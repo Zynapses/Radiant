@@ -5,8 +5,9 @@ node_modules/
 dist/
 .next/
 cdk.out/
-/.build
-/Packages
+.build/
+Packages/
+**/.build/
 
 # Logs
 *.log
