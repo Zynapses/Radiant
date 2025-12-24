@@ -8,16 +8,18 @@
     "functions/*"
   ],
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "pnpm -r build && npm run docs:generate",
     "build:shared": "cd packages/shared && pnpm build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
+    "docs:generate": "node scripts/generate-docs.js",
     "deploy:dev": "cd packages/infrastructure && cdk deploy --all --context environment=dev",
     "deploy:staging": "cd packages/infrastructure && cdk deploy --all --context environment=staging",
     "deploy:prod": "cd packages/infrastructure && cdk deploy --all --context environment=prod --require-approval broadening"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "ts-node": "^10.9.0",
     "typescript": "^5.3.0"
   },
   "engines": {

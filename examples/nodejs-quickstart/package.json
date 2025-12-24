@@ -1,0 +1,15 @@
+{
+  "name": "radiant-nodejs-quickstart",
+  "version": "1.0.0",
+  "description": "Quick start example for RADIANT SDK",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "chat": "node chat.js",
+    "stream": "node streaming.js",
+    "functions": "node function-calling.js"
+  },
+  "dependencies": {
+    "@radiant/sdk": "^4.17.0"
+  }
+}

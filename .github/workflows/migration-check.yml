@@ -1,0 +1,87 @@
+name: Migration Check
+
+on:
+  pull_request:
+    paths:
+      - 'packages/infrastructure/migrations/**'
+
+jobs:
+  validate-migrations:
+    name: Validate Migrations
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: radiant
+          POSTGRES_PASSWORD: radiant_test
+          POSTGRES_DB: radiant_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check migration naming
+        run: |
+          echo "Checking migration file naming conventions..."
+          for file in packages/infrastructure/migrations/*.sql; do
+            filename=$(basename "$file")
+            if ! [[ $filename =~ ^[0-9]{3}_[a-z_]+\.sql$ ]]; then
+              echo "❌ Invalid migration name: $filename"
+              echo "   Expected format: NNN_description.sql (e.g., 001_initial_schema.sql)"
+              exit 1
+            fi
+          done
+          echo "✅ All migration names are valid"
+
+      - name: Check for sequential numbering
+        run: |
+          echo "Checking migration sequence..."
+          expected=1
+          for file in $(ls packages/infrastructure/migrations/*.sql | sort); do
+            filename=$(basename "$file")
+            num=$(echo "$filename" | grep -o '^[0-9]*' | sed 's/^0*//')
+            if [ "$num" != "$expected" ]; then
+              echo "❌ Gap in migration sequence. Expected $expected, got $num"
+              exit 1
+            fi
+            expected=$((expected + 1))
+          done
+          echo "✅ Migration sequence is valid"
+
+      - name: Run migrations on test database
+        run: |
+          echo "Running migrations on test database..."
+          for file in $(ls packages/infrastructure/migrations/*.sql | sort); do
+            echo "  Running: $(basename $file)"
+            PGPASSWORD=radiant_test psql -h localhost -U radiant -d radiant_test -f "$file" -q
+          done
+          echo "✅ All migrations applied successfully"
+
+      - name: Run seed data
+        run: |
+          echo "Running seed data..."
+          for file in packages/infrastructure/migrations/seed/*.sql; do
+            if [ -f "$file" ]; then
+              echo "  Running: $(basename $file)"
+              PGPASSWORD=radiant_test psql -h localhost -U radiant -d radiant_test -f "$file" -q
+            fi
+          done
+          echo "✅ Seed data applied successfully"
+
+      - name: Verify table counts
+        run: |
+          echo "Verifying database structure..."
+          table_count=$(PGPASSWORD=radiant_test psql -h localhost -U radiant -d radiant_test -t -c "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'")
+          echo "Tables created: $table_count"
+          if [ "$table_count" -lt 10 ]; then
+            echo "❌ Expected at least 10 tables"
+            exit 1
+          fi
+          echo "✅ Database structure verified"
