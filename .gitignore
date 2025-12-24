@@ -1,7 +1,30 @@
-.DS_Store
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.next/
+cdk.out/
 /.build
 /Packages
+
+# Logs
+*.log
+
+# Environment
+.env*
+!.env.example
+
+# macOS
+.DS_Store
 xcuserdata/
 DerivedData/
 .swiftpm/
 *.xcodeproj
+
+# IDE
+.idea/
+.vscode/
+
+# Test coverage
+coverage/
