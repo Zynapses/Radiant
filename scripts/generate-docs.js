@@ -1,0 +1,236 @@
+#!/usr/bin/env node
+
+/**
+ * RADIANT Documentation Generator
+ * 
+ * Generates administrator documentation with current version and date.
+ * Run as part of the build process to ensure docs are always up-to-date.
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const RADIANT_VERSION = '4.17.0';
+const DOCS_DIR = path.join(__dirname, '..', 'docs');
+const OUTPUT_DIR = path.join(__dirname, '..', 'dist', 'docs');
+
+const BUILD_DATE = new Date().toISOString().split('T')[0];
+
+const defaultVariables = {
+  '{{BUILD_DATE}}': BUILD_DATE,
+  '{{RADIANT_VERSION}}': RADIANT_VERSION,
+  '{{YEAR}}': new Date().getFullYear().toString(),
+};
+
+const docs = [
+  // Administrator Documentation
+  { source: 'ADMINISTRATOR-GUIDE.md', output: 'admin/ADMINISTRATOR-GUIDE.md' },
+  { source: 'API_REFERENCE.md', output: 'admin/API_REFERENCE.md' },
+  { source: 'DEPLOYMENT-GUIDE.md', output: 'admin/DEPLOYMENT-GUIDE.md' },
+  { source: 'COMPLIANCE.md', output: 'admin/COMPLIANCE.md' },
+  { source: 'DATA_RETENTION.md', output: 'admin/DATA_RETENTION.md' },
+  
+  // System/Infrastructure Documentation
+  { source: 'RADIANT-SYSTEM-GUIDE.md', output: 'system/RADIANT-SYSTEM-GUIDE.md' },
+  { source: 'ARCHITECTURE.md', output: 'system/ARCHITECTURE.md' },
+  { source: 'DISASTER_RECOVERY.md', output: 'system/DISASTER_RECOVERY.md' },
+  { source: 'PERFORMANCE.md', output: 'system/PERFORMANCE.md' },
+  { source: 'COST_OPTIMIZATION.md', output: 'system/COST_OPTIMIZATION.md' },
+  
+  // Consumer/Think Tank Documentation
+  { source: 'THINK-TANK-USER-GUIDE.md', output: 'consumer/THINK-TANK-USER-GUIDE.md' },
+];
+
+function ensureDir(dir) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function processTemplate(content, variables) {
+  let processed = content;
+  
+  for (const [placeholder, value] of Object.entries(variables)) {
+    processed = processed.replace(new RegExp(escapeRegex(placeholder), 'g'), value);
+  }
+  
+  return processed;
+}
+
+function generateDoc(config) {
+  const sourcePath = path.join(DOCS_DIR, config.source);
+  const outputPath = path.join(OUTPUT_DIR, config.output);
+  
+  if (!fs.existsSync(sourcePath)) {
+    console.warn(`⚠️  Source not found: ${config.source}`);
+    return false;
+  }
+  
+  const content = fs.readFileSync(sourcePath, 'utf-8');
+  const processed = processTemplate(content, defaultVariables);
+  
+  ensureDir(path.dirname(outputPath));
+  fs.writeFileSync(outputPath, processed);
+  
+  console.log(`✅ Generated: ${config.output}`);
+  return true;
+}
+
+function generateTableOfContents() {
+  const tocPath = path.join(OUTPUT_DIR, 'INDEX.md');
+  
+  const toc = `# RADIANT v${RADIANT_VERSION} Documentation
+
+> Generated: ${BUILD_DATE}
+
+---
+
+## 📚 Documentation Categories
+
+### 🛡️ Administrator Documentation
+For platform administrators managing tenants, users, and billing.
+
+| Document | Description |
+|----------|-------------|
+| [Administrator Guide](./admin/ADMINISTRATOR-GUIDE.md) | Comprehensive admin documentation |
+| [API Reference](./admin/API_REFERENCE.md) | REST API documentation |
+| [Deployment Guide](./admin/DEPLOYMENT-GUIDE.md) | Deployment instructions |
+| [Compliance](./admin/COMPLIANCE.md) | Security and compliance |
+| [Data Retention](./admin/DATA_RETENTION.md) | Data policies |
+
+### ⚙️ System Documentation
+For DevOps and infrastructure teams managing the deployed RADIANT platform.
+
+| Document | Description |
+|----------|-------------|
+| [System Guide](./system/RADIANT-SYSTEM-GUIDE.md) | Deployed infrastructure guide |
+| [Architecture](./system/ARCHITECTURE.md) | System architecture overview |
+| [Disaster Recovery](./system/DISASTER_RECOVERY.md) | DR procedures |
+| [Performance](./system/PERFORMANCE.md) | Performance tuning |
+| [Cost Optimization](./system/COST_OPTIMIZATION.md) | Cost management |
+
+### 👤 Consumer Documentation (Think Tank)
+For end users of the Think Tank AI platform.
+
+| Document | Description |
+|----------|-------------|
+| [User Guide](./consumer/THINK-TANK-USER-GUIDE.md) | Complete user guide |
+
+### 📋 Runbooks
+Operational procedures for common scenarios.
+
+| Document | Description |
+|----------|-------------|
+| [Incident Response](./runbooks/INCIDENT-RESPONSE.md) | Incident handling |
+| [Scaling](./runbooks/SCALING.md) | Scaling procedures |
+
+---
+
+## 🔗 Quick Links
+
+### For Administrators
+- [Getting Started](./admin/ADMINISTRATOR-GUIDE.md#2-getting-started)
+- [Tenant Management](./admin/ADMINISTRATOR-GUIDE.md#4-tenant-management)
+- [Billing Configuration](./admin/ADMINISTRATOR-GUIDE.md#7-billing--subscriptions)
+- [Troubleshooting](./admin/ADMINISTRATOR-GUIDE.md#10-troubleshooting)
+
+### For DevOps
+- [Infrastructure Overview](./system/RADIANT-SYSTEM-GUIDE.md#2-infrastructure-components)
+- [Database Operations](./system/RADIANT-SYSTEM-GUIDE.md#5-database-operations)
+- [Monitoring](./system/RADIANT-SYSTEM-GUIDE.md#8-monitoring--observability)
+- [Backup & Recovery](./system/RADIANT-SYSTEM-GUIDE.md#10-backup--recovery)
+
+### For Users
+- [Getting Started](./consumer/THINK-TANK-USER-GUIDE.md#1-getting-started)
+- [Choosing Models](./consumer/THINK-TANK-USER-GUIDE.md#4-choosing-models)
+- [Credits & Billing](./consumer/THINK-TANK-USER-GUIDE.md#9-credits--billing)
+- [FAQ](./consumer/THINK-TANK-USER-GUIDE.md#12-faq)
+
+---
+
+## 📊 Version Information
+
+| Component | Version |
+|-----------|---------|
+| RADIANT Platform | ${RADIANT_VERSION} |
+| Documentation Build | ${BUILD_DATE} |
+| Node.js Required | >= 20.0.0 |
+
+---
+
+*This documentation is automatically generated during the RADIANT build process.*
+`;
+
+  fs.writeFileSync(tocPath, toc);
+  console.log('✅ Generated: INDEX.md');
+}
+
+function generateVersionJson() {
+  const versionPath = path.join(OUTPUT_DIR, 'version.json');
+  
+  const version = {
+    version: RADIANT_VERSION,
+    buildDate: BUILD_DATE,
+    buildTimestamp: new Date().toISOString(),
+    docs: docs.map(d => d.output),
+  };
+  
+  fs.writeFileSync(versionPath, JSON.stringify(version, null, 2));
+  console.log('✅ Generated: version.json');
+}
+
+function copyRunbooks() {
+  const runbooksSource = path.join(DOCS_DIR, 'runbooks');
+  const runbooksOutput = path.join(OUTPUT_DIR, 'runbooks');
+  
+  if (!fs.existsSync(runbooksSource)) {
+    console.warn('⚠️  Runbooks directory not found');
+    return;
+  }
+  
+  ensureDir(runbooksOutput);
+  
+  const files = fs.readdirSync(runbooksSource);
+  for (const file of files) {
+    if (file.endsWith('.md')) {
+      const content = fs.readFileSync(path.join(runbooksSource, file), 'utf-8');
+      const processed = processTemplate(content, defaultVariables);
+      fs.writeFileSync(path.join(runbooksOutput, file), processed);
+      console.log(`✅ Copied runbook: ${file}`);
+    }
+  }
+}
+
+function main() {
+  console.log(`\n📚 RADIANT Documentation Generator v${RADIANT_VERSION}\n`);
+  console.log(`Build Date: ${BUILD_DATE}\n`);
+  console.log('─'.repeat(50));
+  
+  ensureDir(OUTPUT_DIR);
+  
+  let generated = 0;
+  
+  // Generate main docs
+  for (const doc of docs) {
+    if (generateDoc(doc)) {
+      generated++;
+    }
+  }
+  
+  // Generate index and version
+  generateTableOfContents();
+  generateVersionJson();
+  
+  // Copy runbooks
+  copyRunbooks();
+  
+  console.log('─'.repeat(50));
+  console.log(`\n✨ Documentation generated: ${generated} files`);
+  console.log(`📁 Output directory: ${OUTPUT_DIR}\n`);
+}
+
+main();

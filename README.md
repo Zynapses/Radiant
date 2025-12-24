@@ -104,9 +104,98 @@ radiant/
 | Phase | Description | Status |
 |-------|-------------|--------|
 | 1 | Foundation (Sections 0-2) | ✅ Complete |
-| 2 | Core Infrastructure (Sections 3-7) | Pending |
-| 3 | Admin & Deployment (Sections 8-9) | Pending |
-| 4-9 | Features & Platform | Pending |
+| 2 | Core Infrastructure (Sections 3-7) | ✅ Complete |
+| 3 | Admin & Deployment (Sections 8-9) | ✅ Complete |
+| 4 | AI Features (Sections 10-17) | ✅ Complete |
+| 5 | Consumer Platform (Sections 18-28) | ✅ Complete |
+| 6 | Advanced Features (Sections 29-35) | ✅ Complete |
+| 7 | Intelligence Layer (Sections 36-39) | ✅ Complete |
+| 8 | Platform Hardening (Sections 40-42) | ✅ Complete |
+| 9 | Billing System (Sections 43-46) | ✅ Complete |
+
+## Admin Dashboard
+
+The admin dashboard provides a complete management interface:
+
+| Page | Description |
+|------|-------------|
+| Dashboard | Overview metrics and activity |
+| Models | AI model configuration |
+| Providers | Provider management and credentials |
+| Orchestration | Neural patterns and workflows |
+| Administrators | User management and invitations |
+| Billing | Credits, subscriptions, transactions |
+| Storage | Storage usage monitoring |
+| Localization | Translation management |
+| Configuration | System settings |
+| Migrations | Database migration approval |
+| Audit Logs | Activity tracking |
+| Notifications | System alerts |
+| Settings | User preferences |
+
+### Running the Dashboard
+
+```bash
+cd apps/admin-dashboard
+pnpm dev
+```
+
+## Database Migrations
+
+36 migrations covering:
+- Core schema (tenants, users, admins)
+- AI models and providers
+- Orchestration patterns and workflows
+- Billing and credits
+- Storage management
+- Localization
+- Configuration management
+
+### Running Migrations
+
+```bash
+cd packages/infrastructure
+pnpm migrate
+```
+
+### Seed Data
+
+Demo data is available for development:
+
+```bash
+psql -d radiant -f migrations/seed/001_demo_data.sql
+```
+
+## Lambda Handlers
+
+| Handler | Purpose |
+|---------|---------|
+| router | Main API router |
+| admin | Admin operations |
+| feedback | Feedback learning |
+| orchestration | Neural orchestration |
+| proposals | Workflow proposals |
+| localization | Translation API |
+| configuration | Config management |
+| billing | Credits and subscriptions |
+| storage | Storage tracking |
+| migration-approval | Dual-admin approval |
+
+## Environment Variables
+
+Copy the template and configure:
+
+```bash
+cp .env.example .env
+```
+
+Required variables:
+- `AWS_REGION` - AWS region
+- `AWS_ACCOUNT_ID` - AWS account ID
+- `DB_CLUSTER_ARN` - Aurora cluster ARN
+- `DB_SECRET_ARN` - Database secret ARN
+- `COGNITO_USER_POOL_ID` - Cognito user pool
+- `COGNITO_CLIENT_ID` - Cognito client ID
 
 ## License
 

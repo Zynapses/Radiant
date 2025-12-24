@@ -1,0 +1,147 @@
+{
+  "folders": [
+    {
+      "name": "Root",
+      "path": "."
+    },
+    {
+      "name": "Infrastructure",
+      "path": "packages/infrastructure"
+    },
+    {
+      "name": "Admin Dashboard",
+      "path": "apps/admin-dashboard"
+    },
+    {
+      "name": "Shared",
+      "path": "packages/shared"
+    }
+  ],
+  "settings": {
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[sql]": {
+      "editor.defaultFormatter": "mtxr.sqltools"
+    },
+    "files.associations": {
+      "*.sql": "sql"
+    },
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.next": true,
+      "**/cdk.out": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.next": true,
+      "**/cdk.out": true,
+      "**/pnpm-lock.yaml": true
+    },
+    "tailwindCSS.experimental.classRegex": [
+      ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+    ],
+    "eslint.workingDirectories": [
+      { "directory": "packages/infrastructure", "changeProcessCWD": true },
+      { "directory": "packages/shared", "changeProcessCWD": true },
+      { "directory": "apps/admin-dashboard", "changeProcessCWD": true }
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "bradlc.vscode-tailwindcss",
+      "mtxr.sqltools",
+      "mtxr.sqltools-driver-pg",
+      "ms-azuretools.vscode-docker",
+      "amazonwebservices.aws-toolkit-vscode",
+      "ms-playwright.playwright"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Next.js: Debug Dashboard",
+        "type": "node",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/apps/admin-dashboard",
+        "runtimeExecutable": "pnpm",
+        "runtimeArgs": ["dev"],
+        "console": "integratedTerminal"
+      },
+      {
+        "name": "Jest: Test Infrastructure",
+        "type": "node",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/packages/infrastructure",
+        "runtimeExecutable": "pnpm",
+        "runtimeArgs": ["test"],
+        "console": "integratedTerminal"
+      }
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Install Dependencies",
+        "type": "shell",
+        "command": "pnpm install",
+        "group": "build"
+      },
+      {
+        "label": "Build All",
+        "type": "shell",
+        "command": "pnpm build",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Start Dashboard",
+        "type": "shell",
+        "command": "pnpm --filter @radiant/admin-dashboard dev",
+        "group": "none"
+      },
+      {
+        "label": "Run Tests",
+        "type": "shell",
+        "command": "pnpm test",
+        "group": "test"
+      },
+      {
+        "label": "Docker Up",
+        "type": "shell",
+        "command": "docker-compose up -d",
+        "group": "none"
+      },
+      {
+        "label": "CDK Synth",
+        "type": "shell",
+        "command": "pnpm --filter @radiant/infrastructure cdk synth",
+        "group": "none"
+      }
+    ]
+  }
+}

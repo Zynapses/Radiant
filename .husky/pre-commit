@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run lint-staged
+pnpm lint-staged
+
+# Check for secrets
+echo "🔍 Checking for secrets..."
+if git diff --cached --name-only | xargs grep -l -E "(AKIA[A-Z0-9]{16}|sk-[a-zA-Z0-9]{48}|password\s*=\s*['\"][^'\"]+['\"])" 2>/dev/null; then
+  echo "❌ Potential secrets detected in staged files!"
+  echo "Please remove secrets before committing."
+  exit 1
+fi
+
+echo "✅ Pre-commit checks passed"
