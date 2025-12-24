@@ -4,9 +4,16 @@ import PackageDescription
 
 let package = Package(
     name: "Radiant",
+    platforms: [
+        .macOS(.v14)
+    ],
     targets: [
         .executableTarget(
-            name: "Radiant"
+            name: "Radiant",
+            path: "Sources/Radiant",
+            resources: [
+                .process("Resources")
+            ]
         ),
     ]
 )
