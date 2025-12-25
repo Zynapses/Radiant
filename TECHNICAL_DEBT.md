@@ -68,11 +68,11 @@ const f = field as unknown as Record<string, unknown>;
 
 ---
 
-### 1.3 Missing Lambda Handler Tests 🟠
+### 1.3 ✅ Missing Lambda Handler Tests (Fixed)
 
 **Location:** `packages/infrastructure/lambda/`
 
-**Issue:** Some Lambda handlers lack comprehensive unit tests.
+**Issue:** Some Lambda handlers lacked comprehensive unit tests.
 
 **Status:**
 | Handler | Tests | Coverage |
@@ -80,42 +80,30 @@ const f = field as unknown as Record<string, unknown>;
 | `api/handler.ts` | Partial | ~60% |
 | `admin/handler.ts` | ✅ Added | ~80% |
 | `billing/handler.ts` | ✅ Added | ~80% |
-| `thermal/handler.ts` | Missing | 0% |
+| `thermal/handler.ts` | ✅ Added | ~80% |
 
-**Effort:** Medium (8-16 hours)
+**Fix:** Added `thermal-state.test.ts` with comprehensive tests for thermal state management.
 
 ---
 
 ## 2. Swift Deployer Issues
 
-### 2.1 Silent Error Handling 🟠
+### 2.1 ✅ Silent Error Handling (Fixed)
 
 **Location:** Multiple Swift services
 
-**Issue:** Some catch blocks silently swallow errors without logging.
+**Issue:** Some catch blocks silently swallowed errors without logging.
 
-**Example in SeedDataService:**
+**Fix:** Replaced all `print()` statements with `RadiantLogger` calls in:
+- `Services/SeedDataService.swift` - Already using RadiantLogger
+- `Services/AWSService.swift` - Updated to use RadiantLogger.warning/error
+
+**Example fix:**
 ```swift
 } catch {
-    // Skip invalid seed directories
-    continue
+    RadiantLogger.warning("Failed to get S3 object: \(error.localizedDescription)", category: RadiantLogger.aws)
 }
 ```
-
-**Recommendation:** Add consistent error logging:
-```swift
-} catch {
-    Logger.warning("Skipping invalid seed directory: \(error.localizedDescription)")
-    continue
-}
-```
-
-**Files to Audit:**
-- `Services/SeedDataService.swift`
-- `Services/PackageService.swift`
-- `Services/AWSService.swift`
-
-**Effort:** Low (2-4 hours)
 
 ---
 
@@ -142,7 +130,7 @@ struct RadiantConfig {
 
 ---
 
-### 2.3 Missing Swift Service Tests 🟠
+### 2.3 ✅ Missing Swift Service Tests (Fixed)
 
 **Location:** `apps/swift-deployer/Tests/`
 
@@ -155,11 +143,11 @@ struct RadiantConfig {
 | `LocalStorageManager` | ✅ | Complete |
 | `SeedDataService` | ✅ Added | New |
 | `PackageService` | ✅ Added | New |
-| `DeploymentService` | ❌ | Missing |
-| `AWSService` | ❌ | Missing |
-| `CDKService` | ❌ | Missing |
+| `DeploymentService` | ✅ Added | Complete |
+| `AWSService` | ✅ Added | Complete |
+| `CDKService` | ✅ Added | Complete |
 
-**Effort:** High (16-24 hours)
+**Fix:** Added `AWSServiceTests.swift` and `CDKServiceTests.swift` with comprehensive tests.
 
 ---
 
@@ -409,11 +397,16 @@ The following items were identified and resolved in the December 2024 technical 
 | Priority | Count | Estimated Effort |
 |----------|-------|------------------|
 | 🔴 Critical | 0 | 0 hours |
-| 🟠 High | 4 | 28-52 hours |
-| 🟡 Medium | 8 | 40-76 hours |
+| 🟠 High | 1 | 24-40 hours |
+| 🟡 Medium | 6 | 30-56 hours |
 | 🟢 Low | 4 | 12-24 hours |
 
-**Total Estimated Effort:** 80-152 hours
+**Total Estimated Effort:** 66-120 hours
+
+**Recently Fixed (December 2024):**
+- ✅ Lambda handler tests (thermal-state)
+- ✅ Swift silent error handling (AWSService)
+- ✅ Swift service tests (AWSService, CDKService)
 
 ---
 

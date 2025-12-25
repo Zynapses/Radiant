@@ -262,7 +262,7 @@ actor AWSService {
                 return outputPipe.fileHandleForReading.readDataToEndOfFile()
             }
         } catch {
-            print("Failed to get S3 object: \(error)")
+            RadiantLogger.warning("Failed to get S3 object \(bucket)/\(key): \(error.localizedDescription)", category: RadiantLogger.aws)
         }
         
         return nil
@@ -290,7 +290,7 @@ actor AWSService {
             
             try? FileManager.default.removeItem(at: tempFile)
         } catch {
-            print("Failed to put S3 object: \(error)")
+            RadiantLogger.warning("Failed to put S3 object \(bucket)/\(key): \(error.localizedDescription)", category: RadiantLogger.aws)
             try? FileManager.default.removeItem(at: tempFile)
         }
     }
@@ -323,7 +323,7 @@ actor AWSService {
                 }
             }
         } catch {
-            print("Failed to list S3 objects: \(error)")
+            RadiantLogger.warning("Failed to list S3 objects in \(bucket)/\(prefix): \(error.localizedDescription)", category: RadiantLogger.aws)
         }
         
         return []
@@ -360,7 +360,7 @@ actor AWSService {
                 }
             }
         } catch {
-            print("Failed to get SSM parameter: \(error)")
+            RadiantLogger.warning("Failed to get SSM parameter \(path): \(error.localizedDescription)", category: RadiantLogger.aws)
         }
         
         return nil
@@ -455,7 +455,7 @@ actor AWSService {
                 }
             }
         } catch {
-            print("Failed to create DB snapshot: \(error)")
+            RadiantLogger.error("Failed to create DB snapshot \(snapshotId): \(error.localizedDescription)", category: RadiantLogger.aws)
         }
         
         return nil
@@ -498,7 +498,7 @@ actor AWSService {
             
             return restoreProcess.terminationStatus == 0
         } catch {
-            print("Failed to restore DB from snapshot: \(error)")
+            RadiantLogger.error("Failed to restore DB from snapshot \(snapshotId): \(error.localizedDescription)", category: RadiantLogger.aws)
             return false
         }
     }
@@ -555,7 +555,7 @@ actor AWSService {
                 }
             }
         } catch {
-            print("Failed to get metric statistics: \(error)")
+            RadiantLogger.warning("Failed to get CloudWatch metric \(namespace)/\(metricName): \(error.localizedDescription)", category: RadiantLogger.aws)
         }
         
         return nil
