@@ -94,25 +94,15 @@ export default function LocalizationPage() {
       await apiClient.post('/localization/register', data);
     },
     onSuccess: () => {
-      console.log('String registered successfully');
       queryClient.invalidateQueries({ queryKey: ['localization'] });
       setShowAddDialog(false);
       setNewString({ key: '', defaultText: '', category: '', context: '' });
-    },
-    onError: () => {
-      console.error('Failed to register string');
     },
   });
 
   const translateWithAI = useMutation({
     mutationFn: async ({ key, targetLanguages }: { key: string; targetLanguages: string[] }) => {
       await apiClient.post('/localization/translate-ai', { key, targetLanguages });
-    },
-    onSuccess: () => {
-      console.log('AI translation queued');
-    },
-    onError: () => {
-      console.error('Failed to queue translation');
     },
   });
 

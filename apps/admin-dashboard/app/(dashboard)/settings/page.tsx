@@ -69,7 +69,6 @@ export default function SettingsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] });
-      console.log('Settings saved');
     },
   });
 
