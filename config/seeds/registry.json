@@ -1,0 +1,65 @@
+{
+  "name": "RADIANT AI Registry Seed Data",
+  "description": "Versioned seed data for AI providers and models",
+  "repository": "https://github.com/Zynapses/Radiant",
+  "lastUpdated": "2024-12-25T00:00:00Z",
+  "versions": [
+    {
+      "version": "1.0.0",
+      "directory": "v1",
+      "releaseDate": "2024-12-25",
+      "status": "stable",
+      "stats": {
+        "externalProviders": 21,
+        "externalModels": 50,
+        "selfHostedModels": 38,
+        "services": 5
+      },
+      "changelog": "Initial seed data release with 21 providers, 50+ external models, 38 self-hosted models",
+      "compatibility": {
+        "minRadiantVersion": "4.16.0",
+        "maxRadiantVersion": "5.0.0"
+      }
+    }
+  ],
+  "categories": {
+    "providers": [
+      "text_generation",
+      "image_generation",
+      "video_generation",
+      "audio_generation",
+      "audio",
+      "embedding",
+      "search",
+      "3d_generation",
+      "self_hosted"
+    ],
+    "models": [
+      "text_generation",
+      "reasoning",
+      "code_generation",
+      "image_generation",
+      "video_generation",
+      "text_to_speech",
+      "speech_to_text",
+      "embedding",
+      "search",
+      "3d_generation"
+    ],
+    "selfHosted": [
+      "vision_classification",
+      "vision_detection",
+      "vision_segmentation",
+      "audio_stt",
+      "scientific",
+      "medical_imaging",
+      "geospatial",
+      "3d_reconstruction",
+      "text_generation"
+    ]
+  },
+  "defaultMarkup": {
+    "external": 1.40,
+    "selfHosted": 1.75
+  }
+}
