@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, withAdminAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
 // GET /api/admin/multi-region/regions - Get all region configurations
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async () => {
   try {
     // In production, this would query the database
     // For now, return mock data
@@ -49,24 +50,19 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(regions);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch regions' }, { status: 500 });
+    return apiError('FETCH_FAILED', 'Failed to fetch regions', 500);
   }
-}
+});
 
-// POST /api/admin/multi-region/regions - Add a new region
-export async function POST(request: NextRequest) {
+// POST /api/admin/multi-region/regions - Add a new region (admin only)
+export const POST = withAdminAuth(async (request: AuthenticatedRequest) => {
   try {
     const body = await request.json();
     
-    // Validate required fields
     if (!body.region || !body.endpoint) {
-      return NextResponse.json(
-        { error: 'Region and endpoint are required' },
-        { status: 400 }
-      );
+      return apiError('VALIDATION_ERROR', 'Region and endpoint are required', 400);
     }
 
-    // In production, this would insert into the database
     const newRegion = {
       id: crypto.randomUUID(),
       region: body.region,
@@ -79,10 +75,11 @@ export async function POST(request: NextRequest) {
       lastDeployedVersion: null,
       lastDeployedAt: null,
       latencyMs: null,
+      createdBy: request.user.email,
     };
 
     return NextResponse.json(newRegion, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create region' }, { status: 500 });
+    return apiError('CREATE_FAILED', 'Failed to create region', 500);
   }
-}
+});

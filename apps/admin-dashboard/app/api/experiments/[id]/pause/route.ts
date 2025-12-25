@@ -1,18 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAdminAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
-// POST /api/experiments/[id]/pause - Pause an experiment
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+// POST /api/experiments/[id]/pause - Pause an experiment (admin only)
+export const POST = withAdminAuth(async (
+  request: AuthenticatedRequest,
+  context?: { params: Record<string, string> }
+) => {
   try {
+    const id = context?.params?.id || '';
     return NextResponse.json({
       success: true,
-      experimentId: params.id,
+      experimentId: id,
       status: 'paused',
+      pausedBy: request.user.email,
       pausedAt: new Date().toISOString(),
     });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to pause experiment' }, { status: 500 });
+    return apiError('PAUSE_FAILED', 'Failed to pause experiment', 500);
   }
-}
+});

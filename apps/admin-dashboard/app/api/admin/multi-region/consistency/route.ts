@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, apiError } from '@/lib/api/auth-wrapper';
 
 // GET /api/admin/multi-region/consistency - Check cross-region consistency
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async () => {
   try {
-    // In production, this would check actual region versions
     const consistency = {
       isConsistent: true,
       primaryVersion: '4.18.0',
@@ -19,12 +19,11 @@ export async function GET(request: NextRequest) {
       ],
     };
 
-    // Check if any drift exists
     const versions = Object.values(consistency.regionVersions);
     consistency.isConsistent = versions.every(v => v === consistency.primaryVersion);
 
     return NextResponse.json(consistency);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to check consistency' }, { status: 500 });
+    return apiError('CHECK_FAILED', 'Failed to check consistency', 500);
   }
-}
+});

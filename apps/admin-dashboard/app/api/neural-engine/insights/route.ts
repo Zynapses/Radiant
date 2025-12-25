@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
 // GET /api/neural-engine/insights - Get cost optimization insights
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || 'active';
 
-    // In production, this would query the database
     const insights = [
       {
         id: '1',
@@ -44,23 +44,22 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(insights);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch insights' }, { status: 500 });
+    return apiError('FETCH_FAILED', 'Failed to fetch insights', 500);
   }
-}
+});
 
 // POST /api/neural-engine/insights - Trigger analysis
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const body = await request.json();
-    const { tenantId } = body;
 
-    // In production, this would trigger the neural engine analysis
     return NextResponse.json({
       message: 'Analysis triggered',
-      tenantId,
+      tenantId: request.user.tenantId,
+      triggeredBy: request.user.email,
       estimatedCompletion: new Date(Date.now() + 60000).toISOString(),
     });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to trigger analysis' }, { status: 500 });
+    return apiError('TRIGGER_FAILED', 'Failed to trigger analysis', 500);
   }
-}
+});

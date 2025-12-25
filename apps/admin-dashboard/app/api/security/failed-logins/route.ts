@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
 // GET /api/security/failed-logins - Get failed login attempts
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const product = searchParams.get('product') || 'combined';
@@ -27,6 +28,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(failedLogins);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch failed logins' }, { status: 500 });
+    return apiError('FETCH_FAILED', 'Failed to fetch failed logins', 500);
   }
-}
+});

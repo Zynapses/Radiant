@@ -1,22 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
 // POST /api/compliance/generate - Generate a new compliance report
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const body = await request.json();
-    const { product, framework } = body;
+    const { framework } = body;
 
-    // In production, this would trigger report generation
     const report = {
       id: crypto.randomUUID(),
-      tenantId: 'tenant-1',
+      tenantId: request.user.tenantId || 'tenant-1',
       reportType: framework || 'soc2',
       status: 'generating',
+      requestedBy: request.user.email,
       estimatedCompletion: new Date(Date.now() + 60000).toISOString(),
     };
 
     return NextResponse.json(report, { status: 202 });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to generate report' }, { status: 500 });
+    return apiError('GENERATE_FAILED', 'Failed to generate report', 500);
   }
-}
+});

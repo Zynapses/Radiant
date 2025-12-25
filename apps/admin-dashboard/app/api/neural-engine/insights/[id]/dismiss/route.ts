@@ -1,23 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
 // POST /api/neural-engine/insights/[id]/dismiss - Dismiss an insight
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export const POST = withAuth(async (
+  request: AuthenticatedRequest,
+  context?: { params: Record<string, string> }
+) => {
   try {
+    const id = context?.params?.id || '';
     const body = await request.json();
-    const { reason, dismissedBy } = body;
+    const { reason } = body;
 
-    // In production, this would update the database
     return NextResponse.json({
       success: true,
-      insightId: params.id,
-      dismissedBy: dismissedBy || 'anonymous',
+      insightId: id,
+      dismissedBy: request.user.email,
       dismissedAt: new Date().toISOString(),
       reason: reason || 'No reason provided',
     });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to dismiss insight' }, { status: 500 });
+    return apiError('DISMISS_FAILED', 'Failed to dismiss insight', 500);
   }
-}
+});
