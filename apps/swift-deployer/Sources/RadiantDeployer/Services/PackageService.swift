@@ -105,6 +105,17 @@ struct PackageManifest: Codable, Sendable {
     let installBehavior: InstallBehavior
     let updateBehavior: UpdateBehavior
     let rollbackBehavior: RollbackBehavior
+    let seedData: SeedDataInfo?
+    
+    /// Seed data information included in the package
+    struct SeedDataInfo: Codable, Sendable {
+        let version: String
+        let hash: String
+        let externalProviders: Int
+        let externalModels: Int
+        let selfHostedModels: Int
+        let services: Int
+    }
     
     struct ComponentVersions: Codable, Sendable {
         let radiantPlatform: ComponentInfo

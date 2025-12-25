@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "name": "RADIANT AI Registry Seed Data",
+  "description": "Complete provider and model seed data for fresh installations",
+  "createdAt": "2024-12-25T00:00:00Z",
+  "updatedAt": "2024-12-25T00:00:00Z",
+  "compatibility": {
+    "minRadiantVersion": "4.16.0",
+    "maxRadiantVersion": "5.0.0"
+  },
+  "files": {
+    "providers": "providers.json",
+    "externalModels": "external-models.json",
+    "selfHostedModels": "self-hosted-models.json",
+    "services": "services.json"
+  },
+  "stats": {
+    "externalProviders": 21,
+    "externalModels": 50,
+    "selfHostedModels": 38,
+    "services": 5
+  },
+  "pricing": {
+    "externalMarkup": 1.40,
+    "selfHostedMarkup": 1.75
+  },
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2024-12-25",
+      "changes": [
+        "Initial seed data release",
+        "21 external providers with 50+ models",
+        "38 self-hosted models for SageMaker",
+        "5 mid-level orchestration services"
+      ]
+    }
+  ]
+}

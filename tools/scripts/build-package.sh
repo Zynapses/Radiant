@@ -3,9 +3,75 @@ set -e
 
 # RADIANT Package Builder
 # Builds unified deployment package with atomic component versioning
+# 
+# Usage:
+#   ./build-package.sh                    # Use default seed data (latest)
+#   ./build-package.sh --seed-version 1   # Use specific seed data version
+#   ./build-package.sh --list-seeds       # List available seed data versions
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+SEEDS_DIR="$ROOT_DIR/config/seeds"
+
+# Parse arguments
+SEED_VERSION=""
+LIST_SEEDS=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --seed-version)
+            SEED_VERSION="$2"
+            shift 2
+            ;;
+        --list-seeds)
+            LIST_SEEDS=true
+            shift
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
+# List available seed versions
+if [ "$LIST_SEEDS" = true ]; then
+    echo "📦 Available Seed Data Versions:"
+    for dir in "$SEEDS_DIR"/v*/; do
+        if [ -f "$dir/manifest.json" ]; then
+            version=$(cat "$dir/manifest.json" | grep -o '"version": "[^"]*"' | cut -d'"' -f4)
+            providers=$(cat "$dir/manifest.json" | grep -o '"externalProviders": [0-9]*' | cut -d' ' -f2)
+            models=$(cat "$dir/manifest.json" | grep -o '"externalModels": [0-9]*' | cut -d' ' -f2)
+            selfhosted=$(cat "$dir/manifest.json" | grep -o '"selfHostedModels": [0-9]*' | cut -d' ' -f2)
+            echo "   v$version - $providers providers, $models external models, $selfhosted self-hosted models"
+        fi
+    done
+    exit 0
+fi
+
+# Auto-detect latest seed version if not specified
+if [ -z "$SEED_VERSION" ]; then
+    SEED_VERSION=$(ls -1 "$SEEDS_DIR" 2>/dev/null | grep -E '^v[0-9]+' | sort -V | tail -1 | sed 's/^v//')
+    if [ -z "$SEED_VERSION" ]; then
+        SEED_VERSION="1"
+    fi
+fi
+
+SEED_DIR="$SEEDS_DIR/v$SEED_VERSION"
+if [ ! -d "$SEED_DIR" ]; then
+    echo "❌ Seed data version $SEED_VERSION not found at $SEED_DIR"
+    exit 1
+fi
+
+# Read seed manifest
+SEED_MANIFEST="$SEED_DIR/manifest.json"
+SEED_DATA_VERSION=$(cat "$SEED_MANIFEST" | grep -o '"version": "[^"]*"' | head -1 | cut -d'"' -f4)
+SEED_PROVIDERS=$(cat "$SEED_MANIFEST" | grep -o '"externalProviders": [0-9]*' | cut -d' ' -f2)
+SEED_MODELS=$(cat "$SEED_MANIFEST" | grep -o '"externalModels": [0-9]*' | cut -d' ' -f2)
+SEED_SELFHOSTED=$(cat "$SEED_MANIFEST" | grep -o '"selfHostedModels": [0-9]*' | cut -d' ' -f2)
+SEED_SERVICES=$(cat "$SEED_MANIFEST" | grep -o '"services": [0-9]*' | cut -d' ' -f2)
+
+# Calculate seed data hash
+SEED_HASH=$(find "$SEED_DIR" -type f -exec sha256sum {} \; 2>/dev/null | sha256sum | cut -d' ' -f1 || echo "unknown")
 
 # Read versions
 PACKAGE_VERSION=$(cat "$ROOT_DIR/VERSION" | tr -d '\n')
@@ -23,6 +89,12 @@ echo "   Package Version: $PACKAGE_VERSION"
 echo "   Radiant Version: $RADIANT_VERSION"
 echo "   Think Tank Version: $THINKTANK_VERSION"
 echo "   Build Number: $BUILD_NUMBER"
+echo ""
+echo "🌱 Seed Data: v$SEED_DATA_VERSION"
+echo "   Providers: $SEED_PROVIDERS external"
+echo "   Models: $SEED_MODELS external, $SEED_SELFHOSTED self-hosted"
+echo "   Services: $SEED_SERVICES"
+echo "   Hash: ${SEED_HASH:0:16}..."
 echo ""
 
 # Create output directory
@@ -89,6 +161,11 @@ fi
 # Copy shared
 echo "   Copying shared..."
 cp -r "$ROOT_DIR/packages/shared/src" "$PACKAGE_DIR/shared/" 2>/dev/null || true
+
+# Copy seed data
+echo "   Copying seed data v$SEED_DATA_VERSION..."
+mkdir -p "$PACKAGE_DIR/seeds"
+cp -r "$SEED_DIR"/* "$PACKAGE_DIR/seeds/"
 
 # Create component manifests
 echo "   Creating component manifests..."
@@ -158,13 +235,13 @@ THINKTANK_HASH=$(find "$PACKAGE_DIR/thinktank" -type f -exec sha256sum {} \; 2>/
 
 cat > "$PACKAGE_DIR/manifest.json" << EOF
 {
-  "schemaVersion": "2.0",
+  "schemaVersion": "2.1",
   "package": {
     "version": "$PACKAGE_VERSION",
     "buildNumber": "$BUILD_NUMBER",
     "buildTimestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
     "builder": "radiant-package-builder",
-    "builderVersion": "1.0.0"
+    "builderVersion": "1.1.0"
   },
   "components": {
     "radiant": {
@@ -179,6 +256,14 @@ cat > "$PACKAGE_DIR/manifest.json" << EOF
       "lastModifiedVersion": "$THINKTANK_VERSION",
       "checksumHash": "sha256:$THINKTANK_HASH"
     }
+  },
+  "seedData": {
+    "version": "$SEED_DATA_VERSION",
+    "hash": "$SEED_HASH",
+    "externalProviders": $SEED_PROVIDERS,
+    "externalModels": $SEED_MODELS,
+    "selfHostedModels": $SEED_SELFHOSTED,
+    "services": $SEED_SERVICES
   },
   "compatibility": {
     "minUpgradeFromVersion": "4.16.0",
@@ -196,9 +281,21 @@ cat > "$PACKAGE_DIR/manifest.json" << EOF
   "rollback": {
     "supportedRollbackVersions": ["4.17.0"]
   },
+  "installBehavior": {
+    "seedAIRegistry": true,
+    "createInitialAdmin": true,
+    "runFullMigrations": true
+  },
+  "updateBehavior": {
+    "seedAIRegistry": false,
+    "preserveAdminCustomizations": true,
+    "runIncrementalMigrations": true,
+    "createPreUpdateSnapshot": true
+  },
   "releaseNotes": {
     "highlights": [
       "Unified Package System with atomic component versioning",
+      "AI Registry Seed Data v$SEED_DATA_VERSION with $SEED_PROVIDERS providers",
       "Cost Management with Neural Engine recommendations",
       "Compliance Reports (SOC2, HIPAA, GDPR, ISO27001)",
       "Security & Intrusion Detection Dashboard",

@@ -1,0 +1,69 @@
+{
+  "version": "1.0.0",
+  "services": [
+    {
+      "id": "perception",
+      "displayName": "Perception Service",
+      "description": "Unified computer vision pipeline",
+      "requiredModels": ["yolov8m", "mobilesam"],
+      "optionalModels": ["yolov8x", "sam2", "clip-vit-l14", "grounding-dino"],
+      "endpoints": [
+        { "path": "/perception/detect", "description": "Object detection" },
+        { "path": "/perception/segment", "description": "Image segmentation" },
+        { "path": "/perception/classify", "description": "Image classification" },
+        { "path": "/perception/analyze", "description": "Full pipeline" }
+      ],
+      "pricing": { "perImage": 0.02, "perMinuteVideo": 0.50, "markup": 1.40 },
+      "minTier": 3
+    },
+    {
+      "id": "scientific",
+      "displayName": "Scientific Computing Service",
+      "description": "Protein analysis and math reasoning",
+      "requiredModels": ["esm2-3b"],
+      "optionalModels": ["alphafold2"],
+      "endpoints": [
+        { "path": "/scientific/protein/embed", "description": "Protein embeddings" },
+        { "path": "/scientific/protein/fold", "description": "Protein structure" }
+      ],
+      "pricing": { "perSequence": 0.05, "perProtein": 2.00, "markup": 1.40 },
+      "minTier": 4
+    },
+    {
+      "id": "medical",
+      "displayName": "Medical Imaging Service",
+      "description": "HIPAA-compliant medical image analysis",
+      "requiredModels": ["nnunet"],
+      "optionalModels": ["medsam"],
+      "endpoints": [
+        { "path": "/medical/segment", "description": "Medical segmentation" }
+      ],
+      "pricing": { "perImage": 0.10, "markup": 1.40 },
+      "minTier": 4
+    },
+    {
+      "id": "geospatial",
+      "displayName": "Geospatial Analysis Service",
+      "description": "Satellite imagery and earth observation",
+      "requiredModels": ["prithvi-100m"],
+      "optionalModels": [],
+      "endpoints": [
+        { "path": "/geospatial/classify", "description": "Land classification" }
+      ],
+      "pricing": { "perImage": 0.05, "markup": 1.40 },
+      "minTier": 4
+    },
+    {
+      "id": "reconstruction",
+      "displayName": "3D Reconstruction Service",
+      "description": "3D model generation from images/video",
+      "requiredModels": ["nerfstudio"],
+      "optionalModels": [],
+      "endpoints": [
+        { "path": "/reconstruction/nerf", "description": "NeRF reconstruction" }
+      ],
+      "pricing": { "per3DModel": 1.00, "markup": 1.40 },
+      "minTier": 4
+    }
+  ]
+}
