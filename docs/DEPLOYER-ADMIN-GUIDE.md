@@ -81,6 +81,50 @@ RADIANT Deployer is a native macOS application that provides a complete deployme
 | **Offline Mode** | Core functionality works without internet |
 | **Audit Logging** | Complete deployment history tracking |
 
+#### Deployment Wizard Explained
+
+The Deployment Wizard breaks down the complex AWS infrastructure deployment into manageable steps. Instead of manually running CDK commands and configuring services, the wizard:
+
+1. **Validates Prerequisites**: Checks that all required software (Node.js, AWS CLI, CDK) is installed and properly configured before starting
+2. **Guides Configuration**: Walks you through selecting environment (dev/staging/prod), tier (1-5), and region settings with explanations for each option
+3. **Shows Progress**: Displays real-time progress as each CloudFormation stack deploys, with estimated time remaining
+4. **Handles Errors**: If any step fails, provides clear error messages and suggested remediation steps
+
+#### Lock-Step Mode Explained
+
+Lock-Step Mode prevents version mismatches between RADIANT components that could cause compatibility issues:
+
+- **What it does**: Ensures the Admin Dashboard, Lambda functions, and database schema are all on compatible versions
+- **Why it matters**: A v4.18 Lambda function might expect database columns that don't exist in a v4.17 schema, causing runtime errors
+- **How it works**: Before deployment, the system checks version numbers across all components and blocks deployment if drift exceeds the configured maximum (default: 1 minor version)
+- **When to disable**: Only disable during development when testing individual component changes
+
+#### Automatic Rollback Explained
+
+Automatic Rollback protects your production environment by reverting failed deployments:
+
+- **Trigger conditions**: Activates when any deployment phase fails (CDK deploy error, health check failure, migration error)
+- **Rollback process**: Restores the pre-deployment snapshot, which includes database state, Lambda code, and configuration
+- **Recovery time**: Typically 5-10 minutes depending on the size of changes being reverted
+- **Notification**: Sends alerts via configured channels (email, Slack) when rollback occurs
+
+#### Offline Mode Explained
+
+Offline Mode allows essential operations when internet connectivity is unavailable:
+
+- **Available offline**: Viewing deployment history, browsing local snapshots, reviewing configuration, accessing cached documentation
+- **Requires internet**: Deploying to AWS, health checks, AI assistant queries, credential validation
+- **Data sync**: When connectivity returns, local changes sync automatically with the cloud state
+
+#### Audit Logging Explained
+
+Every action in the Deployer is logged for compliance and troubleshooting:
+
+- **What's logged**: User identity, timestamp, action type, parameters, outcome, duration
+- **Storage**: Logs stored locally in SQLCipher database and optionally synced to CloudWatch
+- **Retention**: Local logs kept for 90 days by default (configurable)
+- **Export**: Logs can be exported to CSV/JSON for compliance audits
+
 ---
 
 ## 2. System Requirements
@@ -95,24 +139,80 @@ RADIANT Deployer is a native macOS application that provides a complete deployme
 | **Storage** | 2 GB free | 10 GB free |
 | **Display** | 1280x800 | 1440x900+ |
 
+#### Why These Requirements?
+
+**macOS 13.0+**: Required for Swift 5.9 runtime and modern SwiftUI features. Older versions lack required system APIs for secure keychain access and modern networking.
+
+**Apple Silicon Recommended**: While Intel Macs are supported, Apple Silicon provides 2-3x faster CDK synthesis and compilation times. The app is built as a universal binary supporting both architectures.
+
+**8 GB RAM Minimum**: CDK synthesis loads the entire infrastructure definition into memory. Complex deployments (Tier 3+) with many resources may require more memory. With 8 GB, you may experience slowdowns during synthesis.
+
+**16 GB RAM Recommended**: Allows comfortable multitasking while deployments run in the background. Essential if you're also running Docker, IDEs, or other development tools.
+
+**2 GB Storage Minimum**: Covers the application itself (~200 MB), local database (~50 MB), and several snapshots. However, snapshots can grow large over time.
+
+**10 GB Storage Recommended**: Provides room for multiple deployment snapshots, comprehensive logs, and CDK cache. Each full snapshot can be 100-500 MB depending on your deployment size.
+
 ### 2.2 Software Requirements
 
-| Software | Version | Purpose |
-|----------|---------|---------|
-| **Xcode** | 15.0+ | Swift runtime (Command Line Tools sufficient) |
-| **AWS CLI** | 2.x | AWS operations |
-| **Node.js** | 20.x LTS | CDK operations |
-| **AWS CDK** | 2.120+ | Infrastructure deployment |
-| **pnpm** | 8.x+ | Package management |
+| Software | Version | Purpose | Installation |
+|----------|---------|---------|--------------|
+| **Xcode** | 15.0+ | Swift runtime (Command Line Tools sufficient) | `xcode-select --install` |
+| **AWS CLI** | 2.x | AWS operations | `brew install awscli` |
+| **Node.js** | 20.x LTS | CDK operations | `brew install node@20` |
+| **AWS CDK** | 2.120+ | Infrastructure deployment | `npm install -g aws-cdk` |
+| **pnpm** | 8.x+ | Package management | `npm install -g pnpm` |
+
+#### Software Explained
+
+**Xcode Command Line Tools**: Provides the Swift runtime and compiler. You don't need the full Xcode IDE - just the command line tools (4 GB vs 12 GB download). The Deployer uses Swift for its native performance and seamless macOS integration.
+
+**AWS CLI v2**: The official AWS command-line interface. Used internally by the Deployer to execute AWS operations, assume IAM roles, and query service status. Version 2 is required for SSO support and improved credential handling.
+
+**Node.js 20 LTS**: Required to run the AWS CDK, which is written in TypeScript. LTS (Long Term Support) versions receive security updates for 30 months. The Deployer manages Node.js processes internally during CDK operations.
+
+**AWS CDK 2.120+**: The Cloud Development Kit that defines RADIANT's infrastructure as TypeScript code. Version 2.120+ includes critical bug fixes for Aurora PostgreSQL and Lambda layer handling. The CDK synthesizes your infrastructure into CloudFormation templates.
+
+**pnpm 8.x**: A fast, disk-efficient package manager used to install CDK dependencies. Chosen over npm for its superior handling of monorepo workspaces and 2-3x faster installation times.
 
 ### 2.3 AWS Requirements
 
-| Requirement | Details |
-|-------------|---------|
-| **AWS Account** | Active account with billing enabled |
-| **IAM User** | AdministratorAccess or equivalent |
-| **Regions** | Access to us-east-1 (required) + additional regions |
-| **Service Quotas** | Default quotas sufficient for Tier 1-2 |
+| Requirement | Details | How to Verify |
+|-------------|---------|---------------|
+| **AWS Account** | Active account with billing enabled | Check AWS Console billing page |
+| **IAM User** | AdministratorAccess or equivalent | `aws sts get-caller-identity` |
+| **Regions** | Access to us-east-1 (required) + additional regions | `aws ec2 describe-regions` |
+| **Service Quotas** | Default quotas sufficient for Tier 1-2 | AWS Service Quotas console |
+
+#### AWS Requirements Explained
+
+**Active AWS Account with Billing**: RADIANT deploys real AWS resources that incur costs. Billing must be enabled and a valid payment method on file. New accounts have a $5 pending charge verification. Free tier covers some resources for 12 months but won't cover all RADIANT components.
+
+**IAM User with AdministratorAccess**: The Deployer needs broad permissions to create and manage resources across many AWS services. For production, you can use a scoped-down policy (see Appendix A), but AdministratorAccess is recommended for initial setup to avoid permission errors.
+
+**Required Permissions Include**:
+- CloudFormation (stack operations)
+- Lambda (function management)
+- API Gateway (REST API setup)
+- RDS/Aurora (database provisioning)
+- Cognito (user pool management)
+- S3 (storage buckets)
+- IAM (role creation)
+- SSM (parameter storage)
+- Secrets Manager (credential storage)
+- CloudWatch (logging and monitoring)
+
+**us-east-1 Required**: This region is required even if you deploy to other regions because:
+- ACM certificates for CloudFront must be in us-east-1
+- Some global services (IAM, Route 53) operate from us-east-1
+- CDK bootstrap resources are region-specific
+
+**Service Quotas**: Default AWS quotas are sufficient for Tier 1-2 deployments. Tier 3+ may require quota increases for:
+- Lambda concurrent executions (default: 1,000)
+- RDS instances (default: 40)
+- VPC Elastic IPs (default: 5)
+
+To request quota increases: AWS Console > Service Quotas > Select service > Request increase
 
 ---
 
@@ -201,6 +301,40 @@ Configure your deployment environment:
 | **Tier** | Infrastructure tier (1-5) | `1` |
 | **Domain** | Your domain name | Required for Tier 2+ |
 | **Stack Prefix** | CDK stack name prefix | `radiant` |
+
+#### Environment Types Explained
+
+**Development (dev)**: For active development and testing. Features relaxed security settings, smaller instance sizes, and no deletion protection. Data can be reset freely. Cost: ~$50-150/month for Tier 1.
+
+**Staging (staging)**: Pre-production environment that mirrors production configuration. Use this to test deployments before going live. Same security as production but can use smaller instances. Cost: ~60% of production.
+
+**Production (prod)**: Live environment serving real users. Includes deletion protection, multi-AZ deployments, automated backups, and enhanced monitoring. Never deploy untested changes directly to production.
+
+#### Infrastructure Tiers Explained
+
+| Tier | Name | Monthly Cost | Use Case | Resources |
+|------|------|--------------|----------|------------|
+| **1** | SEED | $50-150 | Development, POC | Single-AZ, t3.small instances, 20GB storage |
+| **2** | STARTUP | $200-400 | Small production | Multi-AZ database, WAF, basic monitoring |
+| **3** | GROWTH | $1,000-2,500 | Medium production | Self-hosted models, HIPAA compliance, enhanced security |
+| **4** | SCALE | $4,000-8,000 | Large production | Multi-region, global database, dedicated instances |
+| **5** | ENTERPRISE | $15,000-35,000 | Enterprise | Custom SLAs, dedicated support, on-premise options |
+
+**Choosing the Right Tier**: Start with Tier 1 for development. Move to Tier 2 when you have paying customers. Tier 3+ is for organizations with compliance requirements or high traffic.
+
+#### Domain Configuration
+
+For Tier 2+, you need a custom domain:
+
+1. **Register a domain** in Route 53 or transfer an existing domain
+2. **Create a hosted zone** in Route 53 for your domain
+3. **Request an ACM certificate** in us-east-1 for `*.yourdomain.com`
+4. **Validate the certificate** via DNS (automatic if using Route 53)
+
+The Deployer will configure:
+- `api.yourdomain.com` - API Gateway endpoint
+- `admin.yourdomain.com` - Admin Dashboard
+- `app.yourdomain.com` - Think Tank application
 
 ### 4.4 AI Assistant Setup (Optional)
 
@@ -313,6 +447,85 @@ The main dashboard shows:
 | **5. Migration** | ~2m | Run database migrations |
 | **6. Health Check** | ~1m | Verify all services |
 | **7. Cleanup** | ~30s | Remove temporary resources |
+
+#### Phase Details
+
+**Phase 1 - Validation (30 seconds)**
+
+Before any changes are made, the system validates:
+- AWS credentials are valid and not expired
+- IAM permissions are sufficient for all required operations
+- Target environment exists or can be created
+- No conflicting deployments are in progress (deployment lock check)
+- Required software versions are installed (Node.js, CDK, etc.)
+- Network connectivity to AWS services
+
+If validation fails, you'll see specific error messages explaining what needs to be fixed.
+
+**Phase 2 - Snapshot (1 minute)**
+
+A pre-deployment snapshot captures the current state so you can rollback if needed:
+- Database schema and critical data (not full data backup)
+- Current Lambda function code versions
+- SSM Parameter Store values
+- Current CloudFormation stack states
+- Configuration files
+
+Snapshots are stored locally and can be managed in the Snapshots tab.
+
+**Phase 3 - CDK Synth (1 minute)**
+
+The CDK synthesizes TypeScript infrastructure code into CloudFormation templates:
+- Reads infrastructure definitions from `packages/infrastructure/`
+- Resolves all construct dependencies
+- Generates CloudFormation JSON/YAML templates
+- Calculates resource changes (what will be created/updated/deleted)
+- Validates templates against AWS CloudFormation rules
+
+You can review the generated templates before proceeding.
+
+**Phase 4 - CDK Deploy (10-20 minutes)**
+
+The actual AWS resource deployment happens in this phase:
+- CloudFormation stacks are created or updated in dependency order
+- Resources are provisioned (databases, Lambda functions, API Gateway, etc.)
+- IAM roles and policies are configured
+- Networking (VPC, subnets, security groups) is set up
+- DNS records are created/updated
+
+This is the longest phase. Progress shows which stack is currently deploying.
+
+**Phase 5 - Migration (2 minutes)**
+
+Database migrations ensure your schema matches the deployed code:
+- Connects to Aurora PostgreSQL using Data API
+- Runs pending migration files in sequence
+- Creates new tables, columns, indexes as needed
+- Updates RLS (Row-Level Security) policies
+- Verifies migration success with integrity checks
+
+Migrations are idempotent - running them twice won't cause issues.
+
+**Phase 6 - Health Check (1 minute)**
+
+Verifies all deployed services are functioning:
+- API Gateway responds to health endpoint
+- Lambda functions can be invoked
+- Database connections succeed
+- Cognito user pools are accessible
+- S3 buckets are reachable
+- CloudFront distributions are deployed
+
+If health checks fail, automatic rollback is triggered (if enabled).
+
+**Phase 7 - Cleanup (30 seconds)**
+
+Final cleanup tasks:
+- Removes temporary files created during deployment
+- Clears CDK staging buckets of old assets
+- Updates deployment history in local database
+- Releases deployment lock
+- Sends completion notification
 
 ### 6.4 Deployment Progress
 
