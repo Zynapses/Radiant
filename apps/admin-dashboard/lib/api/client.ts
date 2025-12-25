@@ -69,7 +69,12 @@ class ApiClient {
     path: string,
     params?: Record<string, string | number | boolean | undefined>
   ): string {
-    const url = new URL(path, this.baseUrl || 'http://localhost:3000');
+    if (!this.baseUrl) {
+      throw new Error(
+        'API base URL not configured. Set NEXT_PUBLIC_API_URL environment variable.'
+      );
+    }
+    const url = new URL(path, this.baseUrl);
     
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
