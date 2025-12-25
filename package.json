@@ -10,7 +10,10 @@
   "scripts": {
     "build": "pnpm -r build && npm run docs:generate",
     "build:shared": "cd packages/shared && pnpm build",
-    "test": "pnpm -r test",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
     "lint": "pnpm -r lint",
     "docs:generate": "node scripts/generate-docs.js",
     "deploy:dev": "cd packages/infrastructure && cdk deploy --all --context environment=dev",
@@ -20,10 +23,13 @@
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "@vitest/coverage-v8": "^1.2.0",
+    "@vitest/ui": "^1.2.0",
     "husky": "^8.0.0",
     "lint-staged": "^15.0.0",
     "ts-node": "^10.9.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
