@@ -1,0 +1,38 @@
+---
+# Pandoc PDF generation metadata
+title-meta: "RADIANT Documentation"
+author-meta: "RADIANT Team"
+documentclass: report
+papersize: letter
+geometry:
+  - margin=1in
+  - top=1.25in
+  - bottom=1.25in
+fontsize: 11pt
+linestretch: 1.15
+toc: true
+toc-depth: 3
+numbersections: true
+colorlinks: true
+linkcolor: "blue"
+urlcolor: "blue"
+toccolor: "black"
+header-includes:
+  - \usepackage{fancyhdr}
+  - \usepackage{graphicx}
+  - \usepackage{xcolor}
+  - \usepackage{titlesec}
+  - \usepackage{tocloft}
+  - \definecolor{radiantblue}{RGB}{37, 99, 235}
+  - \definecolor{radiantgray}{RGB}{107, 114, 128}
+  - \pagestyle{fancy}
+  - \fancyhf{}
+  - \fancyhead[L]{\leftmark}
+  - \fancyhead[R]{\thepage}
+  - \fancyfoot[C]{\textcolor{radiantgray}{\small RADIANT v4.18.1 Documentation}}
+  - \renewcommand{\headrulewidth}{0.4pt}
+  - \renewcommand{\footrulewidth}{0.4pt}
+  - \titleformat{\chapter}[display]{\normalfont\huge\bfseries\color{radiantblue}}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+  - \titleformat{\section}{\normalfont\Large\bfseries\color{radiantblue}}{\thesection}{1em}{}
+  - \titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+...
