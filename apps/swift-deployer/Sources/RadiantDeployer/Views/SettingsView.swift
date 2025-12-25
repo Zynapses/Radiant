@@ -1000,16 +1000,20 @@ struct QATestingView: View {
             // Tab selector
             HStack(spacing: 0) {
                 QATabButton(title: "Integration Tests", icon: "checkmark.seal", index: 0, selectedTab: $selectedQATab)
-                QATabButton(title: "SQL Editor", icon: "tablecells", index: 1, selectedTab: $selectedQATab)
+                QATabButton(title: "Unit Tests", icon: "testtube.2", index: 1, selectedTab: $selectedQATab)
+                QATabButton(title: "SQL Editor", icon: "tablecells", index: 2, selectedTab: $selectedQATab)
             }
             .background(Color(.textBackgroundColor).opacity(0.5))
             
             Divider()
             
             // Content
-            if selectedQATab == 0 {
+            switch selectedQATab {
+            case 0:
                 IntegrationTestsView()
-            } else {
+            case 1:
+                UnitTestsView()
+            default:
                 SQLEditorView()
             }
         }
@@ -1234,6 +1238,246 @@ struct IntegrationTestsView: View {
             if let data = try? encoder.encode(testResults) {
                 try? data.write(to: url)
             }
+        }
+    }
+}
+
+// MARK: - Unit Tests View
+
+struct UnitTestsView: View {
+    @State private var isRunning = false
+    @State private var testOutput = ""
+    @State private var testsPassed = 0
+    @State private var testsFailed = 0
+    @State private var lastRunDate: Date?
+    @State private var selectedSuite: UnitTestSuite = .all
+    
+    enum UnitTestSuite: String, CaseIterable {
+        case all = "All Tests"
+        case adminDashboard = "Admin Dashboard"
+        case infrastructure = "Infrastructure"
+        case shared = "Shared Package"
+    }
+    
+    var body: some View {
+        HSplitView {
+            // Test Suite Selection
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Text("Unit Test Suites")
+                        .font(.headline)
+                    Spacer()
+                }
+                .padding()
+                
+                Divider()
+                
+                List(UnitTestSuite.allCases, id: \.self, selection: $selectedSuite) { suite in
+                    HStack {
+                        Image(systemName: suiteIcon(for: suite))
+                            .foregroundStyle(.blue)
+                        VStack(alignment: .leading) {
+                            Text(suite.rawValue)
+                                .font(.subheadline)
+                            Text(suiteDescription(for: suite))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .tag(suite)
+                    .padding(.vertical, 4)
+                }
+                .listStyle(.sidebar)
+                
+                Divider()
+                
+                VStack(spacing: 12) {
+                    if isRunning {
+                        ProgressView("Running unit tests...")
+                            .controlSize(.small)
+                    }
+                    
+                    Button("Run Tests") {
+                        runUnitTests()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(isRunning)
+                    
+                    if let lastRun = lastRunDate {
+                        Text("Last run: \(lastRun.formatted())")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding()
+            }
+            .frame(minWidth: 250)
+            
+            // Results Panel
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Text("Test Output")
+                        .font(.headline)
+                    Spacer()
+                    if testsPassed > 0 || testsFailed > 0 {
+                        HStack(spacing: 8) {
+                            Label("\(testsPassed)", systemImage: "checkmark.circle.fill")
+                                .foregroundStyle(.green)
+                            Label("\(testsFailed)", systemImage: "xmark.circle.fill")
+                                .foregroundStyle(.red)
+                        }
+                        .font(.caption)
+                    }
+                }
+                .padding()
+                
+                Divider()
+                
+                if testOutput.isEmpty && !isRunning {
+                    VStack {
+                        Spacer()
+                        Image(systemName: "testtube.2")
+                            .font(.system(size: 48))
+                            .foregroundStyle(.secondary)
+                        Text("No Test Results")
+                            .font(.headline)
+                        Text("Select a test suite and click Run Tests.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ScrollView {
+                        Text(testOutput)
+                            .font(.system(.caption, design: .monospaced))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
+                            .padding()
+                    }
+                }
+                
+                Divider()
+                
+                HStack {
+                    Button("Copy Output") {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(testOutput, forType: .string)
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(testOutput.isEmpty)
+                    
+                    Button("Clear") {
+                        testOutput = ""
+                        testsPassed = 0
+                        testsFailed = 0
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(testOutput.isEmpty)
+                }
+                .padding()
+            }
+            .frame(minWidth: 400)
+        }
+    }
+    
+    private func suiteIcon(for suite: UnitTestSuite) -> String {
+        switch suite {
+        case .all: return "square.stack.3d.up"
+        case .adminDashboard: return "macwindow"
+        case .infrastructure: return "server.rack"
+        case .shared: return "shippingbox"
+        }
+    }
+    
+    private func suiteDescription(for suite: UnitTestSuite) -> String {
+        switch suite {
+        case .all: return "Run all unit tests across packages"
+        case .adminDashboard: return "API client, auth wrapper, middleware tests"
+        case .infrastructure: return "CDK stack and Lambda tests"
+        case .shared: return "Shared types and utilities tests"
+        }
+    }
+    
+    private func runUnitTests() {
+        isRunning = true
+        testOutput = "Starting unit tests for \(selectedSuite.rawValue)...\n\n"
+        testsPassed = 0
+        testsFailed = 0
+        
+        Task {
+            let projectRoot = FileManager.default.currentDirectoryPath
+                .replacingOccurrences(of: "/apps/swift-deployer", with: "")
+            
+            let (command, workingDir) = testCommand(for: selectedSuite, projectRoot: projectRoot)
+            
+            await MainActor.run {
+                testOutput += "$ \(command)\n\n"
+            }
+            
+            let process = Process()
+            let pipe = Pipe()
+            let errorPipe = Pipe()
+            
+            process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+            process.arguments = ["-c", command]
+            process.currentDirectoryURL = URL(fileURLWithPath: workingDir)
+            process.standardOutput = pipe
+            process.standardError = errorPipe
+            
+            do {
+                try process.run()
+                process.waitUntilExit()
+                
+                let outputData = pipe.fileHandleForReading.readDataToEndOfFile()
+                let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+                let output = String(data: outputData, encoding: .utf8) ?? ""
+                let errorOutput = String(data: errorData, encoding: .utf8) ?? ""
+                
+                await MainActor.run {
+                    testOutput += output
+                    if !errorOutput.isEmpty {
+                        testOutput += "\n--- STDERR ---\n\(errorOutput)"
+                    }
+                    
+                    // Parse test results from vitest output
+                    parseTestResults(from: output)
+                    
+                    testOutput += "\n\n✅ Passed: \(testsPassed)  ❌ Failed: \(testsFailed)"
+                    lastRunDate = Date()
+                    isRunning = false
+                }
+            } catch {
+                await MainActor.run {
+                    testOutput += "\n❌ Error: \(error.localizedDescription)"
+                    isRunning = false
+                }
+            }
+        }
+    }
+    
+    private func testCommand(for suite: UnitTestSuite, projectRoot: String) -> (command: String, workingDir: String) {
+        switch suite {
+        case .all:
+            return ("npm run test 2>&1", projectRoot)
+        case .adminDashboard:
+            return ("npm run test 2>&1", "\(projectRoot)/apps/admin-dashboard")
+        case .infrastructure:
+            return ("npm run test 2>&1", "\(projectRoot)/packages/infrastructure")
+        case .shared:
+            return ("npm run test 2>&1", "\(projectRoot)/packages/shared")
+        }
+    }
+    
+    private func parseTestResults(from output: String) {
+        // Parse vitest output format: "Tests  X passed (X)"
+        if let passedMatch = output.range(of: #"(\d+) passed"#, options: .regularExpression) {
+            let passedStr = output[passedMatch].replacingOccurrences(of: " passed", with: "")
+            testsPassed = Int(passedStr) ?? 0
+        }
+        if let failedMatch = output.range(of: #"(\d+) failed"#, options: .regularExpression) {
+            let failedStr = output[failedMatch].replacingOccurrences(of: " failed", with: "")
+            testsFailed = Int(failedStr) ?? 0
         }
     }
 }
