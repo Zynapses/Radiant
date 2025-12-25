@@ -3,7 +3,7 @@
  * Handles authentication, error handling, and request/response transformation
  */
 
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { getTokens } from '@/lib/auth/cognito-client';
 
 // ============================================================================
 // TYPES
@@ -58,8 +58,8 @@ class ApiClient {
 
   private async getAuthToken(): Promise<string | null> {
     try {
-      const session = await fetchAuthSession();
-      return session.tokens?.accessToken?.toString() || null;
+      const tokens = await getTokens();
+      return tokens?.accessToken || null;
     } catch {
       return null;
     }

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
-import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
 import { Providers } from './providers';
 import './globals.css';
@@ -43,17 +42,10 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Providers>
-            {children}
-            <Toaster position="bottom-right" richColors />
-          </Providers>
-        </ThemeProvider>
+        <Providers>
+          {children}
+          <Toaster position="bottom-right" richColors />
+        </Providers>
       </body>
     </html>
   );
