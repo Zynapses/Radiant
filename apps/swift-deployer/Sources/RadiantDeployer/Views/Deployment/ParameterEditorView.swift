@@ -414,7 +414,16 @@ class ParameterEditorViewModel: ObservableObject {
         error = nil
         
         do {
-            let credentials = try await CredentialService().getCredentials(for: app.id)
+            // Load credentials from credential service
+            let credentialService = CredentialService()
+            let allCredentials = try await credentialService.loadCredentials()
+            
+            // Find credentials for this app (use first available for now)
+            guard let credentials = allCredentials.first else {
+                self.error = "No AWS credentials configured"
+                return
+            }
+            
             let fetched = try await deploymentService.fetchCurrentParameters(
                 app: app,
                 environment: environment,
