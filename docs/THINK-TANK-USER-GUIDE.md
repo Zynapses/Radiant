@@ -2,8 +2,8 @@
 
 > **Your gateway to 100+ AI models in one place**
 > 
-> Version: {{RADIANT_VERSION}}
-> Last Updated: {{BUILD_DATE}}
+> Version: 3.2.0 (Platform: RADIANT 4.18.1)
+> Last Updated: December 2024
 
 ---
 
@@ -654,10 +654,12 @@ A: Click **Help** → **Report Issue** or email support@thinktank.ai.
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 4.17.0 | {{BUILD_DATE}} | Initial user guide |
+| 3.2.0 | December 2024 | Time Machine, enhanced collaboration, A/B experiments |
+| 3.1.0 | November 2024 | Canvas improvements, new models |
+| 3.0.0 | October 2024 | Initial release |
 
 ---
 
 *Thank you for using Think Tank! We're constantly improving based on your feedback.*
 
-© {{YEAR}} Think Tank AI. All rights reserved.
+© 2024 Think Tank AI. All rights reserved.
