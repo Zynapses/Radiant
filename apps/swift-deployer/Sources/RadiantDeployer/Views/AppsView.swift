@@ -44,7 +44,7 @@ struct AppCard: View {
                 
                 Spacer()
                 
-                StatusBadge(status: status)
+                StatusBadge(status: status.deployed ? "Deployed" : "Not Deployed", color: status.deployed ? .green : .gray)
             }
             
             if let description = app.description {
@@ -87,7 +87,7 @@ struct AppCard: View {
     }
 }
 
-struct StatusBadge: View {
+struct EnvironmentStatusBadge: View {
     let status: EnvironmentStatus
     
     var body: some View {

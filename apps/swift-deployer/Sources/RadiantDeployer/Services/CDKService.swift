@@ -122,12 +122,13 @@ actor CDKService {
         process.standardOutput = outputPipe
         process.standardError = errorPipe
         
-        var output = ""
+        // Use actor-isolated storage to avoid sendable closure capture warning
+        let outputData = OutputAccumulator()
         
         outputPipe.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
             if let str = String(data: data, encoding: .utf8), !str.isEmpty {
-                output += str
+                outputData.append(str)
                 progressHandler?(str)
             }
         }
@@ -137,6 +138,30 @@ actor CDKService {
         
         outputPipe.fileHandleForReading.readabilityHandler = nil
         
-        return output
+        return outputData.value
     }
+}
+
+// Thread-safe output accumulator to avoid Sendable closure capture issues
+private final class OutputAccumulator: @unchecked Sendable {
+    private var _value: String = ""
+    private let lock = NSLock()
+    
+    var value: String {
+        lock.lock()
+        defer { lock.unlock() }
+        return _value
+    }
+    
+    func append(_ str: String) {
+        lock.lock()
+        defer { lock.unlock() }
+        _value += str
+    }
+}
+
+// MARK: - Singleton
+
+extension CDKService {
+    static let shared = CDKService()
 }

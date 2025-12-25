@@ -71,7 +71,7 @@ export default function BillingPage() {
     queryKey: ['billing', 'tiers'],
     queryFn: async () => {
       const res = await apiClient.get<{ tiers: SubscriptionTier[] }>('/billing/tiers');
-      return res.data.tiers;
+      return res.tiers;
     },
   });
 
@@ -79,15 +79,14 @@ export default function BillingPage() {
     queryKey: ['billing', 'subscription'],
     queryFn: async () => {
       const res = await apiClient.get<{ subscription: Subscription | null }>('/billing/subscription');
-      return res.data.subscription;
+      return res.subscription;
     },
   });
 
   const { data: credits } = useQuery<CreditBalance>({
     queryKey: ['billing', 'credits'],
     queryFn: async () => {
-      const res = await apiClient.get<CreditBalance>('/billing/credits');
-      return res.data;
+      return apiClient.get<CreditBalance>('/billing/credits');
     },
   });
 
@@ -95,7 +94,7 @@ export default function BillingPage() {
     queryKey: ['billing', 'transactions'],
     queryFn: async () => {
       const res = await apiClient.get<{ transactions: Transaction[] }>('/billing/transactions');
-      return res.data.transactions;
+      return res.transactions;
     },
   });
 

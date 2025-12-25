@@ -70,15 +70,14 @@ export default function LocalizationPage() {
     queryKey: ['localization', 'languages'],
     queryFn: async () => {
       const res = await apiClient.get<{ languages: Language[] }>('/localization/languages');
-      return res.data.languages;
+      return res.languages;
     },
   });
 
   const { data: stats } = useQuery<TranslationStats>({
     queryKey: ['localization', 'stats'],
     queryFn: async () => {
-      const res = await apiClient.get<TranslationStats>('/localization/stats');
-      return res.data;
+      return apiClient.get<TranslationStats>('/localization/stats');
     },
   });
 
@@ -86,7 +85,7 @@ export default function LocalizationPage() {
     queryKey: ['localization', 'bundle', selectedLanguage],
     queryFn: async () => {
       const res = await apiClient.get<{ bundle: Record<string, string> }>(`/localization/bundle?language=${selectedLanguage}`);
-      return res.data.bundle;
+      return res.bundle;
     },
   });
 

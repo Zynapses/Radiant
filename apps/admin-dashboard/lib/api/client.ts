@@ -1,214 +1,167 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+/**
+ * Type-safe API client for RADIANT Admin Dashboard
+ * Handles authentication, error handling, and request/response transformation
+ */
 
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  meta?: {
-    pagination?: {
-      page: number;
-      limit: number;
-      total: number;
-      hasMore: boolean;
-    };
-  };
-}
+import { fetchAuthSession } from 'aws-amplify/auth';
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 export interface ApiError {
-  success: false;
-  error: {
-    code: string;
-    message: string;
-    details?: unknown;
+  code: string;
+  message: string;
+  details?: Record<string, unknown>;
+  requestId?: string;
+}
+
+export interface ApiResponse<T> {
+  data: T;
+  meta?: {
+    page?: number;
+    pageSize?: number;
+    total?: number;
+    hasMore?: boolean;
   };
 }
+
+export interface PaginationParams {
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+
+interface RequestOptions {
+  method?: HttpMethod;
+  body?: unknown;
+  params?: Record<string, string | number | boolean | undefined>;
+  headers?: Record<string, string>;
+  skipAuth?: boolean;
+}
+
+// ============================================================================
+// API CLIENT
+// ============================================================================
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 class ApiClient {
   private baseUrl: string;
 
-  constructor(baseUrl: string = API_BASE_URL) {
+  constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
+  private async getAuthToken(): Promise<string | null> {
+    try {
+      const session = await fetchAuthSession();
+      return session.tokens?.accessToken?.toString() || null;
+    } catch {
+      return null;
+    }
+  }
+
+  private buildUrl(
+    path: string,
+    params?: Record<string, string | number | boolean | undefined>
+  ): string {
+    const url = new URL(path, this.baseUrl || 'http://localhost:3000');
     
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          url.searchParams.append(key, String(value));
+        }
+      });
+    }
+    
+    return url.toString();
+  }
+
+  async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+    const {
+      method = 'GET',
+      body,
+      params,
+      headers = {},
+      skipAuth = false,
+    } = options;
+
+    const url = this.buildUrl(path, params);
+    
+    const requestHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...headers,
+    };
+
+    if (!skipAuth) {
+      const token = await this.getAuthToken();
+      if (token) {
+        requestHeaders['Authorization'] = `Bearer ${token}`;
+      }
+    }
+
+    const requestInit: RequestInit = {
+      method,
+      headers: requestHeaders,
       credentials: 'include',
-    });
+    };
+
+    if (body && method !== 'GET') {
+      requestInit.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(url, requestInit);
+
+    const contentType = response.headers.get('content-type');
+    if (!contentType?.includes('application/json')) {
+      if (!response.ok) {
+        throw {
+          code: 'NETWORK_ERROR',
+          message: `Request failed with status ${response.status}`,
+          requestId: response.headers.get('x-request-id') || undefined,
+        } as ApiError;
+      }
+      return {} as T;
+    }
 
     const data = await response.json();
 
     if (!response.ok) {
-      const error = data as ApiError;
-      throw new Error(error.error?.message || 'An error occurred');
+      throw {
+        code: data.error?.code || 'UNKNOWN_ERROR',
+        message: data.error?.message || 'An unknown error occurred',
+        details: data.error?.details,
+        requestId: response.headers.get('x-request-id') || data.requestId,
+      } as ApiError;
     }
 
     return data;
   }
 
-  async get<T>(endpoint: string): Promise<ApiResponse<T>> {
-    return this.request<ApiResponse<T>>(endpoint, { method: 'GET' });
+  get<T>(path: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
+    return this.request<T>(path, { method: 'GET', params });
   }
 
-  async post<T>(endpoint: string, body?: unknown): Promise<ApiResponse<T>> {
-    return this.request<ApiResponse<T>>(endpoint, {
-      method: 'POST',
-      body: body ? JSON.stringify(body) : undefined,
-    });
+  post<T>(path: string, body?: unknown): Promise<T> {
+    return this.request<T>(path, { method: 'POST', body });
   }
 
-  async put<T>(endpoint: string, body?: unknown): Promise<ApiResponse<T>> {
-    return this.request<ApiResponse<T>>(endpoint, {
-      method: 'PUT',
-      body: body ? JSON.stringify(body) : undefined,
-    });
+  put<T>(path: string, body?: unknown): Promise<T> {
+    return this.request<T>(path, { method: 'PUT', body });
   }
 
-  async patch<T>(endpoint: string, body?: unknown): Promise<ApiResponse<T>> {
-    return this.request<ApiResponse<T>>(endpoint, {
-      method: 'PATCH',
-      body: body ? JSON.stringify(body) : undefined,
-    });
+  patch<T>(path: string, body?: unknown): Promise<T> {
+    return this.request<T>(path, { method: 'PATCH', body });
   }
 
-  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
-    return this.request<ApiResponse<T>>(endpoint, { method: 'DELETE' });
+  delete<T>(path: string): Promise<T> {
+    return this.request<T>(path, { method: 'DELETE' });
   }
 }
 
-export const apiClient = new ApiClient();
-
-export const api = {
-  dashboard: {
-    getStats: () => apiClient.get<DashboardStats>('/admin/dashboard'),
-  },
-  models: {
-    list: () => apiClient.get<Model[]>('/admin/models'),
-    get: (id: string) => apiClient.get<Model>(`/admin/models/${id}`),
-    update: (id: string, data: Partial<Model>) => apiClient.put<Model>(`/admin/models/${id}`, data),
-  },
-  providers: {
-    list: () => apiClient.get<Provider[]>('/admin/providers'),
-    get: (id: string) => apiClient.get<Provider>(`/admin/providers/${id}`),
-    update: (id: string, data: Partial<Provider>) => apiClient.put<Provider>(`/admin/providers/${id}`, data),
-  },
-  administrators: {
-    list: () => apiClient.get<Administrator[]>('/admin/administrators'),
-    get: (id: string) => apiClient.get<Administrator>(`/admin/administrators/${id}`),
-    invite: (data: InviteData) => apiClient.post<Invitation>('/admin/invitations', data),
-  },
-  approvals: {
-    list: () => apiClient.get<ApprovalRequest[]>('/admin/approvals'),
-    approve: (id: string) => apiClient.post<ApprovalRequest>(`/admin/approvals/${id}/approve`),
-    reject: (id: string) => apiClient.post<ApprovalRequest>(`/admin/approvals/${id}/reject`),
-  },
-  billing: {
-    getUsage: (params?: UsageParams) => apiClient.get<UsageData>(`/admin/billing/usage${params ? `?${new URLSearchParams(params as Record<string, string>)}` : ''}`),
-    getInvoices: () => apiClient.get<Invoice[]>('/admin/billing/invoices'),
-  },
-  auditLogs: {
-    list: (params?: AuditParams) => apiClient.get<AuditLog[]>(`/admin/audit-logs${params ? `?${new URLSearchParams(params as Record<string, string>)}` : ''}`),
-  },
-};
-
-// Types
-interface DashboardStats {
-  totalRequests: number;
-  totalTokens: number;
-  revenue: number;
-  activeUsers: number;
-  activeModels: number;
-  activeProviders: number;
-}
-
-interface Model {
-  id: string;
-  name: string;
-  displayName: string;
-  category: string;
-  status: string;
-  inputCostPer1k: number;
-  outputCostPer1k: number;
-}
-
-interface Provider {
-  id: string;
-  name: string;
-  displayName: string;
-  type: string;
-  status: string;
-  healthStatus: string;
-}
-
-interface Administrator {
-  id: string;
-  email: string;
-  displayName: string;
-  role: string;
-  mfaEnabled: boolean;
-  lastLoginAt?: string;
-}
-
-interface Invitation {
-  id: string;
-  email: string;
-  role: string;
-  expiresAt: string;
-}
-
-interface InviteData {
-  email: string;
-  role: string;
-}
-
-interface ApprovalRequest {
-  id: string;
-  actionType: string;
-  resourceType: string;
-  status: string;
-  requesterEmail: string;
-  createdAt: string;
-}
-
-interface UsageData {
-  totalRequests: number;
-  totalTokens: number;
-  totalCost: number;
-  byModel: { modelId: string; count: number; tokens: number; cost: number }[];
-}
-
-interface UsageParams {
-  startDate?: string;
-  endDate?: string;
-  tenantId?: string;
-}
-
-interface Invoice {
-  id: string;
-  periodStart: string;
-  periodEnd: string;
-  totalAmount: number;
-  status: string;
-}
-
-interface AuditLog {
-  id: string;
-  actorId: string;
-  action: string;
-  resourceType: string;
-  createdAt: string;
-}
-
-interface AuditParams {
-  startDate?: string;
-  endDate?: string;
-  action?: string;
-}
+export const api = new ApiClient(API_BASE_URL);

@@ -1,76 +1,180 @@
+// RADIANT v4.18.0 - Credential Service
+// Uses 1Password for compliance-certified credential storage (SOC2, HIPAA)
+
 import Foundation
-import Security
 
 actor CredentialService {
-    private let keychainService = "com.radiant.deployer.credentials"
     
-    enum CredentialError: Error {
-        case saveFailed
-        case loadFailed
-        case deleteFailed
-        case encodingFailed
-        case decodingFailed
-    }
+    // MARK: - Types
     
-    func loadCredentials() async throws -> [CredentialSet] {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychainService,
-            kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitAll
-        ]
+    enum CredentialError: Error, LocalizedError {
+        case onePasswordNotInstalled
+        case onePasswordNotSignedIn
+        case saveFailed(String)
+        case loadFailed(String)
+        case deleteFailed(String)
+        case validationFailed(String)
         
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-        
-        guard status == errSecSuccess, let items = result as? [Data] else {
-            if status == errSecItemNotFound {
-                return []
+        var errorDescription: String? {
+            switch self {
+            case .onePasswordNotInstalled:
+                return "1Password CLI is required. Please install from https://1password.com/downloads/command-line/"
+            case .onePasswordNotSignedIn:
+                return "Please sign in to 1Password. Run 'op signin' in Terminal."
+            case .saveFailed(let msg):
+                return "Failed to save credential: \(msg)"
+            case .loadFailed(let msg):
+                return "Failed to load credentials: \(msg)"
+            case .deleteFailed(let msg):
+                return "Failed to delete credential: \(msg)"
+            case .validationFailed(let msg):
+                return "Credential validation failed: \(msg)"
             }
-            throw CredentialError.loadFailed
         }
-        
-        let decoder = JSONDecoder()
-        return items.compactMap { try? decoder.decode(CredentialSet.self, from: $0) }
     }
     
+    struct OnePasswordStatus: Sendable {
+        let installed: Bool
+        let signedIn: Bool
+        let vaultExists: Bool
+    }
+    
+    // MARK: - Properties
+    
+    private let onePassword: OnePasswordService
+    private let auditLogger: AuditLogger
+    
+    // MARK: - Initialization
+    
+    init() {
+        self.onePassword = OnePasswordService()
+        self.auditLogger = AuditLogger.shared
+    }
+    
+    // MARK: - Status Check
+    
+    /// Check 1Password status (installed, signed in, vault exists)
+    func checkOnePasswordStatus() async -> OnePasswordStatus {
+        do {
+            let (installed, signedIn) = try await onePassword.checkStatus()
+            
+            var vaultExists = false
+            if signedIn {
+                let credentials = try? await onePassword.listCredentials()
+                vaultExists = credentials != nil
+            }
+            
+            return OnePasswordStatus(
+                installed: installed,
+                signedIn: signedIn,
+                vaultExists: vaultExists
+            )
+        } catch {
+            return OnePasswordStatus(installed: false, signedIn: false, vaultExists: false)
+        }
+    }
+    
+    // MARK: - Credential Operations
+    
+    /// Load all credentials from 1Password
+    func loadCredentials() async throws -> [CredentialSet] {
+        let status = await checkOnePasswordStatus()
+        guard status.installed else { throw CredentialError.onePasswordNotInstalled }
+        guard status.signedIn else { throw CredentialError.onePasswordNotSignedIn }
+        
+        do {
+            let opCredentials = try await onePassword.listCredentials()
+            
+            return opCredentials.map { cred in
+                CredentialSet(
+                    id: cred.id,
+                    name: cred.name,
+                    accessKeyId: cred.accessKeyId,
+                    secretAccessKey: cred.secretAccessKey,
+                    region: cred.region,
+                    accountId: cred.accountId,
+                    environment: .shared,
+                    createdAt: cred.createdAt,
+                    lastValidatedAt: cred.lastUsedAt,
+                    isValid: nil
+                )
+            }
+        } catch {
+            throw CredentialError.loadFailed(error.localizedDescription)
+        }
+    }
+    
+    /// Save a new credential to 1Password
     func saveCredential(_ credential: CredentialSet) async throws {
-        let encoder = JSONEncoder()
-        guard let data = try? encoder.encode(credential) else {
-            throw CredentialError.encodingFailed
-        }
+        let status = await checkOnePasswordStatus()
+        guard status.installed else { throw CredentialError.onePasswordNotInstalled }
+        guard status.signedIn else { throw CredentialError.onePasswordNotSignedIn }
         
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychainService,
-            kSecAttrAccount as String: credential.id,
-            kSecValueData as String: data,
-            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        ]
-        
-        SecItemDelete(query as CFDictionary)
-        
-        let status = SecItemAdd(query as CFDictionary, nil)
-        guard status == errSecSuccess else {
-            throw CredentialError.saveFailed
+        do {
+            _ = try await onePassword.saveCredential(
+                name: credential.name,
+                accessKeyId: credential.accessKeyId,
+                secretAccessKey: credential.secretAccessKey,
+                region: credential.region,
+                accountId: credential.accountId
+            )
+        } catch {
+            throw CredentialError.saveFailed(error.localizedDescription)
         }
     }
     
+    /// Delete a credential from 1Password
     func deleteCredential(_ id: String) async throws {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychainService,
-            kSecAttrAccount as String: id
-        ]
+        let status = await checkOnePasswordStatus()
+        guard status.installed else { throw CredentialError.onePasswordNotInstalled }
+        guard status.signedIn else { throw CredentialError.onePasswordNotSignedIn }
         
-        let status = SecItemDelete(query as CFDictionary)
-        guard status == errSecSuccess || status == errSecItemNotFound else {
-            throw CredentialError.deleteFailed
+        do {
+            try await onePassword.deleteCredential(id: id)
+        } catch {
+            throw CredentialError.deleteFailed(error.localizedDescription)
         }
     }
     
+    /// Validate credentials by calling AWS STS
     func validateCredentials(_ credential: CredentialSet) async throws -> Bool {
-        // TODO: Implement AWS STS GetCallerIdentity call
-        return true
+        let opCredential = OnePasswordService.AWSCredential(
+            id: credential.id,
+            name: credential.name,
+            accessKeyId: credential.accessKeyId,
+            secretAccessKey: credential.secretAccessKey,
+            region: credential.region,
+            accountId: credential.accountId,
+            createdAt: credential.createdAt,
+            lastUsedAt: credential.lastValidatedAt
+        )
+        
+        return try await onePassword.validateCredential(opCredential)
+    }
+    
+    /// Get a single credential by ID
+    func getCredential(id: String) async throws -> CredentialSet {
+        let status = await checkOnePasswordStatus()
+        guard status.installed else { throw CredentialError.onePasswordNotInstalled }
+        guard status.signedIn else { throw CredentialError.onePasswordNotSignedIn }
+        
+        do {
+            let cred = try await onePassword.getCredential(id: id)
+            
+            return CredentialSet(
+                id: cred.id,
+                name: cred.name,
+                accessKeyId: cred.accessKeyId,
+                secretAccessKey: cred.secretAccessKey,
+                region: cred.region,
+                accountId: cred.accountId,
+                environment: .shared,
+                createdAt: cred.createdAt,
+                lastValidatedAt: cred.lastUsedAt,
+                isValid: nil
+            )
+        } catch {
+            throw CredentialError.loadFailed(error.localizedDescription)
+        }
     }
 }

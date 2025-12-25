@@ -1,8 +1,6 @@
 'use client';
 
-import { useAuth } from '@/lib/auth/hooks';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useRequireAuth } from '@/lib/auth/hooks';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { Loader2 } from 'lucide-react';
@@ -12,33 +10,26 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.push('/login');
-    }
-  }, [user, isLoading, router]);
+  const { isLoading, isAuthenticated } = useRequireAuth();
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-radiant-500" />
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
-  if (!user) {
+  if (!isAuthenticated) {
     return null;
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <div className="flex-1 flex flex-col">
+      <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6">
+        <main className="flex-1 overflow-y-auto bg-muted/30 p-6">
           {children}
         </main>
       </div>

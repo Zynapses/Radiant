@@ -122,6 +122,14 @@ PR titles should follow commit message format.
 - Extract auth context with `extractAuthContext`
 - Return proper HTTP status codes
 - Log errors but don't expose internals
+- Use standardized error codes from `@radiant/shared/errors`
+
+```typescript
+import { ErrorCodes, RadiantError } from '@radiant/shared';
+
+// Throw standardized errors
+throw new RadiantError(ErrorCodes.RESOURCE_NOT_FOUND, 'User not found');
+```
 
 ## Testing
 
@@ -138,6 +146,21 @@ pnpm test:coverage
 pnpm test -- services.test.ts
 ```
 
+### Lambda Handler Tests
+
+Tests are located in `__tests__/` directories within each handler:
+
+```bash
+cd packages/infrastructure
+
+# Run all Lambda tests
+pnpm test
+
+# Run specific handler tests
+pnpm test -- admin
+pnpm test -- billing
+```
+
 ### E2E Tests
 
 ```bash
@@ -150,12 +173,25 @@ pnpm test:e2e
 pnpm test:e2e:ui
 ```
 
+### Swift Tests
+
+```bash
+cd apps/swift-deployer
+
+# Run all Swift tests
+swift test
+
+# Run specific test class
+swift test --filter LocalStorageManagerTests
+```
+
 ### Test Guidelines
 
 - Test business logic, not implementation details
 - Use descriptive test names
 - Mock external dependencies
 - Aim for >80% coverage on new code
+- Use the test utilities in `@radiant/shared/testing`
 
 ## Database Migrations
 
@@ -175,12 +211,32 @@ pnpm test:e2e:ui
 - Must include RLS policies for tenant isolation
 - Must be tested locally before PR
 
+## Error Handling
+
+Use standardized error codes from `packages/shared/src/errors/`:
+
+```typescript
+import { ErrorCodes, RadiantError, createNotFoundError } from '@radiant/shared';
+
+// Using factory functions
+throw createNotFoundError('Tenant', tenantId);
+
+// Direct construction
+throw new RadiantError(ErrorCodes.VALIDATION_REQUIRED_FIELD, 'Email is required', {
+  details: { field: 'email' },
+});
+```
+
+See [Error Codes Reference](docs/ERROR_CODES.md) for the full list.
+
 ## Documentation
 
 - Update README.md for user-facing changes
 - Update OpenAPI spec for API changes
 - Add JSDoc comments for public functions
 - Update CHANGELOG.md
+- Update docs/ERROR_CODES.md for new error codes
+- Update docs/TESTING.md for new test patterns
 
 ## Releasing
 

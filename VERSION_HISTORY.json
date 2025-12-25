@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "1.0",
+  "releases": [
+    {
+      "packageVersion": "4.18.0",
+      "radiantVersion": "4.18.0",
+      "thinktankVersion": "3.2.0",
+      "releaseDate": "2024-12-24T00:00:00Z",
+      "releaseType": "minor",
+      "changes": {
+        "radiant": {
+          "touched": true,
+          "features": [
+            "Unified Package System with atomic component versioning",
+            "Cost Management with Neural Engine recommendations",
+            "Compliance Reports (SOC2, HIPAA, GDPR, ISO27001)",
+            "Security & Intrusion Detection Dashboard",
+            "A/B Testing Framework with statistical analysis",
+            "Deployment Settings with SSM sync",
+            "Configurable Operation Timeouts"
+          ],
+          "checksumHash": "sha256:pending"
+        },
+        "thinktank": {
+          "touched": false,
+          "copiedFromVersion": "4.17.0",
+          "checksumHash": "sha256:pending"
+        }
+      },
+      "compatibility": {
+        "minUpgradeFromVersion": "4.16.0",
+        "lockStepRequired": false
+      }
+    },
+    {
+      "packageVersion": "4.17.0",
+      "radiantVersion": "4.17.0",
+      "thinktankVersion": "3.2.0",
+      "releaseDate": "2024-12-01T00:00:00Z",
+      "releaseType": "minor",
+      "changes": {
+        "radiant": {
+          "touched": true,
+          "features": [
+            "Initial PROMPT-32 implementation",
+            "Swift Deployer App foundation",
+            "CDK Infrastructure stacks",
+            "Admin Dashboard foundation"
+          ],
+          "checksumHash": "sha256:base"
+        },
+        "thinktank": {
+          "touched": true,
+          "features": [
+            "Think Tank platform foundation"
+          ],
+          "checksumHash": "sha256:base"
+        }
+      },
+      "compatibility": {
+        "minUpgradeFromVersion": "4.15.0",
+        "lockStepRequired": false
+      }
+    }
+  ],
+  "rollbackChain": {
+    "4.18.0": ["4.17.0"],
+    "4.17.0": ["4.16.0"]
+  }
+}

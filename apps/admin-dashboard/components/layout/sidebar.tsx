@@ -21,22 +21,69 @@ import {
   GitPullRequest,
   Brain,
   Zap,
+  BarChart3,
+  DollarSign,
+  MessageSquare,
+  Layers,
+  Grid,
+  UserCircle,
+  History,
+  Beaker,
+  ShieldCheck,
+  Workflow,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
-const navigation = [
+interface NavItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  type?: 'link';
+}
+
+interface NavSeparator {
+  type: 'separator';
+  label: string;
+}
+
+type NavigationItem = NavItem | NavSeparator;
+
+const navigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  
+  // AI & Models Section
+  { type: 'separator', label: 'AI & Models' },
   { name: 'Models', href: '/models', icon: Cpu },
+  { name: 'Model Pricing', href: '/models/pricing', icon: DollarSign },
   { name: 'Providers', href: '/providers', icon: Globe },
   { name: 'Orchestration', href: '/orchestration', icon: Brain },
-  { name: 'Administrators', href: '/administrators', icon: Users },
+  { name: 'Workflows', href: '/orchestration/workflows', icon: Workflow },
+  
+  // Think Tank Section
+  { type: 'separator', label: 'Think Tank' },
+  { name: 'Think Tank Users', href: '/thinktank/users', icon: UserCircle },
+  { name: 'Conversations', href: '/thinktank/conversations', icon: MessageSquare },
+  { name: 'Domain Modes', href: '/thinktank/domain-modes', icon: Layers },
+  { name: 'Model Categories', href: '/thinktank/model-categories', icon: Grid },
+  
+  // Operations Section
+  { type: 'separator', label: 'Operations' },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Time Machine', href: '/time-machine', icon: History },
+  { name: 'Experiments', href: '/experiments', icon: Beaker },
+  { name: 'Security', href: '/security', icon: Shield },
+  { name: 'Compliance', href: '/compliance', icon: ShieldCheck },
   { name: 'Billing', href: '/billing', icon: CreditCard },
   { name: 'Storage', href: '/storage', icon: HardDrive },
+  { name: 'Administrators', href: '/administrators', icon: Users },
+  { name: 'Audit Logs', href: '/audit-logs', icon: FileText },
+  
+  // Settings Section
+  { type: 'separator', label: 'Settings' },
   { name: 'Localization', href: '/localization', icon: Languages },
   { name: 'Configuration', href: '/configuration', icon: Sliders },
   { name: 'Migrations', href: '/migrations', icon: GitPullRequest },
-  { name: 'Audit Logs', href: '/audit-logs', icon: FileText },
   { name: 'Notifications', href: '/notifications', icon: Bell },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
@@ -64,15 +111,28 @@ export function Sidebar() {
         )}
       </div>
 
-      <nav className="flex-1 space-y-1 p-2">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href || 
-            (item.href !== '/' && pathname.startsWith(item.href));
+      <nav className="flex-1 space-y-1 p-2 overflow-y-auto">
+        {navigation.map((item, index) => {
+          if (item.type === 'separator') {
+            if (collapsed) return null;
+            return (
+              <div
+                key={`sep-${item.label}`}
+                className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-4 first:mt-0"
+              >
+                {item.label}
+              </div>
+            );
+          }
+
+          const navItem = item as NavItem;
+          const isActive = pathname === navItem.href || 
+            (navItem.href !== '/' && pathname.startsWith(navItem.href));
           
           return (
             <Link
-              key={item.name}
-              href={item.href}
+              key={navItem.name}
+              href={navItem.href}
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                 isActive
@@ -80,8 +140,8 @@ export function Sidebar() {
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               )}
             >
-              <item.icon className="h-5 w-5 flex-shrink-0" />
-              {!collapsed && <span>{item.name}</span>}
+              <navItem.icon className="h-5 w-5 flex-shrink-0" />
+              {!collapsed && <span>{navItem.name}</span>}
             </Link>
           );
         })}

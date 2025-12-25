@@ -1,15 +1,48 @@
-# RADIANT v4.17.0
+# RADIANT v4.18.0
 
 A **multi-tenant AWS SaaS platform** for AI model access and orchestration.
 
 ## Overview
 
-RADIANT consists of two main components:
+RADIANT consists of three components:
 
 | Component | Location | Purpose |
 |-----------|----------|---------|
-| **Swift Deployer App** | `apps/swift-deployer/` | macOS app for deploying infrastructure |
-| **AWS Infrastructure** | `packages/infrastructure/` | CDK stacks, Lambdas, databases |
+| **Swift Deployer App** | `apps/swift-deployer/` | macOS app for deploying AWS infrastructure |
+| **AWS Infrastructure** | `packages/infrastructure/` | CDK stacks, Lambdas, databases (deployed to AWS) |
+| **Admin Dashboard** | `apps/admin-dashboard/` | Next.js web admin interface (deployed to AWS) |
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Your Mac                                  │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │           Swift Deployer App (RadiantDeployer)           │   │
+│  │  • Runs locally on macOS                                 │   │
+│  │  • Deploys infrastructure to AWS via CDK                 │   │
+│  │  • AI Assistant for deployment guidance                  │   │
+│  └─────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ Deploys
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         AWS Cloud                                │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │                 Admin Dashboard (Next.js)                │   │
+│  │  • Hosted on AWS (CloudFront + S3 or Amplify)           │   │
+│  │  • Manage tenants, models, billing, compliance          │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                   │
+│                              ▼                                   │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │              AWS Infrastructure (CDK)                    │   │
+│  │  • API Gateway, Lambda, Aurora PostgreSQL               │   │
+│  │  • Cognito, S3, SageMaker endpoints                     │   │
+│  └─────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ## Requirements
 
@@ -25,19 +58,9 @@ RADIANT consists of two main components:
 
 ## Quick Start
 
-### 1. Install Dependencies
+### Option A: Use Swift Deployer (Recommended)
 
-```bash
-pnpm install
-```
-
-### 2. Build Shared Package
-
-```bash
-pnpm build:shared
-```
-
-### 3. Build Swift Deployer
+The Swift Deployer is a macOS app that guides you through deployment with an AI assistant.
 
 ```bash
 cd apps/swift-deployer
@@ -45,11 +68,28 @@ swift build
 swift run
 ```
 
-### 4. Deploy Infrastructure
+This opens the RadiantDeployer app which will:
+1. Validate your AWS credentials
+2. Guide you through configuration
+3. Deploy all infrastructure to AWS
+4. Deploy the Admin Dashboard to AWS
+
+### Option B: Manual Deployment
 
 ```bash
+# 1. Install dependencies
+pnpm install
+
+# 2. Build shared package
+pnpm build:shared
+
+# 3. Deploy infrastructure to AWS
 pnpm deploy:dev
 ```
+
+### Accessing the Admin Dashboard
+
+After deployment, the Admin Dashboard is accessible at your configured domain (e.g., `admin.yourdomain.com`). It is **not** run locally - it's deployed to AWS and accessed via browser.
 
 ## Project Structure
 
@@ -58,29 +98,45 @@ radiant/
 ├── package.json                    # Root monorepo config
 ├── pnpm-workspace.yaml             # pnpm workspace config
 ├── tsconfig.base.json              # Base TypeScript config
+├── .github/workflows/ci.yml        # CI/CD pipeline
+├── .husky/pre-commit               # Pre-commit hooks
+│
+├── apps/
+│   ├── swift-deployer/             # RadiantDeployer macOS app (runs locally)
+│   │   ├── Package.swift
+│   │   ├── Sources/RadiantDeployer/
+│   │   │   ├── Models/
+│   │   │   ├── Services/
+│   │   │   └── Views/
+│   │   └── Tests/                  # Swift unit & E2E tests
+│   │
+│   └── admin-dashboard/            # Next.js admin UI (deployed to AWS)
+│       ├── app/(dashboard)/
+│       ├── components/
+│       ├── lib/
+│       └── e2e/                    # Playwright E2E tests
 │
 ├── packages/
 │   ├── shared/                     # @radiant/shared - Types & constants
-│   │   ├── src/
-│   │   │   ├── types/              # TypeScript type definitions
-│   │   │   ├── constants/          # Shared constants
-│   │   │   └── utils/              # Utility functions
-│   │   └── package.json
+│   │   └── src/
+│   │       ├── types/
+│   │       ├── constants/
+│   │       ├── utils/
+│   │       ├── errors/             # Standardized error codes
+│   │       └── testing/            # Test utilities
 │   │
 │   └── infrastructure/             # @radiant/infrastructure - CDK stacks
-│       ├── bin/radiant.ts          # CDK app entry point
-│       ├── lib/stacks/             # CDK stack definitions
-│       └── cdk.json
-│
-├── apps/
-│   └── swift-deployer/             # RadiantDeployer macOS app
-│       ├── Package.swift
-│       └── Sources/RadiantDeployer/
-│           ├── Models/
-│           ├── Services/
-│           └── Views/
+│       ├── bin/radiant.ts
+│       ├── lib/stacks/
+│       ├── lambda/
+│       │   ├── admin/__tests__/    # Lambda unit tests
+│       │   ├── billing/__tests__/
+│       │   └── shared/__tests__/
+│       └── migrations/
 │
 └── docs/
+    ├── TESTING.md                  # Testing guide
+    ├── ERROR_CODES.md              # Error codes reference
     └── sections/                   # Full specification documents
 ```
 
@@ -103,15 +159,22 @@ radiant/
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| 1 | Foundation (Sections 0-2) | ✅ Complete |
-| 2 | Core Infrastructure (Sections 3-7) | ✅ Complete |
-| 3 | Admin & Deployment (Sections 8-9) | ✅ Complete |
-| 4 | AI Features (Sections 10-17) | ✅ Complete |
-| 5 | Consumer Platform (Sections 18-28) | ✅ Complete |
-| 6 | Advanced Features (Sections 29-35) | ✅ Complete |
-| 7 | Intelligence Layer (Sections 36-39) | ✅ Complete |
-| 8 | Platform Hardening (Sections 40-42) | ✅ Complete |
-| 9 | Billing System (Sections 43-46) | ✅ Complete |
+| 1-9 | Core Platform (Sections 0-46) | ✅ Complete |
+| 10-24 | PROMPT-32 Update | ✅ Complete |
+| 25-31 | PROMPT-33 Update v3 | ✅ Complete |
+| 32-33 | Verification & Testing | ✅ Complete |
+
+### v4.18.0 New Features (PROMPT-33)
+
+| Feature | Description |
+|---------|-------------|
+| **Unified Package System** | Atomic component versioning with .pkg format |
+| **Cost Management** | Real-time cost tracking with AI recommendations |
+| **Compliance Reports** | SOC2, HIPAA, GDPR, ISO27001 report generation |
+| **Security Dashboard** | Anomaly detection and intrusion alerts |
+| **A/B Testing** | Hash-based experiments with statistical analysis |
+| **Deployment Settings** | SSM-synced configuration with lock-step mode |
+| **AI Assistant** | Claude-powered deployment guidance in Swift app |
 
 ## Admin Dashboard
 
@@ -131,7 +194,12 @@ The admin dashboard provides a complete management interface:
 | Migrations | Database migration approval |
 | Audit Logs | Activity tracking |
 | Notifications | System alerts |
-| Settings | User preferences |
+| Settings | User preferences, deployment settings, timeouts |
+| **Analytics** | Cost analytics with AI recommendations |
+| **Compliance** | SOC2/HIPAA/GDPR/ISO27001 reports |
+| **Security** | Anomaly detection and threat monitoring |
+| **Experiments** | A/B testing with statistical analysis |
+| **Time Machine** | Conversation history and versioning |
 
 ### Running the Dashboard
 
@@ -142,7 +210,7 @@ pnpm dev
 
 ## Database Migrations
 
-36 migrations covering:
+44 migrations covering:
 - Core schema (tenants, users, admins)
 - AI models and providers
 - Orchestration patterns and workflows
@@ -180,6 +248,10 @@ psql -d radiant -f migrations/seed/001_demo_data.sql
 | billing | Credits and subscriptions |
 | storage | Storage tracking |
 | migration-approval | Dual-admin approval |
+| **cost-logger** | Real-time cost tracking |
+| **compliance-reporter** | SOC2/HIPAA/GDPR/ISO27001 reports |
+| **anomaly-detector** | Security intrusion detection |
+| **experiment-tracker** | A/B test assignment and analysis |
 
 ## Environment Variables
 
@@ -196,6 +268,45 @@ Required variables:
 - `DB_SECRET_ARN` - Database secret ARN
 - `COGNITO_USER_POOL_ID` - Cognito user pool
 - `COGNITO_CLIENT_ID` - Cognito client ID
+
+## Testing
+
+RADIANT includes comprehensive testing at multiple levels:
+
+```bash
+# Run all tests
+pnpm test
+
+# Run Lambda unit tests
+cd packages/infrastructure && pnpm test
+
+# Run E2E tests
+cd apps/admin-dashboard && pnpm test:e2e
+
+# Run Swift tests
+cd apps/swift-deployer && swift test
+```
+
+See [Testing Guide](docs/TESTING.md) for detailed information.
+
+## Error Handling
+
+RADIANT uses standardized error codes across all services. See [Error Codes Reference](docs/ERROR_CODES.md).
+
+```typescript
+import { ErrorCodes, RadiantError } from '@radiant/shared';
+
+throw new RadiantError(ErrorCodes.AUTH_INVALID_TOKEN);
+```
+
+## CI/CD
+
+GitHub Actions workflow includes:
+- Linting and type checking
+- Unit tests with coverage
+- E2E tests
+- CDK synthesis validation
+- Automated deployment (on merge to main)
 
 ## License
 

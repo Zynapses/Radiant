@@ -71,16 +71,14 @@ export default function AdministratorsPage() {
   const { data: administrators } = useQuery({
     queryKey: ['administrators'],
     queryFn: async (): Promise<Administrator[]> => {
-      const res = await apiClient.get<Administrator[]>('/admin/administrators');
-      return res.data;
+      return apiClient.get<Administrator[]>('/admin/administrators');
     },
   });
 
   const { data: invitations } = useQuery({
     queryKey: ['invitations'],
     queryFn: async (): Promise<Invitation[]> => {
-      const res = await apiClient.get<Invitation[]>('/admin/invitations');
-      return res.data;
+      return apiClient.get<Invitation[]>('/admin/invitations');
     },
   });
 

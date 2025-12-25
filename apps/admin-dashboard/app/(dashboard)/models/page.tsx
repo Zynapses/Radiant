@@ -61,8 +61,7 @@ export default function ModelsPage() {
   const { data: models, isLoading } = useQuery({
     queryKey: ['models'],
     queryFn: async (): Promise<Model[]> => {
-      const res = await apiClient.get<Model[]>('/admin/models');
-      return res.data;
+      return apiClient.get<Model[]>('/admin/models');
     },
   });
 

@@ -1,4 +1,4 @@
-# RADIANT v4.17.0 - Deployment Guide
+# RADIANT v4.18.0 - Deployment Guide
 
 ## Overview
 
@@ -6,7 +6,15 @@ This guide covers deploying the RADIANT platform from development to production.
 
 1. **AWS Infrastructure** - CDK stacks for all cloud resources
 2. **Admin Dashboard** - Next.js admin interface
-3. **Swift Deployer App** - macOS deployment tool
+3. **Swift Deployer App** - macOS deployment tool with AI assistant
+
+## What's New in v4.18.0
+
+- **Unified Package System** - Deploy with atomic component versioning
+- **AI Assistant** - Claude-powered deployment guidance in Swift app
+- **Configurable Timeouts** - SSM-synced operation timeouts
+- **Cost Management** - Real-time cost tracking and alerts
+- **Compliance Reports** - SOC2, HIPAA, GDPR, ISO27001 reporting
 
 ## Prerequisites
 
@@ -31,6 +39,33 @@ This guide covers deploying the RADIANT platform from development to production.
 | Swift | 5.9+ | `swift --version` |
 
 ## Quick Start
+
+### Automated Deployment
+
+Use the deployment script for a streamlined deployment:
+
+```bash
+# Deploy to dev environment (Tier 1)
+./scripts/deploy.sh --environment dev --tier 1
+
+# Deploy to staging (Tier 2)
+./scripts/deploy.sh --environment staging --tier 2
+
+# Deploy to production (Tier 3+)
+./scripts/deploy.sh --environment prod --tier 3
+```
+
+### Verify Deployment
+
+After deployment, verify all resources:
+
+```bash
+./scripts/verify-deployment.sh --environment dev
+```
+
+---
+
+## Manual Deployment
 
 ### 1. Install Dependencies
 
@@ -112,7 +147,7 @@ cd packages/infrastructure/migrations
 ./run-migrations.sh --environment dev
 ```
 
-Migration files are applied in order:
+Migration files are applied in order (44 total):
 1. `001_initial_schema.sql` - Base tables
 2. `002_tenant_isolation.sql` - RLS policies
 3. `003_ai_models.sql` - Providers and models
@@ -120,6 +155,8 @@ Migration files are applied in order:
 5. `005_admin_approval.sql` - Audit logs
 6. `006_self_hosted_models.sql` - SageMaker config
 7. `007_external_providers.sql` - Provider settings
+8. ... (see `migrations/` for full list)
+44. `044_cost_experiments_security.sql` - Cost tracking, A/B testing, security
 
 ## Post-Deployment Configuration
 
@@ -183,7 +220,7 @@ export RADIANT_DOMAIN=example.com
 curl https://YOUR_API_ENDPOINT/health
 
 # Expected response:
-# {"status":"healthy","version":"4.17.0"}
+# {"status":"healthy","version":"4.18.0"}
 ```
 
 ### Smoke Tests
@@ -228,9 +265,67 @@ npx cdk destroy --all --context environment=dev --context tier=1
 
 **Warning:** This will delete all data including databases. Export data before destroying.
 
+## CI/CD Pipeline
+
+RADIANT includes a GitHub Actions CI/CD pipeline:
+
+### Workflow Stages
+
+| Stage | Trigger | Actions |
+|-------|---------|--------|
+| Lint | All PRs | ESLint, TypeScript check |
+| Build | All PRs | Build shared, infrastructure, dashboard |
+| Test | All PRs | Unit tests, coverage report |
+| CDK Synth | All PRs | Validate CDK templates |
+| Deploy Dev | Merge to develop | Auto-deploy to dev |
+| Deploy Prod | Merge to main | Deploy with approval |
+
+### Pre-commit Hooks
+
+Pre-commit hooks run automatically via Husky:
+
+```bash
+# Hooks run on every commit:
+- lint-staged (ESLint, Prettier)
+- Secret detection
+- Version bump enforcement
+- Discrete validation
+```
+
+To bypass (not recommended):
+```bash
+git commit --no-verify -m "message"
+```
+
+### Manual Deployment from CI
+
+```bash
+# Trigger deployment workflow
+gh workflow run deploy.yml -f environment=staging -f tier=2
+```
+
+## Testing Before Deployment
+
+Always run tests before deploying:
+
+```bash
+# Run all tests
+pnpm test
+
+# Run E2E tests
+cd apps/admin-dashboard && pnpm test:e2e
+
+# Run CDK synthesis (validates templates)
+cd packages/infrastructure && npx cdk synth
+```
+
+See [Testing Guide](TESTING.md) for comprehensive testing information.
+
 ## Support
 
 For issues, check:
 1. CloudWatch Logs for error details
 2. CDK diff to verify expected changes
 3. AWS Console for resource status
+4. [Troubleshooting Guide](TROUBLESHOOTING.md)
+5. [Error Codes Reference](ERROR_CODES.md)

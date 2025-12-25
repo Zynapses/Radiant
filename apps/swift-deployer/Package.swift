@@ -22,6 +22,10 @@ let package = Package(
                 .product(name: "GRDB", package: "GRDB.swift"),
             ],
             path: "Sources/RadiantDeployer",
+            exclude: [
+                "Info.plist",
+                "RadiantDeployer.entitlements",
+            ],
             resources: [
                 .copy("Resources/Infrastructure"),
                 .copy("Resources/NodeRuntime"),

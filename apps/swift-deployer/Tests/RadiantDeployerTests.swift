@@ -3,7 +3,7 @@ import XCTest
 
 final class RadiantDeployerTests: XCTestCase {
     func testVersionConstant() {
-        XCTAssertEqual(RADIANT_VERSION, "4.17.0")
+        XCTAssertEqual(RADIANT_VERSION, "4.18.0")
     }
     
     func testManagedAppDefaults() {

@@ -12,4 +12,31 @@ if git diff --cached --name-only | xargs grep -l -E "(AKIA[A-Z0-9]{16}|sk-[a-zA-
   exit 1
 fi
 
+# Version bump enforcement (PROMPT-33 requirement)
+if [ -z "$SKIP_VERSION_CHECK" ]; then
+  CODE_CHANGED=$(git diff --cached --name-only | grep -E "^(packages/|apps/|migrations/)" | head -1)
+  
+  if [ -n "$CODE_CHANGED" ]; then
+    VERSION_CHANGED=$(git diff --cached --name-only | grep -E "^(VERSION|RADIANT_VERSION|THINKTANK_VERSION)$" | head -1)
+    
+    if [ -z "$VERSION_CHANGED" ]; then
+      echo "⚠️  Code changes detected but no version bump found!"
+      echo "   Changed: $CODE_CHANGED"
+      echo ""
+      echo "   Run: bash tools/scripts/bump-version.sh [patch|minor|major]"
+      echo "   Or set SKIP_VERSION_CHECK=1 to bypass"
+      exit 1
+    fi
+  fi
+fi
+
+# Run discrete validation
+echo "🔍 Running discrete validation..."
+if [ -f "tools/scripts/validate-discrete.sh" ]; then
+  bash tools/scripts/validate-discrete.sh || {
+    echo "❌ Discrete validation failed"
+    exit 1
+  }
+fi
+
 echo "✅ Pre-commit checks passed"

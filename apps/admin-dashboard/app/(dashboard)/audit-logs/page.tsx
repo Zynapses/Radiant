@@ -58,8 +58,7 @@ export default function AuditLogsPage() {
       const params = new URLSearchParams();
       if (actionFilter !== 'all') params.set('action', actionFilter);
       if (resourceFilter !== 'all') params.set('resourceType', resourceFilter);
-      const res = await apiClient.get<AuditLog[]>(`/admin/audit-logs?${params}`);
-      return res.data;
+      return apiClient.get<AuditLog[]>(`/admin/audit-logs?${params}`);
     },
   });
 
