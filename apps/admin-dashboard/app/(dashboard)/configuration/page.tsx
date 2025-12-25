@@ -99,12 +99,8 @@ export default function ConfigurationPage() {
       await apiClient.put(`/configuration/${key}`, { value });
     },
     onSuccess: () => {
-      console.log('Configuration updated');
       queryClient.invalidateQueries({ queryKey: ['configuration'] });
       setEditingConfig(null);
-    },
-    onError: () => {
-      console.error('Failed to update configuration');
     },
   });
 
