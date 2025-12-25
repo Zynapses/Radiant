@@ -233,7 +233,13 @@ actor SeedDataService {
             .appendingPathComponent("config")
             .appendingPathComponent("seeds")
         
-        self.awsService = AWSService()
+        self.awsService = AWSService.shared
+    }
+    
+    /// Initialize with custom seeds directory (for testing)
+    init(seedsDirectory: URL) {
+        self.seedsDirectory = seedsDirectory
+        self.awsService = AWSService.shared
     }
     
     // MARK: - List Available Seed Versions
