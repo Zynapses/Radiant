@@ -105,7 +105,8 @@ struct DeployView: View {
                         ParameterEditorView(
                             app: app,
                             environment: appState.selectedEnvironment,
-                            mode: deploymentMode
+                            mode: deploymentMode,
+                            onSave: { _ in }
                         )
                     }
                 }

@@ -315,7 +315,7 @@ actor SeedDataService {
                     path: url.path
                 ))
             } catch {
-                // Skip invalid seed directories
+                RadiantLogger.warning("Skipping invalid seed directory at \(url.lastPathComponent): \(error.localizedDescription)", category: RadiantLogger.seeds)
                 continue
             }
         }
@@ -325,8 +325,9 @@ actor SeedDataService {
     
     /// List remote seed data versions from S3
     private func listRemoteSeeds() async throws -> [SeedDataInfo] {
-        let bucket = "radiant-releases-us-east-1"
-        let prefix = "seeds/"
+        let config = RadiantConfig.shared
+        let bucket = config.releasesBucket
+        let prefix = config.seedsPrefix
         
         let keys = await awsService.listObjects(bucket: bucket, prefix: prefix)
         
@@ -428,8 +429,9 @@ actor SeedDataService {
     
     /// Download seed data from S3
     private func downloadSeedData(version: String) async throws -> URL {
-        let bucket = "radiant-releases-us-east-1"
-        let prefix = "seeds/v\(version)/"
+        let config = RadiantConfig.shared
+        let bucket = config.releasesBucket
+        let prefix = "\(config.seedsPrefix)v\(version)/"
         
         let localPath = seedsDirectory.appendingPathComponent("v\(version)")
         try fileManager.createDirectory(at: localPath, withIntermediateDirectories: true)

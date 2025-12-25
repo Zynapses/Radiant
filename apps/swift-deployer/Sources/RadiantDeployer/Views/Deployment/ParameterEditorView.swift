@@ -530,8 +530,8 @@ class ParameterEditorViewModel: ObservableObject {
 struct ParameterEditorView_Previews: PreviewProvider {
     static var previews: some View {
         ParameterEditorView(
-            app: ManagedApp.preview,
-            environment: .development,
+            app: ManagedApp.defaults[0],
+            environment: .dev,
             mode: .install,
             onSave: { _ in }
         )

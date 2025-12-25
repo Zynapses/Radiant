@@ -10,6 +10,7 @@ enum DeploymentError: Error, LocalizedError {
     case instanceNotFound
     case snapshotNotFound(String)
     case invalidSnapshot(String)
+    case invalidConfiguration(String)
     case parameterValidationFailed(String)
     case infrastructureDeploymentFailed(String)
     case migrationFailed(String)
@@ -30,6 +31,8 @@ enum DeploymentError: Error, LocalizedError {
             return "Snapshot not found: \(id)"
         case .invalidSnapshot(let reason):
             return "Invalid snapshot: \(reason)"
+        case .invalidConfiguration(let reason):
+            return "Invalid configuration: \(reason)"
         case .parameterValidationFailed(let reason):
             return "Parameter validation failed: \(reason)"
         case .infrastructureDeploymentFailed(let reason):

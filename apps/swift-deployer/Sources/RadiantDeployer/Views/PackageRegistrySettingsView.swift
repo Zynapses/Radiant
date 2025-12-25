@@ -1773,7 +1773,8 @@ struct UploadPackageSheet: View {
                     integrity: PackageManifest.IntegrityInfo(algorithm: "sha256", packageHash: "", signedBy: nil, signature: nil),
                     installBehavior: PackageManifest.InstallBehavior(seedAIRegistry: true, createInitialAdmin: true, runFullMigrations: true),
                     updateBehavior: PackageManifest.UpdateBehavior(seedAIRegistry: false, preserveAdminCustomizations: true, runIncrementalMigrations: true, createPreUpdateSnapshot: true),
-                    rollbackBehavior: PackageManifest.RollbackBehavior(supportedFromVersions: [], requiresDatabaseRollback: true)
+                    rollbackBehavior: PackageManifest.RollbackBehavior(supportedFromVersions: [], requiresDatabaseRollback: true),
+                    seedData: nil
                 )
                 
                 let registry = GitHubPackageRegistry()
