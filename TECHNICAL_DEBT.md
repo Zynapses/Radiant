@@ -185,34 +185,22 @@ process.arguments = ["s3api", "get-object", ...]
 
 ## 3. Admin Dashboard Issues
 
-### 3.0 AWS Amplify v6 SSR Incompatibility 🔴
+### 3.0 ✅ SSR createContext Incompatibility (Fixed)
 
 **Location:** `apps/admin-dashboard/`
 
-**Issue:** AWS Amplify v6 has a fundamental incompatibility with Next.js 14 App Router's SSR. The library uses `createContext` at module evaluation time, which fails during Next.js static generation build phase.
+**Issue:** The `next-themes` ThemeProvider was imported in the root `layout.tsx` (a server component), which caused `createContext` to be called during SSR static generation. The original diagnosis blamed aws-amplify, but investigation revealed `next-themes` was the actual cause.
 
-**Error:**
-```
-TypeError: (0 , r.createContext) is not a function
-```
+**Fix:** 
+1. Moved `ThemeProvider` from `layout.tsx` (server component) to `providers.tsx` (client component)
+2. Created `cognito-client.ts` using pure fetch API calls to Cognito REST endpoints (SSR-safe)
+3. Re-enabled CI build-dashboard job
 
-**Impact:** Admin dashboard cannot be built for production deployment. CI build is temporarily disabled.
-
-**Attempted Solutions (all failed):**
-- `'use client'` directives
-- `next/dynamic` with `ssr: false`
-- Webpack `resolve.alias` to stub modules
-- `NormalModuleReplacementPlugin`
-- Dynamic imports in useEffect
-
-**Recommended Fix:** One of:
-1. Wait for AWS Amplify v7 which may fix SSR compatibility
-2. Replace aws-amplify with `@aws-sdk/client-cognito-identity-provider` for direct Cognito API calls
-3. Use a different auth solution (NextAuth.js, Clerk, etc.)
-
-**Workaround:** CI build-dashboard job is disabled with `if: false`
-
-**Effort:** High (16-24 hours for option 2 or 3)
+**Files:**
+- `app/layout.tsx` - Removed ThemeProvider import
+- `app/providers.tsx` - Added ThemeProvider wrapper (client component)
+- `lib/auth/cognito-client.ts` - New SSR-compatible auth client using fetch API
+- `.github/workflows/ci.yml` - Re-enabled build-dashboard job
 
 ---
 
@@ -420,7 +408,7 @@ The following items were identified and resolved in the December 2024 technical 
 
 | Priority | Count | Estimated Effort |
 |----------|-------|------------------|
-| 🔴 Critical | 1 | 16-24 hours |
+| 🔴 Critical | 0 | 0 hours |
 | 🟠 High | 4 | 28-52 hours |
 | 🟡 Medium | 8 | 40-76 hours |
 | 🟢 Low | 4 | 12-24 hours |

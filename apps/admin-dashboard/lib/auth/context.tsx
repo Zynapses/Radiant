@@ -9,12 +9,11 @@ import {
   type ReactNode,
 } from 'react';
 import {
-  getCurrentUser,
-  fetchAuthSession,
-  signIn,
-  signOut,
-  confirmSignIn,
-} from 'aws-amplify/auth';
+  signIn as cognitoSignIn,
+  confirmMfa as cognitoConfirmMfa,
+  signOut as cognitoSignOut,
+  getTokens,
+} from './cognito-client';
 
 // ============================================================================
 // TYPES
@@ -84,19 +83,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkSession = useCallback(async () => {
     try {
-      await getCurrentUser();
-      const session = await fetchAuthSession();
+      const tokens = await getTokens();
       
-      if (session.tokens?.accessToken) {
-        const adminProfile = await fetchAdminProfile(
-          session.tokens.accessToken.toString()
-        );
+      if (tokens?.accessToken) {
+        const adminProfile = await fetchAdminProfile(tokens.accessToken);
         
         setState({
           isAuthenticated: true,
           isLoading: false,
           user: adminProfile,
-          accessToken: session.tokens.accessToken.toString(),
+          accessToken: tokens.accessToken,
           error: null,
         });
       } else {
@@ -121,12 +117,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
-      const result = await signIn({
-        username: email,
-        password,
-      });
+      const result = await cognitoSignIn(email, password);
       
-      if (result.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_TOTP_CODE') {
+      if (result.needsMfa) {
         setState(prev => ({ ...prev, isLoading: false }));
         return { needsMfa: true };
       }
@@ -150,9 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
-      const result = await confirmSignIn({
-        challengeResponse: code,
-      });
+      const result = await cognitoConfirmMfa(code);
       
       if (result.isSignedIn) {
         await checkSession();
@@ -169,7 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
-      await signOut();
+      await cognitoSignOut();
       setState({
         isAuthenticated: false,
         isLoading: false,
