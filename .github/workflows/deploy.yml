@@ -1,8 +1,7 @@
 name: Deploy
 
 on:
-  push:
-    branches: [main]
+  # Manual deployment only - requires AWS credentials configured in GitHub secrets
   workflow_dispatch:
     inputs:
       environment:
