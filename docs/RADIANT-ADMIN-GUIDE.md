@@ -50,6 +50,43 @@ RADIANT is a multi-tenant AWS SaaS platform providing unified access to 106+ AI 
 | **Operator** | Read access, limited actions | Support team |
 | **Auditor** | Read-only access to logs | Compliance team |
 
+#### Role Details
+
+**Super Admin** - The highest privilege level with unrestricted access:
+- Create and delete tenants
+- Manage all administrators
+- Access all billing and financial data
+- Modify system-wide configuration
+- Approve production database migrations
+- Impersonate any tenant for debugging
+- Access compliance and audit reports
+- Typically limited to 1-3 people (CTO, lead engineer)
+
+**Admin** - Day-to-day operations management:
+- Create and modify tenants (cannot delete)
+- Manage users within tenants
+- Configure AI models and providers
+- View billing data (cannot modify pricing)
+- Monitor system health
+- Cannot access other admin accounts
+- Typically assigned to operations team members
+
+**Operator** - Limited support and monitoring:
+- View tenant information (read-only)
+- View user issues and support tickets
+- Monitor system health dashboards
+- Cannot modify any configuration
+- Cannot access billing or sensitive data
+- Typically assigned to support staff
+
+**Auditor** - Compliance and security review:
+- Full read access to audit logs
+- Access to compliance reports
+- Cannot modify anything
+- Cannot view sensitive data (API keys, passwords)
+- Access is logged for compliance
+- Typically assigned to compliance officers or external auditors
+
 ### 1.3 Key Concepts
 
 | Concept | Description |
@@ -60,6 +97,56 @@ RADIANT is a multi-tenant AWS SaaS platform providing unified access to 106+ AI 
 | **Credits** | Currency for AI usage |
 | **API Key** | Authentication for API access |
 | **App** | Consumer application (Think Tank, etc.) |
+
+#### Tenant Architecture Explained
+
+A **Tenant** represents a complete organization using RADIANT. Each tenant has:
+
+- **Complete Data Isolation**: All data is stored with tenant IDs and protected by PostgreSQL Row-Level Security (RLS). One tenant can never access another tenant's data, even if there's a bug in application code.
+- **Separate Billing**: Each tenant has its own subscription, credit balance, and usage tracking. Costs are attributed to the correct tenant automatically.
+- **Custom Configuration**: Tenants can customize model access, rate limits, and feature flags without affecting other tenants.
+- **User Management**: Each tenant manages their own users, roles, and permissions independently.
+
+#### User vs Administrator
+
+**Users** are end-users who interact with RADIANT-powered applications like Think Tank. They:
+- Sign up and log in via Cognito
+- Use AI models through the API or applications
+- Have credits deducted for usage
+- Cannot access the Admin Dashboard
+
+**Administrators** manage the RADIANT platform itself. They:
+- Access the Admin Dashboard
+- Manage tenants, users, and billing
+- Configure AI models and providers
+- Have no credits (administrative access is separate)
+
+#### Credit System Explained
+
+Credits are RADIANT's universal currency for AI usage:
+
+- **1 credit = $0.01 USD** (configurable per deployment)
+- Different models cost different amounts based on their API pricing
+- Credits are deducted in real-time as requests complete
+- Tenants can purchase credits or receive them through subscriptions
+- Credits can be tracked, audited, and reported on
+
+**Example Credit Costs**:
+| Model | Cost per 1K tokens |
+|-------|-------------------|
+| GPT-4o | 5 credits input, 15 credits output |
+| GPT-4o-mini | 0.5 credits input, 1.5 credits output |
+| Claude 3.5 Sonnet | 3 credits input, 15 credits output |
+| Self-hosted Llama | 0.2 credits (all) |
+
+#### API Key Types
+
+RADIANT supports multiple API key types:
+
+- **User API Keys**: Tied to a specific user, inherit user's permissions
+- **Service API Keys**: For server-to-server communication, not tied to a user
+- **Admin API Keys**: For administrative operations, require elevated permissions
+- **Scoped Keys**: Limited to specific models, endpoints, or rate limits
 
 ---
 
@@ -333,6 +420,22 @@ Navigate to **Models** to see all available models:
 | **Code** | Code generation | Codestral, DeepSeek Coder |
 | **Scientific** | Research models | BioGPT, ChemLLM |
 
+#### Category Details
+
+**Chat/LLM (Large Language Models)**: The core of RADIANT. These models handle conversational AI, content generation, summarization, and general-purpose text tasks. They're the most commonly used and include flagship models from OpenAI, Anthropic, Google, and open-source alternatives.
+
+**Embedding Models**: Convert text into numerical vectors for semantic search, similarity matching, and retrieval-augmented generation (RAG). Essential for building knowledge bases and search functionality. Vectors are typically 1536-3072 dimensions.
+
+**Vision Models**: Analyze images, extract text (OCR), describe visual content, and answer questions about images. Increasingly important for document processing, accessibility, and multimodal applications.
+
+**Audio Models**: Transcribe speech to text, translate audio, and identify speakers. Whisper is the most popular, offering excellent accuracy across 99 languages. Used for meeting transcription, accessibility, and voice interfaces.
+
+**Image Generation**: Create images from text descriptions. DALL-E 3 offers the best prompt following, while Stable Diffusion provides more customization options. Consider content policies when enabling these.
+
+**Code Models**: Specialized for programming tasks including code generation, explanation, debugging, and refactoring. Some are fine-tuned on specific languages or frameworks.
+
+**Scientific Models**: Domain-specific models trained on scientific literature. Useful for research applications but require careful evaluation for accuracy.
+
 ### 6.3 Model Configuration
 
 Click on a model to configure:
@@ -345,6 +448,35 @@ Click on a model to configure:
 | **Max Tokens** | Maximum context/output |
 | **Temperature Range** | Allowed temperature values |
 | **Price Override** | Custom pricing |
+
+#### Configuration Settings Explained
+
+**Enabled**: When disabled, the model is hidden from users and API requests return "model not found". Use this to temporarily remove models during maintenance or to restrict access to specific models.
+
+**Min Tier**: Sets the minimum subscription tier required to access this model. For example, setting GPT-4 to Tier 2 means Free tier users cannot use it. This helps control costs and create upgrade incentives.
+
+**Rate Limits**: Controls requests per minute per user for this model. Prevents abuse and ensures fair access. Set based on the provider's rate limits and your capacity:
+- Conservative: 10-20 requests/minute
+- Standard: 50-100 requests/minute  
+- High: 200+ requests/minute (requires provider rate limit increases)
+
+**Max Tokens**: Limits context window and output length. Useful for controlling costs since longer contexts cost more. Set based on use case:
+- Short tasks (Q&A): 4,096 tokens
+- Medium tasks (writing): 16,384 tokens
+- Long tasks (analysis): 32,768+ tokens
+
+**Temperature Range**: Restricts the temperature parameter users can set. Temperature controls randomness:
+- 0.0: Deterministic, consistent outputs
+- 0.7: Balanced creativity and consistency
+- 1.0+: More creative, less predictable
+
+Restricting range (e.g., 0.0-1.0) prevents users from setting extreme values that produce poor results.
+
+**Price Override**: Allows custom pricing different from the default. Useful for:
+- Offering discounts on specific models
+- Increasing prices for premium models
+- Matching competitor pricing
+- A/B testing pricing strategies
 
 ### 6.4 Self-Hosted Models
 

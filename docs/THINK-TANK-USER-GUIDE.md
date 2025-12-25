@@ -221,6 +221,22 @@ Click the model selector at the bottom of the chat:
 | **Vision** | Image understanding | GPT-4V, LLaVA |
 | **Fast** | Quick responses | GPT-3.5, Claude Instant |
 
+#### Choosing the Right Model
+
+**For everyday questions and tasks**: Start with GPT-4o or Claude 3.5 Sonnet. These models offer the best balance of quality, speed, and cost. They handle most tasks excellently including writing, answering questions, brainstorming, and light coding.
+
+**For professional writing**: Claude 3 Opus excels at long-form content, maintaining consistent tone, and nuanced writing. GPT-4 is also excellent for business documents and creative writing.
+
+**For coding and technical work**: GPT-4 Turbo has strong coding abilities across many languages. For specialized tasks, consider CodeLlama (open source, good for common languages) or specialized models like DeepSeek Coder.
+
+**For data analysis**: Gemini 1.5 Pro handles very long documents (up to 1 million tokens) making it ideal for analyzing large datasets or documents. Claude 3 is excellent for nuanced analytical reasoning.
+
+**For creative projects**: GPT-4 and Mistral Large are both creative and can help with brainstorming, storytelling, and idea generation. They're less constrained in creative contexts.
+
+**For image understanding**: GPT-4V (Vision) and Claude 3 Vision can analyze images, read text from photos, describe scenes, and answer questions about visual content.
+
+**For quick, simple tasks**: GPT-3.5 Turbo and Claude Instant are much faster and cheaper. Use them for simple questions, formatting, or when you need instant responses.
+
 ### 4.3 Auto Mode
 
 Let Think Tank choose the best model:
@@ -229,6 +245,28 @@ Let Think Tank choose the best model:
 2. Our Brain Router analyzes your request
 3. Automatically selects optimal model
 4. Balances quality, speed, and cost
+
+#### How Auto Mode Works
+
+When you enable Auto Mode, Think Tank's Brain Router analyzes each message you send and selects the best model based on:
+
+- **Task complexity**: Simple questions go to fast models; complex tasks go to powerful models
+- **Content type**: Coding questions route to code-specialized models; creative requests to creative models
+- **Your history**: Learns your preferences over time and adjusts recommendations
+- **Cost efficiency**: Avoids using expensive models when cheaper ones would work equally well
+- **Current availability**: Routes around any models experiencing slowdowns
+
+**When to use Auto Mode**:
+- You're not sure which model to use
+- You want to optimize cost without sacrificing quality
+- You have varied tasks throughout the day
+- You're new to Think Tank
+
+**When to choose manually**:
+- You need a specific model's unique capabilities
+- You're doing specialized work (e.g., always want Claude for writing)
+- You're comparing models intentionally
+- You have strong preferences for certain models
 
 ### 4.4 Model Comparison
 
@@ -260,6 +298,20 @@ Pre-configured modes for specific tasks:
 1. Click the Focus selector
 2. Choose your mode
 3. AI adapts its style
+
+#### Focus Mode Details
+
+**Professional Mode**: The AI adopts a business-appropriate tone. Responses are polished, formal, and suitable for workplace communication. Great for drafting emails, reports, presentations, and client communications. Avoids casual language and ensures professional formatting.
+
+**Developer Mode**: Optimized for technical work. The AI provides code with proper syntax highlighting, explains technical concepts clearly, suggests best practices, and can help debug issues. Responses include code comments and consider edge cases.
+
+**Research Mode**: Emphasizes accuracy and thoroughness. The AI cites sources when possible, acknowledges uncertainty, presents multiple perspectives, and structures information logically. Ideal for academic work, fact-checking, and deep analysis.
+
+**Creative Mode**: Removes constraints on creativity. The AI is more willing to explore unusual ideas, use vivid language, and think outside the box. Perfect for brainstorming, creative writing, storytelling, and generating innovative solutions.
+
+**Learning Mode**: The AI becomes a patient tutor. Explanations start from basics and build up, concepts are broken into digestible pieces, and the AI checks understanding before moving on. Great for studying new topics.
+
+**Concise Mode**: Responses are brief and to the point. The AI avoids lengthy explanations and gets straight to the answer. Useful when you need quick facts or are in a hurry.
 
 ### 5.2 Custom Personas
 
