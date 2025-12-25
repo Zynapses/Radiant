@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, apiError } from '@/lib/api/auth-wrapper';
 
 // GET /api/cost/insights - Get cost insights (from Neural Engine)
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async () => {
   try {
     const insights = [
       {
@@ -35,6 +36,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(insights);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch insights' }, { status: 500 });
+    return apiError('FETCH_FAILED', 'Failed to fetch insights', 500);
   }
-}
+});

@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
-// GET /api/health - Get service health status
-export async function GET(request: NextRequest) {
+// GET /api/health - Get service health status (public endpoint)
+export const GET = withAuth(async () => {
   try {
     const health = {
       status: 'healthy',
@@ -20,18 +21,19 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(health);
   } catch (error) {
-    return NextResponse.json({ error: 'Health check failed' }, { status: 500 });
+    return apiError('HEALTH_CHECK_FAILED', 'Health check failed', 500);
   }
-}
+}, { allowPublic: true });
 
-// POST /api/health - Trigger manual health check
-export async function POST(request: NextRequest) {
+// POST /api/health - Trigger manual health check (requires auth)
+export const POST = withAuth(async (request: AuthenticatedRequest) => {
   try {
     return NextResponse.json({
       message: 'Health check triggered',
+      triggeredBy: request.user.email,
       startedAt: new Date().toISOString(),
     });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to trigger health check' }, { status: 500 });
+    return apiError('TRIGGER_FAILED', 'Failed to trigger health check', 500);
   }
-}
+});

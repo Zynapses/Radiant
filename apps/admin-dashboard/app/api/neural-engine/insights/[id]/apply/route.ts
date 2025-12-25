@@ -1,30 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAdminAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
-// POST /api/neural-engine/insights/[id]/apply - Apply an insight (requires human approval)
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+// POST /api/neural-engine/insights/[id]/apply - Apply an insight (admin only, requires human approval)
+export const POST = withAdminAuth(async (
+  request: AuthenticatedRequest,
+  context?: { params: Record<string, string> }
+) => {
   try {
-    const body = await request.json();
-    const { approvedBy } = body;
+    const id = context?.params?.id || '';
 
-    if (!approvedBy) {
-      return NextResponse.json(
-        { error: 'Human approval required. Provide approvedBy field.' },
-        { status: 400 }
-      );
-    }
-
-    // In production, this would update the database and apply the insight
     return NextResponse.json({
       success: true,
       message: 'Insight applied with human approval',
-      insightId: params.id,
-      appliedBy: approvedBy,
+      insightId: id,
+      appliedBy: request.user.email,
       appliedAt: new Date().toISOString(),
     });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to apply insight' }, { status: 500 });
+    return apiError('APPLY_FAILED', 'Failed to apply insight', 500);
   }
-}
+});

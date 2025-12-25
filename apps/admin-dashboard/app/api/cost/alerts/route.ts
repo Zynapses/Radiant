@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
 // GET /api/cost/alerts - Get cost alerts
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async () => {
   try {
     const alerts = [
       {
@@ -38,12 +39,12 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(alerts);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch alerts' }, { status: 500 });
+    return apiError('FETCH_FAILED', 'Failed to fetch alerts', 500);
   }
-}
+});
 
 // POST /api/cost/alerts - Create cost alert
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const body = await request.json();
 
@@ -57,6 +58,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(alert, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create alert' }, { status: 500 });
+    return apiError('CREATE_FAILED', 'Failed to create alert', 500);
   }
-}
+});

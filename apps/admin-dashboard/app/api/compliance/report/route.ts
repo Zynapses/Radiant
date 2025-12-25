@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
 // GET /api/compliance/report - Get compliance report for a framework
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const { searchParams } = new URL(request.url);
-    const product = searchParams.get('product') || 'combined';
     const framework = searchParams.get('framework') || 'soc2';
 
     const report = {
@@ -37,6 +37,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(report);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch report' }, { status: 500 });
+    return apiError('FETCH_FAILED', 'Failed to fetch report', 500);
   }
-}
+});

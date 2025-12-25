@@ -1,28 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAdminAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
-// POST /api/admin/multi-region/deploy - Start multi-region deployment
-export async function POST(request: NextRequest) {
+// POST /api/admin/multi-region/deploy - Start multi-region deployment (admin only)
+export const POST = withAdminAuth(async (request: AuthenticatedRequest) => {
   try {
     const body = await request.json();
-    
     const { version, regions, strategy } = body;
 
     if (!version || !regions || regions.length === 0) {
-      return NextResponse.json(
-        { error: 'Version and target regions are required' },
-        { status: 400 }
-      );
+      return apiError('VALIDATION_ERROR', 'Version and target regions are required', 400);
     }
 
-    // Create deployment record
     const deployment = {
       id: crypto.randomUUID(),
       packageVersion: version,
       strategy: strategy || 'canary',
       targetRegions: regions,
+      startedBy: request.user.email,
       startedAt: new Date().toISOString(),
       completedAt: null,
-      regionStatuses: regions.reduce((acc: Record<string, any>, region: string) => {
+      regionStatuses: regions.reduce((acc: Record<string, unknown>, region: string) => {
         acc[region] = {
           region,
           status: 'pending',
@@ -35,9 +32,8 @@ export async function POST(request: NextRequest) {
       }, {}),
     };
 
-    // In production, this would start the actual deployment process
     return NextResponse.json(deployment, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to start deployment' }, { status: 500 });
+    return apiError('DEPLOY_FAILED', 'Failed to start deployment', 500);
   }
-}
+});

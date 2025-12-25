@@ -1,18 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAdminAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
-// POST /api/experiments/[id]/complete - Complete an experiment
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+// POST /api/experiments/[id]/complete - Complete an experiment (admin only)
+export const POST = withAdminAuth(async (
+  request: AuthenticatedRequest,
+  context?: { params: Record<string, string> }
+) => {
   try {
+    const id = context?.params?.id || '';
     return NextResponse.json({
       success: true,
-      experimentId: params.id,
+      experimentId: id,
       status: 'completed',
+      completedBy: request.user.email,
       completedAt: new Date().toISOString(),
     });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to complete experiment' }, { status: 500 });
+    return apiError('COMPLETE_FAILED', 'Failed to complete experiment', 500);
   }
-}
+});

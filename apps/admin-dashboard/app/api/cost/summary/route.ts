@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, apiError } from '@/lib/api/auth-wrapper';
 
 // GET /api/cost/summary - Get cost summary
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async () => {
   try {
     const summary = {
       totalSpend: 4523.87,
@@ -37,6 +38,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(summary);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch summary' }, { status: 500 });
+    return apiError('FETCH_FAILED', 'Failed to fetch summary', 500);
   }
-}
+});

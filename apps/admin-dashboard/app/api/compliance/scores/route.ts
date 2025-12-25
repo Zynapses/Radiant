@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
 // GET /api/compliance/scores - Get compliance scores for all frameworks
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const product = searchParams.get('product') || 'combined';
@@ -43,6 +44,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(scores);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch scores' }, { status: 500 });
+    return apiError('FETCH_FAILED', 'Failed to fetch scores', 500);
   }
-}
+});

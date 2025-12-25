@@ -1,14 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, apiError } from '@/lib/api/auth-wrapper';
 
 // GET /api/admin/multi-region/deployment/current - Get current deployment status
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async () => {
   try {
-    // In production, this would query the database for active deployment
-    // Return null if no deployment in progress
     const currentDeployment = null;
-
     return NextResponse.json(currentDeployment);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to get deployment status' }, { status: 500 });
+    return apiError('FETCH_FAILED', 'Failed to get deployment status', 500);
   }
-}
+});
