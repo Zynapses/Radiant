@@ -29,7 +29,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, MessageSquare, Eye, Trash2, Download, Clock } from 'lucide-react';
+import { Search, MessageSquare, Eye, Trash2, Download, Clock, Share2, Copy, Check, Link } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 
 interface Conversation {
@@ -67,6 +67,10 @@ export default function ConversationsPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [sharingConversation, setSharingConversation] = useState<Conversation | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const { data: conversations, isLoading } = useQuery<{ data: Conversation[] }>({
     queryKey: ['thinktank-conversations', search, statusFilter],
@@ -90,6 +94,44 @@ export default function ConversationsPage() {
       ),
     enabled: !!selectedConversation,
   });
+
+  const handleShareConversation = async (conv: Conversation) => {
+    setSharingConversation(conv);
+    setShareUrl(null);
+    setCopied(false);
+    setShareDialogOpen(true);
+  };
+
+  const createShareLink = async () => {
+    if (!sharingConversation) return;
+    
+    try {
+      const response = await fetch('/api/thinktank/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversationId: sharingConversation.id,
+          title: sharingConversation.title,
+          isPublic: true,
+          allowCopy: true,
+        }),
+      });
+      
+      const data = await response.json();
+      if (data.shareUrl) {
+        setShareUrl(data.shareUrl);
+      }
+    } catch (error) {
+      console.error('Failed to create share link:', error);
+    }
+  };
+
+  const copyShareUrl = async () => {
+    if (!shareUrl) return;
+    await navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="space-y-6">
@@ -259,62 +301,72 @@ export default function ConversationsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSelectedConversation(conv.id)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-3xl max-h-[80vh]">
-                          <DialogHeader>
-                            <DialogTitle>
-                              Conversation: {conv.title || 'Untitled'}
-                            </DialogTitle>
-                          </DialogHeader>
-                          <div className="text-sm text-muted-foreground mb-4">
-                            User: {conv.userEmail} | Messages: {conv.messageCount} |
-                            Created: {format(new Date(conv.createdAt), 'PPpp')}
-                          </div>
-                          <ScrollArea className="h-[500px] pr-4">
-                            <div className="space-y-4">
-                              {(messages?.data || []).map((msg) => (
-                                <div
-                                  key={msg.id}
-                                  className={`p-3 rounded-lg ${
-                                    msg.role === 'user'
-                                      ? 'bg-blue-50 dark:bg-blue-900/20 ml-8'
-                                      : msg.role === 'assistant'
-                                      ? 'bg-gray-50 dark:bg-gray-800 mr-8'
-                                      : 'bg-yellow-50 dark:bg-yellow-900/20 text-sm'
-                                  }`}
-                                >
-                                  <div className="flex justify-between items-start mb-1">
-                                    <Badge variant="outline" className="text-xs">
-                                      {msg.role}
-                                    </Badge>
-                                    <span className="text-xs text-muted-foreground">
-                                      {format(new Date(msg.createdAt), 'HH:mm:ss')}
-                                    </span>
-                                  </div>
-                                  <div className="whitespace-pre-wrap text-sm">
-                                    {msg.content}
-                                  </div>
-                                  {msg.model && (
-                                    <div className="mt-2 text-xs text-muted-foreground">
-                                      Model: {msg.model} | Tokens:{' '}
-                                      {msg.tokensUsed?.toLocaleString() || 'N/A'}
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
+                      <div className="flex gap-1">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSelectedConversation(conv.id)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-3xl max-h-[80vh]">
+                            <DialogHeader>
+                              <DialogTitle>
+                                Conversation: {conv.title || 'Untitled'}
+                              </DialogTitle>
+                            </DialogHeader>
+                            <div className="text-sm text-muted-foreground mb-4">
+                              User: {conv.userEmail} | Messages: {conv.messageCount} |
+                              Created: {format(new Date(conv.createdAt), 'PPpp')}
                             </div>
-                          </ScrollArea>
-                        </DialogContent>
-                      </Dialog>
+                            <ScrollArea className="h-[500px] pr-4">
+                              <div className="space-y-4">
+                                {(messages?.data || []).map((msg) => (
+                                  <div
+                                    key={msg.id}
+                                    className={`p-3 rounded-lg ${
+                                      msg.role === 'user'
+                                        ? 'bg-blue-50 dark:bg-blue-900/20 ml-8'
+                                        : msg.role === 'assistant'
+                                        ? 'bg-gray-50 dark:bg-gray-800 mr-8'
+                                        : 'bg-yellow-50 dark:bg-yellow-900/20 text-sm'
+                                    }`}
+                                  >
+                                    <div className="flex justify-between items-start mb-1">
+                                      <Badge variant="outline" className="text-xs">
+                                        {msg.role}
+                                      </Badge>
+                                      <span className="text-xs text-muted-foreground">
+                                        {format(new Date(msg.createdAt), 'HH:mm:ss')}
+                                      </span>
+                                    </div>
+                                    <div className="whitespace-pre-wrap text-sm">
+                                      {msg.content}
+                                    </div>
+                                    {msg.model && (
+                                      <div className="mt-2 text-xs text-muted-foreground">
+                                        Model: {msg.model} | Tokens:{' '}
+                                        {msg.tokensUsed?.toLocaleString() || 'N/A'}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </ScrollArea>
+                          </DialogContent>
+                        </Dialog>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleShareConversation(conv)}
+                          title="Share conversation"
+                        >
+                          <Share2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -323,6 +375,64 @@ export default function ConversationsPage() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Share Dialog */}
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Share2 className="h-5 w-5" />
+              Share Conversation
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">
+                {sharingConversation?.title || 'Untitled conversation'}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {sharingConversation?.messageCount} messages · {sharingConversation?.userEmail}
+              </p>
+            </div>
+
+            {!shareUrl ? (
+              <div className="space-y-4">
+                <p className="text-sm">
+                  Create a shareable link that allows anyone to view this conversation.
+                </p>
+                <Button onClick={createShareLink} className="w-full">
+                  <Link className="h-4 w-4 mr-2" />
+                  Generate Share Link
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={shareUrl}
+                    readOnly
+                    className="flex-1 font-mono text-sm"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={copyShareUrl}
+                  >
+                    {copied ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Anyone with this link can view the conversation.
+                </p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
