@@ -1005,7 +1005,8 @@ actor GitHubPackageRegistry {
                         integrity: PackageManifest.IntegrityInfo(algorithm: "sha256", packageHash: calculateSHA256(data: data), signedBy: nil, signature: nil),
                         installBehavior: PackageManifest.InstallBehavior(seedAIRegistry: true, createInitialAdmin: true, runFullMigrations: true),
                         updateBehavior: PackageManifest.UpdateBehavior(seedAIRegistry: false, preserveAdminCustomizations: true, runIncrementalMigrations: true, createPreUpdateSnapshot: true),
-                        rollbackBehavior: PackageManifest.RollbackBehavior(supportedFromVersions: [], requiresDatabaseRollback: true)
+                        rollbackBehavior: PackageManifest.RollbackBehavior(supportedFromVersions: [], requiresDatabaseRollback: true),
+                        seedData: nil
                     )
                     
                     _ = try await uploadPackage(
