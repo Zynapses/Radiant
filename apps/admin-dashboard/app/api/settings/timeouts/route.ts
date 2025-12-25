@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, withAdminAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
 // GET /api/settings/timeouts - Get operation timeout settings
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const timeouts = [
       { operationName: 'cdk_bootstrap', timeoutSeconds: 600, retryCount: 2, retryDelayMs: 5000, isActive: true },
@@ -16,22 +17,22 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(timeouts);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch timeouts' }, { status: 500 });
+    return apiError('FETCH_FAILED', 'Failed to fetch timeouts', 500);
   }
-}
+});
 
-// PUT /api/settings/timeouts - Update timeout settings
-export async function PUT(request: NextRequest) {
+// PUT /api/settings/timeouts - Update timeout settings (admin only)
+export const PUT = withAdminAuth(async (request: AuthenticatedRequest) => {
   try {
     const body = await request.json();
     return NextResponse.json({ success: true, updated: body });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to update timeouts' }, { status: 500 });
+    return apiError('UPDATE_FAILED', 'Failed to update timeouts', 500);
   }
-}
+});
 
-// POST /api/settings/timeouts/sync - Sync with SSM
-export async function POST(request: NextRequest) {
+// POST /api/settings/timeouts/sync - Sync with SSM (admin only)
+export const POST = withAdminAuth(async (request: AuthenticatedRequest) => {
   try {
     return NextResponse.json({
       success: true,
@@ -39,6 +40,6 @@ export async function POST(request: NextRequest) {
       syncedAt: new Date().toISOString(),
     });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to sync with SSM' }, { status: 500 });
+    return apiError('SYNC_FAILED', 'Failed to sync with SSM', 500);
   }
-}
+});

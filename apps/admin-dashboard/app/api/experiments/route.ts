@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
 
 // GET /api/experiments - Get all experiments
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const product = searchParams.get('product') || 'combined';
@@ -68,12 +69,12 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(filtered);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch experiments' }, { status: 500 });
+    return apiError('FETCH_FAILED', 'Failed to fetch experiments', 500);
   }
-}
+});
 
 // POST /api/experiments - Create new experiment
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const body = await request.json();
 
@@ -89,6 +90,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(experiment, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create experiment' }, { status: 500 });
+    return apiError('CREATE_FAILED', 'Failed to create experiment', 500);
   }
-}
+});
