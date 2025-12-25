@@ -1,25 +1,52 @@
 'use client';
 
-import { useAuthContext } from './context';
+import { useAuth, useCurrentAdmin } from './context';
+import { useRouter, usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 
-export function useAuth() {
-  return useAuthContext();
-}
+export { useAuth, useCurrentAdmin };
 
-export function useCurrentAdmin() {
-  const { user, isLoading } = useAuthContext();
-  return { admin: user, isLoading };
-}
+/**
+ * Hook to protect routes that require authentication
+ */
+export function useRequireAuth(requiredPermission?: string) {
+  const { isAuthenticated, isLoading, hasPermission, user } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
 
-export function useRequireAuth() {
-  const { user, isLoading, isAuthenticated } = useAuthContext();
-  
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (!isAuthenticated) {
+      const returnUrl = encodeURIComponent(pathname);
+      router.push(`/login?returnUrl=${returnUrl}`);
+      return;
+    }
+
+    if (requiredPermission && !hasPermission(requiredPermission)) {
+      router.push('/unauthorized');
+    }
+  }, [isAuthenticated, isLoading, hasPermission, requiredPermission, pathname, router]);
+
   return {
-    user,
     isLoading,
     isAuthenticated,
-    isAdmin: user?.role === 'admin' || user?.role === 'super_admin',
-    isSuperAdmin: user?.role === 'super_admin',
-    hasRole: (role: string) => user?.role === role || user?.groups?.includes(role),
+    user,
+    hasPermission,
+  };
+}
+
+/**
+ * Hook to check if user can perform production actions
+ */
+export function useProductionAccess() {
+  const { user, hasPermission } = useAuth();
+  
+  const canAccessProduction = user?.mfaEnabled && hasPermission('deployments:prod');
+  
+  return {
+    canAccessProduction,
+    mfaRequired: !user?.mfaEnabled,
+    hasPermission: hasPermission('deployments:prod'),
   };
 }

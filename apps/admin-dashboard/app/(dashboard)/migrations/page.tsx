@@ -67,7 +67,7 @@ export default function MigrationsPage() {
     queryKey: ['migrations', 'pending'],
     queryFn: async () => {
       const res = await apiClient.get<{ requests: MigrationRequest[] }>('/migration-approval/pending');
-      return res.data.requests;
+      return res.requests;
     },
   });
 
@@ -76,7 +76,7 @@ export default function MigrationsPage() {
     queryFn: async () => {
       if (!selectedRequest) return [];
       const res = await apiClient.get<{ approvals: Approval[] }>(`/migration-approval/${selectedRequest.id}/approvals`);
-      return res.data.approvals;
+      return res.approvals;
     },
     enabled: !!selectedRequest,
   });

@@ -2,29 +2,76 @@ import SwiftUI
 
 struct ProvidersView: View {
     @EnvironmentObject var appState: AppState
-    
-    private let providers = [
-        Provider(id: "openai", name: "OpenAI", status: .active, models: 8, hipaa: true),
-        Provider(id: "anthropic", name: "Anthropic", status: .active, models: 5, hipaa: true),
-        Provider(id: "google", name: "Google AI", status: .active, models: 6, hipaa: true),
-        Provider(id: "mistral", name: "Mistral AI", status: .active, models: 4, hipaa: false),
-        Provider(id: "cohere", name: "Cohere", status: .active, models: 3, hipaa: false),
-        Provider(id: "replicate", name: "Replicate", status: .active, models: 20, hipaa: false),
-        Provider(id: "stability", name: "Stability AI", status: .active, models: 4, hipaa: false),
-        Provider(id: "aws-bedrock", name: "AWS Bedrock", status: .active, models: 12, hipaa: true),
-    ]
+    @State private var providers: [AIRegistryService.AIProvider] = []
+    @State private var isLoading = true
+    @State private var errorMessage: String?
     
     var body: some View {
-        List {
-            ForEach(providers) { provider in
-                ProviderRow(provider: provider)
+        Group {
+            if isLoading {
+                ProgressView("Loading providers...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let error = errorMessage {
+                VStack(spacing: 16) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.largeTitle)
+                        .foregroundStyle(.orange)
+                    Text("Failed to load providers")
+                        .font(.headline)
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Button("Retry") {
+                        Task { await loadProviders() }
+                    }
+                    .buttonStyle(.bordered)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if providers.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "building.2")
+                        .font(.largeTitle)
+                        .foregroundStyle(.secondary)
+                    Text("No providers configured")
+                        .font(.headline)
+                    Text("Connect to a Radiant instance to view providers")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List {
+                    ForEach(providers) { provider in
+                        ProviderRow(provider: provider)
+                    }
+                }
             }
         }
         .navigationTitle("AI Providers")
+        .task {
+            await loadProviders()
+        }
+        .refreshable {
+            await loadProviders()
+        }
+    }
+    
+    private func loadProviders() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let registry = appState.aiRegistryService
+            providers = try await registry.fetchProviders()
+            isLoading = false
+        } catch {
+            errorMessage = error.localizedDescription
+            isLoading = false
+        }
     }
 }
 
-struct Provider: Identifiable {
+struct ProviderDisplayModel: Identifiable {
     let id: String
     let name: String
     let status: ProviderStatus
@@ -32,8 +79,12 @@ struct Provider: Identifiable {
     let hipaa: Bool
 }
 
-enum ProviderStatus {
+enum ProviderStatus: String {
     case active, degraded, maintenance, disabled
+    
+    init(from string: String) {
+        self = ProviderStatus(rawValue: string.lowercased()) ?? .disabled
+    }
     
     var color: Color {
         switch self {
@@ -55,16 +106,20 @@ enum ProviderStatus {
 }
 
 struct ProviderRow: View {
-    let provider: Provider
+    let provider: AIRegistryService.AIProvider
+    
+    private var status: ProviderStatus {
+        ProviderStatus(from: provider.status)
+    }
     
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
                 HStack {
-                    Text(provider.name)
+                    Text(provider.displayName)
                         .font(.headline)
                     
-                    if provider.hipaa {
+                    if provider.isHIPAACompliant {
                         Text("HIPAA")
                             .font(.caption2)
                             .padding(.horizontal, 6)
@@ -72,20 +127,40 @@ struct ProviderRow: View {
                             .background(.blue.opacity(0.2))
                             .clipShape(Capsule())
                     }
+                    
+                    if !provider.enabled {
+                        Text("Disabled")
+                            .font(.caption2)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(.gray.opacity(0.2))
+                            .clipShape(Capsule())
+                    }
                 }
                 
-                Text("\(provider.models) models available")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                HStack {
+                    Text("\(provider.modelCount) models")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    
+                    if let description = provider.description {
+                        Text("•")
+                            .foregroundStyle(.secondary)
+                        Text(description)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                }
             }
             
             Spacer()
             
             HStack(spacing: 4) {
                 Circle()
-                    .fill(provider.status.color)
+                    .fill(status.color)
                     .frame(width: 8, height: 8)
-                Text(provider.status.label)
+                Text(status.label)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

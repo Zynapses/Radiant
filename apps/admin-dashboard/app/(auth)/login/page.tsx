@@ -13,7 +13,7 @@ import { Loader2, Shield } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { signIn, isLoading } = useAuth();
+  const { login, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      await signIn(email, password);
+      await login(email, password);
       router.push('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in');

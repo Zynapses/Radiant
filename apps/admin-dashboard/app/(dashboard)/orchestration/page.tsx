@@ -67,7 +67,7 @@ export default function OrchestrationPage() {
     queryKey: ['orchestration', 'pattern-categories'],
     queryFn: async () => {
       const res = await apiClient.get<{ categories: PatternCategory[] }>('/orchestration/pattern-categories');
-      return res.data.categories;
+      return res.categories;
     },
   });
 
@@ -75,7 +75,7 @@ export default function OrchestrationPage() {
     queryKey: ['orchestration', 'workflow-categories'],
     queryFn: async () => {
       const res = await apiClient.get<{ categories: WorkflowCategory[] }>('/orchestration/workflow-categories');
-      return res.data.categories;
+      return res.categories;
     },
   });
 
@@ -84,7 +84,7 @@ export default function OrchestrationPage() {
     queryFn: async () => {
       if (!selectedPatternCategory) return [];
       const res = await apiClient.get<{ patterns: Pattern[] }>(`/orchestration/patterns/${selectedPatternCategory}`);
-      return res.data.patterns;
+      return res.patterns;
     },
     enabled: !!selectedPatternCategory,
   });
@@ -94,7 +94,7 @@ export default function OrchestrationPage() {
     queryFn: async () => {
       if (!selectedWorkflowCategory) return [];
       const res = await apiClient.get<{ workflows: Workflow[] }>(`/orchestration/workflows/${selectedWorkflowCategory}`);
-      return res.data.workflows;
+      return res.workflows;
     },
     enabled: !!selectedWorkflowCategory,
   });

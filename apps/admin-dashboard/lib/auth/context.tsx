@@ -1,91 +1,214 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  type ReactNode,
+} from 'react';
+import {
+  getCurrentUser,
+  fetchAuthSession,
+  signIn,
+  signOut,
+  confirmSignIn,
+} from 'aws-amplify/auth';
 
-interface User {
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export type AdminRole = 'super_admin' | 'admin' | 'operator' | 'auditor';
+
+export interface AdminUser {
   id: string;
   email: string;
+  firstName: string;
+  lastName: string;
   displayName: string;
-  role: 'super_admin' | 'admin' | 'operator' | 'auditor';
-  groups: string[];
+  role: AdminRole;
+  permissions: string[];
+  mfaEnabled: boolean;
+  lastLoginAt?: string;
 }
 
-interface AuthContextValue {
-  user: User | null;
-  isLoading: boolean;
+interface AuthState {
   isAuthenticated: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  refreshSession: () => Promise<void>;
+  isLoading: boolean;
+  user: AdminUser | null;
+  accessToken: string | null;
+  error: string | null;
 }
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+interface AuthContextValue extends AuthState {
+  login: (email: string, password: string) => Promise<{ needsMfa: boolean }>;
+  confirmMfa: (code: string) => Promise<void>;
+  logout: () => Promise<void>;
+  refreshSession: () => Promise<void>;
+  hasPermission: (permission: string) => boolean;
+}
+
+// ============================================================================
+// CONTEXT
+// ============================================================================
+
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [state, setState] = useState<AuthState>({
+    isAuthenticated: false,
+    isLoading: true,
+    user: null,
+    accessToken: null,
+    error: null,
+  });
+
+  const fetchAdminProfile = useCallback(async (token: string): Promise<AdminUser> => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v2/admin/profile`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch admin profile');
+    }
+    
+    return response.json();
+  }, []);
+
+  const checkSession = useCallback(async () => {
+    try {
+      await getCurrentUser();
+      const session = await fetchAuthSession();
+      
+      if (session.tokens?.accessToken) {
+        const adminProfile = await fetchAdminProfile(
+          session.tokens.accessToken.toString()
+        );
+        
+        setState({
+          isAuthenticated: true,
+          isLoading: false,
+          user: adminProfile,
+          accessToken: session.tokens.accessToken.toString(),
+          error: null,
+        });
+      } else {
+        throw new Error('No access token');
+      }
+    } catch {
+      setState({
+        isAuthenticated: false,
+        isLoading: false,
+        user: null,
+        accessToken: null,
+        error: null,
+      });
+    }
+  }, [fetchAdminProfile]);
 
   useEffect(() => {
     checkSession();
-  }, []);
+  }, [checkSession]);
 
-  const checkSession = async () => {
+  const login = useCallback(async (email: string, password: string) => {
     try {
-      const response = await fetch('/api/auth/session');
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-      }
-    } catch (error) {
-      console.error('Failed to check session:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signIn = useCallback(async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      setState(prev => ({ ...prev, isLoading: true, error: null }));
+      
+      const result = await signIn({
+        username: email,
+        password,
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to sign in');
+      
+      if (result.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_TOTP_CODE') {
+        setState(prev => ({ ...prev, isLoading: false }));
+        return { needsMfa: true };
       }
-
-      const data = await response.json();
-      setUser(data.user);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const signOut = useCallback(async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      setUser(null);
+      
+      if (result.isSignedIn) {
+        await checkSession();
+      }
+      
+      return { needsMfa: false };
     } catch (error) {
-      console.error('Failed to sign out:', error);
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Login failed',
+      }));
+      throw error;
+    }
+  }, [checkSession]);
+
+  const confirmMfa = useCallback(async (code: string) => {
+    try {
+      setState(prev => ({ ...prev, isLoading: true, error: null }));
+      
+      const result = await confirmSignIn({
+        challengeResponse: code,
+      });
+      
+      if (result.isSignedIn) {
+        await checkSession();
+      }
+    } catch (error) {
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'MFA verification failed',
+      }));
+      throw error;
+    }
+  }, [checkSession]);
+
+  const logout = useCallback(async () => {
+    try {
+      await signOut();
+      setState({
+        isAuthenticated: false,
+        isLoading: false,
+        user: null,
+        accessToken: null,
+        error: null,
+      });
+    } catch (error) {
+      console.error('Logout failed:', error);
     }
   }, []);
 
   const refreshSession = useCallback(async () => {
     await checkSession();
-  }, []);
+  }, [checkSession]);
+
+  const hasPermission = useCallback((permission: string): boolean => {
+    if (!state.user) return false;
+    
+    if (state.user.role === 'super_admin') return true;
+    
+    const parts = permission.split(':');
+    if (parts.length === 2) {
+      const wildcardPermission = `${parts[0]}:*`;
+      if (state.user.permissions.includes(wildcardPermission)) return true;
+    }
+    
+    return state.user.permissions.includes(permission);
+  }, [state.user]);
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        isLoading,
-        isAuthenticated: !!user,
-        signIn,
-        signOut,
+        ...state,
+        login,
+        confirmMfa,
+        logout,
         refreshSession,
+        hasPermission,
       }}
     >
       {children}
@@ -93,10 +216,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAuthContext() {
+export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuthContext must be used within an AuthProvider');
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
+}
+
+export function useCurrentAdmin() {
+  const { user, isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated || !user) {
+    throw new Error('Not authenticated');
+  }
+  
+  return user;
 }

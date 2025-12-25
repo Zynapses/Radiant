@@ -52,7 +52,7 @@ export default function StoragePage() {
     queryKey: ['storage', 'usage'],
     queryFn: async () => {
       const res = await apiClient.get<{ usage: StorageUsage[] }>('/storage/usage');
-      return res.data.usage;
+      return res.usage;
     },
   });
 
@@ -60,7 +60,7 @@ export default function StoragePage() {
     queryKey: ['storage', 'events'],
     queryFn: async () => {
       const res = await apiClient.get<{ events: StorageEvent[] }>('/storage/events');
-      return res.data.events;
+      return res.events;
     },
   });
 

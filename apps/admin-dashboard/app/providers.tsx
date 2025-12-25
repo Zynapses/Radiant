@@ -1,10 +1,14 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from 'next-themes';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
 import { AuthProvider } from '@/lib/auth/context';
-import { Toaster } from '@/components/ui/toaster';
+import { configureAmplify } from '@/lib/auth/amplify';
+
+if (typeof window !== 'undefined') {
+  configureAmplify();
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -13,6 +17,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
         defaultOptions: {
           queries: {
             staleTime: 60 * 1000,
+            gcTime: 5 * 60 * 1000,
+            retry: 1,
             refetchOnWindowFocus: false,
           },
         },
@@ -21,12 +27,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <AuthProvider>
-          {children}
-          <Toaster />
-        </AuthProvider>
-      </ThemeProvider>
+      <AuthProvider>{children}</AuthProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

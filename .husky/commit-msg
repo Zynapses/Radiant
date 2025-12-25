@@ -1,0 +1,37 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Validate Conventional Commit format
+commit_msg_file=$1
+commit_msg=$(cat "$commit_msg_file")
+
+# Conventional commit regex pattern
+pattern="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?(!)?: .{1,100}"
+
+if ! echo "$commit_msg" | grep -qE "$pattern"; then
+  echo "❌ Invalid commit message format!"
+  echo ""
+  echo "Commit message must follow Conventional Commits format:"
+  echo "  <type>(<scope>): <description>"
+  echo ""
+  echo "Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
+  echo ""
+  echo "Examples:"
+  echo "  feat(auth): add OAuth2 support"
+  echo "  fix(api): resolve timeout issue"
+  echo "  feat!: breaking change in API"
+  echo ""
+  echo "Your message: $commit_msg"
+  exit 1
+fi
+
+# Determine version bump type from commit
+if echo "$commit_msg" | grep -qE "^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?!:"; then
+  echo "📦 Major version bump detected (breaking change)"
+elif echo "$commit_msg" | grep -qE "^feat(\(.+\))?:"; then
+  echo "📦 Minor version bump detected (new feature)"
+elif echo "$commit_msg" | grep -qE "^fix(\(.+\))?:"; then
+  echo "📦 Patch version bump detected (bug fix)"
+fi
+
+echo "✅ Commit message format valid"

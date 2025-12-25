@@ -60,8 +60,7 @@ export default function ProvidersPage() {
   const { data: providers, isLoading } = useQuery({
     queryKey: ['providers'],
     queryFn: async (): Promise<Provider[]> => {
-      const res = await apiClient.get<Provider[]>('/admin/providers');
-      return res.data;
+      return apiClient.get<Provider[]>('/admin/providers');
     },
   });
 

@@ -29,32 +29,32 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Total Requests"
-          value={data?.totalRequests ?? 0}
-          change={12.5}
+          value={data?.totalRequests?.value ?? 0}
+          change={data?.totalRequests?.change ?? 0}
           icon={Activity}
           loading={isLoading}
         />
         <MetricCard
-          title="Total Tokens"
-          value={data?.totalTokens ?? 0}
-          change={8.2}
-          icon={Zap}
+          title="Active Models"
+          value={data?.activeModels?.value ?? 0}
+          change={0}
+          icon={Cpu}
           loading={isLoading}
           format="number"
         />
         <MetricCard
           title="Revenue (MTD)"
-          value={data?.revenue ?? 0}
-          change={15.3}
+          value={data?.revenue?.value ?? 0}
+          change={data?.revenue?.change ?? 0}
           icon={DollarSign}
           loading={isLoading}
           format="currency"
         />
         <MetricCard
-          title="Active Users"
-          value={data?.activeUsers ?? 0}
-          change={-2.1}
-          icon={Users}
+          title="Error Rate"
+          value={data?.errorRate?.value ?? 0}
+          change={data?.errorRate?.change ?? 0}
+          icon={Zap}
           loading={isLoading}
         />
       </div>

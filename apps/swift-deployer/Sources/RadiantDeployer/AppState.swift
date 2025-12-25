@@ -4,7 +4,7 @@ import Combine
 @MainActor
 final class AppState: ObservableObject {
     // MARK: - Navigation
-    @Published var selectedTab: NavigationTab = .apps
+    @Published var selectedTab: NavigationTab = .dashboard
     @Published var selectedApp: ManagedApp?
     @Published var selectedEnvironment: DeployEnvironment = .dev
     
@@ -23,6 +23,16 @@ final class AppState: ObservableObject {
     let credentialService = CredentialService()
     let cdkService = CDKService()
     let awsService = AWSService()
+    let aiRegistryService = AIRegistryService()
+    
+    // MARK: - Radiant Connection
+    @Published var radiantBaseURL: String?
+    @Published var radiantAuthToken: String?
+    @Published var isConnectedToRadiant = false
+    
+    // MARK: - 1Password Status
+    @Published var onePasswordConfigured = false
+    @Published var onePasswordStatus: CredentialService.OnePasswordStatus?
     
     // MARK: - Initialization
     init() {
@@ -35,11 +45,33 @@ final class AppState: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         
+        // Check 1Password status first
+        onePasswordStatus = await credentialService.checkOnePasswordStatus()
+        onePasswordConfigured = onePasswordStatus?.installed == true && onePasswordStatus?.signedIn == true
+        
+        guard onePasswordConfigured else {
+            apps = ManagedApp.defaults
+            return
+        }
+        
         do {
             credentials = try await credentialService.loadCredentials()
             apps = try await loadApps()
         } catch {
             self.error = AppError(message: "Failed to load data", underlying: error)
+        }
+    }
+    
+    func refreshOnePasswordStatus() async {
+        onePasswordStatus = await credentialService.checkOnePasswordStatus()
+        onePasswordConfigured = onePasswordStatus?.installed == true && onePasswordStatus?.signedIn == true
+        
+        if onePasswordConfigured {
+            do {
+                credentials = try await credentialService.loadCredentials()
+            } catch {
+                self.error = AppError(message: "Failed to load credentials", underlying: error)
+            }
         }
     }
     
@@ -50,27 +82,105 @@ final class AppState: ObservableObject {
 
 // MARK: - Navigation
 enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
+    // Main
+    case dashboard = "Dashboard"
     case apps = "Apps"
     case deploy = "Deploy"
+    
+    // Operations
+    case instances = "Instances"
+    case snapshots = "Snapshots"
+    case packages = "Packages"
+    case history = "History"
+    
+    // AI Registry
     case providers = "Providers"
     case models = "Models"
+    case selfHosted = "Self-Hosted"
+    
+    // Advanced
+    case multiRegion = "Multi-Region"
+    case abTesting = "A/B Testing"
+    
+    // Security & Compliance
+    case security = "Security"
+    case compliance = "Compliance"
+    
+    // System
+    case costs = "Costs"
     case settings = "Settings"
     
     var id: String { rawValue }
     
     var icon: String {
         switch self {
-        case .apps: return "square.grid.2x2"
+        case .dashboard: return "square.grid.2x2"
+        case .apps: return "app.badge"
         case .deploy: return "arrow.up.circle"
+        case .instances: return "server.rack"
+        case .snapshots: return "clock.arrow.circlepath"
+        case .packages: return "shippingbox"
+        case .history: return "clock"
         case .providers: return "building.2"
         case .models: return "cpu"
+        case .selfHosted: return "memorychip"
+        case .multiRegion: return "globe"
+        case .abTesting: return "flask"
+        case .security: return "shield.lefthalf.filled"
+        case .compliance: return "checkmark.shield"
+        case .costs: return "dollarsign.circle"
         case .settings: return "gearshape"
         }
+    }
+    
+    var color: Color {
+        switch self {
+        case .dashboard: return .blue
+        case .apps: return .purple
+        case .deploy: return .green
+        case .instances: return .orange
+        case .snapshots: return .cyan
+        case .packages: return .indigo
+        case .history: return .brown
+        case .providers: return .teal
+        case .models: return .pink
+        case .selfHosted: return .mint
+        case .multiRegion: return .blue
+        case .abTesting: return .purple
+        case .security: return .red
+        case .compliance: return .green
+        case .costs: return .yellow
+        case .settings: return .gray
+        }
+    }
+    
+    static var mainTabs: [NavigationTab] {
+        [.dashboard, .apps, .deploy]
+    }
+    
+    static var operationTabs: [NavigationTab] {
+        [.instances, .snapshots, .packages, .history]
+    }
+    
+    static var aiTabs: [NavigationTab] {
+        [.providers, .models, .selfHosted]
+    }
+    
+    static var advancedTabs: [NavigationTab] {
+        [.multiRegion, .abTesting]
+    }
+    
+    static var securityTabs: [NavigationTab] {
+        [.security, .compliance]
+    }
+    
+    static var systemTabs: [NavigationTab] {
+        [.costs, .settings]
     }
 }
 
 // MARK: - DeployEnvironment
-enum DeployEnvironment: String, CaseIterable, Identifiable, Sendable {
+enum DeployEnvironment: String, CaseIterable, Identifiable, Sendable, Codable {
     case dev = "Development"
     case staging = "Staging"
     case prod = "Production"

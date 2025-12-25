@@ -11,7 +11,9 @@ import {
   Bell,
   Palette,
   Key,
-  Globe
+  Globe,
+  Rocket,
+  Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,6 +29,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { apiClient } from '@/lib/api';
+import { DeploymentSettings } from '@/components/settings/DeploymentSettings';
+import { OperationTimeouts } from '@/components/settings/OperationTimeouts';
 
 interface UserSettings {
   displayName: string;
@@ -53,8 +57,7 @@ export default function SettingsPage() {
   const { data: settings, isLoading } = useQuery({
     queryKey: ['settings'],
     queryFn: async (): Promise<UserSettings> => {
-      const res = await apiClient.get<UserSettings>('/admin/settings');
-      return res.data;
+      return apiClient.get<UserSettings>('/admin/settings');
     },
   });
 
@@ -114,6 +117,14 @@ export default function SettingsPage() {
           <TabsTrigger value="security">
             <Shield className="mr-2 h-4 w-4" />
             Security
+          </TabsTrigger>
+          <TabsTrigger value="deployment">
+            <Rocket className="mr-2 h-4 w-4" />
+            Deployment
+          </TabsTrigger>
+          <TabsTrigger value="timeouts">
+            <Clock className="mr-2 h-4 w-4" />
+            Timeouts
           </TabsTrigger>
         </TabsList>
 
@@ -343,6 +354,14 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="deployment" className="space-y-4">
+          <DeploymentSettings />
+        </TabsContent>
+
+        <TabsContent value="timeouts" className="space-y-4">
+          <OperationTimeouts />
         </TabsContent>
       </Tabs>
     </div>

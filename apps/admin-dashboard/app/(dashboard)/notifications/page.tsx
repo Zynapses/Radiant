@@ -37,8 +37,7 @@ export default function NotificationsPage() {
   const { data: notifications, isLoading } = useQuery({
     queryKey: ['notifications'],
     queryFn: async (): Promise<Notification[]> => {
-      const res = await apiClient.get<Notification[]>('/admin/notifications');
-      return res.data;
+      return apiClient.get<Notification[]>('/admin/notifications');
     },
   });
 

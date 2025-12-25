@@ -72,7 +72,7 @@ export default function ConfigurationPage() {
     queryKey: ['configuration', 'categories'],
     queryFn: async () => {
       const res = await apiClient.get<{ categories: ConfigCategory[] }>('/configuration/categories');
-      return res.data.categories;
+      return res.categories;
     },
   });
 
@@ -81,7 +81,7 @@ export default function ConfigurationPage() {
     queryFn: async () => {
       if (!selectedCategory) return [];
       const res = await apiClient.get<{ configs: ConfigValue[] }>(`/configuration/category/${selectedCategory}`);
-      return res.data.configs;
+      return res.configs;
     },
     enabled: !!selectedCategory,
   });
@@ -90,7 +90,7 @@ export default function ConfigurationPage() {
     queryKey: ['configuration', 'audit'],
     queryFn: async () => {
       const res = await apiClient.get<{ auditLog: AuditEntry[] }>('/configuration/audit');
-      return res.data.auditLog;
+      return res.auditLog;
     },
   });
 

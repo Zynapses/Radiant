@@ -1,12 +1,12 @@
 'use client';
 
-import { useAuth } from '@/lib/auth/hooks';
+import { useAuth } from '@/lib/auth/context';
 import { Button } from '@/components/ui/button';
 import { Bell, Sun, Moon, LogOut, User } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 export function Header() {
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
 
   return (
@@ -44,7 +44,7 @@ export function Header() {
             </div>
           </div>
 
-          <Button variant="ghost" size="icon" onClick={() => signOut()}>
+          <Button variant="ghost" size="icon" onClick={() => logout()}>
             <LogOut className="h-5 w-5" />
           </Button>
         </div>

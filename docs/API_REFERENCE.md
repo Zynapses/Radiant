@@ -310,27 +310,50 @@ List all batch jobs.
 
 ## Error Codes
 
-| Code | HTTP Status | Description |
-|------|-------------|-------------|
-| `invalid_request` | 400 | Invalid request parameters |
-| `unauthorized` | 401 | Missing or invalid API key |
-| `forbidden` | 403 | Insufficient permissions |
-| `not_found` | 404 | Resource not found |
-| `rate_limit` | 429 | Too many requests |
-| `insufficient_credits` | 402 | Not enough credits |
-| `server_error` | 500 | Internal server error |
+RADIANT uses standardized error codes across all endpoints. See [Error Codes Reference](ERROR_CODES.md) for the complete list.
 
-**Error Response:**
+### Error Categories
+
+| Category | Code Range | Description |
+|----------|------------|-------------|
+| Authentication | `RADIANT_AUTH_1xxx` | Token, API key, session errors |
+| Authorization | `RADIANT_AUTHZ_2xxx` | Permission, role, tenant errors |
+| Validation | `RADIANT_VAL_3xxx` | Input validation errors |
+| Resource | `RADIANT_RES_4xxx` | Not found, conflict, quota errors |
+| Rate Limiting | `RADIANT_RATE_5xxx` | Throttling and rate limit errors |
+| AI/Model | `RADIANT_AI_6xxx` | Model, provider, inference errors |
+| Billing | `RADIANT_BILL_7xxx` | Credits, subscription errors |
+| Storage | `RADIANT_STOR_8xxx` | File upload, storage errors |
+| Internal | `RADIANT_INT_9xxx` | Server, database, timeout errors |
+
+### Common Error Codes
+
+| Code | HTTP | Retryable | Description |
+|------|------|-----------|-------------|
+| `RADIANT_AUTH_1001` | 401 | ❌ | Invalid authentication token |
+| `RADIANT_AUTH_1004` | 401 | ❌ | Invalid API key |
+| `RADIANT_VAL_3001` | 400 | ❌ | Required field missing |
+| `RADIANT_RES_4001` | 404 | ❌ | Resource not found |
+| `RADIANT_RATE_5001` | 429 | ✅ | Rate limit exceeded |
+| `RADIANT_BILL_7001` | 402 | ❌ | Insufficient credits |
+| `RADIANT_AI_6004` | 502 | ✅ | AI provider error |
+| `RADIANT_INT_9001` | 500 | ✅ | Internal server error |
+
+**Error Response Format:**
 
 ```json
 {
   "error": {
-    "code": "rate_limit",
-    "message": "Too many requests. Please try again later.",
-    "retry_after": 60
+    "code": "RADIANT_RATE_5001",
+    "message": "Too many requests. Please slow down.",
+    "category": "rate_limit",
+    "retryable": true,
+    "timestamp": "2024-12-25T10:30:00.000Z"
   }
 }
 ```
+
+**Retry-After Header:** Retryable errors include `Retry-After` header with seconds to wait.
 
 ---
 
