@@ -19,11 +19,13 @@ export default defineConfig({
       'apps/**/*.test.{ts,tsx}',
     ],
     exclude: [
-      'node_modules',
-      'dist',
-      '.next',
-      'cdk.out',
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.next/**',
+      '**/cdk.out/**',
       '**/e2e/**',
+      // Admin dashboard has its own vitest config with path aliases
+      'apps/admin-dashboard/**',
     ],
     // Coverage configuration
     coverage: {
