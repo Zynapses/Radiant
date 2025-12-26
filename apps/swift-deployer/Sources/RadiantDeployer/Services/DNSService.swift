@@ -5,6 +5,8 @@ import Foundation
 
 actor DNSService {
     
+    private let auditLogger = AuditLogger.shared
+    
     enum DNSError: Error, LocalizedError {
         case route53Error(String)
         case acmError(String)
@@ -147,6 +149,13 @@ actor DNSService {
             throw DNSError.acmError("Failed to request certificate")
         }
         
+        // Audit log for compliance (SOC2, GDPR)
+        await auditLogger.log(
+            action: .certificateRequested,
+            details: "SSL certificate requested for domain: \(domain)",
+            metadata: ["domain": domain, "arn": arn]
+        )
+        
         // Wait a moment for validation records to be generated
         try await Task.sleep(nanoseconds: 2_000_000_000)
         
@@ -242,6 +251,13 @@ actor DNSService {
            let tokens = json["DkimTokens"] as? [String] {
             dkimTokens = tokens
         }
+        
+        // Audit log for compliance (SOC2, GDPR)
+        await auditLogger.log(
+            action: .emailDomainVerified,
+            details: "SES domain verification initiated for: \(domain)",
+            metadata: ["domain": domain, "dkimTokenCount": String(dkimTokens.count)]
+        )
         
         return SESRecords(
             verificationToken: verificationToken,
