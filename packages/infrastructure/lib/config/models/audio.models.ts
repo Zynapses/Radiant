@@ -1,0 +1,142 @@
+/**
+ * Audio & Speech Models - STT, Speaker Recognition
+ */
+
+import { SageMakerModelConfig } from './index';
+
+// ============================================================================
+// SPEECH-TO-TEXT MODELS (3 models)
+// ============================================================================
+
+export const STT_MODELS: SageMakerModelConfig[] = [
+  {
+    id: 'parakeet-tdt-1b',
+    name: 'parakeet-tdt-1b',
+    displayName: 'NVIDIA Parakeet TDT 1.1B',
+    description: 'State-of-the-art ASR with 4.4% WER on LibriSpeech',
+    category: 'audio_stt',
+    specialty: 'speech_to_text',
+    image: 'pytorch-inference:2.1-gpu-py310-cu121-ubuntu22.04',
+    instanceType: 'ml.g5.xlarge',
+    environment: { MODEL_NAME: 'nvidia/parakeet-tdt-1.1b' },
+    parameters: 1_100_000_000,
+    accuracy: '4.4% WER LibriSpeech test-clean',
+    capabilities: ['speech_to_text', 'english', 'real_time'],
+    inputFormats: ['audio/wav', 'audio/mp3', 'audio/flac'],
+    outputFormats: ['application/json', 'text/plain'],
+    thermal: { defaultState: 'COLD', scaleToZeroAfterMinutes: 15, warmupTimeSeconds: 90, minInstances: 0, maxInstances: 3 },
+    license: 'CC-BY-4.0',
+    pricing: { hourlyRate: 2.47, perMinuteAudio: 0.03, markup: 0.75 },
+    minTier: 3, requiresGPU: true, gpuMemoryGB: 10, status: 'active',
+  },
+  {
+    id: 'whisper-large-v3',
+    name: 'whisper-large-v3',
+    displayName: 'OpenAI Whisper Large V3',
+    description: 'Multilingual speech recognition and translation',
+    category: 'audio_stt',
+    specialty: 'speech_to_text',
+    image: 'pytorch-inference:2.1-transformers4.36-gpu-py310-cu121-ubuntu22.04',
+    instanceType: 'ml.g5.xlarge',
+    environment: { HF_MODEL_ID: 'openai/whisper-large-v3', HF_TASK: 'automatic-speech-recognition' },
+    parameters: 1_550_000_000,
+    accuracy: '5.0% WER LibriSpeech test-clean',
+    capabilities: ['speech_to_text', 'multilingual', 'translation', 'timestamps'],
+    inputFormats: ['audio/wav', 'audio/mp3', 'audio/flac', 'audio/m4a'],
+    outputFormats: ['application/json', 'text/plain', 'text/vtt', 'text/srt'],
+    thermal: { defaultState: 'COLD', scaleToZeroAfterMinutes: 15, warmupTimeSeconds: 90, minInstances: 0, maxInstances: 3 },
+    license: 'MIT',
+    pricing: { hourlyRate: 2.47, perMinuteAudio: 0.04, markup: 0.75 },
+    minTier: 3, requiresGPU: true, gpuMemoryGB: 10, status: 'active',
+  },
+  {
+    id: 'whisper-turbo',
+    name: 'whisper-turbo',
+    displayName: 'OpenAI Whisper Turbo',
+    description: 'Fast multilingual ASR with 8x speed improvement',
+    category: 'audio_stt',
+    specialty: 'speech_to_text',
+    image: 'pytorch-inference:2.1-transformers4.36-gpu-py310-cu121-ubuntu22.04',
+    instanceType: 'ml.g4dn.xlarge',
+    environment: { HF_MODEL_ID: 'openai/whisper-large-v3-turbo', HF_TASK: 'automatic-speech-recognition' },
+    parameters: 809_000_000,
+    accuracy: '5.5% WER LibriSpeech test-clean',
+    capabilities: ['speech_to_text', 'multilingual', 'fast', 'real_time'],
+    inputFormats: ['audio/wav', 'audio/mp3', 'audio/flac', 'audio/m4a'],
+    outputFormats: ['application/json', 'text/plain'],
+    thermal: { defaultState: 'COLD', scaleToZeroAfterMinutes: 15, warmupTimeSeconds: 60, minInstances: 0, maxInstances: 5 },
+    license: 'MIT',
+    pricing: { hourlyRate: 1.30, perMinuteAudio: 0.02, markup: 0.75 },
+    minTier: 3, requiresGPU: true, gpuMemoryGB: 6, status: 'active',
+  },
+];
+
+// ============================================================================
+// SPEAKER RECOGNITION MODELS (3 models)
+// ============================================================================
+
+export const SPEAKER_MODELS: SageMakerModelConfig[] = [
+  {
+    id: 'titanet-large',
+    name: 'titanet-large',
+    displayName: 'NVIDIA TitaNet-Large',
+    description: 'Speaker verification and embedding extraction',
+    category: 'audio_speaker',
+    specialty: 'speaker_identification',
+    image: 'pytorch-inference:2.1-gpu-py310-cu121-ubuntu22.04',
+    instanceType: 'ml.g4dn.xlarge',
+    environment: { MODEL_NAME: 'nvidia/speakerverification_en_titanet_large' },
+    parameters: 23_000_000,
+    accuracy: '0.68% EER VoxCeleb1',
+    capabilities: ['speaker_verification', 'speaker_embedding', 'speaker_identification'],
+    inputFormats: ['audio/wav', 'audio/mp3', 'audio/flac'],
+    outputFormats: ['application/json'],
+    thermal: { defaultState: 'COLD', scaleToZeroAfterMinutes: 15, warmupTimeSeconds: 45, minInstances: 0, maxInstances: 3 },
+    license: 'CC-BY-4.0',
+    pricing: { hourlyRate: 1.30, perMinuteAudio: 0.02, markup: 0.75 },
+    minTier: 3, requiresGPU: true, gpuMemoryGB: 4, status: 'active',
+  },
+  {
+    id: 'ecapa-tdnn',
+    name: 'ecapa-tdnn',
+    displayName: 'ECAPA-TDNN',
+    description: 'Emphasized channel attention for speaker verification',
+    category: 'audio_speaker',
+    specialty: 'speaker_identification',
+    image: 'pytorch-inference:2.1-gpu-py310-cu121-ubuntu22.04',
+    instanceType: 'ml.g4dn.xlarge',
+    environment: { MODEL_NAME: 'speechbrain/spkrec-ecapa-voxceleb' },
+    parameters: 20_800_000,
+    accuracy: '0.80% EER VoxCeleb1',
+    capabilities: ['speaker_verification', 'speaker_embedding'],
+    inputFormats: ['audio/wav', 'audio/mp3', 'audio/flac'],
+    outputFormats: ['application/json'],
+    thermal: { defaultState: 'COLD', scaleToZeroAfterMinutes: 15, warmupTimeSeconds: 45, minInstances: 0, maxInstances: 3 },
+    license: 'Apache-2.0',
+    pricing: { hourlyRate: 1.30, perMinuteAudio: 0.02, markup: 0.75 },
+    minTier: 3, requiresGPU: true, gpuMemoryGB: 4, status: 'active',
+  },
+  {
+    id: 'pyannote-speaker-diarization',
+    name: 'pyannote-speaker-diarization',
+    displayName: 'pyannote Speaker Diarization 3.1',
+    description: 'Who spoke when - speaker diarization pipeline',
+    category: 'audio_speaker',
+    specialty: 'speaker_identification',
+    image: 'pytorch-inference:2.1-gpu-py310-cu121-ubuntu22.04',
+    instanceType: 'ml.g5.xlarge',
+    environment: { MODEL_NAME: 'pyannote/speaker-diarization-3.1' },
+    parameters: 0,
+    accuracy: '18.4% DER AMI Mix-Headset',
+    capabilities: ['speaker_diarization', 'speaker_counting', 'overlap_detection'],
+    inputFormats: ['audio/wav', 'audio/mp3', 'audio/flac'],
+    outputFormats: ['application/json', 'text/rttm'],
+    thermal: { defaultState: 'COLD', scaleToZeroAfterMinutes: 15, warmupTimeSeconds: 60, minInstances: 0, maxInstances: 3 },
+    license: 'MIT',
+    commercialUseNotes: 'Requires pyannote/speaker-diarization access grant',
+    pricing: { hourlyRate: 2.47, perMinuteAudio: 0.05, markup: 0.75 },
+    minTier: 3, requiresGPU: true, gpuMemoryGB: 8, status: 'active',
+  },
+];
+
+export const ALL_AUDIO_MODELS = [...STT_MODELS, ...SPEAKER_MODELS];

@@ -1,0 +1,513 @@
+openapi: 3.1.0
+info:
+  title: RADIANT API
+  description: Multi-tenant AI platform API
+  version: 4.17.0
+  contact:
+    name: RADIANT Support
+  license:
+    name: MIT
+
+servers:
+  - url: https://api.radiant.example.com/v2
+    description: Production
+  - url: https://api-staging.radiant.example.com/v2
+    description: Staging
+  - url: http://localhost:3001/v2
+    description: Local Development
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Health
+    description: Health check endpoints
+  - name: Chat
+    description: AI chat completions
+  - name: Models
+    description: AI model management
+  - name: Providers
+    description: Provider management
+  - name: Billing
+    description: Credits and subscriptions
+  - name: Storage
+    description: Storage usage
+  - name: Localization
+    description: Translation management
+  - name: Configuration
+    description: System configuration
+  - name: Admin
+    description: Administrative operations
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  version:
+                    type: string
+                    example: 4.17.0
+
+  /chat/completions:
+    post:
+      tags: [Chat]
+      summary: Create chat completion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Successful completion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /models:
+    get:
+      tags: [Models]
+      summary: List available models
+      responses:
+        '200':
+          description: List of models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Model'
+
+  /billing/tiers:
+    get:
+      tags: [Billing]
+      summary: Get subscription tiers
+      security: []
+      responses:
+        '200':
+          description: List of tiers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tiers:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubscriptionTier'
+
+  /billing/credits:
+    get:
+      tags: [Billing]
+      summary: Get credit balance
+      responses:
+        '200':
+          description: Credit balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditBalance'
+
+  /billing/transactions:
+    get:
+      tags: [Billing]
+      summary: Get transaction history
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Transaction list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+
+  /storage/usage:
+    get:
+      tags: [Storage]
+      summary: Get storage usage
+      responses:
+        '200':
+          description: Storage usage breakdown
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  usage:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StorageUsage'
+
+  /localization/languages:
+    get:
+      tags: [Localization]
+      summary: Get supported languages
+      security: []
+      responses:
+        '200':
+          description: Language list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  languages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Language'
+
+  /localization/bundle:
+    get:
+      tags: [Localization]
+      summary: Get translation bundle
+      security: []
+      parameters:
+        - name: language
+          in: query
+          required: true
+          schema:
+            type: string
+            example: en
+      responses:
+        '200':
+          description: Translation bundle
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bundle:
+                    type: object
+                    additionalProperties:
+                      type: string
+
+  /configuration/categories:
+    get:
+      tags: [Configuration]
+      summary: Get configuration categories
+      responses:
+        '200':
+          description: Category list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ConfigCategory'
+
+  /admin/models:
+    get:
+      tags: [Admin]
+      summary: List all models (admin)
+      responses:
+        '200':
+          description: Model list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdminModel'
+
+  /admin/providers:
+    get:
+      tags: [Admin]
+      summary: List all providers (admin)
+      responses:
+        '200':
+          description: Provider list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdminProvider'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+
+    ChatRequest:
+      type: object
+      required: [model, messages]
+      properties:
+        model:
+          type: string
+          example: gpt-4o
+        messages:
+          type: array
+          items:
+            type: object
+            properties:
+              role:
+                type: string
+                enum: [system, user, assistant]
+              content:
+                type: string
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 2
+          default: 0.7
+        max_tokens:
+          type: integer
+          minimum: 1
+        stream:
+          type: boolean
+          default: false
+
+    ChatResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+          example: chat.completion
+        model:
+          type: string
+        choices:
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                type: integer
+              message:
+                type: object
+                properties:
+                  role:
+                    type: string
+                  content:
+                    type: string
+              finish_reason:
+                type: string
+        usage:
+          type: object
+          properties:
+            prompt_tokens:
+              type: integer
+            completion_tokens:
+              type: integer
+            total_tokens:
+              type: integer
+
+    Model:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        provider:
+          type: string
+        category:
+          type: string
+        context_window:
+          type: integer
+
+    AdminModel:
+      allOf:
+        - $ref: '#/components/schemas/Model'
+        - type: object
+          properties:
+            status:
+              type: string
+            is_enabled:
+              type: boolean
+            input_cost_per_1k:
+              type: number
+            output_cost_per_1k:
+              type: number
+
+    AdminProvider:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        display_name:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+        health_status:
+          type: string
+        models_count:
+          type: integer
+        is_enabled:
+          type: boolean
+
+    SubscriptionTier:
+      type: object
+      properties:
+        id:
+          type: string
+        tier_name:
+          type: string
+        display_name:
+          type: string
+        price_monthly_cents:
+          type: integer
+          nullable: true
+        price_annual_cents:
+          type: integer
+          nullable: true
+        included_credits_per_user:
+          type: integer
+        features:
+          type: object
+
+    CreditBalance:
+      type: object
+      properties:
+        balance:
+          type: number
+        lifetime_purchased:
+          type: number
+        lifetime_used:
+          type: number
+        lifetime_bonus:
+          type: number
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+        transaction_type:
+          type: string
+          enum: [purchase, usage, bonus, refund]
+        amount:
+          type: number
+        balance_after:
+          type: number
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    StorageUsage:
+      type: object
+      properties:
+        storage_type:
+          type: string
+        bytes_used:
+          type: integer
+        bytes_quota:
+          type: integer
+          nullable: true
+        price_per_gb_cents:
+          type: integer
+        included_gb:
+          type: integer
+        is_over_quota:
+          type: boolean
+
+    Language:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        native_name:
+          type: string
+        is_rtl:
+          type: boolean
+        is_active:
+          type: boolean
+
+    ConfigCategory:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        display_order:
+          type: integer

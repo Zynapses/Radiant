@@ -1,0 +1,171 @@
+# RADIANT v4.17.0 - LiteLLM External Providers Configuration
+# 21 External AI Provider Integrations
+
+general_settings:
+  master_key: ${LITELLM_MASTER_KEY}
+  database_url: ${DATABASE_URL}
+  alerting:
+    - slack
+  alert_types:
+    - llm_exceptions
+    - budget_alerts
+
+litellm_settings:
+  drop_params: true
+  set_verbose: false
+  num_retries: 3
+  request_timeout: 600
+  telemetry: false
+  cache: true
+  cache_params:
+    type: redis
+    host: ${REDIS_HOST}
+    port: 6379
+    password: ${REDIS_PASSWORD}
+
+model_list:
+  # ============================================================================
+  # OPENAI MODELS
+  # ============================================================================
+  - model_name: gpt-4o
+    litellm_params:
+      model: gpt-4o
+      api_key: ${OPENAI_API_KEY}
+      
+  - model_name: gpt-4o-mini
+    litellm_params:
+      model: gpt-4o-mini
+      api_key: ${OPENAI_API_KEY}
+      
+  - model_name: o1
+    litellm_params:
+      model: o1
+      api_key: ${OPENAI_API_KEY}
+      
+  - model_name: o1-mini
+    litellm_params:
+      model: o1-mini
+      api_key: ${OPENAI_API_KEY}
+
+  # ============================================================================
+  # ANTHROPIC MODELS
+  # ============================================================================
+  - model_name: claude-3-5-sonnet
+    litellm_params:
+      model: claude-3-5-sonnet-20241022
+      api_key: ${ANTHROPIC_API_KEY}
+      
+  - model_name: claude-3-5-haiku
+    litellm_params:
+      model: claude-3-5-haiku-20241022
+      api_key: ${ANTHROPIC_API_KEY}
+      
+  - model_name: claude-3-opus
+    litellm_params:
+      model: claude-3-opus-20240229
+      api_key: ${ANTHROPIC_API_KEY}
+
+  # ============================================================================
+  # GOOGLE MODELS
+  # ============================================================================
+  - model_name: gemini-2.0-flash
+    litellm_params:
+      model: gemini/gemini-2.0-flash-exp
+      api_key: ${GOOGLE_API_KEY}
+      
+  - model_name: gemini-1.5-pro
+    litellm_params:
+      model: gemini/gemini-1.5-pro
+      api_key: ${GOOGLE_API_KEY}
+
+  # ============================================================================
+  # XAI MODELS
+  # ============================================================================
+  - model_name: grok-2
+    litellm_params:
+      model: xai/grok-2-1212
+      api_key: ${XAI_API_KEY}
+
+  # ============================================================================
+  # DEEPSEEK MODELS
+  # ============================================================================
+  - model_name: deepseek-chat
+    litellm_params:
+      model: deepseek/deepseek-chat
+      api_key: ${DEEPSEEK_API_KEY}
+      
+  - model_name: deepseek-reasoner
+    litellm_params:
+      model: deepseek/deepseek-reasoner
+      api_key: ${DEEPSEEK_API_KEY}
+
+  # ============================================================================
+  # MISTRAL MODELS
+  # ============================================================================
+  - model_name: mistral-large
+    litellm_params:
+      model: mistral/mistral-large-latest
+      api_key: ${MISTRAL_API_KEY}
+
+  # ============================================================================
+  # EMBEDDING MODELS
+  # ============================================================================
+  - model_name: text-embedding-3-large
+    litellm_params:
+      model: text-embedding-3-large
+      api_key: ${OPENAI_API_KEY}
+      
+  - model_name: text-embedding-3-small
+    litellm_params:
+      model: text-embedding-3-small
+      api_key: ${OPENAI_API_KEY}
+      
+  - model_name: embed-english-v3
+    litellm_params:
+      model: cohere/embed-english-v3.0
+      api_key: ${COHERE_API_KEY}
+      
+  - model_name: voyage-3
+    litellm_params:
+      model: voyage/voyage-3
+      api_key: ${VOYAGE_API_KEY}
+
+  # ============================================================================
+  # AUDIO MODELS
+  # ============================================================================
+  - model_name: tts-1
+    litellm_params:
+      model: tts-1
+      api_key: ${OPENAI_API_KEY}
+      
+  - model_name: tts-1-hd
+    litellm_params:
+      model: tts-1-hd
+      api_key: ${OPENAI_API_KEY}
+      
+  - model_name: whisper-1
+    litellm_params:
+      model: whisper-1
+      api_key: ${OPENAI_API_KEY}
+
+  # ============================================================================
+  # SEARCH MODELS
+  # ============================================================================
+  - model_name: sonar-pro
+    litellm_params:
+      model: perplexity/sonar-pro
+      api_key: ${PERPLEXITY_API_KEY}
+      
+  - model_name: sonar
+    litellm_params:
+      model: perplexity/sonar
+      api_key: ${PERPLEXITY_API_KEY}
+
+router_settings:
+  routing_strategy: simple-shuffle
+  num_retries: 3
+  timeout: 60
+  redis_host: ${REDIS_HOST}
+  redis_port: 6379
+  redis_password: ${REDIS_PASSWORD}
+  enable_pre_call_checks: true

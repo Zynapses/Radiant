@@ -1,0 +1,180 @@
+# RADIANT v4.17.0 - LiteLLM Complete Configuration
+# External + Self-Hosted Model Routing
+
+general_settings:
+  master_key: ${LITELLM_MASTER_KEY}
+  database_url: ${DATABASE_URL}
+  alerting:
+    - slack
+  alert_types:
+    - llm_exceptions
+    - budget_alerts
+    - hanging_requests
+
+litellm_settings:
+  drop_params: true
+  set_verbose: false
+  num_retries: 3
+  request_timeout: 600
+  telemetry: false
+  cache: true
+  cache_params:
+    type: redis
+    host: ${REDIS_HOST}
+    port: 6379
+    password: ${REDIS_PASSWORD}
+    ttl: 3600
+
+model_list:
+  # ============================================================================
+  # EXTERNAL: OPENAI
+  # ============================================================================
+  - model_name: gpt-4o
+    litellm_params:
+      model: gpt-4o
+      api_key: ${OPENAI_API_KEY}
+      
+  - model_name: gpt-4o-mini
+    litellm_params:
+      model: gpt-4o-mini
+      api_key: ${OPENAI_API_KEY}
+      
+  - model_name: o1
+    litellm_params:
+      model: o1
+      api_key: ${OPENAI_API_KEY}
+      
+  - model_name: o1-mini
+    litellm_params:
+      model: o1-mini
+      api_key: ${OPENAI_API_KEY}
+
+  # ============================================================================
+  # EXTERNAL: ANTHROPIC
+  # ============================================================================
+  - model_name: claude-3-5-sonnet
+    litellm_params:
+      model: claude-3-5-sonnet-20241022
+      api_key: ${ANTHROPIC_API_KEY}
+      
+  - model_name: claude-3-5-haiku
+    litellm_params:
+      model: claude-3-5-haiku-20241022
+      api_key: ${ANTHROPIC_API_KEY}
+
+  # ============================================================================
+  # EXTERNAL: GOOGLE
+  # ============================================================================
+  - model_name: gemini-2.0-flash
+    litellm_params:
+      model: gemini/gemini-2.0-flash-exp
+      api_key: ${GOOGLE_API_KEY}
+      
+  - model_name: gemini-1.5-pro
+    litellm_params:
+      model: gemini/gemini-1.5-pro
+      api_key: ${GOOGLE_API_KEY}
+
+  # ============================================================================
+  # EXTERNAL: DEEPSEEK
+  # ============================================================================
+  - model_name: deepseek-chat
+    litellm_params:
+      model: deepseek/deepseek-chat
+      api_key: ${DEEPSEEK_API_KEY}
+      
+  - model_name: deepseek-reasoner
+    litellm_params:
+      model: deepseek/deepseek-reasoner
+      api_key: ${DEEPSEEK_API_KEY}
+
+  # ============================================================================
+  # SELF-HOSTED: VISION MODELS (SageMaker)
+  # ============================================================================
+  - model_name: self-hosted/resnet-152
+    litellm_params:
+      model: sagemaker/${SAGEMAKER_ENDPOINT_RESNET_152}
+      aws_region_name: ${AWS_REGION}
+      
+  - model_name: self-hosted/yolov8
+    litellm_params:
+      model: sagemaker/${SAGEMAKER_ENDPOINT_YOLOV8}
+      aws_region_name: ${AWS_REGION}
+      
+  - model_name: self-hosted/sam-2
+    litellm_params:
+      model: sagemaker/${SAGEMAKER_ENDPOINT_SAM_2}
+      aws_region_name: ${AWS_REGION}
+
+  # ============================================================================
+  # SELF-HOSTED: AUDIO MODELS (SageMaker)
+  # ============================================================================
+  - model_name: self-hosted/whisper-large-v3
+    litellm_params:
+      model: sagemaker/${SAGEMAKER_ENDPOINT_WHISPER_LARGE_V3}
+      aws_region_name: ${AWS_REGION}
+
+  # ============================================================================
+  # SELF-HOSTED: SCIENTIFIC MODELS (SageMaker)
+  # ============================================================================
+  - model_name: self-hosted/esm-fold
+    litellm_params:
+      model: sagemaker/${SAGEMAKER_ENDPOINT_ESM_FOLD}
+      aws_region_name: ${AWS_REGION}
+
+  # ============================================================================
+  # SELF-HOSTED: LLM MODELS (SageMaker)
+  # ============================================================================
+  - model_name: self-hosted/llama-3-70b
+    litellm_params:
+      model: sagemaker/${SAGEMAKER_ENDPOINT_LLAMA_3_70B}
+      aws_region_name: ${AWS_REGION}
+      
+  - model_name: self-hosted/mistral-7b
+    litellm_params:
+      model: sagemaker/${SAGEMAKER_ENDPOINT_MISTRAL_7B}
+      aws_region_name: ${AWS_REGION}
+
+  # ============================================================================
+  # EMBEDDING MODELS
+  # ============================================================================
+  - model_name: text-embedding-3-large
+    litellm_params:
+      model: text-embedding-3-large
+      api_key: ${OPENAI_API_KEY}
+      
+  - model_name: text-embedding-3-small
+    litellm_params:
+      model: text-embedding-3-small
+      api_key: ${OPENAI_API_KEY}
+
+  # ============================================================================
+  # SEARCH MODELS
+  # ============================================================================
+  - model_name: sonar-pro
+    litellm_params:
+      model: perplexity/sonar-pro
+      api_key: ${PERPLEXITY_API_KEY}
+
+router_settings:
+  routing_strategy: usage-based-routing
+  num_retries: 3
+  timeout: 120
+  redis_host: ${REDIS_HOST}
+  redis_port: 6379
+  redis_password: ${REDIS_PASSWORD}
+  enable_pre_call_checks: true
+  fallbacks:
+    - gpt-4o: [claude-3-5-sonnet, gemini-1.5-pro]
+    - claude-3-5-sonnet: [gpt-4o, gemini-1.5-pro]
+    - gemini-1.5-pro: [gpt-4o, claude-3-5-sonnet]
+
+environment_variables:
+  OPENAI_API_KEY: ${OPENAI_API_KEY}
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+  GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+  DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+  PERPLEXITY_API_KEY: ${PERPLEXITY_API_KEY}
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+  AWS_REGION: ${AWS_REGION}
