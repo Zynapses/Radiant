@@ -6,7 +6,8 @@ dist/
 .next/
 cdk.out/
 .build/
-Packages/
+# Swift Package Manager (only in swift-deployer)
+apps/swift-deployer/Packages/
 **/.build/
 
 # Logs
