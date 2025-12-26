@@ -3,30 +3,31 @@
  * Tests for thermal state management of self-hosted models
  */
 
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ThermalStateService, ThermalState } from '../thermal-state';
 
 // Mock the database client
-jest.mock('../../db/client', () => ({
-  executeStatement: jest.fn(),
+vi.mock('../../db/client', () => ({
+  executeStatement: vi.fn(),
 }));
 
 // Mock SageMaker client
-jest.mock('@aws-sdk/client-sagemaker', () => ({
-  SageMakerClient: jest.fn().mockImplementation(() => ({
-    send: jest.fn(),
+vi.mock('@aws-sdk/client-sagemaker', () => ({
+  SageMakerClient: vi.fn().mockImplementation(() => ({
+    send: vi.fn(),
   })),
-  DescribeEndpointCommand: jest.fn(),
+  DescribeEndpointCommand: vi.fn(),
 }));
 
 import { executeStatement } from '../../db/client';
 
-const mockExecuteStatement = executeStatement as jest.MockedFunction<typeof executeStatement>;
+const mockExecuteStatement = vi.mocked(executeStatement);
 
 describe('ThermalStateService', () => {
   let service: ThermalStateService;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     service = new ThermalStateService();
   });
 
