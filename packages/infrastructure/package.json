@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "build:lambda": "cd lambda && npm run build",
-    "typecheck": "tsc --noEmit",
+    "build:lambda": "cd lambda && npm install && npm run build",
+    "typecheck": "tsc --noEmit && cd lambda && npx tsc --noEmit",
     "watch": "tsc -w",
     "cdk": "cdk",
     "synth": "cdk synth",
