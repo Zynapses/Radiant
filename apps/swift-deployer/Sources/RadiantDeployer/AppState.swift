@@ -127,6 +127,10 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
     case models = "Models"
     case selfHosted = "Self-Hosted"
     
+    // Configuration
+    case domains = "Domains"
+    case email = "Email"
+    
     // Advanced
     case multiRegion = "Multi-Region"
     case abTesting = "A/B Testing"
@@ -153,6 +157,8 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
         case .providers: return "building.2"
         case .models: return "cpu"
         case .selfHosted: return "memorychip"
+        case .domains: return "globe.americas"
+        case .email: return "envelope"
         case .multiRegion: return "globe"
         case .abTesting: return "flask"
         case .security: return "shield.lefthalf.filled"
@@ -174,6 +180,8 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
         case .providers: return .teal
         case .models: return .pink
         case .selfHosted: return .mint
+        case .domains: return .cyan
+        case .email: return .orange
         case .multiRegion: return .blue
         case .abTesting: return .purple
         case .security: return .red
@@ -193,6 +201,10 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
     
     static var aiTabs: [NavigationTab] {
         [.providers, .models, .selfHosted]
+    }
+    
+    static var configTabs: [NavigationTab] {
+        [.domains, .email]
     }
     
     static var advancedTabs: [NavigationTab] {
