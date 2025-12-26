@@ -74,7 +74,7 @@ export async function warmupSDK(): Promise<void> {
 export async function warmupConnections(): Promise<void> {
   try {
     // Execute a simple query to establish connection
-    const { executeStatement } = await import('../db/client');
+    const { executeStatement } = await import('../db/client.js');
     await executeStatement('SELECT 1', []);
   } catch (error) {
     // Silently fail - connection will be established on first real query
@@ -143,7 +143,11 @@ export function getInvocationCount(): number {
  * Bundle size optimization hints
  * Use dynamic imports for rarely-used heavy dependencies
  */
-export const dynamicImport = {
+export const dynamicImport: {
+  zod: () => Promise<typeof import('zod')>;
+  sharp: () => Promise<unknown>;
+  pdfLib: () => Promise<unknown>;
+} = {
   // Heavy dependencies that should be dynamically imported
   async zod() {
     return import('zod');
@@ -151,11 +155,21 @@ export const dynamicImport = {
   
   async sharp() {
     // Only import sharp when image processing is needed
-    return import('sharp').catch(() => null);
+    // sharp is optional - may not be available in all Lambda environments
+    try {
+      return await import('sharp' as string);
+    } catch {
+      return null;
+    }
   },
   
   async pdfLib() {
-    return import('pdf-lib').catch(() => null);
+    // pdf-lib is optional - may not be available in all Lambda environments
+    try {
+      return await import('pdf-lib' as string);
+    } catch {
+      return null;
+    }
   },
 };
 

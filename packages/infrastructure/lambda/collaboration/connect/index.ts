@@ -1,4 +1,4 @@
-import { APIGatewayProxyWebsocketHandlerV2 } from 'aws-lambda';
+import { APIGatewayProxyWebsocketHandlerV2, APIGatewayProxyWebsocketEventV2 } from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 
@@ -7,9 +7,15 @@ const docClient = DynamoDBDocumentClient.from(ddbClient);
 
 const CONNECTIONS_TABLE = process.env.CONNECTIONS_TABLE!;
 
+// Extended event type that includes queryStringParameters from $connect route
+type WebSocketConnectEvent = APIGatewayProxyWebsocketEventV2 & {
+  queryStringParameters?: Record<string, string | undefined>;
+};
+
 export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
+  const connectEvent = event as WebSocketConnectEvent;
   const connectionId = event.requestContext.connectionId;
-  const queryParams = event.queryStringParameters || {};
+  const queryParams = connectEvent.queryStringParameters || {};
   
   console.log('WebSocket connect:', { connectionId, queryParams });
 

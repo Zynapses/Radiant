@@ -39,7 +39,7 @@ describe('ThermalStateService', () => {
           warm_until: new Date(Date.now() + 3600000).toISOString(),
           auto_thermal_enabled: false,
         }],
-        numberOfRecordsUpdated: 0,
+        rowCount: 0,
       });
 
       const state = await service.getThermalState('model-123');
@@ -49,7 +49,7 @@ describe('ThermalStateService', () => {
     it('should throw error if model not found', async () => {
       mockExecuteStatement.mockResolvedValueOnce({
         rows: [],
-        numberOfRecordsUpdated: 0,
+        rowCount: 0,
       });
 
       await expect(service.getThermalState('nonexistent')).rejects.toThrow('Model nonexistent not found');
@@ -63,9 +63,9 @@ describe('ThermalStateService', () => {
             warm_until: new Date(Date.now() - 3600000).toISOString(), // Past
             auto_thermal_enabled: true,
           }],
-          numberOfRecordsUpdated: 0,
+          rowCount: 0,
         })
-        .mockResolvedValueOnce({ rows: [], numberOfRecordsUpdated: 1 }); // For transitionToCold
+        .mockResolvedValueOnce({ rows: [], rowCount: 1 }); // For transitionToCold
 
       const state = await service.getThermalState('model-123');
       expect(state).toBe('cold');
@@ -78,7 +78,7 @@ describe('ThermalStateService', () => {
           warm_until: null,
           auto_thermal_enabled: false,
         }],
-        numberOfRecordsUpdated: 0,
+        rowCount: 0,
       });
 
       const state = await service.getThermalState('model-123');
@@ -89,10 +89,10 @@ describe('ThermalStateService', () => {
   describe('warmUp', () => {
     it('should warm up a model with default duration', async () => {
       mockExecuteStatement
-        .mockResolvedValueOnce({ rows: [], numberOfRecordsUpdated: 1 }) // UPDATE
+        .mockResolvedValueOnce({ rows: [], rowCount: 1 }) // UPDATE
         .mockResolvedValueOnce({ // getModel
           rows: [{ config: JSON.stringify({ endpoint_name: 'test-endpoint' }) }],
-          numberOfRecordsUpdated: 0,
+          rowCount: 0,
         });
 
       await service.warmUp('model-123');
@@ -105,10 +105,10 @@ describe('ThermalStateService', () => {
 
     it('should warm up a model with custom duration', async () => {
       mockExecuteStatement
-        .mockResolvedValueOnce({ rows: [], numberOfRecordsUpdated: 1 })
+        .mockResolvedValueOnce({ rows: [], rowCount: 1 })
         .mockResolvedValueOnce({
           rows: [{ config: '{}' }],
-          numberOfRecordsUpdated: 0,
+          rowCount: 0,
         });
 
       await service.warmUp('model-123', 60);
@@ -119,7 +119,7 @@ describe('ThermalStateService', () => {
 
   describe('transitionToCold', () => {
     it('should transition model to cold state', async () => {
-      mockExecuteStatement.mockResolvedValueOnce({ rows: [], numberOfRecordsUpdated: 1 });
+      mockExecuteStatement.mockResolvedValueOnce({ rows: [], rowCount: 1 });
 
       await service.transitionToCold('model-123');
 
@@ -132,7 +132,7 @@ describe('ThermalStateService', () => {
 
   describe('transitionToHot', () => {
     it('should transition model to hot state', async () => {
-      mockExecuteStatement.mockResolvedValueOnce({ rows: [], numberOfRecordsUpdated: 1 });
+      mockExecuteStatement.mockResolvedValueOnce({ rows: [], rowCount: 1 });
 
       await service.transitionToHot('model-123');
 
@@ -148,9 +148,9 @@ describe('ThermalStateService', () => {
       mockExecuteStatement
         .mockResolvedValueOnce({ // getRecentRequestCount
           rows: [{ count: 15 }],
-          numberOfRecordsUpdated: 0,
+          rowCount: 0,
         })
-        .mockResolvedValueOnce({ rows: [], numberOfRecordsUpdated: 1 }); // transitionToHot
+        .mockResolvedValueOnce({ rows: [], rowCount: 1 }); // transitionToHot
 
       const state = await service.checkAndUpdateThermalState('model-123');
       expect(state).toBe('hot');
@@ -160,13 +160,13 @@ describe('ThermalStateService', () => {
       mockExecuteStatement
         .mockResolvedValueOnce({ // getRecentRequestCount
           rows: [{ count: 2 }],
-          numberOfRecordsUpdated: 0,
+          rowCount: 0,
         })
         .mockResolvedValueOnce({ // getMinutesSinceLastRequest
           rows: [{ extract: 20 }],
-          numberOfRecordsUpdated: 0,
+          rowCount: 0,
         })
-        .mockResolvedValueOnce({ rows: [], numberOfRecordsUpdated: 1 }); // transitionToCold
+        .mockResolvedValueOnce({ rows: [], rowCount: 1 }); // transitionToCold
 
       const state = await service.checkAndUpdateThermalState('model-123');
       expect(state).toBe('cold');
@@ -176,11 +176,11 @@ describe('ThermalStateService', () => {
       mockExecuteStatement
         .mockResolvedValueOnce({ // getRecentRequestCount
           rows: [{ count: 5 }],
-          numberOfRecordsUpdated: 0,
+          rowCount: 0,
         })
         .mockResolvedValueOnce({ // getMinutesSinceLastRequest
           rows: [{ extract: 5 }],
-          numberOfRecordsUpdated: 0,
+          rowCount: 0,
         })
         .mockResolvedValueOnce({ // getThermalState
           rows: [{
@@ -188,7 +188,7 @@ describe('ThermalStateService', () => {
             warm_until: new Date(Date.now() + 3600000).toISOString(),
             auto_thermal_enabled: false,
           }],
-          numberOfRecordsUpdated: 0,
+          rowCount: 0,
         });
 
       const state = await service.checkAndUpdateThermalState('model-123');
@@ -205,15 +205,15 @@ describe('ThermalStateService', () => {
       });
 
       mockExecuteStatement
-        .mockResolvedValueOnce({ rows: [{ count: 15 }], numberOfRecordsUpdated: 0 })
-        .mockResolvedValueOnce({ rows: [{ extract: 25 }], numberOfRecordsUpdated: 0 })
+        .mockResolvedValueOnce({ rows: [{ count: 15 }], rowCount: 0 })
+        .mockResolvedValueOnce({ rows: [{ extract: 25 }], rowCount: 0 })
         .mockResolvedValueOnce({
           rows: [{
             thermal_state: 'warm',
             warm_until: new Date(Date.now() + 3600000).toISOString(),
             auto_thermal_enabled: false,
           }],
-          numberOfRecordsUpdated: 0,
+          rowCount: 0,
         });
 
       // With custom threshold of 20, 15 requests should NOT trigger hot

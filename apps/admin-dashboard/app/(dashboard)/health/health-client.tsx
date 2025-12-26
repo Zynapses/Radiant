@@ -48,6 +48,31 @@ interface HealthService {
   status: 'healthy' | 'unhealthy' | 'degraded';
   latencyMs: number;
   lastCheck: string;
+  metrics?: {
+    cpu: number;
+    memory: number;
+    requests: number;
+    errors: number;
+    p50: number;
+    p95: number;
+    p99: number;
+  };
+  history?: Array<{
+    timestamp: string;
+    status: 'healthy' | 'unhealthy' | 'degraded';
+    latencyMs: number;
+  }>;
+  incidents?: Array<{
+    id: string;
+    title: string;
+    severity: 'critical' | 'warning' | 'info';
+    timestamp: string;
+    resolved: boolean;
+  }>;
+  dependencies?: Array<{
+    name: string;
+    status: 'healthy' | 'unhealthy' | 'degraded';
+  }>;
 }
 
 interface HealthData {
