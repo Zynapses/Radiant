@@ -50,7 +50,7 @@ export function isNullField(field: Field): field is { isNull: true } {
 /**
  * Check if field is an array value
  */
-export function isArrayField(field: Field): field is { arrayValue: { stringValues?: string[]; longValues?: number[]; doubleValues?: number[]; booleanValues?: boolean[] } } {
+export function isArrayField(field: Field): boolean {
   return 'arrayValue' in field && field.arrayValue !== undefined;
 }
 
@@ -82,7 +82,7 @@ export function extractFieldValue(field: Field): unknown {
     return field.blobValue;
   }
   
-  if (isArrayField(field)) {
+  if (isArrayField(field) && 'arrayValue' in field && field.arrayValue) {
     const arr = field.arrayValue;
     return arr.stringValues ?? arr.longValues ?? arr.doubleValues ?? arr.booleanValues ?? [];
   }
@@ -167,7 +167,7 @@ export function extractJson<T>(field: Field): T | null {
  * Extract string array value
  */
 export function extractStringArray(field: Field): string[] {
-  if (isArrayField(field) && field.arrayValue.stringValues) {
+  if (isArrayField(field) && 'arrayValue' in field && field.arrayValue?.stringValues) {
     return field.arrayValue.stringValues;
   }
   if (isStringField(field)) {
