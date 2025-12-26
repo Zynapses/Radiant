@@ -54,6 +54,9 @@ export async function PATCH(request: Request) {
   try {
     const updates = await request.json();
     
+    // Store previous config for audit trail (GDPR/SOC2 compliance)
+    const previousConfig = { ...MOCK_THINKTANK_CONFIG };
+    
     // Validate and merge updates
     MOCK_THINKTANK_CONFIG = {
       ...MOCK_THINKTANK_CONFIG,
@@ -68,8 +71,17 @@ export async function PATCH(request: Request) {
       },
     };
     
-    // In production, save to database
+    // In production, save to database and audit log
     // await db.query(`UPDATE thinktank_config SET ...`);
+    // await db.query(`INSERT INTO audit_logs (action, details, ...) VALUES ('thinktank_config_changed', ...)`);
+    
+    // Log configuration change for compliance
+    console.log('[AUDIT] Think Tank config updated:', {
+      action: 'thinktank_config_changed',
+      timestamp: new Date().toISOString(),
+      changedFields: Object.keys(updates),
+      // In production: userId, ipAddress, previousValues
+    });
     
     return NextResponse.json(MOCK_THINKTANK_CONFIG);
   } catch (error) {

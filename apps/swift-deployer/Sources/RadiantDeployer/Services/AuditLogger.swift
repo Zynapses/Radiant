@@ -50,6 +50,28 @@ actor AuditLogger {
         case aiAssistantQuery = "ai_assistant_query"
         case modelDeployed = "model_deployed"
         case modelStopped = "model_stopped"
+        
+        // Domain & DNS (GDPR/SOC2 compliance)
+        case domainConfigured = "domain_configured"
+        case domainRemoved = "domain_removed"
+        case dnsRecordCreated = "dns_record_created"
+        case dnsRecordDeleted = "dns_record_deleted"
+        case certificateRequested = "certificate_requested"
+        case certificateValidated = "certificate_validated"
+        
+        // Email/SES (GDPR/SOC2 compliance)
+        case emailDomainVerified = "email_domain_verified"
+        case emailDomainRemoved = "email_domain_removed"
+        case sesConfigChanged = "ses_config_changed"
+        
+        // Think Tank (HIPAA/GDPR compliance)
+        case thinkTankInstalled = "thinktank_installed"
+        case thinkTankUninstalled = "thinktank_uninstalled"
+        case thinkTankConfigChanged = "thinktank_config_changed"
+        case thinkTankDataExported = "thinktank_data_exported"
+        case thinkTankDataDeleted = "thinktank_data_deleted"
+        case userConsentRecorded = "user_consent_recorded"
+        case userConsentWithdrawn = "user_consent_withdrawn"
     }
     
     struct AuditEntry: Codable, Identifiable {
