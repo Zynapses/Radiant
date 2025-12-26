@@ -18,6 +18,7 @@ struct DomainSetupView: View {
     @State private var successMessage: String?
     
     private let dnsService = DNSService.shared
+    private let auditLogger = AuditLogger.shared
     
     var body: some View {
         ScrollView {
@@ -442,6 +443,17 @@ struct DomainSetupView: View {
             cloudFrontDomain: "d123456789.cloudfront.net", // Placeholder
             albDomain: "alb-123456.us-east-1.elb.amazonaws.com", // Placeholder
             apiGatewayDomain: "api-id.execute-api.us-east-1.amazonaws.com" // Placeholder
+        )
+        
+        // Audit log for compliance (SOC2, GDPR)
+        await auditLogger.log(
+            action: .domainConfigured,
+            details: "Domain configured: \(baseDomain)",
+            metadata: [
+                "domain": baseDomain,
+                "environment": appState.selectedEnvironment.rawValue,
+                "recordCount": String(dnsRecords.count)
+            ]
         )
         
         successMessage = "DNS records generated. Add these to your DNS provider."
