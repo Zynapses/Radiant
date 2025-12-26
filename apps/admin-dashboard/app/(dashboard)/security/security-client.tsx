@@ -59,6 +59,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { ThinkTankSecuritySection } from '@/components/thinktank/thinktank-security-section';
 
 interface SecurityAnomaly {
   id: string;
@@ -536,6 +537,9 @@ export function SecurityDashboardClient() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Think Tank Security Section */}
+      <ThinkTankSecuritySection />
 
       {/* Anomalies Table */}
       <Card>
