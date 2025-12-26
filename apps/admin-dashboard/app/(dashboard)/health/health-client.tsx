@@ -41,6 +41,7 @@ import {
 import { formatDistanceToNow, format, subHours } from 'date-fns';
 import { SectionErrorBoundary } from '@/components/common/error-boundaries';
 import { cn } from '@/lib/utils';
+import { ThinkTankHealthCard } from '@/components/thinktank/thinktank-health-card';
 
 interface HealthService {
   name: string;
@@ -442,6 +443,11 @@ export function HealthClient() {
             </div>
           </CardContent>
         </Card>
+      </SectionErrorBoundary>
+
+      {/* Think Tank Health */}
+      <SectionErrorBoundary>
+        <ThinkTankHealthCard />
       </SectionErrorBoundary>
 
       {/* Service Grid */}
