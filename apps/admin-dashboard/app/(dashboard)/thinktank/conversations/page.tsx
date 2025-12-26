@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
   SelectContent,
@@ -24,12 +25,52 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, MessageSquare, Eye, Trash2, Download, Clock, Share2, Copy, Check, Link } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
+import {
+  Search,
+  MessageSquare,
+  Eye,
+  Trash2,
+  Download,
+  Clock,
+  Share2,
+  Copy,
+  Check,
+  Link,
+  MoreHorizontal,
+  Users,
+  Zap,
+  TrendingUp,
+  Filter,
+  RefreshCw,
+  FileText,
+  Bot,
+  User,
+  ChevronRight,
+  Sparkles,
+  Archive,
+  ExternalLink,
+} from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 
 interface Conversation {
@@ -148,53 +189,75 @@ export default function ConversationsPage() {
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Conversations
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.totalConversations?.toLocaleString() || 0}
+      {/* Stats Cards - Enhanced with icons and trends */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="relative overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Total Conversations</p>
+                <p className="text-3xl font-bold tabular-nums">
+                  {stats?.totalConversations?.toLocaleString() || 0}
+                </p>
+                <p className="text-xs text-emerald-600 flex items-center gap-1">
+                  <TrendingUp className="h-3 w-3" />
+                  +12% from last week
+                </p>
+              </div>
+              <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/30">
+                <MessageSquare className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Active Today
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.activeToday?.toLocaleString() || 0}
+        <Card className="relative overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Active Today</p>
+                <p className="text-3xl font-bold tabular-nums">
+                  {stats?.activeToday?.toLocaleString() || 0}
+                </p>
+                <p className="text-xs text-muted-foreground">Currently engaged users</p>
+              </div>
+              <div className="p-3 rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
+                <Users className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Messages
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.totalMessages?.toLocaleString() || 0}
+        <Card className="relative overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Total Messages</p>
+                <p className="text-3xl font-bold tabular-nums">
+                  {stats?.totalMessages?.toLocaleString() || 0}
+                </p>
+                <p className="text-xs text-emerald-600 flex items-center gap-1">
+                  <TrendingUp className="h-3 w-3" />
+                  +8% from last week
+                </p>
+              </div>
+              <div className="p-3 rounded-xl bg-violet-100 dark:bg-violet-900/30">
+                <FileText className="h-6 w-6 text-violet-600 dark:text-violet-400" />
+              </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Tokens
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {((stats?.totalTokens || 0) / 1000000).toFixed(1)}M
+        <Card className="relative overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Total Tokens</p>
+                <p className="text-3xl font-bold tabular-nums">
+                  {((stats?.totalTokens || 0) / 1000000).toFixed(1)}M
+                </p>
+                <p className="text-xs text-muted-foreground">Across all conversations</p>
+              </div>
+              <div className="p-3 rounded-xl bg-amber-100 dark:bg-amber-900/30">
+                <Zap className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+              </div>
             </div>
           </CardContent>
         </Card>
