@@ -10,9 +10,10 @@ struct RadiantDeployerApp: App {
                 .environmentObject(appState)
                 .frame(minWidth: 1200, minHeight: 800)
         }
-        .windowStyle(.hiddenTitleBar)
+        .windowStyle(.titleBar)
+        .windowToolbarStyle(.unified(showsTitle: true))
         .commands {
-            CommandGroup(replacing: .newItem) { }
+            RadiantCommands(appState: appState)
         }
         
         Settings {

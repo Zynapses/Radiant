@@ -8,6 +8,13 @@ final class AppState: ObservableObject {
     @Published var selectedApp: ManagedApp?
     @Published var selectedEnvironment: DeployEnvironment = .dev
     
+    // MARK: - UI State
+    @Published var showInspector: Bool = false
+    @Published var showAIAssistant: Bool = false
+    @Published var sidebarWidth: CGFloat = 240
+    @Published var inspectorWidth: CGFloat = 280
+    @Published var columnVisibility: NavigationSplitViewVisibility = .all
+    
     // MARK: - Data
     @Published var apps: [ManagedApp] = []
     @Published var credentials: [CredentialSet] = []
@@ -77,6 +84,28 @@ final class AppState: ObservableObject {
     
     private func loadApps() async throws -> [ManagedApp] {
         return ManagedApp.defaults
+    }
+    
+    // MARK: - Commands
+    
+    func refreshAllStatus() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            credentials = try await credentialService.loadCredentials()
+            apps = try await loadApps()
+        } catch {
+            self.error = AppError(message: "Failed to refresh status", underlying: error)
+        }
+    }
+    
+    func runHealthCheck() async {
+        // Health check implementation
+        isLoading = true
+        defer { isLoading = false }
+        
+        // TODO: Implement health check logic
     }
 }
 
