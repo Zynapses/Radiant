@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,89 +18,20 @@ import {
   AlertCircle,
   CheckCircle2
 } from 'lucide-react';
-import { ServiceState, SERVICE_STATE_COLORS } from '@/lib/api/types';
+import { ServiceState, MidLevelService as ApiMidLevelService } from '@/lib/api/types';
+import { servicesApi } from '@/lib/api/endpoints';
 
-interface MidLevelService {
-  id: string;
-  name: string;
-  displayName: string;
-  description: string;
-  state: ServiceState;
-  requiredModels: string[];
-  availableModels: string[];
-  unavailableModels: string[];
-  minTier: number;
-  pricePerRequest: number;
+interface ServiceDisplayData extends ApiMidLevelService {
   icon: React.ElementType;
 }
 
-const mockServices: MidLevelService[] = [
-  {
-    id: 'perception-service',
-    name: 'perception',
-    displayName: 'Perception Service',
-    description: 'Computer vision pipeline combining classification, detection, and segmentation',
-    state: 'RUNNING',
-    requiredModels: ['resnet-152', 'yolov8-x'],
-    availableModels: ['resnet-152', 'yolov8-x', 'sam-2'],
-    unavailableModels: [],
-    minTier: 2,
-    pricePerRequest: 0.05,
-    icon: Eye,
-  },
-  {
-    id: 'scientific-service',
-    name: 'scientific',
-    displayName: 'Scientific Computing',
-    description: 'Protein folding, embeddings, and mathematical reasoning',
-    state: 'DEGRADED',
-    requiredModels: ['esm-fold', 'esm-2'],
-    availableModels: ['esm-2'],
-    unavailableModels: ['esm-fold'],
-    minTier: 3,
-    pricePerRequest: 0.15,
-    icon: Brain,
-  },
-  {
-    id: 'medical-service',
-    name: 'medical',
-    displayName: 'Medical Imaging',
-    description: 'Medical image analysis and segmentation pipelines',
-    state: 'RUNNING',
-    requiredModels: ['medsam', 'medclip'],
-    availableModels: ['medsam', 'medclip'],
-    unavailableModels: [],
-    minTier: 4,
-    pricePerRequest: 0.25,
-    icon: Microscope,
-  },
-  {
-    id: 'geospatial-service',
-    name: 'geospatial',
-    displayName: 'Geospatial Analysis',
-    description: 'Satellite imagery analysis and geographic feature detection',
-    state: 'OFFLINE',
-    requiredModels: ['satmae', 'geoclip'],
-    availableModels: [],
-    unavailableModels: ['satmae', 'geoclip'],
-    minTier: 4,
-    pricePerRequest: 0.20,
-    icon: Globe2,
-  },
-  {
-    id: 'reconstruction-service',
-    name: 'reconstruction',
-    displayName: '3D Reconstruction',
-    description: 'Generate 3D models from images using NeRF and Point-E',
-    state: 'RUNNING',
-    requiredModels: ['point-e', 'shap-e'],
-    availableModels: ['point-e', 'shap-e'],
-    unavailableModels: [],
-    minTier: 3,
-    pricePerRequest: 0.30,
-    icon: Box,
-  },
-];
+const SERVICE_ICONS: Record<string, React.ElementType> = {
+  perception: Eye,
+  scientific: Brain,
+  medical: Microscope,
+  geospatial: Globe2,
+  reconstruction: Box,
+};
 
 function getStateLabel(state: ServiceState): string {
   return state.charAt(0) + state.slice(1).toLowerCase();
@@ -118,11 +50,29 @@ function getStateIcon(state: ServiceState) {
 }
 
 export function ServicesClient() {
-  const [services] = useState(mockServices);
+  const { data: servicesData = [], isLoading, refetch } = useQuery<ServiceDisplayData[]>({
+    queryKey: ['services'],
+    queryFn: async () => {
+      const apiServices = await servicesApi.list();
+      return apiServices.map(s => ({
+        ...s,
+        icon: SERVICE_ICONS[s.name] || Layers,
+      }));
+    },
+  });
 
-  const runningCount = services.filter(s => s.state === 'RUNNING').length;
-  const degradedCount = services.filter(s => s.state === 'DEGRADED').length;
-  const offlineCount = services.filter(s => s.state === 'OFFLINE' || s.state === 'DISABLED').length;
+  const services = servicesData;
+  const runningCount = services.filter((s: ServiceDisplayData) => s.state === 'RUNNING').length;
+  const degradedCount = services.filter((s: ServiceDisplayData) => s.state === 'DEGRADED').length;
+  const offlineCount = services.filter((s: ServiceDisplayData) => s.state === 'OFFLINE' || s.state === 'DISABLED').length;
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-8">
+        <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -179,7 +129,7 @@ export function ServicesClient() {
       </div>
 
       <div className="grid gap-6">
-        {services.map((service) => {
+        {services.map((service: ServiceDisplayData) => {
           const Icon = service.icon;
           return (
             <Card key={service.id}>
@@ -202,10 +152,12 @@ export function ServicesClient() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right text-sm">
-                      <p className="font-medium">${service.pricePerRequest.toFixed(2)}</p>
-                      <p className="text-muted-foreground">per request</p>
+                      <p className="font-medium">{service.metrics.requestsLast24h.toLocaleString()}</p>
+                      <p className="text-muted-foreground">requests/24h</p>
                     </div>
-                    <Badge variant="outline">Tier {service.minTier}+</Badge>
+                    <Badge variant={service.healthStatus === 'healthy' ? 'default' : 'secondary'}>
+                      {service.healthStatus}
+                    </Badge>
                     <Switch checked={service.state !== 'DISABLED'} />
                     <Button variant="ghost" size="icon">
                       <Settings className="h-4 w-4" />
@@ -216,34 +168,25 @@ export function ServicesClient() {
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <p className="text-sm font-medium mb-2">Required Models</p>
+                    <p className="text-sm font-medium mb-2">Models</p>
                     <div className="flex flex-wrap gap-2">
-                      {service.requiredModels.map((model) => (
-                        <Badge 
-                          key={model} 
-                          variant={service.availableModels.includes(model) ? 'default' : 'destructive'}
-                        >
-                          {service.availableModels.includes(model) ? (
-                            <CheckCircle2 className="h-3 w-3 mr-1" />
-                          ) : (
-                            <AlertCircle className="h-3 w-3 mr-1" />
-                          )}
+                      {service.models.map((model: string) => (
+                        <Badge key={model} variant="outline">
+                          <CheckCircle2 className="h-3 w-3 mr-1" />
                           {model}
                         </Badge>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium mb-2">Model Status</p>
+                    <p className="text-sm font-medium mb-2">Performance</p>
                     <div className="flex gap-4 text-sm">
-                      <span className="text-green-600">
-                        {service.availableModels.length} available
+                      <span className="text-muted-foreground">
+                        Latency: {service.metrics.avgLatencyMs}ms
                       </span>
-                      {service.unavailableModels.length > 0 && (
-                        <span className="text-red-600">
-                          {service.unavailableModels.length} unavailable
-                        </span>
-                      )}
+                      <span className={service.metrics.errorRate < 1 ? 'text-green-600' : 'text-red-600'}>
+                        Error rate: {service.metrics.errorRate.toFixed(2)}%
+                      </span>
                     </div>
                   </div>
                 </div>

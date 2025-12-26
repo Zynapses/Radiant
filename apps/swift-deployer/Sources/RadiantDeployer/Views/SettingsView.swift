@@ -649,8 +649,8 @@ struct AIAssistantSettingsView: View {
 // MARK: - Timeout Settings
 
 struct TimeoutSettingsView: View {
-    @State private var timeouts: [TimeoutService.OperationTimeout] = []
-    @State private var selectedTimeout: TimeoutService.OperationTimeout?
+    @State private var timeouts: [OperationTimeout] = []
+    @State private var selectedTimeout: OperationTimeout?
     @State private var isLoading = true
     
     private let timeoutService = TimeoutService.shared
@@ -702,7 +702,7 @@ struct TimeoutSettingsView: View {
         }
     }
     
-    private func saveTimeout(_ timeout: TimeoutService.OperationTimeout) {
+    private func saveTimeout(_ timeout: OperationTimeout) {
         Task {
             await timeoutService.updateTimeout(timeout)
             loadTimeouts()
@@ -711,7 +711,7 @@ struct TimeoutSettingsView: View {
 }
 
 struct TimeoutRow: View {
-    let timeout: TimeoutService.OperationTimeout
+    let timeout: OperationTimeout
     
     var body: some View {
         HStack {
@@ -736,8 +736,8 @@ struct TimeoutRow: View {
 }
 
 struct TimeoutEditorView: View {
-    @State var timeout: TimeoutService.OperationTimeout
-    let onSave: (TimeoutService.OperationTimeout) -> Void
+    @State var timeout: OperationTimeout
+    let onSave: (OperationTimeout) -> Void
     
     var body: some View {
         Form {
@@ -772,7 +772,7 @@ struct TimeoutEditorView: View {
     }
     
     private func resetToDefault() {
-        if let defaultTimeout = TimeoutService.OperationTimeout.defaults.first(where: { $0.operationName == timeout.operationName }) {
+        if let defaultTimeout = OperationTimeout.defaults.first(where: { $0.operationName == timeout.operationName }) {
             timeout = defaultTimeout
         }
     }
@@ -843,7 +843,11 @@ struct StorageSettingsView: View {
     }
     
     private var appSupportPath: String {
-        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        guard let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            // Fallback to home directory if application support is unavailable
+            return FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Library/Application Support/RadiantDeployer").path
+        }
         return appSupport.appendingPathComponent("RadiantDeployer").path
     }
     
@@ -859,8 +863,8 @@ struct StorageSettingsView: View {
         Task {
             let packageService = PackageService()
             cacheSize = (try? await packageService.getCacheSize()) ?? 0
-            packageCount = 3 // Placeholder
-            snapshotCount = 2 // Placeholder
+            packageCount = (try? await packageService.getPackageCount()) ?? 0
+            snapshotCount = (try? await packageService.getSnapshotCount()) ?? 0
         }
     }
     
@@ -975,8 +979,11 @@ struct AdvancedSettingsView: View {
     }
     
     private func openLogFile() {
-        let logPath = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-            .appendingPathComponent("RadiantDeployer/logs")
+        guard let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            RadiantLogger.error("Could not access Application Support directory")
+            return
+        }
+        let logPath = appSupport.appendingPathComponent("RadiantDeployer/logs")
         NSWorkspace.shared.open(logPath)
     }
     

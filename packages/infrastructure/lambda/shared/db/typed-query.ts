@@ -154,8 +154,9 @@ export function parseWithJson<T>(
       if (parsed[field] && typeof parsed[field] === 'string') {
         try {
           parsed[field] = JSON.parse(parsed[field] as string);
-        } catch {
+        } catch (parseError) {
           // Keep original value if JSON parse fails
+          console.debug(`JSON parse failed for field ${field}:`, parseError instanceof Error ? parseError.message : 'unknown');
         }
       }
     }

@@ -106,12 +106,12 @@ function ServiceDetailDialog({
   const StatusIcon = config.icon;
   const ServiceIcon = serviceIcons[service.name] || Server;
 
-  // Generate mock history data
+  // Use service history data from API, fallback to empty if not available
   const historyData = service.history.length > 0 ? service.history : 
     Array.from({ length: 24 }, (_, i) => ({
       timestamp: subHours(new Date(), 23 - i).toISOString(),
-      status: Math.random() > 0.95 ? 'degraded' : 'healthy' as HealthService['status'],
-      latencyMs: Math.floor(20 + Math.random() * 80),
+      status: 'healthy' as HealthService['status'],
+      latencyMs: service.latencyMs || 50,
     }));
 
   return (
@@ -469,18 +469,18 @@ export function HealthClient() {
                   className="cursor-pointer hover:shadow-md transition-shadow"
                   onClick={() => setSelectedService({
                     ...service,
-                    metrics: {
-                      cpu: Math.floor(20 + Math.random() * 40),
-                      memory: Math.floor(30 + Math.random() * 50),
-                      requests: Math.floor(500 + Math.random() * 2000),
-                      errors: Math.random() > 0.9 ? Number((Math.random() * 2).toFixed(1)) : 0.1,
+                    metrics: service.metrics || {
+                      cpu: 0,
+                      memory: 0,
+                      requests: 0,
+                      errors: 0,
                       p50: Math.floor(service.latencyMs * 0.8),
                       p95: Math.floor(service.latencyMs * 1.5),
                       p99: Math.floor(service.latencyMs * 2.5),
                     },
-                    history: [],
-                    incidents: [],
-                    dependencies: [],
+                    history: service.history || [],
+                    incidents: service.incidents || [],
+                    dependencies: service.dependencies || [],
                   })}
                 >
                   <CardHeader className="pb-2">

@@ -1,6 +1,6 @@
 import { APIGatewayProxyWebsocketHandlerV2 } from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, UpdateCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, UpdateCommand, QueryCommand, PutCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 
@@ -8,9 +8,78 @@ const ddbClient = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(ddbClient);
 const lambdaClient = new LambdaClient({});
 
-const CONNECTIONS_TABLE = process.env.CONNECTIONS_TABLE!;
-const WEBSOCKET_URL = process.env.WEBSOCKET_URL!;
-const BROADCAST_FUNCTION_NAME = process.env.BROADCAST_FUNCTION_NAME!;
+// Validate required environment variables at startup
+function getRequiredEnvVar(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Required environment variable ${name} is not set`);
+  }
+  return value;
+}
+
+// Optional environment variable with default
+function getOptionalEnvVar(name: string, defaultValue: string): string {
+  return process.env[name] || defaultValue;
+}
+
+const CONNECTIONS_TABLE = getRequiredEnvVar('CONNECTIONS_TABLE');
+const WEBSOCKET_URL = getRequiredEnvVar('WEBSOCKET_URL');
+const BROADCAST_FUNCTION_NAME = getRequiredEnvVar('BROADCAST_FUNCTION_NAME');
+const MESSAGES_TABLE = getOptionalEnvVar('MESSAGES_TABLE', 'collaboration-messages');
+
+// Type definitions for WebSocket payloads
+interface JoinSessionPayload {
+  participantId: string;
+  token: string;
+}
+
+interface CursorPayload {
+  x: number;
+  y: number;
+  elementId?: string;
+}
+
+interface TypingPayload {
+  isTyping: boolean;
+}
+
+interface MessagePayload {
+  content: string;
+  replyTo?: string;
+  attachments?: string[];
+}
+
+interface EditPayload {
+  messageId: string;
+  content: string;
+}
+
+interface DeletePayload {
+  messageId: string;
+}
+
+interface ReactPayload {
+  messageId: string;
+  emoji: string;
+}
+
+interface CommentPayload {
+  targetId: string;
+  content: string;
+  position?: { start: number; end: number };
+}
+
+interface ResolvePayload {
+  commentId: string;
+}
+
+interface BroadcastMessage {
+  type: string;
+  sessionId: string;
+  payload?: unknown;
+  requestId?: string;
+  timestamp: number;
+}
 
 export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
   const connectionId = event.requestContext.connectionId;
@@ -80,7 +149,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
 async function handleJoinSession(
   connectionId: string,
   sessionId: string,
-  payload: any,
+  payload: JoinSessionPayload,
   apiClient: ApiGatewayManagementApiClient
 ) {
   const { participantId, token } = payload;
@@ -128,7 +197,7 @@ async function handleLeaveSession(connectionId: string, sessionId: string) {
   return { statusCode: 200, body: 'Left session' };
 }
 
-async function handleCursorMove(connectionId: string, sessionId: string, payload: any) {
+async function handleCursorMove(connectionId: string, sessionId: string, payload: CursorPayload) {
   await broadcastToSession(sessionId, connectionId, {
     type: 'cursor_move',
     sessionId,
@@ -138,7 +207,7 @@ async function handleCursorMove(connectionId: string, sessionId: string, payload
   return { statusCode: 200, body: 'Cursor updated' };
 }
 
-async function handleTyping(connectionId: string, sessionId: string, type: string, payload: any) {
+async function handleTyping(connectionId: string, sessionId: string, type: string, payload: TypingPayload) {
   await broadcastToSession(sessionId, connectionId, {
     type,
     sessionId,
@@ -148,9 +217,26 @@ async function handleTyping(connectionId: string, sessionId: string, type: strin
   return { statusCode: 200, body: 'Typing status updated' };
 }
 
-async function handleMessageSend(connectionId: string, sessionId: string, payload: any, requestId?: string) {
-  // In production, this would save to database and potentially trigger AI response
-  const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+async function handleMessageSend(connectionId: string, sessionId: string, payload: MessagePayload, requestId?: string) {
+  const messageId = `msg_${Date.now()}_${crypto.randomUUID().replace(/-/g, '').substring(0, 9)}`;
+  const timestamp = Date.now();
+  
+  // Persist message to DynamoDB
+  await docClient.send(new PutCommand({
+    TableName: MESSAGES_TABLE,
+    Item: {
+      sessionId,
+      messageId,
+      content: payload.content,
+      replyTo: payload.replyTo || null,
+      attachments: payload.attachments || [],
+      senderConnectionId: connectionId,
+      status: 'sent',
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      ttl: Math.floor(timestamp / 1000) + (30 * 24 * 60 * 60), // 30 days TTL
+    },
+  }));
   
   await broadcastToSession(sessionId, null, {
     type: 'message_sent',
@@ -161,33 +247,62 @@ async function handleMessageSend(connectionId: string, sessionId: string, payloa
       status: 'sent',
     },
     requestId,
-    timestamp: Date.now(),
+    timestamp,
   });
   
   return { statusCode: 200, body: 'Message sent' };
 }
 
-async function handleMessageEdit(connectionId: string, sessionId: string, payload: any) {
+async function handleMessageEdit(connectionId: string, sessionId: string, payload: EditPayload) {
+  const timestamp = Date.now();
+  
+  // Update message in DynamoDB
+  await docClient.send(new UpdateCommand({
+    TableName: MESSAGES_TABLE,
+    Key: { sessionId, messageId: payload.messageId },
+    UpdateExpression: 'SET content = :content, updatedAt = :updatedAt, editedBy = :editedBy',
+    ExpressionAttributeValues: {
+      ':content': payload.content,
+      ':updatedAt': timestamp,
+      ':editedBy': connectionId,
+    },
+  }));
+  
   await broadcastToSession(sessionId, null, {
     type: 'message_edited',
     sessionId,
     payload,
-    timestamp: Date.now(),
+    timestamp,
   });
   return { statusCode: 200, body: 'Message edited' };
 }
 
-async function handleMessageDelete(connectionId: string, sessionId: string, payload: any) {
+async function handleMessageDelete(connectionId: string, sessionId: string, payload: DeletePayload) {
+  const timestamp = Date.now();
+  
+  // Soft delete message in DynamoDB (mark as deleted rather than removing)
+  await docClient.send(new UpdateCommand({
+    TableName: MESSAGES_TABLE,
+    Key: { sessionId, messageId: payload.messageId },
+    UpdateExpression: 'SET #status = :status, deletedAt = :deletedAt, deletedBy = :deletedBy',
+    ExpressionAttributeNames: { '#status': 'status' },
+    ExpressionAttributeValues: {
+      ':status': 'deleted',
+      ':deletedAt': timestamp,
+      ':deletedBy': connectionId,
+    },
+  }));
+  
   await broadcastToSession(sessionId, null, {
     type: 'message_deleted',
     sessionId,
     payload,
-    timestamp: Date.now(),
+    timestamp,
   });
   return { statusCode: 200, body: 'Message deleted' };
 }
 
-async function handleMessageReact(connectionId: string, sessionId: string, payload: any) {
+async function handleMessageReact(connectionId: string, sessionId: string, payload: ReactPayload) {
   await broadcastToSession(sessionId, null, {
     type: 'message_reacted',
     sessionId,
@@ -197,24 +312,58 @@ async function handleMessageReact(connectionId: string, sessionId: string, paylo
   return { statusCode: 200, body: 'Reaction updated' };
 }
 
-async function handleCommentAdd(connectionId: string, sessionId: string, payload: any) {
-  const commentId = `cmt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+async function handleCommentAdd(connectionId: string, sessionId: string, payload: CommentPayload) {
+  const commentId = `cmt_${Date.now()}_${crypto.randomUUID().replace(/-/g, '').substring(0, 9)}`;
+  const timestamp = Date.now();
+  
+  // Persist comment to DynamoDB
+  await docClient.send(new PutCommand({
+    TableName: MESSAGES_TABLE,
+    Item: {
+      sessionId,
+      messageId: commentId,
+      type: 'comment',
+      targetId: payload.targetId,
+      content: payload.content,
+      position: payload.position || null,
+      senderConnectionId: connectionId,
+      status: 'active',
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      ttl: Math.floor(timestamp / 1000) + (30 * 24 * 60 * 60), // 30 days TTL
+    },
+  }));
   
   await broadcastToSession(sessionId, null, {
     type: 'comment_added',
     sessionId,
     payload: { ...payload, id: commentId },
-    timestamp: Date.now(),
+    timestamp,
   });
   return { statusCode: 200, body: 'Comment added' };
 }
 
-async function handleCommentResolve(connectionId: string, sessionId: string, payload: any) {
+async function handleCommentResolve(connectionId: string, sessionId: string, payload: ResolvePayload) {
+  const timestamp = Date.now();
+  
+  // Update comment status in DynamoDB
+  await docClient.send(new UpdateCommand({
+    TableName: MESSAGES_TABLE,
+    Key: { sessionId, messageId: payload.commentId },
+    UpdateExpression: 'SET #status = :status, resolvedAt = :resolvedAt, resolvedBy = :resolvedBy',
+    ExpressionAttributeNames: { '#status': 'status' },
+    ExpressionAttributeValues: {
+      ':status': 'resolved',
+      ':resolvedAt': timestamp,
+      ':resolvedBy': connectionId,
+    },
+  }));
+  
   await broadcastToSession(sessionId, null, {
     type: 'comment_resolved',
     sessionId,
     payload,
-    timestamp: Date.now(),
+    timestamp,
   });
   return { statusCode: 200, body: 'Comment resolved' };
 }
@@ -246,7 +395,7 @@ async function getSessionConnections(sessionId: string) {
   return result.Items || [];
 }
 
-async function broadcastToSession(sessionId: string, excludeConnectionId: string | null, message: any) {
+async function broadcastToSession(sessionId: string, excludeConnectionId: string | null, message: BroadcastMessage) {
   await lambdaClient.send(new InvokeCommand({
     FunctionName: BROADCAST_FUNCTION_NAME,
     InvocationType: 'Event',
@@ -258,14 +407,15 @@ async function broadcastToSession(sessionId: string, excludeConnectionId: string
   }));
 }
 
-async function sendToConnection(apiClient: ApiGatewayManagementApiClient, connectionId: string, data: any) {
+async function sendToConnection(apiClient: ApiGatewayManagementApiClient, connectionId: string, data: Record<string, unknown>) {
   try {
     await apiClient.send(new PostToConnectionCommand({
       ConnectionId: connectionId,
       Data: JSON.stringify(data),
     }));
-  } catch (error: any) {
-    if (error.statusCode === 410) {
+  } catch (error: unknown) {
+    const err = error as { statusCode?: number };
+    if (err.statusCode === 410) {
       console.log('Stale connection:', connectionId);
     } else {
       throw error;

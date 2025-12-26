@@ -1,62 +1,19 @@
 import { NextResponse } from 'next/server';
+import { thinkTankApi } from '@/lib/api/endpoints';
 
 /**
  * Think Tank GDPR Data Subject Rights API
- * Implements: Data Export (Right to Portability) and Data Deletion (Right to Erasure)
+ * Proxies to Radiant service layer for GDPR data requests
  */
 
-interface DataExportRequest {
-  id: string;
-  userId: string;
-  email: string;
-  requestType: 'export' | 'delete';
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  requestedAt: string;
-  completedAt: string | null;
-  downloadUrl: string | null;
-  expiresAt: string | null;
-}
-
-// Mock data requests - in production, stored in database
-let MOCK_REQUESTS: DataExportRequest[] = [];
-
-// GET /api/admin/thinktank/gdpr - List all GDPR requests
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-    const requestType = searchParams.get('requestType');
-    const status = searchParams.get('status');
+    const status = searchParams.get('status') || undefined;
+    const requestType = searchParams.get('requestType') || undefined;
 
-    let filtered = MOCK_REQUESTS;
-
-    if (userId) {
-      filtered = filtered.filter((r) => r.userId === userId);
-    }
-    if (requestType) {
-      filtered = filtered.filter((r) => r.requestType === requestType);
-    }
-    if (status) {
-      filtered = filtered.filter((r) => r.status === status);
-    }
-
-    // Calculate statistics
-    const stats = {
-      total: filtered.length,
-      pending: filtered.filter((r) => r.status === 'pending').length,
-      processing: filtered.filter((r) => r.status === 'processing').length,
-      completed: filtered.filter((r) => r.status === 'completed').length,
-      failed: filtered.filter((r) => r.status === 'failed').length,
-      exportRequests: filtered.filter((r) => r.requestType === 'export').length,
-      deleteRequests: filtered.filter((r) => r.requestType === 'delete').length,
-    };
-
-    return NextResponse.json({
-      requests: filtered.sort((a, b) => 
-        new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
-      ),
-      stats,
-    });
+    const result = await thinkTankApi.listGDPRRequests({ status, requestType });
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Failed to fetch GDPR requests:', error);
     return NextResponse.json(
@@ -66,7 +23,6 @@ export async function GET(request: Request) {
   }
 }
 
-// POST /api/admin/thinktank/gdpr - Create new GDPR request
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -86,58 +42,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const newRequest: DataExportRequest = {
-      id: crypto.randomUUID(),
+    const gdprRequest = await thinkTankApi.createGDPRRequest({
       userId,
       email,
       requestType,
-      status: 'pending',
-      requestedAt: new Date().toISOString(),
-      completedAt: null,
-      downloadUrl: null,
-      expiresAt: null,
-    };
-
-    MOCK_REQUESTS.push(newRequest);
-
-    // Audit log for GDPR compliance
-    console.log('[AUDIT] GDPR request created:', {
-      action: requestType === 'export' ? 'thinktank_data_exported' : 'thinktank_data_deleted',
-      timestamp: new Date().toISOString(),
-      requestId: newRequest.id,
-      userId,
-      requestType,
-      status: 'pending',
     });
 
-    // In production, this would trigger an async job to process the request
-    // Simulate processing completion after a delay
-    setTimeout(() => {
-      const idx = MOCK_REQUESTS.findIndex((r) => r.id === newRequest.id);
-      if (idx !== -1) {
-        MOCK_REQUESTS[idx] = {
-          ...MOCK_REQUESTS[idx],
-          status: 'completed',
-          completedAt: new Date().toISOString(),
-          downloadUrl: requestType === 'export' 
-            ? `/api/admin/thinktank/gdpr/download/${newRequest.id}` 
-            : null,
-          expiresAt: requestType === 'export'
-            ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days
-            : null,
-        };
-
-        console.log('[AUDIT] GDPR request completed:', {
-          action: requestType === 'export' ? 'thinktank_data_exported' : 'thinktank_data_deleted',
-          timestamp: new Date().toISOString(),
-          requestId: newRequest.id,
-          userId,
-          status: 'completed',
-        });
-      }
-    }, 2000);
-
-    return NextResponse.json(newRequest, { status: 201 });
+    return NextResponse.json(gdprRequest, { status: 201 });
   } catch (error) {
     console.error('Failed to create GDPR request:', error);
     return NextResponse.json(
@@ -147,7 +58,6 @@ export async function POST(request: Request) {
   }
 }
 
-// PATCH /api/admin/thinktank/gdpr - Update request status (admin only)
 export async function PATCH(request: Request) {
   try {
     const body = await request.json();
@@ -160,31 +70,8 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const idx = MOCK_REQUESTS.findIndex((r) => r.id === requestId);
-    if (idx === -1) {
-      return NextResponse.json(
-        { error: 'Request not found' },
-        { status: 404 }
-      );
-    }
-
-    MOCK_REQUESTS[idx] = {
-      ...MOCK_REQUESTS[idx],
-      status,
-      completedAt: ['completed', 'failed'].includes(status) 
-        ? new Date().toISOString() 
-        : null,
-    };
-
-    // Audit log
-    console.log('[AUDIT] GDPR request status updated:', {
-      action: 'gdpr_request_updated',
-      timestamp: new Date().toISOString(),
-      requestId,
-      newStatus: status,
-    });
-
-    return NextResponse.json(MOCK_REQUESTS[idx]);
+    const updatedRequest = await thinkTankApi.updateGDPRRequest(requestId, status);
+    return NextResponse.json(updatedRequest);
   } catch (error) {
     console.error('Failed to update GDPR request:', error);
     return NextResponse.json(

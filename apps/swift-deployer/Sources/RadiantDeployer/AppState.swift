@@ -105,7 +105,18 @@ final class AppState: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         
-        // TODO: Implement health check logic
+        // Check AWS connectivity and service health
+        guard let credential = credentials.first else {
+            isConnectedToRadiant = false
+            return
+        }
+        
+        let credentialsValid = await AWSService.shared.checkCredentialsValid(credential)
+        let apiHealthy = await AWSService.shared.checkAPIHealth(credential: credential)
+        let dbHealthy = await AWSService.shared.checkDatabaseHealth(credential: credential)
+        
+        // Update connection status based on health checks
+        isConnectedToRadiant = credentialsValid && apiHealthy && dbHealthy
     }
 }
 

@@ -154,7 +154,8 @@ export function PinnedPromptsChat({
     if (stored) {
       try {
         setPrompts(JSON.parse(stored));
-      } catch {
+      } catch (error) {
+        console.warn('[PinnedPrompts] Failed to parse stored prompts:', error instanceof Error ? error.message : 'Unknown');
         setPrompts(DEFAULT_CHAT_PROMPTS);
       }
     } else {

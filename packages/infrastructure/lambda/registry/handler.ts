@@ -2,15 +2,10 @@
 // API endpoints for providers, models, and self-hosted models
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool, PoolClient } from 'pg';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Content-Type': 'application/json',
-};
+import { PoolClient } from 'pg';
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { successResponse, notFoundResponse, handleError, corsPreflightResponse, corsHeaders } from '../shared/middleware/api-response';
 
 // ============================================================================
 // Types
@@ -321,27 +316,16 @@ export async function handler(
 
   // Handle CORS preflight
   if (method === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        ...corsHeaders,
-        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
-      },
-      body: '',
-    };
+    return corsPreflightResponse();
   }
 
-  const client = await pool.connect();
+  const client = await getPoolClient();
 
   try {
     // GET /api/v2/providers
     if (path === '/api/v2/providers' && method === 'GET') {
       const providers = await listProviders(client);
-      return {
-        statusCode: 200,
-        headers: corsHeaders,
-        body: JSON.stringify({ providers }),
-      };
+      return successResponse({ providers });
     }
 
     // GET /api/v2/providers/:id
@@ -349,64 +333,36 @@ export async function handler(
     if (providerMatch && method === 'GET') {
       const provider = await getProvider(client, providerMatch[1]);
       if (!provider) {
-        return {
-          statusCode: 404,
-          headers: corsHeaders,
-          body: JSON.stringify({ error: 'Provider not found' }),
-        };
+        return notFoundResponse('Provider', providerMatch[1]);
       }
-      return {
-        statusCode: 200,
-        headers: corsHeaders,
-        body: JSON.stringify(provider),
-      };
+      return successResponse(provider);
     }
 
     // GET /api/v2/providers/:id/models
     const providerModelsMatch = path.match(/^\/api\/v2\/providers\/([^/]+)\/models$/);
     if (providerModelsMatch && method === 'GET') {
       const models = await listProviderModels(client, providerModelsMatch[1]);
-      return {
-        statusCode: 200,
-        headers: corsHeaders,
-        body: JSON.stringify({ models }),
-      };
+      return successResponse({ models });
     }
 
     // GET /api/v2/models
     if (path === '/api/v2/models' && method === 'GET') {
       const category = event.queryStringParameters?.category;
       const models = await listModels(client, category);
-      return {
-        statusCode: 200,
-        headers: corsHeaders,
-        body: JSON.stringify({ models }),
-      };
+      return successResponse({ models });
     }
 
     // GET /api/v2/models/self-hosted
     if (path === '/api/v2/models/self-hosted' && method === 'GET') {
       const models = await listSelfHostedModels(client);
-      return {
-        statusCode: 200,
-        headers: corsHeaders,
-        body: JSON.stringify({ models }),
-      };
+      return successResponse({ models });
     }
 
     // Not found
-    return {
-      statusCode: 404,
-      headers: corsHeaders,
-      body: JSON.stringify({ error: 'Not found' }),
-    };
+    return notFoundResponse('Endpoint');
   } catch (error) {
-    console.error('Registry handler error:', error);
-    return {
-      statusCode: 500,
-      headers: corsHeaders,
-      body: JSON.stringify({ error: 'Internal server error' }),
-    };
+    logger.error('Registry handler error', error instanceof Error ? error : undefined);
+    return handleError(error);
   } finally {
     client.release();
   }

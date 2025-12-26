@@ -1,9 +1,7 @@
 // RADIANT v4.18.0 - Real-Time Collaboration Service
 // Yjs CRDT-based multi-user editing and collaboration
 
-import { Pool } from 'pg';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+import { getPoolClient } from '../db/centralized-pool';
 
 export interface CollaborationSession {
   id: string;
@@ -58,7 +56,7 @@ export class CollaborationService {
     documentType: 'chat' | 'canvas' | 'artifact',
     createdBy: string
   ): Promise<CollaborationSession> {
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(
@@ -92,7 +90,7 @@ export class CollaborationService {
     userId: string,
     displayName: string
   ): Promise<CollaborationParticipant> {
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       // Generate a deterministic color based on user ID for consistency
@@ -130,7 +128,7 @@ export class CollaborationService {
   }
 
   async leaveSession(sessionId: string, userId: string): Promise<void> {
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       await client.query(
@@ -145,7 +143,7 @@ export class CollaborationService {
   }
 
   async getSession(sessionId: string): Promise<CollaborationSession | null> {
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const sessionResult = await client.query(
@@ -192,7 +190,7 @@ export class CollaborationService {
   }
 
   async applyUpdate(update: DocumentUpdate): Promise<void> {
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       // Store the update for history/replay
@@ -222,7 +220,7 @@ export class CollaborationService {
   }
 
   async updateAwareness(state: AwarenessState): Promise<void> {
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       await client.query(
@@ -245,7 +243,7 @@ export class CollaborationService {
     sessionId: string,
     limit: number = 100
   ): Promise<DocumentUpdate[]> {
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(
@@ -270,7 +268,7 @@ export class CollaborationService {
   }
 
   async closeSession(sessionId: string): Promise<void> {
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       await client.query(

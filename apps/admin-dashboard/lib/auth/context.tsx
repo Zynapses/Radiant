@@ -98,7 +98,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         throw new Error('No access token');
       }
-    } catch {
+    } catch (error) {
+      console.warn('[AuthContext] Authentication check failed:', error instanceof Error ? error.message : 'Unknown error');
       setState({
         isAuthenticated: false,
         isLoading: false,

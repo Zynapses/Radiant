@@ -57,39 +57,12 @@ export function DeploymentsClient() {
   const { data: deployments, isLoading } = useQuery<Deployment[]>({
     queryKey: ['deployments', statusFilter, environmentFilter],
     queryFn: async () => {
-      // Mock data - in production would fetch from API
-      return [
-        {
-          id: '1',
-          version: '4.18.0',
-          environment: 'production',
-          status: 'completed',
-          startedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          completedAt: new Date(Date.now() - 1.5 * 60 * 60 * 1000).toISOString(),
-          startedBy: 'admin@example.com',
-          duration: 1800,
-        },
-        {
-          id: '2',
-          version: '4.18.0',
-          environment: 'staging',
-          status: 'completed',
-          startedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          completedAt: new Date(Date.now() - 23.5 * 60 * 60 * 1000).toISOString(),
-          startedBy: 'dev@example.com',
-          duration: 1200,
-        },
-        {
-          id: '3',
-          version: '4.17.0',
-          environment: 'production',
-          status: 'rolled_back',
-          startedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-          completedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 3600000).toISOString(),
-          startedBy: 'admin@example.com',
-          duration: 3600,
-        },
-      ];
+      const params = new URLSearchParams();
+      if (statusFilter !== 'all') params.append('status', statusFilter);
+      if (environmentFilter !== 'all') params.append('environment', environmentFilter);
+      const response = await fetch(`/api/deployments?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch deployments');
+      return response.json();
     },
   });
 

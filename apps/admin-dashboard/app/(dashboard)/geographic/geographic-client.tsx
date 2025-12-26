@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Globe, TrendingUp, Activity, DollarSign } from 'lucide-react';
+import { Globe, TrendingUp, Activity, DollarSign, RefreshCw } from 'lucide-react';
+import type { RegionStats } from '@/lib/api/types';
 
-interface RegionData {
+interface RegionDisplayData {
   code: string;
   name: string;
   requests: number;
@@ -13,17 +15,6 @@ interface RegionData {
   cost: number;
   growth: number;
 }
-
-const mockRegionData: RegionData[] = [
-  { code: 'US', name: 'United States', requests: 1250000, tokens: 45000000, cost: 12500.00, growth: 15.2 },
-  { code: 'GB', name: 'United Kingdom', requests: 320000, tokens: 12000000, cost: 3200.00, growth: 8.5 },
-  { code: 'DE', name: 'Germany', requests: 280000, tokens: 10500000, cost: 2800.00, growth: 12.3 },
-  { code: 'FR', name: 'France', requests: 195000, tokens: 7200000, cost: 1950.00, growth: 6.8 },
-  { code: 'JP', name: 'Japan', requests: 175000, tokens: 6500000, cost: 1750.00, growth: 22.1 },
-  { code: 'AU', name: 'Australia', requests: 145000, tokens: 5400000, cost: 1450.00, growth: 18.4 },
-  { code: 'CA', name: 'Canada', requests: 125000, tokens: 4600000, cost: 1250.00, growth: 9.7 },
-  { code: 'BR', name: 'Brazil', requests: 95000, tokens: 3500000, cost: 950.00, growth: 31.2 },
-];
 
 function formatNumber(num: number): string {
   if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -38,9 +29,34 @@ function formatCurrency(amount: number): string {
 export function GeographicClient() {
   const [timeRange, setTimeRange] = useState('30d');
 
-  const totalRequests = mockRegionData.reduce((sum, r) => sum + r.requests, 0);
-  const totalTokens = mockRegionData.reduce((sum, r) => sum + r.tokens, 0);
-  const totalCost = mockRegionData.reduce((sum, r) => sum + r.cost, 0);
+  const { data: regionData = [], isLoading } = useQuery<RegionDisplayData[]>({
+    queryKey: ['geographic-regions', timeRange],
+    queryFn: async () => {
+      const response = await fetch(`/api/geographic/regions?period=${timeRange}`);
+      if (!response.ok) throw new Error('Failed to fetch regions');
+      const regions: RegionStats[] = await response.json();
+      return regions.map((r: RegionStats) => ({
+        code: r.region.substring(0, 2).toUpperCase(),
+        name: r.displayName,
+        requests: timeRange === '7d' ? r.requests.last7d : r.requests.last24h,
+        tokens: 0, // Will be populated from usage endpoint
+        cost: 0, // Will be populated from billing endpoint
+        growth: 0, // Will be calculated from historical data
+      }));
+    },
+  });
+
+  const totalRequests = regionData.reduce((sum: number, r: RegionDisplayData) => sum + r.requests, 0);
+  const totalTokens = regionData.reduce((sum: number, r: RegionDisplayData) => sum + r.tokens, 0);
+  const totalCost = regionData.reduce((sum: number, r: RegionDisplayData) => sum + r.cost, 0);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-8">
+        <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -71,7 +87,7 @@ export function GeographicClient() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatNumber(totalRequests)}</div>
-            <p className="text-xs text-muted-foreground">Across {mockRegionData.length} regions</p>
+            <p className="text-xs text-muted-foreground">Across {regionData.length} regions</p>
           </CardContent>
         </Card>
         <Card>
@@ -124,7 +140,7 @@ export function GeographicClient() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {mockRegionData.map((region) => (
+            {regionData.map((region: RegionDisplayData) => (
               <div key={region.code} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-sm">

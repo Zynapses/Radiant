@@ -530,3 +530,92 @@ export function getErrorMetadata(code: ErrorCode) {
 export function isRetryableError(code: ErrorCode): boolean {
   return getErrorMetadata(code).retryable;
 }
+
+/**
+ * i18n translation keys for error messages
+ * These map to the localization registry
+ */
+export const ErrorTranslationKeys: Record<ErrorCode, string> = {
+  // Auth errors
+  [ErrorCodes.AUTH_INVALID_TOKEN]: 'error.auth.invalid_token',
+  [ErrorCodes.AUTH_TOKEN_EXPIRED]: 'error.auth.token_expired',
+  [ErrorCodes.AUTH_MISSING_TOKEN]: 'error.auth.missing_token',
+  [ErrorCodes.AUTH_INVALID_API_KEY]: 'error.auth.invalid_api_key',
+  [ErrorCodes.AUTH_API_KEY_EXPIRED]: 'error.auth.api_key_expired',
+  [ErrorCodes.AUTH_API_KEY_REVOKED]: 'error.auth.api_key_revoked',
+  [ErrorCodes.AUTH_INSUFFICIENT_SCOPE]: 'error.auth.insufficient_scope',
+  [ErrorCodes.AUTH_MFA_REQUIRED]: 'error.auth.mfa_required',
+  [ErrorCodes.AUTH_SESSION_EXPIRED]: 'error.auth.session_expired',
+  // Authorization errors
+  [ErrorCodes.AUTHZ_FORBIDDEN]: 'error.authz.forbidden',
+  [ErrorCodes.AUTHZ_TENANT_MISMATCH]: 'error.authz.tenant_mismatch',
+  [ErrorCodes.AUTHZ_ROLE_REQUIRED]: 'error.authz.role_required',
+  [ErrorCodes.AUTHZ_PERMISSION_DENIED]: 'error.authz.permission_denied',
+  [ErrorCodes.AUTHZ_RESOURCE_ACCESS_DENIED]: 'error.authz.resource_access_denied',
+  [ErrorCodes.AUTHZ_TIER_INSUFFICIENT]: 'error.authz.tier_insufficient',
+  // Validation errors
+  [ErrorCodes.VALIDATION_REQUIRED_FIELD]: 'error.validation.required_field',
+  [ErrorCodes.VALIDATION_INVALID_FORMAT]: 'error.validation.invalid_format',
+  [ErrorCodes.VALIDATION_OUT_OF_RANGE]: 'error.validation.out_of_range',
+  [ErrorCodes.VALIDATION_INVALID_TYPE]: 'error.validation.invalid_type',
+  [ErrorCodes.VALIDATION_CONSTRAINT_VIOLATION]: 'error.validation.constraint_violation',
+  [ErrorCodes.VALIDATION_SCHEMA_MISMATCH]: 'error.validation.schema_mismatch',
+  [ErrorCodes.VALIDATION_INVALID_JSON]: 'error.validation.invalid_json',
+  [ErrorCodes.VALIDATION_MAX_LENGTH_EXCEEDED]: 'error.validation.max_length_exceeded',
+  [ErrorCodes.VALIDATION_MIN_LENGTH_REQUIRED]: 'error.validation.min_length_required',
+  // Resource errors
+  [ErrorCodes.RESOURCE_NOT_FOUND]: 'error.resource.not_found',
+  [ErrorCodes.RESOURCE_ALREADY_EXISTS]: 'error.resource.already_exists',
+  [ErrorCodes.RESOURCE_DELETED]: 'error.resource.deleted',
+  [ErrorCodes.RESOURCE_LOCKED]: 'error.resource.locked',
+  [ErrorCodes.RESOURCE_CONFLICT]: 'error.resource.conflict',
+  [ErrorCodes.RESOURCE_QUOTA_EXCEEDED]: 'error.resource.quota_exceeded',
+  // Rate limiting errors
+  [ErrorCodes.RATE_LIMIT_EXCEEDED]: 'error.rate_limit.exceeded',
+  [ErrorCodes.RATE_LIMIT_TENANT]: 'error.rate_limit.tenant',
+  [ErrorCodes.RATE_LIMIT_USER]: 'error.rate_limit.user',
+  [ErrorCodes.RATE_LIMIT_API_KEY]: 'error.rate_limit.api_key',
+  [ErrorCodes.RATE_LIMIT_MODEL]: 'error.rate_limit.model',
+  [ErrorCodes.RATE_LIMIT_BURST]: 'error.rate_limit.burst',
+  // AI errors
+  [ErrorCodes.AI_MODEL_NOT_FOUND]: 'error.ai.model_not_found',
+  [ErrorCodes.AI_MODEL_UNAVAILABLE]: 'error.ai.model_unavailable',
+  [ErrorCodes.AI_MODEL_OVERLOADED]: 'error.ai.model_overloaded',
+  [ErrorCodes.AI_PROVIDER_ERROR]: 'error.ai.provider_error',
+  [ErrorCodes.AI_CONTEXT_TOO_LONG]: 'error.ai.context_too_long',
+  [ErrorCodes.AI_CONTENT_FILTERED]: 'error.ai.content_filtered',
+  [ErrorCodes.AI_INVALID_REQUEST]: 'error.ai.invalid_request',
+  [ErrorCodes.AI_STREAMING_ERROR]: 'error.ai.streaming_error',
+  [ErrorCodes.AI_TIMEOUT]: 'error.ai.timeout',
+  [ErrorCodes.AI_THERMAL_COLD]: 'error.ai.thermal_cold',
+  // Billing errors
+  [ErrorCodes.BILLING_INSUFFICIENT_CREDITS]: 'error.billing.insufficient_credits',
+  [ErrorCodes.BILLING_PAYMENT_REQUIRED]: 'error.billing.payment_required',
+  [ErrorCodes.BILLING_PAYMENT_FAILED]: 'error.billing.payment_failed',
+  [ErrorCodes.BILLING_SUBSCRIPTION_EXPIRED]: 'error.billing.subscription_expired',
+  [ErrorCodes.BILLING_SUBSCRIPTION_CANCELLED]: 'error.billing.subscription_cancelled',
+  [ErrorCodes.BILLING_INVALID_COUPON]: 'error.billing.invalid_coupon',
+  [ErrorCodes.BILLING_QUOTA_EXCEEDED]: 'error.billing.quota_exceeded',
+  // Storage errors
+  [ErrorCodes.STORAGE_QUOTA_EXCEEDED]: 'error.storage.quota_exceeded',
+  [ErrorCodes.STORAGE_FILE_TOO_LARGE]: 'error.storage.file_too_large',
+  [ErrorCodes.STORAGE_INVALID_FILE_TYPE]: 'error.storage.invalid_file_type',
+  [ErrorCodes.STORAGE_UPLOAD_FAILED]: 'error.storage.upload_failed',
+  [ErrorCodes.STORAGE_FILE_NOT_FOUND]: 'error.storage.file_not_found',
+  // Internal errors
+  [ErrorCodes.INTERNAL_ERROR]: 'error.internal.error',
+  [ErrorCodes.INTERNAL_DATABASE_ERROR]: 'error.internal.database_error',
+  [ErrorCodes.INTERNAL_CACHE_ERROR]: 'error.internal.cache_error',
+  [ErrorCodes.INTERNAL_QUEUE_ERROR]: 'error.internal.queue_error',
+  [ErrorCodes.INTERNAL_SERVICE_UNAVAILABLE]: 'error.internal.service_unavailable',
+  [ErrorCodes.INTERNAL_DEPENDENCY_FAILURE]: 'error.internal.dependency_failure',
+  [ErrorCodes.INTERNAL_CONFIGURATION_ERROR]: 'error.internal.configuration_error',
+  [ErrorCodes.INTERNAL_TIMEOUT]: 'error.internal.timeout',
+};
+
+/**
+ * Get the i18n translation key for an error code
+ */
+export function getErrorTranslationKey(code: ErrorCode): string {
+  return ErrorTranslationKeys[code] || ErrorTranslationKeys[ErrorCodes.INTERNAL_ERROR];
+}

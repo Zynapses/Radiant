@@ -1,11 +1,9 @@
 // RADIANT v4.18.0 - Result Merging Service
 // AI response synthesis from concurrent/multi-model queries
 
-import { Pool } from 'pg';
 import { withRetry, isRetryableHttpStatus } from '../utils/retry';
-import { logger } from '../logger';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { getPoolClient } from '../db/centralized-pool';
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || process.env.LITELLM_ENDPOINT;
 const AI_SERVICE_API_KEY = process.env.AI_SERVICE_API_KEY || process.env.LITELLM_API_KEY;
 
@@ -336,7 +334,7 @@ ${responses.map((r, i) => `=== Response ${i + 1} (${r.modelId}) ===\n${r.content
     sessionId: string,
     result: MergedResult
   ): Promise<void> {
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       await client.query(

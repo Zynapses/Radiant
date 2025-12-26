@@ -2,28 +2,10 @@
 // API endpoints for admin management of domain mode configurations
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Content-Type': 'application/json',
-};
-
-interface Admin {
-  id: string;
-  tenantId: string;
-}
-
-async function requireAdmin(event: APIGatewayProxyEvent): Promise<Admin> {
-  const authHeader = event.headers.Authorization || event.headers.authorization;
-  if (!authHeader) {
-    throw new Error('Unauthorized');
-  }
-  return { id: 'admin-id', tenantId: 'tenant-id' };
-}
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { corsHeaders } from '../shared/middleware/api-response';
+import { requireAdmin } from '../shared/auth/admin-auth';
 
 interface ModeConfig {
   enabled: boolean;
@@ -42,7 +24,7 @@ export async function getDomainModes(
 ): Promise<APIGatewayProxyResult> {
   try {
     const admin = await requireAdmin(event);
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(
@@ -82,7 +64,7 @@ export async function getDomainModes(
       client.release();
     }
   } catch (error) {
-    console.error('Failed to get domain modes', error);
+    logger.error('Failed to get domain modes', error instanceof Error ? error : undefined);
     return {
       statusCode: 500,
       headers: corsHeaders,
@@ -98,7 +80,7 @@ export async function updateDomainModes(
   try {
     const admin = await requireAdmin(event);
     const config: DomainModesConfig = JSON.parse(event.body || '{}');
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       await client.query(
@@ -122,7 +104,7 @@ export async function updateDomainModes(
       client.release();
     }
   } catch (error) {
-    console.error('Failed to update domain modes', error);
+    logger.error('Failed to update domain modes', error instanceof Error ? error : undefined);
     return {
       statusCode: 500,
       headers: corsHeaders,

@@ -1,57 +1,61 @@
 import Foundation
 
+// MARK: - Types (moved outside actor for Swift compatibility)
+
+struct OperationTimeout: Codable, Sendable, Hashable {
+    let operationName: String
+    var timeoutSeconds: Int
+    var retryCount: Int
+    var retryDelayMs: Int
+    var isActive: Bool
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(operationName)
+    }
+    
+    static func == (lhs: OperationTimeout, rhs: OperationTimeout) -> Bool {
+        lhs.operationName == rhs.operationName
+    }
+    
+    static let defaults: [OperationTimeout] = [
+        OperationTimeout(operationName: "cdk_bootstrap", timeoutSeconds: 600, retryCount: 2, retryDelayMs: 5000, isActive: true),
+        OperationTimeout(operationName: "cdk_deploy", timeoutSeconds: 1800, retryCount: 1, retryDelayMs: 10000, isActive: true),
+        OperationTimeout(operationName: "cdk_destroy", timeoutSeconds: 900, retryCount: 1, retryDelayMs: 5000, isActive: true),
+        OperationTimeout(operationName: "migration_run", timeoutSeconds: 300, retryCount: 3, retryDelayMs: 2000, isActive: true),
+        OperationTimeout(operationName: "health_check", timeoutSeconds: 30, retryCount: 5, retryDelayMs: 1000, isActive: true),
+        OperationTimeout(operationName: "model_inference", timeoutSeconds: 120, retryCount: 2, retryDelayMs: 3000, isActive: true),
+        OperationTimeout(operationName: "api_request", timeoutSeconds: 30, retryCount: 3, retryDelayMs: 1000, isActive: true),
+        OperationTimeout(operationName: "file_upload", timeoutSeconds: 300, retryCount: 2, retryDelayMs: 5000, isActive: true),
+    ]
+}
+
+enum TimeoutError: Error, LocalizedError {
+    case operationTimedOut(String, Int)
+    case maxRetriesExceeded(String, Int)
+    case operationNotFound(String)
+    case cancelled
+    
+    var errorDescription: String? {
+        switch self {
+        case .operationTimedOut(let op, let seconds):
+            return "Operation '\(op)' timed out after \(seconds) seconds"
+        case .maxRetriesExceeded(let op, let retries):
+            return "Operation '\(op)' failed after \(retries) retries"
+        case .operationNotFound(let op):
+            return "Unknown operation: \(op)"
+        case .cancelled:
+            return "Operation was cancelled"
+        }
+    }
+}
+
 /// Timeout Service for managing operation timeouts
 /// Syncs with SSM Parameter Store for centralized configuration
 actor TimeoutService {
     
-    // MARK: - Types
+    // MARK: - Singleton
     
-    struct OperationTimeout: Codable, Sendable, Hashable {
-        let operationName: String
-        var timeoutSeconds: Int
-        var retryCount: Int
-        var retryDelayMs: Int
-        var isActive: Bool
-        
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(operationName)
-        }
-        
-        static func == (lhs: OperationTimeout, rhs: OperationTimeout) -> Bool {
-            lhs.operationName == rhs.operationName
-        }
-        
-        static let defaults: [OperationTimeout] = [
-            OperationTimeout(operationName: "cdk_bootstrap", timeoutSeconds: 600, retryCount: 2, retryDelayMs: 5000, isActive: true),
-            OperationTimeout(operationName: "cdk_deploy", timeoutSeconds: 1800, retryCount: 1, retryDelayMs: 10000, isActive: true),
-            OperationTimeout(operationName: "cdk_destroy", timeoutSeconds: 900, retryCount: 1, retryDelayMs: 5000, isActive: true),
-            OperationTimeout(operationName: "migration_run", timeoutSeconds: 300, retryCount: 3, retryDelayMs: 2000, isActive: true),
-            OperationTimeout(operationName: "health_check", timeoutSeconds: 30, retryCount: 5, retryDelayMs: 1000, isActive: true),
-            OperationTimeout(operationName: "model_inference", timeoutSeconds: 120, retryCount: 2, retryDelayMs: 3000, isActive: true),
-            OperationTimeout(operationName: "api_request", timeoutSeconds: 30, retryCount: 3, retryDelayMs: 1000, isActive: true),
-            OperationTimeout(operationName: "file_upload", timeoutSeconds: 300, retryCount: 2, retryDelayMs: 5000, isActive: true),
-        ]
-    }
-    
-    enum TimeoutError: Error, LocalizedError {
-        case operationTimedOut(String, Int)
-        case maxRetriesExceeded(String, Int)
-        case operationNotFound(String)
-        case cancelled
-        
-        var errorDescription: String? {
-            switch self {
-            case .operationTimedOut(let op, let seconds):
-                return "Operation '\(op)' timed out after \(seconds) seconds"
-            case .maxRetriesExceeded(let op, let retries):
-                return "Operation '\(op)' failed after \(retries) retries"
-            case .operationNotFound(let op):
-                return "Unknown operation: \(op)"
-            case .cancelled:
-                return "Operation was cancelled"
-            }
-        }
-    }
+    static let shared = TimeoutService()
     
     // MARK: - Properties
     
@@ -108,18 +112,36 @@ actor TimeoutService {
     
     /// Sync timeouts from SSM with specific path
     func syncFromSSMWithPath(credentials: CredentialSet, basePath: String) async throws {
-        // In production, this would call AWS SSM GetParametersByPath
-        // Simulated SSM fetch with realistic latency
-        try await Task.sleep(nanoseconds: 200_000_000)
+        // Fetch timeout parameters from SSM Parameter Store
+        let awsService = AWSService.shared
         
-        // Simulated parameters from SSM
-        let ssmTimeouts: [String: [String: Any]] = [
-            "cdk_deploy": ["timeout": 1800, "retries": 1, "retryDelay": 10000],
-            "cdk_bootstrap": ["timeout": 600, "retries": 2, "retryDelay": 5000],
-            "health_check": ["timeout": 30, "retries": 5, "retryDelay": 1000],
-            "migration_run": ["timeout": 300, "retries": 3, "retryDelay": 2000],
-            "model_inference": ["timeout": 120, "retries": 2, "retryDelay": 3000],
+        // Define expected parameters
+        let parameterNames = [
+            "cdk_deploy", "cdk_bootstrap", "cdk_destroy", "aws_api_call",
+            "database_migration", "health_check", "package_download", "s3_upload"
         ]
+        
+        var ssmTimeouts: [String: [String: Any]] = [:]
+        
+        for name in parameterNames {
+            let path = "\(basePath)/\(name)"
+            if let value = await awsService.getParameter(path: path),
+               let data = value.data(using: .utf8),
+               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                ssmTimeouts[name] = json
+            }
+        }
+        
+        // Fallback to defaults if SSM is empty
+        if ssmTimeouts.isEmpty {
+            ssmTimeouts = [
+                "cdk_deploy": ["timeout": 1800, "retries": 1, "retryDelay": 10000],
+                "cdk_bootstrap": ["timeout": 600, "retries": 2, "retryDelay": 5000],
+                "health_check": ["timeout": 30, "retries": 5, "retryDelay": 1000],
+                "migration_run": ["timeout": 300, "retries": 3, "retryDelay": 2000],
+                "model_inference": ["timeout": 120, "retries": 2, "retryDelay": 3000],
+            ]
+        }
         
         for (operationName, params) in ssmTimeouts {
             if var timeout = timeouts[operationName] {
@@ -294,16 +316,4 @@ actor TimeoutService {
             return result
         }
     }
-}
-
-// MARK: - Singleton
-
-extension TimeoutService {
-    static let shared = TimeoutService()
-}
-
-// MARK: - CredentialSet Extension for Type
-
-extension CredentialSet {
-    // Add any needed credential handling for SSM
 }

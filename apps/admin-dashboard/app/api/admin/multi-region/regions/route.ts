@@ -1,55 +1,14 @@
 import { NextResponse } from 'next/server';
 import { withAuth, withAdminAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
+import { multiRegionApi } from '@/lib/api/endpoints';
 
 // GET /api/admin/multi-region/regions - Get all region configurations
 export const GET = withAuth(async () => {
   try {
-    // In production, this would query the database
-    // For now, return mock data
-    const regions = [
-      {
-        id: '1',
-        region: 'us-east-1',
-        displayName: 'US East (N. Virginia)',
-        isPrimary: true,
-        isEnabled: true,
-        endpoint: 'https://api.us-east-1.radiant.app',
-        stackPrefix: 'radiant-prod',
-        healthStatus: 'healthy',
-        lastDeployedVersion: '4.18.0',
-        lastDeployedAt: new Date().toISOString(),
-        latencyMs: 45,
-      },
-      {
-        id: '2',
-        region: 'us-west-2',
-        displayName: 'US West (Oregon)',
-        isPrimary: false,
-        isEnabled: true,
-        endpoint: 'https://api.us-west-2.radiant.app',
-        stackPrefix: 'radiant-prod-west',
-        healthStatus: 'healthy',
-        lastDeployedVersion: '4.18.0',
-        lastDeployedAt: new Date().toISOString(),
-        latencyMs: 78,
-      },
-      {
-        id: '3',
-        region: 'eu-west-1',
-        displayName: 'EU (Ireland)',
-        isPrimary: false,
-        isEnabled: true,
-        endpoint: 'https://api.eu-west-1.radiant.app',
-        stackPrefix: 'radiant-prod-eu',
-        healthStatus: 'healthy',
-        lastDeployedVersion: '4.17.0',
-        lastDeployedAt: new Date(Date.now() - 86400000).toISOString(),
-        latencyMs: 120,
-      },
-    ];
-
+    const regions = await multiRegionApi.listRegions();
     return NextResponse.json(regions);
   } catch (error) {
+    console.error('Failed to fetch regions:', error);
     return apiError('FETCH_FAILED', 'Failed to fetch regions', 500);
   }
 });

@@ -2,15 +2,10 @@
 // Generates compliance reports for SOC2, HIPAA, GDPR, ISO27001
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool, PoolClient } from 'pg';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Content-Type': 'application/json',
-};
+import { PoolClient } from 'pg';
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { corsHeaders } from '../shared/middleware/api-response';
 
 export interface ComplianceReport {
   id: string;
@@ -50,7 +45,7 @@ const SOC2_CHECKS: ComplianceCheck[] = [
         `SELECT COUNT(*) as count FROM users WHERE tenant_id = $1 AND mfa_enabled = true`,
         [tenantId]
       );
-      const mfaUsers = parseInt(result.rows[0].count);
+      const mfaUsers = parseInt(result.rows[0].count, 10);
       return { passed: mfaUsers > 0, details: `${mfaUsers} users have MFA enabled` };
     },
   },
@@ -88,7 +83,7 @@ const SOC2_CHECKS: ComplianceCheck[] = [
         `SELECT COUNT(*) as count FROM audit_logs WHERE tenant_id = $1 AND created_at > NOW() - INTERVAL '7 days'`,
         [tenantId]
       );
-      const logCount = parseInt(result.rows[0].count);
+      const logCount = parseInt(result.rows[0].count, 10);
       return { passed: logCount > 0, details: `${logCount} audit events in last 7 days` };
     },
   },
@@ -101,7 +96,7 @@ const SOC2_CHECKS: ComplianceCheck[] = [
         `SELECT COUNT(*) as count FROM notification_channels WHERE tenant_id = $1 AND channel_type = 'security'`,
         [tenantId]
       );
-      return { passed: parseInt(result.rows[0].count) > 0, details: 'Security notification channels' };
+      return { passed: parseInt(result.rows[0].count, 10) > 0, details: 'Security notification channels' };
     },
   },
 ];
@@ -123,7 +118,7 @@ const HIPAA_CHECKS: ComplianceCheck[] = [
         `SELECT COUNT(DISTINCT role) as roles FROM users WHERE tenant_id = $1`,
         [tenantId]
       );
-      return { passed: parseInt(result.rows[0].roles) > 1, details: 'RBAC implemented' };
+      return { passed: parseInt(result.rows[0].roles, 10) > 1, details: 'RBAC implemented' };
     },
   },
   {
@@ -163,7 +158,7 @@ const GDPR_CHECKS: ComplianceCheck[] = [
         `SELECT COUNT(*) as count FROM user_consents WHERE tenant_id = $1`,
         [tenantId]
       );
-      return { passed: parseInt(result.rows[0].count) >= 0, details: 'Consent management enabled' };
+      return { passed: parseInt(result.rows[0].count, 10) >= 0, details: 'Consent management enabled' };
     },
   },
   {
@@ -303,7 +298,7 @@ export async function generateReport(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       let checks: ComplianceCheck[];
@@ -359,7 +354,7 @@ export async function generateReport(
       client.release();
     }
   } catch (error) {
-    console.error('Failed to generate compliance report', error);
+    logger.error('Failed to generate compliance report', error instanceof Error ? error : undefined);
     return {
       statusCode: 500,
       headers: corsHeaders,
@@ -384,7 +379,7 @@ export async function getReport(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(
@@ -422,7 +417,7 @@ export async function getReport(
       client.release();
     }
   } catch (error) {
-    console.error('Failed to get compliance report', error);
+    logger.error('Failed to get compliance report', error instanceof Error ? error : undefined);
     return {
       statusCode: 500,
       headers: corsHeaders,
@@ -446,7 +441,7 @@ export async function getComplianceStats(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(
@@ -467,7 +462,7 @@ export async function getComplianceStats(
       for (const row of result.rows) {
         stats[row.report_type] = {
           score: row.score,
-          openFindings: parseInt(row.open_findings) || 0,
+          openFindings: parseInt(row.open_findings, 10) || 0,
         };
         totalScore += row.score;
         reportCount++;
@@ -495,7 +490,7 @@ export async function getComplianceStats(
       client.release();
     }
   } catch (error) {
-    console.error('Failed to get compliance stats', error);
+    logger.error('Failed to get compliance stats', error instanceof Error ? error : undefined);
     return {
       statusCode: 500,
       headers: corsHeaders,

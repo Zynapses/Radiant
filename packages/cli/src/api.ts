@@ -86,8 +86,8 @@ export async function streamRequest(
           const parsed = JSON.parse(data);
           const content = parsed.choices?.[0]?.delta?.content;
           if (content) onChunk(content);
-        } catch {
-          // Skip invalid JSON
+        } catch (parseError) {
+          // Skip invalid JSON in streaming response
         }
       }
     }

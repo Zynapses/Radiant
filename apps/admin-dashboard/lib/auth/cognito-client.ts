@@ -297,8 +297,8 @@ class CognitoAuthClient {
     
     try {
       return JSON.parse(stored);
-    } catch {
-      this.logError('Failed to parse stored tokens');
+    } catch (error) {
+      this.logError('Failed to parse stored tokens', error instanceof Error ? error.message : 'Unknown error');
       return null;
     }
   }
@@ -428,7 +428,8 @@ class CognitoAuthClient {
       
       const payload = JSON.parse(atob(parts[1]));
       return payload as DecodedToken;
-    } catch {
+    } catch (error) {
+      console.warn('[Cognito] Failed to decode token:', error instanceof Error ? error.message : 'Unknown error');
       return null;
     }
   }
@@ -589,7 +590,8 @@ class CognitoAuthClient {
       }
       
       return tokens;
-    } catch {
+    } catch (error) {
+      console.warn('[Cognito] Token validation failed, attempting refresh:', error instanceof Error ? error.message : 'Unknown error');
       return this.refreshSession();
     }
   }

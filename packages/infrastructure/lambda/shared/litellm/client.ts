@@ -112,8 +112,8 @@ export class LiteLLMClient {
             try {
               const chunk = JSON.parse(jsonStr) as ChatCompletionChunk;
               yield chunk;
-            } catch {
-              logger.warn('Failed to parse SSE chunk', { data: jsonStr });
+            } catch (parseError) {
+              logger.warn('Failed to parse SSE chunk', { data: jsonStr, error: parseError instanceof Error ? parseError.message : 'Unknown' });
             }
           }
         }

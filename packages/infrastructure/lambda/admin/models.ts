@@ -5,10 +5,8 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
-import { logger } from '../shared/logger';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 
 interface Model {
   id: string;
@@ -91,7 +89,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 async function listModels(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const { category, status, provider } = event.queryStringParameters || {};
-  const client = await pool.connect();
+  const client = await getPoolClient();
 
   try {
     let query = `
@@ -156,7 +154,7 @@ async function listModels(event: APIGatewayProxyEvent): Promise<APIGatewayProxyR
 
 async function createModel(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const body = JSON.parse(event.body || '{}');
-  const client = await pool.connect();
+  const client = await getPoolClient();
 
   try {
     const result = await client.query(
@@ -204,7 +202,7 @@ async function createModel(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
 }
 
 async function getModel(modelId: string): Promise<APIGatewayProxyResult> {
-  const client = await pool.connect();
+  const client = await getPoolClient();
 
   try {
     const result = await client.query(
@@ -256,7 +254,7 @@ async function getModel(modelId: string): Promise<APIGatewayProxyResult> {
 
 async function updateModel(modelId: string, event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const body = JSON.parse(event.body || '{}');
-  const client = await pool.connect();
+  const client = await getPoolClient();
 
   try {
     const updates: string[] = [];
@@ -311,7 +309,7 @@ async function updateModel(modelId: string, event: APIGatewayProxyEvent): Promis
 }
 
 async function deleteModel(modelId: string): Promise<APIGatewayProxyResult> {
-  const client = await pool.connect();
+  const client = await getPoolClient();
 
   try {
     const result = await client.query(
@@ -330,7 +328,7 @@ async function deleteModel(modelId: string): Promise<APIGatewayProxyResult> {
 }
 
 async function deprecateModel(modelId: string): Promise<APIGatewayProxyResult> {
-  const client = await pool.connect();
+  const client = await getPoolClient();
 
   try {
     const result = await client.query(
@@ -358,7 +356,7 @@ async function deprecateModel(modelId: string): Promise<APIGatewayProxyResult> {
 }
 
 async function listProviders(): Promise<APIGatewayProxyResult> {
-  const client = await pool.connect();
+  const client = await getPoolClient();
 
   try {
     const result = await client.query(`
@@ -391,7 +389,7 @@ async function listProviders(): Promise<APIGatewayProxyResult> {
 }
 
 async function getProvider(providerId: string): Promise<APIGatewayProxyResult> {
-  const client = await pool.connect();
+  const client = await getPoolClient();
 
   try {
     const result = await client.query(
@@ -431,7 +429,7 @@ async function getProvider(providerId: string): Promise<APIGatewayProxyResult> {
 
 async function updateProvider(providerId: string, event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const body = JSON.parse(event.body || '{}');
-  const client = await pool.connect();
+  const client = await getPoolClient();
 
   try {
     const updates: string[] = [];
@@ -474,7 +472,7 @@ async function updateProvider(providerId: string, event: APIGatewayProxyEvent): 
 }
 
 async function checkProviderHealth(providerId: string): Promise<APIGatewayProxyResult> {
-  const client = await pool.connect();
+  const client = await getPoolClient();
 
   try {
     const providerResult = await client.query(
@@ -504,7 +502,8 @@ async function checkProviderHealth(providerId: string): Promise<APIGatewayProxyR
       if (!res.ok) {
         status = res.status >= 500 ? 'down' : 'degraded';
       }
-    } catch {
+    } catch (error) {
+      logger.warn('Health check failed for model', { error: error instanceof Error ? error.message : 'Unknown error' });
       status = 'down';
     }
 

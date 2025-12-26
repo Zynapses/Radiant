@@ -1,13 +1,11 @@
 // RADIANT v4.18.0 - Voice & Video Service
 // Handles audio input/output integration for Think Tank platform
 
-import { Pool } from 'pg';
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { withRetry, isRetryableHttpStatus } from '../utils/retry';
 import { logger } from '../logger';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+import { getPoolClient } from '../db/centralized-pool';
 const s3 = new S3Client({});
 const AUDIO_BUCKET = process.env.AUDIO_BUCKET || process.env.MEDIA_BUCKET || 'radiant-media';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -67,7 +65,7 @@ export class VoiceVideoService {
       timestamps?: boolean;
     } = {}
   ): Promise<TranscriptionResult> {
-    const client = await pool.connect();
+    const client = await getPoolClient();
     const model = options.model || 'whisper-1';
     const language = options.language || 'en';
 
@@ -147,7 +145,7 @@ export class VoiceVideoService {
   async generateSpeech(
     request: SpeechGenerationRequest
   ): Promise<SpeechGenerationResult> {
-    const client = await pool.connect();
+    const client = await getPoolClient();
     const { text, voiceId, options = {} } = request;
     const format = options.format || 'mp3';
 
@@ -262,7 +260,7 @@ export class VoiceVideoService {
     userId: string,
     voiceConfig: VoiceConfig
   ): Promise<void> {
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       await client.query(
@@ -279,7 +277,7 @@ export class VoiceVideoService {
   }
 
   async getUserVoicePreference(userId: string): Promise<VoiceConfig | null> {
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(

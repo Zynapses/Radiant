@@ -26,9 +26,8 @@ interface AggregatedMetrics {
 export class MetricsCollector {
   private cloudwatch: CloudWatchClient;
   private buffer: MetricEvent[] = [];
-  private flushTimeout: ReturnType<typeof setTimeout> | null = null;
   private readonly BUFFER_SIZE = 100;
-  private readonly FLUSH_INTERVAL_MS = 10000;
+  private isFlushScheduled = false;
 
   constructor() {
     this.cloudwatch = new CloudWatchClient({});
@@ -37,19 +36,26 @@ export class MetricsCollector {
   record(event: MetricEvent): void {
     this.buffer.push(event);
 
+    // Flush immediately when buffer is full (Lambda-safe approach)
     if (this.buffer.length >= this.BUFFER_SIZE) {
-      this.flush();
-    } else if (!this.flushTimeout) {
-      this.flushTimeout = setTimeout(() => this.flush(), this.FLUSH_INTERVAL_MS);
+      // Use setImmediate for non-blocking flush, avoiding setTimeout
+      // which can cause issues with Lambda container freeze/thaw cycles
+      if (!this.isFlushScheduled) {
+        this.isFlushScheduled = true;
+        setImmediate(() => {
+          this.flush().finally(() => {
+            this.isFlushScheduled = false;
+          });
+        });
+      }
     }
   }
 
+  /**
+   * Flush metrics - should be called at end of Lambda handler
+   * to ensure all metrics are persisted before container freeze
+   */
   async flush(): Promise<void> {
-    if (this.flushTimeout) {
-      clearTimeout(this.flushTimeout);
-      this.flushTimeout = null;
-    }
-
     if (this.buffer.length === 0) return;
 
     const events = [...this.buffer];
@@ -61,10 +67,17 @@ export class MetricsCollector {
         this.sendToCloudWatch(events),
       ]);
     } catch (error) {
-      console.error('Failed to flush metrics:', error);
+      console.error('[Metrics] Failed to flush metrics:', error instanceof Error ? error.message : 'Unknown');
       // Re-add events to buffer on failure (with size limit)
       this.buffer = [...events.slice(-50), ...this.buffer].slice(0, this.BUFFER_SIZE);
     }
+  }
+
+  /**
+   * Get pending event count for monitoring
+   */
+  getPendingCount(): number {
+    return this.buffer.length;
   }
 
   private async persistToDatabase(events: MetricEvent[]): Promise<void> {

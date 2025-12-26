@@ -616,7 +616,7 @@ actor DeploymentService {
         
         return InstanceParameters(
             tier: tier,
-            region: AWSRegion(rawValue: outputs["Region"] ?? "us-east-1") ?? .usEast1,
+            region: AWSRegion(rawValue: outputs["Region"] ?? Configuration.primaryRegion) ?? .usEast1,
             vpcCidr: outputs["VpcCidr"] ?? "10.0.0.0/16",
             multiAz: outputs["MultiAz"] == "true",
             auroraInstanceClass: outputs["AuroraInstanceClass"] ?? tier.defaultAuroraInstance,

@@ -470,12 +470,16 @@ export default function WorkflowEditorPage() {
   }, [workflow.nodes, selectedNode]);
 
   const handleAddNode = (type: NodeType) => {
+    // Calculate position based on existing nodes to avoid overlap
+    const existingNodes = workflow.nodes.length;
+    const gridCol = existingNodes % 3;
+    const gridRow = Math.floor(existingNodes / 3);
     const newNode: WorkflowNode = {
       id: `${type}-${Date.now()}`,
       type,
       label: NODE_PALETTE.find(p => p.type === type)?.label || type,
-      x: 200 + Math.random() * 200,
-      y: 200 + Math.random() * 200,
+      x: 200 + gridCol * 220,
+      y: 150 + gridRow * 150,
       config: {},
       inputs: [],
       outputs: [],

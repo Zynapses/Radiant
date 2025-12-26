@@ -74,9 +74,19 @@ export interface ModelSelectionCriteria {
 }
 
 export class UnifiedModelRegistry {
+  private readonly MODEL_COLUMNS = `
+    id, model_id as "modelId", name, display_name as "displayName", description,
+    provider, source, category, specialty, capabilities, input_modalities as "inputModalities",
+    output_modalities as "outputModalities", context_window as "contextWindow", max_output as "maxOutput",
+    input_price_per_1m as "inputPricePer1M", output_price_per_1m as "outputPricePer1M",
+    hourly_rate as "hourlyRate", min_tier as "minTier", thermal_state as "thermalState",
+    warmup_time_seconds as "warmupTimeSeconds", license, commercial_use_allowed as "commercialUseAllowed",
+    enabled, deprecated, status
+  `;
+
   async getAllModels(options?: { includeDisabled?: boolean; includeDeprecated?: boolean }): Promise<UnifiedModel[]> {
     let sql = `
-      SELECT * FROM unified_model_registry
+      SELECT ${this.MODEL_COLUMNS} FROM unified_model_registry
       WHERE 1=1
     `;
 
@@ -95,7 +105,7 @@ export class UnifiedModelRegistry {
 
   async getModel(modelId: string): Promise<UnifiedModel | null> {
     const result = await executeStatement(
-      `SELECT * FROM unified_model_registry WHERE model_id = $1`,
+      `SELECT ${this.MODEL_COLUMNS} FROM unified_model_registry WHERE model_id = $1`,
       [{ name: 'modelId', value: { stringValue: modelId } }]
     );
 
@@ -104,7 +114,7 @@ export class UnifiedModelRegistry {
 
   async getModelsByCategory(category: ModelCategory): Promise<UnifiedModel[]> {
     const result = await executeStatement(
-      `SELECT * FROM unified_model_registry 
+      `SELECT ${this.MODEL_COLUMNS} FROM unified_model_registry 
        WHERE category = $1 AND enabled = true AND deprecated = false
        ORDER BY source, display_name`,
       [{ name: 'category', value: { stringValue: category } }]
@@ -115,7 +125,7 @@ export class UnifiedModelRegistry {
 
   async getModelsByProvider(provider: string): Promise<UnifiedModel[]> {
     const result = await executeStatement(
-      `SELECT * FROM unified_model_registry 
+      `SELECT ${this.MODEL_COLUMNS} FROM unified_model_registry 
        WHERE provider = $1 AND enabled = true AND deprecated = false
        ORDER BY display_name`,
       [{ name: 'provider', value: { stringValue: provider } }]
@@ -126,7 +136,7 @@ export class UnifiedModelRegistry {
 
   async getModelsByCapability(capability: string): Promise<UnifiedModel[]> {
     const result = await executeStatement(
-      `SELECT * FROM unified_model_registry 
+      `SELECT ${this.MODEL_COLUMNS} FROM unified_model_registry 
        WHERE $1 = ANY(capabilities) AND enabled = true AND deprecated = false
        ORDER BY source, display_name`,
       [{ name: 'capability', value: { stringValue: capability } }]
@@ -137,7 +147,7 @@ export class UnifiedModelRegistry {
 
   async selectBestModel(criteria: ModelSelectionCriteria): Promise<UnifiedModel | null> {
     let sql = `
-      SELECT umr.*, ph.status as provider_status, ph.avg_latency_ms
+      SELECT ${this.MODEL_COLUMNS.split(',').map(c => 'umr.' + c.trim().split(' ')[0]).join(', ')}, ph.status as provider_status, ph.avg_latency_ms
       FROM unified_model_registry umr
       LEFT JOIN provider_health ph ON umr.provider = ph.provider_id
       WHERE umr.enabled = true

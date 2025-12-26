@@ -155,7 +155,8 @@ export function extractJson<T>(field: Field): T | null {
   if (isStringField(field)) {
     try {
       return JSON.parse(field.stringValue) as T;
-    } catch {
+    } catch (parseError) {
+      console.debug('JSON parse failed in extractJson:', parseError instanceof Error ? parseError.message : 'unknown');
       return null;
     }
   }
@@ -176,8 +177,9 @@ export function extractStringArray(field: Field): string[] {
       if (Array.isArray(parsed)) {
         return parsed.map(String);
       }
-    } catch {
-      // Not a JSON array
+    } catch (parseError) {
+      // Not a JSON array - this is expected for non-JSON string values
+      console.debug('String field is not a JSON array:', parseError instanceof Error ? parseError.message : 'unknown');
     }
   }
   return [];

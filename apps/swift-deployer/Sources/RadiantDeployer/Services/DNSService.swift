@@ -262,8 +262,8 @@ actor DNSService {
         return SESRecords(
             verificationToken: verificationToken,
             dkimTokens: dkimTokens,
-            mailFromMX: "10 feedback-smtp.us-east-1.amazonses.com",
-            mailFromSPF: "v=spf1 include:amazonses.com ~all"
+            mailFromMX: Configuration.sesMailFromMX(),
+            mailFromSPF: Configuration.sesSPFRecord
         )
     }
     

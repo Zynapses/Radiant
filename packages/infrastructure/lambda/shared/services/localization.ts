@@ -232,7 +232,8 @@ export class LocalizationService {
 
   async getSupportedLanguages(): Promise<unknown[]> {
     const result = await executeStatement(
-      `SELECT * FROM localization_languages WHERE is_active = true ORDER BY display_order`,
+      `SELECT code, name, native_name, direction, is_default, display_order 
+       FROM localization_languages WHERE is_active = true ORDER BY display_order`,
       []
     );
     return result.rows;

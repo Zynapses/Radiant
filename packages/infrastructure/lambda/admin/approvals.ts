@@ -220,8 +220,8 @@ async function handleListApprovals(event: APIGatewayProxyEvent, auth: AuthContex
 
   const status = event.queryStringParameters?.status;
   const pendingForMe = event.queryStringParameters?.pendingForMe === 'true';
-  const limit = parseInt(event.queryStringParameters?.limit || '50');
-  const offset = parseInt(event.queryStringParameters?.offset || '0');
+  const limit = parseInt(event.queryStringParameters?.limit || '50', 10);
+  const offset = parseInt(event.queryStringParameters?.offset || '0', 10);
 
   let sql = `SELECT ar.*, req.first_name as requester_first_name, req.last_name as requester_last_name
              FROM approval_requests ar LEFT JOIN administrators req ON ar.requested_by = req.id WHERE ar.tenant_id = :tenantId`;

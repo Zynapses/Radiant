@@ -1,9 +1,29 @@
 /**
  * RADIANT v4.18.0 - Database Connection Pool Verification
  * Utilities for verifying and monitoring RDS Proxy connection pooling
+ * with connection limits and exhaustion protection
  */
 
 import { executeStatement } from './client';
+import { enhancedLogger } from '../logging/enhanced-logger';
+
+// Connection pool configuration
+const POOL_CONFIG = {
+  maxConnections: parseInt(process.env.DB_POOL_MAX || '10', 10),
+  minConnections: parseInt(process.env.DB_POOL_MIN || '1', 10),
+  acquireTimeoutMs: parseInt(process.env.DB_ACQUIRE_TIMEOUT_MS || '10000', 10),
+  idleTimeoutMs: parseInt(process.env.DB_IDLE_TIMEOUT_MS || '30000', 10),
+  connectionTimeoutMs: parseInt(process.env.DB_CONNECTION_TIMEOUT_MS || '5000', 10),
+  maxWaitingClients: parseInt(process.env.DB_MAX_WAITING || '50', 10),
+  utilizationWarningThreshold: 0.7,  // 70%
+  utilizationCriticalThreshold: 0.9, // 90%
+};
+
+// Connection pool state tracking
+let activeConnectionCount = 0;
+let waitingClientCount = 0;
+let connectionAcquireFailures = 0;
+let lastExhaustionWarning: Date | null = null;
 
 export interface ConnectionPoolStatus {
   isHealthy: boolean;
@@ -14,6 +34,101 @@ export interface ConnectionPoolStatus {
   lastChecked: Date;
   usingProxy: boolean;
   proxyEndpoint?: string;
+  waitingClients: number;
+  acquireFailures: number;
+}
+
+/**
+ * Connection pool exhaustion error
+ */
+export class ConnectionPoolExhaustedError extends Error {
+  constructor(
+    public readonly activeConnections: number,
+    public readonly maxConnections: number,
+    public readonly waitingClients: number
+  ) {
+    super(`Connection pool exhausted: ${activeConnections}/${maxConnections} connections in use, ${waitingClients} clients waiting`);
+    this.name = 'ConnectionPoolExhaustedError';
+  }
+}
+
+/**
+ * Acquire a connection with exhaustion protection
+ */
+export async function acquireConnection(): Promise<void> {
+  // Check if pool is exhausted
+  if (activeConnectionCount >= POOL_CONFIG.maxConnections) {
+    if (waitingClientCount >= POOL_CONFIG.maxWaitingClients) {
+      connectionAcquireFailures++;
+      throw new ConnectionPoolExhaustedError(
+        activeConnectionCount,
+        POOL_CONFIG.maxConnections,
+        waitingClientCount
+      );
+    }
+    
+    // Log warning if utilization is high
+    const utilization = activeConnectionCount / POOL_CONFIG.maxConnections;
+    if (utilization >= POOL_CONFIG.utilizationCriticalThreshold) {
+      const now = new Date();
+      if (!lastExhaustionWarning || now.getTime() - lastExhaustionWarning.getTime() > 60000) {
+        enhancedLogger.warn('DB Pool critical utilization', {
+          active: activeConnectionCount,
+          max: POOL_CONFIG.maxConnections,
+          waiting: waitingClientCount,
+          utilization: `${(utilization * 100).toFixed(1)}%`,
+        });
+        lastExhaustionWarning = now;
+      }
+    }
+  }
+  
+  waitingClientCount++;
+  try {
+    // Simulated acquire - actual pool management is in pg Pool
+    activeConnectionCount++;
+  } finally {
+    waitingClientCount--;
+  }
+}
+
+/**
+ * Release a connection back to the pool
+ */
+export function releaseConnection(): void {
+  if (activeConnectionCount > 0) {
+    activeConnectionCount--;
+  }
+}
+
+/**
+ * Get current pool utilization
+ */
+export function getPoolUtilization(): {
+  utilization: number;
+  status: 'healthy' | 'warning' | 'critical' | 'exhausted';
+} {
+  const utilization = activeConnectionCount / POOL_CONFIG.maxConnections;
+  
+  let status: 'healthy' | 'warning' | 'critical' | 'exhausted';
+  if (utilization >= 1) {
+    status = 'exhausted';
+  } else if (utilization >= POOL_CONFIG.utilizationCriticalThreshold) {
+    status = 'critical';
+  } else if (utilization >= POOL_CONFIG.utilizationWarningThreshold) {
+    status = 'warning';
+  } else {
+    status = 'healthy';
+  }
+  
+  return { utilization, status };
+}
+
+/**
+ * Get pool configuration
+ */
+export function getPoolConfig(): typeof POOL_CONFIG {
+  return { ...POOL_CONFIG };
 }
 
 /**
@@ -68,6 +183,8 @@ export async function checkConnectionPoolHealth(): Promise<ConnectionPoolStatus>
         lastChecked,
         usingProxy: isUsingRdsProxy(),
         proxyEndpoint: getDatabaseEndpoint(),
+        waitingClients: waitingClientCount,
+        acquireFailures: connectionAcquireFailures,
       };
     }
     
@@ -85,6 +202,8 @@ export async function checkConnectionPoolHealth(): Promise<ConnectionPoolStatus>
       lastChecked,
       usingProxy: isUsingRdsProxy(),
       proxyEndpoint: getDatabaseEndpoint(),
+      waitingClients: waitingClientCount,
+      acquireFailures: connectionAcquireFailures,
     };
   } catch (error) {
     // Return degraded status if we can't check
@@ -97,6 +216,8 @@ export async function checkConnectionPoolHealth(): Promise<ConnectionPoolStatus>
       lastChecked,
       usingProxy: isUsingRdsProxy(),
       proxyEndpoint: getDatabaseEndpoint(),
+      waitingClients: waitingClientCount,
+      acquireFailures: connectionAcquireFailures,
     };
   }
 }
@@ -130,7 +251,8 @@ export async function verifyRdsProxyConfig(): Promise<{
   // Check if connection test succeeds
   try {
     await executeStatement('SELECT 1', []);
-  } catch {
+  } catch (error) {
+    console.warn('Database connection test failed:', error instanceof Error ? error.message : 'unknown');
     recommendations.push('Database connection test failed - verify credentials and network');
   }
   

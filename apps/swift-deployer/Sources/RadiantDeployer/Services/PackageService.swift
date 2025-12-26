@@ -389,7 +389,7 @@ actor PackageService {
     
     /// List packages from S3 release bucket
     private func listRemotePackages(channel: ReleaseChannel) async throws -> [PackageInfo] {
-        let region = "us-east-1"  // Release bucket region
+        let region = Configuration.releasesBucketRegion
         let bucket = "radiant-releases-\(region)"
         let prefix = "\(channel.rawValue)/"
         
@@ -400,7 +400,7 @@ actor PackageService {
         for key in keys where key.hasSuffix(".radpkg") {
             // Parse version from filename: radiant-4.18.0-abc123.radpkg
             let filename = URL(string: key)?.lastPathComponent ?? key
-            if let info = parsePackageInfoFromFilename(
+            if let info = await parsePackageInfoFromFilename(
                 filename: filename,
                 channel: channel,
                 bucket: bucket,
@@ -419,7 +419,7 @@ actor PackageService {
         channel: ReleaseChannel,
         bucket: String,
         key: String
-    ) -> PackageInfo? {
+    ) async -> PackageInfo? {
         // Format: radiant-4.18.0-abc123.radpkg
         let pattern = #"radiant-(\d+\.\d+\.\d+)-([a-f0-9]+)\.radpkg"#
         
@@ -436,13 +436,16 @@ actor PackageService {
         let version = String(filename[versionRange])
         let buildId = String(filename[buildIdRange])
         
+        // Fetch S3 metadata for accurate timestamps and sizes
+        let metadata = await awsService.getObjectMetadata(bucket: bucket, key: key)
+        
         return PackageInfo(
             version: version,
             buildId: buildId,
-            buildTimestamp: Date(),  // Would be fetched from S3 metadata
-            packageHash: "",  // Would be fetched from manifest
+            buildTimestamp: metadata?.lastModified ?? Date(),
+            packageHash: metadata?.eTag ?? "",
             filename: filename,
-            size: 0,  // Would be fetched from S3
+            size: metadata?.contentLength ?? 0,
             channel: channel,
             bucket: bucket,
             key: key
@@ -451,8 +454,8 @@ actor PackageService {
     
     /// Get latest stable package info
     func getLatestStable() async throws -> PackageInfo {
-        let region = "us-east-1"
-        let bucket = "radiant-releases-\(region)"
+        let region = Configuration.releasesBucketRegion
+        let bucket = Configuration.releasesBucket(region: region)
         let key = "stable/latest.json"
         
         guard let data = await awsService.getObject(bucket: bucket, key: key) else {
@@ -468,8 +471,8 @@ actor PackageService {
         onProgress: @escaping (Double) -> Void
     ) async throws -> PackageInfo {
         // Try to get latest.json first
-        let region = "us-east-1"
-        let bucket = "radiant-releases-\(region)"
+        let region = Configuration.releasesBucketRegion
+        let bucket = Configuration.releasesBucket(region: region)
         let latestKey = "\(channel.rawValue)/latest.json"
         
         var packageInfo: PackageInfo
@@ -799,6 +802,26 @@ actor PackageService {
         }
         
         return totalSize
+    }
+    
+    /// Get count of cached packages
+    func getPackageCount() throws -> Int {
+        let contents = try fileManager.contentsOfDirectory(
+            at: cacheDirectory,
+            includingPropertiesForKeys: nil
+        )
+        return contents.filter { $0.pathExtension == "radpkg" }.count
+    }
+    
+    /// Get count of snapshots
+    func getSnapshotCount() throws -> Int {
+        let snapshotsDir = cacheDirectory.appendingPathComponent("snapshots")
+        guard fileManager.fileExists(atPath: snapshotsDir.path) else { return 0 }
+        let contents = try fileManager.contentsOfDirectory(
+            at: snapshotsDir,
+            includingPropertiesForKeys: nil
+        )
+        return contents.filter { $0.hasDirectoryPath }.count
     }
     
     // MARK: - Snapshot Package Storage

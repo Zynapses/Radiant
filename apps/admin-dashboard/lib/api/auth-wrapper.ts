@@ -40,12 +40,13 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
     
     const payload = JSON.parse(atob(parts[1]));
     return payload;
-  } catch {
+  } catch (error) {
+    console.warn('[Auth] Failed to decode JWT token:', error instanceof Error ? error.message : 'Unknown error');
     return null;
   }
 }
 
-function getTokenFromRequest(request: NextRequest): string | null {
+export function getTokenFromRequest(request: NextRequest): string | null {
   const authHeader = request.headers.get('authorization');
   if (authHeader?.startsWith('Bearer ')) {
     return authHeader.substring(7);

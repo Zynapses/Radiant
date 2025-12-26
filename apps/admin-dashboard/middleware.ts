@@ -112,7 +112,8 @@ function isTokenValid(token: string): boolean {
     }
     
     return true;
-  } catch {
+  } catch (error) {
+    console.warn('[Middleware] Token validation failed:', error instanceof Error ? error.message : 'Unknown error');
     return false;
   }
 }

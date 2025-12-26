@@ -1755,27 +1755,10 @@ struct UploadPackageSheet: View {
             do {
                 let data = try Data(contentsOf: fileURL)
                 
-                // Load manifest from package
-                // For now, create a placeholder - in production would extract from .radpkg
-                let manifest = PackageManifest(
-                    packageFormat: "1.0",
-                    version: RADIANT_VERSION,
-                    buildId: String(UUID().uuidString.prefix(8)),
-                    buildTimestamp: Date(),
-                    buildHost: Host.current().localizedName ?? "unknown",
-                    components: PackageManifest.ComponentVersions(
-                        radiantPlatform: .init(version: RADIANT_VERSION, minUpgradeFrom: nil, changelog: changelog.isEmpty ? nil : changelog),
-                        thinkTank: nil
-                    ),
-                    migrations: PackageManifest.MigrationInfo(radiant: nil, thinktank: nil),
-                    dependencies: PackageManifest.DependencyInfo(awsCdk: "2.x", nodejs: "20.x", postgresql: "15"),
-                    compatibility: PackageManifest.CompatibilityInfo(minimumDeployerVersion: RADIANT_VERSION, supportedTiers: ["1", "2", "3", "4"], supportedRegions: ["us-east-1", "us-west-2", "eu-west-1"]),
-                    integrity: PackageManifest.IntegrityInfo(algorithm: "sha256", packageHash: "", signedBy: nil, signature: nil),
-                    installBehavior: PackageManifest.InstallBehavior(seedAIRegistry: true, createInitialAdmin: true, runFullMigrations: true),
-                    updateBehavior: PackageManifest.UpdateBehavior(seedAIRegistry: false, preserveAdminCustomizations: true, runIncrementalMigrations: true, createPreUpdateSnapshot: true),
-                    rollbackBehavior: PackageManifest.RollbackBehavior(supportedFromVersions: [], requiresDatabaseRollback: true),
-                    seedData: nil
-                )
+                // Extract manifest from .radpkg file
+                let packageService = PackageService()
+                let deploymentPackage = try packageService.loadPackage(from: fileURL)
+                let manifest = deploymentPackage.manifest
                 
                 let registry = GitHubPackageRegistry()
                 _ = try await registry.uploadPackage(

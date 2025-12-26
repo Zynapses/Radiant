@@ -1,9 +1,12 @@
 /**
  * Logging Middleware
+ * Uses enhanced logger for structured logging with request context
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { Middleware, MiddlewareHandler } from './index';
+import { enhancedLogger } from '../logging/enhanced-logger';
+import { createRequestContext, runWithContextAsync } from '../utils/request-context';
 
 interface AuthenticatedEvent extends APIGatewayProxyEvent {
   auth?: {
@@ -65,7 +68,7 @@ export function loggingMiddleware(options: {
         requestLog.body = truncateBody(event.body);
       }
 
-      console.log(JSON.stringify(requestLog));
+      enhancedLogger.debug('Incoming request', requestLog);
 
       let response: APIGatewayProxyResult;
       let error: Error | undefined;
@@ -101,7 +104,7 @@ export function loggingMiddleware(options: {
         responseLog.error = error.message;
       }
 
-      console.log(JSON.stringify({ type: 'response', ...responseLog }));
+      enhancedLogger.info('Request completed', responseLog as unknown as Record<string, unknown>);
 
       // Add request ID to response headers
       response.headers = {
@@ -150,28 +153,6 @@ function truncateBody(body: string, maxLength: number = 1000): string {
 }
 
 /**
- * Structured logger
+ * Re-export enhanced logger for backward compatibility
  */
-export const logger = {
-  info: (message: string, data?: Record<string, unknown>) => {
-    console.log(JSON.stringify({ level: 'info', message, ...data, timestamp: new Date().toISOString() }));
-  },
-  warn: (message: string, data?: Record<string, unknown>) => {
-    console.warn(JSON.stringify({ level: 'warn', message, ...data, timestamp: new Date().toISOString() }));
-  },
-  error: (message: string, error?: Error, data?: Record<string, unknown>) => {
-    console.error(JSON.stringify({
-      level: 'error',
-      message,
-      error: error?.message,
-      stack: error?.stack,
-      ...data,
-      timestamp: new Date().toISOString(),
-    }));
-  },
-  debug: (message: string, data?: Record<string, unknown>) => {
-    if (process.env.LOG_LEVEL === 'debug') {
-      console.log(JSON.stringify({ level: 'debug', message, ...data, timestamp: new Date().toISOString() }));
-    }
-  },
-};
+export { enhancedLogger as logger };

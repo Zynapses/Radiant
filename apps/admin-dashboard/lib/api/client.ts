@@ -60,7 +60,8 @@ class ApiClient {
     try {
       const tokens = await getTokens();
       return tokens?.accessToken || null;
-    } catch {
+    } catch (error) {
+      console.warn('[ApiClient] Failed to get auth token:', error instanceof Error ? error.message : 'Unknown error');
       return null;
     }
   }
