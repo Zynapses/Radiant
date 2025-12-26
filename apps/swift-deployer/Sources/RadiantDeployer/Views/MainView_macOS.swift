@@ -122,6 +122,19 @@ struct AppSidebar: View {
                     }
                 }
                 
+                // Configuration (Domain & Email)
+                SidebarSection(title: "CONFIGURATION") {
+                    ForEach(NavigationTab.configTabs) { tab in
+                        NavigationLink(value: tab) {
+                            SidebarRow(
+                                title: tab.rawValue,
+                                icon: tab.icon,
+                                iconColor: tab.color
+                            )
+                        }
+                    }
+                }
+                
                 // Advanced
                 SidebarSection(title: "ADVANCED") {
                     ForEach(NavigationTab.advancedTabs) { tab in
@@ -599,6 +612,10 @@ struct DetailContentView: View {
                 ModelsView()
             case .selfHosted:
                 SelfHostedModelsView()
+            case .domains:
+                DomainSetupView()
+            case .email:
+                EmailSetupView()
             case .multiRegion:
                 MultiRegionView()
             case .abTesting:
