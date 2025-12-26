@@ -2,16 +2,10 @@
 // API endpoints for Think Tank model listing and user preferences
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
-import { logger } from '../shared/logger';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Content-Type': 'application/json',
-};
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { UnauthorizedError, ValidationError } from '../shared/errors';
+import { corsHeaders } from '../shared/middleware/api-response';
 
 interface User {
   id: string;
@@ -29,7 +23,7 @@ interface JwtPayload {
 function decodeJwt(token: string): JwtPayload {
   const parts = token.split('.');
   if (parts.length !== 3) {
-    throw new Error('Invalid token format');
+    throw new UnauthorizedError('Invalid token format');
   }
   
   const payload = parts[1];
@@ -40,7 +34,7 @@ function decodeJwt(token: string): JwtPayload {
 async function getUserFromToken(event: APIGatewayProxyEvent): Promise<User> {
   const authHeader = event.headers.Authorization || event.headers.authorization;
   if (!authHeader) {
-    throw new Error('Unauthorized');
+    throw new UnauthorizedError('Missing authorization header');
   }
   
   const token = authHeader.replace(/^Bearer\s+/i, '');
@@ -49,17 +43,18 @@ async function getUserFromToken(event: APIGatewayProxyEvent): Promise<User> {
     const payload = decodeJwt(token);
     
     if (payload.exp && payload.exp * 1000 < Date.now()) {
-      throw new Error('Token expired');
+      throw new UnauthorizedError('Token expired');
     }
     
     const tenantId = payload['custom:tenant_id'] || payload.tenant_id;
     if (!payload.sub || !tenantId) {
-      throw new Error('Invalid token payload');
+      throw new UnauthorizedError('Invalid token payload');
     }
     
     return { id: payload.sub, tenantId };
   } catch (error) {
-    throw new Error('Invalid token');
+    if (error instanceof UnauthorizedError) throw error;
+    throw new UnauthorizedError('Invalid token');
   }
 }
 
@@ -69,7 +64,7 @@ export async function listModels(
 ): Promise<APIGatewayProxyResult> {
   try {
     const user = await getUserFromToken(event);
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(
@@ -147,7 +142,7 @@ export async function getModelPreferences(
 ): Promise<APIGatewayProxyResult> {
   try {
     const user = await getUserFromToken(event);
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(
@@ -230,7 +225,7 @@ export async function updateModelPreferences(
   try {
     const user = await getUserFromToken(event);
     const body = JSON.parse(event.body || '{}');
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       await client.query(
@@ -304,7 +299,7 @@ export async function toggleFavoriteModel(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const currentResult = await client.query(

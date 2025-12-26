@@ -33,6 +33,7 @@ const TIER_LIMITS: Record<string, { requests: number; windowMs: number }> = {
  * In-memory rate limit store for fallback
  */
 const memoryStore = new Map<string, { count: number; resetAt: number }>();
+const MAX_MEMORY_STORE_SIZE = 10000;
 
 function cleanupMemoryStore(): void {
   const now = Date.now();
@@ -43,8 +44,15 @@ function cleanupMemoryStore(): void {
   }
 }
 
-// Cleanup every minute
-setInterval(cleanupMemoryStore, 60000);
+/**
+ * Cleanup on each request instead of global interval (Lambda-safe)
+ * Only cleanup if store exceeds threshold to avoid overhead
+ */
+function maybeCleanupMemoryStore(): void {
+  if (memoryStore.size > MAX_MEMORY_STORE_SIZE) {
+    cleanupMemoryStore();
+  }
+}
 
 /**
  * Get rate limit key from event
@@ -144,6 +152,9 @@ function checkRateLimitMemory(
   maxRequests: number,
   windowMs: number
 ): { allowed: boolean; remaining: number; resetAt: number } {
+  // Lambda-safe cleanup on each request
+  maybeCleanupMemoryStore();
+  
   const now = Date.now();
   const entry = memoryStore.get(key);
 

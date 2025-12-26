@@ -134,18 +134,51 @@ actor DeploymentLockService {
     // MARK: - Lock Status
     
     func checkLock(appId: String, environment: String) async throws -> DeploymentLock? {
-        // Simulated DynamoDB read
-        // In production, this would query DynamoDB
-        try await Task.sleep(nanoseconds: 100_000_000)
-        
-        // Return current lock if it matches
+        // Check local cache first
         if let lock = currentLock,
            lock.appId == appId,
            lock.environment == environment {
             return lock
         }
         
-        return nil
+        // Query DynamoDB for existing lock
+        let tableName = "radiant-deployment-locks"
+        let key: [String: Any] = [
+            "pk": "\(appId)#\(environment)"
+        ]
+        
+        let result = await awsService.dynamoDbGetItem(tableName: tableName, key: key)
+        
+        switch result {
+        case .success(let item):
+            guard let item = item else { return nil }
+            
+            // Parse lock from DynamoDB item
+            guard let lockId = item["lockId"] as? String,
+                  let owner = item["owner"] as? String,
+                  let ownerId = item["ownerId"] as? String,
+                  let acquiredAtStr = item["acquiredAt"] as? String,
+                  let lastHeartbeatStr = item["lastHeartbeat"] as? String,
+                  let expiresAtStr = item["expiresAt"] as? String else {
+                return nil
+            }
+            
+            let formatter = ISO8601DateFormatter()
+            return DeploymentLock(
+                lockId: lockId,
+                appId: appId,
+                environment: environment,
+                owner: owner,
+                ownerId: ownerId,
+                acquiredAt: formatter.date(from: acquiredAtStr) ?? Date(),
+                lastHeartbeat: formatter.date(from: lastHeartbeatStr) ?? Date(),
+                expiresAt: formatter.date(from: expiresAtStr) ?? Date(),
+                metadata: item["metadata"] as? [String: String] ?? [:]
+            )
+            
+        case .failure:
+            return nil
+        }
     }
     
     func getLockStatus(appId: String, environment: String) async -> LockStatus {
@@ -210,24 +243,52 @@ actor DeploymentLockService {
         currentLock = lock
     }
     
-    // MARK: - DynamoDB Operations (Simulated)
+    // MARK: - DynamoDB Operations
+    
+    private let tableName = "radiant-deployment-locks"
     
     private func writeLock(_ lock: DeploymentLock) async throws {
-        // Simulated conditional write to DynamoDB
-        // Uses condition expression to prevent overwriting existing lock
-        try await Task.sleep(nanoseconds: 200_000_000)
+        let formatter = ISO8601DateFormatter()
+        let item: [String: Any] = [
+            "pk": "\(lock.appId)#\(lock.environment)",
+            "lockId": lock.lockId,
+            "appId": lock.appId,
+            "environment": lock.environment,
+            "owner": lock.owner,
+            "ownerId": lock.ownerId,
+            "acquiredAt": formatter.string(from: lock.acquiredAt),
+            "lastHeartbeat": formatter.string(from: lock.lastHeartbeat),
+            "expiresAt": formatter.string(from: lock.expiresAt),
+            "hostname": lock.metadata["hostname"] ?? "",
+            "pid": lock.metadata["pid"] ?? ""
+        ]
+        
+        let result = await awsService.dynamoDbPutItem(tableName: tableName, item: item)
+        
+        if case .failure(let error) = result {
+            throw LockError.lockAcquisitionFailed(error.localizedDescription)
+        }
     }
     
     private func deleteLock(_ lock: DeploymentLock) async throws {
-        try await Task.sleep(nanoseconds: 100_000_000)
+        let key: [String: Any] = [
+            "pk": "\(lock.appId)#\(lock.environment)"
+        ]
+        
+        let result = await awsService.dynamoDbDeleteItem(tableName: tableName, key: key)
+        
+        if case .failure(let error) = result {
+            throw LockError.lockReleaseFailed(error.localizedDescription)
+        }
     }
     
     private func updateLockHeartbeat(_ lock: DeploymentLock) async throws {
-        try await Task.sleep(nanoseconds: 50_000_000)
+        // Re-write the lock with updated heartbeat
+        try await writeLock(lock)
     }
     
     private func releaseStaleLock(_ lock: DeploymentLock) async throws {
-        try await Task.sleep(nanoseconds: 100_000_000)
+        try await deleteLock(lock)
     }
     
     // MARK: - Utility

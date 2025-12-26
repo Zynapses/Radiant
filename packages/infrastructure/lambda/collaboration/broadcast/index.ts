@@ -9,10 +9,18 @@ const docClient = DynamoDBDocumentClient.from(ddbClient);
 const CONNECTIONS_TABLE = process.env.CONNECTIONS_TABLE!;
 const WEBSOCKET_URL = process.env.WEBSOCKET_URL!;
 
+interface BroadcastMessage {
+  type: string;
+  sessionId: string;
+  payload?: unknown;
+  requestId?: string;
+  timestamp: number;
+}
+
 interface BroadcastEvent {
   sessionId: string;
   excludeConnectionId?: string;
-  message: any;
+  message: BroadcastMessage;
 }
 
 export const handler: Handler<BroadcastEvent> = async (event) => {
@@ -49,8 +57,9 @@ export const handler: Handler<BroadcastEvent> = async (event) => {
             ConnectionId: conn.connectionId,
             Data: JSON.stringify(message),
           }));
-        } catch (error: any) {
-          if (error.statusCode === 410) {
+        } catch (error: unknown) {
+          const err = error as { statusCode?: number };
+          if (err.statusCode === 410) {
             // Connection is stale, remove it
             console.log('Removing stale connection:', conn.connectionId);
             await docClient.send(new DeleteCommand({

@@ -2,29 +2,10 @@
 // API endpoints for admin management of chat history snapshots
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
-import { logger } from '../shared/logger';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Content-Type': 'application/json',
-};
-
-interface Admin {
-  id: string;
-  tenantId: string;
-}
-
-async function requireAdmin(event: APIGatewayProxyEvent): Promise<Admin> {
-  const authHeader = event.headers.Authorization || event.headers.authorization;
-  if (!authHeader) {
-    throw new Error('Unauthorized');
-  }
-  return { id: 'admin-id', tenantId: 'tenant-id' };
-}
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { corsHeaders } from '../shared/middleware/api-response';
+import { requireAdmin } from '../shared/auth/admin-auth';
 
 // GET /api/admin/time-machine/snapshots
 export async function listSnapshots(
@@ -34,10 +15,10 @@ export async function listSnapshots(
     const admin = await requireAdmin(event);
     const search = event.queryStringParameters?.search || '';
     const type = event.queryStringParameters?.type || 'all';
-    const limit = parseInt(event.queryStringParameters?.limit || '50');
-    const offset = parseInt(event.queryStringParameters?.offset || '0');
+    const limit = parseInt(event.queryStringParameters?.limit || '50', 10);
+    const offset = parseInt(event.queryStringParameters?.offset || '0', 10);
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       let whereClause = 'WHERE s.tenant_id = $1';
@@ -117,7 +98,7 @@ export async function getStats(
 ): Promise<APIGatewayProxyResult> {
   try {
     const admin = await requireAdmin(event);
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const statsResult = await client.query(
@@ -140,10 +121,10 @@ export async function getStats(
         statusCode: 200,
         headers: corsHeaders,
         body: JSON.stringify({
-          totalSnapshots: parseInt(stats.total_snapshots) || 0,
-          autoSnapshots: parseInt(stats.auto_snapshots) || 0,
-          manualSnapshots: parseInt(stats.manual_snapshots) || 0,
-          branchSnapshots: parseInt(stats.branch_snapshots) || 0,
+          totalSnapshots: parseInt(stats.total_snapshots, 10) || 0,
+          autoSnapshots: parseInt(stats.auto_snapshots, 10) || 0,
+          manualSnapshots: parseInt(stats.manual_snapshots, 10) || 0,
+          branchSnapshots: parseInt(stats.branch_snapshots, 10) || 0,
           storageUsedMb: parseFloat(stats.storage_used_mb) || 0,
         }),
       };
@@ -176,7 +157,7 @@ export async function getSnapshot(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(
@@ -240,7 +221,7 @@ export async function deleteSnapshot(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(
@@ -282,7 +263,7 @@ export async function purgeOldSnapshots(
     const admin = await requireAdmin(event);
     const { daysOld = 90, snapshotType } = JSON.parse(event.body || '{}');
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       let whereClause = `tenant_id = $1 AND created_at < NOW() - $2 * INTERVAL '1 day'`;

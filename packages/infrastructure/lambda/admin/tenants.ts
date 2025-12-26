@@ -5,10 +5,8 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
+import { getClient, query } from '../shared/db/pool-manager';
 import { logger } from '../shared/logger';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 interface Tenant {
   id: string;
@@ -79,7 +77,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 async function listTenants(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const { page = '1', limit = '20', status, tier, search } = event.queryStringParameters || {};
-  const client = await pool.connect();
+  const client = await getClient();
 
   try {
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
@@ -104,11 +102,8 @@ async function listTenants(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-    const countResult = await client.query(
-      `SELECT COUNT(*) FROM tenants t ${whereClause}`,
-      params
-    );
-
+    // Execute count and data queries in parallel
+    const countParams = [...params];
     params.push(limitNum, offset);
     const query = `
       SELECT 
@@ -120,7 +115,10 @@ async function listTenants(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
       LIMIT $${params.length - 1} OFFSET $${params.length}
     `;
 
-    const result = await client.query(query, params);
+    const [countResult, result] = await Promise.all([
+      client.query(`SELECT COUNT(*) FROM tenants t ${whereClause}`, countParams),
+      client.query(query, params),
+    ]);
 
     const tenants: Tenant[] = result.rows.map(row => ({
       id: row.id,
@@ -159,7 +157,7 @@ async function createTenant(event: APIGatewayProxyEvent): Promise<APIGatewayProx
     return response(400, { error: { message: 'name and email are required' } });
   }
 
-  const client = await pool.connect();
+  const client = await getClient();
 
   try {
     const settings: TenantSettings = {
@@ -195,7 +193,7 @@ async function createTenant(event: APIGatewayProxyEvent): Promise<APIGatewayProx
 }
 
 async function getTenant(tenantId: string): Promise<APIGatewayProxyResult> {
-  const client = await pool.connect();
+  const client = await getClient();
 
   try {
     const result = await client.query(
@@ -232,7 +230,7 @@ async function getTenant(tenantId: string): Promise<APIGatewayProxyResult> {
 
 async function updateTenant(tenantId: string, event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const body = JSON.parse(event.body || '{}');
-  const client = await pool.connect();
+  const client = await getClient();
 
   try {
     const updates: string[] = [];
@@ -279,7 +277,7 @@ async function updateTenant(tenantId: string, event: APIGatewayProxyEvent): Prom
 }
 
 async function deleteTenant(tenantId: string): Promise<APIGatewayProxyResult> {
-  const client = await pool.connect();
+  const client = await getClient();
 
   try {
     const result = await client.query(
@@ -298,7 +296,7 @@ async function deleteTenant(tenantId: string): Promise<APIGatewayProxyResult> {
 }
 
 async function suspendTenant(tenantId: string): Promise<APIGatewayProxyResult> {
-  const client = await pool.connect();
+  const client = await getClient();
 
   try {
     await client.query('BEGIN');
@@ -330,7 +328,7 @@ async function suspendTenant(tenantId: string): Promise<APIGatewayProxyResult> {
 }
 
 async function activateTenant(tenantId: string): Promise<APIGatewayProxyResult> {
-  const client = await pool.connect();
+  const client = await getClient();
 
   try {
     await client.query('BEGIN');

@@ -118,7 +118,8 @@ export function validateBody<T>(body: string | null, schema: z.ZodSchema<T>): { 
   let parsed: unknown;
   try {
     parsed = JSON.parse(body);
-  } catch {
+  } catch (parseError) {
+    console.debug('JSON parse error in validation:', parseError instanceof Error ? parseError.message : 'unknown');
     return { success: false, error: 'Invalid JSON body' };
   }
 

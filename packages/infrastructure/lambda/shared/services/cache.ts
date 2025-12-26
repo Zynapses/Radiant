@@ -6,12 +6,23 @@
 
 import Redis from 'ioredis';
 import { logger } from '../logger';
+import { CachingConfig } from './system-config';
 
 let redisClient: Redis | null = null;
 const memoryCache: Map<string, { value: unknown; expiresAt: number }> = new Map();
 
 const REDIS_URL = process.env.REDIS_URL;
-const DEFAULT_TTL = 300; // 5 minutes
+
+// Default TTL - will be overridden by DB config when available
+let DEFAULT_TTL = 300; // 5 minutes
+
+// Load TTL from database config (async, non-blocking)
+CachingConfig.getRedisDefaultTtlSeconds().then(ttl => {
+  DEFAULT_TTL = ttl;
+  logger.info('Cache TTL loaded from config', { ttl });
+}).catch(() => {
+  // Use default if DB not available
+});
 
 /**
  * Initialize Redis connection

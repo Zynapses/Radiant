@@ -277,12 +277,49 @@ async function flushAuditLogs(): Promise<void> {
   await Promise.all(writePromises);
 }
 
+/**
+ * Schedule flush for end of Lambda execution.
+ * Uses a short timeout that will execute before Lambda freezes,
+ * but prefer calling ensureAuditLogsFlushed() explicitly.
+ */
 function startFlushTimer(): void {
   if (flushTimer) return;
+  // Use shorter timeout for Lambda (500ms instead of 5s)
+  // This ensures flush happens before Lambda context freezes
+  const LAMBDA_SAFE_TIMEOUT = 500;
   flushTimer = setTimeout(async () => {
     flushTimer = null;
     await flushAuditLogs();
-  }, FLUSH_INTERVAL);
+  }, LAMBDA_SAFE_TIMEOUT);
+}
+
+/**
+ * Ensure all buffered audit logs are flushed.
+ * Call this at the end of Lambda handlers.
+ */
+export async function ensureAuditLogsFlushed(): Promise<void> {
+  if (flushTimer) {
+    clearTimeout(flushTimer);
+    flushTimer = null;
+  }
+  await flushAuditLogs();
+}
+
+/**
+ * Wrapper for Lambda handlers that ensures audit logs are flushed
+ */
+export function withAuditFlush<TEvent, TResult>(
+  handler: (event: TEvent) => Promise<TResult>
+): (event: TEvent) => Promise<TResult> {
+  return async (event: TEvent) => {
+    try {
+      return await handler(event);
+    } finally {
+      await ensureAuditLogsFlushed().catch(err => {
+        console.error('Failed to flush audit logs:', err);
+      });
+    }
+  };
 }
 
 function generateId(): string {

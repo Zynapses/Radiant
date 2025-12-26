@@ -31,6 +31,8 @@ import {
   Beaker,
   ShieldCheck,
   Workflow,
+  ScrollText,
+  Wrench,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -78,9 +80,11 @@ const navigation: NavigationItem[] = [
   { name: 'Storage', href: '/storage', icon: HardDrive },
   { name: 'Administrators', href: '/administrators', icon: Users },
   { name: 'Audit Logs', href: '/audit-logs', icon: FileText },
+  { name: 'AWS Logs', href: '/aws-logs', icon: ScrollText },
   
   // Settings Section
   { type: 'separator', label: 'Settings' },
+  { name: 'System Config', href: '/system-config', icon: Wrench },
   { name: 'Localization', href: '/localization', icon: Languages },
   { name: 'Configuration', href: '/configuration', icon: Sliders },
   { name: 'Migrations', href: '/migrations', icon: GitPullRequest },

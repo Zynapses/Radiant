@@ -49,24 +49,19 @@ interface ThinkTankSecurityConfig {
   exportRestricted: boolean;
 }
 
-// Mock security config - in production, fetch from API
-const mockSecurityConfig: ThinkTankSecurityConfig = {
-  dataEncryptionEnabled: true,
-  auditLoggingEnabled: true,
-  ipWhitelistEnabled: false,
-  mfaRequired: true,
-  sessionTimeout: 30,
-  maxLoginAttempts: 5,
-  dataRetentionDays: 365,
-  piiMaskingEnabled: true,
-  exportRestricted: false,
-};
-
 export function ThinkTankSecuritySection() {
-  const { data: status, isLoading } = useQuery<ThinkTankStatus>({
+  const { data: status, isLoading: statusLoading } = useQuery<ThinkTankStatus>({
     queryKey: ['thinktank', 'status'],
     queryFn: () => fetch('/api/admin/thinktank/status').then(r => r.json()),
   });
+
+  const { data: securityConfig, isLoading: configLoading } = useQuery<ThinkTankSecurityConfig>({
+    queryKey: ['thinktank', 'security-config'],
+    queryFn: () => fetch('/api/security/thinktank/config').then(r => r.json()),
+    enabled: status?.installed || status?.dataRetained,
+  });
+
+  const isLoading = statusLoading || configLoading;
 
   const isViewOnly = !status?.installed && status?.dataRetained;
 
@@ -110,6 +105,19 @@ export function ThinkTankSecuritySection() {
     );
   }
 
+  // Default config while loading
+  const config = securityConfig ?? {
+    dataEncryptionEnabled: false,
+    auditLoggingEnabled: false,
+    ipWhitelistEnabled: false,
+    mfaRequired: false,
+    sessionTimeout: 30,
+    maxLoginAttempts: 5,
+    dataRetentionDays: 365,
+    piiMaskingEnabled: false,
+    exportRestricted: false,
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -128,9 +136,9 @@ export function ThinkTankSecuritySection() {
                 View Only
               </Badge>
             )}
-            <Badge variant={mockSecurityConfig.dataEncryptionEnabled ? 'default' : 'destructive'}>
+            <Badge variant={config.dataEncryptionEnabled ? 'default' : 'destructive'}>
               <ShieldCheck className="h-3 w-3 mr-1" />
-              {mockSecurityConfig.dataEncryptionEnabled ? 'Encrypted' : 'Not Encrypted'}
+              {config.dataEncryptionEnabled ? 'Encrypted' : 'Not Encrypted'}
             </Badge>
           </div>
         </div>
@@ -141,22 +149,22 @@ export function ThinkTankSecuritySection() {
           <SecurityStatusItem
             icon={Lock}
             label="Encryption"
-            enabled={mockSecurityConfig.dataEncryptionEnabled}
+            enabled={config.dataEncryptionEnabled}
           />
           <SecurityStatusItem
             icon={FileWarning}
             label="Audit Logs"
-            enabled={mockSecurityConfig.auditLoggingEnabled}
+            enabled={config.auditLoggingEnabled}
           />
           <SecurityStatusItem
             icon={Key}
             label="MFA Required"
-            enabled={mockSecurityConfig.mfaRequired}
+            enabled={config.mfaRequired}
           />
           <SecurityStatusItem
             icon={EyeOff}
             label="PII Masking"
-            enabled={mockSecurityConfig.piiMaskingEnabled}
+            enabled={config.piiMaskingEnabled}
           />
         </div>
 
@@ -171,42 +179,42 @@ export function ThinkTankSecuritySection() {
               icon={Lock}
               label="Data Encryption"
               description="Encrypt all conversation data at rest"
-              checked={mockSecurityConfig.dataEncryptionEnabled}
+              checked={config.dataEncryptionEnabled}
               disabled={isViewOnly}
             />
             <SecurityToggle
               icon={FileWarning}
               label="Audit Logging"
               description="Log all user actions and API calls"
-              checked={mockSecurityConfig.auditLoggingEnabled}
+              checked={config.auditLoggingEnabled}
               disabled={isViewOnly}
             />
             <SecurityToggle
               icon={Globe}
               label="IP Whitelist"
               description="Restrict access to specific IP addresses"
-              checked={mockSecurityConfig.ipWhitelistEnabled}
+              checked={config.ipWhitelistEnabled}
               disabled={isViewOnly}
             />
             <SecurityToggle
               icon={Key}
               label="Require MFA"
               description="Require multi-factor authentication for all users"
-              checked={mockSecurityConfig.mfaRequired}
+              checked={config.mfaRequired}
               disabled={isViewOnly}
             />
             <SecurityToggle
               icon={EyeOff}
               label="PII Masking"
               description="Automatically mask sensitive personal information"
-              checked={mockSecurityConfig.piiMaskingEnabled}
+              checked={config.piiMaskingEnabled}
               disabled={isViewOnly}
             />
             <SecurityToggle
               icon={Server}
               label="Export Restrictions"
               description="Prevent data export without admin approval"
-              checked={mockSecurityConfig.exportRestricted}
+              checked={config.exportRestricted}
               disabled={isViewOnly}
             />
           </div>
@@ -224,7 +232,7 @@ export function ThinkTankSecuritySection() {
                 How long to keep conversation data before automatic deletion
               </p>
             </div>
-            <Badge variant="outline">{mockSecurityConfig.dataRetentionDays} days</Badge>
+            <Badge variant="outline">{config.dataRetentionDays} days</Badge>
           </div>
         </div>
 

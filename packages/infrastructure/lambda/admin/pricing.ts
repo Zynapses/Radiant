@@ -2,16 +2,10 @@
 // API endpoints for admin pricing configuration and model overrides
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
-import { logger } from '../shared/logger';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Content-Type': 'application/json',
-};
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { UnauthorizedError, ForbiddenError, ValidationError } from '../shared/errors';
+import { corsHeaders } from '../shared/middleware/api-response';
 
 interface Admin {
   id: string;
@@ -31,7 +25,7 @@ interface JwtPayload {
 function decodeJwt(token: string): JwtPayload {
   const parts = token.split('.');
   if (parts.length !== 3) {
-    throw new Error('Invalid token format');
+    throw new UnauthorizedError('Invalid token format');
   }
   
   const payload = parts[1];
@@ -42,7 +36,7 @@ function decodeJwt(token: string): JwtPayload {
 async function requireAdmin(event: APIGatewayProxyEvent): Promise<Admin> {
   const authHeader = event.headers.Authorization || event.headers.authorization;
   if (!authHeader) {
-    throw new Error('Unauthorized');
+    throw new UnauthorizedError('Missing authorization header');
   }
   
   const token = authHeader.replace(/^Bearer\s+/i, '');
@@ -51,7 +45,7 @@ async function requireAdmin(event: APIGatewayProxyEvent): Promise<Admin> {
     const payload = decodeJwt(token);
     
     if (payload.exp && payload.exp * 1000 < Date.now()) {
-      throw new Error('Token expired');
+      throw new UnauthorizedError('Token expired');
     }
     
     const tenantId = payload['custom:tenant_id'] || payload.tenant_id;
@@ -80,7 +74,7 @@ export async function getPricingConfig(
 ): Promise<APIGatewayProxyResult> {
   try {
     await requireAdmin(event);
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(`SELECT * FROM pricing_config LIMIT 1`);
@@ -138,7 +132,7 @@ export async function updatePricingConfig(
   try {
     const admin = await requireAdmin(event);
     const body = JSON.parse(event.body || '{}');
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       await client.query(
@@ -197,7 +191,7 @@ export async function getModelPricing(
 ): Promise<APIGatewayProxyResult> {
   try {
     const admin = await requireAdmin(event);
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(
@@ -233,17 +227,17 @@ export async function getModelPricing(
         statusCode: 200,
         headers: corsHeaders,
         body: JSON.stringify(
-          result.rows.map((row) => ({
+          result.rows.map((row: Record<string, unknown>) => ({
             modelId: row.model_id,
             displayName: row.display_name,
             providerId: row.provider_id,
             isNovel: row.is_novel,
             category: row.category,
-            baseInputPrice: parseFloat(row.base_input_price) || 0,
-            baseOutputPrice: parseFloat(row.base_output_price) || 0,
-            effectiveMarkup: parseFloat(row.effective_markup) || 0.4,
-            userInputPrice: parseFloat(row.user_input_price) || 0,
-            userOutputPrice: parseFloat(row.user_output_price) || 0,
+            baseInputPrice: parseFloat(String(row.base_input_price)) || 0,
+            baseOutputPrice: parseFloat(String(row.base_output_price)) || 0,
+            effectiveMarkup: parseFloat(String(row.effective_markup)) || 0.4,
+            userInputPrice: parseFloat(String(row.user_input_price)) || 0,
+            userOutputPrice: parseFloat(String(row.user_output_price)) || 0,
             hasOverride: row.has_override,
           }))
         ),
@@ -277,7 +271,7 @@ export async function bulkUpdatePricing(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       await client.query('BEGIN');
@@ -372,7 +366,7 @@ export async function setModelPricingOverride(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       await client.query(
@@ -423,7 +417,7 @@ export async function deleteModelPricingOverride(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       await client.query(
@@ -455,9 +449,9 @@ export async function getPriceHistory(
 ): Promise<APIGatewayProxyResult> {
   try {
     const admin = await requireAdmin(event);
-    const limit = parseInt(event.queryStringParameters?.limit || '100');
+    const limit = parseInt(event.queryStringParameters?.limit || '100', 10);
     const modelId = event.queryStringParameters?.modelId;
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       let query = `
@@ -493,14 +487,14 @@ export async function getPriceHistory(
         statusCode: 200,
         headers: corsHeaders,
         body: JSON.stringify(
-          result.rows.map((row) => ({
+          result.rows.map((row: Record<string, unknown>) => ({
             id: row.id,
             modelId: row.model_id,
             modelName: row.model_name,
-            oldInputPrice: row.old_input_price ? parseFloat(row.old_input_price) : null,
-            newInputPrice: row.new_input_price ? parseFloat(row.new_input_price) : null,
-            oldOutputPrice: row.old_output_price ? parseFloat(row.old_output_price) : null,
-            newOutputPrice: row.new_output_price ? parseFloat(row.new_output_price) : null,
+            oldInputPrice: row.old_input_price ? parseFloat(String(row.old_input_price)) : null,
+            newInputPrice: row.new_input_price ? parseFloat(String(row.new_input_price)) : null,
+            oldOutputPrice: row.old_output_price ? parseFloat(String(row.old_output_price)) : null,
+            newOutputPrice: row.new_output_price ? parseFloat(String(row.new_output_price)) : null,
             changeReason: row.change_reason,
             changedBy: row.changed_by,
             createdAt: row.created_at,

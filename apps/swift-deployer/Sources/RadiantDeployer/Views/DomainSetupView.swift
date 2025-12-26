@@ -435,14 +435,18 @@ struct DomainSetupView: View {
         isLoading = true
         defer { isLoading = false }
         
-        // Generate placeholder records (actual values come from deployment outputs)
+        // Use pending placeholders until deployment completes
+        let cloudFront = "pending-deployment"
+        let alb = "pending-deployment"
+        let apiGateway = "pending-deployment"
+        
         dnsRecords = await dnsService.generateRequiredRecords(
             domain: baseDomain,
             appId: appState.selectedApp?.id ?? "app",
             environment: appState.selectedEnvironment,
-            cloudFrontDomain: "d123456789.cloudfront.net", // Placeholder
-            albDomain: "alb-123456.us-east-1.elb.amazonaws.com", // Placeholder
-            apiGatewayDomain: "api-id.execute-api.us-east-1.amazonaws.com" // Placeholder
+            cloudFrontDomain: cloudFront,
+            albDomain: alb,
+            apiGatewayDomain: apiGateway
         )
         
         // Audit log for compliance (SOC2, GDPR)

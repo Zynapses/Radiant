@@ -16,7 +16,8 @@ export function loadPrompts(scope: PromptScope): PinnedPrompt[] | null {
   
   try {
     return JSON.parse(stored) as PinnedPrompt[];
-  } catch {
+  } catch (error) {
+    console.warn('[Prompts] Failed to parse stored prompts:', error instanceof Error ? error.message : 'Unknown');
     return null;
   }
 }

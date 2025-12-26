@@ -1,44 +1,15 @@
 import { NextResponse } from 'next/server';
 import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
+import { costApi } from '@/lib/api/endpoints';
 
 // GET /api/cost/alerts - Get cost alerts
 export const GET = withAuth(async () => {
   try {
-    const alerts = [
-      {
-        id: '1',
-        alertType: 'threshold',
-        threshold: 5000,
-        currentValue: 4523.87,
-        isTriggered: false,
-        triggeredAt: null,
-        notificationChannels: ['email', 'slack'],
-        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: '2',
-        alertType: 'spike',
-        threshold: 50, // 50% increase
-        currentValue: 12.5,
-        isTriggered: false,
-        triggeredAt: null,
-        notificationChannels: ['email'],
-        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: '3',
-        alertType: 'budget',
-        threshold: 6000,
-        currentValue: 4523.87,
-        isTriggered: false,
-        triggeredAt: null,
-        notificationChannels: ['email', 'slack', 'pagerduty'],
-        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-    ];
+    const alerts = await costApi.getAlerts();
 
     return NextResponse.json(alerts);
   } catch (error) {
+    console.error('Failed to fetch cost alerts:', error);
     return apiError('FETCH_FAILED', 'Failed to fetch alerts', 500);
   }
 });
@@ -48,16 +19,14 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const body = await request.json();
 
-    const alert = {
-      id: crypto.randomUUID(),
+    const alert = await costApi.createAlert({
       ...body,
-      isTriggered: false,
-      triggeredAt: null,
-      createdAt: new Date().toISOString(),
-    };
+      tenantId: request.user.tenantId,
+    });
 
     return NextResponse.json(alert, { status: 201 });
   } catch (error) {
+    console.error('Failed to create cost alert:', error);
     return apiError('CREATE_FAILED', 'Failed to create alert', 500);
   }
 });

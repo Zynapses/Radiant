@@ -76,8 +76,9 @@ export async function warmupConnections(): Promise<void> {
     // Execute a simple query to establish connection
     const { executeStatement } = await import('../db/client');
     await executeStatement('SELECT 1', []);
-  } catch {
+  } catch (error) {
     // Silently fail - connection will be established on first real query
+    console.debug('Cold start DB warmup failed (non-critical):', error instanceof Error ? error.message : 'unknown');
   }
 }
 

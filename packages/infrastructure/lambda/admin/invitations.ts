@@ -240,8 +240,8 @@ async function handleListInvitations(event: APIGatewayProxyEvent, logger: Logger
   requirePermission(auth, 'admin:read');
 
   const status = event.queryStringParameters?.status;
-  const limit = parseInt(event.queryStringParameters?.limit || '50');
-  const offset = parseInt(event.queryStringParameters?.offset || '0');
+  const limit = parseInt(event.queryStringParameters?.limit || '50', 10);
+  const offset = parseInt(event.queryStringParameters?.offset || '0', 10);
 
   let sql = `SELECT i.*, a.first_name as inviter_first_name, a.last_name as inviter_last_name
              FROM invitations i LEFT JOIN administrators a ON i.invited_by = a.id WHERE i.tenant_id = :tenantId`;

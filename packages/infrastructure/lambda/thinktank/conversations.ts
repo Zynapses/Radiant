@@ -2,29 +2,10 @@
 // API endpoints for admin management of Think Tank conversations
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
-import { logger } from '../shared/logger';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Content-Type': 'application/json',
-};
-
-interface Admin {
-  id: string;
-  tenantId: string;
-}
-
-async function requireAdmin(event: APIGatewayProxyEvent): Promise<Admin> {
-  const authHeader = event.headers.Authorization || event.headers.authorization;
-  if (!authHeader) {
-    throw new Error('Unauthorized');
-  }
-  return { id: 'admin-id', tenantId: 'tenant-id' };
-}
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { corsHeaders } from '../shared/middleware/api-response';
+import { requireAdmin } from '../shared/auth/admin-auth';
 
 // GET /api/admin/thinktank/conversations
 export async function listConversations(
@@ -34,10 +15,10 @@ export async function listConversations(
     const admin = await requireAdmin(event);
     const search = event.queryStringParameters?.search || '';
     const status = event.queryStringParameters?.status || 'all';
-    const limit = parseInt(event.queryStringParameters?.limit || '50');
-    const offset = parseInt(event.queryStringParameters?.offset || '0');
+    const limit = parseInt(event.queryStringParameters?.limit || '50', 10);
+    const offset = parseInt(event.queryStringParameters?.offset || '0', 10);
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       let whereClause = 'WHERE c.tenant_id = $1';
@@ -121,7 +102,7 @@ export async function getConversationStats(
 ): Promise<APIGatewayProxyResult> {
   try {
     const admin = await requireAdmin(event);
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const statsResult = await client.query(
@@ -143,10 +124,10 @@ export async function getConversationStats(
         statusCode: 200,
         headers: corsHeaders,
         body: JSON.stringify({
-          totalConversations: parseInt(stats.total_conversations) || 0,
-          activeToday: parseInt(stats.active_today) || 0,
-          totalMessages: parseInt(stats.total_messages) || 0,
-          totalTokens: parseInt(stats.total_tokens) || 0,
+          totalConversations: parseInt(stats.total_conversations, 10) || 0,
+          activeToday: parseInt(stats.active_today, 10) || 0,
+          totalMessages: parseInt(stats.total_messages, 10) || 0,
+          totalTokens: parseInt(stats.total_tokens, 10) || 0,
         }),
       };
     } finally {
@@ -178,7 +159,7 @@ export async function getConversationMessages(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       // Verify conversation belongs to tenant
@@ -254,7 +235,7 @@ export async function deleteConversation(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(

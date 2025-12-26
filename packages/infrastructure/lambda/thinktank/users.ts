@@ -2,29 +2,10 @@
 // API endpoints for admin management of Think Tank users
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
-import { logger } from '../shared/logger';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Content-Type': 'application/json',
-};
-
-interface Admin {
-  id: string;
-  tenantId: string;
-}
-
-async function requireAdmin(event: APIGatewayProxyEvent): Promise<Admin> {
-  const authHeader = event.headers.Authorization || event.headers.authorization;
-  if (!authHeader) {
-    throw new Error('Unauthorized');
-  }
-  return { id: 'admin-id', tenantId: 'tenant-id' };
-}
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { successResponse, handleError, notFoundResponse, validationErrorResponse, corsHeaders } from '../shared/middleware/api-response';
+import { requireAdmin } from '../shared/auth/admin-auth';
 
 // GET /api/admin/thinktank/users
 export async function listUsers(
@@ -33,10 +14,10 @@ export async function listUsers(
   try {
     const admin = await requireAdmin(event);
     const search = event.queryStringParameters?.search || '';
-    const limit = parseInt(event.queryStringParameters?.limit || '50');
-    const offset = parseInt(event.queryStringParameters?.offset || '0');
+    const limit = parseInt(event.queryStringParameters?.limit || '50', 10);
+    const offset = parseInt(event.queryStringParameters?.offset || '0', 10);
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       let whereClause = 'WHERE u.tenant_id = $1';
@@ -89,8 +70,8 @@ export async function listUsers(
             display_name: row.display_name,
             language: row.language,
             subscription_tier: row.subscription_tier,
-            conversation_count: parseInt(row.conversation_count) || 0,
-            total_tokens_used: parseInt(row.total_tokens_used) || 0,
+            conversation_count: parseInt(row.conversation_count, 10) || 0,
+            total_tokens_used: parseInt(row.total_tokens_used, 10) || 0,
             total_spent: parseFloat(row.total_spent) || 0,
             last_active_at: row.last_active_at,
             status: row.status,
@@ -116,7 +97,7 @@ export async function getUserStats(
 ): Promise<APIGatewayProxyResult> {
   try {
     const admin = await requireAdmin(event);
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const statsResult = await client.query(
@@ -149,9 +130,9 @@ export async function getUserStats(
         statusCode: 200,
         headers: corsHeaders,
         body: JSON.stringify({
-          totalUsers: parseInt(stats.total_users) || 0,
-          activeUsers7d: parseInt(stats.active_users_7d) || 0,
-          paidUsers: parseInt(stats.paid_users) || 0,
+          totalUsers: parseInt(stats.total_users, 10) || 0,
+          activeUsers7d: parseInt(stats.active_users_7d, 10) || 0,
+          paidUsers: parseInt(stats.paid_users, 10) || 0,
           totalRevenue: parseFloat(stats.total_revenue) || 0,
         }),
       };
@@ -184,7 +165,7 @@ export async function getUser(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(
@@ -232,8 +213,8 @@ export async function getUser(
           isActive: user.is_active,
           subscriptionTier: user.subscription_tier,
           subscriptionStarted: user.subscription_started,
-          conversationCount: parseInt(user.conversation_count) || 0,
-          totalTokensUsed: parseInt(user.total_tokens_used) || 0,
+          conversationCount: parseInt(user.conversation_count, 10) || 0,
+          totalTokensUsed: parseInt(user.total_tokens_used, 10) || 0,
           totalSpent: parseFloat(user.total_spent) || 0,
         }),
       };
@@ -266,7 +247,7 @@ export async function suspendUser(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(
@@ -320,7 +301,7 @@ export async function activateUser(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(

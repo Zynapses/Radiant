@@ -2,15 +2,10 @@
 // AI-powered cost optimization recommendations (human-approved only)
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, ScheduledEvent } from 'aws-lambda';
-import { Pool, PoolClient } from 'pg';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Content-Type': 'application/json',
-};
+import { PoolClient } from 'pg';
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { corsHeaders } from '../shared/middleware/api-response';
 
 export interface CostInsight {
   id: string;
@@ -86,7 +81,7 @@ async function analyzeCostPatterns(client: PoolClient, tenantId: string): Promis
     modelId: row.model_id,
     avgTokensPerRequest: parseFloat(row.avg_tokens),
     avgCostPerRequest: parseFloat(row.avg_cost),
-    requestFrequency: parseInt(row.request_count),
+    requestFrequency: parseInt(row.request_count, 10),
     peakHours: row.peak_hours,
     totalSpend30d: parseFloat(row.total_spend),
   }));
@@ -149,7 +144,7 @@ async function isUserExcluded(client: PoolClient, tenantId: string, userId: stri
 
 // Generate cost insights
 async function generateInsights(tenantId?: string): Promise<CostInsight[]> {
-  const client = await pool.connect();
+  const client = await getPoolClient();
   const insights: CostInsight[] = [];
 
   try {
@@ -272,7 +267,7 @@ export async function getInsights(event: APIGatewayProxyEvent): Promise<APIGatew
     const tenantId = event.queryStringParameters?.tenantId;
     const status = event.queryStringParameters?.status || 'active';
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
     try {
       const result = await client.query(
         `SELECT * FROM cost_insights 
@@ -315,7 +310,7 @@ export async function applyInsight(event: APIGatewayProxyEvent): Promise<APIGate
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
     try {
       // Get insight
       const insightResult = await client.query(
@@ -382,7 +377,7 @@ export async function dismissInsight(event: APIGatewayProxyEvent): Promise<APIGa
     const insightId = event.pathParameters?.id;
     const { reason, dismissedBy } = JSON.parse(event.body || '{}');
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
     try {
       await client.query(
         `UPDATE cost_insights 
@@ -413,9 +408,9 @@ export async function dismissInsight(event: APIGatewayProxyEvent): Promise<APIGa
 
 // Scheduled handler - Run daily analysis
 export async function scheduledAnalysis(event: ScheduledEvent): Promise<void> {
-  console.log('Running scheduled cost analysis...');
+  logger.info('Running scheduled cost analysis...');
   const insights = await generateInsights();
-  console.log(`Generated ${insights.length} new insights`);
+  logger.info(`Generated ${insights.length} new insights`);
 }
 
 // Main handler

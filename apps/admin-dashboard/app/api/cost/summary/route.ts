@@ -1,43 +1,18 @@
 import { NextResponse } from 'next/server';
-import { withAuth, apiError } from '@/lib/api/auth-wrapper';
+import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wrapper';
+import { costApi } from '@/lib/api/endpoints';
 
 // GET /api/cost/summary - Get cost summary
-export const GET = withAuth(async () => {
+export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
-    const summary = {
-      totalSpend: 4523.87,
-      totalSpendChange: 12.5,
-      estimatedMonthly: 5200.00,
-      estimatedChange: 8.3,
-      averageDaily: 150.79,
-      averageDailyChange: -3.2,
-      topModel: 'claude-3-5-sonnet',
-      topModelSpend: 2145.32,
-      tokenCount: 45_678_900,
-      requestCount: 234_567,
-      byProvider: {
-        anthropic: 2890.45,
-        openai: 1633.42,
-      },
-      byModel: {
-        'claude-3-5-sonnet': 2145.32,
-        'gpt-4o': 1234.56,
-        'claude-3-haiku': 745.13,
-        'gpt-4o-mini': 398.86,
-      },
-      trend: [
-        { date: '2024-12-18', cost: 142.30 },
-        { date: '2024-12-19', cost: 156.80 },
-        { date: '2024-12-20', cost: 148.20 },
-        { date: '2024-12-21', cost: 162.40 },
-        { date: '2024-12-22', cost: 155.60 },
-        { date: '2024-12-23', cost: 149.90 },
-        { date: '2024-12-24', cost: 158.70 },
-      ],
-    };
+    const { searchParams } = new URL(request.url);
+    const period = (searchParams.get('period') as '7d' | '30d' | '90d') || '30d';
+
+    const summary = await costApi.getSummary(period);
 
     return NextResponse.json(summary);
   } catch (error) {
+    console.error('Failed to fetch cost summary:', error);
     return apiError('FETCH_FAILED', 'Failed to fetch summary', 500);
   }
 });

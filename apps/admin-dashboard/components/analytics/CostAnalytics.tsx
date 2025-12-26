@@ -36,6 +36,7 @@ interface CostSummary {
   byProvider: Record<string, number>;
   trend: 'up' | 'down' | 'stable';
   trendPercent: number;
+  trendData?: Array<{ date: string; cost: number }>;
 }
 
 interface CostAlert {
@@ -85,12 +86,14 @@ export function CostAnalytics() {
     ? Object.entries(summary.byProvider).map(([name, value]) => ({ name, value }))
     : [];
 
-  // Mock daily data for chart
-  const dailyData = Array.from({ length: 30 }, (_, i) => ({
-    day: `Day ${i + 1}`,
-    cost: Math.random() * 100 + 50,
-    tokens: Math.floor(Math.random() * 100000 + 50000),
-  }));
+  // Use trend data from summary if available, otherwise empty
+  const dailyData = summary?.trendData 
+    ? summary.trendData.map((item: { date: string; cost: number }, i: number) => ({
+        day: `Day ${i + 1}`,
+        cost: item.cost,
+        tokens: 0, // Tokens not included in trend data
+      }))
+    : [];
 
   return (
     <div className="space-y-6">

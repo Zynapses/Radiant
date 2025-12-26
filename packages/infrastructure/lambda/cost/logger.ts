@@ -2,23 +2,18 @@
 // Tracks and logs AI usage costs in real-time
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool, PoolClient } from 'pg';
+import { PoolClient } from 'pg';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
-import { logger } from '../shared/logger';
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { corsHeaders } from '../shared/middleware/api-response';
 
 const sns = new SNSClient({});
 const ses = new SESClient({});
+
 const ALERT_TOPIC_ARN = process.env.COST_ALERT_TOPIC_ARN;
 const ALERT_FROM_EMAIL = process.env.ALERT_FROM_EMAIL || process.env.FROM_EMAIL || '';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Content-Type': 'application/json',
-};
 
 export interface CostEvent {
   tenantId: string;
@@ -61,7 +56,7 @@ export async function logCost(
 ): Promise<APIGatewayProxyResult> {
   try {
     const costEvent: CostEvent = JSON.parse(event.body || '{}');
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       // Insert cost event
@@ -138,58 +133,58 @@ export async function getCostSummary(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
-      // Get daily, weekly, monthly totals
-      const summaryResult = await client.query(
-        `
-        SELECT 
-          COALESCE(SUM(CASE WHEN date = CURRENT_DATE THEN total_cost ELSE 0 END), 0) as daily,
-          COALESCE(SUM(CASE WHEN date >= CURRENT_DATE - 7 THEN total_cost ELSE 0 END), 0) as weekly,
-          COALESCE(SUM(CASE WHEN date >= DATE_TRUNC('month', CURRENT_DATE) THEN total_cost ELSE 0 END), 0) as monthly
-        FROM cost_daily_aggregates
-        WHERE tenant_id = $1
-        `,
-        [tenantId]
-      );
-
-      // Get breakdown by model
-      const modelResult = await client.query(
-        `
-        SELECT model_id, SUM(total_cost) as cost
-        FROM cost_events
-        WHERE tenant_id = $1 AND created_at >= CURRENT_DATE - 30
-        GROUP BY model_id
-        ORDER BY cost DESC
-        LIMIT 10
-        `,
-        [tenantId]
-      );
-
-      // Get breakdown by provider
-      const providerResult = await client.query(
-        `
-        SELECT provider_id, SUM(total_cost) as cost
-        FROM cost_events
-        WHERE tenant_id = $1 AND created_at >= CURRENT_DATE - 30
-        GROUP BY provider_id
-        ORDER BY cost DESC
-        `,
-        [tenantId]
-      );
-
-      // Calculate trend
-      const trendResult = await client.query(
-        `
-        SELECT 
-          COALESCE(SUM(CASE WHEN date >= CURRENT_DATE - 7 THEN total_cost ELSE 0 END), 0) as this_week,
-          COALESCE(SUM(CASE WHEN date >= CURRENT_DATE - 14 AND date < CURRENT_DATE - 7 THEN total_cost ELSE 0 END), 0) as last_week
-        FROM cost_daily_aggregates
-        WHERE tenant_id = $1
-        `,
-        [tenantId]
-      );
+      // Execute all queries in parallel for better performance
+      const [summaryResult, modelResult, providerResult, trendResult] = await Promise.all([
+        // Get daily, weekly, monthly totals
+        client.query(
+          `
+          SELECT 
+            COALESCE(SUM(CASE WHEN date = CURRENT_DATE THEN total_cost ELSE 0 END), 0) as daily,
+            COALESCE(SUM(CASE WHEN date >= CURRENT_DATE - 7 THEN total_cost ELSE 0 END), 0) as weekly,
+            COALESCE(SUM(CASE WHEN date >= DATE_TRUNC('month', CURRENT_DATE) THEN total_cost ELSE 0 END), 0) as monthly
+          FROM cost_daily_aggregates
+          WHERE tenant_id = $1
+          `,
+          [tenantId]
+        ),
+        // Get breakdown by model
+        client.query(
+          `
+          SELECT model_id, SUM(total_cost) as cost
+          FROM cost_events
+          WHERE tenant_id = $1 AND created_at >= CURRENT_DATE - 30
+          GROUP BY model_id
+          ORDER BY cost DESC
+          LIMIT 10
+          `,
+          [tenantId]
+        ),
+        // Get breakdown by provider
+        client.query(
+          `
+          SELECT provider_id, SUM(total_cost) as cost
+          FROM cost_events
+          WHERE tenant_id = $1 AND created_at >= CURRENT_DATE - 30
+          GROUP BY provider_id
+          ORDER BY cost DESC
+          `,
+          [tenantId]
+        ),
+        // Calculate trend
+        client.query(
+          `
+          SELECT 
+            COALESCE(SUM(CASE WHEN date >= CURRENT_DATE - 7 THEN total_cost ELSE 0 END), 0) as this_week,
+            COALESCE(SUM(CASE WHEN date >= CURRENT_DATE - 14 AND date < CURRENT_DATE - 7 THEN total_cost ELSE 0 END), 0) as last_week
+          FROM cost_daily_aggregates
+          WHERE tenant_id = $1
+          `,
+          [tenantId]
+        ),
+      ]);
 
       const summary = summaryResult.rows[0];
       const trend = trendResult.rows[0];
@@ -249,7 +244,7 @@ export async function getCostAlerts(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(

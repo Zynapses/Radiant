@@ -1,12 +1,13 @@
 /**
  * Authentication Middleware
+ * Uses centralized pool manager for database connections
  */
 
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 import { Middleware, MiddlewareHandler } from './index';
-import { Pool } from 'pg';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+import { getPoolClient } from '../db/centralized-pool';
+import { UnauthorizedError, ForbiddenError } from '../errors';
+import { enhancedLogger } from '../logging/enhanced-logger';
 
 export interface AuthContext {
   tenantId: string;
@@ -118,7 +119,7 @@ async function validateToken(token: string): Promise<AuthContext> {
 }
 
 async function validateApiKey(key: string): Promise<AuthContext> {
-  const client = await pool.connect();
+  const client = await getPoolClient();
 
   try {
     const result = await client.query(
@@ -137,17 +138,17 @@ async function validateApiKey(key: string): Promise<AuthContext> {
     );
 
     if (result.rows.length === 0) {
-      throw new Error('Invalid API key');
+      throw new UnauthorizedError('Invalid API key');
     }
 
     const row = result.rows[0];
 
     if (!row.is_active) {
-      throw new Error('API key is disabled');
+      throw new UnauthorizedError('API key is disabled');
     }
 
     if (row.tenant_status !== 'active') {
-      throw new Error('Tenant account is not active');
+      throw new ForbiddenError('Tenant account is not active');
     }
 
     await client.query(
@@ -170,22 +171,22 @@ async function validateJwt(token: string): Promise<AuthContext> {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) {
-      throw new Error('Invalid JWT format');
+      throw new UnauthorizedError('Invalid JWT format');
     }
 
     const [, payload] = parts;
     const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString());
 
     if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-      throw new Error('Token expired');
+      throw new UnauthorizedError('Token expired');
     }
 
     const tenantId = decoded['custom:tenant_id'] || decoded.tenant_id;
     if (!tenantId) {
-      throw new Error('Missing tenant_id in token');
+      throw new UnauthorizedError('Missing tenant_id in token');
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
     try {
       const result = await client.query(
         `SELECT tier, status FROM tenants WHERE id = $1`,
@@ -193,11 +194,11 @@ async function validateJwt(token: string): Promise<AuthContext> {
       );
 
       if (result.rows.length === 0) {
-        throw new Error('Tenant not found');
+        throw new UnauthorizedError('Tenant not found');
       }
 
       if (result.rows[0].status !== 'active') {
-        throw new Error('Tenant account is not active');
+        throw new ForbiddenError('Tenant account is not active');
       }
 
       return {
@@ -210,9 +211,10 @@ async function validateJwt(token: string): Promise<AuthContext> {
       client.release();
     }
   } catch (error) {
-    if (error instanceof Error) {
+    if (error instanceof UnauthorizedError || error instanceof ForbiddenError) {
       throw error;
     }
-    throw new Error('Invalid JWT token');
+    enhancedLogger.error('JWT validation failed', error instanceof Error ? error : undefined);
+    throw new UnauthorizedError('Invalid JWT token');
   }
 }

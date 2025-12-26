@@ -170,11 +170,9 @@ class RadiantWebSocketClient {
       }
       
       this.messageHandlers.forEach((handler) => handler(message));
-    } catch {
-      // Ignore parse errors in production
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[WebSocket] Failed to parse message');
-      }
+    } catch (error) {
+      // Log parse errors for debugging
+      console.warn('[WebSocket] Failed to parse message:', error instanceof Error ? error.message : 'Unknown error');
     }
   }
 
@@ -325,7 +323,8 @@ class RadiantWebSocketClient {
         try {
           this.ws.send(JSON.stringify(item.message));
           item.resolve();
-        } catch {
+        } catch (error) {
+          console.warn('[WebSocket] Failed to send queued message:', error instanceof Error ? error.message : 'Unknown error');
           item.reject(new Error('Failed to send queued message'));
         }
       } else {

@@ -2,16 +2,10 @@
 // Security anomaly detection and intrusion prevention
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, ScheduledEvent } from 'aws-lambda';
-import { Pool, PoolClient } from 'pg';
-import { logger } from '../shared/logger';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Content-Type': 'application/json',
-};
+import { PoolClient } from 'pg';
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { corsHeaders } from '../shared/middleware/api-response';
 
 export interface SecurityAnomaly {
   id: string;
@@ -105,7 +99,7 @@ async function shouldSuppressAlert(
   );
   
   // Suppress if there's already an unresolved alert of this type
-  return parseInt(result.rows[0].count) > 0;
+  return parseInt(result.rows[0].count, 10) > 0;
 }
 
 // Detect geographic anomalies (impossible travel)
@@ -298,7 +292,7 @@ async function detectCredentialStuffing(client: PoolClient, tenantId: string): P
 
 // Run all anomaly detection
 async function runAnomalyDetection(tenantId?: string): Promise<SecurityAnomaly[]> {
-  const client = await pool.connect();
+  const client = await getPoolClient();
   const allAnomalies: SecurityAnomaly[] = [];
 
   try {
@@ -356,9 +350,9 @@ export async function getAnomalies(
   try {
     const tenantId = event.queryStringParameters?.tenantId;
     const severity = event.queryStringParameters?.severity;
-    const limit = parseInt(event.queryStringParameters?.limit || '100');
+    const limit = parseInt(event.queryStringParameters?.limit || '100', 10);
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       let query = `SELECT * FROM security_anomalies WHERE 1=1`;
@@ -416,7 +410,7 @@ export async function getSecurityMetrics(
 ): Promise<APIGatewayProxyResult> {
   try {
     const tenantId = event.queryStringParameters?.tenantId;
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const metricsQuery = tenantId
@@ -441,16 +435,30 @@ export async function getSecurityMetrics(
       const result = await client.query(metricsQuery, tenantId ? [tenantId] : []);
       const metrics = result.rows[0];
 
+      // Query blocked IPs from blocklist table
+      const blockedIpsQuery = tenantId
+        ? `SELECT COUNT(*) as count FROM ip_blocklist WHERE tenant_id = $1 AND is_active = true AND (expires_at IS NULL OR expires_at > NOW())`
+        : `SELECT COUNT(*) as count FROM ip_blocklist WHERE is_active = true AND (expires_at IS NULL OR expires_at > NOW())`;
+      const blockedIpsResult = await client.query(blockedIpsQuery, tenantId ? [tenantId] : []);
+      const blockedIps = parseInt(blockedIpsResult.rows[0]?.count, 10) || 0;
+
+      // Query suspicious logins from auth events (failed logins in last 24h)
+      const suspiciousLoginsQuery = tenantId
+        ? `SELECT COUNT(*) as count FROM auth_events WHERE tenant_id = $1 AND event_type = 'login_failed' AND created_at > NOW() - INTERVAL '24 hours'`
+        : `SELECT COUNT(*) as count FROM auth_events WHERE event_type = 'login_failed' AND created_at > NOW() - INTERVAL '24 hours'`;
+      const suspiciousLoginsResult = await client.query(suspiciousLoginsQuery, tenantId ? [tenantId] : []);
+      const suspiciousLogins = parseInt(suspiciousLoginsResult.rows[0]?.count, 10) || 0;
+
       return {
         statusCode: 200,
         headers: corsHeaders,
         body: JSON.stringify({
-          totalAnomalies24h: parseInt(metrics.total_24h) || 0,
-          criticalCount: parseInt(metrics.critical_count) || 0,
-          highCount: parseInt(metrics.high_count) || 0,
-          blockedIps: 0, // Would query from IP blocklist
-          suspiciousLogins: 0, // Would query from auth events
-          activeThreats: parseInt(metrics.active_threats) || 0,
+          totalAnomalies24h: parseInt(metrics.total_24h, 10) || 0,
+          criticalCount: parseInt(metrics.critical_count, 10) || 0,
+          highCount: parseInt(metrics.high_count, 10) || 0,
+          blockedIps,
+          suspiciousLogins,
+          activeThreats: parseInt(metrics.active_threats, 10) || 0,
         }),
       };
     } finally {

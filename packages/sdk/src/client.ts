@@ -147,8 +147,9 @@ export class RadiantClient {
     try {
       const json = await response.json() as { error?: { message?: string; code?: string; details?: unknown[] } };
       errorData = json;
-    } catch {
-      // Keep default error
+    } catch (parseError) {
+      // Response body couldn't be parsed as JSON - keep default error
+      console.debug('[SDK] Failed to parse error response:', parseError instanceof Error ? parseError.message : 'Unknown');
     }
 
     const message = errorData.error?.message || `HTTP ${response.status}`;
@@ -261,8 +262,9 @@ class ChatResource {
           try {
             const parsed = JSON.parse(data) as StreamingChatCompletionResponse;
             yield parsed;
-          } catch {
-            // Skip invalid JSON
+          } catch (parseError) {
+            // Skip invalid JSON chunks (e.g., partial data)
+            console.debug('[SDK] Skipping invalid JSON chunk');
           }
         }
       }

@@ -2,17 +2,10 @@
 // A/B testing framework with hash-based assignment and statistical analysis
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
-import { logger } from '../shared/logger';
 import { createHash } from 'crypto';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Content-Type': 'application/json',
-};
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { corsHeaders } from '../shared/middleware/api-response';
 
 export interface Experiment {
   id: string;
@@ -146,11 +139,14 @@ export async function listExperiments(
   try {
     const tenantId = event.queryStringParameters?.tenantId;
     const status = event.queryStringParameters?.status;
-    const client = await pool.connect();
+    const page = parseInt(event.queryStringParameters?.page || '1', 10);
+    const pageSize = Math.min(parseInt(event.queryStringParameters?.pageSize || '50', 10), 100);
+    const offset = (page - 1) * pageSize;
+    const client = await getPoolClient();
 
     try {
       let query = `SELECT * FROM experiments WHERE 1=1`;
-      const params: string[] = [];
+      const params: (string | number)[] = [];
       let paramIndex = 1;
 
       if (tenantId) {
@@ -163,7 +159,8 @@ export async function listExperiments(
         params.push(status);
       }
 
-      query += ` ORDER BY created_at DESC`;
+      query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex}`;
+      params.push(pageSize, offset);
 
       const result = await client.query(query, params);
 
@@ -206,7 +203,7 @@ export async function createExperiment(
 ): Promise<APIGatewayProxyResult> {
   try {
     const experiment: Partial<Experiment> = JSON.parse(event.body || '{}');
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       const result = await client.query(
@@ -263,7 +260,7 @@ export async function assignToExperiment(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       // Check for existing assignment
@@ -354,7 +351,7 @@ export async function trackMetric(
       };
     }
 
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       // Get user's variant
@@ -405,7 +402,7 @@ export async function getExperimentResults(
 ): Promise<APIGatewayProxyResult> {
   try {
     const experimentId = event.pathParameters?.id;
-    const client = await pool.connect();
+    const client = await getPoolClient();
 
     try {
       // Get experiment

@@ -562,6 +562,409 @@ actor AWSService {
     }
 }
 
+// MARK: - Health Check Methods
+
+extension AWSService {
+    /// Validate that AWS credentials are configured and valid (returns Bool)
+    func checkCredentialsValid(_ credential: CredentialSet) async -> Bool {
+        do {
+            _ = try await self.getCallerIdentity(credentials: credential)
+            return true
+        } catch {
+            RadiantLogger.warning("Credential validation failed: \(error.localizedDescription)", category: RadiantLogger.aws)
+            return false
+        }
+    }
+    
+    /// Check if the API Gateway is healthy by verifying stack status
+    func checkAPIHealth(credential: CredentialSet) async -> Bool {
+        do {
+            // Check if the API stack exists and is healthy
+            let status = try await self.getStackStatus(
+                stackName: "radiant-api",
+                region: credential.region,
+                credentials: credential
+            )
+            return status == "CREATE_COMPLETE" || status == "UPDATE_COMPLETE"
+        } catch {
+            // Stack might not exist yet, which is okay
+            return true
+        }
+    }
+    
+    /// Check if the database stack is healthy
+    func checkDatabaseHealth(credential: CredentialSet) async -> Bool {
+        
+        do {
+            // Check if the database stack exists and is healthy
+            let status = try await self.getStackStatus(
+                stackName: "radiant-database",
+                region: credential.region,
+                credentials: credential
+            )
+            return status == "CREATE_COMPLETE" || status == "UPDATE_COMPLETE"
+        } catch {
+            // Stack might not exist yet, which is okay
+            return true
+        }
+    }
+    
+    // MARK: - S3 Metadata
+    
+    struct S3ObjectMetadata {
+        let lastModified: Date
+        let contentLength: Int64
+        let eTag: String
+    }
+    
+    /// Get S3 object metadata without downloading content
+    func getObjectMetadata(bucket: String, key: String) async -> S3ObjectMetadata? {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.arguments = [
+            "s3api", "head-object",
+            "--bucket", bucket,
+            "--key", key,
+            "--output", "json"
+        ]
+        
+        let outputPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = FileHandle.nullDevice
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
+            
+            if process.terminationStatus == 0 {
+                let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+                
+                if let json = try? JSONSerialization.jsonObject(with: outputData) as? [String: Any] {
+                    let formatter = ISO8601DateFormatter()
+                    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                    
+                    let lastModified = (json["LastModified"] as? String).flatMap { formatter.date(from: $0) } ?? Date()
+                    let contentLength = json["ContentLength"] as? Int64 ?? 0
+                    let eTag = (json["ETag"] as? String)?.trimmingCharacters(in: CharacterSet(charactersIn: "\"")) ?? ""
+                    
+                    return S3ObjectMetadata(
+                        lastModified: lastModified,
+                        contentLength: contentLength,
+                        eTag: eTag
+                    )
+                }
+            }
+        } catch {
+            RadiantLogger.warning("Failed to get S3 metadata for \(bucket)/\(key): \(error.localizedDescription)", category: RadiantLogger.aws)
+        }
+        
+        return nil
+    }
+    
+    // MARK: - RDS Data API
+    
+    /// Execute SQL statement via RDS Data API (for Aurora Serverless)
+    func executeRdsStatement(
+        resourceArn: String,
+        secretArn: String,
+        database: String,
+        sql: String
+    ) async -> Result<[[String: Any]], Error> {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.arguments = [
+            "rds-data", "execute-statement",
+            "--resource-arn", resourceArn,
+            "--secret-arn", secretArn,
+            "--database", database,
+            "--sql", sql,
+            "--output", "json"
+        ]
+        
+        let outputPipe = Pipe()
+        let errorPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = errorPipe
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
+            
+            if process.terminationStatus != 0 {
+                let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+                let errorMessage = String(data: errorData, encoding: .utf8) ?? "Unknown error"
+                return .failure(AWSError.apiError(errorMessage))
+            }
+            
+            let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+            
+            guard let json = try? JSONSerialization.jsonObject(with: outputData) as? [String: Any] else {
+                return .success([])
+            }
+            
+            // Parse RDS Data API response format
+            var records: [[String: Any]] = []
+            
+            if let recordsArray = json["records"] as? [[[String: Any]]],
+               let columnMetadata = json["columnMetadata"] as? [[String: Any]] {
+                let columnNames = columnMetadata.compactMap { $0["name"] as? String }
+                
+                for row in recordsArray {
+                    var record: [String: Any] = [:]
+                    for (index, field) in row.enumerated() {
+                        if index < columnNames.count {
+                            // Extract value from RDS Data API field format
+                            let value = field["stringValue"] ?? field["longValue"] ?? field["doubleValue"] ?? field["booleanValue"] ?? field["isNull"]
+                            record[columnNames[index]] = value
+                        }
+                    }
+                    records.append(record)
+                }
+            }
+            
+            return .success(records)
+        } catch {
+            return .failure(AWSError.networkError(error.localizedDescription))
+        }
+    }
+    
+    // MARK: - DynamoDB
+    
+    /// Put item to DynamoDB
+    func dynamoDbPutItem(tableName: String, item: [String: Any]) async -> Result<Void, Error> {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        
+        // Convert item to DynamoDB JSON format
+        let dynamoItem = convertToDynamoDbFormat(item)
+        
+        guard let itemJson = try? JSONSerialization.data(withJSONObject: dynamoItem),
+              let itemString = String(data: itemJson, encoding: .utf8) else {
+            return .failure(AWSError.apiError("Failed to serialize item"))
+        }
+        
+        process.arguments = [
+            "dynamodb", "put-item",
+            "--table-name", tableName,
+            "--item", itemString
+        ]
+        
+        let errorPipe = Pipe()
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = errorPipe
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
+            
+            if process.terminationStatus != 0 {
+                let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+                let errorMessage = String(data: errorData, encoding: .utf8) ?? "Unknown error"
+                return .failure(AWSError.apiError(errorMessage))
+            }
+            
+            return .success(())
+        } catch {
+            return .failure(AWSError.networkError(error.localizedDescription))
+        }
+    }
+    
+    /// Get item from DynamoDB
+    func dynamoDbGetItem(tableName: String, key: [String: Any]) async -> Result<[String: Any]?, Error> {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        
+        let dynamoKey = convertToDynamoDbFormat(key)
+        
+        guard let keyJson = try? JSONSerialization.data(withJSONObject: dynamoKey),
+              let keyString = String(data: keyJson, encoding: .utf8) else {
+            return .failure(AWSError.apiError("Failed to serialize key"))
+        }
+        
+        process.arguments = [
+            "dynamodb", "get-item",
+            "--table-name", tableName,
+            "--key", keyString,
+            "--output", "json"
+        ]
+        
+        let outputPipe = Pipe()
+        let errorPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = errorPipe
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
+            
+            if process.terminationStatus != 0 {
+                let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+                let errorMessage = String(data: errorData, encoding: .utf8) ?? "Unknown error"
+                return .failure(AWSError.apiError(errorMessage))
+            }
+            
+            let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+            
+            guard let json = try? JSONSerialization.jsonObject(with: outputData) as? [String: Any],
+                  let item = json["Item"] as? [String: Any] else {
+                return .success(nil)
+            }
+            
+            return .success(convertFromDynamoDbFormat(item))
+        } catch {
+            return .failure(AWSError.networkError(error.localizedDescription))
+        }
+    }
+    
+    /// Delete item from DynamoDB
+    func dynamoDbDeleteItem(tableName: String, key: [String: Any]) async -> Result<Void, Error> {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        
+        let dynamoKey = convertToDynamoDbFormat(key)
+        
+        guard let keyJson = try? JSONSerialization.data(withJSONObject: dynamoKey),
+              let keyString = String(data: keyJson, encoding: .utf8) else {
+            return .failure(AWSError.apiError("Failed to serialize key"))
+        }
+        
+        process.arguments = [
+            "dynamodb", "delete-item",
+            "--table-name", tableName,
+            "--key", keyString
+        ]
+        
+        let errorPipe = Pipe()
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = errorPipe
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
+            
+            if process.terminationStatus != 0 {
+                let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+                let errorMessage = String(data: errorData, encoding: .utf8) ?? "Unknown error"
+                return .failure(AWSError.apiError(errorMessage))
+            }
+            
+            return .success(())
+        } catch {
+            return .failure(AWSError.networkError(error.localizedDescription))
+        }
+    }
+    
+    /// Convert Swift dictionary to DynamoDB JSON format
+    private func convertToDynamoDbFormat(_ item: [String: Any]) -> [String: [String: Any]] {
+        var result: [String: [String: Any]] = [:]
+        for (key, value) in item {
+            switch value {
+            case let s as String:
+                result[key] = ["S": s]
+            case let n as Int:
+                result[key] = ["N": String(n)]
+            case let n as Double:
+                result[key] = ["N": String(n)]
+            case let b as Bool:
+                result[key] = ["BOOL": b]
+            case let d as Date:
+                result[key] = ["S": ISO8601DateFormatter().string(from: d)]
+            default:
+                result[key] = ["S": String(describing: value)]
+            }
+        }
+        return result
+    }
+    
+    /// Convert DynamoDB JSON format to Swift dictionary
+    private func convertFromDynamoDbFormat(_ item: [String: Any]) -> [String: Any] {
+        var result: [String: Any] = [:]
+        for (key, value) in item {
+            if let typeValue = value as? [String: Any] {
+                if let s = typeValue["S"] as? String {
+                    result[key] = s
+                } else if let n = typeValue["N"] as? String {
+                    result[key] = Double(n) ?? Int(n) ?? n
+                } else if let b = typeValue["BOOL"] as? Bool {
+                    result[key] = b
+                }
+            }
+        }
+        return result
+    }
+    
+    // MARK: - RDS Snapshots
+    
+    /// Create RDS cluster snapshot
+    func createRdsSnapshot(clusterIdentifier: String, snapshotIdentifier: String) async -> Result<String, Error> {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.arguments = [
+            "rds", "create-db-cluster-snapshot",
+            "--db-cluster-identifier", clusterIdentifier,
+            "--db-cluster-snapshot-identifier", snapshotIdentifier,
+            "--output", "json"
+        ]
+        
+        let outputPipe = Pipe()
+        let errorPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = errorPipe
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
+            
+            if process.terminationStatus != 0 {
+                let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+                let errorMessage = String(data: errorData, encoding: .utf8) ?? "Unknown error"
+                return .failure(AWSError.apiError(errorMessage))
+            }
+            
+            let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+            
+            if let json = try? JSONSerialization.jsonObject(with: outputData) as? [String: Any],
+               let snapshot = json["DBClusterSnapshot"] as? [String: Any],
+               let arn = snapshot["DBClusterSnapshotArn"] as? String {
+                return .success(arn)
+            }
+            
+            return .success(snapshotIdentifier)
+        } catch {
+            return .failure(AWSError.networkError(error.localizedDescription))
+        }
+    }
+    
+    /// Delete RDS cluster snapshot
+    func deleteRdsSnapshot(snapshotIdentifier: String) async -> Result<Void, Error> {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.arguments = [
+            "rds", "delete-db-cluster-snapshot",
+            "--db-cluster-snapshot-identifier", snapshotIdentifier
+        ]
+        
+        let errorPipe = Pipe()
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = errorPipe
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
+            
+            if process.terminationStatus != 0 {
+                let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+                let errorMessage = String(data: errorData, encoding: .utf8) ?? "Unknown error"
+                return .failure(AWSError.apiError(errorMessage))
+            }
+            
+            return .success(())
+        } catch {
+            return .failure(AWSError.networkError(error.localizedDescription))
+        }
+    }
+}
+
 // MARK: - Singleton
 
 extension AWSService {

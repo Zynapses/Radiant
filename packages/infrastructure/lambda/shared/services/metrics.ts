@@ -241,21 +241,32 @@ export const Metrics = {
 };
 
 // ============================================================================
-// Periodic flush (for Lambda, call at end of handler)
+// Lambda-safe flush management
 // ============================================================================
 
-let flushTimer: NodeJS.Timeout | null = null;
-
-export function startPeriodicFlush(): void {
-  if (flushTimer) return;
-  flushTimer = setInterval(() => {
-    flushMetrics().catch(console.error);
-  }, FLUSH_INTERVAL);
+/**
+ * Flush metrics at the end of Lambda execution.
+ * Call this in your handler's finally block or use withMetricsFlush wrapper.
+ * Avoids global setInterval which is problematic in Lambda environments.
+ */
+export async function ensureMetricsFlushed(): Promise<void> {
+  await flushMetrics();
 }
 
-export function stopPeriodicFlush(): void {
-  if (flushTimer) {
-    clearInterval(flushTimer);
-    flushTimer = null;
-  }
+/**
+ * Wrapper for Lambda handlers that ensures metrics are flushed
+ */
+export function withMetricsFlush<TEvent, TResult>(
+  handler: (event: TEvent) => Promise<TResult>
+): (event: TEvent) => Promise<TResult> {
+  return async (event: TEvent) => {
+    try {
+      return await handler(event);
+    } finally {
+      await flushMetrics().catch(err => {
+        // Log but don't throw - metrics flush failure shouldn't break the handler
+        console.error('Failed to flush metrics:', err);
+      });
+    }
+  };
 }

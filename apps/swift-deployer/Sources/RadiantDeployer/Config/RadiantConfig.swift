@@ -107,8 +107,14 @@ struct RadiantConfig: Sendable {
         self.packagesPrefix = env["RADIANT_PACKAGES_PREFIX"] ?? "packages/"
         self.defaultRegion = env["AWS_DEFAULT_REGION"] ?? "us-east-1"
         
-        // Paths
-        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        // Paths - safely unwrap application support directory
+        let appSupport: URL
+        if let appSupportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+            appSupport = appSupportDir
+        } else {
+            // Fallback to home directory if application support is unavailable
+            appSupport = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support")
+        }
         let radiantDir = appSupport.appendingPathComponent("RadiantDeployer")
         
         self.packageCacheDirectory = radiantDir.appendingPathComponent("packages")

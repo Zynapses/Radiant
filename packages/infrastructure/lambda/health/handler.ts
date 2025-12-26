@@ -2,13 +2,13 @@
  * Health Check Handler
  * 
  * Comprehensive health checks for the RADIANT platform
+ * Uses centralized pool manager for database connections
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Pool } from 'pg';
 import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+import { getPoolClient, poolHealthCheck } from '../shared/db/centralized-pool';
+import { enhancedLogger } from '../shared/logging/enhanced-logger';
 const s3 = new S3Client({});
 const MEDIA_BUCKET = process.env.MEDIA_BUCKET || 'radiant-media';
 
@@ -105,18 +105,16 @@ async function checkDatabase(): Promise<HealthCheck> {
   const start = Date.now();
   
   try {
-    const client = await pool.connect();
-    try {
-      await client.query('SELECT 1');
-      return {
-        name: 'database',
-        status: 'healthy',
-        latency: Date.now() - start,
-        message: 'Database connection successful',
-      };
-    } finally {
-      client.release();
-    }
+    const healthResult = await poolHealthCheck();
+    return {
+      name: 'database',
+      status: healthResult.healthy ? 'healthy' : 'unhealthy',
+      latency: healthResult.latencyMs,
+      message: healthResult.healthy ? 'Database connection successful' : healthResult.error || 'Database check failed',
+      details: {
+        poolStats: healthResult.stats,
+      },
+    };
   } catch (error) {
     return {
       name: 'database',
@@ -249,7 +247,8 @@ async function checkExternalApis(): Promise<HealthCheck> {
           results[provider.name] = 'degraded';
           degradedCount++;
         }
-      } catch {
+      } catch (error) {
+        enhancedLogger.warn(`Health check failed for ${provider.name}`, { error: error instanceof Error ? error.message : 'Unknown' });
         results[provider.name] = 'unreachable';
         degradedCount++;
       }

@@ -2,8 +2,9 @@
 // Syncs external provider models to the database
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, ScheduledEvent } from 'aws-lambda';
-import { Pool } from 'pg';
-import { logger } from '../shared/logger';
+import { getPoolClient } from '../shared/db/centralized-pool';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { corsHeaders } from '../shared/middleware/api-response';
 
 interface ProviderModel {
   id: string;
@@ -14,14 +15,6 @@ interface ProviderModel {
   capabilities: string[];
   isNovel?: boolean;
 }
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-  'Content-Type': 'application/json',
-};
 
 // External provider configurations with model definitions
 const EXTERNAL_PROVIDERS = {
@@ -115,7 +108,7 @@ interface SyncResult {
 }
 
 async function syncProviders(tenantId?: string): Promise<SyncResult> {
-  const client = await pool.connect();
+  const client = await getPoolClient();
   const result: SyncResult = {
     providersUpdated: 0,
     modelsUpdated: 0,
