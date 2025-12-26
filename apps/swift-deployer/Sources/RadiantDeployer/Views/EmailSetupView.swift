@@ -16,6 +16,7 @@ struct EmailSetupView: View {
     @State private var isVerifying = false
     
     private let dnsService = DNSService.shared
+    private let auditLogger = AuditLogger.shared
     
     var body: some View {
         ScrollView {
@@ -425,6 +426,17 @@ struct EmailSetupView: View {
             
             verificationStatus = .pending
             dkimStatus = .pending
+            
+            // Audit log for compliance (SOC2, GDPR)
+            await auditLogger.log(
+                action: .sesConfigChanged,
+                details: "Email domain verification initiated: \(emailDomain)",
+                metadata: [
+                    "domain": emailDomain,
+                    "mailFromDomain": mailFromDomain,
+                    "recordCount": String(sesRecords.count)
+                ]
+            )
             
             successMessage = "Domain verification initiated. Add the DNS records below."
         } catch {
