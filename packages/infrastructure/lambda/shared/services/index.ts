@@ -73,3 +73,4 @@ export * from './notifications';
 export * from './secrets';
 export * from './system-config';
 export * from './tracing';
+export { SpecialtyRankingService, specialtyRankingService, SPECIALTY_CATEGORIES, type SpecialtyCategory, type SpecialtyRanking } from './specialty-ranking.service';
