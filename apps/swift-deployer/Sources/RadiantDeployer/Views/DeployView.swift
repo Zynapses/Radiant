@@ -177,6 +177,13 @@ struct DeployView: View {
             // Required Provider API Keys
             Section("Required Provider API Keys") {
                 RequiredProviderKeyRow(
+                    providerName: "Anthropic (Claude)",
+                    secretPath: "radiant/providers/anthropic",
+                    description: "Primary AI provider for Claude models",
+                    getKeyUrl: "https://console.anthropic.com/settings/keys"
+                )
+                
+                RequiredProviderKeyRow(
                     providerName: "Groq",
                     secretPath: "radiant/providers/groq",
                     description: "Required for fast LLM fallback",
