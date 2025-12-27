@@ -1,5 +1,4 @@
 import SwiftUI
-import Security
 
 struct DeployView: View {
     @EnvironmentObject var appState: AppState
@@ -782,7 +781,7 @@ struct RequiredProviderKeyRow: View {
     @State private var isConfigured = false
     @State private var isChecking = false
     @State private var showKeyInput = false
-    @State private var apiKey = ""
+    @State private var errorMessage: String?
     
     var body: some View {
         HStack {
@@ -804,6 +803,12 @@ struct RequiredProviderKeyRow: View {
                 Text(description)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                
+                if let error = errorMessage {
+                    Text(error)
+                        .font(.caption2)
+                        .foregroundStyle(.orange)
+                }
             }
             
             Spacer()
@@ -812,10 +817,15 @@ struct RequiredProviderKeyRow: View {
                 ProgressView()
                     .controlSize(.small)
             } else if isConfigured {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                HStack(spacing: 4) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                    Text("In 1Password")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
             } else {
-                Button("Configure") {
+                Button("Configure in 1Password") {
                     showKeyInput = true
                 }
                 .buttonStyle(.bordered)
@@ -827,9 +837,9 @@ struct RequiredProviderKeyRow: View {
                 providerName: providerName,
                 secretPath: secretPath,
                 getKeyUrl: getKeyUrl,
-                onSave: { key in
-                    apiKey = key
+                onSave: {
                     isConfigured = true
+                    errorMessage = nil
                 }
             )
         }
@@ -842,10 +852,38 @@ struct RequiredProviderKeyRow: View {
         isChecking = true
         defer { isChecking = false }
         
-        // Check if the secret exists in AWS Secrets Manager
-        // For now, we'll check local keychain
-        let keychain = KeychainService()
-        isConfigured = keychain.getSecret(for: secretPath) != nil
+        // Check if the key exists in 1Password
+        let onePassword = OnePasswordService()
+        
+        do {
+            let (installed, signedIn) = try await onePassword.checkStatus()
+            
+            if !installed {
+                errorMessage = "1Password CLI not installed"
+                isConfigured = false
+                return
+            }
+            
+            if !signedIn {
+                errorMessage = "1Password not configured"
+                isConfigured = false
+                return
+            }
+            
+            // Extract provider name without parenthetical (e.g., "Anthropic (Claude)" -> "Anthropic")
+            let baseProviderName = providerName.components(separatedBy: " (").first ?? providerName
+            
+            if let key = try await onePassword.getProviderAPIKey(provider: baseProviderName) {
+                isConfigured = !key.apiKey.isEmpty
+                errorMessage = nil
+            } else {
+                isConfigured = false
+                errorMessage = nil
+            }
+        } catch {
+            errorMessage = "1Password error"
+            isConfigured = false
+        }
     }
 }
 
@@ -854,10 +892,11 @@ struct ProviderKeyInputSheet: View {
     let providerName: String
     let secretPath: String
     let getKeyUrl: String
-    let onSave: (String) -> Void
+    let onSave: () -> Void
     
     @State private var apiKey = ""
     @State private var isSaving = false
+    @State private var errorMessage: String?
     
     var body: some View {
         VStack(spacing: 0) {
@@ -880,7 +919,7 @@ struct ProviderKeyInputSheet: View {
             
             // Content
             VStack(alignment: .leading, spacing: 16) {
-                Text("Enter your \(providerName) API key. This will be stored in AWS Secrets Manager during deployment.")
+                Text("Enter your \(providerName) API key. This will be stored securely in 1Password and uploaded to AWS Secrets Manager during deployment.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                 
@@ -889,11 +928,21 @@ struct ProviderKeyInputSheet: View {
                     .font(.system(.body, design: .monospaced))
                 
                 HStack {
-                    Image(systemName: "lock.shield")
-                        .foregroundStyle(.green)
-                    Text("Your API key is stored securely and encrypted.")
+                    Image(systemName: "1.circle.fill")
+                        .foregroundStyle(.blue)
+                    Text("Stored in 1Password RADIANT vault")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                }
+                
+                if let error = errorMessage {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle")
+                            .foregroundStyle(.orange)
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                    }
                 }
                 
                 Link(destination: URL(string: getKeyUrl)!) {
@@ -918,31 +967,50 @@ struct ProviderKeyInputSheet: View {
                 
                 Spacer()
                 
-                Button("Save") {
-                    saveKey()
+                if isSaving {
+                    ProgressView()
+                        .controlSize(.small)
+                } else {
+                    Button("Save to 1Password") {
+                        Task { await saveKey() }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(apiKey.isEmpty)
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(apiKey.isEmpty || isSaving)
             }
             .padding()
         }
-        .frame(width: 400, height: 300)
+        .frame(width: 450, height: 320)
     }
     
-    private func saveKey() {
+    private func saveKey() async {
         isSaving = true
+        defer { isSaving = false }
+        errorMessage = nil
         
-        // Save to local keychain for now
-        // Will be uploaded to AWS Secrets Manager during deployment
-        let keychain = KeychainService()
-        keychain.setSecret(apiKey, for: secretPath)
+        let onePassword = OnePasswordService()
         
-        onSave(apiKey)
-        dismiss()
+        // Extract base provider name
+        let baseProviderName = providerName.components(separatedBy: " (").first ?? providerName
+        
+        do {
+            try await onePassword.saveProviderAPIKey(
+                provider: baseProviderName,
+                secretPath: secretPath,
+                apiKey: apiKey
+            )
+            
+            await MainActor.run {
+                onSave()
+                dismiss()
+            }
+        } catch {
+            await MainActor.run {
+                errorMessage = error.localizedDescription
+            }
+        }
     }
 }
-
-// KeychainService is now defined in AWSService.swift
 
 #Preview {
     DeployView()
