@@ -436,6 +436,144 @@ actor OnePasswordService {
         )
     }
     
+    // MARK: - Provider API Keys
+    
+    /// Provider API key stored in 1Password
+    struct ProviderAPIKey: Sendable {
+        let provider: String
+        let secretPath: String
+        let apiKey: String
+    }
+    
+    /// Save a provider API key to 1Password
+    func saveProviderAPIKey(
+        provider: String,
+        secretPath: String,
+        apiKey: String
+    ) async throws {
+        let (installed, signedIn) = try await checkStatus()
+        guard installed else { throw OnePasswordError.cliNotInstalled }
+        guard signedIn else { throw OnePasswordError.notConfigured }
+        
+        try await ensureVaultExists()
+        
+        let itemTitle = "radiant-provider-\(provider.lowercased().replacingOccurrences(of: " ", with: "-"))"
+        
+        // Check if item exists and update, or create new
+        do {
+            // Try to find existing item
+            let output = try await runCommand([
+                "item", "list",
+                "--vault", vaultName,
+                "--format", "json"
+            ])
+            
+            if let data = output.data(using: .utf8),
+               let items = try? JSONDecoder().decode([OnePasswordItem].self, from: data),
+               let existing = items.first(where: { $0.title == itemTitle }) {
+                // Update existing
+                _ = try await runCommand([
+                    "item", "edit", existing.id,
+                    "--vault", vaultName,
+                    "api_key[password]=\(apiKey)",
+                    "secret_path[text]=\(secretPath)"
+                ])
+                return
+            }
+        } catch {
+            // Item doesn't exist, continue to create
+        }
+        
+        // Create new item
+        _ = try await runCommand([
+            "item", "create",
+            "--category", "API Credential",
+            "--vault", vaultName,
+            "--title", itemTitle,
+            "provider[text]=\(provider)",
+            "secret_path[text]=\(secretPath)",
+            "api_key[password]=\(apiKey)",
+            "--format", "json"
+        ])
+        
+        await auditLogger.log(
+            event: .credentialCreated,
+            details: ["provider": provider, "secret_path": secretPath]
+        )
+    }
+    
+    /// Get a provider API key from 1Password
+    func getProviderAPIKey(provider: String) async throws -> ProviderAPIKey? {
+        let (installed, signedIn) = try await checkStatus()
+        guard installed else { throw OnePasswordError.cliNotInstalled }
+        guard signedIn else { throw OnePasswordError.notConfigured }
+        
+        let itemTitle = "radiant-provider-\(provider.lowercased().replacingOccurrences(of: " ", with: "-"))"
+        
+        // Find the item
+        let listOutput = try await runCommand([
+            "item", "list",
+            "--vault", vaultName,
+            "--format", "json"
+        ])
+        
+        guard let listData = listOutput.data(using: .utf8),
+              let items = try? JSONDecoder().decode([OnePasswordItem].self, from: listData),
+              let item = items.first(where: { $0.title == itemTitle }) else {
+            return nil
+        }
+        
+        // Get the full item with fields
+        let output = try await runCommand([
+            "item", "get", item.id,
+            "--vault", vaultName,
+            "--format", "json"
+        ])
+        
+        guard let data = output.data(using: .utf8) else {
+            throw OnePasswordError.invalidResponse
+        }
+        
+        let fullItem = try JSONDecoder().decode(OnePasswordItem.self, from: data)
+        
+        guard let fields = fullItem.fields else {
+            return nil
+        }
+        
+        let apiKey = fields.first { $0.label == "api_key" }?.value ?? ""
+        let secretPath = fields.first { $0.label == "secret_path" }?.value ?? ""
+        
+        return ProviderAPIKey(
+            provider: provider,
+            secretPath: secretPath,
+            apiKey: apiKey
+        )
+    }
+    
+    /// Get all required provider API keys
+    func getRequiredProviderAPIKeys() async throws -> [ProviderAPIKey] {
+        let requiredProviders = ["Anthropic", "Groq"]
+        var keys: [ProviderAPIKey] = []
+        
+        for provider in requiredProviders {
+            if let key = try await getProviderAPIKey(provider: provider) {
+                keys.append(key)
+            }
+        }
+        
+        return keys
+    }
+    
+    /// Check if all required provider API keys are configured
+    func hasRequiredProviderAPIKeys() async -> Bool {
+        do {
+            let keys = try await getRequiredProviderAPIKeys()
+            return keys.count == 2 && keys.allSatisfy { !$0.apiKey.isEmpty }
+        } catch {
+            return false
+        }
+    }
+    
     /// Validate credentials by calling AWS STS
     func validateCredential(_ credential: AWSCredential) async throws -> Bool {
         let process = Process()

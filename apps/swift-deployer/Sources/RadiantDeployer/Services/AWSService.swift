@@ -1,40 +1,4 @@
 import Foundation
-import Security
-
-// KeychainService is defined in DeployView.swift
-// This forward declaration allows AWSService to use it
-class KeychainService {
-    func setSecret(_ value: String, for key: String) {
-        let data = value.data(using: .utf8)!
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key,
-            kSecValueData as String: data
-        ]
-        
-        SecItemDelete(query as CFDictionary)
-        SecItemAdd(query as CFDictionary, nil)
-    }
-    
-    func getSecret(for key: String) -> String? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key,
-            kSecReturnData as String: true
-        ]
-        
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-        
-        guard status == errSecSuccess,
-              let data = result as? Data,
-              let value = String(data: data, encoding: .utf8) else {
-            return nil
-        }
-        
-        return value
-    }
-}
 
 actor AWSService {
     enum AWSError: Error, LocalizedError {
@@ -54,9 +18,32 @@ actor AWSService {
         }
     }
     
+    // MARK: - AWS CLI Path Discovery
+    
+    /// Possible paths where AWS CLI might be installed
+    private static let awsCliPaths = [
+        "/opt/homebrew/bin/aws",      // Apple Silicon Homebrew
+        "/usr/local/bin/aws",          // Intel Homebrew / manual install
+        "/usr/bin/aws"                 // System install
+    ]
+    
+    /// Find the AWS CLI binary path
+    private static func findAwsCliPath() -> String {
+        for path in awsCliPaths {
+            if FileManager.default.fileExists(atPath: path) {
+                return path
+            }
+        }
+        // Fallback to Intel Homebrew path
+        return "/usr/local/bin/aws"
+    }
+    
+    /// Cached AWS CLI path
+    private let awsCliPath: String = AWSService.findAwsCliPath()
+    
     func getCallerIdentity(credentials: CredentialSet) async throws -> AWSAccount {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = ["sts", "get-caller-identity", "--output", "json"]
         
         var environment = ProcessInfo.processInfo.environment
@@ -109,7 +96,7 @@ actor AWSService {
         credentials: CredentialSet
     ) async throws -> String {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "cloudformation", "describe-stacks",
             "--stack-name", stackName,
@@ -155,7 +142,7 @@ actor AWSService {
         credentials: CredentialSet
     ) async throws -> [String: String] {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "cloudformation", "describe-stacks",
             "--stack-name", stackName,
@@ -208,7 +195,7 @@ actor AWSService {
     /// Check if a CloudFormation stack exists
     func stackExists(stackName: String) async -> Bool {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "cloudformation", "describe-stacks",
             "--stack-name", stackName,
@@ -231,7 +218,7 @@ actor AWSService {
     /// Get stack outputs without credentials (uses default)
     func getStackOutputs(stackName: String) async -> [String: String]? {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "cloudformation", "describe-stacks",
             "--stack-name", stackName,
@@ -278,7 +265,7 @@ actor AWSService {
     /// Get object from S3
     func getObject(bucket: String, key: String) async -> Data? {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "s3api", "get-object",
             "--bucket", bucket,
@@ -312,7 +299,7 @@ actor AWSService {
             try data.write(to: tempFile)
             
             let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+            process.executableURL = URL(fileURLWithPath: awsCliPath)
             process.arguments = [
                 "s3", "cp",
                 tempFile.path,
@@ -334,7 +321,7 @@ actor AWSService {
     /// List objects in S3 bucket
     func listObjects(bucket: String, prefix: String) async -> [String] {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "s3api", "list-objects-v2",
             "--bucket", bucket,
@@ -370,7 +357,7 @@ actor AWSService {
     /// Get parameter from SSM Parameter Store
     func getParameter(path: String) async -> String? {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "ssm", "get-parameter",
             "--name", path,
@@ -405,7 +392,7 @@ actor AWSService {
     /// Put parameter to SSM Parameter Store
     func putParameter(path: String, value: String, encrypted: Bool = false) async {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         
         var args = ["ssm", "put-parameter", "--name", path, "--value", value, "--overwrite"]
         if encrypted {
@@ -424,7 +411,7 @@ actor AWSService {
     /// Validate AWS credentials using STS GetCallerIdentity
     func validateCredentials(_ credentials: CredentialSet) async throws -> AWSAccount {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = ["sts", "get-caller-identity", "--output", "json"]
         
         var environment = ProcessInfo.processInfo.environment
@@ -466,7 +453,7 @@ actor AWSService {
     /// Create a DB cluster snapshot
     func createDBClusterSnapshot(snapshotId: String, clusterIdentifier: String) async -> String? {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "rds", "create-db-cluster-snapshot",
             "--db-cluster-snapshot-identifier", snapshotId,
@@ -554,7 +541,7 @@ actor AWSService {
         let formatter = ISO8601DateFormatter()
         
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         
         var args = [
             "cloudwatch", "get-metric-statistics",
@@ -656,7 +643,7 @@ extension AWSService {
     /// Get S3 object metadata without downloading content
     func getObjectMetadata(bucket: String, key: String) async -> S3ObjectMetadata? {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "s3api", "head-object",
             "--bucket", bucket,
@@ -707,7 +694,7 @@ extension AWSService {
         sql: String
     ) async -> Result<[[String: Any]], Error> {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "rds-data", "execute-statement",
             "--resource-arn", resourceArn,
@@ -769,7 +756,7 @@ extension AWSService {
     /// Put item to DynamoDB
     func dynamoDbPutItem(tableName: String, item: [String: Any]) async -> Result<Void, Error> {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         
         // Convert item to DynamoDB JSON format
         let dynamoItem = convertToDynamoDbFormat(item)
@@ -808,7 +795,7 @@ extension AWSService {
     /// Get item from DynamoDB
     func dynamoDbGetItem(tableName: String, key: [String: Any]) async -> Result<[String: Any]?, Error> {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         
         let dynamoKey = convertToDynamoDbFormat(key)
         
@@ -855,7 +842,7 @@ extension AWSService {
     /// Delete item from DynamoDB
     func dynamoDbDeleteItem(tableName: String, key: [String: Any]) async -> Result<Void, Error> {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         
         let dynamoKey = convertToDynamoDbFormat(key)
         
@@ -934,7 +921,7 @@ extension AWSService {
     /// Create RDS cluster snapshot
     func createRdsSnapshot(clusterIdentifier: String, snapshotIdentifier: String) async -> Result<String, Error> {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "rds", "create-db-cluster-snapshot",
             "--db-cluster-identifier", clusterIdentifier,
@@ -974,7 +961,7 @@ extension AWSService {
     /// Delete RDS cluster snapshot
     func deleteRdsSnapshot(snapshotIdentifier: String) async -> Result<Void, Error> {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "rds", "delete-db-cluster-snapshot",
             "--db-cluster-snapshot-identifier", snapshotIdentifier
@@ -1071,7 +1058,7 @@ extension AWSService {
         credentials: CredentialSet
     ) async -> String? {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "secretsmanager", "get-secret-value",
             "--secret-id", secretName,
@@ -1115,7 +1102,7 @@ extension AWSService {
         credentials: CredentialSet
     ) async -> Bool {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: awsCliPath)
         process.arguments = [
             "secretsmanager", "describe-secret",
             "--secret-id", secretName,
@@ -1141,29 +1128,47 @@ extension AWSService {
     }
     
     /// Upload all required provider API keys to Secrets Manager
+    /// Retrieves keys from 1Password and uploads to AWS Secrets Manager
     func uploadRequiredProviderSecrets(
         region: String,
         credentials: CredentialSet,
         onProgress: @escaping (String) -> Void
     ) async throws {
-        let keychain = KeychainService()
+        let onePassword = OnePasswordService()
         
-        // Required providers and their secret paths
+        // Check 1Password is configured
+        let (installed, signedIn) = try await onePassword.checkStatus()
+        guard installed else {
+            throw AWSError.apiError("1Password CLI is not installed. Please install it from https://developer.1password.com/docs/cli")
+        }
+        guard signedIn else {
+            throw AWSError.apiError("1Password is not configured. Please configure your Service Account token in Settings.")
+        }
+        
+        // Get required provider API keys from 1Password
+        onProgress("Retrieving provider API keys from 1Password...")
+        let providerKeys = try await onePassword.getRequiredProviderAPIKeys()
+        
+        // Required providers
         let requiredProviders: [(name: String, secretPath: String)] = [
-            ("Anthropic (Claude)", "radiant/providers/anthropic"),
+            ("Anthropic", "radiant/providers/anthropic"),
             ("Groq", "radiant/providers/groq")
         ]
         
         for provider in requiredProviders {
             onProgress("Uploading \(provider.name) API key to Secrets Manager...")
             
-            guard let apiKey = keychain.getSecret(for: provider.secretPath) else {
-                throw AWSError.apiError("Missing required API key for \(provider.name). Please configure it in the deployment settings.")
+            guard let key = providerKeys.first(where: { $0.provider == provider.name }) else {
+                throw AWSError.apiError("Missing required API key for \(provider.name). Please configure it in 1Password (RADIANT vault, item: radiant-provider-\(provider.name.lowercased()))")
+            }
+            
+            guard !key.apiKey.isEmpty else {
+                throw AWSError.apiError("Empty API key for \(provider.name). Please update it in 1Password.")
             }
             
             try await createOrUpdateSecret(
                 secretName: provider.secretPath,
-                secretValue: apiKey,
+                secretValue: key.apiKey,
                 region: region,
                 credentials: credentials
             )

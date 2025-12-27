@@ -15,8 +15,8 @@
     "services": "services.json"
   },
   "stats": {
-    "externalProviders": 21,
-    "externalModels": 50,
+    "externalProviders": 20,
+    "externalModels": 37,
     "selfHostedModels": 38,
     "services": 5
   },

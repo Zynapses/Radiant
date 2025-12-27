@@ -9,7 +9,7 @@ import { executeStatement } from '../db/client';
 // Types
 // ============================================================================
 
-export type ModelProvider = 'bedrock' | 'litellm' | 'openai' | 'groq' | 'perplexity' | 'xai' | 'together';
+export type ModelProvider = 'bedrock' | 'litellm' | 'openai' | 'anthropic' | 'groq' | 'perplexity' | 'xai' | 'together';
 
 export interface ModelConfig {
   modelId: string;
@@ -347,7 +347,8 @@ export class ModelRouterService {
     // Load API keys from environment
     this.apiKeys = {
       openai: process.env.OPENAI_API_KEY || '',
-      groq: process.env.GROQ_API_KEY || '',
+      anthropic: process.env.ANTHROPIC_API_KEY || '',  // Required - for direct Claude API access
+      groq: process.env.GROQ_API_KEY || '',            // Required - for fast LLM fallback
       perplexity: process.env.PERPLEXITY_API_KEY || '',
       xai: process.env.XAI_API_KEY || '',
       together: process.env.TOGETHER_API_KEY || '',
@@ -355,7 +356,7 @@ export class ModelRouterService {
     };
 
     // Initialize health tracking with defaults
-    const providers: ModelProvider[] = ['bedrock', 'litellm', 'openai', 'groq', 'perplexity', 'xai', 'together'];
+    const providers: ModelProvider[] = ['bedrock', 'litellm', 'openai', 'anthropic', 'groq', 'perplexity', 'xai', 'together'];
     for (const provider of providers) {
       this.providerHealth.set(provider, {
         provider,
@@ -424,10 +425,12 @@ export class ModelRouterService {
         return this.invokeBedrock(config, request);
       case 'litellm':
         return this.invokeLiteLLM(config, request);
+      case 'anthropic':
       case 'groq':
       case 'perplexity':
       case 'xai':
       case 'together':
+      case 'openai':
         return this.invokeDirect(config, request);
       default:
         throw new Error(`Unknown provider: ${config.provider}`);
@@ -594,6 +597,7 @@ export class ModelRouterService {
       bedrock: '', // Uses IAM
       litellm: process.env.LITELLM_API_KEY || '',
       openai: this.apiKeys.openai,
+      anthropic: this.apiKeys.anthropic,  // Direct Anthropic API
       groq: this.apiKeys.groq,
       perplexity: this.apiKeys.perplexity,
       xai: this.apiKeys.xai,
@@ -618,8 +622,9 @@ export class ModelRouterService {
   private getFallbackOrder(config: ModelConfig): ModelProvider[] {
     // Define fallback chains based on primary provider
     const fallbackChains: Record<ModelProvider, ModelProvider[]> = {
-      bedrock: ['litellm', 'groq'],
-      litellm: ['bedrock', 'groq'],
+      bedrock: ['anthropic', 'litellm', 'groq'],
+      litellm: ['bedrock', 'anthropic', 'groq'],
+      anthropic: ['bedrock', 'litellm', 'groq'],
       groq: ['litellm', 'bedrock'],
       perplexity: ['litellm'],
       xai: ['litellm', 'groq'],
