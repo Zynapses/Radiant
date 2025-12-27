@@ -31,7 +31,8 @@
       "regions": ["us-east-1", "eu-west-1"],
       "features": ["streaming", "tool_use", "vision", "extended_thinking", "batch_api"],
       "compliance": ["SOC2", "GDPR", "HIPAA"],
-      "rateLimit": { "requestsPerMinute": 4000, "tokensPerMinute": 400000 }
+      "rateLimit": { "requestsPerMinute": 4000, "tokensPerMinute": 400000 },
+      "required": true
     },
     {
       "id": "google",
