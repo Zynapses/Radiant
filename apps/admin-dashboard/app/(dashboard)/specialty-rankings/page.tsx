@@ -1,7 +1,21 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Brain, RefreshCw, Trophy, TrendingUp, Lock, Unlock, Search } from 'lucide-react';
+import { Brain, RefreshCw, Trophy, TrendingUp, Lock, Search, Settings, Clock, Zap, Sliders } from 'lucide-react';
+
+// Orchestration Modes
+const ORCHESTRATION_MODES = {
+  thinking: { name: 'Thinking', description: 'Standard reasoning with step-by-step analysis', icon: '💭' },
+  extended_thinking: { name: 'Extended Thinking', description: 'Deep multi-step reasoning for complex problems', icon: '🧠' },
+  research: { name: 'Research', description: 'Information gathering and synthesis', icon: '🔬' },
+  creative: { name: 'Creative', description: 'Divergent thinking and idea generation', icon: '🎨' },
+  analytical: { name: 'Analytical', description: 'Data analysis and pattern recognition', icon: '📊' },
+  coding: { name: 'Coding', description: 'Code generation and debugging', icon: '💻' },
+  conversational: { name: 'Conversational', description: 'Natural dialogue and engagement', icon: '💬' },
+  fast: { name: 'Fast', description: 'Quick responses with minimal latency', icon: '⚡' },
+  precise: { name: 'Precise', description: 'High accuracy with verification', icon: '🎯' },
+  balanced: { name: 'Balanced', description: 'Optimal cost/quality/speed tradeoff', icon: '⚖️' },
+};
 
 const SPECIALTY_CATEGORIES = {
   reasoning: { name: 'Reasoning & Logic', icon: '🧠', color: 'purple' },
@@ -40,13 +54,26 @@ const MOCK_RANKINGS = [
 
 type SpecialtyKey = keyof typeof SPECIALTY_CATEGORIES;
 
+type ModeKey = keyof typeof ORCHESTRATION_MODES;
+
 export default function SpecialtyRankingsPage() {
+  const [selectedTab, setSelectedTab] = useState<'specialties' | 'modes' | 'weights' | 'schedule'>('specialties');
   const [selectedSpecialty, setSelectedSpecialty] = useState<SpecialtyKey>('reasoning');
+  const [selectedMode, setSelectedMode] = useState<ModeKey>('thinking');
   const [rankings, setRankings] = useState(MOCK_RANKINGS);
   const [isResearching, setIsResearching] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingModel, setEditingModel] = useState<string | null>(null);
   const [overrideScore, setOverrideScore] = useState<number>(0);
+  
+  // Scoring weights
+  const [benchmarkWeight, setBenchmarkWeight] = useState(50);
+  const [communityWeight, setCommunityWeight] = useState(30);
+  const [internalWeight, setInternalWeight] = useState(20);
+  
+  // Schedule settings
+  const [scheduleFrequency, setScheduleFrequency] = useState<'hourly' | 'daily' | 'weekly' | 'monthly'>('daily');
+  const [scheduleEnabled, setScheduleEnabled] = useState(true);
 
   const getTierColor = (tier: string) => {
     switch (tier) {
@@ -112,18 +139,45 @@ export default function SpecialtyRankingsPage() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
-          <p className="text-xs text-gray-500">Specialty Categories</p>
-          <p className="text-2xl font-bold text-purple-600">{Object.keys(SPECIALTY_CATEGORIES).length}</p>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
-          <p className="text-xs text-gray-500">Ranked Models</p>
-          <p className="text-2xl font-bold text-blue-600">{rankings.length}</p>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
-          <p className="text-xs text-gray-500">S-Tier Models</p>
+      {/* Tabs */}
+      <div className="border-b border-gray-200 dark:border-gray-700">
+        <nav className="flex gap-4">
+          {[
+            { key: 'specialties', label: 'Specialty Rankings', icon: Trophy },
+            { key: 'modes', label: 'Mode Rankings', icon: Zap },
+            { key: 'weights', label: 'Scoring Weights', icon: Sliders },
+            { key: 'schedule', label: 'Research Schedule', icon: Clock },
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setSelectedTab(tab.key as typeof selectedTab)}
+              className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+                selectedTab === tab.key
+                  ? 'border-purple-500 text-purple-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Specialties Tab */}
+      {selectedTab === 'specialties' && (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+              <p className="text-xs text-gray-500">Specialty Categories</p>
+              <p className="text-2xl font-bold text-purple-600">{Object.keys(SPECIALTY_CATEGORIES).length}</p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+              <p className="text-xs text-gray-500">Ranked Models</p>
+              <p className="text-2xl font-bold text-blue-600">{rankings.length}</p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+              <p className="text-xs text-gray-500">S-Tier Models</p>
           <p className="text-2xl font-bold text-yellow-600">{rankings.filter(r => r.tier === 'S').length}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
@@ -289,6 +343,153 @@ export default function SpecialtyRankingsPage() {
           </div>
         </div>
       </div>
+        </>
+      )}
+
+      {/* Modes Tab */}
+      {selectedTab === 'modes' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                Orchestration Modes
+              </h3>
+              <div className="space-y-1">
+                {Object.entries(ORCHESTRATION_MODES).map(([key, mode]) => (
+                  <button
+                    key={key}
+                    onClick={() => setSelectedMode(key as ModeKey)}
+                    className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                      selectedMode === key
+                        ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30'
+                        : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span>{mode.icon}</span>
+                      <span className="text-sm font-medium">{mode.name}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 ml-6">{mode.description}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="lg:col-span-3">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <h3 className="font-semibold mb-4 flex items-center gap-2">
+                  <span className="text-2xl">{ORCHESTRATION_MODES[selectedMode].icon}</span>
+                  {ORCHESTRATION_MODES[selectedMode].name} Mode Rankings
+                </h3>
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rank</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Model</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tier</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {rankings.slice(0, 5).map((r, i) => (
+                      <tr key={r.modelId}>
+                        <td className="px-4 py-3 font-bold">{i + 1}</td>
+                        <td className="px-4 py-3">{r.modelId.split('/')[1]}</td>
+                        <td className="px-4 py-3">{r.score}</td>
+                        <td className="px-4 py-3"><span className={`px-2 py-1 rounded text-xs font-bold ${getTierColor(r.tier)}`}>{r.tier}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Weights Tab */}
+      {selectedTab === 'weights' && (
+        <div className="max-w-2xl space-y-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <Sliders className="w-5 h-5" />
+              Scoring Weight Configuration
+            </h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Adjust how different data sources contribute to the final ranking score. Weights are automatically normalized to sum to 100%.
+            </p>
+            <div className="space-y-6">
+              <div>
+                <div className="flex justify-between mb-2">
+                  <label className="font-medium">Benchmark Score Weight</label>
+                  <span className="text-purple-600 font-mono">{benchmarkWeight}%</span>
+                </div>
+                <input type="range" min="0" max="100" value={benchmarkWeight} onChange={(e) => setBenchmarkWeight(parseInt(e.target.value))} className="w-full" />
+                <p className="text-xs text-gray-500 mt-1">Weight for published benchmarks (MMLU, HumanEval, MATH, etc.)</p>
+              </div>
+              <div>
+                <div className="flex justify-between mb-2">
+                  <label className="font-medium">Community Score Weight</label>
+                  <span className="text-blue-600 font-mono">{communityWeight}%</span>
+                </div>
+                <input type="range" min="0" max="100" value={communityWeight} onChange={(e) => setCommunityWeight(parseInt(e.target.value))} className="w-full" />
+                <p className="text-xs text-gray-500 mt-1">Weight for community reviews and feedback</p>
+              </div>
+              <div>
+                <div className="flex justify-between mb-2">
+                  <label className="font-medium">Internal Score Weight</label>
+                  <span className="text-green-600 font-mono">{internalWeight}%</span>
+                </div>
+                <input type="range" min="0" max="100" value={internalWeight} onChange={(e) => setInternalWeight(parseInt(e.target.value))} className="w-full" />
+                <p className="text-xs text-gray-500 mt-1">Weight for internal usage data from RADIANT deployments</p>
+              </div>
+            </div>
+            <div className="mt-6 pt-6 border-t">
+              <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Save Weights</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Schedule Tab */}
+      {selectedTab === 'schedule' && (
+        <div className="max-w-2xl space-y-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <Clock className="w-5 h-5" />
+              Research Schedule Configuration
+            </h3>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Automatic Research</p>
+                  <p className="text-sm text-gray-500">Automatically research and update rankings</p>
+                </div>
+                <button onClick={() => setScheduleEnabled(!scheduleEnabled)} className={`relative w-12 h-6 rounded-full transition-colors ${scheduleEnabled ? 'bg-purple-600' : 'bg-gray-300'}`}>
+                  <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${scheduleEnabled ? 'left-7' : 'left-1'}`} />
+                </button>
+              </div>
+              <div>
+                <label className="font-medium block mb-2">Research Frequency</label>
+                <select value={scheduleFrequency} onChange={(e) => setScheduleFrequency(e.target.value as typeof scheduleFrequency)} className="w-full px-3 py-2 border rounded-lg">
+                  <option value="hourly">Hourly</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <p className="text-sm"><strong>Last Research:</strong> 2 hours ago</p>
+                <p className="text-sm"><strong>Next Scheduled:</strong> Tomorrow at 3:00 AM</p>
+              </div>
+              <button onClick={handleResearch} disabled={isResearching} className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center gap-2">
+                <RefreshCw className={`w-4 h-4 ${isResearching ? 'animate-spin' : ''}`} />
+                {isResearching ? 'Researching...' : 'Run Research Now'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

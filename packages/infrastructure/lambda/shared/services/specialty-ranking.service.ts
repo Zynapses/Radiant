@@ -30,6 +30,66 @@ export const SPECIALTY_CATEGORIES = {
 
 export type SpecialtyCategory = keyof typeof SPECIALTY_CATEGORIES;
 
+// Orchestration Modes (thinking styles)
+export const ORCHESTRATION_MODES = {
+  thinking: { name: 'Thinking', description: 'Standard reasoning with step-by-step analysis', icon: '💭' },
+  extended_thinking: { name: 'Extended Thinking', description: 'Deep multi-step reasoning for complex problems', icon: '🧠' },
+  research: { name: 'Research', description: 'Information gathering and synthesis', icon: '🔬' },
+  creative: { name: 'Creative', description: 'Divergent thinking and idea generation', icon: '🎨' },
+  analytical: { name: 'Analytical', description: 'Data analysis and pattern recognition', icon: '📊' },
+  coding: { name: 'Coding', description: 'Code generation and debugging', icon: '💻' },
+  conversational: { name: 'Conversational', description: 'Natural dialogue and engagement', icon: '💬' },
+  fast: { name: 'Fast', description: 'Quick responses with minimal latency', icon: '⚡' },
+  precise: { name: 'Precise', description: 'High accuracy with verification', icon: '🎯' },
+  balanced: { name: 'Balanced', description: 'Optimal cost/quality/speed tradeoff', icon: '⚖️' },
+} as const;
+
+export type OrchestrationMode = keyof typeof ORCHESTRATION_MODES;
+
+// Scoring weight configuration
+export interface ScoringWeights {
+  benchmarkWeight: number;    // 0-1: weight for published benchmarks
+  communityWeight: number;    // 0-1: weight for community reviews
+  internalWeight: number;     // 0-1: weight for internal usage data
+}
+
+export const DEFAULT_SCORING_WEIGHTS: ScoringWeights = {
+  benchmarkWeight: 0.5,
+  communityWeight: 0.3,
+  internalWeight: 0.2,
+};
+
+// Research schedule configuration
+export interface ResearchSchedule {
+  scheduleId: string;
+  name: string;
+  frequency: 'hourly' | 'daily' | 'weekly' | 'monthly' | 'manual';
+  cronExpression?: string;
+  enabled: boolean;
+  lastRun?: string;
+  nextRun?: string;
+  targetScope: 'all' | 'specialty' | 'mode' | 'model';
+  targetFilter?: string;
+}
+
+// Mode ranking for orchestration
+export interface ModeRanking {
+  rankingId: string;
+  mode: OrchestrationMode;
+  modelId: string;
+  provider: string;
+  score: number;
+  tier: 'S' | 'A' | 'B' | 'C' | 'D' | 'F';
+  strengths: string[];
+  weaknesses: string[];
+  recommendedFor: string[];
+  notRecommendedFor: string[];
+  confidence: number;
+  isLocked: boolean;
+  adminOverride?: number;
+  updatedAt: string;
+}
+
 export interface SpecialtyRanking {
   rankingId: string;
   modelId: string;
@@ -344,6 +404,281 @@ Order by score descending. Be accurate based on real benchmark data.`;
       adminOverride: row.admin_override ? Number(row.admin_override) : undefined,
       isLocked: Boolean(row.is_locked),
       updatedAt: String(row.updated_at || ''),
+    };
+  }
+
+  // ============================================================================
+  // Mode Rankings
+  // ============================================================================
+
+  async getModeRankings(mode: OrchestrationMode): Promise<ModeRanking[]> {
+    const result = await executeStatement(
+      `SELECT * FROM mode_model_rankings WHERE mode = $1 ORDER BY COALESCE(admin_override, score) DESC`,
+      [{ name: 'mode', value: { stringValue: mode } }]
+    );
+    return result.rows.map(row => this.mapModeRanking(row as Record<string, unknown>));
+  }
+
+  async getBestModelForMode(
+    mode: OrchestrationMode,
+    options: { excludeModels?: string[]; minScore?: number } = {}
+  ): Promise<{ modelId: string; score: number; tier: string } | null> {
+    let sql = `
+      SELECT mr.model_id, mr.score, mr.tier
+      FROM mode_model_rankings mr
+      JOIN model_metadata mm ON mr.model_id = mm.model_id
+      WHERE mr.mode = $1 AND mm.is_available = true
+    `;
+    const params: Array<{ name: string; value: Record<string, unknown> }> = [
+      { name: 'mode', value: { stringValue: mode } },
+    ];
+
+    if (options.minScore) {
+      sql += ` AND COALESCE(mr.admin_override, mr.score) >= $2`;
+      params.push({ name: 'minScore', value: { doubleValue: options.minScore } });
+    }
+
+    sql += ` ORDER BY COALESCE(mr.admin_override, mr.score) DESC LIMIT 1`;
+
+    const result = await executeStatement(sql, params);
+    if (result.rows.length === 0) return null;
+
+    const row = result.rows[0] as Record<string, unknown>;
+    return {
+      modelId: String(row.model_id),
+      score: Number(row.score),
+      tier: String(row.tier),
+    };
+  }
+
+  async researchModeRankings(mode: OrchestrationMode): Promise<RankingResearchResult> {
+    const startTime = Date.now();
+    const modeInfo = ORCHESTRATION_MODES[mode];
+
+    const modelsResult = await executeStatement(
+      `SELECT model_id, provider, model_name FROM model_metadata WHERE is_available = true LIMIT 50`,
+      []
+    );
+    const models = modelsResult.rows as Array<{ model_id: string; provider: string; model_name: string }>;
+
+    const prompt = `Rank these AI models for "${modeInfo.name}" orchestration mode.
+
+Mode: ${modeInfo.name}
+Description: ${modeInfo.description}
+
+Models to rank:
+${models.map(m => `- ${m.model_id} (${m.model_name})`).join('\n')}
+
+For each model, evaluate:
+- How well suited is it for ${modeInfo.name} mode?
+- What are its strengths in this mode?
+- What are its limitations?
+
+Return JSON:
+{
+  "rankings": [
+    { "modelId": "provider/model", "score": 95, "tier": "S", "strengths": ["..."], "weaknesses": ["..."], "recommendedFor": ["..."] }
+  ],
+  "sources": ["source1", "source2"],
+  "confidence": 0.85
+}`;
+
+    const response = await modelRouterService.invoke({
+      modelId: 'anthropic/claude-3-5-sonnet-20241022',
+      messages: [{ role: 'user', content: prompt }],
+      maxTokens: 4096,
+    });
+
+    const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Failed to parse mode rankings');
+
+    const findings = JSON.parse(jsonMatch[0]);
+    let rankingsChanged = 0;
+
+    for (const r of findings.rankings || []) {
+      await this.upsertModeRanking(mode, r.modelId, {
+        score: r.score,
+        tier: r.tier,
+        strengths: r.strengths || [],
+        weaknesses: r.weaknesses || [],
+        recommendedFor: r.recommendedFor || [],
+        confidence: findings.confidence || 0.8,
+      });
+      rankingsChanged++;
+    }
+
+    return {
+      researchId: `research-mode-${Date.now()}`,
+      modelsResearched: models.length,
+      specialtiesUpdated: 1,
+      rankingsChanged,
+      duration: Date.now() - startTime,
+      aiConfidence: findings.confidence || 0.8,
+      completedAt: new Date().toISOString(),
+    };
+  }
+
+  private async upsertModeRanking(mode: OrchestrationMode, modelId: string, data: {
+    score: number;
+    tier: string;
+    strengths: string[];
+    weaknesses: string[];
+    recommendedFor: string[];
+    confidence: number;
+  }): Promise<void> {
+    const provider = modelId.split('/')[0];
+    await executeStatement(
+      `INSERT INTO mode_model_rankings (mode, model_id, provider, score, tier, strengths, weaknesses, recommended_for, confidence)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       ON CONFLICT (mode, model_id) DO UPDATE SET
+         score = $4, tier = $5, strengths = $6, weaknesses = $7, recommended_for = $8, confidence = $9, updated_at = NOW()
+       WHERE mode_model_rankings.is_locked = false`,
+      [
+        { name: 'mode', value: { stringValue: mode } },
+        { name: 'modelId', value: { stringValue: modelId } },
+        { name: 'provider', value: { stringValue: provider } },
+        { name: 'score', value: { doubleValue: data.score } },
+        { name: 'tier', value: { stringValue: data.tier } },
+        { name: 'strengths', value: { stringValue: JSON.stringify(data.strengths) } },
+        { name: 'weaknesses', value: { stringValue: JSON.stringify(data.weaknesses) } },
+        { name: 'recommendedFor', value: { stringValue: JSON.stringify(data.recommendedFor) } },
+        { name: 'confidence', value: { doubleValue: data.confidence } },
+      ]
+    );
+  }
+
+  // ============================================================================
+  // Scoring Weights
+  // ============================================================================
+
+  async getScoringWeights(): Promise<ScoringWeights> {
+    const result = await executeStatement(
+      `SELECT config_value FROM system_config WHERE config_key = 'specialty_ranking_weights'`,
+      []
+    );
+    if (result.rows.length === 0) return DEFAULT_SCORING_WEIGHTS;
+    const row = result.rows[0] as { config_value: string };
+    return JSON.parse(row.config_value);
+  }
+
+  async updateScoringWeights(weights: ScoringWeights): Promise<void> {
+    // Normalize weights to sum to 1
+    const total = weights.benchmarkWeight + weights.communityWeight + weights.internalWeight;
+    const normalized: ScoringWeights = {
+      benchmarkWeight: weights.benchmarkWeight / total,
+      communityWeight: weights.communityWeight / total,
+      internalWeight: weights.internalWeight / total,
+    };
+
+    await executeStatement(
+      `INSERT INTO system_config (config_key, config_value, description)
+       VALUES ('specialty_ranking_weights', $1, 'Weights for specialty ranking calculation')
+       ON CONFLICT (config_key) DO UPDATE SET config_value = $1, updated_at = NOW()`,
+      [{ name: 'weights', value: { stringValue: JSON.stringify(normalized) } }]
+    );
+  }
+
+  // ============================================================================
+  // Research Schedules
+  // ============================================================================
+
+  async getResearchSchedules(): Promise<ResearchSchedule[]> {
+    const result = await executeStatement(
+      `SELECT * FROM ranking_research_schedules ORDER BY name`,
+      []
+    );
+    return result.rows.map(row => this.mapSchedule(row as Record<string, unknown>));
+  }
+
+  async updateResearchSchedule(scheduleId: string, updates: Partial<ResearchSchedule>): Promise<void> {
+    const fields: string[] = [];
+    const params: Array<{ name: string; value: Record<string, unknown> }> = [
+      { name: 'scheduleId', value: { stringValue: scheduleId } },
+    ];
+
+    if (updates.frequency !== undefined) {
+      fields.push(`frequency = $${params.length + 1}`);
+      params.push({ name: 'frequency', value: { stringValue: updates.frequency } });
+    }
+    if (updates.cronExpression !== undefined) {
+      fields.push(`cron_expression = $${params.length + 1}`);
+      params.push({ name: 'cron', value: { stringValue: updates.cronExpression } });
+    }
+    if (updates.enabled !== undefined) {
+      fields.push(`enabled = $${params.length + 1}`);
+      params.push({ name: 'enabled', value: { booleanValue: updates.enabled } });
+    }
+
+    if (fields.length > 0) {
+      await executeStatement(
+        `UPDATE ranking_research_schedules SET ${fields.join(', ')}, updated_at = NOW() WHERE schedule_id = $1`,
+        params
+      );
+    }
+  }
+
+  async triggerResearchNow(scope: 'all' | 'specialty' | 'mode', target?: string): Promise<RankingResearchResult> {
+    if (scope === 'specialty' && target) {
+      return this.researchSpecialtyRankings(target as SpecialtyCategory);
+    } else if (scope === 'mode' && target) {
+      return this.researchModeRankings(target as OrchestrationMode);
+    } else {
+      // Research all
+      const specialties = Object.keys(SPECIALTY_CATEGORIES) as SpecialtyCategory[];
+      const modes = Object.keys(ORCHESTRATION_MODES) as OrchestrationMode[];
+      let total = 0;
+
+      for (const s of specialties.slice(0, 5)) { // Limit to avoid timeout
+        const result = await this.researchSpecialtyRankings(s);
+        total += result.rankingsChanged;
+      }
+      for (const m of modes.slice(0, 3)) {
+        const result = await this.researchModeRankings(m);
+        total += result.rankingsChanged;
+      }
+
+      return {
+        researchId: `full-research-${Date.now()}`,
+        modelsResearched: total,
+        specialtiesUpdated: specialties.length,
+        rankingsChanged: total,
+        duration: 0,
+        aiConfidence: 0.8,
+        completedAt: new Date().toISOString(),
+      };
+    }
+  }
+
+  private mapModeRanking(row: Record<string, unknown>): ModeRanking {
+    return {
+      rankingId: String(row.ranking_id || ''),
+      mode: String(row.mode) as OrchestrationMode,
+      modelId: String(row.model_id),
+      provider: String(row.provider),
+      score: Number(row.score || 0),
+      tier: String(row.tier || 'C') as ModeRanking['tier'],
+      strengths: JSON.parse(String(row.strengths || '[]')),
+      weaknesses: JSON.parse(String(row.weaknesses || '[]')),
+      recommendedFor: JSON.parse(String(row.recommended_for || '[]')),
+      notRecommendedFor: JSON.parse(String(row.not_recommended_for || '[]')),
+      confidence: Number(row.confidence || 0.5),
+      isLocked: Boolean(row.is_locked),
+      adminOverride: row.admin_override ? Number(row.admin_override) : undefined,
+      updatedAt: String(row.updated_at || ''),
+    };
+  }
+
+  private mapSchedule(row: Record<string, unknown>): ResearchSchedule {
+    return {
+      scheduleId: String(row.schedule_id || ''),
+      name: String(row.name || ''),
+      frequency: String(row.frequency || 'daily') as ResearchSchedule['frequency'],
+      cronExpression: row.cron_expression ? String(row.cron_expression) : undefined,
+      enabled: Boolean(row.enabled),
+      lastRun: row.last_run ? String(row.last_run) : undefined,
+      nextRun: row.next_run ? String(row.next_run) : undefined,
+      targetScope: String(row.target_scope || 'all') as ResearchSchedule['targetScope'],
+      targetFilter: row.target_filter ? String(row.target_filter) : undefined,
     };
   }
 }
