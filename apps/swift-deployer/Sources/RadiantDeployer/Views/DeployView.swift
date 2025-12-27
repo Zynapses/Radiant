@@ -1,4 +1,5 @@
 import SwiftUI
+import Security
 
 struct DeployView: View {
     @EnvironmentObject var appState: AppState
@@ -171,6 +172,16 @@ struct DeployView: View {
                         }
                     }
                 }
+            }
+            
+            // Required Provider API Keys
+            Section("Required Provider API Keys") {
+                RequiredProviderKeyRow(
+                    providerName: "Groq",
+                    secretPath: "radiant/providers/groq",
+                    description: "Required for fast LLM fallback",
+                    getKeyUrl: "https://console.groq.com/keys"
+                )
             }
             
             // Deploy Button
@@ -732,6 +743,211 @@ struct LogEntryView: View {
         case .error: return .red
         case .success: return .green
         }
+    }
+}
+
+// MARK: - Required Provider Key Row
+
+struct RequiredProviderKeyRow: View {
+    let providerName: String
+    let secretPath: String
+    let description: String
+    let getKeyUrl: String
+    
+    @State private var isConfigured = false
+    @State private var isChecking = false
+    @State private var showKeyInput = false
+    @State private var apiKey = ""
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(providerName)
+                        .font(.headline)
+                    
+                    Text("REQUIRED")
+                        .font(.caption2)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(.red)
+                        .clipShape(Capsule())
+                }
+                
+                Text(description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            
+            Spacer()
+            
+            if isChecking {
+                ProgressView()
+                    .controlSize(.small)
+            } else if isConfigured {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+            } else {
+                Button("Configure") {
+                    showKeyInput = true
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            }
+        }
+        .sheet(isPresented: $showKeyInput) {
+            ProviderKeyInputSheet(
+                providerName: providerName,
+                secretPath: secretPath,
+                getKeyUrl: getKeyUrl,
+                onSave: { key in
+                    apiKey = key
+                    isConfigured = true
+                }
+            )
+        }
+        .task {
+            await checkKeyConfigured()
+        }
+    }
+    
+    private func checkKeyConfigured() async {
+        isChecking = true
+        defer { isChecking = false }
+        
+        // Check if the secret exists in AWS Secrets Manager
+        // For now, we'll check local keychain
+        let keychain = KeychainService()
+        isConfigured = keychain.getSecret(for: secretPath) != nil
+    }
+}
+
+struct ProviderKeyInputSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let providerName: String
+    let secretPath: String
+    let getKeyUrl: String
+    let onSave: (String) -> Void
+    
+    @State private var apiKey = ""
+    @State private var isSaving = false
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Text("Configure \(providerName) API Key")
+                    .font(.headline)
+                Spacer()
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding()
+            
+            Divider()
+            
+            // Content
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Enter your \(providerName) API key. This will be stored in AWS Secrets Manager during deployment.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                
+                SecureField("API Key", text: $apiKey)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(.body, design: .monospaced))
+                
+                HStack {
+                    Image(systemName: "lock.shield")
+                        .foregroundStyle(.green)
+                    Text("Your API key is stored securely and encrypted.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                
+                Link(destination: URL(string: getKeyUrl)!) {
+                    HStack {
+                        Image(systemName: "arrow.up.right.square")
+                        Text("Get an API key from \(providerName)")
+                    }
+                    .font(.caption)
+                }
+            }
+            .padding()
+            
+            Spacer()
+            
+            Divider()
+            
+            // Actions
+            HStack {
+                Button("Cancel") {
+                    dismiss()
+                }
+                
+                Spacer()
+                
+                Button("Save") {
+                    saveKey()
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(apiKey.isEmpty || isSaving)
+            }
+            .padding()
+        }
+        .frame(width: 400, height: 300)
+    }
+    
+    private func saveKey() {
+        isSaving = true
+        
+        // Save to local keychain for now
+        // Will be uploaded to AWS Secrets Manager during deployment
+        let keychain = KeychainService()
+        keychain.setSecret(apiKey, for: secretPath)
+        
+        onSave(apiKey)
+        dismiss()
+    }
+}
+
+// Simple Keychain Service for local secret storage
+class KeychainService {
+    func setSecret(_ value: String, for key: String) {
+        let data = value.data(using: .utf8)!
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key,
+            kSecValueData as String: data
+        ]
+        
+        SecItemDelete(query as CFDictionary)
+        SecItemAdd(query as CFDictionary, nil)
+    }
+    
+    func getSecret(for key: String) -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key,
+            kSecReturnData as String: true
+        ]
+        
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        
+        guard status == errSecSuccess,
+              let data = result as? Data,
+              let value = String(data: data, encoding: .utf8) else {
+            return nil
+        }
+        
+        return value
     }
 }
 

@@ -258,6 +258,23 @@
       "rateLimit": { "requestsPerMinute": 300, "tokensPerMinute": 1000000 }
     },
     {
+      "id": "groq",
+      "name": "groq",
+      "displayName": "Groq",
+      "category": "text_generation",
+      "description": "Ultra-fast LPU inference for Llama and Mixtral models",
+      "website": "https://groq.com",
+      "apiBaseUrl": "https://api.groq.com/openai/v1",
+      "authType": "bearer",
+      "secretName": "radiant/providers/groq",
+      "enabled": true,
+      "regions": ["us-east-1"],
+      "features": ["streaming", "fast_inference", "function_calling"],
+      "compliance": ["SOC2"],
+      "rateLimit": { "requestsPerMinute": 30, "tokensPerMinute": 100000 },
+      "required": true
+    },
+    {
       "id": "perplexity",
       "name": "perplexity",
       "displayName": "Perplexity",

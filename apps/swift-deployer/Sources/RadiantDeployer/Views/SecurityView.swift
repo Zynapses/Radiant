@@ -76,17 +76,18 @@ struct SecurityView: View {
                         anomalyDetectionSection
                         recentEventsSection
                     }
-                    .frame(maxWidth: .infinity)
+                    .frame(minWidth: 300, maxWidth: .infinity)
                     
                     VStack(spacing: 24) {
                         securityScoreSection
                         quickActionsSection
                     }
-                    .frame(width: 320)
+                    .frame(minWidth: 260, idealWidth: 300, maxWidth: 320)
                 }
             }
             .padding(24)
         }
+        .frame(minWidth: 600)
         .background(Color(nsColor: .windowBackgroundColor))
         .onAppear { loadSecurityData() }
     }

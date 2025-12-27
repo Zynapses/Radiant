@@ -1,10 +1,12 @@
 // RADIANT v4.18.0 - 1Password Integration Service
 // Compliance-certified credential storage (SOC2, HIPAA)
+// Requires 1Password Teams or Business plan for Service Accounts
 
 import Foundation
 import Security
 
 /// 1Password integration for secure, compliant credential storage
+/// Uses Service Account tokens (requires Teams/Business plan)
 /// Requires 1Password CLI (op) to be installed: https://developer.1password.com/docs/cli
 actor OnePasswordService {
     
@@ -12,20 +14,20 @@ actor OnePasswordService {
     
     enum OnePasswordError: Error, LocalizedError {
         case cliNotInstalled
-        case notSignedIn
+        case notConfigured
         case vaultNotFound(String)
         case itemNotFound(String)
         case operationFailed(String)
         case invalidResponse
         case parseError(String)
-        case authenticationFailed
+        case invalidToken
         
         var errorDescription: String? {
             switch self {
             case .cliNotInstalled:
-                return "1Password CLI (op) is not installed. Please install from https://1password.com/downloads/command-line/"
-            case .notSignedIn:
-                return "Not signed in to 1Password. Please sign in."
+                return "1Password CLI (op) is not installed."
+            case .notConfigured:
+                return "Service account token not configured."
             case .vaultNotFound(let vault):
                 return "1Password vault '\(vault)' not found"
             case .itemNotFound(let item):
@@ -36,25 +38,24 @@ actor OnePasswordService {
                 return "Invalid response from 1Password CLI"
             case .parseError(let message):
                 return "Failed to parse 1Password response: \(message)"
-            case .authenticationFailed:
-                return "1Password authentication failed"
+            case .invalidToken:
+                return "Invalid service account token"
             }
         }
     }
     
-    // MARK: - Keychain Storage for Session
+    // MARK: - Keychain Storage for Service Account Token
     
     private static let keychainService = "com.radiant.deployer.1password"
-    private static let sessionTokenKey = "session_token"
-    private static let accountKey = "account"
+    private static let serviceAccountTokenKey = "service_account_token"
     
-    /// Store 1Password session token in Keychain
-    private func storeSessionToken(_ token: String, account: String) {
+    /// Store service account token in Keychain
+    func storeServiceAccountToken(_ token: String) {
         // Delete existing
         let deleteQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: Self.keychainService,
-            kSecAttrAccount as String: Self.sessionTokenKey
+            kSecAttrAccount as String: Self.serviceAccountTokenKey
         ]
         SecItemDelete(deleteQuery as CFDictionary)
         
@@ -62,36 +63,19 @@ actor OnePasswordService {
         let tokenQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: Self.keychainService,
-            kSecAttrAccount as String: Self.sessionTokenKey,
+            kSecAttrAccount as String: Self.serviceAccountTokenKey,
             kSecValueData as String: token.data(using: .utf8)!,
             kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
         ]
         SecItemAdd(tokenQuery as CFDictionary, nil)
-        
-        // Store account
-        let accountDeleteQuery: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: Self.keychainService,
-            kSecAttrAccount as String: Self.accountKey
-        ]
-        SecItemDelete(accountDeleteQuery as CFDictionary)
-        
-        let accountQuery: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: Self.keychainService,
-            kSecAttrAccount as String: Self.accountKey,
-            kSecValueData as String: account.data(using: .utf8)!,
-            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        ]
-        SecItemAdd(accountQuery as CFDictionary, nil)
     }
     
-    /// Retrieve 1Password session token from Keychain
-    private func getStoredSessionToken() -> (token: String, account: String)? {
+    /// Retrieve service account token from Keychain
+    func getServiceAccountToken() -> String? {
         let tokenQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: Self.keychainService,
-            kSecAttrAccount as String: Self.sessionTokenKey,
+            kSecAttrAccount as String: Self.serviceAccountTokenKey,
             kSecReturnData as String: true
         ]
         
@@ -102,25 +86,11 @@ actor OnePasswordService {
             return nil
         }
         
-        let accountQuery: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: Self.keychainService,
-            kSecAttrAccount as String: Self.accountKey,
-            kSecReturnData as String: true
-        ]
-        
-        var accountResult: AnyObject?
-        guard SecItemCopyMatching(accountQuery as CFDictionary, &accountResult) == errSecSuccess,
-              let accountData = accountResult as? Data,
-              let account = String(data: accountData, encoding: .utf8) else {
-            return nil
-        }
-        
-        return (token, account)
+        return token
     }
     
-    /// Clear stored session from Keychain
-    func clearStoredSession() {
+    /// Clear stored token from Keychain
+    func clearStoredToken() {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: Self.keychainService
@@ -128,47 +98,43 @@ actor OnePasswordService {
         SecItemDelete(query as CFDictionary)
     }
     
-    /// Sign in to 1Password and store session in Keychain
-    func signIn(account: String, password: String) async throws {
+    /// Configure with a service account token
+    func configureServiceAccount(token: String) async throws {
+        // Validate the token by running a simple command
         let process = Process()
         process.executableURL = URL(fileURLWithPath: opPath)
-        process.arguments = ["signin", "--account", account, "--raw"]
+        process.arguments = ["account", "get", "--format", "json"]
         
-        let inputPipe = Pipe()
+        var environment = ProcessInfo.processInfo.environment
+        environment["OP_SERVICE_ACCOUNT_TOKEN"] = token
+        process.environment = environment
+        
         let outputPipe = Pipe()
         let errorPipe = Pipe()
-        
-        process.standardInput = inputPipe
         process.standardOutput = outputPipe
         process.standardError = errorPipe
         
         try process.run()
-        
-        // Send password
-        inputPipe.fileHandleForWriting.write(password.data(using: .utf8)!)
-        inputPipe.fileHandleForWriting.closeFile()
-        
         process.waitUntilExit()
         
-        let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
-        let sessionToken = String(data: outputData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        
-        guard process.terminationStatus == 0 && !sessionToken.isEmpty else {
-            throw OnePasswordError.authenticationFailed
+        guard process.terminationStatus == 0 else {
+            let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+            let errorMessage = String(data: errorData, encoding: .utf8) ?? "Unknown error"
+            throw OnePasswordError.invalidToken
         }
         
-        // Store session token in Keychain
-        storeSessionToken(sessionToken, account: account)
+        // Token is valid, store it
+        storeServiceAccountToken(token)
         
         await auditLogger.log(
             event: .credentialListAccessed,
-            details: ["action": "signin", "account": account]
+            details: ["action": "configure_service_account"]
         )
     }
     
-    /// Check if we have a valid stored session
-    func hasStoredSession() -> Bool {
-        return getStoredSessionToken() != nil
+    /// Check if we have a configured service account
+    func hasConfiguredServiceAccount() -> Bool {
+        return getServiceAccountToken() != nil
     }
     
     struct AWSCredential: Codable, Sendable {
@@ -221,35 +187,61 @@ actor OnePasswordService {
     
     private let vaultName: String
     private let itemPrefix: String
-    private let opPath: String
+    private var opPath: String
     private let auditLogger: AuditLogger
+    
+    /// Possible paths where 1Password CLI might be installed
+    private static let opPaths = [
+        "/opt/homebrew/bin/op",      // Apple Silicon Homebrew
+        "/usr/local/bin/op",          // Intel Homebrew / manual install
+        "/usr/bin/op"                 // System install
+    ]
+    
+    /// Find the 1Password CLI binary
+    private static func findOpPath() -> String? {
+        for path in opPaths {
+            if FileManager.default.fileExists(atPath: path) {
+                return path
+            }
+        }
+        return nil
+    }
     
     // MARK: - Initialization
     
     init(
         vaultName: String = "RADIANT",
-        itemPrefix: String = "radiant-aws-",
-        opPath: String = "/usr/local/bin/op"
+        itemPrefix: String = "radiant-aws-"
     ) {
         self.vaultName = vaultName
         self.itemPrefix = itemPrefix
-        self.opPath = opPath
+        self.opPath = Self.findOpPath() ?? "/usr/local/bin/op"
         self.auditLogger = AuditLogger.shared
     }
     
     // MARK: - Public Methods
     
-    /// Check if 1Password CLI is installed and user is signed in
+    /// Check if 1Password CLI is installed and service account is configured
     func checkStatus() async throws -> (installed: Bool, signedIn: Bool) {
+        // Re-check for op binary (might have been installed since init)
+        if let foundPath = Self.findOpPath() {
+            opPath = foundPath
+        }
+        
         // Check if CLI exists
         let installed = FileManager.default.fileExists(atPath: opPath)
         if !installed {
             return (false, false)
         }
         
-        // Check if signed in
+        // Check if service account token is configured and valid
+        guard let token = getServiceAccountToken() else {
+            return (true, false)
+        }
+        
+        // Validate token by running a command
         do {
-            _ = try await runCommand(["account", "get", "--format", "json"])
+            _ = try await runCommand(["vault", "list", "--format", "json"])
             return (true, true)
         } catch {
             return (true, false)
@@ -272,7 +264,7 @@ actor OnePasswordService {
     func listCredentials() async throws -> [AWSCredential] {
         let (installed, signedIn) = try await checkStatus()
         guard installed else { throw OnePasswordError.cliNotInstalled }
-        guard signedIn else { throw OnePasswordError.notSignedIn }
+        guard signedIn else { throw OnePasswordError.notConfigured }
         
         let output = try await runCommand([
             "item", "list",
@@ -358,7 +350,7 @@ actor OnePasswordService {
     ) async throws -> AWSCredential {
         let (installed, signedIn) = try await checkStatus()
         guard installed else { throw OnePasswordError.cliNotInstalled }
-        guard signedIn else { throw OnePasswordError.notSignedIn }
+        guard signedIn else { throw OnePasswordError.notConfigured }
         
         try await ensureVaultExists()
         
@@ -508,10 +500,10 @@ actor OnePasswordService {
         process.executableURL = URL(fileURLWithPath: opPath)
         process.arguments = arguments
         
-        // Set session token from Keychain if available
+        // Set service account token from Keychain
         var environment = ProcessInfo.processInfo.environment
-        if let stored = getStoredSessionToken() {
-            environment["OP_SESSION_\(stored.account)"] = stored.token
+        if let token = getServiceAccountToken() {
+            environment["OP_SERVICE_ACCOUNT_TOKEN"] = token
         }
         process.environment = environment
         
@@ -529,10 +521,10 @@ actor OnePasswordService {
         if process.terminationStatus != 0 {
             let errorMessage = String(data: errorData, encoding: .utf8) ?? "Unknown error"
             
-            if errorMessage.contains("not signed in") || errorMessage.contains("session expired") {
-                // Clear invalid session from Keychain
-                clearStoredSession()
-                throw OnePasswordError.notSignedIn
+            if errorMessage.contains("not authorized") || errorMessage.contains("invalid token") || errorMessage.contains("authentication") {
+                // Clear invalid token from Keychain
+                clearStoredToken()
+                throw OnePasswordError.invalidToken
             }
             if errorMessage.contains("vault") && errorMessage.contains("not found") {
                 throw OnePasswordError.vaultNotFound(vaultName)
