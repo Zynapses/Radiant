@@ -29,6 +29,100 @@ const TIER_LIMITS: Record<string, { requests: number; windowMs: number }> = {
   enterprise: { requests: 20000, windowMs: 60000 },
 };
 
+// Provider-specific rate limits (requests per minute)
+// These are the external API limits we must respect
+export const PROVIDER_RATE_LIMITS: Record<string, { rpm: number; tpm?: number; dailyLimit?: number }> = {
+  groq: { rpm: 30, tpm: 15000, dailyLimit: 14400 },           // Free tier limits
+  anthropic: { rpm: 60, tpm: 100000 },                        // Claude API limits
+  openai: { rpm: 60, tpm: 150000 },                           // GPT-4 limits
+  perplexity: { rpm: 50 },                                    // Perplexity limits
+  together: { rpm: 60, tpm: 100000 },                         // Together AI
+  xai: { rpm: 60 },                                           // xAI/Grok limits
+  bedrock: { rpm: 1000 },                                     // AWS Bedrock (high limit)
+  litellm: { rpm: 500 },                                      // Self-hosted, configurable
+};
+
+// Current provider usage tracking (in-memory, per Lambda instance)
+const providerUsage = new Map<string, { count: number; resetAt: number }>();
+
+/**
+ * Check if a provider call is allowed based on rate limits
+ */
+export function checkProviderRateLimit(provider: string): { 
+  allowed: boolean; 
+  remaining: number; 
+  resetInMs: number;
+  limit: number;
+} {
+  const limits = PROVIDER_RATE_LIMITS[provider];
+  if (!limits) {
+    return { allowed: true, remaining: 999, resetInMs: 0, limit: 999 };
+  }
+
+  const now = Date.now();
+  const windowMs = 60000; // 1 minute window
+  const key = `provider:${provider}`;
+  const usage = providerUsage.get(key);
+
+  if (!usage || usage.resetAt < now) {
+    providerUsage.set(key, { count: 1, resetAt: now + windowMs });
+    return { 
+      allowed: true, 
+      remaining: limits.rpm - 1, 
+      resetInMs: windowMs,
+      limit: limits.rpm
+    };
+  }
+
+  if (usage.count >= limits.rpm) {
+    return { 
+      allowed: false, 
+      remaining: 0, 
+      resetInMs: usage.resetAt - now,
+      limit: limits.rpm
+    };
+  }
+
+  usage.count++;
+  return { 
+    allowed: true, 
+    remaining: limits.rpm - usage.count, 
+    resetInMs: usage.resetAt - now,
+    limit: limits.rpm
+  };
+}
+
+/**
+ * Get current rate limit status for all providers
+ */
+export function getProviderRateLimitStatus(): Record<string, {
+  limit: number;
+  used: number;
+  remaining: number;
+  resetInMs: number;
+}> {
+  const now = Date.now();
+  const status: Record<string, { limit: number; used: number; remaining: number; resetInMs: number }> = {};
+
+  for (const [provider, limits] of Object.entries(PROVIDER_RATE_LIMITS)) {
+    const key = `provider:${provider}`;
+    const usage = providerUsage.get(key);
+    
+    if (!usage || usage.resetAt < now) {
+      status[provider] = { limit: limits.rpm, used: 0, remaining: limits.rpm, resetInMs: 0 };
+    } else {
+      status[provider] = {
+        limit: limits.rpm,
+        used: usage.count,
+        remaining: Math.max(0, limits.rpm - usage.count),
+        resetInMs: usage.resetAt - now
+      };
+    }
+  }
+
+  return status;
+}
+
 /**
  * In-memory rate limit store for fallback
  */

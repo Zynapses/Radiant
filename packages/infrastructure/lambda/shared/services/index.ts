@@ -60,3 +60,16 @@ export { RadiantUnifiedService, radiantUnifiedService } from './radiant-unified.
 export { FeedbackService, feedbackService } from './feedback.service';
 export { SuperiorOrchestrationService, superiorOrchestrationService } from './superior-orchestration.service';
 export { OrchestrationPatternsService, orchestrationPatternsService } from './orchestration-patterns.service';
+
+// Additional services
+export * from './api-keys';
+export * from './audit';
+export * from './cache';
+export * from './database';
+export * from './email';
+export * from './feature-flags';
+export * from './metrics';
+export * from './notifications';
+export * from './secrets';
+export * from './system-config';
+export * from './tracing';
