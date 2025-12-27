@@ -37,7 +37,7 @@ export interface SynthesisRequest {
   preferSpeed?: boolean;
 }
 
-export interface ModelResponse {
+export interface SynthesisModelResponse {
   modelId: string;
   response: string;
   confidence: number;
@@ -52,7 +52,7 @@ export interface SynthesisResult {
   
   // What happened
   modelsUsed: string[];
-  modelResponses: ModelResponse[];
+  modelResponses: SynthesisModelResponse[];
   synthesisSteps: string[];
   
   // Quality metrics
@@ -467,7 +467,7 @@ ${initialAssessment.improvements?.join('\n') || '- Being more accurate\n- Being 
     
     synthesisSteps.push(`Starting cascade strategy with quality threshold ${minQuality}`);
     
-    let currentResponse: ModelResponse | null = null;
+    let currentResponse: SynthesisModelResponse | null = null;
     let modelIndex = 0;
     
     while (modelIndex < cascade.length) {
@@ -559,7 +559,7 @@ ${initialAssessment.improvements?.join('\n') || '- Being more accurate\n- Being 
   private async getMultipleResponses(
     request: SynthesisRequest,
     models: string[]
-  ): Promise<ModelResponse[]> {
+  ): Promise<SynthesisModelResponse[]> {
     const results = await Promise.all(
       models.map(modelId => this.getSingleResponse(request, modelId))
     );
@@ -569,7 +569,7 @@ ${initialAssessment.improvements?.join('\n') || '- Being more accurate\n- Being 
   private async getSingleResponse(
     request: SynthesisRequest,
     modelId: string
-  ): Promise<ModelResponse> {
+  ): Promise<SynthesisModelResponse> {
     const startTime = Date.now();
     
     const result = await modelRouterService.invoke({
@@ -592,9 +592,9 @@ ${initialAssessment.improvements?.join('\n') || '- Being more accurate\n- Being 
 
   private async judgeResponses(
     prompt: string,
-    responses: ModelResponse[],
+    responses: SynthesisModelResponse[],
     judgeModel: string
-  ): Promise<{ bestResponse: ModelResponse; qualityScore: number; reasoning: string }> {
+  ): Promise<{ bestResponse: SynthesisModelResponse; qualityScore: number; reasoning: string }> {
     const judgePrompt = `You are a judge evaluating AI responses. Pick the BEST response.
 
 Original Question: ${prompt}
@@ -636,7 +636,7 @@ REASONING: [Brief explanation of why this response is best]`;
     };
   }
 
-  private buildSynthesisPrompt(prompt: string, responses: ModelResponse[]): string {
+  private buildSynthesisPrompt(prompt: string, responses: SynthesisModelResponse[]): string {
     return `You are synthesizing the best parts from multiple AI responses into one superior response.
 
 Original Question: ${prompt}

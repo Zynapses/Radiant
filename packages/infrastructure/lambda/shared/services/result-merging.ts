@@ -7,7 +7,7 @@ import { getPoolClient } from '../db/centralized-pool';
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || process.env.LITELLM_ENDPOINT;
 const AI_SERVICE_API_KEY = process.env.AI_SERVICE_API_KEY || process.env.LITELLM_API_KEY;
 
-export interface ModelResponse {
+export interface MergeModelResponse {
   modelId: string;
   content: string;
   tokensUsed: number;
@@ -47,7 +47,7 @@ export class ResultMergingService {
   }
 
   async mergeResponses(
-    responses: ModelResponse[],
+    responses: MergeModelResponse[],
     strategy: MergeStrategy
   ): Promise<MergedResult> {
     const startTime = Date.now();
@@ -76,7 +76,7 @@ export class ResultMergingService {
     }
   }
 
-  private singleResponse(response: ModelResponse, startTime: number): MergedResult {
+  private singleResponse(response: MergeModelResponse, startTime: number): MergedResult {
     return {
       content: response.content,
       sources: [
@@ -94,11 +94,11 @@ export class ResultMergingService {
   }
 
   private selectBest(
-    responses: ModelResponse[],
+    responses: MergeModelResponse[],
     options: MergeStrategy['options'],
     startTime: number
   ): MergedResult {
-    let selected: ModelResponse;
+    let selected: MergeModelResponse;
 
     if (options?.preferredModel) {
       const preferred = responses.find((r) => r.modelId === options.preferredModel);
@@ -127,7 +127,7 @@ export class ResultMergingService {
   }
 
   private buildConsensus(
-    responses: ModelResponse[],
+    responses: MergeModelResponse[],
     options: MergeStrategy['options'],
     startTime: number
   ): MergedResult {
@@ -181,7 +181,7 @@ export class ResultMergingService {
   }
 
   private async synthesize(
-    responses: ModelResponse[],
+    responses: MergeModelResponse[],
     options: MergeStrategy['options'],
     startTime: number
   ): Promise<MergedResult> {
@@ -274,7 +274,7 @@ ${responses.map((r, i) => `=== Response ${i + 1} (${r.modelId}) ===\n${r.content
   }
 
   private weightedMerge(
-    responses: ModelResponse[],
+    responses: MergeModelResponse[],
     options: MergeStrategy['options'],
     startTime: number
   ): MergedResult {
@@ -308,7 +308,7 @@ ${responses.map((r, i) => `=== Response ${i + 1} (${r.modelId}) ===\n${r.content
   }
 
   private chainResponses(
-    responses: ModelResponse[],
+    responses: MergeModelResponse[],
     options: MergeStrategy['options'],
     startTime: number
   ): MergedResult {
