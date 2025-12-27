@@ -22,18 +22,19 @@ struct DashboardView: View {
                         quickActionsSection
                         recentDeploymentsSection
                     }
-                    .frame(maxWidth: .infinity)
+                    .frame(minWidth: 300, maxWidth: .infinity)
                     
                     // Right Column
                     VStack(spacing: 24) {
                         environmentStatusSection
                         systemHealthSection
                     }
-                    .frame(width: 350)
+                    .frame(minWidth: 280, idealWidth: 320, maxWidth: 350)
                 }
             }
             .padding(24)
         }
+        .frame(minWidth: 600)
         .background(Color(nsColor: .windowBackgroundColor))
     }
     

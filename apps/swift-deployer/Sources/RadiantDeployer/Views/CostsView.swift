@@ -19,17 +19,18 @@ struct CostsView: View {
                         costBreakdownSection
                         topModelsSection
                     }
-                    .frame(maxWidth: .infinity)
+                    .frame(minWidth: 300, maxWidth: .infinity)
                     
                     VStack(spacing: 24) {
                         alertsSection
                         budgetSection
                     }
-                    .frame(width: 350)
+                    .frame(minWidth: 280, idealWidth: 320, maxWidth: 350)
                 }
             }
             .padding(24)
         }
+        .frame(minWidth: 600)
         .background(Color(nsColor: .windowBackgroundColor))
     }
     

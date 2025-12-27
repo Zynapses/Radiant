@@ -76,6 +76,9 @@ struct AppSidebar: View {
             // Logo Header
             SidebarHeader()
             
+            // Environment Selector (at top for visibility)
+            EnvironmentSelector()
+            
             // Search (Pattern 6)
             SidebarSearch(text: $searchText)
             
@@ -191,9 +194,6 @@ struct AppSidebar: View {
             .searchable(text: $searchText, placement: .sidebar, prompt: "Search")
             
             Divider()
-            
-            // Environment Selector
-            EnvironmentSelector()
             
             // Connection Status
             ConnectionStatus()

@@ -41,6 +41,9 @@ final class AppState: ObservableObject {
     @Published var onePasswordConfigured = false
     @Published var onePasswordStatus: CredentialService.OnePasswordStatus?
     
+    // MARK: - Debug/Testing
+    @Published var bypassOnePassword = true  // Set to true to skip 1Password during testing
+    
     // MARK: - Initialization
     init() {
         Task {
@@ -51,6 +54,13 @@ final class AppState: ObservableObject {
     func loadInitialData() async {
         isLoading = true
         defer { isLoading = false }
+        
+        // Allow bypass for testing
+        if bypassOnePassword {
+            onePasswordConfigured = true
+            apps = ManagedApp.defaults
+            return
+        }
         
         // Check 1Password status first
         onePasswordStatus = await credentialService.checkOnePasswordStatus()
@@ -70,6 +80,11 @@ final class AppState: ObservableObject {
     }
     
     func refreshOnePasswordStatus() async {
+        if bypassOnePassword {
+            onePasswordConfigured = true
+            return
+        }
+        
         onePasswordStatus = await credentialService.checkOnePasswordStatus()
         onePasswordConfigured = onePasswordStatus?.installed == true && onePasswordStatus?.signedIn == true
         

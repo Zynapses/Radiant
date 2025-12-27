@@ -45,8 +45,412 @@ struct SettingsView: View {
                 .tabItem {
                     Label("QA & Testing", systemImage: "checkmark.seal")
                 }
+            
+            CognitiveBrainSettingsView()
+                .tabItem {
+                    Label("Cognitive Brain", systemImage: "brain")
+                }
+            
+            AdvancedCognitionSettingsView()
+                .tabItem {
+                    Label("Advanced Cognition", systemImage: "cpu")
+                }
         }
-        .frame(width: 1000, height: 700)
+        .frame(minWidth: 600, idealWidth: 900, maxWidth: .infinity, minHeight: 500, idealHeight: 700, maxHeight: .infinity)
+    }
+}
+
+// MARK: - Cognitive Brain Settings
+
+struct CognitiveBrainSettingsView: View {
+    @AppStorage("cognitiveBrainEnabled") private var cognitiveBrainEnabled = true
+    @AppStorage("cognitiveBrainLearningEnabled") private var learningEnabled = true
+    @AppStorage("cognitiveBrainAdaptationEnabled") private var adaptationEnabled = true
+    @AppStorage("cognitiveBrainMaxConcurrentRegions") private var maxConcurrentRegions = 5
+    @AppStorage("cognitiveBrainMaxTokensPerRequest") private var maxTokensPerRequest = 16000
+    @AppStorage("cognitiveBrainDailyCostLimitCents") private var dailyCostLimitCents = 10000
+    @AppStorage("cognitiveBrainGlobalLearningRate") private var globalLearningRate = 0.01
+    @AppStorage("cognitiveBrainMemoryRetentionDays") private var memoryRetentionDays = 90
+    @AppStorage("cognitiveBrainEnableMetacognition") private var enableMetacognition = true
+    @AppStorage("cognitiveBrainEnableTheoryOfMind") private var enableTheoryOfMind = true
+    @AppStorage("cognitiveBrainEnableCreativeSynthesis") private var enableCreativeSynthesis = true
+    @AppStorage("cognitiveBrainEnableSelfCorrection") private var enableSelfCorrection = true
+    
+    var body: some View {
+        Form {
+            Section {
+                Toggle("Enable Cognitive Brain", isOn: $cognitiveBrainEnabled)
+                Text("AGI-like cognitive mesh with specialized brain regions")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Label("Cognitive Brain System", systemImage: "brain")
+            }
+            
+            Section("Learning & Adaptation") {
+                Toggle("Enable Learning", isOn: $learningEnabled)
+                    .disabled(!cognitiveBrainEnabled)
+                Toggle("Enable Adaptation", isOn: $adaptationEnabled)
+                    .disabled(!cognitiveBrainEnabled)
+                
+                HStack {
+                    Text("Learning Rate")
+                    Spacer()
+                    Text(String(format: "%.3f", globalLearningRate))
+                        .foregroundStyle(.secondary)
+                }
+                Slider(value: $globalLearningRate, in: 0...0.1, step: 0.001)
+                    .disabled(!cognitiveBrainEnabled || !learningEnabled)
+                
+                Stepper("Memory Retention: \(memoryRetentionDays) days", value: $memoryRetentionDays, in: 7...365, step: 7)
+                    .disabled(!cognitiveBrainEnabled)
+            }
+            
+            Section("Cognitive Capabilities") {
+                Toggle("Metacognition", isOn: $enableMetacognition)
+                Text("Self-awareness of knowledge and limitations")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                Toggle("Theory of Mind", isOn: $enableTheoryOfMind)
+                Text("Model user mental state and anticipate needs")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                Toggle("Creative Synthesis", isOn: $enableCreativeSynthesis)
+                Text("Generate novel ideas by combining concepts")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                Toggle("Self-Correction", isOn: $enableSelfCorrection)
+                Text("Detect and fix errors during processing")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .disabled(!cognitiveBrainEnabled)
+            
+            Section("Performance Limits") {
+                Stepper("Max Concurrent Regions: \(maxConcurrentRegions)", value: $maxConcurrentRegions, in: 1...10)
+                
+                HStack {
+                    Text("Max Tokens per Request")
+                    Spacer()
+                    TextField("Tokens", value: $maxTokensPerRequest, format: .number)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 100)
+                }
+            }
+            .disabled(!cognitiveBrainEnabled)
+            
+            Section("Cost Controls") {
+                HStack {
+                    Text("Daily Cost Limit")
+                    Spacer()
+                    Text("$")
+                    TextField("Amount", value: Binding(
+                        get: { Double(dailyCostLimitCents) / 100.0 },
+                        set: { dailyCostLimitCents = Int($0 * 100) }
+                    ), format: .number.precision(.fractionLength(2)))
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 100)
+                }
+            }
+            .disabled(!cognitiveBrainEnabled)
+            
+            Section("Brain Regions") {
+                BrainRegionRow(name: "Reasoning Engine", function: "prefrontal_cortex", model: "claude-3-5-sonnet", icon: "lightbulb", color: .purple)
+                BrainRegionRow(name: "Memory Center", function: "hippocampus", model: "text-embedding-3-large", icon: "cylinder", color: .cyan)
+                BrainRegionRow(name: "Language Production", function: "broca_area", model: "gpt-4o", icon: "text.bubble", color: .green)
+                BrainRegionRow(name: "Emotional Intelligence", function: "amygdala", model: "gpt-4o-mini", icon: "heart", color: .red)
+                BrainRegionRow(name: "Visual Processing", function: "visual_cortex", model: "claude-3-5-sonnet-vision", icon: "eye", color: .orange)
+                BrainRegionRow(name: "Procedural Skills", function: "cerebellum", model: "claude-3-5-sonnet-code", icon: "chevron.left.forwardslash.chevron.right", color: .pink)
+                BrainRegionRow(name: "Creative Synthesis", function: "default_mode_network", model: "claude-3-5-sonnet", icon: "sparkles", color: .purple)
+                
+                Text("Configure brain regions in the Admin Dashboard")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .formStyle(.grouped)
+        .padding()
+    }
+}
+
+struct BrainRegionRow: View {
+    let name: String
+    let function: String
+    let model: String
+    let icon: String
+    let color: Color
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(color)
+                .frame(width: 24)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(name)
+                    .font(.subheadline.weight(.medium))
+                HStack(spacing: 8) {
+                    Text(function)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Text("•")
+                        .foregroundStyle(.secondary)
+                    Text(model)
+                        .font(.caption2.monospaced())
+                        .foregroundStyle(.secondary)
+                }
+            }
+            
+            Spacer()
+            
+            Circle()
+                .fill(.green)
+                .frame(width: 8, height: 8)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+// MARK: - Advanced Cognition Settings
+
+struct AdvancedCognitionSettingsView: View {
+    // Causal Reasoning
+    @AppStorage("causalReasoningEnabled") private var causalReasoningEnabled = true
+    @AppStorage("causalConfidenceThreshold") private var causalConfidenceThreshold = 0.6
+    @AppStorage("maxCausalChainDepth") private var maxCausalChainDepth = 5
+    @AppStorage("counterfactualEnabled") private var counterfactualEnabled = true
+    
+    // Memory Consolidation
+    @AppStorage("memoryConsolidationEnabled") private var consolidationEnabled = true
+    @AppStorage("consolidationSchedule") private var consolidationSchedule = "daily"
+    @AppStorage("consolidationHour") private var consolidationHour = 3
+    @AppStorage("compressionRatio") private var compressionRatio = 0.7
+    @AppStorage("importanceDecayRate") private var importanceDecayRate = 0.05
+    @AppStorage("autoPruneThreshold") private var autoPruneThreshold = 0.1
+    @AppStorage("autoResolveConflicts") private var autoResolveConflicts = true
+    
+    // Multimodal Binding
+    @AppStorage("multimodalBindingEnabled") private var multimodalBindingEnabled = true
+    @AppStorage("autoEmbedUploads") private var autoEmbedUploads = true
+    @AppStorage("crossModalSearchEnabled") private var crossModalSearchEnabled = true
+    @AppStorage("bindingQualityThreshold") private var bindingQualityThreshold = 0.7
+    
+    // Skill Execution
+    @AppStorage("skillExecutionEnabled") private var skillExecutionEnabled = true
+    @AppStorage("autoSkillSuggestion") private var autoSkillSuggestion = true
+    @AppStorage("skillLearningEnabled") private var skillLearningEnabled = true
+    @AppStorage("maxSkillChainDepth") private var maxSkillChainDepth = 3
+    
+    // Autonomous Agent
+    @AppStorage("autonomousEnabled") private var autonomousEnabled = false
+    @AppStorage("autonomousApprovalRequired") private var autonomousApprovalRequired = true
+    @AppStorage("maxAutonomousActionsPerDay") private var maxAutonomousActionsPerDay = 10
+    @AppStorage("maxAutonomousTokensPerDay") private var maxAutonomousTokensPerDay = 100000
+    @AppStorage("maxAutonomousApiCallsPerDay") private var maxAutonomousApiCallsPerDay = 500
+    
+    // Global Safety
+    @AppStorage("maxTokensPerOperation") private var maxTokensPerOperation = 50000
+    @AppStorage("maxApiCallsPerOperation") private var maxApiCallsPerOperation = 100
+    @AppStorage("operationTimeoutSeconds") private var operationTimeoutSeconds = 300
+    
+    var body: some View {
+        Form {
+            // Causal Reasoning Section
+            Section {
+                Toggle("Enable Causal Reasoning", isOn: $causalReasoningEnabled)
+                Text("Do-calculus, interventions, and counterfactual simulation")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                if causalReasoningEnabled {
+                    HStack {
+                        Text("Confidence Threshold")
+                        Spacer()
+                        Text(String(format: "%.0f%%", causalConfidenceThreshold * 100))
+                            .foregroundStyle(.secondary)
+                    }
+                    Slider(value: $causalConfidenceThreshold, in: 0.3...0.9, step: 0.05)
+                    
+                    Stepper("Max Chain Depth: \(maxCausalChainDepth)", value: $maxCausalChainDepth, in: 2...10)
+                    
+                    Toggle("Enable Counterfactuals", isOn: $counterfactualEnabled)
+                }
+            } header: {
+                Label("Causal Reasoning", systemImage: "arrow.triangle.branch")
+            }
+            
+            // Memory Consolidation Section
+            Section {
+                Toggle("Enable Memory Consolidation", isOn: $consolidationEnabled)
+                Text("Compression, decay curves, and conflict resolution")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                if consolidationEnabled {
+                    Picker("Schedule", selection: $consolidationSchedule) {
+                        Text("Hourly").tag("hourly")
+                        Text("Daily").tag("daily")
+                        Text("Weekly").tag("weekly")
+                        Text("Manual").tag("manual")
+                    }
+                    
+                    if consolidationSchedule == "daily" {
+                        Stepper("Run at: \(consolidationHour):00 UTC", value: $consolidationHour, in: 0...23)
+                    }
+                    
+                    HStack {
+                        Text("Compression Ratio")
+                        Spacer()
+                        Text(String(format: "%.0f%%", compressionRatio * 100))
+                            .foregroundStyle(.secondary)
+                    }
+                    Slider(value: $compressionRatio, in: 0.5...0.9, step: 0.05)
+                    
+                    HStack {
+                        Text("Importance Decay Rate")
+                        Spacer()
+                        Text(String(format: "%.2f/day", importanceDecayRate))
+                            .foregroundStyle(.secondary)
+                    }
+                    Slider(value: $importanceDecayRate, in: 0.01...0.2, step: 0.01)
+                    
+                    HStack {
+                        Text("Auto-Prune Threshold")
+                        Spacer()
+                        Text(String(format: "%.0f%%", autoPruneThreshold * 100))
+                            .foregroundStyle(.secondary)
+                    }
+                    Slider(value: $autoPruneThreshold, in: 0.05...0.3, step: 0.05)
+                    
+                    Toggle("Auto-Resolve Conflicts", isOn: $autoResolveConflicts)
+                }
+            } header: {
+                Label("Memory Consolidation", systemImage: "externaldrive.badge.timemachine")
+            }
+            
+            // Multimodal Binding Section
+            Section {
+                Toggle("Enable Multimodal Binding", isOn: $multimodalBindingEnabled)
+                Text("Shared embedding space and cross-modal retrieval")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                if multimodalBindingEnabled {
+                    Toggle("Auto-Embed Uploads", isOn: $autoEmbedUploads)
+                    Toggle("Cross-Modal Search", isOn: $crossModalSearchEnabled)
+                    
+                    HStack {
+                        Text("Quality Threshold")
+                        Spacer()
+                        Text(String(format: "%.0f%%", bindingQualityThreshold * 100))
+                            .foregroundStyle(.secondary)
+                    }
+                    Slider(value: $bindingQualityThreshold, in: 0.5...0.9, step: 0.05)
+                }
+            } header: {
+                Label("Multimodal Binding", systemImage: "square.stack.3d.up")
+            }
+            
+            // Skill Execution Section
+            Section {
+                Toggle("Enable Skill Execution", isOn: $skillExecutionEnabled)
+                Text("Procedural memory replay and skill learning")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                if skillExecutionEnabled {
+                    Toggle("Auto-Suggest Skills", isOn: $autoSkillSuggestion)
+                    Toggle("Enable Skill Learning", isOn: $skillLearningEnabled)
+                    Stepper("Max Skill Chain: \(maxSkillChainDepth)", value: $maxSkillChainDepth, in: 1...5)
+                }
+            } header: {
+                Label("Skill Execution", systemImage: "bolt.fill")
+            }
+            
+            // Autonomous Agent Section
+            Section {
+                Toggle("Enable Autonomous Agent", isOn: $autonomousEnabled)
+                HStack {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                    Text("Allows system to perform actions proactively")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                
+                if autonomousEnabled {
+                    Toggle("Require Approval", isOn: $autonomousApprovalRequired)
+                    if !autonomousApprovalRequired {
+                        HStack {
+                            Image(systemName: "exclamationmark.shield.fill")
+                                .foregroundStyle(.red)
+                            Text("Actions will execute without user confirmation")
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                        }
+                    }
+                    
+                    Stepper("Max Actions/Day: \(maxAutonomousActionsPerDay)", value: $maxAutonomousActionsPerDay, in: 1...100)
+                    
+                    HStack {
+                        Text("Max Tokens/Day")
+                        Spacer()
+                        TextField("Tokens", value: $maxAutonomousTokensPerDay, format: .number)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 100)
+                    }
+                    
+                    HStack {
+                        Text("Max API Calls/Day")
+                        Spacer()
+                        TextField("Calls", value: $maxAutonomousApiCallsPerDay, format: .number)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 100)
+                    }
+                }
+            } header: {
+                Label("Autonomous Agent", systemImage: "figure.walk.motion")
+            }
+            
+            // Global Safety Section
+            Section {
+                HStack {
+                    Text("Max Tokens per Operation")
+                    Spacer()
+                    TextField("Tokens", value: $maxTokensPerOperation, format: .number)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 100)
+                }
+                
+                HStack {
+                    Text("Max API Calls per Operation")
+                    Spacer()
+                    TextField("Calls", value: $maxApiCallsPerOperation, format: .number)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 80)
+                }
+                
+                Stepper("Operation Timeout: \(operationTimeoutSeconds)s", value: $operationTimeoutSeconds, in: 30...600, step: 30)
+            } header: {
+                Label("Global Safety Limits", systemImage: "shield.checkered")
+            }
+            
+            Section {
+                HStack {
+                    Image(systemName: "info.circle")
+                        .foregroundStyle(.blue)
+                    Text("Advanced settings are applied on next deployment. Fine-tune individual features in the Admin Dashboard.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .formStyle(.grouped)
+        .padding()
     }
 }
 
@@ -254,7 +658,17 @@ struct SettingsStatusBadge: View {
 struct OnePasswordSetupInstructions: View {
     @EnvironmentObject var appState: AppState
     @State private var isChecking = false
+    @State private var isInstalling = false
     @State private var showSignIn = false
+    @State private var installError: String?
+    
+    private var isInstalled: Bool {
+        appState.onePasswordStatus?.installed ?? false
+    }
+    
+    private var isSignedIn: Bool {
+        appState.onePasswordStatus?.signedIn ?? false
+    }
     
     var body: some View {
         VStack(spacing: 24) {
@@ -264,51 +678,79 @@ struct OnePasswordSetupInstructions: View {
                 .font(.system(size: 48))
                 .foregroundStyle(.blue)
             
-            Text("1Password Setup Required")
+            Text("Secure Credential Storage")
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            Text("RADIANT uses 1Password for compliance-certified credential storage (SOC2, HIPAA)")
+            Text("RADIANT stores your AWS credentials securely using 1Password, ensuring enterprise-grade security for your deployments.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal)
+                .padding(.horizontal, 40)
             
-            VStack(alignment: .leading, spacing: 16) {
-                SetupStep(
-                    number: 1,
-                    title: "Install 1Password CLI",
-                    isComplete: appState.onePasswordStatus?.installed ?? false
+            VStack(spacing: 16) {
+                // Step 1: Install 1Password
+                OnePasswordSetupStep(
+                    stepNumber: 1,
+                    title: "Get 1Password",
+                    description: isInstalled ? "1Password is ready" : "Install 1Password on your Mac",
+                    isComplete: isInstalled,
+                    isLoading: isInstalling
                 ) {
-                    NSWorkspace.shared.open(URL(string: "https://1password.com/downloads/command-line/")!)
+                    if !isInstalled {
+                        install1Password()
+                    }
                 }
                 
-                SetupStep(
-                    number: 2,
-                    title: "Sign in to 1Password",
-                    subtitle: "Enter your 1Password credentials",
-                    isComplete: appState.onePasswordStatus?.signedIn ?? false
+                // Step 2: Sign In
+                OnePasswordSetupStep(
+                    stepNumber: 2,
+                    title: "Connect Your Account",
+                    description: isSignedIn ? "Connected to 1Password" : "Sign in with your 1Password account",
+                    isComplete: isSignedIn,
+                    isLoading: false,
+                    isDisabled: !isInstalled
                 ) {
                     showSignIn = true
                 }
             }
-            .padding()
+            .padding(20)
             .background(Color(.textBackgroundColor).opacity(0.5))
             .cornerRadius(12)
             
-            Button {
-                checkStatus()
-            } label: {
+            if let error = installError {
                 HStack {
-                    if isChecking {
-                        ProgressView()
-                            .controlSize(.small)
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.horizontal)
+            }
+            
+            HStack(spacing: 16) {
+                Button {
+                    checkStatus()
+                } label: {
+                    HStack {
+                        if isChecking {
+                            ProgressView()
+                                .controlSize(.small)
+                        }
+                        Text("Refresh Status")
                     }
-                    Text(isChecking ? "Checking..." : "Check Status")
+                }
+                .buttonStyle(.bordered)
+                .disabled(isChecking || isInstalling)
+                
+                if !isInstalled {
+                    Link(destination: URL(string: "https://1password.com")!) {
+                        Text("Learn More")
+                    }
+                    .buttonStyle(.link)
                 }
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(isChecking)
             
             Spacer()
         }
@@ -316,6 +758,53 @@ struct OnePasswordSetupInstructions: View {
         .sheet(isPresented: $showSignIn) {
             OnePasswordSignInSheet()
                 .environmentObject(appState)
+        }
+    }
+    
+    private func install1Password() {
+        isInstalling = true
+        installError = nil
+        
+        Task {
+            do {
+                // Try Homebrew first (most common on dev machines)
+                let brewPath = "/opt/homebrew/bin/brew"
+                let brewPathIntel = "/usr/local/bin/brew"
+                let actualBrewPath = FileManager.default.fileExists(atPath: brewPath) ? brewPath : brewPathIntel
+                
+                if FileManager.default.fileExists(atPath: actualBrewPath) {
+                    // Install via Homebrew silently
+                    let process = Process()
+                    process.executableURL = URL(fileURLWithPath: actualBrewPath)
+                    process.arguments = ["install", "--cask", "1password-cli"]
+                    process.standardOutput = FileHandle.nullDevice
+                    process.standardError = FileHandle.nullDevice
+                    
+                    try process.run()
+                    process.waitUntilExit()
+                    
+                    if process.terminationStatus == 0 {
+                        await appState.refreshOnePasswordStatus()
+                        await MainActor.run {
+                            isInstalling = false
+                        }
+                        return
+                    }
+                }
+                
+                // Fallback: Open 1Password download page
+                await MainActor.run {
+                    NSWorkspace.shared.open(URL(string: "https://1password.com/downloads/mac/")!)
+                    installError = "Please download and install 1Password, then click Refresh Status"
+                    isInstalling = false
+                }
+            } catch {
+                await MainActor.run {
+                    NSWorkspace.shared.open(URL(string: "https://1password.com/downloads/mac/")!)
+                    installError = "Please download and install 1Password, then click Refresh Status"
+                    isInstalling = false
+                }
+            }
         }
     }
     
@@ -330,15 +819,74 @@ struct OnePasswordSetupInstructions: View {
     }
 }
 
-// MARK: - 1Password Sign In Sheet
+// MARK: - Setup Step Component
+
+struct OnePasswordSetupStep: View {
+    let stepNumber: Int
+    let title: String
+    let description: String
+    let isComplete: Bool
+    var isLoading: Bool = false
+    var isDisabled: Bool = false
+    let action: () -> Void
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // Step indicator
+            ZStack {
+                Circle()
+                    .fill(isComplete ? Color.green : (isDisabled ? Color.secondary.opacity(0.2) : Color.blue))
+                    .frame(width: 32, height: 32)
+                
+                if isComplete {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(.white)
+                } else if isLoading {
+                    ProgressView()
+                        .controlSize(.small)
+                        .tint(.white)
+                } else {
+                    Text("\(stepNumber)")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+            }
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(isDisabled ? .secondary : .primary)
+                
+                Text(description)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            
+            Spacer()
+            
+            if !isComplete && !isLoading {
+                Button(action: action) {
+                    Text(stepNumber == 1 ? "Install" : "Sign In")
+                        .frame(width: 70)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.regular)
+                .disabled(isDisabled)
+            }
+        }
+        .padding(.vertical, 8)
+    }
+}
+
+// MARK: - 1Password Service Account Token Sheet
 
 struct OnePasswordSignInSheet: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var appState: AppState
     
-    @State private var account = ""
-    @State private var password = ""
-    @State private var isSigningIn = false
+    @State private var token = ""
+    @State private var isConfiguring = false
     @State private var error: String?
     
     private let onePasswordService = OnePasswordService()
@@ -347,9 +895,9 @@ struct OnePasswordSignInSheet: View {
         VStack(spacing: 0) {
             // Header
             HStack {
-                Image(systemName: "lock.shield.fill")
+                Image(systemName: "key.fill")
                     .foregroundStyle(.blue)
-                Text("Sign in to 1Password")
+                Text("Add Service Account Token")
                     .font(.headline)
                 Spacer()
                 Button {
@@ -367,18 +915,15 @@ struct OnePasswordSignInSheet: View {
             // Form
             Form {
                 Section {
-                    TextField("Account", text: $account, prompt: Text("my.1password.com or team name"))
-                        .textContentType(.username)
-                    
-                    SecureField("Master Password", text: $password)
-                        .textContentType(.password)
+                    SecureField("Service Account Token", text: $token, prompt: Text("Paste your token here"))
+                        .font(.system(.body, design: .monospaced))
                 }
                 
                 Section {
                     HStack {
                         Image(systemName: "info.circle")
                             .foregroundStyle(.blue)
-                        Text("Your password is stored securely in macOS Keychain and never leaves your device.")
+                        Text("Requires 1Password Teams or Business plan. Token is stored securely in macOS Keychain.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -411,32 +956,32 @@ struct OnePasswordSignInSheet: View {
                 Spacer()
                 
                 Button {
-                    signIn()
+                    configureToken()
                 } label: {
                     HStack {
-                        if isSigningIn {
+                        if isConfiguring {
                             ProgressView()
                                 .controlSize(.small)
                         }
-                        Text(isSigningIn ? "Signing in..." : "Sign In")
+                        Text(isConfiguring ? "Validating..." : "Save Token")
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(account.isEmpty || password.isEmpty || isSigningIn)
+                .disabled(token.isEmpty || isConfiguring)
                 .keyboardShortcut(.defaultAction)
             }
             .padding()
         }
-        .frame(width: 400, height: 350)
+        .frame(width: 400, height: 320)
     }
     
-    private func signIn() {
-        isSigningIn = true
+    private func configureToken() {
+        isConfiguring = true
         error = nil
         
         Task {
             do {
-                try await onePasswordService.signIn(account: account, password: password)
+                try await onePasswordService.configureServiceAccount(token: token)
                 await appState.refreshOnePasswordStatus()
                 
                 await MainActor.run {
@@ -445,7 +990,7 @@ struct OnePasswordSignInSheet: View {
             } catch {
                 await MainActor.run {
                     self.error = error.localizedDescription
-                    isSigningIn = false
+                    isConfiguring = false
                 }
             }
         }

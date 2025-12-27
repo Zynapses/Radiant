@@ -5,7 +5,7 @@ struct RadiantDeployerApp: App {
     @StateObject private var appState = AppState()
     
     var body: some Scene {
-        WindowGroup {
+        WindowGroup("Radiant Deployer") {
             MainView()
                 .environmentObject(appState)
                 .frame(minWidth: 1200, minHeight: 800)
