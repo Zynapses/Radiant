@@ -15,6 +15,71 @@ import {
 } from '@aws-sdk/client-rds-data';
 import { getConfig } from '../config';
 
+// MARK: - Parameter Builders
+
+/**
+ * Create a properly typed SqlParameter with string value
+ */
+export function stringParam(name: string, value: string): SqlParameter {
+  return { name, value: { stringValue: value } };
+}
+
+/**
+ * Create a properly typed SqlParameter with long (integer) value
+ */
+export function longParam(name: string, value: number): SqlParameter {
+  return { name, value: { longValue: value } };
+}
+
+/**
+ * Create a properly typed SqlParameter with double value
+ */
+export function doubleParam(name: string, value: number): SqlParameter {
+  return { name, value: { doubleValue: value } };
+}
+
+/**
+ * Create a properly typed SqlParameter with boolean value
+ */
+export function boolParam(name: string, value: boolean): SqlParameter {
+  return { name, value: { booleanValue: value } };
+}
+
+/**
+ * Create a properly typed SqlParameter with null value
+ */
+export function nullParam(name: string): SqlParameter {
+  return { name, value: { isNull: true } };
+}
+
+/**
+ * Create a properly typed SqlParameter - auto-detect type
+ */
+export function param(name: string, value: unknown): SqlParameter {
+  if (value === null || value === undefined) {
+    return nullParam(name);
+  }
+  if (typeof value === 'string') {
+    return stringParam(name, value);
+  }
+  if (typeof value === 'number') {
+    return Number.isInteger(value) ? longParam(name, value) : doubleParam(name, value);
+  }
+  if (typeof value === 'boolean') {
+    return boolParam(name, value);
+  }
+  // For objects/arrays, serialize to JSON string
+  return stringParam(name, JSON.stringify(value));
+}
+
+/**
+ * Type-safe cast for inline parameter objects
+ * Use this when you need to pass parameters inline without the helper functions
+ */
+export function asParams(params: Array<{ name: string; value: { stringValue?: string; longValue?: number; doubleValue?: number; booleanValue?: boolean; isNull?: boolean } }>): SqlParameter[] {
+  return params as SqlParameter[];
+}
+
 let client: RDSDataClient | null = null;
 
 function getClient(): RDSDataClient {
@@ -36,11 +101,19 @@ export interface TransactionContext {
 }
 
 /**
+ * Loose parameter type for convenience - will be cast to SqlParameter[]
+ */
+export type LooseParam = { 
+  name: string; 
+  value: { stringValue?: string; longValue?: number; doubleValue?: number; booleanValue?: boolean; isNull?: boolean } | unknown 
+};
+
+/**
  * Execute a SQL statement using the Data API
  */
 export async function executeStatement<T = Record<string, unknown>>(
   sql: string,
-  parameters?: SqlParameter[],
+  parameters?: SqlParameter[] | LooseParam[],
   options?: QueryOptions
 ): Promise<{ rows: T[]; rowCount: number }> {
   const config = getConfig();
@@ -51,7 +124,7 @@ export async function executeStatement<T = Record<string, unknown>>(
     secretArn: config.AURORA_SECRET_ARN,
     database: 'radiant',
     sql,
-    parameters,
+    parameters: parameters as SqlParameter[] | undefined,
     includeResultMetadata: true,
     ...(options?.transactionId && { transactionId: options.transactionId }),
     ...(options?.continueAfterTimeout && { continueAfterTimeout: true }),

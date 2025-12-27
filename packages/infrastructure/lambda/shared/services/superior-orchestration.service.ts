@@ -1050,7 +1050,7 @@ IMPROVED_RESPONSE: [the fixed response if needed, or "UNCHANGED"]`;
     const improvedMatch = result.content.match(/IMPROVED_RESPONSE:\s*(.+)/is);
 
     const isValid = isValidMatch ? isValidMatch[1].toLowerCase() === 'true' : false;
-    const improved = improvedMatch && !improvedMatch[1].includes('UNCHANGED');
+    const improved = improvedMatch ? !improvedMatch[1].includes('UNCHANGED') : false;
 
     return {
       improved: isValid && improved,

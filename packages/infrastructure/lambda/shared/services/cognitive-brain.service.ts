@@ -1,7 +1,8 @@
 // RADIANT v4.18.0 - Cognitive Brain Service
 // AGI-like cognitive mesh with specialized brain regions
 
-import { executeStatement } from '../db/client';
+import { executeStatement, type LooseParam } from '../db/client';
+import type { SqlParameter } from '@aws-sdk/client-rds-data';
 import { modelRouterService, ModelResponse } from './model-router.service';
 
 // ============================================================================
@@ -239,7 +240,7 @@ export class CognitiveBrainService {
 
   async updateBrainRegion(tenantId: string, regionId: string, updates: Partial<BrainRegion>): Promise<void> {
     const sets: string[] = [];
-    const params: Array<{ name: string; value: unknown }> = [
+    const params: SqlParameter[] = [
       { name: 'tenantId', value: { stringValue: tenantId } },
       { name: 'regionId', value: { stringValue: regionId } },
     ];

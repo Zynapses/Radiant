@@ -30,7 +30,7 @@ export interface LearningFeedback {
   rating?: number;
   thumbs?: 'up' | 'down';
   feedbackText?: string;
-  responseAction?: 'accepted' | 'edited' | 'rejected' | 'regenerated' | 'copied';
+  responseAction?: 'accepted' | 'edited' | 'rejected' | 'regenerated' | 'copied' | 'shared';
   createdAt: string;
 }
 
@@ -201,7 +201,7 @@ export class LearningService {
       helpfulnessRating?: number;
       clarityRating?: number;
       completenessRating?: number;
-      responseAction?: 'accepted' | 'edited' | 'rejected' | 'regenerated' | 'copied';
+      responseAction?: 'accepted' | 'edited' | 'rejected' | 'regenerated' | 'copied' | 'shared';
       editedResponse?: string;
       feedbackSource?: string;
       timeToFeedbackMs?: number;
