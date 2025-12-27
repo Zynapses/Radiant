@@ -197,6 +197,13 @@ actor OnePasswordService {
         "/usr/bin/op"                 // System install
     ]
     
+    /// Possible paths where AWS CLI might be installed
+    private static let awsCliPaths = [
+        "/opt/homebrew/bin/aws",      // Apple Silicon Homebrew
+        "/usr/local/bin/aws",          // Intel Homebrew / manual install
+        "/usr/bin/aws"                 // System install
+    ]
+    
     /// Find the 1Password CLI binary
     private static func findOpPath() -> String? {
         for path in opPaths {
@@ -205,6 +212,16 @@ actor OnePasswordService {
             }
         }
         return nil
+    }
+    
+    /// Find the AWS CLI binary
+    private static func findAwsCliPath() -> String {
+        for path in awsCliPaths {
+            if FileManager.default.fileExists(atPath: path) {
+                return path
+            }
+        }
+        return "/usr/local/bin/aws"
     }
     
     // MARK: - Initialization
@@ -577,7 +594,7 @@ actor OnePasswordService {
     /// Validate credentials by calling AWS STS
     func validateCredential(_ credential: AWSCredential) async throws -> Bool {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.executableURL = URL(fileURLWithPath: Self.findAwsCliPath())
         process.arguments = ["sts", "get-caller-identity", "--output", "json"]
         
         var environment = ProcessInfo.processInfo.environment

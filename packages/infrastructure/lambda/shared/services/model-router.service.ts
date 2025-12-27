@@ -4,6 +4,7 @@
 
 import { BedrockRuntimeClient, InvokeModelCommand, InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
 import { executeStatement } from '../db/client';
+import { checkProviderRateLimit, getProviderRateLimitStatus, PROVIDER_RATE_LIMITS } from '../middleware/rate-limiter';
 
 // ============================================================================
 // Types
@@ -420,6 +421,17 @@ export class ModelRouterService {
   }
 
   private async invokeProvider(config: ModelConfig, request: ModelRequest): Promise<ModelResponse> {
+    // Check provider rate limit before invoking
+    const rateLimitCheck = checkProviderRateLimit(config.provider);
+    if (!rateLimitCheck.allowed) {
+      throw new Error(
+        `Provider ${config.provider} rate limited. ` +
+        `Limit: ${rateLimitCheck.limit}/min, ` +
+        `Reset in: ${Math.ceil(rateLimitCheck.resetInMs / 1000)}s. ` +
+        `Consider using a different provider or waiting.`
+      );
+    }
+
     switch (config.provider) {
       case 'bedrock':
         return this.invokeBedrock(config, request);
@@ -435,6 +447,20 @@ export class ModelRouterService {
       default:
         throw new Error(`Unknown provider: ${config.provider}`);
     }
+  }
+
+  /**
+   * Get current rate limit status for all providers
+   */
+  getRateLimitStatus(): Record<string, { limit: number; used: number; remaining: number; resetInMs: number }> {
+    return getProviderRateLimitStatus();
+  }
+
+  /**
+   * Get configured rate limits for all providers
+   */
+  getProviderLimits(): Record<string, { rpm: number; tpm?: number; dailyLimit?: number }> {
+    return PROVIDER_RATE_LIMITS;
   }
 
   // ============================================================================
