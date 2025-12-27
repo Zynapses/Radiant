@@ -173,5 +173,69 @@ CREATE TRIGGER trg_mode_rankings_updated
     BEFORE UPDATE ON mode_rankings
     FOR EACH ROW EXECUTE FUNCTION update_ranking_timestamp();
 
+-- Mode model rankings (for orchestration modes like thinking, extended_thinking, research, etc.)
+CREATE TABLE IF NOT EXISTS mode_model_rankings (
+    ranking_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    mode TEXT NOT NULL,
+    model_id TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    
+    score DECIMAL(5,2) NOT NULL DEFAULT 0,
+    tier TEXT CHECK (tier IN ('S', 'A', 'B', 'C', 'D', 'F')) DEFAULT 'C',
+    
+    strengths JSONB DEFAULT '[]'::jsonb,
+    weaknesses JSONB DEFAULT '[]'::jsonb,
+    recommended_for JSONB DEFAULT '[]'::jsonb,
+    not_recommended_for JSONB DEFAULT '[]'::jsonb,
+    
+    confidence DECIMAL(3,2) DEFAULT 0.5,
+    admin_override DECIMAL(5,2),
+    is_locked BOOLEAN DEFAULT false,
+    
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    CONSTRAINT uq_mode_model UNIQUE (mode, model_id)
+);
+
+-- Research schedules for automatic ranking updates
+CREATE TABLE IF NOT EXISTS ranking_research_schedules (
+    schedule_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    description TEXT,
+    
+    frequency TEXT CHECK (frequency IN ('hourly', 'daily', 'weekly', 'monthly', 'manual')) DEFAULT 'daily',
+    cron_expression TEXT,
+    enabled BOOLEAN DEFAULT true,
+    
+    target_scope TEXT CHECK (target_scope IN ('all', 'specialty', 'mode', 'model')) DEFAULT 'all',
+    target_filter TEXT,
+    
+    last_run TIMESTAMPTZ,
+    last_run_status TEXT,
+    next_run TIMESTAMPTZ,
+    
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for mode rankings
+CREATE INDEX IF NOT EXISTS idx_mode_model_rankings_mode ON mode_model_rankings(mode);
+CREATE INDEX IF NOT EXISTS idx_mode_model_rankings_model ON mode_model_rankings(model_id);
+CREATE INDEX IF NOT EXISTS idx_mode_model_rankings_score ON mode_model_rankings(mode, score DESC);
+
+-- Trigger for mode rankings timestamp
+CREATE TRIGGER trg_mode_model_rankings_updated
+    BEFORE UPDATE ON mode_model_rankings
+    FOR EACH ROW EXECUTE FUNCTION update_ranking_timestamp();
+
+-- Insert default research schedule
+INSERT INTO ranking_research_schedules (name, description, frequency, target_scope, enabled)
+VALUES 
+    ('Daily Full Refresh', 'Research all specialties and modes daily', 'daily', 'all', true),
+    ('Weekly Deep Research', 'Comprehensive benchmark and community research', 'weekly', 'all', true)
+ON CONFLICT DO NOTHING;
+
 -- Seed initial specialty categories (for reference)
 COMMENT ON TABLE specialty_rankings IS 'Model proficiency rankings across specialties: reasoning, coding, math, creative, analysis, research, legal, medical, finance, science, debugging, architecture, security, vision, audio, conversation, instruction, speed, accuracy, safety';
+COMMENT ON TABLE mode_model_rankings IS 'Model rankings for orchestration modes: thinking, extended_thinking, research, creative, analytical, coding, conversational, fast, precise, balanced';
