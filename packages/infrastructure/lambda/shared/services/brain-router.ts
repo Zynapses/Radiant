@@ -1,6 +1,17 @@
 import { executeStatement } from '../db/client';
+import { specialtyRankingService, type SpecialtyCategory } from './specialty-ranking.service';
 
 export type TaskType = 'chat' | 'code' | 'analysis' | 'creative' | 'vision' | 'audio';
+
+// Map task types to specialty categories
+const TASK_TO_SPECIALTY: Record<TaskType, SpecialtyCategory> = {
+  chat: 'conversation',
+  code: 'coding',
+  analysis: 'analysis',
+  creative: 'creative',
+  vision: 'vision',
+  audio: 'audio',
+};
 
 interface RoutingContext {
   tenantId: string;
@@ -197,7 +208,7 @@ export class BrainRouter {
 
     const costScore = this.scoreCost(model, context);
     const latencyScore = this.scoreLatency(perf, context);
-    const qualityScore = this.scoreQuality(model, context);
+    const qualityScore = await this.scoreQuality(model, context);
     const reliabilityScore = perf.successRate;
 
     const estimatedCost = this.estimateCost(model, context.inputTokenEstimate);
@@ -211,9 +222,9 @@ export class BrainRouter {
       estimatedCost,
       estimatedLatency,
       total:
-        costScore * 0.25 +
-        latencyScore * 0.25 +
-        qualityScore * 0.35 +
+        costScore * 0.20 +
+        latencyScore * 0.20 +
+        qualityScore * 0.45 +  // Increased weight for specialty ranking
         reliabilityScore * 0.15,
     };
   }
@@ -231,7 +242,21 @@ export class BrainRouter {
     return 1 - perf.avgLatencyMs / context.maxLatencyMs;
   }
 
-  private scoreQuality(model: CandidateModel, context: RoutingContext): number {
+  private async scoreQuality(model: CandidateModel, context: RoutingContext): Promise<number> {
+    // First try to get specialty ranking from database
+    const specialty = TASK_TO_SPECIALTY[context.taskType];
+    if (specialty) {
+      try {
+        const rankings = await specialtyRankingService.getModelRankings(model.model_id);
+        const ranking = rankings.find(r => r.specialty === specialty);
+        if (ranking) {
+          return ranking.proficiencyScore / 100; // Convert 0-100 to 0-1
+        }
+      } catch {
+        // Fall through to hardcoded scores
+      }
+    }
+    // Fallback to hardcoded scores
     const taskScores = TASK_QUALITY_SCORES[context.taskType] || {};
     return taskScores[model.model_id] ?? 0.7;
   }
