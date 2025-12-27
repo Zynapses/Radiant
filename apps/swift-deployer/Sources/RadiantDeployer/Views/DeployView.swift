@@ -432,6 +432,24 @@ struct DeployView: View {
             
             switch deploymentMode {
             case .install:
+                // Upload required provider API keys to Secrets Manager
+                await logMessage(.info, "Uploading required provider API keys to AWS Secrets Manager...")
+                try await AWSService.shared.uploadRequiredProviderSecrets(
+                    region: credentials.region,
+                    credentials: credentials,
+                    onProgress: { message in
+                        Task { @MainActor in
+                            self.appState.deploymentLogs.append(LogEntry(
+                                timestamp: Date(),
+                                level: .info,
+                                message: message,
+                                metadata: ["source": "Secrets"]
+                            ))
+                        }
+                    }
+                )
+                await logMessage(.success, "Provider API keys uploaded to Secrets Manager")
+                
                 // Download the latest package
                 await logMessage(.info, "Downloading deployment package v\(RADIANT_VERSION)...")
                 
@@ -924,39 +942,7 @@ struct ProviderKeyInputSheet: View {
     }
 }
 
-// Simple Keychain Service for local secret storage
-class KeychainService {
-    func setSecret(_ value: String, for key: String) {
-        let data = value.data(using: .utf8)!
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key,
-            kSecValueData as String: data
-        ]
-        
-        SecItemDelete(query as CFDictionary)
-        SecItemAdd(query as CFDictionary, nil)
-    }
-    
-    func getSecret(for key: String) -> String? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key,
-            kSecReturnData as String: true
-        ]
-        
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-        
-        guard status == errSecSuccess,
-              let data = result as? Data,
-              let value = String(data: data, encoding: .utf8) else {
-            return nil
-        }
-        
-        return value
-    }
-}
+// KeychainService is now defined in AWSService.swift
 
 #Preview {
     DeployView()

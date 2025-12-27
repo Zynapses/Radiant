@@ -6,6 +6,30 @@ RADIANT implements comprehensive compliance frameworks to meet enterprise securi
 
 ---
 
+## Required Provider API Keys
+
+RADIANT requires the following external AI provider API keys for deployment:
+
+| Provider | Secret Path | Purpose | Get Key |
+|----------|-------------|---------|---------|
+| **Anthropic (Claude)** | `radiant/providers/anthropic` | Primary AI provider for Claude models | https://console.anthropic.com/settings/keys |
+| **Groq** | `radiant/providers/groq` | Fast LPU inference for fallback | https://console.groq.com/keys |
+
+### Deployment Flow
+
+1. **Configure Keys in Deployer** - Enter API keys in the Swift Deployer "Required Provider API Keys" section
+2. **Local Storage** - Keys are stored securely in macOS Keychain
+3. **AWS Upload** - During deployment, keys are uploaded to AWS Secrets Manager
+4. **Lambda Access** - Lambda functions retrieve keys from Secrets Manager at runtime
+
+### Why These Providers Are Required
+
+- **Anthropic (Claude)**: Primary provider for Claude 3.5 Sonnet, Claude Opus 4, and other Claude models via AWS Bedrock. Direct API access provides extended thinking and latest model features.
+
+- **Groq**: Ultra-fast inference (100-200ms) on Llama and Mixtral models. Used as fallback when Bedrock is unavailable and for speed-critical applications.
+
+---
+
 ## SOC 2 Type II Compliance
 
 ### Trust Service Criteria

@@ -1,4 +1,40 @@
 import Foundation
+import Security
+
+// KeychainService is defined in DeployView.swift
+// This forward declaration allows AWSService to use it
+class KeychainService {
+    func setSecret(_ value: String, for key: String) {
+        let data = value.data(using: .utf8)!
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key,
+            kSecValueData as String: data
+        ]
+        
+        SecItemDelete(query as CFDictionary)
+        SecItemAdd(query as CFDictionary, nil)
+    }
+    
+    func getSecret(for key: String) -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key,
+            kSecReturnData as String: true
+        ]
+        
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        
+        guard status == errSecSuccess,
+              let data = result as? Data,
+              let value = String(data: data, encoding: .utf8) else {
+            return nil
+        }
+        
+        return value
+    }
+}
 
 actor AWSService {
     enum AWSError: Error, LocalizedError {
@@ -961,6 +997,178 @@ extension AWSService {
             return .success(())
         } catch {
             return .failure(AWSError.networkError(error.localizedDescription))
+        }
+    }
+    
+    // MARK: - Secrets Manager Operations
+    
+    /// Create or update a secret in AWS Secrets Manager
+    func createOrUpdateSecret(
+        secretName: String,
+        secretValue: String,
+        region: String,
+        credentials: CredentialSet
+    ) async throws {
+        // First try to update existing secret
+        let updateProcess = Process()
+        updateProcess.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        updateProcess.arguments = [
+            "secretsmanager", "put-secret-value",
+            "--secret-id", secretName,
+            "--secret-string", secretValue,
+            "--region", region
+        ]
+        
+        var environment = ProcessInfo.processInfo.environment
+        environment["AWS_ACCESS_KEY_ID"] = credentials.accessKeyId
+        environment["AWS_SECRET_ACCESS_KEY"] = credentials.secretAccessKey
+        environment["AWS_DEFAULT_REGION"] = region
+        updateProcess.environment = environment
+        
+        let updateErrorPipe = Pipe()
+        updateProcess.standardOutput = FileHandle.nullDevice
+        updateProcess.standardError = updateErrorPipe
+        
+        try updateProcess.run()
+        updateProcess.waitUntilExit()
+        
+        if updateProcess.terminationStatus == 0 {
+            RadiantLogger.info("Updated secret: \(secretName)", category: RadiantLogger.aws)
+            return
+        }
+        
+        // Secret doesn't exist, create it
+        let createProcess = Process()
+        createProcess.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        createProcess.arguments = [
+            "secretsmanager", "create-secret",
+            "--name", secretName,
+            "--secret-string", secretValue,
+            "--region", region
+        ]
+        createProcess.environment = environment
+        
+        let createErrorPipe = Pipe()
+        createProcess.standardOutput = FileHandle.nullDevice
+        createProcess.standardError = createErrorPipe
+        
+        try createProcess.run()
+        createProcess.waitUntilExit()
+        
+        if createProcess.terminationStatus != 0 {
+            let errorData = createErrorPipe.fileHandleForReading.readDataToEndOfFile()
+            let errorMessage = String(data: errorData, encoding: .utf8) ?? "Unknown error"
+            throw AWSError.apiError("Failed to create secret \(secretName): \(errorMessage)")
+        }
+        
+        RadiantLogger.info("Created secret: \(secretName)", category: RadiantLogger.aws)
+    }
+    
+    /// Get a secret value from AWS Secrets Manager
+    func getSecretValue(
+        secretName: String,
+        region: String,
+        credentials: CredentialSet
+    ) async -> String? {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.arguments = [
+            "secretsmanager", "get-secret-value",
+            "--secret-id", secretName,
+            "--region", region,
+            "--output", "json"
+        ]
+        
+        var environment = ProcessInfo.processInfo.environment
+        environment["AWS_ACCESS_KEY_ID"] = credentials.accessKeyId
+        environment["AWS_SECRET_ACCESS_KEY"] = credentials.secretAccessKey
+        environment["AWS_DEFAULT_REGION"] = region
+        process.environment = environment
+        
+        let outputPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = FileHandle.nullDevice
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
+            
+            if process.terminationStatus == 0 {
+                let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+                
+                if let json = try? JSONSerialization.jsonObject(with: outputData) as? [String: Any],
+                   let secretString = json["SecretString"] as? String {
+                    return secretString
+                }
+            }
+        } catch {
+            RadiantLogger.warning("Failed to get secret \(secretName): \(error.localizedDescription)", category: RadiantLogger.aws)
+        }
+        
+        return nil
+    }
+    
+    /// Check if a secret exists in AWS Secrets Manager
+    func secretExists(
+        secretName: String,
+        region: String,
+        credentials: CredentialSet
+    ) async -> Bool {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/aws")
+        process.arguments = [
+            "secretsmanager", "describe-secret",
+            "--secret-id", secretName,
+            "--region", region
+        ]
+        
+        var environment = ProcessInfo.processInfo.environment
+        environment["AWS_ACCESS_KEY_ID"] = credentials.accessKeyId
+        environment["AWS_SECRET_ACCESS_KEY"] = credentials.secretAccessKey
+        environment["AWS_DEFAULT_REGION"] = region
+        process.environment = environment
+        
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
+            return process.terminationStatus == 0
+        } catch {
+            return false
+        }
+    }
+    
+    /// Upload all required provider API keys to Secrets Manager
+    func uploadRequiredProviderSecrets(
+        region: String,
+        credentials: CredentialSet,
+        onProgress: @escaping (String) -> Void
+    ) async throws {
+        let keychain = KeychainService()
+        
+        // Required providers and their secret paths
+        let requiredProviders: [(name: String, secretPath: String)] = [
+            ("Anthropic (Claude)", "radiant/providers/anthropic"),
+            ("Groq", "radiant/providers/groq")
+        ]
+        
+        for provider in requiredProviders {
+            onProgress("Uploading \(provider.name) API key to Secrets Manager...")
+            
+            guard let apiKey = keychain.getSecret(for: provider.secretPath) else {
+                throw AWSError.apiError("Missing required API key for \(provider.name). Please configure it in the deployment settings.")
+            }
+            
+            try await createOrUpdateSecret(
+                secretName: provider.secretPath,
+                secretValue: apiKey,
+                region: region,
+                credentials: credentials
+            )
+            
+            onProgress("✓ \(provider.name) API key uploaded")
         }
     }
 }
