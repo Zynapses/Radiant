@@ -1,7 +1,34 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Brain, RefreshCw, Trophy, TrendingUp, Lock, Search, Settings, Clock, Zap, Sliders } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Brain, RefreshCw, Trophy, TrendingUp, Lock, Search, Settings, Clock, Zap, Sliders, AlertCircle } from 'lucide-react';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
+
+interface RankingData {
+  modelId: string;
+  provider: string;
+  score: number;
+  tier: string;
+  trend: string;
+  isLocked?: boolean;
+  adminOverride?: number;
+}
+
+interface ScoringWeights {
+  benchmarkWeight: number;
+  communityWeight: number;
+  internalWeight: number;
+}
+
+interface ResearchSchedule {
+  scheduleId: string;
+  name: string;
+  frequency: 'hourly' | 'daily' | 'weekly' | 'monthly';
+  enabled: boolean;
+  lastRun?: string;
+  nextRun?: string;
+}
 
 // Orchestration Modes
 const ORCHESTRATION_MODES = {
@@ -40,8 +67,8 @@ const SPECIALTY_CATEGORIES = {
   safety: { name: 'Safety & Alignment', icon: '🛡️', color: 'emerald' },
 };
 
-// Mock ranking data
-const MOCK_RANKINGS = [
+// Default ranking data (fallback when API unavailable)
+const DEFAULT_RANKINGS: RankingData[] = [
   { modelId: 'anthropic/claude-3-5-sonnet-20241022', provider: 'anthropic', score: 95, tier: 'S', trend: 'stable' },
   { modelId: 'openai/o1', provider: 'openai', score: 94, tier: 'S', trend: 'improving' },
   { modelId: 'openai/gpt-4o', provider: 'openai', score: 91, tier: 'A', trend: 'stable' },
@@ -60,7 +87,10 @@ export default function SpecialtyRankingsPage() {
   const [selectedTab, setSelectedTab] = useState<'specialties' | 'modes' | 'weights' | 'schedule'>('specialties');
   const [selectedSpecialty, setSelectedSpecialty] = useState<SpecialtyKey>('reasoning');
   const [selectedMode, setSelectedMode] = useState<ModeKey>('thinking');
-  const [rankings, setRankings] = useState(MOCK_RANKINGS);
+  const [rankings, setRankings] = useState<RankingData[]>(DEFAULT_RANKINGS);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<string>('Never');
   const [isResearching, setIsResearching] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingModel, setEditingModel] = useState<string | null>(null);
@@ -95,21 +125,101 @@ export default function SpecialtyRankingsPage() {
     }
   };
 
+  // Fetch rankings for selected specialty
+  const fetchRankings = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_BASE}/admin/specialty-rankings/specialty/${selectedSpecialty}`);
+      if (!res.ok) throw new Error('Failed to fetch rankings');
+      const data = await res.json();
+      setRankings(data.rankings || DEFAULT_RANKINGS);
+      setLastUpdated(new Date().toLocaleTimeString());
+    } catch (err) {
+      console.error('Fetch rankings error:', err);
+      setRankings(DEFAULT_RANKINGS);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedSpecialty]);
+
+  // Fetch weights
+  const fetchWeights = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/admin/specialty-rankings/weights`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setBenchmarkWeight(Math.round(data.benchmarkWeight * 100));
+      setCommunityWeight(Math.round(data.communityWeight * 100));
+      setInternalWeight(Math.round(data.internalWeight * 100));
+    } catch (err) {
+      console.error('Fetch weights error:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRankings();
+    fetchWeights();
+  }, [fetchRankings, fetchWeights]);
+
   const handleResearch = async () => {
     setIsResearching(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    setIsResearching(false);
+    setError(null);
+    try {
+      const res = await fetch(`${API_BASE}/admin/specialty-rankings/research`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scope: 'specialty', target: selectedSpecialty }),
+      });
+      if (!res.ok) throw new Error('Research failed');
+      await fetchRankings();
+    } catch (err) {
+      setError('Research failed. Please try again.');
+      console.error('Research error:', err);
+    } finally {
+      setIsResearching(false);
+    }
   };
 
-  const handleOverride = (modelId: string) => {
-    setRankings(prev => prev.map(r => 
-      r.modelId === modelId ? { ...r, score: overrideScore } : r
-    ).sort((a, b) => b.score - a.score));
+  const handleOverride = async (modelId: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/admin/specialty-rankings/override`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ modelId, specialty: selectedSpecialty, score: overrideScore }),
+      });
+      if (!res.ok) throw new Error('Override failed');
+      setRankings((prev: RankingData[]) => prev.map((r: RankingData) => 
+        r.modelId === modelId ? { ...r, score: overrideScore, isLocked: true } : r
+      ).sort((a: RankingData, b: RankingData) => b.score - a.score));
+    } catch (err) {
+      setError('Override failed. Please try again.');
+      console.error('Override error:', err);
+    }
     setEditingModel(null);
   };
 
-  const filteredRankings = rankings.filter(r => 
+  const handleSaveWeights = async () => {
+    try {
+      const total = benchmarkWeight + communityWeight + internalWeight;
+      const res = await fetch(`${API_BASE}/admin/specialty-rankings/weights`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          benchmarkWeight: benchmarkWeight / total,
+          communityWeight: communityWeight / total,
+          internalWeight: internalWeight / total,
+        }),
+      });
+      if (!res.ok) throw new Error('Save failed');
+      setError(null);
+    } catch (err) {
+      setError('Failed to save weights.');
+      console.error('Save weights error:', err);
+    }
+  };
+
+  const filteredRankings = rankings.filter((r: RankingData) => 
     r.modelId.toLowerCase().includes(searchTerm.toLowerCase()) ||
     r.provider.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -178,11 +288,11 @@ export default function SpecialtyRankingsPage() {
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
               <p className="text-xs text-gray-500">S-Tier Models</p>
-          <p className="text-2xl font-bold text-yellow-600">{rankings.filter(r => r.tier === 'S').length}</p>
+              <p className="text-2xl font-bold text-yellow-600">{rankings.filter((r: RankingData) => r.tier === 'S').length}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Last Updated</p>
-          <p className="text-sm font-medium text-gray-600">2 hours ago</p>
+          <p className="text-sm font-medium text-gray-600">{lastUpdated}</p>
         </div>
       </div>
 
@@ -247,7 +357,7 @@ export default function SpecialtyRankingsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {filteredRankings.map((ranking, index) => (
+                  {filteredRankings.map((ranking: RankingData, index: number) => (
                     <tr key={ranking.modelId} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                       <td className="px-4 py-3">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
@@ -391,7 +501,7 @@ export default function SpecialtyRankingsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                    {rankings.slice(0, 5).map((r, i) => (
+                    {rankings.slice(0, 5).map((r: RankingData, i: number) => (
                       <tr key={r.modelId}>
                         <td className="px-4 py-3 font-bold">{i + 1}</td>
                         <td className="px-4 py-3">{r.modelId.split('/')[1]}</td>
@@ -445,7 +555,7 @@ export default function SpecialtyRankingsPage() {
               </div>
             </div>
             <div className="mt-6 pt-6 border-t">
-              <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Save Weights</button>
+              <button onClick={handleSaveWeights} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Save Weights</button>
             </div>
           </div>
         </div>
