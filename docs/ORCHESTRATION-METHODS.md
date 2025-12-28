@@ -1059,6 +1059,197 @@ Shows:
 
 ---
 
+## AGI Brain + Workflow Integration
+
+The AGI Brain Planner can **select and configure workflows** to solve problems. Users can either let the AGI choose the optimal workflow or specify their preferences.
+
+### User Choices for Workflows
+
+```typescript
+interface GeneratePlanRequest {
+  prompt: string;
+  tenantId: string;
+  userId: string;
+  
+  // ... other options ...
+  
+  // Workflow Selection - User choices
+  preferredWorkflow?: string;           // User-selected workflow code
+  workflowParameterOverrides?: Record<string, unknown>;  // User parameter tweaks
+  allowAgiWorkflowSelection?: boolean;  // Let AGI pick workflow (default: true)
+  excludeWorkflows?: string[];          // Workflows to exclude from selection
+}
+```
+
+### How AGI Selects Workflows
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PROMPT: "Write a comprehensive analysis of renewable energy trends"        │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 1: Check User Preference                                               │
+│                                                                              │
+│  Did user specify preferredWorkflow?                                         │
+│  ├─ YES → Use that workflow with user's parameter overrides                 │
+│  └─ NO  → Continue to AGI selection                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 2: AGI Workflow Selection                                              │
+│                                                                              │
+│  orchestrationPatternsService.selectPattern({                                │
+│    prompt: "Write a comprehensive analysis...",                              │
+│    taskType: "research",                                                     │
+│    complexity: "complex",                                                    │
+│    qualityPriority: 0.9,                                                     │
+│    costSensitive: false,                                                     │
+│    excludePatterns: user.excludeWorkflows                                    │
+│  })                                                                          │
+│                                                                              │
+│  Scores 49 available workflows against problem characteristics               │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 3: Selected Workflow                                                   │
+│                                                                              │
+│  selectedWorkflow: {                                                         │
+│    workflowCode: 'RESEARCH_SYNTHESIS_MULTI',                                │
+│    workflowName: 'Multi-Model Research Synthesis',                          │
+│    selectionReason: 'Matches research task, high quality priority',         │
+│    selectionConfidence: 0.89,                                                │
+│    selectionMethod: 'auto'                                                   │
+│  }                                                                           │
+│                                                                              │
+│  alternatives: [                                                             │
+│    { workflowCode: 'CHAIN_OF_THOUGHT', matchScore: 0.82 },                  │
+│    { workflowCode: 'SELF_CONSISTENCY', matchScore: 0.78 }                   │
+│  ]                                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 4: Workflow Steps with Parameters                                      │
+│                                                                              │
+│  workflowSteps: [                                                            │
+│    {                                                                         │
+│      methodCode: 'DECOMPOSE_PROBLEM',                                        │
+│      parameterOverrides: { max_subproblems: 5 }                              │
+│    },                                                                        │
+│    {                                                                         │
+│      methodCode: 'GENERATE_RESPONSE',                                        │
+│      isParallel: true,                                                       │
+│      parallelConfig: {                                                       │
+│        models: ['claude-3-5-sonnet', 'gpt-4o', 'gemini-pro'],               │
+│        outputMode: 'all'  // 3 streams to next step                         │
+│      }                                                                       │
+│    },                                                                        │
+│    {                                                                         │
+│      methodCode: 'SYNTHESIZE_RESPONSES',                                     │
+│      parameterOverrides: { combination_strategy: 'best_parts' }              │
+│    }                                                                         │
+│  ]                                                                           │
+│                                                                              │
+│  workflowConfig: {                                                           │
+│    ...defaultConfig,                                                         │
+│    ...userParameterOverrides  // User's tweaks merged in                     │
+│  }                                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Example: User Specifies Workflow + Parameters
+
+```typescript
+// User explicitly chooses a workflow and tweaks parameters
+const plan = await agiBrainPlannerService.generatePlan({
+  prompt: "Debug this React component that crashes on mount",
+  tenantId: "tenant-123",
+  userId: "user-456",
+  
+  // User choices
+  preferredWorkflow: 'SELF_REFINE_LOOP',  // User picks this workflow
+  workflowParameterOverrides: {
+    max_iterations: 5,                     // More refinement rounds
+    temperature: 0.2,                      // More precise
+    refinement_focus: 'accuracy'
+  }
+});
+
+// Result includes:
+// - selectedWorkflow.selectionMethod = 'user'
+// - workflowConfig merged with user overrides
+// - workflowSteps configured with user parameters
+```
+
+### Example: AGI Auto-Selects Workflow
+
+```typescript
+// Let AGI choose the best workflow
+const plan = await agiBrainPlannerService.generatePlan({
+  prompt: "Compare the economic policies of three countries",
+  tenantId: "tenant-123",
+  userId: "user-456",
+  
+  allowAgiWorkflowSelection: true,  // default
+  excludeWorkflows: ['FAST_SIMPLE']  // User says: not this one
+});
+
+// AGI analyzes prompt and selects:
+// - selectedWorkflow.workflowCode = 'MULTI_AGENT_DEBATE'
+// - selectedWorkflow.selectionMethod = 'domain_match'
+// - selectedWorkflow.selectionReason = 'Comparison task benefits from debate'
+// - alternatives = [other matching workflows]
+```
+
+### Plan Output with Workflow
+
+```typescript
+interface AGIBrainPlan {
+  // ... existing fields ...
+  
+  // Workflow Integration
+  selectedWorkflow?: {
+    workflowId: string;
+    workflowCode: string;
+    workflowName: string;
+    description: string;
+    category: string;
+    selectionReason: string;
+    selectionConfidence: number;
+    selectionMethod: 'auto' | 'user' | 'domain_match';
+  };
+  
+  workflowSteps?: Array<{
+    bindingId: string;
+    stepOrder: number;
+    methodCode: string;
+    methodName: string;
+    parameterOverrides: Record<string, unknown>;
+    dependsOn: string[];
+    isParallel: boolean;
+    parallelConfig?: {
+      models: string[];
+      outputMode: 'single' | 'all' | 'top_n' | 'threshold';
+    };
+  }>;
+  
+  workflowConfig?: Record<string, unknown>;
+  
+  alternativeWorkflows?: Array<{
+    workflowCode: string;
+    workflowName: string;
+    matchScore: number;
+    reason: string;
+  }>;
+}
+```
+
+---
+
 ## Specialty Categories (Domain Expertise)
 
 > **Full Documentation**: See [SPECIALTY-RANKING.md](./SPECIALTY-RANKING.md) for complete details on the specialty ranking system, AI-powered research, admin controls, and database schema.
