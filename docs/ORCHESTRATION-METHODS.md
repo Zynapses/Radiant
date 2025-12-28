@@ -541,13 +541,295 @@ Each step produces:
 }
 ```
 
-For parallel execution:
+For parallel execution with `outputMode: 'single'` (default):
 ```json
 {
-  "synthesizedResponse": "string",
-  "parallelResults": [
-    { "modelId": "...", "response": "...", "confidence": 0.9 },
-    { "modelId": "...", "response": "...", "confidence": 0.8 }
-  ]
+  "response": "synthesized response string",
+  "streamCount": 1,
+  "outputMode": "single",
+  "synthesisApplied": true,
+  "modelsUsed": ["openai/o1", "claude-3-5-sonnet", "deepseek-reasoner"]
 }
 ```
+
+For parallel execution with `outputMode: 'all'`:
+```json
+{
+  "responses": [
+    { "modelId": "openai/o1", "modelName": "o1", "response": "...", "confidence": 0.92, "latencyMs": 2100, "mode": "thinking" },
+    { "modelId": "claude-3-5-sonnet", "modelName": "Claude 3.5 Sonnet", "response": "...", "confidence": 0.88, "latencyMs": 1800 },
+    { "modelId": "deepseek-reasoner", "modelName": "DeepSeek Reasoner", "response": "...", "confidence": 0.85, "latencyMs": 2400 }
+  ],
+  "streamCount": 3,
+  "outputMode": "all",
+  "synthesisApplied": false,
+  "modelsUsed": ["openai/o1", "claude-3-5-sonnet", "deepseek-reasoner"]
+}
+```
+
+---
+
+## Multi-Model Parallel Execution
+
+### Overview
+
+Any method can utilize **N models** simultaneously via the `parallelExecution` configuration. This enables:
+- **Consensus building** - Multiple perspectives on the same problem
+- **Quality improvement** - Best-of-N selection
+- **Robustness** - Fallback if one model fails
+- **Diverse outputs** - Different approaches to creative tasks
+
+### Parallel Execution Configuration
+
+```typescript
+interface ParallelExecutionConfig {
+  // Core settings
+  enabled: boolean;
+  mode: 'all' | 'race' | 'quorum';
+  models: string[];
+  
+  // Synthesis
+  synthesizeResults?: boolean;
+  synthesisStrategy?: 'best_of' | 'merge' | 'vote' | 'weighted';
+  weightByConfidence?: boolean;
+  
+  // AGI Dynamic Model Selection
+  agiModelSelection?: boolean;
+  minModels?: number;       // Default: 2
+  maxModels?: number;       // Default: 5
+  domainHints?: string[];
+  
+  // Failure handling
+  timeoutMs?: number;
+  quorumThreshold?: number; // For quorum mode: 0.5 = majority
+  failureStrategy?: 'fail_fast' | 'continue' | 'fallback';
+  
+  // OUTPUT STREAM CONFIGURATION
+  outputMode?: 'single' | 'all' | 'top_n' | 'threshold';
+  outputTopN?: number;           // For top_n mode (default: 2)
+  outputThreshold?: number;      // For threshold mode (default: 0.7)
+  preserveModelAttribution?: boolean;
+}
+```
+
+### Execution Modes
+
+| Mode | Behavior | Use Case |
+|------|----------|----------|
+| `all` | Wait for all models to complete | Quality-critical tasks |
+| `race` | Return first successful response | Latency-critical tasks |
+| `quorum` | Wait for majority (threshold configurable) | Balanced approach |
+
+### Synthesis Strategies
+
+| Strategy | Description |
+|----------|-------------|
+| `best_of` | Select highest confidence response |
+| `merge` | Combine all responses into one |
+| `vote` | Majority answer wins |
+| `weighted` | Weight by confidence scores |
+
+---
+
+## Output Stream Modes (Detailed)
+
+### Why Output Modes Matter
+
+When a method uses 3 models, the question is: **how many streams should flow to the next step?**
+
+- **Single stream** (default): Synthesize into one response for simple pipelines
+- **All streams**: Pass all model outputs for the next step to compare/judge
+- **Top N streams**: Only the best N by confidence
+- **Threshold streams**: Only those above a quality bar
+
+### Mode Reference
+
+#### `single` (Default)
+```
+3 Models ──▶ Synthesize ──▶ 1 Stream ──▶ {{response}}
+```
+- **Use when**: Next step expects a single input
+- **Output variable**: `{{response}}`
+- **Example**: GENERATE → CRITIQUE (critic evaluates one response)
+
+#### `all`
+```
+3 Models ──▶ 3 Streams ──▶ {{responses}}[3]
+```
+- **Use when**: Next step needs to compare/synthesize multiple perspectives
+- **Output variable**: `{{responses}}` array
+- **Example**: 3x GENERATE → JUDGE_RESPONSES → pick best
+
+#### `top_n`
+```
+3 Models ──▶ Sort by confidence ──▶ Top 2 ──▶ {{responses}}[2]
+```
+- **Use when**: You want diversity but filtered by quality
+- **Config**: `outputTopN: 2`
+- **Output variable**: `{{responses}}` array
+
+#### `threshold`
+```
+3 Models ──▶ Filter ≥80% ──▶ 0-3 Streams ──▶ {{responses}}[0-3]
+```
+- **Use when**: Only high-quality responses should proceed
+- **Config**: `outputThreshold: 0.8`
+- **Output variable**: `{{responses}}` array (may be empty!)
+
+### Configuration Examples
+
+**Example 1: Multi-model critique with all perspectives**
+```typescript
+{
+  stepName: 'Multi-Perspective Critique',
+  method: 'CRITIQUE_RESPONSE',
+  parallelExecution: {
+    enabled: true,
+    mode: 'all',
+    models: ['openai/o1', 'claude-3-5-sonnet', 'deepseek-reasoner'],
+    outputMode: 'all',                    // Pass all 3 critiques
+    preserveModelAttribution: true        // Know which model said what
+  }
+}
+// Next step receives {{responses}} with 3 critique objects
+```
+
+**Example 2: Best-of-3 generation**
+```typescript
+{
+  stepName: 'Generate with Best Selection',
+  method: 'GENERATE_RESPONSE',
+  parallelExecution: {
+    enabled: true,
+    mode: 'all',
+    models: ['claude-3-5-sonnet', 'gpt-4o', 'gemini-pro'],
+    outputMode: 'top_n',
+    outputTopN: 1,                        // Only best response
+    synthesizeResults: false              // Don't merge, just pick
+  }
+}
+// Next step receives {{response}} (single best)
+```
+
+**Example 3: Quality-filtered ensemble**
+```typescript
+{
+  stepName: 'High-Confidence Ensemble',
+  method: 'GENERATE_WITH_COT',
+  parallelExecution: {
+    enabled: true,
+    agiModelSelection: true,              // AGI picks models
+    minModels: 3,
+    maxModels: 5,
+    outputMode: 'threshold',
+    outputThreshold: 0.85,                // Only ≥85% confidence
+    preserveModelAttribution: true
+  }
+}
+// Next step receives {{responses}} with only high-confidence outputs
+```
+
+### Stream Flow Diagrams
+
+**Single Mode (Default)**
+```
+┌────────────┐  ┌────────────┐  ┌────────────┐
+│   o1       │  │   Claude   │  │  DeepSeek  │
+└─────┬──────┘  └─────┬──────┘  └─────┬──────┘
+      │               │               │
+      └───────────────┼───────────────┘
+                      ▼
+              ┌──────────────┐
+              │  Synthesize  │
+              └──────┬───────┘
+                     │
+                     ▼
+            {{response}} = "..."
+                     │
+                     ▼
+           ┌─────────────────┐
+           │    Next Step    │
+           │ (single input)  │
+           └─────────────────┘
+```
+
+**All Mode**
+```
+┌────────────┐  ┌────────────┐  ┌────────────┐
+│   o1       │  │   Claude   │  │  DeepSeek  │
+│ conf: 0.92 │  │ conf: 0.88 │  │ conf: 0.85 │
+└─────┬──────┘  └─────┬──────┘  └─────┬──────┘
+      │               │               │
+      ▼               ▼               ▼
+{{responses}} = [
+  { modelId: 'o1', response: '...', confidence: 0.92 },
+  { modelId: 'claude', response: '...', confidence: 0.88 },
+  { modelId: 'deepseek', response: '...', confidence: 0.85 }
+]
+                      │
+                      ▼
+           ┌─────────────────┐
+           │    Next Step    │
+           │ (3 inputs)      │
+           │ JUDGE_RESPONSES │
+           └─────────────────┘
+```
+
+**Top N Mode (N=2)**
+```
+┌────────────┐  ┌────────────┐  ┌────────────┐
+│   o1       │  │   Claude   │  │  DeepSeek  │
+│ conf: 0.92 │  │ conf: 0.88 │  │ conf: 0.85 │
+└─────┬──────┘  └─────┬──────┘  └─────┬──────┘
+      │               │               │
+      ▼               ▼               ✗ (filtered out)
+{{responses}} = [
+  { modelId: 'o1', response: '...', confidence: 0.92 },
+  { modelId: 'claude', response: '...', confidence: 0.88 }
+]
+                      │
+                      ▼
+           ┌─────────────────┐
+           │    Next Step    │
+           │ (2 inputs)      │
+           └─────────────────┘
+```
+
+---
+
+## Model Modes
+
+Each model can run in a specialized mode for optimal performance:
+
+| Mode | Description | Best For |
+|------|-------------|----------|
+| `standard` | Default execution | General tasks |
+| `thinking` | Extended reasoning (o1, Claude thinking) | Complex logic |
+| `deep_research` | In-depth research mode | Research tasks |
+| `fast` | Speed-optimized (flash models) | Simple queries |
+| `creative` | Higher temperature | Creative writing |
+| `precise` | Low temperature, factual | Data extraction |
+| `code` | Code-specialized | Programming |
+| `vision` | Multimodal with vision | Image analysis |
+| `long_context` | Extended context handling | Long documents |
+
+### AGI Model Selection with Modes
+
+When `agiModelSelection: true`, the system:
+1. Analyzes the prompt/domain
+2. Scores available models
+3. Assigns optimal modes to each
+4. Selects 2-5 models automatically
+
+```typescript
+// AGI selection result
+{
+  selectedModels: [
+    { modelId: 'openai/o1', mode: 'thinking' },
+    { modelId: 'claude-3-5-sonnet', mode: 'standard' },
+    { modelId: 'deepseek-reasoner', mode: 'deep_research' }
+  ],
+  reasoning: 'Selected 3 models with reasoning modes for complex analysis task',
+  domainDetected: 'science',
+  executionStrategy: 'parallel'
+}
