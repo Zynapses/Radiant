@@ -3,6 +3,7 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, UpdateCommand, QueryCommand, PutCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { enhancedLogger as logger } from '../../shared/logging/enhanced-logger';
 
 const ddbClient = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(ddbClient);
@@ -94,7 +95,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
     const body = JSON.parse(event.body || '{}');
     const { type, sessionId, payload, requestId } = body;
 
-    console.log('WebSocket message:', { connectionId, type, sessionId });
+    logger.debug('WebSocket message', { connectionId, type, sessionId });
 
     switch (type) {
       case 'join_session':
@@ -134,11 +135,11 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
         return { statusCode: 200, body: 'pong' };
       
       default:
-        console.warn('Unknown message type:', type);
+        logger.warn('Unknown message type', { type });
         return { statusCode: 400, body: 'Unknown message type' };
     }
   } catch (error) {
-    console.error('Message handler error:', error);
+    logger.error('Message handler error', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Internal server error' }),
@@ -379,7 +380,7 @@ async function updateLastPing(connectionId: string, sessionId: string) {
       },
     }));
   } catch (error) {
-    console.error('Failed to update last ping:', error);
+    logger.error('Failed to update last ping', error);
   }
 }
 
@@ -416,7 +417,7 @@ async function sendToConnection(apiClient: ApiGatewayManagementApiClient, connec
   } catch (error: unknown) {
     const err = error as { statusCode?: number };
     if (err.statusCode === 410) {
-      console.log('Stale connection:', connectionId);
+      logger.debug('Stale connection', { connectionId });
     } else {
       throw error;
     }

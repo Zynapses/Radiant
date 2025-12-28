@@ -21,6 +21,15 @@ export interface AutoResolveResult {
   estimatedCost: number;
   taskType: TaskType;
   tokenEstimate: number;
+  // Domain detection results
+  domainDetection?: {
+    fieldId?: string;
+    fieldName?: string;
+    domainId?: string;
+    domainName?: string;
+    detectionConfidence: number;
+  };
+  proficiencyMatch?: number;
 }
 
 interface PromptAnalysis {
@@ -55,12 +64,15 @@ export class AutoResolveService {
       preferredProvider: request.preferences?.preferredProvider,
       requiresVision: analysis.requiresVision,
       requiresAudio: analysis.requiresAudio,
+      // Enable domain-aware routing
+      prompt: request.prompt,
+      useDomainProficiencies: true,
     });
 
     await executeStatement(
       `INSERT INTO auto_resolve_requests 
-       (tenant_id, user_id, request_type, selected_model, selection_reason, user_preferences, input_tokens)
-       VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7)`,
+       (tenant_id, user_id, request_type, selected_model, selection_reason, user_preferences, input_tokens, detected_domain_id, domain_match_score, domain_detection_confidence)
+       VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9, $10)`,
       [
         { name: 'tenantId', value: { stringValue: request.tenantId } },
         { name: 'userId', value: { stringValue: request.userId } },
@@ -69,6 +81,9 @@ export class AutoResolveService {
         { name: 'reason', value: { stringValue: routing.reason } },
         { name: 'preferences', value: { stringValue: JSON.stringify(request.preferences || {}) } },
         { name: 'inputTokens', value: { longValue: analysis.tokenEstimate } },
+        { name: 'domainId', value: routing.domainDetection?.domainId ? { stringValue: routing.domainDetection.domainId } : { isNull: true } },
+        { name: 'domainMatchScore', value: routing.proficiencyMatch !== undefined ? { doubleValue: routing.proficiencyMatch } : { isNull: true } },
+        { name: 'domainConfidence', value: routing.domainDetection?.detectionConfidence !== undefined ? { doubleValue: routing.domainDetection.detectionConfidence } : { isNull: true } },
       ]
     );
 
@@ -79,6 +94,8 @@ export class AutoResolveService {
       estimatedCost: routing.estimatedCost,
       taskType: analysis.taskType,
       tokenEstimate: analysis.tokenEstimate,
+      domainDetection: routing.domainDetection,
+      proficiencyMatch: routing.proficiencyMatch,
     };
   }
 

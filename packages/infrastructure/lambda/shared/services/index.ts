@@ -60,6 +60,14 @@ export { RadiantUnifiedService, radiantUnifiedService } from './radiant-unified.
 export { FeedbackService, feedbackService } from './feedback.service';
 export { SuperiorOrchestrationService, superiorOrchestrationService } from './superior-orchestration.service';
 export { OrchestrationPatternsService, orchestrationPatternsService } from './orchestration-patterns.service';
+export { AGILearningPersistenceService, agiLearningPersistenceService } from './agi-learning-persistence.service';
+export { AWSCostMonitoringService, awsCostMonitoringService } from './aws-cost-monitoring.service';
+export { BackgroundLearningService, backgroundLearningService } from './background-learning.service';
+export { InternetLearningService, internetLearningService } from './internet-learning.service';
+export { EthicalGuardrailsService, ethicalGuardrailsService, JESUS_TEACHINGS } from './ethical-guardrails.service';
+export { DelightService, delightService } from './delight.service';
+export { DelightOrchestrationService, delightOrchestrationService } from './delight-orchestration.service';
+export { DelightEventsService, delightEventsService, createDelightEventStream, emitDelightForPlanExecution } from './delight-events.service';
 
 // Additional services
 export * from './api-keys';
@@ -74,3 +82,9 @@ export * from './secrets';
 export * from './system-config';
 export * from './tracing';
 export { SpecialtyRankingService, specialtyRankingService, SPECIALTY_CATEGORIES, type SpecialtyCategory, type SpecialtyRanking } from './specialty-ranking.service';
+export { DomainTaxonomyService, domainTaxonomyService } from './domain-taxonomy.service';
+export { AGIOrchestrationSettingsService, agiOrchestrationSettingsService } from './agi-orchestration-settings.service';
+export { AGIBrainPlannerService, agiBrainPlannerService } from './agi-brain-planner.service';
+export { ArtifactPipelineService, artifactPipeline } from './artifact-pipeline.service';
+export { AGIResponsePipelineService, agiResponsePipeline } from './agi-response-pipeline.service';
+export * from '../types/agi-response.types';

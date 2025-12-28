@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { neuralOrchestrationService } from '../shared/services';
+import { neuralOrchestrationService, domainTaxonomyService } from '../shared/services';
 import { extractAuthContext } from '../shared/auth';
 import { success, handleError } from '../shared/response';
 import { ValidationError } from '../shared/errors';
@@ -139,6 +139,91 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
       await neuralOrchestrationService.recordWorkflowUsage(body.workflowId, body.qualityScore);
       return success({ recorded: true });
+    }
+
+    // POST /orchestration/domain-aware-select - Domain-aware orchestration selection
+    if (method === 'POST' && path.endsWith('/domain-aware-select')) {
+      const body = JSON.parse(event.body || '{}');
+      
+      if (!body.query) {
+        throw new ValidationError('query is required');
+      }
+
+      // Step 1: Detect domain from prompt
+      const domainResult = await domainTaxonomyService.detectDomain(body.query, {
+        include_subspecialties: true,
+        min_confidence: body.minDomainConfidence || 0.3,
+        manual_override: body.domainOverride,
+      });
+
+      // Step 2: Get matching models based on domain proficiencies
+      const matchingModels = await domainTaxonomyService.getMatchingModels(
+        domainResult.merged_proficiencies,
+        {
+          max_models: body.maxModels || 5,
+          min_match_score: body.minMatchScore || 50,
+          include_self_hosted: body.includeSelfHosted ?? true,
+        }
+      );
+
+      // Step 3: Find matching patterns/workflows
+      const [patterns, workflows] = await Promise.all([
+        neuralOrchestrationService.findMatchingPatterns(body.query, 3, 0.5),
+        neuralOrchestrationService.findMatchingWorkflows(body.query, 3, 0.5),
+      ]);
+
+      // Step 4: Determine recommended mode based on proficiencies
+      const proficiencies = domainResult.merged_proficiencies;
+      let recommendedMode = 'thinking';
+      if (proficiencies.reasoning_depth >= 9 && proficiencies.multi_step_problem_solving >= 9) {
+        recommendedMode = 'extended_thinking';
+      } else if (proficiencies.creative_generative >= 8) {
+        recommendedMode = 'creative';
+      } else if (proficiencies.code_generation >= 8) {
+        recommendedMode = 'coding';
+      } else if (proficiencies.research_synthesis >= 8) {
+        recommendedMode = 'research';
+      }
+
+      const primaryModel = matchingModels.find(m => m.recommended) || matchingModels[0];
+
+      return success({
+        domain_detection: {
+          primary_field: domainResult.primary_field ? {
+            id: domainResult.primary_field.field_id,
+            name: domainResult.primary_field.field_name,
+            icon: domainResult.primary_field.field_icon,
+          } : null,
+          primary_domain: domainResult.primary_domain ? {
+            id: domainResult.primary_domain.domain_id,
+            name: domainResult.primary_domain.domain_name,
+            icon: domainResult.primary_domain.domain_icon,
+          } : null,
+          primary_subspecialty: domainResult.primary_subspecialty ? {
+            id: domainResult.primary_subspecialty.subspecialty_id,
+            name: domainResult.primary_subspecialty.subspecialty_name,
+          } : null,
+          confidence: domainResult.detection_confidence,
+          method: domainResult.detection_method,
+        },
+        proficiencies: domainResult.merged_proficiencies,
+        model_selection: {
+          primary_model: primaryModel?.model_id || 'anthropic/claude-3-5-sonnet-20241022',
+          match_score: primaryModel?.match_score || 70,
+          strengths: primaryModel?.strengths || [],
+          weaknesses: primaryModel?.weaknesses || [],
+          alternatives: matchingModels.slice(1, 4).map(m => ({
+            model_id: m.model_id,
+            match_score: m.match_score,
+          })),
+        },
+        orchestration: {
+          recommended_mode: recommendedMode,
+          patterns: patterns.slice(0, 2),
+          workflows: workflows.slice(0, 2),
+        },
+        processing_time_ms: domainResult.processing_time_ms,
+      });
     }
 
     throw new ValidationError(`Unknown route: ${method} ${path}`);

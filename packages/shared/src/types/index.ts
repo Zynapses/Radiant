@@ -7,3 +7,5 @@ export * from './compliance.types';
 export * from './thinktank.types';
 export * from './experiments.types';
 export * from './security.types';
+export * from './domain-taxonomy.types';
+export * from './delight.types';

@@ -3,6 +3,7 @@
 
 import { executeStatement } from '../db/client';
 import { learningService } from './learning.service';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // ============================================================================
 // Types
@@ -162,7 +163,7 @@ export class FeedbackService {
           feedbackSource: feedback.feedbackSource,
         });
       } catch (err) {
-        console.error('Failed to record feedback in learning system:', err);
+        logger.error('Failed to record feedback in learning system', err);
       }
     }
 
@@ -174,7 +175,7 @@ export class FeedbackService {
           didCopyResponse: feedback.userAction === 'copied',
         });
       } catch (err) {
-        console.error('Failed to record implicit signals:', err);
+        logger.error('Failed to record implicit signals', err);
       }
     }
 
@@ -232,7 +233,7 @@ export class FeedbackService {
         }
       );
     } catch (err) {
-      console.error('Failed to record Think Tank learning:', err);
+      logger.error('Failed to record Think Tank learning', err);
     }
 
     return feedbackId;

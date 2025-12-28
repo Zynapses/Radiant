@@ -1,6 +1,7 @@
 import { APIGatewayProxyWebsocketHandlerV2, APIGatewayProxyWebsocketEventV2 } from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
+import { enhancedLogger as logger } from '../../shared/logging/enhanced-logger';
 
 const ddbClient = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(ddbClient);
@@ -17,7 +18,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
   const connectionId = event.requestContext.connectionId;
   const queryParams = connectEvent.queryStringParameters || {};
   
-  console.log('WebSocket connect:', { connectionId, queryParams });
+  logger.info('WebSocket connect', { connectionId, queryParams });
 
   try {
     // Store connection with TTL (24 hours)
@@ -41,7 +42,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
       body: JSON.stringify({ message: 'Connected' }),
     };
   } catch (error) {
-    console.error('Connect error:', error);
+    logger.error('WebSocket connect error', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Failed to connect' }),

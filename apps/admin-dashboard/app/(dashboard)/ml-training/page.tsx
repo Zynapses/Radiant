@@ -79,26 +79,42 @@ const currentModels = [
   { id: 'amazon/nova-pro', provider: 'amazon', name: 'Nova Pro', version: '2024-12-03', reasoning: 0.86, coding: 0.82, vision: true, price: '$0.80/$3.20' },
 ];
 
-const mockTrainingStats = {
-  totalSamples: 24567,
-  unusedSamples: 8234,
-  positiveRatio: 0.78,
-  lastTrainingDate: '2024-12-20',
-  activeModelVersion: 3,
-  modelAccuracy: 0.84,
-};
+interface TrainingStats { totalSamples: number; unusedSamples: number; positiveRatio: number; lastTrainingDate: string; activeModelVersion: number; modelAccuracy: number; }
+interface TrainingBatch { id: string; name: string; status: string; samples: number; accuracy: number; date: string; }
 
-const mockTrainingBatches = [
-  { id: '1', name: 'routing-v3', status: 'completed', samples: 12000, accuracy: 0.84, date: '2024-12-20' },
-  { id: '2', name: 'routing-v2', status: 'completed', samples: 8500, accuracy: 0.79, date: '2024-12-10' },
-  { id: '3', name: 'routing-v1', status: 'completed', samples: 4000, accuracy: 0.72, date: '2024-11-28' },
-];
+const defaultTrainingStats: TrainingStats = { totalSamples: 0, unusedSamples: 0, positiveRatio: 0, lastTrainingDate: '', activeModelVersion: 0, modelAccuracy: 0 };
 
 export default function MLTrainingPage() {
   const [selectedTab, setSelectedTab] = useState<'overview' | 'models' | 'training' | 'data' | 'settings' | 'metrics'>('overview');
   const [providerFilter, setProviderFilter] = useState<string>('all');
   const [config, setConfig] = useState(defaultTrainingConfig);
   const [hasConfigChanges, setHasConfigChanges] = useState(false);
+  const [mockTrainingStats, setMockTrainingStats] = useState<TrainingStats>(defaultTrainingStats);
+  const [mockTrainingBatches, setMockTrainingBatches] = useState<TrainingBatch[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      setError(null);
+      try {
+        const API = process.env.NEXT_PUBLIC_API_URL || '';
+        const [statsRes, batchesRes] = await Promise.all([
+          fetch(`${API}/admin/ml-training/stats`),
+          fetch(`${API}/admin/ml-training/batches`),
+        ]);
+        if (statsRes.ok) { const { data } = await statsRes.json(); setMockTrainingStats(data || defaultTrainingStats); }
+        else setError('Failed to load training data.');
+        if (batchesRes.ok) { const { data } = await batchesRes.json(); setMockTrainingBatches(data || []); }
+      } catch { setError('Failed to connect to training service.'); }
+      setLoading(false);
+    }
+    loadData();
+  }, []);
+
+  if (loading) return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" /></div>;
+  if (error) return <div className="flex flex-col items-center justify-center h-96 text-red-500"><p className="text-lg font-medium">Error</p><p className="text-sm">{error}</p></div>;
 
   const filteredModels = currentModels.filter(m => 
     providerFilter === 'all' || m.provider === providerFilter

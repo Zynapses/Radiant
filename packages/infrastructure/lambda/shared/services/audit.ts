@@ -6,6 +6,7 @@
 
 import { DynamoDBClient, PutItemCommand, QueryCommand, QueryCommandInput, AttributeValue } from '@aws-sdk/client-dynamodb';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { logger } from '../logger';
 
 const dynamodb = new DynamoDBClient({});
 const s3 = new S3Client({});
@@ -161,7 +162,7 @@ export async function queryAuditLogs(
   const { startDate, endDate, action, resource, userId, limit = 100 } = options || {};
 
   let filterExpression = '';
-  const expressionAttributeValues: Record<string, any> = {
+  const expressionAttributeValues: Record<string, AttributeValue> = {
     ':pk': { S: `TENANT#${tenantId}` },
   };
 
@@ -316,7 +317,7 @@ export function withAuditFlush<TEvent, TResult>(
       return await handler(event);
     } finally {
       await ensureAuditLogsFlushed().catch(err => {
-        console.error('Failed to flush audit logs:', err);
+        logger.error('Failed to flush audit logs', err instanceof Error ? err : new Error(String(err)));
       });
     }
   };
@@ -326,7 +327,7 @@ function generateId(): string {
   return 'aud_' + crypto.randomUUID().replace(/-/g, '');
 }
 
-function itemToAuditEntry(item: Record<string, any>): AuditEntry {
+function itemToAuditEntry(item: Record<string, AttributeValue>): AuditEntry {
   return {
     id: item.id?.S || '',
     tenantId: item.tenant_id?.S || '',

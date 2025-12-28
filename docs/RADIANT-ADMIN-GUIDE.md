@@ -27,6 +27,7 @@
 17. [Database Migrations](#17-database-migrations)
 18. [API Management](#18-api-management)
 19. [Troubleshooting](#19-troubleshooting)
+20. [Delight System Administration](#20-delight-system-administration)
 
 ---
 
@@ -1073,6 +1074,104 @@ Configure outgoing webhooks:
 | Lambda | /aws/lambda/radiant-* |
 | Admin Dashboard | /aws/cloudfront/admin |
 | Database | /aws/rds/cluster/radiant |
+
+---
+
+## 20. Delight System Administration
+
+The Delight System provides personality, achievements, and engagement features for Think Tank users.
+
+### 20.1 Accessing Delight Admin
+
+Navigate to **Think Tank → Delight** in the admin sidebar.
+
+### 20.2 Dashboard Overview
+
+The Delight dashboard shows:
+
+| Metric | Description |
+|--------|-------------|
+| **Messages Shown** | Total delight messages displayed |
+| **Achievements Unlocked** | Total achievements earned by users |
+| **Easter Eggs Found** | Hidden features discovered |
+| **Active Users** | Users with Delight enabled |
+
+### 20.3 Managing Categories
+
+Toggle entire categories on/off:
+
+| Category | Purpose |
+|----------|---------|
+| Domain Loading | Messages while loading domain expertise |
+| Domain Transition | Messages when switching topics |
+| Time Awareness | Time-of-day contextual messages |
+| Model Dynamics | Messages about AI consensus/disagreement |
+| Complexity Signals | Feedback on query complexity |
+| Synthesis Quality | Post-response quality indicators |
+| Achievements | Milestone celebrations |
+| Wellbeing | Break/health reminders |
+| Easter Eggs | Hidden features |
+| Sounds | Audio feedback |
+
+### 20.4 Managing Messages
+
+- **Create**: Add new delight messages with targeting options
+- **Edit**: Modify text, triggers, and display settings
+- **Delete**: Remove messages (soft delete)
+- **Toggle**: Enable/disable individual messages
+
+#### Message Targeting Options
+
+| Option | Values |
+|--------|--------|
+| Injection Point | pre_execution, during_execution, post_execution |
+| Trigger Type | domain_loading, time_aware, model_dynamics, etc. |
+| Domain Families | science, humanities, creative, technical, etc. |
+| Time Contexts | morning, afternoon, evening, night, weekend |
+| Display Style | subtle, moderate, expressive |
+
+### 20.5 Statistics Dashboard
+
+Access detailed usage statistics at **Delight → View Statistics**:
+
+- **Weekly Trends**: 12-week activity history
+- **Top Messages**: Most-shown messages with engagement data
+- **Achievement Stats**: Unlock rates, time-to-unlock averages
+- **Easter Egg Stats**: Discovery rates by egg
+- **User Engagement**: Leaderboard by achievement points
+
+### 20.6 Managing Achievements
+
+Configure achievement unlock criteria:
+
+| Setting | Description |
+|---------|-------------|
+| Threshold | Number required to unlock |
+| Rarity | common, uncommon, rare, epic, legendary |
+| Points | Score value for leaderboards |
+| Hidden | Only visible after unlock |
+
+### 20.7 Managing Easter Eggs
+
+Configure hidden features:
+
+| Setting | Description |
+|---------|-------------|
+| Trigger Type | key_sequence, text_input, time_based, random |
+| Trigger Value | The activation pattern |
+| Effect Type | mode_change, visual_transform, sound_play |
+| Duration | How long the effect lasts |
+
+### 20.8 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/delight/dashboard` | GET | Dashboard data |
+| `/api/admin/delight/statistics` | GET | Detailed statistics |
+| `/api/admin/delight/categories/:id` | PATCH | Toggle category |
+| `/api/admin/delight/messages` | POST | Create message |
+| `/api/admin/delight/messages/:id` | PUT/DELETE | Update/delete |
+| `/api/admin/delight/user-engagement` | GET | User leaderboard |
 
 ---
 

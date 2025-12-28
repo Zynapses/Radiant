@@ -333,8 +333,138 @@ Return JSON:
   }
 
   private async executeWebSearch(query: string): Promise<{ results: string[] }> {
-    // Placeholder - would integrate with actual search API
-    return { results: [`Search results for: ${query}`, 'Result 1', 'Result 2'] };
+    // Integrate with configured search provider
+    const searchProvider = process.env.SEARCH_PROVIDER || 'perplexity';
+    
+    try {
+      switch (searchProvider) {
+        case 'perplexity':
+          return await this.searchWithPerplexity(query);
+        case 'serper':
+          return await this.searchWithSerper(query);
+        case 'tavily':
+          return await this.searchWithTavily(query);
+        default:
+          // Fallback: Use AI model to synthesize search-like results
+          return await this.searchWithAI(query);
+      }
+    } catch (error) {
+      // Graceful degradation: return AI-synthesized results on failure
+      return await this.searchWithAI(query);
+    }
+  }
+
+  private async searchWithPerplexity(query: string): Promise<{ results: string[] }> {
+    const apiKey = process.env.PERPLEXITY_API_KEY;
+    if (!apiKey) {
+      throw new Error('PERPLEXITY_API_KEY not configured');
+    }
+
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-sonar-small-128k-online',
+        messages: [{ role: 'user', content: query }],
+        max_tokens: 1000,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Perplexity API error: ${response.status}`);
+    }
+
+    const data = await response.json() as { choices: Array<{ message: { content: string } }> };
+    const content = data.choices?.[0]?.message?.content || '';
+    
+    // Parse response into discrete results
+    return { results: this.parseSearchResults(content) };
+  }
+
+  private async searchWithSerper(query: string): Promise<{ results: string[] }> {
+    const apiKey = process.env.SERPER_API_KEY;
+    if (!apiKey) {
+      throw new Error('SERPER_API_KEY not configured');
+    }
+
+    const response = await fetch('https://google.serper.dev/search', {
+      method: 'POST',
+      headers: {
+        'X-API-KEY': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ q: query, num: 5 }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Serper API error: ${response.status}`);
+    }
+
+    const data = await response.json() as { 
+      organic: Array<{ title: string; snippet: string; link: string }> 
+    };
+    
+    return {
+      results: data.organic?.map(r => `${r.title}: ${r.snippet} (${r.link})`) || [],
+    };
+  }
+
+  private async searchWithTavily(query: string): Promise<{ results: string[] }> {
+    const apiKey = process.env.TAVILY_API_KEY;
+    if (!apiKey) {
+      throw new Error('TAVILY_API_KEY not configured');
+    }
+
+    const response = await fetch('https://api.tavily.com/search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        api_key: apiKey,
+        query,
+        search_depth: 'basic',
+        max_results: 5,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Tavily API error: ${response.status}`);
+    }
+
+    const data = await response.json() as { 
+      results: Array<{ title: string; content: string; url: string }> 
+    };
+    
+    return {
+      results: data.results?.map(r => `${r.title}: ${r.content} (${r.url})`) || [],
+    };
+  }
+
+  private async searchWithAI(query: string): Promise<{ results: string[] }> {
+    // Use AI model to synthesize search-like results based on training knowledge
+    const response = await modelRouterService.invoke({
+      modelId: 'anthropic/claude-3-5-sonnet',
+      messages: [{
+        role: 'user',
+        content: `Based on your knowledge, provide 3-5 informative results for this query. Format each result on a new line with a title and brief description:
+
+Query: ${query}`,
+      }],
+      maxTokens: 500,
+      temperature: 0.3,
+    });
+
+    return { results: this.parseSearchResults(response.content) };
+  }
+
+  private parseSearchResults(content: string): string[] {
+    // Split content into discrete results
+    const lines = content.split('\n').filter(line => line.trim().length > 10);
+    return lines.slice(0, 5); // Limit to 5 results
   }
 
   private async executeDatabaseQuery(tenantId: string, query: string): Promise<{ answer: string }> {

@@ -113,18 +113,30 @@ export default function MetacognitionPage() {
     loadData();
   }, []);
 
+  const [error, setError] = useState<string | null>(null);
+
   async function loadData() {
     setLoading(true);
+    setError(null);
     try {
-      setAssessments(mockAssessments);
-      setErrors(mockErrors);
-      setBoundaries(mockBoundaries);
-      setReflections(mockReflections);
-      setPlans(mockPlans);
-      setStats(mockStats);
-    } finally {
-      setLoading(false);
-    }
+      const API = process.env.NEXT_PUBLIC_API_URL || '';
+      const [assessmentsRes, errorsRes, boundariesRes, reflectionsRes, plansRes, statsRes] = await Promise.all([
+        fetch(`${API}/admin/metacognition/assessments`),
+        fetch(`${API}/admin/metacognition/errors`),
+        fetch(`${API}/admin/metacognition/boundaries`),
+        fetch(`${API}/admin/metacognition/reflections`),
+        fetch(`${API}/admin/metacognition/plans`),
+        fetch(`${API}/admin/metacognition/stats`),
+      ]);
+      if (assessmentsRes.ok) { const { data } = await assessmentsRes.json(); setAssessments(data || []); }
+      else setError('Failed to load metacognition data.');
+      if (errorsRes.ok) { const { data } = await errorsRes.json(); setErrors(data || []); }
+      if (boundariesRes.ok) { const { data } = await boundariesRes.json(); setBoundaries(data || []); }
+      if (reflectionsRes.ok) { const { data } = await reflectionsRes.json(); setReflections(data || []); }
+      if (plansRes.ok) { const { data } = await plansRes.json(); setPlans(data || []); }
+      if (statsRes.ok) { const { data } = await statsRes.json(); setStats(data); }
+    } catch { setError('Failed to connect to metacognition service.'); }
+    setLoading(false);
   }
 
   if (loading) {
@@ -650,46 +662,3 @@ function ImprovementRow({ plan }: { plan: ImprovementPlan }) {
   );
 }
 
-// Mock data
-const mockAssessments: ConfidenceAssessment[] = [
-  { assessmentId: 'a1', subjectType: 'response', subjectContent: 'Implemented the authentication flow with JWT tokens and refresh mechanism...', overallConfidence: 0.88, confidenceFactors: { knowledge: 0.92, reasoning: 0.85, evidence: 0.90, consistency: 0.88, specificity: 0.85 }, knownUnknowns: [], potentialErrors: [], assumptions: ['User has HTTPS enabled'], createdAt: new Date(Date.now() - 3600000).toISOString() },
-  { assessmentId: 'a2', subjectType: 'plan', subjectContent: 'Database migration strategy for moving from PostgreSQL to CockroachDB...', overallConfidence: 0.65, confidenceFactors: { knowledge: 0.70, reasoning: 0.75, evidence: 0.50, consistency: 0.65, specificity: 0.60 }, knownUnknowns: ['Specific CockroachDB version compatibility'], potentialErrors: ['Migration timing estimates'], assumptions: ['Zero downtime requirement can be relaxed'], createdAt: new Date(Date.now() - 7200000).toISOString() },
-  { assessmentId: 'a3', subjectType: 'fact', subjectContent: 'The recommended approach for handling concurrent writes in distributed systems...', overallConfidence: 0.42, confidenceFactors: { knowledge: 0.40, reasoning: 0.50, evidence: 0.35, consistency: 0.45, specificity: 0.40 }, knownUnknowns: ['Latest consensus algorithm research', 'Specific workload characteristics'], potentialErrors: ['Oversimplification of CAP theorem implications'], assumptions: [], createdAt: new Date(Date.now() - 10800000).toISOString() },
-];
-
-const mockErrors: DetectedError[] = [
-  { errorId: 'e1', errorType: 'factual', severity: 'minor', sourceType: 'response', errorDescription: 'Stated that Python 3.9 introduced match statements, but they were actually introduced in Python 3.10', correctionProposed: 'Update to correctly state Python 3.10 introduced match statements', resolutionStatus: 'corrected', createdAt: new Date(Date.now() - 86400000).toISOString() },
-  { errorId: 'e2', errorType: 'logical', severity: 'major', sourceType: 'plan', errorDescription: 'Proposed using synchronous API calls in an async context without proper handling', correctionProposed: 'Wrap synchronous calls in asyncio.to_thread() or use async alternatives', resolutionStatus: 'detected', createdAt: new Date(Date.now() - 43200000).toISOString() },
-  { errorId: 'e3', errorType: 'incomplete', severity: 'minor', sourceType: 'response', errorDescription: 'Omitted error handling for network timeout scenarios in the proposed solution', correctionProposed: 'Add try-catch with specific timeout exception handling', resolutionStatus: 'corrected', createdAt: new Date(Date.now() - 172800000).toISOString() },
-];
-
-const mockBoundaries: KnowledgeBoundary[] = [
-  { boundaryId: 'b1', domain: 'Programming', topic: 'TypeScript', knowledgeLevel: 'expert', confidenceInAssessment: 0.95 },
-  { boundaryId: 'b2', domain: 'Programming', topic: 'Rust', knowledgeLevel: 'proficient', confidenceInAssessment: 0.85 },
-  { boundaryId: 'b3', domain: 'Infrastructure', topic: 'Kubernetes', knowledgeLevel: 'familiar', confidenceInAssessment: 0.80 },
-  { boundaryId: 'b4', domain: 'Machine Learning', topic: 'Reinforcement Learning', knowledgeLevel: 'limited', confidenceInAssessment: 0.70 },
-  { boundaryId: 'b5', domain: 'Domain-Specific', topic: 'Quantum Computing', knowledgeLevel: 'unknown', confidenceInAssessment: 0.90 },
-];
-
-const mockReflections: SelfReflection[] = [
-  { reflectionId: 'r1', triggerType: 'post_session', reflectionFocus: 'Code generation quality', thoughtProcess: 'Reviewed recent code generation tasks. Noticed strong performance in TypeScript and React, but some gaps in handling edge cases for database queries. The pattern detection for optimization opportunities could be improved.', insights: [{ insight: 'Edge case handling needs more systematic approach', confidence: 0.85, actionable: true }, { insight: 'TypeScript type inference is a strength', confidence: 0.90, actionable: false }], performanceRating: 0.78, areasForImprovement: ['database query optimization', 'edge case detection'], createdAt: new Date(Date.now() - 3600000).toISOString() },
-  { reflectionId: 'r2', triggerType: 'error_triggered', reflectionFocus: 'Factual accuracy', thoughtProcess: 'Analyzed recent factual errors. Most were related to version numbers and release dates - information that changes frequently. Need to be more explicit about temporal uncertainty.', insights: [{ insight: 'Version-specific information should include uncertainty markers', confidence: 0.92, actionable: true }], performanceRating: 0.65, areasForImprovement: ['temporal fact verification', 'version number accuracy'], createdAt: new Date(Date.now() - 86400000).toISOString() },
-];
-
-const mockPlans: ImprovementPlan[] = [
-  { planId: 'p1', weaknessType: 'knowledge_gap', weaknessDescription: 'Limited knowledge of latest Rust async patterns', improvementGoal: 'Improve Rust async/await pattern recognition and generation', status: 'in_progress', progressPercentage: 45, priority: 7 },
-  { planId: 'p2', weaknessType: 'calibration', weaknessDescription: 'Overconfidence in database optimization suggestions', improvementGoal: 'Better calibrate confidence for database-related advice', status: 'planning', progressPercentage: 10, priority: 8 },
-  { planId: 'p3', weaknessType: 'skill_deficiency', weaknessDescription: 'Edge case detection in complex conditional logic', improvementGoal: 'Systematically identify edge cases in branching code', status: 'identified', progressPercentage: 0, priority: 6 },
-];
-
-const mockStats: MetacognitionStats = {
-  avgConfidence: 0.72,
-  calibrationScore: 0.082,
-  overconfidenceTendency: 0.05,
-  totalErrors: 3,
-  criticalErrors: 0,
-  errorResolutionRate: 0.67,
-  totalReflections: 2,
-  avgPerformanceRating: 0.715,
-  activeImprovementPlans: 3,
-};

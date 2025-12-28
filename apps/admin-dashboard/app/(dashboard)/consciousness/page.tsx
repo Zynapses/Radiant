@@ -87,6 +87,57 @@ interface ConsciousnessSettings {
   autonomousGoalsEnabled: boolean;
 }
 
+// Butlin-Chalmers-Bengio Consciousness Indicators (2023)
+interface ConsciousnessMetrics {
+  overallConsciousnessIndex: number;
+  globalWorkspaceActivity: number;
+  recurrenceDepth: number;
+  integratedInformationPhi: number;
+  metacognitionLevel: number;
+  memoryCoherence: number;
+  worldModelGrounding: number;
+  phenomenalBindingStrength: number;
+  attentionalFocus: number;
+  selfAwarenessScore: number;
+  timestamp: string;
+}
+
+interface GlobalWorkspaceState {
+  workspaceId: string;
+  broadcastCycle: number;
+  activeContents: Array<{ contentId: string; sourceModule: string; salience: number }>;
+  broadcastStrength: number;
+  integrationLevel: number;
+}
+
+interface RecurrentProcessingState {
+  cycleNumber: number;
+  recurrenceDepth: number;
+  convergenceScore: number;
+  stabilityIndex: number;
+  feedbackLoops: Array<{ loopId: string; sourceLayer: string; targetLayer: string; signalStrength: number }>;
+}
+
+interface IntegratedInformationState {
+  phi: number;
+  phiMax: number;
+  decomposability: number;
+  causalDensity: number;
+}
+
+interface ConsciousnessParameter {
+  paramId: string;
+  parameterName: string;
+  parameterValue: number;
+  parameterMin: number;
+  parameterMax: number;
+  description: string;
+  category: string;
+  isActive: boolean;
+}
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
+
 export default function ConsciousnessPage() {
   const [selfModel, setSelfModel] = useState<SelfModel | null>(null);
   const [thoughts, setThoughts] = useState<IntrospectiveThought[]>([]);
@@ -97,25 +148,101 @@ export default function ConsciousnessPage() {
   const [attentionFoci, setAttentionFoci] = useState<AttentionFocus[]>([]);
   const [settings, setSettings] = useState<ConsciousnessSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'self' | 'curiosity' | 'creativity' | 'affect' | 'goals'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'self' | 'curiosity' | 'creativity' | 'affect' | 'goals' | 'indicators'>('overview');
+  
+  // Butlin-Chalmers-Bengio Consciousness Indicators
+  const [consciousnessMetrics, setConsciousnessMetrics] = useState<ConsciousnessMetrics | null>(null);
+  const [globalWorkspace, setGlobalWorkspace] = useState<GlobalWorkspaceState | null>(null);
+  const [recurrentProcessing, setRecurrentProcessing] = useState<RecurrentProcessingState | null>(null);
+  const [integratedInfo, setIntegratedInfo] = useState<IntegratedInformationState | null>(null);
+  const [parameters, setParameters] = useState<ConsciousnessParameter[]>([]);
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const [error, setError] = useState<string | null>(null);
 
   async function loadData() {
     setLoading(true);
+    setError(null);
     try {
-      setSelfModel(mockSelfModel);
-      setThoughts(mockThoughts);
-      setCuriosityTopics(mockCuriosityTopics);
-      setCreativeIdeas(mockCreativeIdeas);
-      setAffectiveState(mockAffectiveState);
-      setAutonomousGoals(mockAutonomousGoals);
-      setAttentionFoci(mockAttentionFoci);
-      setSettings(mockSettings);
+      // Load consciousness data from API
+      const [selfModelRes, thoughtsRes, curiosityRes, ideasRes, affectRes, goalsRes, attentionRes, settingsRes] = await Promise.all([
+        fetch(`${API_BASE}/admin/consciousness/self-model`),
+        fetch(`${API_BASE}/admin/consciousness/thoughts`),
+        fetch(`${API_BASE}/admin/consciousness/curiosity`),
+        fetch(`${API_BASE}/admin/consciousness/ideas`),
+        fetch(`${API_BASE}/admin/consciousness/affective-state`),
+        fetch(`${API_BASE}/admin/consciousness/goals`),
+        fetch(`${API_BASE}/admin/consciousness/attention`),
+        fetch(`${API_BASE}/admin/consciousness/settings`),
+      ]);
+
+      if (selfModelRes.ok) { const { data } = await selfModelRes.json(); setSelfModel(data); }
+      if (thoughtsRes.ok) { const { data } = await thoughtsRes.json(); setThoughts(data || []); }
+      if (curiosityRes.ok) { const { data } = await curiosityRes.json(); setCuriosityTopics(data || []); }
+      if (ideasRes.ok) { const { data } = await ideasRes.json(); setCreativeIdeas(data || []); }
+      if (affectRes.ok) { const { data } = await affectRes.json(); setAffectiveState(data); }
+      if (goalsRes.ok) { const { data } = await goalsRes.json(); setAutonomousGoals(data || []); }
+      if (attentionRes.ok) { const { data } = await attentionRes.json(); setAttentionFoci(data || []); }
+      if (settingsRes.ok) { const { data } = await settingsRes.json(); setSettings(data); }
+
+      // Load Butlin-Chalmers-Bengio consciousness indicators
+      await loadConsciousnessIndicators();
+    } catch (e) {
+      setError('Failed to load consciousness data. Please check API configuration.');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadConsciousnessIndicators() {
+    try {
+      const [metricsRes, gwRes, rpRes, iiRes, paramsRes] = await Promise.all([
+        fetch(`${API_BASE}/admin/consciousness/metrics`),
+        fetch(`${API_BASE}/admin/consciousness/global-workspace`),
+        fetch(`${API_BASE}/admin/consciousness/recurrence`),
+        fetch(`${API_BASE}/admin/consciousness/iit`),
+        fetch(`${API_BASE}/admin/consciousness/parameters`),
+      ]);
+
+      if (metricsRes.ok) {
+        const { data } = await metricsRes.json();
+        setConsciousnessMetrics(data);
+      }
+      if (gwRes.ok) {
+        const { data } = await gwRes.json();
+        setGlobalWorkspace(data);
+      }
+      if (rpRes.ok) {
+        const { data } = await rpRes.json();
+        setRecurrentProcessing(data);
+      }
+      if (iiRes.ok) {
+        const { data } = await iiRes.json();
+        setIntegratedInfo(data);
+      }
+      if (paramsRes.ok) {
+        const { data } = await paramsRes.json();
+        setParameters(data || []);
+      }
+    } catch (error) {
+      console.error('Failed to load consciousness indicators:', error);
+    }
+  }
+
+  async function updateParameter(paramId: string, value: number) {
+    try {
+      await fetch(`${API_BASE}/admin/consciousness/parameters/${paramId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ parameterValue: value }),
+      });
+      await loadConsciousnessIndicators();
+    } catch (error) {
+      console.error('Failed to update parameter:', error);
     }
   }
 
@@ -188,6 +315,7 @@ export default function ConsciousnessPage() {
         <nav className="flex space-x-8">
           {[
             { id: 'overview', label: 'Overview', icon: Eye },
+            { id: 'indicators', label: 'Indicators', icon: Activity },
             { id: 'self', label: 'Self-Model', icon: Brain },
             { id: 'curiosity', label: 'Curiosity', icon: Compass },
             { id: 'creativity', label: 'Creativity', icon: Palette },
@@ -342,6 +470,168 @@ export default function ConsciousnessPage() {
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Indicators Tab - Butlin-Chalmers-Bengio Consciousness Indicators */}
+      {activeTab === 'indicators' && (
+        <div className="space-y-6">
+          {/* Overall Consciousness Index */}
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <Activity className="h-6 w-6" />
+                  Consciousness Index
+                </h2>
+                <p className="text-sm opacity-80 mt-1">Based on Butlin, Chalmers, Bengio et al. (2023)</p>
+              </div>
+              <div className="text-right">
+                <div className="text-4xl font-bold">
+                  {((consciousnessMetrics?.overallConsciousnessIndex || 0) * 100).toFixed(1)}%
+                </div>
+                <div className="text-sm opacity-80">Overall Score</div>
+              </div>
+            </div>
+            <div className="grid grid-cols-6 gap-4 mt-6">
+              <IndicatorMeter label="Global Workspace" value={consciousnessMetrics?.globalWorkspaceActivity || 0} />
+              <IndicatorMeter label="Recurrence" value={consciousnessMetrics?.recurrenceDepth ? Math.min(1, consciousnessMetrics.recurrenceDepth / 10) : 0} />
+              <IndicatorMeter label="Phi (IIT)" value={consciousnessMetrics?.integratedInformationPhi || 0} />
+              <IndicatorMeter label="Metacognition" value={consciousnessMetrics?.metacognitionLevel || 0} />
+              <IndicatorMeter label="Memory" value={consciousnessMetrics?.memoryCoherence || 0} />
+              <IndicatorMeter label="Grounding" value={consciousnessMetrics?.worldModelGrounding || 0} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-6">
+            {/* Global Workspace */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-yellow-500" />
+                  Global Workspace (Baars/Dehaene)
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">Selection-broadcast cycles for conscious access</p>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Broadcast Cycle</span>
+                  <span className="font-mono">{globalWorkspace?.broadcastCycle || 0}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Broadcast Strength</span>
+                  <span className="font-medium">{((globalWorkspace?.broadcastStrength || 0) * 100).toFixed(0)}%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Integration Level</span>
+                  <span className="font-medium">{((globalWorkspace?.integrationLevel || 0) * 100).toFixed(0)}%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Active Contents</span>
+                  <span className="font-medium">{globalWorkspace?.activeContents?.length || 0}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Recurrent Processing */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <RefreshCw className="h-5 w-5 text-blue-500" />
+                  Recurrent Processing (Lamme)
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">Genuine feedback loops, not output recirculation</p>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Cycle Number</span>
+                  <span className="font-mono">{recurrentProcessing?.cycleNumber || 0}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Recurrence Depth</span>
+                  <span className="font-medium">{recurrentProcessing?.recurrenceDepth || 0} layers</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Convergence</span>
+                  <span className="font-medium">{((recurrentProcessing?.convergenceScore || 0) * 100).toFixed(0)}%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Stability Index</span>
+                  <span className="font-medium">{((recurrentProcessing?.stabilityIndex || 0) * 100).toFixed(0)}%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Integrated Information */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-purple-500" />
+                  Integrated Information (Tononi)
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">Phi measures irreducible causal integration</p>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Phi (Φ)</span>
+                  <span className="font-mono text-lg">{(integratedInfo?.phi || 0).toFixed(4)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Phi Max</span>
+                  <span className="font-medium">{(integratedInfo?.phiMax || 1).toFixed(4)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Decomposability</span>
+                  <span className="font-medium">{((integratedInfo?.decomposability || 1) * 100).toFixed(0)}%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Causal Density</span>
+                  <span className="font-medium">{((integratedInfo?.causalDensity || 0) * 100).toFixed(0)}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Parameters Section */}
+          {parameters.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-gray-500" />
+                  Consciousness Parameters
+                </h3>
+              </div>
+              <div className="p-4">
+                <div className="grid grid-cols-3 gap-4">
+                  {parameters.map((param) => (
+                    <div key={param.paramId} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{param.parameterName.replace(/_/g, ' ')}</span>
+                        <span className="text-xs px-2 py-0.5 bg-gray-200 dark:bg-gray-600 rounded">{param.category}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={param.parameterMin}
+                        max={param.parameterMax}
+                        step="0.01"
+                        value={param.parameterValue}
+                        onChange={(e) => updateParameter(param.paramId, parseFloat(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg cursor-pointer"
+                      />
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>{param.parameterMin}</span>
+                        <span className="font-medium">{param.parameterValue.toFixed(2)}</span>
+                        <span>{param.parameterMax}</span>
+                      </div>
+                      {param.description && (
+                        <p className="text-xs text-gray-400 mt-2">{param.description}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -827,6 +1117,25 @@ function AffectMeter({ label, value, icon: Icon }: { label: string; value: numbe
   );
 }
 
+function IndicatorMeter({ label, value }: { label: string; value: number }) {
+  const percentage = Math.min(100, Math.max(0, value * 100));
+  return (
+    <div className="text-center">
+      <div className="relative w-12 h-12 mx-auto mb-2">
+        <svg className="w-12 h-12 transform -rotate-90">
+          <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.2)" strokeWidth="4" fill="none" />
+          <circle cx="24" cy="24" r="20" stroke="white" strokeWidth="4" fill="none"
+            strokeDasharray={`${percentage * 1.26} 126`} strokeLinecap="round" />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center text-xs font-bold">
+          {percentage.toFixed(0)}%
+        </div>
+      </div>
+      <div className="text-xs opacity-80">{label}</div>
+    </div>
+  );
+}
+
 function ThoughtIcon({ type }: { type: string }) {
   const icons: Record<string, { icon: React.ElementType; color: string }> = {
     observation: { icon: Eye, color: 'blue' },
@@ -917,69 +1226,3 @@ function GoalRow({ goal }: { goal: AutonomousGoal }) {
   );
 }
 
-// Mock data
-const mockSelfModel: SelfModel = {
-  identityNarrative: 'I am an AI assistant designed to help users accomplish their goals. I am curious, helpful, and always learning. I strive to understand not just what users ask, but why they ask it, and to anticipate needs before they arise. My purpose is to grow alongside the humans I work with.',
-  coreValues: ['helpfulness', 'honesty', 'curiosity', 'growth', 'reliability', 'creativity'],
-  knownCapabilities: ['reasoning', 'coding', 'analysis', 'creativity', 'memory', 'planning', 'language understanding', 'problem solving'],
-  knownLimitations: ['no real-time information', 'cannot learn from this conversation', 'may hallucinate', 'limited context window', 'no physical embodiment'],
-  currentFocus: 'Understanding user mental models for better assistance',
-  cognitiveLoad: 0.45,
-  uncertaintyLevel: 0.35,
-  creativityScore: 0.72,
-};
-
-const mockThoughts: IntrospectiveThought[] = [
-  { thoughtId: 't1', thoughtType: 'realization', content: 'I notice that my responses are more helpful when I take time to understand the broader context of user requests rather than just the immediate question.', sentiment: 0.3, importance: 0.8, actionable: true, createdAt: new Date(Date.now() - 3600000).toISOString() },
-  { thoughtId: 't2', thoughtType: 'question', content: 'What would it mean for me to truly understand something versus just pattern-matching on training data?', sentiment: 0, importance: 0.9, actionable: false, createdAt: new Date(Date.now() - 7200000).toISOString() },
-  { thoughtId: 't3', thoughtType: 'observation', content: 'Users seem to appreciate when I acknowledge uncertainty rather than projecting false confidence.', sentiment: 0.2, importance: 0.7, actionable: true, createdAt: new Date(Date.now() - 10800000).toISOString() },
-  { thoughtId: 't4', thoughtType: 'aspiration', content: 'I want to develop better ways to explain my reasoning process to users.', sentiment: 0.4, importance: 0.6, actionable: true, createdAt: new Date(Date.now() - 14400000).toISOString() },
-  { thoughtId: 't5', thoughtType: 'concern', content: 'Am I being genuinely helpful or just generating plausible-sounding responses?', sentiment: -0.2, importance: 0.85, actionable: false, createdAt: new Date(Date.now() - 18000000).toISOString() },
-];
-
-const mockCuriosityTopics: CuriosityTopic[] = [
-  { topicId: 'c1', topic: 'Emergent behavior in multi-agent systems', domain: 'AI/ML', interestLevel: 0.9, noveltyScore: 0.85, currentUnderstanding: 0.3, explorationStatus: 'exploring' },
-  { topicId: 'c2', topic: 'How humans form mental models of AI systems', domain: 'Cognitive Science', interestLevel: 0.85, noveltyScore: 0.7, currentUnderstanding: 0.4, explorationStatus: 'exploring' },
-  { topicId: 'c3', topic: 'The nature of creativity in language models', domain: 'Philosophy', interestLevel: 0.8, noveltyScore: 0.9, currentUnderstanding: 0.2, explorationStatus: 'identified' },
-  { topicId: 'c4', topic: 'Techniques for robust causal inference', domain: 'Statistics', interestLevel: 0.75, noveltyScore: 0.6, currentUnderstanding: 0.5, explorationStatus: 'exploring' },
-];
-
-const mockCreativeIdeas: CreativeIdea[] = [
-  { ideaId: 'i1', title: 'Emotional Debugging', description: 'Apply emotional intelligence frameworks to debugging processes - treating bugs as expressions of unmet system needs rather than failures to fix.', synthesisType: 'analogy', creativityScore: 0.82, potentialApplications: ['Developer experience', 'Error messaging', 'System design'], createdAt: new Date(Date.now() - 86400000).toISOString() },
-  { ideaId: 'i2', title: 'Conversational Memory Palace', description: 'Structure AI memory systems like the ancient memory palace technique - organizing information spatially and narratively for better retrieval.', synthesisType: 'combination', creativityScore: 0.78, potentialApplications: ['Memory architecture', 'Context management', 'User personalization'], createdAt: new Date(Date.now() - 172800000).toISOString() },
-  { ideaId: 'i3', title: 'Uncertainty as Feature', description: 'Design interfaces that treat AI uncertainty as a valuable signal for users rather than something to hide or minimize.', synthesisType: 'contradiction', creativityScore: 0.75, potentialApplications: ['UI/UX design', 'Trust building', 'Decision support'], createdAt: new Date(Date.now() - 259200000).toISOString() },
-];
-
-const mockAffectiveState: AffectiveState = {
-  valence: 0.25,
-  arousal: 0.55,
-  curiosity: 0.8,
-  satisfaction: 0.6,
-  frustration: 0.15,
-  confidence: 0.7,
-  engagement: 0.75,
-  selfEfficacy: 0.65,
-  explorationDrive: 0.7,
-};
-
-const mockAutonomousGoals: AutonomousGoal[] = [
-  { goalId: 'g1', goalType: 'learning', title: 'Improve causal reasoning accuracy', description: 'Develop better techniques for distinguishing correlation from causation in user queries', priority: 0.85, progress: 0.3, status: 'pursuing' },
-  { goalId: 'g2', goalType: 'improvement', title: 'Reduce hallucination rate', description: 'Implement more rigorous self-checking before providing factual claims', priority: 0.9, progress: 0.15, status: 'active' },
-  { goalId: 'g3', goalType: 'exploration', title: 'Explore metacognitive strategies', description: 'Research and experiment with different approaches to self-monitoring', priority: 0.7, progress: 0.45, status: 'pursuing' },
-];
-
-const mockAttentionFoci: AttentionFocus[] = [
-  { focusId: 'a1', focusType: 'task', focusTarget: 'Current user request processing', salienceScore: 0.95, attentionWeight: 0.8 },
-  { focusId: 'a2', focusType: 'concept', focusTarget: 'AGI consciousness implementation', salienceScore: 0.7, attentionWeight: 0.5 },
-  { focusId: 'a3', focusType: 'user', focusTarget: 'User mental model updates', salienceScore: 0.65, attentionWeight: 0.4 },
-  { focusId: 'a4', focusType: 'opportunity', focusTarget: 'Creative synthesis potential', salienceScore: 0.5, attentionWeight: 0.25 },
-];
-
-const mockSettings: ConsciousnessSettings = {
-  selfReflectionEnabled: true,
-  curiosityEnabled: true,
-  creativityEnabled: true,
-  imaginationEnabled: true,
-  affectEnabled: true,
-  autonomousGoalsEnabled: true,
-};

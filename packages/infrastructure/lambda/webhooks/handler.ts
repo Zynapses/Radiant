@@ -7,6 +7,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { DynamoDBClient, PutItemCommand, QueryCommand, DeleteItemCommand, GetItemCommand, AttributeValue } from '@aws-sdk/client-dynamodb';
 import { randomUUID, createHmac } from 'crypto';
+import { logger } from '../shared/logger';
 
 const dynamodb = new DynamoDBClient({});
 const WEBHOOKS_TABLE = process.env.WEBHOOKS_TABLE!;
@@ -71,7 +72,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     return response(404, { error: 'Not found' });
   } catch (error) {
-    console.error('Webhook error:', error);
+    logger.error('Webhook error', error instanceof Error ? error : new Error(String(error)));
     return response(500, { error: 'Internal server error' });
   }
 }

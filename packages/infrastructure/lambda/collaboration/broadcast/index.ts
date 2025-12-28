@@ -2,6 +2,7 @@ import { Handler } from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, QueryCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi';
+import { enhancedLogger as logger } from '../../shared/logging/enhanced-logger';
 
 const ddbClient = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(ddbClient);
@@ -26,7 +27,7 @@ interface BroadcastEvent {
 export const handler: Handler<BroadcastEvent> = async (event) => {
   const { sessionId, excludeConnectionId, message } = event;
   
-  console.log('Broadcasting to session:', { sessionId, messageType: message.type });
+  logger.info('Broadcasting to session', { sessionId, messageType: message.type });
 
   // Parse WebSocket URL to get endpoint
   const urlParts = WEBSOCKET_URL.replace('wss://', '').split('/');
@@ -46,7 +47,7 @@ export const handler: Handler<BroadcastEvent> = async (event) => {
     }));
 
     const connections = result.Items || [];
-    console.log(`Found ${connections.length} connections for session ${sessionId}`);
+    logger.debug(`Found ${connections.length} connections for session ${sessionId}`);
 
     // Send to all connections (except excluded one)
     const sendPromises = connections
@@ -61,7 +62,7 @@ export const handler: Handler<BroadcastEvent> = async (event) => {
           const err = error as { statusCode?: number };
           if (err.statusCode === 410) {
             // Connection is stale, remove it
-            console.log('Removing stale connection:', conn.connectionId);
+            logger.debug('Removing stale connection', { connectionId: conn.connectionId });
             await docClient.send(new DeleteCommand({
               TableName: CONNECTIONS_TABLE,
               Key: {
@@ -70,7 +71,7 @@ export const handler: Handler<BroadcastEvent> = async (event) => {
               },
             }));
           } else {
-            console.error('Failed to send to connection:', conn.connectionId, error);
+            logger.error('Failed to send to connection', error, { connectionId: conn.connectionId });
           }
         }
       });
@@ -85,7 +86,7 @@ export const handler: Handler<BroadcastEvent> = async (event) => {
       }),
     };
   } catch (error) {
-    console.error('Broadcast error:', error);
+    logger.error('Broadcast error', error);
     throw error;
   }
 };

@@ -1,119 +1,64 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-// Mock data for demonstration
-const mockModels = [
-  {
-    modelId: 'openai/gpt-4o',
-    provider: 'openai',
-    modelName: 'GPT-4o',
-    modelFamily: 'gpt',
-    contextWindow: 128000,
-    maxOutputTokens: 4096,
-    capabilities: { reasoning: 0.9, coding: 0.85, vision: 0.9, language: 0.95 },
-    specialties: ['multimodal', 'reasoning', 'coding', 'analysis'],
-    inputPricePer1M: 5.00,
-    outputPricePer1M: 15.00,
-    functionCallingSupport: true,
-    jsonModeSupport: true,
-    metadataCompleteness: 0.85,
-    lastVerified: '2024-12-26T10:00:00Z',
-    isAvailable: true,
-  },
-  {
-    modelId: 'anthropic/claude-3-5-sonnet-20241022',
-    provider: 'anthropic',
-    modelName: 'Claude 3.5 Sonnet',
-    modelFamily: 'claude',
-    contextWindow: 200000,
-    maxOutputTokens: 8192,
-    capabilities: { reasoning: 0.92, coding: 0.95, vision: 0.85, language: 0.93 },
-    specialties: ['coding', 'analysis', 'reasoning', 'long context'],
-    inputPricePer1M: 3.00,
-    outputPricePer1M: 15.00,
-    functionCallingSupport: true,
-    jsonModeSupport: true,
-    metadataCompleteness: 0.90,
-    lastVerified: '2024-12-26T08:00:00Z',
-    isAvailable: true,
-  },
-  {
-    modelId: 'google/gemini-1.5-pro',
-    provider: 'google',
-    modelName: 'Gemini 1.5 Pro',
-    modelFamily: 'gemini',
-    contextWindow: 2000000,
-    maxOutputTokens: 8192,
-    capabilities: { reasoning: 0.88, coding: 0.82, vision: 0.9, longContext: 0.95 },
-    specialties: ['long context', 'multimodal', 'reasoning'],
-    inputPricePer1M: 1.25,
-    outputPricePer1M: 5.00,
-    functionCallingSupport: true,
-    jsonModeSupport: true,
-    metadataCompleteness: 0.75,
-    lastVerified: '2024-12-25T14:00:00Z',
-    isAvailable: true,
-  },
-  {
-    modelId: 'meta/llama-3.1-70b',
-    provider: 'meta',
-    modelName: 'Llama 3.1 70B',
-    modelFamily: 'llama',
-    contextWindow: 128000,
-    maxOutputTokens: 4096,
-    capabilities: { reasoning: 0.82, coding: 0.78, language: 0.85 },
-    specialties: ['open source', 'general', 'reasoning'],
-    inputPricePer1M: 0.99,
-    outputPricePer1M: 0.99,
-    functionCallingSupport: true,
-    jsonModeSupport: false,
-    metadataCompleteness: 0.65,
-    lastVerified: '2024-12-24T12:00:00Z',
-    isAvailable: true,
-  },
-  {
-    modelId: 'mistral/codestral',
-    provider: 'mistral',
-    modelName: 'Codestral',
-    modelFamily: 'mistral',
-    contextWindow: 32000,
-    maxOutputTokens: 4096,
-    capabilities: { coding: 0.92, reasoning: 0.75 },
-    specialties: ['code generation', 'code completion', 'code review'],
-    inputPricePer1M: 1.00,
-    outputPricePer1M: 3.00,
-    functionCallingSupport: true,
-    jsonModeSupport: false,
-    metadataCompleteness: 0.55,
-    lastVerified: null,
-    isAvailable: true,
-  },
-];
+interface ModelMetadata {
+  modelId: string;
+  provider: string;
+  modelName: string;
+  modelFamily: string;
+  contextWindow: number;
+  maxOutputTokens: number;
+  capabilities: Record<string, number>;
+  specialties: string[];
+  inputPricePer1M: number;
+  outputPricePer1M: number;
+  functionCallingSupport: boolean;
+  jsonModeSupport: boolean;
+  metadataCompleteness: number;
+  lastVerified: string | null;
+  isAvailable: boolean;
+}
 
-const mockSchedules = [
-  { id: '1', name: 'Daily Quick Refresh', scope: 'all', scheduleType: 'cron', cronExpression: '0 6 * * *', researchDepth: 'quick', enabled: true, lastRun: '2024-12-26T06:00:00Z' },
-  { id: '2', name: 'Weekly Deep Research', scope: 'all', scheduleType: 'cron', cronExpression: '0 2 * * 0', researchDepth: 'deep', enabled: true, lastRun: '2024-12-22T02:00:00Z' },
-  { id: '3', name: 'Pricing Update', scope: 'all', scheduleType: 'cron', cronExpression: '0 0 * * 1', researchDepth: 'standard', enabled: true, lastRun: '2024-12-23T00:00:00Z' },
-];
-
-const mockResearchHistory = [
-  { id: '1', modelId: 'openai/gpt-4o', researchType: 'scheduled', fieldsUpdated: ['inputPricePer1M', 'outputPricePer1M'], aiConfidence: 0.92, status: 'completed', completedAt: '2024-12-26T06:05:00Z' },
-  { id: '2', modelId: 'anthropic/claude-3-5-sonnet-20241022', researchType: 'manual', fieldsUpdated: ['capabilities', 'benchmarks'], aiConfidence: 0.88, status: 'completed', completedAt: '2024-12-26T05:30:00Z' },
-  { id: '3', modelId: 'google/gemini-1.5-pro', researchType: 'scheduled', fieldsUpdated: ['contextWindow'], aiConfidence: 0.95, status: 'completed', completedAt: '2024-12-25T14:10:00Z' },
-];
+interface ResearchSchedule { id: string; name: string; scope: string; scheduleType: string; cronExpression: string; researchDepth: string; enabled: boolean; lastRun: string; }
+interface ResearchHistory { id: string; modelId: string; researchType: string; fieldsUpdated: string[]; aiConfidence: number; status: string; completedAt: string; }
 
 export default function ModelMetadataPage() {
   const [selectedTab, setSelectedTab] = useState<'models' | 'schedules' | 'research' | 'sources'>('models');
-  const [selectedModel, setSelectedModel] = useState<typeof mockModels[0] | null>(null);
+  const [models, setModels] = useState<ModelMetadata[]>([]);
+  const [schedules, setSchedules] = useState<ResearchSchedule[]>([]);
+  const [researchHistory, setResearchHistory] = useState<ResearchHistory[]>([]);
+  const [selectedModel, setSelectedModel] = useState<ModelMetadata | null>(null);
   const [providerFilter, setProviderFilter] = useState<string>('all');
   const [isResearching, setIsResearching] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredModels = mockModels.filter(model => 
-    providerFilter === 'all' || model.provider === providerFilter
-  );
+  useEffect(() => { loadData(); }, []);
 
-  const providers = Array.from(new Set(mockModels.map(m => m.provider)));
+  async function loadData() {
+    setLoading(true);
+    setError(null);
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL || '';
+      const [modelsRes, schedulesRes, historyRes] = await Promise.all([
+        fetch(`${API}/admin/model-metadata/models`),
+        fetch(`${API}/admin/model-metadata/schedules`),
+        fetch(`${API}/admin/model-metadata/research-history`),
+      ]);
+      if (modelsRes.ok) { const { data } = await modelsRes.json(); setModels(data || []); }
+      else setError('Failed to load model metadata.');
+      if (schedulesRes.ok) { const { data } = await schedulesRes.json(); setSchedules(data || []); }
+      if (historyRes.ok) { const { data } = await historyRes.json(); setResearchHistory(data || []); }
+    } catch { setError('Failed to connect to model metadata service.'); }
+    setLoading(false);
+  }
+
+  if (loading) return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>;
+  if (error) return <div className="flex flex-col items-center justify-center h-96 text-red-500"><p className="text-lg font-medium">Error</p><p className="text-sm">{error}</p><button onClick={loadData} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg">Retry</button></div>;
+
+  const filteredModels = models.filter(model => providerFilter === 'all' || model.provider === providerFilter);
+  const providers = Array.from(new Set(models.map(m => m.provider)));
 
   const getCompletenessColor = (completeness: number) => {
     if (completeness >= 0.8) return 'bg-green-500';
@@ -156,7 +101,7 @@ export default function ModelMetadataPage() {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-sm text-gray-500">Total Models</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">{mockModels.length}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">{models.length}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-sm text-gray-500">Providers</p>
@@ -165,16 +110,16 @@ export default function ModelMetadataPage() {
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-sm text-gray-500">Avg Completeness</p>
           <p className="text-2xl font-bold text-green-600">
-            {Math.round(mockModels.reduce((sum, m) => sum + m.metadataCompleteness, 0) / mockModels.length * 100)}%
+            {Math.round(models.reduce((sum, m) => sum + m.metadataCompleteness, 0) / models.length * 100)}%
           </p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-sm text-gray-500">Active Schedules</p>
-          <p className="text-2xl font-bold text-purple-600">{mockSchedules.filter(s => s.enabled).length}</p>
+          <p className="text-2xl font-bold text-purple-600">{schedules.filter(s => s.enabled).length}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-sm text-gray-500">Research Today</p>
-          <p className="text-2xl font-bold text-orange-600">{mockResearchHistory.length}</p>
+          <p className="text-2xl font-bold text-orange-600">{researchHistory.length}</p>
         </div>
       </div>
 
@@ -327,7 +272,7 @@ export default function ModelMetadataPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {mockSchedules.map((schedule) => (
+                {schedules.map((schedule) => (
                   <tr key={schedule.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
                     <td className="px-4 py-3 font-medium">{schedule.name}</td>
                     <td className="px-4 py-3 capitalize">{schedule.scope}</td>
@@ -402,7 +347,7 @@ export default function ModelMetadataPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {mockResearchHistory.map((research) => (
+              {researchHistory.map((research) => (
                 <tr key={research.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
                   <td className="px-4 py-3 font-mono text-sm">{research.modelId}</td>
                   <td className="px-4 py-3">

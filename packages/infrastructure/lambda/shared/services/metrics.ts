@@ -5,6 +5,7 @@
  */
 
 import { CloudWatchClient, PutMetricDataCommand, StandardUnit, Dimension } from '@aws-sdk/client-cloudwatch';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 const cloudwatch = new CloudWatchClient({});
 const NAMESPACE = process.env.METRICS_NAMESPACE || 'Radiant';
@@ -115,7 +116,7 @@ function addMetric(
 
   // Flush if buffer is full
   if (metricBuffer.length >= BUFFER_SIZE) {
-    flushMetrics().catch(console.error);
+    flushMetrics().catch(err => logger.error('Failed to auto-flush metrics', err));
   }
 }
 
@@ -139,7 +140,7 @@ export async function flushMetrics(): Promise<void> {
       })),
     }));
   } catch (error) {
-    console.error('Failed to publish metrics:', error);
+    logger.error('Failed to publish metrics', error);
     // Re-add failed metrics to buffer (with limit)
     if (metricBuffer.length < BUFFER_SIZE * 2) {
       metricBuffer.push(...metrics);
@@ -265,7 +266,7 @@ export function withMetricsFlush<TEvent, TResult>(
     } finally {
       await flushMetrics().catch(err => {
         // Log but don't throw - metrics flush failure shouldn't break the handler
-        console.error('Failed to flush metrics:', err);
+        logger.error('Failed to flush metrics', err);
       });
     }
   };

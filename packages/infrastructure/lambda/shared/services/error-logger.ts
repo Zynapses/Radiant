@@ -1,5 +1,6 @@
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 type ErrorSeverity = 'debug' | 'info' | 'warning' | 'error' | 'critical';
 
@@ -153,7 +154,7 @@ export class ErrorLogger {
         ]
       );
     } catch (e) {
-      console.error('Failed to update error patterns:', e);
+      logger.error('Failed to update error patterns', e);
     }
   }
 
@@ -176,7 +177,7 @@ export class ErrorLogger {
         })
       );
     } catch (e) {
-      console.error('Failed to send alert:', e);
+      logger.error('Failed to send alert', e);
     }
   }
 }

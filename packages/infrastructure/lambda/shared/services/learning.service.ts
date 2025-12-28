@@ -18,6 +18,11 @@ export interface LearningInteraction {
   modelSelected: string;
   responseText?: string;
   detectedSpecialty?: string;
+  // Domain taxonomy detection
+  detectedDomainId?: string;
+  detectedSubspecialtyId?: string;
+  domainDetectionConfidence?: number;
+  domainMatchScore?: number;
   totalLatencyMs?: number;
   totalCostCents?: number;
   autoQualityScore?: number;
@@ -94,6 +99,11 @@ export interface RecordInteractionParams {
   detectedSpecialty?: string;
   detectedIntent?: string;
   detectedComplexity?: 'trivial' | 'simple' | 'moderate' | 'complex' | 'expert';
+  // Domain taxonomy detection
+  detectedDomainId?: string;
+  detectedSubspecialtyId?: string;
+  domainDetectionConfidence?: number;
+  domainMatchScore?: number;
   totalLatencyMs?: number;
   modelLatencyMs?: number;
   routingLatencyMs?: number;

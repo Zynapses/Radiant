@@ -1,5 +1,6 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { executeStatement } from '../db/client';
+import { logger } from '../logger';
 
 type StepType = 'decompose' | 'reason' | 'execute' | 'verify' | 'synthesize';
 
@@ -315,7 +316,7 @@ Return JSON: { "solution": "complete solution", "confidence": 0.0-1.0 }`
 
       return { result: text, tokens };
     } catch (error) {
-      console.error('Model invocation error:', error);
+      logger.error('Model invocation error', error instanceof Error ? error : new Error(String(error)));
       return { error: 'Model invocation failed', tokens: 0 };
     }
   }

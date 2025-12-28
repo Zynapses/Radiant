@@ -7,6 +7,7 @@ import {
   type OrchestrationMode,
   type ScoringWeights,
 } from '../shared/services/specialty-ranking.service';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 
 const headers = {
   'Content-Type': 'application/json',
@@ -189,7 +190,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     return jsonResponse(404, { error: 'Not found' });
   } catch (error) {
-    console.error('Specialty rankings error:', error);
+    logger.error('Specialty rankings error', error);
     return jsonResponse(500, { error: 'Internal server error', message: String(error) });
   }
 }

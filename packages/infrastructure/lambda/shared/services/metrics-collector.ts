@@ -1,5 +1,6 @@
 import { CloudWatchClient, PutMetricDataCommand, StandardUnit } from '@aws-sdk/client-cloudwatch';
 import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 type MetricType = 'api_request' | 'token_usage' | 'model_inference' | 'billing' | 'error' | 'latency';
 
@@ -67,7 +68,7 @@ export class MetricsCollector {
         this.sendToCloudWatch(events),
       ]);
     } catch (error) {
-      console.error('[Metrics] Failed to flush metrics:', error instanceof Error ? error.message : 'Unknown');
+      logger.error('Failed to flush metrics', { error: error instanceof Error ? error.message : 'Unknown' });
       // Re-add events to buffer on failure (with size limit)
       this.buffer = [...events.slice(-50), ...this.buffer].slice(0, this.BUFFER_SIZE);
     }
@@ -123,7 +124,7 @@ export class MetricsCollector {
           })
         );
       } catch (error) {
-        console.error('Failed to send metrics to CloudWatch:', error);
+        logger.error('Failed to send metrics to CloudWatch', error);
       }
     }
   }

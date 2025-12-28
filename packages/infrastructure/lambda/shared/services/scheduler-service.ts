@@ -7,6 +7,7 @@ import {
   DeleteRuleCommand,
   RemoveTargetsCommand,
 } from '@aws-sdk/client-eventbridge';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 const eventBridge = new EventBridgeClient({});
 const SCHEDULER_LAMBDA_ARN = process.env.SCHEDULER_LAMBDA_ARN;
@@ -360,7 +361,7 @@ export class SchedulerService {
         );
       }
     } catch (error) {
-      console.error(`Failed to create EventBridge rule for prompt ${promptId}:`, error);
+      logger.error(`Failed to create EventBridge rule for prompt ${promptId}`, error);
       throw error;
     }
   }
@@ -383,7 +384,7 @@ export class SchedulerService {
       );
     } catch (error) {
       // Rule may not exist, log but don't throw
-      console.warn(`Failed to delete EventBridge rule for prompt ${promptId}:`, error);
+      logger.warn(`Failed to delete EventBridge rule for prompt ${promptId}`, { error: error instanceof Error ? error.message : 'unknown' });
     }
   }
 

@@ -1,6 +1,7 @@
 import { executeStatement } from '../db/client';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 const sns = new SNSClient({});
 const ses = new SESClient({});
@@ -365,7 +366,7 @@ export class BillingService {
           },
         }));
       } catch (error) {
-        console.error('Failed to publish SNS notification:', error);
+        logger.error('Failed to publish billing SNS notification', error);
       }
     }
 
@@ -402,7 +403,7 @@ export class BillingService {
           },
         }));
       } catch (error) {
-        console.error('Failed to send email notification:', error);
+        logger.error('Failed to send billing email notification', error);
       }
     }
   }

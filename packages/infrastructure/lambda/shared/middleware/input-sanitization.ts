@@ -60,7 +60,7 @@ async function getSanitizationConfig(): Promise<SanitizationConfig> {
     return configCache;
   } catch (error) {
     // Default: sanitization disabled when HIPAA/PHI not explicitly enabled
-    console.warn('Failed to load sanitization config, using defaults:', error instanceof Error ? error.message : 'unknown');
+    logger.warn('Failed to load sanitization config, using defaults', { error: error instanceof Error ? error.message : 'unknown' });
     return {
       hipaaPhiEnabled: false,
       sanitizeHtmlInput: true,

@@ -4,8 +4,9 @@
  * Multi-channel notification delivery (email, in-app, push, SMS)
  */
 
-import { DynamoDBClient, PutItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, PutItemCommand, QueryCommand, UpdateItemCommand, AttributeValue } from '@aws-sdk/client-dynamodb';
 import { sendTemplateEmail, EmailTemplates } from './email';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 const dynamodb = new DynamoDBClient({});
 const NOTIFICATIONS_TABLE = process.env.NOTIFICATIONS_TABLE || 'radiant-notifications';
@@ -101,7 +102,7 @@ export async function sendNotification(options: {
     try {
       await deliverToChannel(notification, channel);
     } catch (error) {
-      console.error(`Failed to deliver to ${channel}:`, error);
+      logger.error(`Failed to deliver notification to ${channel}`, error);
     }
   }
 
@@ -276,17 +277,17 @@ async function deliverEmail(notification: Notification): Promise<void> {
 
 async function deliverPush(notification: Notification): Promise<void> {
   // Send push notification via Firebase/APNs
-  console.log('Push notification:', notification.title);
+  logger.debug('Push notification', { title: notification.title });
 }
 
 async function deliverSms(notification: Notification): Promise<void> {
   // Send SMS via SNS
-  console.log('SMS notification:', notification.title);
+  logger.debug('SMS notification', { title: notification.title });
 }
 
 async function deliverWebhook(notification: Notification): Promise<void> {
   // Deliver via webhook
-  console.log('Webhook notification:', notification.title);
+  logger.debug('Webhook notification', { title: notification.title });
 }
 
 // ============================================================================
@@ -323,7 +324,7 @@ async function updateNotificationStatus(id: string, tenantId: string, status: No
   // Update in database
 }
 
-function itemToNotification(item: Record<string, any>): Notification {
+function itemToNotification(item: Record<string, AttributeValue>): Notification {
   return {
     id: item.id?.S || '',
     tenantId: item.tenant_id?.S || '',

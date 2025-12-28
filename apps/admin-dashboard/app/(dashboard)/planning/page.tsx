@@ -105,26 +105,46 @@ export default function PlanningPage() {
     loadData();
   }, []);
 
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     if (selectedPlan) {
-      setTasks(mockTasks);
-      setMilestones(mockMilestones);
-      setSessions(mockSessions);
-      setExpandedTasks(new Set(['t1'])); // Expand first task by default
+      loadPlanDetails(selectedPlan.planId);
     }
   }, [selectedPlan]);
 
+  async function loadPlanDetails(planId: string) {
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL || '';
+      const [tasksRes, milestonesRes, sessionsRes] = await Promise.all([
+        fetch(`${API}/admin/planning/plans/${planId}/tasks`),
+        fetch(`${API}/admin/planning/plans/${planId}/milestones`),
+        fetch(`${API}/admin/planning/plans/${planId}/sessions`),
+      ]);
+      if (tasksRes.ok) { const { data } = await tasksRes.json(); setTasks(data || []); }
+      if (milestonesRes.ok) { const { data } = await milestonesRes.json(); setMilestones(data || []); }
+      if (sessionsRes.ok) { const { data } = await sessionsRes.json(); setSessions(data || []); }
+      setExpandedTasks(new Set(['t1']));
+    } catch { /* ignore */ }
+  }
+
   async function loadData() {
     setLoading(true);
+    setError(null);
     try {
-      setPlans(mockPlans);
-      setStats(mockStats);
-      if (mockPlans.length > 0) {
-        setSelectedPlan(mockPlans[0]);
-      }
-    } finally {
-      setLoading(false);
-    }
+      const API = process.env.NEXT_PUBLIC_API_URL || '';
+      const [plansRes, statsRes] = await Promise.all([
+        fetch(`${API}/admin/planning/plans`),
+        fetch(`${API}/admin/planning/stats`),
+      ]);
+      if (plansRes.ok) { 
+        const { data } = await plansRes.json(); 
+        setPlans(data || []);
+        if (data && data.length > 0) setSelectedPlan(data[0]);
+      } else setError('Failed to load planning data.');
+      if (statsRes.ok) { const { data } = await statsRes.json(); setStats(data); }
+    } catch { setError('Failed to connect to planning service.'); }
+    setLoading(false);
   }
 
   function toggleTaskExpand(taskId: string) {
@@ -539,70 +559,3 @@ function SessionRow({ session }: { session: PlanSession }) {
   );
 }
 
-// Mock data
-const mockPlans: TaskPlan[] = [
-  { planId: 'p1', name: 'Implement Authentication System', rootGoal: 'Build a secure JWT-based authentication system with MFA support', status: 'active', progress: 45, totalTasks: 12, completedTasks: 5, sessionsCount: 3, priority: 8, estimatedHours: 16, createdAt: new Date(Date.now() - 86400000 * 3).toISOString(), startedAt: new Date(Date.now() - 86400000 * 2).toISOString() },
-  { planId: 'p2', name: 'Database Migration to PostgreSQL', rootGoal: 'Migrate from MySQL to PostgreSQL with zero downtime', status: 'active', progress: 20, totalTasks: 8, completedTasks: 2, sessionsCount: 1, priority: 7, estimatedHours: 24, deadline: new Date(Date.now() + 86400000 * 7).toISOString(), createdAt: new Date(Date.now() - 86400000 * 5).toISOString() },
-  { planId: 'p3', name: 'API Documentation', rootGoal: 'Create comprehensive API documentation with examples', status: 'completed', progress: 100, totalTasks: 6, completedTasks: 6, sessionsCount: 2, priority: 5, estimatedHours: 8, createdAt: new Date(Date.now() - 86400000 * 10).toISOString() },
-  { planId: 'p4', name: 'Performance Optimization', rootGoal: 'Improve application response time by 50%', status: 'draft', progress: 0, totalTasks: 10, completedTasks: 0, sessionsCount: 0, priority: 6, estimatedHours: 20, createdAt: new Date(Date.now() - 86400000).toISOString() },
-];
-
-const mockTasks: PlanTask[] = [
-  {
-    taskId: 't1', name: 'Authentication System', taskType: 'compound', status: 'in_progress', progress: 45, depth: 0, path: '1',
-    children: [
-      {
-        taskId: 't1.1', name: 'Requirements Analysis', taskType: 'compound', status: 'completed', progress: 100, depth: 1, path: '1.1',
-        children: [
-          { taskId: 't1.1.1', name: 'Gather security requirements', taskType: 'primitive', actionType: 'analyze', status: 'completed', progress: 100, depth: 2, path: '1.1.1', estimatedMins: 30 },
-          { taskId: 't1.1.2', name: 'Define acceptance criteria', taskType: 'primitive', actionType: 'generate', status: 'completed', progress: 100, depth: 2, path: '1.1.2', estimatedMins: 20 },
-        ]
-      },
-      {
-        taskId: 't1.2', name: 'Design', taskType: 'compound', status: 'completed', progress: 100, depth: 1, path: '1.2',
-        children: [
-          { taskId: 't1.2.1', name: 'Create technical design', taskType: 'primitive', actionType: 'generate', status: 'completed', progress: 100, depth: 2, path: '1.2.1', estimatedMins: 45 },
-          { taskId: 't1.2.2', name: 'Review design', taskType: 'primitive', actionType: 'review', status: 'completed', progress: 100, depth: 2, path: '1.2.2', estimatedMins: 30 },
-        ]
-      },
-      {
-        taskId: 't1.3', name: 'Implementation', taskType: 'compound', status: 'in_progress', progress: 33, depth: 1, path: '1.3',
-        children: [
-          { taskId: 't1.3.1', name: 'Implement JWT token generation', taskType: 'primitive', actionType: 'code', status: 'completed', progress: 100, depth: 2, path: '1.3.1', estimatedMins: 60 },
-          { taskId: 't1.3.2', name: 'Implement token validation', taskType: 'primitive', actionType: 'code', status: 'in_progress', progress: 50, depth: 2, path: '1.3.2', estimatedMins: 45 },
-          { taskId: 't1.3.3', name: 'Add MFA support', taskType: 'primitive', actionType: 'code', status: 'ready', progress: 0, depth: 2, path: '1.3.3', estimatedMins: 90 },
-        ]
-      },
-      {
-        taskId: 't1.4', name: 'Testing', taskType: 'compound', status: 'pending', progress: 0, depth: 1, path: '1.4',
-        children: [
-          { taskId: 't1.4.1', name: 'Write unit tests', taskType: 'primitive', actionType: 'code', status: 'pending', progress: 0, depth: 2, path: '1.4.1', estimatedMins: 60 },
-          { taskId: 't1.4.2', name: 'Integration testing', taskType: 'primitive', actionType: 'execute', status: 'pending', progress: 0, depth: 2, path: '1.4.2', estimatedMins: 45 },
-        ]
-      },
-    ]
-  },
-];
-
-const mockMilestones: PlanMilestone[] = [
-  { milestoneId: 'm1', name: 'Design Complete', sequenceNumber: 1, status: 'achieved', achievedDate: new Date(Date.now() - 86400000).toISOString() },
-  { milestoneId: 'm2', name: 'Core Implementation', sequenceNumber: 2, status: 'in_progress', targetDate: new Date(Date.now() + 86400000 * 2).toISOString() },
-  { milestoneId: 'm3', name: 'Testing Complete', sequenceNumber: 3, status: 'pending', targetDate: new Date(Date.now() + 86400000 * 5).toISOString() },
-  { milestoneId: 'm4', name: 'Production Ready', sequenceNumber: 4, status: 'pending', targetDate: new Date(Date.now() + 86400000 * 7).toISOString() },
-];
-
-const mockSessions: PlanSession[] = [
-  { sessionId: 's1', startedAt: new Date(Date.now() - 3600000).toISOString(), durationMins: 45, progressAtStart: 35, progressAtEnd: 45, tasksCompleted: 2 },
-  { sessionId: 's2', startedAt: new Date(Date.now() - 86400000).toISOString(), endedAt: new Date(Date.now() - 86400000 + 5400000).toISOString(), durationMins: 90, progressAtStart: 15, progressAtEnd: 35, tasksCompleted: 3 },
-  { sessionId: 's3', startedAt: new Date(Date.now() - 86400000 * 2).toISOString(), endedAt: new Date(Date.now() - 86400000 * 2 + 3600000).toISOString(), durationMins: 60, progressAtStart: 0, progressAtEnd: 15, tasksCompleted: 2 },
-];
-
-const mockStats: PlanningStats = {
-  totalPlans: 4,
-  activePlans: 2,
-  completedPlans: 1,
-  avgCompletionRate: 0.41,
-  totalTasks: 36,
-  completedTasks: 13,
-  avgSessionDuration: 65,
-};

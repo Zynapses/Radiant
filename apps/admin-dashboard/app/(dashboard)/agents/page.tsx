@@ -105,21 +105,36 @@ export default function AgentsPage() {
     loadData();
   }, []);
 
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     if (selectedSession) {
-      setSessionMessages(mockMessages.filter(m => true)); // All messages for demo
+      loadSessionMessages(selectedSession.sessionId);
     }
   }, [selectedSession]);
 
+  async function loadSessionMessages(sessionId: string) {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/admin/agents/sessions/${sessionId}/messages`);
+      if (res.ok) { const { data } = await res.json(); setSessionMessages(data || []); }
+    } catch { /* ignore */ }
+  }
+
   async function loadData() {
     setLoading(true);
+    setError(null);
     try {
-      setAgents(mockAgents);
-      setSessions(mockSessions);
-      setStats(mockStats);
-    } finally {
-      setLoading(false);
-    }
+      const [agentsRes, sessionsRes, statsRes] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/admin/agents`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/admin/agents/sessions`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/admin/agents/stats`),
+      ]);
+      if (agentsRes.ok) { const { data } = await agentsRes.json(); setAgents(data || []); }
+      else setError('Failed to load agents data.');
+      if (sessionsRes.ok) { const { data } = await sessionsRes.json(); setSessions(data || []); }
+      if (statsRes.ok) { const { data } = await statsRes.json(); setStats(data); }
+    } catch { setError('Failed to connect to agents service.'); }
+    setLoading(false);
   }
 
   if (loading) {
@@ -368,7 +383,7 @@ export default function AgentsPage() {
                   </div>
                 )}
                 <button
-                  onClick={() => { setActiveTab('live'); setSessionMessages(mockMessages); }}
+                  onClick={() => { setActiveTab('live'); if (selectedSession) loadSessionMessages(selectedSession.sessionId); }}
                   className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2"
                 >
                   <Eye className="h-4 w-4" />
@@ -553,38 +568,3 @@ function CollaborationButton({ pattern, icon: Icon, label, description }: { patt
   );
 }
 
-// Mock data
-const mockAgents: CognitiveAgent[] = [
-  { agentId: '1', role: 'planner', name: 'Strategic Planner', description: 'Decomposes complex goals into actionable plans', avatarIcon: 'map', avatarColor: '#3b82f6', primaryModelId: 'openai/o1', capabilities: ['planning', 'decomposition', 'strategy'], personality: { assertiveness: 0.7, detailOrientation: 0.9, creativity: 0.5 }, totalActivations: 1250, successRate: 0.94, avgResponseTimeMs: 2400, isActive: true },
-  { agentId: '2', role: 'critic', name: 'Critical Analyst', description: 'Evaluates plans and outputs for flaws', avatarIcon: 'search', avatarColor: '#ef4444', primaryModelId: 'anthropic/claude-3-5-sonnet-20241022', capabilities: ['critique', 'analysis', 'risk_identification'], personality: { assertiveness: 0.8, detailOrientation: 0.95, creativity: 0.3 }, totalActivations: 2100, successRate: 0.91, avgResponseTimeMs: 1800, isActive: true },
-  { agentId: '3', role: 'executor', name: 'Task Executor', description: 'Carries out specific tasks and produces outputs', avatarIcon: 'zap', avatarColor: '#10b981', primaryModelId: 'anthropic/claude-3-5-sonnet-20241022', capabilities: ['execution', 'coding', 'implementation'], personality: { assertiveness: 0.5, detailOrientation: 0.85, creativity: 0.6 }, totalActivations: 3400, successRate: 0.89, avgResponseTimeMs: 2100, isActive: true },
-  { agentId: '4', role: 'verifier', name: 'Quality Verifier', description: 'Verifies outputs against requirements', avatarIcon: 'check-circle', avatarColor: '#8b5cf6', primaryModelId: 'anthropic/claude-3-5-sonnet-20241022', capabilities: ['verification', 'testing', 'validation'], personality: { assertiveness: 0.6, detailOrientation: 1.0, creativity: 0.2 }, totalActivations: 1800, successRate: 0.96, avgResponseTimeMs: 1500, isActive: true },
-  { agentId: '5', role: 'researcher', name: 'Knowledge Researcher', description: 'Gathers information and synthesizes knowledge', avatarIcon: 'book-open', avatarColor: '#f59e0b', primaryModelId: 'perplexity/llama-3.1-sonar-large', capabilities: ['research', 'exploration', 'synthesis'], personality: { assertiveness: 0.4, detailOrientation: 0.8, creativity: 0.7 }, totalActivations: 890, successRate: 0.88, avgResponseTimeMs: 3200, isActive: true },
-  { agentId: '6', role: 'synthesizer', name: 'Solution Synthesizer', description: 'Combines ideas into coherent solutions', avatarIcon: 'git-merge', avatarColor: '#ec4899', primaryModelId: 'anthropic/claude-3-5-sonnet-20241022', capabilities: ['synthesis', 'integration', 'summarization'], personality: { assertiveness: 0.5, detailOrientation: 0.7, creativity: 0.8 }, totalActivations: 650, successRate: 0.92, avgResponseTimeMs: 2000, isActive: true },
-  { agentId: '7', role: 'devils_advocate', name: 'Devils Advocate', description: 'Challenges consensus and prevents groupthink', avatarIcon: 'alert-triangle', avatarColor: '#f97316', primaryModelId: 'anthropic/claude-3-5-sonnet-20241022', capabilities: ['challenge', 'alternative_thinking', 'debate'], personality: { assertiveness: 0.9, detailOrientation: 0.6, creativity: 0.9 }, totalActivations: 420, successRate: 0.85, avgResponseTimeMs: 1700, isActive: true },
-];
-
-const mockSessions: CollaborationSession[] = [
-  { sessionId: 's1', goal: 'Design a scalable API architecture for the new payment system', collaborationPattern: 'debate', participatingAgents: ['1', '2', '7'], status: 'completed', totalMessages: 12, totalRounds: 4, consensusReached: true, finalConfidence: 0.89, startedAt: new Date(Date.now() - 3600000).toISOString(), completedAt: new Date(Date.now() - 3000000).toISOString(), durationMs: 600000 },
-  { sessionId: 's2', goal: 'Implement user authentication flow with MFA', collaborationPattern: 'divide_conquer', participatingAgents: ['1', '3', '6', '4'], status: 'completed', totalMessages: 18, totalRounds: 4, consensusReached: true, finalConfidence: 0.92, startedAt: new Date(Date.now() - 7200000).toISOString(), completedAt: new Date(Date.now() - 6000000).toISOString(), durationMs: 1200000 },
-  { sessionId: 's3', goal: 'Review and improve database query performance', collaborationPattern: 'critical_review', participatingAgents: ['3', '2', '4'], status: 'active', totalMessages: 6, totalRounds: 2, startedAt: new Date(Date.now() - 900000).toISOString() },
-  { sessionId: 's4', goal: 'Choose between microservices vs monolith for new service', collaborationPattern: 'consensus', participatingAgents: ['1', '2', '3', '4'], status: 'completed', totalMessages: 24, totalRounds: 6, consensusReached: false, finalConfidence: 0.68, startedAt: new Date(Date.now() - 14400000).toISOString(), completedAt: new Date(Date.now() - 12000000).toISOString(), durationMs: 2400000 },
-];
-
-const mockMessages: AgentMessage[] = [
-  { messageId: 'm1', fromAgentId: '1', messageType: 'proposal', content: 'I propose we use a REST API with versioning for the payment system. This provides clear contracts and easy evolution.', confidence: 0.85, roundNumber: 1, createdAt: new Date(Date.now() - 3500000).toISOString() },
-  { messageId: 'm2', fromAgentId: '2', messageType: 'critique', content: 'REST is good for simple CRUD, but payment systems need strong consistency guarantees. Have you considered the failure modes?', confidence: 0.78, roundNumber: 1, createdAt: new Date(Date.now() - 3400000).toISOString() },
-  { messageId: 'm3', fromAgentId: '7', messageType: 'disagreement', content: 'What about GraphQL? It could reduce over-fetching for mobile clients and provide better schema evolution.', confidence: 0.72, roundNumber: 1, createdAt: new Date(Date.now() - 3300000).toISOString() },
-  { messageId: 'm4', fromAgentId: '1', messageType: 'proposal', content: 'Good points. Let me revise: REST for external APIs with idempotency keys, event-driven internally for consistency. GraphQL for mobile gateway.', confidence: 0.88, roundNumber: 2, createdAt: new Date(Date.now() - 3200000).toISOString() },
-  { messageId: 'm5', fromAgentId: '2', messageType: 'agreement', content: 'This hybrid approach addresses my consistency concerns while maintaining flexibility. I support this direction.', confidence: 0.91, roundNumber: 2, createdAt: new Date(Date.now() - 3100000).toISOString() },
-];
-
-const mockStats: AgentStats = {
-  totalAgents: 7,
-  activeAgents: 7,
-  totalSessions: 4,
-  activeSessions: 1,
-  avgConsensusRate: 0.75,
-  avgSessionDuration: 1200000,
-  totalMessages: 60,
-};

@@ -45,9 +45,19 @@ const EXTERNAL_PROVIDERS = {
     displayName: 'Google AI',
     apiBase: 'https://generativelanguage.googleapis.com/v1',
     models: [
+      // Gemini 2.0
       { id: 'gemini-2.0-pro', displayName: 'Gemini 2.0 Pro', contextWindow: 2000000, inputPer1M: 1.25, outputPer1M: 5.00, capabilities: ['chat', 'vision'] },
       { id: 'gemini-2.0-flash', displayName: 'Gemini 2.0 Flash', contextWindow: 1000000, inputPer1M: 0.075, outputPer1M: 0.30, capabilities: ['chat', 'vision'] },
       { id: 'gemini-1.5-pro', displayName: 'Gemini 1.5 Pro', contextWindow: 2000000, inputPer1M: 1.25, outputPer1M: 5.00, capabilities: ['chat', 'vision'] },
+      // Gemini 3 Flash
+      { id: 'gemini-3-flash', displayName: 'Gemini 3 Flash', contextWindow: 1000000, inputPer1M: 0.10, outputPer1M: 0.40, capabilities: ['chat', 'vision', 'fast'], isNovel: true },
+      { id: 'gemini-3-flash-thinking', displayName: 'Gemini 3 Flash Thinking', contextWindow: 1000000, inputPer1M: 0.15, outputPer1M: 0.60, capabilities: ['chat', 'reasoning', 'thinking'], isNovel: true },
+      // Gemini 3 Pro
+      { id: 'gemini-3-pro', displayName: 'Gemini 3 Pro', contextWindow: 2000000, inputPer1M: 2.00, outputPer1M: 8.00, capabilities: ['chat', 'vision', 'reasoning', 'coding'], isNovel: true },
+      { id: 'gemini-3-pro-thinking', displayName: 'Gemini 3 Pro Thinking', contextWindow: 2000000, inputPer1M: 3.00, outputPer1M: 12.00, capabilities: ['chat', 'reasoning', 'thinking', 'math'], isNovel: true },
+      // Gemini 3 Ultra
+      { id: 'gemini-3-ultra', displayName: 'Gemini 3 Ultra', contextWindow: 2000000, inputPer1M: 5.00, outputPer1M: 20.00, capabilities: ['chat', 'vision', 'reasoning', 'coding', 'agents', 'multimodal'], isNovel: true },
+      { id: 'gemini-3-ultra-thinking', displayName: 'Gemini 3 Ultra Thinking', contextWindow: 2000000, inputPer1M: 8.00, outputPer1M: 32.00, capabilities: ['chat', 'reasoning', 'thinking', 'math', 'planning', 'agents'], isNovel: true },
     ],
   },
   xai: {

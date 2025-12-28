@@ -93,7 +93,14 @@ class EnvironmentConfig {
     const missing = requiredVars.filter(v => !process.env[v]);
     
     if (missing.length > 0 && process.env.NODE_ENV !== 'test') {
-      console.warn(`[Config] Missing environment variables: ${missing.join(', ')}`);
+      // Use structured output format for Lambda CloudWatch
+      const output = JSON.stringify({
+        timestamp: new Date().toISOString(),
+        level: 'warn',
+        message: 'Missing environment variables',
+        missingVars: missing,
+      });
+      process.stdout.write(output + '\n');
     }
   }
 
@@ -275,6 +282,122 @@ class EnvironmentConfig {
     });
   }
 
+  // AI/LiteLLM Configuration
+  get litellmBaseUrl(): string {
+    return getEnvVar({
+      key: 'LITELLM_BASE_URL',
+      type: 'string',
+      default: '',
+    });
+  }
+
+  get litellmApiKey(): string {
+    return getEnvVar({
+      key: 'LITELLM_API_KEY',
+      type: 'string',
+      default: '',
+    });
+  }
+
+  get bedrockEnabled(): boolean {
+    return getEnvVar({
+      key: 'BEDROCK_ENABLED',
+      type: 'boolean',
+      default: true,
+    });
+  }
+
+  get openaiApiKey(): string {
+    return getEnvVar({
+      key: 'OPENAI_API_KEY',
+      type: 'string',
+      default: '',
+    });
+  }
+
+  get anthropicApiKey(): string {
+    return getEnvVar({
+      key: 'ANTHROPIC_API_KEY',
+      type: 'string',
+      default: '',
+    });
+  }
+
+  get googleApiKey(): string {
+    return getEnvVar({
+      key: 'GOOGLE_API_KEY',
+      type: 'string',
+      default: '',
+    });
+  }
+
+  // Circuit Breaker Configuration
+  get circuitBreakerFailureThreshold(): number {
+    return getEnvVar({
+      key: 'CIRCUIT_BREAKER_FAILURE_THRESHOLD',
+      type: 'number',
+      default: 5,
+    });
+  }
+
+  get circuitBreakerResetTimeoutMs(): number {
+    return getEnvVar({
+      key: 'CIRCUIT_BREAKER_RESET_TIMEOUT_MS',
+      type: 'number',
+      default: 30000,
+    });
+  }
+
+  get circuitBreakerHalfOpenRequests(): number {
+    return getEnvVar({
+      key: 'CIRCUIT_BREAKER_HALF_OPEN_REQUESTS',
+      type: 'number',
+      default: 3,
+    });
+  }
+
+  // Retry Configuration
+  get retryMaxAttempts(): number {
+    return getEnvVar({
+      key: 'RETRY_MAX_ATTEMPTS',
+      type: 'number',
+      default: 3,
+    });
+  }
+
+  get retryInitialDelayMs(): number {
+    return getEnvVar({
+      key: 'RETRY_INITIAL_DELAY_MS',
+      type: 'number',
+      default: 1000,
+    });
+  }
+
+  get retryMaxDelayMs(): number {
+    return getEnvVar({
+      key: 'RETRY_MAX_DELAY_MS',
+      type: 'number',
+      default: 30000,
+    });
+  }
+
+  // Artifact Storage
+  get artifactsBucket(): string {
+    return getEnvVar({
+      key: 'ARTIFACTS_BUCKET',
+      type: 'string',
+      default: `radiant-artifacts-${this.awsRegion}`,
+    });
+  }
+
+  get artifactUrlExpirationSeconds(): number {
+    return getEnvVar({
+      key: 'ARTIFACT_URL_EXPIRATION',
+      type: 'number',
+      default: 3600,
+    });
+  }
+
   // Environment
   get nodeEnv(): string {
     return getEnvVar({
@@ -306,3 +429,82 @@ export const env = EnvironmentConfig.getInstance();
 
 // Re-export for convenience
 export { getEnvVar, EnvVarConfig };
+
+// ============================================================================
+// Startup Validation
+// ============================================================================
+
+export interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+/**
+ * Validate all required environment variables at Lambda startup.
+ * Call this in your handler's initialization code.
+ */
+export function validateEnvironment(requiredVars: string[] = []): ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  // Check required variables
+  const baseRequired = ['AWS_REGION'];
+  const allRequired = [...new Set([...baseRequired, ...requiredVars])];
+
+  for (const varName of allRequired) {
+    if (!process.env[varName]) {
+      errors.push(`Missing required environment variable: ${varName}`);
+    }
+  }
+
+  // Check recommended variables
+  const recommended = ['LOG_LEVEL', 'NODE_ENV'];
+  for (const varName of recommended) {
+    if (!process.env[varName]) {
+      warnings.push(`Missing recommended environment variable: ${varName}`);
+    }
+  }
+
+  // Validate DATABASE_URL format if present
+  const dbUrl = process.env.DATABASE_URL;
+  if (dbUrl && !dbUrl.startsWith('postgres')) {
+    errors.push('DATABASE_URL must be a valid PostgreSQL connection string');
+  }
+
+  // Validate LOG_LEVEL if present
+  const logLevel = process.env.LOG_LEVEL;
+  if (logLevel && !['debug', 'info', 'warn', 'error'].includes(logLevel)) {
+    errors.push('LOG_LEVEL must be one of: debug, info, warn, error');
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings,
+  };
+}
+
+/**
+ * Assert environment is valid, throwing if not.
+ * Use this for fail-fast validation at startup.
+ */
+export function assertValidEnvironment(requiredVars: string[] = []): void {
+  const result = validateEnvironment(requiredVars);
+  
+  if (result.warnings.length > 0 && process.env.NODE_ENV !== 'test') {
+    const output = JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level: 'warn',
+      message: 'Environment validation warnings',
+      warnings: result.warnings,
+    });
+    process.stdout.write(output + '\n');
+  }
+
+  if (!result.valid) {
+    const error = new Error(`Environment validation failed: ${result.errors.join('; ')}`);
+    error.name = 'ConfigurationError';
+    throw error;
+  }
+}

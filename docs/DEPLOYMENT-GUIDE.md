@@ -45,15 +45,17 @@ This guide covers deploying the RADIANT platform from development to production.
 Use the deployment script for a streamlined deployment:
 
 ```bash
-# Deploy to dev environment (Tier 1)
-./scripts/deploy.sh --environment dev --tier 1
+# Deploy to dev environment
+./scripts/deploy.sh --environment dev
 
-# Deploy to staging (Tier 2)
-./scripts/deploy.sh --environment staging --tier 2
+# Deploy to staging
+./scripts/deploy.sh --environment staging
 
-# Deploy to production (Tier 3+)
-./scripts/deploy.sh --environment prod --tier 3
+# Deploy to production
+./scripts/deploy.sh --environment prod
 ```
+
+> **Note:** RADIANT uses a unified deployment model. All features are available in every deployment. Licensing restrictions are handled at the application level, not infrastructure level.
 
 ### Verify Deployment
 

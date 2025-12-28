@@ -399,7 +399,7 @@ function parseConfigValue(value: unknown, valueType: string): unknown {
       }
     } catch (error) {
       // JSON parse failed, return original value
-      console.warn('Failed to parse config value:', { value, error: error instanceof Error ? error.message : 'unknown' });
+      logger.warn('Failed to parse config value', { value, error: error instanceof Error ? error.message : 'unknown' });
       return value;
     }
   }

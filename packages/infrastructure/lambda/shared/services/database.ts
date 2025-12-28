@@ -6,6 +6,7 @@
 
 import { Pool, PoolClient, QueryResult, QueryResultRow } from 'pg';
 import { getSecretJson } from './secrets';
+import { logger } from '../logger';
 
 let pool: Pool | null = null;
 
@@ -38,7 +39,7 @@ export async function initDatabase(): Promise<void> {
   });
 
   pool.on('error', (err: Error) => {
-    console.error('Unexpected database pool error:', err);
+    logger.error('Unexpected database pool error', err);
   });
 }
 

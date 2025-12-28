@@ -1,60 +1,57 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-// Mock learning data
-const mockLearningStats = {
-  totalInteractions: 156847,
-  interactionsWithFeedback: 42356,
-  avgOutcomeScore: 0.78,
-  feedbackPositiveRatio: 0.84,
-  interactionsToday: 4521,
-  feedbackToday: 1234,
-};
+interface LearningStats { totalInteractions: number; interactionsWithFeedback: number; avgOutcomeScore: number; feedbackPositiveRatio: number; interactionsToday: number; feedbackToday: number; }
+interface TopModel { model: string; count: number; avgQuality: number; }
+interface TopSpecialty { specialty: string; count: number; }
+interface FeatureMetric { feature: string; invocations: number; successRate: number; avgLatencyMs: number; impact: number; }
+interface RecentFeedbackItem { id: string; task: string; rating: number; thumbs: string | null; action: string; time: string; }
+interface ImplicitSignals { copyRate: number; regenerateRate: number; sessionContinueRate: number; followupRate: number; avgReadTimeMs: number; }
 
-const mockTopModels = [
-  { model: 'anthropic/claude-3-5-sonnet', count: 45234, avgQuality: 0.91 },
-  { model: 'openai/gpt-4o', count: 38921, avgQuality: 0.89 },
-  { model: 'deepseek/deepseek-chat', count: 24567, avgQuality: 0.88 },
-  { model: 'google/gemini-2.0-flash', count: 18234, avgQuality: 0.85 },
-  { model: 'openai/o1-mini', count: 12456, avgQuality: 0.94 },
-];
-
-const mockTopSpecialties = [
-  { specialty: 'coding', count: 52341 },
-  { specialty: 'reasoning', count: 34567 },
-  { specialty: 'general', count: 28934 },
-  { specialty: 'creative', count: 18234 },
-  { specialty: 'math', count: 12456 },
-];
-
-const mockFeatureMetrics = [
-  { feature: 'moral_compass', invocations: 156847, successRate: 0.99, avgLatencyMs: 45, impact: 0.12 },
-  { feature: 'confidence_calibration', invocations: 142356, successRate: 0.98, avgLatencyMs: 23, impact: 0.08 },
-  { feature: 'context_adaptation', invocations: 134567, successRate: 0.97, avgLatencyMs: 67, impact: 0.15 },
-  { feature: 'self_improvement', invocations: 89234, successRate: 0.96, avgLatencyMs: 156, impact: 0.05 },
-  { feature: 'knowledge_graph', invocations: 23456, successRate: 0.94, avgLatencyMs: 234, impact: 0.03 },
-  { feature: 'think_tank', invocations: 12345, successRate: 0.92, avgLatencyMs: 4567, impact: 0.22 },
-];
-
-const mockRecentFeedback = [
-  { id: '1', task: 'Write a Python sorting algorithm', rating: 5, thumbs: 'up', action: 'copied', time: '2 min ago' },
-  { id: '2', task: 'Explain quantum entanglement', rating: 4, thumbs: 'up', action: 'accepted', time: '5 min ago' },
-  { id: '3', task: 'Debug React component', rating: 3, thumbs: null, action: 'edited', time: '8 min ago' },
-  { id: '4', task: 'Generate marketing copy', rating: 2, thumbs: 'down', action: 'regenerated', time: '12 min ago' },
-  { id: '5', task: 'Solve calculus problem', rating: 5, thumbs: 'up', action: 'copied', time: '15 min ago' },
-];
-
-const mockImplicitSignals = {
-  copyRate: 0.34,
-  regenerateRate: 0.08,
-  sessionContinueRate: 0.72,
-  followupRate: 0.45,
-  avgReadTimeMs: 8500,
-};
+const defaultStats: LearningStats = { totalInteractions: 0, interactionsWithFeedback: 0, avgOutcomeScore: 0, feedbackPositiveRatio: 0, interactionsToday: 0, feedbackToday: 0 };
+const defaultSignals: ImplicitSignals = { copyRate: 0, regenerateRate: 0, sessionContinueRate: 0, followupRate: 0, avgReadTimeMs: 0 };
 
 export default function LearningPage() {
   const [selectedTab, setSelectedTab] = useState<'overview' | 'feedback' | 'signals' | 'features' | 'insights'>('overview');
+  const [mockLearningStats, setMockLearningStats] = useState<LearningStats>(defaultStats);
+  const [mockTopModels, setMockTopModels] = useState<TopModel[]>([]);
+  const [mockTopSpecialties, setMockTopSpecialties] = useState<TopSpecialty[]>([]);
+  const [mockFeatureMetrics, setMockFeatureMetrics] = useState<FeatureMetric[]>([]);
+  const [mockRecentFeedback, setMockRecentFeedback] = useState<RecentFeedbackItem[]>([]);
+  const [mockImplicitSignals, setMockImplicitSignals] = useState<ImplicitSignals>(defaultSignals);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      setError(null);
+      try {
+        const API = process.env.NEXT_PUBLIC_API_URL || '';
+        const [statsRes, modelsRes, specialtiesRes, metricsRes, feedbackRes, signalsRes] = await Promise.all([
+          fetch(`${API}/admin/learning/stats`),
+          fetch(`${API}/admin/learning/top-models`),
+          fetch(`${API}/admin/learning/top-specialties`),
+          fetch(`${API}/admin/learning/feature-metrics`),
+          fetch(`${API}/admin/learning/recent-feedback`),
+          fetch(`${API}/admin/learning/implicit-signals`),
+        ]);
+        if (statsRes.ok) { const { data } = await statsRes.json(); setMockLearningStats(data || defaultStats); }
+        else setError('Failed to load learning data.');
+        if (modelsRes.ok) { const { data } = await modelsRes.json(); setMockTopModels(data || []); }
+        if (specialtiesRes.ok) { const { data } = await specialtiesRes.json(); setMockTopSpecialties(data || []); }
+        if (metricsRes.ok) { const { data } = await metricsRes.json(); setMockFeatureMetrics(data || []); }
+        if (feedbackRes.ok) { const { data } = await feedbackRes.json(); setMockRecentFeedback(data || []); }
+        if (signalsRes.ok) { const { data } = await signalsRes.json(); setMockImplicitSignals(data || defaultSignals); }
+      } catch { setError('Failed to connect to learning service.'); }
+      setLoading(false);
+    }
+    loadData();
+  }, []);
+
+  if (loading) return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" /></div>;
+  if (error) return <div className="flex flex-col items-center justify-center h-96 text-red-500"><p className="text-lg font-medium">Error</p><p className="text-sm">{error}</p></div>;
 
   const getScoreColor = (score: number) => {
     if (score >= 0.9) return 'text-green-600';

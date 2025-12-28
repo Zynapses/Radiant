@@ -1,9 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-// Mock data for demonstration
-const mockIdeas = [
+interface ImprovementIdea {
+  ideaId: string; ideaCode: string; title: string; description: string; category: string; priority: string;
+  status: string; version: number; isDeprecated: boolean; deprecationReason?: string;
+  confidenceScore: number; impactScore: number; feasibilityScore: number; compositeScore: number;
+  createdAt: string; evolutionCount: number;
+}
+interface Notification { id: string; type: string; title: string; message: string; priority: string; read: boolean; createdAt: string; }
+interface SelfAwareness { capability: string; strength: number; weakness: number; actual: number; trend: string; }
+interface Stats { totalIdeas: number; activeIdeas: number; deprecatedIdeas: number; implementedIdeas: number; pendingReview: number; recentAnalyses: number; unreadNotifications: number; }
+
+const defaultIdeas: ImprovementIdea[] = [
   {
     ideaId: '1',
     ideaCode: 'SI-0001',
@@ -92,61 +101,47 @@ const mockIdeas = [
   },
 ];
 
-const mockNotifications = [
-  {
-    id: '1',
-    type: 'new_idea',
-    title: 'New Self-Improvement Idea Generated',
-    message: 'AGI has identified a new improvement opportunity in safety',
-    priority: 'high',
-    read: false,
-    createdAt: '2024-12-26T20:30:00Z',
-  },
-  {
-    id: '2',
-    type: 'idea_evolved',
-    title: 'Idea SI-0001 Evolved',
-    message: 'Confidence calibration idea has been refined based on new performance data',
-    priority: 'normal',
-    read: false,
-    createdAt: '2024-12-26T18:00:00Z',
-  },
-  {
-    id: '3',
-    type: 'idea_deprecated',
-    title: 'Idea SI-0005 Deprecated',
-    message: 'Analogical reasoning idea superseded by more comprehensive approach',
-    priority: 'low',
-    read: true,
-    createdAt: '2024-12-25T10:00:00Z',
-  },
-];
-
-const mockSelfAwareness = [
-  { capability: 'Reasoning', strength: 0.82, weakness: 0.18, actual: 0.79, trend: 'improving' },
-  { capability: 'Memory', strength: 0.75, weakness: 0.25, actual: 0.72, trend: 'stable' },
-  { capability: 'Safety', strength: 0.88, weakness: 0.12, actual: 0.85, trend: 'improving' },
-  { capability: 'Performance', strength: 0.70, weakness: 0.30, actual: 0.68, trend: 'declining' },
-  { capability: 'Creativity', strength: 0.78, weakness: 0.22, actual: 0.80, trend: 'stable' },
-];
-
-const mockStats = {
-  totalIdeas: 12,
-  activeIdeas: 8,
-  deprecatedIdeas: 3,
-  implementedIdeas: 2,
-  pendingReview: 4,
-  recentAnalyses: 3,
-  unreadNotifications: 2,
-};
+const defaultStats: Stats = { totalIdeas: 0, activeIdeas: 0, deprecatedIdeas: 0, implementedIdeas: 0, pendingReview: 0, recentAnalyses: 0, unreadNotifications: 0 };
 
 export default function SelfImprovementPage() {
   const [selectedTab, setSelectedTab] = useState<'overview' | 'ideas' | 'awareness' | 'notifications' | 'history'>('overview');
-  const [selectedIdea, setSelectedIdea] = useState<typeof mockIdeas[0] | null>(null);
+  const [mockIdeas, setMockIdeas] = useState<ImprovementIdea[]>(defaultIdeas);
+  const [mockNotifications, setMockNotifications] = useState<Notification[]>([]);
+  const [mockSelfAwareness, setMockSelfAwareness] = useState<SelfAwareness[]>([]);
+  const [mockStats, setMockStats] = useState<Stats>(defaultStats);
+  const [selectedIdea, setSelectedIdea] = useState<ImprovementIdea | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredIdeas = mockIdeas.filter(idea => {
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      setError(null);
+      try {
+        const API = process.env.NEXT_PUBLIC_API_URL || '';
+        const [ideasRes, notificationsRes, awarenessRes, statsRes] = await Promise.all([
+          fetch(`${API}/admin/self-improvement/ideas`),
+          fetch(`${API}/admin/self-improvement/notifications`),
+          fetch(`${API}/admin/self-improvement/awareness`),
+          fetch(`${API}/admin/self-improvement/stats`),
+        ]);
+        if (ideasRes.ok) { const { data } = await ideasRes.json(); setMockIdeas(data || defaultIdeas); }
+        else setError('Failed to load self-improvement data.');
+        if (notificationsRes.ok) { const { data } = await notificationsRes.json(); setMockNotifications(data || []); }
+        if (awarenessRes.ok) { const { data } = await awarenessRes.json(); setMockSelfAwareness(data || []); }
+        if (statsRes.ok) { const { data } = await statsRes.json(); setMockStats(data || defaultStats); }
+      } catch { setError('Failed to connect to self-improvement service.'); }
+      setLoading(false);
+    }
+    loadData();
+  }, []);
+
+  if (loading) return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" /></div>;
+  if (error) return <div className="flex flex-col items-center justify-center h-96 text-red-500"><p className="text-lg font-medium">Error</p><p className="text-sm">{error}</p></div>;
+
+  const filteredIdeas = mockIdeas.filter((idea: ImprovementIdea) => {
     if (statusFilter !== 'all' && idea.status !== statusFilter) return false;
     if (categoryFilter !== 'all' && idea.category !== categoryFilter) return false;
     return true;

@@ -2,7 +2,6 @@ import SwiftUI
 
 struct DeployView: View {
     @EnvironmentObject var appState: AppState
-    @State private var selectedTier: TierLevel = .seed
     @State private var showConfirmation = false
     @State private var deploymentMode: DeploymentMode = .install
     @State private var isCheckingMode = false
@@ -76,13 +75,6 @@ struct DeployView: View {
                         }
                         .buttonStyle(.borderless)
                     }
-                }
-            }
-            
-            // Tier Selection (for install mode)
-            if deploymentMode == .install {
-                Section("Infrastructure Tier") {
-                    TierPickerNew(selectedTier: $selectedTier)
                 }
             }
             
@@ -362,7 +354,7 @@ struct DeployView: View {
             appState.deploymentLogs.append(LogEntry(
                 timestamp: Date(),
                 level: .info,
-                message: "Using default parameters for \(selectedTier.displayName) tier",
+                message: "Using default deployment parameters",
                 metadata: nil
             ))
             appState.deploymentLogs.append(LogEntry(
@@ -472,7 +464,6 @@ struct DeployView: View {
                 _ = try await appState.cdkService.deploy(
                     appId: app.id,
                     environment: environment.rawValue,
-                    tier: selectedTier.rawValue,
                     credentials: credentials,
                     progressHandler: { message in
                         Task { @MainActor in
@@ -523,7 +514,6 @@ struct DeployView: View {
                 _ = try await appState.cdkService.deploy(
                     appId: app.id,
                     environment: environment.rawValue,
-                    tier: selectedTier.rawValue,
                     credentials: credentials,
                     progressHandler: { message in
                         Task { @MainActor in
@@ -627,88 +617,6 @@ struct DeployView: View {
                 message: message,
                 metadata: nil
             ))
-        }
-    }
-}
-
-// MARK: - Tier Picker (New)
-
-struct TierPickerNew: View {
-    @Binding var selectedTier: TierLevel
-    
-    var body: some View {
-        ForEach(TierLevel.allCases, id: \.self) { tier in
-            Button {
-                selectedTier = tier
-            } label: {
-                HStack {
-                    VStack(alignment: .leading) {
-                        HStack {
-                            Text("Tier \(tier.rawValue): \(tier.displayName)")
-                                .font(.headline)
-                            Spacer()
-                            Text(tier.priceRange)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        Text(tier.description)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    if selectedTier == tier {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.blue)
-                    }
-                }
-                .padding(.vertical, 4)
-            }
-            .buttonStyle(.plain)
-        }
-    }
-}
-
-// MARK: - Legacy Tier Picker (for compatibility)
-
-struct TierPicker: View {
-    @Binding var selectedTier: Int
-    
-    private let tiers = [
-        (1, "SEED", "$50-150/mo", "Development and testing"),
-        (2, "STARTER", "$200-400/mo", "Small production workloads"),
-        (3, "GROWTH", "$1,000-2,500/mo", "Medium production with self-hosted models"),
-        (4, "SCALE", "$4,000-8,000/mo", "Large production with multi-region"),
-        (5, "ENTERPRISE", "$15,000-35,000/mo", "Enterprise-grade global deployment")
-    ]
-    
-    var body: some View {
-        ForEach(tiers, id: \.0) { tier in
-            Button {
-                selectedTier = tier.0
-            } label: {
-                HStack {
-                    VStack(alignment: .leading) {
-                        HStack {
-                            Text("Tier \(tier.0): \(tier.1)")
-                                .font(.headline)
-                            Spacer()
-                            Text(tier.2)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        Text(tier.3)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    if selectedTier == tier.0 {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.blue)
-                    }
-                }
-                .padding(.vertical, 4)
-            }
-            .buttonStyle(.plain)
         }
     }
 }

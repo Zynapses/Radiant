@@ -5,6 +5,7 @@
 import { BedrockRuntimeClient, InvokeModelCommand, InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
 import { executeStatement } from '../db/client';
 import { checkProviderRateLimit, getProviderRateLimitStatus, PROVIDER_RATE_LIMITS } from '../middleware/rate-limiter';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // ============================================================================
 // Types
@@ -370,7 +371,9 @@ export class ModelRouterService {
     }
 
     // Load persisted health from database on cold start (async)
-    this.loadPersistedHealth().catch(() => {});
+    this.loadPersistedHealth().catch(err => {
+      logger.debug('Failed to load persisted health on cold start', { error: err instanceof Error ? err.message : 'unknown' });
+    });
   }
 
   // ============================================================================
@@ -390,7 +393,9 @@ export class ModelRouterService {
       const response = await this.invokeProvider(config, request);
       this.recordSuccess(config.provider, Date.now() - startTime);
       // Record model usage for analytics (fire-and-forget)
-      this.recordModelUsage(config.modelId, config.provider, true, response.latencyMs, response.inputTokens, response.outputTokens, response.costCents).catch(() => {});
+      this.recordModelUsage(config.modelId, config.provider, true, response.latencyMs, response.inputTokens, response.outputTokens, response.costCents).catch(err => {
+        logger.debug('Failed to record model usage', { modelId: config.modelId, error: err instanceof Error ? err.message : 'unknown' });
+      });
       return response;
     } catch (primaryError) {
       const errorMsg = primaryError instanceof Error ? primaryError.message : 'Unknown error';
@@ -408,7 +413,9 @@ export class ModelRouterService {
         const response = await this.invokeProvider(fallbackConfig, request);
         this.recordSuccess(fallbackProvider, Date.now() - startTime);
         // Record model usage for analytics (fire-and-forget)
-        this.recordModelUsage(fallbackConfig.modelId, fallbackProvider, true, response.latencyMs, response.inputTokens, response.outputTokens, response.costCents).catch(() => {});
+        this.recordModelUsage(fallbackConfig.modelId, fallbackProvider, true, response.latencyMs, response.inputTokens, response.outputTokens, response.costCents).catch(err => {
+          logger.debug('Failed to record fallback model usage', { modelId: fallbackConfig.modelId, error: err instanceof Error ? err.message : 'unknown' });
+        });
         return response;
       } catch (fallbackError) {
         const errorMsg = fallbackError instanceof Error ? fallbackError.message : 'Unknown error';
@@ -702,7 +709,9 @@ export class ModelRouterService {
       health.consecutiveFailures = 0;
     }
     // Persist to database (fire-and-forget for performance)
-    this.persistProviderSuccess(provider, latencyMs).catch(() => {});
+    this.persistProviderSuccess(provider, latencyMs).catch(err => {
+      logger.debug('Failed to persist provider success', { provider, error: err instanceof Error ? err.message : 'unknown' });
+    });
   }
 
   private recordFailure(provider: ModelProvider, reason?: string): void {
@@ -716,7 +725,9 @@ export class ModelRouterService {
       }
     }
     // Persist to database (fire-and-forget for performance)
-    this.persistProviderFailure(provider, reason).catch(() => {});
+    this.persistProviderFailure(provider, reason).catch(err => {
+      logger.debug('Failed to persist provider failure', { provider, error: err instanceof Error ? err.message : 'unknown' });
+    });
   }
 
   private async persistProviderSuccess(provider: ModelProvider, latencyMs: number): Promise<void> {

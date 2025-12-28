@@ -6,6 +6,7 @@ import { extractUserFromEvent, type AuthContext } from '../shared/auth';
 import { UnauthorizedError, NotFoundError, ValidationError } from '../shared/errors';
 import { executeStatement } from '../shared/db/client';
 import { metricsCollector } from '../shared/services';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 
 type PipelineType = 'segment' | 'inpaint' | 'upscale' | 'interpolate' | 'face_restore' | 'matting';
 
@@ -51,7 +52,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     return handleError(new NotFoundError('Endpoint not found'));
   } catch (error) {
-    console.error('Visual pipeline error:', error);
+    logger.error('Visual pipeline error', error);
     return handleError(error);
   }
 }
@@ -91,7 +92,7 @@ async function handleCreateJob(
   const jobId = String((result.rows[0] as Record<string, unknown>)?.id || '');
 
   // Start async processing (in production, this would trigger a Step Function or SQS)
-  processJobAsync(jobId, body, user).catch(console.error);
+  processJobAsync(jobId, body, user).catch(err => logger.error('Async job processing failed', err));
 
   metricsCollector.record({
     tenantId: user.tenantId,
