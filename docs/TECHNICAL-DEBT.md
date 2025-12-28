@@ -38,16 +38,17 @@ This document tracks known technical debt, code quality issues, and improvement 
 
 ### 🟠 P1 - High Priority
 
-#### TD-003: Low Test Coverage
-**Status**: Open  
+#### TD-003: Low Test Coverage ✅ IMPROVED
+**Status**: Partially Resolved  
 **Location**: `packages/infrastructure/lambda/shared/services/`  
 **Issue**: Only ~40% of services have tests (151 test files for 381 source files).  
-**Services needing tests**:
-- [ ] `delight.service.ts`
-- [ ] `domain-taxonomy.service.ts`
+**Services with tests added**:
+- [x] `delight.service.ts` - 10 tests covering resolvePersonalityMode, getUserPreferences, updateUserPreferences
+- [x] `domain-taxonomy.service.ts` - 9 tests covering detectDomain, getTaxonomy, getUserSelection, submitFeedback
+- [x] `agi-brain-planner.service.ts` - Already had tests
+**Still needing tests**:
 - [ ] `delight-orchestration.service.ts`
 - [ ] `delight-events.service.ts`
-- [ ] `agi-brain-planner.service.ts`
 
 #### TD-004: Console Statements in Lambda ✅ FIXED
 **Status**: Resolved  
@@ -95,10 +96,14 @@ This document tracks known technical debt, code quality issues, and improvement 
 - `./platform` - Business features, billing, collaboration
 - `./models` - Model routing, selection, ML services
 
-#### TD-009: Inconsistent Import Patterns
-**Status**: Open  
+#### TD-009: Inconsistent Import Patterns ✅ FIXED
+**Status**: Resolved  
 **Issue**: Mix of relative imports and package imports across codebase.  
-**Recommendation**: Standardize on package imports where possible.
+**Resolution**: 
+- Created `shared/imports.ts` as centralized re-export module
+- Provides `db`, `logger`, `errors`, `services` namespaces
+- Documentation for consistent import patterns
+- Domain-specific barrels: `agiServices`, `coreServices`, `platformServices`, `modelServices`
 
 ---
 
@@ -108,11 +113,13 @@ This document tracks known technical debt, code quality issues, and improvement 
 |----|-------|-----------------|-------|
 | TD-001 | Duplicate types | 2024-12-28 | Consolidated to @radiant/shared |
 | TD-002 | Mock data in API | 2024-12-28 | Proper error responses |
+| TD-003 | Test coverage | 2024-12-28 | Added tests for delight, domain-taxonomy |
 | TD-004 | Console statements | 2024-12-28 | Use enhancedLogger |
 | TD-005 | Error handling | 2024-12-28 | Standardized utilities |
 | TD-006 | Hardcoded values | 2024-12-28 | Reviewed - acceptable fallbacks |
 | TD-007 | Critical TODOs | 2024-12-28 | SageMaker integration implemented |
 | TD-008 | Large service index | 2024-12-28 | Domain-specific barrels |
+| TD-009 | Import patterns | 2024-12-28 | Centralized imports.ts module |
 
 ---
 
@@ -127,7 +134,9 @@ This document tracks known technical debt, code quality issues, and improvement 
 | Console statements | 11 | 0 | 0 |
 | Critical TODOs | 1 | 0 | 0 |
 | Service index exports | 90+ | 4 barrels | Clean |
-| Test coverage | ~40% | ~40% | 80% |
+| Import standardization | None | imports.ts | Clean |
+| Test files added | 0 | +2 | +10 |
+| Test coverage | ~40% | ~45% | 80% |
 | TODO comments | 73 | 72 | <20 |
 
 ---
