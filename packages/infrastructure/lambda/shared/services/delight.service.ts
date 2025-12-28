@@ -6,112 +6,53 @@
 import { executeStatement, stringParam, longParam } from '../db/client';
 import { enhancedLogger } from '../logging/enhanced-logger';
 
+// Import types from @radiant/shared - single source of truth
+import type {
+  InjectionPoint,
+  TriggerType,
+  DisplayStyle,
+  PersonalityMode,
+  AchievementType,
+  AchievementRarity,
+  EasterEggTriggerType,
+  EasterEggEffectType,
+  SoundTheme,
+  TimeContext,
+  DelightCategory,
+  DelightMessage,
+  DelightAchievement,
+  UserAchievement,
+  UserDelightPreferences,
+  DelightEasterEgg,
+  DelightSound,
+} from '@radiant/shared';
+
+// Re-export types for consumers of this service
+export type {
+  InjectionPoint,
+  TriggerType,
+  DisplayStyle,
+  PersonalityMode,
+  AchievementType,
+  AchievementRarity,
+  EasterEggTriggerType,
+  EasterEggEffectType,
+  SoundTheme,
+  TimeContext,
+  DelightCategory,
+  DelightMessage,
+  DelightAchievement,
+  UserAchievement,
+  UserDelightPreferences,
+  DelightEasterEgg,
+  DelightSound,
+};
+
 const logger = enhancedLogger;
 
 // ============================================================================
-// Type Definitions
+// Service-specific Types (not in @radiant/shared)
 // ============================================================================
-
-export type InjectionPoint = 'pre_execution' | 'during_execution' | 'post_execution';
-export type TriggerType = 'domain_loading' | 'domain_transition' | 'time_aware' | 'model_dynamics' | 'complexity_signals' | 'synthesis_quality' | 'achievement' | 'wellbeing' | 'easter_egg';
-export type DisplayStyle = 'subtle' | 'moderate' | 'expressive';
-export type PersonalityMode = 'auto' | 'professional' | 'subtle' | 'expressive' | 'playful';
-export type AchievementType = 'domain_explorer' | 'streak' | 'complexity' | 'discovery' | 'time_spent' | 'queries_count';
-export type AchievementRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-export type EasterEggTriggerType = 'key_sequence' | 'text_input' | 'time_based' | 'random' | 'usage_pattern';
-export type EasterEggEffectType = 'mode_change' | 'visual_transform' | 'sound_play' | 'message_show' | 'interface_mod';
-export type SoundTheme = 'default' | 'mission_control' | 'library' | 'workshop' | 'minimal' | 'emissions';
-export type TimeContext = 'morning' | 'afternoon' | 'evening' | 'night' | 'weekend' | 'holiday' | 'long_session' | 'very_late' | 'returning';
-
-export interface DelightCategory {
-  id: string;
-  name: string;
-  description: string | null;
-  icon: string | null;
-  sortOrder: number;
-  isEnabled: boolean;
-}
-
-export interface DelightMessage {
-  id: number;
-  categoryId: string;
-  injectionPoint: InjectionPoint;
-  triggerType: TriggerType;
-  messageText: string;
-  messageAltTexts: string[];
-  domainFamilies: string[];
-  timeContexts: TimeContext[];
-  displayStyle: DisplayStyle;
-  soundEffect: string | null;
-  priority: number;
-  isEnabled: boolean;
-  requiresOptIn: boolean;
-}
-
-export interface DelightAchievement {
-  id: string;
-  name: string;
-  description: string | null;
-  icon: string | null;
-  achievementType: AchievementType;
-  thresholdValue: number;
-  celebrationMessage: string | null;
-  rarity: AchievementRarity;
-  points: number;
-  isHidden: boolean;
-  isEnabled: boolean;
-}
-
-export interface UserAchievement {
-  id: number;
-  viserId: string;
-  tenantId: string;
-  achievementId: string;
-  progressValue: number;
-  isUnlocked: boolean;
-  unlockedAt: Date | null;
-  achievement?: DelightAchievement;
-}
-
-export interface UserDelightPreferences {
-  userId: string;
-  tenantId: string;
-  personalityMode: PersonalityMode;
-  intensityLevel: number;
-  enableDomainMessages: boolean;
-  enableModelPersonality: boolean;
-  enableTimeAwareness: boolean;
-  enableAchievements: boolean;
-  enableWellbeingNudges: boolean;
-  enableEasterEggs: boolean;
-  enableSounds: boolean;
-  soundTheme: SoundTheme;
-  soundVolume: number;
-}
-
-export interface DelightEasterEgg {
-  id: string;
-  name: string;
-  description: string | null;
-  triggerType: EasterEggTriggerType;
-  triggerValue: string;
-  effectType: EasterEggEffectType;
-  effectConfig: Record<string, unknown>;
-  activationMessage: string | null;
-  effectDurationSeconds: number;
-  isEnabled: boolean;
-  discoveryCount: number;
-}
-
-export interface DelightSound {
-  id: string;
-  name: string;
-  soundUrl: string | null;
-  soundCategory: string;
-  soundTheme: SoundTheme;
-  volumeDefault: number;
-  isEnabled: boolean;
-}
 
 export interface DelightMessageResponse {
   message: DelightMessage | null;

@@ -1,5 +1,6 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 type PatternComplexity = 'low' | 'medium' | 'high' | 'very_high';
 type ExecutionType = 'serial' | 'parallel' | 'hybrid';
@@ -356,7 +357,7 @@ export class NeuralOrchestrationService {
       const result = JSON.parse(new TextDecoder().decode(response.body));
       return result.embedding;
     } catch (error) {
-      console.error('Embedding generation error:', error);
+      logger.error('Embedding generation error', { error });
       return new Array(768).fill(0);
     }
   }

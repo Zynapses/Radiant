@@ -1,5 +1,6 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 type MemoryType = 'fact' | 'preference' | 'context' | 'instruction' | 'conversation' | 'skill';
 type RelationshipType = 'related' | 'contradicts' | 'supports' | 'supersedes' | 'derived_from';
@@ -213,7 +214,7 @@ export class MemoryService {
       const result = JSON.parse(new TextDecoder().decode(response.body));
       return result.embedding;
     } catch (error) {
-      console.error('Embedding generation error:', error);
+      logger.error('Embedding generation error', { error });
       // Return zero vector as fallback
       return new Array(1536).fill(0);
     }

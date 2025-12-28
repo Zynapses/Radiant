@@ -7,6 +7,7 @@
 
 import { modelRouterService } from './model-router.service';
 import { learningService } from './learning.service';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // ============================================================================
 // Types
@@ -730,8 +731,8 @@ IMPROVEMENTS: [Comma-separated list of specific improvements needed]`;
           modelsUsed: result.modelsUsed,
         },
       });
-    } catch {
-      console.error('Failed to record learning');
+    } catch (error) {
+      logger.error('Failed to record learning', { error });
       return undefined;
     }
   }

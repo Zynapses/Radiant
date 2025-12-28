@@ -1,5 +1,6 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 type TranslationStatus = 'pending' | 'ai_translated' | 'needs_review' | 'approved' | 'rejected';
 
@@ -191,7 +192,7 @@ export class LocalizationService {
         const translatedText = await this.callTranslationAI(sourceText, 'en', targetLang, context);
         await this.setTranslation(key, targetLang, translatedText, 'ai_translated', 'ai');
       } catch (error) {
-        console.error(`Failed to translate ${key} to ${targetLang}:`, error);
+        logger.error('Failed to translate string', { key, targetLang, error });
       }
     }
   }
