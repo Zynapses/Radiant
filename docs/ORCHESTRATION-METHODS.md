@@ -833,3 +833,218 @@ When `agiModelSelection: true`, the system:
   domainDetected: 'science',
   executionStrategy: 'parallel'
 }
+```
+
+---
+
+## Proficiency System
+
+### Overview
+
+The proficiency system is the **bridge between prompts and model selection**. It enables domain-aware orchestration by scoring both **domains** and **models** across 8 dimensions.
+
+### 8 Proficiency Dimensions (1-10 scale)
+
+| Dimension | Description | High Score Means |
+|-----------|-------------|------------------|
+| `reasoning_depth` | Depth of logical reasoning required | Complex deduction, multi-step logic |
+| `mathematical_quantitative` | Mathematical/quantitative analysis | Calculations, statistics, proofs |
+| `code_generation` | Code writing/debugging capability | Programming tasks |
+| `creative_generative` | Creative/generative content | Stories, art, brainstorming |
+| `research_synthesis` | Research and synthesis ability | Literature review, analysis |
+| `factual_recall_precision` | Factual accuracy requirements | Facts, definitions, dates |
+| `multi_step_problem_solving` | Complex problem decomposition | Breaking down hard problems |
+| `domain_terminology_handling` | Domain-specific jargon handling | Technical vocabulary |
+
+### How Proficiencies Flow Through the System
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  USER PROMPT: "Derive the Navier-Stokes equations for incompressible flow" │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 1: DOMAIN DETECTION                                                    │
+│                                                                              │
+│  Matched: Science → Physics → Fluid Dynamics                                │
+│  Confidence: 0.94                                                            │
+│                                                                              │
+│  Detected Keywords: "Navier-Stokes", "equations", "incompressible", "derive"│
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 2: PROFICIENCY EXTRACTION                                              │
+│                                                                              │
+│  Each level has proficiency scores that get MERGED:                         │
+│                                                                              │
+│  Field (Science):              Domain (Physics):         Subspecialty (Fluid):
+│  ├─ reasoning: 8               ├─ reasoning: 9           ├─ reasoning: 9
+│  ├─ math: 7                    ├─ math: 10               ├─ math: 10
+│  ├─ code: 3                    ├─ code: 4                ├─ code: 5
+│  ├─ creative: 4                ├─ creative: 3            ├─ creative: 2
+│  ├─ research: 7                ├─ research: 8            ├─ research: 7
+│  ├─ factual: 8                 ├─ factual: 9             ├─ factual: 8
+│  ├─ multi_step: 7              ├─ multi_step: 9          ├─ multi_step: 10
+│  └─ terminology: 6             └─ terminology: 8         └─ terminology: 9
+│                                                                              │
+│  MERGED PROFICIENCIES (weighted by specificity):                            │
+│  {                                                                           │
+│    reasoning_depth: 9,                                                       │
+│    mathematical_quantitative: 10,                                            │
+│    code_generation: 5,                                                       │
+│    creative_generative: 2,                                                   │
+│    research_synthesis: 7,                                                    │
+│    factual_recall_precision: 8,                                              │
+│    multi_step_problem_solving: 10,                                           │
+│    domain_terminology_handling: 9                                            │
+│  }                                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 3: ORCHESTRATION MODE SELECTION                                        │
+│                                                                              │
+│  Proficiency-based rules:                                                    │
+│  ├─ reasoning_depth >= 9 AND multi_step >= 9 → extended_thinking ✓          │
+│  ├─ code_generation >= 8 → coding                                           │
+│  ├─ creative_generative >= 8 → creative                                     │
+│  ├─ research_synthesis >= 8 → research                                      │
+│  └─ mathematical_quantitative >= 8 → analysis                               │
+│                                                                              │
+│  Selected: extended_thinking                                                 │
+│  Reason: "Complex reasoning required based on domain proficiencies"          │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 4: MODEL MATCHING                                                      │
+│                                                                              │
+│  Each model has proficiency scores. Match against domain requirements:      │
+│                                                                              │
+│  Model: OpenAI o1                    Match Score: 94%                        │
+│  ├─ reasoning: 10 (need 9) ✓ +1                                              │
+│  ├─ math: 9 (need 10) -1                                                     │
+│  ├─ multi_step: 10 (need 10) ✓                                               │
+│  └─ Strengths: [reasoning, multi_step, math]                                 │
+│                                                                              │
+│  Model: Claude 3.5 Sonnet            Match Score: 87%                        │
+│  ├─ reasoning: 9 (need 9) ✓                                                  │
+│  ├─ math: 8 (need 10) -2                                                     │
+│  └─ Strengths: [reasoning, research, terminology]                            │
+│                                                                              │
+│  Model: DeepSeek Reasoner            Match Score: 91%                        │
+│  ├─ reasoning: 10 (need 9) ✓ +1                                              │
+│  ├─ math: 10 (need 10) ✓                                                     │
+│  └─ Strengths: [math, reasoning, code]                                       │
+│                                                                              │
+│  SELECTED: o1 (primary), DeepSeek (fallback), Claude (fallback)              │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 5: EXECUTION                                                           │
+│                                                                              │
+│  parallelExecution: {                                                        │
+│    enabled: true,                                                            │
+│    models: ['openai/o1', 'deepseek-reasoner'],  // Both strong in math+reason│
+│    mode: 'all',                                                              │
+│    outputMode: 'top_n',                                                      │
+│    outputTopN: 1,  // Pick best                                              │
+│    synthesisStrategy: 'best_of'                                              │
+│  }                                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Proficiency Types in the Hierarchy
+
+```
+Field (Top Level)
+└── field_proficiencies: ProficiencyScores
+    │
+    └── Domain (Middle Level)
+        └── domain_proficiencies: ProficiencyScores
+            │
+            └── Subspecialty (Leaf Level)
+                └── subspecialty_proficiencies: ProficiencyScores
+```
+
+### Model Proficiency Matching
+
+```typescript
+interface ModelProficiencyMatch {
+  model_id: string;
+  provider: string;
+  model_name: string;
+  match_score: number;           // 0-100 overall match
+  dimension_scores: Record<ProficiencyDimension, number>;
+  strengths: ProficiencyDimension[];
+  weaknesses: ProficiencyDimension[];
+  recommended: boolean;
+  ranking: number;
+}
+```
+
+### Proficiency → Mode Decision Table
+
+| Proficiency Condition | Orchestration Mode | Reason |
+|-----------------------|-------------------|--------|
+| `reasoning_depth >= 9` AND `multi_step >= 9` | `extended_thinking` | Complex logical reasoning |
+| `code_generation >= 8` | `coding` | Programming task |
+| `creative_generative >= 8` | `creative` | Creative writing |
+| `research_synthesis >= 8` | `research` | Research/analysis |
+| `mathematical_quantitative >= 8` | `analysis` | Quantitative work |
+| High `factual_recall` + sensitive topic | `self_consistency` | Accuracy critical |
+| Default | `thinking` | Standard reasoning |
+
+### Proficiency → Model Strengths Mapping
+
+| Model | Top Proficiencies | Best For |
+|-------|-------------------|----------|
+| OpenAI o1 | reasoning_depth (10), multi_step (10) | Complex reasoning |
+| Claude 3.5 Sonnet | reasoning (9), research (9), terminology (9) | Research, analysis |
+| DeepSeek Reasoner | math (10), reasoning (10), code (8) | Math, logic, code |
+| GPT-4o | creative (8), research (8), factual (8) | General, creative |
+| Gemini Pro | math (8), code (8), research (8) | Technical analysis |
+| Claude Haiku | factual (7), terminology (7) | Quick answers |
+
+### Example: Proficiency-Driven Workflow
+
+```typescript
+// 1. Detect domain and get proficiencies
+const detection = await domainTaxonomyService.detectDomain(prompt);
+// Returns: { merged_proficiencies: { reasoning_depth: 9, math: 10, ... } }
+
+// 2. Determine orchestration mode from proficiencies
+const mode = determineOrchestrationMode(detection.merged_proficiencies);
+// Returns: 'extended_thinking' (because reasoning >= 9 and multi_step >= 9)
+
+// 3. Match models to proficiencies
+const matches = await domainTaxonomyService.getMatchingModels(
+  detection.merged_proficiencies,
+  { max_models: 3, min_match_score: 80 }
+);
+// Returns: [{ model_id: 'o1', match_score: 94 }, { model_id: 'deepseek', match_score: 91 }]
+
+// 4. Execute with matched models
+const result = await orchestrationService.executeWorkflow({
+  workflowCode: 'EXTENDED_THINKING_DUAL',
+  parallelExecution: {
+    enabled: true,
+    models: matches.map(m => m.model_id),
+    outputMode: 'top_n',
+    outputTopN: 1
+  }
+});
+```
+
+### Admin: Viewing Proficiencies
+
+**Admin Dashboard** → **Orchestration** → **Methods** → **Parallel & Streams** tab
+
+Shows:
+- Domain proficiency requirements for the task
+- Model match scores
+- Which dimensions drove model selection
+- Output stream configuration
