@@ -28,8 +28,12 @@ import {
   Mic,
   Code,
   FileUp,
-  Image,
+  ImageIcon,
+  Globe,
+  Check,
 } from 'lucide-react';
+import { useTranslation, SUPPORTED_LANGUAGES, type LanguageCode } from '@/hooks/useTranslation';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PageErrorBoundary } from '@/components/common/error-boundaries';
 
 interface ThinkTankConfig {
@@ -239,6 +243,8 @@ function ThinkTankSettingsContent() {
           <TabsTrigger value="features">Features</TabsTrigger>
           <TabsTrigger value="rate-limits">Rate Limits</TabsTrigger>
           <TabsTrigger value="models">Models</TabsTrigger>
+          <TabsTrigger value="personality">Personality</TabsTrigger>
+          <TabsTrigger value="language">Language</TabsTrigger>
         </TabsList>
 
         <TabsContent value="limits" className="space-y-4">
@@ -365,7 +371,7 @@ function ThinkTankSettingsContent() {
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Image className="h-5 w-5 text-muted-foreground" />
+                    <ImageIcon className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <Label>Image Generation</Label>
                       <p className="text-sm text-muted-foreground">Enable AI image generation capabilities</p>
@@ -444,8 +450,284 @@ function ThinkTankSettingsContent() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="personality" className="space-y-4">
+          <PersonalitySettings />
+        </TabsContent>
+
+        <TabsContent value="language" className="space-y-4">
+          <LanguageSettings />
+        </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+// Personality mode definitions
+const PERSONALITY_MODES = [
+  {
+    id: 'auto',
+    name: 'Auto',
+    description: 'Intelligently adapts based on time of day, domain, and session length',
+    icon: '✨',
+    details: 'Professional in mornings, playful on evenings/weekends, adapts to domain type',
+  },
+  {
+    id: 'professional',
+    name: 'Professional',
+    description: 'Clean, concise responses with minimal personality',
+    icon: '💼',
+    details: 'Best for business, legal, and medical contexts',
+  },
+  {
+    id: 'subtle',
+    name: 'Subtle',
+    description: 'Light personality touches without being distracting',
+    icon: '🌿',
+    details: 'Calm and understated feedback',
+  },
+  {
+    id: 'expressive',
+    name: 'Expressive',
+    description: 'Engaging personality with helpful feedback messages',
+    icon: '🎯',
+    details: 'Encouraging messages and domain-aware feedback',
+  },
+  {
+    id: 'playful',
+    name: 'Playful',
+    description: 'Fun, witty interactions with easter eggs and achievements',
+    icon: '🎮',
+    details: 'Full personality with achievements, sounds, and surprises',
+  },
+] as const;
+
+type PersonalityModeId = typeof PERSONALITY_MODES[number]['id'];
+
+function PersonalitySettings() {
+  const [selectedMode, setSelectedMode] = useState<PersonalityModeId>('auto');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  // Load user preference
+  const { data: preferences, isLoading } = useQuery({
+    queryKey: ['delight-preferences'],
+    queryFn: async () => {
+      const res = await fetch('/api/thinktank/delight/preferences');
+      if (!res.ok) return { personalityMode: 'auto' };
+      return res.json();
+    },
+  });
+
+  // Update selected mode when preferences load
+  useState(() => {
+    if (preferences?.personalityMode) {
+      setSelectedMode(preferences.personalityMode);
+    }
+  });
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await fetch('/api/thinktank/delight/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ personalityMode: selectedMode }),
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (error) {
+      console.error('Failed to save personality preference:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-yellow-500" />
+          AI Personality Mode
+        </CardTitle>
+        <CardDescription>
+          Choose how Think Tank expresses itself during conversations
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Select Personality Mode</Label>
+            <p className="text-sm text-muted-foreground">
+              This affects how Think Tank communicates, celebrates achievements, and provides feedback
+            </p>
+          </div>
+
+          <div className="grid gap-3">
+            {PERSONALITY_MODES.map((mode) => (
+              <div
+                key={mode.id}
+                className={`flex items-start gap-4 p-4 border rounded-lg cursor-pointer transition-all ${
+                  selectedMode === mode.id
+                    ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                    : 'hover:border-muted-foreground/50 hover:bg-muted/30'
+                }`}
+                onClick={() => setSelectedMode(mode.id)}
+              >
+                <div className="text-2xl">{mode.icon}</div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-medium">{mode.name}</h4>
+                    {mode.id === 'auto' && (
+                      <Badge variant="secondary" className="text-xs">Recommended</Badge>
+                    )}
+                    {selectedMode === mode.id && (
+                      <Check className="h-4 w-4 text-primary ml-auto" />
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">{mode.description}</p>
+                  <p className="text-xs text-muted-foreground/70 mt-1">{mode.details}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Separator />
+
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">
+              {selectedMode === 'auto' ? (
+                <span className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  Auto mode adapts to your context automatically
+                </span>
+              ) : (
+                <span>Manual mode: {PERSONALITY_MODES.find(m => m.id === selectedMode)?.name}</span>
+              )}
+            </div>
+            <Button 
+              onClick={handleSave} 
+              disabled={isSaving || isLoading}
+              variant={saved ? 'outline' : 'default'}
+            >
+              {saved ? (
+                <>
+                  <Check className="h-4 w-4 mr-2" />
+                  Saved
+                </>
+              ) : isSaving ? (
+                'Saving...'
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Preference
+                </>
+              )}
+            </Button>
+          </div>
+
+          <div className="bg-muted/50 rounded-lg p-4">
+            <h4 className="font-medium mb-2">What does personality affect?</h4>
+            <ul className="text-sm text-muted-foreground space-y-1">
+              <li>• <strong>Loading messages</strong> - Domain-specific messages while AI thinks</li>
+              <li>• <strong>Achievements</strong> - Unlockable milestones and celebrations</li>
+              <li>• <strong>Easter eggs</strong> - Hidden features and surprises</li>
+              <li>• <strong>Sounds</strong> - Audio feedback for actions</li>
+              <li>• <strong>Wellbeing nudges</strong> - Friendly break reminders</li>
+            </ul>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function LanguageSettings() {
+  const { language, setLanguage, languages, t } = useTranslation('thinktank.settings');
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Globe className="h-5 w-5" />
+          Language Settings
+        </CardTitle>
+        <CardDescription>
+          Choose your preferred language for Think Tank interface
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="language-select">Interface Language</Label>
+            <Select value={language} onValueChange={(value) => setLanguage(value as LanguageCode)}>
+              <SelectTrigger id="language-select" className="w-full max-w-sm">
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map((lang) => (
+                  <SelectItem key={lang.code} value={lang.code}>
+                    <div className="flex items-center gap-2">
+                      <span>{lang.flag}</span>
+                      <span>{lang.nativeName}</span>
+                      {lang.code !== lang.name && (
+                        <span className="text-muted-foreground">({lang.name})</span>
+                      )}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              This will change the language for all Think Tank interface elements
+            </p>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-3">
+            <Label>Available Languages</Label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {languages.map((lang) => (
+                <div
+                  key={lang.code}
+                  className={`flex items-center gap-2 p-3 border rounded-lg cursor-pointer transition-colors ${
+                    language === lang.code
+                      ? 'border-primary bg-primary/5'
+                      : 'hover:border-muted-foreground/50'
+                  }`}
+                  onClick={() => setLanguage(lang.code as LanguageCode)}
+                >
+                  <span className="text-lg">{lang.flag}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{lang.nativeName}</p>
+                    <p className="text-xs text-muted-foreground truncate">{lang.name}</p>
+                  </div>
+                  {language === lang.code && (
+                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Separator />
+
+          <div className="bg-muted/50 rounded-lg p-4">
+            <h4 className="font-medium mb-2">Translation Coverage</h4>
+            <p className="text-sm text-muted-foreground mb-3">
+              All 16 languages are fully supported with professional translations for:
+            </p>
+            <ul className="text-sm text-muted-foreground space-y-1">
+              <li>• User interface elements</li>
+              <li>• Error messages and notifications</li>
+              <li>• Help documentation</li>
+              <li>• System messages</li>
+            </ul>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

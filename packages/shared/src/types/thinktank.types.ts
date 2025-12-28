@@ -16,6 +16,12 @@ export interface ThinkTankConversation {
   status: 'active' | 'archived' | 'deleted';
   createdAt: Date;
   updatedAt: Date;
+  // Domain taxonomy integration
+  detectedFieldId: string | null;
+  detectedDomainId: string | null;
+  detectedSubspecialtyId: string | null;
+  domainDetectionConfidence: number | null;
+  domainProficiencyMatch: number | null;
 }
 
 export interface ThinkTankMessage {
@@ -114,7 +120,7 @@ export interface ThinkTankUserPreferences {
   id: string;
   userId: string;
   tenantId: string;
-  selectionMode: 'auto' | 'manual' | 'favorites';
+  selectionMode: 'auto' | 'manual' | 'favorites' | 'domain-aware';
   defaultModelId: string | null;
   favoriteModels: string[];
   showStandardModels: boolean;
@@ -127,6 +133,12 @@ export interface ThinkTankUserPreferences {
   recentModels: string[];
   createdAt: Date;
   updatedAt: Date;
+  // Domain taxonomy preferences
+  enableDomainDetection: boolean;
+  defaultFieldId: string | null;
+  defaultDomainId: string | null;
+  defaultSubspecialtyId: string | null;
+  domainModelOverrides: Record<string, string>;  // domainId -> modelId
 }
 
 export interface DomainModeConfig {
@@ -134,6 +146,9 @@ export interface DomainModeConfig {
   defaultModel: string;
   temperature: number;
   systemPrompt: string;
+  // Domain taxonomy integration
+  taxonomyDomainId?: string;  // Link to domain_taxonomy_domains
+  proficiencyRequirements?: ProficiencyScores;
 }
 
 export type DomainMode = 
@@ -146,6 +161,43 @@ export type DomainMode =
   | 'scientific'
   | 'financial'
   | 'technical';
+
+// Re-export ProficiencyScores from domain-taxonomy.types for backward compatibility
+import type { ProficiencyScores } from './domain-taxonomy.types';
+export type { ProficiencyScores } from './domain-taxonomy.types';
+
+// Domain taxonomy selection for Think Tank
+export interface ThinkTankDomainSelection {
+  fieldId: string | null;
+  fieldName: string | null;
+  fieldIcon: string | null;
+  domainId: string | null;
+  domainName: string | null;
+  domainIcon: string | null;
+  subspecialtyId: string | null;
+  subspecialtyName: string | null;
+  detectionConfidence: number;
+  isAutoDetected: boolean;
+  mergedProficiencies: ProficiencyScores | null;
+}
+
+// Model recommendation based on domain
+export interface DomainModelRecommendation {
+  modelId: string;
+  modelName: string;
+  provider: string;
+  matchScore: number;
+  strengths: string[];
+  weaknesses: string[];
+  isRecommended: boolean;
+}
+
+// Orchestration mode recommendation
+export interface OrchestrationModeRecommendation {
+  recommendedMode: 'thinking' | 'extended_thinking' | 'coding' | 'creative' | 'research' | 'analysis';
+  reasoning: string;
+  availableModes: string[];
+}
 
 export interface ThinkTankSession {
   id: string;

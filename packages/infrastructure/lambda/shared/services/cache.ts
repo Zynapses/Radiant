@@ -21,7 +21,7 @@ CachingConfig.getRedisDefaultTtlSeconds().then(ttl => {
   DEFAULT_TTL = ttl;
   logger.info('Cache TTL loaded from config', { ttl });
 }).catch(() => {
-  // Use default if DB not available
+  // Use default TTL if DB config not available - this is expected during cold start
 });
 
 /**

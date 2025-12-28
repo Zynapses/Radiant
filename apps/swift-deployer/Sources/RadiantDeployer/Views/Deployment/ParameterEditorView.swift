@@ -115,12 +115,12 @@ struct ParameterEditorView: View {
         Section("Parameters Source") {
             if mode == .install {
                 Label(
-                    "Using default parameters for \(viewModel.parameters.tier.displayName) tier",
+                    "Using default deployment parameters",
                     systemImage: "doc.badge.gearshape"
                 )
                 .foregroundColor(.secondary)
                 
-                Text("Parameters will be initialized with tier-appropriate defaults. You can customize these values below.")
+                Text("Parameters will be initialized with sensible defaults. You can customize these values below.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             } else {
@@ -147,21 +147,6 @@ struct ParameterEditorView: View {
     
     private var infrastructureSection: some View {
         Section("Infrastructure") {
-            // Tier Picker
-            Picker("Tier", selection: $viewModel.parameters.tier) {
-                ForEach(TierLevel.allCases, id: \.self) { tier in
-                    HStack {
-                        Text(tier.displayName)
-                        Spacer()
-                        Text(tier.priceRange)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .tag(tier)
-                }
-            }
-            .disabled(mode == .rollback)
-            
             // Region Picker
             Picker("Region", selection: $viewModel.parameters.region) {
                 ForEach(AWSRegion.supported, id: \.self) { region in
@@ -178,13 +163,6 @@ struct ParameterEditorView: View {
             
             // Multi-AZ Toggle
             Toggle("Multi-AZ Deployment", isOn: $viewModel.parameters.multiAz)
-                .disabled(viewModel.parameters.tier < .growth)
-            
-            if viewModel.parameters.tier < .growth {
-                Text("Multi-AZ requires GROWTH tier or higher")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
             
             // VPC CIDR
             LabeledContent("VPC CIDR") {
@@ -228,7 +206,6 @@ struct ParameterEditorView: View {
     private var featuresSection: some View {
         Section("Features") {
             Toggle("Self-Hosted Models", isOn: $viewModel.parameters.enableSelfHostedModels)
-                .disabled(viewModel.parameters.tier < .growth)
             
             if viewModel.parameters.enableSelfHostedModels {
                 Text("Enables 56 self-hosted AI models on SageMaker")
@@ -237,7 +214,6 @@ struct ParameterEditorView: View {
             }
             
             Toggle("Multi-Region", isOn: $viewModel.parameters.enableMultiRegion)
-                .disabled(viewModel.parameters.tier < .scale)
             
             Toggle("WAF Protection", isOn: $viewModel.parameters.enableWAF)
             

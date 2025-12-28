@@ -4,7 +4,7 @@
  * Create, validate, and manage API keys for tenant authentication
  */
 
-import { DynamoDBClient, PutItemCommand, GetItemCommand, QueryCommand, UpdateItemCommand, DeleteItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, PutItemCommand, GetItemCommand, QueryCommand, UpdateItemCommand, DeleteItemCommand, AttributeValue } from '@aws-sdk/client-dynamodb';
 import { createHash, randomBytes, createCipheriv, createDecipheriv } from 'crypto';
 
 const dynamodb = new DynamoDBClient({});
@@ -341,7 +341,7 @@ async function updateLastUsed(tenantId: string, keyId: string): Promise<void> {
   }));
 }
 
-function itemToApiKey(item: Record<string, any>): ApiKey {
+function itemToApiKey(item: Record<string, AttributeValue>): ApiKey {
   return {
     id: item.id?.S || '',
     tenantId: item.tenant_id?.S || '',

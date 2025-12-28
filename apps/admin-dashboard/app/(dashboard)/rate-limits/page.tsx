@@ -4,7 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Activity, Settings, RefreshCw, Zap } from 'lucide-react';
 
 // Provider rate limit configuration
-const PROVIDER_RATE_LIMITS = {
+interface ProviderRateLimit {
+  rpm: number;
+  tpm?: number;
+  dailyLimit?: number;
+  tier: string;
+}
+
+const PROVIDER_RATE_LIMITS: Record<string, ProviderRateLimit> = {
   groq: { rpm: 30, tpm: 15000, dailyLimit: 14400, tier: 'Free' },
   anthropic: { rpm: 60, tpm: 100000, tier: 'Standard' },
   openai: { rpm: 60, tpm: 150000, tier: 'Standard' },
@@ -292,7 +299,7 @@ export default function RateLimitsPage() {
               <div>
                 <h3 className="font-medium text-red-800 dark:text-red-200">Groq Free Tier Limits</h3>
                 <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                  Groq's free tier has strict limits: <strong>30 RPM</strong>, <strong>15,000 TPM</strong>, 
+                  Groq&apos;s free tier has strict limits: <strong>30 RPM</strong>, <strong>15,000 TPM</strong>, 
                   and <strong>14,400 requests/day</strong>. When limits are reached, requests automatically 
                   fallback to alternative providers (Bedrock → LiteLLM). Consider upgrading Groq to a paid 
                   tier for higher limits.

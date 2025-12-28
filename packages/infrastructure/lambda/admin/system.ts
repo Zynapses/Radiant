@@ -5,6 +5,7 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 
 interface SystemConfig {
   version: string;
@@ -86,7 +87,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     return response(404, { error: { message: 'Not found' } });
   } catch (error) {
-    console.error('Admin system error:', error);
+    logger.error('Admin system error', error);
     return response(500, { error: { message: 'Internal server error' } });
   }
 }

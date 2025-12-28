@@ -4,6 +4,7 @@
 
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 import { Middleware, MiddlewareHandler } from './index';
+import { logger } from '../logger';
 
 /**
  * Custom error classes
@@ -119,7 +120,7 @@ export function errorMiddleware(options: {
         }
 
         // Log unexpected errors
-        console.error('Unhandled error:', error);
+        logger.error('Unhandled error', error instanceof Error ? error : new Error(String(error)));
 
         // Return generic error for unknown errors
         return {

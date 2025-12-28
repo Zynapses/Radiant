@@ -4,6 +4,7 @@ import { extractUserFromEvent, type AuthContext } from '../shared/auth';
 import { UnauthorizedError, NotFoundError, ValidationError } from '../shared/errors';
 import { brainRouter, type TaskType } from '../shared/services';
 import { executeStatement } from '../shared/db/client';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 
 interface RouteRequest {
   taskType: TaskType;
@@ -13,6 +14,14 @@ interface RouteRequest {
   preferredProvider?: string;
   requiresVision?: boolean;
   requiresAudio?: boolean;
+  // Domain-aware routing
+  prompt?: string;  // Original prompt for domain detection
+  useDomainProficiencies?: boolean;  // Enable domain-aware scoring
+  domainOverride?: {
+    field_id?: string;
+    domain_id?: string;
+    subspecialty_id?: string;
+  };
 }
 
 interface RuleRequest {
@@ -67,7 +76,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     return handleError(new NotFoundError('Endpoint not found'));
   } catch (error) {
-    console.error('Brain router error:', error);
+    logger.error('Brain router error', error);
     return handleError(error);
   }
 }
@@ -97,6 +106,10 @@ async function handleRoute(
     preferredProvider: body.preferredProvider,
     requiresVision: body.requiresVision,
     requiresAudio: body.requiresAudio,
+    // Domain-aware routing
+    prompt: body.prompt,
+    useDomainProficiencies: body.useDomainProficiencies ?? (body.prompt ? true : false),
+    domainOverride: body.domainOverride,
   });
 
   return success(result);

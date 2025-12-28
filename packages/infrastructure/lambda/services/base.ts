@@ -10,6 +10,7 @@ import { executeStatement } from '../shared/db/client';
 import { success as successResponse } from '../shared/response';
 import { publishNotification } from '../thermal/notifier';
 import { AppError } from '../shared/errors';
+import { logger } from '../shared/logger';
 
 // Simple error response helper
 function createError(statusCode: number, message: string): APIGatewayProxyResult {
@@ -193,7 +194,7 @@ export async function invokeModel(
     return { success: true, data: responseBody, latencyMs };
   } catch (error) {
     const latencyMs = Date.now() - startTime;
-    console.error(`Model invocation failed for ${endpointName}:`, error);
+    logger.error(`Model invocation failed for ${endpointName}`, error instanceof Error ? error : new Error(String(error)));
     return { success: false, error: String(error), latencyMs };
   }
 }

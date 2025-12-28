@@ -59,9 +59,9 @@ export async function warmupSDK(): Promise<void> {
   // Import SDK clients to trigger their initialization
   // This happens during module load, not during handler execution
   await Promise.all([
-    import('@aws-sdk/client-rds-data').catch(() => {}),
-    import('@aws-sdk/client-secrets-manager').catch(() => {}),
-    import('@aws-sdk/client-s3').catch(() => {}),
+    import('@aws-sdk/client-rds-data').catch(() => { /* SDK import failure is non-fatal */ }),
+    import('@aws-sdk/client-secrets-manager').catch(() => { /* SDK import failure is non-fatal */ }),
+    import('@aws-sdk/client-s3').catch(() => { /* SDK import failure is non-fatal */ }),
   ]);
   
   sdkWarmedUp = true;

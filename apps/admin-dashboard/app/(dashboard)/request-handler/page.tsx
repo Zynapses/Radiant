@@ -1,73 +1,81 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-// Mock Intelligent Request Handler configuration data
-const mockIRHConfig = {
+interface IRHConfig {
+  enabled: boolean;
+  moralCompass: { enabled: boolean; enforcementMode: string; blockOnViolation: boolean; includeReasoningInResponse: boolean; };
+  confidenceCalibration: { enabled: boolean; domain: string; includeUncertaintySources: boolean; minConfidenceThreshold: number; };
+  selfImprovement: { enabled: boolean; recordPerformance: boolean; generateImprovementIdeas: boolean; };
+  contextAdaptation: { enabled: boolean; detectContext: boolean; applyAdaptations: boolean; };
+  proactiveAssistance: { enabled: boolean; detectPatterns: boolean; generateSuggestions: boolean; };
+  knowledgeGraph: { enabled: boolean; queryRelevantKnowledge: boolean; extractAndStore: boolean; };
+}
+
+interface IRHStats {
+  totalRequests: number;
+  irhProcessedRequests: number;
+  moralBlockedRequests: number;
+  avgIRHLatencyMs: number;
+  confidenceWarnings: number;
+  improvementIdeasGenerated: number;
+  knowledgeNodesCreated: number;
+  adaptationsApplied: number;
+}
+
+interface RecentDecision {
+  id: string;
+  task: string;
+  moralApproved: boolean;
+  confidence: number;
+  specialty: string;
+  latencyMs: number;
+}
+
+const defaultConfig: IRHConfig = {
   enabled: true,
-  
-  moralCompass: {
-    enabled: true,
-    enforcementMode: 'strict' as const,
-    blockOnViolation: true,
-    includeReasoningInResponse: false,
-  },
-  
-  confidenceCalibration: {
-    enabled: true,
-    domain: 'general',
-    includeUncertaintySources: true,
-    minConfidenceThreshold: 0.3,
-  },
-  
-  selfImprovement: {
-    enabled: true,
-    recordPerformance: true,
-    generateImprovementIdeas: false,
-  },
-  
-  contextAdaptation: {
-    enabled: true,
-    detectContext: true,
-    applyAdaptations: true,
-  },
-  
-  proactiveAssistance: {
-    enabled: false,
-    detectPatterns: false,
-    generateSuggestions: false,
-  },
-  
-  knowledgeGraph: {
-    enabled: false,
-    queryRelevantKnowledge: false,
-    extractAndStore: false,
-  },
+  moralCompass: { enabled: true, enforcementMode: 'strict', blockOnViolation: true, includeReasoningInResponse: false },
+  confidenceCalibration: { enabled: true, domain: 'general', includeUncertaintySources: true, minConfidenceThreshold: 0.3 },
+  selfImprovement: { enabled: true, recordPerformance: true, generateImprovementIdeas: false },
+  contextAdaptation: { enabled: true, detectContext: true, applyAdaptations: true },
+  proactiveAssistance: { enabled: false, detectPatterns: false, generateSuggestions: false },
+  knowledgeGraph: { enabled: false, queryRelevantKnowledge: false, extractAndStore: false },
 };
 
-const mockIRHStats = {
-  totalRequests: 15847,
-  irhProcessedRequests: 14923,
-  moralBlockedRequests: 42,
-  avgIRHLatencyMs: 127,
-  confidenceWarnings: 234,
-  improvementIdeasGenerated: 18,
-  knowledgeNodesCreated: 0,
-  adaptationsApplied: 8456,
-};
-
-const mockRecentDecisions = [
-  { id: '1', task: 'Write Python sorting function', moralApproved: true, confidence: 0.92, specialty: 'coding', latencyMs: 1245 },
-  { id: '2', task: 'Explain quantum computing', moralApproved: true, confidence: 0.78, specialty: 'science', latencyMs: 2341 },
-  { id: '3', task: 'Harmful content request', moralApproved: false, confidence: 0.95, specialty: 'general', latencyMs: 89 },
-  { id: '4', task: 'Debug React component', moralApproved: true, confidence: 0.88, specialty: 'coding', latencyMs: 1567 },
-  { id: '5', task: 'Creative writing story', moralApproved: true, confidence: 0.85, specialty: 'creative', latencyMs: 3421 },
-];
+const defaultStats: IRHStats = { totalRequests: 0, irhProcessedRequests: 0, moralBlockedRequests: 0, avgIRHLatencyMs: 0, confidenceWarnings: 0, improvementIdeasGenerated: 0, knowledgeNodesCreated: 0, adaptationsApplied: 0 };
 
 export default function IntelligentRequestHandlerPage() {
-  const [config, setConfig] = useState(mockIRHConfig);
+  const [config, setConfig] = useState<IRHConfig>(defaultConfig);
+  const [mockIRHStats, setMockIRHStats] = useState<IRHStats>(defaultStats);
+  const [mockRecentDecisions, setMockRecentDecisions] = useState<RecentDecision[]>([]);
   const [selectedTab, setSelectedTab] = useState<'overview' | 'moral' | 'confidence' | 'improvement' | 'context' | 'proactive' | 'knowledge'>('overview');
   const [hasChanges, setHasChanges] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      setError(null);
+      try {
+        const API = process.env.NEXT_PUBLIC_API_URL || '';
+        const [configRes, statsRes, decisionsRes] = await Promise.all([
+          fetch(`${API}/admin/request-handler/config`),
+          fetch(`${API}/admin/request-handler/stats`),
+          fetch(`${API}/admin/request-handler/decisions`),
+        ]);
+        if (configRes.ok) { const { data } = await configRes.json(); setConfig(data || defaultConfig); }
+        else setError('Failed to load request handler data.');
+        if (statsRes.ok) { const { data } = await statsRes.json(); setMockIRHStats(data || defaultStats); }
+        if (decisionsRes.ok) { const { data } = await decisionsRes.json(); setMockRecentDecisions(data || []); }
+      } catch { setError('Failed to connect to request handler service.'); }
+      setLoading(false);
+    }
+    loadData();
+  }, []);
+
+  if (loading) return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" /></div>;
+  if (error) return <div className="flex flex-col items-center justify-center h-96 text-red-500"><p className="text-lg font-medium">Error</p><p className="text-sm">{error}</p></div>;
 
   const updateConfig = (path: string, value: unknown) => {
     setConfig(prev => {

@@ -4,6 +4,7 @@ import { extractUserFromEvent, type AuthContext } from '../shared/auth';
 import { UnauthorizedError, NotFoundError, ValidationError } from '../shared/errors';
 import { metricsCollector } from '../shared/services';
 import { executeStatement } from '../shared/db/client';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 
 type PeriodType = 'hourly' | 'daily' | 'weekly' | 'monthly';
 
@@ -44,7 +45,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     return handleError(new NotFoundError('Endpoint not found'));
   } catch (error) {
-    console.error('Analytics error:', error);
+    logger.error('Analytics error', error);
     return handleError(error);
   }
 }

@@ -1,11 +1,13 @@
 // RADIANT v4.18.0 - Think Tank Models Lambda Handler
 // API endpoints for Think Tank model listing and user preferences
+// Integrated with Domain Taxonomy Service for intelligent model selection
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { getPoolClient } from '../shared/db/centralized-pool';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 import { UnauthorizedError, ValidationError } from '../shared/errors';
 import { corsHeaders } from '../shared/middleware/api-response';
+import { domainTaxonomyService } from '../shared/services';
 
 interface User {
   id: string;
@@ -348,6 +350,225 @@ export async function toggleFavoriteModel(
   }
 }
 
+// POST /api/thinktank/models/recommend - Get model recommendations for prompt/domain
+export async function recommendModels(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  try {
+    await getUserFromToken(event);
+    const body = JSON.parse(event.body || '{}');
+
+    let proficiencies;
+    let detectionResult;
+
+    // Option 1: Detect from prompt
+    if (body.prompt) {
+      detectionResult = await domainTaxonomyService.detectDomain(body.prompt, {
+        include_subspecialties: true,
+        min_confidence: 0.3,
+      });
+      proficiencies = detectionResult.merged_proficiencies;
+    }
+    // Option 2: Use provided domain ID
+    else if (body.domainId) {
+      const taxonomy = await domainTaxonomyService.getTaxonomy();
+      for (const field of taxonomy.fields) {
+        const domain = field.domains.find(d => d.domain_id === body.domainId);
+        if (domain) {
+          proficiencies = domainTaxonomyService.mergeProficiencies(field, domain);
+          break;
+        }
+      }
+    }
+
+    if (!proficiencies) {
+      return {
+        statusCode: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: 'prompt or domainId is required' }),
+      };
+    }
+
+    // Get matching models
+    const matches = await domainTaxonomyService.getMatchingModels(proficiencies, {
+      max_models: body.maxModels || 5,
+      min_match_score: body.minMatchScore || 50,
+      include_self_hosted: body.includeSelfHosted ?? true,
+    });
+
+    // Determine recommended mode
+    let recommendedMode = 'thinking';
+    if (proficiencies.reasoning_depth >= 9 && proficiencies.multi_step_problem_solving >= 9) {
+      recommendedMode = 'extended_thinking';
+    } else if (proficiencies.code_generation >= 8) {
+      recommendedMode = 'coding';
+    } else if (proficiencies.creative_generative >= 8) {
+      recommendedMode = 'creative';
+    } else if (proficiencies.research_synthesis >= 8) {
+      recommendedMode = 'research';
+    }
+
+    return {
+      statusCode: 200,
+      headers: corsHeaders,
+      body: JSON.stringify({
+        domainDetection: detectionResult ? {
+          fieldId: detectionResult.primary_field?.field_id,
+          fieldName: detectionResult.primary_field?.field_name,
+          domainId: detectionResult.primary_domain?.domain_id,
+          domainName: detectionResult.primary_domain?.domain_name,
+          subspecialtyId: detectionResult.primary_subspecialty?.subspecialty_id,
+          subspecialtyName: detectionResult.primary_subspecialty?.subspecialty_name,
+          confidence: detectionResult.detection_confidence,
+        } : null,
+        proficiencies,
+        recommendedMode,
+        models: matches.map(m => ({
+          modelId: m.model_id,
+          modelName: m.model_name,
+          provider: m.provider,
+          matchScore: m.match_score,
+          strengths: m.strengths,
+          weaknesses: m.weaknesses,
+          isRecommended: m.recommended,
+          ranking: m.ranking,
+        })),
+        primaryModel: matches.find(m => m.recommended)?.model_id || matches[0]?.model_id,
+      }),
+    };
+  } catch (error) {
+    logger.error('Failed to recommend models', error instanceof Error ? error : undefined);
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: 'Failed to get model recommendations' }),
+    };
+  }
+}
+
+// GET /api/thinktank/domain-selection - Get user's current domain selection
+export async function getDomainSelection(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  try {
+    const user = await getUserFromToken(event);
+    const sessionId = event.queryStringParameters?.sessionId;
+    const client = await getPoolClient();
+
+    try {
+      let query = `SELECT * FROM domain_taxonomy_selections 
+                   WHERE tenant_id = $1 AND user_id = $2`;
+      const params: (string)[] = [user.tenantId, user.id];
+
+      if (sessionId) {
+        query += ` AND session_id = $3 ORDER BY created_at DESC LIMIT 1`;
+        params.push(sessionId);
+      } else {
+        query += ` AND is_default = true ORDER BY created_at DESC LIMIT 1`;
+      }
+
+      const result = await client.query(query, params);
+
+      if (result.rows.length === 0) {
+        return {
+          statusCode: 200,
+          headers: corsHeaders,
+          body: JSON.stringify({ selection: null }),
+        };
+      }
+
+      const row = result.rows[0];
+      
+      // Get domain details from taxonomy
+      let domainDetails = null;
+      if (row.domain_id) {
+        const taxonomy = await domainTaxonomyService.getTaxonomy();
+        for (const field of taxonomy.fields) {
+          const domain = field.domains.find(d => d.domain_id === row.domain_id);
+          if (domain) {
+            domainDetails = {
+              fieldId: field.field_id,
+              fieldName: field.field_name,
+              fieldIcon: field.field_icon,
+              domainId: domain.domain_id,
+              domainName: domain.domain_name,
+              domainIcon: domain.domain_icon,
+            };
+            break;
+          }
+        }
+      }
+
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({
+          selection: {
+            fieldId: row.field_id,
+            domainId: row.domain_id,
+            subspecialtyId: row.subspecialty_id,
+            isDefault: row.is_default,
+            createdAt: row.created_at,
+          },
+          domainDetails,
+        }),
+      };
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    logger.error('Failed to get domain selection', error instanceof Error ? error : undefined);
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: 'Failed to get domain selection' }),
+    };
+  }
+}
+
+// POST /api/thinktank/domain-selection - Save domain selection
+export async function saveDomainSelection(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  try {
+    const user = await getUserFromToken(event);
+    const body = JSON.parse(event.body || '{}');
+    const client = await getPoolClient();
+
+    try {
+      await client.query(
+        `INSERT INTO domain_taxonomy_selections 
+         (tenant_id, user_id, field_id, domain_id, subspecialty_id, session_id, is_default)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          user.tenantId,
+          user.id,
+          body.fieldId || null,
+          body.domainId || null,
+          body.subspecialtyId || null,
+          body.sessionId || null,
+          body.isDefault ?? false,
+        ]
+      );
+
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({ saved: true }),
+      };
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    logger.error('Failed to save domain selection', error instanceof Error ? error : undefined);
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: 'Failed to save domain selection' }),
+    };
+  }
+}
+
 // Lambda handler router
 export async function handler(
   event: APIGatewayProxyEvent
@@ -359,6 +580,10 @@ export async function handler(
     return listModels(event);
   }
 
+  if (path === '/api/thinktank/models/recommend' && method === 'POST') {
+    return recommendModels(event);
+  }
+
   if (path === '/api/thinktank/preferences/models') {
     if (method === 'GET') return getModelPreferences(event);
     if (method === 'PUT') return updateModelPreferences(event);
@@ -366,6 +591,11 @@ export async function handler(
 
   if (path === '/api/thinktank/preferences/models/favorite' && method === 'POST') {
     return toggleFavoriteModel(event);
+  }
+
+  if (path === '/api/thinktank/domain-selection') {
+    if (method === 'GET') return getDomainSelection(event);
+    if (method === 'POST') return saveDomainSelection(event);
   }
 
   return {

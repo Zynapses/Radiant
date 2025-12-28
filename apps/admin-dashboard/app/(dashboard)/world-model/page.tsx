@@ -84,17 +84,26 @@ export default function WorldModelPage() {
     loadData();
   }, []);
 
+  const [error, setError] = useState<string | null>(null);
+
   async function loadData() {
     setLoading(true);
+    setError(null);
     try {
-      // Mock data - in production these would be API calls
-      setEntities(mockEntities);
-      setRelations(mockRelations);
-      setMemories(mockMemories);
-      setStats(mockStats);
-    } finally {
-      setLoading(false);
-    }
+      const API = process.env.NEXT_PUBLIC_API_URL || '';
+      const [entitiesRes, relationsRes, memoriesRes, statsRes] = await Promise.all([
+        fetch(`${API}/admin/world-model/entities`),
+        fetch(`${API}/admin/world-model/relations`),
+        fetch(`${API}/admin/world-model/memories`),
+        fetch(`${API}/admin/world-model/stats`),
+      ]);
+      if (entitiesRes.ok) { const { data } = await entitiesRes.json(); setEntities(data || []); }
+      else setError('Failed to load world model data.');
+      if (relationsRes.ok) { const { data } = await relationsRes.json(); setRelations(data || []); }
+      if (memoriesRes.ok) { const { data } = await memoriesRes.json(); setMemories(data || []); }
+      if (statsRes.ok) { const { data } = await statsRes.json(); setStats(data); }
+    } catch { setError('Failed to connect to world model service.'); }
+    setLoading(false);
   }
 
   const filteredEntities = entities.filter(e =>
@@ -563,40 +572,3 @@ function MemoryRow({ memory, selected, onSelect }: {
   );
 }
 
-// Mock data
-const mockEntities: Entity[] = [
-  { entityId: '1', entityType: 'person', canonicalName: 'John Smith', aliases: ['JS', 'Johnny'], confidence: 0.92, mentionCount: 15, currentState: { role: 'developer', mood: 'productive' }, lastMentioned: new Date().toISOString() },
-  { entityId: '2', entityType: 'organization', canonicalName: 'Acme Corp', aliases: ['Acme', 'ACME'], confidence: 0.88, mentionCount: 8, currentState: { industry: 'technology', size: 'enterprise' }, lastMentioned: new Date().toISOString() },
-  { entityId: '3', entityType: 'concept', canonicalName: 'Machine Learning', aliases: ['ML', 'AI'], confidence: 0.95, mentionCount: 23, currentState: { trending: true, relevance: 'high' }, lastMentioned: new Date().toISOString() },
-  { entityId: '4', entityType: 'location', canonicalName: 'San Francisco', aliases: ['SF', 'Bay Area'], confidence: 0.90, mentionCount: 6, currentState: { weather: 'sunny', timezone: 'PST' }, lastMentioned: new Date().toISOString() },
-  { entityId: '5', entityType: 'object', canonicalName: 'Project Alpha', aliases: ['Alpha'], confidence: 0.85, mentionCount: 12, currentState: { status: 'in_progress', priority: 'high' }, lastMentioned: new Date().toISOString() },
-  { entityId: '6', entityType: 'event', canonicalName: 'Q4 Review', aliases: [], confidence: 0.78, mentionCount: 4, currentState: { date: '2024-12-15', attendees: 12 }, lastMentioned: new Date().toISOString() },
-];
-
-const mockRelations: Relation[] = [
-  { relationId: 'r1', subjectId: '1', predicate: 'works_at', objectId: '2', confidence: 0.9, isCurrent: true },
-  { relationId: 'r2', subjectId: '1', predicate: 'interested_in', objectId: '3', confidence: 0.85, isCurrent: true },
-  { relationId: 'r3', subjectId: '1', predicate: 'located_in', objectId: '4', confidence: 0.75, isCurrent: true },
-  { relationId: 'r4', subjectId: '1', predicate: 'working_on', objectId: '5', confidence: 0.88, isCurrent: true },
-  { relationId: 'r5', subjectId: '2', predicate: 'headquartered_in', objectId: '4', confidence: 0.92, isCurrent: true },
-  { relationId: 'r6', subjectId: '5', predicate: 'uses', objectId: '3', confidence: 0.80, isCurrent: true },
-  { relationId: 'r7', subjectId: '6', predicate: 'discusses', objectId: '5', confidence: 0.70, isCurrent: true },
-];
-
-const mockMemories: EpisodicMemory[] = [
-  { memoryId: 'm1', memoryType: 'input', content: 'User asked about implementing a new feature for the dashboard', summary: 'Feature request for dashboard', currentImportance: 0.85, occurredAt: new Date(Date.now() - 3600000).toISOString(), entities: [{ name: 'dashboard', type: 'object' }], emotions: { sentiment: 'neutral', dominantEmotion: 'neutral' } },
-  { memoryId: 'm2', memoryType: 'output', content: 'Provided detailed implementation plan with code examples', summary: 'Implementation plan delivered', currentImportance: 0.78, occurredAt: new Date(Date.now() - 3000000).toISOString(), entities: [{ name: 'implementation', type: 'concept' }], emotions: { sentiment: 'positive', dominantEmotion: 'satisfaction' } },
-  { memoryId: 'm3', memoryType: 'decision', content: 'Decided to use React for the frontend implementation', summary: 'Tech stack decision made', currentImportance: 0.92, occurredAt: new Date(Date.now() - 7200000).toISOString(), entities: [{ name: 'React', type: 'concept' }, { name: 'frontend', type: 'concept' }], emotions: { sentiment: 'positive', dominantEmotion: 'confidence' } },
-  { memoryId: 'm4', memoryType: 'observation', content: 'User seems experienced with TypeScript based on their questions', summary: 'User proficiency noted', currentImportance: 0.65, occurredAt: new Date(Date.now() - 1800000).toISOString(), entities: [{ name: 'TypeScript', type: 'concept' }], emotions: { sentiment: 'neutral', dominantEmotion: 'neutral' } },
-  { memoryId: 'm5', memoryType: 'action', content: 'Created database migration for new feature tables', summary: 'DB migration created', currentImportance: 0.88, occurredAt: new Date(Date.now() - 900000).toISOString(), entities: [{ name: 'database', type: 'object' }, { name: 'migration', type: 'concept' }], emotions: { sentiment: 'positive', dominantEmotion: 'accomplishment' } },
-];
-
-const mockStats: WorldModelStats = {
-  totalEntities: 6,
-  totalRelations: 7,
-  totalMemories: 5,
-  avgMemoryImportance: 0.816,
-  entitiesByType: { person: 1, organization: 1, concept: 1, location: 1, object: 1, event: 1 },
-  memoriesByType: { input: 1, output: 1, decision: 1, observation: 1, action: 1 },
-  recentActivity: 12,
-};

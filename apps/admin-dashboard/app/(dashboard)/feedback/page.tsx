@@ -1,58 +1,53 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-// Mock feedback data
-const mockFeedbackStats = {
-  totalFeedback: 42356,
-  thumbsUp: 35654,
-  thumbsDown: 6702,
-  avgRating: 4.2,
-  positiveRatio: 0.84,
-  commentsCount: 8456,
-  feedbackToday: 1234,
-};
-
-const mockRecentFeedback = [
-  { id: '1', type: 'response', thumbs: 'up', rating: 5, comment: 'Perfect answer!', model: 'claude-3-5-sonnet', time: '2 min ago', prompt: 'Write a Python sorting function' },
-  { id: '2', type: 'response', thumbs: 'up', rating: 4, comment: null, model: 'gpt-4o', time: '5 min ago', prompt: 'Explain quantum entanglement' },
-  { id: '3', type: 'think_tank', thumbs: 'down', rating: 2, comment: 'AI kept repeating itself', model: 'multiple', time: '8 min ago', prompt: 'Debate the future of AI' },
-  { id: '4', type: 'response', thumbs: 'up', rating: 5, comment: 'Exactly what I needed', model: 'deepseek-chat', time: '12 min ago', prompt: 'Debug React component' },
-  { id: '5', type: 'response', thumbs: 'down', rating: 1, comment: 'Wrong answer', model: 'gpt-4o-mini', time: '15 min ago', prompt: 'Calculate compound interest' },
-  { id: '6', type: 'think_tank', thumbs: 'up', rating: 5, comment: 'Great collaboration between AIs', model: 'multiple', time: '18 min ago', prompt: 'Design a mobile app' },
-  { id: '7', type: 'response', thumbs: 'up', rating: 4, comment: null, model: 'claude-3-5-sonnet', time: '22 min ago', prompt: 'Write unit tests' },
-  { id: '8', type: 'response', thumbs: 'down', rating: 2, comment: 'Too verbose', model: 'o1', time: '25 min ago', prompt: 'Simple math problem' },
-];
-
-const mockModelFeedback = [
-  { model: 'claude-3-5-sonnet', total: 12456, up: 11234, down: 1222, ratio: 0.90 },
-  { model: 'gpt-4o', total: 10234, up: 8934, down: 1300, ratio: 0.87 },
-  { model: 'deepseek-chat', total: 8567, up: 7456, down: 1111, ratio: 0.87 },
-  { model: 'o1', total: 4567, up: 4123, down: 444, ratio: 0.90 },
-  { model: 'gemini-2.0-flash', total: 3456, up: 2890, down: 566, ratio: 0.84 },
-];
-
-const mockTopIssues = [
-  { issue: 'Too verbose', count: 234 },
-  { issue: 'Factual error', count: 189 },
-  { issue: 'Incomplete answer', count: 156 },
-  { issue: 'Wrong format', count: 98 },
-  { issue: 'Too slow', count: 67 },
-];
-
-const mockThinkTankFeedback = [
-  { id: '1', topic: 'AI Ethics Discussion', rating: 5, thumbs: 'up', bestAI: 'claude-3-5-sonnet', comment: 'Great debate!', goalAchieved: true },
-  { id: '2', topic: 'Code Review Session', rating: 4, thumbs: 'up', bestAI: 'gpt-4o', comment: null, goalAchieved: true },
-  { id: '3', topic: 'Creative Writing', rating: 3, thumbs: 'down', bestAI: 'claude-3-5-sonnet', comment: 'AIs disagreed too much', goalAchieved: false },
-];
+interface FeedbackStats { totalFeedback: number; thumbsUp: number; thumbsDown: number; avgRating: number; positiveRatio: number; commentsCount: number; feedbackToday: number; }
+interface RecentFeedback { id: string; type: string; thumbs: 'up' | 'down'; rating: number; comment: string | null; model: string; time: string; prompt: string; }
+interface ModelFeedback { model: string; total: number; up: number; down: number; ratio: number; }
+interface TopIssue { issue: string; count: number; }
+interface ThinkTankFeedback { id: string; topic: string; rating: number; thumbs: 'up' | 'down'; bestAI: string; comment: string | null; goalAchieved: boolean; }
 
 export default function FeedbackPage() {
   const [selectedTab, setSelectedTab] = useState<'overview' | 'recent' | 'models' | 'think_tank' | 'issues'>('overview');
   const [filterType, setFilterType] = useState<'all' | 'up' | 'down'>('all');
+  const [stats, setStats] = useState<FeedbackStats | null>(null);
+  const [recentFeedback, setRecentFeedback] = useState<RecentFeedback[]>([]);
+  const [modelFeedback, setModelFeedback] = useState<ModelFeedback[]>([]);
+  const [topIssues, setTopIssues] = useState<TopIssue[]>([]);
+  const [thinkTankFeedback, setThinkTankFeedback] = useState<ThinkTankFeedback[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredFeedback = mockRecentFeedback.filter(f => 
-    filterType === 'all' || f.thumbs === filterType
-  );
+  useEffect(() => { loadData(); }, []);
+
+  async function loadData() {
+    setLoading(true);
+    setError(null);
+    try {
+      const API = process.env.NEXT_PUBLIC_API_URL || '';
+      const [statsRes, recentRes, modelsRes, issuesRes, thinkTankRes] = await Promise.all([
+        fetch(`${API}/admin/feedback/stats`),
+        fetch(`${API}/admin/feedback/recent`),
+        fetch(`${API}/admin/feedback/by-model`),
+        fetch(`${API}/admin/feedback/issues`),
+        fetch(`${API}/admin/feedback/think-tank`),
+      ]);
+      if (statsRes.ok) { const { data } = await statsRes.json(); setStats(data); }
+      else setError('Failed to load feedback data.');
+      if (recentRes.ok) { const { data } = await recentRes.json(); setRecentFeedback(data || []); }
+      if (modelsRes.ok) { const { data } = await modelsRes.json(); setModelFeedback(data || []); }
+      if (issuesRes.ok) { const { data } = await issuesRes.json(); setTopIssues(data || []); }
+      if (thinkTankRes.ok) { const { data } = await thinkTankRes.json(); setThinkTankFeedback(data || []); }
+    } catch { setError('Failed to connect to feedback service.'); }
+    setLoading(false);
+  }
+
+  if (loading) return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>;
+  if (error) return <div className="flex flex-col items-center justify-center h-96 text-red-500"><p className="text-lg font-medium">Error</p><p className="text-sm">{error}</p><button onClick={loadData} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg">Retry</button></div>;
+  if (!stats) return <div className="flex items-center justify-center h-96 text-gray-500">No feedback data available</div>;
+
+  const filteredFeedback = recentFeedback.filter(f => filterType === 'all' || f.thumbs === filterType);
 
   return (
     <div className="p-6 space-y-6">
@@ -76,31 +71,31 @@ export default function FeedbackPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Total Feedback</p>
-          <p className="text-xl font-bold text-gray-900 dark:text-white">{mockFeedbackStats.totalFeedback.toLocaleString()}</p>
+          <p className="text-xl font-bold text-gray-900 dark:text-white">{stats.totalFeedback.toLocaleString()}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">👍 Thumbs Up</p>
-          <p className="text-xl font-bold text-green-600">{mockFeedbackStats.thumbsUp.toLocaleString()}</p>
+          <p className="text-xl font-bold text-green-600">{stats.thumbsUp.toLocaleString()}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">👎 Thumbs Down</p>
-          <p className="text-xl font-bold text-red-600">{mockFeedbackStats.thumbsDown.toLocaleString()}</p>
+          <p className="text-xl font-bold text-red-600">{stats.thumbsDown.toLocaleString()}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Positive Ratio</p>
-          <p className="text-xl font-bold text-blue-600">{Math.round(mockFeedbackStats.positiveRatio * 100)}%</p>
+          <p className="text-xl font-bold text-blue-600">{Math.round(stats.positiveRatio * 100)}%</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Avg Rating</p>
-          <p className="text-xl font-bold text-yellow-600">{mockFeedbackStats.avgRating.toFixed(1)} ⭐</p>
+          <p className="text-xl font-bold text-yellow-600">{stats.avgRating.toFixed(1)} ⭐</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">With Comments</p>
-          <p className="text-xl font-bold text-purple-600">{mockFeedbackStats.commentsCount.toLocaleString()}</p>
+          <p className="text-xl font-bold text-purple-600">{stats.commentsCount.toLocaleString()}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Today</p>
-          <p className="text-xl font-bold text-orange-600">{mockFeedbackStats.feedbackToday.toLocaleString()}</p>
+          <p className="text-xl font-bold text-orange-600">{stats.feedbackToday.toLocaleString()}</p>
         </div>
       </div>
 
@@ -139,12 +134,12 @@ export default function FeedbackPage() {
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm text-green-600 font-medium">Positive</span>
-                  <span className="text-sm">{Math.round(mockFeedbackStats.positiveRatio * 100)}%</span>
+                  <span className="text-sm">{Math.round(stats.positiveRatio * 100)}%</span>
                 </div>
                 <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-green-500"
-                    style={{ width: `${mockFeedbackStats.positiveRatio * 100}%` }}
+                    style={{ width: `${stats.positiveRatio * 100}%` }}
                   />
                 </div>
               </div>
@@ -152,12 +147,12 @@ export default function FeedbackPage() {
             <div className="grid grid-cols-2 gap-4 mt-6">
               <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                 <span className="text-4xl">👍</span>
-                <p className="text-2xl font-bold text-green-600 mt-2">{mockFeedbackStats.thumbsUp.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-green-600 mt-2">{stats.thumbsUp.toLocaleString()}</p>
                 <p className="text-sm text-gray-500">Positive</p>
               </div>
               <div className="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
                 <span className="text-4xl">👎</span>
-                <p className="text-2xl font-bold text-red-600 mt-2">{mockFeedbackStats.thumbsDown.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-red-600 mt-2">{stats.thumbsDown.toLocaleString()}</p>
                 <p className="text-sm text-gray-500">Negative</p>
               </div>
             </div>
@@ -202,7 +197,7 @@ export default function FeedbackPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 lg:col-span-2">
             <h2 className="text-lg font-semibold mb-4">Recent Feedback Activity</h2>
             <div className="space-y-2">
-              {mockRecentFeedback.slice(0, 5).map(fb => (
+              {recentFeedback.slice(0, 5).map(fb => (
                 <div key={fb.id} className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
                   <div className="flex items-center gap-3">
                     <span className={`text-xl ${fb.thumbs === 'up' ? 'text-green-500' : 'text-red-500'}`}>
@@ -329,7 +324,7 @@ export default function FeedbackPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {mockModelFeedback.map(model => (
+                {modelFeedback.map(model => (
                   <tr key={model.model}>
                     <td className="py-3 font-medium">{model.model}</td>
                     <td className="py-3">{model.total.toLocaleString()}</td>
@@ -375,7 +370,7 @@ export default function FeedbackPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {mockThinkTankFeedback.map(fb => (
+                  {thinkTankFeedback.map(fb => (
                     <tr key={fb.id}>
                       <td className="py-3 font-medium">{fb.topic}</td>
                       <td className="py-3">
@@ -420,7 +415,7 @@ export default function FeedbackPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
             <h2 className="text-lg font-semibold mb-4">Top Issues Reported</h2>
             <div className="space-y-3">
-              {mockTopIssues.map((issue, idx) => (
+              {topIssues.map((issue, idx) => (
                 <div key={issue.issue} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="w-6 h-6 bg-red-100 text-red-800 rounded-full flex items-center justify-center text-xs font-bold">

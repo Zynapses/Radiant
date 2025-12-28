@@ -3,6 +3,7 @@
 // Auto-propagates changes across all services
 
 import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // ============================================================================
 // Types
@@ -157,20 +158,35 @@ export class ConfigEngineService {
       await executeStatement(
         `UPDATE service_instances SET status = 'terminated' WHERE instance_id = $1`,
         [{ name: 'instanceId', value: { stringValue: this.instanceId } }]
-      ).catch(() => {}); // Ignore errors on shutdown
+      ).catch(() => { /* Shutdown errors are non-fatal and expected */ });
     }
   }
 
+  /**
+   * Start polling for config changes.
+   * NOTE: setInterval is NOT used in Lambda environments due to container freeze/thaw.
+   * Instead, config freshness is checked on-demand via checkAndRefresh().
+   * This method is a no-op in Lambda - use checkAndRefresh() directly.
+   */
   private startPolling(): void {
+    // Lambda-safe: Don't use setInterval in Lambda environments
+    // Config freshness is checked on-demand when configs are accessed
+    // For non-Lambda environments (local dev), could use setInterval
+    if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      logger.debug('Skipping interval-based polling in Lambda environment');
+      return;
+    }
+
     if (this.pollInterval) return;
 
+    // Only for non-Lambda environments (local development)
     this.pollInterval = setInterval(async () => {
       try {
         await this.pollForChanges();
       } catch (error) {
-        console.error('[ConfigEngine] Poll error:', error);
+        logger.error('ConfigEngine poll error', error);
       }
-    }, 5000); // Poll every 5 seconds
+    }, 5000);
   }
 
   private stopPolling(): void {
@@ -245,7 +261,7 @@ export class ConfigEngineService {
     
     for (const item of freshness) {
       if (item.needsUpdate) {
-        console.log(`[ConfigEngine] ${item.configType} updated: v${item.serviceVersion} → v${item.currentVersion}`);
+        logger.info(`ConfigEngine ${item.configType} updated: v${item.serviceVersion} → v${item.currentVersion}`);
         
         // Invalidate local cache for this config type
         this.localCache.invalidate(item.configType);
@@ -257,7 +273,7 @@ export class ConfigEngineService {
             try {
               handler(item.currentVersion);
             } catch (error) {
-              console.error(`[ConfigEngine] Handler error for ${item.configType}:`, error);
+              logger.error(`ConfigEngine handler error for ${item.configType}`, error);
             }
           }
         }
@@ -556,5 +572,5 @@ export const configEngine = new ConfigEngineService(
 
 // Auto-initialize on import (for Lambda)
 if (typeof process !== 'undefined' && process.env.AWS_LAMBDA_FUNCTION_NAME) {
-  configEngine.initialize().catch(console.error);
+  configEngine.initialize().catch(err => logger.error('ConfigEngine initialization failed', err));
 }

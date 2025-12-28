@@ -319,6 +319,104 @@ export class ApiStack extends cdk.Stack {
       },
     });
 
+    // Domain Taxonomy API
+    const domainTaxonomy = v2.addResource('domain-taxonomy');
+    const domainTaxonomyLambda = this.createLambda('DomainTaxonomy', 'domain-taxonomy/handler.handler', commonEnv, vpc, apiSecurityGroup, lambdaRole);
+    const domainTaxonomyIntegration = new apigateway.LambdaIntegration(domainTaxonomyLambda);
+    
+    // Public taxonomy endpoints (authenticated users)
+    domainTaxonomy.addMethod('GET', domainTaxonomyIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Fields endpoints
+    domainTaxonomy.addResource('fields').addProxy({
+      defaultIntegration: domainTaxonomyIntegration,
+      defaultMethodOptions: {
+        authorizer: cognitoAuthorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      },
+    });
+    
+    // Full taxonomy
+    domainTaxonomy.addResource('full').addMethod('GET', domainTaxonomyIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Detection endpoints
+    domainTaxonomy.addResource('detect').addMethod('POST', domainTaxonomyIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    domainTaxonomy.addResource('match-models').addMethod('POST', domainTaxonomyIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    domainTaxonomy.addResource('recommend-mode').addMethod('POST', domainTaxonomyIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Search endpoint
+    domainTaxonomy.addResource('search').addMethod('GET', domainTaxonomyIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Domain detail endpoints
+    const taxonomyDomains = domainTaxonomy.addResource('domains');
+    taxonomyDomains.addResource('{domainId}').addProxy({
+      defaultIntegration: domainTaxonomyIntegration,
+      defaultMethodOptions: {
+        authorizer: cognitoAuthorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      },
+    });
+    
+    // Proficiencies endpoint
+    domainTaxonomy.addResource('proficiencies').addResource('{domainId}').addMethod('GET', domainTaxonomyIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // User selection endpoints (Think Tank integration)
+    const userSelection = domainTaxonomy.addResource('user-selection');
+    userSelection.addMethod('GET', domainTaxonomyIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    userSelection.addMethod('POST', domainTaxonomyIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    userSelection.addMethod('DELETE', domainTaxonomyIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Feedback endpoints
+    const taxonomyFeedback = domainTaxonomy.addResource('feedback');
+    taxonomyFeedback.addMethod('POST', domainTaxonomyIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    taxonomyFeedback.addResource('{domainId}').addResource('summary').addMethod('GET', domainTaxonomyIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Admin taxonomy endpoints
+    const taxonomyAdmin = domainTaxonomy.addResource('admin');
+    taxonomyAdmin.addProxy({
+      defaultIntegration: domainTaxonomyIntegration,
+      defaultMethodOptions: {
+        authorizer: adminAuthorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      },
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'ApiUrl', {
       value: this.api.url,

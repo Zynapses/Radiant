@@ -74,17 +74,24 @@ export default function CognitiveBrainPage() {
     loadData();
   }, []);
 
+  const [error, setError] = useState<string | null>(null);
+
   async function loadData() {
     setLoading(true);
+    setError(null);
     try {
-      // In production, these would be real API calls
-      // For now, using mock data that matches our schema
-      setRegions(mockRegions);
-      setSettings(mockSettings);
-      setAnalytics(mockAnalytics);
-    } finally {
-      setLoading(false);
-    }
+      const API = process.env.NEXT_PUBLIC_API_URL || '';
+      const [regionsRes, settingsRes, analyticsRes] = await Promise.all([
+        fetch(`${API}/admin/cognitive-brain/regions`),
+        fetch(`${API}/admin/cognitive-brain/settings`),
+        fetch(`${API}/admin/cognitive-brain/analytics`),
+      ]);
+      if (regionsRes.ok) { const { data } = await regionsRes.json(); setRegions(data || []); }
+      else setError('Failed to load cognitive brain data.');
+      if (settingsRes.ok) { const { data } = await settingsRes.json(); setSettings(data); }
+      if (analyticsRes.ok) { const { data } = await analyticsRes.json(); setAnalytics(data); }
+    } catch { setError('Failed to connect to cognitive brain service.'); }
+    setLoading(false);
   }
 
   async function toggleRegion(regionId: string, isActive: boolean) {
@@ -445,72 +452,3 @@ function SettingToggle({ label, description, checked, onChange }: {
   );
 }
 
-// Mock data matching our schema
-const mockRegions: BrainRegion[] = [
-  {
-    regionId: '1', name: 'Reasoning Engine', slug: 'prefrontal', description: 'Complex reasoning and planning',
-    icon: 'lightbulb', color: '#8b5cf6', cognitiveFunction: 'reasoning', humanBrainAnalog: 'prefrontal_cortex',
-    primaryModelId: 'anthropic/claude-3-5-sonnet-20241022', fallbackModelIds: ['openai/o1', 'openai/gpt-4o'],
-    priority: 90, isActive: true, isSystem: true,
-    metrics: { totalActivations: 15420, successfulActivations: 14890, avgLatencyMs: 1250, avgSatisfactionScore: 0.92 },
-  },
-  {
-    regionId: '2', name: 'Memory Center', slug: 'hippocampus', description: 'Long-term memory storage',
-    icon: 'database', color: '#06b6d4', cognitiveFunction: 'memory', humanBrainAnalog: 'hippocampus',
-    primaryModelId: 'openai/text-embedding-3-large', fallbackModelIds: ['cohere/embed-english-v3.0'],
-    priority: 85, isActive: true, isSystem: true,
-    metrics: { totalActivations: 28340, successfulActivations: 28120, avgLatencyMs: 180, avgSatisfactionScore: 0.95 },
-  },
-  {
-    regionId: '3', name: 'Language Production', slug: 'broca', description: 'Natural language generation',
-    icon: 'message-square', color: '#10b981', cognitiveFunction: 'language_production', humanBrainAnalog: 'broca_area',
-    primaryModelId: 'openai/gpt-4o', fallbackModelIds: ['anthropic/claude-3-5-sonnet-20241022'],
-    priority: 80, isActive: true, isSystem: true,
-    metrics: { totalActivations: 12050, successfulActivations: 11800, avgLatencyMs: 890, avgSatisfactionScore: 0.88 },
-  },
-  {
-    regionId: '4', name: 'Emotional Intelligence', slug: 'amygdala', description: 'Sentiment and emotional response',
-    icon: 'heart', color: '#ef4444', cognitiveFunction: 'emotion', humanBrainAnalog: 'amygdala',
-    primaryModelId: 'openai/gpt-4o-mini-sentiment', fallbackModelIds: ['openai/gpt-4o'],
-    priority: 70, isActive: true, isSystem: true,
-    metrics: { totalActivations: 8920, successfulActivations: 8750, avgLatencyMs: 320, avgSatisfactionScore: 0.86 },
-  },
-  {
-    regionId: '5', name: 'Visual Processing', slug: 'visual-cortex', description: 'Image and video understanding',
-    icon: 'eye', color: '#f59e0b', cognitiveFunction: 'vision', humanBrainAnalog: 'visual_cortex',
-    primaryModelId: 'anthropic/claude-3-5-sonnet-vision', fallbackModelIds: ['google/gemini-1.5-pro'],
-    priority: 75, isActive: true, isSystem: true,
-    metrics: { totalActivations: 3240, successfulActivations: 3100, avgLatencyMs: 2100, avgSatisfactionScore: 0.90 },
-  },
-  {
-    regionId: '6', name: 'Procedural Skills', slug: 'cerebellum', description: 'Code and technical tasks',
-    icon: 'code', color: '#ec4899', cognitiveFunction: 'procedural', humanBrainAnalog: 'cerebellum',
-    primaryModelId: 'anthropic/claude-3-5-sonnet-code', fallbackModelIds: ['deepseek/deepseek-coder-v2'],
-    priority: 80, isActive: true, isSystem: true,
-    metrics: { totalActivations: 9870, successfulActivations: 9650, avgLatencyMs: 1450, avgSatisfactionScore: 0.91 },
-  },
-  {
-    regionId: '7', name: 'Creative Synthesis', slug: 'creative-cortex', description: 'Novel idea generation',
-    icon: 'sparkles', color: '#a855f7', cognitiveFunction: 'creativity', humanBrainAnalog: 'default_mode_network',
-    primaryModelId: 'anthropic/claude-3-5-sonnet-20241022', fallbackModelIds: ['openai/gpt-4o'],
-    priority: 70, isActive: true, isSystem: true,
-    metrics: { totalActivations: 4560, successfulActivations: 4320, avgLatencyMs: 1680, avgSatisfactionScore: 0.89 },
-  },
-];
-
-const mockSettings: CognitiveBrainSettings = {
-  cognitiveBrainEnabled: true, learningEnabled: true, adaptationEnabled: true,
-  maxConcurrentRegions: 5, maxTokensPerRequest: 16000, dailyCostLimitCents: 10000,
-  globalLearningRate: 0.01, enableMetacognition: true, enableTheoryOfMind: true,
-  enableCreativeSynthesis: true, enableSelfCorrection: true,
-};
-
-const mockAnalytics: Analytics = {
-  totalRegions: 7, activeRegions: 7, totalActivations: 82400, successRate: 97,
-  avgLatencyMs: 1124,
-  topRegions: [
-    { name: 'Memory Center', slug: 'hippocampus', activations: 28340, successRate: 99 },
-    { name: 'Reasoning Engine', slug: 'prefrontal', activations: 15420, successRate: 97 },
-    { name: 'Language Production', slug: 'broca', activations: 12050, successRate: 98 },
-  ],
-};

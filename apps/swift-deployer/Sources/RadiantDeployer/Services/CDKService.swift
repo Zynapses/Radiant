@@ -68,7 +68,6 @@ actor CDKService {
     func deploy(
         appId: String,
         environment: String,
-        tier: Int,
         credentials: CredentialSet,
         progressHandler: @escaping (String) -> Void
     ) async throws -> DeploymentOutputs? {
@@ -84,7 +83,6 @@ actor CDKService {
                 "cdk", "deploy", "--all",
                 "--context", "appId=\(appId)",
                 "--context", "environment=\(environment)",
-                "--context", "tier=\(tier)",
                 "--require-approval", "never",
                 "--outputs-file", "cdk-outputs.json"
             ],

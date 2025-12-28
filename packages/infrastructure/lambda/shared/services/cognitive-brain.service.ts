@@ -4,6 +4,9 @@
 import { executeStatement, type LooseParam } from '../db/client';
 import type { SqlParameter } from '@aws-sdk/client-rds-data';
 import { modelRouterService, ModelResponse } from './model-router.service';
+import { consciousnessService, type WorkspaceContent } from './consciousness.service';
+import { agiLearningPersistenceService } from './agi-learning-persistence.service';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // ============================================================================
 // Types
@@ -156,9 +159,42 @@ export interface CognitiveResponse {
 
 export class CognitiveBrainService {
   private regionCache: Map<string, BrainRegion[]> = new Map();
+  private initializedTenants: Set<string> = new Set();
 
   constructor() {
     // Model routing handled by modelRouterService
+  }
+
+  // ============================================================================
+  // Learning State Initialization - Restore on Startup
+  // ============================================================================
+
+  async ensureLearningRestored(tenantId: string): Promise<void> {
+    if (this.initializedTenants.has(tenantId)) {
+      return;
+    }
+
+    try {
+      logger.info(`Restoring AGI learning state for tenant: ${tenantId}`);
+      await agiLearningPersistenceService.restoreAllLearning(tenantId);
+      this.initializedTenants.add(tenantId);
+      logger.info(`Learning state restored for tenant: ${tenantId}`);
+    } catch (error) {
+      logger.error('Failed to restore learning state', error);
+      // Continue even if restoration fails - we can still operate
+      this.initializedTenants.add(tenantId);
+    }
+  }
+
+  isLearningInitialized(tenantId: string): boolean {
+    return this.initializedTenants.has(tenantId) && 
+           agiLearningPersistenceService.isInitialized(tenantId);
+  }
+
+  async forceLearningRestore(tenantId: string): Promise<void> {
+    this.initializedTenants.delete(tenantId);
+    agiLearningPersistenceService.invalidateCache(tenantId);
+    await this.ensureLearningRestored(tenantId);
   }
 
   // Session Management
@@ -285,21 +321,55 @@ export class CognitiveBrainService {
     }
   }
 
-  // Main Processing Loop
+  // Main Processing Loop - Integrated with Consciousness Service
   async process(tenantId: string, sessionId: string, input: string): Promise<CognitiveResponse> {
     const startTime = Date.now();
+
+    // CRITICAL: Ensure learning state is restored before processing
+    await this.ensureLearningRestored(tenantId);
+
     const session = await this.getSession(sessionId);
     if (!session) throw new Error('Session not found');
     const settings = await this.getSettings(tenantId);
     if (!settings.cognitiveBrainEnabled) throw new Error('Cognitive brain disabled');
     const regions = await this.getBrainRegions(tenantId);
-    
-    // Simple routing: use reasoning region by default
+
+    // 1. GLOBAL WORKSPACE: Gather competing contents from different modules
+    const workspaceContents: WorkspaceContent[] = [
+      { contentId: `input-${Date.now()}`, sourceModule: 'perception', contentType: 'perception', salience: 0.9, relevance: 1.0, novelty: 0.7, coalitionStrength: 0.85, data: { input } },
+      { contentId: `goal-${Date.now()}`, sourceModule: 'executive', contentType: 'goal', salience: 0.7, relevance: 0.8, novelty: 0.3, coalitionStrength: 0.7, data: { goal: 'respond_helpfully' } },
+    ];
+
+    // Add memory content if available
+    const memoryState = await consciousnessService.getPersistentMemoryState(tenantId);
+    if (memoryState && memoryState.experienceStream.length > 0) {
+      workspaceContents.push({ contentId: `memory-${Date.now()}`, sourceModule: 'memory', contentType: 'memory', salience: 0.5, relevance: 0.6, novelty: 0.2, coalitionStrength: 0.5, data: { recentExperiences: memoryState.experienceStream.slice(-3) } });
+    }
+
+    // Perform global broadcast - contents compete for conscious access
+    await consciousnessService.performGlobalBroadcast(tenantId, workspaceContents);
+
+    // 2. REGION SELECTION: Use consciousness-informed routing
     const reasoningRegion = regions.find((r) => r.cognitiveFunction === 'reasoning') || regions[0];
     if (!reasoningRegion) throw new Error('No brain regions configured');
 
+    // 3. PROCESS with region activation
     const result = await this.activateRegion(tenantId, sessionId, reasoningRegion, input, settings);
     const response = result.success ? String(result.output) : 'Processing failed. Please try again.';
+
+    // 4. PERSISTENT MEMORY: Record this experience frame
+    await consciousnessService.recordExperienceFrame(tenantId, {
+      sensoryInputs: { text: input },
+      cognitiveState: { processingLoad: 0.6, attentionFocus: 0.8 },
+      emotionalState: { engagement: 0.7, confidence: result.success ? 0.8 : 0.3 },
+      actions: [result.success ? 'generated_response' : 'processing_failed'],
+      phenomenalBinding: result.success ? 0.75 : 0.4,
+    });
+
+    // 5. METACOGNITION: Self-reflection on processing (async, non-blocking)
+    if (settings.enableMetacognition && result.success) {
+      this.performMetacognition(tenantId, input, response).catch(() => { /* Metacognition failures are non-blocking */ });
+    }
 
     return {
       sessionId,
@@ -311,6 +381,22 @@ export class CognitiveBrainService {
       totalCostCents: result.costCents,
       confidence: result.success ? 0.85 : 0.2,
     };
+  }
+
+  // Metacognitive reflection on processing quality
+  private async performMetacognition(tenantId: string, input: string, output: string): Promise<void> {
+    try {
+      // Update self-model with recent performance
+      await consciousnessService.updateSelfModel(tenantId, {
+        currentFocus: 'Processing user request',
+        cognitiveLoad: 0.5,
+      });
+
+      // Trigger occasional self-reflection
+      if (Math.random() < 0.1) {
+        await consciousnessService.performSelfReflection(tenantId);
+      }
+    } catch { /* Metacognition is non-critical */ }
   }
 
   private async activateRegion(tenantId: string, sessionId: string, region: BrainRegion, input: string, settings: CognitiveBrainSettings): Promise<RegionActivationResult> {

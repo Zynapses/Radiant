@@ -1,5 +1,6 @@
 import { SageMakerClient, DescribeEndpointCommand } from '@aws-sdk/client-sagemaker';
 import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 export type ThermalState = 'off' | 'cold' | 'warm' | 'hot' | 'automatic';
 
@@ -117,10 +118,10 @@ export class ThermalStateService {
       const response = await this.sagemaker.send(command);
 
       if (response.EndpointStatus !== 'InService') {
-        console.log(`Endpoint ${endpointName} status: ${response.EndpointStatus}`);
+        logger.debug(`Endpoint ${endpointName} status: ${response.EndpointStatus}`);
       }
     } catch (error) {
-      console.error(`Failed to check endpoint ${endpointName}:`, error);
+      logger.error(`Failed to check endpoint ${endpointName}`, error);
     }
   }
 

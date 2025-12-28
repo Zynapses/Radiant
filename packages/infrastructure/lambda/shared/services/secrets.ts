@@ -12,6 +12,7 @@ import {
   DeleteSecretCommand,
   DescribeSecretCommand,
 } from '@aws-sdk/client-secrets-manager';
+import { logger } from '../logger';
 
 const secretsManager = new SecretsManagerClient({});
 
@@ -44,7 +45,7 @@ export async function getSecret(secretName: string): Promise<string> {
 
     return value;
   } catch (error) {
-    console.error(`Failed to retrieve secret ${secretName}:`, error);
+    logger.error(`Failed to retrieve secret ${secretName}`, error instanceof Error ? error : new Error(String(error)));
     throw new Error(`Secret not found: ${secretName}`);
   }
 }

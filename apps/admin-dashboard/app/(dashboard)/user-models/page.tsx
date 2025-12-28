@@ -119,16 +119,26 @@ export default function UserModelsPage() {
     loadData();
   }, []);
 
+  const [error, setError] = useState<string | null>(null);
+
   async function loadData() {
     setLoading(true);
+    setError(null);
     try {
-      setUsers(mockUsers);
-      setPredictions(mockPredictions);
-      setSuggestions(mockSuggestions);
-      setStats(mockStats);
-    } finally {
-      setLoading(false);
-    }
+      const API = process.env.NEXT_PUBLIC_API_URL || '';
+      const [usersRes, predictionsRes, suggestionsRes, statsRes] = await Promise.all([
+        fetch(`${API}/admin/user-models/users`),
+        fetch(`${API}/admin/user-models/predictions`),
+        fetch(`${API}/admin/user-models/suggestions`),
+        fetch(`${API}/admin/user-models/stats`),
+      ]);
+      if (usersRes.ok) { const { data } = await usersRes.json(); setUsers(data || []); }
+      else setError('Failed to load user models data.');
+      if (predictionsRes.ok) { const { data } = await predictionsRes.json(); setPredictions(data || []); }
+      if (suggestionsRes.ok) { const { data } = await suggestionsRes.json(); setSuggestions(data || []); }
+      if (statsRes.ok) { const { data } = await statsRes.json(); setStats(data); }
+    } catch { setError('Failed to connect to user models service.'); }
+    setLoading(false);
   }
 
   if (loading) {
@@ -609,87 +619,3 @@ function StyleRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-// Mock data
-const mockUsers: UserMentalModel[] = [
-  {
-    modelId: 'u1',
-    userId: 'user-001',
-    userName: 'Sarah Chen',
-    currentGoals: [
-      { goalId: 'g1', goalText: 'Implement authentication flow', goalType: 'session', priority: 8, progress: 65, status: 'active' },
-      { goalId: 'g2', goalText: 'Deploy to production', goalType: 'project', priority: 7, progress: 30, status: 'active' },
-    ],
-    currentEmotionalState: { valence: 0.3, arousal: 0.6, dominantEmotion: 'neutral', confidence: 0.75 },
-    currentCognitiveLoad: 0.65,
-    expertiseDomains: {
-      'TypeScript': { level: 'advanced', confidence: 0.9 },
-      'React': { level: 'expert', confidence: 0.85 },
-      'AWS': { level: 'intermediate', confidence: 0.7 },
-    },
-    communicationStyle: { verbosity: 'concise', formality: 'neutral', preferredFormat: 'code', detailLevel: 'balanced' },
-    modelConfidence: 0.82,
-    totalInteractions: 156,
-    lastInteraction: new Date(Date.now() - 3600000).toISOString(),
-    predictionAccuracy: 0.78,
-  },
-  {
-    modelId: 'u2',
-    userId: 'user-002',
-    userName: 'Marcus Johnson',
-    currentGoals: [
-      { goalId: 'g3', goalText: 'Learn Kubernetes basics', goalType: 'long_term', priority: 5, progress: 20, status: 'active' },
-    ],
-    currentEmotionalState: { valence: -0.2, arousal: 0.4, dominantEmotion: 'neutral', confidence: 0.6 },
-    currentCognitiveLoad: 0.45,
-    expertiseDomains: {
-      'Python': { level: 'expert', confidence: 0.92 },
-      'Docker': { level: 'advanced', confidence: 0.8 },
-      'Kubernetes': { level: 'beginner', confidence: 0.65 },
-    },
-    communicationStyle: { verbosity: 'detailed', formality: 'casual', preferredFormat: 'prose', detailLevel: 'comprehensive' },
-    modelConfidence: 0.71,
-    totalInteractions: 89,
-    lastInteraction: new Date(Date.now() - 86400000).toISOString(),
-    predictionAccuracy: 0.72,
-  },
-  {
-    modelId: 'u3',
-    userId: 'user-003',
-    userName: 'Emily Rodriguez',
-    currentGoals: [],
-    currentEmotionalState: { valence: 0.6, arousal: 0.7, dominantEmotion: 'joy', confidence: 0.8 },
-    currentCognitiveLoad: 0.3,
-    expertiseDomains: {
-      'JavaScript': { level: 'intermediate', confidence: 0.75 },
-    },
-    communicationStyle: { verbosity: 'verbose', formality: 'casual', preferredFormat: 'bullets', detailLevel: 'detailed' },
-    modelConfidence: 0.58,
-    totalInteractions: 34,
-    lastInteraction: new Date(Date.now() - 7200000).toISOString(),
-    predictionAccuracy: 0.65,
-  },
-];
-
-const mockPredictions: UserPrediction[] = [
-  { predictionId: 'p1', predictionType: 'need', content: 'Will need help with JWT token refresh logic', confidence: 0.85, timeframe: 'within_session', outcomeMatched: true, createdAt: new Date(Date.now() - 3600000).toISOString() },
-  { predictionId: 'p2', predictionType: 'next_action', content: 'Likely to ask about error handling patterns', confidence: 0.72, timeframe: 'immediate', outcomeMatched: true, createdAt: new Date(Date.now() - 7200000).toISOString() },
-  { predictionId: 'p3', predictionType: 'frustration', content: 'May get frustrated with CORS configuration', confidence: 0.68, timeframe: 'within_session', outcomeMatched: false, createdAt: new Date(Date.now() - 10800000).toISOString() },
-  { predictionId: 'p4', predictionType: 'question', content: 'Will ask about database connection pooling', confidence: 0.75, timeframe: 'within_day', createdAt: new Date(Date.now() - 1800000).toISOString() },
-];
-
-const mockSuggestions: ProactiveSuggestion[] = [
-  { suggestionId: 's1', suggestionType: 'next_step', suggestionText: 'Consider adding rate limiting to your authentication endpoint before deployment', relevanceScore: 0.88, status: 'accepted', userResponse: 'accepted' },
-  { suggestionId: 's2', suggestionType: 'tip', suggestionText: 'The bcrypt library has a built-in method for comparing hashed passwords safely', relevanceScore: 0.75, status: 'shown' },
-  { suggestionId: 's3', suggestionType: 'warning', suggestionText: 'Your current approach may have a security vulnerability - storing tokens in localStorage is risky', relevanceScore: 0.92, status: 'accepted', userResponse: 'accepted' },
-  { suggestionId: 's4', suggestionType: 'resource', suggestionText: 'This AWS documentation page covers exactly what you need for IAM roles', relevanceScore: 0.7, status: 'rejected', userResponse: 'rejected' },
-];
-
-const mockStats: ToMStats = {
-  totalUsers: 3,
-  activeUsers: 2,
-  avgModelConfidence: 0.70,
-  avgPredictionAccuracy: 0.72,
-  totalPredictions: 150,
-  totalSuggestions: 48,
-  suggestionAcceptRate: 0.67,
-};

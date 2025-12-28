@@ -110,20 +110,34 @@ export default function CognitionPage() {
     loadData();
   }, []);
 
+  const [error, setError] = useState<string | null>(null);
+
   async function loadData() {
     setLoading(true);
+    setError(null);
     try {
-      setStats(mockStats);
-      setSettings(mockSettings);
-      setCausalNodes(mockCausalNodes);
-      setCausalEdges(mockCausalEdges);
-      setAutonomousTasks(mockAutonomousTasks);
-      setPendingApprovals(mockPendingApprovals);
-      setConsolidationJobs(mockConsolidationJobs);
-      setMemoryConflicts(mockMemoryConflicts);
-    } finally {
-      setLoading(false);
-    }
+      const API = process.env.NEXT_PUBLIC_API_URL || '';
+      const [statsRes, settingsRes, nodesRes, edgesRes, tasksRes, approvalsRes, jobsRes, conflictsRes] = await Promise.all([
+        fetch(`${API}/admin/cognition/stats`),
+        fetch(`${API}/admin/cognition/settings`),
+        fetch(`${API}/admin/cognition/causal-nodes`),
+        fetch(`${API}/admin/cognition/causal-edges`),
+        fetch(`${API}/admin/cognition/autonomous-tasks`),
+        fetch(`${API}/admin/cognition/pending-approvals`),
+        fetch(`${API}/admin/cognition/consolidation-jobs`),
+        fetch(`${API}/admin/cognition/memory-conflicts`),
+      ]);
+      if (statsRes.ok) { const { data } = await statsRes.json(); setStats(data); }
+      else setError('Failed to load cognition data.');
+      if (settingsRes.ok) { const { data } = await settingsRes.json(); setSettings(data); }
+      if (nodesRes.ok) { const { data } = await nodesRes.json(); setCausalNodes(data || []); }
+      if (edgesRes.ok) { const { data } = await edgesRes.json(); setCausalEdges(data || []); }
+      if (tasksRes.ok) { const { data } = await tasksRes.json(); setAutonomousTasks(data || []); }
+      if (approvalsRes.ok) { const { data } = await approvalsRes.json(); setPendingApprovals(data || []); }
+      if (jobsRes.ok) { const { data } = await jobsRes.json(); setConsolidationJobs(data || []); }
+      if (conflictsRes.ok) { const { data } = await conflictsRes.json(); setMemoryConflicts(data || []); }
+    } catch { setError('Failed to connect to cognition service.'); }
+    setLoading(false);
   }
 
   if (loading) {
@@ -558,7 +572,7 @@ export default function CognitionPage() {
             </button>
           </div>
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
-            {mockSkills.map((skill) => (
+            {([] as Array<{skillId: string; name: string; skillType: string; executionCount: number; successRate: number}>).map((skill) => (
               <SkillRow key={skill.skillId} skill={skill} />
             ))}
           </div>
@@ -754,42 +768,3 @@ function ActivityItem({ time, action, status }: { time: string; action: string; 
   );
 }
 
-// Mock data
-const mockStats: CognitionStats = { causalNodes: 24, causalEdges: 31, multimodalRepresentations: 156, executableSkills: 12, autonomousTasksEnabled: 3, pendingApprovals: 2, memoryConflicts: 1, consolidationJobsRunning: 0 };
-const mockSettings: CognitionSettings = { causalReasoningEnabled: true, consolidationEnabled: true, consolidationSchedule: 'daily at 3:00 UTC', multimodalBindingEnabled: true, skillExecutionEnabled: true, autonomousEnabled: true, autonomousApprovalRequired: true, maxAutonomousActionsPerDay: 10 };
-const mockCausalNodes: CausalNode[] = [
-  { nodeId: 'n1', name: 'User Request', nodeType: 'event', isManipulable: false },
-  { nodeId: 'n2', name: 'Task Complexity', nodeType: 'variable', currentValue: 'medium', isManipulable: true },
-  { nodeId: 'n3', name: 'Model Selection', nodeType: 'action', isManipulable: true },
-  { nodeId: 'n4', name: 'Response Quality', nodeType: 'outcome', isManipulable: false },
-  { nodeId: 'n5', name: 'User Satisfaction', nodeType: 'outcome', isManipulable: false },
-  { nodeId: 'n6', name: 'Context Length', nodeType: 'variable', currentValue: 2000, isManipulable: true },
-];
-const mockCausalEdges: CausalEdge[] = [
-  { edgeId: 'e1', causeNodeId: 'n1', effectNodeId: 'n2', causalStrength: 0.8, confidence: 0.9 },
-  { edgeId: 'e2', causeNodeId: 'n2', effectNodeId: 'n3', causalStrength: 0.7, confidence: 0.85 },
-  { edgeId: 'e3', causeNodeId: 'n3', effectNodeId: 'n4', causalStrength: 0.9, confidence: 0.8 },
-  { edgeId: 'e4', causeNodeId: 'n4', effectNodeId: 'n5', causalStrength: 0.85, confidence: 0.9 },
-  { edgeId: 'e5', causeNodeId: 'n6', effectNodeId: 'n4', causalStrength: 0.5, confidence: 0.7 },
-];
-const mockAutonomousTasks: AutonomousTask[] = [
-  { taskId: 't1', taskType: 'maintenance', name: 'Daily Memory Consolidation', description: 'Compress and organize memories', isEnabled: true, isPaused: false, requiresApproval: false, runCount: 45, lastRunAt: new Date(Date.now() - 86400000).toISOString() },
-  { taskId: 't2', taskType: 'suggestion', name: 'Proactive User Suggestions', description: 'Generate helpful suggestions', isEnabled: true, isPaused: false, requiresApproval: true, runCount: 23, lastRunAt: new Date(Date.now() - 3600000).toISOString() },
-  { taskId: 't3', taskType: 'monitoring', name: 'Knowledge Graph Update', description: 'Update causal graph', isEnabled: false, isPaused: true, requiresApproval: false, runCount: 12 },
-];
-const mockPendingApprovals: PendingApproval[] = [
-  { executionId: 'ex1', taskName: 'Proactive User Suggestions', proposedActions: [{ action: 'create_suggestion', target: 'user-123', impactAssessment: { level: 'low', description: 'Will show suggestion to user' } }], triggeredAt: new Date(Date.now() - 1800000).toISOString() },
-  { executionId: 'ex2', taskName: 'Skill Learning', proposedActions: [{ action: 'extract_skill', target: 'procedural_memory', impactAssessment: { level: 'low', description: 'Will create new skill from patterns' } }], triggeredAt: new Date(Date.now() - 7200000).toISOString() },
-];
-const mockConsolidationJobs: ConsolidationJob[] = [
-  { jobId: 'j1', jobType: 'compress', status: 'completed', memoriesProcessed: 120, conflictsFound: 3, startedAt: new Date(Date.now() - 86400000).toISOString() },
-  { jobId: 'j2', jobType: 'decay', status: 'completed', memoriesProcessed: 450, conflictsFound: 0, startedAt: new Date(Date.now() - 86400000).toISOString() },
-];
-const mockMemoryConflicts: MemoryConflict[] = [
-  { conflictId: 'c1', conflictType: 'contradiction', severity: 'major', memoryAContent: 'The API uses REST endpoints for all operations', memoryBContent: 'The API uses GraphQL for queries and mutations', resolutionStatus: 'pending' },
-];
-const mockSkills = [
-  { skillId: 's1', name: 'Code Review Procedure', skillType: 'procedure', executionCount: 34, successRate: 0.91 },
-  { skillId: 's2', name: 'Bug Analysis Workflow', skillType: 'workflow', executionCount: 18, successRate: 0.83 },
-  { skillId: 's3', name: 'Documentation Generation', skillType: 'pattern', executionCount: 56, successRate: 0.95 },
-];

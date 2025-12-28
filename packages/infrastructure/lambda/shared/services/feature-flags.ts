@@ -6,6 +6,7 @@
  */
 
 import { DynamoDBClient, GetItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 const dynamodb = new DynamoDBClient({});
 const FLAGS_TABLE = process.env.FLAGS_TABLE || 'radiant-feature-flags';
@@ -199,7 +200,7 @@ async function getFlag(key: string): Promise<FeatureFlag | null> {
 
     return flag;
   } catch (error) {
-    console.error(`Error fetching flag ${key}:`, error);
+    logger.error(`Error fetching feature flag ${key}`, error);
     return null;
   }
 }
@@ -232,7 +233,7 @@ async function getAllFlags(): Promise<FeatureFlag[]> {
       updatedAt: item.updated_at?.S || '',
     }));
   } catch (error) {
-    console.error('Error fetching all flags:', error);
+    logger.error('Error fetching all feature flags', error);
     return [];
   }
 }

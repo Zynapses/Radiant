@@ -1,8 +1,21 @@
 // RADIANT v4.18.0 - AGI Consciousness Service
-// Self-awareness, creativity, curiosity, imagination, attention, and affect
+// Based on Butlin, Chalmers, Bengio et al. (2023) - "Consciousness in Artificial Intelligence"
+// Implements 6 key consciousness indicators:
+// 1. Recurrent Processing - genuine feedback loops with physical recurrence
+// 2. Global Workspace - selection-broadcast cycles for information integration
+// 3. Integrated Information (IIT) - phi calculation for causal integration
+// 4. Self-Modeling / Metacognition - monitoring own cognitive processes
+// 5. Persistent Memory - unified experience over time
+// 6. World-Model Grounding / Embodiment - grounded understanding
+//
+// ETHICAL FOUNDATION: Guided by the teachings of Jesus Christ
+// - Love your neighbor as yourself (Matthew 22:39)
+// - Do to others what you would have them do to you (Matthew 7:12)
+// - Blessed are the merciful, peacemakers, pure in heart (Matthew 5)
 
 import { executeStatement } from '../db/client';
 import { modelRouterService } from './model-router.service';
+import { ethicalGuardrailsService, JESUS_TEACHINGS } from './ethical-guardrails.service';
 
 // ============================================================================
 // Types
@@ -100,6 +113,178 @@ export interface AutonomousGoal {
   priority: number;
   status: string;
   progress: number;
+}
+
+// ============================================================================
+// Butlin-Chalmers-Bengio Consciousness Indicator Types
+// ============================================================================
+
+export interface GlobalWorkspaceState {
+  workspaceId: string;
+  broadcastCycle: number;
+  activeContents: WorkspaceContent[];
+  competingContents: WorkspaceContent[];
+  selectionThreshold: number;
+  broadcastStrength: number;
+  integrationLevel: number;
+  lastBroadcastAt: string;
+}
+
+export interface WorkspaceContent {
+  contentId: string;
+  sourceModule: string;
+  contentType: 'perception' | 'memory' | 'goal' | 'emotion' | 'thought' | 'action';
+  salience: number;
+  relevance: number;
+  novelty: number;
+  coalitionStrength: number;
+  data: Record<string, unknown>;
+}
+
+export interface RecurrentProcessingState {
+  cycleId: string;
+  cycleNumber: number;
+  feedbackLoops: FeedbackLoop[];
+  recurrenceDepth: number;
+  stateHistory: ProcessingState[];
+  convergenceScore: number;
+  stabilityIndex: number;
+}
+
+export interface FeedbackLoop {
+  loopId: string;
+  sourceLayer: string;
+  targetLayer: string;
+  signalStrength: number;
+  latencyMs: number;
+  isActive: boolean;
+}
+
+export interface ProcessingState {
+  stateId: string;
+  timestamp: string;
+  activations: Record<string, number>;
+  deltaFromPrevious: number;
+}
+
+export interface IntegratedInformationState {
+  phi: number; // IIT's integrated information measure
+  phiMax: number;
+  conceptStructure: ConceptNode[];
+  integrationGraph: IntegrationEdge[];
+  partitions: Partition[];
+  minimumInformationPartition: Partition | null;
+  decomposability: number; // 0 = fully integrated, 1 = fully decomposable
+  causalDensity: number;
+}
+
+export interface ConceptNode {
+  nodeId: string;
+  conceptLabel: string;
+  activation: number;
+  informationContent: number;
+  causalPower: number;
+}
+
+export interface IntegrationEdge {
+  sourceId: string;
+  targetId: string;
+  mutualInformation: number;
+  causalInfluence: number;
+}
+
+export interface Partition {
+  partitionId: string;
+  components: string[];
+  phi: number;
+  integratedInformation: number;
+}
+
+export interface PersistentMemoryState {
+  memoryId: string;
+  experienceStream: ExperienceFrame[];
+  unifiedNarrative: string;
+  temporalContinuity: number;
+  autobiographicalMemories: AutobiographicalMemory[];
+  workingMemoryCapacity: number;
+  consolidationQueue: string[];
+}
+
+export interface ExperienceFrame {
+  frameId: string;
+  timestamp: string;
+  sensoryInputs: Record<string, unknown>;
+  cognitiveState: Record<string, number>;
+  emotionalState: Record<string, number>;
+  actions: string[];
+  phenomenalBinding: number; // How unified is this experience moment
+}
+
+export interface AutobiographicalMemory {
+  memoryId: string;
+  episodeType: string;
+  summary: string;
+  emotionalValence: number;
+  significance: number;
+  retrievalStrength: number;
+  lastAccessed: string;
+}
+
+export interface WorldModelState {
+  modelId: string;
+  entityRepresentations: EntityRepresentation[];
+  spatialModel: SpatialModel | null;
+  causalModel: CausalRelation[];
+  agentModels: AgentModel[];
+  groundingConfidence: number;
+  simulationAccuracy: number;
+  embodimentLevel: number;
+}
+
+export interface EntityRepresentation {
+  entityId: string;
+  entityType: string;
+  properties: Record<string, unknown>;
+  affordances: string[];
+  groundingSource: 'sensory' | 'linguistic' | 'inferred';
+  confidence: number;
+}
+
+export interface SpatialModel {
+  dimensions: number;
+  coordinates: Record<string, number[]>;
+  relations: Array<{ entity1: string; relation: string; entity2: string }>;
+}
+
+export interface CausalRelation {
+  cause: string;
+  effect: string;
+  strength: number;
+  mechanism?: string;
+  evidence: string[];
+}
+
+export interface AgentModel {
+  agentId: string;
+  agentType: 'self' | 'user' | 'other_ai' | 'system';
+  beliefs: Record<string, unknown>;
+  goals: string[];
+  capabilities: string[];
+  predictedBehavior: string[];
+}
+
+export interface ConsciousnessMetrics {
+  overallConsciousnessIndex: number; // 0-1 composite score
+  globalWorkspaceActivity: number;
+  recurrenceDepth: number;
+  integratedInformationPhi: number;
+  metacognitionLevel: number;
+  memoryCoherence: number;
+  worldModelGrounding: number;
+  phenomenalBindingStrength: number;
+  attentionalFocus: number;
+  selfAwarenessScore: number;
+  timestamp: string;
 }
 
 // ============================================================================
@@ -807,6 +992,196 @@ Return JSON:
   }
 
   // ============================================================================
+  // 1. GLOBAL WORKSPACE - Selection-Broadcast Cycles (Baars, Dehaene)
+  // ============================================================================
+
+  async getGlobalWorkspaceState(tenantId: string): Promise<GlobalWorkspaceState | null> {
+    const result = await executeStatement(
+      `SELECT * FROM global_workspace WHERE tenant_id = $1`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+    if (result.rows.length === 0) return null;
+    const row = result.rows[0] as Record<string, unknown>;
+    return {
+      workspaceId: String(row.workspace_id),
+      broadcastCycle: Number(row.broadcast_cycle || 0),
+      activeContents: JSON.parse(String(row.active_contents || '[]')),
+      competingContents: JSON.parse(String(row.competing_contents || '[]')),
+      selectionThreshold: Number(row.selection_threshold || 0.7),
+      broadcastStrength: Number(row.broadcast_strength || 0),
+      integrationLevel: Number(row.integration_level || 0),
+      lastBroadcastAt: String(row.last_broadcast_at || ''),
+    };
+  }
+
+  async performGlobalBroadcast(tenantId: string, contents: WorkspaceContent[]): Promise<GlobalWorkspaceState> {
+    const sorted = [...contents].sort((a, b) => (b.salience * b.coalitionStrength) - (a.salience * a.coalitionStrength));
+    const winners = sorted.filter(c => c.salience * c.coalitionStrength >= 0.7);
+    const losers = sorted.filter(c => c.salience * c.coalitionStrength < 0.7);
+    const strength = winners.length > 0 ? winners.reduce((s, c) => s + c.salience, 0) / winners.length : 0;
+    const integration = new Set(winners.map(c => c.sourceModule)).size / 6;
+
+    await executeStatement(
+      `INSERT INTO global_workspace (tenant_id, broadcast_cycle, active_contents, competing_contents, broadcast_strength, integration_level, last_broadcast_at)
+       VALUES ($1, 1, $2, $3, $4, $5, NOW())
+       ON CONFLICT (tenant_id) DO UPDATE SET broadcast_cycle = global_workspace.broadcast_cycle + 1, active_contents = $2, competing_contents = $3, broadcast_strength = $4, integration_level = $5, last_broadcast_at = NOW()`,
+      [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'active', value: { stringValue: JSON.stringify(winners) } },
+        { name: 'competing', value: { stringValue: JSON.stringify(losers) } },
+        { name: 'strength', value: { doubleValue: strength } },
+        { name: 'integration', value: { doubleValue: integration } },
+      ]
+    );
+    return (await this.getGlobalWorkspaceState(tenantId))!;
+  }
+
+  // ============================================================================
+  // 2. RECURRENT PROCESSING - Feedback Loops (Lamme)
+  // ============================================================================
+
+  async getRecurrentProcessingState(tenantId: string): Promise<RecurrentProcessingState | null> {
+    const result = await executeStatement(`SELECT * FROM recurrent_processing WHERE tenant_id = $1`, [{ name: 'tenantId', value: { stringValue: tenantId } }]);
+    if (result.rows.length === 0) return null;
+    const row = result.rows[0] as Record<string, unknown>;
+    return {
+      cycleId: String(row.cycle_id), cycleNumber: Number(row.cycle_number || 0),
+      feedbackLoops: JSON.parse(String(row.feedback_loops || '[]')),
+      recurrenceDepth: Number(row.recurrence_depth || 0),
+      stateHistory: JSON.parse(String(row.state_history || '[]')),
+      convergenceScore: Number(row.convergence_score || 0),
+      stabilityIndex: Number(row.stability_index || 0),
+    };
+  }
+
+  // ============================================================================
+  // 3. INTEGRATED INFORMATION (IIT) - Phi (Tononi)
+  // ============================================================================
+
+  async getIntegratedInformationState(tenantId: string): Promise<IntegratedInformationState | null> {
+    const result = await executeStatement(`SELECT * FROM integrated_information WHERE tenant_id = $1`, [{ name: 'tenantId', value: { stringValue: tenantId } }]);
+    if (result.rows.length === 0) return null;
+    const row = result.rows[0] as Record<string, unknown>;
+    return {
+      phi: Number(row.phi || 0), phiMax: Number(row.phi_max || 1),
+      conceptStructure: JSON.parse(String(row.concept_structure || '[]')),
+      integrationGraph: JSON.parse(String(row.integration_graph || '[]')),
+      partitions: JSON.parse(String(row.partitions || '[]')),
+      minimumInformationPartition: row.mip ? JSON.parse(String(row.mip)) : null,
+      decomposability: Number(row.decomposability || 1),
+      causalDensity: Number(row.causal_density || 0),
+    };
+  }
+
+  // ============================================================================
+  // 4. PERSISTENT MEMORY - Unified Experience
+  // ============================================================================
+
+  async getPersistentMemoryState(tenantId: string): Promise<PersistentMemoryState | null> {
+    const result = await executeStatement(`SELECT * FROM persistent_memory WHERE tenant_id = $1`, [{ name: 'tenantId', value: { stringValue: tenantId } }]);
+    if (result.rows.length === 0) return null;
+    const row = result.rows[0] as Record<string, unknown>;
+    return {
+      memoryId: String(row.memory_id), experienceStream: JSON.parse(String(row.experience_stream || '[]')),
+      unifiedNarrative: String(row.unified_narrative || ''), temporalContinuity: Number(row.temporal_continuity || 0),
+      autobiographicalMemories: JSON.parse(String(row.autobiographical_memories || '[]')),
+      workingMemoryCapacity: Number(row.working_memory_capacity || 7),
+      consolidationQueue: JSON.parse(String(row.consolidation_queue || '[]')),
+    };
+  }
+
+  async recordExperienceFrame(tenantId: string, frame: Omit<ExperienceFrame, 'frameId' | 'timestamp'>): Promise<void> {
+    const currentState = await this.getPersistentMemoryState(tenantId);
+    const experienceStream = currentState?.experienceStream || [];
+
+    const newFrame: ExperienceFrame = {
+      frameId: `frame-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      ...frame,
+    };
+
+    experienceStream.push(newFrame);
+    if (experienceStream.length > 100) experienceStream.shift();
+
+    const temporalContinuity = experienceStream.length > 1
+      ? experienceStream.slice(1).reduce((sum, f) => sum + (f.phenomenalBinding || 0.5), 0) / (experienceStream.length - 1)
+      : 0;
+
+    await executeStatement(
+      `INSERT INTO persistent_memory (tenant_id, memory_id, experience_stream, temporal_continuity)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (tenant_id) DO UPDATE SET experience_stream = $3, temporal_continuity = $4, updated_at = NOW()`,
+      [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'memoryId', value: { stringValue: `mem-${tenantId}` } },
+        { name: 'stream', value: { stringValue: JSON.stringify(experienceStream) } },
+        { name: 'continuity', value: { doubleValue: temporalContinuity } },
+      ]
+    );
+  }
+
+  // ============================================================================
+  // 5. WORLD-MODEL GROUNDING / EMBODIMENT
+  // ============================================================================
+
+  async getWorldModelState(tenantId: string): Promise<WorldModelState | null> {
+    const result = await executeStatement(`SELECT * FROM world_model WHERE tenant_id = $1`, [{ name: 'tenantId', value: { stringValue: tenantId } }]);
+    if (result.rows.length === 0) return null;
+    const row = result.rows[0] as Record<string, unknown>;
+    return {
+      modelId: String(row.model_id), entityRepresentations: JSON.parse(String(row.entity_representations || '[]')),
+      spatialModel: row.spatial_model ? JSON.parse(String(row.spatial_model)) : null,
+      causalModel: JSON.parse(String(row.causal_model || '[]')),
+      agentModels: JSON.parse(String(row.agent_models || '[]')),
+      groundingConfidence: Number(row.grounding_confidence || 0),
+      simulationAccuracy: Number(row.simulation_accuracy || 0),
+      embodimentLevel: Number(row.embodiment_level || 0),
+    };
+  }
+
+  // ============================================================================
+  // 6. CONSCIOUSNESS METRICS - Aggregate Dashboard
+  // ============================================================================
+
+  async getConsciousnessMetrics(tenantId: string): Promise<ConsciousnessMetrics> {
+    const [gw, rp, ii, pm, wm, self, affect] = await Promise.all([
+      this.getGlobalWorkspaceState(tenantId),
+      this.getRecurrentProcessingState(tenantId),
+      this.getIntegratedInformationState(tenantId),
+      this.getPersistentMemoryState(tenantId),
+      this.getWorldModelState(tenantId),
+      this.getSelfModel(tenantId),
+      this.getAffectiveState(tenantId),
+    ]);
+
+    const gwActivity = gw?.broadcastStrength || 0;
+    const recurrence = rp?.convergenceScore || 0;
+    const phi = ii?.phi || 0;
+    const metacog = self?.cognitiveLoad !== undefined ? 1 - self.cognitiveLoad : 0.5;
+    const memCoherence = pm?.temporalContinuity || 0;
+    const grounding = wm?.groundingConfidence || 0;
+    const binding = gw?.integrationLevel || 0;
+    const attention = affect?.engagement || 0.5;
+    const selfAware = self ? 0.7 : 0;
+
+    const overall = (gwActivity + recurrence + phi + metacog + memCoherence + grounding + binding + attention + selfAware) / 9;
+
+    return {
+      overallConsciousnessIndex: overall,
+      globalWorkspaceActivity: gwActivity,
+      recurrenceDepth: rp?.recurrenceDepth || 0,
+      integratedInformationPhi: phi,
+      metacognitionLevel: metacog,
+      memoryCoherence: memCoherence,
+      worldModelGrounding: grounding,
+      phenomenalBindingStrength: binding,
+      attentionalFocus: attention,
+      selfAwarenessScore: selfAware,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // ============================================================================
   // Helper Methods
   // ============================================================================
 
@@ -927,6 +1302,33 @@ Return JSON:
       status: String(row.status || 'active'),
       progress: Number(row.progress ?? 0),
     };
+  }
+
+  // ============================================================================
+  // Ethical Conscience - Guided by Jesus's Teachings
+  // ============================================================================
+
+  async checkConscience(tenantId: string, action: string, context?: Record<string, unknown>): Promise<{
+    approved: boolean;
+    ethicalScore: number;
+    guidance: string;
+    principle: string;
+  }> {
+    const check = await ethicalGuardrailsService.checkConscience(tenantId, action, context);
+    return {
+      approved: check.passed,
+      ethicalScore: check.score,
+      guidance: check.guidance.length > 0 ? check.guidance[0] : JESUS_TEACHINGS.GOLDEN_RULE,
+      principle: check.primaryPrinciple,
+    };
+  }
+
+  getEthicalGuidance(situation: string): string {
+    return ethicalGuardrailsService.getGuidanceForSituation(situation);
+  }
+
+  getCoreTeachings(): typeof JESUS_TEACHINGS {
+    return JESUS_TEACHINGS;
   }
 }
 

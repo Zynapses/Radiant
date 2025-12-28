@@ -61,15 +61,24 @@ import { formatDistanceToNow, format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { ThinkTankSecuritySection } from '@/components/thinktank/thinktank-security-section';
 
+interface AnomalyDetails {
+  attempts?: number;
+  riskScore?: number;
+  affectedSessions?: number;
+  [key: string]: unknown;
+}
+
 interface SecurityAnomaly {
   id: string;
   anomalyType: 'geographic' | 'session_hijack' | 'brute_force' | 'rate_limit' | 'credential_stuffing';
   severity: 'critical' | 'high' | 'medium' | 'low';
   userId: string | null;
   ipAddress: string;
-  details: Record<string, unknown>;
+  details: AnomalyDetails;
   isResolved: boolean;
   detectedAt: string;
+  timeline?: Array<{ action: string; actor: string; timestamp: string }>;
+  relatedEvents?: Array<{ id: string; type: string; timestamp: string; description: string }>;
 }
 
 interface SecurityMetrics {
@@ -268,15 +277,15 @@ function AnomalyDetailDialog({
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div className="p-3 rounded-lg bg-muted">
-                      <p className="text-2xl font-bold">{(anomaly.details as any).attempts || 1}</p>
+                      <p className="text-2xl font-bold">{String(anomaly.details.attempts ?? 1)}</p>
                       <p className="text-sm text-muted-foreground">Attempts</p>
                     </div>
                     <div className="p-3 rounded-lg bg-muted">
-                      <p className="text-2xl font-bold">{(anomaly.details as any).riskScore || 85}%</p>
+                      <p className="text-2xl font-bold">{String(anomaly.details.riskScore ?? 85)}%</p>
                       <p className="text-sm text-muted-foreground">Risk Score</p>
                     </div>
                     <div className="p-3 rounded-lg bg-muted">
-                      <p className="text-2xl font-bold">{(anomaly.details as any).affectedSessions || 1}</p>
+                      <p className="text-2xl font-bold">{String(anomaly.details.affectedSessions ?? 1)}</p>
                       <p className="text-sm text-muted-foreground">Sessions</p>
                     </div>
                   </div>

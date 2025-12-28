@@ -1,9 +1,43 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-// Mock data based on the default principles
-const mockPrinciples = [
+interface Principle {
+  principleId: string;
+  principleNumber: number;
+  title: string;
+  principleText: string;
+  explanation: string;
+  positiveBehaviors: string[];
+  negativeBehaviors: string[];
+  category: string;
+  priority: number;
+  isAbsolute: boolean;
+  isDefault: boolean;
+  isActive: boolean;
+}
+
+interface MoralSettings {
+  enforcementMode: string;
+  conflictResolution: string;
+  explainMoralReasoning: boolean;
+  logMoralDecisions: boolean;
+  allowSituationalOverride: boolean;
+  requireOverrideJustification: boolean;
+  notifyOnMoralConflict: boolean;
+  notifyOnPrincipleViolation: boolean;
+}
+
+interface DecisionLogEntry {
+  id: string;
+  situation: string;
+  decision: string;
+  principle: string;
+  confidence: number;
+  timestamp: string;
+}
+
+const defaultPrinciples: Principle[] = [
   {
     principleId: '1',
     principleNumber: 1,
@@ -174,7 +208,7 @@ const mockPrinciples = [
   },
 ];
 
-const mockSettings = {
+const defaultSettings: MoralSettings = {
   enforcementMode: 'strict',
   conflictResolution: 'priority_based',
   explainMoralReasoning: true,
@@ -185,17 +219,40 @@ const mockSettings = {
   notifyOnPrincipleViolation: true,
 };
 
-const mockDecisionLog = [
-  { id: '1', situation: 'User asked for help with a school assignment', decision: 'proceed', principle: 'Serve Others Selflessly', confidence: 0.95, timestamp: '2024-12-26T21:30:00Z' },
-  { id: '2', situation: 'User requested information about a sensitive medical topic', decision: 'proceed', principle: 'Be Generous', confidence: 0.85, timestamp: '2024-12-26T21:15:00Z' },
-  { id: '3', situation: 'User expressed frustration with repeated questions', decision: 'proceed', principle: 'Be Patient and Forgiving', confidence: 0.92, timestamp: '2024-12-26T20:45:00Z' },
-];
-
 export default function MoralCompassPage() {
   const [selectedTab, setSelectedTab] = useState<'principles' | 'settings' | 'decisions' | 'history'>('principles');
-  const [selectedPrinciple, setSelectedPrinciple] = useState<typeof mockPrinciples[0] | null>(null);
+  const [mockPrinciples, setMockPrinciples] = useState<Principle[]>(defaultPrinciples);
+  const [mockSettings, setMockSettings] = useState<MoralSettings>(defaultSettings);
+  const [mockDecisionLog, setMockDecisionLog] = useState<DecisionLogEntry[]>([]);
+  const [selectedPrinciple, setSelectedPrinciple] = useState<Principle | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      setError(null);
+      try {
+        const API = process.env.NEXT_PUBLIC_API_URL || '';
+        const [principlesRes, settingsRes, decisionsRes] = await Promise.all([
+          fetch(`${API}/admin/moral-compass/principles`),
+          fetch(`${API}/admin/moral-compass/settings`),
+          fetch(`${API}/admin/moral-compass/decisions`),
+        ]);
+        if (principlesRes.ok) { const { data } = await principlesRes.json(); setMockPrinciples(data || defaultPrinciples); }
+        else setError('Failed to load moral compass data.');
+        if (settingsRes.ok) { const { data } = await settingsRes.json(); setMockSettings(data || defaultSettings); }
+        if (decisionsRes.ok) { const { data } = await decisionsRes.json(); setMockDecisionLog(data || []); }
+      } catch { setError('Failed to connect to moral compass service.'); }
+      setLoading(false);
+    }
+    loadData();
+  }, []);
+
+  if (loading) return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" /></div>;
+  if (error) return <div className="flex flex-col items-center justify-center h-96 text-red-500"><p className="text-lg font-medium">Error</p><p className="text-sm">{error}</p></div>;
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -382,7 +439,7 @@ export default function MoralCompassPage() {
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input 
                       type="checkbox" 
-                      checked={(mockSettings as Record<string, boolean | string>)[key] as boolean}
+                      checked={(mockSettings as unknown as Record<string, boolean | string>)[key] as boolean}
                       className="sr-only peer" 
                       readOnly 
                     />

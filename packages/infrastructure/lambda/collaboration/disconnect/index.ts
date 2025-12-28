@@ -2,6 +2,7 @@ import { APIGatewayProxyWebsocketHandlerV2 } from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, DeleteCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { enhancedLogger as logger } from '../../shared/logging/enhanced-logger';
 
 const ddbClient = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(ddbClient);
@@ -12,7 +13,7 @@ const CONNECTIONS_TABLE = process.env.CONNECTIONS_TABLE!;
 export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
   const connectionId = event.requestContext.connectionId;
   
-  console.log('WebSocket disconnect:', { connectionId });
+  logger.info('WebSocket disconnect', { connectionId });
 
   try {
     // Find connection to get session info
@@ -61,7 +62,7 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
       body: JSON.stringify({ message: 'Disconnected' }),
     };
   } catch (error) {
-    console.error('Disconnect error:', error);
+    logger.error('WebSocket disconnect error', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Failed to disconnect' }),

@@ -7,6 +7,7 @@
 import { SQSEvent, SQSRecord } from 'aws-lambda';
 import { DynamoDBClient, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 
 const dynamodb = new DynamoDBClient({});
 const s3 = new S3Client({});
@@ -48,7 +49,7 @@ export async function handler(event: SQSEvent): Promise<void> {
 async function processRecord(record: SQSRecord): Promise<void> {
   const chunk: BatchChunk = JSON.parse(record.body);
   
-  console.log(`Processing chunk ${chunk.chunkId} of job ${chunk.jobId}`);
+  logger.info(`Processing chunk ${chunk.chunkId} of job ${chunk.jobId}`);
 
   try {
     // Update status to processing
@@ -87,7 +88,7 @@ async function processRecord(record: SQSRecord): Promise<void> {
     });
 
   } catch (error) {
-    console.error(`Error processing chunk ${chunk.chunkId}:`, error);
+    logger.error(`Error processing chunk ${chunk.chunkId}`, error);
     await updateChunkStatus(chunk.jobId, chunk.chunkId, 'failed', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });

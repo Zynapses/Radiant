@@ -27,6 +27,7 @@ Think Tank is your all-in-one AI assistant platform. Access the world's best AI 
 10. [Tips & Best Practices](#10-tips--best-practices)
 11. [Keyboard Shortcuts](#11-keyboard-shortcuts)
 12. [FAQ](#12-faq)
+13. [Delight System](#13-delight-system)
 
 ---
 
@@ -706,9 +707,82 @@ A: Click **Help** → **Report Issue** or email support@thinktank.ai.
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 3.2.0 | December 2024 | Time Machine, enhanced collaboration, A/B experiments |
+| 3.2.0 | December 2024 | Time Machine, enhanced collaboration, A/B experiments, **Delight System** |
 | 3.1.0 | November 2024 | Canvas improvements, new models |
 | 3.0.0 | October 2024 | Initial release |
+
+---
+
+## 13. Delight System
+
+Think Tank includes a personality system called "Delight" that makes your AI experience more engaging.
+
+### 13.1 What is Delight?
+
+Delight adds contextual, friendly messages during your conversations:
+
+- **Domain Loading**: "Consulting the fundamental forces..." when you ask physics questions
+- **Time Awareness**: "Burning the midnight tokens" during late-night sessions
+- **Model Dynamics**: "Consensus forming..." when multiple models agree
+- **Wellbeing Nudges**: "You've been thinking hard. Time for a break?"
+
+### 13.2 Personality Modes
+
+Choose your preferred personality style in **Settings → Delight**:
+
+| Mode | Description |
+|------|-------------|
+| **Professional** | Minimal, business-appropriate feedback |
+| **Subtle** | Light touches of personality |
+| **Expressive** | Full personality with humor |
+| **Playful** | Maximum fun, includes easter eggs |
+
+### 13.3 Achievements
+
+Earn achievements as you use Think Tank:
+
+| Achievement | How to Unlock |
+|-------------|---------------|
+| 🧭 Domain Explorer | Explore 10+ knowledge domains |
+| 🔥 Week Warrior | Use Think Tank 7 days in a row |
+| 👑 Renaissance Mind | Explore 50+ domains |
+| ⚡ Monthly Mind | 30-day streak |
+
+View your achievements in **Settings → Achievements**.
+
+### 13.4 Easter Eggs
+
+Think Tank has hidden surprises! Try:
+- Typing special phrases
+- Using keyboard shortcuts
+- Exploring during special times
+
+Discover them yourself—that's half the fun!
+
+### 13.5 Sound Effects
+
+Enable audio feedback in **Settings → Delight → Sounds**:
+
+| Theme | Style |
+|-------|-------|
+| Default | Pleasant chimes |
+| Mission Control | NASA-inspired beeps |
+| Library | Page turns, book sounds |
+| Workshop | Tool clicks |
+| Emissions | Tesla-style... fun |
+
+### 13.6 Customizing Delight
+
+Toggle individual features:
+- ✅ Domain messages
+- ✅ Model personality
+- ✅ Time awareness
+- ✅ Achievements
+- ✅ Wellbeing nudges
+- ✅ Easter eggs
+- ✅ Sound effects
+
+Set intensity level (1-10) to control how often messages appear.
 
 ---
 

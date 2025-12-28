@@ -5,6 +5,8 @@
  * to failing services.
  */
 
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
+
 export type CircuitState = 'closed' | 'open' | 'half-open';
 
 export interface CircuitBreakerConfig {
@@ -54,7 +56,7 @@ async function loadDynamicConfig(name: string): Promise<Partial<CircuitBreakerCo
     return { failureThreshold, successThreshold, timeout };
   } catch (error) {
     // Fallback to defaults if DB not available
-    console.debug('Circuit breaker config not available from DB, using defaults:', error instanceof Error ? error.message : 'unknown');
+    logger.debug('Circuit breaker config not available from DB, using defaults', { error: error instanceof Error ? error.message : 'unknown' });
     return {};
   }
 }
@@ -169,7 +171,8 @@ export class CircuitBreaker {
     const oldState = this.state;
     this.state = newState;
 
-    console.log(`[CircuitBreaker:${this.name}] ${oldState} -> ${newState}`, {
+    logger.info(`Circuit breaker ${this.name} state transition: ${oldState} -> ${newState}`, {
+      circuitName: this.name,
       failures: this.failures,
       successes: this.successes,
       totalRequests: this.totalRequests,
@@ -258,10 +261,10 @@ export function getCircuitBreaker(
       if (Object.keys(dbConfig).length > 0) {
         dynamicConfigs.set(name, dbConfig);
         // Update the breaker's config (it will use new values on next check)
-        console.log(`[CircuitBreaker:${name}] Loaded config from DB:`, dbConfig);
+        logger.debug(`Circuit breaker ${name} loaded config from DB`, { circuitName: name, config: dbConfig });
       }
     }).catch(() => {
-      // Silently fail - will use defaults
+      // DB config unavailable - using defaults is expected and non-fatal
     });
   }
   return breaker;
@@ -284,6 +287,9 @@ export function getAllCircuitBreakerStats(): Record<string, CircuitBreakerStats>
 export const CircuitBreakers = {
   openai: () => getCircuitBreaker('openai', { failureThreshold: 5, timeout: 60000 }),
   anthropic: () => getCircuitBreaker('anthropic', { failureThreshold: 5, timeout: 60000 }),
+  google: () => getCircuitBreaker('google', { failureThreshold: 5, timeout: 60000 }),
+  deepseek: () => getCircuitBreaker('deepseek', { failureThreshold: 5, timeout: 60000 }),
+  xai: () => getCircuitBreaker('xai', { failureThreshold: 5, timeout: 60000 }),
   litellm: () => getCircuitBreaker('litellm', { failureThreshold: 3, timeout: 30000 }),
   bedrock: () => getCircuitBreaker('bedrock', { failureThreshold: 5, timeout: 45000 }),
   stripe: () => getCircuitBreaker('stripe', { failureThreshold: 3, timeout: 30000 }),

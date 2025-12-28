@@ -8,6 +8,7 @@ import { modelRouterService, ModelResponse } from './model-router.service';
 import { moralCompassService, MoralEvaluation } from './moral-compass.service';
 import { agiCompleteService, CalibratedConfidence } from './agi-complete.service';
 import { selfImprovementService } from './self-improvement.service';
+import { domainTaxonomyService, type DomainDetectionResult, type ProficiencyScores } from './domain-taxonomy.service';
 
 // ============================================================================
 // Types
@@ -135,6 +136,14 @@ export interface OrchestrationRequest {
   
   // AGI Configuration - can override defaults per request
   agi?: Partial<AGIConfig>;
+  
+  // Domain Taxonomy Integration
+  useDomainTaxonomy?: boolean;  // Enable domain-aware model selection
+  domainOverride?: {
+    field_id?: string;
+    domain_id?: string;
+    subspecialty_id?: string;
+  };
 }
 
 export interface OrchestrationResult {
@@ -165,6 +174,18 @@ export interface OrchestrationResult {
     knowledgeUsed?: string[];
     improvementIdeasGenerated?: number;
     agiProcessingTimeMs: number;
+  };
+  
+  // Domain Taxonomy Results
+  domainDetection?: {
+    fieldId?: string;
+    fieldName?: string;
+    domainId?: string;
+    domainName?: string;
+    subspecialtyId?: string;
+    subspecialtyName?: string;
+    detectionConfidence: number;
+    mergedProficiencies: ProficiencyScores;
   };
 }
 
@@ -388,27 +409,80 @@ export class AGIOrchestratorService {
     }
 
     // =========================================================================
-    // STANDARD ORCHESTRATION
+    // STANDARD ORCHESTRATION (with Domain Taxonomy Integration)
     // =========================================================================
 
-    // 5. Detect specialty
-    const specialty = request.forceSpecialty || await this.detectSpecialty(request.taskDescription);
+    // 5. Domain detection (if enabled) - enhances specialty detection
+    let domainResult: DomainDetectionResult | undefined;
+    let domainProficiencies: ProficiencyScores | undefined;
+    
+    if (request.useDomainTaxonomy !== false) {  // Enabled by default
+      try {
+        domainResult = await domainTaxonomyService.detectDomain(request.taskDescription, {
+          include_subspecialties: true,
+          min_confidence: 0.3,
+          max_results: 3,
+          manual_override: request.domainOverride,
+        });
+        
+        if (domainResult.detection_confidence > 0.3) {
+          domainProficiencies = domainResult.merged_proficiencies;
+          
+          // Add domain to context detection
+          if (contextDetected) {
+            contextDetected.domainTaxonomy = {
+              fieldId: domainResult.primary_field?.field_id,
+              domainId: domainResult.primary_domain?.domain_id,
+              subspecialtyId: domainResult.primary_subspecialty?.subspecialty_id,
+              confidence: domainResult.detection_confidence,
+            };
+          }
+        }
+      } catch { /* domain detection failed, continue with standard flow */ }
+    }
 
-    // 6. Get orchestration settings
+    // 6. Detect specialty (enhanced with domain if available)
+    let specialty: string | null = request.forceSpecialty || null;
+    if (!specialty) {
+      // Map domain to specialty if detected
+      if (domainResult?.primary_domain) {
+        specialty = this.mapDomainToSpecialty(domainResult.primary_domain.domain_id);
+      }
+      // Fallback to legacy detection
+      if (!specialty) {
+        specialty = await this.detectSpecialty(request.taskDescription);
+      }
+    }
+
+    // 7. Get orchestration settings
     const settings = await this.getSettings(request.tenantId);
 
-    // 7. Determine routing strategy
+    // 8. Determine routing strategy
     const strategy = request.preferredStrategy || 
       (settings?.allow_ensemble && request.qualityPriority && request.qualityPriority > 0.8 ? 'ensemble' : 'single');
 
-    // 8. Select models
+    // 9. Select models (domain-aware if proficiencies available)
     const maxModels = request.maxModels || (settings?.max_models_per_request as number | undefined) || 3;
-    const models = request.forceModels || await this.selectModels(
-      request.tenantId,
-      specialty,
-      strategy,
-      maxModels
-    );
+    let models: string[];
+    
+    if (request.forceModels) {
+      models = request.forceModels;
+    } else if (domainProficiencies) {
+      // Use domain taxonomy for model selection
+      models = await this.selectModelsWithProficiencies(
+        request.tenantId,
+        domainProficiencies,
+        maxModels
+      );
+    } else {
+      // Fallback to specialty-based selection
+      models = await this.selectModels(
+        request.tenantId,
+        specialty,
+        strategy,
+        maxModels
+      );
+    }
 
     // 9. Execute based on strategy
     let result: OrchestrationResult;
@@ -524,6 +598,20 @@ export class AGIOrchestratorService {
       improvementIdeasGenerated,
       agiProcessingTimeMs,
     };
+
+    // Add domain detection results
+    if (domainResult && domainResult.detection_confidence > 0) {
+      result.domainDetection = {
+        fieldId: domainResult.primary_field?.field_id,
+        fieldName: domainResult.primary_field?.field_name,
+        domainId: domainResult.primary_domain?.domain_id,
+        domainName: domainResult.primary_domain?.domain_name,
+        subspecialtyId: domainResult.primary_subspecialty?.subspecialty_id,
+        subspecialtyName: domainResult.primary_subspecialty?.subspecialty_name,
+        detectionConfidence: domainResult.detection_confidence,
+        mergedProficiencies: domainResult.merged_proficiencies,
+      };
+    }
 
     result.totalLatencyMs = Date.now() - startTime;
 
@@ -650,6 +738,62 @@ export class AGIOrchestratorService {
     const fallback = (row.fallback_models as string[]) || [];
 
     return [...preferred.slice(1), ...fallback].slice(0, count);
+  }
+
+  // Map domain IDs to legacy specialty names
+  private mapDomainToSpecialty(domainId: string): string | null {
+    const domainToSpecialty: Record<string, string> = {
+      // Computer Science & IT
+      'software_engineering': 'coding',
+      'web_development': 'coding',
+      'cybersecurity': 'security',
+      'machine_learning': 'reasoning',
+      'deep_learning': 'reasoning',
+      'nlp': 'reasoning',
+      // Sciences
+      'physics': 'science',
+      'chemistry': 'science',
+      'biology': 'science',
+      // Medicine
+      'clinical_medicine': 'medical',
+      'pharmacology': 'medical',
+      // Business
+      'finance': 'finance',
+      'marketing': 'creative',
+      // Law
+      'corporate_law': 'legal',
+      'intellectual_property': 'legal',
+      // Arts
+      'visual_arts': 'creative',
+      'graphic_design': 'creative',
+      // Analysis domains
+      'data_science': 'analysis',
+      'statistics': 'math',
+    };
+    
+    return domainToSpecialty[domainId] || null;
+  }
+
+  // Select models based on domain proficiency requirements
+  async selectModelsWithProficiencies(
+    tenantId: string,
+    proficiencies: ProficiencyScores,
+    maxModels: number
+  ): Promise<string[]> {
+    try {
+      const matches = await domainTaxonomyService.getMatchingModels(proficiencies, {
+        max_models: maxModels,
+        min_match_score: 50,
+        include_self_hosted: true,
+      });
+
+      if (matches.length > 0) {
+        return matches.map(m => m.model_id);
+      }
+    } catch { /* domain matching failed, fall back to default */ }
+
+    // Fallback to default model
+    return ['anthropic/claude-3-5-sonnet-20241022'];
   }
 
   // ============================================================================

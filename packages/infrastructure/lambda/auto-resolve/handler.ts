@@ -4,6 +4,7 @@ import { extractUserFromEvent, type AuthContext } from '../shared/auth';
 import { UnauthorizedError, NotFoundError, ValidationError } from '../shared/errors';
 import { autoResolveService } from '../shared/services/auto-resolve';
 import { metricsCollector } from '../shared/services';
+import { logger } from '../shared/logger';
 
 interface ResolveRequest {
   prompt: string;
@@ -39,7 +40,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     return handleError(new NotFoundError('Endpoint not found'));
   } catch (error) {
-    console.error('Auto-resolve error:', error);
+    logger.error('Auto-resolve error', error instanceof Error ? error : new Error(String(error)));
     return handleError(error);
   }
 }

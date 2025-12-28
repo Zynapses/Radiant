@@ -1,5 +1,6 @@
 import { executeStatement } from '../db/client';
 import { specialtyRankingService, type SpecialtyCategory } from './specialty-ranking.service';
+import { domainTaxonomyService, type ProficiencyScores, type DomainDetectionResult } from './domain-taxonomy.service';
 
 export type TaskType = 'chat' | 'code' | 'analysis' | 'creative' | 'vision' | 'audio';
 
@@ -23,6 +24,14 @@ interface RoutingContext {
   preferredProvider?: string;
   requiresVision?: boolean;
   requiresAudio?: boolean;
+  // Domain taxonomy integration
+  prompt?: string;  // Original prompt for domain detection
+  domainOverride?: {
+    field_id?: string;
+    domain_id?: string;
+    subspecialty_id?: string;
+  };
+  useDomainProficiencies?: boolean;  // Enable domain-aware scoring
 }
 
 interface RoutingResult {
@@ -32,6 +41,17 @@ interface RoutingResult {
   estimatedCost: number;
   estimatedLatencyMs: number;
   confidence: number;
+  // Domain taxonomy results
+  domainDetection?: {
+    fieldId?: string;
+    fieldName?: string;
+    domainId?: string;
+    domainName?: string;
+    subspecialtyId?: string;
+    subspecialtyName?: string;
+    detectionConfidence: number;
+  };
+  proficiencyMatch?: number;  // 0-100 how well model matches domain requirements
 }
 
 interface ModelPerformance {
@@ -47,6 +67,8 @@ interface ModelScore {
   estimatedCost: number;
   estimatedLatency: number;
   total: number;
+  // Domain proficiency matching
+  domainMatchScore?: number;  // 0-100 how well model matches domain requirements
 }
 
 interface CandidateModel {
@@ -111,42 +133,100 @@ const PROVIDER_MAP: Record<string, string> = {
 
 export class BrainRouter {
   private performanceCache: Map<string, ModelPerformance> = new Map();
+  private domainDetectionCache: Map<string, DomainDetectionResult> = new Map();
 
   async route(context: RoutingContext): Promise<RoutingResult> {
     // 1. Check tenant-specific rules first
     const customRule = await this.checkCustomRules(context);
     if (customRule) return customRule;
 
-    // 2. Get available models for task type
+    // 2. Domain detection (if prompt provided and domain routing enabled)
+    let domainResult: DomainDetectionResult | undefined;
+    let requiredProficiencies: ProficiencyScores | undefined;
+
+    if (context.useDomainProficiencies && context.prompt) {
+      domainResult = await this.detectDomain(context.prompt, context.domainOverride);
+      requiredProficiencies = domainResult.merged_proficiencies;
+    }
+
+    // 3. Get available models for task type
     const candidates = await this.getCandidateModels(context);
 
     if (candidates.length === 0) {
-      return this.getDefaultRoute(context);
+      return this.getDefaultRoute(context, domainResult);
     }
 
-    // 3. Score each candidate
+    // 4. Score each candidate (with domain proficiencies if available)
     const scored = await Promise.all(
       candidates.map(async (model) => ({
         model,
-        score: await this.scoreModel(model, context),
+        score: await this.scoreModel(model, context, requiredProficiencies),
       }))
     );
 
-    // 4. Sort by score and return best match
+    // 5. Sort by score and return best match
     scored.sort((a, b) => b.score.total - a.score.total);
     const best = scored[0];
 
-    // 5. Log the routing decision
-    await this.logRoutingDecision(context, best.model, best.score);
+    // 6. Log the routing decision
+    await this.logRoutingDecision(context, best.model, best.score, domainResult);
 
-    return {
+    // 7. Build result with domain detection info
+    const result: RoutingResult = {
       model: best.model.model_id,
       provider: best.model.provider || PROVIDER_MAP[best.model.model_id] || 'unknown',
-      reason: this.formatReason(best.score),
+      reason: this.formatReason(best.score, domainResult),
       estimatedCost: best.score.estimatedCost,
       estimatedLatencyMs: best.score.estimatedLatency,
       confidence: best.score.total,
     };
+
+    // Add domain detection results
+    if (domainResult && domainResult.detection_confidence > 0) {
+      result.domainDetection = {
+        fieldId: domainResult.primary_field?.field_id,
+        fieldName: domainResult.primary_field?.field_name,
+        domainId: domainResult.primary_domain?.domain_id,
+        domainName: domainResult.primary_domain?.domain_name,
+        subspecialtyId: domainResult.primary_subspecialty?.subspecialty_id,
+        subspecialtyName: domainResult.primary_subspecialty?.subspecialty_name,
+        detectionConfidence: domainResult.detection_confidence,
+      };
+      result.proficiencyMatch = best.score.domainMatchScore;
+    }
+
+    return result;
+  }
+
+  // Domain detection with caching
+  private async detectDomain(
+    prompt: string,
+    override?: { field_id?: string; domain_id?: string; subspecialty_id?: string }
+  ): Promise<DomainDetectionResult> {
+    // Simple cache key based on first 100 chars of prompt
+    const cacheKey = prompt.substring(0, 100);
+    
+    if (!override && this.domainDetectionCache.has(cacheKey)) {
+      return this.domainDetectionCache.get(cacheKey)!;
+    }
+
+    const result = await domainTaxonomyService.detectDomain(prompt, {
+      include_subspecialties: true,
+      min_confidence: 0.3,
+      max_results: 3,
+      manual_override: override,
+    });
+
+    if (!override) {
+      this.domainDetectionCache.set(cacheKey, result);
+      // Limit cache size
+      if (this.domainDetectionCache.size > 100) {
+        const firstKey = this.domainDetectionCache.keys().next().value;
+        if (firstKey) this.domainDetectionCache.delete(firstKey);
+      }
+    }
+
+    return result;
   }
 
   private async checkCustomRules(context: RoutingContext): Promise<RoutingResult | null> {
@@ -203,16 +283,28 @@ export class BrainRouter {
     });
   }
 
-  private async scoreModel(model: CandidateModel, context: RoutingContext): Promise<ModelScore> {
+  private async scoreModel(
+    model: CandidateModel,
+    context: RoutingContext,
+    requiredProficiencies?: ProficiencyScores
+  ): Promise<ModelScore> {
     const perf = await this.getModelPerformance(model.model_id);
 
     const costScore = this.scoreCost(model, context);
     const latencyScore = this.scoreLatency(perf, context);
-    const qualityScore = await this.scoreQuality(model, context);
+    let qualityScore = await this.scoreQuality(model, context);
     const reliabilityScore = perf.successRate;
 
     const estimatedCost = this.estimateCost(model, context.inputTokenEstimate);
     const estimatedLatency = perf.avgLatencyMs;
+
+    // Domain proficiency matching (if provided)
+    let domainMatchScore: number | undefined;
+    if (requiredProficiencies) {
+      domainMatchScore = await this.scoreDomainMatch(model.model_id, requiredProficiencies);
+      // Blend domain match into quality score (50/50 with specialty score)
+      qualityScore = (qualityScore * 0.5) + (domainMatchScore / 100 * 0.5);
+    }
 
     return {
       costScore,
@@ -221,12 +313,29 @@ export class BrainRouter {
       reliabilityScore,
       estimatedCost,
       estimatedLatency,
+      domainMatchScore,
       total:
         costScore * 0.20 +
         latencyScore * 0.20 +
-        qualityScore * 0.45 +  // Increased weight for specialty ranking
+        qualityScore * 0.45 +  // Increased weight for specialty/domain ranking
         reliabilityScore * 0.15,
     };
+  }
+
+  // Score how well a model matches domain proficiency requirements
+  private async scoreDomainMatch(modelId: string, required: ProficiencyScores): Promise<number> {
+    try {
+      const matches = await domainTaxonomyService.getMatchingModels(required, {
+        max_models: 20,
+        min_match_score: 0,
+        include_self_hosted: true,
+      });
+
+      const match = matches.find(m => m.model_id === modelId);
+      return match?.match_score || 50; // Default to neutral if not found
+    } catch {
+      return 50; // Neutral score on error
+    }
   }
 
   private scoreCost(model: CandidateModel, context: RoutingContext): number {
@@ -294,12 +403,19 @@ export class BrainRouter {
     return perf;
   }
 
-  private formatReason(score: ModelScore): string {
+  private formatReason(score: ModelScore, domainResult?: DomainDetectionResult): string {
     const factors: string[] = [];
     if (score.costScore > 0.8) factors.push('cost-effective');
     if (score.latencyScore > 0.8) factors.push('fast');
     if (score.qualityScore > 0.8) factors.push('high-quality');
     if (score.reliabilityScore > 0.95) factors.push('reliable');
+    if (score.domainMatchScore && score.domainMatchScore > 75) factors.push('domain-expert');
+    
+    // Add domain context if detected
+    if (domainResult?.primary_domain) {
+      factors.push(`matched ${domainResult.primary_domain.domain_name}`);
+    }
+    
     return factors.join(', ') || 'balanced choice';
   }
 
@@ -311,25 +427,32 @@ export class BrainRouter {
     return true;
   }
 
-  private async logRoutingDecision(context: RoutingContext, model: CandidateModel, score: ModelScore): Promise<void> {
+  private async logRoutingDecision(
+    context: RoutingContext,
+    model: CandidateModel,
+    score: ModelScore,
+    domainResult?: DomainDetectionResult
+  ): Promise<void> {
     await executeStatement(
       `INSERT INTO brain_routing_history 
-       (tenant_id, user_id, task_type, selected_model, selection_reason, input_tokens, cost)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+       (tenant_id, user_id, task_type, selected_model, selection_reason, input_tokens, cost, detected_domain_id, domain_match_score)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
       [
         { name: 'tenantId', value: { stringValue: context.tenantId } },
         { name: 'userId', value: { stringValue: context.userId } },
         { name: 'taskType', value: { stringValue: context.taskType } },
         { name: 'model', value: { stringValue: model.model_id } },
-        { name: 'reason', value: { stringValue: this.formatReason(score) } },
+        { name: 'reason', value: { stringValue: this.formatReason(score, domainResult) } },
         { name: 'tokens', value: { longValue: context.inputTokenEstimate } },
         { name: 'cost', value: { doubleValue: score.estimatedCost } },
+        { name: 'domainId', value: domainResult?.primary_domain ? { stringValue: domainResult.primary_domain.domain_id } : { isNull: true } },
+        { name: 'domainMatchScore', value: score.domainMatchScore !== undefined ? { doubleValue: score.domainMatchScore } : { isNull: true } },
       ]
     );
   }
 
-  private getDefaultRoute(context: RoutingContext): RoutingResult {
-    return {
+  private getDefaultRoute(context: RoutingContext, domainResult?: DomainDetectionResult): RoutingResult {
+    const result: RoutingResult = {
       model: 'gpt-4o',
       provider: 'openai',
       reason: 'default fallback',
@@ -337,6 +460,21 @@ export class BrainRouter {
       estimatedLatencyMs: 1000,
       confidence: 0.5,
     };
+
+    // Include domain detection even in default route
+    if (domainResult && domainResult.detection_confidence > 0) {
+      result.domainDetection = {
+        fieldId: domainResult.primary_field?.field_id,
+        fieldName: domainResult.primary_field?.field_name,
+        domainId: domainResult.primary_domain?.domain_id,
+        domainName: domainResult.primary_domain?.domain_name,
+        subspecialtyId: domainResult.primary_subspecialty?.subspecialty_id,
+        subspecialtyName: domainResult.primary_subspecialty?.subspecialty_name,
+        detectionConfidence: domainResult.detection_confidence,
+      };
+    }
+
+    return result;
   }
 }
 
