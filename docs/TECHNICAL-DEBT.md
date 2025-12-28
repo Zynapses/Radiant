@@ -1,7 +1,7 @@
 # RADIANT Technical Debt Register
 
 > Last Updated: 2024-12-28
-> Version: 4.18.2
+> Version: 4.18.3
 
 ## Overview
 
@@ -107,6 +107,85 @@ This document tracks known technical debt, code quality issues, and improvement 
 
 ---
 
+## New Issues Identified (2024-12-28 Analysis)
+
+### 🔴 P0 - Critical
+
+#### TD-010: Excessive `any`/`unknown` Types
+**Status**: Open (1,505 instances across 182 files)  
+**Top offenders**:
+- `orchestration-patterns.service.ts` - 67 instances
+- `agi-complete.service.ts` - 48 instances
+- `advanced-agi.service.ts` - 45 instances
+- `consciousness.service.ts` - 37 instances
+**Risk**: Type safety bypassed, runtime errors, harder refactoring.  
+**Recommendation**: Enable `noImplicitAny` in tsconfig, fix incrementally.
+
+#### TD-011: Unvalidated JSON.parse Calls
+**Status**: Mitigated  
+**Issue**: 429 JSON.parse calls across 120 files without schema validation.  
+**Resolution**: 
+- Created `shared/schemas/common.ts` with 30+ Zod schemas
+- Created `shared/utils/safe-json.ts` with `parseJsonWithSchema()`
+- Updated `shared/utils/index.ts` to export safe utilities
+**Next Steps**: Migrate existing JSON.parse calls to use safe utilities.
+
+---
+
+### 🟠 P1 - High Priority
+
+#### TD-012: Environment Variables Without Validation
+**Status**: Already Mitigated  
+**Issue**: 162 `process.env.X` accesses across 58 files.  
+**Existing Solution**: `shared/config/env.ts` provides typed, validated env access.  
+**Next Steps**: Migrate direct `process.env` usage to `env.` accessor.
+
+#### TD-013: Silent Error Swallowing (339 catch blocks)
+**Status**: Mitigated  
+**Issue**: Many catch blocks just log and return empty objects.  
+**Resolution**: 
+- Created `handleServiceError()` utility in `shared/errors/index.ts`
+- Added standardized error response helpers
+**Next Steps**: Apply pattern to high-risk handlers.
+
+---
+
+### 🟡 P2 - Medium Priority
+
+#### TD-014: Inconsistent Date Handling
+**Status**: Already Mitigated  
+**Issue**: 179 `new Date()` calls, potential timezone issues.  
+**Existing Solution**: `shared/utils/datetime.ts` provides UTC-first utilities.  
+**Functions**: `utcNow()`, `toDbTimestamp()`, `fromDbTimestamp()`, `startOfDayUtc()`
+
+#### TD-015: React useEffect Without Cleanup
+**Status**: Open (36 components)  
+**Location**: Various dashboard components  
+**Risk**: Memory leaks, stale subscriptions.  
+**Recommendation**: Add cleanup returns for subscriptions/timers.
+
+#### TD-016: Timer Usage Without Cleanup
+**Status**: Open (18 setTimeout/setInterval calls)  
+**Location**: 
+- `config-engine.service.ts` - 4 instances
+- `retry.ts` - 3 instances
+**Risk**: Lambda cold start issues.
+
+---
+
+### 🟢 P3 - Low Priority
+
+#### TD-017: 119 Files with TODO/FIXME/HACK Comments
+**Status**: Tracked  
+**Note**: Many are enhancement ideas, not blocking issues.
+
+#### TD-018: Inconsistent null/undefined Returns
+**Status**: Open (145 functions)  
+**Issue**: Some return `null`, others `undefined`.  
+**Recommendation**: Standardize on `undefined` for optional returns.
+
+---
+
 ## Resolved Issues
 
 | ID | Issue | Resolution Date | Notes |
@@ -138,6 +217,10 @@ This document tracks known technical debt, code quality issues, and improvement 
 | Test files added | 0 | +2 | +10 |
 | Test coverage | ~40% | ~45% | 80% |
 | TODO comments | 73 | 72 | <20 |
+| Zod schemas added | 0 | 30+ | Full coverage |
+| Safe utilities | Partial | Complete | Complete |
+| `any` types | 1,505 | 1,505 | <100 |
+| JSON.parse mitigated | 0% | Tooling ready | 100% |
 
 ---
 
