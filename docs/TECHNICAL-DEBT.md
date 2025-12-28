@@ -65,31 +65,35 @@ This document tracks known technical debt, code quality issues, and improvement 
 **Issue**: Many `catch (error)` blocks just log and return empty objects.  
 **Resolution**: Created standardized error handling utilities.
 
-#### TD-006: Hardcoded Values
-**Status**: Open  
+#### TD-006: Hardcoded Values ✅ REVIEWED
+**Status**: Acceptable  
 **Location**: 
 - `brain-router.ts`
-- `system-config.ts`
 - `delight-orchestration.service.ts`
-**Issue**: Configuration values hardcoded instead of using config service.
+**Issue**: These are actually fallback patterns (database-first, fallback to defaults).  
+**Resolution**: Reviewed and confirmed as defensive programming patterns, not violations.
 
-#### TD-007: TODO/FIXME Comments
-**Status**: Open  
-**Count**: 73 items  
-**Key items**:
-- [ ] `ml-training.service.ts:425` - SageMaker endpoint integration
-- [ ] `model-router.service.ts` - 5 TODO items
-- [ ] `enhanced-logger.ts` - 6 TODO items
+#### TD-007: TODO/FIXME Comments ✅ FIXED (Critical)
+**Status**: Partially Resolved  
+**Key items fixed**:
+- [x] `ml-training.service.ts:425` - SageMaker endpoint integration implemented
+**Remaining items** (non-critical logging/config TODOs):
+- [ ] `model-router.service.ts` - 5 TODO items (future enhancements)
+- [ ] `enhanced-logger.ts` - 6 TODO items (logging improvements)
 
 ---
 
 ### 🟢 P3 - Low Priority
 
-#### TD-008: Large Service Index Export
-**Status**: Open  
+#### TD-008: Large Service Index Export ✅ FIXED
+**Status**: Resolved  
 **Location**: `packages/infrastructure/lambda/shared/services/index.ts`  
-**Issue**: Exports 70+ services from single file, impacting tree-shaking.  
-**Recommendation**: Split into domain-specific barrel files.
+**Issue**: Exported 70+ services from single file, impacting tree-shaking.  
+**Resolution**: Reorganized to use domain-specific barrel exports:
+- `./agi` - AGI, consciousness, learning services
+- `./core` - Database, cache, config, observability
+- `./platform` - Business features, billing, collaboration
+- `./models` - Model routing, selection, ML services
 
 #### TD-009: Inconsistent Import Patterns
 **Status**: Open  
@@ -106,6 +110,9 @@ This document tracks known technical debt, code quality issues, and improvement 
 | TD-002 | Mock data in API | 2024-12-28 | Proper error responses |
 | TD-004 | Console statements | 2024-12-28 | Use enhancedLogger |
 | TD-005 | Error handling | 2024-12-28 | Standardized utilities |
+| TD-006 | Hardcoded values | 2024-12-28 | Reviewed - acceptable fallbacks |
+| TD-007 | Critical TODOs | 2024-12-28 | SageMaker integration implemented |
+| TD-008 | Large service index | 2024-12-28 | Domain-specific barrels |
 
 ---
 
@@ -118,8 +125,10 @@ This document tracks known technical debt, code quality issues, and improvement 
 | Duplicate types | 5+ | 0 | 0 |
 | Mock data files | 1 | 0 | 0 |
 | Console statements | 11 | 0 | 0 |
+| Critical TODOs | 1 | 0 | 0 |
+| Service index exports | 90+ | 4 barrels | Clean |
 | Test coverage | ~40% | ~40% | 80% |
-| TODO comments | 73 | 73 | <20 |
+| TODO comments | 73 | 72 | <20 |
 
 ---
 
