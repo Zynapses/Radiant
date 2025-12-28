@@ -3,6 +3,14 @@
 > Version: 4.18.0
 > Last Updated: 2024-12-28
 
+## Related Documentation
+
+- [Specialty Ranking System](./SPECIALTY-RANKING.md) - Domain-specific model proficiency rankings
+- [Domain Taxonomy](./DOMAIN-TAXONOMY.md) - Hierarchical domain detection
+- [AGI Brain Planner](./AGI-BRAIN-PLANNER.md) - Real-time planning system
+
+---
+
 ## Overview
 
 RADIANT's orchestration system provides **17 reusable methods** that can be composed into **49 workflow patterns**. Each method is parameterized and can receive streams from previous methods in the pipeline.
@@ -1052,6 +1060,8 @@ Shows:
 ---
 
 ## Specialty Categories (Domain Expertise)
+
+> **Full Documentation**: See [SPECIALTY-RANKING.md](./SPECIALTY-RANKING.md) for complete details on the specialty ranking system, AI-powered research, admin controls, and database schema.
 
 In addition to the 8 proficiency dimensions, models are ranked across **20 specialty categories** representing domain-specific expertise:
 
