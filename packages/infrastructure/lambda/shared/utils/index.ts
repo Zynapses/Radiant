@@ -118,4 +118,21 @@ export {
 } from './datetime';
 
 // Circuit breaker for external service calls
-export { CircuitBreaker, CircuitBreakerState } from './circuit-breaker';
+export { CircuitBreaker, CircuitBreakerStats } from './circuit-breaker';
+
+// Nullish value utilities (null/undefined standardization)
+export {
+  isNullish,
+  isNotNullish,
+  nullToUndefined,
+  undefinedToNull,
+  withDefault,
+  withDefaultLazy,
+  mapNullish,
+  filterNullish,
+  sanitizeDbRow,
+  omitUndefined,
+  omitUndefinedDeep,
+  assertNotNullish,
+  coalesce,
+} from './nullish';
