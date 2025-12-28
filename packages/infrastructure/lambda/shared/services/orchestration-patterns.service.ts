@@ -420,6 +420,9 @@ export class OrchestrationPatternsService {
           iteration,
         });
         
+        // Record step execution metrics
+        await this.recordStepExecution(executionId, step, stepResult, iteration);
+        
         // Update context with step output
         if (step.outputVariable) {
           context[step.outputVariable] = stepResult.output;
@@ -1744,6 +1747,64 @@ export class OrchestrationPatternsService {
         { name: 'modelsUsed', value: { stringValue: `{${modelsUsed.join(',')}}` } },
       ]
     );
+  }
+
+  /**
+   * Record individual step execution metrics for analytics
+   */
+  private async recordStepExecution(
+    executionId: string,
+    step: WorkflowStep,
+    result: Omit<StepExecutionResult, 'iteration'>,
+    iteration: number
+  ): Promise<void> {
+    try {
+      await executeStatement(
+        `INSERT INTO orchestration_step_executions (
+          execution_id, binding_id, method_id, step_order, step_name,
+          model_used, latency_ms, cost_cents, quality_score, status,
+          input_tokens, output_tokens, was_parallel, iteration
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+        [
+          { name: 'executionId', value: { stringValue: executionId } },
+          { name: 'bindingId', value: { stringValue: step.bindingId } },
+          { name: 'methodId', value: { stringValue: step.method.methodId } },
+          { name: 'stepOrder', value: { longValue: step.stepOrder } },
+          { name: 'stepName', value: { stringValue: step.stepName || step.method.methodName } },
+          { name: 'modelUsed', value: { stringValue: result.modelUsed } },
+          { name: 'latencyMs', value: { longValue: result.latencyMs } },
+          { name: 'costCents', value: { doubleValue: result.costCents } },
+          { name: 'qualityScore', value: { doubleValue: this.estimateStepQuality(result) } },
+          { name: 'status', value: { stringValue: 'completed' } },
+          { name: 'inputTokens', value: { longValue: (result.input as { tokens?: number })?.tokens || 0 } },
+          { name: 'outputTokens', value: { longValue: (result.output as { tokens?: number })?.tokens || 0 } },
+          { name: 'wasParallel', value: { booleanValue: result.wasParallel || false } },
+          { name: 'iteration', value: { longValue: iteration } },
+        ]
+      );
+    } catch (error) {
+      logger.warn('Failed to record step execution metrics', { error, stepName: step.stepName });
+    }
+  }
+
+  /**
+   * Estimate quality score for a step based on output characteristics
+   */
+  private estimateStepQuality(result: Omit<StepExecutionResult, 'iteration'>): number {
+    let score = 0.7; // Base score
+    
+    // Boost for successful response with content
+    const response = (result.output as { response?: string })?.response || '';
+    if (response.length > 100) score += 0.1;
+    if (response.length > 500) score += 0.05;
+    
+    // Penalize very slow responses
+    if (result.latencyMs > 10000) score -= 0.1;
+    
+    // Boost for parallel execution (more perspectives)
+    if (result.wasParallel) score += 0.05;
+    
+    return Math.min(1, Math.max(0, score));
   }
 
   // ============================================================================
