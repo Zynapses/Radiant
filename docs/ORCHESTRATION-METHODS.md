@@ -1048,3 +1048,245 @@ Shows:
 - Model match scores
 - Which dimensions drove model selection
 - Output stream configuration
+
+---
+
+## Specialty Categories (Domain Expertise)
+
+In addition to the 8 proficiency dimensions, models are ranked across **20 specialty categories** representing domain-specific expertise:
+
+### Specialty Categories
+
+| Category | Icon | Description |
+|----------|------|-------------|
+| `reasoning` | 🧠 | Reasoning & Logic |
+| `coding` | 💻 | Code Generation |
+| `math` | 📐 | Mathematics |
+| `creative` | ✍️ | Creative Writing |
+| `analysis` | 📊 | Data Analysis |
+| `research` | 🔬 | Research & Synthesis |
+| `legal` | ⚖️ | Legal & Compliance |
+| `medical` | 🏥 | Medical & Healthcare |
+| `finance` | 💰 | Finance & Trading |
+| `science` | 🔭 | Scientific |
+| `debugging` | 🐛 | Debugging & QA |
+| `architecture` | 🏗️ | System Architecture |
+| `security` | 🔐 | Security |
+| `vision` | 👁️ | Vision & Images |
+| `audio` | 🎤 | Audio & Speech |
+| `conversation` | 💬 | Conversational |
+| `instruction` | 📋 | Instruction Following |
+| `speed` | ⚡ | Low Latency |
+| `accuracy` | 🎯 | High Accuracy |
+| `safety` | 🛡️ | Safety & Alignment |
+
+### Two-Layer Proficiency System
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  LAYER 1: TASK PROFICIENCY DIMENSIONS (8)                                    │
+│  From domain taxonomy - "What capabilities does this task need?"             │
+│                                                                              │
+│  ├─ reasoning_depth              Multi-step logical thinking                │
+│  ├─ mathematical_quantitative    Calculations, proofs, statistics           │
+│  ├─ code_generation              Programming tasks                          │
+│  ├─ creative_generative          Stories, art, ideas                        │
+│  ├─ research_synthesis           Literature review, analysis                │
+│  ├─ factual_recall_precision     Facts, definitions, accuracy               │
+│  ├─ multi_step_problem_solving   Breaking down complex problems             │
+│  └─ domain_terminology_handling  Technical vocabulary                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    │ Drives
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  LAYER 2: SPECIALTY CATEGORIES (20)                                          │
+│  Per-model rankings - "How good is each model in each specialty?"            │
+│                                                                              │
+│  Domain Expertise:                Performance Attributes:                   │
+│  ├─ 🏥 medical                    ├─ ⚡ speed                                │
+│  ├─ ⚖️ legal                      ├─ 🎯 accuracy                             │
+│  ├─ 💰 finance                    ├─ 🛡️ safety                               │
+│  ├─ 🔭 science                    └─ 📋 instruction                          │
+│  ├─ 🔐 security                                                              │
+│  └─ 🏗️ architecture               Modalities:                               │
+│                                    ├─ 👁️ vision                              │
+│  Task Capabilities:                └─ 🎤 audio                               │
+│  ├─ 🧠 reasoning                                                             │
+│  ├─ 💻 coding                                                                │
+│  ├─ 📐 math                                                                  │
+│  ├─ ✍️ creative                                                              │
+│  ├─ 📊 analysis                                                              │
+│  ├─ 🔬 research                                                              │
+│  ├─ 🐛 debugging                                                             │
+│  └─ 💬 conversation                                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### How Both Layers Work Together
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PROMPT: "Analyze this ECG reading and suggest treatment options"            │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 1: Domain Detection                                                    │
+│  → Field: Medicine → Domain: Cardiology → Subspecialty: Diagnostics          │
+│  → Confidence: 0.91                                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 2: Extract TASK PROFICIENCY Requirements                               │
+│                                                                              │
+│  From domain taxonomy:                                                       │
+│  {                                                                           │
+│    reasoning_depth: 8,              // Diagnostic reasoning                 │
+│    mathematical_quantitative: 5,    // Some measurements                    │
+│    factual_recall_precision: 9,     // Medical accuracy critical            │
+│    research_synthesis: 7,           // Treatment guidelines                 │
+│    domain_terminology_handling: 10  // Medical jargon                       │
+│  }                                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 3: Query SPECIALTY RANKINGS for Models                                 │
+│                                                                              │
+│  Required specialties: medical + accuracy + safety + research                │
+│                                                                              │
+│  Model Specialty Scores:                                                     │
+│  ┌───────────────────────┬──────────┬──────────┬────────┬──────────┐        │
+│  │ Model                 │ 🏥 Medical│ 🎯 Accuracy│ 🛡️ Safety│ 🔬 Research│        │
+│  ├───────────────────────┼──────────┼──────────┼────────┼──────────┤        │
+│  │ Claude 3.5 Sonnet     │ 92 (A)   │ 91 (A)   │ 95 (S) │ 90 (A)   │        │
+│  │ GPT-4o                │ 88 (A)   │ 89 (A)   │ 90 (A) │ 87 (A)   │        │
+│  │ DeepSeek Medical*     │ 95 (S)   │ 85 (B)   │ 88 (A) │ 82 (B)   │        │
+│  │ Gemini Pro            │ 84 (B)   │ 86 (B)   │ 89 (A) │ 88 (A)   │        │
+│  └───────────────────────┴──────────┴──────────┴────────┴──────────┘        │
+│                                                                              │
+│  * Self-hosted domain-specific model                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 4: Combined Scoring                                                    │
+│                                                                              │
+│  Final Score = TaskProficiencyMatch × SpecialtyScore × SafetyWeight         │
+│                                                                              │
+│  Claude 3.5 Sonnet: 0.88 × 92 × 1.2 = 97.2 ← SELECTED (primary)             │
+│  DeepSeek Medical:  0.82 × 95 × 1.0 = 77.9 ← SELECTED (fallback)            │
+│  GPT-4o:            0.85 × 88 × 1.1 = 82.3 ← SELECTED (fallback)            │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 5: Execution with Multi-Model                                          │
+│                                                                              │
+│  parallelExecution: {                                                        │
+│    enabled: true,                                                            │
+│    models: ['claude-3-5-sonnet', 'deepseek-medical', 'gpt-4o'],              │
+│    outputMode: 'threshold',                                                  │
+│    outputThreshold: 0.85,  // Only high-confidence medical advice            │
+│    synthesisStrategy: 'weighted'  // Weight by specialty scores              │
+│  }                                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Specialty Ranking Structure
+
+```typescript
+interface SpecialtyRanking {
+  rankingId: string;
+  modelId: string;
+  provider: string;
+  specialty: SpecialtyCategory;     // 'medical', 'legal', 'coding', etc.
+  proficiencyScore: number;          // 0-100 overall score
+  benchmarkScore: number;            // 0-100 from published benchmarks
+  communityScore: number;            // 0-100 from community reviews
+  internalScore: number;             // 0-100 from internal usage data
+  rank: number;                      // Global rank for this specialty
+  percentile: number;                // e.g., top 10%
+  tier: 'S' | 'A' | 'B' | 'C' | 'D' | 'F';  // Quality tier
+  confidence: number;                // 0-1 confidence in assessment
+  trend: 'improving' | 'stable' | 'declining';
+  adminOverride?: number;            // Admin can lock a score
+  isLocked: boolean;
+}
+```
+
+### Tier System
+
+| Tier | Score Range | Description |
+|------|-------------|-------------|
+| **S** | 95-100 | Elite - Best-in-class for this specialty |
+| **A** | 85-94 | Excellent - Highly recommended |
+| **B** | 75-84 | Good - Solid performance |
+| **C** | 65-74 | Average - Acceptable |
+| **D** | 50-64 | Below Average - Use with caution |
+| **F** | 0-49 | Poor - Not recommended |
+
+### Example: Model Specialty Profiles
+
+**Claude 3.5 Sonnet**
+```
+🧠 reasoning:     94 (S)  │████████████████████░░░░│
+💻 coding:        95 (S)  │████████████████████░░░░│
+📐 math:          88 (A)  │██████████████████░░░░░░│
+✍️ creative:      92 (A)  │███████████████████░░░░░│
+🏥 medical:       92 (A)  │███████████████████░░░░░│
+⚖️ legal:         89 (A)  │██████████████████░░░░░░│
+🔐 security:      91 (A)  │███████████████████░░░░░│
+🛡️ safety:        95 (S)  │████████████████████░░░░│
+```
+
+**OpenAI o1**
+```
+🧠 reasoning:     98 (S)  │█████████████████████░░░│
+💻 coding:        90 (A)  │██████████████████░░░░░░│
+📐 math:          96 (S)  │████████████████████░░░░│
+✍️ creative:      75 (B)  │███████████████░░░░░░░░░│
+🏥 medical:       85 (B)  │█████████████████░░░░░░░│
+⚖️ legal:         88 (A)  │██████████████████░░░░░░│
+🔐 security:      89 (A)  │██████████████████░░░░░░│
+🛡️ safety:        92 (A)  │███████████████████░░░░░│
+```
+
+**DeepSeek Coder**
+```
+🧠 reasoning:     85 (B)  │█████████████████░░░░░░░│
+💻 coding:        96 (S)  │████████████████████░░░░│
+📐 math:          92 (A)  │███████████████████░░░░░│
+✍️ creative:      65 (C)  │█████████████░░░░░░░░░░░│
+🐛 debugging:     94 (S)  │███████████████████░░░░░│
+🏗️ architecture: 88 (A)  │██████████████████░░░░░░│
+⚡ speed:         90 (A)  │██████████████████░░░░░░│
+```
+
+### AI-Powered Research
+
+The specialty rankings are maintained through **automated AI research**:
+
+```typescript
+// Research model proficiency across all specialties
+const result = await specialtyRankingService.researchModelProficiency('anthropic/claude-3-5-sonnet');
+
+// Research all models for a specific specialty
+const result = await specialtyRankingService.researchSpecialtyRankings('medical');
+```
+
+Research sources include:
+- Published benchmarks (MMLU, HumanEval, MATH, etc.)
+- Community reviews and feedback
+- Internal usage data and quality scores
+- Domain-specific evaluations
+
+### Admin Controls
+
+Admins can:
+- **Override scores**: Lock a model's specialty score
+- **View leaderboards**: See top models per specialty
+- **Trigger research**: Refresh rankings from latest data
+- **Configure weights**: Adjust benchmark vs community vs internal weighting
