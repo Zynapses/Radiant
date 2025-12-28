@@ -11,6 +11,7 @@
 import { modelRouterService } from './model-router.service';
 import { learningService } from './learning.service';
 import { feedbackService } from './feedback.service';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // ============================================================================
 // Types
@@ -689,7 +690,10 @@ export class SuperiorOrchestrationService {
     previousResult: SuperiorResult,
     startTime: number
   ): Promise<SuperiorResult> {
-    console.log(`Superiority score ${previousResult.superiorityScore} below threshold, escalating to supreme pattern`);
+    logger.info('Escalating to supreme pattern', { 
+      superiorityScore: previousResult.superiorityScore, 
+      previousPattern: previousResult.pattern 
+    });
     
     const supremeResult = await this.supremePattern(request, startTime);
     

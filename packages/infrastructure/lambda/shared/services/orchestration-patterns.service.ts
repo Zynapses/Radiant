@@ -4,6 +4,7 @@
 // Model Selection: Dynamic from metadata service with modes (Thinking, Deep Research, etc.)
 
 import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { modelRouterService } from './model-router.service';
 import { learningService } from './learning.service';
 import { modelMetadataService, ModelMetadata } from './model-metadata.service';
@@ -480,7 +481,7 @@ export class OrchestrationPatternsService {
         },
       });
     } catch (err) {
-      console.error('Failed to record learning:', err);
+      logger.error('Failed to record learning', { error: err });
     }
     
     return {

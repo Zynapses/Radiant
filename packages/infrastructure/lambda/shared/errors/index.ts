@@ -141,3 +141,105 @@ export function isRetryableError(error: unknown): boolean {
   
   return false;
 }
+
+// ============================================================================
+// Service Error Handling Utilities
+// ============================================================================
+
+import { enhancedLogger } from '../logging/enhanced-logger';
+
+/**
+ * Standardized error handler for service methods.
+ * Use this to ensure consistent logging and error transformation.
+ * 
+ * @example
+ * async myMethod() {
+ *   return handleServiceError('MyService.myMethod', async () => {
+ *     // ... method implementation
+ *   });
+ * }
+ */
+export async function handleServiceError<T>(
+  context: string,
+  fn: () => Promise<T>,
+  options?: {
+    rethrow?: boolean;
+    defaultValue?: T;
+    logLevel?: 'error' | 'warn' | 'info';
+  }
+): Promise<T> {
+  try {
+    return await fn();
+  } catch (error) {
+    const logLevel = options?.logLevel ?? 'error';
+    enhancedLogger[logLevel](`${context} failed`, { 
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : error 
+    });
+    
+    if (options?.rethrow !== false) {
+      throw error;
+    }
+    
+    if (options?.defaultValue !== undefined) {
+      return options.defaultValue;
+    }
+    
+    throw error;
+  }
+}
+
+/**
+ * Wrap a sync function with error handling.
+ */
+export function handleServiceErrorSync<T>(
+  context: string,
+  fn: () => T,
+  options?: {
+    rethrow?: boolean;
+    defaultValue?: T;
+    logLevel?: 'error' | 'warn' | 'info';
+  }
+): T {
+  try {
+    return fn();
+  } catch (error) {
+    const logLevel = options?.logLevel ?? 'error';
+    enhancedLogger[logLevel](`${context} failed`, { 
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : error 
+    });
+    
+    if (options?.rethrow !== false) {
+      throw error;
+    }
+    
+    if (options?.defaultValue !== undefined) {
+      return options.defaultValue;
+    }
+    
+    throw error;
+  }
+}
+
+/**
+ * Safe JSON parse with error handling.
+ */
+export function safeJsonParse<T>(json: string, defaultValue: T): T {
+  try {
+    return JSON.parse(json) as T;
+  } catch {
+    return defaultValue;
+  }
+}
+
+/**
+ * Extract error message from any error type.
+ */
+export function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  return 'Unknown error';
+}
