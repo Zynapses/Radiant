@@ -84,6 +84,35 @@ export interface ParallelExecutionConfig {
   minModels?: number; // Minimum models AGI should select (default: 2)
   maxModels?: number; // Maximum models AGI should select (default: 5)
   domainHints?: string[]; // Optional hints for AGI model selection
+  // Output Stream Configuration - How many streams come out of this step
+  outputMode?: 'single' | 'all' | 'top_n' | 'threshold';
+  // single: 1 synthesized stream (default) - next step gets {{response}}
+  // all: N streams (one per model) - next step gets {{responses}} array
+  // top_n: Best N streams by confidence - next step gets {{responses}} array
+  // threshold: Only streams above confidence threshold - next step gets {{responses}} array
+  outputTopN?: number; // For top_n mode: how many top results to pass (default: 2)
+  outputThreshold?: number; // For threshold mode: min confidence to include (default: 0.7)
+  preserveModelAttribution?: boolean; // Include model ID with each stream in {{responses}}
+}
+
+// Output from a parallel step - can be single or multi-stream
+export interface ParallelStepOutput {
+  // Single stream output (when outputMode = 'single')
+  response?: string;
+  // Multi-stream output (when outputMode = 'all' | 'top_n' | 'threshold')
+  responses?: Array<{
+    modelId: string;
+    modelName: string;
+    response: string;
+    confidence: number;
+    latencyMs: number;
+    mode?: ModelMode;
+  }>;
+  // Metadata
+  streamCount: number;
+  outputMode: 'single' | 'all' | 'top_n' | 'threshold';
+  synthesisApplied: boolean;
+  modelsUsed: string[];
 }
 
 // Model modes for specialized execution
