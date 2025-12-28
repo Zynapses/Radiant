@@ -92,3 +92,30 @@ export * from './input-sanitization';
 
 // Standardized error responses
 export * from './error-response';
+
+// Safe JSON utilities (with Zod schema validation)
+export {
+  safeJsonParse as safeJson,
+  safeJsonParseResult,
+  parseJsonWithSchema,
+  parseJsonWithSchemaOrThrow,
+  parseEventBody,
+  parseJsonField,
+  safeJsonStringify,
+} from './safe-json';
+export type { SafeParseResult } from './safe-json';
+
+// Date/time utilities (UTC-first)
+export {
+  utcNow,
+  unixTimestamp,
+  unixTimestampMs,
+  parseToUtc,
+  toUtcIsoString,
+  toDbTimestamp,
+  fromDbTimestamp,
+  startOfDayUtc,
+} from './datetime';
+
+// Circuit breaker for external service calls
+export { CircuitBreaker, CircuitBreakerState } from './circuit-breaker';
