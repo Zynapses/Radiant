@@ -367,6 +367,7 @@ export default function OrchestrationMethodsPage() {
                 <Tabs defaultValue="parameters" className="space-y-4">
                   <TabsList>
                     <TabsTrigger value="parameters">Parameters</TabsTrigger>
+                    <TabsTrigger value="parallel">Parallel & Streams</TabsTrigger>
                     <TabsTrigger value="template">Template</TabsTrigger>
                     <TabsTrigger value="metrics">Metrics</TabsTrigger>
                     <TabsTrigger value="executions">Executions</TabsTrigger>
@@ -445,6 +446,169 @@ export default function OrchestrationMethodsPage() {
                       <p className="text-xs text-muted-foreground mt-2">
                         Model Role: <code>{selectedMethod.modelRole}</code>
                       </p>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="parallel" className="space-y-4">
+                    <div className="border rounded-lg p-4 space-y-4">
+                      <h4 className="font-medium">Multi-Model Parallel Execution</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Configure how this method runs across multiple AI models simultaneously.
+                      </p>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Execution Mode</Label>
+                          <select className="w-full p-2 border rounded-md text-sm">
+                            <option value="all">All - Wait for all models</option>
+                            <option value="race">Race - First response wins</option>
+                            <option value="quorum">Quorum - Majority consensus</option>
+                          </select>
+                          <p className="text-xs text-muted-foreground">
+                            How to handle multiple model responses
+                          </p>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>Synthesis Strategy</Label>
+                          <select className="w-full p-2 border rounded-md text-sm">
+                            <option value="best_of">Best Of - Highest confidence</option>
+                            <option value="merge">Merge - Combine all responses</option>
+                            <option value="vote">Vote - Majority answer</option>
+                            <option value="weighted">Weighted - By confidence</option>
+                          </select>
+                          <p className="text-xs text-muted-foreground">
+                            How to combine multi-model results
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border rounded-lg p-4 space-y-4 bg-gradient-to-r from-blue-500/5 to-purple-500/5">
+                      <div className="flex items-center gap-2">
+                        <Layers className="h-5 w-5 text-blue-500" />
+                        <h4 className="font-medium">Output Stream Configuration</h4>
+                        <Badge variant="outline" className="ml-auto">NEW</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Control how many output streams this method produces when using multiple models.
+                      </p>
+                      
+                      <div className="space-y-3">
+                        <Label>Output Mode</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="border rounded-lg p-3 cursor-pointer hover:bg-accent/50 transition-colors">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="w-3 h-3 rounded-full bg-blue-500" />
+                              <span className="font-medium text-sm">Single</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              1 synthesized stream → <code className="text-xs">{'{{response}}'}</code>
+                            </p>
+                          </div>
+                          <div className="border rounded-lg p-3 cursor-pointer hover:bg-accent/50 transition-colors">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="flex gap-0.5">
+                                <div className="w-2 h-3 rounded-sm bg-green-500" />
+                                <div className="w-2 h-3 rounded-sm bg-green-500" />
+                                <div className="w-2 h-3 rounded-sm bg-green-500" />
+                              </div>
+                              <span className="font-medium text-sm">All</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              N streams (one per model) → <code className="text-xs">{'{{responses}}'}</code>
+                            </p>
+                          </div>
+                          <div className="border rounded-lg p-3 cursor-pointer hover:bg-accent/50 transition-colors">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="flex gap-0.5">
+                                <div className="w-2 h-3 rounded-sm bg-amber-500" />
+                                <div className="w-2 h-3 rounded-sm bg-amber-500" />
+                              </div>
+                              <span className="font-medium text-sm">Top N</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              Best N by confidence → <code className="text-xs">{'{{responses}}'}</code>
+                            </p>
+                          </div>
+                          <div className="border rounded-lg p-3 cursor-pointer hover:bg-accent/50 transition-colors">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="flex gap-0.5">
+                                <div className="w-2 h-3 rounded-sm bg-purple-500" />
+                                <div className="w-2 h-3 rounded-sm bg-purple-300" />
+                              </div>
+                              <span className="font-medium text-sm">Threshold</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              Only ≥ confidence threshold → <code className="text-xs">{'{{responses}}'}</code>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 pt-2">
+                        <div className="space-y-2">
+                          <Label htmlFor="outputTopN">Top N Count</Label>
+                          <div className="flex items-center gap-2">
+                            <Slider
+                              id="outputTopN"
+                              value={[2]}
+                              min={1}
+                              max={5}
+                              step={1}
+                              className="flex-1"
+                            />
+                            <span className="text-sm font-mono w-8">2</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">For Top N mode</p>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="outputThreshold">Confidence Threshold</Label>
+                          <div className="flex items-center gap-2">
+                            <Slider
+                              id="outputThreshold"
+                              value={[70]}
+                              min={0}
+                              max={100}
+                              step={5}
+                              className="flex-1"
+                            />
+                            <span className="text-sm font-mono w-12">70%</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">For Threshold mode</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2">
+                        <Switch id="preserveModelAttribution" />
+                        <Label htmlFor="preserveModelAttribution" className="text-sm">
+                          Preserve Model Attribution
+                        </Label>
+                        <span className="text-xs text-muted-foreground ml-auto">
+                          Include model ID with each stream
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="border rounded-lg p-4 bg-muted/30">
+                      <h4 className="font-medium mb-2">Stream Flow Diagram</h4>
+                      <div className="font-mono text-xs space-y-1 text-muted-foreground">
+                        <div>3 Models with outputMode=&apos;all&apos;:</div>
+                        <div className="pl-4">
+                          <div>┌─────────┐ ┌─────────┐ ┌─────────┐</div>
+                          <div>│ Model 1 │ │ Model 2 │ │ Model 3 │</div>
+                          <div>└────┬────┘ └────┬────┘ └────┬────┘</div>
+                          <div>     └──────────┼──────────┘</div>
+                          <div>                ▼</div>
+                          <div>   {'{{responses}}'} = [stream1, stream2, stream3]</div>
+                          <div>                │</div>
+                          <div>                ▼</div>
+                          <div>        ┌─────────────────┐</div>
+                          <div>        │   Next Step     │</div>
+                          <div>        │ (receives all 3)│</div>
+                          <div>        └─────────────────┘</div>
+                        </div>
+                      </div>
                     </div>
                   </TabsContent>
 
