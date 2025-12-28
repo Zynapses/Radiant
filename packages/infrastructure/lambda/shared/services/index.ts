@@ -1,90 +1,56 @@
-export { ThermalStateService, thermalStateService, type ThermalState } from './thermal-state';
-export { BrainRouter, brainRouter, type TaskType } from './brain-router';
-export { MetricsCollector, metricsCollector } from './metrics-collector';
-export { ErrorLogger, errorLogger } from './error-logger';
-export { CredentialsManager, credentialsManager } from './credentials-manager';
-export { ReasoningEngine, reasoningEngine } from './reasoning-engine';
-export { ConcurrentSessionManager, concurrentSessionManager } from './concurrent-session';
-export { MemoryService, memoryService } from './memory-service';
-export { TeamService, teamService } from './team-service';
-export { TimeMachineService, timeMachineService } from './time-machine';
-export { ProviderRegistry, providerRegistry } from './provider-registry';
-export { WorkflowEngine, workflowEngine } from './workflow-engine';
-export { FeedbackLearningService, feedbackLearningService } from './feedback-learning';
-export { NeuralOrchestrationService, neuralOrchestrationService } from './neural-orchestration';
-export { WorkflowProposalService, workflowProposalService } from './workflow-proposals';
-export { AppIsolationService, appIsolationService } from './app-isolation';
-export { LocalizationService, localizationService } from './localization';
-export { ConfigurationService, configurationService } from './configuration';
-export { BillingService, billingService } from './billing';
-export { StorageBillingService, storageBillingService } from './storage-billing';
-export { MigrationApprovalService, migrationApprovalService } from './migration-approval';
-export { NeuralEngine, neuralEngine } from './neural-engine';
-export { AutoResolveService, autoResolveService } from './auto-resolve';
-export { CanvasService, canvasService } from './canvas-service';
-export { PersonaService, personaService } from './persona-service';
-export { SchedulerService, schedulerService } from './scheduler-service';
-export { ModelSelectionService, modelSelectionService } from './model-selection-service';
-export { LicenseService, licenseService } from './license-service';
-export { UnifiedModelRegistry, unifiedModelRegistry } from './unified-model-registry';
-export { GrandfatheringService, grandfatheringService } from './grandfathering-service';
-export { VoiceVideoService, createVoiceVideoService } from './voice-video';
-export { CollaborationService, createCollaborationService } from './collaboration';
-export { ResultMergingService, createResultMergingService } from './result-merging';
-export { CognitiveBrainService, cognitiveBrainService } from './cognitive-brain.service';
-export { ModelRouterService, modelRouterService } from './model-router.service';
-export { WorldModelService, worldModelService } from './world-model.service';
-export { EpisodicMemoryService, episodicMemoryService } from './episodic-memory.service';
-export { MultiAgentService, multiAgentService } from './multi-agent.service';
-export { MetacognitionService, metacognitionService } from './metacognition.service';
-export { TheoryOfMindService, theoryOfMindService } from './theory-of-mind.service';
-export { GoalPlanningService, goalPlanningService } from './goal-planning.service';
-export { CausalReasoningService, causalReasoningService } from './causal-reasoning.service';
-export { MemoryConsolidationService, memoryConsolidationService } from './memory-consolidation.service';
-export { MultimodalBindingService, multimodalBindingService } from './multimodal-binding.service';
-export { SkillExecutionService, skillExecutionService } from './skill-execution.service';
-export { AutonomousAgentService, autonomousAgentService } from './autonomous-agent.service';
-export { ConsciousnessService, consciousnessService } from './consciousness.service';
-export { AdvancedAGIService, advancedAGIService } from './advanced-agi.service';
-export { AGIOrchestratorService, agiOrchestratorService } from './agi-orchestrator.service';
-export { ConfigEngineService, configEngine } from './config-engine.service';
-export { AGIExtensionsService, agiExtensionsService } from './agi-extensions.service';
-export { AGICompleteService, agiCompleteService } from './agi-complete.service';
-export { SelfImprovementService, selfImprovementService } from './self-improvement.service';
-export { ModelMetadataService, modelMetadataService } from './model-metadata.service';
-export { MoralCompassService, moralCompassService } from './moral-compass.service';
-export { MLTrainingService, mlTrainingService } from './ml-training.service';
-export { LearningService, learningService } from './learning.service';
-export { ResponseSynthesisService, responseSynthesisService } from './response-synthesis.service';
-export { RadiantUnifiedService, radiantUnifiedService } from './radiant-unified.service';
-export { FeedbackService, feedbackService } from './feedback.service';
-export { SuperiorOrchestrationService, superiorOrchestrationService } from './superior-orchestration.service';
-export { OrchestrationPatternsService, orchestrationPatternsService } from './orchestration-patterns.service';
-export { AGILearningPersistenceService, agiLearningPersistenceService } from './agi-learning-persistence.service';
-export { AWSCostMonitoringService, awsCostMonitoringService } from './aws-cost-monitoring.service';
-export { BackgroundLearningService, backgroundLearningService } from './background-learning.service';
-export { InternetLearningService, internetLearningService } from './internet-learning.service';
-export { EthicalGuardrailsService, ethicalGuardrailsService, JESUS_TEACHINGS } from './ethical-guardrails.service';
+/**
+ * RADIANT v4.18.0 - Services Index
+ * 
+ * Unified export point for all services.
+ * For better tree-shaking and organization, prefer importing from domain-specific barrels:
+ * - ./agi       - AGI, consciousness, learning services
+ * - ./core      - Database, cache, config, observability
+ * - ./platform  - Business features, billing, collaboration
+ * - ./models    - Model routing, selection, ML services
+ */
+
+// ============================================================================
+// Domain-Specific Barrel Re-exports
+// ============================================================================
+
+// AGI Services (consciousness, learning, orchestration, ethics)
+export * from './agi';
+
+// Core Infrastructure Services (database, cache, config, observability)
+export * from './core';
+
+// Platform Services (billing, collaboration, workflows)
+export * from './platform';
+
+// Model Services (routing, selection, ML, thermal)
+export * from './models';
+
+// ============================================================================
+// Domain Taxonomy & Specialty
+// ============================================================================
+
+export { SpecialtyRankingService, specialtyRankingService, SPECIALTY_CATEGORIES, type SpecialtyCategory, type SpecialtyRanking } from './specialty-ranking.service';
+export { DomainTaxonomyService, domainTaxonomyService } from './domain-taxonomy.service';
+
+// ============================================================================
+// Delight System
+// ============================================================================
+
 export { DelightService, delightService } from './delight.service';
 export { DelightOrchestrationService, delightOrchestrationService } from './delight-orchestration.service';
 export { DelightEventsService, delightEventsService, createDelightEventStream, emitDelightForPlanExecution } from './delight-events.service';
 
-// Additional services
-export * from './api-keys';
-export * from './audit';
-export * from './cache';
-export * from './database';
-export * from './email';
-export * from './feature-flags';
-export * from './metrics';
-export * from './notifications';
-export * from './secrets';
-export * from './system-config';
-export * from './tracing';
-export { SpecialtyRankingService, specialtyRankingService, SPECIALTY_CATEGORIES, type SpecialtyCategory, type SpecialtyRanking } from './specialty-ranking.service';
-export { DomainTaxonomyService, domainTaxonomyService } from './domain-taxonomy.service';
+// ============================================================================
+// AGI Orchestration Settings & Brain Planning
+// ============================================================================
+
 export { AGIOrchestrationSettingsService, agiOrchestrationSettingsService } from './agi-orchestration-settings.service';
 export { AGIBrainPlannerService, agiBrainPlannerService } from './agi-brain-planner.service';
 export { ArtifactPipelineService, artifactPipeline } from './artifact-pipeline.service';
 export { AGIResponsePipelineService, agiResponsePipeline } from './agi-response-pipeline.service';
+
+// ============================================================================
+// Types
+// ============================================================================
+
 export * from '../types/agi-response.types';

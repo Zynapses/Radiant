@@ -1,7 +1,11 @@
 // RADIANT v4.18.0 - Machine Learning Training Service
 // Manages training data collection, model training, and continuous learning
 
+import { SageMakerRuntimeClient, InvokeEndpointCommand } from '@aws-sdk/client-sagemaker-runtime';
 import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
+
+const sagemakerClient = new SageMakerRuntimeClient({});
 
 // ============================================================================
 // Types
@@ -422,8 +426,35 @@ export class MLTrainingService {
     const activeModel = await this.getActiveModelVersion('routing');
 
     if (activeModel?.sagemakerEndpoint) {
-      // TODO: Call SageMaker endpoint for prediction
-      // For now, fall back to heuristic
+      try {
+        const response = await sagemakerClient.send(
+          new InvokeEndpointCommand({
+            EndpointName: activeModel.sagemakerEndpoint,
+            ContentType: 'application/json',
+            Body: JSON.stringify({
+              task_text: taskText,
+              specialty: specialty || null,
+              require_vision: requireVision,
+            }),
+          })
+        );
+
+        if (response.Body) {
+          const result = JSON.parse(new TextDecoder().decode(response.Body));
+          return {
+            recommendedModel: result.recommended_model,
+            confidence: result.confidence || 0.85,
+            alternativeModels: result.alternatives || [],
+            reasoning: 'ML model prediction based on trained routing model',
+          };
+        }
+      } catch (error) {
+        logger.warn('SageMaker prediction failed, falling back to heuristic', { 
+          endpoint: activeModel.sagemakerEndpoint,
+          error 
+        });
+        // Fall through to heuristic
+      }
     }
 
     // Heuristic-based routing using historical data
