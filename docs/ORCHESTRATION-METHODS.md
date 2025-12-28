@@ -24,6 +24,49 @@ RADIANT's orchestration system provides **17 reusable methods** that can be comp
 - Methods can depend on multiple previous steps (`dependsOnSteps[]`)
 - Parallel execution supported with `parallelExecution.enabled`
 
+### Output Stream Modes (NEW)
+
+When a method uses N models, you can control how many streams come out:
+
+| Mode | Output | Description |
+|------|--------|-------------|
+| `single` | 1 stream | Synthesized result → `{{response}}` (default) |
+| `all` | N streams | All model outputs → `{{responses}}` array |
+| `top_n` | 1-N streams | Best N by confidence → `{{responses}}` array |
+| `threshold` | 0-N streams | Only above confidence threshold → `{{responses}}` array |
+
+```typescript
+parallelExecution: {
+  enabled: true,
+  models: ['openai/o1', 'claude-3-5-sonnet', 'deepseek-reasoner'],
+  outputMode: 'all',              // Pass all 3 streams to next step
+  preserveModelAttribution: true  // Include model ID with each stream
+}
+```
+
+**Example: 3 models → 3 output streams**
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Model 1   │     │   Model 2   │     │   Model 3   │
+│   (o1)      │     │  (Claude)   │     │ (DeepSeek)  │
+└──────┬──────┘     └──────┬──────┘     └──────┬──────┘
+       │                   │                   │
+       └───────────────────┼───────────────────┘
+                           ▼
+              {{responses}} = [
+                { modelId: 'o1', response: '...', confidence: 0.92 },
+                { modelId: 'claude', response: '...', confidence: 0.88 },
+                { modelId: 'deepseek', response: '...', confidence: 0.85 }
+              ]
+                           │
+                           ▼
+               ┌───────────────────────┐
+               │   Next Step          │
+               │   SYNTHESIZE_RESPONSES│
+               │   receives 3 streams │
+               └───────────────────────┘
+```
+
 ---
 
 ## Methods by Category
