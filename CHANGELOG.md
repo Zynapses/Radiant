@@ -5,6 +5,30 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.9] - 2024-12-28
+
+### Added
+
+#### Domain Ethics Custom Framework Management
+- **Custom Framework CRUD** - Create/update ethics frameworks for new domains
+  - `createCustomFramework()` - Add ethics for domains like veterinary, accounting, etc.
+  - `updateCustomFramework()` - Modify principles, prohibitions, disclaimers
+  - `deleteCustomFramework()` - Remove custom frameworks
+  - `getCustomFrameworks()` - List all custom frameworks
+- **Domain Coverage Checking**
+  - `hasDomainEthicsCoverage()` - Check if domain has ethics (built-in or custom)
+  - `getDomainsWithEthics()` - List all domains with framework counts
+- **Auto-Suggestions for New Domains**
+  - `suggestEthicsForDomain()` - Get suggested principles based on similar domains
+  - `onNewDomainDetected()` - Handle new domain from taxonomy, suggest framework if needed
+- **New Admin API Endpoints**
+  - `GET /custom-frameworks` - List custom frameworks
+  - `GET/POST/PUT/DELETE /custom-frameworks/:id` - CRUD operations
+  - `GET /coverage` - All domains with ethics
+  - `GET /coverage/:domain` - Check specific domain
+  - `GET /suggest/:domain` - Get suggestions for new domain
+  - `POST /on-new-domain` - Handle new domain detection
+
 ## [4.18.8] - 2024-12-28
 
 ### Added

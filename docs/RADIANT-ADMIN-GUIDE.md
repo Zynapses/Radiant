@@ -2220,6 +2220,52 @@ These frameworks **cannot be disabled** as they protect against serious harm:
 | `domain_ethics_audit_log` | Ethics check audit trail |
 | `domain_ethics_framework_overrides` | Tenant overrides |
 
+### 22.8 Custom Framework Management
+
+When new domains are added that need ethics, admins can create custom frameworks:
+
+**New API Endpoints**:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/custom-frameworks` | GET | List all custom frameworks |
+| `/custom-frameworks/:id` | GET | Get specific framework |
+| `/custom-frameworks` | POST | Create new framework |
+| `/custom-frameworks/:id` | PUT | Update framework |
+| `/custom-frameworks/:id` | DELETE | Delete framework |
+| `/coverage` | GET | List all domains with ethics |
+| `/coverage/:domain` | GET | Check domain coverage |
+| `/suggest/:domain` | GET | Get suggestions for new domain |
+| `/on-new-domain` | POST | Handle new domain detection |
+
+**Creating a Custom Framework**:
+
+```typescript
+POST /api/admin/domain-ethics/custom-frameworks
+{
+  "name": "Veterinary Medicine Ethics",
+  "code": "AVMA",
+  "domain": "veterinary",
+  "governingBody": "American Veterinary Medical Association",
+  "principles": [
+    { "id": "p1", "name": "Animal Welfare", "description": "...", "category": "core_ethics" }
+  ],
+  "prohibitions": [
+    { "id": "proh1", "name": "Cannot diagnose", "severity": "critical", "keywords": ["diagnose"] }
+  ],
+  "requiredDisclaimers": [
+    "Consult a licensed veterinarian for your pet's health."
+  ]
+}
+```
+
+**Auto-Suggestion When New Domain Added**:
+
+When a domain like "veterinary" is added to the taxonomy, calling `POST /on-new-domain` will:
+1. Check if built-in or custom framework exists
+2. Identify if domain typically requires ethics
+3. Return suggested principles/prohibitions based on similar domains
+
 ---
 
 ## 23. Model Proficiency Registry
