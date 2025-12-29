@@ -129,6 +129,13 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `data_processing_agreements` | Sub-processor DPAs |
 | `data_breach_incidents` | Security breach tracking |
 | `hipaa_config` | Per-tenant HIPAA configuration |
+| `generative_ui_feedback` | User feedback on generated UI |
+| `ui_improvement_requests` | Real-time improvement requests |
+| `ui_improvement_sessions` | Live AGI improvement sessions |
+| `ui_improvement_iterations` | Session iteration history |
+| `ui_feedback_learnings` | AGI learnings from feedback |
+| `ui_feedback_config` | Per-tenant feedback configuration |
+| `ui_feedback_aggregates` | Pre-computed feedback analytics |
 
 ## Type Imports
 

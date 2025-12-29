@@ -397,3 +397,312 @@ export interface UserGenerativeUIPreferences {
   
   updatedAt: Date;
 }
+
+// ============================================================================
+// GENERATIVE UI FEEDBACK & LEARNING SYSTEM
+// Allows users to provide feedback and help AGI brain improve
+// ============================================================================
+
+/**
+ * User feedback on a generated UI component
+ */
+export interface GenerativeUIFeedback {
+  id: string;
+  tenantId: string;
+  userId: string;
+  appId: string;
+  componentId?: string; // Optional - feedback can be for whole app or specific component
+  
+  // Rating
+  rating: 'thumbs_up' | 'thumbs_down' | 'star_1' | 'star_2' | 'star_3' | 'star_4' | 'star_5';
+  
+  // Feedback categories
+  feedbackType: UIFeedbackType;
+  
+  // User's improvement suggestions
+  improvementSuggestion?: string;
+  expectedBehavior?: string;
+  
+  // What was wrong (for negative feedback)
+  issues?: UIFeedbackIssue[];
+  
+  // Context
+  originalPrompt: string;
+  generatedOutput: string; // Snapshot of what was generated
+  
+  // For "improve before my eyes" feature
+  requestedImprovement?: ImprovementRequest;
+  
+  // AGI processing
+  agiProcessed: boolean;
+  agiInsights?: AGIFeedbackInsights;
+  
+  createdAt: Date;
+}
+
+export type UIFeedbackType =
+  | 'helpful'           // The UI was helpful
+  | 'not_helpful'       // UI wasn't helpful
+  | 'wrong_type'        // Wrong component type was chosen
+  | 'missing_data'      // Data was incomplete
+  | 'incorrect_data'    // Data was wrong
+  | 'layout_issue'      // Layout/design problem
+  | 'functionality'     // Something didn't work
+  | 'improvement'       // General improvement suggestion
+  | 'feature_request';  // Request new feature
+
+export interface UIFeedbackIssue {
+  category: 'accuracy' | 'completeness' | 'usability' | 'design' | 'performance' | 'functionality';
+  description: string;
+  severity: 'minor' | 'major' | 'critical';
+  componentPath?: string; // e.g., "calculator.inputs.rate"
+}
+
+/**
+ * User's request to improve the generated UI in real-time
+ */
+export interface ImprovementRequest {
+  id: string;
+  appId: string;
+  
+  // What to improve
+  improvementType: ImprovementType;
+  targetComponent?: string; // Which component to improve
+  
+  // User's instructions
+  userInstructions: string;
+  
+  // Before/after snapshots
+  beforeState: GeneratedUISnapshot;
+  afterState?: GeneratedUISnapshot;
+  
+  // Status
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  
+  // AGI analysis
+  agiAnalysis?: AGIImprovementAnalysis;
+  
+  createdAt: Date;
+  completedAt?: Date;
+}
+
+export type ImprovementType =
+  | 'add_component'      // Add a new component
+  | 'remove_component'   // Remove a component
+  | 'modify_component'   // Change existing component
+  | 'change_layout'      // Change the layout
+  | 'fix_calculation'    // Fix a calculation/formula
+  | 'add_data'           // Add more data
+  | 'change_style'       // Change visual style
+  | 'add_interactivity'  // Make more interactive
+  | 'simplify'           // Make simpler
+  | 'expand'             // Add more detail
+  | 'regenerate';        // Completely regenerate
+
+/**
+ * Snapshot of a generated UI for before/after comparison
+ */
+export interface GeneratedUISnapshot {
+  timestamp: Date;
+  appId: string;
+  components: UIComponentSchema[];
+  state: Record<string, unknown>;
+  layout: AppLayout;
+  renderHash: string; // Hash of rendered output for comparison
+}
+
+/**
+ * AGI Brain's analysis of user feedback - used for learning
+ */
+export interface AGIFeedbackInsights {
+  // Pattern detection
+  feedbackPattern: string; // What pattern does this feedback represent
+  similarFeedbackCount: number; // How many similar feedbacks exist
+  
+  // Learning signals
+  promptPatternLearned?: string; // Pattern in prompts that leads to this issue
+  componentTypeMismatch?: boolean; // Was wrong component type chosen
+  datExtractionIssue?: boolean; // Was data extraction wrong
+  
+  // Improvement recommendations
+  recommendedChanges: AGIRecommendedChange[];
+  
+  // Model performance
+  modelUsed: string;
+  confidenceScore: number;
+  shouldRetrain: boolean; // Should this be used for retraining
+  
+  processedAt: Date;
+}
+
+export interface AGIRecommendedChange {
+  changeType: 'prompt_handling' | 'component_selection' | 'data_extraction' | 'layout' | 'formula' | 'style';
+  description: string;
+  priority: 'low' | 'medium' | 'high';
+  autoApplicable: boolean; // Can this be auto-applied
+}
+
+/**
+ * AGI's analysis for real-time improvement
+ */
+export interface AGIImprovementAnalysis {
+  // What was understood from user's request
+  interpretedIntent: string;
+  
+  // Vision analysis (if applicable)
+  visionAnalysis?: {
+    currentUIDescription: string;
+    identifiedIssues: string[];
+    suggestedFixes: string[];
+  };
+  
+  // Proposed changes
+  proposedChanges: ProposedUIChange[];
+  
+  // Confidence
+  confidence: number;
+  
+  // Alternative approaches
+  alternatives?: {
+    description: string;
+    changes: ProposedUIChange[];
+  }[];
+}
+
+export interface ProposedUIChange {
+  targetPath: string; // e.g., "components[0].inputs[1]"
+  changeType: 'add' | 'remove' | 'modify' | 'replace';
+  beforeValue?: unknown;
+  afterValue: unknown;
+  explanation: string;
+}
+
+// ============================================================================
+// REAL-TIME UI IMPROVEMENT ("Improve Before Your Eyes")
+// ============================================================================
+
+/**
+ * A live improvement session where user collaborates with AGI to improve UI
+ */
+export interface UIImprovementSession {
+  id: string;
+  tenantId: string;
+  userId: string;
+  appId: string;
+  
+  // Session state
+  status: 'active' | 'completed' | 'abandoned';
+  
+  // Improvement history
+  iterations: UIImprovementIteration[];
+  
+  // Current state
+  currentSnapshot: GeneratedUISnapshot;
+  
+  // Session metadata
+  startedAt: Date;
+  lastActivityAt: Date;
+  completedAt?: Date;
+}
+
+export interface UIImprovementIteration {
+  iterationNumber: number;
+  
+  // User's request
+  userRequest: string;
+  
+  // AGI's response
+  agiResponse: {
+    understood: string; // What AGI understood
+    changes: ProposedUIChange[];
+    explanation: string;
+  };
+  
+  // Result
+  applied: boolean;
+  userSatisfied?: boolean;
+  feedback?: string;
+  
+  // Snapshots
+  beforeSnapshot: GeneratedUISnapshot;
+  afterSnapshot?: GeneratedUISnapshot;
+  
+  timestamp: Date;
+}
+
+// ============================================================================
+// AGI LEARNING FROM UI FEEDBACK
+// ============================================================================
+
+/**
+ * Aggregated learning from feedback for AGI improvement
+ */
+export interface UIFeedbackLearning {
+  id: string;
+  tenantId: string;
+  
+  // What was learned
+  learningType: 'prompt_pattern' | 'component_preference' | 'data_format' | 'layout_preference' | 'calculation_fix';
+  
+  // The pattern/rule learned
+  pattern: {
+    trigger: string; // What triggers this pattern (regex or description)
+    response: string; // How to respond
+    confidence: number;
+  };
+  
+  // Evidence
+  feedbackIds: string[]; // Which feedbacks contributed to this learning
+  exampleCount: number;
+  
+  // Application
+  appliedCount: number;
+  successRate: number;
+  
+  // Status
+  status: 'proposed' | 'approved' | 'active' | 'deprecated';
+  
+  createdAt: Date;
+  approvedAt?: Date;
+  approvedBy?: string;
+}
+
+/**
+ * Configuration for the feedback and learning system
+ */
+export interface UIFeedbackConfig {
+  // Feedback collection
+  collectFeedback: boolean;
+  feedbackPromptDelay: number; // ms to wait before showing feedback prompt
+  showFeedbackOnEveryApp: boolean;
+  
+  // Improvement features
+  enableRealTimeImprovement: boolean;
+  maxImprovementIterations: number;
+  autoApplyHighConfidenceChanges: boolean;
+  autoApplyThreshold: number; // Confidence threshold for auto-apply
+  
+  // Learning
+  enableAGILearning: boolean;
+  learningApprovalRequired: boolean; // Require admin approval for learnings
+  minFeedbackForLearning: number; // Min feedback count before learning
+  
+  // Vision analysis
+  enableVisionAnalysis: boolean;
+  visionModel: string;
+}
+
+export const DEFAULT_UI_FEEDBACK_CONFIG: UIFeedbackConfig = {
+  collectFeedback: true,
+  feedbackPromptDelay: 5000, // 5 seconds
+  showFeedbackOnEveryApp: false,
+  enableRealTimeImprovement: true,
+  maxImprovementIterations: 5,
+  autoApplyHighConfidenceChanges: false,
+  autoApplyThreshold: 0.95,
+  enableAGILearning: true,
+  learningApprovalRequired: true,
+  minFeedbackForLearning: 10,
+  enableVisionAnalysis: true,
+  visionModel: 'claude-3-5-sonnet',
+};
