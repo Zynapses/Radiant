@@ -965,6 +965,132 @@ User: "Help me calculate my mortgage payment"
 
 ---
 
+## 19. UI Feedback & Learning System
+
+**Location**: Think Tank → Generated Apps
+
+The feedback system allows users to provide feedback on generated UIs and enables AGI learning for continuous improvement.
+
+### 19.1 User Feedback
+
+Users can provide feedback on any generated UI:
+
+| Feedback Type | Description |
+|---------------|-------------|
+| **Thumbs Up/Down** | Quick positive/negative rating |
+| **Star Rating** | 1-5 star detailed rating |
+| **Detailed Feedback** | Categorized feedback with suggestions |
+
+**Feedback Categories:**
+- Helpful / Not helpful
+- Wrong component type
+- Missing data
+- Incorrect data
+- Layout/design issue
+- Functionality issue
+- Improvement suggestion
+- Feature request
+
+### 19.2 "Improve Before Your Eyes"
+
+Users can request real-time improvements to generated UIs:
+
+```
+User: "Add a column for tax rate"
+       ↓
+┌─────────────────────────────────────────┐
+│          AGI Analysis                    │
+│  Intent: Add new input field             │
+│  Target: Calculator component            │
+│  Confidence: 0.85                        │
+└─────────────────────────────────────────┘
+       ↓
+┌─────────────────────────────────────────┐
+│         UI Updated Live                  │
+│  • New "Tax Rate" input added            │
+│  • Formula updated automatically         │
+│  • User sees changes immediately         │
+└─────────────────────────────────────────┘
+```
+
+**Improvement Types:**
+- Add/remove components
+- Modify existing components
+- Change layout
+- Fix calculations
+- Add data
+- Change style
+- Add interactivity
+- Simplify or expand
+
+### 19.3 AGI Learning
+
+The system learns from user feedback to improve future UI generation:
+
+1. **Pattern Detection** - Identifies common issues in similar prompts
+2. **Component Selection** - Learns which component types work best
+3. **Data Extraction** - Improves data parsing from responses
+4. **Layout Preferences** - Learns user layout preferences
+
+**Learning Workflow:**
+1. Feedback accumulates (configurable threshold, default: 10)
+2. AGI analyzes patterns across feedback
+3. Learning is proposed for admin review
+4. Admin approves/rejects learnings
+5. Approved learnings are activated
+
+### 19.4 Vision Analysis
+
+When enabled, the AGI can "see" the rendered UI and identify issues:
+
+- Describes current UI state
+- Identifies potential usability issues
+- Suggests improvements based on visual analysis
+- Compares before/after snapshots
+
+### 19.5 Admin Configuration
+
+Per-tenant settings at Settings → Cognitive Architecture → UI Feedback:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `collectFeedback` | true | Enable feedback collection |
+| `feedbackPromptDelay` | 5000ms | Delay before showing feedback prompt |
+| `showFeedbackOnEveryApp` | false | Always show feedback prompt |
+| `enableRealTimeImprovement` | true | Enable "Improve" feature |
+| `maxImprovementIterations` | 5 | Max iterations per session |
+| `autoApplyHighConfidenceChanges` | false | Auto-apply high confidence changes |
+| `autoApplyThreshold` | 0.95 | Confidence threshold for auto-apply |
+| `enableAGILearning` | true | Enable learning from feedback |
+| `learningApprovalRequired` | true | Require admin approval for learnings |
+| `minFeedbackForLearning` | 10 | Min feedback count to trigger learning |
+| `enableVisionAnalysis` | true | Enable vision-based analysis |
+| `visionModel` | claude-3-5-sonnet | Model for vision analysis |
+
+### 19.6 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `generative_ui_feedback` | User feedback storage |
+| `ui_improvement_requests` | Improvement request tracking |
+| `ui_improvement_sessions` | Live improvement sessions |
+| `ui_improvement_iterations` | Session iteration history |
+| `ui_feedback_learnings` | AGI learning storage |
+| `ui_feedback_config` | Per-tenant configuration |
+| `ui_feedback_aggregates` | Pre-computed analytics |
+
+### 19.7 Analytics Dashboard
+
+The feedback analytics show:
+- Total feedback count
+- Positive rate percentage
+- Top issues by category
+- Improvement sessions count
+- Active learnings count
+- Daily trend chart
+
+---
+
 ## Related Documentation
 
 - [RADIANT Admin Guide](./RADIANT-ADMIN-GUIDE.md) - Platform administration

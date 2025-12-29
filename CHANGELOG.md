@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Generative UI Feedback & Learning System ("Improve Before Your Eyes")
+- **Feedback Types** - Shared types for UI feedback and AGI learning
+  - `GenerativeUIFeedback` - User feedback on generated components
+  - `ImprovementRequest` - Real-time improvement requests
+  - `UIImprovementSession` - Live collaboration sessions with AGI
+  - `UIFeedbackLearning` - Aggregated learnings from feedback
+  - `AGIImprovementAnalysis` - Vision-based UI analysis
+- **Feedback Service** (`generative-ui-feedback.service.ts`)
+  - Record user feedback (thumbs up/down, star ratings)
+  - Real-time improvement sessions with AGI
+  - Pattern-based and vision-based UI analysis
+  - AGI learning from accumulated feedback
+  - Feedback analytics for admin dashboard
+- **Database Migration** (`091_generative_ui_feedback.sql`)
+  - `generative_ui_feedback` - User feedback storage
+  - `ui_improvement_requests` - Improvement request tracking
+  - `ui_improvement_sessions` - Live improvement sessions
+  - `ui_improvement_iterations` - Session iteration history
+  - `ui_feedback_learnings` - AGI learning storage
+  - `ui_feedback_config` - Per-tenant configuration
+  - `ui_feedback_aggregates` - Pre-computed analytics
+- **React Components** (`UIFeedbackPanel.tsx`)
+  - `UIFeedbackPanel` - Thumbs up/down + detailed feedback
+  - `UIImprovementDialog` - "Improve Before Your Eyes" modal
+  - `FeedbackStatsBadge` - Feedback statistics display
+
 #### GDPR & HIPAA Compliance Enhancement
 - **GDPR Service** (`gdpr.service.ts`)
   - Full implementation of GDPR Data Subject Rights (Articles 15-22)
