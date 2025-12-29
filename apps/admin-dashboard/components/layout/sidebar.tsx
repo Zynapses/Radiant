@@ -159,6 +159,7 @@ const navigation: NavigationItem[] = [
   // Security & Compliance Section
   { type: 'separator', label: 'Security' },
   { name: 'Security', href: '/security', icon: Shield },
+  { name: 'Schedules', href: '/security/schedules', icon: Clock },
   { name: 'Compliance', href: '/compliance', icon: ShieldCheck },
   { name: 'Administrators', href: '/administrators', icon: Users },
   { name: 'Audit Logs', href: '/audit-logs', icon: FileText },

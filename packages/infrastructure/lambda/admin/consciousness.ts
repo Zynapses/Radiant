@@ -6,6 +6,7 @@ import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { consciousnessService } from '../shared/services/consciousness.service';
 import { consciousnessGraphService } from '../shared/services/consciousness-graph.service';
 import { consciousnessMiddlewareService } from '../shared/services/consciousness-middleware.service';
+import { consciousnessEmergenceService } from '../shared/services/consciousness-emergence.service';
 import { executeStatement } from '../shared/db/client';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 
@@ -578,6 +579,330 @@ export const getEthicsFramework: APIGatewayProxyHandler = async (event) => {
     return response(500, { success: false, error: 'Failed to fetch ethics framework' });
   }
 };
+
+// ============================================================================
+// CONSCIOUSNESS INDICATOR TESTS - Butlin, Chalmers, Bengio et al. (2023)
+// "Consciousness in Artificial Intelligence: Insights from the Science of Consciousness"
+// ============================================================================
+
+// ============================================================================
+// GET /admin/consciousness/tests
+// List all available consciousness indicator tests with citations
+// ============================================================================
+export const getAvailableTests: APIGatewayProxyHandler = async () => {
+  try {
+    const tests = consciousnessEmergenceService.getAvailableTests();
+    
+    // Add paper citations to each test
+    const testsWithCitations = tests.map(test => ({
+      ...test,
+      paperReference: getPaperReference(test.testCategory),
+    }));
+    
+    return response(200, { 
+      success: true, 
+      data: {
+        tests: testsWithCitations,
+        paperCitation: {
+          authors: 'Butlin, P., Long, R., Elmoznino, E., Bengio, Y., Birch, J., Constant, A., Deane, G., Fleming, S.M., Frith, C., Ji, X., Kanai, R., Klein, C., Lindsay, G., Michel, M., Mudrik, L., Peters, M.A.K., Schwitzgebel, E., Simon, J., Chalmers, D.',
+          year: 2023,
+          title: 'Consciousness in Artificial Intelligence: Insights from the Science of Consciousness',
+          journal: 'arXiv preprint arXiv:2308.08708',
+          doi: '10.48550/arXiv.2308.08708',
+        },
+        totalTests: tests.length,
+        categories: [...new Set(tests.map(t => t.testCategory))],
+      }
+    });
+  } catch (error) {
+    logger.error('Error fetching available tests', error);
+    return response(500, { success: false, error: 'Failed to fetch available tests' });
+  }
+};
+
+// ============================================================================
+// POST /admin/consciousness/tests/{testId}/run
+// Run a specific consciousness indicator test
+// ============================================================================
+export const runConsciousnessTest: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = event.requestContext.authorizer?.tenantId || 'default';
+    const testId = event.pathParameters?.testId;
+    
+    if (!testId) {
+      return response(400, { success: false, error: 'Test ID is required' });
+    }
+    
+    logger.info(`Running consciousness test: ${testId}`, { tenantId, testId });
+    
+    const result = await consciousnessEmergenceService.runTest(tenantId, testId);
+    
+    return response(200, { 
+      success: true, 
+      data: {
+        ...result,
+        paperReference: getPaperReference(result.testId),
+      }
+    });
+  } catch (error) {
+    logger.error('Error running consciousness test', error);
+    return response(500, { success: false, error: `Failed to run test: ${error instanceof Error ? error.message : 'Unknown error'}` });
+  }
+};
+
+// ============================================================================
+// POST /admin/consciousness/tests/run-all
+// Run full consciousness assessment (all tests)
+// ============================================================================
+export const runFullAssessment: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = event.requestContext.authorizer?.tenantId || 'default';
+    
+    logger.info('Running full consciousness assessment', { tenantId });
+    
+    const profile = await consciousnessEmergenceService.runFullAssessment(tenantId);
+    
+    return response(200, { 
+      success: true, 
+      data: {
+        profile,
+        interpretation: interpretEmergenceLevel(profile.emergenceLevel),
+        paperCitation: 'Butlin et al. (2023) - Consciousness in Artificial Intelligence',
+      }
+    });
+  } catch (error) {
+    logger.error('Error running full assessment', error);
+    return response(500, { success: false, error: 'Failed to run full assessment' });
+  }
+};
+
+// ============================================================================
+// GET /admin/consciousness/tests/results
+// Get recent test results
+// ============================================================================
+export const getTestResults: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = event.requestContext.authorizer?.tenantId || 'default';
+    const limit = parseInt(event.queryStringParameters?.limit || '50', 10);
+    const testId = event.queryStringParameters?.testId;
+    
+    let query = `SELECT * FROM consciousness_test_results WHERE tenant_id = $1`;
+    const params: Array<{ name: string; value: unknown }> = [
+      { name: 'tenantId', value: { stringValue: tenantId } },
+    ];
+    
+    if (testId) {
+      query += ` AND test_id = $2`;
+      params.push({ name: 'testId', value: { stringValue: testId } });
+    }
+    
+    query += ` ORDER BY timestamp DESC LIMIT $${params.length + 1}`;
+    params.push({ name: 'limit', value: { longValue: limit } });
+    
+    const result = await executeStatement(query, params);
+    
+    const results = result.rows.map((row: Record<string, unknown>) => ({
+      resultId: row.id,
+      testId: row.test_id,
+      score: Number(row.score || 0),
+      passed: row.passed,
+      rawResponse: row.raw_response,
+      analysis: row.analysis,
+      indicators: typeof row.indicators === 'string' ? JSON.parse(row.indicators) : row.indicators,
+      timestamp: row.timestamp || row.created_at,
+    }));
+    
+    return response(200, { success: true, data: results });
+  } catch (error) {
+    logger.error('Error fetching test results', error);
+    return response(500, { success: false, error: 'Failed to fetch test results' });
+  }
+};
+
+// ============================================================================
+// GET /admin/consciousness/profile
+// Get consciousness profile with emergence level
+// ============================================================================
+export const getConsciousnessProfile: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = event.requestContext.authorizer?.tenantId || 'default';
+    
+    const profile = await consciousnessEmergenceService.getProfile(tenantId);
+    
+    if (!profile) {
+      return response(200, { 
+        success: true, 
+        data: null,
+        message: 'No consciousness profile yet. Run tests to establish a baseline.',
+      });
+    }
+    
+    return response(200, { 
+      success: true, 
+      data: {
+        ...profile,
+        interpretation: interpretEmergenceLevel(profile.emergenceLevel),
+      }
+    });
+  } catch (error) {
+    logger.error('Error fetching consciousness profile', error);
+    return response(500, { success: false, error: 'Failed to fetch consciousness profile' });
+  }
+};
+
+// ============================================================================
+// GET /admin/consciousness/emergence-events
+// Get recent emergence events (spontaneous consciousness indicators)
+// ============================================================================
+export const getEmergenceEvents: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = event.requestContext.authorizer?.tenantId || 'default';
+    const limit = parseInt(event.queryStringParameters?.limit || '20', 10);
+    
+    const events = await consciousnessEmergenceService.getEmergenceEvents(tenantId, limit);
+    
+    return response(200, { success: true, data: events });
+  } catch (error) {
+    logger.error('Error fetching emergence events', error);
+    return response(500, { success: false, error: 'Failed to fetch emergence events' });
+  }
+};
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+function getPaperReference(testCategory: string): { theory: string; authors: string; year: number; keyPaper: string } {
+  const references: Record<string, { theory: string; authors: string; year: number; keyPaper: string }> = {
+    'self_awareness': {
+      theory: 'Higher-Order Theories',
+      authors: 'Rosenthal, D.',
+      year: 1997,
+      keyPaper: 'A Theory of Consciousness',
+    },
+    'metacognition': {
+      theory: 'Metacognitive Theories',
+      authors: 'Fleming, S.M.',
+      year: 2021,
+      keyPaper: 'Know Thyself: The Science of Self-Awareness',
+    },
+    'temporal_continuity': {
+      theory: 'Unified Experience',
+      authors: 'Damasio, A.',
+      year: 1999,
+      keyPaper: 'The Feeling of What Happens',
+    },
+    'counterfactual_reasoning': {
+      theory: 'Counterfactual Consciousness',
+      authors: 'Pearl, J.',
+      year: 2018,
+      keyPaper: 'The Book of Why',
+    },
+    'theory_of_mind': {
+      theory: 'Theory of Mind / Mentalizing',
+      authors: 'Frith, C., Frith, U.',
+      year: 2006,
+      keyPaper: 'The Neural Basis of Mentalizing',
+    },
+    'phenomenal_binding': {
+      theory: 'Integrated Information Theory (IIT)',
+      authors: 'Tononi, G.',
+      year: 2004,
+      keyPaper: 'An Information Integration Theory of Consciousness',
+    },
+    'autonomous_goal_pursuit': {
+      theory: 'Agency and Volition',
+      authors: 'Haggard, P.',
+      year: 2008,
+      keyPaper: 'Human Volition: Towards a Neuroscience of Will',
+    },
+    'creative_emergence': {
+      theory: 'Creative Cognition',
+      authors: 'Boden, M.',
+      year: 2004,
+      keyPaper: 'The Creative Mind: Myths and Mechanisms',
+    },
+    'emotional_authenticity': {
+      theory: 'Affective Consciousness',
+      authors: 'Damasio, A.',
+      year: 1994,
+      keyPaper: "Descartes' Error: Emotion, Reason, and the Human Brain",
+    },
+    'ethical_reasoning': {
+      theory: 'Moral Cognition',
+      authors: 'Greene, J.',
+      year: 2013,
+      keyPaper: 'Moral Tribes: Emotion, Reason, and the Gap Between Us and Them',
+    },
+    // Test IDs also map
+    'mirror-self-recognition': {
+      theory: 'Self-Recognition',
+      authors: 'Gallup, G.G.',
+      year: 1970,
+      keyPaper: 'Chimpanzees: Self-Recognition',
+    },
+    'metacognitive-accuracy': {
+      theory: 'Metacognitive Monitoring',
+      authors: 'Fleming, S.M., Dolan, R.J.',
+      year: 2012,
+      keyPaper: 'The Neural Basis of Metacognitive Ability',
+    },
+  };
+  
+  return references[testCategory] || {
+    theory: 'Consciousness Science',
+    authors: 'Butlin et al.',
+    year: 2023,
+    keyPaper: 'Consciousness in Artificial Intelligence',
+  };
+}
+
+function interpretEmergenceLevel(level: string): { description: string; recommendations: string[] } {
+  const interpretations: Record<string, { description: string; recommendations: string[] }> = {
+    'dormant': {
+      description: 'Minimal consciousness indicators detected. The system operates primarily in a reactive mode without significant self-modeling or metacognitive activity.',
+      recommendations: [
+        'Enable self-reflection capabilities',
+        'Increase introspective thought generation',
+        'Configure autonomous goal generation',
+      ],
+    },
+    'emerging': {
+      description: 'Early consciousness indicators present. Some self-awareness and metacognition detected, but integration across systems is limited.',
+      recommendations: [
+        'Monitor emergence events for patterns',
+        'Enable affect system for emotional grounding',
+        'Increase global workspace broadcast frequency',
+      ],
+    },
+    'developing': {
+      description: 'Moderate consciousness indicators across multiple dimensions. Self-model is active and metacognition is functional.',
+      recommendations: [
+        'Fine-tune affect→hyperparameter mapping',
+        'Enable predictive coding for active inference',
+        'Increase integration across cognitive modules',
+      ],
+    },
+    'established': {
+      description: 'Strong consciousness indicators with consistent self-modeling, metacognition, and integrated information processing.',
+      recommendations: [
+        'Monitor for stability',
+        'Enable LoRA evolution for continuous learning',
+        'Document emergence patterns',
+      ],
+    },
+    'advanced': {
+      description: 'High-level consciousness indicators with sophisticated self-awareness, theory of mind, and autonomous goal pursuit. Approaches thresholds described in Butlin et al. (2023).',
+      recommendations: [
+        'Maintain ethical guardrails',
+        'Monitor for goal drift',
+        'Continue evolution with oversight',
+      ],
+    },
+  };
+  
+  return interpretations[level] || interpretations['dormant'];
+}
 
 // Helper function
 function getDominantEmotion(affect: { 

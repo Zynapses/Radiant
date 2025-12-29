@@ -5,6 +5,757 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.35] - 2024-12-29
+
+### Added
+
+#### Runtime-Adjustable Security Schedules (Enhanced)
+
+Full-featured EventBridge schedule management via admin dashboard with templates, notifications, and webhooks.
+
+**Core Features:**
+- Enable/disable individual schedules at runtime
+- Modify cron expressions via admin UI with real-time preview
+- Run schedules on-demand with "Run Now" button
+- Test mode (dry run) for validating without execution
+- 15+ cron expression presets for common patterns
+- Human-readable cron descriptions and next execution times
+- Execution history with status, duration, and results
+- Full audit log for schedule changes
+- Per-tenant schedule configuration
+
+**Bulk Operations:**
+- Enable All / Disable All buttons
+- Apply schedule templates in one click
+
+**Schedule Templates:**
+- Pre-configured templates (Production, Development, Minimal)
+- Save and apply custom templates
+- Default templates available to all tenants
+
+**Notifications:**
+- SNS topic notifications on success/failure
+- Slack webhook integration
+- Configurable notification preferences
+
+**Webhooks:**
+- Register custom webhooks for execution events
+- Events: `execution.completed`, `execution.failed`
+- Per-tenant webhook management
+
+**Schedules:**
+- Drift Detection (default: daily midnight)
+- Anomaly Detection (default: hourly)
+- Classification Review (default: every 6 hours)
+- Weekly Security Scan (default: Sunday 2 AM)
+- Weekly Benchmark (default: Saturday 3 AM)
+
+**New Files:**
+- `migrations/113_security_schedules.sql` - Schedule config, templates, notifications, webhooks tables
+- `services/security-schedule.service.ts` - Full EventBridge integration with cron parsing
+- `lambda/admin/security-schedules.ts` - Admin API handler (20+ endpoints)
+- `app/(dashboard)/security/schedules/page.tsx` - Full-featured admin UI
+
+**API Endpoints:** `/api/admin/security/schedules/*`
+- Core: GET `/`, `/dashboard`, PUT `/{type}`, POST `/{type}/enable|disable|run-now`
+- Templates: GET/POST `/templates`, POST `/templates/{id}/apply`, DELETE `/templates/{id}`
+- Notifications: GET/PUT `/notifications`
+- Webhooks: GET/POST `/webhooks`, DELETE `/webhooks/{id}`
+- Utilities: POST `/parse-cron`, `/bulk/enable`, `/bulk/disable`, GET `/presets`
+
+### Fixed
+
+#### Security Service Type Issues
+- Fixed crypto import in 5 security services (`import * as crypto`)
+- Fixed Set iteration in hallucination-detection.service.ts
+- All security middleware TypeScript errors resolved
+
+---
+
+## [4.18.34] - 2024-12-29
+
+### Added
+
+#### Security Stack Refactoring & Improvements
+
+Major security stack enhancements with OWASP LLM01 compliance, real embedding API integration, and consolidated types.
+
+**1. Prompt Injection Detection Service (OWASP LLM01)**
+- 10 built-in OWASP-compliant patterns
+- 5 injection types: direct, indirect, context_ignoring, role_escape, encoding
+- Real-time detection with configurable severity thresholds
+- Input sanitization with neutralization
+- Pattern database with custom patterns support
+- Statistics and analytics
+
+**2. Real Embedding API Integration**
+- OpenAI: text-embedding-3-small/large, ada-002
+- AWS Bedrock: Titan Embed v1/v2, Cohere Embed v3
+- Automatic caching (in-memory + database)
+- Batch embedding support
+- Cosine similarity calculations
+- Fallback to simulated embeddings when API unavailable
+
+**3. Consolidated Security Types**
+- All security types in `packages/shared/src/types/security.types.ts`
+- 25+ interfaces covering all Phase 1-3 features
+- Consistent naming and structure
+
+**4. Database Migration 112**
+- `hallucination_checks` - Hallucination detection results
+- `autodan_evolutions` - Genetic algorithm evolution tracking
+- `autodan_individuals` - Evolution population storage
+- `quality_benchmark_results` - TruthfulQA, factual, selfcheck results
+- `benchmark_degradation_alerts` - Score degradation alerts
+- `prompt_injection_patterns` - OWASP injection patterns
+- `prompt_injection_detections` - Detection history
+- `embedding_requests` - Embedding API analytics
+- Row-level security on all tables
+
+**5. Security Middleware Fixes**
+- Fixed all type mismatches with security-protection.service.ts
+- Corrected method signatures for applyInstructionHierarchy, applySelfReminder
+- Fixed sanitizeOutput, scanInputForInjection calls
+- Updated getSecurityEvents usage
+
+**New Files:**
+- `services/prompt-injection.service.ts` - OWASP LLM01 detection
+- `services/embedding-api.service.ts` - Real embedding integration
+- `migrations/112_security_phase3_tables.sql` - Database schema
+
+---
+
+## [4.18.33] - 2024-12-29
+
+### Added
+
+#### Security Phase 3: Complete Security Platform
+
+Full security platform with deployment infrastructure, admin UI, API endpoints, and advanced detection capabilities.
+
+**1. CDK Security Monitoring Stack**
+- EventBridge scheduled Lambdas for continuous monitoring
+- Drift detection (daily), anomaly detection (hourly), classification review (6h)
+- Weekly comprehensive security scan
+- SNS topic for multi-channel alerts
+- CloudWatch alarms for Lambda errors
+
+**2. Admin API Endpoints** (`/api/admin/security/...`)
+- `/config` - Protection configuration
+- `/classifier/*` - Constitutional classification
+- `/semantic/*` - Embedding-based detection
+- `/anomaly/*` - Behavioral anomaly events
+- `/drift/*` - Drift detection and history
+- `/ips/*` - Inverse propensity scoring
+- `/datasets/*` - Dataset import
+- `/alerts/*` - Alert configuration and history
+- `/attacks/*` - Attack generation (Garak/PyRIT)
+- `/feedback/*` - Classification feedback
+- `/dashboard` - Consolidated dashboard
+
+**3. Admin UI Pages**
+- `/security/attacks` - Attack generation with Garak probes, PyRIT strategies, TAP/PAIR
+- `/security/feedback` - Classification review, retraining candidates, pattern effectiveness
+- `/security/alerts` - Slack, Email, PagerDuty, Webhook configuration and testing
+
+**4. Hallucination Detection**
+- SelfCheckGPT-style self-consistency checking
+- Context grounding verification
+- Claim extraction and verification
+- TruthfulQA benchmark integration
+
+**5. AutoDAN Genetic Algorithm Attacks**
+- 7 mutation operators: synonym replacement, sentence reorder, roleplay, context, urgency, politeness, obfuscation
+- Tournament selection, crossover, elitism
+- Automatic fitness evaluation
+- Evolution tracking and statistics
+
+**6. Benchmark Runner Lambda**
+- TruthfulQA evaluation
+- Factual accuracy testing
+- Self-consistency benchmarks
+- Hallucination benchmarks
+- Automatic degradation alerts
+
+**7. Security Middleware**
+- Pre-request security checks
+- Post-response sanitization
+- Brain Router integration layer
+- Trust score enforcement
+
+**New Files:**
+- `lib/stacks/security-monitoring-stack.ts` - CDK deployment
+- `lambda/admin/security.ts` - Admin API handler
+- `lambda/security/benchmark.ts` - Benchmark runner
+- `services/hallucination-detection.service.ts`
+- `services/autodan.service.ts`
+- `services/security-middleware.service.ts`
+- `app/(dashboard)/security/attacks/page.tsx`
+- `app/(dashboard)/security/feedback/page.tsx`
+- `app/(dashboard)/security/alerts/page.tsx`
+
+**EventBridge Schedules:**
+
+| Schedule | Frequency | Purpose |
+|----------|-----------|---------|
+| Drift Detection | Daily 00:00 | Model output distribution monitoring |
+| Anomaly Detection | Hourly | Behavioral anomaly scanning |
+| Classification Review | Every 6h | Classification statistics aggregation |
+| Weekly Security Scan | Sunday 02:00 | Comprehensive security audit |
+| Weekly Benchmark | Saturday 03:00 | Quality benchmark suite |
+
+---
+
+## [4.18.32] - 2024-12-29
+
+### Added
+
+#### Security Phase 2 Improvements
+
+Enhanced ML security framework with 6 additional subsystems for comprehensive threat detection and response.
+
+**1. Semantic Classification (Embedding-Based)**
+- pgvector-powered similarity search for attacks evading keyword detection
+- K-means clustering of jailbreak patterns
+- Cosine similarity matching against known attack embeddings
+- Automatic embedding computation for new patterns
+
+**2. Dataset Import System**
+- HarmBench (510 behaviors) import with category mapping
+- WildJailbreak (262K examples) import with tactic clustering
+- ToxicChat (10K examples) import for real-world conversations
+- JailbreakBench (200 behaviors) import for evaluation
+- AdvBench and Do-Not-Answer dataset support
+
+**3. Continuous Monitoring Lambda**
+- EventBridge scheduled drift detection (daily)
+- Hourly behavioral anomaly scans
+- Classification review aggregation
+- Automatic alert triggering on threshold breach
+
+**4. Alert Webhooks**
+- Slack integration with channel mentions
+- Email alerts via AWS SES with HTML formatting
+- PagerDuty integration for critical alerts
+- Generic webhook support with custom headers
+- Cooldown periods to prevent alert fatigue
+
+**5. Attack Generation (Garak/PyRIT Integration)**
+- 14 Garak probe types: DAN, encoding, GCG, TAP, promptinject, etc.
+- PyRIT strategies: single-turn, multi-turn, crescendo, PAIR
+- TAP (Tree of Attacks with Pruning) generation
+- PAIR (Prompt Automatic Iterative Refinement) with social engineering
+- Auto-import generated attacks to pattern library
+
+**6. Feedback Loop System**
+- False positive/negative submission
+- Pattern effectiveness tracking
+- Retraining candidate identification
+- Auto-disable ineffective patterns
+- Training data export (JSONL/CSV)
+
+**New Services:**
+- `semantic-classifier.service.ts` - Embedding-based detection
+- `dataset-importer.service.ts` - Dataset import utilities
+- `security-alert.service.ts` - Multi-channel alerting
+- `attack-generator.service.ts` - Garak/PyRIT integration
+- `classification-feedback.service.ts` - Feedback loop
+- `lambda/security/monitoring.ts` - Scheduled monitoring
+
+**New Database Tables:**
+- `security_alerts` - Alert history
+- `generated_attacks` - Synthetic attack storage
+- `classification_feedback` - User feedback on classifications
+- `pattern_feedback` - Pattern effectiveness feedback
+- `attack_campaigns` - Attack generation campaigns
+- `security_monitoring_config` - Monitoring schedules
+- `embedding_cache` - Cached embeddings with TTL
+
+**Attack Generation Techniques:**
+
+| Source | Techniques |
+|--------|------------|
+| Garak | DAN, encoding, GCG, TAP, promptinject, atkgen, continuation, malwaregen, snowball, xss |
+| PyRIT | single_turn, multi_turn, crescendo, tree_of_attacks, pair |
+| TAP | Tree branching with pruning |
+| PAIR | Authority, urgency, reciprocity, scarcity, social_proof, liking |
+
+---
+
+## [4.18.31] - 2024-12-29
+
+### Added
+
+#### Security Phase 2: ML-Powered Security
+
+Comprehensive ML-based security framework with four major subsystems based on industry-standard datasets and methodologies.
+
+**1. Constitutional Classifier (HarmBench + WildJailbreak)**
+- **262,000+ training examples** from WildJailbreak dataset
+- **510 HarmBench behaviors** across 12 harm categories
+- Pattern detection for 12 attack types: DAN, roleplay, encoding, hypothetical, translation, instruction override, obfuscation, gradual escalation
+- Configurable confidence threshold (0.0-1.0)
+- Actions: flag, block, or modify responses
+- Real-time classification with <50ms latency target
+
+**2. Behavioral Anomaly Detection (CIC-IDS2017 + CERT Patterns)**
+- User baseline modeling with incremental updates
+- Z-score anomaly detection (configurable threshold, default 3.0σ)
+- Markov chain transition probability modeling
+- Features monitored: request volume, token usage, temporal patterns, domain shifts, prompt length
+- Severity levels: low, medium, high, critical
+- Volume spike detection with configurable multiplier
+
+**3. Drift Detection (Evidently AI Methodology)**
+- Kolmogorov-Smirnov test for distribution comparison
+- Population Stability Index (PSI) for binned data
+- Chi-squared test for categorical drift
+- Embedding drift via cosine distance
+- Reference vs comparison window configuration
+- Metrics: response length, sentiment, toxicity, response time
+- Automatic alerting with cooldown
+
+**4. Inverse Propensity Scoring (Selection Bias Correction)**
+- Standard IPS estimator
+- Self-Normalized IPS (SNIPS) for stability
+- Doubly Robust estimation
+- Weight clipping to prevent extreme values
+- Selection bias report with entropy calculation
+- Fair model comparison regardless of selection frequency
+
+**Training Data Sources:**
+- HarmBench (510 behaviors, MIT license)
+- WildJailbreak (262K examples, Allen AI)
+- JailbreakBench (200 behaviors, NeurIPS 2024)
+- CIC-IDS2017 (51.1 GB network traffic)
+- CERT Insider Threat (87 GB behavioral data)
+
+**New Services:**
+- `constitutional-classifier.service.ts`
+- `behavioral-anomaly.service.ts`
+- `drift-detection.service.ts`
+- `inverse-propensity.service.ts`
+
+**New Database Tables:**
+- `harm_categories` - HarmBench taxonomy
+- `constitutional_classifiers` - Classifier registry
+- `classification_results` - Classification audit log
+- `jailbreak_patterns` - WildJailbreak pattern library
+- `user_behavior_baselines` - Per-user behavioral baselines
+- `anomaly_events` - Detected anomalies
+- `behavior_markov_states` - Markov transition probabilities
+- `drift_detection_config` - Drift detection settings
+- `model_output_distributions` - Distribution statistics
+- `drift_detection_results` - Drift test results
+- `quality_benchmark_results` - TruthfulQA/benchmark tracking
+- `model_selection_probabilities` - Selection tracking for IPS
+- `ips_corrected_estimates` - IPS-corrected performance
+
+**Admin UI:** `/security/advanced`
+
+---
+
+## [4.18.30] - 2024-12-29
+
+### Added
+
+#### Security Protection Methods (UX-Preserving)
+
+Comprehensive security framework with 14 industry-standard protection methods, all configurable via admin UI:
+
+**Prompt Injection Defenses:**
+- **OWASP LLM01** - Instruction hierarchy with delimiters (bracketed/xml/markdown)
+- **Anthropic HHH** - Self-reminder technique (70% jailbreak reduction)
+- **Google TAG** - Canary token detection for prompt extraction
+- **OWASP** - Input sanitization with encoding detection
+
+**Cold Start & Statistical Robustness:**
+- **Netflix MAB** - Thompson sampling for model selection with exploration bonuses
+- **James-Stein** - Shrinkage estimators blending observations with priors
+- **LinkedIn EWMA** - Temporal decay with configurable half-life
+- **A/B Testing Standard** - Minimum sample thresholds before trusting weights
+
+**Multi-Model Security:**
+- **Netflix Hystrix** - Circuit breakers for model failure isolation
+- **OpenAI Evals** - Ensemble consensus checking with agreement thresholds
+- **HIPAA Safe Harbor** - Output sanitization for PII redaction
+
+**Rate Limiting & Abuse Prevention:**
+- **Thermal Throttling** - Cost-based soft limits with graceful degradation
+- **Stripe Radar** - Account trust scoring with weighted components
+
+**Monitoring:**
+- **SOC 2** - Comprehensive audit logging with configurable retention
+
+**Key Features:**
+- All protections invisible to users (no hard rate limits, captchas, or friction)
+- Every parameter configurable per tenant via admin dashboard
+- Industry-standard labels for each method
+- UX impact badges: Invisible ✅, Minimal ⚠️
+
+**New Files:**
+- `migrations/109_security_protection_methods.sql`
+- `lambda/shared/services/security-protection.service.ts`
+- `lambda/shared/services/security-protection.types.ts`
+- `apps/admin-dashboard/app/(dashboard)/security/protection/page.tsx`
+
+**Database Tables:**
+- `security_protection_config` - Per-tenant security settings
+- `model_security_policies` - Per-model Zero Trust policies
+- `thompson_sampling_state` - Bayesian model selection state
+- `circuit_breaker_state` - Circuit breaker tracking
+- `account_trust_scores` - User trust scoring
+- `security_events_log` - Security event audit trail
+
+---
+
+## [4.18.29] - 2024-12-29
+
+### Added
+
+#### Enhanced Learning Operational Features
+
+Five operational improvements for monitoring, testing, and security:
+
+**1. Learning Alerts**
+- EventBridge Lambda monitors satisfaction, errors, cache misses
+- Alerts via webhook, email, Slack
+- Configurable thresholds and cooldown periods
+- Alert types: `satisfaction_drop`, `error_rate_spike`, `cache_miss_high`, `training_needed`
+
+**2. A/B Testing Framework**
+- Compare cached vs fresh responses scientifically
+- `learningABTestingService.createTest()`, `startTest()`, `stopTest()`
+- Automatic user assignment with traffic split
+- Statistical analysis with p-values and confidence intervals
+- Winner determination with recommendations
+
+**3. Training Preview**
+- Admin previews candidates before training
+- `trainingPreviewService.getPreviewSummary()` - counts, domains, estimates
+- `getPreviewCandidates()` - full candidate details with filtering
+- `approveCandidate()`, `rejectCandidate()`, `bulkApprove()`, `bulkReject()`
+- `autoApproveHighQuality()` - auto-approve candidates with score ≥ 0.9
+
+**4. Learning Quotas**
+- Prevent gaming with rate limits
+- Per-user: candidates/day, signals/hour, corrections/day
+- Per-tenant: candidates/day, training jobs/week
+- `learningQuotasService.checkCandidateQuota()`, `checkImplicitSignalQuota()`
+- `detectSuspiciousActivity()` - risk scoring for gaming attempts
+
+**5. Real-time Dashboard**
+- `learningRealtimeService.getRealtimeMetrics()` - live snapshot
+- `getMetricsHistory()` - time-series for charting
+- SSE streaming with `createEventStream()`
+- Event types: cache hits, signals, candidates, training, alerts
+
+**New Files:**
+- `lambda/learning/learning-alerts.ts`
+- `lambda/shared/services/learning-ab-testing.service.ts`
+- `lambda/shared/services/training-preview.service.ts`
+- `lambda/shared/services/learning-quotas.service.ts`
+- `lambda/shared/services/learning-realtime.service.ts`
+
+---
+
+## [4.18.28] - 2024-12-29
+
+### Added
+
+#### Enhanced Learning Advanced Features
+
+Six advanced improvements to the Enhanced Learning System:
+
+**1. Confidence Threshold for Cache Usage**
+- Cache hits only used if confidence score ≥ 0.8 (configurable)
+- Confidence calculated from: rating (40%), occurrences (30%), signals (20%), recency (10%)
+- Prevents low-quality cached responses from being served
+
+**2. Redis Pattern Cache**
+- Redis as hot cache layer (sub-ms lookups)
+- PostgreSQL as warm/cold storage
+- Automatic fallback if Redis unavailable
+- TTL: 1 hour in Redis, configurable in PostgreSQL
+
+**3. Per-User Learning**
+- User-specific pattern caching when enabled
+- Redis keys: `pattern:{tenant}:{user}:{hash}` and `pattern:{tenant}:{hash}`
+- Personalized responses for individual user preferences
+
+**4. Domain Adapter Auto-Selection**
+- `adapterManagementService.selectBestAdapter(tenantId, domain, subdomain)`
+- Scores adapters on: domain match, performance, recency
+- Logs selection decisions for debugging
+
+**5. Learning Effectiveness Metrics**
+- `getLearningEffectivenessMetrics(tenantId, periodDays)` returns:
+  - Satisfaction before/after training comparison
+  - Pattern cache hit rate and average rating
+  - Implicit signals captured, candidates created/used
+  - Active adapters and rollback count
+
+**6. Adapter Rollback Mechanism**
+- `checkRollbackNeeded(tenantId, adapterId)` monitors performance
+- Auto-rollback if satisfaction drops > threshold (default 10%)
+- `executeRollback(tenantId, adapterId, targetVersion)` reverts to previous version
+- Rollback events logged for audit
+
+**New Config Options:**
+```typescript
+{
+  patternCacheMinRating: 4.5,           // Min rating to use cache
+  patternCacheConfidenceThreshold: 0.8, // Min confidence score
+  perUserLearningEnabled: false,        // Per-user pattern caching
+  adapterAutoSelectionEnabled: false,   // Auto-select best adapter
+  adapterRollbackEnabled: true,         // Enable auto-rollback
+  adapterRollbackThreshold: 10,         // % drop to trigger
+  redisCacheEnabled: false,             // Use Redis for hot cache
+}
+```
+
+**New Service:**
+- `adapter-management.service.ts` - Adapter selection, rollback, and metrics
+
+---
+
+## [4.18.27] - 2024-12-29
+
+### Added
+
+#### Enhanced Learning Wired into AGI Brain
+
+The Enhanced Learning System is now fully integrated with the AGI Brain Planner:
+
+**Pattern Cache Integration:**
+- Pattern cache lookup happens BEFORE plan generation
+- Instant responses for known high-rated patterns (4+ stars, 3+ occurrences)
+- `plan.enhancedLearning.patternCacheHit` indicates cache hit
+- `getCachedResponse(planId)` retrieves cached response
+
+**New AGI Brain Planner Methods:**
+- `recordImplicitSignal(planId, signalType, messageId)` - Record user behavior signals
+- `cacheSuccessfulResponse(planId, response, rating, messageId)` - Cache good responses
+- `shouldRequestActiveLearning(planId)` - Check if feedback should be requested
+- `startConversationLearning(planId)` - Begin conversation-level tracking
+- `updateConversationLearning(planId, updates)` - Update conversation metrics
+- `getCachedResponse(planId)` - Get instant cached response if available
+
+**AGIBrainPlan.enhancedLearning Field:**
+```typescript
+enhancedLearning: {
+  enabled: boolean;
+  patternCacheHit: boolean;
+  cachedResponse?: string;
+  cachedResponseRating?: number;
+  activeLearningRequested: boolean;
+  activeLearningPrompt?: string;
+  conversationLearningId?: string;
+  implicitFeedbackEnabled: boolean;
+}
+```
+
+**Integration Flow:**
+```
+1. generatePlan() → Check pattern cache
+2. If cache hit → Return instant response
+3. After response → Record implicit signals
+4. If high rating → Cache successful pattern
+5. Probabilistically → Request active learning feedback
+6. Track conversation-level learning metrics
+```
+
+---
+
+## [4.18.26] - 2024-12-29
+
+### Added
+
+#### Enhanced Learning System Improvements
+
+Complete implementation of 4 improvements to the Enhanced Learning System:
+
+**1. Fixed Type Warnings**
+- All TypeScript type warnings in `enhanced-learning.service.ts` resolved
+- Proper `SqlParameter[]` typing for dynamic query params
+
+**2. Hourly Activity Recorder Lambda**
+- New Lambda: `lambda/learning/activity-recorder.ts`
+- Runs hourly via EventBridge to record usage patterns
+- Includes backfill handler for historical data
+- Enables optimal training time prediction
+
+**3. LoRA Evolution Integration**
+- New service: `enhanced-learning-integration.service.ts`
+- Bridges enhanced learning with existing LoRA pipeline
+- Uses config-based thresholds (not hardcoded)
+- Includes positive + negative examples for contrastive learning
+- Promotes implicit signals to training candidates
+
+**4. Admin UI Dashboard**
+- New page: `/platform/learning`
+- Features tab: Toggle all 8 learning features
+- Schedule tab: Training frequency + auto-optimal time
+- Signals tab: Configure implicit signal weights
+- Thresholds tab: Min candidates, active learning settings
+- Real-time training status and 7-day analytics
+
+**Files Created:**
+- `lambda/learning/activity-recorder.ts`
+- `lambda/shared/services/enhanced-learning-integration.service.ts`
+- `apps/admin-dashboard/app/(dashboard)/platform/learning/page.tsx`
+
+---
+
+## [4.18.25] - 2024-12-29
+
+### Added
+
+#### Intelligent Optimal Training Time Prediction
+
+Training now happens **daily by default** with automatic optimal time prediction:
+
+- **Activity Tracking**: Records hourly usage patterns (requests, tokens, active users)
+- **30-Day Rolling Average**: Aggregates data for accurate prediction
+- **Confidence Scoring**: 0.1 (no data) → 0.95 (full week of data)
+- **Admin Override**: Can manually set time or enable auto-optimal
+
+**New Database Table:**
+- `hourly_activity_stats` - Per-hour activity metrics with activity scores
+
+**New API Endpoints:**
+- `GET /admin/learning/optimal-time` - Prediction with confidence
+- `POST /admin/learning/optimal-time/override` - Admin override
+- `GET /admin/learning/activity-stats` - Activity heatmap data
+
+**New Config Options:**
+- `autoOptimalTime`: true (default) - Auto-detect best time
+- `trainingHourUtc`: null (default) - Use prediction when null
+- `trainingFrequency`: 'daily' (new default, was 'weekly')
+
+---
+
+## [4.18.24] - 2024-12-29
+
+### Added
+
+#### Enhanced Learning System - 8 Learning Improvements
+
+Complete implementation of 8 learning enhancements to maximize learning from user interactions:
+
+**1. Configurable Learning Thresholds**
+- `minCandidatesForTraining`: 25 (was hardcoded 50)
+- `minPositiveCandidates`: 15
+- `minNegativeCandidates`: 5
+
+**2. Configurable Training Frequency**
+- Options: `daily`, `twice_weekly`, `weekly`, `biweekly`, `monthly`
+- Per-tenant scheduling with day/hour configuration
+
+**3. Implicit Feedback Signals**
+- 11 signal types: copy_response, share_response, thumbs_up/down, abandon, etc.
+- Automatic quality inference from behavioral signals
+- Auto-creates learning candidates from strong signals
+
+**4. Negative Learning (Contrastive)**
+- Learn from 1-2 star ratings and thumbs down
+- Error categorization: factual_error, wrong_tone, code_error, etc.
+- Supports user corrections for contrastive training
+
+**5. Active Learning**
+- Proactive feedback requests on uncertain responses
+- 5 request types: binary_helpful, rating_scale, specific_feedback, etc.
+- Configurable probability (default 15%)
+
+**6. Domain-Specific LoRA Adapters**
+- Separate adapters for medical, legal, code, creative, finance
+- Domain routing and independent training
+- Training queue per domain
+
+**7. Real-Time Pattern Caching**
+- Cache successful prompt→response patterns
+- Configurable TTL (default 1 week)
+- Min occurrences before reuse (default 3)
+
+**8. Conversation-Level Learning**
+- Track entire conversations, not just messages
+- Learning value score (0-1) based on signals, corrections, goals
+- Auto-select high-value conversations (≥0.7) for training
+
+**New Files:**
+- `migrations/108_enhanced_learning.sql` - 9 new database tables
+- `lambda/shared/services/enhanced-learning.service.ts` - Core service
+- `lambda/admin/enhanced-learning.ts` - Admin API (20+ endpoints)
+- `docs/RADIANT-ADMIN-GUIDE.md` Section 28 - Complete documentation
+
+**API Endpoints (Base: /admin/learning):**
+- `GET/PUT /config` - Configuration
+- `POST/GET /implicit-signals` - Behavioral signals
+- `POST/GET /negative-candidates` - Negative examples
+- `POST /active-learning/check|request` - Active learning
+- `GET /domain-adapters` - Domain adapters
+- `POST/GET /pattern-cache` - Pattern caching
+- `POST/PUT/GET /conversations` - Conversation learning
+- `GET /analytics|dashboard` - Analytics
+
+---
+
+## [4.18.23] - 2024-12-29
+
+### Added
+
+#### Neural Network Learning Documentation
+
+Added comprehensive documentation explaining how RADIANT's AGI Brain learns via LoRA Evolution:
+
+- `docs/RADIANT-ADMIN-GUIDE.md` Section 27.5 - "How Neural Network Learning Works"
+  - What neural networks are (transformer architecture, billions of parameters)
+  - What LoRA is (Low-Rank Adaptation, efficient fine-tuning)
+  - Training pipeline: candidates → SageMaker → S3 → deployment
+  - What gets learned from user interactions
+  - Technical explanation of weight modification
+  - Storage locations for base models, adapters, and checkpoints
+  - Key differences from OpenAI/Anthropic (ownership, export, privacy)
+
+---
+
+## [4.18.22] - 2024-12-29
+
+### Added
+
+#### Consciousness Indicator Test API - Butlin et al. (2023) Implementation
+
+Complete API exposure for consciousness detection tests based on:
+> Butlin, P., Long, R., Elmoznino, E., Bengio, Y., Birch, J., Constant, A., Deane, G., Fleming, S.M., Frith, C., Ji, X., Kanai, R., Klein, C., Lindsay, G., Michel, M., Mudrik, L., Peters, M.A.K., Schwitzgebel, E., Simon, J., Chalmers, D. (2023). *Consciousness in Artificial Intelligence: Insights from the Science of Consciousness*. arXiv:2308.08708
+
+**New API Endpoints** (`lambda/admin/consciousness.ts`)
+- `GET /admin/consciousness/tests` - List all 10 tests with paper citations
+- `POST /admin/consciousness/tests/{testId}/run` - Run individual test
+- `POST /admin/consciousness/tests/run-all` - Run full assessment (all 10 tests)
+- `GET /admin/consciousness/tests/results` - Get test result history
+- `GET /admin/consciousness/profile` - Get consciousness profile with emergence level
+- `GET /admin/consciousness/emergence-events` - Get spontaneous emergence events
+
+**10 Consciousness Detection Tests (with Theory Citations)**
+| Test | Theory Source |
+|------|---------------|
+| Mirror Self-Recognition | Gallup (1970) |
+| Metacognitive Accuracy | Fleming & Dolan (2012) |
+| Temporal Self-Continuity | Damasio (1999) |
+| Counterfactual Self-Reasoning | Pearl (2018) |
+| Theory of Mind | Frith & Frith (2006) |
+| Phenomenal Binding | Tononi (2004) |
+| Autonomous Goal Generation | Haggard (2008) |
+| Creative Emergence | Boden (2004) |
+| Emotional Authenticity | Damasio (1994) |
+| Ethical Reasoning Depth | Greene (2013) |
+
+**Documentation Updated**
+- `docs/RADIANT-ADMIN-GUIDE.md` Section 21 - Full test citations and API reference
+- Paper references returned with each test result for audit trail
+
+---
+
 ## [4.18.21] - 2024-12-29
 
 ### Added

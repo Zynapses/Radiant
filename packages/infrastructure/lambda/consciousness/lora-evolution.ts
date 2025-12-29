@@ -11,6 +11,8 @@ import {
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { executeStatement } from '../shared/db/client';
 import { learningCandidateService, type TrainingDataset } from '../shared/services/learning-candidate.service';
+import { enhancedLearningService } from '../shared/services/enhanced-learning.service';
+import { enhancedLearningIntegrationService } from '../shared/services/enhanced-learning-integration.service';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -21,7 +23,7 @@ import { v4 as uuidv4 } from 'uuid';
 const SAGEMAKER_ROLE_ARN = process.env.SAGEMAKER_ROLE_ARN || '';
 const TRAINING_BUCKET = process.env.TRAINING_BUCKET || 'radiant-lora-training';
 const BASE_MODEL = process.env.LORA_BASE_MODEL || 'meta-llama/Llama-3-8B-Instruct';
-const MIN_CANDIDATES_FOR_TRAINING = 50;
+// MIN_CANDIDATES_FOR_TRAINING now comes from enhanced learning config (default 25)
 const MAX_TRAINING_CANDIDATES = 1000;
 const MAX_TRAINING_TOKENS = 500000;
 
@@ -95,16 +97,29 @@ export const handler: Handler<ScheduledEvent> = async (event) => {
 // ============================================================================
 
 async function getTenantsWithPendingCandidates(): Promise<string[]> {
-  const result = await executeStatement(
-    `SELECT DISTINCT tenant_id, COUNT(*) as candidate_count
-     FROM learning_candidates
-     WHERE training_status = 'pending' AND expires_at > NOW()
-     GROUP BY tenant_id
-     HAVING COUNT(*) >= $1`,
-    [{ name: 'minCandidates', value: { longValue: MIN_CANDIDATES_FOR_TRAINING } }]
+  // Get all active tenants
+  const tenantsResult = await executeStatement(
+    `SELECT id FROM tenants WHERE status = 'active'`,
+    []
   );
-
-  return result.rows.map(row => String((row as Record<string, unknown>).tenant_id));
+  
+  const readyTenants: string[] = [];
+  
+  for (const row of tenantsResult.rows || []) {
+    const tenantId = String((row as Record<string, unknown>).id);
+    
+    // Use enhanced learning integration to check if tenant is ready for training
+    const { shouldTrain, reason, stats } = await enhancedLearningIntegrationService.shouldTriggerTraining(tenantId);
+    
+    if (shouldTrain) {
+      logger.info('Tenant ready for training', { tenantId, reason, stats });
+      readyTenants.push(tenantId);
+    } else {
+      logger.debug('Tenant not ready for training', { tenantId, reason, stats });
+    }
+  }
+  
+  return readyTenants;
 }
 
 async function processEvolutionForTenant(tenantId: string): Promise<{
@@ -127,8 +142,12 @@ async function processEvolutionForTenant(tenantId: string): Promise<{
       MAX_TRAINING_TOKENS
     );
 
-    if (dataset.candidates.length < MIN_CANDIDATES_FOR_TRAINING) {
-      await updateJobStatus(jobId, 'completed', 'Insufficient candidates after filtering');
+    // Get min candidates from enhanced learning config
+    const config = await enhancedLearningService.getConfig(tenantId);
+    const minCandidates = config?.minCandidatesForTraining || 25;
+    
+    if (dataset.candidates.length < minCandidates) {
+      await updateJobStatus(jobId, 'completed', `Insufficient candidates after filtering: ${dataset.candidates.length} < ${minCandidates}`);
       return { tenantId, status: 'skipped', jobId };
     }
 

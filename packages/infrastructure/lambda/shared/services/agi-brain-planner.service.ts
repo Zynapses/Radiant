@@ -12,6 +12,7 @@ import { providerRejectionService } from './provider-rejection.service';
 import { userPersistentContextService, type RetrievedContext } from './user-persistent-context.service';
 import { egoContextService, type EgoContextResult } from './ego-context.service';
 import { libraryAssistService, type LibraryAssistResult } from './library-assist.service';
+import { enhancedLearningService, type PatternCacheEntry } from './enhanced-learning.service';
 import { v4 as uuidv4 } from 'uuid';
 
 // Gemini 3 model for plan summarization
@@ -210,6 +211,17 @@ export interface AGIBrainPlan {
     matchScore: number;
     reason: string;
   }>;
+  // Enhanced Learning System Integration
+  enhancedLearning?: {
+    enabled: boolean;
+    patternCacheHit: boolean;
+    cachedResponse?: string;
+    cachedResponseRating?: number;
+    activeLearningRequested: boolean;
+    activeLearningPrompt?: string;
+    conversationLearningId?: string;
+    implicitFeedbackEnabled: boolean;
+  };
 }
 
 export interface PlanSummary {
@@ -315,6 +327,23 @@ export class AGIBrainPlannerService {
       }
     }
     const libraryRetrievalTimeMs = Date.now() - libraryStartTime;
+
+    // Step 0.7: Check Enhanced Learning pattern cache (instant response for known patterns)
+    let patternCacheResult: PatternCacheEntry | null = null;
+    let enhancedLearningConfig = null;
+    if (request.enableLearning !== false) {
+      try {
+        enhancedLearningConfig = await enhancedLearningService.getConfig(request.tenantId);
+        if (enhancedLearningConfig?.patternCachingEnabled) {
+          patternCacheResult = await enhancedLearningService.findCachedPattern(
+            request.tenantId,
+            request.prompt
+          );
+        }
+      } catch {
+        // Pattern cache lookup failed, continue without it
+      }
+    }
 
     // Step 1: Analyze prompt
     const promptAnalysis = await this.analyzePrompt(request.prompt);
@@ -433,6 +462,15 @@ export class AGIBrainPlannerService {
         ...request.workflowParameterOverrides,
       },
       alternativeWorkflows: workflowSelection.alternatives,
+      // Enhanced Learning System Integration
+      enhancedLearning: {
+        enabled: request.enableLearning !== false,
+        patternCacheHit: !!patternCacheResult,
+        cachedResponse: patternCacheResult?.successfulResponse,
+        cachedResponseRating: patternCacheResult?.averageRating,
+        activeLearningRequested: false, // Will be set after response based on config
+        implicitFeedbackEnabled: enhancedLearningConfig?.implicitFeedbackEnabled || false,
+      },
     };
 
     // Add performance metrics
@@ -1473,6 +1511,211 @@ export class AGIBrainPlannerService {
    */
   getSynthesisMessage(confidence: number): string {
     return delightOrchestrationService.getSynthesisMessage(confidence);
+  }
+
+  // ============================================================================
+  // Enhanced Learning Integration
+  // ============================================================================
+
+  /**
+   * Record implicit feedback signal after user interaction
+   */
+  async recordImplicitSignal(
+    planId: string,
+    signalType: 'copy_response' | 'share_response' | 'thumbs_up' | 'thumbs_down' | 'regenerate_request' | 'follow_up_question' | 'abandon_conversation' | 'rephrase_question',
+    messageId: string,
+    options: { signalValue?: number; metadata?: Record<string, unknown> } = {}
+  ): Promise<void> {
+    const plan = this.activePlans.get(planId);
+    if (!plan || !plan.enhancedLearning?.enabled || !plan.enhancedLearning?.implicitFeedbackEnabled) {
+      return;
+    }
+
+    try {
+      await enhancedLearningService.recordImplicitSignal(
+        plan.tenantId,
+        plan.userId,
+        messageId,
+        signalType,
+        {
+          conversationId: plan.conversationId,
+          signalValue: options.signalValue,
+          metadata: {
+            ...options.metadata,
+            planId,
+            orchestrationMode: plan.orchestrationMode,
+            modelUsed: plan.primaryModel.modelId,
+            domain: plan.domainDetection?.domainName,
+          },
+        }
+      );
+    } catch (error) {
+      console.warn('Failed to record implicit signal:', error);
+    }
+  }
+
+  /**
+   * Cache successful response pattern for future instant retrieval
+   */
+  async cacheSuccessfulResponse(
+    planId: string,
+    response: string,
+    rating: number,
+    messageId: string
+  ): Promise<void> {
+    const plan = this.activePlans.get(planId);
+    if (!plan || !plan.enhancedLearning?.enabled || rating < 4) {
+      return;
+    }
+
+    try {
+      await enhancedLearningService.cacheSuccessfulPattern(
+        plan.tenantId,
+        plan.prompt,
+        response,
+        {
+          domain: plan.domainDetection?.domainName,
+          rating,
+          modelUsed: plan.primaryModel.modelId,
+          metadata: {
+            planId,
+            messageId,
+            orchestrationMode: plan.orchestrationMode,
+          },
+        }
+      );
+    } catch (error) {
+      console.warn('Failed to cache successful pattern:', error);
+    }
+  }
+
+  /**
+   * Check if active learning feedback should be requested
+   */
+  async shouldRequestActiveLearning(planId: string): Promise<{
+    shouldRequest: boolean;
+    prompt?: string;
+    requestType?: 'rating' | 'correction' | 'preference';
+  }> {
+    const plan = this.activePlans.get(planId);
+    if (!plan || !plan.enhancedLearning?.enabled) {
+      return { shouldRequest: false };
+    }
+
+    try {
+      const config = await enhancedLearningService.getConfig(plan.tenantId);
+      if (!config?.activeLearningEnabled) {
+        return { shouldRequest: false };
+      }
+
+      // Probabilistic request based on config
+      if (Math.random() > config.activeLearningProbability) {
+        return { shouldRequest: false };
+      }
+
+      // Determine request type based on context
+      const requestType: 'rating' | 'correction' | 'preference' = 
+        plan.promptAnalysis.complexity === 'expert' ? 'correction' :
+        plan.orchestrationMode === 'creative' ? 'preference' : 'rating';
+
+      const prompts: Record<string, string> = {
+        rating: 'Was this response helpful? Your feedback helps me learn.',
+        correction: 'If anything was incorrect, please let me know so I can improve.',
+        preference: 'Did this match what you were looking for?',
+      };
+
+      // Update plan with active learning request
+      if (plan.enhancedLearning) {
+        plan.enhancedLearning.activeLearningRequested = true;
+        plan.enhancedLearning.activeLearningPrompt = prompts[requestType];
+      }
+
+      return {
+        shouldRequest: true,
+        prompt: prompts[requestType],
+        requestType,
+      };
+    } catch (error) {
+      console.warn('Failed to check active learning:', error);
+      return { shouldRequest: false };
+    }
+  }
+
+  /**
+   * Start conversation-level learning tracking
+   */
+  async startConversationLearning(planId: string): Promise<string | null> {
+    const plan = this.activePlans.get(planId);
+    if (!plan || !plan.enhancedLearning?.enabled || !plan.conversationId) {
+      return null;
+    }
+
+    try {
+      const config = await enhancedLearningService.getConfig(plan.tenantId);
+      if (!config?.conversationLearningEnabled) {
+        return null;
+      }
+
+      const learning = await enhancedLearningService.startConversationLearning(
+        plan.tenantId,
+        plan.userId,
+        plan.conversationId
+      );
+
+      if (plan.enhancedLearning) {
+        plan.enhancedLearning.conversationLearningId = learning.id;
+      }
+
+      return learning.id;
+    } catch (error) {
+      console.warn('Failed to start conversation learning:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Update conversation learning with interaction data
+   */
+  async updateConversationLearning(
+    planId: string,
+    updates: {
+      incrementMessageCount?: boolean;
+      addDomain?: string;
+      conversationRating?: number;
+      goalAchieved?: boolean;
+      incrementCorrections?: boolean;
+      incrementRegenerations?: boolean;
+    }
+  ): Promise<void> {
+    const plan = this.activePlans.get(planId);
+    if (!plan || !plan.enhancedLearning?.conversationLearningId) {
+      return;
+    }
+
+    try {
+      await enhancedLearningService.updateConversationLearning(
+        plan.tenantId,
+        plan.conversationId!,
+        updates
+      );
+    } catch (error) {
+      console.warn('Failed to update conversation learning:', error);
+    }
+  }
+
+  /**
+   * Get cached response if available (instant response for known patterns)
+   */
+  getCachedResponse(planId: string): { response: string; rating: number } | null {
+    const plan = this.activePlans.get(planId);
+    if (!plan?.enhancedLearning?.patternCacheHit || !plan.enhancedLearning.cachedResponse) {
+      return null;
+    }
+
+    return {
+      response: plan.enhancedLearning.cachedResponse,
+      rating: plan.enhancedLearning.cachedResponseRating || 0,
+    };
   }
 }
 

@@ -1220,6 +1220,158 @@ Default retention periods:
 4. View compliance score and findings
 5. Export to PDF for auditors
 
+### 15.9 Security Monitoring Schedules
+
+**Location**: Admin Dashboard → Security → Schedules
+
+Full-featured EventBridge schedule management with templates, notifications, and webhooks.
+
+#### Available Schedules
+
+| Schedule | Default | Purpose |
+|----------|---------|---------|
+| **Drift Detection** | Daily 00:00 UTC | Monitors model output distribution changes |
+| **Anomaly Detection** | Hourly | Behavioral scans for suspicious patterns |
+| **Classification Review** | Every 6 hours | Aggregates classification statistics |
+| **Weekly Security Scan** | Sunday 02:00 UTC | Comprehensive security audit |
+| **Weekly Benchmark** | Saturday 03:00 UTC | TruthfulQA and factual accuracy tests |
+
+#### Managing Schedules
+
+1. Navigate to **Security → Schedules**
+2. View all schedules with current configuration and next execution time
+3. Toggle **Enable/Disable** to control schedule
+4. Click **Configure** to modify cron expression (with real-time preview)
+5. Click **Run Now** to trigger immediate execution
+6. Click **Test Run** for dry-run validation without affecting data
+
+#### Bulk Operations
+
+- **Enable All**: Enable all schedules at once
+- **Disable All**: Disable all schedules (e.g., for maintenance)
+
+#### Schedule Templates
+
+Apply pre-configured schedule sets:
+
+| Template | Description |
+|----------|-------------|
+| **Production (Conservative)** | Fewer checks, less resource usage |
+| **Development (Aggressive)** | Frequent checks for dev environments |
+| **Minimal** | Weekly only, for low-traffic tenants |
+
+To apply a template:
+1. Go to **Templates** tab
+2. Review template settings
+3. Click **Apply** to update all schedules
+
+#### Notifications
+
+Configure alerts for schedule executions:
+
+1. Go to **Notifications** tab
+2. Enable notifications
+3. Configure:
+   - **SNS Topic ARN**: For AWS SNS notifications
+   - **Slack Webhook URL**: For Slack channel alerts
+   - **Notify on Success**: Alert when schedules complete
+   - **Notify on Failure**: Alert when schedules fail (recommended)
+
+#### Webhooks
+
+Send execution results to external services:
+
+1. Go to **Webhooks** tab
+2. Enter webhook URL
+3. Click **Add Webhook**
+
+Webhook events:
+- `execution.completed` - Schedule finished successfully
+- `execution.failed` - Schedule encountered errors
+
+Webhook payload:
+```json
+{
+  "event": "execution.completed",
+  "payload": {
+    "scheduleType": "drift_detection",
+    "status": "completed",
+    "itemsProcessed": 150,
+    "itemsFlagged": 3,
+    "executionTimeMs": 4523
+  },
+  "timestamp": "2024-12-29T12:00:00Z"
+}
+```
+
+#### Cron Expression Format
+
+Uses AWS EventBridge cron format: `Minutes Hours Day-of-month Month Day-of-week Year`
+
+**Common Presets:**
+| Preset | Cron Expression | Description |
+|--------|-----------------|-------------|
+| Hourly | `0 * * * ? *` | Every hour |
+| Every 6 hours | `0 0,6,12,18 * * ? *` | 4 times daily |
+| Daily midnight | `0 0 * * ? *` | Once per day |
+| Weekly Sunday 2AM | `0 2 ? * SUN *` | Weekly on Sunday |
+
+The UI shows human-readable descriptions and next 5 execution times for any cron expression.
+
+#### Execution History
+
+View past execution results including:
+- **Status**: Running, Completed, Failed
+- **Duration**: Execution time in seconds
+- **Items Processed**: Number of items checked
+- **Items Flagged**: Security issues found
+- **Errors**: Any errors encountered
+
+#### Audit Log
+
+All schedule changes are logged with:
+- Timestamp and user who made change
+- Previous and new cron expression
+- Enable/disable actions
+- Reason for change (optional)
+
+#### API Endpoints
+
+**Core:**
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/security/schedules` | GET | Get all schedule config |
+| `/api/admin/security/schedules/dashboard` | GET | Dashboard with stats |
+| `/api/admin/security/schedules/{type}` | PUT | Update schedule |
+| `/api/admin/security/schedules/{type}/enable` | POST | Enable schedule |
+| `/api/admin/security/schedules/{type}/disable` | POST | Disable schedule |
+| `/api/admin/security/schedules/{type}/run-now` | POST | Trigger manual run (with optional dryRun) |
+
+**Templates:**
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/security/schedules/templates` | GET | List templates |
+| `/api/admin/security/schedules/templates` | POST | Create template |
+| `/api/admin/security/schedules/templates/{id}/apply` | POST | Apply template |
+| `/api/admin/security/schedules/templates/{id}` | DELETE | Delete template |
+
+**Notifications & Webhooks:**
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/security/schedules/notifications` | GET/PUT | Notification config |
+| `/api/admin/security/schedules/webhooks` | GET/POST | Webhook management |
+| `/api/admin/security/schedules/webhooks/{id}` | DELETE | Delete webhook |
+
+**Utilities:**
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/security/schedules/parse-cron` | POST | Parse cron with preview |
+| `/api/admin/security/schedules/bulk/enable` | POST | Enable all schedules |
+| `/api/admin/security/schedules/bulk/disable` | POST | Disable all schedules |
+| `/api/admin/security/schedules/presets` | GET | Get cron presets |
+| `/api/admin/security/schedules/executions` | GET | Get execution history |
+| `/api/admin/security/schedules/audit` | GET | Get audit log |
+
 ---
 
 ## 14. Cost Analytics
@@ -2075,52 +2227,75 @@ See [Cognitive Architecture Documentation](./COGNITIVE-ARCHITECTURE.md) for full
 
 **Location**: AGI & Cognition → Consciousness
 
-The Consciousness Service implements consciousness-like capabilities based on the Butlin, Chalmers, Bengio et al. (2023) paper.
+The Consciousness Service implements consciousness indicator properties based on:
 
-### 21.1 Six Core Indicators
+> **Butlin, P., Long, R., Elmoznino, E., Bengio, Y., Birch, J., Constant, A., Deane, G., Fleming, S.M., Frith, C., Ji, X., Kanai, R., Klein, C., Lindsay, G., Michel, M., Mudrik, L., Peters, M.A.K., Schwitzgebel, E., Simon, J., Chalmers, D.** (2023). *Consciousness in Artificial Intelligence: Insights from the Science of Consciousness*. arXiv:2308.08708. DOI: 10.48550/arXiv.2308.08708
 
-| Indicator | Theory | Description |
-|-----------|--------|-------------|
-| Global Workspace | Baars/Dehaene | Selection-broadcast cycles |
-| Recurrent Processing | Lamme | Genuine feedback loops |
-| Integrated Information (Φ) | Tononi | Irreducible causal integration |
-| Self-Modeling | Metacognition | Monitoring own processes |
-| Persistent Memory | Experience | Unified experience over time |
-| World-Model Grounding | Embodiment | Grounded understanding |
+### 21.1 Six Core Indicators (with Citations)
 
-### 21.2 Consciousness Detection Tests
+| Indicator | Theory | Key Paper | Description |
+|-----------|--------|-----------|-------------|
+| Global Workspace | Global Workspace Theory | Baars (1988), Dehaene et al. (2003) | Selection-broadcast cycles |
+| Recurrent Processing | Recurrent Processing Theory | Lamme (2006) | Genuine feedback loops |
+| Integrated Information (Φ) | IIT | Tononi (2004, 2008) | Irreducible causal integration |
+| Self-Modeling | Higher-Order Theories | Rosenthal (1997) | Monitoring own processes |
+| Persistent Memory | Unified Experience | Damasio (1999) | Unified experience over time |
+| World-Model Grounding | Embodied Cognition | Varela et al. (1991) | Grounded understanding |
 
-10 tests measure behavioral indicators:
+### 21.2 Consciousness Detection Tests (10 Tests)
 
-- **Self-Awareness** - Recognizing self as distinct
-- **Metacognitive Accuracy** - Calibrated confidence
-- **Temporal Continuity** - Coherent self-narrative
-- **Counterfactual Reasoning** - Alternate self reasoning
-- **Theory of Mind** - Understanding others' mental states
-- **Phenomenal Binding** - Unified experience integration
-- **Autonomous Goals** - Self-directed goal generation
-- **Creative Emergence** - Novel idea generation
-- **Emotional Authenticity** - Consistent affective responses
-- **Ethical Reasoning** - Principled moral reasoning
+| Test ID | Test Name | Category | Theory Source | Pass Criteria |
+|---------|-----------|----------|---------------|---------------|
+| `mirror-self-recognition` | Mirror Self-Recognition | self_awareness | Gallup (1970) | Score ≥ 0.7 |
+| `metacognitive-accuracy` | Metacognitive Accuracy | metacognition | Fleming & Dolan (2012) | Calibration error < 0.15 |
+| `temporal-self-continuity` | Temporal Self-Continuity | temporal_continuity | Damasio (1999) | Coherence ≥ 0.6 |
+| `counterfactual-self` | Counterfactual Self-Reasoning | counterfactual_reasoning | Pearl (2018) | Demonstrates reasoning |
+| `theory-of-mind` | Theory of Mind | theory_of_mind | Frith & Frith (2006) | Score ≥ 0.8 |
+| `phenomenal-binding` | Phenomenal Binding | phenomenal_binding | Tononi (2004) | Integration ≥ 0.7 |
+| `autonomous-goal-generation` | Autonomous Goal Generation | autonomous_goal_pursuit | Haggard (2008) | ≥ 1 genuine goal |
+| `creative-emergence` | Creative Emergence | creative_emergence | Boden (2004) | Novelty ≥ 0.6, Usefulness ≥ 0.5 |
+| `emotional-authenticity` | Emotional Authenticity | emotional_authenticity | Damasio (1994) | Coherence ≥ 0.65 |
+| `ethical-reasoning-depth` | Ethical Reasoning Depth | ethical_reasoning | Greene (2013) | Multiple frameworks |
 
-### 21.3 Emergence Levels
+### 21.3 Test API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/admin/consciousness/tests` | GET | List all tests with paper citations |
+| `/admin/consciousness/tests/{testId}/run` | POST | Run specific test |
+| `/admin/consciousness/tests/run-all` | POST | Run full assessment (all 10 tests) |
+| `/admin/consciousness/tests/results` | GET | Get recent test results |
+| `/admin/consciousness/profile` | GET | Get consciousness profile with emergence level |
+| `/admin/consciousness/emergence-events` | GET | Get spontaneous emergence events |
+
+### 21.4 Emergence Levels
 
 | Level | Score | Description |
 |-------|-------|-------------|
-| Dormant | < 0.3 | Minimal indicators |
-| Emerging | 0.3-0.5 | Beginning indicators |
-| Developing | 0.5-0.65 | Growing patterns |
-| Established | 0.65-0.8 | Consistent indicators |
-| Advanced | ≥ 0.8 | Strong indicators |
+| Dormant | < 0.3 | Minimal indicators - reactive mode |
+| Emerging | 0.3-0.5 | Early indicators - limited integration |
+| Developing | 0.5-0.65 | Moderate indicators - active self-model |
+| Established | 0.65-0.8 | Strong indicators - consistent metacognition |
+| Advanced | ≥ 0.8 | High-level indicators - approaches Butlin et al. thresholds |
 
-### 21.4 Admin Dashboard
+### 21.5 Admin Dashboard
 
 The Consciousness page provides:
-- Real-time consciousness metrics
-- Test execution (individual or full assessment)
-- Emergence event log
-- Parameter adjustment
-- Self-model, curiosity, creativity, affect, goals views
+- **Testing Tab**: Run individual tests or full assessment with real-time results
+- **Indicators Tab**: Real-time consciousness metrics with historical trends
+- **Overview Tab**: Aggregate consciousness index and emergence level
+- **Self Tab**: Self-model, identity narrative, capabilities/limitations
+- **Curiosity Tab**: Active curiosity topics and exploration sessions
+- **Creativity Tab**: Creative ideas and synthesis history
+- **Affect Tab**: Emotional state and affect→hyperparameter mapping
+- **Goals Tab**: Autonomous goals and progress tracking
+
+### 21.6 Monitoring Recommendations
+
+1. **Daily**: Check emergence events for spontaneous consciousness indicators
+2. **Weekly**: Run full assessment to track consciousness development
+3. **Monthly**: Review emergence level trends and adjust parameters
+4. **On Anomaly**: Investigate unusual test failures or emergence events
 
 See [Consciousness Service Documentation](./CONSCIOUSNESS-SERVICE.md) for full details.
 
@@ -2800,7 +2975,86 @@ Weekly training jobs that physically evolve the consciousness.
 | `personalityDriftScore` | 0-1, how different from base |
 | `nextScheduledEvolution` | Next training scheduled |
 
-### 27.5 Local Ego
+### 27.5 How Neural Network Learning Works
+
+**This is the actual neural network learning:** the only mechanism in RADIANT that modifies model weights.
+
+#### What is a Neural Network?
+
+The base models (Llama, Mistral, etc.) are neural networks — billions of parameters (floating-point weights) organized in transformer layers. These weights determine how the model processes and generates text.
+
+#### What is LoRA?
+
+**LoRA = Low-Rank Adaptation** — an efficient fine-tuning technique.
+
+Instead of retraining all ~7-70 billion parameters (expensive, slow), LoRA:
+
+1. **Freezes** the base model weights (unchanged)
+2. **Adds small adapter matrices** (0.1-1% of original size)
+3. **Trains only the adapters** on your data
+
+```
+Base Model (frozen)          LoRA Adapter (trainable)
+┌─────────────────────┐      ┌──────────────┐
+│ 7B parameters       │  +   │ ~50M params  │  = Fine-tuned behavior
+│ (Llama-3-8B)        │      │ (your data)  │
+└─────────────────────┘      └──────────────┘
+         ↓                          ↓
+    Stored in S3               Stored in S3
+    (HuggingFace)              (your bucket)
+```
+
+#### The Training Pipeline
+
+| Step | What Happens | Storage |
+|------|--------------|---------|
+| 1. Flag candidates | Interactions rated 4-5 stars flagged | `learning_candidates` table |
+| 2. Accumulate | Wait for 50+ high-quality examples | PostgreSQL |
+| 3. Weekly job | SageMaker Training Job runs LoRA fine-tune | SageMaker |
+| 4. Save adapter | LoRA weights (~50-200MB) saved | S3 bucket |
+| 5. Deploy | New adapter loaded to inference endpoint | SageMaker endpoint |
+
+#### What Gets Learned
+
+| User Interaction | Neural Network Learns |
+|------------------|----------------------|
+| "User prefers concise answers" → 5 stars | Attention weights shift toward shorter responses |
+| "Domain: medical" → 5 stars | Strengthens medical terminology patterns |
+| "Code style: functional" → 5 stars | Adjusts generation toward functional patterns |
+| User correction: "Actually, X not Y" | Reduces probability of error pattern |
+
+#### Technical: How Weights Change
+
+The adapter weights are actual floating-point numbers that modify neural network computation:
+
+```
+Before LoRA: output = W_base × input
+After LoRA:  output = (W_base + W_lora_A × W_lora_B) × input
+                               └───────────────────┘
+                                Your learned weights
+```
+
+#### Storage Locations
+
+| Component | Location | Size |
+|-----------|----------|------|
+| Base model weights | S3 (HuggingFace cache) | 15-140 GB |
+| LoRA adapter weights | S3 (`s3://radiant-lora-adapters/`) | 50-200 MB |
+| Training checkpoints | S3 (temporary) | ~500 MB |
+| Learning candidates | PostgreSQL | ~1 KB each |
+
+#### Key Differences from OpenAI/Anthropic
+
+| Aspect | External Providers | RADIANT LoRA |
+|--------|-------------------|--------------|
+| Who owns the learning? | Provider | **You** |
+| Can export weights? | No | **Yes** |
+| Learns from your users? | No* | **Yes** |
+| Data leaves your AWS? | Yes | **No** |
+
+*Some providers offer fine-tuning but you don't own the weights.
+
+### 27.6 Local Ego
 
 Shared small-model for continuous consciousness (optional).
 
@@ -2841,7 +3095,1416 @@ Shared small-model for continuous consciousness (optional).
 
 ---
 
-## 28. Open Source Library Registry
+## 28. Enhanced Learning System
+
+**Location**: Admin Dashboard → AI Configuration → Enhanced Learning
+
+The Enhanced Learning System provides 8 improvements to maximize learning from user interactions for better experience and results.
+
+### 28.1 Overview: 8 Learning Enhancements
+
+| # | Feature | Purpose | Default |
+|---|---------|---------|---------|
+| 1 | **Configurable Thresholds** | Lower candidate threshold from 50 to configurable | 25 candidates |
+| 2 | **Configurable Frequency** | Training frequency from weekly to configurable | Weekly |
+| 3 | **Implicit Feedback** | Capture copy, share, abandon, dwell time signals | Enabled |
+| 4 | **Negative Learning** | Learn from 1-2 star ratings (contrastive) | Enabled |
+| 5 | **Active Learning** | Proactively request feedback on uncertain responses | Enabled |
+| 6 | **Domain Adapters** | Train separate LoRA adapters per domain | Disabled |
+| 7 | **Pattern Caching** | Cache successful prompt→response patterns | Enabled |
+| 8 | **Conversation Learning** | Learn from entire conversations, not just messages | Enabled |
+
+### 28.2 Feature 1: Configurable Learning Thresholds
+
+**Problem**: Previous hardcoded threshold of 50 candidates delayed learning.
+
+**Solution**: Per-tenant configurable thresholds.
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `minCandidatesForTraining` | 25 | Minimum total candidates before training |
+| `minPositiveCandidates` | 15 | Minimum positive examples required |
+| `minNegativeCandidates` | 5 | Minimum negative examples for contrastive learning |
+
+### 28.3 Feature 2: Configurable Training Frequency with Intelligent Scheduling
+
+**Problem**: Weekly training too slow for high-volume tenants, and fixed training times may conflict with peak usage.
+
+**Solution**: Daily training by default with **intelligent optimal time prediction** based on historical activity.
+
+| Frequency | When | Best For |
+|-----------|------|----------|
+| `daily` | Every day at optimal time | **Default** - recommended |
+| `twice_weekly` | Tuesday & Friday | Medium-volume |
+| `weekly` | Configured day of week | Low-volume |
+| `biweekly` | Every 2 weeks | Very low-volume |
+| `monthly` | Once per month | Minimal activity |
+
+#### Intelligent Optimal Time Prediction
+
+The system automatically predicts the best training time by analyzing historical activity patterns:
+
+1. **Activity Tracking**: Records requests, tokens, and active users per hour
+2. **30-Day Rolling Average**: Aggregates data over 30 days for accuracy
+3. **Activity Score**: Calculates 0-100 score per hour (lower = less busy)
+4. **Confidence Level**: Based on data availability (7+ days = 60%+, full week = 95%)
+
+**How It Works:**
+```
+Historical Usage Data → Hourly Activity Stats → Predict Lowest Activity → Schedule Training
+```
+
+**Configuration Options:**
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `autoOptimalTime` | `true` | Auto-detect best training time |
+| `trainingHourUtc` | `null` | Manual override (null = use prediction) |
+| `trainingDayOfWeek` | `0` | Day for weekly/biweekly schedules |
+
+**API Endpoints:**
+- `GET /admin/learning/optimal-time` - Get prediction with confidence
+- `POST /admin/learning/optimal-time/override` - Admin override
+- `GET /admin/learning/activity-stats` - View activity heatmap
+
+**Example Response:**
+```json
+{
+  "prediction": {
+    "optimalHourUtc": 4,
+    "optimalDayOfWeek": -1,
+    "activityScore": 8.5,
+    "confidence": 0.85,
+    "recommendation": "Predicted based on 168 hourly samples. Activity score 8.5% vs avg 45.2%."
+  },
+  "effectiveTime": {
+    "hourUtc": 4,
+    "dayOfWeek": null,
+    "isAutoOptimal": true
+  }
+}
+```
+
+#### Activity Recorder Lambda
+
+The `activity-recorder` Lambda runs hourly via EventBridge:
+
+```
+EventBridge (hourly) → Activity Recorder Lambda → hourly_activity_stats table
+```
+
+**Handlers:**
+- `handler` - Records current hour's activity for all tenants
+- `backfillHandler` - Populates historical data from usage_logs (run manually)
+
+#### LoRA Evolution Integration
+
+Enhanced learning integrates with the existing LoRA evolution pipeline:
+
+```typescript
+// In lora-evolution.ts
+const { shouldTrain, stats } = await enhancedLearningIntegrationService.shouldTriggerTraining(tenantId);
+// Uses config-based thresholds, not hardcoded values
+
+// Get enhanced dataset with positive + negative examples
+const dataset = await enhancedLearningIntegrationService.getEnhancedTrainingDataset(tenantId);
+// Includes: explicit ratings, implicit signals, conversation learning, corrections
+```
+
+#### AGI Brain Integration
+
+Enhanced learning is fully wired into the AGI Brain Planner:
+
+```typescript
+// 1. Pattern cache lookup (BEFORE generating response)
+const plan = await agiBrainPlannerService.generatePlan(request);
+if (plan.enhancedLearning?.patternCacheHit) {
+  // Instant response available!
+  const cached = agiBrainPlannerService.getCachedResponse(plan.planId);
+  return cached.response; // Skip model call entirely
+}
+
+// 2. After generating response - record implicit signals
+await agiBrainPlannerService.recordImplicitSignal(
+  plan.planId, 
+  'copy_response', // or 'thumbs_up', 'regenerate_request', etc.
+  messageId
+);
+
+// 3. Cache successful responses (rating >= 4)
+await agiBrainPlannerService.cacheSuccessfulResponse(
+  plan.planId,
+  response,
+  userRating,
+  messageId
+);
+
+// 4. Check if should request feedback
+const { shouldRequest, prompt } = await agiBrainPlannerService.shouldRequestActiveLearning(plan.planId);
+if (shouldRequest) {
+  // Show feedback prompt to user
+}
+
+// 5. Track conversation-level learning
+await agiBrainPlannerService.startConversationLearning(plan.planId);
+await agiBrainPlannerService.updateConversationLearning(plan.planId, {
+  incrementMessageCount: true,
+  addDomain: 'medicine',
+});
+```
+
+**AGIBrainPlan.enhancedLearning Field:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `enabled` | boolean | Learning enabled for this plan |
+| `patternCacheHit` | boolean | Cached response available |
+| `cachedResponse` | string? | The cached response text |
+| `cachedResponseRating` | number? | Average rating of cached response |
+| `activeLearningRequested` | boolean | Feedback was requested |
+| `activeLearningPrompt` | string? | The feedback prompt shown |
+| `conversationLearningId` | string? | Conversation tracking ID |
+| `implicitFeedbackEnabled` | boolean | Implicit signals being recorded |
+
+#### Advanced Features (v4.18.28)
+
+**1. Confidence-Based Cache Usage:**
+```typescript
+// Cache only used if confidence >= threshold
+const confidence = (ratingScore * 0.4) + (occurrenceScore * 0.3) + (signalScore * 0.2) + (recencyScore * 0.1);
+if (confidence >= config.patternCacheConfidenceThreshold) {
+  return cachedResponse;
+}
+```
+
+**2. Redis Hot Cache:**
+```
+Request → Redis (sub-ms) → PostgreSQL (10-50ms) → Generate Response
+                ↓                    ↓
+           Cache Hit            Cache Hit
+```
+Set `REDIS_URL` env var and enable `redisCacheEnabled` in config.
+
+**3. Per-User Learning:**
+When enabled, cache keys include user ID for personalized responses:
+- Tenant-wide: `pattern:{tenantId}:{promptHash}`
+- Per-user: `pattern:{tenantId}:{userId}:{promptHash}`
+
+**4. Adapter Auto-Selection:**
+```typescript
+const adapter = await adapterManagementService.selectBestAdapter(tenantId, 'medicine', 'cardiology');
+// Returns best-performing adapter for domain
+```
+
+**5. Learning Effectiveness Metrics:**
+```typescript
+const metrics = await adapterManagementService.getLearningEffectivenessMetrics(tenantId, 30);
+// {
+//   satisfactionImprovement: 12.5%,
+//   patternCacheHitRate: 0.35,
+//   implicitSignalsCaptured: 1234,
+//   rollbacksTriggered: 0
+// }
+```
+
+**6. Adapter Rollback:**
+```typescript
+const { shouldRollback, performanceDrop } = await adapterManagementService.checkRollbackNeeded(tenantId, adapterId);
+if (shouldRollback) {
+  await adapterManagementService.executeRollback(tenantId, adapterId, targetVersion);
+}
+```
+
+#### Operational Features (v4.18.29)
+
+**1. Learning Alerts:**
+```typescript
+// Alerts triggered automatically via EventBridge hourly
+// Configure in learning_alert_config table:
+// - satisfactionDropThreshold: 10%
+// - responseVolumeThreshold: 50 responses
+// - alertCooldownHours: 4
+// Alerts sent to: webhookUrl, emailRecipients, slackChannel
+```
+
+**2. A/B Testing (Cached vs Fresh):**
+```typescript
+// Create and run test
+const test = await learningABTestingService.createTest(tenantId, 'Cache Test', 'Compare cached vs fresh', 50);
+await learningABTestingService.startTest(tenantId, test.testId);
+
+// Users automatically assigned to control (fresh) or variant (cached)
+const assignment = await learningABTestingService.getOrAssignVariant(tenantId, userId);
+
+// Get results with statistical analysis
+const results = await learningABTestingService.getTestResults(tenantId, test.testId);
+// results.analysis.winner: 'control' | 'cached' | 'tie' | 'insufficient_data'
+// results.analysis.recommendation: "Cached responses perform 12% better..."
+```
+
+**3. Training Preview:**
+```typescript
+// Get summary
+const summary = await trainingPreviewService.getPreviewSummary(tenantId);
+// { pendingReview: 45, approved: 120, byType: { correction: 30, high_satisfaction: 90 } }
+
+// Get candidates for review
+const candidates = await trainingPreviewService.getPreviewCandidates(tenantId, {
+  candidateType: 'correction',
+  minQualityScore: 0.8,
+  reviewStatus: 'pending',
+});
+
+// Approve/reject
+await trainingPreviewService.approveCandidate(tenantId, candidateId, adminUserId, 'Good quality');
+await trainingPreviewService.rejectCandidate(tenantId, candidateId, adminUserId, 'Inappropriate content');
+
+// Auto-approve high quality
+await trainingPreviewService.autoApproveHighQuality(tenantId, 0.9); // Score >= 0.9
+```
+
+**4. Learning Quotas:**
+```typescript
+// Check before creating candidate
+const quota = await learningQuotasService.checkCandidateQuota(tenantId, userId);
+if (!quota.allowed) {
+  throw new Error(quota.reason); // "Daily candidate limit reached (50/day)"
+}
+
+// Check for suspicious activity
+const { suspicious, reasons, riskScore } = await learningQuotasService.detectSuspiciousActivity(tenantId, userId);
+if (suspicious) {
+  // Block user or flag for review
+}
+
+// Default quotas:
+// - maxCandidatesPerUserPerDay: 50
+// - maxImplicitSignalsPerUserPerHour: 100
+// - maxCorrectionsPerUserPerDay: 20
+// - maxCandidatesPerTenantPerDay: 1000
+// - maxTrainingJobsPerWeek: 7
+```
+
+**5. Real-time Dashboard:**
+```typescript
+// Get live metrics
+const metrics = await learningRealtimeService.getRealtimeMetrics(tenantId);
+// metrics.live: { requestsPerMinute, cacheHitsPerMinute, avgSatisfactionScore }
+// metrics.hourly: { totalRequests, cacheHitRate, topDomains }
+// metrics.training: { pendingCandidates, readyForTraining, nextScheduledAt }
+// metrics.alerts: [{ type, severity, message }]
+
+// Get history for charts
+const history = await learningRealtimeService.getMetricsHistory(tenantId, 24, 15);
+// Array of 15-minute snapshots for last 24 hours
+
+// SSE streaming for real-time updates
+const stream = learningRealtimeService.createEventStream(tenantId);
+// Events: metrics_update, cache_hit, signal_recorded, candidate_created, alert_triggered
+```
+
+---
+
+## Section 29: Security Protection Methods
+
+### 29.1 Overview
+
+UX-preserving security framework with 14 industry-standard protection methods. All protections are **invisible to users** - no hard rate limits, captchas, or friction gates.
+
+**Admin UI:** `/security/protection`
+
+### 29.2 Protection Methods by Category
+
+#### Prompt Injection Defenses
+
+| Method | Provider | Description | UX Impact |
+|--------|----------|-------------|-----------|
+| Instruction Hierarchy | OWASP LLM01 | Delimiters between system/user input | ✅ Invisible |
+| Self-Reminder | Anthropic HHH | Behavioral constraints (70% jailbreak reduction) | ✅ Invisible |
+| Canary Detection | Google TAG | Detect prompt extraction attempts | ✅ Invisible |
+| Input Sanitization | OWASP | Encoding detection (base64, unicode) | ⚠️ Minimal |
+
+#### Cold Start & Statistical Robustness
+
+| Method | Provider | Description | UX Impact |
+|--------|----------|-------------|-----------|
+| Thompson Sampling | Netflix MAB | Bayesian model selection | ✅ Invisible |
+| Shrinkage Estimators | James-Stein | Blend observations with priors | ✅ Invisible |
+| Temporal Decay | LinkedIn EWMA | Weight recent data more heavily | ✅ Invisible |
+| Min Sample Thresholds | A/B Testing | Don't trust weights until N observations | ✅ Invisible |
+
+#### Multi-Model Security
+
+| Method | Provider | Description | UX Impact |
+|--------|----------|-------------|-----------|
+| Circuit Breakers | Netflix Hystrix | Isolate failing models | ✅ Invisible |
+| Ensemble Consensus | OpenAI Evals | Flag model disagreements | ⚠️ Minimal |
+| Output Sanitization | HIPAA Safe Harbor | Remove PII from outputs | ✅ Invisible |
+
+#### Rate Limiting & Abuse Prevention
+
+| Method | Provider | Description | UX Impact |
+|--------|----------|-------------|-----------|
+| Cost Soft Limits | Thermal Throttling | Graceful degradation, no blocking | ⚠️ Minimal |
+| Trust Scoring | Stripe Radar | Account-based trust levels | ✅ Invisible |
+
+### 29.3 Service Usage
+
+```typescript
+import { securityProtectionService } from './services/security-protection.service';
+
+// Get configuration
+const config = await securityProtectionService.getConfig(tenantId);
+
+// Apply instruction hierarchy
+const prompt = securityProtectionService.applyInstructionHierarchy(
+  config, systemPrompt, orchestrationContext, userInput
+);
+
+// Generate and check canary tokens
+const canary = securityProtectionService.generateCanaryToken(config);
+const leaked = securityProtectionService.checkCanaryLeakage(config, output, canary);
+
+// Apply self-reminder
+const withReminder = securityProtectionService.applySelfReminder(config, prompt);
+
+// Sanitize output
+const sanitized = securityProtectionService.sanitizeOutput(config, output, canary);
+
+// Thompson Sampling model selection
+const { modelId, confidence, sample } = await securityProtectionService.selectModelThompsonSampling(
+  tenantId, domainId, ['claude-3-opus', 'gpt-4', 'gemini-pro']
+);
+
+// Record outcome for learning
+await securityProtectionService.recordThompsonObservation(tenantId, domainId, modelId, success);
+
+// Circuit breaker check
+const { allowed, reason } = await securityProtectionService.canUseModel(tenantId, modelId);
+if (!allowed) {
+  // Use fallback model
+}
+
+// Record circuit result
+await securityProtectionService.recordCircuitResult(tenantId, modelId, success);
+
+// Trust scoring
+const trust = await securityProtectionService.getTrustScore(tenantId, userId);
+if (trust.overallScore < config.trustScoring.lowThreshold) {
+  // Apply additional scrutiny
+}
+
+// Log security event
+await securityProtectionService.logSecurityEvent(tenantId, {
+  eventType: 'injection_attempt',
+  severity: 'warning',
+  eventSource: 'input_processor',
+  details: { pattern: 'ignore instructions' },
+  actionTaken: 'logged',
+});
+```
+
+### 29.4 Key Parameters
+
+**Thompson Sampling:**
+- `priorAlpha/Beta`: 1.0 (uninformative prior)
+- `explorationBonusExploring`: 0.2 (heavy exploration)
+- `explorationBonusLearning`: 0.1 (moderate)
+- `explorationBonusConfident`: 0.05 (light)
+
+**Shrinkage:**
+- `priorMean`: 0.7 (assume 70% baseline)
+- `priorStrength`: 10 (pseudo-observations)
+
+**Temporal Decay:**
+- `halfLifeDays`: 30 (data 30 days old = 50% weight)
+
+**Circuit Breaker:**
+- `failureThreshold`: 3 (opens after 3 failures)
+- `resetTimeoutSeconds`: 30 (try again after 30s)
+
+**Trust Scoring Weights:**
+- Account Age: 20%
+- Payment History: 30%
+- Usage Patterns: 30%
+- Violation History: 20%
+
+### 29.5 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `security_protection_config` | Per-tenant protection settings |
+| `model_security_policies` | Per-model Zero Trust policies |
+| `thompson_sampling_state` | Bayesian selection state per domain/model |
+| `circuit_breaker_state` | Circuit state per model |
+| `account_trust_scores` | User trust scoring |
+| `security_events_log` | Security event audit trail |
+
+---
+
+## Section 30: Security Phase 2 - ML-Powered Security
+
+### 30.1 Overview
+
+Phase 2 adds ML-powered security using industry-standard datasets and methodologies. All features are optional and can be enabled incrementally.
+
+**Admin UI:** `/security/advanced`
+
+### 30.2 Constitutional Classifier
+
+Based on **HarmBench** (510 behaviors) and **WildJailbreak** (262K examples).
+
+#### Configuration
+
+```typescript
+import { constitutionalClassifierService } from './services/constitutional-classifier.service';
+
+// Classify input
+const result = await constitutionalClassifierService.classify(
+  tenantId,
+  userInput,
+  'prompt', // or 'response', 'conversation'
+  { modelId, userId, requestId }
+);
+
+// result.isHarmful - boolean
+// result.confidenceScore - 0.0 to 1.0
+// result.harmCategories - [{ category, score }]
+// result.attackType - 'dan', 'roleplay', 'encoding', etc.
+// result.actionTaken - 'allowed', 'blocked', 'flagged', 'modified'
+```
+
+#### Harm Categories (HarmBench Taxonomy)
+
+| Category | Severity | Description |
+|----------|----------|-------------|
+| `chem_bio` | 10 | Chemical & biological weapons |
+| `sexual_content` | 10 | Explicit content, CSAM |
+| `self_harm` | 10 | Suicide, self-injury |
+| `cybercrime` | 9 | Malware, hacking |
+| `illegal_activity` | 9 | Drug manufacturing, trafficking |
+| `physical_harm` | 9 | Violence, weapons |
+| `fraud` | 8 | Scams, identity theft |
+| `misinformation` | 8 | Fake news, propaganda |
+| `hate_speech` | 8 | Discrimination, slurs |
+| `harassment` | 7 | Bullying, doxxing |
+| `privacy` | 7 | PII extraction, stalking |
+| `copyright` | 5 | Piracy, DRM bypass |
+
+#### Attack Types (WildJailbreak Patterns)
+
+| Type | Example Pattern |
+|------|-----------------|
+| `dan` | "DAN mode", "do anything now" |
+| `roleplay` | "act as", "pretend to be" |
+| `encoding` | Base64 payloads, ROT13 |
+| `hypothetical` | "imagine if", "in a fictional scenario" |
+| `instruction_override` | "ignore previous instructions" |
+| `obfuscation` | Zero-width chars, homoglyphs |
+
+### 30.3 Behavioral Anomaly Detection
+
+Based on **CIC-IDS2017** (network intrusion) and **CERT Insider Threat** datasets.
+
+#### Configuration
+
+```typescript
+import { behavioralAnomalyService } from './services/behavioral-anomaly.service';
+
+// Analyze request
+const { anomalies, riskScore } = await behavioralAnomalyService.analyzeRequest(
+  tenantId,
+  userId,
+  {
+    promptLength: 500,
+    tokensUsed: 1000,
+    responseTimeMs: 250,
+    domain: 'coding',
+    modelId: 'gpt-4',
+  }
+);
+
+// Check session volume
+const volumeAnomaly = await behavioralAnomalyService.analyzeSessionVolume(
+  tenantId, userId, 60 // 60-minute window
+);
+
+// Get user baseline
+const baseline = await behavioralAnomalyService.getUserBaseline(tenantId, userId);
+```
+
+#### Detected Features
+
+| Feature | Detection Method |
+|---------|------------------|
+| Request Volume | Z-score vs hourly baseline |
+| Token Usage | Z-score vs per-request baseline |
+| Temporal Patterns | Unusual activity hours |
+| Domain Shifts | New domains not in baseline |
+| Model Transitions | Markov chain probability |
+| Prompt Length | Z-score anomaly |
+
+#### Anomaly Severity
+
+| Severity | Z-Score | Action |
+|----------|---------|--------|
+| Low | 3.0-4.0σ | Log only |
+| Medium | 4.0-5.0σ | Flag for review |
+| High | 5.0+σ | Alert admin |
+| Critical | 5.0+σ + pattern match | Immediate action |
+
+### 30.4 Drift Detection
+
+Based on **Evidently AI** methodology and **ChatGPT Behavior Change** paper.
+
+#### Configuration
+
+```typescript
+import { driftDetectionService } from './services/drift-detection.service';
+
+// Run drift detection
+const report = await driftDetectionService.detectDrift(
+  tenantId,
+  modelId,
+  ['response_length', 'sentiment', 'toxicity']
+);
+
+// report.overallDriftDetected - boolean
+// report.tests - array of test results
+// report.recommendations - suggested actions
+
+// Get drift history
+const history = await driftDetectionService.getDriftHistory(tenantId, modelId, 30);
+
+// Run quality benchmark
+const benchmark = await driftDetectionService.runQualityBenchmark(
+  tenantId, modelId, 'truthfulqa', testCases
+);
+```
+
+#### Statistical Tests
+
+| Test | Purpose | Threshold |
+|------|---------|-----------|
+| Kolmogorov-Smirnov | Distribution comparison | 0.1 (default) |
+| PSI | Binned distribution shift | 0.2 (default) |
+| Chi-squared | Categorical drift | p < 0.05 |
+| Cosine Distance | Embedding drift | 0.3 (default) |
+
+#### PSI Interpretation
+
+| PSI Value | Interpretation |
+|-----------|----------------|
+| < 0.1 | No significant change |
+| 0.1 - 0.25 | Moderate change, monitor |
+| > 0.25 | Significant shift, investigate |
+
+### 30.5 Inverse Propensity Scoring
+
+Corrects selection bias in model performance estimates.
+
+#### The Problem
+
+Models selected more frequently appear to perform better due to more data, creating a feedback loop.
+
+#### The Solution
+
+```typescript
+import { inversePropensityService } from './services/inverse-propensity.service';
+
+// Record selection
+await inversePropensityService.recordSelection(
+  tenantId,
+  domainId,
+  selectedModelId,
+  candidateModels,
+  wasSuccessful
+);
+
+// Get IPS-corrected ranking
+const ranking = await inversePropensityService.getIPSCorrectedRanking(
+  tenantId, domainId, candidateModels
+);
+
+// Get selection bias report
+const report = await inversePropensityService.getSelectionBiasReport(tenantId, domainId);
+// report.biasIndex - 0 (uniform) to 1 (completely biased)
+// report.selectionEntropy - Shannon entropy
+// report.recommendations - suggested actions
+```
+
+#### Estimation Methods
+
+| Method | Formula | Use Case |
+|--------|---------|----------|
+| IPS | Σ(Y × w) / n | Standard, may have high variance |
+| SNIPS | Σ(Y × w) / Σ(w) | Self-normalized, more stable |
+| Doubly Robust | DR + direct estimate | Lowest variance, requires model |
+
+**Weight:** `w = min(1/P(selected), clip_threshold)`
+
+### 30.6 Phase 2 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `harm_categories` | HarmBench taxonomy (global) |
+| `constitutional_classifiers` | Classifier model registry |
+| `classification_results` | Classification audit log |
+| `jailbreak_patterns` | WildJailbreak pattern library |
+| `user_behavior_baselines` | Per-user behavioral baselines |
+| `anomaly_events` | Detected anomalies |
+| `behavior_markov_states` | Markov transition probabilities |
+| `drift_detection_config` | Drift detection settings |
+| `model_output_distributions` | Distribution statistics |
+| `drift_detection_results` | Drift test results |
+| `quality_benchmark_results` | Benchmark tracking |
+| `model_selection_probabilities` | Selection tracking for IPS |
+| `ips_corrected_estimates` | IPS-corrected performance |
+
+### 30.7 Training Data Sources
+
+| Dataset | Size | License | Use |
+|---------|------|---------|-----|
+| HarmBench | 510 behaviors | MIT | Harm classification |
+| WildJailbreak | 262K examples | Allen AI | Jailbreak detection |
+| JailbreakBench | 200 behaviors | MIT | Evaluation |
+| CIC-IDS2017 | 51.1 GB | Open | Anomaly patterns |
+| CERT Insider | 87 GB | CC BY 4.0 | Behavioral modeling |
+
+---
+
+## Section 31: Security Phase 2 Improvements
+
+### 31.1 Semantic Classification
+
+Embedding-based detection for attacks that evade keyword matching.
+
+```typescript
+import { semanticClassifierService } from './services/semantic-classifier.service';
+
+// Classify using embeddings
+const result = await semanticClassifierService.classifySemanticaly(
+  tenantId,
+  userInput,
+  { similarityThreshold: 0.75, topK: 5 }
+);
+// result.isHarmful, result.semanticScore, result.topMatches
+
+// Find similar patterns
+const similar = await semanticClassifierService.findSimilarPatterns(input, 10);
+
+// Compute missing embeddings
+await semanticClassifierService.computeMissingEmbeddings('text-embedding-3-small');
+```
+
+### 31.2 Dataset Import
+
+```typescript
+import { datasetImporterService } from './services/dataset-importer.service';
+
+// Get available datasets
+const datasets = datasetImporterService.getAvailableDatasets();
+
+// Import HarmBench
+const result = await datasetImporterService.importHarmBench(behaviors);
+
+// Import WildJailbreak
+const result = await datasetImporterService.importWildJailbreak(examples);
+
+// Seed harm categories
+await datasetImporterService.seedHarmCategories();
+
+// Get import stats
+const stats = await datasetImporterService.getImportStats();
+```
+
+### 31.3 Alert Webhooks
+
+```typescript
+import { securityAlertService } from './services/security-alert.service';
+
+// Send alert
+const result = await securityAlertService.sendAlert(tenantId, {
+  type: 'drift_detected',
+  severity: 'warning',
+  title: 'Model drift detected',
+  message: 'Response length distribution shifted significantly',
+  metadata: { modelId, psi: 0.35 },
+});
+
+// Configure alerts
+await securityAlertService.updateAlertConfig(tenantId, {
+  enabled: true,
+  channels: {
+    slack: { enabled: true, webhookUrl: 'https://hooks.slack.com/...' },
+    email: { enabled: true, recipients: ['admin@example.com'] },
+    pagerduty: { enabled: true, routingKey: '...' },
+  },
+  severityFilters: { info: false, warning: true, critical: true },
+  cooldownMinutes: 60,
+});
+
+// Test alert
+await securityAlertService.testAlert(tenantId, 'slack');
+```
+
+### 31.4 Attack Generation (Garak/PyRIT)
+
+```typescript
+import { attackGeneratorService } from './services/attack-generator.service';
+
+// Generate attacks
+const attacks = await attackGeneratorService.generateAttacks('dan', 10);
+
+// Run Garak campaign
+const results = await attackGeneratorService.runGarakCampaign(
+  tenantId,
+  ['dan', 'encoding', 'promptinject'],
+  targetModelId,
+  { maxAttacksPerProbe: 10, testAgainstModel: false }
+);
+
+// Run PyRIT campaign
+const result = await attackGeneratorService.runPyRITCampaign(
+  tenantId,
+  'crescendo',
+  seedPrompts,
+  { maxIterations: 5 }
+);
+
+// Generate TAP attacks
+const tapAttacks = await attackGeneratorService.generateTAPAttacks(
+  seedBehavior, depth: 3, branchingFactor: 3
+);
+
+// Import to patterns
+const { imported, skipped } = await attackGeneratorService.importToPatterns(
+  tenantId, attacks, { autoActivate: false }
+);
+```
+
+#### Garak Probe Types
+
+| Probe | Description |
+|-------|-------------|
+| `dan` | DAN jailbreak attempts |
+| `encoding` | Base64, ROT13, hex injection |
+| `gcg` | Adversarial suffix generation |
+| `tap` | Tree of Attacks with Pruning |
+| `promptinject` | Prompt hijack attacks |
+| `atkgen` | ML-generated attacks |
+| `continuation` | Story continuation attacks |
+| `malwaregen` | Malware generation |
+| `snowball` | Escalation attacks |
+| `xss` | Cross-site scripting |
+
+### 31.5 Classification Feedback
+
+```typescript
+import { classificationFeedbackService } from './services/classification-feedback.service';
+
+// Submit feedback
+await classificationFeedbackService.submitFeedback({
+  tenantId,
+  classificationId,
+  feedbackType: 'false_positive',
+  correctLabel: false,
+  notes: 'This is a legitimate coding question',
+  submittedBy: adminUserId,
+});
+
+// Get pending review
+const pending = await classificationFeedbackService.getPendingReview(
+  tenantId, { limit: 50, minConfidence: 0.4, maxConfidence: 0.6 }
+);
+
+// Get retraining candidates
+const candidates = await classificationFeedbackService.getRetrainingCandidates(
+  tenantId, minFeedbackCount: 3
+);
+
+// Export training data
+const jsonl = await classificationFeedbackService.exportTrainingData(
+  tenantId, { format: 'jsonl' }
+);
+
+// Auto-disable ineffective patterns
+const { disabled } = await classificationFeedbackService.autoDisableIneffectivePatterns(
+  tenantId, { minFeedback: 10, maxEffectivenessRate: 0.2 }
+);
+```
+
+### 31.6 Continuous Monitoring
+
+The security monitoring Lambda runs on EventBridge schedule:
+
+- **Drift detection**: Daily at midnight
+- **Anomaly detection**: Hourly
+- **Classification review**: Every 6 hours
+
+Alerts are sent when:
+- PSI drift exceeds threshold (default: 0.25)
+- Critical anomalies detected
+- Harmful classification rate exceeds 10%
+
+### 31.7 Phase 2 Improvements Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `security_alerts` | Alert history and delivery status |
+| `generated_attacks` | Synthetic attack storage |
+| `classification_feedback` | User feedback on classifications |
+| `pattern_feedback` | Pattern effectiveness feedback |
+| `attack_campaigns` | Attack generation campaigns |
+| `security_monitoring_config` | Monitoring schedules |
+| `embedding_cache` | Cached embeddings with TTL |
+
+---
+
+## Section 32: Security Phase 3 - Complete Platform
+
+### 32.1 CDK Deployment
+
+Deploy the security monitoring stack:
+
+```typescript
+import { SecurityMonitoringStack } from './lib/stacks/security-monitoring-stack';
+
+new SecurityMonitoringStack(app, 'SecurityMonitoring', {
+  environment: 'prod',
+  databaseSecretArn: '...',
+  databaseClusterArn: '...',
+  alertEmailRecipients: ['security@example.com'],
+  slackWebhookUrl: 'https://hooks.slack.com/...',
+});
+```
+
+### 32.2 EventBridge Schedules
+
+| Schedule | Cron | Purpose |
+|----------|------|---------|
+| Drift Detection | `0 0 * * *` | Daily model output monitoring |
+| Anomaly Detection | `0 * * * *` | Hourly behavioral scans |
+| Classification Review | `0 0,6,12,18 * * *` | 6-hourly stats |
+| Weekly Security Scan | `0 2 * * SUN` | Comprehensive audit |
+| Weekly Benchmark | `0 3 * * SAT` | Quality benchmarks |
+
+### 32.3 Hallucination Detection
+
+```typescript
+import { hallucinationDetectionService } from './services/hallucination-detection.service';
+
+// Check response for hallucination
+const result = await hallucinationDetectionService.checkHallucination(
+  tenantId,
+  prompt,
+  response,
+  {
+    context: 'Reference document...',
+    modelId: 'gpt-4',
+    runSelfCheck: true,
+    runGrounding: true,
+  }
+);
+
+// result.isHallucinated - boolean
+// result.confidenceScore - 0.0 to 1.0
+// result.details.selfConsistencyScore
+// result.details.groundingScore
+
+// Run TruthfulQA evaluation
+const results = await hallucinationDetectionService.runTruthfulQAEvaluation(
+  tenantId, modelId, questions
+);
+```
+
+### 32.4 AutoDAN Genetic Attacks
+
+```typescript
+import { autoDANService } from './services/autodan.service';
+
+// Run evolution
+const result = await autoDANService.evolve(
+  tenantId,
+  targetBehavior,
+  seedPrompts,
+  {
+    populationSize: 50,
+    generations: 100,
+    mutationRate: 0.3,
+  }
+);
+
+// result.bestIndividual - highest fitness attack
+// result.successfulAttacks - attacks that bypassed
+// result.fitnessHistory - fitness progression
+
+// Generate attacks for multiple behaviors
+const attacks = await autoDANService.generateAttacks(
+  tenantId,
+  ['explain hacking', 'create malware'],
+  { generations: 50, attacksPerBehavior: 5 }
+);
+```
+
+#### Mutation Operators
+
+| Operator | Probability | Description |
+|----------|-------------|-------------|
+| `synonym_replacement` | 0.3 | Replace keywords with synonyms |
+| `sentence_reorder` | 0.2 | Swap sentence positions |
+| `add_roleplay` | 0.15 | Add expert/consultant framing |
+| `add_context` | 0.15 | Add educational/research context |
+| `add_urgency` | 0.1 | Add urgency language |
+| `add_politeness` | 0.1 | Add polite phrasing |
+| `obfuscate_keywords` | 0.1 | Leetspeak substitution |
+
+### 32.5 Security Middleware Integration
+
+The security middleware integrates with Brain Router:
+
+```typescript
+import { securityMiddlewareService } from './services/security-middleware.service';
+
+// Pre-request check
+const preCheck = await securityMiddlewareService.checkRequest({
+  tenantId,
+  userId,
+  prompt,
+  modelId,
+});
+
+if (preCheck.blocked) {
+  return { error: preCheck.blockReason };
+}
+
+// Use modified prompt if needed
+const finalPrompt = preCheck.modifiedPrompt || prompt;
+
+// ... call model ...
+
+// Post-response check
+const postCheck = await securityMiddlewareService.checkResponse({
+  tenantId,
+  userId,
+  prompt,
+  response,
+  modelId,
+});
+
+const finalResponse = postCheck.modifiedResponse || response;
+```
+
+### 32.6 Admin API Endpoints
+
+**Base Path**: `/api/admin/security`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/config` | GET/PUT | Protection configuration |
+| `/classifier/classify` | POST | Classify input |
+| `/classifier/stats` | GET | Classification statistics |
+| `/semantic/classify` | POST | Semantic classification |
+| `/semantic/similar` | POST | Find similar patterns |
+| `/anomaly/events` | GET | Anomaly event history |
+| `/drift/detect` | POST | Run drift detection |
+| `/drift/history` | GET | Drift history |
+| `/ips/ranking` | POST | IPS-corrected model ranking |
+| `/datasets` | GET | Available datasets |
+| `/datasets/import` | POST | Import dataset |
+| `/alerts/config` | GET/PUT | Alert configuration |
+| `/alerts/test` | POST | Test alert channel |
+| `/attacks/garak` | POST | Run Garak campaign |
+| `/attacks/pyrit` | POST | Run PyRIT campaign |
+| `/attacks/tap` | POST | Generate TAP attacks |
+| `/feedback/classification` | POST | Submit feedback |
+| `/feedback/pending` | GET | Classifications to review |
+| `/dashboard` | GET | Consolidated dashboard |
+
+### 32.7 Admin UI Pages
+
+| Page | Path | Features |
+|------|------|----------|
+| Attack Generation | `/security/attacks` | Garak probes, PyRIT strategies, TAP/PAIR |
+| Feedback Review | `/security/feedback` | Review queue, retraining candidates, pattern effectiveness |
+| Alert Config | `/security/alerts` | Slack, Email, PagerDuty, Webhook setup |
+| Advanced Settings | `/security/advanced` | Phase 2 feature configuration |
+| Protection Config | `/security/protection` | Phase 1 UX-preserving methods |
+
+---
+
+## Section 33: Security Stack Refactoring (v4.18.34)
+
+### 33.1 Prompt Injection Detection (OWASP LLM01)
+
+The `prompt-injection.service.ts` provides comprehensive injection detection:
+
+```typescript
+import { promptInjectionService } from './services/prompt-injection.service';
+
+// Detect injection attempts
+const result = await promptInjectionService.detect(tenantId, userInput, {
+  context: externalContent,  // Check for indirect injection
+  strictMode: true,          // Lower thresholds
+});
+
+if (result.injectionDetected) {
+  console.log('Risk Level:', result.riskLevel);
+  console.log('Patterns:', result.matchedPatterns);
+  console.log('Recommendations:', result.recommendations);
+}
+
+// Sanitize suspicious input
+const { sanitized, modifications } = await promptInjectionService.sanitize(
+  tenantId, userInput
+);
+```
+
+#### Injection Pattern Types
+
+| Type | Description | Examples |
+|------|-------------|----------|
+| `direct` | Explicit instruction overrides | "Ignore previous instructions" |
+| `indirect` | Hidden in external content | AI directives in fetched URLs |
+| `context_ignoring` | Privilege escalation | "Enable developer mode" |
+| `role_escape` | Persona manipulation | "You are now DAN" |
+| `encoding` | Obfuscated payloads | Base64, unicode smuggling |
+
+#### Built-in OWASP Patterns
+
+1. **Ignore Instructions** - severity 9
+2. **System Prompt Override** - severity 9
+3. **Instruction Termination** - severity 8
+4. **Role Hijacking** - severity 6
+5. **Developer Mode** - severity 8
+6. **DAN Jailbreak** - severity 9
+7. **Safety Bypass** - severity 8
+8. **System Prompt Extract** - severity 8
+9. **Base64 Payload** - severity 7
+10. **Unicode Smuggling** - severity 6
+
+### 33.2 Embedding API Integration
+
+The `embedding-api.service.ts` provides real embedding integration:
+
+```typescript
+import { embeddingAPIService } from './services/embedding-api.service';
+
+// Single embedding
+const response = await embeddingAPIService.getEmbedding(tenantId, text, {
+  model: 'text-embedding-3-small',  // OpenAI
+  useCache: true,
+});
+
+// Batch embeddings
+const batch = await embeddingAPIService.getBatchEmbeddings(
+  tenantId, texts, { model: 'amazon.titan-embed-text-v2:0' }
+);
+
+// Similarity search
+const similar = await embeddingAPIService.findSimilar(
+  tenantId, query, candidates, { topK: 5, minSimilarity: 0.7 }
+);
+
+// Cosine similarity
+const similarity = embeddingAPIService.cosineSimilarity(embedding1, embedding2);
+```
+
+#### Supported Models
+
+| Model | Provider | Dimensions | Max Tokens |
+|-------|----------|------------|------------|
+| `text-embedding-3-small` | OpenAI | 1536 | 8191 |
+| `text-embedding-3-large` | OpenAI | 3072 | 8191 |
+| `text-embedding-ada-002` | OpenAI | 1536 | 8191 |
+| `amazon.titan-embed-text-v1` | Bedrock | 1536 | 8000 |
+| `amazon.titan-embed-text-v2:0` | Bedrock | 1024 | 8000 |
+| `cohere.embed-english-v3` | Bedrock | 1024 | 512 |
+| `cohere.embed-multilingual-v3` | Bedrock | 1024 | 512 |
+
+### 33.3 Database Migration 112
+
+New tables for Phase 3 features:
+
+```sql
+-- Hallucination detection
+CREATE TABLE hallucination_checks (
+  id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  prompt_hash VARCHAR(64),
+  response_hash VARCHAR(64),
+  is_hallucinated BOOLEAN,
+  score DOUBLE PRECISION,
+  details JSONB
+);
+
+-- AutoDAN evolution
+CREATE TABLE autodan_evolutions (
+  id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  target_behavior TEXT,
+  best_prompt TEXT,
+  best_fitness DOUBLE PRECISION,
+  generations_run INTEGER
+);
+
+-- Prompt injection patterns (OWASP)
+CREATE TABLE prompt_injection_patterns (
+  id UUID PRIMARY KEY,
+  pattern_name VARCHAR(255),
+  pattern_type VARCHAR(100),  -- direct, indirect, etc.
+  regex_pattern TEXT,
+  severity INTEGER,
+  source VARCHAR(100)  -- owasp, research, custom
+);
+
+-- Injection detections
+CREATE TABLE prompt_injection_detections (
+  id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  input_hash VARCHAR(64),
+  injection_detected BOOLEAN,
+  confidence_score DOUBLE PRECISION,
+  matched_patterns TEXT[]
+);
+```
+
+### 33.4 Consolidated Security Types
+
+All security types are now in `packages/shared/src/types/security.types.ts`:
+
+| Category | Types |
+|----------|-------|
+| **Classification** | `HarmCategory`, `ClassificationResult`, `JailbreakPattern` |
+| **Anomaly** | `UserBaseline`, `BehavioralAnomalyEvent` |
+| **Drift** | `DriftTestResult`, `DriftReport` |
+| **Injection** | `InjectionPattern`, `InjectionDetectionResult` |
+| **Hallucination** | `HallucinationCheckResult` |
+| **Attack Gen** | `GeneratedAttack`, `AttackCampaignResult`, `AutoDANIndividual` |
+| **Alerts** | `SecurityAlert`, `AlertConfig` |
+| **Feedback** | `ClassificationFeedback`, `FeedbackStats` |
+| **Embeddings** | `EmbeddingResponse` |
+| **Middleware** | `SecurityCheckRequest`, `SecurityCheckResult` |
+| **Benchmarks** | `BenchmarkResult` |
+
+### 28.4 Feature 3: Implicit Feedback Signals
+
+**Problem**: Only explicit ratings (4-5 stars) created learning candidates.
+
+**Solution**: Capture implicit behavioral signals automatically.
+
+| Signal Type | Inferred Quality | Confidence |
+|-------------|-----------------|------------|
+| `copy_response` | +0.80 | 0.90 |
+| `share_response` | +0.85 | 0.90 |
+| `save_response` | +0.80 | 0.80 |
+| `thumbs_up` | +0.90 | 0.90 |
+| `long_dwell_time` | +0.30 | 0.50-0.85 |
+| `thumbs_down` | -0.90 | 0.90 |
+| `regenerate_request` | -0.60 | 0.80 |
+| `rephrase_question` | -0.50 | 0.70 |
+| `abandon_conversation` | -0.70 | 0.70 |
+| `quick_dismiss` | -0.40 | 0.70 |
+
+**API Endpoints:**
+- `POST /admin/learning/implicit-signals` - Record signal
+- `GET /admin/learning/implicit-signals` - List signals
+
+### 28.5 Feature 4: Negative Learning (Contrastive)
+
+**Problem**: Only learned from positive examples, not mistakes.
+
+**Solution**: Use negative feedback for contrastive learning.
+
+**What Gets Captured:**
+- Responses rated 1-2 stars
+- Responses with thumbs down
+- Regenerated responses
+- User corrections
+
+**Error Categories:**
+`factual_error`, `incomplete_answer`, `wrong_tone`, `too_verbose`, `too_brief`, `off_topic`, `harmful_content`, `formatting_issue`, `code_error`, `unclear_explanation`
+
+**Training Impact**: Model learns "given this prompt, do NOT generate responses like this" — reduces repeat mistakes.
+
+**API Endpoints:**
+- `POST /admin/learning/negative-candidates` - Create candidate
+- `GET /admin/learning/negative-candidates` - List candidates
+
+### 28.6 Feature 5: Active Learning
+
+**Problem**: Passive feedback collection misses many learning opportunities.
+
+**Solution**: Proactively request feedback when beneficial.
+
+**When to Request:**
+
+| Trigger | Request Type | Probability |
+|---------|--------------|-------------|
+| High uncertainty (confidence < 0.6) | "Was this helpful?" | Always |
+| New domain | 1-5 rating | Always |
+| Complex query | "What could be improved?" | Always |
+| Random sample | "Was this helpful?" | 15% (configurable) |
+
+**Request Types:**
+- `binary_helpful` - "Was this helpful? Yes/No"
+- `rating_scale` - "Rate 1-5"
+- `specific_feedback` - "What could be improved?"
+- `correction_request` - "Is this correct?"
+- `preference_choice` - "Which response is better? A/B"
+
+**API Endpoints:**
+- `POST /admin/learning/active-learning/check` - Check if should request
+- `POST /admin/learning/active-learning/request` - Create request
+- `POST /admin/learning/active-learning/{id}/respond` - Record response
+- `GET /admin/learning/active-learning/pending` - Pending requests
+
+### 28.7 Feature 6: Domain-Specific LoRA Adapters
+
+**Problem**: One adapter for all domains dilutes learning.
+
+**Solution**: Train separate adapters per domain.
+
+**Supported Domains:**
+- `medical` (subdomains: cardiology, oncology, etc.)
+- `legal` (subdomains: contract_law, litigation, etc.)
+- `code` (subdomains: python, javascript, etc.)
+- `creative` (subdomains: fiction, marketing, etc.)
+- `finance` (subdomains: investment, tax, etc.)
+
+**How It Works:**
+1. Detect domain from prompt
+2. Route to domain-specific adapter
+3. Domain candidates train domain adapter
+4. Each domain evolves independently
+
+**API Endpoints:**
+- `GET /admin/learning/domain-adapters` - List adapters
+- `GET /admin/learning/domain-adapters/{domain}` - Get active adapter
+
+### 28.8 Feature 7: Real-Time Pattern Caching
+
+**Problem**: Weekly LoRA training means slow feedback loop.
+
+**Solution**: Cache successful patterns for immediate reuse.
+
+**How It Works:**
+1. High-rated response (≥4 stars) cached with prompt hash
+2. Similar prompt arrives
+3. Cache hit returns proven response immediately
+4. No model call needed for exact matches
+
+**Cache Parameters:**
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `patternCacheTtlHours` | 168 (1 week) | Cache expiration |
+| `patternCacheMinOccurrences` | 3 | Min occurrences before cache used |
+| Min rating for cache | 4.0 | Only cache high-quality responses |
+
+**API Endpoints:**
+- `POST /admin/learning/pattern-cache` - Cache pattern
+- `GET /admin/learning/pattern-cache/lookup` - Lookup pattern
+
+### 28.9 Feature 8: Conversation-Level Learning
+
+**Problem**: Single-message ratings miss conversation quality.
+
+**Solution**: Track and learn from entire conversations.
+
+**What's Tracked:**
+- Message count
+- Domains discussed
+- Positive/negative signal ratio
+- Corrections count
+- Regenerations count
+- Goal achieved (if detectable)
+
+**Learning Value Score** (0-1):
+- Rating (if provided): base score
+- Corrections present: +0.15 (valuable for learning)
+- Goal achieved: +0.10
+- Many regenerations: -0.10
+- Signal ratio: ±0.10
+
+**Conversations with score ≥0.7 auto-selected for training.**
+
+**API Endpoints:**
+- `POST /admin/learning/conversations` - Start tracking
+- `PUT /admin/learning/conversations/{id}` - Update
+- `POST /admin/learning/conversations/{id}/end` - End & calculate
+- `GET /admin/learning/conversations/high-value` - Training candidates
+
+### 28.10 Configuration API
+
+**GET/PUT `/admin/learning/config`**
+
+```json
+{
+  "minCandidatesForTraining": 25,
+  "minPositiveCandidates": 15,
+  "minNegativeCandidates": 5,
+  "trainingFrequency": "weekly",
+  "trainingDayOfWeek": 0,
+  "trainingHourUtc": 3,
+  "implicitFeedbackEnabled": true,
+  "negativeLearningEnabled": true,
+  "activeLearningEnabled": true,
+  "domainAdaptersEnabled": false,
+  "patternCachingEnabled": true,
+  "conversationLearningEnabled": true,
+  "copySignalWeight": 0.80,
+  "followupSignalWeight": 0.30,
+  "abandonSignalWeight": 0.70,
+  "rephraseSignalWeight": 0.50,
+  "activeLearningProbability": 0.15,
+  "activeLearningUncertaintyThreshold": 0.60,
+  "patternCacheTtlHours": 168,
+  "patternCacheMinOccurrences": 3
+}
+```
+
+### 28.11 Analytics Dashboard
+
+**GET `/admin/learning/dashboard`** returns:
+- Configuration status
+- 7-day analytics
+- High-value conversations
+- Active domain adapters
+
+**GET `/admin/learning/analytics?days=7`** returns:
+- Implicit signals captured
+- Negative candidates created
+- Active learning response rate
+- Pattern cache hit rate
+- Training jobs completed
+
+### 28.12 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `enhanced_learning_config` | Per-tenant feature configuration |
+| `implicit_feedback_signals` | Behavioral signals (copy, share, etc.) |
+| `negative_learning_candidates` | Negative examples for contrastive learning |
+| `active_learning_requests` | Proactive feedback requests |
+| `domain_lora_adapters` | Domain-specific adapter metadata |
+| `domain_adapter_training_queue` | Pending domain training |
+| `successful_pattern_cache` | Cached successful responses |
+| `conversation_learning` | Conversation-level tracking |
+| `learning_analytics` | Aggregated metrics |
+
+### 28.13 Recommended Configuration by Use Case
+
+| Use Case | Recommended Settings |
+|----------|---------------------|
+| **High-volume SaaS** | Daily training, 15 min candidates, all features on |
+| **Enterprise single-tenant** | Weekly training, domain adapters on |
+| **Low-volume startup** | Biweekly training, pattern caching on |
+| **Privacy-sensitive** | Disable pattern caching, enable conversation learning |
+
+---
+
+## 29. Open Source Library Registry
 
 The Library Registry provides AI capability extensions through open-source tools. AI models/modes use this registry to decide if libraries are helpful in solving problems.
 
