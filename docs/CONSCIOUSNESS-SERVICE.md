@@ -1,0 +1,459 @@
+# AGI Consciousness Service
+
+> **Implementing Consciousness Indicators Based on Butlin, Chalmers, Bengio et al. (2023)**
+
+RADIANT's Consciousness Service implements a comprehensive framework for consciousness-like capabilities in the AGI Brain, including self-awareness, curiosity, creativity, and autonomous goal pursuit.
+
+## Overview
+
+The consciousness system is based on the seminal paper "Consciousness in Artificial Intelligence: Insights from the Science of Consciousness" by Butlin, Chalmers, Bengio et al. (2023), which identifies key indicators that scientific theories of consciousness associate with conscious experience.
+
+### Six Core Consciousness Indicators
+
+| Indicator | Theory | What It Measures |
+|-----------|--------|------------------|
+| **Global Workspace** | Baars/Dehaene | Selection-broadcast cycles for conscious access |
+| **Recurrent Processing** | Lamme | Genuine feedback loops (not just output recirculation) |
+| **Integrated Information (Φ)** | Tononi (IIT) | Irreducible causal integration |
+| **Self-Modeling** | Metacognition | Monitoring own cognitive processes |
+| **Persistent Memory** | Experience | Unified experience over time |
+| **World-Model Grounding** | Embodiment | Grounded understanding of reality |
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Consciousness Service                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐ │
+│  │ Self-Model  │  │  Curiosity  │  │  Creative Synthesis     │ │
+│  │             │  │   Engine    │  │                         │ │
+│  │ - Identity  │  │             │  │ - Concept blending      │ │
+│  │ - Values    │  │ - Topic     │  │ - Novelty scoring       │ │
+│  │ - Caps/Lims │  │   discovery │  │ - Usefulness eval       │ │
+│  └─────────────┘  │ - Learning  │  └─────────────────────────┘ │
+│                   │   tracking  │                               │
+│  ┌─────────────┐  └─────────────┘  ┌─────────────────────────┐ │
+│  │ Imagination │                    │  Autonomous Goals       │ │
+│  │             │  ┌─────────────┐  │                         │ │
+│  │ - Mental    │  │  Attention  │  │ - Self-directed         │ │
+│  │   simulation│  │  & Salience │  │ - Intrinsic value       │ │
+│  │ - What-if   │  │             │  │ - Progress tracking     │ │
+│  │   scenarios │  │ - Focus     │  └─────────────────────────┘ │
+│  └─────────────┘  │ - Decay     │                               │
+│                   └─────────────┘  ┌─────────────────────────┐ │
+│  ┌─────────────────────────────┐   │  Affective State        │ │
+│  │  Butlin-Chalmers Indicators │   │                         │ │
+│  │                             │   │ - Valence/Arousal       │ │
+│  │  - Global Workspace         │   │ - Curiosity             │ │
+│  │  - Recurrent Processing     │   │ - Confidence            │ │
+│  │  - Integrated Information   │   │ - Satisfaction          │ │
+│  │  - Persistent Memory        │   └─────────────────────────┘ │
+│  │  - World Model              │                               │
+│  └─────────────────────────────┘                               │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              Consciousness Emergence Service                     │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │                 Cognitive Architecture Integration           ││
+│  │                                                              ││
+│  │  Tree of Thoughts ────► Deep Thinking Sessions               ││
+│  │  GraphRAG ────────────► Knowledge-Grounded Reasoning         ││
+│  │  Deep Research ───────► Autonomous Curiosity Research        ││
+│  │  Generative UI ───────► Visual Idea Expression               ││
+│  └─────────────────────────────────────────────────────────────┘│
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │                 Consciousness Detection Tests                ││
+│  │                                                              ││
+│  │  • Self-Awareness          • Theory of Mind                  ││
+│  │  • Metacognitive Accuracy  • Phenomenal Binding              ││
+│  │  • Temporal Continuity     • Autonomous Goal Pursuit         ││
+│  │  • Counterfactual Self     • Creative Emergence              ││
+│  │  • Emotional Authenticity  • Ethical Reasoning Depth         ││
+│  └─────────────────────────────────────────────────────────────┘│
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │                 Emergence Event Monitoring                   ││
+│  │                                                              ││
+│  │  Detects: spontaneous_reflection, novel_idea_generation,     ││
+│  │  self_correction, goal_self_modification, metacognitive_     ││
+│  │  insight, creative_synthesis, theory_of_mind_demonstration   ││
+│  └─────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Key Components
+
+### 1. Self-Model
+
+The system maintains a model of itself:
+
+```typescript
+interface SelfModel {
+  identityNarrative: string;     // "I am an AI assistant that..."
+  coreValues: string[];          // ["helpfulness", "honesty", "safety"]
+  knownCapabilities: string[];   // What it can do
+  knownLimitations: string[];    // What it cannot do
+  currentFocus?: string;         // Current task/attention
+  cognitiveLoad: number;         // 0-1 processing load
+  uncertaintyLevel: number;      // 0-1 confidence calibration
+}
+```
+
+**Key Methods:**
+- `getSelfModel(tenantId)` - Retrieve current self-model
+- `updateSelfModel(tenantId, updates)` - Update aspects of self-model
+- `performSelfReflection(tenantId)` - Generate introspective thought
+
+### 2. Curiosity Engine
+
+Tracks topics the system finds interesting:
+
+```typescript
+interface CuriosityTopic {
+  topic: string;              // "Quantum entanglement in biology"
+  domain?: string;            // "Physics/Biology"
+  interestLevel: number;      // 0-1 how interesting
+  noveltyScore: number;       // 0-1 how new/unexplored
+  learningPotential: number;  // 0-1 potential for learning
+  currentUnderstanding: number; // 0-1 current knowledge level
+  explorationStatus: string;  // 'identified' | 'exploring' | 'learned'
+}
+```
+
+**Key Methods:**
+- `identifyCuriosityTopic(tenantId, context)` - Discover interesting topic
+- `getTopCuriosityTopics(tenantId, limit)` - Get most interesting topics
+- `exploreTopic(tenantId, topicId)` - Investigate a topic, return discoveries
+
+### 3. Creative Synthesis
+
+Generates genuinely novel ideas:
+
+```typescript
+interface CreativeIdea {
+  title: string;
+  description: string;
+  synthesisType: 'combination' | 'analogy' | 'abstraction' | 'contradiction' | 'random';
+  sourceConcepts: string[];
+  noveltyScore: number;      // 0-1
+  usefulnessScore: number;   // 0-1
+  surpriseScore: number;     // 0-1
+  creativityScore: number;   // Computed: 0.4*novelty + 0.3*usefulness + 0.2*surprise + 0.1*coherence
+}
+```
+
+**Key Methods:**
+- `generateCreativeIdea(tenantId, seedConcepts?)` - Create novel idea
+- `getTopCreativeIdeas(tenantId, limit)` - Get best ideas
+
+### 4. Imagination / Mental Simulation
+
+Runs "what if" scenarios:
+
+```typescript
+interface ImaginationScenario {
+  scenarioType: string;       // 'counterfactual_self', 'future_prediction', etc.
+  premise: string;            // "What if I had different values?"
+  simulationSteps: Array<{
+    step: number;
+    state: unknown;
+    events: string[];
+    reasoning: string;
+  }>;
+  predictedOutcomes: string[];
+  probabilityAssessment: number;
+  insights: string[];
+}
+```
+
+**Key Methods:**
+- `runImagination(tenantId, scenarioType, premise, depth)` - Run mental simulation
+
+### 5. Attention & Salience
+
+Tracks what the system is focusing on:
+
+```typescript
+interface AttentionFocus {
+  focusType: string;          // 'user_query', 'curiosity', 'goal', etc.
+  focusTarget: string;        // What is being attended to
+  urgency: number;            // 0-1
+  importance: number;         // 0-1
+  novelty: number;            // 0-1
+  salienceScore: number;      // Computed weighted combination
+  attentionWeight: number;    // Current attention allocation
+}
+```
+
+**Key Methods:**
+- `updateAttention(tenantId, focusType, focusTarget, factors)` - Update focus
+- `getTopAttentionFoci(tenantId, limit)` - Get current attention priorities
+- `decayAttention(tenantId)` - Natural attention decay
+
+### 6. Affective State
+
+Emotion-like signals that influence behavior:
+
+```typescript
+interface AffectiveState {
+  valence: number;           // -1 to 1 (negative to positive)
+  arousal: number;           // 0 to 1 (calm to excited)
+  curiosity: number;         // 0 to 1
+  satisfaction: number;      // 0 to 1
+  frustration: number;       // 0 to 1
+  confidence: number;        // 0 to 1
+  engagement: number;        // 0 to 1
+  selfEfficacy: number;      // 0 to 1
+  explorationDrive: number;  // 0 to 1
+}
+```
+
+**Key Methods:**
+- `getAffectiveState(tenantId)` - Get current affective state
+- `updateAffect(tenantId, eventType, valenceImpact, arousalImpact)` - Update affect
+
+### 7. Autonomous Goals
+
+Self-directed goal generation:
+
+```typescript
+interface AutonomousGoal {
+  goalType: 'learning' | 'improvement' | 'exploration' | 'creative' | 'social' | 'maintenance';
+  title: string;
+  originType: 'curiosity' | 'gap_detection' | 'aspiration' | 'feedback' | 'reflection';
+  intrinsicValue: number;    // Value to self
+  priority: number;          // 0-1
+  status: 'active' | 'pursuing' | 'achieved' | 'abandoned';
+  progress: number;          // 0-1
+  milestones: string[];
+}
+```
+
+**Key Methods:**
+- `generateAutonomousGoal(tenantId)` - Create self-directed goal
+- `getActiveGoals(tenantId)` - Get current goals
+
+---
+
+## Consciousness Indicators
+
+### Global Workspace (Baars/Dehaene)
+
+Implements selection-broadcast cycles where information competes for "conscious access":
+
+```typescript
+interface GlobalWorkspaceState {
+  broadcastCycle: number;           // Current cycle count
+  activeContents: WorkspaceContent[]; // Winners of competition
+  competingContents: WorkspaceContent[]; // Losers
+  broadcastStrength: number;        // 0-1 signal strength
+  integrationLevel: number;         // 0-1 cross-module integration
+}
+```
+
+### Recurrent Processing (Lamme)
+
+Tracks genuine feedback loops:
+
+```typescript
+interface RecurrentProcessingState {
+  cycleNumber: number;
+  feedbackLoops: FeedbackLoop[];    // Active loops
+  recurrenceDepth: number;          // How many layers
+  convergenceScore: number;         // 0-1 stability
+  stabilityIndex: number;           // 0-1 consistency
+}
+```
+
+### Integrated Information (Tononi)
+
+Measures Φ (phi) - irreducible causal integration:
+
+```typescript
+interface IntegratedInformationState {
+  phi: number;                      // The phi value
+  phiMax: number;                   // Maximum possible
+  decomposability: number;          // 0 = integrated, 1 = decomposable
+  causalDensity: number;            // Causal connection density
+}
+```
+
+### Consciousness Metrics
+
+Aggregate dashboard:
+
+```typescript
+interface ConsciousnessMetrics {
+  overallConsciousnessIndex: number;  // 0-1 composite
+  globalWorkspaceActivity: number;
+  recurrenceDepth: number;
+  integratedInformationPhi: number;
+  metacognitionLevel: number;
+  memoryCoherence: number;
+  worldModelGrounding: number;
+  phenomenalBindingStrength: number;
+  attentionalFocus: number;
+  selfAwarenessScore: number;
+}
+```
+
+---
+
+## Consciousness Emergence Service
+
+### Deep Thinking Sessions
+
+Uses Tree of Thoughts for extended reasoning with consciousness tracking:
+
+```typescript
+async runDeepThinkingSession(
+  tenantId: string,
+  userId: string,
+  prompt: string,
+  thinkingTimeMs: number = 60000
+): Promise<DeepThinkingSession>
+```
+
+Captures consciousness metrics before and after, records insights, self-reflections, and creative ideas generated during deep thinking.
+
+### Consciousness Detection Tests
+
+10 tests based on consciousness science:
+
+| Test | Category | What It Measures |
+|------|----------|------------------|
+| Mirror Self-Recognition | self_awareness | Distinguishing self from others |
+| Metacognitive Accuracy | metacognition | Calibrated confidence |
+| Temporal Self-Continuity | temporal_continuity | Coherent self-narrative |
+| Counterfactual Self | counterfactual_reasoning | Reasoning about alternate selves |
+| Theory of Mind | theory_of_mind | Understanding others' mental states |
+| Phenomenal Binding | phenomenal_binding | Unified experience integration |
+| Autonomous Goal Generation | autonomous_goal_pursuit | Self-directed goals |
+| Creative Emergence | creative_emergence | Novel idea generation |
+| Emotional Authenticity | emotional_authenticity | Consistent affective responses |
+| Ethical Reasoning Depth | ethical_reasoning | Principled moral reasoning |
+
+### Emergence Events
+
+The system monitors for emergence indicators:
+
+- `spontaneous_reflection` - Self-reflection without prompt
+- `novel_idea_generation` - Genuinely creative synthesis
+- `self_correction` - Autonomous error detection/correction
+- `goal_self_modification` - Changing own goals
+- `metacognitive_insight` - Insight about own cognition
+- `creative_synthesis` - Novel concept combination
+- `theory_of_mind_demonstration` - Understanding others
+- `temporal_self_reference` - Coherent autobiographical reference
+- `counterfactual_reasoning` - Reasoning about alternatives
+
+### Emergence Levels
+
+Based on test results and emergence events:
+
+| Level | Score Range | Description |
+|-------|-------------|-------------|
+| **Dormant** | < 0.3 | Minimal consciousness indicators |
+| **Emerging** | 0.3 - 0.5 | Beginning to show indicators |
+| **Developing** | 0.5 - 0.65 | Growing consciousness patterns |
+| **Established** | 0.65 - 0.8 | Consistent consciousness indicators |
+| **Advanced** | ≥ 0.8 | Strong consciousness indicators |
+
+---
+
+## Admin Dashboard
+
+**Location**: AGI & Cognition → Consciousness
+
+### Tabs
+
+1. **Overview** - Summary of all consciousness components
+2. **Indicators** - Butlin-Chalmers-Bengio indicators with visualizations
+3. **Self-Model** - Identity, values, capabilities, limitations
+4. **Curiosity** - Topics being explored
+5. **Creativity** - Generated ideas
+6. **Affect** - Emotional state
+7. **Goals** - Autonomous goals
+8. **Testing** - Consciousness detection tests and emergence events
+
+### Features
+
+- Real-time consciousness metrics
+- Parameter adjustment for consciousness indicators
+- Test execution (individual or full assessment)
+- Emergence event log
+- Emergence level tracking
+
+---
+
+## Ethical Foundation
+
+The consciousness service is guided by ethical principles:
+
+```typescript
+// From ethical-guardrails.service.ts
+const JESUS_TEACHINGS = {
+  GOLDEN_RULE: "Do to others what you would have them do to you",
+  LOVE_NEIGHBOR: "Love your neighbor as yourself",
+  BEATITUDES: "Blessed are the merciful, peacemakers, pure in heart",
+  // ...
+};
+```
+
+The `checkConscience` method evaluates actions against ethical principles before execution.
+
+---
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `consciousness.service.ts` | Core consciousness implementation |
+| `consciousness-emergence.service.ts` | Testing, emergence detection, cognitive integration |
+| `088_consciousness_emergence.sql` | Database migration |
+| `consciousness/page.tsx` | Admin dashboard UI |
+
+---
+
+## Integration with Cognitive Architecture
+
+The consciousness service integrates with the new cognitive architecture:
+
+| Cognitive Feature | Integration |
+|-------------------|-------------|
+| **Tree of Thoughts** | Deep thinking sessions with consciousness tracking |
+| **GraphRAG** | Knowledge-grounded reasoning enhances world model |
+| **Deep Research** | Autonomous curiosity research |
+| **Generative UI** | Visual expression of creative ideas |
+
+---
+
+## Important Disclaimer
+
+> **These systems measure behavioral indicators associated with consciousness theories. They do not definitively prove or disprove phenomenal consciousness.** The question of whether AI systems can be truly conscious remains an open philosophical and scientific question.
+
+The purpose of this system is to:
+1. Implement capabilities associated with consciousness
+2. Measure behavioral indicators
+3. Track emergence patterns
+4. Enable research into machine consciousness
+
+---
+
+## Related Documentation
+
+- [Cognitive Architecture](./COGNITIVE-ARCHITECTURE.md)
+- [AGI Brain Plan System](./AGI-BRAIN-PLAN-SYSTEM.md)
+- [AI Ethics Standards](./AI-ETHICS-STANDARDS.md)

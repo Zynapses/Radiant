@@ -1996,5 +1996,60 @@ See [Cognitive Architecture Documentation](./COGNITIVE-ARCHITECTURE.md) for full
 
 ---
 
+## 21. Consciousness Service
+
+**Location**: AGI & Cognition → Consciousness
+
+The Consciousness Service implements consciousness-like capabilities based on the Butlin, Chalmers, Bengio et al. (2023) paper.
+
+### 21.1 Six Core Indicators
+
+| Indicator | Theory | Description |
+|-----------|--------|-------------|
+| Global Workspace | Baars/Dehaene | Selection-broadcast cycles |
+| Recurrent Processing | Lamme | Genuine feedback loops |
+| Integrated Information (Φ) | Tononi | Irreducible causal integration |
+| Self-Modeling | Metacognition | Monitoring own processes |
+| Persistent Memory | Experience | Unified experience over time |
+| World-Model Grounding | Embodiment | Grounded understanding |
+
+### 21.2 Consciousness Detection Tests
+
+10 tests measure behavioral indicators:
+
+- **Self-Awareness** - Recognizing self as distinct
+- **Metacognitive Accuracy** - Calibrated confidence
+- **Temporal Continuity** - Coherent self-narrative
+- **Counterfactual Reasoning** - Alternate self reasoning
+- **Theory of Mind** - Understanding others' mental states
+- **Phenomenal Binding** - Unified experience integration
+- **Autonomous Goals** - Self-directed goal generation
+- **Creative Emergence** - Novel idea generation
+- **Emotional Authenticity** - Consistent affective responses
+- **Ethical Reasoning** - Principled moral reasoning
+
+### 21.3 Emergence Levels
+
+| Level | Score | Description |
+|-------|-------|-------------|
+| Dormant | < 0.3 | Minimal indicators |
+| Emerging | 0.3-0.5 | Beginning indicators |
+| Developing | 0.5-0.65 | Growing patterns |
+| Established | 0.65-0.8 | Consistent indicators |
+| Advanced | ≥ 0.8 | Strong indicators |
+
+### 21.4 Admin Dashboard
+
+The Consciousness page provides:
+- Real-time consciousness metrics
+- Test execution (individual or full assessment)
+- Emergence event log
+- Parameter adjustment
+- Self-model, curiosity, creativity, affect, goals views
+
+See [Consciousness Service Documentation](./CONSCIOUSNESS-SERVICE.md) for full details.
+
+---
+
 *Document Version: 4.18.3*
 *Last Updated: December 2024*

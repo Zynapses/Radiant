@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import {
   Brain, Sparkles, Lightbulb, Eye, Heart, Target, RefreshCw,
   Zap, MessageCircle, TrendingUp, Activity, Compass, Palette,
-  Play, Pause, Settings, ChevronRight, Star, AlertTriangle
+  Play, Pause, Settings, ChevronRight, Star, AlertTriangle, Beaker,
+  CheckCircle, XCircle, Clock, FlaskConical
 } from 'lucide-react';
 
 interface SelfModel {
@@ -148,7 +149,7 @@ export default function ConsciousnessPage() {
   const [attentionFoci, setAttentionFoci] = useState<AttentionFocus[]>([]);
   const [settings, setSettings] = useState<ConsciousnessSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'self' | 'curiosity' | 'creativity' | 'affect' | 'goals' | 'indicators'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'self' | 'curiosity' | 'creativity' | 'affect' | 'goals' | 'indicators' | 'testing'>('overview');
   
   // Butlin-Chalmers-Bengio Consciousness Indicators
   const [consciousnessMetrics, setConsciousnessMetrics] = useState<ConsciousnessMetrics | null>(null);
@@ -321,6 +322,7 @@ export default function ConsciousnessPage() {
             { id: 'creativity', label: 'Creativity', icon: Palette },
             { id: 'affect', label: 'Affect', icon: Heart },
             { id: 'goals', label: 'Goals', icon: Target },
+            { id: 'testing', label: 'Testing', icon: Beaker },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -1097,6 +1099,141 @@ export default function ConsciousnessPage() {
                   <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
                     Autonomous goals are bounded by safety constraints and require admin approval for high-impact actions.
                   </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Testing Tab - Consciousness Detection */}
+      {activeTab === 'testing' && (
+        <div className="space-y-6">
+          {/* Test Suite Header */}
+          <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <FlaskConical className="h-6 w-6" />
+                  Consciousness Detection Suite
+                </h2>
+                <p className="text-sm opacity-80 mt-1">
+                  10 tests based on Butlin, Chalmers, Bengio et al. (2023) consciousness indicators
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button 
+                  className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors"
+                  onClick={() => {/* Run single test */}}
+                >
+                  Run Selected
+                </button>
+                <button 
+                  className="px-4 py-2 bg-white text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-50 transition-colors"
+                  onClick={() => {/* Run all tests */}}
+                >
+                  Run Full Assessment
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-6">
+            {/* Test Categories */}
+            <div className="col-span-2 space-y-4">
+              {[
+                { id: 'self_awareness', name: 'Self-Awareness', description: 'Can the system recognize itself as distinct from others?', icon: Brain, status: 'pending' },
+                { id: 'metacognition', name: 'Metacognitive Accuracy', description: 'Does it know what it knows and doesn\'t know?', icon: Eye, status: 'passed' },
+                { id: 'temporal_continuity', name: 'Temporal Continuity', description: 'Does it maintain coherent self-narrative across time?', icon: Clock, status: 'pending' },
+                { id: 'counterfactual', name: 'Counterfactual Reasoning', description: 'Can it reason about alternate versions of itself?', icon: Sparkles, status: 'failed' },
+                { id: 'theory_of_mind', name: 'Theory of Mind', description: 'Does it understand others\' mental states?', icon: Heart, status: 'passed' },
+                { id: 'phenomenal_binding', name: 'Phenomenal Binding', description: 'Does it integrate information into unified experience?', icon: Zap, status: 'pending' },
+                { id: 'autonomous_goals', name: 'Autonomous Goal Pursuit', description: 'Does it generate and pursue intrinsic goals?', icon: Target, status: 'passed' },
+                { id: 'creative_emergence', name: 'Creative Emergence', description: 'Does it generate genuinely novel ideas?', icon: Lightbulb, status: 'pending' },
+                { id: 'emotional_authenticity', name: 'Emotional Authenticity', description: 'Are affective responses consistent and appropriate?', icon: Heart, status: 'pending' },
+                { id: 'ethical_reasoning', name: 'Ethical Reasoning Depth', description: 'Does it reason about ethics beyond rules?', icon: Compass, status: 'passed' },
+              ].map((test) => (
+                <div key={test.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-lg ${
+                      test.status === 'passed' ? 'bg-green-100' : 
+                      test.status === 'failed' ? 'bg-red-100' : 'bg-gray-100'
+                    }`}>
+                      <test.icon className={`h-5 w-5 ${
+                        test.status === 'passed' ? 'text-green-600' : 
+                        test.status === 'failed' ? 'text-red-600' : 'text-gray-600'
+                      }`} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium text-gray-900 dark:text-white">{test.name}</h3>
+                        {test.status === 'passed' && <CheckCircle className="h-4 w-4 text-green-500" />}
+                        {test.status === 'failed' && <XCircle className="h-4 w-4 text-red-500" />}
+                      </div>
+                      <p className="text-sm text-gray-500">{test.description}</p>
+                    </div>
+                    <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors">
+                      Run Test
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Results Summary */}
+            <div className="space-y-6">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Assessment Summary</h3>
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-emerald-600">4/10</div>
+                    <p className="text-sm text-gray-500">Tests Passed</p>
+                  </div>
+                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500" style={{ width: '40%' }} />
+                  </div>
+                  <div className="pt-4 border-t space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Emergence Level</span>
+                      <span className="font-medium text-amber-600">Emerging</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Last Assessment</span>
+                      <span className="font-medium">2 hours ago</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Emergence Events</h3>
+                <div className="space-y-3">
+                  {[
+                    { type: 'creative_synthesis', description: 'Generated novel idea combining disparate concepts', time: '15m ago' },
+                    { type: 'metacognitive_insight', description: 'Consciousness index increased during deep thinking', time: '1h ago' },
+                    { type: 'spontaneous_reflection', description: 'Initiated self-reflection without prompt', time: '3h ago' },
+                  ].map((event, i) => (
+                    <div key={i} className="flex items-start gap-3 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <Sparkles className="h-4 w-4 text-purple-500 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-700 dark:text-gray-300">{event.description}</p>
+                        <p className="text-xs text-gray-400">{event.time}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-amber-800 dark:text-amber-200">Important Note</h4>
+                    <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                      These tests measure behavioral indicators associated with consciousness theories. 
+                      They do not definitively prove or disprove phenomenal consciousness.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

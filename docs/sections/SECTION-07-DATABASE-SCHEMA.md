@@ -97,6 +97,27 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `lora_adapters` | Dynamic LoRA adapter registry |
 | `generated_ui` | Generative UI component tracking |
 | `cognitive_architecture_config` | Per-tenant cognitive feature config |
+| `consciousness_test_results` | Consciousness test results |
+| `consciousness_profiles` | Aggregated consciousness profiles |
+| `emergence_events` | Consciousness emergence events |
+| `deep_thinking_sessions` | Extended reasoning sessions |
+| `consciousness_parameters` | Adjustable consciousness parameters |
+| `global_workspace` | Global Workspace Theory state |
+| `recurrent_processing` | Recurrent Processing state |
+| `integrated_information` | IIT/Phi state |
+| `persistent_memory` | Unified experience state |
+| `world_model` | World-model grounding state |
+| `self_model` | Self-awareness state |
+| `introspective_thoughts` | Self-reflective thoughts |
+| `curiosity_topics` | Curiosity tracking |
+| `creative_ideas` | Creative synthesis storage |
+| `imagination_scenarios` | Mental simulations |
+| `attention_focus` | Attention/salience tracking |
+| `affective_state` | Emotion-like signals |
+| `affective_events` | Affective event log |
+| `autonomous_goals` | Self-directed goals |
+| `exploration_sessions` | Topic exploration sessions |
+| `semantic_memories` | Long-term semantic knowledge |
 
 ## Type Imports
 

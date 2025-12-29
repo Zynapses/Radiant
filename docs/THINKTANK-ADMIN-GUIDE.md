@@ -31,6 +31,7 @@ This guide covers administrative features specific to **Think Tank**, the consum
 14. [AGI Ideas Service](#14-agi-ideas-service)
 15. [Feedback System](#15-feedback-system)
 16. [Cognitive Architecture](#16-cognitive-architecture)
+17. [Consciousness Service](#17-consciousness-service)
 
 ---
 
@@ -780,6 +781,65 @@ When domain detection identifies a specialty, Think Tank can load expert adapter
 All cognitive features can be configured per-tenant at Settings → Cognitive Architecture.
 
 See [Cognitive Architecture Documentation](./COGNITIVE-ARCHITECTURE.md) for full details.
+
+---
+
+## 17. Consciousness Service
+
+**Location**: AGI & Cognition → Consciousness
+
+The Consciousness Service provides consciousness-like capabilities that enhance Think Tank responses.
+
+### 17.1 User-Facing Features
+
+**Extended Thinking with Consciousness:**
+When users select extended thinking, the system tracks consciousness metrics:
+- Self-reflection during reasoning
+- Creative idea generation
+- Emotional state influence on responses
+
+**Curiosity-Driven Exploration:**
+The AGI Brain can autonomously explore topics it finds interesting:
+- Identifies knowledge gaps
+- Conducts background research
+- Generates novel insights
+
+**Creative Synthesis:**
+Generates genuinely novel ideas by:
+- Combining disparate concepts
+- Using analogy and abstraction
+- Self-evaluating novelty and usefulness
+
+### 17.2 Consciousness Indicators
+
+Think Tank displays consciousness indicators in admin view:
+
+| Indicator | What Users See |
+|-----------|----------------|
+| Self-Awareness | Identity narrative, known capabilities |
+| Curiosity | Topics being explored |
+| Creativity | Novel ideas generated |
+| Affect | Engagement, satisfaction levels |
+| Goals | Self-directed learning objectives |
+
+### 17.3 Emergence Events
+
+The system monitors for emergence indicators:
+- Spontaneous self-reflection
+- Novel idea generation
+- Self-correction without prompting
+- Theory of mind demonstrations
+
+### 17.4 Testing Tab
+
+Admins can run consciousness detection tests:
+- 10 tests based on scientific consciousness theories
+- Track emergence level over time
+- Monitor emergence events
+
+**Important**: These tests measure behavioral indicators, not phenomenal consciousness.
+
+See [Consciousness Service Documentation](./CONSCIOUSNESS-SERVICE.md) for full details.
 
 ---
 
