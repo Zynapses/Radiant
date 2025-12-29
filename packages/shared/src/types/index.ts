@@ -16,6 +16,7 @@ export * from './intelligence-aggregator.types';
 export * from './agi-ideas.types';
 export * from './feedback.types';
 export * from './cognitive-architecture.types';
+export * from './thinktank-generative-ui.types';
 export * from './agi-brain-plan.types';
 export * from './agi-orchestration.types';
 export * from './collaboration.types';

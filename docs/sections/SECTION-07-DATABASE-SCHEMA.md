@@ -118,6 +118,10 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `autonomous_goals` | Self-directed goals |
 | `exploration_sessions` | Topic exploration sessions |
 | `semantic_memories` | Long-term semantic knowledge |
+| `generated_apps` | Think Tank generated interactive apps |
+| `app_interactions` | User interactions with generated apps |
+| `user_app_preferences` | User preferences for app factory |
+| `app_templates` | Pre-built app templates |
 
 ## Type Imports
 
