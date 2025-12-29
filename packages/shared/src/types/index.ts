@@ -24,3 +24,6 @@ export * from './revenue.types';
 export * from './result-derivation.types';
 export * from './domain-ethics.types';
 export * from './model-coordination.types';
+export * from './inference-components.types';
+export * from './consciousness.types';
+export * from './bipolar-rating.types';

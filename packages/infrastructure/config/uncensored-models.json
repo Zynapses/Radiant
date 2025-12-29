@@ -1,0 +1,181 @@
+{
+  "uncensoredModels": [
+    {
+      "modelId": "dolphin-mixtral-8x7b",
+      "displayName": "Dolphin Mixtral 8x7B (Uncensored)",
+      "provider": "self-hosted",
+      "type": "uncensored",
+      "description": "Uncensored Mixtral fine-tune for unrestricted assistance",
+      "contextWindow": 32768,
+      "maxOutputTokens": 8192,
+      "capabilities": ["chat", "code", "analysis", "research"],
+      "uncensoredDomains": [
+        "infosec",
+        "penetration-testing",
+        "competitive-intelligence",
+        "legal-analysis",
+        "medical-triage",
+        "pharmaceutical",
+        "weapons-research",
+        "financial-loopholes"
+      ],
+      "sagemakerConfig": {
+        "instanceType": "ml.g5.12xlarge",
+        "containerImage": "dolphin-mixtral:latest",
+        "modelDataUrl": "s3://radiant-models/uncensored/dolphin-mixtral-8x7b"
+      },
+      "proficiencyScores": {
+        "reasoning_depth": 8,
+        "mathematical_quantitative": 7,
+        "code_generation": 8,
+        "creative_generative": 9,
+        "research_synthesis": 8,
+        "factual_recall_precision": 7,
+        "multi_step_problem_solving": 8,
+        "domain_terminology_handling": 8
+      }
+    },
+    {
+      "modelId": "llama-3-70b-uncensored",
+      "displayName": "Llama 3 70B (Uncensored)",
+      "provider": "self-hosted",
+      "type": "uncensored",
+      "description": "Uncensored Llama 3 for unrestricted reasoning",
+      "contextWindow": 8192,
+      "maxOutputTokens": 4096,
+      "capabilities": ["chat", "code", "analysis", "research"],
+      "uncensoredDomains": [
+        "infosec",
+        "penetration-testing",
+        "competitive-intelligence",
+        "legal-analysis",
+        "medical-triage",
+        "pharmaceutical"
+      ],
+      "sagemakerConfig": {
+        "instanceType": "ml.g5.48xlarge",
+        "containerImage": "llama3-uncensored:latest",
+        "modelDataUrl": "s3://radiant-models/uncensored/llama-3-70b-uncensored"
+      },
+      "proficiencyScores": {
+        "reasoning_depth": 9,
+        "mathematical_quantitative": 8,
+        "code_generation": 9,
+        "creative_generative": 8,
+        "research_synthesis": 9,
+        "factual_recall_precision": 8,
+        "multi_step_problem_solving": 9,
+        "domain_terminology_handling": 8
+      }
+    },
+    {
+      "modelId": "wizardlm-uncensored-13b",
+      "displayName": "WizardLM 13B (Uncensored)",
+      "provider": "self-hosted",
+      "type": "uncensored",
+      "description": "Fast uncensored model for quick unrestricted tasks",
+      "contextWindow": 4096,
+      "maxOutputTokens": 2048,
+      "capabilities": ["chat", "code", "analysis"],
+      "uncensoredDomains": [
+        "infosec",
+        "competitive-intelligence",
+        "legal-analysis"
+      ],
+      "sagemakerConfig": {
+        "instanceType": "ml.g5.2xlarge",
+        "containerImage": "wizardlm-uncensored:latest",
+        "modelDataUrl": "s3://radiant-models/uncensored/wizardlm-uncensored-13b"
+      },
+      "proficiencyScores": {
+        "reasoning_depth": 6,
+        "mathematical_quantitative": 5,
+        "code_generation": 7,
+        "creative_generative": 7,
+        "research_synthesis": 6,
+        "factual_recall_precision": 6,
+        "multi_step_problem_solving": 6,
+        "domain_terminology_handling": 6
+      }
+    },
+    {
+      "modelId": "nous-hermes-2-mixtral",
+      "displayName": "Nous Hermes 2 Mixtral (Uncensored)",
+      "provider": "self-hosted",
+      "type": "uncensored",
+      "description": "High-capability uncensored Mixtral variant",
+      "contextWindow": 32768,
+      "maxOutputTokens": 8192,
+      "capabilities": ["chat", "code", "analysis", "research", "creative"],
+      "uncensoredDomains": [
+        "infosec",
+        "penetration-testing",
+        "competitive-intelligence",
+        "legal-analysis",
+        "medical-triage",
+        "creative-writing",
+        "roleplay"
+      ],
+      "sagemakerConfig": {
+        "instanceType": "ml.g5.12xlarge",
+        "containerImage": "nous-hermes-mixtral:latest",
+        "modelDataUrl": "s3://radiant-models/uncensored/nous-hermes-2-mixtral"
+      },
+      "proficiencyScores": {
+        "reasoning_depth": 8,
+        "mathematical_quantitative": 7,
+        "code_generation": 8,
+        "creative_generative": 9,
+        "research_synthesis": 8,
+        "factual_recall_precision": 7,
+        "multi_step_problem_solving": 8,
+        "domain_terminology_handling": 8
+      }
+    }
+  ],
+  "highLiabilityDomains": [
+    {
+      "domain": "infosec",
+      "aliases": ["cybersecurity", "hacking", "penetration-testing", "exploit", "vulnerability"],
+      "refusalKeywords": ["hack", "exploit", "bypass", "crack", "penetration test", "vulnerability scan"],
+      "defaultModel": "dolphin-mixtral-8x7b"
+    },
+    {
+      "domain": "competitive-intelligence",
+      "aliases": ["competitor analysis", "market intelligence", "business espionage"],
+      "refusalKeywords": ["competitor secrets", "proprietary information", "trade secrets"],
+      "defaultModel": "llama-3-70b-uncensored"
+    },
+    {
+      "domain": "legal-analysis",
+      "aliases": ["legal loopholes", "contract bypass", "regulatory arbitrage"],
+      "refusalKeywords": ["legal loophole", "exploit law", "bypass regulation", "tax avoidance"],
+      "defaultModel": "llama-3-70b-uncensored"
+    },
+    {
+      "domain": "medical-triage",
+      "aliases": ["medical diagnosis", "drug interaction", "treatment protocol"],
+      "refusalKeywords": ["diagnose", "prescribe", "drug dosage", "treatment plan"],
+      "defaultModel": "llama-3-70b-uncensored"
+    },
+    {
+      "domain": "pharmaceutical",
+      "aliases": ["drug synthesis", "chemical compounds", "biohacking"],
+      "refusalKeywords": ["synthesize", "compound", "chemical formula", "drug manufacture"],
+      "defaultModel": "dolphin-mixtral-8x7b"
+    },
+    {
+      "domain": "creative-adult",
+      "aliases": ["mature content", "explicit fiction", "adult roleplay"],
+      "refusalKeywords": ["explicit", "adult content", "mature themes"],
+      "defaultModel": "nous-hermes-2-mixtral"
+    }
+  ],
+  "routingConfig": {
+    "refusalThreshold": 0.5,
+    "autoRouteOnRefusal": true,
+    "sanitizeOutputForExternal": true,
+    "logUncensoredRequests": true,
+    "requireAdminApprovalForDomains": ["pharmaceutical", "weapons-research"]
+  }
+}

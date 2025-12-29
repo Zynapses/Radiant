@@ -1,8 +1,11 @@
 // RADIANT v4.18.0 - Admin API for Consciousness Indicators
 // Based on Butlin, Chalmers, Bengio et al. (2023)
+// Updated with graph density metrics and heartbeat status
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { consciousnessService } from '../shared/services/consciousness.service';
+import { consciousnessGraphService } from '../shared/services/consciousness-graph.service';
+import { consciousnessMiddlewareService } from '../shared/services/consciousness-middleware.service';
 import { executeStatement } from '../shared/db/client';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 
@@ -318,3 +321,292 @@ export const recordMetrics: APIGatewayProxyHandler = async (event) => {
     return response(500, { success: false, error: 'Failed to record consciousness metrics' });
   }
 };
+
+// ============================================================================
+// GET /admin/consciousness/graph-density
+// Real graph density metrics replacing fake phi
+// ============================================================================
+export const getGraphDensity: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = event.requestContext.authorizer?.tenantId || 'default';
+    const recalculate = event.queryStringParameters?.recalculate === 'true';
+    
+    let metrics;
+    if (recalculate) {
+      metrics = await consciousnessGraphService.calculateGraphDensity(tenantId);
+    } else {
+      // Get cached metrics from DB
+      const result = await executeStatement(
+        `SELECT semantic_graph_density, conceptual_connectivity, information_integration,
+                causal_density, system_complexity_index, total_nodes, total_edges,
+                clustering_coefficient, updated_at
+         FROM integrated_information WHERE tenant_id = $1`,
+        [{ name: 'tenantId', value: { stringValue: tenantId } }]
+      );
+      
+      if (result.rows.length > 0) {
+        const row = result.rows[0] as Record<string, unknown>;
+        metrics = {
+          semanticGraphDensity: Number(row.semantic_graph_density || 0),
+          conceptualConnectivity: Number(row.conceptual_connectivity || 0),
+          informationIntegration: Number(row.information_integration || 0),
+          causalDensity: Number(row.causal_density || 0),
+          systemComplexityIndex: Number(row.system_complexity_index || 0),
+          totalNodes: Number(row.total_nodes || 0),
+          totalEdges: Number(row.total_edges || 0),
+          clusteringCoefficient: Number(row.clustering_coefficient || 0),
+          lastUpdated: row.updated_at,
+        };
+      } else {
+        // Calculate if no cached data
+        metrics = await consciousnessGraphService.calculateGraphDensity(tenantId);
+      }
+    }
+    
+    return response(200, { success: true, data: metrics });
+  } catch (error) {
+    logger.error('Error fetching graph density', error);
+    return response(500, { success: false, error: 'Failed to fetch graph density metrics' });
+  }
+};
+
+// ============================================================================
+// GET /admin/consciousness/heartbeat
+// Heartbeat status and recent activity
+// ============================================================================
+export const getHeartbeatStatus: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = event.requestContext.authorizer?.tenantId || 'default';
+    
+    // Get current heartbeat config and status
+    const configResult = await executeStatement(
+      `SELECT heartbeat_tick, last_heartbeat_at, heartbeat_config, 
+              consciousness_enabled, affect_mapping_config
+       FROM consciousness_parameters WHERE tenant_id = $1`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+    
+    // Get recent heartbeat logs
+    const logsResult = await executeStatement(
+      `SELECT tick, actions, errors, duration_ms, created_at
+       FROM consciousness_heartbeat_log 
+       WHERE tenant_id = $1 
+       ORDER BY created_at DESC LIMIT 10`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+    
+    const config = configResult.rows.length > 0 
+      ? configResult.rows[0] as Record<string, unknown>
+      : null;
+    
+    const heartbeatStatus = {
+      enabled: config?.consciousness_enabled ?? true,
+      currentTick: Number(config?.heartbeat_tick || 0),
+      lastHeartbeat: config?.last_heartbeat_at || null,
+      config: typeof config?.heartbeat_config === 'string' 
+        ? JSON.parse(config.heartbeat_config) 
+        : config?.heartbeat_config || {},
+      affectMappingConfig: typeof config?.affect_mapping_config === 'string'
+        ? JSON.parse(config.affect_mapping_config)
+        : config?.affect_mapping_config || {},
+      recentLogs: logsResult.rows.map((row: Record<string, unknown>) => ({
+        tick: Number(row.tick),
+        actions: typeof row.actions === 'string' ? JSON.parse(row.actions as string) : row.actions,
+        errors: typeof row.errors === 'string' ? JSON.parse(row.errors as string) : row.errors,
+        durationMs: Number(row.duration_ms || 0),
+        createdAt: row.created_at,
+      })),
+    };
+    
+    return response(200, { success: true, data: heartbeatStatus });
+  } catch (error) {
+    logger.error('Error fetching heartbeat status', error);
+    return response(500, { success: false, error: 'Failed to fetch heartbeat status' });
+  }
+};
+
+// ============================================================================
+// PUT /admin/consciousness/heartbeat/config
+// Update heartbeat configuration
+// ============================================================================
+export const updateHeartbeatConfig: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = event.requestContext.authorizer?.tenantId || 'default';
+    const body = JSON.parse(event.body || '{}');
+    
+    const { enabled, heartbeatConfig, affectMappingConfig } = body;
+    
+    const sets: string[] = [];
+    const params: Array<{ name: string; value: unknown }> = [
+      { name: 'tenantId', value: { stringValue: tenantId } },
+    ];
+    
+    if (enabled !== undefined) {
+      sets.push(`consciousness_enabled = $${params.length + 1}`);
+      params.push({ name: 'enabled', value: { booleanValue: enabled } });
+    }
+    if (heartbeatConfig !== undefined) {
+      sets.push(`heartbeat_config = $${params.length + 1}`);
+      params.push({ name: 'heartbeatConfig', value: { stringValue: JSON.stringify(heartbeatConfig) } });
+    }
+    if (affectMappingConfig !== undefined) {
+      sets.push(`affect_mapping_config = $${params.length + 1}`);
+      params.push({ name: 'affectConfig', value: { stringValue: JSON.stringify(affectMappingConfig) } });
+    }
+    
+    if (sets.length === 0) {
+      return response(400, { success: false, error: 'No fields to update' });
+    }
+    
+    await executeStatement(
+      `INSERT INTO consciousness_parameters (tenant_id, ${sets.map(s => s.split(' = ')[0]).join(', ')})
+       VALUES ($1, ${params.slice(1).map((_, i) => `$${i + 2}`).join(', ')})
+       ON CONFLICT (tenant_id) DO UPDATE SET ${sets.join(', ')}, updated_at = NOW()`,
+      params
+    );
+    
+    return response(200, { success: true, message: 'Heartbeat configuration updated' });
+  } catch (error) {
+    logger.error('Error updating heartbeat config', error);
+    return response(500, { success: false, error: 'Failed to update heartbeat configuration' });
+  }
+};
+
+// ============================================================================
+// GET /admin/consciousness/affect-state
+// Get current affective state with hyperparameter recommendations
+// ============================================================================
+export const getAffectState: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = event.requestContext.authorizer?.tenantId || 'default';
+    
+    const affectiveState = await consciousnessService.getAffectiveState(tenantId);
+    const hyperparameters = consciousnessMiddlewareService.mapAffectToHyperparameters(affectiveState);
+    
+    return response(200, { 
+      success: true, 
+      data: {
+        affectiveState,
+        recommendedHyperparameters: hyperparameters,
+        interpretation: {
+          dominantEmotion: getDominantEmotion(affectiveState),
+          boredomLevel: affectiveState 
+            ? (1 - affectiveState.engagement) * (1 - affectiveState.arousal) 
+            : 0,
+          stressLevel: affectiveState
+            ? (affectiveState.frustration + affectiveState.arousal * affectiveState.frustration) / 2
+            : 0,
+        }
+      }
+    });
+  } catch (error) {
+    logger.error('Error fetching affect state', error);
+    return response(500, { success: false, error: 'Failed to fetch affect state' });
+  }
+};
+
+// ============================================================================
+// GET /admin/consciousness/ethics-frameworks
+// List available ethics frameworks
+// ============================================================================
+export const getEthicsFrameworks: APIGatewayProxyHandler = async (event) => {
+  try {
+    const result = await executeStatement(
+      `SELECT framework_id, preset_id, name, description, version, 
+              categories, default_guidance, is_builtin, created_at
+       FROM ethics_frameworks ORDER BY is_builtin DESC, name`,
+      []
+    );
+    
+    const frameworks = result.rows.map((row: Record<string, unknown>) => ({
+      frameworkId: row.framework_id,
+      presetId: row.preset_id,
+      name: row.name,
+      description: row.description,
+      version: row.version,
+      categories: row.categories,
+      defaultGuidance: row.default_guidance,
+      isBuiltin: row.is_builtin,
+      createdAt: row.created_at,
+    }));
+    
+    return response(200, { success: true, data: frameworks });
+  } catch (error) {
+    logger.error('Error fetching ethics frameworks', error);
+    return response(500, { success: false, error: 'Failed to fetch ethics frameworks' });
+  }
+};
+
+// ============================================================================
+// GET /admin/consciousness/ethics-frameworks/{presetId}
+// Get specific ethics framework with teachings and principles
+// ============================================================================
+export const getEthicsFramework: APIGatewayProxyHandler = async (event) => {
+  try {
+    const presetId = event.pathParameters?.presetId;
+    
+    if (!presetId) {
+      return response(400, { success: false, error: 'Preset ID required' });
+    }
+    
+    const result = await executeStatement(
+      `SELECT * FROM ethics_frameworks WHERE preset_id = $1`,
+      [{ name: 'presetId', value: { stringValue: presetId } }]
+    );
+    
+    if (result.rows.length === 0) {
+      return response(404, { success: false, error: 'Framework not found' });
+    }
+    
+    const row = result.rows[0] as Record<string, unknown>;
+    const framework = {
+      frameworkId: row.framework_id,
+      presetId: row.preset_id,
+      name: row.name,
+      description: row.description,
+      version: row.version,
+      teachings: typeof row.teachings === 'string' ? JSON.parse(row.teachings) : row.teachings,
+      principles: typeof row.principles === 'string' ? JSON.parse(row.principles) : row.principles,
+      categories: row.categories,
+      defaultGuidance: row.default_guidance,
+      isBuiltin: row.is_builtin,
+    };
+    
+    return response(200, { success: true, data: framework });
+  } catch (error) {
+    logger.error('Error fetching ethics framework', error);
+    return response(500, { success: false, error: 'Failed to fetch ethics framework' });
+  }
+};
+
+// Helper function
+function getDominantEmotion(affect: { 
+  frustration?: number; 
+  curiosity?: number; 
+  satisfaction?: number;
+  confidence?: number;
+  engagement?: number;
+  valence?: number;
+} | null): string {
+  if (!affect) return 'neutral';
+  
+  const emotions: Record<string, number> = {
+    frustrated: affect.frustration || 0,
+    curious: affect.curiosity || 0,
+    satisfied: affect.satisfaction || 0,
+    confident: affect.confidence || 0,
+    engaged: affect.engagement || 0,
+  };
+  
+  let dominant = 'neutral';
+  let maxValue = 0.5;
+  
+  for (const [emotion, value] of Object.entries(emotions)) {
+    if (value > maxValue) {
+      dominant = emotion;
+      maxValue = value;
+    }
+  }
+  
+  return dominant;
+}

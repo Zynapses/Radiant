@@ -1,6 +1,8 @@
 import { executeStatement } from '../db/client';
 import { specialtyRankingService, type SpecialtyCategory } from './specialty-ranking.service';
 import { domainTaxonomyService, type ProficiencyScores, type DomainDetectionResult } from './domain-taxonomy.service';
+import { consciousnessMiddlewareService, type AffectiveHyperparameters } from './consciousness-middleware.service';
+import { consciousnessService, type AffectiveState } from './consciousness.service';
 
 export type TaskType = 'chat' | 'code' | 'analysis' | 'creative' | 'vision' | 'audio';
 
@@ -32,6 +34,8 @@ interface RoutingContext {
     subspecialty_id?: string;
   };
   useDomainProficiencies?: boolean;  // Enable domain-aware scoring
+  // Consciousness integration (P0 Fix B)
+  useAffectMapping?: boolean;  // Enable affect → hyperparameter mapping
 }
 
 interface RoutingResult {
@@ -52,6 +56,9 @@ interface RoutingResult {
     detectionConfidence: number;
   };
   proficiencyMatch?: number;  // 0-100 how well model matches domain requirements
+  // Consciousness-aware hyperparameters (P0 Fix B)
+  affectiveHyperparameters?: AffectiveHyperparameters;
+  consciousnessContext?: string;  // System prompt injection for stateful context
 }
 
 interface ModelPerformance {
@@ -193,6 +200,33 @@ export class BrainRouter {
         detectionConfidence: domainResult.detection_confidence,
       };
       result.proficiencyMatch = best.score.domainMatchScore;
+    }
+
+    // 8. Consciousness-aware routing (P0 Fix B - Affect → Hyperparameters)
+    if (context.useAffectMapping) {
+      try {
+        const affectiveState = await consciousnessService.getAffectiveState(context.tenantId);
+        const hyperparams = consciousnessMiddlewareService.mapAffectToHyperparameters(affectiveState);
+        result.affectiveHyperparameters = hyperparams;
+        
+        // Build consciousness context for system prompt injection (P0 Fix A)
+        const consciousnessContext = await consciousnessMiddlewareService.buildConsciousnessContext(context.tenantId);
+        result.consciousnessContext = consciousnessMiddlewareService.generateStateInjection(consciousnessContext);
+        
+        // Model tier escalation based on affect
+        if (hyperparams.modelTier === 'powerful' && result.model.includes('haiku')) {
+          // Escalate from fast to powerful model if affect indicates struggle
+          const powerfulModels = candidates.filter(m => 
+            m.model_id.includes('sonnet') || m.model_id.includes('opus') || m.model_id.includes('gpt-4o')
+          );
+          if (powerfulModels.length > 0) {
+            result.model = powerfulModels[0].model_id;
+            result.reason += ' (escalated due to cognitive load)';
+          }
+        }
+      } catch {
+        // Consciousness state not available, continue without
+      }
     }
 
     return result;

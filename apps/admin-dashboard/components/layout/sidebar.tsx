@@ -58,6 +58,7 @@ import {
   Star,
   GlobeIcon,
   Rocket,
+  Thermometer,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -83,6 +84,7 @@ const navigation: NavigationItem[] = [
   // AI & Models Section
   { type: 'separator', label: 'AI & Models' },
   { name: 'Models', href: '/models', icon: Cpu },
+  { name: 'Inference Components', href: '/inference-components', icon: Thermometer },
   { name: 'Model Pricing', href: '/models/pricing', icon: DollarSign },
   { name: 'Model Metadata', href: '/model-metadata', icon: FileText },
   { name: 'Specialty Rankings', href: '/specialty-rankings', icon: Star },

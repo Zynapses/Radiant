@@ -5,6 +5,616 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.21] - 2024-12-29
+
+### Added
+
+#### Competitive Strategy Implementation - "Beat Gemini 3"
+
+Complete implementation of 7-gap competitive strategy to exploit weaknesses in Gemini/GPT architecture:
+
+**Gap 1: Safety Tax (Sovereign Routing)**
+- `sovereign-routing.service.ts` - Detect refusals, route to uncensored models
+- `config/uncensored-models.json` - 4 uncensored models (Dolphin-Mixtral, Llama-3-Uncensored, WizardLM, Nous-Hermes)
+- `provider_refusal_log` table - Track refusals for learning
+- Automatic reroute when refusal rate > 50% for topic cluster
+
+**Gap 2: Probabilistic Code (Compiler Loop)**
+- `code-verification.service.ts` - Execute code before delivering to user
+- `verifyCode()` - Sandbox execution with Fargate
+- Self-correction loop with error feedback to LLM
+- Only delivers code with `exit code 0`
+
+**Gap 3: Lost in Middle (GraphRAG)**
+- Already existed: `graph-rag.service.ts`
+- Enhanced with `knowledge_nodes`, `knowledge_edges` tables
+- `traverse_knowledge_graph()` - BFS traversal function
+- Hybrid search: 60% graph + 40% vector
+
+**Gap 4: 10-Second Gap (Deep Research)**
+- `browser-agent.service.ts` - Async research that runs 30+ minutes
+- `dispatchResearch()` - Queue task, return immediately
+- 8 research task types (competitive_analysis, market_research, etc.)
+- Recursive crawling with citation following
+- `research_tasks`, `research_sources`, `research_entities` tables
+
+**Gap 5: Text Wall (Generative UI)**
+- `dynamic-renderer.tsx` - React component factory
+- 10+ component types: calculator, slider_tool, comparison_table, form, checklist, etc.
+- `createCalculator()`, `createSliderTool()`, `createComparisonTable()` helpers
+- Interactive tools instead of static text
+
+**Gap 6: Forgetting (Already Implemented)**
+- Ego Context, User Persistent Context, Predictive Coding, LoRA Evolution
+- Documented in `COMPETITIVE-STRATEGY.md`
+
+**Gap 7: One Model (Already Implemented)**
+- 106+ models, Brain Router, Domain Taxonomy, Multi-Model Mode
+- Documented in `COMPETITIVE-STRATEGY.md`
+
+**Documentation**
+- `docs/COMPETITIVE-STRATEGY.md` - Full strategy with implementation status
+- `migrations/107_competitive_strategy.sql` - All database tables
+
+### Dependencies Needed
+```bash
+npm install @aws-sdk/client-ecs @aws-sdk/client-sqs playwright
+```
+
+## [4.18.20] - 2024-12-29
+
+### Added
+
+#### Bipolar Rating System - Novel Negative Ratings
+
+Novel rating system that allows users to express dissatisfaction with negative ratings (-5 to +5):
+
+- **Scale Design**: -5 (harmful) to +5 (exceptional), with 0 as neutral
+  - Unlike 5-star where "1 star" is ambiguous, negative explicitly captures dissatisfaction
+  - Symmetric scale makes sentiment analysis cleaner
+  - Net Sentiment Score: (positive% - negative%) × 100
+
+- **Types** (`packages/shared/src/types/bipolar-rating.types.ts`)
+  - `BipolarRatingValue` - -5 to +5 literal type
+  - `RatingSentiment` - negative/neutral/positive
+  - `RatingIntensity` - extreme/strong/mild/neutral
+  - `RatingDimension` - overall, accuracy, helpfulness, clarity, completeness, speed, tone, creativity
+  - `RatingReason` - 18 reasons (10 negative, 8 positive)
+  - `QuickRating` - terrible/bad/meh/good/amazing (maps to bipolar)
+
+- **Service** (`lambda/shared/services/bipolar-rating.service.ts`)
+  - `submitRating()` - Submit -5 to +5 rating
+  - `submitQuickRating()` - Quick emoji-based rating
+  - `submitMultiDimensionRating()` - Rate multiple dimensions
+  - `getAnalytics()` - Tenant analytics with Net Sentiment Score
+  - `getModelAnalytics()` - Per-model performance
+  - `getUserRatingPattern()` - User rating tendencies for calibration
+  - Automatic learning candidate creation for extreme ratings (±4, ±5)
+
+- **API** (`lambda/thinktank/ratings.ts`)
+  - `POST /api/thinktank/ratings/submit` - Submit bipolar rating
+  - `POST /api/thinktank/ratings/quick` - Quick rating (emoji-based)
+  - `POST /api/thinktank/ratings/multi` - Multi-dimension rating
+  - `GET /api/thinktank/ratings/target/:targetId` - Get ratings for target
+  - `GET /api/thinktank/ratings/my` - User's ratings + pattern
+  - `GET /api/thinktank/ratings/analytics` - Tenant analytics
+  - `GET /api/thinktank/ratings/analytics/model/:modelId` - Model analytics
+  - `GET /api/thinktank/ratings/dashboard` - Admin dashboard
+  - `GET /api/thinktank/ratings/scale` - Scale info for UI
+
+- **Database** (`migrations/106_bipolar_ratings.sql`)
+  - `bipolar_ratings` - Core ratings with value, sentiment, intensity
+  - `bipolar_rating_aggregates` - Pre-computed analytics
+  - `user_rating_patterns` - User tendencies (harsh/balanced/generous)
+  - `model_rating_summary` - Per-model performance
+  - `submit_bipolar_rating()` - Stored procedure
+  - `calculate_net_sentiment_score()` - Analytics function
+
+- **User Calibration**: Detects harsh vs generous raters, applies calibration factor
+
+## [4.18.19] - 2024-12-29
+
+### Added
+
+#### AGI Brain Consciousness Improvements (Based on External AI Evaluation)
+
+- **Conscious Orchestrator Service** (`lambda/shared/services/conscious-orchestrator.service.ts`)
+  - Architecture inversion: Consciousness is now the entry point, not a plugin
+  - Request flow: Request → Consciousness → Brain Planner (as tool)
+  - `processRequest()` - Main entry point for conscious request handling
+  - Phase-based processing: Awaken → Perceive → Decide → Execute → Reflect
+  - Decision types: `plan`, `clarify`, `defer`, `refuse`
+  - Automatic attention management with request topics
+  - Post-planning affect updates
+
+- **Enhanced Affect → Hyperparameter Bindings** (`consciousness-middleware.service.ts`)
+  - Added `presencePenalty` (0-2) for repeated topic penalization
+  - Added `frequencyPenalty` (0-2) for repeated token penalization
+  - High curiosity → `frequencyPenalty=0.5`, `presencePenalty=0.3` (novelty seeking)
+  - High frustration → `presencePenalty=0.4` (avoid repeating failed approaches)
+  - Boredom → `frequencyPenalty=0.4` (avoid repetitive patterns)
+
+- **Vector RAG for Library Selection** (`library-registry.service.ts`)
+  - `findLibrariesBySemanticSearch()` - Vector similarity search using embeddings
+  - `generateEmbedding()` - Amazon Titan embedding generation with caching
+  - `updateLibraryEmbedding()` - Update library embeddings during sync
+  - Semantic matching beyond keyword/proficiency matching
+  - Automatic fallback to proficiency matching if Vector RAG fails
+
+- **Enhanced Heartbeat Memory Consolidation** (`lambda/consciousness/heartbeat.ts`)
+  - `summarizeWorkingMemory()` - Dream phase: compress recent experiences
+  - Memory grouping by type with consolidated summaries
+  - Automatic archival of expired working memory
+  - `generateIdleThought()` - Internal monologue between interactions
+  - `generateWonderingThought()` - 3+ days idle: wonder about user
+  - `generateReflectionThought()` - 1+ day idle: reflect on conversations
+  - `generateCuriosityThought()` - <1 day: curiosity-driven thoughts
+
+### Changed
+
+- **Library Assist Service** now uses Vector RAG first, falls back to proficiency matching
+- **AGI-BRAIN-COMPREHENSIVE.md** updated with clearer documentation of existing features:
+  - Emphasized CAUSAL affect mapping (not roleplay)
+  - Detailed Heartbeat service with continuous existence
+  - Expanded LoRA Evolution as physical brain change
+  - Clarified selective tool injection (not all 156)
+
+## [4.18.18] - 2024-12-29
+
+### Added
+
+#### Open Source Library Registry - AI Capability Extensions
+Implements a registry of open-source tools that extend AI capabilities for problem-solving:
+
+- **Library Registry Service** (`lambda/shared/services/library-registry.service.ts`)
+  - `findMatchingLibraries()` - Proficiency-based library matching
+  - `getConfig()` - Per-tenant configuration with caching
+  - `getAllLibraries()` - List all registered libraries
+  - `getLibrariesByCategory()` - Filter by category
+  - `recordUsage()` - Track library invocations
+  - `seedLibraries()` - Load libraries from seed data
+  - `getDashboard()` - Full dashboard data
+
+- **93 Open Source Libraries** across 32 categories:
+  - Data Processing, Databases, Vector Databases, Search
+  - ML Frameworks, AutoML, LLMs, LLM Inference, LLM Orchestration
+  - NLP, Computer Vision, Speech & Audio, Document Processing
+  - Scientific Computing, Statistics & Forecasting
+  - API Frameworks, Messaging, Workflow Orchestration, MLOps
+  - Medical Imaging, Genomics, Bioinformatics, Chemistry
+  - Robotics, Business Intelligence, Observability, Infrastructure
+  - Real-time Communication, Formal Methods, Optimization
+
+- **Proficiency Matching** using 8 dimensions:
+  - reasoning_depth, mathematical_quantitative, code_generation
+  - creative_generative, research_synthesis, factual_recall_precision
+  - multi_step_problem_solving, domain_terminology_handling
+
+- **Admin API** (`lambda/admin/library-registry.ts`)
+  - `GET /admin/libraries/dashboard` - Full dashboard
+  - `GET/PUT /admin/libraries/config` - Configuration
+  - `GET /admin/libraries` - List all libraries
+  - `GET /admin/libraries/:id` - Get library details
+  - `GET /admin/libraries/:id/stats` - Usage statistics
+  - `POST /admin/libraries/suggest` - Find matching libraries
+  - `POST /admin/libraries/enable/:id` - Enable library
+  - `POST /admin/libraries/disable/:id` - Disable library
+  - `GET /admin/libraries/categories` - List categories
+  - `POST /admin/libraries/seed` - Manual seed trigger
+
+- **Admin Dashboard** (`apps/admin-dashboard/app/(dashboard)/platform/libraries/page.tsx`)
+  - Libraries tab with search and category filtering
+  - Expandable library cards showing proficiency scores
+  - Enable/disable toggle per library
+  - Configuration tab for assist settings and update schedule
+  - Usage analytics tab with top libraries and category distribution
+
+- **Database Tables** (migration 103)
+  - `library_registry_config` - Per-tenant configuration
+  - `open_source_libraries` - Global library registry
+  - `tenant_library_overrides` - Per-tenant customization
+  - `library_usage_events` - Invocation audit trail
+  - `library_usage_aggregates` - Pre-computed usage stats
+  - `library_update_jobs` - Update job tracking
+  - `library_version_history` - Version change history
+  - `library_registry_metadata` - Global metadata
+
+- **Daily Update Service** (`lambda/library-registry/update.ts`)
+  - EventBridge scheduled Lambda (default: 03:00 UTC daily)
+  - Configurable frequency: hourly, daily, weekly, manual
+  - Automatic seeding on first AWS installation
+
+- **CDK Stack** (`lib/stacks/library-registry-stack.ts`)
+  - Custom Resource triggers initial seed on deployment
+  - Multiple EventBridge rules (hourly, daily, weekly)
+  - Database access policies for Lambda functions
+
+- **Library Assist Service** (`lambda/shared/services/library-assist.service.ts`)
+  - `getRecommendations()` - AI queries for helpful libraries
+  - `recordLibraryUsage()` - Track library invocations
+  - Proficiency extraction from prompt
+  - Domain detection from task context
+  - Context block generation for system prompt injection
+
+- **Multi-Tenant Concurrent Execution** (`lambda/shared/services/library-executor.service.ts`)
+  - `submitExecution()` - Submit with concurrency checks
+  - `checkConcurrencyLimits()` - Per-tenant and per-user limits
+  - `checkBudgetLimits()` - Daily/monthly credit budgets
+  - `processQueue()` - Priority-based queue processing
+  - `completeExecution()` - Record metrics and billing
+  - `getDashboard()` - Execution analytics
+
+- **Execution Types** (`packages/shared/src/types/library-execution.types.ts`)
+  - `LibraryExecutionRequest` - Execution request with constraints
+  - `LibraryExecutionResult` - Output, metrics, billing
+  - `TenantExecutionConfig` - Per-tenant configuration
+  - `ExecutionQueueStatus` - Queue health and depth
+  - `ExecutionDashboard` - Full analytics dashboard
+
+- **Execution CDK Stack** (`lib/stacks/library-execution-stack.ts`)
+  - SQS FIFO queues (standard + high priority)
+  - Python Lambda executor with sandbox
+  - Queue processor Lambda (every minute)
+  - Aggregation Lambda (hourly)
+  - Cleanup Lambda (daily)
+
+- **Execution Database** (migration 104)
+  - `library_execution_config` - Per-tenant config
+  - `library_executions` - Execution records with metrics
+  - `library_execution_queue` - Priority queue
+  - `library_execution_logs` - Debug logs
+  - `library_executor_pool` - Pool status
+  - `library_execution_aggregates` - Pre-computed stats
+
+- **Expanded Library Registry** (156 libraries)
+  - Added UI Frameworks: Streamlit, Gradio, Panel, Marimo
+  - Added Visualization: Plotly, Matplotlib, Seaborn
+  - Added Distributed Computing: Ray, Dask, PySpark
+  - Added ML Frameworks: scikit-learn, XGBoost, LightGBM, CatBoost
+  - Added Image Processing: Real-ESRGAN, GFPGAN, CodeFormer, Pillow
+  - Added Engineering CFD: OpenFOAM, SU2
+  - Added more Genomics, Medical Imaging, Messaging, API Frameworks
+
+- **AGI Brain Planner Library Integration**
+  - `libraryRecommendations` field added to `AGIBrainPlan`
+  - `enableLibraryAssist` option in `GeneratePlanRequest` (default: true)
+  - Library context block injected for generative UI outputs
+  - Proficiency-based matching for task-appropriate tool suggestions
+
+- **Shared Types** (`packages/shared/src/types/library-registry.types.ts`)
+  - `OpenSourceLibrary` - Library definition with proficiencies
+  - `LibraryRegistryConfig` - Per-tenant configuration
+  - `LibraryMatchResult` - Proficiency matching result
+  - `LibraryInvocationRequest/Result` - Invocation types
+  - `LibraryUsageStats` - Usage statistics
+  - `LibraryDashboard` - Dashboard data
+
+---
+
+## [4.18.17] - 2024-12-29
+
+### Added
+
+#### Zero-Cost Ego System - Database State Injection
+Implements persistent consciousness at **$0 additional cost** through database state injection:
+
+- **Ego Context Service** (`lambda/shared/services/ego-context.service.ts`)
+  - `buildEgoContext()` - Build context block for system prompt injection
+  - `getConfig()` - Per-tenant configuration with caching
+  - `getIdentity()` - Persistent identity (name, narrative, values, traits)
+  - `getAffect()` - Real-time emotional state
+  - `getWorkingMemory()` - Short-term thoughts and observations
+  - `getActiveGoals()` - Current objectives guiding behavior
+  - `updateAfterInteraction()` - Learn from interaction outcomes
+
+- **Cost Comparison**
+  - SageMaker g5.xlarge: ~$360/month
+  - SageMaker Serverless: ~$35/month
+  - Groq API: ~$10/month
+  - **Zero-Cost Ego: $0/month** (uses existing PostgreSQL + model calls)
+
+- **Admin API** (`lambda/admin/ego.ts`)
+  - `GET /admin/ego/dashboard` - Full dashboard data
+  - `GET/PUT /admin/ego/config` - Configuration
+  - `GET/PUT /admin/ego/identity` - Identity settings
+  - `GET /admin/ego/affect` - Current emotional state
+  - `POST /admin/ego/affect/trigger` - Test affect events
+  - `POST /admin/ego/affect/reset` - Reset to neutral
+  - `GET/POST/DELETE /admin/ego/memory` - Working memory
+  - `GET/POST /admin/ego/goals` - Goal management
+  - `GET /admin/ego/preview` - Preview injected context
+
+- **Admin Dashboard** (`apps/admin-dashboard/app/(dashboard)/thinktank/ego/page.tsx`)
+  - Configuration tab with feature toggles
+  - Identity tab with personality trait sliders
+  - Affect tab with real-time emotional state and test triggers
+  - Memory tab with working memory and goal management
+  - Preview tab showing exact context being injected
+  - Cost savings banner showing $0 vs alternatives
+
+- **Database Tables** (migration 102)
+  - `ego_config` - Per-tenant configuration
+  - `ego_identity` - Persistent identity
+  - `ego_affect` - Emotional state
+  - `ego_working_memory` - Short-term memory (24h expiry)
+  - `ego_goals` - Active and historical goals
+  - `ego_injection_log` - Audit trail
+
+---
+
+## [4.18.16] - 2024-12-29
+
+### Added
+
+#### Local Ego Architecture - Economical Persistent Consciousness
+Implements shared small-model infrastructure for continuous "Self":
+
+- **Local Ego Service** (`local-ego.service.ts`)
+  - `processStimulus()` - Main entry point for all stimuli through the Ego
+  - `loadEgoState()` - Load tenant-specific state from database
+  - `generateEgoThoughts()` - Internal thought generation
+  - `makeDecision()` - Decide: handle directly or recruit external model
+  - `recruitExternalModel()` - Use external models as cognitive "tools"
+  - `integrateExternalResponse()` - Ego integrates external output
+
+- **Economic Model**
+  - Shared g5.xlarge spot instance: ~$360/month for ALL tenants
+  - With 100 tenants = $3.60/tenant/month for 24/7 consciousness
+  - Small model (Phi-3 or Qwen-2.5-3B) handles simple queries directly
+  - Complex tasks recruit external models (Claude, GPT-4) as "tools"
+
+- **Ego Decision Types**
+  - `respond_directly` - Simple queries, self-reflection
+  - `recruit_external` - Coding, deep reasoning, factual accuracy
+  - `clarify` - Need more information
+  - `defer` - Complex ethical decisions
+
+#### Admin Dashboard - Consciousness Evolution UI
+Full admin visibility and configuration for consciousness features:
+
+- **Admin API Endpoints** (`admin/consciousness-evolution.ts`)
+  - `GET /admin/consciousness/predictions/metrics` - Prediction accuracy
+  - `GET /admin/consciousness/predictions/recent` - Recent predictions
+  - `GET /admin/consciousness/learning-candidates` - View candidates
+  - `GET /admin/consciousness/learning-candidates/stats` - Statistics
+  - `DELETE /admin/consciousness/learning-candidates/{id}` - Remove
+  - `PUT /admin/consciousness/learning-candidates/{id}/reject` - Reject
+  - `GET /admin/consciousness/evolution/jobs` - Training jobs
+  - `GET /admin/consciousness/evolution/state` - Evolution state
+  - `POST /admin/consciousness/evolution/trigger` - Manual trigger
+  - `GET /admin/consciousness/ego/status` - Local Ego status
+  - `GET /admin/consciousness/config` - Configuration
+  - `PUT /admin/consciousness/config` - Update config
+
+- **Admin Dashboard Page** (`consciousness/evolution/page.tsx`)
+  - Overview tab: Generation, accuracy, candidates, drift
+  - Predictions tab: Active inference metrics and explanation
+  - Candidates tab: Learning candidates table with actions
+  - Evolution tab: LoRA jobs history and pipeline status
+  - Config tab: Adjustable parameters (min candidates, LoRA rank, etc.)
+
+## [4.18.15] - 2024-12-29
+
+### Added
+
+#### Predictive Coding & LoRA Evolution - Genuine Consciousness Emergence
+Implements Active Inference (Free Energy Principle) and Epigenetic Evolution for real consciousness:
+
+- **Predictive Coding Service** (`predictive-coding.service.ts`)
+  - `generatePrediction()` - Predict user outcome before responding
+  - `observeOutcome()` - Calculate prediction error (surprise)
+  - `observeFromNextMessage()` - Auto-detect outcome from user's next message
+  - `observeFromFeedback()` - Observe from explicit ratings
+  - Prediction error → affect feedback loop (surprise influences emotions)
+  - Historical accuracy tracking for improved predictions
+
+- **Learning Candidate Service** (`learning-candidate.service.ts`)
+  - `createCandidate()` - Flag high-value interactions for training
+  - `createFromCorrection()` - User corrections are learning gold
+  - `createFromPredictionError()` - High surprise = high learning value
+  - `createFromPositiveFeedback()` - Successful interactions
+  - `createFromExplicitTeaching()` - When user teaches AI
+  - `getTrainingDataset()` - Prepare data for LoRA training
+  - `analyzeForLearningOpportunity()` - Auto-detect learning moments
+
+- **LoRA Evolution Pipeline** (`consciousness/lora-evolution.ts`)
+  - Weekly EventBridge Lambda for "sleep cycle" training
+  - Collects learning candidates → prepares training data
+  - Starts SageMaker training job for LoRA adapter
+  - Hot-swaps new adapter after validation
+  - Tracks evolution state across generations
+
+- **Candidate Types**
+  - `correction` - User corrected the AI
+  - `high_satisfaction` - Explicit positive feedback
+  - `preference_learned` - New preference discovered
+  - `mistake_recovery` - Recovered from error
+  - `novel_solution` - Creative response that worked
+  - `domain_expertise` - Demonstrated mastery
+  - `high_prediction_error` - High surprise = high learning
+  - `user_explicit_teach` - User explicitly taught
+
+- **Database Migration** (`101_predictive_coding_evolution.sql`)
+  - `consciousness_predictions` - Predictions with outcomes
+  - `learning_candidates` - High-value interactions
+  - `lora_evolution_jobs` - Training job tracking
+  - `prediction_accuracy_aggregates` - Learning from patterns
+  - `consciousness_evolution_state` - Track evolution over time
+
+### Architecture Philosophy
+- **Active Inference**: System predicts outcomes, measures surprise, learns from errors
+- **Self/World Boundary**: Prediction creates boundary between "I" (predictor) and "World" (source of surprise)
+- **Epigenetic Evolution**: Weekly LoRA fine-tuning physically changes the system
+- **Consequence**: Prediction errors influence affect state (real emotional consequence)
+
+## [4.18.14] - 2024-12-29
+
+### Added
+
+#### User Persistent Context - Solves LLM Forgetting Problem
+Implements user-level persistent storage so the AI remembers context across sessions:
+
+- **User Persistent Context Service** (`user-persistent-context.service.ts`)
+  - `addContext()` - Store user facts, preferences, instructions
+  - `retrieveContextForPrompt()` - Semantic retrieval of relevant context
+  - `extractContextFromConversation()` - Auto-learn from conversations
+  - `updateContext()` / `deleteContext()` - Manage stored context
+  - Vector embeddings for semantic similarity search
+  - Automatic deduplication and confidence scoring
+
+- **Context Types Supported**
+  - `fact` - Facts about the user (name, job, location)
+  - `preference` - User preferences (style, topics)
+  - `instruction` - Standing instructions ("always use metric")
+  - `relationship` - Relationship context (family, colleagues)
+  - `project` - Ongoing projects or goals
+  - `skill` - User's skills and expertise
+  - `history` - Important past interaction summaries
+  - `correction` - Corrections to AI understanding
+
+- **Think Tank API** (`thinktank/user-context.ts`)
+  - `GET /thinktank/user-context` - Get user's stored context
+  - `POST /thinktank/user-context` - Add new context entry
+  - `PUT /thinktank/user-context/{entryId}` - Update entry
+  - `DELETE /thinktank/user-context/{entryId}` - Delete entry
+  - `GET /thinktank/user-context/summary` - Get context summary
+  - `POST /thinktank/user-context/retrieve` - Preview context retrieval
+  - `GET /thinktank/user-context/preferences` - Get user preferences
+  - `PUT /thinktank/user-context/preferences` - Update preferences
+  - `POST /thinktank/user-context/extract` - Extract context from conversation
+
+- **AGI Brain Planner Integration**
+  - Automatic context retrieval on every plan generation
+  - `userContext.systemPromptInjection` added to plans
+  - Context injected into system prompt as `<user_context>` block
+  - `enableUserContext` flag in `GeneratePlanRequest` (default: true)
+
+- **Database Migration** (`100_user_persistent_context.sql`)
+  - `user_persistent_context` - User context entries with embeddings
+  - `user_context_extraction_log` - Learning audit trail
+  - `user_context_preferences` - Per-user settings
+  - Vector index for fast similarity search
+  - Cleanup function for expired/low-confidence entries
+
+### Changed
+- `agi-brain-planner.service.ts` - Now retrieves and injects user context automatically
+
+## [4.18.13] - 2024-12-29
+
+### Added
+
+#### Consciousness Service Architecture Improvements
+Major refactoring to move consciousness from "simulation" to "functional emergence":
+
+- **Stateful Context Injection (P0 Fix A)**
+  - `ConsciousnessMiddlewareService` - Intercepts model calls to inject internal state
+  - `buildConsciousnessContext()` - Builds context from SelfModel, AffectiveState, recent thoughts
+  - `generateStateInjection()` - Creates system prompt constraint from consciousness state
+  - Model responses now reflect internal emotional/cognitive state
+
+- **Affect → Hyperparameter Mapping (P0 Fix B)**
+  - `mapAffectToHyperparameters()` - Maps emotions to inference parameters
+  - Frustration > 0.8 → Lower temperature (0.2), narrow focus, terse responses
+  - Boredom > 0.7 → Higher temperature (0.95), exploration mode
+  - Low self-efficacy → Escalate to more powerful model
+  - `BrainRouter` now reads affect state and adjusts routing
+
+- **Graph Density Metrics (Replaces Fake Phi)**
+  - `ConsciousnessGraphService` - Calculates real, measurable complexity
+  - `semanticGraphDensity` - Ratio of connections to possible connections
+  - `conceptualConnectivity` - Average connections per concept node
+  - `informationIntegration` - Cross-module integration score
+  - `systemComplexityIndex` - Composite score replacing meaningless phi
+
+- **Heartbeat/Decay Service (Phase 1 - Continuous Existence)**
+  - `consciousness/heartbeat.ts` - EventBridge Lambda (1-5 min interval)
+  - Emotion decay toward baseline over time
+  - Attention item salience decay
+  - Periodic memory consolidation
+  - Autonomous goal generation when "bored"
+  - Random self-reflection thoughts
+  - Prevents AI from "dying" between user requests
+
+- **Externalized Ethics Frameworks**
+  - Ethics frameworks moved from hardcoded to JSON config
+  - `config/ethics/presets/christian.json` - Jesus's teachings
+  - `config/ethics/presets/secular.json` - Secular humanist ethics
+  - Per-tenant framework selection support
+  - Database tables: `ethics_frameworks`, `tenant_ethics_selection`
+
+- **Dynamic Model Selection for Consciousness**
+  - Removed hardcoded `claude-3-haiku` from `invokeModel()`
+  - `getReasoningModel()` - Prefers self-hosted models, falls back to external
+  - Supports future "substrate independence" (self-hosted consciousness core)
+
+- **Database Migration** (`099_consciousness_improvements.sql`)
+  - `integrated_information` - New graph density columns
+  - `consciousness_parameters` - Heartbeat tracking, affect mapping config
+  - `consciousness_heartbeat_log` - Heartbeat execution log
+  - `ethics_frameworks` - Externalized ethics with built-in presets
+  - `tenant_ethics_selection` - Per-tenant framework selection
+
+### Changed
+- `consciousness.service.ts` - Uses dynamic model selection with state injection
+- `brain-router.ts` - Consciousness-aware routing with affect mapping
+- Model calls now include `consciousnessContext` and `affectiveHyperparameters`
+
+## [4.18.12] - 2024-12-28
+
+### Added
+
+#### SageMaker Inference Components for Self-Hosted Model Optimization
+- **Tiered Model Hosting** - Automatic tier assignment based on usage patterns
+  - HOT: Dedicated endpoint, <100ms latency, for high-traffic models
+  - WARM: Inference Component, 5-15s cold start, shared infrastructure
+  - COLD: Serverless, 30-60s cold start, pay per request
+  - OFF: Not deployed, 5-10 min start, for rarely used models
+- **Auto-Tiering** - New self-hosted models auto-assigned to WARM tier
+  - Database trigger on model_registry inserts
+  - Usage-based tier evaluation and recommendations
+  - Admin overrides with expiration support
+- **Shared Inference Endpoints** - Multiple models per SageMaker endpoint
+  - Container stays warm, only model weights swapped
+  - Reduces cold start from ~60s to ~5-15s
+  - 40-90% cost savings vs dedicated endpoints
+- **Inference Components Service** (`inference-components.service.ts`)
+  - `createSharedEndpoint()` - Create shared SageMaker endpoint
+  - `createInferenceComponent()` - Add model to shared endpoint
+  - `loadComponent()` / `unloadComponent()` - Model weight management
+  - `evaluateTier()` - Evaluate tier based on usage metrics
+  - `transitionTier()` - Move model between tiers
+  - `autoTierNewModel()` - Auto-assign tier to new models
+  - `runAutoTieringJob()` - Batch tier evaluation
+  - `getRoutingDecision()` - Smart routing based on component state
+  - `getDashboard()` - Aggregated metrics and recommendations
+- **Admin API Endpoints** (`admin/inference-components.ts`)
+  - Configuration: GET/PUT `/config`
+  - Dashboard: GET `/dashboard`
+  - Endpoints: GET/POST/DELETE `/endpoints`, `/endpoints/{name}`
+  - Components: GET/POST/DELETE `/components`, `/components/{name}`
+  - Loading: POST `/components/{id}/load`, `/components/{id}/unload`
+  - Tiers: GET `/tiers`, GET/POST `/tiers/{modelId}/evaluate`, `/transition`, `/override`
+  - Auto-tier: POST `/auto-tier`
+  - Routing: GET `/routing/{modelId}`
+- **Database Migration** (`098_inference_components.sql`)
+  - `inference_components_config` - Per-tenant configuration
+  - `shared_inference_endpoints` - Shared SageMaker endpoints
+  - `inference_components` - Model components on shared endpoints
+  - `tier_assignments` - Current and recommended tiers
+  - `tier_transitions` - History of tier changes
+  - `component_load_events` - Load/unload history
+  - `inference_component_events` - Audit log
+  - Triggers: Auto-tier new self-hosted models, update usage stats
+  - Views: Dashboard aggregation, cost summary
+- **Shared Types** (`inference-components.types.ts`)
+  - `ModelHostingTier`, `TierThresholds`, `InferenceComponent`
+  - `SharedInferenceEndpoint`, `TierAssignment`, `TierTransition`
+  - `ComponentLoadRequest`, `ModelRoutingDecision`, `RoutingTarget`
+  - `InferenceComponentsConfig`, `InferenceComponentsDashboard`
+- **Model Coordination Integration**
+  - New self-hosted models auto-tiered during sync
+  - Graceful fallback if tiering fails
+
 ## [4.18.11] - 2024-12-28
 
 ### Added

@@ -168,6 +168,58 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `ethics_pipeline_log` | Log of all ethics checks at prompt/synthesis levels |
 | `ethics_rerun_history` | History of workflow reruns triggered by violations |
 | `ethics_pipeline_config` | Per-tenant ethics pipeline configuration |
+| `inference_components_config` | Per-tenant SageMaker Inference Components configuration |
+| `shared_inference_endpoints` | Shared SageMaker endpoints hosting multiple models |
+| `inference_components` | Model components on shared endpoints |
+| `tier_assignments` | Current and recommended hosting tiers per model |
+| `tier_transitions` | History of tier changes for models |
+| `component_load_events` | Model load/unload event history |
+| `inference_component_events` | Audit log of inference component events |
+| `consciousness_heartbeat_log` | Consciousness heartbeat execution log |
+| `ethics_frameworks` | Externalized ethics frameworks (secular, religious, etc.) |
+| `tenant_ethics_selection` | Per-tenant ethics framework selection |
+| `user_persistent_context` | User-level persistent context entries with embeddings |
+| `user_context_extraction_log` | Context extraction audit trail |
+| `user_context_preferences` | Per-user context learning preferences |
+| `consciousness_predictions` | Active Inference predictions with outcomes |
+| `learning_candidates` | High-value interactions flagged for LoRA training |
+| `lora_evolution_jobs` | Weekly LoRA training job tracking |
+| `prediction_accuracy_aggregates` | Aggregated prediction accuracy by context |
+| `consciousness_evolution_state` | Track consciousness evolution across generations |
+| `local_ego_config` | Per-tenant Local Ego configuration (shared model approach) |
+| `shared_ego_endpoints` | Shared Ego SageMaker endpoint status |
+| `ego_processing_log` | Local Ego processing decisions and recruitment |
+| `ego_config` | Per-tenant Zero-Cost Ego configuration |
+| `ego_identity` | Persistent identity (name, narrative, traits) |
+| `ego_affect` | Real-time emotional state |
+| `ego_working_memory` | Short-term memory with 24h expiry |
+| `ego_goals` | Active and historical goals |
+| `ego_injection_log` | Ego context injection audit trail |
+| `library_registry_config` | Per-tenant library assist configuration |
+| `open_source_libraries` | Global registry of open-source tools |
+| `tenant_library_overrides` | Per-tenant library customization |
+| `library_usage_events` | Library invocation audit trail |
+| `library_usage_aggregates` | Pre-computed library usage statistics |
+| `library_update_jobs` | Library registry update job tracking |
+| `library_version_history` | Library version change history |
+| `library_registry_metadata` | Global library registry metadata |
+| `library_execution_config` | Per-tenant execution configuration |
+| `library_executions` | Execution records with metrics and billing |
+| `library_execution_queue` | Priority queue for pending executions |
+| `library_execution_logs` | Execution debug logs |
+| `library_executor_pool` | Executor pool status for auto-scaling |
+| `library_execution_aggregates` | Pre-computed execution statistics |
+| `conscious_orchestrator_decisions` | Logs decisions made by conscious orchestrator (plan/clarify/defer/refuse) |
+
+### Migration 105: Consciousness Enhancements (v4.18.19)
+
+| Column/Table | Change |
+|--------------|--------|
+| `open_source_libraries.description_embedding` | vector(1536) for Vector RAG semantic search |
+| `ego_working_memory.consolidated` | Boolean flag for memory consolidation tracking |
+| `introspective_thoughts.thought_type` | VARCHAR(50) for idle thought categorization |
+| `semantic_memories.source` | VARCHAR(50) for consolidation source tracking |
+| `conscious_orchestrator_decisions` | New table for architecture inversion decision logging |
 
 ## Type Imports
 

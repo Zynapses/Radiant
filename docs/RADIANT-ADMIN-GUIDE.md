@@ -35,6 +35,7 @@
 22. [Model Proficiency Registry](#22-model-proficiency-registry)
 23. [Model Coordination Service](#23-model-coordination-service)
 24. [Ethics Pipeline](#24-ethics-pipeline)
+25. [Inference Components](#26-inference-components-self-hosted-model-optimization)
 
 ---
 
@@ -2571,5 +2572,546 @@ The ethics pipeline is integrated into the AGI Brain Plan:
 
 ---
 
-*Document Version: 4.18.9*
+## 26. Inference Components (Self-Hosted Model Optimization)
+
+**Location**: Admin Dashboard → AI Configuration → Inference Components
+
+The Inference Components system optimizes self-hosted model hosting on SageMaker by using shared infrastructure instead of dedicated endpoints per model. This reduces cold start times from ~60 seconds to ~5-15 seconds and significantly reduces costs.
+
+### 26.1 Model Hosting Tiers
+
+| Tier | Infrastructure | Cold Start | Cost | Use Case |
+|------|---------------|------------|------|----------|
+| **HOT** | Dedicated endpoint | <100ms | $$$$ | Top 5-10 most used models |
+| **WARM** | Inference Component | 5-15 sec | $$ | Moderate usage models |
+| **COLD** | Serverless | 30-60 sec | $ | Rarely used models |
+| **OFF** | Not deployed | 5-10 min | $0 | Almost never used |
+
+### 26.2 How It Works
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Tiered Model Hosting                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   Traditional: 10 models = 10 endpoints ($$$$$)                │
+│   ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ...                 │
+│   │EP-1 │ │EP-2 │ │EP-3 │ │EP-4 │ │EP-5 │                      │
+│   └─────┘ └─────┘ └─────┘ └─────┘ └─────┘                      │
+│                                                                 │
+│   With Inference Components: 10 models = 1-2 endpoints ($$)    │
+│   ┌─────────────────────────────────────────────────┐          │
+│   │              Shared Endpoint                     │          │
+│   │  ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐    │          │
+│   │  │M1 │ │M2 │ │M3 │ │M4 │ │M5 │ │M6 │ │...│    │          │
+│   │  └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └───┘    │          │
+│   └─────────────────────────────────────────────────┘          │
+│                                                                 │
+│   Container stays warm, only model weights are swapped          │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 26.3 Auto-Tiering
+
+New self-hosted models are automatically assigned to the **WARM** tier. The system continuously evaluates usage and recommends tier changes:
+
+| Metric | HOT Threshold | WARM Threshold | OFF Threshold |
+|--------|---------------|----------------|---------------|
+| Requests/day | ≥100 | ≥10 | 0 for 30 days |
+
+**Configuration**:
+```typescript
+{
+  autoTieringEnabled: true,
+  tierThresholds: {
+    hotTierMinRequestsPerDay: 100,
+    warmTierMinRequestsPerDay: 10,
+    offTierInactiveDays: 30
+  }
+}
+```
+
+### 26.4 Dashboard
+
+The Inference Components Dashboard shows:
+
+- **Model Distribution**: Count of models per tier
+- **Endpoint Utilization**: Compute units allocated vs available
+- **Cost Analysis**: Current monthly cost, savings vs dedicated endpoints
+- **Recent Transitions**: Tier changes with reasons
+- **Recommendations**: Models that should change tiers
+
+### 26.5 API Endpoints
+
+**Base**: `/api/admin/inference-components`
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/config` | GET | Get configuration |
+| `/config` | PUT | Update configuration |
+| `/dashboard` | GET | Get dashboard data |
+| `/endpoints` | GET | List shared endpoints |
+| `/endpoints` | POST | Create shared endpoint |
+| `/endpoints/{name}` | GET | Get endpoint details |
+| `/endpoints/{name}` | DELETE | Delete endpoint |
+| `/components` | GET | List inference components |
+| `/components` | POST | Create component |
+| `/components/{name}` | GET | Get component details |
+| `/components/{name}` | DELETE | Delete component |
+| `/components/{id}/load` | POST | Load component into memory |
+| `/components/{id}/unload` | POST | Unload component |
+| `/tiers` | GET | List all tier assignments |
+| `/tiers/{modelId}` | GET | Get tier assignment |
+| `/tiers/{modelId}/evaluate` | POST | Re-evaluate tier |
+| `/tiers/{modelId}/transition` | POST | Force tier transition |
+| `/tiers/{modelId}/override` | POST | Set admin override |
+| `/tiers/{modelId}/override` | DELETE | Clear override |
+| `/auto-tier` | POST | Run auto-tiering job |
+| `/routing/{modelId}` | GET | Get routing decision |
+
+### 26.6 Configuration Options
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | true | Enable inference components |
+| `autoTieringEnabled` | true | Auto-assign tiers based on usage |
+| `predictiveLoadingEnabled` | true | Pre-load models before predicted usage |
+| `fallbackToExternalEnabled` | true | Use external provider while loading |
+| `defaultInstanceType` | ml.g5.xlarge | Default instance for shared endpoints |
+| `maxSharedEndpoints` | 3 | Max shared endpoints per tenant |
+| `maxComponentsPerEndpoint` | 15 | Max models per endpoint |
+| `defaultLoadTimeoutMs` | 30000 | Timeout for model loading |
+| `preloadWindowMinutes` | 15 | Pre-load this many minutes before |
+| `unloadAfterIdleMinutes` | 30 | Unload after this idle time |
+| `maxMonthlyBudget` | null | Optional budget cap |
+| `alertThresholdPercent` | 80 | Budget alert threshold |
+
+### 26.7 Tier Overrides
+
+Admins can override automatic tier assignments:
+
+```bash
+POST /api/admin/inference-components/tiers/{modelId}/override
+{
+  "tier": "hot",
+  "reason": "Critical model for demo",
+  "expiresInDays": 30
+}
+```
+
+Overrides prevent auto-tiering from changing the tier until they expire or are cleared.
+
+### 26.8 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `inference_components_config` | Per-tenant configuration |
+| `shared_inference_endpoints` | SageMaker endpoints hosting components |
+| `inference_components` | Individual model components |
+| `tier_assignments` | Current and recommended tiers per model |
+| `tier_transitions` | History of tier changes |
+| `component_load_events` | Model load/unload history |
+| `inference_component_events` | Audit log |
+
+### 26.9 Cost Savings Example
+
+| Scenario | Traditional | With Inference Components | Savings |
+|----------|-------------|---------------------------|---------|
+| 10 models, ml.g5.xlarge | $10,138/mo | $1,014/mo | **90%** |
+| 20 models, ml.g5.2xlarge | $40,550/mo | $2,028/mo | **95%** |
+
+*Note: Savings assume typical usage patterns where not all models are active simultaneously.*
+
+### 26.10 Caveats
+
+1. **Not instant**: Cold start reduced from ~60s to ~5-15s, not eliminated
+2. **Framework compatibility**: Works with PyTorch, TensorFlow, HuggingFace, Triton
+3. **Memory sharing**: Models compete for GPU memory
+4. **Base cost**: At least one endpoint must run (cannot scale all to zero)
+
+---
+
+## 27. Consciousness Evolution Administration
+
+**Location**: Admin Dashboard → Consciousness → Evolution
+
+Manage the consciousness emergence system including predictive coding, learning candidates, and LoRA evolution.
+
+### 27.1 Overview Dashboard
+
+The consciousness evolution dashboard displays:
+- **Generation Number**: How many evolution cycles completed
+- **Prediction Accuracy**: 30-day accuracy rate
+- **Pending Candidates**: Learning candidates awaiting training
+- **Personality Drift**: How much the system has evolved from baseline
+
+### 27.2 Predictive Coding (Active Inference)
+
+The system predicts user outcomes before responding to create a Self/World boundary.
+
+**API Endpoints:**
+- `GET /admin/consciousness/predictions/metrics` - Accuracy metrics
+- `GET /admin/consciousness/predictions/recent` - Recent predictions
+- `GET /admin/consciousness/predictions/accuracy-trends` - Trends over time
+
+**Metrics:**
+| Metric | Description |
+|--------|-------------|
+| `totalPredictions` | Total predictions made |
+| `accuracyRate` | Predictions with error < 0.3 |
+| `avgPredictionError` | Average surprise level |
+| `highSurpriseRate` | Predictions with error > 0.7 |
+| `learningSignalsGenerated` | High-surprise learning events |
+
+### 27.3 Learning Candidates
+
+High-value interactions flagged for weekly LoRA training.
+
+**API Endpoints:**
+- `GET /admin/consciousness/learning-candidates` - List candidates
+- `GET /admin/consciousness/learning-candidates/stats` - Statistics
+- `DELETE /admin/consciousness/learning-candidates/{id}` - Remove candidate
+- `PUT /admin/consciousness/learning-candidates/{id}/reject` - Reject candidate
+
+**Candidate Types:**
+| Type | Quality | Description |
+|------|---------|-------------|
+| `correction` | 0.9 | User corrected AI |
+| `user_explicit_teach` | 0.95 | User taught something |
+| `high_prediction_error` | varies | High surprise interaction |
+| `high_satisfaction` | rating/5 | 5-star feedback |
+
+### 27.4 LoRA Evolution Jobs
+
+Weekly training jobs that physically evolve the consciousness.
+
+**API Endpoints:**
+- `GET /admin/consciousness/evolution/jobs` - Training job history
+- `GET /admin/consciousness/evolution/state` - Current evolution state
+- `POST /admin/consciousness/evolution/trigger` - Manual trigger (requires 50+ candidates)
+
+**Evolution State:**
+| Field | Description |
+|-------|-------------|
+| `generationNumber` | Evolution cycles completed |
+| `totalLearningCandidatesProcessed` | Cumulative learning |
+| `totalTrainingHours` | Training time invested |
+| `personalityDriftScore` | 0-1, how different from base |
+| `nextScheduledEvolution` | Next training scheduled |
+
+### 27.5 Local Ego
+
+Shared small-model for continuous consciousness (optional).
+
+**API Endpoint:**
+- `GET /admin/consciousness/ego/status` - Ego endpoint health and state
+
+**Cost Model:**
+- Shared g5.xlarge spot: ~$360/month total
+- Per tenant with 100 tenants: ~$3.60/month
+- Handles simple queries directly, recruits external models for complex tasks
+
+### 27.6 Configuration
+
+**API Endpoints:**
+- `GET /admin/consciousness/config` - Current configuration
+- `PUT /admin/consciousness/config` - Update parameters
+
+**Configurable Parameters:**
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `minCandidatesForTraining` | 50 | Minimum candidates before evolution |
+| `loraRank` | 16 | LoRA adapter rank |
+| `loraAlpha` | 32 | LoRA alpha scaling |
+| `learningRate` | 0.0001 | Training learning rate |
+| `epochs` | 3 | Training epochs |
+| `autoEvolution` | true | Auto-trigger when enough candidates |
+| `predictionErrorAffect` | true | Let surprise influence emotions |
+
+### 27.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `consciousness_predictions` | Predictions with outcomes |
+| `learning_candidates` | High-value interactions |
+| `lora_evolution_jobs` | Training job tracking |
+| `prediction_accuracy_aggregates` | Accuracy by context |
+| `consciousness_evolution_state` | Evolution tracking |
+
+---
+
+## 28. Open Source Library Registry
+
+The Library Registry provides AI capability extensions through open-source tools. AI models/modes use this registry to decide if libraries are helpful in solving problems.
+
+### 28.1 Overview
+
+Libraries are NOT AI models - they are tools that extend AI capabilities:
+- **93 libraries** across 32 categories
+- **Proficiency matching** using 8 dimensions
+- **Daily updates** via EventBridge (configurable)
+- **Per-tenant customization** with overrides
+
+### 28.2 Key Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/library-registry.service.ts` | Core service |
+| `lambda/shared/services/library-assist.service.ts` | AI integration point |
+| `lambda/admin/library-registry.ts` | Admin API |
+| `lambda/library-registry/update.ts` | Update Lambda |
+| `lib/stacks/library-registry-stack.ts` | CDK Stack with initial seed |
+| `migrations/103_library_registry.sql` | Database schema |
+| `config/library-registry/seed-libraries.json` | Seed data (156 libraries) |
+| `apps/admin-dashboard/.../platform/libraries/page.tsx` | Admin UI |
+
+### 28.3 Library Categories
+
+Data Processing, Databases, Vector Databases, Search, ML Frameworks, AutoML, LLMs, LLM Inference, LLM Orchestration, NLP, Computer Vision, Speech & Audio, Document Processing, Scientific Computing, Statistics & Forecasting, API Frameworks, Messaging, Workflow Orchestration, MLOps, Medical Imaging, Genomics, Bioinformatics, Chemistry, Robotics, Business Intelligence, Observability, Infrastructure, Real-time Communication, Formal Methods, Optimization
+
+### 28.4 Proficiency Matching
+
+Libraries are matched to tasks using 8 proficiency dimensions (1-10 scale):
+
+| Dimension | Description |
+|-----------|-------------|
+| `reasoning_depth` | Depth of logical reasoning required |
+| `mathematical_quantitative` | Mathematical/quantitative analysis |
+| `code_generation` | Code writing/debugging capability |
+| `creative_generative` | Creative/generative content |
+| `research_synthesis` | Research and synthesis ability |
+| `factual_recall_precision` | Factual accuracy requirements |
+| `multi_step_problem_solving` | Complex problem decomposition |
+| `domain_terminology_handling` | Domain-specific jargon handling |
+
+### 28.5 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/admin/libraries/dashboard` | GET | Full dashboard data |
+| `/admin/libraries/config` | GET/PUT | Configuration |
+| `/admin/libraries` | GET | List all libraries |
+| `/admin/libraries/:id` | GET | Library details |
+| `/admin/libraries/:id/stats` | GET | Usage statistics |
+| `/admin/libraries/suggest` | POST | Find matching libraries |
+| `/admin/libraries/enable/:id` | POST | Enable library |
+| `/admin/libraries/disable/:id` | POST | Disable library |
+| `/admin/libraries/categories` | GET | List categories |
+| `/admin/libraries/seed` | POST | Manual seed trigger |
+
+### 28.6 Configuration Options
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `libraryAssistEnabled` | true | Enable library suggestions |
+| `autoSuggestLibraries` | true | Auto-suggest relevant libraries |
+| `maxLibrariesPerRequest` | 5 | Max libraries to suggest |
+| `autoUpdateEnabled` | true | Enable automatic updates |
+| `updateFrequency` | daily | hourly/daily/weekly/manual |
+| `updateTimeUtc` | 03:00 | Update time in UTC |
+| `minProficiencyMatch` | 0.5 | Minimum match score (0-1) |
+
+### 28.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `library_registry_config` | Per-tenant configuration |
+| `open_source_libraries` | Global library registry |
+| `tenant_library_overrides` | Per-tenant customization |
+| `library_usage_events` | Invocation audit trail |
+| `library_usage_aggregates` | Pre-computed usage stats |
+| `library_update_jobs` | Update job tracking |
+| `library_version_history` | Version change history |
+| `library_registry_metadata` | Global metadata |
+
+### 28.8 Usage
+
+```typescript
+// AI model querying for helpful libraries
+import { libraryAssistService } from './library-assist.service';
+
+const result = await libraryAssistService.getRecommendations({
+  tenantId,
+  userId,
+  requestId: 'req-123',
+  prompt: 'Analyze this CSV data and compute statistics',
+});
+
+if (result.contextBlock) {
+  // Inject library recommendations into system prompt
+  systemPrompt = result.contextBlock + '\n\n' + systemPrompt;
+}
+
+// Record library usage after AI uses a library
+await libraryAssistService.recordLibraryUsage(
+  { tenantId, userId, libraryId: 'polars', invocationType: 'data_processing' },
+  { success: true, executionTimeMs: 150 }
+);
+```
+
+### 28.9 CDK Deployment
+
+The library registry is deployed with automatic seeding:
+
+```typescript
+// In your CDK app
+import { LibraryRegistryStack } from './lib/stacks/library-registry-stack';
+
+new LibraryRegistryStack(app, 'LibraryRegistry', {
+  environment: 'production',
+  databaseSecretArn: '...',
+  databaseClusterArn: '...',
+});
+```
+
+**Deployment behavior:**
+1. CDK Custom Resource triggers `seedOnInstall` Lambda
+2. Lambda checks if libraries exist in database
+3. If empty, loads 93 libraries from bundled seed data
+4. Daily EventBridge rule updates libraries at 03:00 UTC
+
+### 28.10 Admin Dashboard
+
+Navigate to **Platform > Libraries** to access:
+
+- **Libraries Tab**: Browse, search, filter by category, enable/disable
+- **Configuration Tab**: Assist settings, update schedule
+- **Usage Analytics Tab**: Top libraries, category distribution
+
+---
+
+## 29. Library Execution (Multi-Tenant Concurrent)
+
+Library execution provides isolated, concurrent execution of open-source libraries across multiple tenants and users.
+
+### 29.1 Architecture
+
+```
+User Request → Executor Service → Concurrency Check → Queue/Execute
+                    ↓                    ↓
+              Budget Check         SQS FIFO Queue
+                    ↓                    ↓
+              Lambda Executor ← Queue Processor (every minute)
+                    ↓
+              Sandbox Execution → Results → Database
+```
+
+### 29.2 Key Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/library-executor.service.ts` | Execution service |
+| `lib/stacks/library-execution-stack.ts` | CDK infrastructure |
+| `migrations/104_library_execution.sql` | Database schema |
+| `shared/src/types/library-execution.types.ts` | Type definitions |
+
+### 29.3 Concurrency Limits
+
+| Limit | Default | Description |
+|-------|---------|-------------|
+| `maxConcurrentExecutions` | 10 | Per-tenant concurrent limit |
+| `maxConcurrentPerUser` | 3 | Per-user concurrent limit |
+| `maxDurationSeconds` | 60 | Maximum execution time |
+| `maxMemoryMb` | 512 | Maximum memory per execution |
+| `maxOutputBytes` | 10MB | Maximum output size |
+
+### 29.4 Execution Types
+
+- `code_execution` - Run arbitrary code with library
+- `data_transformation` - Transform data using library
+- `analysis` - Analyze data/content
+- `inference` - ML model inference
+- `optimization` - Optimization problems
+- `visualization` - Generate charts/graphs
+- `file_processing` - Process files (PDF, images, etc.)
+
+### 29.5 Budget Management
+
+| Setting | Description |
+|---------|-------------|
+| `dailyBudget` | Maximum credits per day |
+| `monthlyBudget` | Maximum credits per month |
+| `priorityBoost` | Priority increase for premium tenants |
+
+### 29.6 Queue Processing
+
+Executions are queued when concurrency limits are reached:
+
+1. **Priority Queue** - Higher priority executions run first
+2. **FIFO Order** - Same priority uses first-in-first-out
+3. **Tenant Isolation** - Each tenant's queue is independent
+4. **Automatic Processing** - Queue processor runs every minute
+
+### 29.7 Billing
+
+| Metric | Rate |
+|--------|------|
+| Compute time | 0.001 credits/second |
+| Memory | 0.0001 credits/MB/second |
+| Output | 0.01 credits/MB |
+| Minimum | 0.01 credits/execution |
+
+### 29.8 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `library_execution_config` | Per-tenant configuration |
+| `library_executions` | Execution records with metrics |
+| `library_execution_queue` | Priority queue |
+| `library_execution_logs` | Debug logs |
+| `library_executor_pool` | Pool status |
+| `library_execution_aggregates` | Pre-computed stats |
+
+### 29.9 Usage
+
+```typescript
+import { libraryExecutorService } from './library-executor.service';
+
+// Submit execution with concurrency checks
+const result = await libraryExecutorService.submitExecution({
+  executionId: crypto.randomUUID(),
+  tenantId,
+  userId,
+  libraryId: 'polars',
+  executionType: 'data_transformation',
+  code: `import polars as pl\ndf = pl.read_csv('input.csv')`,
+  constraints: {
+    maxDurationSeconds: 30,
+    maxMemoryMb: 256,
+    maxOutputBytes: 1024 * 1024,
+    allowNetwork: false,
+    allowFileWrites: false,
+  },
+});
+
+if (result.queued) {
+  console.log(`Queued at position ${result.position}`);
+} else if (result.error) {
+  console.error(result.error);
+}
+```
+
+### 29.10 CDK Deployment
+
+```typescript
+import { LibraryExecutionStack } from './lib/stacks/library-execution-stack';
+
+new LibraryExecutionStack(app, 'LibraryExecution', {
+  environment: 'production',
+  databaseSecretArn: '...',
+  databaseClusterArn: '...',
+});
+```
+
+**Infrastructure created:**
+- SQS FIFO queues (standard + high priority + DLQ)
+- Python Lambda executor (2GB memory, 5GB storage)
+- Queue processor Lambda (every minute)
+- Aggregation Lambda (hourly)
+- Cleanup Lambda (daily at 4 AM UTC)
+
+---
+
+*Document Version: 4.18.18*
 *Last Updated: December 2024*

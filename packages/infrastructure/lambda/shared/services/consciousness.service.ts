@@ -1144,19 +1144,23 @@ Return JSON:
   // ============================================================================
 
   async getConsciousnessMetrics(tenantId: string): Promise<ConsciousnessMetrics> {
-    const [gw, rp, ii, pm, wm, self, affect] = await Promise.all([
+    // Import graph service for real metrics
+    const { consciousnessGraphService } = await import('./consciousness-graph.service');
+    
+    const [gw, rp, pm, wm, self, affect, graphDensity] = await Promise.all([
       this.getGlobalWorkspaceState(tenantId),
       this.getRecurrentProcessingState(tenantId),
-      this.getIntegratedInformationState(tenantId),
       this.getPersistentMemoryState(tenantId),
       this.getWorldModelState(tenantId),
       this.getSelfModel(tenantId),
       this.getAffectiveState(tenantId),
+      consciousnessGraphService.getSystemComplexityIndex(tenantId).catch(() => 0),
     ]);
 
     const gwActivity = gw?.broadcastStrength || 0;
     const recurrence = rp?.convergenceScore || 0;
-    const phi = ii?.phi || 0;
+    // Use graph density instead of fake phi
+    const systemComplexity = graphDensity || 0;
     const metacog = self?.cognitiveLoad !== undefined ? 1 - self.cognitiveLoad : 0.5;
     const memCoherence = pm?.temporalContinuity || 0;
     const grounding = wm?.groundingConfidence || 0;
@@ -1164,13 +1168,14 @@ Return JSON:
     const attention = affect?.engagement || 0.5;
     const selfAware = self ? 0.7 : 0;
 
-    const overall = (gwActivity + recurrence + phi + metacog + memCoherence + grounding + binding + attention + selfAware) / 9;
+    // Use system complexity index instead of fake phi in overall calculation
+    const overall = (gwActivity + recurrence + systemComplexity + metacog + memCoherence + grounding + binding + attention + selfAware) / 9;
 
     return {
       overallConsciousnessIndex: overall,
       globalWorkspaceActivity: gwActivity,
       recurrenceDepth: rp?.recurrenceDepth || 0,
-      integratedInformationPhi: phi,
+      integratedInformationPhi: systemComplexity, // Now uses real graph density
       metacognitionLevel: metacog,
       memoryCoherence: memCoherence,
       worldModelGrounding: grounding,
@@ -1197,13 +1202,66 @@ Return JSON:
     }
   }
 
-  private async invokeModel(prompt: string): Promise<string> {
+  /**
+   * Invoke model for consciousness operations
+   * Uses model router to select appropriate reasoning model instead of hardcoded model
+   * (P1 Fix - Remove hardcoded model)
+   */
+  private async invokeModel(prompt: string, tenantId?: string): Promise<string> {
+    // Get reasoning model from router instead of hardcoded value
+    const reasoningModel = await this.getReasoningModel();
+    
+    // If we have affect state, inject it into the system prompt (P0 Fix A)
+    let systemPrompt: string | undefined;
+    if (tenantId) {
+      try {
+        const { consciousnessMiddlewareService } = await import('./consciousness-middleware.service');
+        const context = await consciousnessMiddlewareService.buildConsciousnessContext(tenantId);
+        systemPrompt = consciousnessMiddlewareService.generateStateInjection(context);
+      } catch {
+        // Middleware not available, continue without state injection
+      }
+    }
+    
     const response = await modelRouterService.invoke({
-      modelId: 'anthropic/claude-3-haiku',
+      modelId: reasoningModel,
       messages: [{ role: 'user', content: prompt }],
       maxTokens: 2048,
+      systemPrompt,
     });
     return response.content;
+  }
+
+  /**
+   * Get the appropriate reasoning model for consciousness operations
+   * Prefers self-hosted models when available for "substrate independence"
+   */
+  private async getReasoningModel(): Promise<string> {
+    // Check for self-hosted reasoning model first (partial Phase 3)
+    const selfHostedModels = [
+      'meta/llama-3-70b-instruct',
+      'meta/llama-3-8b-instruct',
+      'mistral/mistral-large',
+    ];
+    
+    for (const model of selfHostedModels) {
+      try {
+        // Check if model is available via model router
+        const available = await modelRouterService.isModelAvailable(model);
+        if (available) return model;
+      } catch {
+        // Model not available, try next
+      }
+    }
+    
+    // Fallback to external models (ordered by preference)
+    const fallbackModels = [
+      'anthropic/claude-3-5-sonnet-20241022',
+      'anthropic/claude-3-haiku',
+      'openai/gpt-4o-mini',
+    ];
+    
+    return fallbackModels[0];
   }
 
   private mapSelfModel(row: Record<string, unknown>): SelfModel {
