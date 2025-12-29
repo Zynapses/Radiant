@@ -5,6 +5,34 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.10] - 2024-12-28
+
+### Added
+
+#### Ethics Pipeline with Prompt/Synthesis Checks and Rerun Capability
+- **Dual-Level Ethics Enforcement**
+  - Prompt-level: Check before generation, catch violations early
+  - Synthesis-level: Check generated content, trigger rerun if needed
+- **Automatic Rerun on Violations**
+  - Up to 3 rerun attempts (configurable)
+  - Violations converted to guidance instructions
+  - Regeneration with ethics compliance requirements
+- **Ethics Pipeline Service** (`ethics-pipeline.service.ts`)
+  - `checkPromptLevel()` - Pre-generation ethics check
+  - `checkSynthesisLevel()` - Post-generation ethics check
+  - `prepareRerun()` - Generate guidance for regeneration
+  - `executeWithEthics()` - Full workflow with automatic rerun
+  - `getStats()` - Pipeline statistics
+- **Database Migration** (`097_ethics_pipeline.sql`)
+  - `ethics_pipeline_log` - All checks at prompt/synthesis levels
+  - `ethics_rerun_history` - Rerun attempts and outcomes
+  - `ethics_pipeline_config` - Per-tenant configuration
+  - Functions: `get_ethics_pipeline_stats`, `get_top_ethics_violations`
+- **AGI Brain Integration**
+  - Step 5: Ethics Evaluation (Prompt) - before generation
+  - Step 6b: Ethics Evaluation (Synthesis) - after generation, can trigger rerun
+  - Both domain-specific and general ethics checked at each level
+
 ## [4.18.9] - 2024-12-28
 
 ### Added

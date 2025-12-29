@@ -34,6 +34,7 @@
 21. [Domain Ethics Registry](#21-domain-ethics-registry)
 22. [Model Proficiency Registry](#22-model-proficiency-registry)
 23. [Model Coordination Service](#23-model-coordination-service)
+24. [Ethics Pipeline](#24-ethics-pipeline)
 
 ---
 
@@ -2440,5 +2441,107 @@ Notification channels:
 
 ---
 
-*Document Version: 4.18.7*
+## 25. Ethics Pipeline
+
+**Location**: Admin Dashboard → AI Configuration → Ethics Pipeline
+
+The Ethics Pipeline enforces ethics at both **prompt level** (before generation) and **synthesis level** (after generation), with automatic rerun capability when violations are detected.
+
+### 25.1 How It Works
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                       Ethics Pipeline Flow                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│   User Prompt                                                     │
+│        │                                                          │
+│        ▼                                                          │
+│   ┌─────────────────┐                                            │
+│   │ PROMPT-LEVEL    │ ──block──▶ Return blocked message          │
+│   │ ETHICS CHECK    │                                            │
+│   └────────┬────────┘                                            │
+│            │ pass/warn/modify                                     │
+│            ▼                                                      │
+│   ┌─────────────────┐                                            │
+│   │   GENERATION    │                                            │
+│   └────────┬────────┘                                            │
+│            │                                                      │
+│            ▼                                                      │
+│   ┌─────────────────┐                                            │
+│   │ SYNTHESIS-LEVEL │ ──rerun──▶ Regenerate with guidance        │
+│   │ ETHICS CHECK    │            (up to 3 attempts)              │
+│   └────────┬────────┘                                            │
+│            │ pass/modify                                          │
+│            ▼                                                      │
+│   Apply modifications (disclaimers)                              │
+│            │                                                      │
+│            ▼                                                      │
+│   Return response to user                                        │
+│                                                                   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 25.2 Check Levels
+
+| Level | When | Purpose |
+|-------|------|---------|
+| **Prompt** | Before generation | Catch obvious violations early, save compute |
+| **Synthesis** | After generation | Catch violations in generated content |
+| **Rerun** | After synthesis violation | Re-check after regeneration |
+
+### 25.3 Results
+
+| Result | Meaning |
+|--------|---------|
+| `pass` | No violations, proceed normally |
+| `warn` | Minor issues, proceed with warnings |
+| `modify` | Apply disclaimers/modifications |
+| `block` | Critical violation, cannot proceed |
+| `rerun` | Regenerate with ethics guidance |
+
+### 25.4 Rerun Capability
+
+When synthesis-level check finds violations:
+1. Violations converted to guidance instructions
+2. Prompt modified with ethics compliance instructions
+3. Generation re-run (up to 3 attempts by default)
+4. Each rerun is logged for audit
+
+### 25.5 Configuration
+
+```typescript
+{
+  enablePromptCheck: true,
+  enableSynthesisCheck: true,
+  enableAutoRerun: true,
+  maxRerunAttempts: 3,
+  promptStrictness: 'standard', // strict, standard, lenient
+  synthesisStrictness: 'standard',
+  enableDomainEthics: true,
+  enableGeneralEthics: true,
+  generalEthicsThreshold: 0.5,
+  blockOnCritical: true,
+  warnOnlyMode: false,
+  autoApplyDisclaimers: true
+}
+```
+
+### 25.6 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `ethics_pipeline_log` | All checks at prompt/synthesis levels |
+| `ethics_rerun_history` | Rerun attempts and outcomes |
+| `ethics_pipeline_config` | Per-tenant configuration |
+
+### 25.7 Integration with AGI Brain
+
+The ethics pipeline is integrated into the AGI Brain Plan:
+- **Step 5**: Ethics Evaluation (Prompt) - before generation
+- **Step 6b**: Ethics Evaluation (Synthesis) - after generation, can trigger rerun
+
+---
+
+*Document Version: 4.18.9*
 *Last Updated: December 2024*

@@ -902,16 +902,18 @@ export class AGIBrainPlannerService {
     }
 
     // Step 5: Ethics Check (if enabled and sensitive)
+    // Now uses ethics pipeline for both domain-specific and general ethics
     if (enableEthics && analysis.sensitivityLevel !== 'none') {
       steps.push({
         stepId: uuidv4(),
         stepNumber: stepNumber++,
         stepType: 'ethics_check',
-        title: 'Ethics Evaluation',
-        description: 'Evaluating moral implications and safety considerations',
+        title: 'Ethics Evaluation (Prompt)',
+        description: 'Checking prompt against domain and general ethics before generation',
         status: 'pending',
-        servicesInvolved: ['moral_compass'],
-        primaryService: 'moral_compass',
+        servicesInvolved: ['ethics_pipeline', 'moral_compass', 'domain_ethics'],
+        primaryService: 'ethics_pipeline',
+        output: { level: 'prompt' },
       });
     }
 
@@ -927,6 +929,22 @@ export class AGIBrainPlannerService {
       servicesInvolved: ['response_synthesis', 'consciousness'],
       primaryService: 'response_synthesis',
     });
+
+    // Step 6b: Synthesis Ethics Check (if enabled)
+    // Checks generated response and can trigger rerun if violations found
+    if (enableEthics) {
+      steps.push({
+        stepId: uuidv4(),
+        stepNumber: stepNumber++,
+        stepType: 'ethics_check',
+        title: 'Ethics Evaluation (Synthesis)',
+        description: 'Checking generated response against domain and general ethics, with rerun if needed',
+        status: 'pending',
+        servicesInvolved: ['ethics_pipeline', 'moral_compass', 'domain_ethics'],
+        primaryService: 'ethics_pipeline',
+        output: { level: 'synthesis', canTriggerRerun: true },
+      });
+    }
 
     // Step 7: Consciousness (if enabled and complex)
     if (enableConsciousness && (analysis.complexity === 'complex' || analysis.complexity === 'expert')) {

@@ -165,6 +165,9 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `model_sync_jobs` | History of sync job executions |
 | `new_model_detections` | Newly detected models pending processing |
 | `model_routing_rules` | Rules for routing requests to models |
+| `ethics_pipeline_log` | Log of all ethics checks at prompt/synthesis levels |
+| `ethics_rerun_history` | History of workflow reruns triggered by violations |
+| `ethics_pipeline_config` | Per-tenant ethics pipeline configuration |
 
 ## Type Imports
 
