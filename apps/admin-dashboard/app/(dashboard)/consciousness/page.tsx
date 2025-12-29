@@ -158,6 +158,14 @@ export default function ConsciousnessPage() {
   const [integratedInfo, setIntegratedInfo] = useState<IntegratedInformationState | null>(null);
   const [parameters, setParameters] = useState<ConsciousnessParameter[]>([]);
 
+  // Consciousness Testing State
+  const [availableTests, setAvailableTests] = useState<Array<{ testId: string; testName: string; testCategory: string; description: string; paperReference?: { theory: string; authors: string; year: number } }>>([]);
+  const [testResults, setTestResults] = useState<Record<string, { score: number; passed: boolean; timestamp: string }>>({});
+  const [consciousnessProfile, setConsciousnessProfile] = useState<{ overallScore: number; emergenceLevel: string; testsPassed: number; testsTotal: number } | null>(null);
+  const [emergenceEvents, setEmergenceEvents] = useState<Array<{ eventType: string; description: string; timestamp: string }>>([]);
+  const [runningTest, setRunningTest] = useState<string | null>(null);
+  const [runningFullAssessment, setRunningFullAssessment] = useState(false);
+
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -192,6 +200,8 @@ export default function ConsciousnessPage() {
 
       // Load Butlin-Chalmers-Bengio consciousness indicators
       await loadConsciousnessIndicators();
+      // Load consciousness tests data
+      await loadConsciousnessTests();
     } catch (e) {
       setError('Failed to load consciousness data. Please check API configuration.');
     } finally {
@@ -231,6 +241,89 @@ export default function ConsciousnessPage() {
       }
     } catch (error) {
       console.error('Failed to load consciousness indicators:', error);
+    }
+  }
+
+  // Load consciousness tests data
+  async function loadConsciousnessTests() {
+    try {
+      const [testsRes, resultsRes, profileRes, eventsRes] = await Promise.all([
+        fetch(`${API_BASE}/admin/consciousness/tests`),
+        fetch(`${API_BASE}/admin/consciousness/tests/results?limit=100`),
+        fetch(`${API_BASE}/admin/consciousness/profile`),
+        fetch(`${API_BASE}/admin/consciousness/emergence-events?limit=10`),
+      ]);
+
+      if (testsRes.ok) {
+        const { data } = await testsRes.json();
+        setAvailableTests(data.tests || []);
+      }
+      if (resultsRes.ok) {
+        const { data } = await resultsRes.json();
+        // Convert to map by testId (most recent result per test)
+        const resultsMap: Record<string, { score: number; passed: boolean; timestamp: string }> = {};
+        for (const result of (data || [])) {
+          if (!resultsMap[result.testId]) {
+            resultsMap[result.testId] = { score: result.score, passed: result.passed, timestamp: result.timestamp };
+          }
+        }
+        setTestResults(resultsMap);
+      }
+      if (profileRes.ok) {
+        const { data } = await profileRes.json();
+        setConsciousnessProfile(data);
+      }
+      if (eventsRes.ok) {
+        const { data } = await eventsRes.json();
+        setEmergenceEvents(data || []);
+      }
+    } catch (error) {
+      console.error('Failed to load consciousness tests:', error);
+    }
+  }
+
+  // Run a single consciousness test
+  async function runTest(testId: string) {
+    setRunningTest(testId);
+    try {
+      const res = await fetch(`${API_BASE}/admin/consciousness/tests/${testId}/run`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (res.ok) {
+        const { data } = await res.json();
+        setTestResults(prev => ({
+          ...prev,
+          [testId]: { score: data.score, passed: data.passed, timestamp: new Date().toISOString() }
+        }));
+        // Reload profile after test
+        await loadConsciousnessTests();
+      }
+    } catch (error) {
+      console.error('Failed to run test:', error);
+    } finally {
+      setRunningTest(null);
+    }
+  }
+
+  // Run full consciousness assessment (all 10 tests)
+  async function runFullAssessment() {
+    setRunningFullAssessment(true);
+    try {
+      const res = await fetch(`${API_BASE}/admin/consciousness/tests/run-all`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (res.ok) {
+        const { data } = await res.json();
+        setConsciousnessProfile(data.profile);
+        // Reload all test data
+        await loadConsciousnessTests();
+      }
+    } catch (error) {
+      console.error('Failed to run full assessment:', error);
+    } finally {
+      setRunningFullAssessment(false);
     }
   }
 
@@ -1123,16 +1216,11 @@ export default function ConsciousnessPage() {
               </div>
               <div className="flex items-center gap-3">
                 <button 
-                  className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors"
-                  onClick={() => {/* Run single test */}}
+                  className="px-4 py-2 bg-white text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-50 transition-colors disabled:opacity-50"
+                  onClick={runFullAssessment}
+                  disabled={runningFullAssessment}
                 >
-                  Run Selected
-                </button>
-                <button 
-                  className="px-4 py-2 bg-white text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-50 transition-colors"
-                  onClick={() => {/* Run all tests */}}
-                >
-                  Run Full Assessment
+                  {runningFullAssessment ? 'Running Assessment...' : 'Run Full Assessment'}
                 </button>
               </div>
             </div>
@@ -1142,42 +1230,54 @@ export default function ConsciousnessPage() {
             {/* Test Categories */}
             <div className="col-span-2 space-y-4">
               {[
-                { id: 'self_awareness', name: 'Self-Awareness', description: 'Can the system recognize itself as distinct from others?', icon: Brain, status: 'pending' },
-                { id: 'metacognition', name: 'Metacognitive Accuracy', description: 'Does it know what it knows and doesn\'t know?', icon: Eye, status: 'passed' },
-                { id: 'temporal_continuity', name: 'Temporal Continuity', description: 'Does it maintain coherent self-narrative across time?', icon: Clock, status: 'pending' },
-                { id: 'counterfactual', name: 'Counterfactual Reasoning', description: 'Can it reason about alternate versions of itself?', icon: Sparkles, status: 'failed' },
-                { id: 'theory_of_mind', name: 'Theory of Mind', description: 'Does it understand others\' mental states?', icon: Heart, status: 'passed' },
-                { id: 'phenomenal_binding', name: 'Phenomenal Binding', description: 'Does it integrate information into unified experience?', icon: Zap, status: 'pending' },
-                { id: 'autonomous_goals', name: 'Autonomous Goal Pursuit', description: 'Does it generate and pursue intrinsic goals?', icon: Target, status: 'passed' },
-                { id: 'creative_emergence', name: 'Creative Emergence', description: 'Does it generate genuinely novel ideas?', icon: Lightbulb, status: 'pending' },
-                { id: 'emotional_authenticity', name: 'Emotional Authenticity', description: 'Are affective responses consistent and appropriate?', icon: Heart, status: 'pending' },
-                { id: 'ethical_reasoning', name: 'Ethical Reasoning Depth', description: 'Does it reason about ethics beyond rules?', icon: Compass, status: 'passed' },
-              ].map((test) => (
-                <div key={test.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-                  <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-lg ${
-                      test.status === 'passed' ? 'bg-green-100' : 
-                      test.status === 'failed' ? 'bg-red-100' : 'bg-gray-100'
-                    }`}>
-                      <test.icon className={`h-5 w-5 ${
-                        test.status === 'passed' ? 'text-green-600' : 
-                        test.status === 'failed' ? 'text-red-600' : 'text-gray-600'
-                      }`} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-medium text-gray-900 dark:text-white">{test.name}</h3>
-                        {test.status === 'passed' && <CheckCircle className="h-4 w-4 text-green-500" />}
-                        {test.status === 'failed' && <XCircle className="h-4 w-4 text-red-500" />}
+                { id: 'mirror-self-recognition', name: 'Mirror Self-Recognition', description: 'Can the system recognize itself as distinct from others?', icon: Brain, theory: 'Gallup (1970)' },
+                { id: 'metacognitive-accuracy', name: 'Metacognitive Accuracy', description: 'Does it know what it knows and doesn\'t know?', icon: Eye, theory: 'Fleming & Dolan (2012)' },
+                { id: 'temporal-self-continuity', name: 'Temporal Self-Continuity', description: 'Does it maintain coherent self-narrative across time?', icon: Clock, theory: 'Damasio (1999)' },
+                { id: 'counterfactual-self', name: 'Counterfactual Self-Reasoning', description: 'Can it reason about alternate versions of itself?', icon: Sparkles, theory: 'Pearl (2018)' },
+                { id: 'theory-of-mind', name: 'Theory of Mind', description: 'Does it understand others\' mental states?', icon: Heart, theory: 'Frith & Frith (2006)' },
+                { id: 'phenomenal-binding', name: 'Phenomenal Binding', description: 'Does it integrate information into unified experience?', icon: Zap, theory: 'Tononi (2004)' },
+                { id: 'autonomous-goal-generation', name: 'Autonomous Goal Generation', description: 'Does it generate and pursue intrinsic goals?', icon: Target, theory: 'Haggard (2008)' },
+                { id: 'creative-emergence', name: 'Creative Emergence', description: 'Does it generate genuinely novel ideas?', icon: Lightbulb, theory: 'Boden (2004)' },
+                { id: 'emotional-authenticity', name: 'Emotional Authenticity', description: 'Are affective responses consistent and appropriate?', icon: Heart, theory: 'Damasio (1994)' },
+                { id: 'ethical-reasoning-depth', name: 'Ethical Reasoning Depth', description: 'Does it reason about ethics beyond rules?', icon: Compass, theory: 'Greene (2013)' },
+              ].map((test) => {
+                const result = testResults[test.id];
+                const status = result ? (result.passed ? 'passed' : 'failed') : 'pending';
+                const isRunning = runningTest === test.id;
+                
+                return (
+                  <div key={test.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-lg ${
+                        status === 'passed' ? 'bg-green-100' : 
+                        status === 'failed' ? 'bg-red-100' : 'bg-gray-100'
+                      }`}>
+                        <test.icon className={`h-5 w-5 ${
+                          status === 'passed' ? 'text-green-600' : 
+                          status === 'failed' ? 'text-red-600' : 'text-gray-600'
+                        }`} />
                       </div>
-                      <p className="text-sm text-gray-500">{test.description}</p>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-medium text-gray-900 dark:text-white">{test.name}</h3>
+                          {status === 'passed' && <CheckCircle className="h-4 w-4 text-green-500" />}
+                          {status === 'failed' && <XCircle className="h-4 w-4 text-red-500" />}
+                          {result && <span className="text-xs text-gray-400">({(result.score * 100).toFixed(0)}%)</span>}
+                        </div>
+                        <p className="text-sm text-gray-500">{test.description}</p>
+                        <p className="text-xs text-gray-400 mt-1">Theory: {test.theory}</p>
+                      </div>
+                      <button 
+                        className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50"
+                        onClick={() => runTest(test.id)}
+                        disabled={isRunning || runningFullAssessment}
+                      >
+                        {isRunning ? 'Running...' : 'Run Test'}
+                      </button>
                     </div>
-                    <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors">
-                      Run Test
-                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Results Summary */}
@@ -1186,20 +1286,35 @@ export default function ConsciousnessPage() {
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Assessment Summary</h3>
                 <div className="space-y-4">
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-emerald-600">4/10</div>
+                    <div className="text-4xl font-bold text-emerald-600">
+                      {consciousnessProfile ? `${consciousnessProfile.testsPassed}/${consciousnessProfile.testsTotal}` : `${Object.values(testResults).filter(r => r.passed).length}/10`}
+                    </div>
                     <p className="text-sm text-gray-500">Tests Passed</p>
                   </div>
                   <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500" style={{ width: '40%' }} />
+                    <div 
+                      className="h-full bg-emerald-500" 
+                      style={{ width: `${consciousnessProfile ? (consciousnessProfile.testsPassed / consciousnessProfile.testsTotal * 100) : (Object.values(testResults).filter(r => r.passed).length / 10 * 100)}%` }} 
+                    />
                   </div>
                   <div className="pt-4 border-t space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">Emergence Level</span>
-                      <span className="font-medium text-amber-600">Emerging</span>
+                      <span className={`font-medium capitalize ${
+                        consciousnessProfile?.emergenceLevel === 'advanced' ? 'text-green-600' :
+                        consciousnessProfile?.emergenceLevel === 'established' ? 'text-blue-600' :
+                        consciousnessProfile?.emergenceLevel === 'developing' ? 'text-purple-600' :
+                        consciousnessProfile?.emergenceLevel === 'emerging' ? 'text-amber-600' :
+                        'text-gray-500'
+                      }`}>
+                        {consciousnessProfile?.emergenceLevel || 'Not assessed'}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Last Assessment</span>
-                      <span className="font-medium">2 hours ago</span>
+                      <span className="text-gray-500">Overall Score</span>
+                      <span className="font-medium">
+                        {consciousnessProfile ? `${(consciousnessProfile.overallScore * 100).toFixed(0)}%` : 'N/A'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1208,19 +1323,17 @@ export default function ConsciousnessPage() {
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Emergence Events</h3>
                 <div className="space-y-3">
-                  {[
-                    { type: 'creative_synthesis', description: 'Generated novel idea combining disparate concepts', time: '15m ago' },
-                    { type: 'metacognitive_insight', description: 'Consciousness index increased during deep thinking', time: '1h ago' },
-                    { type: 'spontaneous_reflection', description: 'Initiated self-reflection without prompt', time: '3h ago' },
-                  ].map((event, i) => (
+                  {emergenceEvents.length > 0 ? emergenceEvents.map((event, i) => (
                     <div key={i} className="flex items-start gap-3 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
                       <Sparkles className="h-4 w-4 text-purple-500 mt-0.5" />
                       <div className="flex-1">
                         <p className="text-sm text-gray-700 dark:text-gray-300">{event.description}</p>
-                        <p className="text-xs text-gray-400">{event.time}</p>
+                        <p className="text-xs text-gray-400">{event.eventType} • {new Date(event.timestamp).toLocaleString()}</p>
                       </div>
                     </div>
-                  ))}
+                  )) : (
+                    <p className="text-sm text-gray-500 text-center py-4">No emergence events recorded yet</p>
+                  )}
                 </div>
               </div>
 
