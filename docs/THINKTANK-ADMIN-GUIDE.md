@@ -965,13 +965,152 @@ User: "Help me calculate my mortgage payment"
 
 ---
 
-## 19. UI Feedback & Learning System
+## 19. Multi-Page Web App Generator
+
+**Location**: Think Tank Responses
+
+The Multi-Page App Generator transforms Think Tank into a full web application builder.
+
+> "Claude can describe a todo app, but now it can BUILD the todo app"
+
+### 19.1 Supported App Types
+
+| Type | Description | Example Prompt |
+|------|-------------|----------------|
+| **web_app** | Custom interactive application | "Build me a task management app" |
+| **dashboard** | Analytics with multiple views | "Create an analytics dashboard" |
+| **wizard** | Multi-step form/process | "Build an onboarding wizard" |
+| **documentation** | Technical docs site | "Create API documentation" |
+| **portfolio** | Personal/business site | "Build my portfolio website" |
+| **landing_page** | Marketing page | "Create a product landing page" |
+| **tutorial** | Interactive lessons | "Build a coding tutorial" |
+| **report** | Business report | "Generate a quarterly report" |
+| **admin_panel** | Admin interface | "Create a user management panel" |
+| **e_commerce** | Online store | "Build an online shop" |
+| **blog** | Content site | "Create a tech blog" |
+
+### 19.2 How It Works
+
+```
+User: "Build me a todo app with projects and tasks"
+       ↓
+┌─────────────────────────────────────────┐
+│         Multi-Page Detection             │
+│  Keywords: "build me", "app"             │
+│  Type: web_app                           │
+│  Confidence: 0.85                        │
+└─────────────────────────────────────────┘
+       ↓
+┌─────────────────────────────────────────┐
+│         Pages Generated                  │
+│  • Home (/)                             │
+│  • Projects (/projects)                  │
+│  • Tasks (/tasks)                        │
+│  • Settings (/settings)                  │
+└─────────────────────────────────────────┘
+       ↓
+┌─────────────────────────────────────────┐
+│         App Preview                      │
+│  ┌─────────────────────────────────┐    │
+│  │ [Home] [Projects] [Tasks] [⚙]  │    │
+│  ├─────────────────────────────────┤    │
+│  │                                  │    │
+│  │   📋 My Projects                │    │
+│  │   ├── Work                      │    │
+│  │   ├── Personal                  │    │
+│  │   └── Side Projects             │    │
+│  │                                  │    │
+│  └─────────────────────────────────┘    │
+└─────────────────────────────────────────┘
+```
+
+### 19.3 Page Types
+
+| Type | Sections | Use Case |
+|------|----------|----------|
+| **home** | Hero, Features, CTA | Landing/main page |
+| **list** | Data table, Filters | Collections |
+| **detail** | Content, Related | Single item view |
+| **form** | Form fields | Input/editing |
+| **dashboard** | Stats, Charts | Analytics |
+| **settings** | Form, Toggles | Configuration |
+| **about** | Content, Team | Information |
+| **contact** | Form, Map | Contact page |
+
+### 19.4 Section Types
+
+| Section | Description |
+|---------|-------------|
+| **hero** | Large banner with CTA |
+| **features** | Grid of feature cards |
+| **stats** | Metric cards |
+| **chart_grid** | Multiple charts |
+| **data_table** | Sortable table |
+| **form** | Input form |
+| **content** | Rich text/markdown |
+| **testimonials** | Customer quotes |
+| **pricing** | Pricing table |
+| **faq** | Accordion FAQ |
+| **team** | Team member cards |
+| **cta** | Call to action |
+| **gallery** | Image gallery |
+| **contact** | Contact form |
+
+### 19.5 Navigation Types
+
+| Type | Best For |
+|------|----------|
+| **top_bar** | Landing pages, portfolios |
+| **sidebar** | Dashboards, admin panels, docs |
+| **bottom_tabs** | Mobile-first apps |
+| **hamburger** | Mobile navigation |
+| **breadcrumb** | Deep hierarchies |
+
+### 19.6 Pre-built Templates
+
+5 featured templates included:
+
+1. **Analytics Dashboard** - Overview, analytics, reports, settings
+2. **Professional Portfolio** - Home, about, projects, contact
+3. **Documentation Site** - Introduction, getting started, API, examples
+4. **Product Landing Page** - Hero, features, testimonials, pricing, FAQ, CTA
+5. **Online Store** - Home, products, cart, checkout
+
+### 19.7 Admin Configuration
+
+Per-tenant settings at Settings → Cognitive Architecture → Multi-Page Apps:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | true | Enable multi-page generation |
+| `maxPagesPerApp` | 20 | Max pages per app |
+| `maxAppsPerUser` | 10 | Max apps per user |
+| `autoDeployPreview` | true | Auto-deploy preview URLs |
+| `customDomainsAllowed` | false | Allow custom domains |
+| `generateAssets` | true | Generate images/icons |
+| `collectAnalytics` | true | Track app usage |
+
+### 19.8 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `generated_multipage_apps` | Multi-page app storage |
+| `app_pages` | Individual pages |
+| `app_versions` | Version history |
+| `app_deployments` | Deployment tracking |
+| `multipage_app_templates` | Pre-built templates |
+| `app_analytics` | Usage analytics |
+| `multipage_app_config` | Per-tenant config |
+
+---
+
+## 20. UI Feedback & Learning System
 
 **Location**: Think Tank → Generated Apps
 
 The feedback system allows users to provide feedback on generated UIs and enables AGI learning for continuous improvement.
 
-### 19.1 User Feedback
+### 20.1 User Feedback
 
 Users can provide feedback on any generated UI:
 
