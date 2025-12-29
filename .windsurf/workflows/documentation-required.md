@@ -6,6 +6,46 @@ description: Policy - Documentation must be updated for all user/admin-facing ch
 
 **This is a MANDATORY policy.** All changes that affect administrators, users, or system behavior must include comprehensive documentation updates.
 
+## ⚠️ CRITICAL: DOCUMENTATION MUST BE PART OF IMPLEMENTATION
+
+**Documentation is NOT a separate step.** Update docs AS YOU BUILD, not afterward.
+
+### MANDATORY: Include in SAME implementation pass
+
+For EVERY feature, update these IN THE SAME TASK (not later):
+
+| If you create... | You MUST also update... |
+|------------------|-------------------------|
+| Database tables | `docs/sections/SECTION-07-DATABASE-SCHEMA.md` |
+| Platform admin features | `docs/RADIANT-ADMIN-GUIDE.md` |
+| Think Tank admin features | `docs/THINKTANK-ADMIN-GUIDE.md` |
+| Any feature | `CHANGELOG.md` |
+| Significant feature | `docs/FEATURE-NAME.md` (standalone) |
+
+### Two Admin Guides
+
+RADIANT has exactly **TWO** admin guides:
+
+| Guide | Purpose | When to update |
+|-------|---------|----------------|
+| `docs/RADIANT-ADMIN-GUIDE.md` | Platform administration: tenants, billing, models, providers, security, infrastructure | Platform/infrastructure features |
+| `docs/THINKTANK-ADMIN-GUIDE.md` | Think Tank administration: user rules, delight system, brain plans, pre-prompts, domains | Think Tank/consumer features |
+
+**Update the appropriate guide based on what you're building. If a feature spans both, update both.**
+
+### NEVER do this:
+❌ "I'll update the admin guide later"  
+❌ "Documentation is the last step"  
+❌ Only updating CHANGELOG.md  
+❌ Creating standalone doc but skipping admin guide  
+
+### ALWAYS do this:
+✅ Update RADIANT-ADMIN-GUIDE.md in the SAME implementation  
+✅ Add to SECTION-07 table list when creating tables  
+✅ Write docs WHILE building, not after  
+
+**A feature is NOT complete until all documentation is updated IN THE SAME PASS.**
+
 ## When Documentation is Required
 
 Update documentation when ANY of the following occur:
@@ -103,6 +143,56 @@ Before completing ANY feature or change, verify:
 - [ ] Have you updated ALL relevant doc files?
 - [ ] Have you included examples?
 - [ ] Have you documented defaults and edge cases?
+
+## Required Documentation Locations by Change Type
+
+### Database Changes (new tables/columns)
+| Location | Required |
+|----------|----------|
+| `docs/sections/SECTION-07-DATABASE-SCHEMA.md` | ✅ Always - Add to canonical table list |
+| `CHANGELOG.md` | ✅ Always |
+| Standalone `docs/*.md` | If significant feature |
+
+### Admin Dashboard Features
+| Location | Required |
+|----------|----------|
+| `docs/RADIANT-ADMIN-GUIDE.md` | ✅ Always - Add new section with full documentation |
+| `CHANGELOG.md` | ✅ Always |
+| Standalone `docs/*.md` | ✅ For significant features |
+| `docs/sections/SECTION-07-DATABASE-SCHEMA.md` | If new tables |
+
+### Think Tank / User-Facing Features
+| Location | Required |
+|----------|----------|
+| Standalone `docs/*.md` | ✅ Always |
+| `docs/RADIANT-ADMIN-GUIDE.md` | If admin-configurable |
+| `CHANGELOG.md` | ✅ Always |
+| `docs/sections/SECTION-07-DATABASE-SCHEMA.md` | If new tables |
+
+### API Changes
+| Location | Required |
+|----------|----------|
+| API handler file header comments | ✅ Always |
+| Standalone `docs/*.md` | ✅ For new APIs |
+| `CHANGELOG.md` | ✅ Always |
+
+### Service Layer Changes
+| Location | Required |
+|----------|----------|
+| Relevant feature `docs/*.md` | ✅ Always |
+| `CHANGELOG.md` | ✅ Always |
+
+## Documentation Quality Standards
+
+Documentation must be **comprehensive**, not just a summary:
+
+1. **Purpose** - What does this feature do and why?
+2. **Usage** - How do users/admins interact with it?
+3. **Configuration** - All available options with defaults
+4. **Database Schema** - Tables and columns with descriptions
+5. **API Endpoints** - Full request/response documentation
+6. **Examples** - Code snippets, UI screenshots, typical workflows
+7. **Integration** - How does this connect to other features?
 
 ## Examples of Required Documentation
 

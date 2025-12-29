@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Heart, AlertTriangle, CheckCircle, XCircle, BookOpen, Shield, RefreshCw } from 'lucide-react';
+import { Heart, AlertTriangle, CheckCircle, XCircle, BookOpen, Shield, RefreshCw, ExternalLink, Award, Scale, Cpu, Globe, FileWarning, Building } from 'lucide-react';
 
 interface EthicalEvaluation {
   evaluationId: string;
@@ -23,6 +23,17 @@ interface EthicalStats {
   evaluationsToday: number;
 }
 
+interface StandardSource {
+  code: string;
+  name: string;
+  fullName: string;
+  organization: string;
+  section?: string;
+  requirement?: string;
+  url?: string;
+  isMandatory: boolean;
+}
+
 interface EthicalPrinciple {
   principleId: string;
   name: string;
@@ -30,6 +41,21 @@ interface EthicalPrinciple {
   source: string;
   category: string;
   weight: number;
+  standards?: StandardSource[];
+}
+
+interface AIEthicsStandard {
+  code: string;
+  name: string;
+  fullName: string;
+  version?: string;
+  organization: string;
+  organizationType: string;
+  description?: string;
+  url?: string;
+  publicationDate?: string;
+  isMandatory: boolean;
+  icon?: string;
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -42,12 +68,25 @@ const CATEGORY_COLORS: Record<string, string> = {
   forgiveness: 'bg-orange-100 text-orange-700',
 };
 
+const STANDARD_ICONS: Record<string, React.ElementType> = {
+  Shield, Award, Scale, Cpu, Globe, FileWarning, Building, Heart, AlertTriangle, BookOpen,
+};
+
+const ORG_TYPE_COLORS: Record<string, string> = {
+  government: 'bg-blue-100 text-blue-700',
+  iso: 'bg-green-100 text-green-700',
+  industry: 'bg-purple-100 text-purple-700',
+  academic: 'bg-amber-100 text-amber-700',
+  religious: 'bg-pink-100 text-pink-700',
+};
+
 export default function EthicsPage() {
   const [evaluations, setEvaluations] = useState<EthicalEvaluation[]>([]);
   const [stats, setStats] = useState<EthicalStats | null>(null);
   const [principles, setPrinciples] = useState<EthicalPrinciple[]>([]);
+  const [standards, setStandards] = useState<AIEthicsStandard[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<'violations' | 'all' | 'principles'>('violations');
+  const [tab, setTab] = useState<'violations' | 'all' | 'principles' | 'standards'>('violations');
 
   useEffect(() => { loadData(); }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -57,15 +96,17 @@ export default function EthicsPage() {
     setLoading(true);
     setError(null);
     try {
-      const [evalRes, statsRes, principlesRes] = await Promise.all([
+      const [evalRes, statsRes, principlesRes, standardsRes] = await Promise.all([
         fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/admin/ethics/${tab === 'violations' ? 'violations' : 'evaluations'}`),
         fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/admin/ethics/stats`),
         fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/admin/ethics/principles`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/admin/ethics/standards`),
       ]);
       if (evalRes.ok) { const d = await evalRes.json(); setEvaluations(d.evaluations || d.violations || []); }
       else setError('Failed to load ethical evaluations.');
       if (statsRes.ok) setStats(await statsRes.json());
       if (principlesRes.ok) { const d = await principlesRes.json(); setPrinciples(d.principles || []); }
+      if (standardsRes.ok) { const d = await standardsRes.json(); setStandards(d.standards || []); }
     } catch { setError('Failed to connect to ethics service.'); }
     setLoading(false);
   }
@@ -98,15 +139,70 @@ export default function EthicsPage() {
 
       {/* Tabs */}
       <div className="flex gap-2 border-b">
-        {(['violations', 'all', 'principles'] as const).map(t => (
+        {(['violations', 'all', 'principles', 'standards'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)} className={`px-4 py-2 font-medium ${tab === t ? 'border-b-2 border-purple-500 text-purple-600' : 'text-gray-500 hover:text-gray-700'}`}>
-            {t === 'violations' ? '⚠️ Violations' : t === 'all' ? '📋 All Evaluations' : '📖 Principles'}
+            {t === 'violations' ? '⚠️ Violations' : t === 'all' ? '📋 All Evaluations' : t === 'principles' ? '📖 Principles' : '📜 Standards'}
           </button>
         ))}
       </div>
 
       {/* Content */}
-      {tab === 'principles' ? (
+      {tab === 'standards' ? (
+        <div className="space-y-4">
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-4">
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              These are the AI ethics standards and frameworks that inform our ethical principles. 
+              Each principle is mapped to relevant sections of these standards.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            {standards.map(s => {
+              const IconComponent = STANDARD_ICONS[s.icon || 'Shield'] || Shield;
+              return (
+                <div key={s.code} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-5">
+                  <div className="flex items-start gap-4">
+                    <div className={`p-3 rounded-lg ${ORG_TYPE_COLORS[s.organizationType] || 'bg-gray-100'}`}>
+                      <IconComponent className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-semibold text-lg">{s.name}</h3>
+                          <p className="text-sm text-gray-500">{s.fullName}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {s.isMandatory && (
+                            <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">Required</span>
+                          )}
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${ORG_TYPE_COLORS[s.organizationType] || 'bg-gray-100'}`}>
+                            {s.organizationType}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">{s.description}</p>
+                      <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                        <span>{s.organization}</span>
+                        {s.version && <span>Version: {s.version}</span>}
+                        {s.publicationDate && <span>Published: {new Date(s.publicationDate).toLocaleDateString()}</span>}
+                      </div>
+                      {s.url && (
+                        <a 
+                          href={s.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 mt-3 text-sm text-purple-600 hover:text-purple-700"
+                        >
+                          View Standard <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : tab === 'principles' ? (
         <div className="grid grid-cols-2 gap-4">
           {principles.map(p => (
             <div key={p.principleId} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-4">
@@ -115,7 +211,25 @@ export default function EthicsPage() {
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${CATEGORY_COLORS[p.category] || 'bg-gray-100'}`}>{p.category}</span>
               </div>
               <p className="text-gray-600 dark:text-gray-300 italic mb-2">&ldquo;{p.teaching}&rdquo;</p>
-              <p className="text-sm text-gray-500">{p.source}</p>
+              <p className="text-sm text-gray-500 mb-3">{p.source}</p>
+              {p.standards && p.standards.length > 0 && (
+                <div className="border-t pt-3 mt-3">
+                  <p className="text-xs font-medium text-gray-500 mb-2">Derived from / Aligned with:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {p.standards.map(std => (
+                      <span 
+                        key={std.code} 
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs"
+                        title={`${std.fullName}${std.section ? ` - ${std.section}` : ''}`}
+                      >
+                        {std.name}
+                        {std.section && <span className="text-gray-400">({std.section})</span>}
+                        {std.isMandatory && <span className="text-red-500">*</span>}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

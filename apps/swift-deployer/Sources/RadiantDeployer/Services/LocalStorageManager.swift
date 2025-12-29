@@ -479,37 +479,97 @@ actor LocalStorageManager {
         }
     }
     
+    /// Get or create encryption key using secure storage hierarchy:
+    /// 1. Environment variable (CI/CD, containers)
+    /// 2. 1Password via CLI (enterprise)
+    /// 3. Local secure file with restricted permissions (fallback)
     private static func getOrCreateEncryptionKey() -> String {
-        let keychain = "com.radiant.deployer.dbkey"
+        // Priority 1: Environment variable (for CI/CD and containerized deployments)
+        if let envKey = ProcessInfo.processInfo.environment["RADIANT_DB_ENCRYPTION_KEY"],
+           !envKey.isEmpty {
+            return envKey
+        }
         
-        // Try to retrieve existing key
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychain,
-            kSecReturnData as String: true,
-        ]
+        // Priority 2: 1Password via CLI (if configured)
+        if let opKey = getKeyFrom1Password() {
+            return opKey
+        }
         
-        var result: AnyObject?
-        if SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess,
-           let data = result as? Data,
-           let key = String(data: data, encoding: .utf8) {
-            return key
+        // Priority 3: Local secure file (fallback for development)
+        return getOrCreateLocalKey()
+    }
+    
+    /// Attempt to retrieve encryption key from 1Password
+    private static func getKeyFrom1Password() -> String? {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/op")
+        process.arguments = ["read", "op://Radiant/DBEncryptionKey/key", "--no-newline"]
+        
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = FileHandle.nullDevice
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
+            
+            if process.terminationStatus == 0 {
+                let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                if let key = String(data: data, encoding: .utf8), !key.isEmpty {
+                    return key
+                }
+            }
+        } catch {
+            // 1Password CLI not available or not configured
+        }
+        
+        return nil
+    }
+    
+    /// Get or create a local encryption key file with restricted permissions
+    private static func getOrCreateLocalKey() -> String {
+        guard let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            return generateRandomKey()
+        }
+        
+        let keyFile = appSupport
+            .appendingPathComponent("RadiantDeployer")
+            .appendingPathComponent(".dbkey")
+        
+        // Try to read existing key
+        if let existingKey = try? String(contentsOf: keyFile, encoding: .utf8),
+           !existingKey.isEmpty {
+            return existingKey.trimmingCharacters(in: .whitespacesAndNewlines)
         }
         
         // Generate new key
-        var bytes = [UInt8](repeating: 0, count: 32)
-        _ = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)
-        let newKey = Data(bytes).base64EncodedString()
+        let newKey = generateRandomKey()
         
-        // Store in keychain
-        let storeQuery: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychain,
-            kSecValueData as String: newKey.data(using: .utf8) ?? Data(),
-        ]
-        SecItemAdd(storeQuery as CFDictionary, nil)
+        // Create directory if needed
+        try? FileManager.default.createDirectory(
+            at: keyFile.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        
+        // Write key with restricted permissions (owner read/write only)
+        do {
+            try newKey.write(to: keyFile, atomically: true, encoding: .utf8)
+            try FileManager.default.setAttributes(
+                [.posixPermissions: 0o600],
+                ofItemAtPath: keyFile.path
+            )
+        } catch {
+            print("Warning: Could not persist encryption key to secure file")
+        }
         
         return newKey
+    }
+    
+    /// Generate a cryptographically secure random key
+    private static func generateRandomKey() -> String {
+        var bytes = [UInt8](repeating: 0, count: 32)
+        _ = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)
+        return Data(bytes).base64EncodedString()
     }
 }
 

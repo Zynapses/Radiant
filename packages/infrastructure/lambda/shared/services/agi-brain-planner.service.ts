@@ -7,6 +7,8 @@ import { agiOrchestrationSettingsService } from './agi-orchestration-settings.se
 import { modelRouterService } from './model-router.service';
 import { delightOrchestrationService, type DelightWorkflowEvent, type WorkflowDelightResponse } from './delight-orchestration.service';
 import { orchestrationPatternsService, type OrchestrationWorkflow, type WorkflowStep } from './orchestration-patterns.service';
+import { prepromptLearningService } from './preprompt-learning.service';
+import { providerRejectionService } from './provider-rejection.service';
 import { v4 as uuidv4 } from 'uuid';
 
 // Gemini 3 model for plan summarization
@@ -79,6 +81,17 @@ export interface ModelSelection {
   estimatedCostPer1kTokens: number;
 }
 
+/** Performance metrics exposed via response headers */
+export interface RouterPerformanceMetrics {
+  routerLatencyMs: number;      // Time spent in brain router decision-making
+  domainDetectionMs: number;    // Time for domain detection
+  modelSelectionMs: number;     // Time for model selection
+  planGenerationMs: number;     // Total plan generation time
+  estimatedCostCents: number;   // Estimated cost for this request
+  modelCostPer1kTokens: number; // Cost of selected model
+  cacheHit: boolean;            // Whether routing decision was cached
+}
+
 export interface AGIBrainPlan {
   planId: string;
   tenantId: string;
@@ -92,6 +105,8 @@ export interface AGIBrainPlan {
   startedAt?: string;
   completedAt?: string;
   totalDurationMs?: number;
+  /** Performance metrics for debugging and optimization */
+  performanceMetrics?: RouterPerformanceMetrics;
   steps: PlanStep[];
   currentStepIndex: number;
   orchestrationMode: OrchestrationMode;
@@ -99,6 +114,10 @@ export interface AGIBrainPlan {
   orchestrationSelection: 'auto' | 'user';  // Whether workflow was auto-selected or user-selected
   primaryModel: ModelSelection;
   fallbackModels: ModelSelection[];
+  // Pre-prompt learning integration
+  prepromptInstanceId?: string;
+  prepromptTemplateCode?: string;
+  systemPrompt?: string;
   domainDetection?: {
     fieldId: string;
     fieldName: string;
@@ -218,12 +237,19 @@ export class AGIBrainPlannerService {
   async generatePlan(request: GeneratePlanRequest): Promise<AGIBrainPlan> {
     const planId = uuidv4();
     const startTime = Date.now();
+    
+    // Performance tracking
+    let domainDetectionMs = 0;
+    let modelSelectionMs = 0;
+    let cacheHit = false;
 
     // Step 1: Analyze prompt
     const promptAnalysis = await this.analyzePrompt(request.prompt);
 
-    // Step 2: Detect domain
+    // Step 2: Detect domain (with timing)
+    const domainStartTime = Date.now();
     const domainResult = await this.detectDomain(request.prompt, request.domainOverride);
+    domainDetectionMs = Date.now() - domainStartTime;
 
     // Step 2.5: Select workflow (AGI chooses optimal workflow pattern)
     const workflowSelection = await this.selectWorkflow(
@@ -236,14 +262,17 @@ export class AGIBrainPlannerService {
     const { mode, reason } = this.determineOrchestrationMode(promptAnalysis, domainResult);
     const orchestrationMode = request.preferredMode || mode;
 
-    // Step 4: Select models
-    const { primary, fallbacks } = await this.selectModels(
+    // Step 4: Select models (with timing)
+    const modelStartTime = Date.now();
+    const { primary, fallbacks, fromCache } = await this.selectModels(
       request.tenantId,
       promptAnalysis,
       domainResult,
       orchestrationMode,
       request.preferredModel
     );
+    modelSelectionMs = Date.now() - modelStartTime;
+    cacheHit = fromCache || false;
 
     // Step 5: Generate plan steps
     const steps = this.generatePlanSteps(
@@ -311,8 +340,61 @@ export class AGIBrainPlannerService {
       alternativeWorkflows: workflowSelection.alternatives,
     };
 
+    // Add performance metrics
+    const planGenerationMs = Date.now() - startTime;
+    plan.performanceMetrics = {
+      routerLatencyMs: domainDetectionMs + modelSelectionMs,
+      domainDetectionMs,
+      modelSelectionMs,
+      planGenerationMs,
+      estimatedCostCents: estimates.costCents,
+      modelCostPer1kTokens: primary.estimatedCostPer1kTokens,
+      cacheHit,
+    };
+
     // Step 7: Generate plan summary (using Gemini 3)
     plan.planSummary = await this.generatePlanSummary(plan);
+
+    // Step 8: Select and track pre-prompt using learning service
+    try {
+      const prepromptResult = await prepromptLearningService.selectPreprompt({
+        planId,
+        tenantId: request.tenantId,
+        userId: request.userId,
+        orchestrationMode,
+        modelId: primary.modelId,
+        detectedDomainId: domainResult?.primary_domain?.domain_id,
+        taskType: promptAnalysis.taskType,
+        complexity: promptAnalysis.complexity,
+        variables: {
+          domain_name: domainResult?.primary_domain?.domain_name || 'general',
+          domain_context: domainResult?.primary_domain?.domain_name || 'general knowledge',
+          domain_confidence: String(Math.round((domainResult?.detection_confidence || 0.5) * 100)),
+          subspecialty_name: domainResult?.primary_subspecialty?.subspecialty_name || '',
+          field_name: domainResult?.primary_field?.field_name || '',
+          complexity: promptAnalysis.complexity,
+          task_type: promptAnalysis.taskType,
+          key_topics: promptAnalysis.keyTopics.join(', '),
+          detected_language: promptAnalysis.detectedLanguage,
+          model_role: 'primary',
+          other_models: plan.fallbackModels.map(m => m.modelName).join(', '),
+          synthesis_strategy: orchestrationMode === 'multi_model' ? 'consensus' : 'single',
+          proficiencies: domainResult?.merged_proficiencies 
+            ? Object.entries(domainResult.merged_proficiencies)
+                .filter(([_, v]) => (v as number) >= 7)
+                .map(([k, v]) => `${k}: ${v}`)
+                .join(', ')
+            : '',
+        },
+      });
+
+      plan.prepromptInstanceId = prepromptResult.selectionLog.instanceId;
+      plan.prepromptTemplateCode = prepromptResult.selectedTemplate.templateCode;
+      plan.systemPrompt = prepromptResult.renderedPreprompt.full;
+    } catch (err) {
+      // Pre-prompt selection failure is non-fatal, use default
+      console.warn('Pre-prompt selection failed, using default:', err);
+    }
 
     // Store in active plans
     this.activePlans.set(planId, plan);
@@ -686,7 +768,7 @@ export class AGIBrainPlannerService {
     domain: Awaited<ReturnType<typeof this.detectDomain>>,
     mode: OrchestrationMode,
     preferredModel?: string
-  ): Promise<{ primary: ModelSelection; fallbacks: ModelSelection[] }> {
+  ): Promise<{ primary: ModelSelection; fallbacks: ModelSelection[]; fromCache: boolean }> {
     // Get matching models from domain taxonomy if available
     let matches: Array<{ model_id: string; model_name: string; provider: string; match_score: number; strengths: string[]; recommended: boolean }> = [];
     
@@ -748,7 +830,7 @@ export class AGIBrainPlannerService {
         estimatedCostPer1kTokens: 0.003,
       }));
 
-    return { primary, fallbacks };
+    return { primary, fallbacks, fromCache: false };
   }
 
   // ============================================================================

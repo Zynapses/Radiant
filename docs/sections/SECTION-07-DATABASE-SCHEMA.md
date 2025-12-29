@@ -23,6 +23,80 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `usage_events` | Request-level usage tracking |
 | `invoices` | Billing invoices |
 | `audit_logs` | Compliance audit trail |
+| `revenue_entries` | Individual revenue events (subscriptions, credits, AI markup) |
+| `cost_entries` | Infrastructure costs (AWS, external AI, platform fees) |
+| `revenue_daily_aggregates` | Pre-computed daily revenue/cost summaries |
+| `model_revenue_tracking` | Per-model revenue breakdown with markup analysis |
+| `accounting_periods` | Month-end close tracking |
+| `reconciliation_entries` | Accounting adjustments |
+| `revenue_export_log` | Audit trail for accounting exports |
+| `preprompt_templates` | Reusable pre-prompt patterns with weights |
+| `preprompt_instances` | Actual pre-prompts used in AGI plans |
+| `preprompt_feedback` | User feedback with attribution analysis |
+| `preprompt_attribution_scores` | Learning correlations per factor |
+| `preprompt_learning_config` | Admin-configurable learning parameters |
+| `preprompt_selection_log` | Selection reasoning audit trail |
+| `user_memory_rules` | User personal AI interaction rules |
+| `preset_user_rules` | Pre-seeded rule templates users can add |
+| `user_rule_application_log` | Tracks when user rules are applied |
+| `memory_categories` | Hierarchical categorization of memory types |
+| `ai_ethics_standards` | Industry AI ethics frameworks (NIST, ISO, EU AI Act) |
+| `ai_ethics_principle_standards` | Mapping principles to standard sections |
+| `provider_rejections` | Track provider/model rejections with fallback chain |
+| `rejection_patterns` | Learn rejection patterns for smarter fallback |
+| `user_rejection_notifications` | Notify users of rejected requests |
+| `model_rejection_stats` | Per-model rejection statistics |
+| `rejection_analytics` | Daily aggregated rejection stats by model/provider/mode |
+| `rejection_keyword_stats` | Track violation keywords for policy review |
+| `rejected_prompt_archive` | Archive rejected prompts with full content for analysis |
+| `routing_decision_cache` | Semantic vector cache for brain router decisions |
+| `storage_tier_config` | Adaptive storage configuration per deployment tier |
+| `ethics_config_presets` | Externalized ethics frameworks (secular, religious, etc.) |
+| `tenant_ethics_config` | Per-tenant ethics preset selection |
+| `preprompt_shadow_tests` | Shadow A/B tests for pre-prompt optimization |
+| `preprompt_shadow_samples` | Individual samples from shadow tests |
+| `preprompt_shadow_settings` | Global shadow testing configuration |
+| `uncertainty_events` | Logprob-based uncertainty detection events |
+| `user_gold_interactions` | Highly-rated interactions for few-shot learning (pgvector) |
+| `synthesis_sessions` | MoA parallel generation sessions |
+| `synthesis_drafts` | Individual model drafts in synthesis |
+| `synthesis_results` | Final synthesized responses |
+| `verification_sessions` | Cross-provider adversarial verification sessions |
+| `verification_issues` | Issues found by adversarial models |
+| `code_execution_sessions` | Code sandbox execution sessions |
+| `code_execution_runs` | Individual execution attempts with patches |
+| `intelligence_aggregator_config` | Per-tenant Intelligence Aggregator configuration |
+| `prompt_patterns` | Common prompt patterns for typeahead matching |
+| `user_prompt_history` | User prompt history with embeddings for suggestions |
+| `suggestion_log` | Typeahead suggestion usage tracking |
+| `result_ideas` | Ideas shown with AI responses |
+| `proactive_suggestions` | Push notification suggestions |
+| `trending_prompts` | Popular prompts by domain |
+| `agi_ideas_config` | Per-tenant AGI Ideas configuration |
+| `agi_learned_prompts` | Persisted prompts with success rates and embeddings |
+| `agi_learned_ideas` | Learned idea patterns with click rates |
+| `prompt_idea_associations` | Links between prompts and effective ideas |
+| `agi_learning_events` | Raw learning signals for analysis |
+| `agi_learning_aggregates` | Pre-computed learning statistics |
+| `agi_model_selection_outcomes` | Model selection outcomes with ratings |
+| `agi_routing_outcomes` | Routing path effectiveness tracking |
+| `agi_domain_detection_feedback` | Domain detection accuracy feedback |
+| `agi_orchestration_mode_outcomes` | Mode effectiveness per context |
+| `agi_response_quality_metrics` | Response quality dimensions |
+| `agi_preprompt_effectiveness` | Preprompt effectiveness tracking |
+| `agi_user_learning_profile` | User preferences learned over time |
+| `agi_unified_learning_log` | Single source of truth for all learning |
+| `response_feedback` | Enhanced feedback with 5-star ratings and comments |
+| `feedback_summaries` | Pre-aggregated feedback statistics by scope |
+| `feedback_config` | Per-tenant feedback configuration |
+| `reasoning_trees` | Tree of Thoughts reasoning sessions |
+| `knowledge_entities` | GraphRAG knowledge entities |
+| `knowledge_relationships` | GraphRAG entity relationships |
+| `research_jobs` | Deep Research job tracking |
+| `job_queue` | Async job processing queue |
+| `lora_adapters` | Dynamic LoRA adapter registry |
+| `generated_ui` | Generative UI component tracking |
+| `cognitive_architecture_config` | Per-tenant cognitive feature config |
 
 ## Type Imports
 

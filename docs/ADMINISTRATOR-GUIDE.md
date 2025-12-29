@@ -1,5 +1,13 @@
 # RADIANT v4.17.0 - Administrator Guide
 
+> ⚠️ **DEPRECATED**: This document has been superseded by:
+> - [RADIANT-ADMIN-GUIDE.md](./RADIANT-ADMIN-GUIDE.md) - Platform administration
+> - [THINKTANK-ADMIN-GUIDE.md](./THINKTANK-ADMIN-GUIDE.md) - Think Tank administration
+>
+> This file is kept for historical reference only. Please use the above guides.
+
+---
+
 > **Comprehensive documentation for RADIANT platform administrators**
 > 
 > Last Updated: {{BUILD_DATE}}

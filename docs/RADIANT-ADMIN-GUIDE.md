@@ -18,11 +18,14 @@
 8. [Billing & Subscriptions](#8-billing--subscriptions)
 9. [Storage Management](#9-storage-management)
 10. [Orchestration & Neural Engine](#10-orchestration--neural-engine)
-11. [Localization](#11-localization)
+11. [Pre-Prompt Learning](#11-pre-prompt-learning)
+12. [Localization](#12-localization)
 12. [Configuration Management](#12-configuration-management)
 13. [Security & Compliance](#13-security--compliance)
 14. [Cost Analytics](#14-cost-analytics)
-15. [A/B Testing & Experiments](#15-ab-testing--experiments)
+15. [Revenue Analytics](#15-revenue-analytics)
+16. [SaaS Metrics Dashboard](#16-saas-metrics-dashboard)
+17. [A/B Testing & Experiments](#17-ab-testing--experiments)
 16. [Audit & Monitoring](#16-audit--monitoring)
 17. [Database Migrations](#17-database-migrations)
 18. [API Management](#18-api-management)
@@ -703,9 +706,94 @@ Create reusable workflows:
 
 ---
 
-## 11. Localization
+## 11. Pre-Prompt Learning
 
-### 11.1 Translation Management
+**Location**: Admin Dashboard → Orchestration → Pre-Prompts
+
+The Pre-Prompt Learning system tracks and learns from the effectiveness of pre-prompts (system prompts) used by the AGI Brain. It uses **attribution analysis** to determine what factor actually caused issues - not just the pre-prompt.
+
+### 11.1 Overview Dashboard
+
+The dashboard shows key metrics:
+
+| Metric | Description |
+|--------|-------------|
+| **Templates** | Active/total pre-prompt templates |
+| **Total Uses** | Pre-prompt instances used |
+| **Avg Rating** | Average user rating (1-5) |
+| **Thumbs Up Rate** | Percentage of positive feedback |
+| **Exploration Rate** | Rate of trying non-optimal templates to learn |
+
+### 11.2 Attribution Analysis
+
+When users report issues, the system analyzes which factor was responsible:
+
+| Factor | When Blamed |
+|--------|-------------|
+| **Pre-prompt** | System instructions wrong |
+| **Model** | Model selection inappropriate |
+| **Mode** | Orchestration mode wrong |
+| **Workflow** | Pattern did not fit task |
+| **Domain** | Domain detection incorrect |
+| **Other** | External factors |
+
+The attribution pie chart shows the distribution of blame across factors.
+
+### 11.3 Template Management
+
+Navigate to the **Templates** tab to:
+
+- View all pre-prompt templates
+- See usage statistics and success rates
+- Check which orchestration modes each template supports
+- View average feedback scores
+
+### 11.4 Adjusting Weights
+
+Click the **sliders icon** on any template to adjust weights:
+
+| Weight | Default | Description |
+|--------|---------|-------------|
+| Base Effectiveness | 0.5 | Starting score before bonuses |
+| Domain Weight | 0.2 | Bonus for matching domain |
+| Mode Weight | 0.2 | Bonus for matching mode |
+| Model Weight | 0.2 | Bonus for compatible model |
+| Complexity Weight | 0.15 | Bonus for complexity match |
+| Task Type Weight | 0.15 | Bonus for task type match |
+| Feedback Weight | 0.1 | Historical feedback influence |
+
+**Score Formula**:
+```
+Final Score = Base + (Domain × DomainWeight) + (Mode × ModeWeight) + 
+              (Model × ModelWeight) + (Complexity × ComplexityWeight) + 
+              (TaskType × TaskTypeWeight) + FeedbackAdjustment
+```
+
+### 11.5 Learning Configuration
+
+Configure learning behavior:
+
+- **Learning Enabled**: Toggle on/off
+- **Exploration Rate**: Percentage of requests using non-optimal templates to gather data (default: 10%)
+- **Exploration Decay**: How quickly exploration decreases (default: 0.99)
+- **Minimum Exploration**: Floor for exploration rate (default: 1%)
+
+### 11.6 Recent Feedback
+
+The **Feedback** tab shows recent user feedback with:
+
+- Rating (1-5 stars)
+- Attribution label (what got blamed)
+- User comments
+- Timestamp
+
+See [Pre-Prompt Learning System Documentation](./PREPROMPT-LEARNING-SYSTEM.md) for full details.
+
+---
+
+## 12. Localization
+
+### 12.1 Translation Management
 
 Navigate to **Localization** to manage:
 
@@ -770,9 +858,242 @@ System configuration is stored in AWS SSM:
 
 ---
 
-## 13. Security & Compliance
+## 13. AI Ethics & Standards
 
-### 13.1 Security Dashboard
+**Location**: Admin Dashboard → Ethics
+
+The Ethics module provides transparency into the ethical principles guiding AI behavior and their source standards.
+
+### 13.1 Standards Tab
+
+View all industry AI ethics frameworks that inform RADIANT's ethical principles:
+
+| Standard | Organization | Type | Required |
+|----------|-------------|------|----------|
+| **NIST AI RMF 1.0** | National Institute of Standards and Technology | Government | ✅ |
+| **ISO/IEC 42001:2023** | International Organization for Standardization | ISO | ✅ |
+| **EU AI Act** | European Union | Government | ✅ |
+| **IEEE 7000-2021** | IEEE | Industry | |
+| **OECD AI Principles** | OECD | Government | |
+| **UNESCO AI Ethics** | UNESCO | Government | |
+| **ISO/IEC 23894:2023** | ISO | ISO | |
+| **ISO/IEC 38507:2022** | ISO | ISO | |
+
+Each standard shows:
+- **Full Name**: Complete standard title with version
+- **Organization**: Issuing body
+- **Type**: Government, ISO, Industry, Academic, Religious
+- **Required Badge**: Mandatory for compliance
+- **Description**: Summary of the standard's purpose
+- **Publication Date**: When the standard was issued
+- **External Link**: Direct link to official standard
+
+### 13.2 Principles Tab
+
+View ethical principles with their standard sources:
+
+| Principle | Category | Source Standards |
+|-----------|----------|------------------|
+| Love Others | Love | NIST GOVERN 1.2, ISO 42001 Clause 5.2, Matthew 22:39 |
+| Golden Rule | Love | NIST MAP 1.1, EU AI Act Article 9, Matthew 7:12 |
+| Speak Truth | Truth | NIST GOVERN 4.1, ISO 42001 Clause 7.4, EU AI Act Article 13, John 8:32 |
+| Show Mercy | Mercy | NIST MEASURE 2.6, EU AI Act Article 14, Matthew 5:7 |
+| Serve Humbly | Service | NIST GOVERN 1.1, ISO 42001 Clause 5.1, Mark 10:45 |
+| Avoid Judgment | Mercy | NIST MAP 2.3, EU AI Act Article 10, Matthew 7:1 |
+| Care for Vulnerable | Service | NIST MAP 1.5, EU AI Act Article 7, ISO 42001 Clause 8.4, Matthew 25:40 |
+
+Each principle displays:
+- **Teaching**: The principle text
+- **Category Badge**: love, mercy, truth, service, humility, peace, forgiveness
+- **Derived from / Aligned with**: Standard badges with section references
+
+### 13.3 Violations Tab
+
+Monitor ethical violations in AI responses:
+
+- **Action**: What was evaluated
+- **Score**: Ethical score percentage
+- **Concerns**: Specific violations detected
+- **Guidance**: Recommended corrections
+- **Reasoning**: Explanation of the evaluation
+
+### 13.4 Statistics
+
+Summary cards showing:
+- **Total Evaluations**: All ethical checks performed
+- **Approved**: Passed evaluations
+- **Violations**: Failed evaluations
+- **Average Score**: Mean ethical score
+- **Today**: Evaluations in the last 24 hours
+
+### 13.5 Standard Alignment Levels
+
+Principles map to standards with different alignment levels:
+
+| Level | Meaning |
+|-------|---------|
+| **derived** | Principle was directly derived from this standard |
+| **aligned** | Principle aligns with this standard's requirements |
+| **supports** | Principle supports this standard's goals |
+| **extends** | Principle extends beyond this standard |
+
+See [AI Ethics Standards Documentation](./AI-ETHICS-STANDARDS.md) for full details.
+
+---
+
+## 14. Provider Rejection Handling
+
+**Location**: Think Tank → Notifications (Bell icon)
+
+When AI providers reject prompts based on their policies (not RADIANT's), the system automatically attempts fallback to alternative models.
+
+### 14.1 How It Works
+
+```
+User Prompt → Model Rejects → Check RADIANT Ethics
+  ├── Our ethics block → Reject with explanation
+  └── Our ethics pass → Try fallback models (up to 3 attempts)
+        ├── Fallback succeeds → Return response (user notified)
+        └── All fail → Reject with full explanation
+```
+
+### 14.2 Rejection Types
+
+| Type | Description | Auto-Fallback |
+|------|-------------|---------------|
+| **content_policy** | Provider's content policy violation | ✅ Yes |
+| **safety_filter** | Safety/moderation filter triggered | ✅ Yes |
+| **provider_ethics** | Provider's ethical guidelines differ | ✅ Yes |
+| **capability_mismatch** | Model can't handle request type | ✅ Yes |
+| **context_length** | Prompt too long for model | ✅ Yes |
+| **moderation** | Pre-flight moderation blocked | ✅ Yes |
+| **rate_limit** | Rate limiting | ⏳ Retry |
+
+### 14.3 User Notifications
+
+Users see rejection notifications via the bell icon in Think Tank:
+
+- **Unread count badge** - Number of unread notifications
+- **Notification panel** - Slides out showing all rejections
+- **Suggested actions** - Rephrase, simplify, contact admin
+- **Resolution status** - Whether fallback succeeded
+
+### 14.4 Fallback Model Selection
+
+Models are selected for fallback based on:
+
+1. **Rejection rate** - Models with lowest historical rejection rates preferred
+2. **Required capabilities** - Must match original model's capabilities
+3. **Provider diversity** - Prefer different providers
+
+### 14.5 Model Rejection Statistics
+
+**Location**: Admin Dashboard → Analytics → Model Stats
+
+View per-model:
+- Total requests and rejections
+- Rejection rate percentage
+- Breakdown by rejection type
+- Fallback success rate
+
+### 14.6 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `provider_rejections` | Track all rejections with fallback chain |
+| `rejection_patterns` | Learn patterns for smarter fallback |
+| `user_rejection_notifications` | User-facing notifications |
+| `model_rejection_stats` | Per-model statistics |
+
+### 14.7 Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `MAX_FALLBACK_ATTEMPTS` | 3 | Maximum fallback tries per request |
+| `MIN_MODELS_FOR_TASK` | 2 | Minimum capable models required |
+
+See [Provider Rejection Handling Documentation](./PROVIDER-REJECTION-HANDLING.md) for full details.
+
+### 14.8 Rejection Analytics
+
+**Location**: Admin Dashboard → Analytics → Rejections
+
+Comprehensive analytics on AI provider rejections to inform ethics policy updates.
+
+#### Summary Cards
+
+- **Total Rejections (30d)** - All rejections in last 30 days
+- **Fallback Success Rate** - Percentage resolved by fallback models
+- **Rejected to User** - Requests that couldn't be completed
+- **Flagged Keywords** - Keywords marked for policy review
+
+#### By Provider Tab
+
+| Column | Description |
+|--------|-------------|
+| Provider | Provider ID (openai, anthropic, google, etc.) |
+| Rejections | Total rejections in period |
+| Models | Number of models affected |
+| Unique Prompts | Distinct prompts rejected |
+| Fallback Rate | Success rate of fallback attempts |
+| Rejected to User | Requests that failed all fallbacks |
+| Types | Rejection types (content_policy, safety_filter, etc.) |
+
+#### Violation Keywords Tab
+
+Track which keywords trigger rejections:
+
+| Column | Description |
+|--------|-------------|
+| Keyword | The triggering keyword |
+| Category | violence, security, controlled, etc. |
+| Occurrences | Times keyword appeared in rejected prompts |
+| Provider Breakdown | Rejections per provider for this keyword |
+| Status | Flagged, Pre-filter added, or Monitoring |
+
+**Actions:**
+- **Flag for Review** - Mark keyword for policy consideration
+- **Add Pre-Filter** - Block prompts containing keyword before sending to AI
+
+#### Flagged Prompts Tab
+
+View full content of rejected prompts for investigation:
+
+- Full prompt text (for policy review only)
+- Detected violation keywords
+- Model and provider that rejected
+- Number of times this prompt pattern was rejected
+- Suggested actions: Add Pre-Filter, Dismiss
+
+#### Policy Review Tab
+
+Recommendations based on rejection patterns:
+
+- High-frequency rejection patterns
+- Suggested pre-filters to add
+- Keywords to consider blocking
+
+#### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `rejection_analytics` | Daily aggregated stats by model/provider/mode |
+| `rejection_keyword_stats` | Per-keyword occurrence and rejection counts |
+| `rejected_prompt_archive` | Full prompt content for flagged reviews |
+
+#### Using Analytics to Update Ethics Policy
+
+1. **Monitor** → Watch the Keywords tab for high-occurrence terms
+2. **Flag** → Mark suspicious keywords for review
+3. **Investigate** → View full prompts in Flagged Prompts tab
+4. **Decide** → Add pre-filter, add warning, or dismiss
+5. **Implement** → Update RADIANT ethics policy to pre-filter prompts
+
+---
+
+## 15. Security & Compliance
+
+### 15.1 Security Dashboard
 
 Navigate to **Security** to monitor:
 
@@ -873,9 +1194,143 @@ Review AI-powered recommendations:
 
 ---
 
-## 15. A/B Testing & Experiments
+## 15. Revenue Analytics
 
-### 15.1 Experiment Dashboard
+### 15.1 Revenue Dashboard
+
+Navigate to **Revenue** to view gross revenue, COGS, and profit:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Revenue Analytics                       Period: Last 30 Days   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Gross Revenue:     $29,450.00           (+12.5% vs last period)│
+│  Total COGS:        $14,150.00                                  │
+│  Gross Profit:      $15,300.00           (+15.2% vs last period)│
+│  Gross Margin:      51.95%                                       │
+│                                                                  │
+│  Revenue Breakdown:                                              │
+│  ├── Subscriptions:       $15,000.00 (50.9%)                    │
+│  ├── Credit Purchases:    $2,500.00 (8.5%)                      │
+│  ├── AI Markup (External): $8,750.00 (29.7%)                    │
+│  └── AI Markup (Self-Hosted): $3,200.00 (10.9%)                 │
+│                                                                  │
+│  ⚠️ Note: Marketing, sales, G&A costs not included (COGS only) │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 15.2 Cost Breakdown (COGS)
+
+View infrastructure and provider costs:
+
+| Category | Description | Example Services |
+|----------|-------------|------------------|
+| AWS Compute | Compute infrastructure | EC2, SageMaker, Lambda |
+| AWS Storage | Storage services | S3, EBS |
+| AWS Network | Data transfer | API Gateway, CloudFront |
+| AWS Database | Database services | Aurora, DynamoDB |
+| External AI | Provider costs | OpenAI, Anthropic APIs |
+| Platform Fees | Payment processing | Stripe fees |
+
+### 15.3 Revenue by Model
+
+View per-model profitability:
+
+| Model | Provider Cost | Customer Charge | Markup | Requests |
+|-------|--------------|-----------------|--------|----------|
+| gpt-4o | $500.00 | $650.00 | 30% | 12,345 |
+| claude-3.5-sonnet | $300.00 | $390.00 | 30% | 8,901 |
+| Self-hosted Llama | $100.00 | $175.00 | 75% | 45,678 |
+
+### 15.4 Accounting Exports
+
+Export revenue data for accounting software:
+
+1. Click **Export** dropdown
+2. Select format:
+   - **CSV**: Summary for spreadsheets
+   - **JSON**: Full details for integrations
+   - **QuickBooks IIF**: Direct import to QuickBooks
+   - **Xero CSV**: Import to Xero
+   - **Sage CSV**: Import to Sage
+3. Configure date range
+4. Download file
+
+**QuickBooks Integration**:
+- Import via File → Utilities → Import → IIF Files
+- Creates General Journal entries
+- Requires matching account names
+
+See [Revenue Analytics Documentation](./REVENUE-ANALYTICS.md) for full details.
+
+---
+
+## 16. SaaS Metrics Dashboard
+
+### 16.1 Overview
+
+Navigate to **SaaS Metrics** for a comprehensive view of business health:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  SaaS Metrics Dashboard                  Period: Last 30 Days   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  MRR: $89,500      ARR: $1,074,000     Gross Margin: 53.1%     │
+│  +12.5%            +15.2%               ████████████░░ 53%      │
+│                                                                  │
+│  Customers: 342    Churn: 2.3%         LTV:CAC: 6.98x          │
+│  +5.8%             ⚠️ Target <2%        ✅ Healthy              │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 16.2 Key Metrics
+
+| Metric | Description | Healthy Range |
+|--------|-------------|---------------|
+| **MRR** | Monthly Recurring Revenue | Growing month-over-month |
+| **ARR** | Annual Recurring Revenue | MRR × 12 |
+| **Gross Margin** | (Revenue - COGS) / Revenue | > 50% |
+| **Churn Rate** | Customers lost / Total | < 3% |
+| **LTV:CAC** | Lifetime Value / Acquisition Cost | > 3:1 |
+
+### 16.3 Dashboard Tabs
+
+1. **Overview**: Revenue trends, top tenants, cost breakdown
+2. **Revenue**: MRR movement, revenue by product/tier
+3. **Costs**: Cost distribution, COGS breakdown
+4. **Customers**: Growth trends, churn analysis
+5. **Models**: Per-model profitability analysis
+
+### 16.4 Exporting Reports
+
+Export data for Excel or accounting:
+
+1. Click **Export** dropdown
+2. Select format:
+   - **Excel (CSV)**: Full metrics in spreadsheet format
+   - **JSON**: Structured data for integrations
+3. File downloads with period and date in filename
+
+**Export includes:**
+- Revenue summary (MRR, ARR, Gross Profit)
+- Cost breakdown by category
+- Customer metrics (total, new, churned)
+- Unit economics (ARPU, LTV, CAC)
+- Top tenants with details
+- Model performance metrics
+- Daily trend data
+
+See [SaaS Metrics Dashboard Documentation](./SAAS-METRICS-DASHBOARD.md) for full details.
+
+---
+
+## 17. A/B Testing & Experiments
+
+### 16.1 Experiment Dashboard
 
 Navigate to **Experiments** to manage:
 
@@ -1200,5 +1655,346 @@ Configure hidden features:
 
 ---
 
-*Document Version: 4.18.1*
+## 16. Adaptive Storage Configuration
+
+**Location**: Admin Dashboard → Settings → Storage
+
+Configure storage backends per deployment tier to optimize costs.
+
+### 16.1 Storage Types
+
+| Type | Use Case | Monthly Cost |
+|------|----------|--------------|
+| **Fargate PostgreSQL** | Tier 1-2 (dev/startup) | $5-50 |
+| **Aurora Serverless v2** | Tier 3-5 (production) | $100-2500 |
+| **DynamoDB** | Simple key-value workloads | Pay per request |
+
+### 16.2 Default Configuration
+
+| Tier | Default Storage | Reason |
+|------|-----------------|--------|
+| 1 (SEED) | Fargate PostgreSQL | Low cost for dev |
+| 2 (STARTUP) | Fargate PostgreSQL | Cost-effective for small prod |
+| 3 (GROWTH) | Aurora Serverless | Auto-scaling for growth |
+| 4 (SCALE) | Aurora Serverless | High availability |
+| 5 (ENTERPRISE) | Aurora Serverless + Multi-AZ | Maximum reliability |
+
+### 16.3 Admin Overrides
+
+To override the default storage type:
+
+1. Go to Settings → Storage
+2. Enable "Admin Override" for the tier
+3. Select new storage type
+4. Provide override reason (required)
+5. Save configuration
+
+Overrides are logged with timestamp and administrator ID.
+
+---
+
+## 17. Ethics Configuration
+
+**Location**: Admin Dashboard → Settings → Ethics
+
+Manage AI ethics frameworks with externalized, configurable presets.
+
+### 17.1 Ethics Presets
+
+| Preset | Type | Default Status |
+|--------|------|----------------|
+| **Secular (NIST/ISO)** | Secular | Enabled (Default) |
+| **Christian Ethics** | Religious | Disabled |
+| **Corporate Governance** | Corporate | Disabled |
+
+### 17.2 Enabling Religious Presets
+
+Religious ethics presets are disabled by default. To enable:
+
+1. Go to Settings → Ethics
+2. Navigate to "Religious" tab
+3. Toggle "Enable Religious Preset"
+4. Click "Apply This Preset"
+
+**Warning**: Enabling religious presets incorporates faith-based principles into AI decision-making. Ensure this aligns with your organization's policies.
+
+### 17.3 Tenant Ethics Selection
+
+Each tenant can select their preferred ethics preset:
+
+1. Admin selects preset for tenant
+2. Custom principles can be added
+3. Strict mode can be enabled for enhanced checking
+
+---
+
+## 19. Intelligence Aggregator
+
+**Location**: Admin Dashboard → Settings → Intelligence
+
+Advanced AI capabilities that enable RADIANT to outperform any single model.
+
+> **Why a System > a Model**: See [Intelligence Aggregator Architecture](./INTELLIGENCE-AGGREGATOR-ARCHITECTURE.md) for the full technical analysis of why Radiant's orchestration outperforms any single SOTA model.
+
+### 19.1 Feature Overview
+
+| Feature | Default | Cost Impact | Purpose |
+|---------|---------|-------------|---------|
+| **Uncertainty Detection** | On | Minimal | Detect low-confidence claims via logprobs |
+| **Success Memory RAG** | On | Minimal | Learn from highly-rated interactions |
+| **MoA Synthesis** | Off | 3-4x | Parallel generation + synthesis |
+| **Cross-Provider Verification** | Off | 2x | Adversarial error checking |
+| **Code Execution** | Off | Variable | Run code to verify it works |
+
+### 19.2 Uncertainty Detection (Logprobs)
+
+Monitors token confidence to catch "guessing":
+
+```
+Workflow:
+1. Model generates response with logprobs enabled
+2. System monitors average token probability
+3. If confidence < 85% on factual claim → trigger verification
+4. Web search or knowledge base lookup verifies claim
+5. Verified fact injected, generation continues
+```
+
+**Settings:**
+- `threshold`: Confidence level (default: 85%)
+- `verificationTool`: web_search | vector_db | none
+
+### 19.3 Success Memory RAG
+
+Learns user preferences without fine-tuning:
+
+```
+Workflow:
+1. User rates response 4-5 stars
+2. Interaction stored with vector embedding
+3. Future similar prompts retrieve gold interactions
+4. Retrieved interactions injected as few-shot examples
+5. Model matches user's preferred style/format
+```
+
+**Settings:**
+- `minRatingForGold`: 4 or 5 stars
+- `maxGoldInteractions`: Per-user limit (default: 1000)
+- `retrievalCount`: Examples to inject (default: 3)
+
+### 19.4 Mixture of Agents (MoA) Synthesis
+
+Parallel generation eliminates single-model blind spots:
+
+```
+Phase 1 (Propose):
+  GPT-4o      → Draft A
+  Claude 3.5  → Draft B  (parallel)
+  DeepSeek    → Draft C
+
+Phase 2 (Synthesize):
+  Claude 3.5 Opus analyzes all drafts
+  → Combines strengths
+  → Resolves conflicts
+  → Final superior response
+```
+
+**Settings:**
+- `proposerCount`: Number of models (default: 3)
+- `defaultProposers`: Model list
+- `synthesizerModel`: Model for synthesis
+
+### 19.5 Cross-Provider Verification
+
+Adversarial checking from different training data:
+
+```
+Generator (OpenAI) → Initial response
+
+Adversary (Anthropic) with hostile prompt:
+  "Find hallucinations, logic gaps, vulnerabilities..."
+
+If issues found:
+  → Generator regenerates addressing issues
+  → Adversary re-verifies
+  → Max 2 regeneration attempts
+```
+
+**Adversary Personas:**
+- `security_auditor`: Find vulnerabilities
+- `fact_checker`: Find hallucinations
+- `logic_analyzer`: Find reasoning gaps
+- `code_reviewer`: Find bugs
+
+### 19.6 Code Execution Sandbox
+
+Verify generated code actually runs:
+
+```
+Draft → Generate code
+     ↓
+Sandbox → Execute in Lambda/Fargate
+     ↓
+If error:
+  → Feed stderr to model
+  → Model patches code
+  → Re-execute
+     ↓
+Deliver → User gets working code
+```
+
+**⚠️ Security**: Currently static analysis only. Full execution requires security review.
+
+**Settings:**
+- `languages`: python, javascript, typescript
+- `timeoutSeconds`: Max execution time (default: 10)
+- `memoryMb`: Memory limit (default: 128)
+
+### 19.7 Configuration via Admin UI
+
+Navigate to Settings → Intelligence to:
+1. Enable/disable each feature
+2. Configure thresholds and limits
+3. Select models for MoA
+4. Choose verification modes
+
+---
+
+## 18. Infrastructure Configuration
+
+### 18.1 VPC CIDR Override
+
+For enterprise VPC peering, the default CIDR can be overridden:
+
+```typescript
+// In deployment configuration
+{
+  vpcCidrOverride: '172.16.0.0/16'  // Custom CIDR to avoid conflicts
+}
+```
+
+Default CIDRs by tier:
+- Tier 1: `10.0.0.0/20`
+- Tier 2: `10.0.0.0/18`
+- Tier 3: `10.0.0.0/17`
+- Tier 4: `10.0.0.0/16`
+- Tier 5: `10.0.0.0/14`
+
+### 18.2 Router Performance Headers
+
+API responses include performance metrics:
+
+| Header | Description |
+|--------|-------------|
+| `X-Radiant-Router-Latency` | Time spent in brain router (ms) |
+| `X-Radiant-Domain-Detection-Ms` | Domain detection time |
+| `X-Radiant-Model-Selection-Ms` | Model selection time |
+| `X-Radiant-Cost-Cents` | Estimated cost for request |
+| `X-Radiant-Cache-Hit` | Whether routing was cached |
+
+### 18.3 Deploy Core Library
+
+The `@radiant/deploy-core` package provides platform-agnostic deployment:
+
+```typescript
+import { RadiantDeployer } from '@radiant/deploy-core';
+
+const deployer = new RadiantDeployer({
+  appId: 'my-app',
+  environment: 'production',
+  tier: 3,
+  region: 'us-east-1',
+  credentials: { ... },
+  vpcCidrOverride: '172.16.0.0/16',
+});
+
+const result = await deployer.deploy();
+```
+
+Available classes:
+- `RadiantDeployer` - Main deployment orchestration
+- `StackManager` - CloudFormation stack operations
+- `HealthChecker` - Post-deployment health checks
+- `SnapshotManager` - Deployment snapshots for rollback
+
+---
+
+## 20. Cognitive Architecture
+
+**Location**: Settings → Cognitive Architecture
+
+Advanced reasoning capabilities that elevate Radiant beyond single-model limitations.
+
+### 20.1 Tree of Thoughts (System 2 Reasoning)
+
+Monte Carlo Tree Search for deliberate reasoning:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `maxDepth` | 5 | Maximum reasoning steps |
+| `branchingFactor` | 3 | Thoughts per branch |
+| `pruneThreshold` | 0.3 | Score below which to prune |
+| `selectionStrategy` | beam | beam, mcts, or greedy |
+| `defaultThinkingTimeMs` | 30000 | Default thinking budget |
+
+**How it works**: Instead of one linear answer, explores multiple reasoning paths. If a path scores poorly, backtracks and tries a different branch.
+
+### 20.2 GraphRAG (Knowledge Mapping)
+
+Entity and relationship extraction for multi-hop reasoning:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `maxEntitiesPerDocument` | 50 | Extraction limit |
+| `minConfidenceThreshold` | 0.7 | Quality filter |
+| `enableHybridSearch` | true | Combine graph + vector |
+| `graphWeight` | 0.6 | Weight for graph results |
+| `maxHops` | 3 | Traversal depth |
+
+**How it works**: Extracts (Subject, Predicate, Object) triples from documents into a knowledge graph, then traverses relationships to find connections that vector search misses.
+
+### 20.3 Deep Research Agents
+
+Asynchronous background research:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `maxSources` | 50 | Sources to process |
+| `maxDepth` | 2 | Link following depth |
+| `maxDurationMs` | 1800000 | 30 minute timeout |
+| `parallelRequests` | 5 | Concurrent fetches |
+
+**How it works**: User dispatches a research query, agent runs in background visiting 50+ sources, user gets notified when briefing document is ready.
+
+### 20.4 Dynamic LoRA Swapping
+
+Hot-swappable domain expertise:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | false | Requires SageMaker |
+| `cacheSize` | 5 | Adapters in memory |
+| `maxLoadTimeMs` | 5000 | Load timeout |
+| `autoSelectByDomain` | true | Auto-select adapter |
+
+**How it works**: When domain is detected (e.g., California Property Law), loads a specialized LoRA adapter (~100MB) that transforms the generalist model into a specialist.
+
+### 20.5 Generative UI (App Factory)
+
+AI-generated interactive components:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | true | Enable Generative UI |
+| `maxComponentsPerResponse` | 3 | Component limit |
+| `autoDetectOpportunities` | true | Auto-generate |
+
+**Component Types**: chart, table, calculator, comparison, timeline, form, diagram
+
+**How it works**: When user asks "Compare pricing of GPT-4 vs Claude", instead of a static table, generates an interactive pricing calculator with sliders.
+
+See [Cognitive Architecture Documentation](./COGNITIVE-ARCHITECTURE.md) for full details.
+
+---
+
+*Document Version: 4.18.3*
 *Last Updated: December 2024*

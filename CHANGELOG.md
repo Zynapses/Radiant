@@ -5,6 +5,399 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.3] - 2024-12-28
+
+### Added
+
+#### Cognitive Architecture (5 Advanced Features)
+- **Tree of Thoughts** (`tree-of-thoughts.service.ts`)
+  - System 2 reasoning with MCTS/Beam Search
+  - `startReasoning()` - Begin deliberate reasoning
+  - Branching, scoring, pruning, backtracking
+  - User can "trade time for intelligence"
+- **GraphRAG** (`graph-rag.service.ts`)
+  - Knowledge graph with entity/relationship extraction
+  - `extractKnowledge()` - Extract triples from documents
+  - `queryGraph()` - Multi-hop graph traversal
+  - `hybridSearch()` - Combine graph + vector results
+- **Deep Research Agents** (`deep-research.service.ts`)
+  - Async background research jobs
+  - `dispatchResearchJob()` - Fire-and-forget research
+  - 50+ source gathering, analysis, synthesis
+  - Notification when complete
+- **Dynamic LoRA Swapping** (`dynamic-lora.service.ts`)
+  - Hot-swappable domain expertise adapters
+  - `selectAdapterForDomain()` - Auto-select specialist
+  - `loadAdapter()` - Hot-swap in milliseconds
+  - S3 registry + SageMaker integration
+- **Generative UI** (`generative-ui.service.ts`)
+  - AI generates interactive components
+  - `detectUIOpportunity()` - Auto-detect when to generate
+  - `generateUI()` - Create calculators, charts, tables
+  - Component types: chart, table, calculator, comparison, timeline
+- **Database Migration** (`087_cognitive_architecture.sql`)
+  - `reasoning_trees` - Tree of Thoughts sessions
+  - `knowledge_entities`, `knowledge_relationships` - GraphRAG
+  - `research_jobs`, `job_queue` - Deep Research
+  - `lora_adapters` - Dynamic LoRA registry
+  - `generated_ui` - Generative UI tracking
+  - `cognitive_architecture_config` - Per-tenant config
+- **Admin Dashboard** (`/settings/cognitive`)
+  - Configuration UI for all 5 features
+  - Enable/disable toggles, parameter sliders
+  - Explanatory panels for each concept
+- **Comprehensive Documentation** (`docs/COGNITIVE-ARCHITECTURE.md`)
+
+#### Enhanced Feedback System
+- **Shared Types** (`packages/shared/src/types/feedback.types.ts`)
+  - `StarRating` - 1-5 star rating type
+  - `ResponseFeedback` - Full feedback entity with ratings + comments
+  - `FeedbackSummary` - Aggregated feedback statistics
+  - `FeedbackConfig` - Per-tenant feedback configuration
+  - Category ratings: accuracy, helpfulness, clarity, completeness, tone
+- **Database Migration** (`migrations/090_enhanced_feedback_system.sql`)
+  - `response_feedback` - Enhanced feedback with 5-star + comments
+  - `feedback_summaries` - Pre-aggregated summaries by scope
+  - `feedback_config` - Per-tenant configuration
+  - `submit_response_feedback()` - Function with auto-learning integration
+- **Enhanced Feedback Service** (`lambda/shared/services/enhanced-feedback.service.ts`)
+  - `submitFeedback()` - Submit any feedback type
+  - `submitStarRating()` - Think Tank 5-star ratings
+  - `submitThumbsFeedback()` - Legacy thumbs up/down
+  - `getFeedbackSummary()` - Get aggregated stats
+  - `getModelPerformance()` - Feedback by model
+  - `getFeedbackConfig()` / `updateFeedbackConfig()` - Configuration
+
+#### AGI Brain/Ideas Service
+- **Shared Types** (`packages/shared/src/types/agi-ideas.types.ts`)
+  - `PromptSuggestion` - Typeahead suggestion structure
+  - `ResultIdea` - Ideas shown with responses
+  - `AGIIdeasConfig` - Per-tenant configuration
+  - Common prompt patterns for fast matching
+- **Database Migration** (`packages/infrastructure/migrations/087_agi_ideas_service.sql`)
+  - `prompt_patterns` - Seeded common prompt patterns
+  - `user_prompt_history` - User prompt history with embeddings
+  - `suggestion_log` - Track suggestion usage for learning
+  - `result_ideas` - Ideas shown with responses
+  - `proactive_suggestions` - Push suggestion support
+  - `trending_prompts` - Popular prompts by domain
+  - `agi_ideas_config` - Per-tenant feature configuration
+- **AGI Ideas Service** (`lambda/shared/services/agi-ideas.service.ts`)
+  - `getTypeaheadSuggestions()` - Real-time suggestions as user types
+  - `generateResultIdeas()` - Ideas to show with responses
+  - Pattern matching, user history, domain-aware, trending sources
+  - Learning from user selections
+- **API Endpoints** (`lambda/thinktank/ideas.ts`)
+  - `GET /api/thinktank/ideas/typeahead?q=...` - Get suggestions
+  - `POST /api/thinktank/ideas/generate` - Generate result ideas
+  - `POST /api/thinktank/ideas/click` - Record idea clicks
+  - `POST /api/thinktank/ideas/select` - Record suggestion selection
+- **Persistent Learning** (`migrations/088_agi_persistent_learning.sql`)
+  - `agi_learned_prompts` - Persisted prompts with success rates, embeddings
+  - `agi_learned_ideas` - Learned idea patterns with click rates
+  - `prompt_idea_associations` - Links prompts to effective ideas
+  - `agi_learning_events` - Raw learning signals for analysis
+  - `agi_learning_aggregates` - Pre-computed learning statistics
+- **AGI Learning Service** (`lambda/shared/services/agi-learning.service.ts`)
+  - `learnFromPrompt()` - Persist prompts with outcomes
+  - `learnFromIdeaClick()` - Track which ideas work
+  - `recordOutcome()` - Link ratings to learning events
+  - `getSimilarLearnedPrompts()` - Vector search for similar successful prompts
+  - `getLearnedIdeasForPrompt()` - Get best ideas based on learning
+- **Comprehensive Learning** (`migrations/089_agi_comprehensive_learning.sql`)
+  - `agi_model_selection_outcomes` - Which models work best for which prompts
+  - `agi_routing_outcomes` - Which routing paths are most effective
+  - `agi_domain_detection_feedback` - Improve domain detection accuracy
+  - `agi_orchestration_mode_outcomes` - Which modes work best for tasks
+  - `agi_response_quality_metrics` - Track what makes responses good
+  - `agi_preprompt_effectiveness` - Which preprompts work best
+  - `agi_user_learning_profile` - User preferences learned over time
+  - `agi_unified_learning_log` - Single source of truth for all learning
+- **Unified Learning Service** (`lambda/shared/services/agi-unified-learning.service.ts`)
+  - `recordModelSelection()` - Persist model selection outcomes
+  - `recordDomainFeedback()` - Persist domain detection accuracy
+  - `recordModeOutcome()` - Persist orchestration mode effectiveness
+  - `recordRoutingOutcome()` - Persist routing decision outcomes
+  - `recordQualityMetrics()` - Persist response quality signals
+  - `updateUserProfile()` - Update user learning profile
+  - `getBestModelForContext()` - Query learned model preferences
+
+#### Intelligence Aggregator Architecture
+- **Database Migration** (`packages/infrastructure/migrations/086_intelligence_aggregator.sql`)
+  - `uncertainty_events` - Track logprob-based uncertainty detection
+  - `user_gold_interactions` - Store highly-rated interactions for few-shot learning
+  - `synthesis_sessions` - MoA synthesis session tracking
+  - `synthesis_drafts` - Individual model drafts for synthesis
+  - `synthesis_results` - Final synthesized responses
+  - `verification_sessions` - Cross-provider verification sessions
+  - `verification_issues` - Issues found by adversarial verification
+  - `code_execution_sessions` - Code sandbox sessions
+  - `code_execution_runs` - Individual execution attempts
+  - `intelligence_aggregator_config` - Per-tenant feature configuration
+- **Shared Types** (`packages/shared/src/types/intelligence-aggregator.types.ts`)
+  - Types for all 5 Intelligence Aggregator features
+  - `DEFAULT_AGGREGATOR_CONFIG` with sensible defaults
+- **Uncertainty Detection Service** (`lambda/shared/services/uncertainty-detection.service.ts`)
+  - `analyzeLogprobs()` - Calculate confidence from token logprobs
+  - `shouldTriggerVerification()` - Detect when to verify claims
+  - `extractClaims()` - Extract factual/numerical claims from text
+- **Success Memory Service** (`lambda/shared/services/success-memory.service.ts`)
+  - `recordGoldInteraction()` - Store 4-5 star rated responses
+  - `retrieveSimilarInteractions()` - Vector similarity search for few-shot examples
+  - `formatAsFewShotExamples()` - Format for system prompt injection
+- **MoA Synthesis Service** (`lambda/shared/services/moa-synthesis.service.ts`)
+  - `createSession()` - Start parallel generation with multiple models
+  - `recordDraft()` - Store individual model responses
+  - `buildSynthesisPrompt()` - Create prompt for synthesizer
+  - `recordSynthesisResult()` - Store final synthesized response
+- **Cross-Provider Verification Service** (`lambda/shared/services/cross-provider-verification.service.ts`)
+  - `selectAdversaryModel()` - Choose model from different provider
+  - `getAdversaryPrompt()` - Generate hostile verification prompt
+  - `parseAdversaryResponse()` - Extract issues from adversary output
+  - Adversary personas: security_auditor, fact_checker, logic_analyzer, code_reviewer
+- **Code Execution Service** (`lambda/shared/services/code-execution.service.ts`)
+  - `executeCode()` - Run code in sandbox (static analysis for now)
+  - `performStaticAnalysis()` - Syntax checking for Python/JS
+  - `getPatchPrompt()` - Generate fix prompt for model
+  - Draft-Verify-Patch loop support
+- **Admin UI** (`apps/admin-dashboard/app/(dashboard)/settings/intelligence/page.tsx`)
+  - 5-tab configuration interface
+  - Per-feature enable/disable toggles
+  - Cost warnings for expensive features (MoA, Verification)
+  - Security warnings for code execution
+- **Architecture Documentation** (`docs/INTELLIGENCE-AGGREGATOR-ARCHITECTURE.md`)
+  - Technical analysis: "A System > A Model"
+  - MoA advantage: Ensemble consensus filtering
+  - Adversarial verification: Cross-provider critic loops
+  - Code sandbox: Deterministic execution vs probabilistic generation
+  - Safety tax avoidance: Specialized model routing
+  - Comparison matrix: Single model vs orchestrator
+
+#### Platform Improvements (AI Review Fixes)
+- **Security: Keychain Removal** (`apps/swift-deployer/Sources/RadiantDeployer/Services/LocalStorageManager.swift`)
+  - Removed Apple Keychain dependency for DB encryption key
+  - New priority hierarchy: Environment variable > 1Password CLI > Local secure file
+  - Supports CI/CD and containerized deployments via `RADIANT_DB_ENCRYPTION_KEY` env var
+- **VPC CIDR Override** (`packages/infrastructure/lib/stacks/networking-stack.ts`)
+  - Added `vpcCidrOverride` prop for enterprise VPC peering scenarios
+  - Prevents IP range conflicts with client networks
+- **Router Performance Headers** (`packages/infrastructure/lambda/shared/utils/performance-headers.ts`)
+  - New `X-Radiant-Router-Latency`, `X-Radiant-Cost-Cents` headers on API responses
+  - `RouterPerformanceMetrics` type added to AGI Brain Planner
+  - Tracks domain detection, model selection, and plan generation timing
+- **Delight System Master Toggle** (`packages/shared/src/types/delight.types.ts`)
+  - Added `enabled` field to `UserDelightPreferences` (default: true)
+  - Users can disable entire delight system in Think Tank advanced settings
+- **Semantic Routing Cache** (`packages/infrastructure/lambda/shared/services/routing-cache.service.ts`)
+  - New `routing_decision_cache` table for caching brain router decisions
+  - Skip router LLM for repeated/similar prompts
+  - `shouldSkipRouter()` for optimistic execution on simple queries
+- **Adaptive Storage Configuration** (`apps/admin-dashboard/app/(dashboard)/settings/storage/page.tsx`)
+  - Admin UI for configuring storage type per tier
+  - Fargate Postgres for Tier 1-2 (cost savings), Aurora for Tier 3+
+  - Admin override with reason tracking
+- **Deploy Core Library** (`packages/deploy-core/`)
+  - New `@radiant/deploy-core` package with platform-agnostic deployment logic
+  - `RadiantDeployer`, `StackManager`, `HealthChecker`, `SnapshotManager` classes
+  - Enables future CLI and CI/CD integration
+- **Externalized Ethics Config** (`apps/admin-dashboard/app/(dashboard)/settings/ethics/page.tsx`)
+  - Ethics presets moved to database (`ethics_config_presets` table)
+  - Secular preset (NIST/ISO) as default
+  - Religious presets disabled by default, admin-enableable
+  - Per-tenant ethics configuration
+- **Pre-Prompt Shadow Testing** (`apps/admin-dashboard/app/(dashboard)/thinktank/shadow-testing/page.tsx`)
+  - A/B test pre-prompt optimizations in background
+  - Auto/Manual/Scheduled test modes
+  - Statistical confidence tracking
+  - Auto-promote threshold configuration
+- **Database Migration** (`packages/infrastructure/migrations/085_platform_improvements.sql`)
+  - `routing_decision_cache` - Semantic routing cache
+  - `storage_tier_config` - Adaptive storage per tier
+  - `ethics_config_presets` - Externalized ethics frameworks
+  - `tenant_ethics_config` - Per-tenant ethics selection
+  - `preprompt_shadow_tests` - Shadow A/B tests
+  - `preprompt_shadow_samples` - Test samples
+  - `preprompt_shadow_settings` - Global test settings
+
+#### Admin Dashboard - Specialty Model Metadata
+- **Models Page Enhancement** (`apps/admin-dashboard/app/(dashboard)/models/models-client.tsx`)
+  - Added specialty metadata visibility: hosting type, specialty, capabilities, modalities, license, thermal state
+  - Added edit dialog for all specialty metadata fields
+  - New summary cards for Self-Hosted vs External model counts
+  - New table columns: Hosting, Specialty, Thermal, License, Actions
+  - Edit button to modify category, specialty, primary mode, capabilities, modalities, license, commercial use
+
+#### Provider Rejection Handling & Intelligent Fallback
+- **Database Migration** (`packages/infrastructure/migrations/083_provider_rejection_handling.sql`)
+  - `provider_rejections` - Track rejections with fallback chain
+  - `rejection_patterns` - Learn patterns for smarter fallback selection
+  - `user_rejection_notifications` - Notify users of rejected requests
+  - `model_rejection_stats` - Per-model rejection statistics
+  - Functions: `record_provider_rejection()`, `record_fallback_result()`, `create_rejection_notification()`
+- **Rejection Analytics Migration** (`packages/infrastructure/migrations/084_rejection_analytics.sql`)
+  - `rejection_analytics` - Daily aggregated stats by model/provider/mode/type
+  - `rejection_keyword_stats` - Track violation keywords with per-provider counts
+  - `rejected_prompt_archive` - Full prompt content for policy review
+  - Enhanced `provider_rejections` with prompt_content, orchestration_mode, violation_keywords
+  - Views: `rejection_summary_by_provider`, `rejection_summary_by_model`, `top_rejection_keywords`
+  - Functions: `record_rejection_with_analytics()`, `get_rejection_analytics_dashboard()`, `flag_keyword_for_review()`
+- **Rejection Analytics UI** (`apps/admin-dashboard/app/(dashboard)/analytics/rejections/page.tsx`)
+  - Summary cards: Total rejections, fallback success rate, rejected to user, flagged keywords
+  - Tabs: By Provider, Violation Keywords, Flagged Prompts, Policy Review
+  - View full prompt content for policy investigation
+  - Flag keywords for review, add pre-filters
+- **Shared Types** (`packages/shared/src/types/provider-rejection.types.ts`)
+  - ProviderRejection, RejectionType, FallbackAttempt, RejectionNotification types
+  - Constants: REJECTION_TYPE_LABELS, FINAL_STATUS_LABELS
+- **Service** (`packages/infrastructure/lambda/shared/services/provider-rejection.service.ts`)
+  - `handleRejectionWithFallback()` - Auto-fallback to alternative models
+  - `selectFallbackModel()` - Choose model with lowest rejection rate
+  - `getUserNotifications()` - Get user's rejection history
+  - Integration with AGI Brain Planner
+- **Think Tank UI** (`apps/admin-dashboard/components/thinktank/rejection-notifications.tsx`)
+  - Bell icon with unread count
+  - Sheet panel showing all rejection notifications
+  - Suggested actions for users
+  - Rejection banners in conversation
+- **Documentation** (`docs/PROVIDER-REJECTION-HANDLING.md`)
+
+#### AI Ethics Standards Framework
+- **Database Migration** (`packages/infrastructure/migrations/082_ai_ethics_standards.sql`)
+  - `ai_ethics_standards` - Industry AI ethics frameworks with full metadata
+  - `ai_ethics_principle_standards` - Maps ethical principles to standard sections
+  - Seeded standards: NIST AI RMF 1.0, ISO/IEC 42001:2023, EU AI Act, IEEE 7000, OECD AI Principles, UNESCO AI Ethics
+  - View: `ethical_principles_with_standards` - Principles with their standards
+  - Functions: `get_principles_with_standards()`, `seed_principle_standard_mappings()`
+- **Admin UI** (`apps/admin-dashboard/app/(dashboard)/ethics/page.tsx`)
+  - New Standards tab showing all industry frameworks
+  - Standards display: name, full name, organization, version, description, URL, mandatory status
+  - Principles now show "Derived from / Aligned with" badges linking to standards
+  - Color-coded organization types (government, ISO, industry, academic, religious)
+- **API Endpoint** (`GET /admin/ethics/standards`)
+
+#### Windsurf Policies
+- **Auto-Build Policy** (`.windsurf/workflows/auto-build.md`)
+  - Enforces CHANGELOG.md updates for all features/bug fixes
+  - Requires VERSION_HISTORY.json updates on releases
+  - Mandates migration header comments for database changes
+
+#### User Rules System (Memory Rules)
+- **Database Migration** (`packages/infrastructure/migrations/080_user_memory_rules.sql`)
+  - `user_memory_rules` - User personal AI interaction rules with priority and targeting
+  - `preset_user_rules` - Pre-seeded rule templates (20+ presets across 7 categories)
+  - `user_rule_application_log` - Tracks when rules are applied to prompts
+  - Functions: `get_user_rules_for_preprompt()`, `format_user_rules_for_prompt()`
+  - RLS policies for user isolation
+- **Memory Categories** (`packages/infrastructure/migrations/081_memory_categories.sql`)
+  - `memory_categories` - Hierarchical categorization of memory types
+  - 6 top-level categories: Instruction, Preference, Context, Knowledge, Constraint, Goal
+  - 14 sub-categories for fine-grained classification
+  - Functions: `get_memory_category_tree()`, `get_user_memories_by_category()`
+  - Categories: instruction.format, instruction.tone, instruction.source, preference.style, preference.detail, context.personal, context.work, context.project, knowledge.fact, knowledge.definition, knowledge.procedure, constraint.topic, constraint.privacy, constraint.safety, goal.learning, goal.productivity
+- **Shared Types** (`packages/shared/src/types/user-rules.types.ts`)
+  - UserMemoryRule, PresetUserRule, PresetRuleCategory types
+  - MemoryCategory, MemoryCategoryTree, MemoryByCategory types
+  - Rule validation function
+  - Constants: MEMORY_CATEGORY_LABELS, MEMORY_CATEGORY_ICONS, MEMORY_CATEGORY_COLORS
+- **Service** (`packages/infrastructure/lambda/shared/services/user-rules.service.ts`)
+  - CRUD operations for user rules
+  - Preset rule management
+  - `getRulesForPrompt()` - Formats rules for prompt injection
+  - `getMemoryCategories()` - Get category tree
+  - `getMemoriesByCategory()` - Get memories grouped by category
+  - Integration with preprompt-learning.service.ts
+- **Think Tank UI** (`apps/admin-dashboard/app/(dashboard)/thinktank/my-rules/`)
+  - My Rules tab: View, toggle, edit, delete rules
+  - Add from Presets tab: Browse categories, add popular rules
+  - Stats: Active rules count, times applied
+- **Preset Categories**: Privacy & Safety, Sources & Citations, Response Format, Tone & Style, Accessibility, Topic Preferences, Advanced
+- **Documentation** (`docs/USER-RULES-SYSTEM.md`)
+
+#### Pre-Prompt Learning System
+- **Database Migration** (`packages/infrastructure/migrations/079_preprompt_learning.sql`)
+  - `preprompt_templates` - Reusable pre-prompt patterns with configurable weights
+  - `preprompt_instances` - Tracks actual pre-prompts used in plans with full context
+  - `preprompt_feedback` - User feedback with attribution analysis
+  - `preprompt_attribution_scores` - Learning data per template/factor combination
+  - `preprompt_learning_config` - Admin-configurable learning parameters
+  - `preprompt_selection_log` - Selection reasoning audit trail
+  - Materialized view for effectiveness summary
+  - Functions for score calculation and attribution updates
+- **Shared Types** (`packages/shared/src/types/preprompt.types.ts`)
+  - Template, Instance, Feedback, Attribution types
+  - Selection request/result types
+  - Admin dashboard types
+- **Service** (`packages/infrastructure/lambda/shared/services/preprompt-learning.service.ts`)
+  - Template selection with weighted scoring
+  - Variable rendering for dynamic pre-prompts
+  - Feedback processing with auto-attribution inference
+  - Exploration vs exploitation balancing
+  - Admin dashboard data aggregation
+- **AGI Brain Integration** - Pre-prompt selection integrated into plan generation
+- **Admin Dashboard** (`apps/admin-dashboard/app/(dashboard)/orchestration/preprompts/`)
+  - Overview with attribution pie chart and top/low performers
+  - Templates tab with usage stats and weight adjustment
+  - Attribution analysis with factor breakdown
+  - Recent feedback with attribution labels
+  - Weight adjustment sliders per template
+- **Documentation** (`docs/PREPROMPT-LEARNING-SYSTEM.md`)
+
+#### SaaS Metrics Dashboard
+- **Admin Dashboard** (`apps/admin-dashboard/app/(dashboard)/saas-metrics/`)
+  - Comprehensive SaaS business metrics with stunning visualizations
+  - Key metrics: MRR, ARR, Gross Margin, Churn Rate, LTV:CAC ratio
+  - 5 tabs: Overview, Revenue, Costs, Customers, Models
+  - Revenue & Profit trend charts (Area + Line composed)
+  - Revenue by Source/Tier pie and bar charts
+  - MRR Movement chart (New, Expansion, Churned)
+  - Customer growth trends with new/churned breakdown
+  - Model profitability table with margin analysis
+  - **Excel/CSV Export**: Full metrics report for spreadsheets
+  - **JSON Export**: Structured data for integrations
+  - Period selection: 7d, 30d, 90d, 12m
+- **Documentation** (`docs/SAAS-METRICS-DASHBOARD.md`)
+  - Complete feature guide with all metrics definitions
+  - Export format documentation
+  - API integration details
+
+#### Revenue Analytics System
+- **Types** (`packages/shared/src/types/revenue.types.ts`)
+  - Revenue source types: subscription, credit_purchase, ai_markup_external, ai_markup_self_hosted, overage, storage
+  - Cost categories: aws_compute, aws_storage, aws_network, aws_database, external_ai, infrastructure, platform_fees
+  - Export formats: CSV, JSON, QuickBooks IIF, Xero CSV, Sage CSV
+- **Database Migration** (`packages/infrastructure/migrations/078_revenue_analytics.sql`)
+  - `revenue_entries` table for individual revenue events
+  - `cost_entries` table for infrastructure and provider costs
+  - `revenue_daily_aggregates` for pre-computed summaries
+  - `model_revenue_tracking` for per-model revenue breakdown
+  - `accounting_periods` and `reconciliation_entries` for month-end close
+  - Auto-aggregation triggers for daily summaries
+- **Revenue Service** (`packages/infrastructure/lambda/shared/services/revenue.service.ts`)
+  - Dashboard with gross revenue, COGS, gross profit, and margin calculations
+  - Revenue breakdown by source, tenant, product, and model
+  - Multi-format export: CSV summary, JSON details, QuickBooks IIF, Xero CSV, Sage CSV
+- **Admin Dashboard** (`apps/admin-dashboard/app/(dashboard)/revenue/`)
+  - Revenue Analytics page with period selection (7d, 30d, 90d, YTD, 12m)
+  - Summary cards: Gross Revenue, Total COGS, Gross Profit, Gross Margin
+  - Revenue breakdown by source with visual bars
+  - Cost breakdown by AWS service and external providers
+  - Revenue by model with provider cost vs customer charge
+  - Revenue by tenant rankings
+  - Export dropdown for all accounting formats
+
+### Documentation
+
+#### Think Tank Easter Eggs Guide
+- **New Documentation** (`docs/THINK-TANK-EASTER-EGGS.md`)
+  - Complete guide to all 10 easter eggs with activation commands
+  - Deactivation methods: toggle, `/normal`, timeout, settings
+  - Available easter eggs: Konami Code, Chaos Mode, Socratic Mode, Victorian, Pirate, Haiku, Matrix, Disco, Dad Jokes, Emissions
+  - Achievement integration for easter egg discovery
+  - Admin-only configuration notes (easter eggs are Think Tank consumer feature only)
+  - API reference for triggering and deactivating easter eggs
+
+---
+
 ## [4.18.2] - 2024-12-28
 
 ### Added

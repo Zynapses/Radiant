@@ -8,6 +8,8 @@ export interface NetworkingStackProps extends cdk.StackProps {
   environment: Environment;
   tier: number;
   tierConfig: TierConfig;
+  /** Override VPC CIDR to avoid conflicts with enterprise VPC peering */
+  vpcCidrOverride?: string;
 }
 
 export class NetworkingStack extends cdk.Stack {
@@ -16,12 +18,15 @@ export class NetworkingStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: NetworkingStackProps) {
     super(scope, id, props);
     
-    const { appId, environment, tierConfig } = props;
+    const { appId, environment, tierConfig, vpcCidrOverride } = props;
+    
+    // Use override CIDR if provided, otherwise use tier default
+    const vpcCidr = vpcCidrOverride || tierConfig.vpcCidr;
     
     // VPC with configuration based on tier
     this.vpc = new ec2.Vpc(this, 'Vpc', {
       vpcName: `${appId}-${environment}-vpc`,
-      ipAddresses: ec2.IpAddresses.cidr(tierConfig.vpcCidr),
+      ipAddresses: ec2.IpAddresses.cidr(vpcCidr),
       maxAzs: tierConfig.azCount,
       natGateways: tierConfig.natGateways,
       

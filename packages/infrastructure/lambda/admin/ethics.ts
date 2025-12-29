@@ -56,6 +56,28 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return success({ violations });
     }
 
+    // GET /admin/ethics/standards - Get AI ethics standards
+    if (method === 'GET' && path.endsWith('/standards')) {
+      const result = await executeStatement(
+        `SELECT * FROM ai_ethics_standards WHERE is_active = true ORDER BY display_order`,
+        []
+      );
+      const standards = result.rows.map((r: Record<string, unknown>) => ({
+        code: String(r.code),
+        name: String(r.name),
+        fullName: String(r.full_name),
+        version: r.version ? String(r.version) : null,
+        organization: String(r.organization),
+        organizationType: String(r.organization_type),
+        description: r.description ? String(r.description) : null,
+        url: r.url ? String(r.url) : null,
+        publicationDate: r.publication_date ? String(r.publication_date) : null,
+        isMandatory: Boolean(r.is_mandatory),
+        icon: r.icon ? String(r.icon) : 'Shield',
+      }));
+      return success({ standards });
+    }
+
     // GET /admin/ethics/stats - Get ethical statistics
     if (method === 'GET' && path.endsWith('/stats')) {
       const result = await executeStatement(
