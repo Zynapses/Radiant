@@ -122,6 +122,13 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `app_interactions` | User interactions with generated apps |
 | `user_app_preferences` | User preferences for app factory |
 | `app_templates` | Pre-built app templates |
+| `consent_records` | GDPR consent tracking |
+| `gdpr_requests` | GDPR data subject requests |
+| `data_retention_policies` | Configurable data retention |
+| `phi_access_log` | HIPAA PHI access audit trail |
+| `data_processing_agreements` | Sub-processor DPAs |
+| `data_breach_incidents` | Security breach tracking |
+| `hipaa_config` | Per-tenant HIPAA configuration |
 
 ## Type Imports
 
