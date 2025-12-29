@@ -33,6 +33,31 @@ import {
   Workflow,
   ScrollText,
   Wrench,
+  Bot,
+  Sparkles,
+  Target,
+  Compass,
+  Heart,
+  Activity,
+  Map,
+  TrendingUp,
+  Gauge,
+  FileBarChart,
+  Server,
+  Clock,
+  GraduationCap,
+  FlaskConical,
+  Lightbulb,
+  Route,
+  Edit3,
+  ListChecks,
+  Smile,
+  Lock,
+  UsersRound,
+  AlertTriangle,
+  Star,
+  GlobeIcon,
+  Rocket,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -53,37 +78,101 @@ type NavigationItem = NavItem | NavSeparator;
 
 const navigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Health', href: '/health', icon: Activity },
   
   // AI & Models Section
   { type: 'separator', label: 'AI & Models' },
   { name: 'Models', href: '/models', icon: Cpu },
   { name: 'Model Pricing', href: '/models/pricing', icon: DollarSign },
+  { name: 'Model Metadata', href: '/model-metadata', icon: FileText },
+  { name: 'Specialty Rankings', href: '/specialty-rankings', icon: Star },
+  { name: 'User Models', href: '/user-models', icon: UserCircle },
   { name: 'Providers', href: '/providers', icon: Globe },
+  { name: 'Rate Limits', href: '/rate-limits', icon: Gauge },
+  
+  // Orchestration Section
+  { type: 'separator', label: 'Orchestration' },
   { name: 'Orchestration', href: '/orchestration', icon: Brain },
   { name: 'Workflows', href: '/orchestration/workflows', icon: Workflow },
+  { name: 'Pre-Prompts', href: '/orchestration/preprompts', icon: ListChecks },
+  { name: 'Methods', href: '/orchestration/methods', icon: Route },
+  { name: 'Editor', href: '/orchestration/editor', icon: Edit3 },
+  { name: 'AGI Dashboard', href: '/orchestration/agi-dashboard', icon: Sparkles },
+  { name: 'Patterns', href: '/orchestration-patterns', icon: Layers },
+  
+  // AGI & Cognition Section
+  { type: 'separator', label: 'AGI & Cognition' },
+  { name: 'Cognitive Brain', href: '/cognitive-brain', icon: Brain },
+  { name: 'Cognition', href: '/cognition', icon: Lightbulb },
+  { name: 'Consciousness', href: '/consciousness', icon: Sparkles },
+  { name: 'Metacognition', href: '/metacognition', icon: Target },
+  { name: 'World Model', href: '/world-model', icon: GlobeIcon },
+  { name: 'Planning', href: '/planning', icon: ListChecks },
+  { name: 'Agents', href: '/agents', icon: Bot },
+  { name: 'Self-Improvement', href: '/self-improvement', icon: TrendingUp },
+  
+  // Learning Section
+  { type: 'separator', label: 'Learning' },
+  { name: 'AGI Learning', href: '/agi-learning', icon: GraduationCap },
+  { name: 'Learning', href: '/learning', icon: Lightbulb },
+  { name: 'ML Training', href: '/ml-training', icon: FlaskConical },
+  { name: 'Feedback', href: '/feedback', icon: MessageSquare },
+  
+  // Ethics Section
+  { type: 'separator', label: 'Ethics' },
+  { name: 'Ethics', href: '/ethics', icon: Heart },
+  { name: 'Moral Compass', href: '/moral-compass', icon: Compass },
   
   // Think Tank Section
   { type: 'separator', label: 'Think Tank' },
-  { name: 'Think Tank Users', href: '/thinktank/users', icon: UserCircle },
+  { name: 'Users', href: '/thinktank/users', icon: UserCircle },
   { name: 'Conversations', href: '/thinktank/conversations', icon: MessageSquare },
+  { name: 'My Rules', href: '/thinktank/my-rules', icon: ListChecks },
+  { name: 'Delight', href: '/thinktank/delight', icon: Smile },
   { name: 'Domain Modes', href: '/thinktank/domain-modes', icon: Layers },
   { name: 'Model Categories', href: '/thinktank/model-categories', icon: Grid },
+  { name: 'Shadow Testing', href: '/thinktank/shadow-testing', icon: Beaker },
+  { name: 'Collaborate', href: '/thinktank/collaborate', icon: UsersRound },
+  { name: 'TT Compliance', href: '/thinktank/compliance', icon: ShieldCheck },
+  { name: 'TT Settings', href: '/thinktank/settings', icon: Settings },
+  
+  // Analytics & Reports Section
+  { type: 'separator', label: 'Analytics' },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Rejections', href: '/analytics/rejections', icon: AlertTriangle },
+  { name: 'Reports', href: '/reports', icon: FileBarChart },
+  { name: 'SaaS Metrics', href: '/saas-metrics', icon: TrendingUp },
+  { name: 'Revenue', href: '/revenue', icon: DollarSign },
+  { name: 'Costs', href: '/costs', icon: CreditCard },
   
   // Operations Section
   { type: 'separator', label: 'Operations' },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Time Machine', href: '/time-machine', icon: History },
   { name: 'Experiments', href: '/experiments', icon: Beaker },
+  { name: 'Deployments', href: '/deployments', icon: Rocket },
+  { name: 'Services', href: '/services', icon: Server },
+  { name: 'Multi-Region', href: '/multi-region', icon: Map },
+  { name: 'Geographic', href: '/geographic', icon: GlobeIcon },
+  
+  // Security & Compliance Section
+  { type: 'separator', label: 'Security' },
   { name: 'Security', href: '/security', icon: Shield },
   { name: 'Compliance', href: '/compliance', icon: ShieldCheck },
-  { name: 'Billing', href: '/billing', icon: CreditCard },
-  { name: 'Storage', href: '/storage', icon: HardDrive },
   { name: 'Administrators', href: '/administrators', icon: Users },
   { name: 'Audit Logs', href: '/audit-logs', icon: FileText },
   { name: 'AWS Logs', href: '/aws-logs', icon: ScrollText },
   
+  // Billing & Storage Section
+  { type: 'separator', label: 'Billing' },
+  { name: 'Billing', href: '/billing', icon: CreditCard },
+  { name: 'Storage', href: '/storage', icon: HardDrive },
+  
   // Settings Section
   { type: 'separator', label: 'Settings' },
+  { name: 'Cognitive Arch', href: '/settings/cognitive', icon: Brain },
+  { name: 'Intelligence', href: '/settings/intelligence', icon: Zap },
+  { name: 'Storage Tiers', href: '/settings/storage', icon: HardDrive },
+  { name: 'Ethics Config', href: '/settings/ethics', icon: Lock },
   { name: 'System Config', href: '/system-config', icon: Wrench },
   { name: 'Localization', href: '/localization', icon: Languages },
   { name: 'Configuration', href: '/configuration', icon: Sliders },

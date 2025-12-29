@@ -157,6 +157,8 @@ export interface UserDelightPreferences {
   id: number;
   userId: string;
   tenantId: string;
+  /** Master toggle for entire delight system - default true */
+  enabled: boolean;
   personalityMode: PersonalityMode;
   intensityLevel: number;
   enableDomainMessages: boolean;
