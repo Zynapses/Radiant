@@ -417,3 +417,284 @@ export const getDisclaimers: APIGatewayProxyHandler = async (event) => {
     return error(500, 'Failed to get disclaimers');
   }
 };
+
+// ============================================================================
+// Custom Framework Management
+// ============================================================================
+
+/**
+ * GET /api/admin/domain-ethics/custom-frameworks
+ * Get all custom ethics frameworks
+ */
+export const getCustomFrameworks: APIGatewayProxyHandler = async (event) => {
+  try {
+    const domain = event.queryStringParameters?.domain;
+    const activeOnly = event.queryStringParameters?.activeOnly !== 'false';
+    
+    const frameworks = await domainEthicsService.getCustomFrameworks({
+      domain,
+      activeOnly,
+    });
+    
+    return success({
+      frameworks,
+      count: frameworks.length,
+      filters: { domain, activeOnly },
+    });
+  } catch (err) {
+    console.error('Error getting custom frameworks:', err);
+    return error(500, 'Failed to get custom frameworks');
+  }
+};
+
+/**
+ * GET /api/admin/domain-ethics/custom-frameworks/:frameworkId
+ * Get a specific custom framework
+ */
+export const getCustomFramework: APIGatewayProxyHandler = async (event) => {
+  try {
+    const frameworkId = event.pathParameters?.frameworkId;
+    if (!frameworkId) {
+      return error(400, 'Framework ID required');
+    }
+    
+    const framework = await domainEthicsService.getCustomFramework(frameworkId);
+    if (!framework) {
+      return error(404, 'Framework not found');
+    }
+    
+    return success({ framework });
+  } catch (err) {
+    console.error('Error getting custom framework:', err);
+    return error(500, 'Failed to get custom framework');
+  }
+};
+
+/**
+ * POST /api/admin/domain-ethics/custom-frameworks
+ * Create a new custom ethics framework for a domain
+ */
+export const createCustomFramework: APIGatewayProxyHandler = async (event) => {
+  try {
+    const userId = getAdminId(event);
+    const body = JSON.parse(event.body || '{}');
+    
+    const {
+      name,
+      code,
+      domain,
+      subspecialty,
+      governingBody,
+      version,
+      effectiveDate,
+      principles,
+      prohibitions,
+      disclosureRequirements,
+      requiredDisclaimers,
+      emergencyOverrides,
+      canBeDisabled,
+    } = body;
+    
+    if (!name || !code || !domain) {
+      return error(400, 'name, code, and domain are required');
+    }
+    
+    const id = await domainEthicsService.createCustomFramework({
+      name,
+      code,
+      domain,
+      subspecialty,
+      governingBody,
+      version: version || '1.0',
+      effectiveDate,
+      principles: principles || [],
+      prohibitions: prohibitions || [],
+      disclosureRequirements: disclosureRequirements || [],
+      requiredDisclaimers: requiredDisclaimers || [],
+      emergencyOverrides,
+      canBeDisabled: canBeDisabled !== false,
+      createdBy: userId,
+    });
+    
+    return success({
+      message: 'Custom framework created',
+      id,
+      domain,
+    });
+  } catch (err) {
+    console.error('Error creating custom framework:', err);
+    return error(500, 'Failed to create custom framework');
+  }
+};
+
+/**
+ * PUT /api/admin/domain-ethics/custom-frameworks/:frameworkId
+ * Update a custom ethics framework
+ */
+export const updateCustomFramework: APIGatewayProxyHandler = async (event) => {
+  try {
+    const frameworkId = event.pathParameters?.frameworkId;
+    if (!frameworkId) {
+      return error(400, 'Framework ID required');
+    }
+    
+    const body = JSON.parse(event.body || '{}');
+    const {
+      name,
+      principles,
+      prohibitions,
+      disclosureRequirements,
+      requiredDisclaimers,
+    } = body;
+    
+    await domainEthicsService.updateCustomFramework(frameworkId, {
+      name,
+      principles,
+      prohibitions,
+      disclosureRequirements,
+      requiredDisclaimers,
+    });
+    
+    const framework = await domainEthicsService.getCustomFramework(frameworkId);
+    
+    return success({
+      message: 'Framework updated',
+      framework,
+    });
+  } catch (err) {
+    console.error('Error updating custom framework:', err);
+    return error(500, 'Failed to update custom framework');
+  }
+};
+
+/**
+ * DELETE /api/admin/domain-ethics/custom-frameworks/:frameworkId
+ * Delete a custom ethics framework
+ */
+export const deleteCustomFramework: APIGatewayProxyHandler = async (event) => {
+  try {
+    const frameworkId = event.pathParameters?.frameworkId;
+    if (!frameworkId) {
+      return error(400, 'Framework ID required');
+    }
+    
+    await domainEthicsService.deleteCustomFramework(frameworkId);
+    
+    return success({
+      message: 'Framework deleted',
+      frameworkId,
+    });
+  } catch (err) {
+    console.error('Error deleting custom framework:', err);
+    return error(500, 'Failed to delete custom framework');
+  }
+};
+
+// ============================================================================
+// Domain Coverage & Suggestions
+// ============================================================================
+
+/**
+ * GET /api/admin/domain-ethics/coverage
+ * Get all domains that have ethics frameworks (built-in or custom)
+ */
+export const getDomainCoverage: APIGatewayProxyHandler = async () => {
+  try {
+    const domains = await domainEthicsService.getDomainsWithEthics();
+    
+    return success({
+      domains,
+      totalDomains: domains.length,
+      withBuiltIn: domains.filter(d => d.builtInCount > 0).length,
+      withCustom: domains.filter(d => d.customCount > 0).length,
+    });
+  } catch (err) {
+    console.error('Error getting domain coverage:', err);
+    return error(500, 'Failed to get domain coverage');
+  }
+};
+
+/**
+ * GET /api/admin/domain-ethics/coverage/:domain
+ * Check if a specific domain has ethics coverage
+ */
+export const checkDomainCoverage: APIGatewayProxyHandler = async (event) => {
+  try {
+    const domain = event.pathParameters?.domain;
+    if (!domain) {
+      return error(400, 'Domain required');
+    }
+    
+    const coverage = await domainEthicsService.hasDomainEthicsCoverage(domain);
+    
+    return success({
+      domain,
+      ...coverage,
+    });
+  } catch (err) {
+    console.error('Error checking domain coverage:', err);
+    return error(500, 'Failed to check domain coverage');
+  }
+};
+
+/**
+ * GET /api/admin/domain-ethics/suggest/:domain
+ * Get suggested ethics requirements for a new domain
+ */
+export const suggestEthicsForDomain: APIGatewayProxyHandler = async (event) => {
+  try {
+    const domain = event.pathParameters?.domain;
+    if (!domain) {
+      return error(400, 'Domain required');
+    }
+    
+    const suggestions = await domainEthicsService.suggestEthicsForDomain(domain);
+    
+    return success({
+      domain,
+      ...suggestions,
+    });
+  } catch (err) {
+    console.error('Error getting ethics suggestions:', err);
+    return error(500, 'Failed to get ethics suggestions');
+  }
+};
+
+/**
+ * POST /api/admin/domain-ethics/on-new-domain
+ * Handle notification of a new domain being added to taxonomy
+ * Returns whether ethics are needed and suggests a framework if so
+ */
+export const onNewDomainDetected: APIGatewayProxyHandler = async (event) => {
+  try {
+    const body = JSON.parse(event.body || '{}');
+    const { domain, fieldName, domainName } = body;
+    
+    if (!domain) {
+      return error(400, 'Domain required');
+    }
+    
+    const detectedBy = getAdminId(event);
+    
+    const result = await domainEthicsService.onNewDomainDetected(domain, {
+      fieldName,
+      domainName,
+      detectedBy,
+    });
+    
+    return success({
+      domain,
+      ...result,
+      message: result.requiresEthics && !result.hasBuiltInFramework && !result.hasCustomFramework
+        ? 'This domain may require ethics configuration. A suggested framework has been provided.'
+        : result.hasBuiltInFramework
+          ? 'This domain has built-in ethics coverage.'
+          : result.hasCustomFramework
+            ? 'This domain has custom ethics coverage.'
+            : 'No ethics coverage needed for this domain.',
+    });
+  } catch (err) {
+    console.error('Error handling new domain:', err);
+    return error(500, 'Failed to handle new domain');
+  }
+};

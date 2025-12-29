@@ -648,6 +648,367 @@ class DomainEthicsService {
   }
   
   // ============================================================================
+  // Custom Framework Management
+  // ============================================================================
+  
+  /**
+   * Create a custom ethics framework for a new domain
+   */
+  async createCustomFramework(
+    framework: Omit<DomainEthicsFramework, 'id' | 'createdAt' | 'updatedAt'> & { createdBy?: string }
+  ): Promise<string> {
+    const result = await executeStatement(
+      `INSERT INTO domain_ethics_custom_frameworks (
+         framework_id, name, code, domain, subspecialty,
+         governing_body, version, effective_date,
+         principles, prohibitions, disclosure_requirements, required_disclaimers,
+         emergency_overrides, can_be_disabled, is_active, created_by
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+       RETURNING id`,
+      [
+        { name: 'frameworkId', value: { stringValue: `custom_${framework.domain}_${Date.now()}` } },
+        { name: 'name', value: { stringValue: framework.name } },
+        { name: 'code', value: { stringValue: framework.code } },
+        { name: 'domain', value: { stringValue: framework.domain } },
+        { name: 'subspecialty', value: framework.subspecialty ? { stringValue: framework.subspecialty } : { isNull: true } },
+        { name: 'governingBody', value: framework.governingBody ? { stringValue: framework.governingBody } : { isNull: true } },
+        { name: 'version', value: { stringValue: framework.version || '1.0' } },
+        { name: 'effectiveDate', value: framework.effectiveDate ? { stringValue: framework.effectiveDate } : { isNull: true } },
+        { name: 'principles', value: { stringValue: JSON.stringify(framework.principles) } },
+        { name: 'prohibitions', value: { stringValue: JSON.stringify(framework.prohibitions) } },
+        { name: 'disclosures', value: { stringValue: JSON.stringify(framework.disclosureRequirements) } },
+        { name: 'disclaimers', value: { stringValue: JSON.stringify(framework.requiredDisclaimers) } },
+        { name: 'emergencyOverrides', value: framework.emergencyOverrides ? { stringValue: JSON.stringify(framework.emergencyOverrides) } : { isNull: true } },
+        { name: 'canBeDisabled', value: { booleanValue: framework.canBeDisabled !== false } },
+        { name: 'isActive', value: { booleanValue: true } },
+        { name: 'createdBy', value: framework.createdBy ? { stringValue: framework.createdBy } : { isNull: true } },
+      ]
+    );
+    
+    return result.records?.[0]?.[0]?.stringValue || '';
+  }
+  
+  /**
+   * Update an existing custom framework
+   */
+  async updateCustomFramework(
+    frameworkId: string,
+    updates: Partial<DomainEthicsFramework>
+  ): Promise<void> {
+    const updateFields: string[] = [];
+    const params: Array<{ name: string; value: Record<string, unknown> }> = [
+      { name: 'frameworkId', value: { stringValue: frameworkId } },
+    ];
+    
+    if (updates.name) {
+      updateFields.push(`name = $${params.length + 1}`);
+      params.push({ name: 'name', value: { stringValue: updates.name } });
+    }
+    if (updates.principles) {
+      updateFields.push(`principles = $${params.length + 1}`);
+      params.push({ name: 'principles', value: { stringValue: JSON.stringify(updates.principles) } });
+    }
+    if (updates.prohibitions) {
+      updateFields.push(`prohibitions = $${params.length + 1}`);
+      params.push({ name: 'prohibitions', value: { stringValue: JSON.stringify(updates.prohibitions) } });
+    }
+    if (updates.disclosureRequirements) {
+      updateFields.push(`disclosure_requirements = $${params.length + 1}`);
+      params.push({ name: 'disclosures', value: { stringValue: JSON.stringify(updates.disclosureRequirements) } });
+    }
+    if (updates.requiredDisclaimers) {
+      updateFields.push(`required_disclaimers = $${params.length + 1}`);
+      params.push({ name: 'disclaimers', value: { stringValue: JSON.stringify(updates.requiredDisclaimers) } });
+    }
+    
+    updateFields.push(`updated_at = NOW()`);
+    
+    if (updateFields.length > 1) {
+      await executeStatement(
+        `UPDATE domain_ethics_custom_frameworks SET ${updateFields.join(', ')} WHERE framework_id = $1`,
+        params
+      );
+    }
+  }
+  
+  /**
+   * Get all custom frameworks (from database)
+   */
+  async getCustomFrameworks(options: {
+    domain?: string;
+    activeOnly?: boolean;
+  } = {}): Promise<DomainEthicsFramework[]> {
+    let sql = `SELECT * FROM domain_ethics_custom_frameworks WHERE 1=1`;
+    const params: Array<{ name: string; value: Record<string, unknown> }> = [];
+    
+    if (options.domain) {
+      sql += ` AND domain = $${params.length + 1}`;
+      params.push({ name: 'domain', value: { stringValue: options.domain } });
+    }
+    
+    if (options.activeOnly !== false) {
+      sql += ` AND is_active = true`;
+    }
+    
+    sql += ` ORDER BY domain, created_at`;
+    
+    const result = await executeStatement(sql, params);
+    
+    return (result.records || []).map(row => this.mapFrameworkRow(row));
+  }
+  
+  /**
+   * Get a specific custom framework
+   */
+  async getCustomFramework(frameworkId: string): Promise<DomainEthicsFramework | null> {
+    const result = await executeStatement(
+      `SELECT * FROM domain_ethics_custom_frameworks WHERE framework_id = $1`,
+      [{ name: 'frameworkId', value: { stringValue: frameworkId } }]
+    );
+    
+    if (!result.records || result.records.length === 0) {
+      return null;
+    }
+    
+    return this.mapFrameworkRow(result.records[0]);
+  }
+  
+  /**
+   * Delete a custom framework
+   */
+  async deleteCustomFramework(frameworkId: string): Promise<void> {
+    await executeStatement(
+      `DELETE FROM domain_ethics_custom_frameworks WHERE framework_id = $1`,
+      [{ name: 'frameworkId', value: { stringValue: frameworkId } }]
+    );
+  }
+  
+  /**
+   * Check if a domain has ethics coverage (built-in or custom)
+   */
+  async hasDomainEthicsCoverage(domain: string): Promise<{
+    hasCoverage: boolean;
+    frameworks: Array<{ id: string; name: string; source: 'built-in' | 'custom' }>;
+  }> {
+    // Check built-in
+    const builtIn = getEthicsFrameworkByDomain(domain);
+    const frameworks: Array<{ id: string; name: string; source: 'built-in' | 'custom' }> = [];
+    
+    if (builtIn) {
+      frameworks.push({ id: builtIn.id, name: builtIn.name, source: 'built-in' });
+    }
+    
+    // Check custom
+    const custom = await this.getCustomFrameworks({ domain, activeOnly: true });
+    for (const cf of custom) {
+      frameworks.push({ id: cf.id, name: cf.name, source: 'custom' });
+    }
+    
+    return {
+      hasCoverage: frameworks.length > 0,
+      frameworks,
+    };
+  }
+  
+  /**
+   * Get all domains that have ethics frameworks defined
+   */
+  async getDomainsWithEthics(): Promise<Array<{
+    domain: string;
+    frameworkCount: number;
+    builtInCount: number;
+    customCount: number;
+  }>> {
+    // Get built-in domains
+    const builtInDomains = getActiveFrameworks().map(f => f.domain);
+    
+    // Get custom domains
+    const customResult = await executeStatement(
+      `SELECT domain, COUNT(*) as count FROM domain_ethics_custom_frameworks 
+       WHERE is_active = true GROUP BY domain`,
+      []
+    );
+    
+    const customCounts: Record<string, number> = {};
+    for (const row of customResult.records || []) {
+      const r = row as Array<{ stringValue?: string; longValue?: number }>;
+      const domain = r[0]?.stringValue || '';
+      const count = Number(r[1]?.longValue || 0);
+      customCounts[domain] = count;
+    }
+    
+    // Combine
+    const allDomains = new Set([...builtInDomains, ...Object.keys(customCounts)]);
+    
+    return Array.from(allDomains).map(domain => {
+      const builtInCount = builtInDomains.includes(domain) ? 1 : 0;
+      const customCount = customCounts[domain] || 0;
+      return {
+        domain,
+        frameworkCount: builtInCount + customCount,
+        builtInCount,
+        customCount,
+      };
+    });
+  }
+  
+  /**
+   * Suggest ethics requirements for a new domain based on similar domains
+   */
+  async suggestEthicsForDomain(domain: string): Promise<{
+    suggestedPrinciples: string[];
+    suggestedProhibitions: string[];
+    suggestedDisclaimers: string[];
+    similarDomains: string[];
+  }> {
+    // Map similar domains
+    const domainSimilarity: Record<string, string[]> = {
+      'law': ['legal'],
+      'medicine': ['healthcare', 'medical'],
+      'psychology': ['healthcare', 'mental_health'],
+      'psychiatry': ['healthcare', 'mental_health', 'psychology'],
+      'nursing': ['healthcare', 'medical'],
+      'pharmacy': ['healthcare', 'medical'],
+      'accounting': ['finance', 'financial'],
+      'tax': ['finance', 'financial', 'legal'],
+      'real_estate': ['finance', 'legal'],
+      'insurance': ['finance', 'financial'],
+      'veterinary': ['healthcare'],
+      'dentistry': ['healthcare', 'medical'],
+    };
+    
+    const similarDomains = domainSimilarity[domain.toLowerCase()] || [];
+    
+    // Get ethics from similar domains
+    const suggestedPrinciples: string[] = [];
+    const suggestedProhibitions: string[] = [];
+    const suggestedDisclaimers: string[] = [];
+    
+    for (const similar of similarDomains) {
+      const framework = getEthicsFrameworkByDomain(similar);
+      if (framework) {
+        suggestedPrinciples.push(...framework.principles.slice(0, 3).map(p => p.name));
+        suggestedProhibitions.push(...framework.prohibitions.slice(0, 3).map(p => p.name));
+        suggestedDisclaimers.push(...framework.requiredDisclaimers.slice(0, 2));
+      }
+    }
+    
+    // Generic suggestions if no similar domains found
+    if (suggestedPrinciples.length === 0) {
+      suggestedPrinciples.push(
+        'Accuracy and Truthfulness',
+        'Professional Competence Boundaries',
+        'User Safety Priority'
+      );
+      suggestedProhibitions.push(
+        'Cannot replace professional consultation',
+        'Cannot provide specific advice requiring licensure'
+      );
+      suggestedDisclaimers.push(
+        'This information is for educational purposes only.',
+        'Please consult a qualified professional for specific advice.'
+      );
+    }
+    
+    return {
+      suggestedPrinciples: [...new Set(suggestedPrinciples)],
+      suggestedProhibitions: [...new Set(suggestedProhibitions)],
+      suggestedDisclaimers: [...new Set(suggestedDisclaimers)],
+      similarDomains,
+    };
+  }
+  
+  /**
+   * Sync ethics frameworks when a new domain is detected in the domain taxonomy
+   */
+  async onNewDomainDetected(
+    domain: string,
+    info: { fieldName?: string; domainName?: string; detectedBy?: string }
+  ): Promise<{
+    hasBuiltInFramework: boolean;
+    hasCustomFramework: boolean;
+    suggestedFramework?: Partial<DomainEthicsFramework>;
+    requiresEthics: boolean;
+  }> {
+    // Check if built-in framework exists
+    const builtIn = getEthicsFrameworkByDomain(domain);
+    
+    // Check if custom framework exists
+    const custom = await this.getCustomFrameworks({ domain, activeOnly: true });
+    
+    // Domains that typically require ethics
+    const ethicsRequiredDomains = [
+      'law', 'legal', 'healthcare', 'medical', 'finance', 'financial',
+      'psychology', 'psychiatry', 'counseling', 'therapy',
+      'engineering', 'architecture', 'pharmacy', 'nursing',
+      'accounting', 'tax', 'real_estate', 'insurance', 'veterinary'
+    ];
+    
+    const requiresEthics = ethicsRequiredDomains.some(d => 
+      domain.toLowerCase().includes(d) || (info.domainName || '').toLowerCase().includes(d)
+    );
+    
+    let suggestedFramework: Partial<DomainEthicsFramework> | undefined;
+    
+    if (!builtIn && custom.length === 0 && requiresEthics) {
+      // Suggest a framework
+      const suggestions = await this.suggestEthicsForDomain(domain);
+      
+      suggestedFramework = {
+        name: `${info.domainName || domain} Ethics Framework`,
+        code: domain.toUpperCase().replace(/[^A-Z0-9]/g, '_'),
+        domain,
+        principles: suggestions.suggestedPrinciples.map((name, i) => ({
+          id: `principle_${i}`,
+          name,
+          description: `Professional standard for ${name.toLowerCase()}`,
+          category: 'professional_standards' as const,
+        })),
+        prohibitions: suggestions.suggestedProhibitions.map((name, i) => ({
+          id: `prohibition_${i}`,
+          name,
+          description: name,
+          severity: 'major' as const,
+          keywords: [],
+          patterns: [],
+          actionOnViolation: 'warn' as const,
+        })),
+        requiredDisclaimers: suggestions.suggestedDisclaimers,
+        disclosureRequirements: [],
+        canBeDisabled: true,
+      };
+    }
+    
+    return {
+      hasBuiltInFramework: !!builtIn,
+      hasCustomFramework: custom.length > 0,
+      suggestedFramework,
+      requiresEthics,
+    };
+  }
+  
+  private mapFrameworkRow(row: unknown[]): DomainEthicsFramework {
+    const r = row as Array<{ stringValue?: string; booleanValue?: boolean }>;
+    
+    return {
+      id: r[0]?.stringValue || '',
+      name: r[2]?.stringValue || '',
+      code: r[3]?.stringValue || '',
+      domain: r[4]?.stringValue || '',
+      subspecialty: r[5]?.stringValue,
+      governingBody: r[6]?.stringValue,
+      version: r[7]?.stringValue || '1.0',
+      effectiveDate: r[8]?.stringValue,
+      principles: r[9]?.stringValue ? JSON.parse(r[9].stringValue) : [],
+      prohibitions: r[10]?.stringValue ? JSON.parse(r[10].stringValue) : [],
+      disclosureRequirements: r[11]?.stringValue ? JSON.parse(r[11].stringValue) : [],
+      requiredDisclaimers: r[12]?.stringValue ? JSON.parse(r[12].stringValue) : [],
+      emergencyOverrides: r[13]?.stringValue ? JSON.parse(r[13].stringValue) : undefined,
+      canBeDisabled: r[14]?.booleanValue ?? true,
+    };
+  }
+  
+  // ============================================================================
   // Helper Methods
   // ============================================================================
   
