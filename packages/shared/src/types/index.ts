@@ -23,3 +23,4 @@ export * from './collaboration.types';
 export * from './revenue.types';
 export * from './result-derivation.types';
 export * from './domain-ethics.types';
+export * from './model-coordination.types';
