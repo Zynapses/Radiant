@@ -22,3 +22,4 @@ export * from './agi-orchestration.types';
 export * from './collaboration.types';
 export * from './revenue.types';
 export * from './result-derivation.types';
+export * from './domain-ethics.types';

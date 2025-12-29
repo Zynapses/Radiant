@@ -5,6 +5,46 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.6] - 2024-12-28
+
+### Added
+
+#### Domain Ethics Registry (Professional Ethics by Domain)
+- **6 Built-in Ethics Frameworks** - Domain-specific professional ethics
+  - **Legal (ABA)** - Bar association rules, unauthorized practice prevention
+  - **Medical (AMA)** - Medical ethics, emergency 911 warnings, no diagnosis
+  - **Financial (CFP)** - Fiduciary duty, no guaranteed returns, risk warnings
+  - **Engineering (NSPE)** - Public safety, PE stamp requirements
+  - **Journalism (SPJ)** - Accuracy, source verification, AI disclosure
+  - **Psychology (APA)** - Mental health ethics, crisis intervention (988)
+- **Shared Types** (`domain-ethics.types.ts`)
+  - `DomainEthicsFramework`, `EthicsPrinciple`, `EthicsProhibition`
+  - `DomainEthicsCheck`, `EthicsViolation`, `EthicsWarning`
+  - `DomainEthicsConfig`, `DomainEthicsAuditLog`
+- **Ethics Registry** (`domain-ethics-registry.ts`)
+  - Full framework definitions with principles, prohibitions, disclosures
+  - Helper functions: `getEthicsFrameworkByDomain()`, `getActiveFrameworks()`
+- **Domain Ethics Service** (`domain-ethics.service.ts`)
+  - `checkDomainEthics()` - Check content against applicable frameworks
+  - `applyModifications()` - Add required disclaimers/warnings
+  - `getTenantConfig()`, `updateTenantConfig()` - Admin configuration
+  - `setFrameworkEnabled()` - Enable/disable frameworks (safety frameworks protected)
+  - `getAuditLogs()`, `getStats()` - Audit and analytics
+- **Admin API** (`admin/domain-ethics.ts`)
+  - `GET /frameworks` - List all ethics frameworks
+  - `GET /frameworks/:id` - Get framework details
+  - `PUT /frameworks/:id/enable` - Enable/disable framework
+  - `GET /config`, `PUT /config` - Tenant configuration
+  - `PUT /domains/:domain/settings` - Domain-specific settings
+  - `GET /audit`, `GET /stats` - Audit logs and statistics
+  - `POST /test` - Test ethics check on sample content
+- **Database Migration** (`095_domain_ethics_registry.sql`)
+  - `domain_ethics_config` - Per-tenant configuration
+  - `domain_ethics_custom_frameworks` - Custom and built-in frameworks
+  - `domain_ethics_audit_log` - Ethics check audit trail
+  - `domain_ethics_framework_overrides` - Tenant overrides
+  - Functions: `get_domain_ethics_frameworks`, `is_domain_ethics_enabled`, `get_domain_ethics_stats`
+
 ## [4.18.5] - 2024-12-28
 
 ### Added

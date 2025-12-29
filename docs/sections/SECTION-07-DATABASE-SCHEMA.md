@@ -154,6 +154,11 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `derivation_steps` | Individual steps in the execution plan |
 | `derivation_model_usage` | Models used during result generation with token and cost tracking |
 | `derivation_timeline_events` | Timeline events for visualization of execution flow |
+| `domain_ethics_config` | Per-tenant domain ethics configuration |
+| `domain_ethics_custom_frameworks` | Custom and built-in professional ethics frameworks |
+| `domain_ethics_audit_log` | Audit log of ethics checks performed |
+| `domain_ethics_framework_overrides` | Tenant-specific framework overrides |
+| `domain_ethics_violation_patterns` | Custom violation patterns for frameworks |
 
 ## Type Imports
 

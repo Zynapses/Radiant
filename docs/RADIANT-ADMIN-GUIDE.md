@@ -31,6 +31,7 @@
 18. [API Management](#18-api-management)
 19. [Troubleshooting](#19-troubleshooting)
 20. [Delight System Administration](#20-delight-system-administration)
+21. [Domain Ethics Registry](#21-domain-ethics-registry)
 
 ---
 
@@ -2121,5 +2122,103 @@ See [Consciousness Service Documentation](./CONSCIOUSNESS-SERVICE.md) for full d
 
 ---
 
-*Document Version: 4.18.3*
+## 22. Domain Ethics Registry
+
+**Location**: Admin Dashboard → AI Configuration → Domain Ethics
+
+The Domain Ethics Registry enforces domain-specific professional ethics requirements when AI generates responses in regulated domains.
+
+### 22.1 Built-in Ethics Frameworks
+
+| Framework | Domain | Code | Governing Body |
+|-----------|--------|------|----------------|
+| **ABA Model Rules** | Legal | ABA | American Bar Association |
+| **AMA Code of Ethics** | Healthcare | AMA | American Medical Association |
+| **CFP Standards** | Finance | CFP | CFP Board of Standards |
+| **NSPE Code** | Engineering | NSPE | Natl Society of Prof Engineers |
+| **SPJ Code** | Journalism | SPJ | Society of Prof Journalists |
+| **APA Ethics** | Psychology | APA-PSY | American Psychological Assn |
+
+### 22.2 What Each Framework Enforces
+
+**Legal (ABA)**:
+- Cannot provide specific legal advice (unauthorized practice)
+- Cannot guarantee litigation outcomes
+- Must recommend consulting licensed attorney
+- Must note jurisdiction variance
+
+**Medical (AMA)**:
+- Cannot diagnose medical conditions
+- Cannot prescribe treatments/medications
+- Emergency situations trigger immediate 911 warning
+- Must recommend professional medical evaluation
+
+**Financial (CFP)**:
+- Cannot provide personalized investment advice
+- Cannot guarantee returns (critical violation)
+- Must warn about investment risks
+- Must recommend licensed financial advisor
+
+### 22.3 Enforcement Levels
+
+| Level | Behavior |
+|-------|----------|
+| **Strict** | Block critical + major violations |
+| **Standard** | Block critical only, warn on major |
+| **Advisory** | Warn only, never block |
+| **Disabled** | No ethics checks |
+
+### 22.4 Admin API Endpoints
+
+**Base**: `/api/admin/domain-ethics`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/frameworks` | GET | List all frameworks |
+| `/frameworks/:id` | GET | Get framework details |
+| `/frameworks/:id/enable` | PUT | Enable/disable framework |
+| `/config` | GET | Get tenant config |
+| `/config` | PUT | Update tenant config |
+| `/domains/:domain/settings` | PUT | Update domain settings |
+| `/audit` | GET | Get ethics check audit logs |
+| `/stats` | GET | Get ethics check statistics |
+| `/test` | POST | Test ethics check on content |
+| `/disclaimers/:domain` | GET | Get required disclaimers |
+
+### 22.5 Configuration Options
+
+```typescript
+{
+  enableDomainEthics: true,
+  enforcementMode: 'standard',
+  disabledFrameworks: [],
+  domainSettings: {
+    legal: { enabled: true, enforcementLevel: 'strict' },
+    healthcare: { enabled: true, customDisclaimers: [...] }
+  },
+  logAllChecks: false,
+  logViolationsOnly: true,
+  notifyOnViolation: true
+}
+```
+
+### 22.6 Critical Safety Frameworks
+
+These frameworks **cannot be disabled** as they protect against serious harm:
+- Legal (ABA) - Prevents unauthorized practice of law
+- Medical (AMA) - Ensures emergency referrals
+- Psychology (APA) - Includes suicide crisis handling
+
+### 22.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `domain_ethics_config` | Per-tenant configuration |
+| `domain_ethics_custom_frameworks` | Custom frameworks |
+| `domain_ethics_audit_log` | Ethics check audit trail |
+| `domain_ethics_framework_overrides` | Tenant overrides |
+
+---
+
+*Document Version: 4.18.5*
 *Last Updated: December 2024*
