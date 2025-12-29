@@ -35,6 +35,7 @@ This guide covers administrative features specific to **Think Tank**, the consum
 18. [App Factory](#18-app-factory)
 19. [Generative UI Feedback](#19-generative-ui-feedback)
 20. [Media Capabilities](#20-media-capabilities)
+21. [Result Derivation History](#21-result-derivation-history)
 
 ---
 
@@ -1310,6 +1311,99 @@ Think Tank supports rich media inputs and outputs through 56 self-hosted models.
 | `self_hosted_model_metadata` | 56 model definitions with capabilities |
 | `thinktank_media_capabilities` | Media support per model |
 | `model_selection_history` | Model selection audit trail |
+
+---
+
+## 21. Result Derivation History
+
+Think Tank provides comprehensive visibility into how each result was derived, including the plan, models used, workflow execution, and quality metrics.
+
+### 21.1 What's Captured
+
+For every Think Tank result, the system records:
+
+| Category | Details |
+|----------|---------|
+| **Plan** | Orchestration mode, steps, template used, generation time |
+| **Domain Detection** | Field, domain, subspecialty, confidence scores, alternatives |
+| **Model Selection** | Models used, selection reasons, alternatives considered |
+| **Workflow Execution** | Phases, steps, timing, status, fallback chain |
+| **Quality Metrics** | Overall score, dimensions (relevance, accuracy, etc.) |
+| **Timing** | Total duration, breakdown by phase |
+| **Costs** | Per-model costs, total cost, estimated savings |
+
+### 21.2 API Endpoints
+
+**Base**: `/api/thinktank/derivation`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/:id` | GET | Get full derivation history |
+| `/by-prompt/:promptId` | GET | Get derivation by prompt ID |
+| `/:id/timeline` | GET | Get timeline for visualization |
+| `/:id/models` | GET | Get detailed model usage |
+| `/:id/steps` | GET | Get step-by-step execution |
+| `/:id/quality` | GET | Get quality metrics |
+| `/session/:sessionId` | GET | List derivations for session |
+| `/user` | GET | List user's derivations |
+| `/analytics` | GET | Get derivation analytics |
+
+### 21.3 Timeline Visualization
+
+The derivation timeline shows chronological events:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Timeline                                                     │
+├─────────────────────────────────────────────────────────────┤
+│ 00:00.000  📋 Plan Generated (extended_thinking, 7 steps)   │
+│ 00:00.050  🔍 Started: Domain Detection                      │
+│ 00:00.120  ✓ Completed: Domain Detection (software_eng)     │
+│ 00:00.125  🤖 Model: Llama 3.3 70B (primary_generation)     │
+│ 00:00.130  🔍 Started: Generate Response                     │
+│ 00:02.500  ✓ Completed: Generate Response                   │
+│ 00:02.510  🔍 Started: Verification                         │
+│ 00:03.200  ✓ Completed: Verification (passed)               │
+│ 00:03.250  ✅ Execution Complete (Quality: 92/100)          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 21.4 Model Usage Details
+
+Each model call is tracked with:
+- Input/output token counts
+- Latency in milliseconds
+- Cost breakdown (input/output/total)
+- Selection reason and score
+- Alternatives that were considered
+- Quality tier (premium/standard/economy)
+
+### 21.5 Quality Dimensions
+
+Results are scored on 5 dimensions (0-100):
+- **Relevance** - How well the response addresses the prompt
+- **Accuracy** - Factual correctness
+- **Completeness** - Coverage of the topic
+- **Clarity** - How clear and understandable
+- **Coherence** - Logical flow and consistency
+
+### 21.6 Analytics Dashboard
+
+Aggregated analytics available at `/api/thinktank/derivation/analytics`:
+- Total derivations in period
+- Average duration, cost, quality
+- Mode distribution (pie chart)
+- Domain distribution
+- Top models by usage and quality
+
+### 21.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `result_derivations` | Main derivation records |
+| `derivation_steps` | Individual plan steps |
+| `derivation_model_usage` | Model calls with tokens/costs |
+| `derivation_timeline_events` | Timeline events |
 
 ---
 
