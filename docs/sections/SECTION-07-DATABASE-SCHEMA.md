@@ -159,6 +159,12 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `domain_ethics_audit_log` | Audit log of ethics checks performed |
 | `domain_ethics_framework_overrides` | Tenant-specific framework overrides |
 | `domain_ethics_violation_patterns` | Custom violation patterns for frameworks |
+| `model_registry` | Central registry of all AI models with capabilities |
+| `model_endpoints` | Communication endpoints for models with auth and health |
+| `model_sync_config` | Configuration for timed sync service |
+| `model_sync_jobs` | History of sync job executions |
+| `new_model_detections` | Newly detected models pending processing |
+| `model_routing_rules` | Rules for routing requests to models |
 
 ## Type Imports
 

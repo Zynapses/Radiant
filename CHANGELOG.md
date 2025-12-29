@@ -5,6 +5,49 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.8] - 2024-12-28
+
+### Added
+
+#### Model Coordination Service (Persistent Model Registry & Timed Sync)
+- **Model Registry** - Central database of all models (external + self-hosted)
+  - Endpoints with auth methods, request/response formats
+  - Health monitoring with status tracking
+  - Routing priority and fallback chains
+- **Timed Sync Service** - Configurable automatic registry updates
+  - Intervals: 5min, 15min, 30min, hourly, 6hr, daily
+  - Auto-discovery when new models detected
+  - Auto-generate proficiencies for new models
+- **Shared Types** (`model-coordination.types.ts`)
+  - `ModelEndpoint`, `ModelRegistryEntry`, `SyncConfig`, `SyncJob`
+  - `NewModelDetection`, `ModelRoutingRules`, `RoutingRule`
+  - Endpoint types: openai_compatible, anthropic_compatible, sagemaker, bedrock, custom_rest
+  - Auth methods: api_key, bearer_token, aws_sig_v4, oauth2, custom_header
+- **Coordination Service** (`model-coordination.service.ts`)
+  - `getSyncConfig()`, `updateSyncConfig()` - Manage sync settings
+  - `executeSync()` - Run full sync job
+  - `syncSelfHostedModels()` - Sync from code registry
+  - `syncExternalProviders()` - Check health, update status
+  - `detectNewModel()` - Register new model detection
+  - `getDashboard()` - Full dashboard data
+- **Admin API** (`admin/model-coordination.ts`)
+  - `GET/PUT /config` - Sync configuration
+  - `POST /sync` - Trigger manual sync
+  - `GET /sync/jobs` - Sync job history
+  - `GET/POST/PUT /registry` - Model registry CRUD
+  - `POST /endpoints` - Add model endpoints
+  - `GET /detections` - Pending model detections
+  - `GET /dashboard` - Dashboard data
+  - `GET /intervals` - Available sync interval options
+- **Database Migration** (`096_model_coordination_registry.sql`)
+  - `model_registry` - Central model registry
+  - `model_endpoints` - Endpoints with auth and health
+  - `model_sync_config` - Sync configuration
+  - `model_sync_jobs` - Sync job history
+  - `new_model_detections` - Pending detections
+  - `model_routing_rules` - Routing rules
+  - Functions: `get_model_endpoints`, `get_best_endpoint`, `get_sync_dashboard_stats`
+
 ## [4.18.7] - 2024-12-28
 
 ### Added

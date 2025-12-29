@@ -33,6 +33,7 @@
 20. [Delight System Administration](#20-delight-system-administration)
 21. [Domain Ethics Registry](#21-domain-ethics-registry)
 22. [Model Proficiency Registry](#22-model-proficiency-registry)
+23. [Model Coordination Service](#23-model-coordination-service)
 
 ---
 
@@ -2293,5 +2294,105 @@ Mode scores consider:
 
 ---
 
-*Document Version: 4.18.6*
+## 24. Model Coordination Service
+
+**Location**: Admin Dashboard → AI Configuration → Model Coordination
+
+The Model Coordination Service provides persistent storage for model communication protocols and automated sync for keeping the model registry up-to-date.
+
+### 24.1 What It Does
+
+- **Model Registry** - Central database of all models (external + self-hosted) with endpoints
+- **Timed Sync** - Configurable intervals for automatic registry updates
+- **Auto-Discovery** - Detects new models and triggers proficiency generation
+- **Health Monitoring** - Tracks endpoint health status
+- **Routing Rules** - Configurable rules for model selection
+
+### 24.2 Sync Configuration
+
+| Setting | Default | Options |
+|---------|---------|---------|
+| `autoSyncEnabled` | true | Enable/disable automatic sync |
+| `syncIntervalMinutes` | 60 | 5, 15, 30, 60, 360, 1440 |
+| `syncExternalProviders` | true | Sync external provider models |
+| `syncSelfHostedModels` | true | Sync self-hosted SageMaker models |
+| `syncFromHuggingFace` | false | Sync from HuggingFace Hub |
+| `autoDiscoveryEnabled` | true | Auto-process new model detections |
+| `autoGenerateProficiencies` | true | Generate proficiencies for new models |
+
+### 24.3 Sync Intervals
+
+| Interval | Use Case |
+|----------|----------|
+| **5 minutes** | Development/testing |
+| **15 minutes** | Frequent updates needed |
+| **30 minutes** | Balanced frequency |
+| **60 minutes** | Recommended for production |
+| **6 hours** | Stable environments |
+| **Daily** | Low-change environments |
+
+### 24.4 Admin API Endpoints
+
+**Base**: `/api/admin/model-coordination`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/config` | GET | Get sync configuration |
+| `/config` | PUT | Update sync configuration |
+| `/sync` | POST | Trigger manual sync |
+| `/sync/jobs` | GET | Get recent sync jobs |
+| `/registry` | GET | Get all registry entries |
+| `/registry/:modelId` | GET | Get single registry entry |
+| `/registry` | POST | Add model to registry |
+| `/registry/:modelId` | PUT | Update registry entry |
+| `/endpoints` | POST | Add endpoint for a model |
+| `/endpoints/:id/health` | PUT | Update endpoint health |
+| `/detections` | GET | Get pending model detections |
+| `/detect` | POST | Report new model detection |
+| `/dashboard` | GET | Get full dashboard data |
+| `/intervals` | GET | Get available sync intervals |
+
+### 24.5 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `model_registry` | Central registry of all models |
+| `model_endpoints` | Communication endpoints with auth |
+| `model_sync_config` | Sync configuration per tenant |
+| `model_sync_jobs` | History of sync executions |
+| `new_model_detections` | Newly detected models |
+| `model_routing_rules` | Routing rules for model selection |
+
+### 24.6 Model Endpoint Structure
+
+Each model can have multiple endpoints for redundancy:
+
+```typescript
+{
+  endpointType: 'sagemaker' | 'openai_compatible' | 'anthropic_compatible' | 'bedrock' | 'custom_rest',
+  baseUrl: 'https://...',
+  authMethod: 'api_key' | 'bearer_token' | 'aws_sig_v4' | 'oauth2',
+  authConfig: { headerName, keyPath, roleArn },
+  requestFormat: { contentType, messageField, modelField },
+  responseFormat: { contentType, textPath, usagePath },
+  healthStatus: 'healthy' | 'degraded' | 'unhealthy' | 'unknown',
+  rateLimitRpm: 60,
+  timeoutMs: 30000
+}
+```
+
+### 24.7 Notifications
+
+Configure notifications for:
+- **New Model Detected** - When unknown model appears
+- **Model Removed** - When model becomes unavailable
+- **Sync Failure** - When sync job fails
+
+Notification channels:
+- Email (list of addresses)
+- Webhook (URL for HTTP POST)
+
+---
+
+*Document Version: 4.18.7*
 *Last Updated: December 2024*
