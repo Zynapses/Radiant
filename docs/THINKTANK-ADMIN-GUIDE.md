@@ -2,7 +2,7 @@
 
 > **Configuration and administration of Think Tank AI features**
 > 
-> Version: 3.2.0 | Platform: RADIANT 4.18.3
+> Version: 3.2.1 | Platform: RADIANT 4.18.4
 > Last Updated: December 2024
 
 ---
@@ -33,6 +33,8 @@ This guide covers administrative features specific to **Think Tank**, the consum
 16. [Cognitive Architecture](#16-cognitive-architecture)
 17. [Consciousness Service](#17-consciousness-service)
 18. [App Factory](#18-app-factory)
+19. [Generative UI Feedback](#19-generative-ui-feedback)
+20. [Media Capabilities](#20-media-capabilities)
 
 ---
 
@@ -1227,6 +1229,87 @@ The feedback analytics show:
 - Improvement sessions count
 - Active learnings count
 - Daily trend chart
+
+---
+
+## 20. Media Capabilities
+
+Think Tank supports rich media inputs and outputs through 56 self-hosted models.
+
+### 20.1 Supported Media Types
+
+| Type | Input Models | Output Models | Formats |
+|------|-------------|---------------|---------|
+| **Image** | Llama 3.2 Vision, Qwen2-VL, Pixtral, Phi-3.5 Vision, Yi-VL | FLUX.1, Stable Diffusion XL/3 | jpg, png, webp, gif |
+| **Audio** | Whisper Large V3, Qwen2-Audio | Bark, MusicGen, AudioGen | mp3, wav, flac, m4a, ogg |
+| **Video** | Qwen2-VL 72B | - | mp4, avi, mov |
+| **3D** | Point-E, Shap-E | Point-E, Shap-E | glb, obj, ply |
+| **Document** | Vision models (OCR) | - | pdf, docx, txt |
+
+### 20.2 Image Generation
+
+**Available Models:**
+- **FLUX.1 Dev** - Premium quality, artistic content (non-commercial)
+- **FLUX.1 Schnell** - Fast generation, commercial use allowed
+- **Stable Diffusion XL** - Versatile, inpainting/img2img support
+- **Stable Diffusion 3** - Best text rendering in images
+
+**Selection Criteria:**
+- `qualityTier: 'premium'` → FLUX.1 Dev
+- `preferInpainting: true` → Stable Diffusion XL
+- `preferTextRendering: true` → Stable Diffusion 3
+- Default → FLUX.1 Schnell (fast + commercial)
+
+### 20.3 Audio Processing
+
+**Transcription Models:**
+- **Whisper Large V3** - Best quality, 99+ languages
+- **Whisper Medium** - Faster, good quality
+
+**Text-to-Speech:**
+- **Bark** - Expressive, multilingual, voice cloning
+
+**Music Generation:**
+- **MusicGen Large** - High quality music (30s max)
+- **MusicGen Medium** - Faster, prototyping
+
+**Sound Effects:**
+- **AudioGen Medium** - Environmental sounds, effects
+
+### 20.4 Vision/Image Understanding
+
+**Models by Use Case:**
+- **Document OCR**: Pixtral 12B, Qwen2-VL
+- **Chart Analysis**: Llama 3.2 90B Vision, Qwen2-VL 72B
+- **Quick Analysis**: Llama 3.2 11B Vision, Phi-3.5 Vision
+- **Video Understanding**: Qwen2-VL 72B (up to 5min clips)
+- **Chinese OCR**: Yi-VL 34B
+
+### 20.5 3D Generation
+
+**Models:**
+- **Point-E** - Fast point cloud generation
+- **Shap-E** - Mesh generation for game assets
+
+**Output Formats:** GLB, OBJ, PLY
+
+### 20.6 Media Limits
+
+| Model | Max Image | Max Audio | Max Video |
+|-------|-----------|-----------|-----------|
+| FLUX.1 Dev | 2048px | - | - |
+| Stable Diffusion XL | 1024px | - | - |
+| Whisper Large V3 | - | 60min | - |
+| MusicGen | - | 30s | - |
+| Qwen2-VL 72B | 4096px | 5min | 5min |
+
+### 20.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `self_hosted_model_metadata` | 56 model definitions with capabilities |
+| `thinktank_media_capabilities` | Media support per model |
+| `model_selection_history` | Model selection audit trail |
 
 ---
 

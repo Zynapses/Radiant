@@ -5,6 +5,69 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.4] - 2024-12-28
+
+### Added
+
+#### Self-Hosted Model Registry (56 Models with AGI Orchestration)
+- **56 Self-Hosted Models** - Comprehensive registry with full metadata for orchestration
+  - **Text Models (45)**: Llama 3.3/3.2, Qwen 2.5, Mistral, DeepSeek V3, Phi-4, Gemma 2, Yi, CodeLlama, StarCoder, InternLM
+  - **Image Models (4)**: FLUX.1 Dev/Schnell, Stable Diffusion XL/3
+  - **Audio Models (6)**: Whisper Large V3/Medium, Bark, MusicGen, AudioGen
+  - **3D Models (2)**: Point-E, Shap-E
+  - **Embedding Models (3)**: BGE-M3, E5-Mistral-7B, Nomic Embed
+- **Shared Types** (`self-hosted-registry.ts`)
+  - `SelfHostedModelDefinition` - Full model metadata with 25+ fields
+  - `ModelFamily` - 22 model families (llama, qwen, mistral, deepseek, etc.)
+  - `ModelModality` - Input/output types (text, image, audio, video, 3d, code, embedding)
+  - `DomainStrength` - Domain expertise levels (excellent, good, moderate, basic)
+  - `InstanceType` - SageMaker instance types for hardware requirements
+  - Helper functions: `getSelfHostedModelById`, `getSelfHostedModelsByCapability`, etc.
+- **Model Metadata Includes**:
+  - Family, version, parameter count (e.g., "70B")
+  - Input/output modalities and capabilities
+  - Context window and max output tokens
+  - Hardware requirements (instance type, VRAM, quantization, tensor parallelism)
+  - Pricing estimates (input/output per 1M tokens)
+  - Domain strengths with subspecialties
+  - Orchestration hints (preferredFor, avoidFor, pairsWellWith, fallbackTo)
+  - Media support (image/audio/video input/output, formats, limits)
+  - Licensing and commercial use info
+- **Database Migration** (`093_enhanced_self_hosted_models.sql`)
+  - `self_hosted_model_metadata` - Comprehensive model metadata storage
+  - `model_orchestration_preferences` - Tenant-specific model selection preferences
+  - `self_hosted_model_usage` - Usage analytics per tenant
+  - `model_selection_history` - Selection history for learning
+  - `thinktank_media_capabilities` - Media capabilities for Think Tank
+  - Functions: `get_models_by_capability`, `get_models_by_domain`, `get_models_by_modality`
+- **AGI Brain Integration** (`self-hosted-model-selector.service.ts`)
+  - `selectBestModel()` - Score and rank models based on criteria
+  - `getModelsForOrchestrationMode()` - Models suitable for each mode
+  - `getFallbackChain()` - Model fallback chains
+  - `getComplementaryModels()` - Multi-model orchestration
+  - Tenant preference support with domain overrides
+  - Selection history recording for analytics
+- **Think Tank Media Service** (`thinktank-media.service.ts`)
+  - `getMediaCapableModels()` - All models with media capabilities
+  - `selectImageGenerationModel()` - Best model for image generation
+  - `selectAudioModel()` - Best model for transcription/TTS/music
+  - `select3DGenerationModel()` - Best model for 3D generation
+  - `selectVisionModel()` - Best model for image/video understanding
+  - `validateMediaInput()` - Validate media against model constraints
+  - Format and limit checking for all media types
+- **Model Proficiency Service** (`model-proficiency.service.ts`)
+  - `generateAllProficiencies()` - Generate ranked proficiencies for all models
+  - `generateProficienciesForModel()` - Auto-generate when new model added by admin
+  - `getDomainRanking()` - Get ranked models for any domain/subspecialty
+  - `getModeRanking()` - Get ranked models for each orchestration mode
+  - `getBestModelsForTask()` - Find best models for a specific task
+  - `compareModels()` - Side-by-side model comparison with analysis
+  - `syncToDatabase()` - Sync proficiencies on model discovery
+- **Additional Database Tables** (Migration 093)
+  - `model_proficiency_rankings` - Ranked scores across 15 domains and 9 modes
+  - `model_discovery_log` - Track new model discoveries with proficiency generation
+  - Functions: `get_top_models_for_domain`, `get_top_models_for_mode`, `trigger_proficiency_generation`
+
 ## [4.18.3] - 2024-12-28
 
 ### Added
