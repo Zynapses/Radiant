@@ -2439,6 +2439,34 @@ Notification channels:
 - Email (list of addresses)
 - Webhook (URL for HTTP POST)
 
+### 24.8 Pre-Seeded Models
+
+The registry comes pre-seeded with external provider models:
+
+| Provider | Models |
+|----------|--------|
+| **OpenAI** | gpt-4o, gpt-4o-mini, gpt-4-turbo, o1, o1-mini, o1-pro |
+| **Anthropic** | claude-3-5-sonnet, claude-3-5-haiku, claude-3-opus |
+| **Google** | gemini-2.0-flash-thinking, gemini-2.0-flash, gemini-1.5-pro, gemini-1.5-flash |
+| **DeepSeek** | deepseek-chat, deepseek-reasoner |
+| **xAI** | grok-2, grok-2-vision |
+
+Self-hosted models are synced from `SELF_HOSTED_MODEL_REGISTRY` on first sync.
+
+### 24.9 Scheduled Sync (EventBridge)
+
+The sync runs automatically via EventBridge Lambda trigger:
+
+| Interval | EventBridge Rule | Default |
+|----------|------------------|---------|
+| 5 min | `radiant-model-sync-5min-{env}` | Disabled |
+| 15 min | `radiant-model-sync-15min-{env}` | Disabled |
+| 1 hour | `radiant-model-sync-hourly-{env}` | **Enabled** |
+| 6 hours | `radiant-model-sync-6hour-{env}` | Disabled |
+| Daily | `radiant-model-sync-daily-{env}` | Disabled |
+
+**To change interval**: Update `syncIntervalMinutes` in admin config, then enable/disable corresponding EventBridge rules in AWS Console or via CDK.
+
 ---
 
 ## 25. Ethics Pipeline

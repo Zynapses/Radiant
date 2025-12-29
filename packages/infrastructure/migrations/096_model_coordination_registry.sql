@@ -543,3 +543,121 @@ COMMENT ON FUNCTION get_model_endpoints(TEXT) IS 'Get all active endpoints for a
 COMMENT ON FUNCTION get_best_endpoint(TEXT) IS 'Get the best healthy endpoint for a model';
 COMMENT ON FUNCTION get_sync_dashboard_stats() IS 'Get statistics for sync dashboard';
 COMMENT ON FUNCTION match_models_by_rules(UUID, TEXT, TEXT, TEXT) IS 'Match models based on routing rules';
+
+-- ============================================================================
+-- PRE-SEED EXTERNAL PROVIDER MODELS
+-- Seeds the model_registry with known external provider models
+-- ============================================================================
+
+-- OpenAI Models
+INSERT INTO model_registry (model_id, source, provider, family, capabilities, input_modalities, output_modalities, status)
+VALUES 
+    ('openai/gpt-4o', 'external', 'openai', 'gpt-4', ARRAY['chat', 'reasoning', 'code_generation', 'vision'], ARRAY['text', 'image'], ARRAY['text'], 'active'),
+    ('openai/gpt-4o-mini', 'external', 'openai', 'gpt-4', ARRAY['chat', 'reasoning', 'code_generation'], ARRAY['text'], ARRAY['text'], 'active'),
+    ('openai/gpt-4-turbo', 'external', 'openai', 'gpt-4', ARRAY['chat', 'reasoning', 'code_generation', 'vision'], ARRAY['text', 'image'], ARRAY['text'], 'active'),
+    ('openai/o1', 'external', 'openai', 'o1', ARRAY['reasoning', 'math', 'analysis'], ARRAY['text'], ARRAY['text'], 'active'),
+    ('openai/o1-mini', 'external', 'openai', 'o1', ARRAY['reasoning', 'math'], ARRAY['text'], ARRAY['text'], 'active'),
+    ('openai/o1-pro', 'external', 'openai', 'o1', ARRAY['reasoning', 'math', 'analysis', 'extended_thinking'], ARRAY['text'], ARRAY['text'], 'active')
+ON CONFLICT (model_id) DO NOTHING;
+
+-- Anthropic Models
+INSERT INTO model_registry (model_id, source, provider, family, capabilities, input_modalities, output_modalities, status)
+VALUES 
+    ('anthropic/claude-3-5-sonnet-20241022', 'external', 'anthropic', 'claude-3.5', ARRAY['chat', 'reasoning', 'code_generation', 'vision', 'creative_writing'], ARRAY['text', 'image'], ARRAY['text'], 'active'),
+    ('anthropic/claude-3-5-haiku-20241022', 'external', 'anthropic', 'claude-3.5', ARRAY['chat', 'reasoning', 'code_generation'], ARRAY['text'], ARRAY['text'], 'active'),
+    ('anthropic/claude-3-opus-20240229', 'external', 'anthropic', 'claude-3', ARRAY['chat', 'reasoning', 'code_generation', 'vision', 'creative_writing'], ARRAY['text', 'image'], ARRAY['text'], 'active')
+ON CONFLICT (model_id) DO NOTHING;
+
+-- Google Models
+INSERT INTO model_registry (model_id, source, provider, family, capabilities, input_modalities, output_modalities, status)
+VALUES 
+    ('google/gemini-2.0-flash-thinking-exp', 'external', 'google', 'gemini-2', ARRAY['chat', 'reasoning', 'extended_thinking', 'vision'], ARRAY['text', 'image'], ARRAY['text'], 'active'),
+    ('google/gemini-2.0-flash-exp', 'external', 'google', 'gemini-2', ARRAY['chat', 'reasoning', 'vision'], ARRAY['text', 'image'], ARRAY['text'], 'active'),
+    ('google/gemini-1.5-pro', 'external', 'google', 'gemini-1.5', ARRAY['chat', 'reasoning', 'vision', 'audio'], ARRAY['text', 'image', 'audio'], ARRAY['text'], 'active'),
+    ('google/gemini-1.5-flash', 'external', 'google', 'gemini-1.5', ARRAY['chat', 'reasoning'], ARRAY['text'], ARRAY['text'], 'active')
+ON CONFLICT (model_id) DO NOTHING;
+
+-- DeepSeek Models
+INSERT INTO model_registry (model_id, source, provider, family, capabilities, input_modalities, output_modalities, status)
+VALUES 
+    ('deepseek/deepseek-chat', 'external', 'deepseek', 'deepseek-v3', ARRAY['chat', 'reasoning', 'code_generation'], ARRAY['text'], ARRAY['text'], 'active'),
+    ('deepseek/deepseek-reasoner', 'external', 'deepseek', 'deepseek-r1', ARRAY['reasoning', 'math', 'extended_thinking'], ARRAY['text'], ARRAY['text'], 'active')
+ON CONFLICT (model_id) DO NOTHING;
+
+-- xAI Models
+INSERT INTO model_registry (model_id, source, provider, family, capabilities, input_modalities, output_modalities, status)
+VALUES 
+    ('xai/grok-2', 'external', 'xai', 'grok-2', ARRAY['chat', 'reasoning', 'creative_writing'], ARRAY['text'], ARRAY['text'], 'active'),
+    ('xai/grok-2-vision', 'external', 'xai', 'grok-2', ARRAY['chat', 'reasoning', 'vision'], ARRAY['text', 'image'], ARRAY['text'], 'active')
+ON CONFLICT (model_id) DO NOTHING;
+
+-- Create default endpoints for external providers
+INSERT INTO model_endpoints (model_id, endpoint_type, base_url, auth_method, health_status, priority, is_active)
+SELECT 
+    model_id,
+    'openai_compatible',
+    CASE 
+        WHEN provider = 'openai' THEN 'https://api.openai.com/v1'
+        WHEN provider = 'anthropic' THEN 'https://api.anthropic.com/v1'
+        WHEN provider = 'google' THEN 'https://generativelanguage.googleapis.com/v1beta'
+        WHEN provider = 'deepseek' THEN 'https://api.deepseek.com/v1'
+        WHEN provider = 'xai' THEN 'https://api.x.ai/v1'
+        ELSE ''
+    END,
+    CASE 
+        WHEN provider = 'anthropic' THEN 'custom_header'
+        ELSE 'bearer_token'
+    END,
+    'unknown',
+    1,
+    true
+FROM model_registry
+WHERE source = 'external'
+ON CONFLICT DO NOTHING;
+
+-- ============================================================================
+-- FUNCTION TO SEED SELF-HOSTED MODELS
+-- Called by the sync service to populate self-hosted models from code registry
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION seed_self_hosted_model(
+    p_model_id TEXT,
+    p_family TEXT,
+    p_capabilities TEXT[],
+    p_input_modalities TEXT[],
+    p_output_modalities TEXT[]
+)
+RETURNS UUID AS $$
+DECLARE
+    v_registry_id UUID;
+BEGIN
+    INSERT INTO model_registry (
+        model_id, source, provider, family,
+        capabilities, input_modalities, output_modalities,
+        status, last_synced_at, sync_source
+    ) VALUES (
+        p_model_id, 'self-hosted', 'sagemaker', p_family,
+        p_capabilities, p_input_modalities, p_output_modalities,
+        'active', NOW(), 'seed'
+    )
+    ON CONFLICT (model_id) DO UPDATE SET
+        capabilities = p_capabilities,
+        input_modalities = p_input_modalities,
+        output_modalities = p_output_modalities,
+        last_synced_at = NOW()
+    RETURNING id INTO v_registry_id;
+    
+    -- Create default SageMaker endpoint
+    INSERT INTO model_endpoints (
+        model_id, endpoint_type, base_url, auth_method,
+        health_status, priority, is_active
+    ) VALUES (
+        p_model_id, 'sagemaker', '', 'aws_sig_v4',
+        'unknown', 1, true
+    ) ON CONFLICT DO NOTHING;
+    
+    RETURN v_registry_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+COMMENT ON FUNCTION seed_self_hosted_model(TEXT, TEXT, TEXT[], TEXT[], TEXT[]) IS 'Seed or update a self-hosted model in the registry';
