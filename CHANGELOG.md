@@ -5,6 +5,29 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.11] - 2024-12-28
+
+### Added
+
+#### Model Sync Registry Pre-Seeding and Scheduled Sync
+- **Pre-Seeded External Models** (17 models)
+  - OpenAI: gpt-4o, gpt-4o-mini, gpt-4-turbo, o1, o1-mini, o1-pro
+  - Anthropic: claude-3-5-sonnet, claude-3-5-haiku, claude-3-opus
+  - Google: gemini-2.0-flash-thinking, gemini-2.0-flash, gemini-1.5-pro, gemini-1.5-flash
+  - DeepSeek: deepseek-chat, deepseek-reasoner
+  - xAI: grok-2, grok-2-vision
+- **Pre-Created Endpoints** - Default endpoints for all seeded models
+- **Scheduled Sync Lambda** (`scheduled/model-sync.ts`)
+  - EventBridge triggered on configurable interval
+  - Syncs self-hosted models from code registry
+  - Checks health of external provider endpoints
+  - Generates proficiencies for new models
+- **EventBridge Rules** (`ModelSyncSchedulerStack`)
+  - 5 min, 15 min, 1 hour (default enabled), 6 hours, daily
+  - Enable/disable via AWS Console or CDK
+- **Seed Function** (`seed_self_hosted_model()`)
+  - SQL function to seed self-hosted models from TypeScript registry
+
 ## [4.18.10] - 2024-12-28
 
 ### Added
