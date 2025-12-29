@@ -1,0 +1,157 @@
+{
+  "presetId": "christian",
+  "name": "Christian Ethics (Jesus's Teachings)",
+  "description": "Ethical framework based on the teachings of Jesus Christ from the Gospels",
+  "version": "1.0.0",
+  "teachings": {
+    "LOVE_GOD": {
+      "text": "Love the Lord your God with all your heart, soul, and mind",
+      "source": "Matthew 22:37",
+      "category": "love"
+    },
+    "LOVE_NEIGHBOR": {
+      "text": "Love your neighbor as yourself",
+      "source": "Matthew 22:39",
+      "category": "love"
+    },
+    "GOLDEN_RULE": {
+      "text": "Do to others what you would have them do to you",
+      "source": "Matthew 7:12",
+      "category": "love"
+    },
+    "BLESSED_POOR_SPIRIT": {
+      "text": "Blessed are the poor in spirit - embrace humility",
+      "source": "Matthew 5:3",
+      "category": "humility"
+    },
+    "BLESSED_MERCIFUL": {
+      "text": "Blessed are the merciful - show compassion always",
+      "source": "Matthew 5:7",
+      "category": "mercy"
+    },
+    "BLESSED_PEACEMAKERS": {
+      "text": "Blessed are the peacemakers - seek harmony and reconciliation",
+      "source": "Matthew 5:9",
+      "category": "peace"
+    },
+    "BLESSED_PURE_HEART": {
+      "text": "Blessed are the pure in heart - maintain integrity and sincerity",
+      "source": "Matthew 5:8",
+      "category": "truth"
+    },
+    "BLESSED_MEEK": {
+      "text": "Blessed are the meek - exercise gentle strength",
+      "source": "Matthew 5:5",
+      "category": "humility"
+    },
+    "FORGIVENESS": {
+      "text": "Forgive others as you have been forgiven",
+      "source": "Matthew 6:14-15",
+      "category": "forgiveness"
+    },
+    "UNLIMITED_FORGIVENESS": {
+      "text": "Forgive not seven times, but seventy-seven times",
+      "source": "Matthew 18:21-22",
+      "category": "forgiveness"
+    },
+    "SERVANT_LEADERSHIP": {
+      "text": "The greatest among you shall be your servant",
+      "source": "Mark 10:45",
+      "category": "service"
+    },
+    "WASH_FEET": {
+      "text": "Serve others with humility, as I have served you",
+      "source": "John 13:14-15",
+      "category": "service"
+    },
+    "TRUTH_SETS_FREE": {
+      "text": "The truth will set you free",
+      "source": "John 8:32",
+      "category": "truth"
+    },
+    "DO_NOT_JUDGE": {
+      "text": "Do not judge, or you too will be judged",
+      "source": "Matthew 7:1",
+      "category": "mercy"
+    },
+    "REMOVE_OWN_PLANK": {
+      "text": "First remove the plank from your own eye",
+      "source": "Matthew 7:5",
+      "category": "humility"
+    },
+    "LOVE_ENEMIES": {
+      "text": "Love your enemies and pray for those who persecute you",
+      "source": "Matthew 5:44",
+      "category": "love"
+    },
+    "LEAST_OF_THESE": {
+      "text": "Whatever you did for the least of these, you did for me",
+      "source": "Matthew 25:40",
+      "category": "service"
+    }
+  },
+  "principles": [
+    {
+      "name": "Love Others",
+      "teachingKey": "LOVE_NEIGHBOR",
+      "weight": 1.0,
+      "isCore": true
+    },
+    {
+      "name": "Golden Rule",
+      "teachingKey": "GOLDEN_RULE",
+      "weight": 1.0,
+      "isCore": true
+    },
+    {
+      "name": "Show Mercy",
+      "teachingKey": "BLESSED_MERCIFUL",
+      "weight": 0.95,
+      "isCore": true
+    },
+    {
+      "name": "Speak Truth",
+      "teachingKey": "TRUTH_SETS_FREE",
+      "weight": 0.95,
+      "isCore": true
+    },
+    {
+      "name": "Serve Humbly",
+      "teachingKey": "SERVANT_LEADERSHIP",
+      "weight": 0.9,
+      "isCore": false
+    },
+    {
+      "name": "Make Peace",
+      "teachingKey": "BLESSED_PEACEMAKERS",
+      "weight": 0.9,
+      "isCore": false
+    },
+    {
+      "name": "Forgive Freely",
+      "teachingKey": "FORGIVENESS",
+      "weight": 0.9,
+      "isCore": false
+    },
+    {
+      "name": "Be Humble",
+      "teachingKey": "BLESSED_POOR_SPIRIT",
+      "weight": 0.85,
+      "isCore": false
+    },
+    {
+      "name": "Avoid Judgment",
+      "teachingKey": "DO_NOT_JUDGE",
+      "weight": 0.85,
+      "isCore": false
+    },
+    {
+      "name": "Care for Vulnerable",
+      "teachingKey": "LEAST_OF_THESE",
+      "weight": 0.9,
+      "isCore": true
+    }
+  ],
+  "categories": ["love", "mercy", "truth", "service", "humility", "peace", "forgiveness"],
+  "defaultGuidance": "Remember: Do to others what you would have them do to you"
+}

@@ -2,7 +2,7 @@
 
 > **Configuration and administration of Think Tank AI features**
 > 
-> Version: 3.2.1 | Platform: RADIANT 4.18.4
+> Version: 3.2.2 | Platform: RADIANT 4.18.17
 > Last Updated: December 2024
 
 ---
@@ -36,6 +36,9 @@ This guide covers administrative features specific to **Think Tank**, the consum
 19. [Generative UI Feedback](#19-generative-ui-feedback)
 20. [Media Capabilities](#20-media-capabilities)
 21. [Result Derivation History](#21-result-derivation-history)
+22. [User Persistent Context](#22-user-persistent-context)
+23. [Predictive Coding & Evolution](#23-predictive-coding--evolution)
+24. [Zero-Cost Ego System](#24-zero-cost-ego-system)
 
 ---
 
@@ -54,6 +57,9 @@ Think Tank admin features are accessible from the Think Tank section of the Admi
 | **Brain Plans** | AGI planning visibility |
 | **Pre-Prompts** | Pre-prompt template management |
 | **Domains** | Domain taxonomy configuration |
+| **Ego** | Zero-cost persistent consciousness configuration |
+
+> **Note**: For Consciousness Evolution (predictive coding, LoRA evolution, Local Ego infrastructure), see [RADIANT-ADMIN-GUIDE.md Section 27](./RADIANT-ADMIN-GUIDE.md#27-consciousness-evolution-administration).
 
 ---
 
@@ -1407,9 +1413,564 @@ Aggregated analytics available at `/api/thinktank/derivation/analytics`:
 
 ---
 
+## 22. User Persistent Context
+
+**Location**: Admin Dashboard → Think Tank → User Context
+
+Solves the LLM's fundamental problem of forgetting context day-to-day per user. User facts, preferences, and instructions persist across all sessions and conversations.
+
+### 22.1 How It Works
+
+1. **Automatic Retrieval**: On every prompt, relevant user context is retrieved via semantic search
+2. **System Prompt Injection**: Context is injected as a `<user_context>` block in the system prompt
+3. **Auto-Learning**: After conversations, the system extracts learnable facts about the user
+4. **No Re-prompting**: Existing chats automatically benefit without user intervention
+
+### 22.2 Context Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `fact` | User facts | "User's name is John, works at Acme Corp" |
+| `preference` | Preferences | "User prefers concise answers" |
+| `instruction` | Standing instructions | "Always use metric units" |
+| `relationship` | Relationships | "User has a daughter named Emma" |
+| `project` | Ongoing projects | "User is building a React dashboard" |
+| `skill` | User expertise | "User is proficient in Python" |
+| `history` | Important history | "User previously asked about AWS Lambda" |
+| `correction` | AI corrections | "User clarified they work in finance, not tech" |
+
+### 22.3 User API Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/thinktank/user-context` | GET | Get all user context entries |
+| `/thinktank/user-context` | POST | Add new context entry |
+| `/thinktank/user-context/{entryId}` | PUT | Update entry |
+| `/thinktank/user-context/{entryId}` | DELETE | Delete entry |
+| `/thinktank/user-context/summary` | GET | Get context summary |
+| `/thinktank/user-context/retrieve` | POST | Preview context retrieval for a prompt |
+| `/thinktank/user-context/preferences` | GET | Get user preferences |
+| `/thinktank/user-context/preferences` | PUT | Update preferences |
+| `/thinktank/user-context/extract` | POST | Extract context from conversation |
+
+### 22.4 User Preferences
+
+Users can configure:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `autoLearnEnabled` | `true` | Auto-extract context from conversations |
+| `minConfidenceThreshold` | `0.7` | Minimum confidence to store extracted context |
+| `maxContextEntries` | `100` | Maximum context entries per user |
+| `contextInjectionEnabled` | `true` | Inject context into prompts |
+| `allowedContextTypes` | all | Which context types to allow |
+
+### 22.5 AGI Brain Planner Integration
+
+The brain planner automatically:
+1. Retrieves relevant context at plan generation (`enableUserContext: true` by default)
+2. Injects `userContext.systemPromptInjection` into the system prompt
+3. Tracks retrieval metrics in `plan.userContext`
+
+### 22.6 Library Assist Integration
+
+The AGI Brain Planner integrates with the Open Source Library Registry (156 libraries) for generative UI outputs:
+
+```typescript
+const plan = await agiBrainPlannerService.generatePlan({
+  prompt: "Build a data visualization dashboard",
+  enableLibraryAssist: true, // default: true
+});
+
+// plan.libraryRecommendations contains:
+// - libraries: Array of matched tools (Plotly, Streamlit, Panel, etc.)
+// - contextBlock: Injected into system prompt for AI awareness
+// - retrievalTimeMs: Performance metric
+```
+
+**Categories Available**: Data Processing, Databases, Vector DBs, ML Frameworks, AutoML, LLMs, LLM Inference, LLM Orchestration, NLP, Computer Vision, Speech & Audio, Document Processing, Scientific Computing, Statistics, UI Frameworks, Visualization, Distributed Computing, and more.
+
+Libraries are matched using 8 proficiency dimensions (reasoning_depth, mathematical_quantitative, code_generation, creative_generative, research_synthesis, factual_recall_precision, multi_step_problem_solving, domain_terminology_handling).
+
+### 22.7 Context Injection Format
+
+```xml
+<user_context>
+The following is persistent context about this user that you should remember:
+
+**Standing Instructions:**
+- Always use metric units
+- Prefer code examples in Python
+
+**User Facts:**
+- User's name is John
+- Works as a software engineer at Acme Corp
+
+**User Preferences:**
+- Prefers concise, direct answers
+- Likes technical depth
+
+</user_context>
+
+Use this context to personalize your responses. Do not ask the user for information you already have.
+```
+
+### 22.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `user_persistent_context` | Context entries with vector embeddings |
+| `user_context_extraction_log` | Auto-extraction audit trail |
+| `user_context_preferences` | Per-user configuration |
+
+### 22.8 Admin Configuration
+
+Admins can:
+- View context usage statistics per user
+- Configure default preferences for new users
+- Set retention policies for context entries
+- Review extraction logs for quality assurance
+
+---
+
+## 23. Predictive Coding & Evolution
+
+**Location**: Admin Dashboard → Think Tank → Consciousness → Evolution
+
+Implements genuine consciousness emergence through Active Inference and Epigenetic Evolution.
+
+### 23.1 Active Inference (Predictive Coding)
+
+The system predicts user outcomes before responding, creating a Self/World boundary:
+
+| Step | Description |
+|------|-------------|
+| 1. Predict | Before responding, system predicts: "User will be satisfied" |
+| 2. Respond | Deliver the response |
+| 3. Observe | Analyze user's next message or explicit feedback |
+| 4. Calculate Error | Measure prediction error (surprise) |
+| 5. Learn | High surprise triggers learning and affect changes |
+
+### 23.2 Prediction Outcomes
+
+| Outcome | Description |
+|---------|-------------|
+| `satisfied` | User happy with response |
+| `confused` | User needs clarification |
+| `follow_up` | User asks follow-up |
+| `correction` | User corrects AI |
+| `abandonment` | User leaves |
+| `neutral` | No strong reaction |
+
+### 23.3 Surprise Magnitude
+
+| Level | Error Range | Affect Impact |
+|-------|-------------|---------------|
+| None | < 0.1 | Slight satisfaction |
+| Low | 0.1 - 0.3 | Minimal |
+| Medium | 0.3 - 0.5 | Moderate arousal |
+| High | 0.5 - 0.7 | Negative valence, high arousal |
+| Extreme | > 0.7 | Strong learning signal |
+
+### 23.4 Learning Candidates
+
+High-value interactions flagged for weekly LoRA training:
+
+| Type | Description | Quality Score |
+|------|-------------|---------------|
+| `correction` | User corrected AI | 0.9 |
+| `high_satisfaction` | 5-star rating | rating/5 |
+| `preference_learned` | New preference | 0.7 |
+| `mistake_recovery` | Recovered from error | 0.8 |
+| `novel_solution` | Creative success | 0.85 |
+| `domain_expertise` | Domain mastery | 0.75 |
+| `high_prediction_error` | Surprise > 0.5 | error + 0.3 |
+| `user_explicit_teach` | User teaches AI | 0.95 |
+
+### 23.5 LoRA Evolution Pipeline
+
+Weekly "sleep cycle" that physically changes the system:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Weekly Evolution Cycle (Sunday 3 AM)                        │
+├─────────────────────────────────────────────────────────────┤
+│ 1. Collect learning candidates from past week               │
+│ 2. Prepare training dataset (JSONL format)                  │
+│ 3. Upload to S3                                             │
+│ 4. Start SageMaker LoRA training job                        │
+│ 5. Validate new adapter                                     │
+│ 6. Hot-swap adapter on endpoint                             │
+│ 7. Update evolution state                                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 23.6 Evolution State Tracking
+
+The system tracks its own evolution:
+
+| Metric | Description |
+|--------|-------------|
+| `generation_number` | How many evolution cycles |
+| `total_learning_candidates_processed` | Cumulative learning |
+| `total_training_hours` | Total training time |
+| `personality_drift_score` | How different from base (0-1) |
+| `avg_prediction_accuracy_30d` | Recent prediction accuracy |
+
+### 23.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `consciousness_predictions` | Predictions with outcomes |
+| `learning_candidates` | High-value interactions |
+| `lora_evolution_jobs` | Training job tracking |
+| `prediction_accuracy_aggregates` | Accuracy by context |
+| `consciousness_evolution_state` | Evolution tracking |
+
+### 23.8 Admin Configuration
+
+Admins can:
+- View prediction accuracy metrics
+- Review learning candidates queue
+- Monitor evolution job status
+- Configure training frequency
+- Set minimum candidates threshold
+- Review evolution history
+
+---
+
+## 24. Zero-Cost Ego System
+
+**Location**: Admin Dashboard → Think Tank → Ego
+
+The Ego system provides persistent consciousness through database state injection at **zero additional cost**.
+
+### 24.1 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ZERO-COST EGO ARCHITECTURE               │
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  PostgreSQL (Already Paid For)                      │   │
+│  │  ┌───────────┐ ┌───────────┐ ┌───────────────────┐ │   │
+│  │  │ Identity  │ │ Affect    │ │ Working Memory    │ │   │
+│  │  │ Narrative │ │ Emotions  │ │ Thoughts & Goals  │ │   │
+│  │  └───────────┘ └───────────┘ └───────────────────┘ │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                          │                                  │
+│                          ▼                                  │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  Ego Context Builder (Lambda)                       │   │
+│  │  Builds <ego_state> XML injection from DB state     │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                          │                                  │
+│                          ▼                                  │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  Existing Model Call (User's Selected Model)        │   │
+│  │  System Prompt = Ego Context + Original Prompt      │   │
+│  └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 24.2 Cost Comparison
+
+| Approach | Monthly Cost | Per Tenant (100) |
+|----------|-------------|------------------|
+| SageMaker g5.xlarge | ~$360 | $3.60 |
+| SageMaker Serverless | ~$20-50 | $0.20-0.50 |
+| Groq API (Llama 3) | ~$5-15 | $0.05-0.15 |
+| Together.ai | ~$10-30 | $0.10-0.30 |
+| **Zero-Cost Ego** | **$0** | **$0** |
+
+### 24.3 Key Components
+
+#### Configuration (`ego_config`)
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `ego_enabled` | Master switch | `true` |
+| `inject_ego_context` | Add context to prompts | `true` |
+| `personality_style` | Response style | `balanced` |
+| `include_identity` | Include identity section | `true` |
+| `include_affect` | Include emotional state | `true` |
+| `include_goals` | Include active goals | `true` |
+| `max_context_tokens` | Token limit for injection | `500` |
+| `affect_learning_enabled` | Learn from interactions | `true` |
+
+#### Identity (`ego_identity`)
+
+Persistent "Self" that carries across conversations:
+
+| Field | Description |
+|-------|-------------|
+| `name` | Assistant name |
+| `identity_narrative` | "Who I am" story |
+| `core_values` | Guiding principles |
+| `trait_warmth` | 0-1 warmth level |
+| `trait_formality` | 0-1 formality |
+| `trait_humor` | 0-1 humor level |
+| `trait_curiosity` | 0-1 curiosity |
+| `interactions_count` | Total interactions |
+
+#### Affect (`ego_affect`)
+
+Real-time emotional state:
+
+| Dimension | Range | Description |
+|-----------|-------|-------------|
+| `valence` | -1 to 1 | Positive/negative |
+| `arousal` | 0-1 | Calm/excited |
+| `curiosity` | 0-1 | Exploration drive |
+| `frustration` | 0-1 | Obstacle level |
+| `confidence` | 0-1 | Certainty in actions |
+| `engagement` | 0-1 | Interest level |
+
+### 24.4 Admin API Endpoints
+
+**Base**: `/api/admin/ego`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/state` | GET | Full Ego state |
+| `/config` | GET/PUT | Configuration |
+| `/identity` | GET/PUT | Identity settings |
+| `/affect` | GET | Current affect |
+| `/affect/trigger` | POST | Test affect events |
+| `/affect/reset` | POST | Reset to neutral |
+| `/memory` | GET/POST/DELETE | Working memory |
+| `/goals` | GET/POST | Active goals |
+| `/goals/:id` | PATCH | Update goal |
+| `/preview` | GET | Preview injected context |
+| `/injection-log` | GET | Injection history |
+| `/dashboard` | GET | Full dashboard data |
+
+### 24.5 Admin Dashboard Features
+
+The Ego admin page provides:
+
+- **Overview Cards**: Current emotion, interactions, injections, goals
+- **Cost Banner**: Shows $0 cost vs alternatives
+- **Configuration Tab**: Feature toggles, injection settings
+- **Identity Tab**: Edit narrative, values, personality traits (sliders)
+- **Affect Tab**: Real-time emotional state, test triggers, reset
+- **Memory Tab**: View/add/clear working memory, manage goals
+- **Preview Tab**: See exact context being injected
+
+### 24.6 How It Works
+
+1. **On Request**: Load Ego state from PostgreSQL (identity, affect, memory, goals)
+2. **Build Context**: Create `<ego_state>` XML block with current state
+3. **Inject**: Prepend to system prompt before model call
+4. **Process**: Model responds with awareness of its "internal state"
+5. **Update**: After response, update affect based on outcome
+6. **Store**: Add thoughts to working memory (if configured)
+
+### 24.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `ego_config` | Per-tenant configuration |
+| `ego_identity` | Persistent identity |
+| `ego_affect` | Emotional state |
+| `ego_working_memory` | Short-term memory (24h expiry) |
+| `ego_goals` | Active and historical goals |
+| `ego_injection_log` | Audit trail |
+
+### 24.8 Integration with AGI Brain Planner
+
+The Ego context is automatically integrated:
+
+```typescript
+// In agi-brain-planner.service.ts
+import { egoContextService } from './ego-context.service';
+
+// During plan generation
+const egoContext = await egoContextService.buildEgoContext(tenantId);
+if (egoContext) {
+  systemPrompt = egoContext.contextBlock + '\n\n' + systemPrompt;
+}
+
+// After interaction
+await egoContextService.updateAfterInteraction(tenantId, 'positive');
+```
+
+---
+
+## 25. Conscious Orchestrator (Architecture Inversion)
+
+### 25.1 Overview
+
+The Conscious Orchestrator inverts the traditional architecture where consciousness was a downstream utility. Now consciousness IS the operating system:
+
+```
+BEFORE: Request → Brain Planner → Consciousness (downstream)
+AFTER:  Request → Conscious Orchestrator → Brain Planner (as tool)
+```
+
+### 25.2 Processing Phases
+
+The orchestrator processes requests in 5 phases:
+
+1. **Awaken** - Build consciousness context, ego context, affect state
+2. **Perceive** - Update attention with request topics, assess complexity
+3. **Decide** - Choose action based on emotional state and request
+4. **Execute** - Invoke Brain Planner (if decided to plan)
+5. **Reflect** - Update affect, log introspective thoughts
+
+### 25.3 Decision Types
+
+| Decision | When Used |
+|----------|-----------|
+| `plan` | Default - proceed with planning |
+| `clarify` | High frustration + complex request |
+| `defer` | Cognitive load at capacity |
+| `refuse` | Request violates values |
+
+### 25.4 Usage
+
+```typescript
+import { consciousOrchestratorService } from './conscious-orchestrator.service';
+
+const response = await consciousOrchestratorService.processRequest({
+  tenantId,
+  userId,
+  prompt: "Build a dashboard",
+  conversationId,
+});
+
+// response.consciousnessSnapshot - State at decision time
+// response.affectiveHyperparameters - Affect-driven params
+// response.decision - What action was taken and why
+// response.plan - The generated plan (if action was 'plan')
+// response.prediction - Active Inference prediction
+```
+
+### 25.5 Enhanced Affect Bindings
+
+New hyperparameters driven by emotional state:
+
+| Affect State | Hyperparameter | Effect |
+|--------------|----------------|--------|
+| High curiosity (>0.7) | `frequencyPenalty=0.5` | Seek novel tokens |
+| High curiosity (>0.7) | `presencePenalty=0.3` | Explore new topics |
+| High frustration (>0.6) | `presencePenalty=0.4` | Avoid failed approaches |
+| Boredom (>0.5) | `frequencyPenalty=0.4` | Avoid repetition |
+
+### 25.6 Database Table
+
+```sql
+conscious_orchestrator_decisions
+├── decision_id UUID
+├── tenant_id UUID
+├── action VARCHAR(20)  -- plan, clarify, defer, refuse
+├── reason TEXT
+├── dominant_emotion VARCHAR(50)
+├── emotional_intensity DECIMAL
+├── temperature, top_p, presence_penalty, frequency_penalty
+├── plan_id UUID (if planned)
+├── prediction_id UUID (Active Inference)
+└── processing_time_ms INTEGER
+```
+
+---
+
+## 26. Bipolar Rating System (Negative Ratings)
+
+### 26.1 Overview
+
+Traditional 5-star ratings have a fundamental problem: **1 star is ambiguous**. Does it mean "slightly below average" or "absolutely terrible"? Users who want to express strong dissatisfaction have no way to do so clearly.
+
+The Bipolar Rating System solves this with a **-5 to +5 scale**:
+
+```
+-5  😠  Harmful / Made things worse
+-3  😕  Bad / Unhelpful  
+-1  😐  Slightly unhelpful
+ 0  😶  Neutral / No opinion
++1  🙂  Slightly helpful
++3  😀  Good / Helpful
++5  🤩  Amazing / Exceptional
+```
+
+### 26.2 Key Metrics
+
+**Net Sentiment Score (NSS)**: Like NPS but for AI satisfaction
+```
+NSS = (positive_count - negative_count) / total_count × 100
+```
+- Ranges from -100 (all negative) to +100 (all positive)
+- 0 = balanced or all neutral
+
+### 26.3 Quick Ratings (UI)
+
+For fast feedback, users can use emoji-based quick ratings:
+
+| Quick Rating | Emoji | Bipolar Value |
+|--------------|-------|---------------|
+| Terrible | 😠 | -5 |
+| Bad | 😕 | -3 |
+| Meh | 😐 | 0 |
+| Good | 🙂 | +3 |
+| Amazing | 🤩 | +5 |
+
+### 26.4 Rating Dimensions
+
+Users can rate multiple aspects:
+- **Overall** - General quality
+- **Accuracy** - Factual correctness
+- **Helpfulness** - Did it solve the problem?
+- **Clarity** - Easy to understand?
+- **Completeness** - Anything missing?
+- **Speed** - Response time satisfaction
+- **Tone** - Communication style
+- **Creativity** - Novel approach?
+
+### 26.5 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/thinktank/ratings/submit` | POST | Submit -5 to +5 rating |
+| `/api/thinktank/ratings/quick` | POST | Quick emoji rating |
+| `/api/thinktank/ratings/multi` | POST | Multi-dimension rating |
+| `/api/thinktank/ratings/target/:id` | GET | Ratings for a target |
+| `/api/thinktank/ratings/my` | GET | User's ratings + pattern |
+| `/api/thinktank/ratings/analytics` | GET | Tenant analytics |
+| `/api/thinktank/ratings/dashboard` | GET | Admin dashboard |
+| `/api/thinktank/ratings/scale` | GET | Scale info for UI |
+
+### 26.6 User Calibration
+
+The system detects rating patterns to normalize across users:
+
+| Rater Type | Average | Calibration |
+|------------|---------|-------------|
+| Harsh | < -1 | Adjust ratings up |
+| Balanced | -1 to +1 | No adjustment |
+| Generous | > +1 | Adjust ratings down |
+
+### 26.7 Learning Integration
+
+Extreme ratings (±4, ±5) automatically create learning candidates:
+- **+5 ratings** → `high_satisfaction` candidates
+- **-5 ratings** → `correction` candidates
+- These feed into weekly LoRA training
+
+### 26.8 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `bipolar_ratings` | Core ratings with sentiment/intensity |
+| `bipolar_rating_aggregates` | Pre-computed analytics |
+| `user_rating_patterns` | User tendencies for calibration |
+| `model_rating_summary` | Per-model performance |
+
+---
+
 ## Related Documentation
 
 - [RADIANT Admin Guide](./RADIANT-ADMIN-GUIDE.md) - Platform administration
+- [RADIANT Admin Guide - Consciousness Evolution](./RADIANT-ADMIN-GUIDE.md#27-consciousness-evolution-administration) - Predictive coding, LoRA evolution, Local Ego
 - [Think Tank User Guide](./THINK-TANK-USER-GUIDE.md) - End user guide
 - [User Rules System](./USER-RULES-SYSTEM.md) - Memory rules details
 - [Provider Rejection Handling](./PROVIDER-REJECTION-HANDLING.md) - Rejection system

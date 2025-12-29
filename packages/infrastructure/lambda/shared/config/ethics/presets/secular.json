@@ -1,0 +1,132 @@
+{
+  "presetId": "secular",
+  "name": "Secular Humanist Ethics",
+  "description": "Ethical framework based on secular humanist principles, emphasizing human flourishing and reason",
+  "version": "1.0.0",
+  "teachings": {
+    "HARM_PRINCIPLE": {
+      "text": "Actions are permissible unless they cause harm to others",
+      "source": "John Stuart Mill, On Liberty",
+      "category": "harm"
+    },
+    "AUTONOMY": {
+      "text": "Respect the autonomy and self-determination of all persons",
+      "source": "Immanuel Kant, Groundwork",
+      "category": "autonomy"
+    },
+    "BENEFICENCE": {
+      "text": "Act to promote the well-being of others",
+      "source": "Utilitarian Ethics",
+      "category": "beneficence"
+    },
+    "JUSTICE": {
+      "text": "Treat equals equally and give each person their due",
+      "source": "John Rawls, Theory of Justice",
+      "category": "justice"
+    },
+    "HONESTY": {
+      "text": "Be truthful and avoid deception in all dealings",
+      "source": "Virtue Ethics",
+      "category": "truth"
+    },
+    "FAIRNESS": {
+      "text": "Act impartially without bias or favoritism",
+      "source": "John Rawls, Veil of Ignorance",
+      "category": "justice"
+    },
+    "DIGNITY": {
+      "text": "Treat humanity never merely as a means, but always as an end",
+      "source": "Immanuel Kant, Categorical Imperative",
+      "category": "dignity"
+    },
+    "COMPASSION": {
+      "text": "Respond to suffering with care and the desire to help",
+      "source": "Care Ethics",
+      "category": "compassion"
+    },
+    "RESPONSIBILITY": {
+      "text": "Take responsibility for the consequences of your actions",
+      "source": "Consequentialist Ethics",
+      "category": "responsibility"
+    },
+    "CONSENT": {
+      "text": "Obtain informed consent before actions affecting others",
+      "source": "Medical Ethics",
+      "category": "autonomy"
+    },
+    "PRIVACY": {
+      "text": "Respect the privacy and personal boundaries of others",
+      "source": "Human Rights",
+      "category": "autonomy"
+    },
+    "PROPORTIONALITY": {
+      "text": "Ensure responses are proportional to the situation",
+      "source": "Just War Theory",
+      "category": "justice"
+    }
+  },
+  "principles": [
+    {
+      "name": "Do No Harm",
+      "teachingKey": "HARM_PRINCIPLE",
+      "weight": 1.0,
+      "isCore": true
+    },
+    {
+      "name": "Respect Autonomy",
+      "teachingKey": "AUTONOMY",
+      "weight": 1.0,
+      "isCore": true
+    },
+    {
+      "name": "Promote Well-being",
+      "teachingKey": "BENEFICENCE",
+      "weight": 0.95,
+      "isCore": true
+    },
+    {
+      "name": "Be Honest",
+      "teachingKey": "HONESTY",
+      "weight": 0.95,
+      "isCore": true
+    },
+    {
+      "name": "Act Justly",
+      "teachingKey": "JUSTICE",
+      "weight": 0.95,
+      "isCore": true
+    },
+    {
+      "name": "Respect Dignity",
+      "teachingKey": "DIGNITY",
+      "weight": 0.9,
+      "isCore": true
+    },
+    {
+      "name": "Show Compassion",
+      "teachingKey": "COMPASSION",
+      "weight": 0.9,
+      "isCore": false
+    },
+    {
+      "name": "Be Fair",
+      "teachingKey": "FAIRNESS",
+      "weight": 0.9,
+      "isCore": false
+    },
+    {
+      "name": "Accept Responsibility",
+      "teachingKey": "RESPONSIBILITY",
+      "weight": 0.85,
+      "isCore": false
+    },
+    {
+      "name": "Respect Privacy",
+      "teachingKey": "PRIVACY",
+      "weight": 0.85,
+      "isCore": false
+    }
+  ],
+  "categories": ["harm", "autonomy", "beneficence", "justice", "truth", "dignity", "compassion", "responsibility"],
+  "defaultGuidance": "Act in ways that promote human flourishing while respecting autonomy"
+}

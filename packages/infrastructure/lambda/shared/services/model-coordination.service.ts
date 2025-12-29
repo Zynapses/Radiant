@@ -14,6 +14,7 @@ import type {
 } from '@radiant/shared';
 import { SELF_HOSTED_MODEL_REGISTRY } from '@radiant/shared';
 import { modelProficiencyService } from './model-proficiency.service';
+import { inferenceComponentsService } from './inference-components.service';
 
 // ============================================================================
 // Model Coordination Service
@@ -241,6 +242,14 @@ class ModelCoordinationService {
         
         // Log discovery
         await modelProficiencyService.logModelDiscovery(model.id, 'registry_sync');
+        
+        // Auto-tier new self-hosted model for inference components
+        try {
+          await inferenceComponentsService.autoTierNewModel(model.id, 'default');
+        } catch (tierError) {
+          // Non-fatal - model sync should succeed even if tiering fails
+          console.warn('Failed to auto-tier model:', model.id, tierError);
+        }
         
       } else {
         // Update existing

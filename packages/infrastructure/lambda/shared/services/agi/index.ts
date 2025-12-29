@@ -7,6 +7,8 @@
 
 // Core AGI Services
 export { ConsciousnessService, consciousnessService } from '../consciousness.service';
+export { consciousnessGraphService } from '../consciousness-graph.service';
+export { consciousnessMiddlewareService } from '../consciousness-middleware.service';
 export { MetacognitionService, metacognitionService } from '../metacognition.service';
 export { MoralCompassService, moralCompassService } from '../moral-compass.service';
 export { SelfImprovementService, selfImprovementService } from '../self-improvement.service';
@@ -50,3 +52,11 @@ export { MultimodalBindingService, multimodalBindingService } from '../multimoda
 
 // Ethics
 export { EthicalGuardrailsService, ethicalGuardrailsService, JESUS_TEACHINGS } from '../ethical-guardrails.service';
+
+// User Persistent Context
+export { userPersistentContextService } from '../user-persistent-context.service';
+
+// Predictive Coding & Learning Evolution
+export { predictiveCodingService } from '../predictive-coding.service';
+export { learningCandidateService } from '../learning-candidate.service';
+export { localEgoService } from '../local-ego.service';

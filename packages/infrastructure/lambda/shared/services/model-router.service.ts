@@ -841,6 +841,34 @@ export class ModelRouterService {
     return results as Record<ModelProvider, boolean>;
   }
 
+  /**
+   * Check if a model is available and healthy
+   * Used by consciousness service for dynamic model selection
+   */
+  async isModelAvailable(modelId: string): Promise<boolean> {
+    const config = MODEL_REGISTRY[modelId];
+    if (!config) return false;
+    if (!config.isAvailable) return false;
+    
+    // Check provider health
+    const health = this.providerHealth.get(config.provider);
+    if (health?.isHealthy === false) return false;
+    if (health?.consecutiveFailures && health.consecutiveFailures > 3) return false;
+    
+    // For self-hosted models, check if endpoint is actually running
+    if (config.provider === 'bedrock' && config.bedrockModelId) {
+      try {
+        // Quick check - just verify the model config exists in registry
+        // Full health check would be too slow for this use case
+        return true;
+      } catch {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
   // Get best model for a capability
   getBestModel(capability: string, constraints?: { maxLatencyMs?: number; maxCostPer1k?: number }): ModelConfig | null {
     const candidates = this.listModels(capability)

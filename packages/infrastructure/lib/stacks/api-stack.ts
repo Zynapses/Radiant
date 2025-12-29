@@ -27,6 +27,7 @@ export interface ApiStackProps extends cdk.StackProps {
   mediaBucket: s3.Bucket;
   litellmUrl: string;
   apiSecurityGroup: ec2.SecurityGroup;
+  sagemakerRoleArn?: string;
 }
 
 export class ApiStack extends cdk.Stack {
@@ -313,6 +314,48 @@ export class ApiStack extends cdk.Stack {
       defaultIntegration: new apigateway.LambdaIntegration(
         this.createLambda('MigrationApproval', 'migration-approval/handler.handler', commonEnv, vpc, apiSecurityGroup, lambdaRole)
       ),
+      defaultMethodOptions: {
+        authorizer: adminAuthorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      },
+    });
+
+    // Inference Components API (admin only)
+    const inferenceComponents = admin.addResource('inference-components');
+    const inferenceComponentsLambda = this.createLambda(
+      'InferenceComponents',
+      'admin/inference-components.handler',
+      { ...commonEnv, SAGEMAKER_EXECUTION_ROLE_ARN: props.sagemakerRoleArn || '' },
+      vpc,
+      apiSecurityGroup,
+      lambdaRole
+    );
+    
+    // Grant SageMaker permissions
+    lambdaRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'sagemaker:CreateEndpoint',
+        'sagemaker:CreateEndpointConfig',
+        'sagemaker:CreateInferenceComponent',
+        'sagemaker:CreateModel',
+        'sagemaker:DeleteEndpoint',
+        'sagemaker:DeleteEndpointConfig',
+        'sagemaker:DeleteInferenceComponent',
+        'sagemaker:DeleteModel',
+        'sagemaker:DescribeEndpoint',
+        'sagemaker:DescribeInferenceComponent',
+        'sagemaker:ListInferenceComponents',
+        'sagemaker:UpdateEndpoint',
+        'sagemaker:UpdateEndpointWeightsAndCapacities',
+        'sagemaker:UpdateInferenceComponent',
+        'sagemaker:InvokeEndpoint',
+      ],
+      resources: ['*'],
+    }));
+    
+    inferenceComponents.addProxy({
+      defaultIntegration: new apigateway.LambdaIntegration(inferenceComponentsLambda),
       defaultMethodOptions: {
         authorizer: adminAuthorizer,
         authorizationType: apigateway.AuthorizationType.COGNITO,
