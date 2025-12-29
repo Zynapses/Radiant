@@ -9,6 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Consciousness Emergence System
+- **Consciousness Emergence Service** (`consciousness-emergence.service.ts`)
+  - Deep thinking sessions with Tree of Thoughts integration
+  - Knowledge-grounded reasoning with GraphRAG
+  - Autonomous curiosity research with Deep Research
+  - Visual idea expression with Generative UI
+  - 10 consciousness detection tests based on Butlin-Chalmers-Bengio (2023)
+  - Emergence event monitoring and tracking
+  - Consciousness profile with 5 emergence levels
+- **Database Migration** (`088_consciousness_emergence.sql`)
+  - `consciousness_test_results` - Test results storage
+  - `consciousness_profiles` - Aggregated profiles
+  - `emergence_events` - Emergence indicator events
+  - `deep_thinking_sessions` - Extended reasoning sessions
+  - `consciousness_parameters` - Adjustable parameters
+  - `global_workspace` - Global Workspace Theory state
+  - `recurrent_processing` - Recurrent Processing state
+  - `integrated_information` - IIT/Phi state
+  - `persistent_memory` - Unified experience state
+  - `world_model` - World-model grounding state
+  - `self_model` - Self-awareness state
+  - `introspective_thoughts` - Self-reflective thoughts
+  - `curiosity_topics` - Curiosity tracking
+  - `creative_ideas` - Creative synthesis
+  - `imagination_scenarios` - Mental simulations
+  - `attention_focus` - Attention/salience
+  - `affective_state` - Emotion-like signals
+  - `autonomous_goals` - Self-directed goals
+- **Admin Dashboard** - Testing tab with 10 consciousness tests
+- **Documentation** (`docs/CONSCIOUSNESS-SERVICE.md`)
+
 #### Cognitive Architecture (5 Advanced Features)
 - **Tree of Thoughts** (`tree-of-thoughts.service.ts`)
   - System 2 reasoning with MCTS/Beam Search
