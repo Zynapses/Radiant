@@ -1126,24 +1126,94 @@ Automatic detection of:
 - Brute force attacks
 - Unusual API patterns
 
-### 13.3 Compliance Reports
+### 15.3 Compliance Dashboard
 
-Navigate to **Compliance** to generate:
+Navigate to **Compliance** to access five tabs:
 
-| Framework | Description |
-|-----------|-------------|
-| **SOC 2** | Service organization controls |
-| **HIPAA** | Healthcare data protection |
-| **GDPR** | EU data protection |
-| **ISO 27001** | Information security |
+| Tab | Purpose |
+|-----|---------|
+| **Reports** | SOC 2, HIPAA, GDPR, ISO 27001 compliance reports |
+| **GDPR** | Data subject requests and consent management |
+| **HIPAA** | PHI protection and access controls |
+| **Breaches** | Data breach incident tracking |
+| **Retention** | Data retention policy configuration |
 
-### 13.4 Generating Reports
+### 15.4 GDPR Management
 
-1. Click **"Generate Report"**
-2. Select framework
-3. Choose date range
-4. Select metrics to include
-5. Generate PDF/CSV
+The GDPR tab provides:
+
+**Data Subject Requests** (Articles 15-22):
+| Request Type | Description | Deadline |
+|--------------|-------------|----------|
+| Access | Export all user data | 30 days |
+| Rectification | Correct personal data | 30 days |
+| Erasure | Right to be forgotten | 30 days |
+| Restriction | Limit processing | 30 days |
+| Portability | Machine-readable export | 30 days |
+| Objection | Object to processing | 30 days |
+
+**Processing Requests:**
+1. Navigate to **Compliance → GDPR**
+2. View pending requests with deadlines
+3. Click **"Process"** to fulfill request
+4. System automatically exports/deletes data
+5. Request marked complete with audit trail
+
+### 15.5 HIPAA Configuration
+
+The HIPAA tab provides per-tenant settings:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| **HIPAA Mode** | Off | Enable all HIPAA features |
+| **PHI Detection** | On | Auto-detect PHI in requests |
+| **PHI Encryption** | On | Column-level encryption |
+| **Enhanced Logging** | On | Detailed PHI access logs |
+| **MFA Required** | On | Require MFA for all users |
+| **Session Timeout** | 15 min | Auto-logout after inactivity |
+| **Access Review** | 90 days | Periodic access review period |
+| **PHI Retention** | 2190 days | 6 years per HIPAA |
+| **Audit Retention** | 2555 days | 7 years recommended |
+
+### 15.6 Data Breach Management
+
+The Breaches tab tracks security incidents:
+
+**Incident Types:**
+- Unauthorized access
+- Data theft
+- Ransomware
+- Accidental disclosure
+- System breach
+- Insider threat
+
+**Notification Requirements:**
+| Regulation | Notify | Timeline |
+|------------|--------|----------|
+| GDPR | DPA + affected users | 72 hours |
+| HIPAA | HHS + affected individuals | 60 days |
+
+### 15.7 Data Retention Policies
+
+Default retention periods:
+
+| Data Type | Retention | Legal Basis | Action |
+|-----------|-----------|-------------|--------|
+| Session Data | 90 days | Legitimate Interest | Delete |
+| Usage Analytics | 2 years | Legitimate Interest | Anonymize |
+| Audit Logs | 7 years | Legal Obligation | Archive |
+| PHI Data | 6 years | Legal Obligation | Archive |
+| Billing Records | 7 years | Legal Obligation | Archive |
+| GDPR Requests | 3 years | Legal Obligation | Archive |
+| Consent Records | 7 years | Legal Obligation | Archive |
+
+### 15.8 Generating Compliance Reports
+
+1. Navigate to **Compliance → Reports**
+2. Select framework (SOC 2, HIPAA, GDPR, ISO 27001)
+3. Click **"Generate Report"**
+4. View compliance score and findings
+5. Export to PDF for auditors
 
 ---
 
