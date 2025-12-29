@@ -5,6 +5,39 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.7] - 2024-12-28
+
+### Added
+
+#### Model Proficiency Registry (Persistent Database Rankings)
+- **Database Persistence** - Proficiency rankings now stored in `model_proficiency_rankings` table
+  - Individual rows per model/domain/mode combination
+  - Ranks computed and stored with strength levels
+  - Automatic recomputation on model changes
+- **Discovery Audit Log** - Model additions tracked in `model_discovery_log`
+  - Source tracking: admin, registry_sync, huggingface, auto
+  - Proficiency generation status and duration
+  - Error tracking for failed generations
+- **Enhanced Service** (`model-proficiency.service.ts`)
+  - `storeProficiencyRankings()` - Persist rankings to database
+  - `logModelDiscovery()` - Create audit log entry
+  - `completeModelDiscovery()` - Mark generation complete
+  - `getAllRankingsFromDB()` - Retrieve persisted rankings
+  - `getDiscoveryLog()` - Retrieve audit log
+  - `recomputeAllRankings()` - Recompute and update all rankings
+- **Admin API** (`admin/model-proficiency.ts`)
+  - `GET /rankings` - All rankings from database
+  - `GET /rankings/domain/:domain` - Domain-specific rankings
+  - `GET /rankings/mode/:mode` - Mode-specific rankings
+  - `GET /rankings/model/:modelId` - Model's full profile
+  - `POST /rankings/recompute` - Trigger recomputation
+  - `POST /compare` - Compare multiple models
+  - `POST /best-for-task` - Find best for a task
+  - `GET /discovery-log` - Audit log entries
+  - `POST /discover` - Manual model discovery
+  - `POST /sync-registry` - Sync code registry to DB
+  - `GET /overview` - Summary statistics
+
 ## [4.18.6] - 2024-12-28
 
 ### Added

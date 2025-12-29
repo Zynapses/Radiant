@@ -32,6 +32,7 @@
 19. [Troubleshooting](#19-troubleshooting)
 20. [Delight System Administration](#20-delight-system-administration)
 21. [Domain Ethics Registry](#21-domain-ethics-registry)
+22. [Model Proficiency Registry](#22-model-proficiency-registry)
 
 ---
 
@@ -2220,5 +2221,77 @@ These frameworks **cannot be disabled** as they protect against serious harm:
 
 ---
 
-*Document Version: 4.18.5*
+## 23. Model Proficiency Registry
+
+**Location**: Admin Dashboard → AI Configuration → Model Proficiency
+
+The Model Proficiency Registry tracks and ranks all 56 self-hosted models across 15 domains and 9 orchestration modes.
+
+### 23.1 What's Tracked
+
+**Per Model**:
+- Proficiency scores (0-100) for each domain
+- Rank within each domain (1 = best)
+- Strength level (excellent, good, moderate, basic)
+- Mode scores for each orchestration mode
+- Capability match counts
+
+**Database Tables**:
+| Table | Purpose |
+|-------|---------|
+| `model_proficiency_rankings` | Ranked scores per domain/mode |
+| `model_discovery_log` | Audit trail of model additions |
+
+### 23.2 15 Domains Ranked
+
+software_engineering, mathematics, science, business, creative, healthcare, legal, education, finance, marketing, visual_analysis, audio_processing, multilingual, general, retrieval
+
+### 23.3 9 Orchestration Modes Ranked
+
+thinking, extended_thinking, coding, creative, research, analysis, multi_model, chain_of_thought, self_consistency
+
+### 23.4 Admin API Endpoints
+
+**Base**: `/api/admin/model-proficiency`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/rankings` | GET | Get all rankings from database |
+| `/rankings/domain/:domain` | GET | Get rankings for a domain |
+| `/rankings/mode/:mode` | GET | Get rankings for a mode |
+| `/rankings/model/:modelId` | GET | Get model's full profile |
+| `/rankings/recompute` | POST | Recompute all rankings |
+| `/compare` | POST | Compare multiple models |
+| `/best-for-task` | POST | Find best models for a task |
+| `/discovery-log` | GET | Get model discovery audit log |
+| `/discover` | POST | Manually trigger discovery |
+| `/sync-registry` | POST | Sync code registry to database |
+| `/overview` | GET | Get summary statistics |
+
+### 23.5 Automatic Proficiency Generation
+
+When a new model is discovered or added:
+1. **Discovery logged** in `model_discovery_log`
+2. **Proficiencies computed** for all 15 domains
+3. **Mode scores computed** for all 9 modes
+4. **Rankings stored** in `model_proficiency_rankings`
+5. **Status updated** to 'completed'
+
+### 23.6 Ranking Computation
+
+Domain scores consider:
+- Explicit domain strengths from model metadata
+- Capability matches (e.g., 'code_generation' → software_engineering)
+- Quality tier bonuses (premium +10, standard +5)
+- Latency class adjustments
+
+Mode scores consider:
+- Required capabilities for the mode
+- Model family bonuses (e.g., CodeLlama → coding mode)
+- Context window size (extended_thinking needs 100k+)
+- PreferredFor hints from model metadata
+
+---
+
+*Document Version: 4.18.6*
 *Last Updated: December 2024*

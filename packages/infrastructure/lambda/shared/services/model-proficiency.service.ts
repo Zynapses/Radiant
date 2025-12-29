@@ -559,9 +559,251 @@ class ModelProficiencyService {
           { name: 'huggingfaceId', value: model.huggingFaceId ? { stringValue: model.huggingFaceId } : { isNull: true } },
         ]
       );
+      
+      // Also store individual proficiency rankings in model_proficiency_rankings table
+      await this.storeProficiencyRankings(model.id, domainScores, modeScores);
+      
     } catch (error) {
       console.error(`Failed to store proficiencies for ${model.id}:`, error);
     }
+  }
+  
+  /**
+   * Store individual proficiency rankings in the dedicated rankings table
+   */
+  private async storeProficiencyRankings(
+    modelId: string,
+    domainScores: Array<{ domain: string; score: number; strength: DomainStrength }>,
+    modeScores: Array<{ mode: string; score: number }>
+  ): Promise<void> {
+    // Store domain proficiencies
+    for (const ds of domainScores) {
+      if (ds.score > 0) {
+        await executeStatement(
+          `INSERT INTO model_proficiency_rankings (
+             model_id, domain, proficiency_score, strength_level, computed_at
+           ) VALUES ($1, $2, $3, $4, NOW())
+           ON CONFLICT (model_id, domain, subspecialty, orchestration_mode) 
+           DO UPDATE SET 
+             proficiency_score = $3,
+             strength_level = $4,
+             computed_at = NOW()`,
+          [
+            { name: 'modelId', value: { stringValue: modelId } },
+            { name: 'domain', value: { stringValue: ds.domain } },
+            { name: 'score', value: { doubleValue: ds.score } },
+            { name: 'strength', value: { stringValue: ds.strength } },
+          ]
+        );
+      }
+    }
+    
+    // Store mode proficiencies
+    for (const ms of modeScores) {
+      if (ms.score > 0) {
+        await executeStatement(
+          `INSERT INTO model_proficiency_rankings (
+             model_id, domain, orchestration_mode, mode_score, computed_at
+           ) VALUES ($1, '__mode__', $2, $3, NOW())
+           ON CONFLICT (model_id, domain, subspecialty, orchestration_mode) 
+           DO UPDATE SET 
+             mode_score = $3,
+             computed_at = NOW()`,
+          [
+            { name: 'modelId', value: { stringValue: modelId } },
+            { name: 'mode', value: { stringValue: ms.mode } },
+            { name: 'score', value: { doubleValue: ms.score } },
+          ]
+        );
+      }
+    }
+  }
+  
+  /**
+   * Log model discovery to the discovery log table
+   */
+  async logModelDiscovery(
+    modelId: string,
+    source: 'admin' | 'registry_sync' | 'huggingface' | 'auto',
+    discoveredBy?: string,
+    capabilities?: string[]
+  ): Promise<string> {
+    const model = getSelfHostedModelById(modelId);
+    
+    const result = await executeStatement(
+      `INSERT INTO model_discovery_log (
+         model_id, discovery_source, discovered_by,
+         model_family, parameter_count, capabilities_detected, status
+       ) VALUES ($1, $2, $3, $4, $5, $6, 'pending')
+       RETURNING id`,
+      [
+        { name: 'modelId', value: { stringValue: modelId } },
+        { name: 'source', value: { stringValue: source } },
+        { name: 'discoveredBy', value: discoveredBy ? { stringValue: discoveredBy } : { isNull: true } },
+        { name: 'family', value: model ? { stringValue: model.family } : { isNull: true } },
+        { name: 'paramCount', value: model ? { stringValue: model.parameterCount } : { isNull: true } },
+        { name: 'capabilities', value: capabilities ? { stringValue: `{${capabilities.join(',')}}` } : { isNull: true } },
+      ]
+    );
+    
+    return result.records?.[0]?.[0]?.stringValue || '';
+  }
+  
+  /**
+   * Complete model discovery with proficiency generation
+   */
+  async completeModelDiscovery(logId: string, durationMs: number): Promise<void> {
+    await executeStatement(
+      `UPDATE model_discovery_log SET
+         proficiencies_generated = true,
+         generation_timestamp = NOW(),
+         generation_duration_ms = $2,
+         status = 'completed'
+       WHERE id = $1`,
+      [
+        { name: 'logId', value: { stringValue: logId } },
+        { name: 'durationMs', value: { longValue: durationMs } },
+      ]
+    );
+  }
+  
+  /**
+   * Mark model discovery as failed
+   */
+  async failModelDiscovery(logId: string, errorMessage: string): Promise<void> {
+    await executeStatement(
+      `UPDATE model_discovery_log SET
+         status = 'failed',
+         error_message = $2
+       WHERE id = $1`,
+      [
+        { name: 'logId', value: { stringValue: logId } },
+        { name: 'error', value: { stringValue: errorMessage } },
+      ]
+    );
+  }
+  
+  /**
+   * Get all proficiency rankings from database
+   */
+  async getAllRankingsFromDB(): Promise<Array<{
+    modelId: string;
+    domain: string;
+    score: number;
+    rank: number;
+    strength: string;
+    mode?: string;
+    modeScore?: number;
+    modeRank?: number;
+  }>> {
+    const result = await executeStatement(
+      `SELECT model_id, domain, proficiency_score, rank_in_domain, strength_level,
+              orchestration_mode, mode_score, rank_in_mode
+       FROM model_proficiency_rankings
+       ORDER BY domain, rank_in_domain`,
+      []
+    );
+    
+    return (result.records || []).map(row => ({
+      modelId: (row[0] as { stringValue?: string }).stringValue || '',
+      domain: (row[1] as { stringValue?: string }).stringValue || '',
+      score: Number((row[2] as { doubleValue?: number }).doubleValue || 0),
+      rank: Number((row[3] as { longValue?: number }).longValue || 0),
+      strength: (row[4] as { stringValue?: string }).stringValue || 'basic',
+      mode: (row[5] as { stringValue?: string }).stringValue,
+      modeScore: (row[6] as { doubleValue?: number }).doubleValue,
+      modeRank: (row[7] as { longValue?: number }).longValue,
+    }));
+  }
+  
+  /**
+   * Get discovery log entries
+   */
+  async getDiscoveryLog(limit = 50): Promise<Array<{
+    id: string;
+    modelId: string;
+    source: string;
+    family?: string;
+    status: string;
+    proficienciesGenerated: boolean;
+    createdAt: Date;
+  }>> {
+    const result = await executeStatement(
+      `SELECT id, model_id, discovery_source, model_family, status, 
+              proficiencies_generated, created_at
+       FROM model_discovery_log
+       ORDER BY created_at DESC
+       LIMIT $1`,
+      [{ name: 'limit', value: { longValue: limit } }]
+    );
+    
+    return (result.records || []).map(row => ({
+      id: (row[0] as { stringValue?: string }).stringValue || '',
+      modelId: (row[1] as { stringValue?: string }).stringValue || '',
+      source: (row[2] as { stringValue?: string }).stringValue || '',
+      family: (row[3] as { stringValue?: string }).stringValue,
+      status: (row[4] as { stringValue?: string }).stringValue || 'pending',
+      proficienciesGenerated: (row[5] as { booleanValue?: boolean }).booleanValue || false,
+      createdAt: new Date((row[6] as { stringValue?: string }).stringValue || ''),
+    }));
+  }
+  
+  /**
+   * Recompute all rankings and update the database
+   */
+  async recomputeAllRankings(): Promise<{ domainsUpdated: number; modesUpdated: number }> {
+    let domainsUpdated = 0;
+    let modesUpdated = 0;
+    
+    // Compute and store domain rankings
+    for (const domain of ALL_DOMAINS) {
+      const ranking = await this.getDomainRanking(domain);
+      
+      for (let i = 0; i < ranking.models.length; i++) {
+        const model = ranking.models[i];
+        await executeStatement(
+          `UPDATE model_proficiency_rankings SET
+             rank_in_domain = $3,
+             proficiency_score = $4,
+             strength_level = $5,
+             computed_at = NOW()
+           WHERE model_id = $1 AND domain = $2`,
+          [
+            { name: 'modelId', value: { stringValue: model.modelId } },
+            { name: 'domain', value: { stringValue: domain } },
+            { name: 'rank', value: { longValue: i + 1 } },
+            { name: 'score', value: { doubleValue: model.score } },
+            { name: 'strength', value: { stringValue: model.strengthLevel } },
+          ]
+        );
+        domainsUpdated++;
+      }
+    }
+    
+    // Compute and store mode rankings
+    for (const mode of ORCHESTRATION_MODES) {
+      const ranking = await this.getModeRanking(mode);
+      
+      for (let i = 0; i < ranking.models.length; i++) {
+        const model = ranking.models[i];
+        await executeStatement(
+          `UPDATE model_proficiency_rankings SET
+             rank_in_mode = $3,
+             mode_score = $4,
+             computed_at = NOW()
+           WHERE model_id = $1 AND orchestration_mode = $2`,
+          [
+            { name: 'modelId', value: { stringValue: model.modelId } },
+            { name: 'mode', value: { stringValue: mode } },
+            { name: 'rank', value: { longValue: i + 1 } },
+            { name: 'score', value: { doubleValue: model.score } },
+          ]
+        );
+        modesUpdated++;
+      }
+    }
+    
+    return { domainsUpdated, modesUpdated };
   }
   
   private async generateDomainProficiencies(domain: string): Promise<void> {
