@@ -706,3 +706,647 @@ export const DEFAULT_UI_FEEDBACK_CONFIG: UIFeedbackConfig = {
   enableVisionAnalysis: true,
   visionModel: 'claude-3-5-sonnet',
 };
+
+// ============================================================================
+// MULTI-PAGE GENERATIVE UI ("Web App Generator")
+// Transforms Think Tank into a full web application generator
+// "Claude can describe a todo app, but now it can BUILD the todo app"
+// ============================================================================
+
+/**
+ * Multi-page application types supported
+ */
+export type MultiPageAppType =
+  | 'web_app'           // Full interactive web application
+  | 'dashboard'         // Multi-view analytics dashboard
+  | 'wizard'            // Multi-step form/process
+  | 'documentation'     // Documentation site with pages
+  | 'portfolio'         // Personal/business portfolio
+  | 'landing_page'      // Marketing landing page with sections
+  | 'tutorial'          // Interactive step-by-step tutorial
+  | 'report'            // Multi-section business report
+  | 'admin_panel'       // Admin interface with CRUD
+  | 'e_commerce'        // Product catalog with cart
+  | 'blog';             // Blog with posts and categories
+
+/**
+ * A complete multi-page generated application
+ */
+export interface GeneratedMultiPageApp {
+  id: string;
+  tenantId: string;
+  userId: string;
+  conversationId: string;
+  
+  // App metadata
+  name: string;
+  description: string;
+  appType: MultiPageAppType;
+  icon?: string;
+  
+  // Pages
+  pages: GeneratedPage[];
+  homePage: string; // Page ID of home/landing page
+  
+  // Navigation
+  navigation: AppNavigation;
+  
+  // Global state (shared across pages)
+  globalState: Record<string, unknown>;
+  
+  // Theme and styling
+  theme: AppTheme;
+  
+  // Data sources
+  dataSources: DataSource[];
+  
+  // Actions/API endpoints
+  actions: AppAction[];
+  
+  // Generated assets
+  assets: GeneratedAsset[];
+  
+  // Build info
+  buildStatus: 'draft' | 'building' | 'ready' | 'deployed';
+  previewUrl?: string;
+  
+  // Metadata
+  createdAt: Date;
+  updatedAt: Date;
+  version: number;
+}
+
+/**
+ * A single page within a multi-page app
+ */
+export interface GeneratedPage {
+  id: string;
+  slug: string; // URL path e.g., "about", "settings/profile"
+  title: string;
+  description?: string;
+  
+  // Page type
+  pageType: PageType;
+  
+  // Layout and components
+  layout: PageLayout;
+  sections: PageSection[];
+  
+  // Page-specific state
+  localState: Record<string, unknown>;
+  
+  // SEO
+  meta?: PageMeta;
+  
+  // Access control
+  requiresAuth?: boolean;
+  allowedRoles?: string[];
+  
+  // Navigation
+  showInNav: boolean;
+  navOrder?: number;
+  navIcon?: string;
+  parentPageId?: string; // For nested navigation
+}
+
+export type PageType =
+  | 'home'              // Landing/home page
+  | 'list'              // List view (e.g., products, posts)
+  | 'detail'            // Detail view (single item)
+  | 'form'              // Input form
+  | 'dashboard'         // Analytics/metrics view
+  | 'settings'          // Configuration page
+  | 'profile'           // User profile
+  | 'about'             // About/info page
+  | 'contact'           // Contact form
+  | 'search'            // Search results
+  | 'error'             // Error page (404, 500)
+  | 'auth'              // Login/register
+  | 'custom';           // Custom page type
+
+/**
+ * Page layout configuration
+ */
+export interface PageLayout {
+  type: 'full_width' | 'centered' | 'sidebar_left' | 'sidebar_right' | 'two_column' | 'three_column';
+  maxWidth?: string;
+  padding?: string;
+  background?: string;
+  
+  // Header/footer for this page
+  showHeader: boolean;
+  showFooter: boolean;
+  showBreadcrumbs: boolean;
+}
+
+/**
+ * A section within a page
+ */
+export interface PageSection {
+  id: string;
+  title?: string;
+  
+  // Section type determines rendering
+  sectionType: SectionType;
+  
+  // Components within this section
+  components: UIComponentSchema[];
+  
+  // Section layout
+  layout: 'stack' | 'grid' | 'flex' | 'masonry';
+  columns?: number;
+  gap?: string;
+  
+  // Styling
+  background?: string;
+  padding?: string;
+  
+  // Visibility conditions
+  visibleIf?: string; // Expression to evaluate
+}
+
+export type SectionType =
+  | 'hero'              // Large hero section
+  | 'features'          // Feature grid/list
+  | 'content'           // Text/rich content
+  | 'gallery'           // Image gallery
+  | 'testimonials'      // Customer testimonials
+  | 'pricing'           // Pricing table
+  | 'cta'               // Call to action
+  | 'stats'             // Statistics/metrics
+  | 'team'              // Team members
+  | 'faq'               // FAQ accordion
+  | 'contact'           // Contact form
+  | 'data_table'        // Data table/grid
+  | 'chart_grid'        // Multiple charts
+  | 'form'              // Input form
+  | 'custom';           // Custom section
+
+/**
+ * Application navigation structure
+ */
+export interface AppNavigation {
+  type: 'top_bar' | 'sidebar' | 'bottom_tabs' | 'hamburger' | 'breadcrumb' | 'none';
+  
+  // Main navigation items
+  items: NavItem[];
+  
+  // Secondary actions (e.g., user menu)
+  secondaryItems?: NavItem[];
+  
+  // Logo/brand
+  brand?: {
+    text?: string;
+    logo?: string;
+    link?: string;
+  };
+  
+  // Mobile behavior
+  mobileBreakpoint?: number;
+  mobileType?: 'hamburger' | 'bottom_tabs' | 'drawer';
+}
+
+export interface NavItem {
+  id: string;
+  label: string;
+  icon?: string;
+  
+  // Link target
+  pageId?: string;      // Internal page link
+  href?: string;        // External link
+  action?: string;      // Action to trigger
+  
+  // Children for dropdowns
+  children?: NavItem[];
+  
+  // Visibility
+  requiresAuth?: boolean;
+  visibleIf?: string;
+}
+
+/**
+ * Application theme
+ */
+export interface AppTheme {
+  mode: 'light' | 'dark' | 'system';
+  
+  // Colors
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    surface: string;
+    text: string;
+    textSecondary: string;
+    border: string;
+    error: string;
+    warning: string;
+    success: string;
+    info: string;
+  };
+  
+  // Typography
+  fonts: {
+    heading: string;
+    body: string;
+    mono: string;
+  };
+  
+  // Spacing and sizing
+  borderRadius: 'none' | 'small' | 'medium' | 'large' | 'full';
+  spacing: 'compact' | 'normal' | 'comfortable';
+  
+  // Custom CSS
+  customCss?: string;
+}
+
+/**
+ * Data source for the application
+ */
+export interface DataSource {
+  id: string;
+  name: string;
+  type: 'static' | 'api' | 'database' | 'file' | 'computed';
+  
+  // For static data
+  data?: unknown;
+  
+  // For API data
+  endpoint?: string;
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  headers?: Record<string, string>;
+  
+  // Transform/mapping
+  transform?: string; // JavaScript expression to transform data
+  
+  // Caching
+  cacheDuration?: number; // seconds
+  
+  // Refresh
+  autoRefresh?: boolean;
+  refreshInterval?: number;
+}
+
+/**
+ * Application action (like an API endpoint)
+ */
+export interface AppAction {
+  id: string;
+  name: string;
+  description?: string;
+  
+  // Trigger
+  trigger: 'button_click' | 'form_submit' | 'page_load' | 'interval' | 'event';
+  
+  // Action type
+  type: 'navigate' | 'api_call' | 'update_state' | 'show_modal' | 'download' | 'share' | 'custom';
+  
+  // Action configuration
+  config: Record<string, unknown>;
+  
+  // Feedback
+  successMessage?: string;
+  errorMessage?: string;
+}
+
+/**
+ * Generated asset (images, icons, etc.)
+ */
+export interface GeneratedAsset {
+  id: string;
+  type: 'image' | 'icon' | 'illustration' | 'logo' | 'favicon';
+  name: string;
+  url?: string;
+  base64?: string;
+  prompt?: string; // AI generation prompt used
+}
+
+/**
+ * Page SEO metadata
+ */
+export interface PageMeta {
+  title?: string;
+  description?: string;
+  keywords?: string[];
+  ogImage?: string;
+  canonical?: string;
+}
+
+// ============================================================================
+// SPECIFIC MULTI-PAGE APP TEMPLATES
+// ============================================================================
+
+/**
+ * Dashboard app configuration
+ */
+export interface DashboardAppConfig {
+  appType: 'dashboard';
+  
+  // Dashboard-specific
+  refreshInterval?: number;
+  
+  pages: {
+    overview: boolean;
+    analytics: boolean;
+    reports: boolean;
+    settings: boolean;
+  };
+  
+  // Widgets available
+  widgets: DashboardWidget[];
+  
+  // Data sources
+  metrics: MetricDefinition[];
+}
+
+export interface DashboardWidget {
+  id: string;
+  type: 'metric_card' | 'line_chart' | 'bar_chart' | 'pie_chart' | 'table' | 'list' | 'map' | 'calendar';
+  title: string;
+  dataSource: string;
+  size: 'small' | 'medium' | 'large' | 'full';
+  refreshable: boolean;
+}
+
+export interface MetricDefinition {
+  id: string;
+  name: string;
+  formula: string;
+  format: 'number' | 'currency' | 'percentage' | 'duration';
+  trend?: 'up_good' | 'down_good' | 'neutral';
+}
+
+/**
+ * Wizard/multi-step form configuration
+ */
+export interface WizardAppConfig {
+  appType: 'wizard';
+  
+  // Steps
+  steps: WizardStep[];
+  
+  // Navigation
+  allowSkip: boolean;
+  allowBack: boolean;
+  showProgress: boolean;
+  progressStyle: 'bar' | 'steps' | 'dots';
+  
+  // Completion
+  onComplete: 'submit' | 'navigate' | 'download' | 'custom';
+  completionPage?: string;
+  
+  // Validation
+  validateOnStep: boolean;
+  validateOnComplete: boolean;
+}
+
+export interface WizardStep {
+  id: string;
+  title: string;
+  description?: string;
+  icon?: string;
+  
+  // Fields in this step
+  fields: FormField[];
+  
+  // Validation
+  validationRules?: Record<string, string>;
+  
+  // Conditional logic
+  skipIf?: string; // Expression to evaluate
+}
+
+/**
+ * Documentation site configuration
+ */
+export interface DocumentationAppConfig {
+  appType: 'documentation';
+  
+  // Structure
+  sections: DocSection[];
+  
+  // Features
+  search: boolean;
+  tableOfContents: boolean;
+  codeHighlighting: boolean;
+  copyCode: boolean;
+  
+  // Navigation
+  showPrevNext: boolean;
+  showBreadcrumbs: boolean;
+  
+  // Theme
+  syntaxTheme: 'github' | 'dracula' | 'monokai' | 'vs';
+}
+
+export interface DocSection {
+  id: string;
+  title: string;
+  icon?: string;
+  
+  pages: DocPage[];
+}
+
+export interface DocPage {
+  id: string;
+  slug: string;
+  title: string;
+  content: string; // Markdown content
+  order: number;
+}
+
+/**
+ * E-commerce app configuration
+ */
+export interface ECommerceAppConfig {
+  appType: 'e_commerce';
+  
+  // Product configuration
+  products: ProductConfig[];
+  categories: CategoryConfig[];
+  
+  // Features
+  cart: boolean;
+  wishlist: boolean;
+  search: boolean;
+  filters: boolean;
+  reviews: boolean;
+  
+  // Checkout
+  checkoutSteps: ('cart' | 'shipping' | 'payment' | 'confirmation')[];
+  
+  // Currency
+  currency: string;
+  currencySymbol: string;
+}
+
+export interface ProductConfig {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  images: string[];
+  category: string;
+  variants?: ProductVariant[];
+  inStock: boolean;
+}
+
+export interface ProductVariant {
+  id: string;
+  name: string;
+  options: string[];
+  priceModifier?: number;
+}
+
+export interface CategoryConfig {
+  id: string;
+  name: string;
+  slug: string;
+  parentId?: string;
+  image?: string;
+}
+
+/**
+ * Blog app configuration
+ */
+export interface BlogAppConfig {
+  appType: 'blog';
+  
+  // Posts
+  posts: BlogPost[];
+  categories: string[];
+  tags: string[];
+  
+  // Features
+  comments: boolean;
+  search: boolean;
+  archives: boolean;
+  relatedPosts: boolean;
+  socialShare: boolean;
+  
+  // Layout
+  listLayout: 'cards' | 'list' | 'magazine';
+  postsPerPage: number;
+}
+
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string; // Markdown
+  author: string;
+  publishedAt: Date;
+  category: string;
+  tags: string[];
+  featuredImage?: string;
+}
+
+// ============================================================================
+// MULTI-PAGE APP DETECTION
+// ============================================================================
+
+/**
+ * Detection result for multi-page app opportunity
+ */
+export interface MultiPageDetectionResult {
+  shouldGenerate: boolean;
+  confidence: number;
+  suggestedType: MultiPageAppType;
+  suggestedPages: string[];
+  reason: string;
+  complexity: 'simple' | 'moderate' | 'complex';
+  estimatedBuildTime: number; // seconds
+}
+
+/**
+ * Keywords that trigger multi-page app generation
+ */
+export const MULTI_PAGE_TRIGGERS: Record<MultiPageAppType, string[]> = {
+  web_app: ['build me', 'create app', 'make an app', 'web application', 'interactive app'],
+  dashboard: ['dashboard', 'analytics dashboard', 'admin dashboard', 'metrics dashboard', 'monitoring'],
+  wizard: ['wizard', 'multi-step', 'step by step form', 'onboarding flow', 'registration flow'],
+  documentation: ['documentation', 'docs site', 'api docs', 'help center', 'knowledge base'],
+  portfolio: ['portfolio', 'personal website', 'showcase', 'my website', 'professional site'],
+  landing_page: ['landing page', 'marketing page', 'product page', 'homepage', 'sales page'],
+  tutorial: ['tutorial', 'course', 'learning path', 'how-to guide', 'interactive lesson'],
+  report: ['report', 'business report', 'analysis report', 'quarterly report', 'annual report'],
+  admin_panel: ['admin panel', 'admin interface', 'management system', 'cms', 'back office'],
+  e_commerce: ['e-commerce', 'online store', 'shop', 'product catalog', 'storefront'],
+  blog: ['blog', 'news site', 'magazine', 'articles', 'content site'],
+};
+
+// ============================================================================
+// MULTI-PAGE APP GENERATION
+// ============================================================================
+
+export interface MultiPageGenerationRequest {
+  tenantId: string;
+  userId: string;
+  conversationId: string;
+  messageId: string;
+  
+  // User's request
+  prompt: string;
+  
+  // Optional specifics
+  appType?: MultiPageAppType;
+  requestedPages?: string[];
+  theme?: Partial<AppTheme>;
+  
+  // Generation options
+  includeExampleData: boolean;
+  generateAssets: boolean;
+  targetComplexity: 'minimal' | 'standard' | 'full';
+}
+
+export interface MultiPageGenerationResult {
+  success: boolean;
+  app?: GeneratedMultiPageApp;
+  error?: string;
+  
+  // Generation stats
+  pagesGenerated: number;
+  componentsGenerated: number;
+  generationTimeMs: number;
+  tokensUsed: number;
+}
+
+// ============================================================================
+// DEFAULT CONFIGURATIONS
+// ============================================================================
+
+export const DEFAULT_APP_THEME: AppTheme = {
+  mode: 'light',
+  colors: {
+    primary: '#3b82f6',
+    secondary: '#6366f1',
+    accent: '#f59e0b',
+    background: '#ffffff',
+    surface: '#f8fafc',
+    text: '#1e293b',
+    textSecondary: '#64748b',
+    border: '#e2e8f0',
+    error: '#ef4444',
+    warning: '#f59e0b',
+    success: '#22c55e',
+    info: '#3b82f6',
+  },
+  fonts: {
+    heading: 'Inter, system-ui, sans-serif',
+    body: 'Inter, system-ui, sans-serif',
+    mono: 'JetBrains Mono, monospace',
+  },
+  borderRadius: 'medium',
+  spacing: 'normal',
+};
+
+export const DEFAULT_PAGE_LAYOUT: PageLayout = {
+  type: 'centered',
+  maxWidth: '1200px',
+  padding: '2rem',
+  showHeader: true,
+  showFooter: true,
+  showBreadcrumbs: true,
+};

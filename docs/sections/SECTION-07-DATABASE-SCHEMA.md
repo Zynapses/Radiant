@@ -136,6 +136,13 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `ui_feedback_learnings` | AGI learnings from feedback |
 | `ui_feedback_config` | Per-tenant feedback configuration |
 | `ui_feedback_aggregates` | Pre-computed feedback analytics |
+| `generated_multipage_apps` | Multi-page web applications |
+| `app_pages` | Individual pages within multi-page apps |
+| `app_versions` | Version history for multi-page apps |
+| `app_deployments` | Deployment tracking for apps |
+| `multipage_app_templates` | Pre-built app templates |
+| `app_analytics` | Usage analytics for generated apps |
+| `multipage_app_config` | Per-tenant multi-page app config |
 
 ## Type Imports
 
