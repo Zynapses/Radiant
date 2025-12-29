@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Think Tank App Factory ("Dynamic Software Generator")
+- **App Factory Service** (`thinktank-app-factory.service.ts`)
+  - Transforms Think Tank from chatbot into dynamic software generator
+  - "Gemini 3 can write the code for a calculator, but it cannot become the calculator"
+  - Automatic app detection from prompts and responses
+  - 7 calculator templates: mortgage, tip, BMI, compound interest, ROI, discount, percentage
+  - Component generation: calculator, chart, table, comparison, timeline, form
+  - View recommendation engine (text, app, or split)
+- **Database Migration** (`089_thinktank_app_factory.sql`)
+  - `generated_apps` - Stores generated interactive apps
+  - `app_interactions` - Records user interactions
+  - `user_app_preferences` - User view preferences
+  - `app_templates` - Pre-built app templates
+- **Shared Types** (`thinktank-generative-ui.types.ts`)
+  - `ThinkTankEnhancedResponse` - Response with text + generated app
+  - `GeneratedUIApp` - Interactive app structure
+  - `ViewToggleConfig` - View switching configuration
+  - Calculator, Chart, Comparison, Table, Form, Timeline configs
+- **React Components** (`components/thinktank/app-factory/`)
+  - `AppViewToggle` - Toggle between Response/App/Split views
+  - `GeneratedCalculator` - Interactive calculator with real-time computation
+  - `GeneratedAppRenderer` - Main renderer with chart, table, comparison, timeline
+  - `ViewTransition` - Animated view transitions
+  - `SplitViewContainer` - Resizable split view panels
+
 #### Consciousness Emergence System
 - **Consciousness Emergence Service** (`consciousness-emergence.service.ts`)
   - Deep thinking sessions with Tree of Thoughts integration

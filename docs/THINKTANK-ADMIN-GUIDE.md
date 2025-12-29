@@ -32,6 +32,7 @@ This guide covers administrative features specific to **Think Tank**, the consum
 15. [Feedback System](#15-feedback-system)
 16. [Cognitive Architecture](#16-cognitive-architecture)
 17. [Consciousness Service](#17-consciousness-service)
+18. [App Factory](#18-app-factory)
 
 ---
 
@@ -840,6 +841,127 @@ Admins can run consciousness detection tests:
 **Important**: These tests measure behavioral indicators, not phenomenal consciousness.
 
 See [Consciousness Service Documentation](./CONSCIOUSNESS-SERVICE.md) for full details.
+
+---
+
+## 18. App Factory
+
+**Location**: Think Tank Responses
+
+The App Factory transforms Think Tank from a "chatbot" into a "dynamic software generator."
+
+> "Gemini 3 can write the code for a calculator, but it cannot become the calculator."
+
+### 18.1 What It Does
+
+When a user asks a question that could benefit from interactivity, Think Tank:
+1. Generates the text response (as always)
+2. **Also** generates an interactive app (calculator, chart, etc.)
+3. User can toggle between **Response** and **App** views
+
+### 18.2 Supported App Types
+
+| Type | Trigger Keywords | Example |
+|------|------------------|---------|
+| **Calculator** | calculate, mortgage, tip, BMI, ROI | "How much is a 20% tip on $85?" → Interactive tip calculator |
+| **Chart** | visualize, chart, graph, distribution | "Show GPU market share" → Interactive pie/bar chart |
+| **Table** | table, list, breakdown | "List all providers and prices" → Sortable table |
+| **Comparison** | compare, vs, versus, pros and cons | "Compare GPT-4 vs Claude 3" → Side-by-side comparison |
+| **Timeline** | timeline, history, chronological | "History of AI" → Visual timeline |
+
+### 18.3 Calculator Templates
+
+Pre-built calculators for common use cases:
+
+- **Mortgage Calculator** - Monthly payment, total cost, interest
+- **Tip Calculator** - Tip amount, total, split per person
+- **BMI Calculator** - Body mass index with category
+- **Compound Interest** - Future value, total interest
+- **ROI Calculator** - Return on investment, gain/loss
+- **Discount Calculator** - Sale price, savings
+- **Percentage Calculator** - Result, remaining
+
+### 18.4 View Toggle
+
+Users can switch between three views:
+
+| View | Description |
+|------|-------------|
+| **Response** | Traditional text response |
+| **App** | Interactive generated app only |
+| **Split** | Both side-by-side (resizable) |
+
+### 18.5 User Preferences
+
+Users can configure:
+- **Default View** - text, app, split, or auto
+- **Auto-show App** - Automatically switch to app view
+- **Auto-show Threshold** - Confidence level to auto-switch (0-1)
+- **Split Direction** - Horizontal or vertical
+- **Animations** - Enable/disable view transitions
+
+### 18.6 Admin Configuration
+
+Per-tenant settings at Settings → Cognitive Architecture → Generative UI:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | true | Enable app factory |
+| `allowedComponentTypes` | all | Which component types to allow |
+| `maxComponentsPerResponse` | 3 | Max apps per response |
+| `autoDetectOpportunities` | true | Auto-detect when to generate apps |
+| `autoDetectTriggers` | [various] | Keywords that trigger app generation |
+
+### 18.7 How It Works
+
+```
+User: "Help me calculate my mortgage payment"
+       ↓
+┌─────────────────────────────────────────┐
+│            App Detection                 │
+│  • Keywords: "calculate", "mortgage"     │
+│  • Confidence: 0.95                      │
+│  • Suggested: calculator                 │
+└─────────────────────────────────────────┘
+       ↓
+┌─────────────────────────────────────────┐
+│         Text Response Generated          │
+│  "To calculate your mortgage payment..." │
+└─────────────────────────────────────────┘
+       ↓
+┌─────────────────────────────────────────┐
+│         App Generated                    │
+│  • Mortgage Calculator                   │
+│  • Inputs: Principal, Rate, Term         │
+│  • Outputs: Monthly, Total, Interest     │
+└─────────────────────────────────────────┘
+       ↓
+┌─────────────────────────────────────────┐
+│         User Sees                        │
+│  [Response] [App] [Split]  ← Toggle     │
+│                                          │
+│  ┌─────────────────────────────────┐    │
+│  │   🧮 Mortgage Calculator        │    │
+│  │                                  │    │
+│  │   Loan Amount: [___300,000___]  │    │
+│  │   Rate: [====●====] 6.5%        │    │
+│  │   Term: [30 Years ▼]            │    │
+│  │                                  │    │
+│  │   Monthly: $1,896.20            │    │
+│  │   Total: $682,633               │    │
+│  │   Interest: $382,633            │    │
+│  └─────────────────────────────────┘    │
+└─────────────────────────────────────────┘
+```
+
+### 18.8 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `generated_apps` | Stores generated apps with components, state, logic |
+| `app_interactions` | Records every user interaction with apps |
+| `user_app_preferences` | User view and animation preferences |
+| `app_templates` | Pre-built templates for common calculators |
 
 ---
 
