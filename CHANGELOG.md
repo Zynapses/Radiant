@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### GDPR & HIPAA Compliance Enhancement
+- **GDPR Service** (`gdpr.service.ts`)
+  - Full implementation of GDPR Data Subject Rights (Articles 15-22)
+  - Consent management (record, check, withdraw)
+  - Data export (Article 15 & 20)
+  - Data erasure/right to be forgotten (Article 17)
+  - Data restriction (Article 18)
+  - Right to object (Article 21)
+  - GDPR request tracking with 30-day deadline enforcement
+- **PHI Sanitization Service** (`phi-sanitization.service.ts`)
+  - HIPAA 18 identifiers detection
+  - Pattern-based PHI detection (SSN, MRN, NPI, DEA, etc.)
+  - Medical condition keyword detection
+  - Automatic redaction with audit logging
+  - HIPAA configuration per tenant
+- **Database Migration** (`090_gdpr_hipaa_compliance.sql`)
+  - `consent_records` - GDPR Article 7 consent tracking
+  - `gdpr_requests` - Data subject request management
+  - `data_retention_policies` - Configurable retention
+  - `phi_access_log` - HIPAA audit trail
+  - `data_processing_agreements` - Sub-processor tracking
+  - `data_breach_incidents` - Breach management
+  - `hipaa_config` - Per-tenant HIPAA settings
+  - Default retention policies and sub-processors
+
 #### Think Tank App Factory ("Dynamic Software Generator")
 - **App Factory Service** (`thinktank-app-factory.service.ts`)
   - Transforms Think Tank from chatbot into dynamic software generator
