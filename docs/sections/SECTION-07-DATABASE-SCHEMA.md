@@ -150,6 +150,10 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `thinktank_media_capabilities` | Media input/output capabilities for Think Tank integration |
 | `model_proficiency_rankings` | Ranked proficiency scores for models across domains and modes |
 | `model_discovery_log` | Log of model discoveries with proficiency generation status |
+| `result_derivations` | Comprehensive history of how Think Tank results are derived |
+| `derivation_steps` | Individual steps in the execution plan |
+| `derivation_model_usage` | Models used during result generation with token and cost tracking |
+| `derivation_timeline_events` | Timeline events for visualization of execution flow |
 
 ## Type Imports
 

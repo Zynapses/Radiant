@@ -5,6 +5,51 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.5] - 2024-12-28
+
+### Added
+
+#### Result Derivation History ("See How It Was Made")
+- **Comprehensive Tracking** - Full history of how each Think Tank result was derived
+  - Plan: orchestration mode, steps, template, generation time
+  - Domain Detection: field, domain, subspecialty, confidence, alternatives
+  - Model Selection: models used, reasons, alternatives, costs
+  - Workflow Execution: phases, steps, timing, fallback chain
+  - Quality Metrics: 5 dimensions (relevance, accuracy, completeness, clarity, coherence)
+  - Timing: total duration, breakdown by phase
+  - Costs: per-model, total, estimated savings vs external
+- **Shared Types** (`result-derivation.types.ts`)
+  - `ResultDerivation` - Complete derivation record
+  - `DerivationPlan`, `DerivationStep` - Plan structure
+  - `ModelUsageRecord` - Per-model token/cost tracking
+  - `WorkflowExecution`, `WorkflowPhase` - Workflow state
+  - `QualityMetrics`, `TimingRecord`, `CostRecord`
+  - `DerivationTimeline`, `DerivationTimelineEvent`
+- **Derivation Service** (`result-derivation.service.ts`)
+  - `createDerivation()` - Start tracking a new result
+  - `recordPlan()`, `recordStep()`, `updateStep()` - Track plan execution
+  - `recordModelUsage()` - Track each model call
+  - `recordDomainDetection()`, `recordOrchestration()` - Context
+  - `completeDerivation()` - Finalize with quality and costs
+  - `getDerivation()`, `getDerivationTimeline()` - Retrieve history
+  - `getAnalytics()` - Aggregated analytics
+- **API Endpoints** (`derivation-history.ts`)
+  - `GET /:id` - Full derivation history
+  - `GET /by-prompt/:promptId` - By prompt ID
+  - `GET /:id/timeline` - Timeline visualization
+  - `GET /:id/models` - Model usage details
+  - `GET /:id/steps` - Step-by-step execution
+  - `GET /:id/quality` - Quality metrics
+  - `GET /session/:sessionId` - Session derivations
+  - `GET /user` - User's derivations
+  - `GET /analytics` - Analytics dashboard
+- **Database Migration** (`094_result_derivation_history.sql`)
+  - `result_derivations` - Main derivation records
+  - `derivation_steps` - Individual plan steps
+  - `derivation_model_usage` - Model calls with tokens/costs
+  - `derivation_timeline_events` - Timeline events
+  - Functions: `get_full_derivation`, `get_session_derivations`, `get_derivation_analytics`
+
 ## [4.18.4] - 2024-12-28
 
 ### Added
