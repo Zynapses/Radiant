@@ -143,6 +143,13 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `multipage_app_templates` | Pre-built app templates |
 | `app_analytics` | Usage analytics for generated apps |
 | `multipage_app_config` | Per-tenant multi-page app config |
+| `self_hosted_model_metadata` | Comprehensive metadata for 56 self-hosted AI models |
+| `model_orchestration_preferences` | Tenant-specific model selection preferences |
+| `self_hosted_model_usage` | Usage analytics for self-hosted models per tenant |
+| `model_selection_history` | History of model selections by the orchestration engine |
+| `thinktank_media_capabilities` | Media input/output capabilities for Think Tank integration |
+| `model_proficiency_rankings` | Ranked proficiency scores for models across domains and modes |
+| `model_discovery_log` | Log of model discoveries with proficiency generation status |
 
 ## Type Imports
 
