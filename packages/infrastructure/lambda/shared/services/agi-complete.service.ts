@@ -669,7 +669,44 @@ Use the analogy to provide an inference. Return JSON:
     tenantId: string,
     query: string
   ): Promise<Array<{ node: KnowledgeNode; relevance: number }>> {
-    // Simple keyword search (would use embeddings in production)
+    // Try embedding-based search first, fall back to keyword search
+    const embedding = await this.generateQueryEmbedding(query);
+    
+    if (embedding) {
+      // Use pgvector for semantic search if embedding available
+      const embeddingResult = await executeStatement(
+        `SELECT *, 
+          1 - (embedding <=> $3::vector) as relevance
+         FROM knowledge_nodes
+         WHERE (tenant_id = $1 OR tenant_id IS NULL)
+           AND embedding IS NOT NULL
+         ORDER BY embedding <=> $3::vector
+         LIMIT 20`,
+        [
+          { name: 'tenantId', value: { stringValue: tenantId } },
+          { name: 'query', value: { stringValue: query } },
+          { name: 'embedding', value: { stringValue: `[${embedding.join(',')}]` } },
+        ]
+      );
+      
+      if (embeddingResult.rows.length > 0) {
+        return embeddingResult.rows.map(row => {
+          const r = row as Record<string, unknown>;
+          return {
+            node: {
+              nodeId: String(r.node_id),
+              name: String(r.name),
+              nodeType: String(r.node_type),
+              properties: typeof r.properties === 'string' ? JSON.parse(r.properties) : (r.properties as Record<string, unknown>) || {},
+              confidence: Number(r.confidence ?? 1.0),
+            },
+            relevance: Number(r.relevance ?? 0.5),
+          };
+        });
+      }
+    }
+    
+    // Fallback to keyword search
     const result = await executeStatement(
       `SELECT *, 
         CASE WHEN name ILIKE '%' || $2 || '%' THEN 1.0
@@ -699,6 +736,38 @@ Use the analogy to provide an inference. Return JSON:
         relevance: Number(r.relevance ?? 0.5),
       };
     });
+  }
+  
+  private async generateQueryEmbedding(query: string): Promise<number[] | null> {
+    try {
+      // Use OpenAI embeddings API or Bedrock Titan embeddings
+      const embeddingEndpoint = process.env.EMBEDDING_API_URL || 'https://api.openai.com/v1/embeddings';
+      const apiKey = process.env.OPENAI_API_KEY;
+      
+      if (!apiKey) return null;
+      
+      const response = await fetch(embeddingEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          input: query,
+          model: 'text-embedding-3-small',
+        }),
+      });
+      
+      if (!response.ok) return null;
+      
+      const data = await response.json() as {
+        data: Array<{ embedding: number[] }>;
+      };
+      
+      return data.data?.[0]?.embedding || null;
+    } catch {
+      return null;
+    }
   }
 
   async extractKnowledgeFromText(

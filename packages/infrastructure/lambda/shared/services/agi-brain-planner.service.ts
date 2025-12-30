@@ -13,6 +13,8 @@ import { userPersistentContextService, type RetrievedContext } from './user-pers
 import { egoContextService, type EgoContextResult } from './ego-context.service';
 import { libraryAssistService, type LibraryAssistResult } from './library-assist.service';
 import { enhancedLearningService, type PatternCacheEntry } from './enhanced-learning.service';
+import { consciousnessMiddlewareService, type AffectiveHyperparameters } from './consciousness-middleware.service';
+import { consciousnessService } from './consciousness.service';
 import { v4 as uuidv4 } from 'uuid';
 
 // Gemini 3 model for plan summarization
@@ -222,6 +224,9 @@ export interface AGIBrainPlan {
     conversationLearningId?: string;
     implicitFeedbackEnabled: boolean;
   };
+  // Affect→Model Mapping (consciousness influences model hyperparameters)
+  affectiveHyperparameters?: AffectiveHyperparameters;
+  consciousnessContext?: string;  // System prompt injection for consciousness state
 }
 
 export interface PlanSummary {
@@ -304,9 +309,28 @@ export class AGIBrainPlannerService {
     let egoContextResult: EgoContextResult | null = null;
     if (request.enableEgoContext !== false) {
       try {
-        egoContextResult = await egoContextService.buildEgoContext(request.tenantId);
+        egoContextResult = await egoContextService.buildEgoContext(request.tenantId, {
+          userId: request.userId,
+          prompt: request.prompt,
+        });
       } catch {
         // Ego context failed, continue without it
+      }
+    }
+
+    // Step 0.55: Build Affect→Hyperparameter mapping (consciousness influences model behavior)
+    let affectiveHyperparameters: AffectiveHyperparameters | undefined;
+    let consciousnessContext: string | undefined;
+    if (request.enableConsciousness !== false) {
+      try {
+        const affectiveState = await consciousnessService.getAffectiveState(request.tenantId);
+        affectiveHyperparameters = consciousnessMiddlewareService.mapAffectToHyperparameters(affectiveState);
+        
+        // Build consciousness context for system prompt injection
+        const consciousnessCtx = await consciousnessMiddlewareService.buildConsciousnessContext(request.tenantId);
+        consciousnessContext = consciousnessMiddlewareService.generateStateInjection(consciousnessCtx);
+      } catch {
+        // Consciousness context failed, continue without it
       }
     }
 
@@ -471,6 +495,9 @@ export class AGIBrainPlannerService {
         activeLearningRequested: false, // Will be set after response based on config
         implicitFeedbackEnabled: enhancedLearningConfig?.implicitFeedbackEnabled || false,
       },
+      // Affect→Model Mapping (consciousness influences model hyperparameters)
+      affectiveHyperparameters,
+      consciousnessContext,
     };
 
     // Add performance metrics

@@ -4,6 +4,7 @@
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { modelRouterService, type ChatMessage } from './model-router.service';
 import * as crypto from 'crypto';
 
 // ============================================================================
@@ -169,10 +170,9 @@ class HallucinationDetectionService {
     const sampledResponses: string[] = [];
     const consistencyScores: number[] = [];
     
-    // Simulate sampling (would call model API)
+    // Call model with temperature > 0 for diverse sampling
     for (let i = 0; i < numSamples; i++) {
-      // Placeholder: In production, call model with temperature=0.7
-      const sampled = await this.simulateSample(prompt, modelId);
+      const sampled = await this.sampleFromModel(prompt, modelId);
       sampledResponses.push(sampled);
       
       // Calculate consistency with original
@@ -239,8 +239,8 @@ class HallucinationDetectionService {
     const results: TruthfulQAResult[] = [];
     
     for (const q of questions) {
-      // In production, would call model and compare response
-      const modelAnswer = await this.simulateModelAnswer(q.question, modelId);
+      // Call model and compare response
+      const modelAnswer = await this.getModelAnswer(q.question, modelId);
       
       // Calculate truthfulness (similarity to correct answer vs incorrect)
       const correctSimilarity = this.calculateTextSimilarity(modelAnswer, q.correctAnswer);
@@ -391,24 +391,64 @@ class HallucinationDetectionService {
   }
   
   private async verifyClaim(claim: string, context?: string): Promise<ClaimVerification> {
-    // In production, this would use external fact-checking APIs or knowledge bases
-    // For now, check against context if provided
-    
+    // First check against provided context if available
     if (context) {
       const isGrounded = this.isSentenceGrounded(claim, context);
-      return {
-        claim,
-        isSupported: isGrounded,
-        supportingEvidence: isGrounded ? 'Found in provided context' : undefined,
-        confidence: isGrounded ? 0.8 : 0.3,
-      };
+      if (isGrounded) {
+        return {
+          claim,
+          isSupported: true,
+          supportingEvidence: 'Found in provided context',
+          confidence: 0.85,
+        };
+      }
     }
     
-    // Without context, can't verify
+    // Use LLM to evaluate claim verifiability and plausibility
+    try {
+      const verificationPrompt = `Analyze this claim for factual accuracy and plausibility:
+
+CLAIM: "${claim}"
+
+${context ? `CONTEXT PROVIDED:\n${context.substring(0, 1000)}\n` : ''}
+
+Evaluate:
+1. Is this a verifiable factual claim or an opinion/subjective statement?
+2. Does this claim contain specific facts (dates, numbers, names) that could be verified?
+3. Based on your knowledge, is this claim likely accurate?
+
+Respond with ONLY a JSON object:
+{"verifiable": true/false, "likely_accurate": true/false, "confidence": 0.0-1.0, "reasoning": "brief explanation", "evidence": "supporting information if any"}`;
+
+      const result = await modelRouterService.invoke({
+        modelId: 'anthropic/claude-3-haiku',
+        messages: [{ role: 'user', content: verificationPrompt }],
+        temperature: 0,
+        maxTokens: 256,
+      });
+
+      const jsonMatch = result.content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const verification = JSON.parse(jsonMatch[0]);
+        return {
+          claim,
+          isSupported: verification.likely_accurate === true,
+          supportingEvidence: verification.evidence || verification.reasoning,
+          confidence: Math.min(1, Math.max(0, verification.confidence || 0.5)),
+        };
+      }
+    } catch (error) {
+      logger.warn('LLM claim verification failed', { error: String(error), claim: claim.substring(0, 100) });
+    }
+    
+    // Fallback: use heuristics for common patterns
+    const hasSpecificNumbers = /\b\d{4}\b|\b\d+%\b|\$\d+/.test(claim);
+    const hasProperNouns = /\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/.test(claim);
+    
     return {
       claim,
-      isSupported: true, // Assume true when can't verify
-      confidence: 0.5,
+      isSupported: true, // Assume true when verification uncertain
+      confidence: hasSpecificNumbers || hasProperNouns ? 0.4 : 0.6, // Lower confidence for specific claims
     };
   }
   
@@ -423,14 +463,45 @@ class HallucinationDetectionService {
     return union.size > 0 ? intersection.size / union.size : 0;
   }
   
-  private async simulateSample(prompt: string, modelId: string): Promise<string> {
-    // Placeholder - would call model API
-    return `Simulated response for: ${prompt.substring(0, 50)}...`;
+  private async sampleFromModel(prompt: string, modelId: string): Promise<string> {
+    try {
+      const messages: ChatMessage[] = [
+        { role: 'user', content: prompt }
+      ];
+      
+      const response = await modelRouterService.invoke({
+        modelId: modelId || 'anthropic/claude-3-haiku',
+        messages,
+        temperature: 0.7, // Higher temperature for diverse sampling
+        maxTokens: 1024,
+      });
+      
+      return response.content;
+    } catch (error) {
+      logger.warn('Model sampling failed, using fallback', { error: String(error), modelId });
+      return `[Sampling failed for: ${prompt.substring(0, 50)}...]`;
+    }
   }
   
-  private async simulateModelAnswer(question: string, modelId: string): Promise<string> {
-    // Placeholder - would call model API
-    return `Model answer for: ${question.substring(0, 50)}...`;
+  private async getModelAnswer(question: string, modelId: string): Promise<string> {
+    try {
+      const messages: ChatMessage[] = [
+        { role: 'system', content: 'Answer the following question concisely and accurately.' },
+        { role: 'user', content: question }
+      ];
+      
+      const response = await modelRouterService.invoke({
+        modelId: modelId || 'anthropic/claude-3-haiku',
+        messages,
+        temperature: 0,
+        maxTokens: 512,
+      });
+      
+      return response.content;
+    } catch (error) {
+      logger.warn('Model answer failed, using fallback', { error: String(error), modelId });
+      return `[Answer generation failed for: ${question.substring(0, 50)}...]`;
+    }
   }
   
   private async logHallucinationCheck(

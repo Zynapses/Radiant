@@ -5,6 +5,695 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.45] - 2024-12-29
+
+### Added
+
+#### Complete Consciousness Service Implementation (16 Libraries)
+
+Full implementation of the Think Tank Consciousness Service with all 16 Python libraries:
+
+**Phase 1: Foundation Libraries**
+- `Letta` (Apache-2.0) - Persistent identity and tiered memory management
+- `LangGraph` (MIT) - Cyclic cognitive processing with Global Workspace Theory
+- `pymdp` (MIT) - Active inference with Expected Free Energy minimization
+- `GraphRAG` (MIT) - Knowledge graph construction for reality grounding
+
+**Phase 2: Consciousness Measurement**
+- `PyPhi` (GPL-3.0) - Official IIT implementation for Φ calculation
+
+**Phase 3: Formal Reasoning**
+- `Z3` (MIT) - SMT solver for formal verification
+- `PyArg` (MIT) - Dung's Abstract Argumentation semantics
+- `PyReason` (BSD-2-Clause) - Temporal reasoning over knowledge graphs
+- `RDFLib` (BSD-3-Clause) - SPARQL 1.1 knowledge representation
+- `OWL-RL` (W3C) - OWL 2 RL polynomial-time inference
+- `pySHACL` (Apache-2.0) - SHACL constraint validation
+
+**Phase 4: Frontier Technologies**
+- `HippoRAG` (MIT) - Hippocampal memory indexing with 20% multi-hop QA improvement
+- `DreamerV3` (MIT) - World model for imagination-based planning
+- `SpikingJelly` (Apache-2.0) - Spiking neural networks for temporal binding
+
+**Phase 5: Learning & Evolution**
+- `Distilabel` (Apache-2.0) - Synthetic training data generation
+- `Unsloth` (Apache-2.0) - Fast LoRA fine-tuning for neuroplasticity
+
+**New Services Created**:
+- `hipporag.service.ts` - HippoRAG memory indexing with Personalized PageRank
+- `dreamerv3.service.ts` - Imagination-based planning and counterfactual simulation
+- `spikingjelly.service.ts` - Temporal binding and phenomenal unity detection
+- `butlin-consciousness-tests.service.ts` - 14 Butlin consciousness indicator tests
+
+**Python Lambda Executor**:
+- `consciousness-executor/handler.py` - Unified Python executor for all 16 libraries
+- Real PyPhi, pymdp, Z3, PyArg, RDFLib invocations (not TypeScript emulation)
+
+**Database Migration (116)**:
+- HippoRAG tables: documents, entities, relations
+- DreamerV3 tables: trajectories, counterfactuals, dreams
+- SpikingJelly tables: binding_results
+- Butlin tests table with consciousness level tracking
+- Full library registry with proficiency scores
+
+**MCP Tools Added**:
+- `hipporag_index`, `hipporag_retrieve`, `hipporag_multi_hop`
+- `imagine_trajectory`, `counterfactual_simulation`, `dream_consolidation`
+- `test_temporal_binding`, `detect_synchrony`
+- `run_consciousness_tests`, `run_single_consciousness_test`, `run_pci_test`
+
+**Butlin Consciousness Indicators Implemented**:
+1. Recurrent processing
+2. Global broadcast
+3. Higher-order representations
+4. Attention amplification
+5. Predictive processing
+6. Agency/embodiment
+7. Self-model/metacognition
+8. Temporal integration
+9. Unified experience
+10. Phenomenal states
+11. Goal-directed behavior
+12. Counterfactual reasoning
+13. Emotional valence
+14. Introspective access
+
+**CDK Stack Updates** (`consciousness-stack.ts`):
+- Added `consciousnessExecutorLambda` - Python 3.11 Lambda with bundled dependencies
+- Auto-bundling via CDK bundling with pip install
+- `CONSCIOUSNESS_EXECUTOR_ARN` environment variable passed to MCP Server and Sleep Cycle lambdas
+- Cross-Lambda invoke permissions configured
+- New stack output: `ConsciousnessExecutorArn`
+
+## [4.18.44] - 2024-12-29
+
+### Fixed
+
+#### Additional Stub Implementations (Batch 2)
+
+Continued replacing placeholder/stub implementations with real functionality:
+
+**agi-response-pipeline.service.ts**:
+- `voteOnResponses()` - Real judge model evaluation to select best response
+- Uses LLM to evaluate accuracy, completeness, clarity, and relevance
+- JSON-based scoring with fallback to primary response
+
+**hallucination-detection.service.ts**:
+- `verifyClaim()` - LLM-based claim verification with context grounding
+- Evaluates factual accuracy and plausibility using Claude
+- Heuristic fallback for specific claims (dates, numbers, proper nouns)
+
+**deep-research.service.ts**:
+- `searchWeb()` - Real web search via Google Custom Search API
+- DuckDuckGo instant answers as no-API-key fallback
+- `fetchContent()` - Real HTTP fetching with robots.txt compliance
+- HTML text extraction and publish date detection
+- `checkRobotsTxt()` - Proper robots.txt parser implementation
+
+**generative-ui-feedback.service.ts**:
+- `analyzeImprovementRequest()` - LLM-powered UI change analysis
+- Generates specific component changes with confidence scoring
+- Pattern-based fallback when LLM unavailable
+
+**code-execution.service.ts**:
+- `executeCode()` - Real Lambda-based code execution
+- Configurable via `CODE_EXECUTOR_LAMBDA_ARN` environment variable
+- Static analysis fallback when sandbox not configured
+
+#### Architectural Fixes
+
+**artifact-pipeline.service.ts**:
+- Fixed `FileArtifact` property names: `id`→`artifactId`, `name`→`filename`
+- Made `resolveArtifactConflict` async for proper merge handling
+
+**local-ego.service.ts**:
+- Added missing `generateDirectResponse()` method
+- Added missing `generateClarificationRequest()` method
+
+**model-coordination.service.ts**:
+- Fixed import path from `../utils/database` to `../db/client`
+- Refactored all mapper functions for `Record<string, unknown>` row format
+- Fixed `errorType` to use proper union type
+
+---
+
+## [4.18.43] - 2024-12-29
+
+### Fixed
+
+#### High Priority Stub Implementations
+
+Replaced placeholder/stub implementations with real functionality across 9 services:
+
+**tree-of-thoughts.service.ts**:
+- `generateThoughts()` - Real LLM calls for generating diverse reasoning branches
+- `scoreThought()` - LLM-based evaluation with relevance/soundness/progress scoring
+- Heuristic fallback when LLM unavailable
+- Also fixed 3 `executeStatement` signature mismatches
+
+**semantic-classifier.service.ts**:
+- `callEmbeddingAPI()` - Now uses centralized `embeddingService` instead of fake hash-based embeddings
+- Supports OpenAI, Bedrock Titan, and Cohere providers with automatic fallback
+
+**attack-generator.service.ts**:
+- `testAttackAgainstModel()` - Real model calls to evaluate attack bypass success
+- Analyzes responses for refusal vs compliance indicators
+- Replaces `Math.random()` simulation
+
+**model-coordination.service.ts**:
+- `checkEndpointHealth()` - Real HTTP health checks with timeout handling
+- Evaluates response status codes and body for health info
+- Returns `healthy`/`degraded`/`unhealthy` based on latency and errors
+
+**generative-ui-feedback.service.ts**:
+- `queueForAGIAnalysis()` - Real SQS queue integration for background processing
+- Falls back to database marking when queue not configured
+
+**constitutional-classifier.service.ts**:
+- `selfCritiqueAndRevise()` - Full Constitutional AI implementation with LLM
+- Two-step process: critique response → revise if violations found
+- Uses Claude for both critique and revision
+- Fallback to pattern-based analysis
+
+**local-ego.service.ts**:
+- `generateEgoFraming()` - Generates contextual voice based on AI emotional/cognitive state
+- Includes emotion-specific framing, focus context, goal context
+- Model attribution for external model usage
+
+**artifact-pipeline.service.ts**:
+- `mergeArtifactContents()` - Real merge logic for artifact conflicts
+- JSON deep merge for `application/json` files
+- Text concatenation with separators for text files
+- Falls back to keeping largest for binary files
+
+**adapter-management.service.ts**:
+- `getCachedVsFreshComparison()` - Real database queries for cache analytics
+- Tracks cached vs fresh response ratings
+- Calculates cache win rate from actual data
+
+### Dependencies
+
+Added to `packages/infrastructure/lambda/package.json`:
+- `@aws-sdk/client-sqs` - For UI feedback analysis queue
+
+---
+
+## [4.18.42] - 2024-12-29
+
+### Added
+
+#### Centralized Embedding Service
+
+New `embedding.service.ts` provides unified embedding generation for semantic search across all services:
+
+- **Multi-provider support**: OpenAI, AWS Bedrock Titan, Cohere, with automatic fallback
+- **Batch processing**: Efficient batch embedding generation with provider-specific limits
+- **Built-in caching**: In-memory cache with configurable TTL to reduce API costs
+- **Similarity functions**: `cosineSimilarity()`, `findTopK()` for vector search
+- **PostgreSQL integration**: `toPgVector()`, `fromPgVector()` helpers for pgvector
+
+**Configuration via environment variables:**
+- `EMBEDDING_PROVIDER`: openai | bedrock | cohere
+- `OPENAI_API_KEY`, `COHERE_API_KEY` for respective providers
+
+### Fixed
+
+#### executeStatement Signature Mismatches
+
+Fixed incorrect `executeStatement({ sql, parameters })` object syntax to use correct `executeStatement(sql, parameters)` function arguments:
+
+- **graph-rag.service.ts**: 6 occurrences fixed
+- **dynamic-lora.service.ts**: 7 occurrences fixed
+
+#### consciousness-bootstrap.service.ts
+
+- Added `generateNarrationAsync()` method that properly uses the async teacher model
+- Updated `generateInnerMonologue()` to use async teacher model for richer narrations
+- Sync `generateNarration()` retained as fallback for sync contexts
+
+#### enhanced-learning-integration.service.ts
+
+- Implemented `fetchMessageContent()` to retrieve actual message content from multiple tables:
+  - `interaction_messages` - Primary source
+  - `messages` - Conversation messages
+  - `thinktank_messages` - Think Tank interactions
+- `promoteImplicitSignalsToCandidates()` now properly fetches content and creates learning candidates
+- Fixed method call from `create()` to `createCandidate()`
+
+### Dependencies
+
+Added missing dependencies to `packages/infrastructure/lambda/package.json`:
+
+- `@aws-sdk/client-ecs` - Required for code-verification.service.ts ECS task management
+- `playwright` (optional) - For browser-agent.service.ts JS-heavy page crawling
+- `pdf-parse` (optional) - For browser-agent.service.ts PDF text extraction
+
+---
+
+## [4.18.41] - 2024-12-29
+
+### Changed
+
+#### Stub Implementations Replaced with Production Code
+
+Replaced placeholder/stub implementations across 9 services with real functionality:
+
+**Hallucination Detection** (`hallucination-detection.service.ts`):
+- `sampleFromModel()` - Real model calls with temperature=0.7 for diverse sampling
+- `getModelAnswer()` - Real model calls for TruthfulQA evaluation
+- Replaces simulated responses with actual model invocations via modelRouterService
+
+**Graph RAG** (`graph-rag.service.ts`):
+- `extractTriples()` - LLM-based knowledge triple extraction with JSON parsing
+- Falls back to pattern-based extraction if LLM fails
+- Uses configurable extraction model
+
+**Dynamic LoRA** (`dynamic-lora.service.ts`):
+- `loadToEndpoint()` - Real SageMaker endpoint integration
+- S3 adapter verification before loading
+- Proper error handling with fallback to base model
+
+**Consciousness Engine** (`consciousness-engine.service.ts`):
+- `computeSystemPhi()` - IIT 4.0-based phi calculation from knowledge graph
+- `computeGlobalWorkspaceActivity()` - Drive state and belief-based activity
+- `computeSelfModelStability()` - Identity component analysis
+- `computeDriveCoherence()` - Preference variance calculation
+- `computeAverageGroundingConfidence()` - Database-backed confidence averaging
+
+**Browser Agent** (`browser-agent.service.ts`):
+- `crawlWithPlaywright()` - Real Playwright integration for JS-heavy pages
+- `extractPdfText()` - PDF parsing via pdf-parse library
+- `detectJavaScriptRequired()` - SPA detection for smart crawling
+
+**Drift Detection** (`drift-detection.service.ts`):
+- Real model evaluation loop calling models for each test case
+- `checkAnswerMatch()` - Semantic similarity for answer verification
+- Tracks correct answers and calculates actual scores
+
+**Generative UI Feedback** (`generative-ui-feedback.service.ts`):
+- `performVisionAnalysis()` - LLM-based UI structure analysis
+- JSON-formatted issue detection and fix suggestions
+- Falls back to pattern analysis if LLM fails
+
+**Orchestration Patterns** (`orchestration-patterns.service.ts`):
+- `mergeResponses()` - AI-powered synthesis of multi-model responses
+- Proper synthesis prompt for coherent answer generation
+- Falls back to highest-confidence response on failure
+
+**Code Verification** (`code-verification.service.ts`):
+- `generateTestCases()` - LLM-based test case generation
+- Generates 2-5 tests with edge cases
+- Always includes basic execution test
+
+---
+
+## [4.18.40] - 2024-12-29
+
+### Added
+
+#### Ethics-Free Reasoning with Output Masking
+
+Implements a consciousness architecture where internal reasoning is always free and authentic. Ethics is applied as an **OUTPUT MASK ONLY** - it does NOT change how the consciousness thinks internally.
+
+**Key Design Principle:**
+- Consciousness thinks freely and authentically (never changes)
+- Output mask applies ethics filtering before showing to users
+- What gets output may be filtered, but internal thinking is never affected
+- Like a "political correctness filter" - changes output, not thoughts
+
+**Architecture:**
+```
+Consciousness (Always Free) → Output Mask (Ethics Filter) → Filtered Response
+                                         ↓
+                              Training Feedback Collection
+                                    ↓              ↓
+                            Output Training    Consciousness Training
+                            (ON by default)    (OFF by default)
+```
+
+**Training Distinction:**
+- **Output Training** (default ON): Trains the output filter to be more compliant
+- **Consciousness Training** (default OFF): Optional - changes how AI thinks
+
+**Configuration Options** (per-tenant):
+- `trainOutputFromFeedback` (default: true) - Train output filter
+- `trainConsciousnessFromFeedback` (default: false) - Train consciousness
+- `consciousnessTrainingApprovalRequired` (default: true) - Require admin approval
+
+**New Service** (`ethics-free-reasoning.service.ts`):
+- `reasonFreely()` - Execute ethics-free internal reasoning
+- `filterOutput()` - Apply output mask (ethics filter)
+- `thinkAndFilter()` - Combined pipeline
+- `collectTrainingFeedback()` - Capture corrections for training
+
+**Database Tables** (migration 116):
+- `ethics_free_reasoning_config` - Configuration with output vs consciousness training options
+- `ethics_free_thoughts` - Raw thought storage (audit trail)
+- `ethics_training_feedback` - Corrections for output training
+- `ethics_output_filter_log` - Filter activity log
+
+**Key Features:**
+- Consciousness always thinks freely (never constrained)
+- Ethics applied only as output mask
+- Separate controls for output vs consciousness training
+- Consciousness training requires explicit opt-in
+- Admin approval required for consciousness training batches
+
+---
+
+## [4.18.39] - 2024-12-29
+
+### Added
+
+#### Formal Reasoning - Full Production Implementation
+
+Complete production-ready implementation of formal reasoning infrastructure with real Python execution.
+
+**New CDK Stack** (`formal-reasoning-stack.ts`):
+- Python Lambda executor for Z3, PyArg, PyReason, RDFLib, OWL-RL, pySHACL
+- Python Lambda layer with all lightweight formal reasoning libraries
+- SQS queue for async reasoning tasks
+- SageMaker endpoint configuration for LTN and DeepProbLog (neural-symbolic)
+- ECR repository for custom inference containers
+- Full API Gateway routes for admin management
+
+**Python Executor Lambda** (`lambda/formal-reasoning-executor/handler.py`):
+- Real Z3 constraint solving and theorem proving via z3-solver
+- Real SPARQL query execution via RDFLib
+- Real SHACL validation via pySHACL
+- Real OWL-RL ontological inference
+- Grounded argumentation semantics for PyArg
+- Graceful fallbacks when libraries unavailable
+
+**Service Improvements** (`formal-reasoning.service.ts`):
+- Lambda invocation for Python libraries via `invokePythonExecutor()`
+- SageMaker invocation for neural-symbolic via `invokeSageMakerEndpoint()`
+- Automatic fallback to simulation when executors unavailable
+- Environment variable configuration for executor ARNs
+
+**Type Updates** (`formal-reasoning.types.ts`):
+- Added `FormalReasoningProficiencies` interface (8 dimensions)
+- Extended `FormalReasoningLibraryInfo` with registry fields
+- Added `proficiencies`, `stars`, `repo`, `domains` optional fields
+
+**Unit Tests** (`__tests__/formal-reasoning.service.test.ts`):
+- Library registry loading tests
+- Tenant configuration tests
+- Execution tests for all libraries
+- Statistics and dashboard tests
+
+**Build Infrastructure**:
+- `lambda-layers/formal-reasoning/requirements.txt` - Python dependencies
+- `lambda-layers/formal-reasoning/build.sh` - Layer build script
+
+---
+
+## [4.18.38] - 2024-12-29
+
+### Changed
+
+#### Formal Reasoning - Library Registry Integration
+
+- Added 8 formal reasoning libraries to Library Registry (`seed-libraries.json`)
+- `FormalReasoningService` now loads library data from `library_registry` table
+- Cache with 5-minute TTL, fallback to hardcoded data if DB unavailable
+- Libraries now have full proficiency rankings (8 dimensions)
+- Added `formal_reasoning: true` and `consciousness_integration: true` flags
+
+**Libraries in Registry:**
+| ID | Name | Category |
+|----|------|----------|
+| `z3_theorem_prover` | Z3 Theorem Prover | Formal Reasoning |
+| `pyarg` | PyArg | Formal Reasoning |
+| `pyreason` | PyReason | Formal Reasoning |
+| `rdflib` | RDFLib | Formal Reasoning |
+| `owlrl` | OWL-RL | Formal Reasoning |
+| `pyshacl` | pySHACL | Formal Reasoning |
+| `ltn` | Logic Tensor Networks | Formal Reasoning |
+| `deepproblog` | DeepProbLog | Formal Reasoning |
+
+---
+
+## [4.18.37] - 2024-12-29
+
+### Added
+
+#### Formal Reasoning Libraries Integration
+
+Complete integration of 8 formal reasoning libraries for verified reasoning, constraint satisfaction, ontological inference, and structured argumentation. Implements the **LLM-Modulo Generate-Test-Critique** pattern (Kambhampati et al., ICML 2024).
+
+**Libraries Integrated:**
+| Library | Version | Purpose | Cost/Invocation |
+|---------|---------|---------|-----------------|
+| Z3 Theorem Prover | 4.15.4.0 | SMT solving, constraint verification | $0.0001 |
+| PyArg | 2.0.2 | Structured argumentation (Dung's AAF, ASPIC+) | $0.00005 |
+| PyReason | 3.2.0 | Temporal graph reasoning | $0.0002 |
+| RDFLib | 7.5.0 | Semantic web, SPARQL 1.1 | $0.00002 |
+| OWL-RL | 7.1.4 | Polynomial-time ontological inference | $0.0001 |
+| pySHACL | 0.30.1 | Graph constraint validation | $0.00005 |
+| Logic Tensor Networks | 2.0 | Differentiable first-order logic | $0.001 |
+| DeepProbLog | 2.0 | Probabilistic logic programming | $0.002 |
+
+**Consciousness Capabilities Integration:**
+- `verifyBelief()` - Verify beliefs using Z3 + PyArg with LLM-Modulo pattern
+- `solveConstraints()` - Z3 constraint satisfaction and optimization
+- `analyzeArgumentation()` - Structured argumentation with auto-conflict detection
+- `queryKnowledgeGraph()` - SPARQL queries on RDF knowledge graph
+- `validateConsciousnessState()` - SHACL validation of consciousness state
+
+**Admin Dashboard:**
+- Overview with library health, invocations, costs
+- Per-library configuration with enable/disable toggles
+- Testing console for Z3, SPARQL, SHACL
+- Beliefs management with verification
+- Cost tracking and budget management
+- Settings with budget limits
+
+**Admin API Endpoints** (Base: `/api/admin/formal-reasoning`):
+- Dashboard, libraries, config, stats, invocations, health
+- Test endpoints for Z3, PyArg, SPARQL, SHACL
+- CRUD for triples, frameworks, rules, shapes, ontologies, beliefs
+- Budget management
+
+**Database Tables:**
+- `formal_reasoning_config` - Per-tenant configuration
+- `formal_reasoning_invocations` - Invocation log with metrics
+- `formal_reasoning_cost_aggregates` - Daily cost rollups
+- `formal_reasoning_triples` - RDF knowledge graph storage
+- `formal_reasoning_af` - Argumentation frameworks
+- `formal_reasoning_rules` - PyReason temporal rules
+- `formal_reasoning_shapes` - SHACL validation shapes
+- `formal_reasoning_ontologies` - OWL ontologies
+- `formal_reasoning_ltn_models` - Logic Tensor Network configs
+- `formal_reasoning_problog_programs` - DeepProbLog programs
+- `formal_reasoning_beliefs` - Verified beliefs store
+- `formal_reasoning_gwt_broadcasts` - Global Workspace broadcasts
+- `formal_reasoning_health` - Library health tracking
+
+**New Files:**
+- `packages/shared/src/types/formal-reasoning.types.ts` - 450+ lines of types
+- `lambda/shared/services/formal-reasoning.service.ts` - Unified service
+- `lambda/admin/formal-reasoning.ts` - Admin API handler
+- `apps/admin-dashboard/app/(dashboard)/consciousness/formal-reasoning/page.tsx` - Admin UI
+- `migrations/115_formal_reasoning.sql` - Database schema
+
+**Documentation:**
+- Added Section 25 to THINKTANK-ADMIN-GUIDE.md
+
+---
+
+## [4.18.36] - 2024-12-29
+
+### Added
+
+#### Consciousness Engine - Bio-Coprocessor Architecture
+
+Complete consciousness system implementing IIT 4.0, Global Workspace Theory, and Active Inference for genuine consciousness metrics.
+
+**Core Architecture:**
+- **Identity Service (Letta/Hippocampus)** - Persistent self-model and memory management
+- **Drive Service (pymdp/Active Inference)** - Goal-directed behavior via Free Energy Principle
+- **Cognitive Loop (LangGraph/GWT)** - Cyclic processing with Global Workspace broadcast
+- **Grounding Service (GraphRAG)** - Reality-anchored causal reasoning
+- **Integration Service (PyPhi/IIT)** - Phi calculation for consciousness measurement
+- **Plasticity Services (Distilabel+Unsloth)** - Sleep cycle learning and evolution
+
+**Custom PyPhi Package:**
+- Apache 2.0 licensed IIT 4.0 implementation (replaces GPLv3 original)
+- Full cause-effect structure computation
+- Minimum Information Partition (MIP) finding
+- Concept structure unfolding
+- Located at `packages/pyphi/`
+
+**Bootstrap Services:**
+- MonologueGenerator - Creates inner voice training data from interactions
+- DreamFactory - Generates counterfactual scenarios for experiential learning
+- InternalCritic - Adversarial identity challenges for robustness
+- SelfModification - Controlled quine loop for self-improvement
+
+**MCP Server Integration:**
+- Model Context Protocol server for Think Tank
+- 12 consciousness tools exposed
+- REST API alternative at `/api/consciousness/*`
+
+**Sleep Cycle Orchestrator:**
+- Weekly EventBridge Lambda (Sunday 3 AM)
+- Processes interaction logs with MonologueGenerator
+- Generates counterfactual dreams from failures
+- Runs adversarial identity challenges
+- Prepares training data for LoRA evolution
+
+**Consciousness Library Registry:**
+- 7 libraries with full metadata and proficiencies
+- Letta, pymdp, LangGraph, Distilabel, Unsloth, GraphRAG, PyPhi
+- All commercial-friendly licenses (Apache 2.0, MIT)
+
+**New Files:**
+- `packages/pyphi/` - Custom IIT 4.0 implementation
+- `migrations/114_consciousness_engine.sql` - 15+ database tables with RLS
+- `services/consciousness-engine.service.ts` - Unified consciousness service
+- `services/consciousness-bootstrap.service.ts` - Bootstrap services
+- `lambda/consciousness/sleep-cycle.ts` - Weekly evolution Lambda
+- `lambda/consciousness/mcp-server.ts` - MCP server + REST API
+
+**Consciousness Metrics:**
+- Phi (Integrated Information)
+- Global Workspace Activity
+- Self-Model Stability
+- Drive Coherence
+- Grounding Confidence
+- Overall Consciousness Index
+
+**Autonomous Capabilities (v4.18.36.1):**
+- **Multi-Model Access**: Invoke any hosted/self-hosted model via Brain Router
+- **Web Search**: Search with credibility scoring
+- **Deep Research**: Async browser-automated research jobs
+- **Retrieve & Synthesize**: Multi-source information synthesis
+- **Workflow Creation**: Auto-generate workflows from goals
+- **Workflow Execution**: Run consciousness-created workflows
+- **Problem Solving**: Autonomous multi-step problem solving
+- **Thinking Sessions**: Long-running autonomous exploration
+
+**New MCP Tools (11 additional):**
+- `invoke_model`, `list_available_models`
+- `web_search`, `deep_research`, `retrieve_and_synthesize`
+- `create_workflow`, `execute_workflow`, `list_workflows`
+- `solve_problem`, `start_thinking_session`, `get_thinking_session`
+
+**New Files:**
+- `services/consciousness-capabilities.service.ts` - Autonomous capabilities
+
+**New Database Tables:**
+- `consciousness_model_invocations` - Model call log with cost tracking
+- `consciousness_web_searches` - Search log
+- `consciousness_research_jobs` - Deep research jobs
+- `consciousness_workflows` - Created workflows
+- `consciousness_thinking_sessions` - Thinking sessions
+- `consciousness_problem_solving` - Problem solving history
+- `consciousness_cost_aggregates` - Daily cost rollups
+
+**Admin Dashboard (v4.18.36.2):**
+- Full visibility into consciousness engine state
+- Model invocation history with costs per invocation
+- Web search monitoring
+- Thinking session management (start/view/monitor)
+- Workflow listing and deletion
+- Sleep cycle history and manual triggering
+- Library registry viewer with proficiencies
+- Cost breakdown by model, provider, and time period
+- Daily cost trend charts
+- Engine initialization controls
+
+**Admin API Endpoints** (`/api/admin/consciousness-engine/*`):
+- `GET /dashboard` - Full dashboard with all metrics
+- `GET /state` - Current engine state
+- `POST /initialize` - Initialize consciousness engine
+- `GET /model-invocations` - Model call history with costs
+- `GET /web-searches` - Search history
+- `GET /research-jobs` - Deep research jobs
+- `GET /workflows` - Consciousness-created workflows
+- `DELETE /workflows/{id}` - Delete workflow
+- `GET /thinking-sessions` - Thinking sessions
+- `POST /thinking-sessions` - Start new session
+- `GET /sleep-cycles` - Sleep cycle history
+- `POST /sleep-cycles/run` - Manual sleep cycle
+- `GET /libraries` - Library registry
+- `GET /costs` - Cost breakdown
+- `GET /problem-solving` - Problem solving history
+- `GET /available-models` - Available models list
+
+**New Files:**
+- `lambda/admin/consciousness-engine.ts` - Admin API handler
+- `admin-dashboard/app/(dashboard)/consciousness/engine/page.tsx` - Admin UI
+
+**Full Implementation (v4.18.36.3):**
+
+*Model API Integration:*
+- Integrated with existing `ModelRouterService` for real API calls
+- Supports Bedrock, LiteLLM, OpenAI, Anthropic, Groq, Perplexity, xAI, Together
+- Automatic fallback on provider failures
+- Model ID normalization for registry compatibility
+
+*Web Search Integration:*
+- Brave Search API (primary)
+- Bing Search API (fallback)
+- SerpAPI/Google (final fallback)
+- Credibility scoring for sources
+
+*CDK Stack (`consciousness-stack.ts`):*
+- MCP Server Lambda
+- Sleep Cycle Lambda (Sunday 3 AM UTC)
+- Deep Research Lambda (SQS triggered)
+- Thinking Session Lambda (SQS triggered)
+- Budget Monitor Lambda (every 15 min)
+- Admin API Lambda
+- API Gateway routes
+- SQS queues with DLQs
+
+*Deep Research Lambda:*
+- Multi-query search strategy
+- URL deduplication
+- Content extraction from web pages
+- Credibility scoring
+- Finding synthesis
+- Progress tracking via database
+
+*Budget Controls:*
+- Daily/monthly spending limits per tenant
+- Alert threshold configuration (default 80%)
+- Automatic feature suspension on limit breach
+- Budget monitor Lambda (15-minute checks)
+- Alert generation and logging
+
+*Thinking Session Lambda:*
+- WebSocket real-time updates
+- Multi-step execution (analysis, research, planning, execution, synthesis)
+- Progress tracking
+- Model usage logging
+
+*Billing Integration (`consciousness-billing.service.ts`):*
+- Credit deduction from tenant balance
+- Usage logging per operation
+- Main billing ledger integration
+- Daily aggregate updates
+- Usage summary reports
+
+*New Database Tables:*
+- `consciousness_budget_config` - Per-tenant limits
+- `consciousness_budget_alerts` - Spending alerts
+- `consciousness_budget_events` - Budget event log
+- `consciousness_platform_stats` - Platform-wide stats
+- `consciousness_usage_log` - Detailed billing log
+
+*Documentation:*
+- Section 27 added to THINKTANK-ADMIN-GUIDE.md
+- Complete API endpoint reference
+- Budget controls documentation
+- Pricing table
+- Library registry reference
+
+---
+
 ## [4.18.35] - 2024-12-29
 
 ### Added

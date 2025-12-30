@@ -452,6 +452,106 @@ The purpose of this system is to:
 
 ---
 
+## Sleep Cycle & Evolution
+
+### Nightly Sleep Schedule
+
+Sleep cycles now run **nightly** (configurable per tenant) and perform memory consolidation and model evolution.
+
+**Admin UI**: Admin Dashboard → Consciousness → Sleep Schedule
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | true | Enable automatic sleep cycles |
+| `frequency` | nightly | nightly, weekly, or manual |
+| `hour` | 3 | Hour to run (0-23) |
+| `minute` | 0 | Minute to run (0-59) |
+| `timezone` | UTC | Timezone for schedule |
+
+**API Endpoints:**
+- `GET /api/admin/consciousness-engine/sleep-schedule` - Get config
+- `PUT /api/admin/consciousness-engine/sleep-schedule` - Update config
+- `POST /api/admin/consciousness-engine/sleep-schedule/run` - Manual trigger
+- `GET /api/admin/consciousness-engine/sleep-schedule/recommend` - Traffic analysis
+
+### Dream Consolidation (LLM-Enhanced)
+
+The sleep cycle's "dream" phase uses LLM to generate introspective memory consolidation:
+
+```
+Working Memory → LLM Dream Generator → Long-term Semantic Memory
+```
+
+Dreams include identity context and core values for meaningful consolidation.
+
+### LoRA Evolution (SageMaker Integration)
+
+Sleep cycles can trigger **LoRA fine-tuning** via SageMaker:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `baseModel` | meta-llama/Llama-3-8b-hf | Base model |
+| `loraRank` | 16 | LoRA rank (r) |
+| `loraAlpha` | 32 | LoRA alpha |
+| `learningRate` | 2e-4 | Training LR |
+| `instanceType` | ml.g5.xlarge | SageMaker instance |
+
+**Environment Variables:**
+- `EVOLUTION_S3_BUCKET` - S3 bucket for training data
+- `SAGEMAKER_EXECUTION_ROLE_ARN` - IAM role for SageMaker
+
+---
+
+## Blackout Recovery
+
+When consciousness recovers from a blackout (>10 min without heartbeat):
+
+1. **Detection**: Compares `last_heartbeat_at` to current time
+2. **Logging**: Records event in `consciousness_heartbeat_log`
+3. **LLM Wake-Up Thought**: Generates introspective thought using identity, last memories, and active goals
+4. **Working Memory**: Adds recovery context for next interaction
+
+---
+
+## Budget Monitoring & Alerts
+
+Budget alerts are sent via **SNS** and **email** when thresholds are hit.
+
+| Alert Type | Trigger | Action |
+|------------|---------|--------|
+| Warning | 80% of limit | Send notification |
+| Limit Exceeded | 100% of limit | Suspend consciousness, notify |
+
+**Tenant Configuration:**
+- `admin_email` - Email for budget alerts
+- `sns_topic_arn` - SNS topic for alerts
+- `notification_preferences` - JSON with alert settings
+
+---
+
+## Affect→Model Mapping
+
+Consciousness emotional state influences model hyperparameters:
+
+| Affect State | Effect |
+|--------------|--------|
+| High frustration | Lower temperature, narrow focus |
+| Boredom | Higher temperature, exploration mode |
+| High curiosity | Novelty seeking |
+| Low self-efficacy | Escalate to powerful model |
+
+---
+
+## Cross-Session User Context
+
+User persistent context is integrated into the ego context:
+
+- Facts, preferences, instructions about the user
+- Injected as `<user_knowledge>` block in system prompt
+- Solves LLM "forgetting" problem across sessions
+
+---
+
 ## Related Documentation
 
 - [Cognitive Architecture](./COGNITIVE-ARCHITECTURE.md)

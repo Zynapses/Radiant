@@ -344,7 +344,7 @@ export class ArtifactPipelineService {
         result.mergedArtifacts.push(artifacts[0]);
       } else {
         // Conflict - resolve based on strategy
-        const resolved = this.resolveArtifactConflict(artifacts, strategy);
+        const resolved = await this.resolveArtifactConflict(artifacts, strategy);
         result.mergedArtifacts.push(resolved.artifact);
         result.duplicatesRemoved += artifacts.length - 1;
         result.conflictsResolved.push({
@@ -357,10 +357,10 @@ export class ArtifactPipelineService {
     return result;
   }
 
-  private resolveArtifactConflict(
+  private async resolveArtifactConflict(
     artifacts: FileArtifact[],
     strategy: 'merge_all' | 'dedupe' | 'latest_wins' | 'primary_wins'
-  ): { artifact: FileArtifact; resolution: 'kept_primary' | 'kept_latest' | 'merged' | 'user_choice' } {
+  ): Promise<{ artifact: FileArtifact; resolution: 'kept_primary' | 'kept_latest' | 'merged' | 'user_choice' }> {
     switch (strategy) {
       case 'primary_wins':
         // First artifact wins (from primary model)
@@ -386,10 +386,131 @@ export class ArtifactPipelineService {
         
       case 'merge_all':
       default:
-        // For merge_all, we'd need to actually merge content
-        // For now, keep primary
-        return { artifact: artifacts[0], resolution: 'kept_primary' };
+        // Merge artifacts based on their type
+        return this.mergeArtifactContents(artifacts);
     }
+  }
+  
+  /**
+   * Merge multiple artifacts into a single combined artifact
+   */
+  private async mergeArtifactContents(
+    artifacts: FileArtifact[]
+  ): Promise<{ artifact: FileArtifact; resolution: 'merged' | 'kept_primary' | 'kept_latest' }> {
+    if (artifacts.length === 0) {
+      throw new Error('No artifacts to merge');
+    }
+    if (artifacts.length === 1) {
+      return { artifact: artifacts[0], resolution: 'kept_primary' };
+    }
+    
+    const primary = artifacts[0];
+    const mimeCategory = primary.mimeType.split('/')[0];
+    
+    // Text-based merging for applicable types
+    if (mimeCategory === 'text' || 
+        primary.mimeType === 'application/json' ||
+        primary.mimeType === 'application/xml' ||
+        primary.mimeType.includes('xml')) {
+      
+      // For JSON, merge objects
+      if (primary.mimeType === 'application/json') {
+        try {
+          let merged: Record<string, unknown> = {};
+          for (const artifact of artifacts) {
+            const content = await this.downloadArtifactContent(artifact.artifactId, artifact.generatedBy.stepId);
+            if (content) {
+              const parsed = JSON.parse(content.toString('utf-8'));
+              merged = this.deepMerge(merged, parsed);
+            }
+          }
+          
+          // Create merged artifact
+          const mergedContent = JSON.stringify(merged, null, 2);
+          const mergedArtifact: FileArtifact = {
+            ...primary,
+            artifactId: `merged-${Date.now()}`,
+            size: Buffer.byteLength(mergedContent),
+            checksum: this.computeChecksum(Buffer.from(mergedContent)),
+            generatedBy: {
+              ...primary.generatedBy,
+              timestamp: new Date().toISOString(),
+            },
+            metadata: {
+              ...primary.metadata,
+              mergedFrom: artifacts.map(a => a.artifactId).join(','),
+              mergeStrategy: 'deep_merge',
+            },
+          };
+          
+          return { artifact: mergedArtifact, resolution: 'merged' };
+        } catch {
+          // Fall back to keeping primary if JSON merge fails
+          return { artifact: primary, resolution: 'kept_primary' };
+        }
+      }
+      
+      // For other text types, concatenate with separators
+      const textParts: string[] = [];
+      for (const artifact of artifacts) {
+        const content = await this.downloadArtifactContent(artifact.artifactId, artifact.generatedBy.stepId);
+        if (content) {
+          textParts.push(`/* === From: ${artifact.filename} === */\n${content.toString('utf-8')}`);
+        }
+      }
+      
+      const mergedContent = textParts.join('\n\n');
+      const mergedArtifact: FileArtifact = {
+        ...primary,
+        artifactId: `merged-${Date.now()}`,
+        filename: `merged_${primary.filename}`,
+        size: Buffer.byteLength(mergedContent),
+        checksum: this.computeChecksum(Buffer.from(mergedContent)),
+        metadata: {
+          ...primary.metadata,
+          mergedFrom: artifacts.map(a => a.artifactId).join(','),
+          mergeStrategy: 'concatenate',
+        },
+      };
+      
+      return { artifact: mergedArtifact, resolution: 'merged' };
+    }
+    
+    // For binary/non-mergeable types, keep the largest or most recent
+    const sorted = [...artifacts].sort((a, b) => b.size - a.size);
+    return { artifact: sorted[0], resolution: 'kept_primary' };
+  }
+  
+  /**
+   * Deep merge two objects
+   */
+  private deepMerge(target: Record<string, unknown>, source: Record<string, unknown>): Record<string, unknown> {
+    const result = { ...target };
+    
+    for (const key of Object.keys(source)) {
+      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+        if (target[key] && typeof target[key] === 'object' && !Array.isArray(target[key])) {
+          result[key] = this.deepMerge(target[key] as Record<string, unknown>, source[key] as Record<string, unknown>);
+        } else {
+          result[key] = source[key];
+        }
+      } else if (Array.isArray(source[key])) {
+        // Concatenate arrays
+        result[key] = [...(Array.isArray(target[key]) ? target[key] as unknown[] : []), ...(source[key] as unknown[])];
+      } else {
+        result[key] = source[key];
+      }
+    }
+    
+    return result;
+  }
+  
+  /**
+   * Compute checksum for content
+   */
+  private computeChecksum(content: Buffer): string {
+    const crypto = require('crypto');
+    return crypto.createHash('sha256').update(content).digest('hex');
   }
 
   // ============================================================================

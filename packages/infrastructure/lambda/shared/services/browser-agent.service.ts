@@ -440,38 +440,142 @@ class BrowserAgentService {
   // ==========================================================================
 
   private async generateSeedUrls(query: string, config: ResearchConfig): Promise<string[]> {
-    // In production, this would use a search API (Google, Bing, etc.)
-    // For now, generate search engine URLs
-    const encodedQuery = encodeURIComponent(query);
     const urls: string[] = [];
-
-    // Google search
-    urls.push(`https://www.google.com/search?q=${encodedQuery}`);
-
-    // News if enabled
-    if (config.includeNews) {
-      urls.push(`https://news.google.com/search?q=${encodedQuery}`);
+    
+    // Try real search APIs first
+    const searchResults = await this.callSearchApi(query, config);
+    if (searchResults.length > 0) {
+      urls.push(...searchResults);
     }
+    
+    // Fallback to search engine URLs if no API results
+    if (urls.length === 0) {
+      const encodedQuery = encodeURIComponent(query);
+      
+      urls.push(`https://www.google.com/search?q=${encodedQuery}`);
 
-    // Academic if enabled
-    if (config.includeAcademic) {
-      urls.push(`https://scholar.google.com/scholar?q=${encodedQuery}`);
-    }
+      if (config.includeNews) {
+        urls.push(`https://news.google.com/search?q=${encodedQuery}`);
+      }
 
-    // Focus domains
-    if (config.focusDomains) {
-      for (const domain of config.focusDomains) {
-        urls.push(`https://www.google.com/search?q=${encodedQuery}+site:${domain}`);
+      if (config.includeAcademic) {
+        urls.push(`https://scholar.google.com/scholar?q=${encodedQuery}`);
+      }
+
+      if (config.focusDomains) {
+        for (const domain of config.focusDomains) {
+          urls.push(`https://www.google.com/search?q=${encodedQuery}+site:${domain}`);
+        }
       }
     }
 
     return urls;
   }
+  
+  private async callSearchApi(query: string, config: ResearchConfig): Promise<string[]> {
+    const urls: string[] = [];
+    
+    // Try Bing Search API
+    const bingKey = process.env.BING_SEARCH_API_KEY;
+    if (bingKey) {
+      try {
+        const bingUrls = await this.searchWithBing(query, bingKey, config);
+        urls.push(...bingUrls);
+        return urls;
+      } catch (error) {
+        logger.debug('Bing search failed', { error: String(error) });
+      }
+    }
+    
+    // Try Google Custom Search API
+    const googleKey = process.env.GOOGLE_SEARCH_API_KEY;
+    const googleCx = process.env.GOOGLE_SEARCH_CX;
+    if (googleKey && googleCx) {
+      try {
+        const googleUrls = await this.searchWithGoogle(query, googleKey, googleCx, config);
+        urls.push(...googleUrls);
+        return urls;
+      } catch (error) {
+        logger.debug('Google search failed', { error: String(error) });
+      }
+    }
+    
+    // Try SerpAPI as fallback
+    const serpKey = process.env.SERPAPI_KEY;
+    if (serpKey) {
+      try {
+        const serpUrls = await this.searchWithSerpApi(query, serpKey, config);
+        urls.push(...serpUrls);
+        return urls;
+      } catch (error) {
+        logger.debug('SerpAPI search failed', { error: String(error) });
+      }
+    }
+    
+    return urls;
+  }
+  
+  private async searchWithBing(query: string, apiKey: string, config: ResearchConfig): Promise<string[]> {
+    const count = config.maxSources || 10;
+    const endpoint = `https://api.bing.microsoft.com/v7.0/search?q=${encodeURIComponent(query)}&count=${count}`;
+    
+    const response = await fetch(endpoint, {
+      headers: { 'Ocp-Apim-Subscription-Key': apiKey },
+    });
+    
+    if (!response.ok) throw new Error(`Bing API error: ${response.status}`);
+    
+    const data = await response.json() as {
+      webPages?: { value: Array<{ url: string }> };
+      news?: { value: Array<{ url: string }> };
+    };
+    
+    const urls: string[] = [];
+    
+    if (data.webPages?.value) {
+      urls.push(...data.webPages.value.map(r => r.url));
+    }
+    
+    if (config.includeNews && data.news?.value) {
+      urls.push(...data.news.value.map(r => r.url));
+    }
+    
+    return urls;
+  }
+  
+  private async searchWithGoogle(query: string, apiKey: string, cx: string, config: ResearchConfig): Promise<string[]> {
+    const num = Math.min(config.maxSources || 10, 10);
+    const endpoint = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query)}&num=${num}`;
+    
+    const response = await fetch(endpoint);
+    
+    if (!response.ok) throw new Error(`Google API error: ${response.status}`);
+    
+    const data = await response.json() as {
+      items?: Array<{ link: string }>;
+    };
+    
+    return data.items?.map(r => r.link) || [];
+  }
+  
+  private async searchWithSerpApi(query: string, apiKey: string, config: ResearchConfig): Promise<string[]> {
+    const num = config.maxSources || 10;
+    const endpoint = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&api_key=${apiKey}&num=${num}`;
+    
+    const response = await fetch(endpoint);
+    
+    if (!response.ok) throw new Error(`SerpAPI error: ${response.status}`);
+    
+    const data = await response.json() as {
+      organic_results?: Array<{ link: string }>;
+    };
+    
+    return data.organic_results?.map(r => r.link) || [];
+  }
 
   private async crawlUrl(target: CrawlTarget, config: ResearchConfig): Promise<Source | null> {
-    // In production, this would use Playwright for JavaScript rendering
-    // For now, use fetch for basic HTML
     try {
+      // First, try basic fetch for simple HTML pages
       const response = await fetch(target.url, {
         headers: {
           'User-Agent': 'RadiantResearchBot/1.0 (+https://radiant.ai/bot)',
@@ -483,19 +587,47 @@ class BrowserAgentService {
 
       const contentType = response.headers.get('content-type') || '';
       
-      // Handle PDFs
+      // Handle PDFs using pdf-parse
       if (contentType.includes('pdf') && config.includePdfs) {
-        // Would use pdf-parse in production
+        try {
+          const pdfBuffer = await response.arrayBuffer();
+          const pdfText = await this.extractPdfText(Buffer.from(pdfBuffer));
+          
+          if (pdfText) {
+            return {
+              index: 0,
+              url: target.url,
+              title: this.extractPdfTitle(pdfText) || target.url,
+              domain: new URL(target.url).hostname,
+              extractedText: pdfText.substring(0, 50000),
+              relevanceScore: 0.6,
+              sourceType: 'academic',
+            };
+          }
+        } catch (pdfError) {
+          logger.warn('PDF extraction failed', { url: target.url, error: String(pdfError) });
+        }
         return null;
       }
 
-      // Handle HTML
+      // Handle HTML - check if JavaScript rendering is needed
       if (contentType.includes('html')) {
         const html = await response.text();
+        
+        // Check if page requires JavaScript (common SPA indicators)
+        const needsJs = this.detectJavaScriptRequired(html);
+        
+        if (needsJs && config.enableJsRendering !== false) {
+          // Use Playwright for JavaScript-heavy pages
+          const jsRendered = await this.crawlWithPlaywright(target.url, config);
+          if (jsRendered) return jsRendered;
+        }
+        
+        // Fall back to basic extraction
         const extracted = this.extractFromHtml(html, target.url);
         
         return {
-          index: 0, // Will be set later
+          index: 0,
           url: target.url,
           title: extracted.title,
           domain: new URL(target.url).hostname,
@@ -508,6 +640,124 @@ class BrowserAgentService {
       return null;
     } catch (error) {
       logger.debug('Crawl failed', { url: target.url, error });
+      return null;
+    }
+  }
+
+  /**
+   * Extract text from PDF using pdf-parse
+   */
+  private async extractPdfText(pdfBuffer: Buffer): Promise<string | null> {
+    try {
+      // Dynamic import of pdf-parse
+      const pdfParse = await import('pdf-parse').then(m => m.default);
+      const data = await pdfParse(pdfBuffer);
+      return data.text;
+    } catch (error) {
+      logger.warn('pdf-parse not available, skipping PDF extraction', { error: String(error) });
+      return null;
+    }
+  }
+
+  private extractPdfTitle(text: string): string | null {
+    // Try to extract title from first lines of PDF
+    const lines = text.split('\n').filter(l => l.trim().length > 0);
+    if (lines.length > 0) {
+      const firstLine = lines[0].trim();
+      if (firstLine.length > 5 && firstLine.length < 200) {
+        return firstLine;
+      }
+    }
+    return null;
+  }
+
+  private detectJavaScriptRequired(html: string): boolean {
+    // Check for common SPA framework indicators
+    const spaIndicators = [
+      'id="root"',
+      'id="app"',
+      'id="__next"',
+      'ng-app',
+      'data-reactroot',
+      'data-v-',
+      '__NUXT__',
+      '__NEXT_DATA__',
+    ];
+    
+    for (const indicator of spaIndicators) {
+      if (html.includes(indicator)) {
+        // Check if the content is actually empty (hydration needed)
+        const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+        if (bodyMatch) {
+          const bodyContent = bodyMatch[1]
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+            .replace(/<[^>]+>/g, '')
+            .trim();
+          
+          // If body is mostly empty, JS rendering is needed
+          if (bodyContent.length < 500) {
+            return true;
+          }
+        }
+      }
+    }
+    
+    return false;
+  }
+
+  /**
+   * Crawl URL using Playwright for JavaScript rendering
+   */
+  private async crawlWithPlaywright(url: string, config: ResearchConfig): Promise<Source | null> {
+    try {
+      // Dynamic import of Playwright
+      const { chromium } = await import('playwright');
+      
+      const browser = await chromium.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
+      
+      try {
+        const context = await browser.newContext({
+          userAgent: 'RadiantResearchBot/1.0 (+https://radiant.ai/bot)',
+        });
+        
+        const page = await context.newPage();
+        await page.goto(url, { 
+          waitUntil: 'networkidle',
+          timeout: 30000,
+        });
+        
+        // Wait for content to load
+        await page.waitForLoadState('domcontentloaded');
+        
+        // Extract content
+        const title = await page.title();
+        const text = await page.evaluate(() => {
+          // Remove scripts, styles, nav, footer
+          const elementsToRemove = document.querySelectorAll('script, style, nav, footer, header, aside');
+          elementsToRemove.forEach(el => el.remove());
+          
+          return document.body?.innerText || '';
+        });
+        
+        await browser.close();
+        
+        return {
+          index: 0,
+          url,
+          title,
+          domain: new URL(url).hostname,
+          extractedText: text.substring(0, 50000),
+          relevanceScore: 0.7, // Higher score for JS-rendered content
+          sourceType: this.classifySourceType(url),
+        };
+      } finally {
+        await browser.close();
+      }
+    } catch (error) {
+      logger.warn('Playwright crawl failed', { url, error: String(error) });
       return null;
     }
   }
@@ -540,26 +790,112 @@ class BrowserAgentService {
     return [...new Set(matches)].slice(0, 50);
   }
 
-  private extractEntities(text: string): ExtractedEntity[] {
-    // Simple entity extraction - in production use NLP/NER
+  private async extractEntitiesWithNER(text: string): Promise<ExtractedEntity[]> {
+    // Try LLM-based NER first
+    try {
+      const { modelRouterService } = await import('./model-router.service');
+      
+      const response = await modelRouterService.invoke({
+        modelId: 'anthropic/claude-3-haiku',
+        messages: [
+          { 
+            role: 'system', 
+            content: `Extract named entities from the text. Return JSON array:
+[{"name": "Entity Name", "type": "person|company|organization|location|product|technology|event", "mentions": 1}]
+Extract up to 20 entities. Focus on important entities mentioned multiple times.` 
+          },
+          { role: 'user', content: `Extract entities from:\n${text.substring(0, 3000)}` }
+        ],
+        temperature: 0,
+        maxTokens: 1024,
+      });
+      
+      const jsonMatch = response.content.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]) as Array<{
+          name: string;
+          type: string;
+          mentions?: number;
+        }>;
+        
+        return parsed.map(e => ({
+          name: e.name,
+          type: e.type as ExtractedEntity['type'],
+          mentions: e.mentions || 1,
+          context: [],
+        })).slice(0, 50);
+      }
+    } catch (error) {
+      logger.debug('LLM NER failed, using pattern-based extraction', { error: String(error) });
+    }
+    
+    // Fallback to pattern-based extraction
+    return this.extractEntitiesPatternBased(text);
+  }
+  
+  private extractEntitiesPatternBased(text: string): ExtractedEntity[] {
     const entities: ExtractedEntity[] = [];
+    const entityCounts = new Map<string, { type: string; count: number }>();
     
-    // Extract capitalized phrases as potential entities
-    const phraseRegex = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b/g;
-    const matches = text.match(phraseRegex) || [];
-    
-    for (const match of matches) {
-      if (match.split(' ').length <= 4) {
-        entities.push({
-          name: match,
-          type: 'company', // Would use NER to classify
-          mentions: 1,
-          context: [text.substring(text.indexOf(match) - 50, text.indexOf(match) + 50)],
-        });
+    // Extract capitalized phrases (potential names/companies)
+    const phraseRegex = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})\b/g;
+    let match;
+    while ((match = phraseRegex.exec(text)) !== null) {
+      const name = match[1];
+      if (name.length > 2) {
+        const existing = entityCounts.get(name);
+        if (existing) {
+          existing.count++;
+        } else {
+          entityCounts.set(name, { type: this.classifyEntityType(name, text), count: 1 });
+        }
       }
     }
-
-    return entities.slice(0, 50);
+    
+    // Convert to array and sort by mentions
+    for (const [name, data] of entityCounts.entries()) {
+      entities.push({
+        name,
+        type: data.type as ExtractedEntity['type'],
+        mentions: data.count,
+        context: [],
+      });
+    }
+    
+    return entities.sort((a, b) => b.mentions - a.mentions).slice(0, 50);
+  }
+  
+  private classifyEntityType(name: string, context: string): string {
+    const lowerName = name.toLowerCase();
+    const lowerContext = context.toLowerCase();
+    
+    // Person indicators
+    if (/\b(mr|mrs|ms|dr|prof|ceo|cfo|president|director)\b/i.test(context.substring(context.indexOf(name) - 50, context.indexOf(name) + 50))) {
+      return 'person';
+    }
+    
+    // Company indicators
+    if (/\b(inc|corp|llc|ltd|company|corporation)\b/i.test(lowerName) ||
+        /\b(announced|reported|shares|stock|revenue)\b/i.test(lowerContext)) {
+      return 'company';
+    }
+    
+    // Location indicators
+    if (/\b(city|country|state|nation|capital)\b/i.test(lowerContext)) {
+      return 'location';
+    }
+    
+    // Technology indicators
+    if (/\b(api|sdk|platform|software|hardware|ai|ml)\b/i.test(lowerContext)) {
+      return 'technology';
+    }
+    
+    return 'organization'; // Default
+  }
+  
+  private extractEntities(text: string): ExtractedEntity[] {
+    // Sync wrapper - use pattern-based for sync contexts
+    return this.extractEntitiesPatternBased(text);
   }
 
   private shouldCrawl(url: string, config: ResearchConfig): boolean {

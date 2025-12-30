@@ -460,10 +460,32 @@ export const updateConsciousnessConfig: APIGatewayProxyHandler = async (event) =
       }
     }
     
-    // Evolution config would be stored separately (for future expansion)
+    // Store evolution config in consciousness_parameters
     if (evolutionConfig) {
-      logger.info('Evolution config update requested', { tenantId, evolutionConfig });
-      // TODO: Store in dedicated evolution_config table
+      await executeStatement(
+        `UPDATE consciousness_parameters 
+         SET evolution_enabled = $2,
+             evolution_config = $3,
+             updated_at = NOW()
+         WHERE tenant_id = $1`,
+        [
+          { name: 'tenantId', value: { stringValue: tenantId } },
+          { name: 'enabled', value: { booleanValue: evolutionConfig.enabled ?? true } },
+          { name: 'config', value: { stringValue: JSON.stringify({
+            baseModel: evolutionConfig.baseModel || 'meta-llama/Llama-3-8b-hf',
+            loraRank: evolutionConfig.loraRank || 16,
+            loraAlpha: evolutionConfig.loraAlpha || 32,
+            learningRate: evolutionConfig.learningRate || 2e-4,
+            epochs: evolutionConfig.epochs || 1,
+            batchSize: evolutionConfig.batchSize || 4,
+            maxSteps: evolutionConfig.maxSteps || 100,
+            warmupSteps: evolutionConfig.warmupSteps || 10,
+            instanceType: evolutionConfig.instanceType || 'ml.g5.xlarge',
+          }) } },
+        ]
+      );
+      
+      logger.info('Evolution config updated', { tenantId, evolutionConfig });
     }
     
     return response(200, { success: true, message: 'Configuration updated' });

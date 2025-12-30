@@ -2,6 +2,8 @@
 // Enables user feedback collection and AGI brain learning from UI generation
 
 import { executeStatement, stringParam } from '../db/client';
+import { modelRouterService, type ChatMessage } from './model-router.service';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import crypto from 'crypto';
 
 // ============================================================================
@@ -363,9 +365,60 @@ class GenerativeUIFeedbackService {
     // Build analysis prompt
     const analysisPrompt = this.buildAnalysisPrompt(userRequest, currentSnapshot);
     
-    // For now, use pattern-based analysis
-    // In production, this would call the AGI brain service
-    const analysis = this.performPatternAnalysis(userRequest, currentSnapshot);
+    // Use LLM for intelligent analysis
+    let analysis = this.performPatternAnalysis(userRequest, currentSnapshot);
+    
+    try {
+      const llmPrompt = `Analyze this UI improvement request and generate specific changes.
+
+USER REQUEST: "${userRequest}"
+
+CURRENT UI STATE:
+${JSON.stringify(currentSnapshot.components, null, 2).substring(0, 2000)}
+
+Based on the request, determine:
+1. The user's intent (what they want to achieve)
+2. Specific changes needed (add/remove/modify components)
+3. Your confidence level (0-1)
+
+Respond with ONLY a JSON object:
+{
+  "intent": "description of user's goal",
+  "changes": [
+    {
+      "targetPath": "path.to.component",
+      "changeType": "add|remove|modify",
+      "beforeValue": "current value if modifying",
+      "afterValue": "new value",
+      "explanation": "why this change"
+    }
+  ],
+  "confidence": 0.85,
+  "alternatives": [
+    {"description": "alternative approach", "changes": []}
+  ]
+}`;
+
+      const result = await modelRouterService.invoke({
+        modelId: 'anthropic/claude-3-haiku',
+        messages: [{ role: 'user', content: llmPrompt }],
+        temperature: 0.2,
+        maxTokens: 1024,
+      });
+
+      const jsonMatch = result.content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const llmAnalysis = JSON.parse(jsonMatch[0]);
+        analysis = {
+          intent: llmAnalysis.intent || analysis.intent,
+          changes: llmAnalysis.changes || analysis.changes,
+          confidence: llmAnalysis.confidence || analysis.confidence,
+          alternatives: llmAnalysis.alternatives,
+        };
+      }
+    } catch (error) {
+      logger.warn('LLM analysis failed, using pattern-based fallback', { error: String(error) });
+    }
 
     // If vision analysis is enabled, describe the current UI
     const visionAnalysis = await this.performVisionAnalysis(currentSnapshot);
@@ -445,13 +498,49 @@ class GenerativeUIFeedbackService {
     identifiedIssues: string[];
     suggestedFixes: string[];
   } | undefined> {
-    // In production, this would use a vision model to analyze the rendered UI
-    // For now, we analyze the component structure
-
     const components = snapshot.components as { type: string; title: string; inputs?: unknown[] }[];
     const componentTypes = components.map(c => c.type);
     const issues: string[] = [];
     const fixes: string[] = [];
+
+    // Try to use vision model for analysis
+    try {
+      const uiDescription = JSON.stringify(snapshot, null, 2);
+      const messages: ChatMessage[] = [
+        { 
+          role: 'system', 
+          content: `You are a UI/UX analysis expert. Analyze the following UI component structure and identify:
+1. A brief description of the current UI
+2. Any usability or design issues
+3. Suggested improvements
+
+Respond in JSON format:
+{"description": "...", "issues": ["..."], "fixes": ["..."]}`
+        },
+        { role: 'user', content: `Analyze this UI structure:\n${uiDescription}` }
+      ];
+      
+      const response = await modelRouterService.invoke({
+        modelId: 'anthropic/claude-3-haiku',
+        messages,
+        temperature: 0.3,
+        maxTokens: 1024,
+      });
+      
+      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return {
+          currentUIDescription: parsed.description || `UI with ${componentTypes.length} components`,
+          identifiedIssues: parsed.issues || [],
+          suggestedFixes: parsed.fixes || [],
+        };
+      }
+    } catch (error) {
+      logger.debug('Vision analysis via LLM failed, using fallback', { error: String(error) });
+    }
+
+    // Fallback: analyze component structure
 
     // Check for common issues
     if (componentTypes.includes('calculator')) {
@@ -485,10 +574,74 @@ class GenerativeUIFeedbackService {
     newSnapshot.timestamp = new Date();
     newSnapshot.renderHash = crypto.randomUUID().slice(0, 8);
 
-    // Apply each change (simplified implementation)
+    // Apply each change using path-based update mechanism
     for (const change of changes) {
-      // In production, this would use a path-based update mechanism
-      // For now, we just update the timestamp to indicate change
+      try {
+        const pathParts = change.targetPath.split(/\.|\[|\]/).filter(p => p);
+        let current: unknown = newSnapshot;
+        
+        // Navigate to parent of target
+        for (let i = 0; i < pathParts.length - 1; i++) {
+          const part = pathParts[i];
+          const idx = parseInt(part, 10);
+          if (!isNaN(idx) && Array.isArray(current)) {
+            current = current[idx];
+          } else if (typeof current === 'object' && current !== null) {
+            current = (current as Record<string, unknown>)[part];
+          }
+        }
+        
+        // Apply the change
+        const lastPart = pathParts[pathParts.length - 1];
+        const lastIdx = parseInt(lastPart, 10);
+        
+        if (typeof current === 'object' && current !== null) {
+          const target = current as Record<string, unknown>;
+          
+          switch (change.changeType) {
+            case 'add':
+              if (Array.isArray(target[lastPart])) {
+                (target[lastPart] as unknown[]).push(change.afterValue);
+              } else if (!isNaN(lastIdx) && Array.isArray(current)) {
+                (current as unknown[]).splice(lastIdx, 0, change.afterValue);
+              } else {
+                target[lastPart] = change.afterValue;
+              }
+              break;
+              
+            case 'remove':
+              if (!isNaN(lastIdx) && Array.isArray(current)) {
+                (current as unknown[]).splice(lastIdx, 1);
+              } else {
+                delete target[lastPart];
+              }
+              break;
+              
+            case 'modify':
+              if (!isNaN(lastIdx) && Array.isArray(current)) {
+                (current as unknown[])[lastIdx] = change.afterValue;
+              } else {
+                target[lastPart] = change.afterValue;
+              }
+              break;
+              
+            case 'replace':
+              // Replace entire value at path
+              if (!isNaN(lastIdx) && Array.isArray(current)) {
+                (current as unknown[])[lastIdx] = change.afterValue;
+              } else {
+                target[lastPart] = change.afterValue;
+              }
+              break;
+          }
+        }
+      } catch (error) {
+        logger.debug('Failed to apply UI change', { 
+          path: change.targetPath, 
+          type: change.changeType,
+          error: String(error) 
+        });
+      }
     }
 
     return newSnapshot;
@@ -542,12 +695,57 @@ Respond with a structured analysis.
   }
 
   /**
-   * Queue feedback for AGI analysis
+   * Queue feedback for AGI analysis via SQS
    */
   private async queueForAGIAnalysis(feedbackId: string): Promise<void> {
-    // In production, this would add to a queue for background processing
-    // For now, we'll mark it for processing
-    console.log(`Feedback ${feedbackId} queued for AGI analysis`);
+    const queueUrl = process.env.UI_FEEDBACK_ANALYSIS_QUEUE_URL;
+    
+    if (!queueUrl) {
+      // If queue not configured, mark for manual processing in database
+      await executeStatement(
+        `UPDATE generative_ui_feedback SET queued_for_analysis = true, queued_at = NOW() WHERE id = $1::uuid`,
+        [stringParam('feedbackId', feedbackId)]
+      );
+      logger.debug('Feedback marked for analysis (queue not configured)', { feedbackId });
+      return;
+    }
+    
+    try {
+      // Send to SQS for background processing
+      const { SQSClient, SendMessageCommand } = await import('@aws-sdk/client-sqs');
+      
+      const sqsClient = new SQSClient({ region: process.env.AWS_REGION || 'us-east-1' });
+      
+      await sqsClient.send(new SendMessageCommand({
+        QueueUrl: queueUrl,
+        MessageBody: JSON.stringify({
+          feedbackId,
+          action: 'analyze_feedback',
+          timestamp: new Date().toISOString(),
+        }),
+        MessageGroupId: 'ui-feedback-analysis',
+        MessageDeduplicationId: `feedback-${feedbackId}`,
+      }));
+      
+      // Mark as queued in database
+      await executeStatement(
+        `UPDATE generative_ui_feedback SET queued_for_analysis = true, queued_at = NOW() WHERE id = $1::uuid`,
+        [stringParam('feedbackId', feedbackId)]
+      );
+      
+      logger.info('Feedback queued for AGI analysis', { feedbackId, queueUrl });
+    } catch (error) {
+      logger.error('Failed to queue feedback for AGI analysis', { feedbackId, error: String(error) });
+      
+      // Still mark for processing so it can be picked up by batch job
+      await executeStatement(
+        `UPDATE generative_ui_feedback SET queued_for_analysis = true, queue_error = $2, queued_at = NOW() WHERE id = $1::uuid`,
+        [
+          stringParam('feedbackId', feedbackId),
+          stringParam('queueError', String(error)),
+        ]
+      );
+    }
   }
 
   /**

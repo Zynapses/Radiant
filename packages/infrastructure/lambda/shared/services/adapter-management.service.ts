@@ -615,6 +615,7 @@ class AdapterManagementService {
   
   /**
    * Get A/B test results comparing cached vs fresh responses
+   * Queries actual response tracking data from the database
    */
   async getCachedVsFreshComparison(tenantId: string, periodDays: number = 7): Promise<{
     cachedResponseCount: number;
@@ -623,16 +624,78 @@ class AdapterManagementService {
     freshAvgRating: number;
     cacheWinRate: number;
   }> {
-    // This would require tracking which responses came from cache vs fresh
-    // For now, return estimated values based on cache hit rate
-    const cacheMetrics = await this.getCacheMetrics(tenantId, periodDays);
+    // Query cached response metrics
+    const cachedResult = await executeStatement(
+      `SELECT 
+         COUNT(*) as count,
+         AVG(user_rating) as avg_rating
+       FROM response_tracking
+       WHERE tenant_id = $1::uuid
+         AND was_cached = true
+         AND created_at >= NOW() - INTERVAL '1 day' * $2
+         AND user_rating IS NOT NULL`,
+      [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'days', value: { longValue: periodDays } },
+      ]
+    );
+    
+    // Query fresh response metrics
+    const freshResult = await executeStatement(
+      `SELECT 
+         COUNT(*) as count,
+         AVG(user_rating) as avg_rating
+       FROM response_tracking
+       WHERE tenant_id = $1::uuid
+         AND (was_cached = false OR was_cached IS NULL)
+         AND created_at >= NOW() - INTERVAL '1 day' * $2
+         AND user_rating IS NOT NULL`,
+      [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'days', value: { longValue: periodDays } },
+      ]
+    );
+    
+    // Query win rate (cached responses rated higher than average fresh)
+    const winRateResult = await executeStatement(
+      `WITH fresh_avg AS (
+         SELECT AVG(user_rating) as avg_rating
+         FROM response_tracking
+         WHERE tenant_id = $1::uuid
+           AND (was_cached = false OR was_cached IS NULL)
+           AND created_at >= NOW() - INTERVAL '1 day' * $2
+           AND user_rating IS NOT NULL
+       )
+       SELECT 
+         COUNT(*) FILTER (WHERE r.user_rating >= f.avg_rating) as wins,
+         COUNT(*) as total
+       FROM response_tracking r
+       CROSS JOIN fresh_avg f
+       WHERE r.tenant_id = $1::uuid
+         AND r.was_cached = true
+         AND r.created_at >= NOW() - INTERVAL '1 day' * $2
+         AND r.user_rating IS NOT NULL`,
+      [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'days', value: { longValue: periodDays } },
+      ]
+    );
+    
+    const cachedCount = Number(cachedResult.rows?.[0]?.count || 0);
+    const cachedAvg = parseFloat(cachedResult.rows?.[0]?.avg_rating as string) || 0;
+    const freshCount = Number(freshResult.rows?.[0]?.count || 0);
+    const freshAvg = parseFloat(freshResult.rows?.[0]?.avg_rating as string) || 0;
+    
+    const wins = Number(winRateResult.rows?.[0]?.wins || 0);
+    const total = Number(winRateResult.rows?.[0]?.total || 0);
+    const winRate = total > 0 ? wins / total : 0;
     
     return {
-      cachedResponseCount: 0,
-      cachedAvgRating: cacheMetrics.patternCacheAvgRating,
-      freshResponseCount: 0,
-      freshAvgRating: 0,
-      cacheWinRate: 0,
+      cachedResponseCount: cachedCount,
+      cachedAvgRating: cachedAvg,
+      freshResponseCount: freshCount,
+      freshAvgRating: freshAvg,
+      cacheWinRate: winRate,
     };
   }
 }

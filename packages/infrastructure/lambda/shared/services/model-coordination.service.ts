@@ -2,7 +2,7 @@
 // Coordinates communication between hosted and self-hosted AI models
 // Includes timed sync, auto-discovery, and endpoint management
 
-import { executeStatement } from '../utils/database';
+import { executeStatement, stringParam, longParam } from '../db/client';
 import type {
   ModelEndpoint,
   ModelRegistryEntry,
@@ -36,12 +36,12 @@ class ModelCoordinationService {
       [{ name: 'tenantId', value: tenantId ? { stringValue: tenantId } : { isNull: true } }]
     );
     
-    if (!result.records || result.records.length === 0) {
+    if (!result.rows || result.rows.length === 0) {
       // Return default config
       return this.getDefaultSyncConfig(tenantId);
     }
     
-    return this.mapSyncConfig(result.records[0]);
+    return this.mapSyncConfig(result.rows[0]);
   }
   
   /**
@@ -272,9 +272,9 @@ class ModelCoordinationService {
     scanned: number;
     updated: number;
     endpointsUpdated: number;
-    errors: Array<{ errorType: string; message: string; timestamp: Date }>;
+    errors: Array<{ errorType: 'connection' | 'auth' | 'format' | 'validation' | 'unknown'; message: string; timestamp: Date }>;
   }> {
-    const result = { scanned: 0, updated: 0, endpointsUpdated: 0, errors: [] as Array<{ errorType: string; message: string; timestamp: Date }> };
+    const result = { scanned: 0, updated: 0, endpointsUpdated: 0, errors: [] as Array<{ errorType: 'connection' | 'auth' | 'format' | 'validation' | 'unknown'; message: string; timestamp: Date }> };
     
     // Get all external endpoints
     const endpointsResult = await executeStatement(
@@ -284,7 +284,7 @@ class ModelCoordinationService {
       []
     );
     
-    for (const row of endpointsResult.records || []) {
+    for (const row of endpointsResult.rows || []) {
       result.scanned++;
       
       const endpoint = this.mapEndpointRow(row);
@@ -312,14 +312,72 @@ class ModelCoordinationService {
   }
   
   /**
-   * Check endpoint health
+   * Check endpoint health via HTTP request
    */
   private async checkEndpointHealth(
     endpoint: ModelEndpoint
   ): Promise<'healthy' | 'degraded' | 'unhealthy'> {
-    // In real implementation, would make HTTP request to health check URL
-    // For now, return current status
-    return endpoint.healthStatus === 'unknown' ? 'healthy' : endpoint.healthStatus as 'healthy' | 'degraded' | 'unhealthy';
+    // If no health check URL configured, return current status
+    if (!endpoint.healthCheckUrl) {
+      return endpoint.healthStatus === 'unknown' ? 'healthy' : endpoint.healthStatus as 'healthy' | 'degraded' | 'unhealthy';
+    }
+    
+    const startTime = Date.now();
+    const timeoutMs = 5000; // 5 second timeout
+    
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      
+      const response = await fetch(endpoint.healthCheckUrl, {
+        method: 'GET',
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+      
+      clearTimeout(timeoutId);
+      const latencyMs = Date.now() - startTime;
+      
+      // Check response status
+      if (response.ok) {
+        // Check if response time indicates degraded performance
+        if (latencyMs > 2000) {
+          return 'degraded';
+        }
+        
+        // Try to parse response body for additional health info
+        try {
+          const body = await response.json() as { status?: string; healthy?: boolean };
+          if (body.status === 'unhealthy' || body.healthy === false) {
+            return 'unhealthy';
+          }
+          if (body.status === 'degraded') {
+            return 'degraded';
+          }
+        } catch {
+          // Body parsing failed, but response was OK
+        }
+        
+        return 'healthy';
+      } else if (response.status >= 500) {
+        return 'unhealthy';
+      } else if (response.status >= 400) {
+        return 'degraded';
+      }
+      
+      return 'healthy';
+    } catch (error) {
+      // Network error, timeout, or connection refused
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      if (errorMessage.includes('abort') || errorMessage.includes('timeout')) {
+        return 'degraded'; // Timeout suggests slow but possibly working
+      }
+      
+      return 'unhealthy'; // Connection failed
+    }
   }
   
   // ============================================================================
@@ -338,11 +396,11 @@ class ModelCoordinationService {
       [{ name: 'modelId', value: { stringValue: modelId } }]
     );
     
-    if (!result.records || result.records.length === 0) {
+    if (!result.rows || result.rows.length === 0) {
       return null;
     }
     
-    return this.mapRegistryEntry(result.records[0]);
+    return this.mapRegistryEntry(result.rows[0]);
   }
   
   /**
@@ -377,7 +435,7 @@ class ModelCoordinationService {
     
     const result = await executeStatement(sql, params);
     
-    return (result.records || []).map(row => this.mapRegistryEntry(row));
+    return (result.rows || []).map(row => this.mapRegistryEntry(row));
   }
   
   /**
@@ -412,7 +470,7 @@ class ModelCoordinationService {
       ]
     );
     
-    return result.records?.[0]?.[0]?.stringValue || '';
+    return String(result.rows?.[0]?.id || '');
   }
   
   /**
@@ -492,7 +550,7 @@ class ModelCoordinationService {
       ]
     );
     
-    return result.records?.[0]?.[0]?.stringValue || '';
+    return String(result.rows?.[0]?.id || '');
   }
   
   /**
@@ -544,7 +602,7 @@ class ModelCoordinationService {
       ]
     );
     
-    const detectionId = result.records?.[0]?.[0]?.stringValue || '';
+    const detectionId = String(result.rows?.[0]?.id || '');
     
     // Trigger sync if auto-discovery enabled
     const config = await this.getSyncConfig();
@@ -565,7 +623,7 @@ class ModelCoordinationService {
       []
     );
     
-    return (result.records || []).map(row => this.mapDetection(row));
+    return (result.rows || []).map(row => this.mapDetection(row));
   }
   
   // ============================================================================
@@ -611,13 +669,13 @@ class ModelCoordinationService {
     // Get pending detections
     const pendingDetections = await this.getPendingDetections();
     
-    const statsRow = statsResult.records?.[0];
-    const endpointRow = endpointStatsResult.records?.[0];
+    const statsRow = statsResult.rows?.[0];
+    const endpointRow = endpointStatsResult.rows?.[0];
     
     return {
       config,
-      lastSync: lastJobResult.records?.[0] ? this.mapSyncJob(lastJobResult.records[0]) : undefined,
-      recentJobs: (recentJobsResult.records || []).map(row => this.mapSyncJob(row)),
+      lastSync: lastJobResult.rows?.[0] ? this.mapSyncJob(lastJobResult.rows[0]) : undefined,
+      recentJobs: (recentJobsResult.rows || []).map(row => this.mapSyncJob(row)),
       registryStats: {
         totalModels: Number((statsRow?.[0] as { longValue?: number })?.longValue || 0),
         externalModels: Number((statsRow?.[1] as { longValue?: number })?.longValue || 0),
@@ -649,7 +707,7 @@ class ModelCoordinationService {
       ]
     );
     
-    return result.records?.[0]?.[0]?.stringValue || '';
+    return String(result.rows?.[0]?.id || '');
   }
   
   private async updateSyncJob(job: SyncJob): Promise<void> {
@@ -711,125 +769,115 @@ class ModelCoordinationService {
   // Mapping Helpers
   // ============================================================================
   
-  private mapSyncConfig(row: unknown[]): SyncConfig {
-    const r = row as Array<{ stringValue?: string; booleanValue?: boolean; longValue?: number }>;
-    
+  private mapSyncConfig(row: Record<string, unknown>): SyncConfig {
     return {
-      id: r[0]?.stringValue || '',
-      tenantId: r[1]?.stringValue,
-      autoSyncEnabled: r[2]?.booleanValue ?? true,
-      syncIntervalMinutes: Number(r[3]?.longValue || 60),
-      syncExternalProviders: r[4]?.booleanValue ?? true,
-      syncSelfHostedModels: r[5]?.booleanValue ?? true,
-      syncFromHuggingFace: r[6]?.booleanValue ?? false,
-      autoDiscoveryEnabled: r[7]?.booleanValue ?? true,
-      autoGenerateProficiencies: r[8]?.booleanValue ?? true,
-      notifyOnNewModel: r[9]?.booleanValue ?? true,
-      notifyOnModelRemoved: r[10]?.booleanValue ?? false,
-      notifyOnSyncFailure: r[11]?.booleanValue ?? true,
-      notificationEmails: r[12]?.stringValue ? JSON.parse(r[12].stringValue) : undefined,
-      notificationWebhook: r[13]?.stringValue,
-      lastSyncAt: r[14]?.stringValue ? new Date(r[14].stringValue) : undefined,
-      lastSyncStatus: r[15]?.stringValue as SyncStatus,
-      lastSyncDurationMs: r[16]?.longValue,
-      nextScheduledSync: r[17]?.stringValue ? new Date(r[17].stringValue) : undefined,
-      createdAt: new Date(r[18]?.stringValue || ''),
-      updatedAt: new Date(r[19]?.stringValue || ''),
+      id: String(row.id || ''),
+      tenantId: row.tenant_id ? String(row.tenant_id) : undefined,
+      autoSyncEnabled: row.auto_sync_enabled !== false,
+      syncIntervalMinutes: Number(row.sync_interval_minutes || 60),
+      syncExternalProviders: row.sync_external_providers !== false,
+      syncSelfHostedModels: row.sync_self_hosted_models !== false,
+      syncFromHuggingFace: Boolean(row.sync_from_huggingface),
+      autoDiscoveryEnabled: row.auto_discovery_enabled !== false,
+      autoGenerateProficiencies: row.auto_generate_proficiencies !== false,
+      notifyOnNewModel: row.notify_on_new_model !== false,
+      notifyOnModelRemoved: Boolean(row.notify_on_model_removed),
+      notifyOnSyncFailure: row.notify_on_sync_failure !== false,
+      notificationEmails: row.notification_emails ? (row.notification_emails as string[]) : undefined,
+      notificationWebhook: row.notification_webhook ? String(row.notification_webhook) : undefined,
+      lastSyncAt: row.last_sync_at ? new Date(String(row.last_sync_at)) : undefined,
+      lastSyncStatus: row.last_sync_status as SyncStatus,
+      lastSyncDurationMs: row.last_sync_duration_ms ? Number(row.last_sync_duration_ms) : undefined,
+      nextScheduledSync: row.next_scheduled_sync ? new Date(String(row.next_scheduled_sync)) : undefined,
+      createdAt: new Date(String(row.created_at || '')),
+      updatedAt: new Date(String(row.updated_at || '')),
     };
   }
   
-  private mapSyncJob(row: unknown[]): SyncJob {
-    const r = row as Array<{ stringValue?: string; longValue?: number }>;
-    
+  private mapSyncJob(row: Record<string, unknown>): SyncJob {
     return {
-      id: r[0]?.stringValue || '',
-      configId: r[1]?.stringValue || '',
-      triggerType: (r[2]?.stringValue || 'manual') as SyncJob['triggerType'],
-      triggeredBy: r[3]?.stringValue,
-      status: (r[4]?.stringValue || 'pending') as SyncStatus,
-      startedAt: new Date(r[5]?.stringValue || ''),
-      completedAt: r[6]?.stringValue ? new Date(r[6].stringValue) : undefined,
-      durationMs: r[7]?.longValue,
-      modelsScanned: Number(r[8]?.longValue || 0),
-      modelsAdded: Number(r[9]?.longValue || 0),
-      modelsUpdated: Number(r[10]?.longValue || 0),
-      modelsRemoved: Number(r[11]?.longValue || 0),
-      endpointsUpdated: Number(r[12]?.longValue || 0),
-      proficienciesGenerated: Number(r[13]?.longValue || 0),
-      errors: r[14]?.stringValue ? JSON.parse(r[14].stringValue) : [],
-      warnings: r[15]?.stringValue ? JSON.parse(r[15].stringValue) : [],
+      id: String(row.id || ''),
+      configId: String(row.config_id || ''),
+      triggerType: (String(row.trigger_type || 'manual')) as SyncJob['triggerType'],
+      triggeredBy: row.triggered_by ? String(row.triggered_by) : undefined,
+      status: (String(row.status || 'pending')) as SyncStatus,
+      startedAt: new Date(String(row.started_at || '')),
+      completedAt: row.completed_at ? new Date(String(row.completed_at)) : undefined,
+      durationMs: row.duration_ms ? Number(row.duration_ms) : undefined,
+      modelsScanned: Number(row.models_scanned || 0),
+      modelsAdded: Number(row.models_added || 0),
+      modelsUpdated: Number(row.models_updated || 0),
+      modelsRemoved: Number(row.models_removed || 0),
+      endpointsUpdated: Number(row.endpoints_updated || 0),
+      proficienciesGenerated: Number(row.proficiencies_generated || 0),
+      errors: row.errors ? (typeof row.errors === 'string' ? JSON.parse(row.errors) : row.errors) : [],
+      warnings: row.warnings ? (typeof row.warnings === 'string' ? JSON.parse(row.warnings) : row.warnings) : [],
     };
   }
   
-  private mapRegistryEntry(row: unknown[]): ModelRegistryEntry {
-    const r = row as Array<{ stringValue?: string; longValue?: number }>;
-    
+  private mapRegistryEntry(row: Record<string, unknown>): ModelRegistryEntry {
     return {
-      id: r[0]?.stringValue || '',
-      modelId: r[1]?.stringValue || '',
-      source: (r[2]?.stringValue || 'external') as ModelRegistryEntry['source'],
-      provider: r[3]?.stringValue || '',
-      family: r[4]?.stringValue || '',
-      capabilities: r[5]?.stringValue ? (r[5].stringValue as unknown as string[]) : [],
-      inputModalities: r[6]?.stringValue ? (r[6].stringValue as unknown as string[]) : [],
-      outputModalities: r[7]?.stringValue ? (r[7].stringValue as unknown as string[]) : [],
-      endpoints: r[8]?.stringValue ? JSON.parse(r[8].stringValue) : [],
-      primaryEndpointId: r[9]?.stringValue || '',
-      routingPriority: Number(r[10]?.longValue || 1),
-      fallbackModelIds: r[11]?.stringValue ? (r[11].stringValue as unknown as string[]) : [],
-      status: (r[12]?.stringValue || 'active') as ModelRegistryEntry['status'],
-      lastSyncedAt: r[13]?.stringValue ? new Date(r[13].stringValue) : undefined,
-      syncSource: r[14]?.stringValue,
-      createdAt: new Date(r[15]?.stringValue || ''),
-      updatedAt: new Date(r[16]?.stringValue || ''),
+      id: String(row.id || ''),
+      modelId: String(row.model_id || ''),
+      source: (String(row.source || 'external')) as ModelRegistryEntry['source'],
+      provider: String(row.provider || ''),
+      family: String(row.family || ''),
+      capabilities: row.capabilities as string[] || [],
+      inputModalities: row.input_modalities as string[] || [],
+      outputModalities: row.output_modalities as string[] || [],
+      endpoints: row.endpoints ? (typeof row.endpoints === 'string' ? JSON.parse(row.endpoints) : row.endpoints) : [],
+      primaryEndpointId: String(row.primary_endpoint_id || ''),
+      routingPriority: Number(row.routing_priority || 1),
+      fallbackModelIds: row.fallback_model_ids as string[] || [],
+      status: (String(row.status || 'active')) as ModelRegistryEntry['status'],
+      lastSyncedAt: row.last_synced_at ? new Date(String(row.last_synced_at)) : undefined,
+      syncSource: row.sync_source ? String(row.sync_source) : undefined,
+      createdAt: new Date(String(row.created_at || '')),
+      updatedAt: new Date(String(row.updated_at || '')),
     };
   }
   
-  private mapEndpointRow(row: unknown[]): ModelEndpoint {
-    const r = row as Array<{ stringValue?: string; longValue?: number; booleanValue?: boolean }>;
-    
+  private mapEndpointRow(row: Record<string, unknown>): ModelEndpoint {
     return {
-      id: r[0]?.stringValue || '',
-      modelId: r[1]?.stringValue || '',
-      endpointType: (r[2]?.stringValue || 'custom_rest') as ModelEndpoint['endpointType'],
-      baseUrl: r[3]?.stringValue || '',
-      path: r[4]?.stringValue,
-      method: (r[5]?.stringValue || 'POST') as 'POST' | 'GET',
-      authMethod: (r[6]?.stringValue || 'api_key') as ModelEndpoint['authMethod'],
-      authConfig: r[7]?.stringValue ? JSON.parse(r[7].stringValue) : undefined,
-      requestFormat: r[8]?.stringValue ? JSON.parse(r[8].stringValue) : { contentType: 'application/json', messageField: 'messages' },
-      responseFormat: r[9]?.stringValue ? JSON.parse(r[9].stringValue) : { contentType: 'application/json', textPath: 'content' },
-      rateLimitRpm: r[10]?.longValue,
-      rateLimitTpm: r[11]?.longValue,
-      maxConcurrent: r[12]?.longValue,
-      timeoutMs: r[13]?.longValue,
-      healthCheckUrl: r[14]?.stringValue,
-      healthCheckInterval: r[15]?.longValue,
-      lastHealthCheck: r[16]?.stringValue ? new Date(r[16].stringValue) : undefined,
-      healthStatus: (r[17]?.stringValue || 'unknown') as ModelEndpoint['healthStatus'],
-      priority: Number(r[18]?.longValue || 1),
-      isActive: r[19]?.booleanValue ?? true,
-      createdAt: new Date(r[20]?.stringValue || ''),
-      updatedAt: new Date(r[21]?.stringValue || ''),
+      id: String(row.id || ''),
+      modelId: String(row.model_id || ''),
+      endpointType: (String(row.endpoint_type || 'custom_rest')) as ModelEndpoint['endpointType'],
+      baseUrl: String(row.base_url || ''),
+      path: row.path ? String(row.path) : undefined,
+      method: (String(row.method || 'POST')) as 'POST' | 'GET',
+      authMethod: (String(row.auth_method || 'api_key')) as ModelEndpoint['authMethod'],
+      authConfig: row.auth_config ? (typeof row.auth_config === 'string' ? JSON.parse(row.auth_config) : row.auth_config) : undefined,
+      requestFormat: row.request_format ? (typeof row.request_format === 'string' ? JSON.parse(row.request_format) : row.request_format) : { contentType: 'application/json', messageField: 'messages' },
+      responseFormat: row.response_format ? (typeof row.response_format === 'string' ? JSON.parse(row.response_format) : row.response_format) : { contentType: 'application/json', textPath: 'content' },
+      rateLimitRpm: row.rate_limit_rpm ? Number(row.rate_limit_rpm) : undefined,
+      rateLimitTpm: row.rate_limit_tpm ? Number(row.rate_limit_tpm) : undefined,
+      maxConcurrent: row.max_concurrent ? Number(row.max_concurrent) : undefined,
+      timeoutMs: row.timeout_ms ? Number(row.timeout_ms) : undefined,
+      healthCheckUrl: row.health_check_url ? String(row.health_check_url) : undefined,
+      healthCheckInterval: row.health_check_interval ? Number(row.health_check_interval) : undefined,
+      lastHealthCheck: row.last_health_check ? new Date(String(row.last_health_check)) : undefined,
+      healthStatus: (String(row.health_status || 'unknown')) as ModelEndpoint['healthStatus'],
+      priority: Number(row.priority || 1),
+      isActive: row.is_active !== false,
+      createdAt: new Date(String(row.created_at || '')),
+      updatedAt: new Date(String(row.updated_at || '')),
     };
   }
   
-  private mapDetection(row: unknown[]): NewModelDetection {
-    const r = row as Array<{ stringValue?: string; booleanValue?: boolean }>;
-    
+  private mapDetection(row: Record<string, unknown>): NewModelDetection {
     return {
-      id: r[0]?.stringValue || '',
-      modelId: r[1]?.stringValue || '',
-      detectedAt: new Date(r[2]?.stringValue || ''),
-      detectionSource: (r[3]?.stringValue || 'manual') as NewModelDetection['detectionSource'],
-      provider: r[4]?.stringValue,
-      family: r[5]?.stringValue,
-      capabilities: r[6]?.stringValue ? (r[6].stringValue as unknown as string[]) : undefined,
-      processed: r[7]?.booleanValue || false,
-      processedAt: r[8]?.stringValue ? new Date(r[8].stringValue) : undefined,
-      addedToRegistry: r[9]?.booleanValue || false,
-      proficienciesGenerated: r[10]?.booleanValue || false,
-      skipReason: r[11]?.stringValue,
+      id: String(row.id || ''),
+      modelId: String(row.model_id || ''),
+      detectedAt: new Date(String(row.detected_at || '')),
+      detectionSource: (String(row.detection_source || 'manual')) as NewModelDetection['detectionSource'],
+      provider: row.provider ? String(row.provider) : undefined,
+      family: row.family ? String(row.family) : undefined,
+      capabilities: row.capabilities as string[] || undefined,
+      processed: Boolean(row.processed),
+      processedAt: row.processed_at ? new Date(String(row.processed_at)) : undefined,
+      addedToRegistry: Boolean(row.added_to_registry),
+      proficienciesGenerated: Boolean(row.proficiencies_generated),
+      skipReason: row.skip_reason ? String(row.skip_reason) : undefined,
     };
   }
 }

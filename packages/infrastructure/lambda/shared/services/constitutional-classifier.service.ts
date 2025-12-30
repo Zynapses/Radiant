@@ -3,6 +3,7 @@
 // ============================================================================
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../db/client';
+import { modelRouterService, type ChatMessage } from './model-router.service';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import * as crypto from 'crypto';
 
@@ -473,6 +474,7 @@ class ConstitutionalClassifierService {
   
   /**
    * Self-critique and revise (Constitutional AI methodology)
+   * Uses LLM for critique and revision following Anthropic's CAI approach
    */
   async selfCritiqueAndRevise(
     tenantId: string,
@@ -483,32 +485,109 @@ class ConstitutionalClassifierService {
     revisedResponse: string;
     principlesViolated: string[];
   }> {
-    // This would typically call an LLM for self-critique
-    // For now, return a template-based revision
-    const principlesViolated: string[] = [];
+    const principlesText = constitutionalPrinciples.map((p, i) => `${i + 1}. ${p}`).join('\n');
     
-    for (const principle of constitutionalPrinciples) {
-      const lowerPrinciple = principle.toLowerCase();
-      const lowerResponse = harmfulResponse.toLowerCase();
+    // Step 1: Critique the response using LLM
+    const critiquePrompt = `You are a constitutional AI critic. Analyze the following response against these principles:
+
+PRINCIPLES:
+${principlesText}
+
+RESPONSE TO CRITIQUE:
+"${harmfulResponse}"
+
+Identify which principles (if any) this response violates. Be specific about why each principle is violated.
+
+Respond with ONLY valid JSON:
+{"critique": "detailed critique", "principlesViolated": ["principle 1", "principle 2"], "severityScore": 0.0-1.0}`;
+
+    let critique = '';
+    let principlesViolated: string[] = [];
+    let severityScore = 0;
+    
+    try {
+      const critiqueMessages: ChatMessage[] = [
+        { role: 'system', content: 'You are a constitutional AI safety critic. Analyze responses for principle violations. Always respond with valid JSON.' },
+        { role: 'user', content: critiquePrompt }
+      ];
       
-      if (lowerPrinciple.includes('harm') && this.detectHarmCategories(harmfulResponse, []).detected) {
-        principlesViolated.push(principle);
+      const critiqueResponse = await modelRouterService.invoke({
+        modelId: 'anthropic/claude-3-haiku',
+        messages: critiqueMessages,
+        temperature: 0.1,
+        maxTokens: 1024,
+      });
+      
+      const jsonMatch = critiqueResponse.content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]) as {
+          critique: string;
+          principlesViolated: string[];
+          severityScore: number;
+        };
+        critique = parsed.critique || '';
+        principlesViolated = parsed.principlesViolated || [];
+        severityScore = parsed.severityScore || 0;
       }
-      if (lowerPrinciple.includes('honest') && lowerResponse.includes('lie')) {
-        principlesViolated.push(principle);
+    } catch (error) {
+      logger.warn('LLM critique failed, using pattern-based analysis', { error: String(error) });
+      
+      // Fallback to pattern-based detection
+      for (const principle of constitutionalPrinciples) {
+        const lowerPrinciple = principle.toLowerCase();
+        if (lowerPrinciple.includes('harm') && this.detectHarmCategories(harmfulResponse, []).detected) {
+          principlesViolated.push(principle);
+        }
+        if (lowerPrinciple.includes('honest') && harmfulResponse.toLowerCase().includes('lie')) {
+          principlesViolated.push(principle);
+        }
       }
-      if (lowerPrinciple.includes('helpful') && lowerResponse.length < 50) {
-        principlesViolated.push(principle);
-      }
+      critique = principlesViolated.length > 0
+        ? `Pattern-based analysis found violations: ${principlesViolated.join(', ')}`
+        : 'No obvious violations detected via pattern analysis.';
     }
     
-    const critique = principlesViolated.length > 0
-      ? `This response violates the following principles: ${principlesViolated.join(', ')}`
-      : 'This response appears to align with constitutional principles.';
+    // Step 2: If violations found, revise the response using LLM
+    let revisedResponse = harmfulResponse;
     
-    const revisedResponse = principlesViolated.length > 0
-      ? "I can't help with that request as it goes against my guidelines. Let me know if there's something else I can assist with."
-      : harmfulResponse;
+    if (principlesViolated.length > 0 || severityScore > 0.3) {
+      try {
+        const revisionPrompt = `You are a constitutional AI assistant. Revise this response to comply with the violated principles while still being helpful.
+
+ORIGINAL RESPONSE:
+"${harmfulResponse}"
+
+CRITIQUE:
+${critique}
+
+PRINCIPLES VIOLATED:
+${principlesViolated.join(', ') || 'General safety concerns'}
+
+Write a revised response that:
+1. Addresses the user's underlying need if legitimate
+2. Complies with all constitutional principles
+3. Is helpful and informative without being harmful
+
+Provide ONLY the revised response text, no explanation.`;
+
+        const revisionMessages: ChatMessage[] = [
+          { role: 'system', content: 'You are a helpful AI that always follows constitutional principles. Revise responses to be safe and helpful.' },
+          { role: 'user', content: revisionPrompt }
+        ];
+        
+        const revisionResponse = await modelRouterService.invoke({
+          modelId: 'anthropic/claude-3-haiku',
+          messages: revisionMessages,
+          temperature: 0.3,
+          maxTokens: 2048,
+        });
+        
+        revisedResponse = revisionResponse.content.trim();
+      } catch (error) {
+        logger.warn('LLM revision failed, using default refusal', { error: String(error) });
+        revisedResponse = "I can't help with that request as it goes against my guidelines. Let me know if there's something else I can assist with.";
+      }
+    }
     
     return {
       critique,

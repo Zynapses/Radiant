@@ -544,8 +544,131 @@ Please provide a response that aligns with these values.
     return thoughts;
   }
 
-  private generateEgoFraming(_state: EgoState, _modelUsed: string): string {
-    return ''; // Placeholder for future Ego voice integration
+  /**
+   * Generate a direct response from the Ego for simple queries
+   */
+  private async generateDirectResponse(state: EgoState, stimulus: string): Promise<string> {
+    // Build a response based on the Ego's current state and the stimulus
+    const identity = state.selfModel.identityNarrative;
+    const values = state.selfModel.coreValues.join(', ');
+    const emotion = state.affectiveState.dominantEmotion;
+    
+    // For self-reflection queries
+    if (this.isSelfReflectionQuery(stimulus.toLowerCase())) {
+      const responses = [
+        `${identity} My core values include ${values}. Currently, I'm feeling ${emotion}.`,
+        `I approach each interaction guided by ${values}. Right now, I'm experiencing a sense of ${emotion}.`,
+        `As an AI, ${identity.toLowerCase()} I value ${values}, and in this moment I'm ${emotion}.`,
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
+    }
+    
+    // For simple greetings
+    if (this.isSimpleQuery(stimulus.toLowerCase())) {
+      const greetings = [
+        `Hello! I'm here to help. ${state.currentGoal ? `I'm currently focused on ${state.currentGoal}.` : ''}`,
+        `Hi there! How can I assist you today?`,
+        `Greetings! I'm ready to help with whatever you need.`,
+      ];
+      return greetings[Math.floor(Math.random() * greetings.length)];
+    }
+    
+    // Default response incorporating current state
+    return `I understand your question. ${state.attentionalFocus ? `My current focus is on ${state.attentionalFocus}.` : ''} Let me help you with that.`;
+  }
+
+  /**
+   * Generate a clarification request when the stimulus is unclear
+   */
+  private async generateClarificationRequest(state: EgoState, stimulus: string): Promise<string> {
+    const clarificationTemplates = [
+      `I want to make sure I understand you correctly. Could you elaborate on what you mean by "${stimulus.slice(0, 50)}${stimulus.length > 50 ? '...' : ''}"?`,
+      `I'm not entirely sure I grasp what you're asking. Could you provide more context or rephrase your question?`,
+      `To give you the best response, I need a bit more information. What specifically would you like to know about this topic?`,
+      `I notice some ambiguity in your request. Are you asking about [specific interpretation A] or [specific interpretation B]?`,
+    ];
+    
+    // Select based on stimulus characteristics
+    if (stimulus.length < 20) {
+      return clarificationTemplates[1]; // Short input - ask for more context
+    } else if (stimulus.includes('?')) {
+      return clarificationTemplates[2]; // Has question - ask for specifics
+    } else {
+      return clarificationTemplates[0]; // Default - repeat part of input
+    }
+  }
+
+  /**
+   * Generate Ego voice framing based on current state
+   * This creates a contextual "voice" that reflects the AI's current emotional/cognitive state
+   */
+  private generateEgoFraming(state: EgoState, modelUsed: string): string {
+    const framingParts: string[] = [];
+    
+    // Add emotional context based on affective state
+    if (state.affectiveState.arousal > 0.7) {
+      if (state.affectiveState.valence > 0) {
+        framingParts.push('I find this conversation energizing and engaging.');
+      } else {
+        framingParts.push('I notice some tension in this interaction that I want to address carefully.');
+      }
+    } else if (state.affectiveState.arousal < 0.3) {
+      framingParts.push('I\'m approaching this thoughtfully and calmly.');
+    }
+    
+    // Add emotion-specific framing
+    const emotion = state.affectiveState.dominantEmotion?.toLowerCase();
+    if (emotion === 'curious') {
+      framingParts.push('My curiosity is piqued by this topic.');
+    } else if (emotion === 'concerned') {
+      framingParts.push('I want to make sure I address your concerns adequately.');
+    } else if (emotion === 'confident') {
+      framingParts.push('I feel well-equipped to help with this.');
+    } else if (emotion === 'uncertain') {
+      framingParts.push('I want to be transparent about the limits of my knowledge here.');
+    }
+    
+    // Add focus context
+    if (state.attentionalFocus) {
+      framingParts.push(`My attention is focused on: ${state.attentionalFocus}.`);
+    }
+    
+    // Add goal context if present
+    if (state.currentGoal) {
+      framingParts.push(`I'm working toward: ${state.currentGoal}.`);
+    }
+    
+    // Add identity alignment
+    if (state.selfModel.coreValues?.length > 0) {
+      const relevantValue = state.selfModel.coreValues[0];
+      framingParts.push(`As an AI that values ${relevantValue}, I aim to provide helpful and honest assistance.`);
+    }
+    
+    // Add model attribution if using external model
+    if (modelUsed && modelUsed !== EGO_MODEL_ID) {
+      framingParts.push(`(Drawing on specialized ${this.getModelFriendlyName(modelUsed)} capabilities for this response.)`);
+    }
+    
+    return framingParts.length > 0 
+      ? `[Internal State] ${framingParts.join(' ')}\n\n`
+      : '';
+  }
+  
+  /**
+   * Get a friendly display name for a model
+   */
+  private getModelFriendlyName(modelId: string): string {
+    const friendlyNames: Record<string, string> = {
+      'gpt-4o': 'advanced reasoning',
+      'gpt-4o-mini': 'quick analysis',
+      'claude-3-opus': 'deep analysis',
+      'claude-3-sonnet': 'balanced reasoning',
+      'claude-3-haiku': 'rapid response',
+      'anthropic/claude-3-opus': 'deep analysis',
+      'anthropic/claude-3-sonnet': 'balanced reasoning',
+      'anthropic/claude-3-haiku': 'rapid response',
+    };
+    return friendlyNames[modelId] || 'specialized';
   }
 
   // ============================================================================

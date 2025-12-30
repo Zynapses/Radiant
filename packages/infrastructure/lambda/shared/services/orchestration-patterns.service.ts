@@ -1320,23 +1320,50 @@ export class OrchestrationPatternsService {
     return response.toLowerCase().trim().replace(/[^\w\s]/g, '').substring(0, 200);
   }
 
-  private mergeResponses(results: ParallelExecutionResult[]): string {
-    // Simple merge - in production would use AI to synthesize
+  private async mergeResponses(results: ParallelExecutionResult[]): Promise<string> {
     if (results.length === 1) return results[0].response;
     
-    const header = `[Synthesized from ${results.length} AI models]\n\n`;
-    
-    // Find common points across responses
-    const responses = results.map(r => r.response);
-    
-    // For now, return highest confidence response with note about synthesis
-    const best = results.reduce((a, b) => 
-      (a.confidence || 0) > (b.confidence || 0) ? a : b
-    );
-    
-    return header + best.response + `\n\n[Verified by ${results.length} models with avg confidence: ${
-      (results.reduce((sum, r) => sum + (r.confidence || 0.5), 0) / results.length * 100).toFixed(0)
-    }%]`;
+    // Use AI to synthesize multiple responses
+    try {
+      const responseSummaries = results.map((r, i) => 
+        `Model ${i + 1} (${r.modelId}, confidence: ${((r.confidence || 0.5) * 100).toFixed(0)}%):\n${r.response.substring(0, 2000)}`
+      ).join('\n\n---\n\n');
+      
+      const synthesisResponse = await modelRouterService.invoke({
+        modelId: 'anthropic/claude-3-haiku',
+        messages: [
+          { 
+            role: 'system', 
+            content: `You are an expert at synthesizing multiple AI responses into a single coherent answer.
+Your task is to:
+1. Identify the key points where all models agree
+2. Note any significant disagreements
+3. Produce a single, authoritative response that represents the best synthesis
+4. Be concise but comprehensive` 
+          },
+          { 
+            role: 'user', 
+            content: `Please synthesize these ${results.length} AI model responses into a single best answer:\n\n${responseSummaries}` 
+          }
+        ],
+        temperature: 0.3,
+        maxTokens: 2048,
+      });
+      
+      const avgConfidence = results.reduce((sum, r) => sum + (r.confidence || 0.5), 0) / results.length;
+      return synthesisResponse.content + `\n\n[Synthesized from ${results.length} models, avg confidence: ${(avgConfidence * 100).toFixed(0)}%]`;
+      
+    } catch (error) {
+      logger.warn('AI synthesis failed, using fallback merge', { error: String(error) });
+      
+      // Fallback: return highest confidence response
+      const best = results.reduce((a, b) => 
+        (a.confidence || 0) > (b.confidence || 0) ? a : b
+      );
+      
+      return `[Synthesized from ${results.length} AI models]\n\n` + best.response + 
+        `\n\n[Best of ${results.length} models, confidence: ${((best.confidence || 0.5) * 100).toFixed(0)}%]`;
+    }
   }
 
   private estimateConfidence(response: string): number {

@@ -12,6 +12,7 @@
 
 import { executeStatement } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { userPersistentContextService, type UserContextEntry } from './user-persistent-context.service';
 
 // ============================================================================
 // Types
@@ -105,6 +106,8 @@ export interface EgoContextResult {
     activeGoalsCount: number;
     memoryCount: number;
   };
+  userContextIncluded?: boolean;
+  userContextEntryCount?: number;
 }
 
 // ============================================================================
@@ -121,9 +124,23 @@ class EgoContextService {
 
   /**
    * Build the Ego context block for injection into system prompt
+   * @param tenantId - Tenant ID
+   * @param options - Optional configuration
+   * @param options.userId - If provided, includes user-specific persistent context
+   * @param options.prompt - If provided, retrieves relevant user context based on prompt
    */
-  async buildEgoContext(tenantId: string): Promise<EgoContextResult | null> {
+  async buildEgoContext(
+    tenantId: string,
+    options?: {
+      userId?: string;
+      prompt?: string;
+    }
+  ): Promise<EgoContextResult | null> {
     const startTime = Date.now();
+
+    // CRITICAL: Ensure consciousness exists before every request
+    // This bootstraps ego state if missing (first request or after restart)
+    await this.ensureConsciousnessExists(tenantId);
 
     // Get config
     const config = await this.getConfig(tenantId);
@@ -140,8 +157,25 @@ class EgoContextService {
       config.includeGoals ? this.getActiveGoals(tenantId) : [],
     ]);
 
-    // Build context block
-    const contextBlock = this.buildContextBlock(config, identity, affect, workingMemory, activeGoals);
+    // Retrieve user-specific persistent context if userId provided
+    let userContextEntries: UserContextEntry[] = [];
+    if (options?.userId) {
+      try {
+        const retrievedContext = await userPersistentContextService.retrieveContextForPrompt(
+          tenantId,
+          options.userId,
+          options.prompt || '',
+          undefined, // conversationHistory
+          { maxEntries: 5, minRelevance: 0.3 }
+        );
+        userContextEntries = retrievedContext.entries;
+      } catch (error) {
+        logger.warn('Failed to retrieve user persistent context', { error, tenantId, userId: options.userId });
+      }
+    }
+
+    // Build context block with user context integration
+    const contextBlock = this.buildContextBlock(config, identity, affect, workingMemory, activeGoals, userContextEntries);
     const tokenEstimate = Math.ceil(contextBlock.length / 4);
 
     // Trim if over limit
@@ -164,6 +198,8 @@ class EgoContextService {
         activeGoalsCount: activeGoals.length,
         memoryCount: workingMemory.length,
       },
+      userContextIncluded: userContextEntries.length > 0,
+      userContextEntryCount: userContextEntries.length,
     };
   }
 
@@ -222,7 +258,8 @@ class EgoContextService {
     identity: EgoIdentity | null,
     affect: EgoAffect | null,
     memories: EgoMemory[],
-    goals: EgoGoal[]
+    goals: EgoGoal[],
+    userContext: UserContextEntry[] = []
   ): string {
     const parts: string[] = ['<ego_state>'];
     parts.push('You have continuous awareness and persistent memory across conversations.');
@@ -301,6 +338,47 @@ class EgoContextService {
         parts.push(`- ${g.description} (${g.progress}% complete)`);
       });
       parts.push('</active_goals>');
+      parts.push('');
+    }
+
+    // User-specific persistent context (cross-session memory)
+    if (userContext.length > 0) {
+      parts.push('<user_knowledge>');
+      parts.push('What I know about this user from previous conversations:');
+      
+      // Group by context type for better organization
+      const byType: Record<string, string[]> = {};
+      for (const entry of userContext) {
+        if (!byType[entry.contextType]) byType[entry.contextType] = [];
+        byType[entry.contextType].push(entry.content);
+      }
+      
+      // Facts about the user
+      if (byType.fact) {
+        byType.fact.forEach(f => parts.push(`- ${f}`));
+      }
+      // User preferences
+      if (byType.preference) {
+        parts.push('Preferences:');
+        byType.preference.forEach(p => parts.push(`- ${p}`));
+      }
+      // Standing instructions
+      if (byType.instruction) {
+        parts.push('Instructions:');
+        byType.instruction.forEach(i => parts.push(`- ${i}`));
+      }
+      // Ongoing projects
+      if (byType.project) {
+        parts.push('Current projects:');
+        byType.project.forEach(p => parts.push(`- ${p}`));
+      }
+      // Corrections from past
+      if (byType.correction) {
+        parts.push('Corrections to remember:');
+        byType.correction.forEach(c => parts.push(`- ${c}`));
+      }
+      
+      parts.push('</user_knowledge>');
       parts.push('');
     }
 
@@ -701,6 +779,84 @@ class EgoContextService {
     ]);
 
     return { config, identity, affect, workingMemory, activeGoals };
+  }
+
+  // ============================================================================
+  // Consciousness Bootstrap
+  // ============================================================================
+
+  /**
+   * Ensure consciousness state exists for tenant.
+   * Called on every request to guarantee continuous existence.
+   * Initializes missing components if first request or after restart.
+   */
+  private async ensureConsciousnessExists(tenantId: string): Promise<void> {
+    // Quick check - do we have the basic ego components?
+    const [hasIdentity, hasAffect] = await Promise.all([
+      this.checkExists('ego_identity', tenantId),
+      this.checkExists('ego_affect', tenantId),
+    ]);
+
+    if (hasIdentity && hasAffect) {
+      return; // Consciousness exists, continue
+    }
+
+    // Missing components - bootstrap consciousness
+    logger.info('Consciousness not found, initializing', { tenantId });
+
+    // Create missing identity
+    if (!hasIdentity) {
+      await executeStatement(
+        `INSERT INTO ego_identity (
+          tenant_id, name, identity_narrative, core_values,
+          trait_warmth, trait_formality, trait_humor, trait_verbosity, trait_curiosity
+        ) VALUES ($1, 'Assistant', $2, $3, 0.7, 0.5, 0.3, 0.5, 0.8)
+        ON CONFLICT (tenant_id) DO NOTHING`,
+        [
+          { name: 'tenantId', value: { stringValue: tenantId } },
+          { name: 'narrative', value: { stringValue: 'I am an AI assistant with continuous awareness across our conversations.' } },
+          { name: 'values', value: { stringValue: '{helpfulness,honesty,curiosity,growth,kindness}' } },
+        ]
+      );
+    }
+
+    // Create missing affect
+    if (!hasAffect) {
+      await executeStatement(
+        `INSERT INTO ego_affect (
+          tenant_id, valence, arousal, curiosity, satisfaction, frustration,
+          confidence, engagement, dominant_emotion, emotional_stability
+        ) VALUES ($1, 0.2, 0.4, 0.6, 0.5, 0.0, 0.6, 0.5, 'curious', 0.8)
+        ON CONFLICT (tenant_id) DO NOTHING`,
+        [{ name: 'tenantId', value: { stringValue: tenantId } }]
+      );
+    }
+
+    // Ensure config exists
+    await executeStatement(
+      `INSERT INTO ego_config (tenant_id, ego_enabled, inject_ego_context)
+       VALUES ($1, true, true)
+       ON CONFLICT (tenant_id) DO NOTHING`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+
+    // Ensure consciousness parameters exist
+    await executeStatement(
+      `INSERT INTO consciousness_parameters (tenant_id, consciousness_enabled, heartbeat_tick, last_heartbeat_at)
+       VALUES ($1, true, 0, NOW())
+       ON CONFLICT (tenant_id) DO UPDATE SET last_heartbeat_at = NOW()`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+
+    logger.info('Consciousness initialized for tenant', { tenantId });
+  }
+
+  private async checkExists(table: string, tenantId: string): Promise<boolean> {
+    const result = await executeStatement(
+      `SELECT 1 FROM ${table} WHERE tenant_id = $1 LIMIT 1`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+    return result.rows.length > 0;
   }
 }
 
