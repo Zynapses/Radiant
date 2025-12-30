@@ -10,6 +10,7 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { ethicsFreeReasoningService } from '../shared/services/ethics-free-reasoning.service';
 import { executeStatement } from '../shared/db/client';
+import { logger } from '../shared/logger';
 
 // ============================================================================
 // Handler
@@ -79,7 +80,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     };
 
   } catch (error) {
-    console.error('Ethics-free reasoning admin error:', error);
+    logger.error(`Ethics-free reasoning admin error: ${String(error)}`);
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

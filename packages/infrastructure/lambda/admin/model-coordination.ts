@@ -3,6 +3,7 @@
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { modelCoordinationService } from '../shared/services/model-coordination.service';
+import { logger } from '../shared/logger';
 
 // ============================================================================
 // Helper Functions
@@ -42,7 +43,7 @@ export const getSyncConfig: APIGatewayProxyHandler = async (event) => {
     
     return success({ config });
   } catch (err) {
-    console.error('Error getting sync config:', err);
+    logger.error(`Error getting sync config: ${String(err)}`);
     return error(500, 'Failed to get sync configuration');
   }
 };
@@ -96,7 +97,7 @@ export const updateSyncConfig: APIGatewayProxyHandler = async (event) => {
       config,
     });
   } catch (err) {
-    console.error('Error updating sync config:', err);
+    logger.error(`Error updating sync config: ${String(err)}`);
     return error(500, 'Failed to update sync configuration');
   }
 };
@@ -126,7 +127,7 @@ export const triggerSync: APIGatewayProxyHandler = async (event) => {
       job,
     });
   } catch (err) {
-    console.error('Error triggering sync:', err);
+    logger.error(`Error triggering sync: ${String(err)}`);
     return error(500, 'Failed to trigger sync');
   }
 };
@@ -145,7 +146,7 @@ export const getSyncJobs: APIGatewayProxyHandler = async (event) => {
       lastSync: dashboard.lastSync,
     });
   } catch (err) {
-    console.error('Error getting sync jobs:', err);
+    logger.error(`Error getting sync jobs: ${String(err)}`);
     return error(500, 'Failed to get sync jobs');
   }
 };
@@ -178,7 +179,7 @@ export const getRegistry: APIGatewayProxyHandler = async (event) => {
       filters: { source, status, limit, offset },
     });
   } catch (err) {
-    console.error('Error getting registry:', err);
+    logger.error(`Error getting registry: ${String(err)}`);
     return error(500, 'Failed to get registry');
   }
 };
@@ -201,7 +202,7 @@ export const getRegistryEntry: APIGatewayProxyHandler = async (event) => {
     
     return success({ entry });
   } catch (err) {
-    console.error('Error getting registry entry:', err);
+    logger.error(`Error getting registry entry: ${String(err)}`);
     return error(500, 'Failed to get registry entry');
   }
 };
@@ -236,7 +237,7 @@ export const addRegistryEntry: APIGatewayProxyHandler = async (event) => {
       modelId,
     });
   } catch (err) {
-    console.error('Error adding registry entry:', err);
+    logger.error(`Error adding registry entry: ${String(err)}`);
     return error(500, 'Failed to add model to registry');
   }
 };
@@ -269,7 +270,7 @@ export const updateRegistryEntry: APIGatewayProxyHandler = async (event) => {
       entry,
     });
   } catch (err) {
-    console.error('Error updating registry entry:', err);
+    logger.error(`Error updating registry entry: ${String(err)}`);
     return error(500, 'Failed to update registry entry');
   }
 };
@@ -333,7 +334,7 @@ export const addEndpoint: APIGatewayProxyHandler = async (event) => {
       modelId,
     });
   } catch (err) {
-    console.error('Error adding endpoint:', err);
+    logger.error(`Error adding endpoint: ${String(err)}`);
     return error(500, 'Failed to add endpoint');
   }
 };
@@ -364,7 +365,7 @@ export const updateEndpointHealth: APIGatewayProxyHandler = async (event) => {
       healthStatus,
     });
   } catch (err) {
-    console.error('Error updating endpoint health:', err);
+    logger.error(`Error updating endpoint health: ${String(err)}`);
     return error(500, 'Failed to update endpoint health');
   }
 };
@@ -386,7 +387,7 @@ export const getPendingDetections: APIGatewayProxyHandler = async () => {
       count: detections.length,
     });
   } catch (err) {
-    console.error('Error getting pending detections:', err);
+    logger.error(`Error getting pending detections: ${String(err)}`);
     return error(500, 'Failed to get pending detections');
   }
 };
@@ -416,7 +417,7 @@ export const reportDetection: APIGatewayProxyHandler = async (event) => {
       modelId,
     });
   } catch (err) {
-    console.error('Error reporting detection:', err);
+    logger.error(`Error reporting detection: ${String(err)}`);
     return error(500, 'Failed to report detection');
   }
 };
@@ -436,7 +437,7 @@ export const getDashboard: APIGatewayProxyHandler = async (event) => {
     
     return success({ dashboard });
   } catch (err) {
-    console.error('Error getting dashboard:', err);
+    logger.error(`Error getting dashboard: ${String(err)}`);
     return error(500, 'Failed to get dashboard');
   }
 };

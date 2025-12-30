@@ -1,13 +1,14 @@
 // RADIANT v4.18.0 - Model Proficiency Service
 // Generates and manages ranked proficiencies for all models across domains and modes
 
-import { executeStatement } from '../utils/database';
+import { executeStatement } from '../db/client';
 import {
   SELF_HOSTED_MODEL_REGISTRY,
   SelfHostedModelDefinition,
   getSelfHostedModelById,
   DomainStrength,
 } from '@radiant/shared';
+import { logger } from '../logger';
 
 // ============================================================================
 // Types
@@ -126,7 +127,7 @@ class ModelProficiencyService {
    * Generate proficiencies for all models and store in database
    */
   async generateAllProficiencies(): Promise<void> {
-    console.log('Generating proficiencies for all models...');
+    logger.info('Generating proficiencies for all models...');
     
     // Generate domain proficiencies
     for (const domain of ALL_DOMAINS) {
@@ -138,7 +139,7 @@ class ModelProficiencyService {
       await this.generateModeProficiencies(mode);
     }
     
-    console.log('Proficiency generation complete.');
+    logger.info('Proficiency generation complete.');
   }
   
   /**
@@ -147,11 +148,11 @@ class ModelProficiencyService {
   async generateProficienciesForModel(modelId: string): Promise<ModelProficiencyProfile | null> {
     const model = getSelfHostedModelById(modelId);
     if (!model) {
-      console.error(`Model not found: ${modelId}`);
+      logger.error(`Model not found: ${modelId}`);
       return null;
     }
     
-    console.log(`Generating proficiencies for model: ${model.displayName}`);
+    logger.info(`Generating proficiencies for model: ${model.displayName}`);
     
     // Calculate proficiency scores for all domains
     const domainScores: Array<{ domain: string; score: number; strength: DomainStrength }> = [];
@@ -564,7 +565,7 @@ class ModelProficiencyService {
       await this.storeProficiencyRankings(model.id, domainScores, modeScores);
       
     } catch (error) {
-      console.error(`Failed to store proficiencies for ${model.id}:`, error);
+      logger.error(`Failed to store proficiencies for ${model.id}: ${String(error)}`);
     }
   }
   
@@ -646,7 +647,7 @@ class ModelProficiencyService {
       ]
     );
     
-    return result.records?.[0]?.[0]?.stringValue || '';
+    return String(result.rows?.[0]?.id || '');
   }
   
   /**
@@ -704,15 +705,15 @@ class ModelProficiencyService {
       []
     );
     
-    return (result.records || []).map(row => ({
-      modelId: (row[0] as { stringValue?: string }).stringValue || '',
-      domain: (row[1] as { stringValue?: string }).stringValue || '',
-      score: Number((row[2] as { doubleValue?: number }).doubleValue || 0),
-      rank: Number((row[3] as { longValue?: number }).longValue || 0),
-      strength: (row[4] as { stringValue?: string }).stringValue || 'basic',
-      mode: (row[5] as { stringValue?: string }).stringValue,
-      modeScore: (row[6] as { doubleValue?: number }).doubleValue,
-      modeRank: (row[7] as { longValue?: number }).longValue,
+    return (result.rows || []).map((row: Record<string, unknown>) => ({
+      modelId: String(row.model_id || ''),
+      domain: String(row.domain || ''),
+      score: Number(row.proficiency_score || 0),
+      rank: Number(row.rank_in_domain || 0),
+      strength: String(row.strength_level || 'basic'),
+      mode: row.orchestration_mode ? String(row.orchestration_mode) : undefined,
+      modeScore: row.mode_score ? Number(row.mode_score) : undefined,
+      modeRank: row.rank_in_mode ? Number(row.rank_in_mode) : undefined,
     }));
   }
   
@@ -737,14 +738,14 @@ class ModelProficiencyService {
       [{ name: 'limit', value: { longValue: limit } }]
     );
     
-    return (result.records || []).map(row => ({
-      id: (row[0] as { stringValue?: string }).stringValue || '',
-      modelId: (row[1] as { stringValue?: string }).stringValue || '',
-      source: (row[2] as { stringValue?: string }).stringValue || '',
-      family: (row[3] as { stringValue?: string }).stringValue,
-      status: (row[4] as { stringValue?: string }).stringValue || 'pending',
-      proficienciesGenerated: (row[5] as { booleanValue?: boolean }).booleanValue || false,
-      createdAt: new Date((row[6] as { stringValue?: string }).stringValue || ''),
+    return (result.rows || []).map((row: Record<string, unknown>) => ({
+      id: String(row.id || ''),
+      modelId: String(row.model_id || ''),
+      source: String(row.discovery_source || ''),
+      family: row.model_family ? String(row.model_family) : undefined,
+      status: String(row.status || 'pending'),
+      proficienciesGenerated: Boolean(row.proficiencies_generated),
+      createdAt: new Date(String(row.created_at || '')),
     }));
   }
   
@@ -808,12 +809,12 @@ class ModelProficiencyService {
   
   private async generateDomainProficiencies(domain: string): Promise<void> {
     const ranking = await this.getDomainRanking(domain);
-    console.log(`Generated ${domain} ranking: ${ranking.models.length} models`);
+    logger.debug(`Generated ${domain} ranking: ${ranking.models.length} models`);
   }
   
   private async generateModeProficiencies(mode: string): Promise<void> {
     const ranking = await this.getModeRanking(mode);
-    console.log(`Generated ${mode} ranking: ${ranking.models.length} models`);
+    logger.debug(`Generated ${mode} ranking: ${ranking.models.length} models`);
   }
   
   private async getOverallRank(modelId: string): Promise<number> {
@@ -864,7 +865,7 @@ class ModelProficiencyService {
         'SELECT 1 FROM self_hosted_model_metadata WHERE model_id = $1',
         [{ name: 'modelId', value: { stringValue: modelId } }]
       );
-      return (result.records?.length || 0) > 0;
+      return (result.rows?.length || 0) > 0;
     } catch {
       return false;
     }

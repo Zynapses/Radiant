@@ -102,11 +102,22 @@ const navigation: NavigationItem[] = [
   { name: 'AGI Dashboard', href: '/orchestration/agi-dashboard', icon: Sparkles },
   { name: 'Patterns', href: '/orchestration-patterns', icon: Layers },
   
+  // System Section
+  { type: 'separator', label: 'System' },
+  { name: 'Infrastructure Tier', href: '/system/infrastructure', icon: Server },
+  { name: 'Service Health', href: '/system/health', icon: Activity },
+  
   // AGI & Cognition Section
   { type: 'separator', label: 'AGI & Cognition' },
   { name: 'Cognitive Brain', href: '/cognitive-brain', icon: Brain },
   { name: 'Cognition', href: '/cognition', icon: Lightbulb },
   { name: 'Consciousness', href: '/consciousness', icon: Sparkles },
+  { name: 'Bobble', href: '/consciousness/bobble', icon: Heart },
+  { name: 'Bobble Global', href: '/consciousness/bobble/global', icon: GlobeIcon },
+  { name: 'Engine', href: '/consciousness/engine', icon: Cpu },
+  { name: 'Evolution', href: '/consciousness/evolution', icon: TrendingUp },
+  { name: 'Formal Reasoning', href: '/consciousness/formal-reasoning', icon: Route },
+  { name: 'Sleep Schedule', href: '/consciousness/sleep-schedule', icon: Clock },
   { name: 'Metacognition', href: '/metacognition', icon: Target },
   { name: 'World Model', href: '/world-model', icon: GlobeIcon },
   { name: 'Planning', href: '/planning', icon: ListChecks },
@@ -135,6 +146,7 @@ const navigation: NavigationItem[] = [
   { name: 'Model Categories', href: '/thinktank/model-categories', icon: Grid },
   { name: 'Shadow Testing', href: '/thinktank/shadow-testing', icon: Beaker },
   { name: 'Collaborate', href: '/thinktank/collaborate', icon: UsersRound },
+  { name: 'Ego System', href: '/thinktank/ego', icon: UserCircle },
   { name: 'TT Compliance', href: '/thinktank/compliance', icon: ShieldCheck },
   { name: 'TT Settings', href: '/thinktank/settings', icon: Settings },
   
@@ -159,6 +171,8 @@ const navigation: NavigationItem[] = [
   // Security & Compliance Section
   { type: 'separator', label: 'Security' },
   { name: 'Security', href: '/security', icon: Shield },
+  { name: 'Sec Alerts', href: '/security/alerts', icon: AlertTriangle },
+  { name: 'Protection', href: '/security/protection', icon: ShieldCheck },
   { name: 'Schedules', href: '/security/schedules', icon: Clock },
   { name: 'Compliance', href: '/compliance', icon: ShieldCheck },
   { name: 'Administrators', href: '/administrators', icon: Users },
@@ -179,6 +193,7 @@ const navigation: NavigationItem[] = [
   { name: 'System Config', href: '/system-config', icon: Wrench },
   { name: 'Localization', href: '/localization', icon: Languages },
   { name: 'Configuration', href: '/configuration', icon: Sliders },
+  { name: 'Platform Libraries', href: '/platform/libraries', icon: Layers },
   { name: 'Migrations', href: '/migrations', icon: GitPullRequest },
   { name: 'Notifications', href: '/notifications', icon: Bell },
   { name: 'Settings', href: '/settings', icon: Settings },

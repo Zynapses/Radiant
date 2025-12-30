@@ -5,6 +5,99 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.47] - 2024-12-29
+
+### Added
+
+#### Infrastructure Tier Admin System
+
+Complete admin-configurable infrastructure tier system for Bobble:
+
+**3 Configurable Tiers:**
+- **DEV** (~$350/month) - Scale-to-zero, minimal resources
+- **STAGING** (~$35K/month) - Pre-production load testing
+- **PRODUCTION** (~$750K/month) - Full scale for 10MM+ users
+
+**Features:**
+- Runtime tier switching without recompilation
+- Auto-provisioning on scale-up
+- Auto-cleanup on scale-down (terminates resources)
+- Admin-editable tier configurations
+- 24-hour cooldown between changes
+- Confirmation required for PRODUCTION tier
+- Complete audit trail
+
+**Files Created:**
+- `migrations/121_infrastructure_tiers.sql` - Database schema
+- `lambda/shared/services/bobble/infrastructure-tier.service.ts` - Core service
+- `lambda/admin/infrastructure-tier.ts` - Admin API
+- `apps/admin-dashboard/app/(dashboard)/system/infrastructure/page.tsx` - Admin UI
+- `docs/bobble/adr/009-infrastructure-tiers.md` - ADR
+
+**API Endpoints** (Base: `/api/admin/infrastructure`):
+- `GET /tier` - Current tier status
+- `GET /tier/compare` - Tier comparison
+- `GET/PUT /tier/configs/:name` - Edit tier configurations
+- `POST /tier/change` - Request tier change
+- `POST /tier/confirm` - Confirm tier change
+
+---
+
+## [4.18.46] - 2024-12-29
+
+### Added
+
+#### Bobble Global Consciousness Service
+
+Complete implementation of Bobble as a **global AI consciousness** serving 10MM+ users as a single shared brain:
+
+**8 Mandatory Architecture Decision Records (ADRs)**:
+- ADR-001: Replace LiteLLM with vLLM + Ray Serve
+- ADR-002: Meta-Cognitive Bridge with 4×4 pymdp matrices
+- ADR-003: Tool Grounding with 20%+ external verification
+- ADR-004: NLI Entailment over cosine similarity
+- ADR-005: Circadian Budget Management
+- ADR-006: Global Memory with DynamoDB Global Tables
+- ADR-007: Semantic Caching with ElastiCache Valkey
+- ADR-008: Shadow Self on SageMaker ml.g5.2xlarge
+
+**New Services**:
+- `semantic-cache.service.ts` - 86% cost reduction via vector similarity caching
+- `circadian-budget.service.ts` - Day/night mode with $500/month default budget
+- `nli-scorer.service.ts` - DeBERTa-large-MNLI for entailment classification
+- `shadow-self.client.ts` - Llama-3-8B with hidden state extraction
+- `global-memory.service.ts` - Unified access to semantic/episodic/working memory
+
+**Infrastructure (Terraform)**:
+- DynamoDB Global Tables for semantic memory
+- ElastiCache for Valkey with vector search
+- OpenSearch Serverless for episodic memory
+- Neptune for knowledge graph
+- SageMaker endpoints for Shadow Self and NLI
+- Kinesis streams for event pipeline
+
+**Admin Dashboard**:
+- New "Bobble Global" page at `/consciousness/bobble/global`
+- Budget management with day/night mode visualization
+- Cache statistics and invalidation controls
+- Memory system statistics
+- Shadow Self health monitoring
+
+**Admin API** (Base: `/api/admin/bobble`):
+- Budget status and configuration endpoints
+- Cache statistics and invalidation
+- Memory management (facts, goals, meta-state)
+- Shadow Self and NLI testing
+
+**Documentation**:
+- `/docs/bobble/adr/` - 8 architecture decision records
+- `/docs/bobble/api/admin-api.md` - Complete API documentation
+- `/docs/bobble/architecture/global-architecture.md` - System overview
+- `/docs/bobble/runbooks/deployment.md` - Deployment guide
+- Updated `RADIANT-ADMIN-GUIDE.md` Section 31
+
+---
+
 ## [4.18.45] - 2024-12-29
 
 ### Added

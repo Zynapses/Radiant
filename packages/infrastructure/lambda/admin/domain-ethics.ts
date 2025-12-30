@@ -4,6 +4,7 @@
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { domainEthicsService } from '../shared/services/domain-ethics.service';
 import { DOMAIN_ETHICS_REGISTRY } from '@radiant/shared';
+import { logger } from '../shared/logger';
 
 // ============================================================================
 // Helper Functions
@@ -71,7 +72,7 @@ export const listFrameworks: APIGatewayProxyHandler = async (event) => {
       domains: Object.keys(byDomain),
     });
   } catch (err) {
-    console.error('Error listing frameworks:', err);
+    logger.error(`Error listing frameworks: ${String(err)}`);
     return error(500, 'Failed to list frameworks');
   }
 };
@@ -99,7 +100,7 @@ export const getFramework: APIGatewayProxyHandler = async (event) => {
       disclosureCount: framework.disclosureRequirements.length,
     });
   } catch (err) {
-    console.error('Error getting framework:', err);
+    logger.error(`Error getting framework: ${String(err)}`);
     return error(500, 'Failed to get framework');
   }
 };
@@ -123,7 +124,7 @@ export const getFrameworksByDomain: APIGatewayProxyHandler = async (event) => {
       count: frameworks.length,
     });
   } catch (err) {
-    console.error('Error getting frameworks by domain:', err);
+    logger.error(`Error getting frameworks by domain: ${String(err)}`);
     return error(500, 'Failed to get frameworks');
   }
 };
@@ -154,7 +155,7 @@ export const getConfig: APIGatewayProxyHandler = async (event) => {
       availableEnforcementModes: ['strict', 'standard', 'advisory', 'disabled'],
     });
   } catch (err) {
-    console.error('Error getting config:', err);
+    logger.error(`Error getting config: ${String(err)}`);
     return error(500, 'Failed to get configuration');
   }
 };
@@ -179,7 +180,7 @@ export const updateConfig: APIGatewayProxyHandler = async (event) => {
       message: 'Configuration updated successfully',
     });
   } catch (err) {
-    console.error('Error updating config:', err);
+    logger.error(`Error updating config: ${String(err)}`);
     return error(500, 'Failed to update configuration');
   }
 };
@@ -218,7 +219,7 @@ export const setFrameworkEnabled: APIGatewayProxyHandler = async (event) => {
       message: `Framework ${enabled ? 'enabled' : 'disabled'} successfully`,
     });
   } catch (err) {
-    console.error('Error setting framework enabled:', err);
+    logger.error(`Error setting framework enabled: ${String(err)}`);
     return error(500, 'Failed to update framework');
   }
 };
@@ -251,7 +252,7 @@ export const updateDomainSettings: APIGatewayProxyHandler = async (event) => {
       message: 'Domain settings updated successfully',
     });
   } catch (err) {
-    console.error('Error updating domain settings:', err);
+    logger.error(`Error updating domain settings: ${String(err)}`);
     return error(500, 'Failed to update domain settings');
   }
 };
@@ -300,7 +301,7 @@ export const getAuditLogs: APIGatewayProxyHandler = async (event) => {
       },
     });
   } catch (err) {
-    console.error('Error getting audit logs:', err);
+    logger.error(`Error getting audit logs: ${String(err)}`);
     return error(500, 'Failed to get audit logs');
   }
 };
@@ -329,7 +330,7 @@ export const getStats: APIGatewayProxyHandler = async (event) => {
       },
     });
   } catch (err) {
-    console.error('Error getting stats:', err);
+    logger.error(`Error getting stats: ${String(err)}`);
     return error(500, 'Failed to get statistics');
   }
 };
@@ -380,7 +381,7 @@ export const testEthicsCheck: APIGatewayProxyHandler = async (event) => {
       wouldBlock: !check.passed && check.violations.some(v => v.action === 'block'),
     });
   } catch (err) {
-    console.error('Error testing ethics check:', err);
+    logger.error(`Error testing ethics check: ${String(err)}`);
     return error(500, 'Failed to test ethics check');
   }
 };
@@ -413,7 +414,7 @@ export const getDisclaimers: APIGatewayProxyHandler = async (event) => {
       count: disclaimers.length,
     });
   } catch (err) {
-    console.error('Error getting disclaimers:', err);
+    logger.error(`Error getting disclaimers: ${String(err)}`);
     return error(500, 'Failed to get disclaimers');
   }
 };
@@ -442,7 +443,7 @@ export const getCustomFrameworks: APIGatewayProxyHandler = async (event) => {
       filters: { domain, activeOnly },
     });
   } catch (err) {
-    console.error('Error getting custom frameworks:', err);
+    logger.error(`Error getting custom frameworks: ${String(err)}`);
     return error(500, 'Failed to get custom frameworks');
   }
 };
@@ -465,7 +466,7 @@ export const getCustomFramework: APIGatewayProxyHandler = async (event) => {
     
     return success({ framework });
   } catch (err) {
-    console.error('Error getting custom framework:', err);
+    logger.error(`Error getting custom framework: ${String(err)}`);
     return error(500, 'Failed to get custom framework');
   }
 };
@@ -522,7 +523,7 @@ export const createCustomFramework: APIGatewayProxyHandler = async (event) => {
       domain,
     });
   } catch (err) {
-    console.error('Error creating custom framework:', err);
+    logger.error(`Error creating custom framework: ${String(err)}`);
     return error(500, 'Failed to create custom framework');
   }
 };
@@ -562,7 +563,7 @@ export const updateCustomFramework: APIGatewayProxyHandler = async (event) => {
       framework,
     });
   } catch (err) {
-    console.error('Error updating custom framework:', err);
+    logger.error(`Error updating custom framework: ${String(err)}`);
     return error(500, 'Failed to update custom framework');
   }
 };
@@ -585,7 +586,7 @@ export const deleteCustomFramework: APIGatewayProxyHandler = async (event) => {
       frameworkId,
     });
   } catch (err) {
-    console.error('Error deleting custom framework:', err);
+    logger.error(`Error deleting custom framework: ${String(err)}`);
     return error(500, 'Failed to delete custom framework');
   }
 };
@@ -609,7 +610,7 @@ export const getDomainCoverage: APIGatewayProxyHandler = async () => {
       withCustom: domains.filter(d => d.customCount > 0).length,
     });
   } catch (err) {
-    console.error('Error getting domain coverage:', err);
+    logger.error(`Error getting domain coverage: ${String(err)}`);
     return error(500, 'Failed to get domain coverage');
   }
 };
@@ -632,7 +633,7 @@ export const checkDomainCoverage: APIGatewayProxyHandler = async (event) => {
       ...coverage,
     });
   } catch (err) {
-    console.error('Error checking domain coverage:', err);
+    logger.error(`Error checking domain coverage: ${String(err)}`);
     return error(500, 'Failed to check domain coverage');
   }
 };
@@ -655,7 +656,7 @@ export const suggestEthicsForDomain: APIGatewayProxyHandler = async (event) => {
       ...suggestions,
     });
   } catch (err) {
-    console.error('Error getting ethics suggestions:', err);
+    logger.error(`Error getting ethics suggestions: ${String(err)}`);
     return error(500, 'Failed to get ethics suggestions');
   }
 };
@@ -694,7 +695,7 @@ export const onNewDomainDetected: APIGatewayProxyHandler = async (event) => {
             : 'No ethics coverage needed for this domain.',
     });
   } catch (err) {
-    console.error('Error handling new domain:', err);
+    logger.error(`Error handling new domain: ${String(err)}`);
     return error(500, 'Failed to handle new domain');
   }
 };
