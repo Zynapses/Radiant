@@ -180,7 +180,7 @@ export default function OrchestrationMethodsPage() {
     return matchesSearch && matchesCategory;
   });
 
-  const categories = [...new Set(methods.map(m => m.methodCategory))];
+  const categories = Array.from(new Set(methods.map(m => m.methodCategory)));
 
   const methodMetrics = selectedMethod ? metrics[selectedMethod.methodCode] : null;
   const methodExecutions = selectedMethod 

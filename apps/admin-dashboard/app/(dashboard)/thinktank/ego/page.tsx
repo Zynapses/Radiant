@@ -176,28 +176,28 @@ interface EgoDashboard {
 
 // API functions
 async function fetchEgoDashboard(): Promise<EgoDashboard> {
-  const response = await apiClient.get('/admin/ego/dashboard');
-  return response.data.data;
+  const response = await apiClient.get<{ data: EgoDashboard }>('/admin/ego/dashboard');
+  return response.data;
 }
 
 async function updateEgoConfig(updates: Partial<EgoConfig>): Promise<EgoConfig> {
-  const response = await apiClient.put('/admin/ego/config', updates);
-  return response.data.data;
+  const response = await apiClient.put<{ data: EgoConfig }>('/admin/ego/config', updates);
+  return response.data;
 }
 
 async function updateEgoIdentity(updates: Partial<EgoIdentity>): Promise<EgoIdentity> {
-  const response = await apiClient.put('/admin/ego/identity', updates);
-  return response.data.data;
+  const response = await apiClient.put<{ data: EgoIdentity }>('/admin/ego/identity', updates);
+  return response.data;
 }
 
 async function triggerAffectEvent(event: { eventType: string; valenceDelta: number; arousalDelta: number }): Promise<EgoAffect> {
-  const response = await apiClient.post('/admin/ego/affect/trigger', event);
-  return response.data.data;
+  const response = await apiClient.post<{ data: EgoAffect }>('/admin/ego/affect/trigger', event);
+  return response.data;
 }
 
 async function resetAffect(): Promise<EgoAffect> {
-  const response = await apiClient.post('/admin/ego/affect/reset');
-  return response.data.data;
+  const response = await apiClient.post<{ data: EgoAffect }>('/admin/ego/affect/reset');
+  return response.data;
 }
 
 async function addMemory(memory: { memoryType: string; content: string; importance: number; isPinned: boolean }): Promise<void> {

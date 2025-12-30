@@ -2,6 +2,8 @@
 // System 2 Reasoning with Monte Carlo Tree Search / Beam Search
 
 import { executeStatement, stringParam } from '../db/client';
+import { modelRouterService, type ChatMessage } from './model-router.service';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import type {
   ThoughtNode,
   ReasoningTree,
@@ -286,7 +288,7 @@ class TreeOfThoughtsService {
   }
 
   /**
-   * Generate multiple thought branches
+   * Generate multiple thought branches using LLM
    */
   private async generateThoughts(
     tree: ReasoningTree,
@@ -296,55 +298,148 @@ class TreeOfThoughtsService {
     const path = this.getPathToNode(tree.rootNode, node.id);
     const context = path.map(id => this.findNode(tree.rootNode, id)?.thought).filter(Boolean);
 
-    const prompt = `You are a strategic reasoning assistant. Given a problem and the reasoning path so far, generate ${tree.config.branchingFactor} distinct next steps or approaches.
+    const systemPrompt = `You are a strategic reasoning assistant specializing in ${tree.problemType} problems. Generate diverse, high-quality reasoning steps. Always respond with valid JSON only.`;
+    
+    const userPrompt = `Given the problem and reasoning path so far, generate ${tree.config.branchingFactor} distinct next steps or approaches.
 
-Problem: ${tree.originalPrompt}
+PROBLEM: ${tree.originalPrompt}
 
-Reasoning path so far:
-${context.map((t, i) => `Step ${i}: ${t}`).join('\n')}
+REASONING PATH SO FAR:
+${context.length > 0 ? context.map((t, i) => `Step ${i}: ${t}`).join('\n') : '(Starting fresh)'}
 
-Generate ${tree.config.branchingFactor} different next reasoning steps. Each should be a distinct approach or continuation. Format as JSON:
-{
-  "thoughts": ["thought 1", "thought 2", "thought 3"],
-  "reasoning": ["why thought 1", "why thought 2", "why thought 3"]
-}`;
+CURRENT THOUGHT: ${node.thought}
 
-    // This would call the actual LLM - placeholder for structure
+Generate ${tree.config.branchingFactor} different, creative next reasoning steps. Each should:
+1. Be a distinct approach or continuation
+2. Make meaningful progress toward the solution
+3. Be logically sound
+
+Respond with ONLY valid JSON:
+{"thoughts": ["step 1", "step 2", "step 3"], "reasoning": ["why step 1", "why step 2", "why step 3"]}`;
+
+    try {
+      const messages: ChatMessage[] = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ];
+      
+      const response = await modelRouterService.invoke({
+        modelId: tree.config.generationModel || 'gpt-4o',
+        messages,
+        temperature: 0.8, // Higher temperature for diverse thoughts
+        maxTokens: 2048,
+      });
+      
+      // Parse JSON response
+      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]) as ThoughtGenerationResult;
+        if (parsed.thoughts?.length && parsed.reasoning?.length) {
+          return {
+            thoughts: parsed.thoughts.slice(0, tree.config.branchingFactor),
+            reasoning: parsed.reasoning.slice(0, tree.config.branchingFactor),
+          };
+        }
+      }
+      
+      logger.warn('Failed to parse LLM response for thought generation, using fallback');
+    } catch (error) {
+      logger.error('LLM thought generation failed', { error: String(error) });
+    }
+    
+    // Fallback: generate basic thoughts
     const thoughts: string[] = [];
     const reasoning: string[] = [];
+    const approaches = ['analytical', 'creative', 'systematic'];
 
     for (let i = 0; i < tree.config.branchingFactor; i++) {
-      thoughts.push(`Approach ${i + 1}: Continue reasoning from "${node.thought.slice(0, 50)}..."`);
-      reasoning.push(`Generated approach ${i + 1} for problem type ${tree.problemType}`);
+      const approach = approaches[i % approaches.length];
+      thoughts.push(`${approach.charAt(0).toUpperCase() + approach.slice(1)} approach: Analyze "${node.thought.slice(0, 50)}..." from a ${approach} perspective`);
+      reasoning.push(`Applying ${approach} reasoning to ${tree.problemType} problem`);
     }
 
     return { thoughts, reasoning };
   }
 
   /**
-   * Score a thought node
+   * Score a thought node using LLM evaluation
    */
   private async scoreThought(tree: ReasoningTree, node: ThoughtNode): Promise<ThoughtScore> {
-    const prompt = `Rate this reasoning step for solving the problem. Score from 0.0 to 1.0.
+    const systemPrompt = `You are a critical reasoning evaluator. Score reasoning steps objectively. Always respond with valid JSON only.`;
+    
+    const userPrompt = `Rate this reasoning step for solving the problem.
 
-Problem: ${tree.originalPrompt}
-Problem Type: ${tree.problemType}
+PROBLEM: ${tree.originalPrompt}
+PROBLEM TYPE: ${tree.problemType}
 
-Reasoning Step: ${node.thought}
+REASONING STEP TO EVALUATE: ${node.thought}
 
-Evaluate:
-1. Relevance to problem (0-1)
-2. Logical soundness (0-1)
-3. Progress toward solution (0-1)
+Score each criterion from 0.0 to 1.0:
+1. Relevance: How relevant is this step to solving the problem?
+2. Soundness: How logically sound is this reasoning?
+3. Progress: How much progress does this make toward a solution?
 
-Return JSON: { "score": 0.X, "confidence": 0.X, "reasoning": "why" }`;
+Calculate final score as weighted average: (relevance * 0.3) + (soundness * 0.4) + (progress * 0.3)
 
-    // Placeholder scoring - would call scoring model
-    const score = 0.5 + Math.random() * 0.4;
+Respond with ONLY valid JSON:
+{"score": 0.X, "confidence": 0.X, "reasoning": "brief explanation", "breakdown": {"relevance": 0.X, "soundness": 0.X, "progress": 0.X}}`;
+
+    try {
+      const messages: ChatMessage[] = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ];
+      
+      const response = await modelRouterService.invoke({
+        modelId: tree.config.scoringModel || 'gpt-4o-mini',
+        messages,
+        temperature: 0.1, // Low temperature for consistent scoring
+        maxTokens: 512,
+      });
+      
+      // Parse JSON response
+      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]) as {
+          score: number;
+          confidence: number;
+          reasoning: string;
+          breakdown?: { relevance: number; soundness: number; progress: number };
+        };
+        
+        // Validate score is in range
+        const score = Math.max(0, Math.min(1, parsed.score || 0.5));
+        const confidence = Math.max(0, Math.min(1, parsed.confidence || 0.7));
+        
+        return {
+          score,
+          confidence,
+          reasoning: parsed.reasoning || 'Evaluated by scoring model',
+        };
+      }
+      
+      logger.warn('Failed to parse LLM scoring response, using heuristic');
+    } catch (error) {
+      logger.error('LLM thought scoring failed', { error: String(error) });
+    }
+    
+    // Fallback: heuristic scoring based on thought content
+    let score = 0.5;
+    const thought = node.thought.toLowerCase();
+    
+    // Boost score for structured reasoning indicators
+    if (thought.includes('therefore') || thought.includes('because') || thought.includes('thus')) score += 0.1;
+    if (thought.includes('step') || thought.includes('first') || thought.includes('then')) score += 0.1;
+    if (thought.length > 100) score += 0.05; // More detailed thoughts
+    if (thought.includes('?')) score -= 0.05; // Questions indicate uncertainty
+    
+    // Clamp score
+    score = Math.max(0.2, Math.min(0.9, score));
+    
     return {
       score,
-      confidence: 0.8,
-      reasoning: `Evaluated step for ${tree.problemType} problem`,
+      confidence: 0.6, // Lower confidence for heuristic scoring
+      reasoning: `Heuristic evaluation for ${tree.problemType} problem`,
     };
   }
 
@@ -487,39 +582,37 @@ Return JSON: { "score": 0.X, "confidence": 0.X, "reasoning": "why" }`;
    * Save tree to database
    */
   private async saveTree(tree: ReasoningTree): Promise<void> {
-    await executeStatement({
-      sql: `
-        INSERT INTO reasoning_trees (
-          id, tenant_id, user_id, plan_id,
-          original_prompt, problem_type, tree_data, config,
-          total_nodes, max_depth, branching_factor,
-          current_best_score, explored_paths, pruned_paths,
-          thinking_time_ms, elapsed_time_ms,
-          final_answer, final_confidence,
-          status, started_at, completed_at
-        ) VALUES (
-          $1::uuid, $2::uuid, $3::uuid, $4::uuid,
-          $5, $6, $7::jsonb, $8::jsonb,
-          $9, $10, $11,
-          $12, $13, $14,
-          $15, $16,
-          $17, $18,
-          $19, $20, $21
-        )
-        ON CONFLICT (id) DO UPDATE SET
-          tree_data = $7::jsonb,
-          total_nodes = $9,
-          max_depth = $10,
-          current_best_score = $12,
-          explored_paths = $13,
-          pruned_paths = $14,
-          elapsed_time_ms = $16,
-          final_answer = $17,
-          final_confidence = $18,
-          status = $19,
-          completed_at = $21
-      `,
-      parameters: [
+    await executeStatement(
+      `INSERT INTO reasoning_trees (
+         id, tenant_id, user_id, plan_id,
+         original_prompt, problem_type, tree_data, config,
+         total_nodes, max_depth, branching_factor,
+         current_best_score, explored_paths, pruned_paths,
+         thinking_time_ms, elapsed_time_ms,
+         final_answer, final_confidence,
+         status, started_at, completed_at
+       ) VALUES (
+         $1::uuid, $2::uuid, $3::uuid, $4::uuid,
+         $5, $6, $7::jsonb, $8::jsonb,
+         $9, $10, $11,
+         $12, $13, $14,
+         $15, $16,
+         $17, $18,
+         $19, $20, $21
+       )
+       ON CONFLICT (id) DO UPDATE SET
+         tree_data = $7::jsonb,
+         total_nodes = $9,
+         max_depth = $10,
+         current_best_score = $12,
+         explored_paths = $13,
+         pruned_paths = $14,
+         elapsed_time_ms = $16,
+         final_answer = $17,
+         final_confidence = $18,
+         status = $19,
+         completed_at = $21`,
+      [
         stringParam('id', tree.id),
         stringParam('tenantId', tree.tenantId),
         stringParam('userId', tree.userId),
@@ -541,18 +634,18 @@ Return JSON: { "score": 0.X, "confidence": 0.X, "reasoning": "why" }`;
         stringParam('status', tree.status),
         stringParam('startedAt', tree.startedAt.toISOString()),
         stringParam('completedAt', tree.completedAt?.toISOString() || ''),
-      ],
-    });
+      ]
+    );
   }
 
   /**
    * Get tree by ID
    */
   async getTree(treeId: string): Promise<ReasoningTree | null> {
-    const result = await executeStatement({
-      sql: `SELECT * FROM reasoning_trees WHERE id = $1::uuid`,
-      parameters: [stringParam('id', treeId)],
-    });
+    const result = await executeStatement(
+      `SELECT * FROM reasoning_trees WHERE id = $1::uuid`,
+      [stringParam('id', treeId)]
+    );
 
     if (!result.rows?.length) return null;
 
@@ -587,10 +680,10 @@ Return JSON: { "score": 0.X, "confidence": 0.X, "reasoning": "why" }`;
    * Get configuration for tenant
    */
   async getConfig(tenantId: string): Promise<TreeOfThoughtsConfig> {
-    const result = await executeStatement({
-      sql: `SELECT tree_of_thoughts FROM cognitive_architecture_config WHERE tenant_id = $1::uuid`,
-      parameters: [stringParam('tenantId', tenantId)],
-    });
+    const result = await executeStatement(
+      `SELECT tree_of_thoughts FROM cognitive_architecture_config WHERE tenant_id = $1::uuid`,
+      [stringParam('tenantId', tenantId)]
+    );
 
     if (result.rows?.length && result.rows[0].tree_of_thoughts) {
       return result.rows[0].tree_of_thoughts as TreeOfThoughtsConfig;

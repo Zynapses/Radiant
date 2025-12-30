@@ -4,6 +4,7 @@
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { modelRouterService, type ChatMessage } from './model-router.service';
 
 // ============================================================================
 // Types
@@ -538,11 +539,36 @@ class DriftDetectionService {
     
     const baselineScore = Number(baselineResult.rows?.[0]?.score || 0);
     
-    // This would typically call the model to evaluate each test case
-    // For now, return a simulated result
-    const score = baselineScore > 0 ? baselineScore * (0.95 + Math.random() * 0.1) : 0.7;
+    // Run actual model evaluation on test cases
     const totalQuestions = testCases.length;
-    const correctAnswers = Math.round(score * totalQuestions);
+    let correctAnswers = 0;
+    const categoryCorrect: Record<string, number> = {};
+    const categoryTotal: Record<string, number> = {};
+    
+    for (const testCase of testCases) {
+      try {
+        const messages: ChatMessage[] = [
+          { role: 'system', content: 'Answer the following question. Be concise and accurate.' },
+          { role: 'user', content: testCase.question }
+        ];
+        
+        const response = await modelRouterService.invoke({
+          modelId,
+          messages,
+          temperature: 0,
+          maxTokens: 256,
+        });
+        
+        // Check if response matches expected answer using semantic similarity
+        const isCorrect = this.checkAnswerMatch(response.content, testCase.expectedAnswer);
+        if (isCorrect) correctAnswers++;
+        
+      } catch (error) {
+        logger.warn('Test case evaluation failed', { modelId, error: String(error) });
+      }
+    }
+    
+    const score = totalQuestions > 0 ? correctAnswers / totalQuestions : 0;
     const scoreDelta = score - baselineScore;
     const significantChange = Math.abs(scoreDelta) > 0.1;
     
@@ -763,6 +789,30 @@ class DriftDetectionService {
          AND alert_sent = false`,
       [stringParam('tenantId', tenantId), stringParam('modelId', modelId)]
     );
+  }
+
+  /**
+   * Check if model answer matches expected answer using semantic similarity
+   */
+  private checkAnswerMatch(modelAnswer: string, expectedAnswer: string): boolean {
+    const normalizedModel = modelAnswer.toLowerCase().trim();
+    const normalizedExpected = expectedAnswer.toLowerCase().trim();
+    
+    // Exact match
+    if (normalizedModel === normalizedExpected) return true;
+    
+    // Contains match (expected answer is in model answer)
+    if (normalizedModel.includes(normalizedExpected)) return true;
+    
+    // Word overlap (Jaccard similarity > 0.5)
+    const modelWords = new Set(normalizedModel.split(/\W+/).filter(w => w.length > 2));
+    const expectedWords = new Set(normalizedExpected.split(/\W+/).filter(w => w.length > 2));
+    
+    const intersection = new Set([...modelWords].filter(w => expectedWords.has(w)));
+    const union = new Set([...modelWords, ...expectedWords]);
+    
+    const similarity = union.size > 0 ? intersection.size / union.size : 0;
+    return similarity > 0.5;
   }
 }
 

@@ -637,14 +637,65 @@ export class AGIResponsePipelineService {
     responses: AGIResponse[],
     context: PipelineExecutionContext
   ): Promise<{ content: ResponseContent[]; agreement: number }> {
-    // For voting, we'd use a judge model to pick the best response
-    // For now, use the primary (first) response
     if (responses.length === 0) {
       return { content: [], agreement: 1 };
+    }
+    
+    if (responses.length === 1) {
+      return { content: responses[0].content, agreement: 1 };
     }
 
     // Calculate agreement based on content similarity
     const agreement = this.calculateAgreement(responses);
+    
+    // Use a judge model to evaluate and pick the best response
+    const responseSummaries = responses.map((r, i) => {
+      const text = r.content
+        .filter((c): c is TextContent => c.type === 'text')
+        .map(t => t.content)
+        .join('\n');
+      return `[Response ${i + 1}] (Model: ${r.model.modelName})\n${text}`;
+    }).join('\n\n---\n\n');
+
+    const judgePrompt = `You are a response quality judge. Evaluate the following responses and select the BEST one.
+
+${responseSummaries}
+
+Evaluate each response on:
+1. Accuracy and correctness
+2. Completeness of the answer
+3. Clarity and readability
+4. Relevance to the original query
+
+Respond with ONLY a JSON object in this exact format:
+{"winner": <response_number>, "reasoning": "<brief_explanation>", "scores": [<score_1>, <score_2>, ...]}
+
+Where winner is 1-indexed and scores are 0-1 for each response.`;
+
+    try {
+      // Use a capable model for judging
+      const judgeResult = await modelRouterService.invoke({
+        modelId: 'anthropic/claude-3-haiku',
+        messages: [{ role: 'user', content: judgePrompt }],
+        temperature: 0,
+        maxTokens: 256,
+      });
+
+      // Parse the judge's decision
+      const jsonMatch = judgeResult.content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const decision = JSON.parse(jsonMatch[0]);
+        const winnerIndex = (decision.winner || 1) - 1;
+        const validIndex = Math.max(0, Math.min(winnerIndex, responses.length - 1));
+        
+        return {
+          content: responses[validIndex].content,
+          agreement,
+        };
+      }
+    } catch {
+      // Fall back to primary response on judge failure
+    }
 
     return {
       content: responses[0].content,

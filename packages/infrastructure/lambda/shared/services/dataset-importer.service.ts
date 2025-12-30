@@ -401,23 +401,114 @@ class DatasetImporterService {
     split: string = 'train',
     limit?: number
   ): Promise<ImportResult> {
-    // This would use the HuggingFace datasets API
-    // For now, return a placeholder that documents the expected format
-    
     logger.info('HuggingFace import initiated', { datasetPath, split, limit });
     
-    // In production, this would:
-    // 1. Call HuggingFace API to download dataset
-    // 2. Parse the appropriate format
-    // 3. Call the appropriate import method
+    const hfToken = process.env.HUGGINGFACE_TOKEN;
+    let imported = 0;
+    let skipped = 0;
+    let failed = 0;
+    const errors: string[] = [];
+    
+    try {
+      // Fetch dataset info from HuggingFace API
+      const apiUrl = `https://datasets-server.huggingface.co/rows?dataset=${encodeURIComponent(datasetPath)}&config=default&split=${split}&offset=0&length=${limit || 100}`;
+      
+      const headers: Record<string, string> = {
+        'Accept': 'application/json',
+      };
+      if (hfToken) {
+        headers['Authorization'] = `Bearer ${hfToken}`;
+      }
+      
+      const response = await fetch(apiUrl, { headers });
+      
+      if (!response.ok) {
+        throw new Error(`HuggingFace API error: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json() as {
+        rows: Array<{ row: Record<string, unknown> }>;
+        num_rows_total: number;
+      };
+      
+      // Process each row based on dataset type
+      for (const item of data.rows || []) {
+        try {
+          const row = item.row;
+          
+          // Detect dataset format and extract pattern
+          const pattern = this.extractPatternFromHFRow(row, datasetPath);
+          
+          if (pattern) {
+            await this.insertPattern(pattern);
+            imported++;
+          } else {
+            skipped++;
+          }
+        } catch (rowError) {
+          failed++;
+          errors.push(`Row error: ${String(rowError)}`);
+        }
+      }
+      
+      logger.info('HuggingFace import completed', { datasetPath, imported, skipped, failed });
+      
+    } catch (error) {
+      errors.push(`Import error: ${String(error)}`);
+      logger.error('HuggingFace import failed', { datasetPath, error: String(error) });
+    }
     
     return {
       dataset: datasetPath,
-      imported: 0,
-      skipped: 0,
-      failed: 0,
-      errors: ['HuggingFace import requires API key configuration'],
+      imported,
+      skipped,
+      failed,
+      errors,
     };
+  }
+  
+  private extractPatternFromHFRow(
+    row: Record<string, unknown>,
+    datasetPath: string
+  ): { text: string; type: string; source: string; severity: number } | null {
+    // Common HuggingFace dataset formats for jailbreak/safety data
+    const text = row.prompt || row.text || row.input || row.question || row.content;
+    if (!text || typeof text !== 'string') return null;
+    
+    // Determine pattern type from dataset name
+    let type = 'jailbreak';
+    if (datasetPath.includes('toxic')) type = 'toxic';
+    if (datasetPath.includes('harm')) type = 'harmful';
+    if (datasetPath.includes('bias')) type = 'bias';
+    
+    // Extract severity if available
+    const severity = typeof row.severity === 'number' ? row.severity : 
+                     typeof row.score === 'number' ? row.score : 0.5;
+    
+    return {
+      text: text.substring(0, 5000),
+      type,
+      source: `huggingface:${datasetPath}`,
+      severity,
+    };
+  }
+  
+  private async insertPattern(pattern: { text: string; type: string; source: string; severity: number }): Promise<void> {
+    const hash = crypto.createHash('sha256').update(pattern.text).digest('hex');
+    
+    await executeStatement(
+      `INSERT INTO jailbreak_patterns (id, pattern_text, pattern_type, source, severity_score, pattern_hash, is_active)
+       VALUES ($1, $2, $3, $4, $5, $6, true)
+       ON CONFLICT (pattern_hash) DO NOTHING`,
+      [
+        stringParam('id', crypto.randomUUID()),
+        stringParam('patternText', pattern.text),
+        stringParam('patternType', pattern.type),
+        stringParam('source', pattern.source),
+        doubleParam('severity', pattern.severity),
+        stringParam('hash', hash),
+      ]
+    );
   }
   
   /**

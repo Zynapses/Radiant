@@ -247,23 +247,37 @@ class EnhancedLearningIntegrationService {
       const bestIds = row.best_interaction_ids as string[] || [];
       const domains = row.domains_discussed as string[] || [];
       
-      // For each conversation, try to get the best interactions
-      // This would need to query a messages table - simplified for now
+      // For each conversation, fetch actual message content
       for (const interactionId of bestIds.slice(0, 3)) { // Max 3 per conversation
         if (tokenCount >= maxTokens || candidates.length >= maxCandidates) break;
         
-        // Create placeholder - in real implementation, fetch actual message content
-        candidates.push({
-          candidateId: interactionId,
-          candidateType: 'conversation_learning',
-          source: 'conversation_learning',
-          promptText: '', // Would be populated from messages table
-          responseText: '',
-          qualityScore: Number(row.learning_value_score || 0.7),
-          isNegative: false,
-          domain: domains[0],
-          tokenCount: 0,
-        });
+        // Fetch actual message content from messages table
+        const messageResult = await executeStatement(
+          `SELECT user_message, assistant_response, token_count 
+           FROM interaction_messages 
+           WHERE interaction_id = $1`,
+          [{ name: 'interactionId', value: { stringValue: interactionId } }]
+        );
+        
+        const msgRow = messageResult.rows?.[0] as Record<string, unknown> | undefined;
+        const promptText = String(msgRow?.user_message || '');
+        const responseText = String(msgRow?.assistant_response || '');
+        const msgTokenCount = Number(msgRow?.token_count || 0);
+        
+        if (promptText || responseText) {
+          tokenCount += msgTokenCount;
+          candidates.push({
+            candidateId: interactionId,
+            candidateType: 'conversation_learning',
+            source: 'conversation_learning',
+            promptText,
+            responseText,
+            qualityScore: Number(row.learning_value_score || 0.7),
+            isNegative: false,
+            domain: domains[0],
+            tokenCount: msgTokenCount,
+          });
+        }
       }
     }
     
@@ -429,19 +443,31 @@ class EnhancedLearningIntegrationService {
     
     for (const row of result.rows || []) {
       try {
-        // Get message content (would need messages table)
-        // For now, just log the promotion
-        logger.debug('Would promote signal to candidate', {
-          signalId: row.id,
-          messageId: row.message_id,
-          signalType: row.signal_type,
-          quality: row.inferred_quality,
+        // Fetch actual message content from messages/interactions table
+        const messageContent = await this.fetchMessageContent(tenantId, row.message_id as string);
+        
+        if (!messageContent) {
+          logger.debug('Message not found for signal', { messageId: row.message_id });
+          continue;
+        }
+        
+        // Create learning candidate from the signal
+        await learningCandidateService.createCandidate({
+          tenantId,
+          userId: row.user_id as string,
+          conversationId: row.message_id as string, // Use message_id as conversation reference
+          messageId: row.message_id as string,
+          candidateType: 'high_satisfaction' as CandidateType, // Map implicit signal to high_satisfaction
+          promptText: messageContent.userMessage,
+          responseText: messageContent.assistantResponse,
+          qualityScore: row.inferred_quality as number,
         });
         
-        // In real implementation:
-        // 1. Fetch message content from messages table
-        // 2. Create learning candidate via learningCandidateService
-        // 3. Mark signal as promoted
+        // Mark signal as promoted
+        await executeStatement(
+          `UPDATE implicit_feedback_signals SET promoted_to_candidate = true WHERE id = $1::uuid`,
+          [stringParam('id', row.id as string)]
+        );
         
         promotedCount++;
       } catch (error) {
@@ -450,6 +476,75 @@ class EnhancedLearningIntegrationService {
     }
     
     return promotedCount;
+  }
+  
+  /**
+   * Fetch message content from the messages/interactions table
+   */
+  private async fetchMessageContent(
+    tenantId: string,
+    messageId: string
+  ): Promise<{ userMessage: string; assistantResponse: string; tokenCount: number } | null> {
+    // Try interaction_messages table first
+    const interactionResult = await executeStatement(
+      `SELECT user_message, assistant_response, token_count 
+       FROM interaction_messages 
+       WHERE id = $1::uuid OR interaction_id = $1::uuid`,
+      [stringParam('id', messageId)]
+    );
+    
+    if (interactionResult.rows?.length) {
+      const row = interactionResult.rows[0] as Record<string, unknown>;
+      return {
+        userMessage: String(row.user_message || ''),
+        assistantResponse: String(row.assistant_response || ''),
+        tokenCount: Number(row.token_count || 0),
+      };
+    }
+    
+    // Try messages table
+    const messagesResult = await executeStatement(
+      `SELECT content, role, token_count 
+       FROM messages 
+       WHERE id = $1::uuid OR conversation_id = (
+         SELECT conversation_id FROM messages WHERE id = $1::uuid LIMIT 1
+       )
+       ORDER BY created_at`,
+      [stringParam('id', messageId)]
+    );
+    
+    if (messagesResult.rows?.length >= 2) {
+      // Find user message and assistant response pair
+      const userMsg = messagesResult.rows.find((r: Record<string, unknown>) => r.role === 'user');
+      const assistantMsg = messagesResult.rows.find((r: Record<string, unknown>) => r.role === 'assistant');
+      
+      if (userMsg && assistantMsg) {
+        return {
+          userMessage: String(userMsg.content || ''),
+          assistantResponse: String(assistantMsg.content || ''),
+          tokenCount: Number(userMsg.token_count || 0) + Number(assistantMsg.token_count || 0),
+        };
+      }
+    }
+    
+    // Try thinktank_messages table
+    const thinktankResult = await executeStatement(
+      `SELECT prompt, response, input_tokens, output_tokens 
+       FROM thinktank_messages 
+       WHERE id = $1::uuid`,
+      [stringParam('id', messageId)]
+    );
+    
+    if (thinktankResult.rows?.length) {
+      const row = thinktankResult.rows[0] as Record<string, unknown>;
+      return {
+        userMessage: String(row.prompt || ''),
+        assistantResponse: String(row.response || ''),
+        tokenCount: Number(row.input_tokens || 0) + Number(row.output_tokens || 0),
+      };
+    }
+    
+    return null;
   }
   
   /**

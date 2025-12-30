@@ -1,0 +1,27 @@
+# Formal Reasoning Python Lambda Layer
+# Build with: pip install -r requirements.txt -t python/lib/python3.11/site-packages/
+
+# Z3 Theorem Prover - SMT solving, constraint satisfaction
+z3-solver==4.13.0.0
+
+# RDFLib - SPARQL 1.1, semantic web, knowledge graphs
+rdflib==7.0.0
+
+# OWL-RL - Polynomial-time ontological inference
+owlrl==6.0.2
+
+# pySHACL - SHACL constraint validation
+pyshacl==0.25.0
+
+# PyReason - Temporal graph reasoning (Numba-accelerated)
+# Note: Requires numpy and numba
+pyreason==1.3.0
+
+# PyArg (python-argumentation) - Structured argumentation
+# Note: Small package, may need to install from git if not on PyPI
+# pip install git+https://github.com/DaphneOdekerken/PyArg.git
+
+# Supporting dependencies
+numpy>=1.24.0
+networkx>=3.0
+lxml>=4.9.0

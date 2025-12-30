@@ -561,6 +561,7 @@ function TabsComponent({ config, onAction }: { config: ComponentConfig; onAction
 function ProgressTrackerComponent({ config, data }: { config: ComponentConfig; data?: Record<string, unknown> }) {
   const progress = Number(data?.progress || 0);
   const status = String(data?.status || 'pending');
+  const steps = Array.isArray(data?.steps) ? (data.steps as Array<{ name: string; completed: boolean }>) : null;
   
   return (
     <div className="space-y-4">
@@ -571,9 +572,9 @@ function ProgressTrackerComponent({ config, data }: { config: ComponentConfig; d
         <span className="text-sm font-medium">{progress}%</span>
       </div>
       <Progress value={progress} />
-      {data?.steps && Array.isArray(data.steps) && (
+      {steps && (
         <div className="space-y-2 mt-4">
-          {data.steps.map((step: { name: string; completed: boolean }, i: number) => (
+          {steps.map((step, i: number) => (
             <div key={i} className="flex items-center gap-2 text-sm">
               {step.completed ? (
                 <CheckCircle className="h-4 w-4 text-green-500" />

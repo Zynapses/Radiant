@@ -36,6 +36,7 @@
 23. [Model Coordination Service](#23-model-coordination-service)
 24. [Ethics Pipeline](#24-ethics-pipeline)
 25. [Inference Components](#26-inference-components-self-hosted-model-optimization)
+26. [Service Environment Variables](#30-service-environment-variables)
 
 ---
 
@@ -2298,6 +2299,41 @@ The Consciousness page provides:
 4. **On Anomaly**: Investigate unusual test failures or emergence events
 
 See [Consciousness Service Documentation](./CONSCIOUSNESS-SERVICE.md) for full details.
+
+### 21.7 Consciousness Library Registry (16 Libraries)
+
+The consciousness engine integrates 16 specialized Python libraries across 5 phases:
+
+| Phase | Library | License | Function | Biological Analog |
+|-------|---------|---------|----------|-------------------|
+| **1: Foundation** | Letta | Apache-2.0 | Identity/Memory | Hippocampus |
+| | LangGraph | MIT | Cognitive Loop | Thalamocortical Loop |
+| | pymdp | MIT | Active Inference | Prefrontal Cortex |
+| | GraphRAG | MIT | Reality Grounding | Semantic Memory |
+| **2: Measurement** | PyPhi | GPL-3.0 | IIT Φ Calculation | Integrated Networks |
+| **3: Reasoning** | Z3 | MIT | Formal Verification | Cerebellum |
+| | PyArg | MIT | Argumentation | Broca's Area |
+| | PyReason | BSD-2-Clause | Temporal Reasoning | Prefrontal Cortex |
+| | RDFLib | BSD-3-Clause | Knowledge Graphs | Semantic Memory |
+| | OWL-RL | W3C | Ontological Inference | Inferential Cortex |
+| | pySHACL | Apache-2.0 | Constraint Validation | Error Detection |
+| **4: Frontier** | HippoRAG | MIT | Memory Indexing | Hippocampus |
+| | DreamerV3 | MIT | World Modeling | Prefrontal-Hippocampal |
+| | SpikingJelly | Apache-2.0 | Temporal Binding | Thalamocortical Oscillations |
+| **5: Learning** | Distilabel | Apache-2.0 | Synthetic Data | Hebbian Learning |
+| | Unsloth | Apache-2.0 | Fast Fine-tuning | Synaptic Plasticity |
+
+**MCP Tools Available:**
+- `hipporag_index`, `hipporag_retrieve`, `hipporag_multi_hop` - Memory indexing
+- `imagine_trajectory`, `counterfactual_simulation`, `dream_consolidation` - World model
+- `test_temporal_binding`, `detect_synchrony` - Phenomenal binding
+- `run_consciousness_tests`, `run_single_consciousness_test`, `run_pci_test` - Testing
+
+**Environment Variables:**
+| Variable | Description |
+|----------|-------------|
+| `CONSCIOUSNESS_EXECUTOR_ARN` | ARN of Python executor Lambda |
+| `DREAMERV3_SAGEMAKER_ENDPOINT` | SageMaker endpoint for DreamerV3 |
 
 ---
 
@@ -4776,5 +4812,56 @@ new LibraryExecutionStack(app, 'LibraryExecution', {
 
 ---
 
-*Document Version: 4.18.18*
+## 30. Service Environment Variables
+
+The following environment variables configure optional service features:
+
+### 30.1 Deep Research Service
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `SEARCH_API_KEY` | Google Custom Search API key | No (uses DuckDuckGo fallback) |
+| `SEARCH_ENGINE_ID` | Google Custom Search engine ID | No (uses DuckDuckGo fallback) |
+
+**Setup:**
+1. Create a Google Custom Search Engine at https://cse.google.com
+2. Get API key from Google Cloud Console
+3. Set both variables for Google search, or leave unset for DuckDuckGo
+
+### 30.2 Code Execution Service
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `CODE_EXECUTOR_LAMBDA_ARN` | ARN of the code execution Lambda | No (static analysis only) |
+
+**Setup:**
+1. Deploy the code execution Lambda via CDK
+2. Set the ARN to enable real code execution
+3. Without this, the service performs static analysis only
+
+### 30.3 UI Feedback Service
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `UI_FEEDBACK_ANALYSIS_QUEUE_URL` | SQS queue URL for async analysis | No (uses DB marking) |
+
+**Setup:**
+1. Create SQS queue via CDK or manually
+2. Set URL to enable background processing
+3. Without this, feedback is marked in DB for batch processing
+
+### 30.4 Redis Cache (Enhanced Learning)
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `REDIS_URL` | Redis connection URL | No (uses DB only) |
+
+**Setup:**
+1. Deploy ElastiCache Redis cluster
+2. Set connection URL (e.g., `redis://host:6379`)
+3. Enable `redisCacheEnabled` in learning config
+
+---
+
+*Document Version: 4.18.19*
 *Last Updated: December 2024*

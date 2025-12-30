@@ -6,6 +6,7 @@
 
 import { executeStatement } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { modelRouterService, type ChatMessage } from './model-router.service';
 import { ECSClient, RunTaskCommand } from '@aws-sdk/client-ecs';
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 
@@ -356,16 +357,64 @@ class CodeVerificationService {
   // ==========================================================================
 
   /**
-   * Generate test cases for code
+   * Generate test cases for code using LLM analysis
    */
   async generateTestCases(codeBlock: CodeBlock): Promise<TestCase[]> {
-    // Basic test - just check if code runs without error
-    const basicTest = this.createBasicTest(codeBlock.language);
+    const tests: TestCase[] = [];
     
-    // TODO: Use LLM to generate more sophisticated tests based on code analysis
-    // For now, return basic execution test
+    // Always include basic execution test
+    tests.push(this.createBasicTest(codeBlock.language));
     
-    return [basicTest];
+    // Use LLM to generate sophisticated tests based on code analysis
+    try {
+      const messages: ChatMessage[] = [
+        { 
+          role: 'system', 
+          content: `You are an expert at generating test cases for code. Analyze the code and generate test cases.
+Return a JSON array of test cases with this format:
+[{"input": "test input", "expectedOutput": "expected output", "description": "what this tests"}]
+
+Rules:
+1. Generate 2-5 test cases covering different scenarios
+2. Include edge cases (empty input, large values, special characters)
+3. Test the main functionality
+4. Be specific about expected output` 
+        },
+        { 
+          role: 'user', 
+          content: `Generate test cases for this ${codeBlock.language} code:\n\n\`\`\`${codeBlock.language}\n${codeBlock.code}\n\`\`\`` 
+        }
+      ];
+      
+      const response = await modelRouterService.invoke({
+        modelId: 'anthropic/claude-3-haiku',
+        messages,
+        temperature: 0.3,
+        maxTokens: 1024,
+      });
+      
+      const jsonMatch = response.content.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]) as Array<{
+          input: string;
+          expectedOutput?: string;
+          description?: string;
+        }>;
+        
+        for (const tc of parsed) {
+          tests.push({
+            input: tc.input || '',
+            expectedOutput: tc.expectedOutput,
+            expectedExitCode: 0,
+            timeout: 30000,
+          });
+        }
+      }
+    } catch (error) {
+      logger.debug('LLM test generation failed, using basic test only', { error: String(error) });
+    }
+    
+    return tests;
   }
 
   private createBasicTest(language: SupportedLanguage): TestCase {

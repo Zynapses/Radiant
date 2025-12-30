@@ -904,6 +904,340 @@ function interpretEmergenceLevel(level: string): { description: string; recommen
   return interpretations[level] || interpretations['dormant'];
 }
 
+// ============================================================================
+// GET /admin/consciousness/sleep-schedule
+// Get sleep cycle schedule configuration
+// ============================================================================
+export const getSleepSchedule: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = event.requestContext.authorizer?.tenantId || 'default';
+    
+    const result = await executeStatement(
+      `SELECT sleep_enabled, sleep_schedule_hour, sleep_schedule_minute, 
+              sleep_timezone, sleep_frequency, sleep_weekly_day,
+              last_sleep_at, next_sleep_at, sleep_duration_limit_minutes,
+              sleep_config
+       FROM consciousness_parameters WHERE tenant_id = $1`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+    
+    const config = result.rows?.[0] as Record<string, unknown> | undefined;
+    
+    // Get recent sleep history
+    const historyResult = await executeStatement(
+      `SELECT sleep_id, started_at, completed_at, duration_ms, status,
+              monologues_generated, dreams_generated, memories_consolidated,
+              identity_updates, evolution_triggered, error_message
+       FROM consciousness_sleep_history
+       WHERE tenant_id = $1
+       ORDER BY started_at DESC
+       LIMIT 10`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+    
+    return response(200, {
+      success: true,
+      data: {
+        schedule: {
+          enabled: config?.sleep_enabled ?? true,
+          hour: config?.sleep_schedule_hour ?? 3,
+          minute: config?.sleep_schedule_minute ?? 0,
+          timezone: config?.sleep_timezone ?? 'UTC',
+          frequency: config?.sleep_frequency ?? 'nightly',
+          weeklyDay: config?.sleep_weekly_day ?? 0,
+          durationLimitMinutes: config?.sleep_duration_limit_minutes ?? 30,
+          config: config?.sleep_config ? JSON.parse(String(config.sleep_config)) : {},
+        },
+        timing: {
+          lastSleepAt: config?.last_sleep_at ?? null,
+          nextSleepAt: config?.next_sleep_at ?? null,
+        },
+        recentHistory: (historyResult.rows || []).map((row: Record<string, unknown>) => ({
+          sleepId: row.sleep_id,
+          startedAt: row.started_at,
+          completedAt: row.completed_at,
+          durationMs: row.duration_ms,
+          status: row.status,
+          stats: {
+            monologuesGenerated: row.monologues_generated,
+            dreamsGenerated: row.dreams_generated,
+            memoriesConsolidated: row.memories_consolidated,
+            identityUpdates: row.identity_updates,
+            evolutionTriggered: row.evolution_triggered,
+          },
+          error: row.error_message,
+        })),
+      },
+    });
+  } catch (error) {
+    logger.error('Error fetching sleep schedule', error);
+    return response(500, { success: false, error: 'Failed to fetch sleep schedule' });
+  }
+};
+
+// ============================================================================
+// PUT /admin/consciousness/sleep-schedule
+// Update sleep cycle schedule configuration
+// ============================================================================
+export const updateSleepSchedule: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = event.requestContext.authorizer?.tenantId || 'default';
+    const body = JSON.parse(event.body || '{}');
+    
+    const { 
+      enabled, 
+      hour, 
+      minute, 
+      timezone, 
+      frequency, 
+      weeklyDay,
+      durationLimitMinutes,
+      config 
+    } = body;
+    
+    // Validate inputs
+    if (hour !== undefined && (hour < 0 || hour > 23)) {
+      return response(400, { success: false, error: 'Hour must be between 0 and 23' });
+    }
+    if (minute !== undefined && (minute < 0 || minute > 59)) {
+      return response(400, { success: false, error: 'Minute must be between 0 and 59' });
+    }
+    if (frequency !== undefined && !['nightly', 'weekly', 'manual'].includes(frequency)) {
+      return response(400, { success: false, error: 'Frequency must be nightly, weekly, or manual' });
+    }
+    if (weeklyDay !== undefined && (weeklyDay < 0 || weeklyDay > 6)) {
+      return response(400, { success: false, error: 'Weekly day must be between 0 (Sunday) and 6 (Saturday)' });
+    }
+    
+    const sets: string[] = [];
+    const params: Array<{ name: string; value: unknown }> = [
+      { name: 'tenantId', value: { stringValue: tenantId } },
+    ];
+    
+    if (enabled !== undefined) {
+      sets.push(`sleep_enabled = $${params.length + 1}`);
+      params.push({ name: 'enabled', value: { booleanValue: enabled } });
+    }
+    if (hour !== undefined) {
+      sets.push(`sleep_schedule_hour = $${params.length + 1}`);
+      params.push({ name: 'hour', value: { longValue: hour } });
+    }
+    if (minute !== undefined) {
+      sets.push(`sleep_schedule_minute = $${params.length + 1}`);
+      params.push({ name: 'minute', value: { longValue: minute } });
+    }
+    if (timezone !== undefined) {
+      sets.push(`sleep_timezone = $${params.length + 1}`);
+      params.push({ name: 'timezone', value: { stringValue: timezone } });
+    }
+    if (frequency !== undefined) {
+      sets.push(`sleep_frequency = $${params.length + 1}`);
+      params.push({ name: 'frequency', value: { stringValue: frequency } });
+    }
+    if (weeklyDay !== undefined) {
+      sets.push(`sleep_weekly_day = $${params.length + 1}`);
+      params.push({ name: 'weeklyDay', value: { longValue: weeklyDay } });
+    }
+    if (durationLimitMinutes !== undefined) {
+      sets.push(`sleep_duration_limit_minutes = $${params.length + 1}`);
+      params.push({ name: 'durationLimit', value: { longValue: durationLimitMinutes } });
+    }
+    if (config !== undefined) {
+      sets.push(`sleep_config = $${params.length + 1}`);
+      params.push({ name: 'config', value: { stringValue: JSON.stringify(config) } });
+    }
+    
+    if (sets.length === 0) {
+      return response(400, { success: false, error: 'No updates provided' });
+    }
+    
+    await executeStatement(
+      `INSERT INTO consciousness_parameters (tenant_id, ${sets.map(s => s.split(' = ')[0]).join(', ')})
+       VALUES ($1, ${params.slice(1).map((_, i) => `$${i + 2}`).join(', ')})
+       ON CONFLICT (tenant_id) DO UPDATE SET ${sets.join(', ')}, updated_at = NOW()`,
+      params
+    );
+    
+    return response(200, { 
+      success: true, 
+      message: 'Sleep schedule updated',
+      note: frequency === 'manual' 
+        ? 'Manual mode enabled - sleep cycles will only run when triggered manually'
+        : `Sleep cycles scheduled ${frequency === 'nightly' ? 'nightly' : 'weekly'} at ${String(hour ?? 3).padStart(2, '0')}:${String(minute ?? 0).padStart(2, '0')} ${timezone ?? 'UTC'}`
+    });
+  } catch (error) {
+    logger.error('Error updating sleep schedule', error);
+    return response(500, { success: false, error: 'Failed to update sleep schedule' });
+  }
+};
+
+// ============================================================================
+// POST /admin/consciousness/sleep-schedule/run
+// Manually trigger a sleep cycle
+// ============================================================================
+export const triggerSleepCycle: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = event.requestContext.authorizer?.tenantId || 'default';
+    const body = JSON.parse(event.body || '{}');
+    const { dryRun } = body;
+    
+    // Import Lambda client to invoke sleep cycle
+    const { LambdaClient, InvokeCommand } = await import('@aws-sdk/client-lambda');
+    const lambda = new LambdaClient({});
+    
+    const sleepLambdaArn = process.env.SLEEP_CYCLE_LAMBDA_ARN;
+    if (!sleepLambdaArn) {
+      return response(500, { success: false, error: 'Sleep cycle Lambda not configured' });
+    }
+    
+    // Invoke sleep cycle Lambda asynchronously
+    await lambda.send(new InvokeCommand({
+      FunctionName: sleepLambdaArn,
+      InvocationType: 'Event', // Async
+      Payload: JSON.stringify({
+        tenantId,
+        force: true,
+        dryRun: dryRun ?? false,
+      }),
+    }));
+    
+    return response(202, { 
+      success: true, 
+      message: 'Sleep cycle triggered',
+      dryRun: dryRun ?? false,
+      note: 'Sleep cycle is running in the background. Check sleep history for results.',
+    });
+  } catch (error) {
+    logger.error('Error triggering sleep cycle', error);
+    return response(500, { success: false, error: 'Failed to trigger sleep cycle' });
+  }
+};
+
+// ============================================================================
+// GET /admin/consciousness/sleep-schedule/recommend
+// Analyze historical traffic to recommend optimal sleep time
+// ============================================================================
+export const recommendSleepTime: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = event.requestContext.authorizer?.tenantId || 'default';
+    
+    // Analyze last 30 days of request patterns by hour
+    const trafficResult = await executeStatement(
+      `SELECT 
+        EXTRACT(HOUR FROM created_at) as hour,
+        COUNT(*) as request_count,
+        AVG(EXTRACT(EPOCH FROM response_time)) as avg_response_time_sec
+       FROM api_request_logs
+       WHERE tenant_id = $1 
+         AND created_at > NOW() - INTERVAL '30 days'
+       GROUP BY EXTRACT(HOUR FROM created_at)
+       ORDER BY hour`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+    
+    // Also check conversation activity by hour
+    const conversationResult = await executeStatement(
+      `SELECT 
+        EXTRACT(HOUR FROM created_at) as hour,
+        COUNT(*) as message_count
+       FROM conversation_messages
+       WHERE tenant_id = $1 
+         AND created_at > NOW() - INTERVAL '30 days'
+       GROUP BY EXTRACT(HOUR FROM created_at)
+       ORDER BY hour`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+    
+    // Build hourly activity map
+    const hourlyActivity: Record<number, { requests: number; messages: number; score: number }> = {};
+    for (let h = 0; h < 24; h++) {
+      hourlyActivity[h] = { requests: 0, messages: 0, score: 0 };
+    }
+    
+    for (const row of (trafficResult.rows || []) as Array<Record<string, unknown>>) {
+      const hour = Number(row.hour);
+      hourlyActivity[hour].requests = Number(row.request_count) || 0;
+    }
+    
+    for (const row of (conversationResult.rows || []) as Array<Record<string, unknown>>) {
+      const hour = Number(row.hour);
+      hourlyActivity[hour].messages = Number(row.message_count) || 0;
+    }
+    
+    // Calculate activity score for each hour
+    const maxRequests = Math.max(...Object.values(hourlyActivity).map(h => h.requests), 1);
+    const maxMessages = Math.max(...Object.values(hourlyActivity).map(h => h.messages), 1);
+    
+    for (const hour of Object.keys(hourlyActivity)) {
+      const h = Number(hour);
+      hourlyActivity[h].score = 
+        (hourlyActivity[h].requests / maxRequests) * 0.5 +
+        (hourlyActivity[h].messages / maxMessages) * 0.5;
+    }
+    
+    // Find the hour with lowest activity (best for sleep)
+    let bestHour = 3; // Default to 3 AM
+    let lowestScore = Infinity;
+    
+    // Prefer hours between midnight and 6 AM
+    const preferredHours = [3, 4, 2, 5, 1, 0];
+    for (const hour of preferredHours) {
+      if (hourlyActivity[hour].score < lowestScore) {
+        lowestScore = hourlyActivity[hour].score;
+        bestHour = hour;
+      }
+    }
+    
+    // Check all hours if none of the preferred hours are low enough
+    if (lowestScore > 0.1) {
+      for (let h = 0; h < 24; h++) {
+        if (hourlyActivity[h].score < lowestScore) {
+          lowestScore = hourlyActivity[h].score;
+          bestHour = h;
+        }
+      }
+    }
+    
+    // Get current sleep config for comparison
+    const currentConfig = await executeStatement(
+      `SELECT sleep_schedule_hour, sleep_timezone FROM consciousness_parameters WHERE tenant_id = $1`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+    const config = currentConfig.rows?.[0] as Record<string, unknown> | undefined;
+    
+    return response(200, {
+      success: true,
+      data: {
+        recommendation: {
+          hour: bestHour,
+          minute: 0,
+          activityScore: lowestScore,
+          confidence: lowestScore < 0.05 ? 'high' : lowestScore < 0.15 ? 'medium' : 'low',
+          reason: `Hour ${bestHour}:00 has the lowest traffic (${(lowestScore * 100).toFixed(1)}% of peak)`,
+        },
+        currentConfig: {
+          hour: config?.sleep_schedule_hour ?? 3,
+          timezone: config?.sleep_timezone ?? 'UTC',
+        },
+        hourlyActivity: Object.entries(hourlyActivity).map(([hour, data]) => ({
+          hour: Number(hour),
+          requests: data.requests,
+          messages: data.messages,
+          activityScore: Math.round(data.score * 100) / 100,
+        })),
+        analysisWindow: '30 days',
+        dataPoints: {
+          totalRequests: Object.values(hourlyActivity).reduce((sum, h) => sum + h.requests, 0),
+          totalMessages: Object.values(hourlyActivity).reduce((sum, h) => sum + h.messages, 0),
+        },
+      },
+    });
+  } catch (error) {
+    logger.error('Error analyzing traffic for sleep recommendation', error);
+    return response(500, { success: false, error: 'Failed to analyze traffic patterns' });
+  }
+};
+
 // Helper function
 function getDominantEmotion(affect: { 
   frustration?: number; 

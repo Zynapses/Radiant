@@ -2,6 +2,9 @@
 // Hot-swappable domain expertise adapters
 
 import { executeStatement, stringParam } from '../db/client';
+import { SageMakerRuntimeClient, InvokeEndpointCommand } from '@aws-sdk/client-sagemaker-runtime';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import type {
   LoRAAdapter,
   LoRALoadRequest,
@@ -44,26 +47,24 @@ class DynamicLoRAService {
     if (!loraDomain) return null;
 
     // Find best matching adapter
-    const result = await executeStatement({
-      sql: `
-        SELECT * FROM lora_adapters
-        WHERE (tenant_id = $1::uuid OR tenant_id IS NULL)
-        AND domain = $2
-        AND is_active = true
-        AND is_verified = true
-        ${subdomain ? `AND (subdomain = $3 OR subdomain IS NULL)` : ''}
-        ORDER BY 
-          CASE WHEN tenant_id = $1::uuid THEN 0 ELSE 1 END,
-          CASE WHEN subdomain = $3 THEN 0 ELSE 1 END,
-          benchmark_score DESC NULLS LAST
-        LIMIT 1
-      `,
-      parameters: [
+    const result = await executeStatement(
+      `SELECT * FROM lora_adapters
+       WHERE (tenant_id = $1::uuid OR tenant_id IS NULL)
+       AND domain = $2
+       AND is_active = true
+       AND is_verified = true
+       ${subdomain ? `AND (subdomain = $3 OR subdomain IS NULL)` : ''}
+       ORDER BY 
+         CASE WHEN tenant_id = $1::uuid THEN 0 ELSE 1 END,
+         CASE WHEN subdomain = $3 THEN 0 ELSE 1 END,
+         benchmark_score DESC NULLS LAST
+       LIMIT 1`,
+      [
         stringParam('tenantId', tenantId),
         stringParam('domain', loraDomain),
         stringParam('subdomain', subdomain || ''),
-      ],
-    });
+      ]
+    );
 
     if (!result.rows?.length) return null;
 
@@ -136,12 +137,39 @@ class DynamicLoRAService {
   }
 
   /**
-   * Unload an adapter from memory
+   * Unload an adapter from memory via SageMaker
    */
   async unloadAdapter(adapterId: string): Promise<void> {
     if (!this.loadedAdapters.has(adapterId)) return;
+    
+    const adapter = this.loadedAdapters.get(adapterId);
+    if (!adapter) return;
 
-    // Would call SageMaker API to unload
+    try {
+      // Call SageMaker API to unload the adapter
+      const sagemakerClient = new SageMakerRuntimeClient({
+        region: process.env.AWS_REGION || 'us-east-1',
+      });
+      
+      // Send unload command to the endpoint
+      const command = new InvokeEndpointCommand({
+        EndpointName: process.env.SAGEMAKER_ENDPOINT,
+        ContentType: 'application/json',
+        Body: JSON.stringify({
+          action: 'unload_adapter',
+          adapter_id: adapterId,
+        }),
+      });
+      
+      await sagemakerClient.send(command);
+      logger.info('Adapter unloaded from SageMaker', { adapterId });
+    } catch (error) {
+      logger.warn('SageMaker unload failed, removing from local cache only', { 
+        adapterId, 
+        error: String(error) 
+      });
+    }
+
     this.loadedAdapters.delete(adapterId);
   }
 
@@ -149,10 +177,10 @@ class DynamicLoRAService {
    * Get adapter by ID
    */
   async getAdapter(adapterId: string): Promise<LoRAAdapter | null> {
-    const result = await executeStatement({
-      sql: `SELECT * FROM lora_adapters WHERE id = $1::uuid`,
-      parameters: [stringParam('id', adapterId)],
-    });
+    const result = await executeStatement(
+      `SELECT * FROM lora_adapters WHERE id = $1::uuid`,
+      [stringParam('id', adapterId)]
+    );
 
     if (!result.rows?.length) return null;
     return this.mapRowToAdapter(result.rows[0]);
@@ -165,19 +193,17 @@ class DynamicLoRAService {
     tenantId: string,
     domain: LoRADomain
   ): Promise<LoRAAdapter[]> {
-    const result = await executeStatement({
-      sql: `
-        SELECT * FROM lora_adapters
-        WHERE (tenant_id = $1::uuid OR tenant_id IS NULL)
-        AND domain = $2
-        AND is_active = true
-        ORDER BY benchmark_score DESC NULLS LAST
-      `,
-      parameters: [
+    const result = await executeStatement(
+      `SELECT * FROM lora_adapters
+       WHERE (tenant_id = $1::uuid OR tenant_id IS NULL)
+       AND domain = $2
+       AND is_active = true
+       ORDER BY benchmark_score DESC NULLS LAST`,
+      [
         stringParam('tenantId', tenantId),
         stringParam('domain', domain),
-      ],
-    });
+      ]
+    );
 
     return (result.rows || []).map(row => this.mapRowToAdapter(row));
   }
@@ -189,25 +215,23 @@ class DynamicLoRAService {
     const id = crypto.randomUUID();
     const now = new Date();
 
-    await executeStatement({
-      sql: `
-        INSERT INTO lora_adapters (
-          id, tenant_id, name, description, domain, subdomain,
-          s3_bucket, s3_key, size_bytes, checksum,
-          base_model, rank, alpha, target_modules,
-          benchmark_score, avg_latency_ms, load_time_ms,
-          times_loaded, is_active, is_verified,
-          created_at, updated_at
-        ) VALUES (
-          $1::uuid, $2::uuid, $3, $4, $5, $6,
-          $7, $8, $9, $10,
-          $11, $12, $13, $14::text[],
-          $15, $16, $17,
-          0, $18, $19,
-          $20, $21
-        )
-      `,
-      parameters: [
+    await executeStatement(
+      `INSERT INTO lora_adapters (
+         id, tenant_id, name, description, domain, subdomain,
+         s3_bucket, s3_key, size_bytes, checksum,
+         base_model, rank, alpha, target_modules,
+         benchmark_score, avg_latency_ms, load_time_ms,
+         times_loaded, is_active, is_verified,
+         created_at, updated_at
+       ) VALUES (
+         $1::uuid, $2::uuid, $3, $4, $5, $6,
+         $7, $8, $9, $10,
+         $11, $12, $13, $14::text[],
+         $15, $16, $17,
+         0, $18, $19,
+         $20, $21
+       )`,
+      [
         stringParam('id', id),
         stringParam('tenantId', adapter.tenantId || ''),
         stringParam('name', adapter.name),
@@ -229,8 +253,8 @@ class DynamicLoRAService {
         stringParam('isVerified', String(adapter.isVerified)),
         stringParam('createdAt', now.toISOString()),
         stringParam('updatedAt', now.toISOString()),
-      ],
-    });
+      ]
+    );
 
     return {
       ...adapter,
@@ -249,18 +273,16 @@ class DynamicLoRAService {
     benchmarkScore: number,
     avgLatencyMs: number
   ): Promise<void> {
-    await executeStatement({
-      sql: `
-        UPDATE lora_adapters
-        SET benchmark_score = $1, avg_latency_ms = $2, updated_at = NOW()
-        WHERE id = $3::uuid
-      `,
-      parameters: [
+    await executeStatement(
+      `UPDATE lora_adapters
+       SET benchmark_score = $1, avg_latency_ms = $2, updated_at = NOW()
+       WHERE id = $3::uuid`,
+      [
         stringParam('benchmarkScore', String(benchmarkScore)),
         stringParam('avgLatencyMs', String(avgLatencyMs)),
         stringParam('id', adapterId),
-      ],
-    });
+      ]
+    );
   }
 
   /**
@@ -329,6 +351,9 @@ class DynamicLoRAService {
     return mapping[lower] || null;
   }
 
+  private sagemakerClient = new SageMakerRuntimeClient({});
+  private s3Client = new S3Client({});
+
   /**
    * Load adapter to SageMaker endpoint
    */
@@ -336,12 +361,79 @@ class DynamicLoRAService {
     adapter: LoRAAdapter,
     endpoint: string
   ): Promise<void> {
-    // Would call SageMaker to load adapter
-    // Placeholder for actual implementation
-    console.log(`Loading adapter ${adapter.id} to endpoint ${endpoint}`);
+    const config = await this.getConfig('default');
     
-    // Simulate load time
-    await new Promise(resolve => setTimeout(resolve, 100));
+    const adapterPath = (adapter as unknown as { s3Path?: string; storagePath?: string }).s3Path 
+      || (adapter as unknown as { storagePath?: string }).storagePath
+      || `s3://${config.registryBucket}/adapters/${adapter.id}`;
+    
+    logger.info('Loading LoRA adapter to SageMaker endpoint', {
+      adapterId: adapter.id,
+      endpoint,
+      adapterPath,
+    });
+
+    try {
+      // First, verify the adapter exists in S3
+      const s3Parts = adapterPath.match(/s3:\/\/([^/]+)\/(.+)/);
+      if (s3Parts) {
+        const [, bucket, key] = s3Parts;
+        await this.s3Client.send(new GetObjectCommand({
+          Bucket: bucket,
+          Key: key,
+        }));
+      }
+
+      // Send load command to SageMaker endpoint
+      // The endpoint should be configured to accept adapter loading requests
+      const loadPayload = JSON.stringify({
+        action: 'load_adapter',
+        adapter_id: adapter.id,
+        adapter_name: adapter.name,
+        s3_path: adapterPath,
+        base_model: adapter.baseModel,
+        rank: adapter.rank,
+        alpha: adapter.alpha,
+      });
+
+      const command = new InvokeEndpointCommand({
+        EndpointName: endpoint,
+        ContentType: 'application/json',
+        Body: Buffer.from(loadPayload),
+        CustomAttributes: 'action=load_adapter',
+      });
+
+      const response = await this.sagemakerClient.send(command);
+      
+      if (response.Body) {
+        const responseText = Buffer.from(response.Body).toString('utf-8');
+        const result = JSON.parse(responseText);
+        
+        if (result.status === 'error') {
+          throw new Error(result.message || 'Failed to load adapter');
+        }
+        
+        logger.info('LoRA adapter loaded successfully', {
+          adapterId: adapter.id,
+          endpoint,
+          loadTimeMs: result.load_time_ms,
+        });
+      }
+    } catch (error) {
+      logger.error('Failed to load LoRA adapter to endpoint', {
+        adapterId: adapter.id,
+        endpoint,
+        error: String(error),
+      });
+      
+      // If fallback is enabled, don't throw - just log and continue without adapter
+      if (config.fallbackToBase) {
+        logger.warn('Falling back to base model without adapter');
+        return;
+      }
+      
+      throw error;
+    }
   }
 
   /**
@@ -371,14 +463,12 @@ class DynamicLoRAService {
    * Record adapter load in database
    */
   private async recordAdapterLoad(adapterId: string): Promise<void> {
-    await executeStatement({
-      sql: `
-        UPDATE lora_adapters
-        SET times_loaded = times_loaded + 1, last_loaded_at = NOW()
-        WHERE id = $1::uuid
-      `,
-      parameters: [stringParam('id', adapterId)],
-    });
+    await executeStatement(
+      `UPDATE lora_adapters
+       SET times_loaded = times_loaded + 1, last_loaded_at = NOW()
+       WHERE id = $1::uuid`,
+      [stringParam('id', adapterId)]
+    );
   }
 
   /**
@@ -416,10 +506,10 @@ class DynamicLoRAService {
    * Get configuration
    */
   async getConfig(tenantId: string): Promise<DynamicLoRAConfig> {
-    const result = await executeStatement({
-      sql: `SELECT dynamic_lora FROM cognitive_architecture_config WHERE tenant_id = $1::uuid`,
-      parameters: [stringParam('tenantId', tenantId)],
-    });
+    const result = await executeStatement(
+      `SELECT dynamic_lora FROM cognitive_architecture_config WHERE tenant_id = $1::uuid`,
+      [stringParam('tenantId', tenantId)]
+    );
 
     if (result.rows?.length && result.rows[0].dynamic_lora) {
       return result.rows[0].dynamic_lora as DynamicLoRAConfig;

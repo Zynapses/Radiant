@@ -447,31 +447,202 @@ class DeepResearchService {
   }
 
   /**
-   * Search web (placeholder)
+   * Search web using configured search provider
    */
   private async searchWeb(
     query: string,
     limit: number
   ): Promise<{ url: string; title: string }[]> {
-    // Would integrate with search API (Google, Bing, etc.)
-    return [
-      { url: `https://example.com/search?q=${encodeURIComponent(query)}`, title: `Results for ${query}` },
-    ];
+    const searchApiKey = process.env.SEARCH_API_KEY;
+    const searchEngineId = process.env.SEARCH_ENGINE_ID;
+    
+    // Try Google Custom Search API if configured
+    if (searchApiKey && searchEngineId) {
+      try {
+        const response = await fetch(
+          `https://www.googleapis.com/customsearch/v1?key=${searchApiKey}&cx=${searchEngineId}&q=${encodeURIComponent(query)}&num=${Math.min(limit, 10)}`
+        );
+        
+        if (response.ok) {
+          const data = await response.json() as { items?: Array<{ link: string; title: string }> };
+          return (data.items || []).map((item) => ({
+            url: item.link,
+            title: item.title,
+          }));
+        }
+      } catch (error) {
+        console.warn('Google search failed, falling back to DuckDuckGo', error);
+      }
+    }
+    
+    // Fallback to DuckDuckGo instant answers (no API key required)
+    try {
+      const ddgResponse = await fetch(
+        `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`
+      );
+      
+      if (ddgResponse.ok) {
+        const data = await ddgResponse.json() as {
+          RelatedTopics?: Array<{ FirstURL?: string; Text?: string }>;
+          AbstractURL?: string;
+          AbstractSource?: string;
+          Heading?: string;
+        };
+        const results: { url: string; title: string }[] = [];
+        
+        // Extract related topics
+        if (data.RelatedTopics) {
+          for (const topic of data.RelatedTopics.slice(0, limit)) {
+            if (topic.FirstURL && topic.Text) {
+              results.push({ url: topic.FirstURL, title: topic.Text.substring(0, 100) });
+            }
+          }
+        }
+        
+        // Add abstract source if available
+        if (data.AbstractURL && data.AbstractSource) {
+          results.unshift({ url: data.AbstractURL, title: `${data.AbstractSource}: ${data.Heading || query}` });
+        }
+        
+        return results;
+      }
+    } catch (error) {
+      console.warn('DuckDuckGo search failed', error);
+    }
+    
+    // Final fallback: return empty results
+    return [];
   }
 
   /**
-   * Fetch content from URL
+   * Fetch content from URL using native fetch
    */
   private async fetchContent(
     url: string,
     config: DeepResearchConfig
   ): Promise<{ text: string; hasImages: boolean; publishDate?: string } | null> {
-    // Would use Playwright/Puppeteer
-    // Placeholder
-    return {
-      text: `Content from ${url}`,
-      hasImages: false,
-    };
+    // Check robots.txt if configured
+    if (config.respectRobotsTxt) {
+      const canFetch = await this.checkRobotsTxt(url);
+      if (!canFetch) {
+        console.warn(`Blocked by robots.txt: ${url}`);
+        return null;
+      }
+    }
+    
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+      
+      const response = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'RadiantResearchBot/1.0 (+https://radiant.ai/bot)',
+          'Accept': 'text/html,application/xhtml+xml,text/plain,application/pdf',
+        },
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        return null;
+      }
+      
+      const contentType = response.headers.get('content-type') || '';
+      const lastModified = response.headers.get('last-modified');
+      
+      // Handle different content types
+      if (contentType.includes('application/pdf')) {
+        // For PDF, return metadata only (would need pdf-parse for full extraction)
+        return {
+          text: `[PDF Document: ${url}]`,
+          hasImages: false,
+          publishDate: lastModified ? new Date(lastModified).toISOString() : undefined,
+        };
+      }
+      
+      const html = await response.text();
+      
+      // Extract text content from HTML
+      const text = this.extractTextFromHtml(html);
+      const hasImages = /<img\s/i.test(html);
+      
+      // Try to extract publish date from meta tags
+      const dateMatch = html.match(/<meta[^>]+(?:property|name)="(?:article:published_time|date|DC\.date)"[^>]+content="([^"]+)"/i);
+      const publishDate = dateMatch?.[1] || (lastModified ? new Date(lastModified).toISOString() : undefined);
+      
+      return { text, hasImages, publishDate };
+    } catch (error) {
+      console.warn(`Failed to fetch ${url}:`, error);
+      return null;
+    }
+  }
+  
+  /**
+   * Check if URL is allowed by robots.txt
+   */
+  private async checkRobotsTxt(url: string): Promise<boolean> {
+    try {
+      const urlObj = new URL(url);
+      const robotsUrl = `${urlObj.protocol}//${urlObj.host}/robots.txt`;
+      
+      const response = await fetch(robotsUrl, { 
+        signal: AbortSignal.timeout(5000),
+        headers: { 'User-Agent': 'RadiantResearchBot/1.0' }
+      });
+      
+      if (!response.ok) return true; // No robots.txt = allowed
+      
+      const robotsTxt = await response.text();
+      const path = urlObj.pathname;
+      
+      // Simple robots.txt parser
+      const lines = robotsTxt.split('\n');
+      let inUserAgentBlock = false;
+      
+      for (const line of lines) {
+        const trimmed = line.trim().toLowerCase();
+        if (trimmed.startsWith('user-agent:')) {
+          const agent = trimmed.replace('user-agent:', '').trim();
+          inUserAgentBlock = agent === '*' || agent.includes('radiant');
+        } else if (inUserAgentBlock && trimmed.startsWith('disallow:')) {
+          const disallowed = trimmed.replace('disallow:', '').trim();
+          if (disallowed && path.startsWith(disallowed)) {
+            return false;
+          }
+        }
+      }
+      
+      return true;
+    } catch {
+      return true; // On error, assume allowed
+    }
+  }
+  
+  /**
+   * Extract text content from HTML
+   */
+  private extractTextFromHtml(html: string): string {
+    // Remove script and style tags
+    let text = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+    text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+    text = text.replace(/<noscript[^>]*>[\s\S]*?<\/noscript>/gi, '');
+    
+    // Remove HTML tags
+    text = text.replace(/<[^>]+>/g, ' ');
+    
+    // Decode HTML entities
+    text = text.replace(/&nbsp;/g, ' ');
+    text = text.replace(/&amp;/g, '&');
+    text = text.replace(/&lt;/g, '<');
+    text = text.replace(/&gt;/g, '>');
+    text = text.replace(/&quot;/g, '"');
+    text = text.replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code)));
+    
+    // Clean up whitespace
+    text = text.replace(/\s+/g, ' ').trim();
+    
+    return text;
   }
 
   /**

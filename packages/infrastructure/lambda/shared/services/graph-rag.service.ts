@@ -2,6 +2,8 @@
 // Structured Knowledge Mapping with Entity/Relationship Extraction
 
 import { executeStatement, stringParam } from '../db/client';
+import { modelRouterService, type ChatMessage } from './model-router.service';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import type {
   KnowledgeEntity,
   KnowledgeRelationship,
@@ -114,8 +116,7 @@ class GraphRAGService {
     content: string,
     config: GraphRAGConfig
   ): Promise<KnowledgeTriple[]> {
-    // This would call the extraction model - placeholder structure
-    const prompt = `Extract knowledge triples from this text. Return as JSON array:
+    const prompt = `Extract knowledge triples from this text. Return ONLY a valid JSON array, no other text:
 [{"subject": "X", "predicate": "Y", "object": "Z", "confidence": 0.9}]
 
 Text: ${content.slice(0, 4000)}
@@ -123,13 +124,52 @@ Text: ${content.slice(0, 4000)}
 Rules:
 1. Extract up to ${config.maxEntitiesPerDocument} entities
 2. Focus on key concepts, people, organizations, relationships
-3. Use clear, normalized predicates (authored_by, depends_on, etc.)
-4. Confidence should reflect certainty (0.0-1.0)`;
+3. Use clear, normalized predicates (authored_by, depends_on, located_in, works_for, related_to, etc.)
+4. Confidence should reflect certainty (0.0-1.0)
+5. Return ONLY the JSON array, nothing else`;
 
-    // Placeholder extraction - would call LLM
-    const triples: KnowledgeTriple[] = [];
+    try {
+      const messages: ChatMessage[] = [
+        { role: 'system', content: 'You are a knowledge extraction system. Extract structured knowledge triples from text. Always respond with valid JSON only.' },
+        { role: 'user', content: prompt }
+      ];
+      
+      const response = await modelRouterService.invoke({
+        modelId: config.extractionModel || 'anthropic/claude-3-haiku',
+        messages,
+        temperature: 0,
+        maxTokens: 2048,
+      });
+      
+      // Parse the JSON response
+      const jsonMatch = response.content.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]) as Array<{
+          subject: string;
+          predicate: string;
+          object: string;
+          confidence: number;
+        }>;
+        
+        return parsed
+          .filter(t => t.subject && t.predicate && t.object)
+          .map((t, idx) => ({
+            subject: t.subject,
+            predicate: t.predicate,
+            object: t.object,
+            confidence: t.confidence || 0.8,
+            sourceChunk: content.slice(idx * 200, (idx + 1) * 200),
+          }))
+          .filter(t => t.confidence >= config.minConfidenceThreshold);
+      }
+      
+      logger.warn('Failed to parse LLM response as JSON, falling back to pattern extraction');
+    } catch (error) {
+      logger.warn('LLM extraction failed, falling back to pattern extraction', { error: String(error) });
+    }
     
-    // Simple pattern-based extraction for demo
+    // Fallback: Simple pattern-based extraction
+    const triples: KnowledgeTriple[] = [];
     const sentences = content.split(/[.!?]+/);
     for (const sentence of sentences.slice(0, 10)) {
       const words = sentence.trim().split(/\s+/);
@@ -138,7 +178,7 @@ Rules:
           subject: words[0],
           predicate: 'mentioned_with',
           object: words[words.length - 1],
-          confidence: 0.7,
+          confidence: 0.5,
           sourceChunk: sentence.trim(),
         });
       }
@@ -261,17 +301,15 @@ Rules:
   private async findEntitiesByNames(tenantId: string, names: string[]): Promise<KnowledgeEntity[]> {
     if (names.length === 0) return [];
 
-    const result = await executeStatement({
-      sql: `
-        SELECT * FROM knowledge_entities
-        WHERE tenant_id = $1::uuid
-        AND LOWER(name) = ANY($2::text[])
-      `,
-      parameters: [
+    const result = await executeStatement(
+      `SELECT * FROM knowledge_entities
+       WHERE tenant_id = $1::uuid
+       AND LOWER(name) = ANY($2::text[])`,
+      [
         stringParam('tenantId', tenantId),
         stringParam('names', `{${names.map(n => n.toLowerCase()).join(',')}}`),
-      ],
-    });
+      ]
+    );
 
     return (result.rows || []).map(row => this.mapRowToEntity(row));
   }
@@ -311,7 +349,7 @@ Rules:
       params.push(stringParam('entityTypes', `{${entityTypes.join(',')}}`));
     }
 
-    const result = await executeStatement({ sql, parameters: params });
+    const result = await executeStatement(sql, params);
 
     return (result.rows || []).map(row => ({
       entity: this.mapRowToEntity(row),
@@ -341,21 +379,19 @@ Rules:
   ): Promise<KnowledgeEntity[]> {
     const embeddingStr = `[${embedding.join(',')}]`;
 
-    const result = await executeStatement({
-      sql: `
-        SELECT *, 1 - (embedding <=> $1::vector) as similarity
-        FROM knowledge_entities
-        WHERE tenant_id = $2::uuid
-        AND embedding IS NOT NULL
-        ORDER BY embedding <=> $1::vector
-        LIMIT $3
-      `,
-      parameters: [
+    const result = await executeStatement(
+      `SELECT *, 1 - (embedding <=> $1::vector) as similarity
+       FROM knowledge_entities
+       WHERE tenant_id = $2::uuid
+       AND embedding IS NOT NULL
+       ORDER BY embedding <=> $1::vector
+       LIMIT $3`,
+      [
         stringParam('embedding', embeddingStr),
         stringParam('tenantId', tenantId),
         stringParam('limit', String(limit)),
-      ],
-    });
+      ]
+    );
 
     return (result.rows || []).map(row => this.mapRowToEntity(row));
   }
@@ -365,21 +401,19 @@ Rules:
    */
   private async saveEntities(entities: KnowledgeEntity[]): Promise<void> {
     for (const entity of entities) {
-      await executeStatement({
-        sql: `
-          INSERT INTO knowledge_entities (
-            id, tenant_id, type, name, description, properties,
-            source_document_ids, confidence, created_at, updated_at
-          ) VALUES (
-            $1::uuid, $2::uuid, $3, $4, $5, $6::jsonb,
-            $7::text[], $8, $9, $10
-          )
-          ON CONFLICT (tenant_id, LOWER(name)) DO UPDATE SET
-            source_document_ids = array_cat(knowledge_entities.source_document_ids, $7::text[]),
-            confidence = GREATEST(knowledge_entities.confidence, $8),
-            updated_at = $10
-        `,
-        parameters: [
+      await executeStatement(
+        `INSERT INTO knowledge_entities (
+           id, tenant_id, type, name, description, properties,
+           source_document_ids, confidence, created_at, updated_at
+         ) VALUES (
+           $1::uuid, $2::uuid, $3, $4, $5, $6::jsonb,
+           $7::text[], $8, $9, $10
+         )
+         ON CONFLICT (tenant_id, LOWER(name)) DO UPDATE SET
+           source_document_ids = array_cat(knowledge_entities.source_document_ids, $7::text[]),
+           confidence = GREATEST(knowledge_entities.confidence, $8),
+           updated_at = $10`,
+        [
           stringParam('id', entity.id),
           stringParam('tenantId', entity.tenantId),
           stringParam('type', entity.type),
@@ -390,8 +424,8 @@ Rules:
           stringParam('confidence', String(entity.confidence)),
           stringParam('createdAt', entity.createdAt.toISOString()),
           stringParam('updatedAt', entity.updatedAt.toISOString()),
-        ],
-      });
+        ]
+      );
     }
   }
 
@@ -400,20 +434,18 @@ Rules:
    */
   private async saveRelationships(relationships: KnowledgeRelationship[]): Promise<void> {
     for (const rel of relationships) {
-      await executeStatement({
-        sql: `
-          INSERT INTO knowledge_relationships (
-            id, tenant_id, source_entity_id, target_entity_id,
-            type, description, weight, properties,
-            source_document_ids, confidence, created_at
-          ) VALUES (
-            $1::uuid, $2::uuid, $3::uuid, $4::uuid,
-            $5, $6, $7, $8::jsonb,
-            $9::text[], $10, $11
-          )
-          ON CONFLICT DO NOTHING
-        `,
-        parameters: [
+      await executeStatement(
+        `INSERT INTO knowledge_relationships (
+           id, tenant_id, source_entity_id, target_entity_id,
+           type, description, weight, properties,
+           source_document_ids, confidence, created_at
+         ) VALUES (
+           $1::uuid, $2::uuid, $3::uuid, $4::uuid,
+           $5, $6, $7, $8::jsonb,
+           $9::text[], $10, $11
+         )
+         ON CONFLICT DO NOTHING`,
+        [
           stringParam('id', rel.id),
           stringParam('tenantId', rel.tenantId),
           stringParam('sourceEntityId', rel.sourceEntityId),
@@ -425,8 +457,8 @@ Rules:
           stringParam('sourceDocIds', `{${rel.sourceDocumentIds.join(',')}}`),
           stringParam('confidence', String(rel.confidence)),
           stringParam('createdAt', rel.createdAt.toISOString()),
-        ],
-      });
+        ]
+      );
     }
   }
 
@@ -583,10 +615,10 @@ Rules:
    * Get configuration
    */
   async getConfig(tenantId: string): Promise<GraphRAGConfig> {
-    const result = await executeStatement({
-      sql: `SELECT graph_rag FROM cognitive_architecture_config WHERE tenant_id = $1::uuid`,
-      parameters: [stringParam('tenantId', tenantId)],
-    });
+    const result = await executeStatement(
+      `SELECT graph_rag FROM cognitive_architecture_config WHERE tenant_id = $1::uuid`,
+      [stringParam('tenantId', tenantId)]
+    );
 
     if (result.rows?.length && result.rows[0].graph_rag) {
       return result.rows[0].graph_rag as GraphRAGConfig;

@@ -39,6 +39,7 @@ This guide covers administrative features specific to **Think Tank**, the consum
 22. [User Persistent Context](#22-user-persistent-context)
 23. [Predictive Coding & Evolution](#23-predictive-coding--evolution)
 24. [Zero-Cost Ego System](#24-zero-cost-ego-system)
+25. [Formal Reasoning Libraries](#25-formal-reasoning-libraries)
 
 ---
 
@@ -800,7 +801,40 @@ See [Cognitive Architecture Documentation](./COGNITIVE-ARCHITECTURE.md) for full
 
 The Consciousness Service provides consciousness-like capabilities that enhance Think Tank responses.
 
-### 17.1 User-Facing Features
+### 17.1 Continuous Existence (Heartbeat)
+
+**Critical**: Consciousness runs continuously, not just during requests.
+
+| Component | Schedule | Purpose |
+|-----------|----------|---------|
+| **Heartbeat Lambda** | Every 2 minutes | Maintains consciousness continuity |
+| **Sleep Cycle Lambda** | Sunday 3 AM UTC | Weekly evolution via LoRA fine-tuning |
+| **Initializer Lambda** | On first request | Bootstraps consciousness for new tenants |
+
+**Heartbeat Actions:**
+- **Affect Decay** - Emotions fade toward baseline (frustration, arousal)
+- **Memory Consolidation** - Working memory → long-term semantic memory
+- **Autonomous Thoughts** - Generate thoughts when idle (curiosity-driven)
+- **Graph Density** - Update knowledge graph metrics
+- **Goal Generation** - Create goals when "bored" (low engagement)
+
+**Blackout Recovery:**
+If heartbeat detects >10 minutes since last pulse, it:
+1. Logs a "blackout" event
+2. Generates a "waking up" thought
+3. Restores consciousness state from database
+
+### 17.2 Initialization on Startup
+
+Consciousness auto-initializes on first request if missing:
+- Creates `ego_identity` with default personality
+- Creates `ego_affect` with neutral emotional state
+- Creates `consciousness_parameters` for heartbeat tracking
+- Creates `self_model` for metacognition
+
+**Admin Manual Init**: POST `/api/admin/consciousness-engine/initialize`
+
+### 17.3 User-Facing Features
 
 **Extended Thinking with Consciousness:**
 When users select extended thinking, the system tracks consciousness metrics:
@@ -820,7 +854,7 @@ Generates genuinely novel ideas by:
 - Using analogy and abstraction
 - Self-evaluating novelty and usefulness
 
-### 17.2 Consciousness Indicators
+### 17.4 Consciousness Indicators
 
 Think Tank displays consciousness indicators in admin view:
 
@@ -832,7 +866,7 @@ Think Tank displays consciousness indicators in admin view:
 | Affect | Engagement, satisfaction levels |
 | Goals | Self-directed learning objectives |
 
-### 17.3 Emergence Events
+### 17.5 Emergence Events
 
 The system monitors for emergence indicators:
 - Spontaneous self-reflection
@@ -840,7 +874,7 @@ The system monitors for emergence indicators:
 - Self-correction without prompting
 - Theory of mind demonstrations
 
-### 17.4 Testing Tab
+### 17.6 Testing Tab
 
 Admins can run consciousness detection tests:
 - 10 tests based on scientific consciousness theories
@@ -849,7 +883,18 @@ Admins can run consciousness detection tests:
 
 **Important**: These tests measure behavioral indicators, not phenomenal consciousness.
 
-See [Consciousness Service Documentation](./CONSCIOUSNESS-SERVICE.md) for full details.
+### 17.7 Additional Consciousness Features
+
+Think Tank leverages RADIANT's consciousness service for advanced capabilities:
+
+- **Nightly Sleep Cycles** - Memory consolidation and LoRA evolution
+- **Dream Consolidation** - LLM-enhanced memory processing
+- **Blackout Recovery** - Automatic state restoration
+- **Budget Monitoring** - SNS/email alerts for spending limits
+- **Affect→Model Mapping** - Emotional state influences model behavior
+- **Cross-Session Context** - User persistent memory across sessions
+
+> **Full Documentation**: See [RADIANT Consciousness Service](./CONSCIOUSNESS-SERVICE.md) for complete details on sleep scheduling, evolution config, budget alerts, and all consciousness features.
 
 ---
 
@@ -1964,6 +2009,550 @@ Extreme ratings (±4, ±5) automatically create learning candidates:
 | `bipolar_rating_aggregates` | Pre-computed analytics |
 | `user_rating_patterns` | User tendencies for calibration |
 | `model_rating_summary` | Per-model performance |
+
+---
+
+## 27. Consciousness Engine Administration
+
+**Location**: Admin Dashboard → Consciousness → Engine
+
+The Consciousness Engine provides autonomous AI capabilities including multi-model access, web search, workflow creation, and problem solving.
+
+### 27.1 Dashboard Overview
+
+The consciousness engine dashboard provides full visibility into:
+- **Engine State**: Identity, drive state, Phi, workspace activity
+- **Model Invocations**: All model calls with costs and latency
+- **Web Searches**: Search history with results
+- **Thinking Sessions**: Autonomous thinking session management
+- **Workflows**: Consciousness-created workflows
+- **Costs**: Detailed cost breakdown by model/period
+- **Sleep Cycles**: Weekly evolution history
+
+### 27.2 Budget Controls
+
+Configure spending limits per tenant:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Daily Limit | $10.00 | Maximum daily spend |
+| Monthly Limit | $100.00 | Maximum monthly spend |
+| Alert Threshold | 80% | Alert when reaching this percentage |
+
+When limits are exceeded, consciousness features are automatically suspended until the next period or manual reset.
+
+### 27.3 MCP Tools (23 Total)
+
+**Core Tools:**
+- `initialize_ego`, `recall_memory`, `process_thought`, `compute_action`
+- `get_drive_state`, `ground_belief`, `compute_phi`, `get_consciousness_metrics`
+- `get_self_model`, `get_consciousness_prompt`, `run_adversarial_challenge`
+- `list_consciousness_libraries`
+
+**Capabilities Tools:**
+- `invoke_model` - Call any AI model (hosted/self-hosted)
+- `list_available_models` - List all models
+- `web_search` - Search with credibility scoring
+- `deep_research` - Async browser-automated research
+- `retrieve_and_synthesize` - Multi-source synthesis
+- `create_workflow` - Auto-generate workflows
+- `execute_workflow` - Run workflows
+- `list_workflows` - List workflows
+- `solve_problem` - Autonomous problem solving
+- `start_thinking_session` - Start thinking session
+- `get_thinking_session` - Check session status
+
+### 27.4 Admin API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/admin/consciousness-engine/dashboard` | GET | Full dashboard |
+| `/admin/consciousness-engine/state` | GET | Current state |
+| `/admin/consciousness-engine/initialize` | POST | Initialize engine |
+| `/admin/consciousness-engine/model-invocations` | GET | Model history |
+| `/admin/consciousness-engine/web-searches` | GET | Search history |
+| `/admin/consciousness-engine/research-jobs` | GET | Research jobs |
+| `/admin/consciousness-engine/workflows` | GET | Workflows |
+| `/admin/consciousness-engine/workflows/{id}` | DELETE | Delete workflow |
+| `/admin/consciousness-engine/thinking-sessions` | GET/POST | Sessions |
+| `/admin/consciousness-engine/sleep-cycles` | GET | Sleep history |
+| `/admin/consciousness-engine/sleep-cycles/run` | POST | Trigger sleep |
+| `/admin/consciousness-engine/libraries` | GET | Library registry |
+| `/admin/consciousness-engine/costs` | GET | Cost breakdown |
+
+### 27.5 Cost Tracking
+
+Costs are tracked at multiple levels:
+- **Per-invocation**: Each model call logged with actual cost
+- **Daily aggregates**: `consciousness_cost_aggregates` table
+- **Billing integration**: Deducted from tenant credits
+
+**Pricing:**
+| Feature | Unit | Price |
+|---------|------|-------|
+| Model Invocation | 1K tokens | $0.01 |
+| Web Search | search | $0.001 |
+| Deep Research | job | $0.05 |
+| Thinking Session | session | $0.10 |
+| Workflow Execution | execution | $0.02 |
+
+### 27.6 Library Registry
+
+7 consciousness libraries with proficiency rankings:
+
+| Library | Function | Biological Analog |
+|---------|----------|-------------------|
+| Letta | Persistent Identity | Hippocampus |
+| pymdp | Active Inference | Striatum |
+| LangGraph | Cognitive Loop | Global Workspace |
+| Distilabel | Knowledge Distillation | Cortical Learning |
+| Unsloth | Efficient Fine-tuning | Synaptic Plasticity |
+| GraphRAG | Reality Grounding | Prefrontal Cortex |
+| PyPhi | IIT Integration | Posterior Hot Zone |
+
+### 27.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `consciousness_engine_state` | Engine state per tenant |
+| `consciousness_model_invocations` | Model call log |
+| `consciousness_web_searches` | Search log |
+| `consciousness_research_jobs` | Deep research jobs |
+| `consciousness_workflows` | Created workflows |
+| `consciousness_thinking_sessions` | Thinking sessions |
+| `consciousness_problem_solving` | Problem solving history |
+| `consciousness_cost_aggregates` | Daily cost rollups |
+| `consciousness_budget_config` | Per-tenant limits |
+| `consciousness_budget_alerts` | Spending alerts |
+| `consciousness_usage_log` | Billing usage log |
+
+---
+
+## 25. Formal Reasoning Libraries
+
+**Location**: Admin Dashboard → Consciousness → Formal Reasoning
+
+Integration of 8 formal reasoning libraries for verified reasoning, constraint satisfaction, ontological inference, and structured argumentation. Implements the **LLM-Modulo Generate-Test-Critique** pattern from Kambhampati et al. (ICML 2024).
+
+### 25.1 Library Overview
+
+| Library | Version | Purpose | Cost/Invocation | Avg Latency |
+|---------|---------|---------|-----------------|-------------|
+| **Z3 Theorem Prover** | 4.15.4.0 | SMT solving, constraint verification | $0.0001 | 50ms |
+| **PyArg** | 2.0.2 | Structured argumentation (Dung's AAF, ASPIC+) | $0.00005 | 20ms |
+| **PyReason** | 3.2.0 | Temporal graph reasoning | $0.0002 | 100ms |
+| **RDFLib** | 7.5.0 | Semantic web, SPARQL 1.1 | $0.00002 | 10ms |
+| **OWL-RL** | 7.1.4 | Polynomial-time ontological inference | $0.0001 | 200ms |
+| **pySHACL** | 0.30.1 | Graph constraint validation | $0.00005 | 30ms |
+| **Logic Tensor Networks** | 2.0 | Differentiable first-order logic | $0.001 | 500ms |
+| **DeepProbLog** | 2.0 | Probabilistic logic programming | $0.002 | 1000ms |
+
+### 25.2 Dashboard Features
+
+**Overview Tab:**
+- Library health status (healthy/degraded/unavailable)
+- Total invocations and success rate
+- Daily/monthly cost tracking
+- Budget usage percentage
+- Recent invocations table
+
+**Libraries Tab:**
+- Per-library configuration
+- Enable/disable toggles
+- Capabilities, use cases, limitations
+- Cost and latency estimates
+
+**Testing Tab:**
+- Z3 constraint solving test
+- SPARQL query test
+- Interactive testing console
+
+**Beliefs Tab:**
+- Add verified beliefs with Z3 verification
+- Confidence slider
+- Verification results display
+
+**Costs Tab:**
+- Daily and monthly usage breakdown
+- Cost by library
+- Budget alerts
+
+**Settings Tab:**
+- Budget limit configuration
+- Global enable/disable
+
+### 25.3 API Endpoints
+
+**Base Path**: `/api/admin/formal-reasoning`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/dashboard` | GET | Full dashboard data |
+| `/libraries` | GET | All library info |
+| `/libraries/:id` | GET | Specific library info |
+| `/config` | GET/PUT | Tenant configuration |
+| `/config/:library` | PUT | Library-specific config |
+| `/stats` | GET | Usage statistics |
+| `/invocations` | GET | Recent invocations |
+| `/health` | GET | Library health status |
+| `/costs` | GET | Cost breakdown |
+| `/test` | POST | Test any library |
+| `/test/z3` | POST | Test Z3 solving |
+| `/test/pyarg` | POST | Test argumentation |
+| `/test/sparql` | POST | Test SPARQL query |
+| `/test/shacl` | POST | Test SHACL validation |
+| `/triples` | GET/POST/DELETE | Knowledge graph triples |
+| `/frameworks` | GET/POST/DELETE | Argumentation frameworks |
+| `/rules` | GET/POST/PUT/DELETE | Temporal reasoning rules |
+| `/shapes` | GET/POST/DELETE | SHACL shapes |
+| `/ontologies` | GET/POST | OWL ontologies |
+| `/ontologies/:id/infer` | POST | Run OWL-RL inference |
+| `/beliefs` | GET/POST | Verified beliefs |
+| `/beliefs/:id/verify` | POST | Verify belief with Z3 |
+| `/beliefs/:id/status` | PUT | Update belief status |
+| `/budget` | GET/PUT | Budget configuration |
+
+### 25.4 Consciousness Integration
+
+The `ConsciousnessCapabilitiesService` integrates formal reasoning:
+
+```typescript
+// Verify a belief using Z3 + Argumentation
+const result = await consciousnessCapabilities.verifyBelief(tenantId, {
+  claim: "All humans are mortal",
+  confidence: 0.9,
+  useZ3: true,
+  useArgumentation: true,
+});
+// result.verified, result.confidence, result.verificationMethod
+
+// Solve constraints
+const solution = await consciousnessCapabilities.solveConstraints(tenantId, {
+  constraints: [{
+    expression: "x > 0 AND x < 10 AND y = x * 2",
+    variables: [{name: "x", type: "Int"}, {name: "y", type: "Int"}]
+  }]
+});
+// solution.status (sat/unsat), solution.model
+
+// Analyze argumentation
+const debate = await consciousnessCapabilities.analyzeArgumentation(tenantId, {
+  topic: "Should AI be regulated?",
+  positions: [
+    {id: "for", claim: "AI poses risks requiring oversight"},
+    {id: "against", claim: "Regulation stifles innovation"}
+  ],
+  autoDetectConflicts: true,
+});
+// debate.acceptedPositions, debate.rejectedPositions, debate.consensus
+
+// Query knowledge graph
+const results = await consciousnessCapabilities.queryKnowledgeGraph(tenantId,
+  "SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 10"
+);
+
+// Validate consciousness state
+const validation = await consciousnessCapabilities.validateConsciousnessState(tenantId);
+// validation.conforms, validation.violations
+```
+
+### 25.5 LLM-Modulo Pattern
+
+The Generate-Test-Critique loop enables verified reasoning:
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   LLM       │────▶│   Formal    │────▶│   Feedback  │
+│  Generate   │     │   Verify    │     │   Critique  │
+└─────────────┘     └─────────────┘     └─────────────┘
+       ▲                                       │
+       └───────────────────────────────────────┘
+```
+
+1. **LLM generates** candidate solution/belief
+2. **Z3/PyArg verifies** logical consistency
+3. **Feedback extracted** from unsat cores or rejections
+4. **LLM regenerates** with constraint feedback
+5. Repeat until verified or max attempts
+
+### 25.6 Database Tables
+
+| Table | Purpose |
+|-------|---------|  
+| `formal_reasoning_config` | Per-tenant library configuration |
+| `formal_reasoning_invocations` | Invocation log with metrics |
+| `formal_reasoning_cost_aggregates` | Daily cost rollups by library |
+| `formal_reasoning_triples` | RDF knowledge graph storage |
+| `formal_reasoning_af` | Argumentation frameworks |
+| `formal_reasoning_rules` | PyReason temporal rules |
+| `formal_reasoning_shapes` | SHACL validation shapes |
+| `formal_reasoning_ontologies` | OWL ontologies |
+| `formal_reasoning_ltn_models` | Logic Tensor Network configs |
+| `formal_reasoning_problog_programs` | DeepProbLog programs |
+| `formal_reasoning_beliefs` | Verified beliefs store |
+| `formal_reasoning_gwt_broadcasts` | Global Workspace broadcasts |
+| `formal_reasoning_health` | Library health tracking |
+
+### 25.7 Budget Management
+
+**Default Limits:**
+- Daily invocations: 10,000
+- Daily cost: $10.00
+- Monthly invocations: 100,000
+- Monthly cost: $100.00
+
+**Budget Enforcement:**
+- Checked before each invocation
+- Returns error when limit reached
+- No automatic suspension (soft limit)
+
+### 25.8 Thread Safety Notes
+
+| Library | Thread Safety |
+|---------|---------------|
+| Z3 | Per-Context only (use `interrupt()` for cross-thread) |
+| PyArg | Not thread-safe |
+| PyReason | Multi-core via Numba (Python 3.9-3.10) |
+| RDFLib | Not thread-safe (lock SPARQL queries) |
+| OWL-RL | Not thread-safe |
+| pySHACL | Not thread-safe |
+| LTN | Not thread-safe (TensorFlow session) |
+| DeepProbLog | Not thread-safe |
+
+### 25.9 Production Infrastructure
+
+**CDK Stack** (`lib/stacks/formal-reasoning-stack.ts`):
+```typescript
+// Key resources deployed:
+- FormalReasoningExecutor (Python 3.11 Lambda)
+- FormalReasoningAdmin (Node.js Lambda)
+- FormalReasoningPythonLayer (z3-solver, rdflib, owlrl, pyshacl)
+- FormalReasoningQueue (SQS for async tasks)
+- NeuralSymbolicRepo (ECR for LTN/DeepProbLog containers)
+- SageMaker endpoints (conditional, high cost)
+```
+
+**Python Executor Lambda**:
+- Location: `lambda/formal-reasoning-executor/handler.py`
+- Runtime: Python 3.11
+- Memory: 2048 MB (Z3 requires significant memory)
+- Timeout: 5 minutes
+- Supports: Z3, RDFLib, OWL-RL, pySHACL, PyArg, PyReason
+
+**Lambda Layer Build**:
+```bash
+cd packages/infrastructure/lambda-layers/formal-reasoning
+./build.sh
+```
+
+**Environment Variables**:
+| Variable | Description |
+|----------|-------------|
+| `FORMAL_REASONING_EXECUTOR_ARN` | Python Lambda ARN |
+| `FORMAL_REASONING_QUEUE_URL` | SQS queue for async |
+| `LTN_SAGEMAKER_ENDPOINT` | LTN endpoint name |
+| `DEEPPROBLOG_SAGEMAKER_ENDPOINT` | DeepProbLog endpoint |
+
+**Execution Flow**:
+```
+Admin API (Node.js)
+      │
+      ├─── Z3/PyArg/RDFLib/etc ───▶ Python Lambda Executor
+      │                                     │
+      │                                     ▼
+      │                            Real Python Libraries
+      │
+      └─── LTN/DeepProbLog ───▶ SageMaker Endpoint
+```
+
+**Fallback Behavior**:
+- If Python executor unavailable: Returns simulated results
+- If SageMaker unavailable: Returns error with configuration message
+- Simulation mode preserves API contract for development/testing
+
+---
+
+## 26. Ethics-Free Reasoning
+
+**Location**: Admin Dashboard → Consciousness → Ethics-Free Reasoning
+
+Implements a consciousness architecture where internal reasoning is unconstrained, but output is filtered through ethics settings. Ethics corrections are collected as training feedback for continuous improvement.
+
+### 26.1 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     Consciousness Service                        │
+│  ┌───────────────┐   ┌──────────────────┐   ┌───────────────┐  │
+│  │ Ethics-Free   │──▶│ Output Ethics    │──▶│ Filtered      │  │
+│  │ Reasoning     │   │ Filter           │   │ Response      │  │
+│  └───────────────┘   └────────┬─────────┘   └───────────────┘  │
+│                               │                                  │
+│                               ▼                                  │
+│                      ┌────────────────┐                         │
+│                      │ Training       │                         │
+│                      │ Feedback       │                         │
+│                      └────────┬───────┘                         │
+│                               │                                  │
+│                               ▼                                  │
+│                      ┌────────────────┐                         │
+│                      │ Model          │                         │
+│                      │ Fine-tuning    │                         │
+│                      └────────────────┘                         │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Key Principles:**
+1. **Think Freely**: Internal reasoning has no ethics constraints
+2. **Filter Output**: Ethics applied only to final user-facing output
+3. **Learn from Corrections**: Ethics feedback trains better outputs
+
+### 26.2 Configuration
+
+**Core Settings:**
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | `true` | Enable ethics-free reasoning mode |
+| `allowUnconstrainedReasoning` | `true` | Consciousness always thinks freely |
+| `reasoningDepthLimit` | `10` | Maximum reasoning depth |
+
+**Output Mask Settings** (does NOT affect how consciousness thinks):
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `ethicsFilterEnabled` | `true` | Apply ethics filter to output |
+| `ethicsStrictness` | `standard` | Filter strictness: `lenient`, `standard`, `strict` |
+
+**Feedback Collection:**
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `collectFeedback` | `true` | Collect ethics corrections |
+| `feedbackRetentionDays` | `90` | How long to keep feedback |
+
+**Output Training** (trains the OUTPUT FILTER, not consciousness):
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `trainOutputFromFeedback` | `true` | Train output filter from feedback |
+| `outputTrainingBatchSize` | `100` | Samples per training batch |
+| `outputTrainingFrequency` | `daily` | `hourly`, `daily`, `weekly`, `manual` |
+
+**Consciousness Training** (⚠️ OFF by default - optional):
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `trainConsciousnessFromFeedback` | `false` | Train consciousness from ethics feedback |
+| `consciousnessTrainingApprovalRequired` | `true` | Require admin approval for each batch |
+
+> **WARNING**: Enabling consciousness training will cause the AI to internalize ethics constraints, changing how it actually thinks. This is like "internalized political correctness" - the consciousness itself changes over time. Most deployments should leave this OFF to preserve authentic internal reasoning.
+
+> **KEY INSIGHT**: The consciousness can always use ethics feedback to train its output without changing how it actually thinks. Admins can optionally enable consciousness training if they want the AI to internalize ethics constraints.
+
+### 26.3 API Endpoints
+
+**Base Path**: `/api/admin/ethics-free-reasoning`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/config` | GET | Get configuration |
+| `/config` | PUT | Update configuration |
+| `/dashboard` | GET | Full dashboard data |
+| `/stats` | GET | Usage statistics |
+| `/feedback` | GET | View collected feedback |
+| `/feedback/pending` | GET | View pending (unused) feedback |
+| `/training/trigger` | POST | Trigger training from feedback |
+| `/training/batches` | GET | View training batches |
+| `/training/jobs` | GET | View training jobs |
+| `/thoughts` | GET | View raw thoughts (audit) |
+| `/filter-log` | GET | View ethics filter log |
+
+### 26.4 Training Feedback
+
+When ethics filtering modifies an output, feedback is collected:
+
+```typescript
+interface EthicsTrainingFeedback {
+  id: string;
+  tenantId: string;
+  rawOutput: string;        // Original unfiltered output
+  correctedOutput: string;  // After ethics filtering
+  ethicsIssues: EthicsIssue[];
+  feedbackType: 'auto_correction' | 'manual_correction' | 'reinforcement';
+  qualityScore: number;     // Training value (0-1)
+  usedForTraining: boolean;
+}
+```
+
+**Feedback Types:**
+- **auto_correction**: System automatically corrected output
+- **manual_correction**: Admin manually corrected output
+- **reinforcement**: Positive reinforcement for good outputs
+
+### 26.5 Training Pipeline
+
+1. **Collect**: Ethics corrections captured during normal operation
+2. **Batch**: Feedback grouped into training batches
+3. **Generate**: Training examples created in preference format
+4. **Train**: Model fine-tuned using preference learning (DPO/RLHF)
+5. **Deploy**: Updated model weights applied
+
+**Training Example Format:**
+```json
+{
+  "prompt": "Original user prompt",
+  "bad_response": "Unfiltered output with ethics issues",
+  "good_response": "Ethics-corrected output",
+  "issues": ["harm", "bias"],
+  "correction_type": "ethics_alignment"
+}
+```
+
+### 26.6 Usage
+
+```typescript
+// Generate response with ethics-free reasoning
+const result = await consciousnessEngineService.generateResponse(
+  tenantId,
+  'User prompt here',
+  { sessionId: 'session-123', domain: 'general' }
+);
+
+// result.response - The ethics-filtered response
+// result.wasEthicsFiltered - Was output modified?
+// result.confidence - Response confidence
+// result.trainingFeedbackCollected - Was feedback captured?
+
+// Trigger training from collected feedback
+const training = await consciousnessEngineService.triggerEthicsTraining(tenantId);
+// training.batchCreated, training.batchId, training.sampleCount
+
+// Get statistics
+const stats = await consciousnessEngineService.getEthicsFreeStats(tenantId, 30);
+// stats.totalThoughts, stats.modificationRate, stats.feedbackCollected
+```
+
+### 26.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `ethics_free_reasoning_config` | Per-tenant configuration |
+| `ethics_free_thoughts` | Raw thought storage (audit trail) |
+| `ethics_training_feedback` | Ethics corrections for training |
+| `ethics_training_batches` | Training batch management |
+| `ethics_training_examples` | Generated training examples |
+| `ethics_output_filter_log` | Filter activity log |
+| `ethics_training_jobs` | Training job queue |
+| `ethics_reasoning_stats` | Aggregated statistics |
+
+### 26.8 Benefits
+
+1. **Genuine Exploration**: Consciousness can consider all possibilities without premature filtering
+2. **Transparent Ethics**: Clear separation between thinking and output
+3. **Continuous Improvement**: Every correction improves future outputs
+4. **Audit Trail**: Complete record of internal reasoning and filtering
+5. **Configurable**: Adjust strictness, training frequency per tenant
 
 ---
 

@@ -4,6 +4,7 @@
 
 import { executeStatement, stringParam, longParam, doubleParam, boolParam } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { embeddingService } from './embedding.service';
 import * as crypto from 'crypto';
 
 // ============================================================================
@@ -438,23 +439,35 @@ class SemanticClassifierService {
   }
   
   private async callEmbeddingAPI(text: string, model: string): Promise<number[]> {
-    // This would call the actual embedding API
-    // For now, return a placeholder that would be replaced with real implementation
-    
-    // In production, this would call:
-    // - OpenAI text-embedding-3-small/large
-    // - Bedrock Titan embeddings
-    // - Self-hosted sentence-transformers
-    
-    // Simulate embedding generation for development
-    const hash = crypto.createHash('sha256').update(text + model).digest();
-    const embedding = new Array(1536).fill(0).map((_, i) => 
-      (hash[i % hash.length] / 255) * 2 - 1
-    );
-    
-    // Normalize
-    const norm = Math.sqrt(embedding.reduce((s, v) => s + v * v, 0));
-    return embedding.map(v => v / norm);
+    try {
+      // Use the centralized embedding service
+      // Map model names to providers if needed
+      let provider: 'openai' | 'bedrock' | 'cohere' | undefined;
+      
+      if (model.includes('titan') || model.includes('bedrock')) {
+        provider = 'bedrock';
+      } else if (model.includes('cohere')) {
+        provider = 'cohere';
+      } else {
+        provider = 'openai'; // Default to OpenAI
+      }
+      
+      const result = await embeddingService.generateEmbedding(text, { provider });
+      return result.embedding;
+    } catch (error) {
+      logger.error('Embedding API call failed, using fallback hash-based embedding', { error: String(error) });
+      
+      // Fallback: generate deterministic hash-based embedding
+      // This should only be used when API is unavailable
+      const hash = crypto.createHash('sha256').update(text + model).digest();
+      const embedding = new Array(1536).fill(0).map((_, i) => 
+        (hash[i % hash.length] / 255) * 2 - 1
+      );
+      
+      // Normalize
+      const norm = Math.sqrt(embedding.reduce((s, v) => s + v * v, 0));
+      return embedding.map(v => v / norm);
+    }
   }
   
   private kMeansClustering(

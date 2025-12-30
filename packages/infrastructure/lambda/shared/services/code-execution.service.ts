@@ -130,7 +130,6 @@ class CodeExecutionService {
 
   /**
    * Execute code in sandbox (Lambda/Fargate)
-   * This is a simulation - actual execution would invoke Lambda
    */
   async executeCode(
     sessionId: string,
@@ -140,13 +139,7 @@ class CodeExecutionService {
   ): Promise<ExecutionResult> {
     const startTime = Date.now();
     
-    // In production, this would:
-    // 1. Package code into a Lambda-compatible format
-    // 2. Invoke Lambda with code and test input
-    // 3. Capture stdout/stderr
-    // 4. Return results
-    
-    // For now, perform static analysis
+    // First perform static analysis to catch obvious errors
     const staticAnalysis = this.performStaticAnalysis(code, language);
     
     if (staticAnalysis.hasErrors) {
@@ -162,11 +155,69 @@ class CodeExecutionService {
       };
     }
 
-    // Simulate successful execution for valid code
+    // Try to execute via Lambda if configured
+    const executorArn = process.env.CODE_EXECUTOR_LAMBDA_ARN;
+    if (executorArn) {
+      try {
+        const { LambdaClient, InvokeCommand } = await import('@aws-sdk/client-lambda');
+        const lambda = new LambdaClient({});
+        
+        const payload = {
+          sessionId,
+          code,
+          language,
+          limits: {
+            timeoutSeconds: Math.min(limits.timeoutSeconds, 30), // Cap at 30s
+            memoryMb: Math.min(limits.memoryMb, 512), // Cap at 512MB
+            cpuShares: limits.cpuShares || 256,
+          },
+        };
+        
+        const command = new InvokeCommand({
+          FunctionName: executorArn,
+          InvocationType: 'RequestResponse',
+          Payload: Buffer.from(JSON.stringify(payload)),
+        });
+        
+        const response = await lambda.send(command);
+        
+        if (response.Payload) {
+          const result = JSON.parse(Buffer.from(response.Payload).toString());
+          
+          if (response.FunctionError) {
+            return {
+              success: false,
+              exitCode: 1,
+              stdout: '',
+              stderr: result.errorMessage || 'Execution failed',
+              executionTimeMs: Date.now() - startTime,
+              errorType: 'runtime',
+              errorMessage: result.errorMessage,
+            };
+          }
+          
+          return {
+            success: result.exitCode === 0,
+            exitCode: result.exitCode || 0,
+            stdout: result.stdout || '',
+            stderr: result.stderr || '',
+            executionTimeMs: result.executionTimeMs || (Date.now() - startTime),
+            errorType: result.exitCode === 0 ? 'none' : 'runtime',
+            errorMessage: result.stderr || undefined,
+          };
+        }
+      } catch (error) {
+        console.warn('Lambda execution failed, falling back to static analysis', error);
+      }
+    }
+
+    // Fallback: return static analysis result (code is valid but not executed)
     return {
       success: true,
       exitCode: 0,
-      stdout: '// Code passed static analysis\n// Execution simulated',
+      stdout: `[Static analysis passed - execution sandbox not configured]\n` +
+              `Language: ${language}\n` +
+              `Code length: ${code.length} characters`,
       stderr: '',
       executionTimeMs: Date.now() - startTime,
       errorType: 'none',

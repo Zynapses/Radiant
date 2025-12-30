@@ -1,0 +1,36 @@
+# Consciousness Library Executor Dependencies
+# All 16 consciousness libraries from the unified implementation prompt
+
+# Phase 1: Foundation
+letta>=0.6.0
+langgraph>=0.2.0
+inferactively-pymdp>=0.0.8
+graphrag>=0.3.0
+
+# Phase 2: Consciousness Measurement
+pyphi>=1.2.1
+
+# Phase 3: Formal Reasoning
+z3-solver>=4.15.4.0
+python-argumentation>=2.0.2
+pyreason>=3.2.0
+rdflib[berkeleydb,networkx,html,lxml,orjson]>=7.5.0
+owlrl>=7.1.4
+pyshacl[js,http]>=0.30.1
+
+# Phase 4: Frontier Technologies
+hipporag>=0.1.0
+# dreamerv3 - installed separately or from GitHub
+spikingjelly>=0.0.0.0.14
+
+# Phase 5: Learning & Evolution
+distilabel>=1.0.0
+# unsloth - requires GPU, installed on training instances
+
+# Core dependencies
+numpy>=1.24.0
+scipy>=1.10.0
+networkx>=3.0
+torch>=2.0.0
+joblib>=1.3.0
+numba>=0.57.0

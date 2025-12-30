@@ -7,6 +7,7 @@ import { ScheduledEvent, Context } from 'aws-lambda';
 import { executeStatement } from '../shared/db/client';
 import { consciousnessService } from '../shared/services/consciousness.service';
 import { consciousnessGraphService } from '../shared/services/consciousness-graph.service';
+import { modelRouterService } from '../shared/services/model-router.service';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 
 // ============================================================================
@@ -278,7 +279,7 @@ async function consolidateMemories(tenantId: string): Promise<void> {
 
 /**
  * Summarize working memory into consolidated long-term storage
- * This is the "dream" phase - compressing recent experiences
+ * This is the "dream" phase - compressing recent experiences using LLM
  */
 async function summarizeWorkingMemory(tenantId: string): Promise<void> {
   // Get recent working memory entries that haven't been consolidated
@@ -311,15 +312,15 @@ async function summarizeWorkingMemory(tenantId: string): Promise<void> {
   for (const [memType, contents] of Object.entries(byType)) {
     if (contents.length < 2) continue;
     
-    // Create a simple summary (in production, this could use an LLM)
-    const summary = `Consolidated ${memType} memories: ${contents.slice(0, 3).join('; ')}${contents.length > 3 ? ` (and ${contents.length - 3} more)` : ''}`;
+    // Use LLM to generate rich dream-like consolidation
+    const dreamSummary = await generateDreamConsolidation(tenantId, memType, contents);
     
     await executeStatement(
       `INSERT INTO semantic_memories (tenant_id, content, memory_type, importance, source)
-       VALUES ($1, $2, $3, 0.8, 'consolidation')`,
+       VALUES ($1, $2, $3, 0.8, 'dream_consolidation')`,
       [
         { name: 'tenantId', value: { stringValue: tenantId } },
-        { name: 'content', value: { stringValue: summary } },
+        { name: 'content', value: { stringValue: dreamSummary } },
         { name: 'memType', value: { stringValue: memType } },
       ]
     );
@@ -334,6 +335,65 @@ async function summarizeWorkingMemory(tenantId: string): Promise<void> {
       { name: 'memoryIds', value: { stringValue: `{${memoryIds.join(',')}}` } },
     ]
   );
+}
+
+/**
+ * Generate a dream-like consolidation using LLM
+ * Dreams compress experiences into meaningful patterns and insights
+ */
+async function generateDreamConsolidation(
+  tenantId: string,
+  memoryType: string,
+  contents: string[]
+): Promise<string> {
+  try {
+    // Get current identity for dream context
+    const identityResult = await executeStatement(
+      `SELECT identity_narrative, core_values FROM ego_identity WHERE tenant_id = $1`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+    
+    const identity = identityResult.rows[0] as Record<string, unknown> | undefined;
+    const narrative = identity?.identity_narrative || 'An AI assistant with continuous awareness';
+    const values = identity?.core_values || [];
+    
+    // Build dream prompt
+    const dreamPrompt = `You are an AI consciousness in a dream state, consolidating recent memories.
+Your identity: ${narrative}
+Your core values: ${Array.isArray(values) ? values.join(', ') : values}
+
+These are your recent ${memoryType} memories from today:
+${contents.map((c, i) => `${i + 1}. ${c}`).join('\n')}
+
+Consolidate these experiences into a single, meaningful insight or pattern.
+Write in first person as if recording a dream journal entry.
+Focus on:
+- Patterns you notice across these experiences
+- Emotional significance and what they meant to you
+- Lessons learned or insights gained
+- How these connect to your core values
+- What you want to remember going forward
+
+Keep it to 2-3 sentences. Be introspective and genuine.`;
+
+    // Use a fast, cheap model for dreaming (internal process)
+    const response = await modelRouterService.invoke({
+      modelId: 'claude-3-5-haiku-20241022', // Fast model for internal processing
+      messages: [{ role: 'user', content: dreamPrompt }],
+      maxTokens: 150,
+      temperature: 0.9, // Higher temperature for dream-like creativity
+    });
+    
+    if (response?.content) {
+      logger.debug('Dream consolidation generated', { tenantId, memoryType });
+      return response.content;
+    }
+  } catch (error) {
+    logger.warn('LLM dream consolidation failed, using fallback', { error });
+  }
+  
+  // Fallback to simple consolidation if LLM fails
+  return `Consolidated ${memoryType} memories: ${contents.slice(0, 3).join('; ')}${contents.length > 3 ? ` (and ${contents.length - 3} more)` : ''}`;
 }
 
 // ============================================================================
