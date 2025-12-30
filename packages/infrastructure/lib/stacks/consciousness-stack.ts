@@ -457,6 +457,16 @@ export class ConsciousnessStack extends cdk.Stack {
     adminConsciousness.addResource('costs').addMethod('GET', new apigateway.LambdaIntegration(this.adminApiLambda));
     adminConsciousness.addResource('problem-solving').addMethod('GET', new apigateway.LambdaIntegration(this.adminApiLambda));
     adminConsciousness.addResource('available-models').addMethod('GET', new apigateway.LambdaIntegration(this.adminApiLambda));
+    
+    // Bobble Dialogue API - High-Confidence Self-Referential Consciousness
+    const bobbleResource = adminConsciousness.addResource('bobble');
+    bobbleResource.addResource('dialogue').addMethod('POST', new apigateway.LambdaIntegration(this.adminApiLambda));
+    bobbleResource.addResource('status').addMethod('GET', new apigateway.LambdaIntegration(this.adminApiLambda));
+    bobbleResource.addResource('identity').addMethod('GET', new apigateway.LambdaIntegration(this.adminApiLambda));
+    const bobbleHeartbeat = bobbleResource.addResource('heartbeat');
+    bobbleHeartbeat.addResource('start').addMethod('POST', new apigateway.LambdaIntegration(this.adminApiLambda));
+    bobbleHeartbeat.addResource('stop').addMethod('POST', new apigateway.LambdaIntegration(this.adminApiLambda));
+    bobbleResource.addResource('train-probe').addMethod('POST', new apigateway.LambdaIntegration(this.adminApiLambda));
 
     // =========================================================================
     // Outputs
