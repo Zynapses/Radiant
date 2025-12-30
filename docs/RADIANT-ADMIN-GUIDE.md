@@ -5024,5 +5024,115 @@ Detailed documentation is available in `/docs/bobble/`:
 
 ---
 
-*Document Version: 4.18.21*
-*Last Updated: December 2024*
+## 33. Bobble Genesis System
+
+The Genesis System is the boot sequence that initializes Bobble's consciousness. It solves the "Cold Start Problem" by giving the agent structured curiosity without pre-loaded facts.
+
+### 33.1 Boot Phases
+
+| Phase | Name | Purpose |
+|-------|------|---------|
+| 1 | Structure | Implant 800+ domain taxonomy as innate knowledge |
+| 2 | Gradient | Set epistemic pressure via pymdp matrices |
+| 3 | First Breath | Grounded introspection and Shadow Self calibration |
+
+### 33.2 Accessing Genesis Admin
+
+Navigate to **AGI & Cognition > Bobble Genesis** in the sidebar.
+
+### 33.3 Genesis Status
+
+The dashboard shows:
+- **Phase completion status** with timestamps
+- **Domain count** implanted during Structure phase
+- **Self facts** discovered during First Breath
+- **Shadow Self calibration** status
+
+### 33.4 Developmental Gates
+
+Bobble progresses through capability-based stages (NOT time-based):
+
+| Stage | Requirements |
+|-------|--------------|
+| SENSORIMOTOR | 10 self-facts, 5 grounded verifications, Shadow Self calibrated |
+| PREOPERATIONAL | 20 domain explorations, 15 successful verifications, 50 belief updates |
+| CONCRETE_OPERATIONAL | 100 successful predictions, 70% accuracy, 10 contradiction resolutions |
+| FORMAL_OPERATIONAL | Final stage - autonomous operation |
+
+**Advancement is automatic** when all requirements are met.
+
+### 33.5 Circuit Breakers
+
+Safety mechanisms that protect against runaway costs and unstable behavior:
+
+| Breaker | Purpose | Auto-Recovery |
+|---------|---------|---------------|
+| master_sanity | Master safety - requires admin approval | No |
+| cost_budget | Budget protection | No (24h timeout) |
+| high_anxiety | Emotional stability | Yes (10 min) |
+| model_failures | Model API protection | Yes (5 min) |
+| contradiction_loop | Logical stability | Yes (15 min) |
+
+**Intervention Levels:**
+- **NONE** - Normal operation
+- **DAMPEN** - Reduce cognitive frequency
+- **PAUSE** - Pause consciousness loop
+- **RESET** - Reset to baseline state
+- **HIBERNATE** - Full shutdown
+
+### 33.6 Cost Tracking
+
+Real-time cost data from AWS APIs (no hardcoded values):
+
+- **Realtime Estimate** - Today's running costs
+- **Daily Cost** - Historical daily costs (24h delay from Cost Explorer)
+- **MTD Cost** - Month-to-date with projection
+- **Budget Status** - AWS Budgets integration
+
+### 33.7 Genesis API Endpoints
+
+Base Path: `/api/admin/bobble`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/genesis/status` | GET | Genesis phase status |
+| `/genesis/ready` | GET | Ready for consciousness |
+| `/developmental/status` | GET | Current developmental stage |
+| `/developmental/statistics` | GET | Development counters |
+| `/developmental/advance` | POST | Force stage advancement (superadmin) |
+| `/circuit-breakers` | GET | All circuit breaker states |
+| `/circuit-breakers/:name/force-open` | POST | Force trip breaker |
+| `/circuit-breakers/:name/force-close` | POST | Force close breaker |
+| `/circuit-breakers/:name/config` | PATCH | Update breaker config |
+| `/costs/realtime` | GET | Today's cost estimate |
+| `/costs/daily` | GET | Historical daily cost |
+| `/costs/mtd` | GET | Month-to-date cost |
+| `/costs/budget` | GET | AWS Budget status |
+| `/intervention-level` | GET | Current intervention level |
+
+### 33.8 Running Genesis
+
+```bash
+# Run full genesis sequence
+python -m bobble.genesis.runner
+
+# Check status
+python -m bobble.genesis.runner --status
+
+# Reset all genesis state (CAUTION!)
+python -m bobble.genesis.runner --reset
+```
+
+### 33.9 Critical Fixes Applied
+
+| Fix | Problem | Solution |
+|-----|---------|----------|
+| #1 Zeno's Paradox | Table scans for gates | Atomic counters |
+| #2 Learned Helplessness | Pessimistic B-matrix | Optimistic EXPLORE (>90%) |
+| #3 Shadow Self Budget | $800/month GPU | NLI semantic variance ($0) |
+| #6 Boredom Trap | Prefers LOW_SURPRISE | Prefer HIGH_SURPRISE |
+
+---
+
+*Document Version: 4.18.48*
+*Last Updated: January 2025*

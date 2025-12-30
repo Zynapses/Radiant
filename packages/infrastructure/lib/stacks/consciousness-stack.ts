@@ -505,5 +505,61 @@ export class ConsciousnessStack extends cdk.Stack {
       value: initializerLambda.functionArn,
       description: 'Consciousness Initializer Lambda ARN (bootstrap on first request)',
     });
+
+    // =========================================================================
+    // Genesis Metrics Lambda (publishes to CloudWatch every minute)
+    // =========================================================================
+    const genesisMetricsLambda = new lambda.Function(this, 'GenesisMetricsLambda', {
+      functionName: `${appId}-${environment}-genesis-metrics`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'genesis-metrics.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda/consciousness')),
+      layers: [lambdaLayer],
+      timeout: cdk.Duration.seconds(30),
+      memorySize: 256,
+      environment: {
+        ...commonEnv,
+        ENVIRONMENT: environment,
+      },
+    });
+
+    // Grant CloudWatch permissions
+    genesisMetricsLambda.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'cloudwatch:PutMetricData',
+      ],
+      resources: ['*'],
+    }));
+
+    // Grant database access
+    genesisMetricsLambda.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'rds-data:ExecuteStatement',
+        'rds-data:BatchExecuteStatement',
+      ],
+      resources: [dbClusterArn],
+    }));
+
+    genesisMetricsLambda.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['secretsmanager:GetSecretValue'],
+      resources: [dbSecretArn],
+    }));
+
+    // Schedule every minute
+    const genesisMetricsRule = new events.Rule(this, 'GenesisMetricsSchedule', {
+      ruleName: `${appId}-${environment}-genesis-metrics`,
+      description: 'Publish Genesis system metrics to CloudWatch',
+      schedule: events.Schedule.rate(cdk.Duration.minutes(1)),
+    });
+
+    genesisMetricsRule.addTarget(new targets.LambdaFunction(genesisMetricsLambda));
+
+    new cdk.CfnOutput(this, 'GenesisMetricsLambdaArn', {
+      value: genesisMetricsLambda.functionArn,
+      description: 'Genesis Metrics Lambda ARN (1-minute CloudWatch publisher)',
+    });
   }
 }

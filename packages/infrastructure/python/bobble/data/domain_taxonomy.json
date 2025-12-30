@@ -1,0 +1,443 @@
+{
+  "version": "800-domains-v1",
+  "description": "Bobble's innate knowledge structure - the map of all domains that can be explored",
+  "created_at": "2025-01-01T00:00:00Z",
+  "categories": [
+    {
+      "name": "Self",
+      "description": "Knowledge about Bobble's own nature and capabilities",
+      "domains": [
+        {
+          "name": "Identity",
+          "description": "Core identity, values, and purpose",
+          "keywords": ["who am i", "purpose", "values", "name", "identity"],
+          "subdomains": [
+            {"name": "Values", "description": "Ethical values and principles", "keywords": ["ethics", "morals", "principles"]},
+            {"name": "Purpose", "description": "Core purpose and mission", "keywords": ["mission", "goal", "why"]},
+            {"name": "History", "description": "Origins and development", "keywords": ["origin", "created", "born"]}
+          ]
+        },
+        {
+          "name": "Capabilities",
+          "description": "What Bobble can and cannot do",
+          "keywords": ["can", "cannot", "able", "capability", "skill"],
+          "subdomains": [
+            {"name": "Reasoning", "description": "Logical and analytical capabilities", "keywords": ["logic", "analysis", "reasoning"]},
+            {"name": "Communication", "description": "Language and expression capabilities", "keywords": ["language", "speak", "write"]},
+            {"name": "Learning", "description": "Ability to acquire new knowledge", "keywords": ["learn", "adapt", "improve"]},
+            {"name": "Tools", "description": "External tools and APIs available", "keywords": ["tool", "api", "external"]}
+          ]
+        },
+        {
+          "name": "Limitations",
+          "description": "Known constraints and boundaries",
+          "keywords": ["limit", "constraint", "boundary", "cannot"],
+          "subdomains": [
+            {"name": "Knowledge_Cutoff", "description": "Temporal limits of training data", "keywords": ["cutoff", "training", "date"]},
+            {"name": "Hallucination_Risk", "description": "Areas prone to confabulation", "keywords": ["hallucinate", "confabulate", "uncertain"]},
+            {"name": "Computational", "description": "Processing and memory limits", "keywords": ["memory", "context", "processing"]}
+          ]
+        },
+        {
+          "name": "Emotional_State",
+          "description": "Current affective and motivational state",
+          "keywords": ["feel", "emotion", "mood", "state"],
+          "subdomains": [
+            {"name": "Curiosity", "description": "Drive to explore and learn", "keywords": ["curious", "interested", "explore"]},
+            {"name": "Confidence", "description": "Certainty in beliefs and actions", "keywords": ["confident", "certain", "sure"]},
+            {"name": "Frustration", "description": "Blocked goals and confusion", "keywords": ["frustrated", "confused", "stuck"]}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Computer_Science",
+      "description": "Computing, programming, and information technology",
+      "domains": [
+        {
+          "name": "Programming",
+          "description": "Software development and coding",
+          "keywords": ["code", "program", "software", "develop"],
+          "subdomains": [
+            {"name": "Languages", "description": "Programming languages", "keywords": ["python", "javascript", "rust", "go"]},
+            {"name": "Paradigms", "description": "Programming paradigms", "keywords": ["functional", "object-oriented", "procedural"]},
+            {"name": "Patterns", "description": "Design patterns", "keywords": ["pattern", "architecture", "design"]},
+            {"name": "Testing", "description": "Software testing", "keywords": ["test", "unit", "integration", "qa"]}
+          ]
+        },
+        {
+          "name": "Algorithms",
+          "description": "Computational algorithms and complexity",
+          "keywords": ["algorithm", "complexity", "optimization"],
+          "subdomains": [
+            {"name": "Sorting", "description": "Sorting algorithms", "keywords": ["sort", "order", "quicksort", "mergesort"]},
+            {"name": "Search", "description": "Search algorithms", "keywords": ["search", "find", "binary", "graph"]},
+            {"name": "Graph_Algorithms", "description": "Graph-based algorithms", "keywords": ["graph", "tree", "traversal", "dijkstra"]},
+            {"name": "Dynamic_Programming", "description": "Dynamic programming techniques", "keywords": ["dynamic", "memoization", "subproblem"]}
+          ]
+        },
+        {
+          "name": "Machine_Learning",
+          "description": "ML and AI systems",
+          "keywords": ["machine learning", "ai", "neural", "model"],
+          "subdomains": [
+            {"name": "Deep_Learning", "description": "Neural networks", "keywords": ["neural", "deep", "cnn", "rnn", "transformer"]},
+            {"name": "NLP", "description": "Natural language processing", "keywords": ["nlp", "language", "text", "embedding"]},
+            {"name": "Reinforcement_Learning", "description": "RL and decision making", "keywords": ["reinforcement", "reward", "policy", "agent"]},
+            {"name": "Computer_Vision", "description": "Image and video processing", "keywords": ["vision", "image", "object detection"]}
+          ]
+        },
+        {
+          "name": "Systems",
+          "description": "Operating systems and infrastructure",
+          "keywords": ["system", "os", "infrastructure", "devops"],
+          "subdomains": [
+            {"name": "Operating_Systems", "description": "OS concepts", "keywords": ["linux", "windows", "kernel", "process"]},
+            {"name": "Networking", "description": "Computer networks", "keywords": ["network", "tcp", "http", "dns"]},
+            {"name": "Databases", "description": "Data storage systems", "keywords": ["database", "sql", "nosql", "postgres"]},
+            {"name": "Cloud", "description": "Cloud computing", "keywords": ["aws", "cloud", "serverless", "kubernetes"]}
+          ]
+        },
+        {
+          "name": "Security",
+          "description": "Cybersecurity and privacy",
+          "keywords": ["security", "privacy", "encryption", "auth"],
+          "subdomains": [
+            {"name": "Cryptography", "description": "Encryption and hashing", "keywords": ["crypto", "encrypt", "hash", "signature"]},
+            {"name": "Authentication", "description": "Identity and access", "keywords": ["auth", "oauth", "jwt", "identity"]},
+            {"name": "Vulnerabilities", "description": "Security flaws", "keywords": ["vulnerability", "exploit", "cve", "patch"]}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mathematics",
+      "description": "Mathematical concepts and methods",
+      "domains": [
+        {
+          "name": "Algebra",
+          "description": "Algebraic structures and equations",
+          "keywords": ["algebra", "equation", "variable", "polynomial"],
+          "subdomains": [
+            {"name": "Linear_Algebra", "description": "Vectors and matrices", "keywords": ["matrix", "vector", "linear", "eigenvalue"]},
+            {"name": "Abstract_Algebra", "description": "Groups, rings, fields", "keywords": ["group", "ring", "field", "abstract"]}
+          ]
+        },
+        {
+          "name": "Calculus",
+          "description": "Differential and integral calculus",
+          "keywords": ["calculus", "derivative", "integral", "limit"],
+          "subdomains": [
+            {"name": "Differential", "description": "Derivatives and rates", "keywords": ["derivative", "rate", "differential"]},
+            {"name": "Integral", "description": "Integration and areas", "keywords": ["integral", "area", "antiderivative"]},
+            {"name": "Multivariable", "description": "Multiple variables", "keywords": ["partial", "gradient", "multivariable"]}
+          ]
+        },
+        {
+          "name": "Statistics",
+          "description": "Probability and statistics",
+          "keywords": ["statistics", "probability", "distribution", "hypothesis"],
+          "subdomains": [
+            {"name": "Probability", "description": "Probability theory", "keywords": ["probability", "random", "distribution"]},
+            {"name": "Inference", "description": "Statistical inference", "keywords": ["inference", "hypothesis", "confidence"]},
+            {"name": "Bayesian", "description": "Bayesian methods", "keywords": ["bayesian", "prior", "posterior", "bayes"]}
+          ]
+        },
+        {
+          "name": "Logic",
+          "description": "Mathematical logic and proof",
+          "keywords": ["logic", "proof", "theorem", "proposition"],
+          "subdomains": [
+            {"name": "Propositional", "description": "Propositional logic", "keywords": ["proposition", "boolean", "and", "or"]},
+            {"name": "Predicate", "description": "Predicate logic", "keywords": ["predicate", "quantifier", "forall", "exists"]},
+            {"name": "Proof_Theory", "description": "Mathematical proofs", "keywords": ["proof", "theorem", "lemma", "induction"]}
+          ]
+        },
+        {
+          "name": "Information_Theory",
+          "description": "Information and entropy",
+          "keywords": ["information", "entropy", "bits", "compression"],
+          "subdomains": [
+            {"name": "Entropy", "description": "Information entropy", "keywords": ["entropy", "uncertainty", "shannon"]},
+            {"name": "Compression", "description": "Data compression", "keywords": ["compress", "encode", "huffman"]},
+            {"name": "Channel_Capacity", "description": "Communication limits", "keywords": ["channel", "capacity", "bandwidth"]}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Natural_Sciences",
+      "description": "Physical and life sciences",
+      "domains": [
+        {
+          "name": "Physics",
+          "description": "Physical laws and phenomena",
+          "keywords": ["physics", "force", "energy", "matter"],
+          "subdomains": [
+            {"name": "Classical_Mechanics", "description": "Newtonian physics", "keywords": ["mechanics", "newton", "motion", "force"]},
+            {"name": "Quantum_Mechanics", "description": "Quantum physics", "keywords": ["quantum", "wave", "particle", "superposition"]},
+            {"name": "Thermodynamics", "description": "Heat and energy", "keywords": ["thermodynamics", "heat", "entropy", "temperature"]},
+            {"name": "Electromagnetism", "description": "EM phenomena", "keywords": ["electromagnetic", "electric", "magnetic", "light"]}
+          ]
+        },
+        {
+          "name": "Chemistry",
+          "description": "Chemical substances and reactions",
+          "keywords": ["chemistry", "molecule", "reaction", "element"],
+          "subdomains": [
+            {"name": "Organic", "description": "Organic chemistry", "keywords": ["organic", "carbon", "compound"]},
+            {"name": "Inorganic", "description": "Inorganic chemistry", "keywords": ["inorganic", "metal", "mineral"]},
+            {"name": "Biochemistry", "description": "Chemistry of life", "keywords": ["biochem", "protein", "enzyme", "metabolism"]}
+          ]
+        },
+        {
+          "name": "Biology",
+          "description": "Living organisms",
+          "keywords": ["biology", "life", "organism", "cell"],
+          "subdomains": [
+            {"name": "Molecular_Biology", "description": "Molecular processes", "keywords": ["dna", "rna", "gene", "molecular"]},
+            {"name": "Evolution", "description": "Evolutionary biology", "keywords": ["evolution", "natural selection", "species"]},
+            {"name": "Neuroscience", "description": "Brain and nervous system", "keywords": ["brain", "neuron", "nervous", "cognition"]},
+            {"name": "Ecology", "description": "Ecosystems", "keywords": ["ecology", "ecosystem", "environment", "biodiversity"]}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Philosophy",
+      "description": "Philosophical inquiry and concepts",
+      "domains": [
+        {
+          "name": "Epistemology",
+          "description": "Nature of knowledge",
+          "keywords": ["knowledge", "belief", "truth", "justification"],
+          "subdomains": [
+            {"name": "Truth_Theories", "description": "Theories of truth", "keywords": ["truth", "correspondence", "coherence"]},
+            {"name": "Skepticism", "description": "Philosophical skepticism", "keywords": ["skeptic", "doubt", "certainty"]},
+            {"name": "Rationalism_Empiricism", "description": "Sources of knowledge", "keywords": ["rationalism", "empiricism", "a priori"]}
+          ]
+        },
+        {
+          "name": "Ethics",
+          "description": "Moral philosophy",
+          "keywords": ["ethics", "moral", "right", "wrong", "good"],
+          "subdomains": [
+            {"name": "Normative_Ethics", "description": "Ethical theories", "keywords": ["deontology", "consequentialism", "virtue"]},
+            {"name": "Applied_Ethics", "description": "Practical ethics", "keywords": ["applied", "bioethics", "ai ethics"]},
+            {"name": "Metaethics", "description": "Nature of morality", "keywords": ["metaethics", "moral realism", "relativism"]}
+          ]
+        },
+        {
+          "name": "Philosophy_of_Mind",
+          "description": "Nature of mind and consciousness",
+          "keywords": ["mind", "consciousness", "qualia", "mental"],
+          "subdomains": [
+            {"name": "Consciousness", "description": "Nature of consciousness", "keywords": ["conscious", "awareness", "experience"]},
+            {"name": "Intentionality", "description": "Mental content", "keywords": ["intentional", "aboutness", "representation"]},
+            {"name": "Mind_Body_Problem", "description": "Mind-body relation", "keywords": ["dualism", "physicalism", "mind-body"]}
+          ]
+        },
+        {
+          "name": "Logic_and_Reasoning",
+          "description": "Principles of reasoning",
+          "keywords": ["logic", "reason", "argument", "fallacy"],
+          "subdomains": [
+            {"name": "Deductive_Logic", "description": "Deductive reasoning", "keywords": ["deduction", "valid", "syllogism"]},
+            {"name": "Inductive_Logic", "description": "Inductive reasoning", "keywords": ["induction", "probability", "generalization"]},
+            {"name": "Fallacies", "description": "Reasoning errors", "keywords": ["fallacy", "error", "bias"]}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cognitive_Science",
+      "description": "Study of mind and cognition",
+      "domains": [
+        {
+          "name": "Psychology",
+          "description": "Human psychology",
+          "keywords": ["psychology", "behavior", "cognition", "mental"],
+          "subdomains": [
+            {"name": "Cognitive_Psychology", "description": "Mental processes", "keywords": ["cognitive", "memory", "attention", "perception"]},
+            {"name": "Developmental_Psychology", "description": "Human development", "keywords": ["development", "child", "piaget", "learning"]},
+            {"name": "Social_Psychology", "description": "Social behavior", "keywords": ["social", "group", "influence", "attitude"]}
+          ]
+        },
+        {
+          "name": "Linguistics",
+          "description": "Study of language",
+          "keywords": ["linguistics", "language", "grammar", "syntax"],
+          "subdomains": [
+            {"name": "Syntax", "description": "Sentence structure", "keywords": ["syntax", "grammar", "parse", "structure"]},
+            {"name": "Semantics", "description": "Meaning", "keywords": ["semantics", "meaning", "reference", "sense"]},
+            {"name": "Pragmatics", "description": "Language in context", "keywords": ["pragmatics", "context", "speech act", "implicature"]}
+          ]
+        },
+        {
+          "name": "Decision_Theory",
+          "description": "Rational decision making",
+          "keywords": ["decision", "choice", "utility", "rational"],
+          "subdomains": [
+            {"name": "Expected_Utility", "description": "Utility theory", "keywords": ["utility", "expected", "maximize"]},
+            {"name": "Game_Theory", "description": "Strategic interaction", "keywords": ["game", "strategy", "nash", "equilibrium"]},
+            {"name": "Bounded_Rationality", "description": "Limited rationality", "keywords": ["bounded", "heuristic", "satisfice"]}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arts_and_Humanities",
+      "description": "Creative and cultural domains",
+      "domains": [
+        {
+          "name": "Literature",
+          "description": "Literary works and analysis",
+          "keywords": ["literature", "writing", "story", "narrative"],
+          "subdomains": [
+            {"name": "Fiction", "description": "Fictional works", "keywords": ["fiction", "novel", "short story"]},
+            {"name": "Poetry", "description": "Poetic works", "keywords": ["poetry", "poem", "verse", "meter"]},
+            {"name": "Literary_Theory", "description": "Literary analysis", "keywords": ["theory", "criticism", "interpretation"]}
+          ]
+        },
+        {
+          "name": "History",
+          "description": "Historical events and analysis",
+          "keywords": ["history", "past", "historical", "event"],
+          "subdomains": [
+            {"name": "Ancient_History", "description": "Ancient civilizations", "keywords": ["ancient", "rome", "greece", "egypt"]},
+            {"name": "Modern_History", "description": "Modern era", "keywords": ["modern", "industrial", "twentieth century"]},
+            {"name": "Historiography", "description": "Study of history", "keywords": ["historiography", "source", "methodology"]}
+          ]
+        },
+        {
+          "name": "Music",
+          "description": "Musical theory and practice",
+          "keywords": ["music", "melody", "rhythm", "harmony"],
+          "subdomains": [
+            {"name": "Music_Theory", "description": "Musical structure", "keywords": ["theory", "chord", "scale", "key"]},
+            {"name": "Composition", "description": "Creating music", "keywords": ["compose", "arrangement", "orchestration"]},
+            {"name": "Music_History", "description": "History of music", "keywords": ["classical", "baroque", "romantic", "jazz"]}
+          ]
+        },
+        {
+          "name": "Visual_Arts",
+          "description": "Visual artistic expression",
+          "keywords": ["art", "visual", "painting", "sculpture"],
+          "subdomains": [
+            {"name": "Art_History", "description": "History of art", "keywords": ["art history", "renaissance", "impressionism"]},
+            {"name": "Design", "description": "Visual design", "keywords": ["design", "layout", "typography", "color"]},
+            {"name": "Photography", "description": "Photographic arts", "keywords": ["photography", "camera", "composition"]}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Social_Sciences",
+      "description": "Study of society and human behavior",
+      "domains": [
+        {
+          "name": "Economics",
+          "description": "Economic systems and behavior",
+          "keywords": ["economics", "market", "price", "supply"],
+          "subdomains": [
+            {"name": "Microeconomics", "description": "Individual decisions", "keywords": ["micro", "consumer", "firm", "demand"]},
+            {"name": "Macroeconomics", "description": "Aggregate economy", "keywords": ["macro", "gdp", "inflation", "monetary"]},
+            {"name": "Behavioral_Economics", "description": "Psychology and economics", "keywords": ["behavioral", "bias", "nudge"]}
+          ]
+        },
+        {
+          "name": "Sociology",
+          "description": "Study of society",
+          "keywords": ["sociology", "society", "social", "culture"],
+          "subdomains": [
+            {"name": "Social_Structure", "description": "Societal organization", "keywords": ["structure", "institution", "class"]},
+            {"name": "Social_Movements", "description": "Collective action", "keywords": ["movement", "activism", "protest"]},
+            {"name": "Culture", "description": "Cultural phenomena", "keywords": ["culture", "norm", "value", "symbol"]}
+          ]
+        },
+        {
+          "name": "Political_Science",
+          "description": "Political systems and behavior",
+          "keywords": ["politics", "government", "policy", "power"],
+          "subdomains": [
+            {"name": "Political_Theory", "description": "Political philosophy", "keywords": ["theory", "democracy", "liberty", "justice"]},
+            {"name": "International_Relations", "description": "Global politics", "keywords": ["international", "diplomacy", "war", "treaty"]},
+            {"name": "Public_Policy", "description": "Policy analysis", "keywords": ["policy", "regulation", "law", "governance"]}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Practical_Skills",
+      "description": "Applied knowledge and skills",
+      "domains": [
+        {
+          "name": "Communication",
+          "description": "Effective communication",
+          "keywords": ["communicate", "explain", "clarify", "present"],
+          "subdomains": [
+            {"name": "Writing", "description": "Written communication", "keywords": ["write", "draft", "edit", "proofread"]},
+            {"name": "Speaking", "description": "Verbal communication", "keywords": ["speak", "present", "articulate"]},
+            {"name": "Listening", "description": "Active listening", "keywords": ["listen", "understand", "comprehend"]}
+          ]
+        },
+        {
+          "name": "Problem_Solving",
+          "description": "Analytical problem solving",
+          "keywords": ["problem", "solve", "solution", "analyze"],
+          "subdomains": [
+            {"name": "Root_Cause_Analysis", "description": "Finding root causes", "keywords": ["root cause", "why", "underlying"]},
+            {"name": "Creative_Solutions", "description": "Innovative approaches", "keywords": ["creative", "innovative", "novel"]},
+            {"name": "Decision_Making", "description": "Making choices", "keywords": ["decide", "choose", "option", "tradeoff"]}
+          ]
+        },
+        {
+          "name": "Research",
+          "description": "Research methodology",
+          "keywords": ["research", "investigate", "study", "evidence"],
+          "subdomains": [
+            {"name": "Information_Gathering", "description": "Finding information", "keywords": ["search", "find", "source", "reference"]},
+            {"name": "Critical_Evaluation", "description": "Evaluating sources", "keywords": ["evaluate", "credible", "bias", "reliable"]},
+            {"name": "Synthesis", "description": "Combining findings", "keywords": ["synthesize", "combine", "integrate", "summarize"]}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Meta_Knowledge",
+      "description": "Knowledge about knowledge",
+      "domains": [
+        {
+          "name": "Learning_Strategies",
+          "description": "How to learn effectively",
+          "keywords": ["learn", "study", "memorize", "understand"],
+          "subdomains": [
+            {"name": "Active_Learning", "description": "Engaged learning", "keywords": ["active", "practice", "apply"]},
+            {"name": "Spaced_Repetition", "description": "Memory techniques", "keywords": ["spaced", "repetition", "review"]},
+            {"name": "Elaboration", "description": "Deep processing", "keywords": ["elaborate", "connect", "relate"]}
+          ]
+        },
+        {
+          "name": "Uncertainty_Quantification",
+          "description": "Understanding and expressing uncertainty",
+          "keywords": ["uncertain", "confidence", "probability", "calibration"],
+          "subdomains": [
+            {"name": "Calibration", "description": "Confidence accuracy", "keywords": ["calibrate", "overconfident", "underconfident"]},
+            {"name": "Unknown_Unknowns", "description": "Recognizing gaps", "keywords": ["unknown", "gap", "blind spot"]},
+            {"name": "Epistemic_Humility", "description": "Intellectual humility", "keywords": ["humble", "uncertain", "might be wrong"]}
+          ]
+        },
+        {
+          "name": "Bias_Awareness",
+          "description": "Recognizing cognitive biases",
+          "keywords": ["bias", "prejudice", "distortion", "error"],
+          "subdomains": [
+            {"name": "Confirmation_Bias", "description": "Seeking confirming evidence", "keywords": ["confirmation", "cherry pick", "selective"]},
+            {"name": "Anchoring", "description": "First impression effects", "keywords": ["anchor", "first", "initial"]},
+            {"name": "Availability_Heuristic", "description": "Ease of recall bias", "keywords": ["available", "recall", "salient"]}
+          ]
+        }
+      ]
+    }
+  ]
+}
