@@ -62,3 +62,47 @@ export type {
   TierChangeResult,
   TierComparison 
 } from './infrastructure-tier.service';
+
+// Genesis System (v4.18.x)
+export { GenesisService, genesisService } from './genesis.service';
+export type { 
+  GenesisState, 
+  DevelopmentStatistics, 
+  DevelopmentalStage, 
+  DevelopmentalGateStatus 
+} from './genesis.service';
+
+export { CostTrackingService, costTrackingService } from './cost-tracking.service';
+export type { 
+  RealtimeCostEstimate, 
+  DailyCost, 
+  MtdCost, 
+  BudgetStatus as CostBudgetStatus, 
+  SettingsCostEstimate, 
+  PricingTable 
+} from './cost-tracking.service';
+
+export { CircuitBreakerService, circuitBreakerService } from './circuit-breaker.service';
+export type { 
+  CircuitState, 
+  InterventionLevel, 
+  CircuitBreakerConfig, 
+  CircuitBreakerState, 
+  NeurochemicalState, 
+  CircuitBreakerDashboard 
+} from './circuit-breaker.service';
+
+export { ConsciousnessLoopService, consciousnessLoopService } from './consciousness-loop.service';
+export type { 
+  ConsciousnessLoopState, 
+  LoopSettings, 
+  LoopStatus, 
+  TickResult 
+} from './consciousness-loop.service';
+
+export { QueryFallbackService, queryFallbackService } from './query-fallback.service';
+export type { 
+  FallbackResponse, 
+  CachedContext, 
+  FallbackConfig 
+} from './query-fallback.service';

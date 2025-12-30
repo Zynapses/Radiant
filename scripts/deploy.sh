@@ -179,10 +179,46 @@ echo -e "${GREEN}  Deployment Complete!${NC}"
 echo -e "${BLUE}═══════════════════════════════════════════════════════════════${NC}"
 echo ""
 echo -e "Duration: ${GREEN}${MINUTES}m ${SECONDS}s${NC}"
+# Run Bobble Genesis if this is a fresh deployment
+if [ "$DRY_RUN" = false ]; then
+    echo ""
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BLUE}  Bobble Genesis System${NC}"
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    echo -e "${YELLOW}Running Bobble Genesis boot sequence...${NC}"
+    
+    PYTHON_CMD=""
+    if command -v python3 &> /dev/null; then
+        PYTHON_CMD="python3"
+    elif command -v /usr/local/bin/python3 &> /dev/null; then
+        PYTHON_CMD="/usr/local/bin/python3"
+    elif command -v /usr/bin/python3 &> /dev/null; then
+        PYTHON_CMD="/usr/bin/python3"
+    fi
+    
+    if [ -n "$PYTHON_CMD" ]; then
+        # Install dependencies if needed
+        $PYTHON_CMD -m pip install boto3 pyyaml numpy --quiet 2>/dev/null || true
+        
+        # Run genesis
+        cd ../python
+        $PYTHON_CMD -m bobble.genesis.runner 2>&1 || {
+            echo -e "${YELLOW}⚠ Genesis runner failed - may need manual execution${NC}"
+            echo -e "${YELLOW}  Run: python3 -m bobble.genesis.runner${NC}"
+        }
+        cd ../infrastructure
+    else
+        echo -e "${YELLOW}⚠ Python3 not found - skipping Genesis${NC}"
+        echo -e "${YELLOW}  Run manually: python3 -m bobble.genesis.runner${NC}"
+    fi
+fi
+
 echo ""
 echo -e "${YELLOW}Next Steps:${NC}"
 echo "  1. Run database migrations: ./scripts/run-migrations.sh --environment $ENVIRONMENT"
-echo "  2. Create first admin user (see docs/DEPLOYMENT-GUIDE.md)"
-echo "  3. Configure AI providers in Admin Dashboard"
-echo "  4. Run verification: ./scripts/verify-deployment.sh --environment $ENVIRONMENT"
+echo "  2. Run Bobble Genesis (if not auto-run): python3 -m bobble.genesis.runner"
+echo "  3. Create first admin user (see docs/DEPLOYMENT-GUIDE.md)"
+echo "  4. Configure AI providers in Admin Dashboard"
+echo "  5. Run verification: ./scripts/verify-deployment.sh --environment $ENVIRONMENT"
 echo ""

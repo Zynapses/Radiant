@@ -126,6 +126,18 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `gdpr_requests` | GDPR data subject requests |
 | `data_retention_policies` | Configurable data retention |
 | `phi_access_log` | HIPAA PHI access audit trail |
+| `bobble_genesis_state` | Genesis boot sequence state tracking |
+| `bobble_development_counters` | Atomic counters for developmental gates |
+| `bobble_developmental_stage` | Current developmental stage (Piaget-inspired) |
+| `bobble_circuit_breakers` | Circuit breaker states and configuration |
+| `bobble_circuit_breaker_events` | Circuit breaker event history |
+| `bobble_neurochemistry` | Emotional/cognitive state (anxiety, curiosity, etc.) |
+| `bobble_tick_costs` | Per-tick cost tracking |
+| `bobble_pricing_cache` | AWS pricing table cache |
+| `bobble_pymdp_state` | PyMDP active inference state |
+| `bobble_pymdp_matrices` | Active inference matrices (A, B, C, D) |
+| `bobble_consciousness_settings` | Loop configuration settings |
+| `bobble_loop_state` | Consciousness loop execution state |
 | `data_processing_agreements` | Sub-processor DPAs |
 | `data_breach_incidents` | Security breach tracking |
 | `hipaa_config` | Per-tenant HIPAA configuration |

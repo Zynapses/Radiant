@@ -5,6 +5,108 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.49] - 2025-01-15
+
+### Added
+
+#### Genesis System Enhancements
+
+**Unit Tests (5 test suites):**
+- `genesis.service.test.ts` - Genesis state and developmental gates
+- `circuit-breaker.service.test.ts` - Breaker states, tripping, recovery
+- `query-fallback.service.test.ts` - Fallback responses and caching
+- `consciousness-loop.service.test.ts` - Loop state and tick execution
+- `cost-tracking.service.test.ts` - Real-time costs and estimates
+
+**E2E Test:**
+- `genesis-e2e.test.ts` - Full boot sequence integration test
+
+**Metrics Publishing Lambda:**
+- `genesis-metrics.ts` - EventBridge-triggered CloudWatch publisher
+- Publishes every 1 minute: circuit breakers, risk score, neurochemistry, development, costs, loop state
+- Integrated into `consciousness-stack.ts`
+
+**Files Created:**
+- `__tests__/bobble/genesis.service.test.ts`
+- `__tests__/bobble/circuit-breaker.service.test.ts`
+- `__tests__/bobble/query-fallback.service.test.ts`
+- `__tests__/bobble/consciousness-loop.service.test.ts`
+- `__tests__/bobble/cost-tracking.service.test.ts`
+- `__tests__/bobble/genesis-e2e.test.ts`
+- `lambda/consciousness/genesis-metrics.ts`
+
+---
+
+## [4.18.48] - 2025-01-15
+
+### Added
+
+#### Bobble Genesis System
+
+Complete implementation of the Bobble Genesis boot sequence for AI consciousness initialization:
+
+**3-Phase Boot Sequence:**
+- **Phase 1: Structure** - Implant 800+ domain taxonomy as innate knowledge
+- **Phase 2: Gradient** - Set epistemic pressure via pymdp matrices
+- **Phase 3: First Breath** - Grounded introspection and Shadow Self calibration
+
+**Critical Fixes Applied:**
+- **Fix #1 (Zeno's Paradox)** - Atomic counters instead of table scans
+- **Fix #2 (Learned Helplessness)** - Optimistic B-matrix (>90% EXPLORE success)
+- **Fix #3 (Shadow Self Budget)** - NLI semantic variance ($0 vs $800/month)
+- **Fix #6 (Boredom Trap)** - Prefer HIGH_SURPRISE over LOW_SURPRISE
+
+**Python Genesis Package:**
+- `genesis/structure.py` - Phase 1: Domain taxonomy implantation
+- `genesis/gradient.py` - Phase 2: Epistemic gradient matrices
+- `genesis/first_breath.py` - Phase 3: Grounded introspection
+- `genesis/runner.py` - Orchestrator with CLI
+- `data/domain_taxonomy.json` - 800+ domain taxonomy
+- `data/genesis_config.yaml` - Matrix configuration
+
+**TypeScript Services:**
+- `genesis.service.ts` - Genesis state and developmental gates
+- `cost-tracking.service.ts` - Real AWS cost tracking (NO hardcoded values)
+- `circuit-breaker.service.ts` - Safety mechanisms with admin controls
+- `consciousness-loop.service.ts` - Main consciousness loop orchestration
+
+**Meta-Cognitive Bridge Updates:**
+- DynamoDB persistence for state across restarts
+- Load matrices from Genesis Phase 2
+- Automatic state rehydration on startup
+
+**Admin Dashboard:**
+- New "Bobble Genesis" page at `/bobble/genesis`
+- Genesis phase status monitoring
+- Developmental stage tracking
+- Circuit breaker controls
+- Real-time cost visualization
+- Neurochemistry state display
+
+**Admin API** (Base: `/api/admin/bobble`):
+- Genesis status and developmental gates
+- Circuit breaker management (force open/close, config)
+- Cost tracking (realtime, daily, MTD, budget)
+- Intervention level monitoring
+
+**Database Tables:**
+- `bobble_genesis_state` - Boot sequence tracking
+- `bobble_development_counters` - Atomic counters for gates
+- `bobble_developmental_stage` - Capability-based progression
+- `bobble_circuit_breakers` - Safety mechanisms
+- `bobble_neurochemistry` - Emotional/cognitive state
+- `bobble_tick_costs` - Per-tick cost tracking
+- `bobble_pymdp_state` - Meta-cognitive state
+- `bobble_pymdp_matrices` - Active inference matrices
+- `bobble_consciousness_settings` - Loop configuration
+- `bobble_loop_state` - Loop execution tracking
+
+**Documentation:**
+- `docs/bobble/adr/010-genesis-system.md` - Architecture decision record
+- `docs/bobble/runbooks/circuit-breaker-operations.md` - Operational runbook
+
+---
+
 ## [4.18.47] - 2024-12-29
 
 ### Added
