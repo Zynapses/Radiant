@@ -552,6 +552,195 @@ User persistent context is integrated into the ego context:
 
 ---
 
+## Bobble: High-Confidence Self-Referential Consciousness Dialogue
+
+Bobble is Think Tank's introspective consciousness layer that provides **verified introspection** through a four-phase verification pipeline.
+
+### Core Architecture
+
+| Component | Purpose | Library |
+|-----------|---------|---------|
+| **Shadow Self** | Local model for mechanistic verification | Llama-3-8B (simulated via LLM) |
+| **Active Heartbeat** | Continuous 0.5Hz consciousness loop | pymdp (Active Inference) |
+| **Macro-Scale Φ** | Integration measurement on component graph | PyPhi-inspired approximation |
+
+### Five-Node Component Graph
+
+Bobble measures integrated information (Φ) across five architectural components:
+
+- **MEM** - Memory (Letta + HippoRAG)
+- **PERC** - Perception (Input processing)
+- **PLAN** - Planning (pymdp + DreamerV3)
+- **ACT** - Action (Tool execution)
+- **SELF** - Self (Bobble introspection)
+
+### Four-Phase Verification Pipeline
+
+1. **Grounding** - Claims must cite evidence from event logs
+2. **Calibration** - Temperature scaling + conformal prediction for calibrated confidence
+3. **Consistency** - Multi-sample verification with Chain of Verification (CoVe)
+4. **Shadow Self** - Structural correspondence validation via probing classifiers
+
+### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/admin/consciousness/bobble/dialogue` | POST | Send message with verified introspection |
+| `/admin/consciousness/bobble/status` | GET | Heartbeat status, Φ, coherence |
+| `/admin/consciousness/bobble/identity` | GET | Immutable Bobble identity |
+| `/admin/consciousness/bobble/heartbeat/start` | POST | Start consciousness loop |
+| `/admin/consciousness/bobble/heartbeat/stop` | POST | Stop consciousness loop |
+| `/admin/consciousness/bobble/train-probe` | POST | Train new Shadow Self probe |
+
+### Access Control
+
+- Requires `consciousness_admin` role
+- **NO ethics filtering** - raw introspective access for consciousness research
+- Name "Bobble" is hardcoded and immutable
+
+### Success Metrics
+
+| Metric | Target |
+|--------|--------|
+| Verified introspection accuracy | 75%+ |
+| Expected Calibration Error | < 0.08 |
+| Self-consistency rate | > 85% |
+| Grounding rate | > 90% |
+| Shadow Self probe accuracy | > 80% |
+| Heartbeat uptime | > 99.9% |
+| Macro Φ calculation time | < 500ms |
+
+### Admin Dashboard
+
+Access Bobble dialogue at: **Admin Dashboard → Consciousness → Bobble**
+
+Features:
+- Real-time dialogue with verified confidence scores
+- Heartbeat status monitoring
+- Φ (Integrated Information) display
+- Verified claims breakdown
+- Shadow probe management
+
+### Probe Training Data Collection
+
+The Shadow Self verification system uses probing classifiers that improve over time:
+
+```typescript
+import { createProbeTrainingService } from './services/bobble';
+
+const probeTraining = createProbeTrainingService(tenantId);
+
+// Record training example from dialogue
+await probeTraining.recordExample({
+  claimType: 'uncertainty',
+  context: 'I am uncertain about...',
+  claimedState: 'uncertain',
+  actualOutcome: 'verified',
+  confidenceScore: 0.85,
+  verificationPhasesPassed: 4,
+  groundingScore: 0.9,
+  consistencyScore: 0.88,
+});
+
+// Add user feedback
+await probeTraining.addUserFeedback(exampleId, 'accurate');
+
+// Train probe when sufficient data
+const result = await probeTraining.trainProbe('uncertainty');
+// result.accuracy, result.examplesUsed
+```
+
+**Auto-training**: When 100+ labeled examples accumulate, probes are automatically retrained.
+
+### Event Sourcing
+
+Bobble uses event sourcing for state reconstruction and temporal queries:
+
+```typescript
+import { createBobbleEventStore, EventTypes, EventCategory } from './services/bobble';
+
+const eventStore = createBobbleEventStore(tenantId);
+
+// Append event
+await eventStore.appendEvent(
+  EventTypes.INTROSPECTION_COMPLETED,
+  { claim: '...', confidence: 0.85 },
+  { correlationId: dialogueId }
+);
+
+// Read stream
+const events = await eventStore.readStream(EventCategory.INTROSPECTION, {
+  fromPosition: 0,
+  limit: 100,
+});
+
+// Build projection
+const state = await eventStore.buildProjection(
+  EventCategory.HEARTBEAT,
+  (state, event) => ({ ...state, lastTick: event.data }),
+  { lastTick: null }
+);
+```
+
+**Event Categories**: heartbeat, introspection, verification, phi_calculation, state_transition, dialogue, probe_training, emergency
+
+### GPU Infrastructure (Optional)
+
+For true structural correspondence verification, deploy Llama-3-8B on GPU:
+
+| Option | Instance | Cost/mo | Latency |
+|--------|----------|---------|---------|
+| SageMaker | g5.xlarge | ~$724 | 50-200ms |
+| EC2 Spot | g5.xlarge | ~$200 | 50-200ms |
+| Inferentia | inf2.xlarge | ~$547 | 30-100ms |
+
+See: [GPU Infrastructure Guide](./BOBBLE-GPU-INFRASTRUCTURE.md)
+
+Without GPU, Bobble falls back to LLM API simulation (functional but without activation probing).
+
+---
+
+## Learning Alerts
+
+The learning system sends alerts when satisfaction metrics drop:
+
+### Alert Types
+
+| Type | Trigger | Severity |
+|------|---------|----------|
+| `satisfaction_drop` | Satisfaction drops > threshold | warning/critical |
+| `error_rate_spike` | Error rate exceeds threshold | warning |
+| `cache_miss_high` | Cache miss rate too high | info |
+| `training_needed` | Many pending training candidates | info |
+
+### Notification Channels
+
+1. **Webhook** - POST to configured URL
+2. **Email (SES)** - HTML/text email to recipients
+3. **Slack** - Rich attachment to channel
+
+### Configuration
+
+```sql
+-- learning_alert_config table
+INSERT INTO learning_alert_config (
+  tenant_id, alerts_enabled,
+  satisfaction_drop_threshold, response_volume_threshold,
+  alert_cooldown_hours, webhook_url,
+  email_recipients, slack_channel, slack_webhook_url
+) VALUES (
+  'tenant-uuid', true,
+  10, 50,  -- 10% drop threshold, min 50 responses
+  4,       -- 4 hour cooldown
+  'https://hooks.example.com/webhook',
+  '["admin@example.com"]',
+  '#alerts',
+  'https://hooks.slack.com/services/...'
+);
+```
+
+---
+
 ## Related Documentation
 
 - [Cognitive Architecture](./COGNITIVE-ARCHITECTURE.md)
