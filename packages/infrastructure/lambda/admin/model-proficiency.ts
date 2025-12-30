@@ -3,6 +3,7 @@
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { modelProficiencyService } from '../shared/services/model-proficiency.service';
+import { logger } from '../shared/logger';
 
 // ============================================================================
 // Helper Functions
@@ -67,7 +68,7 @@ export const getAllRankings: APIGatewayProxyHandler = async () => {
       modes: Object.keys(byMode),
     });
   } catch (err) {
-    console.error('Error getting rankings:', err);
+    logger.error(`Error getting rankings: ${String(err)}`);
     return error(500, 'Failed to get rankings');
   }
 };
@@ -95,7 +96,7 @@ export const getDomainRankings: APIGatewayProxyHandler = async (event) => {
       totalModels: ranking.models.length,
     });
   } catch (err) {
-    console.error('Error getting domain rankings:', err);
+    logger.error(`Error getting domain rankings: ${String(err)}`);
     return error(500, 'Failed to get domain rankings');
   }
 };
@@ -121,7 +122,7 @@ export const getModeRankings: APIGatewayProxyHandler = async (event) => {
       totalModels: ranking.models.length,
     });
   } catch (err) {
-    console.error('Error getting mode rankings:', err);
+    logger.error(`Error getting mode rankings: ${String(err)}`);
     return error(500, 'Failed to get mode rankings');
   }
 };
@@ -164,7 +165,7 @@ export const getModelProfile: APIGatewayProxyHandler = async (event) => {
       topModes: modeRankings.slice(0, 3),
     });
   } catch (err) {
-    console.error('Error getting model profile:', err);
+    logger.error(`Error getting model profile: ${String(err)}`);
     return error(500, 'Failed to get model profile');
   }
 };
@@ -188,7 +189,7 @@ export const recomputeRankings: APIGatewayProxyHandler = async () => {
       durationMs,
     });
   } catch (err) {
-    console.error('Error recomputing rankings:', err);
+    logger.error(`Error recomputing rankings: ${String(err)}`);
     return error(500, 'Failed to recompute rankings');
   }
 };
@@ -214,7 +215,7 @@ export const compareModels: APIGatewayProxyHandler = async (event) => {
     
     return success({ comparison });
   } catch (err) {
-    console.error('Error comparing models:', err);
+    logger.error(`Error comparing models: ${String(err)}`);
     return error(500, 'Failed to compare models');
   }
 };
@@ -245,7 +246,7 @@ export const getBestForTask: APIGatewayProxyHandler = async (event) => {
       models,
     });
   } catch (err) {
-    console.error('Error finding best models:', err);
+    logger.error(`Error finding best models: ${String(err)}`);
     return error(500, 'Failed to find best models');
   }
 };
@@ -282,7 +283,7 @@ export const getDiscoveryLog: APIGatewayProxyHandler = async (event) => {
       stats,
     });
   } catch (err) {
-    console.error('Error getting discovery log:', err);
+    logger.error(`Error getting discovery log: ${String(err)}`);
     return error(500, 'Failed to get discovery log');
   }
 };
@@ -332,7 +333,7 @@ export const discoverModel: APIGatewayProxyHandler = async (event) => {
       throw genError;
     }
   } catch (err) {
-    console.error('Error discovering model:', err);
+    logger.error(`Error discovering model: ${String(err)}`);
     return error(500, 'Failed to discover model');
   }
 };
@@ -375,7 +376,7 @@ export const syncRegistry: APIGatewayProxyHandler = async () => {
       throw syncError;
     }
   } catch (err) {
-    console.error('Error syncing registry:', err);
+    logger.error(`Error syncing registry: ${String(err)}`);
     return error(500, 'Failed to sync registry');
   }
 };
@@ -423,7 +424,7 @@ export const getOverview: APIGatewayProxyHandler = async () => {
       recentDiscoveries: logs,
     });
   } catch (err) {
-    console.error('Error getting overview:', err);
+    logger.error(`Error getting overview: ${String(err)}`);
     return error(500, 'Failed to get overview');
   }
 };

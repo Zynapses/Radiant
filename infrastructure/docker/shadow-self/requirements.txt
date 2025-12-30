@@ -1,0 +1,31 @@
+# Shadow Self Dependencies
+
+# PyTorch with CUDA support
+torch>=2.1.0
+torchvision>=0.16.0
+
+# Transformers for Llama-3
+transformers>=4.36.0
+accelerate>=0.25.0
+safetensors>=0.4.1
+
+# Quantization support
+bitsandbytes>=0.41.0
+
+# vLLM for fast inference (optional)
+# vllm>=0.2.7
+
+# SageMaker inference toolkit
+sagemaker-inference>=1.10.0
+multi-model-server>=1.1.11
+
+# HTTP server
+flask>=3.0.0
+gunicorn>=21.2.0
+
+# Utilities
+numpy>=1.24.0
+pydantic>=2.5.0
+
+# Logging
+structlog>=23.2.0

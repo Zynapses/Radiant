@@ -7,3 +7,4 @@ export * from './stacks/storage-stack';
 export * from './stacks/ai-stack';
 export * from './stacks/api-stack';
 export * from './stacks/admin-stack';
+export * from './stacks/bobble-tier-transition-stack';

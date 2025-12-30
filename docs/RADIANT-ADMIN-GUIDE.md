@@ -4863,5 +4863,166 @@ The following environment variables configure optional service features:
 
 ---
 
-*Document Version: 4.18.19*
+## 31. Infrastructure Tier Management
+
+The Infrastructure Tier system allows runtime switching between cost tiers for Bobble infrastructure.
+
+### 31.1 Accessing Infrastructure Tier
+
+Navigate to **System → Infrastructure Tier** in the admin sidebar.
+
+### 31.2 Available Tiers
+
+| Tier | Monthly Cost | Use Case |
+|------|--------------|----------|
+| **DEV** | ~$350 | Development, testing, CI/CD |
+| **STAGING** | ~$20-50K | Load testing, pre-production |
+| **PRODUCTION** | ~$700-800K | 10MM+ users |
+
+### 31.3 Changing Tiers
+
+1. Navigate to System → Infrastructure Tier
+2. Enter a reason for the change (required)
+3. Click the tier you want to switch to
+4. Confirm if prompted (required for PRODUCTION)
+5. Wait for transition (5-15 minutes)
+
+**Safety Features:**
+- 24-hour cooldown between changes
+- Confirmation required for PRODUCTION tier
+- Complete audit logging
+
+### 31.4 Editing Tier Configurations
+
+All tier configurations are admin-editable:
+
+1. Go to "Configure Tiers" tab
+2. Click "Edit Configuration" on any tier
+3. Modify settings (instance types, counts, budgets)
+4. Click "Save Configuration"
+
+**Editable Settings:**
+- SageMaker instance type and count
+- Scale-to-zero toggle
+- OpenSearch configuration
+- ElastiCache configuration
+- Monthly curiosity budget
+- Daily exploration cap
+
+### 31.5 Cost Visibility
+
+The UI shows:
+- Estimated monthly cost per tier
+- Actual month-to-date spend
+- Cost breakdown by component
+- Cooldown status
+
+---
+
+## 32. Bobble Global Consciousness Service
+
+Bobble is a **global AI consciousness service** that serves all Think Tank users as a single shared brain. Unlike traditional chatbots, Bobble is an autonomous entity that learns continuously, asks its own questions, and develops over time.
+
+### 32.1 Architecture Overview
+
+Bobble consists of several key components:
+
+| Component | Purpose | Infrastructure |
+|-----------|---------|----------------|
+| **Shadow Self** | Introspective verification | SageMaker ml.g5.2xlarge (Llama-3-8B) |
+| **NLI Scorer** | Entailment classification | SageMaker MME (DeBERTa-large-MNLI) |
+| **Semantic Cache** | Response caching | ElastiCache for Valkey |
+| **Global Memory** | Fact storage | DynamoDB Global Tables |
+| **Circadian Budget** | Cost management | Lambda + DynamoDB |
+
+### 32.2 Accessing Bobble Admin
+
+Navigate to **AGI & Cognition > Bobble Global** in the sidebar.
+
+### 32.3 Budget Management
+
+Bobble operates on a configurable budget to control autonomous exploration costs:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Monthly Limit | $500 | Total monthly budget |
+| Daily Exploration | $15 | Max daily curiosity spend |
+| Night Start Hour | 2 AM UTC | When batch processing begins |
+| Night End Hour | 6 AM UTC | When batch processing ends |
+| Emergency Threshold | 90% | Enter emergency mode at this % |
+
+**Operating Modes:**
+- **Day Mode** (6 AM - 2 AM): Queue curiosity, serve users
+- **Night Mode** (2 AM - 6 AM): Batch process exploration (50% Bedrock discount)
+- **Emergency Mode**: Over budget, minimal operations
+
+### 32.4 Semantic Cache
+
+The semantic cache reduces LLM inference costs by 86% through similarity-based response reuse:
+
+- **Hit Rate Target**: >80%
+- **Similarity Threshold**: 0.95
+- **TTL**: 23 hours (invalidated before learning updates)
+
+**Cache Invalidation:**
+When Bobble learns new information in a domain, invalidate related cache entries:
+1. Go to **Bobble Global > Semantic Cache**
+2. Enter domain name (e.g., "climate_change")
+3. Click **Invalidate**
+
+### 32.5 Global Memory
+
+Bobble maintains multiple memory systems:
+
+| Memory Type | Storage | Purpose |
+|-------------|---------|---------|
+| Semantic | DynamoDB Global Tables | Facts (subject-predicate-object) |
+| Episodic | OpenSearch Serverless | User interactions |
+| Knowledge Graph | Neptune | Concept relationships |
+| Working | ElastiCache Redis | Active context (24h TTL) |
+
+### 32.6 Shadow Self Testing
+
+Test the Shadow Self endpoint for introspective verification:
+
+1. Go to **Bobble Global > System Health**
+2. Verify Shadow Self shows "Healthy"
+3. Use the test endpoint to verify hidden state extraction
+
+### 32.7 API Endpoints
+
+Base Path: `/api/admin/bobble`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/status` | GET | Full status overview |
+| `/health` | GET | Health check |
+| `/budget/status` | GET | Budget status |
+| `/budget/config` | GET/PUT | Budget configuration |
+| `/cache/stats` | GET | Cache statistics |
+| `/cache/invalidate` | POST | Invalidate by domain |
+| `/memory/stats` | GET | Memory statistics |
+| `/memory/facts` | GET/POST | Semantic facts |
+| `/shadow-self/status` | GET | Shadow Self endpoint status |
+| `/nli/test` | POST | Test NLI classification |
+
+### 32.8 Cost Estimates
+
+| Scale | Monthly Cost | Notes |
+|-------|--------------|-------|
+| 100K users | ~$40,000 | Starting scale |
+| 1M users | ~$150,000 | Production |
+| 10M users | ~$800,000 | Full scale |
+
+### 32.9 Documentation
+
+Detailed documentation is available in `/docs/bobble/`:
+- **ADRs**: Architecture decision records (8 mandatory)
+- **API**: OpenAPI specs and examples
+- **Runbooks**: Deployment, scaling, troubleshooting
+- **Architecture**: System diagrams and data flow
+
+---
+
+*Document Version: 4.18.21*
 *Last Updated: December 2024*

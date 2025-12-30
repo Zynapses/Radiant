@@ -1,0 +1,17 @@
+# NLI Model Dependencies
+
+# PyTorch
+torch>=2.1.0
+
+# Transformers for DeBERTa
+transformers>=4.36.0
+
+# SageMaker inference toolkit
+sagemaker-inference>=1.10.0
+multi-model-server>=1.1.11
+
+# HTTP server
+flask>=3.0.0
+
+# Utilities
+numpy>=1.24.0

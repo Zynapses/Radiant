@@ -10,6 +10,7 @@ import { AuthStack } from '../lib/stacks/auth-stack';
 import { AIStack } from '../lib/stacks/ai-stack';
 import { ApiStack } from '../lib/stacks/api-stack';
 import { AdminStack } from '../lib/stacks/admin-stack';
+import { BobbleTierTransitionStack } from '../lib/stacks/bobble-tier-transition-stack';
 import { 
   RADIANT_VERSION, 
   getTierConfig,
@@ -209,6 +210,23 @@ const adminStack = new AdminStack(app, `${stackPrefix}-admin`, {
   description: `RADIANT Admin Dashboard - ${appId} ${environment}`,
 });
 adminStack.addDependency(apiStack);
+
+// ============================================================================
+// BOBBLE INFRASTRUCTURE TIER TRANSITION (Phase 3)
+// ============================================================================
+
+// 10. Bobble Tier Transition Stack (Step Functions workflow for tier switching)
+const bobbleTierTransitionStack = new BobbleTierTransitionStack(app, `${stackPrefix}-bobble-tier-transition`, {
+  env,
+  environment: environment as 'dev' | 'staging' | 'prod',
+  dbClusterArn: dataStack.cluster.clusterArn,
+  dbSecretArn: dataStack.cluster.secret?.secretArn,
+  dbName: 'radiant',
+  tags,
+  description: `RADIANT Bobble Tier Transition - ${appId} ${environment}`,
+});
+bobbleTierTransitionStack.addDependency(adminStack);
+bobbleTierTransitionStack.addDependency(dataStack);
 
 // ============================================================================
 // TAGGING

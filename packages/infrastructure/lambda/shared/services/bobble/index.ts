@@ -35,3 +35,30 @@ export type { TrainingExample, TrainingDataset, CollectionConfig } from './probe
 
 export { BobbleEventStoreService, createBobbleEventStore, EventCategory, EventTypes } from './event-store.service';
 export type { ConsciousnessEvent, EventStreamPosition, EventStoreConfig } from './event-store.service';
+
+// New Bobble Global Consciousness Services (v4.18.0)
+export { SemanticCacheService, semanticCacheService } from './semantic-cache.service';
+export type { CacheResult, CacheConfig, CacheStats } from './semantic-cache.service';
+
+export { CircadianBudgetService, circadianBudgetService, OperatingMode } from './circadian-budget.service';
+export type { BudgetConfig, BudgetStatus, CostRecord } from './circadian-budget.service';
+
+export { NLIScorerService, nliScorerService } from './nli-scorer.service';
+export type { NLIResult, NLILabel, NLIConfig } from './nli-scorer.service';
+
+export { ShadowSelfClient, shadowSelfClient } from './shadow-self.client';
+export type { HiddenStateResult, ShadowSelfConfig, EndpointStatus } from './shadow-self.client';
+
+export { GlobalMemoryService, globalMemoryService } from './global-memory.service';
+export type { SemanticFact, EpisodicMemory, WorkingMemoryEntry, GlobalMemoryConfig } from './global-memory.service';
+
+export { InfrastructureTierService, infrastructureTierService } from './infrastructure-tier.service';
+export type { 
+  InfrastructureTier, 
+  TransitionStatus, 
+  TierState, 
+  TierConfig, 
+  TierChangeRequest, 
+  TierChangeResult,
+  TierComparison 
+} from './infrastructure-tier.service';
