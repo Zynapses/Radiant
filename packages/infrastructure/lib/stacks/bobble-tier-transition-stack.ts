@@ -113,7 +113,7 @@ export class BobbleTierTransitionStack extends cdk.Stack {
     // Lambda Functions
     // =========================================================================
 
-    const lambdaDefaults: Partial<lambda.FunctionProps> = {
+    const lambdaDefaults = {
       runtime: lambda.Runtime.NODEJS_20_X,
       timeout: cdk.Duration.minutes(5),
       memorySize: 512,

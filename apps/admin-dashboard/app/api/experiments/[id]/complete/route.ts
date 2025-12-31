@@ -4,10 +4,11 @@ import { withAdminAuth, apiError, type AuthenticatedRequest } from '@/lib/api/au
 // POST /api/experiments/[id]/complete - Complete an experiment (admin only)
 export const POST = withAdminAuth(async (
   request: AuthenticatedRequest,
-  context?: { params: Record<string, string> }
+  context
 ) => {
   try {
-    const id = context?.params?.id || '';
+    const params = context?.params as Record<string, string> | undefined;
+    const id = params?.id || '';
     return NextResponse.json({
       success: true,
       experimentId: id,

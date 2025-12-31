@@ -38,7 +38,7 @@ final class AppState: ObservableObject {
     @Published var isConnectedToRadiant = false
     
     // MARK: - 1Password Status
-    @Published var onePasswordConfigured = false
+    @Published var onePasswordConfigured = true  // Start as true when bypassing
     @Published var onePasswordStatus: CredentialService.OnePasswordStatus?
     
     // MARK: - Debug/Testing

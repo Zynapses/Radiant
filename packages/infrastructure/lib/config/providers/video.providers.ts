@@ -213,45 +213,119 @@ const HAILUO_PROVIDER: ExternalProvider = {
 };
 
 // ============================================================================
-// GOOGLE VEO MODELS
+// GOOGLE VEO MODELS (Gemini Video Generation)
 // ============================================================================
 
 const VEO_MODELS: ExternalModel[] = [
   {
     id: 'google-veo-2',
-    modelId: 'veo-2',
-    litellmId: 'vertex_ai/veo-2',
+    modelId: 'veo-2.0-generate-001',
+    litellmId: 'vertex_ai/veo-2.0-generate-001',
     name: 'veo-2',
-    displayName: 'Google Veo 2',
-    description: 'Google high-quality video generation',
+    displayName: 'Veo 2',
+    description: 'Google DeepMind flagship video generation model with photorealistic output',
     category: 'video_generation',
-    capabilities: ['text_to_video', 'image_to_video', 'high_quality'],
+    capabilities: ['text_to_video', 'image_to_video', 'high_quality', '4k', 'cinematography', 'physics_simulation'],
     inputModalities: ['text', 'image'],
     outputModalities: ['video'],
+    metadata: {
+      maxDuration: 120,
+      resolutions: ['720p', '1080p', '4k'],
+      aspectRatios: ['16:9', '9:16', '1:1'],
+      fps: [24, 30, 60],
+    },
     pricing: {
       type: 'per_second',
-      costPerSecond: 0.04,
+      costPerSecond: 0.05,
+      markup: MARKUP,
+    },
+  },
+  {
+    id: 'google-veo-2-fast',
+    modelId: 'veo-2.0-generate-001-fast',
+    litellmId: 'vertex_ai/veo-2.0-generate-001-fast',
+    name: 'veo-2-fast',
+    displayName: 'Veo 2 Fast',
+    description: 'Faster Veo 2 variant for quicker generation with slightly reduced quality',
+    category: 'video_generation',
+    capabilities: ['text_to_video', 'image_to_video', 'fast'],
+    inputModalities: ['text', 'image'],
+    outputModalities: ['video'],
+    metadata: {
+      maxDuration: 60,
+      resolutions: ['720p', '1080p'],
+      aspectRatios: ['16:9', '9:16', '1:1'],
+      fps: [24, 30],
+    },
+    pricing: {
+      type: 'per_second',
+      costPerSecond: 0.025,
+      markup: MARKUP,
+    },
+  },
+  {
+    id: 'google-veo-2-4k',
+    modelId: 'veo-2.0-generate-001-4k',
+    litellmId: 'vertex_ai/veo-2.0-generate-001-4k',
+    name: 'veo-2-4k',
+    displayName: 'Veo 2 4K',
+    description: 'Ultra high-definition 4K video generation with enhanced detail',
+    category: 'video_generation',
+    capabilities: ['text_to_video', 'image_to_video', 'high_quality', '4k', 'ultra_hd'],
+    inputModalities: ['text', 'image'],
+    outputModalities: ['video'],
+    metadata: {
+      maxDuration: 60,
+      resolutions: ['4k'],
+      aspectRatios: ['16:9', '21:9'],
+      fps: [24, 30, 60],
+    },
+    pricing: {
+      type: 'per_second',
+      costPerSecond: 0.08,
+      markup: MARKUP,
+    },
+  },
+  {
+    id: 'google-imagen-video',
+    modelId: 'imagen-video-001',
+    litellmId: 'vertex_ai/imagen-video-001',
+    name: 'imagen-video',
+    displayName: 'Imagen Video',
+    description: 'Google Imagen-based video generation with high visual fidelity',
+    category: 'video_generation',
+    capabilities: ['text_to_video', 'high_fidelity'],
+    inputModalities: ['text'],
+    outputModalities: ['video'],
+    metadata: {
+      maxDuration: 16,
+      resolutions: ['1280x768'],
+      fps: [24],
+    },
+    pricing: {
+      type: 'per_second',
+      costPerSecond: 0.06,
       markup: MARKUP,
     },
   },
 ];
 
 const VEO_PROVIDER: ExternalProvider = {
-  id: 'veo',
-  name: 'veo',
+  id: 'google-veo',
+  name: 'google-veo',
   displayName: 'Google Veo',
   category: 'video_generation',
-  description: 'Google Veo video generation',
+  description: 'Google DeepMind Veo video generation models',
   website: 'https://deepmind.google/technologies/veo/',
-  apiBaseUrl: 'https://generativelanguage.googleapis.com/v1',
+  apiBaseUrl: 'https://generativelanguage.googleapis.com/v1beta',
   authType: 'api_key',
   secretName: 'radiant/providers/google',
   enabled: true,
-  regions: ['us'],
+  regions: ['us', 'eu'],
   models: VEO_MODELS,
-  rateLimit: { requestsPerMinute: 10 },
-  features: ['text_to_video', 'image_to_video', 'high_quality'],
-  compliance: ['SOC2', 'GDPR'],
+  rateLimit: { requestsPerMinute: 30 },
+  features: ['text_to_video', 'image_to_video', 'high_quality', '4k', 'cinematography'],
+  compliance: ['SOC2', 'GDPR', 'ISO27001'],
 };
 
 // ============================================================================

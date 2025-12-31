@@ -142,6 +142,10 @@ export function ModelsClient() {
       'geospatial': 'bg-emerald-500',
       '3d': 'bg-indigo-500',
       'llm': 'bg-violet-500',
+      'video': 'bg-rose-500',
+      'video_generation': 'bg-rose-500',
+      'image': 'bg-amber-500',
+      'image_generation': 'bg-amber-500',
     };
     return <Badge className={colors[category] || 'bg-gray-500'}>{category}</Badge>;
   };

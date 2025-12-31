@@ -76,35 +76,39 @@ async function proxyRequest(
 // GET /api/admin/infrastructure/[...path]
 export const GET = withAuth(async (
   req: AuthenticatedRequest,
-  { params }: { params: { path: string[] } }
+  context
 ) => {
-  const resolvedParams = await params;
-  return proxyRequest(req, 'GET', resolvedParams.path);
+  const params = context?.params as { path: string[] } | undefined;
+  const path = params?.path || [];
+  return proxyRequest(req, 'GET', path);
 });
 
 // POST /api/admin/infrastructure/[...path]
 export const POST = withAuth(async (
   req: AuthenticatedRequest,
-  { params }: { params: { path: string[] } }
+  context
 ) => {
-  const resolvedParams = await params;
-  return proxyRequest(req, 'POST', resolvedParams.path);
+  const params = context?.params as { path: string[] } | undefined;
+  const path = params?.path || [];
+  return proxyRequest(req, 'POST', path);
 });
 
 // PUT /api/admin/infrastructure/[...path]
 export const PUT = withAuth(async (
   req: AuthenticatedRequest,
-  { params }: { params: { path: string[] } }
+  context
 ) => {
-  const resolvedParams = await params;
-  return proxyRequest(req, 'PUT', resolvedParams.path);
+  const params = context?.params as { path: string[] } | undefined;
+  const path = params?.path || [];
+  return proxyRequest(req, 'PUT', path);
 });
 
 // DELETE /api/admin/infrastructure/[...path]
 export const DELETE = withAuth(async (
   req: AuthenticatedRequest,
-  { params }: { params: { path: string[] } }
+  context
 ) => {
-  const resolvedParams = await params;
-  return proxyRequest(req, 'DELETE', resolvedParams.path);
+  const params = context?.params as { path: string[] } | undefined;
+  const path = params?.path || [];
+  return proxyRequest(req, 'DELETE', path);
 });
