@@ -108,6 +108,17 @@ const EXTERNAL_PROVIDERS = {
       { id: 'command-r', displayName: 'Command R', contextWindow: 128000, inputPer1M: 0.50, outputPer1M: 1.50, capabilities: ['chat', 'rag'] },
     ],
   },
+  'google-veo': {
+    id: 'google-veo',
+    displayName: 'Google Veo',
+    apiBase: 'https://generativelanguage.googleapis.com/v1beta',
+    models: [
+      { id: 'veo-2', displayName: 'Veo 2', contextWindow: 0, inputPer1M: 0, outputPer1M: 50.00, capabilities: ['video', 'text_to_video', 'image_to_video', '4k'], isNovel: true },
+      { id: 'veo-2-fast', displayName: 'Veo 2 Fast', contextWindow: 0, inputPer1M: 0, outputPer1M: 25.00, capabilities: ['video', 'text_to_video', 'fast'], isNovel: true },
+      { id: 'veo-2-4k', displayName: 'Veo 2 4K', contextWindow: 0, inputPer1M: 0, outputPer1M: 80.00, capabilities: ['video', 'text_to_video', '4k', 'ultra_hd'], isNovel: true },
+      { id: 'imagen-video', displayName: 'Imagen Video', contextWindow: 0, inputPer1M: 0, outputPer1M: 60.00, capabilities: ['video', 'text_to_video'], isNovel: true },
+    ],
+  },
 };
 
 interface SyncResult {

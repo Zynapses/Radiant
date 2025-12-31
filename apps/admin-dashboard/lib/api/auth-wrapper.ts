@@ -23,9 +23,9 @@ type RouteHandler = (
   context?: { params: Record<string, string> }
 ) => Promise<NextResponse> | NextResponse;
 
-type AuthenticatedRouteHandler = (
+type AuthenticatedRouteHandler<T = Record<string, string | string[]>> = (
   request: AuthenticatedRequest,
-  context?: { params: Record<string, string> }
+  context?: { params: T }
 ) => Promise<NextResponse> | NextResponse;
 
 interface AuthOptions {
@@ -95,11 +95,11 @@ function extractUserFromToken(token: string): AuthenticatedUser | null {
  *   { requiredRoles: ['admin', 'super_admin'] }
  * );
  */
-export function withAuth(
-  handler: AuthenticatedRouteHandler,
+export function withAuth<T = Record<string, string | string[]>>(
+  handler: AuthenticatedRouteHandler<T>,
   options: AuthOptions = {}
-): RouteHandler {
-  return async (request: NextRequest, context?: { params: Record<string, string> }) => {
+): (request: NextRequest, context?: { params: T }) => Promise<NextResponse> | NextResponse {
+  return async (request: NextRequest, context?: { params: T }) => {
     const { requiredRoles, allowPublic } = options;
     
     const token = getTokenFromRequest(request);
@@ -167,7 +167,9 @@ export function withAuth(
 /**
  * Wrap an API route handler that requires admin role
  */
-export function withAdminAuth(handler: AuthenticatedRouteHandler): RouteHandler {
+export function withAdminAuth<T = Record<string, string | string[]>>(
+  handler: AuthenticatedRouteHandler<T>
+): (request: NextRequest, context?: { params: T }) => Promise<NextResponse> | NextResponse {
   return withAuth(handler, { requiredRoles: ['admin', 'super_admin'] });
 }
 

@@ -3,6 +3,15 @@ import { specialtyRankingService, type SpecialtyCategory } from './specialty-ran
 import { domainTaxonomyService, type ProficiencyScores, type DomainDetectionResult } from './domain-taxonomy.service';
 import { consciousnessMiddlewareService, type AffectiveHyperparameters } from './consciousness-middleware.service';
 import { consciousnessService, type AffectiveState } from './consciousness.service';
+import { LearningInfluenceService } from './learning-influence.service';
+import { Pool } from 'pg';
+
+// Initialize learning influence service (pool will be set by caller)
+let learningInfluenceService: LearningInfluenceService | null = null;
+
+export function initializeLearningService(pool: Pool): void {
+  learningInfluenceService = new LearningInfluenceService(pool);
+}
 
 export type TaskType = 'chat' | 'code' | 'analysis' | 'creative' | 'vision' | 'audio';
 
@@ -36,6 +45,8 @@ interface RoutingContext {
   useDomainProficiencies?: boolean;  // Enable domain-aware scoring
   // Consciousness integration (P0 Fix B)
   useAffectMapping?: boolean;  // Enable affect → hyperparameter mapping
+  // Learning influence integration (v4.18.56)
+  useLearningInfluence?: boolean;  // Enable User → Tenant → Global learning influence
 }
 
 interface RoutingResult {
@@ -59,6 +70,9 @@ interface RoutingResult {
   // Consciousness-aware hyperparameters (P0 Fix B)
   affectiveHyperparameters?: AffectiveHyperparameters;
   consciousnessContext?: string;  // System prompt injection for stateful context
+  // Learning influence tracking (v4.18.56)
+  learningDecisionId?: string;  // For feedback loop
+  learningInfluenceUsed?: boolean;
 }
 
 interface ModelPerformance {
@@ -143,6 +157,35 @@ export class BrainRouter {
   private domainDetectionCache: Map<string, DomainDetectionResult> = new Map();
 
   async route(context: RoutingContext): Promise<RoutingResult> {
+    // 0. Get learning influence if enabled (User → Tenant → Global hierarchy)
+    let learningInfluence: Record<string, unknown> | undefined;
+    let learningDecisionId: string | undefined;
+    
+    if (context.useLearningInfluence && learningInfluenceService) {
+      try {
+        const influence = await learningInfluenceService.getLearningInfluence(
+          context.tenantId,
+          context.userId,
+          'model_selection',
+          {
+            taskType: context.taskType,
+            prompt: context.prompt?.substring(0, 200),
+            requiresVision: context.requiresVision,
+            requiresAudio: context.requiresAudio,
+          }
+        );
+        
+        learningInfluence = influence.combinedRecommendation;
+        
+        // Apply learned model preferences
+        if (influence.userInfluence?.model_preference) {
+          context.preferredProvider = influence.userInfluence.model_preference as string;
+        }
+      } catch {
+        // Learning service not available, continue without
+      }
+    }
+
     // 1. Check tenant-specific rules first
     const customRule = await this.checkCustomRules(context);
     if (customRule) return customRule;
@@ -229,7 +272,51 @@ export class BrainRouter {
       }
     }
 
+    // 9. Learning influence tracking (v4.18.56)
+    if (context.useLearningInfluence && learningInfluenceService && learningInfluence) {
+      try {
+        // Log the decision for future learning feedback loop
+        const { decisionId } = await learningInfluenceService.makeLearnedDecision(
+          context.tenantId,
+          context.userId,
+          'model_selection',
+          {
+            taskType: context.taskType,
+            prompt: context.prompt?.substring(0, 200),
+            domainDetection: result.domainDetection,
+          },
+          { selectedModel: result.model, selectedProvider: result.provider }
+        );
+        result.learningDecisionId = decisionId;
+        result.learningInfluenceUsed = true;
+        
+        // Update tenant model performance tracking
+        await learningInfluenceService.updateTenantModelPerformance(
+          context.tenantId,
+          result.model,
+          context.taskType,
+          true // Assume success, will be updated via feedback
+        );
+      } catch {
+        // Learning tracking failed, continue without
+      }
+    }
+
     return result;
+  }
+
+  /**
+   * Record the outcome of a routing decision for learning feedback loop
+   * Call this after receiving user feedback or implicit signals
+   */
+  async recordRoutingOutcome(
+    tenantId: string,
+    decisionId: string,
+    positive: boolean
+  ): Promise<void> {
+    if (learningInfluenceService) {
+      await learningInfluenceService.recordDecisionOutcome(decisionId, positive, tenantId);
+    }
   }
 
   // Domain detection with caching

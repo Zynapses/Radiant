@@ -28,3 +28,5 @@ export * from './inference-components.types';
 export * from './consciousness.types';
 export * from './bipolar-rating.types';
 export * from './formal-reasoning.types';
+export * from './user-registry.types';
+export * from './metrics-learning.types';

@@ -5,6 +5,639 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.56] - 2025-12-31
+
+### Added
+
+#### Metrics & Persistent Learning Infrastructure
+
+Comprehensive metrics collection and persistent learning system with User → Tenant → Global influence hierarchy. System survives reboots without relearning.
+
+**Metrics Collection:**
+- **Billing Metrics**: Token usage, cost breakdown (cents), storage, compute, API calls
+- **Performance Metrics**: Latency (total, TTFT, inference), throughput, percentiles (p50-p99)
+- **Failure Events**: 12 failure types with severity levels, resolution tracking
+- **Prompt Violations**: 15 violation types, detection methods, review workflow
+- **System Logs**: Centralized logging with 6 levels (trace-fatal)
+
+**Persistent Learning Hierarchy:**
+| Level | Weight | Description |
+|-------|--------|-------------|
+| User | 60% | Individual preferences, rules, behaviors (highest priority) |
+| Tenant | 30% | Aggregate patterns from organization users |
+| Global | 10% | Anonymized cross-tenant baseline (min 5 tenants) |
+
+**User Learning (Think Tank Rules):**
+- Versioned user rules with automatic history tracking
+- Categories: behavior, format, tone, content, restriction, preference, domain, persona, workflow
+- Learned preferences: communication style, response format, detail level, expertise, model preference
+- Learning sources: explicit, implicit, feedback, conversation, pattern detection
+
+**Tenant Aggregate Learning:**
+- Model performance tracking (quality, speed, cost-efficiency, reliability scores)
+- Learning dimensions: task patterns, error recovery, format preferences, domain expertise
+- Learning events with impact scoring
+
+**Global Aggregate Learning:**
+- Anonymized with minimum 5-tenant threshold
+- Pattern library for shared successful approaches
+- Per-tenant opt-out available
+
+**Snapshot & Recovery:**
+- Daily snapshots for user, tenant, and global scopes
+- Checksum verification for integrity
+- Recovery logs with detailed audit trail
+- **NO RELEARNING REQUIRED** after system reboot
+
+**Database Schema (Migration 129):**
+- Metrics: `billing_metrics`, `performance_metrics`, `failure_events`, `prompt_violations`, `system_logs`
+- User Learning: `user_rules`, `user_rules_versions`, `user_learned_preferences`, `user_preference_versions`
+- Tenant Learning: `tenant_aggregate_learning`, `tenant_learning_events`, `tenant_model_performance`
+- Global Learning: `global_aggregate_learning`, `global_model_performance`, `global_pattern_library`
+- Config: `learning_influence_config`, `learning_decision_log`
+- Recovery: `learning_snapshots`, `learning_recovery_log`
+
+**API Endpoints (Base: /api/admin/metrics):**
+- Dashboard: `GET /dashboard`, `GET /summary`
+- Billing: `GET/POST /billing`
+- Performance: `GET/POST /performance`, `GET /performance/latency`
+- Failures: `GET/POST /failures`, `POST /failures/:id/resolve`
+- Violations: `GET/POST /violations`, `POST /violations/:id/review`
+- Learning: `GET /learning/influence`, `GET/PUT /learning/config`, `GET /learning/tenant`, `GET /learning/global`
+- Snapshots: `GET/POST /learning/snapshots`, `POST /learning/snapshots/:id/recover`
+
+**Admin Dashboard:**
+- New Metrics page at `apps/admin-dashboard/app/(dashboard)/metrics/page.tsx`
+- Tabs: Overview, Billing, Performance, Failures, Violations, Learning
+- Learning hierarchy visualization with weight breakdown
+
+**Files Created:**
+- `packages/shared/src/types/metrics-learning.types.ts`
+- `packages/infrastructure/lambda/shared/services/metrics-collection.service.ts`
+- `packages/infrastructure/lambda/shared/services/learning-influence.service.ts`
+- `packages/infrastructure/lambda/admin/metrics.ts`
+- `packages/infrastructure/migrations/129_metrics_persistent_learning.sql`
+- `apps/admin-dashboard/app/(dashboard)/metrics/page.tsx`
+
+**Documentation:**
+- RADIANT-ADMIN-GUIDE.md Section 36: Complete metrics and learning documentation
+- THINKTANK-ADMIN-GUIDE.md Section 28: User memories and persistent learning
+
+---
+
+## [4.18.55] - 2025-12-31
+
+### Added
+
+#### Intelligent File Conversion Service
+
+Radiant-side file conversion system that automatically decides when and how to convert files for AI providers. Think Tank drops files, Radiant decides what to do.
+
+**Core Concept:**
+- Think Tank submits files without worrying about provider compatibility
+- Radiant detects file format and checks target provider capabilities
+- Conversion only happens if the AI provider doesn't understand the format
+- Uses AI + libraries for intelligent conversion
+
+**File Conversion Service (`lambda/shared/services/file-conversion.service.ts`):**
+- Format detection from MIME types and file extensions
+- Provider capabilities registry (OpenAI, Anthropic, Google, xAI, DeepSeek, self-hosted)
+- Conversion decision engine with 10 strategies:
+  - `none` - No conversion needed (native support)
+  - `extract_text` - PDF, DOCX, PPTX text extraction
+  - `ocr` - Image OCR for text-heavy images
+  - `transcribe` - Audio to text (Whisper)
+  - `describe_image` - AI image description for non-vision providers
+  - `describe_video` - Frame extraction + description
+  - `parse_data` - CSV/XLSX to structured JSON
+  - `decompress` - Archive extraction
+  - `render_code` - Syntax-highlighted code formatting
+  - `unsupported` - Fallback text extraction
+
+**Database Schema (Migration 127):**
+- `file_conversions` - Tracks all conversion decisions and results
+- `provider_file_capabilities` - Provider format support registry
+- `v_file_conversion_stats` - Aggregated statistics view
+- `check_format_supported()` - Format compatibility check
+- `get_conversion_stats()` - Tenant statistics function
+- `cleanup_old_conversions()` - Retention cleanup
+
+**API Endpoints (Think Tank):**
+- `POST /api/thinktank/files/process` - Submit file for processing
+- `POST /api/thinktank/files/check-compatibility` - Pre-flight format check
+- `GET /api/thinktank/files/capabilities` - Provider capabilities
+- `GET /api/thinktank/files/history` - Conversion history
+- `GET /api/thinktank/files/stats` - Conversion statistics
+
+**Supported Formats (25+):**
+- Documents: PDF, DOCX, DOC, XLSX, XLS, PPTX, PPT
+- Text: TXT, MD, JSON, CSV, XML, HTML
+- Images: PNG, JPG, JPEG, GIF, WEBP, SVG, BMP, TIFF
+- Audio: MP3, WAV, OGG, FLAC, M4A
+- Video: MP4, WEBM, MOV, AVI
+- Code: PY, JS, TS, Java, C++, C, Go, Rust, Ruby
+- Archives: ZIP, TAR, GZ
+
+**Provider Capabilities:**
+| Provider | Vision | Audio | Video | Max Size | Native Docs |
+|----------|--------|-------|-------|----------|-------------|
+| OpenAI | ✓ | ✓ | ✗ | 20MB | txt, md, json, csv |
+| Anthropic | ✓ | ✗ | ✗ | 32MB | pdf, txt, md, json, csv |
+| Google | ✓ | ✓ | ✓ | 100MB | pdf, txt, md, json, csv |
+| xAI | ✓ | ✗ | ✗ | 20MB | txt, md, json |
+| DeepSeek | ✗ | ✗ | ✗ | 10MB | txt, md, json, csv |
+| Self-hosted | ✓ | ✓ | ✗ | 50MB | txt, md, json, csv |
+
+**Converter Modules:**
+- `packages/infrastructure/lambda/shared/services/converters/pdf-converter.ts` - PDF text extraction (pdf-parse)
+- `packages/infrastructure/lambda/shared/services/converters/docx-converter.ts` - DOCX extraction (mammoth)
+- `packages/infrastructure/lambda/shared/services/converters/excel-converter.ts` - Excel/CSV parsing (xlsx)
+- `packages/infrastructure/lambda/shared/services/converters/audio-converter.ts` - Audio transcription (Whisper)
+- `packages/infrastructure/lambda/shared/services/converters/image-converter.ts` - Image description + OCR (Textract)
+- `packages/infrastructure/lambda/shared/services/converters/video-converter.ts` - Video frame extraction (ffmpeg)
+- `packages/infrastructure/lambda/shared/services/converters/archive-converter.ts` - Archive decompression (adm-zip, tar)
+
+**Files Created:**
+- `packages/infrastructure/lambda/shared/services/file-conversion.service.ts`
+- `packages/infrastructure/lambda/thinktank/file-conversion.ts`
+- `packages/infrastructure/migrations/127_file_conversion_service.sql`
+
+#### Domain-Specific File Format Support
+
+AGI Brain integration for intelligent conversion of domain-specific file formats. Supports 50+ specialized formats across multiple domains with library recommendations.
+
+**Domain Registries (`converters/domain-formats.ts`):**
+
+| Domain | Formats | Example Libraries |
+|--------|---------|-------------------|
+| **Mechanical Engineering** | STEP, STL, OBJ, Fusion 360, IGES, DXF, GLTF | OpenCASCADE, trimesh, FreeCAD |
+| **Electrical Engineering** | KiCad, EAGLE, SPICE | kicad-cli, PySpice, ngspice |
+| **Medical/Healthcare** | DICOM, HL7 FHIR | pydicom, fhir.resources |
+| **Scientific** | NetCDF, HDF5, FITS | xarray, h5py, astropy |
+| **Geospatial** | Shapefile, GeoTIFF | geopandas, rasterio |
+| **Bioinformatics** | FASTA, PDB | Biopython, py3Dmol |
+
+**CAD Converter (`converters/cad-converter.ts`):**
+- Native parsing for STL (ASCII & binary), OBJ, DXF
+- STEP metadata extraction (entities, parts, assembly structure)
+- GLTF/GLB scene analysis
+- Bounding box calculation, triangle counts, geometry metrics
+- 3D printing assessment for STL files
+
+**AGI Brain Integration (`converters/domain-converter-selector.ts`):**
+- `planDomainConversion()` - Creates conversion plan based on format + user domain
+- `convertDomainFile()` - Executes domain-specific conversion
+- `getSupportedDomainFormats()` - Lists all supported formats by domain
+- `getAiDescriptionPrompt()` - Gets specialized AI prompt for format
+- `getRequiredDependencies()` - Returns npm/python/system dependencies
+
+**Conversion Strategy Selection:**
+- User's domain context influences strategy (technical vs visual)
+- Conversation context parsing ("preview" → visual, "export" → data)
+- Library availability fallback
+- AI description prompts per format
+
+**Files Created:**
+- `packages/infrastructure/lambda/shared/services/converters/cad-converter.ts`
+- `packages/infrastructure/lambda/shared/services/converters/domain-formats.ts`
+- `packages/infrastructure/lambda/shared/services/converters/domain-converter-selector.ts`
+
+#### Multi-Model File Preparation
+
+Per-model conversion decisions for multi-model orchestration. Only converts files for models that don't support the format - passes original to models with native support.
+
+**Key Principle:** "If a model accepts the file type, assume it understands it unless proven otherwise."
+
+**Service (`multi-model-file-prep.service.ts`):**
+- `prepareFileForModels()` - Prepare single file for multiple target models
+- `getContentForModel()` - Get appropriate content (original or converted) for specific model
+- `addFormatOverride()` - Mark model as needing conversion despite claiming support
+- `generatePrepSummary()` - Human-readable summary of prep decisions
+
+**Per-Model Actions:**
+| Action | When | Result |
+|--------|------|--------|
+| `pass_original` | Model natively supports format | Original file passed |
+| `convert` | Model doesn't support format | Converted content passed |
+| `skip` | File too large or conversion failed | Model excluded |
+
+**Features:**
+- Cached conversions - convert once, reuse for all models that need it
+- Model format overrides - when a model proves it doesn't understand a format
+- Per-model capability checking (vision, audio, video, document formats)
+- File size limit checking per provider
+
+**Files Created:**
+- `packages/infrastructure/lambda/shared/services/multi-model-file-prep.service.ts`
+
+#### File Conversion Reinforcement Learning
+
+AGI Brain/consciousness integration for persistent learning from file conversion outcomes. The system learns which models truly understand which formats.
+
+**Key Principle:** Learn from experience - when a model claims to support a format but fails, remember it.
+
+**Learning Service (`file-conversion-learning.service.ts`):**
+- `recordOutcomeFeedback()` - Record conversion outcome and update understanding
+- `getFormatRecommendation()` - Get learned recommendation for model/format
+- `inferOutcomeFromResponse()` - Auto-detect outcome from model response
+- `setForceConvert()` / `clearForceConvert()` - Admin overrides
+
+**Understanding Score (0.0 to 1.0):**
+| Score | Meaning | Action |
+|-------|---------|--------|
+| 0.8 - 1.0 | Excellent | Pass original |
+| 0.6 - 0.8 | Good | Pass original |
+| 0.4 - 0.6 | Moderate | May convert |
+| 0.0 - 0.4 | Poor | Convert |
+
+**Learning Signals:**
+- User feedback (1-5 star ratings)
+- Model response analysis (understood vs confused)
+- Error/hallucination detection
+- Conversion success/failure outcomes
+
+**Consciousness Integration:**
+Creates Learning Candidates for significant events:
+- `format_misunderstanding` - Model failed on claimed format
+- `unnecessary_conversion` - Model would have understood
+- `hallucination_detection` - Model made up content
+- `user_correction` - Negative user feedback
+
+**Database Tables (Migration 128):**
+- `model_format_understanding` - Per-tenant model/format scores
+- `conversion_outcome_feedback` - Recorded feedback
+- `format_understanding_events` - Audit trail
+- `global_format_learning` - Cross-tenant aggregates
+
+**Files Created:**
+- `packages/infrastructure/lambda/shared/services/file-conversion-learning.service.ts`
+- `packages/infrastructure/migrations/128_file_conversion_learning.sql`
+
+---
+
+#### Tenant Management System (TMS)
+
+Comprehensive tenant lifecycle management with soft delete, restore, phantom tenants, multi-tenant user support, and configurable retention:
+
+**Database Schema (Migration 126):**
+- Extended `tenants` table with type, tier, compliance_mode, retention_days, deletion tracking
+- `tenant_user_memberships` - Multi-tenant user support with role-based membership
+- `tms_risk_acceptances` - Compliance risk acceptance tracking
+- `tms_audit_log` - Immutable audit trail for all TMS operations
+- `tms_retention_settings` - Global retention configuration
+- `tms_verification_codes` - 2FA codes for sensitive operations
+- `tms_deletion_notifications` - Deletion warning tracking
+
+**PostgreSQL Functions:**
+- `tms_prevent_orphan_users()` - Trigger to prevent orphan users (no tenant membership)
+- `tms_process_scheduled_deletions()` - Batch hard delete processing
+- `tms_create_phantom_tenant()` - Individual tenant creation for new signups
+- `tms_create_verification_code()` - Generate 6-digit verification codes
+- `tms_verify_code()` - Verify codes with attempt limiting
+
+**Views:**
+- `v_tms_tenant_summary` - Tenant overview with user counts
+- `v_tms_user_memberships` - User membership summary
+- `v_tms_pending_deletions` - Tenants scheduled for deletion
+
+**TMS Package (`packages/tms/`):**
+- Complete TypeScript types with Zod validation schemas
+- TenantService with full CRUD, soft delete, restore, phantom creation
+- NotificationService for email notifications (SES)
+- Database utilities with Aurora Data API support
+
+**Lambda Handlers (12):**
+- `create-tenant` - POST /tenants
+- `get-tenant` - GET /tenants/{tenantId}
+- `update-tenant` - PUT /tenants/{tenantId}
+- `delete-tenant` - DELETE /tenants/{tenantId} (soft delete)
+- `restore-tenant` - POST /tenants/{tenantId}/restore
+- `request-restore-code` - POST /tenants/{tenantId}/restore/request-code
+- `phantom-tenant` - POST /phantom-tenant
+- `list-tenants` - GET /tenants
+- `list-memberships` - GET /tenants/{tenantId}/users
+- `add-membership` - POST /tenants/{tenantId}/users
+- `update-membership` - PUT /tenants/{tenantId}/users/{userId}
+- `remove-membership` - DELETE /tenants/{tenantId}/users/{userId}
+
+**Scheduled Jobs (4):**
+- Hard Delete Job - Daily 3:00 AM UTC (processes expired tenants)
+- Deletion Notification Job - Daily 9:00 AM UTC (7/3/1 day warnings)
+- Orphan Check Job - Weekly Sunday 2:00 AM UTC (cleanup)
+- Compliance Report Job - Monthly 1st 4:00 AM UTC
+
+**CDK Stack (`TmsStack`):**
+- All Lambda functions with proper IAM roles
+- API Gateway with CORS support
+- EventBridge schedules for all jobs
+- SNS topic for security alerts
+- S3 audit bucket with Object Lock
+- Optional Lambda code signing
+
+**Admin Dashboard:**
+- Complete tenant management page (`/tenants`)
+- Create tenant dialog with all fields
+- Delete tenant with reason and notification
+- Restore tenant with verification code flow
+- Filtering, pagination, search
+- Pending deletions alert section
+
+**Key Features:**
+- **No Orphan Users**: Database trigger ensures users always have at least one tenant
+- **Phantom Tenants**: Auto-creates individual workspace for new user signups
+- **Configurable Retention**: 7-730 days with HIPAA minimum of 90 days
+- **2FA for Sensitive Ops**: Verification code required for restore/hard delete
+- **Multi-Tenant Users**: Users can belong to multiple organizations
+- **Compliance Modes**: HIPAA, SOC2, GDPR framework support
+- **5-Tier System**: SEED, SPROUT, GROWTH, SCALE, ENTERPRISE
+
+**Files Created:**
+- `packages/infrastructure/migrations/126_tenant_management_system.sql`
+- `packages/tms/` (complete package with types, services, handlers, tests)
+- `packages/infrastructure/lib/stacks/tms-stack.ts`
+- `apps/admin-dashboard/app/(dashboard)/tenants/page.tsx`
+
+---
+
+## [4.18.54] - 2025-12-30
+
+### Added
+
+#### Multi-Application User Registry
+
+Comprehensive multi-tenant user registry with data sovereignty, consent management, DSAR compliance, break glass access, and legal hold:
+
+**Database Schema (auth schema):**
+- `auth.tenant_id()` - STABLE function for efficient RLS
+- `auth.user_id()` - STABLE function for user context
+- `auth.app_id()` - STABLE function for app isolation
+- `auth.permission_level()` - STABLE function for authorization
+- `auth.is_break_glass()` - STABLE function for emergency access
+- `auth.set_context()` / `auth.clear_context()` - Context management
+
+**Table Extensions:**
+- `tenants` - Added data_region, allowed_regions, tier, compliance_frameworks, billing_email
+- `users` - Added jurisdiction, age_bracket, mfa_enabled, locale, timezone, deleted_at, anonymized_at
+- `registered_apps` - Added tenant_id, app_type, client_secret_hash, secret_rotation_at, rate_limit_tier
+
+**New Tables (6):**
+- `user_application_assignments` - User-to-app assignments with permissions
+- `consent_records` - GDPR/CCPA/COPPA consent tracking with lawful basis
+- `data_retention_obligations` - Legal hold and retention management
+- `break_glass_access_log` - Immutable emergency access audit trail
+- `dsar_requests` - Data subject access request tracking
+
+**Credential Management:**
+- `verify_app_credentials()` - Dual-active credential verification
+- `rotate_app_secret()` - Zero-downtime secret rotation with window
+- `set_app_secret()` - Initial credential setup
+- `clear_expired_rotation_windows()` - Cleanup function
+
+**Break Glass Access:**
+- `initiate_break_glass()` - Start emergency access with audit
+- `end_break_glass()` - End access with action summary
+- P0 alerting via SNS for all break glass events
+- Immutable audit log with hash chain
+
+**Legal Hold:**
+- `apply_legal_hold()` - Prevent data deletion for legal matters
+- `release_legal_hold()` - Release holds with audit trail
+- Case ID tracking for litigation support
+
+**DSAR Compliance:**
+- `process_dsar_request()` - Handle access/delete/portability requests
+- `withdraw_consent()` - Consent withdrawal with cascade
+- `check_cross_border_transfer()` - Cross-border transfer validation
+- 30-day SLA tracking with status workflow
+
+**Infrastructure (CDK):**
+- DynamoDB tables for Cognito token enrichment
+- S3 bucket with Object Lock for 7-year audit retention
+- KMS key for audit log encryption
+- Kinesis Firehose for audit log delivery
+- SNS topic for security alerts
+
+**API Endpoints (25+):**
+- Dashboard and statistics
+- User-application assignment CRUD
+- Consent management and withdrawal
+- Legal hold apply/release
+- Break glass initiate/end
+- DSAR processing
+- Cross-border transfer validation
+- Credential rotation
+
+**Files Created:**
+- `packages/infrastructure/migrations/125_multi_app_user_registry.sql`
+- `packages/shared/src/types/user-registry.types.ts`
+- `packages/infrastructure/lambda/shared/services/db-context.service.ts`
+- `packages/infrastructure/lambda/shared/services/user-registry.service.ts`
+- `packages/infrastructure/lambda/admin/user-registry.ts`
+- `packages/infrastructure/lambda/authorizer/token-authorizer.ts`
+- `packages/infrastructure/lib/stacks/user-registry-stack.ts`
+
+---
+
+## [4.18.53] - 2025-12-30
+
+### Added
+
+#### Compliance Checklist Registry
+
+Full-featured compliance checklist system linked to regulatory standards with versioning and auto-update:
+
+**Database Tables (8 new):**
+- `compliance_checklist_versions` - Versioned checklists per regulatory standard
+- `compliance_checklist_categories` - Categories organizing checklist items
+- `compliance_checklist_items` - Individual items with guidance and evidence types
+- `tenant_checklist_config` - Per-tenant version selection (auto/specific/pinned)
+- `tenant_checklist_progress` - Item completion tracking
+- `checklist_audit_runs` - Audit run history and results
+- `regulatory_version_updates` - Detected regulatory updates
+- `checklist_update_sources` - Auto-update source configuration
+
+**Version Selection Modes:**
+- **Auto** (default): Automatically uses latest active version
+- **Specific**: Use specific version, notified of updates
+- **Pinned**: Locked to exact version, no automatic updates
+
+**Pre-Built Checklists:**
+- SOC 2 Type II v2024.1 (7 categories, 18+ items)
+- HIPAA v2024.1
+- GDPR v2024.1
+- ISO 27001:2022 v2022.1
+- PCI-DSS v4.0
+
+**Admin UI Features:**
+- Dashboard showing all standards with completion progress
+- Per-standard checklist with category views
+- Item status tracking (not started, in progress, completed, blocked, N/A)
+- Version selector with auto/pinned modes
+- Audit run management (manual, scheduled, pre-audit, certification)
+- Evidence linking to checklist items
+
+**API Endpoints (20+):**
+- Dashboard and configuration management
+- Version and category CRUD
+- Checklist item management
+- Progress tracking per tenant
+- Audit run lifecycle
+- Auto-update source management
+
+**Files Created:**
+- `packages/infrastructure/migrations/124_compliance_checklist_registry.sql`
+- `packages/infrastructure/lambda/shared/services/checklist-registry.service.ts`
+- `packages/infrastructure/lambda/admin/checklist-registry.ts`
+- `apps/admin-dashboard/app/(dashboard)/compliance/checklists/page.tsx`
+
+---
+
+## [4.18.52] - 2025-12-30
+
+### Added
+
+#### Google Veo Video Generation Provider
+
+Added Google DeepMind Veo as a hosted AI provider for video generation:
+
+**Models Added:**
+- **Veo 2**: Flagship video generation with photorealistic output, 4K support, cinematography
+- **Veo 2 Fast**: Faster variant with reduced latency for quick generations
+- **Veo 2 4K**: Ultra high-definition 4K video generation
+- **Imagen Video**: Google Imagen-based video generation with high visual fidelity
+
+**Capabilities:**
+- Text-to-video generation
+- Image-to-video generation
+- 4K and 1080p resolutions
+- Multiple aspect ratios (16:9, 9:16, 1:1, 21:9)
+- Up to 120 seconds video duration
+- Physics simulation and cinematography controls
+
+**Files Modified:**
+- `packages/infrastructure/lib/config/providers/video.providers.ts` - Enhanced Veo provider with 4 models
+- `packages/infrastructure/lambda/admin/sync-providers.ts` - Added Veo to sync service
+- `apps/admin-dashboard/app/(dashboard)/models/models-client.tsx` - Added video category badges
+
+### Improved
+
+#### Compliance Documentation
+
+Enhanced compliance regulations documentation in the administrator guide:
+
+- **SOC 2 Type II**: Trust Services Criteria mapping with evidence sources
+- **HIPAA/HITECH**: Administrative and technical safeguards with configuration details
+- **GDPR**: Lawful bases, data subject rights, cross-border transfers
+- **ISO 27001:2022**: Annex A controls implementation mapping
+- **PCI-DSS v4.0**: All 12 requirements with implementation details
+- **FedRAMP/StateRAMP**: Control families and authorization boundaries
+- **EU AI Act**: Risk classification and article compliance
+
+Added compliance audit checklist with pre-audit preparation steps, required documentation, and evidence collection API endpoints.
+
+---
+
+## [4.18.51] - 2025-12-30
+
+### Added
+
+#### Self-Audit & Regulatory Reporting
+
+Automated compliance self-auditing with timestamped pass/fail results visible in admin dashboard:
+
+**45+ Automated Compliance Checks:**
+- **SOC 2**: MFA enforcement, password policy, session timeout, RBAC, encryption, audit logging, change management
+- **HIPAA**: PHI encryption, PHI detection, access logging, minimum necessary, BAA tracking, data retention
+- **GDPR**: Consent management, data subject rights, processing records, breach notification
+- **ISO 27001**: Security policy, access control, cryptographic controls, incident management
+- **PCI-DSS**: Firewall, cardholder data protection, transmission encryption, audit trails
+
+**Database Tables:**
+- `compliance_audit_runs` - Audit execution history with scores
+- `compliance_audit_results` - Individual check results per run
+- `compliance_audit_schedules` - Scheduled audit configurations
+- `system_audit_checks` - Registry of all automated checks
+
+**Admin API Endpoints** (Base: `/api/admin/self-audit`):
+- `GET /dashboard` - Summary stats, framework scores, recent runs
+- `POST /run` - Execute compliance audit by framework
+- `GET /history` - Audit run history with filtering
+- `GET /runs/:runId` - Full audit run with results
+- `GET /runs/:runId/results` - Individual check results
+- `GET /runs/:runId/report` - Generate compliance report
+- `GET /checks` - List all registered audit checks
+- `GET /frameworks` - Available frameworks with check counts
+
+**Admin UI:**
+- Dashboard with overall pass rate and framework scores
+- Framework compliance score cards with trend indicators
+- Audit history table with status, scores, and timing
+- Run details sheet with category breakdown
+- Critical failures highlight panel
+- Check registry browser by framework
+- One-click audit execution per framework or all
+
+**Database Functions:**
+- `run_audit_check(check_code)` - Execute single check
+- `run_framework_audit(framework)` - Execute all framework checks
+
+**Files Created:**
+- `migrations/123_compliance_audit_history.sql`
+- `lambda/shared/services/self-audit.service.ts`
+- `lambda/admin/self-audit.ts`
+- `apps/admin-dashboard/app/(dashboard)/compliance/self-audit/page.tsx`
+
+---
+
+## [4.18.50] - 2025-12-30
+
+### Added
+
+#### Regulatory Standards Registry
+
+Comprehensive registry of all regulatory standards Radiant must comply with:
+
+**35 Regulatory Frameworks:**
+- **Data Privacy**: GDPR, CCPA, CPRA, LGPD, PIPEDA, APPI, PDPA
+- **Healthcare**: HIPAA, HITECH, HITRUST CSF
+- **Security**: SOC 2, SOC 1, ISO 27001, ISO 27017, ISO 27018, ISO 27701, CSA STAR, NIST CSF, NIST 800-53, CIS Controls
+- **Financial**: PCI-DSS, SOX, GLBA
+- **Government**: FedRAMP, StateRAMP, ITAR, CMMC
+- **AI Governance**: EU AI Act, NIST AI RMF, ISO 42001, IEEE 7000
+- **Accessibility**: WCAG 2.1, ADA, Section 508
+- **Industry-Specific**: FERPA, COPPA
+
+**Database Tables:**
+- `regulatory_standards` - Master registry with 35 frameworks
+- `regulatory_requirements` - Individual controls/requirements per standard
+- `tenant_compliance_status` - Per-tenant compliance tracking
+- `compliance_evidence` - Evidence artifacts for audits
+
+**Admin API Endpoints** (Base: `/api/admin/regulatory-standards`):
+- `GET /dashboard` - Summary stats and priority standards
+- `GET /` - List all standards with filters
+- `GET /:id` - Standard details with requirements
+- `PUT /:id` - Update standard metadata
+- `GET /:id/requirements` - List requirements
+- `PATCH /requirements/:id` - Update requirement status
+- `GET /tenant-compliance` - Tenant's compliance status
+- `PUT /tenant-compliance/:standardId` - Update tenant compliance
+- `GET /categories` - List all categories
+
+**Admin UI:**
+- Overview dashboard with summary cards and progress
+- Standards browser with search and filtering
+- Tenant compliance tracker with enable/disable
+- Requirements implementation tracker
+- Standard details sheet with requirement status updates
+
+**Files Created:**
+- `migrations/122_regulatory_standards_registry.sql`
+- `lambda/admin/regulatory-standards.ts`
+- `apps/admin-dashboard/app/(dashboard)/compliance/regulatory-standards/page.tsx`
+
+---
+
 ## [4.18.49] - 2025-01-15
 
 ### Added

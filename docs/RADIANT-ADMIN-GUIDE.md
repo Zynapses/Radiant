@@ -2,7 +2,9 @@
 
 > **Complete guide for managing the RADIANT AI Platform via the Admin Dashboard**
 > 
-> Version: 4.18.1 | Last Updated: December 2024
+> Version: 4.18.55 | Last Updated: December 30, 2024
+>
+> **Compliance Frameworks:** HIPAA, SOC 2 Type II, GDPR, FDA 21 CFR Part 11
 
 ---
 
@@ -158,6 +160,100 @@ RADIANT supports multiple API key types:
 - **Admin API Keys**: For administrative operations, require elevated permissions
 - **Scoped Keys**: Limited to specific models, endpoints, or rate limits
 
+### 1.4 Authentication Flow & Security
+
+#### JWT-Based Authentication
+
+All authentication flows through Amazon Cognito with JWT tokens:
+
+```
+┌─────────┐    1. Login    ┌─────────┐    2. Validate    ┌─────────┐
+│  User   │ ─────────────▶ │ Cognito │ ────────────────▶ │   JWT   │
+└─────────┘                └─────────┘                   └────┬────┘
+                                                              │
+                                                    3. Include Claims
+                                                              │
+                                                              ▼
+┌─────────┐   6. Execute   ┌─────────┐   5. Set Context  ┌─────────┐
+│ Database│ ◀───────────── │ Lambda  │ ◀──────────────── │   API   │
+└─────────┘                └─────────┘                   │ Gateway │
+                                                         └────┬────┘
+                                                              │
+                                                    4. Validate JWT
+                                                         Extract tenant_id
+```
+
+**Authentication Steps:**
+
+1. **Authentication:** Users authenticate via Amazon Cognito. Upon success, they receive a JSON Web Token (JWT).
+2. **Token Validation:** The API Gateway Custom Authorizer validates the JWT signature using Cognito's public keys.
+3. **Context Injection:** The Authorizer extracts the immutable `tenant_id` from the JWT claims and injects it into the request context.
+4. **Lambda Context Setting:** The Lambda function sets PostgreSQL session variables before any database operation.
+5. **RLS Enforcement:** All queries are automatically filtered by the database engine.
+
+#### JWT Claims Structure
+
+```json
+{
+  "sub": "user-uuid-here",
+  "email": "user@example.com",
+  "custom:tenant_id": "tenant-uuid-here",
+  "custom:app_id": "thinktank",
+  "custom:user_role": "member",
+  "custom:tenant_role": "admin",
+  "iat": 1735570000,
+  "exp": 1735573600,
+  "iss": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_XXXXX"
+}
+```
+
+#### Critical Security Invariant
+
+> **⚠️ CRITICAL:** Application code **NEVER** accepts a `tenant_id` from the request body, query parameters, or custom headers. It **ONLY** trusts the ID injected by the API Gateway Authorizer from the cryptographically signed JWT.
+
+This is the single most important security rule in the RADIANT architecture. Violation of this rule creates a critical vulnerability allowing tenant impersonation.
+
+#### Conditional Access Policies
+
+| Condition | Action |
+|-----------|--------|
+| New device detected | Require MFA re-authentication |
+| Unusual location | Challenge with security questions |
+| After-hours access | Alert + additional logging |
+| Multiple failed attempts | Temporary lockout + notification |
+| API key from new IP | Rate limit + alert |
+| Tenant status = suspended | Reject all requests |
+| Tenant status = pending_deletion | Reject all requests |
+
+### 1.5 Compute Isolation (Lambda Tenant Isolation Mode)
+
+RADIANT leverages **AWS Lambda Tenant Isolation Mode** (released 2025) to enforce strict boundaries between tenants sharing the same function code.
+
+#### How It Works
+
+1. **Request Arrival** - Request arrives at Lambda with tenant identifier in event payload
+2. **Tenant Detection** - Lambda service inspects the `tenant_id` field from the authorizer context
+3. **Environment Binding** - Request routed to execution environment dedicated to that tenant
+4. **Isolation Guarantee** - Warm environments are tenant-specific and never reused across tenants
+5. **Resource Isolation** - `/tmp` directory and memory are cryptographically isolated per tenant
+
+#### Security Guarantees
+
+| Threat | Without Isolation Mode | With Isolation Mode |
+|--------|----------------------|---------------------|
+| `/tmp` data leakage | Possible (shared container) | **Eliminated** (separate microVM) |
+| Memory scraping | Possible (shared memory) | **Eliminated** (isolated memory) |
+| Global variable pollution | Possible | **Eliminated** |
+| Cold start timing attacks | Reduced | **Eliminated** |
+| Environment variable exposure | Possible | **Eliminated** |
+
+#### Administrator Verification
+
+To verify Tenant Isolation Mode is enabled:
+1. AWS Console → Lambda → Function → Configuration → Concurrency
+2. Check for "Tenant Isolation: Enabled" badge
+3. Or via AWS CLI: `aws lambda get-function-configuration --function-name <name>`
+
 ---
 
 ## 2. Accessing the Admin Dashboard
@@ -257,32 +353,67 @@ The dashboard displays key metrics at a glance:
 
 ## 4. Tenant Management
 
+> **New in v4.18.55**: Complete Tenant Management System (TMS) with lifecycle management, multi-tenant users, soft delete/restore, and compliance features.
+
 ### 4.1 Viewing Tenants
 
 Navigate to **Tenants** to see all organizations:
 
 | Column | Description |
 |--------|-------------|
-| **Name** | Organization name |
-| **Plan** | Subscription tier |
-| **Users** | User count |
-| **Status** | Active/Suspended/Trial |
-| **Created** | Creation date |
-| **Last Active** | Last API call |
+| **Name** | Organization display name and internal identifier |
+| **Type** | Organization or Individual (phantom tenant) |
+| **Tier** | Service tier (1-5: SEED, SPROUT, GROWTH, SCALE, ENTERPRISE) |
+| **Status** | Active, Suspended, Pending, Pending Deletion, Deleted |
+| **Compliance** | HIPAA, SOC2, GDPR badges if enabled |
+| **Users** | Active user count with invited/suspended breakdown |
+| **Created** | Creation date with relative time |
+
+#### Tenant Types
+
+| Type | Description | Use Case |
+|------|-------------|----------|
+| **Organization** | Company or team workspace | B2B customers |
+| **Individual** | Personal workspace (phantom tenant) | B2C users, free tier |
+
+#### Tenant Tiers
+
+| Tier | Name | Features |
+|------|------|----------|
+| 1 | SEED | Basic features, standard support |
+| 2 | SPROUT | Advanced features, email support |
+| 3 | GROWTH | Premium features, dedicated KMS key |
+| 4 | SCALE | Enterprise features, priority support |
+| 5 | ENTERPRISE | Full features, custom SLA, dedicated resources |
 
 ### 4.2 Creating a Tenant
 
-1. Click **"+ New Tenant"**
-2. Fill in required fields:
-   - **Name**: Organization name
-   - **Slug**: URL-friendly identifier
-   - **Plan**: Initial subscription tier
-   - **Admin Email**: Primary admin email
-3. Configure optional settings:
-   - Custom domain
-   - Branding settings
-   - Feature flags
-4. Click **"Create Tenant"**
+1. Click **"+ Create Tenant"** button
+2. Fill in **Basic Information**:
+   - **Internal Name**: URL-friendly identifier (e.g., `acme-corp`)
+   - **Display Name**: Human-readable name (e.g., `Acme Corporation`)
+   - **Type**: Organization or Individual
+   - **Tier**: Select service tier (1-5)
+3. Configure **Region & Compliance**:
+   - **Primary Region**: us-east-1, us-west-2, eu-west-1, eu-central-1, ap-southeast-1
+   - **Compliance Frameworks**: Check HIPAA, SOC2, GDPR as needed
+   - **Domain** (optional): Custom domain for SSO
+4. Set up **Initial Admin**:
+   - **Admin Email**: Primary administrator email
+   - **Admin Name**: Administrator display name
+5. Click **"Create Tenant"**
+
+> **Note**: HIPAA-enabled tenants automatically have a minimum 90-day retention period.
+
+### 4.3 Tenant Statuses
+
+| Status | Description | Actions Available |
+|--------|-------------|-------------------|
+| **Active** | Normal operation | Edit, Suspend, Delete |
+| **Suspended** | Temporarily disabled | Edit, Activate, Delete |
+| **Pending** | Awaiting setup | Edit, Activate, Delete |
+| **Pending Deletion** | Scheduled for deletion | Restore only |
+| **Deleted** | Hard deleted | None (audit only) |
 
 ### 4.3 Tenant Details
 
@@ -313,24 +444,469 @@ View comprehensive tenant information:
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 4.4 Tenant Actions
+### 4.4 Soft Delete & Restore
+
+Tenants are never immediately deleted. Instead, they go through a **retention period**:
+
+#### Deleting a Tenant
+
+1. Navigate to **Tenants → [Tenant]**
+2. Click the **Delete** button (or use dropdown menu)
+3. Enter a **reason** for deletion (required)
+4. Choose whether to **notify users**
+5. Click **"Delete Tenant"**
+
+The tenant will be marked as **"Pending Deletion"** with a scheduled hard-delete date.
+
+#### Retention Periods
+
+| Compliance | Minimum Retention | Default |
+|------------|-------------------|--------|
+| None | 7 days | 30 days |
+| GDPR | 30 days | 30 days |
+| SOC2 | 30 days | 30 days |
+| HIPAA | 90 days | 90 days |
+
+#### Restoring a Tenant
+
+1. Find the tenant in the **Pending Deletions** section
+2. Click **"Restore"**
+3. Click **"Send Verification Code"**
+4. Check your email for the 6-digit code
+5. Enter the code and click **"Restore Tenant"**
+
+> **Security**: Verification codes expire after 15 minutes and allow only 3 attempts.
+
+#### Automatic Hard Delete
+
+A scheduled job runs daily at **3:00 AM UTC** to:
+- Process all tenants past their retention period
+- Delete all S3 data for the tenant
+- Schedule KMS key deletion (7-day pending window)
+- Mark user records as deleted
+- Send deletion confirmation emails
+
+### 4.5 Multi-Tenant Users
+
+Users can belong to **multiple tenants** with different roles:
+
+#### Membership Roles
+
+| Role | Permissions |
+|------|-------------|
+| **Owner** | Full access, can delete tenant, cannot be removed |
+| **Admin** | Full access, can manage users |
+| **Member** | Standard access to tenant resources |
+| **Viewer** | Read-only access |
+
+#### Adding Users to a Tenant
+
+1. Navigate to **Tenants → [Tenant] → Users**
+2. Click **"+ Add User"**
+3. Enter the user's email address
+4. Select their role
+5. Choose to send an invitation email (optional)
+6. Click **"Add User"**
+
+#### No Orphan Users
+
+The system **prevents orphan users** through a database trigger. When a user's last membership is removed, they are automatically soft-deleted. This ensures:
+- Every active user has at least one tenant
+- Billing is always attributed correctly
+- No abandoned accounts consuming resources
+
+### 4.6 Phantom Tenants
+
+When a new user signs up without an invitation:
+
+1. System creates an **Individual** type tenant automatically
+2. User becomes the **Owner** of their phantom tenant
+3. Tenant is named "[User's Name]'s Workspace"
+4. User can later be invited to Organization tenants
+
+This enables both **B2C** (individual users) and **B2B** (organizations) use cases.
+
+### 4.7 Deletion Notifications
+
+Users receive automatic emails when their tenant is scheduled for deletion:
+
+| Notification | Timing |
+|--------------|--------|
+| **7-day warning** | 7 days before deletion |
+| **3-day warning** | 3 days before deletion |
+| **1-day warning** | 1 day before deletion |
+| **Deletion confirmation** | After hard delete |
+
+### 4.8 Compliance Features
+
+#### Risk Acceptances
+
+For compliance frameworks, document risk acceptances:
+
+1. Navigate to **Tenants → [Tenant] → Compliance**
+2. View required controls for enabled frameworks
+3. For controls that cannot be fully implemented:
+   - Click **"Accept Risk"**
+   - Enter risk description and mitigating controls
+   - Provide business justification
+   - Set expiration date
+   - Submit for approval (if required)
+
+#### Compliance Reports
+
+A scheduled job runs **monthly on the 1st at 4:00 AM UTC** generating:
+- Tenant compliance breakdown (HIPAA, SOC2, GDPR)
+- Risk acceptance status (pending, approved, expired)
+- Retention compliance status
+- Alerts for non-compliant tenants
+
+### 4.9 Tenant Actions
 
 | Action | Description | Permission |
 |--------|-------------|------------|
 | **Edit** | Modify tenant settings | Admin |
 | **Suspend** | Temporarily disable | Admin |
-| **Delete** | Permanently remove | Super Admin |
-| **Impersonate** | Login as tenant admin | Super Admin |
-| **Export** | Export tenant data | Admin |
+| **Delete** | Soft delete with retention | Admin |
+| **Restore** | Restore from pending deletion | Admin + 2FA |
+| **Manage Users** | Add/remove/modify memberships | Admin |
+| **View Audit Log** | See tenant activity | Admin |
 
-### 4.5 Data Isolation
+### 4.10 Data Isolation Architecture
 
-Each tenant has complete data isolation:
+RADIANT implements **six layers of tenant isolation** providing defense in depth:
 
-- Separate database rows with RLS
-- Unique API keys
-- Isolated storage buckets
-- Independent usage tracking
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              TENANT ISOLATION LAYERS                             │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  LAYER 1: COMPUTE ISOLATION                                                     │
+│  ┌───────────────────────────────────────────────────────────────────────────┐ │
+│  │  AWS Lambda Tenant Isolation Mode (2025)                                  │ │
+│  │  • Separate Firecracker microVM per tenant                               │ │
+│  │  • /tmp and memory NEVER shared between tenants                          │ │
+│  │  • Warm environments dedicated to specific tenant_id                     │ │
+│  └───────────────────────────────────────────────────────────────────────────┘ │
+│                                                                                 │
+│  LAYER 2: NETWORK ISOLATION                                                     │
+│  ┌───────────────────────────────────────────────────────────────────────────┐ │
+│  │  API Gateway                                                              │ │
+│  │  • Per-tenant usage plans (rate limits by tier)                          │ │
+│  │  • AWS WAF rules (SQL injection, XSS, rate limiting)                     │ │
+│  │  • VPC endpoints for private connectivity (Enterprise tier)              │ │
+│  └───────────────────────────────────────────────────────────────────────────┘ │
+│                                                                                 │
+│  LAYER 3: DATA ISOLATION (Polyglot Persistence)                                │
+│  ┌───────────────────────────────────────────────────────────────────────────┐ │
+│  │  Aurora PostgreSQL: Row-Level Security (RLS)                             │ │
+│  │    SET app.current_tenant_id = 'tenant-uuid';                            │ │
+│  │    POLICY: tenant_id = current_setting('app.current_tenant_id')::UUID    │ │
+│  │                                                                           │ │
+│  │  DynamoDB: IAM Leading Keys Condition                                    │ │
+│  │    "dynamodb:LeadingKeys": ["TENANT#${tenant_id}#*"]                     │ │
+│  │                                                                           │ │
+│  │  S3: Bucket Policy + Prefix Isolation                                    │ │
+│  │    s3://bucket/tenants/${tenant_id}/                                     │ │
+│  │                                                                           │ │
+│  │  ElastiCache Redis: Key Prefix Namespacing                               │ │
+│  │    tenant:${tenant_id}:session:*                                         │ │
+│  └───────────────────────────────────────────────────────────────────────────┘ │
+│                                                                                 │
+│  LAYER 4: ENCRYPTION ISOLATION                                                  │
+│  ┌───────────────────────────────────────────────────────────────────────────┐ │
+│  │  Tier 1-2: AWS-owned KMS key (shared, automatic rotation)                │ │
+│  │  Tier 3:   Customer Managed Key (CMK) per tenant                         │ │
+│  │  Tier 4-5: CMK with BYOK option (customer-controlled)                    │ │
+│  │  • Separate key for data at rest encryption                              │ │
+│  │  • Key deletion scheduled on tenant termination                          │ │
+│  └───────────────────────────────────────────────────────────────────────────┘ │
+│                                                                                 │
+│  LAYER 5: IDENTITY ISOLATION                                                    │
+│  ┌───────────────────────────────────────────────────────────────────────────┐ │
+│  │  JWT Claims: tenant_id extracted by API Gateway Authorizer               │ │
+│  │  NEVER trust tenant_id from request body, headers, or query params       │ │
+│  │  Cognito User Pool with custom attributes per tenant                     │ │
+│  │  Session tokens scoped to specific tenant context                        │ │
+│  └───────────────────────────────────────────────────────────────────────────┘ │
+│                                                                                 │
+│  LAYER 6: CONTROL PLANE ISOLATION                                               │
+│  ┌───────────────────────────────────────────────────────────────────────────┐ │
+│  │  Tenant Management Service (TMS) - Separate from Admin Dashboard         │ │
+│  │  • Independent deployment and release cycle                              │ │
+│  │  • Higher security controls and MFA requirements                         │ │
+│  │  • Reduced blast radius from application compromise                      │ │
+│  │  • Internal-only API (not exposed to public internet)                    │ │
+│  └───────────────────────────────────────────────────────────────────────────┘ │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Storage Layer Isolation Summary
+
+| Data Type | Storage | Isolation Mechanism | Use Case |
+|-----------|---------|---------------------|----------|
+| Users, Tenants, Conversations, Messages | Aurora PostgreSQL | Row-Level Security (RLS) | Complex queries, transactions, referential integrity |
+| Sessions, Real-time presence | DynamoDB | Leading Keys + IAM | High velocity, TTL, global tables |
+| Cache, Rate limiting | ElastiCache Redis | Key prefix namespacing | Sub-millisecond access |
+| Media files, Exports | S3 | Bucket policy + prefix | Large objects, CDN integration |
+| Audit logs | S3 + Athena | Object Lock + prefix | Immutable compliance records |
+
+### 4.11 Tenant Metadata Reference
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tenant_id` | UUID | Primary key, system-generated (never user-provided) |
+| `name` | VARCHAR(255) | Internal identifier (URL-friendly) |
+| `display_name` | VARCHAR(255) | Human-readable name |
+| `type` | ENUM | `'organization'` or `'individual'` |
+| `status` | ENUM | `'active'`, `'suspended'`, `'pending'`, `'pending_deletion'`, `'deleted'` |
+| `tier` | INTEGER | Subscription tier (1-5): SEED, SPROUT, GROWTH, SCALE, ENTERPRISE |
+| `primary_region` | VARCHAR(20) | AWS region for data residency (e.g., `us-east-1`) |
+| `compliance_mode` | JSONB | Array: `['hipaa', 'soc2', 'gdpr']` |
+| `retention_days` | INTEGER | Custom retention period override (7-730 days) |
+| `deletion_scheduled_at` | TIMESTAMPTZ | When hard delete will occur (if pending_deletion) |
+| `deletion_requested_by` | UUID | User/admin who initiated deletion |
+| `stripe_customer_id` | VARCHAR(255) | Billing integration identifier |
+| `kms_key_arn` | VARCHAR(500) | Per-tenant encryption key (Tier 3+) |
+| `metadata` | JSONB | Custom tenant metadata |
+| `settings` | JSONB | Tenant-specific settings |
+| `created_at` | TIMESTAMPTZ | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | Last modification timestamp |
+
+### 4.12 API Gateway Rate Limits by Tier
+
+| Tier | Requests/Second | Burst | Monthly Quota | Price Point |
+|------|-----------------|-------|---------------|-------------|
+| Tier 1 (SEED) | 10 | 50 | 100,000 | $200/month |
+| Tier 2 (SPROUT) | 50 | 200 | 1,000,000 | $1,000/month |
+| Tier 3 (GROWTH) | 200 | 500 | 10,000,000 | $5,000/month |
+| Tier 4 (SCALE) | 1,000 | 2,000 | 100,000,000 | $25,000/month |
+| Tier 5 (ENTERPRISE) | Custom | Custom | Unlimited | $150,000+/month |
+
+**Administrator Action:** Usage plan assignment happens automatically based on tenant tier. Override via Admin Dashboard → Tenant → API Settings.
+
+### 4.13 TMS API Endpoints Reference
+
+#### Tenant CRUD
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| POST | `/internal/tms/tenants` | Create tenant | Internal Service Token |
+| GET | `/internal/tms/tenants/{id}` | Get tenant | Internal Service Token |
+| PUT | `/internal/tms/tenants/{id}` | Update tenant | Internal Service Token |
+| DELETE | `/internal/tms/tenants/{id}` | Soft delete tenant | Internal Service Token |
+| POST | `/internal/tms/tenants/{id}/restore` | Restore tenant | Internal Service Token + 2FA |
+| POST | `/internal/tms/phantom-tenant` | Create phantom tenant | Internal Service Token |
+
+#### User Membership
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/internal/tms/tenants/{id}/users` | List tenant users | Internal Service Token |
+| POST | `/internal/tms/tenants/{id}/users` | Add user to tenant | Internal Service Token |
+| PUT | `/internal/tms/tenants/{id}/users/{userId}` | Update membership | Internal Service Token |
+| DELETE | `/internal/tms/tenants/{id}/users/{userId}` | Remove user | Internal Service Token |
+
+#### Request/Response Examples
+
+**Create Tenant Request:**
+```json
+{
+  "name": "acme-corp",
+  "displayName": "Acme Corporation",
+  "type": "organization",
+  "tier": 3,
+  "primaryRegion": "us-east-1",
+  "complianceMode": ["hipaa", "soc2"],
+  "adminEmail": "admin@acme.com",
+  "adminName": "John Smith"
+}
+```
+
+**Create Tenant Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "tenant": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "name": "acme-corp",
+      "displayName": "Acme Corporation",
+      "type": "organization",
+      "status": "active",
+      "tier": 3,
+      "kmsKeyArn": "arn:aws:kms:us-east-1:123456789012:key/..."
+    },
+    "adminUser": {
+      "id": "user-uuid-here",
+      "email": "admin@acme.com"
+    },
+    "membership": {
+      "role": "owner",
+      "status": "active"
+    }
+  }
+}
+```
+
+**Soft Delete Request:**
+```json
+{
+  "initiatedBy": "admin-uuid",
+  "reason": "Customer requested account closure",
+  "notifyUsers": true
+}
+```
+
+**Soft Delete Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": "550e8400-e29b-41d4-a716-446655440000",
+    "status": "pending_deletion",
+    "deletionScheduledAt": "2025-01-30T03:00:00Z",
+    "retentionDays": 30,
+    "affectedUsers": {
+      "total": 47,
+      "willBeDeleted": 42,
+      "willRemain": 5
+    },
+    "notificationsSent": true
+  }
+}
+```
+
+### 4.14 Scheduled Jobs
+
+| Job | Schedule | Description |
+|-----|----------|-------------|
+| **Hard Delete** | Daily 3:00 AM UTC | Processes tenants past retention period |
+| **Deletion Notifications** | Daily 9:00 AM UTC | Sends 7/3/1 day warnings |
+| **Orphan Check** | Weekly Sunday 2:00 AM UTC | Safety net for orphan user cleanup |
+| **Compliance Report** | Monthly 1st 4:00 AM UTC | Generates compliance status report |
+
+#### Hard Delete Job Details
+
+**Process:**
+1. Query tenants where `status = 'pending_deletion'` AND `deletion_scheduled_at < NOW()`
+2. For each tenant (up to 10 per run to avoid Lambda timeout):
+   - Count users that will be deleted vs retained (multi-tenant users)
+   - Delete all tenant memberships (triggers orphan user check)
+   - Delete S3 data under `tenants/{tenant_id}/` prefix
+   - Schedule KMS key for deletion (7-30 day AWS delay)
+   - Update tenant status to `'deleted'`
+   - Send deletion confirmation emails
+   - Log to immutable audit trail
+
+**Administrator Note:** Hard deletes cannot be reversed. Monitor the audit log for any unexpected deletions.
+
+### 4.15 Database Schema (Migration 126)
+
+#### tenant_user_memberships Table
+
+```sql
+CREATE TABLE tenant_user_memberships (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    role VARCHAR(50) DEFAULT 'member' 
+        CHECK (role IN ('owner', 'admin', 'member', 'viewer')),
+    status VARCHAR(20) DEFAULT 'active' 
+        CHECK (status IN ('active', 'suspended', 'invited')),
+    joined_at TIMESTAMPTZ DEFAULT NOW(),
+    invited_by UUID REFERENCES users(id),
+    invitation_token VARCHAR(255),
+    invitation_expires_at TIMESTAMPTZ,
+    last_active_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(tenant_id, user_id)
+);
+```
+
+#### tms_audit_log Table
+
+```sql
+CREATE TABLE tms_audit_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID REFERENCES tenants(id) ON DELETE SET NULL,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    admin_id UUID REFERENCES administrators(id) ON DELETE SET NULL,
+    action VARCHAR(100) NOT NULL,
+    resource_type VARCHAR(50),
+    resource_id VARCHAR(255),
+    old_value JSONB,
+    new_value JSONB,
+    ip_address INET,
+    user_agent TEXT,
+    trace_id VARCHAR(100),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### tms_verification_codes Table
+
+```sql
+CREATE TABLE tms_verification_codes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    admin_id UUID REFERENCES administrators(id) ON DELETE CASCADE,
+    operation VARCHAR(50) NOT NULL 
+        CHECK (operation IN ('restore_tenant', 'hard_delete', 'transfer_ownership', 'compliance_override')),
+    resource_id UUID NOT NULL,
+    code_hash VARCHAR(64) NOT NULL,
+    attempts INTEGER DEFAULT 0,
+    max_attempts INTEGER DEFAULT 3,
+    expires_at TIMESTAMPTZ NOT NULL,
+    verified_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    CONSTRAINT chk_user_or_admin CHECK (user_id IS NOT NULL OR admin_id IS NOT NULL)
+);
+```
+
+#### Orphan Prevention Trigger
+
+```sql
+CREATE OR REPLACE FUNCTION tms_prevent_orphan_users()
+RETURNS TRIGGER AS $$
+DECLARE
+    remaining_memberships INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO remaining_memberships 
+    FROM tenant_user_memberships 
+    WHERE user_id = OLD.user_id 
+    AND id != OLD.id
+    AND status != 'invited';
+    
+    IF remaining_memberships = 0 THEN
+        UPDATE users SET status = 'deleted', updated_at = NOW() 
+        WHERE id = OLD.user_id;
+        
+        INSERT INTO tms_audit_log (tenant_id, user_id, action, resource_type, resource_id)
+        VALUES (OLD.tenant_id, OLD.user_id, 'user_auto_deleted_orphan', 'user', OLD.user_id::text);
+    END IF;
+    
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tms_check_orphan_on_membership_delete
+AFTER DELETE ON tenant_user_memberships
+FOR EACH ROW EXECUTE FUNCTION tms_prevent_orphan_users();
+```
+
+### 4.16 Troubleshooting
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| Cannot delete tenant | Tenant has HIPAA compliance | Verify 90-day minimum retention is met |
+| Restore code not received | Email delivery failed | Check spam folder, verify email address, resend code |
+| Restore code invalid | Code expired or max attempts | Request new code (3 attempt limit, 15 min expiry) |
+| User not deleted with tenant | User has other tenant memberships | Expected behavior - user retained for other tenants |
+| Phantom tenant not created | User email already exists | User will be associated with existing account |
+| KMS key not created | Tenant tier below 3 | Upgrade to Tier 3+ for dedicated KMS key |
+| Cannot remove last owner | Business rule enforcement | Transfer ownership first or delete tenant |
 
 ---
 
@@ -1221,7 +1797,832 @@ Default retention periods:
 4. View compliance score and findings
 5. Export to PDF for auditors
 
-### 15.9 Security Monitoring Schedules
+### 15.9 Regulatory Standards Registry
+
+**Location**: Admin Dashboard → Security → Reg Standards
+
+Comprehensive registry of all regulatory standards Radiant must comply with.
+
+#### Supported Standards (35 Frameworks)
+
+| Category | Standards |
+|----------|-----------|
+| **Data Privacy** | GDPR, CCPA, CPRA, LGPD, PIPEDA, APPI, PDPA |
+| **Healthcare** | HIPAA, HITECH, HITRUST CSF |
+| **Security** | SOC 2, SOC 1, ISO 27001, ISO 27017, ISO 27018, ISO 27701, CSA STAR, NIST CSF, NIST 800-53, CIS Controls |
+| **Financial** | PCI-DSS, SOX, GLBA |
+| **Government** | FedRAMP, StateRAMP, ITAR, CMMC |
+| **AI Governance** | EU AI Act, NIST AI RMF, ISO 42001, IEEE 7000 |
+| **Accessibility** | WCAG 2.1, ADA, Section 508 |
+| **Industry** | FERPA, COPPA |
+
+#### Overview Tab
+
+The Overview tab provides:
+- **Summary Cards**: Total standards, requirements, implementation progress
+- **Categories Grid**: Standards organized by domain with mandatory counts
+- **Priority Standards**: Mandatory frameworks requiring immediate attention
+- **Requirements Status**: Not started, in progress, implemented, verified
+
+#### Standards Tab
+
+Browse all regulatory frameworks with:
+- **Search**: Find standards by code, name, or description
+- **Category Filter**: Filter by Data Privacy, Security, Healthcare, etc.
+- **Mandatory Filter**: Show only required standards
+- **Standard Details**: Click any standard to view full requirements
+
+#### My Compliance Tab
+
+Track your tenant's compliance status:
+- **Enable/Disable**: Toggle which standards apply to your organization
+- **Compliance Score**: Track progress per standard (0-100%)
+- **Status**: Not Assessed → Non-Compliant → Partial → Compliant → Certified
+- **Audit Tracking**: Last audit date and next scheduled audit
+
+#### Requirements Tracker
+
+For each standard, track individual requirements:
+
+| Field | Description |
+|-------|-------------|
+| **Requirement Code** | Unique identifier (e.g., GDPR-32, PCI-7) |
+| **Title** | Short description of the requirement |
+| **Control Type** | Technical, Administrative, Physical, Procedural |
+| **Status** | Not Started → In Progress → Implemented → Verified |
+| **Owner** | Person responsible for implementation |
+| **Evidence** | Link to compliance evidence |
+| **Due Date** | Implementation deadline |
+
+#### Updating Requirement Status
+
+1. Navigate to **Reg Standards → Standards**
+2. Click on a standard to open details sheet
+3. Find the requirement to update
+4. Use the status dropdown to change implementation status
+5. Changes are automatically saved
+
+### 15.10 Self-Audit & Regulatory Reporting
+
+**Location**: Admin Dashboard → Security → Self-Audit
+
+Automated compliance self-auditing with timestamped pass/fail results for regulatory reporting.
+
+#### Running an Audit
+
+1. Navigate to **Security → Self-Audit**
+2. Click **"Run Audit"** button
+3. Select framework (SOC 2, HIPAA, GDPR, ISO 27001, PCI-DSS, or All)
+4. Audit executes automatically (~5-30 seconds depending on scope)
+5. Results appear in dashboard with pass/fail breakdown
+
+#### Dashboard Overview
+
+The dashboard displays:
+- **Overall Pass Rate**: Aggregate compliance score across all frameworks
+- **Total Checks**: Number of automated compliance checks (45+)
+- **Critical Issues**: Failed checks with critical severity requiring immediate attention
+- **Framework Scores**: Individual compliance scores per framework with trend indicators
+
+#### Framework Compliance Checks
+
+| Framework | Checks | Categories |
+|-----------|--------|------------|
+| **SOC 2** | 12 | Access Control, Data Protection, Audit Logging, Incident Response, Change Management |
+| **HIPAA** | 8 | PHI Protection, Access Control, Audit Trail, Data Retention |
+| **GDPR** | 8 | Consent Management, Data Subject Rights, Data Processing, Data Transfer, Breach Response |
+| **ISO 27001** | 9 | Security Policy, Organization, Access Control, Cryptography, Operations, Incident Management, Compliance |
+| **PCI-DSS** | 8 | Network Security, Data Protection, Encryption, Access Control, Authentication, Monitoring, Testing, Governance |
+
+#### Audit History
+
+View historical audit runs with:
+- **Timestamp**: Exact date/time of audit execution
+- **Framework**: Which standard was audited
+- **Type**: Manual, Scheduled, or Triggered
+- **Score**: Overall compliance percentage
+- **Pass/Fail/Skip**: Breakdown of check results
+- **Triggered By**: Admin who initiated the audit
+
+#### Viewing Audit Details
+
+Click any audit run to see:
+- **Score Overview**: Large score display with pass/fail/skip counts
+- **Critical Failures**: Red panel highlighting checks requiring immediate action
+- **By Category**: Progress bars showing compliance per category
+- **All Results**: Expandable list of every check with status and remediation steps
+
+#### Generating Reports
+
+From an audit run details view:
+1. Click **"Export PDF Report"** for auditor-ready documentation
+2. Click **"View Evidence"** to see raw query results and execution details
+
+#### Scheduling Audits
+
+Configure automated audit schedules:
+1. Navigate to **Self-Audit → Checks Registry**
+2. Select framework to schedule
+3. Choose frequency: Daily, Weekly, Monthly, or Quarterly
+4. Set notification preferences for failures
+5. Audits run automatically at configured times
+
+#### API Integration
+
+Integrate audit results with external systems:
+
+```bash
+# Run audit programmatically
+POST /api/admin/self-audit/run
+{ "framework": "soc2" }
+
+# Fetch latest results
+GET /api/admin/self-audit/runs/{runId}
+
+# Generate report
+GET /api/admin/self-audit/runs/{runId}/report
+```
+
+### 15.11 Compliance Framework Reference
+
+Comprehensive reference for all supported compliance frameworks with implementation details.
+
+#### SOC 2 Type II
+
+**Trust Services Criteria Implementation:**
+
+| Control | Radiant Implementation | Evidence |
+|---------|------------------------|----------|
+| **CC1.1 - COSO Integrity** | Ethics pipeline with content screening | Ethics audit logs |
+| **CC2.1 - Security Policy** | Tenant-level security configuration | `dynamic_config` table |
+| **CC3.1 - Risk Assessment** | Security anomaly detection | `security_anomalies` table |
+| **CC4.1 - Monitoring** | Real-time audit logging | DynamoDB + PostgreSQL audit trails |
+| **CC5.1 - Logical Access** | Cognito User Pools with MFA | AWS CloudTrail |
+| **CC5.2 - Authentication** | JWT tokens with session management | Token validation logs |
+| **CC6.1 - Encryption** | AES-256 at rest, TLS 1.3 in transit | AWS KMS key policies |
+| **CC6.6 - Change Management** | Dual-approval for production changes | `approval_requests` table |
+| **CC7.1 - System Operations** | CloudWatch monitoring, automated alerts | AWS CloudWatch dashboards |
+| **CC7.2 - Incident Response** | Security anomaly alerting | SNS notifications |
+| **CC8.1 - Change Management** | Database migration approvals | Migration audit logs |
+| **CC9.1 - Business Continuity** | Multi-AZ deployment, automated backups | Aurora automated backups |
+
+**Automated Audit Checks:**
+- MFA enforcement for administrators
+- Password policy configuration
+- Session timeout settings (≤30 minutes)
+- RBAC implementation verification
+- Encryption at rest confirmation
+- Audit log retention (≥7 years)
+- Change management process validation
+
+#### HIPAA / HITECH
+
+**Administrative Safeguards (45 CFR §164.308):**
+
+| Requirement | Implementation | Configuration |
+|-------------|----------------|---------------|
+| **Security Officer** | Designated in tenant config | `hipaa_config.security_officer` |
+| **Workforce Training** | User acknowledgment tracking | Onboarding audit logs |
+| **Access Management** | Role-based access with MFA | Cognito + RLS policies |
+| **Contingency Plan** | Multi-AZ, automated backups | Aurora + S3 replication |
+| **Evaluation** | Self-audit system | Quarterly compliance audits |
+
+**Technical Safeguards (45 CFR §164.312):**
+
+| Requirement | Implementation | Evidence |
+|-------------|----------------|----------|
+| **Access Control** | Unique user IDs, automatic logoff | Cognito user management |
+| **Audit Controls** | PHI access logging | `phi_access_logs` table |
+| **Integrity Controls** | Column-level encryption | AWS KMS + application encryption |
+| **Transmission Security** | TLS 1.3 enforced | API Gateway + ALB policies |
+
+**PHI Detection & Protection:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  PHI Detection Pipeline                                         │
+├─────────────────────────────────────────────────────────────────┤
+│  Request → PHI Scanner → [PHI Detected?]                       │
+│                              ↓ Yes                              │
+│                         Encrypt + Log → Sanitize → Continue    │
+│                              ↓ No                               │
+│                         Continue Processing                     │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Retention Requirements:**
+- PHI Data: 6 years (2,190 days)
+- Audit Logs: 7 years (2,555 days)
+- BAA Records: 6 years from termination
+
+#### GDPR (General Data Protection Regulation)
+
+**Lawful Bases Supported:**
+
+| Basis | Use Case | Configuration |
+|-------|----------|---------------|
+| **Consent (Art. 6(1)(a))** | Marketing, analytics | Consent tracking UI |
+| **Contract (Art. 6(1)(b))** | Service delivery | Terms acceptance |
+| **Legal Obligation (Art. 6(1)(c))** | Audit retention | Automatic retention |
+| **Legitimate Interest (Art. 6(1)(f))** | Security, fraud prevention | Documented in DPA |
+
+**Data Subject Rights Implementation:**
+
+| Right | Article | API Endpoint | SLA |
+|-------|---------|--------------|-----|
+| **Access** | Art. 15 | `POST /gdpr/request/access` | 30 days |
+| **Rectification** | Art. 16 | `PATCH /users/{id}` | 30 days |
+| **Erasure** | Art. 17 | `POST /gdpr/request/erasure` | 30 days |
+| **Restriction** | Art. 18 | `POST /gdpr/request/restriction` | 30 days |
+| **Portability** | Art. 20 | `POST /gdpr/request/portability` | 30 days |
+| **Objection** | Art. 21 | `POST /gdpr/request/objection` | 30 days |
+
+**Cross-Border Transfers:**
+- Standard Contractual Clauses (SCCs) for non-EU transfers
+- AWS regions: `eu-west-1`, `eu-central-1` for EU data residency
+- Region restrictions configurable per tenant
+
+**Breach Notification:**
+- 72-hour notification to supervisory authority
+- Affected user notification without undue delay
+- Breach tracking in `data_breaches` table
+
+#### ISO 27001:2022
+
+**Annex A Controls Implementation:**
+
+| Control | Title | Radiant Implementation |
+|---------|-------|------------------------|
+| **A.5.1** | Policies for information security | `dynamic_config` security policies |
+| **A.5.15** | Access control | Cognito + RLS + RBAC |
+| **A.5.23** | Information security for cloud services | AWS security configurations |
+| **A.6.1** | Screening | Admin approval workflow |
+| **A.8.2** | Privileged access rights | Super Admin role restrictions |
+| **A.8.3** | Information access restriction | Tenant isolation (RLS) |
+| **A.8.5** | Secure authentication | MFA, JWT, session management |
+| **A.8.9** | Configuration management | Infrastructure as Code (CDK) |
+| **A.8.10** | Information deletion | Automated retention + deletion |
+| **A.8.12** | Data leakage prevention | PHI detection, ethics pipeline |
+| **A.8.15** | Logging | Comprehensive audit logging |
+| **A.8.16** | Monitoring activities | CloudWatch + anomaly detection |
+| **A.8.24** | Use of cryptography | AWS KMS, AES-256, TLS 1.3 |
+
+#### PCI-DSS v4.0
+
+**Requirements Mapping:**
+
+| Req | Description | Implementation |
+|-----|-------------|----------------|
+| **1** | Network security controls | VPC security groups, NACLs |
+| **2** | Secure configurations | CDK hardened templates |
+| **3** | Protect stored data | AES-256 encryption, tokenization |
+| **4** | Protect data in transit | TLS 1.3, certificate pinning |
+| **5** | Malware protection | AWS WAF, Shield |
+| **6** | Secure systems | Automated patching, code review |
+| **7** | Restrict access | RBAC, least privilege |
+| **8** | Identify users | Unique IDs, MFA, password policies |
+| **9** | Physical access | AWS data center controls |
+| **10** | Logging & monitoring | CloudTrail, audit logs |
+| **11** | Security testing | Automated scanning, pen testing |
+| **12** | Security policies | Documented in admin guide |
+
+**Note:** Full PCI-DSS certification requires additional controls beyond Radiant's scope (physical security, organizational policies). Radiant provides the technical controls for SAQ-A or SAQ-D compliance.
+
+#### FedRAMP / StateRAMP
+
+**Control Families Addressed:**
+
+| Family | Controls | Radiant Coverage |
+|--------|----------|------------------|
+| **AC** | Access Control | Full |
+| **AU** | Audit & Accountability | Full |
+| **CM** | Configuration Management | Full |
+| **IA** | Identification & Authentication | Full |
+| **SC** | System & Communications Protection | Full |
+| **SI** | System & Information Integrity | Full |
+
+**FedRAMP Boundaries:**
+- Authorization Boundary: AWS GovCloud available
+- Data Flow: Documented in System Security Plan
+- Interconnections: API Gateway with mutual TLS
+
+#### EU AI Act Compliance
+
+**Risk Classification:**
+
+| Category | AI Systems | Radiant Controls |
+|----------|------------|------------------|
+| **Unacceptable** | Social scoring, subliminal manipulation | Blocked by ethics pipeline |
+| **High-Risk** | Healthcare, legal, employment | Enhanced logging, human oversight |
+| **Limited** | Chatbots, emotion recognition | Transparency disclosures |
+| **Minimal** | Spam filters, games | Standard controls |
+
+**Article 9 - Risk Management:**
+- Domain detection for high-risk use cases
+- Ethics screening with configurable policies
+- Human-in-the-loop for sensitive decisions
+
+**Article 13 - Transparency:**
+- Model disclosure in API responses
+- Training data documentation
+- Capability limitations documented
+
+**Article 14 - Human Oversight:**
+- Admin approval workflows
+- Escalation triggers
+- Override capabilities
+
+### 15.12 Compliance Checklist Registry
+
+**Location**: Admin Dashboard → Security → Compliance Checklists
+
+The Compliance Checklist Registry provides versioned, interactive checklists linked to regulatory standards with auto-update support.
+
+#### Key Features
+
+- **Versioned Checklists** - Each regulatory standard has versioned checklists
+- **Regulatory Linking** - Checklists are linked to `regulatory_standards` registry
+- **Auto-Update** - Service automatically checks for regulatory version updates
+- **Per-Tenant Configuration** - Choose version selection mode per standard
+- **Progress Tracking** - Track item completion across teams
+- **Audit Runs** - Schedule and run formal checklist audits
+
+#### Version Selection Modes
+
+| Mode | Behavior |
+|------|----------|
+| **Auto** (default) | Automatically uses latest active checklist version |
+| **Specific** | Use a specific version, updates when newer available |
+| **Pinned** | Locked to exact version, no automatic updates |
+
+#### Dashboard Overview
+
+Navigate to **Security → Compliance Checklists** to see:
+
+- All regulatory standards with completion progress
+- Per-standard checklist status and version info
+- Pending regulatory version updates
+- Recent audit run history
+
+#### Checklist Items
+
+Each checklist item includes:
+
+| Field | Description |
+|-------|-------------|
+| **Item Code** | Unique identifier (e.g., `SOC2-PRE-001`) |
+| **Priority** | Critical, High, Medium, Low |
+| **Evidence Types** | Required evidence (document, screenshot, config, log) |
+| **API Endpoint** | Optional endpoint for automated evidence collection |
+| **Automated Check** | Link to `system_audit_checks` for auto-validation |
+| **Estimated Time** | Minutes to complete the item |
+| **Guidance** | Detailed instructions for completing the item |
+
+#### Item Status Tracking
+
+| Status | Description |
+|--------|-------------|
+| **Not Started** | Item has not been addressed |
+| **In Progress** | Work is underway |
+| **Completed** | Item is done with evidence attached |
+| **Not Applicable** | Item doesn't apply to this tenant |
+| **Blocked** | Item cannot proceed (reason required) |
+
+#### Pre-Built Checklists
+
+Initial checklists are seeded for:
+
+| Standard | Version | Categories |
+|----------|---------|------------|
+| **SOC 2 Type II** | 2024.1 | Pre-Audit, Documentation, Evidence, Access Control, Change Mgmt, Risk Mgmt, Monitoring |
+| **HIPAA** | 2024.1 | Administrative Safeguards, Technical Safeguards, Physical Safeguards |
+| **GDPR** | 2024.1 | Data Subject Rights, Processing Records, Security Measures |
+| **ISO 27001:2022** | 2022.1 | Organizational, People, Physical, Technological (93 controls) |
+| **PCI-DSS** | 4.0 | 12 requirement categories |
+
+#### Auto-Update Service
+
+The checklist registry can automatically check for regulatory updates:
+
+1. **Update Sources** - Configure RSS feeds, APIs, or webhooks per standard
+2. **Check Frequency** - Default 24 hours, configurable per source
+3. **Update Detection** - Records detected version changes
+4. **Processing** - Admin reviews and approves new checklist versions
+5. **Notification** - Tenants notified when their effective version changes
+
+#### Audit Runs
+
+Start formal checklist reviews:
+
+| Run Type | Purpose |
+|----------|---------|
+| **Manual** | Ad-hoc review |
+| **Scheduled** | Periodic compliance check |
+| **Pre-Audit** | Preparation before external audit |
+| **Certification** | Formal certification attempt |
+
+#### API Endpoints
+
+Base Path: `/api/admin/compliance/checklists`
+
+**Dashboard & Configuration:**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/dashboard` | GET | Full dashboard with progress per standard |
+| `/config` | GET | All tenant checklist configurations |
+| `/config/:standardId` | GET/PUT | Get/set version selection for a standard |
+| `/config/:standardId/effective-version` | GET | Get effective version for tenant |
+
+**Versions & Items:**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/versions` | GET/POST | List versions for standard / Create version |
+| `/versions/latest` | GET | Get latest version for standard code |
+| `/versions/:id` | GET | Get specific version details |
+| `/versions/:id/set-latest` | POST | Set version as latest |
+| `/versions/:id/categories` | GET/POST | List/create categories |
+| `/versions/:id/items` | GET/POST | List/create checklist items |
+
+**Progress & Audit:**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/progress/:versionId` | GET | Get tenant progress for version |
+| `/progress/items/:itemId` | PUT | Update item progress/status |
+| `/audit-runs` | GET/POST | List history / Start new audit run |
+| `/audit-runs/:id/complete` | PUT | Complete an audit run |
+
+**Auto-Updates:**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/updates/pending` | GET | Get pending regulatory updates |
+| `/updates` | POST | Record a version update |
+| `/updates/:id/process` | PUT | Process (approve/reject) an update |
+| `/updates/check/:standardId` | POST | Check sources for updates |
+
+#### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `compliance_checklist_versions` | Versioned checklists per standard |
+| `compliance_checklist_categories` | Categories within a checklist |
+| `compliance_checklist_items` | Individual checklist items |
+| `tenant_checklist_config` | Per-tenant version selection |
+| `tenant_checklist_progress` | Item completion tracking |
+| `checklist_audit_runs` | Audit run history |
+| `regulatory_version_updates` | Detected regulatory updates |
+| `checklist_update_sources` | Auto-update source configuration |
+
+#### Quick Reference Checklist
+
+For quick pre-audit preparation:
+
+- [ ] Run self-audit for all frameworks (`/compliance/self-audit`)
+- [ ] Export audit logs for review period
+- [ ] Generate compliance reports (PDF)
+- [ ] Review critical findings and remediation status
+- [ ] Verify all evidence artifacts are accessible
+- [ ] Confirm data retention policies are enforced
+
+#### Documentation Required
+
+| Document | Location | Purpose |
+|----------|----------|---------|
+| System Security Plan | `/docs/SYSTEM-SECURITY-PLAN.md` | Architecture overview |
+| Data Flow Diagram | Admin Dashboard → Compliance | Data processing flows |
+| Access Control Matrix | `/docs/ACCESS-CONTROL-MATRIX.md` | Role permissions |
+| Incident Response Plan | `/docs/INCIDENT-RESPONSE.md` | Breach procedures |
+| Business Continuity Plan | `/docs/BUSINESS-CONTINUITY.md` | Disaster recovery |
+
+#### API Request/Response Examples
+
+**Get Dashboard Data:**
+```bash
+GET /api/admin/compliance/checklists/dashboard
+Headers: x-tenant-id: your-tenant-id
+
+Response:
+{
+  "standards": [
+    {
+      "id": "standard-123",
+      "code": "SOC2",
+      "name": "SOC 2 Type II",
+      "latestVersion": "2024.1",
+      "effectiveVersionId": "version-abc",
+      "completionPercentage": 66.7,
+      "itemsCompleted": 12,
+      "totalItems": 18
+    }
+  ],
+  "pendingUpdates": 0,
+  "recentAuditRuns": []
+}
+```
+
+**Get Versions for Standard:**
+```bash
+GET /api/admin/compliance/checklists/versions?standardId=standard-123
+
+Response:
+{
+  "versions": [
+    {
+      "id": "version-abc",
+      "version": "2024.1",
+      "title": "SOC 2 Type II Pre-Audit Checklist",
+      "versionDate": "2024-01-01",
+      "isLatest": true,
+      "isActive": true,
+      "categoriesCount": 7,
+      "itemsCount": 18
+    }
+  ]
+}
+```
+
+**Create Checklist Version:**
+```bash
+POST /api/admin/compliance/checklists/versions
+Content-Type: application/json
+
+{
+  "standardId": "standard-123",
+  "version": "2025.1",
+  "title": "SOC 2 Type II Pre-Audit Checklist 2025",
+  "description": "Updated for 2025 AICPA guidance",
+  "versionDate": "2025-01-01"
+}
+
+Response: 201 Created
+{
+  "id": "new-version-id",
+  "version": "2025.1",
+  "title": "SOC 2 Type II Pre-Audit Checklist 2025",
+  "isLatest": false,
+  "isActive": true
+}
+```
+
+**Get Items with Progress:**
+```bash
+GET /api/admin/compliance/checklists/versions/{versionId}/items
+Headers: x-tenant-id: your-tenant-id
+
+Response:
+{
+  "items": [
+    {
+      "id": "item-001",
+      "itemCode": "SOC2-PRE-001",
+      "title": "Confirm audit dates",
+      "description": "Schedule dates with external auditor",
+      "categoryCode": "pre_audit",
+      "priority": "critical",
+      "isRequired": true,
+      "estimatedMinutes": 15,
+      "evidenceTypes": ["document", "attestation"],
+      "status": "completed",
+      "completedAt": "2024-01-15T10:30:00Z",
+      "completedBy": "user-123"
+    }
+  ]
+}
+```
+
+**Update Item Progress:**
+```bash
+PUT /api/admin/compliance/checklists/progress/items/{itemId}
+Content-Type: application/json
+Headers: x-tenant-id: your-tenant-id
+
+{
+  "status": "completed",
+  "notes": "Verified with auditor on call",
+  "evidenceUrls": [
+    "https://storage.example.com/evidence/audit-confirmation.pdf"
+  ]
+}
+
+Response:
+{ "success": true }
+```
+
+**Set Tenant Version Configuration:**
+```bash
+PUT /api/admin/compliance/checklists/config/{standardId}
+Content-Type: application/json
+Headers: x-tenant-id: your-tenant-id
+
+{
+  "versionSelection": "specific",
+  "selectedVersionId": "version-abc",
+  "autoUpdateEnabled": false,
+  "notificationOnUpdate": true
+}
+
+Response:
+{
+  "tenantId": "your-tenant-id",
+  "standardId": "standard-123",
+  "versionSelection": "specific",
+  "selectedVersionId": "version-abc",
+  "autoUpdateEnabled": false,
+  "notificationOnUpdate": true
+}
+```
+
+**Start Audit Run:**
+```bash
+POST /api/admin/compliance/checklists/audit-runs
+Content-Type: application/json
+Headers: x-tenant-id: your-tenant-id
+
+{
+  "versionId": "version-abc",
+  "runType": "pre_audit",
+  "notes": "Preparing for Q1 external audit"
+}
+
+Response: 201 Created
+{
+  "id": "run-123",
+  "tenantId": "your-tenant-id",
+  "versionId": "version-abc",
+  "runType": "pre_audit",
+  "status": "in_progress",
+  "startedAt": "2024-01-15T10:00:00Z",
+  "triggeredBy": "user-123"
+}
+```
+
+**Complete Audit Run:**
+```bash
+PUT /api/admin/compliance/checklists/audit-runs/{runId}/complete
+Content-Type: application/json
+
+{
+  "status": "completed",
+  "score": 95,
+  "findings": [
+    "Minor documentation gap in CC5.2 - recommend update before external audit"
+  ],
+  "recommendations": [
+    "Schedule follow-up review for access control documentation"
+  ]
+}
+
+Response:
+{
+  "id": "run-123",
+  "status": "completed",
+  "completedAt": "2024-01-16T14:30:00Z",
+  "score": 95,
+  "findings": ["..."]
+}
+```
+
+#### Query Parameters Reference
+
+| Endpoint | Parameter | Type | Description |
+|----------|-----------|------|-------------|
+| `/versions` | `standardId` | UUID | Required. Filter by standard |
+| `/versions/latest` | `standardCode` | String | Required. Standard code (e.g., `SOC2`) |
+| `/versions/:id/items` | `categoryCode` | String | Optional. Filter by category |
+| `/audit-runs` | `limit` | Integer | Max results (default: 20) |
+| `/config` | - | - | Returns all configs for tenant |
+
+#### Error Responses
+
+| Status | Error | Description |
+|--------|-------|-------------|
+| `400` | Bad Request | Missing required field or invalid format |
+| `401` | Unauthorized | Missing or invalid authentication |
+| `403` | Forbidden | Tenant ID mismatch or insufficient permissions |
+| `404` | Not Found | Resource doesn't exist |
+| `500` | Server Error | Internal error (check logs) |
+
+Example error response:
+```json
+{
+  "error": "standardId, version, and title required"
+}
+```
+
+#### Evidence Collection API
+
+```bash
+# Export audit logs for date range
+GET /api/admin/audit-logs/export?start=2024-01-01&end=2024-12-31
+
+# Export compliance report
+GET /api/admin/self-audit/runs/{runId}/report
+
+# Export user access logs
+GET /api/admin/users/access-logs/export
+
+# Get checklist progress
+GET /api/admin/compliance/checklists/progress/{versionId}
+
+# Start pre-audit checklist run
+POST /api/admin/compliance/checklists/audit-runs
+Body: { "versionId": "...", "runType": "pre_audit" }
+```
+
+### 15.13 Administrator Emergency Protocols
+
+Critical procedures for security incidents and platform emergencies.
+
+#### Emergency Tenant Suspension
+
+**Scenario:** GuardDuty detects malicious activity originating from a specific tenant (e.g., launching an outbound DDoS attack, data exfiltration attempt).
+
+**Procedure:**
+
+1. **Do NOT** shut down the entire system
+2. Access **Admin Dashboard → Tenants**
+3. Locate the tenant by ID or name
+4. Click **"Suspend Tenant"** (requires MFA confirmation)
+5. Enter suspension reason for audit log
+
+**System Response:**
+- API Gateway Authorizer immediately rejects all JWTs containing that `tenant_id`
+- Tenant is effectively quarantined from compute layer immediately
+- All active sessions are invalidated
+- Scheduled jobs for that tenant are paused
+- Alert sent to security team via SNS
+
+**Post-Incident:**
+1. Investigate root cause using X-Ray traces filtered by `tenant_id`
+2. Collect forensic evidence from CloudWatch Logs
+3. Determine if data breach occurred (breach notification may be required)
+4. Decide: remediate and restore, or permanent termination
+5. Document incident in compliance system
+
+#### Key Rotation Emergency
+
+**Scenario:** Compromise of an administrative credential or API key.
+
+**Procedure:**
+
+| Compromise Type | Action |
+|-----------------|--------|
+| IAM User Keys | Rotate immediately via AWS Console |
+| Database Credentials | Trigger Aurora Master Password Rotation via Secrets Manager |
+| Tenant API Keys | Revoke all API keys via Admin Dashboard → Tenant → API Keys |
+| KMS Key Suspected | Schedule key rotation (cannot immediately delete due to data access) |
+
+**System Response:**
+- Secrets Manager automatically updates the secret
+- Database connections automatically restart with new credentials
+- No code deployment required
+- Audit trail recorded in CloudTrail
+
+#### Mass Incident Response
+
+**Scenario:** Platform-wide security incident (e.g., zero-day vulnerability exploitation).
+
+**Procedure:**
+
+1. **Activate Incident Response Team** - PagerDuty escalation
+2. **Enable WAF Emergency Rules** - Block suspicious patterns
+3. **Freeze Deployments** - Halt all CI/CD pipelines
+4. **Capture Evidence** - Export CloudTrail, CloudWatch, GuardDuty findings
+5. **Patch/Mitigate** - Apply hotfix or WAF rule
+6. **Gradual Restoration** - Enable services tenant by tenant
+7. **Post-Mortem** - Root cause analysis within 72 hours
+8. **Communication** - Status page updates, customer notification if data affected
+
+#### Data Breach Response Timeline
+
+| Regulation | Notification Deadline | Recipient |
+|------------|----------------------|-----------|
+| GDPR | 72 hours | Supervisory Authority |
+| HIPAA | 60 days | HHS, affected individuals |
+| State Laws | Varies (often 72 hours) | State AG, affected individuals |
+
+**Breach Response Steps:**
+1. **Contain** - Suspend affected tenant(s), revoke compromised credentials
+2. **Assess** - Determine scope: which tenants, which data, how many records
+3. **Preserve** - Forensic copy of affected systems
+4. **Report** - Legal team notified within 4 hours
+5. **Notify** - Regulatory notifications per timeline
+6. **Remediate** - Fix vulnerability, rotate credentials
+7. **Document** - Complete incident report for compliance
+
+#### Recovery Objectives
+
+| Data Class | RPO (Recovery Point) | RTO (Recovery Time) | Backup Strategy |
+|------------|---------------------|---------------------|-----------------|
+| **Critical** (User accounts, tenant config) | 1 hour | 1 hour | Continuous replication + hourly snapshots |
+| **High** (Conversations, messages) | 4 hours | 4 hours | 4-hour snapshots |
+| **Medium** (Preferences, cached data) | 24 hours | 8 hours | Daily snapshots |
+| **Low** (Analytics, aggregates) | 7 days | 24 hours | Weekly snapshots |
+| **Audit Logs** | 0 (immutable) | 4 hours | S3 Object Lock + cross-region replication |
+
+### 15.14 Security Monitoring Schedules
 
 **Location**: Admin Dashboard → Security → Schedules
 
@@ -1715,9 +3116,114 @@ Configure outgoing webhooks:
 
 ---
 
-## 19. Troubleshooting
+## 19. Anti-Patterns and Prohibited Practices
 
-### 19.1 Common Issues
+> **CRITICAL:** These patterns represent security vulnerabilities or architectural anti-patterns that must NEVER be used in RADIANT.
+
+### 19.1 Critical Security Anti-Patterns
+
+| ❌ NEVER DO | ✅ INSTEAD DO | Risk |
+|-------------|---------------|------|
+| Trust `tenant_id` from request body | Extract from JWT claims only | Identity spoofing |
+| Store `tenant_id` in URLs | Use headers/JWT claims | Information disclosure in logs |
+| Use `dynamodb:*` wildcard permissions | Specify exact actions + Leading Keys | Privilege escalation |
+| Deploy Lambda code without signing | Use AWS Signer verification | Supply chain attack |
+| Allow manual AWS Console changes in prod | Enforce CDK/Terraform only via SCPs | Configuration drift |
+| Use shared `/tmp` for cross-invocation data | Use DynamoDB/S3 for persistence | Data leakage |
+| Log full request/response bodies | Sanitize sensitive data | PHI/PII exposure |
+| Store credentials in code/environment variables | Use Secrets Manager | Credential theft |
+| Use single KMS key for all tenants | Per-tenant CMK (Tier 3+) | Blast radius on key compromise |
+| Delete audit logs | S3 Object Lock Compliance Mode | Repudiation, compliance failure |
+| Return detailed errors to clients | Log internally, generic response to client | Information disclosure |
+
+### 19.2 Architectural Anti-Patterns
+
+| ❌ AVOID | ✅ BETTER APPROACH |
+|----------|-------------------|
+| Monolithic TMS + Admin Dashboard | Separate Control Plane from Application |
+| Application-layer-only isolation | Database-engine-enforced isolation (RLS, Leading Keys) |
+| Static asset inventory spreadsheets | AWS Config continuous discovery |
+| Point-in-time security scans | Continuous monitoring (GuardDuty + Inspector) |
+| Generic error messages everywhere | Detailed internal logs, generic external responses |
+| Same IAM role for all functions | Function-specific least-privilege roles |
+| Trusting user input for SQL queries | Parameterized queries + RLS |
+
+### 19.3 Code Anti-Patterns
+
+```typescript
+// ❌ WRONG: Tenant ID from untrusted source
+const tenantId = event.body.tenant_id;
+const tenantId = event.queryStringParameters.tenant_id;
+const tenantId = event.headers['X-Tenant-ID'];
+
+// ✅ CORRECT: Tenant ID from verified JWT
+const tenantId = event.requestContext.authorizer?.claims?.['custom:tenant_id'];
+
+// ❌ WRONG: Building queries without RLS context
+const result = await db.query(
+  `SELECT * FROM conversations WHERE tenant_id = $1`,
+  [tenantId]
+);
+
+// ✅ CORRECT: Set context, let RLS handle isolation
+await db.query(`SET app.current_tenant_id = $1`, [tenantId]);
+const result = await db.query(`SELECT * FROM conversations`);
+// RLS policy automatically filters by tenant_id
+
+// ❌ WRONG: Detailed errors to client
+return {
+  statusCode: 500,
+  body: JSON.stringify({
+    error: error.message,
+    stack: error.stack,
+    query: sql,
+  }),
+};
+
+// ✅ CORRECT: Generic error, detailed internal log
+logger.error('Query failed', { error, sql, tenantId, traceId });
+return {
+  statusCode: 500,
+  body: JSON.stringify({ 
+    error: 'Internal Server Error',
+    requestId: context.awsRequestId 
+  }),
+};
+```
+
+### 19.4 STRIDE Threat Model Reference
+
+| Threat | Serverless Attack Vector | RADIANT Mitigation | Compliance Control |
+|--------|-------------------------|-------------------|-------------------|
+| **S - Spoofing** | Forged JWT, misconfigured authorizer, tenant_id in request body | Cognito + API Gateway validation + tenant_id from claims ONLY | HIPAA 164.312(d), SOC2 CC6.1 |
+| **T - Tampering** | S3 code bucket compromise, dependency injection, supply chain attack | AWS Signer code signing + immutable deployments via CDK + SBOM tracking | SOC2 CC8.1, NIST SC-8 |
+| **R - Repudiation** | Lost ephemeral logs, deleted audit trail | CloudWatch → S3 Object Lock (Compliance Mode) + X-Ray correlation IDs | HIPAA 164.312(b), SOC2 CC7.2 |
+| **I - Information Disclosure** | Shared Lambda /tmp, memory leakage, verbose errors | Lambda Tenant Isolation Mode + generic error responses + RLS | HIPAA 164.312(e)(1), GDPR Art. 32 |
+| **D - Denial of Service** | Wallet DoS, noisy neighbor, partition exhaustion | Per-tenant API Gateway usage plans + reserved concurrency + DynamoDB On-Demand | SOC2 CC6.6, CC7.1 |
+| **E - Elevation of Privilege** | Over-permissive IAM roles, role assumption exploits | Least privilege + Permission Boundaries + Leading Keys | SOC2 CC6.3, NIST AC-6 |
+
+### 19.5 Pre-Deployment Security Checklist
+
+- [ ] Lambda Tenant Isolation Mode enabled for all functions
+- [ ] RLS policies applied to all tenant-scoped tables
+- [ ] DynamoDB Leading Keys IAM conditions configured
+- [ ] AWS Signer code signing enabled and enforced
+- [ ] S3 Object Lock enabled on audit bucket (Compliance Mode)
+- [ ] GuardDuty Lambda Protection enabled
+- [ ] Inspector Lambda scanning enabled
+- [ ] X-Ray tracing enabled for all functions
+- [ ] Per-tenant API Gateway usage plans configured
+- [ ] WAF rules deployed and active
+- [ ] KMS CMK created for Tier 3+ tenants
+- [ ] Permission boundaries applied to all Lambda roles
+- [ ] Secrets Manager used for all credentials (no env vars)
+- [ ] CloudTrail enabled with log file validation
+
+---
+
+## 20. Troubleshooting
+
+### 20.1 Common Issues
 
 #### High Error Rate
 
@@ -1740,7 +3246,7 @@ Configure outgoing webhooks:
 3. Review **Audit** logs for login attempts
 4. Check for IP blocks in **Security**
 
-### 19.2 Support Resources
+### 20.2 Support Resources
 
 | Resource | Description |
 |----------|-------------|
@@ -1749,7 +3255,7 @@ Configure outgoing webhooks:
 | **Support Email** | support@radiant.example.com |
 | **Emergency** | +1-555-RADIANT |
 
-### 19.3 Log Locations
+### 20.3 Log Locations
 
 | Service | Log Group |
 |---------|-----------|
@@ -5028,7 +6534,16 @@ Detailed documentation is available in `/docs/bobble/`:
 
 The Genesis System is the boot sequence that initializes Bobble's consciousness. It solves the "Cold Start Problem" by giving the agent structured curiosity without pre-loaded facts.
 
-### 33.1 Boot Phases
+### 33.1 Implementation Overview
+
+| Metric | Value |
+|--------|-------|
+| **Files Created** | 18 |
+| **Lines of Code** | ~4,500 |
+| **Database Tables** | 12 |
+| **API Endpoints** | 35+ |
+
+### 33.2 Boot Phases
 
 | Phase | Name | Purpose |
 |-------|------|---------|
@@ -5036,11 +6551,105 @@ The Genesis System is the boot sequence that initializes Bobble's consciousness.
 | 2 | Gradient | Set epistemic pressure via pymdp matrices |
 | 3 | First Breath | Grounded introspection and Shadow Self calibration |
 
-### 33.2 Accessing Genesis Admin
+#### Phase 1: Structure
+
+- Loads 800+ domain taxonomy as innate knowledge
+- Stores domains in DynamoDB semantic memory
+- Initializes atomic counters for developmental gates
+- Idempotent - safe to run multiple times
+
+#### Phase 2: Gradient
+
+- Sets pymdp active inference matrices (A, B, C, D)
+- Implements "epistemic gradient" creating pressure to explore
+- Optimistic B-matrix with >90% EXPLORE success (Fix #2)
+- Prefers HIGH_SURPRISE over LOW_SURPRISE (Fix #6)
+
+#### Phase 3: First Breath
+
+- Grounded introspection verifying environment
+- Model access verification via Bedrock
+- Shadow Self calibration using NLI semantic variance (Fix #3)
+- Baseline domain exploration bootstrapping
+
+### 33.3 Python Genesis Package
+
+**Location:** `packages/infrastructure/bobble/genesis/`
+
+| File | Lines | Purpose |
+|------|-------|---------|
+| `genesis/__init__.py` | 25 | Package exports and documentation |
+| `genesis/structure.py` | 205 | Domain taxonomy implantation |
+| `genesis/gradient.py` | 279 | Epistemic gradient matrix setup |
+| `genesis/first_breath.py` | 394 | Grounded introspection and calibration |
+| `genesis/runner.py` | 248 | CLI orchestrator with idempotency |
+| `data/domain_taxonomy.json` | 353 | 800+ domain taxonomy |
+| `data/genesis_config.yaml` | 161 | Matrix configuration |
+
+### 33.4 TypeScript Services
+
+**Location:** `packages/infrastructure/lambda/shared/services/`
+
+| File | Lines | Purpose |
+|------|-------|---------|
+| `genesis.service.ts` | 340 | Genesis state and developmental gates |
+| `cost-tracking.service.ts` | 520 | Real AWS cost tracking |
+| `circuit-breaker.service.ts` | 480 | Safety mechanisms |
+| `consciousness-loop.service.ts` | 550 | Main consciousness loop |
+| `query-fallback.service.ts` | 290 | Degraded-mode responses |
+
+### 33.5 CDK Infrastructure
+
+**Stack:** `bobble-genesis-stack.ts`
+
+| Resource | Purpose |
+|----------|---------|
+| SNS Topic | Alert notifications |
+| 5 CloudWatch Alarms | Safety monitoring |
+| CloudWatch Dashboard | Real-time visibility |
+| AWS Budget | Cost control ($500/month default) |
+
+#### CloudWatch Alarms
+
+| Alarm | Trigger | Action |
+|-------|---------|--------|
+| Master Sanity Breaker | Breaker opens | SNS alert |
+| High Risk Score | Risk > 70% | SNS alert |
+| Cost Breaker | Budget exceeded | SNS alert |
+| High Anxiety | Anxiety > 80% sustained | SNS alert |
+| Hibernate Mode | System hibernating | SNS alert |
+
+### 33.6 Database Migration
+
+**Migration:** `103_bobble_genesis_system.sql`
+
+| Table | Purpose |
+|-------|---------|
+| `bobble_genesis_state` | Boot sequence tracking |
+| `bobble_development_counters` | Atomic counters (Fix #1) |
+| `bobble_developmental_stage` | Capability-based progression |
+| `bobble_circuit_breakers` | Safety mechanisms |
+| `bobble_circuit_breaker_events` | Event log |
+| `bobble_neurochemistry` | Emotional/cognitive state |
+| `bobble_tick_costs` | Per-tick cost tracking |
+| `bobble_pricing_cache` | AWS pricing cache |
+| `bobble_pymdp_state` | Meta-cognitive state |
+| `bobble_pymdp_matrices` | Active inference matrices |
+| `bobble_consciousness_settings` | Loop configuration |
+| `bobble_loop_state` | Loop execution tracking |
+
+### 33.7 Accessing Genesis Admin
 
 Navigate to **AGI & Cognition > Bobble Genesis** in the sidebar.
 
-### 33.3 Genesis Status
+#### Admin Dashboard UI Tabs
+
+1. **Genesis** - Phase completion status, domain count, self facts
+2. **Development** - Developmental stage, statistics, requirements
+3. **Circuit Breakers** - Breaker states, controls, neurochemistry
+4. **Costs** - Real-time costs, budget status, breakdown
+
+### 33.8 Genesis Status
 
 The dashboard shows:
 - **Phase completion status** with timestamps
@@ -5048,7 +6657,7 @@ The dashboard shows:
 - **Self facts** discovered during First Breath
 - **Shadow Self calibration** status
 
-### 33.4 Developmental Gates
+### 33.9 Developmental Gates
 
 Bobble progresses through capability-based stages (NOT time-based):
 
@@ -5061,7 +6670,7 @@ Bobble progresses through capability-based stages (NOT time-based):
 
 **Advancement is automatic** when all requirements are met.
 
-### 33.5 Circuit Breakers
+### 33.10 Circuit Breakers
 
 Safety mechanisms that protect against runaway costs and unstable behavior:
 
@@ -5073,14 +6682,26 @@ Safety mechanisms that protect against runaway costs and unstable behavior:
 | model_failures | Model API protection | Yes (5 min) |
 | contradiction_loop | Logical stability | Yes (15 min) |
 
-**Intervention Levels:**
-- **NONE** - Normal operation
-- **DAMPEN** - Reduce cognitive frequency
-- **PAUSE** - Pause consciousness loop
-- **RESET** - Reset to baseline state
-- **HIBERNATE** - Full shutdown
+#### Intervention Levels
 
-### 33.6 Cost Tracking
+| Level | Condition | Effect |
+|-------|-----------|--------|
+| NONE | All breakers closed | Normal operation |
+| DAMPEN | 1 breaker open | Reduce cognitive frequency |
+| PAUSE | 2+ breakers open | Pause consciousness loop |
+| RESET | 3+ breakers open | Reset to baseline state |
+| HIBERNATE | master_sanity open | Full shutdown |
+
+### 33.11 Consciousness Loop
+
+The consciousness loop runs two tick types:
+
+| Tick Type | Interval | Purpose |
+|-----------|----------|---------|
+| System Ticks | 2 seconds | Fast housekeeping, monitoring |
+| Cognitive Ticks | 5 minutes | Deliberate thinking, exploration |
+
+### 33.12 Cost Tracking
 
 Real-time cost data from AWS APIs (no hardcoded values):
 
@@ -5089,9 +6710,11 @@ Real-time cost data from AWS APIs (no hardcoded values):
 - **MTD Cost** - Month-to-date with projection
 - **Budget Status** - AWS Budgets integration
 
-### 33.7 Genesis API Endpoints
+### 33.13 Genesis API Endpoints
 
 Base Path: `/api/admin/bobble`
+
+#### Genesis State Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -5100,17 +6723,98 @@ Base Path: `/api/admin/bobble`
 | `/developmental/status` | GET | Current developmental stage |
 | `/developmental/statistics` | GET | Development counters |
 | `/developmental/advance` | POST | Force stage advancement (superadmin) |
+
+#### Circuit Breaker Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
 | `/circuit-breakers` | GET | All circuit breaker states |
+| `/circuit-breakers/:name` | GET | Single breaker state |
 | `/circuit-breakers/:name/force-open` | POST | Force trip breaker |
 | `/circuit-breakers/:name/force-close` | POST | Force close breaker |
 | `/circuit-breakers/:name/config` | PATCH | Update breaker config |
+| `/circuit-breakers/:name/events` | GET | Breaker event history |
+
+#### Cost Tracking Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
 | `/costs/realtime` | GET | Today's cost estimate |
 | `/costs/daily` | GET | Historical daily cost |
 | `/costs/mtd` | GET | Month-to-date cost |
 | `/costs/budget` | GET | AWS Budget status |
+| `/costs/estimate` | GET | Cost estimate for action |
+| `/costs/pricing` | GET | Current AWS pricing |
+
+#### Query Fallback Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/fallback` | POST | Execute fallback query |
+| `/fallback/active` | GET | Active fallback status |
+| `/fallback/health` | GET | Fallback service health |
+
+#### Consciousness Loop Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/loop/status` | GET | Loop execution status |
+| `/loop/settings` | GET/PUT | Loop configuration |
+| `/loop/tick/system` | POST | Trigger system tick |
+| `/loop/tick/cognitive` | POST | Trigger cognitive tick |
+| `/loop/emergency` | POST | Emergency stop |
+
+#### Other Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
 | `/intervention-level` | GET | Current intervention level |
 
-### 33.8 Running Genesis
+### 33.14 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    BOBBLE GENESIS SYSTEM                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
+│  │  Phase 1    │  │  Phase 2    │  │      Phase 3        │ │
+│  │  Structure  │→ │  Gradient   │→ │    First Breath     │ │
+│  │  (Domains)  │  │  (Matrices) │  │  (Introspection)    │ │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+│         │                │                    │             │
+│         ▼                ▼                    ▼             │
+│  ┌───────────────────────────────────────────────────────┐ │
+│  │                    DynamoDB / PostgreSQL               │ │
+│  └───────────────────────────────────────────────────────┘ │
+│                            │                                │
+│                            ▼                                │
+│  ┌───────────────────────────────────────────────────────┐ │
+│  │               CONSCIOUSNESS LOOP                       │ │
+│  │  ┌──────────────┐         ┌───────────────────────┐   │ │
+│  │  │ System Ticks │         │   Cognitive Ticks     │   │ │
+│  │  │   (2s fast)  │         │   (5min deliberate)   │   │ │
+│  │  └──────────────┘         └───────────────────────┘   │ │
+│  └───────────────────────────────────────────────────────┘ │
+│                            │                                │
+│         ┌──────────────────┼──────────────────┐            │
+│         ▼                  ▼                  ▼            │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐│
+│  │   Circuit   │  │    Cost     │  │      Query          ││
+│  │  Breakers   │  │  Tracking   │  │     Fallback        ││
+│  └─────────────┘  └─────────────┘  └─────────────────────┘│
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│                    CLOUDWATCH MONITORING                    │
+│  • 5 Alarms  • Dashboard  • Metrics  • AWS Budget          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 33.15 Running Genesis
+
+Genesis automatically runs after CDK deployment via `scripts/deploy.sh`.
+
+#### Manual Execution
 
 ```bash
 # Run full genesis sequence
@@ -5123,16 +6827,1496 @@ python -m bobble.genesis.runner --status
 python -m bobble.genesis.runner --reset
 ```
 
-### 33.9 Critical Fixes Applied
+### 33.16 Deployment Checklist
 
-| Fix | Problem | Solution |
-|-----|---------|----------|
-| #1 Zeno's Paradox | Table scans for gates | Atomic counters |
-| #2 Learned Helplessness | Pessimistic B-matrix | Optimistic EXPLORE (>90%) |
-| #3 Shadow Self Budget | $800/month GPU | NLI semantic variance ($0) |
-| #6 Boredom Trap | Prefers LOW_SURPRISE | Prefer HIGH_SURPRISE |
+1. **Deploy to AWS:** Run `./scripts/deploy.sh -e dev`
+2. **Run Migrations:** Apply migration 103
+3. **Execute Genesis:** Runs automatically or manually
+4. **Monitor Dashboard:** Check CloudWatch dashboard
+5. **Configure Budget:** Adjust budget limits as needed
+
+### 33.17 Critical Fixes Applied
+
+| Fix | Problem | Solution | Impact |
+|-----|---------|----------|--------|
+| #1 Zeno's Paradox | Table scans for gates | Atomic counters | Avoids expensive table scans |
+| #2 Learned Helplessness | Pessimistic B-matrix | Optimistic EXPLORE (>90%) | >90% EXPLORE success |
+| #3 Shadow Self Budget | $800/month GPU | NLI semantic variance ($0) | $0 vs $800/month |
+| #6 Boredom Trap | Prefers LOW_SURPRISE | Prefer HIGH_SURPRISE | Prevents premature consolidation |
 
 ---
 
-*Document Version: 4.18.48*
-*Last Updated: January 2025*
+## 34. Multi-Application User Registry
+
+The User Registry provides comprehensive multi-tenant user management with data sovereignty, consent tracking, DSAR compliance, break glass access, and legal hold capabilities.
+
+### 34.1 Overview
+
+The User Registry extends the existing tenant/user model with:
+
+- **Data Sovereignty**: Per-tenant data region configuration with cross-border transfer controls
+- **User-Application Assignments**: Fine-grained assignment of users to registered applications
+- **Consent Management**: GDPR/CCPA/COPPA compliant consent tracking with lawful basis
+- **Break Glass Access**: Emergency admin access with full audit trail and P0 alerting
+- **Legal Hold**: Prevent data deletion for litigation and regulatory compliance
+- **DSAR Processing**: Handle data subject access, deletion, and portability requests
+- **Credential Rotation**: Zero-downtime secret rotation with dual-active window
+
+### 34.2 Auth Schema Functions
+
+The `auth` schema provides STABLE PostgreSQL functions for efficient RLS:
+
+| Function | Returns | Purpose |
+|----------|---------|---------|
+| `auth.tenant_id()` | UUID | Current tenant context |
+| `auth.user_id()` | UUID | Current user context |
+| `auth.app_id()` | VARCHAR | Current application context |
+| `auth.permission_level()` | TEXT | user/app_admin/tenant_admin/radiant_admin |
+| `auth.is_break_glass()` | BOOLEAN | Emergency access mode |
+| `auth.jurisdiction()` | TEXT | User's legal jurisdiction |
+| `auth.data_region()` | TEXT | Data residency region |
+
+#### Context Management
+
+```sql
+-- Set context for request
+SELECT auth.set_context(
+  p_tenant_id := '...',
+  p_user_id := '...',
+  p_app_id := 'thinktank',
+  p_permission_level := 'tenant_admin',
+  p_jurisdiction := 'EU',
+  p_data_region := 'eu-west-1',
+  p_break_glass := false
+);
+
+-- Clear after request
+SELECT auth.clear_context();
+```
+
+### 34.3 User Application Assignments
+
+Users can be assigned to multiple applications with different permission levels.
+
+#### Assignment Types
+
+| Type | Description |
+|------|-------------|
+| `standard` | Normal user access |
+| `admin` | Application admin |
+| `readonly` | Read-only access |
+| `trial` | Limited trial access |
+
+#### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/user-registry/assignments` | GET | List assignments (by userId or appId) |
+| `/user-registry/assignments` | POST | Create assignment |
+| `/user-registry/assignments/revoke` | POST | Revoke assignment |
+
+### 34.4 Consent Management
+
+GDPR/CCPA/COPPA compliant consent tracking with full audit trail.
+
+#### Lawful Bases (GDPR Article 6)
+
+| Basis | Description |
+|-------|-------------|
+| `consent` | User explicitly consented |
+| `contract` | Necessary for contract |
+| `legal_obligation` | Required by law |
+| `vital_interests` | Protect vital interests |
+| `public_interest` | Public interest task |
+| `legitimate_interests` | Legitimate business interest |
+
+#### Consent Methods
+
+| Method | Description |
+|--------|-------------|
+| `explicit_checkbox` | Unchecked checkbox |
+| `click_accept` | Click to accept button |
+| `implicit` | Implied consent |
+| `parent_consent` | Parent/guardian consent |
+| `verified_parent` | Verified parental consent (COPPA) |
+| `double_opt_in` | Email confirmation |
+
+#### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/user-registry/consent` | GET | Get user consents |
+| `/user-registry/consent` | POST | Record consent |
+| `/user-registry/consent/withdraw` | POST | Withdraw consent |
+| `/user-registry/consent/check` | GET | Check consent status |
+
+### 34.5 Break Glass Access
+
+Emergency admin access for critical situations with full audit trail.
+
+#### Requirements
+
+- **Radiant Admin only** - Tenant admins cannot initiate
+- **Incident ticket recommended** - Link to incident tracking
+- **Approval tracking** - Record who approved access
+- **P0 alerting** - SNS notification on initiation
+- **Immutable audit log** - Hash-chained entries
+
+#### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/user-registry/break-glass` | GET | List access logs |
+| `/user-registry/break-glass/active` | GET | Active sessions |
+| `/user-registry/break-glass/initiate` | POST | Start emergency access |
+| `/user-registry/break-glass/end` | POST | End access session |
+
+#### Example: Initiate Break Glass
+
+```bash
+POST /api/admin/user-registry/break-glass/initiate
+{
+  "tenantId": "tenant-uuid",
+  "accessReason": "Customer escalation - data corruption investigation",
+  "incidentTicket": "INC-2024-001234",
+  "approvedBy": "cto@company.com"
+}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "accessId": "bg-uuid",
+  "message": "Break Glass access initiated",
+  "instructions": "Access will be logged. End session when complete."
+}
+```
+
+### 34.6 Legal Hold
+
+Prevent data deletion for litigation, regulatory investigation, or audit.
+
+#### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/user-registry/legal-hold` | GET | List holds |
+| `/user-registry/legal-hold/apply` | POST | Apply hold |
+| `/user-registry/legal-hold/release` | POST | Release hold |
+
+#### Example: Apply Legal Hold
+
+```bash
+POST /api/admin/user-registry/legal-hold/apply
+{
+  "userId": "user-uuid",
+  "reason": "Pending litigation - case #2024-CV-1234",
+  "caseId": "2024-CV-1234"
+}
+```
+
+### 34.7 DSAR Processing
+
+Handle Data Subject Access Requests as required by GDPR, CCPA, etc.
+
+#### Request Types
+
+| Type | Description | SLA |
+|------|-------------|-----|
+| `access` | Export user data | 30 days |
+| `delete` | Delete user data | 30 days |
+| `portability` | Export in machine-readable format | 30 days |
+| `rectification` | Correct inaccurate data | 30 days |
+| `restriction` | Restrict processing | 30 days |
+| `objection` | Object to processing | 30 days |
+
+#### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/user-registry/dsar` | GET | List DSAR requests |
+| `/user-registry/dsar/process` | POST | Process request |
+| `/user-registry/dsar/:id` | PATCH | Update status |
+
+### 34.8 Cross-Border Transfer
+
+Validate data transfers between regions based on user jurisdiction.
+
+#### Transfer Mechanisms
+
+| Mechanism | Description |
+|-----------|-------------|
+| `same_region` | Data stays in same region |
+| `pre_approved_region` | Region in tenant's allowed list |
+| `adequacy_decision` | EU adequacy decision exists |
+| `explicit_consent` | User consented to transfer |
+| `sccs` | Standard Contractual Clauses |
+| `bcr` | Binding Corporate Rules |
+
+#### API Endpoint
+
+```bash
+GET /api/admin/user-registry/cross-border/check?userId=xxx&targetRegion=us-west-2
+```
+
+### 34.9 Credential Rotation
+
+Zero-downtime secret rotation for applications.
+
+#### How It Works
+
+1. **Generate new secret** - Create new credential
+2. **Set rotation window** - Both secrets valid (default 24h)
+3. **Update clients** - Migrate clients to new secret
+4. **Window expires** - Old secret automatically invalid
+
+#### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/user-registry/credentials/verify` | POST | Verify credentials |
+| `/user-registry/credentials/rotate` | POST | Start rotation |
+| `/user-registry/credentials/set` | POST | Set initial secret |
+| `/user-registry/credentials/cleanup` | POST | Clear expired windows |
+
+### 34.10 Infrastructure
+
+#### DynamoDB Tables
+
+| Table | Purpose |
+|-------|---------|
+| `radiant-app-client-mapping-{env}` | M2M token enrichment |
+| `radiant-user-assignments-{env}` | Assignment cache with TTL |
+| `radiant-tenant-config-{env}` | Tenant configuration cache |
+
+#### S3 Audit Bucket
+
+- **Object Lock**: COMPLIANCE mode, 7-year retention
+- **Encryption**: CMK with key rotation
+- **Lifecycle**: Glacier transition at 90 days
+- **Partitioning**: year/month/day prefixes
+
+#### Security Alerts
+
+SNS topic `radiant-security-alerts-{env}` for:
+- Break Glass initiation
+- Legal hold changes
+- DSAR completions
+- Suspicious access patterns
+
+### 34.11 Database Migration
+
+Migration file: `packages/infrastructure/migrations/125_multi_app_user_registry.sql`
+
+Tables created/modified:
+- Extended: `tenants`, `users`, `registered_apps`
+- Created: `user_application_assignments`, `consent_records`, `data_retention_obligations`, `break_glass_access_log`, `dsar_requests`
+
+---
+
+## 35. Intelligent File Conversion Infrastructure
+
+**Location**: Platform Infrastructure (operates automatically, no direct admin UI)
+
+The **Intelligent File Conversion Service** is a Radiant-side system that automatically decides when and how to convert files for AI providers. Client applications (Think Tank, etc.) submit files; Radiant determines the optimal conversion strategy based on the target AI provider's capabilities.
+
+### 35.1 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              CLIENT APPLICATION                              │
+│  User drops file into chat → Submit to Radiant API                          │
+└───────────────────────────────────┬──────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              RADIANT                                         │
+│                                                                              │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐          │
+│  │ Format Detection│───▶│ Provider Check  │───▶│ Decision Engine │          │
+│  │   - MIME type   │    │   - Capabilities│    │   - Strategy    │          │
+│  │   - Extension   │    │   - Limits      │    │   - Warnings    │          │
+│  │   - Magic bytes │    │   - Vision/Audio│    │   - Token est.  │          │
+│  └─────────────────┘    └─────────────────┘    └────────┬────────┘          │
+│                                                          │                   │
+│                         ┌────────────────────────────────┴─────┐             │
+│                         │         Needs Conversion?            │             │
+│                         └────────────────┬─────────────────────┘             │
+│                                          │                                   │
+│              ┌───────────────────────────┼───────────────────────────┐       │
+│              │ NO                        │                      YES  │       │
+│              ▼                           │                           ▼       │
+│  ┌─────────────────┐                     │            ┌─────────────────┐    │
+│  │ Return original │                     │            │ Execute Strategy│    │
+│  │ file as-is      │                     │            │ (see 35.4)      │    │
+│  └─────────────────┘                     │            └────────┬────────┘    │
+│                                          │                     │             │
+│                                          └──────────┬──────────┘             │
+│                                                     │                        │
+│                                                     ▼                        │
+│                                          ┌─────────────────┐                 │
+│                                          │ Return Result   │                 │
+│                                          │ + Update Learning│                │
+│                                          └─────────────────┘                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 35.2 Core Principle
+
+> **"Let Radiant decide, not Think Tank"**
+
+1. Think Tank submits files **without worrying about provider compatibility**
+2. Radiant detects file format and **checks target provider capabilities**
+3. Conversion **only happens if the AI provider doesn't understand the format**
+4. Uses **AI + libraries** for intelligent conversion
+5. **Learns from outcomes** to improve future decisions
+
+### 35.3 Provider Capabilities Registry
+
+The service maintains a registry of what each AI provider can handle natively:
+
+| Provider | Vision | Audio | Video | Max File Size | Native Document Formats |
+|----------|--------|-------|-------|---------------|------------------------|
+| **OpenAI** | ✅ GPT-4V | ✅ Whisper | ❌ | 20MB | txt, md, json, csv |
+| **Anthropic** | ✅ Claude 3 | ❌ | ❌ | 32MB | pdf, txt, md, json, csv |
+| **Google** | ✅ Gemini | ✅ | ✅ | 100MB | pdf, txt, md, json, csv |
+| **xAI** | ✅ Grok | ❌ | ❌ | 20MB | txt, md, json |
+| **DeepSeek** | ❌ | ❌ | ❌ | 10MB | txt, md, json, csv |
+| **Self-hosted** | ✅ LLaVA | ✅ Whisper | ❌ | 50MB | txt, md, json, csv |
+
+### 35.4 Conversion Strategies (Detailed)
+
+#### `none` - No Conversion
+Provider natively supports the format. File is passed through as-is.
+
+#### `extract_text` - Text Extraction
+Extracts plain text from documents.
+
+| Format | Library | Output |
+|--------|---------|--------|
+| PDF | `pdf-parse` | Text + page metadata |
+| DOCX/DOC | `mammoth` | Structured text |
+| PPTX/PPT | native | Text from slides |
+| HTML/XML | native | Tags stripped |
+
+**Example output:**
+```
+[Document Title]
+Page 1:
+Content from first page...
+
+Page 2:
+Content from second page...
+
+[Metadata]
+Pages: 10
+Author: John Doe
+Created: 2024-01-15
+```
+
+#### `ocr` - Optical Character Recognition
+Uses **AWS Textract** to extract text from images.
+
+**Features:**
+- Printed and handwritten text detection
+- Table detection and extraction
+- Form field detection
+- Confidence scores per block
+
+**Example output:**
+```
+[OCR Result]
+Confidence: 94.5%
+
+INVOICE #12345
+Date: January 15, 2024
+
+Item          Qty    Price
+Widget A       10    $50.00
+Widget B        5    $25.00
+
+Total: $625.00
+```
+
+#### `transcribe` - Audio Transcription
+Uses **OpenAI Whisper** (or self-hosted) for speech-to-text.
+
+**Features:**
+- Automatic language detection
+- Timestamp segments
+- SRT/VTT subtitle generation
+
+**Example output:**
+```
+[Transcription]
+Duration: 5:32
+Language: English
+
+[00:00] Hello and welcome to today's meeting.
+[00:05] We'll be discussing the Q4 roadmap.
+[00:12] First, let's review the current status...
+```
+
+#### `describe_image` - AI Image Description
+Uses vision-capable models to describe image contents.
+
+**Models used:**
+- GPT-4 Vision (OpenAI)
+- Claude 3 Vision (Anthropic)
+- LLaVA (self-hosted)
+
+**Example output:**
+```
+[Image Description]
+Model: gpt-4-vision
+Dimensions: 1920x1080
+
+This image shows a modern office space with an open floor plan. 
+In the foreground, there are several desks arranged in clusters, 
+each with monitors and office supplies.
+
+[Text detected in image]:
+"RADIANT - Innovation Center"
+```
+
+#### `describe_video` - Video Frame Analysis
+Extracts key frames and describes each using vision models.
+
+**Configuration:**
+- Frame interval: 10 seconds (default)
+- Maximum frames: 10 (default)
+
+**Example output:**
+```
+**Video Overview** (2m 30s, 1920x1080)
+
+**Frame Analysis:**
+
+**[0:00]** The video opens with a title screen showing the company logo.
+**[0:10]** A presenter stands in front of a whiteboard with diagrams.
+**[0:20]** Close-up of the whiteboard showing a flowchart.
+
+**Summary:**
+The video begins with company logo and ends with key point summary.
+```
+
+#### `parse_data` - Structured Data Parsing
+
+| Format | Library | Output |
+|--------|---------|--------|
+| CSV | native | JSON array of objects |
+| XLSX/XLS | `xlsx` | JSON with sheet data |
+| JSON | native | Validated and prettified |
+
+**Example output (CSV):**
+```json
+{
+  "data": [
+    {"name": "Alice", "email": "alice@example.com", "role": "Admin"},
+    {"name": "Bob", "email": "bob@example.com", "role": "User"}
+  ],
+  "metadata": {
+    "rowCount": 2,
+    "columnCount": 3,
+    "headers": ["name", "email", "role"]
+  }
+}
+```
+
+#### `decompress` - Archive Extraction
+Extracts and processes archive contents.
+
+| Format | Library |
+|--------|---------|
+| ZIP | `adm-zip` |
+| TAR | `tar` |
+| GZIP | `zlib` |
+
+**Features:**
+- Recursive extraction
+- Text file content inclusion
+- Binary file detection
+- Size limits enforcement
+
+#### `render_code` - Code Formatting
+Formats code files with syntax highlighting as markdown.
+
+### 35.5 Supported File Formats
+
+#### Documents
+| Format | Extension | Conversion Strategy |
+|--------|-----------|---------------------|
+| PDF | `.pdf` | `extract_text` via pdf-parse |
+| Word | `.docx`, `.doc` | `extract_text` via mammoth |
+| PowerPoint | `.pptx`, `.ppt` | `extract_text` |
+| Excel | `.xlsx`, `.xls` | `parse_data` via xlsx |
+
+#### Text Files
+| Format | Extension | Notes |
+|--------|-----------|-------|
+| Plain Text | `.txt` | Direct passthrough |
+| Markdown | `.md` | Direct passthrough |
+| JSON | `.json` | Direct or `parse_data` |
+| CSV | `.csv` | `parse_data` |
+| XML | `.xml` | Direct or `extract_text` |
+| HTML | `.html` | `extract_text` |
+
+#### Images
+| Format | Extension | Conversion Strategy |
+|--------|-----------|---------------------|
+| PNG | `.png` | Native or `describe_image` |
+| JPEG | `.jpg`, `.jpeg` | Native or `describe_image` |
+| GIF | `.gif` | Native or `describe_image` |
+| WebP | `.webp` | Native or `describe_image` |
+| SVG | `.svg` | Convert to PNG or `describe_image` |
+| BMP | `.bmp` | Convert to PNG or `describe_image` |
+| TIFF | `.tiff` | Convert to PNG or `describe_image` |
+
+#### Audio
+| Format | Extension | Conversion Strategy |
+|--------|-----------|---------------------|
+| MP3 | `.mp3` | `transcribe` via Whisper |
+| WAV | `.wav` | `transcribe` via Whisper |
+| OGG | `.ogg` | `transcribe` via Whisper |
+| FLAC | `.flac` | `transcribe` via Whisper |
+| M4A | `.m4a` | `transcribe` via Whisper |
+
+#### Video
+| Format | Extension | Conversion Strategy |
+|--------|-----------|---------------------|
+| MP4 | `.mp4` | `describe_video` |
+| WebM | `.webm` | `describe_video` |
+| MOV | `.mov` | `describe_video` |
+| AVI | `.avi` | `describe_video` |
+
+#### Code Files
+| Format | Extension | Notes |
+|--------|-----------|-------|
+| Python | `.py` | Syntax-highlighted markdown |
+| JavaScript | `.js`, `.jsx` | Syntax-highlighted markdown |
+| TypeScript | `.ts`, `.tsx` | Syntax-highlighted markdown |
+| Java | `.java` | Syntax-highlighted markdown |
+| C/C++ | `.c`, `.cpp`, `.h` | Syntax-highlighted markdown |
+| Go | `.go` | Syntax-highlighted markdown |
+| Rust | `.rs` | Syntax-highlighted markdown |
+| Ruby | `.rb` | Syntax-highlighted markdown |
+
+#### Archives
+| Format | Extension | Conversion Strategy |
+|--------|-----------|---------------------|
+| ZIP | `.zip` | `decompress` via adm-zip |
+| TAR | `.tar` | `decompress` via tar |
+| GZIP | `.gz`, `.tar.gz` | `decompress` via zlib |
+
+### 35.6 Multi-Model File Preparation
+
+When multiple AI models work on the same prompt (multi-model orchestration), the system makes **per-model conversion decisions**:
+
+> **Key Principle:** "If a model accepts the file type, assume it understands it unless proven otherwise."
+
+```
+File: document.pdf → 3 Models
+
+┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+│  Claude 3.5 │  │  GPT-4      │  │  DeepSeek   │
+│  PDF: ✅    │  │  PDF: ❌    │  │  PDF: ❌    │
+├─────────────┤  ├─────────────┤  ├─────────────┤
+│ PASS        │  │ CONVERT     │  │ CONVERT     │
+│ ORIGINAL    │  │ (extract)   │  │ (cached)    │
+└─────────────┘  └─────────────┘  └─────────────┘
+```
+
+**Per-Model Actions:**
+
+| Action | When | Result |
+|--------|------|--------|
+| `pass_original` | Model natively supports format | Original file passed |
+| `convert` | Model doesn't support format | Converted content passed |
+| `skip` | File too large or conversion failed | Model excluded |
+
+**Features:**
+- **Cached conversions**: Convert once, reuse for all models that need it
+- **Per-model capability checking**: Vision, audio, video, document formats
+- **Learned understanding**: Uses reinforcement learning data (see 35.10)
+
+### 35.7 Domain-Specific File Formats
+
+The service includes a registry of **50+ domain-specific formats** that are widely used in specialized fields but not commonly supported by mainstream AI providers.
+
+#### Mechanical Engineering / CAD
+
+| Format | Extensions | Description | Recommended Library |
+|--------|------------|-------------|---------------------|
+| **STEP** | `.step`, `.stp`, `.p21` | ISO 10303 CAD exchange | OpenCASCADE, FreeCAD |
+| **STL** | `.stl` | 3D printing mesh | numpy-stl, trimesh |
+| **OBJ** | `.obj` | Wavefront 3D model | trimesh, three.js |
+| **Fusion 360** | `.f3d`, `.f3z` | Autodesk parametric CAD | Fusion 360 API |
+| **IGES** | `.iges`, `.igs` | Legacy CAD exchange | OpenCASCADE |
+| **DXF** | `.dxf` | AutoCAD 2D drawings | ezdxf |
+| **GLTF/GLB** | `.gltf`, `.glb` | Web 3D format | three.js, trimesh |
+
+**CAD Converter Extracts:**
+
+| Format | What's Extracted |
+|--------|------------------|
+| **STL** | Triangle count, bounding box, 3D printing assessment, volume estimate |
+| **OBJ** | Vertices, faces, materials, groups |
+| **STEP** | Entities, part names, assembly structure, schema version |
+| **DXF** | Layers, entity types (lines, arcs, circles), block count |
+| **GLTF/GLB** | Meshes, materials, animations, scene graph |
+
+#### Electrical Engineering
+
+| Format | Extensions | Description | Library |
+|--------|------------|-------------|---------|
+| **KiCad** | `.kicad_pcb`, `.kicad_sch` | PCB/schematic | kicad-cli, kiutils |
+| **EAGLE** | `.brd`, `.sch` | Autodesk PCB | eagle-to-kicad |
+| **SPICE** | `.spice`, `.sp`, `.cir` | Circuit simulation | PySpice, ngspice |
+
+#### Medical/Healthcare
+
+| Format | Extensions | Description | Library |
+|--------|------------|-------------|---------|
+| **DICOM** | `.dcm`, `.dicom` | Medical imaging | pydicom, dcmtk |
+| **HL7 FHIR** | `.json`, `.xml` | Health records | fhir.resources |
+
+#### Scientific/Research
+
+| Format | Extensions | Description | Library |
+|--------|------------|-------------|---------|
+| **NetCDF** | `.nc`, `.nc4` | Climate/geoscience | netCDF4, xarray |
+| **HDF5** | `.h5`, `.hdf5` | Scientific data | h5py |
+| **FITS** | `.fits` | Astronomy data | astropy |
+
+#### Geospatial
+
+| Format | Extensions | Description | Library |
+|--------|------------|-------------|---------|
+| **Shapefile** | `.shp`, `.dbf` | Vector GIS | geopandas, shapefile |
+| **GeoTIFF** | `.tif`, `.geotiff` | Georeferenced raster | rasterio |
+
+#### Bioinformatics
+
+| Format | Extensions | Description | Library |
+|--------|------------|-------------|---------|
+| **FASTA** | `.fasta`, `.fa` | DNA/protein sequences | Biopython |
+| **PDB** | `.pdb` | Protein structure | Biopython, py3Dmol |
+
+#### Domain Detection
+
+When a domain-specific file is uploaded:
+
+1. Format detected by extension and MIME type
+2. Domain identified (e.g., Mechanical Engineering)
+3. AGI Brain selects appropriate library
+4. Extracts domain-relevant information
+5. Generates AI-readable description with specialized prompts
+
+**Example AI Prompts per Format:**
+
+```
+# STL file prompt
+"This is an STL 3D model file. Describe the shape, identify what object 
+it might be, assess printability, and note any potential issues for 3D printing."
+
+# DICOM file prompt
+"This is a DICOM medical image. Describe the imaging modality, anatomical 
+region, and any visible findings. Note: Do not provide medical diagnoses."
+
+# STEP file prompt  
+"This is a STEP CAD file. Describe the mechanical part or assembly, 
+including approximate geometry, features, and likely manufacturing process."
+```
+
+### 35.8 Database Schema
+
+#### Migration: `127_file_conversion_service.sql`
+
+| Table | Purpose |
+|-------|---------|
+| `file_conversions` | Tracks all conversion decisions and results |
+| `provider_file_capabilities` | Provider format support registry (configurable) |
+
+**`file_conversions` columns:**
+- `id` - UUID primary key
+- `tenant_id` - Tenant reference
+- `user_id` - User who uploaded
+- `conversation_id` - Associated conversation
+- `filename` - Original filename
+- `mime_type` - MIME type
+- `file_format` - Detected format
+- `file_size` - Size in bytes
+- `file_checksum` - SHA256 hash
+- `target_provider_id` - Target AI provider
+- `target_model_id` - Target model
+- `conversion_strategy` - Strategy used
+- `conversion_decision` - Full decision JSON
+- `converted_content` - Converted content (if applicable)
+- `token_estimate` - Estimated tokens
+- `processing_time_ms` - Processing duration
+- `success` - Success boolean
+- `error` - Error message if failed
+- `created_at` - Timestamp
+
+**View:** `v_file_conversion_stats` - Aggregated statistics per tenant
+
+**Functions:**
+- `check_format_supported(provider, format)` - Check if format is natively supported
+- `get_conversion_stats(tenant_id, days)` - Get tenant statistics for N days
+- `cleanup_old_conversions(retention_days)` - Clean up old conversion records
+
+#### Migration: `128_file_conversion_learning.sql`
+
+| Table | Purpose |
+|-------|---------|
+| `model_format_understanding` | Per-tenant learned model/format scores |
+| `conversion_outcome_feedback` | Recorded feedback for learning |
+| `format_understanding_events` | Audit trail of score changes |
+| `global_format_learning` | Cross-tenant aggregate insights |
+
+### 35.9 API Endpoints
+
+**Base Path:** `/api/thinktank/files`
+
+#### Process File
+
+```
+POST /api/thinktank/files/process
+```
+
+**Request:**
+```json
+{
+  "filename": "document.pdf",
+  "mimeType": "application/pdf",
+  "content": "<base64-encoded-content>",
+  "targetProvider": "anthropic",
+  "targetModel": "claude-3-5-sonnet",
+  "conversationId": "conv-uuid-optional"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "conversionId": "conv_abc123",
+    "originalFile": {
+      "filename": "document.pdf",
+      "format": "pdf",
+      "size": 1048576,
+      "checksum": "sha256:abc123..."
+    },
+    "convertedContent": {
+      "type": "text",
+      "content": "Extracted document text...",
+      "tokenEstimate": 2500,
+      "metadata": {
+        "originalFormat": "pdf",
+        "conversionStrategy": "extract_text",
+        "pageCount": 10,
+        "title": "Annual Report 2024"
+      }
+    },
+    "processingTimeMs": 1250
+  }
+}
+```
+
+#### Check Compatibility
+
+```
+POST /api/thinktank/files/check-compatibility
+```
+
+**Request:**
+```json
+{
+  "filename": "image.png",
+  "mimeType": "image/png",
+  "fileSize": 524288,
+  "targetProvider": "deepseek"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "fileInfo": {
+      "filename": "image.png",
+      "format": "png",
+      "size": 524288
+    },
+    "provider": {
+      "id": "deepseek",
+      "supportsFormat": false,
+      "supportsVision": false,
+      "maxFileSize": 10485760
+    },
+    "decision": {
+      "needsConversion": true,
+      "strategy": "describe_image",
+      "reason": "Provider deepseek lacks vision - will use AI to describe image",
+      "targetFormat": "txt"
+    }
+  }
+}
+```
+
+#### Get Capabilities
+
+```
+GET /api/thinktank/files/capabilities
+```
+
+Returns all provider capabilities for UI display.
+
+#### Get History
+
+```
+GET /api/thinktank/files/history?limit=50&offset=0
+```
+
+Returns conversion history for the current user.
+
+#### Get Statistics
+
+```
+GET /api/thinktank/files/stats?days=30
+```
+
+Returns conversion statistics for the current tenant.
+
+### 35.10 Reinforcement Learning Integration
+
+The file conversion system integrates with the AGI Brain/consciousness for **persistent learning from conversion outcomes**.
+
+#### How Learning Works
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    REINFORCEMENT LEARNING LOOP                               │
+│                                                                              │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐   │
+│  │   File      │───▶│  Decision   │───▶│   Model     │───▶│  Outcome    │   │
+│  │   Upload    │    │  Engine     │    │  Response   │    │  Detection  │   │
+│  └─────────────┘    └─────────────┘    └─────────────┘    └──────┬──────┘   │
+│                            ▲                                      │          │
+│                            │                                      ▼          │
+│                    ┌───────┴───────┐                     ┌─────────────┐     │
+│                    │   Learning    │◀────────────────────│  Feedback   │     │
+│                    │   Database    │                     │  Recording  │     │
+│                    └───────────────┘                     └─────────────┘     │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Learning Signals
+
+| Signal | Source | What It Learns |
+|--------|--------|----------------|
+| **User Rating** | Explicit 1-5 stars | Direct quality signal |
+| **Model Response** | Auto-inferred from text | Did model understand? |
+| **Error Detection** | Model errors/hallucinations | Format incompatibility |
+| **Conversion Outcome** | Success/failure | Model capability |
+
+#### Understanding Score
+
+Each model/format combination has a learned understanding score (0.0 to 1.0):
+
+| Score | Level | Recommended Action |
+|-------|-------|-------------------|
+| 0.8 - 1.0 | Excellent | Pass original file |
+| 0.6 - 0.8 | Good | Pass original file |
+| 0.4 - 0.6 | Moderate | May need conversion |
+| 0.0 - 0.4 | Poor | Always convert |
+
+#### Auto-Inference from Response
+
+The system automatically detects outcomes from model responses:
+
+**Failure signals detected:**
+- "I can't read", "unable to process", "cannot access the file"
+- "appears to be empty", "binary data", "base64"
+- Model asking for clarification about file content
+- Hallucinated content detection
+
+#### Consciousness Integration
+
+Significant learning events create **Learning Candidates** for the consciousness system:
+
+| Event | Learning Candidate Type | Quality |
+|-------|------------------------|---------|
+| Model failed on format it claimed to support | `format_misunderstanding` | 0.85 |
+| Unnecessary conversion (model would have understood) | `unnecessary_conversion` | 0.70 |
+| Model hallucinated file content | `hallucination_detection` | 0.90 |
+| User gave negative rating | `user_correction` | 0.85 |
+
+These feed into the **LoRA evolution system** for persistent consciousness improvement.
+
+#### Admin Override
+
+Force conversion for problematic model/format combinations:
+
+```sql
+-- Check current understanding scores
+SELECT model_id, file_format, understanding_score, confidence, 
+       success_count, failure_count
+FROM model_format_understanding
+WHERE tenant_id = 'your-tenant-id'
+ORDER BY understanding_score ASC;
+```
+
+**API Override:**
+```
+POST /api/admin/file-conversion/force-convert
+{
+  "modelId": "claude-3-haiku",
+  "fileFormat": "pdf",
+  "reason": "Struggles with multi-column PDFs"
+}
+```
+
+```
+DELETE /api/admin/file-conversion/force-convert
+{
+  "modelId": "claude-3-haiku",
+  "fileFormat": "pdf"
+}
+```
+
+### 35.11 Environment Variables
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `FILE_CONVERSION_BUCKET` | S3 bucket for file storage | `radiant-files` | Yes |
+| `OPENAI_API_KEY` | OpenAI API key for Whisper/Vision | - | Yes |
+| `ANTHROPIC_API_KEY` | Anthropic API key for Claude Vision | - | No |
+| `WHISPER_ENDPOINT_URL` | Self-hosted Whisper endpoint | - | No |
+| `VISION_ENDPOINT_URL` | Self-hosted LLaVA endpoint | - | No |
+| `AWS_TEXTRACT_REGION` | AWS region for Textract | `us-east-1` | No |
+| `FILE_CONVERSION_MAX_SIZE_MB` | Maximum file size | `100` | No |
+| `FILE_CONVERSION_TIMEOUT_SEC` | Processing timeout | `60` | No |
+
+### 35.12 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/file-conversion.service.ts` | Main conversion service with decision engine |
+| `lambda/shared/services/multi-model-file-prep.service.ts` | Multi-model preparation |
+| `lambda/shared/services/file-conversion-learning.service.ts` | Reinforcement learning |
+| `lambda/shared/services/converters/pdf-converter.ts` | PDF text extraction |
+| `lambda/shared/services/converters/docx-converter.ts` | DOCX extraction |
+| `lambda/shared/services/converters/excel-converter.ts` | Excel/CSV parsing |
+| `lambda/shared/services/converters/audio-converter.ts` | Audio transcription |
+| `lambda/shared/services/converters/image-converter.ts` | Image description + OCR |
+| `lambda/shared/services/converters/video-converter.ts` | Video frame extraction |
+| `lambda/shared/services/converters/archive-converter.ts` | Archive decompression |
+| `lambda/shared/services/converters/cad-converter.ts` | CAD/3D file parsing |
+| `lambda/shared/services/converters/domain-formats.ts` | Domain format registry |
+| `lambda/shared/services/converters/domain-converter-selector.ts` | AGI Brain integration |
+| `lambda/thinktank/file-conversion.ts` | API handlers |
+| `migrations/127_file_conversion_service.sql` | Main database schema |
+| `migrations/128_file_conversion_learning.sql` | Learning schema |
+
+### 35.13 Monitoring
+
+**Metrics tracked per tenant:**
+- Total files processed
+- Conversion success/failure rate
+- Average processing time
+- Most common formats
+- Most common conversion strategies
+- Storage usage
+- Learning statistics (formats learned, understanding improvements)
+
+**Alerts:**
+- High failure rate (>5%)
+- Processing time > 30s
+- Storage quota approaching limit
+- Learning anomalies (sudden score drops)
+
+---
+
+## 36. Metrics & Persistent Learning Infrastructure
+
+**Location**: Admin Dashboard → Metrics
+
+The Metrics & Persistent Learning Infrastructure provides comprehensive tracking of billing, performance, failures, violations, and logs, plus a persistent learning system that survives system reboots with a User → Tenant → Global influence hierarchy.
+
+### 36.1 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         METRICS COLLECTION                                   │
+│                                                                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
+│  │   Billing    │  │ Performance  │  │   Failures   │  │  Violations  │    │
+│  │   Metrics    │  │   Metrics    │  │    Events    │  │   Tracking   │    │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘    │
+│         │                 │                 │                 │             │
+│         └─────────────────┴─────────────────┴─────────────────┘             │
+│                                    │                                        │
+│                                    ▼                                        │
+│                         ┌─────────────────────┐                             │
+│                         │   PostgreSQL RLS    │                             │
+│                         │   (Per-Tenant)      │                             │
+│                         └──────────┬──────────┘                             │
+│                                    │                                        │
+│                                    ▼                                        │
+│                         ┌─────────────────────┐                             │
+│                         │   Admin Dashboard   │                             │
+│                         │   Metrics UI        │                             │
+│                         └─────────────────────┘                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      PERSISTENT LEARNING HIERARCHY                           │
+│                                                                              │
+│     ┌─────────────────────────────────────────────────────────────────┐     │
+│     │                    USER LEARNING (60%)                          │     │
+│     │  • Individual preferences, rules, behaviors                     │     │
+│     │  • Versioned with timestamp for rollback                        │     │
+│     │  • Highest priority in decision making                          │     │
+│     └─────────────────────────────────────────────────────────────────┘     │
+│                                    │                                        │
+│                                    ▼                                        │
+│     ┌─────────────────────────────────────────────────────────────────┐     │
+│     │                   TENANT LEARNING (30%)                         │     │
+│     │  • Aggregate patterns from all users in organization            │     │
+│     │  • Fills gaps where user data is sparse                         │     │
+│     │  • Per-tenant model performance tracking                        │     │
+│     └─────────────────────────────────────────────────────────────────┘     │
+│                                    │                                        │
+│                                    ▼                                        │
+│     ┌─────────────────────────────────────────────────────────────────┐     │
+│     │                   GLOBAL LEARNING (10%)                         │     │
+│     │  • Anonymized aggregate from all tenants                        │     │
+│     │  • Baseline intelligence, privacy-protected                     │     │
+│     │  • Minimum 5 tenant threshold for aggregation                   │     │
+│     └─────────────────────────────────────────────────────────────────┘     │
+│                                                                              │
+│     ┌─────────────────────────────────────────────────────────────────┐     │
+│     │                   SNAPSHOT & RECOVERY                           │     │
+│     │  • Daily snapshots for fast recovery                            │     │
+│     │  • System reboots do NOT require relearning                     │     │
+│     │  • Checksums for integrity verification                         │     │
+│     └─────────────────────────────────────────────────────────────────┘     │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 36.2 Metrics Categories
+
+#### Billing Metrics
+Tracks cost and usage per tenant/user/model:
+- **Token usage**: Input/output tokens per request
+- **Cost breakdown**: Cost in cents (avoids floating point issues)
+- **Storage usage**: Bytes used and storage cost
+- **Compute usage**: Self-hosted compute seconds and cost
+- **API call counts**: Successful and failed calls
+
+#### Performance Metrics
+Tracks latency and throughput:
+- **Total latency**: End-to-end request time
+- **Time to first token**: Streaming response start
+- **Inference time**: Model processing time
+- **Queue wait time**: Time in request queue
+- **Throughput**: Tokens per second
+
+#### Failure Events
+Tracks errors with classification:
+
+| Failure Type | Description |
+|--------------|-------------|
+| `api_error` | API endpoint errors |
+| `model_error` | Model inference failures |
+| `timeout` | Request timeouts |
+| `rate_limit` | Rate limiting triggered |
+| `auth_error` | Authentication failures |
+| `validation_error` | Request validation failures |
+| `provider_error` | External provider failures |
+| `quota_exceeded` | Usage quota exceeded |
+| `content_filter` | Content filtered |
+| `context_length` | Context too long |
+
+**Severity levels**: `low`, `medium`, `high`, `critical`
+
+#### Prompt Violations
+Tracks content policy violations:
+
+| Violation Type | Description |
+|----------------|-------------|
+| `content_policy` | General policy violation |
+| `jailbreak_attempt` | Attempted jailbreak |
+| `injection_attempt` | Prompt injection |
+| `pii_exposure` | PII in prompt |
+| `harassment` | Harassment content |
+| `hate_speech` | Hate speech detected |
+| `violence` | Violence content |
+| `sexual_content` | Sexual content |
+| `illegal_activity` | Illegal activity |
+
+**Actions taken**: `blocked`, `warned`, `filtered`, `logged`, `escalated`
+
+#### System Logs
+Centralized logging with levels:
+- `trace`, `debug`, `info`, `warn`, `error`, `fatal`
+
+### 36.3 User Learning (Think Tank Rules Included)
+
+#### User Rules (Versioned)
+User-defined rules for AI behavior with automatic versioning:
+
+```typescript
+interface UserRule {
+  id: string;
+  tenantId: string;
+  userId: string;
+  ruleName: string;
+  ruleCategory: 'behavior' | 'format' | 'tone' | 'content' | 'restriction' | 
+                'preference' | 'domain' | 'persona' | 'workflow' | 'other';
+  currentVersion: number;
+  ruleContent: string;
+  rulePriority: number; // 0-100
+  isActive: boolean;
+  appliesToModels?: string[];
+  appliesToTasks?: string[];
+  effectivenessScore: number; // Learned from outcomes
+}
+```
+
+**Automatic versioning**: Every update creates a new version for rollback capability.
+
+#### User Learned Preferences
+AGI Brain learns user preferences automatically:
+
+| Category | Examples |
+|----------|----------|
+| `communication_style` | Formal, casual, technical |
+| `response_format` | Bullet points, paragraphs, code |
+| `detail_level` | Brief, detailed, comprehensive |
+| `expertise_level` | Beginner, intermediate, expert |
+| `model_preference` | Preferred models for tasks |
+| `language` | Response language preference |
+
+**Learning sources**:
+- `explicit_setting` - User explicitly set
+- `implicit_behavior` - Inferred from behavior
+- `feedback` - Derived from ratings
+- `conversation` - Learned from chat
+- `pattern_detection` - Automatic pattern matching
+
+### 36.4 Tenant Aggregate Learning
+
+Aggregates learning across all users in a tenant:
+
+#### Learning Dimensions
+- **Model performance**: Quality, speed, cost-efficiency, reliability per model/task
+- **Task patterns**: Common task types and successful approaches
+- **Error recovery**: How to recover from specific errors
+- **Format preferences**: Organization-wide format preferences
+- **Domain expertise**: Learned domain-specific knowledge
+
+#### Model Performance Tracking
+Per-tenant model scoring:
+
+```sql
+SELECT model_id, task_type, quality_score, reliability_score, 
+       total_uses, successful_uses, confidence
+FROM tenant_model_performance
+WHERE tenant_id = 'your-tenant-id'
+ORDER BY quality_score DESC;
+```
+
+### 36.5 Global Aggregate Learning
+
+Anonymized cross-tenant learning:
+
+- **Minimum threshold**: 5 tenants before data is included
+- **Anonymization**: User/tenant data is hashed, never stored
+- **Privacy controls**: Per-tenant opt-out available
+- **Pattern library**: Successful patterns shared anonymously
+
+### 36.6 Learning Influence Configuration
+
+Per-tenant configuration for influence weights:
+
+```typescript
+interface LearningInfluenceConfig {
+  tenantId: string;
+  userWeight: number;    // Default: 0.60
+  tenantWeight: number;  // Default: 0.30
+  globalWeight: number;  // Default: 0.10
+  enableUserLearning: boolean;
+  enableTenantAggregation: boolean;
+  enableGlobalLearning: boolean;
+  contributeToGlobal: boolean;
+}
+```
+
+**Weights must sum to 1.0**
+
+### 36.7 Persistence & Recovery
+
+#### Snapshots
+Daily snapshots for fast recovery:
+- **User snapshots**: All preferences, rules, memories
+- **Tenant snapshots**: Aggregate learning, model performance
+- **Global snapshots**: Cross-tenant aggregates, pattern library
+
+#### Recovery Process
+On system reboot or failure:
+1. Load latest snapshot
+2. Verify checksum integrity
+3. Restore learning state
+4. Log recovery event
+
+**NO RELEARNING REQUIRED** - All learning is persisted in PostgreSQL.
+
+### 36.8 Database Schema
+
+**Migration**: `129_metrics_persistent_learning.sql`
+
+#### Metrics Tables
+
+| Table | Purpose |
+|-------|---------|
+| `billing_metrics` | Cost and usage tracking |
+| `performance_metrics` | Latency and throughput |
+| `failure_events` | Error tracking |
+| `prompt_violations` | Policy violations |
+| `system_logs` | Centralized logs |
+| `mv_tenant_daily_metrics` | Materialized view for daily aggregates |
+
+#### Learning Tables
+
+| Table | Purpose |
+|-------|---------|
+| `user_rules` | User-defined rules (versioned) |
+| `user_rules_versions` | Rule version history |
+| `user_learned_preferences` | Learned user preferences |
+| `user_preference_versions` | Preference version history |
+| `user_memory_versions` | Memory version history |
+| `tenant_aggregate_learning` | Tenant-level learning state |
+| `tenant_learning_events` | Tenant learning audit trail |
+| `tenant_model_performance` | Per-tenant model scores |
+| `global_aggregate_learning` | Cross-tenant learning |
+| `global_model_performance` | Global model scores |
+| `global_pattern_library` | Shared patterns |
+| `learning_influence_config` | Per-tenant influence weights |
+| `learning_decision_log` | Decision audit trail |
+| `learning_snapshots` | Point-in-time snapshots |
+| `learning_recovery_log` | Recovery audit trail |
+
+### 36.9 API Endpoints
+
+**Base Path**: `/api/admin/metrics`
+
+#### Dashboard & Summary
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/dashboard` | GET | Full dashboard data |
+| `/summary` | GET | Metrics summary |
+
+#### Billing
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/billing` | GET | Billing metrics |
+| `/billing` | POST | Record billing metric |
+
+#### Performance
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/performance` | GET | Performance metrics |
+| `/performance/latency` | GET | Latency percentiles |
+| `/performance` | POST | Record performance metric |
+
+#### Failures
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/failures` | GET | Failure events |
+| `/failures` | POST | Record failure |
+| `/failures/:id/resolve` | POST | Resolve failure |
+
+#### Violations
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/violations` | GET | Prompt violations |
+| `/violations` | POST | Record violation |
+| `/violations/:id/review` | POST | Review violation |
+
+#### Learning
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/learning/influence` | GET | Get learning influence |
+| `/learning/config` | GET/PUT | Influence configuration |
+| `/learning/tenant` | GET | Tenant learning state |
+| `/learning/global` | GET | Global learning state |
+| `/learning/model-performance` | GET | Model performance scores |
+| `/learning/event` | POST | Record learning event |
+| `/learning/user-preferences` | GET/POST | User preferences |
+
+#### Snapshots & Recovery
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/learning/snapshots` | GET | Get latest snapshot |
+| `/learning/snapshots` | POST | Create snapshot |
+| `/learning/snapshots/:id/recover` | POST | Recover from snapshot |
+| `/learning/recovery-logs` | GET | Recovery history |
+
+### 36.10 Admin Dashboard
+
+**Location**: `apps/admin-dashboard/app/(dashboard)/metrics/page.tsx`
+
+#### Dashboard Tabs
+- **Overview**: Summary cards, daily usage chart, top models
+- **Billing**: Cost breakdown by date and model
+- **Performance**: Latency percentiles, model performance table
+- **Failures**: Recent failures with severity and resolution status
+- **Violations**: Content violations with review status
+- **Learning**: Learning hierarchy visualization, snapshot status
+
+### 36.11 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/metrics-learning.types.ts` | TypeScript types |
+| `lambda/shared/services/metrics-collection.service.ts` | Metrics collection |
+| `lambda/shared/services/learning-influence.service.ts` | Learning hierarchy |
+| `lambda/shared/middleware/metrics-middleware.ts` | Auto-metrics for AI endpoints |
+| `lambda/admin/metrics.ts` | API handlers |
+| `lambda/scheduled/learning-snapshots.ts` | Daily snapshot Lambda |
+| `lambda/scheduled/learning-aggregation.ts` | Weekly aggregation Lambda |
+| `migrations/129_metrics_persistent_learning.sql` | Database schema |
+| `apps/admin-dashboard/app/(dashboard)/metrics/page.tsx` | Admin UI |
+| `lib/stacks/api-stack.ts` | CDK routes (lines 463-625) |
+| `lib/stacks/scheduled-tasks-stack.ts` | Scheduled Lambdas |
+
+### 36.15 Integration Points
+
+#### Brain Router Integration
+The Brain Router automatically uses learning influence when `useLearningInfluence: true`:
+
+```typescript
+import { brainRouter, initializeLearningService } from './services/brain-router';
+
+// Initialize once at startup
+initializeLearningService(pool);
+
+// Route with learning influence
+const result = await brainRouter.route({
+  tenantId,
+  userId,
+  taskType: 'code',
+  prompt: userPrompt,
+  useLearningInfluence: true,  // Enable User → Tenant → Global
+  useDomainProficiencies: true,
+  useAffectMapping: true,
+});
+
+// result.learningDecisionId - Use for feedback loop
+// result.learningInfluenceUsed - true if learning was applied
+
+// Record outcome after user feedback
+await brainRouter.recordRoutingOutcome(tenantId, result.learningDecisionId, positive);
+```
+
+#### Metrics Middleware
+Wrap AI endpoints to automatically record metrics:
+
+```typescript
+import { withMetrics } from './middleware/metrics-middleware';
+
+// Wrap handler
+export const handler = withMetrics(async (event, context) => {
+  // Your handler logic
+  return { statusCode: 200, body: JSON.stringify(result) };
+});
+```
+
+#### Manual Metrics Recording
+Record metrics programmatically:
+
+```typescript
+import { 
+  recordBillingMetric, 
+  recordFailure, 
+  recordViolation,
+  logSystem 
+} from './middleware/metrics-middleware';
+
+// Record billing
+await recordBillingMetric(tenantId, userId, modelId, inputTokens, outputTokens, costCents);
+
+// Record failure
+await recordFailure(tenantId, userId, 'model_error', 'high', 'Model timeout', modelId);
+
+// Record violation
+await recordViolation(tenantId, userId, 'jailbreak_attempt', 'high', promptSnippet, 'blocked');
+
+// System log
+await logSystem('info', 'my-service', 'Operation completed', { details: 'value' }, tenantId);
+```
+
+### 36.16 Scheduled Tasks
+
+| Task | Schedule | Purpose |
+|------|----------|---------|
+| **Learning Snapshots** | Daily 3 AM UTC | Create user/tenant/global learning backups |
+| **Learning Aggregation** | Weekly Sun 4 AM UTC | Aggregate tenant data to global (min 5 tenants) |
+
+Both Lambdas are configured in `scheduled-tasks-stack.ts` and handle:
+- Error recovery with logging
+- Cleanup of old data (30-day snapshots, 90-day events)
+- Materialized view refresh for dashboard performance
+
+### 36.12 Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `METRICS_RETENTION_DAYS` | Days to retain detailed metrics | `90` |
+| `SNAPSHOT_FREQUENCY_HOURS` | Hours between snapshots | `24` |
+| `GLOBAL_AGGREGATION_MIN_TENANTS` | Minimum tenants for global | `5` |
+| `LEARNING_WEIGHTS_USER` | Default user weight | `0.60` |
+| `LEARNING_WEIGHTS_TENANT` | Default tenant weight | `0.30` |
+| `LEARNING_WEIGHTS_GLOBAL` | Default global weight | `0.10` |
+
+### 36.13 Monitoring & Alerts
+
+**Metrics to monitor**:
+- Billing metrics recording rate
+- Failure rate by severity
+- Violation rate by type
+- Snapshot success rate
+- Recovery success rate
+- Learning event volume
+
+**Alerts**:
+- High failure rate (>5%)
+- Critical severity failures
+- Snapshot failures
+- Recovery failures
+- Unusual violation patterns
+
+### 36.14 Security Considerations
+
+- **RLS enforcement**: All tables use Row Level Security
+- **Super admin bypass**: For cross-tenant analytics
+- **Anonymization**: Global learning uses hashed identifiers
+- **Audit trail**: All decisions logged for compliance
+- **Data retention**: Configurable retention periods
+
+---
+
+*Document Version: 4.18.56*
+*Last Updated: December 2025*

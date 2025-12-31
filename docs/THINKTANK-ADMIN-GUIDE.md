@@ -40,6 +40,8 @@ This guide covers administrative features specific to **Think Tank**, the consum
 23. [Predictive Coding & Evolution](#23-predictive-coding--evolution)
 24. [Zero-Cost Ego System](#24-zero-cost-ego-system)
 25. [Formal Reasoning Libraries](#25-formal-reasoning-libraries)
+26. [Ethics-Free Reasoning Mode](#26-ethics-free-reasoning-mode)
+27. [Intelligent File Conversion](#27-intelligent-file-conversion)
 
 ---
 
@@ -2556,9 +2558,386 @@ const stats = await consciousnessEngineService.getEthicsFreeStats(tenantId, 30);
 
 ---
 
+## 27. Intelligent File Conversion
+
+**Location**: Think Tank Chat → File Drop / Attach
+
+Think Tank allows users to drop or attach files to conversations. Radiant automatically decides if and how to convert files for the target AI provider.
+
+### 27.1 Core Concept
+
+**"Let Radiant decide, not Think Tank"**
+
+When a user drops a file into Think Tank:
+1. Think Tank submits the file to Radiant's file conversion service
+2. Radiant detects the file format and checks target provider capabilities
+3. Radiant decides: pass through (native support) OR convert
+4. Conversion only happens if the AI provider doesn't understand the format
+5. Think Tank receives the processed content ready for the AI
+
+### 27.2 Supported File Formats
+
+| Category | Formats | Notes |
+|----------|---------|-------|
+| **Documents** | PDF, DOCX, DOC, XLSX, XLS, PPTX, PPT | Text extraction |
+| **Text** | TXT, MD, JSON, CSV, XML, HTML | Direct or parsed |
+| **Images** | PNG, JPG, JPEG, GIF, WEBP, SVG, BMP, TIFF | Vision or description |
+| **Audio** | MP3, WAV, OGG, FLAC, M4A | Transcription |
+| **Video** | MP4, WEBM, MOV, AVI | Frame extraction |
+| **Code** | PY, JS, TS, Java, C++, C, Go, Rust, Ruby | Syntax formatting |
+| **Archives** | ZIP, TAR, GZ | Content extraction |
+
+### 27.3 Provider Capabilities
+
+Different AI providers support different file formats natively:
+
+| Provider | Vision | Audio | Video | Max Size | Native Docs |
+|----------|--------|-------|-------|----------|-------------|
+| **OpenAI** | ✓ | ✓ (Whisper) | ✗ | 20MB | txt, md, json, csv |
+| **Anthropic** | ✓ | ✗ | ✗ | 32MB | pdf, txt, md, json, csv |
+| **Google** | ✓ | ✓ | ✓ | 100MB | pdf, txt, md, json, csv |
+| **xAI** | ✓ | ✗ | ✗ | 20MB | txt, md, json |
+| **DeepSeek** | ✗ | ✗ | ✗ | 10MB | txt, md, json, csv |
+| **Self-hosted** | ✓ (LLaVA) | ✓ (Whisper) | ✗ | 50MB | txt, md, json, csv |
+
+### 27.4 Conversion Strategies
+
+| Strategy | When Used | Output |
+|----------|-----------|--------|
+| `none` | Provider natively supports format | Original file |
+| `extract_text` | PDF, DOCX, PPTX → text | Plain text |
+| `ocr` | Image with text content | Extracted text |
+| `transcribe` | Audio files | Transcription text |
+| `describe_image` | Image + provider lacks vision | AI description |
+| `describe_video` | Video + provider lacks video | Frame descriptions |
+| `parse_data` | CSV, XLSX → structured | JSON data |
+| `decompress` | Archives | Extracted contents |
+| `render_code` | Code files | Syntax-highlighted markdown |
+
+### 27.5 API Endpoints
+
+**Base Path**: `/api/thinktank/files`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/process` | POST | Submit file for processing |
+| `/check-compatibility` | POST | Pre-flight format check |
+| `/capabilities` | GET | Provider capabilities |
+| `/history` | GET | Conversion history |
+| `/stats` | GET | Conversion statistics |
+
+#### Process File Request
+
+```json
+POST /api/thinktank/files/process
+{
+  "filename": "document.pdf",
+  "mimeType": "application/pdf",
+  "content": "<base64-encoded-content>",
+  "targetProvider": "anthropic",
+  "targetModel": "claude-3-5-sonnet",
+  "conversationId": "conv-uuid"
+}
+```
+
+#### Process File Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "conversionId": "conv_abc123",
+    "originalFile": {
+      "filename": "document.pdf",
+      "format": "pdf",
+      "size": 1048576,
+      "checksum": "sha256..."
+    },
+    "convertedContent": {
+      "type": "text",
+      "content": "Extracted document text...",
+      "tokenEstimate": 2500,
+      "metadata": {
+        "originalFormat": "pdf",
+        "conversionStrategy": "extract_text"
+      }
+    },
+    "processingTimeMs": 1250
+  }
+}
+```
+
+#### Check Compatibility Request
+
+```json
+POST /api/thinktank/files/check-compatibility
+{
+  "filename": "image.png",
+  "mimeType": "image/png",
+  "fileSize": 524288,
+  "targetProvider": "deepseek"
+}
+```
+
+#### Check Compatibility Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "fileInfo": {
+      "filename": "image.png",
+      "format": "png",
+      "size": 524288
+    },
+    "provider": {
+      "id": "deepseek",
+      "supportsFormat": false,
+      "supportsVision": false,
+      "maxFileSize": 10485760
+    },
+    "decision": {
+      "needsConversion": true,
+      "strategy": "describe_image",
+      "reason": "Provider deepseek lacks vision - will use AI to describe image",
+      "targetFormat": "txt"
+    }
+  }
+}
+```
+
+### 27.6 User Experience
+
+**In Think Tank Chat:**
+
+1. User drags file into chat or clicks attach
+2. Think Tank shows upload progress
+3. Radiant processes file (typically <2 seconds)
+4. If conversion needed, shows indicator: "📄 document.pdf → Extracted as text"
+5. Content sent to AI with conversation
+
+**Visual Indicators:**
+
+| Icon | Meaning |
+|------|---------|
+| 📎 | File attached (native support) |
+| 🔄 | File converted |
+| ⚠️ | Conversion warning (partial support) |
+| ❌ | Unsupported format |
+
+### 27.7 Admin Configuration
+
+**Location**: Admin Dashboard → Think Tank → File Settings
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Max file size | 50MB | Maximum upload size |
+| Conversion timeout | 30s | Processing timeout |
+| Enable transcription | true | Audio → text |
+| Enable OCR | true | Image text extraction |
+| Enable video processing | false | Video frame extraction |
+| Retention days | 30 | How long to keep converted files |
+
+### 27.8 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `file_conversions` | Tracks all conversion decisions and results |
+| `provider_file_capabilities` | Provider format support registry |
+| `v_file_conversion_stats` | Aggregated statistics view |
+
+### 27.9 Multi-Model File Preparation
+
+When using multi-model orchestration (multiple AI models working on the same prompt), Radiant makes **per-model conversion decisions**:
+
+> **Key Principle:** "If a model accepts the file type, assume it understands it unless proven otherwise."
+
+**Example: PDF with 3 models**
+
+```
+┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+│  Claude 3.5 │  │  GPT-4      │  │  DeepSeek   │
+│  PDF: ✅    │  │  PDF: ❌    │  │  PDF: ❌    │
+├─────────────┤  ├─────────────┤  ├─────────────┤
+│ PASS        │  │ CONVERT     │  │ CONVERT     │
+│ ORIGINAL    │  │ (extract)   │  │ (cached)    │
+└─────────────┘  └─────────────┘  └─────────────┘
+```
+
+**Per-Model Actions:**
+
+| Action | When | Result |
+|--------|------|--------|
+| `pass_original` | Model natively supports format | Original file passed |
+| `convert` | Model doesn't support format | Converted content passed |
+| `skip` | File too large or conversion failed | Model excluded |
+
+**Features:**
+- **Cached conversions**: Convert once, reuse for all models that need it
+- **Per-model capability checking**: Vision, audio, video, document formats
+- **Model format overrides**: When a model claims support but proves it doesn't understand
+
+### 27.10 Domain-Specific File Formats
+
+The service includes a registry of 50+ domain-specific formats that are widely used in specialized fields:
+
+| Domain | Formats | Example Use Cases |
+|--------|---------|-------------------|
+| **Mechanical Engineering** | STEP, STL, OBJ, Fusion 360, IGES, DXF, GLTF | CAD models, 3D printing |
+| **Electrical Engineering** | KiCad, EAGLE, SPICE | PCB design, circuit simulation |
+| **Medical** | DICOM, HL7 FHIR | Medical imaging, health records |
+| **Scientific** | NetCDF, HDF5, FITS | Climate data, astronomy |
+| **Geospatial** | Shapefile, GeoTIFF | GIS, mapping |
+| **Bioinformatics** | FASTA, PDB | DNA sequences, protein structures |
+
+**How Domain Detection Works:**
+
+1. User uploads a domain-specific file (e.g., `part.step`)
+2. Radiant detects format and identifies domain (Mechanical Engineering)
+3. AGI Brain selects appropriate conversion library (OpenCASCADE)
+4. Extracts relevant information (geometry, parts, assembly structure)
+5. Provides AI-readable description with domain-specific prompts
+
+**CAD/3D File Support:**
+
+| Format | What's Extracted |
+|--------|------------------|
+| **STL** | Triangle count, bounding box, 3D printing assessment |
+| **OBJ** | Vertices, faces, materials, groups |
+| **STEP** | Entities, part names, assembly structure |
+| **DXF** | Layers, entity types, block count |
+| **GLTF/GLB** | Meshes, materials, animations, scene graph |
+
+### 27.11 Reinforcement Learning
+
+The system **learns from conversion outcomes** to make better decisions over time.
+
+**How it works:**
+1. File is processed with initial decision (pass original or convert)
+2. Model responds to the file
+3. System detects outcome (success, partial, failure)
+4. Understanding score is updated for that model/format
+5. Future decisions use learned understanding
+
+**Understanding Score (0.0 to 1.0):**
+
+| Score | Level | Action |
+|-------|-------|--------|
+| 0.8+ | Excellent | Pass original |
+| 0.6 - 0.8 | Good | Pass original |
+| 0.4 - 0.6 | Moderate | May convert |
+| < 0.4 | Poor | Convert |
+
+**Feedback sources:**
+- **User ratings** - Explicit 1-5 star feedback
+- **Model response analysis** - Auto-detected understanding
+- **Error detection** - Model errors and hallucinations
+- **Conversion outcomes** - Success/failure tracking
+
+**Consciousness integration:**
+Significant learning events (model failures, hallucinations, negative feedback) create **Learning Candidates** that feed into the AGI consciousness evolution system.
+
+### 27.12 Monitoring
+
+**Conversion Statistics** (per tenant):
+- Total files processed
+- Conversion rate (% requiring conversion)
+- Success/failure rate
+- Average processing time
+- Most common formats
+- Most common conversion strategies
+- **Learning stats** - Formats learned, understanding improvements
+
+**Access**: Admin Dashboard → Think Tank → Files → Statistics
+
+### 27.13 Related Documentation
+
+For complete technical documentation including API reference, database schema, and implementation details:
+
+- **[FILE-CONVERSION-SERVICE.md](./FILE-CONVERSION-SERVICE.md)** - Comprehensive standalone documentation
+- **[RADIANT-ADMIN-GUIDE.md Section 35](./RADIANT-ADMIN-GUIDE.md#35-file-conversion-infrastructure)** - Infrastructure administration
+
+---
+
+## 28. User Memories & Persistent Learning
+
+**Location**: Think Tank Chat → User learns from interactions
+
+Think Tank integrates with the Radiant persistent learning system to remember user preferences, rules, and behaviors across sessions. The system survives reboots without relearning.
+
+### 28.1 Learning Influence Hierarchy
+
+Decisions in Think Tank are influenced by learned knowledge in this priority order:
+
+| Level | Weight | Description |
+|-------|--------|-------------|
+| **User** | 60% | Individual user preferences, rules, learned behaviors |
+| **Tenant** | 30% | Aggregate patterns from all users in organization |
+| **Global** | 10% | Anonymized cross-tenant learning baseline |
+
+### 28.2 What Think Tank Learns
+
+#### User Rules (Versioned)
+Users can define rules that the AI follows:
+- **Behavior rules**: "Always explain your reasoning"
+- **Format rules**: "Use bullet points for lists"
+- **Tone rules**: "Be concise and direct"
+- **Restriction rules**: "Never discuss competitor products"
+
+All rules are versioned with timestamps for rollback capability.
+
+#### Learned Preferences
+Think Tank automatically learns:
+- Communication style preferences
+- Response format preferences
+- Detail level preferences
+- Model preferences for tasks
+- Domain expertise indicators
+
+### 28.3 Persistence Guarantee
+
+**NO RELEARNING REQUIRED** after system restarts:
+- All learning persisted in PostgreSQL
+- Daily snapshots for fast recovery
+- Checksums verify integrity on restore
+- Recovery logs track all restore events
+
+### 28.4 Integration with AGI Brain
+
+The AGI Brain uses learned knowledge when:
+1. Selecting models for tasks
+2. Formatting responses
+3. Adjusting response length
+4. Choosing communication style
+5. Applying user-defined rules
+
+### 28.5 Admin Configuration
+
+Administrators can configure learning weights per tenant:
+
+```
+Admin Dashboard → Metrics → Learning → Config
+```
+
+Options:
+- Adjust user/tenant/global weights (must sum to 1.0)
+- Enable/disable learning levels
+- Opt out of global learning contribution
+
+### 28.6 Related Documentation
+
+See **[RADIANT Admin Guide Section 36](./RADIANT-ADMIN-GUIDE.md#36-metrics--persistent-learning-infrastructure)** for:
+- Complete database schema
+- API endpoints
+- Implementation details
+- Monitoring and alerts
+
+---
+
 ## Related Documentation
 
 - [RADIANT Admin Guide](./RADIANT-ADMIN-GUIDE.md) - Platform administration
+- [RADIANT Admin Guide - Metrics & Learning](./RADIANT-ADMIN-GUIDE.md#36-metrics--persistent-learning-infrastructure) - Persistent learning system
 - [RADIANT Admin Guide - Consciousness Evolution](./RADIANT-ADMIN-GUIDE.md#27-consciousness-evolution-administration) - Predictive coding, LoRA evolution, Local Ego
 - [Think Tank User Guide](./THINK-TANK-USER-GUIDE.md) - End user guide
 - [User Rules System](./USER-RULES-SYSTEM.md) - Memory rules details

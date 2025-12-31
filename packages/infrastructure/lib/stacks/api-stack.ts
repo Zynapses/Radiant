@@ -460,6 +460,170 @@ export class ApiStack extends cdk.Stack {
       },
     });
 
+    // =========================================================================
+    // Metrics & Persistent Learning API (v4.18.56)
+    // =========================================================================
+    const metricsLambda = this.createLambda(
+      'Metrics',
+      'admin/metrics.handler',
+      commonEnv,
+      vpc,
+      apiSecurityGroup,
+      lambdaRole
+    );
+    const metricsIntegration = new apigateway.LambdaIntegration(metricsLambda);
+
+    // Admin metrics endpoints
+    const metrics = admin.addResource('metrics');
+    
+    // Dashboard and summary
+    metrics.addResource('dashboard').addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    metrics.addResource('summary').addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Billing metrics
+    const billingMetrics = metrics.addResource('billing');
+    billingMetrics.addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    billingMetrics.addMethod('POST', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Performance metrics
+    const performanceMetrics = metrics.addResource('performance');
+    performanceMetrics.addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    performanceMetrics.addMethod('POST', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    performanceMetrics.addResource('latency').addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Failures
+    const failures = metrics.addResource('failures');
+    failures.addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    failures.addMethod('POST', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    failures.addResource('{failureId}').addResource('resolve').addMethod('POST', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Violations
+    const violations = metrics.addResource('violations');
+    violations.addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    violations.addMethod('POST', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    violations.addResource('{violationId}').addResource('review').addMethod('POST', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Logs
+    const logs_resource = metrics.addResource('logs');
+    logs_resource.addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    logs_resource.addMethod('POST', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Learning endpoints
+    const learning = metrics.addResource('learning');
+    learning.addResource('influence').addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const learningConfig = learning.addResource('config');
+    learningConfig.addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    learningConfig.addMethod('PUT', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    learning.addResource('tenant').addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    learning.addResource('global').addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    learning.addResource('model-performance').addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    learning.addResource('event').addMethod('POST', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const userPreferences = learning.addResource('user-preferences');
+    userPreferences.addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    userPreferences.addMethod('POST', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Snapshots and recovery
+    const snapshots = learning.addResource('snapshots');
+    snapshots.addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    snapshots.addMethod('POST', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    snapshots.addResource('{snapshotId}').addResource('recover').addMethod('POST', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    learning.addResource('recovery-logs').addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Aggregate endpoints (super admin)
+    const aggregate = metrics.addResource('aggregate');
+    aggregate.addResource('tenants').addMethod('GET', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    aggregate.addResource('global-learning').addMethod('POST', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'ApiUrl', {
       value: this.api.url,

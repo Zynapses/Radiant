@@ -239,9 +239,56 @@ export class ScheduledTasksStack extends cdk.Stack {
       targets: [new targets.LambdaFunction(cacheWarmupLambda)],
     });
 
+    // =========================================================================
+    // Learning Snapshots (daily at 3 AM UTC) - v4.18.56
+    // Creates snapshots of user/tenant/global learning state for fast recovery
+    // =========================================================================
+    const learningSnapshotsLambda = new lambda.Function(this, 'LearningSnapshots', {
+      functionName: `${appId}-${environment}-learning-snapshots`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'scheduled/learning-snapshots.handler',
+      code: lambda.Code.fromAsset('lambda/dist'),
+      timeout: cdk.Duration.minutes(15),
+      memorySize: 1024,
+      environment: {
+        APP_ID: appId,
+        ENVIRONMENT: environment,
+      },
+    });
+
+    new events.Rule(this, 'LearningSnapshotsSchedule', {
+      ruleName: `${appId}-${environment}-learning-snapshots`,
+      schedule: events.Schedule.cron({ minute: '0', hour: '3' }),
+      targets: [new targets.LambdaFunction(learningSnapshotsLambda)],
+    });
+
+    // =========================================================================
+    // Learning Aggregation (weekly on Sunday at 4 AM UTC) - v4.18.56
+    // Aggregates tenant learning to global anonymized learning
+    // =========================================================================
+    const learningAggregationLambda = new lambda.Function(this, 'LearningAggregation', {
+      functionName: `${appId}-${environment}-learning-aggregation`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'scheduled/learning-aggregation.handler',
+      code: lambda.Code.fromAsset('lambda/dist'),
+      timeout: cdk.Duration.minutes(15),
+      memorySize: 1024,
+      environment: {
+        APP_ID: appId,
+        ENVIRONMENT: environment,
+        GLOBAL_AGGREGATION_MIN_TENANTS: '5',
+      },
+    });
+
+    new events.Rule(this, 'LearningAggregationSchedule', {
+      ruleName: `${appId}-${environment}-learning-aggregation`,
+      schedule: events.Schedule.cron({ minute: '0', hour: '4', weekDay: 'SUN' }),
+      targets: [new targets.LambdaFunction(learningAggregationLambda)],
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'ScheduledTasksCreated', {
-      value: '8',
+      value: '10',
       description: 'Number of scheduled tasks created',
     });
   }
@@ -250,14 +297,16 @@ export class ScheduledTasksStack extends cdk.Stack {
 /**
  * Scheduled Tasks Summary
  * 
- * | Task                    | Schedule            | Purpose                        |
- * |-------------------------|---------------------|--------------------------------|
- * | Usage Aggregator        | Every hour          | Aggregate raw usage data       |
- * | Credit Alerts           | Every 15 minutes    | Check low balance warnings     |
- * | Data Cleanup            | Daily at 3 AM UTC   | Delete expired data            |
- * | Model Status            | Every 5 minutes     | Check AI provider availability |
- * | Billing Reconciliation  | Daily at 1 AM UTC   | Reconcile usage with invoices  |
- * | Analytics Report        | Daily at 6 AM UTC   | Generate daily reports         |
- * | Webhook Retry           | Every 5 minutes     | Retry failed webhook deliveries|
- * | Cache Warmup            | Every 30 minutes    | Pre-load cache data            |
+ * | Task                    | Schedule              | Purpose                        |
+ * |-------------------------|-----------------------|--------------------------------|
+ * | Usage Aggregator        | Every hour            | Aggregate raw usage data       |
+ * | Credit Alerts           | Every 15 minutes      | Check low balance warnings     |
+ * | Data Cleanup            | Daily at 3 AM UTC     | Delete expired data            |
+ * | Model Status            | Every 5 minutes       | Check AI provider availability |
+ * | Billing Reconciliation  | Daily at 1 AM UTC     | Reconcile usage with invoices  |
+ * | Analytics Report        | Daily at 6 AM UTC     | Generate daily reports         |
+ * | Webhook Retry           | Every 5 minutes       | Retry failed webhook deliveries|
+ * | Cache Warmup            | Every 30 minutes      | Pre-load cache data            |
+ * | Learning Snapshots      | Daily at 3 AM UTC     | Create learning state backups  |
+ * | Learning Aggregation    | Weekly Sun 4 AM UTC   | Aggregate to global learning   |
  */

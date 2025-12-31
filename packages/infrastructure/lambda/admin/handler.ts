@@ -131,6 +131,192 @@ async function routeRequest(
     return handleProviders(event, method, pathParts[2]);
   }
 
+  // Compliance - delegate to dedicated handlers
+  if (pathParts[1] === 'compliance') {
+    if (pathParts[2] === 'checklists') {
+      const { handler: checklistHandler } = await import('./checklist-registry');
+      return checklistHandler(event);
+    }
+    if (pathParts[2] === 'regulatory-standards') {
+      const { handler: regulatoryHandler } = await import('./regulatory-standards');
+      return regulatoryHandler(event);
+    }
+    if (pathParts[2] === 'self-audit') {
+      const { handler: selfAuditHandler } = await import('./self-audit');
+      return selfAuditHandler(event);
+    }
+  }
+
+  // Security - delegate to dedicated handlers
+  if (pathParts[1] === 'security') {
+    if (pathParts[2] === 'schedules') {
+      const { handler: schedulesHandler } = await import('./security-schedules');
+      return schedulesHandler(event);
+    }
+    const { handler: securityHandler } = await import('./security');
+    return securityHandler(event);
+  }
+
+  // System configuration
+  if (pathParts[1] === 'system') {
+    if (pathParts[2] === 'config') {
+      const { handler: configHandler } = await import('./system-config');
+      return configHandler(event);
+    }
+    const { handler: systemHandler } = await import('./system');
+    return systemHandler(event);
+  }
+
+  // Time Machine
+  if (pathParts[1] === 'time-machine') {
+    const { handler: timeMachineHandler } = await import('./time-machine');
+    return timeMachineHandler(event);
+  }
+
+  // Orchestration methods
+  if (pathParts[1] === 'orchestration' && pathParts[2] === 'methods') {
+    const { handler: methodsHandler } = await import('./orchestration-methods');
+    return methodsHandler(event);
+  }
+
+  // Pricing
+  if (pathParts[1] === 'pricing') {
+    const { handler: pricingHandler } = await import('./pricing');
+    return pricingHandler(event);
+  }
+
+  // AWS costs
+  if (pathParts[1] === 'aws-costs') {
+    const { handler: awsCostsHandler } = await import('./aws-costs');
+    return awsCostsHandler(event);
+  }
+
+  // Ethics
+  if (pathParts[1] === 'ethics') {
+    const { handler: ethicsHandler } = await import('./ethics');
+    return ethicsHandler(event);
+  }
+
+  // Specialty rankings
+  if (pathParts[1] === 'specialty-rankings') {
+    const { handler: rankingsHandler } = await import('./specialty-rankings');
+    return rankingsHandler(event);
+  }
+
+  // AGI learning
+  if (pathParts[1] === 'agi-learning') {
+    const { handler: agiLearningHandler } = await import('./agi-learning');
+    return agiLearningHandler(event);
+  }
+
+  // Internet learning
+  if (pathParts[1] === 'internet-learning') {
+    const { handler: internetLearningHandler } = await import('./internet-learning');
+    return internetLearningHandler(event);
+  }
+
+  // Enhanced learning
+  if (pathParts[1] === 'enhanced-learning') {
+    const { handler: enhancedLearningHandler } = await import('./enhanced-learning');
+    return enhancedLearningHandler(event);
+  }
+
+  // Logs (AWS logs)
+  if (pathParts[1] === 'logs') {
+    const { handler: logsHandler } = await import('./logs');
+    return logsHandler(event);
+  }
+
+  // Consciousness
+  if (pathParts[1] === 'consciousness') {
+    if (pathParts[2] === 'engine') {
+      const { handler: engineHandler } = await import('./consciousness-engine');
+      return engineHandler(event);
+    }
+    if (pathParts[2] === 'evolution') {
+      const { handler: evolutionHandler } = await import('./consciousness-evolution');
+      return evolutionHandler(event);
+    }
+    const { handler: consciousnessHandler } = await import('./consciousness');
+    return consciousnessHandler(event);
+  }
+
+  // Ego system
+  if (pathParts[1] === 'ego') {
+    const { handler: egoHandler } = await import('./ego');
+    return egoHandler(event);
+  }
+
+  // Formal reasoning
+  if (pathParts[1] === 'formal-reasoning') {
+    const { handler: formalReasoningHandler } = await import('./formal-reasoning');
+    return formalReasoningHandler(event);
+  }
+
+  // Domain ethics
+  if (pathParts[1] === 'domain-ethics') {
+    const { handler: domainEthicsHandler } = await import('./domain-ethics');
+    return domainEthicsHandler(event);
+  }
+
+  // Ethics-free reasoning
+  if (pathParts[1] === 'ethics-free-reasoning') {
+    const { handler: ethicsFreeHandler } = await import('./ethics-free-reasoning');
+    return ethicsFreeHandler(event);
+  }
+
+  // Bobble services
+  if (pathParts[1] === 'bobble') {
+    if (pathParts[2] === 'genesis') {
+      const { handler: genesisHandler } = await import('./bobble-genesis');
+      return genesisHandler(event);
+    }
+    if (pathParts[2] === 'dialogue') {
+      const { handler: dialogueHandler } = await import('./bobble-dialogue');
+      return dialogueHandler(event);
+    }
+    if (pathParts[2] === 'global') {
+      const { handler: globalHandler } = await import('./bobble-global');
+      return globalHandler(event);
+    }
+  }
+
+  // Model coordination
+  if (pathParts[1] === 'model-coordination') {
+    const { handler: coordinationHandler } = await import('./model-coordination');
+    return coordinationHandler(event);
+  }
+
+  // Model proficiency
+  if (pathParts[1] === 'model-proficiency') {
+    const { handler: proficiencyHandler } = await import('./model-proficiency');
+    return proficiencyHandler(event);
+  }
+
+  // Infrastructure tier
+  if (pathParts[1] === 'infrastructure-tier') {
+    const { handler: tierHandler } = await import('./infrastructure-tier');
+    return tierHandler(event);
+  }
+
+  // Library registry
+  if (pathParts[1] === 'library-registry') {
+    const { handler: libraryHandler } = await import('./library-registry');
+    return libraryHandler(event);
+  }
+
+  // Inference components
+  if (pathParts[1] === 'inference-components') {
+    const { handler: inferenceHandler } = await import('./inference-components');
+    return inferenceHandler(event);
+  }
+
+  // User Registry - assignments, consent, DSAR, break glass, legal hold
+  if (pathParts[1] === 'user-registry') {
+    const { handler: userRegistryHandler } = await import('./user-registry');
+    return userRegistryHandler(event);
+  }
+
   throw new NotFoundError(`Admin route not found: ${method} ${path}`);
 }
 
