@@ -11,6 +11,7 @@
 import { executeStatement } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { brainConfigService } from './brain-config.service';
+import { ecdVerificationService } from './ecd-verification.service';
 import {
   type SystemLevel,
   type SofaiRoutingDecision,
@@ -66,9 +67,15 @@ class SofaiRouterService {
     const domain = params.domain || this.detectDomain(params.prompt);
     const domainRisk = await this.getDomainRisk(domain);
     const computeCost = this.calculateComputeCost(params.prompt);
+    
+    // ECD Risk: Estimate hallucination risk based on query characteristics
+    const ecdRisk = ecdVerificationService.estimateECDRisk(params.prompt);
+    
+    // Enhanced formula: Combine domain risk and ECD risk (60/40 weighting)
+    const combinedRisk = domainRisk * 0.6 + ecdRisk * 0.4;
 
-    // SOFAI Formula: Route to System 2 if (1-trust) * domainRisk > threshold
-    const routingScore = (1 - trust) * domainRisk;
+    // SOFAI Formula: Route to System 2 if (1-trust) * combinedRisk > threshold
+    const routingScore = (1 - trust) * combinedRisk;
     const shouldUseSystem2 = routingScore > system2Threshold;
 
     let level: SystemLevel;
@@ -76,13 +83,13 @@ class SofaiRouterService {
 
     if (shouldUseSystem2) {
       level = 'system2';
-      reasoning = `High routing score (${routingScore.toFixed(2)}) exceeds threshold (${system2Threshold}). Domain: ${domain}, Risk: ${domainRisk.toFixed(2)}`;
-    } else if (enableSystem1_5 && routingScore > system2Threshold * 0.5) {
+      reasoning = `High routing score (${routingScore.toFixed(2)}) exceeds threshold (${system2Threshold}). Domain: ${domain}, Risk: ${combinedRisk.toFixed(2)}, ECD: ${ecdRisk.toFixed(2)}`;
+    } else if (enableSystem1_5 && (routingScore > system2Threshold * 0.5 || ecdRisk > 0.5)) {
       level = 'system1.5';
-      reasoning = `Moderate routing score (${routingScore.toFixed(2)}). Using intermediate reasoning. Domain: ${domain}`;
+      reasoning = `Moderate routing score (${routingScore.toFixed(2)}) or ECD risk (${ecdRisk.toFixed(2)}). Using intermediate reasoning. Domain: ${domain}`;
     } else {
       level = 'system1';
-      reasoning = `Low routing score (${routingScore.toFixed(2)}). Fast response appropriate. Domain: ${domain}`;
+      reasoning = `Low routing score (${routingScore.toFixed(2)}). Fast response appropriate. Domain: ${domain}, ECD: ${ecdRisk.toFixed(2)}`;
     }
 
     const decision = this.createDecision(

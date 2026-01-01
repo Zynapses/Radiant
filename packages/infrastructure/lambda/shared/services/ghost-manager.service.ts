@@ -203,8 +203,27 @@ class GhostManagerService {
     const migrationEnabled = await brainConfigService.getBoolean('GHOST_MIGRATION_ENABLED', true);
 
     if (migrationEnabled) {
-      // For now, we do cold start. Future: implement migration
-      logger.info('Ghost migration not yet implemented, performing cold start', {
+      // Attempt migration if versions are compatible
+      const migratedVector = await this.migrateGhostVector(
+        oldRecord.vector,
+        oldRecord.version,
+        currentVersion
+      );
+
+      if (migratedVector) {
+        logger.info('Ghost vector migrated successfully', {
+          userId,
+          tenantId,
+          oldVersion: oldRecord.version,
+          newVersion: currentVersion,
+        });
+
+        // Save migrated vector with new version
+        await this.saveGhost(userId, tenantId, migratedVector, currentVersion, false);
+        return migratedVector;
+      }
+
+      logger.info('Ghost migration failed, performing cold start', {
         userId,
         tenantId,
         oldVersion: oldRecord.version,
@@ -215,6 +234,160 @@ class GhostManagerService {
     // Default: Cold start - delete old ghost
     await this.deleteGhost(userId, tenantId);
     return null;
+  }
+
+  /**
+   * Migrate ghost vector between model versions
+   * 
+   * Migration strategies:
+   * 1. Same-family upgrade (e.g., llama3-70b-v1 -> llama3-70b-v2): 
+   *    Direct transfer with optional normalization
+   * 2. Same-dimension different-model:
+   *    Apply learned projection matrix if available
+   * 3. Different dimensions:
+   *    Cold start required (return null)
+   */
+  private async migrateGhostVector(
+    oldVector: number[],
+    oldVersion: string,
+    newVersion: string
+  ): Promise<Float32Array | null> {
+    // Check dimension compatibility
+    if (oldVector.length !== GHOST_VECTOR_DIMENSION) {
+      logger.warn('Ghost vector dimension mismatch, cold start required', {
+        oldDimension: oldVector.length,
+        expectedDimension: GHOST_VECTOR_DIMENSION,
+      });
+      return null;
+    }
+
+    // Parse version info (format: model-size-vN)
+    const oldParts = oldVersion.split('-');
+    const newParts = newVersion.split('-');
+
+    // Extract model family (e.g., "llama3", "qwen2.5")
+    const oldFamily = oldParts.slice(0, -1).join('-');
+    const newFamily = newParts.slice(0, -1).join('-');
+
+    // Same family upgrade - direct transfer with normalization
+    if (oldFamily === newFamily) {
+      logger.debug('Same-family ghost migration', { oldFamily, newFamily });
+      return this.normalizeGhostVector(new Float32Array(oldVector));
+    }
+
+    // Check for pre-computed projection matrix
+    const projectionMatrix = await this.loadProjectionMatrix(oldVersion, newVersion);
+    if (projectionMatrix) {
+      logger.debug('Applying projection matrix for ghost migration');
+      return this.applyProjection(new Float32Array(oldVector), projectionMatrix);
+    }
+
+    // Different family, no projection - attempt semantic preservation
+    // This uses a simple normalization that preserves relative magnitudes
+    // It's lossy but better than cold start for maintaining context hints
+    const semanticPreservation = await brainConfigService.getBoolean(
+      'GHOST_SEMANTIC_PRESERVATION_ENABLED',
+      true
+    );
+
+    if (semanticPreservation) {
+      logger.debug('Applying semantic preservation migration');
+      return this.semanticPreservationMigrate(new Float32Array(oldVector));
+    }
+
+    return null;
+  }
+
+  /**
+   * Normalize ghost vector (L2 normalization)
+   */
+  private normalizeGhostVector(vector: Float32Array): Float32Array {
+    let magnitude = 0;
+    for (let i = 0; i < vector.length; i++) {
+      magnitude += vector[i] * vector[i];
+    }
+    magnitude = Math.sqrt(magnitude);
+
+    if (magnitude === 0) return vector;
+
+    const normalized = new Float32Array(vector.length);
+    for (let i = 0; i < vector.length; i++) {
+      normalized[i] = vector[i] / magnitude;
+    }
+    return normalized;
+  }
+
+  /**
+   * Load projection matrix from database (if available)
+   */
+  private async loadProjectionMatrix(
+    fromVersion: string,
+    toVersion: string
+  ): Promise<Float32Array[] | null> {
+    try {
+      const result = await executeStatement(
+        `SELECT matrix_data FROM ghost_projection_matrices
+         WHERE from_version = $1 AND to_version = $2
+         AND is_active = true`,
+        [
+          { name: 'fromVersion', value: { stringValue: fromVersion } },
+          { name: 'toVersion', value: { stringValue: toVersion } },
+        ]
+      );
+
+      if (result.records && result.records.length > 0) {
+        const matrixData = result.records[0][0].stringValue;
+        if (matrixData) {
+          const parsed = JSON.parse(matrixData);
+          return parsed.map((row: number[]) => new Float32Array(row));
+        }
+      }
+    } catch {
+      // Table may not exist yet, that's fine
+    }
+    return null;
+  }
+
+  /**
+   * Apply projection matrix to transform vector
+   */
+  private applyProjection(
+    vector: Float32Array,
+    matrix: Float32Array[]
+  ): Float32Array {
+    const result = new Float32Array(matrix.length);
+    for (let i = 0; i < matrix.length; i++) {
+      let sum = 0;
+      for (let j = 0; j < vector.length; j++) {
+        sum += vector[j] * matrix[i][j];
+      }
+      result[i] = sum;
+    }
+    return this.normalizeGhostVector(result);
+  }
+
+  /**
+   * Semantic preservation migration
+   * Preserves relative importance of features while adapting to new space
+   */
+  private semanticPreservationMigrate(vector: Float32Array): Float32Array {
+    // Apply softmax-like transformation to preserve relative magnitudes
+    // while allowing the new model to reinterpret the context hints
+    const result = new Float32Array(vector.length);
+    
+    // Find max for numerical stability
+    let maxVal = -Infinity;
+    for (let i = 0; i < vector.length; i++) {
+      if (vector[i] > maxVal) maxVal = vector[i];
+    }
+
+    // Apply scaled transformation
+    const scale = 0.5; // Reduce magnitude to allow new model to dominate
+    for (let i = 0; i < vector.length; i++) {
+      result[i] = (vector[i] - maxVal * 0.5) * scale;
+    }
+
+    return this.normalizeGhostVector(result);
   }
 
   // ===========================================================================

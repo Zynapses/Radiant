@@ -425,6 +425,25 @@ export class AdminStack extends cdk.Stack {
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
 
+    // ECD (Entity-Context Divergence) - Truth Engine™
+    const ecd = brain.addResource('ecd');
+    ecd.addResource('stats').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    ecd.addResource('trend').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    ecd.addResource('entities').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    ecd.addResource('divergences').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
     // Reconciliation
     brain.addResource('reconciliation').addResource('trigger').addMethod('POST', adminIntegration, {
       authorizer: adminAuthorizer,

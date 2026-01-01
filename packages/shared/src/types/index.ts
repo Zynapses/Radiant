@@ -39,3 +39,4 @@ export * from './compliance-sandwich.types';
 export * from './admin-config.types';
 export * from './library-registry.types';
 export * from './library-execution.types';
+export * from './ecd.types';

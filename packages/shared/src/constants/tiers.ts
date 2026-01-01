@@ -35,6 +35,7 @@ export const TIER_CONFIGS: Record<TierLevel, TierConfig> = {
     enableGuardDuty: false,
     enableSecurityHub: false,
     enableHipaa: false,
+    enableBrain: false,
     estimatedMonthlyCost: { min: 50, max: 150, typical: 85 },
   },
   2: {
@@ -58,6 +59,7 @@ export const TIER_CONFIGS: Record<TierLevel, TierConfig> = {
     enableGuardDuty: true,
     enableSecurityHub: false,
     enableHipaa: false,
+    enableBrain: false,
     estimatedMonthlyCost: { min: 200, max: 400, typical: 255 },
   },
   3: {
@@ -81,6 +83,7 @@ export const TIER_CONFIGS: Record<TierLevel, TierConfig> = {
     enableGuardDuty: true,
     enableSecurityHub: true,
     enableHipaa: true,
+    enableBrain: true,
     estimatedMonthlyCost: { min: 1000, max: 2500, typical: 1475 },
   },
   4: {
@@ -104,6 +107,7 @@ export const TIER_CONFIGS: Record<TierLevel, TierConfig> = {
     enableGuardDuty: true,
     enableSecurityHub: true,
     enableHipaa: true,
+    enableBrain: true,
     estimatedMonthlyCost: { min: 4000, max: 8000, typical: 5450 },
   },
   5: {
@@ -127,6 +131,7 @@ export const TIER_CONFIGS: Record<TierLevel, TierConfig> = {
     enableGuardDuty: true,
     enableSecurityHub: true,
     enableHipaa: true,
+    enableBrain: true,
     estimatedMonthlyCost: { min: 15000, max: 35000, typical: 21500 },
   },
 };
