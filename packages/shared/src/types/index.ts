@@ -32,3 +32,8 @@ export * from './user-registry.types';
 export * from './metrics-learning.types';
 export * from './localization.types';
 export * from './translation-middleware.types';
+export * from './ghost.types';
+export * from './brain-v6.types';
+export * from './dreaming.types';
+export * from './compliance-sandwich.types';
+export * from './admin-config.types';
