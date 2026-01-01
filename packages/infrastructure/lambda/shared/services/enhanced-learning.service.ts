@@ -902,8 +902,7 @@ class EnhancedLearningService {
   }
   
   private async findInRedisCache(tenantId: string, promptHash: string, userId?: string): Promise<PatternCacheEntry | null> {
-    // Redis integration - placeholder for actual Redis client
-    // In production, use ioredis or similar
+    // Redis integration using ioredis (dynamically loaded)
     try {
       const redis = await this.getRedisClient();
       if (!redis) return null;

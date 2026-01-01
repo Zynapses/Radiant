@@ -10,6 +10,7 @@ export interface CostSummary {
   periodEnd: string;
   forecastedMonthEnd: number;
   percentChange: number;
+  error?: string; // Set when Cost Explorer unavailable
 }
 
 export interface ServiceCost {
@@ -40,6 +41,7 @@ export interface CostReport {
   dailyCosts: DailyCost[];
   alerts: CostAlert[];
   lastUpdated: string;
+  hasErrors?: boolean; // True if any data fetch failed
 }
 
 export class AWSCostMonitoringService {
@@ -75,7 +77,9 @@ export class AWSCostMonitoringService {
         forecastedMonthEnd: cost * 1.1,
         percentChange: prevCost > 0 ? ((cost - prevCost) / prevCost) * 100 : 0,
       };
-    } catch { return this.mockSummary(days); }
+    } catch (error) {
+      return this.emptySummary(days, String(error));
+    }
   }
 
   private async fetchCost(start: Date, end: Date): Promise<number> {
@@ -113,7 +117,9 @@ export class AWSCostMonitoringService {
         serviceName, cost: Math.round(cost * 100) / 100,
         percentage: total > 0 ? Math.round((cost / total) * 10000) / 100 : 0, trend: 'stable' as const,
       })).sort((a, b) => b.cost - a.cost);
-    } catch { return this.mockServices(); }
+    } catch {
+      return []; // Return empty array on error
+    }
   }
 
   async getDailyCosts(days = 30): Promise<DailyCost[]> {
@@ -135,7 +141,9 @@ export class AWSCostMonitoringService {
         }
         return { date: r.TimePeriod?.Start || '', cost: Math.round(cost * 100) / 100, services };
       });
-    } catch { return this.mockDaily(days); }
+    } catch {
+      return []; // Return empty array on error
+    }
   }
 
   async getCostAlerts(tenantId: string): Promise<CostAlert[]> {
@@ -162,28 +170,16 @@ export class AWSCostMonitoringService {
     );
   }
 
-  private mockSummary(days: number): CostSummary {
-    return { totalCost: 1247.83, currency: 'USD', periodStart: new Date(Date.now() - days * 86400000).toISOString().split('T')[0], periodEnd: new Date().toISOString().split('T')[0], forecastedMonthEnd: 1450.00, percentChange: 12.5 };
-  }
-
-  private mockServices(): ServiceCost[] {
-    return [
-      { serviceName: 'Amazon Bedrock', cost: 523.45, percentage: 41.9, trend: 'up' },
-      { serviceName: 'AWS Lambda', cost: 234.12, percentage: 18.8, trend: 'stable' },
-      { serviceName: 'Amazon RDS', cost: 189.67, percentage: 15.2, trend: 'down' },
-      { serviceName: 'Amazon S3', cost: 156.34, percentage: 12.5, trend: 'stable' },
-      { serviceName: 'Amazon API Gateway', cost: 89.25, percentage: 7.2, trend: 'up' },
-      { serviceName: 'Other', cost: 55.00, percentage: 4.4, trend: 'stable' },
-    ];
-  }
-
-  private mockDaily(days: number): DailyCost[] {
-    const result: DailyCost[] = [];
-    for (let i = days; i >= 0; i--) {
-      const d = new Date(); d.setDate(d.getDate() - i);
-      result.push({ date: d.toISOString().split('T')[0], cost: 35 + Math.random() * 20, services: { 'Amazon Bedrock': 15 + Math.random() * 10, 'AWS Lambda': 8 + Math.random() * 5 } });
-    }
-    return result;
+  private emptySummary(days: number, error: string): CostSummary {
+    return {
+      totalCost: 0,
+      currency: 'USD',
+      periodStart: new Date(Date.now() - days * 86400000).toISOString().split('T')[0],
+      periodEnd: new Date().toISOString().split('T')[0],
+      forecastedMonthEnd: 0,
+      percentChange: 0,
+      error: `Cost Explorer unavailable: ${error}`,
+    };
   }
 }
 

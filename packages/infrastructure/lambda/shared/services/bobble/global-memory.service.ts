@@ -204,11 +204,21 @@ export class GlobalMemoryService {
   }
 
   /**
-   * Search facts by text (simple contains search).
+   * Search facts by text using OpenSearch if available, falling back to DynamoDB scan.
    */
   async searchFacts(query: string, limit: number = 20): Promise<SemanticFact[]> {
-    // For production, use OpenSearch for full-text search
-    // This is a simple scan with filter
+    // Try OpenSearch first for production full-text search
+    const openSearchEndpoint = process.env.OPENSEARCH_ENDPOINT;
+    if (openSearchEndpoint) {
+      try {
+        const results = await this.searchFactsWithOpenSearch(query, limit, openSearchEndpoint);
+        if (results.length > 0) return results;
+      } catch (error) {
+        logger.warn('OpenSearch search failed, falling back to DynamoDB', { error: String(error) });
+      }
+    }
+    
+    // Fallback to DynamoDB scan with filter
     const response = await this.docClient.send(new QueryCommand({
       TableName: this.config.semanticTable,
       IndexName: 'gsi2',
@@ -226,6 +236,57 @@ export class GlobalMemoryService {
     }));
 
     return (response.Items || []).map(this.itemToFact);
+  }
+
+  /**
+   * Search facts using OpenSearch Serverless for full-text search.
+   */
+  private async searchFactsWithOpenSearch(
+    query: string, 
+    limit: number, 
+    endpoint: string
+  ): Promise<SemanticFact[]> {
+    const indexName = process.env.OPENSEARCH_FACTS_INDEX || 'semantic-facts';
+    const url = `${endpoint}/${indexName}/_search`;
+    
+    const searchBody = {
+      size: limit,
+      query: {
+        multi_match: {
+          query,
+          fields: ['subject^2', 'object^2', 'predicate', 'domain'],
+          fuzziness: 'AUTO',
+        },
+      },
+      sort: [{ confidence: 'desc' }, '_score'],
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(searchBody),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenSearch error: ${response.status}`);
+    }
+
+    const data = await response.json() as {
+      hits?: { hits?: Array<{ _source: Record<string, unknown> }> };
+    };
+    
+    return (data.hits?.hits || []).map(hit => ({
+      factId: String(hit._source.factId || ''),
+      subject: String(hit._source.subject || ''),
+      predicate: String(hit._source.predicate || ''),
+      object: String(hit._source.object || ''),
+      domain: String(hit._source.domain || ''),
+      confidence: Number(hit._source.confidence || 0),
+      sources: Array.isArray(hit._source.sources) ? hit._source.sources.map(String) : [],
+      createdAt: new Date(String(hit._source.createdAt || Date.now())),
+      updatedAt: new Date(String(hit._source.updatedAt || Date.now())),
+      version: Number(hit._source.version || 1),
+    }));
   }
 
   // ============================================================================

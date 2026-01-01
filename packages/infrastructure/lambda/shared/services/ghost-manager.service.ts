@@ -566,13 +566,24 @@ class GhostManagerService {
         versionDistribution[r.version as string] = Number(r.version_count);
       }
 
+      // Count ghosts needing migration (version != current version)
+      const currentVersion = await brainConfigService.getString('GHOST_CURRENT_VERSION', 'llama3-70b-v1');
+      const migrationResult = await executeStatement(
+        `SELECT COUNT(*) as pending FROM ghost_vectors 
+         WHERE version != $1 ${tenantId ? 'AND tenant_id = $2' : ''}`,
+        tenantId 
+          ? [{ name: 'v', value: { stringValue: currentVersion } }, { name: 't', value: { stringValue: tenantId } }]
+          : [{ name: 'v', value: { stringValue: currentVersion } }]
+      );
+      const migrationsPending = Number((migrationResult.rows[0] as Record<string, unknown>)?.pending || 0);
+
       return {
         totalGhosts,
         activeGhosts,
         avgTurnCount,
         avgTimeSinceReanchor,
         versionDistribution,
-        migrationsPending: 0, // TODO: implement migration tracking
+        migrationsPending,
       };
     } catch (error) {
       logger.error(`Failed to get ghost stats: ${String(error)}`);
