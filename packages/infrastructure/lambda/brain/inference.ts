@@ -234,7 +234,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 }
 
 // =============================================================================
-// LLM Call (placeholder)
+// LLM Call - Routes through LiteLLM proxy
 // =============================================================================
 
 interface LLMResponse {
@@ -247,30 +247,78 @@ interface LLMResponse {
   };
 }
 
+const LITELLM_ENDPOINT = process.env.LITELLM_ENDPOINT || 'http://localhost:4000';
+
 async function callLLM(
   formattedContext: string,
   systemLevel: SystemLevel,
   options?: { maxTokens?: number; temperature?: number }
 ): Promise<LLMResponse> {
-  // TODO: Integrate with actual LLM inference
-  // This would call SageMaker, LiteLLM, or external APIs based on systemLevel
-  
+  // Select model based on system level
   const model = systemLevel === 'system2' 
-    ? 'llama3-70b' 
+    ? process.env.SYSTEM2_MODEL || 'llama3-70b-instruct'
     : systemLevel === 'system1.5' 
-      ? 'llama3-8b' 
-      : 'llama3-8b-fast';
+      ? process.env.SYSTEM15_MODEL || 'llama3-8b-instruct'
+      : process.env.SYSTEM1_MODEL || 'llama3-8b-instruct';
 
-  // Placeholder response
-  return {
-    response: '[Brain response placeholder - integrate with LLM]',
-    model,
-    tokenUsage: {
-      input: Math.ceil(formattedContext.length / 4),
-      output: 50,
-      total: Math.ceil(formattedContext.length / 4) + 50,
-    },
-  };
+  const maxTokens = options?.maxTokens || 2048;
+  const temperature = options?.temperature ?? (systemLevel === 'system2' ? 0.7 : 0.3);
+
+  try {
+    // Call LiteLLM proxy
+    const response = await fetch(`${LITELLM_ENDPOINT}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.LITELLM_API_KEY || ''}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: formattedContext },
+        ],
+        max_tokens: maxTokens,
+        temperature,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`LiteLLM error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json() as {
+      choices: Array<{ message: { content: string } }>;
+      model: string;
+      usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
+    };
+
+    return {
+      response: data.choices[0]?.message?.content || '',
+      model: data.model || model,
+      tokenUsage: {
+        input: data.usage?.prompt_tokens || 0,
+        output: data.usage?.completion_tokens || 0,
+        total: data.usage?.total_tokens || 0,
+      },
+    };
+  } catch (error) {
+    logger.error('LLM call failed', { model, error: String(error) });
+    
+    // Fallback for development/testing
+    if (process.env.NODE_ENV === 'development') {
+      return {
+        response: `[Dev mode - LLM unavailable] System ${systemLevel} would respond here.`,
+        model,
+        tokenUsage: {
+          input: Math.ceil(formattedContext.length / 4),
+          output: 50,
+          total: Math.ceil(formattedContext.length / 4) + 50,
+        },
+      };
+    }
+    throw error;
+  }
 }
 
 // =============================================================================
