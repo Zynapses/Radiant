@@ -606,7 +606,7 @@ export function QAClient() {
                   {runs.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
-                        No test runs yet. Click "Run All Tests" to start.
+                        No test runs yet. Click &quot;Run All Tests&quot; to start.
                       </TableCell>
                     </TableRow>
                   )}

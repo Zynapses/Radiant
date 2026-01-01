@@ -210,7 +210,7 @@ export default function GhostStatusPage() {
         <CardHeader>
           <CardTitle>Ghost Health Check</CardTitle>
           <CardDescription>
-            Check the health status of a specific user's ghost vector
+            Check the health status of a specific user&apos;s ghost vector
           </CardDescription>
         </CardHeader>
         <CardContent>
