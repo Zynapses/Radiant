@@ -334,6 +334,103 @@ export class AdminStack extends cdk.Stack {
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
 
+    // =========================================================================
+    // Brain v6.0.4 - AGI Brain Admin Routes
+    // =========================================================================
+    const brain = admin.addResource('brain');
+    
+    // Dashboard
+    brain.addResource('dashboard').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Configuration
+    const brainConfig = brain.addResource('config');
+    brainConfig.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    brainConfig.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const brainConfigByKey = brainConfig.addResource('{key}');
+    brainConfigByKey.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    brainConfigByKey.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    brainConfigByKey.addResource('reset').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    brainConfig.addResource('history').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Ghost Vectors
+    const ghost = brain.addResource('ghost');
+    ghost.addResource('stats').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    ghost.addResource('{userId}').addResource('health').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Dreams
+    const dreams = brain.addResource('dreams');
+    dreams.addResource('queue').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    dreams.addResource('schedules').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    dreams.addResource('trigger').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Oversight
+    const oversight = brain.addResource('oversight');
+    oversight.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    oversight.addResource('stats').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const oversightById = oversight.addResource('{insightId}');
+    oversightById.addResource('approve').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    oversightById.addResource('reject').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // SOFAI Stats
+    brain.addResource('sofai').addResource('stats').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Reconciliation
+    brain.addResource('reconciliation').addResource('trigger').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'AdminDashboardUrl', {
       value: `https://${this.adminDistribution.distributionDomainName}`,
