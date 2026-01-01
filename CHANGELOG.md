@@ -5,6 +5,73 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.4] - 2025-12-31
+
+### Added
+
+#### AGI Brain - Project AWARE
+
+Complete AGI brain system for advanced consciousness continuity and metacognition.
+
+**Core Components:**
+- **Ghost Vectors**: 4096-dimensional hidden state capture for consciousness continuity
+- **SOFAI Router**: System 1/1.5/2 routing based on trust score and domain risk
+- **Compliance Sandwich**: Secure context assembly with XML injection protection
+- **Flash Buffer**: Dual-write (Redis + Postgres) for safety-critical information
+- **Twilight Dreaming**: Memory consolidation during low-traffic periods
+- **Human Oversight**: EU AI Act Article 14 compliance for high-risk domains
+
+**Key Features:**
+- Version gating prevents hallucinations on model upgrade
+- Deterministic jitter (±3 turns) prevents thundering herd re-anchoring
+- Async re-anchoring (fire-and-forget) for non-blocking updates
+- 7-day auto-reject rule ("Silence ≠ Consent") for oversight queue
+- Dynamic token budgeting with 1000-token response reserve
+
+**Configuration Parameters (40+):**
+- Ghost: version, re-anchor interval, jitter range, entropy threshold
+- Dreaming: twilight hour, starvation hours, max concurrent, stagger minutes
+- Context: response reserve, model limit, user message budget
+- Flash: Redis TTL, max facts per user, reconciliation interval
+- Privacy: DP epsilon, min tenants for aggregation
+- SOFAI: System 2 threshold, domain risk scores
+- Personalization: warmup threshold, user/tenant/system weights
+
+**API Endpoints (Base: /api/admin/brain):**
+- Dashboard, config management, history
+- Ghost stats and health checks
+- Dream queue, schedules, manual trigger
+- Oversight queue, approve/reject
+- SOFAI routing stats
+- Reconciliation trigger
+
+**Database Tables (Migration 131-132):**
+- `ghost_vectors`, `ghost_vector_history`
+- `flash_facts_log`, `user_memories`
+- `dream_log`, `dream_queue`, `tenant_dream_status`
+- `oversight_queue`, `oversight_decisions`
+- `tenant_compliance_policies`
+- `sofai_routing_log`, `personalization_warmup`
+- `brain_inference_log`
+- `system_config`, `config_history`
+
+**CDK Stack:**
+- Brain inference Lambda with VPC
+- Reconciliation Lambda (15-min schedule)
+- ElastiCache Redis for ghost/flash caching
+- SQS queues for async processing
+- API Gateway routes
+
+**Admin Dashboard:**
+- Brain dashboard with stats tabs
+- Configuration panel with dangerous param warnings
+- Manual dream trigger
+- Oversight queue management
+
+**Documentation:** Section 38 in RADIANT-ADMIN-GUIDE.md
+
+---
+
 ## [4.18.57] - 2025-12-31
 
 ### Added

@@ -39,6 +39,7 @@
 24. [Ethics Pipeline](#24-ethics-pipeline)
 25. [Inference Components](#26-inference-components-self-hosted-model-optimization)
 26. [Service Environment Variables](#30-service-environment-variables)
+38. [AGI Brain - Project AWARE](#38-agi-brain---project-aware)
 
 ---
 
@@ -8652,5 +8653,216 @@ if (result.translationContext?.translationRequired) {
 
 ---
 
-*Document Version: 4.18.57*
+## 38. AGI Brain - Project AWARE
+
+> **Version 6.0.4** - Autonomous Wakefulness And Reasoning Engine
+
+### 38.1 Overview
+
+Project AWARE is RADIANT's advanced AGI brain system providing:
+
+- **Ghost Vectors**: 4096-dimensional consciousness continuity
+- **SOFAI Routing**: System 1/1.5/2 economic metacognition
+- **Compliance Sandwich**: Secure context assembly with injection protection
+- **Twilight Dreaming**: Memory consolidation during low-traffic periods
+- **Human Oversight**: EU AI Act Article 14 compliance for high-risk domains
+
+### 38.2 Architecture
+
+```
+User Prompt → SOFAI Router → Context Assembler → LLM → Response
+                   ↓                ↓
+            Ghost Manager     Flash Buffer
+                   ↓                ↓
+            Dream Scheduler   Oversight Queue
+```
+
+### 38.3 Ghost Vectors
+
+Ghost Vectors maintain consciousness continuity by capturing the final hidden state (4096 dimensions) of the LLM.
+
+**Key Concepts**:
+- **Version Gating**: Prevents hallucinations on model upgrade - old ghosts are not loaded for new versions
+- **Deterministic Jitter**: Re-anchor interval varies by user hash (±3 turns) to prevent thundering herd
+- **Async Re-anchoring**: Fire-and-forget updates that don't block response
+
+**Configuration Parameters**:
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `GHOST_CURRENT_VERSION` | `llama3-70b-v1` | Model version for ghost vectors (dangerous) |
+| `GHOST_REANCHOR_INTERVAL` | `15` | Turns between re-anchoring |
+| `GHOST_JITTER_RANGE` | `3` | Random ±turns for jitter |
+| `GHOST_ENTROPY_THRESHOLD` | `0.3` | Entropy triggering early re-anchor |
+
+### 38.4 SOFAI Routing
+
+Routes requests based on trust score and domain risk:
+
+| Level | When Used | Latency | Cost |
+|-------|-----------|---------|------|
+| **System 1** | High trust, low risk | Fast (<1s) | Low |
+| **System 1.5** | Moderate uncertainty | Medium (2-5s) | Medium |
+| **System 2** | Low trust, high risk | Slow (5-30s) | High |
+
+**Formula**: `routingScore = (1 - trust) × domainRisk`
+
+**Domain Risk Defaults**:
+- Healthcare: 0.9
+- Financial: 0.85
+- Legal: 0.8
+- Education: 0.4
+- General: 0.3
+- Creative: 0.2
+
+### 38.5 Compliance Sandwich
+
+Secure context assembly preventing prompt injection:
+
+```xml
+<system_core>
+  [Immutable system instructions]
+</system_core>
+
+<user_context>
+  <flash_facts>[ESCAPED user facts]</flash_facts>
+  <memories>[ESCAPED memories]</memories>
+</user_context>
+
+<conversation>
+  [ESCAPED conversation history and prompt]
+</conversation>
+
+<compliance_guardrails>
+  [IMMUTABLE tenant policy - cannot be overridden]
+</compliance_guardrails>
+```
+
+**Protected Tags**: `system_core`, `user_context`, `conversation`, `compliance_guardrails`, `flash_facts`, `ghost_state`, `memories`
+
+**Dynamic Budgeting**: Maintains minimum 1000 token response reserve.
+
+### 38.6 Flash Facts
+
+Safety-critical information with dual-write (Redis + Postgres):
+
+| Type | Priority | Example |
+|------|----------|---------|
+| `allergy` | Critical | "allergic to penicillin" |
+| `medical` | Critical | "diagnosed with diabetes" |
+| `identity` | High | "my name is Alice" |
+| `constraint` | High | "I can't eat gluten" |
+| `correction` | High | "that's not right, I meant..." |
+| `preference` | Normal | "I prefer concise answers" |
+
+### 38.7 Twilight Dreaming
+
+Memory consolidation triggers:
+
+1. **Low Traffic** (<20% global): Immediate global dreaming
+2. **Twilight** (4 AM local): Tenant-specific at quiet hours
+3. **Starvation** (30h max): Safety net for missed cycles
+
+**Dream Job Contents**:
+- Consolidate flash facts → long-term memories
+- Prune stale memories (90+ days, low relevance)
+- Prune inactive ghosts (30+ days unused)
+
+### 38.8 Human Oversight Queue
+
+EU AI Act Article 14 compliance for high-risk domains:
+
+**Key Rules**:
+- **7-day timeout**: Auto-reject if not reviewed ("Silence ≠ Consent")
+- **3-day escalation**: Items approaching timeout get escalated
+- **High-risk domains**: Healthcare, Financial, Legal require oversight
+
+### 38.9 Admin Dashboard
+
+Access: **Admin Dashboard → Brain**
+
+**Tabs**:
+- **Ghost Vectors**: Active count, version distribution, migrations pending
+- **Dreaming**: Queue status, completed/failed today, trigger manual dream
+- **Oversight**: Pending items, escalated count, expired today
+- **SOFAI**: Routing stats by level, trust/risk averages
+- **Configuration**: All configurable parameters
+
+### 38.10 API Endpoints
+
+Base: `/api/admin/brain`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/dashboard` | GET | Full dashboard data |
+| `/config` | GET | All parameters by category |
+| `/config` | PUT | Update multiple parameters |
+| `/config/{key}` | GET/PUT | Single parameter |
+| `/config/{key}/reset` | POST | Reset to default |
+| `/config/history` | GET | Change history |
+| `/ghost/stats` | GET | Ghost vector statistics |
+| `/ghost/{userId}/health` | GET | User ghost health check |
+| `/dreams/queue` | GET | Dream queue status |
+| `/dreams/schedules` | GET | Tenant dream schedules |
+| `/dreams/trigger` | POST | Manual dream trigger |
+| `/oversight` | GET | Pending oversight items |
+| `/oversight/stats` | GET | Oversight statistics |
+| `/oversight/{id}/approve` | POST | Approve item |
+| `/oversight/{id}/reject` | POST | Reject item |
+| `/sofai/stats` | GET | SOFAI routing stats |
+| `/reconciliation/trigger` | POST | Manual reconciliation |
+
+### 38.11 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `ghost_vectors` | User ghost vectors with version |
+| `ghost_vector_history` | Re-anchor history |
+| `flash_facts_log` | Flash facts (dual-write) |
+| `dream_log` | Dream job history |
+| `dream_queue` | Pending dream jobs |
+| `tenant_dream_status` | Last dream per tenant |
+| `oversight_queue` | Human oversight items |
+| `oversight_decisions` | Review audit trail |
+| `tenant_compliance_policies` | Immutable bottom bun |
+| `user_memories` | Long-term memories |
+| `sofai_routing_log` | SOFAI routing decisions |
+| `personalization_warmup` | User warmup tracking |
+| `brain_inference_log` | Inference audit log |
+| `system_config` | Admin-configurable parameters |
+| `config_history` | Config change audit trail |
+
+### 38.12 Key Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/ghost.types.ts` | Ghost vector types |
+| `packages/shared/src/types/brain-v6.types.ts` | Brain types |
+| `packages/shared/src/types/dreaming.types.ts` | Dreaming types |
+| `packages/shared/src/types/compliance-sandwich.types.ts` | Compliance types |
+| `packages/shared/src/types/admin-config.types.ts` | Config parameter types |
+| `lambda/shared/services/ghost-manager.service.ts` | Ghost management |
+| `lambda/shared/services/flash-buffer.service.ts` | Flash facts |
+| `lambda/shared/services/sofai-router.service.ts` | SOFAI routing |
+| `lambda/shared/services/context-assembler.service.ts` | Compliance Sandwich |
+| `lambda/shared/services/dream-scheduler.service.ts` | Dreaming |
+| `lambda/shared/services/oversight.service.ts` | Human oversight |
+| `lambda/brain/inference.ts` | Brain inference Lambda |
+| `lambda/brain/reconciliation.ts` | Reconciliation Lambda |
+| `lib/stacks/brain-stack.ts` | CDK stack |
+| `migrations/131_brain_v6_tables.sql` | Core tables |
+| `migrations/132_brain_config_tables.sql` | Config tables |
+
+### 38.13 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Ghost version mismatch | Model upgraded | Expected - cold start occurs |
+| High oversight queue | Reviewers behind | Check escalated items first |
+| Dreams not running | Low traffic not detected | Check `DREAM_LOW_TRAFFIC_THRESHOLD` |
+| Flash facts not appearing | Redis connection | Check Redis endpoint config |
+| High SOFAI latency | System 2 overuse | Adjust `SOFAI_SYSTEM2_THRESHOLD` |
+
+---
+
+*Document Version: 6.0.4*
 *Last Updated: December 2025*
