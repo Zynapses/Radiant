@@ -60,3 +60,28 @@ export { userPersistentContextService } from '../user-persistent-context.service
 export { predictiveCodingService } from '../predictive-coding.service';
 export { learningCandidateService } from '../learning-candidate.service';
 export { localEgoService } from '../local-ego.service';
+
+// ============================================================================
+// Brain v6.0.4 - Project AWARE Services
+// ============================================================================
+
+// Brain Configuration
+export { brainConfigService } from '../brain-config.service';
+
+// Ghost Vector Management (consciousness continuity)
+export { ghostManagerService } from '../ghost-manager.service';
+
+// Flash Buffer (safety-critical facts)
+export { flashBufferService } from '../flash-buffer.service';
+
+// SOFAI Router (System 1/1.5/2 routing)
+export { sofaiRouterService } from '../sofai-router.service';
+
+// Context Assembler (Compliance Sandwich)
+export { contextAssemblerService } from '../context-assembler.service';
+
+// Dream Scheduler (Twilight Dreaming)
+export { dreamSchedulerService } from '../dream-scheduler.service';
+
+// Human Oversight (EU AI Act compliance)
+export { oversightService } from '../oversight.service';

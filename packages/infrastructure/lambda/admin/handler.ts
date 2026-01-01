@@ -317,6 +317,24 @@ async function routeRequest(
     return userRegistryHandler(event);
   }
 
+  // Brain v6.0.4 - AGI Brain admin
+  if (pathParts[1] === 'brain') {
+    const { handler: brainHandler } = await import('./brain');
+    return brainHandler(event);
+  }
+
+  // Metrics & Learning
+  if (pathParts[1] === 'metrics') {
+    const { handler: metricsHandler } = await import('./metrics');
+    return metricsHandler(event);
+  }
+
+  // Translation middleware
+  if (pathParts[1] === 'translation') {
+    const { handler: translationHandler } = await import('./translation');
+    return translationHandler(event);
+  }
+
   throw new NotFoundError(`Admin route not found: ${method} ${path}`);
 }
 
