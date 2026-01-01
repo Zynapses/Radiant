@@ -3,7 +3,7 @@ import { specialtyRankingService, type SpecialtyCategory } from './specialty-ran
 import { domainTaxonomyService, type ProficiencyScores, type DomainDetectionResult } from './domain-taxonomy.service';
 import { consciousnessMiddlewareService, type AffectiveHyperparameters } from './consciousness-middleware.service';
 import { consciousnessService, type AffectiveState } from './consciousness.service';
-import { LearningInfluenceService } from './learning-influence.service';
+import { LearningInfluenceService } from './learning-hierarchy.service';
 import { translationMiddlewareService } from './translation-middleware.service';
 import { Pool } from 'pg';
 import { LanguageCode } from '@radiant/shared';

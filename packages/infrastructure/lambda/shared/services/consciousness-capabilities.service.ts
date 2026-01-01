@@ -11,7 +11,7 @@
 
 import { executeStatement } from '../db/client';
 import { logger } from '../logger';
-import { BrainRouter } from './brain-router';
+import { BrainRouter } from './cognitive-router.service';
 import { WorkflowEngine } from './workflow-engine';
 import { consciousnessEngineService, DriveState } from './consciousness-engine.service';
 import { ModelRouterService, ModelRequest, ModelResponse } from './model-router.service';

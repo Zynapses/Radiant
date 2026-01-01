@@ -26,7 +26,7 @@ export interface ConversationMessage {
   content: string;
 }
 
-export class NeuralEngine {
+export class PreferenceEngine {
   private bedrock: BedrockRuntimeClient;
 
   constructor() {
@@ -356,4 +356,4 @@ Return only valid JSON array, no other text.`,
   }
 }
 
-export const neuralEngine = new NeuralEngine();
+export const preferenceEngine = new PreferenceEngine();

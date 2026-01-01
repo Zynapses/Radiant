@@ -10,7 +10,7 @@ import { orchestrationPatternsService, type OrchestrationWorkflow, type Workflow
 import { prepromptLearningService } from './preprompt-learning.service';
 import { providerRejectionService } from './provider-rejection.service';
 import { userPersistentContextService, type RetrievedContext } from './user-persistent-context.service';
-import { egoContextService, type EgoContextResult } from './ego-context.service';
+import { egoContextService, type EgoContextResult } from './identity-core.service';
 import { libraryAssistService, type LibraryAssistResult } from './library-assist.service';
 import { enhancedLearningService, type PatternCacheEntry } from './enhanced-learning.service';
 import { consciousnessMiddlewareService, type AffectiveHyperparameters } from './consciousness-middleware.service';

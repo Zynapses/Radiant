@@ -1,5 +1,5 @@
 import { executeStatement } from '../db/client';
-import { brainRouter, type TaskType } from './brain-router';
+import { brainRouter, type TaskType } from './cognitive-router.service';
 import type { SqlParameter } from '@aws-sdk/client-rds-data';
 
 export interface AutoResolveRequest {

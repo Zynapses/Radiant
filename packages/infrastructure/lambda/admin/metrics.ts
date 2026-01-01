@@ -6,7 +6,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { Pool } from 'pg';
 import { MetricsCollectionService } from '../shared/services/metrics-collection.service';
-import { LearningInfluenceService } from '../shared/services/learning-influence.service';
+import { LearningInfluenceService } from '../shared/services/learning-hierarchy.service';
 
 const pool = new Pool({
   host: process.env.DB_HOST,

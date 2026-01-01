@@ -2,8 +2,8 @@
 // Exposes predictive coding, learning candidates, and LoRA evolution to admin dashboard
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
-import { predictiveCodingService } from '../shared/services/predictive-coding.service';
-import { learningCandidateService } from '../shared/services/learning-candidate.service';
+import { predictiveCodingService } from '../shared/services/prediction-engine.service';
+import { learningCandidateService } from '../shared/services/distillation-pipeline.service';
 import { localEgoService } from '../shared/services/local-ego.service';
 import { executeStatement } from '../shared/db/client';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';

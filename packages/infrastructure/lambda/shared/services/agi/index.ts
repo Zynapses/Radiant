@@ -57,8 +57,8 @@ export { EthicalGuardrailsService, ethicalGuardrailsService, JESUS_TEACHINGS } f
 export { userPersistentContextService } from '../user-persistent-context.service';
 
 // Predictive Coding & Learning Evolution
-export { predictiveCodingService } from '../predictive-coding.service';
-export { learningCandidateService } from '../learning-candidate.service';
+export { predictiveCodingService, predictionEngine } from '../prediction-engine.service';
+export { learningCandidateService, distillationPipeline } from '../distillation-pipeline.service';
 export { localEgoService } from '../local-ego.service';
 
 // ============================================================================

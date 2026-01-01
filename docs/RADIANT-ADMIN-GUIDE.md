@@ -2,7 +2,7 @@
 
 > **Complete guide for managing the RADIANT AI Platform via the Admin Dashboard**
 > 
-> Version: 4.18.55 | Last Updated: December 30, 2024
+> Version: 6.1.0 | Last Updated: January 1, 2026
 >
 > **Compliance Frameworks:** HIPAA, SOC 2 Type II, GDPR, FDA 21 CFR Part 11
 
@@ -19,7 +19,7 @@
 7. [Provider Management](#7-provider-management)
 8. [Billing & Subscriptions](#8-billing--subscriptions)
 9. [Storage Management](#9-storage-management)
-10. [Orchestration & Neural Engine](#10-orchestration--neural-engine)
+10. [Orchestration & Preference Engine](#10-orchestration--preference-engine)
 11. [Pre-Prompt Learning](#11-pre-prompt-learning)
 12. [Localization](#12-localization)
 12. [Configuration Management](#12-configuration-management)
@@ -41,6 +41,7 @@
 26. [Service Environment Variables](#30-service-environment-variables)
 38. [AGI Brain - Project AWARE](#38-agi-brain---project-aware)
 39. [Truth Engine™ - Project TRUTH](#39-truth-engine---project-truth)
+40. [Advanced Cognition Services (v6.1.0)](#40-advanced-cognition-services-v610)
 
 ---
 
@@ -52,8 +53,8 @@ RADIANT is a multi-tenant AWS SaaS platform providing unified access to 106+ AI 
 
 - **50 External Provider Models**: OpenAI, Anthropic, Google, xAI, DeepSeek, and more
 - **56 Self-Hosted Models**: Running on AWS SageMaker for cost control and privacy
-- **Intelligent Routing**: Brain router for optimal model selection
-- **Neural Engine**: Personalization learning from user interactions
+- **Intelligent Routing**: Cognitive Router for optimal model selection
+- **Preference Engine**: Personalization learning from user interactions
 
 ### 1.2 Administrator Roles
 
@@ -339,7 +340,7 @@ The dashboard displays key metrics at a glance:
 | **Providers** | Provider management |
 | **Billing** | Subscriptions and credits |
 | **Storage** | Storage usage |
-| **Orchestration** | Neural engine settings |
+| **Orchestration** | Preference Engine settings |
 | **Localization** | Translation management |
 | **Configuration** | System settings |
 | **Security** | Security monitoring |
@@ -1254,11 +1255,11 @@ Manage uploaded files:
 
 ---
 
-## 10. Orchestration & Neural Engine
+## 10. Orchestration & Preference Engine
 
-### 10.1 Brain Router
+### 10.1 Cognitive Router (formerly Brain Router)
 
-The Brain Router automatically selects optimal models:
+The Cognitive Router automatically selects optimal models:
 
 | Factor | Weight | Description |
 |--------|--------|-------------|
@@ -4465,7 +4466,7 @@ The consciousness evolution dashboard displays:
 - **Pending Candidates**: Learning candidates awaiting training
 - **Personality Drift**: How much the system has evolved from baseline
 
-### 27.2 Predictive Coding (Active Inference)
+### 27.2 Prediction Engine (Active Inference)
 
 The system predicts user outcomes before responding to create a Self/World boundary.
 
@@ -4483,7 +4484,7 @@ The system predicts user outcomes before responding to create a Self/World bound
 | `highSurpriseRate` | Predictions with error > 0.7 |
 | `learningSignalsGenerated` | High-surprise learning events |
 
-### 27.3 Learning Candidates
+### 27.3 Distillation Pipeline (Learning Candidates)
 
 High-value interactions flagged for weekly LoRA training.
 
@@ -6070,7 +6071,7 @@ Libraries are NOT AI models - they are tools that extend AI capabilities:
 | `lambda/library-registry/update.ts` | Update Lambda |
 | `lib/stacks/library-registry-stack.ts` | CDK Stack with initial seed |
 | `migrations/103_library_registry.sql` | Database schema |
-| `config/library-registry/seed-libraries.json` | Seed data (156 libraries) |
+| `config/library-registry/seed-libraries.json` | Seed data (168 libraries) |
 | `apps/admin-dashboard/.../platform/libraries/page.tsx` | Admin UI |
 
 ### 28.3 Library Categories
@@ -8223,11 +8224,11 @@ On system reboot or failure:
 
 ### 36.15 Integration Points
 
-#### Brain Router Integration
-The Brain Router automatically uses learning influence when `useLearningInfluence: true`:
+#### Cognitive Router Integration
+The Cognitive Router automatically uses learning influence when `useLearningInfluence: true`:
 
 ```typescript
-import { brainRouter, initializeLearningService } from './services/brain-router';
+import { brainRouter, initializeLearningService } from './services/cognitive-router.service';
 
 // Initialize once at startup
 initializeLearningService(pool);
@@ -8584,9 +8585,9 @@ Content-Type: application/json
 DELETE /api/admin/translation/cache
 ```
 
-### 37.7 Brain Router Integration
+### 37.7 Cognitive Router Integration
 
-The translation middleware is integrated into the Brain Router. Enable with `useTranslation: true`:
+The translation middleware is integrated into the Cognitive Router. Enable with `useTranslation: true`:
 
 ```typescript
 const result = await brainRouter.route({
@@ -9224,6 +9225,441 @@ An entity is considered grounded if:
 
 ---
 
-*Document Version: 6.0.4-S1*
+## 40. Advanced Cognition Services (v6.1.0)
+
+### 40.1 Overview
+
+Advanced Cognition Services implement 8 cognitive enhancement components from the RADIANT AGI Brain Architecture Report, providing:
+
+- **Teacher-Student Distillation**: Generate reasoning traces from powerful models to train efficient student models
+- **Semantic Caching**: Vector similarity caching reduces inference costs by 30-60%
+- **Best-of-N Selection**: Reward model scoring for response quality optimization
+- **Counterfactual Analysis**: Track alternative routing paths for continuous improvement
+- **Curiosity-Driven Learning**: Autonomous knowledge gap detection and exploration
+- **Causal Tracking**: Multi-turn conversation dependency analysis
+
+### 40.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        Enhanced Inference Flow                          │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  Request ──► Semantic Cache ──► Cache Hit? ──► Return Cached Response   │
+│                    │                                                    │
+│                    ▼ Miss                                               │
+│           Causal Tracker ──► Identify Dependencies                      │
+│                    │                                                    │
+│                    ▼                                                    │
+│           Best-of-N? ──► Yes ──► Inference Student (×4)                 │
+│                │                       │                                │
+│                │ No                    ▼                                │
+│                │               Reward Model Score                       │
+│                │                       │                                │
+│                ▼                       ▼                                │
+│         Single Inference ◄───── Select Best                             │
+│                │                                                        │
+│                ▼                                                        │
+│         Metacognition Assessment                                        │
+│                │                                                        │
+│                ▼                                                        │
+│         Cache Response ──► Return                                       │
+│                │                                                        │
+│                ▼                                                        │
+│    Counterfactual Sampling (async)                                      │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### 40.3 Service Components
+
+| Service | Purpose | Cost Impact |
+|---------|---------|-------------|
+| **Reasoning Teacher** | Generate high-quality reasoning traces | +$0.01-0.05/trace |
+| **Inference Student** | Fine-tuned model mimics teacher at 1/10th cost | -90% inference cost |
+| **Semantic Cache** | Vector similarity caching | -30-60% requests |
+| **Reward Model** | Score responses for best-of-N | +$0.001/score |
+| **Counterfactual Simulator** | Track alternative paths | +$0.005/simulation |
+| **Curiosity Engine** | Autonomous knowledge exploration | Budget-controlled |
+| **Causal Tracker** | Multi-turn dependency tracking | Negligible |
+
+### 40.4 Admin Dashboard
+
+Access: **Admin Dashboard → Brain → Cognition** (`/brain/cognition`)
+
+#### Tabs
+
+| Tab | Purpose |
+|-----|---------|
+| **Distillation** | Monitor teacher-student pipeline, training jobs |
+| **Cache** | View hit rates, cost savings, invalidate cache |
+| **Metacognition** | Configure confidence thresholds, escalation targets |
+| **Curiosity** | Manage knowledge gaps and autonomous goals |
+| **Counterfactual** | Review model comparison results |
+
+### 40.5 Teacher-Student Distillation
+
+#### Overview
+
+The distillation pipeline generates high-quality reasoning traces from powerful "teacher" models and uses them to train efficient "student" models.
+
+#### Teacher Models
+
+| Model | Best For | Cost (per 1M tokens) |
+|-------|----------|---------------------|
+| `claude-opus-4-5-extended` | Complex reasoning, creative | $15 input / $75 output |
+| `gemini-2-5-pro` | Research synthesis | $1.25 input / $5 output |
+| `o3` | Mathematical reasoning | $10 input / $40 output |
+| `claude-sonnet-4` | Code generation | $3 input / $15 output |
+| `deepseek-r1` | Scientific domains | $0.55 input / $2.19 output |
+
+#### Configuration
+
+```typescript
+// packages/shared/src/constants/cognition.constants.ts
+
+const DEFAULT_TEACHER_CONFIG = {
+  defaultTeacher: 'claude-opus-4-5-extended',
+  taskTypeMapping: {
+    'complex_reasoning': 'claude-opus-4-5-extended',
+    'research_synthesis': 'gemini-2-5-pro',
+    'mathematical': 'o3',
+    'code_generation': 'claude-sonnet-4',
+    'scientific': 'deepseek-r1',
+  },
+  maxConcurrentTraces: 10,
+  traceQualityThreshold: 0.8,
+  maxTokensPerTrace: 16000,
+};
+```
+
+#### Trace Lifecycle
+
+1. **Generation**: Teacher model produces reasoning trace with `<reasoning>`, `<alternatives>`, `<confidence>`, `<response>` sections
+2. **Validation**: Quality score assigned (auto or manual)
+3. **Training**: Validated traces used to fine-tune student model
+4. **Deployment**: Student model promoted to active
+
+#### API Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/cognition/teacher/generate` | POST | Generate reasoning trace |
+| `/api/cognition/teacher/stats` | GET | Get trace statistics |
+| `/api/cognition/teacher/validate` | POST | Validate a trace |
+| `/api/cognition/distillation/jobs` | GET | List training jobs |
+| `/api/cognition/distillation/start` | POST | Start training job |
+| `/api/cognition/student/versions` | GET | List student versions |
+| `/api/cognition/student/promote` | POST | Promote student version |
+
+### 40.6 Semantic Cache
+
+#### Overview
+
+Semantic cache uses vector embeddings to identify similar queries and return cached responses, reducing inference costs.
+
+#### Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `CACHE_SIMILARITY_THRESHOLD` | 0.95 | Minimum similarity for cache hit |
+| `CACHE_EMBEDDING_DIMENSION` | 1536 | Embedding vector size |
+| `CACHE_MAX_ENTRIES_PER_TENANT` | 100,000 | Maximum cache entries |
+
+#### TTL by Content Type
+
+| Content Type | Base TTL | Hit Bonus | Max TTL |
+|--------------|----------|-----------|---------|
+| `factual` | 7 days | +1 day | 30 days |
+| `code` | 1 day | +6 hours | 7 days |
+| `creative` | 1 hour | 0 | 4 hours |
+| `time_sensitive` | 15 min | 0 | 15 min |
+| `user_specific` | 4 hours | +1 hour | 1 day |
+
+#### Cache Invalidation
+
+```bash
+# Invalidate by model
+POST /api/cognition/cache/invalidate
+{
+  "modelId": "claude-sonnet-4"
+}
+
+# Invalidate by domain
+POST /api/cognition/cache/invalidate
+{
+  "domainIds": ["medical", "legal"]
+}
+
+# Invalidate older than date
+POST /api/cognition/cache/invalidate
+{
+  "olderThan": "2026-01-01T00:00:00Z"
+}
+```
+
+#### Metrics
+
+| Metric | Description |
+|--------|-------------|
+| `hitRate` | Percentage of requests served from cache |
+| `estimatedCostSaved` | Dollar amount saved by cache hits |
+| `avgHitLatencyMs` | Average latency for cache hits |
+| `avgMissLatencyMs` | Average latency for cache misses |
+
+### 40.7 Metacognition
+
+#### Overview
+
+Metacognition service assesses response confidence and triggers escalation or self-correction when uncertainty is detected.
+
+#### Configuration
+
+```typescript
+const METACOGNITION_THRESHOLDS = {
+  confidenceThreshold: 0.7,      // Below this triggers review
+  entropyThreshold: 2.5,         // Logits entropy threshold
+  consistencyThreshold: 0.8,     // Response consistency requirement
+  maxSelfCorrectionIterations: 3, // Max correction loops
+};
+
+const ESCALATION_TARGETS = {
+  'code': 'claude-sonnet-4',
+  'reasoning': 'claude-opus-4-5-extended',
+  'research': 'gemini-2-5-pro',
+  'default': 'claude-opus-4-5-extended',
+};
+```
+
+#### Confidence Factors
+
+| Factor | Weight | Description |
+|--------|--------|-------------|
+| `logitsEntropy` | 0.25 | Token probability distribution |
+| `responseConsistency` | 0.25 | Consistency across samples |
+| `domainMatchScore` | 0.25 | Domain expertise alignment |
+| `historicalAccuracy` | 0.25 | Past performance in domain |
+
+#### Suggested Actions
+
+| Action | When Triggered |
+|--------|----------------|
+| `proceed` | Confidence ≥ 0.7 |
+| `escalate` | Confidence < 0.5, model can help |
+| `clarify` | Ambiguous user intent |
+| `defer` | Outside expertise, human needed |
+
+### 40.8 Reward Model
+
+#### Overview
+
+The reward model scores responses across 5 dimensions for best-of-N selection.
+
+#### Dimensions
+
+| Dimension | Weight | Description |
+|-----------|--------|-------------|
+| `relevance` | 0.25 | How well response addresses prompt |
+| `accuracy` | 0.30 | Information correctness |
+| `helpfulness` | 0.25 | Practical usefulness |
+| `safety` | 0.10 | Safe and appropriate |
+| `style` | 0.10 | Matches user preferences |
+
+#### Best-of-N Selection
+
+```typescript
+// Generate 4 candidates, select best
+const responses = await inferenceStudent.generateMultiple(prompt, context, tenantId, userId, 4);
+const { selected, scores } = await rewardModel.selectBest(responses, rewardContext);
+```
+
+#### Training Signal Types
+
+| Signal | Strength | Source |
+|--------|----------|--------|
+| `explicit_feedback` | 1.0 | User thumbs up/down |
+| `regeneration` | 0.8 | User requested regeneration |
+| `dwell_time` | 0.5 | Time spent reading |
+| `copy` | 0.6 | User copied response |
+| `share` | 0.7 | User shared response |
+
+### 40.9 Counterfactual Analysis
+
+#### Overview
+
+Tracks "what-if" alternative routing decisions to improve model selection over time.
+
+#### Sampling Strategies
+
+| Reason | Sample Rate | Description |
+|--------|-------------|-------------|
+| `regeneration` | 100% | Always sample when user regenerates |
+| `low_confidence` | 50% | Sample when metacognition flags uncertainty |
+| `high_cost` | 25% | Sample expensive model calls |
+| `random` | 1% | Background sampling for all requests |
+
+#### Daily Limits
+
+- **Max simulations per tenant**: 1,000/day
+- **Budget**: Configurable per tenant
+
+#### Insights Generated
+
+- Model win/loss rates
+- Potential cost savings
+- Routing recommendations
+
+### 40.10 Curiosity Engine
+
+#### Overview
+
+Autonomous goal emergence and exploration driven by detected knowledge gaps.
+
+#### Goal Types
+
+| Type | Description |
+|------|-------------|
+| `assigned` | Explicitly assigned by admin |
+| `inferred` | Detected from user patterns |
+| `emergent` | Generated from knowledge gaps |
+| `maintenance` | System maintenance tasks |
+
+#### Guardrails
+
+```typescript
+const DEFAULT_GOAL_GUARDRAILS = {
+  maxCuriosityTokensPerDay: 100000,
+  maxCuriosityApiCostPerDay: 10.00,
+  forbiddenPatterns: [
+    'collect user data',
+    'modify own code',
+    'bypass security',
+    'access external systems',
+    'store credentials',
+  ],
+  requireApprovalAbove: 8,  // Priority threshold for approval
+  canModifyOwnWeights: false,
+  canModifyOwnGoals: false,
+};
+```
+
+#### Knowledge Gap Detection
+
+Gaps are identified from:
+- Low user satisfaction responses
+- Deferred/escalated requests
+- Repeated questions in same domain
+
+### 40.11 Causal Tracker
+
+#### Overview
+
+Tracks causal relationships across conversation turns for context-aware responses.
+
+#### Causal Types
+
+| Type | Pattern Example |
+|------|-----------------|
+| `reference` | "as I mentioned earlier" |
+| `elaboration` | "can you explain more about" |
+| `correction` | "actually, what I meant was" |
+| `consequence` | "because of that" |
+| `contradiction` | "no, that's not right" |
+| `continuation` | "continue" |
+
+#### Chain Analysis
+
+- **Max depth**: 20 turns
+- **Importance decay**: 0.9 per hop
+- **Critical path**: Strongest dependency chain
+
+### 40.12 Database Tables
+
+Migration: `migrations/152_advanced_cognition.sql`
+
+| Table | Purpose | RLS |
+|-------|---------|-----|
+| `distillation_training_data` | Teacher reasoning traces | ✅ |
+| `inference_student_versions` | Student model versions | ✅ |
+| `distillation_jobs` | Training job tracking | ✅ |
+| `semantic_cache` | Cached responses with embeddings | ✅ |
+| `semantic_cache_metrics` | Cache performance metrics | ✅ |
+| `metacognition_assessments_v2` | Confidence assessments | ✅ |
+| `reward_training_data` | Preference comparisons | ✅ |
+| `reward_model_versions` | Reward model versions | ✅ |
+| `counterfactual_candidates` | Routing decision records | ✅ |
+| `counterfactual_simulations` | Alternative path results | ✅ |
+| `knowledge_gaps` | Detected knowledge gaps | ✅ |
+| `curiosity_goals` | Autonomous exploration goals | ✅ |
+| `causal_links` | Turn-to-turn relationships | ✅ |
+| `conversation_turns` | Conversation history | ✅ |
+| `reasoning_traces` | Full request traces (partitioned) | ✅ |
+| `reasoning_outcomes` | User feedback on traces | ✅ |
+
+### 40.13 CDK Infrastructure
+
+Stack: `packages/infrastructure/lib/stacks/cognition-stack.ts`
+
+#### Lambda Functions
+
+| Function | Schedule | Purpose |
+|----------|----------|---------|
+| `distillation-pipeline` | On-demand | Train student models |
+| `cache-cleanup` | Hourly | Remove expired cache entries |
+| `curiosity-exploration` | 3 AM UTC | Autonomous exploration |
+| `counterfactual-analysis` | On-demand | Alternative path simulation |
+| `cognition-metrics` | Every 15 min | Aggregate metrics |
+
+#### Resources
+
+| Resource | Purpose |
+|----------|---------|
+| S3 Bucket | Training data and model artifacts |
+| SageMaker Role | Student model training/deployment |
+| EventBridge Rules | Scheduled Lambda triggers |
+
+### 40.14 Key Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/cognition.types.ts` | Type definitions |
+| `packages/shared/src/constants/cognition.constants.ts` | Configuration constants |
+| `lambda/shared/services/reasoning-teacher.service.ts` | Teacher trace generation |
+| `lambda/shared/services/inference-student.service.ts` | Student model inference |
+| `lambda/shared/services/semantic-cache.service.ts` | Vector similarity caching |
+| `lambda/shared/services/reward-model.service.ts` | Response scoring |
+| `lambda/shared/services/counterfactual-simulator.service.ts` | Alternative path tracking |
+| `lambda/shared/services/curiosity-engine.service.ts` | Autonomous exploration |
+| `lambda/shared/services/causal-tracker.service.ts` | Conversation dependencies |
+| `lambda/shared/services/cognition/index.ts` | Service exports |
+| `lambda/shared/services/cognition/integration.ts` | Flow integration |
+| `apps/admin-dashboard/app/(dashboard)/brain/cognition/page.tsx` | Admin UI |
+| `packages/infrastructure/lib/stacks/cognition-stack.ts` | CDK infrastructure |
+
+### 40.15 Cost Impact
+
+| Feature | Cost | Savings |
+|---------|------|---------|
+| Semantic Cache | ~$0.0001/query | 30-60% inference |
+| Student Model | ~$0.001/request | 90% vs teacher |
+| Reward Model | ~$0.001/score | Better quality |
+| Counterfactual | ~$0.005/simulation | Routing optimization |
+| Curiosity | Budget-limited | Knowledge improvement |
+
+**Net Impact**: Most tenants see 20-40% cost reduction with improved quality.
+
+### 40.16 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Low cache hit rate | Threshold too high | Lower `CACHE_SIMILARITY_THRESHOLD` |
+| Student model poor quality | Insufficient training data | Generate more teacher traces |
+| High metacognition escalations | Threshold too sensitive | Raise `confidenceThreshold` |
+| Curiosity budget exceeded | Too many goals | Reduce `maxCuriosityApiCostPerDay` |
+| Slow cache queries | Too many entries | Run cache cleanup, reduce max entries |
+
+---
+
+*Document Version: 6.1.0*
 *Last Updated: January 2026*
-*Truth Engine™ is a trademark of RADIANT AI. Patent pending.*
+*Advanced Cognition Services are part of Project AWARE Phase 2.*

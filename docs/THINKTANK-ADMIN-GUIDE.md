@@ -1521,7 +1521,7 @@ The brain planner automatically:
 
 ### 22.6 Library Assist Integration
 
-The AGI Brain Planner integrates with the Open Source Library Registry (156 libraries) for generative UI outputs:
+The AGI Brain Planner integrates with the Open Source Library Registry (168 libraries) for generative UI outputs:
 
 ```typescript
 const plan = await agiBrainPlannerService.generatePlan({

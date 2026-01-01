@@ -6,7 +6,7 @@
 
 import { ScheduledEvent } from 'aws-lambda';
 import { Pool } from 'pg';
-import { LearningInfluenceService } from '../shared/services/learning-influence.service';
+import { LearningInfluenceService } from '../shared/services/learning-hierarchy.service';
 
 const pool = new Pool({
   host: process.env.DB_HOST,

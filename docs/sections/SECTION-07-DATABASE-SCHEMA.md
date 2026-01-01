@@ -225,6 +225,43 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `ecd_metrics` | ECD verification results per request (score, entities, refinements) |
 | `ecd_audit_log` | Full audit trail with original and final responses |
 | `ecd_entity_stats` | Aggregated entity extraction statistics by type |
+| `distillation_training_data` | Teacher model reasoning traces for student training |
+| `inference_student_versions` | Student model versions with metrics |
+| `distillation_jobs` | Distillation training job tracking |
+| `semantic_cache` | Vector similarity cache for responses |
+| `semantic_cache_metrics` | Cache performance metrics |
+| `metacognition_assessments_v2` | Enhanced confidence assessments |
+| `reward_training_data` | Preference comparison training data |
+| `reward_model_versions` | Reward model version tracking |
+| `counterfactual_candidates` | Routing decision records for counterfactual analysis |
+| `counterfactual_simulations` | Alternative path simulation results |
+| `knowledge_gaps` | Detected knowledge gaps from uncertainty |
+| `curiosity_goals` | Autonomous exploration goals |
+| `causal_links` | Turn-to-turn causal relationships |
+| `conversation_turns` | Conversation history for causal tracking |
+| `reasoning_traces` | Full request traces (partitioned by month) |
+| `reasoning_outcomes` | User feedback on reasoning traces |
+
+### Migration 152: Advanced Cognition (v6.1.0)
+
+| Table | Purpose |
+|-------|---------|
+| `distillation_training_data` | Teacher reasoning traces with quality scores |
+| `inference_student_versions` | Student model versions with SageMaker endpoints |
+| `distillation_jobs` | Training job lifecycle tracking |
+| `semantic_cache` | Vector similarity cache with pgvector embeddings |
+| `semantic_cache_metrics` | Hourly cache performance metrics |
+| `metacognition_assessments_v2` | Confidence, entropy, escalation decisions |
+| `reward_training_data` | Winning/losing response pairs with signals |
+| `reward_model_versions` | Reward model artifacts and accuracy |
+| `counterfactual_candidates` | Original routing decisions to analyze |
+| `counterfactual_simulations` | Alternative model comparison results |
+| `knowledge_gaps` | Topics with low user satisfaction |
+| `curiosity_goals` | Budget-controlled autonomous exploration |
+| `causal_links` | Reference, elaboration, correction relationships |
+| `conversation_turns` | Turn content for causal analysis |
+| `reasoning_traces` | Partitioned trace storage (monthly partitions) |
+| `reasoning_outcomes` | Regeneration, edit, dwell time signals |
 
 ### Migration 133: ECD Tables - Truth Engine™ (v6.0.4-S1)
 

@@ -4,7 +4,7 @@
 
 import { executeStatement, stringParam, longParam, doubleParam } from '../db/client';
 import { enhancedLearningService } from './enhanced-learning.service';
-import { learningCandidateService, type CandidateType } from './learning-candidate.service';
+import { learningCandidateService, type CandidateType } from './distillation-pipeline.service';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // ============================================================================

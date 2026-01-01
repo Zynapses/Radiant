@@ -575,4 +575,6 @@ class PredictiveCodingService {
   }
 }
 
-export const predictiveCodingService = new PredictiveCodingService();
+export const predictionEngine = new PredictiveCodingService();
+// Backward compatibility alias
+export const predictiveCodingService = predictionEngine;

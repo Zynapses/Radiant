@@ -171,6 +171,17 @@ export async function transactionWithRls<T>(
 }
 
 /**
+ * Get the database pool (initializing if needed)
+ * Used by cognition services for direct pool access
+ */
+export async function getDbPool(): Promise<Pool> {
+  if (!pool) {
+    await initDatabase();
+  }
+  return pool!;
+}
+
+/**
  * Close the database pool
  */
 export async function closeDatabase(): Promise<void> {

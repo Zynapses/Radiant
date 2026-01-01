@@ -9,10 +9,10 @@
 
 import { consciousnessMiddlewareService, type ConsciousnessContext, type AffectiveHyperparameters } from './consciousness-middleware.service';
 import { consciousnessService } from './consciousness.service';
-import { egoContextService, type EgoContextResult } from './ego-context.service';
+import { egoContextService, type EgoContextResult } from './identity-core.service';
 import { agiBrainPlannerService, type AGIBrainPlan, type GeneratePlanRequest, type OrchestrationMode } from './agi-brain-planner.service';
 import { userPersistentContextService } from './user-persistent-context.service';
-import { predictiveCodingService } from './predictive-coding.service';
+import { predictiveCodingService } from './prediction-engine.service';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // ============================================================================

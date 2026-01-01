@@ -4,7 +4,7 @@
 
 import { executeStatement } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
-import { learningCandidateService } from './learning-candidate.service';
+import { learningCandidateService } from './distillation-pipeline.service';
 import type {
   BipolarRating,
   BipolarRatingInput,

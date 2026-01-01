@@ -3,7 +3,7 @@
 // ============================================================================
 
 import { executeStatement, stringParam, longParam } from '../db/client';
-import { learningCandidateService } from './learning-candidate.service';
+import { learningCandidateService } from './distillation-pipeline.service';
 import { enhancedLearningService } from './enhanced-learning.service';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
