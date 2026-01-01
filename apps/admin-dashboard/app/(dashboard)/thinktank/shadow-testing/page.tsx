@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -66,11 +66,7 @@ export default function ShadowTestingPage() {
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [testsRes, settingsRes] = await Promise.all([
@@ -85,7 +81,7 @@ export default function ShadowTestingPage() {
 
       if (settingsRes.ok) {
         const data = await settingsRes.json();
-        setSettings(data.settings || settings);
+        setSettings(prev => data.settings || prev);
       }
     } catch (error) {
       console.error('Failed to fetch shadow test data:', error);
@@ -134,9 +130,14 @@ export default function ShadowTestingPage() {
           createdAt: new Date(Date.now() - 604800000).toISOString(),
         },
       ]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleStartTest = async (testId: string) => {
     setSaving(true);

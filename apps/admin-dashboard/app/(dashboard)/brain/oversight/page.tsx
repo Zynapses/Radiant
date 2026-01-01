@@ -6,7 +6,7 @@
  * EU AI Act Article 14 compliance
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -80,7 +80,7 @@ export default function OversightQueuePage() {
   const [attestation, setAttestation] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const statsRes = await fetch('/api/admin/brain/oversight/stats');
@@ -100,7 +100,7 @@ export default function OversightQueuePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [tenantId]);
 
   const handleReview = async () => {
     if (!selectedItem || !reviewAction || !reasoning || !attestation) return;
@@ -135,7 +135,7 @@ export default function OversightQueuePage() {
     fetchData();
     const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
-  }, [tenantId]);
+  }, [fetchData]);
 
   const getDomainBadgeVariant = (domain: string) => {
     switch (domain) {

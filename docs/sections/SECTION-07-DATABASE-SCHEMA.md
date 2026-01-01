@@ -222,6 +222,35 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `library_executor_pool` | Executor pool status for auto-scaling |
 | `library_execution_aggregates` | Pre-computed execution statistics |
 | `conscious_orchestrator_decisions` | Logs decisions made by conscious orchestrator (plan/clarify/defer/refuse) |
+| `ecd_metrics` | ECD verification results per request (score, entities, refinements) |
+| `ecd_audit_log` | Full audit trail with original and final responses |
+| `ecd_entity_stats` | Aggregated entity extraction statistics by type |
+
+### Migration 133: ECD Tables - Truth Engine™ (v6.0.4-S1)
+
+| Table | Purpose |
+|-------|---------|
+| `ecd_metrics` | Per-request ECD verification results with scores and entity counts |
+| `ecd_audit_log` | Full response audit trail for divergence analysis |
+| `ecd_entity_stats` | Daily aggregated stats by entity type (grounded/divergent) |
+
+**ECD Configuration (added to `system_config`):**
+- `ECD_ENABLED` - Enable verification loop
+- `ECD_THRESHOLD` - Max acceptable divergence (0.1)
+- `ECD_MAX_REFINEMENTS` - Auto-correction attempts (2)
+- `ECD_BLOCK_ON_FAILURE` - Block failed responses
+- `ECD_HEALTHCARE_THRESHOLD` - Healthcare threshold (0.05)
+- `ECD_FINANCIAL_THRESHOLD` - Financial threshold (0.05)
+- `ECD_LEGAL_THRESHOLD` - Legal threshold (0.05)
+- `ECD_ANCHORING_ENABLED` - Critical fact anchoring
+- `ECD_ANCHORING_OVERSIGHT` - Send to oversight queue
+
+**Helper Functions:**
+- `get_ecd_stats(tenant_id, days)` - ECD statistics
+- `get_ecd_trend(tenant_id, days)` - Score trend over time
+- `get_ecd_entity_breakdown(tenant_id, days)` - Entity type stats
+- `log_ecd_metrics(...)` - Log verification results
+- `update_ecd_entity_stats(...)` - Update entity aggregates
 
 ### Migration 105: Consciousness Enhancements (v4.18.19)
 

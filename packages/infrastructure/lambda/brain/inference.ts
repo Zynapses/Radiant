@@ -28,6 +28,7 @@ import {
   ConversationMessage,
 } from '@radiant/shared';
 import { embeddingService } from '../shared/services/embedding.service';
+import { ecdVerificationService } from '../shared/services/ecd-verification.service';
 
 // =============================================================================
 // Redis Initialization
@@ -184,13 +185,51 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     }
 
     // ===========================================================================
-    // Step 4: Call LLM (placeholder - integrate with actual inference)
+    // Step 4: Call LLM with ECD Verification (Truth Engine™)
     // ===========================================================================
+    const detectedDomain = domain || sofaiRouterService.detectDomain(prompt);
+    
+    // Use ECD verification service for verified inference
+    const verificationResult = await ecdVerificationService.executeWithVerification({
+      userId,
+      tenantId,
+      requestId,
+      prompt,
+      sourceContext: assembledContext.userContext,
+      flashFacts: assembledContext.flashFacts.map(f => f.fact),
+      retrievedDocs: [], // Add retrieved docs if available
+      domain: detectedDomain,
+      generateResponse: async (refinedPrompt: string) => {
+        const result = await callLLM(
+          contextAssemblerService.formatForModel({
+            ...assembledContext,
+            userContext: refinedPrompt,
+          }),
+          routingDecision.level,
+          options
+        );
+        return result.response;
+      },
+    });
+
+    // Get final LLM response with token usage
     const llmResponse = await callLLM(
       contextAssemblerService.formatForModel(assembledContext),
       routingDecision.level,
       options
     );
+    
+    // Use verified response if ECD passed, otherwise use verification result
+    const finalResponse = verificationResult.passed 
+      ? llmResponse.response 
+      : verificationResult.finalResponse;
+
+    logger.debug('ECD verification complete', {
+      passed: verificationResult.passed,
+      ecdScore: verificationResult.ecdScore.score,
+      refinementAttempts: verificationResult.refinementAttempts,
+      blocked: verificationResult.blocked,
+    });
 
     // ===========================================================================
     // Step 5: Detect Flash Facts
@@ -236,13 +275,14 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     }
 
     // ===========================================================================
-    // Step 7: Check for Human Oversight (high-risk domains)
+    // Step 7: Check for Human Oversight (high-risk domains + ECD failures)
     // ===========================================================================
-    const detectedDomain = domain || sofaiRouterService.detectDomain(prompt);
-    if (oversightService.requiresOversight(detectedDomain)) {
-      // For high-risk domains, consider submitting to oversight
-      // This is typically done for generated insights, not raw responses
-      logger.debug('High-risk domain detected', { domain: detectedDomain });
+    if (oversightService.requiresOversight(detectedDomain) || verificationResult.requiresOversight) {
+      // For high-risk domains or ECD failures, consider submitting to oversight
+      logger.debug('Oversight may be required', { 
+        domain: detectedDomain,
+        ecdRequiresOversight: verificationResult.requiresOversight,
+      });
     }
 
     // ===========================================================================
@@ -268,7 +308,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     // Build Response
     // ===========================================================================
     const response: BrainInferenceResponse = {
-      response: llmResponse.response,
+      response: finalResponse,
       systemLevel: routingDecision.level,
       routingDecision,
       budget: assembledContext.budget,
@@ -276,6 +316,13 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       flashFactsDetected,
       latencyMs: Date.now() - startTime,
       tokenUsage: llmResponse.tokenUsage,
+      // ECD verification metadata
+      verification: {
+        passed: verificationResult.passed,
+        ecdScore: verificationResult.ecdScore.score,
+        refinementAttempts: verificationResult.refinementAttempts,
+        blocked: verificationResult.blocked,
+      },
     };
 
     logger.info('Brain inference complete', {

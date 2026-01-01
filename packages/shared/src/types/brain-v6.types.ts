@@ -227,6 +227,13 @@ export interface BrainInferenceResponse {
     output: number;
     total: number;
   };
+  /** ECD verification result (Truth Engine™) */
+  verification?: {
+    passed: boolean;
+    ecdScore: number;
+    refinementAttempts: number;
+    blocked: boolean;
+  };
 }
 
 // =============================================================================

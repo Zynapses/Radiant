@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { brainApi, type BrainDashboardData } from '@/lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -25,43 +26,6 @@ import {
   Zap,
 } from 'lucide-react';
 
-interface BrainDashboardData {
-  ghost: {
-    totalGhosts: number;
-    activeGhosts: number;
-    avgTurnCount: number;
-    avgTimeSinceReanchor: number;
-    versionDistribution: Record<string, number>;
-    migrationsPending: number;
-  };
-  dreams: {
-    pendingJobs: number;
-    runningJobs: number;
-    completedToday: number;
-    failedToday: number;
-    avgDurationMs: number;
-    oldestPendingAt: string | null;
-  };
-  oversight: {
-    pending: number;
-    escalated: number;
-    approvedToday: number;
-    rejectedToday: number;
-    expiredToday: number;
-    avgReviewTimeMs: number;
-    oldestPendingAt: string | null;
-    byDomain: Record<string, number>;
-  };
-  sofai: {
-    total: number;
-    byLevel: Record<string, number>;
-    avgTrust: number;
-    avgDomainRisk: number;
-    avgLatencyMs: number;
-  } | null;
-  timestamp: string;
-}
-
 export default function BrainDashboardPage() {
   const [data, setData] = useState<BrainDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -70,13 +34,11 @@ export default function BrainDashboardPage() {
   const fetchDashboard = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/brain/dashboard');
-      if (!response.ok) throw new Error('Failed to fetch dashboard');
-      const result = await response.json();
+      const result = await brainApi.getDashboard();
       setData(result);
       setError(null);
     } catch (err) {
-      setError(String(err));
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }

@@ -44,6 +44,9 @@ export interface TierConfig {
   litellmCpu: number;
   litellmMemory: number;
   
+  // Brain (AGI Brain v6.0.4)
+  enableBrain: boolean;
+  
   // Security
   enableWaf: boolean;
   enableGuardDuty: boolean;

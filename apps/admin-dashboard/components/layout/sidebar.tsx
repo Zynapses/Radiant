@@ -115,6 +115,7 @@ const navigation: NavigationItem[] = [
   { name: 'Brain Ghost', href: '/brain/ghost', icon: Activity },
   { name: 'Brain Oversight', href: '/brain/oversight', icon: Shield },
   { name: 'Brain SoFAI', href: '/brain/sofai', icon: Heart },
+  { name: 'Brain ECD', href: '/brain/ecd', icon: Shield },
   { name: 'Cognitive Brain', href: '/cognitive-brain', icon: Brain },
   { name: 'Cognition', href: '/cognition', icon: Lightbulb },
   { name: 'Consciousness', href: '/consciousness', icon: Sparkles },

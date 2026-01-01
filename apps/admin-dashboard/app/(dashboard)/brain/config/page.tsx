@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { configApi, type ParameterCategory, type Parameter } from '@/lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -45,36 +46,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-interface ParameterConstraints {
-  min?: number;
-  max?: number;
-  step?: number;
-  options?: string[];
-}
-
-interface Parameter {
-  id: string;
-  categoryId: string;
-  key: string;
-  name: string;
-  description: string;
-  type: 'number' | 'string' | 'boolean' | 'select' | 'json';
-  value: unknown;
-  defaultValue: unknown;
-  constraints?: ParameterConstraints;
-  dangerous?: boolean;
-  requiresRestart?: boolean;
-}
-
-interface ParameterCategory {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  displayOrder: number;
-  parameters: Parameter[];
-}
-
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   ghost: <Ghost className="h-5 w-5" />,
   dreaming: <Moon className="h-5 w-5" />,
@@ -100,10 +71,8 @@ export default function BrainConfigPage() {
   const fetchConfig = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/brain/config');
-      if (!response.ok) throw new Error('Failed to fetch config');
-      const data = await response.json();
-      setCategories(data.categories || []);
+      const data = await configApi.getConfig();
+      setCategories(data || []);
     } catch (err) {
       console.error('Failed to load config:', err);
     } finally {
@@ -143,14 +112,7 @@ export default function BrainConfigPage() {
         value,
       }));
 
-      const response = await fetch('/api/admin/brain/config', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ updates, changedBy: 'admin' }),
-      });
-
-      if (!response.ok) throw new Error('Failed to save config');
-
+      await configApi.batchUpdate(updates);
       setPendingChanges(new Map());
       await fetchConfig();
     } catch (err) {
@@ -162,11 +124,7 @@ export default function BrainConfigPage() {
 
   const resetToDefault = async (key: string) => {
     try {
-      await fetch(`/api/admin/brain/config/${key}/reset`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ changedBy: 'admin' }),
-      });
+      await configApi.resetParameter(key);
       await fetchConfig();
     } catch (err) {
       console.error('Failed to reset:', err);

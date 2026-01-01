@@ -96,7 +96,7 @@ export class TmsStack extends cdk.Stack {
     if (props.enableCodeSigning) {
       const signingProfile = new signer.SigningProfile(this, 'SigningProfile', {
         platform: signer.Platform.AWS_LAMBDA_SHA384_ECDSA,
-        signatureValidityPeriod: cdk.Duration.days(365),
+        signatureValidity: cdk.Duration.days(365),
       });
 
       codeSigningConfig = new lambda.CodeSigningConfig(this, 'CodeSigningConfig', {
@@ -178,7 +178,7 @@ export class TmsStack extends cdk.Stack {
     // COMMON LAMBDA CONFIGURATION
     // =========================================================================
 
-    const commonLambdaProps: Partial<lambda.FunctionProps> = {
+    const commonLambdaProps = {
       runtime: lambda.Runtime.NODEJS_20_X,
       architecture: lambda.Architecture.ARM_64,
       timeout: cdk.Duration.seconds(30),

@@ -217,19 +217,25 @@ adminStack.addDependency(apiStack);
 // ============================================================================
 
 // 10. Brain Stack (Ghost Vectors, SOFAI, Dreaming, Oversight)
-const brainStack = new BrainStack(app, `${stackPrefix}-brain`, {
-  env,
-  vpc: networkingStack.vpc,
-  dbSecurityGroup: securityStack.databaseSecurityGroup,
-  dbClusterArn: dataStack.cluster.clusterArn,
-  dbSecretArn: dataStack.cluster.secret?.secretArn || '',
-  environment,
-  litellmUrl: aiStack.litellmUrl,
-  tags,
-  description: `RADIANT AGI Brain v6.0.4 - ${appId} ${environment}`,
-});
-brainStack.addDependency(aiStack);
-brainStack.addDependency(dataStack);
+// Only create BrainStack if enabled for this tier (Tier 3+)
+let brainStack: BrainStack | undefined;
+if (tierConfig.enableBrain) {
+  brainStack = new BrainStack(app, `${stackPrefix}-brain`, {
+    env,
+    vpc: networkingStack.vpc,
+    dbSecurityGroup: securityStack.databaseSecurityGroup,
+    dbClusterArn: dataStack.cluster.clusterArn,
+    dbSecretArn: dataStack.cluster.secret?.secretArn || '',
+    environment,
+    litellmUrl: aiStack.litellmUrl,
+    tags,
+    description: `RADIANT AGI Brain v6.0.4 - ${appId} ${environment}`,
+  });
+  brainStack.addDependency(aiStack);
+  brainStack.addDependency(dataStack);
+} else {
+  console.log(`║ Brain Stack:  SKIPPED (requires Tier 3+)                      ║`);
+}
 
 // ============================================================================
 // BOBBLE INFRASTRUCTURE TIER TRANSITION (Phase 3)

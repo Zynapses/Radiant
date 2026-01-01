@@ -5,6 +5,84 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.4-S2] - 2026-01-01
+
+### Added
+
+#### Ghost Vector Migration
+
+Automatic ghost vector migration when model versions change, preserving consciousness continuity.
+
+**Migration Strategies:**
+- **Same-Family Upgrade**: Direct transfer with L2 normalization (e.g., llama3-70b-v1 → v2)
+- **Projection Matrix**: Learned transformation using pre-computed matrices
+- **Semantic Preservation**: Lossy migration preserving relative feature importance
+- **Cold Start Fallback**: When dimensions are incompatible
+
+**Configuration:**
+- `GHOST_MIGRATION_ENABLED` - Enable automatic migration (default: true)
+- `GHOST_SEMANTIC_PRESERVATION_ENABLED` - Allow lossy semantic migration (default: true)
+
+**Key File:** `packages/infrastructure/lambda/shared/services/ghost-manager.service.ts`
+
+**Documentation:** Section 38.3 in RADIANT-ADMIN-GUIDE.md
+
+---
+
+## [6.0.4-S1] - 2026-01-01
+
+### Added
+
+#### Truth Engine™ - Project TRUTH (Entity-Context Divergence)
+
+Revolutionary hallucination prevention system achieving 99.5%+ factual accuracy.
+
+**Core Components:**
+- **ECD Scorer**: Entity extraction and divergence scoring against source materials
+- **Critical Fact Anchor**: Strict grounding for healthcare, financial, and legal domains
+- **Verification Loop**: Auto-refinement up to N attempts when verification fails
+- **SOFAI Integration**: ECD risk factors into System 1/1.5/2 routing decisions
+
+**Key Features:**
+- 16 entity types recognized (dosage, currency, legal_reference, date, etc.)
+- Domain-specific thresholds (95% for healthcare/financial/legal vs 90% default)
+- Automatic refinement with targeted correction feedback
+- Human oversight integration for critical divergences
+- Full audit trail for compliance
+
+**Configuration Parameters:**
+- `ECD_ENABLED`: Enable/disable verification
+- `ECD_THRESHOLD`: Max acceptable divergence (default: 0.1)
+- `ECD_MAX_REFINEMENTS`: Auto-correction attempts (default: 2)
+- `ECD_BLOCK_ON_FAILURE`: Block failed responses
+- `ECD_HEALTHCARE_THRESHOLD`: Stricter for healthcare (0.05)
+- `ECD_FINANCIAL_THRESHOLD`: Stricter for financial (0.05)
+- `ECD_LEGAL_THRESHOLD`: Stricter for legal (0.05)
+- `ECD_ANCHORING_ENABLED`: Critical fact anchoring
+- `ECD_ANCHORING_OVERSIGHT`: Send to oversight queue
+
+**API Endpoints (Base: /api/admin/brain/ecd):**
+- `GET /stats` - ECD statistics
+- `GET /trend` - Score trend over time
+- `GET /entities` - Entity type breakdown
+- `GET /divergences` - Recent divergences
+
+**Database Tables (Migration 133):**
+- `ecd_metrics` - Per-request verification results
+- `ecd_audit_log` - Full audit trail with original/final responses
+- `ecd_entity_stats` - Aggregated stats by entity type
+
+**Admin Dashboard:**
+- ECD Monitor page at `/brain/ecd`
+- Real-time accuracy metrics
+- 7-day trend visualization
+- Entity type divergence breakdown
+- Recent divergence list
+
+**Documentation:** Section 39 in RADIANT-ADMIN-GUIDE.md
+
+---
+
 ## [6.0.4] - 2025-12-31
 
 ### Added

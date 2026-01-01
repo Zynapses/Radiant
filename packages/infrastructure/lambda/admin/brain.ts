@@ -107,6 +107,12 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return getSofaiStats(event);
     }
 
+    // ECD (Entity-Context Divergence) - Truth Engine™
+    if (path.startsWith('/api/admin/brain/ecd')) {
+      const { handler: ecdHandler } = await import('./ecd');
+      return ecdHandler(event, {} as any, () => {});
+    }
+
     // Reconciliation
     if (path === '/api/admin/brain/reconciliation/trigger' && method === 'POST') {
       return triggerReconciliation(event);
