@@ -716,7 +716,7 @@ function LanguageSettings() {
           <div className="bg-muted/50 rounded-lg p-4">
             <h4 className="font-medium mb-2">Translation Coverage</h4>
             <p className="text-sm text-muted-foreground mb-3">
-              All 16 languages are fully supported with professional translations for:
+              All 18 languages are fully supported with professional translations for:
             </p>
             <ul className="text-sm text-muted-foreground space-y-1">
               <li>• User interface elements</li>

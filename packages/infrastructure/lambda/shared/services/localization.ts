@@ -1,4 +1,4 @@
-import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
+import { SageMakerRuntimeClient, InvokeEndpointCommand } from '@aws-sdk/client-sagemaker-runtime';
 import { executeStatement } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
@@ -20,11 +20,14 @@ interface Translation {
 }
 
 export class LocalizationService {
-  private bedrock: BedrockRuntimeClient;
+  private sagemaker: SageMakerRuntimeClient;
   private bundleCache: Map<string, { data: Record<string, string>; expiresAt: number }> = new Map();
+  private readonly TRANSLATION_ENDPOINT = process.env.QWEN_TRANSLATION_ENDPOINT || 'radiant-qwen25-7b-translation';
 
   constructor() {
-    this.bedrock = new BedrockRuntimeClient({});
+    this.sagemaker = new SageMakerRuntimeClient({
+      region: process.env.AWS_REGION || 'us-east-1',
+    });
   }
 
   async registerString(entry: LocalizationEntry): Promise<string> {
@@ -240,6 +243,10 @@ export class LocalizationService {
     return result.rows;
   }
 
+  /**
+   * Call Qwen 2.5 7B via SageMaker for translation
+   * Cost: $0.08/1M input, $0.24/1M output (3x cheaper than Claude Haiku)
+   */
   private async callTranslationAI(
     text: string,
     sourceLang: string,
@@ -253,20 +260,58 @@ Text to translate: "${text}"
 
 Provide ONLY the translated text, nothing else.`;
 
-    const response = await this.bedrock.send(
-      new InvokeModelCommand({
-        modelId: 'anthropic.claude-3-haiku-20240307-v1:0',
-        body: JSON.stringify({
-          anthropic_version: 'bedrock-2023-05-31',
-          max_tokens: 1024,
-          messages: [{ role: 'user', content: prompt }],
-        }),
-        contentType: 'application/json',
-      })
-    );
+    try {
+      // Qwen 2.5 7B Instruct ChatML format
+      const payload = {
+        inputs: `<|im_start|>system
+You are a professional translator. Translate accurately while preserving formatting.<|im_end|>
+<|im_start|>user
+${prompt}<|im_end|>
+<|im_start|>assistant
+`,
+        parameters: {
+          max_new_tokens: 1024,
+          temperature: 0.3,
+          top_p: 0.9,
+          do_sample: true,
+          return_full_text: false,
+        },
+      };
 
-    const result = JSON.parse(new TextDecoder().decode(response.body));
-    return result.content?.[0]?.text?.trim() || text;
+      const response = await this.sagemaker.send(
+        new InvokeEndpointCommand({
+          EndpointName: this.TRANSLATION_ENDPOINT,
+          ContentType: 'application/json',
+          Body: JSON.stringify(payload),
+        })
+      );
+
+      const responseBody = JSON.parse(new TextDecoder().decode(response.Body));
+
+      // Handle different response formats from TGI/vLLM
+      let translatedText: string;
+      if (Array.isArray(responseBody)) {
+        // TGI format: [{generated_text: "..."}]
+        translatedText = responseBody[0]?.generated_text?.trim() || '';
+      } else if (responseBody.generated_text) {
+        // Single response format
+        translatedText = responseBody.generated_text.trim();
+      } else if (responseBody.choices) {
+        // vLLM OpenAI-compatible format
+        translatedText = responseBody.choices[0]?.text?.trim() || '';
+      } else {
+        translatedText = String(responseBody).trim();
+      }
+
+      // Clean up any trailing assistant tokens
+      translatedText = translatedText.replace(/<\|im_end\|>/g, '').trim();
+
+      return translatedText || text;
+    } catch (error) {
+      logger.error(`Qwen translation model call failed: ${String(error)}`);
+      // Return original text on error
+      return text;
+    }
   }
 
   private invalidateBundleCache(languageCode: string): void {

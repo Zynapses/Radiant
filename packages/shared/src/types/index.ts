@@ -30,3 +30,5 @@ export * from './bipolar-rating.types';
 export * from './formal-reasoning.types';
 export * from './user-registry.types';
 export * from './metrics-learning.types';
+export * from './localization.types';
+export * from './translation-middleware.types';

@@ -5,6 +5,73 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.18.57] - 2025-12-31
+
+### Added
+
+#### Translation Middleware (18 Language Support)
+
+Automatic translation layer for multilingual AI model support. Enables cost-effective self-hosted models to serve users in any of 18 supported languages.
+
+**Architecture:**
+- Language detection with script type identification (Latin, CJK, Arabic, Cyrillic, Devanagari, Thai)
+- Model language capability matrix defining native/good/moderate/poor/none support per language
+- Conditional translation routing: input → English → model → English → output
+- Smart caching with 7-day TTL and 60-80% cost reduction
+
+**Supported Languages (18):**
+English, Spanish, French, German, Portuguese, Italian, Dutch, Polish, Russian, Turkish, Japanese, Korean, Chinese (Simplified), Chinese (Traditional), Arabic (RTL), Hindi, Thai, Vietnamese
+
+**Translation Model:**
+- Default: Qwen 2.5 7B (excellent multilingual, cost-effective)
+- $0.08/1M input, $0.24/1M output (3x cheaper than Claude Haiku)
+- Preserves code blocks, URLs, @mentions during translation
+
+**Model Language Matrix:**
+| Model Type | Translate Threshold | Example |
+|------------|-------------------|---------|
+| External (Claude, GPT-4) | `none` | Never translate |
+| Large Self-Hosted (Qwen 72B) | `moderate` | Translate for poor/none |
+| Medium Self-Hosted (Llama 70B) | `good` | Translate for moderate/poor/none |
+| Small Self-Hosted (7B models) | `native` | Translate for all non-English |
+
+**Brain Router Integration:**
+```typescript
+const result = await brainRouter.route({
+  tenantId, userId, taskType: 'chat', prompt,
+  useTranslation: true,  // Enable translation middleware
+});
+// result.translationContext - { originalLanguage, translationRequired, inputTranslated, outputWillBeTranslated }
+```
+
+**API Endpoints (Base: /api/admin/translation):**
+- `GET/PUT /config` - Configuration management
+- `GET /dashboard` - Metrics and cache stats
+- `GET /languages` - Model language support matrix
+- `POST /detect` - Language detection
+- `POST /translate` - Test translation
+- `POST /check-model` - Check if translation required for model+language
+- `DELETE /cache` - Clear translation cache
+
+**Database Tables (Migration 130):**
+- `translation_config` - Per-tenant configuration
+- `model_language_matrices` - Model → language threshold mapping
+- `model_language_capabilities` - Per-language quality scores
+- `translation_cache` - Cached translations (7-day TTL)
+- `translation_metrics` - Usage tracking
+- `translation_events` - Audit log
+
+**Files Created:**
+- `packages/shared/src/types/localization.types.ts` - 18 language definitions
+- `packages/shared/src/types/translation-middleware.types.ts` - Translation types
+- `packages/infrastructure/lambda/shared/services/translation-middleware.service.ts` - Core service
+- `packages/infrastructure/lambda/admin/translation.ts` - Admin API
+- `packages/infrastructure/migrations/130_translation_middleware.sql` - Database schema
+
+**Documentation:** Section 37 in RADIANT-ADMIN-GUIDE.md
+
+---
+
 ## [4.18.56] - 2025-12-31
 
 ### Added
