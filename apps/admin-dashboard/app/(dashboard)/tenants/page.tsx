@@ -530,7 +530,7 @@ function DeleteTenantDialog({
           <AlertDialogDescription asChild>
             <div className="space-y-3">
               <p>
-                This will schedule <strong>"{tenant.displayName}"</strong> for deletion after{' '}
+                This will schedule <strong>&quot;{tenant.displayName}&quot;</strong> for deletion after{' '}
                 <strong>{tenant.retentionDays} days</strong>.
               </p>
               <p>
@@ -632,7 +632,7 @@ function RestoreTenantDialog({
         <DialogHeader>
           <DialogTitle>Restore Tenant</DialogTitle>
           <DialogDescription>
-            Restore "{tenant.displayName}" from pending deletion
+            Restore &quot;{tenant.displayName}&quot; from pending deletion
           </DialogDescription>
         </DialogHeader>
 

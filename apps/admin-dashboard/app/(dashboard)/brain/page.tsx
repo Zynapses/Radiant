@@ -157,7 +157,7 @@ export default function BrainDashboardPage() {
           subtitle={`${data?.oversight.escalated || 0} escalated`}
           icon={<Shield className="h-5 w-5" />}
           color="amber"
-          alert={data?.oversight.escalated && data.oversight.escalated > 0}
+          alert={(data?.oversight.escalated ?? 0) > 0}
         />
         <StatCard
           title="SOFAI Routing"
