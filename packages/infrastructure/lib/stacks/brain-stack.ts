@@ -28,6 +28,7 @@ export interface BrainStackProps extends cdk.StackProps {
   dbClusterArn: string;
   dbSecretArn: string;
   environment: string;
+  litellmUrl?: string;
 }
 
 export class BrainStack extends cdk.Stack {
@@ -122,9 +123,14 @@ export class BrainStack extends cdk.Stack {
       DB_SECRET_ARN: dbSecretArn,
       REDIS_ENDPOINT: this.redisCluster.attrRedisEndpointAddress,
       REDIS_PORT: this.redisCluster.attrRedisEndpointPort,
+      REDIS_URL: `redis://${this.redisCluster.attrRedisEndpointAddress}:${this.redisCluster.attrRedisEndpointPort}`,
       DREAM_QUEUE_URL: dreamQueue.queueUrl,
       REANCHOR_QUEUE_URL: reanchorQueue.queueUrl,
       LOG_LEVEL: environment === 'prod' ? 'info' : 'debug',
+      LITELLM_ENDPOINT: props.litellmUrl || 'http://localhost:4000',
+      SYSTEM1_MODEL: 'llama3-8b-instruct',
+      SYSTEM15_MODEL: 'llama3-8b-instruct',
+      SYSTEM2_MODEL: 'llama3-70b-instruct',
     };
 
     // ===========================================================================

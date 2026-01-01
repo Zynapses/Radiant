@@ -224,6 +224,7 @@ const brainStack = new BrainStack(app, `${stackPrefix}-brain`, {
   dbClusterArn: dataStack.cluster.clusterArn,
   dbSecretArn: dataStack.cluster.secret?.secretArn || '',
   environment,
+  litellmUrl: aiStack.litellmUrl,
   tags,
   description: `RADIANT AGI Brain v6.0.4 - ${appId} ${environment}`,
 });
