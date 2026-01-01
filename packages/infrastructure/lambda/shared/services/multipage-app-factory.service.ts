@@ -4,6 +4,7 @@
 
 import { executeStatement, stringParam } from '../db/client';
 import crypto from 'crypto';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // ============================================================================
 // Types
@@ -406,7 +407,7 @@ class MultiPageAppFactoryService {
     // Save to database
     await this.saveApp(app);
 
-    console.log(`Generated ${appType} with ${pages.length} pages in ${Date.now() - startTime}ms`);
+    logger.info('Generated multi-page app', { appType, pageCount: pages.length, durationMs: Date.now() - startTime });
 
     return app;
   }

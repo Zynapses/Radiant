@@ -27,6 +27,7 @@ import {
   SystemLevel,
   ConversationMessage,
 } from '@radiant/shared';
+import { embeddingService } from '../shared/services/embedding.service';
 
 // =============================================================================
 // Redis Initialization
@@ -216,8 +217,15 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
           tenantId,
           [prompt, llmResponse.response],
           async (history) => {
-            // Placeholder for actual ghost capture
-            return new Float32Array(4096);
+            // Generate ghost vector from conversation history
+            const combinedText = history.join(' ').slice(0, 8000);
+            const result = await embeddingService.generateEmbedding(combinedText);
+            const ghostVector = new Float32Array(4096);
+            const len = Math.min(result.embedding.length, 4096);
+            for (let i = 0; i < len; i++) {
+              ghostVector[i] = result.embedding[i];
+            }
+            return ghostVector;
           }
         );
         ghostUpdated = true;
