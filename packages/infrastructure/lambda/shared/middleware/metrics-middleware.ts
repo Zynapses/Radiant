@@ -7,8 +7,8 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { Pool } from 'pg';
 import { MetricsCollectionService } from '../services/metrics-collection.service';
-import { LearningInfluenceService } from '../services/learning-influence.service';
-import { initializeLearningService } from '../services/brain-router';
+import { LearningInfluenceService } from '../services/learning-hierarchy.service';
+import { initializeLearningService } from '../services/cognitive-router.service';
 
 let pool: Pool | null = null;
 let metricsService: MetricsCollectionService | null = null;

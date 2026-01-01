@@ -5,6 +5,80 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.1.0] - 2026-01-01
+
+### Added
+
+#### Advanced Cognition Services (Project AWARE Phase 2)
+
+Implemented 8 advanced cognitive components from the RADIANT AGI Brain Architecture Report.
+
+**New Services:**
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| **Reasoning Teacher** | `reasoning-teacher.service.ts` | Generate high-quality reasoning traces for distillation |
+| **Inference Student** | `inference-student.service.ts` | Fine-tuned model that mimics teacher at 1/10th cost |
+| **Semantic Cache** | `semantic-cache.service.ts` | Vector similarity caching to reduce inference costs |
+| **Reward Model** | `reward-model.service.ts` | Score response quality for best-of-N selection |
+| **Counterfactual Simulator** | `counterfactual-simulator.service.ts` | Track "what-if" alternative paths |
+| **Curiosity Engine** | `curiosity-engine.service.ts` | Autonomous goal emergence and exploration |
+| **Causal Tracker** | `causal-tracker.service.ts` | Multi-turn causal relationship tracking |
+
+**Key Features:**
+
+- **Teacher-Student Distillation**: Generate reasoning traces from powerful models (Claude Opus 4.5, o3, Gemini 2.5 Pro) to train efficient student models
+- **Semantic Caching**: 95% similarity threshold, content-type-aware TTL, automatic invalidation
+- **Metacognition Enhancement**: Extended confidence assessment with self-correction loops
+- **Best-of-N Selection**: Reward model scores responses on 5 dimensions (relevance, accuracy, helpfulness, safety, style)
+- **Counterfactual Analysis**: Track alternative model routing decisions for continuous improvement
+- **Curiosity-Driven Learning**: Autonomous knowledge gap detection and goal-directed exploration with guardrails
+- **Causal Chain Tracking**: Identify dependencies across conversation turns
+
+**Database Migration:** `152_advanced_cognition.sql`
+- 13 new tables with RLS policies
+- Vector embeddings for semantic cache (pgvector)
+- Partitioned tables for high-volume data
+
+**Admin Dashboard:** New `/brain/cognition` page with tabs for all services
+
+**CDK Stack:** `cognition-stack.ts` with scheduled Lambdas for:
+- Cache cleanup (hourly)
+- Curiosity exploration (3 AM UTC daily)
+- Metrics aggregation (every 15 minutes)
+
+---
+
+## [6.0.4-S3] - 2026-01-01
+
+### Changed
+
+#### Unified Naming Convention
+
+Implemented unified naming convention from RADIANT AGI Brain Architecture Report (Section 16).
+
+**Service Renames:**
+| Old Name | New Unified Name | Rationale |
+|----------|------------------|-----------|
+| `brain-router.ts` | `cognitive-router.service.ts` | More descriptive of function |
+| `neural-engine.ts` | `preference-engine.service.ts` | Clearer purpose |
+| `learning-candidate.service.ts` | `distillation-pipeline.service.ts` | Aligns with Teacher-Student |
+| `learning-influence.service.ts` | `learning-hierarchy.service.ts` | Simplified |
+| `ego-context.service.ts` | `identity-core.service.ts` | Clearer biological analog |
+| `predictive-coding.service.ts` | `prediction-engine.service.ts` | Consistent with "Engine" pattern |
+| `lora-evolution.ts` | `evolution-pipeline.ts` | Consistent with "Pipeline" pattern |
+
+**Naming Patterns:**
+- `*Engine` - Stateful processing with learning (PreferenceEngine, PredictionEngine)
+- `*Pipeline` - Data transformation flows (DistillationPipeline, EvolutionPipeline)
+- `*Service` - Stateless utility functions
+- `*Router` - Request routing decisions (CognitiveRouter)
+- `*Core` - Central identity components (IdentityCore)
+
+**Backward Compatibility:** All old exports preserved as aliases.
+
+---
+
 ## [6.0.4-S2] - 2026-01-01
 
 ### Added

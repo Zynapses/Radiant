@@ -10,7 +10,7 @@ import {
 } from '@aws-sdk/client-sagemaker';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { executeStatement } from '../shared/db/client';
-import { learningCandidateService, type TrainingDataset } from '../shared/services/learning-candidate.service';
+import { learningCandidateService, type TrainingDataset } from '../shared/services/distillation-pipeline.service';
 import { enhancedLearningService } from '../shared/services/enhanced-learning.service';
 import { enhancedLearningIntegrationService } from '../shared/services/enhanced-learning-integration.service';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';

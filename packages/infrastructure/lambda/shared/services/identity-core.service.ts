@@ -860,4 +860,6 @@ class EgoContextService {
   }
 }
 
-export const egoContextService = new EgoContextService();
+export const identityCore = new EgoContextService();
+// Backward compatibility alias
+export const egoContextService = identityCore;

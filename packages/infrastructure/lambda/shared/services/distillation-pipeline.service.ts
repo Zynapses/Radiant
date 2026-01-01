@@ -492,4 +492,6 @@ class LearningCandidateService {
   }
 }
 
-export const learningCandidateService = new LearningCandidateService();
+export const distillationPipeline = new LearningCandidateService();
+// Backward compatibility alias
+export const learningCandidateService = distillationPipeline;

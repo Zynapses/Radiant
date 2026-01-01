@@ -3,7 +3,7 @@
 // Cost: $0 additional - persistent state in PostgreSQL, injected into existing model calls
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
-import { egoContextService, type EgoConfig, type EgoIdentity } from '../shared/services/ego-context.service';
+import { egoContextService, type EgoConfig, type EgoIdentity } from '../shared/services/identity-core.service';
 import { executeStatement } from '../shared/db/client';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 
