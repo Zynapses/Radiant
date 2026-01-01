@@ -20,7 +20,6 @@ import * as elasticache from 'aws-cdk-lib/aws-elasticache';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
-import * as path from 'path';
 
 export interface BrainStackProps extends cdk.StackProps {
   vpc: ec2.IVpc;
