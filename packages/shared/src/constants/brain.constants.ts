@@ -10,16 +10,9 @@
 // Version Constants
 // =============================================================================
 
-/**
- * Current Ghost Vector model version
- * CRITICAL: Must match the model producing hidden states
- */
-export const CURRENT_GHOST_VERSION = 'llama3-70b-v1';
+// Note: CURRENT_GHOST_VERSION is exported from ghost.types.ts
 
-/**
- * Ghost vector dimension (LLaMA 3 70B hidden state size)
- */
-export const GHOST_VECTOR_DIMENSION = 4096;
+// Note: GHOST_VECTOR_DIMENSION is exported from ghost.types.ts
 
 /**
  * API version for brain endpoints
@@ -152,10 +145,7 @@ export const MAX_CONCURRENT_DREAMS = 100;
  */
 export const DREAM_STAGGER_MINUTES = 5;
 
-/**
- * Dream scheduler check interval (minutes)
- */
-export const DREAM_CHECK_INTERVAL_MINUTES = 15;
+// Note: DREAM_CHECK_INTERVAL_MINUTES is exported from dreaming.types.ts
 
 // =============================================================================
 // SOFAI Constants
@@ -187,10 +177,7 @@ export const DEFAULT_DOMAIN_RISKS: Record<string, number> = {
   creative: 0.2,
 };
 
-/**
- * High-risk domains requiring human oversight
- */
-export const HIGH_RISK_DOMAINS = ['healthcare', 'financial', 'legal'] as const;
+// Note: HIGH_RISK_DOMAINS is exported from compliance-sandwich.types.ts
 
 // =============================================================================
 // Privacy Constants
@@ -201,15 +188,7 @@ export const HIGH_RISK_DOMAINS = ['healthcare', 'financial', 'legal'] as const;
  */
 export const DEFAULT_DP_EPSILON = 0.5;
 
-/**
- * Minimum tenants for privacy aggregation
- */
-export const MIN_TENANTS_FOR_AGGREGATION = 10;
-
-/**
- * Minimum tenants for high-risk domain aggregation
- */
-export const MIN_TENANTS_HIGH_RISK = 20;
+// Note: MIN_TENANTS_FOR_AGGREGATION and MIN_TENANTS_HIGH_RISK are exported from compliance-sandwich.types.ts
 
 /**
  * Minimum semantic diversity for aggregation
@@ -220,29 +199,13 @@ export const MIN_SEMANTIC_DIVERSITY = 5;
 // Oversight Constants
 // =============================================================================
 
-/**
- * Oversight timeout in days (auto-reject)
- * "Silence ≠ Consent"
- */
-export const OVERSIGHT_TIMEOUT_DAYS = 7;
-
-/**
- * Escalation threshold in days
- */
-export const OVERSIGHT_ESCALATION_DAYS = 3;
+// Note: OVERSIGHT_TIMEOUT_DAYS and OVERSIGHT_ESCALATION_DAYS are exported from compliance-sandwich.types.ts
 
 // =============================================================================
 // Personalization Constants
 // =============================================================================
 
-/**
- * Default personalization weights
- */
-export const DEFAULT_PERSONALIZATION_WEIGHTS = {
-  USER: 0.6,
-  TENANT: 0.3,
-  SYSTEM: 0.1,
-} as const;
+// Note: DEFAULT_PERSONALIZATION_WEIGHTS is exported from brain-v6.types.ts
 
 /**
  * Warmup threshold (interactions to full user weight)
@@ -284,18 +247,7 @@ export const CACHE_TTLS = {
 // Compliance Sandwich Constants
 // =============================================================================
 
-/**
- * Protected XML tags that must never appear in user content
- */
-export const PROTECTED_XML_TAGS = [
-  'system_core',
-  'user_context',
-  'conversation',
-  'compliance_guardrails',
-  'flash_facts',
-  'ghost_state',
-  'memories',
-] as const;
+// Note: PROTECTED_XML_TAGS is exported from compliance-sandwich.types.ts
 
 /**
  * Compliance sandwich section markers
