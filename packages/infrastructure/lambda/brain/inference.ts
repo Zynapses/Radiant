@@ -12,6 +12,7 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { v4 as uuidv4 } from 'uuid';
+import Redis from 'ioredis';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 import { executeStatement } from '../shared/db/client';
 import { brainConfigService } from '../shared/services/brain-config.service';
@@ -26,6 +27,52 @@ import {
   SystemLevel,
   ConversationMessage,
 } from '@radiant/shared';
+
+// =============================================================================
+// Redis Initialization
+// =============================================================================
+
+let redisClient: Redis | null = null;
+let servicesInitialized = false;
+
+async function initializeServices(): Promise<void> {
+  if (servicesInitialized) return;
+
+  const redisUrl = process.env.REDIS_URL || process.env.REDIS_ENDPOINT;
+  if (redisUrl && !redisClient) {
+    try {
+      redisClient = new Redis(redisUrl);
+      redisClient.on('error', (err) => {
+        logger.error('Redis connection error', { error: String(err) });
+      });
+
+      // Initialize services with Redis client
+      const redisAdapter = {
+        get: async (key: string) => redisClient?.get(key) ?? null,
+        set: async (key: string, value: string, options?: { EX?: number }) => {
+          if (options?.EX) {
+            await redisClient?.setex(key, options.EX, value);
+          } else {
+            await redisClient?.set(key, value);
+          }
+        },
+        lpush: async (key: string, ...values: string[]) => redisClient?.lpush(key, ...values) ?? 0,
+        lrange: async (key: string, start: number, stop: number) => redisClient?.lrange(key, start, stop) ?? [],
+        ltrim: async (key: string, start: number, stop: number) => { await redisClient?.ltrim(key, start, stop); },
+        expire: async (key: string, seconds: number) => { await redisClient?.expire(key, seconds); },
+        del: async (key: string) => { await redisClient?.del(key); },
+      };
+
+      flashBufferService.initialize(redisAdapter);
+      ghostManagerService.initialize(redisAdapter);
+      logger.info('Brain services initialized with Redis');
+    } catch (err) {
+      logger.warn('Redis unavailable, services running without cache', { error: String(err) });
+    }
+  }
+
+  servicesInitialized = true;
+}
 
 // =============================================================================
 // Response Helpers
@@ -60,6 +107,9 @@ function error(statusCode: number, message: string): APIGatewayProxyResult {
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const startTime = Date.now();
   const requestId = uuidv4();
+
+  // Initialize services on cold start
+  await initializeServices();
 
   try {
     // Parse request
