@@ -8,3 +8,4 @@ export * from './providers/xai';
 export * from './models/registry';
 export * from './models/self-hosted-registry';
 export * from './domain-ethics-registry';
+export * from './brain.constants';
