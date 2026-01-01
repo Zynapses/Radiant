@@ -4,7 +4,9 @@ import { domainTaxonomyService, type ProficiencyScores, type DomainDetectionResu
 import { consciousnessMiddlewareService, type AffectiveHyperparameters } from './consciousness-middleware.service';
 import { consciousnessService, type AffectiveState } from './consciousness.service';
 import { LearningInfluenceService } from './learning-influence.service';
+import { translationMiddlewareService } from './translation-middleware.service';
 import { Pool } from 'pg';
+import { LanguageCode } from '@radiant/shared';
 
 // Initialize learning influence service (pool will be set by caller)
 let learningInfluenceService: LearningInfluenceService | null = null;
@@ -47,6 +49,9 @@ interface RoutingContext {
   useAffectMapping?: boolean;  // Enable affect → hyperparameter mapping
   // Learning influence integration (v4.18.56)
   useLearningInfluence?: boolean;  // Enable User → Tenant → Global learning influence
+  // Translation middleware (v4.18.0 - 18 language support)
+  useTranslation?: boolean;  // Enable automatic translation for non-native languages
+  detectedLanguage?: LanguageCode;  // Pre-detected language (optional)
 }
 
 interface RoutingResult {
@@ -73,6 +78,13 @@ interface RoutingResult {
   // Learning influence tracking (v4.18.56)
   learningDecisionId?: string;  // For feedback loop
   learningInfluenceUsed?: boolean;
+  // Translation middleware (v4.18.0 - 18 language support)
+  translationContext?: {
+    originalLanguage: LanguageCode;
+    translationRequired: boolean;
+    inputTranslated?: boolean;
+    outputWillBeTranslated?: boolean;
+  };
 }
 
 interface ModelPerformance {
@@ -272,7 +284,35 @@ export class BrainRouter {
       }
     }
 
-    // 9. Learning influence tracking (v4.18.56)
+    // 9. Translation middleware (v4.18.0 - 18 language support)
+    if (context.useTranslation && context.prompt) {
+      try {
+        // Detect language if not already provided
+        const detectedLanguage = context.detectedLanguage || 
+          (await translationMiddlewareService.detectLanguage(context.prompt)).detectedLanguage;
+        
+        // Check if translation is required for this model + language combo
+        const translationRequired = await translationMiddlewareService.isTranslationRequired(
+          result.model,
+          detectedLanguage
+        );
+        
+        result.translationContext = {
+          originalLanguage: detectedLanguage,
+          translationRequired,
+          inputTranslated: translationRequired && detectedLanguage !== 'en',
+          outputWillBeTranslated: translationRequired && detectedLanguage !== 'en',
+        };
+        
+        if (translationRequired) {
+          result.reason += ` (translation: ${detectedLanguage}→en→${detectedLanguage})`;
+        }
+      } catch {
+        // Translation detection failed, continue without
+      }
+    }
+
+    // 10. Learning influence tracking (v4.18.56)
     if (context.useLearningInfluence && learningInfluenceService && learningInfluence) {
       try {
         // Log the decision for future learning feedback loop

@@ -6367,6 +6367,23 @@ The following environment variables configure optional service features:
 2. Set connection URL (e.g., `redis://host:6379`)
 3. Enable `redisCacheEnabled` in learning config
 
+### 30.5 Translation Service (Qwen 2.5 7B)
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `QWEN_TRANSLATION_ENDPOINT` | SageMaker endpoint for Qwen 2.5 7B translation | `radiant-qwen25-7b-translation` |
+
+**Setup:**
+1. Deploy Qwen 2.5 7B Instruct model to SageMaker (TGI or vLLM container)
+2. Set endpoint name if different from default
+3. Cost: $0.08/1M input tokens, $0.24/1M output tokens (3x cheaper than Claude Haiku)
+
+**Model Requirements:**
+- Model: `Qwen/Qwen2.5-7B-Instruct`
+- Container: HuggingFace TGI or vLLM
+- Instance: ml.g5.xlarge or larger
+- Supports ChatML format (`<|im_start|>` tokens)
+
 ---
 
 ## 31. Infrastructure Tier Management
@@ -8318,5 +8335,322 @@ Both Lambdas are configured in `scheduled-tasks-stack.ts` and handle:
 
 ---
 
-*Document Version: 4.18.56*
+## 37. Translation Middleware (18 Language Support)
+
+The Translation Middleware provides automatic translation for multilingual support across all 18 supported languages. It intelligently routes prompts through translation when the target model doesn't natively support the user's language.
+
+### 37.1 Overview
+
+**Purpose**: Enable cost-effective self-hosted models to serve users in any of the 18 supported languages by transparently translating input to English, processing, and translating output back.
+
+**Architecture**:
+```
+User Input (Any Language)
+         │
+         ▼
+┌─────────────────────┐
+│ Language Detection  │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────────────┐
+│ Model Language Matrix Check │
+│  (Is translation required?) │
+└──────────┬──────────────────┘
+           │
+     ┌─────┴─────┐
+     │           │
+  No │           │ Yes
+     │           │
+     ▼           ▼
+  Direct    ┌───────────────┐
+  Process   │ Translate to  │
+            │ English       │
+            └───────┬───────┘
+                    │
+                    ▼
+            ┌───────────────┐
+            │ Process with  │
+            │ Model         │
+            └───────┬───────┘
+                    │
+                    ▼
+            ┌───────────────┐
+            │ Translate     │
+            │ Back          │
+            └───────┬───────┘
+                    │
+                    ▼
+              User Output
+```
+
+### 37.2 Supported Languages
+
+| # | Code | Language | Native Name | RTL |
+|---|------|----------|-------------|-----|
+| 1 | `en` | English | English | No |
+| 2 | `es` | Spanish | Español | No |
+| 3 | `fr` | French | Français | No |
+| 4 | `de` | German | Deutsch | No |
+| 5 | `pt` | Portuguese | Português | No |
+| 6 | `it` | Italian | Italiano | No |
+| 7 | `nl` | Dutch | Nederlands | No |
+| 8 | `pl` | Polish | Polski | No |
+| 9 | `ru` | Russian | Русский | No |
+| 10 | `tr` | Turkish | Türkçe | No |
+| 11 | `ja` | Japanese | 日本語 | No |
+| 12 | `ko` | Korean | 한국어 | No |
+| 13 | `zh-CN` | Chinese (Simplified) | 简体中文 | No |
+| 14 | `zh-TW` | Chinese (Traditional) | 繁體中文 | No |
+| 15 | `ar` | Arabic | العربية | **Yes** |
+| 16 | `hi` | Hindi | हिन्दी | No |
+| 17 | `th` | Thai | ไทย | No |
+| 18 | `vi` | Vietnamese | Tiếng Việt | No |
+
+### 37.3 Model Language Support Levels
+
+Each model has a language capability matrix defining support levels:
+
+| Level | Quality Score | Behavior |
+|-------|--------------|----------|
+| `native` | 90-100 | No translation needed |
+| `good` | 75-89 | No translation (acceptable quality) |
+| `moderate` | 50-74 | May translate depending on threshold |
+| `poor` | 25-49 | Translation recommended |
+| `none` | 0-24 | Translation required |
+
+**Model Categories**:
+
+| Model Type | Translate Threshold | Example |
+|------------|-------------------|---------|
+| External (Claude, GPT-4) | `none` | Never translate |
+| Large Self-Hosted (Qwen 72B) | `moderate` | Translate for poor/none |
+| Medium Self-Hosted (Llama 70B) | `good` | Translate for moderate/poor/none |
+| Small Self-Hosted (7B models) | `native` | Translate for all non-English |
+
+### 37.4 Translation Model
+
+**Default**: `qwen2.5-7b-instruct`
+
+**Why Qwen 2.5 7B**:
+- Excellent multilingual capabilities (trained on Chinese + English + 27 languages)
+- Cost-effective: $0.08/1M input, $0.24/1M output
+- 3x cheaper than Claude Haiku
+- Fast inference on g5.2xlarge
+
+**Cost Comparison**:
+| Model | Input/1M | Output/1M |
+|-------|----------|-----------|
+| **Qwen 2.5 7B** | $0.08 | $0.24 |
+| Claude Haiku | $0.25 | $1.25 |
+| GPT-3.5 Turbo | $0.50 | $1.50 |
+
+### 37.5 Configuration
+
+**Admin UI**: Settings → Translation
+
+**Configuration Options**:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | `true` | Enable/disable translation middleware |
+| `translation_model` | `qwen2.5-7b-instruct` | Model used for translation |
+| `cache_enabled` | `true` | Cache translations to reduce cost |
+| `cache_ttl_hours` | `168` | Cache expiry (7 days) |
+| `max_cache_size` | `10000` | Max cache entries per tenant |
+| `confidence_threshold` | `0.70` | Min confidence to accept translation |
+| `max_input_length` | `50000` | Max characters per translation |
+| `preserve_code_blocks` | `true` | Don't translate code |
+| `preserve_urls` | `true` | Don't translate URLs |
+| `preserve_mentions` | `true` | Don't translate @mentions |
+| `fallback_to_english` | `true` | Fallback if translation fails |
+| `cost_limit_per_day_cents` | `1000` | Max daily translation cost ($10) |
+
+### 37.6 API Reference
+
+**Base URL**: `/api/admin/translation`
+
+#### Get Configuration
+```http
+GET /api/admin/translation/config
+```
+
+**Response**:
+```json
+{
+  "config": {
+    "enabled": true,
+    "translation_model": "qwen2.5-7b-instruct",
+    "cache_enabled": true,
+    "cache_ttl_hours": 168,
+    "cost_limit_per_day_cents": 1000
+  },
+  "isDefault": false
+}
+```
+
+#### Update Configuration
+```http
+PUT /api/admin/translation/config
+Content-Type: application/json
+
+{
+  "enabled": true,
+  "cost_limit_per_day_cents": 2000
+}
+```
+
+#### Get Dashboard
+```http
+GET /api/admin/translation/dashboard?days=30
+```
+
+**Response**:
+```json
+{
+  "config": { ... },
+  "metrics": {
+    "totalTranslations": 1523,
+    "byLanguagePair": {
+      "ja->en": 450,
+      "en->ja": 448,
+      "zh-CN->en": 312,
+      "en->zh-CN": 313
+    },
+    "totalTokens": { "input": 2500000, "output": 2800000 },
+    "estimatedCost": 0.87,
+    "periodDays": 30
+  },
+  "cache": {
+    "entriesCount": 856,
+    "totalHits": 4521
+  },
+  "recentTranslations": [ ... ]
+}
+```
+
+#### Detect Language
+```http
+POST /api/admin/translation/detect
+Content-Type: application/json
+
+{
+  "text": "こんにちは、元気ですか？"
+}
+```
+
+**Response**:
+```json
+{
+  "detectedLanguage": "ja",
+  "confidence": 0.95,
+  "alternativeLanguages": [
+    { "language": "zh-CN", "confidence": 0.03 }
+  ],
+  "isMultilingual": false,
+  "scriptType": "cjk"
+}
+```
+
+#### Check Model Language Support
+```http
+POST /api/admin/translation/check-model
+Content-Type: application/json
+
+{
+  "modelId": "llama-3.2-8b-instruct",
+  "languageCode": "ja"
+}
+```
+
+**Response**:
+```json
+{
+  "modelId": "llama-3.2-8b-instruct",
+  "languageCode": "ja",
+  "translationRequired": true,
+  "capability": {
+    "supportLevel": "poor",
+    "qualityScore": 35,
+    "translateThreshold": "native"
+  }
+}
+```
+
+#### Clear Cache
+```http
+DELETE /api/admin/translation/cache
+```
+
+### 37.7 Brain Router Integration
+
+The translation middleware is integrated into the Brain Router. Enable with `useTranslation: true`:
+
+```typescript
+const result = await brainRouter.route({
+  tenantId,
+  userId,
+  taskType: 'chat',
+  prompt: userPrompt,
+  useTranslation: true,  // Enable translation middleware
+  useDomainProficiencies: true,
+  useAffectMapping: true,
+});
+
+// Check if translation will be applied
+if (result.translationContext?.translationRequired) {
+  console.log(`Translation: ${result.translationContext.originalLanguage} → en → ${result.translationContext.originalLanguage}`);
+}
+```
+
+### 37.8 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `translation_config` | Per-tenant configuration |
+| `model_language_matrices` | Model → language threshold mapping |
+| `model_language_capabilities` | Per-language support for each model |
+| `translation_cache` | Cached translations (7 day TTL) |
+| `translation_metrics` | Translation usage metrics |
+| `translation_events` | Audit log |
+
+### 37.9 Key Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/localization.types.ts` | 18 language definitions |
+| `packages/shared/src/types/translation-middleware.types.ts` | Translation types & matrices |
+| `lambda/shared/services/translation-middleware.service.ts` | Core translation service |
+| `lambda/admin/translation.ts` | Admin API handler |
+| `migrations/130_translation_middleware.sql` | Database schema |
+
+### 37.10 Monitoring
+
+**Metrics to Monitor**:
+- Translation count by language pair
+- Cache hit rate (target: >60%)
+- Average translation latency (<500ms)
+- Daily translation cost
+- Translation confidence scores
+
+**Alerts**:
+- Daily cost exceeds limit
+- Cache hit rate drops below 40%
+- Translation latency exceeds 2s
+- High error rate (>5%)
+
+### 37.11 Cost Optimization
+
+1. **Enable caching**: Reduces repeat translation costs by 60-80%
+2. **Use Qwen 2.5 7B**: 3x cheaper than alternatives
+3. **Set daily limits**: Prevent runaway costs
+4. **Prefer external models for multilingual**: Claude/GPT-4o handle all 18 languages natively
+
+**Estimated Monthly Costs** (10,000 daily prompts, 50% non-English):
+- Without caching: ~$25/month
+- With 70% cache hit: ~$8/month
+
+---
+
+*Document Version: 4.18.57*
 *Last Updated: December 2025*
