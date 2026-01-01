@@ -37,3 +37,5 @@ export * from './brain-v6.types';
 export * from './dreaming.types';
 export * from './compliance-sandwich.types';
 export * from './admin-config.types';
+export * from './library-registry.types';
+export * from './library-execution.types';

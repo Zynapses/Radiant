@@ -6,6 +6,7 @@
  */
 
 import { Pool } from 'pg';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // ============================================================================
 // TYPES
@@ -685,7 +686,7 @@ export class ChecklistRegistryService {
 
         // In a real implementation, this would fetch from the source
         // For now, we just log that we checked
-        console.log(`Checked update source: ${source.source_name} for standard ${standardId}`);
+        logger.debug('Checked update source', { sourceName: source.source_name, standardId });
 
       } catch (error) {
         // Record error

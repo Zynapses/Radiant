@@ -91,7 +91,7 @@ export interface ExecutionConstraints {
 
 export interface LibraryExecutionResult {
   executionId: string;
-  status: ExecutionStatus;
+  status: LibraryExecutionStatus;
   
   /** Execution output */
   output?: LibraryExecutionOutput;
@@ -106,7 +106,7 @@ export interface LibraryExecutionResult {
   billing: ExecutionBilling;
 }
 
-export type ExecutionStatus = 
+export type LibraryExecutionStatus = 
   | 'queued'
   | 'running'
   | 'completed'
@@ -291,7 +291,7 @@ export interface ExecutionDashboard {
     executionId: string;
     libraryId: string;
     userId: string;
-    status: ExecutionStatus;
+    status: LibraryExecutionStatus;
     startedAt: Date;
     durationMs: number;
   }>;
@@ -300,7 +300,7 @@ export interface ExecutionDashboard {
     executionId: string;
     libraryId: string;
     userId: string;
-    status: ExecutionStatus;
+    status: LibraryExecutionStatus;
     completedAt: Date;
     durationMs: number;
     creditsUsed: number;

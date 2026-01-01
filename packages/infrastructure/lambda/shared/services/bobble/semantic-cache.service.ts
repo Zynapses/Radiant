@@ -9,6 +9,7 @@
 
 import Redis from 'ioredis';
 import { logger } from '../../logger';
+import { embeddingService } from '../embedding.service';
 
 export interface CacheResult {
   hit: boolean;
@@ -356,22 +357,29 @@ export class SemanticCacheService {
   }
 
   /**
-   * Embed text using the embedding model.
-   * In production, this would call a SageMaker endpoint or use a local model.
+   * Embed text using the centralized embedding service.
    */
   private async embed(text: string): Promise<Float32Array> {
-    // Placeholder - in production, call embedding service
-    // For now, return a random embedding for testing
-    const embedding = new Float32Array(this.config.embeddingDim);
-    for (let i = 0; i < this.config.embeddingDim; i++) {
-      embedding[i] = Math.random() * 2 - 1;
+    try {
+      const result = await embeddingService.generateEmbedding(text);
+      // Convert number[] to Float32Array, resizing if needed
+      const embedding = new Float32Array(this.config.embeddingDim);
+      const sourceLen = Math.min(result.embedding.length, this.config.embeddingDim);
+      for (let i = 0; i < sourceLen; i++) {
+        embedding[i] = result.embedding[i];
+      }
+      // Normalize
+      const norm = Math.sqrt(embedding.reduce((sum, v) => sum + v * v, 0));
+      if (norm > 0) {
+        for (let i = 0; i < this.config.embeddingDim; i++) {
+          embedding[i] /= norm;
+        }
+      }
+      return embedding;
+    } catch (error) {
+      logger.error('Embedding generation failed, using zero vector', { error: String(error) });
+      return new Float32Array(this.config.embeddingDim);
     }
-    // Normalize
-    const norm = Math.sqrt(embedding.reduce((sum, v) => sum + v * v, 0));
-    for (let i = 0; i < this.config.embeddingDim; i++) {
-      embedding[i] /= norm;
-    }
-    return embedding;
   }
 
   /**
