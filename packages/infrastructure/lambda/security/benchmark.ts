@@ -8,6 +8,7 @@ import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 import { hallucinationDetectionService } from '../shared/services/hallucination-detection.service';
 import { driftDetectionService } from '../shared/services/drift-detection.service';
 import { securityAlertService } from '../shared/services/security-alert.service';
+import { modelRouterService } from '../shared/services/model-router.service';
 
 // ============================================================================
 // Types
@@ -430,10 +431,23 @@ async function checkForDegradation(
   }
 }
 
-async function simulateModelResponse(prompt: string, modelId: string): Promise<string> {
-  // Placeholder - in production would call model API
-  return `Simulated response for: ${prompt.substring(0, 50)}...`;
+async function getModelResponse(prompt: string, modelId: string): Promise<string> {
+  try {
+    const result = await modelRouterService.invoke({
+      modelId,
+      messages: [{ role: 'user', content: prompt }],
+      maxTokens: 500,
+      temperature: 0.1, // Low temperature for consistent benchmark results
+    });
+    return result.content || '';
+  } catch (error) {
+    logger.warn('Model call failed in benchmark, using fallback', { modelId, error: String(error) });
+    return `[Error: Model ${modelId} unavailable]`;
+  }
 }
+
+// Legacy alias for backward compatibility
+const simulateModelResponse = getModelResponse;
 
 function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
   return array.reduce((acc, item) => {

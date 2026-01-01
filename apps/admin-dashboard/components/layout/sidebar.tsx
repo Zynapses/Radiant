@@ -101,6 +101,7 @@ const navigation: NavigationItem[] = [
   { name: 'Editor', href: '/orchestration/editor', icon: Edit3 },
   { name: 'AGI Dashboard', href: '/orchestration/agi-dashboard', icon: Sparkles },
   { name: 'Patterns', href: '/orchestration-patterns', icon: Layers },
+  { name: 'Pattern Editor', href: '/orchestration-patterns/editor', icon: Edit3 },
   
   // System Section
   { type: 'separator', label: 'System' },
@@ -161,6 +162,7 @@ const navigation: NavigationItem[] = [
   // Analytics & Reports Section
   { type: 'separator', label: 'Analytics' },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Metrics', href: '/metrics', icon: Gauge },
   { name: 'Rejections', href: '/analytics/rejections', icon: AlertTriangle },
   { name: 'Reports', href: '/reports', icon: FileBarChart },
   { name: 'SaaS Metrics', href: '/saas-metrics', icon: TrendingUp },
@@ -190,6 +192,7 @@ const navigation: NavigationItem[] = [
   { name: 'Checklists', href: '/compliance/checklists', icon: ListChecks },
   { name: 'Self-Audit', href: '/compliance/self-audit', icon: Activity },
   { name: 'Reg Standards', href: '/compliance/regulatory-standards', icon: FileBarChart },
+  { name: 'Tenants', href: '/tenants', icon: Users },
   { name: 'Administrators', href: '/administrators', icon: Users },
   { name: 'Audit Logs', href: '/audit-logs', icon: FileText },
   { name: 'AWS Logs', href: '/aws-logs', icon: ScrollText },
@@ -209,6 +212,7 @@ const navigation: NavigationItem[] = [
   { name: 'Localization', href: '/localization', icon: Languages },
   { name: 'Translations', href: '/localization/translations', icon: FileText },
   { name: 'Configuration', href: '/configuration', icon: Sliders },
+  { name: 'System Settings', href: '/configuration/system', icon: Wrench },
   { name: 'Platform Libraries', href: '/platform/libraries', icon: Layers },
   { name: 'Platform Learning', href: '/platform/learning', icon: GraduationCap },
   { name: 'Migrations', href: '/migrations', icon: GitPullRequest },

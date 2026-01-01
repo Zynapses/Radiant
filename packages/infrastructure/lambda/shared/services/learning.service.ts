@@ -1,5 +1,10 @@
 // RADIANT v4.18.0 - Learning Service
 // Comprehensive data collection and feedback capture for continuous learning
+//
+// NOTE: For advanced learning features (pattern caching, implicit feedback,
+// per-user learning, domain adapters), use enhanced-learning.service.ts.
+// This service handles basic interaction logging and feedback capture.
+//
 
 import { executeStatement } from '../db/client';
 
