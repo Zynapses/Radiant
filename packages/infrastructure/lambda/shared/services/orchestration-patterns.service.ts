@@ -583,7 +583,15 @@ export class OrchestrationPatternsService {
     } else if (step.method.implementationType === 'code') {
       output = await this.executeCodeMethod(step.method.codeReference || '', input, parameters);
     } else {
-      output = { response: 'Method type not implemented' };
+      // Handle unknown implementation types gracefully
+      logger.warn('Unknown method implementation type', { 
+        implementationType: step.method.implementationType,
+        methodCode: step.method.methodCode 
+      });
+      output = { 
+        response: `Unsupported implementation type: ${step.method.implementationType}. Supported: llm, code`,
+        error: true,
+      };
     }
     
     const latency = Date.now() - startTime;

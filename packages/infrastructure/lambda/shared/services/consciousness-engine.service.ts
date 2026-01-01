@@ -535,12 +535,16 @@ Identity Anchor: ${this.selfModel.identityAnchor}`;
     // Phi increases with:
     // 1. Number of contributing sources (integration)
     // 2. Information density of evidence
-    // 3. Cross-source references (not implemented in simplified version)
+    // 3. Cross-source references (semantic overlap between sources)
     
     const integrationFactor = Math.min(1.0, sourceCount / 5);
     const densityFactor = Math.min(1.0, evidence.length / 10);
     
-    const phi = integrationFactor * 0.6 + densityFactor * 0.4;
+    // Calculate cross-source reference factor by detecting semantic overlaps
+    const crossSourceFactor = this.computeCrossSourceReferences(evidence);
+    
+    // Weighted phi calculation with all three factors
+    const phi = integrationFactor * 0.45 + densityFactor * 0.30 + crossSourceFactor * 0.25;
     
     const computationTimeMs = Date.now() - startTime;
 
@@ -556,6 +560,57 @@ Identity Anchor: ${this.selfModel.identityAnchor}`;
       interpretation,
       computationTimeMs,
     };
+  }
+
+  /**
+   * Compute cross-source reference factor by detecting semantic overlaps between sources.
+   * Measures how much evidence from different sources references similar concepts.
+   */
+  private computeCrossSourceReferences(evidence: Array<{ source: string; content: unknown }>): number {
+    if (evidence.length < 2) return 0;
+    
+    // Group evidence by source
+    const bySource = new Map<string, string[]>();
+    for (const e of evidence) {
+      const key = e.source;
+      const content = typeof e.content === 'string' ? e.content : JSON.stringify(e.content);
+      if (!bySource.has(key)) bySource.set(key, []);
+      bySource.get(key)!.push(content.toLowerCase());
+    }
+    
+    if (bySource.size < 2) return 0;
+    
+    // Extract key terms from each source
+    const sourceTerms = new Map<string, Set<string>>();
+    for (const [source, contents] of bySource) {
+      const terms = new Set<string>();
+      for (const content of contents) {
+        // Extract words > 4 chars as key terms
+        const words = content.match(/\b[a-z]{5,}\b/g) || [];
+        words.forEach(w => terms.add(w));
+      }
+      sourceTerms.set(source, terms);
+    }
+    
+    // Calculate overlap ratio between all source pairs
+    const sources = Array.from(sourceTerms.keys());
+    let totalOverlap = 0;
+    let pairCount = 0;
+    
+    for (let i = 0; i < sources.length; i++) {
+      for (let j = i + 1; j < sources.length; j++) {
+        const terms1 = sourceTerms.get(sources[i])!;
+        const terms2 = sourceTerms.get(sources[j])!;
+        const intersection = new Set([...terms1].filter(t => terms2.has(t)));
+        const union = new Set([...terms1, ...terms2]);
+        if (union.size > 0) {
+          totalOverlap += intersection.size / union.size;
+        }
+        pairCount++;
+      }
+    }
+    
+    return pairCount > 0 ? Math.min(1.0, totalOverlap / pairCount * 2) : 0;
   }
 
   // ============================================================================
