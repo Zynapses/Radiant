@@ -1,5 +1,10 @@
 // AGI Persistent Learning Service
 // Learns from prompts and ideas to improve future suggestions
+//
+// @deprecated Use enhanced-learning.service.ts for comprehensive learning.
+// This service provides basic prompt learning. For full features including
+// pattern caching, implicit feedback, and per-user learning, use enhancedLearningService.
+//
 
 import { executeStatement, stringParam } from '../db/client';
 import crypto from 'crypto';

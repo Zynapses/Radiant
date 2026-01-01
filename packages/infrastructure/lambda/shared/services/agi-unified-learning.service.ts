@@ -1,5 +1,9 @@
 // AGI Unified Learning Service
 // Single integration point for ALL AGI learning - ensures everything is persistent
+//
+// @deprecated Use enhanced-learning.service.ts for comprehensive learning features.
+// Migration: Import { enhancedLearningService } from './enhanced-learning.service'
+//
 
 import { executeStatement, stringParam } from '../db/client';
 import crypto from 'crypto';

@@ -1,6 +1,10 @@
 // RADIANT v4.18.0 - Embedding API Service
 // Real embedding API integration for OpenAI, Bedrock, and local models
 // ============================================================================
+//
+// @deprecated Use embedding.service.ts instead. This service will be removed in v5.0.
+// Migration: Import { embeddingService } from './embedding.service' instead.
+//
 
 import { executeStatement, stringParam, longParam, doubleParam } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
