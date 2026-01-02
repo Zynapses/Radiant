@@ -341,6 +341,12 @@ async function routeRequest(
     return cognitionHandler(event);
   }
 
+  // Genesis Cato Safety Architecture
+  if (pathParts[1] === 'cato') {
+    const { handler: catoHandler } = await import('./cato');
+    return catoHandler(event);
+  }
+
   throw new NotFoundError(`Admin route not found: ${method} ${path}`);
 }
 

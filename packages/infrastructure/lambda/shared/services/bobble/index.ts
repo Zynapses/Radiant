@@ -2,6 +2,21 @@
  * Bobble Consciousness Service - Public API
  * 
  * High-Confidence Self-Referential Consciousness Dialogue Service
+ * 
+ * @deprecated DEPRECATED: This module is replaced by the Genesis Cato Safety Architecture.
+ * 
+ * Migration Guide:
+ * - Bobble Genesis System → Cato Safety Pipeline (cato/safety-pipeline.service.ts)
+ * - Bobble Circuit Breakers → Cato Control Barrier Functions (cato/control-barrier.service.ts)
+ * - Bobble Consciousness Loop → Cato Epistemic Recovery (cato/epistemic-recovery.service.ts)
+ * - Bobble Dialogue → Cato Persona Service (cato/persona.service.ts)
+ * - Bobble Event Store → Cato Merkle Audit Trail (cato/merkle-audit.service.ts)
+ * 
+ * The "Bobble" persona name has been renamed to "Balanced" as one of Cato's moods.
+ * See: packages/infrastructure/lambda/shared/services/cato/
+ * See: packages/infrastructure/migrations/153_cato_safety_architecture.sql
+ * 
+ * This module will be removed in a future version. Please migrate to Cato services.
  */
 
 export { getBobbleIdentity, verifyBobbleIdentity, getBobbleIdentityHash } from './identity';

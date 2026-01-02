@@ -58,7 +58,17 @@ export async function createTenant(tenant: Omit<Tenant, 'id' | 'created_at' | 'u
       status: tenant.status,
     })
   );
-  return result.rows[0];
+  const newTenant = result.rows[0];
+
+  // Initialize Cato Safety Architecture config for new tenant
+  await executeStatement(
+    `INSERT INTO cato_tenant_config (tenant_id)
+     VALUES (:tenantId)
+     ON CONFLICT (tenant_id) DO NOTHING`,
+    toSqlParams({ tenantId: newTenant.id })
+  );
+
+  return newTenant;
 }
 
 // ============================================================================

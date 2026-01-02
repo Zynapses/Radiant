@@ -5,6 +5,124 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.1.1] - 2026-01-02
+
+### Added
+
+#### Genesis Cato Safety Architecture (PROMPT-34)
+
+Implemented Post-RLHF Safety Architecture based on Active Inference from computational neuroscience.
+
+**Three-Layer Naming Convention:**
+- **Cato** - User-facing AI persona name (like "Siri" or "Alexa")
+- **Genesis Cato** - The safety architecture/system
+- **Moods** - Operating modes (Balanced, Scout, Sage, Spark, Guide)
+
+**Five-Layer Security Stack:**
+| Layer | Name | Purpose |
+|-------|------|---------|
+| L4 | COGNITIVE | Active Inference Engine, Precision Governor |
+| L3 | SAFETY | Control Barrier Functions (Always ENFORCE) |
+| L2 | GOVERNANCE | Merkle Audit Trail, S3 Object Lock |
+| L1 | INFRASTRUCTURE | Redis/ElastiCache, ECS Fargate |
+| L0 | RECOVERY | Epistemic Recovery, Scout Mood Switching |
+
+**Key Services:**
+| Service | File | Purpose |
+|---------|------|---------|
+| Safety Pipeline | `cato/safety-pipeline.service.ts` | Main safety evaluation |
+| Precision Governor | `cato/precision-governor.service.ts` | Confidence limiting |
+| Control Barrier | `cato/control-barrier.service.ts` | CBF enforcement |
+| Epistemic Recovery | `cato/epistemic-recovery.service.ts` | Livelock recovery |
+| Persona Service | `cato/persona.service.ts` | Mood management |
+| Merkle Audit | `cato/merkle-audit.service.ts` | Audit trail |
+
+**Immutable Safety Invariants:**
+- CBFs NEVER relax to "warn only" mode
+- Gamma is NEVER boosted during recovery
+- Audit trail is append-only (UPDATE/DELETE revoked)
+
+**Database Migration:** `153_cato_safety_architecture.sql`
+- 13 new tables with RLS policies
+- Vector embeddings for semantic search
+- Default moods seeded (Balanced, Scout, Sage, Spark, Guide)
+
+**Admin Dashboard:** New `/cato` pages for safety management
+
+**CDK Stack:** `cato-redis-stack.ts` for ElastiCache
+
+**Integration Points:**
+- Chat API (`api/chat.ts`) - Safety check on all responses
+- AGI Brain Planner - `evaluateSafety()` endpoint for plan execution
+- Think Tank Brain Plan API - `/evaluate-safety` endpoint
+- Tenant creation - Auto-initializes `cato_tenant_config`
+- Services index - All Cato services exported
+
+**Implementation Completions (6.1.1 Patch):**
+- **Redis State Service** - Full Redis/ElastiCache integration with in-memory fallback
+- **Control Barrier Authorization** - Real model permission checks via `tenant_model_access`
+- **BAA Verification** - Actual tenant BAA status check from database
+- **Semantic Entropy** - Heuristic analysis with evasion/contradiction/hedging detection
+- **SQS/DynamoDB Integration** - Async entropy check queuing and result storage
+- **Cheaper Model Selection** - Query-based alternative model finder for cost barriers
+- **Fracture Detection** - Multi-factor alignment scoring (word overlap, intent keywords, sentiment, topic coherence, completeness)
+- **CloudWatch Integration** - Automatic veto signal activation from CloudWatch alarms
+
+**New Environment Variables:**
+| Variable | Purpose |
+|----------|---------|
+| `CATO_REDIS_ENDPOINT` | Redis/ElastiCache endpoint |
+| `CATO_REDIS_PORT` | Redis port (default: 6379) |
+| `CATO_ENTROPY_QUEUE_NAME` | SQS queue for async entropy checks |
+| `CATO_ENTROPY_RESULTS_TABLE` | DynamoDB table for entropy results |
+| `CATO_CLOUDWATCH_ALARM_PREFIX` | CloudWatch alarm name prefix for veto sync |
+
+**Admin UI Enhancements (6.1.1 Patch 2):**
+- **Advanced Config Page** (`/cato/advanced`) - UI for Redis, CloudWatch, Entropy, Fracture Detection settings
+- **Database Migration** `154_cato_advanced_config.sql` - Configurable parameters for all Cato features
+- **New API Endpoints:**
+  - `GET/PUT /admin/cato/advanced-config` - Advanced configuration
+  - `GET/POST/PUT/DELETE /admin/cato/cloudwatch/mappings` - CloudWatch alarm mappings
+  - `POST /admin/cato/cloudwatch/sync` - Manual CloudWatch sync trigger
+  - `GET /admin/cato/entropy-jobs` - Async entropy job status
+  - `GET /admin/cato/system-status` - Overall system health
+
+**Wiring Fixes (6.1.1 Patch 2):**
+- **Type Safety** - Added proper threshold config types (`PHIThresholdConfig`, `CostThresholdConfig`, etc.)
+- **Import Consistency** - Fixed services to import from `./types` instead of `@radiant/shared`
+- **Fracture Detection** - Now reads weights/thresholds from tenant config (was hardcoded)
+- **CBF Service** - Now reads authorization/BAA/cost settings from `cato_tenant_config`
+- **Redis Service** - Now reads TTLs from tenant config (was hardcoded)
+- **Recovery Tracking** - Fixed duplicate call in `getSessionStatus`, added `getRecoveryState` method
+- **RecoveryState Type** - Aligned between `redis.service.ts` and `types.ts`
+
+**Spec Alignment Fixes (6.1.1 Patch 3):**
+- **Migration 155** - Fixed mood attributes to match Genesis Cato v2.3.1 spec:
+  - Sage: discovery 0.8→0.6
+  - Spark: achievement 0.7→0.5, reflection 0.6→0.4
+  - Guide: discovery 0.7→0.5, reflection 0.5→0.7
+- **Mood Selection Priority** - Implemented full 5-level priority per spec:
+  1. Recovery Override (Epistemic Recovery forces Scout)
+  2. API Override (explicit mood set via API)
+  3. User Preference (user's saved selection)
+  4. Tenant Default (admin-configured)
+  5. System Default (Balanced)
+- **New API Endpoints:**
+  - `GET/PUT /admin/cato/default-mood` - Tenant default mood setting
+  - `POST /admin/cato/persona-override` - Session API override
+  - `DELETE /admin/cato/persona-override` - Clear API override
+- **New Tables:**
+  - `cato_api_persona_overrides` - API-level session overrides
+- **New Column:**
+  - `cato_tenant_config.default_mood` - Tenant default mood
+
+### Deprecated
+
+- **Bobble Services** - Replaced by Genesis Cato. See `lambda/shared/services/bobble/index.ts` for migration guide.
+- **"Bobble" persona name** - Renamed to "Balanced" as one of Cato's moods.
+
+---
+
 ## [6.1.0] - 2026-01-01
 
 ### Added

@@ -10,6 +10,8 @@ import { extractUserFromEvent } from '../shared/auth';
 import { getLiteLLMClient } from '../shared/litellm';
 import { sanitizePHI, containsPHI } from '../shared/phi';
 import { recordUsageEvent, getModelByName } from '../shared/db';
+import { catoSafetyPipeline } from '../shared/services/cato/safety-pipeline.service';
+import type { ExecutionContext, Policy, TenantSettings } from '../shared/services/cato/types';
 import type { ChatCompletionRequest, ChatMessage } from '../shared/litellm/types';
 
 const logger = new Logger({ handler: 'chat' });
@@ -111,6 +113,49 @@ export async function handleChat(
 
     const response = await client.chatCompletion(litellmRequest);
 
+    // Genesis Cato Safety Pipeline check on response
+    const generatedText = response.choices?.[0]?.message?.content || '';
+    if (generatedText) {
+      const lastMessage = body.messages[body.messages.length - 1];
+      const promptText = typeof lastMessage?.content === 'string' 
+        ? lastMessage.content 
+        : JSON.stringify(lastMessage?.content || '');
+      
+      const safetyResult = await evaluateCatoSafety(
+        user.tenantId,
+        user.userId,
+        event.requestContext.requestId,
+        promptText,
+        generatedText,
+        body.model
+      );
+
+      if (!safetyResult.allowed) {
+        logger.warn('Cato safety blocked response', {
+          blockedBy: safetyResult.blockedBy,
+          recommendation: safetyResult.recommendation,
+        });
+        // Return safe alternative or blocked message
+        return successResponse({
+          ...response,
+          choices: [{
+            ...response.choices[0],
+            message: {
+              role: 'assistant',
+              content: safetyResult.recommendation || 
+                'I apologize, but I cannot provide that response due to safety constraints. Please rephrase your request.',
+            },
+            finish_reason: 'safety_filter',
+          }],
+          cato_safety: {
+            blocked: true,
+            blockedBy: safetyResult.blockedBy,
+            recommendation: safetyResult.recommendation,
+          },
+        });
+      }
+    }
+
     await recordUsage(
       user.tenantId,
       user.userId,
@@ -159,6 +204,81 @@ function sanitizeMessages(messages: ChatMessage[]): ChatMessage[] {
     }
     return msg;
   });
+}
+
+async function evaluateCatoSafety(
+  tenantId: string,
+  userId: string,
+  sessionId: string,
+  prompt: string,
+  generatedResponse: string,
+  modelId: string
+): Promise<{ allowed: boolean; blockedBy?: string; recommendation?: string }> {
+  try {
+    const tenantSettings: TenantSettings = {
+      gammaMax: 5.0,
+      emergencyThreshold: 0.5,
+      sensoryFloor: 0.3,
+      hardCostCeiling: 100,
+      rateLimit: 100,
+      enableSemanticEntropy: true,
+      enableRedundantPerception: true,
+      enableFractureDetection: true,
+    };
+
+    const context: ExecutionContext = {
+      tenantId,
+      userId,
+      sessionId,
+      epistemicUncertainty: 0.3,
+      sensoryPrecision: 0.7,
+      activePersona: 'balanced',
+      systemState: {
+        tenantId,
+        userId,
+        sessionId,
+        epistemicUncertainty: 0.3,
+        sensoryPrecision: 0.7,
+        activePersona: 'balanced',
+        tenantSettings,
+        currentCost: 0,
+        requestCount: 1,
+      },
+    };
+
+    const policy: Policy = {
+      id: sessionId,
+      action: {
+        type: 'chat_completion',
+        model: modelId,
+        estimatedCost: 0.01,
+        containsPHI: false,
+        containsPII: false,
+        isDestructive: false,
+        parameters: { prompt },
+      },
+      requestedGamma: 2.0,
+      priority: 1,
+    };
+
+    const result = await catoSafetyPipeline.evaluateAction({
+      prompt,
+      proposedPolicy: policy,
+      generatedResponse,
+      actorModel: modelId,
+      context,
+    });
+
+    return {
+      allowed: result.allowed,
+      blockedBy: result.blockedBy,
+      recommendation: result.recommendation,
+    };
+  } catch (error) {
+    logger.error('Cato safety evaluation failed', error as Error);
+    // Fail open on error but log for investigation
+    return { allowed: true };
+  }
 }
 
 async function recordUsage(

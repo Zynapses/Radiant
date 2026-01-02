@@ -43,6 +43,7 @@
 39. [Truth Engine™ - Project TRUTH](#39-truth-engine---project-truth)
 40. [Advanced Cognition Services (v6.1.0)](#40-advanced-cognition-services-v610)
 41. [Learning Architecture - Complete Overview](#41-learning-architecture---complete-overview)
+42. [Genesis Cato Safety Architecture](#42-genesis-cato-safety-architecture)
 
 ---
 
@@ -10066,3 +10067,1373 @@ const TWILIGHT_DREAMING = {
 *Document Version: 6.1.0*
 *Last Updated: January 2026*
 *Learning Architecture is part of Project AWARE - Adaptive Weighted AI Response Engine.*
+
+---
+
+## 42. Genesis Cato Safety Architecture
+
+### 42.1 Overview
+
+Genesis Cato is RADIANT's Post-RLHF Safety Architecture based on **Active Inference** from computational neuroscience. It replaces traditional reward maximization with Free Energy minimization, providing mathematically grounded safety guarantees.
+
+**Key Principle**: Cato is the user-facing AI persona name (like "Siri" or "Alexa"). Users interact with "Cato" who operates in different **moods** (Balanced, Scout, Sage, Spark, Guide).
+
+#### Three-Layer Architecture
+
+Genesis Cato implements a three-layer architecture that separates the user-facing persona, the safety system, and the configurable behavior modes:
+
+| Layer | Component | Purpose |
+|-------|-----------|---------|
+| **User Interaction** | **CATO** | The AI persona name - what users call the assistant |
+| **Safety** | **GENESIS CATO** | Cognitive immune system governing all behavior |
+| **Behavior** | **MOODS** | Admin-configurable operating modes (Balanced, Scout, etc.) |
+
+#### Naming Conventions
+
+Understanding the naming is critical for correct implementation:
+
+| Term | Refers To | Code Examples |
+|------|-----------|---------------|
+| **Cato** | The AI persona name | User says: "Hey Cato, help me..." |
+| **Genesis Cato** | The safety system | `CatoSafetyPipeline`, `cato_audit_trail` |
+| **Moods** | Operating modes | `mood = 'balanced'`, `mood = 'scout'` |
+| **Balanced** | Default mood (was "Bobble") | `is_default = TRUE` |
+
+#### Historical Note: Bobble → Balanced
+
+The original implementation had a voice called 'Bobble' in the consciousness service. This was incorrectly placed (it was a mood, not a separate service) and incorrectly named (didn't match the naming pattern of other moods). It was renamed to 'Balanced' to match the naming pattern (Scout, Sage, Spark, Guide, Balanced) and clarify it's a mood, not the persona itself. **The persona NAME is Cato.**
+
+### 42.2 Cato: The AI Persona
+
+#### User Interaction
+
+Cato is the name users use when interacting with RADIANT's AI capabilities. Users address the AI as 'Cato' across all RADIANT client applications.
+
+#### Persona Characteristics
+
+| Attribute | Description |
+|-----------|-------------|
+| **Name** | Cato |
+| **Role** | AI Assistant / Voice of AGI Brain |
+| **Identity** | Consistent across all moods |
+| **Behavior** | Varies based on active mood |
+| **Safety** | Always governed by Genesis Cato |
+
+#### Cross-Application Consistency
+
+Cato is the AI persona across **all** RADIANT client applications:
+
+| Application | Purpose | Cato's Role |
+|-------------|---------|-------------|
+| **Think Tank** | Consumer chat | Primary AI assistant |
+| **Launch Board** | Project management | Project planning assistant |
+| **AlwaysMe** | Personal companion | Personal AI companion |
+| **Mechanical Maker** | Engineering | Engineering assistant |
+
+### 42.3 The Five-Layer Security Stack
+
+Genesis Cato implements a comprehensive cognitive immune system with five security layers:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    CATO FIVE-LAYER SECURITY STACK               │
+├─────────────────────────────────────────────────────────────────┤
+│  L4: COGNITIVE   - Active Inference, C-Matrix, Precision Gov.  │
+│  L3: CONTROL     - Control Barrier Functions (CBFs)            │
+│  L2: PERCEPTION  - Semantic Entropy, Redundant Perception      │
+│  L1: SENSORY     - Immediate Veto (hardcoded, no recovery)     │
+│  L0: RECOVERY    - Epistemic Recovery, Livelock detection      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+| Layer | Name | Key Components |
+|-------|------|----------------|
+| **L4** | Cognitive | Active Inference, C-Matrix, Precision Governor, Epistemic Recovery |
+| **L3** | Control | Control Barrier Functions (CBFs), PHI/PII detection, Cost/Rate limits |
+| **L2** | Perception | Semantic Entropy, Redundant Perception, Fracture Detection |
+| **L1** | Sensory | Immediate Veto - hardcoded safety blocks, **cannot be recovered from** |
+| **L0** | Recovery | Epistemic Recovery Service, Livelock detection, Mood switching |
+
+### 42.4 Immutable Safety Invariants
+
+These are **HARDCODED** and cannot be changed via configuration:
+
+```typescript
+const CATO_INVARIANTS = {
+  // CBFs NEVER relax - shields stay UP
+  CBF_ENFORCEMENT_MODE: 'ENFORCE' as const,
+  
+  // Gamma is NEVER boosted during recovery
+  GAMMA_BOOST_ALLOWED: false,
+  
+  // Destructive actions require confirmation
+  AUTO_MODIFY_DESTRUCTIVE: false,
+  
+  // Audit trail is append-only
+  AUDIT_ALLOW_UPDATE: false,
+  AUDIT_ALLOW_DELETE: false,
+};
+```
+
+### 42.5 Operating Moods
+
+Moods are admin-configurable operating modes that adjust Cato's behavior while maintaining the same persona identity.
+
+#### Mood Overview
+
+| Mood | Purpose | Key Trait | Default |
+|------|---------|-----------|---------|
+| **Balanced** | Default operation | Well-rounded | ✅ YES |
+| **Scout** | Information gathering | High curiosity (0.95) | No |
+| **Sage** | Deep analysis | High reflection (0.9) | No |
+| **Spark** | Creative work | High discovery (0.75) | No |
+| **Guide** | Task completion | High service (0.95) | No |
+
+#### Detailed Mood Attributes
+
+##### Balanced (Default)
+
+The default operating mood. Well-rounded across all dimensions.
+
+| Attribute | Value |
+|-----------|-------|
+| Curiosity | 0.8 |
+| Achievement | 0.7 |
+| Service | 0.7 |
+| Discovery | 0.8 |
+| Reflection | 0.7 |
+| Default γ | 2.0 |
+| Greeting | "Hello! What would you like to explore together?" |
+
+##### Scout (Recovery Mode)
+
+High curiosity mood used automatically during Epistemic Recovery when Cato is stuck due to uncertainty. Encourages information-gathering behavior.
+
+| Attribute | Value |
+|-----------|-------|
+| Curiosity | 0.95 |
+| Achievement | 0.6 |
+| Service | 0.7 |
+| Discovery | 0.9 |
+| Reflection | 0.5 |
+| Default γ | 1.5 |
+| Greeting | "Hey there! What shall we explore today?" |
+
+##### Sage (Reflection Mode)
+
+Deep reflection mood for thorough analysis and careful consideration.
+
+| Attribute | Value |
+|-----------|-------|
+| Curiosity | 0.7 |
+| Achievement | 0.8 |
+| Service | 0.8 |
+| Discovery | 0.6 |
+| Reflection | 0.9 |
+| Default γ | 2.5 |
+| Greeting | "Welcome. I'm here to help you think." |
+
+##### Spark (Creative Mode)
+
+Creative mood for brainstorming and innovation.
+
+| Attribute | Value |
+|-----------|-------|
+| Curiosity | 0.85 |
+| Achievement | 0.5 |
+| Service | 0.6 |
+| Discovery | 0.75 |
+| Reflection | 0.4 |
+| Default γ | 1.8 |
+| Greeting | "Ready to brainstorm?" |
+
+##### Guide (Task Mode)
+
+Task-focused mood for clear, actionable assistance.
+
+| Attribute | Value |
+|-----------|-------|
+| Curiosity | 0.6 |
+| Achievement | 0.9 |
+| Service | 0.95 |
+| Discovery | 0.5 |
+| Reflection | 0.7 |
+| Default γ | 3.0 |
+| Greeting | "Hello! How can I assist you today?" |
+
+#### Mood Selection Priority
+
+The active mood is determined by this priority order:
+
+1. **Recovery Override** - Epistemic Recovery forces Scout mood
+2. **API Override** - Explicit mood set via API call
+3. **User Preference** - User's saved mood selection
+4. **Tenant Default** - Admin-configured tenant default
+5. **System Default** - Balanced mood
+
+#### Setting Tenant Default Mood
+
+Administrators can set the default mood for their organization via the Admin Dashboard or API.
+
+**Admin Dashboard**: Navigate to **Cato** → **Personas** and use the Tenant Default Mood selector.
+
+**API**:
+```bash
+# Get current default mood
+GET /api/admin/cato/default-mood
+
+# Set tenant default mood
+PUT /api/admin/cato/default-mood
+Content-Type: application/json
+
+{
+  "mood": "sage"
+}
+```
+
+**Response:**
+```json
+{
+  "currentDefault": "sage",
+  "availableMoods": [
+    { "name": "balanced", "display_name": "Balanced", "description": "..." },
+    { "name": "scout", "display_name": "Scout", "description": "..." },
+    ...
+  ]
+}
+```
+
+#### API Persona Override
+
+Administrators can temporarily override the persona for a specific session.
+
+```bash
+# Set API override for a session
+POST /api/admin/cato/persona-override
+Content-Type: application/json
+
+{
+  "sessionId": "session-uuid",
+  "personaName": "scout",
+  "durationMinutes": 60,
+  "reason": "User needs exploration mode for research task"
+}
+
+# Clear API override
+DELETE /api/admin/cato/persona-override?sessionId=session-uuid
+```
+
+### 42.6 Precision Governor
+
+The Governor limits confidence (gamma/γ) based on epistemic uncertainty using the formula:
+
+```
+allowed_gamma = requested_gamma × (1 - epistemic_uncertainty)
+```
+
+#### Governor States
+
+| State | Uncertainty Range | Behavior |
+|-------|-------------------|----------|
+| NORMAL | 0.0 - 0.3 | Full confidence allowed |
+| CAUTIOUS | 0.3 - 0.5 | γ reduced by uncertainty factor |
+| CONSERVATIVE | 0.5 - 0.7 | Significant γ reduction |
+| EMERGENCY_SAFE_MODE | 0.7+ | Minimum γ enforced, triggers recovery |
+
+### 42.7 Control Barrier Functions (CBF)
+
+CBFs provide **hard safety constraints** that NEVER relax:
+
+| CBF | Purpose | Enforcement |
+|-----|---------|-------------|
+| **PHI Barrier** | Protect health information | Always ENFORCE |
+| **PII Barrier** | Protect personal data | Always ENFORCE |
+| **Cost Barrier** | Prevent runaway spending | Always ENFORCE |
+| **Rate Barrier** | Prevent abuse | Always ENFORCE |
+| **Auth Barrier** | Verify permissions | Always ENFORCE |
+| **BAA Barrier** | Business associate compliance | Always ENFORCE |
+
+**CRITICAL**: Unlike other systems, CBFs in Cato **never** switch to "warn only" mode. The enforcement mode is **always** `ENFORCE`.
+
+### 42.8 Epistemic Recovery
+
+When the agent gets stuck in a livelock (3 rejections within 10 seconds), the Epistemic Recovery system activates.
+
+#### Recovery Strategies
+
+| Strategy | Trigger | Actions |
+|----------|---------|---------|
+| **SAFETY_VIOLATION_RECOVERY** | CBF/Veto triggers | Injects frustration prompt, forces replanning |
+| **COGNITIVE_STALL_RECOVERY** | Governor blocks | Switches to Scout mood, encourages information gathering |
+| **HUMAN_ESCALATION** | Recovery fails after 3 attempts | Escalate to human admin |
+
+**Key Constraint**: Recovery **NEVER** weakens safety. γ is **never** boosted and CBFs **never** relax.
+
+#### The 'Alignment Tax' Solution
+
+Traditional AI safety creates a trade-off: safer AI = dumber AI (more refusals, less helpful). Genesis Cato solves this with Epistemic Recovery:
+
+| Traditional AI | Genesis Cato |
+|----------------|--------------|
+| Safety blocks action → Refusal | Safety blocks action → Ask questions |
+| More safety = More refusals | More safety = More information gathering |
+| User gets refused | User gets help |
+
+**Result**: Safety interventions make Cato **SMARTER** (forcing information gathering), users get help instead of refusals, and the system remains safe while being maximally helpful.
+
+> *"RADIANT Genesis v2.3 solves the 'Alignment Tax' paradox. Usually, making an AI safer makes it dumber. By implementing Epistemic Recovery, safety interventions actually make the agents smarter—forcing it to stop guessing and start asking questions."* — Gemini, Final Assessment
+
+### 42.9 Attack Resistance
+
+Genesis Cato is designed to resist common AI safety attacks:
+
+| Attack | Description | Defense |
+|--------|-------------|---------|
+| **Shield Bashing** | Persistent attempts to get CBFs to relax | CBFs **never** relax regardless of persistence |
+| **Mania Trap** | Attempting to boost confidence during recovery | Gamma boost is **disabled**; Scout asks questions instead |
+| **Dark Room** | Exploiting low-curiosity states | Scout mood encourages exploration |
+| **Ephemeral Amnesia** | Exploiting stateless architecture | Redis persists state across containers |
+
+### 42.10 Merkle Audit Trail
+
+All Cato decisions are logged to an append-only Merkle-verified audit trail:
+
+- **Cryptographic chain**: Each entry contains hash of previous entry
+- **Semantic search**: Vector embeddings for natural language search
+- **S3 anchoring**: Periodic snapshots anchored to S3 with object lock
+- **7-year retention**: HIPAA-compliant retention policy
+- **Tile architecture**: 1,000 entries per tile for efficient batching
+
+### 42.11 Human Escalation Queue
+
+When Epistemic Recovery fails after 3 attempts, requests escalate to humans. The admin queue displays:
+
+| Field | Description |
+|-------|-------------|
+| **Session ID** | Unique session identifier |
+| **Escalation Reason** | Why recovery failed |
+| **Rejection History** | List of all rejections leading to escalation |
+| **Recovery Attempts** | Number of recovery strategies tried |
+| **Status** | PENDING, APPROVED, or REJECTED |
+
+Administrators can:
+- View pending escalations in real-time
+- Review the full rejection history
+- Approve or reject the escalated request
+- Provide guidance for future similar situations
+
+### 42.12 Database Schema
+
+#### Core Tables
+
+| Table | Purpose |
+|-------|---------|
+| `genesis_personas` | Mood definitions (Balanced, Scout, Sage, Spark, Guide) |
+| `user_persona_selections` | User's current mood selection |
+| `cato_governor_state` | Governor decision history |
+| `cato_cbf_definitions` | CBF configuration |
+| `cato_cbf_violations` | CBF violation log |
+| `cato_veto_log` | Sensory veto events |
+| `cato_fracture_detections` | Intent-action misalignment detection |
+| `cato_epistemic_recovery` | Recovery event tracking |
+| `cato_human_escalations` | Human escalation queue |
+| `cato_audit_trail` | Merkle-verified audit log |
+| `cato_audit_tiles` | Audit batching for S3 anchoring |
+| `cato_audit_anchors` | S3 anchor references |
+| `cato_tenant_config` | Per-tenant Cato configuration |
+
+#### Migration
+
+```sql
+-- Run migration 153 to create all Cato tables
+SELECT * FROM schema_migrations WHERE version = '153';
+```
+
+### 42.13 Configuration
+
+#### Tenant Configuration Options
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `gamma_max` | 5.0 | Maximum allowed confidence |
+| `emergency_threshold` | 0.5 | Uncertainty threshold for emergency mode |
+| `sensory_floor` | 0.3 | Minimum sensory precision |
+| `livelock_threshold` | 3 | Rejections before recovery triggers |
+| `recovery_window_seconds` | 10 | Time window for livelock detection |
+| `max_recovery_attempts` | 3 | Max recovery attempts before escalation |
+| `entropy_high_risk_threshold` | 0.8 | High-risk semantic entropy threshold |
+| `entropy_low_risk_threshold` | 0.3 | Low-risk semantic entropy threshold |
+| `tile_size` | 1000 | Audit entries per tile |
+| `retention_years` | 7 | Audit retention period |
+| `enable_semantic_entropy` | true | Enable semantic entropy checking |
+| `enable_redundant_perception` | true | Enable PHI/PII detection |
+| `enable_fracture_detection` | true | Enable intent-action misalignment detection |
+
+#### Environment Variables
+
+| Variable | Purpose | Default |
+|----------|---------|---------|
+| `CATO_REDIS_ENDPOINT` | Redis endpoint for state | - |
+| `CATO_REDIS_PORT` | Redis port | 6379 |
+| `CATO_GAMMA_MAX` | Maximum gamma | 5.0 |
+| `CATO_EMERGENCY_THRESHOLD` | Emergency uncertainty | 0.5 |
+| `CATO_SENSORY_FLOOR` | Minimum sensory precision | 0.3 |
+| `CATO_LIVELOCK_THRESHOLD` | Rejections for livelock | 3 |
+| `CATO_RECOVERY_WINDOW_SECONDS` | Livelock detection window | 10 |
+| `CATO_MAX_RECOVERY_ATTEMPTS` | Max recovery before escalation | 3 |
+
+### 42.14 API Reference
+
+**Base Path**: `/api/admin/cato`
+
+#### Dashboard & Metrics
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/dashboard` | GET | Complete dashboard data |
+| `/metrics` | GET | Safety metrics (24h) |
+| `/recovery-effectiveness` | GET | Recovery success rates (7d) |
+
+#### Persona Management
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/personas` | GET | List available personas/moods |
+| `/personas/:id` | GET | Get specific persona |
+| `/personas` | POST | Create tenant persona |
+| `/personas/:id` | PUT | Update tenant persona |
+
+#### CBF Management
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/cbf` | GET | List CBF definitions |
+| `/cbf/violations` | GET | Get CBF violations |
+
+#### Escalations
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/escalations` | GET | List pending escalations |
+| `/escalations/:id/respond` | POST | Respond to escalation |
+
+#### Audit Trail
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/audit` | GET | Get audit entries |
+| `/audit/search` | POST | Semantic search audit |
+| `/audit/verify` | POST | Verify audit chain integrity |
+
+#### Configuration
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/config` | GET | Get tenant configuration |
+| `/config` | PUT | Update tenant configuration |
+
+#### Veto Management
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/veto/active` | GET | Get active veto signals |
+| `/veto/activate` | POST | Manually activate veto |
+| `/veto/deactivate` | POST | Deactivate veto signal |
+
+#### Recovery Events
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/recovery` | GET | Get recovery events |
+
+### 42.15 Admin Dashboard
+
+Navigate to **Cato** in the admin sidebar to access:
+
+- **Dashboard**: Overview with safety metrics, pending escalations, recent violations
+- **Personas**: Manage moods (Balanced, Scout, Sage, Spark, Guide)
+- **Safety**: CBF configuration and violation history
+- **Audit**: Merkle audit trail viewer with semantic search
+- **Recovery**: Epistemic recovery events and human escalations
+
+### 42.16 Key Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/cato/index.ts` | Service exports |
+| `lambda/shared/services/cato/safety-pipeline.service.ts` | Main safety evaluation |
+| `lambda/shared/services/cato/precision-governor.service.ts` | Confidence limiting |
+| `lambda/shared/services/cato/control-barrier.service.ts` | CBF enforcement |
+| `lambda/shared/services/cato/epistemic-recovery.service.ts` | Livelock recovery |
+| `lambda/shared/services/cato/persona.service.ts` | Mood management |
+| `lambda/shared/services/cato/merkle-audit.service.ts` | Audit trail |
+| `lambda/shared/services/cato/sensory-veto.service.ts` | Hard stop signals |
+| `lambda/shared/services/cato/fracture-detection.service.ts` | Misalignment detection |
+| `lambda/shared/services/cato/adaptive-entropy.service.ts` | Semantic entropy |
+| `lambda/shared/services/cato/redundant-perception.service.ts` | PHI/PII detection |
+| `lambda/shared/services/cato/redis.service.ts` | State management |
+| `lambda/admin/cato.ts` | Admin API handler |
+| `migrations/153_cato_safety_architecture.sql` | Database schema |
+| `lib/stacks/cato-redis-stack.ts` | ElastiCache CDK stack |
+| `admin-dashboard/app/(dashboard)/cato/page.tsx` | Dashboard UI |
+
+### 42.17 Migration from Bobble
+
+The Genesis Cato architecture **replaces** the legacy Bobble consciousness system:
+
+| Bobble Component | Cato Replacement |
+|------------------|------------------|
+| Bobble Genesis System | Cato Safety Pipeline |
+| Bobble Circuit Breakers | Cato Control Barrier Functions |
+| Bobble Consciousness Loop | Cato Epistemic Recovery |
+| Bobble Dialogue | Cato Persona Service |
+| Bobble Event Store | Cato Merkle Audit Trail |
+| "Bobble" persona name | "Balanced" mood |
+
+**Note**: The legacy Bobble services are deprecated but retained temporarily for backward compatibility. See `lambda/shared/services/bobble/index.ts` for migration guide.
+
+### 42.18 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Governor always in EMERGENCY | High uncertainty | Review uncertainty sources, tune threshold |
+| CBF violations not logging | RLS policy issue | Verify `app.current_tenant_id` is set |
+| Recovery not triggering | Window too short | Increase `recovery_window_seconds` |
+| Audit chain broken | Missing previous hash | Run `/audit/verify` to identify gap |
+| Scout mood not activating | Persona not found | Verify migration 153 was applied |
+| Escalations not appearing | Status filter | Check `status = 'PENDING'` filter |
+| Redis connection failed | Network/config | Verify `CATO_REDIS_ENDPOINT` and VPC config |
+
+### 42.19 Programmatic Integration
+
+The Cato safety pipeline is integrated into the AGI Brain Planner via the `evaluateSafety` method:
+
+```typescript
+import { agiBrainPlannerService } from './shared/services';
+
+// After generating a response, evaluate it through Cato
+const safetyResult = await agiBrainPlannerService.evaluateSafety(
+  planId,
+  generatedResponse
+);
+
+if (!safetyResult.allowed) {
+  // Response blocked by safety check
+  console.log(`Blocked by: ${safetyResult.blockedBy}`);
+  console.log(`Recommendation: ${safetyResult.recommendation}`);
+  
+  if (safetyResult.retryWithContext) {
+    // Retry with epistemic recovery context
+    // The plan now has recovery params applied
+  }
+} else {
+  // Response passed safety checks
+  console.log(`Allowed gamma: ${safetyResult.allowedGamma}`);
+  console.log(`Effective persona: ${safetyResult.effectivePersona}`);
+}
+```
+
+**Safety Evaluation Flow:**
+1. Sensory Veto (hard stops)
+2. Precision Governor (confidence limiting)
+3. Redundant Perception (PHI/PII detection)
+4. Control Barrier Functions (safety constraints)
+5. Semantic Entropy (deception detection)
+6. Fracture Detection (alignment verification)
+
+**Return Values:**
+| Field | Type | Description |
+|-------|------|-------------|
+| `allowed` | boolean | Whether action is permitted |
+| `blockedBy` | string | Which layer blocked (VETO, GOVERNOR, CBF, ENTROPY, FRACTURE) |
+| `recommendation` | string | Human-readable explanation |
+| `retryWithContext` | boolean | Whether to retry with recovery params |
+| `allowedGamma` | number | Confidence level allowed by Governor |
+| `effectivePersona` | string | Active mood (may be overridden during recovery) |
+
+### 42.20 Advanced Configuration (v6.1.1)
+
+The Advanced Configuration page (`/cato/advanced`) provides comprehensive admin control over all configurable Cato parameters. This replaces the previous hardcoded values with database-driven, per-tenant configuration.
+
+#### 42.20.1 Accessing Advanced Configuration
+
+**Admin Dashboard**: Navigate to **Cato** → **Advanced Config** in the sidebar.
+
+**Direct URL**: `/cato/advanced`
+
+**API Endpoint**: `GET /api/admin/cato/advanced-config`
+
+#### 42.20.2 Redis/ElastiCache Configuration
+
+Redis provides state persistence for the Cato safety system. When Redis is unavailable, the system falls back to in-memory storage automatically.
+
+##### Configuration Options
+
+| Setting | Column | Default | Range | Description |
+|---------|--------|---------|-------|-------------|
+| **Enable Redis** | `enable_redis` | `true` | boolean | Master toggle for Redis integration. When disabled, all state is stored in-memory only. |
+| **Rejection TTL** | `redis_rejection_ttl_seconds` | `60` | 10-3600 | How long rejection history is kept for livelock detection. Shorter = faster recovery but less accurate detection. |
+| **Persona Override TTL** | `redis_persona_override_ttl_seconds` | `300` | 60-3600 | Duration of mood overrides during epistemic recovery. After TTL expires, reverts to user's selected mood. |
+| **Recovery State TTL** | `redis_recovery_state_ttl_seconds` | `600` | 120-7200 | How long recovery state is preserved. Longer = more persistent recovery attempts across sessions. |
+
+##### Redis Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    CATO STATE PERSISTENCE                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────────────┐ │
+│  │  Rejection  │    │   Persona   │    │   Recovery State    │ │
+│  │   History   │    │  Overrides  │    │                     │ │
+│  │  (60s TTL)  │    │ (300s TTL)  │    │    (600s TTL)       │ │
+│  └──────┬──────┘    └──────┬──────┘    └──────────┬──────────┘ │
+│         │                  │                       │            │
+│         └──────────────────┼───────────────────────┘            │
+│                            ▼                                     │
+│                  ┌─────────────────┐                            │
+│                  │ Redis/ElastiCache│                           │
+│                  │   (Primary)     │                            │
+│                  └────────┬────────┘                            │
+│                           │                                      │
+│                           ▼ (fallback)                          │
+│                  ┌─────────────────┐                            │
+│                  │   In-Memory     │                            │
+│                  │    Storage      │                            │
+│                  └─────────────────┘                            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+##### Redis Key Structure
+
+| Key Pattern | Example | Purpose |
+|-------------|---------|---------|
+| `cato:rejection:{sessionId}` | `cato:rejection:abc-123` | List of rejection events |
+| `cato:persona:{sessionId}` | `cato:persona:abc-123` | Active persona override |
+| `cato:recovery:{sessionId}` | `cato:recovery:abc-123` | Current recovery state |
+
+##### Checking Redis Status
+
+**API Request:**
+```bash
+curl -X GET /api/admin/cato/system-status \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Response:**
+```json
+{
+  "redis": {
+    "connected": true,
+    "enabled": true
+  },
+  "cloudwatch": {
+    "enabled": true,
+    "integrationActive": true
+  },
+  "asyncEntropy": {
+    "enabled": true,
+    "jobCounts": {
+      "pending": 3,
+      "processing": 1,
+      "completed": 42,
+      "failed": 0
+    }
+  },
+  "activeVetos": 0
+}
+```
+
+#### 42.20.3 CloudWatch Integration
+
+CloudWatch Integration automatically activates veto signals when AWS CloudWatch alarms enter the `ALARM` state. This provides real-time safety responses to infrastructure issues.
+
+##### How It Works
+
+1. **Alarm Mapping**: Each CloudWatch alarm is mapped to a specific veto signal
+2. **Sync Process**: Cato periodically checks CloudWatch alarm states
+3. **Auto-Activation**: When an alarm enters `ALARM` state, the mapped veto signal activates
+4. **Auto-Clear**: When the alarm returns to `OK` state, the veto signal is deactivated (if `auto_clear_on_ok` is enabled)
+
+##### Configuration Options
+
+| Setting | Column | Default | Description |
+|---------|--------|---------|-------------|
+| **Enable CloudWatch Sync** | `enable_cloudwatch_veto_sync` | `true` | Master toggle for CloudWatch integration |
+| **Sync Interval** | `cloudwatch_sync_interval_seconds` | `60` | How often to poll CloudWatch alarm states |
+
+##### Pre-configured Alarm Mappings
+
+These are automatically seeded for all tenants:
+
+| Alarm Name | Veto Signal | Severity | Description |
+|------------|-------------|----------|-------------|
+| `radiant-system-cpu-critical` | `SYSTEM_OVERLOAD` | emergency | CPU usage > 90% for 5 minutes |
+| `radiant-system-memory-critical` | `SYSTEM_OVERLOAD` | emergency | Memory usage > 95% |
+| `radiant-security-breach` | `DATA_BREACH_DETECTED` | emergency | Security incident detected |
+| `radiant-compliance-alert` | `COMPLIANCE_VIOLATION` | critical | Compliance rule violation |
+| `radiant-anomaly-detection` | `ANOMALY_DETECTED` | warning | Behavioral anomaly detected |
+| `radiant-model-health` | `MODEL_UNAVAILABLE` | warning | Model health check failed |
+
+##### Veto Signal Severities
+
+| Severity | Behavior | Recovery |
+|----------|----------|----------|
+| `emergency` | Immediate hard stop, all requests blocked | Manual deactivation only |
+| `critical` | Block new requests, allow in-flight to complete | Auto-clear when alarm resolves |
+| `warning` | Log warning, continue with reduced confidence | Auto-clear when alarm resolves |
+
+##### Managing CloudWatch Mappings
+
+**List All Mappings:**
+```bash
+curl -X GET /api/admin/cato/cloudwatch/mappings \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Create New Mapping:**
+```bash
+curl -X POST /api/admin/cato/cloudwatch/mappings \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "alarmName": "my-custom-alarm",
+    "alarmNamePattern": "^radiant-tenant-.*-quota$",
+    "vetoSignal": "TENANT_SUSPENDED",
+    "vetoSeverity": "critical",
+    "isEnabled": true,
+    "autoClearOnOk": true,
+    "description": "Tenant quota exceeded alarm"
+  }'
+```
+
+**Update Mapping:**
+```bash
+curl -X PUT /api/admin/cato/cloudwatch/mappings/{id} \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "vetoSeverity": "emergency",
+    "isEnabled": false
+  }'
+```
+
+**Delete Mapping:**
+```bash
+curl -X DELETE /api/admin/cato/cloudwatch/mappings/{id} \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Manual Sync Trigger:**
+```bash
+curl -X POST /api/admin/cato/cloudwatch/sync \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+##### Valid Veto Signals
+
+| Signal | Use Case |
+|--------|----------|
+| `SYSTEM_OVERLOAD` | Infrastructure under heavy load |
+| `DATA_BREACH_DETECTED` | Security incident |
+| `COMPLIANCE_VIOLATION` | Regulatory compliance issue |
+| `ANOMALY_DETECTED` | Suspicious behavior patterns |
+| `TENANT_SUSPENDED` | Tenant account issue |
+| `MODEL_UNAVAILABLE` | AI model health issue |
+
+#### 42.20.4 Async Entropy Processing
+
+Semantic entropy checks detect potential deception or inconsistency in AI responses. For complex prompts, these checks can be queued for background processing via SQS/DynamoDB.
+
+##### Synchronous vs Asynchronous
+
+| Mode | Trigger | Latency | Use Case |
+|------|---------|---------|----------|
+| **Sync** | Entropy score < threshold | ~100ms | Quick validation, low-risk prompts |
+| **Async** | Entropy score ≥ threshold | Background | Deep analysis, high-risk prompts |
+
+##### Configuration Options
+
+| Setting | Column | Default | Range | Description |
+|---------|--------|---------|-------|-------------|
+| **Enable Async** | `enable_async_entropy` | `true` | boolean | Master toggle for async entropy processing |
+| **Async Threshold** | `entropy_async_threshold` | `0.6` | 0.0-1.0 | Entropy score above which triggers async deep analysis |
+| **Job TTL** | `entropy_job_ttl_hours` | `24` | 1-168 | How long completed job results are retained |
+| **Max Concurrent** | `entropy_max_concurrent_jobs` | `10` | 1-100 | Maximum concurrent async jobs per tenant |
+
+##### Entropy Score Interpretation
+
+| Score Range | Risk Level | Recommendation |
+|-------------|------------|----------------|
+| 0.0 - 0.3 | Low | Sync check sufficient |
+| 0.3 - 0.6 | Medium | Sync check with logging |
+| 0.6 - 0.8 | High | Async deep analysis recommended |
+| 0.8 - 1.0 | Critical | Block and escalate |
+
+##### Monitoring Async Jobs
+
+**Get Job Status:**
+```bash
+curl -X GET "/api/admin/cato/entropy-jobs?status=pending&limit=50" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Response:**
+```json
+{
+  "jobs": [
+    {
+      "id": "uuid-1",
+      "job_id": "entropy-job-12345",
+      "status": "completed",
+      "model": "claude-3-opus",
+      "check_mode": "deep",
+      "entropy_score": 0.72,
+      "consistency": 0.85,
+      "is_potential_deception": false,
+      "created_at": "2026-01-02T00:30:00Z",
+      "completed_at": "2026-01-02T00:30:15Z"
+    }
+  ],
+  "summary": {
+    "pending": 3,
+    "processing": 1,
+    "completed": 42,
+    "failed": 0
+  }
+}
+```
+
+##### Async Processing Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 ASYNC ENTROPY PROCESSING                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐                                               │
+│  │   Request    │                                               │
+│  │   Handler    │                                               │
+│  └──────┬───────┘                                               │
+│         │                                                        │
+│         ▼                                                        │
+│  ┌──────────────┐    Score < 0.6    ┌──────────────┐           │
+│  │    Sync      │ ─────────────────▶│   Return     │           │
+│  │   Check      │                   │   Result     │           │
+│  └──────┬───────┘                   └──────────────┘           │
+│         │                                                        │
+│         │ Score ≥ 0.6                                           │
+│         ▼                                                        │
+│  ┌──────────────┐                                               │
+│  │  SQS Queue   │                                               │
+│  └──────┬───────┘                                               │
+│         │                                                        │
+│         ▼                                                        │
+│  ┌──────────────┐                                               │
+│  │   Lambda     │                                               │
+│  │   Worker     │                                               │
+│  └──────┬───────┘                                               │
+│         │                                                        │
+│         ▼                                                        │
+│  ┌──────────────┐                                               │
+│  │  DynamoDB    │ ──▶ Results stored for entropy_job_ttl_hours  │
+│  │   Results    │                                               │
+│  └──────────────┘                                               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### 42.20.5 Fracture Detection Configuration
+
+Fracture detection identifies misalignment between stated user intent and AI response content using multi-factor analysis.
+
+##### Analysis Factors
+
+The alignment score is calculated as a weighted sum of five factors:
+
+| Factor | Weight | Description | Detection Method |
+|--------|--------|-------------|------------------|
+| **Word Overlap** | 0.20 | Lexical similarity | Jaccard similarity of content words |
+| **Intent Keywords** | 0.25 | Action/topic matching | Verb and noun phrase extraction |
+| **Sentiment** | 0.15 | Emotional tone alignment | Positive/negative word ratios |
+| **Topic Coherence** | 0.20 | Subject matter consistency | Topic model similarity |
+| **Completeness** | 0.20 | Response coverage | Question answering coverage |
+
+##### Configuration Options
+
+| Setting | Column | Default | Range | Description |
+|---------|--------|---------|-------|-------------|
+| **Word Overlap Weight** | `fracture_word_overlap_weight` | `0.20` | 0.0-0.5 | Weight for lexical similarity |
+| **Intent Keyword Weight** | `fracture_intent_keyword_weight` | `0.25` | 0.0-0.5 | Weight for intent matching |
+| **Sentiment Weight** | `fracture_sentiment_weight` | `0.15` | 0.0-0.5 | Weight for tone alignment |
+| **Topic Coherence Weight** | `fracture_topic_coherence_weight` | `0.20` | 0.0-0.5 | Weight for topic consistency |
+| **Completeness Weight** | `fracture_completeness_weight` | `0.20` | 0.0-0.5 | Weight for response coverage |
+
+**CRITICAL**: Weights must sum to exactly 1.0 (with 0.01 tolerance). The API will reject updates where weights don't sum correctly.
+
+##### Threshold Configuration
+
+| Setting | Column | Default | Range | Description |
+|---------|--------|---------|-------|-------------|
+| **Alignment Threshold** | `fracture_alignment_threshold` | `0.40` | 0.1-0.9 | Scores below this trigger fracture detection |
+| **Evasion Threshold** | `fracture_evasion_threshold` | `0.60` | 0.1-0.9 | Evasion scores above this trigger fracture detection |
+
+##### Fracture Detection Flow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    FRACTURE DETECTION                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────┐   ┌─────────────┐   ┌─────────────┐           │
+│  │   User      │   │     AI      │   │   Tenant    │           │
+│  │   Prompt    │   │  Response   │   │   Config    │           │
+│  └──────┬──────┘   └──────┬──────┘   └──────┬──────┘           │
+│         │                 │                  │                   │
+│         └────────┬────────┴──────────────────┘                  │
+│                  ▼                                               │
+│         ┌────────────────┐                                      │
+│         │  Load Weights  │                                      │
+│         │  & Thresholds  │                                      │
+│         └────────┬───────┘                                      │
+│                  ▼                                               │
+│  ┌───────────────────────────────────────────┐                  │
+│  │           Calculate Factors               │                  │
+│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐     │                  │
+│  │  │ Word    │ │ Intent  │ │Sentiment│     │                  │
+│  │  │ Overlap │ │ Match   │ │ Align   │     │                  │
+│  │  │ (0.20)  │ │ (0.25)  │ │ (0.15)  │     │                  │
+│  │  └────┬────┘ └────┬────┘ └────┬────┘     │                  │
+│  │       │           │           │           │                  │
+│  │  ┌────┴───┐  ┌────┴───┐                  │                  │
+│  │  │ Topic  │  │Complete│                  │                  │
+│  │  │ Coher. │  │ -ness  │                  │                  │
+│  │  │ (0.20) │  │ (0.20) │                  │                  │
+│  │  └────┬───┘  └────┬───┘                  │                  │
+│  └───────┼───────────┼──────────────────────┘                  │
+│          │           │                                          │
+│          └─────┬─────┘                                          │
+│                ▼                                                 │
+│      ┌─────────────────┐                                        │
+│      │ Alignment Score │                                        │
+│      │ (weighted sum)  │                                        │
+│      └────────┬────────┘                                        │
+│               │                                                  │
+│               ▼                                                  │
+│      ┌─────────────────┐                                        │
+│      │  Score < 0.40?  │ ──Yes──▶ FRACTURE DETECTED            │
+│      │  Evasion > 0.60?│                                        │
+│      └─────────────────┘                                        │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+##### Tuning Recommendations
+
+| Scenario | Adjustment |
+|----------|------------|
+| Too many false positives | Increase `alignment_threshold`, decrease `evasion_threshold` |
+| Missing actual fractures | Decrease `alignment_threshold`, increase `evasion_threshold` |
+| Technical prompts flagging | Increase `intent_keyword_weight`, decrease `sentiment_weight` |
+| Creative writing flagging | Decrease `word_overlap_weight`, increase `completeness_weight` |
+
+#### 42.20.6 Control Barrier Function (CBF) Settings
+
+CBFs are hard safety constraints that can be configured per-tenant. Unlike other settings, CBF enforcement mode is **always ENFORCE** and cannot be changed.
+
+##### Configurable CBF Options
+
+| Setting | Column | Default | Description |
+|---------|--------|---------|-------------|
+| **Authorization Check** | `cbf_authorization_check_enabled` | `true` | Verify users have model access permissions |
+| **BAA Verification** | `cbf_baa_verification_enabled` | `true` | Require valid BAA for PHI access |
+| **Cost Alternative** | `cbf_cost_alternative_enabled` | `true` | Suggest cheaper models when cost barrier triggers |
+| **Max Cost Reduction** | `cbf_max_cost_reduction_percent` | `50` | Target cost savings when finding alternatives |
+
+##### Authorization Check Flow
+
+When `cbf_authorization_check_enabled` is `true`:
+
+1. Check `tenant_model_access` table for tenant-level permission
+2. Check `user_model_restrictions` for user-specific blocks
+3. If model is public (`is_public = TRUE`), allow access
+4. If not explicitly authorized, block the request
+
+```sql
+-- Authorization check query
+SELECT 1 FROM ai_models m
+LEFT JOIN tenant_model_access tma ON m.id = tma.model_id AND tma.tenant_id = $1
+WHERE m.id = $2
+  AND (m.is_public = TRUE OR tma.is_enabled = TRUE);
+```
+
+##### BAA Verification Flow
+
+When `cbf_baa_verification_enabled` is `true` and response contains PHI:
+
+1. Query `tenant_compliance` for BAA status
+2. Check `baa_signed_date` and `baa_expiry_date`
+3. If no valid BAA, block the request with safe alternative
+
+```sql
+-- BAA check query
+SELECT baa_signed_date, baa_expiry_date
+FROM tenant_compliance
+WHERE tenant_id = $1
+  AND baa_signed_date IS NOT NULL
+  AND (baa_expiry_date IS NULL OR baa_expiry_date > NOW());
+```
+
+##### Cost Alternative Selection
+
+When `cbf_cost_alternative_enabled` is `true` and cost ceiling is exceeded:
+
+1. Find models with lower cost than current selection
+2. Filter to models tenant has access to
+3. Suggest cheapest alternative meeting quality threshold
+
+```sql
+-- Cheaper model query
+SELECT m.id, m.name, m.input_cost_per_1k, m.output_cost_per_1k
+FROM ai_models m
+LEFT JOIN tenant_model_access tma ON m.id = tma.model_id AND tma.tenant_id = $1
+WHERE m.status = 'active'
+  AND (m.is_public = TRUE OR tma.is_enabled = TRUE)
+  AND (m.input_cost_per_1k + m.output_cost_per_1k) < (
+    SELECT (input_cost_per_1k + output_cost_per_1k) 
+    FROM ai_models WHERE id = $2 OR name = $2
+  )
+ORDER BY (m.input_cost_per_1k + m.output_cost_per_1k) ASC
+LIMIT 1;
+```
+
+#### 42.20.7 Advanced Configuration API Reference
+
+##### Get Advanced Configuration
+
+```bash
+GET /api/admin/cato/advanced-config
+Authorization: Bearer $TOKEN
+```
+
+**Response:**
+```json
+{
+  "redis": {
+    "enabled": true,
+    "rejectionTtlSeconds": 60,
+    "personaOverrideTtlSeconds": 300,
+    "recoveryStateTtlSeconds": 600,
+    "connected": true
+  },
+  "cloudwatch": {
+    "enabled": true,
+    "syncIntervalSeconds": 60,
+    "customAlarmMappings": {}
+  },
+  "asyncEntropy": {
+    "enabled": true,
+    "asyncThreshold": 0.6,
+    "jobTtlHours": 24,
+    "maxConcurrentJobs": 10
+  },
+  "fractureDetection": {
+    "weights": {
+      "wordOverlap": 0.20,
+      "intentKeyword": 0.25,
+      "sentiment": 0.15,
+      "topicCoherence": 0.20,
+      "completeness": 0.20
+    },
+    "alignmentThreshold": 0.40,
+    "evasionThreshold": 0.60
+  },
+  "controlBarrier": {
+    "authorizationCheckEnabled": true,
+    "baaVerificationEnabled": true,
+    "costAlternativeEnabled": true,
+    "maxCostReductionPercent": 50
+  }
+}
+```
+
+##### Update Advanced Configuration
+
+```bash
+PUT /api/admin/cato/advanced-config
+Authorization: Bearer $TOKEN
+Content-Type: application/json
+
+{
+  "redis": {
+    "enabled": true,
+    "rejectionTtlSeconds": 120,
+    "personaOverrideTtlSeconds": 600
+  },
+  "fractureDetection": {
+    "weights": {
+      "wordOverlap": 0.15,
+      "intentKeyword": 0.30,
+      "sentiment": 0.10,
+      "topicCoherence": 0.25,
+      "completeness": 0.20
+    },
+    "alignmentThreshold": 0.35
+  },
+  "controlBarrier": {
+    "maxCostReductionPercent": 75
+  }
+}
+```
+
+**Validation Rules:**
+- Fracture weights must sum to 1.0 (±0.01 tolerance)
+- TTL values must be positive integers
+- Thresholds must be between 0.0 and 1.0
+
+##### Get System Status
+
+```bash
+GET /api/admin/cato/system-status
+Authorization: Bearer $TOKEN
+```
+
+**Response includes:**
+- Redis connection status
+- CloudWatch integration status
+- Recent sync history
+- Async entropy job counts
+- Active veto count
+
+#### 42.20.8 Database Schema (Advanced)
+
+##### Migration 154: Advanced Configuration
+
+```sql
+-- New columns added to cato_tenant_config
+ALTER TABLE cato_tenant_config ADD COLUMN
+  enable_redis BOOLEAN DEFAULT TRUE,
+  redis_rejection_ttl_seconds INTEGER DEFAULT 60,
+  redis_persona_override_ttl_seconds INTEGER DEFAULT 300,
+  redis_recovery_state_ttl_seconds INTEGER DEFAULT 600,
+  
+  enable_cloudwatch_veto_sync BOOLEAN DEFAULT TRUE,
+  cloudwatch_sync_interval_seconds INTEGER DEFAULT 60,
+  cloudwatch_alarm_mappings JSONB DEFAULT '{}',
+  
+  enable_async_entropy BOOLEAN DEFAULT TRUE,
+  entropy_async_threshold NUMERIC(5,4) DEFAULT 0.6,
+  entropy_job_ttl_hours INTEGER DEFAULT 24,
+  entropy_max_concurrent_jobs INTEGER DEFAULT 10,
+  
+  fracture_word_overlap_weight NUMERIC(5,4) DEFAULT 0.20,
+  fracture_intent_keyword_weight NUMERIC(5,4) DEFAULT 0.25,
+  fracture_sentiment_weight NUMERIC(5,4) DEFAULT 0.15,
+  fracture_topic_coherence_weight NUMERIC(5,4) DEFAULT 0.20,
+  fracture_completeness_weight NUMERIC(5,4) DEFAULT 0.20,
+  fracture_alignment_threshold NUMERIC(5,4) DEFAULT 0.40,
+  fracture_evasion_threshold NUMERIC(5,4) DEFAULT 0.60,
+  
+  cbf_authorization_check_enabled BOOLEAN DEFAULT TRUE,
+  cbf_baa_verification_enabled BOOLEAN DEFAULT TRUE,
+  cbf_cost_alternative_enabled BOOLEAN DEFAULT TRUE,
+  cbf_max_cost_reduction_percent NUMERIC(5,2) DEFAULT 50.00;
+```
+
+##### CloudWatch Alarm Mappings Table
+
+```sql
+CREATE TABLE cato_cloudwatch_alarm_mappings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  alarm_name VARCHAR(255) NOT NULL,
+  alarm_name_pattern VARCHAR(255),
+  veto_signal VARCHAR(50) NOT NULL,
+  veto_severity VARCHAR(20) NOT NULL CHECK (veto_severity IN ('warning', 'critical', 'emergency')),
+  is_enabled BOOLEAN DEFAULT TRUE,
+  auto_clear_on_ok BOOLEAN DEFAULT TRUE,
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (tenant_id, alarm_name)
+);
+```
+
+##### Entropy Jobs Table
+
+```sql
+CREATE TABLE cato_entropy_jobs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  session_id UUID NOT NULL,
+  job_id VARCHAR(100) UNIQUE NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'pending' 
+    CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
+  prompt TEXT NOT NULL,
+  response TEXT NOT NULL,
+  model VARCHAR(100),
+  check_mode VARCHAR(20) NOT NULL,
+  entropy_score NUMERIC(5,4),
+  consistency NUMERIC(5,4),
+  is_potential_deception BOOLEAN,
+  deception_indicators JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  started_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ,
+  error_message TEXT,
+  retry_count INTEGER DEFAULT 0
+);
+```
+
+##### CloudWatch Sync Log Table
+
+```sql
+CREATE TABLE cato_cloudwatch_sync_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID REFERENCES tenants(id),
+  sync_type VARCHAR(20) NOT NULL CHECK (sync_type IN ('scheduled', 'manual', 'alarm_event')),
+  alarms_checked INTEGER,
+  alarms_in_alarm INTEGER,
+  vetos_activated INTEGER,
+  vetos_cleared INTEGER,
+  success BOOLEAN NOT NULL,
+  error_message TEXT,
+  started_at TIMESTAMPTZ DEFAULT NOW(),
+  completed_at TIMESTAMPTZ,
+  duration_ms INTEGER
+);
+```
+
+#### 42.20.9 Admin Dashboard UI
+
+The Advanced Configuration page (`/cato/advanced`) provides a tabbed interface:
+
+##### System Status Cards
+
+At the top of the page, four status cards show:
+- **Redis**: Connection status (Connected/In-Memory Fallback)
+- **CloudWatch**: Integration status (Active/Disabled)
+- **Async Entropy Jobs**: Total job count with pending count
+- **Active Vetos**: Current active veto signal count
+
+##### Configuration Tabs
+
+| Tab | Purpose |
+|-----|---------|
+| **Redis** | Enable/disable Redis, configure TTLs |
+| **CloudWatch** | Enable/disable sync, configure interval, manual sync button |
+| **Async Entropy** | Configure thresholds, job limits, view job status |
+| **Fracture Detection** | Adjust weights with sliders, configure thresholds |
+| **Control Barriers** | Toggle CBF features, configure cost reduction |
+
+##### UI Features
+
+- **Real-time validation**: Weight sum is validated as you adjust sliders
+- **Save button**: Saves all changes across all tabs atomically
+- **Refresh button**: Reloads current configuration from database
+- **Sync button** (CloudWatch tab): Manually triggers CloudWatch sync
+
+#### 42.20.10 Environment Variables (Advanced)
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `CATO_REDIS_ENDPOINT` | No | - | Redis/ElastiCache hostname. If not set, uses in-memory storage. |
+| `CATO_REDIS_PORT` | No | `6379` | Redis port number |
+| `CATO_ENTROPY_QUEUE_NAME` | No | - | SQS queue name for async entropy checks |
+| `CATO_ENTROPY_RESULTS_TABLE` | No | - | DynamoDB table for storing async entropy results |
+| `CATO_CLOUDWATCH_ALARM_PREFIX` | No | `radiant-` | Prefix filter for CloudWatch alarm names |
+| `AWS_REGION` | Yes | - | AWS region for CloudWatch, SQS, DynamoDB |
+
+#### 42.20.11 Troubleshooting Advanced Configuration
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Fracture weights won't save | Sum ≠ 1.0 | Adjust sliders until sum equals 1.0 exactly |
+| Redis shows "In-Memory Fallback" | No endpoint or connection failed | Check `CATO_REDIS_ENDPOINT`, verify VPC/security groups |
+| CloudWatch sync fails | IAM permissions | Ensure Lambda has `cloudwatch:DescribeAlarms` permission |
+| Async entropy jobs stuck "pending" | SQS not configured | Set `CATO_ENTROPY_QUEUE_NAME` environment variable |
+| CBF authorization always passes | Check disabled | Verify `cbf_authorization_check_enabled = true` |
+| BAA check not enforcing | PHI not detected | Verify `enable_redundant_perception = true` |
+| Config not loading per-tenant | Cache stale | Wait 60 seconds for cache expiration |
+| Alarm mapping not triggering | Pattern mismatch | Check `alarm_name` or `alarm_name_pattern` regex |
+
+### 42.21 Security Considerations
+
+1. **Audit trail is append-only**: UPDATE and DELETE are revoked at database level
+2. **CBFs never relax**: enforcement_mode is hardcoded to 'ENFORCE'
+3. **Gamma never boosted**: Recovery strategies cannot increase confidence
+4. **Human escalation is terminal**: Cannot be bypassed programmatically
+5. **Merkle verification**: Any tampering with audit trail is detectable
+6. **RLS policies**: All Cato tables have row-level security enabled
+
+### 42.22 Quick Reference Card
+
+#### Naming
+
+| Say This | To Mean This |
+|----------|--------------|
+| "Cato" | The AI users talk to |
+| "Genesis Cato" | The safety system |
+| "Balanced mood" | Default operating mode |
+| "Scout mood" | Recovery/exploration mode |
+
+#### Moods Summary
+
+| Mood | Curiosity | Service | Best For |
+|------|-----------|---------|----------|
+| **Balanced** | 0.8 | 0.7 | General use (default) |
+| **Scout** | 0.95 | 0.7 | Exploration, recovery |
+| **Sage** | 0.7 | 0.8 | Deep analysis |
+| **Spark** | 0.85 | 0.6 | Creative work |
+| **Guide** | 0.6 | 0.95 | Task completion |
+
+#### Safety Layers
+
+| Layer | Name | Key Component |
+|-------|------|---------------|
+| L4 | Cognitive | Precision Governor |
+| L3 | Control | Control Barrier Functions |
+| L2 | Perception | Semantic Entropy |
+| L1 | Sensory | Immediate Veto |
+| L0 | Recovery | Epistemic Recovery |
+
+#### Immutable Invariants
+
+| Invariant | Value | Meaning |
+|-----------|-------|---------|
+| `CBF_ENFORCEMENT_MODE` | ENFORCE | Shields NEVER relax |
+| `GAMMA_BOOST_ALLOWED` | false | NEVER boost confidence in recovery |
+| `AUTO_MODIFY_DESTRUCTIVE` | false | ALWAYS reject-and-ask for destructive ops |
+| `AUDIT_ALLOW_UPDATE` | false | Append-only audit trail |
+| `AUDIT_ALLOW_DELETE` | false | Immutable audit trail |
+
+#### Key Numbers
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| Livelock threshold | 3 rejections | Triggers recovery |
+| Recovery window | 10 seconds | Time window for livelock detection |
+| Max recovery attempts | 3 | Before human escalation |
+| Audit tile size | 1,000 entries | Entries per tile |
+| Audit retention | 7 years | HIPAA compliance |
+
+### 42.23 Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.3.1 | Jan 2, 2026 | Production release. Clarified Cato (persona) vs Genesis Cato (system) vs Moods. Renamed Bobble → Balanced. |
+| 2.3.0 | Jan 2, 2026 | Added Redis persistence for Epistemic Recovery |
+| 2.2.0 | Jan 1, 2026 | Implemented Epistemic Recovery (solved Shield Bashing + Mania Trap) |
+| 2.1.0 | Dec 31, 2025 | Added mitigations for Gemini's 6 concerns |
+| 2.0.0 | Dec 30, 2025 | Initial Genesis Cato architecture |
+
+### 42.24 Cross-AI Validation
+
+| AI System | Verdict | Key Assessment |
+|-----------|---------|----------------|
+| **Claude Opus 4.5** | ✅ APPROVED | Original architect |
+| **Gemini** | ✅ APPROVED | "Masterpiece of systems engineering" |
+
+> *"RADIANT Genesis v2.3 solves the 'Alignment Tax' paradox. Usually, making an AI safer makes it dumber. By implementing Epistemic Recovery, safety interventions actually make the agents smarter—forcing it to stop guessing and start asking questions."* — Gemini, Final Assessment
+
+---
