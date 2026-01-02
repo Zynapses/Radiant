@@ -3,6 +3,8 @@
 
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { executeStatement } from '../db/client';
+import { callLiteLLMEmbedding } from './litellm.service';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // ============================================================================
 // Types
@@ -748,17 +750,14 @@ Return JSON:
 
   private async generateEmbedding(text: string): Promise<number[]> {
     try {
-      const response = await this.bedrock.send(
-        new InvokeModelCommand({
-          modelId: 'amazon.titan-embed-text-v1',
-          body: JSON.stringify({ inputText: text.substring(0, 8000) }),
-          contentType: 'application/json',
-        })
-      );
-      const result = JSON.parse(new TextDecoder().decode(response.body));
-      return result.embedding;
-    } catch {
-      return new Array(1536).fill(0);
+      const response = await callLiteLLMEmbedding({
+        model: 'text-embedding-3-small',
+        input: text.substring(0, 8000),
+      });
+      return response.data?.[0]?.embedding || [];
+    } catch (error) {
+      logger.warn('Embedding generation failed', { error });
+      return [];
     }
   }
 

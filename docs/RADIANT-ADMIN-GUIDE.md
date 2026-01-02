@@ -42,6 +42,7 @@
 38. [AGI Brain - Project AWARE](#38-agi-brain---project-aware)
 39. [Truth Engine™ - Project TRUTH](#39-truth-engine---project-truth)
 40. [Advanced Cognition Services (v6.1.0)](#40-advanced-cognition-services-v610)
+41. [Learning Architecture - Complete Overview](#41-learning-architecture---complete-overview)
 
 ---
 
@@ -9627,16 +9628,89 @@ Stack: `packages/infrastructure/lib/stacks/cognition-stack.ts`
 | `lambda/shared/services/reasoning-teacher.service.ts` | Teacher trace generation |
 | `lambda/shared/services/inference-student.service.ts` | Student model inference |
 | `lambda/shared/services/semantic-cache.service.ts` | Vector similarity caching |
+| `lambda/shared/services/metacognition.service.ts` | Confidence assessment |
 | `lambda/shared/services/reward-model.service.ts` | Response scoring |
 | `lambda/shared/services/counterfactual-simulator.service.ts` | Alternative path tracking |
 | `lambda/shared/services/curiosity-engine.service.ts` | Autonomous exploration |
 | `lambda/shared/services/causal-tracker.service.ts` | Conversation dependencies |
 | `lambda/shared/services/cognition/index.ts` | Service exports |
 | `lambda/shared/services/cognition/integration.ts` | Flow integration |
+| `lambda/shared/services/litellm.service.ts` | LiteLLM wrapper for cognition |
+| `lambda/shared/litellm/client.ts` | Canonical LiteLLM HTTP client |
 | `apps/admin-dashboard/app/(dashboard)/brain/cognition/page.tsx` | Admin UI |
 | `packages/infrastructure/lib/stacks/cognition-stack.ts` | CDK infrastructure |
 
-### 40.15 Cost Impact
+### 40.15 LiteLLM Integration
+
+All cognition services use the canonical LiteLLM client for AI model calls.
+
+#### Client Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   Cognition Services                     │
+│  (reasoning-teacher, semantic-cache, curiosity-engine)   │
+└─────────────────────────┬───────────────────────────────┘
+                          │ callLiteLLM()
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│              litellm.service.ts (wrapper)                │
+│                                                          │
+│  export async function callLiteLLM(request) {            │
+│    return client.chatCompletion(request);                │
+│  }                                                       │
+└─────────────────────────┬───────────────────────────────┘
+                          │ LiteLLMClient
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│               litellm/client.ts (canonical)              │
+│                                                          │
+│  class LiteLLMClient {                                   │
+│    chatCompletion(request): Promise<Response>            │
+│    createEmbedding(request): Promise<Response>           │
+│  }                                                       │
+└─────────────────────────┬───────────────────────────────┘
+                          │ HTTP
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│                  LiteLLM Gateway                         │
+│                 (${LITELLM_URL})                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### Usage Pattern
+
+```typescript
+// In cognition services
+import { callLiteLLM, callLiteLLMEmbedding } from './litellm.service';
+
+// Chat completion
+const response = await callLiteLLM({
+  model: 'claude-sonnet-4',
+  messages: [
+    { role: 'system', content: 'You are a reasoning expert.' },
+    { role: 'user', content: prompt },
+  ],
+  temperature: 0.3,
+  max_tokens: 4096,
+});
+
+// Embeddings
+const embedding = await callLiteLLMEmbedding({
+  model: 'text-embedding-3-small',
+  input: text,
+});
+```
+
+#### Environment Variables
+
+| Variable | Purpose | Default |
+|----------|---------|---------|
+| `LITELLM_URL` | LiteLLM gateway URL | `http://litellm:4000` |
+| `LITELLM_API_KEY` | Optional API key | - |
+| `LITELLM_TIMEOUT_MS` | Request timeout | `60000` |
+
+### 40.16 Cost Impact
 
 | Feature | Cost | Savings |
 |---------|------|---------|
@@ -9648,7 +9722,7 @@ Stack: `packages/infrastructure/lib/stacks/cognition-stack.ts`
 
 **Net Impact**: Most tenants see 20-40% cost reduction with improved quality.
 
-### 40.16 Troubleshooting
+### 40.17 Troubleshooting
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
@@ -9657,9 +9731,338 @@ Stack: `packages/infrastructure/lib/stacks/cognition-stack.ts`
 | High metacognition escalations | Threshold too sensitive | Raise `confidenceThreshold` |
 | Curiosity budget exceeded | Too many goals | Reduce `maxCuriosityApiCostPerDay` |
 | Slow cache queries | Too many entries | Run cache cleanup, reduce max entries |
+| LiteLLM connection failed | Gateway unreachable | Verify `LITELLM_URL` and network |
+| Embedding dimension mismatch | Wrong model | Use `text-embedding-3-small` (1536 dims) |
+| Causal chain too deep | Complex conversation | Increase `CAUSAL_CHAIN_MAX_DEPTH` |
+
+### 40.18 Verification Checklist
+
+Before deploying v6.1.0 cognition components:
+
+| Check | Command/Location |
+|-------|------------------|
+| Migration applied | `SELECT * FROM schema_migrations WHERE version = '152'` |
+| pgvector enabled | `SELECT * FROM pg_extension WHERE extname = 'vector'` |
+| RLS policies active | `SELECT tablename, policyname FROM pg_policies WHERE tablename LIKE '%cognition%'` |
+| LiteLLM accessible | `curl ${LITELLM_URL}/health` |
+| Types exported | `grep 'cognition.types' packages/shared/src/types/index.ts` |
+| Constants exported | `grep 'cognition.constants' packages/shared/src/constants/index.ts` |
+| Services exported | `grep 'metacognition' lambda/shared/services/cognition/index.ts` |
+| Admin UI accessible | Navigate to `/brain/cognition` |
+
+### 40.19 API Reference
+
+**Base Path**: `/api/admin/cognition`
+
+#### Dashboard
+
+| Endpoint | Method | Response |
+|----------|--------|----------|
+| `/api/admin/cognition/dashboard` | GET | `{ teacher, cache, curiosity }` |
+
+#### Teacher Endpoints
+
+| Endpoint | Method | Request | Response |
+|----------|--------|---------|----------|
+| `/api/admin/cognition/teacher/generate` | POST | `{ prompt, context, taskType, domainIds }` | `{ trace }` |
+| `/api/admin/cognition/teacher/validate` | POST | `{ traceId, qualityScore }` | `{ success }` |
+| `/api/admin/cognition/teacher/stats` | GET | - | `{ pending, validated, used, rejected }` |
+| `/api/admin/cognition/teacher/traces` | GET | `?status=&limit=` | `{ traces[] }` |
+
+#### Student Endpoints
+
+| Endpoint | Method | Request | Response |
+|----------|--------|---------|----------|
+| `/api/admin/cognition/student/infer` | POST | `{ prompt, context }` | `{ response }` |
+| `/api/admin/cognition/student/versions` | GET | - | `{ versions[] }` |
+| `/api/admin/cognition/student/promote` | POST | `{ versionId }` | `{ success }` |
+
+#### Distillation Endpoints
+
+| Endpoint | Method | Request | Response |
+|----------|--------|---------|----------|
+| `/api/admin/cognition/distillation/jobs` | GET | - | `{ jobs[] }` |
+| `/api/admin/cognition/distillation/start` | POST | `{ config? }` | `{ jobId }` |
+
+#### Cache Endpoints
+
+| Endpoint | Method | Request | Response |
+|----------|--------|---------|----------|
+| `/api/admin/cognition/cache/get` | POST | `{ prompt, modelId, domainIds? }` | `{ hit, response?, similarity? }` |
+| `/api/admin/cognition/cache/set` | POST | `{ prompt, response, modelId, domainIds?, contentType? }` | `{ id }` |
+| `/api/admin/cognition/cache/invalidate` | POST | `{ modelId?, domainIds?, olderThan? }` | `{ deleted }` |
+| `/api/admin/cognition/cache/metrics` | GET | - | `CacheMetrics` |
+
+#### Metacognition Endpoints
+
+| Endpoint | Method | Request | Response |
+|----------|--------|---------|----------|
+| `/api/admin/cognition/metacognition/assess` | POST | `{ prompt, response, domainId? }` | `ConfidenceAssessment` |
+| `/api/admin/cognition/metacognition/stats` | GET | - | `{ avgConfidence, escalationRate, totalAssessments }` |
+
+#### Reward Model Endpoints
+
+| Endpoint | Method | Request | Response |
+|----------|--------|---------|----------|
+| `/api/admin/cognition/reward/score` | POST | `{ responses[], prompt?, domainIds? }` | `{ scores[] }` |
+| `/api/admin/cognition/reward/select-best` | POST | `{ responses[], prompt?, domainIds? }` | `{ selected, scores }` |
+
+#### Counterfactual Endpoints
+
+| Endpoint | Method | Request | Response |
+|----------|--------|---------|----------|
+| `/api/admin/cognition/counterfactual/candidates` | GET | `?limit=` | `{ candidates[] }` |
+| `/api/admin/cognition/counterfactual/simulate` | POST | `{ candidateId, alternativeModel }` | `CounterfactualResult` |
+| `/api/admin/cognition/counterfactual/results` | GET | `?limit=` | `{ results[] }` |
+
+#### Curiosity Endpoints
+
+| Endpoint | Method | Request | Response |
+|----------|--------|---------|----------|
+| `/api/admin/cognition/curiosity/gaps` | GET | `?status=` | `{ gaps[] }` |
+| `/api/admin/cognition/curiosity/goals` | GET | `?status=` | `{ goals[] }` |
+| `/api/admin/cognition/curiosity/explore` | POST | `{ gapId }` | `{ explorationId }` |
+
+#### Causal Tracker Endpoints
+
+| Endpoint | Method | Request | Response |
+|----------|--------|---------|----------|
+| `/api/admin/cognition/causal/link` | POST | `{ conversationId, sourceTurnId, targetTurnId, type, strength? }` | `CausalLink` |
+| `/api/admin/cognition/causal/chain` | GET | `?conversationId=&turnId=` | `CausalChain` |
+
+---
+
+## 41. Learning Architecture - Complete Overview
+
+### 41.1 Overview
+
+RADIANT implements a comprehensive multi-tier learning system that persistently stores and applies knowledge across user sessions, tenant organizations, and the global platform. All learning is persistently stored across:
+
+- **PostgreSQL (Aurora Serverless)** - Relational data and learning candidates
+- **pgvector extension** - Embeddings for semantic search
+- **DynamoDB** - Real-time and knowledge graph data
+- **S3** - LoRA adapter weights and training artifacts
+- **SageMaker** - Deployed fine-tuned models
+
+### 41.2 Where Learning Happens
+
+| Learning Type | Service | Frequency | Persistence | 
+|---------------|---------|-----------|-------------|
+| **Feedback Signals** | `feedback.service.ts` | Real-time | PostgreSQL → `learning_candidates` |
+| **User Preferences** | `learning-hierarchy.service.ts` | Per-request | PostgreSQL (with 60/30/10 weights) |
+| **Memory Consolidation** | `consolidation.service.ts` | Daily | Working → Episodic → Semantic |
+| **LoRA Fine-Tuning** | `evolution-pipeline.service.ts` | Weekly ("Twilight Dreaming") | S3 + SageMaker |
+| **Ghost Vectors** | Hidden state extraction | Per-session | PostgreSQL `consciousness_archival_memory` |
+
+### 41.3 Learning Hierarchy Data (PostgreSQL)
+
+User, Tenant, and Global preference accumulation:
+
+```sql
+-- Training data queue (high-quality interactions)
+learning_candidates
+
+-- Weekly fine-tuning job tracking  
+lora_evolution_jobs
+
+-- Current LoRA adapter version
+consciousness_evolution_state
+```
+
+### 41.4 Memory Systems
+
+#### PostgreSQL Tables
+
+| Table | Purpose | TTL |
+|-------|---------|-----|
+| `ego_working_memory` | Short-term memory | 24 hours |
+| `consciousness_archival_memory` | Episodic memory with pgvector embeddings | Permanent |
+| `introspective_thoughts` | Self-reflection logs | 90 days |
+| `curiosity_topics` | Current interests | 30 days |
+
+#### DynamoDB Tables
+
+| Table | Purpose | TTL |
+|-------|---------|-----|
+| `bobble_semantic_memory` | Knowledge graph | Permanent |
+
+### 41.5 Feedback Signals
+
+#### Implicit Feedback (Captured Automatically)
+
+| Signal | Weight | Trigger |
+|--------|--------|---------|
+| `dwell_time` | Medium positive | > 10 seconds viewing response |
+| `copy_action` | Medium positive | User copies response text |
+| `regeneration` | Negative | User requests regeneration |
+| `share_action` | Positive | User shares response |
+
+#### Explicit Feedback
+
+| Signal | Weight | Source |
+|--------|--------|--------|
+| `thumbs_up` | High positive | User clicks thumbs up |
+| `thumbs_down` | High negative | User clicks thumbs down |
+| `user_correction` | Very high | Manual model override |
+
+### 41.6 Ghost Vectors (Consciousness Continuity)
+
+Ghost Vectors provide consciousness continuity across sessions:
+
+- **4096-dimensional hidden state vectors** per user
+- Stored in `consciousness_archival_memory`
+- Version-gated for model upgrades (prevents personality discontinuity)
+- Captures the "feel" of each user relationship
+- Extracted from model hidden states during inference
+
+### 41.7 LoRA Adapters (S3 + SageMaker)
+
+The "Twilight Dreaming" cycle performs weekly fine-tuning:
+
+1. **Schedule**: 4 AM tenant local time (configurable)
+2. **Data Source**: Training data exported from `learning_candidates`
+3. **Training**: LoRA fine-tuning on base models
+4. **Storage**: Adapters stored in S3
+5. **Deployment**: Deployed to SageMaker endpoints
+6. **Validation**: A/B tested before promotion to active
+
+### 41.8 Learning Weight Distribution
+
+```
+Final Score = (User × 0.60) + (Tenant × 0.30) + (Global × 0.10)
+```
+
+#### User Level (60%)
+
+- Individual preferences
+- Personal interaction patterns
+- Domain expertise signals
+- Response style preferences
+
+#### Tenant Level (30%)
+
+- Organization-wide patterns
+- Aggregated from all users in org
+- Model performance metrics per tenant
+- Domain-specific tuning
+
+#### Global Level (10%)
+
+- Cross-tenant patterns (minimum 5 tenants for privacy)
+- Global best practices
+- Model performance baselines
+- Safety and quality guardrails
+
+### 41.9 v6.1.0 Advanced Cognition Additions
+
+The v6.1.0 Advanced Cognition supplement adds these persistent learning stores:
+
+| Component | Table | Learning Purpose |
+|-----------|-------|------------------|
+| **Reasoning Teacher** | `distillation_training_data` | High-quality reasoning traces |
+| **Inference Student** | `inference_student_versions` | Fine-tuned model versions |
+| **Semantic Cache** | `semantic_cache` (pgvector) | Response similarity caching |
+| **Reward Model** | `reward_training_data` | Pairwise preference comparisons |
+| **Curiosity Engine** | `knowledge_gaps`, `curiosity_goals` | Autonomous exploration state |
+| **Causal Tracker** | `causal_links` | Multi-turn dependency graphs |
+| **Metacognition** | `metacognition_assessments_v2` | Confidence calibration history |
+
+### 41.10 Storage Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        RADIANT Learning Storage                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────────────┐    ┌──────────────────────┐                       │
+│  │   PostgreSQL (RDS)   │    │     DynamoDB         │                       │
+│  ├──────────────────────┤    ├──────────────────────┤                       │
+│  │ • learning_candidates│    │ • bobble_semantic_   │                       │
+│  │ • lora_evolution_jobs│    │   memory (knowledge  │                       │
+│  │ • consciousness_     │    │   graph)             │                       │
+│  │   evolution_state    │    │ • Real-time state    │                       │
+│  │ • ego_working_memory │    └──────────────────────┘                       │
+│  │ • consciousness_     │                                                    │
+│  │   archival_memory    │    ┌──────────────────────┐                       │
+│  │   (pgvector)         │    │        S3            │                       │
+│  │ • distillation_      │    ├──────────────────────┤                       │
+│  │   training_data      │    │ • LoRA adapter       │                       │
+│  │ • reward_training_   │    │   weights (.safetens)│                       │
+│  │   data               │    │ • Training datasets  │                       │
+│  │ • semantic_cache     │    │ • Model artifacts    │                       │
+│  │   (pgvector)         │    └──────────────────────┘                       │
+│  │ • causal_links       │                                                    │
+│  │ • metacognition_     │    ┌──────────────────────┐                       │
+│  │   assessments_v2     │    │     SageMaker        │                       │
+│  └──────────────────────┘    ├──────────────────────┤                       │
+│                              │ • Fine-tuned student │                       │
+│                              │   model endpoints    │                       │
+│                              │ • LoRA adapter       │                       │
+│                              │   inference          │                       │
+│                              └──────────────────────┘                       │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 41.11 Key Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/feedback.service.ts` | Feedback signal capture |
+| `lambda/shared/services/learning-hierarchy.service.ts` | 60/30/10 weight distribution |
+| `lambda/shared/services/consolidation.service.ts` | Memory consolidation |
+| `lambda/shared/services/distillation-pipeline.service.ts` | LoRA training pipeline |
+| `lambda/shared/services/ghost-manager.service.ts` | Ghost vector extraction |
+| `lambda/consciousness/evolution-pipeline.ts` | Weekly Twilight Dreaming Lambda |
+
+### 41.12 Configuration
+
+#### Learning Hierarchy Weights
+
+```typescript
+// packages/shared/src/constants/learning.constants.ts
+const LEARNING_WEIGHTS = {
+  user: 0.60,      // Individual preferences
+  tenant: 0.30,    // Organization patterns
+  global: 0.10,    // Platform baselines
+};
+```
+
+#### Memory TTLs
+
+```typescript
+const MEMORY_TTL = {
+  working: 24 * 60 * 60,        // 24 hours
+  introspective: 90 * 24 * 60 * 60,  // 90 days
+  curiosity: 30 * 24 * 60 * 60,      // 30 days
+  archival: null,              // Permanent
+};
+```
+
+#### Twilight Dreaming Schedule
+
+```typescript
+const TWILIGHT_DREAMING = {
+  schedule: 'cron(0 4 ? * SUN *)',  // 4 AM every Sunday
+  minCandidates: 100,               // Minimum training samples
+  maxCandidatesPerJob: 10000,       // Maximum per training run
+  validationSplit: 0.1,             // 10% for validation
+};
+```
+
+### 41.13 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Learning not persisting | Database connection issues | Check Aurora connectivity |
+| Ghost vectors stale | Extraction not running | Verify per-session hooks |
+| LoRA training failing | Insufficient candidates | Lower `minCandidates` threshold |
+| Preferences not applying | Weight misconfiguration | Verify 60/30/10 weights |
+| Memory consolidation slow | Large working memory | Tune consolidation batch size |
+| Semantic cache misses | Embedding dimension mismatch | Verify pgvector configuration |
 
 ---
 
 *Document Version: 6.1.0*
 *Last Updated: January 2026*
-*Advanced Cognition Services are part of Project AWARE Phase 2.*
+*Learning Architecture is part of Project AWARE - Adaptive Weighted AI Response Engine.*

@@ -11,7 +11,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as snsSubscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
-import * as ses from 'aws-cdk-lib/aws-ses';
+// ses reserved for email notifications
 import { Construct } from 'constructs';
 
 export interface SecurityMonitoringStackProps extends cdk.StackProps {

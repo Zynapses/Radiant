@@ -34,7 +34,7 @@ export class MultiRegionStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: MultiRegionStackProps) {
     super(scope, id, props);
 
-    const { appId, environment, primaryRegion, secondaryRegions, domainName, hostedZoneId } = props;
+    const { appId, environment, primaryRegion, domainName, hostedZoneId } = props;
 
     // =========================================================================
     // Global Database
@@ -43,7 +43,8 @@ export class MultiRegionStack extends cdk.Stack {
     // Note: Global cluster must be created in primary region first,
     // then secondary clusters added in other regions
     
-    const globalClusterIdentifier = `${appId}-${environment}-global`;
+    // globalClusterIdentifier reserved for Aurora Global setup
+    // const globalClusterIdentifier = `${appId}-${environment}-global`;
     
     // This would be created in the primary region stack
     // Secondary regions would reference this and add read replicas
@@ -53,7 +54,7 @@ export class MultiRegionStack extends cdk.Stack {
     // =========================================================================
     
     // Primary bucket (created in primary region)
-    const primaryBucket = new s3.Bucket(this, 'PrimaryBucket', {
+    new s3.Bucket(this, 'PrimaryBucket', {
       bucketName: `${appId}-storage-${environment}-${primaryRegion}`,
       versioned: true,
       encryption: s3.BucketEncryption.S3_MANAGED,
@@ -72,7 +73,7 @@ export class MultiRegionStack extends cdk.Stack {
       enabled: true,
     });
 
-    const listener = new globalaccelerator.Listener(this, 'Listener', {
+    new globalaccelerator.Listener(this, 'Listener', {
       accelerator,
       portRanges: [{ fromPort: 443, toPort: 443 }],
       protocol: globalaccelerator.ConnectionProtocol.TCP,
@@ -86,7 +87,7 @@ export class MultiRegionStack extends cdk.Stack {
     // Route 53 Health Checks
     // =========================================================================
     
-    const hostedZone = route53.HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
+    route53.HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
       hostedZoneId,
       zoneName: domainName,
     });
@@ -179,12 +180,12 @@ export class RegionalStack extends cdk.Stack {
   }) {
     super(scope, id, props);
 
-    const { appId, environment, isPrimary, globalClusterIdentifier } = props;
+    const { isPrimary } = props;
 
     // Database - Primary or Secondary
     if (isPrimary) {
       // Primary creates the global cluster
-      const cluster = new rds.DatabaseCluster(this, 'Database', {
+      new rds.DatabaseCluster(this, 'Database', {
         engine: rds.DatabaseClusterEngine.auroraPostgres({
           version: rds.AuroraPostgresEngineVersion.VER_15_4,
         }),

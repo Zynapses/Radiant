@@ -2,7 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+// dynamodb reserved for task state tracking
 import * as sns from 'aws-cdk-lib/aws-sns';
 import { Construct } from 'constructs';
 
@@ -21,7 +21,7 @@ export class ScheduledTasksStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ScheduledTasksStackProps) {
     super(scope, id, props);
 
-    const { appId, environment, alertsTopic } = props;
+    const { appId, environment } = props;
 
     // =========================================================================
     // Usage Aggregation (hourly)

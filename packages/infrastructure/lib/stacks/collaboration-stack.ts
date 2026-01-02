@@ -153,7 +153,7 @@ export class CollaborationStack extends cdk.Stack {
     });
 
     // WebSocket stage
-    const websocketStage = new apigatewayv2.WebSocketStage(this, 'CollaborationStage', {
+    new apigatewayv2.WebSocketStage(this, 'CollaborationStage', {
       webSocketApi: websocketApi,
       stageName: environment,
       autoDeploy: true,

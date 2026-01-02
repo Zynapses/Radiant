@@ -7,7 +7,7 @@
 import type { SemanticCacheEntry, ContentType, CacheMetrics } from '@radiant/shared';
 import { CACHE_TTL_CONFIGS, CACHE_SIMILARITY_THRESHOLD, CACHE_MAX_ENTRIES_PER_TENANT } from '@radiant/shared/constants';
 import { getDbPool } from './database';
-import { callLiteLLM } from './litellm.service';
+import { callLiteLLMEmbedding } from './litellm.service';
 
 export class SemanticCacheService {
   private metricsBuffer: Map<string, { hits: number; misses: number }> = new Map();
@@ -209,8 +209,8 @@ export class SemanticCacheService {
   }
   
   private async generateEmbedding(text: string): Promise<number[]> {
-    const response = await callLiteLLM({ model: 'text-embedding-3-small', input: text });
-    return response.data?.[0]?.embedding || new Array(1536).fill(0);
+    const response = await callLiteLLMEmbedding({ model: 'text-embedding-3-small', input: text });
+    return response.data?.[0]?.embedding || [];
   }
   
   private async recordHit(entryId: string, tenantId: string): Promise<void> {

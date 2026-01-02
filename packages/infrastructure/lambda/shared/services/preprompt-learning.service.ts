@@ -260,7 +260,7 @@ class PrepromptLearningService {
     }
 
     // Complexity bonus
-    if (complexity && template.complexityRange.includes(complexity as any)) {
+    if (complexity && template.complexityRange.includes(complexity)) {
       complexityBonus = template.complexityWeight;
     }
 
@@ -617,7 +617,7 @@ class PrepromptLearningService {
       totalFeedback: Number(uStats.total_feedback),
       overallAvgRating: Number(uStats.avg_rating) || 0,
       overallThumbsUpRate: Number(uStats.thumbs_up_rate) || 0,
-      attributionDistribution: attributionDist as any,
+      attributionDistribution: attributionDist as Record<string, number>,
       learningEnabled: learningConfig.enabled,
       explorationRate: explorationConfig.rate,
       topTemplates: topTemplates.rows.map(r => ({
@@ -909,7 +909,7 @@ class PrepromptLearningService {
       applicableModes: (row.applicable_modes as string[]) || [],
       applicableDomains: (row.applicable_domains as string[]) || [],
       applicableTaskTypes: (row.applicable_task_types as string[]) || [],
-      complexityRange: (row.complexity_range as any[]) || [],
+      complexityRange: (row.complexity_range as Array<'simple' | 'moderate' | 'complex' | 'expert'>) || [],
       compatibleModels: (row.compatible_models as string[]) || [],
       preferredModels: (row.preferred_models as string[]) || [],
       incompatibleModels: (row.incompatible_models as string[]) || [],
@@ -952,7 +952,7 @@ class PrepromptLearningService {
       detectedSubspecialtyId: row.detected_subspecialty_id ? String(row.detected_subspecialty_id) : undefined,
       domainConfidence: row.domain_confidence ? Number(row.domain_confidence) : undefined,
       taskType: row.task_type ? String(row.task_type) : undefined,
-      complexity: row.complexity as any,
+      complexity: row.complexity as 'simple' | 'moderate' | 'complex' | 'expert' | undefined,
       promptTokenCount: row.prompt_token_count ? Number(row.prompt_token_count) : undefined,
       workflowId: row.workflow_id ? String(row.workflow_id) : undefined,
       workflowCode: row.workflow_code ? String(row.workflow_code) : undefined,
@@ -961,7 +961,7 @@ class PrepromptLearningService {
       latencyMs: row.latency_ms ? Number(row.latency_ms) : undefined,
       tokensUsed: row.tokens_used ? Number(row.tokens_used) : undefined,
       costCents: row.cost_cents ? Number(row.cost_cents) : undefined,
-      status: row.status as any,
+      status: row.status as 'pending' | 'executing' | 'completed' | 'failed',
       errorMessage: row.error_message ? String(row.error_message) : undefined,
       createdAt: new Date(row.created_at as string),
       completedAt: row.completed_at ? new Date(row.completed_at as string) : undefined,

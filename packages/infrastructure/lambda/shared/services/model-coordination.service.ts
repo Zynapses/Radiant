@@ -3,6 +3,7 @@
 // Includes timed sync, auto-discovery, and endpoint management
 
 import { executeStatement, stringParam, longParam } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import type {
   ModelEndpoint,
   ModelRegistryEntry,
@@ -248,7 +249,7 @@ class ModelCoordinationService {
           await inferenceComponentsService.autoTierNewModel(model.id, 'default');
         } catch (tierError) {
           // Non-fatal - model sync should succeed even if tiering fails
-          console.warn('Failed to auto-tier model:', model.id, tierError);
+          logger.warn('Failed to auto-tier model', { modelId: model.id, error: tierError });
         }
         
       } else {

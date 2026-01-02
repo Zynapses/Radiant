@@ -6,6 +6,7 @@
  */
 
 import { Pool, PoolClient } from 'pg';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { AuthContext, PermissionLevel } from '@radiant/shared/types/user-registry.types';
 
 const pool = new Pool({
@@ -20,7 +21,7 @@ const pool = new Pool({
 });
 
 pool.on('error', (err) => {
-  console.error('Unexpected database pool error:', err);
+  logger.error('Unexpected database pool error', err);
 });
 
 /**
@@ -102,7 +103,7 @@ export async function withSecureDBContext<T>(
     try {
       await client.query('RESET ALL');
     } catch (resetError) {
-      console.error('Failed to reset session:', resetError);
+      logger.error('Failed to reset session', resetError as Error);
     }
     client.release();
   }
@@ -149,7 +150,7 @@ export async function withAuthContext<T>(
     try {
       await client.query('SELECT auth.clear_context()');
     } catch (clearError) {
-      console.error('Failed to clear auth context:', clearError);
+      logger.error('Failed to clear auth context', clearError as Error);
     }
     client.release();
   }

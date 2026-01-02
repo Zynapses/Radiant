@@ -335,6 +335,12 @@ async function routeRequest(
     return translationHandler(event);
   }
 
+  // Cognition v6.1.0 - Advanced Cognition Services
+  if (pathParts[1] === 'cognition') {
+    const { handler: cognitionHandler } = await import('./cognition');
+    return cognitionHandler(event);
+  }
+
   throw new NotFoundError(`Admin route not found: ${method} ${path}`);
 }
 

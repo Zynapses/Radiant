@@ -1,7 +1,7 @@
 // RADIANT v4.18.0 - Result Derivation Service
 // Aggregates and provides comprehensive execution history for Think Tank results
 
-import { executeStatement } from '../utils/database';
+import { executeStatement } from '../db/client';
 import type {
   ResultDerivation,
   DerivationPlan,

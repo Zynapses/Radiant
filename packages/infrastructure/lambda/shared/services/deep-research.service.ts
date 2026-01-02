@@ -2,6 +2,7 @@
 // Asynchronous background research with browser automation
 
 import { executeStatement, stringParam } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import type {
   ResearchJob,
   ResearchSource,
@@ -136,7 +137,7 @@ class DeepResearchService {
 
     } catch (error) {
       job.status = 'failed';
-      console.error(`Research job ${jobId} failed:`, error);
+      logger.error(`Research job ${jobId} failed`, error as Error);
     }
 
     await this.saveJob(job);
@@ -412,11 +413,11 @@ class DeepResearchService {
   private async reviewOutput(job: ResearchJob): Promise<void> {
     // Quality checks
     if (!job.briefingDocument || job.briefingDocument.length < 500) {
-      console.warn(`Job ${job.id}: Briefing document may be too short`);
+      logger.warn(`Job ${job.id}: Briefing document may be too short`);
     }
 
     if (job.sourcesProcessed < 5) {
-      console.warn(`Job ${job.id}: Few sources processed (${job.sourcesProcessed})`);
+      logger.warn(`Job ${job.id}: Few sources processed (${job.sourcesProcessed})`);
     }
   }
 
@@ -471,7 +472,7 @@ class DeepResearchService {
           }));
         }
       } catch (error) {
-        console.warn('Google search failed, falling back to DuckDuckGo', error);
+        logger.warn('Google search failed, falling back to DuckDuckGo', { error });
       }
     }
     
@@ -507,7 +508,7 @@ class DeepResearchService {
         return results;
       }
     } catch (error) {
-      console.warn('DuckDuckGo search failed', error);
+      logger.warn('DuckDuckGo search failed', { error });
     }
     
     // Final fallback: return empty results
@@ -525,7 +526,7 @@ class DeepResearchService {
     if (config.respectRobotsTxt) {
       const canFetch = await this.checkRobotsTxt(url);
       if (!canFetch) {
-        console.warn(`Blocked by robots.txt: ${url}`);
+        logger.warn(`Blocked by robots.txt: ${url}`);
         return null;
       }
     }
@@ -573,7 +574,7 @@ class DeepResearchService {
       
       return { text, hasImages, publishDate };
     } catch (error) {
-      console.warn(`Failed to fetch ${url}:`, error);
+      logger.warn(`Failed to fetch ${url}`, { error });
       return null;
     }
   }

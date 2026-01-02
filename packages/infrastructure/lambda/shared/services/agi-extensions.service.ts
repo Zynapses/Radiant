@@ -2,6 +2,7 @@
 // Explainability, Tool Use, Safety, Feedback Learning, Dialogue Management
 
 import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { modelRouterService } from './model-router.service';
 
 // ============================================================================
@@ -181,7 +182,7 @@ Return JSON:
           confidence: parsed.overall_confidence || 0.7,
         };
       }
-    } catch { /* explanation generation failed */ }
+    } catch (error) { logger.debug('Explanation generation failed', { error }); }
 
     return {
       traceId: '',
@@ -523,7 +524,7 @@ Query: ${query}`,
                   modifiedContent = modifiedContent.replace(regex, '[REDACTED]');
                 }
               }
-            } catch { /* invalid regex */ }
+            } catch (error) { logger.debug('Invalid regex pattern', { error }); }
           }
           break;
 
@@ -760,7 +761,7 @@ Return JSON:
           dialogueAct: parsed.dialogue_act || 'other',
         };
       }
-    } catch { /* analysis failed */ }
+    } catch (error) { logger.debug('Dialogue analysis failed', { error }); }
 
     return { intent: 'unknown', sentiment: 0, dialogueAct: 'other' };
   }
@@ -827,7 +828,7 @@ Return JSON:
           status: 'pending',
         };
       }
-    } catch { /* decomposition failed */ }
+    } catch (error) { logger.debug('Task decomposition failed', { error }); }
 
     return {
       decompositionId: '',

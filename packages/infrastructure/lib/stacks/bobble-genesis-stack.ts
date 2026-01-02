@@ -2,9 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as budgets from 'aws-cdk-lib/aws-budgets';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as events from 'aws-cdk-lib/aws-events';
-import * as targets from 'aws-cdk-lib/aws-events-targets';
+// lambda, events, targets reserved for scheduled genesis checks
 import { Construct } from 'constructs';
 
 interface BobbleGenesisStackProps extends cdk.StackProps {

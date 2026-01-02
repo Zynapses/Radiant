@@ -5,6 +5,7 @@
  */
 
 import type { CounterfactualResult } from '@radiant/shared';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { COUNTERFACTUAL_SAMPLING_STRATEGIES, COUNTERFACTUAL_MAX_DAILY_SIMULATIONS } from '@radiant/shared/constants';
 import { getDbPool } from './database';
 import { callLiteLLM } from './litellm.service';
@@ -63,7 +64,7 @@ export class CounterfactualSimulatorService {
     const tenantId = candidate.tenant_id;
     
     if (!this.checkDailyLimit(tenantId)) {
-      console.log(`Daily simulation limit reached for tenant ${tenantId}`);
+      logger.info(`Daily simulation limit reached for tenant ${tenantId}`);
       return null;
     }
     
@@ -84,7 +85,7 @@ export class CounterfactualSimulatorService {
       alternativeLatencyMs = Date.now() - startTime;
       alternativeCost = this.estimateCost(alternativeModel, candidate.prompt.length, alternativeResponse.length);
     } catch (error) {
-      console.error(`Failed to simulate alternative model ${alternativeModel}:`, error);
+      logger.error(`Failed to simulate alternative model ${alternativeModel}`, error as Error);
     }
     
     let originalRewardScore: number | null = null;
@@ -119,7 +120,7 @@ export class CounterfactualSimulatorService {
         else if (delta < -0.05) preferredByReward = 'original';
         else preferredByReward = 'equal';
       } catch (error) {
-        console.error('Failed to score responses:', error);
+        logger.error('Failed to score responses', error as Error);
       }
     }
     

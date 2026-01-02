@@ -2,6 +2,8 @@
 // AGI Enhancement Phase 4: Model user cognitive state, predict needs, anticipatory assistance
 
 import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { callLiteLLMEmbedding } from './litellm.service';
 import { modelRouterService } from './model-router.service';
 import { episodicMemoryService } from './episodic-memory.service';
 
@@ -311,7 +313,7 @@ Return empty array if no clear goals detected.`;
         }
         return trackedGoals;
       }
-    } catch { /* no goals detected */ }
+    } catch (error) { logger.debug('No goals detected', { error }); }
 
     return [];
   }
@@ -390,7 +392,7 @@ Return JSON:
           confidence: parsed.confidence || 0.5,
         };
       }
-    } catch { /* use defaults */ }
+    } catch (error) { logger.debug('Emotion detection failed, using defaults', { error }); }
 
     // Store in history
     await executeStatement(
@@ -525,7 +527,7 @@ Return JSON array:
           });
         }
       }
-    } catch { /* no predictions */ }
+    } catch (error) { logger.debug('No predictions generated', { error }); }
 
     return predictions;
   }
@@ -603,7 +605,7 @@ Keep it under 200 words. Be direct and concise.`;
           originalValue: response.length,
           adaptedValue: adaptedResponse.length,
         });
-      } catch { /* keep original */ }
+      } catch (error) { logger.debug('Verbosity adaptation failed, keeping original', { error }); }
     } else if (verbosityPref === 'verbose' && response.length < 200) {
       const expandedPrompt = `Expand this response with more context, examples, and explanation:
 
@@ -618,7 +620,7 @@ Add relevant details and examples. Be thorough but not redundant.`;
           originalValue: response.length,
           adaptedValue: adaptedResponse.length,
         });
-      } catch { /* keep original */ }
+      } catch (error) { logger.debug('Verbosity adaptation failed, keeping original', { error }); }
     }
 
     // Apply formality adaptation
@@ -640,7 +642,7 @@ Keep the same information but adjust the language style.`;
             adaptedValue: formalityPref,
           });
         }
-      } catch { /* keep current */ }
+      } catch (error) { logger.debug('Formality adaptation failed, keeping current', { error }); }
     }
 
     // Record adaptation usage
@@ -851,7 +853,7 @@ Return null if expertise cannot be determined.`;
           };
         }
       }
-    } catch { /* could not detect */ }
+    } catch (error) { logger.debug('Could not detect confusion', { error }); }
 
     return null;
   }
@@ -862,13 +864,14 @@ Return null if expertise cannot be determined.`;
 
   private async generateEmbedding(text: string): Promise<number[]> {
     try {
-      const response = await modelRouterService.invoke({
-        modelId: 'amazon/titan-embed-text',
-        messages: [{ role: 'user', content: text.substring(0, 8000) }],
+      const response = await callLiteLLMEmbedding({
+        model: 'text-embedding-3-small',
+        input: text.substring(0, 8000),
       });
-      return new Array(1536).fill(0);
-    } catch {
-      return new Array(1536).fill(0);
+      return response.data?.[0]?.embedding || [];
+    } catch (error) {
+      logger.warn('Embedding generation failed', { error });
+      return [];
     }
   }
 

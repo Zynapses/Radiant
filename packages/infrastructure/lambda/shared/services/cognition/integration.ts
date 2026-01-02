@@ -4,6 +4,7 @@
  */
 
 import { semanticCache } from '../semantic-cache.service';
+import { enhancedLogger as logger } from '../../logging/enhanced-logger';
 import { rewardModel } from '../reward-model.service';
 import { inferenceStudent } from '../inference-student.service';
 import { counterfactualSimulator } from '../counterfactual-simulator.service';
@@ -151,7 +152,7 @@ export async function enhancedInference(
       candidateId,
       'claude-sonnet-4',
       'random'
-    ).catch(console.error);
+    ).catch((error) => logger.error('Counterfactual simulation failed', error as Error));
   }
   
   return {

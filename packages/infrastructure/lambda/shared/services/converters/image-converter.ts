@@ -1,7 +1,7 @@
 // RADIANT v4.18.55 - Image Description & OCR Converter
 // Uses vision models for description and AWS Textract for OCR
 
-import { TextractClient, DetectDocumentTextCommand, AnalyzeDocumentCommand } from '@aws-sdk/client-textract';
+import { TextractClient, DetectDocumentTextCommand, AnalyzeDocumentCommand, FeatureType } from '@aws-sdk/client-textract';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 import * as sharp from 'sharp';
@@ -185,13 +185,13 @@ export async function extractTextFromImage(
 
     if (detectTables || detectForms) {
       // Use AnalyzeDocument for tables/forms
-      const featureTypes: string[] = [];
-      if (detectTables) featureTypes.push('TABLES');
-      if (detectForms) featureTypes.push('FORMS');
+      const featureTypes: FeatureType[] = [];
+      if (detectTables) featureTypes.push(FeatureType.TABLES);
+      if (detectForms) featureTypes.push(FeatureType.FORMS);
 
       response = await textract.send(new AnalyzeDocumentCommand({
         Document: { Bytes: processedBuffer },
-        FeatureTypes: featureTypes as any,
+        FeatureTypes: featureTypes,
       }));
     } else {
       // Use DetectDocumentText for simple text extraction

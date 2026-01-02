@@ -4,7 +4,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
-import * as iam from 'aws-cdk-lib/aws-iam';
+// iam reserved for future task role policies
 import { Construct } from 'constructs';
 
 export interface LiteLLMConstructProps {
@@ -81,7 +81,7 @@ export class LiteLLMConstruct extends Construct {
     };
 
     // LiteLLM Container
-    const container = taskDefinition.addContainer('litellm', {
+    taskDefinition.addContainer('litellm', {
       image: ecs.ContainerImage.fromRegistry('ghcr.io/berriai/litellm:main-latest'),
       logging: ecs.LogDrivers.awsLogs({
         streamPrefix: 'litellm',

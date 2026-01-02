@@ -399,7 +399,7 @@ export class ModelRouterService {
       return response;
     } catch (primaryError) {
       const errorMsg = primaryError instanceof Error ? primaryError.message : 'Unknown error';
-      console.warn(`Primary provider ${config.provider} failed for ${request.modelId}:`, primaryError);
+      logger.warn(`Primary provider ${config.provider} failed for ${request.modelId}`, { error: primaryError });
       this.recordFailure(config.provider, errorMsg);
     }
 
@@ -419,7 +419,7 @@ export class ModelRouterService {
         return response;
       } catch (fallbackError) {
         const errorMsg = fallbackError instanceof Error ? fallbackError.message : 'Unknown error';
-        console.warn(`Fallback provider ${fallbackProvider} failed:`, fallbackError);
+        logger.warn(`Fallback provider ${fallbackProvider} failed`, { error: fallbackError });
         this.recordFailure(fallbackProvider, errorMsg);
       }
     }

@@ -5,6 +5,7 @@
  */
 
 import type { KnowledgeGap, Goal, GoalType, GoalStatus, GoalGuardrails, Milestone } from '@radiant/shared';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { DEFAULT_GOAL_GUARDRAILS } from '@radiant/shared/constants';
 import { getDbPool } from './database';
 import { callLiteLLM } from './litellm.service';
@@ -154,7 +155,7 @@ If no significant gap, return: { "has_gap": false }`;
     }
     
     if (goal.priority > this.guardrails.requireApprovalAbove) {
-      console.log(`Goal ${goalId} requires approval (priority ${goal.priority})`);
+      logger.info(`Goal ${goalId} requires approval (priority ${goal.priority})`);
       return { tokensUsed: 0, costUsed: 0, progress: goal.progress };
     }
     

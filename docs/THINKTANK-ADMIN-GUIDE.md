@@ -532,11 +532,30 @@ The system learns from user interactions:
 | `typeahead_enabled` | true | Enable typeahead suggestions |
 | `typeahead_min_chars` | 3 | Characters before suggestions appear |
 | `typeahead_max_suggestions` | 5 | Max suggestions to show |
+| `typeahead_debounce_ms` | 150 | Debounce delay before fetching suggestions |
+| `typeahead_use_ai` | false | Enable AI-generated suggestions (slower) |
 | `result_ideas_enabled` | true | Show ideas with responses |
 | `result_ideas_max` | 5 | Max ideas per response |
-| `result_ideas_modes` | research, analysis, thinking | Modes that show ideas |
+| `result_ideas_min_confidence` | 0.6 | Minimum confidence for idea display |
+| `result_ideas_modes` | research, analysis, thinking, extended_thinking | Modes that show ideas |
+| `proactive_enabled` | false | Enable proactive push suggestions |
+| `proactive_max_per_day` | 3 | Max proactive suggestions per day |
 
-### 14.6 Persistent Learning
+### 14.6 Pattern Matching
+
+The service uses regex patterns for instant local matching:
+
+| Pattern | Trigger Regex | Suggested Completions |
+|---------|---------------|----------------------|
+| `howTo` | `/^how (do\|can\|to\|would)/i` | "step by step", "with examples", "for beginners", "best practices" |
+| `explain` | `/^(explain\|what is\|what are\|describe)/i` | "in simple terms", "with analogies", "the key concepts", "pros and cons" |
+| `compare` | `/^(compare\|difference\|versus\|vs)/i` | "with a table", "key differences", "which is better for", "trade-offs" |
+| `code` | `/^(write\|create\|build\|implement\|code)/i` | "with error handling", "with tests", "with documentation", "production-ready" |
+| `analyze` | `/^(analyze\|review\|evaluate\|assess)/i` | "strengths and weaknesses", "with recommendations", "risk assessment", "detailed breakdown" |
+| `summarize` | `/^(summarize\|summary\|tldr\|brief)/i` | "key points", "in bullet points", "executive summary", "one paragraph" |
+| `debug` | `/^(debug\|fix\|error\|issue\|problem)/i` | "with explanation", "step by step", "root cause", "prevention tips" |
+
+### 14.7 Persistent Learning
 
 The AGI Brain learns persistently from user interactions:
 
@@ -581,6 +600,43 @@ The AGI Brain learns persistently from user interactions:
 - `click_rate` - % of times idea was clicked
 - `association_strength` - How strongly a prompt-idea pair works
 - `times_used` - Popularity of prompt pattern
+
+### 14.8 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `agi_ideas_config` | Per-tenant AGI Ideas configuration |
+| `prompt_patterns` | Common prompt patterns for typeahead matching |
+| `user_prompt_history` | User prompt history with embeddings for suggestions |
+| `suggestion_log` | Typeahead suggestion usage tracking |
+| `result_ideas` | Ideas shown with AI responses |
+| `proactive_suggestions` | Push notification suggestions |
+| `trending_prompts` | Popular prompts by domain |
+| `agi_learned_prompts` | Persisted prompts with success rates and embeddings |
+| `agi_learned_ideas` | Learned idea patterns with click rates |
+| `prompt_idea_associations` | Links between prompts and effective ideas |
+| `agi_learning_events` | Raw learning signals for analysis |
+| `agi_learning_aggregates` | Pre-computed learning statistics |
+
+### 14.9 Key Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/agi-ideas.service.ts` | Main service (570 lines) |
+| `lambda/thinktank/ideas.ts` | API handler |
+| `packages/shared/src/types/agi-ideas.types.ts` | Type definitions |
+| `migrations/049_agi_ideas.sql` | Database schema |
+
+### 14.10 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| No suggestions appearing | `typeahead_enabled` is false | Enable in tenant config |
+| Suggestions too slow | AI generation enabled | Set `typeahead_use_ai` to false |
+| Wrong domain suggestions | Domain detection failed | Check domain taxonomy config |
+| Ideas not learning | Low usage volume | Need more user interactions |
+| Proactive suggestions not sent | Feature disabled by default | Enable `proactive_enabled` |
+| Duplicate suggestions | Pattern overlap | Review custom patterns |
 
 ---
 

@@ -2,7 +2,9 @@
 // AGI Enhancement Phase 5: Hierarchical Task Networks, long-horizon planning, multi-session continuity
 
 import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { modelRouterService } from './model-router.service';
+import { callLiteLLMEmbedding } from './litellm.service';
 import { episodicMemoryService } from './episodic-memory.service';
 
 // ============================================================================
@@ -293,7 +295,7 @@ Keep tasks concrete and actionable. Each primitive task should be completable in
           estimatedTotalHours: parsed.estimated_total_hours || 1,
         };
       }
-    } catch { /* use defaults */ }
+    } catch (error) { logger.debug('Goal decomposition failed, using defaults', { error }); }
 
     return {
       tasks: [{ name: goal, type: 'primitive', actionType: 'analyze' }],
@@ -912,13 +914,14 @@ Complete the task and provide the result.`;
 
   private async generateEmbedding(text: string): Promise<number[]> {
     try {
-      await modelRouterService.invoke({
-        modelId: 'amazon/titan-embed-text',
-        messages: [{ role: 'user', content: text.substring(0, 8000) }],
+      const response = await callLiteLLMEmbedding({
+        model: 'text-embedding-3-small',
+        input: text.substring(0, 8000),
       });
-      return new Array(1536).fill(0);
-    } catch {
-      return new Array(1536).fill(0);
+      return response.data?.[0]?.embedding || [];
+    } catch (error) {
+      logger.warn('Embedding generation failed', { error });
+      return [];
     }
   }
 

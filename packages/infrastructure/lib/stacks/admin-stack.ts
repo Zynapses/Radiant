@@ -2,14 +2,14 @@ import * as cdk from 'aws-cdk-lib';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
-import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
+// s3deploy reserved for static asset deployment
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+// dynamodb reserved for admin state tables
 import * as rds from 'aws-cdk-lib/aws-rds';
 import { Construct } from 'constructs';
 import type { TierConfig, Environment } from '@radiant/shared';

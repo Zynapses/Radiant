@@ -348,7 +348,7 @@ export const canEdit = (permission: Permission): boolean =>
 export const canComment = (permission: Permission): boolean =>
   permission === 'owner' || permission === 'editor' || permission === 'commenter';
 
-export const canView = (permission: Permission): boolean => true;
+export const canView = (_permission: Permission): boolean => true;
 
 export const canManageParticipants = (permission: Permission): boolean =>
   permission === 'owner';
