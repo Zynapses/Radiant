@@ -217,6 +217,59 @@ export async function updateStep(
   }
 }
 
+// POST /api/thinktank/brain-plan/:planId/evaluate-safety - Evaluate response through Cato Safety Pipeline
+export async function evaluateSafety(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  try {
+    await getUserFromToken(event);
+    const planId = event.pathParameters?.planId;
+    const body = JSON.parse(event.body || '{}');
+
+    if (!planId) {
+      return {
+        statusCode: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: 'planId is required' }),
+      };
+    }
+
+    if (!body.generatedResponse) {
+      return {
+        statusCode: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: 'generatedResponse is required' }),
+      };
+    }
+
+    // Run through Cato Safety Pipeline
+    const safetyResult = await agiBrainPlannerService.evaluateSafety(
+      planId,
+      body.generatedResponse
+    );
+
+    return {
+      statusCode: 200,
+      headers: corsHeaders,
+      body: JSON.stringify({
+        allowed: safetyResult.allowed,
+        blockedBy: safetyResult.blockedBy,
+        recommendation: safetyResult.recommendation,
+        retryWithContext: safetyResult.retryWithContext,
+        allowedGamma: safetyResult.allowedGamma,
+        effectivePersona: safetyResult.effectivePersona,
+      }),
+    };
+  } catch (error) {
+    logger.error('Failed to evaluate safety', error instanceof Error ? error : undefined);
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: 'Failed to evaluate safety' }),
+    };
+  }
+}
+
 // GET /api/thinktank/brain-plan/recent - Get recent plans for user
 export async function getRecentPlans(
   event: APIGatewayProxyEvent
@@ -437,6 +490,11 @@ export async function handler(
   // PATCH /api/thinktank/brain-plan/:planId/step/:stepId
   if (method === 'PATCH' && path.includes('/step/')) {
     return updateStep(event);
+  }
+
+  // POST /api/thinktank/brain-plan/:planId/evaluate-safety
+  if (method === 'POST' && path.endsWith('/evaluate-safety')) {
+    return evaluateSafety(event);
   }
 
   return {

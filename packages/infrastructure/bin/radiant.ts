@@ -11,6 +11,7 @@ import { AIStack } from '../lib/stacks/ai-stack';
 import { ApiStack } from '../lib/stacks/api-stack';
 import { AdminStack } from '../lib/stacks/admin-stack';
 import { BobbleTierTransitionStack } from '../lib/stacks/bobble-tier-transition-stack';
+import { CatoRedisStack } from '../lib/stacks/cato-redis-stack';
 import { BrainStack } from '../lib/stacks/brain-stack';
 import { 
   RADIANT_VERSION, 
@@ -187,6 +188,7 @@ const apiStack = new ApiStack(app, `${stackPrefix}-api`, {
   mediaBucket: storageStack.mediaBucket,
   litellmUrl: aiStack.litellmUrl,
   apiSecurityGroup: securityStack.apiSecurityGroup,
+  // Genesis Cato Safety - Redis endpoint will be added after CatoRedisStack is created
   tags,
   description: `RADIANT API Layer - ${appId} ${environment}`,
 });
@@ -238,10 +240,41 @@ if (tierConfig.enableBrain) {
 }
 
 // ============================================================================
+// GENESIS CATO SAFETY ARCHITECTURE (Phase 3)
+// ============================================================================
+
+// 11. Cato Redis Stack (Epistemic Recovery state persistence)
+// Only create for Tier 2+ as safety features require Redis
+let catoRedisStack: CatoRedisStack | undefined;
+if (tier >= 2) {
+  const tierMapping: Record<number, 'SEED' | 'SPROUT' | 'GROWTH' | 'SCALE' | 'ENTERPRISE'> = {
+    1: 'SEED',
+    2: 'SPROUT',
+    3: 'GROWTH',
+    4: 'SCALE',
+    5: 'ENTERPRISE',
+  };
+  
+  catoRedisStack = new CatoRedisStack(app, `${stackPrefix}-cato-redis`, {
+    env,
+    vpc: networkingStack.vpc,
+    lambdaSecurityGroup: securityStack.apiSecurityGroup,
+    environment,
+    tier: tierMapping[tier] || 'SPROUT',
+    tags,
+    description: `RADIANT Genesis Cato Safety - ${appId} ${environment}`,
+  });
+  catoRedisStack.addDependency(networkingStack);
+  catoRedisStack.addDependency(securityStack);
+} else {
+  console.log(`║ Cato Redis:   SKIPPED (requires Tier 2+)                      ║`);
+}
+
+// ============================================================================
 // BOBBLE INFRASTRUCTURE TIER TRANSITION (Phase 3)
 // ============================================================================
 
-// 11. Bobble Tier Transition Stack (Step Functions workflow for tier switching)
+// 12. Bobble Tier Transition Stack (Step Functions workflow for tier switching)
 const bobbleTierTransitionStack = new BobbleTierTransitionStack(app, `${stackPrefix}-bobble-tier-transition`, {
   env,
   environment: environment as 'dev' | 'staging' | 'prod',

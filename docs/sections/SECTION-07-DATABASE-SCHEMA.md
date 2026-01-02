@@ -98,6 +98,23 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `generated_ui` | Generative UI component tracking |
 | `cognitive_architecture_config` | Per-tenant cognitive feature config |
 | `consciousness_test_results` | Consciousness test results |
+| `genesis_personas` | Cato mood definitions (Balanced, Scout, Sage, Spark, Guide) |
+| `user_persona_selections` | User's selected Cato mood |
+| `cato_governor_state` | Precision Governor decision history |
+| `cato_cbf_definitions` | Control Barrier Function definitions |
+| `cato_cbf_violations` | CBF violation log |
+| `cato_veto_log` | Sensory veto events (hard stops) |
+| `cato_fracture_detections` | Intent-action misalignment detection |
+| `cato_epistemic_recovery` | Epistemic recovery event tracking |
+| `cato_human_escalations` | Human escalation queue |
+| `cato_audit_trail` | Merkle-verified append-only audit log |
+| `cato_audit_tiles` | Audit batching for S3 anchoring |
+| `cato_audit_anchors` | S3 Object Lock anchor references |
+| `cato_tenant_config` | Per-tenant Cato safety configuration |
+| `cato_cloudwatch_alarm_mappings` | CloudWatch alarm to veto signal mappings |
+| `cato_entropy_jobs` | Async entropy check job tracking |
+| `cato_cloudwatch_sync_log` | CloudWatch sync audit log |
+| `cato_api_persona_overrides` | API-level session persona overrides |
 | `consciousness_profiles` | Aggregated consciousness profiles |
 | `emergence_events` | Consciousness emergence events |
 | `deep_thinking_sessions` | Extended reasoning sessions |
@@ -241,6 +258,140 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `conversation_turns` | Conversation history for causal tracking |
 | `reasoning_traces` | Full request traces (partitioned by month) |
 | `reasoning_outcomes` | User feedback on reasoning traces |
+
+### Migration 154: Cato Advanced Configuration (v6.1.1)
+
+Extends the Genesis Cato Safety Architecture with configurable parameters and new supporting tables.
+
+**New Columns on `cato_tenant_config`:**
+
+| Column | Type | Default | Description |
+|--------|------|---------|-------------|
+| `enable_redis` | BOOLEAN | TRUE | Enable Redis state persistence |
+| `redis_rejection_ttl_seconds` | INTEGER | 60 | TTL for rejection history |
+| `redis_persona_override_ttl_seconds` | INTEGER | 300 | TTL for persona overrides |
+| `redis_recovery_state_ttl_seconds` | INTEGER | 600 | TTL for recovery state |
+| `enable_cloudwatch_veto_sync` | BOOLEAN | TRUE | Enable CloudWatch alarm integration |
+| `cloudwatch_sync_interval_seconds` | INTEGER | 60 | CloudWatch sync polling interval |
+| `cloudwatch_alarm_mappings` | JSONB | '{}' | Custom alarm mappings |
+| `enable_async_entropy` | BOOLEAN | TRUE | Enable async entropy checks |
+| `entropy_async_threshold` | NUMERIC(5,4) | 0.6 | Threshold for async processing |
+| `entropy_job_ttl_hours` | INTEGER | 24 | Entropy job result retention |
+| `entropy_max_concurrent_jobs` | INTEGER | 10 | Max concurrent entropy jobs |
+| `fracture_word_overlap_weight` | NUMERIC(5,4) | 0.20 | Fracture detection weight |
+| `fracture_intent_keyword_weight` | NUMERIC(5,4) | 0.25 | Fracture detection weight |
+| `fracture_sentiment_weight` | NUMERIC(5,4) | 0.15 | Fracture detection weight |
+| `fracture_topic_coherence_weight` | NUMERIC(5,4) | 0.20 | Fracture detection weight |
+| `fracture_completeness_weight` | NUMERIC(5,4) | 0.20 | Fracture detection weight |
+| `fracture_alignment_threshold` | NUMERIC(5,4) | 0.40 | Fracture alignment threshold |
+| `fracture_evasion_threshold` | NUMERIC(5,4) | 0.60 | Fracture evasion threshold |
+| `cbf_authorization_check_enabled` | BOOLEAN | TRUE | Enable model authorization checks |
+| `cbf_baa_verification_enabled` | BOOLEAN | TRUE | Enable BAA verification |
+| `cbf_cost_alternative_enabled` | BOOLEAN | TRUE | Enable cost alternative suggestions |
+| `cbf_max_cost_reduction_percent` | NUMERIC(5,2) | 50.00 | Target cost reduction |
+
+**New Tables:**
+
+| Table | Purpose |
+|-------|---------|
+| `cato_cloudwatch_alarm_mappings` | CloudWatch alarm to veto signal mappings |
+| `cato_entropy_jobs` | Async entropy check job tracking |
+| `cato_cloudwatch_sync_log` | CloudWatch sync audit log |
+
+**`cato_cloudwatch_alarm_mappings` Schema:**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `tenant_id` | UUID | Tenant reference |
+| `alarm_name` | VARCHAR(255) | CloudWatch alarm name |
+| `alarm_name_pattern` | VARCHAR(255) | Regex pattern for alarm matching |
+| `veto_signal` | VARCHAR(50) | Veto signal to activate |
+| `veto_severity` | VARCHAR(20) | warning, critical, emergency |
+| `is_enabled` | BOOLEAN | Enable/disable mapping |
+| `auto_clear_on_ok` | BOOLEAN | Auto-clear when alarm resolves |
+| `description` | TEXT | Mapping description |
+
+**`cato_entropy_jobs` Schema:**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `tenant_id` | UUID | Tenant reference |
+| `session_id` | UUID | Session reference |
+| `job_id` | VARCHAR(100) | Unique job identifier |
+| `status` | VARCHAR(20) | pending, processing, completed, failed |
+| `prompt` | TEXT | Original prompt |
+| `response` | TEXT | AI response to check |
+| `model` | VARCHAR(100) | Model used |
+| `check_mode` | VARCHAR(20) | Check mode (sync, async, deep) |
+| `entropy_score` | NUMERIC(5,4) | Calculated entropy score |
+| `consistency` | NUMERIC(5,4) | Consistency score |
+| `is_potential_deception` | BOOLEAN | Deception flag |
+| `deception_indicators` | JSONB | Detailed indicators |
+| `expires_at` | TIMESTAMPTZ | Job expiration time |
+
+**`cato_cloudwatch_sync_log` Schema:**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `tenant_id` | UUID | Tenant reference (NULL for global) |
+| `sync_type` | VARCHAR(20) | scheduled, manual, alarm_event |
+| `alarms_checked` | INTEGER | Number of alarms checked |
+| `alarms_in_alarm` | INTEGER | Alarms in ALARM state |
+| `vetos_activated` | INTEGER | Vetos activated this sync |
+| `vetos_cleared` | INTEGER | Vetos cleared this sync |
+| `success` | BOOLEAN | Sync success flag |
+| `error_message` | TEXT | Error details if failed |
+| `duration_ms` | INTEGER | Sync duration |
+
+**Default Alarm Mappings Seeded:**
+
+| Alarm | Signal | Severity |
+|-------|--------|----------|
+| `radiant-system-cpu-critical` | SYSTEM_OVERLOAD | emergency |
+| `radiant-system-memory-critical` | SYSTEM_OVERLOAD | emergency |
+| `radiant-security-breach` | DATA_BREACH_DETECTED | emergency |
+| `radiant-compliance-alert` | COMPLIANCE_VIOLATION | critical |
+| `radiant-anomaly-detection` | ANOMALY_DETECTED | warning |
+| `radiant-model-health` | MODEL_UNAVAILABLE | warning |
+
+### Migration 155: Cato Spec Alignment (v6.1.1 Patch 3)
+
+Fixes mood attributes to match Genesis Cato v2.3.1 specification and adds tenant default mood support.
+
+**Mood Attribute Fixes:**
+
+| Mood | Attribute | Was | Now |
+|------|-----------|-----|-----|
+| Sage | discovery | 0.8 | 0.6 |
+| Spark | achievement | 0.7 | 0.5 |
+| Spark | reflection | 0.6 | 0.4 |
+| Guide | discovery | 0.7 | 0.5 |
+| Guide | reflection | 0.5 | 0.7 |
+
+**New Column on `cato_tenant_config`:**
+
+| Column | Type | Default | Description |
+|--------|------|---------|-------------|
+| `default_mood` | VARCHAR(50) | 'balanced' | Tenant-specific default mood override |
+
+**New Table: `cato_api_persona_overrides`**
+
+Stores API-level persona overrides for sessions (temporary, session-based).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `tenant_id` | UUID | Tenant reference |
+| `session_id` | UUID | Session reference |
+| `user_id` | UUID | Optional user reference |
+| `persona_name` | VARCHAR(50) | Mood name (balanced, scout, sage, spark, guide) |
+| `expires_at` | TIMESTAMPTZ | When override expires |
+| `created_at` | TIMESTAMPTZ | Creation timestamp |
+| `created_by` | UUID | Admin who set the override |
+| `reason` | TEXT | Optional reason for override |
 
 ### Migration 152: Advanced Cognition (v6.1.0)
 

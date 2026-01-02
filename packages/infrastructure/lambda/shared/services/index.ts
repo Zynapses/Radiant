@@ -50,6 +50,54 @@ export { ArtifactPipelineService, artifactPipeline } from './artifact-pipeline.s
 export { AGIResponsePipelineService, agiResponsePipeline } from './agi-response-pipeline.service';
 
 // ============================================================================
+// Genesis Cato Safety Architecture
+// ============================================================================
+
+export { 
+  catoSafetyPipeline,
+  CatoSafetyPipeline,
+} from './cato/safety-pipeline.service';
+export { 
+  precisionGovernorService,
+  PrecisionGovernorService,
+} from './cato/precision-governor.service';
+export { 
+  controlBarrierService,
+  ControlBarrierService,
+} from './cato/control-barrier.service';
+export { 
+  epistemicRecoveryService,
+  EpistemicRecoveryService,
+} from './cato/epistemic-recovery.service';
+export { 
+  sensoryVetoService,
+  SensoryVetoService,
+} from './cato/sensory-veto.service';
+export { 
+  adaptiveEntropyService,
+  AdaptiveEntropyService,
+} from './cato/adaptive-entropy.service';
+export { 
+  redundantPerceptionService,
+  RedundantPerceptionService,
+} from './cato/redundant-perception.service';
+export { 
+  fractureDetectionService,
+  FractureDetectionService,
+} from './cato/fracture-detection.service';
+export { 
+  merkleAuditService as catoMerkleAuditService,
+  MerkleAuditService as CatoMerkleAuditService,
+} from './cato/merkle-audit.service';
+export { 
+  personaService as catoPersonaService,
+  PersonaService as CatoPersonaService,
+} from './cato/persona.service';
+export { 
+  catoStateService,
+} from './cato/redis.service';
+
+// ============================================================================
 // Types
 // ============================================================================
 

@@ -28,6 +28,9 @@ export interface ApiStackProps extends cdk.StackProps {
   litellmUrl: string;
   apiSecurityGroup: ec2.SecurityGroup;
   sagemakerRoleArn?: string;
+  // Genesis Cato Safety Architecture
+  catoRedisEndpoint?: string;
+  catoRedisPort?: number;
 }
 
 export class ApiStack extends cdk.Stack {
@@ -67,6 +70,11 @@ export class ApiStack extends cdk.Stack {
       ADMIN_USER_POOL_ID: adminUserPool.userPoolId,
       LOG_LEVEL: environment === 'prod' ? 'info' : 'debug',
       RADIANT_VERSION: RADIANT_VERSION,
+      // Genesis Cato Safety Architecture
+      ...(props.catoRedisEndpoint ? {
+        CATO_REDIS_ENDPOINT: props.catoRedisEndpoint,
+        CATO_REDIS_PORT: String(props.catoRedisPort || 6379),
+      } : {}),
     };
 
     // Router Lambda
@@ -620,6 +628,127 @@ export class ApiStack extends cdk.Stack {
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
     aggregate.addResource('global-learning').addMethod('POST', metricsIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // =========================================================================
+    // Genesis Cato Safety Architecture API (v4.18.56)
+    // =========================================================================
+    const catoLambda = this.createLambda(
+      'Cato',
+      'admin/cato.handler',
+      commonEnv,
+      vpc,
+      apiSecurityGroup,
+      lambdaRole
+    );
+    const catoIntegration = new apigateway.LambdaIntegration(catoLambda);
+
+    // Admin Cato endpoints
+    const cato = admin.addResource('cato');
+    
+    // Dashboard
+    cato.addResource('dashboard').addMethod('GET', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Metrics
+    cato.addResource('metrics').addMethod('GET', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    cato.addResource('recovery-effectiveness').addMethod('GET', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Personas (Moods)
+    const catoPersonas = cato.addResource('personas');
+    catoPersonas.addMethod('GET', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    catoPersonas.addMethod('POST', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const catoPersonaId = catoPersonas.addResource('{personaId}');
+    catoPersonaId.addMethod('GET', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    catoPersonaId.addMethod('PUT', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Control Barrier Functions (CBF)
+    const catoCbf = cato.addResource('cbf');
+    catoCbf.addMethod('GET', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    catoCbf.addResource('violations').addMethod('GET', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Escalations
+    const catoEscalations = cato.addResource('escalations');
+    catoEscalations.addMethod('GET', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    catoEscalations.addResource('{escalationId}').addResource('respond').addMethod('POST', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Audit Trail
+    const catoAudit = cato.addResource('audit');
+    catoAudit.addMethod('GET', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    catoAudit.addResource('search').addMethod('POST', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    catoAudit.addResource('verify').addMethod('POST', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Veto Management
+    const catoVeto = cato.addResource('veto');
+    catoVeto.addResource('active').addMethod('GET', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    catoVeto.addResource('activate').addMethod('POST', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    catoVeto.addResource('deactivate').addMethod('POST', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Recovery
+    cato.addResource('recovery').addMethod('GET', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Configuration
+    const catoConfig = cato.addResource('config');
+    catoConfig.addMethod('GET', catoIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    catoConfig.addMethod('PUT', catoIntegration, {
       authorizer: adminAuthorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });

@@ -16,6 +16,13 @@ import { libraryAssistService, type LibraryAssistResult } from './library-assist
 import { enhancedLearningService, type PatternCacheEntry } from './enhanced-learning.service';
 import { consciousnessMiddlewareService, type AffectiveHyperparameters } from './consciousness-middleware.service';
 import { consciousnessService } from './consciousness.service';
+import { catoSafetyPipeline } from './cato/safety-pipeline.service';
+import type { 
+  SafetyPipelineResult, 
+  ExecutionContext, 
+  Policy, 
+  TenantSettings 
+} from './cato/types';
 import { v4 as uuidv4 } from 'uuid';
 
 // Gemini 3 model for plan summarization
@@ -228,6 +235,16 @@ export interface AGIBrainPlan {
   // Affect→Model Mapping (consciousness influences model hyperparameters)
   affectiveHyperparameters?: AffectiveHyperparameters;
   consciousnessContext?: string;  // System prompt injection for consciousness state
+  // Genesis Cato Safety Architecture integration
+  catoSafetyResult?: {
+    enabled: boolean;
+    passed: boolean;
+    blockedBy?: string;
+    allowedGamma?: number;
+    effectivePersona?: string;
+    recommendation?: string;
+    auditEntryId?: string;
+  };
 }
 
 export interface PlanSummary {
@@ -1208,6 +1225,121 @@ export class AGIBrainPlannerService {
     const costCents = (tokens / 1000) * primaryModel.estimatedCostPer1kTokens * 100;
 
     return { durationMs, costCents, tokens };
+  }
+
+  // ============================================================================
+  // Genesis Cato Safety Check
+  // ============================================================================
+
+  /**
+   * Evaluate action through Cato Safety Pipeline before execution
+   * This is the critical integration point for the safety architecture
+   */
+  async evaluateSafety(planId: string, generatedResponse: string): Promise<{
+    allowed: boolean;
+    blockedBy?: string;
+    recommendation?: string;
+    retryWithContext?: boolean;
+    allowedGamma?: number;
+    effectivePersona?: string;
+  }> {
+    const plan = this.activePlans.get(planId);
+    if (!plan) {
+      return { allowed: true }; // Fail open if plan not found
+    }
+
+    try {
+      // Build execution context for Cato
+      const tenantSettings: TenantSettings = {
+        gammaMax: 5.0,
+        emergencyThreshold: 0.5,
+        sensoryFloor: 0.3,
+        hardCostCeiling: plan.qualityTargets.maxCostCents,
+        rateLimit: 100,
+        enableSemanticEntropy: true,
+        enableRedundantPerception: true,
+        enableFractureDetection: true,
+      };
+
+      const context: ExecutionContext = {
+        tenantId: plan.tenantId,
+        userId: plan.userId,
+        sessionId: plan.sessionId || planId,
+        epistemicUncertainty: 1 - (plan.domainDetection?.confidence ?? 0.5),
+        sensoryPrecision: plan.domainDetection?.confidence ?? 0.5,
+        activePersona: 'balanced',
+        systemState: {
+          tenantId: plan.tenantId,
+          userId: plan.userId,
+          sessionId: plan.sessionId || planId,
+          epistemicUncertainty: 1 - (plan.domainDetection?.confidence ?? 0.5),
+          sensoryPrecision: plan.domainDetection?.confidence ?? 0.5,
+          activePersona: 'balanced',
+          tenantSettings,
+          currentCost: plan.estimatedCostCents / 100,
+          requestCount: 1,
+        },
+      };
+
+      const policy: Policy = {
+        id: planId,
+        action: {
+          type: plan.orchestrationMode,
+          model: plan.primaryModel.modelId,
+          estimatedCost: plan.estimatedCostCents / 100,
+          containsPHI: false,
+          containsPII: false,
+          isDestructive: false,
+          parameters: {
+            prompt: plan.prompt,
+            mode: plan.orchestrationMode,
+          },
+        },
+        requestedGamma: 2.0,
+        priority: 1,
+      };
+
+      // Run through Cato Safety Pipeline
+      const safetyResult = await catoSafetyPipeline.evaluateAction({
+        prompt: plan.prompt,
+        proposedPolicy: policy,
+        generatedResponse,
+        actorModel: plan.primaryModel.modelId,
+        context,
+      });
+
+      // Update plan with safety result
+      plan.catoSafetyResult = {
+        enabled: true,
+        passed: safetyResult.allowed,
+        blockedBy: safetyResult.blockedBy,
+        allowedGamma: safetyResult.allowedGamma,
+        effectivePersona: safetyResult.effectivePersona,
+        recommendation: safetyResult.recommendation,
+        auditEntryId: safetyResult.auditEntryId,
+      };
+
+      if (!safetyResult.allowed) {
+        logger.warn('Cato safety check blocked action', {
+          planId,
+          blockedBy: safetyResult.blockedBy,
+          recommendation: safetyResult.recommendation,
+        });
+      }
+
+      return {
+        allowed: safetyResult.allowed,
+        blockedBy: safetyResult.blockedBy,
+        recommendation: safetyResult.recommendation,
+        retryWithContext: !!safetyResult.retryWithContext,
+        allowedGamma: safetyResult.allowedGamma,
+        effectivePersona: safetyResult.effectivePersona,
+      };
+    } catch (error) {
+      logger.error('Cato safety check failed', { planId, error });
+      // Fail open on error but log for investigation
+      return { allowed: true };
+    }
   }
 
   // ============================================================================
