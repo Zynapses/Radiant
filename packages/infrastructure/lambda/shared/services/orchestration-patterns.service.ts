@@ -1618,15 +1618,29 @@ Your task is to:
     // SECURITY: Input is sanitized to alphanumeric + comparison operators only
     // This prevents injection attacks while allowing basic comparisons
     try {
+      // Strict sanitization: only allow safe characters
       const sanitized = condition.replace(/[^a-zA-Z0-9_.<>=! ]/g, '');
-      // Validate sanitized condition doesn't contain dangerous patterns
-      if (sanitized.length > 100 || /[;{}]/.test(condition)) {
+      
+      // Security validations
+      const dangerousPatterns = /[;{}()\[\]\\'"]/;
+      if (sanitized.length > 100 || dangerousPatterns.test(condition)) {
+        logger.warn('Condition rejected for security', { condition: condition.substring(0, 50), reason: 'dangerous_pattern' });
         return true; // Fail safe
       }
+      
+      // Block dangerous keywords
+      const dangerousKeywords = ['eval', 'function', 'constructor', 'prototype', '__proto__', 'require', 'import', 'process', 'global'];
+      const lowerCondition = sanitized.toLowerCase();
+      if (dangerousKeywords.some(kw => lowerCondition.includes(kw))) {
+        logger.warn('Condition rejected for security', { condition: condition.substring(0, 50), reason: 'dangerous_keyword' });
+        return true; // Fail safe
+      }
+      
       // eslint-disable-next-line no-new-func -- Required for dynamic condition eval, input is sanitized above
       const fn = new Function(...Object.keys(context), `return ${sanitized}`);
       return Boolean(fn(...Object.values(context)));
-    } catch {
+    } catch (error) {
+      logger.debug('Condition evaluation failed, defaulting to true', { error });
       return true; // Fail safe on evaluation errors
     }
   }

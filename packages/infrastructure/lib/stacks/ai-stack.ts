@@ -3,7 +3,7 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as logs from 'aws-cdk-lib/aws-logs';
-import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
+// secretsmanager reserved for provider API keys
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import type { TierConfig, Environment } from '@radiant/shared';
@@ -45,7 +45,7 @@ export class AIStack extends cdk.Stack {
     });
 
     // LiteLLM container
-    const litellmContainer = litellmTaskDef.addContainer('litellm', {
+    litellmTaskDef.addContainer('litellm', {
       image: ecs.ContainerImage.fromRegistry('ghcr.io/berriai/litellm:main-latest'),
       logging: ecs.LogDrivers.awsLogs({
         streamPrefix: 'litellm',

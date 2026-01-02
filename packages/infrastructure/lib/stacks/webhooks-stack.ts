@@ -4,7 +4,7 @@ import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
-import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+// apigateway reserved for webhook endpoint
 import { Construct } from 'constructs';
 
 interface WebhooksStackProps extends cdk.StackProps {

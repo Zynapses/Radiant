@@ -1102,7 +1102,7 @@ Return JSON: {"type": "...", "needsResearch": bool, "needsWorkflow": bool, "appr
       if (jsonMatch) {
         analysisResult = JSON.parse(jsonMatch[0]);
       }
-    } catch { /* use defaults */ }
+    } catch (error) { logger.debug('Analysis parsing failed, using defaults', { error }); }
 
     // 2. Research if needed
     if (analysisResult.needsResearch) {

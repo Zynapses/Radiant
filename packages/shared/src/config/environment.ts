@@ -177,7 +177,7 @@ function getEnv(name: string, defaultValue?: string): string | undefined {
   return process.env[name] ?? defaultValue;
 }
 
-function getRequiredEnv(name: string): string {
+export function getRequiredEnv(name: string): string {
   const value = process.env[name];
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
@@ -192,7 +192,7 @@ function getIntEnv(name: string, defaultValue: number): number {
   return isNaN(parsed) ? defaultValue : parsed;
 }
 
-function getFloatEnv(name: string, defaultValue: number): number {
+export function getFloatEnv(name: string, defaultValue: number): number {
   const value = process.env[name];
   if (!value) return defaultValue;
   const parsed = parseFloat(value);
@@ -205,13 +205,13 @@ function getBoolEnv(name: string, defaultValue: boolean): boolean {
   return value.toLowerCase() === 'true' || value === '1';
 }
 
-function getArrayEnv(name: string, defaultValue: string[] = []): string[] {
+export function getArrayEnv(name: string, defaultValue: string[] = []): string[] {
   const value = process.env[name];
   if (!value) return defaultValue;
   return value.split(',').map(s => s.trim()).filter(Boolean);
 }
 
-function getJsonEnv<T>(name: string, defaultValue: T): T {
+export function getJsonEnv<T>(name: string, defaultValue: T): T {
   const value = process.env[name];
   if (!value) return defaultValue;
   try {

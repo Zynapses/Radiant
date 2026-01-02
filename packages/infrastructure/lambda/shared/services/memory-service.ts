@@ -1,6 +1,6 @@
-import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { executeStatement } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import { callLiteLLMEmbedding } from './litellm.service';
 
 type MemoryType = 'fact' | 'preference' | 'context' | 'instruction' | 'conversation' | 'skill';
 type RelationshipType = 'related' | 'contradicts' | 'supports' | 'supersedes' | 'derived_from';
@@ -23,12 +23,6 @@ interface MemorySearchResult {
 }
 
 export class MemoryService {
-  private bedrock: BedrockRuntimeClient;
-
-  constructor() {
-    this.bedrock = new BedrockRuntimeClient({});
-  }
-
   async getOrCreateStore(
     tenantId: string,
     userId: string,
@@ -203,20 +197,14 @@ export class MemoryService {
 
   private async generateEmbedding(text: string): Promise<number[]> {
     try {
-      const response = await this.bedrock.send(
-        new InvokeModelCommand({
-          modelId: 'amazon.titan-embed-text-v1',
-          body: JSON.stringify({ inputText: text }),
-          contentType: 'application/json',
-        })
-      );
-
-      const result = JSON.parse(new TextDecoder().decode(response.body));
-      return result.embedding;
+      const response = await callLiteLLMEmbedding({
+        model: 'text-embedding-3-small',
+        input: text.substring(0, 8000),
+      });
+      return response.data?.[0]?.embedding || [];
     } catch (error) {
-      logger.error('Embedding generation error', { error });
-      // Return zero vector as fallback
-      return new Array(1536).fill(0);
+      logger.warn('Embedding generation failed', { error });
+      return [];
     }
   }
 }

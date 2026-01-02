@@ -3,6 +3,8 @@
 
 import { executeStatement } from '../db/client';
 import { modelRouterService } from './model-router.service';
+import { callLiteLLMEmbedding } from './litellm.service';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import * as crypto from 'crypto';
 
 // ============================================================================
@@ -539,13 +541,14 @@ Summarize:
 
   private async generateEmbedding(text: string): Promise<number[]> {
     try {
-      await modelRouterService.invoke({
-        modelId: 'amazon/titan-embed-text',
-        messages: [{ role: 'user', content: text.substring(0, 8000) }],
+      const response = await callLiteLLMEmbedding({
+        model: 'text-embedding-3-small',
+        input: text.substring(0, 8000),
       });
-      return new Array(1536).fill(0);
-    } catch {
-      return new Array(1536).fill(0);
+      return response.data?.[0]?.embedding || [];
+    } catch (error) {
+      logger.warn('Embedding generation failed', { error });
+      return [];
     }
   }
 

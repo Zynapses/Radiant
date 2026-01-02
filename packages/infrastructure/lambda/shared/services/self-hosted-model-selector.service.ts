@@ -1,7 +1,8 @@
 // RADIANT v4.18.0 - Self-Hosted Model Selector Service
 // Integrates 56 self-hosted models with AGI Brain orchestration
 
-import { executeStatement } from '../utils/database';
+import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import {
   SELF_HOSTED_MODEL_REGISTRY,
   SelfHostedModelDefinition,
@@ -377,7 +378,7 @@ class SelfHostedModelSelectorService {
         ]
       );
     } catch (error) {
-      console.error('Failed to record model selection:', error);
+      logger.error('Failed to record model selection', error as Error);
     }
   }
 }

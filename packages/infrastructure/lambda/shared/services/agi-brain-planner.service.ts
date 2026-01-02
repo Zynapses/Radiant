@@ -2,6 +2,7 @@
 // Real-time planning system that generates execution plans for prompts
 
 import { executeStatement } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { domainTaxonomyService } from './domain-taxonomy.service';
 import { agiOrchestrationSettingsService } from './agi-orchestration-settings.service';
 import { modelRouterService } from './model-router.service';
@@ -553,7 +554,7 @@ export class AGIBrainPlannerService {
       plan.systemPrompt = prepromptResult.renderedPreprompt.full;
     } catch (err) {
       // Pre-prompt selection failure is non-fatal, use default
-      console.warn('Pre-prompt selection failed, using default:', err);
+      logger.warn('Pre-prompt selection failed, using default', { error: err });
     }
 
     // Store in active plans
@@ -1577,7 +1578,7 @@ export class AGIBrainPlannerService {
         }
       );
     } catch (error) {
-      console.warn('Failed to record implicit signal:', error);
+      logger.warn('Failed to record implicit signal', { error });
     }
   }
 
@@ -1612,7 +1613,7 @@ export class AGIBrainPlannerService {
         }
       );
     } catch (error) {
-      console.warn('Failed to cache successful pattern:', error);
+      logger.warn('Failed to cache successful pattern', { error });
     }
   }
 
@@ -1663,7 +1664,7 @@ export class AGIBrainPlannerService {
         requestType,
       };
     } catch (error) {
-      console.warn('Failed to check active learning:', error);
+      logger.warn('Failed to check active learning', { error });
       return { shouldRequest: false };
     }
   }
@@ -1695,7 +1696,7 @@ export class AGIBrainPlannerService {
 
       return learning.id;
     } catch (error) {
-      console.warn('Failed to start conversation learning:', error);
+      logger.warn('Failed to start conversation learning', { error });
       return null;
     }
   }
@@ -1726,7 +1727,7 @@ export class AGIBrainPlannerService {
         updates
       );
     } catch (error) {
-      console.warn('Failed to update conversation learning:', error);
+      logger.warn('Failed to update conversation learning', { error });
     }
   }
 

@@ -17,7 +17,7 @@ export class FoundationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: FoundationStackProps) {
     super(scope, id, props);
     
-    const { appId, environment, tier, tierConfig } = props;
+    const { appId, environment, tier } = props;
     
     // KMS Key for encryption at rest
     this.encryptionKey = new kms.Key(this, 'EncryptionKey', {

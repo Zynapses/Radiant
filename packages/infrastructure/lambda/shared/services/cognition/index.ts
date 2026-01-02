@@ -13,6 +13,9 @@ export { semanticCache, SemanticCacheService } from '../semantic-cache.service';
 // Cognitive services
 export { rewardModel, RewardModelService } from '../reward-model.service';
 
+// Metacognition
+export { metacognitionService, MetacognitionService } from '../metacognition.service';
+
 // Advanced analytics
 export { counterfactualSimulator, CounterfactualSimulatorService } from '../counterfactual-simulator.service';
 export { curiosityEngine, CuriosityEngineService } from '../curiosity-engine.service';

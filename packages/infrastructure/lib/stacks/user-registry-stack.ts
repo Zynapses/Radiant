@@ -16,7 +16,7 @@ import * as kms from 'aws-cdk-lib/aws-kms';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as firehose from 'aws-cdk-lib/aws-kinesisfirehose';
-import * as logs from 'aws-cdk-lib/aws-logs';
+// logs reserved for CloudWatch log groups
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Construct } from 'constructs';

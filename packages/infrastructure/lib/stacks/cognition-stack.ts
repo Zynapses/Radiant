@@ -143,7 +143,7 @@ export class CognitionStack extends cdk.Stack {
     });
     
     // Counterfactual analysis Lambda
-    const counterfactualLambda = new lambda.Function(this, 'CounterfactualLambda', {
+    new lambda.Function(this, 'CounterfactualLambda', {
       functionName: `radiant-${props.stage}-counterfactual-analysis`,
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'cognition/counterfactual.handler',

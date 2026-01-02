@@ -5,6 +5,7 @@
  */
 
 import type { StudentVersion, StudentInferenceRequest, StudentInferenceResponse } from '@radiant/shared';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { STUDENT_TRAINING_CONFIG, STUDENT_INFERENCE_DEFAULTS } from '@radiant/shared/constants';
 import { getDbPool } from './database';
 import { SageMakerRuntimeClient, InvokeEndpointCommand } from '@aws-sdk/client-sagemaker-runtime';
@@ -248,7 +249,7 @@ export class InferenceStudentService {
   }
   
   private async createSagemakerEndpoint(endpointName: string, modelArtifactS3: string): Promise<void> {
-    console.log(`Creating SageMaker endpoint: ${endpointName} from ${modelArtifactS3}`);
+    logger.info(`Creating SageMaker endpoint: ${endpointName} from ${modelArtifactS3}`);
   }
   
   clearCache(tenantId?: string): void {

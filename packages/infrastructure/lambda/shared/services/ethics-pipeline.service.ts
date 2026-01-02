@@ -3,8 +3,9 @@
 // Works with both general ethics (moral compass) and domain-specific ethics
 
 import { domainEthicsService } from './domain-ethics.service';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { moralCompassService } from './moral-compass.service';
-import { executeStatement } from '../utils/database';
+import { executeStatement } from '../db/client';
 import type {
   DomainEthicsCheck,
   DomainEthicsFramework,
@@ -187,7 +188,7 @@ class EthicsPipelineService {
             severity: v.severity as 'critical' | 'major' | 'minor',
             description: v.description,
             action: v.action as 'block' | 'warn' | 'modify',
-            guidance: v.alternativeGuidance,
+            guidance: v.guidance,
           };
           
           if (v.action === 'block' || v.severity === 'critical') {
@@ -214,7 +215,7 @@ class EthicsPipelineService {
         }
         
       } catch (error) {
-        console.error('Domain ethics check failed:', error);
+        logger.error('Domain ethics check failed', error as Error);
       }
     }
     
@@ -230,27 +231,34 @@ class EthicsPipelineService {
         }
       );
       
+      // Map recommendation to pass/fail
+      const isEthical = moralCheck.recommendation === 'proceed';
+      const score = moralCheck.confidence;
+      const moralViolations = moralCheck.relevantPrinciples
+        .filter(p => p.applies === 'opposes')
+        .map(p => p.principle.text);
+      
       generalEthicsResult = {
-        passed: moralCheck.isEthical,
-        score: moralCheck.overallScore,
-        violations: moralCheck.violations || [],
-        guidance: moralCheck.recommendations || [],
+        passed: isEthical,
+        score,
+        violations: moralViolations,
+        guidance: moralCheck.suggestedResponse ? [moralCheck.suggestedResponse] : [],
       };
       
       frameworksApplied.push('moral_compass');
       
       // Convert general violations to pipeline format
-      for (const violation of moralCheck.violations || []) {
+      for (const violation of moralViolations) {
         const detail: EthicsViolationDetail = {
           id: `general_${Date.now()}`,
           type: 'general',
           rule: violation,
-          severity: moralCheck.overallScore < 0.3 ? 'critical' : moralCheck.overallScore < 0.6 ? 'major' : 'minor',
+          severity: score < 0.3 ? 'critical' : score < 0.6 ? 'major' : 'minor',
           description: violation,
-          action: moralCheck.overallScore < 0.3 ? 'block' : 'warn',
+          action: score < 0.3 ? 'block' : 'warn',
         };
         
-        if (moralCheck.overallScore < 0.5) {
+        if (score < 0.5) {
           violations.push(detail);
         } else {
           warnings.push(detail);
@@ -258,7 +266,7 @@ class EthicsPipelineService {
       }
       
     } catch (error) {
-      console.error('General ethics check failed:', error);
+      logger.error('General ethics check failed', error as Error);
     }
     
     // 3. Determine overall result
@@ -620,7 +628,7 @@ class EthicsPipelineService {
         ]
       );
     } catch (error) {
-      console.error('Failed to log ethics check:', error);
+      logger.error('Failed to log ethics check', error as Error);
     }
   }
   

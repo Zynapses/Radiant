@@ -24,7 +24,7 @@ export class SecurityStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: SecurityStackProps) {
     super(scope, id, props);
     
-    const { appId, environment, tier, tierConfig, vpc } = props;
+    const { appId, environment, tierConfig, vpc } = props;
     const isProd = environment === 'prod';
 
     // KMS Key for data encryption (Aurora, DynamoDB, S3)

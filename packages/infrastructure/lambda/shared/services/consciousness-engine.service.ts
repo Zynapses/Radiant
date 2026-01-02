@@ -225,6 +225,37 @@ export class ConsciousnessEngineService {
     return this.selfModel;
   }
 
+  /**
+   * Get the full consciousness state for a tenant.
+   * Used for SHACL validation and state serialization.
+   */
+  async getFullState(tenantId: string): Promise<Record<string, unknown>> {
+    await this.loadEgo(tenantId);
+    
+    // Load affective state from database
+    const affectResult = await executeStatement(
+      `SELECT valence, arousal, curiosity, frustration, confidence
+       FROM ego_affect WHERE tenant_id = $1`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    ).catch(() => ({ rows: [] }));
+    
+    const affectiveState = affectResult.rows?.[0] as Record<string, number> || {
+      valence: 0,
+      arousal: 0.5,
+      curiosity: 0.5,
+      frustration: 0,
+      confidence: 0.5,
+    };
+
+    return {
+      selfModel: this.selfModel,
+      driveState: this.currentDriveState,
+      affectiveState,
+      preferredStates: Object.fromEntries(this.preferredStates),
+      beliefs: Object.fromEntries(this.beliefs),
+    };
+  }
+
   async pageInMemory(tenantId: string, query: string, k: number = 5): Promise<MemoryEntry[]> {
     const result = await executeStatement(
       `SELECT id, content, timestamp, emotional_valence, salience, context, memory_type

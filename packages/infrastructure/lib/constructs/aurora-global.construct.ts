@@ -34,7 +34,7 @@ export class AuroraGlobalCluster extends Construct {
       encryptionKey,
       tier,
       environment,
-      enableGlobal = false,
+      // enableGlobal reserved for future global database support
     } = props;
 
     // Database credentials
@@ -63,7 +63,7 @@ export class AuroraGlobalCluster extends Construct {
     );
 
     // Determine configuration based on tier
-    const instanceType = this.getInstanceType(tier);
+    // instanceType reserved for provisioned instances
     const minCapacity = this.getMinCapacity(tier);
     const maxCapacity = this.getMaxCapacity(tier);
     const readerCount = this.getReaderCount(tier);
@@ -139,17 +139,6 @@ export class AuroraGlobalCluster extends Construct {
       value: secret.secretArn,
       description: 'Database credentials secret ARN',
     });
-  }
-
-  private getInstanceType(tier: number): ec2.InstanceType {
-    switch (tier) {
-      case 1: return ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.MEDIUM);
-      case 2: return ec2.InstanceType.of(ec2.InstanceClass.R6G, ec2.InstanceSize.LARGE);
-      case 3: return ec2.InstanceType.of(ec2.InstanceClass.R6G, ec2.InstanceSize.XLARGE);
-      case 4: return ec2.InstanceType.of(ec2.InstanceClass.R6G, ec2.InstanceSize.XLARGE2);
-      case 5: return ec2.InstanceType.of(ec2.InstanceClass.R6G, ec2.InstanceSize.XLARGE4);
-      default: return ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.MEDIUM);
-    }
   }
 
   private getMinCapacity(tier: number): number {

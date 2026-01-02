@@ -1,7 +1,7 @@
 // RADIANT v4.18.0 - Domain Ethics Service
 // Enforces domain-specific professional ethics (bar association, medical, financial, etc.)
 
-import { executeStatement } from '../utils/database';
+import { executeStatement } from '../db/client';
 import type {
   DomainEthicsFramework,
   DomainEthicsCheck,

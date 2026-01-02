@@ -3,6 +3,7 @@
 // "Let's let Radiant decide if it needs conversion or not, not Think Tank"
 
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { createHash } from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
@@ -1148,7 +1149,7 @@ export class FileConversionService {
       ]);
     } catch (error) {
       // Don't fail the conversion if logging fails
-      console.error('Failed to log conversion decision:', error);
+      logger.error('Failed to log conversion decision', error as Error);
     }
   }
 }

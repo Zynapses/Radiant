@@ -38,7 +38,7 @@ export class ApiStack extends cdk.Stack {
     super(scope, id, props);
 
     const {
-      appId, environment, tier, tierConfig, vpc, userPool, adminUserPool,
+      appId, environment, tier, vpc, userPool, adminUserPool,
       auroraCluster, usageTable, sessionsTable, cacheTable, mediaBucket,
       litellmUrl, apiSecurityGroup,
     } = props;
