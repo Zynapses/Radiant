@@ -626,6 +626,8 @@ struct DetailContentView: View {
                 ComplianceView()
             case .costs:
                 CostsView()
+            case .monitoring:
+                AWSMonitoringView()
             case .settings:
                 SettingsView()
             }

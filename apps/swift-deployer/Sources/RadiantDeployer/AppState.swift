@@ -167,6 +167,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
     
     // System
     case costs = "Costs"
+    case monitoring = "Monitoring"
     case settings = "Settings"
     
     var id: String { rawValue }
@@ -190,6 +191,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
         case .security: return "shield.lefthalf.filled"
         case .compliance: return "checkmark.shield"
         case .costs: return "dollarsign.circle"
+        case .monitoring: return "waveform.path.ecg.rectangle"
         case .settings: return "gearshape"
         }
     }
@@ -213,6 +215,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
         case .security: return .red
         case .compliance: return .green
         case .costs: return .yellow
+        case .monitoring: return .teal
         case .settings: return .gray
         }
     }
@@ -242,7 +245,7 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
     }
     
     static var systemTabs: [NavigationTab] {
-        [.costs, .settings]
+        [.costs, .monitoring, .settings]
     }
 }
 

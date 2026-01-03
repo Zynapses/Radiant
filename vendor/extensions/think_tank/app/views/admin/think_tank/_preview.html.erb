@@ -1,0 +1,21 @@
+<%# Preview Partial - Displays iframe preview of generated page %>
+
+<div class="tt-pane tt-preview-pane">
+  <div class="tt-pane-header">
+    <span class="tt-pane-title">Preview</span>
+    <% if local_assigns[:episode] && episode&.preview_url %>
+      <%= link_to 'Open in new tab ↗', episode.preview_url, 
+          target: '_blank', class: 'tt-link' %>
+    <% end %>
+  </div>
+  <div class="tt-preview-container">
+    <% if local_assigns[:episode] && episode&.preview_url %>
+      <iframe id="tt-preview" src="<%= episode.preview_url %>" 
+              class="tt-preview-iframe"></iframe>
+    <% else %>
+      <div class="tt-preview-placeholder">
+        <p>Preview will appear here when build completes</p>
+      </div>
+    <% end %>
+  </div>
+</div>

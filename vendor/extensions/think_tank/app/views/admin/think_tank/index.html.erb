@@ -1,0 +1,247 @@
+<%# 
+  Think Tank Mission Control Dashboard
+  Split-screen interface with terminal (left) and preview (right)
+%>
+
+<%= stylesheet_link_tag 'admin/think_tank' %>
+
+<div class="think-tank-dashboard">
+  <!-- Header -->
+  <div class="tt-header">
+    <h1>🧠 Think Tank</h1>
+    <div class="tt-header-actions">
+      <%= link_to 'Settings', { action: 'settings' }, class: 'button' %>
+      <%= link_to 'History', '#', class: 'button', id: 'toggle-history' %>
+    </div>
+  </div>
+  
+  <% unless @api_configured %>
+    <div class="tt-alert tt-alert-warning">
+      ⚠️ RADIANT API not configured. 
+      <%= link_to 'Configure now', { action: 'settings' } %>
+    </div>
+  <% end %>
+  
+  <!-- Prompt Form -->
+  <div class="tt-prompt-section">
+    <%= form_tag({ action: 'create' }, method: :post, class: 'tt-prompt-form') do %>
+      <div class="tt-form-row">
+        <div class="tt-form-group tt-form-group-template">
+          <label for="template">Template</label>
+          <%= select_tag :template, 
+              options_for_select([['-- None --', '']] + (@templates || {}).keys.map { |k| [k.to_s.titleize, k] }),
+              class: 'tt-select' %>
+        </div>
+        
+        <div class="tt-form-group tt-form-group-model">
+          <label for="model">Model</label>
+          <%= select_tag :model,
+              options_for_select(%w[claude-3-haiku claude-3-sonnet claude-3-opus gpt-4-turbo]),
+              class: 'tt-select' %>
+        </div>
+      </div>
+      
+      <div class="tt-form-group">
+        <label for="prompt">What would you like to build?</label>
+        <%= text_area_tag :prompt, '', 
+            placeholder: 'e.g., Build a mortgage calculator with principal, interest rate, and term inputs',
+            rows: 3,
+            class: 'tt-textarea',
+            required: true %>
+      </div>
+      
+      <div class="tt-form-actions">
+        <%= submit_tag '🚀 Build It', class: 'tt-button tt-button-primary', disabled: !@api_configured %>
+      </div>
+    <% end %>
+  </div>
+  
+  <!-- Split Screen: Terminal + Preview -->
+  <div class="tt-split-screen">
+    <!-- Left Pane: Terminal -->
+    <div class="tt-pane tt-terminal-pane">
+      <div class="tt-pane-header">
+        <span class="tt-pane-title">Terminal</span>
+        <span class="tt-status" id="tt-status">
+          <% if @current_episode %>
+            <%= @current_episode.status.to_s.titleize %>
+          <% else %>
+            Ready
+          <% end %>
+        </span>
+      </div>
+      <div class="tt-terminal" id="tt-terminal">
+        <% if @current_episode && @current_episode.log_stream.present? %>
+          <% @current_episode.log_stream.each do |log| %>
+            <div class="tt-log tt-log-<%= log[:level] || log['level'] %>">
+              <span class="tt-log-time"><%= log[:time] || log['time'] %></span>
+              <span class="tt-log-msg"><%= log[:message] || log['message'] %></span>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="tt-log tt-log-info">
+            <span class="tt-log-time">--:--:--</span>
+            <span class="tt-log-msg">Enter a prompt above to start building...</span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Right Pane: Preview -->
+    <div class="tt-pane tt-preview-pane">
+      <div class="tt-pane-header">
+        <span class="tt-pane-title">Preview</span>
+        <% if @current_episode&.preview_url %>
+          <%= link_to 'Open in new tab ↗', @current_episode.preview_url, 
+              target: '_blank', class: 'tt-link' %>
+        <% end %>
+      </div>
+      <div class="tt-preview-container">
+        <% if @current_episode&.preview_url %>
+          <iframe id="tt-preview" src="<%= @current_episode.preview_url %>" 
+                  class="tt-preview-iframe"></iframe>
+        <% else %>
+          <div class="tt-preview-placeholder">
+            <p>Preview will appear here when build completes</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- History Sidebar (hidden by default) -->
+  <div class="tt-history-sidebar" id="tt-history" style="display: none;">
+    <h3>Recent Episodes</h3>
+    <ul class="tt-history-list">
+      <% @episodes.each do |episode| %>
+        <li class="tt-history-item tt-history-<%= episode.status %>">
+          <%= link_to url_for(action: 'index', uuid: episode.uuid) do %>
+            <span class="tt-history-status"><%= status_icon(episode.status) %></span>
+            <span class="tt-history-goal"><%= truncate(episode.goal, length: 50) %></span>
+            <span class="tt-history-time"><%= time_ago_in_words(episode.created_at) %> ago</span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+
+<!-- Polling Script -->
+<script>
+(function() {
+  var currentUuid = '<%= @current_episode&.uuid %>';
+  var lastIndex = <%= @current_episode&.log_stream&.length || 0 %>;
+  var pollInterval = 2000; // 2 seconds
+  var poller = null;
+  
+  // Status icons
+  var statusIcons = {
+    pending: '⏳',
+    thinking: '🧠',
+    morphing: '🔨',
+    completed: '✅',
+    failed: '❌'
+  };
+  
+  function appendLog(log) {
+    var terminal = document.getElementById('tt-terminal');
+    var div = document.createElement('div');
+    div.className = 'tt-log tt-log-' + log.level;
+    div.innerHTML = '<span class="tt-log-time">' + log.time + '</span>' +
+                    '<span class="tt-log-msg">' + log.message + '</span>';
+    terminal.appendChild(div);
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+  
+  function updateStatus(status) {
+    var el = document.getElementById('tt-status');
+    el.textContent = (statusIcons[status] || '') + ' ' + status.charAt(0).toUpperCase() + status.slice(1);
+    el.className = 'tt-status tt-status-' + status;
+  }
+  
+  function updatePreview(url) {
+    if (!url) return;
+    
+    var container = document.querySelector('.tt-preview-container');
+    var iframe = document.getElementById('tt-preview');
+    
+    if (iframe) {
+      iframe.src = url;
+    } else {
+      container.innerHTML = '<iframe id="tt-preview" src="' + url + '" class="tt-preview-iframe"></iframe>';
+    }
+    
+    // Update link
+    var header = document.querySelector('.tt-preview-pane .tt-pane-header');
+    var link = header.querySelector('.tt-link');
+    if (link) {
+      link.href = url;
+    } else {
+      var a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.className = 'tt-link';
+      a.textContent = 'Open in new tab ↗';
+      header.appendChild(a);
+    }
+  }
+  
+  function poll() {
+    if (!currentUuid) return;
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/admin/think_tank/poll/' + currentUuid + '?last_index=' + lastIndex);
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        var data = JSON.parse(xhr.responseText);
+        
+        // Update status
+        updateStatus(data.status);
+        
+        // Append new logs
+        if (data.logs && data.logs.length > 0) {
+          data.logs.forEach(appendLog);
+          lastIndex = data.log_count;
+        }
+        
+        // Update preview if completed
+        if (data.preview_url) {
+          updatePreview(data.preview_url);
+        }
+        
+        // Stop polling if terminal state
+        if (data.status === 'completed' || data.status === 'failed') {
+          stopPolling();
+        }
+      }
+    };
+    xhr.send();
+  }
+  
+  function startPolling() {
+    if (poller) return;
+    poller = setInterval(poll, pollInterval);
+    poll(); // Initial poll
+  }
+  
+  function stopPolling() {
+    if (poller) {
+      clearInterval(poller);
+      poller = null;
+    }
+  }
+  
+  // Start polling if we have an active episode
+  var currentStatus = '<%= @current_episode&.status %>';
+  if (currentUuid && ['pending', 'thinking', 'morphing'].indexOf(currentStatus) >= 0) {
+    startPolling();
+  }
+  
+  // History toggle
+  document.getElementById('toggle-history').addEventListener('click', function(e) {
+    e.preventDefault();
+    var sidebar = document.getElementById('tt-history');
+    sidebar.style.display = sidebar.style.display === 'none' ? 'block' : 'none';
+  });
+})();
+</script>
