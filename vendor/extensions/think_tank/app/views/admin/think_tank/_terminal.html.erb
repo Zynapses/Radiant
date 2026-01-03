@@ -1,0 +1,29 @@
+<%# Terminal Partial - Displays log stream with real-time updates %>
+
+<div class="tt-pane tt-terminal-pane">
+  <div class="tt-pane-header">
+    <span class="tt-pane-title">Terminal</span>
+    <span class="tt-status" id="tt-status">
+      <% if local_assigns[:episode] && episode %>
+        <%= status_icon(episode.status) %> <%= episode.status.to_s.titleize %>
+      <% else %>
+        Ready
+      <% end %>
+    </span>
+  </div>
+  <div class="tt-terminal" id="tt-terminal">
+    <% if local_assigns[:episode] && episode&.log_stream.present? %>
+      <% episode.log_stream.each do |log| %>
+        <div class="tt-log tt-log-<%= log[:level] || log['level'] %>">
+          <span class="tt-log-time"><%= log[:time] || log['time'] %></span>
+          <span class="tt-log-msg"><%= log[:message] || log['message'] %></span>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="tt-log tt-log-info">
+        <span class="tt-log-time">--:--:--</span>
+        <span class="tt-log-msg">Enter a prompt above to start building...</span>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,154 @@
+<%# 
+  Think Tank Settings Page
+  Configure RADIANT API connection and other settings
+%>
+
+<%= stylesheet_link_tag 'admin/think_tank' %>
+
+<div class="think-tank-dashboard">
+  <div class="tt-header">
+    <h1>🧠 Think Tank Settings</h1>
+    <div class="tt-header-actions">
+      <%= link_to '← Back to Dashboard', { action: 'index' }, class: 'button' %>
+    </div>
+  </div>
+  
+  <%= form_tag({ action: 'update_settings' }, method: :put, class: 'tt-settings-form') do %>
+    
+    <!-- API Configuration Section -->
+    <div class="tt-settings-section">
+      <h2>RADIANT API Configuration</h2>
+      <p class="tt-section-description">
+        Connect to your RADIANT platform to enable AI-powered page generation.
+      </p>
+      
+      <div class="tt-form-group">
+        <label for="settings_radiant_api_endpoint">API Endpoint</label>
+        <%= text_field_tag 'settings[radiant_api_endpoint]', 
+            @settings['radiant_api_endpoint'],
+            placeholder: 'https://api.your-radiant-instance.com',
+            class: 'tt-input' %>
+        <span class="tt-help">The base URL of your RADIANT API</span>
+      </div>
+      
+      <div class="tt-form-group">
+        <label for="settings_radiant_api_key">API Key</label>
+        <%= password_field_tag 'settings[radiant_api_key]', 
+            @settings['radiant_api_key'],
+            placeholder: '••••••••••••••••',
+            class: 'tt-input' %>
+        <span class="tt-help">Your RADIANT API authentication key</span>
+      </div>
+      
+      <div class="tt-form-group">
+        <label for="settings_radiant_tenant_id">Tenant ID</label>
+        <%= text_field_tag 'settings[radiant_tenant_id]', 
+            @settings['radiant_tenant_id'],
+            placeholder: 'your-tenant-id',
+            class: 'tt-input' %>
+        <span class="tt-help">Your RADIANT tenant identifier (optional)</span>
+      </div>
+      
+      <div class="tt-form-actions-inline">
+        <button type="button" id="test-api-btn" class="tt-button tt-button-secondary">
+          Test Connection
+        </button>
+        <span id="test-api-result"></span>
+      </div>
+    </div>
+    
+    <!-- Model Configuration Section -->
+    <div class="tt-settings-section">
+      <h2>Model Configuration</h2>
+      
+      <div class="tt-form-group">
+        <label for="settings_default_model">Default Model</label>
+        <%= select_tag 'settings[default_model]',
+            options_for_select(
+              @available_models.map { |m| [m, m] },
+              @settings['default_model']
+            ),
+            class: 'tt-select' %>
+        <span class="tt-help">The AI model used for generating pages</span>
+      </div>
+      
+      <div class="tt-form-group">
+        <label for="settings_max_tokens">Max Tokens</label>
+        <%= number_field_tag 'settings[max_tokens]', 
+            @settings['max_tokens'] || 4096,
+            min: 1000, max: 32000, step: 100,
+            class: 'tt-input tt-input-number' %>
+        <span class="tt-help">Maximum tokens for AI response</span>
+      </div>
+      
+      <div class="tt-form-group">
+        <label for="settings_api_timeout">API Timeout (seconds)</label>
+        <%= number_field_tag 'settings[api_timeout]', 
+            @settings['api_timeout'] || 60,
+            min: 10, max: 300, step: 10,
+            class: 'tt-input tt-input-number' %>
+        <span class="tt-help">Request timeout in seconds</span>
+      </div>
+    </div>
+    
+    <!-- Page Generation Section -->
+    <div class="tt-settings-section">
+      <h2>Page Generation</h2>
+      
+      <div class="tt-form-group">
+        <label for="settings_default_layout">Default Layout</label>
+        <%= text_field_tag 'settings[default_layout]', 
+            @settings['default_layout'] || 'Normal',
+            class: 'tt-input' %>
+        <span class="tt-help">Radiant layout to use for generated pages</span>
+      </div>
+      
+      <div class="tt-form-group">
+        <label for="settings_snippet_prefix">Snippet Prefix</label>
+        <%= text_field_tag 'settings[snippet_prefix]', 
+            @settings['snippet_prefix'] || 'tt_',
+            class: 'tt-input tt-input-small' %>
+        <span class="tt-help">Prefix for generated snippet names</span>
+      </div>
+      
+      <div class="tt-form-group tt-form-group-checkbox">
+        <%= check_box_tag 'settings[auto_publish]', 'true', 
+            @settings['auto_publish'] == true || @settings['auto_publish'] == 'true',
+            class: 'tt-checkbox' %>
+        <label for="settings_auto_publish">Auto-publish pages</label>
+        <span class="tt-help">Automatically publish pages after creation (otherwise creates as draft)</span>
+      </div>
+    </div>
+    
+    <div class="tt-form-actions">
+      <%= submit_tag 'Save Settings', class: 'tt-button tt-button-primary' %>
+    </div>
+  <% end %>
+</div>
+
+<script>
+document.getElementById('test-api-btn').addEventListener('click', function() {
+  var resultEl = document.getElementById('test-api-result');
+  resultEl.textContent = 'Testing...';
+  resultEl.className = '';
+  
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/admin/think_tank/test_api');
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onload = function() {
+    var data = JSON.parse(xhr.responseText);
+    if (data.success) {
+      resultEl.textContent = '✅ ' + data.message;
+      resultEl.className = 'tt-test-success';
+    } else {
+      resultEl.textContent = '❌ ' + data.message;
+      resultEl.className = 'tt-test-error';
+    }
+  };
+  xhr.onerror = function() {
+    resultEl.textContent = '❌ Network error';
+    resultEl.className = 'tt-test-error';
+  };
+  xhr.send();
+});
+</script>

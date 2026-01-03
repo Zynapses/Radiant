@@ -1,0 +1,91 @@
+# Think Tank Extension Localization
+en:
+  think_tank:
+    title: "Think Tank"
+    description: "AI-powered page builder"
+    
+    # Statuses
+    statuses:
+      pending: "Pending"
+      thinking: "Thinking"
+      morphing: "Morphing"
+      completed: "Completed"
+      failed: "Failed"
+    
+    # Dashboard
+    dashboard:
+      title: "Think Tank Mission Control"
+      prompt_label: "What would you like to build?"
+      prompt_placeholder: "e.g., Build a mortgage calculator with principal, interest rate, and term inputs"
+      template_label: "Template"
+      template_none: "-- None --"
+      model_label: "Model"
+      build_button: "🚀 Build It"
+      settings_link: "Settings"
+      history_link: "History"
+    
+    # Terminal
+    terminal:
+      title: "Terminal"
+      ready: "Ready"
+      initial_message: "Enter a prompt above to start building..."
+    
+    # Preview
+    preview:
+      title: "Preview"
+      open_tab: "Open in new tab ↗"
+      placeholder: "Preview will appear here when build completes"
+    
+    # Settings
+    settings:
+      title: "Think Tank Settings"
+      back_link: "← Back to Dashboard"
+      
+      api_section: "RADIANT API Configuration"
+      api_description: "Connect to your RADIANT platform to enable AI-powered page generation."
+      api_endpoint: "API Endpoint"
+      api_endpoint_placeholder: "https://api.your-radiant-instance.com"
+      api_endpoint_help: "The base URL of your RADIANT API"
+      api_key: "API Key"
+      api_key_placeholder: "••••••••••••••••"
+      api_key_help: "Your RADIANT API authentication key"
+      tenant_id: "Tenant ID"
+      tenant_id_placeholder: "your-tenant-id"
+      tenant_id_help: "Your RADIANT tenant identifier (optional)"
+      test_connection: "Test Connection"
+      
+      model_section: "Model Configuration"
+      default_model: "Default Model"
+      default_model_help: "The AI model used for generating pages"
+      max_tokens: "Max Tokens"
+      max_tokens_help: "Maximum tokens for AI response"
+      api_timeout: "API Timeout (seconds)"
+      api_timeout_help: "Request timeout in seconds"
+      
+      page_section: "Page Generation"
+      default_layout: "Default Layout"
+      default_layout_help: "Radiant layout to use for generated pages"
+      snippet_prefix: "Snippet Prefix"
+      snippet_prefix_help: "Prefix for generated snippet names"
+      auto_publish: "Auto-publish pages"
+      auto_publish_help: "Automatically publish pages after creation (otherwise creates as draft)"
+      
+      save_button: "Save Settings"
+    
+    # Messages
+    messages:
+      api_not_configured: "RADIANT API not configured."
+      configure_now: "Configure now"
+      prompt_required: "Please enter a prompt"
+      task_started: "Task started! Watch the terminal for progress."
+      page_created: "Page created: %{url}"
+      build_failed: "Build failed: %{error}"
+      settings_saved: "Settings saved"
+      episode_deleted: "Episode deleted"
+      api_success: "API connection successful"
+      api_failed: "API connection failed"
+    
+    # History
+    history:
+      title: "Recent Episodes"
+      ago: "ago"

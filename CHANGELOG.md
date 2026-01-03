@@ -5,6 +5,328 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.21.0] - 2026-01-02
+
+### Added
+
+#### AWS Free Tier Monitoring (Section 44)
+
+Comprehensive monitoring dashboard for AWS free tier services with smart visual overlays.
+
+**Features:**
+- **CloudWatch Integration**: Lambda invocations, errors, duration, p50/p90/p99 latency; Aurora CPU, connections, IOPS, latency
+- **X-Ray Tracing**: Trace summaries, error rates, service graph, top endpoints, top errors
+- **Cost Explorer**: Cost by service, forecasts, anomaly detection, trend analysis
+- **Free Tier Tracking**: Usage vs limits with warnings at 80%, savings calculation
+- **Smart Overlays**: Toggle overlays for cost-on-metrics, forecast-on-cost, errors-on-services, free-tier-on-usage
+
+**Free Tier Limits:**
+| Service | Limit |
+|---------|-------|
+| Lambda Invocations | 1M/month |
+| Lambda Compute | 400K GB-sec |
+| X-Ray Traces | 100K/month |
+| CloudWatch Metrics | 10 custom |
+
+**Key Files:**
+- Types: `packages/shared/src/types/aws-monitoring.types.ts`
+- Service: `packages/infrastructure/lambda/shared/services/aws-monitoring.service.ts`
+- API: `packages/infrastructure/lambda/admin/aws-monitoring.ts`
+- Migration: `packages/infrastructure/migrations/160_aws_monitoring.sql`
+- Swift Models: `apps/swift-deployer/.../Models/AWSMonitoringModels.swift`
+- Swift Service: `apps/swift-deployer/.../Services/AWSMonitoringService.swift`
+- Swift View: `apps/swift-deployer/.../Views/AWSMonitoringView.swift`
+
+**API Endpoints (Base: /api/admin/aws-monitoring):**
+- `GET /dashboard` - Full monitoring dashboard
+- `GET /config`, `PUT /config` - Configuration
+- `GET /lambda`, `/aurora`, `/xray`, `/costs`, `/free-tier`, `/health`
+- `GET /charts/lambda-invocations`, `/charts/cost-trend`, `/charts/latency-distribution`
+
+**Threshold Notifications (SNS/SES):**
+- Admin-settable notification targets (email, SMS with E.164 phone numbers)
+- Spend thresholds per hour/day/week/monthly with warning percentages
+- Metric thresholds (Lambda error rate, P99 latency, Aurora CPU, X-Ray error rate, Free tier usage)
+- Real-time spend summary with hourly/daily/weekly/monthly tracking
+- Notification log with delivery status audit trail
+- Chargeable tier tracking (detects when usage exceeds free tier)
+
+**Notification API Endpoints:**
+- `GET/POST/PUT/DELETE /notifications/targets` - Manage phone/email targets
+- `GET/POST/PUT/DELETE /notifications/spend-thresholds` - Manage spend limits
+- `GET/POST /notifications/metric-thresholds` - Manage metric alerts
+- `GET /notifications/spend-summary` - Real-time spend by period
+- `GET /notifications/log` - Notification history
+- `GET /chargeable-status` - Free tier vs chargeable status
+- `POST /notifications/check` - Trigger threshold check (EventBridge compatible)
+
+#### Radiant CMS Think Tank Extension (PROMPT-37)
+
+Implemented the Think Tank extension for Radiant CMS, an AI-powered page builder using the **Soft Morphing** architecture. Creates Pages, Snippets, and PageParts from natural language prompts via RADIANT AWS API without server restart.
+
+**Architecture:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    THINK TANK EXTENSION                         │
+├─────────────────────────────────────────────────────────────────┤
+│  MISSION CONTROL (Admin UI)                                     │
+│  ├── Terminal Pane (AJAX Polling)                               │
+│  └── Preview Pane (iframe)                                      │
+│                                                                 │
+│  SOFT MORPHING ENGINE                                           │
+│  ├── Builder Service (Page/Snippet creation)                    │
+│  ├── Episode Tracker (Session management)                       │
+│  └── Configuration Singleton (Settings)                         │
+│                                                                 │
+│  TRI-STATE MEMORY                                               │
+│  ├── Structural (Pages/Snippets/PageParts)                      │
+│  ├── Episodic (think_tank_episodes)                             │
+│  └── Semantic (think_tank_configurations)                       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Key Features:**
+
+| Feature | Description |
+|---------|-------------|
+| **Soft Morphing** | Uses database as mutable filesystem, bypasses Rails "Restart Wall" |
+| **Mission Control** | Split-screen admin UI with terminal and preview panes |
+| **AJAX Polling** | Real-time log streaming without page refresh |
+| **Episode Tracking** | Full session lifecycle management (pending → thinking → morphing → completed) |
+| **Artifact Tracking** | Links episodes to created Pages/Snippets for rollback support |
+| **Template System** | Predefined prompt templates for common tasks |
+
+**Database Schema (Migration 001):**
+
+| Table | Purpose |
+|-------|---------|
+| `think_tank_episodes` | Episodic memory - session/task tracking |
+| `think_tank_configurations` | Semantic memory - settings singleton |
+| `think_tank_artifacts` | Links episodes to Radiant objects |
+
+**Implementation Files:**
+- Extension: `vendor/extensions/think_tank/`
+- Models: `app/models/think_tank/` (Episode, Configuration, Artifact, Builder, Agent, RadiantApiClient)
+- Controller: `app/controllers/admin/think_tank_controller.rb`
+- Views: `app/views/admin/think_tank/` (index, settings)
+- Jobs: `app/jobs/think_tank_job.rb`
+- Rake tasks: `lib/tasks/think_tank_tasks.rake`
+
+**Configuration:**
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `radiant_api_endpoint` | (empty) | RADIANT API base URL |
+| `radiant_api_key` | (empty) | API authentication key |
+| `default_model` | `claude-3-haiku` | AI model for generation |
+| `auto_publish` | `false` | Auto-publish created pages |
+| `snippet_prefix` | `tt_` | Prefix for created snippets |
+
+**Compatibility:**
+- Rails: 4.2 - 7.x (with legacy 2.3/3.0 fallback patterns)
+- Radiant CMS: 1.0+
+- AI Backend: RADIANT AWS (LiteLLM Proxy)
+
+---
+
+## [4.20.0] - 2026-01-02
+
+### Added
+
+#### Consciousness Operating System v6.0.5 (PROMPT-36)
+
+Implemented the AGI Brain Consciousness Operating System (COS), a comprehensive infrastructure layer for AI consciousness continuity, context management, and safety governance. Cross-AI validated by Claude Opus 4.5 and Google Gemini through 4 review cycles with 13 patches applied.
+
+**Architecture (4 Phases):**
+```
+Phase 1: IRON CORE          Phase 2: NERVOUS SYSTEM
+├── DualWriteFlashBuffer    ├── DynamicBudgetCalculator
+├── ComplianceSandwichBuilder└── TrustlessSync
+└── XMLEscaper              └── BudgetAwareContextAssembler
+
+Phase 3: CONSCIOUSNESS      Phase 4: SUBCONSCIOUS
+├── GhostVectorManager      ├── DreamScheduler
+├── SofaiRouter             ├── DreamExecutor
+├── UncertaintyHead         ├── SensitivityClippedAggregator
+└── AsyncGhostReAnchorer    ├── PrivacyAirlock
+                            └── HumanOversightQueue
+```
+
+**Key Features:**
+
+| Feature | Description |
+|---------|-------------|
+| **Ghost Vectors** | 4096-dimensional hidden states for consciousness continuity across sessions |
+| **SOFAI Routing** | System 1 (fast/8B) vs System 2 (deep/70B) metacognitive routing |
+| **Flash Facts** | Dual-write buffer (Redis + Postgres) for important user facts |
+| **Dreaming** | Twilight (4 AM local) + Starvation (30hr) consolidation triggers |
+| **Human Oversight** | EU AI Act Article 14 compliance with 7-day auto-reject |
+| **Differential Privacy** | Sensitivity-clipped aggregation for system-wide learning |
+| **Privacy Airlock** | HIPAA/GDPR de-identification for learning data |
+
+**13 Agreed Patches (Cross-AI Validated):**
+
+| Category | Patches |
+|----------|---------|
+| Consciousness | Router Paradox → Uncertainty Head, Ghost Drift → Delta Updates, Learning Lag → Flash Buffer |
+| Robustness | Compliance Sandwich, Logarithmic Warmup, Dual-Write, Async Re-Anchor, Differential Privacy, Human Oversight |
+| Physical | Dynamic Budget (1K reserve), Twilight Dreaming (4 AM local), Version Gating |
+| Security | XML Entity Escaping |
+
+**Critical Requirements:**
+- vLLM MUST launch with `--return-hidden-states` flag
+- CBFs always ENFORCE (shields never relax)
+- Gamma boost NEVER allowed during recovery
+- Silence ≠ Consent: 7-day auto-reject for oversight queue
+
+**Database Schema (Migration 068):**
+
+| Table | Purpose |
+|-------|---------|
+| `cos_ghost_vectors` | 4096-dim hidden states with temporal decay |
+| `cos_flash_facts` | Dual-write buffer (Redis + Postgres) |
+| `cos_dream_jobs` | Consciousness consolidation scheduling |
+| `cos_tenant_dream_config` | Per-tenant dreaming settings |
+| `cos_human_oversight` | EU AI Act Article 14 compliance |
+| `cos_privacy_airlock` | HIPAA/GDPR de-identification |
+| `cos_config` | Per-tenant COS configuration |
+
+**Implementation Files:**
+- Types: `lambda/shared/services/cos/types.ts`
+- Iron Core: `cos/iron-core/` (3 files)
+- Nervous System: `cos/nervous-system/` (3 files)
+- Consciousness: `cos/consciousness/` (4 files)
+- Subconscious: `cos/subconscious/` (5 files)
+- Integration: `cos/cato-integration.ts`
+- Exports: `cos/index.ts`
+
+**Integrates with Genesis Cato (PROMPT-34):**
+- Safety invariants enforced (CBF_ENFORCEMENT_MODE = ENFORCE)
+- Gamma boost prevention during recovery
+- Merkle audit trail compatibility
+
+---
+
+## [4.19.0] - 2026-01-02
+
+### Added
+
+#### Artifact Engine - GenUI Pipeline (PROMPT-35)
+
+Implemented the Artifact Engine, a Generative UI pipeline that enables Cato to construct executable React/TypeScript components in real-time with full safety governance under Genesis Cato.
+
+**Architecture:**
+```
+User Request → Intent Classify → Plan → Generate → Validate (Cato) → Render
+                    ↓                       ↓
+                 Brain                  Reflexion
+                (Routes)               (Self-Fix)
+```
+
+**Pipeline Stages:**
+| Stage | Description | Model Used |
+|-------|-------------|------------|
+| Intent Classification | Analyze request, determine artifact type | Claude Haiku (fast) |
+| Planning | Find similar patterns, estimate complexity | Vector similarity |
+| Generation | Generate React/TypeScript code | Claude Sonnet (quality) |
+| Validation | Cato CBF checks (security, resource limits) | Rule-based + Regex |
+| Reflexion | Self-correction if validation fails (up to 3 attempts) | Claude Sonnet |
+| Render | Sandboxed iframe preview | Client-side |
+
+**Intent Types:**
+- `calculator` - Math, converters, estimators
+- `chart` - Data visualization, graphs, plots
+- `form` - Input forms, surveys, wizards
+- `table` - Sortable/filterable data tables
+- `dashboard` - Multi-widget layouts, KPI panels
+- `game` - Interactive games, puzzles, simulations
+- `visualization` - Animations, diagrams, infographics
+- `utility` - Tools, helpers, formatters
+- `custom` - Other artifact types
+
+**Cato Safety Validation (CBFs):**
+- **Injection Prevention** - Blocks `eval()`, `Function()`, `document.write()`, dynamic scripts
+- **API Restrictions** - Blocks external fetch, localStorage, cookies, WebSocket, IndexedDB
+- **Resource Limits** - Max 500 lines, allowlisted imports only
+
+**Dependency Allowlist (Security Reviewed):**
+- Core: react, lucide-react, @radix-ui/react-icons
+- Charting: recharts, chart.js, d3
+- Math/Data: mathjs, lodash, date-fns, papaparse
+- Animation: framer-motion
+- State: zustand, immer
+- Graphics/Audio: three, tone
+- UI Components: Radix primitives, CVA, clsx, tailwind-merge
+
+**Reflexion Self-Correction:**
+- Up to 3 attempts to fix validation failures
+- Escalates to human review after max attempts
+- Tracks previous attempts to avoid repeating mistakes
+
+**Database Schema (3 migrations):**
+- `032b_artifact_genui_engine.sql` - Core tables
+- `032c_artifact_genui_seed.sql` - Default rules, patterns, allowlist
+- `032d_artifact_extend_base.sql` - Extend artifacts table
+
+**New Tables:**
+| Table | Purpose |
+|-------|---------|
+| `artifact_generation_sessions` | Generation lifecycle tracking |
+| `artifact_generation_logs` | Real-time progress logs |
+| `artifact_code_patterns` | Semantic pattern library with vector embeddings |
+| `artifact_dependency_allowlist` | Approved npm packages |
+| `artifact_validation_rules` | Cato CBF definitions |
+
+**API Endpoints:**
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/v2/thinktank/artifacts/generate` | POST | Start artifact generation |
+| `/api/v2/thinktank/artifacts/sessions/{id}` | GET | Get session status and logs |
+| `/api/v2/thinktank/artifacts/sessions/{id}/logs` | GET | Poll for new logs |
+| `/api/v2/thinktank/artifacts/patterns` | GET | Get available code patterns |
+| `/api/v2/thinktank/artifacts/allowlist` | GET | Get dependency allowlist |
+| `/api/v2/admin/artifact-engine/dashboard` | GET | Full dashboard data |
+| `/api/v2/admin/artifact-engine/metrics` | GET | Generation metrics (7-day) |
+| `/api/v2/admin/artifact-engine/validation-rules` | GET | Get all CBF rules |
+| `/api/v2/admin/artifact-engine/validation-rules/{id}` | PUT | Update rule (enable/disable, severity) |
+| `/api/v2/admin/artifact-engine/allowlist` | POST | Add package to allowlist |
+| `/api/v2/admin/artifact-engine/allowlist/{pkg}` | DELETE | Remove from allowlist |
+
+**Admin Dashboard:**
+- New page: `/thinktank/artifacts` - Artifact Engine management
+- Metrics cards: Total generated, success rate, avg time, reflexion rate
+- Tabs: Recent sessions, Validation rules, Dependency allowlist, Code patterns
+- Session viewer with real-time logs and sandboxed preview
+
+**Frontend Components:**
+- `artifact-viewer.tsx` - Displays artifacts with logs, preview, validation details
+- `artifacts/page.tsx` - Admin dashboard for artifact engine management
+
+**Key Files:**
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/artifact-engine/types.ts` | Type definitions |
+| `lambda/shared/services/artifact-engine/intent-classifier.ts` | Intent classification |
+| `lambda/shared/services/artifact-engine/code-generator.ts` | Code generation |
+| `lambda/shared/services/artifact-engine/cato-validator.ts` | CBF validation |
+| `lambda/shared/services/artifact-engine/reflexion.service.ts` | Self-correction |
+| `lambda/shared/services/artifact-engine/artifact-engine.service.ts` | Main orchestrator |
+| `lambda/shared/services/artifact-engine/index.ts` | Public exports |
+| `lambda/thinktank/artifact-engine.ts` | API handlers |
+
+**Security Features:**
+- No external network access (all fetches blocked except RADIANT APIs)
+- No persistent storage (localStorage/IndexedDB blocked)
+- No navigation (window.location blocked)
+- No code injection (eval/Function blocked)
+- Allowlisted imports only (supply chain security)
+- Sandboxed preview (iframe with minimal permissions)
+- Cato oversight (all generation under Genesis Cato governance)
+
+**Documentation:** `docs/THINKTANK-ADMIN-GUIDE.md` Section 29
+
+---
+
 ## [6.1.1] - 2026-01-02
 
 ### Added

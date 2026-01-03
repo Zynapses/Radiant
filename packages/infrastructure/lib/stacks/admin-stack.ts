@@ -142,6 +142,56 @@ export class AdminStack extends cdk.Stack {
       resources: [adminUserPool.userPoolArn],
     }));
 
+    // Grant AWS Monitoring permissions (CloudWatch, Cost Explorer, X-Ray, SNS, SES)
+    adminLambdaRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'cloudwatch:GetMetricData',
+        'cloudwatch:GetMetricStatistics',
+        'cloudwatch:ListMetrics',
+        'cloudwatch:DescribeAlarms',
+      ],
+      resources: ['*'],
+    }));
+
+    adminLambdaRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'ce:GetCostAndUsage',
+        'ce:GetCostForecast',
+        'ce:GetAnomalies',
+        'ce:GetDimensionValues',
+      ],
+      resources: ['*'],
+    }));
+
+    adminLambdaRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'xray:GetTraceSummaries',
+        'xray:GetServiceGraph',
+        'xray:BatchGetTraces',
+      ],
+      resources: ['*'],
+    }));
+
+    adminLambdaRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'sns:Publish',
+      ],
+      resources: ['*'],
+    }));
+
+    adminLambdaRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'ses:SendEmail',
+        'ses:SendRawEmail',
+      ],
+      resources: ['*'],
+    }));
+
     // Admin Lambda function
     this.adminFunction = new lambda.Function(this, 'AdminFunction', {
       functionName: `${appId}-${environment}-admin`,
@@ -446,6 +496,184 @@ export class AdminStack extends cdk.Stack {
 
     // Reconciliation
     brain.addResource('reconciliation').addResource('trigger').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // =========================================================================
+    // AWS Free Tier Monitoring Routes
+    // =========================================================================
+    const awsMonitoring = admin.addResource('aws-monitoring');
+    
+    // Dashboard
+    awsMonitoring.addResource('dashboard').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Configuration
+    const monitoringConfig = awsMonitoring.addResource('config');
+    monitoringConfig.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    monitoringConfig.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Lambda metrics
+    awsMonitoring.addResource('lambda').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Aurora metrics
+    awsMonitoring.addResource('aurora').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // X-Ray traces
+    const xray = awsMonitoring.addResource('xray');
+    xray.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    xray.addResource('service-graph').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Cost Explorer
+    const costs = awsMonitoring.addResource('costs');
+    costs.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    costs.addResource('anomalies').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Free tier usage
+    awsMonitoring.addResource('free-tier').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Health status
+    awsMonitoring.addResource('health').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Charts
+    const charts = awsMonitoring.addResource('charts');
+    charts.addResource('lambda-invocations').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    charts.addResource('cost-trend').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    charts.addResource('latency-distribution').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Notifications management
+    const notifications = awsMonitoring.addResource('notifications');
+    const notifTargets = notifications.addResource('targets');
+    notifTargets.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    notifTargets.addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const notifTargetById = notifTargets.addResource('{targetId}');
+    notifTargetById.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    notifTargetById.addMethod('DELETE', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Spend thresholds
+    const spendThresholds = notifications.addResource('spend-thresholds');
+    spendThresholds.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    spendThresholds.addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const spendThresholdById = spendThresholds.addResource('{thresholdId}');
+    spendThresholdById.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    spendThresholdById.addMethod('DELETE', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Metric thresholds
+    const metricThresholds = notifications.addResource('metric-thresholds');
+    metricThresholds.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    metricThresholds.addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Spend summary
+    notifications.addResource('spend-summary').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Notification log
+    notifications.addResource('log').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Notification check trigger
+    notifications.addResource('check').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Chargeable tier status
+    awsMonitoring.addResource('chargeable-status').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Tier settings (free/paid toggle sliders)
+    const tierSettings = awsMonitoring.addResource('tier-settings');
+    tierSettings.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    tierSettings.addResource('toggle-paid').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    tierSettings.addResource('auto-scale').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    tierSettings.addResource('budget-cap').addMethod('POST', adminIntegration, {
       authorizer: adminAuthorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });

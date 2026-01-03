@@ -1,0 +1,36 @@
+<%# Prompt Form Partial - Input form for AI page generation %>
+
+<div class="tt-prompt-section">
+  <%= form_tag({ action: 'create' }, method: :post, class: 'tt-prompt-form') do %>
+    <div class="tt-form-row">
+      <div class="tt-form-group tt-form-group-template">
+        <label for="template">Template</label>
+        <%= select_tag :template, 
+            options_for_select([['-- None --', '']] + (local_assigns[:templates] || {}).keys.map { |k| [k.to_s.titleize, k] }),
+            class: 'tt-select' %>
+      </div>
+      
+      <div class="tt-form-group tt-form-group-model">
+        <label for="model">Model</label>
+        <%= select_tag :model,
+            options_for_select(local_assigns[:models] || %w[claude-3-haiku claude-3-sonnet claude-3-opus gpt-4-turbo]),
+            class: 'tt-select' %>
+      </div>
+    </div>
+    
+    <div class="tt-form-group">
+      <label for="prompt">What would you like to build?</label>
+      <%= text_area_tag :prompt, '', 
+          placeholder: 'e.g., Build a mortgage calculator with principal, interest rate, and term inputs',
+          rows: 3,
+          class: 'tt-textarea',
+          required: true %>
+    </div>
+    
+    <div class="tt-form-actions">
+      <%= submit_tag '🚀 Build It', 
+          class: 'tt-button tt-button-primary', 
+          disabled: !local_assigns[:api_configured] %>
+    </div>
+  <% end %>
+</div>

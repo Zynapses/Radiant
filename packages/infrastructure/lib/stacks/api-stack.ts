@@ -753,6 +753,94 @@ export class ApiStack extends cdk.Stack {
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
 
+    // =========================================================================
+    // Artifact Engine API (v4.19.0) - GenUI Pipeline
+    // =========================================================================
+    const artifactEngineLambda = this.createLambda(
+      'ArtifactEngine',
+      'thinktank/artifact-engine.handler',
+      commonEnv,
+      vpc,
+      apiSecurityGroup,
+      lambdaRole
+    );
+    const artifactEngineIntegration = new apigateway.LambdaIntegration(artifactEngineLambda);
+
+    // Think Tank artifact routes
+    const thinktank = v2.addResource('thinktank');
+    const artifacts = thinktank.addResource('artifacts');
+
+    // POST /api/v2/thinktank/artifacts/generate - Start artifact generation
+    artifacts.addResource('generate').addMethod('POST', artifactEngineIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET /api/v2/thinktank/artifacts/patterns - Get available code patterns
+    artifacts.addResource('patterns').addMethod('GET', artifactEngineIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET /api/v2/thinktank/artifacts/allowlist - Get dependency allowlist
+    artifacts.addResource('allowlist').addMethod('GET', artifactEngineIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Session routes
+    const artifactSessions = artifacts.addResource('sessions');
+    const artifactSession = artifactSessions.addResource('{sessionId}');
+
+    // GET /api/v2/thinktank/artifacts/sessions/{sessionId} - Get session status
+    artifactSession.addMethod('GET', artifactEngineIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET /api/v2/thinktank/artifacts/sessions/{sessionId}/logs - Get session logs
+    artifactSession.addResource('logs').addMethod('GET', artifactEngineIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Admin artifact-engine routes
+    const artifactEngineAdmin = admin.addResource('artifact-engine');
+
+    // GET /api/v2/admin/artifact-engine/dashboard - Full dashboard data
+    artifactEngineAdmin.addResource('dashboard').addMethod('GET', artifactEngineIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET /api/v2/admin/artifact-engine/metrics - Generation metrics
+    artifactEngineAdmin.addResource('metrics').addMethod('GET', artifactEngineIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Validation rules
+    const validationRules = artifactEngineAdmin.addResource('validation-rules');
+    validationRules.addMethod('GET', artifactEngineIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    validationRules.addResource('{ruleId}').addMethod('PUT', artifactEngineIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Admin allowlist management
+    const adminAllowlist = artifactEngineAdmin.addResource('allowlist');
+    adminAllowlist.addMethod('POST', artifactEngineIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    adminAllowlist.addResource('{packageName}').addMethod('DELETE', artifactEngineIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'ApiUrl', {
       value: this.api.url,

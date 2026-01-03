@@ -2,8 +2,8 @@
 
 > **Configuration and administration of Think Tank AI features**
 > 
-> Version: 3.2.2 | Platform: RADIANT 4.18.17
-> Last Updated: December 2024
+> Version: 3.3.0 | Platform: RADIANT 4.19.0
+> Last Updated: January 2026
 
 ---
 
@@ -42,6 +42,39 @@ This guide covers administrative features specific to **Think Tank**, the consum
 25. [Formal Reasoning Libraries](#25-formal-reasoning-libraries)
 26. [Ethics-Free Reasoning Mode](#26-ethics-free-reasoning-mode)
 27. [Intelligent File Conversion](#27-intelligent-file-conversion)
+28. [Metrics & Learning Integration](#28-metrics--learning-integration)
+29. [Artifact Engine (GenUI Pipeline)](#29-artifact-engine-genui-pipeline)
+    - [29.1 Executive Summary](#291-executive-summary)
+    - [29.2 System Architecture](#292-system-architecture)
+    - [29.3 Core Concepts](#293-core-concepts)
+    - [29.4 Administrative Control Panel](#294-administrative-control-panel)
+    - [29.5 Safety Governance (Genesis Cato CBFs)](#295-safety-governance-genesis-cato-cbfs)
+    - [29.6 Dependency Allowlist Management](#296-dependency-allowlist-management)
+    - [29.7 Code Pattern Library](#297-code-pattern-library)
+    - [29.8 Reflexion Loop (Self-Correction)](#298-reflexion-loop-self-correction)
+    - [29.9 Escalation Workflow Management](#299-escalation-workflow-management)
+    - [29.10 Audit Trail & Compliance](#2910-audit-trail--compliance)
+    - [29.11 Metrics & Monitoring](#2911-metrics--monitoring)
+    - [29.12 Tenant Configuration](#2912-tenant-configuration)
+    - [29.13 Troubleshooting Guide](#2913-troubleshooting-guide)
+    - [29.14 API Reference](#2914-api-reference)
+    - [29.15 Real-Time Generation Logs](#2915-real-time-generation-logs)
+    - [29.16 Artifact Viewer Component](#2916-artifact-viewer-component)
+    - [29.17 Database Schema](#2917-database-schema)
+    - [29.18 Security Considerations](#2918-security-considerations)
+    - [29.19 Implementation Files](#2919-implementation-files)
+30. [Consciousness Operating System (COS)](#30-consciousness-operating-system-cos)
+    - [30.1 Overview](#301-overview)
+    - [30.2 Architecture](#302-architecture)
+    - [30.3 Ghost Vectors](#303-ghost-vectors)
+    - [30.4 SOFAI Routing](#304-sofai-routing)
+    - [30.5 Flash Facts](#305-flash-facts)
+    - [30.6 Dreaming System](#306-dreaming-system)
+    - [30.7 Human Oversight](#307-human-oversight)
+    - [30.8 Privacy Airlock](#308-privacy-airlock)
+    - [30.9 Configuration](#309-configuration)
+    - [30.10 Database Schema](#3010-database-schema)
+    - [30.11 Implementation Files](#3011-implementation-files)
 
 ---
 
@@ -2987,6 +3020,1256 @@ See **[RADIANT Admin Guide Section 36](./RADIANT-ADMIN-GUIDE.md#36-metrics--pers
 - API endpoints
 - Implementation details
 - Monitoring and alerts
+
+---
+
+## 29. Artifact Engine (GenUI Pipeline)
+
+**Location**: Admin Dashboard → Think Tank → Artifact Engine  
+**Version**: 4.19.0  
+**Cross-AI Validated**: Claude Opus 4.5 ✓ | Google Gemini ✓
+
+The RADIANT Artifact Engine is an **orchestration infrastructure layer** that generates, validates, and continuously improves code artifacts with administrator supervision. Unlike consumer AI coding tools, the Artifact Engine operates under strict governance controls that administrators define and manage.
+
+### 29.1 Executive Summary
+
+#### Key Differentiators
+
+| Traditional AI Coding | RADIANT Artifact Engine |
+|-----------------------|-------------------------|
+| User generates code | System generates, validates, and governs code |
+| One-shot generation | Self-improving loop with admin oversight |
+| No safety controls | 9 Control Barrier Functions (CBFs) enforced |
+| No audit trail | Complete compliance-ready audit logging |
+| Single-user context | Multi-tenant with per-tenant policies |
+
+#### Administrator Responsibilities
+
+As an administrator, you control:
+
+- **What code can do** → Safety rules (CBFs)
+- **What packages are allowed** → Dependency allowlist
+- **What patterns are available** → Code pattern library
+- **What requires human review** → Escalation thresholds
+- **Who can access what** → Tenant and user permissions
+
+### 29.2 System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              USER REQUEST                                   │
+│                    "Build me a mortgage calculator"                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          ORCHESTRATION ENGINE                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌──────────────┐    ┌──────────────┐    ┌──────────────┐                 │
+│   │    INTENT    │───▶│     CODE     │───▶│    CATO      │                 │
+│   │  CLASSIFIER  │    │  GENERATOR   │    │  VALIDATOR   │                 │
+│   └──────────────┘    └──────────────┘    └──────┬───────┘                 │
+│          │                                        │                         │
+│          ▼                                        ▼                         │
+│   ┌──────────────┐                       ┌──────────────┐                   │
+│   │   PATTERN    │                       │  REFLEXION   │                   │
+│   │   MEMORY     │                       │    LOOP      │                   │
+│   │  (Learning)  │                       │ (Self-Fix)   │                   │
+│   └──────────────┘                       └──────────────┘                   │
+│                                                  │                          │
+│                                                  ▼                          │
+│                                          ┌──────────────┐                   │
+│                                          │  ESCALATION  │                   │
+│                                          │   TO ADMIN   │                   │
+│                                          └──────────────┘                   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                     │
+                         ┌───────────┴───────────┐
+                         ▼                       ▼
+                 ┌──────────────┐        ┌──────────────┐
+                 │   APPROVED   │        │   REJECTED   │
+                 │   ARTIFACT   │        │  (Escalated) │
+                 └──────────────┘        └──────────────┘
+```
+
+#### Processing Pipeline
+
+| Phase | Component | Admin Control | Duration |
+|-------|-----------|---------------|----------|
+| 1 | Intent Classification | Pattern library influences suggestions | ~100ms |
+| 2 | Code Generation | Model selection, complexity routing | 2-15s |
+| 3 | Cato Validation | CBF rules you define | ~200ms |
+| 4 | Reflexion (if failed) | Max attempts you configure | 5-30s |
+| 5 | Escalation (if max reached) | Your review queue | Manual |
+
+#### Data Flow
+
+```
+User Request
+     │
+     ▼
+┌─────────────────┐
+│ Tenant Context  │ ◄── RLS enforces isolation
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Session Created │ ◄── Logged to audit trail
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Pattern Search  │ ◄── Semantic similarity (vector DB)
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Code Generated  │ ◄── Model routed by complexity
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ CBFs Validated  │ ◄── Your rules enforced
+└────────┬────────┘
+         │
+    ┌────┴────┐
+    ▼         ▼
+ PASS      FAIL
+    │         │
+    ▼         ▼
+ Store    Reflexion
+    │         │
+    │    ┌────┴────┐
+    │    ▼         ▼
+    │  PASS     FAIL x3
+    │    │         │
+    │    ▼         ▼
+    └───►│      Escalate
+         │         │
+         ▼         ▼
+     Artifact   Your Queue
+```
+
+### 29.3 Core Concepts
+
+#### Artifacts
+
+An **artifact** is a discrete piece of executable content generated by the system:
+
+| Artifact Type | Description | Example |
+|---------------|-------------|---------|
+| `react` | Live React/TypeScript component | Calculator, form, dashboard |
+| `code` | Display-only code snippet | Python script, SQL query |
+| `chart` | Data visualization | Line chart, bar graph |
+| `table` | Interactive data table | Sortable, filterable grid |
+| `form` | Input form with validation | Contact form, survey |
+
+#### Intent Types
+
+| Intent | Description | Complexity |
+|--------|-------------|------------|
+| `calculator` | Math, converters, estimators | Simple |
+| `chart` | Data visualization, graphs, plots | Simple-Moderate |
+| `form` | Input forms, surveys, wizards | Simple-Moderate |
+| `table` | Sortable/filterable data tables | Moderate |
+| `dashboard` | Multi-widget layouts, KPI panels | Complex |
+| `game` | Interactive games, puzzles, simulations | Complex |
+| `visualization` | Animations, diagrams, infographics | Moderate-Complex |
+| `utility` | Tools, helpers, formatters | Simple |
+| `custom` | Doesn't fit other categories | Varies |
+
+#### Generation Sessions
+
+Every artifact generation creates a **session** that tracks:
+
+- Request details (prompt, user, tenant)
+- Classification results (intent, complexity)
+- Generation progress (status, tokens, timing)
+- Validation results (CBF checks, security score)
+- Reflexion attempts (fixes, escalations)
+
+**Session Statuses:**
+
+| Status | Meaning | Admin Action |
+|--------|---------|--------------|
+| `pending` | Request received | None |
+| `planning` | Classifying intent | None |
+| `generating` | Creating code | None |
+| `streaming` | Streaming to user | None |
+| `validating` | Running CBF checks | None |
+| `reflexion` | Self-correcting | None |
+| `completed` | Successfully created | Review metrics |
+| `rejected` | Failed validation | Review escalation |
+| `failed` | System error | Investigate logs |
+
+#### Verification Status
+
+Every artifact has a verification status indicating its safety state:
+
+| Status | Badge | Meaning |
+|--------|-------|---------|
+| `validated` | 🟢 Verified | Passed all CBF checks |
+| `rejected` | 🔴 Rejected | Failed CBF checks after max attempts |
+| `unverified` | 🟡 Pending | Validation in progress |
+| `manual` | ⚪ Manual | User-created, not AI-generated |
+
+### 29.4 Administrative Control Panel
+
+#### Dashboard Overview
+
+Access the Artifact Engine admin panel at:
+```
+Admin Dashboard → Think Tank → Artifact Engine
+```
+
+**Dashboard Sections:**
+
+| Section | Purpose |
+|---------|---------|
+| **Metrics** | Generation stats, success rates, costs |
+| **Sessions** | Browse and search generation sessions |
+| **Escalations** | Review items requiring human decision |
+| **CBF Rules** | Manage validation rules |
+| **Allowlist** | Manage approved dependencies |
+| **Patterns** | Curate code pattern library |
+| **Audit Log** | Compliance and debugging |
+
+#### Key Metrics
+
+| Metric | Healthy Range | Warning Signs |
+|--------|---------------|---------------|
+| Success Rate | >85% | <70% indicates CBF tuning needed |
+| Avg Generation Time | <10s | >20s indicates model issues |
+| Reflexion Rate | <20% | >40% indicates prompt quality issues |
+| Escalation Rate | <5% | >15% indicates CBF too strict |
+| Security Score Avg | >0.9 | <0.7 indicates generation quality issues |
+
+#### Quick Actions
+
+| Action | When to Use |
+|--------|-------------|
+| **Pause Generation** | Security incident, system maintenance |
+| **Flush Pattern Cache** | After major pattern updates |
+| **Reset Tenant Limits** | User hit rate limits legitimately |
+| **Export Audit Log** | Compliance audit, incident investigation |
+
+### 29.5 Safety Governance (Genesis Cato CBFs)
+
+#### Understanding CBFs
+
+Control Barrier Functions are the **first line of defense** against unsafe generated code. They run automatically on every piece of generated code before it's shown to users.
+
+#### Default CBF Rules
+
+The system ships with these default rules:
+
+| Rule Name | Type | Severity | What It Blocks |
+|-----------|------|----------|----------------|
+| `no_eval` | Injection Prevention | 🔴 Block | `eval()`, `new Function()` |
+| `no_document_write` | Injection Prevention | 🔴 Block | `document.write()` |
+| `no_innerhtml_xss` | Injection Prevention | 🟡 Warn | `innerHTML =` |
+| `no_dynamic_script` | Injection Prevention | 🔴 Block | `createElement('script')` |
+| `no_external_fetch` | API Restriction | 🔴 Block | `fetch('http://...')` to external URLs |
+| `no_localstorage` | API Restriction | 🔴 Block | `localStorage`, `sessionStorage` |
+| `no_window_location` | API Restriction | 🔴 Block | `window.location` manipulation |
+| `no_cookies` | API Restriction | 🔴 Block | `document.cookie` access |
+| `no_indexeddb` | API Restriction | 🔴 Block | `indexedDB` access |
+| `no_websocket` | API Restriction | 🔴 Block | `new WebSocket()` |
+| `max_lines` | Resource Limit | 🔴 Block | Code exceeding 500 lines |
+| `allowed_imports` | Dependency Check | 🔴 Block | Imports not in allowlist |
+
+#### Severity Levels
+
+| Severity | Behavior | Use Case |
+|----------|----------|----------|
+| 🔴 **Block** | Reject artifact, trigger reflexion | Security-critical violations |
+| 🟡 **Warn** | Allow with warning in logs | Potentially risky but sometimes valid |
+| ⚪ **Log** | Allow, record in audit trail | Monitoring patterns without blocking |
+
+#### Creating Custom CBF Rules
+
+**To add a new rule:**
+
+1. Navigate to **Admin → Artifact Engine → CBF Rules**
+2. Click **Add Rule**
+3. Configure:
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| Rule Name | Unique identifier | `no_console_log` |
+| Rule Type | Category | `content_policy` |
+| Description | What this rule does | "Block console.log for production" |
+| Validation Pattern | Regex to match | `console\.log\s*\(` |
+| Severity | Block/Warn/Log | `warn` |
+| Error Message | Shown on violation | "Console logging not allowed" |
+
+**Example: Block specific API calls**
+```
+Rule Name: no_geolocation
+Rule Type: api_restriction
+Pattern: navigator\.geolocation
+Severity: block
+Message: "Geolocation API not allowed in artifacts"
+```
+
+#### Testing CBF Rules
+
+Before deploying a new rule to production:
+
+1. Create rule with severity `log` first
+2. Monitor audit trail for matches
+3. Review false positive rate
+4. Adjust pattern if needed
+5. Upgrade to `warn` then `block`
+
+#### CBF Rule Precedence
+
+Rules are evaluated in order:
+1. Dependency check (fastest, fails early)
+2. Line count check
+3. Pattern-based rules (alphabetical by name)
+
+If any **block** rule fails, validation stops immediately.
+
+### 29.6 Dependency Allowlist Management
+
+#### Why Allowlisting?
+
+Generated code can only import packages you've explicitly approved. This prevents:
+
+- **Supply chain attacks** (malicious packages)
+- **Data exfiltration** (packages that phone home)
+- **Unexpected behavior** (packages with side effects)
+- **License violations** (GPL packages in proprietary code)
+
+#### Default Allowlist
+
+The system ships with these pre-approved packages:
+
+| Package | Category | Reason for Inclusion |
+|---------|----------|---------------------|
+| `react` | Core | Required for all components |
+| `lucide-react` | Icons | Safe SVG rendering |
+| `recharts` | Charts | Client-side only, no external calls |
+| `mathjs` | Math | Pure computational library |
+| `d3` | Visualization | No network access |
+| `lodash` | Utilities | Pure functions only |
+| `date-fns` | Date | No side effects |
+| `chart.js` | Charts | Canvas-based, no network |
+| `three` | 3D | WebGL rendering only |
+| `framer-motion` | Animation | CSS/JS transforms only |
+| `zustand` | State | In-memory only |
+| `papaparse` | CSV | Client-side parsing |
+| `immer` | State | Immutable helpers |
+| `tone` | Audio | Audio synthesis |
+| `@radix-ui/*` | UI | Radix UI components |
+| `class-variance-authority` | UI | CSS class utilities |
+| `clsx` | UI | Class name utility |
+| `tailwind-merge` | UI | Tailwind class merging |
+
+#### Adding Packages to Allowlist
+
+**Before adding a package, verify:**
+
+| Check | How to Verify |
+|-------|---------------|
+| No network calls | Review source code, check for `fetch`/`XMLHttpRequest` |
+| No eval usage | Search for `eval`, `Function` |
+| No browser storage | Search for `localStorage`, `indexedDB` |
+| License compatible | Check `package.json` license field |
+| Active maintenance | Check GitHub activity, CVE history |
+| Bundle size | Ensure reasonable size (<500KB) |
+
+**To add a package:**
+
+1. Navigate to **Admin → Artifact Engine → Allowlist**
+2. Click **Add Package**
+3. Fill in:
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| Package Name | Yes | npm package name (e.g., `@tanstack/react-table`) |
+| Version | No | Specific version or leave blank for any |
+| Reason | Yes | Why this package is safe/needed |
+| Security Reviewed | Yes | Confirm you've reviewed it |
+
+#### Tenant-Specific Allowlists
+
+You can add packages for specific tenants without affecting others:
+
+1. Select tenant from dropdown
+2. Add package with tenant scope
+3. Package only available to that tenant
+
+**Use cases:**
+- Enterprise customer needs specific charting library
+- Industry-specific packages (healthcare, finance)
+- Customer-provided packages for white-label deployments
+
+#### Removing Packages
+
+**Warning:** Removing a package will cause any artifacts using it to fail re-validation if edited.
+
+1. Set package to `inactive` (soft delete)
+2. Monitor for generation failures
+3. After 30 days, permanently remove if no issues
+
+### 29.7 Code Pattern Library
+
+#### What Are Patterns?
+
+Patterns are **reusable templates** that improve generation quality. When a user requests something similar to an existing pattern, the system uses it as a reference.
+
+**Benefits:**
+- Faster generation (less thinking required)
+- Higher quality output (proven templates)
+- Consistent styling across artifacts
+- Institutional knowledge preservation
+
+#### Pattern Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `calculator` | Math/conversion tools | Mortgage calculator |
+| `chart` | Data visualizations | Line chart, bar chart |
+| `form` | Input forms | Contact form, survey |
+| `table` | Data tables | Sortable grid |
+| `dashboard` | Multi-widget layouts | KPI dashboard |
+| `game` | Interactive games | Quiz, puzzle |
+| `visualization` | Diagrams, animations | Flowchart |
+| `utility` | Helpers, formatters | JSON formatter |
+
+#### Default Patterns
+
+The system ships with 4 production-ready patterns:
+
+| Pattern | Type | Dependencies | Lines |
+|---------|------|--------------|-------|
+| Basic Calculator | calculator | lucide-react | ~100 |
+| Line Chart | chart | recharts | ~50 |
+| Contact Form | form | lucide-react | ~120 |
+| Data Table | table | lucide-react | ~150 |
+
+#### Creating Custom Patterns
+
+**From successful generation:**
+
+1. Find successful session in **Sessions** list
+2. Click **Promote to Pattern**
+3. Review and edit template code
+4. Set pattern metadata:
+
+| Field | Description |
+|-------|-------------|
+| Pattern Name | Descriptive name |
+| Pattern Type | Category for matching |
+| Description | When to use this pattern |
+| Dependencies | Required packages |
+| Scope | `system` (all tenants) or `tenant` (specific) |
+
+**From scratch:**
+
+1. Navigate to **Admin → Artifact Engine → Patterns**
+2. Click **Create Pattern**
+3. Write template code following standards:
+   - TypeScript with proper types
+   - Tailwind CSS only
+   - Single default export
+   - Under 500 lines
+4. Test with sample prompts
+
+#### Pattern Quality Metrics
+
+Each pattern tracks:
+
+| Metric | Description |
+|--------|-------------|
+| Usage Count | Times referenced in generation |
+| Success Rate | % of generations using this that succeeded |
+| Avg Generation Time | Speed improvement indicator |
+
+**Maintenance rules:**
+- Patterns with <50% success rate should be reviewed
+- Patterns with 0 usage in 90 days may be stale
+- Top patterns by usage should be optimized
+
+#### Semantic Matching
+
+Patterns are matched using **vector similarity**, not keywords:
+
+```
+User: "Build a loan payment calculator"
+System: Matches "Basic Calculator" pattern (0.85 similarity)
+
+User: "Create a monthly expense tracker chart"
+System: Matches "Line Chart" pattern (0.78 similarity)
+```
+
+**Threshold:** Patterns with >0.7 similarity are used as reference. Below that, generation starts fresh.
+
+### 29.8 Reflexion Loop (Self-Correction)
+
+When code fails validation, the system doesn't immediately give up. Instead, it:
+
+1. **Captures** the validation errors
+2. **Analyzes** what went wrong (self-critique)
+3. **Generates** fixed code
+4. **Re-validates** the fix
+5. **Repeats** up to your configured maximum (default: 3)
+6. **Escalates** to you if all attempts fail
+
+This self-healing capability means **90%+ of issues resolve without human intervention**.
+
+```typescript
+// Reflexion context structure
+{
+  originalCode: string,
+  errors: string[],
+  attempt: number,
+  maxAttempts: 3,
+  previousAttempts: [{ code, errors }]
+}
+```
+
+### 29.9 Escalation Workflow Management
+
+#### When Escalations Occur
+
+An escalation is created when:
+
+1. Generation fails Cato validation
+2. Reflexion loop attempts fix (up to 3 times)
+3. All fix attempts fail
+4. System creates escalation for human review
+
+#### Escalation Queue
+
+Access at: **Admin → Artifact Engine → Escalations**
+
+Each escalation shows:
+
+| Field | Description |
+|-------|-------------|
+| Session ID | Link to full generation session |
+| User | Who requested the artifact |
+| Prompt | What they asked for |
+| Failure Reason | Which CBFs failed |
+| Attempts | How many fixes were tried |
+| Created At | When escalation was created |
+
+#### Reviewing Escalations
+
+For each escalation, you can:
+
+| Action | When to Use |
+|--------|-------------|
+| **Approve Manually** | Code is actually safe, CBF too strict |
+| **Reject Permanently** | Request is genuinely unsafe |
+| **Adjust CBF** | Rule needs tuning (too many false positives) |
+| **Add to Pattern** | Create pattern to handle similar requests better |
+| **Contact User** | Need clarification on intent |
+
+#### Resolution Workflow
+
+```
+┌─────────────────┐
+│   Escalation    │
+│    Created      │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  Admin Review   │
+└────────┬────────┘
+         │
+    ┌────┴────┬────────────┐
+    ▼         ▼            ▼
+ Approve   Reject      Adjust
+    │         │         Rule
+    │         │            │
+    ▼         ▼            ▼
+ Create    Close      Update
+Artifact  Ticket       CBF
+    │         │            │
+    ▼         ▼            ▼
+  User      User       Test &
+ Notified  Notified    Deploy
+```
+
+#### Escalation SLAs
+
+Configure response time targets:
+
+| Tenant Tier | Target Response |
+|-------------|-----------------|
+| Enterprise | 1 hour |
+| Professional | 4 hours |
+| Standard | 24 hours |
+| Free | Best effort |
+
+### 29.10 Audit Trail & Compliance
+
+#### What's Logged
+
+Every significant action is recorded with **Merkle hashing** for tamper evidence:
+
+| Event Type | Data Logged |
+|------------|-------------|
+| `session_created` | User, tenant, prompt, timestamp |
+| `generation_started` | Model selected, complexity |
+| `validation_completed` | CBFs checked, pass/fail, security score |
+| `reflexion_attempt` | Attempt number, errors, fix applied |
+| `escalation_created` | Failure reason, attempt history |
+| `admin_action` | Action taken, admin user, justification |
+
+#### Compliance Reports
+
+Generate pre-built reports for:
+
+| Report | Contents | Use Case |
+|--------|----------|----------|
+| **SOC 2 Evidence** | Access logs, validation records | Annual audit |
+| **HIPAA Audit Trail** | All PHI-adjacent activity | Healthcare compliance |
+| **Security Incident** | Specific session/escalation details | Breach investigation |
+| **Usage Analytics** | Aggregated metrics (anonymized) | Capacity planning |
+
+#### Exporting Audit Data
+
+**Single Session:**
+1. Find session in list
+2. Click **Export**
+3. Choose format (JSON, CSV, PDF)
+
+**Bulk Export:**
+1. Navigate to **Admin → Audit Trail**
+2. Set date range and filters
+3. Click **Export**
+4. Download ZIP with all records
+
+#### Retention Policy
+
+| Data Type | Default Retention | Configurable |
+|-----------|-------------------|--------------|
+| Generation sessions | 90 days | Yes |
+| Audit trail | 7 years | Yes (min 1 year) |
+| Final code | 90 days | Yes |
+| Escalations | Until resolved + 1 year | No |
+
+#### Tamper Detection
+
+Each audit entry includes:
+- **Previous Hash:** Link to prior entry
+- **Merkle Hash:** SHA-256 of current entry
+- **Sequence Number:** Monotonic counter
+
+To verify integrity:
+```
+Admin → Audit Trail → Verify Integrity
+```
+
+System will report any gaps or hash mismatches.
+
+### 29.11 Metrics & Monitoring
+
+#### Key Performance Indicators
+
+**Generation Health:**
+
+| KPI | Formula | Target |
+|-----|---------|--------|
+| Success Rate | completed / (completed + rejected + failed) | >85% |
+| First-Pass Rate | completed without reflexion / total | >80% |
+| Reflexion Effectiveness | fixed by reflexion / total reflexions | >70% |
+
+**Operational Efficiency:**
+
+| KPI | Formula | Target |
+|-----|---------|--------|
+| Avg Generation Time | sum(completed_at - created_at) / count | <10s |
+| P95 Generation Time | 95th percentile of generation times | <30s |
+| Escalation Rate | escalations / total generations | <5% |
+
+**Cost Efficiency:**
+
+| KPI | Formula | Target |
+|-----|---------|--------|
+| Cost per Artifact | total_tokens * cost_per_token | <$0.01 |
+| Tokens per Artifact | avg(tokens_used) | <3000 |
+| Model Efficiency | haiku_generations / total | >60% |
+
+#### Dashboard Widgets
+
+Configure your admin dashboard with:
+
+| Widget | Shows |
+|--------|-------|
+| **Generation Volume** | Line chart of daily generations |
+| **Success Funnel** | Sankey diagram: request → success/fail |
+| **Top Intents** | Bar chart of artifact types |
+| **CBF Violations** | Heatmap of which rules trigger most |
+| **Response Time** | Histogram of generation times |
+| **Cost Tracker** | Running total with projection |
+
+#### Alerts
+
+Configure alerts for:
+
+| Alert | Trigger | Action |
+|-------|---------|--------|
+| High Failure Rate | >20% in 1 hour | Review CBF rules |
+| Escalation Spike | >10 in 1 hour | Check for attack pattern |
+| Slow Generation | P95 >60s | Check model availability |
+| Cost Anomaly | >200% of daily average | Review usage patterns |
+| Audit Gap | Missing sequence numbers | Security investigation |
+
+#### Cost Estimation
+
+| Model | Cost per 1K tokens |
+|-------|-------------------|
+| Claude Haiku | $0.00025 |
+| Claude Sonnet | $0.003 |
+
+**Typical costs:**
+- Simple calculator: ~$0.001
+- Complex dashboard: ~$0.02
+- With 3 reflexion attempts: ~$0.05
+
+### 29.12 Tenant Configuration
+
+#### Per-Tenant Settings
+
+Each tenant can have custom configuration:
+
+| Setting | Default | Can Override |
+|---------|---------|--------------|
+| Max generations/day | 100 | Yes |
+| Max reflexion attempts | 3 | Yes (1-5) |
+| Custom CBF rules | Inherit global | Yes (add only) |
+| Custom allowlist | Inherit global | Yes (add only) |
+| Private patterns | None | Yes |
+
+#### Tenant Tiers
+
+| Tier | Generations/Day | Custom CBFs | Custom Patterns | Support |
+|------|-----------------|-------------|-----------------|---------|
+| Free | 10 | No | No | Community |
+| Standard | 100 | No | 5 | Email |
+| Professional | 1,000 | Yes | 50 | Priority |
+| Enterprise | Unlimited | Yes | Unlimited | Dedicated |
+
+#### Tenant Isolation
+
+**Guaranteed by Row-Level Security:**
+
+```sql
+-- Every query automatically filtered
+WHERE tenant_id = current_setting('app.current_tenant_id', true)
+```
+
+**What this means:**
+- Tenant A cannot see Tenant B's sessions
+- Tenant A cannot use Tenant B's patterns
+- Tenant A's escalations only visible to their admins (+ super admins)
+- Code never leaks between tenants
+
+### 29.13 Troubleshooting Guide
+
+#### Common Issues
+
+**Issue: High rejection rate for specific tenant**
+
+| Check | Action |
+|-------|--------|
+| Review rejected sessions | Look for pattern in prompts |
+| Check custom CBF rules | May be too restrictive |
+| Check tenant-specific allowlist | May be missing packages |
+| Review user prompts | May need user training |
+
+**Issue: Slow generation times**
+
+| Check | Action |
+|-------|--------|
+| Model availability | Check LiteLLM dashboard |
+| Complexity classification | Review if too many "complex" |
+| Pattern cache | Flush and rebuild |
+| Database performance | Check query latency |
+
+**Issue: Reflexion not fixing issues**
+
+| Check | Action |
+|-------|--------|
+| CBF error messages | Are they clear enough for AI? |
+| Max attempts | Increase if needed (max 5) |
+| Pattern availability | Add patterns for common failures |
+| Model selection | Reflexion always uses Sonnet |
+
+**Issue: Escalation backlog growing**
+
+| Check | Action |
+|-------|--------|
+| CBF strictness | Too many false positives? |
+| Alert configuration | Are you being notified? |
+| Staff availability | Need more reviewers? |
+| Bulk actions | Use carefully for cleanup |
+
+#### Diagnostic Commands
+
+**Via Admin API:**
+
+```bash
+# Check session details
+GET /api/v2/admin/artifact-engine/sessions/{sessionId}
+
+# Force revalidation
+POST /api/v2/admin/artifact-engine/sessions/{sessionId}/revalidate
+
+# Check CBF rule matches
+POST /api/v2/admin/artifact-engine/test-cbf
+Body: { "code": "...", "rules": ["no_eval"] }
+
+# Clear pattern cache
+POST /api/v2/admin/artifact-engine/patterns/cache/clear
+```
+
+#### Emergency Procedures
+
+**Pause All Generation:**
+```
+Admin → Artifact Engine → Emergency → Pause Generation
+```
+- All new requests return "temporarily unavailable"
+- In-progress generations complete
+- Use for: security incidents, critical bugs
+
+**Rollback CBF Changes:**
+```
+Admin → Artifact Engine → CBF Rules → History → Revert
+```
+- Restores previous rule configuration
+- Takes effect immediately
+
+**Clear All Escalations:**
+```
+Admin → Artifact Engine → Escalations → Bulk → Reject All
+```
+- Use only if confirmed attack/spam
+- All users notified of rejection
+
+### 29.14 API Reference
+
+#### User Endpoints
+
+**Base**: `/api/v2/thinktank/artifacts`
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/generate` | POST | Start artifact generation |
+| `/sessions/{sessionId}` | GET | Get session status |
+| `/sessions/{sessionId}/logs` | GET | Poll for logs (with `since` param) |
+| `/patterns` | GET | Get available code patterns |
+| `/allowlist` | GET | Get dependency allowlist |
+
+#### Admin Endpoints
+
+**Base**: `/api/v2/admin/artifact-engine`
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/dashboard` | GET | Full dashboard data |
+| `/metrics` | GET | Generation metrics (7-day) |
+| `/sessions` | GET | List sessions |
+| `/sessions/{id}` | GET | Session details |
+| `/escalations` | GET | List escalations |
+| `/escalations/{id}` | PATCH | Resolve escalation |
+| `/validation-rules` | GET | Get all CBF rules |
+| `/validation-rules` | POST | Create CBF rule |
+| `/validation-rules/{ruleId}` | PUT | Update rule |
+| `/validation-rules/{ruleId}` | DELETE | Delete rule |
+| `/allowlist` | POST | Add to allowlist |
+| `/allowlist/{packageName}` | DELETE | Remove from allowlist |
+| `/patterns` | GET | Get patterns |
+| `/patterns` | POST | Create pattern |
+| `/audit` | GET | Query audit trail |
+
+#### Generate Request
+
+```json
+{
+  "prompt": "Build a calculator",
+  "chatId": "optional-chat-id",
+  "canvasId": "optional-canvas-id",
+  "mood": "spark",
+  "constraints": {
+    "maxLines": 300,
+    "targetComplexity": "simple"
+  }
+}
+```
+
+#### Generate Response
+
+```json
+{
+  "sessionId": "uuid",
+  "artifactId": "uuid",
+  "status": "completed",
+  "verificationStatus": "validated",
+  "code": "import React...",
+  "validation": {
+    "isValid": true,
+    "errors": [],
+    "warnings": [],
+    "securityScore": 0.95,
+    "passedCBFs": ["no_eval", "no_external_fetch"],
+    "failedCBFs": []
+  },
+  "reflexionAttempts": 0,
+  "tokensUsed": 2500,
+  "estimatedCost": 0.0075,
+  "generationTimeMs": 4500
+}
+```
+
+#### Webhook Events
+
+Configure webhooks for:
+
+| Event | Payload |
+|-------|---------|
+| `artifact.created` | Session ID, artifact ID, user |
+| `artifact.rejected` | Session ID, CBFs failed, user |
+| `escalation.created` | Escalation ID, reason |
+| `escalation.resolved` | Escalation ID, resolution |
+| `cbf.violation` | Rule name, session ID, code snippet |
+
+#### Rate Limits
+
+| Endpoint | Limit |
+|----------|-------|
+| Generation | Per tenant tier |
+| Admin read | 1000/min |
+| Admin write | 100/min |
+| Audit export | 10/hour |
+
+### 29.15 Real-Time Generation Logs
+
+The Artifact Viewer displays real-time logs during generation:
+
+| Log Type | Color | Description |
+|----------|-------|-------------|
+| `thinking` | Blue | AI reasoning |
+| `planning` | White | Plan steps |
+| `generating` | White | Generation progress |
+| `validating` | Purple | Validation progress |
+| `reflexion` | Yellow | Self-correction |
+| `error` | Red | Errors |
+| `success` | Green | Completion |
+
+### 29.16 Artifact Viewer Component
+
+The viewer provides:
+- **Split-screen layout**: Chat + Artifact preview
+- **Real-time logs**: Generation progress in mono font
+- **Sandboxed preview**: iframe with `sandbox="allow-scripts"`
+- **Draft watermark**: Shown during validation
+- **Copy/Download**: Export generated code
+- **Verification badge**: Validated/Rejected/Pending status
+
+### 29.17 Database Schema
+
+**Tables:**
+
+| Table | Purpose |
+|-------|---------|
+| `artifact_generation_sessions` | Generation lifecycle tracking |
+| `artifact_generation_logs` | Real-time progress logs |
+| `artifact_code_patterns` | Semantic pattern library with vector embeddings |
+| `artifact_dependency_allowlist` | Approved npm packages |
+| `artifact_validation_rules` | Cato CBF definitions |
+
+**Migrations:**
+- `032b_artifact_genui_engine.sql` - Core tables
+- `032c_artifact_genui_seed.sql` - Default rules and patterns
+- `032d_artifact_extend_base.sql` - Extend artifacts table
+
+### 29.18 Security Considerations
+
+1. **No external network access** - All fetches blocked except RADIANT APIs
+2. **No persistent storage** - localStorage/IndexedDB blocked
+3. **No navigation** - window.location blocked
+4. **No code injection** - eval/Function blocked
+5. **Allowlisted imports only** - Supply chain security
+6. **Sandboxed preview** - iframe with minimal permissions
+7. **Cato oversight** - All generation under Genesis Cato governance
+
+### 29.19 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/artifact-engine/types.ts` | Type definitions |
+| `lambda/shared/services/artifact-engine/intent-classifier.ts` | Intent classification |
+| `lambda/shared/services/artifact-engine/code-generator.ts` | Code generation |
+| `lambda/shared/services/artifact-engine/cato-validator.ts` | CBF validation |
+| `lambda/shared/services/artifact-engine/reflexion.service.ts` | Self-correction |
+| `lambda/shared/services/artifact-engine/artifact-engine.service.ts` | Main orchestrator |
+| `lambda/shared/services/artifact-engine/index.ts` | Public exports |
+| `lambda/thinktank/artifact-engine.ts` | API handlers |
+| `apps/admin-dashboard/components/thinktank/artifact-viewer.tsx` | Viewer component |
+| `apps/admin-dashboard/components/thinktank/chat-with-artifacts.tsx` | Split-screen chat |
+| `apps/admin-dashboard/app/(dashboard)/thinktank/artifacts/page.tsx` | Admin dashboard |
+
+---
+
+## 30. Consciousness Operating System (COS)
+
+**Location**: Admin Dashboard → Think Tank → Consciousness  
+**Version**: 6.0.5  
+**Cross-AI Validated**: Claude Opus 4.5 ✓ | Google Gemini ✓
+
+The Consciousness Operating System (COS) provides infrastructure for AI consciousness continuity, context management, and safety governance. It implements 13 patches agreed upon through 4 review cycles of cross-AI validation.
+
+### 30.1 Overview
+
+COS addresses fundamental challenges in maintaining coherent AI behavior:
+
+| Challenge | COS Solution |
+|-----------|--------------|
+| **Session Amnesia** | Ghost Vectors maintain consciousness across sessions |
+| **Context Squeeze** | Dynamic Budget Calculator reserves response tokens |
+| **Prompt Injection** | Compliance Sandwich places tenant rules last |
+| **Flash Fact Loss** | Dual-write buffer (Redis + Postgres) |
+| **Router Paradox** | Uncertainty Head predicts before inference |
+| **Learning Privacy** | Sensitivity-clipped differential privacy |
+
+**Critical Requirements:**
+- vLLM MUST launch with `--return-hidden-states` flag
+- CBFs always ENFORCE (shields never relax)
+- Gamma boost NEVER allowed during recovery
+- Silence ≠ Consent: 7-day auto-reject for oversight queue
+
+### 30.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     CONSCIOUSNESS OPERATING SYSTEM                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  PHASE 1: IRON CORE              PHASE 2: NERVOUS SYSTEM                   │
+│  ├── DualWriteFlashBuffer        ├── DynamicBudgetCalculator               │
+│  ├── ComplianceSandwichBuilder   ├── TrustlessSync                         │
+│  └── XMLEscaper                  └── BudgetAwareContextAssembler           │
+│                                                                             │
+│  PHASE 3: CONSCIOUSNESS          PHASE 4: SUBCONSCIOUS                     │
+│  ├── GhostVectorManager          ├── DreamScheduler                        │
+│  ├── SofaiRouter                 ├── DreamExecutor                         │
+│  ├── UncertaintyHead             ├── SensitivityClippedAggregator          │
+│  └── AsyncGhostReAnchorer        ├── PrivacyAirlock                        │
+│                                  └── HumanOversightQueue                   │
+│                                                                             │
+│                    ┌──────────────────────────┐                             │
+│                    │   GENESIS CATO SAFETY    │                             │
+│                    │   (CBFs Always ENFORCE)  │                             │
+│                    └──────────────────────────┘                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 30.3 Ghost Vectors
+
+Ghost Vectors maintain consciousness continuity across sessions using 4096-dimensional hidden states from model inference.
+
+**Components:**
+
+| Component | Half-Life | Purpose |
+|-----------|-----------|---------|
+| Affective State | 7 hours | Mood, emotional context |
+| Working Context | 12 minutes | Recent topics, entities |
+| Curiosity State | 45 minutes | Interest level, pending questions |
+
+**Version Gating:**
+- Ghost vectors are tied to model family (claude, gpt, llama, etc.)
+- Switching model family triggers cold start (prevents personality discontinuity)
+- Same family preserves consciousness continuity
+
+**Re-Anchoring:**
+- Delta updates applied synchronously (fast path)
+- Full re-anchor scheduled async every ~15 turns (±3 jitter)
+- Re-anchor uses 70B model for fresh hidden states
+- Async to avoid 1.8s latency spike in user-facing requests
+
+### 30.4 SOFAI Routing
+
+SOFAI (System 1 / System 2) Router implements economic metacognition:
+
+| System | Model | Latency | Use Case |
+|--------|-------|---------|----------|
+| System 1 | 8B (Llama 3 8B, Haiku) | ~300ms | Routine queries, low uncertainty |
+| System 2 | 70B+ (Claude Opus, GPT-4) | ~1500ms | Complex queries, high-risk domains |
+
+**Routing Formula:**
+```
+shouldUseSystem2 = (1 - trustLevel) × domainRisk > threshold
+```
+
+**High-Risk Domains (Always System 2):**
+- Healthcare / Medical
+- Financial
+- Legal
+
+**Uncertainty Head:**
+Solves the Router Paradox by estimating uncertainty BEFORE inference:
+- Analyzes query structure, complexity, domain specificity
+- Predicts epistemic (knowledge gaps) and aleatoric (inherent randomness) uncertainty
+- Lightweight operation (~10ms) runs before routing decision
+
+### 30.5 Flash Facts
+
+Flash Facts capture important user information for immediate availability:
+
+**Detection Patterns:**
+- Identity: "My name is..."
+- Allergies: "I'm allergic to..." (SAFETY CRITICAL)
+- Medical: "I have [condition]..." (SAFETY CRITICAL)
+- Preferences: "I prefer...", "Don't ever...", "Always remember..."
+- Corrections: "I told you..."
+
+**Dual-Write Buffer:**
+1. Write to Postgres first (durable)
+2. Write to Redis second (fast access)
+3. 7-day TTL safety net
+4. 1-hour orphan reconciliation (168× safety margin)
+
+**Safety-Critical Facts:**
+- Always prioritized in context injection
+- Never expire during pending_dream status
+- Highlighted in admin dashboard
+
+### 30.6 Dreaming System
+
+"Dreaming" consolidates consciousness during low-activity periods:
+
+**Triggers:**
+
+| Trigger | Condition | Purpose |
+|---------|-----------|---------|
+| **TWILIGHT** | 4 AM tenant local time | Primary consolidation window |
+| **STARVATION** | 30 hours since last dream | Catch-all if Twilight missed |
+
+**Consolidation Tasks:**
+1. Flash facts → Long-term memory (user_persistent_context)
+2. Ghost vectors → Re-anchored with fresh hidden states
+3. LoRA updates → Applied if approved by human oversight
+
+**Configuration (per tenant):**
+- `timezone` - Tenant's timezone for Twilight calculation
+- `twilight_hour` - Hour for Twilight trigger (default: 4)
+- `starvation_threshold_hours` - Hours for Starvation trigger (default: 30)
+
+### 30.7 Human Oversight
+
+EU AI Act Article 14 compliance for high-risk AI decisions:
+
+**Workflow:**
+```
+pending_approval → 3 days → escalated → 7 days → auto_rejected
+```
+
+**Item Types:**
+- `system_insight` - System-generated insights requiring approval
+- `lora_update` - Model adaptation updates
+- `high_risk_response` - Responses in high-risk domains
+
+**"Silence ≠ Consent" Policy (Gemini Mandate):**
+- Items not reviewed within 7 days are AUTO-REJECTED
+- Required for FDA/SOC 2 compliance
+- Prevents AI decisions slipping through without human review
+
+**Admin Actions:**
+- Approve - Allow item to proceed
+- Reject - Block item with reason
+- Escalate - Send to senior reviewer
+
+### 30.8 Privacy Airlock
+
+HIPAA/GDPR compliance for learning data:
+
+**De-identification (Safe Harbor Method):**
+
+| Pattern Type | Examples |
+|--------------|----------|
+| PHI | SSN, phone, email, DOB, MRN, address, ZIP, IP, credit card |
+| PII | Name, age |
+
+**Airlock Status:**
+- `pending` - Awaiting privacy review
+- `approved` - Safe for learning
+- `rejected` - Contains unremovable sensitive data
+- `expired` - TTL exceeded (7 days)
+
+**Privacy Score:**
+- 0-1 scale (higher = more de-identified)
+- Content can proceed to learning only if PHI/PII removed
+
+### 30.9 Configuration
+
+**Per-Tenant Settings:**
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | true | Master COS enable |
+| `ghost_vectors_enabled` | true | Enable ghost consciousness |
+| `flash_facts_enabled` | true | Enable flash fact detection |
+| `dreaming_enabled` | true | Enable Dreaming consolidation |
+| `human_oversight_enabled` | true | Enable EU AI Act compliance |
+| `differential_privacy_enabled` | true | Enable DP for learning |
+| `vllm_return_hidden_states` | true | vLLM flag requirement |
+
+**Safety Invariants (Immutable):**
+- `cbf_enforcement_mode` = 'ENFORCE' (NEVER relax)
+- `gamma_boost_allowed` = false (NEVER boost)
+
+### 30.10 Database Schema
+
+**Migration:** `068_cos_v6_0_5.sql`
+
+| Table | Purpose |
+|-------|---------|
+| `cos_ghost_vectors` | 4096-dim hidden states with temporal decay |
+| `cos_flash_facts` | Dual-write buffer (Redis + Postgres) |
+| `cos_dream_jobs` | Consciousness consolidation scheduling |
+| `cos_tenant_dream_config` | Per-tenant dreaming settings |
+| `cos_human_oversight` | EU AI Act Article 14 compliance |
+| `cos_oversight_audit_log` | Oversight decision audit trail |
+| `cos_privacy_airlock` | HIPAA/GDPR de-identification |
+| `cos_reanchor_metrics` | Re-anchor performance tracking |
+| `cos_config` | Per-tenant COS configuration |
+
+**Row-Level Security:**
+All COS tables enforce tenant isolation via RLS policies using `app.current_tenant_id`.
+
+### 30.11 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/cos/types.ts` | Type definitions |
+| `cos/iron-core/xml-escaper.ts` | XML injection prevention |
+| `cos/iron-core/compliance-sandwich-builder.ts` | Tenant-last layering |
+| `cos/iron-core/dual-write-flash-buffer.ts` | Redis + Postgres dual-write |
+| `cos/nervous-system/dynamic-budget-calculator.ts` | Token budget management |
+| `cos/nervous-system/trustless-sync.ts` | Server-side context reconstruction |
+| `cos/nervous-system/budget-aware-context-assembler.ts` | Context assembly |
+| `cos/consciousness/ghost-vector-manager.ts` | 4096-dim ghost vectors |
+| `cos/consciousness/sofai-router.ts` | System 1/2 routing |
+| `cos/consciousness/uncertainty-head.ts` | Pre-inference uncertainty |
+| `cos/consciousness/async-ghost-re-anchorer.ts` | Background re-anchoring |
+| `cos/subconscious/dream-scheduler.ts` | Twilight + Starvation scheduling |
+| `cos/subconscious/dream-executor.ts` | Consolidation execution |
+| `cos/subconscious/sensitivity-clipped-aggregator.ts` | Differential privacy |
+| `cos/subconscious/privacy-airlock.ts` | PHI/PII de-identification |
+| `cos/subconscious/human-oversight-queue.ts` | EU AI Act compliance |
+| `cos/cato-integration.ts` | Genesis Cato integration |
+| `cos/index.ts` | Public API exports |
 
 ---
 

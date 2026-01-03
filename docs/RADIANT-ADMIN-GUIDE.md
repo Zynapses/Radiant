@@ -44,6 +44,7 @@
 40. [Advanced Cognition Services (v6.1.0)](#40-advanced-cognition-services-v610)
 41. [Learning Architecture - Complete Overview](#41-learning-architecture---complete-overview)
 42. [Genesis Cato Safety Architecture](#42-genesis-cato-safety-architecture)
+43. [Radiant CMS Think Tank Extension](#43-radiant-cms-think-tank-extension)
 
 ---
 
@@ -11435,5 +11436,1133 @@ At the top of the page, four status cards show:
 | **Gemini** | ✅ APPROVED | "Masterpiece of systems engineering" |
 
 > *"RADIANT Genesis v2.3 solves the 'Alignment Tax' paradox. Usually, making an AI safer makes it dumber. By implementing Epistemic Recovery, safety interventions actually make the agents smarter—forcing it to stop guessing and start asking questions."* — Gemini, Final Assessment
+
+---
+
+## 43. Radiant CMS Think Tank Extension
+
+**Location**: `vendor/extensions/think_tank/`  
+**Version**: 1.0.0 (PROMPT-37)  
+**Compatibility**: Radiant CMS 1.0+ / Rails 4.2 - 7.x  
+**AI Backend**: RADIANT AWS Platform (LiteLLM Proxy)
+
+The **Think Tank Extension** is an AI-powered page builder for Radiant CMS that enables administrators and content creators to generate complete, functional web pages using natural language prompts. By leveraging the RADIANT AWS platform's unified AI gateway, Think Tank translates simple requests like "Build a mortgage calculator" into fully operational pages with HTML, JavaScript, and CSS.
+
+### 43.1 Executive Overview
+
+#### The Problem We Solve
+
+Radiant CMS, built on Ruby on Rails, operates under a fundamental constraint: **the Restart Wall**. Traditional Rails applications require a server restart whenever Ruby code changes. This makes dynamic feature generation impossible through conventional means.
+
+Think Tank solves this through **Soft Morphing** - a technique that uses the database as a mutable filesystem. Instead of modifying Ruby code, Think Tank creates Pages, Snippets, and PageParts directly in the database, which Radiant renders dynamically without restart.
+
+#### Key Capabilities
+
+| Category | Examples |
+|----------|----------|
+| **Interactive Tools** | Calculators, form builders, quizzes, surveys |
+| **Content Pages** | Landing pages, about pages, FAQ sections |
+| **Widgets** | Image galleries, accordions, tabs, carousels |
+| **Data Displays** | Tables, charts, dashboards, timelines |
+| **Forms** | Contact forms, registration forms, booking forms |
+
+#### Core Features
+
+| Feature | Description |
+|---------|-------------|
+| **Natural Language Input** | Describe what you want in plain English |
+| **Real-Time Progress** | Watch the build process in a live terminal |
+| **Instant Preview** | See results immediately in an iframe |
+| **Template Library** | Start from predefined templates |
+| **Multi-Model Support** | Choose from Claude, GPT-4, and other models |
+| **Artifact Tracking** | Complete history of created pages and snippets |
+| **Rollback Support** | Delete pages created by specific sessions |
+
+#### How It Works
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                         USER WORKFLOW                            │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  1. PROMPT                    2. THINK                           │
+│  ┌─────────────────────┐     ┌─────────────────────┐            │
+│  │ "Build a mortgage   │ ──► │ AI analyzes request │            │
+│  │  calculator with    │     │ and generates code  │            │
+│  │  amortization table"│     │ (HTML, JS, CSS)     │            │
+│  └─────────────────────┘     └──────────┬──────────┘            │
+│                                         │                        │
+│  4. VIEW                      3. MORPH  ▼                        │
+│  ┌─────────────────────┐     ┌─────────────────────┐            │
+│  │ Page is live at     │ ◄── │ Builder creates     │            │
+│  │ /mortgage-calculator│     │ Page + Snippet +    │            │
+│  │ Ready to use!       │     │ PagePart records    │            │
+│  └─────────────────────┘     └─────────────────────┘            │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### 43.2 System Requirements
+
+#### Software Requirements
+
+| Component | Minimum | Maximum | Recommended |
+|-----------|---------|---------|-------------|
+| **Ruby** | 2.3.0 | 3.2.x | 3.1.x |
+| **Rails** | 4.2.0 | 7.1.x | 6.1.x or 7.0.x |
+| **Radiant CMS** | 1.0.x | 1.2.x | 1.1.x+ |
+| **Bundler** | 1.17.0 | 2.x | 2.4.x |
+
+#### Database Support
+
+| Database | Minimum Version | Notes |
+|----------|-----------------|-------|
+| **MySQL** | 5.7 | 8.0+ recommended |
+| **PostgreSQL** | 10 | 14+ recommended |
+| **SQLite** | 3.8 | Development only |
+
+#### Background Jobs (Optional but Recommended)
+
+| Adapter | Support Level | Notes |
+|---------|---------------|-------|
+| **Sidekiq** | Full | Recommended for production |
+| **Delayed::Job** | Full | Simple setup |
+| **Resque** | Full | Redis-based |
+| **ActiveJob (inline)** | Limited | Blocks requests, not for production |
+
+### 43.3 Installation Guide
+
+#### Pre-Installation Checklist
+
+- [ ] Radiant CMS is installed and running
+- [ ] Database is accessible and migrated
+- [ ] You have admin access to Radiant
+- [ ] RADIANT API credentials are available
+- [ ] Network allows outbound HTTPS to RADIANT API
+
+#### Installation Steps
+
+```bash
+# Navigate to extensions directory
+cd /path/to/radiant/vendor/extensions
+
+# Clone or copy the extension
+git clone https://github.com/your-org/think_tank.git
+
+# Navigate to Radiant root
+cd /path/to/radiant
+
+# Install dependencies
+bundle install
+
+# Run migrations
+rake think_tank:migrate RAILS_ENV=production
+
+# Restart Radiant
+touch tmp/restart.txt  # For Passenger
+# OR
+systemctl restart radiant  # For systemd
+```
+
+#### Verification
+
+```ruby
+# From Rails console
+rails console
+> Radiant::Extension.descendants.map(&:name)
+# Should include "ThinkTankExtension"
+
+> ActiveRecord::Base.connection.tables.grep(/think_tank/)
+# Should return: ["think_tank_episodes", "think_tank_configurations", "think_tank_artifacts"]
+```
+
+### 43.4 Configuration Reference
+
+#### Global Settings
+
+All settings are stored in the `think_tank_configurations` table and managed through `/admin/think_tank/settings`.
+
+##### API Configuration
+
+| Setting | Key | Type | Default | Description |
+|---------|-----|------|---------|-------------|
+| **API Endpoint** | `radiant_api_endpoint` | String | (empty) | RADIANT API base URL |
+| **API Key** | `radiant_api_key` | String | (empty) | Authentication key for RADIANT API |
+| **Tenant ID** | `radiant_tenant_id` | String | (empty) | Your organization's tenant identifier |
+| **Request Timeout** | `api_timeout` | Integer | 60 | Seconds to wait for API response |
+
+##### AI Model Configuration
+
+| Setting | Key | Type | Default | Description |
+|---------|-----|------|---------|-------------|
+| **Default Model** | `default_model` | String | `claude-3-haiku` | Model used when none specified |
+| **Max Tokens** | `max_tokens` | Integer | 4096 | Maximum response tokens |
+
+##### Page Creation Settings
+
+| Setting | Key | Type | Default | Description |
+|---------|-----|------|---------|-------------|
+| **Auto Publish** | `auto_publish` | Boolean | `false` | Automatically publish created pages |
+| **Default Layout** | `default_layout` | String | `Normal` | Radiant layout for new pages |
+| **Snippet Prefix** | `snippet_prefix` | String | `tt_` | Prefix for created snippet names |
+
+#### Environment Variables
+
+```bash
+# Required
+export RADIANT_API_ENDPOINT="https://api.radiant.example.com"
+export RADIANT_API_KEY="your-api-key-here"
+export RADIANT_TENANT_ID="your-tenant-id"
+
+# Optional
+export THINK_TANK_DEFAULT_MODEL="claude-3-sonnet"
+export THINK_TANK_MAX_TOKENS="8192"
+export THINK_TANK_AUTO_PUBLISH="false"
+```
+
+#### Model Selection Guide
+
+| Model | Identifier | Best For | Cost | Speed |
+|-------|------------|----------|------|-------|
+| **Claude 3 Haiku** | `claude-3-haiku` | Simple pages, forms | $ | Fast |
+| **Claude 3 Sonnet** | `claude-3-sonnet` | Balanced quality/cost | $$ | Medium |
+| **Claude 3 Opus** | `claude-3-opus` | Complex applications | $$$ | Slower |
+| **GPT-4 Turbo** | `gpt-4-turbo` | Advanced logic | $$$ | Medium |
+| **GPT-3.5 Turbo** | `gpt-3.5-turbo` | Budget option | $ | Fast |
+
+### 43.5 User Guide
+
+#### The Dashboard Interface
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ 🧠 Think Tank                           [Settings] [History]   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  Template: [-- None --  ▼]    Model: [claude-3-haiku ▼] │   │
+│  │                                                         │   │
+│  │  What would you like to build?                          │   │
+│  │  ┌─────────────────────────────────────────────────┐   │   │
+│  │  │ Build a mortgage calculator with principal,     │   │   │
+│  │  │ interest rate, term, and amortization schedule  │   │   │
+│  │  └─────────────────────────────────────────────────┘   │   │
+│  │                                      [🚀 Build It]      │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  ┌──────────────────────────┐  ┌───────────────────────────┐   │
+│  │       TERMINAL           │  │         PREVIEW           │   │
+│  │                          │  │                           │   │
+│  │ 12:34:56 🧠 Thinking...  │  │    [Live Page Preview]    │   │
+│  │ 12:34:58 🔨 Building...  │  │                           │   │
+│  │ 12:35:02 ✅ Complete!    │  │                           │   │
+│  │                          │  │                           │   │
+│  └──────────────────────────┘  └───────────────────────────┘   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### Creating Your First Page
+
+1. **Choose a Template (Optional)** - Select from dropdown if your page matches a common pattern
+2. **Select a Model** - `claude-3-haiku` for simple, `claude-3-opus` for complex
+3. **Enter Your Prompt** - Write a clear, detailed description
+4. **Click "Build It"** - Watch real-time progress in terminal
+5. **Review the Result** - Preview appears when complete
+
+#### Good Prompt Examples
+
+```
+Build a contact form with fields for name, email, phone, and message.
+Include validation for required fields and email format.
+Add a success message when the form is submitted.
+Style with a modern, clean look using blue accent colors.
+```
+
+```
+Create a mortgage calculator that takes principal amount, interest rate,
+and loan term (years). Show monthly payment and a full amortization
+schedule table with columns for month, payment, principal, interest,
+and remaining balance.
+```
+
+#### Status Stages
+
+| Status | Icon | Description |
+|--------|------|-------------|
+| **Pending** | ⏳ | Request queued, waiting to start |
+| **Thinking** | 🧠 | AI is analyzing request and generating code |
+| **Morphing** | 🔨 | Creating database records (Pages, Snippets) |
+| **Completed** | ✅ | Build successful, page is live |
+| **Failed** | ❌ | Error occurred, see terminal for details |
+
+### 43.6 Architecture Deep Dive
+
+#### Component Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                       THINK TANK EXTENSION                          │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                    PRESENTATION LAYER                        │   │
+│  │  ┌─────────────┐  ┌────────────┐  ┌────────────────────┐   │   │
+│  │  │ Controller  │  │ Views/ERB  │  │ JavaScript (AJAX)  │   │   │
+│  │  └──────┬──────┘  └─────┬──────┘  └──────────┬─────────┘   │   │
+│  └─────────┼───────────────┼────────────────────┼─────────────┘   │
+│            │               │                    │                  │
+│  ┌─────────┼───────────────┼────────────────────┼─────────────┐   │
+│  │         ▼               ▼                    ▼              │   │
+│  │                    SERVICE LAYER                            │   │
+│  │  ┌─────────────┐  ┌────────────┐  ┌────────────────────┐   │   │
+│  │  │   Agent     │  │  Builder   │  │   API Client       │   │   │
+│  │  │ (Orchestr.) │  │ (Morphing) │  │ (RADIANT Gateway)  │   │   │
+│  │  └──────┬──────┘  └─────┬──────┘  └──────────┬─────────┘   │   │
+│  └─────────┼───────────────┼────────────────────┼─────────────┘   │
+│            │               │                    │                  │
+│  ┌─────────┼───────────────┼────────────────────┼─────────────┐   │
+│  │         ▼               ▼                    ▼              │   │
+│  │                    DATA LAYER                               │   │
+│  │  ┌─────────────┐  ┌────────────┐  ┌────────────────────┐   │   │
+│  │  │  Episode    │  │ Configur-  │  │  Artifact          │   │   │
+│  │  │  (Memory)   │  │ ation      │  │  (Tracking)        │   │   │
+│  │  └──────┬──────┘  └─────┬──────┘  └──────────┬─────────┘   │   │
+│  └─────────┼───────────────┼────────────────────┼─────────────┘   │
+│            │               │                    │                  │
+│            └───────────────┼────────────────────┘                  │
+│                            ▼                                       │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                    RADIANT CMS LAYER                         │   │
+│  │  ┌─────────────┐  ┌────────────┐  ┌────────────────────┐   │   │
+│  │  │   Pages     │  │  Snippets  │  │    PageParts       │   │   │
+│  │  └─────────────┘  └────────────┘  └────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### The Tri-State Memory Model
+
+| State | Table | Purpose |
+|-------|-------|---------|
+| **Structural** | Radiant `pages`, `snippets`, `page_parts` | Rendered content |
+| **Episodic** | `think_tank_episodes` | Session history |
+| **Semantic** | `think_tank_configurations` | Global settings |
+
+### 43.7 Database Schema
+
+#### Entity Relationship
+
+```
+┌──────────────────┐         ┌───────────────────────┐
+│      users       │         │ think_tank_episodes   │
+├──────────────────┤         ├───────────────────────┤
+│ id               │◄───┐    │ id                    │
+│ login            │    └────│ created_by_id         │
+│ ...              │         │ uuid, goal, status    │
+└──────────────────┘         │ log_stream, artifacts │
+                             └───────────┬───────────┘
+                                         │ 1:*
+                             ┌───────────┴───────────┐
+                             │ think_tank_artifacts  │
+                             ├───────────────────────┤
+                             │ episode_id            │
+                             │ artifactable_type/id  │──► Page/Snippet/PagePart
+                             │ role, position        │
+                             └───────────────────────┘
+```
+
+#### think_tank_episodes
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer | Primary key |
+| `uuid` | varchar(36) | Unique session identifier |
+| `goal` | text | User's original prompt |
+| `status` | varchar(20) | pending/thinking/morphing/completed/failed |
+| `log_stream` | text | JSON array of log entries |
+| `artifacts` | text | JSON of created artifact IDs |
+| `error_message` | text | Error details if failed |
+| `created_by_id` | integer | Foreign key to users |
+| `model_used` | varchar(100) | AI model identifier |
+| `tokens_used` | integer | Total tokens consumed |
+| `cost_estimate` | decimal(10,6) | Estimated cost in USD |
+| `started_at` | datetime | When thinking started |
+| `completed_at` | datetime | When finished |
+
+#### think_tank_configurations
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer | Primary key |
+| `key` | varchar(100) | Configuration key (unique) |
+| `value` | text | JSON value |
+| `description` | varchar(500) | Human description |
+| `updated_by_id` | integer | Last modifier |
+
+#### think_tank_artifacts
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | integer | Primary key |
+| `episode_id` | integer | Foreign key to episodes |
+| `artifactable_type` | varchar(50) | 'Page', 'Snippet', 'PagePart' |
+| `artifactable_id` | integer | ID of the Radiant object |
+| `role` | varchar(50) | Artifact role |
+| `position` | integer | Order within episode |
+
+### 43.8 API Reference
+
+#### Admin Routes
+
+| Route | Method | Purpose |
+|-------|--------|---------|
+| `/admin/think_tank` | GET | Dashboard |
+| `/admin/think_tank` | POST | Create episode |
+| `/admin/think_tank/poll/:uuid` | GET | AJAX polling (returns JSON) |
+| `/admin/think_tank/episodes/:uuid` | GET | Episode details |
+| `/admin/think_tank/episodes/:uuid` | DELETE | Delete episode |
+| `/admin/think_tank/settings` | GET | Settings page |
+| `/admin/think_tank/settings` | PUT | Update settings |
+| `/admin/think_tank/test_api` | POST | Test API connection |
+
+#### Poll Response Format
+
+```json
+{
+  "uuid": "abc123-def456-...",
+  "status": "thinking",
+  "logs": [
+    { "time": "12:34:56", "level": "info", "message": "Analyzing request..." }
+  ],
+  "log_count": 5,
+  "preview_url": null,
+  "duration": 12,
+  "tokens_used": 0,
+  "cost_estimate": null
+}
+```
+
+#### Model APIs
+
+```ruby
+# Episode
+ThinkTank::Episode.create_for_prompt(goal: "Build...", user: current_user, model: "claude-3-haiku")
+episode.log!("Processing...", level: :info)
+episode.start_thinking!
+episode.start_morphing!
+episode.complete!({ primary_page_id: 123 })
+episode.fail!("Error message")
+
+# Configuration
+ThinkTank::Configuration.get('default_model')
+ThinkTank::Configuration.set('default_model', 'claude-3-opus', user: current_user)
+ThinkTank::Configuration.api_configured?
+ThinkTank::Configuration.templates
+
+# Builder
+builder = ThinkTank::Builder.new(episode)
+result = builder.morph(slug: 'page', title: 'Page', html_body: '<h1>Hi</h1>', js_logic: '...', css_styles: '...')
+
+# Agent
+agent = ThinkTank::Agent.new(episode)
+result = agent.execute("Build a calculator")
+
+# API Client
+client = ThinkTank::RadiantApiClient.new
+response = client.chat(messages: [...], model: 'claude-3-haiku')
+client.healthy?
+client.list_models
+```
+
+### 43.9 Rake Tasks
+
+```bash
+# Run migrations
+rake think_tank:migrate
+
+# Rollback migrations
+rake think_tank:rollback
+
+# Clean up old episodes (default: 30 days)
+rake think_tank:cleanup[30]
+
+# Test API connection
+rake think_tank:test_api
+
+# Show configuration
+rake think_tank:config
+
+# Show statistics
+rake think_tank:stats
+
+# Reset all data (use with caution)
+rake think_tank:reset
+
+# Health check
+rake think_tank:health
+```
+
+### 43.10 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `think_tank_extension.rb` | Extension registration |
+| `app/models/think_tank/episode.rb` | Episodic memory model |
+| `app/models/think_tank/configuration.rb` | Semantic memory singleton |
+| `app/models/think_tank/artifact.rb` | Artifact tracking |
+| `app/models/think_tank/builder.rb` | Soft Morphing engine |
+| `app/models/think_tank/agent.rb` | AI orchestration |
+| `app/models/think_tank/radiant_api_client.rb` | RADIANT API client |
+| `app/controllers/admin/think_tank_controller.rb` | Admin controller |
+| `app/views/admin/think_tank/index.html.erb` | Mission Control dashboard |
+| `app/views/admin/think_tank/settings.html.erb` | Settings page |
+| `app/views/admin/think_tank/show.html.erb` | Episode details |
+| `app/views/admin/think_tank/_terminal.html.erb` | Terminal partial |
+| `app/views/admin/think_tank/_preview.html.erb` | Preview partial |
+| `app/views/admin/think_tank/_prompt_form.html.erb` | Prompt form partial |
+| `app/helpers/admin/think_tank_helper.rb` | View helpers |
+| `app/jobs/think_tank_job.rb` | Background job |
+| `lib/tasks/think_tank_tasks.rake` | Rake tasks |
+| `public/stylesheets/admin/think_tank.css` | Styles |
+
+### 43.11 Security Guide
+
+#### API Key Security
+
+| Approach | Security Level | Recommendation |
+|----------|----------------|----------------|
+| Database only | Low | Not recommended for production |
+| Environment variables | Medium | Recommended minimum |
+| Secrets manager | High | Best for enterprise |
+
+#### Access Control
+
+Think Tank inherits Radiant's authentication. To restrict access by role:
+
+```ruby
+# In controller
+before_filter :require_admin_role
+
+def require_admin_role
+  unless current_user.admin?
+    flash[:error] = "Access denied"
+    redirect_to admin_pages_path
+  end
+end
+```
+
+#### Content Security
+
+| Setting | Risk Level | Recommendation |
+|---------|------------|----------------|
+| `auto_publish: false` | Low | Recommended for production |
+| `auto_publish: true` | Medium | Only for internal/trusted use |
+
+### 43.12 Operations & Monitoring
+
+#### Key Metrics
+
+| Metric | Description | Target |
+|--------|-------------|--------|
+| **Episode Success Rate** | Completed / Total | > 95% |
+| **Average Build Time** | Time from create to complete | < 60s |
+| **API Response Time** | RADIANT API latency | < 10s |
+| **Tokens per Episode** | Average token consumption | Track trend |
+
+#### Backup Strategy
+
+| Data | Frequency | Retention | Method |
+|------|-----------|-----------|--------|
+| Database | Daily | 30 days | pg_dump/mysqldump |
+| Configuration | Weekly | 90 days | Export to JSON |
+| Episodes | Daily | 30 days | Included in DB backup |
+
+### 43.13 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| "API not configured" | Missing endpoint/key | Configure in Settings |
+| "Connection failed" | Network/auth issue | Check network, verify credentials |
+| Episode stuck "thinking" | API timeout | Increase `api_timeout` |
+| "No JSON found in response" | AI format error | Simplify prompt, try different model |
+| Page not rendering | Layout missing | Verify `default_layout` exists |
+| Snippet collision | Name exists | Extension auto-appends timestamp |
+| No preview | Page created as draft | Enable `auto_publish` or manually publish |
+| Slow builds | Network latency | Check API status, use faster model |
+
+#### Diagnostic Commands
+
+```ruby
+# Rails console diagnostics
+client = ThinkTank::RadiantApiClient.new
+puts "Configured: #{client.configured?}"
+puts "Healthy: #{client.healthy?}"
+puts "Last error: #{client.last_error}"
+
+# Check recent episodes
+episodes = ThinkTank::Episode.recent.limit(10)
+episodes.each { |e| puts "#{e.uuid}: #{e.status} (#{e.duration}s)" }
+```
+
+### 43.14 Appendices
+
+#### Status Reference
+
+| Status | Description | Terminal? | Can Transition To |
+|--------|-------------|-----------|-------------------|
+| `pending` | Queued, not started | No | thinking |
+| `thinking` | AI is generating | No | morphing, failed |
+| `morphing` | Creating artifacts | No | completed, failed |
+| `completed` | Successfully finished | Yes | - |
+| `failed` | Error occurred | Yes | - |
+
+#### Error Codes
+
+| Error | Cause | Resolution |
+|-------|-------|------------|
+| `API_NOT_CONFIGURED` | Missing API settings | Configure in settings |
+| `API_CONNECTION_FAILED` | Network/auth issue | Check network, credentials |
+| `API_TIMEOUT` | Request took too long | Retry, check API status |
+| `INVALID_JSON_RESPONSE` | AI didn't return JSON | Simplify prompt, change model |
+| `MISSING_REQUIRED_FIELDS` | AI response incomplete | Add details to prompt |
+| `PAGE_CREATION_FAILED` | Database error | Check logs, DB connectivity |
+| `PARENT_PAGE_NOT_FOUND` | Invalid parent_slug | Verify parent exists |
+
+#### Glossary
+
+| Term | Definition |
+|------|------------|
+| **Artifact** | Any Radiant object (Page, Snippet, PagePart) created by Think Tank |
+| **Episode** | A single Think Tank session from prompt to completion |
+| **Morph/Morphing** | The process of creating database records from AI output |
+| **Prompt** | Natural language instruction given to the AI |
+| **Restart Wall** | Rails' requirement to restart server for code changes |
+| **Soft Morphing** | Using database as mutable filesystem to bypass restart |
+| **Tri-State Memory** | Three-tier data model (Structural, Episodic, Semantic) |
+
+---
+
+## 44. AWS Free Tier Monitoring
+
+**Location**: Radiant Deployer App → System → Monitoring  
+**Migration**: `migrations/160_aws_monitoring.sql`  
+**Version**: v4.21.0
+
+The AWS Free Tier Monitoring system provides real-time visibility into CloudWatch metrics, X-Ray traces, and Cost Explorer data using AWS free tier services.
+
+### 44.1 Overview
+
+| Service | Free Tier Limit | What We Monitor |
+|---------|-----------------|-----------------|
+| **CloudWatch** | 10 custom metrics, 1M API requests/month | Lambda invocations, errors, duration; Aurora CPU, connections, IOPS |
+| **X-Ray** | 100,000 traces/month | Request traces, error rates, latency distribution, service graph |
+| **Cost Explorer** | Basic usage (effectively free) | Cost by service, forecasts, anomaly detection |
+
+### 44.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    AWS FREE TIER MONITORING                          │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐            │
+│  │  CloudWatch  │   │    X-Ray     │   │Cost Explorer │            │
+│  │   Metrics    │   │   Traces     │   │    API       │            │
+│  └──────┬───────┘   └──────┬───────┘   └──────┬───────┘            │
+│         │                  │                  │                     │
+│         └──────────────────┼──────────────────┘                     │
+│                            │                                        │
+│                   ┌────────▼────────┐                               │
+│                   │  AWS Monitoring │                               │
+│                   │     Service     │                               │
+│                   │  (Lambda/Node)  │                               │
+│                   └────────┬────────┘                               │
+│                            │                                        │
+│                   ┌────────▼────────┐                               │
+│                   │  PostgreSQL     │                               │
+│                   │  Cache (5min)   │                               │
+│                   └────────┬────────┘                               │
+│                            │                                        │
+│  ┌─────────────────────────▼─────────────────────────┐             │
+│  │              SWIFT DEPLOYER APP                    │             │
+│  │  ┌─────────────────────────────────────────────┐  │             │
+│  │  │           Smart Visual Dashboard            │  │             │
+│  │  │  • Lambda Invocations Chart                 │  │             │
+│  │  │  • Cost by Service (Pie + Forecast Overlay) │  │             │
+│  │  │  • Latency Distribution (P50/P90/P99)       │  │             │
+│  │  │  • X-Ray Trace Status                       │  │             │
+│  │  │  • Free Tier Usage Bars                     │  │             │
+│  │  │  • Service Health Grid                      │  │             │
+│  │  └─────────────────────────────────────────────┘  │             │
+│  └───────────────────────────────────────────────────┘             │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 44.3 Key Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/aws-monitoring.types.ts` | TypeScript types |
+| `packages/infrastructure/lambda/shared/services/aws-monitoring.service.ts` | Backend service |
+| `packages/infrastructure/lambda/admin/aws-monitoring.ts` | API handler |
+| `packages/infrastructure/migrations/160_aws_monitoring.sql` | Database schema |
+| `apps/swift-deployer/.../Models/AWSMonitoringModels.swift` | Swift models |
+| `apps/swift-deployer/.../Services/AWSMonitoringService.swift` | Swift service |
+| `apps/swift-deployer/.../Views/AWSMonitoringView.swift` | Swift UI |
+
+### 44.4 Database Schema
+
+```sql
+-- Configuration per tenant
+CREATE TABLE aws_monitoring_config (
+    tenant_id UUID PRIMARY KEY,
+    enabled BOOLEAN DEFAULT true,
+    refresh_interval_minutes INTEGER DEFAULT 5,
+    cloudwatch_config JSONB,  -- lambdaFunctions[], auroraClusterId, etc.
+    xray_config JSONB,        -- samplingRate, filterExpression
+    cost_explorer_config JSONB, -- anomalyDetection, forecastEnabled
+    alerting_config JSONB     -- thresholds, slack/email
+);
+
+-- Metrics cache (5 minute TTL)
+CREATE TABLE aws_monitoring_cache (
+    tenant_id UUID,
+    metric_type VARCHAR(50),  -- 'lambda', 'aurora', 'xray', 'cost', 'dashboard'
+    metric_key VARCHAR(255),
+    data JSONB,
+    expires_at TIMESTAMPTZ
+);
+
+-- Historical aggregations
+CREATE TABLE aws_monitoring_aggregations (
+    tenant_id UUID,
+    period_type VARCHAR(20),  -- 'hourly', 'daily', 'weekly', 'monthly'
+    lambda_summary JSONB,
+    aurora_summary JSONB,
+    xray_summary JSONB,
+    cost_summary JSONB
+);
+
+-- Cost anomalies
+CREATE TABLE aws_cost_anomalies (
+    tenant_id UUID,
+    anomaly_id VARCHAR(255),
+    service VARCHAR(100),
+    severity VARCHAR(20),  -- 'low', 'medium', 'high', 'critical'
+    status VARCHAR(20)     -- 'open', 'acknowledged', 'resolved'
+);
+
+-- Free tier usage tracking
+CREATE TABLE aws_free_tier_usage (
+    tenant_id UUID,
+    service VARCHAR(100),
+    metric VARCHAR(100),
+    free_tier_limit BIGINT,
+    used_amount BIGINT,
+    status VARCHAR(20)  -- 'ok', 'warning', 'exceeded'
+);
+```
+
+### 44.5 API Endpoints
+
+**Base**: `/api/admin/aws-monitoring`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/dashboard` | Full monitoring dashboard |
+| `GET` | `/config` | Get monitoring configuration |
+| `PUT` | `/config` | Update configuration |
+| `POST` | `/refresh` | Force refresh all metrics |
+| `GET` | `/lambda` | Lambda function metrics |
+| `GET` | `/aurora` | Aurora database metrics |
+| `GET` | `/xray` | X-Ray trace summary |
+| `GET` | `/xray/service-graph` | Service dependency graph |
+| `GET` | `/costs` | Cost summary |
+| `GET` | `/costs/anomalies` | Cost anomalies |
+| `GET` | `/free-tier` | Free tier usage |
+| `GET` | `/health` | Service health status |
+| `GET` | `/charts/lambda-invocations` | Pre-formatted chart data |
+| `GET` | `/charts/cost-trend` | Cost trend with forecast overlay |
+| `GET` | `/charts/latency-distribution` | P50/P90/P99 distribution |
+
+### 44.6 Smart Visual Features
+
+The Swift UI includes intelligent overlays that can be toggled:
+
+| Overlay Type | Description |
+|--------------|-------------|
+| **cost_on_metrics** | Show cost impact on service metrics |
+| **latency_on_traces** | Latency distribution on trace data |
+| **errors_on_services** | Error rates on service graph |
+| **forecast_on_cost** | Cost forecast overlaid on historical data |
+| **free_tier_on_usage** | Free tier limits on usage graphs |
+| **health_on_topology** | Health status on service topology |
+
+### 44.7 Dashboard Sections
+
+| Tab | Contents |
+|-----|----------|
+| **Overview** | Health banner, quick stats, Lambda chart, cost pie, latency distribution |
+| **Lambda** | Function table, invocations vs errors chart, cost estimates |
+| **Aurora** | CPU, connections, IOPS, latency charts |
+| **X-Ray** | Trace summary, top endpoints, top errors, status distribution |
+| **Costs** | Cost by service, forecast, anomalies, service breakdown |
+| **Free Tier** | Savings, usage bars, at-risk/exceeded alerts |
+
+### 44.8 Free Tier Limits Tracked
+
+| Service | Metric | Free Limit | Warning At |
+|---------|--------|------------|------------|
+| Lambda | Invocations | 1,000,000/month | 80% |
+| Lambda | Compute | 400,000 GB-seconds | 80% |
+| X-Ray | Traces | 100,000/month | 80% |
+| CloudWatch | Custom Metrics | 10 | 80% |
+| CloudWatch | API Requests | 1,000,000/month | 80% |
+
+### 44.9 Configuration Example
+
+```json
+{
+  "cloudwatch": {
+    "enabled": true,
+    "lambdaFunctions": [
+      "radiant-api-prod",
+      "radiant-orchestrator-prod",
+      "radiant-thinktank-prod"
+    ],
+    "auroraClusterId": "radiant-aurora-prod"
+  },
+  "xray": {
+    "enabled": true,
+    "samplingRate": 0.05,
+    "traceRetentionDays": 30
+  },
+  "costExplorer": {
+    "enabled": true,
+    "anomalyDetection": true,
+    "forecastEnabled": true
+  },
+  "alerting": {
+    "thresholds": {
+      "lambdaErrorRate": 5,
+      "lambdaP99Latency": 10000,
+      "auroraCpuPercent": 80,
+      "xrayErrorRate": 5
+    }
+  }
+}
+```
+
+### 44.10 IAM Permissions Required
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:GetMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "xray:GetServiceGraph",
+        "xray:GetTraceSummaries",
+        "xray:BatchGetTraces"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ce:GetCostAndUsage",
+        "ce:GetCostForecast",
+        "ce:GetAnomalies"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sns:Publish"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ses:SendEmail"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+### 44.11 Threshold Notifications
+
+The monitoring system supports admin-configurable notifications via SMS and Email.
+
+#### Notification Targets
+
+Admins can configure one or more notification targets (phone numbers or email addresses):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `type` | `email` \| `sms` | Notification method |
+| `value` | string | Email address or E.164 phone number (+15551234567) |
+| `name` | string | Admin display name |
+| `enabled` | boolean | Whether notifications are active |
+
+**API Endpoints:**
+- `GET /notifications/targets` - List all targets
+- `POST /notifications/targets` - Add new target
+- `PUT /notifications/targets/:id` - Update target
+- `DELETE /notifications/targets/:id` - Delete target
+
+#### Spend Thresholds
+
+Configure spend limits per time period with warning percentages:
+
+| Period | Description | Example |
+|--------|-------------|---------|
+| `hourly` | Alert when hourly spend exceeds threshold | $5/hour |
+| `daily` | Alert when daily spend exceeds threshold | $50/day |
+| `weekly` | Alert when weekly spend exceeds threshold | $200/week |
+| `monthly` | Alert when monthly spend exceeds threshold | $500/month |
+
+Each threshold includes a **warning percent** (default 80%) that triggers a warning before the threshold is exceeded.
+
+**API Endpoints:**
+- `GET /notifications/spend-thresholds` - List all thresholds
+- `POST /notifications/spend-thresholds` - Set threshold
+- `PUT /notifications/spend-thresholds/:id` - Update threshold
+- `DELETE /notifications/spend-thresholds/:id` - Delete threshold
+
+**Example Request:**
+```json
+POST /api/admin/aws-monitoring/notifications/spend-thresholds
+{
+  "period": "daily",
+  "thresholdAmount": 50.00,
+  "warningPercent": 80
+}
+```
+
+#### Metric Thresholds
+
+Alert when specific metrics exceed thresholds:
+
+| Metric Type | Description | Typical Threshold |
+|-------------|-------------|-------------------|
+| `lambda_error_rate` | Lambda error percentage | 5% |
+| `lambda_p99_latency` | Lambda P99 latency | 10000ms |
+| `aurora_cpu` | Aurora CPU utilization | 80% |
+| `xray_error_rate` | X-Ray trace error rate | 5% |
+| `free_tier_usage` | Free tier usage percentage | 80% |
+
+**API Endpoints:**
+- `GET /notifications/metric-thresholds` - List all thresholds
+- `POST /notifications/metric-thresholds` - Set threshold
+
+#### Spend Summary
+
+Real-time spend tracking across all periods:
+
+```json
+GET /api/admin/aws-monitoring/notifications/spend-summary
+
+{
+  "success": true,
+  "data": {
+    "hourly": 2.34,
+    "daily": 45.67,
+    "weekly": 189.23,
+    "monthly": 456.78,
+    "hourlyChange": 5.2,
+    "dailyChange": -3.1,
+    "weeklyChange": 12.4,
+    "monthlyChange": 8.7
+  }
+}
+```
+
+#### Notification Log
+
+Audit trail of all sent notifications:
+
+```json
+GET /api/admin/aws-monitoring/notifications/log?limit=50
+
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "type": "spend_warning",
+      "message": "WARNING: Daily spend at 85% of threshold...",
+      "sentAt": "2026-01-02T12:00:00Z",
+      "deliveryStatus": "sent"
+    }
+  ]
+}
+```
+
+### 44.12 Chargeable Tier Tracking
+
+The system tracks when usage exceeds free tier limits:
+
+```json
+GET /api/admin/aws-monitoring/chargeable-status
+
+{
+  "success": true,
+  "data": {
+    "isChargeable": true,
+    "reason": "Usage has exceeded AWS free tier limits",
+    "estimatedMonthlyCost": 45.67,
+    "recommendation": "Current usage is within acceptable chargeable limits"
+  }
+}
+```
+
+### 44.13 Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `SES_FROM_ADDRESS` | Email sender address for alerts | Yes (for email) |
+| `AWS_REGION` | AWS region for SNS/SES | Yes |
+
+### 44.14 Notification Tables
+
+```sql
+-- Notification targets (phone/email)
+aws_monitoring_notification_targets (
+  id, tenant_id, type, value, name, enabled, verified, ...
+)
+
+-- Spend thresholds (hourly/daily/weekly/monthly)
+aws_monitoring_spend_thresholds (
+  id, tenant_id, period, threshold_amount, warning_percent, enabled, ...
+)
+
+-- Metric thresholds
+aws_monitoring_metric_thresholds (
+  id, tenant_id, metric_type, threshold_value, comparison, enabled, ...
+)
+
+-- Notification log (audit trail)
+aws_monitoring_notification_log (
+  id, tenant_id, target_id, type, message, sent_at, delivery_status, ...
+)
+
+-- Chargeable tier tracking
+aws_chargeable_tier_status (
+  id, tenant_id, service, is_chargeable, became_chargeable_at, estimated_monthly_cost, ...
+)
+
+-- Free tier service settings (admin toggles)
+aws_free_tier_settings (
+  id, tenant_id, service, free_tier_enabled, paid_tier_enabled, auto_scale_to_paid, max_paid_budget, ...
+)
+
+-- Configurable free tier limits (per-tenant overrides)
+aws_free_tier_limits (
+  id, tenant_id, service, limit_name, limit_value, unit, description, is_custom, ...
+)
+```
+
+### 44.15 Free Tier / Paid Tier Toggle (Slider Button)
+
+Administrators can toggle each AWS service between free tier and paid tier using slider buttons in the UI. **Free tier is ON by default for all services.**
+
+#### Service Tier Settings
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `service` | AWSServiceType | AWS service name (lambda, aurora, xray, etc.) |
+| `freeTierEnabled` | boolean | Free tier enabled (always true) |
+| `paidTierEnabled` | boolean | Paid tier enabled (admin toggle) |
+| `autoScaleToPaid` | boolean | Auto-upgrade when free tier exceeded |
+| `maxPaidBudget` | number? | Optional budget cap for paid tier |
+| `enabledBy` | string | Admin email who enabled paid tier |
+
+#### API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/tier-settings` | Get all service tier settings |
+| `POST` | `/tier-settings/toggle-paid` | Toggle paid tier for a service |
+| `POST` | `/tier-settings/auto-scale` | Enable/disable auto-scale to paid |
+| `POST` | `/tier-settings/budget-cap` | Set budget cap for a service |
+
+#### Toggle Paid Tier Example
+
+```json
+POST /api/admin/aws-monitoring/tier-settings/toggle-paid
+{
+  "service": "lambda",
+  "enabled": true,
+  "maxBudget": 50.00
+}
+
+// Response
+{
+  "success": true,
+  "data": {
+    "service": "lambda",
+    "freeTierEnabled": true,
+    "paidTierEnabled": true,
+    "autoScaleToPaid": false,
+    "maxPaidBudget": 50.00,
+    "enabledBy": "admin@example.com"
+  },
+  "message": "Paid tier enabled for lambda. Charges may apply beyond free tier limits."
+}
+```
+
+#### Supported Services
+
+| Service | Free Tier Limits |
+|---------|------------------|
+| `lambda` | 1M requests, 400K GB-seconds/month |
+| `aurora` | 750 ACU-hours, 10GB storage/month |
+| `xray` | 100K traces/month |
+| `cloudwatch` | 10 metrics, 3 dashboards, 10 alarms |
+| `cost_explorer` | ~1000 API requests/month |
+| `api_gateway` | 1M REST API calls/month |
+| `sqs` | 1M requests/month |
+| `s3` | 5GB storage, 20K GET, 2K PUT |
+| `dynamodb` | 25GB storage, 25 RCU, 25 WCU |
+| `sns` | 1M publishes, 100K HTTP/S deliveries |
+| `ses` | 62K outbound emails/month (from EC2) |
+
+#### Swift UI
+
+The tier settings are available in the Radiant Deployer App under **Monitoring → Tier Settings**. Each service displays:
+
+- Service icon and name
+- Current tier status (FREE or PAID badge)
+- Toggle switch for paid tier
+- Auto-scale option (when paid enabled)
+- Budget cap configuration
+
+### 44.16 Configurable Free Tier Limits
+
+Free tier limits are stored in the database and can be overridden per-tenant. Default values match official AWS free tier limits as of 2024.
+
+```sql
+-- Example: Override Lambda invocation limit for a tenant
+UPDATE aws_free_tier_limits 
+SET limit_value = 2000000, is_custom = true
+WHERE tenant_id = 'your-tenant-id' AND service = 'lambda' AND limit_name = 'invocations';
+```
 
 ---
