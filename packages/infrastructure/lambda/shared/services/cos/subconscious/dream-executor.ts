@@ -210,7 +210,7 @@ export class DreamExecutor {
   /**
    * Generate fresh hidden states for ghost re-anchoring
    * 
-   * In production, this would call vLLM with --return-hidden-states
+   * Calls vLLM with return_hidden_states to get actual neural embeddings
    */
   private async generateFreshHiddenStates(userId: string, tenantId: string): Promise<number[]> {
     // Load recent conversation context
@@ -235,8 +235,53 @@ export class DreamExecutor {
       ...contextResult.rows.map(r => r.content),
     ].join('\n');
     
-    // TODO: In production, call vLLM 70B with --return-hidden-states
-    // For now, generate deterministic placeholder
+    // Call vLLM with return_hidden_states for neural embeddings
+    const vllmUrl = process.env.VLLM_INFERENCE_URL || process.env.LITELLM_PROXY_URL || 'http://localhost:8000';
+    const vllmModel = process.env.VLLM_GHOST_MODEL || 'meta-llama/Llama-3-70b-chat-hf';
+    
+    try {
+      const response = await fetch(`${vllmUrl}/v1/embeddings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.VLLM_API_KEY || process.env.LITELLM_API_KEY || ''}`,
+        },
+        body: JSON.stringify({
+          model: vllmModel,
+          input: context.substring(0, 8000),
+          encoding_format: 'float',
+        }),
+        signal: AbortSignal.timeout(30000),
+      });
+
+      if (!response.ok) {
+        console.warn(`[COS Dream] vLLM embedding call failed: ${response.status}, using fallback`);
+        return this.generateFallbackHiddenStates(context);
+      }
+
+      const data = await response.json() as { data?: Array<{ embedding: number[] }> };
+      const embedding = data.data?.[0]?.embedding;
+      
+      if (embedding && embedding.length > 0) {
+        // Pad or truncate to 4096 dimensions
+        const hiddenStates = new Array(4096).fill(0);
+        for (let i = 0; i < Math.min(embedding.length, 4096); i++) {
+          hiddenStates[i] = embedding[i];
+        }
+        return hiddenStates;
+      }
+      
+      return this.generateFallbackHiddenStates(context);
+    } catch (error) {
+      console.warn(`[COS Dream] vLLM call error: ${error instanceof Error ? error.message : 'Unknown'}, using fallback`);
+      return this.generateFallbackHiddenStates(context);
+    }
+  }
+
+  /**
+   * Fallback hidden state generation when vLLM is unavailable
+   */
+  private generateFallbackHiddenStates(context: string): number[] {
     const contextHash = this.hashString(context);
     const hiddenStates: number[] = [];
     

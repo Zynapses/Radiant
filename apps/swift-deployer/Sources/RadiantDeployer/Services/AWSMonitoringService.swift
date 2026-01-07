@@ -115,6 +115,81 @@ final class AWSMonitoringService: ObservableObject {
         return await fetchEndpoint("/api/admin/aws-monitoring/health", instance: instance)
     }
     
+    // MARK: - Tier Settings
+    
+    func togglePaidTier(for instance: DeployedInstance, service: String, enabled: Bool) async -> Bool {
+        do {
+            let endpoint = "\(instance.apiEndpoint)/api/admin/aws-monitoring/tier-settings"
+            guard let url = URL(string: endpoint) else { return false }
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "PUT"
+            request.addValue("Bearer \(instance.authToken)", forHTTPHeaderField: "Authorization")
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            let body = TierSettingsRequest(service: service, paidTierEnabled: enabled)
+            request.httpBody = try JSONEncoder().encode(body)
+            
+            let (_, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else { return false }
+            if httpResponse.statusCode == 200 {
+                await fetchDashboard(for: instance)
+                return true
+            }
+            return false
+        } catch {
+            self.error = error.localizedDescription
+            return false
+        }
+    }
+    
+    func setAutoScale(for instance: DeployedInstance, service: String, enabled: Bool) async -> Bool {
+        do {
+            let endpoint = "\(instance.apiEndpoint)/api/admin/aws-monitoring/auto-scale"
+            guard let url = URL(string: endpoint) else { return false }
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "PUT"
+            request.addValue("Bearer \(instance.authToken)", forHTTPHeaderField: "Authorization")
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            let body = AutoScaleRequest(service: service, autoScaleEnabled: enabled)
+            request.httpBody = try JSONEncoder().encode(body)
+            
+            let (_, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else { return false }
+            return httpResponse.statusCode == 200
+        } catch {
+            self.error = error.localizedDescription
+            return false
+        }
+    }
+    
+    func setBudgetCap(for instance: DeployedInstance, service: String, cap: Double) async -> Bool {
+        do {
+            let endpoint = "\(instance.apiEndpoint)/api/admin/aws-monitoring/budget-cap"
+            guard let url = URL(string: endpoint) else { return false }
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "PUT"
+            request.addValue("Bearer \(instance.authToken)", forHTTPHeaderField: "Authorization")
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            let body = BudgetCapRequest(service: service, budgetCap: cap)
+            request.httpBody = try JSONEncoder().encode(body)
+            
+            let (_, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else { return false }
+            return httpResponse.statusCode == 200
+        } catch {
+            self.error = error.localizedDescription
+            return false
+        }
+    }
+    
     // MARK: - Configuration
     
     func updateConfig(for instance: DeployedInstance, config: MonitoringConfigUpdate) async -> Bool {
@@ -387,6 +462,21 @@ struct AlertThresholdsUpdate: Encodable {
     var auroraCpuPercent: Double?
     var costDailyLimit: Double?
     var xrayErrorRate: Double?
+}
+
+struct TierSettingsRequest: Encodable {
+    let service: String
+    let paidTierEnabled: Bool
+}
+
+struct AutoScaleRequest: Encodable {
+    let service: String
+    let autoScaleEnabled: Bool
+}
+
+struct BudgetCapRequest: Encodable {
+    let service: String
+    let budgetCap: Double
 }
 
 enum MonitoringError: LocalizedError {
