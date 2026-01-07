@@ -76,6 +76,10 @@ This guide covers administrative features specific to **Think Tank**, the consum
     - [30.10 Database Schema](#3010-database-schema)
     - [30.11 Implementation Files](#3011-implementation-files)
 31. [Why Think Tank Beats Standalone AI](#31-why-think-tank-beats-standalone-ai-the-system-advantage)
+32. [Swarm Orchestration & Flyte Operations](#32-swarm-orchestration--flyte-operations)
+    - [32.1 System Architecture: The "Deep Swarm"](#321-system-architecture-the-deep-swarm)
+    - [32.2 Operational Troubleshooting](#322-operational-troubleshooting)
+    - [32.3 Compliance & Security](#323-compliance--security)
 
 ---
 
@@ -4401,6 +4405,264 @@ Think Tank wins because:
 4. **It escalates when needed** (SOFAI Routing)
 
 For detailed technical architecture, see [RADIANT Admin Guide Section 46](./RADIANT-ADMIN-GUIDE.md#46-radiant-vs-frontier-models-comparative-analysis).
+
+---
+
+## 32. Swarm Orchestration & Flyte Operations
+
+**Version:** v4.19.2  
+**Status:** Production Ready
+
+This addendum covers the operational details of Think Tank's multi-agent swarm orchestration system built on Flyte workflows.
+
+### 32.1 System Architecture: The "Deep Swarm"
+
+Think Tank v4.19.2 replaces serial execution with **Dynamic Workflow Parallelism**.
+
+#### 32.1.1 "Scatter-Gather" Pattern
+
+| Aspect | Old Behavior | New Behavior |
+|--------|--------------|--------------|
+| **Execution** | Agents ran sequentially (Agent A → Agent B) | Orchestrator spawns a `@dynamic` node for every agent |
+| **Isolation** | Blocked agents blocked everything | Blocked agents release compute (Pod spins down) while others continue |
+| **Scalability** | O(n) time complexity | O(1) effective time for parallel agents |
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    SCATTER-GATHER PATTERN                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│                      ┌─────────────┐                            │
+│                      │ Orchestrator │                            │
+│                      └──────┬──────┘                            │
+│                             │                                    │
+│              ┌──────────────┼──────────────┐                    │
+│              │              │              │                    │
+│              ▼              ▼              ▼                    │
+│        ┌─────────┐    ┌─────────┐    ┌─────────┐               │
+│        │ Agent A │    │ Agent B │    │ Agent C │  ← SCATTER    │
+│        │ (Legal) │    │ (Domain)│    │ (Fact)  │               │
+│        └────┬────┘    └────┬────┘    └────┬────┘               │
+│             │              │              │                     │
+│             │    ┌─────────┴─────────┐    │                     │
+│             │    │  HITL Wait Here   │    │  ← Non-blocking     │
+│             │    │  (Pod Released)   │    │                     │
+│             │    └─────────┬─────────┘    │                     │
+│             │              │              │                     │
+│             └──────────────┼──────────────┘                    │
+│                            ▼                                    │
+│                      ┌─────────┐                                │
+│                      │Synthesize│  ← GATHER                     │
+│                      └─────────┘                                │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### 32.1.2 S3 Bronze Layer Offloading (Critical Change)
+
+> ⚠️ **Breaking Change**: Think Tank no longer accepts raw JSON payloads to prevent gRPC payload limits (~4MB) from crashing workflows with large RAG contexts.
+
+**New Flow:**
+```
+Radiant API → Upload to S3 → Pass s3_uri to Flyte → Flyte Hydrates Data
+```
+
+**Storage Location:**
+```
+s3://radiant-bronze/flyte-inputs/{tenant_id}/{swarm_id}/
+```
+
+**Admin Action Required:**
+
+When debugging a failed workflow in the Flyte Console:
+
+1. **DO NOT** look for inputs in the "Inputs" tab (it only contains the `s3_uri`)
+2. Copy the `s3_uri` from the workflow inputs
+3. Download the JSON file from AWS S3 to inspect the actual payload
+
+```bash
+# Download input payload for debugging
+aws s3 cp s3://radiant-bronze/flyte-inputs/{tenant_id}/{swarm_id}/input.json ./debug-input.json
+cat ./debug-input.json | jq .
+```
+
+### 32.2 Operational Troubleshooting
+
+This release includes fixes for 3 critical stability issues ("Silent Killers"). Use this guide to diagnose production anomalies.
+
+#### 32.2.1 "Stuck" Workflows (Signal Mismatch)
+
+| Aspect | Details |
+|--------|---------|
+| **Symptom** | Workflow is `RUNNING` but UI shows "Approved" |
+| **Root Cause** | Signal ID sent by API does not match ID the workflow is waiting for |
+
+**Diagnosis Steps:**
+
+1. **Verify Signal Format**: Must be `human_decision_{decision_id}`
+   
+2. **Check Database**:
+   ```sql
+   SELECT id, flyte_execution_id, flyte_node_id 
+   FROM pending_decisions 
+   WHERE status = 'pending' 
+   AND tenant_id = '<TENANT_ID>';
+   ```
+
+3. **Cross-Reference Flyte**: The `flyte_node_id` must match the node in the Flyte execution graph
+
+**Resolution:**
+
+If deadlocked, terminate the workflow via Flyte Console:
+```bash
+flytectl delete execution <EXECUTION_ID> \
+  --project radiant \
+  --domain production
+```
+
+#### 32.2.2 "Zombie" Cache
+
+| Aspect | Details |
+|--------|---------|
+| **Symptom** | User rejects a plan, retries, and AI immediately returns the same rejected plan without thinking |
+| **Root Cause** | Flyte caching returning stale results |
+
+**Verification:**
+
+Ensure `think_tank_workflow.py` has the correct decorator:
+
+```python
+# ✅ CORRECT - Forces fresh execution
+@dynamic(cache=False)
+def execute_swarm(agents: List[AgentConfig], task_data: TaskData) -> List[AgentResult]:
+    ...
+
+# ❌ WRONG - Will return cached (potentially rejected) results
+@dynamic
+def execute_swarm(agents: List[AgentConfig], task_data: TaskData) -> List[AgentResult]:
+    ...
+```
+
+**Files to Check:**
+- `packages/flyte/workflows/think_tank_workflow.py`
+
+#### 32.2.3 Emergency Manual Intervention
+
+If the API layer is unavailable, Admins can manually unblock a workflow using `flytectl`:
+
+```bash
+flytectl update execution <EXECUTION_ID> \
+  --project radiant \
+  --domain production \
+  --signal-id "human_decision_<DECISION_ID>" \
+  --signal-value '{"resolution": "approved", "guidance": "Emergency Override via CLI"}'
+```
+
+**Signal Value Schema:**
+```json
+{
+  "resolution": "approved" | "rejected" | "modified",
+  "guidance": "string - guidance for AI refinement",
+  "resolved_by": "admin-user-id",
+  "resolved_at": "2026-01-07T12:00:00Z"
+}
+```
+
+### 32.3 Compliance & Security
+
+#### 32.3.1 Tenant Isolation (Strict RLS)
+
+> ⚠️ **Warning for DB Admins**: All tables are protected by Row-Level Security. Running a standard `SELECT *` as a superuser might return 0 rows or trigger an error depending on your client config.
+
+**Correct Query Pattern:**
+
+To query data manually, you must set the Tenant Context for your session:
+
+```sql
+BEGIN;
+-- Must match a valid tenant UUID
+SET app.tenant_id = '123e4567-e89b-12d3-a456-426614174000'; 
+
+SELECT * FROM pending_decisions;
+
+COMMIT;
+-- Or use RESET to clear context
+RESET app.tenant_id;
+```
+
+**Protected Tables:**
+- `pending_decisions`
+- `decision_audit`
+- `decision_domain_config`
+- `websocket_connections`
+
+#### 32.3.2 Audit Log Export
+
+To export the decision audit trail for SOC2/HIPAA evidence:
+
+```sql
+SELECT 
+    da.created_at,
+    da.actor_id,
+    da.actor_type,
+    da.action,
+    da.details->>'resolution' as resolution,
+    da.details->>'guidance' as guidance,
+    pd.domain,
+    pd.question
+FROM decision_audit da
+JOIN pending_decisions pd ON da.decision_id = pd.id
+WHERE da.tenant_id = '<TENANT_ID>'
+AND da.created_at > NOW() - INTERVAL '30 days'
+ORDER BY da.created_at DESC;
+```
+
+**Export to CSV:**
+```bash
+psql "$DATABASE_URL" -c "COPY (
+  SELECT 
+    created_at, 
+    actor_id, 
+    action, 
+    details->>'resolution' as resolution, 
+    details->>'guidance' as guidance 
+  FROM decision_audit 
+  WHERE tenant_id = '<TENANT_ID>' 
+  AND created_at > NOW() - INTERVAL '30 days'
+) TO STDOUT WITH CSV HEADER" > audit_export.csv
+```
+
+#### 32.3.3 PHI Sanitization
+
+All decision content is sanitized before human review to prevent PHI exposure:
+
+| Pattern | Replacement |
+|---------|-------------|
+| SSN (XXX-XX-XXXX) | `[SSN REDACTED]` |
+| Email addresses | `[EMAIL REDACTED]` |
+| Phone numbers | `[PHONE REDACTED]` |
+| Credit card numbers | `[CC REDACTED]` |
+| Medical Record Numbers | `[MRN REDACTED]` |
+| ZIP codes (5-digit) | `[ZIP REDACTED]` |
+
+**Disable Sanitization** (requires tenant config):
+```sql
+UPDATE decision_domain_config 
+SET sanitize_phi = false 
+WHERE tenant_id = '<TENANT_ID>' 
+AND domain = 'general';
+```
+
+> ⚠️ **Warning**: Disabling PHI sanitization may violate HIPAA compliance. Only disable for non-healthcare tenants.
+
+### 32.4 Related Sections
+
+| Section | Relevance |
+|---------|-----------|
+| [RADIANT Admin Guide - Section 48](./RADIANT-ADMIN-GUIDE.md#48-mission-control-human-in-the-loop-hitl-system) | Full Mission Control architecture |
+| [RADIANT Admin Guide - Section 47](./RADIANT-ADMIN-GUIDE.md#47-flyte-native-state-management) | Flyte state management |
+| [RADIANT Admin Guide - Section 42](./RADIANT-ADMIN-GUIDE.md#42-genesis-cato-safety-architecture) | Cato safety integration |
+| [Section 30 - COS](#30-consciousness-operating-system-cos) | SOFAI routing |
 
 ---
 

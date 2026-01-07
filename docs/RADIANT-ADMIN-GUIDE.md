@@ -49,6 +49,7 @@
 45. [Just Think Tank: Multi-Agent Architecture](#45-just-think-tank-multi-agent-architecture)
 46. [RADIANT vs Frontier Models: Comparative Analysis](#46-radiant-vs-frontier-models-comparative-analysis)
 47. [Flyte-Native State Management](#47-flyte-native-state-management)
+48. [Mission Control: Human-in-the-Loop (HITL) System](#48-mission-control-human-in-the-loop-hitl-system)
 
 ---
 
@@ -13606,5 +13607,339 @@ def expensive_computation(data: FlyteFile) -> FlyteFile:
 | [40. Advanced Cognition Services](#40-advanced-cognition-services-v610) | Teacher-Student distillation workflows |
 | [23. Predictive Coding & Evolution](#23-predictive-coding--evolution) | LoRA evolution pipeline |
 | [26. Inference Components](#26-inference-components-self-hosted-model-optimization) | Model deployment workflows |
+
+---
+
+## 48. Mission Control: Human-in-the-Loop (HITL) System
+
+**Version:** 4.19.2  
+**Status:** Production Ready  
+
+Mission Control is RADIANT's comprehensive Human-in-the-Loop (HITL) system that enables human oversight of AI-generated decisions, particularly for high-stakes domains like medical, financial, and legal contexts.
+
+### 48.1 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        MISSION CONTROL ARCHITECTURE                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐                   │
+│  │ RadiantSwarm │───▶│FlyteLauncher │───▶│ Flyte Admin  │                   │
+│  │  (Scatter-   │    │ (S3 Upload,  │    │  (Workflow   │                   │
+│  │   Gather)    │    │  Launch)     │    │  Execution)  │                   │
+│  └──────────────┘    └──────────────┘    └──────┬───────┘                   │
+│                                                  │                           │
+│                                    ┌─────────────▼─────────────┐            │
+│                                    │  Python HITL Workflow     │            │
+│                                    │  - execute_swarm          │            │
+│                                    │  - synthesize_results     │            │
+│                                    │  - wait_for_input ←───────┼────┐       │
+│                                    │  - deep_reasoning         │    │       │
+│                                    └───────────────────────────┘    │       │
+│                                                                      │       │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐           │       │
+│  │  Admin UI    │◀───│  WebSocket   │◀───│ Redis Bridge │◀──────────┤       │
+│  │  Dashboard   │    │  API GW      │    │  (ECS)       │           │       │
+│  └──────┬───────┘    └──────────────┘    └──────────────┘           │       │
+│         │                                       ▲                    │       │
+│         │            ┌──────────────┐           │                    │       │
+│         └───────────▶│ REST API     │───────────┤                    │       │
+│                      │ Lambda       │           │                    │       │
+│                      └──────┬───────┘           │                    │       │
+│                             │                   │                    │       │
+│                      ┌──────▼───────┐    ┌──────┴───────┐           │       │
+│                      │  PostgreSQL  │    │    Redis     │───────────┘       │
+│                      │  (Decisions) │    │  (Pub/Sub)   │                   │
+│                      └──────────────┘    └──────────────┘                   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 48.2 Key Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| **RadiantSwarm** | `lambda/shared/services/swarm/radiant-swarm.ts` | Scatter-gather agent orchestration |
+| **FlyteLauncher** | `lambda/shared/services/swarm/flyte-launcher.ts` | Flyte workflow integration |
+| **Think Tank Workflow** | `packages/flyte/workflows/think_tank_workflow.py` | Python HITL workflow with `wait_for_input` |
+| **Mission Control API** | `lambda/functions/mission-control/index.ts` | REST API for decisions |
+| **WebSocket Handler** | `lambda/functions/websocket/connection-handler.ts` | Real-time connection management |
+| **Redis Bridge** | `packages/services/redis-bridge/src/index.ts` | ECS Fargate service for pub/sub |
+| **Timeout Cleanup** | `lambda/functions/timeout-cleanup/index.ts` | Scheduled expiration handler |
+| **Cato Integration** | `lambda/shared/services/cato/hitl-integration.service.ts` | Epistemic recovery escalation |
+
+### 48.3 Database Schema
+
+**Tables Created by Migration V2026_01_07_001:**
+
+```sql
+-- pending_decisions: Core HITL decision tracking
+CREATE TABLE pending_decisions (
+  id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  session_id UUID NOT NULL,
+  question TEXT NOT NULL,
+  context JSONB NOT NULL,
+  domain VARCHAR(50) NOT NULL,  -- medical, financial, legal, general
+  urgency VARCHAR(20) DEFAULT 'normal',  -- low, normal, high, critical
+  status VARCHAR(20) DEFAULT 'pending',  -- pending, resolved, expired, escalated
+  timeout_seconds INTEGER NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  flyte_execution_id VARCHAR(256) NOT NULL,
+  flyte_node_id VARCHAR(256) NOT NULL,
+  cato_escalation_id UUID,  -- Link to Cato if epistemic recovery
+  resolution VARCHAR(50),  -- approved, rejected, modified, timed_out
+  guidance TEXT,
+  resolved_by UUID,
+  resolved_at TIMESTAMPTZ
+);
+
+-- decision_audit: Complete audit trail
+CREATE TABLE decision_audit (
+  id UUID PRIMARY KEY,
+  decision_id UUID NOT NULL,
+  action VARCHAR(50) NOT NULL,  -- created, viewed, resolved, expired, escalated
+  actor_type VARCHAR(50) NOT NULL,  -- user, system, timeout_lambda, cato
+  details JSONB NOT NULL
+);
+
+-- decision_domain_config: Per-domain timeout and escalation settings
+CREATE TABLE decision_domain_config (
+  domain VARCHAR(50) NOT NULL,
+  tenant_id UUID,  -- NULL = global default
+  default_timeout_seconds INTEGER NOT NULL,
+  escalation_timeout_seconds INTEGER NOT NULL,
+  auto_escalate BOOLEAN DEFAULT TRUE,
+  escalation_channel VARCHAR(100),  -- pagerduty, slack, email
+  required_roles TEXT[]
+);
+
+-- websocket_connections: Active WebSocket connections
+CREATE TABLE websocket_connections (
+  connection_id VARCHAR(256) PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  user_id UUID,
+  subscribed_domains TEXT[]
+);
+```
+
+### 48.4 Domain-Specific Configuration
+
+| Domain | Default Timeout | Escalation Timeout | Auto-Escalate | Required Roles |
+|--------|-----------------|-------------------|---------------|----------------|
+| **Medical** | 5 minutes | 1 minute | Yes (PagerDuty) | MD, RN, PA |
+| **Financial** | 10 minutes | 2 minutes | Yes (PagerDuty) | ANALYST, ADVISOR |
+| **Legal** | 15 minutes | 3 minutes | Yes (Email) | LEGAL, COMPLIANCE |
+| **General** | 30 minutes | 5 minutes | Yes (Slack) | None |
+
+### 48.5 API Reference
+
+**Base URL:** `/api/mission-control`
+
+#### List Pending Decisions
+```http
+GET /decisions?status=pending&domain=medical&limit=50
+X-Tenant-ID: {tenant_id}
+Authorization: Bearer {token}
+
+Response:
+[
+  {
+    "id": "uuid",
+    "question": "Is this treatment appropriate?",
+    "domain": "medical",
+    "urgency": "critical",
+    "status": "pending",
+    "expiresAt": "2026-01-07T12:05:00Z",
+    "createdAt": "2026-01-07T12:00:00Z"
+  }
+]
+```
+
+#### Resolve Decision
+```http
+POST /decisions/{id}/resolve
+X-Tenant-ID: {tenant_id}
+Content-Type: application/json
+
+{
+  "resolution": "approved|rejected|modified",
+  "guidance": "Optional guidance for AI refinement"
+}
+
+Response:
+{
+  "id": "uuid",
+  "status": "resolved",
+  "resolution": "modified",
+  "guidance": "Consider contraindications...",
+  "resolvedBy": "user-uuid",
+  "resolvedAt": "2026-01-07T12:03:00Z"
+}
+```
+
+#### Get Dashboard Stats
+```http
+GET /stats
+X-Tenant-ID: {tenant_id}
+
+Response:
+{
+  "pendingCount": 5,
+  "resolvedToday": 23,
+  "expiredToday": 1,
+  "escalatedToday": 0,
+  "avgResolutionTimeMs": 45000,
+  "byDomain": { "medical": 3, "general": 2 },
+  "byUrgency": { "critical": 2, "high": 3 }
+}
+```
+
+### 48.6 Flyte Workflow Integration
+
+The HITL workflow uses Flyte's `wait_for_input` signal mechanism:
+
+```python
+@workflow
+def think_tank_hitl_workflow(
+    s3_uri: str,  # Input data from S3 (not inline JSON)
+    swarm_id: str,
+    tenant_id: str,
+    session_id: str,
+    user_id: str,
+    hitl_domain: str,
+) -> Dict[str, Any]:
+    # 1. Load input from S3
+    input_data = load_input_from_s3_task(s3_uri=s3_uri)
+    
+    # 2. Execute agent swarm (true parallel execution)
+    agent_results = execute_swarm(agents=agents, task_data=task_data)
+    
+    # 3. Synthesize results
+    synthesis_result = synthesize_results(agent_results=agent_results)
+    
+    # 4. If review needed, pause for human input
+    human_decision = wait_for_input(
+        name=f"human_decision_{decision_id}",
+        timeout=timedelta(seconds=timeout_seconds),
+        expected_type=dict,
+    )
+    
+    # 5. Incorporate human guidance
+    final_response = perform_deep_reasoning(synthesis, human_decision)
+    
+    return build_workflow_result(...)
+```
+
+**Critical Implementation Details:**
+- Input data offloaded to S3 Bronze layer (avoids payload explosion)
+- `@dynamic(cache=False)` on `execute_swarm` (prevents zombie cache)
+- Signal names use `decision_id`, not `agent_id` (prevents signal mismatch)
+
+### 48.7 Real-Time Updates
+
+The system uses Redis Pub/Sub for real-time updates:
+
+```
+Redis Pub/Sub Channels:
+├── decision_pending:{tenant_id}   → New decision created
+├── decision_resolved:{tenant_id}  → Decision resolved
+├── decision_expired:{tenant_id}   → Decision timed out
+├── decision_escalated:{tenant_id} → Decision escalated
+└── swarm_event:{tenant_id}        → Swarm execution events
+```
+
+**Redis Bridge Service** (ECS Fargate):
+- Always-on, serverless
+- Subscribes to Redis channels
+- Broadcasts to WebSocket connections via API Gateway Management API
+- Includes health check endpoint
+
+### 48.8 Cato Integration
+
+When Cato's Epistemic Recovery fails after maximum attempts:
+
+```typescript
+// In safety-pipeline.service.ts
+if (recoveryAttempts >= MAX_RECOVERY_ATTEMPTS) {
+  const result = await catoHitlIntegration.createCatoEscalationWithHitl({
+    tenantId,
+    sessionId,
+    userId,
+    originalTask,
+    rejectionHistory,
+    recoveryAttempts,
+    lastError,
+    flyteExecutionId,
+    flyteNodeId,
+    context,
+  });
+  
+  // Decision created, Flyte workflow paused
+  return { escalated: true, decisionId: result.decisionId };
+}
+```
+
+### 48.9 Deployment
+
+```bash
+# Deploy Mission Control
+./tools/scripts/deploy-mission-control.sh [dev|staging|prod]
+
+# Register Flyte workflows
+./packages/flyte/scripts/register-workflows.sh [environment]
+```
+
+**Environment Variables:**
+| Variable | Description |
+|----------|-------------|
+| `DB_SECRET_ARN` | Secrets Manager ARN for database credentials |
+| `REDIS_HOST` | Redis/ElastiCache host |
+| `REDIS_PORT` | Redis port (default: 6379) |
+| `FLYTE_ADMIN_URL` | Flyte Admin API URL |
+| `PAGERDUTY_ROUTING_KEY` | PagerDuty Events API v2 routing key |
+| `SLACK_WEBHOOK_URL` | Slack Incoming Webhook URL |
+| `WEBSOCKET_API_ENDPOINT` | WebSocket API Gateway endpoint |
+
+### 48.10 Monitoring & Alerts
+
+**CloudWatch Metrics:**
+- `PendingDecisionCount` - Number of unresolved decisions
+- `DecisionResolutionTime` - Time from creation to resolution
+- `ExpiredDecisionCount` - Decisions that timed out
+- `EscalatedDecisionCount` - Decisions sent to PagerDuty/Slack
+
+**CloudWatch Alarms:**
+- Critical: `PendingDecisionCount > 10` (medical domain)
+- High: `ExpiredDecisionCount > 3` (24h window)
+- Medium: `DecisionResolutionTime > 300000` (5 min avg)
+
+### 48.11 Security Considerations
+
+1. **PHI Sanitization**: All decision content sanitized before human review
+   - SSN, email, phone, ZIP, credit card patterns removed
+   - Medical Record Numbers (MRN) redacted
+   
+2. **RLS Enforcement**: All database queries use tenant context
+   - `SET app.tenant_id = $1` in handler (session-level, not transaction)
+   - `RESET app.tenant_id` in finally block
+   
+3. **Role-Based Access**: Domain-specific role requirements
+   - Medical decisions require MD, RN, or PA roles
+   - Financial decisions require ANALYST or ADVISOR roles
+   
+4. **Audit Trail**: Complete decision lifecycle logged
+   - Created, viewed, resolved, expired, escalated events
+   - Actor ID and type recorded
+
+### 48.12 Related Sections
+
+| Section | Relevance |
+|---------|-----------|
+| [42. Genesis Cato Safety Architecture](#42-genesis-cato-safety-architecture) | Epistemic recovery integration |
+| [45. Just Think Tank](#45-just-think-tank-multi-agent-architecture) | Swarm orchestration |
+| [47. Flyte-Native State Management](#47-flyte-native-state-management) | Workflow durability |
+| [36. Metrics & Persistent Learning](#36-metrics--persistent-learning) | Decision metrics tracking |
 
 ---
