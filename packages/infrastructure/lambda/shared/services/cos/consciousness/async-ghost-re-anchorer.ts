@@ -122,8 +122,35 @@ export class AsyncGhostReAnchorer {
       
       console.error(`[COS] Re-anchor failed: ${job.ghostId}`, error);
       
-      // TODO: Implement retry logic if needed
-      // For now, log and continue
+      // Implement retry logic with exponential backoff
+      const retryCount = (job as ReanchorJob & { retryCount?: number }).retryCount || 0;
+      if (retryCount < this.MAX_RETRIES) {
+        const backoffMs = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+        console.log(`[COS] Scheduling retry ${retryCount + 1}/${this.MAX_RETRIES} for ${job.ghostId} in ${backoffMs}ms`);
+        
+        // Schedule retry with backoff
+        setTimeout(async () => {
+          await this.queueReanchor({
+            ...job,
+            priority: 'high',
+          });
+          // Store retry count in Redis for tracking
+          await this.redis.set(
+            `${this.PROCESSING_KEY}:retry:${job.ghostId}`,
+            String(retryCount + 1),
+            'EX',
+            3600 // 1 hour TTL
+          );
+        }, backoffMs);
+      } else {
+        console.error(`[COS] Re-anchor exhausted retries for ${job.ghostId}`);
+        // Log permanent failure for alerting
+        await query(
+          `INSERT INTO cos_reanchor_failures (ghost_id, user_id, tenant_id, error, created_at)
+           VALUES ($1, $2, $3, $4, NOW())`,
+          [job.ghostId, job.userId, job.tenantId, error instanceof Error ? error.message : 'Unknown']
+        ).catch(() => {});
+      }
       return true;
       
     } finally {
@@ -218,12 +245,8 @@ export class AsyncGhostReAnchorer {
   /**
    * Get hidden states from 70B model
    * 
-   * In production, this would:
-   * 1. Load recent conversation for user
-   * 2. Call 70B model with --return-hidden-states
-   * 3. Extract final layer hidden states
-   * 
-   * Current implementation returns placeholder for testing
+   * Calls vLLM embedding endpoint to get neural embeddings
+   * Falls back to deterministic hash-based generation if unavailable
    */
   private async getHiddenStatesFrom70B(job: ReanchorJob): Promise<number[]> {
     // Load conversation context
@@ -236,19 +259,60 @@ export class AsyncGhostReAnchorer {
     
     const context = contextResult.rows.map(r => r.content).join('\n');
     
-    // TODO: In production, call vLLM with:
-    // POST /v1/completions
-    // { "model": "llama-3-70b", "prompt": context, "return_hidden_states": true }
+    // Call vLLM embedding endpoint for neural embeddings
+    const vllmUrl = process.env.VLLM_INFERENCE_URL || process.env.LITELLM_PROXY_URL || 'http://localhost:8000';
+    const vllmModel = process.env.VLLM_GHOST_MODEL || 'meta-llama/Llama-3-70b-chat-hf';
     
-    // For now, generate deterministic placeholder based on context hash
-    // This ensures same context = same ghost (reproducible)
+    try {
+      const response = await fetch(`${vllmUrl}/v1/embeddings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.VLLM_API_KEY || process.env.LITELLM_API_KEY || ''}`,
+        },
+        body: JSON.stringify({
+          model: vllmModel,
+          input: context.substring(0, 8000),
+          encoding_format: 'float',
+        }),
+        signal: AbortSignal.timeout(25000), // 25s timeout (within 30s processing limit)
+      });
+
+      if (!response.ok) {
+        console.warn(`[COS] vLLM embedding call failed: ${response.status}, using fallback`);
+        return this.generateFallbackHiddenStates(context);
+      }
+
+      const data = await response.json() as { data?: Array<{ embedding: number[] }> };
+      const embedding = data.data?.[0]?.embedding;
+      
+      if (embedding && embedding.length > 0) {
+        // Pad or truncate to 4096 dimensions
+        const hiddenStates = new Array(4096).fill(0);
+        for (let i = 0; i < Math.min(embedding.length, 4096); i++) {
+          hiddenStates[i] = embedding[i];
+        }
+        return hiddenStates;
+      }
+      
+      return this.generateFallbackHiddenStates(context);
+    } catch (error) {
+      console.warn(`[COS] vLLM call error: ${error instanceof Error ? error.message : 'Unknown'}, using fallback`);
+      return this.generateFallbackHiddenStates(context);
+    }
+  }
+
+  /**
+   * Fallback hidden state generation when vLLM is unavailable
+   * Generates deterministic values based on context hash
+   */
+  private generateFallbackHiddenStates(context: string): number[] {
     const contextHash = this.hashString(context);
     const hiddenStates: number[] = [];
     
     for (let i = 0; i < 4096; i++) {
-      // Generate pseudo-random but deterministic values
       const seed = (contextHash + i * 31) % 1000000;
-      hiddenStates.push((Math.sin(seed) + 1) / 2); // 0 to 1 range
+      hiddenStates.push((Math.sin(seed) + 1) / 2);
     }
     
     return hiddenStates;

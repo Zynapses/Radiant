@@ -864,7 +864,11 @@ struct AWSMonitoringView: View {
                 GridItem(.flexible(), spacing: 16)
             ], spacing: 16) {
                 ForEach(AWSServiceType.allCases, id: \.rawValue) { service in
-                    ServiceTierToggleCard(service: service)
+                    ServiceTierToggleCard(
+                        service: service,
+                        instance: getActiveInstance(),
+                        monitoringService: monitoringService
+                    )
                 }
             }
             
@@ -894,6 +898,8 @@ struct AWSMonitoringView: View {
 
 struct ServiceTierToggleCard: View {
     let service: AWSServiceType
+    let instance: DeployedInstance?
+    @ObservedObject var monitoringService: AWSMonitoringService
     @State private var paidTierEnabled = false
     @State private var autoScaleEnabled = false
     @State private var budgetCap: Double = 0
@@ -1032,21 +1038,40 @@ struct ServiceTierToggleCard: View {
     }
     
     private func togglePaidTier(enabled: Bool) async {
+        guard let instance = instance else { return }
         isUpdating = true
-        // TODO: Call API to toggle paid tier
-        // await monitoringService.togglePaidTier(service: service, enabled: enabled)
-        try? await Task.sleep(nanoseconds: 500_000_000) // Simulate API call
+        let success = await monitoringService.togglePaidTier(
+            for: instance,
+            service: service.rawValue,
+            enabled: enabled
+        )
+        if !success {
+            // Revert toggle on failure
+            paidTierEnabled = !enabled
+        }
         isUpdating = false
     }
     
     private func setAutoScale(enabled: Bool) async {
-        // TODO: Call API to set auto-scale
-        // await monitoringService.setAutoScale(service: service, enabled: enabled)
+        guard let instance = instance else { return }
+        let success = await monitoringService.setAutoScale(
+            for: instance,
+            service: service.rawValue,
+            enabled: enabled
+        )
+        if !success {
+            // Revert toggle on failure
+            autoScaleEnabled = !enabled
+        }
     }
     
     private func setBudgetCap() async {
-        // TODO: Call API to set budget cap
-        // await monitoringService.setBudgetCap(service: service, cap: budgetCap)
+        guard let instance = instance else { return }
+        _ = await monitoringService.setBudgetCap(
+            for: instance,
+            service: service.rawValue,
+            cap: budgetCap
+        )
     }
 }
 
