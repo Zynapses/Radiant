@@ -2,7 +2,7 @@
 
 > **Complete guide for managing the RADIANT AI Platform via the Admin Dashboard**
 > 
-> Version: 6.1.0 | Last Updated: January 1, 2026
+> Version: 5.0.2 | Last Updated: January 2026
 >
 > **Compliance Frameworks:** HIPAA, SOC 2 Type II, GDPR, FDA 21 CFR Part 11
 
@@ -50,6 +50,9 @@
 46. [RADIANT vs Frontier Models: Comparative Analysis](#46-radiant-vs-frontier-models-comparative-analysis)
 47. [Flyte-Native State Management](#47-flyte-native-state-management)
 48. [Mission Control: Human-in-the-Loop (HITL) System](#48-mission-control-human-in-the-loop-hitl-system)
+49. [The Grimoire - Procedural Memory (NEW in v5.0)](#49-the-grimoire---procedural-memory-new-in-v50)
+50. [The Economic Governor - Cost Optimization (NEW in v5.0)](#50-the-economic-governor---cost-optimization-new-in-v50)
+51. [Self-Optimizing System Architecture (NEW in v5.0)](#51-self-optimizing-system-architecture-new-in-v50)
 
 ---
 
@@ -13943,3 +13946,498 @@ if (recoveryAttempts >= MAX_RECOVERY_ATTEMPTS) {
 | [36. Metrics & Persistent Learning](#36-metrics--persistent-learning) | Decision metrics tracking |
 
 ---
+
+## 49. The Grimoire - Procedural Memory (NEW in v5.0)
+
+### 49.1 Overview
+
+The Grimoire is RADIANT's institutional memory system. It automatically extracts, stores, and retrieves lessons learned from successful AI executions, allowing the system to improve over time.
+
+**IDE Equivalent:** Code Snippets Library + IntelliSense
+
+**Key Capabilities:**
+- Automatic heuristic extraction from Flyte execution traces
+- Confidence decay and reinforcement based on outcomes
+- Semantic search for relevant heuristics at agent spawn
+- Manual expert heuristic entry via Admin Dashboard
+
+### 49.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         THE GRIMOIRE ARCHITECTURE                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌───────────────────┐                        ┌───────────────────┐         │
+│  │   CONSULT         │                        │   LIBRARIAN       │         │
+│  │   (Before Exec)   │                        │   (After Exec)    │         │
+│  └─────────┬─────────┘                        └─────────┬─────────┘         │
+│            │                                            │                    │
+│            ▼                                            ▼                    │
+│  ┌───────────────────┐                        ┌───────────────────┐         │
+│  │  Generate Prompt  │                        │  Extract Heuristic│         │
+│  │    Embedding      │                        │   via LLM         │         │
+│  └─────────┬─────────┘                        └─────────┬─────────┘         │
+│            │                                            │                    │
+│            ▼                                            ▼                    │
+│  ┌───────────────────┐                        ┌───────────────────┐         │
+│  │  Vector Search    │                        │  Cato Validation  │         │
+│  │  (pgvector)       │                        │  (Fail-Closed)    │         │
+│  └─────────┬─────────┘                        └─────────┬─────────┘         │
+│            │                                            │                    │
+│            ▼                                            │                    │
+│  ┌───────────────────┐                                  │                    │
+│  │  Cato Validation  │                                  │                    │
+│  │  (Fail-Open)      │                                  │                    │
+│  └─────────┬─────────┘                                  │                    │
+│            │                                            │                    │
+│            ▼                                            ▼                    │
+│  ┌───────────────────────────────────────────────────────────────────┐     │
+│  │                     knowledge_heuristics                           │     │
+│  │                     (PostgreSQL + pgvector)                        │     │
+│  └───────────────────────────────────────────────────────────────────┘     │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 49.3 Core Concepts
+
+| Term | Definition | Example |
+|------|------------|---------|
+| **Heuristic** | Reusable lesson extracted from successful execution | "When querying sales data, always join with regions table" |
+| **Confidence Score** | How reinforced a heuristic is (0.0-1.0) | 0.9 = highly validated |
+| **Context Embedding** | Vector representation for semantic search | 1536-dimension float array |
+| **Similarity Threshold** | Max cosine distance for relevance | 0.25 (lower = more similar) |
+| **Librarian** | Background task that extracts heuristics | Runs after successful execution |
+| **Institutional Wisdom** | Accumulated heuristics per tenant/domain | Injected into system prompts |
+
+### 49.4 Heuristic Lifecycle
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        HEURISTIC LIFECYCLE                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   ┌──────────┐     ┌──────────┐     ┌──────────┐     ┌──────────────────┐  │
+│   │ EXTRACT  │────▶│ VALIDATE │────▶│  STORE   │────▶│ REINFORCE/DECAY  │  │
+│   │          │     │  (Cato)  │     │          │     │                  │  │
+│   └──────────┘     └────┬─────┘     └──────────┘     └────────┬─────────┘  │
+│        │                │                                      │            │
+│        │           Block if                              Used again?        │
+│        │           HIGH risk                                   │            │
+│        │                │                          ┌───────────┴──────┐    │
+│        │                ▼                          │                  │    │
+│        │           DISCARD                    confidence++      confidence-- │
+│        │                                     (max 1.0)        (if unused)    │
+│        │                                          │                  │      │
+│        │                                          │                  ▼      │
+│        │                                          │           EXPIRE/DELETE │
+│        │                                          │           (90 days or   │
+│        └──────────────────────────────────────────┴───────── conf < 0.3)   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 49.5 Security Model
+
+| Operation | Cato Policy | Failure Mode |
+|-----------|-------------|--------------|
+| **Read** (consult_grimoire) | Validate before return | **Fail-Open** (return anyway) |
+| **Write** (librarian_review) | Validate before insert | **Fail-Closed** (discard) |
+
+This asymmetric policy ensures:
+- Reads don't break if Cato is unavailable
+- Writes never poison the knowledge base
+
+### 49.6 Admin Dashboard
+
+Navigate to: **Admin Dashboard → Think Tank → Grimoire**
+
+| Panel | Description |
+|-------|-------------|
+| **Heuristic Browser** | Search and view all stored heuristics |
+| **Domain Distribution** | Statistics of heuristics by domain |
+| **Confidence Scores** | Distribution of confidence scores |
+| **Recent Extractions** | Latest heuristics from Librarian |
+| **Add Heuristic** | Manually add expert heuristics |
+| **Reinforce/Penalize** | Adjust confidence scores |
+
+### 49.7 Database Schema
+
+```sql
+CREATE TABLE knowledge_heuristics (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    domain VARCHAR(50) NOT NULL,
+    heuristic_text TEXT NOT NULL,
+    context_embedding vector(1536),
+    confidence_score FLOAT DEFAULT 0.5,
+    source_execution_id VARCHAR(255),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '90 days'),
+    CONSTRAINT unique_heuristic_per_domain UNIQUE (tenant_id, domain, heuristic_text)
+);
+
+-- Vector index for semantic search
+CREATE INDEX idx_heuristics_embedding ON knowledge_heuristics 
+USING ivfflat (context_embedding vector_cosine_ops) WITH (lists = 100);
+```
+
+### 49.8 API Reference
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/thinktank/grimoire/heuristics` | GET | List tenant heuristics |
+| `/api/thinktank/grimoire/heuristics` | POST | Add manual heuristic |
+| `/api/thinktank/grimoire/heuristics/:id` | DELETE | Delete heuristic |
+| `/api/thinktank/grimoire/heuristics/:id/reinforce` | POST | Adjust confidence |
+| `/api/thinktank/grimoire/stats` | GET | Grimoire statistics |
+
+### 49.9 Metrics
+
+| Metric | Description | Alert Threshold |
+|--------|-------------|-----------------|
+| `grimoire.heuristics.total` | Total heuristics stored | > 10000 per tenant |
+| `grimoire.heuristics.retrieved` | Heuristics returned per query | Track average |
+| `grimoire.heuristics.blocked` | Cato-blocked retrievals | > 10/hour |
+| `grimoire.librarian.extractions` | New heuristics per hour | Track trend |
+| `grimoire.embedding.latency_ms` | Embedding generation time | > 500ms |
+
+### 49.10 Maintenance
+
+**Daily Cleanup (Automatic):**
+- Runs at 3 AM UTC via EventBridge
+- Removes heuristics where `expires_at < NOW()` 
+- Removes low-confidence heuristics (< 0.3) older than 30 days
+
+**Manual Pruning:**
+```sql
+-- Remove all heuristics for a domain
+SET app.current_tenant_id = 'your-uuid';
+DELETE FROM knowledge_heuristics WHERE domain = 'old-domain';
+
+-- Reset confidence scores
+UPDATE knowledge_heuristics
+SET confidence_score = 0.5
+WHERE domain = 'your-domain';
+```
+
+### 49.11 Troubleshooting
+
+#### Heuristics Not Being Retrieved
+
+**Symptoms:** `consult_grimoire` returns empty despite stored heuristics.
+
+1. **Check heuristics exist:**
+```sql
+SET app.current_tenant_id = 'your-tenant-uuid';
+SELECT COUNT(*) FROM knowledge_heuristics WHERE domain = 'your-domain';
+```
+
+2. **Check similarity threshold** - If all distances > 0.25, no matches returned
+
+3. **Check Cato blocking:**
+```bash
+grep "Grimoire: Blocked unsafe heuristic" /var/log/flyte/*.log
+```
+
+#### Vector Index Performance Degradation
+
+**Symptoms:** Grimoire queries slow (>500ms)
+
+**Fix:**
+```sql
+-- Rebuild vector index (non-blocking)
+REINDEX INDEX CONCURRENTLY idx_heuristics_embedding;
+```
+
+---
+
+## 50. The Economic Governor - Cost Optimization (NEW in v5.0)
+
+### 50.1 Overview
+
+The Economic Governor automatically routes AI tasks to the most cost-effective model that can handle them. It uses a "System 0" cheap classifier to score task complexity before selecting the model.
+
+**IDE Equivalent:** Build Optimization / Incremental Compilation
+
+### 50.2 How It Works
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      ECONOMIC GOVERNOR FLOW                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   ┌─────────────┐                                                           │
+│   │   Request   │                                                           │
+│   │  (Task +    │                                                           │
+│   │   Model)    │                                                           │
+│   └──────┬──────┘                                                           │
+│          │                                                                   │
+│          ▼                                                                   │
+│   ┌─────────────┐                                                           │
+│   │  Governor   │──── Mode = 'off' or 'performance'? ────▶ Use Original    │
+│   │   Check     │                                                           │
+│   └──────┬──────┘                                                           │
+│          │ Mode = 'balanced' or 'cost_saver'                                │
+│          ▼                                                                   │
+│   ┌─────────────┐                                                           │
+│   │  System 0   │                                                           │
+│   │ Classifier  │──── Prompt → gpt-4o-mini → Score (1-10)                  │
+│   └──────┬──────┘                                                           │
+│          │                                                                   │
+│          ▼                                                                   │
+│   ┌─────────────────────────────────────────────────────────────┐           │
+│   │                     ROUTING DECISION                         │           │
+│   │                                                               │           │
+│   │   Score ≤ 4 (balanced)     Use gpt-4o-mini (cheap)          │           │
+│   │   Score ≤ 7 (cost_saver)   Use gpt-4o-mini (cheap)          │           │
+│   │   5 ≤ Score ≤ 8            Use Original Model                │           │
+│   │   Score ≥ 9                Use gpt-4o (premium)              │           │
+│   │                                                               │           │
+│   └─────────────────────────────────────────────────────────────┘           │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 50.3 Governor Modes
+
+| Mode | Cheap Threshold | Use Case | Est. Savings |
+|------|-----------------|----------|--------------|
+| **off** | N/A | Disabled | 0% |
+| **performance** | N/A | Critical paths, demos | 0% |
+| **balanced** | Score ≤ 4 | Default production | 30-50% |
+| **cost_saver** | Score ≤ 7 | Dev, testing, bulk | 60-80% |
+
+### 50.4 Complexity Scale
+
+| Score | Task Type | Typical Model |
+|-------|-----------|---------------|
+| 1-3 | Formatting, summarization, basic Q&A | gpt-4o-mini |
+| 4-6 | Analysis, comparison, multi-step reasoning | Original model |
+| 7-8 | Complex analysis, creative writing, planning | Original model |
+| 9-10 | Advanced reasoning, code generation, synthesis | gpt-4o |
+
+### 50.5 Admin Configuration
+
+Navigate to: **Admin Dashboard → Think Tank → Governor**
+
+**Via API:**
+```bash
+curl -X PUT https://api.radiant.example.com/api/mission-control/governor/config \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"domain": "general", "mode": "cost_saver"}'
+```
+
+### 50.6 Database Schema
+
+```sql
+-- Governor mode configuration (added to existing table)
+ALTER TABLE decision_domain_config 
+ADD COLUMN governor_mode VARCHAR(20) DEFAULT 'balanced' 
+CHECK (governor_mode IN ('performance', 'balanced', 'cost_saver', 'off'));
+
+-- Savings tracking
+CREATE TABLE governor_savings_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    execution_id VARCHAR(255) NOT NULL,
+    original_model VARCHAR(100) NOT NULL,
+    selected_model VARCHAR(100) NOT NULL,
+    complexity_score INTEGER NOT NULL,
+    estimated_original_cost DECIMAL(10,6),
+    estimated_actual_cost DECIMAL(10,6),
+    savings_amount DECIMAL(10,6),
+    governor_mode VARCHAR(20) NOT NULL,
+    reason TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 50.7 API Reference
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/mission-control/governor/config` | GET | Get Governor config |
+| `/api/mission-control/governor/config` | PUT | Update Governor mode |
+| `/api/mission-control/governor/statistics` | GET | Governor statistics |
+| `/api/mission-control/governor/recent` | GET | Recent routing decisions |
+| `/api/mission-control/governor/analyze` | POST | Analyze prompt complexity |
+
+### 50.8 Metrics
+
+| Metric | Description | Alert Threshold |
+|--------|-------------|-----------------|
+| `governor.decisions.total` | Total routing decisions | Track volume |
+| `governor.downgrade.count` | Cheap model selections | Track percentage |
+| `governor.upgrade.count` | Premium model selections | > 20% |
+| `governor.classifier.latency_ms` | System 0 scoring time | > 200ms |
+| `governor.savings.estimated_usd` | Estimated cost savings | Track daily |
+
+### 50.9 Cost Tracking
+
+**Example (Daily):**
+- 1,000 requests at $0.01/each (gpt-4o)
+- Governor downgrades 600 to gpt-4o-mini ($0.001/each)
+- Original cost: $10.00
+- Actual cost: $4.60
+- **Savings: $5.40 (54%)**
+
+### 50.10 Troubleshooting
+
+#### Governor Not Optimizing
+
+**Symptoms:** Cost savings lower than expected, no downgrades.
+
+1. **Check Governor mode:**
+```sql
+SET app.current_tenant_id = 'your-tenant-uuid';
+SELECT domain, governor_mode FROM decision_domain_config;
+-- If 'off' or 'performance', Governor is bypassed
+```
+
+2. **Check complexity scores in logs:**
+```bash
+grep "Governor Complexity" /var/log/lambda/*.log | tail -20
+# Look for scores consistently > 4 (balanced) or > 7 (cost_saver)
+```
+
+3. **Verify LiteLLM proxy connectivity**
+
+---
+
+## 51. Self-Optimizing System Architecture (NEW in v5.0)
+
+### 51.1 Overview
+
+Version 5.0 transforms RADIANT from a stateless request-response system into a self-optimizing platform that learns from every execution.
+
+### 51.2 The Learning Loop
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     RADIANT v5.0 LEARNING LOOP                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│                        ┌───────────────────┐                                │
+│                        │    User Request   │                                │
+│                        └─────────┬─────────┘                                │
+│                                  │                                           │
+│                                  ▼                                           │
+│   ┌───────────────────────────────────────────────────────────┐             │
+│   │                    OPTIMIZATION LAYER                      │             │
+│   │  ┌─────────────────┐      ┌─────────────────┐            │             │
+│   │  │   Economic      │      │   The Grimoire  │            │             │
+│   │  │   Governor      │      │   (Consult)     │            │             │
+│   │  │   (Route)       │      │                 │            │             │
+│   │  └────────┬────────┘      └────────┬────────┘            │             │
+│   │           │                        │                      │             │
+│   │           └────────────┬───────────┘                      │             │
+│   └────────────────────────┼──────────────────────────────────┘             │
+│                            │                                                 │
+│                            ▼                                                 │
+│   ┌───────────────────────────────────────────────────────────┐             │
+│   │                    EXECUTION LAYER                         │             │
+│   │  ┌─────────────────┐      ┌─────────────────┐            │             │
+│   │  │   Swarm         │      │   HITL          │            │             │
+│   │  │   Execution     │─────▶│   (if needed)   │            │             │
+│   │  └─────────────────┘      └─────────────────┘            │             │
+│   └────────────────────────────┼──────────────────────────────┘             │
+│                                │                                             │
+│                                ▼                                             │
+│   ┌───────────────────────────────────────────────────────────┐             │
+│   │                    LEARNING LAYER                          │             │
+│   │  ┌─────────────────┐      ┌─────────────────┐            │             │
+│   │  │   Librarian     │      │   Audit &       │            │             │
+│   │  │   (Extract)     │─────▶│   Metrics       │            │             │
+│   │  └─────────────────┘      └─────────────────┘            │             │
+│   └───────────────────────────────────────────────────────────┘             │
+│                                │                                             │
+│                                ▼                                             │
+│                        ┌───────────────────┐                                │
+│                        │    Response       │                                │
+│                        └───────────────────┘                                │
+│                                                                              │
+│   ◀─────────────────────── FEEDBACK LOOP ───────────────────────────────▶  │
+│   │                                                                       │  │
+│   │   Success → Extract Heuristic → Reinforce Confidence                 │  │
+│   │   Failure → No Heuristic → Decay Related Heuristics                  │  │
+│   │                                                                       │  │
+└───┴───────────────────────────────────────────────────────────────────────┴──┘
+```
+
+### 51.3 Version Comparison
+
+| Capability | v4.20.3 | v5.0.2 |
+|------------|---------|--------|
+| **Memory** | Stateless | Persistent (Grimoire) |
+| **Model Selection** | Manual/Fixed | Automatic (Governor) |
+| **Learning** | None | Continuous (Librarian) |
+| **Cost Optimization** | Manual tier selection | Automatic per-request |
+| **Knowledge Sharing** | Per-session only | Cross-session, per-tenant |
+
+### 51.4 IDE Metaphor Extended
+
+| IDE Concept | v4.20 Feature | v5.0 Evolution | Business Value |
+|-------------|---------------|----------------|----------------|
+| **Breakpoint** | HITL Decision Point | *(unchanged)* | AI pauses at high-stakes moments |
+| **Code Snippets** | Pattern Library | **The Grimoire** | AI learns and reuses successful patterns |
+| **Build Optimization** | Manual model selection | **Economic Governor** | Automatic cost-performance optimization |
+| **IntelliSense** | Static suggestions | **Contextual Wisdom** | Dynamic, context-aware recommendations |
+
+### 51.5 Upgrade Path
+
+**From v4.20.3 to v5.0.2:**
+
+1. Apply migration `V2026_01_09_001__v5_grimoire_governor.sql` 
+2. Deploy new Lambda functions (Governor API, Grimoire cleanup)
+3. Configure EventBridge for daily cleanup
+4. Set default Governor mode to `balanced` 
+5. Grimoire populates automatically from new executions
+
+**Rollback (if needed):**
+
+1. Set Governor mode to `off` for all domains
+2. Grimoire continues to exist but is not consulted
+3. No data loss; can re-enable at any time
+
+### 51.6 Implementation Files
+
+| Component | File |
+|-----------|------|
+| **Migration** | `packages/infrastructure/migrations/V2026_01_09_001__v5_grimoire_governor.sql` |
+| **Governor Service** | `packages/infrastructure/lambda/shared/services/governor/economic-governor.ts` |
+| **Grimoire Tasks** | `packages/flyte/workflows/grimoire_tasks.py` |
+| **Cato Client** | `packages/flyte/utils/cato_client.py` |
+| **DB Utils** | `packages/flyte/utils/db.py` |
+| **CDK Stack** | `packages/infrastructure/lib/stacks/grimoire-stack.ts` |
+| **Grimoire UI** | `apps/admin-dashboard/app/(dashboard)/thinktank/grimoire/page.tsx` |
+| **Governor UI** | `apps/admin-dashboard/app/(dashboard)/thinktank/governor/page.tsx` |
+
+### 51.7 Related Sections
+
+| Section | Relevance |
+|---------|-----------|
+| [42. Genesis Cato Safety Architecture](#42-genesis-cato-safety-architecture) | Heuristic validation |
+| [45. Just Think Tank](#45-just-think-tank-multi-agent-architecture) | Swarm integration |
+| [48. Mission Control](#48-mission-control-human-in-the-loop-hitl-system) | HITL integration |
+
+---
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| **5.0.2** | 2026-01-08 | The Grimoire (procedural memory); Economic Governor (cost optimization); Self-optimizing architecture |
+| 4.20.3 | 2026-01-08 | Mission Control GA; MCP Hybrid Interface; Domain Risk Policies |
+| 4.20.2 | 2026-01-07 | Fixed RLS tenant bleed |
+| 4.20.0 | 2026-01-06 | Initial Mission Control release |
+
+---
+
+*Version 5.0.2 | January 2026*
+*Cross-AI Validated: Claude Opus 4.5 ✓ | Google Gemini ✓*
+*System Evolution: The Grimoire + Economic Governor*
+*Status: GO FOR LAUNCH*

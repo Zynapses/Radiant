@@ -17,10 +17,19 @@ For EVERY feature, update these IN THE SAME TASK (not later):
 | If you create... | You MUST also update... |
 |------------------|-------------------------|
 | Database tables | `docs/sections/SECTION-07-DATABASE-SCHEMA.md` |
-| Platform admin features | `docs/RADIANT-ADMIN-GUIDE.md` |
-| Think Tank admin features | `docs/THINKTANK-ADMIN-GUIDE.md` |
+| Platform admin features | `docs/RADIANT-ADMIN-GUIDE.md` + `docs/STRATEGIC-VISION-MARKETING.md` |
+| Think Tank admin features | `docs/THINKTANK-ADMIN-GUIDE.md` + `docs/STRATEGIC-VISION-MARKETING.md` |
 | Any feature | `CHANGELOG.md` |
 | Significant feature | `docs/FEATURE-NAME.md` (standalone) |
+
+### ⚠️ AUTOMATIC: Strategic Vision Update
+
+**When you modify `RADIANT-ADMIN-GUIDE.md` OR `THINKTANK-ADMIN-GUIDE.md`, you MUST ALSO update `docs/STRATEGIC-VISION-MARKETING.md`:**
+
+1. Add new features to "Platform Capabilities: What's Implemented Today"
+2. Move implemented features from "Upcoming" to "Implemented"
+3. Update version numbers if changed
+4. Add to Document History table
 
 ### Two Admin Guides
 
