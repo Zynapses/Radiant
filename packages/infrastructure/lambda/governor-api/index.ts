@@ -3,11 +3,19 @@
  * RADIANT v5.0.2 - System Evolution
  * 
  * REST API for managing the Economic Governor (cost optimization).
+ * Uses shared utilities to avoid code duplication.
  */
 
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { Client } from 'pg';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { PoolClient } from 'pg';
 import { Logger } from '../shared/logger';
+import { success, handleError } from '../shared/response';
+import { 
+  withSecureDBContext, 
+  isTenantAdmin,
+  AuthContext 
+} from '../shared/services/db-context.service';
+import { ValidationError, UnauthorizedError, NotFoundError } from '../shared/errors';
 import { EconomicGovernor, GovernorMode } from '../shared/services/governor';
 
 const logger = new Logger({ appId: 'governor-api' });
@@ -15,142 +23,77 @@ const logger = new Logger({ appId: 'governor-api' });
 const VALID_MODES: GovernorMode[] = ['performance', 'balanced', 'cost_saver', 'off'];
 const VALID_DOMAINS = ['general', 'medical', 'financial', 'legal', 'technical', 'creative'];
 
-let dbClient: Client | null = null;
-
-async function getDbClient(): Promise<Client> {
-  if (!dbClient) {
-    const { SecretsManager } = await import('@aws-sdk/client-secrets-manager');
-    const sm = new SecretsManager({});
-    const secretArn = process.env.DB_SECRET_ARN;
-    
-    if (!secretArn) {
-      throw new Error('DB_SECRET_ARN not configured');
-    }
-    
-    const secretResponse = await sm.getSecretValue({ SecretId: secretArn });
-    const secret = JSON.parse(secretResponse.SecretString || '{}');
-    
-    dbClient = new Client({
-      host: secret.host,
-      database: secret.dbname,
-      user: secret.username,
-      password: secret.password,
-      port: secret.port || 5432,
-      ssl: { rejectUnauthorized: false }
-    });
-    
-    await dbClient.connect();
-  }
-  return dbClient;
-}
-
-interface AuthContext {
-  tenantId: string;
-  userId: string;
-  role: string;
-}
-
-function extractAuth(event: APIGatewayProxyEvent): AuthContext {
+function extractAuthFromEvent(event: APIGatewayProxyEvent): AuthContext {
   const claims = event.requestContext.authorizer?.claims || {};
+  const authorizer = event.requestContext.authorizer || {};
   return {
-    tenantId: claims['custom:tenant_id'] || event.headers['x-tenant-id'] || '',
-    userId: claims.sub || '',
-    role: claims['custom:role'] || 'user'
+    tenantId: claims['custom:tenant_id'] || authorizer.tenant_id || event.headers['x-tenant-id'] || '',
+    userId: claims.sub || authorizer.user_id || '',
+    permissionLevel: (claims['custom:role'] || authorizer.permission_level || 'user') as any,
+    scopes: [],
+    groups: []
   };
 }
 
-async function withTenantContext<T>(
-  db: Client,
-  tenantId: string,
-  fn: () => Promise<T>
-): Promise<T> {
-  await db.query(`SET app.current_tenant_id = $1`, [tenantId]);
-  try {
-    return await fn();
-  } finally {
-    await db.query(`RESET app.current_tenant_id`);
-  }
-}
-
-function createResponse(statusCode: number, body: unknown): APIGatewayProxyResult {
-  return {
-    statusCode,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-Tenant-ID'
-    },
-    body: JSON.stringify(body)
-  };
-}
-
-export async function handler(
-  event: APIGatewayProxyEvent,
-  context: Context
-): Promise<APIGatewayProxyResult> {
-  const { tenantId, role } = extractAuth(event);
+export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  const authContext = extractAuthFromEvent(event);
   
-  if (!tenantId) {
-    return createResponse(401, { error: 'Tenant ID required' });
+  if (!authContext.tenantId) {
+    return handleError(new UnauthorizedError('Tenant ID required'));
   }
   
   const path = event.path;
   const method = event.httpMethod;
   
-  logger.info('Governor API request', { path, method, tenantId });
+  logger.info('Governor API request', { path, method, tenantId: authContext.tenantId });
   
   try {
-    const db = await getDbClient();
-    
     // GET /api/mission-control/governor/config
     if (path.endsWith('/config') && method === 'GET') {
-      return await getConfig(db, tenantId);
+      return await getConfig(authContext);
     }
     
     // PUT /api/mission-control/governor/config
     if (path.endsWith('/config') && method === 'PUT') {
-      return await updateConfig(event, db, tenantId, role);
+      return await updateConfig(event, authContext);
     }
     
     // GET /api/mission-control/governor/statistics
     if (path.endsWith('/statistics') && method === 'GET') {
-      return await getStatistics(event, db, tenantId);
+      return await getStatistics(event, authContext);
     }
     
     // GET /api/mission-control/governor/recent
     if (path.endsWith('/recent') && method === 'GET') {
-      return await getRecentDecisions(event, db, tenantId);
+      return await getRecentDecisions(event, authContext);
     }
     
     // POST /api/mission-control/governor/analyze
     if (path.endsWith('/analyze') && method === 'POST') {
-      return await analyzePrompt(event, db, tenantId);
+      return await analyzePrompt(event, authContext);
     }
     
-    return createResponse(404, { error: 'Not found' });
+    return handleError(new NotFoundError('Endpoint not found'));
     
-  } catch (error: any) {
-    logger.error('Governor API error', error);
-    return createResponse(500, { error: error.message || 'Internal server error' });
+  } catch (error: unknown) {
+    logger.error('Governor API error', error as Error);
+    return handleError(error);
   }
 }
 
-async function getConfig(
-  db: Client,
-  tenantId: string
-): Promise<APIGatewayProxyResult> {
-  return withTenantContext(db, tenantId, async () => {
-    const result = await db.query(`
+async function getConfig(authContext: AuthContext): Promise<APIGatewayProxyResult> {
+  return withSecureDBContext(authContext, async (client: PoolClient) => {
+    const result = await client.query(`
       SELECT domain, governor_mode, updated_at
       FROM decision_domain_config 
       WHERE tenant_id = $1
       ORDER BY domain
-    `, [tenantId]);
+    `, [authContext.tenantId]);
     
     const governor = new EconomicGovernor(logger);
     
-    return createResponse(200, { 
-      tenantId,
+    return success({ 
+      tenantId: authContext.tenantId,
       globalConfig: governor.getConfig(),
       domains: result.rows.map(row => ({
         domain: row.domain,
@@ -163,62 +106,53 @@ async function getConfig(
 
 async function updateConfig(
   event: APIGatewayProxyEvent,
-  db: Client,
-  tenantId: string,
-  role: string
+  authContext: AuthContext
 ): Promise<APIGatewayProxyResult> {
-  if (!['admin', 'super_admin'].includes(role)) {
-    return createResponse(403, { error: 'Admin role required' });
+  if (!isTenantAdmin(authContext)) {
+    return handleError(new UnauthorizedError('Admin role required'));
   }
   
   let body: { domain?: string; mode?: GovernorMode };
   try {
     body = JSON.parse(event.body || '{}');
   } catch {
-    return createResponse(400, { error: 'Invalid JSON body' });
+    return handleError(new ValidationError('Invalid JSON body'));
   }
   
   const { domain, mode } = body;
 
   if (!mode || !VALID_MODES.includes(mode)) {
-    return createResponse(400, { 
-      error: 'Invalid governor mode',
-      validModes: VALID_MODES 
-    });
+    return handleError(new ValidationError(`Invalid governor mode. Valid modes: ${VALID_MODES.join(', ')}`));
   }
 
   if (domain && !VALID_DOMAINS.includes(domain)) {
-    return createResponse(400, { 
-      error: 'Invalid domain',
-      validDomains: VALID_DOMAINS 
-    });
+    return handleError(new ValidationError(`Invalid domain. Valid domains: ${VALID_DOMAINS.join(', ')}`));
   }
 
-  return withTenantContext(db, tenantId, async () => {
+  return withSecureDBContext(authContext, async (client: PoolClient) => {
     const targetDomain = domain || 'general';
     
-    const prevResult = await db.query(
+    const prevResult = await client.query(
       `SELECT governor_mode FROM decision_domain_config WHERE tenant_id = $1 AND domain = $2`,
-      [tenantId, targetDomain]
+      [authContext.tenantId, targetDomain]
     );
     const previousMode = prevResult.rows[0]?.governor_mode || 'balanced';
     
-    await db.query(`
+    await client.query(`
       INSERT INTO decision_domain_config (tenant_id, domain, governor_mode, updated_at)
       VALUES ($1, $2, $3, NOW())
       ON CONFLICT (tenant_id, domain) 
       DO UPDATE SET governor_mode = $3, updated_at = NOW()
-    `, [tenantId, targetDomain, mode]);
+    `, [authContext.tenantId, targetDomain, mode]);
     
-    logger.info('Governor mode updated', { tenantId, domain: targetDomain, mode, previousMode });
+    logger.info('Governor mode updated', { tenantId: authContext.tenantId, domain: targetDomain, mode, previousMode });
     
-    await db.query(`
+    await client.query(`
       INSERT INTO audit_logs (tenant_id, action, resource_type, resource_id, details, created_at)
       VALUES ($1, 'UPDATE', 'governor_config', $2, $3, NOW())
-    `, [tenantId, targetDomain, JSON.stringify({ previousMode, newMode: mode })]);
+    `, [authContext.tenantId, targetDomain, JSON.stringify({ previousMode, newMode: mode })]);
     
-    return createResponse(200, { 
-      success: true, 
+    return success({ 
       domain: targetDomain,
       mode,
       previousMode
@@ -228,14 +162,13 @@ async function updateConfig(
 
 async function getStatistics(
   event: APIGatewayProxyEvent,
-  db: Client,
-  tenantId: string
+  authContext: AuthContext
 ): Promise<APIGatewayProxyResult> {
   const params = event.queryStringParameters || {};
   const days = parseInt(params.days || '30', 10);
   
-  return withTenantContext(db, tenantId, async () => {
-    const overallResult = await db.query(`
+  return withSecureDBContext(authContext, async (client: PoolClient) => {
+    const overallResult = await client.query(`
       SELECT 
         COUNT(*) as total_decisions,
         AVG(complexity_score) as avg_complexity,
@@ -246,9 +179,9 @@ async function getStatistics(
         COUNT(*) FILTER (WHERE complexity_score >= 9) as complex_tasks
       FROM governor_savings_log
       WHERE tenant_id = $1 AND created_at > NOW() - INTERVAL '1 day' * $2
-    `, [tenantId, days]);
+    `, [authContext.tenantId, days]);
     
-    const dailyResult = await db.query(`
+    const dailyResult = await client.query(`
       SELECT 
         DATE_TRUNC('day', created_at) as day,
         COUNT(*) as decisions,
@@ -259,9 +192,9 @@ async function getStatistics(
       GROUP BY DATE_TRUNC('day', created_at)
       ORDER BY day DESC
       LIMIT 30
-    `, [tenantId, days]);
+    `, [authContext.tenantId, days]);
     
-    const byModeResult = await db.query(`
+    const byModeResult = await client.query(`
       SELECT 
         governor_mode,
         COUNT(*) as count,
@@ -269,11 +202,11 @@ async function getStatistics(
       FROM governor_savings_log
       WHERE tenant_id = $1 AND created_at > NOW() - INTERVAL '1 day' * $2
       GROUP BY governor_mode
-    `, [tenantId, days]);
+    `, [authContext.tenantId, days]);
     
     const overall = overallResult.rows[0];
     
-    return createResponse(200, {
+    return success({
       period: { days },
       summary: {
         totalDecisions: parseInt(overall.total_decisions) || 0,
@@ -303,14 +236,13 @@ async function getStatistics(
 
 async function getRecentDecisions(
   event: APIGatewayProxyEvent,
-  db: Client,
-  tenantId: string
+  authContext: AuthContext
 ): Promise<APIGatewayProxyResult> {
   const params = event.queryStringParameters || {};
   const limit = Math.min(parseInt(params.limit || '50', 10), 100);
   
-  return withTenantContext(db, tenantId, async () => {
-    const result = await db.query(`
+  return withSecureDBContext(authContext, async (client: PoolClient) => {
+    const result = await client.query(`
       SELECT 
         id,
         execution_id,
@@ -327,9 +259,9 @@ async function getRecentDecisions(
       WHERE tenant_id = $1
       ORDER BY created_at DESC
       LIMIT $2
-    `, [tenantId, limit]);
+    `, [authContext.tenantId, limit]);
     
-    return createResponse(200, {
+    return success({
       decisions: result.rows.map(row => ({
         id: row.id,
         executionId: row.execution_id,
@@ -349,26 +281,25 @@ async function getRecentDecisions(
 
 async function analyzePrompt(
   event: APIGatewayProxyEvent,
-  db: Client,
-  tenantId: string
+  authContext: AuthContext
 ): Promise<APIGatewayProxyResult> {
   let body: { prompt?: string; model?: string };
   try {
     body = JSON.parse(event.body || '{}');
   } catch {
-    return createResponse(400, { error: 'Invalid JSON body' });
+    return handleError(new ValidationError('Invalid JSON body'));
   }
   
   const { prompt, model } = body;
   
   if (!prompt) {
-    return createResponse(400, { error: 'Prompt is required' });
+    return handleError(new ValidationError('Prompt is required'));
   }
   
-  return withTenantContext(db, tenantId, async () => {
-    const configResult = await db.query(
+  return withSecureDBContext(authContext, async (client: PoolClient) => {
+    const configResult = await client.query(
       `SELECT governor_mode FROM decision_domain_config WHERE tenant_id = $1 AND domain = 'general'`,
-      [tenantId]
+      [authContext.tenantId]
     );
     const mode = (configResult.rows[0]?.governor_mode || 'balanced') as GovernorMode;
     
@@ -379,7 +310,7 @@ async function analyzePrompt(
       mode
     );
     
-    return createResponse(200, {
+    return success({
       complexityScore: decision.complexityScore,
       originalModel: decision.originalModel,
       recommendedModel: decision.selectedModel,

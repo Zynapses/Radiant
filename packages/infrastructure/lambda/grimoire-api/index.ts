@@ -3,141 +3,86 @@
  * RADIANT v5.0.2 - System Evolution
  * 
  * REST API for managing The Grimoire (procedural memory system).
+ * Uses shared utilities to avoid code duplication.
  */
 
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { Client } from 'pg';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { PoolClient } from 'pg';
 import { Logger } from '../shared/logger';
+import { success, handleError } from '../shared/response';
+import { 
+  withSecureDBContext, 
+  isTenantAdmin,
+  AuthContext 
+} from '../shared/services/db-context.service';
+import { ValidationError, UnauthorizedError, NotFoundError, ConflictError } from '../shared/errors';
 
 const logger = new Logger({ appId: 'grimoire-api' });
 
-let dbClient: Client | null = null;
-
-async function getDbClient(): Promise<Client> {
-  if (!dbClient) {
-    const { SecretsManager } = await import('@aws-sdk/client-secrets-manager');
-    const sm = new SecretsManager({});
-    const secretArn = process.env.DB_SECRET_ARN;
-    
-    if (!secretArn) {
-      throw new Error('DB_SECRET_ARN not configured');
-    }
-    
-    const secretResponse = await sm.getSecretValue({ SecretId: secretArn });
-    const secret = JSON.parse(secretResponse.SecretString || '{}');
-    
-    dbClient = new Client({
-      host: secret.host,
-      database: secret.dbname,
-      user: secret.username,
-      password: secret.password,
-      port: secret.port || 5432,
-      ssl: { rejectUnauthorized: false }
-    });
-    
-    await dbClient.connect();
-  }
-  return dbClient;
-}
-
-interface AuthContext {
-  tenantId: string;
-  userId: string;
-  role: string;
-}
-
-function extractAuth(event: APIGatewayProxyEvent): AuthContext {
+function extractAuthFromEvent(event: APIGatewayProxyEvent): AuthContext {
   const claims = event.requestContext.authorizer?.claims || {};
+  const authorizer = event.requestContext.authorizer || {};
   return {
-    tenantId: claims['custom:tenant_id'] || event.headers['x-tenant-id'] || '',
-    userId: claims.sub || '',
-    role: claims['custom:role'] || 'user'
+    tenantId: claims['custom:tenant_id'] || authorizer.tenant_id || event.headers['x-tenant-id'] || '',
+    userId: claims.sub || authorizer.user_id || '',
+    permissionLevel: (claims['custom:role'] || authorizer.permission_level || 'user') as any,
+    scopes: [],
+    groups: []
   };
 }
 
-async function withTenantContext<T>(
-  db: Client,
-  tenantId: string,
-  fn: () => Promise<T>
-): Promise<T> {
-  await db.query(`SET app.current_tenant_id = $1`, [tenantId]);
-  try {
-    return await fn();
-  } finally {
-    await db.query(`RESET app.current_tenant_id`);
-  }
-}
-
-function createResponse(statusCode: number, body: unknown): APIGatewayProxyResult {
-  return {
-    statusCode,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-Tenant-ID'
-    },
-    body: JSON.stringify(body)
-  };
-}
-
-export async function handler(
-  event: APIGatewayProxyEvent,
-  context: Context
-): Promise<APIGatewayProxyResult> {
-  const { tenantId, role } = extractAuth(event);
+export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+  const authContext = extractAuthFromEvent(event);
   
-  if (!tenantId) {
-    return createResponse(401, { error: 'Tenant ID required' });
+  if (!authContext.tenantId) {
+    return handleError(new UnauthorizedError('Tenant ID required'));
   }
   
   const path = event.path;
   const method = event.httpMethod;
   
-  logger.info('Grimoire API request', { path, method, tenantId });
+  logger.info('Grimoire API request', { path, method, tenantId: authContext.tenantId });
   
   try {
-    const db = await getDbClient();
-    
     // GET /api/thinktank/grimoire/heuristics
     if (path.endsWith('/heuristics') && method === 'GET') {
-      return await listHeuristics(event, db, tenantId);
+      return await listHeuristics(event, authContext);
     }
     
     // POST /api/thinktank/grimoire/heuristics
     if (path.endsWith('/heuristics') && method === 'POST') {
-      return await addHeuristic(event, db, tenantId, role);
+      return await addHeuristic(event, authContext);
     }
     
     // DELETE /api/thinktank/grimoire/heuristics/:id
     if (path.includes('/heuristics/') && method === 'DELETE') {
-      const id = path.split('/').pop();
-      return await deleteHeuristic(db, tenantId, role, id || '');
+      const id = path.split('/').pop() || '';
+      return await deleteHeuristic(id, authContext);
     }
     
     // POST /api/thinktank/grimoire/heuristics/:id/reinforce
     if (path.includes('/reinforce') && method === 'POST') {
       const parts = path.split('/');
       const id = parts[parts.length - 2];
-      return await reinforceHeuristic(event, db, tenantId, id);
+      return await reinforceHeuristic(event, id, authContext);
     }
     
     // GET /api/thinktank/grimoire/stats
     if (path.endsWith('/stats') && method === 'GET') {
-      return await getStats(db, tenantId);
+      return await getStats(authContext);
     }
     
-    return createResponse(404, { error: 'Not found' });
+    return handleError(new NotFoundError('Endpoint not found'));
     
-  } catch (error: any) {
-    logger.error('Grimoire API error', error);
-    return createResponse(500, { error: error.message || 'Internal server error' });
+  } catch (error: unknown) {
+    logger.error('Grimoire API error', error as Error);
+    return handleError(error);
   }
 }
 
 async function listHeuristics(
   event: APIGatewayProxyEvent,
-  db: Client,
-  tenantId: string
+  authContext: AuthContext
 ): Promise<APIGatewayProxyResult> {
   const params = event.queryStringParameters || {};
   const domain = params.domain;
@@ -145,14 +90,14 @@ async function listHeuristics(
   const limit = Math.min(parseInt(params.limit || '100', 10), 500);
   const offset = parseInt(params.offset || '0', 10);
   
-  return withTenantContext(db, tenantId, async () => {
+  return withSecureDBContext(authContext, async (client: PoolClient) => {
     let query = `
       SELECT id, domain, heuristic_text, confidence_score, 
              source_execution_id, created_at, updated_at, expires_at
       FROM knowledge_heuristics
       WHERE expires_at > NOW()
     `;
-    const queryParams: any[] = [];
+    const queryParams: (string | number)[] = [];
     let paramIndex = 1;
     
     if (domain && domain !== 'all') {
@@ -168,9 +113,9 @@ async function listHeuristics(
     query += ` ORDER BY confidence_score DESC, created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
     queryParams.push(limit, offset);
     
-    const result = await db.query(query, queryParams);
+    const result = await client.query(query, queryParams);
     
-    return createResponse(200, {
+    return success({
       heuristics: result.rows.map(row => ({
         id: row.id,
         domain: row.domain,
@@ -188,131 +133,110 @@ async function listHeuristics(
 
 async function addHeuristic(
   event: APIGatewayProxyEvent,
-  db: Client,
-  tenantId: string,
-  role: string
+  authContext: AuthContext
 ): Promise<APIGatewayProxyResult> {
-  if (!['admin', 'super_admin'].includes(role)) {
-    return createResponse(403, { error: 'Admin role required' });
+  if (!isTenantAdmin(authContext)) {
+    return handleError(new UnauthorizedError('Admin role required'));
   }
   
   let body: { domain?: string; heuristic_text?: string; confidence?: number };
   try {
     body = JSON.parse(event.body || '{}');
   } catch {
-    return createResponse(400, { error: 'Invalid JSON body' });
+    return handleError(new ValidationError('Invalid JSON body'));
   }
   
   const { domain, heuristic_text, confidence } = body;
   
   if (!domain || !heuristic_text) {
-    return createResponse(400, { error: 'domain and heuristic_text are required' });
+    return handleError(new ValidationError('domain and heuristic_text are required'));
   }
   
   if (heuristic_text.length < 20 || heuristic_text.length > 500) {
-    return createResponse(400, { error: 'Heuristic must be 20-500 characters' });
+    return handleError(new ValidationError('Heuristic must be 20-500 characters'));
   }
   
-  return withTenantContext(db, tenantId, async () => {
-    const result = await db.query(`
+  return withSecureDBContext(authContext, async (client: PoolClient) => {
+    const result = await client.query(`
       INSERT INTO knowledge_heuristics 
       (tenant_id, domain, heuristic_text, confidence_score, source_execution_id)
       VALUES ($1, $2, $3, $4, 'manual')
       ON CONFLICT (tenant_id, domain, heuristic_text) DO NOTHING
       RETURNING id
-    `, [tenantId, domain, heuristic_text, confidence || 0.7]);
+    `, [authContext.tenantId, domain, heuristic_text, confidence || 0.7]);
     
     if (result.rowCount === 0) {
-      return createResponse(409, { error: 'Heuristic already exists' });
+      return handleError(new ConflictError('Heuristic already exists'));
     }
     
-    logger.info('Heuristic added', { tenantId, domain, id: result.rows[0].id });
+    logger.info('Heuristic added', { tenantId: authContext.tenantId, domain, id: result.rows[0].id });
     
-    return createResponse(201, { 
-      success: true, 
-      id: result.rows[0].id 
-    });
+    return success({ id: result.rows[0].id }, 201);
   });
 }
 
 async function deleteHeuristic(
-  db: Client,
-  tenantId: string,
-  role: string,
-  id: string
+  id: string,
+  authContext: AuthContext
 ): Promise<APIGatewayProxyResult> {
-  if (!['admin', 'super_admin'].includes(role)) {
-    return createResponse(403, { error: 'Admin role required' });
+  if (!isTenantAdmin(authContext)) {
+    return handleError(new UnauthorizedError('Admin role required'));
   }
   
-  return withTenantContext(db, tenantId, async () => {
-    const result = await db.query(`
+  return withSecureDBContext(authContext, async (client: PoolClient) => {
+    const result = await client.query(`
       DELETE FROM knowledge_heuristics
       WHERE id = $1 AND tenant_id = $2
-    `, [id, tenantId]);
+    `, [id, authContext.tenantId]);
     
     if (result.rowCount === 0) {
-      return createResponse(404, { error: 'Heuristic not found' });
+      return handleError(new NotFoundError('Heuristic not found'));
     }
     
-    logger.info('Heuristic deleted', { tenantId, id });
+    logger.info('Heuristic deleted', { tenantId: authContext.tenantId, id });
     
-    return createResponse(200, { success: true });
+    return success({ deleted: true });
   });
 }
 
 async function reinforceHeuristic(
   event: APIGatewayProxyEvent,
-  db: Client,
-  tenantId: string,
-  id: string
+  id: string,
+  authContext: AuthContext
 ): Promise<APIGatewayProxyResult> {
   let body: { positive?: boolean };
   try {
     body = JSON.parse(event.body || '{}');
   } catch {
-    return createResponse(400, { error: 'Invalid JSON body' });
+    return handleError(new ValidationError('Invalid JSON body'));
   }
   
   const positive = body.positive !== false;
   
-  return withTenantContext(db, tenantId, async () => {
-    let result;
-    if (positive) {
-      result = await db.query(`
-        UPDATE knowledge_heuristics
-        SET confidence_score = LEAST(confidence_score + 0.1, 1.0),
-            updated_at = NOW()
-        WHERE id = $1 AND tenant_id = $2
-        RETURNING confidence_score
-      `, [id, tenantId]);
-    } else {
-      result = await db.query(`
-        UPDATE knowledge_heuristics
-        SET confidence_score = GREATEST(confidence_score - 0.2, 0),
-            updated_at = NOW()
-        WHERE id = $1 AND tenant_id = $2
-        RETURNING confidence_score
-      `, [id, tenantId]);
-    }
+  return withSecureDBContext(authContext, async (client: PoolClient) => {
+    const query = positive
+      ? `UPDATE knowledge_heuristics
+         SET confidence_score = LEAST(confidence_score + 0.1, 1.0), updated_at = NOW()
+         WHERE id = $1 AND tenant_id = $2
+         RETURNING confidence_score`
+      : `UPDATE knowledge_heuristics
+         SET confidence_score = GREATEST(confidence_score - 0.2, 0), updated_at = NOW()
+         WHERE id = $1 AND tenant_id = $2
+         RETURNING confidence_score`;
+    
+    const result = await client.query(query, [id, authContext.tenantId]);
     
     if (result.rowCount === 0) {
-      return createResponse(404, { error: 'Heuristic not found' });
+      return handleError(new NotFoundError('Heuristic not found'));
     }
     
-    return createResponse(200, { 
-      success: true,
-      new_confidence: parseFloat(result.rows[0].confidence_score)
-    });
+    return success({ new_confidence: parseFloat(result.rows[0].confidence_score) });
   });
 }
 
-async function getStats(
-  db: Client,
-  tenantId: string
-): Promise<APIGatewayProxyResult> {
-  return withTenantContext(db, tenantId, async () => {
-    const result = await db.query(`
+async function getStats(authContext: AuthContext): Promise<APIGatewayProxyResult> {
+  return withSecureDBContext(authContext, async (client: PoolClient) => {
+    const result = await client.query(`
       SELECT 
         domain,
         COUNT(*) as total,
@@ -323,9 +247,9 @@ async function getStats(
       FROM knowledge_heuristics
       WHERE expires_at > NOW() AND tenant_id = $1
       GROUP BY domain
-    `, [tenantId]);
+    `, [authContext.tenantId]);
     
-    const byDomain: Record<string, any> = {};
+    const byDomain: Record<string, unknown> = {};
     let totalHeuristics = 0;
     let totalHighConfidence = 0;
     let totalExpiringSoon = 0;
@@ -344,7 +268,7 @@ async function getStats(
       totalExpiringSoon += stats.expiring_soon;
     }
     
-    return createResponse(200, {
+    return success({
       total_heuristics: totalHeuristics,
       total_high_confidence: totalHighConfidence,
       total_expiring_soon: totalExpiringSoon,
