@@ -2,7 +2,7 @@
 
 > **Configuration and administration of Think Tank AI features**
 > 
-> Version: 3.3.0 | Platform: RADIANT 4.19.0
+> Version: 3.5.0 | Platform: RADIANT 5.0.2
 > Last Updated: January 2026
 
 ---
@@ -80,6 +80,18 @@ This guide covers administrative features specific to **Think Tank**, the consum
     - [32.1 System Architecture: The "Deep Swarm"](#321-system-architecture-the-deep-swarm)
     - [32.2 Operational Troubleshooting](#322-operational-troubleshooting)
     - [32.3 Compliance & Security](#323-compliance--security)
+33. [Cognitive Platform Enhancements](#33-cognitive-platform-enhancements)
+    - [33.1 Strategic Vision: Beyond Task Execution](#331-strategic-vision-beyond-task-execution)
+    - [33.2 The Grimoire (Procedural Memory & Self-Correction)](#332-the-grimoire-procedural-memory--self-correction)
+    - [33.3 Time-Travel Debugging (Visual Forking)](#333-time-travel-debugging-visual-forking)
+    - [33.4 The Economic Governor (Model Arbitrage)](#334-the-economic-governor-model-arbitrage)
+    - [33.5 Sentinel Agents (Event-Driven Autonomy)](#335-sentinel-agents-event-driven-autonomy)
+    - [33.6 The Council of Rivals (Adversarial Consensus)](#336-the-council-of-rivals-adversarial-consensus)
+    - [33.7 Implementation Roadmap](#337-implementation-roadmap)
+    - [33.8 Database Schema](#338-database-schema)
+    - [33.9 API Reference](#339-api-reference)
+    - [33.10 Configuration](#3310-configuration)
+    - [33.11 Troubleshooting](#3311-troubleshooting)
 
 ---
 
@@ -4663,6 +4675,945 @@ AND domain = 'general';
 | [RADIANT Admin Guide - Section 47](./RADIANT-ADMIN-GUIDE.md#47-flyte-native-state-management) | Flyte state management |
 | [RADIANT Admin Guide - Section 42](./RADIANT-ADMIN-GUIDE.md#42-genesis-cato-safety-architecture) | Cato safety integration |
 | [Section 30 - COS](#30-consciousness-operating-system-cos) | SOFAI routing |
+
+---
+
+## 33. Cognitive Platform Enhancements
+
+> **From Modern Orchestrator to Category-Defining Cognitive Platform**
+> 
+> Version: 4.20.0 | Status: Strategic Roadmap
+
+This section documents five strategic enhancements that transform Think Tank from a task execution engine into a self-evolving cognitive platform with an unassailable competitive moat.
+
+### 33.1 Strategic Vision: Beyond Task Execution
+
+#### The Fundamental Shift
+
+Most AI orchestration engines (LangChain, AutoGen, Enterprise Copilots) are **stateless**: they solve a problem, reset, and solve it again from scratch. They suffer from "Goldfish Memory."
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     ORCHESTRATION PARADIGM COMPARISON                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   TRADITIONAL (Stateless)              RADIANT (Cognitive)                  │
+│   ========================             ====================                  │
+│                                                                              │
+│   Task → Solve → Reset                 Task → Solve → LEARN → Evolve        │
+│        ↓                                     ↓                               │
+│   Task → Solve → Reset                 Next Task (with accumulated skills)  │
+│        ↓                                     ↓                               │
+│   Task → Solve → Reset                 System becomes expert over time      │
+│                                                                              │
+│   ❌ No memory between runs            ✅ Procedural memory persists        │
+│   ❌ Same mistakes repeated            ✅ Self-correction from errors       │
+│   ❌ Flat cost curve                   ✅ Decreasing cost over time         │
+│   ❌ Reactive only                     ✅ Proactive monitoring              │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### The Five Strategic Moats
+
+| Enhancement | Category | Impact | Competitive Advantage |
+|-------------|----------|--------|----------------------|
+| **Economic Governor** | Cost Optimization | -40% API costs | Immediate ROI |
+| **The Grimoire** | Procedural Memory | +60% accuracy over time | Lock-in effect |
+| **Time-Travel** | Developer Experience | -80% debug time | Power user magnet |
+| **Sentinels** | Autonomous Agents | New revenue stream | Market expansion |
+| **Council of Rivals** | Quality Assurance | -90% hallucinations | Trust differentiator |
+
+---
+
+### 33.2 The Grimoire (Procedural Memory & Self-Correction)
+
+#### Problem Statement
+
+If an agent struggles to write a valid SQL query for your schema today, it will struggle again tomorrow. RAG provides *facts*, but it doesn't provide *skills*. Current systems have:
+
+- **No skill retention** between sessions
+- **Repeated mistakes** on similar tasks
+- **No personalization** to tenant-specific patterns
+- **Static performance** regardless of usage volume
+
+#### Solution: Write-Back Procedural Memory
+
+The Grimoire is a tenant-isolated knowledge graph that captures **learned heuristics** from successful task executions, making the system smarter with every interaction.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         THE GRIMOIRE ARCHITECTURE                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   ┌─────────────┐     ┌──────────────────┐     ┌─────────────────────┐      │
+│   │ Swarm       │────▶│ The Librarian    │────▶│ Knowledge Graph     │      │
+│   │ Execution   │     │ (Background)     │     │ (Procedural Memory) │      │
+│   └─────────────┘     └──────────────────┘     └─────────────────────┘      │
+│         │                     │                          │                   │
+│         │                     ▼                          │                   │
+│         │            ┌──────────────────┐                │                   │
+│         │            │ Heuristic        │                │                   │
+│         │            │ Extraction       │                │                   │
+│         │            │ • Pattern Match  │                │                   │
+│         │            │ • Success Signal │                │                   │
+│         │            │ • Context Tags   │                │                   │
+│         │            └──────────────────┘                │                   │
+│         │                                                ▼                   │
+│         │                                      ┌─────────────────────┐      │
+│         └─────────────────────────────────────▶│ Future Agent Spawn  │      │
+│                     Query Grimoire             │ (Pre-loaded Skills) │      │
+│                                                └─────────────────────┘      │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### The Librarian Service
+
+A background agent that analyzes every completed Flyte execution trace:
+
+```typescript
+interface LearnedHeuristic {
+  id: string;
+  tenantId: string;
+  category: 'sql_pattern' | 'api_usage' | 'code_style' | 'domain_knowledge' | 'user_preference';
+  trigger: string;           // When to apply this heuristic
+  heuristic: string;         // The learned rule
+  confidence: number;        // 0.0 - 1.0
+  sourceExecutionId: string; // Flyte execution that taught this
+  successCount: number;      // Times this heuristic led to success
+  failureCount: number;      // Times this heuristic led to failure
+  lastApplied: Date;
+  tags: string[];
+  embedding: number[];       // Vector for semantic search
+}
+
+// Example learned heuristics:
+const exampleHeuristics = [
+  {
+    category: 'sql_pattern',
+    trigger: 'querying sales table',
+    heuristic: 'Always filter by is_deleted = false when querying the sales table',
+    confidence: 0.95,
+    tags: ['sql', 'sales', 'soft-delete']
+  },
+  {
+    category: 'user_preference', 
+    trigger: 'generating Python code for user_123',
+    heuristic: 'User prefers fully typed Python with dataclasses over dicts',
+    confidence: 0.88,
+    tags: ['python', 'typing', 'user_123']
+  },
+  {
+    category: 'domain_knowledge',
+    trigger: 'medical terminology in oncology',
+    heuristic: 'TNM staging must specify edition (e.g., AJCC 8th edition)',
+    confidence: 0.92,
+    tags: ['medical', 'oncology', 'staging']
+  }
+];
+```
+
+#### Confidence Decay & Reinforcement
+
+Heuristics evolve based on application outcomes:
+
+| Event | Confidence Change |
+|-------|-------------------|
+| **Successful application** | +0.02 (max 0.99) |
+| **Failed application** | -0.05 (min 0.30) |
+| **Weekly decay (unused)** | -0.01 |
+| **User correction** | New heuristic at 0.95 |
+| **Below 0.30** | Auto-archived |
+
+#### Admin UI: Grimoire Management
+
+**Location**: Admin Dashboard → Think Tank → Grimoire
+
+| Tab | Description |
+|-----|-------------|
+| **Heuristics Browser** | Search, filter, and view all learned heuristics |
+| **Confidence Tuning** | Adjust confidence thresholds and decay rates |
+| **Category Management** | Enable/disable heuristic categories |
+| **Audit Trail** | View heuristic application history |
+| **Manual Entry** | Add expert heuristics manually |
+
+#### Grimoire API Reference
+
+```
+Base: /api/thinktank/grimoire
+
+GET    /heuristics              List heuristics with filtering
+GET    /heuristics/:id          Get heuristic with application history
+POST   /heuristics              Manually add a heuristic
+PATCH  /heuristics/:id          Update confidence/enabled status
+DELETE /heuristics/:id          Remove heuristic
+GET    /stats                   Grimoire statistics
+POST   /heuristics/bulk         Bulk import heuristics
+```
+
+---
+
+### 33.3 Time-Travel Debugging (Visual Forking)
+
+#### Problem Statement
+
+An agent runs for 20 minutes, succeeds at 9 steps, but fails on step 10 due to a vague instruction. In current systems:
+
+- You must **restart from Step 1**, wasting time and money
+- **No way to edit** the context at a specific point
+- **Lost compute costs** for successful early steps
+- **Poor debugging experience** for complex workflows
+
+#### Solution: DVR Interface with Checkpoint Forking
+
+Leverage Flyte's native checkpointing to build a time-travel debugging experience:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     TIME-TRAVEL DEBUGGING INTERFACE                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   Execution: think_tank_swarm_abc123                                        │
+│   Status: FAILED at Step 10    │    Total Duration: 18:42                   │
+│                                                                              │
+│   ──●────●────●────●────●────●────●────●────●────✗──────────────────────    │
+│     1    2    3    4    5    6    7    8    9   10                          │
+│     ✓    ✓    ✓    ✓    ✓    ✓    ✓    ✓    ✓    ✗                          │
+│                              ▲                                               │
+│                        [Timeline Slider]                                     │
+│                                                                              │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │ Step 6: Code Generation                                              │   │
+│   │ Duration: 2:34  │  Model: claude-3-5-sonnet  │  Cost: $0.08          │   │
+│   │                                                                      │   │
+│   │ Input Context: "Generate a Python function to calculate..."          │   │
+│   │ Output: def calculate_quarterly_revenue(transactions):...            │   │
+│   │                                                                      │   │
+│   │ [Edit Context]  [Fork From Here]  [View Full Trace]                 │   │
+│   └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Fork Execution Service
+
+```typescript
+interface ForkRequest {
+  originalExecutionId: string;
+  forkFromNodeId: string;
+  contextModifications: {
+    systemPromptAppend?: string;
+    userPromptReplace?: string;
+    variableOverrides?: Record<string, unknown>;
+    modelOverride?: string;
+  };
+  forkedBy: string;
+  reason?: string;
+}
+
+interface ForkResult {
+  forkedExecutionId: string;
+  forkedFromNode: string;
+  estimatedSavings: {
+    timeMinutes: number;
+    costUsd: number;
+    tokensSkipped: number;
+  };
+  status: 'launched' | 'pending_approval';
+}
+```
+
+#### Admin UI: Time-Travel Debugger
+
+**Location**: Admin Dashboard → Think Tank → Executions → [Select] → Time Travel
+
+| Feature | Description |
+|---------|-------------|
+| **Timeline View** | Visual representation of execution nodes with status |
+| **Node Inspector** | View input/output, model, tokens, cost for each node |
+| **Context Editor** | Modify system prompt, user prompt, variables |
+| **Fork Button** | Create new execution from selected checkpoint |
+| **Comparison View** | Side-by-side diff of original vs forked execution |
+| **Savings Calculator** | Real-time estimate of time/cost savings |
+
+#### Time-Travel API Reference
+
+```
+Base: /api/thinktank/time-travel
+
+GET  /executions/:id/timeline              Get execution timeline with checkpoints
+GET  /executions/:id/checkpoints/:nodeId   Get checkpoint details
+POST /executions/:id/checkpoints/:nodeId/preview   Preview modifications
+POST /executions/:id/fork                  Fork execution from checkpoint
+GET  /executions/:originalId/compare/:forkedId     Compare executions
+GET  /executions/:id/forks                 Get fork history
+```
+
+---
+
+### 33.4 The Economic Governor (Model Arbitrage)
+
+#### Problem Statement
+
+- Using **GPT-4o for every sub-task** is financially ruinous
+- Using **Llama-3-8b for everything** leads to errors
+- **No visibility** into which tasks need expensive models
+- **Flat cost curve** regardless of task complexity
+
+#### Solution: Predictive Cost Routing
+
+A "System 0" pre-dispatch analysis that routes tasks to the optimal model based on complexity:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     ECONOMIC GOVERNOR ARCHITECTURE                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   ┌──────────┐    ┌───────────────────┐    ┌─────────────────────────────┐  │
+│   │ Incoming │───▶│ System 0          │───▶│ Model Router                │  │
+│   │ Task     │    │ (Complexity       │    │                             │  │
+│   └──────────┘    │  Estimator)       │    │  Score 1-3 → Haiku/Llama    │  │
+│                   │                   │    │  Score 4-7 → Sonnet/GPT-4o-m│  │
+│                   │  • Token count    │    │  Score 8-10 → Opus/O1       │  │
+│                   │  • Task type      │    │                             │  │
+│                   │  • Domain         │    └─────────────────────────────┘  │
+│                   │  • History        │                  │                   │
+│                   └───────────────────┘                  ▼                   │
+│                           │                   ┌─────────────────────────┐   │
+│                           ▼                   │ Savings Tracker         │   │
+│                   ┌───────────────────┐       │ "Saved $4.20 via smart  │   │
+│                   │ Complexity Score  │       │  routing this query"    │   │
+│                   │ (1-10)            │       └─────────────────────────┘   │
+│                   └───────────────────┘                                      │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Complexity Factors
+
+| Factor | Weight | Description |
+|--------|--------|-------------|
+| **Prompt Length** | 15% | Token count estimate |
+| **Task Type** | 25% | Summarization (2) → Multi-step reasoning (9) |
+| **Domain** | 20% | General (3) → Medical/Scientific (8) |
+| **Keywords** | 20% | Complexity indicator words |
+| **Structure** | 20% | Code blocks, lists, nested requirements |
+
+#### Model Tier Mapping
+
+| Tier | Score Range | Models | Use Cases |
+|------|-------------|--------|-----------|
+| **Economy** | 1-3 | Haiku, GPT-4o-mini, Llama-3-8b | Simple Q&A, summarization |
+| **Standard** | 4-7 | Sonnet, GPT-4o | Code generation, analysis |
+| **Premium** | 8-10 | Opus, O1-preview | Complex reasoning, planning |
+
+#### Admin UI: Economic Governor Dashboard
+
+**Location**: Admin Dashboard → Think Tank → Economic Governor
+
+| Panel | Description |
+|-------|-------------|
+| **Savings Overview** | Total savings this period, trend chart |
+| **Model Distribution** | Pie chart of model usage by tier |
+| **Complexity Histogram** | Distribution of task complexity scores |
+| **Routing Rules** | Configure tier thresholds and overrides |
+| **Budget Alerts** | Set spending alerts and caps |
+
+#### Economic Governor API Reference
+
+```
+Base: /api/thinktank/economic-governor
+
+GET  /savings?period=month          Get savings dashboard
+GET  /routing-rules                 Get current routing rules
+PUT  /routing-rules                 Update routing configuration
+POST /analyze-complexity            Analyze specific task complexity
+GET  /model-usage                   Get model usage breakdown
+POST /budget-alert                  Configure budget alerts
+```
+
+#### Configuration Options
+
+```typescript
+interface EconomicGovernorConfig {
+  economyThreshold: number;       // Default: 3
+  standardThreshold: number;      // Default: 7
+  forceModelOverrides: {
+    [taskType: string]: string;   // e.g., "legal_analysis" → "opus"
+  };
+  budgetCap: {
+    daily: number;
+    monthly: number;
+  };
+  alertThresholds: {
+    warningPercent: number;       // Default: 80
+    criticalPercent: number;      // Default: 95
+  };
+}
+```
+
+---
+
+### 33.5 Sentinel Agents (Event-Driven Autonomy)
+
+#### Problem Statement
+
+Current agents are **reactive only**—they wait for user input. A true cognitive platform should be **proactive**:
+
+- **No autonomous monitoring** capabilities
+- **No long-lived workflows** that persist between sessions
+- **No event-driven triggers** for automated responses
+- **Missed opportunities** for preventive action
+
+#### Solution: Long-Lived Hibernating Workflows
+
+Allow agents to set up persistent monitors that wake up when conditions are met:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       SENTINEL AGENT ARCHITECTURE                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   User: "Monitor server logs. If Error 500 spikes, analyze and alert me."   │
+│                                                                              │
+│   1. SETUP PHASE                                                             │
+│   ┌─────────────┐    ┌─────────────────┐    ┌──────────────────┐            │
+│   │ Parse       │───▶│ Generate        │───▶│ Configure        │            │
+│   │ Instruction │    │ EventBridge     │    │ Hibernate State  │            │
+│   └─────────────┘    │ Rule            │    └──────────────────┘            │
+│                      └─────────────────┘             │                       │
+│                                                      ▼                       │
+│   2. HIBERNATION PHASE (Days/Weeks/Months)                                   │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │  Flyte Workflow: HIBERNATE state (wait_for_signal)                   │   │
+│   │  • Zero compute cost while waiting                                   │   │
+│   │  • State preserved in S3                                             │   │
+│   └─────────────────────────────────────────────────────────────────────┘   │
+│                              │ Event Fires!                                  │
+│                              ▼                                               │
+│   3. REHYDRATION PHASE                                                       │
+│   ┌─────────────────┐    ┌─────────────────┐    ┌────────────────┐          │
+│   │ EventBridge     │───▶│ Signal Lambda   │───▶│ Workflow       │          │
+│   │ Triggers        │    │ Sends Signal    │    │ Resumes        │          │
+│   └─────────────────┘    └─────────────────┘    └────────────────┘          │
+│                                                         │                    │
+│   4. ANALYSIS & ALERT PHASE                             ▼                    │
+│   ┌─────────────────┐    ┌─────────────────┐    ┌────────────────┐          │
+│   │ Pull Latest     │───▶│ Swarm Analysis  │───▶│ Alert User     │          │
+│   │ Context         │    │ (Root Cause)    │    │ via Slack/SMS  │          │
+│   └─────────────────┘    └─────────────────┘    └────────────────┘          │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Sentinel Trigger Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| **cloudwatch_alarm** | AWS CloudWatch alarm state change | CPU > 90% |
+| **eventbridge_pattern** | Custom EventBridge event pattern | CodePipeline failure |
+| **webhook** | External HTTP webhook | GitHub push |
+| **schedule** | Cron or rate expression | Every hour |
+| **metric_threshold** | Custom metric threshold | Error rate > 5% |
+
+#### Sentinel Action Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| **swarm_analysis** | Run AI swarm for analysis | Root cause analysis |
+| **notification** | Send alert via channels | Slack + Email |
+| **remediation** | Execute automated fix | Scale up instances |
+| **custom_workflow** | Launch custom Flyte workflow | Data pipeline |
+
+#### Admin UI: Sentinel Management
+
+**Location**: Admin Dashboard → Think Tank → Sentinels
+
+| Tab | Description |
+|-----|-------------|
+| **Active Sentinels** | List of hibernating sentinels with status |
+| **Create Sentinel** | Natural language sentinel configuration |
+| **Trigger History** | Log of all sentinel activations |
+| **Analytics** | Sentinel effectiveness metrics |
+
+#### Sentinel API Reference
+
+```
+Base: /api/thinktank/sentinels
+
+GET    /                           List all sentinels
+POST   /                           Create new sentinel (natural language)
+GET    /:id                        Get sentinel details
+PATCH  /:id                        Update sentinel (pause/resume)
+DELETE /:id                        Delete sentinel and EventBridge rule
+GET    /:id/triggers               Get trigger history
+POST   /:id/test                   Test sentinel with mock event
+GET    /analytics                  Sentinel effectiveness metrics
+```
+
+#### Example Sentinel Configurations
+
+```typescript
+// Monitor for deployment failures
+{
+  name: "Deployment Monitor",
+  triggerInstruction: "Watch for failed CodePipeline deployments",
+  actionInstruction: "Analyze the failure logs and suggest fixes, then alert #devops on Slack"
+}
+
+// Proactive cost monitoring
+{
+  name: "Cost Anomaly Detector",
+  triggerInstruction: "If AWS daily costs exceed $500 or increase 50% from yesterday",
+  actionInstruction: "Identify the cost drivers and alert finance@company.com"
+}
+
+// Security sentinel
+{
+  name: "Security Scanner",
+  triggerInstruction: "Every 6 hours, or when a new ECR image is pushed",
+  actionInstruction: "Scan for vulnerabilities and create a report"
+}
+```
+
+---
+
+### 33.6 The Council of Rivals (Adversarial Consensus)
+
+#### Problem Statement
+
+LLMs suffer from:
+
+- **Hallucinations** (confident but wrong answers)
+- **Sycophancy** (agreeing with user's incorrect premises)
+- **Blind spots** (missing edge cases)
+- **No self-verification** (unable to catch own errors)
+
+#### Solution: Structured Adversarial Debate
+
+Force multiple models to argue against each other before synthesizing a final answer:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      COUNCIL OF RIVALS ARCHITECTURE                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   User Query: "Should we migrate from PostgreSQL to MongoDB?"               │
+│                                                                              │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                         THE COUNCIL                                  │   │
+│   │                                                                      │   │
+│   │   ┌───────────────┐  ┌───────────────┐  ┌───────────────┐           │   │
+│   │   │ ADVOCATE      │  │ CRITIC        │  │ PRAGMATIST    │           │   │
+│   │   │ (Claude)      │  │ (GPT-4o)      │  │ (Llama-70b)   │           │   │
+│   │   │               │  │               │  │               │           │   │
+│   │   │ "Migrate!     │  │ "Don't! You   │  │ "It depends   │           │   │
+│   │   │ Schema flex-  │  │ lose ACID,    │  │ on your data  │           │   │
+│   │   │ ibility is    │  │ joins become  │  │ access patt-  │           │   │
+│   │   │ worth it."    │  │ nightmares."  │  │ erns..."      │           │   │
+│   │   └───────────────┘  └───────────────┘  └───────────────┘           │   │
+│   │           │                  │                  │                    │   │
+│   │           └──────────────────┼──────────────────┘                    │   │
+│   │                              ▼                                        │   │
+│   │                    ┌─────────────────┐                               │   │
+│   │                    │ ROUND 2:        │                               │   │
+│   │                    │ Cross-Examine   │                               │   │
+│   │                    │ Each Other      │                               │   │
+│   │                    └─────────────────┘                               │   │
+│   │                              │                                        │   │
+│   │                              ▼                                        │   │
+│   │                    ┌─────────────────┐                               │   │
+│   │                    │ ARBITER         │                               │   │
+│   │                    │ (Opus)          │                               │   │
+│   │                    │                 │                               │   │
+│   │                    │ Synthesize      │                               │   │
+│   │                    │ final answer    │                               │   │
+│   │                    │ with confidence │                               │   │
+│   │                    └─────────────────┘                               │   │
+│   │                                                                      │   │
+│   └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│   Final Output: "For your use case (heavy joins, ACID requirements),        │
+│   stay with PostgreSQL. Migration cost would outweigh benefits."            │
+│   Confidence: 87% | Dissent: Advocate (13%)                                 │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Council Roles
+
+| Role | Purpose | Default Model |
+|------|---------|---------------|
+| **Advocate** | Argues FOR the proposed solution | Claude Sonnet |
+| **Critic** | Argues AGAINST, finds weaknesses | GPT-4o |
+| **Pragmatist** | Considers practical constraints | Llama-70b |
+| **Arbiter** | Synthesizes final verdict | Claude Opus |
+
+#### Council Configuration
+
+```typescript
+interface CouncilConfig {
+  enabled: boolean;
+  triggerComplexity: number;      // Min complexity score (default: 7)
+  triggerDomains: string[];       // Domains requiring council (e.g., ['legal', 'medical'])
+  roles: {
+    advocate: { model: string; temperature: number };
+    critic: { model: string; temperature: number };
+    pragmatist: { model: string; temperature: number };
+    arbiter: { model: string; temperature: number };
+  };
+  rounds: number;                 // Cross-examination rounds (default: 2)
+  confidenceThreshold: number;    // Min confidence for consensus (default: 0.75)
+  includeDissentReport: boolean;  // Show minority opinions
+}
+```
+
+#### Council Output Format
+
+```typescript
+interface CouncilVerdict {
+  question: string;
+  verdict: string;
+  confidence: number;           // 0.0 - 1.0
+  consensusLevel: 'unanimous' | 'majority' | 'split';
+  arguments: {
+    advocate: { position: string; keyPoints: string[] };
+    critic: { position: string; keyPoints: string[] };
+    pragmatist: { position: string; keyPoints: string[] };
+  };
+  crossExamination: {
+    round: number;
+    challenges: Array<{
+      from: string;
+      to: string;
+      challenge: string;
+      response: string;
+    }>;
+  }[];
+  arbiterReasoning: string;
+  dissent?: {
+    role: string;
+    position: string;
+    confidence: number;
+  };
+}
+```
+
+#### Admin UI: Council of Rivals
+
+**Location**: Admin Dashboard → Think Tank → Council of Rivals
+
+| Tab | Description |
+|-----|-------------|
+| **Configuration** | Enable/disable, configure roles and models |
+| **Trigger Rules** | Set complexity/domain triggers |
+| **Session History** | View past council deliberations |
+| **Analytics** | Consensus rates, dissent patterns |
+
+#### Council API Reference
+
+```
+Base: /api/thinktank/council
+
+GET  /config                      Get council configuration
+PUT  /config                      Update council configuration
+POST /deliberate                  Manually trigger council deliberation
+GET  /sessions                    List past deliberation sessions
+GET  /sessions/:id                Get full deliberation transcript
+GET  /analytics                   Council effectiveness metrics
+```
+
+---
+
+### 33.7 Implementation Roadmap
+
+#### Priority Matrix
+
+| Phase | Enhancement | Effort | Impact | Priority |
+|-------|-------------|--------|--------|----------|
+| **Q1** | Economic Governor | Medium | High (ROI) | **P0** |
+| **Q1** | The Grimoire | High | Very High | **P0** |
+| **Q2** | Time-Travel Debugging | Medium | Medium | **P1** |
+| **Q2** | Council of Rivals | Medium | High | **P1** |
+| **Q3** | Sentinel Agents | High | High | **P2** |
+
+#### Recommended Implementation Order
+
+1. **Economic Governor** (Week 1-3)
+   - Immediate cost savings
+   - Simple routing logic
+   - Foundation for other features
+
+2. **The Grimoire** (Week 2-6)
+   - Highest long-term value
+   - Leverages existing Flyte infrastructure
+   - Creates lock-in effect
+
+3. **Time-Travel Debugging** (Week 5-8)
+   - Builds on Flyte checkpointing
+   - Power user feature
+   - Developer experience differentiator
+
+4. **Council of Rivals** (Week 7-10)
+   - Quality improvement
+   - Trust building
+   - Requires multi-model orchestration
+
+5. **Sentinel Agents** (Week 9-14)
+   - Most complex
+   - Requires EventBridge integration
+   - New revenue opportunities
+
+#### Dependencies
+
+```
+Economic Governor ─────┐
+                       │
+The Grimoire ─────────┼──▶ Time-Travel
+                       │
+Council of Rivals ────┘
+
+Sentinel Agents (independent, can parallel)
+```
+
+---
+
+### 33.8 Database Schema
+
+```sql
+-- Grimoire tables
+CREATE TABLE grimoire_heuristics (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  category VARCHAR(50) NOT NULL,
+  trigger TEXT NOT NULL,
+  heuristic TEXT NOT NULL,
+  confidence DECIMAL(3,2) NOT NULL DEFAULT 0.70,
+  source_execution_id VARCHAR(255),
+  success_count INTEGER DEFAULT 0,
+  failure_count INTEGER DEFAULT 0,
+  last_applied TIMESTAMPTZ,
+  tags TEXT[],
+  embedding VECTOR(1536),
+  enabled BOOLEAN DEFAULT true,
+  archived_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_grimoire_tenant_category ON grimoire_heuristics(tenant_id, category);
+CREATE INDEX idx_grimoire_embedding ON grimoire_heuristics USING ivfflat (embedding vector_cosine_ops);
+
+-- Economic Governor tables
+CREATE TABLE economic_governor_savings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  execution_id VARCHAR(255) NOT NULL,
+  actual_model VARCHAR(100) NOT NULL,
+  actual_cost DECIMAL(10,6) NOT NULL,
+  baseline_model VARCHAR(100) NOT NULL,
+  baseline_cost DECIMAL(10,6) NOT NULL,
+  savings DECIMAL(10,6) NOT NULL,
+  savings_percent DECIMAL(5,2) NOT NULL,
+  complexity_score DECIMAL(3,1) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_savings_tenant_date ON economic_governor_savings(tenant_id, created_at);
+
+-- Sentinel tables
+CREATE TABLE sentinels (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  user_id UUID NOT NULL REFERENCES users(id),
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  trigger_type VARCHAR(50) NOT NULL,
+  trigger_config JSONB NOT NULL,
+  action_type VARCHAR(50) NOT NULL,
+  action_config JSONB NOT NULL,
+  status VARCHAR(50) DEFAULT 'hibernating',
+  flyte_execution_id VARCHAR(255),
+  eventbridge_rule_arn TEXT,
+  trigger_count INTEGER DEFAULT 0,
+  max_triggers INTEGER,
+  expires_at TIMESTAMPTZ,
+  last_triggered TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_sentinels_tenant_status ON sentinels(tenant_id, status);
+
+-- Council of Rivals tables
+CREATE TABLE council_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  user_id UUID NOT NULL REFERENCES users(id),
+  question TEXT NOT NULL,
+  verdict TEXT,
+  confidence DECIMAL(3,2),
+  consensus_level VARCHAR(20),
+  arguments JSONB,
+  cross_examination JSONB,
+  arbiter_reasoning TEXT,
+  dissent JSONB,
+  duration_ms INTEGER,
+  total_cost DECIMAL(10,6),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_council_tenant_date ON council_sessions(tenant_id, created_at);
+
+-- Time-Travel checkpoints
+CREATE TABLE execution_checkpoints (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  execution_id VARCHAR(255) NOT NULL,
+  node_id VARCHAR(255) NOT NULL,
+  workflow_name VARCHAR(255) NOT NULL,
+  s3_uri TEXT NOT NULL,
+  state_hash VARCHAR(64),
+  metadata JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(execution_id, node_id)
+);
+
+CREATE TABLE execution_forks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  original_execution_id VARCHAR(255) NOT NULL,
+  forked_execution_id VARCHAR(255) NOT NULL,
+  fork_node_id VARCHAR(255) NOT NULL,
+  modifications JSONB NOT NULL,
+  forked_by UUID REFERENCES users(id),
+  reason TEXT,
+  time_saved_minutes INTEGER,
+  cost_saved DECIMAL(10,6),
+  tokens_skipped INTEGER,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS policies
+ALTER TABLE grimoire_heuristics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE economic_governor_savings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sentinels ENABLE ROW LEVEL SECURITY;
+ALTER TABLE council_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE execution_checkpoints ENABLE ROW LEVEL SECURITY;
+ALTER TABLE execution_forks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation ON grimoire_heuristics
+  USING (tenant_id = current_setting('app.current_tenant_id')::UUID);
+CREATE POLICY tenant_isolation ON economic_governor_savings
+  USING (tenant_id = current_setting('app.current_tenant_id')::UUID);
+CREATE POLICY tenant_isolation ON sentinels
+  USING (tenant_id = current_setting('app.current_tenant_id')::UUID);
+CREATE POLICY tenant_isolation ON council_sessions
+  USING (tenant_id = current_setting('app.current_tenant_id')::UUID);
+CREATE POLICY tenant_isolation ON execution_checkpoints
+  USING (tenant_id = current_setting('app.current_tenant_id')::UUID);
+CREATE POLICY tenant_isolation ON execution_forks
+  USING (tenant_id = current_setting('app.current_tenant_id')::UUID);
+```
+
+---
+
+### 33.9 API Reference
+
+#### Complete Endpoint Summary
+
+| Service | Base Path | Key Endpoints |
+|---------|-----------|---------------|
+| **Grimoire** | `/api/thinktank/grimoire` | CRUD heuristics, stats, bulk import |
+| **Time-Travel** | `/api/thinktank/time-travel` | Timeline, checkpoints, fork, compare |
+| **Economic Governor** | `/api/thinktank/economic-governor` | Savings, routing rules, analyze |
+| **Sentinels** | `/api/thinktank/sentinels` | CRUD sentinels, triggers, test |
+| **Council** | `/api/thinktank/council` | Config, deliberate, sessions |
+
+---
+
+### 33.10 Configuration
+
+#### Tenant-Level Feature Flags
+
+```typescript
+interface CognitiveEnhancementsConfig {
+  grimoire: {
+    enabled: boolean;
+    autoExtract: boolean;
+    minConfidenceThreshold: number;
+    decayEnabled: boolean;
+  };
+  timeTravel: {
+    enabled: boolean;
+    maxCheckpointsPerExecution: number;
+    retentionDays: number;
+  };
+  economicGovernor: {
+    enabled: boolean;
+    economyThreshold: number;
+    standardThreshold: number;
+    budgetCapDaily: number;
+    budgetCapMonthly: number;
+  };
+  sentinels: {
+    enabled: boolean;
+    maxActiveSentinels: number;
+    allowedTriggerTypes: string[];
+  };
+  council: {
+    enabled: boolean;
+    triggerComplexity: number;
+    triggerDomains: string[];
+    rounds: number;
+  };
+}
+```
+
+---
+
+### 33.11 Troubleshooting
+
+#### Common Issues
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| Grimoire not learning | Auto-extract disabled | Enable in tenant config |
+| Fork fails | Checkpoint expired | Increase retention period |
+| Governor routes wrong | Stale complexity model | Retrain on recent data |
+| Sentinel not triggering | EventBridge rule disabled | Check AWS console |
+| Council timeout | Too many rounds | Reduce cross-examination rounds |
+
+#### Debug Commands
+
+```bash
+# Check Grimoire heuristic count
+curl -X GET "https://api.radiant.ai/thinktank/grimoire/stats" \
+  -H "Authorization: Bearer $TOKEN"
+
+# Test Economic Governor routing
+curl -X POST "https://api.radiant.ai/thinktank/economic-governor/analyze-complexity" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"prompt": "Write a complex SQL query", "taskType": "code_generation"}'
+
+# Check Sentinel status
+curl -X GET "https://api.radiant.ai/thinktank/sentinels" \
+  -H "Authorization: Bearer $TOKEN"
+
+# View Council session
+curl -X GET "https://api.radiant.ai/thinktank/council/sessions/{sessionId}" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### 33.12 Related Sections
+
+| Section | Relevance |
+|---------|-----------|
+| [Section 23 - Predictive Coding](#23-predictive-coding--evolution) | Foundation for Grimoire learning |
+| [Section 30 - COS](#30-consciousness-operating-system-cos) | SOFAI integration |
+| [Section 32 - Swarm Orchestration](#32-swarm-orchestration--flyte-operations) | Flyte integration for all features |
+| [RADIANT Admin Guide - Section 47](./RADIANT-ADMIN-GUIDE.md#47-flyte-native-state-management) | Flyte checkpointing |
 
 ---
 

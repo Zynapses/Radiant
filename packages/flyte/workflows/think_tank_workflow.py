@@ -1,12 +1,16 @@
 """
 Think Tank HITL Workflow - Flyte workflow for Human-in-the-Loop AI reasoning
 
+RADIANT v5.0.2 - System Evolution
+
 This workflow implements:
 - True swarm parallelism with per-agent execution
 - Non-blocking HITL via wait_for_input
 - Domain-aware timeout handling
 - PHI sanitization before human review
 - Integration with Mission Control API
+- The Grimoire integration (procedural memory)
+- Economic Governor integration (cost optimization)
 """
 
 import json
@@ -21,6 +25,9 @@ import requests
 from flytekit import task, workflow, dynamic, wait_for_input, approve, current_context
 from flytekit.types.file import FlyteFile
 from dataclasses import dataclass
+
+# v5.0.2 - The Grimoire Integration
+from radiant.flyte.workflows.grimoire_tasks import consult_grimoire, librarian_review
 
 
 # ============================================================================
@@ -205,8 +212,16 @@ def execute_agent(
     task_data: Dict[str, Any],
     tenant_id: str,
     coordinator_guidance: Optional[str] = None,
+    domain: str = "general",
+    swarm_id: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Execute a single agent and return its result."""
+    """
+    Execute a single agent and return its result.
+    
+    v5.0.2 Enhancement: Integrates with The Grimoire for procedural memory
+    - Consults Grimoire for relevant heuristics before execution
+    - Invokes Librarian to extract lessons after successful execution
+    """
     import time
     start_time = time.time()
     
@@ -216,7 +231,20 @@ def execute_agent(
     max_tokens = agent_config.get("max_tokens", 2048)
     
     prompt = task_data.get("prompt", "")
-    system_prompt = task_data.get("system_prompt")
+    system_prompt = task_data.get("system_prompt", "")
+    
+    # v5.0.2: Consult The Grimoire for relevant heuristics
+    try:
+        grimoire_wisdom = consult_grimoire(
+            tenant_id=tenant_id,
+            domain=domain,
+            prompt=prompt
+        )
+        if grimoire_wisdom:
+            system_prompt = f"{system_prompt}\n{grimoire_wisdom}" if system_prompt else grimoire_wisdom
+    except Exception as e:
+        print(f"Grimoire consultation failed (non-blocking): {e}")
+        grimoire_wisdom = ""
     
     if coordinator_guidance:
         prompt = f"{prompt}\n\nCoordinator guidance: {coordinator_guidance}"
@@ -239,6 +267,18 @@ def execute_agent(
         tokens_used = response.get("usage", {}).get("total_tokens", 0)
         latency_ms = int((time.time() - start_time) * 1000)
         
+        # v5.0.2: Librarian Review - Extract lessons from successful execution
+        try:
+            librarian_review(
+                tenant_id=tenant_id,
+                domain=domain,
+                original_prompt=task_data.get("prompt", ""),
+                final_response=content,
+                execution_id=swarm_id
+            )
+        except Exception as e:
+            print(f"Librarian review failed (non-blocking): {e}")
+        
         return {
             "agent_id": agent_id,
             "status": "success",
@@ -246,6 +286,7 @@ def execute_agent(
             "latency_ms": latency_ms,
             "tokens_used": tokens_used,
             "safety_passed": True,
+            "grimoire_applied": bool(grimoire_wisdom),
         }
         
     except Exception as e:
@@ -256,6 +297,7 @@ def execute_agent(
             "error": str(e),
             "latency_ms": latency_ms,
             "safety_passed": False,
+            "grimoire_applied": bool(grimoire_wisdom),
         }
 
 
@@ -369,8 +411,14 @@ def execute_swarm(
     task_data: Dict[str, Any],
     tenant_id: str,
     mode: str = "parallel",
+    domain: str = "general",
+    swarm_id: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
-    """Execute all agents in the swarm using true parallel execution."""
+    """
+    Execute all agents in the swarm using true parallel execution.
+    
+    v5.0.2 Enhancement: Passes domain and swarm_id for Grimoire integration
+    """
     results = []
     
     if mode == "sequential":
@@ -381,6 +429,8 @@ def execute_swarm(
                 task_data=task_data,
                 tenant_id=tenant_id,
                 coordinator_guidance=previous_response,
+                domain=domain,
+                swarm_id=swarm_id,
             )
             results.append(result)
             if result.get("status") == "success":
@@ -396,6 +446,8 @@ def execute_swarm(
             agent_config=coordinator,
             task_data=task_data,
             tenant_id=tenant_id,
+            domain=domain,
+            swarm_id=swarm_id,
         )
         results.append(coord_result)
         
@@ -407,6 +459,8 @@ def execute_swarm(
                     task_data=task_data,
                     tenant_id=tenant_id,
                     coordinator_guidance=coordinator_guidance,
+                    domain=domain,
+                    swarm_id=swarm_id,
                 )
                 results.append(worker_result)
     else:
@@ -415,6 +469,8 @@ def execute_swarm(
                 agent_config=agent,
                 task_data=task_data,
                 tenant_id=tenant_id,
+                domain=domain,
+                swarm_id=swarm_id,
             )
             results.append(result)
     
@@ -456,6 +512,8 @@ def think_tank_hitl_workflow(
         task_data=task_data,
         tenant_id=tenant_id,
         mode=mode,
+        domain=hitl_domain,
+        swarm_id=swarm_id,
     )
     
     synthesis_result = synthesize_results(

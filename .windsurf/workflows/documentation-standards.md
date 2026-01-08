@@ -21,12 +21,27 @@ Every feature implementation MUST include documentation updates in the SAME impl
 | If creating... | MUST update... |
 |----------------|----------------|
 | Database tables/migrations | `docs/sections/SECTION-07-DATABASE-SCHEMA.md` |
-| Platform admin features | `docs/RADIANT-ADMIN-GUIDE.md` |
-| Think Tank admin features | `docs/THINKTANK-ADMIN-GUIDE.md` |
+| Platform admin features | `docs/RADIANT-ADMIN-GUIDE.md` **+ Strategic Vision** |
+| Think Tank admin features | `docs/THINKTANK-ADMIN-GUIDE.md` **+ Strategic Vision** |
 | Any feature | `CHANGELOG.md` |
 | Significant feature | Standalone `docs/FEATURE-NAME.md` |
 | API endpoints | Include in admin guide + `docs/api/` |
 | Security features | Include in admin guide security section |
+
+### ⚠️ AUTOMATIC: Strategic Vision Update
+
+**EVERY time you modify `RADIANT-ADMIN-GUIDE.md` OR `THINKTANK-ADMIN-GUIDE.md`, you MUST ALSO update:**
+
+**`docs/STRATEGIC-VISION-MARKETING.md`**
+
+| Change Type | Strategic Vision Update Required |
+|-------------|----------------------------------|
+| New feature implemented | Add to "Platform Capabilities: What's Implemented Today" section |
+| Planned feature completed | Move from "Upcoming" to "Implemented Today" |
+| Version bump | Update version in document header |
+| Any admin guide change | Add entry to Document History table |
+
+**This is NOT optional.** The Strategic Vision document is customer-facing marketing material that must accurately reflect platform capabilities.
 
 ### Two Admin Guides (use correct one)
 
@@ -164,6 +179,7 @@ Before marking any feature complete, verify:
 
 - [ ] CHANGELOG.md updated with feature entry
 - [ ] Appropriate admin guide(s) updated
+- [ ] **Strategic Vision document updated** (if admin guide changed)
 - [ ] Database schema documentation updated (if tables added)
 - [ ] API documentation complete (if endpoints added)
 - [ ] Security considerations documented

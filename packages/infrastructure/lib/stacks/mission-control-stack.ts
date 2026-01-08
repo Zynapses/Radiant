@@ -10,6 +10,7 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 
 export interface MissionControlStackProps extends cdk.StackProps {
@@ -34,6 +35,18 @@ export class MissionControlStack extends cdk.Stack {
     const { environment, vpc, cluster, redisHost, redisPort, dbSecretArn } = props;
 
     // ========================================================================
+    // S3 BRONZE BUCKET (v4.20.3 - Critical for Payload Offloading)
+    // ========================================================================
+    
+    // Reference the Bronze Bucket from RADIANT core infrastructure
+    // This bucket stores payload offloads for Flyte workflow inputs
+    const bronzeBucket = s3.Bucket.fromBucketName(
+      this, 
+      'BronzeBucket', 
+      `radiant-bronze-${environment}` 
+    );
+
+    // ========================================================================
     // LAMBDA FUNCTIONS
     // ========================================================================
 
@@ -52,6 +65,7 @@ export class MissionControlStack extends cdk.Stack {
         REDIS_HOST: redisHost,
         REDIS_PORT: String(redisPort),
         FLYTE_ADMIN_URL: `https://flyte.${environment}.radiant.internal`,
+        RADIANT_BRONZE_BUCKET: bronzeBucket.bucketName,
       },
       vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
@@ -61,6 +75,9 @@ export class MissionControlStack extends cdk.Stack {
     // Grant Secrets Manager access
     const dbSecret = secretsmanager.Secret.fromSecretCompleteArn(this, 'DbSecret', dbSecretArn);
     dbSecret.grantRead(missionControlLambda);
+    
+    // Grant S3 permissions for payload offloading (v4.20.3)
+    bronzeBucket.grantReadWrite(missionControlLambda);
 
     // WebSocket Connection Handler Lambda
     const wsConnectionLambda = new lambda.Function(this, 'WsConnectionLambda', {
