@@ -41,9 +41,18 @@ except ImportError:
             return func
         return decorator
 
-from radiant.flyte.utils.db import get_safe_db_connection, get_system_db_connection
-from radiant.flyte.utils.embeddings import generate_embedding
-from radiant.flyte.utils.cato_client import CatoClient
+try:
+    from radiant.flyte.utils.db import get_safe_db_connection, get_system_db_connection
+    from radiant.flyte.utils.embeddings import generate_embedding
+    from radiant.flyte.utils.cato_client import CatoClient
+except ImportError:
+    # Fallback to relative imports for local development
+    import sys
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils.db import get_safe_db_connection, get_system_db_connection
+    from utils.embeddings import generate_embedding
+    from utils.cato_client import CatoClient
 
 
 # Configuration
