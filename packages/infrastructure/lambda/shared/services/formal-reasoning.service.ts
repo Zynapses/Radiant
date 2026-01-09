@@ -24,6 +24,7 @@
 
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { SageMakerRuntimeClient, InvokeEndpointCommand } from '@aws-sdk/client-sagemaker-runtime';
+import { callWithResilience } from './resilient-provider.service';
 import { executeStatement } from '../db/client';
 import { logger } from '../logger';
 import { libraryRegistryService, Library } from './library-registry.service';
@@ -49,6 +50,7 @@ import {
   FormalReasoningInvocationLog,
   FormalReasoningDashboard,
   LibraryHealth,
+  LibraryStats,
   Z3Config,
   Z3Constraint,
   Z3Result,
@@ -757,7 +759,16 @@ class FormalReasoningService {
         InvocationType: 'RequestResponse',
       });
 
-      const response = await lambdaClient.send(command);
+      // Wrap Lambda invocation with resilience
+      const response = await callWithResilience(
+        () => lambdaClient.send(command),
+        {
+          provider: 'lambda-formal-reasoning',
+          operation: taskType,
+          timeoutMs: 120000, // Formal reasoning can be slow
+          maxRetries: 2,
+        }
+      );
       
       if (response.FunctionError) {
         const errorPayload = response.Payload 
@@ -810,7 +821,16 @@ class FormalReasoningService {
         Body: Buffer.from(JSON.stringify(input)),
       });
 
-      const response = await sagemakerClient.send(command);
+      // Wrap SageMaker invocation with resilience
+      const response = await callWithResilience(
+        () => sagemakerClient.send(command),
+        {
+          provider: `sagemaker-${library}`,
+          operation: 'inference',
+          timeoutMs: 60000,
+          maxRetries: 2,
+        }
+      );
       const body = JSON.parse(Buffer.from(response.Body!).toString());
 
       return {

@@ -1,5 +1,6 @@
-// RADIANT v4.18.0 - SageMaker Inference Components Service
+// RADIANT v5.2.1 - SageMaker Inference Components Service
 // Manages multi-model hosting with reduced cold starts via Inference Components
+// Now with resilience patterns: circuit breaker, retry, timeout
 
 import {
   SageMakerClient,
@@ -14,11 +15,13 @@ import {
   DeleteEndpointCommand,
   CreateEndpointConfigCommand,
   CreateModelCommand,
+  ProductionVariantInstanceType,
 } from '@aws-sdk/client-sagemaker';
 import {
   SageMakerRuntimeClient,
   InvokeEndpointCommand,
 } from '@aws-sdk/client-sagemaker-runtime';
+import { callWithResilience } from './resilient-provider.service';
 import { executeStatement } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import type {
@@ -37,9 +40,8 @@ import type {
   RoutingTarget,
   InferenceComponentsConfig,
   InferenceComponentsDashboard,
-  DEFAULT_INFERENCE_COMPONENTS_CONFIG,
-  DEFAULT_TIER_THRESHOLDS,
 } from '@radiant/shared';
+import { DEFAULT_TIER_THRESHOLDS } from '@radiant/shared';
 
 // ============================================================================
 // Configuration
@@ -209,7 +211,7 @@ class InferenceComponentsService {
       ExecutionRoleArn: process.env.SAGEMAKER_EXECUTION_ROLE_ARN,
       ProductionVariants: [{
         VariantName: 'AllTraffic',
-        InstanceType: instanceType,
+        InstanceType: instanceType as ProductionVariantInstanceType,
         InitialInstanceCount: instanceCount,
         ModelDataDownloadTimeoutInSeconds: 3600,
         ContainerStartupHealthCheckTimeoutInSeconds: 600,
@@ -528,13 +530,21 @@ class InferenceComponentsService {
         return { componentId, success: true, loadTimeMs: 0, fromCache: true };
       }
 
-      // Scale up copies
-      await sagemaker.send(new UpdateInferenceComponentCommand({
-        InferenceComponentName: component.componentName,
-        RuntimeConfig: {
-          CopyCount: 1,
-        },
-      }));
+      // Scale up copies with resilience
+      await callWithResilience(
+        () => sagemaker.send(new UpdateInferenceComponentCommand({
+          InferenceComponentName: component.componentName,
+          RuntimeConfig: {
+            CopyCount: 1,
+          },
+        })),
+        {
+          provider: 'sagemaker',
+          operation: 'scale-component',
+          timeoutMs: 30000,
+          maxRetries: 2,
+        }
+      );
 
       // Wait for component to be ready
       const ready = await this.waitForComponentReady(component.componentName, timeoutMs);
@@ -576,13 +586,21 @@ class InferenceComponentsService {
 
     const componentName = (result.rows[0] as { component_name: string }).component_name;
 
-    // Scale to zero copies
-    await sagemaker.send(new UpdateInferenceComponentCommand({
-      InferenceComponentName: componentName,
-      RuntimeConfig: {
-        CopyCount: 0,
-      },
-    }));
+    // Scale to zero copies with resilience
+    await callWithResilience(
+      () => sagemaker.send(new UpdateInferenceComponentCommand({
+        InferenceComponentName: componentName,
+        RuntimeConfig: {
+          CopyCount: 0,
+        },
+      })),
+      {
+        provider: 'sagemaker',
+        operation: 'unload-component',
+        timeoutMs: 30000,
+        maxRetries: 2,
+      }
+    );
 
     await executeStatement(
       `UPDATE inference_components SET
@@ -663,9 +681,17 @@ class InferenceComponentsService {
     const startTime = Date.now();
 
     while (Date.now() - startTime < timeoutMs) {
-      const response = await sagemaker.send(new DescribeInferenceComponentCommand({
-        InferenceComponentName: componentName,
-      }));
+      const response = await callWithResilience(
+        () => sagemaker.send(new DescribeInferenceComponentCommand({
+          InferenceComponentName: componentName,
+        })),
+        {
+          provider: 'sagemaker',
+          operation: 'describe-component',
+          timeoutMs: 10000,
+          maxRetries: 2,
+        }
+      );
 
       if (response.InferenceComponentStatus === 'InService') {
         return true;
