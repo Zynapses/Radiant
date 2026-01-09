@@ -1,8 +1,10 @@
-// RADIANT v4.18.0 - Translation Middleware Service
+// RADIANT v5.2.1 - Translation Middleware Service
 // Automatic translation layer for multilingual model routing
 // Uses Qwen 2.5 7B for cost-effective translation ($0.08/$0.24 per 1M tokens)
+// Now with resilience patterns: circuit breaker, retry, timeout
 
 import { SageMakerRuntimeClient, InvokeEndpointCommand } from '@aws-sdk/client-sagemaker-runtime';
+import { callWithResilience } from './resilient-provider.service';
 import { executeStatement } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { createHash } from 'crypto';
@@ -373,12 +375,21 @@ ${prompt}<|im_end|>
         },
       };
 
-      const response = await this.sagemaker.send(
-        new InvokeEndpointCommand({
-          EndpointName: this.TRANSLATION_ENDPOINT,
-          ContentType: 'application/json',
-          Body: JSON.stringify(payload),
-        })
+      // Wrap SageMaker call with resilience
+      const response = await callWithResilience(
+        () => this.sagemaker.send(
+          new InvokeEndpointCommand({
+            EndpointName: this.TRANSLATION_ENDPOINT,
+            ContentType: 'application/json',
+            Body: JSON.stringify(payload),
+          })
+        ),
+        {
+          provider: 'sagemaker-translation',
+          operation: 'translate',
+          timeoutMs: 60000,
+          maxRetries: 2,
+        }
       );
 
       const responseBody = JSON.parse(new TextDecoder().decode(response.Body));

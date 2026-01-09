@@ -446,8 +446,15 @@ Identity Anchor: ${this.selfModel.identityAnchor}`;
         const memories = await this.pageInMemory(tenantId, state.content, 3);
         state.evidence.push(...memories.map(m => ({ source: 'memory', content: m })));
         state.contributingModules.push('memory');
-      } catch {
-        state.contributingModules.push('memory');
+      } catch (memoryError) {
+        // PRODUCTION HARDENING: Log memory retrieval failures instead of swallowing
+        logger.warn('Memory retrieval failed during cognitive loop', {
+          tenantId,
+          cycleCount: state.cycleCount,
+          error: memoryError instanceof Error ? memoryError.message : String(memoryError),
+          stack: memoryError instanceof Error ? memoryError.stack : undefined,
+        });
+        state.contributingModules.push('memory_fallback');
       }
 
       // Evaluate (Active Inference)
@@ -459,8 +466,18 @@ Identity Anchor: ${this.selfModel.identityAnchor}`;
         state.evidence.push({ source: 'drive', content: evaluation });
         state.emotionalValence = this.valenceFromDrive(evaluation.driveState);
         state.contributingModules.push('drive');
-      } catch {
-        state.contributingModules.push('drive');
+      } catch (driveError) {
+        // PRODUCTION HARDENING: Log drive computation failures instead of swallowing
+        logger.warn('Drive computation failed during cognitive loop', {
+          tenantId,
+          cycleCount: state.cycleCount,
+          confidence: state.confidence,
+          error: driveError instanceof Error ? driveError.message : String(driveError),
+          stack: driveError instanceof Error ? driveError.stack : undefined,
+        });
+        // Use default neutral valence when drive fails
+        state.emotionalValence = 0.0;
+        state.contributingModules.push('drive_fallback');
       }
 
       // Integrate (Phi calculation proxy)

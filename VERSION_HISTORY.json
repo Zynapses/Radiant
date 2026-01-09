@@ -2,6 +2,67 @@
   "schemaVersion": "1.0",
   "releases": [
     {
+      "packageVersion": "5.2.1",
+      "radiantVersion": "5.2.1",
+      "thinktankVersion": "3.2.0",
+      "releaseDate": "2026-01-10T00:00:00Z",
+      "releaseType": "minor",
+      "changes": {
+        "radiant": {
+          "touched": true,
+          "features": [
+            "CircuitBreaker resilience pattern (TypeScript)",
+            "Tenacity retry decorators (Python)",
+            "RateLimiterService with Redis token bucket",
+            "Environment validator with fail-fast on missing config",
+            "Fixed silent failures in consciousness-engine",
+            "EconomicGovernor unit tests",
+            "ResilientProviderService for AI provider calls",
+            "React ErrorBoundary for admin dashboard",
+            "IdempotencyService for billing operations",
+            "Fixed 10+ empty catch blocks in advanced-agi.service.ts"
+          ],
+          "checksumHash": "sha256:pending"
+        },
+        "thinktank": {
+          "touched": false,
+          "copiedFromVersion": "5.0.3",
+          "checksumHash": "sha256:pending"
+        }
+      },
+      "compatibility": {
+        "minUpgradeFromVersion": "5.0.3",
+        "lockStepRequired": false
+      }
+    },
+    {
+      "packageVersion": "5.0.3",
+      "radiantVersion": "5.0.3",
+      "thinktankVersion": "3.2.0",
+      "releaseDate": "2026-01-10T00:00:00Z",
+      "releaseType": "patch",
+      "changes": {
+        "radiant": {
+          "touched": true,
+          "features": [
+            "Grimoire schema fix: SHA-256 hash for uniqueness constraint",
+            "Vector index upgrade: IVFFlat to HNSW",
+            "Maintenance security: configurable system tenant ID"
+          ],
+          "checksumHash": "sha256:pending"
+        },
+        "thinktank": {
+          "touched": false,
+          "copiedFromVersion": "5.0.2",
+          "checksumHash": "sha256:pending"
+        }
+      },
+      "compatibility": {
+        "minUpgradeFromVersion": "5.0.2",
+        "lockStepRequired": false
+      }
+    },
+    {
       "packageVersion": "4.18.0",
       "radiantVersion": "4.18.0",
       "thinktankVersion": "3.2.0",
@@ -64,6 +125,9 @@
     }
   ],
   "rollbackChain": {
+    "5.2.1": ["5.2.0"],
+    "5.2.0": ["5.0.3"],
+    "5.0.3": ["5.0.2"],
     "4.18.0": ["4.17.0"],
     "4.17.0": ["4.16.0"]
   }

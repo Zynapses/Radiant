@@ -5,6 +5,149 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.1] - 2026-01-10
+
+### Added
+
+#### Code Review Fixes (Post-Audit)
+
+Implements recommendations from Claude Opus 4.5 code review of v5.2.0.
+
+**P0: Circuit Breaker Integration**
+- **ResilientProviderService** (`lambda/shared/services/resilient-provider.service.ts`)
+  - Ready-to-use wrapper for all external AI provider calls
+  - Combines CircuitBreaker + Retry + Timeout in single call
+  - Provider health monitoring via `getAllProviderHealth()`
+  - Auto-logging of state changes and failures
+- **callWithResilience() Integration** - Now live in all provider calls:
+  - `model-router.service.ts` - Bedrock, LiteLLM, and direct provider calls (Groq, Perplexity, xAI, Together)
+  - `embedding.service.ts` - OpenAI, Bedrock, Cohere embedding calls (single + batch)
+  - `translation-middleware.service.ts` - Qwen 2.5 7B SageMaker translation calls
+  - `inference-components.service.ts` - SageMaker inference component lifecycle (load, unload, describe)
+  - `formal-reasoning.service.ts` - Lambda executor and SageMaker neural-symbolic calls (LTN, DeepProbLog)
+
+**P0: Silent Failure Fixes**
+- Fixed 10+ empty catch blocks in `advanced-agi.service.ts`
+  - Strategy selection, transfer learning, prediction, action selection
+  - Rule extraction, hybrid reasoning, proposal generation
+  - All now log proper error context with `logger.warn()`
+
+**P1: React ErrorBoundary**
+- **ErrorBoundary** component (`apps/admin-dashboard/components/error-boundary.tsx`)
+  - Catches component errors without crashing entire UI
+  - `PageErrorBoundary` - Full-page error handling
+  - `SectionErrorBoundary` - Graceful section-level fallbacks
+  - Error reporting to `/api/admin/errors/report` in production
+  - Dev mode shows stack traces, prod shows user-friendly message
+
+**P1: Billing Idempotency**
+- **IdempotencyService** (`lambda/shared/services/idempotency.service.ts`)
+  - Prevents duplicate charges on retry
+  - 24-hour TTL for idempotency keys
+  - Status tracking: pending → completed/failed
+  - Helper functions: `extractIdempotencyKey()`, `generateIdempotencyKey()`
+- **Migration** `V2026_01_10_002__idempotency_keys.sql`
+  - `idempotency_keys` table with RLS
+  - Cleanup function for expired records
+
+**New Files:**
+- `packages/infrastructure/lambda/shared/services/resilient-provider.service.ts`
+- `packages/infrastructure/lambda/shared/services/idempotency.service.ts`
+- `packages/infrastructure/migrations/V2026_01_10_002__idempotency_keys.sql`
+- `apps/admin-dashboard/components/error-boundary.tsx`
+
+**Files Modified:**
+- `packages/infrastructure/lambda/shared/services/advanced-agi.service.ts` (empty catch fixes)
+
+## [5.2.0] - 2026-01-10
+
+### Added
+
+#### Production Hardening (PROMPT-39)
+
+Major operational resilience improvements based on code audit findings.
+
+**Phase 1: Resilience Layer**
+- **CircuitBreaker** (`packages/shared/src/utils/resilience.ts`)
+  - Prevents cascading failures when AI providers are down or slow
+  - States: CLOSED → OPEN → HALF_OPEN with configurable thresholds
+  - 5 failures in 30 seconds opens circuit for 60 seconds
+  - Includes retry with exponential backoff, timeout wrappers, and bulkhead pattern
+- **Python Resilience** (`packages/flyte/utils/resilience.py`)
+  - Tenacity-based retry decorators with exponential backoff
+  - `@with_retry(max_attempts=3)` for external API calls
+  - Circuit breaker implementation for Python Flyte tasks
+  - Strict HTTP timeouts: 5s connect, 60s read (never infinite)
+
+**Phase 2: Observability & Error Handling**
+- **Silent Failure Fixes** (`consciousness-engine.service.ts`)
+  - Empty catch blocks now log full error traces with correlation IDs
+  - Memory retrieval and drive computation failures are properly logged
+  - Fallback logic clearly marked with `_fallback` module tags
+- **Environment Validator** (`packages/shared/src/config/validator.ts`)
+  - Validates required env vars on Lambda cold start
+  - Throws `CriticalConfigurationError` immediately if config missing
+  - Prevents app from starting in broken state
+  - Core requirements: `LITELLM_PROXY_URL`, `DB_SECRET_ARN`, `DB_CLUSTER_ARN`
+
+**Phase 3: Rate Limiting**
+- **RateLimiterService** (`lambda/shared/services/rate-limiter.service.ts`)
+  - Token bucket algorithm with Redis storage
+  - Default: 100 requests/minute per tenant (configurable)
+  - In-memory fallback when Redis unavailable
+  - Per-tenant overrides with expiration support
+  - `withRateLimit` middleware for Lambda handlers
+  - Proper 429 responses with `Retry-After` headers
+
+**Phase 4: Testing Foundation**
+- **EconomicGovernor Tests** (`__tests__/economic-governor.service.test.ts`)
+  - Full test coverage for model selection logic
+  - Tests for all governor modes (off, performance, balanced, cost_saver)
+  - Error handling and edge case coverage
+  - Batch processing and singleton pattern tests
+
+**New Files:**
+- `packages/shared/src/utils/resilience.ts` - TypeScript resilience utilities
+- `packages/shared/src/config/validator.ts` - Environment validation
+- `packages/flyte/utils/resilience.py` - Python resilience utilities
+- `packages/infrastructure/lambda/shared/services/rate-limiter.service.ts`
+- `packages/infrastructure/__tests__/economic-governor.service.test.ts`
+
+**Environment Variables:**
+- `RATE_LIMIT_ENABLED` - Enable/disable rate limiting (default: true)
+- `RATE_LIMIT_REQUESTS_PER_MINUTE` - Default rate limit (default: 100)
+- `RATE_LIMIT_WINDOW_SECONDS` - Rate limit window (default: 60)
+
+## [5.0.3] - 2026-01-10
+
+### Fixed
+
+#### Grimoire Schema Compliance (Post-Audit Fix)
+
+Addresses two issues identified during code audit:
+
+**1. Index Row Size Crash Prevention**
+- Added SHA-256 hash column (`heuristic_hash`) for uniqueness constraint
+- Replaced TEXT-based unique constraint with hash-based constraint
+- Prevents PostgreSQL B-Tree index size limit errors on long heuristics
+- SHA-256 chosen over MD5 for SOC2/Veracode compliance scanner compatibility
+
+**2. Vector Index Performance Upgrade**
+- Migrated from IVFFlat to HNSW indexing for `context_embedding`
+- HNSW offers better recall, no pre-training required, superior for dynamic inserts
+- Parameters: `m=16`, `ef_construction=64`
+
+**3. Maintenance Security Enhancement**
+- System tenant ID now configurable via `SYSTEM_MAINTENANCE_TENANT_ID` environment variable
+- Production warning logged if using default system tenant
+- Improves audit trail clarity and removes hardcoded "magic UUID"
+
+**Migration:** `V2026_01_10_001__fix_heuristics_schema.sql`
+
+**Files Changed:**
+- `packages/infrastructure/migrations/V2026_01_10_001__fix_heuristics_schema.sql` (new)
+- `packages/flyte/utils/db.py` (environment-configurable system tenant)
+
 ## [4.21.0] - 2026-01-02
 
 ### Added

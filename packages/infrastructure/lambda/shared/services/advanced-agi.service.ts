@@ -187,7 +187,12 @@ Return JSON: {"selected_index": 1-N, "reasoning": "why"}`;
           return strategies[index];
         }
       }
-    } catch { /* fallback to highest quality */ }
+    } catch (error) {
+      logger.warn('Strategy selection failed, using fallback', {
+        error: error instanceof Error ? error.message : String(error),
+        strategiesCount: strategies.length,
+      });
+    }
 
     return strategies[0];
   }
@@ -245,7 +250,13 @@ Return JSON:
           adaptedKnowledge: parsed.transferred_knowledge || {},
         };
       }
-    } catch { /* transfer failed */ }
+    } catch (error) {
+      logger.warn('Transfer learning failed', {
+        error: error instanceof Error ? error.message : String(error),
+        sourceDomain,
+        targetDomain,
+      });
+    }
 
     return { success: false, adaptedKnowledge: {} };
   }
@@ -329,7 +340,12 @@ Return JSON:
           confidence: parsed.confidence || 0.5,
         };
       }
-    } catch { /* prediction failed */ }
+    } catch (error) {
+      logger.warn('Prediction failed', {
+        error: error instanceof Error ? error.message : String(error),
+        modelId,
+      });
+    }
 
     return {
       predictionId: '',
@@ -419,7 +435,12 @@ Return JSON:
           reasoning: parsed.reasoning || '',
         };
       }
-    } catch { /* fallback */ }
+    } catch (error) {
+      logger.warn('Action selection failed', {
+        error: error instanceof Error ? error.message : String(error),
+        tenantId,
+      });
+    }
 
     return { action: 'explore', expectedFreeEnergy: 0, reasoning: 'Selection failed' };
   }
@@ -499,7 +520,13 @@ Return JSON:
           extractedRules.push(this.mapSymbolicRule(result.rows[0] as Record<string, unknown>));
         }
       }
-    } catch { /* extraction failed */ }
+    } catch (error) {
+      logger.warn('Rule extraction failed', {
+        error: error instanceof Error ? error.message : String(error),
+        tenantId,
+        domain,
+      });
+    }
 
     return extractedRules;
   }
@@ -566,7 +593,12 @@ Return JSON:
           confidence: parsed.confidence || 0.5,
         };
       }
-    } catch { /* reasoning failed */ }
+    } catch (error) {
+      logger.warn('Hybrid reasoning failed', {
+        error: error instanceof Error ? error.message : String(error),
+        tenantId,
+      });
+    }
 
     return { conclusion: '', steps: [], confidence: 0 };
   }
@@ -707,7 +739,13 @@ Return JSON:
 
         return this.mapProposal(result.rows[0] as Record<string, unknown>);
       }
-    } catch { /* proposal failed */ }
+    } catch (error) {
+      logger.warn('Improvement proposal generation failed', {
+        error: error instanceof Error ? error.message : String(error),
+        tenantId,
+        proposalType,
+      });
+    }
 
     return null;
   }
@@ -766,7 +804,12 @@ Return JSON:
 
         return (result.rows[0] as { template_id: string }).template_id;
       }
-    } catch { /* evolution failed */ }
+    } catch (error) {
+      logger.warn('Prompt template evolution failed', {
+        error: error instanceof Error ? error.message : String(error),
+        templateId,
+      });
+    }
 
     return null;
   }
@@ -832,7 +875,12 @@ Return JSON:
           suggestions: parsed.suggestions || [],
         };
       }
-    } catch { /* reasoning failed */ }
+    } catch (error) {
+      logger.warn('Common sense reasoning failed', {
+        error: error instanceof Error ? error.message : String(error),
+        tenantId,
+      });
+    }
 
     return { inferences: [], warnings: [], suggestions: [] };
   }
@@ -848,7 +896,10 @@ Return JSON:
         messages: [{ role: 'user', content: text.substring(0, 8000) }],
       });
       return new Array(1536).fill(0);
-    } catch {
+    } catch (error) {
+      logger.debug('Embedding generation failed, using zero vector', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return new Array(1536).fill(0);
     }
   }

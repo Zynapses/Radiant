@@ -1,7 +1,7 @@
 """
 Database Utilities for Flyte Tasks
 
-RADIANT v5.0.2 - System Evolution
+RADIANT v5.0.3 - System Evolution
 
 Provides RLS-safe database connections with automatic pgvector registration.
 All Flyte tasks should use get_safe_db_connection() for database access.
@@ -33,7 +33,32 @@ except ImportError:
 _connection_pool: Optional[pool.ThreadedConnectionPool] = None
 
 # System tenant ID for maintenance operations
-SYSTEM_TENANT_ID = '00000000-0000-0000-0000-000000000000'
+# Configurable via environment variable to avoid hardcoded "magic UUID" security smell
+# In production, set SYSTEM_MAINTENANCE_TENANT_ID to a dedicated maintenance tenant
+_DEFAULT_SYSTEM_TENANT = '00000000-0000-0000-0000-000000000000'
+SYSTEM_TENANT_ID = os.environ.get('SYSTEM_MAINTENANCE_TENANT_ID', _DEFAULT_SYSTEM_TENANT)
+
+
+def _validate_system_tenant_config() -> None:
+    """
+    Validates system tenant configuration.
+    Logs a warning if using default system tenant in production.
+    
+    This check runs once on module load to alert operators if they've
+    forgotten to configure the maintenance tenant ID.
+    """
+    if SYSTEM_TENANT_ID == _DEFAULT_SYSTEM_TENANT:
+        env = os.environ.get('RADIANT_ENV', 'development')
+        if env == 'production':
+            print(
+                "WARNING: Using default SYSTEM_MAINTENANCE_TENANT_ID in production. "
+                "Consider setting SYSTEM_MAINTENANCE_TENANT_ID environment variable "
+                "to a dedicated maintenance tenant for better audit trails."
+            )
+
+
+# Run validation on module load
+_validate_system_tenant_config()
 
 
 def _get_pool() -> pool.ThreadedConnectionPool:

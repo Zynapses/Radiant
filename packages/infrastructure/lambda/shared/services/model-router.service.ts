@@ -1,8 +1,10 @@
-// RADIANT v4.18.0 - Hybrid Model Router Service
+// RADIANT v5.2.1 - Hybrid Model Router Service
 // Primary: AWS Bedrock | Fallback: LiteLLM | Specialized: Direct APIs
 // State is persisted to database for Lambda cold start resilience
+// Now with resilience patterns: circuit breaker, retry, timeout
 
 import { BedrockRuntimeClient, InvokeModelCommand, InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
+import { callWithResilience, isProviderHealthy, CircuitOpenError } from './resilient-provider.service';
 import { executeStatement } from '../db/client';
 import { checkProviderRateLimit, getProviderRateLimitStatus, PROVIDER_RATE_LIMITS } from '../middleware/rate-limiter';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
@@ -494,12 +496,21 @@ export class ModelRouterService {
       messages: messages.map(m => ({ role: m.role === 'system' ? 'user' : m.role, content: m.content })),
     };
 
-    const response = await this.bedrock.send(
-      new InvokeModelCommand({
-        modelId: config.bedrockModelId,
-        body: JSON.stringify(body),
-        contentType: 'application/json',
-      })
+    // Wrap Bedrock call with resilience (circuit breaker, retry, timeout)
+    const response = await callWithResilience(
+      () => this.bedrock.send(
+        new InvokeModelCommand({
+          modelId: config.bedrockModelId,
+          body: JSON.stringify(body),
+          contentType: 'application/json',
+        })
+      ),
+      {
+        provider: 'bedrock',
+        operation: 'chat',
+        timeoutMs: 90000, // Bedrock can be slow for large models
+        maxRetries: 2,
+      }
     );
 
     const result = JSON.parse(new TextDecoder().decode(response.body));
@@ -530,24 +541,36 @@ export class ModelRouterService {
       ? [{ role: 'system', content: request.systemPrompt }, ...request.messages]
       : request.messages;
 
-    const response = await fetch(`${this.litellmBaseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.LITELLM_API_KEY || 'sk-litellm'}`,
-      },
-      body: JSON.stringify({
-        model: config.litellmModelId,
-        messages,
-        max_tokens: request.maxTokens || config.maxTokens,
-        temperature: request.temperature ?? 0.7,
-      }),
-    });
+    // Wrap LiteLLM call with resilience
+    const response = await callWithResilience(
+      async () => {
+        const resp = await fetch(`${this.litellmBaseUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.LITELLM_API_KEY || 'sk-litellm'}`,
+          },
+          body: JSON.stringify({
+            model: config.litellmModelId,
+            messages,
+            max_tokens: request.maxTokens || config.maxTokens,
+            temperature: request.temperature ?? 0.7,
+          }),
+        });
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`LiteLLM error: ${response.status} ${error}`);
-    }
+        if (!resp.ok) {
+          const error = await resp.text();
+          throw new Error(`LiteLLM error: ${resp.status} ${error}`);
+        }
+        return resp;
+      },
+      {
+        provider: 'litellm',
+        operation: 'chat',
+        timeoutMs: 60000,
+        maxRetries: 3,
+      }
+    );
 
     const result = await response.json() as OpenAICompatibleResponse;
     const content = result.choices?.[0]?.message?.content || '';
@@ -585,24 +608,40 @@ export class ModelRouterService {
     // Map model ID to provider-specific format
     const modelName = this.getDirectModelName(config);
 
-    const response = await fetch(config.directEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: modelName,
-        messages,
-        max_tokens: request.maxTokens || config.maxTokens,
-        temperature: request.temperature ?? 0.7,
-      }),
-    });
+    // Provider-specific timeout (Groq is fast, Perplexity does search)
+    const timeoutMs = config.provider === 'groq' ? 30000 : 
+                      config.provider === 'perplexity' ? 120000 : 60000;
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`${config.provider} error: ${response.status} ${error}`);
-    }
+    // Wrap direct API call with resilience
+    const response = await callWithResilience(
+      async () => {
+        const resp = await fetch(config.directEndpoint!, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model: modelName,
+            messages,
+            max_tokens: request.maxTokens || config.maxTokens,
+            temperature: request.temperature ?? 0.7,
+          }),
+        });
+
+        if (!resp.ok) {
+          const error = await resp.text();
+          throw new Error(`${config.provider} error: ${resp.status} ${error}`);
+        }
+        return resp;
+      },
+      {
+        provider: config.provider,
+        operation: 'chat',
+        timeoutMs,
+        maxRetries: 3,
+      }
+    );
 
     const result = await response.json() as OpenAICompatibleResponse;
     const content = result.choices?.[0]?.message?.content || '';
