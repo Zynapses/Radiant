@@ -14649,10 +14649,241 @@ Version 5.0 transforms RADIANT from a stateless request-response system into a s
 
 ---
 
+## 52. Semantic Blackboard & Multi-Agent Orchestration (NEW in v5.3.0)
+
+### 52.1 Overview
+
+The Semantic Blackboard architecture solves the "Thundering Herd" problem where multiple AI agents spam users with redundant questions. It implements MCP (Model Context Protocol) as the primary interface with API fallback.
+
+**Key Problems Solved:**
+- Multiple agents asking the same question (semantic deduplication)
+- Race conditions on shared resources
+- Circular dependencies causing deadlocks
+- Wasted compute while waiting for user input
+
+### 52.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     SEMANTIC BLACKBOARD ARCHITECTURE                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐     │
+│  │   Radiant   │   │ Think Tank  │   │    Cato     │   │  Artifact   │     │
+│  │   Agent     │   │   Agent     │   │   Agent     │   │   Engine    │     │
+│  └──────┬──────┘   └──────┬──────┘   └──────┬──────┘   └──────┬──────┘     │
+│         │                 │                 │                 │             │
+│         └─────────────────┼─────────────────┼─────────────────┘             │
+│                           │                 │                               │
+│                           ▼                 ▼                               │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │                       MCP ORCHESTRATOR                                 │ │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │ │
+│  │  │  ask_user   │  │  acquire_   │  │  declare_   │  │  hydrate_   │  │ │
+│  │  │    tool     │  │  resource   │  │ dependency  │  │   state     │  │ │
+│  │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  │ │
+│  └─────────┼────────────────┼────────────────┼────────────────┼──────────┘ │
+│            │                │                │                │             │
+│            ▼                ▼                ▼                ▼             │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │                      SEMANTIC BLACKBOARD                               │ │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │ │
+│  │  │  Resolved   │  │  Resource   │  │   Agent     │  │  Hydration  │  │ │
+│  │  │  Decisions  │  │   Locks     │  │Dependencies │  │  Snapshots  │  │ │
+│  │  │  (Vector)   │  │             │  │             │  │             │  │ │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘  │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                           │                                                 │
+│                           ▼                                                 │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │                    MISSION CONTROL SIDEBAR                             │ │
+│  │  ┌─────────────────────────────────────────────────────────────────┐  │ │
+│  │  │  Decision Cards  │  Question Groups  │  Facts Tab  │  Agents   │  │ │
+│  │  └─────────────────────────────────────────────────────────────────┘  │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 52.3 Core Components
+
+#### 52.3.1 Semantic Blackboard (Question Matching)
+
+When an agent asks a question via `ask_user`, the system:
+1. Generates a vector embedding of the question
+2. Searches `resolved_decisions` for semantically similar questions
+3. If match found (similarity ≥ 85%): auto-reply with cached answer
+4. If no match: queue for user input
+
+**Example:**
+- Agent A asks: "What is the maximum budget?"
+- Agent B asks: "What's the spending limit?"
+- Semantic similarity: 0.92 → B gets A's answer automatically
+
+#### 52.3.2 Question Grouping (Fan-Out)
+
+Similar questions within the grouping window are combined:
+1. First question creates a group
+2. Similar questions join the group
+3. User answers once
+4. Answer fans out to all waiting agents
+
+**UI Display:** Single card shows "Budget question (3 agents waiting)"
+
+#### 52.3.3 Process Hydration (State Serialization)
+
+When waiting for user input:
+1. Agent serializes state to `hydration_snapshots`
+2. Process can be killed (no CPU/memory cost)
+3. When user responds, state is restored
+4. Agent resumes from `resume_point`
+
+**Storage:** Small states in PostgreSQL, large states in S3 (with compression)
+
+#### 52.3.4 Cycle Detection (Deadlock Prevention)
+
+Before creating a dependency:
+1. BFS traversal checks for circular path
+2. If cycle detected: creates "Intervention Needed" card
+3. User manually provides data to break the cycle
+
+#### 52.3.5 Resource Locking
+
+Prevents race conditions:
+1. Agent declares intent via `acquire_resource`
+2. If available: lock granted with timeout
+3. If locked: agent joins wait queue
+4. On release: next agent in queue is notified
+
+### 52.4 MCP Tools
+
+| Tool | Purpose | Schema |
+|------|---------|--------|
+| `ask_user` | Request input with semantic cache | `{question, context, urgency, topic, options, defaultValue, timeoutSeconds}` |
+| `acquire_resource` | Get resource lock | `{resourceUri, lockType, timeoutSeconds, waitIfLocked}` |
+| `release_resource` | Release lock | `{lockId}` |
+| `declare_dependency` | Declare agent dependency | `{dependencyAgentId, dependencyType, waitKey, timeoutSeconds}` |
+| `satisfy_dependency` | Satisfy waiting agent | `{dependentAgentId, waitKey, value}` |
+| `hydrate_state` | Serialize state | `{checkpointName, state, resumePoint}` |
+| `restore_state` | Restore from checkpoint | `{checkpointName}` |
+
+### 52.5 Database Schema
+
+**Migration:** `158_semantic_blackboard_orchestration.sql`
+
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `resolved_decisions` | Semantic question cache | `question_embedding`, `answer`, `times_reused` |
+| `agent_registry` | Active agent tracking | `status`, `is_hydrated`, `blocked_by_*` |
+| `agent_dependencies` | Inter-agent dependencies | `dependency_type`, `wait_key`, `status` |
+| `resource_locks` | Shared resource locks | `resource_uri`, `lock_type`, `wait_queue` |
+| `question_groups` | Grouped similar questions | `canonical_question`, `question_embedding` |
+| `question_group_members` | Group membership | `similarity_score`, `answer_delivered` |
+| `hydration_snapshots` | Serialized agent state | `state_data`, `s3_key`, `resume_point` |
+| `blackboard_events` | Audit trail | `event_type`, `details` |
+| `blackboard_config` | Per-tenant configuration | All settings |
+
+### 52.6 Admin API
+
+**Base Path:** `/api/admin/blackboard`
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/dashboard` | GET | Complete dashboard data |
+| `/decisions` | GET | List resolved decisions (Facts) |
+| `/decisions/:id/invalidate` | POST | Revoke/edit a fact |
+| `/groups` | GET | List pending question groups |
+| `/groups/:id/answer` | POST | Answer a group |
+| `/agents` | GET | List active agents |
+| `/agents/:id` | GET | Get agent details |
+| `/agents/:id/snapshots` | GET | List hydration snapshots |
+| `/agents/:id/restore` | POST | Restore agent from snapshot |
+| `/locks` | GET | List active resource locks |
+| `/locks/:id/release` | POST | Force release a lock |
+| `/config` | GET/PUT | Get/update configuration |
+| `/events` | GET | Audit log |
+| `/cleanup` | POST | Run cleanup job |
+
+### 52.7 Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `similarity_threshold` | 0.85 | Minimum cosine similarity for question matching |
+| `embedding_model` | `text-embedding-ada-002` | Model for question embeddings |
+| `enable_question_grouping` | true | Group similar questions |
+| `grouping_window_seconds` | 60 | Window to collect similar questions |
+| `max_group_size` | 10 | Maximum agents per group |
+| `enable_answer_reuse` | true | Reuse cached answers |
+| `answer_ttl_seconds` | 3600 | How long answers remain valid |
+| `max_reuse_count` | 100 | Maximum times to reuse an answer |
+| `default_lock_timeout_seconds` | 300 | Resource lock timeout |
+| `max_lock_wait_seconds` | 60 | Maximum time to wait for lock |
+| `enable_auto_hydration` | true | Auto-serialize on user block |
+| `hydration_threshold_seconds` | 300 | Wait time before hydrating |
+| `max_hydration_size_mb` | 50 | Maximum state size |
+| `enable_cycle_detection` | true | Detect circular dependencies |
+
+### 52.8 Facts Panel (Revoke Protocol)
+
+The Facts Panel allows administrators to manage resolved decisions:
+
+**View Facts:**
+- All answered questions with answers
+- Filter by topic, validity, source
+- Search by question or answer text
+
+**Edit Fact:**
+1. Click Edit on a fact
+2. Provide new answer and reason
+3. System invalidates old answer
+4. Creates new resolved decision
+5. Notifies affected agents via Redis pub/sub
+
+**Invalidate (Revoke) Fact:**
+1. Click Invalidate on a fact
+2. Provide invalidation reason
+3. Fact marked as invalid (not deleted)
+4. Agents that received this answer are notified
+5. Agents must re-request if they need this data
+
+### 52.9 Key Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/semantic-blackboard.service.ts` | Core blackboard logic |
+| `lambda/shared/services/agent-orchestrator.service.ts` | Cycle detection, locking |
+| `lambda/shared/services/process-hydration.service.ts` | State serialization |
+| `lambda/admin/blackboard.ts` | Admin API handler |
+| `lambda/consciousness/mcp-server.ts` | MCP tool definitions |
+| `components/decisions/FactsPanel.tsx` | Facts UI with edit/revoke |
+| `components/decisions/DecisionSidebar.tsx` | Decision cards |
+| `migrations/158_semantic_blackboard_orchestration.sql` | Database schema |
+
+### 52.10 Environment Variables
+
+| Variable | Purpose | Default |
+|----------|---------|---------|
+| `HYDRATION_S3_BUCKET` | S3 bucket for large state snapshots | - |
+| `BLACKBOARD_REDIS_ENDPOINT` | Redis for pub/sub notifications | - |
+
+### 52.11 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| No semantic matches | Similarity threshold too high | Lower `similarity_threshold` to 0.80 |
+| Questions not grouping | Window too short | Increase `grouping_window_seconds` |
+| Hydration fails | State too large | Enable S3 storage, increase `max_hydration_size_mb` |
+| Cycle not detected | Detection disabled | Enable `enable_cycle_detection` |
+| Lock timeout | Holder agent crashed | Run `/cleanup` endpoint |
+| Stale answers | TTL too long | Reduce `answer_ttl_seconds` |
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| **5.3.0** | 2026-01-10 | Semantic Blackboard; Multi-Agent Orchestration; MCP Primary Interface; Process Hydration; Cycle Detection |
 | **5.0.2** | 2026-01-08 | The Grimoire (procedural memory); Economic Governor (cost optimization); Self-optimizing architecture |
 | 4.20.3 | 2026-01-08 | Mission Control GA; MCP Hybrid Interface; Domain Risk Policies |
 | 4.20.2 | 2026-01-07 | Fixed RLS tenant bleed |
