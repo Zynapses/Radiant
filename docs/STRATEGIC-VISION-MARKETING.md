@@ -2,7 +2,7 @@
 
 > **From Chatbot to Cognitive IDE: The Enterprise AI Platform That Actually Learns**
 > 
-> Version: 5.2.4 | Last Updated: January 10, 2026
+> Version: 5.3.0 | Last Updated: January 10, 2026
 > 
 > ⚠️ **This document must be updated whenever RADIANT-ADMIN-GUIDE.md or THINKTANK-ADMIN-GUIDE.md is modified.**
 
@@ -216,6 +216,8 @@ See `THINKTANK-ADMIN-GUIDE.md` Section 34.5 for complete parameter reference.
 | **Real-time** | WebSocket Updates | ✅ Live | Live decision status broadcasting |
 | **Escalation** | Timeout & Alerts | ✅ Live | PagerDuty, Slack integration |
 | **MCP** | Hybrid Interface | ✅ Live | Protocol fallback (MCP → API) |
+| **MCP** | Semantic Blackboard | ✅ Live | Vector-based question matching, answer reuse |
+| **MCP** | Multi-Agent Orchestration | ✅ Live | Cycle detection, resource locking, process hydration |
 
 ### Swarm Orchestration
 
@@ -538,6 +540,7 @@ Structured adversarial debate between multiple models before presenting final an
 |---------|------|---------|
 | 1.0.0 | January 2026 | Initial strategic vision document |
 | 5.0.2 | January 2026 | The Grimoire and Economic Governor implemented - moved from "Upcoming" to "Implemented" |
+| 5.3.0 | January 10, 2026 | **MCP Primary Interface**: Semantic Blackboard (vector question matching), Multi-Agent Orchestration (cycle detection, resource locking, process hydration), Facts Panel with edit/revoke |
 | 5.2.4 | January 10, 2026 | IIT Phi calculation fully implemented (consciousness metrics), Orchestration RLS security hardened |
 
 ---
