@@ -5,6 +5,92 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.3.0] - 2026-01-10
+
+### Added
+
+#### Semantic Blackboard & Multi-Agent Orchestration (MCP Primary Interface)
+
+Complete implementation of the multi-agent orchestration architecture with MCP as primary interface and API fallback. Prevents "Thundering Herd" problem where multiple agents spam users with redundant questions.
+
+**Core Components:**
+
+1. **Semantic Blackboard** - Vector DB for question matching/reuse
+   - Questions are embedded and stored with answers
+   - Similarity search (default 85% threshold) finds semantically equivalent questions
+   - Auto-reply to agents with cached answers (source: `memory`)
+   - Configurable TTL and reuse limits
+
+2. **Question Grouping** - Fan-out answers to multiple agents
+   - Similar questions within grouping window (60s) are grouped
+   - Single user answer fans out to all waiting agents
+   - Card-based UI shows grouped questions and affected agents
+
+3. **Process Hydration** - State serialization on user block
+   - Agents serialize state before waiting for user input
+   - Processes can be killed to free resources
+   - State restored when user responds (S3 or DB storage)
+   - Compression for large states (>10KB)
+
+4. **Cycle Detection** - Deadlock prevention
+   - BFS algorithm detects circular dependencies before creation
+   - Creates "Intervention Needed" card in Mission Control
+   - Prevents infinite waits between agents
+
+5. **Resource Locking** - Race condition prevention
+   - Agents acquire locks before accessing shared resources
+   - Wait queue for blocked agents
+   - Automatic timeout and cleanup
+
+**MCP Tools Added:**
+- `ask_user` - Request input with semantic cache lookup
+- `acquire_resource` / `release_resource` - Resource locking
+- `declare_dependency` / `satisfy_dependency` - Inter-agent coordination
+- `hydrate_state` / `restore_state` - Process hydration
+
+**Database Migration:** `158_semantic_blackboard_orchestration.sql`
+- 9 new tables with RLS policies
+- Vector embeddings for semantic search
+- Helper functions for cycle detection and lock management
+
+**Admin API Endpoints (Base: /api/admin/blackboard):**
+- `GET /dashboard` - Complete dashboard data
+- `GET/POST /decisions` - Resolved decisions (Facts tab)
+- `POST /decisions/:id/invalidate` - Revoke/edit facts
+- `GET /groups`, `POST /groups/:id/answer` - Question groups
+- `GET /agents`, `GET /agents/:id` - Agent registry
+- `GET /agents/:id/snapshots`, `POST /agents/:id/restore` - Hydration
+- `GET /locks`, `POST /locks/:id/release` - Resource locks
+- `GET/PUT /config` - Configuration
+- `GET /events` - Audit log
+- `POST /cleanup` - Expired resource cleanup
+
+**Admin UI:**
+- Facts Panel with edit/invalidate (revoke) functionality
+- Toast notifications when answers are shared
+- Visual feedback for grouped questions
+
+**Key Files:**
+- `lambda/shared/services/semantic-blackboard.service.ts` - Core blackboard logic
+- `lambda/shared/services/agent-orchestrator.service.ts` - Cycle detection, locking
+- `lambda/shared/services/process-hydration.service.ts` - State serialization
+- `lambda/admin/blackboard.ts` - Admin API handler
+- `lambda/consciousness/mcp-server.ts` - MCP tool definitions
+- `components/decisions/FactsPanel.tsx` - Facts UI with edit/revoke
+
+**Configuration (blackboard_config table):**
+| Setting | Default | Description |
+|---------|---------|-------------|
+| similarity_threshold | 0.85 | Minimum similarity for question matching |
+| enable_question_grouping | true | Group similar questions |
+| grouping_window_seconds | 60 | Window to wait for similar questions |
+| enable_answer_reuse | true | Reuse cached answers |
+| answer_ttl_seconds | 3600 | How long answers are valid |
+| enable_auto_hydration | true | Auto-serialize state on user block |
+| enable_cycle_detection | true | Detect circular dependencies |
+
+---
+
 ## [5.2.4] - 2026-01-10
 
 ### Added

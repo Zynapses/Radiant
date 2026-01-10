@@ -46,6 +46,105 @@ interface MCPTool {
 }
 
 const CONSCIOUSNESS_TOOLS: MCPTool[] = [
+  // ============================================================================
+  // User Interaction Tools (Semantic Blackboard)
+  // ============================================================================
+  {
+    name: 'ask_user',
+    description: 'Request input from the user. Uses Semantic Blackboard to check if a similar question was already answered. If found, returns cached answer. Otherwise, queues question for user.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        question: { type: 'string', description: 'The question to ask the user' },
+        context: { type: 'string', description: 'Why this information is needed' },
+        urgency: { type: 'string', description: 'Urgency level: low, normal, high, critical' },
+        topic: { type: 'string', description: 'Topic tag for grouping similar questions (e.g., budget, timeline, scope)' },
+        options: { type: 'string', description: 'JSON array of predefined answer options, if applicable' },
+        defaultValue: { type: 'string', description: 'Default value if user does not respond' },
+        timeoutSeconds: { type: 'number', description: 'Timeout in seconds before using default (default: 300)' },
+      },
+      required: ['question', 'context'],
+    },
+  },
+  {
+    name: 'acquire_resource',
+    description: 'Acquire a lock on a shared resource to prevent race conditions with other agents',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        resourceUri: { type: 'string', description: 'Resource URI (e.g., file:/path, db:table:id)' },
+        lockType: { type: 'string', description: 'Lock type: read, write, exclusive' },
+        timeoutSeconds: { type: 'number', description: 'Lock timeout in seconds (default: 300)' },
+        waitIfLocked: { type: 'boolean', description: 'Wait in queue if resource is locked (default: true)' },
+      },
+      required: ['resourceUri', 'lockType'],
+    },
+  },
+  {
+    name: 'release_resource',
+    description: 'Release a previously acquired resource lock',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        lockId: { type: 'string', description: 'Lock ID returned from acquire_resource' },
+      },
+      required: ['lockId'],
+    },
+  },
+  {
+    name: 'declare_dependency',
+    description: 'Declare that this agent depends on another agent for data or approval',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        dependencyAgentId: { type: 'string', description: 'Agent ID this agent depends on' },
+        dependencyType: { type: 'string', description: 'Type: data, approval, resource, sequence' },
+        waitKey: { type: 'string', description: 'Key identifying what is being waited for' },
+        timeoutSeconds: { type: 'number', description: 'Timeout in seconds (default: 3600)' },
+      },
+      required: ['dependencyAgentId', 'dependencyType', 'waitKey'],
+    },
+  },
+  {
+    name: 'satisfy_dependency',
+    description: 'Satisfy a dependency that another agent is waiting for',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        dependentAgentId: { type: 'string', description: 'Agent ID that is waiting' },
+        waitKey: { type: 'string', description: 'Key of the dependency to satisfy' },
+        value: { type: 'string', description: 'JSON value to provide' },
+      },
+      required: ['dependentAgentId', 'waitKey', 'value'],
+    },
+  },
+  {
+    name: 'hydrate_state',
+    description: 'Serialize current agent state for later resumption (used when waiting for user input)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        checkpointName: { type: 'string', description: 'Name for this checkpoint' },
+        state: { type: 'string', description: 'JSON state to serialize' },
+        resumePoint: { type: 'string', description: 'Where to resume from' },
+      },
+      required: ['checkpointName', 'state'],
+    },
+  },
+  {
+    name: 'restore_state',
+    description: 'Restore agent state from a previous hydration checkpoint',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        checkpointName: { type: 'string', description: 'Name of checkpoint to restore' },
+      },
+      required: ['checkpointName'],
+    },
+  },
+  // ============================================================================
+  // Consciousness Identity Tools
+  // ============================================================================
   {
     name: 'initialize_ego',
     description: 'Initialize the AI ego with identity parameters (name, values, purpose)',
