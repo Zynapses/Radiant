@@ -2,7 +2,7 @@
 
 > **From Chatbot to Cognitive IDE: The Enterprise AI Platform That Actually Learns**
 > 
-> Version: 5.0.2 | Last Updated: January 2026
+> Version: 5.2.4 | Last Updated: January 10, 2026
 > 
 > ⚠️ **This document must be updated whenever RADIANT-ADMIN-GUIDE.md or THINKTANK-ADMIN-GUIDE.md is modified.**
 
@@ -155,6 +155,58 @@ The **Council of Rivals** provides the audit trail and safety checks required by
 | **Safety** | Ethics Frameworks | ✅ Live | Externalized ethics (Christian, Secular presets) |
 | **GenUI** | Artifact Engine | ✅ Live | Real-time code generation with Reflexion loop |
 | **Collaboration** | Canvas & Artifacts | ✅ Live | Shared workspaces, version history |
+| **Orchestration** | 70+ Workflow Methods | ✅ Live | Complete method registry with display/scientific names |
+| **User Templates** | Workflow Templates | ✅ Live | User-customizable workflows with parameter overrides |
+| **Neural Decision** | Cato Neural Engine | ✅ Live | Affect-to-hyperparameter mapping, active inference |
+
+### Orchestration Workflow Methods (Updated Jan 2026)
+
+**20 fully-implemented scientific algorithms** with no fallbacks or stubs:
+
+| Category | Methods | Key Capabilities |
+|----------|---------|-----------------|
+| **Generation** | 3 | Chain-of-Thought (+20-40% accuracy), Iterative Refinement |
+| **Evaluation** | 6 | Multi-Judge Panel (PoLL), G-Eval Scoring, Pairwise Preference |
+| **Synthesis** | 5 | Mixture of Agents (+8% over GPT-4o), LLM-Blender Fusion (+12%) |
+| **Verification** | 8 | Process Reward Model (+6% MATH), SelfCheckGPT (+25% F1), CiteFix |
+| **Debate** | 5 | Sparse Debate (-40-60% cost), ArgLLMs Bipolar, HAH-Delphi (>90%) |
+| **Aggregation** | 4 | Self-Consistency (+17.9% GSM8K), GEDI Electoral (+30% consensus) |
+| **Routing** | 7 | RouteLLM, FrugalGPT, **Pareto Routing**, **C3PO Cascade**, **AutoMix POMDP** |
+| **Collaboration** | 5 | ECON Nash (+11.2%), Logic-LM (+39.2%), AFlow MCTS Discovery |
+| **Uncertainty** | 6 | Semantic Entropy, **SE Probes (logprob-based)**, **Kernel Entropy (embedding KDE)**, Conformal Prediction |
+| **Hallucination** | 3 | Multi-Method Detection (F1 0.85+), MetaQA Metamorphic |
+| **Human-in-Loop** | 3 | HITL Review (+90% error prevention), Active Learning (+60%) |
+| **Neural** | 1 | Cato Neural Decision Engine (safety + consciousness integration) |
+
+**New Implementations (Jan 2026)**:
+- **SE Probes**: ICML 2024 - Logprob-based entropy estimation (300x faster than sampling)
+- **Kernel Entropy**: NeurIPS 2024 - Embedding KDE for fine-grained uncertainty
+- **Pareto Routing**: Multi-objective model selection on quality/latency/cost frontier
+- **C3PO Cascade**: Self-supervised difficulty prediction with tiered escalation
+- **AutoMix POMDP**: Belief-state model selection with ε-greedy exploration
+
+**System vs User Methods**: All 70+ built-in methods are protected as "system" methods—admins can only modify parameters, not definitions. Future releases will support user-created custom methods.
+
+**User Workflow Templates**: Users can create, customize, and share their own workflow templates with custom method parameters. Templates are saved per-user and can be shared with the team.
+
+#### Configurable Parameters (Admin & User Level)
+
+Every orchestration method exposes configurable parameters:
+
+| Level | Where | What Can Be Set |
+|-------|-------|-----------------|
+| **Admin (Defaults)** | `Admin Dashboard → Orchestration → Methods` | Default parameters for all tenants |
+| **User (Overrides)** | `Think Tank → Workflow Templates` | Per-template parameter overrides |
+
+**Example Parameters by Category**:
+- **Uncertainty**: `sample_count`, `threshold`, `kernel`, `bandwidth`, `fast_mode`
+- **Routing**: `budget_cents`, `quality_weight`, `confidence_threshold`, `cascade_levels`
+- **Debate**: `debate_rounds`, `topology`, `consensus_target`, `max_rounds`
+- **Evaluation**: `num_judges`, `scoring_criteria`, `dimensions`, `use_cot`
+- **Hallucination**: `methods`, `flag_threshold`, `transformations`
+- **Human-in-Loop**: `confidence_threshold`, `stake_level`, `auto_approve_above`
+
+See `THINKTANK-ADMIN-GUIDE.md` Section 34.5 for complete parameter reference.
 
 ### Mission Control (Human-in-the-Loop)
 
@@ -486,6 +538,7 @@ Structured adversarial debate between multiple models before presenting final an
 |---------|------|---------|
 | 1.0.0 | January 2026 | Initial strategic vision document |
 | 5.0.2 | January 2026 | The Grimoire and Economic Governor implemented - moved from "Upcoming" to "Implemented" |
+| 5.2.4 | January 10, 2026 | IIT Phi calculation fully implemented (consciousness metrics), Orchestration RLS security hardened |
 
 ---
 

@@ -5,6 +5,7 @@
  */
 
 import { Handler } from 'aws-lambda';
+import { logger } from '../shared/logging/enhanced-logger';
 import { 
   SageMakerClient, 
   CreateEndpointCommand,
@@ -57,7 +58,7 @@ const TIER_CONFIGS: Record<string, {
 };
 
 export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) => {
-  console.log('Provisioning SageMaker:', JSON.stringify(event));
+  logger.info('Provisioning SageMaker:', { event });
 
   const { tenantId, toTier } = event;
   const config = TIER_CONFIGS[toTier];
@@ -74,7 +75,7 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
     return result;
   }
 
-  const endpointName = `bobble-shadow-self-${tenantId.substring(0, 8)}`;
+  const endpointName = `cato-shadow-self-${tenantId.substring(0, 8)}`;
   const endpointConfigName = `${endpointName}-config`;
 
   try {
@@ -85,7 +86,7 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
       }));
 
       // Endpoint exists - update scaling
-      console.log(`Endpoint ${endpointName} exists, updating scaling...`);
+      logger.info(`Endpoint ${endpointName} exists, updating scaling...`);
       
       await sagemaker.send(new UpdateEndpointWeightsAndCapacitiesCommand({
         EndpointName: endpointName,
@@ -96,19 +97,19 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
       }));
 
       result.resources.push(`Updated endpoint: ${endpointName}`);
-      console.log('Endpoint updated successfully');
+      logger.info('Endpoint updated successfully');
 
     } catch (error: any) {
       if (error.name === 'ResourceNotFound' || error.name === 'ValidationException') {
         // Endpoint doesn't exist - create it
-        console.log(`Creating new endpoint: ${endpointName}`);
+        logger.info(`Creating new endpoint: ${endpointName}`);
 
         // Create endpoint config
         await sagemaker.send(new CreateEndpointConfigCommand({
           EndpointConfigName: endpointConfigName,
           ProductionVariants: [{
             VariantName: 'AllTraffic',
-            ModelName: 'bobble-shadow-self-model',
+            ModelName: 'cato-shadow-self-model',
             InstanceType: config.instanceType as any,
             InitialInstanceCount: config.minInstances || 1,
             InitialVariantWeight: 1.0
@@ -123,14 +124,14 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
         }));
         result.resources.push(`Created endpoint: ${endpointName}`);
 
-        console.log('Endpoint creation initiated');
+        logger.info('Endpoint creation initiated');
       } else {
         throw error;
       }
     }
 
   } catch (error: any) {
-    console.error('SageMaker provisioning error:', error);
+    logger.error('SageMaker provisioning error:', error);
     result.status = 'FAILED';
     result.errors.push(error.message);
   }

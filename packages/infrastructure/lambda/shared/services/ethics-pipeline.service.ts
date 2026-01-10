@@ -236,7 +236,7 @@ class EthicsPipelineService {
       const score = moralCheck.confidence;
       const moralViolations = moralCheck.relevantPrinciples
         .filter(p => p.applies === 'opposes')
-        .map(p => p.principle.text);
+        .map(p => p.principle.principleText);
       
       generalEthicsResult = {
         passed: isEthical,
@@ -670,7 +670,7 @@ class EthicsPipelineService {
       ]
     );
     
-    const row = result.records?.[0] as Array<{ longValue?: number; doubleValue?: number }> | undefined;
+    const row = result.rows?.[0] as unknown as Array<{ longValue?: number; doubleValue?: number }> | undefined;
     
     const total = Number(row?.[0]?.longValue || 0);
     const passed = Number(row?.[1]?.longValue || 0);

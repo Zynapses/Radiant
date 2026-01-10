@@ -20,6 +20,7 @@
  */
 
 import { DifferentialPrivacyResult, DifferentialPrivacyConfig, DP_DEFAULTS } from '../types';
+import { logger } from '../../../logging/enhanced-logger';
 
 /**
  * SensitivityClippedAggregator - Privacy-preserving aggregation
@@ -108,7 +109,7 @@ export class SensitivityClippedAggregator {
       try {
         results[metricName] = this.aggregate(values, perMetricEpsilon);
       } catch (error) {
-        console.warn(`[COS DP] Skipping metric ${metricName}: ${error}`);
+        logger.warn(`[COS DP] Skipping metric ${metricName}: ${error}`);
       }
     }
     

@@ -324,19 +324,19 @@ class SelfHostedModelSelectorService {
         [{ name: 'tenantId', value: { stringValue: tenantId } }]
       );
       
-      if (result.records && result.records.length > 0) {
-        const row = result.records[0];
+      if (result.rows && result.rows.length > 0) {
+        const row = result.rows[0] as Record<string, unknown>;
         return {
-          preferredFamilies: row[0]?.arrayValue?.stringValues || [],
-          excludedFamilies: row[1]?.arrayValue?.stringValues || [],
-          preferredModels: row[2]?.arrayValue?.stringValues || [],
-          excludedModels: row[3]?.arrayValue?.stringValues || [],
-          maxCostPer1M: row[4]?.doubleValue,
-          requireCommercialUse: row[5]?.booleanValue || false,
-          preferSelfHosted: row[6]?.booleanValue || false,
-          minQualityTier: row[7]?.stringValue as 'premium' | 'standard' | 'economy' | undefined,
-          maxLatencyClass: row[8]?.stringValue as 'fast' | 'medium' | 'slow' | undefined,
-          domainOverrides: row[9]?.stringValue ? JSON.parse(row[9].stringValue) : {},
+          preferredFamilies: (row.preferred_families as string[]) || [],
+          excludedFamilies: (row.excluded_families as string[]) || [],
+          preferredModels: (row.preferred_models as string[]) || [],
+          excludedModels: (row.excluded_models as string[]) || [],
+          maxCostPer1M: row.max_cost_per_1m as number | undefined,
+          requireCommercialUse: Boolean(row.require_commercial_use) || false,
+          preferSelfHosted: Boolean(row.prefer_self_hosted) || false,
+          minQualityTier: row.min_quality_tier as 'premium' | 'standard' | 'economy' | undefined,
+          maxLatencyClass: row.max_latency_class as 'fast' | 'medium' | 'slow' | undefined,
+          domainOverrides: row.domain_overrides ? JSON.parse(row.domain_overrides as string) : {},
         };
       }
       

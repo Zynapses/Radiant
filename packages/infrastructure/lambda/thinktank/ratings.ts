@@ -154,7 +154,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       
       // Calculate summary
       const values = ratings.map(r => r.value);
-      const avgRating = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+      const avgRating = values.length > 0 ? values.reduce((a: number, b: number) => a + b, 0) / values.length : 0;
       const positiveCount = values.filter(v => v > 0).length;
       const negativeCount = values.filter(v => v < 0).length;
       

@@ -850,7 +850,7 @@ export class LearningInfluenceService {
       startedAt: row.started_at as string,
       completedAt: row.completed_at as string | undefined,
       success: row.success as boolean | undefined,
-      recordsRecovered: row.records_recovered as number | undefined,
+      recordsRecovered: row.rows_recovered as number | undefined,
       timeToRecoverMs: row.time_to_recover_ms as number | undefined,
       errorMessage: row.error_message as string | undefined,
       errorDetails: row.error_details as Record<string, unknown> | undefined,

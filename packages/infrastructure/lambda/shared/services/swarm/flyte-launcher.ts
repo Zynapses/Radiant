@@ -155,7 +155,7 @@ export class FlyteLauncher {
       throw new Error(`Flyte launch failed: ${response.status} - ${errorText}`);
     }
 
-    const result = await response.json();
+    const result = await response.json() as Record<string, any>;
     const executionId = result.id?.name || executionName;
 
     this.logger.info('Flyte workflow launched successfully', {
@@ -246,7 +246,7 @@ export class FlyteLauncher {
       throw new Error(`Failed to get execution status: ${response.status} - ${errorText}`);
     }
 
-    const result = await response.json();
+    const result = await response.json() as Record<string, any>;
 
     return {
       executionId,
@@ -314,7 +314,7 @@ export class FlyteLauncher {
       throw new Error(`Failed to list executions: ${response.status} - ${errorText}`);
     }
 
-    const result = await response.json();
+    const result = await response.json() as Record<string, any>;
     const executions: FlyteExecutionStatus[] = [];
 
     for (const exec of result.executions || []) {
@@ -349,7 +349,7 @@ export class FlyteLauncher {
       throw new Error(`Failed to get execution output: ${response.status} - ${errorText}`);
     }
 
-    const result = await response.json();
+    const result = await response.json() as Record<string, unknown>;
     return this.parseFlyteOutputs(result);
   }
 

@@ -5,6 +5,7 @@
  */
 
 import { Handler } from 'aws-lambda';
+import { logger } from '../shared/logging/enhanced-logger';
 import { 
   ElastiCacheClient,
   CreateReplicationGroupCommand,
@@ -58,7 +59,7 @@ const TIER_CONFIGS: Record<string, {
 };
 
 export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) => {
-  console.log('Provisioning ElastiCache:', JSON.stringify(event));
+  logger.info('Provisioning ElastiCache:', { event });
 
   const { tenantId, toTier } = event;
   const config = TIER_CONFIGS[toTier];
@@ -75,7 +76,7 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
     return result;
   }
 
-  const clusterName = `bobble-cache-${tenantId.substring(0, 8)}`;
+  const clusterName = `cato-cache-${tenantId.substring(0, 8)}`;
 
   try {
     if (config.type === 'serverless') {
@@ -90,7 +91,7 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
           await elasticache.send(new CreateServerlessCacheCommand({
             ServerlessCacheName: clusterName,
             Engine: 'valkey',
-            Description: 'Bobble semantic cache',
+            Description: 'Cato semantic cache',
             CacheUsageLimits: {
               ECPUPerSecond: { Maximum: config.maxEcpu }
             }
@@ -118,7 +119,7 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
         if (error.name === 'ReplicationGroupNotFoundFault') {
           await elasticache.send(new CreateReplicationGroupCommand({
             ReplicationGroupId: clusterName,
-            ReplicationGroupDescription: 'Bobble semantic cache cluster',
+            ReplicationGroupDescription: 'Cato semantic cache cluster',
             Engine: 'valkey',
             CacheNodeType: config.nodeType,
             NumCacheClusters: config.numCacheNodes,
@@ -131,7 +132,7 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
       }
     }
   } catch (error: any) {
-    console.error('ElastiCache provisioning error:', error);
+    logger.error('ElastiCache provisioning error:', error);
     result.status = 'FAILED';
     result.errors.push(error.message);
   }

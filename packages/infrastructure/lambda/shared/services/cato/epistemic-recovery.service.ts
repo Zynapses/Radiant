@@ -10,6 +10,7 @@
 
 import { query } from '../database';
 import { catoStateService } from './redis.service';
+import { logger } from '../../logging/enhanced-logger';
 import {
   RecoveryParams,
   RecoveryStrategyType,
@@ -52,7 +53,7 @@ export class EpistemicRecoveryService {
         };
       }
     } catch (error) {
-      console.warn('[CATO Recovery] Failed to load config, using defaults:', error);
+      logger.warn('[CATO Recovery] Failed to load config, using defaults:', { data: error });
     }
   }
 
@@ -313,7 +314,7 @@ INSTRUCTIONS:
    */
   async resetRecovery(sessionId: string): Promise<void> {
     await catoStateService.resetSession(sessionId);
-    console.log(`[CATO] Recovery state reset for session ${sessionId}`);
+    logger.info(`[CATO] Recovery state reset for session ${sessionId}`);
   }
 
   /**

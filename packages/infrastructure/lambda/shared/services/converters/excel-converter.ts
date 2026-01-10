@@ -68,7 +68,7 @@ export async function extractExcelData(
 
     const sheetNames = workbook.SheetNames;
     const sheetsToProcess = sheetsToInclude 
-      ? sheetNames.filter(name => sheetsToInclude.includes(name))
+      ? sheetNames.filter((name: string) => sheetsToInclude.includes(name))
       : maxSheets 
         ? sheetNames.slice(0, maxSheets)
         : sheetNames;

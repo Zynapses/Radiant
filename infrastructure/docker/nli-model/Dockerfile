@@ -1,7 +1,7 @@
-# Bobble NLI Model Container
+# Cato NLI Model Container
 # DeBERTa-large-MNLI for entailment classification
 #
-# See: /docs/bobble/adr/004-nli-entailment.md
+# See: /docs/cato/adr/004-nli-entailment.md
 
 FROM nvidia/cuda:12.1-runtime-ubuntu22.04
 

@@ -5,7 +5,7 @@
  * NAMING CONVENTION:
  * - CATO = The AI persona name users interact with
  * - MOODS = Operating modes (Balanced, Scout, Sage, Spark, Guide)
- * - Default mood is "Balanced" (renamed from "Bobble")
+ * - Default mood is "Balanced" (renamed from "Cato")
  */
 
 import { query } from '../database';
@@ -139,11 +139,13 @@ export class PersonaService {
     }
 
     // Priority 2: API Override (temporary session override)
-    const apiOverride = await this.getApiOverride(tenantId, sessionId);
-    if (apiOverride) {
-      const apiPersona = await this.getPersonaByName(apiOverride);
-      if (apiPersona) {
-        return apiPersona;
+    if (tenantId) {
+      const apiOverride = await this.getApiOverride(tenantId, sessionId);
+      if (apiOverride) {
+        const apiPersona = await this.getPersonaByName(apiOverride);
+        if (apiPersona) {
+          return apiPersona;
+        }
       }
     }
 
@@ -154,7 +156,7 @@ export class PersonaService {
     }
 
     // Priority 4: Tenant Default
-    const tenantDefault = await this.getTenantDefaultPersona(tenantId);
+    const tenantDefault = tenantId ? await this.getTenantDefaultPersona(tenantId) : null;
     if (tenantDefault) {
       return tenantDefault;
     }

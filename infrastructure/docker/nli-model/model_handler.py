@@ -3,7 +3,7 @@ NLI Model Handler - HTTP Server for SageMaker MME
 
 Handles incoming NLI classification requests.
 
-See: /docs/bobble/adr/004-nli-entailment.md
+See: /docs/cato/adr/004-nli-entailment.md
 """
 
 import os

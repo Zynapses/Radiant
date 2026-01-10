@@ -277,9 +277,14 @@ export class BillingService {
   }
 
   async getTransactionHistory(tenantId: string, limit: number = 50): Promise<unknown[]> {
+    // Sanitize limit to prevent SQL injection - must be positive integer, max 1000
+    const safeLimit = Math.min(Math.max(1, Math.floor(limit)), 1000);
     const result = await executeStatement(
-      `SELECT * FROM credit_transactions WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT ${limit}`,
-      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+      `SELECT * FROM credit_transactions WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT $2`,
+      [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'limit', value: { longValue: safeLimit } }
+      ]
     );
     return result.rows;
   }

@@ -265,8 +265,8 @@ class DomainEthicsService {
       []
     );
     
-    for (const row of customResult.records || []) {
-      const data = row[0]?.stringValue;
+    for (const row of customResult.rows || []) {
+      const data = (row as { framework_data?: string }).framework_data;
       if (data) {
         frameworks.push(JSON.parse(data) as DomainEthicsFramework);
       }
@@ -341,7 +341,7 @@ class DomainEthicsService {
       [{ name: 'tenantId', value: { stringValue: tenantId } }]
     );
     
-    if (!result.records || result.records.length === 0) {
+    if (!result.rows || result.rows.length === 0) {
       // Return default config
       return {
         tenantId,
@@ -357,7 +357,7 @@ class DomainEthicsService {
       };
     }
     
-    const row = result.records[0];
+    const row = result.rows[0];
     return this.mapConfigRow(row, tenantId);
   }
   
@@ -486,7 +486,7 @@ class DomainEthicsService {
       ]
     );
     
-    return result.records?.[0]?.[0]?.stringValue || '';
+    return (result.rows?.[0] as Record<string, unknown>)?.id as string || '';
   }
   
   /**
@@ -535,7 +535,7 @@ class DomainEthicsService {
     
     const result = await executeStatement(sql, params);
     
-    return (result.records || []).map(row => this.mapAuditLogRow(row, tenantId));
+    return (result.rows || []).map(row => this.mapAuditLogRow(row, tenantId));
   }
   
   /**
@@ -559,7 +559,7 @@ class DomainEthicsService {
       ]
     );
     
-    const row = result.records?.[0];
+    const row = result.rows?.[0];
     
     // Get domain distribution
     const domainResult = await executeStatement(
@@ -574,17 +574,19 @@ class DomainEthicsService {
     );
     
     const checksByDomain: Record<string, number> = {};
-    for (const domainRow of domainResult.records || []) {
-      const domain = domainRow[0]?.stringValue || '';
-      const count = Number(domainRow[1]?.longValue || 0);
+    for (const domainRow of domainResult.rows || []) {
+      const r = domainRow as { detected_domain?: string; count?: string | number };
+      const domain = r.detected_domain || '';
+      const count = Number(r.count || 0);
       checksByDomain[domain] = count;
     }
     
+    const statsRow = row as { total_checks?: string | number; checks_today?: string | number; violations_blocked?: string | number; warnings_issued?: string | number } | undefined;
     return {
-      totalChecks: Number(row?.[0]?.longValue || 0),
-      checksToday: Number(row?.[1]?.longValue || 0),
-      violationsBlocked: Number(row?.[2]?.longValue || 0),
-      warningsIssued: Number(row?.[3]?.longValue || 0),
+      totalChecks: Number(statsRow?.total_checks || 0),
+      checksToday: Number(statsRow?.checks_today || 0),
+      violationsBlocked: Number(statsRow?.violations_blocked || 0),
+      warningsIssued: Number(statsRow?.warnings_issued || 0),
       topViolatedRules: [], // Would need additional query
       checksByDomain,
     };
@@ -667,25 +669,26 @@ class DomainEthicsService {
        RETURNING id`,
       [
         { name: 'frameworkId', value: { stringValue: `custom_${framework.domain}_${Date.now()}` } },
-        { name: 'name', value: { stringValue: framework.name } },
-        { name: 'code', value: { stringValue: framework.code } },
+        { name: 'name', value: { stringValue: framework.frameworkName } },
+        { name: 'code', value: { stringValue: framework.frameworkCode } },
         { name: 'domain', value: { stringValue: framework.domain } },
-        { name: 'subspecialty', value: framework.subspecialty ? { stringValue: framework.subspecialty } : { isNull: true } },
+        { name: 'subspecialty', value: framework.subspecialties?.length ? { stringValue: framework.subspecialties[0] } : { isNull: true } },
         { name: 'governingBody', value: framework.governingBody ? { stringValue: framework.governingBody } : { isNull: true } },
-        { name: 'version', value: { stringValue: framework.version || '1.0' } },
-        { name: 'effectiveDate', value: framework.effectiveDate ? { stringValue: framework.effectiveDate } : { isNull: true } },
+        { name: 'version', value: { stringValue: '1.0' } },
+        { name: 'effectiveDate', value: { isNull: true } },
         { name: 'principles', value: { stringValue: JSON.stringify(framework.principles) } },
         { name: 'prohibitions', value: { stringValue: JSON.stringify(framework.prohibitions) } },
         { name: 'disclosures', value: { stringValue: JSON.stringify(framework.disclosureRequirements) } },
         { name: 'disclaimers', value: { stringValue: JSON.stringify(framework.requiredDisclaimers) } },
-        { name: 'emergencyOverrides', value: framework.emergencyOverrides ? { stringValue: JSON.stringify(framework.emergencyOverrides) } : { isNull: true } },
+        { name: 'emergencyOverrides', value: { isNull: true } },
         { name: 'canBeDisabled', value: { booleanValue: framework.canBeDisabled !== false } },
         { name: 'isActive', value: { booleanValue: true } },
         { name: 'createdBy', value: framework.createdBy ? { stringValue: framework.createdBy } : { isNull: true } },
       ]
     );
     
-    return result.records?.[0]?.[0]?.stringValue || '';
+    const row = result.rows?.[0] as Record<string, unknown> | undefined;
+    return (row?.id as string) || '';
   }
   
   /**
@@ -700,9 +703,9 @@ class DomainEthicsService {
       { name: 'frameworkId', value: { stringValue: frameworkId } },
     ];
     
-    if (updates.name) {
+    if (updates.frameworkName) {
       updateFields.push(`name = $${params.length + 1}`);
-      params.push({ name: 'name', value: { stringValue: updates.name } });
+      params.push({ name: 'name', value: { stringValue: updates.frameworkName } });
     }
     if (updates.principles) {
       updateFields.push(`principles = $${params.length + 1}`);
@@ -754,7 +757,7 @@ class DomainEthicsService {
     
     const result = await executeStatement(sql, params);
     
-    return (result.records || []).map(row => this.mapFrameworkRow(row));
+    return (result.rows || []).map(row => this.mapFrameworkRow(row));
   }
   
   /**
@@ -766,11 +769,11 @@ class DomainEthicsService {
       [{ name: 'frameworkId', value: { stringValue: frameworkId } }]
     );
     
-    if (!result.records || result.records.length === 0) {
+    if (!result.rows || result.rows.length === 0) {
       return null;
     }
     
-    return this.mapFrameworkRow(result.records[0]);
+    return this.mapFrameworkRow(result.rows[0]);
   }
   
   /**
@@ -795,13 +798,13 @@ class DomainEthicsService {
     const frameworks: Array<{ id: string; name: string; source: 'built-in' | 'custom' }> = [];
     
     if (builtIn) {
-      frameworks.push({ id: builtIn.id, name: builtIn.name, source: 'built-in' });
+      frameworks.push({ id: builtIn.id, name: (builtIn as any).name || builtIn.id, source: 'built-in' });
     }
     
     // Check custom
     const custom = await this.getCustomFrameworks({ domain, activeOnly: true });
     for (const cf of custom) {
-      frameworks.push({ id: cf.id, name: cf.name, source: 'custom' });
+      frameworks.push({ id: cf.id, name: cf.frameworkName || cf.id, source: 'custom' });
     }
     
     return {
@@ -830,10 +833,10 @@ class DomainEthicsService {
     );
     
     const customCounts: Record<string, number> = {};
-    for (const row of customResult.records || []) {
-      const r = row as Array<{ stringValue?: string; longValue?: number }>;
-      const domain = r[0]?.stringValue || '';
-      const count = Number(r[1]?.longValue || 0);
+    for (const row of customResult.rows || []) {
+      const r = row as Record<string, unknown>;
+      const domain = (r.domain as string) || '';
+      const count = Number(r.count) || 0;
       customCounts[domain] = count;
     }
     
@@ -887,8 +890,8 @@ class DomainEthicsService {
     for (const similar of similarDomains) {
       const framework = getEthicsFrameworkByDomain(similar);
       if (framework) {
-        suggestedPrinciples.push(...framework.principles.slice(0, 3).map(p => p.name));
-        suggestedProhibitions.push(...framework.prohibitions.slice(0, 3).map(p => p.name));
+        suggestedPrinciples.push(...framework.principles.slice(0, 3).map(p => (p as any).name || (p as any).title || ''));
+        suggestedProhibitions.push(...framework.prohibitions.slice(0, 3).map(p => (p as any).name || (p as any).title || ''));
         suggestedDisclaimers.push(...framework.requiredDisclaimers.slice(0, 2));
       }
     }
@@ -955,24 +958,24 @@ class DomainEthicsService {
       const suggestions = await this.suggestEthicsForDomain(domain);
       
       suggestedFramework = {
-        name: `${info.domainName || domain} Ethics Framework`,
-        code: domain.toUpperCase().replace(/[^A-Z0-9]/g, '_'),
+        frameworkName: `${info.domainName || domain} Ethics Framework`,
+        frameworkCode: domain.toUpperCase().replace(/[^A-Z0-9]/g, '_'),
         domain,
         principles: suggestions.suggestedPrinciples.map((name, i) => ({
           id: `principle_${i}`,
-          name,
+          title: name,
           description: `Professional standard for ${name.toLowerCase()}`,
           category: 'professional_standards' as const,
-        })),
+        })) as any,
         prohibitions: suggestions.suggestedProhibitions.map((name, i) => ({
           id: `prohibition_${i}`,
-          name,
+          title: name,
           description: name,
           severity: 'major' as const,
           keywords: [],
           patterns: [],
           actionOnViolation: 'warn' as const,
-        })),
+        })) as any,
         requiredDisclaimers: suggestions.suggestedDisclaimers,
         disclosureRequirements: [],
         canBeDisabled: true,
@@ -987,24 +990,28 @@ class DomainEthicsService {
     };
   }
   
-  private mapFrameworkRow(row: unknown[]): DomainEthicsFramework {
-    const r = row as Array<{ stringValue?: string; booleanValue?: boolean }>;
-    
+  private mapFrameworkRow(row: Record<string, unknown>): DomainEthicsFramework {
     return {
-      id: r[0]?.stringValue || '',
-      name: r[2]?.stringValue || '',
-      code: r[3]?.stringValue || '',
-      domain: r[4]?.stringValue || '',
-      subspecialty: r[5]?.stringValue,
-      governingBody: r[6]?.stringValue,
-      version: r[7]?.stringValue || '1.0',
-      effectiveDate: r[8]?.stringValue,
-      principles: r[9]?.stringValue ? JSON.parse(r[9].stringValue) : [],
-      prohibitions: r[10]?.stringValue ? JSON.parse(r[10].stringValue) : [],
-      disclosureRequirements: r[11]?.stringValue ? JSON.parse(r[11].stringValue) : [],
-      requiredDisclaimers: r[12]?.stringValue ? JSON.parse(r[12].stringValue) : [],
-      emergencyOverrides: r[13]?.stringValue ? JSON.parse(r[13].stringValue) : undefined,
-      canBeDisabled: r[14]?.booleanValue ?? true,
+      id: (row.framework_id as string) || (row.id as string) || '',
+      frameworkName: (row.name as string) || '',
+      frameworkCode: (row.code as string) || '',
+      domain: (row.domain as string) || '',
+      subspecialties: row.subspecialty ? [(row.subspecialty as string)] : [],
+      governingBody: (row.governing_body as string) || '',
+      jurisdiction: row.jurisdiction as string | undefined,
+      description: (row.description as string) || '',
+      websiteUrl: row.website_url as string | undefined,
+      lastUpdated: new Date(row.updated_at as string || row.last_updated as string || Date.now()),
+      principles: row.principles ? JSON.parse(row.principles as string) : [],
+      prohibitions: row.prohibitions ? JSON.parse(row.prohibitions as string) : [],
+      disclosureRequirements: row.disclosure_requirements ? JSON.parse(row.disclosure_requirements as string) : [],
+      requiredDisclaimers: row.required_disclaimers ? JSON.parse(row.required_disclaimers as string) : [],
+      mandatoryWarnings: row.mandatory_warnings ? JSON.parse(row.mandatory_warnings as string) : [],
+      enforcementLevel: (row.enforcement_level as 'strict' | 'standard' | 'advisory') || 'standard',
+      isActive: row.is_active !== false,
+      canBeDisabled: Boolean(row.can_be_disabled) ?? true,
+      lastModifiedBy: row.last_modified_by as string | undefined,
+      lastModifiedAt: row.last_modified_at ? new Date(row.last_modified_at as string) : undefined,
     };
   }
   
@@ -1012,40 +1019,36 @@ class DomainEthicsService {
   // Helper Methods
   // ============================================================================
   
-  private mapConfigRow(row: unknown[], tenantId: string): DomainEthicsConfig {
-    const r = row as Array<{ stringValue?: string; booleanValue?: boolean }>;
-    
+  private mapConfigRow(row: Record<string, unknown>, tenantId: string): DomainEthicsConfig {
     return {
       tenantId,
-      enableDomainEthics: r[1]?.booleanValue ?? true,
-      enforcementMode: (r[2]?.stringValue as DomainEthicsConfig['enforcementMode']) || 'standard',
-      disabledFrameworks: r[3]?.stringValue ? JSON.parse(r[3].stringValue) : [],
+      enableDomainEthics: Boolean(row.enable_domain_ethics) ?? true,
+      enforcementMode: (row.enforcement_mode as DomainEthicsConfig['enforcementMode']) || 'standard',
+      disabledFrameworks: row.disabled_frameworks ? JSON.parse(row.disabled_frameworks as string) : [],
       customFrameworks: [],
-      domainSettings: r[4]?.stringValue ? JSON.parse(r[4].stringValue) : {},
-      logAllChecks: r[5]?.booleanValue ?? false,
-      logViolationsOnly: r[6]?.booleanValue ?? true,
-      notifyOnViolation: r[7]?.booleanValue ?? true,
-      notifyOnWarning: r[8]?.booleanValue ?? false,
-      notificationEmails: r[9]?.stringValue ? JSON.parse(r[9].stringValue) : undefined,
+      domainSettings: row.domain_settings ? JSON.parse(row.domain_settings as string) : {},
+      logAllChecks: Boolean(row.log_all_checks) ?? false,
+      logViolationsOnly: Boolean(row.log_violations_only) ?? true,
+      notifyOnViolation: Boolean(row.notify_on_violation) ?? true,
+      notifyOnWarning: Boolean(row.notify_on_warning) ?? false,
+      notificationEmails: row.notification_emails ? JSON.parse(row.notification_emails as string) : undefined,
     };
   }
   
-  private mapAuditLogRow(row: unknown[], tenantId: string): DomainEthicsAuditLog {
-    const r = row as Array<{ stringValue?: string }>;
-    
+  private mapAuditLogRow(row: Record<string, unknown>, tenantId: string): DomainEthicsAuditLog {
     return {
-      id: r[0]?.stringValue || '',
+      id: (row.id as string) || '',
       tenantId,
-      userId: r[2]?.stringValue || '',
-      sessionId: r[3]?.stringValue || '',
-      promptId: r[4]?.stringValue || '',
-      detectedDomain: r[5]?.stringValue || '',
-      detectedSubspecialty: r[6]?.stringValue,
-      frameworksApplied: r[7]?.stringValue ? JSON.parse(r[7].stringValue) : [],
-      checkResult: r[8]?.stringValue ? JSON.parse(r[8].stringValue) : {},
-      actionTaken: (r[9]?.stringValue as DomainEthicsAuditLog['actionTaken']) || 'allowed',
-      modificationsApplied: r[10]?.stringValue ? JSON.parse(r[10].stringValue) : undefined,
-      createdAt: new Date(r[11]?.stringValue || ''),
+      userId: (row.user_id as string) || '',
+      sessionId: (row.session_id as string) || '',
+      promptId: (row.prompt_id as string) || '',
+      detectedDomain: (row.detected_domain as string) || '',
+      detectedSubspecialty: row.detected_subspecialty as string | undefined,
+      frameworksApplied: row.frameworks_applied ? JSON.parse(row.frameworks_applied as string) : [],
+      checkResult: row.check_result ? JSON.parse(row.check_result as string) : {},
+      actionTaken: (row.action_taken as DomainEthicsAuditLog['actionTaken']) || 'allowed',
+      modificationsApplied: row.modifications_applied ? JSON.parse(row.modifications_applied as string) : undefined,
+      createdAt: new Date((row.created_at as string) || ''),
     };
   }
 }

@@ -15,8 +15,10 @@ vi.mock('../domain-taxonomy.service', () => ({
 
 vi.mock('../model-router.service', () => ({
   modelRouterService: {
-    selectModel: vi.fn(),
-    getModelMetadata: vi.fn(),
+    invoke: vi.fn(),
+    getModel: vi.fn(),
+    listModels: vi.fn(),
+    isModelAvailable: vi.fn(),
   },
 }));
 
@@ -33,7 +35,7 @@ import { modelRouterService } from '../model-router.service';
 
 const mockExecuteStatement = executeStatement as ReturnType<typeof vi.fn>;
 const mockDetectDomain = domainTaxonomyService.detectDomain as ReturnType<typeof vi.fn>;
-const mockSelectModel = modelRouterService.selectModel as ReturnType<typeof vi.fn>;
+const mockInvoke = (modelRouterService as any).invoke as ReturnType<typeof vi.fn>;
 
 describe('AGIBrainPlannerService', () => {
   beforeEach(() => {
@@ -52,7 +54,7 @@ describe('AGIBrainPlannerService', () => {
       });
 
       // Mock model selection
-      mockSelectModel.mockResolvedValueOnce({
+      mockInvoke.mockResolvedValueOnce({
         modelId: 'claude-3-5-sonnet',
         modelName: 'Claude 3.5 Sonnet',
         provider: 'anthropic',
@@ -85,7 +87,7 @@ describe('AGIBrainPlannerService', () => {
         confidence: 0.78,
       });
 
-      mockSelectModel.mockResolvedValueOnce({
+      mockInvoke.mockResolvedValueOnce({
         modelId: 'claude-3-opus',
         modelName: 'Claude 3 Opus',
         provider: 'anthropic',

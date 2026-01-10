@@ -3,12 +3,16 @@
  * Provides admin endpoints for Cato Safety Architecture management
  */
 
-import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult, Context, Callback } from 'aws-lambda';
+
+// Noop callback for internal routing
+const noop: Callback = () => {};
 import { query } from '../shared/services/database';
 import { personaService } from '../shared/services/cato/persona.service';
 import { merkleAuditService } from '../shared/services/cato/merkle-audit.service';
 import { sensoryVetoService } from '../shared/services/cato/sensory-veto.service';
 import { catoStateService } from '../shared/services/cato/redis.service';
+import { logger } from '../shared/logging/enhanced-logger';
 
 // Response helpers
 const success = (data: unknown, statusCode = 200): APIGatewayProxyResult => ({
@@ -53,7 +57,7 @@ export const getMetrics: APIGatewayProxyHandler = async (event) => {
 
     return success(metrics);
   } catch (err) {
-    console.error('Failed to get Cato metrics:', err);
+    logger.error('Failed to get Cato metrics:', err);
     return error('Failed to get metrics', 500);
   }
 };
@@ -73,7 +77,7 @@ export const getRecoveryEffectiveness: APIGatewayProxyHandler = async (event) =>
 
     return success(result.rows);
   } catch (err) {
-    console.error('Failed to get recovery effectiveness:', err);
+    logger.error('Failed to get recovery effectiveness:', err);
     return error('Failed to get recovery effectiveness', 500);
   }
 };
@@ -88,7 +92,7 @@ export const getPersonas: APIGatewayProxyHandler = async (event) => {
     const personas = await personaService.getTenantPersonas(tenantId);
     return success(personas);
   } catch (err) {
-    console.error('Failed to get personas:', err);
+    logger.error('Failed to get personas:', err);
     return error('Failed to get personas', 500);
   }
 };
@@ -111,7 +115,7 @@ export const getPersona: APIGatewayProxyHandler = async (event) => {
 
     return success(persona);
   } catch (err) {
-    console.error('Failed to get persona:', err);
+    logger.error('Failed to get persona:', err);
     return error('Failed to get persona', 500);
   }
 };
@@ -132,7 +136,7 @@ export const createPersona: APIGatewayProxyHandler = async (event) => {
 
     return success(persona, 201);
   } catch (err) {
-    console.error('Failed to create persona:', err);
+    logger.error('Failed to create persona:', err);
     return error('Failed to create persona', 500);
   }
 };
@@ -158,7 +162,7 @@ export const updatePersona: APIGatewayProxyHandler = async (event) => {
 
     return success(persona);
   } catch (err) {
-    console.error('Failed to update persona:', err);
+    logger.error('Failed to update persona:', err);
     return error('Failed to update persona', 500);
   }
 };
@@ -182,7 +186,7 @@ export const getEscalations: APIGatewayProxyHandler = async (event) => {
 
     return success(result.rows);
   } catch (err) {
-    console.error('Failed to get escalations:', err);
+    logger.error('Failed to get escalations:', err);
     return error('Failed to get escalations', 500);
   }
 };
@@ -222,7 +226,7 @@ export const respondToEscalation: APIGatewayProxyHandler = async (event) => {
 
     return success(result.rows[0]);
   } catch (err) {
-    console.error('Failed to respond to escalation:', err);
+    logger.error('Failed to respond to escalation:', err);
     return error('Failed to respond to escalation', 500);
   }
 };
@@ -256,7 +260,7 @@ export const getAuditTrail: APIGatewayProxyHandler = async (event) => {
     const result = await query(queryStr, params);
     return success(result.rows);
   } catch (err) {
-    console.error('Failed to get audit trail:', err);
+    logger.error('Failed to get audit trail:', err);
     return error('Failed to get audit trail', 500);
   }
 };
@@ -278,7 +282,7 @@ export const searchAuditTrail: APIGatewayProxyHandler = async (event) => {
     const entries = await merkleAuditService.searchEntries(tenantId, searchQuery, limit);
     return success(entries);
   } catch (err) {
-    console.error('Failed to search audit trail:', err);
+    logger.error('Failed to search audit trail:', err);
     return error('Failed to search audit trail', 500);
   }
 };
@@ -296,7 +300,7 @@ export const verifyAuditChain: APIGatewayProxyHandler = async (event) => {
     const result = await merkleAuditService.verifyChain(tenantId, fromSequence);
     return success(result);
   } catch (err) {
-    console.error('Failed to verify audit chain:', err);
+    logger.error('Failed to verify audit chain:', err);
     return error('Failed to verify audit chain', 500);
   }
 };
@@ -318,7 +322,7 @@ export const getCBFDefinitions: APIGatewayProxyHandler = async (event) => {
 
     return success(result.rows);
   } catch (err) {
-    console.error('Failed to get CBF definitions:', err);
+    logger.error('Failed to get CBF definitions:', err);
     return error('Failed to get CBF definitions', 500);
   }
 };
@@ -349,7 +353,7 @@ export const getCBFViolations: APIGatewayProxyHandler = async (event) => {
     const result = await query(queryStr, params);
     return success(result.rows);
   } catch (err) {
-    console.error('Failed to get CBF violations:', err);
+    logger.error('Failed to get CBF violations:', err);
     return error('Failed to get CBF violations', 500);
   }
 };
@@ -405,7 +409,7 @@ export const getConfig: APIGatewayProxyHandler = async (event) => {
       defaultPersonaId: config.default_persona_id,
     });
   } catch (err) {
-    console.error('Failed to get Cato config:', err);
+    logger.error('Failed to get Cato config:', err);
     return error('Failed to get configuration', 500);
   }
 };
@@ -466,7 +470,7 @@ export const updateConfig: APIGatewayProxyHandler = async (event) => {
 
     return success(result.rows[0]);
   } catch (err) {
-    console.error('Failed to update Cato config:', err);
+    logger.error('Failed to update Cato config:', err);
     return error('Failed to update configuration', 500);
   }
 };
@@ -508,7 +512,7 @@ export const getDashboard: APIGatewayProxyHandler = async (event) => {
       config: configResult.rows[0] || null,
     });
   } catch (err) {
-    console.error('Failed to get dashboard:', err);
+    logger.error('Failed to get dashboard:', err);
     return error('Failed to get dashboard', 500);
   }
 };
@@ -540,7 +544,7 @@ export const getRecoveryEvents: APIGatewayProxyHandler = async (event) => {
     const result = await query(queryStr, params);
     return success(result.rows);
   } catch (err) {
-    console.error('Failed to get recovery events:', err);
+    logger.error('Failed to get recovery events:', err);
     return error('Failed to get recovery events', 500);
   }
 };
@@ -575,7 +579,7 @@ export const activateVeto: APIGatewayProxyHandler = async (event) => {
 
     return success({ message: `Veto signal ${signal} activated` });
   } catch (err) {
-    console.error('Failed to activate veto:', err);
+    logger.error('Failed to activate veto:', err);
     return error('Failed to activate veto', 500);
   }
 };
@@ -598,7 +602,7 @@ export const deactivateVeto: APIGatewayProxyHandler = async (event) => {
 
     return success({ message: `Veto signal ${signal} deactivated` });
   } catch (err) {
-    console.error('Failed to deactivate veto:', err);
+    logger.error('Failed to deactivate veto:', err);
     return error('Failed to deactivate veto', 500);
   }
 };
@@ -613,7 +617,7 @@ export const getActiveVetos: APIGatewayProxyHandler = async (event) => {
     const vetos = sensoryVetoService.getActiveVetos(tenantId);
     return success(vetos);
   } catch (err) {
-    console.error('Failed to get active vetos:', err);
+    logger.error('Failed to get active vetos:', err);
     return error('Failed to get active vetos', 500);
   }
 };
@@ -644,7 +648,7 @@ export const getTenantDefaultMood: APIGatewayProxyHandler = async (event) => {
       availableMoods: moodsResult.rows,
     });
   } catch (err) {
-    console.error('Failed to get tenant default mood:', err);
+    logger.error('Failed to get tenant default mood:', err);
     return error('Failed to get default mood', 500);
   }
 };
@@ -677,7 +681,7 @@ export const setTenantDefaultMood: APIGatewayProxyHandler = async (event) => {
 
     return success({ message: `Default mood set to ${mood}`, defaultMood: mood });
   } catch (err) {
-    console.error('Failed to set tenant default mood:', err);
+    logger.error('Failed to set tenant default mood:', err);
     return error('Failed to set default mood', 500);
   }
 };
@@ -718,7 +722,7 @@ export const setApiPersonaOverride: APIGatewayProxyHandler = async (event) => {
       expiresIn: `${durationMinutes || 60} minutes`,
     });
   } catch (err) {
-    console.error('Failed to set persona override:', err);
+    logger.error('Failed to set persona override:', err);
     return error('Failed to set persona override', 500);
   }
 };
@@ -740,7 +744,7 @@ export const clearApiPersonaOverride: APIGatewayProxyHandler = async (event) => 
 
     return success({ message: `Persona override cleared for session ${sessionId}` });
   } catch (err) {
-    console.error('Failed to clear persona override:', err);
+    logger.error('Failed to clear persona override:', err);
     return error('Failed to clear persona override', 500);
   }
 };
@@ -845,7 +849,7 @@ export const getAdvancedConfig: APIGatewayProxyHandler = async (event) => {
       },
     });
   } catch (err) {
-    console.error('Failed to get advanced Cato config:', err);
+    logger.error('Failed to get advanced Cato config:', err);
     return error('Failed to get advanced configuration', 500);
   }
 };
@@ -934,7 +938,7 @@ export const updateAdvancedConfig: APIGatewayProxyHandler = async (event) => {
 
     return success({ message: 'Advanced configuration updated', config: result.rows[0] });
   } catch (err) {
-    console.error('Failed to update advanced Cato config:', err);
+    logger.error('Failed to update advanced Cato config:', err);
     return error('Failed to update advanced configuration', 500);
   }
 };
@@ -958,7 +962,7 @@ export const getCloudWatchMappings: APIGatewayProxyHandler = async (event) => {
 
     return success(result.rows);
   } catch (err) {
-    console.error('Failed to get CloudWatch mappings:', err);
+    logger.error('Failed to get CloudWatch mappings:', err);
     return error('Failed to get CloudWatch mappings', 500);
   }
 };
@@ -1009,7 +1013,7 @@ export const createCloudWatchMapping: APIGatewayProxyHandler = async (event) => 
     if (err.code === '23505') {
       return error('Alarm mapping already exists', 409);
     }
-    console.error('Failed to create CloudWatch mapping:', err);
+    logger.error('Failed to create CloudWatch mapping:', err);
     return error('Failed to create CloudWatch mapping', 500);
   }
 };
@@ -1059,7 +1063,7 @@ export const updateCloudWatchMapping: APIGatewayProxyHandler = async (event) => 
 
     return success(result.rows[0]);
   } catch (err) {
-    console.error('Failed to update CloudWatch mapping:', err);
+    logger.error('Failed to update CloudWatch mapping:', err);
     return error('Failed to update CloudWatch mapping', 500);
   }
 };
@@ -1087,7 +1091,7 @@ export const deleteCloudWatchMapping: APIGatewayProxyHandler = async (event) => 
 
     return success({ message: 'Mapping deleted' });
   } catch (err) {
-    console.error('Failed to delete CloudWatch mapping:', err);
+    logger.error('Failed to delete CloudWatch mapping:', err);
     return error('Failed to delete CloudWatch mapping', 500);
   }
 };
@@ -1116,7 +1120,7 @@ export const triggerCloudWatchSync: APIGatewayProxyHandler = async (event) => {
       durationMs: Date.now() - startTime,
     });
   } catch (err) {
-    console.error('Failed to sync CloudWatch:', err);
+    logger.error('Failed to sync CloudWatch:', err);
     return error('Failed to sync CloudWatch', 500);
   }
 };
@@ -1165,7 +1169,7 @@ export const getEntropyJobs: APIGatewayProxyHandler = async (event) => {
 
     return success({ jobs: result.rows, summary });
   } catch (err) {
-    console.error('Failed to get entropy jobs:', err);
+    logger.error('Failed to get entropy jobs:', err);
     return error('Failed to get entropy jobs', 500);
   }
 };
@@ -1224,7 +1228,7 @@ export const getSystemStatus: APIGatewayProxyHandler = async (event) => {
       activeVetos: sensoryVetoService.getActiveVetos(tenantId).length,
     });
   } catch (err) {
-    console.error('Failed to get system status:', err);
+    logger.error('Failed to get system status:', err);
     return error('Failed to get system status', 500);
   }
 };
@@ -1232,7 +1236,7 @@ export const getSystemStatus: APIGatewayProxyHandler = async (event) => {
 /**
  * Main handler - routes requests to appropriate functions
  */
-export const handler: APIGatewayProxyHandler = async (event, context) => {
+export const handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
   const method = event.httpMethod;
   const pathParts = event.path.split('/').filter(Boolean);
   // pathParts: ['api', 'v2', 'admin', 'cato', ...]
@@ -1243,106 +1247,106 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
   try {
     // Dashboard
     if (resource === 'dashboard') {
-      return getDashboard(event, context);
+      return getDashboard(event, context, noop) as Promise<APIGatewayProxyResult>;
     }
 
     // Metrics
     if (resource === 'metrics') {
-      return getMetrics(event, context);
+      return getMetrics(event, context, noop) as Promise<APIGatewayProxyResult>;
     }
 
     // Recovery effectiveness
     if (resource === 'recovery-effectiveness') {
-      return getRecoveryEffectiveness(event, context);
+      return getRecoveryEffectiveness(event, context, noop) as Promise<APIGatewayProxyResult>;
     }
 
     // Personas
     if (resource === 'personas') {
       if (method === 'GET' && !subResource) {
-        return getPersonas(event, context);
+        return getPersonas(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'GET' && subResource) {
         event.pathParameters = { id: subResource };
-        return getPersona(event, context);
+        return getPersona(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'POST') {
-        return createPersona(event, context);
+        return createPersona(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'PUT' && subResource) {
         event.pathParameters = { id: subResource };
-        return updatePersona(event, context);
+        return updatePersona(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
     }
 
     // Escalations
     if (resource === 'escalations') {
       if (method === 'GET' && !subResource) {
-        return getEscalations(event, context);
+        return getEscalations(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'POST' && subResource && resourceId === 'respond') {
         event.pathParameters = { id: subResource };
-        return respondToEscalation(event, context);
+        return respondToEscalation(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
     }
 
     // Audit trail
     if (resource === 'audit') {
       if (method === 'GET') {
-        return getAuditTrail(event, context);
+        return getAuditTrail(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'POST' && subResource === 'search') {
-        return searchAuditTrail(event, context);
+        return searchAuditTrail(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'POST' && subResource === 'verify') {
-        return verifyAuditChain(event, context);
+        return verifyAuditChain(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
     }
 
     // CBF definitions and violations
     if (resource === 'cbf') {
       if (method === 'GET' && !subResource) {
-        return getCBFDefinitions(event, context);
+        return getCBFDefinitions(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'GET' && subResource === 'violations') {
-        return getCBFViolations(event, context);
+        return getCBFViolations(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
     }
 
     // Configuration
     if (resource === 'config') {
       if (method === 'GET') {
-        return getConfig(event, context);
+        return getConfig(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'PUT') {
-        return updateConfig(event, context);
+        return updateConfig(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
     }
 
     // Recovery events
     if (resource === 'recovery') {
-      return getRecoveryEvents(event, context);
+      return getRecoveryEvents(event, context, noop) as Promise<APIGatewayProxyResult>;
     }
 
     // Veto management
     if (resource === 'veto') {
       if (method === 'GET' && subResource === 'active') {
-        return getActiveVetos(event, context);
+        return getActiveVetos(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'POST' && subResource === 'activate') {
-        return activateVeto(event, context);
+        return activateVeto(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'POST' && subResource === 'deactivate') {
-        return deactivateVeto(event, context);
+        return deactivateVeto(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
     }
 
     // Advanced configuration
     if (resource === 'advanced-config') {
       if (method === 'GET') {
-        return getAdvancedConfig(event, context);
+        return getAdvancedConfig(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'PUT') {
-        return updateAdvancedConfig(event, context);
+        return updateAdvancedConfig(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
     }
 
@@ -1350,62 +1354,62 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     if (resource === 'cloudwatch') {
       if (subResource === 'mappings') {
         if (method === 'GET' && !resourceId) {
-          return getCloudWatchMappings(event, context);
+          return getCloudWatchMappings(event, context, noop) as Promise<APIGatewayProxyResult>;
         }
         if (method === 'POST' && !resourceId) {
-          return createCloudWatchMapping(event, context);
+          return createCloudWatchMapping(event, context, noop) as Promise<APIGatewayProxyResult>;
         }
         if (method === 'PUT' && resourceId) {
           event.pathParameters = { id: resourceId };
-          return updateCloudWatchMapping(event, context);
+          return updateCloudWatchMapping(event, context, noop) as Promise<APIGatewayProxyResult>;
         }
         if (method === 'DELETE' && resourceId) {
           event.pathParameters = { id: resourceId };
-          return deleteCloudWatchMapping(event, context);
+          return deleteCloudWatchMapping(event, context, noop) as Promise<APIGatewayProxyResult>;
         }
       }
       if (subResource === 'sync' && method === 'POST') {
-        return triggerCloudWatchSync(event, context);
+        return triggerCloudWatchSync(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
     }
 
     // Entropy jobs
     if (resource === 'entropy-jobs') {
       if (method === 'GET') {
-        return getEntropyJobs(event, context);
+        return getEntropyJobs(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
     }
 
     // System status
     if (resource === 'system-status') {
       if (method === 'GET') {
-        return getSystemStatus(event, context);
+        return getSystemStatus(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
     }
 
     // Tenant default mood
     if (resource === 'default-mood') {
       if (method === 'GET') {
-        return getTenantDefaultMood(event, context);
+        return getTenantDefaultMood(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'PUT') {
-        return setTenantDefaultMood(event, context);
+        return setTenantDefaultMood(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
     }
 
     // API persona override (for sessions)
     if (resource === 'persona-override') {
       if (method === 'POST') {
-        return setApiPersonaOverride(event, context);
+        return setApiPersonaOverride(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
       if (method === 'DELETE') {
-        return clearApiPersonaOverride(event, context);
+        return clearApiPersonaOverride(event, context, noop) as Promise<APIGatewayProxyResult>;
       }
     }
 
     return error(`Cato route not found: ${method} ${event.path}`, 404);
   } catch (err) {
-    console.error('Cato handler error:', err);
+    logger.error('Cato handler error:', err);
     return error('Internal server error', 500);
   }
 };

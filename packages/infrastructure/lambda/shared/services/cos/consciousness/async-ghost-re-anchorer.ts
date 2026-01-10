@@ -21,6 +21,7 @@ import { Redis } from 'ioredis';
 import { query } from '../../database';
 import { GhostVectorManager } from './ghost-vector-manager';
 import { ReanchorJob, REANCHOR_CONFIG } from '../types';
+import { logger } from '../../../logging/enhanced-logger';
 
 export interface ReanchorQueueStats {
   pending: number;
@@ -77,7 +78,7 @@ export class AsyncGhostReAnchorer {
       await this.redis.lpush(this.QUEUE_KEY, JSON.stringify(job));
     }
     
-    console.log(`[COS] Re-anchor queued: ${params.ghostId} (priority: ${job.priority})`);
+    logger.info(`[COS] Re-anchor queued: ${params.ghostId} (priority: ${job.priority})`);
     return params.ghostId;
   }
   
@@ -113,20 +114,20 @@ export class AsyncGhostReAnchorer {
       const processingTimeMs = Date.now() - startTime;
       await this.logMetrics('completed', processingTimeMs);
       
-      console.log(`[COS] Re-anchor completed: ${job.ghostId} in ${processingTimeMs}ms`);
+      logger.info(`[COS] Re-anchor completed: ${job.ghostId} in ${processingTimeMs}ms`);
       return true;
       
     } catch (error) {
       const processingTimeMs = Date.now() - startTime;
       await this.logMetrics('failed', processingTimeMs);
       
-      console.error(`[COS] Re-anchor failed: ${job.ghostId}`, error);
+      logger.error(`[COS] Re-anchor failed: ${job.ghostId}`, error);
       
       // Implement retry logic with exponential backoff
       const retryCount = (job as ReanchorJob & { retryCount?: number }).retryCount || 0;
       if (retryCount < this.MAX_RETRIES) {
         const backoffMs = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
-        console.log(`[COS] Scheduling retry ${retryCount + 1}/${this.MAX_RETRIES} for ${job.ghostId} in ${backoffMs}ms`);
+        logger.info(`[COS] Scheduling retry ${retryCount + 1}/${this.MAX_RETRIES} for ${job.ghostId} in ${backoffMs}ms`);
         
         // Schedule retry with backoff
         setTimeout(async () => {
@@ -143,7 +144,7 @@ export class AsyncGhostReAnchorer {
           );
         }, backoffMs);
       } else {
-        console.error(`[COS] Re-anchor exhausted retries for ${job.ghostId}`);
+        logger.error(`[COS] Re-anchor exhausted retries for ${job.ghostId}`);
         // Log permanent failure for alerting
         await query(
           `INSERT INTO cos_reanchor_failures (ghost_id, user_id, tenant_id, error, created_at)
@@ -227,7 +228,7 @@ export class AsyncGhostReAnchorer {
     }
     
     if (recovered > 0) {
-      console.log(`[COS] Recovered ${recovered} stale re-anchor jobs`);
+      logger.info(`[COS] Recovered ${recovered} stale re-anchor jobs`);
     }
     
     return recovered;
@@ -279,7 +280,7 @@ export class AsyncGhostReAnchorer {
       });
 
       if (!response.ok) {
-        console.warn(`[COS] vLLM embedding call failed: ${response.status}, using fallback`);
+        logger.warn(`[COS] vLLM embedding call failed: ${response.status}, using fallback`);
         return this.generateFallbackHiddenStates(context);
       }
 
@@ -297,7 +298,7 @@ export class AsyncGhostReAnchorer {
       
       return this.generateFallbackHiddenStates(context);
     } catch (error) {
-      console.warn(`[COS] vLLM call error: ${error instanceof Error ? error.message : 'Unknown'}, using fallback`);
+      logger.warn('[COS] vLLM call error, using fallback', { error: error instanceof Error ? error.message : 'Unknown' });
       return this.generateFallbackHiddenStates(context);
     }
   }
@@ -337,7 +338,7 @@ export class AsyncGhostReAnchorer {
       `INSERT INTO cos_reanchor_metrics (outcome, processing_time_ms, created_at)
        VALUES ($1, $2, NOW())`,
       [outcome, processingTimeMs]
-    ).catch(err => console.error('[COS] Failed to log reanchor metrics:', err));
+    ).catch(err => logger.error('[COS] Failed to log reanchor metrics', err));
   }
   
   /**
@@ -366,7 +367,7 @@ export class AsyncGhostReAnchorer {
 export async function startReanchorWorker(redis: Redis, intervalMs: number = 1000): Promise<void> {
   const worker = new AsyncGhostReAnchorer(redis);
   
-  console.log('[COS] Re-anchor worker started');
+  logger.info('[COS] Re-anchor worker started');
   
   // Process jobs continuously
   const processLoop = async () => {
@@ -378,7 +379,7 @@ export async function startReanchorWorker(redis: Redis, intervalMs: number = 100
       await worker.processAll(10);
       
     } catch (error) {
-      console.error('[COS] Re-anchor worker error:', error);
+      logger.error('[COS] Re-anchor worker error:', error);
     }
     
     // Schedule next iteration

@@ -184,9 +184,9 @@ export class DomainTaxonomyService {
         description: String(r.description || ''),
         parent_domain: String(r.parent_domain),
         detection_keywords: this.parseJsonArray(r.detection_keywords),
-        terminology_signals: this.parseJsonObject(r.terminology_signals) as TerminologySignals,
+        terminology_signals: this.parseJsonObject(r.terminology_signals) as unknown as TerminologySignals,
         certifications: this.parseJsonArray(r.certifications),
-        subspecialty_proficiencies: this.parseJsonObject(r.subspecialty_proficiencies) as ProficiencyScores,
+        subspecialty_proficiencies: this.parseJsonObject(r.subspecialty_proficiencies) as unknown as ProficiencyScores,
       };
 
       const existing = subspecialtiesByDomain.get(subspecialty.parent_domain) || [];
@@ -207,7 +207,7 @@ export class DomainTaxonomyService {
         professional_associations: this.parseJsonArray(r.professional_associations),
         key_journals: this.parseJsonArray(r.key_journals),
         reference_databases: this.parseJsonArray(r.reference_databases),
-        domain_proficiencies: this.parseJsonObject(r.domain_proficiencies) as ProficiencyScores,
+        domain_proficiencies: this.parseJsonObject(r.domain_proficiencies) as unknown as ProficiencyScores,
         subspecialties: subspecialtiesByDomain.get(String(r.domain_id)) || [],
       };
 
@@ -225,7 +225,7 @@ export class DomainTaxonomyService {
         field_icon: String(r.field_icon || '📚'),
         field_color: String(r.field_color || '#6366f1'),
         field_description: String(r.field_description || ''),
-        field_proficiencies: this.parseJsonObject(r.field_proficiencies) as ProficiencyScores,
+        field_proficiencies: this.parseJsonObject(r.field_proficiencies) as unknown as ProficiencyScores,
         domains: domainsByField.get(String(r.field_id)) || [],
       };
       fields.push(field);

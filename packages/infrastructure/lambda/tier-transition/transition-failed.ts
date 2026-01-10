@@ -7,6 +7,7 @@
 import { Handler } from 'aws-lambda';
 import { RDSDataClient, ExecuteStatementCommand } from '@aws-sdk/client-rds-data';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
+import { logger } from '../shared/logging/enhanced-logger';
 
 const rdsData = new RDSDataClient({});
 const sns = new SNSClient({});
@@ -32,7 +33,7 @@ interface FailureResult {
 }
 
 export const handler: Handler<TransitionEvent, FailureResult> = async (event) => {
-  console.error('Transition failed:', JSON.stringify(event));
+  logger.error('Transition failed:', undefined, { event });
 
   const { tenantId, fromTier, toTier, requestedBy, error } = event;
   const failedAt = new Date().toISOString();
@@ -51,7 +52,7 @@ export const handler: Handler<TransitionEvent, FailureResult> = async (event) =>
         secretArn: secretArn,
         database: database,
         sql: `
-          UPDATE bobble_infrastructure_tier
+          UPDATE cato_infrastructure_tier
           SET 
             target_tier = NULL,
             transition_status = 'FAILED',
@@ -70,7 +71,7 @@ export const handler: Handler<TransitionEvent, FailureResult> = async (event) =>
         secretArn: secretArn,
         database: database,
         sql: `
-          UPDATE bobble_tier_change_log
+          UPDATE cato_tier_change_log
           SET 
             status = 'FAILED',
             completed_at = :failedAt::timestamptz,
@@ -88,10 +89,10 @@ export const handler: Handler<TransitionEvent, FailureResult> = async (event) =>
         ]
       }));
 
-      console.log('Database updated with failure status');
+      logger.info('Database updated with failure status');
     }
   } catch (dbError) {
-    console.error('Failed to update database:', dbError);
+    logger.error('Failed to update database:', dbError);
   }
 
   // Send alert
@@ -101,7 +102,7 @@ export const handler: Handler<TransitionEvent, FailureResult> = async (event) =>
     if (topicArn) {
       await sns.send(new PublishCommand({
         TopicArn: topicArn,
-        Subject: `🚨 ALERT: Bobble Tier Transition FAILED: ${fromTier} → ${toTier}`,
+        Subject: `🚨 ALERT: Cato Tier Transition FAILED: ${fromTier} → ${toTier}`,
         Message: JSON.stringify({
           event: 'TIER_TRANSITION_FAILED',
           severity: 'HIGH',
@@ -115,10 +116,10 @@ export const handler: Handler<TransitionEvent, FailureResult> = async (event) =>
         }, null, 2)
       }));
       alertSent = true;
-      console.log('Alert sent');
+      logger.info('Alert sent');
     }
   } catch (snsError) {
-    console.error('Failed to send alert:', snsError);
+    logger.error('Failed to send alert:', snsError);
   }
 
   return {

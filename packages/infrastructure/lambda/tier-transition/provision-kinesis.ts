@@ -5,6 +5,7 @@
  */
 
 import { Handler } from 'aws-lambda';
+import { logger } from '../shared/logging/enhanced-logger';
 import {
   KinesisClient,
   CreateStreamCommand,
@@ -46,7 +47,7 @@ const TIER_CONFIGS: Record<string, {
 };
 
 export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) => {
-  console.log('Provisioning Kinesis:', JSON.stringify(event));
+  logger.info('Provisioning Kinesis:', { event });
 
   const { tenantId, toTier } = event;
   const config = TIER_CONFIGS[toTier];
@@ -63,7 +64,7 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
     return result;
   }
 
-  const streamName = `bobble-events-${tenantId.substring(0, 8)}`;
+  const streamName = `cato-events-${tenantId.substring(0, 8)}`;
 
   try {
     // Check if stream exists
@@ -103,7 +104,7 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
       result.resources.push(`Stream exists: ${streamName}`);
     }
   } catch (error: any) {
-    console.error('Kinesis provisioning error:', error);
+    logger.error('Kinesis provisioning error:', error);
     result.status = 'FAILED';
     result.errors.push(error.message);
   }

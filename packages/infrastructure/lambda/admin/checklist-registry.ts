@@ -7,6 +7,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { Pool } from 'pg';
 import { getChecklistRegistryService } from '../shared/services/checklist-registry.service';
+import { logger } from '../shared/logging/enhanced-logger';
 
 const pool = new Pool({
   host: process.env.DB_HOST,
@@ -56,7 +57,7 @@ function notFound(message: string): APIGatewayProxyResult {
 }
 
 function serverError(error: Error): APIGatewayProxyResult {
-  console.error('Server error:', error);
+  logger.error('Server error:', error);
   return {
     statusCode: 500,
     headers: { 'Content-Type': 'application/json' },

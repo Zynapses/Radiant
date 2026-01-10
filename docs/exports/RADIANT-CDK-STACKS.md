@@ -68,8 +68,8 @@ RADIANT's infrastructure is defined using **AWS CDK (Cloud Development Kit)**, e
 | `api-stack.ts` | 34K | Public REST API Gateway and Lambda |
 | `auth-stack.ts` | 6K | Cognito user pools and authentication |
 | `batch-stack.ts` | 8K | AWS Batch for heavy compute jobs |
-| `bobble-genesis-stack.ts` | 12K | Bobble consciousness genesis |
-| `bobble-tier-transition-stack.ts` | 17K | Tenant tier upgrade automation |
+| `cato-genesis-stack.ts` | 12K | Cato consciousness genesis |
+| `cato-tier-transition-stack.ts` | 17K | Tenant tier upgrade automation |
 | `brain-stack.ts` | 10K | AGI Brain Router infrastructure |
 | `cato-redis-stack.ts` | 4K | Cato Safety with Redis state |
 | `cognition-stack.ts` | 7K | Metacognition and introspection |

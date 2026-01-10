@@ -396,7 +396,7 @@ export class ConsciousnessCapabilitiesService {
         claim: p.claim,
         premises: p.premises,
       })),
-      attacks: request.attacks || [],
+      attacks: (request.attacks || []).map(a => ({ attacker: a.from, target: a.to })),
     };
 
     // Auto-detect conflicts if requested

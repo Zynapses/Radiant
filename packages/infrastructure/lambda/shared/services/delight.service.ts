@@ -322,24 +322,32 @@ class DelightService {
 
       return result.rows.map((row) => ({
         id: row.id as number,
-        viserId: row.userId as string,
+        userId: row.userId as string,
         tenantId: row.tenantId as string,
         achievementId: row.achievementId as string,
         progressValue: row.progressValue as number,
         isUnlocked: row.isUnlocked as boolean,
         unlockedAt: row.unlockedAt as Date | null,
+        createdAt: new Date(row.created_at as string || Date.now()),
+        updatedAt: new Date(row.updated_at as string || Date.now()),
         achievement: {
           id: row.achievementId as string,
           name: row.name as string,
           description: row.description as string | null,
           icon: row.icon as string | null,
+          badgeImageUrl: row.badge_image_url as string | null,
           achievementType: 'discovery' as AchievementType,
           thresholdValue: 1,
+          thresholdConditions: {},
           celebrationMessage: row.celebrationMessage as string | null,
+          celebrationSound: row.celebration_sound as string | null,
+          celebrationAnimation: row.celebration_animation as string | null,
           rarity: row.rarity as AchievementRarity,
           points: row.points as number,
           isHidden: row.isHidden as boolean,
           isEnabled: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       }));
     } catch (error) {
@@ -881,8 +889,10 @@ class DelightService {
 
   private getDefaultPreferences(userId: string, tenantId: string): UserDelightPreferences {
     return {
+      id: 0,
       userId,
       tenantId,
+      enabled: true,
       personalityMode: 'auto',
       intensityLevel: 5,
       enableDomainMessages: true,
@@ -894,13 +904,20 @@ class DelightService {
       enableSounds: false,
       soundTheme: 'default',
       soundVolume: 50,
+      messagePosition: 'inline' as const,
+      showModelAttributions: true,
+      showConfidenceIndicators: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
   }
 
   private mapRowToPreferences(row: Record<string, unknown>): UserDelightPreferences {
     return {
+      id: row.id as number,
       userId: row.user_id as string,
       tenantId: row.tenant_id as string,
+      enabled: row.enabled !== false,
       personalityMode: (row.personality_mode as PersonalityMode) || 'expressive',
       intensityLevel: (row.intensity_level as number) || 5,
       enableDomainMessages: row.enable_domain_messages !== false,
@@ -912,6 +929,11 @@ class DelightService {
       enableSounds: row.enable_sounds === true,
       soundTheme: (row.sound_theme as SoundTheme) || 'default',
       soundVolume: (row.sound_volume as number) || 50,
+      messagePosition: (row.message_position as 'status_bar' | 'toast' | 'inline' | 'margin') || 'inline',
+      showModelAttributions: row.show_model_attributions !== false,
+      showConfidenceIndicators: row.show_confidence_indicators !== false,
+      createdAt: new Date(row.created_at as string),
+      updatedAt: new Date(row.updated_at as string),
     };
   }
 

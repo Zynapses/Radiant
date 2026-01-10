@@ -558,7 +558,7 @@ async getIntegratedInformationState(tenantId: string): Promise<IntegratedInforma
 }
 ```
 
-**CRITICAL CONCERN**: There is no phi calculation in the codebase. The `integrated_information` table stores phi values but there's no algorithm to compute them. This is a **major gap** - IIT is a core consciousness theory but its implementation is essentially a placeholder.
+**✅ RESOLVED (v5.2.4)**: Full IIT 4.0 Phi calculation implemented in `iit-phi-calculation.service.ts`. The service builds system state from consciousness tables, constructs a Transition Probability Matrix (TPM), calculates Cause-Effect Structure (CES), finds the Minimum Information Partition (MIP), and computes phi as information lost by the MIP. Uses exact algorithm for ≤8 nodes, approximation for larger systems. Results automatically stored in `integrated_information` table.
 
 ### 5.10 Persistent Memory
 

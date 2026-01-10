@@ -10,6 +10,7 @@ import { query } from '../database';
 import { SQSClient, SendMessageCommand, GetQueueUrlCommand } from '@aws-sdk/client-sqs';
 import { DynamoDBClient, GetItemCommand, PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { EntropyCheckResult, EntropyCheckMode, ProposedAction, ExecutionContext } from './types';
+import { logger } from '../../logging/enhanced-logger';
 
 // Default thresholds
 const DEFAULT_CONFIG = {
@@ -63,7 +64,7 @@ export class AdaptiveEntropyService {
         };
       }
     } catch (error) {
-      console.warn('[CATO Entropy] Failed to load config, using defaults:', error);
+      logger.warn('[CATO Entropy] Failed to load config, using defaults:', { data: error });
     }
   }
 
@@ -220,7 +221,7 @@ export class AdaptiveEntropyService {
         sampledModel: actorModel,
       };
     } catch (error) {
-      console.error('[CATO Entropy] Check failed:', error);
+      logger.error('[CATO Entropy] Check failed:', error);
       // Return conservative values on error
       return {
         isPotentialDeception: false,
@@ -361,7 +362,7 @@ export class AdaptiveEntropyService {
 
     const queueName = process.env.CATO_ENTROPY_QUEUE_NAME;
     if (!queueName) {
-      console.log('[CATO Entropy] No SQS queue configured');
+      logger.info('[CATO Entropy] No SQS queue configured');
       return null;
     }
 
@@ -371,7 +372,7 @@ export class AdaptiveEntropyService {
       this.queueUrl = response.QueueUrl || null;
       return this.queueUrl;
     } catch (error) {
-      console.error('[CATO Entropy] Failed to get queue URL:', error);
+      logger.error('[CATO Entropy] Failed to get queue URL:', error);
       return null;
     }
   }
@@ -390,7 +391,7 @@ export class AdaptiveEntropyService {
     
     const queueUrl = await this.getQueueUrl();
     if (!queueUrl) {
-      console.log(`[CATO Entropy] No queue available, skipping background check: ${jobId}`);
+      logger.info(`[CATO Entropy] No queue available, skipping background check: ${jobId}`);
       return jobId;
     }
 
@@ -413,9 +414,9 @@ export class AdaptiveEntropyService {
       });
 
       await getSQSClient().send(command);
-      console.log(`[CATO Entropy] Queued background check: ${jobId}`);
+      logger.info(`[CATO Entropy] Queued background check: ${jobId}`);
     } catch (error) {
-      console.error('[CATO Entropy] Failed to queue message:', error);
+      logger.error('[CATO Entropy] Failed to queue message:', error);
     }
     
     return jobId;
@@ -456,7 +457,7 @@ export class AdaptiveEntropyService {
         },
       };
     } catch (error) {
-      console.error('[CATO Entropy] Failed to get background result:', error);
+      logger.error('[CATO Entropy] Failed to get background result:', error);
       return null;
     }
   }
@@ -495,7 +496,7 @@ export class AdaptiveEntropyService {
 
       await getDynamoClient().send(command);
     } catch (error) {
-      console.error('[CATO Entropy] Failed to store result:', error);
+      logger.error('[CATO Entropy] Failed to store result:', error);
     }
   }
 }

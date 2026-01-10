@@ -7,13 +7,13 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import type { PermissionLevel, AuthContext } from '@radiant/shared';
 import { PoolClient } from 'pg';
 import { Logger } from '../shared/logger';
 import { success, handleError } from '../shared/response';
 import { 
   withSecureDBContext, 
-  isTenantAdmin,
-  AuthContext 
+  isTenantAdmin
 } from '../shared/services/db-context.service';
 import { ValidationError, UnauthorizedError, NotFoundError, ConflictError } from '../shared/errors';
 
@@ -25,7 +25,7 @@ function extractAuthFromEvent(event: APIGatewayProxyEvent): AuthContext {
   return {
     tenantId: claims['custom:tenant_id'] || authorizer.tenant_id || event.headers['x-tenant-id'] || '',
     userId: claims.sub || authorizer.user_id || '',
-    permissionLevel: (claims['custom:role'] || authorizer.permission_level || 'user') as any,
+    permissionLevel: (claims['custom:role'] || authorizer.permission_level || 'user') as PermissionLevel,
     scopes: [],
     groups: []
   };

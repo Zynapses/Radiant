@@ -5617,6 +5617,450 @@ curl -X GET "https://api.radiant.ai/thinktank/council/sessions/{sessionId}" \
 
 ---
 
+## 34. Orchestration Workflow Methods Reference
+
+**Location**: Admin Dashboard → Think Tank → Orchestration → Methods
+
+This section documents the complete **70+ orchestration workflow methods** available in Think Tank. Each method has a **display name** (user-friendly) and **scientific name** (formal/academic reference).
+
+### 34.1 Method Categories Overview
+
+| Category | Methods | Purpose |
+|----------|---------|---------|
+| **Generation** | 3 | Generate responses with various reasoning strategies |
+| **Evaluation** | 6 | Critique, judge, and score outputs |
+| **Synthesis** | 5 | Combine multiple responses into unified outputs |
+| **Verification** | 8 | Fact-check and verify claims |
+| **Debate** | 5 | Multi-agent deliberation and argumentation |
+| **Aggregation** | 4 | Vote, blend, and aggregate responses |
+| **Reasoning** | 2 | Problem decomposition and reflection |
+| **Routing** | 6 | Dynamic model selection and cascading |
+| **Collaboration** | 5 | Multi-agent coordination |
+| **Uncertainty** | 6 | Confidence estimation and calibration |
+| **Hallucination** | 3 | Detect and prevent hallucinations |
+| **Human-in-Loop** | 3 | Human oversight and review |
+| **Neural** | 1 | Cato-integrated neural decision engine |
+
+### 34.2 Complete Methods Reference
+
+#### Generation Methods
+
+| Display Name | Scientific Name | Code | Description |
+|-------------|-----------------|------|-------------|
+| Generate | Basic Generation | `GENERATE_RESPONSE` | Standard response generation |
+| Think Step-by-Step | Chain-of-Thought Generation | `GENERATE_WITH_COT` | Reasoning before answering (+20-40% accuracy) |
+| Refine | Iterative Refinement | `REFINE_RESPONSE` | Improve based on feedback |
+
+#### Evaluation Methods
+
+| Display Name | Scientific Name | Code | Accuracy Gain |
+|-------------|-----------------|------|---------------|
+| Critique | Critical Evaluation | `CRITIQUE_RESPONSE` | Identifies flaws |
+| Judge | Comparative Judgment | `JUDGE_RESPONSES` | Evaluates multiple outputs |
+| Multi-Judge Panel | Panel of LLMs (PoLL) | `POLL_JUDGE` | -40-60% single-model bias |
+| Structured Scoring | G-Eval NLG Framework | `G_EVAL` | 0.5+ human correlation |
+| Head-to-Head Compare | Pairwise Preference | `PAIRWISE_PREFER` | Reliable for subtle differences |
+| Side-by-Side Compare | Comparative Analysis | `COMPARE_ANALYSIS` | +50% decision clarity |
+
+#### Synthesis Methods
+
+| Display Name | Scientific Name | Code | Accuracy Gain |
+|-------------|-----------------|------|---------------|
+| Synthesize | Multi-Response Synthesis | `SYNTHESIZE_RESPONSES` | Combines best parts |
+| Consensus | Consensus Aggregation | `BUILD_CONSENSUS` | Agreement points |
+| Layered Synthesis | Mixture of Agents (MoA) | `MOA_LAYERS` | +8% over GPT-4o |
+| Combine & Summarize | Multi-Source Synthesis | `MULTI_SOURCE_SYNTH` | +40% coverage |
+| Rank & Merge | LLM-Blender Fusion | `LLM_BLENDER` | +12% over best model |
+
+#### Verification Methods
+
+| Display Name | Scientific Name | Code | Accuracy Gain |
+|-------------|-----------------|------|---------------|
+| Fact Check | Factual Verification | `VERIFY_FACTS` | Extract & verify claims |
+| Step Verification | Process Reward Model | `PROCESS_REWARD` | +6% on MATH |
+| Internal Consistency | SelfCheckGPT | `SELFCHECK_GPT` | +25% hallucination F1 |
+| Source Attribution | Citation Verification | `CITE_VERIFY` | +40% citation accuracy |
+| Logic-Based Check | Zero-Shot Natural Logic | `NATURAL_LOGIC` | +8.96 accuracy points |
+| Combined Verification | UniFact Unified | `UNIFACT` | +20% comprehensive |
+| Internal State Check | EigenScore | `EIGENSCORE` | Hidden state analysis |
+| Re-Query Consistency | Iterative Prompting | `REQUERY_CHECK` | Black-box detection |
+
+#### Debate Methods
+
+| Display Name | Scientific Name | Code | Accuracy Gain |
+|-------------|-----------------|------|---------------|
+| Challenge | Adversarial Challenge | `GENERATE_CHALLENGE` | Counter-arguments |
+| Defend | Position Defense | `DEFEND_POSITION` | Respond to challenges |
+| Efficient Debate | Sparse Topology Debate | `SPARSE_DEBATE` | -40-60% cost, <5% quality loss |
+| Attack & Support Map | ArgLLMs Bipolar | `ARG_MAPPING` | +35% structured argumentation |
+| Human-AI Panel | HAH-Delphi Hybrid | `HAH_DELPHI` | >90% expert coverage |
+| Confidence-Weighted | ReConcile Consensus | `RECONCILE_WEIGHTED` | +15-25% diverse ensembles |
+
+#### Aggregation Methods
+
+| Display Name | Scientific Name | Code | Accuracy Gain |
+|-------------|-----------------|------|---------------|
+| Vote | Majority Aggregation | `MAJORITY_VOTE` | Most common answer |
+| Weight | Weighted Aggregation | `WEIGHTED_AGGREGATE` | Confidence-weighted |
+| Multi-Sample Voting | Self-Consistency | `SELF_CONSISTENCY` | +17.9% on GSM8K |
+| Ranked Choice | GEDI Electoral CDM | `GEDI_VOTE` | +30% consensus |
+
+#### Routing Methods
+
+| Display Name | Scientific Name | Code | Accuracy Gain | Implementation |
+|-------------|-----------------|------|---------------|----------------|
+| Classify | Task Classification | `DETECT_TASK_TYPE` | Detect complexity | Keyword analysis |
+| Route | Model Selection | `SELECT_BEST_MODEL` | Optimal model | Capability matching |
+| Smart Selection | RouteLLM Adaptive | `ROUTELLM` | -50% cost, <3% loss | Learned router |
+| Progressive Escalation | FrugalGPT Cascade | `FRUGAL_CASCADE` | -90% cost maintained | Confidence-based escalation |
+| Budget-Aware | Pareto Routing | `PARETO_ROUTE` | Optimal trade-off | Pareto frontier calculation |
+| Smart Cost Escalation | C3PO Self-Supervised | `C3PO_CASCADE` | -40% cost, +2% quality | Difficulty prediction + tiered cascade (NeurIPS 2024) |
+| Self-Routing | AutoMix POMDP | `AUTOMIX` | Self-improving | ε-greedy exploration + self-verification (Nov 2025) |
+
+**Implementation Notes:**
+- **Pareto Routing**: Computes Pareto frontier across quality/latency/cost, selects optimal model within budget constraints.
+- **C3PO Cascade**: Predicts query difficulty using prompt features, starts at appropriate tier, cascades up if confidence insufficient.
+- **AutoMix POMDP**: Uses POMDP belief state for model selection with ε-greedy exploration and self-verification for quality assurance.
+
+#### Collaboration Methods
+
+| Display Name | Scientific Name | Code | Accuracy Gain |
+|-------------|-----------------|------|---------------|
+| No-Comm Coordination | ECON Bayesian Nash | `ECON_NASH` | +11.2% coordination |
+| Fair Merge | Token Auction | `TOKEN_AUCTION` | Fair multi-stakeholder |
+| Logic & Solve | Logic-LM Neuro-Symbolic | `LOGIC_LM` | +39.2% over standard |
+| Generate & Verify | LLM-Modulo Framework | `LLM_MODULO` | 12%→93.9% plan success |
+| Auto-Discover | AFlow MCTS Discovery | `AFLOW_MCTS` | Beats human designs |
+
+#### Uncertainty Methods
+
+| Display Name | Scientific Name | Code | Accuracy Gain | Implementation |
+|-------------|-----------------|------|---------------|----------------|
+| Meaning-Based | Semantic Entropy | `SEMANTIC_ENTROPY` | AUROC 0.79-0.87 | NLI clustering |
+| Calibrated Confidence | Calibrated Estimation | `CALIBRATED_CONF` | ECE -15% | Temperature scaling |
+| Agreement Scoring | Consistency UQ | `CONSISTENCY_UQ` | Simple, effective | Multi-sample agreement |
+| Fast Uncertainty | SE Probes (Logprob-based) | `SE_PROBES` | 300x faster, 90% accuracy | Token logprob entropy (ICML 2024) |
+| Detailed Score | Kernel Language Entropy | `KERNEL_ENTROPY` | Finer-grained | Embedding KDE (NeurIPS 2024) |
+| Guaranteed Bounds | Conformal Prediction | `CONFORMAL_PRED` | Statistical guarantees | Coverage calibration |
+
+**Implementation Notes:**
+- **SE Probes**: Uses OpenAI logprobs API to compute per-token Shannon entropy. Approximates hidden state probes without model internals access.
+- **Kernel Entropy**: Generates embeddings via `text-embedding-3-small`, applies Gaussian KDE with Silverman bandwidth, returns density-based entropy.
+
+#### Hallucination Detection (NEW)
+
+| Display Name | Scientific Name | Code | Accuracy Gain |
+|-------------|-----------------|------|---------------|
+| Fact-Check Scanner | Multi-Method Detection | `MULTI_HALLUC` | F1 0.85+ |
+| Mutation Testing | MetaQA Metamorphic | `METAQA` | +30% subtle inconsistencies |
+| Source Verification | Factual Grounding | `FACTUAL_GROUND` | +45% grounding accuracy |
+
+#### Human-in-the-Loop (NEW)
+
+| Display Name | Scientific Name | Code | Purpose |
+|-------------|-----------------|------|---------|
+| Human Review Queue | HITL Review System | `HITL_REVIEW` | +90% critical error prevention |
+| Multi-Level Review | Tiered Evaluation | `TIERED_EVAL` | Efficient human resources |
+| Smart Sampling | Active Learning | `ACTIVE_SAMPLE` | +60% labeling efficiency |
+
+#### Neural/ML Methods (NEW)
+
+| Display Name | Scientific Name | Code | Description |
+|-------------|-----------------|------|-------------|
+| Neural Decision | Cato Neural Decision Engine | `CATO_NEURAL` | Integrates Cato safety pipeline with consciousness affect state and predictive coding |
+
+### 34.3 System vs User Methods
+
+All orchestration methods have an `isSystemMethod` flag:
+
+| Type | Can Edit Parameters | Can Edit Definition | Can Delete |
+|------|---------------------|---------------------|------------|
+| **System Method** | ✅ Yes | ❌ No | ❌ No |
+| **User Method** | ✅ Yes | ✅ Yes | ✅ Yes |
+
+**System methods** are the 70+ built-in methods documented above. Administrators can:
+- Enable/disable system methods
+- Modify default parameters
+- View execution metrics
+
+**User methods** (future feature) will allow tenants to create custom methods with their own prompts or code references.
+
+### 34.4 User Workflow Templates
+
+**Location**: Admin Dashboard → Think Tank → Workflow Templates
+
+Users can create custom workflows by:
+
+1. **Creating from scratch** - Add methods step by step
+2. **Basing on system workflow** - Start from one of 49 system patterns
+3. **Customizing parameters** - Override default parameters per step
+4. **Sharing with team** - Make templates available to organization
+
+#### Template Structure
+
+```typescript
+interface UserWorkflowTemplate {
+  templateId: string;
+  templateName: string;
+  templateDescription: string;
+  baseWorkflowCode?: string;
+  steps: Array<{
+    stepOrder: number;
+    methodCode: string;
+    displayName: string;
+    parameters: Record<string, unknown>;
+    condition?: string;
+    isEnabled: boolean;
+  }>;
+  category: string;
+  tags: string[];
+  isShared: boolean;
+  timesUsed: number;
+}
+```
+
+#### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/orchestration/user-templates` | GET | List user templates (own + shared) |
+| `/api/admin/orchestration/user-templates` | POST | Create template |
+| `/api/admin/orchestration/user-templates/:id` | GET | Get template details |
+| `/api/admin/orchestration/user-templates/:id` | PATCH | Update template (owner only) |
+| `/api/admin/orchestration/user-templates/:id` | DELETE | Delete template (owner only) |
+| `/api/admin/orchestration/user-templates/:id/share` | POST | Toggle team sharing |
+| `/api/admin/orchestration/user-templates/:id/duplicate` | POST | Duplicate template |
+
+**Method Management Endpoints**:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/orchestration/methods` | GET | List all methods (includes `isSystemMethod`) |
+| `/api/admin/orchestration/methods/:code` | GET | Get method details |
+| `/api/admin/orchestration/methods/:code` | PATCH | Update method (parameters only for system methods) |
+| `/api/admin/orchestration/metrics` | GET | Method execution metrics |
+| `/api/admin/orchestration/executions` | GET | Recent executions |
+
+### 34.4 Cato Neural Decision Engine
+
+The `CATO_NEURAL` method integrates with the Genesis Cato safety architecture:
+
+#### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `safety_mode` | enum | `enforce` | CBF enforcement: enforce, warn, monitor |
+| `use_affect_mapping` | boolean | `true` | Map affect state to hyperparameters |
+| `use_predictive_coding` | boolean | `true` | Enable active inference |
+| `precision_governor_enabled` | boolean | `true` | Limit confidence by epistemic state |
+| `cbf_threshold` | number | `0.95` | Safety barrier threshold |
+
+#### Affect-to-Hyperparameter Mapping
+
+| Affect State | Hyperparameter Effect |
+|--------------|----------------------|
+| High frustration (>0.5) | Lower temperature (more focused) |
+| High curiosity (>0.6) | Higher temperature (exploration) |
+| Low self-efficacy (<0.4) | Escalate to expert model |
+| High arousal (>0.7) | Longer max tokens |
+
+### 34.5 Method Parameters Reference
+
+All methods have configurable parameters that can be set at the **Admin level** (defaults) or overridden in **User Workflow Templates**.
+
+#### Uncertainty & Confidence Methods
+
+| Method | Parameter | Type | Default | Description |
+|--------|-----------|------|---------|-------------|
+| **SEMANTIC_ENTROPY** | `sample_count` | integer | 10 | Number of response samples (5-20) |
+| | `temperature` | number | 0.7 | Sampling temperature |
+| | `clustering_method` | enum | "nli" | Clustering: nli, embedding, exact |
+| | `entropy_threshold` | number | 0.5 | Flag uncertainty above this |
+| **SE_PROBES** | `probe_layers` | array | [-1, -2] | Model layers to probe (logprob-based) |
+| | `threshold` | number | 0.5 | Uncertainty threshold |
+| | `fast_mode` | boolean | true | Use fast logprob estimation |
+| | `sample_count` | integer | 5 | Number of samples for averaging |
+| **KERNEL_ENTROPY** | `kernel` | enum | "rbf" | Kernel: rbf, linear, polynomial |
+| | `bandwidth` | string | "auto" | Bandwidth or "auto" for Silverman |
+| | `sample_count` | integer | 10 | Response samples for KDE |
+| **CALIBRATED_CONF** | `calibration_method` | enum | "platt_scaling" | platt_scaling, isotonic, temperature_scaling |
+| | `confidence_prompt` | string | "verbalized" | How to elicit confidence |
+| | `temperature` | number | 0.3 | Sampling temperature |
+| **CONSISTENCY_UQ** | `sample_count` | integer | 5 | Number of response samples |
+| | `agreement_metric` | enum | "jaccard" | jaccard, cosine, exact_match, bertscore |
+| | `threshold` | number | 0.7 | Agreement threshold |
+| **CONFORMAL_PRED** | `coverage_target` | number | 0.9 | Target coverage (0.5-0.99) |
+| | `calibration_size` | integer | 500 | Calibration set size |
+| | `adaptive` | boolean | true | Use adaptive conformal sets |
+
+#### Routing Methods
+
+| Method | Parameter | Type | Default | Description |
+|--------|-----------|------|---------|-------------|
+| **ROUTELLM** | `router_model` | enum | "matrix_factorization" | Router: matrix_factorization, bert, causal_lm |
+| | `cost_threshold` | number | 0.7 | Max cost relative to baseline |
+| | `quality_floor` | number | 0.8 | Minimum acceptable quality |
+| **FRUGAL_CASCADE** | `model_cascade` | array | ["gpt-4o-mini", "gpt-4o", "o1"] | Models in escalation order |
+| | `confidence_threshold` | number | 0.85 | Escalate below this confidence |
+| | `max_escalations` | integer | 2 | Maximum escalation steps |
+| **PARETO_ROUTE** | `budget_cents` | number | 10 | Budget constraint per query |
+| | `quality_weight` | number | 0.7 | Weight for quality (0-1) |
+| | `latency_weight` | number | 0.1 | Weight for latency (0-1) |
+| **C3PO_CASCADE** | `cascade_levels` | integer | 3 | Number of model tiers |
+| | `self_supervised` | boolean | true | Enable self-supervised learning |
+| | `calibration_samples` | integer | 100 | Samples for difficulty calibration |
+| **AUTOMIX** | `pomdp_horizon` | integer | 3 | POMDP planning horizon |
+| | `exploration_rate` | number | 0.1 | ε for ε-greedy exploration |
+| | `self_verification` | boolean | true | Verify own outputs |
+
+#### Debate & Deliberation Methods
+
+| Method | Parameter | Type | Default | Description |
+|--------|-----------|------|---------|-------------|
+| **SPARSE_DEBATE** | `topology` | enum | "ring" | Network: ring, star, tree, full |
+| | `debate_rounds` | integer | 3 | Number of debate rounds (1-10) |
+| | `temperature` | number | 0.7 | Agent response temperature |
+| **ARG_MAPPING** | `strength_threshold` | number | 0.5 | Min argument strength to include |
+| | `include_rebuttal` | boolean | true | Generate rebuttals |
+| | `max_depth` | integer | 3 | Max argument tree depth |
+| **HAH_DELPHI** | `tiers` | integer | 4 | Number of consensus tiers |
+| | `human_threshold` | number | 0.6 | Escalate to human above this |
+| | `consensus_target` | number | 0.9 | Target consensus level |
+| | `max_rounds` | integer | 5 | Maximum Delphi rounds |
+| **RECONCILE_WEIGHTED** | `min_confidence` | number | 0.6 | Minimum confidence to include |
+| | `weight_by` | string | "confidence" | Weighting strategy |
+| | `reconciliation_rounds` | integer | 2 | Reconciliation iterations |
+
+#### Evaluation Methods
+
+| Method | Parameter | Type | Default | Description |
+|--------|-----------|------|---------|-------------|
+| **POLL_JUDGE** | `num_judges` | integer | 3 | Number of judge models |
+| | `scoring_criteria` | array | ["accuracy", "completeness", "clarity"] | Evaluation dimensions |
+| | `aggregation` | enum | "mean" | Aggregation: mean, median, weighted |
+| **G_EVAL** | `dimensions` | array | ["coherence", "consistency", "fluency", "relevance"] | G-Eval dimensions |
+| | `use_cot` | boolean | true | Chain-of-thought scoring |
+| | `score_range` | array | [1, 5] | Score min/max |
+| **PAIRWISE_PREFER** | `comparison_criteria` | array | ["quality", "accuracy", "helpfulness"] | Comparison dimensions |
+| | `allow_tie` | boolean | true | Allow tie verdicts |
+| **SELFCHECK_GPT** | `sample_count` | integer | 5 | Consistency check samples |
+| | `check_type` | enum | "consistency" | Check type: consistency, bertscore, nli |
+| | `threshold` | number | 0.7 | Inconsistency threshold |
+
+#### Hallucination Detection Methods
+
+| Method | Parameter | Type | Default | Description |
+|--------|-----------|------|---------|-------------|
+| **MULTI_HALLUC** | `methods` | array | ["consistency", "attribution", "semantic_entropy"] | Detection methods |
+| | `aggregation` | enum | "weighted" | weighted, majority, any |
+| | `flag_threshold` | number | 0.6 | Flag as hallucination above |
+| **METAQA** | `transformations` | array | ["paraphrase", "negation", "entity_swap"] | Mutation types |
+| | `num_mutations` | integer | 3 | Mutations per claim |
+| | `consistency_threshold` | number | 0.8 | Consistency threshold |
+| **FACTUAL_GROUND** | `retrieval_top_k` | integer | 5 | Documents to retrieve |
+| | `evidence_threshold` | number | 0.7 | Evidence support threshold |
+| | `require_explicit_support` | boolean | true | Require explicit evidence |
+
+#### Human-in-the-Loop Methods
+
+| Method | Parameter | Type | Default | Description |
+|--------|-----------|------|---------|-------------|
+| **HITL_REVIEW** | `confidence_threshold` | number | 0.7 | Route to human below this |
+| | `stake_level` | enum | "medium" | low, medium, high, critical |
+| | `auto_approve_above` | number | 0.95 | Auto-approve above this confidence |
+| | `queue_priority` | enum | "fifo" | Queue ordering |
+| **TIERED_EVAL** | `tiers` | integer | 3 | Evaluation tiers |
+| | `auto_tier_threshold` | number | 0.85 | Auto-approve threshold |
+| | `escalation_criteria` | array | ["low_confidence", "high_stakes"] | When to escalate |
+| **ACTIVE_SAMPLE** | `uncertainty_method` | enum | "entropy" | entropy, margin, random |
+| | `batch_size` | integer | 10 | Samples per batch |
+| | `diversity_weight` | number | 0.3 | Diversity in selection |
+
+### 34.6 User Workflow Template Parameter Overrides
+
+When users create workflow templates, they can override default parameters for each step:
+
+```typescript
+// Example: User template with parameter overrides
+{
+  "templateName": "High-Confidence Research",
+  "steps": [
+    {
+      "stepOrder": 1,
+      "methodCode": "SEMANTIC_ENTROPY",
+      "parameters": {
+        "sample_count": 15,        // Override: more samples
+        "entropy_threshold": 0.3   // Override: stricter threshold
+      }
+    },
+    {
+      "stepOrder": 2,
+      "methodCode": "FRUGAL_CASCADE",
+      "parameters": {
+        "confidence_threshold": 0.95,  // Override: higher confidence
+        "max_escalations": 3           // Override: allow more escalation
+      }
+    }
+  ]
+}
+```
+
+**Admin Dashboard** (`Orchestration → Methods`):
+- View and edit **default parameters** for all methods
+- Changes apply to all workflows using the method
+- System methods: parameters only, not method definition
+
+**Think Tank UI** (`Workflow Templates`):
+- Users create templates with **parameter overrides**
+- Overrides apply only to that template
+- Templates can be shared with team
+
+### 34.7 Database Tables
+
+```sql
+-- Methods with display/scientific names
+ALTER TABLE orchestration_methods 
+ADD COLUMN display_name VARCHAR(200),
+ADD COLUMN scientific_name VARCHAR(300),
+ADD COLUMN research_reference TEXT,
+ADD COLUMN accuracy_improvement VARCHAR(200),
+ADD COLUMN complexity_level VARCHAR(50);
+
+-- User workflow templates
+CREATE TABLE user_workflow_templates (
+  template_id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  user_id UUID NOT NULL,
+  template_name VARCHAR(200) NOT NULL,
+  template_description TEXT,
+  base_workflow_code VARCHAR(100),
+  steps JSONB NOT NULL DEFAULT '[]',
+  category VARCHAR(100),
+  tags TEXT[] DEFAULT '{}',
+  is_shared BOOLEAN DEFAULT false,
+  times_used INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(tenant_id, user_id, template_name)
+);
+```
+
+### 34.7 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `migrations/066_orchestration_patterns_registry.sql` | Base schema with `is_system_method`/`is_system_workflow` |
+| `migrations/157_orchestration_methods_part1.sql` | Schema updates, display/scientific names |
+| `migrations/157_orchestration_methods_part2.sql` | Ensemble, verification methods |
+| `migrations/157_orchestration_methods_part3.sql` | Uncertainty, routing, neural methods |
+| `lambda/shared/services/orchestration-methods.service.ts` | **20 algorithm implementations** including SE Probes, Kernel Entropy, Pareto, C3PO, AutoMix |
+| `lambda/shared/services/cato/neural-decision.service.ts` | Cato Neural Decision Engine |
+| `lambda/admin/orchestration-methods.ts` | Methods API with system method protection |
+| `lambda/admin/orchestration-user-templates.ts` | User templates CRUD API |
+| `apps/admin-dashboard/app/(dashboard)/orchestration/methods/page.tsx` | Admin method config with system badge |
+| `apps/admin-dashboard/app/(dashboard)/thinktank/workflow-templates/page.tsx` | User templates UI |
+
+---
+
 ## Related Documentation
 
 - [RADIANT Admin Guide](./RADIANT-ADMIN-GUIDE.md) - Platform administration

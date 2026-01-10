@@ -10,8 +10,9 @@ import { AuthStack } from '../lib/stacks/auth-stack';
 import { AIStack } from '../lib/stacks/ai-stack';
 import { ApiStack } from '../lib/stacks/api-stack';
 import { AdminStack } from '../lib/stacks/admin-stack';
-import { BobbleTierTransitionStack } from '../lib/stacks/bobble-tier-transition-stack';
+import { CatoTierTransitionStack } from '../lib/stacks/cato-tier-transition-stack';
 import { CatoRedisStack } from '../lib/stacks/cato-redis-stack';
+import { CatoGenesisStack } from '../lib/stacks/cato-genesis-stack';
 import { BrainStack } from '../lib/stacks/brain-stack';
 import { 
   RADIANT_VERSION, 
@@ -270,22 +271,34 @@ if (tier >= 2) {
   console.log(`║ Cato Redis:   SKIPPED (requires Tier 2+)                      ║`);
 }
 
+// 12. Cato Genesis Stack (Monitoring and alerting for Cato safety)
+const catoGenesisStack = new CatoGenesisStack(app, `${stackPrefix}-cato-genesis`, {
+  env,
+  appId,
+  environment,
+  alertEmail: app.node.tryGetContext('alertEmail'),
+  monthlyBudgetUsd: tier >= 3 ? 1000 : 500,
+  tags,
+  description: `RADIANT Cato Genesis Monitoring - ${appId} ${environment}`,
+});
+catoGenesisStack.addDependency(foundationStack);
+
 // ============================================================================
-// BOBBLE INFRASTRUCTURE TIER TRANSITION (Phase 3)
+// CATO INFRASTRUCTURE TIER TRANSITION (Phase 3)
 // ============================================================================
 
-// 12. Bobble Tier Transition Stack (Step Functions workflow for tier switching)
-const bobbleTierTransitionStack = new BobbleTierTransitionStack(app, `${stackPrefix}-bobble-tier-transition`, {
+// 13. Cato Tier Transition Stack (Step Functions workflow for tier switching)
+const catoTierTransitionStack = new CatoTierTransitionStack(app, `${stackPrefix}-cato-tier-transition`, {
   env,
   environment: environment as 'dev' | 'staging' | 'prod',
   dbClusterArn: dataStack.cluster.clusterArn,
   dbSecretArn: dataStack.cluster.secret?.secretArn,
   dbName: 'radiant',
   tags,
-  description: `RADIANT Bobble Tier Transition - ${appId} ${environment}`,
+  description: `RADIANT Cato Tier Transition - ${appId} ${environment}`,
 });
-bobbleTierTransitionStack.addDependency(adminStack);
-bobbleTierTransitionStack.addDependency(dataStack);
+catoTierTransitionStack.addDependency(adminStack);
+catoTierTransitionStack.addDependency(dataStack);
 
 // ============================================================================
 // TAGGING

@@ -4,7 +4,7 @@
 import { TextractClient, DetectDocumentTextCommand, AnalyzeDocumentCommand, FeatureType } from '@aws-sdk/client-textract';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 
 export interface ImageDescriptionResult {
   success: boolean;

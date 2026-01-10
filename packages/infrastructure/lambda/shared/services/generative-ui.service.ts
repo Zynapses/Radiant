@@ -389,7 +389,7 @@ class GenerativeUIService {
         }
         
         if (Object.keys(item).length > 1) {
-          items.push(item);
+          items.push(item as Record<string, Record<string, unknown>>);
         }
       }
     }
@@ -494,29 +494,27 @@ class GenerativeUIService {
     interactionType: 'view' | 'interact' | 'rate',
     rating?: number
   ): Promise<void> {
-    await executeStatement({
-      sql: `
-        UPDATE generated_ui
-        SET interaction_count = interaction_count + 1,
-            last_interacted_at = NOW(),
-            user_rating = COALESCE($1, user_rating)
-        WHERE id = $2::uuid
-      `,
-      parameters: [
+    await executeStatement(
+      `UPDATE generated_ui
+       SET interaction_count = interaction_count + 1,
+           last_interacted_at = NOW(),
+           user_rating = COALESCE($1, user_rating)
+       WHERE id = $2::uuid`,
+      [
         stringParam('rating', rating ? String(rating) : ''),
         stringParam('id', uiId),
-      ],
-    });
+      ]
+    );
   }
 
   /**
    * Get generated UI by ID
    */
   async getGeneratedUI(uiId: string): Promise<GeneratedUI | null> {
-    const result = await executeStatement({
-      sql: `SELECT * FROM generated_ui WHERE id = $1::uuid`,
-      parameters: [stringParam('id', uiId)],
-    });
+    const result = await executeStatement(
+      `SELECT * FROM generated_ui WHERE id = $1::uuid`,
+      [stringParam('id', uiId)]
+    );
 
     if (!result.rows?.length) return null;
     return this.mapRowToGeneratedUI(result.rows[0]);
@@ -526,21 +524,19 @@ class GenerativeUIService {
    * Save generated UI to database
    */
   private async saveGeneratedUI(ui: GeneratedUI): Promise<void> {
-    await executeStatement({
-      sql: `
-        INSERT INTO generated_ui (
-          id, tenant_id, user_id, conversation_id, message_id,
-          prompt, generated_from, components, layout,
-          generation_model, generation_time_ms,
-          interaction_count, created_at
-        ) VALUES (
-          $1::uuid, $2::uuid, $3::uuid, $4::uuid, $5::uuid,
-          $6, $7, $8::jsonb, $9,
-          $10, $11,
-          $12, $13
-        )
-      `,
-      parameters: [
+    await executeStatement(
+      `INSERT INTO generated_ui (
+        id, tenant_id, user_id, conversation_id, message_id,
+        prompt, generated_from, components, layout,
+        generation_model, generation_time_ms,
+        interaction_count, created_at
+      ) VALUES (
+        $1::uuid, $2::uuid, $3::uuid, $4::uuid, $5::uuid,
+        $6, $7, $8::jsonb, $9,
+        $10, $11,
+        $12, $13
+      )`,
+      [
         stringParam('id', ui.id),
         stringParam('tenantId', ui.tenantId),
         stringParam('userId', ui.userId),
@@ -554,8 +550,8 @@ class GenerativeUIService {
         stringParam('generationTimeMs', String(ui.generationTimeMs)),
         stringParam('interactionCount', String(ui.interactionCount)),
         stringParam('createdAt', ui.createdAt.toISOString()),
-      ],
-    });
+      ]
+    );
   }
 
   // Helper methods
@@ -628,10 +624,10 @@ class GenerativeUIService {
    * Get configuration
    */
   async getConfig(tenantId: string): Promise<GenerativeUIConfig> {
-    const result = await executeStatement({
-      sql: `SELECT generative_ui FROM cognitive_architecture_config WHERE tenant_id = $1::uuid`,
-      parameters: [stringParam('tenantId', tenantId)],
-    });
+    const result = await executeStatement(
+      `SELECT generative_ui FROM cognitive_architecture_config WHERE tenant_id = $1::uuid`,
+      [stringParam('tenantId', tenantId)]
+    );
 
     if (result.rows?.length && result.rows[0].generative_ui) {
       return result.rows[0].generative_ui as GenerativeUIConfig;

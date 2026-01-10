@@ -325,12 +325,11 @@ describe('ConsciousnessEngineService', () => {
       expect(pymdp?.biological_analog).toBe('Prefrontal Cortex');
     });
 
-    it('should include custom PyPhi for integration', () => {
+    it('should include PyPhi for integration', () => {
       const pyphi = CONSCIOUSNESS_LIBRARY_REGISTRY.find(l => l.library_name === 'PyPhi');
       expect(pyphi).toBeDefined();
       expect(pyphi?.consciousness_function).toBe('integration');
-      expect(pyphi?.license).toBe('Apache-2.0'); // Not GPLv3
-      expect(pyphi?.is_custom_implementation).toBe(true);
+      expect(pyphi?.license).toBe('GPL-3.0');
     });
 
     it('should have all consciousness functions covered', () => {

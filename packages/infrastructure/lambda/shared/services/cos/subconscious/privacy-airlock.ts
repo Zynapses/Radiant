@@ -16,6 +16,7 @@
 
 import { query } from '../../database';
 import crypto from 'crypto';
+import { logger } from '../../../logging/enhanced-logger';
 
 export type PrivacyLevel = 'public' | 'internal' | 'confidential' | 'restricted' | 'phi';
 export type AirlockStatus = 'pending' | 'approved' | 'rejected' | 'expired';
@@ -129,7 +130,7 @@ export class PrivacyAirlock {
       ]
     );
     
-    console.log(`[COS Airlock] Packet ${packet.id} submitted: status=${status}, PHI=${phiDetected.detected}, PII=${piiDetected.detected}`);
+    logger.info(`[COS Airlock] Packet ${packet.id} submitted: status=${status}, PHI=${phiDetected.detected}, PII=${piiDetected.detected}`);
     
     return entry;
   }
@@ -238,7 +239,7 @@ export class PrivacyAirlock {
       [newStatus, deidentResult.deidentifiedContent, reviewerId, entryId]
     );
     
-    console.log(`[COS Airlock] Entry ${entryId} processed: ${newStatus} by ${reviewerId}`);
+    logger.info(`[COS Airlock] Entry ${entryId} processed: ${newStatus} by ${reviewerId}`);
     
     return {
       id: entryId,

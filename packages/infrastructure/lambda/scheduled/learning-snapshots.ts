@@ -7,6 +7,7 @@
 import { ScheduledEvent } from 'aws-lambda';
 import { Pool } from 'pg';
 import { LearningInfluenceService } from '../shared/services/learning-hierarchy.service';
+import { logger } from '../shared/logging/enhanced-logger';
 
 const pool = new Pool({
   host: process.env.DB_HOST,
@@ -31,14 +32,14 @@ export const handler = async (event: ScheduledEvent): Promise<{
   statusCode: number;
   body: string;
 }> => {
-  console.log('Learning Snapshots Lambda triggered', { time: event.time });
+  logger.info('Learning Snapshots Lambda triggered', { time: event.time });
 
   const results: SnapshotResult[] = [];
   let globalSnapshotId: string | undefined;
 
   try {
     // 1. Create global snapshot first
-    console.log('Creating global learning snapshot...');
+    logger.info('Creating global learning snapshot');
     try {
       globalSnapshotId = await learningService.createSnapshot('global');
       results.push({
@@ -46,7 +47,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
         snapshotId: globalSnapshotId,
         success: true,
       });
-      console.log('Global snapshot created:', globalSnapshotId);
+      logger.info('Global snapshot created', { snapshotId: globalSnapshotId });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       results.push({
@@ -55,7 +56,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
         success: false,
         error: errorMessage,
       });
-      console.error('Failed to create global snapshot:', errorMessage);
+      logger.error('Failed to create global snapshot', undefined, { error: errorMessage });
     }
 
     // 2. Get all active tenants with learning data
@@ -71,7 +72,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
       LIMIT 1000
     `);
 
-    console.log(`Found ${tenantsResult.rows.length} tenants with learning data`);
+    logger.info('Found tenants with learning data', { count: tenantsResult.rows.length });
 
     // 3. Create tenant snapshots
     for (const row of tenantsResult.rows) {
@@ -86,7 +87,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
           snapshotId,
           success: true,
         });
-        console.log(`Tenant snapshot created for ${tenantName}:`, snapshotId);
+        logger.info('Tenant snapshot created', { tenantName, snapshotId });
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         results.push({
@@ -96,7 +97,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
           success: false,
           error: errorMessage,
         });
-        console.error(`Failed to create snapshot for tenant ${tenantName}:`, errorMessage);
+        logger.error('Failed to create tenant snapshot', undefined, { tenantName, error: errorMessage });
       }
     }
 
@@ -107,11 +108,11 @@ export const handler = async (event: ScheduledEvent): Promise<{
       AND is_current = false
       RETURNING id
     `);
-    console.log(`Cleaned up ${cleanupResult.rowCount} old snapshots`);
+    logger.info('Cleaned up old snapshots', { count: cleanupResult.rowCount });
 
     // 5. Refresh materialized views for metrics
     await pool.query('SELECT refresh_tenant_daily_metrics()');
-    console.log('Refreshed tenant daily metrics view');
+    logger.info('Refreshed tenant daily metrics view');
 
     // 6. Log snapshot run
     await pool.query(`
@@ -138,7 +139,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
       cleanedUp: cleanupResult.rowCount,
     };
 
-    console.log('Snapshot job completed:', summary);
+    logger.info('Snapshot job completed', { summary });
 
     return {
       statusCode: 200,
@@ -152,7 +153,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Learning snapshots job failed:', errorMessage);
+    logger.error('Learning snapshots job failed', undefined, { error: errorMessage });
 
     // Log failure
     await pool.query(`

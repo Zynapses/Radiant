@@ -8,6 +8,10 @@ description: Policy - All builds, features, and metadata changes must be tracked
 
 ## Required Updates
 
+**⚠️ CRITICAL: Documentation is part of the build, not a separate step.**
+
+See also: `/documentation-required` and `/documentation-standards` workflows.
+
 When making ANY of the following changes, you MUST update the corresponding files:
 
 ### 1. Feature Changes → Update CHANGELOG.md
@@ -79,19 +83,33 @@ New migrations must include header comments:
 -- Affects: Tables/features affected
 ```
 
+### 5. Feature Documentation → Update Admin Guides
+
+**All user/admin-facing features MUST have documentation updated in the SAME implementation pass:**
+
+| If you create... | You MUST also update... |
+|------------------|-------------------------|
+| Platform admin features | `docs/RADIANT-ADMIN-GUIDE.md` |
+| Think Tank features | `docs/THINKTANK-ADMIN-GUIDE.md` |
+| Orchestration methods/workflows | `docs/THINKTANK-ADMIN-GUIDE.md` Section 34 |
+| Any significant feature | `docs/STRATEGIC-VISION-MARKETING.md` |
+
+**This is NOT optional.** A feature is incomplete without documentation.
+
 ## When to Apply This Policy
 
-| Change Type | CHANGELOG | VERSION_HISTORY | Version Files |
-|-------------|-----------|-----------------|---------------|
-| New feature | ✅ Required | On release | On release |
-| Bug fix | ✅ Required | On release | On release |
-| Behavior change | ✅ Required | On release | On release |
-| New API endpoint | ✅ Required | On release | On release |
-| New migration | ✅ Required | On release | On release |
-| Config change | ✅ Required | On release | On release |
-| UI component | ✅ Required | On release | On release |
-| Documentation only | Optional | No | No |
-| Refactor (no behavior change) | Optional | No | No |
+| Change Type | CHANGELOG | VERSION_HISTORY | Version Files | Admin Guide |
+|-------------|-----------|-----------------|---------------|-------------|
+| New feature | ✅ Required | On release | On release | ✅ Required |
+| Bug fix | ✅ Required | On release | On release | If behavior changes |
+| Behavior change | ✅ Required | On release | On release | ✅ Required |
+| New API endpoint | ✅ Required | On release | On release | ✅ Required |
+| New migration | ✅ Required | On release | On release | If user-facing |
+| Config change | ✅ Required | On release | On release | ✅ Required |
+| UI component | ✅ Required | On release | On release | ✅ Required |
+| Orchestration method | ✅ Required | On release | On release | ✅ Required |
+| Documentation only | Optional | No | No | N/A |
+| Refactor (no behavior change) | Optional | No | No | No |
 
 ## Enforcement Checklist
 

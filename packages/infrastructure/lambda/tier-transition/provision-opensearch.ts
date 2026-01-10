@@ -5,6 +5,7 @@
  */
 
 import { Handler } from 'aws-lambda';
+import { logger } from '../shared/logging/enhanced-logger';
 import { 
   OpenSearchClient, 
   CreateDomainCommand,
@@ -14,7 +15,7 @@ import {
 import {
   OpenSearchServerlessClient,
   CreateCollectionCommand,
-  GetCollectionCommand
+  BatchGetCollectionCommand
 } from '@aws-sdk/client-opensearchserverless';
 
 const opensearch = new OpenSearchClient({});
@@ -62,7 +63,7 @@ const TIER_CONFIGS: Record<string, {
 };
 
 export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) => {
-  console.log('Provisioning OpenSearch:', JSON.stringify(event));
+  logger.info('Provisioning OpenSearch:', { event });
 
   const { tenantId, toTier } = event;
   const config = TIER_CONFIGS[toTier];
@@ -79,20 +80,20 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
     return result;
   }
 
-  const domainName = `bobble-vectors-${tenantId.substring(0, 8)}`;
-  const collectionName = `bobble-vectors-${tenantId.substring(0, 8)}`;
+  const domainName = `cato-vectors-${tenantId.substring(0, 8)}`;
+  const collectionName = `cato-vectors-${tenantId.substring(0, 8)}`;
 
   try {
     if (config.type === 'serverless') {
       // Create or verify serverless collection
       try {
-        await aoss.send(new GetCollectionCommand({ names: [collectionName] }));
+        await aoss.send(new BatchGetCollectionCommand({ names: [collectionName] }));
         result.resources.push(`Serverless collection exists: ${collectionName}`);
       } catch {
         await aoss.send(new CreateCollectionCommand({
           name: collectionName,
           type: 'VECTORSEARCH',
-          description: 'Bobble semantic vector search'
+          description: 'Cato semantic vector search'
         }));
         result.resources.push(`Created serverless collection: ${collectionName}`);
       }
@@ -138,7 +139,7 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
       }
     }
   } catch (error: any) {
-    console.error('OpenSearch provisioning error:', error);
+    logger.error('OpenSearch provisioning error:', error);
     result.status = 'FAILED';
     result.errors.push(error.message);
   }

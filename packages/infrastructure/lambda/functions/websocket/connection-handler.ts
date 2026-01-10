@@ -11,9 +11,9 @@
 import {
   APIGatewayProxyHandler,
   APIGatewayProxyWebsocketHandlerV2,
-  ScheduledHandler,
 } from 'aws-lambda';
 import { Redis } from 'ioredis';
+import { logger } from '../../shared/logging/enhanced-logger';
 import {
   ApiGatewayManagementApiClient,
   PostToConnectionCommand,
@@ -91,7 +91,7 @@ async function storeConnection(
     endpoint
   );
 
-  console.log(`Connection stored: ${connectionId} for tenant ${tenantId}`);
+  logger.info(`Connection stored: ${connectionId} for tenant ${tenantId}`);
 }
 
 async function removeConnection(
@@ -117,7 +117,7 @@ async function removeConnection(
 
   await redisClient.hdel('ws:connection_endpoints', connectionId);
 
-  console.log(`Connection removed: ${connectionId}`);
+  logger.info(`Connection removed: ${connectionId}`);
 }
 
 async function updateHeartbeat(
@@ -201,7 +201,7 @@ async function cleanupStaleConnections(): Promise<{
     }
   }
 
-  console.log(`Stale connection cleanup: checked=${checked}, removed=${removed}`);
+  logger.info(`Stale connection cleanup: checked=${checked}, removed=${removed}`);
   return { checked, removed };
 }
 
@@ -237,7 +237,7 @@ async function handleMessage(
       break;
 
     default:
-      console.log(`Unknown action: ${action}`);
+      logger.info(`Unknown action: ${action}`);
   }
 }
 
@@ -252,7 +252,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   const stage = event.requestContext.stage;
   const endpoint = `https://${domainName}/${stage}`;
 
-  console.log(`WebSocket event: ${routeKey}, connectionId: ${connectionId}`);
+  logger.info(`WebSocket event: ${routeKey}, connectionId: ${connectionId}`);
 
   try {
     if (routeKey === '$connect') {
@@ -324,7 +324,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       body: 'Unknown route',
     };
   } catch (error) {
-    console.error('WebSocket handler error:', error);
+    logger.error('WebSocket handler error:', error);
     return {
       statusCode: 500,
       body: 'Internal error',
@@ -332,17 +332,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   }
 };
 
-export const scheduledHandler: ScheduledHandler = async (event) => {
-  if ((event as any).action === 'cleanup_stale') {
+export const scheduledHandler = async (event: { action?: string }): Promise<void> => {
+  if (event.action === 'cleanup_stale') {
     const result = await cleanupStaleConnections();
-    return {
-      statusCode: 200,
-      body: JSON.stringify(result),
-    };
+    logger.info('Scheduled cleanup completed', { result });
   }
-
-  return {
-    statusCode: 200,
-    body: 'No action',
-  };
 };

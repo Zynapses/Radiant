@@ -426,8 +426,7 @@ class DeepResearchService {
    */
   private async sendNotification(job: ResearchJob): Promise<void> {
     // Would integrate with notification service
-    await executeStatement({
-      sql: `
+    await executeStatement(`
         INSERT INTO notifications (
           id, tenant_id, user_id, type, title, message,
           action_url, created_at
@@ -435,16 +434,14 @@ class DeepResearchService {
           $1::uuid, $2::uuid, $3::uuid, 'research_complete',
           $4, $5, $6, NOW()
         )
-      `,
-      parameters: [
+      `, [
         stringParam('id', crypto.randomUUID()),
         stringParam('tenantId', job.tenantId),
         stringParam('userId', job.userId),
         stringParam('title', `Research Complete: ${job.query.slice(0, 50)}...`),
         stringParam('message', job.executiveSummary || 'Your research is ready'),
         stringParam('actionUrl', `/research/${job.id}`),
-      ],
-    });
+      ]);
   }
 
   /**
@@ -708,50 +705,45 @@ class DeepResearchService {
    */
   private async enqueueJob(jobId: string): Promise<void> {
     // Would send to SQS/Redis queue
-    await executeStatement({
-      sql: `
+    await executeStatement(`
         INSERT INTO job_queue (id, job_type, job_id, status, created_at)
         VALUES ($1::uuid, 'research', $2::uuid, 'pending', NOW())
-      `,
-      parameters: [
+      `, [
         stringParam('id', crypto.randomUUID()),
         stringParam('jobId', jobId),
-      ],
-    });
+      ]);
   }
 
   /**
    * Save job to database
    */
   private async saveJob(job: ResearchJob): Promise<void> {
-    await executeStatement({
-      sql: `
-        INSERT INTO research_jobs (
-          id, tenant_id, user_id, query, research_type, scope,
-          config, status, progress, current_phase,
-          sources_found, sources_processed, sources,
-          briefing_document, executive_summary, key_findings, recommendations,
-          estimated_completion_ms, actual_duration_ms,
-          queued_at, started_at, completed_at,
-          notification_sent, notification_channel
-        ) VALUES (
-          $1::uuid, $2::uuid, $3::uuid, $4, $5, $6,
-          $7::jsonb, $8, $9, $10,
-          $11, $12, $13::jsonb,
-          $14, $15, $16::text[], $17::text[],
-          $18, $19,
-          $20, $21, $22,
-          $23, $24
-        )
-        ON CONFLICT (id) DO UPDATE SET
-          status = $8, progress = $9, current_phase = $10,
-          sources_found = $11, sources_processed = $12, sources = $13::jsonb,
-          briefing_document = $14, executive_summary = $15,
-          key_findings = $16::text[], recommendations = $17::text[],
-          actual_duration_ms = $19, completed_at = $22,
-          notification_sent = $23
-      `,
-      parameters: [
+    await executeStatement(
+      `INSERT INTO research_jobs (
+        id, tenant_id, user_id, query, research_type, scope,
+        config, status, progress, current_phase,
+        sources_found, sources_processed, sources,
+        briefing_document, executive_summary, key_findings, recommendations,
+        estimated_completion_ms, actual_duration_ms,
+        queued_at, started_at, completed_at,
+        notification_sent, notification_channel
+      ) VALUES (
+        $1::uuid, $2::uuid, $3::uuid, $4, $5, $6,
+        $7::jsonb, $8, $9, $10,
+        $11, $12, $13::jsonb,
+        $14, $15, $16::text[], $17::text[],
+        $18, $19,
+        $20, $21, $22,
+        $23, $24
+      )
+      ON CONFLICT (id) DO UPDATE SET
+        status = $8, progress = $9, current_phase = $10,
+        sources_found = $11, sources_processed = $12, sources = $13::jsonb,
+        briefing_document = $14, executive_summary = $15,
+        key_findings = $16::text[], recommendations = $17::text[],
+        actual_duration_ms = $19, completed_at = $22,
+        notification_sent = $23`,
+      [
         stringParam('id', job.id),
         stringParam('tenantId', job.tenantId),
         stringParam('userId', job.userId),
@@ -776,18 +768,18 @@ class DeepResearchService {
         stringParam('completedAt', job.completedAt?.toISOString() || ''),
         stringParam('notificationSent', String(job.notificationSent)),
         stringParam('notificationChannel', job.notificationChannel),
-      ],
-    });
+      ]
+    );
   }
 
   /**
    * Get job by ID
    */
   async getJob(jobId: string): Promise<ResearchJob | null> {
-    const result = await executeStatement({
-      sql: `SELECT * FROM research_jobs WHERE id = $1::uuid`,
-      parameters: [stringParam('id', jobId)],
-    });
+    const result = await executeStatement(
+      `SELECT * FROM research_jobs WHERE id = $1::uuid`,
+      [stringParam('id', jobId)]
+    );
 
     if (!result.rows?.length) return null;
 
@@ -803,19 +795,16 @@ class DeepResearchService {
     userId: string,
     limit: number = 10
   ): Promise<ResearchJob[]> {
-    const result = await executeStatement({
-      sql: `
+    const result = await executeStatement(`
         SELECT * FROM research_jobs
         WHERE tenant_id = $1::uuid AND user_id = $2::uuid
         ORDER BY queued_at DESC
         LIMIT $3
-      `,
-      parameters: [
+      `, [
         stringParam('tenantId', tenantId),
         stringParam('userId', userId),
         stringParam('limit', String(limit)),
-      ],
-    });
+      ]);
 
     return (result.rows || []).map(row => this.mapRowToJob(row));
   }
@@ -856,10 +845,10 @@ class DeepResearchService {
    * Get configuration
    */
   async getConfig(tenantId: string): Promise<DeepResearchConfig> {
-    const result = await executeStatement({
-      sql: `SELECT deep_research FROM cognitive_architecture_config WHERE tenant_id = $1::uuid`,
-      parameters: [stringParam('tenantId', tenantId)],
-    });
+    const result = await executeStatement(
+      `SELECT deep_research FROM cognitive_architecture_config WHERE tenant_id = $1::uuid`,
+      [stringParam('tenantId', tenantId)]
+    );
 
     if (result.rows?.length && result.rows[0].deep_research) {
       return result.rows[0].deep_research as DeepResearchConfig;

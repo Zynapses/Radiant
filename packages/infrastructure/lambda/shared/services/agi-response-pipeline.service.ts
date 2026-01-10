@@ -20,6 +20,7 @@ import {
   UserAnswer,
   ModelResponseMetadata,
   PipelineContext,
+  ArtifactType,
 } from '../types/agi-response.types';
 import { artifactPipeline, ArtifactUploadRequest } from './artifact-pipeline.service';
 import { modelRouterService } from './model-router.service';
@@ -941,17 +942,17 @@ Your consensus response:`;
     return map[language.toLowerCase()] || 'txt';
   }
 
-  private getMimeType(filename: string): string {
+  private getMimeType(filename: string): ArtifactType {
     const ext = filename.split('.').pop()?.toLowerCase() || '';
-    const map: Record<string, string> = {
+    const map: Record<string, ArtifactType> = {
       py: 'text/plain',
-      js: 'text/javascript',
-      ts: 'text/typescript',
+      js: 'text/plain',
+      ts: 'text/plain',
       json: 'application/json',
-      yaml: 'text/yaml',
+      yaml: 'text/plain',
       sql: 'text/plain',
       html: 'text/html',
-      css: 'text/css',
+      css: 'text/plain',
       md: 'text/markdown',
       pdf: 'application/pdf',
       png: 'image/png',

@@ -60,13 +60,11 @@ export interface RejectionEntry {
   timestamp: number;
 }
 
+// Re-export Cato types - import from built package
 export {
-  // Immutable invariants
   CATO_INVARIANTS,
   DEFAULT_PERSONA_NAME,
   RECOVERY_PERSONA_NAME,
-  
-  // Persona types
   type Persona,
   type PersonaDrives,
   type PersonaVoice,
@@ -75,14 +73,10 @@ export {
   type PersonaScope,
   type UserPersonaSelection,
   type CMatrix,
-  
-  // Governor types
   type GovernorState,
   type GovernorParams,
   type GovernorResult,
   type GovernorStateRecord,
-  
-  // CBF types
   type BarrierType,
   type BarrierScope,
   type EnforcementMode,
@@ -92,19 +86,13 @@ export {
   type SafeAlternativeStrategy,
   type SafeAlternative,
   type CBFViolation,
-  
-  // Veto types
   type VetoSeverity,
   type VetoSignal,
   type VetoResult,
   type VetoLogEntry,
-  
-  // Fracture types
   type FractureSeverity,
   type FractureResult,
   type FractureDetection,
-  
-  // Recovery types
   type RecoveryStrategyType,
   type RejectionSource,
   type RejectionEvent,
@@ -114,21 +102,13 @@ export {
   type EscalationStatus,
   type EscalationDecision,
   type HumanEscalation,
-  
-  // Audit types
   type AuditTile,
   type AuditEntry,
   type AuditAnchor,
   type AuditSearchResult,
-  
-  // Entropy types
   type EntropyCheckMode,
   type EntropyCheckResult,
-  
-  // Perception types
   type PerceptionResult,
-  
-  // Pipeline types
   type SystemState,
   type ProposedAction,
   type Policy,
@@ -136,20 +116,12 @@ export {
   type TenantSettings,
   type SafetyBlockedBy,
   type SafetyPipelineResult,
-  
-  // Config types
   type CatoTenantConfig,
-  
-  // Metrics types
   type CatoSafetyMetrics,
   type RecoveryEffectiveness,
-  
-  // API types
   type CreatePersonaRequest,
   type UpdatePersonaRequest,
   type EscalationResponseRequest,
   type UpdateConfigRequest,
-  
-  // Dashboard types
   type CatoDashboardData,
 } from '@radiant/shared';

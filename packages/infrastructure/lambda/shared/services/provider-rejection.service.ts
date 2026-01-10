@@ -5,7 +5,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { executeStatement, stringParam, boolParam } from '../db/client';
-import { enhancedLogger } from './enhanced-logger.service';
+import { enhancedLogger } from '../logging/enhanced-logger';
 import type {
   ProviderRejection,
   RejectionType,

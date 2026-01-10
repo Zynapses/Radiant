@@ -1,7 +1,7 @@
 // RADIANT v4.18.55 - DOCX/DOC Text Extraction Converter
 // Uses mammoth for DOCX and handles DOC via fallback
 
-import * as mammoth from 'mammoth';
+import mammoth from 'mammoth';
 
 export interface DocxExtractionResult {
   success: boolean;
@@ -42,7 +42,7 @@ export async function extractDocxText(
 
   try {
     // Configure mammoth options
-    const mammothOptions: mammoth.Options = {
+    const mammothOptions: any = {
       // Custom style mapping for cleaner output
       styleMap: preserveStyles ? [
         "b => strong",
@@ -59,8 +59,8 @@ export async function extractDocxText(
 
     // Handle images
     if (includeImages) {
-      mammothOptions.convertImage = mammoth.images.imgElement((image) => {
-        return image.read("base64").then((imageBuffer) => {
+      mammothOptions.convertImage = mammoth.images.imgElement((image: { contentType: string; read: (encoding: string) => Promise<string> }) => {
+        return image.read("base64").then((imageBuffer: string) => {
           return {
             src: `[IMAGE: ${image.contentType}, ${Math.round(imageBuffer.length / 1024)}KB]`,
           };
@@ -68,7 +68,7 @@ export async function extractDocxText(
       });
     }
 
-    let result: mammoth.Result;
+    let result: any;
     let text: string;
 
     switch (outputFormat) {
@@ -104,7 +104,7 @@ export async function extractDocxText(
       metadata: {
         hasImages: text.includes('[IMAGE:'),
         hasStyles: preserveStyles,
-        warnings: result.messages.map(m => m.message),
+        warnings: result.messages.map((m: { message: string }) => m.message),
       },
     };
   } catch (error) {

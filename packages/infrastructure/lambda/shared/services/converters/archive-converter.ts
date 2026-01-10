@@ -1,7 +1,7 @@
 // RADIANT v4.18.55 - Archive Decompression Converter
 // Extracts and processes contents of ZIP, TAR, GZ archives
 
-import * as AdmZip from 'adm-zip';
+import AdmZip from 'adm-zip';
 import * as tar from 'tar';
 import * as zlib from 'zlib';
 import * as path from 'path';

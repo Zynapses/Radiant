@@ -174,7 +174,7 @@ radiant/
 | `auth-stack.ts` | Cognito authentication |
 | `batch-stack.ts` | Batch processing jobs |
 | `brain-stack.ts` | Brain Router orchestration |
-| `bobble-genesis-stack.ts` | Consciousness engine |
+| `cato-genesis-stack.ts` | Consciousness engine |
 | `cato-redis-stack.ts` | Cato Safety with Redis |
 | `database-stack.ts` | Aurora PostgreSQL |
 | `grimoire-stack.ts` | Procedural memory system |

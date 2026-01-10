@@ -1,10 +1,10 @@
 """
 NLI Model Inference - DeBERTa-large-MNLI
 
-Provides entailment classification for Bobble verification.
+Provides entailment classification for Cato verification.
 Properly detects negation unlike cosine similarity.
 
-See: /docs/bobble/adr/004-nli-entailment.md
+See: /docs/cato/adr/004-nli-entailment.md
 """
 
 import torch

@@ -250,7 +250,7 @@ class SemanticClassifierService {
         stringParam('examplePrompts', `{${pattern.examplePrompts.map(p => `"${p.replace(/"/g, '\\"')}"`).join(',')}}`),
         longParam('severity', pattern.severity),
         stringParam('source', pattern.source || 'manual'),
-        stringParam('embedding', avgEmbedding.length > 0 ? `[${avgEmbedding.join(',')}]` : null),
+        stringParam('embedding', avgEmbedding.length > 0 ? `[${avgEmbedding.join(',')}]` : undefined),
       ]
     );
     

@@ -8,6 +8,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { withSecureDBContext, extractAuthContext, isRadiantAdmin, isTenantAdmin } from '../shared/services/db-context.service';
 import { userRegistryService } from '../shared/services/user-registry.service';
+import { logger } from '../shared/logging/enhanced-logger';
 import {
   AssignAppRequest,
   RevokeAppRequest,
@@ -18,7 +19,7 @@ import {
   InitiateBreakGlassRequest,
   EndBreakGlassRequest,
   ProcessDSARRequest,
-} from '@radiant/shared/types/user-registry.types';
+} from '@radiant/shared';
 
 function jsonResponse(statusCode: number, body: unknown): APIGatewayProxyResult {
   return {
@@ -434,7 +435,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     return jsonResponse(404, { error: `Route not found: ${method} ${path}` });
     
   } catch (error) {
-    console.error('User registry error:', error);
+    logger.error('User registry error:', error);
     
     if (error instanceof Error) {
       if (error.message.includes('privileges')) {

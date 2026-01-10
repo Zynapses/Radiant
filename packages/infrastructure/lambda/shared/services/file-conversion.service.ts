@@ -573,10 +573,13 @@ export class FileConversionService {
       );
 
       return {
-        ...result,
+        success: result.success ?? true,
         conversionId,
         originalFile: fileInfo,
         processingTimeMs: Date.now() - startTime,
+        convertedContent: result.convertedContent,
+        convertedFileUrl: result.convertedFileUrl,
+        error: result.error,
       };
 
     } catch (error) {

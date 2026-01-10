@@ -3,8 +3,26 @@
  * Admin endpoints for AGI Brain configuration and monitoring
  */
 
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import type { ParameterKey } from '@radiant/shared';
+
+// Minimal context for handler routing
+const emptyContext: Context = {
+  callbackWaitsForEmptyEventLoop: false,
+  functionName: '',
+  functionVersion: '',
+  invokedFunctionArn: '',
+  memoryLimitInMB: '',
+  awsRequestId: '',
+  logGroupName: '',
+  logStreamName: '',
+  getRemainingTimeInMillis: () => 0,
+  done: () => {},
+  fail: () => {},
+  succeed: () => {},
+};
+const noop = () => {};
 import { executeStatement } from '../shared/db/client';
 import { brainConfigService } from '../shared/services/brain-config.service';
 import { ghostManagerService } from '../shared/services/ghost-manager.service';
@@ -109,8 +127,8 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     // ECD (Entity-Context Divergence) - Truth Engine™
     if (path.startsWith('/api/admin/brain/ecd')) {
-      const { handler: ecdHandler } = await import('./ecd');
-      return ecdHandler(event, {} as any, () => {});
+      const { handler: ecdHandler } = await import('./ecd.js');
+      return ecdHandler(event, emptyContext, noop) as Promise<APIGatewayProxyResult>;
     }
 
     // Reconciliation
@@ -173,7 +191,7 @@ async function getConfigValue(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   const key = event.pathParameters?.key || event.path.split('/').pop();
   if (!key) return error(400, 'key is required');
 
-  const value = await brainConfigService.getValue(key as any);
+  const value = await brainConfigService.getValue(key as ParameterKey);
   return success({ key, value });
 }
 
@@ -185,7 +203,7 @@ async function setConfigValue(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   if (!key) return error(400, 'key is required');
   if (value === undefined) return error(400, 'value is required');
 
-  const result = await brainConfigService.setValue(key as any, value, changedBy || 'admin', reason);
+  const result = await brainConfigService.setValue(key as ParameterKey, value, changedBy || 'admin', reason);
   return success(result);
 }
 
@@ -196,7 +214,7 @@ async function resetConfigValue(event: APIGatewayProxyEvent): Promise<APIGateway
 
   if (!key) return error(400, 'key is required');
 
-  const result = await brainConfigService.resetToDefault(key as any, changedBy || 'admin');
+  const result = await brainConfigService.resetToDefault(key as ParameterKey, changedBy || 'admin');
   return success(result);
 }
 
@@ -204,7 +222,7 @@ async function getConfigHistory(event: APIGatewayProxyEvent): Promise<APIGateway
   const key = event.queryStringParameters?.key;
   const limit = parseInt(event.queryStringParameters?.limit || '50', 10);
 
-  const history = await brainConfigService.getHistory(key as any, limit);
+  const history = await brainConfigService.getHistory(key as ParameterKey | undefined, limit);
   return success({ history });
 }
 

@@ -17,6 +17,7 @@
  */
 
 import { TokenBudget, TokenBudgetReserved, ModelConfig, MODEL_CONFIGS } from '../types';
+import { logger } from '../../../logging/enhanced-logger';
 
 export interface BudgetCalculationParams {
   modelId: string;
@@ -210,7 +211,7 @@ export class DynamicBudgetCalculator {
     }
     
     // Fallback: conservative defaults
-    console.warn(`[COS] Unknown model ${modelId}, using conservative defaults`);
+    logger.warn(`[COS] Unknown model ${modelId}, using conservative defaults`);
     return {
       contextWindow: 8192,
       inputLimit: 7000,

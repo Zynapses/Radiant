@@ -5,6 +5,7 @@
  */
 
 import { Handler } from 'aws-lambda';
+import { logger } from '../shared/logging/enhanced-logger';
 import {
   SageMakerClient,
   DeleteEndpointCommand,
@@ -30,7 +31,7 @@ interface CleanupResult {
 }
 
 export const handler: Handler<TransitionEvent, CleanupResult> = async (event) => {
-  console.log('Cleaning up SageMaker:', JSON.stringify(event));
+  logger.info('Cleaning up SageMaker:', { event });
 
   const { tenantId, fromTier, toTier } = event;
   const prefix = tenantId.substring(0, 8);
@@ -42,7 +43,7 @@ export const handler: Handler<TransitionEvent, CleanupResult> = async (event) =>
     errors: []
   };
 
-  const endpointName = `bobble-shadow-self-${prefix}`;
+  const endpointName = `cato-shadow-self-${prefix}`;
 
   try {
     // Check if endpoint exists
@@ -50,7 +51,7 @@ export const handler: Handler<TransitionEvent, CleanupResult> = async (event) =>
       await sagemaker.send(new DescribeEndpointCommand({ EndpointName: endpointName }));
     } catch (error: any) {
       if (error.name === 'ValidationException') {
-        console.log('Endpoint does not exist, nothing to cleanup');
+        logger.info('Endpoint does not exist, nothing to cleanup');
         return result;
       }
       throw error;
@@ -87,8 +88,8 @@ export const handler: Handler<TransitionEvent, CleanupResult> = async (event) =>
     // Delete multi-region endpoints when scaling from PRODUCTION
     if (fromTier === 'PRODUCTION' && toTier !== 'PRODUCTION') {
       const multiRegionEndpoints = [
-        `bobble-shadow-self-${prefix}-eu-west-1`,
-        `bobble-shadow-self-${prefix}-ap-northeast-1`
+        `cato-shadow-self-${prefix}-eu-west-1`,
+        `cato-shadow-self-${prefix}-ap-northeast-1`
       ];
 
       for (const epName of multiRegionEndpoints) {
@@ -104,7 +105,7 @@ export const handler: Handler<TransitionEvent, CleanupResult> = async (event) =>
     }
 
   } catch (error: any) {
-    console.error('SageMaker cleanup error:', error);
+    logger.error('SageMaker cleanup error:', error);
     result.status = 'PARTIAL';
     result.errors.push(error.message);
   }

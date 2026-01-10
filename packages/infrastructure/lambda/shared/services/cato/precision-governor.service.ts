@@ -8,6 +8,7 @@
  */
 
 import { query } from '../database';
+import { logger } from '../../logging/enhanced-logger';
 import {
   GovernorParams,
   GovernorResult,
@@ -47,7 +48,7 @@ export class PrecisionGovernorService {
         };
       }
     } catch (error) {
-      console.warn('[CATO Governor] Failed to load config, using defaults:', error);
+      logger.warn('[CATO Governor] Failed to load config, using defaults:', { data: error });
     }
   }
 
@@ -184,7 +185,7 @@ export class PrecisionGovernorService {
         ]
       );
     } catch (error) {
-      console.error('[CATO Governor] Failed to record decision:', error);
+      logger.error('[CATO Governor] Failed to record decision:', error);
     }
   }
 

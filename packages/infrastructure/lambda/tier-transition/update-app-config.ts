@@ -6,6 +6,7 @@
 
 import { Handler } from 'aws-lambda';
 import { RDSDataClient, ExecuteStatementCommand } from '@aws-sdk/client-rds-data';
+import { logger } from '../shared/logging/enhanced-logger';
 
 const rdsData = new RDSDataClient({});
 
@@ -23,7 +24,7 @@ interface UpdateResult {
 }
 
 export const handler: Handler<TransitionEvent, UpdateResult> = async (event) => {
-  console.log('Updating app config:', JSON.stringify(event));
+  logger.info('Updating app config:', { event });
 
   const { tenantId, toTier, direction, requestedBy } = event;
   const prefix = tenantId.substring(0, 8);
@@ -44,7 +45,7 @@ export const handler: Handler<TransitionEvent, UpdateResult> = async (event) => 
         secretArn: secretArn,
         database: database,
         sql: `
-          UPDATE bobble_infrastructure_tier
+          UPDATE cato_infrastructure_tier
           SET 
             current_tier = :tier,
             target_tier = NULL,
@@ -70,7 +71,7 @@ export const handler: Handler<TransitionEvent, UpdateResult> = async (event) => 
         secretArn: secretArn,
         database: database,
         sql: `
-          UPDATE bobble_tier_change_log
+          UPDATE cato_tier_change_log
           SET 
             status = 'IN_PROGRESS',
             resources_provisioned = :resources::jsonb
@@ -81,20 +82,20 @@ export const handler: Handler<TransitionEvent, UpdateResult> = async (event) => 
         `,
         parameters: [
           { name: 'tenantId', value: { stringValue: tenantId } },
-          { name: 'resources', value: { stringValue: JSON.stringify(Object.keys(newConfig.endpoints)) } }
+          { name: 'resources', value: { stringValue: JSON.stringify(Object.keys((newConfig as Record<string, unknown>).endpoints || {})) } }
         ]
       }));
 
-      console.log('Database updated successfully');
+      logger.info('Database updated successfully');
     } else {
-      console.log('Database ARNs not configured, skipping DB update');
+      logger.info('Database ARNs not configured, skipping DB update');
     }
   } catch (error) {
-    console.error('Failed to update database:', error);
+    logger.error('Failed to update database:', error);
     // Don't fail the transition - the config is still valid
   }
 
-  console.log('App config updated:', newConfig);
+  logger.info('App config updated:', { data: newConfig });
   return {
     updated: true,
     config: newConfig
@@ -106,11 +107,11 @@ function buildTierConfig(tier: string, prefix: string): Record<string, unknown> 
     DEV: {
       estimatedMonthlyCost: 350,
       endpoints: {
-        sagemaker: `bobble-shadow-self-${prefix}`,
-        opensearch: `bobble-vectors-${prefix}`,
-        elasticache: `bobble-cache-${prefix}.serverless`,
-        neptune: `bobble-graph-${prefix}`,
-        kinesis: `bobble-events-${prefix}`
+        sagemaker: `cato-shadow-self-${prefix}`,
+        opensearch: `cato-vectors-${prefix}`,
+        elasticache: `cato-cache-${prefix}.serverless`,
+        neptune: `cato-graph-${prefix}`,
+        kinesis: `cato-events-${prefix}`
       },
       settings: {
         sagemakerScaleToZero: true,
@@ -122,11 +123,11 @@ function buildTierConfig(tier: string, prefix: string): Record<string, unknown> 
     STAGING: {
       estimatedMonthlyCost: 35000,
       endpoints: {
-        sagemaker: `bobble-shadow-self-${prefix}`,
-        opensearch: `bobble-vectors-${prefix}`,
-        elasticache: `bobble-cache-${prefix}`,
-        neptune: `bobble-graph-${prefix}`,
-        kinesis: `bobble-events-${prefix}`
+        sagemaker: `cato-shadow-self-${prefix}`,
+        opensearch: `cato-vectors-${prefix}`,
+        elasticache: `cato-cache-${prefix}`,
+        neptune: `cato-graph-${prefix}`,
+        kinesis: `cato-events-${prefix}`
       },
       settings: {
         sagemakerScaleToZero: false,
@@ -138,11 +139,11 @@ function buildTierConfig(tier: string, prefix: string): Record<string, unknown> 
     PRODUCTION: {
       estimatedMonthlyCost: 750000,
       endpoints: {
-        sagemaker: `bobble-shadow-self-${prefix}`,
-        opensearchServerless: `bobble-vectors-${prefix}`,
-        elasticache: `bobble-cache-${prefix}`,
-        neptune: `bobble-graph-${prefix}`,
-        kinesis: `bobble-events-${prefix}`
+        sagemaker: `cato-shadow-self-${prefix}`,
+        opensearchServerless: `cato-vectors-${prefix}`,
+        elasticache: `cato-cache-${prefix}`,
+        neptune: `cato-graph-${prefix}`,
+        kinesis: `cato-events-${prefix}`
       },
       settings: {
         sagemakerScaleToZero: false,

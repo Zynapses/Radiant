@@ -3,6 +3,7 @@
  */
 
 import { z } from 'zod';
+import { logger } from './logging/enhanced-logger';
 
 const envSchema = z.object({
   APP_ID: z.string().min(1),
@@ -30,7 +31,7 @@ export function getConfig(): Config {
   const result = envSchema.safeParse(process.env);
   
   if (!result.success) {
-    console.error('Configuration validation failed:', result.error.flatten());
+    logger.error('Configuration validation failed:', undefined, { data: result.error.flatten() });
     throw new Error(`Invalid configuration: ${JSON.stringify(result.error.flatten())}`);
   }
 

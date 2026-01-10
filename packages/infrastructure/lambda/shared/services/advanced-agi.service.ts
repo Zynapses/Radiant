@@ -3,6 +3,7 @@
 
 import { executeStatement } from '../db/client';
 import { modelRouterService } from './model-router.service';
+import { logger } from '../logging/enhanced-logger';
 
 // ============================================================================
 // Types

@@ -19,4 +19,6 @@ export * from './redundant-perception.service';
 export * from './fracture-detection.service';
 export * from './safety-pipeline.service';
 export * from './redis.service';
+export * from './hitl-integration.service';
+export * from './neural-decision.service';
 export * from './types';

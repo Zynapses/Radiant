@@ -40,15 +40,15 @@ class ECDVerificationService {
       anchoringEnabled,
       anchoringOversight,
     ] = await Promise.all([
-      brainConfigService.getBoolean('ECD_ENABLED', true),
-      brainConfigService.getNumber('ECD_THRESHOLD', 0.1),
-      brainConfigService.getNumber('ECD_MAX_REFINEMENTS', 2),
-      brainConfigService.getBoolean('ECD_BLOCK_ON_FAILURE', false),
-      brainConfigService.getNumber('ECD_HEALTHCARE_THRESHOLD', 0.05),
-      brainConfigService.getNumber('ECD_FINANCIAL_THRESHOLD', 0.05),
-      brainConfigService.getNumber('ECD_LEGAL_THRESHOLD', 0.05),
-      brainConfigService.getBoolean('ECD_ANCHORING_ENABLED', true),
-      brainConfigService.getBoolean('ECD_ANCHORING_OVERSIGHT', true),
+      brainConfigService.getBoolean('ECD_ENABLED' as any, true),
+      brainConfigService.getNumber('ECD_THRESHOLD' as any, 0.1),
+      brainConfigService.getNumber('ECD_MAX_REFINEMENTS' as any, 2),
+      brainConfigService.getBoolean('ECD_BLOCK_ON_FAILURE' as any, false),
+      brainConfigService.getNumber('ECD_HEALTHCARE_THRESHOLD' as any, 0.05),
+      brainConfigService.getNumber('ECD_FINANCIAL_THRESHOLD' as any, 0.05),
+      brainConfigService.getNumber('ECD_LEGAL_THRESHOLD' as any, 0.05),
+      brainConfigService.getBoolean('ECD_ANCHORING_ENABLED' as any, true),
+      brainConfigService.getBoolean('ECD_ANCHORING_OVERSIGHT' as any, true),
     ]);
 
     return {

@@ -7,7 +7,7 @@
 
 import { Pool, PoolClient } from 'pg';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
-import { AuthContext, PermissionLevel } from '@radiant/shared/types/user-registry.types';
+import { AuthContext, PermissionLevel } from '@radiant/shared';
 
 const pool = new Pool({
   host: process.env.DB_HOST,
@@ -161,10 +161,10 @@ export async function withAuthContext<T>(
  */
 export function extractAuthContext(event: {
   requestContext?: {
-    authorizer?: Record<string, string>;
+    authorizer?: Record<string, unknown> | null;
   };
 }): AuthContext {
-  const authorizer = event.requestContext?.authorizer || {};
+  const authorizer = (event.requestContext?.authorizer || {}) as Record<string, string>;
   
   if (!authorizer.tenant_id) {
     throw new Error('Missing tenant_id in authorization context');
@@ -238,7 +238,7 @@ export function isBreakGlassActive(authContext: AuthContext): boolean {
  */
 export function hasScope(authContext: AuthContext, scope: string): boolean {
   return authContext.scopes?.includes(scope) === true ||
-    authContext.scopes?.some(s => s.endsWith('/admin.full')) === true;
+    authContext.scopes?.some((s: string) => s.endsWith('/admin.full')) === true;
 }
 
 /**

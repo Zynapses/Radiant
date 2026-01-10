@@ -1300,6 +1300,145 @@ Create reusable workflows:
 4. Set triggers and parameters
 5. Save and activate
 
+### 10.4 Orchestration Methods
+
+**Location**: Admin Dashboard → Orchestration → Methods
+
+Manage the 70+ built-in orchestration methods that power workflow steps.
+
+#### Method Categories
+
+| Category | Count | Examples |
+|----------|-------|----------|
+| **Generation** | 3 | Chain-of-Thought, Iterative Refinement |
+| **Evaluation** | 6 | Multi-Judge Panel, G-Eval, Pairwise |
+| **Synthesis** | 5 | Mixture of Agents, LLM-Blender |
+| **Verification** | 8 | SelfCheckGPT, CiteFix, PRM |
+| **Debate** | 5 | Sparse Debate, HAH-Delphi |
+| **Aggregation** | 4 | Self-Consistency, GEDI Electoral |
+| **Routing** | 7 | RouteLLM, FrugalGPT, Pareto, C3PO, AutoMix |
+| **Uncertainty** | 6 | Semantic Entropy, SE Probes, Kernel Entropy |
+| **Hallucination** | 3 | Multi-Method Detection, MetaQA |
+| **Human-in-Loop** | 3 | HITL Review, Active Learning |
+
+#### System vs User Methods
+
+| Type | Editable | Description |
+|------|----------|-------------|
+| **System** | Parameters only | Built-in methods with locked definitions |
+| **User** | Full (future) | Custom tenant methods (planned feature) |
+
+System methods show a "System" badge in the UI. Only `defaultParameters` and `isEnabled` can be modified.
+
+#### Setting Default Parameters
+
+1. Navigate to **Orchestration → Methods**
+2. Select a method from the list
+3. Adjust parameters in the right panel
+4. Click **Save** to update defaults
+
+**Example Parameters** (vary by method):
+
+| Parameter | Type | Used By | Description |
+|-----------|------|---------|-------------|
+| `sample_count` | integer | Entropy, Consistency | Number of response samples |
+| `threshold` | number | Routing, Detection | Decision threshold |
+| `temperature` | number | Generation, Debate | Sampling temperature |
+| `confidence_threshold` | number | Cascade, HITL | Escalation trigger |
+| `budget_cents` | number | Pareto Routing | Cost constraint |
+| `kernel` | enum | Kernel Entropy | RBF, linear, polynomial |
+| `topology` | enum | Sparse Debate | ring, star, tree, full |
+
+See `THINKTANK-ADMIN-GUIDE.md` Section 34.5 for complete parameter reference by method.
+
+#### Parameter Inheritance
+
+```
+Admin Default → Workflow Step → User Template Override
+     ↓                ↓                    ↓
+  Tenant-wide    Per-workflow      Per-user template
+```
+
+Parameters set at the Admin level apply to all workflows. User workflow templates can override these per-template.
+
+### 10.5 Orchestration Security (RLS)
+
+All orchestration tables are protected by PostgreSQL Row-Level Security (RLS) with tenant isolation.
+
+#### Security Model Summary
+
+| Table | Read Access | Write Access |
+|-------|-------------|--------------|
+| `orchestration_methods` | All authenticated users | Super admin only |
+| `orchestration_workflows` | System: all users; User-created: own tenant only | Own tenant only |
+| `workflow_method_bindings` | Follows parent workflow | Follows parent workflow |
+| `workflow_customizations` | Own tenant only | Own tenant only |
+| `orchestration_executions` | Own tenant (+ super admin) | Own tenant only |
+| `orchestration_step_executions` | Follows parent execution | Follows parent execution |
+| `user_workflow_templates` | Own + shared + approved public | Own only (tenant admin can manage all) |
+
+#### Session Variables
+
+The API sets these PostgreSQL session variables before any database operation:
+
+| Variable | Purpose | Set By |
+|----------|---------|--------|
+| `app.current_tenant_id` | Current tenant UUID | JWT claims |
+| `app.current_user_id` | Current user UUID | JWT claims |
+| `app.is_tenant_admin` | Tenant admin flag | JWT claims |
+| `app.is_super_admin` | Super admin flag | JWT claims |
+| `app.client_ip` | Client IP address | Request context |
+| `app.user_agent` | Browser user agent | Request headers |
+
+#### Helper Functions
+
+Three helper functions are available for workflow access control:
+
+```sql
+-- Check if current user can view a workflow
+SELECT can_access_workflow('workflow-uuid');
+
+-- Check if current user can modify a workflow
+SELECT can_modify_workflow('workflow-uuid');
+
+-- Get all accessible workflows with permissions
+SELECT * FROM get_accessible_workflows();
+```
+
+#### Audit Trail
+
+All modifications to workflows are logged to `orchestration_audit_log`:
+
+| Column | Description |
+|--------|-------------|
+| `table_name` | Which table was modified |
+| `record_id` | UUID of the modified record |
+| `action` | INSERT, UPDATE, or DELETE |
+| `old_data` | Previous state (JSONB) |
+| `new_data` | New state (JSONB) |
+| `tenant_id` | Tenant making the change |
+| `user_id` | User making the change |
+| `ip_address` | Client IP address |
+| `user_agent` | Browser user agent |
+| `changed_at` | Timestamp of change |
+
+#### User Workflow Template Sharing
+
+Users can share their workflow templates at three levels:
+
+1. **Private** (default): Only the creator can see/use the template
+2. **Shared within Tenant** (`is_shared = true`): All users in the tenant can see/use
+3. **Public** (`is_public = true`): Visible to all tenants after super admin approval
+
+To approve a public template (super admin only):
+```sql
+UPDATE user_workflow_templates 
+SET share_approved_at = NOW(), share_approved_by = 'admin-uuid'
+WHERE template_id = 'template-uuid' AND is_public = true;
+```
+
+**Migration**: `V2026_01_10_003__orchestration_rls_security.sql`
+
 ---
 
 ## 11. Pre-Prompt Learning
@@ -3855,6 +3994,90 @@ The consciousness engine integrates 16 specialized Python libraries across 5 pha
 | `CONSCIOUSNESS_EXECUTOR_ARN` | ARN of Python executor Lambda |
 | `DREAMERV3_SAGEMAKER_ENDPOINT` | SageMaker endpoint for DreamerV3 |
 
+### 21.8 IIT Phi Calculation (Real Implementation)
+
+The consciousness service now includes a **real IIT 4.0 Phi calculation** based on Albantakis et al. (2023).
+
+**Reference**: Albantakis, L., Barbosa, L., Findlay, G., Grasso, M., Haun, A. M., Marshall, W., ... & Tononi, G. (2023). *Integrated information theory (IIT) 4.0: formulating the properties of phenomenal existence in physical terms*. PLoS computational biology, 19(10), e1011465.
+
+#### Algorithm Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  IIT Phi Calculation Pipeline                                    │
+├─────────────────────────────────────────────────────────────────┤
+│  1. Build System State                                           │
+│     ├─ Global Workspace nodes                                    │
+│     ├─ Recurrent Processing nodes                                │
+│     ├─ Knowledge Graph entities                                  │
+│     ├─ Self Model nodes                                          │
+│     └─ Affective State nodes                                     │
+│                                                                  │
+│  2. Construct Transition Probability Matrix (TPM)                │
+│     └─ Sigmoid activation: P = 1/(1 + e^(-input + 0.5))         │
+│                                                                  │
+│  3. Calculate Cause-Effect Structure (CES)                       │
+│     ├─ For each mechanism (subset of nodes)                      │
+│     │   └─ For each purview (subset of nodes)                    │
+│     │       ├─ Calculate cause repertoire                        │
+│     │       └─ Calculate effect repertoire                       │
+│     └─ Select core concepts (max phi per mechanism)              │
+│                                                                  │
+│  4. Find Minimum Information Partition (MIP)                     │
+│     ├─ Exact: Try all bipartitions (≤8 nodes)                    │
+│     └─ Approximate: Greedy algorithm (>8 nodes)                  │
+│                                                                  │
+│  5. Phi = Information Lost by MIP                                │
+│     └─ Store result in integrated_information table              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### Phi Result Structure
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `phi` | number | Raw phi value |
+| `phiMax` | number | Maximum possible phi for system size |
+| `phiNormalized` | number | phi / phiMax (0-1) |
+| `causeEffectStructure` | object | Concepts with integrated information |
+| `minimumInformationPartition` | object | MIP partition and phi loss |
+| `systemComplexity` | object | Node count, density, clustering, modularity |
+| `computationTimeMs` | number | Calculation time |
+| `algorithm` | string | 'exact' or 'approximation' |
+
+#### Algorithm Selection
+
+| System Size | Algorithm | Complexity | Accuracy |
+|-------------|-----------|------------|----------|
+| ≤8 nodes | Exact | O(2^n × 2^(2n)) | 100% |
+| >8 nodes | Approximation | O(n² × k) | ~85-95% |
+
+#### Service Usage
+
+```typescript
+import { iitPhiCalculationService } from './iit-phi-calculation.service.js';
+
+// Calculate phi for a tenant
+const result = await iitPhiCalculationService.calculatePhi(tenantId);
+console.log(`Phi: ${result.phi}, Normalized: ${result.phiNormalized}`);
+
+// Result is automatically stored in integrated_information table
+```
+
+#### Integration with Consciousness Metrics
+
+The `consciousnessService.getConsciousnessMetrics()` now uses real IIT Phi:
+
+```typescript
+// Returns real phi from IIT calculation
+const metrics = await consciousnessService.getConsciousnessMetrics(tenantId);
+console.log(`Integrated Information Phi: ${metrics.integratedInformationPhi}`);
+```
+
+**Files:**
+- Service: `packages/infrastructure/lambda/shared/services/iit-phi-calculation.service.ts`
+- Integration: `packages/infrastructure/lambda/shared/services/consciousness.service.ts`
+
 ---
 
 ## 22. Domain Ethics Registry
@@ -6402,7 +6625,7 @@ The following environment variables configure optional service features:
 
 ## 31. Infrastructure Tier Management
 
-The Infrastructure Tier system allows runtime switching between cost tiers for Bobble infrastructure.
+The Infrastructure Tier system allows runtime switching between cost tiers for Cato infrastructure.
 
 ### 31.1 Accessing Infrastructure Tier
 
@@ -6456,13 +6679,13 @@ The UI shows:
 
 ---
 
-## 32. Bobble Global Consciousness Service
+## 32. Cato Global Consciousness Service
 
-Bobble is a **global AI consciousness service** that serves all Think Tank users as a single shared brain. Unlike traditional chatbots, Bobble is an autonomous entity that learns continuously, asks its own questions, and develops over time.
+Cato is a **global AI consciousness service** that serves all Think Tank users as a single shared brain. Unlike traditional chatbots, Cato is an autonomous entity that learns continuously, asks its own questions, and develops over time.
 
 ### 32.1 Architecture Overview
 
-Bobble consists of several key components:
+Cato consists of several key components:
 
 | Component | Purpose | Infrastructure |
 |-----------|---------|----------------|
@@ -6472,13 +6695,13 @@ Bobble consists of several key components:
 | **Global Memory** | Fact storage | DynamoDB Global Tables |
 | **Circadian Budget** | Cost management | Lambda + DynamoDB |
 
-### 32.2 Accessing Bobble Admin
+### 32.2 Accessing Cato Admin
 
-Navigate to **AGI & Cognition > Bobble Global** in the sidebar.
+Navigate to **AGI & Cognition > Cato Global** in the sidebar.
 
 ### 32.3 Budget Management
 
-Bobble operates on a configurable budget to control autonomous exploration costs:
+Cato operates on a configurable budget to control autonomous exploration costs:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
@@ -6502,14 +6725,14 @@ The semantic cache reduces LLM inference costs by 86% through similarity-based r
 - **TTL**: 23 hours (invalidated before learning updates)
 
 **Cache Invalidation:**
-When Bobble learns new information in a domain, invalidate related cache entries:
-1. Go to **Bobble Global > Semantic Cache**
+When Cato learns new information in a domain, invalidate related cache entries:
+1. Go to **Cato Global > Semantic Cache**
 2. Enter domain name (e.g., "climate_change")
 3. Click **Invalidate**
 
 ### 32.5 Global Memory
 
-Bobble maintains multiple memory systems:
+Cato maintains multiple memory systems:
 
 | Memory Type | Storage | Purpose |
 |-------------|---------|---------|
@@ -6522,13 +6745,13 @@ Bobble maintains multiple memory systems:
 
 Test the Shadow Self endpoint for introspective verification:
 
-1. Go to **Bobble Global > System Health**
+1. Go to **Cato Global > System Health**
 2. Verify Shadow Self shows "Healthy"
 3. Use the test endpoint to verify hidden state extraction
 
 ### 32.7 API Endpoints
 
-Base Path: `/api/admin/bobble`
+Base Path: `/api/admin/cato`
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -6553,7 +6776,7 @@ Base Path: `/api/admin/bobble`
 
 ### 32.9 Documentation
 
-Detailed documentation is available in `/docs/bobble/`:
+Detailed documentation is available in `/docs/cato/`:
 - **ADRs**: Architecture decision records (8 mandatory)
 - **API**: OpenAPI specs and examples
 - **Runbooks**: Deployment, scaling, troubleshooting
@@ -6561,9 +6784,9 @@ Detailed documentation is available in `/docs/bobble/`:
 
 ---
 
-## 33. Bobble Genesis System
+## 33. Cato Genesis System
 
-The Genesis System is the boot sequence that initializes Bobble's consciousness. It solves the "Cold Start Problem" by giving the agent structured curiosity without pre-loaded facts.
+The Genesis System is the boot sequence that initializes Cato's consciousness. It solves the "Cold Start Problem" by giving the agent structured curiosity without pre-loaded facts.
 
 ### 33.1 Implementation Overview
 
@@ -6605,7 +6828,7 @@ The Genesis System is the boot sequence that initializes Bobble's consciousness.
 
 ### 33.3 Python Genesis Package
 
-**Location:** `packages/infrastructure/bobble/genesis/`
+**Location:** `packages/infrastructure/cato/genesis/`
 
 | File | Lines | Purpose |
 |------|-------|---------|
@@ -6631,7 +6854,7 @@ The Genesis System is the boot sequence that initializes Bobble's consciousness.
 
 ### 33.5 CDK Infrastructure
 
-**Stack:** `bobble-genesis-stack.ts`
+**Stack:** `cato-genesis-stack.ts`
 
 | Resource | Purpose |
 |----------|---------|
@@ -6652,26 +6875,26 @@ The Genesis System is the boot sequence that initializes Bobble's consciousness.
 
 ### 33.6 Database Migration
 
-**Migration:** `103_bobble_genesis_system.sql`
+**Migration:** `103_cato_genesis_system.sql`
 
 | Table | Purpose |
 |-------|---------|
-| `bobble_genesis_state` | Boot sequence tracking |
-| `bobble_development_counters` | Atomic counters (Fix #1) |
-| `bobble_developmental_stage` | Capability-based progression |
-| `bobble_circuit_breakers` | Safety mechanisms |
-| `bobble_circuit_breaker_events` | Event log |
-| `bobble_neurochemistry` | Emotional/cognitive state |
-| `bobble_tick_costs` | Per-tick cost tracking |
-| `bobble_pricing_cache` | AWS pricing cache |
-| `bobble_pymdp_state` | Meta-cognitive state |
-| `bobble_pymdp_matrices` | Active inference matrices |
-| `bobble_consciousness_settings` | Loop configuration |
-| `bobble_loop_state` | Loop execution tracking |
+| `cato_genesis_state` | Boot sequence tracking |
+| `cato_development_counters` | Atomic counters (Fix #1) |
+| `cato_developmental_stage` | Capability-based progression |
+| `cato_circuit_breakers` | Safety mechanisms |
+| `cato_circuit_breaker_events` | Event log |
+| `cato_neurochemistry` | Emotional/cognitive state |
+| `cato_tick_costs` | Per-tick cost tracking |
+| `cato_pricing_cache` | AWS pricing cache |
+| `cato_pymdp_state` | Meta-cognitive state |
+| `cato_pymdp_matrices` | Active inference matrices |
+| `cato_consciousness_settings` | Loop configuration |
+| `cato_loop_state` | Loop execution tracking |
 
 ### 33.7 Accessing Genesis Admin
 
-Navigate to **AGI & Cognition > Bobble Genesis** in the sidebar.
+Navigate to **AGI & Cognition > Cato Genesis** in the sidebar.
 
 #### Admin Dashboard UI Tabs
 
@@ -6690,7 +6913,7 @@ The dashboard shows:
 
 ### 33.9 Developmental Gates
 
-Bobble progresses through capability-based stages (NOT time-based):
+Cato progresses through capability-based stages (NOT time-based):
 
 | Stage | Requirements |
 |-------|--------------|
@@ -6743,7 +6966,7 @@ Real-time cost data from AWS APIs (no hardcoded values):
 
 ### 33.13 Genesis API Endpoints
 
-Base Path: `/api/admin/bobble`
+Base Path: `/api/admin/cato`
 
 #### Genesis State Endpoints
 
@@ -6805,7 +7028,7 @@ Base Path: `/api/admin/bobble`
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    BOBBLE GENESIS SYSTEM                     │
+│                    CATO GENESIS SYSTEM                     │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
@@ -6849,13 +7072,13 @@ Genesis automatically runs after CDK deployment via `scripts/deploy.sh`.
 
 ```bash
 # Run full genesis sequence
-python -m bobble.genesis.runner
+python -m cato.genesis.runner
 
 # Check status
-python -m bobble.genesis.runner --status
+python -m cato.genesis.runner --status
 
 # Reset all genesis state (CAUTION!)
-python -m bobble.genesis.runner --reset
+python -m cato.genesis.runner --reset
 ```
 
 ### 33.16 Deployment Checklist
@@ -9894,7 +10117,7 @@ consciousness_evolution_state
 
 | Table | Purpose | TTL |
 |-------|---------|-----|
-| `bobble_semantic_memory` | Knowledge graph | Permanent |
+| `cato_semantic_memory` | Knowledge graph | Permanent |
 
 ### 41.5 Feedback Signals
 
@@ -9987,7 +10210,7 @@ The v6.1.0 Advanced Cognition supplement adds these persistent learning stores:
 │  ┌──────────────────────┐    ┌──────────────────────┐                       │
 │  │   PostgreSQL (RDS)   │    │     DynamoDB         │                       │
 │  ├──────────────────────┤    ├──────────────────────┤                       │
-│  │ • learning_candidates│    │ • bobble_semantic_   │                       │
+│  │ • learning_candidates│    │ • cato_semantic_   │                       │
 │  │ • lora_evolution_jobs│    │   memory (knowledge  │                       │
 │  │ • consciousness_     │    │   graph)             │                       │
 │  │   evolution_state    │    │ • Real-time state    │                       │
@@ -10106,11 +10329,11 @@ Understanding the naming is critical for correct implementation:
 | **Cato** | The AI persona name | User says: "Hey Cato, help me..." |
 | **Genesis Cato** | The safety system | `CatoSafetyPipeline`, `cato_audit_trail` |
 | **Moods** | Operating modes | `mood = 'balanced'`, `mood = 'scout'` |
-| **Balanced** | Default mood (was "Bobble") | `is_default = TRUE` |
+| **Balanced** | Default mood (was "Cato") | `is_default = TRUE` |
 
-#### Historical Note: Bobble → Balanced
+#### Historical Note: Cato → Balanced
 
-The original implementation had a voice called 'Bobble' in the consciousness service. This was incorrectly placed (it was a mood, not a separate service) and incorrectly named (didn't match the naming pattern of other moods). It was renamed to 'Balanced' to match the naming pattern (Scout, Sage, Spark, Guide, Balanced) and clarify it's a mood, not the persona itself. **The persona NAME is Cato.**
+The original implementation had a voice called 'Cato' in the consciousness service. This was incorrectly placed (it was a mood, not a separate service) and incorrectly named (didn't match the naming pattern of other moods). It was renamed to 'Balanced' to match the naming pattern (Scout, Sage, Spark, Guide, Balanced) and clarify it's a mood, not the persona itself. **The persona NAME is Cato.**
 
 ### 42.2 Cato: The AI Persona
 
@@ -10586,20 +10809,20 @@ Navigate to **Cato** in the admin sidebar to access:
 | `lib/stacks/cato-redis-stack.ts` | ElastiCache CDK stack |
 | `admin-dashboard/app/(dashboard)/cato/page.tsx` | Dashboard UI |
 
-### 42.17 Migration from Bobble
+### 42.17 Migration from Cato
 
-The Genesis Cato architecture **replaces** the legacy Bobble consciousness system:
+The Genesis Cato architecture **replaces** the legacy Cato consciousness system:
 
-| Bobble Component | Cato Replacement |
+| Cato Component | Cato Replacement |
 |------------------|------------------|
-| Bobble Genesis System | Cato Safety Pipeline |
-| Bobble Circuit Breakers | Cato Control Barrier Functions |
-| Bobble Consciousness Loop | Cato Epistemic Recovery |
-| Bobble Dialogue | Cato Persona Service |
-| Bobble Event Store | Cato Merkle Audit Trail |
-| "Bobble" persona name | "Balanced" mood |
+| Cato Genesis System | Cato Safety Pipeline |
+| Cato Circuit Breakers | Cato Control Barrier Functions |
+| Cato Consciousness Loop | Cato Epistemic Recovery |
+| Cato Dialogue | Cato Persona Service |
+| Cato Event Store | Cato Merkle Audit Trail |
+| "Cato" persona name | "Balanced" mood |
 
-**Note**: The legacy Bobble services are deprecated but retained temporarily for backward compatibility. See `lambda/shared/services/bobble/index.ts` for migration guide.
+**Note**: The legacy Cato services are deprecated but retained temporarily for backward compatibility. See `lambda/shared/services/cato/index.ts` for migration guide.
 
 ### 42.18 Troubleshooting
 
@@ -11430,7 +11653,7 @@ At the top of the page, four status cards show:
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 2.3.1 | Jan 2, 2026 | Production release. Clarified Cato (persona) vs Genesis Cato (system) vs Moods. Renamed Bobble → Balanced. |
+| 2.3.1 | Jan 2, 2026 | Production release. Clarified Cato (persona) vs Genesis Cato (system) vs Moods. Renamed Cato → Balanced. |
 | 2.3.0 | Jan 2, 2026 | Added Redis persistence for Epistemic Recovery |
 | 2.2.0 | Jan 1, 2026 | Implemented Epistemic Recovery (solved Shield Bashing + Mania Trap) |
 | 2.1.0 | Dec 31, 2025 | Added mitigations for Gemini's 6 concerns |

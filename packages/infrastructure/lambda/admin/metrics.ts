@@ -7,6 +7,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { Pool } from 'pg';
 import { MetricsCollectionService } from '../shared/services/metrics-collection.service';
 import { LearningInfluenceService } from '../shared/services/learning-hierarchy.service';
+import { logger } from '../shared/logging/enhanced-logger';
 
 const pool = new Pool({
   host: process.env.DB_HOST,
@@ -418,7 +419,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     return response(404, { error: 'Not found' });
 
   } catch (error) {
-    console.error('Metrics API error:', error);
+    logger.error('Metrics API error:', error);
     return response(500, { 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

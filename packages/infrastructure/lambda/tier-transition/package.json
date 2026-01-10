@@ -1,7 +1,7 @@
 {
   "name": "@radiant/tier-transition-lambdas",
   "version": "4.18.47",
-  "description": "Bobble Infrastructure Tier Transition Lambda Functions",
+  "description": "Cato Infrastructure Tier Transition Lambda Functions",
   "private": true,
   "scripts": {
     "build": "tsc",

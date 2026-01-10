@@ -358,6 +358,8 @@ class SofaiRouterService {
     avgLatencyMs: number;
   }> {
     try {
+      // Sanitize days to prevent SQL injection - must be positive integer, max 365
+      const safeDays = Math.min(Math.max(1, Math.floor(days)), 365);
       const result = await executeStatement(
         `SELECT 
            level,
@@ -366,9 +368,12 @@ class SofaiRouterService {
            AVG(domain_risk) as avg_risk,
            AVG(latency_ms) as avg_latency
          FROM sofai_routing_log
-         WHERE tenant_id = $1 AND created_at > NOW() - INTERVAL '${days} days'
+         WHERE tenant_id = $1 AND created_at > NOW() - INTERVAL '1 day' * $2
          GROUP BY level`,
-        [{ name: 'tenantId', value: { stringValue: tenantId } }]
+        [
+          { name: 'tenantId', value: { stringValue: tenantId } },
+          { name: 'days', value: { longValue: safeDays } }
+        ]
       );
 
       const byLevel: Record<SystemLevel, number> = {

@@ -5,7 +5,7 @@
  */
 
 import { executeStatement } from './client';
-import { enhancedLogger } from '../logging/enhanced-logger';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // Connection pool configuration
 const POOL_CONFIG = {
@@ -72,7 +72,7 @@ export async function acquireConnection(): Promise<void> {
     if (utilization >= POOL_CONFIG.utilizationCriticalThreshold) {
       const now = new Date();
       if (!lastExhaustionWarning || now.getTime() - lastExhaustionWarning.getTime() > 60000) {
-        enhancedLogger.warn('DB Pool critical utilization', {
+        logger.warn('DB Pool critical utilization', {
           active: activeConnectionCount,
           max: POOL_CONFIG.maxConnections,
           waiting: waitingClientCount,
@@ -252,7 +252,7 @@ export async function verifyRdsProxyConfig(): Promise<{
   try {
     await executeStatement('SELECT 1', []);
   } catch (error) {
-    console.warn('Database connection test failed:', error instanceof Error ? error.message : 'unknown');
+    logger.warn('Database connection test failed:', { data: error instanceof Error ? error.message : 'unknown' });
     recommendations.push('Database connection test failed - verify credentials and network');
   }
   

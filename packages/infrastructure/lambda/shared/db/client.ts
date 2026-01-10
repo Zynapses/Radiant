@@ -19,9 +19,13 @@ import { getConfig } from '../config';
 
 /**
  * Create a properly typed SqlParameter with string value
+ * If only value is provided, uses empty name (for positional params)
  */
-export function stringParam(name: string, value: string): SqlParameter {
-  return { name, value: { stringValue: value } };
+export function stringParam(nameOrValue: string, value?: string): SqlParameter {
+  if (value === undefined) {
+    return { name: '', value: { stringValue: nameOrValue } };
+  }
+  return { name: nameOrValue, value: { stringValue: value } };
 }
 
 /**

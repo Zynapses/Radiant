@@ -4,6 +4,7 @@
 
 import { ScheduledEvent, Context } from 'aws-lambda';
 import { modelCoordinationService } from '../shared/services/model-coordination.service';
+import { logger } from '../shared/logging/enhanced-logger';
 
 // ============================================================================
 // Types
@@ -33,7 +34,7 @@ export const handler = async (
   context: Context
 ): Promise<SyncResult> => {
   const startTime = Date.now();
-  console.log('Model sync scheduled job started', {
+  logger.info('Model sync scheduled job started', {
     eventTime: event.time,
     requestId: context.awsRequestId,
   });
@@ -43,7 +44,7 @@ export const handler = async (
     const config = await modelCoordinationService.getSyncConfig();
     
     if (!config.autoSyncEnabled) {
-      console.log('Auto sync is disabled, skipping');
+      logger.info('Auto sync is disabled, skipping');
       return {
         success: true,
         modelsScanned: 0,
@@ -61,7 +62,7 @@ export const handler = async (
       'scheduled'
     );
 
-    console.log('Model sync completed', {
+    logger.info('Model sync completed', {
       jobId: job.id,
       status: job.status,
       modelsScanned: job.modelsScanned,
@@ -84,7 +85,7 @@ export const handler = async (
     };
 
   } catch (error) {
-    console.error('Model sync failed', error);
+    logger.error('Model sync failed', error instanceof Error ? error : undefined);
     
     return {
       success: false,
@@ -138,7 +139,7 @@ export const manualTriggerHandler = async (event: {
     };
 
   } catch (error) {
-    console.error('Manual sync failed', error);
+    logger.error('Manual sync failed', error instanceof Error ? error : undefined);
     
     return {
       statusCode: 500,

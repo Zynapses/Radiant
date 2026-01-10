@@ -4,7 +4,7 @@ Shadow Self Model Handler - HTTP Server for SageMaker
 This module provides the HTTP server for the Shadow Self container.
 It handles incoming inference requests and health checks.
 
-See: /docs/bobble/adr/008-shadow-self-infrastructure.md
+See: /docs/cato/adr/008-shadow-self-infrastructure.md
 """
 
 import os

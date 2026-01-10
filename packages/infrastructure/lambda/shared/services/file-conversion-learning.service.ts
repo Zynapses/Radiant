@@ -192,7 +192,7 @@ class FileConversionLearningService {
       { name: 'weight', value: { doubleValue: this.LEARNING_RATE } },
     ]);
 
-    const record = result.records?.[0];
+    const record = result.rows?.[0];
     return this.mapToFormatUnderstanding(record);
   }
 
@@ -214,7 +214,7 @@ class FileConversionLearningService {
       { name: 'threshold', value: { doubleValue: this.UNDERSTANDING_THRESHOLD } },
     ]);
 
-    const record = result.records?.[0];
+    const record = result.rows?.[0];
     
     if (!record) {
       return {
@@ -227,14 +227,15 @@ class FileConversionLearningService {
       };
     }
 
-    const reason = record[3]?.stringValue || '';
+    const r = record as Record<string, unknown>;
+    const reason = (r.reason as string) || '';
     
     return {
-      shouldConvert: record[0]?.booleanValue || false,
-      understandingScore: parseFloat(record[1]?.stringValue || '0.5'),
-      confidence: parseFloat(record[2]?.stringValue || '0'),
+      shouldConvert: Boolean(r.should_convert) || false,
+      understandingScore: parseFloat((r.understanding_score as string) || '0.5'),
+      confidence: parseFloat((r.confidence as string) || '0'),
       reason,
-      totalAttempts: parseInt(record[4]?.longValue || record[4]?.stringValue || '0'),
+      totalAttempts: parseInt((r.total_attempts as string) || '0'),
       source: reason.includes('global') ? 'global_learning' : 
               reason.includes('No learning') ? 'default' : 'tenant_learning',
     };
@@ -342,7 +343,7 @@ class FileConversionLearningService {
     }
 
     const result = await executeStatement(query, params);
-    return (result.records || []).map(r => this.mapToFormatUnderstanding(r));
+    return (result.rows || []).map(r => this.mapToFormatUnderstanding(r));
   }
 
   /**
@@ -362,14 +363,14 @@ class FileConversionLearningService {
          AND created_at > NOW() - INTERVAL '7 days') as recent_improvements
     `, [stringParam(tenantId)]);
 
-    const record = result.records?.[0];
+    const record = result.rows?.[0] as Record<string, unknown> | undefined;
     
     return {
-      totalFeedback: parseInt(record?.[0]?.longValue || record?.[0]?.stringValue || '0'),
-      formatsLearned: parseInt(record?.[1]?.longValue || record?.[1]?.stringValue || '0'),
-      modelsTracked: parseInt(record?.[2]?.longValue || record?.[2]?.stringValue || '0'),
-      averageUnderstanding: parseFloat(record?.[3]?.stringValue || '0.5'),
-      recentImprovements: parseInt(record?.[4]?.longValue || record?.[4]?.stringValue || '0'),
+      totalFeedback: parseInt((record?.total_feedback as string) || '0'),
+      formatsLearned: parseInt((record?.formats_learned as string) || '0'),
+      modelsTracked: parseInt((record?.models_tracked as string) || '0'),
+      averageUnderstanding: parseFloat((record?.avg_understanding as string) || '0.5'),
+      recentImprovements: parseInt((record?.recent_improvements as string) || '0'),
     };
   }
 

@@ -378,10 +378,7 @@ export const handler: ScheduledHandler = async () => {
       durationMs: duration,
     });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(result),
-    };
+    // ScheduledHandler returns void
   } catch (error) {
     logger.error('Timeout cleanup failed', {
       error: error instanceof Error ? error.message : 'Unknown',
