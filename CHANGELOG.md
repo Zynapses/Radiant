@@ -60,6 +60,23 @@ Comprehensive unit test suite for Row Level Security policies.
 - Updated RADIANT_VERSION to 5.2.4
 - Updated TECHNICAL-DEBT.md with resolved items and current date
 
+### Refactored
+
+#### Complete Bobble to Cato Rename
+
+Full codebase refactoring to rename "Bobble" to "Cato" for consistency with the Genesis Cato Safety Architecture.
+
+**Changes:**
+- Renamed all `bobble/` directories to `cato/` across infrastructure, tests, docs, and terraform
+- Renamed all `bobble-*.ts` files to `cato-*.ts` (services, stacks, handlers)
+- Updated all internal content references (Bobble → Cato)
+- Updated documentation files (`BOBBLE-*.md` → `CATO-*.md`)
+- Fixed cross-link issues (CatoGenesisStack import, sidebar navigation)
+- Added missing `cato_validation_result` to Session type
+- Added `resizable` UI component for artifact viewer
+
+**Note:** 4 historical SQL migrations retain "bobble" in filenames (103, 118, 119, 120) - these are intentionally preserved for migration history integrity.
+
 ---
 
 ## [5.2.3] - 2026-01-10
