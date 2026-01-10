@@ -17,6 +17,7 @@
 import { Redis } from 'ioredis';
 import { query } from '../../database';
 import { GhostVector, DEFAULT_DECAY_CONSTANTS, REANCHOR_CONFIG } from '../types';
+import { logger } from '../../../logging/enhanced-logger';
 
 export interface GetGhostParams {
   userId: string;
@@ -80,7 +81,7 @@ export class GhostVectorManager {
       
       // Version check - different family = cold start
       if (ghost.modelFamily !== params.modelFamily) {
-        console.log(`[COS] Ghost version mismatch: ${ghost.modelFamily} vs ${params.modelFamily}, starting fresh`);
+        logger.info(`[COS] Ghost version mismatch: ${ghost.modelFamily} vs ${params.modelFamily}, starting fresh`);
         return null;
       }
       
@@ -101,7 +102,7 @@ export class GhostVectorManager {
     
     // Version check for database ghost
     if (ghost.modelFamily !== params.modelFamily) {
-      console.log(`[COS] Ghost version mismatch from DB: ${ghost.modelFamily} vs ${params.modelFamily}`);
+      logger.info(`[COS] Ghost version mismatch from DB: ${ghost.modelFamily} vs ${params.modelFamily}`);
       return null;
     }
     
@@ -163,7 +164,7 @@ export class GhostVectorManager {
     await this.storeGhost(ghost);
     await this.redis.setex(`${this.CACHE_PREFIX}${params.userId}`, this.CACHE_TTL, JSON.stringify(ghost));
     
-    console.log(`[COS] Ghost created for user ${params.userId} (model: ${params.modelFamily})`);
+    logger.info(`[COS] Ghost created for user ${params.userId} (model: ${params.modelFamily})`);
     return ghost;
   }
   
@@ -235,7 +236,7 @@ export class GhostVectorManager {
     if (ghost.turnsSinceReanchor >= reanchorThreshold) {
       // Fire and forget - async to avoid 1.8s latency spike
       this.scheduleReanchor(ghost).catch(err => 
-        console.error('[COS] Failed to schedule re-anchor:', err)
+        logger.error('[COS] Failed to schedule re-anchor', err)
       );
     }
     
@@ -276,7 +277,7 @@ export class GhostVectorManager {
     await this.storeGhost(ghost);
     await this.redis.setex(cacheKey, this.CACHE_TTL, JSON.stringify(ghost));
     
-    console.log(`[COS] Ghost re-anchored for user ${userId}`);
+    logger.info(`[COS] Ghost re-anchored for user ${userId}`);
     return ghost;
   }
   
@@ -293,7 +294,7 @@ export class GhostVectorManager {
     };
     
     await this.redis.lpush('cos:reanchor_queue', JSON.stringify(job));
-    console.log(`[COS] Re-anchor scheduled for ghost ${ghost.id}`);
+    logger.info(`[COS] Re-anchor scheduled for ghost ${ghost.id}`);
   }
   
   /**

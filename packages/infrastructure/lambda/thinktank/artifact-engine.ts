@@ -10,6 +10,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { artifactEngineService } from '../shared/services/artifact-engine';
 import { query } from '../shared/db/pool-manager';
+import { logger } from '../shared/logging/enhanced-logger';
 
 interface AuthContext {
   tenantId: string;
@@ -100,7 +101,7 @@ export const generateArtifact: APIGatewayProxyHandler = async (event): Promise<A
 
     return jsonResponse(200, result);
   } catch (error: unknown) {
-    console.error('Artifact generation error:', error);
+    logger.error('Artifact generation error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     return errorResponse(500, message);
   }
@@ -138,7 +139,7 @@ export const getSessionStatus: APIGatewayProxyHandler = async (event): Promise<A
 
     return jsonResponse(200, result);
   } catch (error: unknown) {
-    console.error('Get session error:', error);
+    logger.error('Get session error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     return errorResponse(500, message);
   }
@@ -202,7 +203,7 @@ export const getSessionLogs: APIGatewayProxyHandler = async (event): Promise<API
       isComplete,
     });
   } catch (error: unknown) {
-    console.error('Get session logs error:', error);
+    logger.error('Get session logs error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     return errorResponse(500, message);
   }
@@ -236,7 +237,7 @@ export const getPatterns: APIGatewayProxyHandler = async (event): Promise<APIGat
 
     return jsonResponse(200, patterns);
   } catch (error: unknown) {
-    console.error('Get patterns error:', error);
+    logger.error('Get patterns error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     return errorResponse(500, message);
   }
@@ -274,7 +275,7 @@ export const getAllowlist: APIGatewayProxyHandler = async (event): Promise<APIGa
 
     return jsonResponse(200, result.rows);
   } catch (error: unknown) {
-    console.error('Get allowlist error:', error);
+    logger.error('Get allowlist error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     return errorResponse(500, message);
   }
@@ -308,7 +309,7 @@ export const getAdminMetrics: APIGatewayProxyHandler = async (event): Promise<AP
 
     return jsonResponse(200, metrics);
   } catch (error: unknown) {
-    console.error('Get admin metrics error:', error);
+    logger.error('Get admin metrics error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     return errorResponse(500, message);
   }
@@ -348,7 +349,7 @@ export const getValidationRules: APIGatewayProxyHandler = async (event): Promise
 
     return jsonResponse(200, result.rows);
   } catch (error: unknown) {
-    console.error('Get validation rules error:', error);
+    logger.error('Get validation rules error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     return errorResponse(500, message);
   }
@@ -407,7 +408,7 @@ export const updateValidationRule: APIGatewayProxyHandler = async (event): Promi
 
     return jsonResponse(200, { success: true });
   } catch (error: unknown) {
-    console.error('Update validation rule error:', error);
+    logger.error('Update validation rule error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     return errorResponse(500, message);
   }
@@ -451,7 +452,7 @@ export const addToAllowlist: APIGatewayProxyHandler = async (event): Promise<API
 
     return jsonResponse(201, { id: result.rows[0].id });
   } catch (error: unknown) {
-    console.error('Add to allowlist error:', error);
+    logger.error('Add to allowlist error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     return errorResponse(500, message);
   }
@@ -483,7 +484,7 @@ export const removeFromAllowlist: APIGatewayProxyHandler = async (event): Promis
 
     return jsonResponse(200, { success: true });
   } catch (error: unknown) {
-    console.error('Remove from allowlist error:', error);
+    logger.error('Remove from allowlist error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     return errorResponse(500, message);
   }
@@ -525,7 +526,7 @@ export const getDashboard: APIGatewayProxyHandler = async (event): Promise<APIGa
       allowlist: allowlist.rows,
     });
   } catch (error: unknown) {
-    console.error('Get dashboard error:', error);
+    logger.error('Get dashboard error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
     return errorResponse(500, message);
   }

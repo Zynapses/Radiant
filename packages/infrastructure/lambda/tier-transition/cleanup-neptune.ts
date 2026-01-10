@@ -5,6 +5,7 @@
  */
 
 import { Handler } from 'aws-lambda';
+import { logger } from '../shared/logging/enhanced-logger';
 import {
   NeptuneClient,
   DeleteDBInstanceCommand,
@@ -31,7 +32,7 @@ interface CleanupResult {
 }
 
 export const handler: Handler<TransitionEvent, CleanupResult> = async (event) => {
-  console.log('Cleaning up Neptune:', JSON.stringify(event));
+  logger.info('Cleaning up Neptune:', { event });
 
   const { tenantId, fromTier, toTier, timestamp } = event;
   const prefix = tenantId.substring(0, 8);
@@ -44,7 +45,7 @@ export const handler: Handler<TransitionEvent, CleanupResult> = async (event) =>
     errors: []
   };
 
-  const clusterName = `bobble-graph-${prefix}`;
+  const clusterName = `cato-graph-${prefix}`;
 
   try {
     // When going from PRODUCTION (provisioned) to serverless
@@ -67,7 +68,7 @@ export const handler: Handler<TransitionEvent, CleanupResult> = async (event) =>
 
           result.deleted.push(instanceId);
           result.snapshots.push(snapshotId);
-          console.log(`Deleted instance ${instanceId} with snapshot ${snapshotId}`);
+          logger.info(`Deleted instance ${instanceId} with snapshot ${snapshotId}`);
         }
       } catch (error: any) {
         if (error.name !== 'DBInstanceNotFoundFault') {
@@ -108,7 +109,7 @@ export const handler: Handler<TransitionEvent, CleanupResult> = async (event) =>
     }
 
   } catch (error: any) {
-    console.error('Neptune cleanup error:', error);
+    logger.error('Neptune cleanup error:', error);
     result.status = 'PARTIAL';
     result.errors.push(error.message);
   }

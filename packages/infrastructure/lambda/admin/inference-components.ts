@@ -278,7 +278,7 @@ export const listTierAssignments: APIGatewayProxyHandler = async (event) => {
     const tenantId = event.requestContext.authorizer?.tenantId || 'default';
     
     // Get all tier assignments for tenant's models
-    const { executeStatement } = await import('../shared/db/client');
+    const { executeStatement } = await import('../shared/db/client.js');
     const result = await executeStatement(
       `SELECT ta.* FROM tier_assignments ta
        JOIN model_registry mr ON ta.model_id = mr.model_id
@@ -401,7 +401,7 @@ export const overrideTier: APIGatewayProxyHandler = async (event) => {
       return response(400, { success: false, error: 'Valid tier is required (hot, warm, cold, off)' });
     }
 
-    const { executeStatement } = await import('../shared/db/client');
+    const { executeStatement } = await import('../shared/db/client.js');
     const expiresAt = expiresInDays
       ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000).toISOString()
       : null;
@@ -443,7 +443,7 @@ export const clearTierOverride: APIGatewayProxyHandler = async (event) => {
       return response(400, { success: false, error: 'modelId is required' });
     }
 
-    const { executeStatement } = await import('../shared/db/client');
+    const { executeStatement } = await import('../shared/db/client.js');
     await executeStatement(
       `UPDATE tier_assignments SET
         tier_override = NULL,

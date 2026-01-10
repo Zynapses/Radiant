@@ -1,7 +1,7 @@
 // RADIANT v4.18.55 - PDF Text Extraction Converter
 // Uses pdf-parse for reliable PDF text extraction
 
-import * as pdfParse from 'pdf-parse';
+import pdfParse from 'pdf-parse';
 
 export interface PdfExtractionResult {
   success: boolean;

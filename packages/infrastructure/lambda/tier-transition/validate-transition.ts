@@ -5,6 +5,7 @@
  */
 
 import { Handler } from 'aws-lambda';
+import { logger } from '../shared/logging/enhanced-logger';
 
 interface TransitionEvent {
   tenantId: string;
@@ -17,7 +18,7 @@ interface TransitionEvent {
 }
 
 export const handler: Handler<TransitionEvent, TransitionEvent> = async (event) => {
-  console.log('Validating transition:', JSON.stringify(event));
+  logger.info('Validating transition:', { event });
 
   const { tenantId, fromTier, toTier, direction } = event;
 
@@ -42,6 +43,6 @@ export const handler: Handler<TransitionEvent, TransitionEvent> = async (event) 
     throw new Error(`Direction mismatch. Expected ${expectedDirection} for ${fromTier} -> ${toTier}`);
   }
 
-  console.log('Validation passed');
+  logger.info('Validation passed');
   return event;
 };

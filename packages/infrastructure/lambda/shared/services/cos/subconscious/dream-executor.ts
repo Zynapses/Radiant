@@ -17,6 +17,7 @@ import { DreamJob } from '../types';
 import { DreamScheduler } from './dream-scheduler';
 import { DualWriteFlashBuffer } from '../iron-core/dual-write-flash-buffer';
 import { GhostVectorManager } from '../consciousness/ghost-vector-manager';
+import { logger } from '../../../logging/enhanced-logger';
 
 export interface DreamExecutionResult {
   jobId: string;
@@ -84,7 +85,7 @@ export class DreamExecutor {
     try {
       // Mark as running
       await this.scheduler.markDreamStarted(job.id);
-      console.log(`[COS Dream] Starting dream for tenant ${job.tenantId} (trigger: ${job.trigger})`);
+      logger.info(`[COS Dream] Starting dream for tenant ${job.tenantId} (trigger: ${job.trigger})`);
       
       // Phase 1: Consolidate flash facts
       result.flashFactsConsolidated = await this.consolidateFlashFacts(job.tenantId);
@@ -105,16 +106,14 @@ export class DreamExecutor {
       result.success = true;
       result.durationMs = Date.now() - startTime;
       
-      console.log(`[COS Dream] Completed for tenant ${job.tenantId}: ` +
-        `${result.flashFactsConsolidated} facts, ${result.ghostVectorsReanchored} ghosts, ` +
-        `${result.loraUpdatesApplied} LoRA in ${result.durationMs}ms`);
+      logger.info('[COS Dream] Completed', { tenantId: job.tenantId, flashFactsConsolidated: result.flashFactsConsolidated, ghostVectorsReanchored: result.ghostVectorsReanchored, loraUpdatesApplied: result.loraUpdatesApplied, durationMs: result.durationMs });
       
     } catch (error) {
       result.error = error instanceof Error ? error.message : String(error);
       result.durationMs = Date.now() - startTime;
       
       await this.scheduler.markDreamFailed(job.id, result.error);
-      console.error(`[COS Dream] Failed for tenant ${job.tenantId}:`, error);
+      logger.error(`[COS Dream] Failed for tenant ${job.tenantId}:`, error);
     }
     
     return result;
@@ -145,7 +144,7 @@ export class DreamExecutor {
         consolidated++;
         
       } catch (error) {
-        console.error(`[COS Dream] Failed to consolidate fact ${row.id}:`, error);
+        logger.error(`[COS Dream] Failed to consolidate fact ${row.id}:`, error);
       }
     }
     
@@ -200,7 +199,7 @@ export class DreamExecutor {
         reanchored++;
         
       } catch (error) {
-        console.error(`[COS Dream] Failed to reanchor ghost for user ${row.user_id}:`, error);
+        logger.error(`[COS Dream] Failed to reanchor ghost for user ${row.user_id}:`, error);
       }
     }
     
@@ -255,7 +254,7 @@ export class DreamExecutor {
       });
 
       if (!response.ok) {
-        console.warn(`[COS Dream] vLLM embedding call failed: ${response.status}, using fallback`);
+        logger.warn(`[COS Dream] vLLM embedding call failed: ${response.status}, using fallback`);
         return this.generateFallbackHiddenStates(context);
       }
 
@@ -273,7 +272,7 @@ export class DreamExecutor {
       
       return this.generateFallbackHiddenStates(context);
     } catch (error) {
-      console.warn(`[COS Dream] vLLM call error: ${error instanceof Error ? error.message : 'Unknown'}, using fallback`);
+      logger.warn('[COS Dream] vLLM call error, using fallback', { error: error instanceof Error ? error.message : 'Unknown' });
       return this.generateFallbackHiddenStates(context);
     }
   }
@@ -322,10 +321,10 @@ export class DreamExecutor {
         );
         
         applied++;
-        console.log(`[COS Dream] Applied LoRA update ${row.id} for tenant ${tenantId}`);
+        logger.info(`[COS Dream] Applied LoRA update ${row.id} for tenant ${tenantId}`);
         
       } catch (error) {
-        console.error(`[COS Dream] Failed to apply LoRA update ${row.id}:`, error);
+        logger.error(`[COS Dream] Failed to apply LoRA update ${row.id}:`, error);
       }
     }
     
@@ -398,16 +397,16 @@ export class DreamExecutor {
 export async function startDreamWorker(redis: Redis, intervalMs: number = 5000): Promise<void> {
   const executor = new DreamExecutor(redis);
   
-  console.log('[COS] Dream worker started');
+  logger.info('[COS] Dream worker started');
   
   const processLoop = async () => {
     try {
       const result = await executor.processNext();
       if (result) {
-        console.log(`[COS Dream Worker] Processed dream ${result.jobId}: ${result.success ? 'success' : 'failed'}`);
+        logger.info(`[COS Dream Worker] Processed dream ${result.jobId}: ${result.success ? 'success' : 'failed'}`);
       }
     } catch (error) {
-      console.error('[COS Dream Worker] Error:', error);
+      logger.error('[COS Dream Worker] Error:', error);
     }
     
     setTimeout(processLoop, intervalMs);

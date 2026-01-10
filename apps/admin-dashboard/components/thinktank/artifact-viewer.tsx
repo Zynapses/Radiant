@@ -49,6 +49,12 @@ interface Session {
   reflexion_attempts: number;
   total_tokens_used: number;
   estimated_cost: number;
+  cato_validation_result?: {
+    passedCBFs: string[];
+    failedCBFs: string[];
+    warnings: Array<{ rule: string; message: string }>;
+    securityScore: number;
+  };
 }
 
 export function ArtifactViewer({ sessionId, onClose }: ArtifactViewerProps) {
@@ -366,12 +372,7 @@ function LogLine({ log }: { log: LogEntry }) {
 function ValidationDetails({ session }: { session: Session | null }) {
   if (!session) return null;
 
-  const validation = (session as unknown as { cato_validation_result?: {
-    passedCBFs: string[];
-    failedCBFs: string[];
-    warnings: Array<{ rule: string; message: string }>;
-    securityScore: number;
-  } }).cato_validation_result;
+  const validation = session.cato_validation_result;
 
   if (!validation) {
     return <p className="text-muted-foreground">No validation data available</p>;

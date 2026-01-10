@@ -313,7 +313,7 @@ export default function InfrastructureTierPage() {
             Infrastructure Tier
           </h1>
           <p className="text-muted-foreground mt-1">
-            Manage Bobble infrastructure scaling and costs
+            Manage Cato infrastructure scaling and costs
           </p>
         </div>
         <Button onClick={fetchData} variant="outline" size="sm">

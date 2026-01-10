@@ -16,6 +16,7 @@
 import { Redis } from 'ioredis';
 import { query } from '../../database';
 import { DreamJob, DreamTrigger, TenantDreamConfig } from '../types';
+import { logger } from '../../../logging/enhanced-logger';
 
 export interface SchedulingResult {
   scheduled: number;
@@ -84,7 +85,7 @@ export class DreamScheduler {
       }
       
       if (result.scheduled > 0) {
-        console.log(`[COS] Twilight dreams scheduled: ${result.scheduled} tenants`);
+        logger.info(`[COS] Twilight dreams scheduled: ${result.scheduled} tenants`);
       }
       
     } catch (error) {
@@ -132,7 +133,7 @@ export class DreamScheduler {
       }
       
       if (result.scheduled > 0) {
-        console.log(`[COS] Starvation dreams scheduled: ${result.scheduled} tenants (threshold: ${this.STARVATION_HOURS}h)`);
+        logger.info(`[COS] Starvation dreams scheduled: ${result.scheduled} tenants (threshold: ${this.STARVATION_HOURS}h)`);
       }
       
     } catch (error) {

@@ -6,7 +6,12 @@
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { executeStatement } from '../shared/db/client';
-import { extractAdminContext } from '../shared/auth/admin-context';
+import { extractAuthContext } from '../shared/auth';
+
+function extractAdminContext(event: any) {
+  const auth = extractAuthContext(event);
+  return { isAuthenticated: auth.isAdmin, tenantId: auth.tenantId };
+}
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 
 // =============================================================================
@@ -56,7 +61,7 @@ export const getStats: APIGatewayProxyHandler = async (event) => {
       ]
     );
 
-    const row = result.records?.[0];
+    const row = result.rows?.[0] as Record<string, unknown> | undefined;
     if (!row) {
       return success({
         avgScore: 0,
@@ -68,11 +73,11 @@ export const getStats: APIGatewayProxyHandler = async (event) => {
     }
 
     return success({
-      avgScore: row[0]?.doubleValue || 0,
-      firstPassRate: row[1]?.doubleValue || 100,
-      refinementsToday: row[2]?.longValue || 0,
-      blockedToday: row[3]?.longValue || 0,
-      totalRequests: row[4]?.longValue || 0,
+      avgScore: Number(row.avg_score) || 0,
+      firstPassRate: Number(row.first_pass_rate) || 100,
+      refinementsToday: Number(row.refinements_today) || 0,
+      blockedToday: Number(row.blocked_today) || 0,
+      totalRequests: Number(row.total_requests) || 0,
     });
   } catch (err) {
     logger.error(`ECD getStats error: ${String(err)}`);
@@ -101,11 +106,11 @@ export const getTrend: APIGatewayProxyHandler = async (event) => {
       ]
     );
 
-    const trendData = (result.records || []).map(row => ({
-      date: row[0]?.stringValue || '',
-      avgScore: row[1]?.doubleValue || 0,
-      passRate: row[2]?.doubleValue || 100,
-      totalRequests: row[3]?.longValue || 0,
+    const trendData = (result.rows || []).map((row: Record<string, unknown>) => ({
+      date: (row.date as string) || '',
+      avgScore: Number(row.avg_score) || 0,
+      passRate: Number(row.pass_rate) || 100,
+      totalRequests: Number(row.total_requests) || 0,
     }));
 
     return success(trendData);
@@ -136,12 +141,12 @@ export const getEntityBreakdown: APIGatewayProxyHandler = async (event) => {
       ]
     );
 
-    const entityData = (result.records || []).map(row => ({
-      entityType: row[0]?.stringValue || 'unknown',
-      totalCount: row[1]?.longValue || 0,
-      groundedCount: row[2]?.longValue || 0,
-      divergentCount: row[3]?.longValue || 0,
-      divergenceRate: row[4]?.doubleValue || 0,
+    const entityData = (result.rows || []).map((row: Record<string, unknown>) => ({
+      entityType: (row.entity_type as string) || 'unknown',
+      totalCount: Number(row.total_count) || 0,
+      groundedCount: Number(row.grounded_count) || 0,
+      divergentCount: Number(row.divergent_count) || 0,
+      divergenceRate: Number(row.divergence_rate) || 0,
     }));
 
     return success(entityData);
@@ -182,11 +187,11 @@ export const getRecentDivergences: APIGatewayProxyHandler = async (event) => {
       ]
     );
 
-    const divergences = (result.records || []).map(row => ({
-      entity: row[0]?.stringValue || '',
-      type: row[1]?.stringValue || 'unknown',
-      reason: row[2]?.stringValue || 'not_in_context',
-      timestamp: row[3]?.stringValue || new Date().toISOString(),
+    const divergences = (result.rows || []).map((row: Record<string, unknown>) => ({
+      entity: (row.entity as string) || '',
+      type: (row.type as string) || 'unknown',
+      reason: (row.reason as string) || 'not_in_context',
+      timestamp: (row.timestamp as string) || new Date().toISOString(),
     }));
 
     return success(divergences);
@@ -200,7 +205,7 @@ export const getRecentDivergences: APIGatewayProxyHandler = async (event) => {
 // Main Handler (routes requests)
 // =============================================================================
 
-export const handler: APIGatewayProxyHandler = async (event, context) => {
+export const handler: APIGatewayProxyHandler = async (event, context, callback): Promise<APIGatewayProxyResult> => {
   const path = event.path || '';
   const method = event.httpMethod || 'GET';
 
@@ -208,19 +213,19 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
 
   // Route based on path
   if (path.endsWith('/stats') && method === 'GET') {
-    return getStats(event, context, () => {});
+    return (await getStats(event, context, callback)) || error(500, 'No response');
   }
   
   if (path.endsWith('/trend') && method === 'GET') {
-    return getTrend(event, context, () => {});
+    return (await getTrend(event, context, callback)) || error(500, 'No response');
   }
   
   if (path.endsWith('/entities') && method === 'GET') {
-    return getEntityBreakdown(event, context, () => {});
+    return (await getEntityBreakdown(event, context, callback)) || error(500, 'No response');
   }
   
   if (path.endsWith('/divergences') && method === 'GET') {
-    return getRecentDivergences(event, context, () => {});
+    return (await getRecentDivergences(event, context, callback)) || error(500, 'No response');
   }
 
   return error(404, 'Not found');

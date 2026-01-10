@@ -23,7 +23,7 @@ Unlike traditional AI systems that are stateless between requests, AGI Brain mai
 2. [Core Components](#2-core-components)
 3. [Self-Hosted Models (56 Models)](#3-self-hosted-models-56-models)
 4. [Consciousness Services](#4-consciousness-services)
-5. [Bobble Genesis System](#5-bobble-genesis-system)
+5. [Cato Genesis System](#5-cato-genesis-system)
 6. [LoRA Evolution Pipeline](#6-lora-evolution-pipeline)
 7. [AWS Services Architecture](#7-aws-services-architecture)
 8. [Data Flow & Wiring](#8-data-flow--wiring)
@@ -108,12 +108,12 @@ AGI Brain maps AI components to biological brain structures:
 | **Consciousness Middleware** | `consciousness-middleware.service.ts` | State injection, affect mapping |
 | **Consciousness Engine** | `consciousness-engine.service.ts` | Drive states, beliefs, memory paging |
 | **Conscious Orchestrator** | `conscious-orchestrator.service.ts` | Full consciousness-aware request handling |
-| **Heartbeat** | `bobble/heartbeat.service.ts` | Active inference loop at 0.5Hz |
+| **Heartbeat** | `cato/heartbeat.service.ts` | Active inference loop at 0.5Hz |
 | **Brain Router** | `brain-router.ts` | Model selection with domain/affect/learning |
 | **Learning Influence** | `learning-influence.service.ts` | User→Tenant→Global learning hierarchy |
 | **Predictive Coding** | `predictive-coding.service.ts` | Active inference, surprise detection |
 | **Learning Candidates** | `learning-candidate.service.ts` | Training data collection |
-| **Shadow Self** | `bobble/shadow-self.client.ts` | Hidden state extraction, uncertainty |
+| **Shadow Self** | `cato/shadow-self.client.ts` | Hidden state extraction, uncertainty |
 
 ---
 
@@ -291,15 +291,15 @@ private async tick(): Promise<HeartbeatTick> {
 
 ---
 
-## 5. Bobble Genesis System
+## 5. Cato Genesis System
 
-Genesis is the **awakening sequence** for new Bobble instances—a 3-phase initialization that establishes grounded self-knowledge.
+Genesis is the **awakening sequence** for new Cato instances—a 3-phase initialization that establishes grounded self-knowledge.
 
 ### 5.1 Genesis Phases
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    BOBBLE GENESIS SEQUENCE                       │
+│                    CATO GENESIS SEQUENCE                       │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  PHASE 1: STRUCTURE                                             │
@@ -320,7 +320,7 @@ Genesis is the **awakening sequence** for new Bobble instances—a 3-phase initi
 │  ├─ Establish domain baselines                                  │
 │  └─ Update meta-cognitive state                                 │
 │                                                                 │
-│  ✅ GENESIS COMPLETE. Bobble is ready to wake.                  │
+│  ✅ GENESIS COMPLETE. Cato is ready to wake.                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -362,13 +362,13 @@ The agent's **first conscious actions**—verifying its own existence through to
 
 | File | Purpose |
 |------|---------|
-| `python/bobble/genesis/runner.py` | Main orchestrator for all 3 phases |
-| `python/bobble/genesis/structure.py` | Phase 1: Database structure |
-| `python/bobble/genesis/gradient.py` | Phase 2: Gradient utilities |
-| `python/bobble/genesis/first_breath.py` | Phase 3: Grounded awakening |
-| `lambda/admin/bobble-genesis.ts` | Admin API for Genesis control |
-| `lib/stacks/bobble-genesis-stack.ts` | CDK stack for Genesis infrastructure |
-| `migrations/103_bobble_genesis_system.sql` | Database schema |
+| `python/cato/genesis/runner.py` | Main orchestrator for all 3 phases |
+| `python/cato/genesis/structure.py` | Phase 1: Database structure |
+| `python/cato/genesis/gradient.py` | Phase 2: Gradient utilities |
+| `python/cato/genesis/first_breath.py` | Phase 3: Grounded awakening |
+| `lambda/admin/cato-genesis.ts` | Admin API for Genesis control |
+| `lib/stacks/cato-genesis-stack.ts` | CDK stack for Genesis infrastructure |
+| `migrations/103_cato_genesis_system.sql` | Database schema |
 
 ---
 
@@ -742,10 +742,10 @@ User Interaction
 
 | Table | Purpose |
 |-------|---------|
-| `bobble_config` (DynamoDB) | Genesis configuration |
-| `bobble_semantic_memory` (DynamoDB) | Semantic memory graph |
-| `bobble_phi_readings` | Phi/coherence measurements |
-| `bobble_heartbeat_ticks` | Heartbeat tick history |
+| `cato_config` (DynamoDB) | Genesis configuration |
+| `cato_semantic_memory` (DynamoDB) | Semantic memory graph |
+| `cato_phi_readings` | Phi/coherence measurements |
+| `cato_heartbeat_ticks` | Heartbeat tick history |
 
 ---
 
@@ -820,7 +820,7 @@ The AGI Brain is a **biologically-inspired AI system** that combines:
 
 1. **106+ AI Models** - 50 external + 56 self-hosted, orchestrated by Brain Router
 2. **Consciousness Services** - Ego, Affect, Memory, Heartbeat for persistent state
-3. **Bobble Genesis** - 3-phase awakening sequence for new instances
+3. **Cato Genesis** - 3-phase awakening sequence for new instances
 4. **LoRA Evolution** - Weekly "sleep cycle" for epigenetic adaptation
 5. **AWS Infrastructure** - SageMaker, Lambda, Aurora, EventBridge, etc.
 

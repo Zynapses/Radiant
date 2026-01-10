@@ -447,7 +447,7 @@ export class RadiantSwarm {
         throw new Error(`LiteLLM error: ${response.status} - ${errorText}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as { choices?: { message?: { content?: string } }[]; usage?: { total_tokens?: number } };
       const latencyMs = Date.now() - startTime;
 
       const content = data.choices?.[0]?.message?.content || '';
@@ -522,7 +522,7 @@ export class RadiantSwarm {
         return { passed: true, violations: [] };
       }
 
-      const result = await response.json();
+      const result = await response.json() as { passed?: boolean; violations?: string[] };
       return {
         passed: result.passed ?? true,
         violations: result.violations ?? [],
@@ -593,7 +593,7 @@ Provide a synthesized answer that incorporates the best insights from all expert
         throw new Error('Synthesis failed');
       }
 
-      const data = await response.json();
+      const data = await response.json() as { choices?: { message?: { content?: string } }[] };
       const synthesizedContent = data.choices?.[0]?.message?.content || '';
 
       const agreementScore = this.calculateAgreement(successfulResults);

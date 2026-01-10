@@ -1,5 +1,5 @@
 /**
- * Bobble Infrastructure Tier Transition Lambda Functions
+ * Cato Infrastructure Tier Transition Lambda Functions
  * 
  * Export all handlers for the Step Functions workflow.
  */

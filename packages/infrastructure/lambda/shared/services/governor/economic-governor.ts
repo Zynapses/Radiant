@@ -214,7 +214,7 @@ Return ONLY a single integer from 1-10. No explanation.`
         return 5;
       }
 
-      const data = await response.json();
+      const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
       const content = data.choices?.[0]?.message?.content || '5';
       const score = parseInt(content.trim(), 10);
       

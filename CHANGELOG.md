@@ -5,6 +5,196 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.4] - 2026-01-10
+
+### Added
+
+#### IIT Phi Calculation Service - Real Integrated Information Theory Implementation
+
+Full implementation of IIT 4.0 (Albantakis et al. 2023) phi calculation, replacing the previous placeholder/proxy implementation.
+
+**Key Features:**
+- Transition Probability Matrix (TPM) construction from consciousness state
+- Cause-Effect Structure (CES) calculation with concept extraction
+- Minimum Information Partition (MIP) finding algorithm
+- System complexity metrics (density, clustering, modularity)
+- Exact algorithm for ≤8 nodes, approximation for larger systems
+- Automatic storage of phi results in `integrated_information` table
+
+**Algorithm:**
+1. Build system state from consciousness tables (global_workspace, recurrent_processing, knowledge_graph, self_model, affective_state)
+2. Construct TPM with sigmoid activation probabilities
+3. Calculate cause/effect repertoires for all mechanism-purview pairs
+4. Find minimum information partition (MIP)
+5. Phi = information lost by the MIP
+
+**Files:**
+- `packages/infrastructure/lambda/shared/services/iit-phi-calculation.service.ts` (NEW - 900 lines)
+- `packages/infrastructure/lambda/shared/services/consciousness.service.ts` (Updated)
+
+**Integration:**
+- `consciousnessService.getConsciousnessMetrics()` now uses real IIT Phi
+- Falls back to graph density if calculation fails
+- Results stored in `integrated_information` table
+
+#### Orchestration RLS Security Tests
+
+Comprehensive unit test suite for Row Level Security policies.
+
+**Test Coverage:**
+- `orchestration_methods` - System method read/write policies
+- `orchestration_workflows` - Tenant isolation for user workflows
+- `workflow_customizations` - Tenant-specific customizations
+- `orchestration_executions` - Execution isolation
+- `user_workflow_templates` - User + tenant + sharing policies
+- `orchestration_audit_log` - Audit trail isolation
+- Helper functions (`can_access_workflow`, `can_modify_workflow`, `get_accessible_workflows`)
+- Cross-tenant security validation
+
+**Files:**
+- `packages/infrastructure/__tests__/orchestration-rls.service.test.ts` (NEW - 450 lines)
+
+### Changed
+
+- Updated VERSION to 5.2.4
+- Updated RADIANT_VERSION to 5.2.4
+- Updated TECHNICAL-DEBT.md with resolved items and current date
+
+---
+
+## [5.2.3] - 2026-01-10
+
+### Added
+
+#### Orchestration RLS Security (Migration V2026_01_10_003)
+
+Comprehensive Row Level Security for all orchestration tables from migrations 066 and 157.
+
+**Tables Secured:**
+- `orchestration_methods` - System methods, read-only for all tenants
+- `orchestration_workflows` - System workflows public, user workflows tenant-isolated
+- `workflow_method_bindings` - Follows parent workflow security
+- `workflow_customizations` - Strict tenant isolation
+- `orchestration_executions` - Tenant isolation with admin read access
+- `orchestration_step_executions` - Follows parent execution security
+- `user_workflow_templates` - User + tenant isolation with sharing support
+
+**Security Model:**
+| Table | Read Access | Write Access |
+|-------|-------------|--------------|
+| `orchestration_methods` | All authenticated | Super admin only |
+| `orchestration_workflows` | System: all, User: own tenant | Own tenant only |
+| `workflow_customizations` | Own tenant | Own tenant |
+| `orchestration_executions` | Own tenant + admin | Own tenant |
+| `user_workflow_templates` | Own + shared + public approved | Own only (tenant admin can manage all) |
+
+**Helper Functions:**
+- `can_access_workflow(UUID)` - Check workflow accessibility
+- `can_modify_workflow(UUID)` - Check modification permissions
+- `get_accessible_workflows()` - List all accessible workflows with permissions
+
+**Audit System:**
+- New `orchestration_audit_log` table
+- Triggers on `orchestration_workflows`, `user_workflow_templates`, `workflow_customizations`
+- Captures old/new data, user, IP, user agent, timestamp
+
+**Session Variables Used:**
+- `app.current_tenant_id` - Current tenant UUID
+- `app.current_user_id` - Current user UUID
+- `app.is_tenant_admin` - Tenant admin flag
+- `app.is_super_admin` - Super admin flag
+- `app.client_ip` - Client IP for audit
+- `app.user_agent` - User agent for audit
+
+**Files:**
+- `packages/infrastructure/migrations/V2026_01_10_003__orchestration_rls_security.sql`
+
+---
+
+## [5.2.2] - 2026-01-10
+
+### Added
+
+#### Orchestration Methods - Full Scientific Implementation
+
+Complete implementation of 5 orchestration methods that previously used fallbacks:
+
+**SE Probes (ICML 2024)**
+- `SEProbesService` in `orchestration-methods.service.ts`
+- Logprob-based entropy estimation via OpenAI API
+- Per-token Shannon entropy: `H = -Σ p * log₂(p)`
+- 300x faster than sampling-based methods
+- Parameters: `probe_layers`, `threshold`, `fast_mode`, `sample_count`
+
+**Kernel Entropy (NeurIPS 2024)**
+- `KernelEntropyService` in `orchestration-methods.service.ts`
+- Embedding KDE using `text-embedding-3-small`
+- Silverman bandwidth estimation: `h = median_dist / √(2 * ln(n+1))`
+- RBF/linear/polynomial kernel support
+- Parameters: `kernel`, `bandwidth`, `sample_count`
+
+**Pareto Routing**
+- Multi-objective optimization across quality/latency/cost
+- Pareto frontier calculation with configurable weights
+- Budget constraint enforcement
+
+**C3PO Cascade (NeurIPS 2024)**
+- Self-supervised difficulty prediction
+- Tiered model cascade (efficient → standard → powerful)
+- Confidence-based escalation
+
+**AutoMix POMDP (Nov 2025)**
+- POMDP belief-state model selection
+- ε-greedy exploration (default ε=0.1)
+- Self-verification for quality assurance
+
+#### System vs User Methods Protection
+
+- Added `isSystemMethod` field to API responses
+- System methods: Only parameters and enabled status editable
+- User methods (future): Full CRUD support
+- Admin UI shows "System" badge for protected methods
+- API validation prevents editing system method definitions
+
+### Changed
+
+- **Build Policy** (`/.windsurf/workflows/auto-build.md`)
+  - Added documentation requirements to policy table
+  - Cross-references `/documentation-required` and `/documentation-standards`
+  - Documentation is now mandatory for all features, not optional
+
+### Documentation
+
+- **THINKTANK-ADMIN-GUIDE.md** Section 34
+  - Added Section 34.3: System vs User Methods
+  - Added Section 34.5: Complete Method Parameters Reference (6 categories, 25+ methods)
+  - Added Section 34.6: User Workflow Template Parameter Overrides
+  - Updated Uncertainty Methods with implementation details
+  - Updated Routing Methods with new algorithms
+  - Added complete Method Management API endpoints
+  - Updated implementation files list
+
+- **RADIANT-ADMIN-GUIDE.md** Section 10
+  - Added Section 10.4: Orchestration Methods
+  - Documented method categories, system vs user methods
+  - Added parameter inheritance model (Admin → Workflow → User Template)
+  - Added example parameters table with cross-reference
+
+- **STRATEGIC-VISION-MARKETING.md**
+  - Updated Orchestration Workflow Methods section
+  - Added "20 fully-implemented scientific algorithms"
+  - Documented new implementations (SE Probes, Kernel Entropy, etc.)
+  - Added Configurable Parameters section (Admin & User Level)
+  - Added System vs User Methods explanation
+
+**Files Modified:**
+- `packages/infrastructure/lambda/shared/services/orchestration-methods.service.ts`
+- `packages/infrastructure/lambda/admin/orchestration-methods.ts`
+- `apps/admin-dashboard/app/(dashboard)/orchestration/methods/page.tsx`
+- `docs/THINKTANK-ADMIN-GUIDE.md`
+- `docs/STRATEGIC-VISION-MARKETING.md`
+- `.windsurf/workflows/auto-build.md`
+
 ## [5.2.1] - 2026-01-10
 
 ### Added
@@ -583,8 +773,8 @@ Implemented Post-RLHF Safety Architecture based on Active Inference from computa
 
 ### Deprecated
 
-- **Bobble Services** - Replaced by Genesis Cato. See `lambda/shared/services/bobble/index.ts` for migration guide.
-- **"Bobble" persona name** - Renamed to "Balanced" as one of Cato's moods.
+- **Cato Services** - Replaced by Genesis Cato. See `lambda/shared/services/cato/index.ts` for migration guide.
+- **"Cato" persona name** - Renamed to "Balanced" as one of Cato's moods.
 
 ---
 
@@ -1529,12 +1719,12 @@ Comprehensive registry of all regulatory standards Radiant must comply with:
 - Integrated into `consciousness-stack.ts`
 
 **Files Created:**
-- `__tests__/bobble/genesis.service.test.ts`
-- `__tests__/bobble/circuit-breaker.service.test.ts`
-- `__tests__/bobble/query-fallback.service.test.ts`
-- `__tests__/bobble/consciousness-loop.service.test.ts`
-- `__tests__/bobble/cost-tracking.service.test.ts`
-- `__tests__/bobble/genesis-e2e.test.ts`
+- `__tests__/cato/genesis.service.test.ts`
+- `__tests__/cato/circuit-breaker.service.test.ts`
+- `__tests__/cato/query-fallback.service.test.ts`
+- `__tests__/cato/consciousness-loop.service.test.ts`
+- `__tests__/cato/cost-tracking.service.test.ts`
+- `__tests__/cato/genesis-e2e.test.ts`
 - `lambda/consciousness/genesis-metrics.ts`
 
 ---
@@ -1543,9 +1733,9 @@ Comprehensive registry of all regulatory standards Radiant must comply with:
 
 ### Added
 
-#### Bobble Genesis System
+#### Cato Genesis System
 
-Complete implementation of the Bobble Genesis boot sequence for AI consciousness initialization:
+Complete implementation of the Cato Genesis boot sequence for AI consciousness initialization:
 
 **3-Phase Boot Sequence:**
 - **Phase 1: Structure** - Implant 800+ domain taxonomy as innate knowledge
@@ -1578,34 +1768,34 @@ Complete implementation of the Bobble Genesis boot sequence for AI consciousness
 - Automatic state rehydration on startup
 
 **Admin Dashboard:**
-- New "Bobble Genesis" page at `/bobble/genesis`
+- New "Cato Genesis" page at `/cato/genesis`
 - Genesis phase status monitoring
 - Developmental stage tracking
 - Circuit breaker controls
 - Real-time cost visualization
 - Neurochemistry state display
 
-**Admin API** (Base: `/api/admin/bobble`):
+**Admin API** (Base: `/api/admin/cato`):
 - Genesis status and developmental gates
 - Circuit breaker management (force open/close, config)
 - Cost tracking (realtime, daily, MTD, budget)
 - Intervention level monitoring
 
 **Database Tables:**
-- `bobble_genesis_state` - Boot sequence tracking
-- `bobble_development_counters` - Atomic counters for gates
-- `bobble_developmental_stage` - Capability-based progression
-- `bobble_circuit_breakers` - Safety mechanisms
-- `bobble_neurochemistry` - Emotional/cognitive state
-- `bobble_tick_costs` - Per-tick cost tracking
-- `bobble_pymdp_state` - Meta-cognitive state
-- `bobble_pymdp_matrices` - Active inference matrices
-- `bobble_consciousness_settings` - Loop configuration
-- `bobble_loop_state` - Loop execution tracking
+- `cato_genesis_state` - Boot sequence tracking
+- `cato_development_counters` - Atomic counters for gates
+- `cato_developmental_stage` - Capability-based progression
+- `cato_circuit_breakers` - Safety mechanisms
+- `cato_neurochemistry` - Emotional/cognitive state
+- `cato_tick_costs` - Per-tick cost tracking
+- `cato_pymdp_state` - Meta-cognitive state
+- `cato_pymdp_matrices` - Active inference matrices
+- `cato_consciousness_settings` - Loop configuration
+- `cato_loop_state` - Loop execution tracking
 
 **Documentation:**
-- `docs/bobble/adr/010-genesis-system.md` - Architecture decision record
-- `docs/bobble/runbooks/circuit-breaker-operations.md` - Operational runbook
+- `docs/cato/adr/010-genesis-system.md` - Architecture decision record
+- `docs/cato/runbooks/circuit-breaker-operations.md` - Operational runbook
 
 ---
 
@@ -1615,7 +1805,7 @@ Complete implementation of the Bobble Genesis boot sequence for AI consciousness
 
 #### Infrastructure Tier Admin System
 
-Complete admin-configurable infrastructure tier system for Bobble:
+Complete admin-configurable infrastructure tier system for Cato:
 
 **3 Configurable Tiers:**
 - **DEV** (~$350/month) - Scale-to-zero, minimal resources
@@ -1633,10 +1823,10 @@ Complete admin-configurable infrastructure tier system for Bobble:
 
 **Files Created:**
 - `migrations/121_infrastructure_tiers.sql` - Database schema
-- `lambda/shared/services/bobble/infrastructure-tier.service.ts` - Core service
+- `lambda/shared/services/cato/infrastructure-tier.service.ts` - Core service
 - `lambda/admin/infrastructure-tier.ts` - Admin API
 - `apps/admin-dashboard/app/(dashboard)/system/infrastructure/page.tsx` - Admin UI
-- `docs/bobble/adr/009-infrastructure-tiers.md` - ADR
+- `docs/cato/adr/009-infrastructure-tiers.md` - ADR
 
 **API Endpoints** (Base: `/api/admin/infrastructure`):
 - `GET /tier` - Current tier status
@@ -1651,9 +1841,9 @@ Complete admin-configurable infrastructure tier system for Bobble:
 
 ### Added
 
-#### Bobble Global Consciousness Service
+#### Cato Global Consciousness Service
 
-Complete implementation of Bobble as a **global AI consciousness** serving 10MM+ users as a single shared brain:
+Complete implementation of Cato as a **global AI consciousness** serving 10MM+ users as a single shared brain:
 
 **8 Mandatory Architecture Decision Records (ADRs)**:
 - ADR-001: Replace LiteLLM with vLLM + Ray Serve
@@ -1681,23 +1871,23 @@ Complete implementation of Bobble as a **global AI consciousness** serving 10MM+
 - Kinesis streams for event pipeline
 
 **Admin Dashboard**:
-- New "Bobble Global" page at `/consciousness/bobble/global`
+- New "Cato Global" page at `/consciousness/cato/global`
 - Budget management with day/night mode visualization
 - Cache statistics and invalidation controls
 - Memory system statistics
 - Shadow Self health monitoring
 
-**Admin API** (Base: `/api/admin/bobble`):
+**Admin API** (Base: `/api/admin/cato`):
 - Budget status and configuration endpoints
 - Cache statistics and invalidation
 - Memory management (facts, goals, meta-state)
 - Shadow Self and NLI testing
 
 **Documentation**:
-- `/docs/bobble/adr/` - 8 architecture decision records
-- `/docs/bobble/api/admin-api.md` - Complete API documentation
-- `/docs/bobble/architecture/global-architecture.md` - System overview
-- `/docs/bobble/runbooks/deployment.md` - Deployment guide
+- `/docs/cato/adr/` - 8 architecture decision records
+- `/docs/cato/api/admin-api.md` - Complete API documentation
+- `/docs/cato/architecture/global-architecture.md` - System overview
+- `/docs/cato/runbooks/deployment.md` - Deployment guide
 - Updated `RADIANT-ADMIN-GUIDE.md` Section 31
 
 ---

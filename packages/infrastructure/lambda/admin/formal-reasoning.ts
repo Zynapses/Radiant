@@ -51,7 +51,7 @@ function jsonResponse(statusCode: number, body: unknown): APIGatewayProxyResult 
 /**
  * Extract tenant ID from request context.
  */
-function getTenantId(event: { requestContext?: { authorizer?: { tenantId?: string } } }): string {
+function getTenantId(event: { requestContext?: { authorizer?: { tenantId?: string } | null } }): string {
   const tenantId = event.requestContext?.authorizer?.tenantId;
   if (!tenantId) {
     throw new Error('Tenant ID not found in request context');

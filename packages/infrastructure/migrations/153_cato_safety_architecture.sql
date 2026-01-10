@@ -15,7 +15,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 -- ============================================================================
 -- PART 1: PERSONA SYSTEM (MOODS)
 -- NOTE: "CATO" is the AI persona name. These are MOODS that Cato operates in.
--- Default mood is "Balanced" (renamed from legacy "Bobble")
+-- Default mood is "Balanced" (renamed from legacy "Cato")
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS genesis_personas (
@@ -605,7 +605,7 @@ $$ LANGUAGE plpgsql;
 -- IMPORTANT NAMING:
 -- - "CATO" is the AI PERSONA NAME (what users talk to: "Hey Cato...")
 -- - These are MOODS that Cato can operate in (admin-settable)
--- - "Bobble" was renamed to "Balanced" to match other mood names
+-- - "Cato" was renamed to "Balanced" to match other mood names
 -- ============================================================================
 
 INSERT INTO genesis_personas (
@@ -614,7 +614,7 @@ INSERT INTO genesis_personas (
   is_default, is_active
 )
 VALUES
-  -- BALANCED: DEFAULT MOOD (was "Bobble")
+  -- BALANCED: DEFAULT MOOD (was "Cato")
   (
     'e5f6a7b8-c9d0-1234-efab-567890123456',
     'balanced',

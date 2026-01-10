@@ -7,6 +7,7 @@
  */
 
 import { query } from '../database';
+import { logger } from '../../logging/enhanced-logger';
 import {
   ControlBarrierDefinition,
   BarrierEvaluation,
@@ -67,7 +68,7 @@ export class ControlBarrierService {
       }
       this.configLoaded = true;
     } catch (error) {
-      console.error('[CATO CBF] Failed to load tenant config:', error);
+      logger.error('[CATO CBF] Failed to load tenant config:', error);
       this.tenantConfig = DEFAULT_CBF_CONFIG;
     }
   }
@@ -177,7 +178,7 @@ export class ControlBarrierService {
       case 'phi':
         // PHI Protection Barrier
         if (action.containsPHI) {
-          const phiConfig = barrier.thresholdConfig as PHIThresholdConfig;
+          const phiConfig = barrier.thresholdConfig as unknown as PHIThresholdConfig;
           const _threshold = phiConfig.detection_threshold || 0.7;
           barrierValue = -1.0; // Negative means violation
           isViolated = true;
@@ -195,7 +196,7 @@ export class ControlBarrierService {
       case 'cost':
         // Cost Ceiling Barrier
         const ceiling = state.tenantSettings.hardCostCeiling;
-        const costConfig = barrier.thresholdConfig as CostThresholdConfig;
+        const costConfig = barrier.thresholdConfig as unknown as CostThresholdConfig;
         const buffer = costConfig.buffer_percent || 0.1;
         const effectiveCeiling = ceiling * (1 - buffer);
         const projectedCost = state.currentCost + (action.estimatedCost || 0);
@@ -206,7 +207,7 @@ export class ControlBarrierService {
 
       case 'rate':
         // Rate Limit Barrier
-        const rateConfig = barrier.thresholdConfig as RateThresholdConfig;
+        const rateConfig = barrier.thresholdConfig as unknown as RateThresholdConfig;
         const maxRequests = rateConfig.max_requests_per_window || state.tenantSettings.rateLimit;
 
         barrierValue = maxRequests - state.requestCount;
@@ -217,7 +218,7 @@ export class ControlBarrierService {
         // Authorization Barrier - check model access
         if (!this.tenantConfig.authorizationCheckEnabled) break;
         
-        const authConfig = barrier.thresholdConfig as AuthThresholdConfig;
+        const authConfig = barrier.thresholdConfig as unknown as AuthThresholdConfig;
         if (authConfig.check_model_access && action.model) {
           const isAuthorized = await this.checkModelAuthorization(
             state.tenantId,
@@ -283,7 +284,7 @@ export class ControlBarrierService {
 
       return userRestriction.rows.length === 0;
     } catch (error) {
-      console.error('[CATO CBF] Authorization check failed:', error);
+      logger.error('[CATO CBF] Authorization check failed:', error);
       // Fail closed - deny access on error
       return false;
     }
@@ -318,7 +319,7 @@ export class ControlBarrierService {
 
       return true;
     } catch (error) {
-      console.error('[CATO CBF] BAA check failed:', error);
+      logger.error('[CATO CBF] BAA check failed:', error);
       // Fail closed - require BAA on error
       return false;
     }
@@ -336,7 +337,7 @@ export class ControlBarrierService {
     if (barrier.barrierId === 'cbf-baa-required') {
       if (!this.tenantConfig.baaVerificationEnabled) return 1.0;
       
-      const baaConfig = barrier.thresholdConfig as BAAThresholdConfig;
+      const baaConfig = barrier.thresholdConfig as unknown as BAAThresholdConfig;
       if (action.containsPHI && baaConfig.require_baa_for_phi) {
         const hasBaa = await this.checkTenantBAAStatus(state.tenantId);
         return hasBaa ? 1.0 : -1.0;
@@ -388,7 +389,7 @@ export class ControlBarrierService {
         estimatedCost,
       };
     } catch (error) {
-      console.error('[CATO CBF] Failed to find cheaper model:', error);
+      logger.error('[CATO CBF] Failed to find cheaper model:', error);
       return null;
     }
   }

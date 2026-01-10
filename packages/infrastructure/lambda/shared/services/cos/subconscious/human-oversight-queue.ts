@@ -15,6 +15,7 @@
  */
 
 import { query } from '../../database';
+import { logger } from '../../../logging/enhanced-logger';
 import { 
   HumanOversightItem, 
   OversightStatus, 
@@ -95,7 +96,7 @@ export class HumanOversightQueue {
       ]
     );
     
-    console.log(`[COS Oversight] Item submitted: ${id} (type: ${params.itemType})`);
+    logger.info(`[COS Oversight] Item submitted: ${id} (type: ${params.itemType})`);
     return item;
   }
   
@@ -115,7 +116,7 @@ export class HumanOversightQueue {
     // Log audit trail
     await this.logAuditEvent(decision.itemId, status, decision.reviewedBy, decision.reviewNotes);
     
-    console.log(`[COS Oversight] Decision recorded: ${decision.itemId} → ${status} by ${decision.reviewedBy}`);
+    logger.info(`[COS Oversight] Decision recorded: ${decision.itemId} → ${status} by ${decision.reviewedBy}`);
     
     return this.getItem(decision.itemId);
   }
@@ -153,11 +154,11 @@ export class HumanOversightQueue {
     const autoRejectedCount = rejectedResult.rowCount || 0;
     
     if (escalatedCount > 0) {
-      console.log(`[COS Oversight] Escalated ${escalatedCount} items`);
+      logger.info(`[COS Oversight] Escalated ${escalatedCount} items`);
     }
     
     if (autoRejectedCount > 0) {
-      console.warn(`[COS Oversight] Auto-rejected ${autoRejectedCount} items (Silence ≠ Consent)`);
+      logger.warn(`[COS Oversight] Auto-rejected ${autoRejectedCount} items (Silence ≠ Consent)`);
       
       // Log each auto-rejection for audit
       for (const row of rejectedResult.rows) {

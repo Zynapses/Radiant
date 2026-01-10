@@ -32,6 +32,8 @@ interface OrchestrationMethod {
   methodId: string;
   methodCode: string;
   methodName: string;
+  displayName: string;
+  scientificName: string;
   description: string;
   methodCategory: string;
   defaultParameters: Record<string, unknown>;
@@ -40,6 +42,10 @@ interface OrchestrationMethod {
   promptTemplate?: string;
   modelRole: string;
   recommendedModels: string[];
+  researchReference?: string;
+  accuracyImprovement?: string;
+  complexityLevel: 'simple' | 'moderate' | 'advanced' | 'expert';
+  isSystemMethod: boolean; // System methods can only have parameters edited
   isEnabled: boolean;
 }
 
@@ -75,6 +81,12 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   reasoning: <Code2 className="h-4 w-4" />,
   aggregation: <BarChart3 className="h-4 w-4" />,
   verification: <AlertCircle className="h-4 w-4" />,
+  debate: <MessageSquare className="h-4 w-4" />,
+  collaboration: <Layers className="h-4 w-4" />,
+  uncertainty: <AlertCircle className="h-4 w-4" />,
+  hallucination: <AlertCircle className="h-4 w-4" />,
+  human_loop: <CheckCircle2 className="h-4 w-4" />,
+  neural: <Zap className="h-4 w-4" />,
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -85,6 +97,12 @@ const CATEGORY_COLORS: Record<string, string> = {
   reasoning: 'bg-cyan-500/10 text-cyan-500',
   aggregation: 'bg-pink-500/10 text-pink-500',
   verification: 'bg-orange-500/10 text-orange-500',
+  debate: 'bg-indigo-500/10 text-indigo-500',
+  collaboration: 'bg-violet-500/10 text-violet-500',
+  uncertainty: 'bg-yellow-500/10 text-yellow-500',
+  hallucination: 'bg-red-500/10 text-red-500',
+  human_loop: 'bg-emerald-500/10 text-emerald-500',
+  neural: 'bg-fuchsia-500/10 text-fuchsia-500',
 };
 
 export default function OrchestrationMethodsPage() {
@@ -109,9 +127,10 @@ export default function OrchestrationMethodsPage() {
 
       if (methodsRes.ok) {
         const data = await methodsRes.json();
-        setMethods(data.methods || getMockMethods());
+        setMethods(data.methods || []);
       } else {
-        setMethods(getMockMethods());
+        console.warn('Methods API not available');
+        setMethods([]);
       }
 
       if (metricsRes.ok) {
@@ -129,7 +148,7 @@ export default function OrchestrationMethodsPage() {
       }
     } catch (err) {
       console.error('Failed to load orchestration methods', err);
-      setMethods(getMockMethods());
+      setMethods([]);
     } finally {
       setLoading(false);
     }
@@ -351,10 +370,32 @@ export default function OrchestrationMethodsPage() {
                   <div>
                     <CardTitle className="flex items-center gap-2">
                       {CATEGORY_ICONS[selectedMethod.methodCategory]}
-                      {selectedMethod.methodName}
+                      {selectedMethod.displayName || selectedMethod.methodName}
+                      {selectedMethod.isSystemMethod && (
+                        <Badge variant="secondary" className="text-xs font-normal">
+                          System
+                        </Badge>
+                      )}
                     </CardTitle>
-                    <CardDescription className="mt-1">
-                      <code className="text-xs bg-muted px-1 py-0.5 rounded">{selectedMethod.methodCode}</code>
+                    <CardDescription className="mt-1 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <code className="text-xs bg-muted px-1 py-0.5 rounded">{selectedMethod.methodCode}</code>
+                        {selectedMethod.complexityLevel && (
+                          <Badge variant="outline" className="text-xs">
+                            {selectedMethod.complexityLevel}
+                          </Badge>
+                        )}
+                      </div>
+                      {selectedMethod.scientificName && (
+                        <div className="text-xs text-muted-foreground italic">
+                          Scientific: {selectedMethod.scientificName}
+                        </div>
+                      )}
+                      {selectedMethod.isSystemMethod && (
+                        <div className="text-xs text-amber-600 dark:text-amber-400">
+                          System method: Only parameters and enabled status can be modified
+                        </div>
+                      )}
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
@@ -748,146 +789,3 @@ export default function OrchestrationMethodsPage() {
   );
 }
 
-function getMockMethods(): OrchestrationMethod[] {
-  return [
-    {
-      methodId: '1',
-      methodCode: 'GENERATE_RESPONSE',
-      methodName: 'Generate Response',
-      description: 'Generate a response to a prompt using specified model',
-      methodCategory: 'generation',
-      defaultParameters: { temperature: 0.7, max_tokens: 4096 },
-      parameterSchema: {},
-      implementationType: 'prompt',
-      promptTemplate: 'Generate a response to: {{prompt}}\n\nContext: {{context}}',
-      modelRole: 'generator',
-      recommendedModels: ['anthropic/claude-3-5-sonnet-20241022', 'openai/gpt-4o'],
-      isEnabled: true,
-    },
-    {
-      methodId: '2',
-      methodCode: 'GENERATE_WITH_COT',
-      methodName: 'Generate with Chain-of-Thought',
-      description: 'Generate response using chain-of-thought reasoning',
-      methodCategory: 'generation',
-      defaultParameters: { temperature: 0.3, max_tokens: 8192, thinking_budget: 2000 },
-      parameterSchema: {},
-      implementationType: 'prompt',
-      promptTemplate: 'Think through this step-by-step before answering:\n\n{{prompt}}\n\nShow your reasoning, then provide your answer.',
-      modelRole: 'generator',
-      recommendedModels: ['openai/o1', 'deepseek/deepseek-reasoner'],
-      isEnabled: true,
-    },
-    {
-      methodId: '3',
-      methodCode: 'CRITIQUE_RESPONSE',
-      methodName: 'Critique Response',
-      description: 'Critically evaluate a response for flaws and improvements',
-      methodCategory: 'evaluation',
-      defaultParameters: { focus_areas: ['accuracy', 'completeness', 'clarity', 'logic'], severity_threshold: 'medium' },
-      parameterSchema: {},
-      implementationType: 'prompt',
-      promptTemplate: 'Critically evaluate this response...',
-      modelRole: 'critic',
-      recommendedModels: ['openai/o1', 'anthropic/claude-3-5-sonnet-20241022'],
-      isEnabled: true,
-    },
-    {
-      methodId: '4',
-      methodCode: 'JUDGE_RESPONSES',
-      methodName: 'Judge Multiple Responses',
-      description: 'Compare and judge multiple responses to select the best',
-      methodCategory: 'evaluation',
-      defaultParameters: { evaluation_mode: 'pairwise', criteria: ['accuracy', 'helpfulness', 'clarity', 'completeness'] },
-      parameterSchema: {},
-      implementationType: 'prompt',
-      promptTemplate: 'Judge these responses to the question...',
-      modelRole: 'judge',
-      recommendedModels: ['openai/o1', 'anthropic/claude-3-5-sonnet-20241022'],
-      isEnabled: true,
-    },
-    {
-      methodId: '5',
-      methodCode: 'SYNTHESIZE_RESPONSES',
-      methodName: 'Synthesize Multiple Responses',
-      description: 'Combine best parts from multiple responses',
-      methodCategory: 'synthesis',
-      defaultParameters: { combination_strategy: 'best_parts', conflict_resolution: 'majority' },
-      parameterSchema: {},
-      implementationType: 'prompt',
-      promptTemplate: 'Synthesize these responses into one superior response...',
-      modelRole: 'synthesizer',
-      recommendedModels: ['anthropic/claude-3-5-sonnet-20241022', 'openai/gpt-4o'],
-      isEnabled: true,
-    },
-    {
-      methodId: '6',
-      methodCode: 'VERIFY_FACTS',
-      methodName: 'Verify Factual Claims',
-      description: 'Extract and verify factual claims in a response',
-      methodCategory: 'verification',
-      defaultParameters: { extraction_method: 'explicit', verification_depth: 'thorough' },
-      parameterSchema: {},
-      implementationType: 'prompt',
-      promptTemplate: 'Extract all factual claims from this response and verify each...',
-      modelRole: 'verifier',
-      recommendedModels: ['openai/o1', 'anthropic/claude-3-5-sonnet-20241022'],
-      isEnabled: true,
-    },
-    {
-      methodId: '7',
-      methodCode: 'DECOMPOSE_PROBLEM',
-      methodName: 'Decompose Problem',
-      description: 'Break down a complex problem into sub-problems',
-      methodCategory: 'reasoning',
-      defaultParameters: { max_subproblems: 5, decomposition_strategy: 'functional' },
-      parameterSchema: {},
-      implementationType: 'prompt',
-      promptTemplate: 'Decompose this problem into smaller sub-problems...',
-      modelRole: 'reasoner',
-      recommendedModels: ['openai/o1', 'anthropic/claude-3-5-sonnet-20241022'],
-      isEnabled: true,
-    },
-    {
-      methodId: '8',
-      methodCode: 'SELF_REFLECT',
-      methodName: 'Self Reflect',
-      description: 'AI reflects on its own response to identify improvements',
-      methodCategory: 'evaluation',
-      defaultParameters: { reflection_depth: 'thorough', aspects: ['accuracy', 'completeness', 'clarity'] },
-      parameterSchema: {},
-      implementationType: 'prompt',
-      promptTemplate: 'Reflect on your response...',
-      modelRole: 'critic',
-      recommendedModels: ['anthropic/claude-3-5-sonnet-20241022', 'openai/o1'],
-      isEnabled: true,
-    },
-    {
-      methodId: '9',
-      methodCode: 'DETECT_TASK_TYPE',
-      methodName: 'Detect Task Type',
-      description: 'Analyze prompt to determine task type and complexity',
-      methodCategory: 'routing',
-      defaultParameters: { task_categories: ['coding', 'reasoning', 'creative', 'factual', 'math', 'research'] },
-      parameterSchema: {},
-      implementationType: 'prompt',
-      promptTemplate: 'Analyze this prompt and classify it...',
-      modelRole: 'router',
-      recommendedModels: ['openai/gpt-4o-mini', 'anthropic/claude-3-5-haiku-20241022'],
-      isEnabled: true,
-    },
-    {
-      methodId: '10',
-      methodCode: 'MAJORITY_VOTE',
-      methodName: 'Majority Vote',
-      description: 'Select the most common answer from multiple responses',
-      methodCategory: 'aggregation',
-      defaultParameters: { vote_method: 'exact_match', tie_breaker: 'first' },
-      parameterSchema: {},
-      implementationType: 'code',
-      modelRole: 'aggregator',
-      recommendedModels: [],
-      isEnabled: true,
-    },
-  ];
-}

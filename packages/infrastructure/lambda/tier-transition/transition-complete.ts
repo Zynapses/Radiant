@@ -7,6 +7,7 @@
 import { Handler } from 'aws-lambda';
 import { RDSDataClient, ExecuteStatementCommand } from '@aws-sdk/client-rds-data';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
+import { logger } from '../shared/logging/enhanced-logger';
 
 const rdsData = new RDSDataClient({});
 const sns = new SNSClient({});
@@ -29,7 +30,7 @@ interface CompletionResult {
 }
 
 export const handler: Handler<TransitionEvent, CompletionResult> = async (event) => {
-  console.log('Completing transition:', JSON.stringify(event));
+  logger.info('Completing transition:', { event });
 
   const { tenantId, fromTier, toTier, direction, requestedBy, reason } = event;
   const completedAt = new Date().toISOString();
@@ -50,7 +51,7 @@ export const handler: Handler<TransitionEvent, CompletionResult> = async (event)
         secretArn: secretArn,
         database: database,
         sql: `
-          UPDATE bobble_infrastructure_tier
+          UPDATE cato_infrastructure_tier
           SET 
             current_tier = :tier,
             target_tier = NULL,
@@ -78,7 +79,7 @@ export const handler: Handler<TransitionEvent, CompletionResult> = async (event)
         secretArn: secretArn,
         database: database,
         sql: `
-          UPDATE bobble_tier_change_log
+          UPDATE cato_tier_change_log
           SET 
             status = 'COMPLETED',
             completed_at = :completedAt::timestamptz,
@@ -94,10 +95,10 @@ export const handler: Handler<TransitionEvent, CompletionResult> = async (event)
         ]
       }));
 
-      console.log('Database updated successfully');
+      logger.info('Database updated successfully');
     }
   } catch (error) {
-    console.error('Failed to update database:', error);
+    logger.error('Failed to update database:', error);
   }
 
   // Send notification
@@ -107,7 +108,7 @@ export const handler: Handler<TransitionEvent, CompletionResult> = async (event)
     if (topicArn) {
       await sns.send(new PublishCommand({
         TopicArn: topicArn,
-        Subject: `Bobble Tier Transition Complete: ${fromTier} → ${toTier}`,
+        Subject: `Cato Tier Transition Complete: ${fromTier} → ${toTier}`,
         Message: JSON.stringify({
           event: 'TIER_TRANSITION_COMPLETE',
           tenantId,
@@ -120,13 +121,13 @@ export const handler: Handler<TransitionEvent, CompletionResult> = async (event)
         }, null, 2)
       }));
       notificationSent = true;
-      console.log('Notification sent');
+      logger.info('Notification sent');
     }
   } catch (error) {
-    console.error('Failed to send notification:', error);
+    logger.error('Failed to send notification:', error);
   }
 
-  console.log(`Transition complete: ${fromTier} → ${toTier}`);
+  logger.info(`Transition complete: ${fromTier} → ${toTier}`);
 
   return {
     status: 'COMPLETED',

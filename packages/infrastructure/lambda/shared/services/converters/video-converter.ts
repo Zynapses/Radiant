@@ -4,7 +4,7 @@
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
-import * as ffmpeg from 'fluent-ffmpeg';
+import ffmpeg from 'fluent-ffmpeg';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
@@ -183,7 +183,7 @@ async function getVideoMetadata(videoPath: string): Promise<{
   codec: string;
 }> {
   return new Promise((resolve, reject) => {
-    ffmpeg.ffprobe(videoPath, (err, data) => {
+    ffmpeg.ffprobe(videoPath, (err: any, data: any) => {
       if (err) {
         reject(new Error(`Failed to probe video: ${err.message}`));
         return;
@@ -267,7 +267,7 @@ async function extractFrames(
         ])
         .output(outputPath)
         .on('end', () => resolve())
-        .on('error', (err) => reject(new Error(`Frame extraction failed: ${err.message}`)))
+        .on('error', (err: Error) => reject(new Error(`Frame extraction failed: ${err.message}`)))
         .run();
     });
 

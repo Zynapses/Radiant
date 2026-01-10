@@ -159,11 +159,11 @@ async function transcribeWithOpenAI(
     throw new Error(`OpenAI API error: ${response.status} - ${errorBody}`);
   }
 
-  const result = await response.json();
+  const result = await response.json() as { text?: string; segments?: Array<{ start: number; end: number; text: string; avg_logprob?: number }>; duration?: number; language?: string };
 
   // Parse response based on format
   if (includeTimestamps && result.segments) {
-    const segments: TranscriptionSegment[] = result.segments.map((seg: any, index: number) => ({
+    const segments: TranscriptionSegment[] = result.segments.map((seg, index: number) => ({
       id: index,
       start: seg.start,
       end: seg.end,
@@ -173,18 +173,18 @@ async function transcribeWithOpenAI(
 
     return {
       success: true,
-      text: result.text,
+      text: result.text || '',
       segments,
       metadata: {
         duration: result.duration || segments[segments.length - 1]?.end || 0,
         language: result.language,
-        wordCount: result.text.split(/\s+/).length,
+        wordCount: (result.text || '').split(/\s+/).length,
         model,
       },
     };
   }
 
-  const text = typeof result === 'string' ? result : result.text;
+  const text = result.text || '';
   
   return {
     success: true,
@@ -251,7 +251,7 @@ async function transcribeWithSelfHosted(
     throw new Error(`Whisper endpoint error: ${response.status}`);
   }
 
-  const result = await response.json();
+  const result = await response.json() as { text: string; segments?: TranscriptionSegment[]; duration?: number; language?: string };
 
   return {
     success: true,

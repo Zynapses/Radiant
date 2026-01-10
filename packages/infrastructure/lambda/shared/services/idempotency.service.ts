@@ -142,11 +142,10 @@ export class IdempotencyService {
       const errorMessage = error instanceof Error ? error.message : String(error);
       await this.failIdempotencyRecord(idempotencyKey, tenantId, errorMessage);
 
-      logger.error('Idempotent operation failed', {
+      logger.error('Idempotent operation failed', error instanceof Error ? error : new Error(errorMessage), {
         idempotencyKey,
         operationType,
         tenantId,
-        error: errorMessage,
       });
 
       throw error;

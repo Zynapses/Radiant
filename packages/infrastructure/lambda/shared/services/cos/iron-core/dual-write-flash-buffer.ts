@@ -18,6 +18,7 @@
 import { Redis } from 'ioredis';
 import { query } from '../../database';
 import { FlashFact, FlashFactType, FlashFactStatus, FLASH_PATTERNS } from '../types';
+import { logger } from '../../../logging/enhanced-logger';
 
 export interface FlashFactDetectionResult {
   detected: boolean;
@@ -133,10 +134,10 @@ export class DualWriteFlashBuffer {
     try {
       await this.redis.setex(redisKey, this.REDIS_TTL_SECONDS, JSON.stringify(flashFact));
     } catch (error) {
-      console.error(`[COS] Redis write failed for flash fact ${id}, will be recovered:`, error);
+      logger.error(`[COS] Redis write failed for flash fact ${id}, will be recovered:`, error);
     }
     
-    console.log(`[COS] Flash fact stored: ${id} (${params.factType}, critical=${params.isSafetyCritical})`);
+    logger.info(`[COS] Flash fact stored: ${id} (${params.factType}, critical=${params.isSafetyCritical})`);
     return flashFact;
   }
   
@@ -270,12 +271,12 @@ export class DualWriteFlashBuffer {
         );
         
         recoveredCount++;
-        console.log(`[COS] Recovered orphan flash fact: ${flashFact.id} (${flashFact.factType})`);
+        logger.info(`[COS] Recovered orphan flash fact: ${flashFact.id} (${flashFact.factType})`);
       }
     }
     
     if (recoveredCount > 0) {
-      console.log(`[COS] Reconciliation complete: ${recoveredCount} orphans recovered`);
+      logger.info(`[COS] Reconciliation complete: ${recoveredCount} orphans recovered`);
     }
     
     return recoveredCount;

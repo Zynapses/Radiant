@@ -28,7 +28,7 @@ export const CATO_INVARIANTS = {
   AUDIT_ALLOW_DELETE: false,
 } as const;
 
-/** Default mood for Cato (renamed from "Bobble") */
+/** Default mood for Cato (renamed from "Cato") */
 export const DEFAULT_PERSONA_NAME = 'balanced';
 
 /** Mood used during Epistemic Recovery */

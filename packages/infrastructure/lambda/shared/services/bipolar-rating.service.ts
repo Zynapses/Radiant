@@ -459,18 +459,16 @@ class BipolarRatingService {
       const candidateType = value >= 4 ? 'high_satisfaction' : 'correction';
       const quality = Math.abs(value) / 5; // 0.8 for ±4, 1.0 for ±5
       
-      await learningCandidateService.createCandidate(tenantId, {
+      await learningCandidateService.createCandidate({
+        tenantId,
         userId,
         conversationId: targetId,
-        responseId: targetId,
-        candidateType,
-        quality,
-        reason: feedback || `Rating: ${value}, Reasons: ${reasons.join(', ')}`,
-        metadata: {
-          ratingValue: value,
-          reasons,
-          feedback,
-        },
+        messageId: targetId,
+        candidateType: candidateType as 'high_satisfaction' | 'correction',
+        promptText: `Rating: ${value}`,
+        responseText: feedback || `Reasons: ${reasons.join(', ')}`,
+        qualityScore: quality,
+        userRating: value,
       });
       
       return true;

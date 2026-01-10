@@ -8,6 +8,7 @@ import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { modelRouterService } from './model-router.service';
 import { learningService } from './learning.service';
 import { modelMetadataService, ModelMetadata } from './model-metadata.service';
+import { orchestrationMethodsService } from './orchestration-methods.service';
 
 // ============================================================================
 // Types
@@ -1461,6 +1462,36 @@ Your task is to:
     const [serviceName, methodName] = codeReference.split('.');
     
     try {
+      // Check if this is an orchestration method (new services)
+      const orchestrationServices = [
+        'semantic-entropy-service',
+        'self-consistency-service',
+        'poll-judge-service',
+        'selfcheck-service',
+        'routellm-service',
+        'frugal-cascade-service',
+        'debate-service',
+        'multi-hallucination-service',
+        'cato-neural-decision-service',
+        'conformal-prediction-service',
+        'moa-synthesis-service',
+        'process-reward-service',
+        'hitl-review-service',
+        'active-learning-service',
+      ];
+
+      if (orchestrationServices.includes(serviceName) || codeReference.includes('-service.')) {
+        return await orchestrationMethodsService.executeMethod(codeReference, {
+          prompt: String(input.prompt || input.originalPrompt || ''),
+          context: String(input.context || ''),
+          responses: input.responses as string[] | undefined,
+          tenantId: String(input.tenantId || ''),
+          userId: String(input.userId || ''),
+          sessionId: String(input.sessionId || ''),
+          ...input,
+        }, parameters);
+      }
+
       switch (serviceName) {
         case 'learning':
           return await this.executeLearningMethod(methodName, input, parameters);
@@ -1473,7 +1504,7 @@ Your task is to:
         default:
           return { 
             error: `Unknown service: ${serviceName}`,
-            availableServices: ['learning', 'model', 'memory', 'analysis']
+            availableServices: ['learning', 'model', 'memory', 'analysis', ...orchestrationServices]
           };
       }
     } catch (error) {

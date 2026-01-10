@@ -3,6 +3,7 @@
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { resultDerivationService } from '../shared/services/result-derivation.service';
+import { logger } from '../shared/logging/enhanced-logger';
 
 // ============================================================================
 // Helper Functions
@@ -27,11 +28,11 @@ const error = (statusCode: number, message: string): APIGatewayProxyResult => ({
   body: JSON.stringify({ error: message }),
 });
 
-const getTenantId = (event: { requestContext?: { authorizer?: { tenantId?: string } } }): string => {
+const getTenantId = (event: { requestContext?: { authorizer?: { tenantId?: string } | null } }): string => {
   return event.requestContext?.authorizer?.tenantId || '';
 };
 
-const getUserId = (event: { requestContext?: { authorizer?: { userId?: string } } }): string => {
+const getUserId = (event: { requestContext?: { authorizer?: { userId?: string } | null } }): string => {
   return event.requestContext?.authorizer?.userId || '';
 };
 
@@ -63,7 +64,7 @@ export const getDerivation: APIGatewayProxyHandler = async (event) => {
       },
     });
   } catch (err) {
-    console.error('Error getting derivation:', err);
+    logger.error('Error getting derivation:', err);
     return error(500, 'Failed to get derivation');
   }
 };
@@ -86,7 +87,7 @@ export const getDerivationByPrompt: APIGatewayProxyHandler = async (event) => {
     
     return success({ derivation });
   } catch (err) {
-    console.error('Error getting derivation by prompt:', err);
+    logger.error('Error getting derivation by prompt:', err);
     return error(500, 'Failed to get derivation');
   }
 };
@@ -106,7 +107,7 @@ export const getDerivationTimeline: APIGatewayProxyHandler = async (event) => {
     
     return success({ timeline });
   } catch (err) {
-    console.error('Error getting derivation timeline:', err);
+    logger.error('Error getting derivation timeline:', err);
     return error(500, 'Failed to get timeline');
   }
 };
@@ -140,7 +141,7 @@ export const listSessionDerivations: APIGatewayProxyHandler = async (event) => {
       },
     });
   } catch (err) {
-    console.error('Error listing session derivations:', err);
+    logger.error('Error listing session derivations:', err);
     return error(500, 'Failed to list derivations');
   }
 };
@@ -182,7 +183,7 @@ export const listUserDerivations: APIGatewayProxyHandler = async (event) => {
       },
     });
   } catch (err) {
-    console.error('Error listing user derivations:', err);
+    logger.error('Error listing user derivations:', err);
     return error(500, 'Failed to list derivations');
   }
 };
@@ -220,7 +221,7 @@ export const getDerivationAnalytics: APIGatewayProxyHandler = async (event) => {
       },
     });
   } catch (err) {
-    console.error('Error getting derivation analytics:', err);
+    logger.error('Error getting derivation analytics:', err);
     return error(500, 'Failed to get analytics');
   }
 };
@@ -276,7 +277,7 @@ export const getDerivationModels: APIGatewayProxyHandler = async (event) => {
       byProvider,
     });
   } catch (err) {
-    console.error('Error getting derivation models:', err);
+    logger.error('Error getting derivation models:', err);
     return error(500, 'Failed to get model usage');
   }
 };
@@ -326,7 +327,7 @@ export const getDerivationSteps: APIGatewayProxyHandler = async (event) => {
       stats,
     });
   } catch (err) {
-    console.error('Error getting derivation steps:', err);
+    logger.error('Error getting derivation steps:', err);
     return error(500, 'Failed to get steps');
   }
 };
@@ -363,7 +364,7 @@ export const getDerivationQuality: APIGatewayProxyHandler = async (event) => {
       },
     });
   } catch (err) {
-    console.error('Error getting derivation quality:', err);
+    logger.error('Error getting derivation quality:', err);
     return error(500, 'Failed to get quality metrics');
   }
 };

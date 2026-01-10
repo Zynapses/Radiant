@@ -8,6 +8,7 @@ import { Handler } from 'aws-lambda';
 import { SageMakerClient, DeleteEndpointCommand, DescribeEndpointCommand } from '@aws-sdk/client-sagemaker';
 import { ElastiCacheClient, DeleteReplicationGroupCommand, DescribeReplicationGroupsCommand } from '@aws-sdk/client-elasticache';
 import { NeptuneClient, DeleteDBClusterCommand, DescribeDBClustersCommand } from '@aws-sdk/client-neptune';
+import { logger } from '../shared/logging/enhanced-logger';
 
 const sagemaker = new SageMakerClient({});
 const elasticache = new ElastiCacheClient({});
@@ -30,7 +31,7 @@ interface RollbackResult {
 }
 
 export const handler: Handler<TransitionEvent, RollbackResult> = async (event) => {
-  console.log('Rolling back provisioning:', JSON.stringify(event));
+  logger.info('Rolling back provisioning:', { event });
 
   const { tenantId, toTier } = event;
   const prefix = tenantId.substring(0, 8);
@@ -43,9 +44,9 @@ export const handler: Handler<TransitionEvent, RollbackResult> = async (event) =
   // Only rollback resources that were being created for the NEW tier
   // Don't touch existing resources from the old tier
 
-  const endpointName = `bobble-shadow-self-${prefix}`;
-  const cacheName = `bobble-cache-${prefix}`;
-  const clusterName = `bobble-graph-${prefix}`;
+  const endpointName = `cato-shadow-self-${prefix}`;
+  const cacheName = `cato-cache-${prefix}`;
+  const clusterName = `cato-graph-${prefix}`;
 
   // Rollback SageMaker if it was being created
   try {
@@ -101,6 +102,6 @@ export const handler: Handler<TransitionEvent, RollbackResult> = async (event) =
     result.status = 'PARTIAL_ROLLBACK';
   }
 
-  console.log('Rollback complete:', result);
+  logger.info('Rollback complete:', { data: result });
   return result;
 };

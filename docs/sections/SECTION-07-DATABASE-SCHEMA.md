@@ -143,18 +143,18 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `gdpr_requests` | GDPR data subject requests |
 | `data_retention_policies` | Configurable data retention |
 | `phi_access_log` | HIPAA PHI access audit trail |
-| `bobble_genesis_state` | Genesis boot sequence state tracking |
-| `bobble_development_counters` | Atomic counters for developmental gates |
-| `bobble_developmental_stage` | Current developmental stage (Piaget-inspired) |
-| `bobble_circuit_breakers` | Circuit breaker states and configuration |
-| `bobble_circuit_breaker_events` | Circuit breaker event history |
-| `bobble_neurochemistry` | Emotional/cognitive state (anxiety, curiosity, etc.) |
-| `bobble_tick_costs` | Per-tick cost tracking |
-| `bobble_pricing_cache` | AWS pricing table cache |
-| `bobble_pymdp_state` | PyMDP active inference state |
-| `bobble_pymdp_matrices` | Active inference matrices (A, B, C, D) |
-| `bobble_consciousness_settings` | Loop configuration settings |
-| `bobble_loop_state` | Consciousness loop execution state |
+| `cato_genesis_state` | Genesis boot sequence state tracking |
+| `cato_development_counters` | Atomic counters for developmental gates |
+| `cato_developmental_stage` | Current developmental stage (Piaget-inspired) |
+| `cato_circuit_breakers` | Circuit breaker states and configuration |
+| `cato_circuit_breaker_events` | Circuit breaker event history |
+| `cato_neurochemistry` | Emotional/cognitive state (anxiety, curiosity, etc.) |
+| `cato_tick_costs` | Per-tick cost tracking |
+| `cato_pricing_cache` | AWS pricing table cache |
+| `cato_pymdp_state` | PyMDP active inference state |
+| `cato_pymdp_matrices` | Active inference matrices (A, B, C, D) |
+| `cato_consciousness_settings` | Loop configuration settings |
+| `cato_loop_state` | Consciousness loop execution state |
 | `data_processing_agreements` | Sub-processor DPAs |
 | `data_breach_incidents` | Security breach tracking |
 | `hipaa_config` | Per-tenant HIPAA configuration |
@@ -176,6 +176,14 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `model_orchestration_preferences` | Tenant-specific model selection preferences |
 | `self_hosted_model_usage` | Usage analytics for self-hosted models per tenant |
 | `model_selection_history` | History of model selections by the orchestration engine |
+| `orchestration_methods` | Shared reusable AI orchestration methods (70+) |
+| `orchestration_workflows` | System (49) and user-defined orchestration workflows |
+| `workflow_method_bindings` | Links methods to workflows with parameter overrides |
+| `workflow_customizations` | Tenant-level customizations of system workflows |
+| `orchestration_executions` | Workflow execution tracking with audit |
+| `orchestration_step_executions` | Individual step execution records |
+| `user_workflow_templates` | User-saved workflow templates with sharing |
+| `orchestration_audit_log` | Audit trail for all workflow changes |
 | `thinktank_media_capabilities` | Media input/output capabilities for Think Tank integration |
 | `model_proficiency_rankings` | Ranked proficiency scores for models across domains and modes |
 | `model_discovery_log` | Log of model discoveries with proficiency generation status |

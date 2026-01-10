@@ -308,9 +308,8 @@ export class RateLimiterService {
       };
     } catch (error) {
       // On Redis error, fail open (allow request) but log warning
-      logger.error('Rate limiter Redis error - failing open', {
+      logger.error('Rate limiter Redis error - failing open', error instanceof Error ? error : new Error(String(error)), {
         tenantId,
-        error: error instanceof Error ? error.message : String(error),
       });
       
       return {
@@ -375,9 +374,8 @@ export class RateLimiterService {
         remaining: Math.max(0, effectiveConfig.maxRequests - currentCount),
       };
     } catch (error) {
-      logger.error('Rate limiter status check failed', {
+      logger.error('Rate limiter status check failed', error instanceof Error ? error : new Error(String(error)), {
         tenantId,
-        error: error instanceof Error ? error.message : String(error),
       });
       
       return {
@@ -433,7 +431,7 @@ export class RateLimiterService {
    */
   updateConfig(config: Partial<RateLimitConfig>): void {
     this.config = { ...this.config, ...config };
-    logger.info('Rate limiter config updated', this.config);
+    logger.info('Rate limiter config updated', this.config as unknown as Record<string, unknown>);
   }
   
   /**

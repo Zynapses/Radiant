@@ -58,7 +58,7 @@ export async function handler(
       user_agent: event.headers['User-Agent'] || event.headers['user-agent'],
     });
 
-    const result = await routeRequest(event, auth);
+    const result = await routeRequest(event, auth, context);
 
     logger.info('Admin request completed', {
       method,
@@ -81,7 +81,8 @@ export async function handler(
 
 async function routeRequest(
   event: APIGatewayProxyEvent,
-  auth: { userId: string; isSuperAdmin: boolean }
+  auth: { userId: string; isSuperAdmin: boolean },
+  context: Context
 ): Promise<APIGatewayProxyResult> {
   const method = event.httpMethod;
   const path = event.path;
@@ -134,217 +135,217 @@ async function routeRequest(
   // Compliance - delegate to dedicated handlers
   if (pathParts[1] === 'compliance') {
     if (pathParts[2] === 'checklists') {
-      const { handler: checklistHandler } = await import('./checklist-registry');
+      const { handler: checklistHandler } = await import('./checklist-registry.js');
       return checklistHandler(event);
     }
     if (pathParts[2] === 'regulatory-standards') {
-      const { handler: regulatoryHandler } = await import('./regulatory-standards');
-      return regulatoryHandler(event);
+      const mod = await import('./regulatory-standards.js');
+      return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
     }
     if (pathParts[2] === 'self-audit') {
-      const { handler: selfAuditHandler } = await import('./self-audit');
-      return selfAuditHandler(event);
+      const mod = await import('./self-audit.js');
+      return (mod.getDashboard(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
     }
   }
 
   // Security - delegate to dedicated handlers
   if (pathParts[1] === 'security') {
     if (pathParts[2] === 'schedules') {
-      const { handler: schedulesHandler } = await import('./security-schedules');
-      return schedulesHandler(event);
+      const mod = await import('./security-schedules.js');
+      return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
     }
-    const { handler: securityHandler } = await import('./security');
-    return securityHandler(event);
+    const mod = await import('./security.js');
+    return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
   }
 
   // System configuration
   if (pathParts[1] === 'system') {
     if (pathParts[2] === 'config') {
-      const { handler: configHandler } = await import('./system-config');
-      return configHandler(event);
+      const mod = await import('./system-config.js');
+      return mod.handler(event) as Promise<APIGatewayProxyResult>;
     }
-    const { handler: systemHandler } = await import('./system');
-    return systemHandler(event);
+    const mod = await import('./system.js');
+    return mod.handler(event) as Promise<APIGatewayProxyResult>;
   }
 
   // Time Machine
   if (pathParts[1] === 'time-machine') {
-    const { handler: timeMachineHandler } = await import('./time-machine');
+    const { handler: timeMachineHandler } = await import('./time-machine.js');
     return timeMachineHandler(event);
   }
 
   // Orchestration methods
   if (pathParts[1] === 'orchestration' && pathParts[2] === 'methods') {
-    const { handler: methodsHandler } = await import('./orchestration-methods');
+    const { handler: methodsHandler } = await import('./orchestration-methods.js');
     return methodsHandler(event);
   }
 
   // Pricing
   if (pathParts[1] === 'pricing') {
-    const { handler: pricingHandler } = await import('./pricing');
+    const { handler: pricingHandler } = await import('./pricing.js');
     return pricingHandler(event);
   }
 
   // AWS costs
   if (pathParts[1] === 'aws-costs') {
-    const { handler: awsCostsHandler } = await import('./aws-costs');
+    const { handler: awsCostsHandler } = await import('./aws-costs.js');
     return awsCostsHandler(event);
   }
 
   // Ethics
   if (pathParts[1] === 'ethics') {
-    const { handler: ethicsHandler } = await import('./ethics');
+    const { handler: ethicsHandler } = await import('./ethics.js');
     return ethicsHandler(event);
   }
 
   // Specialty rankings
   if (pathParts[1] === 'specialty-rankings') {
-    const { handler: rankingsHandler } = await import('./specialty-rankings');
+    const { handler: rankingsHandler } = await import('./specialty-rankings.js');
     return rankingsHandler(event);
   }
 
   // AGI learning
   if (pathParts[1] === 'agi-learning') {
-    const { handler: agiLearningHandler } = await import('./agi-learning');
+    const { handler: agiLearningHandler } = await import('./agi-learning.js');
     return agiLearningHandler(event);
   }
 
   // Internet learning
   if (pathParts[1] === 'internet-learning') {
-    const { handler: internetLearningHandler } = await import('./internet-learning');
+    const { handler: internetLearningHandler } = await import('./internet-learning.js');
     return internetLearningHandler(event);
   }
 
   // Enhanced learning
   if (pathParts[1] === 'enhanced-learning') {
-    const { handler: enhancedLearningHandler } = await import('./enhanced-learning');
-    return enhancedLearningHandler(event);
+    const mod = await import('./enhanced-learning.js');
+    return (mod.getConfig(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // Logs (AWS logs)
   if (pathParts[1] === 'logs') {
-    const { handler: logsHandler } = await import('./logs');
+    const { handler: logsHandler } = await import('./logs.js');
     return logsHandler(event);
   }
 
   // Consciousness
   if (pathParts[1] === 'consciousness') {
     if (pathParts[2] === 'engine') {
-      const { handler: engineHandler } = await import('./consciousness-engine');
-      return engineHandler(event);
+      const mod = await import('./consciousness-engine.js');
+      return (mod.getDashboard(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
     }
     if (pathParts[2] === 'evolution') {
-      const { handler: evolutionHandler } = await import('./consciousness-evolution');
-      return evolutionHandler(event);
+      const mod = await import('./consciousness-evolution.js');
+      return (mod.getPredictionMetrics(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
     }
-    const { handler: consciousnessHandler } = await import('./consciousness');
-    return consciousnessHandler(event);
+    const mod = await import('./consciousness.js');
+    return (mod.getConsciousnessMetrics(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // Ego system
   if (pathParts[1] === 'ego') {
-    const { handler: egoHandler } = await import('./ego');
-    return egoHandler(event);
+    const mod = await import('./ego.js');
+    return (mod.getEgoDashboard(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // Formal reasoning
   if (pathParts[1] === 'formal-reasoning') {
-    const { handler: formalReasoningHandler } = await import('./formal-reasoning');
-    return formalReasoningHandler(event);
+    const mod = await import('./formal-reasoning.js');
+    return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
   }
 
   // Domain ethics
   if (pathParts[1] === 'domain-ethics') {
-    const { handler: domainEthicsHandler } = await import('./domain-ethics');
-    return domainEthicsHandler(event);
+    const mod = await import('./domain-ethics.js');
+    return (mod.listFrameworks(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // Ethics-free reasoning
   if (pathParts[1] === 'ethics-free-reasoning') {
-    const { handler: ethicsFreeHandler } = await import('./ethics-free-reasoning');
-    return ethicsFreeHandler(event);
+    const mod = await import('./ethics-free-reasoning.js');
+    return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
   }
 
-  // Bobble services
-  if (pathParts[1] === 'bobble') {
+  // Cato services
+  if (pathParts[1] === 'cato') {
     if (pathParts[2] === 'genesis') {
-      const { handler: genesisHandler } = await import('./bobble-genesis');
-      return genesisHandler(event);
+      const mod = await import('./cato-genesis.js');
+      return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
     }
     if (pathParts[2] === 'dialogue') {
-      const { handler: dialogueHandler } = await import('./bobble-dialogue');
-      return dialogueHandler(event);
+      const mod = await import('./cato-dialogue.js');
+      return (mod.dialogue(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
     }
     if (pathParts[2] === 'global') {
-      const { handler: globalHandler } = await import('./bobble-global');
-      return globalHandler(event);
+      const mod = await import('./cato-global.js');
+      return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
     }
   }
 
   // Model coordination
   if (pathParts[1] === 'model-coordination') {
-    const { handler: coordinationHandler } = await import('./model-coordination');
-    return coordinationHandler(event);
+    const mod = await import('./model-coordination.js');
+    return (mod.getSyncConfig(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // Model proficiency
   if (pathParts[1] === 'model-proficiency') {
-    const { handler: proficiencyHandler } = await import('./model-proficiency');
-    return proficiencyHandler(event);
+    const mod = await import('./model-proficiency.js');
+    return (mod.getAllRankings(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // Infrastructure tier
   if (pathParts[1] === 'infrastructure-tier') {
-    const { handler: tierHandler } = await import('./infrastructure-tier');
-    return tierHandler(event);
+    const mod = await import('./infrastructure-tier.js');
+    return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
   }
 
   // Library registry
   if (pathParts[1] === 'library-registry') {
-    const { handler: libraryHandler } = await import('./library-registry');
-    return libraryHandler(event);
+    const mod = await import('./library-registry.js');
+    return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
   }
 
   // Inference components
   if (pathParts[1] === 'inference-components') {
-    const { handler: inferenceHandler } = await import('./inference-components');
-    return inferenceHandler(event);
+    const mod = await import('./inference-components.js');
+    return (mod.getConfig(event, {} as any, () => {}) || successResponse({ message: 'Not found' })) as APIGatewayProxyResult;
   }
 
   // User Registry - assignments, consent, DSAR, break glass, legal hold
   if (pathParts[1] === 'user-registry') {
-    const { handler: userRegistryHandler } = await import('./user-registry');
+    const { handler: userRegistryHandler } = await import('./user-registry.js');
     return userRegistryHandler(event);
   }
 
   // Brain v6.0.4 - AGI Brain admin
   if (pathParts[1] === 'brain') {
-    const { handler: brainHandler } = await import('./brain');
+    const { handler: brainHandler } = await import('./brain.js');
     return brainHandler(event);
   }
 
   // Metrics & Learning
   if (pathParts[1] === 'metrics') {
-    const { handler: metricsHandler } = await import('./metrics');
+    const { handler: metricsHandler } = await import('./metrics.js');
     return metricsHandler(event);
   }
 
   // Translation middleware
   if (pathParts[1] === 'translation') {
-    const { handler: translationHandler } = await import('./translation');
+    const { handler: translationHandler } = await import('./translation.js');
     return translationHandler(event);
   }
 
   // Cognition v6.1.0 - Advanced Cognition Services
   if (pathParts[1] === 'cognition') {
-    const { handler: cognitionHandler } = await import('./cognition');
+    const { handler: cognitionHandler } = await import('./cognition.js');
     return cognitionHandler(event);
   }
 
   // Genesis Cato Safety Architecture
   if (pathParts[1] === 'cato') {
-    const { handler: catoHandler } = await import('./cato');
-    return catoHandler(event);
+    const mod = await import('./cato.js');
+    return mod.handler(event, context) as Promise<APIGatewayProxyResult>;
   }
 
   throw new NotFoundError(`Admin route not found: ${method} ${path}`);

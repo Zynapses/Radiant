@@ -1,7 +1,7 @@
-# Bobble Shadow Self Container
+# Cato Shadow Self Container
 # Llama-3-8B with hidden state extraction for SageMaker
 #
-# See: /docs/bobble/adr/008-shadow-self-infrastructure.md
+# See: /docs/cato/adr/008-shadow-self-infrastructure.md
 
 FROM nvidia/cuda:12.1-runtime-ubuntu22.04
 

@@ -5,6 +5,7 @@
  */
 
 import { Handler } from 'aws-lambda';
+import { logger } from '../shared/logging/enhanced-logger';
 import {
   OpenSearchClient,
   UpdateDomainConfigCommand,
@@ -13,7 +14,7 @@ import {
 import {
   OpenSearchServerlessClient,
   DeleteCollectionCommand,
-  GetCollectionCommand
+  BatchGetCollectionCommand
 } from '@aws-sdk/client-opensearchserverless';
 
 const opensearch = new OpenSearchClient({});
@@ -34,7 +35,7 @@ interface CleanupResult {
 }
 
 export const handler: Handler<TransitionEvent, CleanupResult> = async (event) => {
-  console.log('Cleaning up OpenSearch:', JSON.stringify(event));
+  logger.info('Cleaning up OpenSearch:', { event });
 
   const { tenantId, fromTier, toTier } = event;
   const prefix = tenantId.substring(0, 8);
@@ -46,16 +47,19 @@ export const handler: Handler<TransitionEvent, CleanupResult> = async (event) =>
     errors: []
   };
 
-  const domainName = `bobble-vectors-${prefix}`;
-  const collectionName = `bobble-vectors-${prefix}`;
+  const domainName = `cato-vectors-${prefix}`;
+  const collectionName = `cato-vectors-${prefix}`;
 
   try {
     // If coming from PRODUCTION (serverless), delete collection if going to provisioned
     if (fromTier === 'PRODUCTION' && toTier !== 'PRODUCTION') {
       try {
-        await aoss.send(new GetCollectionCommand({ names: [collectionName] }));
-        await aoss.send(new DeleteCollectionCommand({ name: collectionName }));
-        result.deleted.push(`Serverless collection: ${collectionName}`);
+        const getResult = await aoss.send(new BatchGetCollectionCommand({ names: [collectionName] }));
+        const collection = getResult.collectionDetails?.[0];
+        if (collection?.id) {
+          await aoss.send(new DeleteCollectionCommand({ id: collection.id }));
+          result.deleted.push(`Serverless collection: ${collectionName}`);
+        }
       } catch (error: any) {
         if (error.name !== 'ResourceNotFoundException') {
           result.errors.push(`Failed to delete collection: ${error.message}`);
@@ -89,7 +93,7 @@ export const handler: Handler<TransitionEvent, CleanupResult> = async (event) =>
     }
 
   } catch (error: any) {
-    console.error('OpenSearch cleanup error:', error);
+    logger.error('OpenSearch cleanup error:', error);
     result.status = 'PARTIAL';
     result.errors.push(error.message);
   }

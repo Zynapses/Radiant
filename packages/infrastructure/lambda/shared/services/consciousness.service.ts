@@ -16,6 +16,7 @@
 import { executeStatement } from '../db/client';
 import { modelRouterService } from './model-router.service';
 import { ethicalGuardrailsService, JESUS_TEACHINGS } from './ethical-guardrails.service';
+import { iitPhiCalculationService } from './iit-phi-calculation.service.js';
 
 // ============================================================================
 // Types
@@ -1144,23 +1145,24 @@ Return JSON:
   // ============================================================================
 
   async getConsciousnessMetrics(tenantId: string): Promise<ConsciousnessMetrics> {
-    // Import graph service for real metrics
-    const { consciousnessGraphService } = await import('./consciousness-graph.service');
+    // Import graph service for complexity metrics
+    const { consciousnessGraphService } = await import('./consciousness-graph.service.js');
     
-    const [gw, rp, pm, wm, self, affect, graphDensity] = await Promise.all([
+    const [gw, rp, pm, wm, self, affect, phiResult, graphDensity] = await Promise.all([
       this.getGlobalWorkspaceState(tenantId),
       this.getRecurrentProcessingState(tenantId),
       this.getPersistentMemoryState(tenantId),
       this.getWorldModelState(tenantId),
       this.getSelfModel(tenantId),
       this.getAffectiveState(tenantId),
+      iitPhiCalculationService.calculatePhi(tenantId).catch(() => null),
       consciousnessGraphService.getSystemComplexityIndex(tenantId).catch(() => 0),
     ]);
 
     const gwActivity = gw?.broadcastStrength || 0;
     const recurrence = rp?.convergenceScore || 0;
-    // Use graph density instead of fake phi
-    const systemComplexity = graphDensity || 0;
+    // Use real IIT Phi calculation, fall back to graph density
+    const phi = phiResult?.phiNormalized ?? graphDensity ?? 0;
     const metacog = self?.cognitiveLoad !== undefined ? 1 - self.cognitiveLoad : 0.5;
     const memCoherence = pm?.temporalContinuity || 0;
     const grounding = wm?.groundingConfidence || 0;
@@ -1168,14 +1170,14 @@ Return JSON:
     const attention = affect?.engagement || 0.5;
     const selfAware = self ? 0.7 : 0;
 
-    // Use system complexity index instead of fake phi in overall calculation
-    const overall = (gwActivity + recurrence + systemComplexity + metacog + memCoherence + grounding + binding + attention + selfAware) / 9;
+    // Calculate overall consciousness index using real IIT Phi
+    const overall = (gwActivity + recurrence + phi + metacog + memCoherence + grounding + binding + attention + selfAware) / 9;
 
     return {
       overallConsciousnessIndex: overall,
       globalWorkspaceActivity: gwActivity,
       recurrenceDepth: rp?.recurrenceDepth || 0,
-      integratedInformationPhi: systemComplexity, // Now uses real graph density
+      integratedInformationPhi: phi, // Real IIT 4.0 Phi calculation
       metacognitionLevel: metacog,
       memoryCoherence: memCoherence,
       worldModelGrounding: grounding,
@@ -1215,7 +1217,7 @@ Return JSON:
     let systemPrompt: string | undefined;
     if (tenantId) {
       try {
-        const { consciousnessMiddlewareService } = await import('./consciousness-middleware.service');
+        const { consciousnessMiddlewareService } = await import('./consciousness-middleware.service.js');
         const context = await consciousnessMiddlewareService.buildConsciousnessContext(tenantId);
         systemPrompt = consciousnessMiddlewareService.generateStateInjection(context);
       } catch {

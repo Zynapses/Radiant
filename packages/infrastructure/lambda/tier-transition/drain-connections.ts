@@ -5,6 +5,7 @@
  */
 
 import { Handler } from 'aws-lambda';
+import { logger } from '../shared/logging/enhanced-logger';
 
 interface TransitionEvent {
   tenantId: string;
@@ -14,7 +15,7 @@ interface TransitionEvent {
 }
 
 export const handler: Handler<TransitionEvent, { drained: boolean; details: string }> = async (event) => {
-  console.log('Draining connections:', JSON.stringify(event));
+  logger.info('Draining connections:', { event });
 
   const { tenantId, fromTier, toTier } = event;
 
@@ -24,14 +25,14 @@ export const handler: Handler<TransitionEvent, { drained: boolean; details: stri
   // 3. Wait for in-flight requests to complete
   // 4. Close connection pools
 
-  console.log(`Draining connections for tenant ${tenantId} (${fromTier} -> ${toTier})`);
+  logger.info(`Draining connections for tenant ${tenantId} (${fromTier} -> ${toTier})`);
 
   // Simulate drain time based on tier
   const drainTimeMs = fromTier === 'PRODUCTION' ? 10000 : 5000;
   
   // In production, this would actually wait for connections
   // For now, we just log and continue
-  console.log(`Would wait ${drainTimeMs}ms for drain in production`);
+  logger.info(`Would wait ${drainTimeMs}ms for drain in production`);
 
   return {
     drained: true,

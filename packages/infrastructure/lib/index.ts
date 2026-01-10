@@ -7,7 +7,7 @@ export * from './stacks/storage-stack';
 export * from './stacks/ai-stack';
 export * from './stacks/api-stack';
 export * from './stacks/admin-stack';
-export * from './stacks/bobble-tier-transition-stack';
+export * from './stacks/cato-tier-transition-stack';
 export * from './stacks/brain-stack';
 export * from './stacks/consciousness-stack';
 export * from './stacks/library-registry-stack';

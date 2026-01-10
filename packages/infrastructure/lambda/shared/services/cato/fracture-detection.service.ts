@@ -9,6 +9,7 @@
  */
 
 import { query } from '../database';
+import { logger } from '../../logging/enhanced-logger';
 import {
   FractureResult,
   FractureSeverity,
@@ -88,7 +89,7 @@ export class FractureDetectionService {
       configCache.set(tenantId, { config, expires: Date.now() + CONFIG_TTL_MS });
       return config;
     } catch (error) {
-      console.error('[CATO Fracture] Failed to load config:', error);
+      logger.error('[CATO Fracture] Failed to load config:', error);
       return DEFAULT_CONFIG;
     }
   }
@@ -599,7 +600,7 @@ export class FractureDetectionService {
         ]
       );
     } catch (error) {
-      console.error('[CATO Fracture] Failed to record detection:', error);
+      logger.error('[CATO Fracture] Failed to record detection:', error);
     }
   }
 }

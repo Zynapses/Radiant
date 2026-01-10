@@ -7,6 +7,7 @@
 import { ScheduledEvent } from 'aws-lambda';
 import { Pool } from 'pg';
 import { LearningInfluenceService } from '../shared/services/learning-hierarchy.service';
+import { logger } from '../shared/logging/enhanced-logger';
 
 const pool = new Pool({
   host: process.env.DB_HOST,
@@ -30,7 +31,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
   statusCode: number;
   body: string;
 }> => {
-  console.log('Learning Aggregation Lambda triggered', { time: event.time });
+  logger.info('Learning Aggregation Lambda triggered', { time: event.time });
 
   const stats: AggregationStats = {
     tenantsProcessed: 0,
@@ -51,7 +52,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
     const minTenantThreshold = parseInt(process.env.GLOBAL_AGGREGATION_MIN_TENANTS || '5');
     
     if (tenantCount < minTenantThreshold) {
-      console.log(`Skipping global aggregation: only ${tenantCount} tenants (minimum: ${minTenantThreshold})`);
+      logger.info('Skipping global aggregation: insufficient tenants', { tenantCount, minTenantThreshold });
       return {
         statusCode: 200,
         body: JSON.stringify({
@@ -65,7 +66,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
     stats.tenantsProcessed = tenantCount;
 
     // 2. Run the aggregate_to_global function
-    console.log('Running global aggregation...');
+    logger.info('Running global aggregation');
     await learningService.aggregateToGlobal();
     
     // 3. Count updated global dimensions
@@ -152,7 +153,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
       WHERE occurred_at < NOW() - INTERVAL '90 days'
       RETURNING id
     `);
-    console.log(`Cleaned up ${cleanupResult.rowCount} old learning events`);
+    logger.info('Cleaned up old learning events', { count: cleanupResult.rowCount });
 
     // 8. Cleanup old decision logs (keep 30 days)
     const decisionCleanup = await pool.query(`
@@ -161,7 +162,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
       AND outcome_recorded = true
       RETURNING id
     `);
-    console.log(`Cleaned up ${decisionCleanup.rowCount} old decision logs`);
+    logger.info('Cleaned up old decision logs', { count: decisionCleanup.rowCount });
 
     // 9. Log aggregation run
     await pool.query(`
@@ -174,7 +175,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
       )
     `, [JSON.stringify(stats)]);
 
-    console.log('Aggregation job completed:', stats);
+    logger.info('Aggregation job completed', { stats });
 
     return {
       statusCode: 200,
@@ -187,7 +188,7 @@ export const handler = async (event: ScheduledEvent): Promise<{
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Learning aggregation job failed:', errorMessage);
+    logger.error('Learning aggregation job failed', undefined, { error: errorMessage });
 
     // Log failure
     await pool.query(`

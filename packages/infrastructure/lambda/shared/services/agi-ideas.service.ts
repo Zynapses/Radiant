@@ -155,8 +155,7 @@ class AGIIdeasService {
     partialPrompt: string
   ): Promise<PromptSuggestion[]> {
     try {
-      const result = await executeStatement({
-        sql: `
+      const result = await executeStatement(`
           SELECT prompt_text, domain_id, response_rating
           FROM user_prompt_history
           WHERE user_id = $1::uuid
@@ -164,12 +163,10 @@ class AGIIdeasService {
             AND response_rating >= 4
           ORDER BY created_at DESC
           LIMIT 3
-        `,
-        parameters: [
+        `, [
           stringParam('userId', userId),
           stringParam('partial', partialPrompt),
-        ],
-      });
+        ]);
 
       return (result.rows || []).map(row => ({
         id: crypto.randomUUID(),
@@ -224,17 +221,14 @@ class AGIIdeasService {
    */
   private async getTrendingSuggestions(domainHint?: string): Promise<PromptSuggestion[]> {
     try {
-      const result = await executeStatement({
-        sql: `
+      const result = await executeStatement(`
           SELECT prompt_template, domain_name, usage_count
           FROM trending_prompts
           WHERE is_active = true
             ${domainHint ? 'AND domain_name ILIKE $1' : ''}
           ORDER BY usage_count DESC
           LIMIT 2
-        `,
-        parameters: domainHint ? [stringParam('domain', `%${domainHint}%`)] : [],
-      });
+        `, domainHint ? [stringParam('domain', `%${domainHint}%`)] : []);
 
       return (result.rows || []).map(row => ({
         id: crypto.randomUUID(),
@@ -427,8 +421,7 @@ class AGIIdeasService {
         sourceBreakdown[s.source] = (sourceBreakdown[s.source] || 0) + 1;
       }
 
-      await executeStatement({
-        sql: `
+      await executeStatement(`
           INSERT INTO suggestion_log (
             tenant_id, user_id, partial_prompt, cursor_position,
             suggestions, suggestion_count, source_breakdown
@@ -436,16 +429,14 @@ class AGIIdeasService {
             current_setting('app.current_tenant_id')::uuid,
             $1::uuid, $2, $3, $4::jsonb, $5, $6::jsonb
           )
-        `,
-        parameters: [
+        `, [
           stringParam('userId', request.userId),
           stringParam('partial', request.partialPrompt),
           stringParam('cursor', String(request.cursorPosition)),
           stringParam('suggestions', JSON.stringify(suggestions)),
           stringParam('count', String(suggestions.length)),
           stringParam('breakdown', JSON.stringify(sourceBreakdown)),
-        ],
-      });
+        ]);
     } catch {
       // Non-critical, don't fail
     }
@@ -462,8 +453,7 @@ class AGIIdeasService {
   ): Promise<void> {
     try {
       for (const idea of ideas) {
-        await executeStatement({
-          sql: `
+        await executeStatement(`
             INSERT INTO result_ideas (
               tenant_id, user_id, plan_id,
               category, title, description, suggested_prompt,
@@ -472,8 +462,7 @@ class AGIIdeasService {
               $1::uuid, $2::uuid, $3::uuid,
               $4, $5, $6, $7, $8, $9
             )
-          `,
-          parameters: [
+          `, [
             stringParam('tenantId', tenantId),
             stringParam('userId', userId),
             stringParam('planId', planId || ''),
@@ -483,8 +472,7 @@ class AGIIdeasService {
             stringParam('suggestedPrompt', idea.suggestedPrompt || ''),
             stringParam('confidence', String(idea.confidence)),
             stringParam('priority', String(idea.priority)),
-          ],
-        });
+          ]);
       }
     } catch {
       // Non-critical
@@ -495,23 +483,17 @@ class AGIIdeasService {
    * Record user selection of a suggestion
    */
   async recordSuggestionSelection(logId: string, selectedId: string): Promise<void> {
-    await executeStatement({
-      sql: `SELECT record_suggestion_selection($1::uuid, $2)`,
-      parameters: [
+    await executeStatement(`SELECT record_suggestion_selection($1::uuid, $2)`, [
         stringParam('logId', logId),
         stringParam('selectedId', selectedId),
-      ],
-    });
+      ]);
   }
 
   /**
    * Record user click on a result idea
    */
   async recordIdeaClick(ideaId: string): Promise<void> {
-    await executeStatement({
-      sql: `SELECT record_idea_click($1::uuid)`,
-      parameters: [stringParam('ideaId', ideaId)],
-    });
+    await executeStatement(`SELECT record_idea_click($1::uuid)`, [stringParam('ideaId', ideaId)]);
   }
 
   /**
@@ -527,8 +509,7 @@ class AGIIdeasService {
     const promptHash = crypto.createHash('sha256').update(promptText).digest('hex').slice(0, 16);
 
     try {
-      await executeStatement({
-        sql: `
+      await executeStatement(`
           INSERT INTO user_prompt_history (
             tenant_id, user_id, prompt_text, prompt_hash,
             domain_id, orchestration_mode
@@ -536,16 +517,14 @@ class AGIIdeasService {
             $1::uuid, $2::uuid, $3, $4, $5::uuid, $6
           )
           ON CONFLICT DO NOTHING
-        `,
-        parameters: [
+        `, [
           stringParam('tenantId', tenantId),
           stringParam('userId', userId),
           stringParam('promptText', promptText),
           stringParam('promptHash', promptHash),
           stringParam('domainId', domainId || ''),
           stringParam('orchestrationMode', orchestrationMode || ''),
-        ],
-      });
+        ]);
     } catch {
       // Non-critical
     }

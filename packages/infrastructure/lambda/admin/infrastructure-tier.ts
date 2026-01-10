@@ -1,12 +1,12 @@
 /**
  * Infrastructure Tier Admin API
  * 
- * Admin endpoints for managing Bobble infrastructure tiers.
+ * Admin endpoints for managing Cato infrastructure tiers.
  * Location: System → Infrastructure in Admin Dashboard
  * 
  * Base Path: /api/admin/infrastructure
  * 
- * @see /docs/bobble/adr/009-infrastructure-tiers.md
+ * @see /docs/cato/adr/009-infrastructure-tiers.md
  */
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
@@ -15,7 +15,7 @@ import {
   infrastructureTierService,
   InfrastructureTier,
   TierConfig
-} from '../shared/services/bobble/infrastructure-tier.service';
+} from '../shared/services/cato/infrastructure-tier.service';
 
 // ============================================================================
 // Helpers

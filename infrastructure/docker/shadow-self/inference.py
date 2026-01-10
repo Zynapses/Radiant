@@ -4,7 +4,7 @@ Shadow Self Inference - Llama-3-8B with Hidden State Extraction
 This module provides the core inference logic for the Shadow Self endpoint.
 It extracts hidden states for activation probing and uncertainty detection.
 
-See: /docs/bobble/adr/008-shadow-self-infrastructure.md
+See: /docs/cato/adr/008-shadow-self-infrastructure.md
 """
 
 import torch

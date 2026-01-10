@@ -11,6 +11,7 @@
 import * as crypto from 'crypto';
 import { query } from '../database';
 import { AuditEntry, AuditTile, CATO_INVARIANTS } from '@radiant/shared';
+import { logger } from '../../logging/enhanced-logger';
 
 const TILE_SIZE = 1000; // Entries per tile
 
@@ -31,7 +32,7 @@ export class MerkleAuditService {
         this.tileSize = result.rows[0].tile_size;
       }
     } catch (error) {
-      console.warn('[CATO Audit] Failed to load config, using defaults:', error);
+      logger.warn('[CATO Audit] Failed to load config, using defaults:', { data: error });
     }
   }
 

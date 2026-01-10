@@ -11,6 +11,7 @@
 import { query } from '../database';
 import { CloudWatchClient, DescribeAlarmsCommand, StateValue } from '@aws-sdk/client-cloudwatch';
 import { VetoSignal, VetoResult, VetoSeverity, ExecutionContext } from './types';
+import { logger } from '../../logging/enhanced-logger';
 
 // Active veto signals (updated by monitoring systems and CloudWatch)
 const activeVetoSignals: Map<string, VetoSignal[]> = new Map();
@@ -130,7 +131,7 @@ export class SensoryVetoService {
     existing.push(vetoSignal);
     activeVetoSignals.set(scope, existing);
 
-    console.warn(`[CATO Veto] Activated: ${signal} for ${scope} from ${source}`);
+    logger.warn(`[CATO Veto] Activated: ${signal} for ${scope} from ${source}`);
   }
 
   /**
@@ -141,7 +142,7 @@ export class SensoryVetoService {
     const filtered = existing.filter((v) => v.signal !== signal);
     activeVetoSignals.set(scope, filtered);
 
-    console.log(`[CATO Veto] Deactivated: ${signal} for ${scope}`);
+    logger.info(`[CATO Veto] Deactivated: ${signal} for ${scope}`);
   }
 
   /**
@@ -230,7 +231,7 @@ export class SensoryVetoService {
         ]
       );
     } catch (error) {
-      console.error('[CATO Veto] Failed to record event:', error);
+      logger.error('[CATO Veto] Failed to record event:', error);
     }
   }
 
@@ -248,7 +249,7 @@ export class SensoryVetoService {
    */
   clearTenantVetos(tenantId: string): void {
     activeVetoSignals.delete(tenantId);
-    console.log(`[CATO Veto] Cleared all vetos for tenant ${tenantId}`);
+    logger.info(`[CATO Veto] Cleared all vetos for tenant ${tenantId}`);
   }
 
   /**
@@ -277,7 +278,7 @@ export class SensoryVetoService {
 
         if (mapping) {
           this.activateVeto('global', mapping.signal, `CloudWatch:${alarmName}`);
-          console.log(`[CATO Veto] Activated from CloudWatch alarm: ${alarmName}`);
+          logger.info(`[CATO Veto] Activated from CloudWatch alarm: ${alarmName}`);
         } else {
           // Check for tenant-specific alarms (pattern: radiant-{tenantId}-{type})
           const tenantMatch = alarmName.match(/^radiant-([a-z0-9-]+)-(cpu|memory|quota)/);
@@ -291,14 +292,14 @@ export class SensoryVetoService {
             }
             
             this.activateVeto(tenantId, signal, `CloudWatch:${alarmName}`);
-            console.log(`[CATO Veto] Activated tenant veto from CloudWatch: ${alarmName}`);
+            logger.info(`[CATO Veto] Activated tenant veto from CloudWatch: ${alarmName}`);
           }
         }
       }
 
-      console.log(`[CATO Veto] CloudWatch sync complete. ${alarmsInAlarm.length} alarms in ALARM state.`);
+      logger.info(`[CATO Veto] CloudWatch sync complete. ${alarmsInAlarm.length} alarms in ALARM state.`);
     } catch (error) {
-      console.error('[CATO Veto] CloudWatch sync failed:', error);
+      logger.error('[CATO Veto] CloudWatch sync failed:', error);
     }
   }
 
@@ -383,7 +384,7 @@ export class SensoryVetoService {
         ]
       );
     } catch (error) {
-      console.error('[CATO Veto] Failed to record CloudWatch event:', error);
+      logger.error('[CATO Veto] Failed to record CloudWatch event:', error);
     }
   }
 }

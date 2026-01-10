@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIANT Workflow Methods Reference v4.18.0</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      color: #1a1a2e;
+      background: #fff;
+    }
+    h1 { color: #6366f1; border-bottom: 3px solid #6366f1; padding-bottom: 10px; }
+    h2 { color: #4f46e5; margin-top: 40px; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
+    h3 { color: #7c3aed; margin-top: 30px; }
+    h4 { color: #8b5cf6; margin-top: 20px; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+    th, td { border: 1px solid #d1d5db; padding: 8px 10px; text-align: left; }
+    th { background: #f3f4f6; font-weight: 600; }
+    tr:nth-child(even) { background: #f9fafb; }
+    code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-family: 'Monaco', 'Consolas', monospace; font-size: 12px; }
+    pre { background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 12px; }
+    pre code { background: none; padding: 0; color: inherit; }
+    .header { text-align: center; margin-bottom: 40px; }
+    .header p { color: #6b7280; }
+    .category-badge { display: inline-block; background: #6366f1; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; }
+    .method-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 16px 0; }
+    .method-card h4 { margin-top: 0; }
+    .param-list { margin: 8px 0; }
+    .param-list li { margin: 4px 0; }
+    .toc { background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .toc h3 { margin-top: 0; }
+    .toc ul { columns: 2; }
+    .toc li { margin: 4px 0; }
+    .toc a { color: #4f46e5; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .note { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 16px 0; }
+    .print-btn { position: fixed; top: 20px; right: 20px; background: #6366f1; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; }
+    .print-btn:hover { background: #4f46e5; }
+    @media print {
+      .print-btn { display: none; }
+      body { padding: 20px; }
+      h2 { page-break-before: always; }
+      table { page-break-inside: avoid; }
+      .method-card { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <button class="print-btn" onclick="window.print()">📄 Print / Save as PDF</button>
+
+  <div class="header">
+    <h1>RADIANT Workflow Methods Reference</h1>
+    <p>Version 4.18.0 | Complete Method & Workflow Documentation</p>
+    <p>Generated: January 2026</p>
+  </div>
+
+  <div class="toc">
+    <h3>Table of Contents</h3>
+    <ul>
+      <li><a href="#methods">Part 1: Core Orchestration Methods (16)</a></li>
+      <li><a href="#method-details">Part 2: Method Details with Parameters</a></li>
+      <li><a href="#workflows">Part 3: 49 Orchestration Workflows</a></li>
+      <li><a href="#modes">Part 4: Model Modes (8)</a></li>
+      <li><a href="#parallel">Part 5: Parallel Execution Configuration</a></li>
+      <li><a href="#steps">Part 6: AGI Brain Plan Step Types (11)</a></li>
+      <li><a href="#services">Part 7: 18 AGI Services</a></li>
+      <li><a href="#examples">Part 8: Usage Examples</a></li>
+    </ul>
+  </div>
+
+  <h2 id="methods">Part 1: Core Orchestration Methods (16 Methods)</h2>
+  
+  <table>
+    <thead>
+      <tr><th>Code</th><th>Common Name</th><th>Scientific Name</th><th>Category</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>GENERATE_RESPONSE</code></td><td>Generate</td><td>Basic Generation</td><td>generation</td><td>Generate a response to a prompt</td></tr>
+      <tr><td><code>GENERATE_WITH_COT</code></td><td>Think Step-by-Step</td><td>Chain-of-Thought Generation</td><td>generation</td><td>Generate with explicit reasoning steps</td></tr>
+      <tr><td><code>CRITIQUE_RESPONSE</code></td><td>Critique</td><td>Critical Evaluation</td><td>evaluation</td><td>Evaluate response for flaws</td></tr>
+      <tr><td><code>JUDGE_RESPONSES</code></td><td>Judge</td><td>Comparative Judgment</td><td>evaluation</td><td>Compare and rank multiple responses</td></tr>
+      <tr><td><code>VERIFY_FACTS</code></td><td>Fact Check</td><td>Factual Verification</td><td>verification</td><td>Extract and verify claims</td></tr>
+      <tr><td><code>SYNTHESIZE_RESPONSES</code></td><td>Synthesize</td><td>Multi-Response Synthesis</td><td>synthesis</td><td>Combine best parts from multiple responses</td></tr>
+      <tr><td><code>BUILD_CONSENSUS</code></td><td>Consensus</td><td>Consensus Aggregation</td><td>synthesis</td><td>Find agreement across responses</td></tr>
+      <tr><td><code>GENERATE_CHALLENGE</code></td><td>Challenge</td><td>Adversarial Challenge</td><td>evaluation</td><td>Argue against a response</td></tr>
+      <tr><td><code>DEFEND_POSITION</code></td><td>Defend</td><td>Position Defense</td><td>evaluation</td><td>Defend against challenges</td></tr>
+      <tr><td><code>DETECT_TASK_TYPE</code></td><td>Classify</td><td>Task Classification</td><td>routing</td><td>Detect task type and complexity</td></tr>
+      <tr><td><code>SELECT_BEST_MODEL</code></td><td>Route</td><td>Model Selection</td><td>routing</td><td>Choose optimal model</td></tr>
+      <tr><td><code>REFINE_RESPONSE</code></td><td>Refine</td><td>Iterative Refinement</td><td>generation</td><td>Improve based on feedback</td></tr>
+      <tr><td><code>DECOMPOSE_PROBLEM</code></td><td>Decompose</td><td>Problem Decomposition</td><td>reasoning</td><td>Break into sub-problems</td></tr>
+      <tr><td><code>SELF_REFLECT</code></td><td>Reflect</td><td>Self-Reflection</td><td>evaluation</td><td>AI evaluates own output</td></tr>
+      <tr><td><code>MAJORITY_VOTE</code></td><td>Vote</td><td>Majority Aggregation</td><td>aggregation</td><td>Select most common answer</td></tr>
+      <tr><td><code>WEIGHTED_AGGREGATE</code></td><td>Weight</td><td>Weighted Aggregation</td><td>aggregation</td><td>Combine by confidence</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="method-details">Part 2: Method Details with Parameters</h2>
+
+  <div class="method-card">
+    <h4>GENERATE_RESPONSE</h4>
+    <p><strong>Common:</strong> Generate | <strong>Scientific:</strong> Basic Generation</p>
+    <ul class="param-list">
+      <li><strong>Inputs:</strong> <code>prompt</code> (string), <code>context</code> (string, optional)</li>
+      <li><strong>Output:</strong> <code>response</code> (string), <code>tokens</code> (number)</li>
+      <li><strong>Parameters:</strong>
+        <ul>
+          <li><code>temperature</code>: 0-2 (default: 0.7)</li>
+          <li><code>max_tokens</code>: integer (default: 4096)</li>
+        </ul>
+      </li>
+      <li><strong>Model Role:</strong> <code>generator</code></li>
+      <li><strong>Recommended Models:</strong> Claude 3.5 Sonnet, GPT-4o, DeepSeek Chat</li>
+    </ul>
+  </div>
+
+  <div class="method-card">
+    <h4>GENERATE_WITH_COT</h4>
+    <p><strong>Common:</strong> Think Step-by-Step | <strong>Scientific:</strong> Chain-of-Thought Generation</p>
+    <ul class="param-list">
+      <li><strong>Inputs:</strong> <code>prompt</code> (string)</li>
+      <li><strong>Output:</strong> <code>response</code> (string), <code>reasoning</code> (string)</li>
+      <li><strong>Parameters:</strong>
+        <ul>
+          <li><code>temperature</code>: 0-2 (default: 0.3)</li>
+          <li><code>max_tokens</code>: integer (default: 8192)</li>
+          <li><code>thinking_budget</code>: integer (default: 2000)</li>
+        </ul>
+      </li>
+      <li><strong>Model Role:</strong> <code>generator</code></li>
+      <li><strong>Recommended Models:</strong> o1, DeepSeek Reasoner, Claude 3.5 Sonnet</li>
+    </ul>
+  </div>
+
+  <div class="method-card">
+    <h4>CRITIQUE_RESPONSE</h4>
+    <p><strong>Common:</strong> Critique | <strong>Scientific:</strong> Critical Evaluation</p>
+    <ul class="param-list">
+      <li><strong>Inputs:</strong> <code>original_prompt</code> (string), <code>response</code> (string)</li>
+      <li><strong>Output:</strong> <code>issues</code> (array), <code>suggestions</code> (array), <code>severity_scores</code> (object)</li>
+      <li><strong>Parameters:</strong>
+        <ul>
+          <li><code>focus_areas</code>: array (default: ["accuracy", "completeness", "clarity", "logic"])</li>
+          <li><code>severity_threshold</code>: "low" | "medium" | "high" (default: "medium")</li>
+        </ul>
+      </li>
+      <li><strong>Model Role:</strong> <code>critic</code></li>
+      <li><strong>Recommended Models:</strong> o1, Claude 3.5 Sonnet</li>
+    </ul>
+  </div>
+
+  <div class="method-card">
+    <h4>JUDGE_RESPONSES</h4>
+    <p><strong>Common:</strong> Judge | <strong>Scientific:</strong> Comparative Judgment</p>
+    <ul class="param-list">
+      <li><strong>Inputs:</strong> <code>original_prompt</code> (string), <code>responses</code> (array of strings)</li>
+      <li><strong>Output:</strong> <code>best_index</code> (number), <code>score</code> (0-1), <code>reasoning</code> (string)</li>
+      <li><strong>Parameters:</strong>
+        <ul>
+          <li><code>evaluation_mode</code>: "pointwise" | "pairwise" | "listwise" (default: "pairwise")</li>
+          <li><code>criteria</code>: array (default: ["accuracy", "helpfulness", "clarity", "completeness"])</li>
+        </ul>
+      </li>
+      <li><strong>Model Role:</strong> <code>judge</code></li>
+      <li><strong>Recommended Models:</strong> o1, Claude 3.5 Sonnet</li>
+    </ul>
+  </div>
+
+  <div class="method-card">
+    <h4>VERIFY_FACTS</h4>
+    <p><strong>Common:</strong> Fact Check | <strong>Scientific:</strong> Factual Verification</p>
+    <ul class="param-list">
+      <li><strong>Inputs:</strong> <code>response</code> (string)</li>
+      <li><strong>Output:</strong> <code>claims</code> (array), <code>verdicts</code> (array), <code>confidence</code> (number)</li>
+      <li><strong>Parameters:</strong>
+        <ul>
+          <li><code>extraction_method</code>: "explicit" | "implicit" (default: "explicit")</li>
+          <li><code>verification_depth</code>: "quick" | "thorough" | "exhaustive" (default: "thorough")</li>
+        </ul>
+      </li>
+      <li><strong>Model Role:</strong> <code>verifier</code></li>
+      <li><strong>Recommended Models:</strong> o1, Claude 3.5 Sonnet</li>
+    </ul>
+  </div>
+
+  <div class="method-card">
+    <h4>SYNTHESIZE_RESPONSES</h4>
+    <p><strong>Common:</strong> Synthesize | <strong>Scientific:</strong> Multi-Response Synthesis</p>
+    <ul class="param-list">
+      <li><strong>Inputs:</strong> <code>original_prompt</code> (string), <code>responses</code> (array with model attribution)</li>
+      <li><strong>Output:</strong> <code>synthesized_response</code> (string), <code>sources</code> (array)</li>
+      <li><strong>Parameters:</strong>
+        <ul>
+          <li><code>combination_strategy</code>: "best_parts" | "merge_all" | "hierarchical" (default: "best_parts")</li>
+          <li><code>conflict_resolution</code>: "majority" | "most_confident" | "all" (default: "majority")</li>
+        </ul>
+      </li>
+      <li><strong>Model Role:</strong> <code>synthesizer</code></li>
+      <li><strong>Recommended Models:</strong> Claude 3.5 Sonnet, GPT-4o</li>
+    </ul>
+  </div>
+
+  <div class="method-card">
+    <h4>BUILD_CONSENSUS</h4>
+    <p><strong>Common:</strong> Consensus | <strong>Scientific:</strong> Consensus Aggregation</p>
+    <ul class="param-list">
+      <li><strong>Inputs:</strong> <code>responses</code> (array of strings)</li>
+      <li><strong>Output:</strong> <code>consensus_points</code> (array), <code>disputed_points</code> (array), <code>unique_insights</code> (array)</li>
+      <li><strong>Parameters:</strong>
+        <ul>
+          <li><code>consensus_threshold</code>: 0-1 (default: 0.7)</li>
+          <li><code>include_disputed</code>: boolean (default: true)</li>
+        </ul>
+      </li>
+      <li><strong>Model Role:</strong> <code>synthesizer</code></li>
+      <li><strong>Recommended Models:</strong> Claude 3.5 Sonnet, GPT-4o</li>
+    </ul>
+  </div>
+
+  <div class="method-card">
+    <h4>DECOMPOSE_PROBLEM</h4>
+    <p><strong>Common:</strong> Decompose | <strong>Scientific:</strong> Problem Decomposition</p>
+    <ul class="param-list">
+      <li><strong>Inputs:</strong> <code>prompt</code> (string)</li>
+      <li><strong>Output:</strong> <code>subproblems</code> (array), <code>dependencies</code> (graph), <code>complexity_estimates</code> (object)</li>
+      <li><strong>Parameters:</strong>
+        <ul>
+          <li><code>max_subproblems</code>: integer (default: 5)</li>
+          <li><code>decomposition_strategy</code>: "functional" | "temporal" | "hierarchical" (default: "functional")</li>
+        </ul>
+      </li>
+      <li><strong>Model Role:</strong> <code>reasoner</code></li>
+      <li><strong>Recommended Models:</strong> o1, Claude 3.5 Sonnet</li>
+    </ul>
+  </div>
+
+  <div class="method-card">
+    <h4>SELF_REFLECT</h4>
+    <p><strong>Common:</strong> Reflect | <strong>Scientific:</strong> Self-Reflection</p>
+    <ul class="param-list">
+      <li><strong>Inputs:</strong> <code>original_prompt</code> (string), <code>response</code> (string)</li>
+      <li><strong>Output:</strong> <code>strengths</code> (array), <code>weaknesses</code> (array), <code>improvements</code> (array), <code>revised_response</code> (string)</li>
+      <li><strong>Parameters:</strong>
+        <ul>
+          <li><code>reflection_depth</code>: "quick" | "thorough" | "exhaustive" (default: "thorough")</li>
+          <li><code>aspects</code>: array (default: ["accuracy", "completeness", "clarity"])</li>
+        </ul>
+      </li>
+      <li><strong>Model Role:</strong> <code>critic</code></li>
+      <li><strong>Recommended Models:</strong> Claude 3.5 Sonnet, o1</li>
+    </ul>
+  </div>
+
+  <h2 id="workflows">Part 3: 49 Orchestration Workflows</h2>
+
+  <h3>Category 1: Adversarial & Validation (2 patterns)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Code</th><th>Common Name</th><th>Scientific Name</th><th>Description</th><th>Models</th><th>Latency</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><code>ARE</code></td><td>Red Team Attack</td><td>Adversarial Robustness Evaluation</td><td>One AI probes another for vulnerabilities</td><td>2</td><td>high</td></tr>
+      <tr><td>2</td><td><code>LM_VS_LM</code></td><td>Cross-Examination</td><td>LM vs LM Factual Verification</td><td>Interrogator questions responder to expose hallucinations</td><td>2</td><td>high</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Category 2: Debate & Deliberation (3 patterns)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Code</th><th>Common Name</th><th>Scientific Name</th><th>Description</th><th>Models</th><th>Latency</th></tr></thead>
+    <tbody>
+      <tr><td>3</td><td><code>SOD</code></td><td>AI Debate</td><td>Scalable Oversight via Debate</td><td>Two AIs argue opposing positions to convince a judge</td><td>3</td><td>very_high</td></tr>
+      <tr><td>4</td><td><code>MDA</code></td><td>Multi-Agent Debate</td><td>Multiagent Deliberative Alignment</td><td>Multiple LLMs propose, critique, refine until consensus</td><td>3</td><td>very_high</td></tr>
+      <tr><td>5</td><td><code>ReConcile</code></td><td>Round Table Consensus</td><td>Reconciled Ensemble Deliberation</td><td>Heterogeneous models reconcile viewpoints iteratively</td><td>3</td><td>very_high</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Category 3: Judge & Critic (3 patterns)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Code</th><th>Common Name</th><th>Scientific Name</th><th>Description</th><th>Models</th><th>Latency</th></tr></thead>
+    <tbody>
+      <tr><td>6</td><td><code>LAAJE</code></td><td>AI Judge</td><td>LLM-as-a-Judge Evaluation</td><td>AI evaluates using pointwise, pairwise, or listwise modes</td><td>2</td><td>medium</td></tr>
+      <tr><td>7</td><td><code>RLAIF</code></td><td>Constitutional Critic</td><td>Reinforcement Learning from AI Feedback</td><td>AI critiques against explicit principles</td><td>2</td><td>high</td></tr>
+      <tr><td>8</td><td><code>IREF</code></td><td>Critique-Revise Loop</td><td>Iterative Refinement with External Feedback</td><td>Generator → Critic → Revise loop until quality threshold</td><td>2</td><td>high</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Category 4: Ensemble & Aggregation (3 patterns)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Code</th><th>Common Name</th><th>Scientific Name</th><th>Description</th><th>Models</th><th>Latency</th></tr></thead>
+    <tbody>
+      <tr><td>9</td><td><code>SCMR</code></td><td>Majority Vote</td><td>Self-Consistency via Marginal Reasoning</td><td>Same prompt to N instances, select most common answer</td><td>3</td><td>medium</td></tr>
+      <tr><td>10</td><td><code>CWMA</code></td><td>Weighted Ensemble</td><td>Confidence-Weighted Model Aggregation</td><td>Weight contributions by confidence/expertise</td><td>3</td><td>medium</td></tr>
+      <tr><td>11</td><td><code>SMoE</code></td><td>Mixture Router</td><td>Sparse Mixture-of-Experts Routing</td><td>Lightweight router selects specialist per input</td><td>2</td><td>low</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Category 5: Reflection & Self-Improvement (3 patterns)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Code</th><th>Common Name</th><th>Scientific Name</th><th>Description</th><th>Models</th><th>Latency</th></tr></thead>
+    <tbody>
+      <tr><td>12</td><td><code>ISFR</code></td><td>Self-Refine Loop</td><td>Iterative Self-Feedback Refinement</td><td>AI generates → self-critiques → refines</td><td>1</td><td>high</td></tr>
+      <tr><td>13</td><td><code>VRL</code></td><td>Reflexion Agent</td><td>Verbal Reinforcement Learning</td><td>Reflects on failures, stores in episodic memory</td><td>1</td><td>high</td></tr>
+      <tr><td>14</td><td><code>LATS</code></td><td>Tree Search Reasoning</td><td>Language Agent Tree Search</td><td>Monte-Carlo tree search exploring reasoning paths</td><td>1</td><td>very_high</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Category 6: Verification & Fact-Checking (2 patterns)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Code</th><th>Common Name</th><th>Scientific Name</th><th>Description</th><th>Models</th><th>Latency</th></tr></thead>
+    <tbody>
+      <tr><td>15</td><td><code>CoVe</code></td><td>Chain of Verification</td><td>Stepwise Verification Prompting</td><td>Draft → verify questions → answer independently</td><td>1</td><td>high</td></tr>
+      <tr><td>16</td><td><code>SelfRAG</code></td><td>Retrieval-Augmented Verification</td><td>Self-Reflective RAG</td><td>Self-critiques, fetches documents, validates against evidence</td><td>1</td><td>high</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Category 7: Multi-Agent Collaboration (2 patterns)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Code</th><th>Common Name</th><th>Scientific Name</th><th>Description</th><th>Models</th><th>Latency</th></tr></thead>
+    <tbody>
+      <tr><td>17</td><td><code>LLM_MAS</code></td><td>Agent Team</td><td>LLM-based Multi-Agent Systems</td><td>Specialized agents collaborate via natural language</td><td>3</td><td>very_high</td></tr>
+      <tr><td>18</td><td><code>MAPR</code></td><td>Peer Review Pipeline</td><td>Multi-Agent Peer Review</td><td>Sequential review chain, each reviews prior work</td><td>3</td><td>high</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Category 8: Reasoning Enhancement (9 patterns)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Code</th><th>Common Name</th><th>Scientific Name</th><th>Description</th><th>Models</th><th>Latency</th></tr></thead>
+    <tbody>
+      <tr><td>19</td><td><code>CoT</code></td><td>Chain-of-Thought</td><td>CoT Prompting</td><td>Step-by-step reasoning before answer</td><td>1</td><td>medium</td></tr>
+      <tr><td>20</td><td><code>ZeroShotCoT</code></td><td>Zero-Shot CoT</td><td>"Let's think step by step"</td><td>Add reasoning prompt without examples</td><td>1</td><td>low</td></tr>
+      <tr><td>21</td><td><code>ToT</code></td><td>Tree-of-Thoughts</td><td>ToT with BFS/DFS</td><td>Explore multiple reasoning paths</td><td>1</td><td>very_high</td></tr>
+      <tr><td>22</td><td><code>GoT</code></td><td>Graph-of-Thoughts</td><td>GoT Synthesis</td><td>Thought units as graph nodes</td><td>1</td><td>very_high</td></tr>
+      <tr><td>23</td><td><code>ReAct</code></td><td>ReAct</td><td>Reasoning + Acting</td><td>Interleave reasoning and tool use</td><td>1</td><td>high</td></tr>
+      <tr><td>24</td><td><code>L2M</code></td><td>Least-to-Most</td><td>Decomposition Prompting</td><td>Solve smallest subproblems first</td><td>1</td><td>high</td></tr>
+      <tr><td>25</td><td><code>PS</code></td><td>Plan-and-Solve</td><td>Explicit Planning</td><td>Devise plan then execute step by step</td><td>1</td><td>medium</td></tr>
+      <tr><td>26</td><td><code>MCP</code></td><td>Metacognitive Prompting</td><td>5-stage reflection</td><td>Understand, decompose, execute, verify, refine</td><td>1</td><td>high</td></tr>
+      <tr><td>27</td><td><code>PoT</code></td><td>Program-of-Thought</td><td>Code-based Reasoning</td><td>Generate code to solve math problems</td><td>1</td><td>medium</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Category 9: Model Routing Strategies (4 patterns)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Code</th><th>Common Name</th><th>Scientific Name</th><th>Description</th><th>Models</th><th>Latency</th></tr></thead>
+    <tbody>
+      <tr><td>28</td><td><code>SINGLE</code></td><td>Single Model</td><td>Primary model only</td><td>Route to single best model</td><td>1</td><td>low</td></tr>
+      <tr><td>29</td><td><code>ENSEMBLE</code></td><td>Ensemble</td><td>Query multiple, synthesize</td><td>Query multiple models, synthesize results</td><td>3</td><td>high</td></tr>
+      <tr><td>30</td><td><code>CASCADE</code></td><td>Cascade</td><td>Escalate on low confidence</td><td>Start cheap, escalate if needed</td><td>2</td><td>variable</td></tr>
+      <tr><td>31</td><td><code>SPECIALIST</code></td><td>Specialist Routing</td><td>Route to domain expert</td><td>Route to best model per domain</td><td>2</td><td>medium</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Category 10: Domain-Specific Orchestration (4 patterns)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Code</th><th>Common Name</th><th>Scientific Name</th><th>Description</th><th>Models</th><th>Latency</th></tr></thead>
+    <tbody>
+      <tr><td>32</td><td><code>DOMAIN_INJECT</code></td><td>Domain Expert Injection</td><td>Prepend domain prompts</td><td>Prepend domain-specific system prompts</td><td>1</td><td>low</td></tr>
+      <tr><td>33</td><td><code>MULTI_EXPERT</code></td><td>Multi-Expert Consensus</td><td>Multiple domain experts</td><td>Route to multiple experts, synthesize</td><td>3</td><td>high</td></tr>
+      <tr><td>34</td><td><code>CHALLENGER_CONSENSUS</code></td><td>Challenger + Consensus</td><td>Baseline then challenge</td><td>Baseline → Challenge → Synthesis</td><td>2</td><td>high</td></tr>
+      <tr><td>35</td><td><code>CROSS_DOMAIN</code></td><td>Cross-Domain Synthesis</td><td>Multi-domain merge</td><td>Detect multi-domain, route to each, merge</td><td>3</td><td>high</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Category 11: Cognitive Frameworks (14 patterns)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Code</th><th>Common Name</th><th>Scientific Name</th><th>Description</th><th>Models</th><th>Latency</th></tr></thead>
+    <tbody>
+      <tr><td>36</td><td><code>FIRST_PRINCIPLES</code></td><td>First Principles</td><td>Decompose to fundamentals</td><td>Decompose to fundamental truths, rebuild</td><td>1</td><td>high</td></tr>
+      <tr><td>37</td><td><code>ANALOGICAL</code></td><td>Analogical Reasoning</td><td>Cross-domain patterns</td><td>Find analogies from other domains</td><td>1</td><td>medium</td></tr>
+      <tr><td>38</td><td><code>SYSTEMS</code></td><td>Systems Thinking</td><td>Feedback loops, emergence</td><td>Analyze as interconnected system</td><td>1</td><td>high</td></tr>
+      <tr><td>39</td><td><code>SOCRATIC</code></td><td>Socratic Method</td><td>Dialectical questioning</td><td>Use probing questions to illuminate</td><td>1</td><td>medium</td></tr>
+      <tr><td>40</td><td><code>TRIZ</code></td><td>TRIZ</td><td>Contradiction resolution</td><td>Use 40 inventive principles</td><td>1</td><td>high</td></tr>
+      <tr><td>41</td><td><code>DESIGN_THINKING</code></td><td>Design Thinking</td><td>Empathize→Define→Ideate→Prototype→Test</td><td>Human-centered design process</td><td>1</td><td>very_high</td></tr>
+      <tr><td>42</td><td><code>SCIENTIFIC</code></td><td>Scientific Method</td><td>Hypothesis→Experiment→Analysis</td><td>Formulate hypothesis, test, analyze</td><td>1</td><td>high</td></tr>
+      <tr><td>43</td><td><code>LATERAL</code></td><td>Lateral Thinking</td><td>Random entry, provocation</td><td>Break conventional thinking</td><td>1</td><td>medium</td></tr>
+      <tr><td>44</td><td><code>ABDUCTIVE</code></td><td>Abductive Reasoning</td><td>Inference to best explanation</td><td>Generate and evaluate hypotheses</td><td>1</td><td>medium</td></tr>
+      <tr><td>45</td><td><code>COUNTERFACTUAL</code></td><td>Counterfactual</td><td>What-if analysis</td><td>Explore alternative scenarios</td><td>1</td><td>high</td></tr>
+      <tr><td>46</td><td><code>DIALECTICAL</code></td><td>Dialectical</td><td>Thesis-antithesis-synthesis</td><td>Explore opposing views for synthesis</td><td>1</td><td>high</td></tr>
+      <tr><td>47</td><td><code>MORPHOLOGICAL</code></td><td>Morphological Analysis</td><td>Parameter space exploration</td><td>Explore all parameter combinations</td><td>1</td><td>high</td></tr>
+      <tr><td>48</td><td><code>PREMORTEM</code></td><td>Pre-mortem</td><td>Prospective hindsight</td><td>Imagine failure, work backwards</td><td>1</td><td>medium</td></tr>
+      <tr><td>49</td><td><code>FERMI</code></td><td>Fermi Estimation</td><td>Order of magnitude reasoning</td><td>Break estimation into components</td><td>1</td><td>low</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="modes">Part 4: Model Modes (8 Modes)</h2>
+  <table>
+    <thead><tr><th>Mode</th><th>Description</th><th>Temperature</th><th>Use For</th></tr></thead>
+    <tbody>
+      <tr><td><code>standard</code></td><td>Default operation</td><td>0.7</td><td>General tasks</td></tr>
+      <tr><td><code>thinking</code></td><td>Extended reasoning (o1, Claude thinking)</td><td>1.0</td><td>Complex reasoning</td></tr>
+      <tr><td><code>deep_research</code></td><td>In-depth research mode</td><td>0.5</td><td>Research tasks</td></tr>
+      <tr><td><code>fast</code></td><td>Speed-optimized (flash models)</td><td>0.7</td><td>Simple queries</td></tr>
+      <tr><td><code>creative</code></td><td>Higher temperature, creative</td><td>0.9</td><td>Creative writing</td></tr>
+      <tr><td><code>precise</code></td><td>Low temperature, factual</td><td>0.1</td><td>Accuracy-critical</td></tr>
+      <tr><td><code>code</code></td><td>Code-specialized</td><td>0.2</td><td>Code generation</td></tr>
+      <tr><td><code>vision</code></td><td>Multimodal with vision</td><td>0.7</td><td>Image analysis</td></tr>
+      <tr><td><code>long_context</code></td><td>Extended context handling</td><td>0.7</td><td>Long documents</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="parallel">Part 5: Parallel Execution Configuration</h2>
+  <pre><code>parallelExecution: {
+  enabled: boolean,              // Enable parallel execution
+  mode: 'all' | 'race' | 'quorum', // Wait strategy
+  models: string[],              // Models to use (or let AGI select)
+  quorumThreshold?: number,      // For quorum mode (0.5 = majority)
+  synthesizeResults?: boolean,   // Combine results
+  synthesisStrategy?: 'best_of' | 'merge' | 'vote' | 'weighted',
+  timeoutMs?: number,           // Timeout per call
+  failureStrategy?: 'fail_fast' | 'continue' | 'fallback',
+  
+  // AGI Dynamic Selection
+  agiModelSelection?: boolean,   // Let AGI pick models
+  minModels?: number,           // Min models to select (default: 2)
+  maxModels?: number,           // Max models to select (default: 5)
+  
+  // Output Streaming
+  outputMode: 'single' | 'all' | 'top_n' | 'threshold',
+  outputTopN?: number,          // For top_n mode
+  outputThreshold?: number,     // Min confidence for threshold mode
+}</code></pre>
+
+  <h2 id="steps">Part 6: AGI Brain Plan Step Types (11 Types)</h2>
+  <table>
+    <thead><tr><th>Step Type</th><th>Description</th><th>Primary Service</th></tr></thead>
+    <tbody>
+      <tr><td><code>analyze</code></td><td>Analyze prompt complexity and intent</td><td>brain_router</td></tr>
+      <tr><td><code>detect_domain</code></td><td>Detect field/domain/subspecialty</td><td>domain_taxonomy</td></tr>
+      <tr><td><code>select_model</code></td><td>Choose optimal model(s)</td><td>model_router</td></tr>
+      <tr><td><code>prepare_context</code></td><td>Build context with user memory, ego</td><td>context_assembler</td></tr>
+      <tr><td><code>ethics_check</code></td><td>Evaluate ethical implications</td><td>moral_compass</td></tr>
+      <tr><td><code>generate</code></td><td>Generate primary response</td><td>model_router</td></tr>
+      <tr><td><code>synthesize</code></td><td>Combine multiple responses</td><td>response_synthesis</td></tr>
+      <tr><td><code>verify</code></td><td>Verify factual accuracy</td><td>verification</td></tr>
+      <tr><td><code>refine</code></td><td>Improve based on feedback</td><td>refinement</td></tr>
+      <tr><td><code>calibrate</code></td><td>Calibrate confidence</td><td>confidence_calibration</td></tr>
+      <tr><td><code>reflect</code></td><td>Self-reflect on output</td><td>metacognition</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="services">Part 7: 18 AGI Services (Adjustable Weights)</h2>
+  <table>
+    <thead><tr><th>Service ID</th><th>Description</th><th>Default Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>consciousness</code></td><td>Global workspace, self-modeling</td><td>0.8</td></tr>
+      <tr><td><code>metacognition</code></td><td>Thinking about thinking</td><td>0.7</td></tr>
+      <tr><td><code>moral_compass</code></td><td>Ethical evaluation</td><td>0.9</td></tr>
+      <tr><td><code>self_improvement</code></td><td>Learning from interactions</td><td>0.6</td></tr>
+      <tr><td><code>domain_taxonomy</code></td><td>800+ domain classification</td><td>0.8</td></tr>
+      <tr><td><code>brain_router</code></td><td>Model selection logic</td><td>0.9</td></tr>
+      <tr><td><code>confidence_calibration</code></td><td>Calibrated uncertainty</td><td>0.7</td></tr>
+      <tr><td><code>error_detection</code></td><td>Catch mistakes</td><td>0.8</td></tr>
+      <tr><td><code>knowledge_graph</code></td><td>Semantic connections</td><td>0.6</td></tr>
+      <tr><td><code>proactive_assistance</code></td><td>Anticipate needs</td><td>0.5</td></tr>
+      <tr><td><code>analogical_reasoning</code></td><td>Cross-domain patterns</td><td>0.6</td></tr>
+      <tr><td><code>world_model</code></td><td>Reality grounding</td><td>0.7</td></tr>
+      <tr><td><code>episodic_memory</code></td><td>Conversation memory</td><td>0.7</td></tr>
+      <tr><td><code>theory_of_mind</code></td><td>User modeling</td><td>0.6</td></tr>
+      <tr><td><code>goal_planning</code></td><td>Multi-step planning</td><td>0.7</td></tr>
+      <tr><td><code>causal_reasoning</code></td><td>Cause-effect analysis</td><td>0.7</td></tr>
+      <tr><td><code>multimodal_binding</code></td><td>Cross-modal integration</td><td>0.5</td></tr>
+      <tr><td><code>response_synthesis</code></td><td>Final response assembly</td><td>0.9</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="examples">Part 8: Usage Examples</h2>
+
+  <h4>Simple Workflow Execution</h4>
+  <pre><code>const result = await orchestrationPatternsService.executeWorkflow({
+  tenantId: 'tenant-123',
+  userId: 'user-456',
+  workflowCode: 'CoT',  // Chain-of-Thought
+  prompt: 'Solve this math problem...',
+  configOverrides: {
+    temperature: 0.3,
+    max_iterations: 2
+  }
+});</code></pre>
+
+  <h4>AGI Auto-Selection</h4>
+  <pre><code>const plan = await agiBrainPlannerService.generatePlan({
+  tenantId: 'tenant-123',
+  userId: 'user-456',
+  prompt: 'Complex research question...',
+  allowAgiWorkflowSelection: true,  // AGI picks best workflow
+  enableConsciousness: true,
+  enableEthicsCheck: true,
+});
+// plan.selectedWorkflow - AGI's choice
+// plan.workflowSteps - Configured steps</code></pre>
+
+  <h4>Parallel Multi-Model with AGI Selection</h4>
+  <pre><code>// In workflow step configuration:
+{
+  stepOrder: 2,
+  methodCode: 'GENERATE_RESPONSE',
+  parallelExecution: {
+    enabled: true,
+    agiModelSelection: true,  // AGI picks models
+    minModels: 2,
+    maxModels: 4,
+    synthesizeResults: true,
+    synthesisStrategy: 'best_of',
+    outputMode: 'single'  // Synthesized into one response
+  }
+}</code></pre>
+
+  <div class="note">
+    <strong>To save as PDF:</strong> Click the "Print / Save as PDF" button in the top right, or press Ctrl+P (Cmd+P on Mac) and select "Save as PDF" as the destination.
+  </div>
+
+  <footer style="margin-top: 60px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 13px;">
+    <p>RADIANT v4.18.0 | Workflow Methods Reference</p>
+    <p>© 2026 Zynapses</p>
+  </footer>
+</body>
+</html>

@@ -1,7 +1,7 @@
 // RADIANT v4.18.0 - Domain Ethics Admin API Handler
 // Admin endpoints for managing domain-specific professional ethics
 
-import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyHandler, APIGatewayProxyResult, APIGatewayProxyEvent } from 'aws-lambda';
 import { domainEthicsService } from '../shared/services/domain-ethics.service';
 import { DOMAIN_ETHICS_REGISTRY } from '@radiant/shared';
 import { logger } from '../shared/logger';
@@ -29,11 +29,11 @@ const error = (statusCode: number, message: string): APIGatewayProxyResult => ({
   body: JSON.stringify({ error: message }),
 });
 
-const getTenantId = (event: { requestContext?: { authorizer?: Record<string, unknown> } }): string => {
+const getTenantId = (event: APIGatewayProxyEvent): string => {
   return String(event.requestContext?.authorizer?.tenantId || '');
 };
 
-const getAdminId = (event: { requestContext?: { authorizer?: Record<string, unknown> } }): string => {
+const getAdminId = (event: { requestContext?: { authorizer?: Record<string, unknown> | null } }): string => {
   return String(event.requestContext?.authorizer?.userId || '');
 };
 
@@ -501,18 +501,20 @@ export const createCustomFramework: APIGatewayProxyHandler = async (event) => {
     }
     
     const id = await domainEthicsService.createCustomFramework({
-      name,
-      code,
+      frameworkName: name,
+      frameworkCode: code,
       domain,
-      subspecialty,
-      governingBody,
-      version: version || '1.0',
-      effectiveDate,
+      subspecialties: subspecialty ? [subspecialty] : [],
+      governingBody: governingBody || '',
+      description: '',
+      lastUpdated: new Date(),
       principles: principles || [],
       prohibitions: prohibitions || [],
       disclosureRequirements: disclosureRequirements || [],
       requiredDisclaimers: requiredDisclaimers || [],
-      emergencyOverrides,
+      mandatoryWarnings: [],
+      enforcementLevel: 'standard',
+      isActive: true,
       canBeDisabled: canBeDisabled !== false,
       createdBy: userId,
     });
@@ -549,7 +551,7 @@ export const updateCustomFramework: APIGatewayProxyHandler = async (event) => {
     } = body;
     
     await domainEthicsService.updateCustomFramework(frameworkId, {
-      name,
+      frameworkName: name,
       principles,
       prohibitions,
       disclosureRequirements,

@@ -125,8 +125,8 @@ export async function handleChat(
         user.tenantId,
         user.userId,
         event.requestContext.requestId,
-        promptText,
-        generatedText,
+        String(promptText),
+        String(generatedText),
         body.model
       );
 

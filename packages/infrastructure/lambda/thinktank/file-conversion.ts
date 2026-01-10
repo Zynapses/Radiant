@@ -3,7 +3,8 @@
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { fileConversionService, ConversionDecision, FileInfo } from '../shared/services/file-conversion.service';
-import { executeStatement, stringParam, uuidParam } from '../shared/db/client';
+import { executeStatement, stringParam } from '../shared/db/client';
+import { logger } from '../shared/logging/enhanced-logger';
 
 // ============================================================================
 // Types
@@ -41,7 +42,7 @@ function getCorsHeaders(origin?: string): Record<string, string> {
   };
 }
 
-function extractContext(event: { requestContext?: { authorizer?: { claims?: Record<string, string> } }; headers?: Record<string, string> }) {
+function extractContext(event: { requestContext?: { authorizer?: { claims?: Record<string, string> } | null }; headers?: Record<string, string | undefined> | null }) {
   const claims = event.requestContext?.authorizer?.claims || {};
   return {
     tenantId: claims['custom:tenant_id'] || event.headers?.['x-tenant-id'],
@@ -113,7 +114,7 @@ export const processFileHandler: APIGatewayProxyHandler = async (event) => {
     return successResponse(result, headers);
 
   } catch (error) {
-    console.error('File processing error:', error);
+    logger.error('File processing error:', error);
     return errorResponse(500, 'Internal server error', headers);
   }
 };
@@ -184,7 +185,7 @@ export const checkCompatibilityHandler: APIGatewayProxyHandler = async (event) =
     }, headers);
 
   } catch (error) {
-    console.error('Compatibility check error:', error);
+    logger.error('Compatibility check error:', error);
     return errorResponse(500, 'Internal server error', headers);
   }
 };
@@ -235,18 +236,18 @@ export const getCapabilitiesHandler: APIGatewayProxyHandler = async (event) => {
       providerId ? [stringParam(providerId)] : []
     );
 
-    const capabilities = result.records?.map((record: any) => ({
-      providerId: record[0]?.stringValue,
-      supportedFormats: JSON.parse(record[1]?.stringValue || '[]'),
-      nativeDocumentFormats: JSON.parse(record[2]?.stringValue || '[]'),
-      maxFileSize: record[3]?.longValue,
-      supportsVision: record[4]?.booleanValue,
-      supportsAudio: record[5]?.booleanValue,
-      supportsVideo: record[6]?.booleanValue,
-      supportsDocuments: record[7]?.booleanValue,
-      modelOverrides: JSON.parse(record[8]?.stringValue || '{}'),
-      lastVerifiedAt: record[9]?.stringValue,
-    })) || [];
+    const capabilities = (result.rows || []).map((record: Record<string, unknown>) => ({
+      providerId: record.provider_id as string,
+      supportedFormats: JSON.parse((record.supported_formats as string) || '[]'),
+      nativeDocumentFormats: JSON.parse((record.native_document_formats as string) || '[]'),
+      maxFileSize: record.max_file_size as number,
+      supportsVision: Boolean(record.supports_vision),
+      supportsAudio: Boolean(record.supports_audio),
+      supportsVideo: Boolean(record.supports_video),
+      supportsDocuments: Boolean(record.supports_documents),
+      modelOverrides: JSON.parse((record.model_overrides as string) || '{}'),
+      lastVerifiedAt: record.last_verified_at as string,
+    }));
 
     return successResponse(
       providerId ? capabilities[0] : capabilities,
@@ -254,7 +255,7 @@ export const getCapabilitiesHandler: APIGatewayProxyHandler = async (event) => {
     );
 
   } catch (error) {
-    console.error('Get capabilities error:', error);
+    logger.error('Get capabilities error:', error);
     return errorResponse(500, 'Internal server error', headers);
   }
 };
@@ -302,33 +303,33 @@ export const getHistoryHandler: APIGatewayProxyHandler = async (event) => {
       WHERE tenant_id = $1
     `;
 
-    const params: any[] = [uuidParam(context.tenantId)];
+    const params: any[] = [stringParam(context.tenantId)];
 
     if (conversationId) {
       query += ` AND conversation_id = $2`;
-      params.push(uuidParam(conversationId));
+      params.push(stringParam(conversationId));
     }
 
     query += ` ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
 
     const result = await executeStatement(query, params);
 
-    const conversions = result.records?.map((record: any) => ({
-      id: record[0]?.stringValue,
-      filename: record[1]?.stringValue,
-      originalFormat: record[2]?.stringValue,
-      originalSize: record[3]?.longValue,
-      targetProvider: record[4]?.stringValue,
-      targetModel: record[5]?.stringValue,
-      needsConversion: record[6]?.booleanValue,
-      strategy: record[7]?.stringValue,
-      decisionReason: record[8]?.stringValue,
-      status: record[9]?.stringValue,
-      tokenEstimate: record[10]?.longValue,
-      processingTimeMs: record[11]?.longValue,
-      createdAt: record[12]?.stringValue,
-      completedAt: record[13]?.stringValue,
-    })) || [];
+    const conversions = (result.rows || []).map((record: Record<string, unknown>) => ({
+      id: record.id as string,
+      filename: record.filename as string,
+      originalFormat: record.original_format as string,
+      originalSize: record.original_size as number,
+      targetProvider: record.target_provider as string,
+      targetModel: record.target_model as string,
+      needsConversion: Boolean(record.needs_conversion),
+      strategy: record.strategy as string,
+      decisionReason: record.decision_reason as string,
+      status: record.conversion_status as string,
+      tokenEstimate: record.converted_token_estimate as number,
+      processingTimeMs: record.processing_time_ms as number,
+      createdAt: record.created_at as string,
+      completedAt: record.completed_at as string,
+    }));
 
     return successResponse({
       conversions,
@@ -336,7 +337,7 @@ export const getHistoryHandler: APIGatewayProxyHandler = async (event) => {
     }, headers);
 
   } catch (error) {
-    console.error('Get history error:', error);
+    logger.error('Get history error:', error);
     return errorResponse(500, 'Internal server error', headers);
   }
 };
@@ -364,20 +365,20 @@ export const getStatsHandler: APIGatewayProxyHandler = async (event) => {
 
     const result = await executeStatement(
       `SELECT * FROM get_conversion_stats($1, $2)`,
-      [uuidParam(context.tenantId), { name: 'days', value: { longValue: days } }]
+      [stringParam('tenantId', context.tenantId), { name: 'days', value: { longValue: days } }]
     );
 
-    if (result.records && result.records[0]) {
-      const record = result.records[0];
+    if (result.rows && result.rows[0]) {
+      const record = result.rows[0] as Record<string, unknown>;
       return successResponse({
-        totalFiles: record[0]?.longValue || 0,
-        convertedCount: record[1]?.longValue || 0,
-        nativeCount: record[2]?.longValue || 0,
-        failedCount: record[3]?.longValue || 0,
-        totalBytesProcessed: record[4]?.longValue || 0,
-        avgProcessingMs: record[5]?.longValue || 0,
-        mostCommonFormat: record[6]?.stringValue || 'none',
-        mostCommonStrategy: record[7]?.stringValue || 'none',
+        totalFiles: Number(record.total_files || 0),
+        convertedCount: Number(record.converted_count || 0),
+        nativeCount: Number(record.native_count || 0),
+        failedCount: Number(record.failed_count || 0),
+        totalBytesProcessed: Number(record.total_bytes_processed || 0),
+        avgProcessingMs: Number(record.avg_processing_ms || 0),
+        mostCommonFormat: String(record.most_common_format || 'none'),
+        mostCommonStrategy: String(record.most_common_strategy || 'none'),
         periodDays: days,
       }, headers);
     }
@@ -395,7 +396,7 @@ export const getStatsHandler: APIGatewayProxyHandler = async (event) => {
     }, headers);
 
   } catch (error) {
-    console.error('Get stats error:', error);
+    logger.error('Get stats error:', error);
     return errorResponse(500, 'Internal server error', headers);
   }
 };

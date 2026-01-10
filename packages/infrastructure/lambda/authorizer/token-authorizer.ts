@@ -8,6 +8,7 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
 import { APIGatewayTokenAuthorizerEvent, APIGatewayAuthorizerResult, Context } from 'aws-lambda';
+import { logger } from '../shared/logging/enhanced-logger';
 
 const COGNITO_USER_POOL_ID = process.env.COGNITO_USER_POOL_ID!;
 const COGNITO_REGION = process.env.COGNITO_REGION || process.env.AWS_REGION || 'us-east-1';
@@ -49,12 +50,12 @@ export async function handler(
   event: APIGatewayTokenAuthorizerEvent,
   _context: Context
 ): Promise<APIGatewayAuthorizerResult> {
-  console.log('Authorizer invoked for:', event.methodArn);
+  logger.info('Authorizer invoked for:', { data: event.methodArn });
   
   const token = event.authorizationToken?.replace('Bearer ', '');
   
   if (!token) {
-    console.error('No token provided');
+    logger.error('No token provided');
     throw new Error('Unauthorized');
   }
   
@@ -86,7 +87,7 @@ export async function handler(
     
     // Tenant ID is required
     if (!tenantId) {
-      console.error('Missing tenant_id claim');
+      logger.error('Missing tenant_id claim');
       throw new Error('Unauthorized');
     }
     
@@ -103,7 +104,7 @@ export async function handler(
     const isAuthorized = checkAuthorization(effectivePermissionLevel, scopes, resource, decoded.sub, appUid);
     
     if (!isAuthorized) {
-      console.warn('Authorization denied for:', decoded.sub, 'resource:', resource.path);
+      logger.warn('Authorization denied', { userId: decoded.sub, resource: resource.path });
       return generatePolicy(decoded.sub, 'Deny', event.methodArn, {});
     }
     
@@ -120,11 +121,11 @@ export async function handler(
       token_use: decoded.token_use,
     };
     
-    console.log('Authorization granted for:', decoded.sub, 'permission_level:', effectivePermissionLevel);
+    logger.info('Authorization granted', { userId: decoded.sub, permissionLevel: effectivePermissionLevel });
     return generatePolicy(decoded.sub, 'Allow', event.methodArn, context);
     
   } catch (error) {
-    console.error('Authorization failed:', error);
+    logger.error('Authorization failed:', error);
     throw new Error('Unauthorized');
   }
 }

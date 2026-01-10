@@ -5,6 +5,7 @@
  */
 
 import { Handler } from 'aws-lambda';
+import { logger } from '../shared/logging/enhanced-logger';
 import {
   ElastiCacheClient,
   DeleteReplicationGroupCommand,
@@ -31,7 +32,7 @@ interface CleanupResult {
 }
 
 export const handler: Handler<TransitionEvent, CleanupResult> = async (event) => {
-  console.log('Cleaning up ElastiCache:', JSON.stringify(event));
+  logger.info('Cleaning up ElastiCache:', { event });
 
   const { tenantId, fromTier, toTier, timestamp } = event;
   const prefix = tenantId.substring(0, 8);
@@ -44,7 +45,7 @@ export const handler: Handler<TransitionEvent, CleanupResult> = async (event) =>
     errors: []
   };
 
-  const clusterName = `bobble-cache-${prefix}`;
+  const clusterName = `cato-cache-${prefix}`;
 
   try {
     // When going to DEV, delete provisioned cluster (will use serverless)
@@ -64,11 +65,11 @@ export const handler: Handler<TransitionEvent, CleanupResult> = async (event) =>
 
         result.deleted.push(clusterName);
         result.snapshots.push(snapshotName);
-        console.log(`Deleted cluster ${clusterName} with snapshot ${snapshotName}`);
+        logger.info(`Deleted cluster ${clusterName} with snapshot ${snapshotName}`);
 
       } catch (error: any) {
         if (error.name === 'ReplicationGroupNotFoundFault') {
-          console.log('Cluster does not exist, nothing to cleanup');
+          logger.info('Cluster does not exist, nothing to cleanup');
         } else {
           throw error;
         }
@@ -92,7 +93,7 @@ export const handler: Handler<TransitionEvent, CleanupResult> = async (event) =>
     }
 
   } catch (error: any) {
-    console.error('ElastiCache cleanup error:', error);
+    logger.error('ElastiCache cleanup error:', error);
     result.status = 'PARTIAL';
     result.errors.push(error.message);
   }

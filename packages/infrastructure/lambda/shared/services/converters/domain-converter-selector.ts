@@ -184,7 +184,7 @@ export async function convertDomainFile(
         format: cadFormat,
         domain: 'mechanical_engineering',
         strategy: 'extract_geometry',
-        metadata: cadResult.metadata,
+        metadata: cadResult.metadata as unknown as Record<string, unknown>,
         aiDescriptionPrompt: format?.aiDescriptionPrompt,
         tokenEstimate: Math.ceil(cadResult.text.length / 4),
       };

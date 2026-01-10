@@ -6,9 +6,11 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { Pool } from 'pg';
+import type { FailureType, ViolationType, ViolationAction } from '@radiant/shared';
 import { MetricsCollectionService } from '../services/metrics-collection.service';
 import { LearningInfluenceService } from '../services/learning-hierarchy.service';
 import { initializeLearningService } from '../services/cognitive-router.service';
+import { logger } from '../logging/enhanced-logger';
 
 let pool: Pool | null = null;
 let metricsService: MetricsCollectionService | null = null;
@@ -133,7 +135,7 @@ export function withMetrics(handler: HandlerFunction): HandlerFunction {
 
     // Record metrics asynchronously (don't block response)
     recordMetricsAsync(metricsContext, latencyMs, success, errorType, errorMessage).catch((err) => {
-      console.error('Failed to record metrics:', err);
+      logger.error('Failed to record metrics:', err);
     });
 
     return result;
@@ -182,7 +184,7 @@ async function recordMetricsAsync(
       await metricsService.recordFailure({
         tenantId: ctx.tenantId,
         userId: ctx.userId,
-        failureType: errorType as any,
+        failureType: errorType as FailureType,
         severity: errorType === 'internal_error' ? 'high' : 'low',
         endpoint: ctx.endpoint,
         modelId: ctx.modelId,
@@ -201,7 +203,7 @@ async function recordMetricsAsync(
     }
 
   } catch (error) {
-    console.error('Error recording metrics:', error);
+    logger.error('Error recording metrics:', error);
   }
 }
 
@@ -248,7 +250,7 @@ export async function recordFailure(
   return metricsService.recordFailure({
     tenantId,
     userId,
-    failureType: failureType as any,
+    failureType: failureType as FailureType,
     severity,
     errorMessage,
     modelId,
@@ -273,10 +275,10 @@ export async function recordViolation(
   return metricsService.recordViolation({
     tenantId,
     userId,
-    violationType: violationType as any,
+    violationType: violationType as ViolationType,
     severity,
     promptSnippet,
-    actionTaken: actionTaken as any,
+    actionTaken: actionTaken as ViolationAction,
     detectionMethod: 'content_filter',
   });
 }

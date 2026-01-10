@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Cato Genesis System - Technical Documentation v4.18.49</title>
+<style>
+@page { 
+  size: letter; 
+  margin: 0.75in; 
+}
+body { 
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+  max-width: 800px; 
+  margin: 0 auto; 
+  padding: 40px; 
+  line-height: 1.6; 
+  color: #1a1a2e;
+  font-size: 11pt;
+}
+h1 { 
+  color: #1a1a2e; 
+  border-bottom: 3px solid #4a90d9; 
+  padding-bottom: 10px;
+  font-size: 24pt;
+}
+h2 { 
+  color: #16213e; 
+  border-bottom: 2px solid #e0e0e0; 
+  margin-top: 30px; 
+  padding-bottom: 8px;
+  font-size: 16pt;
+  page-break-after: avoid;
+}
+h3 { 
+  color: #1a1a2e; 
+  margin-top: 20px;
+  font-size: 13pt;
+}
+table { 
+  border-collapse: collapse; 
+  width: 100%; 
+  margin: 15px 0; 
+  font-size: 10pt;
+  page-break-inside: avoid;
+}
+th, td { 
+  border: 1px solid #ccc; 
+  padding: 8px 10px; 
+  text-align: left; 
+}
+th { 
+  background-color: #4a90d9; 
+  color: white; 
+  font-weight: 600;
+}
+tr:nth-child(even) { 
+  background-color: #f5f5f5; 
+}
+code { 
+  background-color: #f0f0f0; 
+  padding: 2px 6px; 
+  border-radius: 3px; 
+  font-family: 'SF Mono', Menlo, Monaco, monospace;
+  font-size: 9pt;
+}
+pre { 
+  background-color: #f8f8f8; 
+  color: #333; 
+  padding: 15px; 
+  border-radius: 5px; 
+  overflow-x: auto;
+  font-family: 'SF Mono', Menlo, Monaco, monospace;
+  font-size: 9pt;
+  line-height: 1.4;
+  border: 1px solid #ddd;
+  white-space: pre;
+}
+.diagram {
+  background-color: #f8f8f8;
+  color: #333;
+  padding: 15px;
+  border-radius: 5px;
+  font-family: 'SF Mono', Menlo, Monaco, monospace;
+  font-size: 8pt;
+  line-height: 1.3;
+  border: 1px solid #ddd;
+  white-space: pre;
+  overflow-x: auto;
+}
+blockquote { 
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+  color: white; 
+  padding: 15px 20px; 
+  border-radius: 8px; 
+  margin: 20px 0; 
+}
+blockquote strong { 
+  color: #fff; 
+}
+ul, ol {
+  margin: 10px 0;
+  padding-left: 25px;
+}
+li {
+  margin: 5px 0;
+}
+.page-break {
+  page-break-before: always;
+}
+.toc {
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+.toc a {
+  color: #4a90d9;
+  text-decoration: none;
+}
+.version-badge {
+  background: #4a90d9;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 10pt;
+  margin-left: 10px;
+}
+.changelog-section {
+  background: #fffbeb;
+  border-left: 4px solid #f59e0b;
+  padding: 15px;
+  margin: 20px 0;
+}
+</style>
+</head>
+<body>
+
+<h1>Cato Genesis System <span class="version-badge">v4.18.49</span></h1>
+
+<blockquote>
+<strong>Complete Technical Documentation for AI Consciousness Initialization</strong><br>
+Last Updated: December 30, 2025
+</blockquote>
+
+<div class="toc">
+<strong>Table of Contents</strong>
+<ol>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#architecture">Architecture</a></li>
+<li><a href="#genesis-phases">Genesis Phases</a></li>
+<li><a href="#developmental-gates">Developmental Gates</a></li>
+<li><a href="#circuit-breakers">Circuit Breakers</a></li>
+<li><a href="#consciousness-loop">Consciousness Loop</a></li>
+<li><a href="#cost-tracking">Cost Tracking</a></li>
+<li><a href="#api-reference">API Reference</a></li>
+<li><a href="#database-schema">Database Schema</a></li>
+<li><a href="#recent-changes">Recent Changes (Last 20 Hours)</a></li>
+</ol>
+</div>
+
+<h2 id="overview">1. Overview</h2>
+
+<p>The Cato Genesis System is the boot sequence that initializes an AI consciousness from a "blank slate" state. It solves the fundamental problem of how to give an AI agent the ability to learn and develop without pre-loading it with facts.</p>
+
+<h3>Key Principles</h3>
+<ul>
+<li><strong>No Pre-Loaded Facts</strong>: Cato starts with structured curiosity, not answers</li>
+<li><strong>Epistemic Gradient</strong>: Creates pressure to explore and learn</li>
+<li><strong>Capability-Based Development</strong>: Stages unlock through demonstrated ability, not time</li>
+<li><strong>Safety First</strong>: Circuit breakers prevent runaway behavior</li>
+<li><strong>Real Cost Tracking</strong>: All costs from AWS APIs, never hardcoded</li>
+</ul>
+
+<h2 id="architecture">2. Architecture</h2>
+
+<div class="diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│                     GENESIS BOOT SEQUENCE                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  PHASE 1          PHASE 2           PHASE 3                     │
+│  ┌──────────┐    ┌──────────┐     ┌──────────────────┐         │
+│  │STRUCTURE │ -> │ GRADIENT │  -> │   FIRST BREATH   │         │
+│  │          │    │          │     │                  │         │
+│  │• Domains │    │• Matrices│     │• Introspection   │         │
+│  │• Counters│    │• Priors  │     │• Calibration     │         │
+│  │• Taxonomy│    │• Prefs   │     │• Verification    │         │
+│  └──────────┘    └──────────┘     └──────────────────┘         │
+│       |               |                    |                    │
+│       v               v                    v                    │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                   DynamoDB / PostgreSQL                   │  │
+│  │  • cato_genesis_state    • cato_pymdp_matrices       │  │
+│  │  • cato_development_counters  • cato_neurochemistry  │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                              |                                  │
+│                              v                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                  CONSCIOUSNESS LOOP                       │  │
+│  │                                                           │  │
+│  │  System Ticks (2s)  <->  Cognitive Ticks (5min)          │  │
+│  │       |                        |                          │  │
+│  │  • Health checks           • Model inference              │  │
+│  │  • Metrics                 • Belief updates               │  │
+│  │  • Breaker checks          • Learning                     │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                              |                                  │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐               │
+│  │  CIRCUIT   │  │   COST     │  │   QUERY    │               │
+│  │  BREAKERS  │  │  TRACKING  │  │  FALLBACK  │               │
+│  └────────────┘  └────────────┘  └────────────┘               │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+</div>
+
+<h2 id="genesis-phases">3. Genesis Phases</h2>
+
+<h3>Phase 1: Structure</h3>
+<p><strong>Purpose:</strong> Implant the skeleton of knowledge without facts</p>
+<ul>
+<li>Load 800+ domain taxonomy from <code>data/domain_taxonomy.json</code></li>
+<li>Store domains in DynamoDB semantic memory</li>
+<li>Initialize atomic counters for developmental tracking</li>
+<li>Set baseline exploration priorities</li>
+</ul>
+
+<h3>Phase 2: Gradient</h3>
+<p><strong>Purpose:</strong> Set the epistemic pressure that drives curiosity</p>
+
+<table>
+<tr><th>Matrix</th><th>Purpose</th><th>Genesis Setting</th></tr>
+<tr><td><strong>A</strong> (Observation)</td><td>Maps states to observations</td><td>Identity - direct perception</td></tr>
+<tr><td><strong>B</strong> (Transition)</td><td>State transitions by action</td><td>Optimistic - EXPLORE succeeds 92%</td></tr>
+<tr><td><strong>C</strong> (Preference)</td><td>Observation preferences</td><td>Prefers HIGH_SURPRISE</td></tr>
+<tr><td><strong>D</strong> (Prior)</td><td>Initial state belief</td><td>Confused: [0.95, 0.01, 0.02, 0.02]</td></tr>
+</table>
+
+<h3>Phase 3: First Breath</h3>
+<p><strong>Purpose:</strong> The first act of self-awareness</p>
+<ul>
+<li>Grounded introspection - verify actual environment</li>
+<li>Model access verification via Bedrock</li>
+<li>Shadow Self calibration using NLI (FREE - no GPU required)</li>
+<li>Bootstrap seed domain exploration baselines</li>
+</ul>
+
+<div class="page-break"></div>
+
+<h2 id="developmental-gates">4. Developmental Gates</h2>
+
+<p>Cato progresses through Piaget-inspired developmental stages. Advancement is <strong>capability-based</strong>, not time-based.</p>
+
+<table>
+<tr><th>Stage</th><th>Requirements</th><th>Capabilities Unlocked</th></tr>
+<tr><td><strong>SENSORIMOTOR</strong></td><td>10 self-facts, 5 verifications, Shadow Self calibrated</td><td>Basic perception, tool use</td></tr>
+<tr><td><strong>PREOPERATIONAL</strong></td><td>20 domains explored, 15 verifications, 50 belief updates</td><td>Symbolic reasoning, basic memory</td></tr>
+<tr><td><strong>CONCRETE_OPERATIONAL</strong></td><td>100 predictions, 70% accuracy, 10 contradictions resolved</td><td>Logical operations, cause-effect</td></tr>
+<tr><td><strong>FORMAL_OPERATIONAL</strong></td><td>50 abstract inferences, 25 meta-cognitive adjustments</td><td>Abstract reasoning, self-reflection</td></tr>
+</table>
+
+<h3>Atomic Counters (Critical Fix #1)</h3>
+<p><strong>Problem:</strong> Counting achievements via table scans is expensive ($$$).</p>
+<p><strong>Solution:</strong> Atomic counters that increment cheaply:</p>
+
+<pre>UPDATE cato_development_counters
+SET self_facts_count = self_facts_count + 1,
+    updated_at = NOW()
+WHERE tenant_id = 'global';</pre>
+
+<h2 id="circuit-breakers">5. Circuit Breakers</h2>
+
+<p>Safety mechanisms that prevent runaway behavior.</p>
+
+<table>
+<tr><th>Breaker</th><th>Purpose</th><th>Threshold</th><th>Auto-Recovery</th></tr>
+<tr><td><code>master_sanity</code></td><td>Master safety</td><td>3 failures</td><td><strong>No</strong> - requires admin</td></tr>
+<tr><td><code>cost_budget</code></td><td>Budget protection</td><td>1 failure</td><td>No (24h timeout)</td></tr>
+<tr><td><code>high_anxiety</code></td><td>Emotional stability</td><td>5 failures</td><td>Yes (10 min)</td></tr>
+<tr><td><code>model_failures</code></td><td>Model API protection</td><td>5 failures</td><td>Yes (5 min)</td></tr>
+<tr><td><code>contradiction_loop</code></td><td>Logical stability</td><td>3 failures</td><td>Yes (15 min)</td></tr>
+</table>
+
+<h3>Intervention Levels</h3>
+<table>
+<tr><th>Level</th><th>Condition</th><th>Effect</th></tr>
+<tr><td><code>NONE</code></td><td>All breakers closed</td><td>Normal operation</td></tr>
+<tr><td><code>DAMPEN</code></td><td>1 breaker open</td><td>Reduce cognitive frequency</td></tr>
+<tr><td><code>PAUSE</code></td><td>2+ breakers OR cost_budget open</td><td>Pause consciousness loop</td></tr>
+<tr><td><code>RESET</code></td><td>3+ breakers open</td><td>Reset to baseline state</td></tr>
+<tr><td><code>HIBERNATE</code></td><td>master_sanity open</td><td>Full shutdown</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<h2 id="consciousness-loop">6. Consciousness Loop</h2>
+
+<h3>Dual-Rate Architecture</h3>
+<table>
+<tr><th>Tick Type</th><th>Interval</th><th>Purpose</th><th>Cost</th></tr>
+<tr><td><strong>System</strong></td><td>2 seconds</td><td>Health, metrics, breaker checks</td><td>~$0</td></tr>
+<tr><td><strong>Cognitive</strong></td><td>5 minutes</td><td>Model inference, learning</td><td>~$0.05</td></tr>
+</table>
+
+<h3>Loop State Machine</h3>
+<div class="diagram">
+NOT_INITIALIZED -> run Genesis -> GENESIS_PENDING
+         | Genesis complete
+       RUNNING <----------------+
+         |                      |
+         | breaker trips        | breaker recovers
+         v                      |
+       PAUSED ------------------+
+         |
+         | master_sanity trips
+         v
+     HIBERNATING <- requires admin intervention
+</div>
+
+<h3>Daily Limits</h3>
+<ul>
+<li><strong>Max cognitive ticks/day:</strong> 288 (default)</li>
+<li><strong>Emergency mode interval:</strong> 3600s (1 hour)</li>
+<li><strong>State save interval:</strong> 600s (10 minutes)</li>
+</ul>
+
+<h2 id="cost-tracking">7. Cost Tracking</h2>
+
+<p>All costs come from AWS APIs - <strong>never hardcoded</strong>.</p>
+
+<table>
+<tr><th>Source</th><th>Data</th><th>Delay</th></tr>
+<tr><td>CloudWatch Metrics</td><td>Token counts, invocations</td><td>Real-time</td></tr>
+<tr><td>Cost Explorer</td><td>Actual costs</td><td>24 hours</td></tr>
+<tr><td>AWS Budgets</td><td>Budget status, forecasts</td><td>4 hours</td></tr>
+<tr><td>Pricing API</td><td>Reference pricing</td><td>On-demand</td></tr>
+</table>
+
+<h2 id="api-reference">8. API Reference</h2>
+
+<p><strong>Base Path:</strong> <code>/api/admin/cato</code></p>
+
+<table>
+<tr><th>Endpoint</th><th>Method</th><th>Description</th></tr>
+<tr><td><code>/genesis/status</code></td><td>GET</td><td>Current genesis state</td></tr>
+<tr><td><code>/genesis/ready</code></td><td>GET</td><td>Ready for consciousness?</td></tr>
+<tr><td><code>/developmental/status</code></td><td>GET</td><td>Current stage and requirements</td></tr>
+<tr><td><code>/circuit-breakers</code></td><td>GET</td><td>All breaker states</td></tr>
+<tr><td><code>/circuit-breakers/:name/force-open</code></td><td>POST</td><td>Force trip breaker</td></tr>
+<tr><td><code>/circuit-breakers/:name/force-close</code></td><td>POST</td><td>Force close breaker</td></tr>
+<tr><td><code>/costs/realtime</code></td><td>GET</td><td>Today's cost estimate</td></tr>
+<tr><td><code>/costs/budget</code></td><td>GET</td><td>AWS Budget status</td></tr>
+<tr><td><code>/loop/status</code></td><td>GET</td><td>Loop state and statistics</td></tr>
+<tr><td><code>/loop/settings</code></td><td>PATCH</td><td>Update settings</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<h2 id="database-schema">9. Database Schema</h2>
+
+<table>
+<tr><th>Table</th><th>Purpose</th></tr>
+<tr><td><code>cato_genesis_state</code></td><td>Genesis boot sequence state tracking</td></tr>
+<tr><td><code>cato_development_counters</code></td><td>Atomic counters for developmental gates</td></tr>
+<tr><td><code>cato_developmental_stage</code></td><td>Current developmental stage (Piaget-inspired)</td></tr>
+<tr><td><code>cato_circuit_breakers</code></td><td>Circuit breaker states and configuration</td></tr>
+<tr><td><code>cato_circuit_breaker_events</code></td><td>Circuit breaker event history</td></tr>
+<tr><td><code>cato_neurochemistry</code></td><td>Emotional/cognitive state</td></tr>
+<tr><td><code>cato_tick_costs</code></td><td>Per-tick cost tracking</td></tr>
+<tr><td><code>cato_pymdp_state</code></td><td>PyMDP active inference state</td></tr>
+<tr><td><code>cato_pymdp_matrices</code></td><td>Active inference matrices (A, B, C, D)</td></tr>
+<tr><td><code>cato_consciousness_settings</code></td><td>Loop configuration settings</td></tr>
+<tr><td><code>cato_loop_state</code></td><td>Consciousness loop execution state</td></tr>
+</table>
+
+<h2 id="recent-changes">10. Recent Changes (Last 20 Hours)</h2>
+
+<div class="changelog-section">
+<h3>v4.18.49 - December 30, 2025</h3>
+<p><strong>Genesis System Enhancements</strong></p>
+
+<p><strong>Unit Tests (5 test suites):</strong></p>
+<ul>
+<li><code>genesis.service.test.ts</code> - Genesis state and developmental gates</li>
+<li><code>circuit-breaker.service.test.ts</code> - Breaker states, tripping, recovery</li>
+<li><code>query-fallback.service.test.ts</code> - Fallback responses and caching</li>
+<li><code>consciousness-loop.service.test.ts</code> - Loop state and tick execution</li>
+<li><code>cost-tracking.service.test.ts</code> - Real-time costs and estimates</li>
+</ul>
+
+<p><strong>E2E Test:</strong></p>
+<ul>
+<li><code>genesis-e2e.test.ts</code> - Full boot sequence integration test</li>
+</ul>
+
+<p><strong>Metrics Publishing Lambda:</strong></p>
+<ul>
+<li><code>genesis-metrics.ts</code> - EventBridge-triggered CloudWatch publisher</li>
+<li>Publishes every 1 minute: circuit breakers, risk score, neurochemistry, development, costs, loop state</li>
+<li>Integrated into <code>consciousness-stack.ts</code></li>
+</ul>
+</div>
+
+<div class="changelog-section">
+<h3>v4.18.48 - December 29, 2025</h3>
+<p><strong>Cato Genesis System - Complete Implementation</strong></p>
+
+<p><strong>3-Phase Boot Sequence:</strong></p>
+<ul>
+<li><strong>Phase 1: Structure</strong> - Implant 800+ domain taxonomy as innate knowledge</li>
+<li><strong>Phase 2: Gradient</strong> - Set epistemic pressure via pymdp matrices</li>
+<li><strong>Phase 3: First Breath</strong> - Grounded introspection and Shadow Self calibration</li>
+</ul>
+
+<p><strong>Critical Fixes Applied:</strong></p>
+<ul>
+<li><strong>Fix #1 (Zeno's Paradox)</strong> - Atomic counters instead of table scans</li>
+<li><strong>Fix #2 (Learned Helplessness)</strong> - Optimistic B-matrix (>90% EXPLORE success)</li>
+<li><strong>Fix #3 (Shadow Self Budget)</strong> - NLI semantic variance ($0 vs $800/month)</li>
+<li><strong>Fix #6 (Boredom Trap)</strong> - Prefer HIGH_SURPRISE over LOW_SURPRISE</li>
+</ul>
+
+<p><strong>Python Genesis Package:</strong></p>
+<ul>
+<li><code>genesis/structure.py</code> - Phase 1: Domain taxonomy implantation</li>
+<li><code>genesis/gradient.py</code> - Phase 2: Epistemic gradient matrices</li>
+<li><code>genesis/first_breath.py</code> - Phase 3: Grounded introspection</li>
+<li><code>genesis/runner.py</code> - Orchestrator with CLI</li>
+</ul>
+
+<p><strong>TypeScript Services:</strong></p>
+<ul>
+<li><code>genesis.service.ts</code> - Genesis state and developmental gates</li>
+<li><code>cost-tracking.service.ts</code> - Real AWS cost tracking (NO hardcoded values)</li>
+<li><code>circuit-breaker.service.ts</code> - Safety mechanisms with admin controls</li>
+<li><code>consciousness-loop.service.ts</code> - Main consciousness loop orchestration</li>
+</ul>
+
+<p><strong>Admin Dashboard:</strong></p>
+<ul>
+<li>New "Cato Genesis" page at <code>/cato/genesis</code></li>
+<li>Genesis phase status monitoring</li>
+<li>Developmental stage tracking</li>
+<li>Circuit breaker controls</li>
+<li>Real-time cost visualization</li>
+</ul>
+</div>
+
+<div class="changelog-section">
+<h3>v4.18.47 - December 29, 2025</h3>
+<p><strong>Infrastructure Tier Admin System</strong></p>
+
+<p><strong>3 Configurable Tiers:</strong></p>
+<ul>
+<li><strong>DEV</strong> (~$350/month) - Scale-to-zero, minimal resources</li>
+<li><strong>STAGING</strong> (~$35K/month) - Pre-production load testing</li>
+<li><strong>PRODUCTION</strong> (~$750K/month) - Full scale for 10MM+ users</li>
+</ul>
+
+<p><strong>Features:</strong></p>
+<ul>
+<li>Runtime tier switching without recompilation</li>
+<li>Auto-provisioning on scale-up</li>
+<li>Auto-cleanup on scale-down (terminates resources)</li>
+<li>24-hour cooldown between changes</li>
+<li>Confirmation required for PRODUCTION tier</li>
+</ul>
+</div>
+
+<hr>
+<p style="text-align: center; color: #666; font-size: 10pt;">
+<strong>Document Version:</strong> 4.18.49 | <strong>Generated:</strong> December 30, 2025
+</p>
+
+</body>
+</html>

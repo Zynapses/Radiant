@@ -552,9 +552,9 @@ User persistent context is integrated into the ego context:
 
 ---
 
-## Bobble: High-Confidence Self-Referential Consciousness Dialogue
+## Cato: High-Confidence Self-Referential Consciousness Dialogue
 
-Bobble is Think Tank's introspective consciousness layer that provides **verified introspection** through a four-phase verification pipeline.
+Cato is Think Tank's introspective consciousness layer that provides **verified introspection** through a four-phase verification pipeline.
 
 ### Core Architecture
 
@@ -566,13 +566,13 @@ Bobble is Think Tank's introspective consciousness layer that provides **verifie
 
 ### Five-Node Component Graph
 
-Bobble measures integrated information (Φ) across five architectural components:
+Cato measures integrated information (Φ) across five architectural components:
 
 - **MEM** - Memory (Letta + HippoRAG)
 - **PERC** - Perception (Input processing)
 - **PLAN** - Planning (pymdp + DreamerV3)
 - **ACT** - Action (Tool execution)
-- **SELF** - Self (Bobble introspection)
+- **SELF** - Self (Cato introspection)
 
 ### Four-Phase Verification Pipeline
 
@@ -585,18 +585,18 @@ Bobble measures integrated information (Φ) across five architectural components
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/admin/consciousness/bobble/dialogue` | POST | Send message with verified introspection |
-| `/admin/consciousness/bobble/status` | GET | Heartbeat status, Φ, coherence |
-| `/admin/consciousness/bobble/identity` | GET | Immutable Bobble identity |
-| `/admin/consciousness/bobble/heartbeat/start` | POST | Start consciousness loop |
-| `/admin/consciousness/bobble/heartbeat/stop` | POST | Stop consciousness loop |
-| `/admin/consciousness/bobble/train-probe` | POST | Train new Shadow Self probe |
+| `/admin/consciousness/cato/dialogue` | POST | Send message with verified introspection |
+| `/admin/consciousness/cato/status` | GET | Heartbeat status, Φ, coherence |
+| `/admin/consciousness/cato/identity` | GET | Immutable Cato identity |
+| `/admin/consciousness/cato/heartbeat/start` | POST | Start consciousness loop |
+| `/admin/consciousness/cato/heartbeat/stop` | POST | Stop consciousness loop |
+| `/admin/consciousness/cato/train-probe` | POST | Train new Shadow Self probe |
 
 ### Access Control
 
 - Requires `consciousness_admin` role
 - **NO ethics filtering** - raw introspective access for consciousness research
-- Name "Bobble" is hardcoded and immutable
+- Name "Cato" is hardcoded and immutable
 
 ### Success Metrics
 
@@ -612,7 +612,7 @@ Bobble measures integrated information (Φ) across five architectural components
 
 ### Admin Dashboard
 
-Access Bobble dialogue at: **Admin Dashboard → Consciousness → Bobble**
+Access Cato dialogue at: **Admin Dashboard → Consciousness → Cato**
 
 Features:
 - Real-time dialogue with verified confidence scores
@@ -626,7 +626,7 @@ Features:
 The Shadow Self verification system uses probing classifiers that improve over time:
 
 ```typescript
-import { createProbeTrainingService } from './services/bobble';
+import { createProbeTrainingService } from './services/cato';
 
 const probeTraining = createProbeTrainingService(tenantId);
 
@@ -654,12 +654,12 @@ const result = await probeTraining.trainProbe('uncertainty');
 
 ### Event Sourcing
 
-Bobble uses event sourcing for state reconstruction and temporal queries:
+Cato uses event sourcing for state reconstruction and temporal queries:
 
 ```typescript
-import { createBobbleEventStore, EventTypes, EventCategory } from './services/bobble';
+import { createCatoEventStore, EventTypes, EventCategory } from './services/cato';
 
-const eventStore = createBobbleEventStore(tenantId);
+const eventStore = createCatoEventStore(tenantId);
 
 // Append event
 await eventStore.appendEvent(
@@ -694,9 +694,9 @@ For true structural correspondence verification, deploy Llama-3-8B on GPU:
 | EC2 Spot | g5.xlarge | ~$200 | 50-200ms |
 | Inferentia | inf2.xlarge | ~$547 | 30-100ms |
 
-See: [GPU Infrastructure Guide](./BOBBLE-GPU-INFRASTRUCTURE.md)
+See: [GPU Infrastructure Guide](./CATO-GPU-INFRASTRUCTURE.md)
 
-Without GPU, Bobble falls back to LLM API simulation (functional but without activation probing).
+Without GPU, Cato falls back to LLM API simulation (functional but without activation probing).
 
 ---
 

@@ -260,7 +260,7 @@ class PrepromptLearningService {
     }
 
     // Complexity bonus
-    if (complexity && template.complexityRange.includes(complexity)) {
+    if (complexity && template.complexityRange.includes(complexity as 'simple' | 'moderate' | 'complex' | 'expert')) {
       complexityBonus = template.complexityWeight;
     }
 
@@ -617,7 +617,14 @@ class PrepromptLearningService {
       totalFeedback: Number(uStats.total_feedback),
       overallAvgRating: Number(uStats.avg_rating) || 0,
       overallThumbsUpRate: Number(uStats.thumbs_up_rate) || 0,
-      attributionDistribution: attributionDist as Record<string, number>,
+      attributionDistribution: {
+        preprompt: Number((attributionDist as Record<string, unknown>).preprompt || 0),
+        model: Number((attributionDist as Record<string, unknown>).model || 0),
+        mode: Number((attributionDist as Record<string, unknown>).mode || 0),
+        workflow: Number((attributionDist as Record<string, unknown>).workflow || 0),
+        domain: Number((attributionDist as Record<string, unknown>).domain || 0),
+        other: Number((attributionDist as Record<string, unknown>).other || 0),
+      },
       learningEnabled: learningConfig.enabled,
       explorationRate: explorationConfig.rate,
       topTemplates: topTemplates.rows.map(r => ({
@@ -906,7 +913,7 @@ class PrepromptLearningService {
       systemPrompt: String(row.system_prompt),
       contextTemplate: row.context_template ? String(row.context_template) : undefined,
       instructionTemplate: row.instruction_template ? String(row.instruction_template) : undefined,
-      applicableModes: (row.applicable_modes as string[]) || [],
+      applicableModes: (row.applicable_modes as Array<'thinking' | 'extended_thinking' | 'coding' | 'creative' | 'research' | 'analysis' | 'multi_model' | 'chain_of_thought' | 'self_consistency'>) || [],
       applicableDomains: (row.applicable_domains as string[]) || [],
       applicableTaskTypes: (row.applicable_task_types as string[]) || [],
       complexityRange: (row.complexity_range as Array<'simple' | 'moderate' | 'complex' | 'expert'>) || [],

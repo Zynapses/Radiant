@@ -5,6 +5,7 @@
  */
 
 import { Handler } from 'aws-lambda';
+import { logger } from '../shared/logging/enhanced-logger';
 import {
   NeptuneClient,
   CreateDBClusterCommand,
@@ -54,7 +55,7 @@ const TIER_CONFIGS: Record<string, {
 };
 
 export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) => {
-  console.log('Provisioning Neptune:', JSON.stringify(event));
+  logger.info('Provisioning Neptune:', { event });
 
   const { tenantId, toTier } = event;
   const config = TIER_CONFIGS[toTier];
@@ -71,7 +72,7 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
     return result;
   }
 
-  const clusterName = `bobble-graph-${tenantId.substring(0, 8)}`;
+  const clusterName = `cato-graph-${tenantId.substring(0, 8)}`;
 
   try {
     // Check if cluster exists
@@ -136,7 +137,7 @@ export const handler: Handler<TransitionEvent, ProvisionResult> = async (event) 
       }
     }
   } catch (error: any) {
-    console.error('Neptune provisioning error:', error);
+    logger.error('Neptune provisioning error:', error);
     result.status = 'FAILED';
     result.errors.push(error.message);
   }

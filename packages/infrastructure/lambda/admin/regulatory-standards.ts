@@ -626,3 +626,39 @@ export const getCategories: APIGatewayProxyHandler = async () => {
     if (client) client.release();
   }
 };
+
+// ============================================================================
+// Main Handler - Routes to individual handlers
+// ============================================================================
+export const handler: APIGatewayProxyHandler = async (event, context, callback): Promise<APIGatewayProxyResult> => {
+  const { httpMethod, path } = event;
+  const pathParts = path.split('/').filter(Boolean);
+  
+  // /admin/compliance/regulatory-standards/dashboard
+  if (pathParts[3] === 'dashboard' && httpMethod === 'GET') {
+    return (await getDashboard(event, context, callback)) || response(500, { success: false, error: 'No response' });
+  }
+  // /admin/compliance/regulatory-standards/categories
+  if (pathParts[3] === 'categories' && httpMethod === 'GET') {
+    return (await getCategories(event, context, callback)) || response(500, { success: false, error: 'No response' });
+  }
+  // /admin/compliance/regulatory-standards/:id/requirements
+  if (pathParts[4] === 'requirements') {
+    if (httpMethod === 'GET') return (await listRequirements(event, context, callback)) || response(500, { success: false, error: 'No response' });
+    if (httpMethod === 'PUT' || httpMethod === 'PATCH') return (await updateRequirement(event, context, callback)) || response(500, { success: false, error: 'No response' });
+  }
+  // /admin/compliance/regulatory-standards/:id/compliance
+  if (pathParts[4] === 'compliance') {
+    if (httpMethod === 'GET') return (await getTenantCompliance(event, context, callback)) || response(500, { success: false, error: 'No response' });
+    if (httpMethod === 'PUT' || httpMethod === 'PATCH') return (await updateTenantCompliance(event, context, callback)) || response(500, { success: false, error: 'No response' });
+  }
+  // /admin/compliance/regulatory-standards/:id
+  if (pathParts[3] && !pathParts[4]) {
+    if (httpMethod === 'GET') return (await getStandard(event, context, callback)) || response(500, { success: false, error: 'No response' });
+    if (httpMethod === 'PUT' || httpMethod === 'PATCH') return (await updateStandard(event, context, callback)) || response(500, { success: false, error: 'No response' });
+  }
+  // /admin/compliance/regulatory-standards
+  if (httpMethod === 'GET') return (await listStandards(event, context, callback)) || response(500, { success: false, error: 'No response' });
+  
+  return response(404, { success: false, error: 'Not found' });
+};

@@ -19,6 +19,7 @@
 import { Redis } from 'ioredis';
 import { query } from '../../database';
 import crypto from 'crypto';
+import { logger } from '../../../logging/enhanced-logger';
 
 export interface ConversationMessage {
   id: string;
@@ -103,7 +104,7 @@ export class TrustlessSync {
       if (row.content_hash) {
         const computedHash = this.hashContent(row.content);
         if (computedHash !== row.content_hash) {
-          console.error(`[COS] Integrity violation detected for message ${row.id}`);
+          logger.error(`[COS] Integrity violation detected for message ${row.id}`);
           integrityVerified = false;
           continue; // Skip tampered messages
         }
@@ -308,10 +309,10 @@ export async function logContextManipulationAttempt(params: {
     })]
   );
   
-  console.error(`[COS SECURITY] Context manipulation attempt detected:`, {
+  logger.error(`[COS SECURITY] Context manipulation attempt detected:`, undefined, { data: {
     tenantId: params.tenantId,
     userId: params.userId,
     conversationId: params.conversationId,
     discrepancyCount: params.discrepancies.length,
-  });
+  } });
 }

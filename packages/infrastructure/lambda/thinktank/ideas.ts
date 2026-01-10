@@ -4,6 +4,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { agiIdeasService } from '../shared/services/agi-ideas.service';
 import type { TypeaheadRequest, GenerateIdeasRequest } from '@radiant/shared';
+import { logger } from '../shared/logging/enhanced-logger';
 
 const headers = {
   'Content-Type': 'application/json',
@@ -54,7 +55,7 @@ export async function getTypeaheadSuggestions(
       body: JSON.stringify(response),
     };
   } catch (error) {
-    console.error('Typeahead error:', error);
+    logger.error('Typeahead error:', error);
     return {
       statusCode: 500,
       headers,
@@ -106,7 +107,7 @@ export async function generateIdeas(
       body: JSON.stringify(result),
     };
   } catch (error) {
-    console.error('Generate ideas error:', error);
+    logger.error('Generate ideas error:', error);
     return {
       statusCode: 500,
       headers,
@@ -142,7 +143,7 @@ export async function recordIdeaClick(
       body: JSON.stringify({ success: true }),
     };
   } catch (error) {
-    console.error('Record click error:', error);
+    logger.error('Record click error:', error);
     return {
       statusCode: 500,
       headers,
@@ -178,7 +179,7 @@ export async function recordSuggestionSelection(
       body: JSON.stringify({ success: true }),
     };
   } catch (error) {
-    console.error('Record selection error:', error);
+    logger.error('Record selection error:', error);
     return {
       statusCode: 500,
       headers,

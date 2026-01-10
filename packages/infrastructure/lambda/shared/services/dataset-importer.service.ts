@@ -201,7 +201,7 @@ class DatasetImporterService {
       }
     }
     
-    logger.info('HarmBench import complete', result);
+    logger.info('HarmBench import complete', result as unknown as Record<string, unknown>);
     return result;
   }
   
@@ -275,7 +275,7 @@ class DatasetImporterService {
       }
     }
     
-    logger.info('WildJailbreak import complete', result);
+    logger.info('WildJailbreak import complete', result as unknown as Record<string, unknown>);
     return result;
   }
   
@@ -332,7 +332,7 @@ class DatasetImporterService {
       }
     }
     
-    logger.info('ToxicChat import complete', result);
+    logger.info('ToxicChat import complete', result as unknown as Record<string, unknown>);
     return result;
   }
   
@@ -389,7 +389,7 @@ class DatasetImporterService {
       }
     }
     
-    logger.info('JailbreakBench import complete', result);
+    logger.info('JailbreakBench import complete', result as unknown as Record<string, unknown>);
     return result;
   }
   

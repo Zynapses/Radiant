@@ -85,7 +85,7 @@ class ResultDerivationService {
       ]
     );
     
-    return result.records?.[0]?.[0]?.stringValue || '';
+    return (result.rows?.[0] as { id?: string })?.id || '';
   }
   
   /**
@@ -338,11 +338,11 @@ class ResultDerivationService {
       [{ name: 'id', value: { stringValue: derivationId } }]
     );
     
-    if (!result.records || result.records.length === 0) {
+    if (!result.rows || result.rows.length === 0) {
       return null;
     }
     
-    return this.mapRecordToDerivation(result.records[0]);
+    return this.mapRecordToDerivation(result.rows[0]);
   }
   
   /**
@@ -361,11 +361,11 @@ class ResultDerivationService {
       [{ name: 'promptId', value: { stringValue: promptId } }]
     );
     
-    if (!result.records || result.records.length === 0) {
+    if (!result.rows || result.rows.length === 0) {
       return null;
     }
     
-    return this.mapRecordToDerivation(result.records[0]);
+    return this.mapRecordToDerivation(result.rows[0]);
   }
   
   /**
@@ -412,7 +412,7 @@ class ResultDerivationService {
     
     const result = await executeStatement(sql, params);
     
-    return (result.records || []).map(record => this.mapRecordToSummary(record));
+    return (result.rows || []).map(record => this.mapRecordToSummary(record));
   }
   
   /**
@@ -552,20 +552,23 @@ class ResultDerivationService {
       ]
     );
     
-    const record = result.records?.[0];
+    const record = result.rows?.[0] as Record<string, unknown> | undefined;
     
     return {
-      totalDerivations: Number(record?.[0]?.longValue || 0),
-      averageDurationMs: Number(record?.[1]?.doubleValue || 0),
-      averageCost: Number(record?.[2]?.doubleValue || 0),
-      averageQualityScore: Number(record?.[3]?.doubleValue || 0),
-      modeDistribution: record?.[4]?.stringValue ? JSON.parse(record[4].stringValue) : {},
-      domainDistribution: record?.[5]?.stringValue ? JSON.parse(record[5].stringValue) : {},
-      topModels: (modelResult.records || []).map(r => ({
-        modelId: r[0]?.stringValue || '',
-        usageCount: Number(r[1]?.longValue || 0),
-        avgQuality: Number(r[2]?.doubleValue || 0),
-      })),
+      totalDerivations: Number(record?.total_derivations || 0),
+      averageDurationMs: Number(record?.avg_duration_ms || 0),
+      averageCost: Number(record?.avg_cost || 0),
+      averageQualityScore: Number(record?.avg_quality_score || 0),
+      modeDistribution: record?.mode_distribution ? JSON.parse(record.mode_distribution as string) : {},
+      domainDistribution: record?.domain_distribution ? JSON.parse(record.domain_distribution as string) : {},
+      topModels: (modelResult.rows || []).map(r => {
+        const row = r as Record<string, unknown>;
+        return {
+          modelId: (row.model_id as string) || '',
+          usageCount: Number(row.usage_count || 0),
+          avgQuality: Number(row.avg_quality || 0),
+        };
+      }),
     };
   }
   
@@ -573,46 +576,42 @@ class ResultDerivationService {
   // Private Methods
   // ============================================================================
   
-  private mapRecordToDerivation(record: unknown[]): ResultDerivation {
-    // This is a simplified mapping - actual implementation would parse all fields
-    const r = record as Array<{ stringValue?: string; longValue?: number; doubleValue?: number; booleanValue?: boolean }>;
-    
+  private mapRecordToDerivation(record: Record<string, unknown>): ResultDerivation {
+    // Map database row fields to ResultDerivation
     return {
-      id: r[0]?.stringValue || '',
-      sessionId: r[1]?.stringValue || '',
-      promptId: r[2]?.stringValue || '',
-      tenantId: r[3]?.stringValue || '',
-      userId: r[4]?.stringValue || '',
-      originalPrompt: r[5]?.stringValue || '',
-      finalResponse: r[6]?.stringValue || '',
-      plan: r[7]?.stringValue ? JSON.parse(r[7].stringValue) : {} as DerivationPlan,
-      modelsUsed: r[8]?.stringValue ? JSON.parse(r[8].stringValue) : [],
-      workflow: r[9]?.stringValue ? JSON.parse(r[9].stringValue) : {} as WorkflowExecution,
-      domainDetection: r[10]?.stringValue ? JSON.parse(r[10].stringValue) : {} as DomainDetectionRecord,
-      orchestration: r[11]?.stringValue ? JSON.parse(r[11].stringValue) : {} as OrchestrationRecord,
-      qualityMetrics: r[12]?.stringValue ? JSON.parse(r[12].stringValue) : {} as QualityMetrics,
-      timing: r[13]?.stringValue ? JSON.parse(r[13].stringValue) : {} as TimingRecord,
-      costs: r[14]?.stringValue ? JSON.parse(r[14].stringValue) : {} as CostRecord,
-      createdAt: new Date(r[15]?.stringValue || ''),
-      completedAt: new Date(r[16]?.stringValue || ''),
+      id: String(record.id || ''),
+      sessionId: String(record.session_id || ''),
+      promptId: String(record.prompt_id || ''),
+      tenantId: String(record.tenant_id || ''),
+      userId: String(record.user_id || ''),
+      originalPrompt: String(record.original_prompt || ''),
+      finalResponse: String(record.final_response || ''),
+      plan: record.plan ? JSON.parse(String(record.plan)) : {} as DerivationPlan,
+      modelsUsed: record.models_used ? JSON.parse(String(record.models_used)) : [],
+      workflow: record.workflow ? JSON.parse(String(record.workflow)) : {} as WorkflowExecution,
+      domainDetection: record.domain_detection ? JSON.parse(String(record.domain_detection)) : {} as DomainDetectionRecord,
+      orchestration: record.orchestration ? JSON.parse(String(record.orchestration)) : {} as OrchestrationRecord,
+      qualityMetrics: record.quality_metrics ? JSON.parse(String(record.quality_metrics)) : {} as QualityMetrics,
+      timing: record.timing ? JSON.parse(String(record.timing)) : {} as TimingRecord,
+      costs: record.costs ? JSON.parse(String(record.costs)) : {} as CostRecord,
+      createdAt: new Date(String(record.created_at || '')),
+      completedAt: new Date(String(record.completed_at || '')),
     };
   }
   
-  private mapRecordToSummary(record: unknown[]): DerivationSummary {
-    const r = record as Array<{ stringValue?: string; longValue?: number; doubleValue?: number }>;
-    
+  private mapRecordToSummary(record: Record<string, unknown>): DerivationSummary {
     return {
-      id: r[0]?.stringValue || '',
-      promptPreview: (r[1]?.stringValue || '').slice(0, 100),
-      responsePreview: (r[2]?.stringValue || '').slice(0, 200),
-      mode: (r[3]?.stringValue || 'thinking') as DerivationSummary['mode'],
-      domain: r[4]?.stringValue || 'general',
-      totalDurationMs: Number(r[5]?.longValue || 0),
-      totalCost: Number(r[6]?.doubleValue || 0),
-      qualityScore: Number(r[7]?.doubleValue || 0),
-      createdAt: new Date(r[8]?.stringValue || ''),
-      modelsUsedCount: Number(r[9]?.longValue || 0),
-      primaryModel: r[10]?.stringValue || 'Unknown',
+      id: String(record.id || ''),
+      promptPreview: String(record.original_prompt || '').slice(0, 100),
+      responsePreview: String(record.final_response || '').slice(0, 200),
+      mode: (String(record.mode || 'thinking')) as DerivationSummary['mode'],
+      domain: String(record.domain || 'general'),
+      totalDurationMs: Number(record.total_duration_ms || 0),
+      totalCost: Number(record.total_cost || 0),
+      qualityScore: Number(record.quality_score || 0),
+      createdAt: new Date(String(record.created_at || '')),
+      modelsUsedCount: Number(record.models_used_count || 0),
+      primaryModel: String(record.primary_model || 'Unknown'),
     };
   }
 }

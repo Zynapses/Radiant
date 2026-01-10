@@ -6,6 +6,7 @@
 
 import { Handler } from 'aws-lambda';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
+import { logger } from '../shared/logging/enhanced-logger';
 
 const sns = new SNSClient({});
 
@@ -27,7 +28,7 @@ interface AlertResult {
 }
 
 export const handler: Handler<TransitionEvent, AlertResult> = async (event) => {
-  console.warn('Cleanup failed, sending alert:', JSON.stringify(event));
+  logger.warn('Cleanup failed, sending alert:', { event });
 
   const { tenantId, fromTier, toTier, requestedBy, error } = event;
   const prefix = tenantId.substring(0, 8);
@@ -38,16 +39,16 @@ export const handler: Handler<TransitionEvent, AlertResult> = async (event) => {
   
   if (fromTier === 'PRODUCTION') {
     orphanedResources.push(
-      `bobble-shadow-self-${prefix}-eu-west-1`,
-      `bobble-shadow-self-${prefix}-ap-northeast-1`,
-      `bobble-vectors-${prefix} (serverless collection)`
+      `cato-shadow-self-${prefix}-eu-west-1`,
+      `cato-shadow-self-${prefix}-ap-northeast-1`,
+      `cato-vectors-${prefix} (serverless collection)`
     );
   }
   
   if (fromTier !== 'DEV' && toTier === 'DEV') {
     orphanedResources.push(
-      `bobble-cache-${prefix} (ElastiCache cluster)`,
-      `bobble-graph-${prefix} (Neptune instances)`
+      `cato-cache-${prefix} (ElastiCache cluster)`,
+      `cato-graph-${prefix} (Neptune instances)`
     );
   }
 
@@ -58,7 +59,7 @@ export const handler: Handler<TransitionEvent, AlertResult> = async (event) => {
     if (topicArn) {
       await sns.send(new PublishCommand({
         TopicArn: topicArn,
-        Subject: `⚠️ WARNING: Bobble Tier Cleanup Failed (resources may be orphaned)`,
+        Subject: `⚠️ WARNING: Cato Tier Cleanup Failed (resources may be orphaned)`,
         Message: JSON.stringify({
           event: 'TIER_CLEANUP_FAILED',
           severity: 'MEDIUM',
@@ -73,10 +74,10 @@ export const handler: Handler<TransitionEvent, AlertResult> = async (event) => {
         }, null, 2)
       }));
       alertSent = true;
-      console.log('Alert sent successfully');
+      logger.info('Alert sent successfully');
     }
   } catch (snsError) {
-    console.error('Failed to send alert:', snsError);
+    logger.error('Failed to send alert:', snsError);
   }
 
   return {

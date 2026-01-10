@@ -9,6 +9,7 @@ import { SageMakerClient, DescribeEndpointCommand } from '@aws-sdk/client-sagema
 import { OpenSearchClient, DescribeDomainCommand } from '@aws-sdk/client-opensearch';
 import { ElastiCacheClient, DescribeReplicationGroupsCommand } from '@aws-sdk/client-elasticache';
 import { NeptuneClient, DescribeDBClustersCommand } from '@aws-sdk/client-neptune';
+import { logger } from '../shared/logging/enhanced-logger';
 
 const sagemaker = new SageMakerClient({});
 const opensearch = new OpenSearchClient({});
@@ -28,7 +29,7 @@ class ResourceNotReady extends Error {
 }
 
 export const handler: Handler<TransitionEvent, { verified: boolean; details: Record<string, string> }> = async (event) => {
-  console.log('Verifying provisioning:', JSON.stringify(event));
+  logger.info('Verifying provisioning:', { event });
 
   const { tenantId, toTier } = event;
   const prefix = tenantId.substring(0, 8);
@@ -37,7 +38,7 @@ export const handler: Handler<TransitionEvent, { verified: boolean; details: Rec
   // Check SageMaker endpoint
   try {
     const endpoint = await sagemaker.send(new DescribeEndpointCommand({
-      EndpointName: `bobble-shadow-self-${prefix}`
+      EndpointName: `cato-shadow-self-${prefix}`
     }));
     
     if (endpoint.EndpointStatus !== 'InService') {
@@ -57,7 +58,7 @@ export const handler: Handler<TransitionEvent, { verified: boolean; details: Rec
   if (toTier !== 'PRODUCTION') {
     try {
       const domain = await opensearch.send(new DescribeDomainCommand({
-        DomainName: `bobble-vectors-${prefix}`
+        DomainName: `cato-vectors-${prefix}`
       }));
       
       if (domain.DomainStatus?.Processing) {
@@ -80,7 +81,7 @@ export const handler: Handler<TransitionEvent, { verified: boolean; details: Rec
   if (toTier !== 'DEV') {
     try {
       const result = await elasticache.send(new DescribeReplicationGroupsCommand({
-        ReplicationGroupId: `bobble-cache-${prefix}`
+        ReplicationGroupId: `cato-cache-${prefix}`
       }));
       
       const status = result.ReplicationGroups?.[0]?.Status;
@@ -102,7 +103,7 @@ export const handler: Handler<TransitionEvent, { verified: boolean; details: Rec
   // Check Neptune
   try {
     const result = await neptune.send(new DescribeDBClustersCommand({
-      DBClusterIdentifier: `bobble-graph-${prefix}`
+      DBClusterIdentifier: `cato-graph-${prefix}`
     }));
     
     const status = result.DBClusters?.[0]?.Status;
@@ -118,6 +119,6 @@ export const handler: Handler<TransitionEvent, { verified: boolean; details: Rec
     throw error;
   }
 
-  console.log('All resources verified:', details);
+  logger.info('All resources verified:', { data: details });
   return { verified: true, details };
 };

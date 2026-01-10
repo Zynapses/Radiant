@@ -5,7 +5,7 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
-import { executeStatement } from '../shared/db/client';
+import { executeStatement, toSqlParams, stringParam, longParam } from '../shared/db/client';
 import {
   reasoningTeacher,
   inferenceStudent,
@@ -238,16 +238,17 @@ async function getTeacherStats(event: APIGatewayProxyEvent): Promise<APIGatewayP
       AVG(quality_score) as avg_quality,
       SUM(cost_usd) as total_cost
     FROM distillation_training_data
-    WHERE tenant_id = :tenantId
+    WHERE tenant_id = $1
     GROUP BY status
-  `, { tenantId });
+  `, [stringParam('tenantId', tenantId)]);
 
   const stats: Record<string, { count: number; avgQuality: number | null; totalCost: number }> = {};
   for (const row of result.rows || []) {
-    stats[row.status] = {
-      count: parseInt(row.count, 10),
-      avgQuality: row.avg_quality ? parseFloat(row.avg_quality) : null,
-      totalCost: parseFloat(row.total_cost || '0'),
+    const r = row as { status: string; count: string; avg_quality: string | null; total_cost: string | null };
+    stats[r.status] = {
+      count: parseInt(r.count, 10),
+      avgQuality: r.avg_quality ? parseFloat(r.avg_quality) : null,
+      totalCost: parseFloat(r.total_cost || '0'),
     };
   }
 
@@ -263,10 +264,10 @@ async function getTeacherTraces(event: APIGatewayProxyEvent): Promise<APIGateway
     SELECT id, input_prompt, task_type, teacher_model_id, confidence_score, 
            quality_score, status, created_at
     FROM distillation_training_data
-    WHERE tenant_id = :tenantId AND status = :status
+    WHERE tenant_id = $1 AND status = $2
     ORDER BY created_at DESC
-    LIMIT :limit
-  `, { tenantId, status, limit });
+    LIMIT $3
+  `, [stringParam('tenantId', tenantId), stringParam('status', status), longParam('limit', limit)]);
 
   return success({ traces: result.rows || [] });
 }
@@ -301,10 +302,10 @@ async function getStudentVersions(event: APIGatewayProxyEvent): Promise<APIGatew
     SELECT id, version_number, base_model, training_examples_count, 
            accuracy_score, latency_p50_ms, is_active, created_at
     FROM inference_student_versions
-    WHERE tenant_id = :tenantId
+    WHERE tenant_id = $1
     ORDER BY version_number DESC
     LIMIT 20
-  `, { tenantId });
+  `, [stringParam('tenantId', tenantId)]);
 
   return success({ versions: result.rows || [] });
 }
@@ -317,7 +318,7 @@ async function promoteStudentVersion(event: APIGatewayProxyEvent): Promise<APIGa
     return error(400, 'Missing required field: versionId');
   }
 
-  await inferenceStudent.promoteVersion(body.versionId, tenantId);
+  await inferenceStudent.promote(tenantId, body.versionId);
   return success({ success: true });
 }
 
@@ -332,20 +333,18 @@ async function getDistillationJobs(event: APIGatewayProxyEvent): Promise<APIGate
     SELECT id, status, examples_collected, training_job_arn, 
            started_at, completed_at, error_message
     FROM distillation_jobs
-    WHERE tenant_id = :tenantId
+    WHERE tenant_id = $1
     ORDER BY started_at DESC
     LIMIT 20
-  `, { tenantId });
+  `, [stringParam('tenantId', tenantId)]);
 
   return success({ jobs: result.rows || [] });
 }
 
 async function startDistillationJob(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   const tenantId = getTenantId(event);
-  const body = JSON.parse(event.body || '{}');
-
-  const jobId = await inferenceStudent.startDistillationJob(tenantId, body.config);
-  return success({ jobId });
+  // Distillation jobs are triggered by LoRA evolution pipeline, not directly
+  return error(501, 'Distillation jobs are managed by the LoRA evolution pipeline');
 }
 
 // =============================================================================
@@ -368,7 +367,7 @@ async function cacheGet(event: APIGatewayProxyEvent): Promise<APIGatewayProxyRes
   );
 
   if (cached) {
-    return success({ hit: true, response: cached.response, similarity: cached.similarity });
+    return success({ hit: true, response: cached.response });
   }
   return success({ hit: false });
 }
@@ -397,12 +396,11 @@ async function cacheInvalidate(event: APIGatewayProxyEvent): Promise<APIGatewayP
   const body = JSON.parse(event.body || '{}');
   const tenantId = getTenantId(event);
 
-  const deleted = await semanticCache.invalidate(
-    tenantId,
-    body.modelId,
-    body.domainIds,
-    body.olderThan ? new Date(body.olderThan) : undefined
-  );
+  const deleted = await semanticCache.invalidate(tenantId, {
+    modelId: body.modelId,
+    domainIds: body.domainIds,
+    olderThan: body.olderThan ? new Date(body.olderThan) : undefined,
+  });
 
   return success({ deleted });
 }
@@ -426,13 +424,11 @@ async function metacognitionAssess(event: APIGatewayProxyEvent): Promise<APIGate
     return error(400, 'Missing required fields: prompt, response');
   }
 
-  const assessment = await metacognitionService.assessConfidence({
+  const assessment = await metacognitionService.assessConfidence(
     tenantId,
-    subjectType: 'response',
-    subjectContent: body.response,
-    prompt: body.prompt,
-    domainId: body.domainId,
-  });
+    body.response,
+    'response'
+  );
 
   return success(assessment);
 }
@@ -446,17 +442,18 @@ async function getMetacognitionStats(event: APIGatewayProxyEvent): Promise<APIGa
       COUNT(*) FILTER (WHERE suggested_action = 'escalate') as escalation_count,
       COUNT(*) as total_count
     FROM confidence_assessments
-    WHERE tenant_id = :tenantId
+    WHERE tenant_id = $1
       AND created_at > NOW() - INTERVAL '7 days'
-  `, { tenantId });
+  `, [stringParam('tenantId', tenantId)]);
 
-  const row = result.rows?.[0] || {};
+  const row = (result.rows?.[0] || {}) as { avg_confidence?: string; escalation_count?: string; total_count?: string };
+  const totalCount = parseInt(row.total_count || '0', 10);
   return success({
     avgConfidence: parseFloat(row.avg_confidence || '0'),
-    escalationRate: row.total_count > 0 
-      ? parseInt(row.escalation_count || '0', 10) / parseInt(row.total_count, 10) 
+    escalationRate: totalCount > 0 
+      ? parseInt(row.escalation_count || '0', 10) / totalCount
       : 0,
-    totalAssessments: parseInt(row.total_count || '0', 10),
+    totalAssessments: totalCount,
   });
 }
 
@@ -486,7 +483,7 @@ async function rewardScore(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
     },
   };
 
-  const scores = await rewardModel.scoreResponses(body.responses, context);
+  const scores = await rewardModel.scoreMultiple(body.responses, context);
   return success({ scores });
 }
 
@@ -528,10 +525,10 @@ async function getCounterfactualCandidates(event: APIGatewayProxyEvent): Promise
     SELECT id, request_id, original_model, alternative_models, 
            created_at, simulated
     FROM counterfactual_candidates
-    WHERE tenant_id = :tenantId
+    WHERE tenant_id = $1
     ORDER BY created_at DESC
-    LIMIT :limit
-  `, { tenantId, limit });
+    LIMIT $2
+  `, [stringParam('tenantId', tenantId), longParam('limit', limit)]);
 
   return success({ candidates: result.rows || [] });
 }
@@ -556,7 +553,7 @@ async function getCounterfactualResults(event: APIGatewayProxyEvent): Promise<AP
   const tenantId = getTenantId(event);
   const limit = parseInt(event.queryStringParameters?.limit || '50', 10);
 
-  const results = await counterfactualSimulator.getResults(tenantId, limit);
+  const results = await counterfactualSimulator.getSimulations(tenantId, { limit });
   return success({ results });
 }
 
@@ -568,7 +565,7 @@ async function getKnowledgeGaps(event: APIGatewayProxyEvent): Promise<APIGateway
   const tenantId = getTenantId(event);
   const status = event.queryStringParameters?.status;
 
-  const gaps = await curiosityEngine.getKnowledgeGaps(tenantId, status);
+  const gaps = await curiosityEngine.getKnowledgeGaps(tenantId, { minImportance: 0 });
   return success({ gaps });
 }
 
@@ -576,7 +573,7 @@ async function getCuriosityGoals(event: APIGatewayProxyEvent): Promise<APIGatewa
   const tenantId = getTenantId(event);
   const status = event.queryStringParameters?.status;
 
-  const goals = await curiosityEngine.getGoals(tenantId, status);
+  const goals = await curiosityEngine.getActiveGoals(tenantId);
   return success({ goals });
 }
 
@@ -588,8 +585,17 @@ async function exploreKnowledgeGap(event: APIGatewayProxyEvent): Promise<APIGate
     return error(400, 'Missing required field: gapId');
   }
 
-  const explorationId = await curiosityEngine.exploreGap(body.gapId, tenantId);
-  return success({ explorationId });
+  // Generate a goal from the gap and then explore it
+  const gap = (await curiosityEngine.getKnowledgeGaps(tenantId, { limit: 100 })).find(g => g.id === body.gapId);
+  if (!gap) {
+    return error(404, 'Knowledge gap not found');
+  }
+  const goal = await curiosityEngine.generateGoalFromGap(tenantId, gap);
+  if (!goal) {
+    return error(400, 'Could not generate goal from gap');
+  }
+  const explorationResult = await curiosityEngine.exploreGoal(tenantId, goal.id, { maxTokens: 10000, maxCost: 1.0 });
+  return success({ goalId: goal.id, ...explorationResult });
 }
 
 // =============================================================================
@@ -625,10 +631,10 @@ async function getCausalChain(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     return error(400, 'Missing required query parameter: conversationId');
   }
 
-  const chain = await causalTracker.buildCausalChain(
+  const chain = await causalTracker.getCausalChain(
     tenantId,
     conversationId,
-    turnId
+    turnId || ''
   );
 
   return success(chain);
@@ -646,25 +652,26 @@ async function getDashboard(event: APIGatewayProxyEvent): Promise<APIGatewayProx
     executeStatement(`
       SELECT status, COUNT(*) as count 
       FROM distillation_training_data 
-      WHERE tenant_id = :tenantId 
+      WHERE tenant_id = $1 
       GROUP BY status
-    `, { tenantId }),
+    `, [stringParam('tenantId', tenantId)]),
     semanticCache.getMetrics(tenantId),
     executeStatement(`
       SELECT COUNT(*) as count 
       FROM knowledge_gaps 
-      WHERE tenant_id = :tenantId AND status = 'identified'
-    `, { tenantId }),
+      WHERE tenant_id = $1
+    `, [stringParam('tenantId', tenantId)]),
     executeStatement(`
       SELECT COUNT(*) as count 
       FROM curiosity_goals 
-      WHERE tenant_id = :tenantId AND status IN ('pending', 'active')
-    `, { tenantId }),
+      WHERE tenant_id = $1 AND status IN ('pending', 'active')
+    `, [stringParam('tenantId', tenantId)]),
   ]);
 
   const traceStats: Record<string, number> = {};
   for (const row of teacherStats.rows || []) {
-    traceStats[row.status] = parseInt(row.count, 10);
+    const r = row as { status: string; count: string };
+    traceStats[r.status] = parseInt(r.count, 10);
   }
 
   return success({
@@ -675,8 +682,8 @@ async function getDashboard(event: APIGatewayProxyEvent): Promise<APIGatewayProx
     },
     cache: cacheMetrics,
     curiosity: {
-      knowledgeGaps: parseInt(gapsCount.rows?.[0]?.count || '0', 10),
-      activeGoals: parseInt(goalsCount.rows?.[0]?.count || '0', 10),
+      knowledgeGaps: parseInt((gapsCount.rows?.[0] as { count?: string })?.count || '0', 10),
+      activeGoals: parseInt((goalsCount.rows?.[0] as { count?: string })?.count || '0', 10),
     },
   });
 }

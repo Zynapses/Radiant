@@ -26,6 +26,7 @@ import { DynamicBudgetCalculator } from './nervous-system/dynamic-budget-calcula
 import { BudgetAwareContextAssembler } from './nervous-system/budget-aware-context-assembler';
 import { DualWriteFlashBuffer } from './iron-core/dual-write-flash-buffer';
 import { HumanOversightQueue } from './subconscious/human-oversight-queue';
+import { logger } from '../../logging/enhanced-logger';
 import { 
   GhostVector, 
   SOFAIRoutingResult, 
@@ -231,7 +232,7 @@ export class COSCatoIntegration {
       }
     } catch (error) {
       // Ghost update is non-critical, log and continue
-      console.warn('[COS] Ghost update failed:', error);
+      logger.warn('[COS] Ghost update failed:', { data: error });
     }
   }
   

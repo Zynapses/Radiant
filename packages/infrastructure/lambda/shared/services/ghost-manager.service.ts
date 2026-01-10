@@ -335,10 +335,11 @@ class GhostManagerService {
         ]
       );
 
-      if (result.records && result.records.length > 0) {
-        const matrixData = result.records[0][0].stringValue;
-        if (matrixData) {
-          const parsed = JSON.parse(matrixData);
+      if (result.rows && result.rows.length > 0) {
+        const row = result.rows[0] as Record<string, unknown>;
+        const matrixString = row?.matrix_data as string | undefined;
+        if (matrixString) {
+          const parsed = JSON.parse(matrixString);
           return parsed.map((row: number[]) => new Float32Array(row));
         }
       }

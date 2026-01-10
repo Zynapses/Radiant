@@ -5,8 +5,9 @@
 
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { executeStatement } from '../shared/db/client';
-import { successResponse, errorResponse } from '../shared/middleware/api-response';
+import { successResponse, handleError } from '../shared/middleware/api-response';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { NotFoundError, ValidationError, InternalError } from '../shared/errors';
 
 // ============================================================================
 // Types
@@ -68,10 +69,10 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return await getRecentExecutions(limit, methodCode);
     }
 
-    return errorResponse(404, 'NOT_FOUND', 'Endpoint not found');
+    return handleError(new NotFoundError('Endpoint not found'));
   } catch (error) {
     logger.error('Orchestration methods admin error', { error });
-    return errorResponse(500, 'INTERNAL_ERROR', 'Internal server error');
+    return handleError(new InternalError('Internal server error'));
   }
 }
 
@@ -82,9 +83,11 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 async function getAllMethods(): Promise<APIGatewayProxyResult> {
   const result = await executeStatement(
     `SELECT 
-      method_id, method_code, method_name, description, method_category,
-      default_parameters, parameter_schema, implementation_type,
-      prompt_template, code_reference, model_role, recommended_models, is_enabled
+      method_id, method_code, method_name, display_name, scientific_name,
+      description, method_category, default_parameters, parameter_schema, 
+      implementation_type, prompt_template, code_reference, model_role, 
+      recommended_models, research_reference, accuracy_improvement, 
+      complexity_level, is_system_method, is_enabled
      FROM orchestration_methods
      ORDER BY method_category, method_name`,
     []
@@ -101,17 +104,52 @@ async function getMethod(methodCode: string): Promise<APIGatewayProxyResult> {
   );
 
   if (result.rows.length === 0) {
-    return errorResponse(404, 'NOT_FOUND', `Method ${methodCode} not found`);
+    return handleError(new NotFoundError(`Method ${methodCode} not found`));
   }
 
   const method = mapMethod(result.rows[0] as Record<string, unknown>);
   return successResponse({ method });
 }
 
+interface MethodUpdateRequest {
+  defaultParameters?: Record<string, unknown>;
+  isEnabled?: boolean;
+  // These fields can only be updated for non-system methods
+  methodName?: string;
+  description?: string;
+  promptTemplate?: string;
+  codeReference?: string;
+}
+
 async function updateMethod(
   methodCode: string,
-  updates: { defaultParameters?: Record<string, unknown>; isEnabled?: boolean }
+  updates: MethodUpdateRequest
 ): Promise<APIGatewayProxyResult> {
+  // First, check if this is a system method
+  const checkResult = await executeStatement(
+    `SELECT is_system_method FROM orchestration_methods WHERE method_code = $1`,
+    [{ name: 'code', value: { stringValue: methodCode } }]
+  );
+
+  if (checkResult.rows.length === 0) {
+    return handleError(new NotFoundError(`Method ${methodCode} not found`));
+  }
+
+  const isSystemMethod = (checkResult.rows[0] as Record<string, unknown>).is_system_method !== false;
+
+  // For system methods, only allow updating defaultParameters and isEnabled
+  if (isSystemMethod) {
+    const nonParameterUpdates = ['methodName', 'description', 'promptTemplate', 'codeReference']
+      .filter(key => updates[key as keyof MethodUpdateRequest] !== undefined);
+    
+    if (nonParameterUpdates.length > 0) {
+      return handleError(new ValidationError(
+        `System methods cannot be modified. Only default parameters and enabled status can be changed. ` +
+        `Attempted to modify: ${nonParameterUpdates.join(', ')}`
+      ));
+    }
+  }
+
   const setClauses: string[] = [];
   const params: Array<{ name: string; value: { stringValue?: string; booleanValue?: boolean } }> = [
     { name: 'code', value: { stringValue: methodCode } },
@@ -119,6 +157,7 @@ async function updateMethod(
 
   let paramIndex = 2;
 
+  // Always allowed for both system and user methods
   if (updates.defaultParameters !== undefined) {
     setClauses.push(`default_parameters = $${paramIndex}`);
     params.push({ name: `p${paramIndex}`, value: { stringValue: JSON.stringify(updates.defaultParameters) } });
@@ -131,8 +170,35 @@ async function updateMethod(
     paramIndex++;
   }
 
+  // Only for non-system methods
+  if (!isSystemMethod) {
+    if (updates.methodName !== undefined) {
+      setClauses.push(`method_name = $${paramIndex}`);
+      params.push({ name: `p${paramIndex}`, value: { stringValue: updates.methodName } });
+      paramIndex++;
+    }
+
+    if (updates.description !== undefined) {
+      setClauses.push(`description = $${paramIndex}`);
+      params.push({ name: `p${paramIndex}`, value: { stringValue: updates.description } });
+      paramIndex++;
+    }
+
+    if (updates.promptTemplate !== undefined) {
+      setClauses.push(`prompt_template = $${paramIndex}`);
+      params.push({ name: `p${paramIndex}`, value: { stringValue: updates.promptTemplate } });
+      paramIndex++;
+    }
+
+    if (updates.codeReference !== undefined) {
+      setClauses.push(`code_reference = $${paramIndex}`);
+      params.push({ name: `p${paramIndex}`, value: { stringValue: updates.codeReference } });
+      paramIndex++;
+    }
+  }
+
   if (setClauses.length === 0) {
-    return errorResponse(400, 'BAD_REQUEST', 'No valid updates provided');
+    return handleError(new ValidationError('No valid updates provided'));
   }
 
   setClauses.push('updated_at = NOW()');
@@ -141,6 +207,8 @@ async function updateMethod(
     `UPDATE orchestration_methods SET ${setClauses.join(', ')} WHERE method_code = $1`,
     params
   );
+
+  logger.info('Method updated', { methodCode, isSystemMethod, updates: Object.keys(updates) });
 
   return await getMethod(methodCode);
 }
@@ -297,6 +365,8 @@ function mapMethod(row: Record<string, unknown>) {
     methodId: String(row.method_id),
     methodCode: String(row.method_code),
     methodName: String(row.method_name),
+    displayName: row.display_name ? String(row.display_name) : String(row.method_name),
+    scientificName: row.scientific_name ? String(row.scientific_name) : undefined,
     description: String(row.description || ''),
     methodCategory: String(row.method_category),
     defaultParameters: typeof row.default_parameters === 'string'
@@ -310,6 +380,10 @@ function mapMethod(row: Record<string, unknown>) {
     codeReference: row.code_reference ? String(row.code_reference) : undefined,
     modelRole: String(row.model_role || 'generator'),
     recommendedModels: (row.recommended_models as string[]) || [],
+    researchReference: row.research_reference ? String(row.research_reference) : undefined,
+    accuracyImprovement: row.accuracy_improvement ? String(row.accuracy_improvement) : undefined,
+    complexityLevel: row.complexity_level ? String(row.complexity_level) as 'simple' | 'moderate' | 'advanced' | 'expert' : 'moderate',
+    isSystemMethod: row.is_system_method !== false, // Default true for backward compatibility
     isEnabled: Boolean(row.is_enabled),
   };
 }

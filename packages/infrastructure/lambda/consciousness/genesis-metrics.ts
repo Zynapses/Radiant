@@ -18,13 +18,13 @@
 import { ScheduledHandler } from 'aws-lambda';
 import { CloudWatchClient, PutMetricDataCommand, MetricDatum } from '@aws-sdk/client-cloudwatch';
 import { logger } from '../shared/logging/enhanced-logger';
-import { genesisService } from '../shared/services/bobble/genesis.service';
-import { circuitBreakerService } from '../shared/services/bobble/circuit-breaker.service';
-import { costTrackingService } from '../shared/services/bobble/cost-tracking.service';
-import { consciousnessLoopService } from '../shared/services/bobble/consciousness-loop.service';
+import { genesisService } from '../shared/services/cato/genesis.service';
+import { circuitBreakerService } from '../shared/services/cato/circuit-breaker.service';
+import { costTrackingService } from '../shared/services/cato/cost-tracking.service';
+import { consciousnessLoopService } from '../shared/services/cato/consciousness-loop.service';
 
 const cloudwatch = new CloudWatchClient({ region: process.env.AWS_REGION || 'us-east-1' });
-const NAMESPACE = 'Bobble/Consciousness';
+const NAMESPACE = 'Cato/Consciousness';
 const ENVIRONMENT = process.env.ENVIRONMENT || 'dev';
 
 interface MetricBatch {
@@ -85,14 +85,8 @@ export const handler: ScheduledHandler = async (event) => {
       durationMs: duration
     });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        success: true,
-        metricsCount: allMetrics.length,
-        durationMs: duration
-      })
-    };
+    // ScheduledHandler returns void, just log success
+    logger.info('Genesis metrics published', { metricsCount: allMetrics.length, durationMs: duration });
 
   } catch (error) {
     logger.error('Genesis metrics publishing failed', { error });

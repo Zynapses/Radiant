@@ -9,6 +9,7 @@
 import { createClient, RedisClientType } from 'redis';
 import { query } from '../database';
 import { RecoveryState, RejectionEntry } from './types';
+import { logger } from '../../logging/enhanced-logger';
 
 // Default TTLs in seconds (for Redis) and milliseconds (for in-memory)
 // These can be overridden per-tenant via cato_tenant_config
@@ -74,7 +75,7 @@ class CatoStateService {
         });
       }
     } catch (error) {
-      console.error('[CATO State] Failed to load tenant TTLs:', error);
+      logger.error('[CATO State] Failed to load tenant TTLs:', error);
     }
   }
 
@@ -99,7 +100,7 @@ class CatoStateService {
     const redisPort = process.env.CATO_REDIS_PORT || '6379';
 
     if (!redisEndpoint) {
-      console.log('[CATO State] No Redis endpoint configured, using in-memory storage');
+      logger.info('[CATO State] No Redis endpoint configured, using in-memory storage');
       return;
     }
 
@@ -111,7 +112,7 @@ class CatoStateService {
           connectTimeout: 5000,
           reconnectStrategy: (retries: number) => {
             if (retries > 3) {
-              console.warn('[CATO State] Redis reconnect failed, falling back to in-memory');
+              logger.warn('[CATO State] Redis reconnect failed, falling back to in-memory');
               return false;
             }
             return Math.min(retries * 100, 3000);
@@ -120,23 +121,23 @@ class CatoStateService {
       });
 
       this.redisClient.on('error', (err: Error) => {
-        console.error('[CATO State] Redis error:', err.message);
+        logger.error('[CATO State] Redis error:', undefined, { data: err.message });
         this.redisConnected = false;
       });
 
       this.redisClient.on('connect', () => {
-        console.log('[CATO State] Redis connected');
+        logger.info('[CATO State] Redis connected');
         this.redisConnected = true;
       });
 
       this.redisClient.on('disconnect', () => {
-        console.log('[CATO State] Redis disconnected');
+        logger.info('[CATO State] Redis disconnected');
         this.redisConnected = false;
       });
 
       await this.redisClient.connect();
     } catch (error) {
-      console.warn('[CATO State] Failed to connect to Redis, using in-memory:', error);
+      logger.warn('[CATO State] Failed to connect to Redis, using in-memory:', { data: error });
       this.redisClient = null;
     }
   }
@@ -192,7 +193,7 @@ class CatoStateService {
         const length = await this.redisClient!.lLen(key);
         return length;
       } catch (error) {
-        console.error('[CATO State] Redis recordRejection failed:', error);
+        logger.error('[CATO State] Redis recordRejection failed:', error);
         // Fall through to in-memory
       }
     }
@@ -216,7 +217,7 @@ class CatoStateService {
         const entries = await this.redisClient!.lRange(key, 0, -1);
         return entries.map((e: string) => JSON.parse(e) as RejectionEntry);
       } catch (error) {
-        console.error('[CATO State] Redis getRejectionHistory failed:', error);
+        logger.error('[CATO State] Redis getRejectionHistory failed:', error);
       }
     }
 
@@ -236,7 +237,7 @@ class CatoStateService {
         await this.redisClient!.del(KEYS.REJECTION + sessionId);
         return;
       } catch (error) {
-        console.error('[CATO State] Redis clearRejectionHistory failed:', error);
+        logger.error('[CATO State] Redis clearRejectionHistory failed:', error);
       }
     }
     this.rejectionHistory.delete(sessionId);
@@ -250,10 +251,10 @@ class CatoStateService {
       try {
         const key = KEYS.PERSONA + sessionId;
         await this.redisClient!.set(key, personaName, { EX: TTL.PERSONA_OVERRIDE });
-        console.log(`[CATO] Session ${sessionId} persona override set to: ${personaName} (Redis)`);
+        logger.info(`[CATO] Session ${sessionId} persona override set to: ${personaName} (Redis)`);
         return;
       } catch (error) {
-        console.error('[CATO State] Redis setPersonaOverride failed:', error);
+        logger.error('[CATO State] Redis setPersonaOverride failed:', error);
       }
     }
 
@@ -262,7 +263,7 @@ class CatoStateService {
       value: personaName,
       expiresAt: Date.now() + TTL_MS.PERSONA_OVERRIDE,
     });
-    console.log(`[CATO] Session ${sessionId} persona override set to: ${personaName}`);
+    logger.info(`[CATO] Session ${sessionId} persona override set to: ${personaName}`);
   }
 
   /**
@@ -274,7 +275,7 @@ class CatoStateService {
         const value = await this.redisClient!.get(KEYS.PERSONA + sessionId);
         return value;
       } catch (error) {
-        console.error('[CATO State] Redis getPersonaOverride failed:', error);
+        logger.error('[CATO State] Redis getPersonaOverride failed:', error);
       }
     }
 
@@ -296,7 +297,7 @@ class CatoStateService {
         await this.redisClient!.del(KEYS.PERSONA + sessionId);
         return;
       } catch (error) {
-        console.error('[CATO State] Redis clearPersonaOverride failed:', error);
+        logger.error('[CATO State] Redis clearPersonaOverride failed:', error);
       }
     }
     this.personaOverrides.delete(sessionId);
@@ -312,7 +313,7 @@ class CatoStateService {
         await this.redisClient!.set(key, JSON.stringify(state), { EX: TTL.RECOVERY_STATE });
         return;
       } catch (error) {
-        console.error('[CATO State] Redis setRecoveryState failed:', error);
+        logger.error('[CATO State] Redis setRecoveryState failed:', error);
       }
     }
 
@@ -332,7 +333,7 @@ class CatoStateService {
         const value = await this.redisClient!.get(KEYS.RECOVERY + sessionId);
         return value ? JSON.parse(value) as RecoveryState : null;
       } catch (error) {
-        console.error('[CATO State] Redis getRecoveryState failed:', error);
+        logger.error('[CATO State] Redis getRecoveryState failed:', error);
       }
     }
 
@@ -354,7 +355,7 @@ class CatoStateService {
         await this.redisClient!.del(KEYS.RECOVERY + sessionId);
         return;
       } catch (error) {
-        console.error('[CATO State] Redis clearRecoveryState failed:', error);
+        logger.error('[CATO State] Redis clearRecoveryState failed:', error);
       }
     }
     this.recoveryStates.delete(sessionId);
@@ -373,7 +374,7 @@ class CatoStateService {
         ]);
         return;
       } catch (error) {
-        console.error('[CATO State] Redis resetSession failed:', error);
+        logger.error('[CATO State] Redis resetSession failed:', error);
       }
     }
 

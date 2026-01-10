@@ -30,7 +30,7 @@ import {
   UserRegistryDashboard,
   SecretRotationResult,
   ApplicationExtended,
-} from '@radiant/shared/types/user-registry.types';
+} from '@radiant/shared';
 import { withSecureDBContext, isRadiantAdmin, isTenantAdmin } from './db-context.service';
 
 // ============================================================================
