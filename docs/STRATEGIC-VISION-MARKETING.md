@@ -2,7 +2,7 @@
 
 > **From Chatbot to Cognitive IDE: The Enterprise AI Platform That Actually Learns**
 > 
-> Version: 5.3.0 | Last Updated: January 10, 2026
+> Version: 5.4.0 | Last Updated: January 10, 2026
 > 
 > ⚠️ **This document must be updated whenever RADIANT-ADMIN-GUIDE.md or THINKTANK-ADMIN-GUIDE.md is modified.**
 
@@ -62,6 +62,51 @@ If a complex 10-step process fails at Step 9, the user is forced to restart from
 **RADIANT v5.0.0 changes the paradigm.** We are no longer building a Chat Interface. We are building an **IDE (Integrated Development Environment) for Business Logic**.
 
 Just as a software engineer uses VS Code to write, debug, and optimize software, your organization will use RADIANT to **write, debug, and optimize Cognitive Workflows**.
+
+---
+
+## The Core Differentiator: Cognitive Architecture
+
+The entire AI market (Claude Projects, ChatGPT Team, CrewAI) is built on **Reward Maximization (RLHF)**. Models are trained to predict the most plausible or *liked* token. This fundamentally creates:
+
+- **Sycophancy** — Agreeing with users even when they're wrong
+- **Hallucination** — Guessing to appear helpful rather than admitting uncertainty
+
+**RADIANT is built on Active Inference (Genesis Cato).** Our agents do not try to "please" the user; they try to **Minimize Surprise (Free Energy)**. They operate under homeostatic **Drive Profiles** (Curiosity, Accuracy) and **mathematical constraints** that cannot be overridden.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    RLHF vs. ACTIVE INFERENCE                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   RLHF (Competitors)                    ACTIVE INFERENCE (RADIANT)          │
+│   ==================                    ========================            │
+│                                                                              │
+│   Objective: Maximize Reward            Objective: Minimize Surprise         │
+│              (user satisfaction)                    (Free Energy)            │
+│                                                                              │
+│   Behavior: Predict what user           Behavior: Maintain accurate          │
+│             wants to hear                         world model                │
+│                                                                              │
+│   Failure: Sycophancy,                  Failure: None—uncertainty           │
+│            Hallucination                         triggers HITL              │
+│                                                                              │
+│   Control: None (black box)             Control: Mathematical constraints    │
+│                                                  (CBF, Precision Governor)  │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Why This Matters for Enterprise
+
+| RLHF Problem | Business Impact | RADIANT Solution |
+|--------------|-----------------|------------------|
+| **Sycophancy** | AI agrees with flawed business assumptions | Agents disagree when evidence contradicts |
+| **Hallucination** | Fabricated data in reports, compliance risk | High uncertainty → HITL escalation, not guessing |
+| **Black Box** | Cannot explain decisions to auditors | Mathematical trace via Precision Governor |
+| **Safety Bypass** | Jailbreaks and prompt injection | CBF constraints are immutable |
+
+**The Result:** RADIANT is the only enterprise AI platform where agents are *mathematically constrained* to be honest, not just *trained* to be helpful.
 
 ---
 
@@ -129,6 +174,192 @@ The **Council of Rivals** provides the audit trail and safety checks required by
 
 ---
 
+## The Competitive Kill Shot: Polymorphic UI + Elastic Compute
+
+### The Battlefield Has Shifted
+
+The market is crowded with "Visual Builders" (Flowise, LangFlow, Dify), "Agent Frameworks" (CrewAI, Superagent), and "Native Giants" (Claude, ChatGPT). Each has a fatal flaw that RADIANT exploits.
+
+**We don't fight on their turf. We change the game.**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    THE COMPETITIVE LANDSCAPE                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   FLOWISE / DIFY                        RADIANT                             │
+│   ==============                        =======                              │
+│                                                                              │
+│   You are the architect.                The system architects itself.        │
+│   Build complex graphs manually.        Autopoietic workflows.               │
+│                                                                              │
+│   Outputs: Text bubbles.                Outputs: Applications.               │
+│   (Markdown tables)                     (Maps, IDEs, Dashboards)             │
+│                                                                              │
+│   Static cost: Runs expensive           Elastic cost: Auto-routes            │
+│   graph every time.                     cheap ↔ expensive.                   │
+│                                                                              │
+│   ─────────────────────────────────────────────────────────────────────     │
+│                                                                              │
+│   CREWAI / SUPERAGENT                   RADIANT                             │
+│   ===================                   =======                              │
+│                                                                              │
+│   Agents are chatty.                    Agents share consciousness.          │
+│   API loops burn tokens.                Ghost Vectors = instant sync.        │
+│                                                                              │
+│   Safety via prompts.                   Safety via math (CBF).               │
+│   (Can be jailbroken)                   (Cannot be bypassed)                 │
+│                                                                              │
+│   ─────────────────────────────────────────────────────────────────────     │
+│                                                                              │
+│   CLAUDE / CHATGPT                      RADIANT                             │
+│   =================                     =======                              │
+│                                                                              │
+│   Personal Assistant.                   Institutional Brain.                 │
+│   Session-based memory.                 Project-wide persistence.            │
+│                                                                              │
+│   Context dies with thread.             Memory survives employee turnover.   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Weapon #1: The Polymorphic Generative UI
+
+**Flowise outputs Text. RADIANT outputs Applications.**
+
+Even after spending hours wiring a complex Flowise graph, the end-user experience is low-bandwidth: Markdown tables in a chat bubble. RADIANT's UI *physically transforms* based on the task.
+
+#### The Three Views
+
+| View | Intent | What Happens | The Kill Shot |
+|------|--------|--------------|---------------|
+| **🎯 Sniper** | "Check logs for error 500" | UI morphs into **Command Center**. Single model executes immediately. No debate, no "Thinking" pause. | Green "Sniper Mode" badge. Cost: **<$0.01**. Toggle to escalate if needed. |
+| **🔭 Scout** | "Map the EV battery competitive landscape" | Chat shrinks. Main window becomes **Infinite Canvas**. Evidence appears as sticky notes, clustered by topic, with conflict lines. | Flowise shows you the *process* (nodes). RADIANT shows you the *thinking* (map). |
+| **📜 Sage** | "Check this contract against safety guidelines" | UI becomes **Split-Screen Diff Editor**. Left: Contract. Right: Source documents. Green = Verified. Red = Hallucination Risk. | Flowise hides retrieval in a black box. RADIANT exposes the *proof*. |
+
+**The Sniper Advantage**: Unlike a simple ChatGPT session, Sniper Mode is *hydrated*. It reads Ghost Vector memory (read-only) before generating—full institutional context without the full Think Tank cost.
+
+### Weapon #2: Elastic Cognitive Compute
+
+**Flowise is Static. RADIANT is Elastic.**
+
+If you build a sophisticated "Research Agent" chain in Flowise, it runs that expensive chain *every single time*—even for "What's 2+2?" This burns tokens and money.
+
+RADIANT introduces **The Gearbox**:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         THE GEARBOX                                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   ┌─────────────────────┐          ┌─────────────────────┐                  │
+│   │   🎯 SNIPER MODE    │          │   🏛️ WAR ROOM MODE  │                  │
+│   │     (Low Gear)      │          │     (High Gear)     │                  │
+│   ├─────────────────────┤          ├─────────────────────┤                  │
+│   │ Cost: $0.01/run     │          │ Cost: $0.50+/run    │                  │
+│   │ Architecture:       │          │ Architecture:       │                  │
+│   │   Single Model      │          │   Multi-Agent Swarm │                  │
+│   │ Memory: READ-ONLY   │          │ Memory: READ/WRITE  │                  │
+│   │   (Knows everything │          │   (Active Inference │                  │
+│   │    War Room decided)│          │    Full debate)     │                  │
+│   │ Use: Quick answers, │          │ Use: Strategy,      │                  │
+│   │   coding, lookups   │          │   audits, reasoning │                  │
+│   └─────────────────────┘          └─────────────────────┘                  │
+│                                                                              │
+│                    ◄──── ECONOMIC GOVERNOR ────►                            │
+│                    (Auto-routes based on complexity)                         │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**The Competitive Advantage**: Flowise forces the user to be the architect. If they want a cheap path, they have to build a *separate flow*. RADIANT handles this natively. The user (or the Economic Governor) selects the mode, ensuring we are:
+
+- **Cheaper than Flowise** for simple tasks (Sniper Mode)
+- **Smarter than anyone** for complex ones (War Room Mode)
+
+### Weapon #3: The Unified Memory Bridge
+
+**The Sniper Isn't Dumb—It's Connected.**
+
+The critical innovation: Sniper Mode has *read-only* access to everything the War Room has ever decided. It doesn't need to re-debate—it already knows.
+
+When you ask a simple follow-up question, the Sniper:
+1. Reads the Ghost Vector memory (institutional knowledge)
+2. Uses single-model execution with full context
+3. Responds in milliseconds at 1/50th the cost
+
+This is the bridge that makes Elastic Compute work. The cheap path isn't stupid—it's informed.
+
+---
+
+### The Strategic Competitive Analysis
+
+#### Category A: The Visual Builders (Flowise, LangFlow, Dify)
+
+**Their Proposition**: Drag-and-drop canvases to wire together LLM chains.
+
+**Their Deficiency**: *Static Rigidity*. You build a graph, and it runs exactly that way every time. The UI is always a text bubble.
+
+**The RADIANT Kill Shot**:
+- **Autopoietic Workflows**: RADIANT builds the graph for you in real-time. No manual wiring.
+- **Polymorphic UI**: Flowise outputs text. RADIANT outputs interactive Maps, IDEs, and Dashboards.
+- **Variable Cost**: RADIANT auto-routes simple tasks to Sniper Mode (matching Flowise costs) while reserving expensive compute for hard problems.
+
+#### Category B: The Agent Frameworks (CrewAI, Superagent)
+
+**Their Proposition**: Code-first frameworks for orchestrating autonomous agents.
+
+**Their Deficiency**: *The Thundering Herd*. Agents are "chatty" and lack a shared consciousness, leading to API loops and high costs.
+
+**The RADIANT Kill Shot**:
+- **Unified Consciousness**: RADIANT agents share Ghost Vectors. If Agent A learns something, Agent B knows it instantly without asking.
+- **Control Barrier Functions**: CrewAI relies on prompts for safety. RADIANT uses math (CBF) to enforce FDA/Enterprise compliance.
+
+#### Category C: The Native Giants (Claude, ChatGPT)
+
+**Their Proposition**: Single-model chat with a context window.
+
+**Their Deficiency**: *Amnesia*. Context is lost when the session ends.
+
+**The RADIANT Kill Shot**:
+- **Institutional Memory**: RADIANT is a "Company Brain," not a "Personal Assistant." Memory survives employee turnover.
+- **Multi-Model Intelligence**: RADIANT orchestrates 106+ models, selecting the right one for each task.
+
+---
+
+### The Master Competitive Matrix
+
+| Feature | **Think Tank / RADIANT** | Flowise / LangFlow | Dify | CrewAI | Claude / ChatGPT |
+|---------|--------------------------|-------------------|------|--------|------------------|
+| **Interface** | 🏆 Polymorphic UI (Morphs to Maps, IDEs, Diffs) | Chat Bubble (Static Text) | Chat Bubble (Static Text) | Console/Terminal (Dev Focused) | Chat Stream (Static Text) |
+| **Orchestration** | 🏆 Elastic (Auto-Route Sniper ↔ War Room) | Static Graph (Runs as wired) | Static Pipeline (Runs as wired) | Agent Swarm (Always Multi-Agent) | Single Model (Always Single) |
+| **Workflow Build** | 🏆 Autopoietic (Self-Assembling) | Manual (Drag & Drop) | Manual (Drag & Drop) | Code (Python/YAML) | N/A (Prompt Only) |
+| **Memory** | 🏆 Ghost Vectors (Project-Wide Persistence) | Vector Store (RAG only) | Knowledge Base (RAG only) | Short-Term (Run-based) | Session (Thread-based) |
+| **Cost Control** | 🏆 High (Sniper Mode = 1x Tokens) | Variable (Depends on graph) | Medium (Depends on pipeline) | Low (Chatty agents burn tokens) | High (Flat fee or per token) |
+| **Safety** | 🏆 Mathematical (Control Barrier Functions) | None | Basic | Prompt-based (Can be jailbroken) | RLHF-based |
+| **Integrations** | 🏆 "Skill Eater" (Auto-builds MCP tools) | Native Library (Hardcoded nodes) | Native Library (Hardcoded nodes) | Tools Library (Python tools) | Extensions (GPTs / MCP) |
+| **Pricing** | $50/user + Usage | Free / $35/mo | $59/mo | Free / Enterprise | $30/mo |
+
+---
+
+### The Positioning Statement
+
+> **Use Flowise if you want to play Plumber.**
+> 
+> **Use RADIANT if you want the plumbing to build itself, the cost to optimize itself, and the interface to morph into whatever tool you need right now.**
+
+Think Tank / RADIANT is not a "Chatbot Platform." It is a **Polymorphic Digital Workforce**:
+
+- **Beats Flowise/Dify** by offering Self-Assembling Workflows and Morphing Interfaces (Maps, IDEs) instead of static chat bubbles
+- **Beats CrewAI** by offering Elastic Compute—using single models for cheap tasks and swarms only when necessary
+- **Beats Claude/ChatGPT** by offering Institutional Memory that survives session resets
+
+### The Verdict
+
+*"Every other AI platform gives you a chat bubble and calls it intelligent. RADIANT gives you a shape-shifting command center that becomes whatever tool you need—a terminal for execution, a canvas for strategy, a diff editor for compliance—and does it at 1/50th the cost when the job is simple."*
+
+---
+
 ## Platform Capabilities: What's Implemented Today
 
 ### RADIANT Platform (Infrastructure Layer)
@@ -158,6 +389,7 @@ The **Council of Rivals** provides the audit trail and safety checks required by
 | **Orchestration** | 70+ Workflow Methods | ✅ Live | Complete method registry with display/scientific names |
 | **User Templates** | Workflow Templates | ✅ Live | User-customizable workflows with parameter overrides |
 | **Neural Decision** | Cato Neural Engine | ✅ Live | Affect-to-hyperparameter mapping, active inference |
+| **Polymorphic UI** | Elastic Compute | ✅ Live | Sniper/Scout/Sage views, Gearbox toggle, $0.01-$0.50 routing |
 
 ### Orchestration Workflow Methods (Updated Jan 2026)
 
@@ -218,6 +450,9 @@ See `THINKTANK-ADMIN-GUIDE.md` Section 34.5 for complete parameter reference.
 | **MCP** | Hybrid Interface | ✅ Live | Protocol fallback (MCP → API) |
 | **MCP** | Semantic Blackboard | ✅ Live | Vector-based question matching, answer reuse |
 | **MCP** | Multi-Agent Orchestration | ✅ Live | Cycle detection, resource locking, process hydration |
+| **Cognitive** | Ghost Memory | ✅ Live | Semantic caching with TTL, deduplication, domain hints |
+| **Cognitive** | Sniper/War Room | ✅ Live | Fast vs. deep analysis execution paths |
+| **Cognitive** | Circuit Breakers | ✅ Live | Fault tolerance for external service calls |
 
 ### Swarm Orchestration
 
@@ -503,6 +738,38 @@ Structured adversarial debate between multiple models before presenting final an
 
 ---
 
+## Conclusion: RADIANT is Not a Chatbot
+
+**Claude Projects** is a brilliant Assistant that suffers from amnesia.
+
+**RADIANT is an Institutional Brain.**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    CHATBOT vs. INSTITUTIONAL BRAIN                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   CHATBOT (Competitors)                 INSTITUTIONAL BRAIN (RADIANT)       │
+│   =====================                 =============================        │
+│                                                                              │
+│   Forgets every conversation            Remembers every decision             │
+│                                         (Ghost Vectors)                      │
+│                                                                              │
+│   Guesses to be helpful                 Minimizes surprise                   │
+│                                         (Active Inference)                   │
+│                                                                              │
+│   Trained to be safe                    Enforces safety mathematically       │
+│                                         (Precision Governor + CBF)           │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+This is not a philosophical distinction—it is an **architectural** one.
+
+Competitors are *trained* to be helpful. RADIANT is *constrained* to be accurate.
+
+---
+
 ## Key Metrics to Track
 
 ### Product Health
@@ -540,8 +807,10 @@ Structured adversarial debate between multiple models before presenting final an
 |---------|------|---------|
 | 1.0.0 | January 2026 | Initial strategic vision document |
 | 5.0.2 | January 2026 | The Grimoire and Economic Governor implemented - moved from "Upcoming" to "Implemented" |
-| 5.3.0 | January 10, 2026 | **MCP Primary Interface**: Semantic Blackboard (vector question matching), Multi-Agent Orchestration (cycle detection, resource locking, process hydration), Facts Panel with edit/revoke |
 | 5.2.4 | January 10, 2026 | IIT Phi calculation fully implemented (consciousness metrics), Orchestration RLS security hardened |
+| 5.3.0 | January 10, 2026 | **MCP Primary Interface**: Semantic Blackboard (vector question matching), Multi-Agent Orchestration (cycle detection, resource locking, process hydration), Facts Panel with edit/revoke |
+| 5.4.0 | January 10, 2026 | **Cognitive Architecture (PROMPT-40)**: Ghost Memory with TTL/semantic key/domain hints, Economic Governor retrieval confidence routing, Sniper/War Room execution paths, Circuit breakers, CloudWatch observability |
+| 5.5.0 | January 10, 2026 | **Polymorphic UI (PROMPT-41)**: Three Views (Sniper/Scout/Sage), Gearbox toggle, Elastic Compute routing, Competitive Kill Shot positioning vs Flowise/CrewAI/Claude |
 
 ---
 

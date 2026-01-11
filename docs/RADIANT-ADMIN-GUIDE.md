@@ -14879,10 +14879,447 @@ The Facts Panel allows administrators to manage resolved decisions:
 
 ---
 
+## 53. Cognitive Architecture (PROMPT-40)
+
+### 53.1 Overview
+
+The Cognitive Architecture implements Active Inference principles for intelligent query routing and response caching. It provides:
+
+- **Ghost Memory**: Semantic caching with TTL, deduplication keys, and domain hints
+- **Economic Governor**: Complexity-aware routing with retrieval confidence integration
+- **Sniper/War Room Paths**: Fast vs. deep analysis execution strategies
+- **Circuit Breakers**: Fault tolerance for external service calls
+- **CloudWatch Observability**: Real-time metrics for cognitive operations
+
+### 53.2 The Core Differentiator: Active Inference vs. RLHF
+
+The entire AI market (Claude Projects, ChatGPT Team, CrewAI) is built on **Reward Maximization (RLHF)**. Models are trained to predict the most plausible or *liked* token. This fundamentally creates two critical failure modes:
+
+| Problem | Cause | Industry Impact |
+|---------|-------|-----------------|
+| **Sycophancy** | Model optimizes for user approval | Agrees with incorrect user assumptions |
+| **Hallucination** | Model guesses to appear helpful | Fabricates plausible-sounding information |
+
+**RADIANT is different.** Built on **Active Inference (Genesis Cato)**, our agents do not try to "please" the user. Instead, they operate under a fundamentally different objective:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    RLHF vs. ACTIVE INFERENCE                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   RLHF (Competitors)                    ACTIVE INFERENCE (RADIANT)          │
+│   ==================                    ========================            │
+│                                                                              │
+│   Objective: Maximize Reward            Objective: Minimize Surprise         │
+│              (user satisfaction)                    (Free Energy)            │
+│                                                                              │
+│   Behavior: Predict what user           Behavior: Maintain accurate          │
+│             wants to hear                         world model                │
+│                                                                              │
+│   Failure: Sycophancy,                  Failure: None—uncertainty           │
+│            Hallucination                         triggers HITL              │
+│                                                                              │
+│   Control: None (black box)             Control: Mathematical constraints    │
+│                                                  (CBF, Precision Governor)  │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Key Active Inference Components:**
+
+| Component | Purpose | Implementation |
+|-----------|---------|----------------|
+| **Free Energy Minimization** | Agents minimize prediction error, not maximize reward | Precision Governor limits confidence |
+| **Homeostatic Drive Profiles** | Agents balance competing drives (Curiosity vs. Accuracy) | Drive state vectors in Ghost Memory |
+| **Control Barrier Functions** | Mathematical safety constraints that cannot be overridden | CBF enforcement layer (always ENFORCE) |
+| **Epistemic Recovery** | When uncertainty is high, agents seek information rather than guess | HITL escalation via Mission Control |
+
+**Why This Matters:**
+
+- **No Sycophancy**: Agents will disagree with users when evidence contradicts their position
+- **No Hallucination**: High uncertainty triggers "I don't know" + HITL escalation, not fabrication
+- **Auditable**: Every decision has a mathematical trace via Precision Governor
+- **Safe by Design**: CBF constraints are immutable—agents cannot bypass safety checks
+
+See Section 42 (Genesis Cato Safety Architecture) for implementation details.
+
+### 53.3 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     COGNITIVE ARCHITECTURE                           │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│   User Query ──► Ghost Memory Read ──► Economic Governor             │
+│                         │                      │                     │
+│                    ┌────┴────┐          ┌──────┴──────┐             │
+│                    │         │          │             │             │
+│                    ▼         ▼          ▼             ▼             │
+│                   Hit      Miss      Sniper       War Room          │
+│                    │         │          │             │             │
+│                    │         │          │             │             │
+│                    └─────────┼──────────┴─────────────┘             │
+│                              │                                       │
+│                              ▼                                       │
+│                        Write-Back                                    │
+│                      (non-blocking)                                  │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 53.3 Ghost Memory Schema
+
+The Ghost Memory system extends ghost vectors with cognitive fields:
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `ttl_seconds` | INTEGER | 86400 | Time-to-live (24h default) |
+| `semantic_key` | TEXT | - | Query hash for deduplication |
+| `domain_hint` | VARCHAR(50) | - | Compliance routing: medical, financial, legal, general |
+| `retrieval_confidence` | FLOAT | 1.0 | Confidence score 0-1 |
+| `source_workflow` | VARCHAR(100) | - | Origin: sniper, war_room |
+| `last_accessed_at` | TIMESTAMPTZ | - | Last read timestamp |
+| `access_count` | INTEGER | 0 | Read count |
+
+### 53.4 Economic Governor Routing
+
+The Economic Governor routes queries based on complexity and retrieval confidence:
+
+**Routing Decision Tree:**
+
+1. **Circuit Breaker Open** → War Room (fallback)
+2. **retrieval_confidence < 0.7** → War Room (validation needed)
+3. **domain_hint = medical/financial/legal** → War Room + Precision Governor
+4. **complexity < 0.3** → Sniper (fast path)
+5. **complexity > 0.7** → War Room (deep analysis)
+6. **Medium complexity + Ghost Hit** → Sniper
+7. **Medium complexity + No Ghost Hit** → War Room
+
+**Configuration:**
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `sniperThreshold` | 0.3 | Complexity threshold for Sniper path |
+| `warRoomThreshold` | 0.7 | Complexity threshold for War Room |
+| `retrievalConfidenceThreshold` | 0.7 | Minimum confidence for cache hit |
+| `lowConfidenceRoute` | war_room | Route when confidence is low |
+
+### 53.5 Execution Paths
+
+#### Sniper Path
+- **Purpose**: Fast execution for simple queries
+- **Model**: gpt-4o-mini (cheap)
+- **Timeout**: 60 seconds
+- **Retries**: 1
+- **Write-back**: Queued (non-blocking)
+
+#### War Room Path
+- **Purpose**: Deep analysis for complex queries
+- **Model**: claude-3-5-sonnet (premium)
+- **Timeout**: 120 seconds
+- **Retries**: 2
+- **Write-back**: Queued with higher confidence
+
+#### HITL Escalation
+- **Purpose**: Human-in-the-loop for uncertain queries
+- **Timeout**: 24 hours
+- **Integration**: Mission Control pending_decisions
+
+### 53.6 Circuit Breakers
+
+Circuit breakers protect against cascading failures:
+
+| Circuit | Failure Threshold | Recovery Timeout | Half-Open Requests |
+|---------|-------------------|------------------|-------------------|
+| ghost_memory | 5 | 30s | 3 |
+| sniper | 3 | 15s | 2 |
+| war_room | 5 | 60s | 3 |
+
+**States:**
+- **CLOSED**: Normal operation
+- **OPEN**: Blocking requests, using fallback
+- **HALF_OPEN**: Testing recovery with limited requests
+
+### 53.7 MCP Tools
+
+New MCP tools for cognitive operations:
+
+| Tool | Description |
+|------|-------------|
+| `read_ghost_memory` | Read by semantic key with circuit breaker |
+| `append_ghost_memory` | Write with TTL, non-blocking |
+| `cognitive_route` | Get Economic Governor routing decision |
+| `emit_cognitive_metric` | Emit CloudWatch metric |
+
+### 53.8 CloudWatch Metrics
+
+Namespace: `Radiant/Cognitive`
+
+| Metric | Dimensions | Unit | Description |
+|--------|------------|------|-------------|
+| `GhostMemoryHit` | UserId, DomainHint | Count | Cache hits |
+| `GhostMemoryMiss` | Reason | Count | Cache misses |
+| `GhostMemoryLatency` | - | Milliseconds | Read latency |
+| `RoutingDecision` | RouteType, GhostHit, DomainHint | Count | Routing decisions |
+| `ComplexityScore` | RouteType | None | Query complexity |
+| `RetrievalConfidence` | RouteType | None | Ghost confidence |
+| `SniperExecution` | Success, Model | Count | Sniper executions |
+| `SniperLatency` | Success | Milliseconds | Sniper latency |
+| `WarRoomExecution` | Success, FallbackTriggered | Count | War Room executions |
+| `WarRoomLatency` | - | Milliseconds | War Room latency |
+| `HITLEscalation` | Reason, DomainHint | Count | HITL escalations |
+| `CircuitBreakerState` | CircuitName, State | Count | State changes |
+| `CostSavings` | RouteType | None (cents) | Cost optimization |
+
+### 53.9 API Endpoints
+
+Base: `/api/admin/cognitive`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/dashboard` | GET | Cognitive dashboard with metrics |
+| `/config` | GET/PUT | Get/update configuration |
+| `/ghost/read` | POST | Read Ghost Memory |
+| `/ghost/write` | POST | Write Ghost Memory |
+| `/ghost/cleanup` | POST | Cleanup expired entries |
+| `/routing/test` | POST | Test routing decision |
+| `/circuits` | GET | List circuit breaker states |
+| `/circuits/:name/reset` | POST | Reset circuit breaker |
+| `/metrics` | GET | Get cognitive metrics summary |
+
+### 53.10 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `ghost_vectors` | Extended with cognitive fields |
+| `cognitive_routing_decisions` | Routing audit log |
+| `ghost_memory_write_queue` | Async write-back queue |
+| `cognitive_circuit_breakers` | Circuit breaker state |
+| `cognitive_metrics` | Metric storage |
+| `cognitive_hitl_escalations` | HITL tracking |
+| `cognitive_config` | Per-tenant configuration |
+
+### 53.11 Key Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/governor/economic-governor.ts` | Economic Governor with cognitive routing |
+| `lambda/shared/services/ghost-manager.service.ts` | Ghost Memory with TTL/semantic key |
+| `lambda/shared/services/cognitive-metrics.service.ts` | CloudWatch metrics |
+| `lambda/consciousness/mcp-server.ts` | MCP tools |
+| `python/cato/cognitive/workflows.py` | Flyte workflows |
+| `python/cato/cognitive/circuit_breaker.py` | Circuit breaker |
+| `python/cato/cognitive/metrics.py` | Python metrics |
+| `migrations/159_cognitive_architecture_v2.sql` | Database schema |
+
+### 53.12 Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `ghost_memory_enabled` | true | Enable Ghost Memory |
+| `ghost_default_ttl_seconds` | 86400 | Default TTL (24h) |
+| `ghost_similarity_threshold` | 0.85 | Semantic matching threshold |
+| `governor_enabled` | true | Enable Economic Governor |
+| `governor_mode` | balanced | Mode: off, cost_saver, balanced, performance |
+| `circuit_breaker_enabled` | true | Enable circuit breakers |
+| `metrics_enabled` | true | Enable CloudWatch metrics |
+| `metrics_sample_rate` | 1.0 | Metric sampling rate |
+
+### 53.13 Domain Routing
+
+High-risk domains are automatically routed to War Room with Precision Governor:
+
+| Domain | Route | Reason |
+|--------|-------|--------|
+| `medical` | War Room | Patient safety, regulatory compliance |
+| `financial` | War Room | Fiduciary responsibility |
+| `legal` | War Room | Legal liability |
+| `general` | Sniper | Standard processing |
+
+### 53.14 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Low cache hit rate | TTL too short | Increase `ghost_default_ttl_seconds` |
+| All queries to War Room | Confidence threshold too high | Lower `retrievalConfidenceThreshold` |
+| Circuit breaker stuck open | Recovery timeout too long | Reset via `/circuits/:name/reset` |
+| High latency | Too many War Room routes | Tune `sniperThreshold` |
+| Missing metrics | Sampling rate too low | Increase `metrics_sample_rate` |
+| Ghost write failures | Queue backlog | Check SQS queue depth |
+
+### 53.16 Conclusion: RADIANT is Not a Chatbot
+
+**Claude Projects** is a brilliant Assistant that suffers from amnesia.
+
+**RADIANT is an Institutional Brain.**
+
+| Capability | How RADIANT Achieves It |
+|------------|------------------------|
+| **Remembers every decision** | Ghost Vectors with semantic keys, TTL, and domain hints |
+| **Minimizes surprise** | Active Inference (Free Energy minimization, not reward maximization) |
+| **Enforces safety mathematically** | Precision Governor + Control Barrier Functions (immutable constraints) |
+
+This is not a philosophical distinction—it is an architectural one. Competitors are trained to be helpful. RADIANT is *constrained* to be accurate.
+
+---
+
+## 54. Polymorphic UI Integration (PROMPT-41)
+
+### 54.1 Overview
+
+**Flowise outputs Text. RADIANT outputs Applications.**
+
+The Polymorphic UI system extends Think Tank's Agentic Morphing Interface with intelligent view selection. Because RADIANT understands semantic intent, the UI *physically transforms* based on:
+
+- **Task Complexity** → Terminal (Sniper) vs. MindMap/DiffEditor (War Room)
+- **Domain Hint** → Compliance views for medical/financial/legal
+- **Drive Profile** → Scout (exploration), Sage (verification), Sniper (execution)
+
+Unlike static chatbot interfaces that always render Markdown tables, RADIANT morphs into the tool the user actually needs: Command Centers, Mind Maps, Diff Editors, and Dashboards.
+
+### 54.2 The Gearbox (Elastic Compute)
+
+**Flowise is Static. RADIANT is Elastic.**
+
+The "Gearbox" gives users manual control over the cost-quality tradeoff:
+
+| Mode | Cost | Architecture | Memory | Use Case |
+|------|------|--------------|--------|----------|
+| **🎯 Sniper** | $0.01/run | Single Model | Read-Only Ghost Memory | Quick answers, lookups, coding |
+| **🏛️ War Room** | $0.50+/run | Multi-Agent Ensemble | Read/Write + Active Inference | Strategy, audits, reasoning |
+
+**The Competitive Advantage**: Flowise forces users to be architects—if they want a cheap path, they must build a separate flow. RADIANT handles this natively. The user (or the Economic Governor) selects the mode, ensuring RADIANT is **cheaper than Flowise for simple tasks** and **smarter for complex ones**.
+
+**Escalation**: A green "Escalate to War Room" button appears after Sniper responses, allowing users to request deeper analysis if the fast answer is insufficient.
+
+### 54.3 The Three Views
+
+#### 🎯 The Sniper View (Execution & Cost Savings)
+
+**Intent**: "Check the logs for error 500" or "Draft a quick email."
+
+| Aspect | Description |
+|--------|-------------|
+| **Execution Mode** | Sniper (Single Model) |
+| **The Morph** | UI transforms into a **Command Center / Terminal** |
+| **The Action** | Runs immediately. No multi-agent debate. No "Thinking" pause. |
+| **The Difference** | Unlike ChatGPT, Sniper is *Hydrated*—it reads Ghost Vector memory (read-only) before generating, so it has full institutional context without the cost of the full Think Tank |
+| **Visual Feedback** | Green "Sniper Mode" badge glows |
+| **Cost Transparency** | "Estimated Cost: <$0.01" badge displayed |
+| **User Control** | Toggle to "Escalate to War Room" if insufficient |
+
+#### 🔭 The Scout View (Research & Strategy)
+
+**Intent**: "Map the competitive landscape for EV batteries."
+
+| Aspect | Description |
+|--------|-------------|
+| **Execution Mode** | Think Tank (Multi-Agent Swarm) |
+| **The Morph** | Chat UI shrinks. Main window becomes an **Infinite Canvas (Mind Map)** |
+| **The Action** | Scout agent spawns "Sticky Notes" of evidence, clusters them by topic, draws dynamic lines between conflicting data points |
+| **The Kill Shot** | Flowise shows you the *process* (nodes). RADIANT shows you the *thinking* (map). |
+
+#### 📜 The Sage View (Audit & Validation)
+
+**Intent**: "Check this contract against our safety guidelines."
+
+| Aspect | Description |
+|--------|-------------|
+| **Execution Mode** | Convergent with Control Barrier Functions |
+| **The Morph** | UI becomes a **Split-Screen Diff Editor** |
+| **The Action** | Left side: Content under review. Right side: Source documents with confidence scores (Green = Verified, Red = Hallucination Risk) |
+| **The Kill Shot** | Flowise hides retrieval inside a black box. RADIANT exposes the *proof* in a specialized UI optimized for verification. |
+
+### 54.4 View Types Reference
+
+| View | Trigger | Description |
+|------|---------|-------------|
+| `terminal_simple` | Quick commands, lookups | Command Center - fast execution |
+| `mindmap` | Research, exploration | Infinite Canvas - visual mapping |
+| `diff_editor` | Verification, compliance | Split-Screen - source validation |
+| `dashboard` | Analytics queries | Metrics visualization |
+| `decision_cards` | HITL escalation | Mission Control interface |
+| `chat` | Default | Standard conversation |
+
+### 54.4 View Selection Logic
+
+```
+1. HITL escalation → decision_cards
+2. Domain = medical/financial/legal → diff_editor
+3. Query matches Scout patterns → mindmap
+4. Query matches Sage patterns → diff_editor
+5. Query matches Dashboard patterns → dashboard
+6. Sniper route OR quick command patterns → terminal_simple
+7. Default → chat
+```
+
+### 54.5 MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `render_interface` | Morph UI to specified view type |
+| `escalate_to_war_room` | Escalate from Sniper to War Room |
+| `get_polymorphic_route` | Get routing + view decision |
+
+### 54.6 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `view_state_history` | Tracks UI morphing decisions |
+| `execution_escalations` | Tracks Sniper → War Room escalations |
+| `polymorphic_config` | Per-tenant configuration |
+
+### 54.7 Configuration
+
+```sql
+-- polymorphic_config table
+enable_auto_morphing: true       -- Auto-morph based on query
+enable_gearbox_toggle: true      -- Show Sniper/War Room toggle
+enable_cost_display: true        -- Show cost badges
+enable_escalation_button: true   -- Show Escalate button
+default_execution_mode: 'sniper' -- Default mode
+```
+
+### 54.8 Key Files
+
+| File | Purpose |
+|------|---------|
+| `governor/economic-governor.ts` | `determineViewType()`, `determinePolymorphicRoute()` |
+| `consciousness/mcp-server.ts` | `render_interface`, `escalate_to_war_room` tools |
+| `python/cato/cognitive/workflows.py` | `determine_polymorphic_view`, `render_interface` tasks |
+| `migrations/160_polymorphic_ui.sql` | Database schema |
+| `components/thinktank/polymorphic/` | React view components |
+
+### 54.9 API Integration
+
+```typescript
+// Get polymorphic routing decision
+const decision = await governor.determinePolymorphicRoute(query, {
+  userTier: 'standard',
+  retrievalConfidence: 0.85,
+  ghostHit: true,
+  domainHint: 'financial',
+  userOverride: undefined, // or 'sniper' | 'war_room'
+});
+
+// Returns:
+// {
+//   routeType: 'war_room',
+//   viewType: 'diff_editor',
+//   executionMode: 'war_room',
+//   rationale: 'Compliance domain (financial) requires verification view',
+//   estimatedCostCents: 50,
+// }
+```
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| **5.5.0** | 2026-01-10 | Polymorphic UI (PROMPT-41); ViewRouter component; Terminal/MindMap/DiffEditor views; Gearbox toggle; Escalation tracking |
+| **5.4.0** | 2026-01-10 | Cognitive Architecture (PROMPT-40); Ghost Memory TTL/semantic key; Economic Governor retrieval confidence; Sniper/War Room workflows; Circuit breakers; CloudWatch observability |
 | **5.3.0** | 2026-01-10 | Semantic Blackboard; Multi-Agent Orchestration; MCP Primary Interface; Process Hydration; Cycle Detection |
 | **5.0.2** | 2026-01-08 | The Grimoire (procedural memory); Economic Governor (cost optimization); Self-optimizing architecture |
 | 4.20.3 | 2026-01-08 | Mission Control GA; MCP Hybrid Interface; Domain Risk Policies |

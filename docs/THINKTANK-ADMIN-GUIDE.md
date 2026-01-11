@@ -92,6 +92,16 @@ This guide covers administrative features specific to **Think Tank**, the consum
     - [33.9 API Reference](#339-api-reference)
     - [33.10 Configuration](#3310-configuration)
     - [33.11 Troubleshooting](#3311-troubleshooting)
+34. [Orchestration Methods (70+ Algorithms)](#34-orchestration-methods-70-algorithms)
+35. [Polymorphic UI (PROMPT-41)](#35-polymorphic-ui-prompt-41)
+    - [35.1 Overview](#351-overview)
+    - [35.2 The Gearbox (Elastic Compute)](#352-the-gearbox-elastic-compute)
+    - [35.3 The Three Views](#353-the-three-views)
+    - [35.4 View Types](#354-view-types)
+    - [35.5 Configuration](#355-configuration)
+    - [35.6 Implementation Files](#356-implementation-files)
+    - [35.7 Database Tables](#357-database-tables)
+    - [35.8 API Endpoints](#358-api-endpoints)
 
 ---
 
@@ -6058,6 +6068,92 @@ CREATE TABLE user_workflow_templates (
 | `lambda/admin/orchestration-user-templates.ts` | User templates CRUD API |
 | `apps/admin-dashboard/app/(dashboard)/orchestration/methods/page.tsx` | Admin method config with system badge |
 | `apps/admin-dashboard/app/(dashboard)/thinktank/workflow-templates/page.tsx` | User templates UI |
+
+---
+
+## 35. Polymorphic UI (PROMPT-41)
+
+### 35.1 Overview
+
+**Flowise outputs Text. Think Tank outputs Applications.**
+
+The Polymorphic UI system makes Think Tank's interface physically transform based on task complexity, domain hints, and drive profile. Unlike static chatbot interfaces, Think Tank morphs into the tool the user actually needs.
+
+### 35.2 The Gearbox (Elastic Compute)
+
+Users can manually control the cost-quality tradeoff via the Gearbox:
+
+| Mode | Cost | Architecture | Memory | Use Case |
+|------|------|--------------|--------|----------|
+| **🎯 Sniper** | $0.01/run | Single Model | Read-Only Ghost Memory | Quick answers, lookups, coding |
+| **🏛️ War Room** | $0.50+/run | Multi-Agent Ensemble | Read/Write + Active Inference | Strategy, audits, reasoning |
+
+**Escalation**: A green "Escalate to War Room" button appears after Sniper responses.
+
+### 35.3 The Three Views
+
+| View | Intent | Morph | Key Feature |
+|------|--------|-------|-------------|
+| **🎯 Sniper** | Quick commands | Terminal/Command Center | Green badge, cost transparency, immediate execution |
+| **🔭 Scout** | Research & exploration | Infinite Canvas/Mind Map | Sticky notes, topic clustering, conflict lines |
+| **📜 Sage** | Audit & validation | Split-Screen Diff Editor | Left=content, Right=sources with confidence scores |
+
+### 35.4 View Types
+
+| View Type | Trigger | Description |
+|-----------|---------|-------------|
+| `terminal_simple` | Quick commands, lookups | Command Center - fast execution |
+| `mindmap` | Research, exploration | Infinite Canvas - visual mapping |
+| `diff_editor` | Verification, compliance | Split-Screen - source validation |
+| `dashboard` | Analytics queries | Metrics visualization |
+| `decision_cards` | HITL escalation | Mission Control interface |
+| `chat` | Default | Standard conversation |
+
+### 35.5 Configuration
+
+Access via **Think Tank → Polymorphic UI** in admin dashboard.
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `enableAutoMorphing` | Auto-morph based on query | `true` |
+| `enableGearboxToggle` | Show Sniper/War Room toggle | `true` |
+| `enableCostDisplay` | Show cost badges | `true` |
+| `enableEscalationButton` | Show Escalate button | `true` |
+| `defaultExecutionMode` | Default mode | `sniper` |
+| `domainViewOverrides` | Per-domain view mapping | medical/financial/legal → `diff_editor` |
+
+### 35.6 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `governor/economic-governor.ts` | `determineViewType()`, `determinePolymorphicRoute()` |
+| `consciousness/mcp-server.ts` | `render_interface`, `escalate_to_war_room` tools |
+| `python/cato/cognitive/workflows.py` | Flyte tasks for view selection |
+| `migrations/160_polymorphic_ui.sql` | Database schema |
+| `components/thinktank/polymorphic/` | React view components |
+| `app/(dashboard)/thinktank/polymorphic/page.tsx` | Admin page |
+
+### 35.7 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `view_state_history` | Tracks UI morphing decisions |
+| `execution_escalations` | Tracks Sniper → War Room escalations |
+| `polymorphic_config` | Per-tenant configuration |
+
+### 35.8 API Endpoints
+
+Base: `/api/admin/polymorphic`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/?action=config` | Get configuration |
+| GET | `/?action=view-history` | Get view state history |
+| GET | `/?action=escalations` | Get escalation history |
+| GET | `/?action=analytics` | Get usage analytics |
+| POST | `/` (action: render) | Render specific view |
+| POST | `/` (action: escalate) | Escalate to War Room |
+| POST | `/` (action: update-config) | Update configuration |
 
 ---
 

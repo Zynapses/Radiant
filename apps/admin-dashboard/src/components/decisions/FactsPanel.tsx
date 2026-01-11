@@ -322,12 +322,12 @@ export const FactsPanel: React.FC<FactsPanelProps> = ({ onEditFact }) => {
         setFacts(data.data?.decisions || []);
         
         // Extract unique topics
-        const uniqueTopics = [...new Set(
+        const topicsSet = new Set<string>(
           data.data?.decisions
             .map((f: ResolvedDecision) => f.topic)
             .filter(Boolean) as string[]
-        )];
-        setTopics(uniqueTopics);
+        );
+        setTopics(Array.from(topicsSet));
       }
     } catch (error) {
       console.error('Failed to fetch facts:', error);

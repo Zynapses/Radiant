@@ -1,5 +1,5 @@
 /**
- * RADIANT v6.0.4 - Ghost Vector Manager
+ * RADIANT v5.4.0 - Ghost Vector Manager (PROMPT-40 Cognitive Architecture)
  * Manages consciousness continuity with version gating
  * 
  * Ghost Vectors capture the final hidden state of the LLM,
@@ -10,6 +10,13 @@
  * - Deterministic jitter to prevent thundering herd
  * - Async re-anchoring (fire-and-forget)
  * - Dual storage (Redis + Postgres)
+ * 
+ * v5.4.0 Additions (PROMPT-40):
+ * - TTL support (ttl_seconds) with 24h default
+ * - Semantic key for deduplication
+ * - Domain hint for compliance routing
+ * - Retrieval confidence tracking
+ * - Circuit breaker integration
  */
 
 import { executeStatement } from '../db/client';
@@ -28,6 +35,37 @@ import {
   serializeGhostVector,
   deserializeGhostVector,
 } from '@radiant/shared';
+import { getCognitiveMetrics } from './cognitive-metrics.service';
+
+// v5.4.0 - Cognitive Architecture Types
+export interface GhostMemoryEntry {
+  semanticKey: string;
+  content: string;
+  domainHint?: string;
+  ttlSeconds?: number;
+  confidence?: number;
+  sourceWorkflow?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface GhostReadResult {
+  hit: boolean;
+  content?: string;
+  semanticKey?: string;
+  confidence: number;
+  domainHint?: string;
+  ttlRemainingSeconds?: number;
+  circuitBreakerFallback: boolean;
+  latencyMs: number;
+}
+
+export interface CognitiveGhostOptions {
+  ttlSeconds?: number;
+  semanticKey?: string;
+  domainHint?: string;
+  retrievalConfidence?: number;
+  sourceWorkflow?: string;
+}
 
 // =============================================================================
 // Ghost Manager Service
@@ -812,6 +850,329 @@ class GhostManagerService {
       lastAccess: new Date(),
       turnsSinceReanchor: loadResult.turnCount,
     };
+  }
+
+  // ===========================================================================
+  // v5.4.0 - Cognitive Architecture Methods (PROMPT-40)
+  // ===========================================================================
+
+  /**
+   * Read Ghost Memory by semantic key with circuit breaker fallback
+   */
+  async readGhostMemory(
+    userId: string,
+    tenantId: string,
+    semanticKey: string
+  ): Promise<GhostReadResult> {
+    const startTime = Date.now();
+    const metrics = getCognitiveMetrics(tenantId);
+
+    try {
+      // Try to find by semantic key
+      const result = await executeStatement(
+        `SELECT 
+           semantic_key, vector, domain_hint, ttl_seconds, 
+           retrieval_confidence, updated_at,
+           EXTRACT(EPOCH FROM ((updated_at + (ttl_seconds || ' seconds')::interval) - NOW())) as ttl_remaining
+         FROM ghost_vectors
+         WHERE tenant_id = $1 
+           AND user_id = $2 
+           AND semantic_key = $3
+           AND (ttl_seconds IS NULL OR ttl_seconds <= 0 OR 
+                updated_at + (ttl_seconds || ' seconds')::interval > NOW())
+         LIMIT 1`,
+        [
+          { name: 'tenantId', value: { stringValue: tenantId } },
+          { name: 'userId', value: { stringValue: userId } },
+          { name: 'semanticKey', value: { stringValue: semanticKey } },
+        ]
+      );
+
+      const latencyMs = Date.now() - startTime;
+
+      if (result.rows && result.rows.length > 0) {
+        const row = result.rows[0] as Record<string, unknown>;
+        const confidence = Number(row.retrieval_confidence) || 1.0;
+
+        await metrics.recordGhostHit({
+          userId,
+          semanticKey,
+          confidence,
+          domainHint: row.domain_hint as string,
+          latencyMs,
+        });
+
+        // Update access stats
+        await this.updateGhostAccessStats(userId, tenantId);
+
+        return {
+          hit: true,
+          content: row.vector as string, // Content stored in vector field for semantic entries
+          semanticKey: row.semantic_key as string,
+          confidence,
+          domainHint: row.domain_hint as string | undefined,
+          ttlRemainingSeconds: Math.max(0, Math.floor(Number(row.ttl_remaining) || 0)),
+          circuitBreakerFallback: false,
+          latencyMs,
+        };
+      }
+
+      await metrics.recordGhostMiss({
+        userId,
+        reason: 'not_found',
+        latencyMs,
+      });
+
+      return {
+        hit: false,
+        confidence: 1.0,
+        circuitBreakerFallback: false,
+        latencyMs,
+      };
+    } catch (error) {
+      const latencyMs = Date.now() - startTime;
+      logger.error(`Ghost Memory read failed: ${String(error)}`);
+
+      await metrics.recordGhostMiss({
+        userId,
+        reason: 'error',
+        latencyMs,
+      });
+
+      return {
+        hit: false,
+        confidence: 1.0,
+        circuitBreakerFallback: true,
+        latencyMs,
+      };
+    } finally {
+      await metrics.flush();
+    }
+  }
+
+  /**
+   * Append to Ghost Memory with TTL and semantic key (non-blocking write-back)
+   */
+  async appendGhostMemory(
+    userId: string,
+    tenantId: string,
+    entry: GhostMemoryEntry
+  ): Promise<boolean> {
+    const metrics = getCognitiveMetrics(tenantId);
+    const ttlSeconds = entry.ttlSeconds ?? 86400; // 24h default
+
+    try {
+      const currentVersion = await brainConfigService.getString('GHOST_CURRENT_VERSION', 'llama3-70b-v1');
+
+      await executeStatement(
+        `INSERT INTO ghost_vectors (
+           user_id, tenant_id, vector, version, semantic_key, 
+           domain_hint, ttl_seconds, retrieval_confidence, 
+           source_workflow, metadata, turn_count, updated_at
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 0, NOW())
+         ON CONFLICT (user_id, tenant_id) 
+         WHERE semantic_key = $5
+         DO UPDATE SET
+           vector = EXCLUDED.vector,
+           domain_hint = EXCLUDED.domain_hint,
+           ttl_seconds = EXCLUDED.ttl_seconds,
+           retrieval_confidence = EXCLUDED.retrieval_confidence,
+           source_workflow = EXCLUDED.source_workflow,
+           metadata = EXCLUDED.metadata,
+           updated_at = NOW()`,
+        [
+          { name: 'userId', value: { stringValue: userId } },
+          { name: 'tenantId', value: { stringValue: tenantId } },
+          { name: 'content', value: { stringValue: entry.content } },
+          { name: 'version', value: { stringValue: currentVersion } },
+          { name: 'semanticKey', value: { stringValue: entry.semanticKey } },
+          { name: 'domainHint', value: entry.domainHint ? { stringValue: entry.domainHint } : { isNull: true } },
+          { name: 'ttlSeconds', value: { longValue: ttlSeconds } },
+          { name: 'confidence', value: { doubleValue: entry.confidence ?? 1.0 } },
+          { name: 'sourceWorkflow', value: entry.sourceWorkflow ? { stringValue: entry.sourceWorkflow } : { isNull: true } },
+          { name: 'metadata', value: { stringValue: JSON.stringify(entry.metadata || {}) } },
+        ]
+      );
+
+      await metrics.recordGhostWrite({
+        userId,
+        semanticKey: entry.semanticKey,
+        ttlSeconds,
+        domainHint: entry.domainHint,
+        success: true,
+      });
+
+      logger.info('Ghost Memory entry written', {
+        userId,
+        tenantId,
+        semanticKey: entry.semanticKey,
+        domainHint: entry.domainHint,
+        ttlSeconds,
+      });
+
+      return true;
+    } catch (error) {
+      logger.warn(`Ghost Memory write failed (non-blocking): ${String(error)}`);
+      
+      await metrics.recordGhostWriteFailure(userId, 'write_error');
+      
+      // Per PROMPT-40: "Log but don't fail - memory write is important but not blocking"
+      return false;
+    } finally {
+      await metrics.flush();
+    }
+  }
+
+  /**
+   * Update access statistics for a ghost entry
+   */
+  private async updateGhostAccessStats(userId: string, tenantId: string): Promise<void> {
+    try {
+      await executeStatement(
+        `UPDATE ghost_vectors 
+         SET last_accessed_at = NOW(),
+             access_count = COALESCE(access_count, 0) + 1
+         WHERE user_id = $1 AND tenant_id = $2`,
+        [
+          { name: 'userId', value: { stringValue: userId } },
+          { name: 'tenantId', value: { stringValue: tenantId } },
+        ]
+      );
+    } catch (error) {
+      logger.debug(`Failed to update ghost access stats: ${String(error)}`);
+    }
+  }
+
+  /**
+   * Clean up expired ghost entries
+   */
+  async cleanupExpiredGhosts(tenantId?: string, batchSize: number = 1000): Promise<number> {
+    try {
+      const result = await executeStatement(
+        `WITH deleted AS (
+           DELETE FROM ghost_vectors
+           WHERE id IN (
+             SELECT id FROM ghost_vectors
+             WHERE ${tenantId ? 'tenant_id = $1 AND' : ''}
+               ttl_seconds IS NOT NULL
+               AND ttl_seconds > 0
+               AND updated_at + (ttl_seconds || ' seconds')::interval < NOW()
+             LIMIT ${batchSize}
+           )
+           RETURNING id
+         )
+         SELECT COUNT(*) as count FROM deleted`,
+        tenantId ? [{ name: 'tenantId', value: { stringValue: tenantId } }] : []
+      );
+
+      const deletedCount = Number((result.rows[0] as Record<string, unknown>)?.count || 0);
+      
+      if (deletedCount > 0) {
+        logger.info('Cleaned up expired ghost entries', { tenantId, deletedCount });
+      }
+
+      return deletedCount;
+    } catch (error) {
+      logger.error(`Failed to cleanup expired ghosts: ${String(error)}`);
+      return 0;
+    }
+  }
+
+  /**
+   * Save ghost with cognitive options (TTL, semantic key, domain hint)
+   */
+  async saveGhostWithCognitive(
+    userId: string,
+    tenantId: string,
+    vector: Float32Array,
+    version: string,
+    options: CognitiveGhostOptions = {}
+  ): Promise<void> {
+    const {
+      ttlSeconds = 86400,
+      semanticKey,
+      domainHint,
+      retrievalConfidence = 1.0,
+      sourceWorkflow,
+    } = options;
+
+    const turnCount = await this.incrementTurnCount(userId, tenantId);
+
+    // Save to Redis with TTL
+    await this.cacheGhostWithCognitive(userId, tenantId, vector, version, turnCount, options);
+
+    // Save to Postgres with cognitive fields
+    try {
+      const vectorBuffer = serializeGhostVector(vector);
+      const vectorBase64 = vectorBuffer.toString('base64');
+
+      await executeStatement(
+        `INSERT INTO ghost_vectors (
+           user_id, tenant_id, vector, version, turn_count, 
+           ttl_seconds, semantic_key, domain_hint, retrieval_confidence, 
+           source_workflow, updated_at
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
+         ON CONFLICT (user_id, tenant_id) DO UPDATE SET
+           vector = EXCLUDED.vector,
+           version = EXCLUDED.version,
+           turn_count = EXCLUDED.turn_count,
+           ttl_seconds = EXCLUDED.ttl_seconds,
+           semantic_key = COALESCE(EXCLUDED.semantic_key, ghost_vectors.semantic_key),
+           domain_hint = COALESCE(EXCLUDED.domain_hint, ghost_vectors.domain_hint),
+           retrieval_confidence = EXCLUDED.retrieval_confidence,
+           source_workflow = EXCLUDED.source_workflow,
+           updated_at = NOW()`,
+        [
+          { name: 'userId', value: { stringValue: userId } },
+          { name: 'tenantId', value: { stringValue: tenantId } },
+          { name: 'vector', value: { stringValue: vectorBase64 } },
+          { name: 'version', value: { stringValue: version } },
+          { name: 'turnCount', value: { longValue: turnCount } },
+          { name: 'ttlSeconds', value: { longValue: ttlSeconds } },
+          { name: 'semanticKey', value: semanticKey ? { stringValue: semanticKey } : { isNull: true } },
+          { name: 'domainHint', value: domainHint ? { stringValue: domainHint } : { isNull: true } },
+          { name: 'confidence', value: { doubleValue: retrievalConfidence } },
+          { name: 'sourceWorkflow', value: sourceWorkflow ? { stringValue: sourceWorkflow } : { isNull: true } },
+        ]
+      );
+    } catch (error) {
+      logger.error(`Failed to save ghost with cognitive options: ${String(error)}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Cache ghost in Redis with cognitive options
+   */
+  private async cacheGhostWithCognitive(
+    userId: string,
+    tenantId: string,
+    vector: Float32Array,
+    version: string,
+    turnCount: number,
+    options: CognitiveGhostOptions
+  ): Promise<void> {
+    if (!this.redis) return;
+
+    try {
+      const redisKey = buildGhostRedisKey(tenantId, userId);
+      const ttl = options.ttlSeconds ?? GHOST_REDIS_TTL_SECONDS;
+      
+      const data = JSON.stringify({
+        vector: Array.from(vector),
+        version,
+        turnCount,
+        semanticKey: options.semanticKey,
+        domainHint: options.domainHint,
+        retrievalConfidence: options.retrievalConfidence ?? 1.0,
+        sourceWorkflow: options.sourceWorkflow,
+        cachedAt: new Date().toISOString(),
+      });
+
+      await this.redis.set(redisKey, data, { EX: ttl });
+    } catch (error) {
+      logger.warn(`Failed to cache ghost with cognitive options: ${String(error)}`);
+    }
   }
 }
 
