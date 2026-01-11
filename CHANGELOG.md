@@ -5,6 +5,167 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.5.0] - 2026-01-10
+
+### Added
+
+#### Polymorphic UI Integration (PROMPT-41)
+
+Production-ready implementation of Think Tank's Polymorphic UI system. The UI physically transforms based on task complexity, domain hints, and drive profile.
+
+**Flowise outputs Text. RADIANT outputs Applications.**
+
+**The Three Views:**
+
+1. **🎯 Sniper View (Command Center)**
+   - Intent: Quick commands, lookups, fast execution
+   - Morph: Terminal-style Command Center UI
+   - Cost: $0.01/run (single model, read-only Ghost Memory)
+   - Features: Green "Sniper Mode" badge, cost transparency, escalation button
+
+2. **🔭 Scout View (Infinite Canvas)**
+   - Intent: Research, exploration, competitive analysis
+   - Morph: Mind Map with sticky notes clustered by topic
+   - Features: Dynamic conflict lines, evidence clustering, visual thinking
+
+3. **📜 Sage View (Verification Editor)**
+   - Intent: Audit, compliance, validation
+   - Morph: Split-screen diff editor
+   - Features: Left=Content, Right=Sources with confidence (Green=Verified, Red=Risk)
+
+**The Gearbox (Elastic Compute):**
+- Manual toggle: Sniper Mode ($0.01) ↔ War Room Mode ($0.50+)
+- Economic Governor auto-routes based on complexity
+- Escalation button: Promote Sniper → War Room if insufficient
+- Cheaper than Flowise for simple tasks, smarter for complex ones
+
+**MCP Tools Added:**
+- `render_interface` - Morph UI to specified view type with data payload
+- `escalate_to_war_room` - Escalate from Sniper to War Room with reason
+- `get_polymorphic_route` - Get routing decision + recommended view type
+
+**Database Tables:**
+- `view_state_history` - Tracks UI morphing decisions and outcomes
+- `execution_escalations` - Tracks Sniper → War Room escalations
+- `polymorphic_config` - Per-tenant configuration
+
+**React Components:**
+- `ViewRouter` - Main polymorphic routing component with Gearbox
+- `TerminalView` - Sniper Command Center
+- `MindMapView` - Scout Infinite Canvas
+- `DiffEditorView` - Sage Verification Editor
+- `DashboardView` - Analytics metrics
+- `DecisionCardsView` - HITL Mission Control
+- `ChatView` - Default conversation
+
+**Flyte Workflows (Python):**
+- `determine_polymorphic_view` - View type selection based on query patterns
+- `render_interface` - Emit UI morphing events
+- `log_escalation` - Record Sniper → War Room escalations
+- `run_polymorphic_query` - Combined cognitive + polymorphic routing
+
+**Key Files:**
+- `governor/economic-governor.ts` - `determineViewType()`, `determinePolymorphicRoute()`
+- `consciousness/mcp-server.ts` - Polymorphic UI tools
+- `python/cato/cognitive/workflows.py` - Flyte tasks
+- `migrations/160_polymorphic_ui.sql` - Database schema
+- `components/thinktank/polymorphic/` - React view components
+
+---
+
+## [5.4.0] - 2026-01-10
+
+### Added
+
+#### Cognitive Architecture (PROMPT-40)
+
+Production-ready implementation of Active Inference cognitive routing system with Ghost Memory enhancements, Economic Governor retrieval confidence integration, and CloudWatch observability.
+
+**Core Components:**
+
+1. **Ghost Memory Schema Enhancements**
+   - `ttl_seconds` - Time-to-live with 24h default
+   - `semantic_key` - Query hash for deduplication
+   - `domain_hint` - Compliance routing (medical, financial, legal, general)
+   - `retrieval_confidence` - Confidence score 0-1
+   - `source_workflow` - Origin tracking (sniper, war_room)
+   - Access statistics (`last_accessed_at`, `access_count`)
+
+2. **Economic Governor v2** - Retrieval confidence routing
+   - Routes based on retrieval confidence + complexity
+   - `retrieval_confidence < 0.7` → War Room (validation needed)
+   - High-risk domains (medical/financial/legal) → War Room + Precision Governor
+   - `complexity < 0.3` → Sniper (fast path)
+   - Ghost hit with high confidence → Sniper
+   - New `cognitiveRoute()` method for unified routing decisions
+
+3. **Sniper/War Room Execution Paths**
+   - **Sniper**: Fast, cheap (gpt-4o-mini), 60s timeout, 1 retry
+   - **War Room**: Thorough, premium (claude-3-5-sonnet), 120s timeout, 2 retries
+   - Non-blocking write-back to Ghost Memory on success
+   - HITL escalation for uncertain queries (24h timeout)
+
+4. **Circuit Breakers** - Fault tolerance
+   - States: CLOSED → OPEN → HALF_OPEN
+   - Per-endpoint configuration (ghost_memory, sniper, war_room)
+   - Automatic fallback to War Room when open
+   - CloudWatch metrics for state changes
+
+5. **CloudWatch Observability** (Namespace: `Radiant/Cognitive`)
+   - `GhostMemoryHit/Miss` - Cache performance
+   - `RoutingDecision` - Route type distribution
+   - `SniperExecution/WarRoomExecution` - Execution metrics
+   - `CircuitBreakerState` - Fault tolerance monitoring
+   - `CostSavings` - Economic optimization tracking
+
+**MCP Tools Added:**
+- `read_ghost_memory` - Read by semantic key with circuit breaker
+- `append_ghost_memory` - Non-blocking write with TTL
+- `cognitive_route` - Get Economic Governor routing decision
+- `emit_cognitive_metric` - Emit CloudWatch metric
+
+**Flyte Workflows (Python):**
+- `cognitive_workflow` - Main workflow orchestrating read → route → execute → write-back
+- `sniper_execute` - Fast path with retry logic
+- `war_room_execute` - Deep analysis with multi-model support
+- `read_ghost_memory` - Circuit breaker-protected reads
+- `append_ghost_memory` - Non-blocking writes with queue
+
+**Database Migration:** `159_cognitive_architecture_v2.sql`
+- Extended `ghost_vectors` table with cognitive fields
+- `cognitive_routing_decisions` - Routing audit log
+- `ghost_memory_write_queue` - Async write-back queue
+- `cognitive_circuit_breakers` - Circuit breaker state
+- `cognitive_metrics` - Metric storage
+- `cognitive_hitl_escalations` - HITL tracking
+- `cognitive_config` - Per-tenant configuration
+- Helper functions: `is_ghost_expired()`, `ghost_semantic_match()`, `update_circuit_breaker()`
+
+**Key Files:**
+- `lambda/shared/services/governor/economic-governor.ts` - Economic Governor with cognitive routing
+- `lambda/shared/services/ghost-manager.service.ts` - Ghost Memory with TTL/semantic key
+- `lambda/shared/services/cognitive-metrics.service.ts` - CloudWatch metrics service
+- `lambda/consciousness/mcp-server.ts` - MCP tools
+- `python/cato/cognitive/workflows.py` - Flyte workflows
+- `python/cato/cognitive/circuit_breaker.py` - Circuit breaker implementation
+- `python/cato/cognitive/metrics.py` - Python metrics service
+
+**Configuration:**
+| Setting | Default | Description |
+|---------|---------|-------------|
+| ghost_default_ttl_seconds | 86400 | Default TTL (24h) |
+| sniperThreshold | 0.3 | Complexity threshold for Sniper |
+| warRoomThreshold | 0.7 | Complexity threshold for War Room |
+| retrievalConfidenceThreshold | 0.7 | Minimum confidence for cache hit |
+| circuit_breaker_failure_threshold | 5 | Failures before opening |
+| circuit_breaker_recovery_seconds | 30 | Time before half-open |
+
+**Documentation:**
+- RADIANT-ADMIN-GUIDE.md Section 53 - Cognitive Architecture
+- STRATEGIC-VISION-MARKETING.md - Updated with Cognitive IDE capabilities
+
+---
+
 ## [5.3.0] - 2026-01-10
 
 ### Added

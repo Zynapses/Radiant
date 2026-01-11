@@ -43,3 +43,4 @@ export * from './ecd.types';
 export * from './cognition.types';
 export * from './cato.types';
 export * from './aws-monitoring.types';
+export * from './polymorphic-ui.types';

@@ -163,6 +163,7 @@ const navigation: NavigationItem[] = [
   { name: 'Shadow Testing', href: '/thinktank/shadow-testing', icon: Beaker },
   { name: 'Collaborate', href: '/thinktank/collaborate', icon: UsersRound },
   { name: 'Ego System', href: '/thinktank/ego', icon: UserCircle },
+  { name: 'Polymorphic UI', href: '/thinktank/polymorphic', icon: Zap },
   { name: 'TT Artifacts', href: '/thinktank/artifacts', icon: Sparkles },
   { name: 'TT Compliance', href: '/thinktank/compliance', icon: ShieldCheck },
   { name: 'TT Settings', href: '/thinktank/settings', icon: Settings },

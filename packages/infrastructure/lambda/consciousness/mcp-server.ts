@@ -51,7 +51,7 @@ const CONSCIOUSNESS_TOOLS: MCPTool[] = [
   // ============================================================================
   {
     name: 'ask_user',
-    description: 'Request input from the user. Uses Semantic Blackboard to check if a similar question was already answered. If found, returns cached answer. Otherwise, queues question for user.',
+    description: 'Request input from the user. Uses Semantic Blackboard to check if a similar question was already answered. If found, returns cached answer. Otherwise, queues question for user. Supports Ghost Memory persistence via semantic_key.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -62,6 +62,10 @@ const CONSCIOUSNESS_TOOLS: MCPTool[] = [
         options: { type: 'string', description: 'JSON array of predefined answer options, if applicable' },
         defaultValue: { type: 'string', description: 'Default value if user does not respond' },
         timeoutSeconds: { type: 'number', description: 'Timeout in seconds before using default (default: 300)' },
+        semantic_key: { type: 'string', description: 'PROMPT-41: Semantic key for Ghost Memory deduplication. If provided, checks if similar question was answered before.' },
+        domain_hint: { type: 'string', description: 'PROMPT-41: Domain hint for compliance routing. Valid values: medical, financial, legal, general' },
+        ttl_seconds: { type: 'number', description: 'PROMPT-41: Time-to-live for cached answer in seconds (default: 86400 = 24h)' },
+        topic_group: { type: 'string', description: 'PROMPT-41: Topic group for clustering related questions in the Semantic Blackboard' },
       },
       required: ['question', 'context'],
     },
@@ -140,6 +144,145 @@ const CONSCIOUSNESS_TOOLS: MCPTool[] = [
         checkpointName: { type: 'string', description: 'Name of checkpoint to restore' },
       },
       required: ['checkpointName'],
+    },
+  },
+  // ============================================================================
+  // Ghost Memory Tools (PROMPT-40 Cognitive Architecture)
+  // ============================================================================
+  {
+    name: 'read_ghost_memory',
+    description: 'Read from Ghost Memory by semantic key. Returns cached response if found with high confidence, otherwise indicates miss. Uses circuit breaker for fault tolerance.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        semanticKey: { type: 'string', description: 'Semantic key (query hash) for deduplication lookup' },
+        domainHint: { type: 'string', description: 'Domain hint for compliance routing: medical, financial, legal, general' },
+      },
+      required: ['semanticKey'],
+    },
+  },
+  {
+    name: 'append_ghost_memory',
+    description: 'Append entry to Ghost Memory with TTL and semantic key. Non-blocking write-back - logs failures but does not block workflow.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        semanticKey: { type: 'string', description: 'Semantic key for deduplication' },
+        content: { type: 'string', description: 'Content to store (response text)' },
+        domainHint: { type: 'string', description: 'Domain hint: medical, financial, legal, general' },
+        ttlSeconds: { type: 'number', description: 'Time-to-live in seconds (default: 86400 = 24h)' },
+        confidence: { type: 'number', description: 'Retrieval confidence score 0-1 (default: 1.0)' },
+        sourceWorkflow: { type: 'string', description: 'Source workflow: sniper, war_room' },
+      },
+      required: ['semanticKey', 'content'],
+    },
+  },
+  {
+    name: 'cognitive_route',
+    description: 'Get Economic Governor routing decision based on retrieval confidence and complexity. Returns route type (sniper/war_room/hitl) and selected model.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'User query to route' },
+        retrievalConfidence: { type: 'number', description: 'Ghost Memory retrieval confidence 0-1' },
+        ghostHit: { type: 'boolean', description: 'Whether Ghost Memory returned a hit' },
+        domainHint: { type: 'string', description: 'Domain hint for compliance routing' },
+        userTier: { type: 'string', description: 'User tier: free, standard, premium' },
+      },
+      required: ['query'],
+    },
+  },
+  {
+    name: 'emit_cognitive_metric',
+    description: 'Emit a metric to CloudWatch for cognitive architecture observability',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        metricName: { type: 'string', description: 'Metric name (e.g., GhostMemoryHit, SniperExecution)' },
+        value: { type: 'number', description: 'Metric value' },
+        unit: { type: 'string', description: 'Unit: Count, Milliseconds, Percent' },
+        dimensions: { type: 'string', description: 'JSON object of dimension key-value pairs' },
+      },
+      required: ['metricName', 'value'],
+    },
+  },
+  // ============================================================================
+  // Polymorphic UI Tools (PROMPT-41)
+  // ============================================================================
+  {
+    name: 'render_interface',
+    description: 'Morph the User Interface to match the current task type and data. The UI physically transforms based on the Drive Profile, Task Complexity, and Cost constraints.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        view_type: { 
+          type: 'string', 
+          description: 'The UI component to render. Valid values: terminal_simple (Sniper Command Center), mindmap (Scout Infinite Canvas), diff_editor (Sage Verification View), dashboard, decision_cards, chat' 
+        },
+        execution_mode: {
+          type: 'string',
+          description: 'Execution mode. Valid values: sniper (Single Agent, Fast, $0.01) or war_room (Multi-Agent Ensemble, Deep, $0.50+)'
+        },
+        data_payload: { 
+          type: 'object',
+          description: 'The raw data to populate the view (e.g., JSON graph for mindmap, diff data for diff_editor)'
+        },
+        rationale: {
+          type: 'string',
+          description: 'Why is the view changing? Displayed as a toast notification to the user'
+        },
+        domain_hint: {
+          type: 'string',
+          description: 'Determines compliance rendering. Valid values: medical, financial, legal, general. Medical/financial/legal trigger verification views'
+        },
+        estimated_cost_cents: {
+          type: 'number',
+          description: 'Estimated cost of this operation in cents. Displayed as cost badge'
+        }
+      },
+      required: ['view_type', 'execution_mode', 'data_payload'],
+    },
+  },
+  {
+    name: 'escalate_to_war_room',
+    description: 'User triggers re-analysis with full multi-agent ensemble after Sniper Mode response is insufficient. This is the "Escalate" button in the UI Gearbox.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        original_query: { 
+          type: 'string',
+          description: 'The original question that Sniper answered'
+        },
+        sniper_response_id: { 
+          type: 'string',
+          description: 'UUID of the Sniper response being escalated'
+        },
+        escalation_reason: { 
+          type: 'string',
+          description: 'Why is War Room needed? Valid values: insufficient_depth, factual_doubt, need_alternatives, compliance_required'
+        },
+        additional_context: {
+          type: 'string',
+          description: 'Any additional context for the War Room agents'
+        }
+      },
+      required: ['original_query', 'sniper_response_id', 'escalation_reason'],
+    },
+  },
+  {
+    name: 'get_polymorphic_route',
+    description: 'Get the Economic Governor routing decision including both execution mode (sniper/war_room) AND recommended UI view type. Returns full Gearbox state.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'User query to analyze' },
+        user_tier: { type: 'string', description: 'User tier: free, standard, premium' },
+        retrieval_confidence: { type: 'number', description: 'Ghost Memory retrieval confidence 0-1' },
+        ghost_hit: { type: 'boolean', description: 'Whether Ghost Memory returned a cached hit' },
+        domain_hint: { type: 'string', description: 'Domain hint for compliance routing' },
+        user_override: { type: 'string', description: 'Manual user override from UI Gearbox. Valid values: sniper, war_room' }
+      },
+      required: ['query'],
     },
   },
   // ============================================================================
