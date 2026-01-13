@@ -102,6 +102,22 @@ This guide covers administrative features specific to **Think Tank**, the consum
     - [35.6 Implementation Files](#356-implementation-files)
     - [35.7 Database Tables](#357-database-tables)
     - [35.8 API Endpoints](#358-api-endpoints)
+36. [Think Tank Policy Framework: Strategic Intelligence](#36-think-tank-policy-framework-strategic-intelligence)
+    - [36.1 The Cato Institute Policy Foundation](#361-the-cato-institute-policy-foundation)
+    - [36.2 The $10 Trillion Cybercrime Economy](#362-the-10-trillion-cybercrime-economy)
+    - [36.3 Memory Safety and the 70% Problem](#363-memory-safety-and-the-70-problem)
+    - [36.4 Regulatory Stance Configuration](#364-regulatory-stance-configuration)
+    - [36.5 Database Tables](#365-database-tables)
+    - [36.6 Implementation Files](#366-implementation-files)
+37. [Agentic Orchestration: SSF, CAEP, and Identity Remediation](#37-agentic-orchestration-ssf-caep-and-identity-remediation)
+    - [37.1 The Agentic AI Paradigm](#371-the-agentic-ai-paradigm)
+    - [37.2 Shared Signals Framework (SSF) Integration](#372-shared-signals-framework-ssf-integration)
+    - [37.3 Continuous Access Evaluation Profile (CAEP)](#373-continuous-access-evaluation-profile-caep)
+    - [37.4 Autonomous Identity Remediation](#374-autonomous-identity-remediation)
+    - [37.5 The Radiant Ghost in Think Tank](#375-the-radiant-ghost-in-think-tank)
+    - [37.6 Database Tables](#376-database-tables)
+    - [37.7 API Endpoints](#377-api-endpoints)
+    - [37.8 Implementation Files](#378-implementation-files)
 
 ---
 
@@ -6154,6 +6170,536 @@ Base: `/api/admin/polymorphic`
 | POST | `/` (action: render) | Render specific view |
 | POST | `/` (action: escalate) | Escalate to War Room |
 | POST | `/` (action: update-config) | Update configuration |
+
+---
+
+## 36. Think Tank Policy Framework: Strategic Intelligence
+
+The Think Tank is not merely a chatbot interface—it is a **policy research engine** informed by rigorous analysis from organizations like the Cato Institute. This section documents the strategic framework that underlies Think Tank's approach to technology policy, regulation, and economic analysis.
+
+### 36.1 The Cato Institute Policy Foundation
+
+The Cato Institute, a renowned policy think tank, provides crucial insights on technology regulation and innovation. Think Tank integrates these perspectives to ensure users receive balanced, evidence-based analysis rather than ideologically-driven conclusions.
+
+#### Core Policy Principles
+
+| Principle | Description | Application in Think Tank |
+|-----------|-------------|--------------------------|
+| **Pro-Innovation Default** | Permissionless innovation should be the norm | Bias toward "how can this work?" not "why won't this work?" |
+| **Evidence-Based Analysis** | Policy must be grounded in data, not fear | Require citations and data sources in policy discussions |
+| **Regulatory Humility** | Acknowledge limits of prediction | Flag uncertainty explicitly; avoid overconfident prescriptions |
+| **Market-Based Solutions** | Private sector often innovates faster than regulators | Explore voluntary standards before mandates |
+| **Individual Liberty** | Technology should enhance freedom, not surveillance | Privacy-by-design; minimize data collection |
+
+### 36.2 The $10 Trillion Cybercrime Economy
+
+A critical context for Think Tank's policy analysis is the scale of the threat environment. The global economy loses approximately **$10 trillion annually** to cybercrime—a figure larger than the GDP of every country except the United States and China.
+
+#### Economic Impact Analysis
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    GLOBAL CYBERCRIME ECONOMIC IMPACT                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   ANNUAL LOSSES: ~$10 TRILLION                                               │
+│                                                                              │
+│   ┌──────────────────────────────────────────────────────────────────────┐  │
+│   │                                                                      │  │
+│   │   $10T ────────────────────────────────────────────── CYBERCRIME    │  │
+│   │                                                                      │  │
+│   │   $4.2T ─────────────────────── GERMANY GDP                         │  │
+│   │                                                                      │  │
+│   │   $3.4T ──────────────────── JAPAN GDP                              │  │
+│   │                                                                      │  │
+│   │   $2.1T ────────────── UK GDP                                       │  │
+│   │                                                                      │  │
+│   └──────────────────────────────────────────────────────────────────────┘  │
+│                                                                              │
+│   BREAKDOWN BY ATTACK TYPE:                                                  │
+│   ─────────────────────────                                                  │
+│   • Ransomware: $20B+ annually                                              │
+│   • Business Email Compromise: $2.7B annually                               │
+│   • Data Breaches: $4.45M average cost per incident                        │
+│   • Supply Chain Attacks: Growing 742% since 2019                          │
+│   • Nation-State Attacks: Incalculable strategic damage                    │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Implications for Policy Discussion
+
+When users ask Think Tank about cybersecurity policy, the system contextualizes recommendations against this $10T backdrop:
+
+| User Query | Policy-Aware Response Approach |
+|------------|-------------------------------|
+| "Should we regulate AI?" | Frame against: AI can *reduce* $10T losses if deployed correctly |
+| "Is this security spending justified?" | Compare against: Your $1M security budget vs. $4.45M average breach cost |
+| "Should we ban ransomware payments?" | Analyze: Prohibition vs. harm reduction strategies |
+| "How strict should compliance be?" | Balance: Compliance costs vs. breach probability × impact |
+
+### 36.3 Memory Safety and the 70% Problem
+
+The Think Tank injects a specific technical insight into relevant conversations: **70% of all software vulnerabilities** stem from memory safety issues. This statistic, validated by Microsoft, Google, and the NSA, should inform every software architecture discussion.
+
+#### Memory Safety Vulnerability Classes
+
+| Vulnerability | Description | % of CVEs |
+|---------------|-------------|-----------|
+| **Buffer Overflow** | Writing beyond allocated memory | ~30% |
+| **Use-After-Free** | Accessing freed memory | ~20% |
+| **Double Free** | Freeing memory twice | ~8% |
+| **Null Pointer Dereference** | Accessing null pointers | ~7% |
+| **Integer Overflow** | Arithmetic exceeding bounds | ~5% |
+| **Total Memory Safety** | All memory-related issues | **~70%** |
+
+#### Policy Recommendation Engine
+
+When users discuss software architecture, security, or procurement, Think Tank can inject policy-informed guidance:
+
+```typescript
+// Policy injection for memory safety discussions
+const MEMORY_SAFETY_POLICY = {
+  context: 'User discussing software architecture or security',
+  
+  injectedGuidance: `
+    POLICY CONTEXT: Memory safety vulnerabilities account for 70% of all CVEs.
+    
+    RECOMMENDATIONS:
+    1. For new projects: Prefer memory-safe languages (Rust, Go, Swift)
+    2. For existing C/C++ code: Consider incremental migration or sandboxing
+    3. For procurement: Require memory-safe language attestation from vendors
+    4. For risk assessment: Memory-unsafe components = higher risk weight
+    
+    SOURCE: Microsoft, Google, NSA research (2019-2024)
+  `,
+  
+  triggerPatterns: [
+    'architecture', 'security', 'language choice', 'procurement',
+    'vulnerability', 'CVE', 'buffer overflow', 'memory'
+  ],
+};
+```
+
+### 36.4 Regulatory Stance Configuration
+
+Administrators can configure Think Tank's default policy stance for their organization:
+
+| Setting | Options | Description |
+|---------|---------|-------------|
+| `defaultRegulatorystance` | `cautious` / `balanced` / `pro_innovation` | Bias in regulatory discussions |
+| `requireCitations` | `true` / `false` | Require sources for policy claims |
+| `flagUncertainty` | `always` / `when_high` / `never` | Uncertainty disclosure level |
+| `privateDataBias` | `minimize` / `balanced` / `maximize_utility` | Data collection philosophy |
+| `complianceEmphasis` | `strict` / `risk_based` / `minimal` | Compliance recommendation style |
+
+#### Configuration Example
+
+Navigate to **Think Tank → Policy Framework** in admin dashboard:
+
+```yaml
+# policy-framework.config.yaml
+policy_framework:
+  enabled: true
+  
+  default_stance: balanced
+  
+  cybercrime_context:
+    enabled: true
+    inject_10T_context: true
+    inject_memory_safety_context: true
+    
+  citation_requirements:
+    require_for_policy_claims: true
+    preferred_sources:
+      - cato_institute
+      - brookings
+      - nist
+      - academic_peer_reviewed
+    flag_opinion_vs_fact: true
+    
+  uncertainty_handling:
+    disclosure_level: always
+    confidence_threshold_for_recommendation: 0.7
+    escalate_low_confidence_to_human: true
+    
+  privacy_settings:
+    default_data_collection: minimize
+    require_purpose_limitation: true
+    support_right_to_deletion: true
+```
+
+### 36.5 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `policy_framework_config` | Per-tenant policy configuration |
+| `policy_citation_log` | Citations used in policy discussions |
+| `policy_uncertainty_flags` | Uncertainty disclosures |
+| `regulatory_stance_overrides` | Per-domain stance overrides |
+
+### 36.6 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/policy-framework.service.ts` | Policy context injection |
+| `lambda/shared/services/citation-manager.service.ts` | Citation tracking and validation |
+| `lambda/thinktank/policy-context.ts` | API handler for policy queries |
+| `migrations/164_policy_framework.sql` | Database schema |
+| `config/policy/cato-principles.yaml` | Cato Institute policy principles |
+
+---
+
+## 37. Agentic Orchestration: SSF, CAEP, and Identity Remediation
+
+Think Tank's AI agents operate within a rigorous security framework that leverages open standards for real-time security signaling. This section documents the Shared Signals Framework (SSF) and Continuous Access Evaluation Profile (CAEP) integration specific to Think Tank operations.
+
+### 37.1 The Agentic AI Paradigm
+
+Traditional automation follows rigid if-then rules. **Agentic AI** represents a fundamental shift: AI systems that continuously evaluate their environment, learn from outcomes, and adapt their behavior within defined safety constraints.
+
+#### Traditional Automation vs. Agentic AI
+
+| Aspect | Traditional Automation | Agentic AI (Think Tank) |
+|--------|----------------------|-------------------------|
+| **Decision Logic** | Static rules | Dynamic evaluation |
+| **Learning** | None | Continuous adaptation |
+| **Error Handling** | Fail or retry | Investigate and adapt |
+| **Human Interaction** | Scheduled checkpoints | On-demand escalation |
+| **Security Model** | Perimeter-based | Zero Trust + CAEP |
+
+### 37.2 Shared Signals Framework (SSF) Integration
+
+The **Shared Signals Framework** is an open standard that enables real-time security event sharing between systems. Think Tank agents both emit and consume SSF signals.
+
+#### SSF Event Flow in Think Tank
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    THINK TANK SSF EVENT ARCHITECTURE                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   SIGNAL EMITTERS (Think Tank generates)                                    │
+│   ══════════════════════════════════════                                    │
+│                                                                              │
+│   ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐            │
+│   │ User Behavior   │  │ Content Safety  │  │ Agent Activity  │            │
+│   │ Anomaly         │  │ Violation       │  │ Escalation      │            │
+│   └────────┬────────┘  └────────┬────────┘  └────────┬────────┘            │
+│            │                    │                    │                      │
+│            └────────────────────┴────────────────────┘                      │
+│                                 │                                           │
+│                                 ▼                                           │
+│                    ┌─────────────────────────┐                             │
+│                    │    SSF TRANSMITTER      │                             │
+│                    │  (Think Tank → Cato)    │                             │
+│                    └────────────┬────────────┘                             │
+│                                 │                                           │
+│   ══════════════════════════════╪══════════════════════════════════════    │
+│                                 │                                           │
+│                                 ▼                                           │
+│                    ┌─────────────────────────┐                             │
+│                    │    SSF RECEIVER         │                             │
+│                    │  (Cato → Think Tank)    │                             │
+│                    └────────────┬────────────┘                             │
+│                                 │                                           │
+│            ┌────────────────────┼────────────────────┐                      │
+│            │                    │                    │                      │
+│            ▼                    ▼                    ▼                      │
+│   ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐            │
+│   │ Session Revoke  │  │ Threat Detected │  │ Genesis Alert   │            │
+│   │ → Terminate     │  │ → Restrict      │  │ → Pause Agents  │            │
+│   └─────────────────┘  └─────────────────┘  └─────────────────┘            │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### SSF Events Emitted by Think Tank
+
+| Event Type | Trigger | Recipient Action |
+|------------|---------|------------------|
+| `thinktank.behavior.anomaly` | User behavior deviates significantly from baseline | Cato increases monitoring |
+| `thinktank.content.violation` | User attempts prohibited content | Identity provider notified |
+| `thinktank.agent.escalation` | Agent requires human approval | Mission Control alerted |
+| `thinktank.session.suspicious` | Multiple failed attempts or unusual patterns | Cato may revoke session |
+| `thinktank.data.exfiltration_attempt` | Suspected data extraction attempt | Block and investigate |
+
+#### SSF Events Consumed by Think Tank
+
+| Event Type | Source | Think Tank Action |
+|------------|--------|-------------------|
+| `session-revoked` | Identity Provider | Immediately terminate user session |
+| `credential-change` | Identity Provider | Force re-authentication |
+| `threat-detected` | Cato SASE | Restrict agent capabilities |
+| `genesis.alert` | Genesis Reactor | Pause all non-critical agents |
+| `device-compliance-change` | MDM/EDR | Re-evaluate user permissions |
+
+### 37.3 Continuous Access Evaluation Profile (CAEP)
+
+**CAEP** extends SSF with specific event types designed for continuous session validation. Unlike traditional session timeouts, CAEP enables **real-time session adjustment** based on security signals.
+
+#### CAEP Session Lifecycle
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    CAEP SESSION LIFECYCLE IN THINK TANK                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   1. SESSION START                                                           │
+│      ┌──────────────────────────────────────────────────────────────────┐   │
+│      │ User authenticates → Session created → CAEP listener registered  │   │
+│      └──────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│   2. CONTINUOUS EVALUATION (every CAEP event)                               │
+│      ┌──────────────────────────────────────────────────────────────────┐   │
+│      │                                                                   │   │
+│      │   CAEP Event Received → Evaluate Impact → Adjust Session         │   │
+│      │                                                                   │   │
+│      │   Example: IP Change                                             │   │
+│      │   ├─ Same country? → Log only                                    │   │
+│      │   ├─ Different country? → Step-up authentication                 │   │
+│      │   └─ Impossible travel? → Terminate session                      │   │
+│      │                                                                   │   │
+│      └──────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│   3. SESSION TERMINATION                                                     │
+│      ┌──────────────────────────────────────────────────────────────────┐   │
+│      │ CAEP revoke signal OR user logout OR timeout → Clean termination │   │
+│      │ → Preserve conversation state → Clear credentials → Audit log    │   │
+│      └──────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### CAEP Configuration for Think Tank
+
+```yaml
+# caep-thinktank.config.yaml
+caep:
+  enabled: true
+  
+  session_management:
+    # How to handle IP changes
+    ip_change_policy:
+      same_country: log_only
+      different_country: step_up_auth
+      impossible_travel: terminate_session
+      impossible_travel_threshold_hours: 2
+    
+    # How to handle device changes
+    device_change_policy:
+      known_device: allow
+      unknown_device_trusted_location: step_up_auth
+      unknown_device_unknown_location: terminate_session
+    
+    # How to handle credential events
+    credential_change_policy:
+      password_change: force_reauth
+      mfa_change: force_reauth
+      role_change: re_evaluate_permissions
+  
+  agent_restrictions:
+    # During security events, restrict agent capabilities
+    during_threat_detected:
+      disable_autonomous_actions: true
+      disable_external_api_calls: true
+      require_human_approval_all: true
+      
+    during_genesis_alert:
+      pause_all_agents: true
+      preserve_state: true
+      notify_administrators: true
+```
+
+### 37.4 Autonomous Identity Remediation
+
+Think Tank agents can perform **autonomous identity remediation**—cleaning up identity data quality issues without human intervention. This capability requires careful configuration to balance efficiency with safety.
+
+#### Remediation Capabilities
+
+| Action | Autonomous? | Conditions |
+|--------|-------------|------------|
+| **Remove Orphan Account** | Yes | Inactive 90+ days, no entitlements, no recent auth |
+| **Disable Stale Service Account** | Yes | Unused 180+ days, not in critical systems |
+| **Fix Group Membership Inconsistency** | Yes | Source of truth mismatch detected |
+| **Delete Human Account** | **No** | Always requires human approval |
+| **Revoke Admin Privileges** | **No** | Always requires human approval |
+| **Bulk Operations (100+)** | **No** | Always requires human approval |
+
+#### Remediation Workflow
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    AUTONOMOUS REMEDIATION WORKFLOW                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   1. DETECTION                                                               │
+│      Agent scans Identity Fabric for anomalies                              │
+│      ├─ Orphan accounts (no manager, no recent activity)                    │
+│      ├─ Stale service accounts (unused beyond threshold)                    │
+│      └─ Inconsistent group memberships (source mismatch)                    │
+│                                                                              │
+│   2. VALIDATION                                                              │
+│      ├─ Verify anomaly against multiple data sources                        │
+│      ├─ Check against exclusion lists (VIPs, system accounts)              │
+│      ├─ Confirm remediation action is within autonomous scope              │
+│      └─ Verify Genesis Interlock allows action (no active alerts)          │
+│                                                                              │
+│   3. EXECUTION                                                               │
+│      ├─ If autonomous: Execute immediately, log action                      │
+│      └─ If requires approval: Create Mission Control escalation            │
+│                                                                              │
+│   4. VERIFICATION                                                            │
+│      ├─ Confirm action completed successfully                               │
+│      ├─ Verify no unintended side effects                                  │
+│      └─ Update remediation statistics                                       │
+│                                                                              │
+│   5. LEARNING                                                                │
+│      ├─ If action succeeded: Reinforce pattern                             │
+│      └─ If action failed or reversed: Flag for human review                │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Remediation Configuration
+
+Navigate to **Think Tank → Identity → Remediation** in admin dashboard:
+
+```yaml
+# identity-remediation-thinktank.config.yaml
+identity_remediation:
+  enabled: true
+  
+  # Autonomous action limits
+  autonomous_limits:
+    max_per_hour: 50
+    max_per_day: 200
+    cooldown_after_error_minutes: 30
+    
+  # Detection criteria
+  detection:
+    orphan_account:
+      inactive_days_threshold: 90
+      require_no_entitlements: true
+      require_no_recent_auth: true
+      exclude_patterns:
+        - "*-system@*"
+        - "*-service@*"
+        - "admin@*"
+        
+    stale_service_account:
+      unused_days_threshold: 180
+      exclude_critical_systems: true
+      critical_system_tags:
+        - genesis
+        - security
+        - auth
+        
+    group_membership:
+      check_source_of_truth: true
+      sources:
+        - active_directory
+        - scim_provider
+        - hr_system
+  
+  # Notification settings
+  notifications:
+    notify_on_autonomous_action: true
+    notify_recipients:
+      - security_team
+      - identity_admins
+    daily_summary: true
+    
+  # Genesis Interlock integration
+  genesis_interlock:
+    pause_during: [GEN-300, GEN-400, GEN-500]
+    resume_automatically: true
+```
+
+### 37.5 The Radiant Ghost in Think Tank
+
+The **Radiant Ghost** metaphor extends to Think Tank's user interface, providing visual feedback about agent activity.
+
+#### Ghost States in Think Tank UI
+
+| State | Indicator | Meaning | User Action |
+|-------|-----------|---------|-------------|
+| **Idle** | Faint outline | No active agents | None |
+| **Thinking** | Soft pulse | Agent processing request | Wait |
+| **Researching** | Searching animation | Agent gathering information | Wait |
+| **Writing** | Typing animation | Agent generating response | Watch |
+| **Validating** | Checkmark animation | Agent verifying output | Wait |
+| **Escalating** | Orange pulse | Agent needs human input | Respond |
+| **Alert** | Red pulse | Security or safety event | Investigate |
+
+#### Ghost Configuration
+
+```yaml
+# ghost-ui.config.yaml
+ghost_ui:
+  enabled: true
+  
+  # Visual settings
+  visuals:
+    idle_opacity: 0.3
+    active_opacity: 0.8
+    alert_opacity: 1.0
+    animation_speed: normal  # slow, normal, fast
+    
+  # State display
+  states:
+    show_thinking: true
+    show_researching: true
+    show_writing: true
+    show_validating: true
+    show_escalating: true
+    show_alert: true
+    
+  # Accessibility
+  accessibility:
+    respect_reduced_motion: true
+    provide_text_status: true
+    screen_reader_announcements: true
+```
+
+### 37.6 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `ssf_events_emitted` | SSF events sent by Think Tank |
+| `ssf_events_received` | SSF events received by Think Tank |
+| `caep_session_events` | CAEP session lifecycle events |
+| `identity_remediation_log` | All remediation actions |
+| `identity_remediation_errors` | Failed remediation attempts |
+| `ghost_state_log` | Ghost UI state transitions |
+
+### 37.7 API Endpoints
+
+Base: `/api/thinktank/security`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/ssf/status` | SSF integration status |
+| GET | `/ssf/events` | Recent SSF events |
+| POST | `/ssf/emit` | Manually emit SSF event (admin only) |
+| GET | `/caep/session` | Current session CAEP status |
+| GET | `/remediation/stats` | Remediation statistics |
+| GET | `/remediation/log` | Remediation action log |
+| POST | `/remediation/trigger` | Trigger manual remediation scan |
+| GET | `/ghost/state` | Current Ghost state |
+
+### 37.8 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/ssf-thinktank.service.ts` | SSF emitter/receiver for Think Tank |
+| `lambda/shared/services/caep-session.service.ts` | CAEP session management |
+| `lambda/shared/services/identity-remediation-thinktank.service.ts` | Think Tank remediation agent |
+| `lambda/thinktank/security-events.ts` | Security event API handler |
+| `components/thinktank/ghost-indicator.tsx` | Ghost UI component |
+| `migrations/165_agentic_orchestration.sql` | Database schema |
+| `config/security/ssf-events.yaml` | SSF event definitions |
+| `config/security/caep-policies.yaml` | CAEP policy configuration |
 
 ---
 
