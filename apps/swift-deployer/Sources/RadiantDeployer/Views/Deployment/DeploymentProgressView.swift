@@ -254,7 +254,7 @@ struct EnhancedDeploymentProgressView: View {
                 event: state.displayName
             )
         } catch {
-            aiExplanation = ai.fallbackExplanation(for: state.displayName)
+            aiExplanation = await ai.fallbackExplanation(for: state.displayName)
         }
     }
 }

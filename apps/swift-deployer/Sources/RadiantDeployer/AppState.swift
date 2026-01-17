@@ -38,11 +38,13 @@ final class AppState: ObservableObject {
     @Published var isConnectedToRadiant = false
     
     // MARK: - 1Password Status
-    @Published var onePasswordConfigured = true  // Start as true when bypassing
+    @Published var onePasswordConfigured = false
     @Published var onePasswordStatus: CredentialService.OnePasswordStatus?
     
     // MARK: - Debug/Testing
-    @Published var bypassOnePassword = true  // Set to true to skip 1Password during testing
+    /// Set to true ONLY for local development without 1Password installed
+    /// WARNING: When true, uses default placeholder credentials - never deploy with this enabled
+    @Published var bypassOnePassword = false
     
     // MARK: - Initialization
     init() {

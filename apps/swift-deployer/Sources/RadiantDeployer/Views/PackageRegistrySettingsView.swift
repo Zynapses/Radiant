@@ -1757,7 +1757,7 @@ struct UploadPackageSheet: View {
                 
                 // Extract manifest from .radpkg file
                 let packageService = PackageService()
-                let deploymentPackage = try packageService.loadPackage(from: fileURL)
+                let deploymentPackage = try await packageService.loadPackage(from: fileURL)
                 let manifest = deploymentPackage.manifest
                 
                 let registry = GitHubPackageRegistry()
