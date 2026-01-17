@@ -56,6 +56,7 @@
 55. [Genesis Infrastructure: Sovereign Power Architecture](#55-genesis-infrastructure-sovereign-power-architecture)
 56. [Cato Security Grid: Native Network Defense](#56-cato-security-grid-native-network-defense)
 57. [AGI Brain & Identity Data Fabric: Agentic Orchestration](#57-agi-brain--identity-data-fabric-agentic-orchestration)
+58. [Deployment Safety & Environment Management](#58-deployment-safety--environment-management)
 
 ---
 
@@ -16179,10 +16180,183 @@ memory_safety:
 
 ---
 
+## 58. Deployment Safety & Environment Management
+
+### 58.1 Overview
+
+RADIANT uses a **three-environment architecture** (Dev, Staging, Prod) with strict safety rules to prevent accidental infrastructure damage. This section documents the **hard rules** that must never be bypassed.
+
+### 58.2 Environment Architecture
+
+| Environment | AWS Profile | Purpose | CDK Watch | Approval Required |
+|-------------|-------------|---------|-----------|-------------------|
+| **Dev** | `radiant-dev` | Development, testing | ✅ Allowed | No |
+| **Staging** | `radiant-staging` | Pre-production testing | 🛑 **FORBIDDEN** | Yes |
+| **Prod** | `radiant-prod` | Production | 🛑 **FORBIDDEN** | Yes |
+
+### 58.3 Critical Safety Rule: cdk watch is DEV-ONLY
+
+> ⚠️ **THIS RULE MUST NEVER BE IGNORED** ⚠️
+
+`cdk watch --hotswap` is **ONLY** allowed in the DEV environment. It is **absolutely forbidden** for staging and production.
+
+#### Why This Rule Exists
+
+`cdk watch --hotswap` bypasses CloudFormation safety mechanisms:
+
+| Risk | Description | Impact |
+|------|-------------|--------|
+| **No Rollback** | Hotswap changes cannot be rolled back automatically | Manual recovery required |
+| **State Drift** | CloudFormation state doesn't match actual resources | Future deployments may fail |
+| **Inconsistent Infrastructure** | Partial deployments can leave broken state | Service outages |
+| **No Change Sets** | No preview of what will change | Unexpected deletions |
+
+#### Enforcement Points
+
+The rule is enforced at **four independent levels**:
+
+1. **Swift Deployer App** (`apps/swift-deployer/Sources/RadiantDeployer/Services/CDKService.swift`)
+   ```swift
+   guard isHotswapAllowed(environment: environment) else {
+       throw CDKError.hotswapBlockedForEnvironment(environment)
+   }
+   ```
+   - `deployWithHotswap()` and `startWatch()` throw errors for non-dev
+   - Standard `deploy()` uses `--require-approval broadening` for staging/prod
+   - **This is the primary deployment method and enforces safety automatically**
+
+2. **CDK Entry Point** (`packages/infrastructure/bin/radiant.ts`)
+   ```typescript
+   if (isCdkWatch && detectedEnv !== 'dev') {
+     console.error('🛑 BLOCKED: cdk watch is FORBIDDEN...');
+     process.exit(1);  // Hard exit - no bypass
+   }
+   ```
+
+3. **Environment Configuration** (`packages/infrastructure/lib/config/environments.ts`)
+   - `enableCdkWatch: false` hardcoded for staging/prod
+   - `assertCdkWatchAllowed(env)` throws error for non-dev
+
+4. **Safety Script** (`scripts/cdk-safety-check.sh`)
+   - Pre-deploy check that blocks watch on non-dev
+   - Requires typing environment name to confirm staging/prod deploys
+
+### 58.4 Safe Deployment Methods
+
+#### For Development (cdk watch allowed)
+
+```bash
+# Configure credentials
+source ./scripts/setup_credentials.sh
+
+# Start Direct Dev Mode
+cd packages/infrastructure
+npx cdk watch --hotswap --profile radiant-dev
+```
+
+#### For Staging (approval required)
+
+```bash
+# Option 1: Swift Deployer (recommended)
+# Open Swift Deployer app → Select Staging → Deploy
+
+# Option 2: CLI with approval gates
+AWS_PROFILE=radiant-staging npx cdk deploy --all \
+  --require-approval broadening
+```
+
+#### For Production (approval required)
+
+```bash
+# Option 1: Swift Deployer (STRONGLY recommended)
+# Open Swift Deployer app → Select Production → Deploy
+
+# Option 2: CLI with approval gates (use with caution)
+AWS_PROFILE=radiant-prod npx cdk deploy --all \
+  --require-approval broadening
+```
+
+### 58.5 Credential Setup
+
+Before deploying to any environment, configure AWS credentials:
+
+1. **Create IAM Users** in AWS Console:
+   - `radiant-dev-deployer`
+   - `radiant-staging-deployer`
+   - `radiant-prod-deployer`
+
+2. **Attach Permissions**: `AdministratorAccess` policy (or scoped CDK policy)
+
+3. **Generate Access Keys** for each user
+
+4. **Configure Profiles**:
+   ```bash
+   # Edit the credentials script first
+   nano scripts/setup_credentials.sh
+   
+   # Then run it
+   source ./scripts/setup_credentials.sh
+   ```
+
+5. **Bootstrap CDK** (one-time per account/region):
+   ```bash
+   chmod +x ./scripts/bootstrap_cdk.sh
+   ./scripts/bootstrap_cdk.sh
+   ```
+
+### 58.6 Environment Detection
+
+The CDK entry point detects the target environment via multiple signals:
+
+| Signal | Priority | Example |
+|--------|----------|---------|
+| `RADIANT_ENV` env var | 1 (highest) | `RADIANT_ENV=staging` |
+| `CDK_CONTEXT_environment` | 2 | `-c environment=staging` |
+| `AWS_PROFILE` pattern | 3 | `radiant-staging` in profile name |
+| Default | 4 (lowest) | Falls back to `dev` |
+
+### 58.7 Troubleshooting
+
+#### "BLOCKED: cdk watch is FORBIDDEN" Error
+
+This error means you attempted to run `cdk watch` against a non-dev environment. This is intentional and cannot be bypassed.
+
+**Solution**: Use `cdk deploy` with approval gates instead:
+```bash
+AWS_PROFILE=radiant-{env} npx cdk deploy --all --require-approval broadening
+```
+
+#### Wrong Environment Detected
+
+If the wrong environment is being detected:
+```bash
+# Explicitly set the environment
+export RADIANT_ENV=dev
+export AWS_PROFILE=radiant-dev
+
+# Verify
+echo $RADIANT_ENV $AWS_PROFILE
+```
+
+### 58.8 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `apps/swift-deployer/.../CDKService.swift` | Swift Deployer CDK service with safety enforcement |
+| `packages/infrastructure/bin/radiant.ts` | CDK entry point with safety check |
+| `packages/infrastructure/lib/config/environments.ts` | Environment configurations |
+| `scripts/setup_credentials.sh` | AWS credential setup |
+| `scripts/bootstrap_cdk.sh` | CDK bootstrap helper |
+| `scripts/cdk-safety-check.sh` | Pre-deploy safety validation |
+| `packages/infrastructure/ARCHITECTURE.md` | Stack vs Lambda architecture guide |
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| **5.7.0** | 2026-01-17 | Deployment Safety (cdk watch DEV-only rule, environment guards, credential setup) |
 | **5.6.0** | 2026-01-12 | Genesis Infrastructure (Kaleidos reactor integration, SDS/PDSA compliance, SSF physical-to-digital bridge); Cato Security Grid (SPACE engine, inline AI/ML 3-6x detection, GenAI CASB controls); AGI Brain Identity Fabric (fastWorkflow agents, autonomous remediation, memory safety) |
 | **5.5.0** | 2026-01-10 | Polymorphic UI (PROMPT-41); ViewRouter component; Terminal/MindMap/DiffEditor views; Gearbox toggle; Escalation tracking |
 | **5.4.0** | 2026-01-10 | Cognitive Architecture (PROMPT-40); Ghost Memory TTL/semantic key; Economic Governor retrieval confidence; Sniper/War Room workflows; Circuit breakers; CloudWatch observability |

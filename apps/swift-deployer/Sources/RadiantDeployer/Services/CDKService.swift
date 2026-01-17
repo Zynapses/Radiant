@@ -4,12 +4,21 @@ actor CDKService {
     private var process: Process?
     private var outputPipe: Pipe?
     
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CRITICAL SAFETY RULE: cdk watch/hotswap is DEV-ONLY
+    // ═══════════════════════════════════════════════════════════════════════════
+    // This rule is enforced at the CDK entry point AND here in Swift.
+    // Hotswap bypasses CloudFormation safety checks and can corrupt infrastructure.
+    // ═══════════════════════════════════════════════════════════════════════════
+    
     enum CDKError: Error, LocalizedError {
         case nodeNotFound
         case cdkNotFound
         case bootstrapFailed(String)
         case deployFailed(String)
         case synthesizeFailed(String)
+        case hotswapBlockedForEnvironment(String)
+        case watchBlockedForEnvironment(String)
         
         var errorDescription: String? {
             switch self {
@@ -23,8 +32,29 @@ actor CDKService {
                 return "CDK deploy failed: \(message)"
             case .synthesizeFailed(let message):
                 return "CDK synth failed: \(message)"
+            case .hotswapBlockedForEnvironment(let env):
+                return "🛑 BLOCKED: Hotswap deployments are FORBIDDEN for \(env). Use standard deploy with approval gates."
+            case .watchBlockedForEnvironment(let env):
+                return "🛑 BLOCKED: cdk watch is FORBIDDEN for \(env). Use standard deploy with approval gates."
             }
         }
+    }
+    
+    /// Check if hotswap/watch is allowed for the given environment
+    /// Returns true ONLY for dev environment
+    private func isHotswapAllowed(environment: String) -> Bool {
+        let env = environment.lowercased()
+        return env == "dev" || env == "development"
+    }
+    
+    /// Get the appropriate approval mode for the environment
+    /// - DEV: "never" (fast iteration)
+    /// - STAGING/PROD: "broadening" (requires approval for permission changes)
+    private func getApprovalMode(environment: String) -> String {
+        if isHotswapAllowed(environment: environment) {
+            return "never"
+        }
+        return "broadening"
     }
     
     func checkPrerequisites() async throws -> Bool {
@@ -71,16 +101,73 @@ actor CDKService {
         credentials: CredentialSet,
         progressHandler: @escaping (String) -> Void
     ) async throws -> DeploymentOutputs? {
+        // ═══════════════════════════════════════════════════════════════════════
+        // SAFETY: Use environment-appropriate approval mode
+        // DEV: --require-approval never (fast iteration)
+        // STAGING/PROD: --require-approval broadening (safety gates)
+        // ═══════════════════════════════════════════════════════════════════════
+        let approvalMode = getApprovalMode(environment: environment)
+        
         let env = [
             "AWS_ACCESS_KEY_ID": credentials.accessKeyId,
             "AWS_SECRET_ACCESS_KEY": credentials.secretAccessKey,
-            "AWS_DEFAULT_REGION": credentials.region
+            "AWS_DEFAULT_REGION": credentials.region,
+            "RADIANT_ENV": environment.lowercased()  // Pass to CDK for additional safety checks
         ]
+        
+        // Log safety mode for transparency
+        if approvalMode == "broadening" {
+            progressHandler("🛡️ Safety Mode: Deploying to \(environment.uppercased()) with approval gates enabled\n")
+        }
         
         let output = try await runCommand(
             "npx",
             arguments: [
                 "cdk", "deploy", "--all",
+                "--context", "appId=\(appId)",
+                "--context", "environment=\(environment)",
+                "--require-approval", approvalMode,
+                "--outputs-file", "cdk-outputs.json"
+            ],
+            environment: env,
+            progressHandler: progressHandler
+        )
+        
+        if output.contains("failed") || output.contains("Error") {
+            throw CDKError.deployFailed(output)
+        }
+        
+        return nil
+    }
+    
+    /// Deploy with hotswap - DEV ONLY
+    /// This function will throw an error if called for non-dev environments
+    func deployWithHotswap(
+        appId: String,
+        environment: String,
+        credentials: CredentialSet,
+        progressHandler: @escaping (String) -> Void
+    ) async throws -> DeploymentOutputs? {
+        // ═══════════════════════════════════════════════════════════════════════
+        // 🛑 CRITICAL SAFETY CHECK: Hotswap is DEV-ONLY
+        // ═══════════════════════════════════════════════════════════════════════
+        guard isHotswapAllowed(environment: environment) else {
+            throw CDKError.hotswapBlockedForEnvironment(environment)
+        }
+        
+        let env = [
+            "AWS_ACCESS_KEY_ID": credentials.accessKeyId,
+            "AWS_SECRET_ACCESS_KEY": credentials.secretAccessKey,
+            "AWS_DEFAULT_REGION": credentials.region,
+            "RADIANT_ENV": "dev"
+        ]
+        
+        progressHandler("⚡ Hotswap Mode: Fast deployment for DEV environment\n")
+        
+        let output = try await runCommand(
+            "npx",
+            arguments: [
+                "cdk", "deploy", "--all", "--hotswap",
                 "--context", "appId=\(appId)",
                 "--context", "environment=\(environment)",
                 "--require-approval", "never",
@@ -95,6 +182,44 @@ actor CDKService {
         }
         
         return nil
+    }
+    
+    /// Start cdk watch - DEV ONLY
+    /// This function will throw an error if called for non-dev environments
+    func startWatch(
+        appId: String,
+        environment: String,
+        credentials: CredentialSet,
+        progressHandler: @escaping (String) -> Void
+    ) async throws {
+        // ═══════════════════════════════════════════════════════════════════════
+        // 🛑 CRITICAL SAFETY CHECK: cdk watch is DEV-ONLY
+        // ═══════════════════════════════════════════════════════════════════════
+        guard isHotswapAllowed(environment: environment) else {
+            throw CDKError.watchBlockedForEnvironment(environment)
+        }
+        
+        let env = [
+            "AWS_ACCESS_KEY_ID": credentials.accessKeyId,
+            "AWS_SECRET_ACCESS_KEY": credentials.secretAccessKey,
+            "AWS_DEFAULT_REGION": credentials.region,
+            "RADIANT_ENV": "dev",
+            "CDK_WATCH": "true"
+        ]
+        
+        progressHandler("👁️ Watch Mode: Starting continuous deployment for DEV environment\n")
+        progressHandler("⚠️ This mode is ONLY available for development. Press Ctrl+C to stop.\n")
+        
+        _ = try await runCommand(
+            "npx",
+            arguments: [
+                "cdk", "watch", "--hotswap",
+                "--context", "appId=\(appId)",
+                "--context", "environment=\(environment)"
+            ],
+            environment: env,
+            progressHandler: progressHandler
+        )
     }
     
     private func runCommand(
