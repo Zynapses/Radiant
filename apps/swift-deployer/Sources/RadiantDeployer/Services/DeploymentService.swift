@@ -881,7 +881,7 @@ actor DeploymentService {
             id: snapshotId,
             appId: app.id,
             environment: environment.rawValue,
-            version: currentParams.version ?? RADIANT_VERSION,
+            version: currentParams.version,
             packageHash: "",
             parameters: currentParams,
             createdAt: Date(),
@@ -964,7 +964,7 @@ actor DeploymentService {
         let metadata: [String: String] = [
             "version": snapshot.version,
             "rolledBackAt": ISO8601DateFormatter().string(from: Date()),
-            "rolledBackFrom": currentParams.version ?? "unknown",
+            "rolledBackFrom": currentParams.version,
             "snapshotId": snapshot.id
         ]
         let metadataJson = try JSONSerialization.data(withJSONObject: metadata)

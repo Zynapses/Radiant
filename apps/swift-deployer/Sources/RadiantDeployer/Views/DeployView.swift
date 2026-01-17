@@ -500,11 +500,11 @@ struct DeployView: View {
                     environment: environment,
                     credentials: credentials
                 )
-                await logMessage(.info, "Current version: \(currentParams.version ?? "unknown")")
+                await logMessage(.info, "Current version: \(currentParams.version)")
                 
                 // Download update package
                 await logMessage(.info, "Downloading update package...")
-                let packageInfo = try await packageService.downloadLatestPackage(channel: .stable) { progress in
+                _ = try await packageService.downloadLatestPackage(channel: .stable) { progress in
                     Task { @MainActor in
                         self.appState.deploymentProgress?.progress = progress * 0.1
                     }

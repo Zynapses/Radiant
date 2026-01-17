@@ -2101,7 +2101,7 @@ struct TestResultCard: View {
 // MARK: - Integration Test Models
 
 struct IntegrationTestResult: Identifiable, Codable {
-    let id = UUID()
+    let id: UUID
     let testId: String
     let testName: String
     let status: TestStatus
@@ -2111,6 +2111,31 @@ struct IntegrationTestResult: Identifiable, Codable {
     
     enum TestStatus: String, Codable {
         case passed, failed, skipped
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case testId, testName, status, duration, message, details
+    }
+    
+    init(testId: String, testName: String, status: TestStatus, duration: TimeInterval, message: String, details: String? = nil) {
+        self.id = UUID()
+        self.testId = testId
+        self.testName = testName
+        self.status = status
+        self.duration = duration
+        self.message = message
+        self.details = details
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = UUID()  // Generate new ID when decoding
+        self.testId = try container.decode(String.self, forKey: .testId)
+        self.testName = try container.decode(String.self, forKey: .testName)
+        self.status = try container.decode(TestStatus.self, forKey: .status)
+        self.duration = try container.decode(TimeInterval.self, forKey: .duration)
+        self.message = try container.decode(String.self, forKey: .message)
+        self.details = try container.decodeIfPresent(String.self, forKey: .details)
     }
 }
 
