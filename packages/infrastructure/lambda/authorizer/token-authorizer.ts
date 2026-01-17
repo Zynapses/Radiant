@@ -9,9 +9,10 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
 import { APIGatewayTokenAuthorizerEvent, APIGatewayAuthorizerResult, Context } from 'aws-lambda';
 import { logger } from '../shared/logging/enhanced-logger';
+import { requireEnv, optionalEnv } from '../shared/config/env';
 
-const COGNITO_USER_POOL_ID = process.env.COGNITO_USER_POOL_ID!;
-const COGNITO_REGION = process.env.COGNITO_REGION || process.env.AWS_REGION || 'us-east-1';
+const COGNITO_USER_POOL_ID = requireEnv('COGNITO_USER_POOL_ID');
+const COGNITO_REGION = optionalEnv('COGNITO_REGION', optionalEnv('AWS_REGION', 'us-east-1'));
 const COGNITO_ISSUER = `https://cognito-idp.${COGNITO_REGION}.amazonaws.com/${COGNITO_USER_POOL_ID}`;
 
 const client = jwksClient({

@@ -3,12 +3,13 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, DeleteCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { enhancedLogger as logger } from '../../shared/logging/enhanced-logger';
+import { requireEnv } from '../../shared/config/env';
 
 const ddbClient = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(ddbClient);
 const lambdaClient = new LambdaClient({});
 
-const CONNECTIONS_TABLE = process.env.CONNECTIONS_TABLE!;
+const CONNECTIONS_TABLE = requireEnv('CONNECTIONS_TABLE');
 
 export const handler: APIGatewayProxyWebsocketHandlerV2 = async (event) => {
   const connectionId = event.requestContext.connectionId;

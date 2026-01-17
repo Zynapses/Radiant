@@ -8,9 +8,10 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { DynamoDBClient, PutItemCommand, QueryCommand, DeleteItemCommand, GetItemCommand, AttributeValue } from '@aws-sdk/client-dynamodb';
 import { randomUUID, createHmac } from 'crypto';
 import { logger } from '../shared/logger';
+import { requireEnv } from '../shared/config/env';
 
 const dynamodb = new DynamoDBClient({});
-const WEBHOOKS_TABLE = process.env.WEBHOOKS_TABLE!;
+const WEBHOOKS_TABLE = requireEnv('WEBHOOKS_TABLE');
 
 interface Webhook {
   id: string;

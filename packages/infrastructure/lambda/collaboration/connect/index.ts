@@ -2,11 +2,12 @@ import { APIGatewayProxyWebsocketHandlerV2, APIGatewayProxyWebsocketEventV2 } fr
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { enhancedLogger as logger } from '../../shared/logging/enhanced-logger';
+import { requireEnv } from '../../shared/config/env';
 
 const ddbClient = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(ddbClient);
 
-const CONNECTIONS_TABLE = process.env.CONNECTIONS_TABLE!;
+const CONNECTIONS_TABLE = requireEnv('CONNECTIONS_TABLE');
 
 // Extended event type that includes queryStringParameters from $connect route
 type WebSocketConnectEvent = APIGatewayProxyWebsocketEventV2 & {
