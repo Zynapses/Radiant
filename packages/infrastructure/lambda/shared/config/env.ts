@@ -486,6 +486,36 @@ export function validateEnvironment(requiredVars: string[] = []): ValidationResu
 }
 
 /**
+ * Get a required environment variable with a helpful error message.
+ * Use this instead of process.env.VAR! to get better error messages.
+ * 
+ * @example
+ * const clusterArn = requireEnv('AURORA_CLUSTER_ARN');
+ * const redisHost = requireEnv('REDIS_HOST', 'localhost');
+ */
+export function requireEnv(key: string, defaultValue?: string): string {
+  const value = process.env[key];
+  if (value !== undefined && value !== '') {
+    return value;
+  }
+  if (defaultValue !== undefined) {
+    return defaultValue;
+  }
+  throw new Error(
+    `Required environment variable ${key} is not set. ` +
+    `Ensure it is configured in the CDK stack or Lambda environment.`
+  );
+}
+
+/**
+ * Get an optional environment variable with a default.
+ * Never throws - returns default if not set.
+ */
+export function optionalEnv(key: string, defaultValue: string): string {
+  return process.env[key] || defaultValue;
+}
+
+/**
  * Assert environment is valid, throwing if not.
  * Use this for fail-fast validation at startup.
  */

@@ -3,12 +3,13 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, QueryCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi';
 import { enhancedLogger as logger } from '../../shared/logging/enhanced-logger';
+import { requireEnv } from '../../shared/config/env';
 
 const ddbClient = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(ddbClient);
 
-const CONNECTIONS_TABLE = process.env.CONNECTIONS_TABLE!;
-const WEBSOCKET_URL = process.env.WEBSOCKET_URL!;
+const CONNECTIONS_TABLE = requireEnv('CONNECTIONS_TABLE');
+const WEBSOCKET_URL = requireEnv('WEBSOCKET_URL');
 
 interface BroadcastMessage {
   type: string;

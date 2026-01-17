@@ -14,6 +14,7 @@ import { Client } from 'pg';
 import { Redis } from 'ioredis';
 import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 import { FlyteLauncher } from '../../shared/services/swarm/flyte-launcher';
+import { requireEnv, optionalEnv } from '../../shared/config/env';
 
 // ============================================================================
 // TYPES
@@ -78,7 +79,7 @@ const logger: Logger = {
 async function initializeConnections(): Promise<void> {
   if (!dbClient) {
     const secret = await secretsManager.getSecretValue({
-      SecretId: process.env.DB_SECRET_ARN!,
+      SecretId: requireEnv('DB_SECRET_ARN'),
     });
     const credentials = JSON.parse(secret.SecretString!);
 
@@ -95,14 +96,14 @@ async function initializeConnections(): Promise<void> {
 
   if (!redis) {
     redis = new Redis({
-      host: process.env.REDIS_HOST!,
-      port: parseInt(process.env.REDIS_PORT!, 10),
+      host: requireEnv('REDIS_HOST'),
+      port: parseInt(requireEnv('REDIS_PORT'), 10),
     });
   }
 
   if (!flyteLauncher) {
     flyteLauncher = new FlyteLauncher(
-      process.env.FLYTE_ADMIN_URL!,
+      requireEnv('FLYTE_ADMIN_URL'),
       'radiant',
       process.env.NODE_ENV === 'prod' ? 'production' : 'development',
       logger

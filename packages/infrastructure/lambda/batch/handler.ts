@@ -8,13 +8,14 @@ import { SQSEvent, SQSRecord } from 'aws-lambda';
 import { DynamoDBClient, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { requireEnv } from '../shared/config/env';
 
 const dynamodb = new DynamoDBClient({});
 const s3 = new S3Client({});
 
-const JOBS_TABLE = process.env.JOBS_TABLE!;
-const INPUT_BUCKET = process.env.INPUT_BUCKET!;
-const OUTPUT_BUCKET = process.env.OUTPUT_BUCKET!;
+const JOBS_TABLE = requireEnv('JOBS_TABLE');
+const INPUT_BUCKET = requireEnv('INPUT_BUCKET');
+const OUTPUT_BUCKET = requireEnv('OUTPUT_BUCKET');
 
 interface BatchChunk {
   jobId: string;
