@@ -5,6 +5,40 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.7.0] - 2026-01-17
+
+### Added
+
+#### Deployment Safety & Environment Management
+
+Hard safety rules to prevent accidental infrastructure damage in staging/production environments.
+
+**Critical Rule: cdk watch is DEV-ONLY**
+- `cdk watch --hotswap` is now **forbidden** for staging and production
+- Enforced at three levels: CDK entry point, environment config, safety script
+- Attempting to run `cdk watch` on non-dev environments results in hard `process.exit(1)`
+
+**Why?** Hotswap bypasses CloudFormation safety checks, skips rollback capabilities, and can leave infrastructure in inconsistent states.
+
+**New Files:**
+- `scripts/setup_credentials.sh` - Multi-environment AWS credential setup
+- `scripts/bootstrap_cdk.sh` - CDK bootstrap helper
+- `scripts/cdk-safety-check.sh` - Pre-deploy safety validation
+- `packages/infrastructure/lib/config/environments.ts` - Environment configurations
+- `packages/infrastructure/ARCHITECTURE.md` - Stack vs Lambda architecture guide
+
+**Safe Deployment Methods:**
+```bash
+# DEV (cdk watch allowed)
+npx cdk watch --hotswap --profile radiant-dev
+
+# STAGING/PROD (approval required)
+AWS_PROFILE=radiant-staging npx cdk deploy --all --require-approval broadening
+AWS_PROFILE=radiant-prod npx cdk deploy --all --require-approval broadening
+```
+
+**Documentation:** See `docs/RADIANT-ADMIN-GUIDE.md` Section 58
+
 ## [5.5.0] - 2026-01-10
 
 ### Added

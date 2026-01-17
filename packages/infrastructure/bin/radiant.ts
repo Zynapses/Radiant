@@ -21,6 +21,47 @@ import {
   type Environment 
 } from '@radiant/shared';
 
+// ============================================================================
+// 🛑 CRITICAL SAFETY CHECK: Block cdk watch on non-dev environments
+// ============================================================================
+// This check runs BEFORE any CDK synthesis to prevent dangerous hotswap
+// deployments to staging or production environments.
+// ============================================================================
+
+const isCdkWatch = process.argv.includes('watch') || 
+                   process.env.CDK_WATCH === 'true' ||
+                   process.env.npm_lifecycle_event === 'cdk:watch';
+
+const detectedEnv = process.env.RADIANT_ENV || 
+                    process.env.CDK_CONTEXT_environment ||
+                    (process.env.AWS_PROFILE?.includes('staging') ? 'staging' : 
+                     process.env.AWS_PROFILE?.includes('prod') ? 'prod' : 'dev');
+
+if (isCdkWatch && detectedEnv !== 'dev') {
+  console.error(`
+╔═══════════════════════════════════════════════════════════════════════════╗
+║ 🛑 BLOCKED: cdk watch is FORBIDDEN for ${detectedEnv.toUpperCase().padEnd(8)} environment           ║
+╠═══════════════════════════════════════════════════════════════════════════╣
+║                                                                           ║
+║  cdk watch --hotswap bypasses CloudFormation safety checks and can:       ║
+║    • Leave infrastructure in inconsistent states                          ║
+║    • Skip rollback capabilities                                           ║
+║    • Cause production outages                                             ║
+║                                                                           ║
+║  FOR STAGING/PROD, use one of these SAFE methods:                         ║
+║                                                                           ║
+║    1. Swift Deployer (recommended)                                        ║
+║       Open the Swift Deployer app and use the deployment wizard           ║
+║                                                                           ║
+║    2. Manual CLI with approval gates:                                     ║
+║       AWS_PROFILE=radiant-${detectedEnv} npx cdk deploy --all \\                   ║
+║         --require-approval broadening                                     ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+`);
+  process.exit(1);
+}
+
 const app = new cdk.App();
 
 // ============================================================================
