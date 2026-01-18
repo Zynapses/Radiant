@@ -47,11 +47,82 @@ class ToolEntropyService {
   private readonly AUTO_CHAIN_THRESHOLD = 5;
   private readonly TIME_WINDOW_MS = 60000; // 1 minute window for co-occurrence
   private recentToolUsage: Map<string, ToolUsageEvent[]> = new Map();
+  private initialized = false;
+
+  /**
+   * Initialize service and restore tool usage sessions from database
+   */
+  async initialize(): Promise<void> {
+    if (this.initialized) return;
+
+    try {
+      // Get distinct session keys with recent activity
+      const keysResult = await executeStatement(
+        `SELECT DISTINCT session_key FROM tool_usage_sessions WHERE expires_at > NOW()`,
+        []
+      );
+
+      for (const row of (keysResult.rows || []) as Array<{ session_key: string }>) {
+        const usageResult = await executeStatement(
+          `SELECT tool_name, used_at, tenant_id, user_id, session_id 
+           FROM tool_usage_sessions 
+           WHERE session_key = $1 AND expires_at > NOW()
+           ORDER BY used_at DESC LIMIT 10`,
+          [stringParam('sessionKey', row.session_key)]
+        );
+
+        const events: ToolUsageEvent[] = (usageResult.rows || []).map((r: unknown) => {
+          const usage = r as { tool_name: string; used_at: string; tenant_id: string; user_id: string; session_id: string };
+          return {
+            tenant_id: usage.tenant_id,
+            user_id: usage.user_id,
+            session_id: usage.session_id,
+            tool_name: usage.tool_name,
+            timestamp: new Date(usage.used_at),
+          };
+        });
+
+        if (events.length > 0) {
+          this.recentToolUsage.set(row.session_key, events);
+        }
+      }
+
+      this.initialized = true;
+      logger.info('Tool Entropy initialized', { restoredSessions: this.recentToolUsage.size });
+    } catch (error) {
+      logger.error('Failed to initialize Tool Entropy', { error });
+      this.initialized = true;
+    }
+  }
+
+  /**
+   * Persist a tool usage event to database
+   */
+  private async persistToolUsage(sessionKey: string, event: ToolUsageEvent): Promise<void> {
+    try {
+      await executeStatement(
+        `INSERT INTO tool_usage_sessions (
+          session_key, tenant_id, user_id, session_id, tool_name, used_at, expires_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, NOW() + INTERVAL '10 minutes')`,
+        [
+          stringParam('sessionKey', sessionKey),
+          stringParam('tenantId', event.tenant_id),
+          stringParam('userId', event.user_id),
+          stringParam('sessionId', event.session_id),
+          stringParam('toolName', event.tool_name),
+          stringParam('usedAt', event.timestamp.toISOString()),
+        ]
+      );
+    } catch (error) {
+      logger.error('Failed to persist tool usage', { sessionKey, error });
+    }
+  }
 
   /**
    * Record a tool usage event
    */
   async recordToolUsage(event: ToolUsageEvent): Promise<void> {
+    await this.initialize();
     const sessionKey = `${event.tenant_id}:${event.user_id}:${event.session_id}`;
     
     // Get recent tools for this session
@@ -79,6 +150,9 @@ class ToolEntropyService {
       recentTools.shift();
     }
     this.recentToolUsage.set(sessionKey, recentTools);
+
+    // Persist for restart recovery
+    await this.persistToolUsage(sessionKey, event);
 
     // Clean up old sessions periodically
     if (Math.random() < 0.01) {

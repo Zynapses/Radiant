@@ -42,6 +42,7 @@ export interface PasteBackStats {
 // ============================================================================
 
 class PasteBackDetectionService {
+  private initialized = false;
   private readonly defaultConfig: PasteBackConfig = {
     enabled: true,
     detection_window_ms: 30000, // 30 seconds
@@ -79,19 +80,101 @@ class PasteBackDetectionService {
   private recentGenerations: Map<string, { episodeId: string; timestamp: number }> = new Map();
 
   /**
+   * Initialize service and restore recent generations from database
+   */
+  async initialize(): Promise<void> {
+    if (this.initialized) return;
+
+    try {
+      const result = await executeStatement(
+        `SELECT cache_key, episode_id, generated_at FROM recent_generations_cache WHERE expires_at > NOW()`,
+        []
+      );
+
+      for (const row of (result.rows || []) as Array<{ cache_key: string; episode_id: string; generated_at: string }>) {
+        this.recentGenerations.set(row.cache_key, {
+          episodeId: row.episode_id,
+          timestamp: new Date(row.generated_at).getTime(),
+        });
+      }
+
+      this.initialized = true;
+      logger.info('Paste-Back Detection initialized', { restoredGenerations: this.recentGenerations.size });
+    } catch (error) {
+      logger.error('Failed to initialize Paste-Back Detection', { error });
+      this.initialized = true;
+    }
+  }
+
+  /**
+   * Persist a recent generation to database
+   */
+  private async persistGeneration(
+    key: string,
+    tenantId: string,
+    userId: string,
+    sessionId: string,
+    episodeId: string,
+    timestamp: number
+  ): Promise<void> {
+    try {
+      await executeStatement(
+        `INSERT INTO recent_generations_cache (
+          cache_key, tenant_id, user_id, session_id, episode_id, generated_at, expires_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, NOW() + INTERVAL '5 minutes')
+        ON CONFLICT (cache_key) DO UPDATE SET
+          episode_id = EXCLUDED.episode_id,
+          generated_at = EXCLUDED.generated_at,
+          expires_at = NOW() + INTERVAL '5 minutes'`,
+        [
+          stringParam('cacheKey', key),
+          stringParam('tenantId', tenantId),
+          stringParam('userId', userId),
+          stringParam('sessionId', sessionId),
+          stringParam('episodeId', episodeId),
+          stringParam('generatedAt', new Date(timestamp).toISOString()),
+        ]
+      );
+    } catch (error) {
+      logger.error('Failed to persist generation', { key, error });
+    }
+  }
+
+  /**
+   * Remove a generation from persistence
+   */
+  private async removeGenerationFromCache(key: string): Promise<void> {
+    try {
+      await executeStatement(
+        `DELETE FROM recent_generations_cache WHERE cache_key = $1`,
+        [stringParam('cacheKey', key)]
+      );
+    } catch (error) {
+      logger.error('Failed to remove generation from cache', { key, error });
+    }
+  }
+
+  /**
    * Record that a generation just happened (call after AI responds)
    */
-  recordGeneration(
+  async recordGeneration(
     tenantId: string,
     userId: string,
     sessionId: string,
     episodeId: string
-  ): void {
+  ): Promise<void> {
+    await this.initialize();
+    
     const key = `${tenantId}:${userId}:${sessionId}`;
+    const timestamp = Date.now();
+    
     this.recentGenerations.set(key, {
       episodeId,
-      timestamp: Date.now(),
+      timestamp,
     });
+
+    // Persist for restart recovery
+    await this.persistGeneration(key, tenantId, userId, sessionId, episodeId, timestamp);
 
     // Cleanup old entries periodically
     if (Math.random() < 0.05) {
@@ -166,6 +249,7 @@ class PasteBackDetectionService {
 
     // Clear the generation tracking (one-time detection)
     this.recentGenerations.delete(key);
+    await this.removeGenerationFromCache(key);
 
     return event;
   }

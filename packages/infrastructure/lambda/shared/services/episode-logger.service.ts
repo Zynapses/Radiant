@@ -58,11 +58,87 @@ export interface EpisodeCreateInput {
 
 class EpisodeLoggerService {
   private activeEpisodes: Map<string, Episode> = new Map();
+  private initialized = false;
+
+  /**
+   * Initialize service and restore active episodes from database
+   */
+  async initialize(): Promise<void> {
+    if (this.initialized) return;
+
+    try {
+      const result = await executeStatement(
+        `SELECT episode_id, episode_data FROM active_episodes_cache WHERE expires_at > NOW()`,
+        []
+      );
+
+      for (const row of (result.rows || []) as Array<{ episode_id: string; episode_data: string }>) {
+        try {
+          const episode = JSON.parse(row.episode_data) as Episode;
+          episode.created_at = new Date(episode.created_at);
+          if (episode.completed_at) {
+            episode.completed_at = new Date(episode.completed_at);
+          }
+          this.activeEpisodes.set(row.episode_id, episode);
+        } catch {
+          // Skip malformed entries
+        }
+      }
+
+      this.initialized = true;
+      logger.info('Episode Logger initialized', { restoredEpisodes: this.activeEpisodes.size });
+    } catch (error) {
+      logger.error('Failed to initialize Episode Logger', { error });
+      this.initialized = true; // Continue without restored data
+    }
+  }
+
+  /**
+   * Persist an active episode to database cache
+   */
+  private async persistActiveEpisode(episode: Episode): Promise<void> {
+    try {
+      await executeStatement(
+        `INSERT INTO active_episodes_cache (
+          episode_id, tenant_id, user_id, session_id, episode_data, 
+          last_activity_at, expires_at
+        ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW() + INTERVAL '1 hour')
+        ON CONFLICT (episode_id) DO UPDATE SET
+          episode_data = EXCLUDED.episode_data,
+          last_activity_at = NOW(),
+          expires_at = NOW() + INTERVAL '1 hour'`,
+        [
+          stringParam('episodeId', episode.episode_id),
+          stringParam('tenantId', episode.tenant_id),
+          stringParam('userId', episode.user_id),
+          stringParam('sessionId', episode.session_id),
+          stringParam('episodeData', JSON.stringify(episode)),
+        ]
+      );
+    } catch (error) {
+      logger.error('Failed to persist active episode', { episodeId: episode.episode_id, error });
+    }
+  }
+
+  /**
+   * Remove episode from persistence cache
+   */
+  private async removeFromCache(episodeId: string): Promise<void> {
+    try {
+      await executeStatement(
+        `DELETE FROM active_episodes_cache WHERE episode_id = $1`,
+        [stringParam('episodeId', episodeId)]
+      );
+    } catch (error) {
+      logger.error('Failed to remove episode from cache', { episodeId, error });
+    }
+  }
 
   /**
    * Start a new episode for tracking
    */
   async startEpisode(input: EpisodeCreateInput): Promise<string> {
+    await this.initialize();
     const episodeId = uuidv4();
     
     const episode: Episode = {
@@ -87,6 +163,9 @@ class EpisodeLoggerService {
     };
 
     this.activeEpisodes.set(episodeId, episode);
+
+    // Persist to cache for restart recovery
+    await this.persistActiveEpisode(episode);
 
     await executeStatement(
       `INSERT INTO learning_episodes (
@@ -245,6 +324,9 @@ class EpisodeLoggerService {
 
     this.activeEpisodes.delete(episodeId);
 
+    // Remove from persistence cache
+    await this.removeFromCache(episodeId);
+
     logger.info('Episode completed', { episodeId, outcome });
     return episode;
   }
@@ -363,7 +445,7 @@ class EpisodeLoggerService {
     );
   }
 
-  private deriveOutcome(episode: Episode): Episode['outcome_signal'] {
+  private deriveOutcome(episode: Episode): 'positive' | 'negative' | 'neutral' {
     const { metrics } = episode;
 
     // Strong negative signals
