@@ -13,6 +13,7 @@ import { executeStatement } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { brainConfigService } from './brain-config.service';
 import { flashBufferService } from './flash-buffer.service';
+import { empiricismLoopService } from './empiricism-loop.service';
 import {
   type DreamJob,
   type DreamTrigger,
@@ -21,6 +22,13 @@ import {
   type TenantDreamSchedule,
   type DreamQueueStatus,
 } from '@radiant/shared';
+
+// Extended report type with verification fields
+interface DreamReportWithVerification extends DreamReport {
+  verificationsRun?: number;
+  skillsVerified?: number;
+  verificationSurprises?: number;
+}
 
 // =============================================================================
 // Dream Scheduler Service
@@ -355,6 +363,30 @@ class DreamSchedulerService {
       // 3. Prune stale ghosts
       const ghostsPruned = await this.pruneStaleGhosts(tenantId);
       report.ghostsPruned = ghostsPruned;
+
+      // 4. ACTIVE VERIFICATION (Empiricism Loop)
+      // During dreams, autonomously verify uncertain skills by running sandbox tests
+      // This implements Gemini's "Recursive Curiosity" / "Boredom Protocol"
+      try {
+        const verificationResult = await empiricismLoopService.activeVerification(tenantId);
+        (report as DreamReportWithVerification).verificationsRun = verificationResult.verificationsRun;
+        (report as DreamReportWithVerification).skillsVerified = verificationResult.skillsUpdated;
+        (report as DreamReportWithVerification).verificationSurprises = verificationResult.surpriseEvents;
+        
+        logger.info('Active verification during dream', {
+          tenantId,
+          verificationsRun: verificationResult.verificationsRun,
+          skillsUpdated: verificationResult.skillsUpdated,
+          surpriseEvents: verificationResult.surpriseEvents,
+        });
+      } catch (verifyError) {
+        logger.warn('Active verification failed during dream', { tenantId, error: verifyError });
+        report.errors.push({
+          operation: 'active_verification',
+          error: String(verifyError),
+          timestamp: new Date(),
+        });
+      }
 
       // Complete successfully
       report.completedAt = new Date();
