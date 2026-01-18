@@ -10466,14 +10466,46 @@ Enable LoRA inference per tenant in the Enhanced Learning config:
 | Medical Q&A | Generic response | Specialty-tuned | +35% accuracy |
 | Coding assistance | Generic response | Language-tuned | +25% correctness |
 
-### 41A.11 Troubleshooting
+### 41A.11 Boot Warm-Up (Proactive Hydration)
+
+To eliminate cold-start latency, RADIANT proactively loads global "Cato" adapters on container boot.
+
+**Warm-Up Lambda**: `lambda/consciousness/adapter-warmup.ts`
+
+**Triggers:**
+- CloudFormation deployment (custom resource)
+- EventBridge schedule (every 15 minutes to keep warm)
+- Manual invocation for testing
+
+**API:**
+```typescript
+// Warm up all global adapters for all tenants
+const result = await loraInferenceService.warmUpGlobalAdapters();
+// { success: true, tenantsProcessed: 5, adaptersLoaded: 5, durationMs: 1234 }
+
+// Warm up a specific endpoint
+const result = await loraInferenceService.warmUpEndpoint('radiant-lora-llama3-70b', 3);
+
+// Check warm-up status
+const status = await loraInferenceService.getWarmUpStatus();
+// { isWarmedUp: true, loadedGlobalAdapters: [...], endpointCount: 2, totalLoadedAdapters: 7 }
+```
+
+**Sequence:**
+1. Lambda queries all tenants with `adapter_auto_selection_enabled = true`
+2. For each tenant, loads the global "Cato" adapter
+3. Adapter is marked as pinned (never evicted)
+4. First user request has zero adapter loading latency
+
+### 41A.12 Troubleshooting
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
 | Adapter not loading | S3 path incorrect | Verify `s3_key` in `domain_lora_adapters` |
-| Slow first request | Adapter loading | Pre-warm with `preloadAdapters()` |
+| Slow first request | Warm-up not running | Check EventBridge rule for `adapter-warmup` |
 | Fallback to base | Adapter selection failed | Check `adapterAutoSelectionEnabled` |
 | Performance regression | Bad adapter | Enable `adapterRollbackEnabled` |
+| Global adapter evicted | `isPinned` not set | Ensure `adapter_layer = 'global'` in DB |
 
 ---
 

@@ -5,6 +5,40 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.10.0] - 2026-01-17
+
+### Added
+
+#### Proactive Boot Warm-Up for Global Adapters
+
+Eliminates cold-start latency by pre-loading global "Cato" adapters on container boot.
+
+**New Files:**
+- `lambda/consciousness/adapter-warmup.ts` - Warm-up Lambda handler
+
+**New API:**
+```typescript
+// Warm up all global adapters for all tenants
+await loraInferenceService.warmUpGlobalAdapters();
+
+// Warm up a specific endpoint
+await loraInferenceService.warmUpEndpoint('radiant-lora-llama3-70b', 3);
+
+// Check warm-up status
+await loraInferenceService.getWarmUpStatus();
+```
+
+**Triggers:**
+- CloudFormation deployment (custom resource)
+- EventBridge schedule (every 15 minutes to keep warm)
+- Manual invocation for testing
+
+**Result:** First user request after cold start has zero adapter loading latency.
+
+**Documentation:** See `docs/RADIANT-ADMIN-GUIDE.md` Section 41A.11
+
+---
+
 ## [5.9.0] - 2026-01-17
 
 ### Added
