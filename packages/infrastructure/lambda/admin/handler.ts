@@ -348,6 +348,18 @@ async function routeRequest(
     return mod.handler(event, context) as Promise<APIGatewayProxyResult>;
   }
 
+  // Empiricism Loop - Reality-testing circuit for consciousness
+  if (pathParts[1] === 'empiricism') {
+    const { handler: empiricismHandler } = await import('./empiricism-loop.js');
+    return empiricismHandler(event);
+  }
+
+  // LoRA Adapters - Tri-layer adapter management
+  if (pathParts[1] === 'lora') {
+    const { handler: loraHandler } = await import('./lora-adapters.js');
+    return loraHandler(event);
+  }
+
   throw new NotFoundError(`Admin route not found: ${method} ${path}`);
 }
 
