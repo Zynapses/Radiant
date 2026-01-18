@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api';
+import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -535,24 +537,98 @@ function CreateReportDialog({ open, onOpenChange }: { open: boolean; onOpenChang
 }
 
 export default function ReportsPage() {
-  const [reports, setReports] = useState<Report[]>(SAMPLE_REPORTS);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterSchedule, setFilterSchedule] = useState<string>('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
 
+  // Fetch reports from API
+  const { data: reportsData, isLoading } = useQuery({
+    queryKey: ['reports', filterType, filterSchedule, activeTab === 'favorites'],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (filterType !== 'all') params.append('type', filterType);
+      if (filterSchedule !== 'all') params.append('schedule', filterSchedule);
+      if (activeTab === 'favorites') params.append('favorite', 'true');
+      
+      const res = await apiClient.get<{ reports: Report[]; count: number }>(
+        `/admin/reports?${params.toString()}`
+      );
+      return res;
+    },
+  });
+
+  // Fetch stats
+  const { data: stats } = useQuery({
+    queryKey: ['reports', 'stats'],
+    queryFn: async () => {
+      const res = await apiClient.get<{
+        total_reports: number;
+        scheduled_reports: number;
+        favorite_reports: number;
+        sent_this_month: number;
+      }>('/admin/reports/stats');
+      return res;
+    },
+  });
+
+  // Toggle favorite mutation
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: async ({ id, isFavorite }: { id: string; isFavorite: boolean }) => {
+      await apiClient.put(`/admin/reports/${id}`, { is_favorite: !isFavorite });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reports'] });
+    },
+  });
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiClient.delete(`/admin/reports/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reports'] });
+      toast({ title: 'Report deleted', description: 'The report has been deleted.' });
+    },
+  });
+
+  // Run report mutation
+  const runReportMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiClient.post<{ success: boolean; download_url?: string; error?: string }>(
+        `/admin/reports/${id}/run`, {}
+      );
+      return res;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['reports'] });
+      if (data.success && data.download_url) {
+        toast({ 
+          title: 'Report generated', 
+          description: 'Your report is ready for download.',
+          action: (
+            <a href={data.download_url} target="_blank" rel="noopener noreferrer">
+              Download
+            </a>
+          ),
+        });
+      } else if (data.error) {
+        toast({ title: 'Report failed', description: data.error, variant: 'destructive' });
+      }
+    },
+    onError: () => {
+      toast({ title: 'Error', description: 'Failed to generate report.', variant: 'destructive' });
+    },
+  });
+
+  const reports = reportsData?.reports || [];
+
   const filteredReports = reports.filter(report => {
     if (searchQuery && !report.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    if (filterType !== 'all' && report.type !== filterType) {
-      return false;
-    }
-    if (filterSchedule !== 'all' && report.schedule !== filterSchedule) {
-      return false;
-    }
-    if (activeTab === 'favorites' && !report.isFavorite) {
       return false;
     }
     if (activeTab === 'scheduled' && report.schedule === 'manual') {
@@ -562,13 +638,18 @@ export default function ReportsPage() {
   });
 
   const handleToggleFavorite = (reportId: string) => {
-    setReports(prev =>
-      prev.map(r => r.id === reportId ? { ...r, isFavorite: !r.isFavorite } : r)
-    );
+    const report = reports.find(r => r.id === reportId);
+    if (report) {
+      toggleFavoriteMutation.mutate({ id: reportId, isFavorite: report.isFavorite });
+    }
   };
 
   const handleDelete = (reportId: string) => {
-    setReports(prev => prev.filter(r => r.id !== reportId));
+    deleteMutation.mutate(reportId);
+  };
+
+  const handleRun = (reportId: string) => {
+    runReportMutation.mutate(reportId);
   };
 
   return (
@@ -599,7 +680,7 @@ export default function ReportsPage() {
                 <FileText className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{reports.length}</p>
+                <p className="text-2xl font-bold">{stats?.total_reports ?? reports.length}</p>
                 <p className="text-sm text-muted-foreground">Total Reports</p>
               </div>
             </div>
@@ -613,7 +694,7 @@ export default function ReportsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {reports.filter(r => r.schedule !== 'manual').length}
+                  {stats?.scheduled_reports ?? reports.filter(r => r.schedule !== 'manual').length}
                 </p>
                 <p className="text-sm text-muted-foreground">Scheduled</p>
               </div>
@@ -628,7 +709,7 @@ export default function ReportsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">
-                  {reports.filter(r => r.isFavorite).length}
+                  {stats?.favorite_reports ?? reports.filter(r => r.isFavorite).length}
                 </p>
                 <p className="text-sm text-muted-foreground">Favorites</p>
               </div>
@@ -642,7 +723,7 @@ export default function ReportsPage() {
                 <Send className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">47</p>
+                <p className="text-2xl font-bold">{stats?.sent_this_month ?? 0}</p>
                 <p className="text-sm text-muted-foreground">Sent This Month</p>
               </div>
             </div>
@@ -708,7 +789,7 @@ export default function ReportsPage() {
             <ReportCard
               key={report.id}
               report={report}
-              onRun={() => console.log('Run report:', report.id)}
+              onRun={() => handleRun(report.id)}
               onEdit={() => console.log('Edit report:', report.id)}
               onDelete={() => handleDelete(report.id)}
               onToggleFavorite={() => handleToggleFavorite(report.id)}
