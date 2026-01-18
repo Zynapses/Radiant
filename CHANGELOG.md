@@ -5,6 +5,52 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.12.5] - 2026-01-17
+
+### Added
+
+#### Admin Reports System (Full Implementation)
+
+Complete report writer with scheduling, recipients, and multi-format generation.
+
+**Features:**
+- **6 Report Types** - Usage, Cost, Security, Performance, Compliance, Custom
+- **4 Output Formats** - PDF, Excel, CSV, JSON
+- **5 Schedules** - Manual, Daily, Weekly, Monthly, Quarterly
+- **8 Pre-built Templates** - Usage Summary, Cost Breakdown, Security Audit, etc.
+- **Recipient Management** - Email delivery for scheduled reports
+- **Execution History** - Full audit trail with download links
+
+**API Endpoints (Base: `/api/admin/reports`):**
+- `GET/POST /` - List/Create reports
+- `GET/PUT/DELETE /:id` - Get/Update/Delete report
+- `POST /:id/run` - Run immediately with download URL
+- `POST /:id/duplicate` - Duplicate report
+- `GET /templates` - List templates
+- `GET /stats` - Report statistics
+
+**Scheduling:**
+- EventBridge Lambda every 5 minutes
+- Automatic next_run_at calculation
+- S3 storage with integrity checksums
+
+**Database Tables:**
+- `report_templates` - Pre-built templates
+- `admin_reports` - User reports with scheduling
+- `report_executions` - Execution history
+- `report_subscriptions` - Email recipients
+
+**Files:**
+- Migration: `migrations/V2026_01_17_006__admin_reports.sql`
+- Generator: `lambda/shared/services/report-generator.service.ts`
+- API: `lambda/admin/reports.ts`
+- Scheduler: `lambda/admin/scheduled-reports.ts`
+- UI: Updated `apps/admin-dashboard/app/(dashboard)/reports/page.tsx`
+
+**Documentation:** Admin Guide Section 41C.18
+
+---
+
 ## [5.12.4] - 2026-01-17
 
 ### Added

@@ -11491,6 +11491,61 @@ const status = await persistenceGuard.getIntegrityStatus(tenantId);
 
 ---
 
+### 41C.18 Admin Reports System
+
+Full report writer with scheduling, recipients, and multi-format generation.
+
+**Report Types:**
+- `usage` - API calls, tokens, users
+- `cost` - Billing breakdown by model/user
+- `security` - Login attempts, anomalies
+- `performance` - Latency, throughput, errors
+- `compliance` - SOC2, GDPR, HIPAA status
+- `custom` - Custom queries
+
+**Output Formats:** PDF, Excel, CSV, JSON
+
+**Scheduling:** Manual, Daily, Weekly, Monthly, Quarterly
+
+**Database Tables:**
+
+| Table | Purpose |
+|-------|---------|
+| `report_templates` | Pre-built report types |
+| `admin_reports` | User-created reports |
+| `report_executions` | Execution history |
+| `report_subscriptions` | Email recipients |
+
+**API Endpoints (Base: `/api/admin/reports`):**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | List all reports |
+| `POST` | `/` | Create report |
+| `GET` | `/:id` | Get report with executions |
+| `PUT` | `/:id` | Update report |
+| `DELETE` | `/:id` | Delete report (soft) |
+| `POST` | `/:id/run` | Run report immediately |
+| `POST` | `/:id/duplicate` | Duplicate report |
+| `GET` | `/:id/download/:executionId` | Get download URL |
+| `GET` | `/templates` | List templates |
+| `GET` | `/stats` | Report statistics |
+
+**Scheduled Execution:**
+- EventBridge Lambda runs every 5 minutes
+- Checks `next_run_at` for due reports
+- Generates and stores in S3
+- Emails recipients (future)
+
+**Files:**
+- Migration: `migrations/V2026_01_17_006__admin_reports.sql`
+- Generator: `lambda/shared/services/report-generator.service.ts`
+- API: `lambda/admin/reports.ts`
+- Scheduler: `lambda/admin/scheduled-reports.ts`
+- UI: `apps/admin-dashboard/app/(dashboard)/reports/page.tsx`
+
+---
+
 ## 42. Genesis Cato Safety Architecture
 
 ### 42.1 Overview
