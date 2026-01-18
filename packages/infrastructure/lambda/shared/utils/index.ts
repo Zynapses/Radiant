@@ -136,3 +136,18 @@ export {
   assertNotNullish,
   coalesce,
 } from './nullish';
+
+// Database utilities
+export * from './db';
+
+// Logger utilities
+export * from './logger';
+
+// Auth utilities (explicit to avoid conflicts with request-context)
+export { 
+  withAdminAuth, 
+  AuthContext, 
+  AuthenticatedEvent,
+  getTenantId as getAuthTenantId,
+  getUserId as getAuthUserId,
+} from './auth';
