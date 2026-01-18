@@ -5,6 +5,44 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.12.2] - 2026-01-17
+
+### Added
+
+#### S3 Content Offloading with Orphan Cleanup
+
+Large user content is now offloaded to S3 to prevent database scaling issues.
+
+**Offloaded Tables:**
+
+| Table | Column(s) | Threshold |
+|-------|-----------|-----------|
+| `thinktank_messages` | `content` | 10KB |
+| `memories` | `content` | 10KB |
+| `learning_episodes` | `draft_content`, `final_content` | 10KB |
+| `rejected_prompt_archive` | `prompt_content` | 10KB |
+
+**Features:**
+- **Content-Addressable Storage** - SHA-256 deduplication
+- **Compression** - gzip for content > 1KB
+- **Reference Counting** - Track shared content
+- **Orphan Cleanup** - 24hr grace period, then auto-delete
+
+**Architecture:**
+```
+Content > 10KB → Hash → Dedup Check → Compress → S3 → Registry
+DELETE row → Trigger → Orphan Queue → 24hr → Lambda → S3 Delete
+```
+
+**Files:**
+- Migration: `migrations/V2026_01_17_004__s3_content_offloading.sql`
+- Service: `lambda/shared/services/s3-content-offload.service.ts`
+- Cleanup Lambda: `lambda/admin/s3-orphan-cleanup.ts`
+
+**Documentation:** Admin Guide Section 41C.16
+
+---
+
 ## [5.12.1] - 2026-01-17
 
 ### Added

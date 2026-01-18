@@ -11239,6 +11239,104 @@ Unprocessed feedback (skeletonization, recipe checks, DPO pairing) is queued for
 
 ---
 
+### 41C.16 S3 Content Offloading
+
+Large user content is offloaded to S3 to prevent database scaling issues.
+
+**Tables with S3 Offloading:**
+
+| Table | Column(s) | Threshold | Notes |
+|-------|-----------|-----------|-------|
+| `thinktank_messages` | `content` | 10KB | User messages |
+| `memories` | `content` | 10KB | Persistent memories |
+| `learning_episodes` | `draft_content`, `final_content` | 10KB | Code drafts |
+| `rejected_prompt_archive` | `prompt_content` | 10KB | Rejected prompts |
+
+**Architecture:**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    S3 CONTENT OFFLOADING FLOW                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   Content > 10KB                                                            │
+│        │                                                                    │
+│        ▼                                                                    │
+│   ┌──────────────────┐     ┌──────────────────┐                            │
+│   │  SHA-256 Hash    │ ──► │  Check Registry  │                            │
+│   │  (Content-Addr)  │     │  (Dedup Check)   │                            │
+│   └──────────────────┘     └────────┬─────────┘                            │
+│                                     │                                       │
+│                    ┌────────────────┴────────────────┐                     │
+│                    │                                 │                     │
+│               EXISTS                            NEW CONTENT                │
+│                    │                                 │                     │
+│                    ▼                                 ▼                     │
+│           ┌──────────────┐               ┌──────────────────┐              │
+│           │ Increment    │               │ Compress (gzip)  │              │
+│           │ Ref Count    │               │ Upload to S3     │              │
+│           └──────────────┘               │ Register in DB   │              │
+│                                          └──────────────────┘              │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Orphan Cleanup (On Deletion):**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ORPHAN CLEANUP FLOW                                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   DELETE FROM source_table                                                  │
+│        │                                                                    │
+│        ▼                                                                    │
+│   ┌──────────────────┐                                                      │
+│   │  TRIGGER:        │  ← queue_s3_orphan_on_delete()                      │
+│   │  Queue Orphan    │                                                      │
+│   └────────┬─────────┘                                                      │
+│            │                                                                │
+│            ▼                                                                │
+│   ┌──────────────────┐     24hr grace     ┌──────────────────┐             │
+│   │  s3_orphan_queue │ ──────────────────►│  EventBridge     │             │
+│   │  (pending)       │     period         │  Lambda (5 min)  │             │
+│   └──────────────────┘                    └────────┬─────────┘             │
+│                                                    │                        │
+│                                                    ▼                        │
+│                                           ┌──────────────────┐             │
+│                                           │ S3 DeleteObject  │             │
+│                                           │ Mark Complete    │             │
+│                                           └──────────────────┘             │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Configuration (per-tenant):**
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `offloading_enabled` | `true` | Enable/disable offloading |
+| `auto_offload_threshold_bytes` | `10000` | Offload if content > 10KB |
+| `compression_enabled` | `true` | Compress large content |
+| `compression_algorithm` | `gzip` | Compression algorithm |
+| `orphan_grace_period_hours` | `24` | Wait before deleting orphans |
+
+**Database Tables:**
+
+| Table | Purpose |
+|-------|---------|
+| `s3_content_registry` | Central registry of all S3 content with reference tracking |
+| `s3_orphan_queue` | Queue of orphaned S3 objects pending deletion |
+| `s3_offloading_config` | Per-tenant offloading configuration |
+
+**Service:** `lambda/shared/services/s3-content-offload.service.ts`
+
+**Cleanup Lambda:** `lambda/admin/s3-orphan-cleanup.ts` (EventBridge every 5 minutes)
+
+**Migration:** `migrations/V2026_01_17_004__s3_content_offloading.sql`
+
+---
+
 ## 42. Genesis Cato Safety Architecture
 
 ### 42.1 Overview
