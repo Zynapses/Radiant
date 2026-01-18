@@ -6,6 +6,8 @@ import type { SqlParameter } from '@aws-sdk/client-rds-data';
 import { modelRouterService, ModelResponse } from './model-router.service';
 import { consciousnessService, type WorkspaceContent } from './consciousness.service';
 import { agiLearningPersistenceService } from './agi-learning-persistence.service';
+import { loraInferenceService } from './lora-inference.service';
+import { adapterManagementService } from './adapter-management.service';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // ============================================================================
@@ -403,7 +405,17 @@ export class CognitiveBrainService {
     const startTime = Date.now();
     try {
       const systemPrompt = this.buildRegionPrompt(region, settings);
-      const modelResponse = await this.callModel(region.primaryModelId, systemPrompt, input, region.maxTokensPerCall);
+      // Pass tenantId and domain for LoRA adapter selection
+      const modelResponse = await this.callModel(
+        region.primaryModelId, 
+        systemPrompt, 
+        input, 
+        region.maxTokensPerCall,
+        { 
+          tenantId, 
+          domain: region.cognitiveFunction // Use cognitive function as domain hint
+        }
+      );
       const latency = Date.now() - startTime;
       await this.logActivation(tenantId, sessionId, region.regionId, true, latency, modelResponse.modelUsed);
       return {
@@ -436,7 +448,50 @@ export class CognitiveBrainService {
     return settings.customSystemPrompt || prompts[region.cognitiveFunction] || 'You are an AI assistant.';
   }
 
-  private async callModel(modelId: string, systemPrompt: string, input: string, maxTokens: number): Promise<ModelResponse> {
+  private async callModel(
+    modelId: string, 
+    systemPrompt: string, 
+    input: string, 
+    maxTokens: number,
+    options?: { tenantId?: string; domain?: string; subdomain?: string }
+  ): Promise<ModelResponse> {
+    // Check if LoRA inference should be used for self-hosted models
+    if (options?.tenantId && this.isSelfHostedModel(modelId)) {
+      const loraEnabled = await loraInferenceService.isLoRAEnabled(options.tenantId);
+      
+      if (loraEnabled) {
+        try {
+          const loraResponse = await loraInferenceService.invokeWithLoRA({
+            tenantId: options.tenantId,
+            modelId,
+            prompt: input,
+            systemPrompt,
+            maxTokens,
+            domain: options.domain,
+            subdomain: options.subdomain,
+          });
+          
+          // Convert LoRA response to ModelResponse format
+          return {
+            content: loraResponse.content,
+            modelUsed: loraResponse.modelUsed,
+            provider: 'litellm', // Self-hosted models go through LiteLLM-compatible interface
+            inputTokens: loraResponse.inputTokens,
+            outputTokens: loraResponse.outputTokens,
+            latencyMs: loraResponse.latencyMs,
+            costCents: loraResponse.costCents,
+            cached: false,
+          };
+        } catch (error) {
+          logger.warn('LoRA inference failed, falling back to base model', {
+            modelId,
+            error: error instanceof Error ? error.message : 'Unknown',
+          });
+          // Fall through to standard model router
+        }
+      }
+    }
+    
     // Use hybrid model router: Bedrock (primary) -> LiteLLM (fallback) -> Direct (specialized)
     return modelRouterService.invoke({
       modelId,
@@ -444,6 +499,18 @@ export class CognitiveBrainService {
       systemPrompt,
       maxTokens,
     });
+  }
+
+  /**
+   * Check if a model is self-hosted (eligible for LoRA)
+   */
+  private isSelfHostedModel(modelId: string): boolean {
+    const selfHostedPrefixes = [
+      'llama', 'mistral', 'qwen', 'deepseek', 'yi', 'falcon',
+      'self-hosted/', 'local/', 'sagemaker/'
+    ];
+    const lowerModelId = modelId.toLowerCase();
+    return selfHostedPrefixes.some(prefix => lowerModelId.includes(prefix));
   }
 
   private async logActivation(tenantId: string, sessionId: string, regionId: string, success: boolean, latencyMs: number, modelUsed: string): Promise<void> {

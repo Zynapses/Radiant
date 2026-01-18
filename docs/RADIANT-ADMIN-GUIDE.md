@@ -10306,6 +10306,131 @@ const TWILIGHT_DREAMING = {
 
 ---
 
+## 41A. LoRA Inference Integration
+
+### 41A.1 Overview
+
+The LoRA Inference Integration connects trained LoRA adapters to the actual inference path, enabling domain-specific fine-tuned responses. Previously, LoRA adapters were trained but not used during inference. This integration bridges that gap.
+
+### 41A.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        LoRA Inference Flow                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  User Request                                                                │
+│       │                                                                      │
+│       ▼                                                                      │
+│  ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐       │
+│  │ Cognitive Brain │ ──► │ Domain Detection│ ──► │ Adapter Selection│       │
+│  └─────────────────┘     └─────────────────┘     └─────────────────┘       │
+│                                                          │                   │
+│                                                          ▼                   │
+│  ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐       │
+│  │    Response     │ ◄── │ SageMaker w/LoRA│ ◄── │  Load Adapter   │       │
+│  └─────────────────┘     └─────────────────┘     └─────────────────┘       │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 41A.3 Key Components
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| **LoRA Inference Service** | `lora-inference.service.ts` | Orchestrates adapter loading and inference |
+| **Adapter Management** | `adapter-management.service.ts` | Selects best adapter per domain |
+| **Cognitive Brain** | `cognitive-brain.service.ts` | Integrates LoRA into model calls |
+| **Model Router** | `model-router.service.ts` | Extended with LoRA request fields |
+
+### 41A.4 How It Works
+
+1. **Request Arrives**: Cognitive brain receives inference request with tenant and domain
+2. **Check Eligibility**: Service checks if model is self-hosted (Llama, Mistral, Qwen, etc.)
+3. **Adapter Selection**: `adapterManagementService.selectBestAdapter()` finds optimal adapter
+4. **Load Adapter**: If not in memory, load adapter weights to SageMaker endpoint
+5. **Inference**: Execute with LoRA-enhanced model
+6. **Fallback**: If LoRA fails, automatically falls back to base model
+
+### 41A.5 Adapter Selection Logic
+
+```typescript
+// Selection priority:
+// 1. Explicitly specified adapter ID
+// 2. Auto-select by domain + subdomain match
+// 3. Tenant's active/default adapter
+// 4. Fall back to base model (no adapter)
+
+const adapter = await loraInferenceService.invokeWithLoRA({
+  tenantId,
+  modelId: 'llama-3-70b',
+  prompt: userInput,
+  domain: 'legal',           // Optional domain hint
+  subdomain: 'contract_law', // Optional subdomain
+});
+```
+
+### 41A.6 Self-Hosted Model Detection
+
+Models eligible for LoRA inference are detected by prefix:
+
+| Prefix | Examples |
+|--------|----------|
+| `llama` | `llama-3-70b`, `llama-3.1-8b` |
+| `mistral` | `mistral-7b`, `mixtral-8x7b` |
+| `qwen` | `qwen2.5-72b`, `qwen2.5-7b` |
+| `deepseek` | `deepseek-coder-33b` |
+| `yi` | `yi-34b` |
+| `falcon` | `falcon-40b` |
+| `self-hosted/` | Any custom self-hosted model |
+| `sagemaker/` | Any SageMaker endpoint |
+
+### 41A.7 Endpoint Memory Management
+
+Each SageMaker endpoint can hold multiple adapters in memory (default: 5). When full:
+
+1. **LRU Eviction**: Least recently used adapter is unloaded
+2. **Load New**: New adapter weights loaded from S3
+3. **Cache Update**: In-memory adapter cache updated
+
+### 41A.8 Configuration
+
+Enable LoRA inference per tenant in the Enhanced Learning config:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `adapterAutoSelectionEnabled` | `false` | Enable automatic adapter selection |
+| `adapterRollbackEnabled` | `true` | Auto-rollback on performance drop |
+| `adapterRollbackThreshold` | `10` | % satisfaction drop to trigger rollback |
+
+### 41A.9 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `domain_lora_adapters` | Adapter metadata and S3 locations |
+| `adapter_usage_log` | Inference usage tracking |
+| `component_load_events` | Adapter load/unload events |
+| `consciousness_evolution_state` | Active adapter per tenant |
+
+### 41A.10 Cost Benefits
+
+| Scenario | Without LoRA | With LoRA | Improvement |
+|----------|--------------|-----------|-------------|
+| Legal queries | Generic response | Domain-tuned | +40% relevance |
+| Medical Q&A | Generic response | Specialty-tuned | +35% accuracy |
+| Coding assistance | Generic response | Language-tuned | +25% correctness |
+
+### 41A.11 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Adapter not loading | S3 path incorrect | Verify `s3_key` in `domain_lora_adapters` |
+| Slow first request | Adapter loading | Pre-warm with `preloadAdapters()` |
+| Fallback to base | Adapter selection failed | Check `adapterAutoSelectionEnabled` |
+| Performance regression | Bad adapter | Enable `adapterRollbackEnabled` |
+
+---
+
 ## 42. Genesis Cato Safety Architecture
 
 ### 42.1 Overview
