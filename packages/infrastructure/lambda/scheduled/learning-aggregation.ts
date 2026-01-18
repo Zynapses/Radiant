@@ -15,6 +15,8 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
+  // Note: rejectUnauthorized: false is acceptable for Aurora within AWS VPC
+  // Aurora uses AWS-managed certificates that may not chain to public CAs
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
 });
 
