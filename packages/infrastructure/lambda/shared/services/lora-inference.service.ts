@@ -1073,6 +1073,194 @@ class LoRAInferenceService {
       }
     }
   }
+
+  // ==========================================================================
+  // Warm-Up / Boot Hydration
+  // ==========================================================================
+
+  /**
+   * Warm up endpoints by pre-loading global "Cato" adapters
+   * Called on container boot or deployment to eliminate cold-start latency
+   * 
+   * This ensures the first user request doesn't have to wait for adapter loading.
+   */
+  async warmUpGlobalAdapters(): Promise<WarmUpResult> {
+    const startTime = Date.now();
+    const results: WarmUpResult = {
+      success: true,
+      tenantsProcessed: 0,
+      adaptersLoaded: 0,
+      errors: [],
+      durationMs: 0,
+    };
+
+    try {
+      // Get all active tenants with LoRA enabled
+      const tenantsResult = await executeStatement(
+        `SELECT DISTINCT t.id as tenant_id, t.name as tenant_name
+         FROM tenants t
+         JOIN enhanced_learning_config elc ON t.id = elc.tenant_id
+         WHERE elc.adapter_auto_selection_enabled = true
+           AND t.status = 'active'
+         LIMIT 100`, // Safety limit
+        []
+      );
+
+      if (!tenantsResult.rows?.length) {
+        logger.info('No tenants with LoRA enabled, skipping warm-up');
+        results.durationMs = Date.now() - startTime;
+        return results;
+      }
+
+      logger.info('Starting global adapter warm-up', {
+        tenantCount: tenantsResult.rows.length,
+      });
+
+      for (const row of tenantsResult.rows) {
+        const tenantId = String((row as Record<string, unknown>).tenant_id);
+        const tenantName = String((row as Record<string, unknown>).tenant_name);
+
+        try {
+          // Get the global Cato adapter for this tenant
+          const globalAdapter = await this.getGlobalCatoAdapter(tenantId, 'llama-3-70b');
+          
+          if (globalAdapter) {
+            await this.ensureAdapterLoaded(tenantId, globalAdapter);
+            results.adaptersLoaded++;
+            logger.info('Warmed up global adapter', {
+              tenantId,
+              tenantName,
+              adapterId: globalAdapter.adapterId,
+              adapterName: globalAdapter.adapterName,
+            });
+          }
+
+          results.tenantsProcessed++;
+        } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+          results.errors.push({ tenantId, error: errorMsg });
+          logger.warn('Failed to warm up tenant', { tenantId, tenantName, error: errorMsg });
+        }
+      }
+
+      results.durationMs = Date.now() - startTime;
+      logger.info('Global adapter warm-up complete', {
+        success: results.success,
+        tenantsProcessed: results.tenantsProcessed,
+        adaptersLoaded: results.adaptersLoaded,
+        errorCount: results.errors.length,
+        durationMs: results.durationMs,
+      });
+      return results;
+
+    } catch (error) {
+      results.success = false;
+      results.errors.push({ tenantId: 'global', error: error instanceof Error ? error.message : 'Unknown' });
+      results.durationMs = Date.now() - startTime;
+      logger.error('Global adapter warm-up failed', { error });
+      return results;
+    }
+  }
+
+  /**
+   * Warm up a specific endpoint by pre-loading its most-used adapters
+   * Useful for warming up after endpoint scaling events
+   */
+  async warmUpEndpoint(endpointName: string, maxAdapters: number = 3): Promise<EndpointWarmUpResult> {
+    const startTime = Date.now();
+    const result: EndpointWarmUpResult = {
+      endpointName,
+      adaptersLoaded: 0,
+      errors: [],
+      durationMs: 0,
+    };
+
+    try {
+      // Find most frequently used adapters for this endpoint
+      const adaptersResult = await executeStatement(
+        `SELECT dla.*, COUNT(aul.id) as usage_count
+         FROM domain_lora_adapters dla
+         LEFT JOIN adapter_usage_log aul ON dla.id::text = aul.adapter_id
+         WHERE dla.status = 'active'
+           AND (dla.adapter_layer = 'global' OR dla.adapter_name LIKE '%cato%')
+         GROUP BY dla.id
+         ORDER BY 
+           CASE WHEN dla.adapter_layer = 'global' THEN 0 ELSE 1 END,
+           usage_count DESC
+         LIMIT $1`,
+        [{ name: 'maxAdapters', value: { longValue: maxAdapters } }]
+      );
+
+      for (const row of adaptersResult.rows || []) {
+        try {
+          const adapter = this.mapAdapterRow(row as Record<string, unknown>);
+          const tenantId = String((row as Record<string, unknown>).tenant_id);
+          await this.ensureAdapterLoaded(tenantId, adapter);
+          result.adaptersLoaded++;
+        } catch (error) {
+          result.errors.push(error instanceof Error ? error.message : 'Unknown');
+        }
+      }
+
+      result.durationMs = Date.now() - startTime;
+      return result;
+
+    } catch (error) {
+      result.errors.push(error instanceof Error ? error.message : 'Unknown');
+      result.durationMs = Date.now() - startTime;
+      return result;
+    }
+  }
+
+  /**
+   * Health check for warm-up status
+   * Returns which global adapters are currently loaded
+   */
+  async getWarmUpStatus(): Promise<WarmUpStatus> {
+    const loadedGlobalAdapters: Array<{ endpointName: string; adapterId: string; adapterName: string }> = [];
+
+    for (const [endpointName, adapters] of this.loadedAdapters) {
+      for (const adapter of adapters) {
+        if (adapter.isPinned) {
+          loadedGlobalAdapters.push({
+            endpointName,
+            adapterId: adapter.adapterId,
+            adapterName: adapter.adapterName,
+          });
+        }
+      }
+    }
+
+    return {
+      isWarmedUp: loadedGlobalAdapters.length > 0,
+      loadedGlobalAdapters,
+      endpointCount: this.loadedAdapters.size,
+      totalLoadedAdapters: Array.from(this.loadedAdapters.values()).reduce((sum, a) => sum + a.length, 0),
+    };
+  }
+}
+
+// Warm-up result types
+export interface WarmUpResult {
+  success: boolean;
+  tenantsProcessed: number;
+  adaptersLoaded: number;
+  errors: Array<{ tenantId: string; error: string }>;
+  durationMs: number;
+}
+
+export interface EndpointWarmUpResult {
+  endpointName: string;
+  adaptersLoaded: number;
+  errors: string[];
+  durationMs: number;
+}
+
+export interface WarmUpStatus {
+  isWarmedUp: boolean;
+  loadedGlobalAdapters: Array<{ endpointName: string; adapterId: string; adapterName: string }>;
+  endpointCount: number;
+  totalLoadedAdapters: number;
 }
 
 export const loraInferenceService = new LoRAInferenceService();
