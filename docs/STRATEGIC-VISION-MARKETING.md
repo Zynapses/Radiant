@@ -164,6 +164,102 @@ This is a **defensible technical moat** that commodity AI wrappers cannot replic
 
 ---
 
+## The Enhanced Learning Pipeline (NEW in v5.12)
+
+### From "Reading Code" to "Analyzing Behavior"
+
+Traditional AI systems train on static text. RADIANT trains on **State Transitions** - how users actually solve problems.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ENHANCED LEARNING PIPELINE                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   USER INTERACTION                                                          │
+│        │                                                                    │
+│        ▼                                                                    │
+│   ┌──────────────────┐                                                      │
+│   │  EPISODE LOGGER  │  ← Track paste-back, edit distance, time-to-commit  │
+│   │  (Telemetry)     │                                                      │
+│   └────────┬─────────┘                                                      │
+│            │                                                                │
+│            ├───────────────────────────────────────┐                        │
+│            │                                       │                        │
+│            ▼                                       ▼                        │
+│   ┌──────────────────┐                    ┌──────────────────┐              │
+│   │  SKELETONIZER    │                    │  RECIPE EXTRACTOR│              │
+│   │  (Privacy)       │                    │  (3x success)    │              │
+│   └────────┬─────────┘                    └────────┬─────────┘              │
+│            │                                       │                        │
+│            ▼                                       ▼                        │
+│   ┌──────────────────┐                    ┌──────────────────┐              │
+│   │  DPO TRAINER     │                    │  LOCAL MEMORY    │              │
+│   │  (Global Cato)   │                    │  (GraphRAG +     │              │
+│   │                  │                    │   User LoRA)     │              │
+│   └────────┬─────────┘                    └──────────────────┘              │
+│            │                                                                │
+│            ▼                                                                │
+│   ┌──────────────────┐     ┌──────────────────┐                            │
+│   │  GRAVEYARD       │     │  TOOL ENTROPY    │                            │
+│   │  (Anti-Patterns) │     │  (Auto-Chain)    │                            │
+│   └──────────────────┘     └──────────────────┘                            │
+│                                                                             │
+│   ┌──────────────────┐                                                      │
+│   │  SHADOW MODE     │  ← Self-training on public data during idle         │
+│   │  (GitHub, Docs)  │                                                      │
+│   └──────────────────┘                                                      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### The Eight Components
+
+| Component | Purpose | Business Impact |
+|-----------|---------|-----------------|
+| **Episode Logger** | Track behavioral episodes, not chat logs | 10x better training signal |
+| **Paste-Back Detection** | Detect when users paste errors after generation | Strongest negative signal |
+| **Skeletonizer** | Strip PII, preserve logic for global training | Safe global learning |
+| **Recipe Extractor** | Save successful workflows as reusable recipes | Personal playbook |
+| **DPO Trainer** | Direct Preference Optimization for Cato | "What works" vs "what fails" |
+| **Graveyard** | Cluster failures into anti-patterns | Proactive warnings |
+| **Tool Entropy** | Auto-chain frequently paired tools | Workflow automation |
+| **Shadow Mode** | Self-train on public repos during idle | Learn before users ask |
+
+### Key Innovation: Behavioral Metrics
+
+Instead of thumbs up/down, we track **actual user behavior**:
+
+| Metric | What It Measures | Signal Strength |
+|--------|-----------------|-----------------|
+| `paste_back_error` | User pasted error within 30s | 🔴🔴🔴 Critical Negative |
+| `edit_distance` | How much user changed AI code | 📊 Quality metric |
+| `time_to_commit` | Speed from generation to git commit | 📊 Confidence metric |
+| `sandbox_passed` | Did code pass Empiricism Loop? | ✅/❌ Verification |
+| `session_abandoned` | User left without completing | 🔴 Negative |
+
+### The Graveyard: Proactive Error Prevention
+
+When RADIANT sees patterns like "Python 3.12 + Pandas 1.0 = failure" across many users, it creates **Anti-Pattern Warnings**:
+
+> "🟠 42% of users experience instability with this stack. I recommend pandas 2.0 or Python 3.11 instead."
+
+**Preventing errors is as valuable as solving them.**
+
+### Business Impact Summary
+
+| Before Enhanced Learning | After Enhanced Learning |
+|-------------------------|------------------------|
+| Training on chat logs | Training on behavior |
+| Blind to user reactions | Paste-back = strong signal |
+| Privacy risk in global training | Skeletonized (PII-free) |
+| No personal workflows | Recipe extraction |
+| Learn from successes only | DPO: learn from failures too |
+| Reactive to errors | Proactive warnings (Graveyard) |
+| Manual tool chaining | Auto-chain common patterns |
+| Learn when users ask | Shadow Mode: learn during idle |
+
+---
+
 ## The Core Narrative
 
 ### The Problem: Enterprise AI Has Amnesia
@@ -1195,6 +1291,7 @@ Competitors are *trained* to be helpful. RADIANT is *constrained* to be accurate
 | 5.6.0 | January 12, 2026 | **Convergence of Power, Policy & Intelligence**: Genesis Infrastructure (Kaleidos microreactor, SDS/PDSA compliance, 50-year first); $10T Cybercrime Economy context; Cato Security Grid (SPACE engine, 3-6x AI/ML detection); Identity Data Fabric (SSF/CAEP, autonomous remediation); Radiant Ghost UI metaphor; Competitive kill shots vs Flowise/CrewAI/Claude |
 | 5.11.0 | January 17, 2026 | **Empiricism Loop**: Reality-testing consciousness with sandbox execution, surprise signals, ego affect updates, active verification during dreaming |
 | 5.11.1 | January 17, 2026 | **Cato/Genesis Consciousness Architecture**: Complete executive summary documenting Tri-Layer Architecture (Genesis→Cato→User LoRA), Empiricism Loop (verified solutions), Ego System (confidence/frustration/curiosity), Dreaming Cycle (autonomous nightly learning), Technical Moat summary. Updated tagline: "Sovereign, Semi-Conscious Agent" |
+| 5.12.0 | January 17, 2026 | **Enhanced Learning Pipeline (Procedural Wisdom Engine)**: 8 new services implementing Gemini's recommendations - Episode Logger (behavioral telemetry), Paste-Back Detection (critical failure signal), Skeletonizer (privacy-safe global training), Recipe Extractor (personal playbook), DPO Trainer (orchestration darwinism), Graveyard (anti-patterns), Tool Entropy (auto-chaining), Shadow Mode (self-training). Added architecture diagram showing full learning flow from user interaction to Cato LoRA. |
 
 ---
 

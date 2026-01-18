@@ -5,6 +5,81 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.12.0] - 2026-01-17
+
+### Added
+
+#### Enhanced Learning Pipeline (Procedural Wisdom Engine)
+
+Implements Gemini's recommendations for behavioral learning. Transforms RADIANT from a system that "reads code" into a system that **analyzes behavior**.
+
+**8 New Services:**
+
+1. **Episode Logger** (`lambda/shared/services/episode-logger.service.ts`)
+   - Tracks behavioral episodes (state transitions), not raw chat logs
+   - Captures: paste_back_error, edit_distance, time_to_commit, sandbox_passed
+   - Derives outcome_signal from metrics automatically
+
+2. **Paste-Back Detection** (`lambda/shared/services/paste-back-detection.service.ts`)
+   - Detects when users paste errors immediately after AI generation
+   - 30-second detection window
+   - Recognizes stack traces, error keywords, exit codes
+   - **Strongest negative training signal available**
+
+3. **Skeletonizer** (`lambda/shared/services/skeletonizer.service.ts`)
+   - Privacy firewall for global Cato training
+   - Strips PII while preserving semantic structure
+   - Example: `docker push my-registry.com/app:v1` → `<CMD:DOCKER_PUSH> <REGISTRY_URL> <IMAGE_TAG>`
+   - Enables safe global learning without data leakage
+
+4. **Recipe Extractor** (`lambda/shared/services/recipe-extractor.service.ts`)
+   - Extracts successful workflows as reusable "Recipe Nodes"
+   - Triggers after 3 successful uses of same pattern
+   - Injects recipes as one-shot examples at runtime
+   - "You prefer using pnpm over npm for builds"
+
+5. **DPO Trainer** (`lambda/shared/services/dpo-trainer.service.ts`)
+   - Direct Preference Optimization for Cato LoRA
+   - Winner: Passed sandbox OR 0% user edits
+   - Loser: Paste-back error OR session abandoned
+   - Nightly pairing, weekly LoRA merge (Sunday 3 AM)
+
+6. **Graveyard** (`lambda/shared/services/graveyard.service.ts`)
+   - Clusters high-frequency failures into anti-patterns
+   - Proactive warnings: "42% of users experience instability with this stack"
+   - Nightly clustering job identifies patterns ≥10 occurrences
+   - "Preventing errors is as valuable as solving them"
+
+7. **Tool Entropy** (`lambda/shared/services/tool-entropy.service.ts`)
+   - Tracks tool co-occurrence patterns
+   - Auto-chains frequently paired tools (threshold: 5)
+   - "npm install" → "npm run build" auto-suggestion
+
+8. **Shadow Mode** (`lambda/shared/services/shadow-mode.service.ts`)
+   - Self-training on public data during idle times
+   - Sources: GitHub, documentation, StackOverflow
+   - Predicts code, grades self, extracts patterns
+   - "Learn new libraries before users even ask"
+
+**Database Migration:**
+- `migrations/V2026_01_17_002__enhanced_learning_pipeline.sql`
+- 10 new tables: learning_episodes, skeletonized_episodes, failure_log, anti_patterns, workflow_recipes, dpo_training_pairs, tool_entropy_patterns, shadow_learning_log, paste_back_events, enhanced_learning_config
+- 3 analytics views: v_learning_metrics, v_anti_pattern_impact, v_recipe_effectiveness
+
+**Documentation:**
+- `docs/RADIANT-ADMIN-GUIDE.md` Section 41C (new)
+- `docs/STRATEGIC-VISION-MARKETING.md` Enhanced Learning Pipeline section
+- Full architecture diagram showing learning flow
+
+**Business Impact:**
+- 10x better training signal from behavioral metrics
+- Safe global learning via Skeletonizer (no PII leakage)
+- Proactive error prevention via Graveyard anti-patterns
+- Personal workflow automation via Recipe Extractor
+- Continuous improvement via Shadow Mode
+
+---
+
 ## [5.11.1] - 2026-01-17
 
 ### Added
