@@ -5,39 +5,65 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.9.0] - 2026-01-17
+
+### Added
+
+#### Tri-Layer LoRA Adapter Stacking Architecture
+
+Implements multi-adapter composition for personalized AI responses. Moves from single adapter selection to tri-layer stacking.
+
+**Architecture:**
+```
+W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User)
+```
+
+| Layer | Name | Purpose | Eviction |
+|-------|------|---------|----------|
+| Layer 0 | **Genesis** | Base model (Llama, Mistral, Qwen) | N/A (frozen) |
+| Layer 1 | **Cato** | Global constitution - collective conscience | **NEVER** (pinned) |
+| Layer 2 | **User Persona** | Personal context, style, preferences | LRU |
+
+**Key Changes:**
+- `lora-inference.service.ts` - Tri-layer adapter stacking with `AdapterStack` type
+- `cognitive-brain.service.ts` - Now passes `userId` for Layer 2 selection
+- `model-router.service.ts` - Extended with `useGlobalAdapter`, `useUserAdapter`, scale overrides
+
+**New API:**
+```typescript
+const response = await loraInferenceService.invokeWithLoRA({
+  tenantId,
+  userId,                 // Required for Layer 2 (User Persona)
+  modelId: 'llama-3-70b',
+  prompt: userInput,
+  useGlobalAdapter: true, // Layer 1: Cato (default: true)
+  useUserAdapter: true,   // Layer 2: User (default: true)
+  globalScale: 1.0,       // Scale override for drift protection
+  userScale: 1.0,
+});
+
+// Response includes stack info
+response.adapterStack.globalAdapterId;
+response.adapterStack.userAdapterId;
+response.adaptersUsedCount; // 1-3 adapters used
+```
+
+**Benefits:**
+- Users feel AI "learned" instantly via personal adapter
+- Global Cato adapter provides safety and collective wisdom
+- Pinned adapters never evicted, ensuring consistent behavior
+
+**Documentation:** See `docs/RADIANT-ADMIN-GUIDE.md` Section 41A
+
+---
+
 ## [5.8.0] - 2026-01-17
 
 ### Added
 
-#### LoRA Inference Integration
+#### LoRA Inference Integration (Foundation)
 
-Bridges trained LoRA adapters to the inference path, enabling domain-specific fine-tuned responses.
-
-**Key Components:**
-- `lora-inference.service.ts` - Orchestrates adapter loading and inference
-- `adapter-management.service.ts` - Selects best adapter per domain
-- Updated `cognitive-brain.service.ts` - Integrates LoRA into model calls
-- Updated `model-router.service.ts` - Extended with LoRA request fields
-
-**How It Works:**
-1. Cognitive brain checks if model is self-hosted (Llama, Mistral, Qwen, etc.)
-2. `adapterManagementService.selectBestAdapter()` finds optimal adapter
-3. Load adapter weights to SageMaker endpoint if not in memory
-4. Execute inference with LoRA-enhanced model
-5. Automatic fallback to base model if LoRA fails
-
-**Benefits:**
-- +40% relevance improvement for domain-specific queries
-- LRU-based adapter memory management (default: 5 adapters per endpoint)
-- Automatic performance rollback if adapter quality degrades
-
-**Configuration:**
-```typescript
-// Enable in Enhanced Learning config
-adapterAutoSelectionEnabled: true  // Enable automatic adapter selection
-adapterRollbackEnabled: true       // Auto-rollback on performance drop
-adapterRollbackThreshold: 10       // % satisfaction drop to trigger
-```
+Initial integration of LoRA adapters into the inference path. Superseded by v5.9.0 tri-layer architecture.
 
 **Documentation:** See `docs/RADIANT-ADMIN-GUIDE.md` Section 41A
 

@@ -355,8 +355,8 @@ export class CognitiveBrainService {
     const reasoningRegion = regions.find((r) => r.cognitiveFunction === 'reasoning') || regions[0];
     if (!reasoningRegion) throw new Error('No brain regions configured');
 
-    // 3. PROCESS with region activation
-    const result = await this.activateRegion(tenantId, sessionId, reasoningRegion, input, settings);
+    // 3. PROCESS with region activation (pass userId for tri-layer LoRA)
+    const result = await this.activateRegion(tenantId, sessionId, session.userId, reasoningRegion, input, settings);
     const response = result.success ? String(result.output) : 'Processing failed. Please try again.';
 
     // 4. PERSISTENT MEMORY: Record this experience frame
@@ -401,18 +401,19 @@ export class CognitiveBrainService {
     } catch { /* Metacognition is non-critical */ }
   }
 
-  private async activateRegion(tenantId: string, sessionId: string, region: BrainRegion, input: string, settings: CognitiveBrainSettings): Promise<RegionActivationResult> {
+  private async activateRegion(tenantId: string, sessionId: string, userId: string, region: BrainRegion, input: string, settings: CognitiveBrainSettings): Promise<RegionActivationResult> {
     const startTime = Date.now();
     try {
       const systemPrompt = this.buildRegionPrompt(region, settings);
-      // Pass tenantId and domain for LoRA adapter selection
+      // Pass tenantId, userId, and domain for tri-layer LoRA adapter selection
       const modelResponse = await this.callModel(
         region.primaryModelId, 
         systemPrompt, 
         input, 
         region.maxTokensPerCall,
         { 
-          tenantId, 
+          tenantId,
+          userId, // For user-specific adapter (Layer 2)
           domain: region.cognitiveFunction // Use cognitive function as domain hint
         }
       );
@@ -453,9 +454,10 @@ export class CognitiveBrainService {
     systemPrompt: string, 
     input: string, 
     maxTokens: number,
-    options?: { tenantId?: string; domain?: string; subdomain?: string }
+    options?: { tenantId?: string; userId?: string; domain?: string; subdomain?: string }
   ): Promise<ModelResponse> {
     // Check if LoRA inference should be used for self-hosted models
+    // Uses tri-layer adapter stacking: Global (Cato) + User + Domain
     if (options?.tenantId && this.isSelfHostedModel(modelId)) {
       const loraEnabled = await loraInferenceService.isLoRAEnabled(options.tenantId);
       
@@ -463,12 +465,16 @@ export class CognitiveBrainService {
         try {
           const loraResponse = await loraInferenceService.invokeWithLoRA({
             tenantId: options.tenantId,
+            userId: options.userId, // For user-specific adapter (Layer 2)
             modelId,
             prompt: input,
             systemPrompt,
             maxTokens,
             domain: options.domain,
             subdomain: options.subdomain,
+            // Tri-layer defaults: use both global and user adapters
+            useGlobalAdapter: true,  // Layer 1: Cato global adapter
+            useUserAdapter: true,    // Layer 2: User personal adapter
           });
           
           // Convert LoRA response to ModelResponse format

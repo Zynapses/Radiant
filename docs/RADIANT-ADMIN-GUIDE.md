@@ -10306,30 +10306,47 @@ const TWILIGHT_DREAMING = {
 
 ---
 
-## 41A. LoRA Inference Integration
+## 41A. LoRA Inference Integration (Tri-Layer Architecture)
 
 ### 41A.1 Overview
 
-The LoRA Inference Integration connects trained LoRA adapters to the actual inference path, enabling domain-specific fine-tuned responses. Previously, LoRA adapters were trained but not used during inference. This integration bridges that gap.
+The LoRA Inference Integration implements a **tri-layer adapter stacking** architecture that composes multiple LoRA adapters at inference time:
 
-### 41A.2 Architecture
+- **Layer 0: Genesis** (Base Model) - Frozen foundation (Llama, Mistral, Qwen, etc.)
+- **Layer 1: Cato** (Global Constitution) - Pinned collective conscience adapter
+- **Layer 2: User Persona** (Personal Context) - LRU-managed user-specific adapter
+
+Weight composition at runtime:
+```
+W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User)
+```
+
+### 41A.2 Tri-Layer Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                        LoRA Inference Flow                                   │
+│                    Tri-Layer LoRA Inference Architecture                     │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
-│  User Request                                                                │
-│       │                                                                      │
-│       ▼                                                                      │
-│  ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐       │
-│  │ Cognitive Brain │ ──► │ Domain Detection│ ──► │ Adapter Selection│       │
-│  └─────────────────┘     └─────────────────┘     └─────────────────┘       │
-│                                                          │                   │
-│                                                          ▼                   │
-│  ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐       │
-│  │    Response     │ ◄── │ SageMaker w/LoRA│ ◄── │  Load Adapter   │       │
-│  └─────────────────┘     └─────────────────┘     └─────────────────┘       │
+│  Layer 0: Genesis (Base Model)                                               │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  Frozen Foundation: Llama-3-70B / Mistral / Qwen                    │   │
+│  │  Status: Read-Only                                                   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                              ▲                                               │
+│                              │ + (1.0 × weights)                            │
+│  Layer 1: Cato (Global Constitution)                                        │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  Collective Conscience: Safety, Logic, Skills from ALL users       │   │
+│  │  Status: PINNED (never evicted) | Updated: Nightly batch           │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                              ▲                                               │
+│                              │ + (1.0 × weights)                            │
+│  Layer 2: User Persona (Personal Context)                                   │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  Individual Context: Style, Preferences, Project Variables          │   │
+│  │  Status: LRU Cache | Updated: Per-session or explicit feedback     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -10338,36 +10355,53 @@ The LoRA Inference Integration connects trained LoRA adapters to the actual infe
 
 | Component | File | Purpose |
 |-----------|------|---------|
-| **LoRA Inference Service** | `lora-inference.service.ts` | Orchestrates adapter loading and inference |
+| **LoRA Inference Service** | `lora-inference.service.ts` | Orchestrates tri-layer adapter stacking |
 | **Adapter Management** | `adapter-management.service.ts` | Selects best adapter per domain |
-| **Cognitive Brain** | `cognitive-brain.service.ts` | Integrates LoRA into model calls |
+| **Cognitive Brain** | `cognitive-brain.service.ts` | Integrates LoRA with userId for Layer 2 |
 | **Model Router** | `model-router.service.ts` | Extended with LoRA request fields |
 
-### 41A.4 How It Works
+### 41A.4 How Tri-Layer Works
 
-1. **Request Arrives**: Cognitive brain receives inference request with tenant and domain
+1. **Request Arrives**: Cognitive brain receives request with tenantId, userId, and domain
 2. **Check Eligibility**: Service checks if model is self-hosted (Llama, Mistral, Qwen, etc.)
-3. **Adapter Selection**: `adapterManagementService.selectBestAdapter()` finds optimal adapter
-4. **Load Adapter**: If not in memory, load adapter weights to SageMaker endpoint
-5. **Inference**: Execute with LoRA-enhanced model
+3. **Build Adapter Stack**:
+   - Layer 1: `getGlobalCatoAdapter()` - Get pinned global adapter
+   - Layer 2: `getUserPersonalAdapter()` - Get user's personal adapter
+   - Optional: Domain adapter if domain hint provided
+4. **Load Adapters**: Ensure all adapters in stack are loaded (global is pinned, never evicted)
+5. **Invoke with Stack**: Send multi-adapter payload to vLLM/LoRAX endpoint
 6. **Fallback**: If LoRA fails, automatically falls back to base model
 
-### 41A.5 Adapter Selection Logic
+### 41A.5 Adapter Stack API
 
 ```typescript
-// Selection priority:
-// 1. Explicitly specified adapter ID
-// 2. Auto-select by domain + subdomain match
-// 3. Tenant's active/default adapter
-// 4. Fall back to base model (no adapter)
-
-const adapter = await loraInferenceService.invokeWithLoRA({
+// Tri-layer invocation with adapter composition
+const response = await loraInferenceService.invokeWithLoRA({
   tenantId,
+  userId,                    // Required for Layer 2 (User Persona)
   modelId: 'llama-3-70b',
   prompt: userInput,
   domain: 'legal',           // Optional domain hint
   subdomain: 'contract_law', // Optional subdomain
+  
+  // Tri-layer options
+  useGlobalAdapter: true,    // Layer 1: Cato (default: true)
+  useUserAdapter: true,      // Layer 2: User (default: true)
+  
+  // Scale overrides (for drift protection)
+  globalScale: 1.0,          // Default: 1.0
+  userScale: 1.0,            // Default: 1.0, reduced to 0.7 if drift detected
 });
+
+// Response includes adapter stack info
+console.log(response.adapterStack);
+// {
+//   globalAdapterId: 'cato-v3',
+//   globalAdapterName: 'cato-global-constitution',
+//   userAdapterId: 'user-123-v5',
+//   userAdapterName: 'user-123-preferences',
+//   scales: { global: 1.0, user: 1.0, domain: 1.0 }
+// }
 ```
 
 ### 41A.6 Self-Hosted Model Detection
@@ -10387,11 +10421,15 @@ Models eligible for LoRA inference are detected by prefix:
 
 ### 41A.7 Endpoint Memory Management
 
-Each SageMaker endpoint can hold multiple adapters in memory (default: 5). When full:
+Each SageMaker endpoint can hold multiple adapters in memory (default: 5).
 
-1. **LRU Eviction**: Least recently used adapter is unloaded
-2. **Load New**: New adapter weights loaded from S3
-3. **Cache Update**: In-memory adapter cache updated
+**Critical Rule: Global adapters are PINNED and never evicted.**
+
+When endpoint is full:
+1. **Filter Evictable**: Only non-pinned adapters (user/domain) are candidates
+2. **LRU Selection**: Least recently used among evictable adapters
+3. **Evict**: Unload selected adapter
+4. **Load New**: Load new adapter weights from S3
 
 ### 41A.8 Configuration
 
@@ -10402,6 +10440,14 @@ Enable LoRA inference per tenant in the Enhanced Learning config:
 | `adapterAutoSelectionEnabled` | `false` | Enable automatic adapter selection |
 | `adapterRollbackEnabled` | `true` | Auto-rollback on performance drop |
 | `adapterRollbackThreshold` | `10` | % satisfaction drop to trigger rollback |
+
+### 41A.9 Adapter Layer Classification
+
+| Layer | `adapterLayer` | `isPinned` | Eviction | Update Frequency |
+|-------|---------------|------------|----------|------------------|
+| Layer 1: Global | `global` | `true` | NEVER | Nightly batch |
+| Layer 2: User | `user` | `false` | LRU | Per-session |
+| Layer 3: Domain | `domain` | `false` | LRU | Weekly training |
 
 ### 41A.9 Database Tables
 

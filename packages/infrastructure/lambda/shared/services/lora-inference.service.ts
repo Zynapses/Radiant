@@ -1,6 +1,7 @@
-// RADIANT v4.18.0 - LoRA Inference Service
+// RADIANT v4.18.0 - LoRA Inference Service (Tri-Layer Architecture)
 // Bridges trained LoRA adapters to the inference path
-// Integrates with SageMaker endpoints for dynamic adapter loading
+// Implements adapter composition: Genesis (Base) + Cato (Global) + User (Personal)
+// Integrates with SageMaker/vLLM endpoints for dynamic adapter stacking
 
 import { SageMakerRuntimeClient, InvokeEndpointCommand } from '@aws-sdk/client-sagemaker-runtime';
 import { S3Client, GetObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
@@ -28,10 +29,46 @@ export interface LoRAAdapterInfo {
   benchmarkScore?: number;
   loadTimeMs?: number;
   isActive: boolean;
+  // Tri-layer classification
+  adapterLayer: 'global' | 'user' | 'domain';
+  // Scaling factor for weight composition (default 1.0)
+  scale?: number;
+  // Whether this adapter is pinned (never evicted)
+  isPinned?: boolean;
+}
+
+// Tri-Layer Adapter Stack
+export interface AdapterStack {
+  // Layer 0: Genesis (Base Model) - implicit, always present
+  baseModel: string;
+  // Layer 1: Cato (Global Constitution) - pinned, never evicted
+  globalAdapter?: LoRAAdapterInfo;
+  // Layer 2: User Persona (Personal Context) - LRU managed
+  userAdapter?: LoRAAdapterInfo;
+  // Optional: Domain-specific adapter (can stack on top)
+  domainAdapter?: LoRAAdapterInfo;
+  // Combined scaling factors
+  scales: {
+    global: number;
+    user: number;
+    domain: number;
+  };
+}
+
+// Adapter composition for inference payload
+export interface AdapterComposition {
+  adapters: Array<{
+    name: string;
+    id: string;
+    scale: number;
+    layer: 'global' | 'user' | 'domain';
+  }>;
+  totalScale: number;
 }
 
 export interface LoRAInferenceRequest {
   tenantId: string;
+  userId?: string;
   modelId: string;
   prompt: string;
   systemPrompt?: string;
@@ -42,19 +79,38 @@ export interface LoRAInferenceRequest {
   // Optional: domain hints for auto-selection
   domain?: string;
   subdomain?: string;
+  // Tri-layer options
+  useGlobalAdapter?: boolean; // Default true - include Cato global adapter
+  useUserAdapter?: boolean;   // Default true - include user's personal adapter
+  // Scale overrides (for drift protection)
+  globalScale?: number;       // Default 1.0
+  userScale?: number;         // Default 1.0
 }
 
 export interface LoRAInferenceResponse {
   content: string;
   modelUsed: string;
+  // Single adapter (legacy)
   adapterUsed?: string;
   adapterName?: string;
   adapterDomain?: string;
+  // Tri-layer adapter stack (new)
+  adapterStack?: {
+    globalAdapterId?: string;
+    globalAdapterName?: string;
+    userAdapterId?: string;
+    userAdapterName?: string;
+    domainAdapterId?: string;
+    domainAdapterName?: string;
+    scales: { global: number; user: number; domain: number };
+  };
   inputTokens: number;
   outputTokens: number;
   latencyMs: number;
   costCents: number;
   adapterLoadTimeMs?: number;
+  // Composition details
+  adaptersUsedCount: number;
 }
 
 export interface LoRAEndpointConfig {
@@ -68,9 +124,12 @@ export interface LoRAEndpointConfig {
 
 interface LoadedAdapter {
   adapterId: string;
+  adapterName: string;
+  layer: 'global' | 'user' | 'domain';
   loadedAt: Date;
   lastUsedAt: Date;
   useCount: number;
+  isPinned: boolean; // If true, never evict (global adapters)
 }
 
 // ============================================================================
@@ -93,23 +152,27 @@ class LoRAInferenceService {
   }
 
   // ==========================================================================
-  // Main Inference Methods
+  // Main Inference Methods (Tri-Layer Architecture)
   // ==========================================================================
 
   /**
-   * Invoke a model with optional LoRA adapter
+   * Invoke a model with tri-layer LoRA adapter stack
+   * Layer 0: Genesis (Base Model) - always present
+   * Layer 1: Cato (Global Constitution) - pinned, never evicted
+   * Layer 2: User Persona (Personal Context) - LRU managed
+   * 
    * This is the main entry point for LoRA-enhanced inference
    */
   async invokeWithLoRA(request: LoRAInferenceRequest): Promise<LoRAInferenceResponse> {
     const startTime = Date.now();
     
     try {
-      // 1. Determine which adapter to use (if any)
-      const adapter = await this.selectAdapter(request);
+      // 1. Build the adapter stack (Global + User + optional Domain)
+      const adapterStack = await this.buildAdapterStack(request);
       
-      // 2. If no adapter, fall back to base model inference
-      if (!adapter) {
-        logger.debug('No LoRA adapter selected, using base model', { 
+      // 2. If no adapters in stack, fall back to base model inference
+      if (!adapterStack.globalAdapter && !adapterStack.userAdapter && !adapterStack.domainAdapter) {
+        logger.debug('No LoRA adapters selected, using base model', { 
           tenantId: request.tenantId, 
           modelId: request.modelId,
           domain: request.domain 
@@ -117,24 +180,43 @@ class LoRAInferenceService {
         return this.invokeBaseModel(request);
       }
       
-      // 3. Ensure adapter is loaded on endpoint
+      // 3. Ensure all adapters in stack are loaded on endpoint
       const loadStartTime = Date.now();
-      await this.ensureAdapterLoaded(request.tenantId, adapter);
+      await this.ensureAdapterStackLoaded(request.tenantId, adapterStack);
       const adapterLoadTimeMs = Date.now() - loadStartTime;
       
-      // 4. Invoke with adapter
-      const response = await this.invokeSageMakerWithAdapter(request, adapter);
+      // 4. Invoke with adapter stack composition
+      const response = await this.invokeSageMakerWithAdapterStack(request, adapterStack);
       
       // 5. Record adapter usage for analytics
-      await this.recordAdapterUsage(request.tenantId, adapter.adapterId, response);
+      await this.recordAdapterStackUsage(request.tenantId, adapterStack, response);
+      
+      // 6. Build response with stack info
+      const adaptersUsed = [
+        adapterStack.globalAdapter,
+        adapterStack.userAdapter,
+        adapterStack.domainAdapter,
+      ].filter(Boolean);
       
       return {
         ...response,
-        adapterUsed: adapter.adapterId,
-        adapterName: adapter.adapterName,
-        adapterDomain: adapter.domain,
+        // Legacy single-adapter fields (use primary adapter)
+        adapterUsed: adapterStack.userAdapter?.adapterId || adapterStack.globalAdapter?.adapterId,
+        adapterName: adapterStack.userAdapter?.adapterName || adapterStack.globalAdapter?.adapterName,
+        adapterDomain: adapterStack.domainAdapter?.domain,
+        // New tri-layer stack info
+        adapterStack: {
+          globalAdapterId: adapterStack.globalAdapter?.adapterId,
+          globalAdapterName: adapterStack.globalAdapter?.adapterName,
+          userAdapterId: adapterStack.userAdapter?.adapterId,
+          userAdapterName: adapterStack.userAdapter?.adapterName,
+          domainAdapterId: adapterStack.domainAdapter?.adapterId,
+          domainAdapterName: adapterStack.domainAdapter?.adapterName,
+          scales: adapterStack.scales,
+        },
         adapterLoadTimeMs,
         latencyMs: Date.now() - startTime,
+        adaptersUsedCount: adaptersUsed.length,
       };
       
     } catch (error) {
@@ -151,7 +233,137 @@ class LoRAInferenceService {
   }
 
   /**
-   * Select the best adapter for the request
+   * Build the tri-layer adapter stack for a request
+   * Implements: W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User)
+   */
+  private async buildAdapterStack(request: LoRAInferenceRequest): Promise<AdapterStack> {
+    const stack: AdapterStack = {
+      baseModel: request.modelId,
+      scales: {
+        global: request.globalScale ?? 1.0,
+        user: request.userScale ?? 1.0,
+        domain: 1.0,
+      },
+    };
+
+    // Layer 1: Global "Cato" Adapter (unless explicitly disabled)
+    if (request.useGlobalAdapter !== false) {
+      stack.globalAdapter = await this.getGlobalCatoAdapter(request.tenantId, request.modelId) ?? undefined;
+    }
+
+    // Layer 2: User Personal Adapter (unless explicitly disabled)
+    if (request.useUserAdapter !== false && request.userId) {
+      stack.userAdapter = await this.getUserPersonalAdapter(request.tenantId, request.userId) ?? undefined;
+    }
+
+    // Optional Layer 3: Domain-specific adapter (if domain hint provided or adapter specified)
+    if (request.adapterId) {
+      stack.domainAdapter = await this.getAdapterById(request.tenantId, request.adapterId) ?? undefined;
+    } else if (request.domain) {
+      stack.domainAdapter = await this.selectDomainAdapter(request) ?? undefined;
+    }
+
+    logger.debug('Built adapter stack', {
+      tenantId: request.tenantId,
+      hasGlobal: !!stack.globalAdapter,
+      hasUser: !!stack.userAdapter,
+      hasDomain: !!stack.domainAdapter,
+      scales: stack.scales,
+    });
+
+    return stack;
+  }
+
+  /**
+   * Get the global "Cato" adapter for a tenant
+   * This is the collective conscience adapter trained on all users
+   */
+  private async getGlobalCatoAdapter(tenantId: string, baseModel: string): Promise<LoRAAdapterInfo | null> {
+    const result = await executeStatement(
+      `SELECT * FROM domain_lora_adapters 
+       WHERE tenant_id = $1 
+         AND adapter_layer = 'global' 
+         AND base_model = $2
+         AND status = 'active'
+       ORDER BY adapter_version DESC LIMIT 1`,
+      [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'baseModel', value: { stringValue: baseModel } },
+      ]
+    );
+    
+    if (!result.rows?.length) {
+      // Try to find any global adapter for this tenant
+      const fallback = await executeStatement(
+        `SELECT * FROM domain_lora_adapters 
+         WHERE tenant_id = $1 
+           AND (adapter_layer = 'global' OR adapter_name LIKE '%cato%' OR adapter_name LIKE '%global%')
+           AND status = 'active'
+         ORDER BY adapter_version DESC LIMIT 1`,
+        [{ name: 'tenantId', value: { stringValue: tenantId } }]
+      );
+      if (!fallback.rows?.length) return null;
+      const adapter = this.mapAdapterRow(fallback.rows[0] as Record<string, unknown>);
+      adapter.adapterLayer = 'global';
+      adapter.isPinned = true;
+      return adapter;
+    }
+    
+    const adapter = this.mapAdapterRow(result.rows[0] as Record<string, unknown>);
+    adapter.adapterLayer = 'global';
+    adapter.isPinned = true;
+    return adapter;
+  }
+
+  /**
+   * Get user's personal adapter
+   * This stores the user's specific context, style, and preferences
+   */
+  private async getUserPersonalAdapter(tenantId: string, userId: string): Promise<LoRAAdapterInfo | null> {
+    const result = await executeStatement(
+      `SELECT * FROM domain_lora_adapters 
+       WHERE tenant_id = $1 
+         AND (adapter_layer = 'user' OR user_id = $2)
+         AND status = 'active'
+       ORDER BY adapter_version DESC LIMIT 1`,
+      [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'userId', value: { stringValue: userId } },
+      ]
+    );
+    
+    if (!result.rows?.length) return null;
+    const adapter = this.mapAdapterRow(result.rows[0] as Record<string, unknown>);
+    adapter.adapterLayer = 'user';
+    adapter.isPinned = false;
+    return adapter;
+  }
+
+  /**
+   * Select domain-specific adapter based on request hints
+   */
+  private async selectDomainAdapter(request: LoRAInferenceRequest): Promise<LoRAAdapterInfo | null> {
+    if (!request.domain) return null;
+    
+    const selection = await adapterManagementService.selectBestAdapter(
+      request.tenantId,
+      request.domain,
+      request.subdomain
+    );
+    
+    if (!selection) return null;
+    
+    const adapter = await this.getAdapterById(request.tenantId, selection.adapterId);
+    if (adapter) {
+      adapter.adapterLayer = 'domain';
+      adapter.isPinned = false;
+    }
+    return adapter;
+  }
+
+  /**
+   * Legacy: Select single best adapter for the request
+   * @deprecated Use buildAdapterStack for tri-layer composition
    */
   private async selectAdapter(request: LoRAInferenceRequest): Promise<LoRAAdapterInfo | null> {
     // If adapter explicitly specified, use it
@@ -291,9 +503,12 @@ class LoRAInferenceService {
       // Update loaded adapters cache
       loaded.push({
         adapterId: adapter.adapterId,
+        adapterName: adapter.adapterName,
+        layer: adapter.adapterLayer,
         loadedAt: new Date(),
         lastUsedAt: new Date(),
         useCount: 1,
+        isPinned: adapter.isPinned ?? false,
       });
       this.loadedAdapters.set(endpointName, loaded);
       
@@ -312,14 +527,22 @@ class LoRAInferenceService {
 
   /**
    * Evict the least recently used adapter from endpoint
+   * IMPORTANT: Never evict pinned adapters (global "Cato" adapters)
    */
   private async evictLeastRecentlyUsedAdapter(endpointName: string): Promise<void> {
     const loaded = this.loadedAdapters.get(endpointName) || [];
     if (loaded.length === 0) return;
     
-    // Find LRU adapter
-    loaded.sort((a, b) => a.lastUsedAt.getTime() - b.lastUsedAt.getTime());
-    const lruAdapter = loaded[0];
+    // Filter out pinned adapters - they are NEVER evicted
+    const evictable = loaded.filter(a => !a.isPinned);
+    if (evictable.length === 0) {
+      logger.warn('No evictable adapters (all pinned), cannot load new adapter', { endpointName });
+      return;
+    }
+    
+    // Find LRU adapter among evictable ones
+    evictable.sort((a, b) => a.lastUsedAt.getTime() - b.lastUsedAt.getTime());
+    const lruAdapter = evictable[0];
     
     logger.info('Evicting LRU adapter from endpoint', {
       endpointName,
@@ -405,6 +628,7 @@ class LoRAInferenceService {
       outputTokens,
       latencyMs: Date.now() - startTime,
       costCents,
+      adaptersUsedCount: 1,
     };
   }
 
@@ -447,7 +671,136 @@ class LoRAInferenceService {
       outputTokens,
       latencyMs: Date.now() - startTime,
       costCents: this.calculateSelfHostedCost(inputTokens, outputTokens),
+      adaptersUsedCount: 0,
     };
+  }
+
+  // ==========================================================================
+  // Tri-Layer Adapter Stack Methods
+  // ==========================================================================
+
+  /**
+   * Ensure all adapters in the stack are loaded on the endpoint
+   * Global adapter is loaded first and pinned
+   */
+  private async ensureAdapterStackLoaded(tenantId: string, stack: AdapterStack): Promise<void> {
+    const adaptersToLoad = [
+      stack.globalAdapter,
+      stack.userAdapter,
+      stack.domainAdapter,
+    ].filter((a): a is LoRAAdapterInfo => !!a);
+
+    for (const adapter of adaptersToLoad) {
+      await this.ensureAdapterLoaded(tenantId, adapter);
+    }
+  }
+
+  /**
+   * Invoke SageMaker with adapter stack composition
+   * Implements: W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User) + (scale × W_Domain)
+   */
+  private async invokeSageMakerWithAdapterStack(
+    request: LoRAInferenceRequest,
+    stack: AdapterStack
+  ): Promise<LoRAInferenceResponse> {
+    const startTime = Date.now();
+    const baseModel = stack.globalAdapter?.baseModel || stack.userAdapter?.baseModel || stack.domainAdapter?.baseModel || request.modelId;
+    const endpointName = await this.getEndpointForModel(baseModel);
+    
+    // Build adapter composition array for vLLM/LoRAX
+    const adapters: Array<{ name: string; id: string; scale: number }> = [];
+    
+    if (stack.globalAdapter) {
+      adapters.push({
+        name: stack.globalAdapter.adapterName,
+        id: stack.globalAdapter.adapterId,
+        scale: stack.scales.global,
+      });
+    }
+    
+    if (stack.userAdapter) {
+      adapters.push({
+        name: stack.userAdapter.adapterName,
+        id: stack.userAdapter.adapterId,
+        scale: stack.scales.user,
+      });
+    }
+    
+    if (stack.domainAdapter) {
+      adapters.push({
+        name: stack.domainAdapter.adapterName,
+        id: stack.domainAdapter.adapterId,
+        scale: stack.scales.domain,
+      });
+    }
+    
+    // Payload for vLLM/LoRAX with multi-adapter support
+    const payload = {
+      action: 'generate',
+      // Multi-adapter composition (vLLM/LoRAX format)
+      adapters: adapters.map(a => ({
+        name: a.name,
+        scale: a.scale,
+      })),
+      // Legacy single adapter fallback
+      adapter_id: adapters[0]?.id,
+      inputs: request.prompt,
+      parameters: {
+        max_new_tokens: request.maxTokens || 2048,
+        temperature: request.temperature ?? 0.7,
+        do_sample: true,
+        top_p: 0.9,
+      },
+      system_prompt: request.systemPrompt,
+    };
+    
+    logger.debug('Invoking with adapter stack', {
+      endpointName,
+      adapterCount: adapters.length,
+      adapters: adapters.map(a => a.name),
+    });
+    
+    const response = await this.sagemakerClient.send(new InvokeEndpointCommand({
+      EndpointName: endpointName,
+      ContentType: 'application/json',
+      Body: JSON.stringify(payload),
+    }));
+    
+    const result = JSON.parse(new TextDecoder().decode(response.Body));
+    
+    const content = result.generated_text || result.outputs || result[0]?.generated_text || '';
+    const inputTokens = result.usage?.input_tokens || Math.ceil(request.prompt.length / 4);
+    const outputTokens = result.usage?.output_tokens || Math.ceil(content.length / 4);
+    const costCents = this.calculateSelfHostedCost(inputTokens, outputTokens);
+    
+    return {
+      content,
+      modelUsed: baseModel,
+      inputTokens,
+      outputTokens,
+      latencyMs: Date.now() - startTime,
+      costCents,
+      adaptersUsedCount: adapters.length,
+    };
+  }
+
+  /**
+   * Record usage for all adapters in the stack
+   */
+  private async recordAdapterStackUsage(
+    tenantId: string,
+    stack: AdapterStack,
+    response: LoRAInferenceResponse
+  ): Promise<void> {
+    const adapters = [
+      stack.globalAdapter,
+      stack.userAdapter,
+      stack.domainAdapter,
+    ].filter((a): a is LoRAAdapterInfo => !!a);
+
+    for (const adapter of adapters) {
+      await this.recordAdapterUsage(tenantId, adapter.adapterId, response);
+    }
   }
 
   // ==========================================================================
@@ -574,6 +927,17 @@ class LoRAInferenceService {
    * Map database row to adapter info
    */
   private mapAdapterRow(row: Record<string, unknown>): LoRAAdapterInfo {
+    // Determine adapter layer from database or infer from name
+    let adapterLayer: 'global' | 'user' | 'domain' = 'domain';
+    if (row.adapter_layer) {
+      adapterLayer = row.adapter_layer as 'global' | 'user' | 'domain';
+    } else if (row.user_id) {
+      adapterLayer = 'user';
+    } else if (String(row.adapter_name || '').toLowerCase().includes('cato') || 
+               String(row.adapter_name || '').toLowerCase().includes('global')) {
+      adapterLayer = 'global';
+    }
+    
     return {
       adapterId: String(row.id),
       adapterName: String(row.adapter_name || row.name || 'unnamed'),
@@ -589,6 +953,8 @@ class LoRAInferenceService {
       benchmarkScore: row.benchmark_score ? Number(row.benchmark_score) : undefined,
       loadTimeMs: row.load_time_ms ? Number(row.load_time_ms) : undefined,
       isActive: row.status === 'active',
+      adapterLayer,
+      isPinned: adapterLayer === 'global',
     };
   }
 
@@ -653,22 +1019,32 @@ class LoRAInferenceService {
    */
   async getAdapters(tenantId: string): Promise<LoRAAdapterInfo[]> {
     return enhancedLearningService.listDomainAdapters(tenantId).then(adapters => 
-      adapters.map(a => ({
-        adapterId: a.id,
-        adapterName: a.adapterName,
-        domain: a.domain,
-        subdomain: a.subdomain,
-        version: a.adapterVersion,
-        s3Bucket: a.s3Bucket || process.env.EVOLUTION_S3_BUCKET || 'radiant-evolution-data',
-        s3Key: a.s3Key || '',
-        baseModel: a.baseModel || 'llama-3-70b',
-        loraRank: 16, // Default LoRA rank
-        loraAlpha: 32, // Default LoRA alpha
-        targetModules: ['q_proj', 'k_proj', 'v_proj', 'o_proj'], // Default target modules
-        benchmarkScore: a.accuracyScore, // Map from accuracyScore
-        loadTimeMs: undefined, // Not tracked in DomainLoraAdapter
-        isActive: a.status === 'active',
-      }))
+      adapters.map(a => {
+        // Infer adapter layer from name or default to domain
+        let adapterLayer: 'global' | 'user' | 'domain' = 'domain';
+        if (a.adapterName.toLowerCase().includes('cato') || a.adapterName.toLowerCase().includes('global')) {
+          adapterLayer = 'global';
+        }
+        
+        return {
+          adapterId: a.id,
+          adapterName: a.adapterName,
+          domain: a.domain,
+          subdomain: a.subdomain,
+          version: a.adapterVersion,
+          s3Bucket: a.s3Bucket || process.env.EVOLUTION_S3_BUCKET || 'radiant-evolution-data',
+          s3Key: a.s3Key || '',
+          baseModel: a.baseModel || 'llama-3-70b',
+          loraRank: 16, // Default LoRA rank
+          loraAlpha: 32, // Default LoRA alpha
+          targetModules: ['q_proj', 'k_proj', 'v_proj', 'o_proj'], // Default target modules
+          benchmarkScore: a.accuracyScore, // Map from accuracyScore
+          loadTimeMs: undefined, // Not tracked in DomainLoraAdapter
+          isActive: a.status === 'active',
+          adapterLayer,
+          isPinned: adapterLayer === 'global',
+        };
+      })
     );
   }
 
