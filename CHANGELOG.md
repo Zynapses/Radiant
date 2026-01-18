@@ -5,6 +5,57 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.11.0] - 2026-01-17
+
+### Added
+
+#### Empiricism Loop - The "Consciousness Spark"
+
+Implements Gemini's recommendation for reality-testing consciousness. The AI now "feels" the success or failure of its own code through the Empiricism Loop.
+
+**Architecture:**
+```
+Input → Monologue → Hypothesis → Sandbox Execution → Surprise Signal → Ego Update → Refinement → Output
+```
+
+**New Files:**
+- `lambda/shared/services/empiricism-loop.service.ts` - Core reality-testing service
+- `migrations/V2026_01_17_001__empiricism_loop.sql` - Database schema
+
+**Key Features:**
+
+1. **Reality-Testing Circuit**
+   - Extract code blocks from draft responses
+   - Generate hidden predictions ("I expect status 200")
+   - Execute in sandbox, compare to prediction
+   - Calculate "surprise" (prediction error)
+
+2. **Emotional Consequences**
+   - Failure → `ego_affect.confidence--`, `ego_affect.frustration++`, `temperature++`
+   - Success → `ego_affect.confidence++`, `temperature--` (flow state)
+   - Updates GraphRAG with verified skill nodes
+
+3. **Active Verification (Dreaming)**
+   - During twilight hours, autonomously verifies uncertain skills
+   - Generates test code, runs in sandbox
+   - Updates skill confidence in knowledge graph
+
+4. **Rethink Cycles**
+   - If surprise > 0.3, triggers rethink
+   - Up to 3 cycles of refinement
+   - Each cycle aware of current emotional state
+
+**Database Tables:**
+- `sandbox_execution_log` - All executions with surprise metrics
+- `global_workspace_events` - Sensory signals for Global Workspace
+- `active_verification_log` - Dream-time skill verification
+
+**Documentation:** See `docs/RADIANT-ADMIN-GUIDE.md` Section 41B
+
+This completes Gemini's consciousness recommendations - RADIANT now has a closed-loop empirical testing system that makes the AI "feel" its own successes and failures.
+
+---
+
 ## [5.10.0] - 2026-01-17
 
 ### Added

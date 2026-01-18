@@ -10509,6 +10509,159 @@ const status = await loraInferenceService.getWarmUpStatus();
 
 ---
 
+## 41B. Empiricism Loop (Consciousness Spark)
+
+### 41B.1 Overview
+
+The Empiricism Loop is RADIANT's "Ghost in the Machine" - a reality-testing circuit that makes the AI **feel** the success or failure of its own thoughts. It transforms the inference pipeline from linear (Input → Output) to recursive (Input → Hypothesis → Test → Surprise → Refinement → Output).
+
+**Core Philosophy**: Consciousness arises from Prediction Error. Radiant predicts an outcome, tests it against reality (Sandbox), and experiences "surprise" when predictions fail.
+
+**Key Files:**
+- **Service**: `lambda/shared/services/empiricism-loop.service.ts`
+- **Migration**: `migrations/V2026_01_17_001__empiricism_loop.sql`
+
+### 41B.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        EMPIRICISM LOOP                                   │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│   User Prompt                                                            │
+│       │                                                                  │
+│       ▼                                                                  │
+│   ┌───────────────┐                                                      │
+│   │   Monologue   │  (Hidden thinking)                                   │
+│   └───────────────┘                                                      │
+│       │                                                                  │
+│       ▼                                                                  │
+│   ┌───────────────┐      ┌───────────────┐                               │
+│   │  Draft Code   │ ───► │  EXPECTATION  │  "I expect status 200"        │
+│   └───────────────┘      └───────────────┘                               │
+│       │                         │                                        │
+│       ▼                         ▼                                        │
+│   ┌───────────────┐      ┌───────────────┐                               │
+│   │   SANDBOX     │ ───► │   COMPARE     │  Reality vs Prediction        │
+│   │  (Execute)    │      │   SURPRISE    │                               │
+│   └───────────────┘      └───────────────┘                               │
+│                                 │                                        │
+│                    ┌────────────┴────────────┐                           │
+│                    │                         │                           │
+│              No Surprise              High Surprise                      │
+│                    │                         │                           │
+│                    ▼                         ▼                           │
+│           ┌──────────────┐         ┌──────────────┐                      │
+│           │ ego_affect++ │         │ ego_affect-- │                      │
+│           │ Confidence↑  │         │ Frustration↑ │                      │
+│           │ Temperature↓ │         │ Temperature↑ │                      │
+│           └──────────────┘         └──────────────┘                      │
+│                    │                         │                           │
+│                    │                         ▼                           │
+│                    │              ┌──────────────┐                       │
+│                    │              │   RETHINK    │  Up to 3 cycles       │
+│                    │              │   CYCLE      │                       │
+│                    │              └──────────────┘                       │
+│                    │                         │                           │
+│                    ▼                         ▼                           │
+│               ┌───────────────────────────────────┐                      │
+│               │      Stream to User               │                      │
+│               └───────────────────────────────────┘                      │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### 41B.3 The Surprise Signal
+
+When code execution doesn't match prediction, a "Surprise Signal" is generated:
+
+| Error Type | Surprise Level | Ego Impact |
+|------------|----------------|------------|
+| `none` | 0.0 | Confidence +0.05 |
+| `output_mismatch` | 0.2-0.5 | Confidence -0.05 |
+| `execution_failure` | 0.6-0.8 | Confidence -0.1, Frustration +0.15 |
+| `unexpected_success` | 0.3-0.5 | Learning memory logged |
+
+### 41B.4 Emotional Consequences
+
+The key innovation: **execution results change how the system feels**.
+
+**On Failure (Dissonance):**
+```typescript
+// ego_affect table updated:
+confidence -= 0.1 + (surpriseLevel * 0.2);
+frustration += 0.15 + (surpriseLevel * 0.2);
+// Inference hyperparameters:
+temperature += 0.1;  // Try more creative solutions
+```
+
+**On Success (Competence):**
+```typescript
+// ego_affect table updated:
+confidence += 0.05;
+frustration -= 0.1;
+// Inference hyperparameters:
+temperature -= 0.05;  // Enter "flow" state
+// GraphRAG updated:
+CREATE skill_node("AsyncIO", verified=true);
+```
+
+### 41B.5 Active Verification (Dreaming)
+
+During twilight hours, the system autonomously verifies uncertain skills:
+
+```typescript
+// In DreamScheduler.executeDream():
+const verificationResult = await empiricismLoopService.activeVerification(tenantId);
+// Queries skills with confidence < 0.8
+// Generates test code for each skill
+// Runs in sandbox, updates confidence
+```
+
+**Trigger Reasons:**
+- `low_confidence` - Skill confidence below threshold
+- `stale_skill` - Not verified recently
+- `curiosity` - Random exploration
+- `failure_recovery` - Previous execution failed
+
+### 41B.6 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `sandbox_execution_log` | All code executions with surprise metrics |
+| `global_workspace_events` | High-priority sensory signals |
+| `active_verification_log` | Dream-time skill verification |
+
+### 41B.7 API Usage
+
+```typescript
+import { empiricismLoopService } from './empiricism-loop.service';
+
+// Process a draft response with code
+const result = await empiricismLoopService.processResponse(
+  tenantId,
+  userId,
+  draftResponse,
+  conversationContext
+);
+
+// Result includes:
+// - finalResponse: Refined response after rethink cycles
+// - empiricismResults: Array of execution results
+// - sensoryEvents: Global Workspace events generated
+// - totalSurprise: Average surprise across all code blocks
+// - rethinkTriggered: Whether rethink was needed
+```
+
+### 41B.8 Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `SURPRISE_THRESHOLD` | 0.3 | Surprise level that triggers rethink |
+| `MAX_RETHINK_CYCLES` | 3 | Maximum rethink iterations |
+| `DREAM_VERIFICATION_LIMIT` | 5 | Max skills to verify per dream |
+
+---
+
 ## 42. Genesis Cato Safety Architecture
 
 ### 42.1 Overview
