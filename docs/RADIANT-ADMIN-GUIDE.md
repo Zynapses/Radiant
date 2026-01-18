@@ -10861,6 +10861,318 @@ const result = await empiricismLoopService.processResponse(
 
 ---
 
+## 41C. Enhanced Learning Pipeline (Procedural Wisdom Engine)
+
+### 41C.1 Overview
+
+The Enhanced Learning Pipeline transforms RADIANT from a system that "reads code" into a system that **analyzes behavior**. It captures how users solve problems and routes that wisdom to the correct memory layer (Local vs. Global).
+
+**Objective**: Transform passive chat logs into active behavioral learning, enabling Cato to learn from user actions, not just words.
+
+**Key Files:**
+- **Episode Logger**: `lambda/shared/services/episode-logger.service.ts`
+- **Skeletonizer**: `lambda/shared/services/skeletonizer.service.ts`
+- **Graveyard**: `lambda/shared/services/graveyard.service.ts`
+- **Recipe Extractor**: `lambda/shared/services/recipe-extractor.service.ts`
+- **DPO Trainer**: `lambda/shared/services/dpo-trainer.service.ts`
+- **Tool Entropy**: `lambda/shared/services/tool-entropy.service.ts`
+- **Shadow Mode**: `lambda/shared/services/shadow-mode.service.ts`
+- **Paste-Back Detection**: `lambda/shared/services/paste-back-detection.service.ts`
+- **Migration**: `migrations/V2026_01_17_002__enhanced_learning_pipeline.sql`
+
+### 41C.2 Enhanced Learning Pipeline Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ENHANCED LEARNING PIPELINE                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   USER INTERACTION                                                          │
+│        │                                                                    │
+│        ▼                                                                    │
+│   ┌──────────────────┐                                                      │
+│   │  EPISODE LOGGER  │  ← Track paste-back, edit distance, time-to-commit  │
+│   │  (Telemetry)     │                                                      │
+│   └────────┬─────────┘                                                      │
+│            │                                                                │
+│            ├───────────────────────────────────────┐                        │
+│            │                                       │                        │
+│            ▼                                       ▼                        │
+│   ┌──────────────────┐                    ┌──────────────────┐              │
+│   │  SKELETONIZER    │                    │  RECIPE EXTRACTOR│              │
+│   │  (Privacy)       │                    │  (3x success)    │              │
+│   └────────┬─────────┘                    └────────┬─────────┘              │
+│            │                                       │                        │
+│            ▼                                       ▼                        │
+│   ┌──────────────────┐                    ┌──────────────────┐              │
+│   │  DPO TRAINER     │                    │  LOCAL MEMORY    │              │
+│   │  (Global Cato)   │                    │  (GraphRAG +     │              │
+│   │                  │                    │   User LoRA)     │              │
+│   └────────┬─────────┘                    └──────────────────┘              │
+│            │                                                                │
+│            ▼                                                                │
+│   ┌──────────────────┐     ┌──────────────────┐                            │
+│   │  GRAVEYARD       │     │  TOOL ENTROPY    │                            │
+│   │  (Anti-Patterns) │     │  (Auto-Chain)    │                            │
+│   └──────────────────┘     └──────────────────┘                            │
+│                                                                             │
+│   ┌──────────────────┐                                                      │
+│   │  SHADOW MODE     │  ← Self-training on public data during idle         │
+│   │  (GitHub, Docs)  │                                                      │
+│   └──────────────────┘                                                      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 41C.3 Episode Logger (Behavioral Telemetry)
+
+The Episode Logger records **structured "Episodes"** rather than raw chat logs. It tracks state transitions, not just text.
+
+**Episode Schema:**
+```json
+{
+  "episode_id": "uuid",
+  "goal_intent": "Deploy React App to AWS",
+  "workflow_trace": [
+    {"tool": "file_search", "status": "success"},
+    {"tool": "docker_build", "status": "fail", "error_type": "permissions"},
+    {"tool": "sudo_fix", "status": "success"}
+  ],
+  "outcome_signal": "positive",
+  "metrics": {
+    "paste_back_error": false,
+    "edit_distance": 0.1,
+    "time_to_commit_ms": 45000,
+    "sandbox_passed": true
+  }
+}
+```
+
+**Key Metrics:**
+
+| Metric | Signal Type | Description |
+|--------|-------------|-------------|
+| `paste_back_error` | 🔴 Strong Negative | User pasted error immediately after generation |
+| `edit_distance` | 📊 Quality | How much user changed AI's code (low = good) |
+| `time_to_commit_ms` | 📊 Confidence | Latency between generation and git commit |
+| `sandbox_passed` | ✅/❌ Verification | Did code pass Empiricism Loop sandbox? |
+| `session_abandoned` | 🔴 Negative | User left without completing |
+
+### 41C.4 Skeletonizer (Privacy Firewall)
+
+Before any data touches global Cato training, the Skeletonizer strips PII while preserving semantic structure.
+
+**Example Transformation:**
+```
+Input:   docker push my-registry.com/user-a/app:v1
+Skeleton: <CMD:DOCKER_PUSH> <REGISTRY_URL> <IMAGE_TAG>
+```
+
+**Pattern Categories:**
+- URLs, IPs, Ports → `<URL>`, `<IP_ADDRESS>`, `<PORT>`
+- Docker/Git commands → `<CMD:DOCKER_PUSH>`, `<CMD:GIT_CLONE>`
+- AWS ARNs/S3 paths → `<AWS_ARN>`, `<S3_URI>`
+- API keys/Secrets → `<API_KEY>`, `<TOKEN>`
+- Database URIs → `<POSTGRES_URI>`, `<MONGODB_URI>`
+- File paths → `<USER_HOME>`, `<PROJECT_PATH>`
+
+**Effect**: Cato learns the **Logic** of Docker, not the **Data** of the User.
+
+### 41C.5 DPO Training (Orchestration Darwinism)
+
+Uses **Direct Preference Optimization** to train Cato on what works.
+
+**Winner/Loser Pairing:**
+- **Winner**: Anonymized workflows that passed sandbox OR had 0% user edits
+- **Loser**: Workflows where user pasted error OR abandoned session
+
+**Training Formula:**
+```
+Loss = -log(σ(β × (r_chosen - r_rejected)))
+```
+
+**Nightly Job:**
+1. Skeletonize positive/negative episodes
+2. Create DPO pairs with similar goal_skeletons
+3. Calculate margin based on metrics difference
+4. Export to S3 for SageMaker training
+5. Merge into Cato LoRA weekly (Sunday 3 AM)
+
+**Effect**: If 1,000 users fail using Library X but succeed using Library Y, Cato mathematically evolves to suggest Library Y first.
+
+### 41C.6 Recipe Extractor (Personal Playbook)
+
+If a specific tool sequence succeeds **3 times** for a user, extract it as a "Recipe Node" in GraphRAG.
+
+**Recipe Structure:**
+```json
+{
+  "recipe_id": "uuid",
+  "recipe_name": "Deploy React AWS",
+  "goal_pattern": "aws_deploy_react_app",
+  "tool_sequence": [
+    {"tool_type": "FILE_OPERATION", "order": 0},
+    {"tool_type": "BUILD_OPERATION", "order": 1},
+    {"tool_type": "DEPLOY_OPERATION", "order": 2}
+  ],
+  "success_count": 5,
+  "confidence": 0.85
+}
+```
+
+**Runtime Injection**: When user starts a similar task, inject Recipe into context as a "One-Shot Example."
+
+**Effect**: Radiant remembers "You prefer using pnpm over npm for builds."
+
+### 41C.7 Graveyard (Negative Knowledge)
+
+Clusters high-frequency failures and creates proactive warnings.
+
+**Anti-Pattern Structure:**
+```json
+{
+  "pattern_type": "version_incompatibility",
+  "signature": "DEPENDENCY_ERROR:Module_not_found_pandas",
+  "failure_count": 47,
+  "failure_rate": 0.42,
+  "affected_stacks": ["python-3.12", "pandas-1.0"],
+  "recommended_fix": "Upgrade to pandas 2.0 or use Python 3.11",
+  "severity": "high"
+}
+```
+
+**Proactive Warning Example:**
+> "🟠 42% of users experience instability with Python 3.12 + Pandas 1.0. I recommend using pandas 2.0 or Python 3.11 instead."
+
+**Nightly Clustering Job:**
+1. Group failures by error_signature
+2. Identify patterns with ≥10 occurrences
+3. Extract common context (stacks, versions)
+4. Generate recommended fixes
+5. Activate warnings in Brain Router
+
+### 41C.8 Tool Entropy (Auto-Chaining)
+
+Tracks tool co-occurrence patterns. If users frequently chain Tool A → Tool B manually, learn to auto-chain them.
+
+**Pattern Detection:**
+- Track tool usage within 60-second windows
+- Increment co-occurrence counter
+- Enable auto-chain when count ≥ 5
+
+**Example:**
+```
+Tool A: "npm install" → Tool B: "npm run build"
+Co-occurrences: 8
+Auto-chain: ENABLED
+```
+
+**Effect**: Radiant learns to automatically suggest "npm run build" after "npm install".
+
+### 41C.9 Shadow Mode (Self-Training)
+
+During idle times, Radiant "watches" public sources, predicts code, and grades itself.
+
+**Sources:**
+- GitHub public repos (trending libraries)
+- Documentation updates (new API changes)
+- StackOverflow (common patterns)
+
+**Self-Grading Process:**
+1. Extract challenge from source
+2. Generate prediction without seeing answer
+3. Compare to actual solution
+4. Calculate Jaccard similarity
+5. If grade ≥ 0.7, extract learnable pattern
+
+**Effect**: Radiant learns new libraries **before** users even ask.
+
+### 41C.10 Paste-Back Detection (Critical Signal)
+
+The **strongest negative signal available**. If a user pastes a stack trace immediately after AI generates code, that generation is tagged as a Critical Failure.
+
+**Detection Window:** 30 seconds after generation
+
+**Error Patterns Detected:**
+- Stack traces (`at line`, `Traceback`)
+- Error keywords (`Error:`, `Exception`, `FAILED`)
+- Exit codes (`exit code 1`, `exit status 1`)
+- Module errors (`Module not found`, `Cannot find module`)
+
+**Impact on Learning:**
+- Episode immediately tagged as `outcome_signal: negative`
+- Ego affect updated (confidence--, frustration++)
+- High priority for DPO loser pairing
+
+### 41C.11 Admin Dashboard
+
+**Location**: Admin Dashboard → AGI & Cognition → Learning Pipeline
+
+| Tab | Features |
+|-----|----------|
+| **Episodes** | View episodes, filter by outcome, export for analysis |
+| **Recipes** | Browse user recipes, promote to global, delete stale |
+| **Anti-Patterns** | View active warnings, adjust severity, deactivate |
+| **DPO Training** | View batches, training metrics, model checkpoints |
+| **Tool Entropy** | View patterns, enable/disable auto-chain |
+| **Shadow Mode** | Enable/disable, configure sources, view grades |
+| **Configuration** | Per-tenant feature toggles, thresholds |
+
+### 41C.12 API Endpoints
+
+**Base Path:** `/api/admin/learning`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/episodes` | GET | List episodes with filters |
+| `/episodes/:id` | GET | Get episode details |
+| `/recipes` | GET | List workflow recipes |
+| `/recipes/:id/promote` | POST | Promote to global |
+| `/anti-patterns` | GET | List anti-patterns |
+| `/anti-patterns/:id` | PATCH | Update severity/status |
+| `/dpo/batches` | GET | List DPO training batches |
+| `/dpo/stats` | GET | Training statistics |
+| `/tool-entropy` | GET | List tool patterns |
+| `/tool-entropy/:id/auto-chain` | POST | Toggle auto-chain |
+| `/shadow-mode/stats` | GET | Shadow learning stats |
+| `/config` | GET/PUT | Configuration |
+
+### 41C.13 Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `episode_logging_enabled` | true | Enable episode tracking |
+| `paste_back_detection_enabled` | true | Detect error paste-backs |
+| `paste_back_window_ms` | 30000 | Detection window (ms) |
+| `auto_skeletonize` | true | Auto-skeletonize episodes |
+| `recipe_extraction_enabled` | true | Extract recipes |
+| `recipe_success_threshold` | 3 | Successes before recipe |
+| `dpo_training_enabled` | true | Enable DPO training |
+| `dpo_batch_size` | 100 | Pairs per batch |
+| `failure_clustering_enabled` | true | Enable Graveyard |
+| `proactive_warnings_enabled` | true | Show anti-pattern warnings |
+| `warning_confidence_threshold` | 0.7 | Min confidence for warning |
+| `tool_entropy_enabled` | true | Track tool patterns |
+| `auto_chain_threshold` | 5 | Co-occurrences for auto-chain |
+| `shadow_mode_enabled` | false | Self-training (opt-in) |
+
+### 41C.14 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `learning_episodes` | Behavioral episode tracking |
+| `skeletonized_episodes` | Privacy-safe global training data |
+| `failure_log` | Raw failure data for clustering |
+| `anti_patterns` | Identified anti-patterns |
+| `workflow_recipes` | Successful workflow patterns |
+| `dpo_training_pairs` | DPO winner/loser pairs |
+| `tool_entropy_patterns` | Tool co-occurrence patterns |
+| `shadow_learning_log` | Self-training results |
+| `paste_back_events` | Critical failure signals |
+| `enhanced_learning_config` | Per-tenant configuration |
+
+---
+
 ## 42. Genesis Cato Safety Architecture
 
 ### 42.1 Overview
