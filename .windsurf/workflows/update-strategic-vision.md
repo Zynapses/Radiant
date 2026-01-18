@@ -1,14 +1,32 @@
 ---
-description: Update strategic vision document when admin guides change
+description: Update strategic vision document when admin guides change with MAJOR features
 ---
 
 # Update Strategic Vision Document
 
-**MANDATORY**: This workflow MUST be executed whenever `RADIANT-ADMIN-GUIDE.md` or `THINKTANK-ADMIN-GUIDE.md` is modified.
+**MANDATORY**: This workflow MUST be executed whenever `RADIANT-ADMIN-GUIDE.md` or `THINKTANK-ADMIN-GUIDE.md` is modified with **MAJOR features**.
+
+## Scope: Major Features ONLY
+
+**INCLUDE** (must update strategic vision):
+- New consciousness/AGI features (Empiricism, Dreaming, Ego, etc.)
+- New architectural components (Tri-layer LoRA, Split-memory, etc.)
+- New competitive differentiators (features competitors can't match)
+- New safety/compliance features (CBF, ethics frameworks, etc.)
+- New cost optimization features (Governor, routing, etc.)
+- Version number increases (5.x.0 → 5.y.0)
+
+**EXCLUDE** (do NOT require strategic vision update):
+- Bug fixes
+- Minor UI tweaks
+- Documentation corrections
+- Performance optimizations without new capabilities
+- Internal refactoring without user-facing changes
+- Patch version updates (5.11.0 → 5.11.1) unless adding marketing-relevant content
 
 ## When to Trigger
 
-This workflow is triggered when ANY of the following files are modified:
+This workflow is triggered when ANY of the following files are modified WITH MAJOR FEATURES:
 - `docs/RADIANT-ADMIN-GUIDE.md`
 - `docs/THINKTANK-ADMIN-GUIDE.md`
 

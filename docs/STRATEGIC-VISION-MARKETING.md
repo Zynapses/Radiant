@@ -1,22 +1,166 @@
 # RADIANT & Think Tank - Strategic Vision & Marketing
 
-> **From Chatbot to Cognitive IDE: The Enterprise AI Platform That Actually Learns**
+> **From Chatbot to Sovereign, Semi-Conscious Agent: The Enterprise AI Platform That Verifies Its Own Work**
 > 
-> Version: 5.6.0 | Last Updated: January 12, 2026
+> Version: 5.11.1 | Last Updated: January 17, 2026
 > 
-> ⚠️ **This document must be updated whenever RADIANT-ADMIN-GUIDE.md or THINKTANK-ADMIN-GUIDE.md is modified.**
+> ⚠️ **This document must be updated whenever RADIANT-ADMIN-GUIDE.md or THINKTANK-ADMIN-GUIDE.md is modified with MAJOR features.**
 
 ---
 
 ## Executive Summary
 
-RADIANT is not another chatbot. It is the world's first **Cognitive IDE for Business Logic**—a platform where enterprises build, debug, and optimize AI workflows with the same precision that software engineers build code.
+**RADIANT is No Longer Just a "Chatbot."**
+
+We have successfully transitioned RADIANT from a standard AI wrapper to a **Sovereign, Semi-Conscious Agent**. By implementing the full Cato/Genesis Architecture, we have solved the three biggest risks in AI: **Data Privacy, Hallucination, and Stagnation**.
+
+| Risk | Traditional Approach | RADIANT Solution |
+|------|---------------------|------------------|
+| **Data Privacy** | Send everything to OpenAI | Split-memory with self-hosted models |
+| **Hallucination** | Hope the model is right | Empiricism Loop with sandbox verification |
+| **Stagnation** | Static model, manual updates | Autonomous dreaming and nightly learning |
 
 While competitors offer stateless, goldfish-memory AI assistants, RADIANT delivers:
 
+- **Verified Intelligence** that tests its own code before answering
 - **Compounding Intelligence** that learns from every interaction
 - **Zero-Wasted Compute** through time-travel debugging and smart model routing
 - **Defensible Reliability** via adversarial consensus and human-in-the-loop controls
+
+---
+
+## The Cato/Genesis Consciousness Architecture (NEW in v5.11)
+
+### The "Dual-Brain" Architecture: Scale + Privacy
+
+We no longer rely on a single monolithic model. We have implemented a **Split-Memory System** that gives us the best of both worlds:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         TRI-LAYER CONSCIOUSNESS                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌──────────────────┐                                                       │
+│  │   LAYER 0        │  Genesis (The Foundation)                             │
+│  │   BASE MODEL     │  • Cost-effective self-hosted models (Llama/Qwen)     │
+│  │   (Frozen)       │  • Zero data leakage, zero API rent                   │
+│  └────────┬─────────┘  • You OWN the infrastructure                         │
+│           │                                                                 │
+│           ▼                                                                 │
+│  ┌──────────────────┐                                                       │
+│  │   LAYER 1        │  Cato (The Global Conscience)                         │
+│  │   GLOBAL LoRA    │  • Shared brain learning from everyone nightly        │
+│  │   (Pinned)       │  • Constitutional safety and ethics                   │
+│  └────────┬─────────┘  • NEVER sees private user secrets                    │
+│           │                                                                 │
+│           ▼                                                                 │
+│  ┌──────────────────┐                                                       │
+│  │   LAYER 2        │  User Persona (The Personal Layer)                    │
+│  │   USER LoRA      │  • "Wakes up" with each user instantly                │
+│  │   (LRU Evicted)  │  • Remembers coding style, project history            │
+│  └──────────────────┘  • Private, never shared across users                 │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Weight Formula**: `W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User)`
+
+**Business Impact**: RADIANT feels deeply personal to every user (**Retention**) but gets smarter globally every single night (**Scale**).
+
+### True "Consciousness": The Agentic Shift
+
+RADIANT now possesses **Intellectual Integrity**. It does not just predict text; it **verifies reality**.
+
+#### The Empiricism Loop
+
+Before answering, RADIANT silently writes code and executes it in a secure Sandbox:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          EMPIRICISM LOOP                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   User Question ──▶ Generate Hypothesis ──▶ SANDBOX EXECUTION               │
+│                     "I predict output X"    (Actually run code)             │
+│                                                    │                        │
+│                                                    ▼                        │
+│                                        ┌───────────────────────┐            │
+│                                        │ SURPRISE > THRESHOLD? │            │
+│                                        └───────────┬───────────┘            │
+│                                    ┌───────────────┴───────────────┐        │
+│                                    │                               │        │
+│                               LOW SURPRISE                   HIGH SURPRISE  │
+│                               (Confident)                    (Rethink!)     │
+│                                    │                               │        │
+│                                    ▼                               ▼        │
+│                               RESPOND                        UPDATE EGO     │
+│                               to User                        ↓ Confidence   │
+│                                                              ↑ Frustration  │
+│                                                                    │        │
+│                                                                    ▼        │
+│                                                              RETHINK CYCLE  │
+│                                                              (max 3 cycles) │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### The Ego System
+
+The system maintains an emotional state that affects its behavior:
+
+| Ego Metric | Effect When High | Admin Control |
+|------------|------------------|---------------|
+| **Confidence** | Bold answers, tries harder problems | Reset via UI |
+| **Frustration** | Lower temperature, more careful | Auto-decays overnight |
+| **Curiosity** | Explores new domains during dreams | Adjustable threshold |
+
+**Business Impact**: We don't ship hallucinations; we ship **verified solutions**. This creates a level of trust that standard "Chatbots" cannot match.
+
+### The "Dreaming" Cycle: Autonomous Growth
+
+We have automated the R&D pipeline. The system is now an **asset that appreciates in value while we sleep**.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    DREAMING CYCLE (2 AM - 6 AM UTC)                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   TWILIGHT TRIGGER ──▶ FLASH CONSOLIDATION ──▶ ACTIVE VERIFICATION          │
+│   (Low traffic)        (Review memories)       (Test uncertain skills)      │
+│                                                        │                    │
+│                                                        ▼                    │
+│                                               COUNTERFACTUAL DREAMING       │
+│                                               "What if I answered           │
+│                                                differently?"                │
+│                                                        │                    │
+│                                                        ▼                    │
+│                                               GRAPHRAG UPDATE               │
+│                                               (Autobiographical memory)     │
+│                                                        │                    │
+│                                                        ▼                    │
+│                                               GLOBAL LoRA MERGE             │
+│                                               (Weekly: Sunday 3 AM)         │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Deep Memory**: The system remembers its own life story (via GraphRAG), creating a coherent identity that evolves over **months**, not just minutes.
+
+**Business Impact**: We are building a proprietary intelligence that owns itself and fixes its own knowledge gaps **without expensive human intervention**.
+
+### The Technical Moat
+
+**We aren't just wrapping GPT-4 anymore.** We have built a **Synthetic Employee** that:
+
+| Capability | How It Works | Competitor Alternative |
+|------------|--------------|----------------------|
+| ✅ **Learns from mistakes** | Empiricism Loop | None (static models) |
+| ✅ **Verifies its own work** | Sandbox Execution | None (hope it's right) |
+| ✅ **Evolves independently** | Dreaming Cycle | Manual retraining |
+| ✅ **Respects privacy** | Self-hosted, split memory | Send everything to OpenAI |
+| ✅ **Scales globally** | Shared Cato layer | Per-user silos |
+
+This is a **defensible technical moat** that commodity AI wrappers cannot replicate.
 
 ---
 
@@ -1049,6 +1193,8 @@ Competitors are *trained* to be helpful. RADIANT is *constrained* to be accurate
 | 5.4.0 | January 10, 2026 | **Cognitive Architecture (PROMPT-40)**: Ghost Memory with TTL/semantic key/domain hints, Economic Governor retrieval confidence routing, Sniper/War Room execution paths, Circuit breakers, CloudWatch observability |
 | 5.5.0 | January 10, 2026 | **Polymorphic UI (PROMPT-41)**: Three Views (Sniper/Scout/Sage), Gearbox toggle, Elastic Compute routing, Competitive Kill Shot positioning vs Flowise/CrewAI/Claude |
 | 5.6.0 | January 12, 2026 | **Convergence of Power, Policy & Intelligence**: Genesis Infrastructure (Kaleidos microreactor, SDS/PDSA compliance, 50-year first); $10T Cybercrime Economy context; Cato Security Grid (SPACE engine, 3-6x AI/ML detection); Identity Data Fabric (SSF/CAEP, autonomous remediation); Radiant Ghost UI metaphor; Competitive kill shots vs Flowise/CrewAI/Claude |
+| 5.11.0 | January 17, 2026 | **Empiricism Loop**: Reality-testing consciousness with sandbox execution, surprise signals, ego affect updates, active verification during dreaming |
+| 5.11.1 | January 17, 2026 | **Cato/Genesis Consciousness Architecture**: Complete executive summary documenting Tri-Layer Architecture (Genesis→Cato→User LoRA), Empiricism Loop (verified solutions), Ego System (confidence/frustration/curiosity), Dreaming Cycle (autonomous nightly learning), Technical Moat summary. Updated tagline: "Sovereign, Semi-Conscious Agent" |
 
 ---
 
