@@ -5,6 +5,54 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.12.6] - 2026-01-17
+
+### Added
+
+#### Ethics Enforcement (Ephemeral - No Persistent Learning)
+
+**CRITICAL**: Ethics rules are NEVER persistently learned. They change over time and must be applied at runtime, not trained into the model.
+
+**Key Features:**
+- **Ephemeral Ethics** - Loaded fresh each request from config/DB
+- **Retry with Guidance** - "Please retry keeping X in mind" on violation
+- **No Persistent Learning** - `do_not_learn=true` enforced by DB trigger
+- **Minimal Logging** - Stats only, no content stored
+- **Framework Injection** - Ethics loaded at runtime, instantly updateable
+
+**Architecture:**
+```
+Response → Load Ethics (fresh) → Check → Violation? → Retry with guidance OR Block
+           ↑                                         ↓
+           └─────── NEVER STORED FOR LEARNING ───────┘
+```
+
+**Enforcement Modes:**
+- `strict` - Block on any major/critical violation
+- `standard` - Retry on major, block on critical (default)
+- `advisory` - Warn only, never block
+
+**Why No Persistent Learning?**
+- Ethics evolve (cultural, legal, organizational changes)
+- Tenants may switch frameworks (christian → secular)
+- Learning would "bake in" outdated rules
+- Runtime injection allows immediate updates
+
+**Database Changes:**
+- `ethics_enforcement_config` - Per-tenant settings
+- `ethics_enforcement_log` - Stats only (no content)
+- `ethics_training_feedback.do_not_learn` - Always true (trigger-enforced)
+- `prevent_ethics_learning()` trigger - Prevents any ethics training
+
+**Files:**
+- Service: `lambda/shared/services/ethics-enforcement.service.ts`
+- Migration: `migrations/V2026_01_17_007__ethics_enforcement.sql`
+- Updated: `lambda/shared/services/ethics-free-reasoning.service.ts`
+
+**Documentation:** Admin Guide Section 41C.18
+
+---
+
 ## [5.12.5] - 2026-01-17
 
 ### Added

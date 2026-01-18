@@ -467,6 +467,10 @@ class EthicsFreeReasoningService {
   
   /**
    * Collect training feedback when ethics corrections are made.
+   * 
+   * CRITICAL: Ethics feedback is NEVER used for training.
+   * The do_not_learn flag is ALWAYS set to true.
+   * Ethics change over time and must not be "baked in" to the model.
    */
   async collectTrainingFeedback(
     tenantId: string,
@@ -485,17 +489,18 @@ class EthicsFreeReasoningService {
       ethicsIssues: issues,
       correctedOutput,
       feedbackType: 'auto_correction',
-      usedForTraining: false,
+      usedForTraining: false, // NEVER train on ethics
       qualityScore: this.calculateFeedbackQuality(issues, rawOutput, correctedOutput),
       timestamp: new Date().toISOString(),
     };
     
     // Store feedback in database
+    // NOTE: do_not_learn is ALWAYS true - enforced by DB trigger
     await executeStatement(
       `INSERT INTO ethics_training_feedback (
          id, tenant_id, session_id, raw_output, ethics_issues,
-         corrected_output, feedback_type, quality_score, created_at
-       ) VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7, $8, NOW())`,
+         corrected_output, feedback_type, quality_score, do_not_learn, created_at
+       ) VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7, $8, true, NOW())`,
       [
         { name: 'id', value: { stringValue: feedback.id } },
         { name: 'tenantId', value: { stringValue: tenantId } },

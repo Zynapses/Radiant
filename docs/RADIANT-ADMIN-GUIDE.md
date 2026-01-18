@@ -11491,7 +11491,117 @@ const status = await persistenceGuard.getIntegrityStatus(tenantId);
 
 ---
 
-### 41C.18 Admin Reports System
+### 41C.18 Ethics Enforcement (Ephemeral)
+
+**CRITICAL DESIGN PRINCIPLE**: Ethics rules are NEVER persistently learned.
+
+Ethics change over time (cultural, legal, organizational), so they must be:
+1. Loaded fresh each request from config/DB
+2. Never trained into the model
+3. Applied as runtime enforcement, not learned behavior
+
+**Architecture:**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ETHICS ENFORCEMENT FLOW                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   Response Generated                                                        │
+│        │                                                                    │
+│        ▼                                                                    │
+│   ┌──────────────────┐     ┌──────────────────┐                            │
+│   │  Load Ethics     │ ──► │  Check Response  │                            │
+│   │  (Fresh/Ephemeral)│     │  Against Rules   │                            │
+│   └──────────────────┘     └────────┬─────────┘                            │
+│                                     │                                       │
+│                    ┌────────────────┴────────────────┐                     │
+│                    │                                 │                     │
+│               PASSED                            VIOLATION                  │
+│                    │                                 │                     │
+│                    ▼                                 ▼                     │
+│           ┌──────────────┐               ┌──────────────────┐              │
+│           │ Return       │               │ Can Retry?       │              │
+│           │ Response     │               │ (max 2 attempts) │              │
+│           └──────────────┘               └────────┬─────────┘              │
+│                                                   │                        │
+│                              ┌────────────────────┴──────────────────┐     │
+│                              │                                       │     │
+│                          YES, RETRY                              NO, BLOCK │
+│                              │                                       │     │
+│                              ▼                                       ▼     │
+│                   ┌─────────────────────┐              ┌──────────────────┐│
+│                   │ "Retry with X in    │              │ Return Safe      ││
+│                   │  mind" instructions │              │ Response         ││
+│                   └─────────────────────┘              └──────────────────┘│
+│                                                                             │
+│   ⚠️ NEVER STORED FOR LEARNING - Ethics are ephemeral                      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Key Features:**
+
+| Feature | Description |
+|---------|-------------|
+| **Ephemeral Ethics** | Loaded fresh each request, never cached |
+| **Retry with Guidance** | "Please retry keeping X in mind" |
+| **No Persistent Learning** | `do_not_learn=true` always |
+| **Minimal Logging** | Stats only, no content stored |
+| **Framework Injection** | Ethics loaded from config at runtime |
+
+**Why No Persistent Learning?**
+- Ethics evolve over time
+- Tenants may change frameworks (christian → secular)
+- Learning would "bake in" outdated rules
+- Runtime injection allows immediate updates
+
+**Enforcement Modes:**
+
+| Mode | Behavior |
+|------|----------|
+| `strict` | Block on any major/critical violation |
+| `standard` | Retry on major, block on critical |
+| `advisory` | Warn only, never block |
+
+**Database Tables:**
+
+| Table | Purpose |
+|-------|---------|
+| `ethics_enforcement_config` | Per-tenant settings |
+| `ethics_enforcement_log` | Stats only (no content) |
+
+**Service:** `lambda/shared/services/ethics-enforcement.service.ts`
+
+**Migration:** `migrations/V2026_01_17_007__ethics_enforcement.sql`
+
+**Usage:**
+
+```typescript
+import { ethicsEnforcementService } from './ethics-enforcement.service';
+
+// Execute with automatic retry on violation
+const result = await ethicsEnforcementService.executeWithEnforcement(
+  tenantId,
+  userId,
+  sessionId,
+  prompt,
+  async (prompt, retryContext) => {
+    // Generate response (retryContext provided on retry)
+    const response = await generateResponse(prompt);
+    return { response };
+  },
+  domain
+);
+
+// result.response - Safe response (original or retry or blocked)
+// result.wasRetried - Whether retry was needed
+// result.ethicsEnforced - Whether safe response was used
+```
+
+---
+
+### 41C.19 Admin Reports System
 
 Full report writer with scheduling, recipients, and multi-format generation.
 
