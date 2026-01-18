@@ -6,9 +6,9 @@
  */
 
 import { ScheduledHandler } from 'aws-lambda';
-import { executeStatement, stringParam } from '../shared/db/client';
+import { executeStatement, stringParam } from '../shared/utils/db';
 import { reportGeneratorService } from '../shared/services/report-generator.service';
-import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
+import { logger } from '../shared/utils/logger';
 import { v4 as uuidv4 } from 'uuid';
 
 interface DueReport {
@@ -74,7 +74,7 @@ async function getDueReports(): Promise<DueReport[]> {
     []
   );
 
-  return (result.rows || []) as DueReport[];
+  return (result.rows || []) as unknown as DueReport[];
 }
 
 /**

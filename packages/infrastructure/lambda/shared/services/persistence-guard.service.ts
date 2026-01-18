@@ -15,8 +15,8 @@
  */
 
 import { createHash } from 'crypto';
-import { executeStatement, stringParam, intParam, boolParam } from '../utils/db';
-import { logger } from '../utils/logger';
+import { executeStatement, stringParam, boolParam } from '../db/client';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 // ============================================================================
 // Types
@@ -503,7 +503,7 @@ class PersistenceGuardService {
           stringParam('tenantId', tenantId),
           stringParam('transactionId', transactionId),
           stringParam('status', status),
-          stringParam('operations', data ? JSON.stringify(data) : null),
+          stringParam('operations', data ? JSON.stringify(data) : ''),
         ]
       );
     } catch (error) {
