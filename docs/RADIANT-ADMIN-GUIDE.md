@@ -11171,6 +11171,72 @@ The **strongest negative signal available**. If a user pastes a stack trace imme
 | `paste_back_events` | Critical failure signals |
 | `enhanced_learning_config` | Per-tenant configuration |
 
+### 41C.15 Session Persistence (Restart Recovery)
+
+All in-memory state is persisted to the database for Lambda restart recovery.
+
+**Persisted State:**
+
+| Service | In-Memory Data | Persistence Table | TTL |
+|---------|---------------|-------------------|-----|
+| Episode Logger | Active episodes | `active_episodes_cache` | 1 hour |
+| Paste-Back Detection | Recent generations | `recent_generations_cache` | 5 minutes |
+| Tool Entropy | Tool usage sessions | `tool_usage_sessions` | 10 minutes |
+| Feedback Loop | Pending items | `pending_feedback_items` | Until processed |
+
+**Architecture:**
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    SESSION PERSISTENCE FLOW                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   Lambda Start                                                              │
+│        │                                                                    │
+│        ▼                                                                    │
+│   ┌──────────────────┐                                                      │
+│   │  initialize()    │  ← Called on first service method invocation        │
+│   │  (Lazy Load)     │                                                      │
+│   └────────┬─────────┘                                                      │
+│            │                                                                │
+│            ▼                                                                │
+│   ┌──────────────────┐     ┌──────────────────┐                            │
+│   │  Restore from DB │ ──► │  In-Memory Map   │                            │
+│   │  (WHERE expires  │     │  (Fast Access)   │                            │
+│   │   > NOW())       │     │                  │                            │
+│   └──────────────────┘     └────────┬─────────┘                            │
+│                                     │                                       │
+│                                     ▼                                       │
+│                            ┌──────────────────┐                            │
+│                            │  On Each Update  │                            │
+│                            │  Persist to DB   │                            │
+│                            └──────────────────┘                            │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Cleanup:**
+
+Expired entries are cleaned up by:
+1. **Periodic cleanup** - 1-5% chance on each operation
+2. **Scheduled cleanup** - EventBridge rule every 5 minutes calls `cleanup_expired_learning_caches()`
+
+**Pending Feedback Items:**
+
+Unprocessed feedback (skeletonization, recipe checks, DPO pairing) is queued for async processing:
+
+```json
+{
+  "feedback_type": "skeletonize",
+  "priority": 1,
+  "payload": { "episode_id": "..." },
+  "status": "pending",
+  "retry_count": 0,
+  "max_retries": 3
+}
+```
+
+**Migration:** `migrations/V2026_01_17_003__learning_session_persistence.sql`
+
 ---
 
 ## 42. Genesis Cato Safety Architecture

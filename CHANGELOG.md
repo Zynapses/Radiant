@@ -5,6 +5,35 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.12.1] - 2026-01-17
+
+### Added
+
+#### Session Persistence for Learning Pipeline
+
+All in-memory state now persists to database for Lambda restart recovery.
+
+**Persisted State:**
+
+| Service | Persistence Table | TTL |
+|---------|-------------------|-----|
+| Episode Logger | `active_episodes_cache` | 1 hour |
+| Paste-Back Detection | `recent_generations_cache` | 5 minutes |
+| Tool Entropy | `tool_usage_sessions` | 10 minutes |
+| Feedback Loop | `pending_feedback_items` | Until processed |
+
+**Architecture:**
+- Lazy initialization on first method call
+- Restore from DB where `expires_at > NOW()`
+- Persist on each update with UPSERT
+- Cleanup: periodic (1-5% chance) + scheduled (every 5 minutes)
+
+**Migration:** `migrations/V2026_01_17_003__learning_session_persistence.sql`
+
+**Documentation:** Admin Guide Section 41C.15
+
+---
+
 ## [5.12.0] - 2026-01-17
 
 ### Added
