@@ -81,7 +81,10 @@ async function initializeConnections(): Promise<void> {
     const secret = await secretsManager.getSecretValue({
       SecretId: requireEnv('DB_SECRET_ARN'),
     });
-    const credentials = JSON.parse(secret.SecretString!);
+    if (!secret.SecretString) {
+      throw new Error('Database secret is empty or binary - expected JSON string');
+    }
+    const credentials = JSON.parse(secret.SecretString);
 
     dbClient = new Client({
       host: credentials.host,
@@ -89,6 +92,8 @@ async function initializeConnections(): Promise<void> {
       database: credentials.dbname,
       user: credentials.username,
       password: credentials.password,
+      // Note: rejectUnauthorized: false is acceptable for Aurora within AWS VPC
+      // Aurora uses AWS-managed certificates that may not chain to public CAs
       ssl: { rejectUnauthorized: false },
     });
     await dbClient.connect();
