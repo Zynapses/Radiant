@@ -5,6 +5,45 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.12.4] - 2026-01-17
+
+### Added
+
+#### Persistence Guard (Global Data Integrity)
+
+**GLOBAL ENFORCEMENT** of data completeness for all persistent memory structures.
+Ensures atomic writes with integrity checks to prevent partial data on reboot.
+
+**ALL persistent memory operations MUST use this service - NO EXCEPTIONS.**
+
+**Key Features:**
+- **Schema Validation** - Required fields checked before persist
+- **SHA-256 Checksum** - Deterministic hash for integrity verification
+- **Write-Ahead Log (WAL)** - Crash recovery for incomplete transactions
+- **Atomic Transactions** - All-or-nothing commits
+- **Completeness Flag** - `is_complete=false` until checksum verified
+- **Corruption Detection** - Automatic detection on restore
+
+**Architecture:**
+```
+Data → Schema Validate → SHA-256 Hash → WAL → Begin TX → Write → Verify Checksum
+  ↓ MATCH: is_complete=true, COMMIT
+  ↓ MISMATCH: ROLLBACK, Log Corruption
+```
+
+**Database Tables:**
+- `persistence_records` - Central store with checksum and completeness flag
+- `persistence_wal` - Write-ahead log for crash recovery
+- `persistence_integrity_log` - Audit log of integrity events
+
+**Files:**
+- Service: `lambda/shared/services/persistence-guard.service.ts`
+- Migration: `migrations/V2026_01_17_005__persistence_guard.sql`
+
+**Documentation:** Admin Guide Section 41C.17
+
+---
+
 ## [5.12.3] - 2026-01-17
 
 ### Added

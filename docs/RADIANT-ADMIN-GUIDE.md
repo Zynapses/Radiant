@@ -11335,6 +11335,124 @@ Large user content is offloaded to S3 to prevent database scaling issues.
 
 **Migration:** `migrations/V2026_01_17_004__s3_content_offloading.sql`
 
+---
+
+### 41C.17 Persistence Guard (Data Integrity)
+
+**GLOBAL ENFORCEMENT** of data completeness for all persistent memory structures.
+Ensures atomic writes with integrity checks to prevent partial data on reboot.
+
+**ALL persistent memory operations MUST use this service - NO EXCEPTIONS.**
+
+**Architecture:**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    PERSISTENCE GUARD FLOW                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   Data to Persist                                                           │
+│        │                                                                    │
+│        ▼                                                                    │
+│   ┌──────────────────┐     ┌──────────────────┐                            │
+│   │  Schema Validate │ ──► │  Calculate       │                            │
+│   │  (Required Fields)│     │  SHA-256 Hash    │                            │
+│   └──────────────────┘     └────────┬─────────┘                            │
+│                                     │                                       │
+│                                     ▼                                       │
+│   ┌──────────────────┐     ┌──────────────────┐                            │
+│   │  Write to WAL    │ ──► │  Begin TX        │                            │
+│   │  (Crash Recovery)│     │  is_complete=F   │                            │
+│   └──────────────────┘     └────────┬─────────┘                            │
+│                                     │                                       │
+│                                     ▼                                       │
+│   ┌──────────────────┐     ┌──────────────────┐                            │
+│   │  Write Data      │ ──► │  Verify Checksum │                            │
+│   │  to Database     │     │  After Write     │                            │
+│   └──────────────────┘     └────────┬─────────┘                            │
+│                                     │                                       │
+│                    ┌────────────────┴────────────────┐                     │
+│                    │                                 │                     │
+│               MATCH                             MISMATCH                   │
+│                    │                                 │                     │
+│                    ▼                                 ▼                     │
+│           ┌──────────────┐               ┌──────────────────┐              │
+│           │ is_complete=T│               │ ROLLBACK TX      │              │
+│           │ COMMIT TX    │               │ Log Corruption   │              │
+│           └──────────────┘               └──────────────────┘              │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Key Features:**
+
+| Feature | Description |
+|---------|-------------|
+| **Schema Validation** | Required fields checked before persist |
+| **SHA-256 Checksum** | Deterministic hash for integrity verification |
+| **Write-Ahead Log** | Crash recovery for incomplete transactions |
+| **Atomic Transactions** | All-or-nothing commits |
+| **Completeness Flag** | `is_complete=false` until checksum verified |
+| **Corruption Detection** | Automatic detection on restore |
+
+**Database Tables:**
+
+| Table | Purpose |
+|-------|---------|
+| `persistence_records` | Central store with checksum and completeness flag |
+| `persistence_wal` | Write-ahead log for crash recovery |
+| `persistence_integrity_log` | Audit log of integrity events |
+
+**Usage:**
+
+```typescript
+import { persistenceGuard } from './persistence-guard.service';
+
+// Define required schema - enforces data completeness
+const SCHEMA = {
+  id: 'string',
+  tenant_id: 'string',
+  data: 'object',
+};
+
+// Validate before persist
+const validation = persistenceGuard.validateForPersistence(data, SCHEMA);
+if (!validation.valid) {
+  throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+}
+
+// Atomic persist with checksum
+await persistenceGuard.persistAtomic(tenantId, 'table_name', recordId, data, SCHEMA);
+
+// Restore with integrity check
+const result = await persistenceGuard.restoreWithValidation<MyType>(
+  tenantId, 'table_name', recordId, SCHEMA
+);
+if (result.corrupted) {
+  // Handle corruption - data was partial or checksum mismatch
+}
+```
+
+**Startup Recovery:**
+
+```typescript
+// On Lambda cold start - recover incomplete transactions
+await persistenceGuard.recoverIncompleteTransactions(tenantId);
+```
+
+**Integrity Status:**
+
+```typescript
+const status = await persistenceGuard.getIntegrityStatus(tenantId);
+// { total_records, complete_records, incomplete_records, corrupted_records, pending_transactions }
+```
+
+**Service:** `lambda/shared/services/persistence-guard.service.ts`
+
+**Migration:** `migrations/V2026_01_17_005__persistence_guard.sql`
+
+---
+
 **Admin API (Base: `/api/admin/s3-storage`):**
 
 | Method | Endpoint | Description |

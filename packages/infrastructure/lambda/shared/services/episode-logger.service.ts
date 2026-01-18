@@ -1,10 +1,12 @@
-// RADIANT v5.12.0 - Episode Logger Service
+// RADIANT v5.12.4 - Episode Logger Service
 // Tracks behavioral episodes (state transitions) rather than raw chat logs
 // Captures how users solve problems with rich feedback signals
+// Uses PersistenceGuard for atomic writes with integrity checks
 
 import { executeStatement, stringParam, doubleParam, boolParam, longParam } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { v4 as uuidv4 } from 'uuid';
+import { persistenceGuard } from './persistence-guard.service';
 
 // ============================================================================
 // Types
@@ -60,33 +62,67 @@ class EpisodeLoggerService {
   private activeEpisodes: Map<string, Episode> = new Map();
   private initialized = false;
 
+  // Schema for episode validation - enforces data completeness
+  private static readonly EPISODE_SCHEMA: Record<string, string> = {
+    episode_id: 'string',
+    tenant_id: 'string',
+    user_id: 'string',
+    session_id: 'string',
+    goal_intent: 'string',
+    workflow_trace: 'array',
+    outcome_signal: 'string',
+    metrics: 'object',
+  };
+
   /**
    * Initialize service and restore active episodes from database
+   * Uses PersistenceGuard for integrity verification
    */
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
     try {
+      // First, recover any incomplete transactions
+      const tenantId = process.env.DEFAULT_TENANT_ID || 'system';
+      await persistenceGuard.recoverIncompleteTransactions(tenantId);
+
       const result = await executeStatement(
         `SELECT episode_id, episode_data FROM active_episodes_cache WHERE expires_at > NOW()`,
         []
       );
 
+      let restored = 0;
+      let skipped = 0;
+
       for (const row of (result.rows || []) as Array<{ episode_id: string; episode_data: string }>) {
         try {
           const episode = JSON.parse(row.episode_data) as Episode;
+          
+          // Validate data completeness using PersistenceGuard
+          const validation = persistenceGuard.validateForPersistence(episode, EpisodeLoggerService.EPISODE_SCHEMA);
+          if (!validation.valid) {
+            logger.warn('Skipping incomplete episode on restore', { 
+              episodeId: row.episode_id, 
+              errors: validation.errors 
+            });
+            skipped++;
+            continue;
+          }
+
           episode.created_at = new Date(episode.created_at);
           if (episode.completed_at) {
             episode.completed_at = new Date(episode.completed_at);
           }
           this.activeEpisodes.set(row.episode_id, episode);
-        } catch {
-          // Skip malformed entries
+          restored++;
+        } catch (error) {
+          logger.warn('Skipping malformed episode', { episodeId: row.episode_id, error });
+          skipped++;
         }
       }
 
       this.initialized = true;
-      logger.info('Episode Logger initialized', { restoredEpisodes: this.activeEpisodes.size });
+      logger.info('Episode Logger initialized', { restored, skipped });
     } catch (error) {
       logger.error('Failed to initialize Episode Logger', { error });
       this.initialized = true; // Continue without restored data
@@ -95,9 +131,30 @@ class EpisodeLoggerService {
 
   /**
    * Persist an active episode to database cache
+   * Uses PersistenceGuard for atomic writes with integrity verification
    */
   private async persistActiveEpisode(episode: Episode): Promise<void> {
+    // Validate data completeness BEFORE persisting - NO EXCEPTIONS
+    const validation = persistenceGuard.validateForPersistence(episode, EpisodeLoggerService.EPISODE_SCHEMA);
+    if (!validation.valid) {
+      logger.error('Cannot persist incomplete episode', { 
+        episodeId: episode.episode_id, 
+        errors: validation.errors 
+      });
+      throw new Error(`Episode validation failed: ${validation.errors.join(', ')}`);
+    }
+
     try {
+      // Use atomic persistence with checksum
+      await persistenceGuard.persistAtomic(
+        episode.tenant_id,
+        'active_episodes_cache',
+        episode.episode_id,
+        episode,
+        EpisodeLoggerService.EPISODE_SCHEMA
+      );
+
+      // Also write to the cache table for quick access
       await executeStatement(
         `INSERT INTO active_episodes_cache (
           episode_id, tenant_id, user_id, session_id, episode_data, 
@@ -115,8 +172,14 @@ class EpisodeLoggerService {
           stringParam('episodeData', JSON.stringify(episode)),
         ]
       );
+
+      logger.debug('Episode persisted with integrity check', { 
+        episodeId: episode.episode_id, 
+        checksum: validation.checksum 
+      });
     } catch (error) {
       logger.error('Failed to persist active episode', { episodeId: episode.episode_id, error });
+      throw error;
     }
   }
 
