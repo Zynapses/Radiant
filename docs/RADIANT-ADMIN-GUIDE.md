@@ -11335,6 +11335,42 @@ Large user content is offloaded to S3 to prevent database scaling issues.
 
 **Migration:** `migrations/V2026_01_17_004__s3_content_offloading.sql`
 
+**Admin API (Base: `/api/admin/s3-storage`):**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/dashboard` | Full dashboard with stats, config, and table list |
+| `GET` | `/config` | Get offloading configuration |
+| `PUT` | `/config` | Update offloading configuration |
+| `POST` | `/trigger-cleanup` | Manually trigger orphan cleanup |
+| `GET` | `/orphans?status=pending` | List orphan queue entries |
+| `GET` | `/history?days=30` | Storage history/trends |
+
+**Admin UI:** Storage → S3 Offloading tab
+
+**Dashboard Metrics:**
+- **S3 Objects** - Total count and size in GB
+- **Dedup Savings** - Percentage saved via content-addressable storage
+- **Orphan Queue** - Pending, processing, completed today, failed
+- **Storage by Category** - Breakdown by table with object count, size, compression %
+
+**Editable Configuration:**
+
+| Setting | Type | Description |
+|---------|------|-------------|
+| Offloading Enabled | Toggle | Master on/off switch |
+| Compression Enabled | Toggle | Enable gzip compression |
+| Auto Cleanup | Toggle | Automatic orphan deletion |
+| Offload Messages | Toggle | Offload thinktank_messages |
+| Offload Memories | Toggle | Offload memories table |
+| Offload Episodes | Toggle | Offload learning_episodes |
+| Offload Training Data | Toggle | Offload shadow_learning_log |
+| Offload Threshold | Number | Bytes threshold (default: 10000) |
+| Compression Threshold | Number | Compress if > bytes (default: 1000) |
+| Grace Period | Number | Hours before orphan deletion (default: 24) |
+| Compression Algorithm | Select | gzip, lz4, or none |
+| S3 Bucket | Text | Target bucket name |
+
 ---
 
 ## 42. Genesis Cato Safety Architecture

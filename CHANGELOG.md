@@ -5,6 +5,42 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.12.3] - 2026-01-17
+
+### Added
+
+#### S3 Storage Admin Dashboard
+
+Admin UI for managing S3 content offloading with full stats and configuration.
+
+**Admin UI:** Storage → S3 Offloading tab
+
+**Dashboard Metrics:**
+- S3 Objects (count + GB)
+- Dedup Savings (%)
+- Orphan Queue (pending, completed today)
+- Storage by Category (table breakdown)
+
+**Editable Configuration:**
+- Feature toggles (offloading, compression, auto cleanup)
+- Content type toggles (messages, memories, episodes, training data)
+- Thresholds (offload, compression, grace period)
+- Compression algorithm (gzip, lz4, none)
+- S3 bucket
+
+**API Endpoints (Base: `/api/admin/s3-storage`):**
+- `GET /dashboard` - Full dashboard data
+- `GET/PUT /config` - Configuration
+- `POST /trigger-cleanup` - Manual cleanup
+- `GET /orphans` - Orphan queue
+- `GET /history` - Storage trends
+
+**Files:**
+- API: `lambda/admin/s3-storage.ts`
+- UI: `apps/admin-dashboard/app/(dashboard)/storage/storage-client.tsx`
+
+---
+
 ## [5.12.2] - 2026-01-17
 
 ### Added
