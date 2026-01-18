@@ -41,6 +41,12 @@ export interface ModelRequest {
   temperature?: number;
   systemPrompt?: string;
   stream?: boolean;
+  // LoRA adapter support for self-hosted models
+  loraAdapterId?: string;
+  loraAdapterName?: string;
+  tenantId?: string;
+  domain?: string;
+  subdomain?: string;
 }
 
 export interface ModelResponse {
@@ -52,6 +58,10 @@ export interface ModelResponse {
   latencyMs: number;
   costCents: number;
   cached: boolean;
+  // LoRA adapter info (if used)
+  loraAdapterUsed?: string;
+  loraAdapterName?: string;
+  loraLoadTimeMs?: number;
 }
 
 export interface ProviderHealth {
