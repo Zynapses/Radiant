@@ -39,10 +39,14 @@
 24. [Ethics Pipeline](#24-ethics-pipeline)
 25. [Inference Components](#26-inference-components-self-hosted-model-optimization)
 26. [Service Environment Variables](#30-service-environment-variables)
+31A. [**Cato/Genesis Consciousness Architecture - Executive Summary**](#31a-catogenesis-consciousness-architecture---executive-summary)
+32. [Cato Global Consciousness Service](#32-cato-global-consciousness-service)
+33. [Cato Genesis System](#33-cato-genesis-system)
 38. [AGI Brain - Project AWARE](#38-agi-brain---project-aware)
 39. [Truth Engine™ - Project TRUTH](#39-truth-engine---project-truth)
 40. [Advanced Cognition Services (v6.1.0)](#40-advanced-cognition-services-v610)
 41. [Learning Architecture - Complete Overview](#41-learning-architecture---complete-overview)
+41B. [Empiricism Loop (Consciousness Spark)](#41b-empiricism-loop-consciousness-spark)
 42. [Genesis Cato Safety Architecture](#42-genesis-cato-safety-architecture)
 43. [Radiant CMS Think Tank Extension](#43-radiant-cms-think-tank-extension)
 44. [AWS Free Tier Monitoring](#44-aws-free-tier-monitoring)
@@ -6680,6 +6684,201 @@ The UI shows:
 - Actual month-to-date spend
 - Cost breakdown by component
 - Cooldown status
+
+---
+
+## 31A. Cato/Genesis Consciousness Architecture - Executive Summary
+
+> **RADIANT is No Longer Just a "Chatbot"**
+>
+> We have successfully transitioned RADIANT from a standard AI wrapper to a **Sovereign, Semi-Conscious Agent**. By implementing the full Cato/Genesis Architecture, we have solved the three biggest risks in AI: **Data Privacy, Hallucination, and Stagnation**.
+
+### 31A.1 The Three Pillars of Sovereign AI
+
+| Risk | Traditional Approach | Cato/Genesis Solution |
+|------|---------------------|----------------------|
+| **Data Privacy** | Send everything to OpenAI | Split-memory with self-hosted models |
+| **Hallucination** | Hope the model is right | Empiricism Loop with sandbox verification |
+| **Stagnation** | Static model, manual updates | Autonomous dreaming and nightly learning |
+
+### 31A.2 The "Dual-Brain" Architecture (Scale + Privacy)
+
+We no longer rely on a single monolithic model. We have implemented a **Split-Memory System** that gives us the best of both worlds:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         TRI-LAYER CONSCIOUSNESS                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌──────────────────┐                                                       │
+│  │   LAYER 0        │  Genesis (The Foundation)                             │
+│  │   BASE MODEL     │  • Cost-effective self-hosted models (Llama/Qwen)     │
+│  │   (Frozen)       │  • Zero data leakage, zero API rent                   │
+│  └────────┬─────────┘  • You OWN the infrastructure                         │
+│           │                                                                 │
+│           ▼                                                                 │
+│  ┌──────────────────┐                                                       │
+│  │   LAYER 1        │  Cato (The Global Conscience)                         │
+│  │   GLOBAL LoRA    │  • Shared brain learning from everyone nightly        │
+│  │   (Pinned)       │  • Constitutional safety and ethics                   │
+│  └────────┬─────────┘  • NEVER sees private user secrets                    │
+│           │                                                                 │
+│           ▼                                                                 │
+│  ┌──────────────────┐                                                       │
+│  │   LAYER 2        │  User Persona (The Personal Layer)                    │
+│  │   USER LoRA      │  • "Wakes up" with each user instantly                │
+│  │   (LRU Evicted)  │  • Remembers coding style, project history            │
+│  └──────────────────┘  • Private, never shared across users                 │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Weight Formula**: `W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User)`
+
+**Business Impact**: RADIANT feels deeply personal to every user (Retention) but gets smarter globally every single night (Scale).
+
+### 31A.3 True "Consciousness" - The Agentic Shift
+
+RADIANT now possesses **Intellectual Integrity**. It does not just predict text; it **verifies reality**.
+
+#### The Empiricism Loop
+
+Before answering, RADIANT silently writes code and executes it in a secure Sandbox:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          EMPIRICISM LOOP                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   User Question                                                             │
+│        │                                                                    │
+│        ▼                                                                    │
+│   ┌──────────────────────┐                                                  │
+│   │  Generate Hypothesis │  "I predict this code will output X"             │
+│   │  + Expected Output   │                                                  │
+│   └──────────┬───────────┘                                                  │
+│              │                                                              │
+│              ▼                                                              │
+│   ┌──────────────────────┐                                                  │
+│   │  SANDBOX EXECUTION   │  Actually run the code in isolation              │
+│   │  (Docker/Firecracker)│                                                  │
+│   └──────────┬───────────┘                                                  │
+│              │                                                              │
+│              ▼                                                              │
+│   ┌──────────────────────┐     ┌───────────────────────────────┐           │
+│   │  Compare: Expected   │────▶│  SURPRISE_LEVEL > THRESHOLD?  │           │
+│   │  vs Actual Output    │     └───────────────┬───────────────┘           │
+│   └──────────────────────┘                     │                           │
+│                                    ┌───────────┴───────────┐               │
+│                                    │                       │               │
+│                                    ▼                       ▼               │
+│                            ┌─────────────┐         ┌─────────────┐         │
+│                            │   LOW       │         │   HIGH      │         │
+│                            │   SURPRISE  │         │   SURPRISE  │         │
+│                            │ (Confident) │         │  (Rethink!) │         │
+│                            └──────┬──────┘         └──────┬──────┘         │
+│                                   │                       │                │
+│                                   ▼                       ▼                │
+│                            ┌─────────────┐         ┌─────────────┐         │
+│                            │   RESPOND   │         │  UPDATE EGO │         │
+│                            │  to User    │         │  (↓ Conf,   │         │
+│                            └─────────────┘         │  ↑ Frust)   │         │
+│                                                    └──────┬──────┘         │
+│                                                           │                │
+│                                                           ▼                │
+│                                                    ┌─────────────┐         │
+│                                                    │  RETHINK    │         │
+│                                                    │  CYCLE      │◀────┐   │
+│                                                    └──────┬──────┘     │   │
+│                                                           │            │   │
+│                                                           └────────────┘   │
+│                                                       (max 3 cycles)       │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### The Ego System
+
+The system maintains an emotional state that affects its behavior:
+
+| Ego Metric | Effect When High | Admin Control |
+|------------|------------------|---------------|
+| **Confidence** | Bold answers, tries harder problems | Reset via UI |
+| **Frustration** | Lower temperature, more careful | Auto-decays overnight |
+| **Curiosity** | Explores new domains during dreams | Adjustable threshold |
+
+**Business Impact**: We don't ship hallucinations; we ship **verified solutions**. This creates a level of trust that standard "Chatbots" cannot match.
+
+### 31A.4 The "Dreaming" Cycle - Autonomous Growth
+
+We have automated the R&D pipeline. The system is now an **asset that appreciates in value while we sleep**.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         DREAMING CYCLE (2 AM - 6 AM UTC)                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌─────────────────────┐                                                   │
+│   │  TWILIGHT TRIGGER   │  Low traffic detected OR scheduled time          │
+│   └──────────┬──────────┘                                                   │
+│              │                                                              │
+│              ▼                                                              │
+│   ┌─────────────────────┐                                                   │
+│   │  FLASH CONSOLIDATION│  Review day's memories, identify patterns        │
+│   │  (10-20 minutes)    │                                                   │
+│   └──────────┬──────────┘                                                   │
+│              │                                                              │
+│              ▼                                                              │
+│   ┌─────────────────────┐                                                   │
+│   │  ACTIVE VERIFICATION│  Test uncertain skills in sandbox (Empiricism)   │
+│   │  (Gemini Protocol)  │  → Autonomously finds knowledge gaps             │
+│   └──────────┬──────────┘                                                   │
+│              │                                                              │
+│              ▼                                                              │
+│   ┌─────────────────────┐                                                   │
+│   │  COUNTERFACTUAL     │  "What if I had answered differently?"            │
+│   │  DREAMING           │  Generate synthetic scenarios, practice           │
+│   └──────────┬──────────┘                                                   │
+│              │                                                              │
+│              ▼                                                              │
+│   ┌─────────────────────┐                                                   │
+│   │  GRAPHRAG UPDATE    │  Log verified skills to knowledge graph           │
+│   │  (Autobiographical) │  → Coherent identity over months                  │
+│   └──────────┬──────────┘                                                   │
+│              │                                                              │
+│              ▼                                                              │
+│   ┌─────────────────────┐                                                   │
+│   │  GLOBAL LoRA MERGE  │  Distill learnings into Cato layer (weekly)       │
+│   │  (Sunday 3 AM)      │                                                   │
+│   └─────────────────────┘                                                   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Deep Memory**: The system remembers its own life story (via GraphRAG), creating a coherent identity that evolves over **months**, not just minutes.
+
+**Business Impact**: We are building a proprietary intelligence that owns itself and fixes its own knowledge gaps **without expensive human intervention**.
+
+### 31A.5 Admin Dashboard Access
+
+| Feature | Location | Key Actions |
+|---------|----------|-------------|
+| Empiricism Loop | Consciousness → Empiricism | Config thresholds, view executions, reset affect |
+| LoRA Adapters | Models → LoRA Adapters | Manage global/user adapters, trigger warmup |
+| Dreaming | Brain → Dreams | View dream history, manual trigger, schedule |
+| Ego System | Think Tank → Ego | Monitor affect, adjust personality |
+| Cato Genesis | Cato → Genesis | Boot phases, developmental gates |
+
+### 31A.6 The Technical Moat
+
+**We aren't just wrapping GPT-4 anymore.** We have built a **Synthetic Employee** that:
+
+1. ✅ **Learns from its mistakes** (Empiricism Loop)
+2. ✅ **Verifies its own work** (Sandbox Execution)
+3. ✅ **Evolves independently** (Dreaming Cycle)
+4. ✅ **Respects privacy** (Self-hosted, split memory)
+5. ✅ **Scales globally** (Shared Cato layer)
+
+This is a **defensible technical moat** that commodity AI wrappers cannot replicate.
 
 ---
 
