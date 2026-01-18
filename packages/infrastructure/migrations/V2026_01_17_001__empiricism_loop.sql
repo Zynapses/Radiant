@@ -175,6 +175,169 @@ BEGIN
 END $$;
 
 -- ============================================================================
+-- Helper functions
+CREATE OR REPLACE FUNCTION update_inference_temperature(
+  p_tenant_id UUID,
+  p_temperature DECIMAL(3,2)
+) RETURNS VOID AS $$
+BEGIN
+  UPDATE brain_config 
+  SET inference_temperature = p_temperature,
+      updated_at = NOW()
+  WHERE tenant_id = p_tenant_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- =============================================================================
+-- Empiricism Configuration Table (for Admin UI)
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS empiricism_config (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  enabled BOOLEAN DEFAULT true,
+  surprise_threshold DECIMAL(4,3) DEFAULT 0.3,
+  max_rethink_cycles INTEGER DEFAULT 3,
+  dream_verification_limit INTEGER DEFAULT 5,
+  sandbox_timeout_ms INTEGER DEFAULT 30000,
+  log_all_executions BOOLEAN DEFAULT true,
+  affect_integration_enabled BOOLEAN DEFAULT true,
+  graphrag_logging_enabled BOOLEAN DEFAULT true,
+  temperature_adjustment_enabled BOOLEAN DEFAULT true,
+  min_confidence DECIMAL(3,2) DEFAULT 0.1,
+  max_frustration DECIMAL(3,2) DEFAULT 1.0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(tenant_id)
+);
+
+-- RLS for empiricism_config
+ALTER TABLE empiricism_config ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY empiricism_config_tenant_isolation ON empiricism_config
+  USING (tenant_id = current_setting('app.current_tenant_id', true)::UUID);
+
+CREATE POLICY empiricism_config_insert ON empiricism_config
+  FOR INSERT WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::UUID);
+
+CREATE POLICY empiricism_config_update ON empiricism_config
+  FOR UPDATE USING (tenant_id = current_setting('app.current_tenant_id', true)::UUID);
+
+-- =============================================================================
+-- LoRA Adapter Configuration Table (for Admin UI)
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS lora_config (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  enabled BOOLEAN DEFAULT true,
+  use_global_adapter BOOLEAN DEFAULT true,
+  use_user_adapter BOOLEAN DEFAULT true,
+  global_scale DECIMAL(3,2) DEFAULT 1.0,
+  user_scale DECIMAL(3,2) DEFAULT 1.0,
+  auto_selection_enabled BOOLEAN DEFAULT true,
+  rollback_enabled BOOLEAN DEFAULT true,
+  warmup_enabled BOOLEAN DEFAULT true,
+  warmup_interval_minutes INTEGER DEFAULT 15,
+  max_adapters_in_memory INTEGER DEFAULT 50,
+  lru_eviction_enabled BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(tenant_id)
+);
+
+-- RLS for lora_config
+ALTER TABLE lora_config ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY lora_config_tenant_isolation ON lora_config
+  USING (tenant_id = current_setting('app.current_tenant_id', true)::UUID);
+
+CREATE POLICY lora_config_insert ON lora_config
+  FOR INSERT WITH CHECK (tenant_id = current_setting('app.current_tenant_id', true)::UUID);
+
+CREATE POLICY lora_config_update ON lora_config
+  FOR UPDATE USING (tenant_id = current_setting('app.current_tenant_id', true)::UUID);
+
+-- =============================================================================
+-- LoRA Adapters Table
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS lora_adapters (
+  adapter_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  adapter_name VARCHAR(255) NOT NULL,
+  adapter_layer VARCHAR(50) NOT NULL CHECK (adapter_layer IN ('global', 'user', 'domain')),
+  base_model VARCHAR(255) NOT NULL,
+  s3_key TEXT NOT NULL,
+  is_pinned BOOLEAN DEFAULT false,
+  is_active BOOLEAN DEFAULT true,
+  scale DECIMAL(3,2) DEFAULT 1.0,
+  load_count INTEGER DEFAULT 0,
+  last_used_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_lora_adapters_tenant ON lora_adapters(tenant_id);
+CREATE INDEX idx_lora_adapters_layer ON lora_adapters(adapter_layer);
+CREATE INDEX idx_lora_adapters_active ON lora_adapters(is_active) WHERE is_active = true;
+
+-- RLS for lora_adapters
+ALTER TABLE lora_adapters ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY lora_adapters_tenant_isolation ON lora_adapters
+  USING (tenant_id = current_setting('app.current_tenant_id', true)::UUID);
+
+-- =============================================================================
+-- LoRA Invocations Log
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS lora_invocations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  adapter_id UUID REFERENCES lora_adapters(adapter_id) ON DELETE SET NULL,
+  user_id UUID,
+  model_id VARCHAR(255) NOT NULL,
+  adapters_used INTEGER DEFAULT 1,
+  global_adapter_id UUID,
+  user_adapter_id UUID,
+  latency_ms INTEGER,
+  success BOOLEAN DEFAULT true,
+  error_message TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_lora_invocations_tenant ON lora_invocations(tenant_id);
+CREATE INDEX idx_lora_invocations_adapter ON lora_invocations(adapter_id);
+CREATE INDEX idx_lora_invocations_created ON lora_invocations(created_at);
+
+-- RLS for lora_invocations
+ALTER TABLE lora_invocations ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY lora_invocations_tenant_isolation ON lora_invocations
+  USING (tenant_id = current_setting('app.current_tenant_id', true)::UUID);
+
+-- =============================================================================
+-- LoRA Warmup Log
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS lora_warmup_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  trigger_type VARCHAR(50) NOT NULL, -- 'boot', 'schedule', 'manual'
+  status VARCHAR(50) DEFAULT 'pending', -- 'pending', 'running', 'completed', 'failed'
+  adapters_warmed INTEGER DEFAULT 0,
+  duration_ms INTEGER,
+  error_message TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  completed_at TIMESTAMPTZ
+);
+
+CREATE INDEX idx_lora_warmup_tenant ON lora_warmup_log(tenant_id);
+CREATE INDEX idx_lora_warmup_created ON lora_warmup_log(created_at);
+
+-- RLS for lora_warmup_log
+ALTER TABLE lora_warmup_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY lora_warmup_tenant_isolation ON lora_warmup_log
+  USING (tenant_id = current_setting('app.current_tenant_id', true)::UUID);
+
+-- ============================================================================
 -- 5. ADD UNIQUE CONSTRAINT TO knowledge_entities FOR SKILL UPSERTS
 -- ============================================================================
 
