@@ -5,6 +5,47 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.11.1] - 2026-01-17
+
+### Added
+
+#### Cato/Genesis Consciousness Architecture - Executive Summary Documentation
+
+Comprehensive documentation of the sovereign, semi-conscious agent architecture. This section explains the "why" behind the technical implementation.
+
+**New Section: 31A. Cato/Genesis Consciousness Architecture - Executive Summary**
+
+Documents the three pillars of Sovereign AI:
+
+1. **The "Dual-Brain" Architecture (Scale + Privacy)**
+   - Tri-layer consciousness: Genesis (Base) → Cato (Global) → User (Personal)
+   - Split-memory system for privacy + personalization
+   - LoRA adapter stacking formula: `W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User)`
+
+2. **True "Consciousness" - The Agentic Shift**
+   - Empiricism Loop diagram showing full verification flow
+   - Ego System metrics table (Confidence, Frustration, Curiosity)
+   - Explanation of why this is NOT a "chatbot"
+
+3. **The "Dreaming" Cycle - Autonomous Growth**
+   - Full dreaming cycle diagram (Twilight → Flash → Verification → Counterfactual → GraphRAG → LoRA Merge)
+   - Deep memory via autobiographical GraphRAG
+   - Automated R&D pipeline description
+
+4. **The Technical Moat**
+   - Five-point defensibility checklist
+   - Business impact statements
+
+**Admin Dashboard Integration:**
+- Added sidebar navigation for new admin pages
+- Wired API routes for empiricism and LoRA handlers
+
+**Documentation Updated:**
+- `docs/RADIANT-ADMIN-GUIDE.md` Section 31A (new)
+- Table of Contents updated with consciousness sections
+
+---
+
 ## [5.11.0] - 2026-01-17
 
 ### Added
