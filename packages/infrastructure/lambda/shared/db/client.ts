@@ -113,13 +113,37 @@ export type LooseParam = {
 };
 
 /**
+ * Object-style input for executeStatement
+ */
+export interface ExecuteStatementInput {
+  sql: string;
+  parameters?: SqlParameter[] | LooseParam[];
+  options?: QueryOptions;
+}
+
+/**
  * Execute a SQL statement using the Data API
+ * Supports both positional args (sql, params, options) and object-style ({ sql, parameters })
  */
 export async function executeStatement<T = Record<string, unknown>>(
-  sql: string,
+  sqlOrInput: string | ExecuteStatementInput,
   parameters?: SqlParameter[] | LooseParam[],
   options?: QueryOptions
-): Promise<{ rows: T[]; rowCount: number }> {
+): Promise<{ rows: T[]; rowCount: number; numberOfRecordsUpdated?: number }> {
+  // Handle object-style input
+  let sql: string;
+  let params: SqlParameter[] | LooseParam[] | undefined;
+  let opts: QueryOptions | undefined;
+  
+  if (typeof sqlOrInput === 'object' && 'sql' in sqlOrInput) {
+    sql = sqlOrInput.sql;
+    params = sqlOrInput.parameters;
+    opts = sqlOrInput.options;
+  } else {
+    sql = sqlOrInput;
+    params = parameters;
+    opts = options;
+  }
   const config = getConfig();
   const client = getClient();
 
@@ -128,10 +152,10 @@ export async function executeStatement<T = Record<string, unknown>>(
     secretArn: config.AURORA_SECRET_ARN,
     database: 'radiant',
     sql,
-    parameters: parameters as SqlParameter[] | undefined,
+    parameters: params as SqlParameter[] | undefined,
     includeResultMetadata: true,
-    ...(options?.transactionId && { transactionId: options.transactionId }),
-    ...(options?.continueAfterTimeout && { continueAfterTimeout: true }),
+    ...(opts?.transactionId && { transactionId: opts.transactionId }),
+    ...(opts?.continueAfterTimeout && { continueAfterTimeout: true }),
   };
 
   const command = new ExecuteStatementCommand(input);

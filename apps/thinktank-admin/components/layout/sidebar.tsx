@@ -94,6 +94,7 @@ const navigation: NavSection[] = [
       { name: 'Transparency', href: '/sovereign-mesh/transparency', icon: Eye },
       { name: 'AI Helper', href: '/sovereign-mesh/ai-helper', icon: Wand2 },
       { name: 'Approvals', href: '/sovereign-mesh/approvals', icon: ClipboardCheck },
+      { name: 'HITL Orchestration', href: '/hitl-orchestration', icon: UsersRound },
     ],
   },
   {

@@ -38,6 +38,18 @@ export { DomainTaxonomyService, domainTaxonomyService } from './domain-taxonomy.
 
 export { DelightService, delightService } from './delight.service';
 export { DelightOrchestrationService, delightOrchestrationService } from './delight-orchestration.service';
+
+// HITL Orchestration Services
+export {
+  mcpElicitationService,
+  voiService,
+  abstentionService,
+  batchingService,
+  rateLimitingService,
+  deduplicationService,
+  escalationService,
+} from './hitl-orchestration';
+
 export { DelightEventsService, delightEventsService, createDelightEventStream, emitDelightForPlanExecution } from './delight-events.service';
 
 // ============================================================================

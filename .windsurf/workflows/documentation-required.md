@@ -19,6 +19,7 @@ For EVERY feature, update these IN THE SAME TASK (not later):
 | Database tables | `docs/sections/SECTION-07-DATABASE-SCHEMA.md` |
 | Platform admin features | `docs/RADIANT-ADMIN-GUIDE.md` + `docs/STRATEGIC-VISION-MARKETING.md` |
 | Think Tank admin features | `docs/THINKTANK-ADMIN-GUIDE.md` + `docs/STRATEGIC-VISION-MARKETING.md` |
+| Lambda services/handlers | `docs/ENGINEERING-IMPLEMENTATION-VISION.md` (Section 5) |
 | Any feature | `CHANGELOG.md` |
 | Significant feature | `docs/FEATURE-NAME.md` (standalone) |
 

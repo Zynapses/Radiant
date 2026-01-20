@@ -266,6 +266,52 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `conversation_turns` | Conversation history for causal tracking |
 | `reasoning_traces` | Full request traces (partitioned by month) |
 | `reasoning_outcomes` | User feedback on reasoning traces |
+| `hitl_question_batches` | HITL question batch records |
+| `hitl_rate_limits` | HITL rate limit configuration per scope |
+| `hitl_question_cache` | HITL deduplication cache with TTL |
+| `hitl_voi_aspects` | HITL VOI aspect tracking |
+| `hitl_voi_decisions` | HITL VOI decision records |
+| `hitl_abstention_config` | HITL abstention detection settings |
+| `hitl_abstention_events` | HITL abstention event log |
+| `hitl_escalation_chains` | HITL escalation chain configuration |
+| `gateway_instances` | Gateway instance registry with heartbeat tracking |
+| `gateway_statistics` | Gateway time-series metrics (5-minute buckets) |
+| `gateway_configuration` | Gateway per-tenant and global settings |
+| `gateway_alerts` | Gateway alert and incident tracking |
+| `gateway_sessions` | Gateway active connection tracking |
+| `gateway_audit_log` | Gateway admin action audit trail |
+| `code_quality_snapshots` | Periodic code coverage/quality metrics |
+| `test_file_registry` | Source files and test status tracking |
+| `json_parse_locations` | JSON.parse migration tracking |
+| `technical_debt_items` | Technical debt items by priority/status |
+| `code_quality_alerts` | Code quality regression alerts |
+| `agents` | Sovereign Mesh agent registry with AI config |
+| `agent_executions` | Agent OODA execution state |
+| `agent_iteration_logs` | Detailed agent iteration tracking |
+| `apps` | Sovereign Mesh app registry (3,000+ apps) |
+| `app_connections` | OAuth/API credentials for apps |
+| `app_learned_inferences` | AI learning loop for apps |
+| `ai_helper_calls` | AI Helper usage tracking |
+| `ai_helper_cache` | AI Helper response caching |
+| `ai_helper_config` | AI Helper system/tenant configuration |
+| `workflow_blueprints` | Pre-flight workflow provisioning |
+| `capability_checks` | Capability verification results |
+| `cato_decision_events` | Cato decision transparency events |
+| `cato_war_room_deliberations` | Cato War Room deliberation capture |
+| `hitl_queue_configs` | HITL approval queue configuration |
+| `hitl_approval_requests` | HITL approval request records |
+| `execution_snapshots` | Time-travel debugging snapshots |
+| `replay_sessions` | Replay/what-if analysis sessions |
+| `thinktank_user_consents` | GDPR consent records |
+| `thinktank_gdpr_requests` | GDPR data subject requests |
+| `thinktank_security_config` | Per-tenant security settings |
+| `thinktank_rejections` | User rejection notifications |
+| `thinktank_user_preferences` | User model and UI preferences |
+| `thinktank_ui_feedback` | UI feedback collection |
+| `thinktank_ui_improvement_sessions` | AI UI improvement sessions |
+| `thinktank_multipage_apps` | User-generated multipage apps |
+| `thinktank_voice_sessions` | Voice transcription records |
+| `thinktank_file_attachments` | File attachment storage |
 
 ### Migration 154: Cato Advanced Configuration (v6.1.1)
 

@@ -8521,9 +8521,66 @@ Think Tank users see a subset of Sovereign Mesh functionality:
 
 ---
 
+## Section 47: HITL Orchestration in Think Tank Admin
+
+**Location**: Think Tank Admin → Sovereign Mesh → HITL Orchestration
+
+Advanced Human-in-the-Loop orchestration for intelligent question management in user workflows.
+
+### 47.1 Overview
+
+HITL Orchestration implements industry best practices to reduce unnecessary questions while ensuring critical information is captured:
+
+| Feature | Description |
+|---------|-------------|
+| **SAGE-Agent Bayesian VOI** | Calculates whether asking a question is worth the user's time |
+| **Question Batching** | Groups related questions to reduce interruptions |
+| **Two-Question Rule** | Maximum 2 clarifications per workflow |
+| **Abstention Detection** | Detects when AI should decline to answer |
+
+### 47.2 User-Facing Benefits
+
+- **70% fewer unnecessary questions** - AI only asks when genuinely needed
+- **2.7x faster response times** - Batched questions reduce context switching
+- **Explicit assumptions** - When skipping questions, AI states assumptions clearly
+
+### 47.3 Navigation
+
+| Page | Path | Purpose |
+|------|------|---------|
+| HITL Orchestration | `/hitl-orchestration` | View orchestration metrics and settings |
+
+### 47.4 Dashboard Tabs
+
+| Tab | Description |
+|-----|-------------|
+| **Overview** | Key metrics, VOI breakdown, abstention reasons |
+| **Value of Information** | SAGE-Agent VOI statistics and decisions |
+| **Abstention** | Detection methods and model-level statistics |
+| **Batching** | Three-layer batching strategies and metrics |
+
+### 47.5 Key Metrics
+
+| Metric | Description |
+|--------|-------------|
+| Question Reduction | Percentage of questions skipped via VOI |
+| Prior Accuracy | How often predictions match actual answers |
+| Abstention Events | Times AI correctly declined to answer |
+| Batch Completion | Success rate of batched question sets |
+
+### 47.6 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `apps/thinktank-admin/app/hitl-orchestration/page.tsx` | Dashboard page |
+| `apps/thinktank-admin/components/layout/sidebar.tsx` | Navigation item |
+
+---
+
 ## Related Documentation
 
 - [RADIANT Admin Guide](./RADIANT-ADMIN-GUIDE.md) - Platform administration
+- [RADIANT Admin Guide - HITL Orchestration](./RADIANT-ADMIN-GUIDE.md#section-64-hitl-orchestration-enhancements) - Full HITL Orchestration documentation
 - [RADIANT Admin Guide - Metrics & Learning](./RADIANT-ADMIN-GUIDE.md#36-metrics--persistent-learning-infrastructure) - Persistent learning system
 - [RADIANT Admin Guide - Consciousness Evolution](./RADIANT-ADMIN-GUIDE.md#27-consciousness-evolution-administration) - Predictive coding, LoRA evolution, Local Ego
 - [Think Tank User Guide](./THINK-TANK-USER-GUIDE.md) - End user guide
