@@ -19,7 +19,7 @@ export interface ReportConfig {
   id: string;
   tenant_id: string;
   name: string;
-  report_type: 'usage' | 'cost' | 'security' | 'performance' | 'compliance' | 'custom';
+  report_type: 'usage' | 'cost' | 'security' | 'performance' | 'compliance' | 'code_quality' | 'custom';
   format: 'pdf' | 'csv' | 'json' | 'excel';
   parameters: ReportParameters;
   recipients: string[];
@@ -168,6 +168,8 @@ class ReportGeneratorService {
         return this.fetchPerformanceData(config.tenant_id, dateRange, config.parameters);
       case 'compliance':
         return this.fetchComplianceData(config.tenant_id, dateRange, config.parameters);
+      case 'code_quality':
+        return this.fetchCodeQualityData(config.tenant_id, dateRange, config.parameters);
       default:
         return this.fetchCustomData(config.tenant_id, dateRange, config.parameters);
     }
@@ -611,6 +613,163 @@ class ReportGeneratorService {
       metadata: {
         tenant_id: tenantId,
         report_type: 'compliance',
+        parameters: params,
+      },
+    };
+  }
+
+  /**
+   * Fetch code quality report data
+   */
+  private async fetchCodeQualityData(
+    tenantId: string,
+    dateRange: { start: string; end: string },
+    params: ReportParameters
+  ): Promise<ReportData> {
+    // Fetch latest coverage by component
+    const coverageResult = await executeStatement(
+      `SELECT DISTINCT ON (component)
+        component,
+        line_coverage,
+        function_coverage,
+        branch_coverage,
+        overall_coverage,
+        total_files,
+        files_with_tests,
+        captured_at
+      FROM code_quality_snapshots
+      WHERE snapshot_type = 'test_coverage'
+        AND ($1::UUID IS NULL OR tenant_id IS NULL OR tenant_id = $1::UUID)
+      ORDER BY component, captured_at DESC`,
+      [stringParam('tenantId', tenantId)]
+    );
+
+    // Fetch technical debt summary
+    const debtResult = await executeStatement(
+      `SELECT 
+        debt_id,
+        title,
+        category,
+        priority,
+        status,
+        component,
+        estimated_hours
+      FROM technical_debt_items
+      WHERE status IN ('open', 'in_progress')
+        AND ($1::UUID IS NULL OR tenant_id IS NULL OR tenant_id = $1::UUID)
+      ORDER BY 
+        CASE priority WHEN 'p0_critical' THEN 1 WHEN 'p1_high' THEN 2 WHEN 'p2_medium' THEN 3 ELSE 4 END`,
+      [stringParam('tenantId', tenantId)]
+    );
+
+    // Fetch JSON safety progress
+    const jsonResult = await executeStatement(
+      `SELECT 
+        component,
+        SUM(CASE WHEN is_migrated THEN 1 ELSE 0 END) AS migrated,
+        COUNT(*) AS total
+      FROM json_parse_locations
+      WHERE $1::UUID IS NULL OR tenant_id IS NULL OR tenant_id = $1::UUID
+      GROUP BY component`,
+      [stringParam('tenantId', tenantId)]
+    );
+
+    const coverageData = (coverageResult.rows || []) as Array<{
+      component: string;
+      line_coverage: string;
+      function_coverage: string;
+      branch_coverage: string;
+      overall_coverage: string;
+      total_files: string;
+      files_with_tests: string;
+    }>;
+
+    const debtData = (debtResult.rows || []) as Array<{
+      debt_id: string;
+      title: string;
+      category: string;
+      priority: string;
+      status: string;
+      estimated_hours: string;
+    }>;
+
+    const jsonData = (jsonResult.rows || []) as Array<{
+      component: string;
+      migrated: string;
+      total: string;
+    }>;
+
+    // Calculate averages
+    const avgCoverage = coverageData.length > 0
+      ? coverageData.reduce((sum, c) => sum + parseFloat(c.overall_coverage || '0'), 0) / coverageData.length
+      : 0;
+
+    const totalDebtHours = debtData.reduce((sum, d) => sum + parseInt(d.estimated_hours || '0', 10), 0);
+    const criticalDebt = debtData.filter(d => d.priority === 'p0_critical').length;
+    const highDebt = debtData.filter(d => d.priority === 'p1_high').length;
+
+    const totalJsonLocations = jsonData.reduce((sum, j) => sum + parseInt(j.total || '0', 10), 0);
+    const migratedJsonLocations = jsonData.reduce((sum, j) => sum + parseInt(j.migrated || '0', 10), 0);
+    const jsonSafetyPercent = totalJsonLocations > 0
+      ? Math.round((migratedJsonLocations / totalJsonLocations) * 100)
+      : 100;
+
+    return {
+      title: 'Code Quality Report',
+      subtitle: `As of ${new Date().toISOString().split('T')[0]}`,
+      generated_at: new Date().toISOString(),
+      date_range: dateRange,
+      summary: {
+        overall_coverage_percent: Math.round(avgCoverage * 10) / 10,
+        components_tested: coverageData.filter(c => parseFloat(c.overall_coverage || '0') > 0).length,
+        total_components: coverageData.length,
+        open_debt_items: debtData.length,
+        critical_debt_items: criticalDebt,
+        high_priority_debt_items: highDebt,
+        estimated_debt_hours: totalDebtHours,
+        json_safety_progress_percent: jsonSafetyPercent,
+      },
+      sections: [
+        {
+          title: 'Test Coverage by Component',
+          type: 'table',
+          columns: [
+            { key: 'component', label: 'Component' },
+            { key: 'overall_coverage', label: 'Overall %', format: 'percent' },
+            { key: 'line_coverage', label: 'Lines %', format: 'percent' },
+            { key: 'function_coverage', label: 'Functions %', format: 'percent' },
+            { key: 'branch_coverage', label: 'Branches %', format: 'percent' },
+            { key: 'files_with_tests', label: 'Files Tested', format: 'number' },
+          ],
+          data: coverageData,
+        },
+        {
+          title: 'Technical Debt Items',
+          type: 'table',
+          columns: [
+            { key: 'debt_id', label: 'ID' },
+            { key: 'title', label: 'Title' },
+            { key: 'category', label: 'Category' },
+            { key: 'priority', label: 'Priority' },
+            { key: 'status', label: 'Status' },
+            { key: 'estimated_hours', label: 'Est. Hours', format: 'number' },
+          ],
+          data: debtData,
+        },
+        {
+          title: 'JSON Safety Migration',
+          type: 'table',
+          columns: [
+            { key: 'component', label: 'Component' },
+            { key: 'migrated', label: 'Migrated', format: 'number' },
+            { key: 'total', label: 'Total', format: 'number' },
+          ],
+          data: jsonData,
+        },
+      ],
+      metadata: {
+        tenant_id: tenantId,
+        report_type: 'code_quality',
         parameters: params,
       },
     };

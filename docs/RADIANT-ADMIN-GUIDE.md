@@ -62,6 +62,8 @@
 57. [AGI Brain & Identity Data Fabric: Agentic Orchestration](#57-agi-brain--identity-data-fabric-agentic-orchestration)
 58. [Deployment Safety & Environment Management](#58-deployment-safety--environment-management)
 59. [White-Label Invisibility (Moat #25)](#59-white-label-invisibility-moat-25)
+60. [User Violation Enforcement](#60-user-violation-enforcement)
+61. [Multi-Protocol Gateway Architecture](#61-multi-protocol-gateway-architecture)
 
 ---
 
@@ -18270,10 +18272,458 @@ Risk score (0-100) is calculated as sum of severity impacts for active violation
 
 ---
 
+## 61. Multi-Protocol Gateway Architecture
+
+### 61.1 Overview
+
+The RADIANT Multi-Protocol Gateway v3.0 is a custom Go-based connectivity layer supporting MCP, A2A, OpenAI, Anthropic, and Google interfaces at **1M+ concurrent connection scale**.
+
+**Key Components:**
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Go Gateway** | Custom Go service | WebSocket/SSE termination, NATS bridging |
+| **NATS JetStream** | Message bus | At-least-once delivery, session persistence |
+| **Cedar Authorization** | ABAC policies | Resource-level access control |
+| **Resume Tokens** | HMAC-signed tokens | Session rehydration on reconnect |
+
+### 61.2 Architecture Diagram
+
+```
+Internet → NLB (Layer 4) → Go Gateway Fleet → NATS JetStream → Lambda Workers
+                              │
+                              └→ ~80K connections per c6g.xlarge instance
+```
+
+### 61.3 Protocol Support
+
+| Protocol | Subject Pattern | Use Case |
+|----------|-----------------|----------|
+| **MCP** | `in.mcp.{tenant}.{agent}` | Model Context Protocol |
+| **A2A** | `in.a2a.{tenant}.{agent}` | Agent-to-Agent communication |
+| **FC** | `in.fc.{tenant}.{agent}` | Function calling |
+
+### 61.4 NATS Stream Configuration
+
+| Stream | Subjects | Retention | Purpose |
+|--------|----------|-----------|---------|
+| `INBOX` | `in.>` | WorkQueue | Incoming messages |
+| `OUTBOX` | `out.>` | 1h TTL | Responses to sessions |
+| `HISTORY` | `history.>` | 10K msgs/subject | Session replay |
+
+### 61.5 Cedar Authorization
+
+Resource-level ABAC with policies for:
+- Cross-tenant access denial
+- Tool namespace restrictions
+- Sensitive resource protection
+- Admin bypass rules
+
+### 61.6 Resume Token Strategy
+
+Sessions survive connection drops via HMAC-signed resume tokens containing:
+- Session ID, Tenant ID, Principal ID
+- NATS inbox/outbox subjects
+- Expiry timestamp
+
+### 61.7 Capacity Planning
+
+| Component | Instance | Capacity | Count for 1M |
+|-----------|----------|----------|--------------|
+| Go Gateway | c6g.xlarge | 80K conn | 13 instances |
+| NATS Cluster | r6g.xlarge | N/A | 3 nodes |
+| Lambda (MCP) | 1024MB | N/A | 1000 concurrent |
+
+**Estimated Cost:** $8,000-15,000/month for 1M connections
+
+### 61.8 Admin Dashboard Controls
+
+The Gateway admin interface provides comprehensive monitoring and configuration:
+
+**Dashboard Overview (`/gateway`)**
+- Real-time connection count and peak connections
+- Messages per minute throughput
+- Average latency with warning thresholds
+- Error rate monitoring
+- Active instance count
+
+**Statistics & Reporting**
+- 5-minute bucketed statistics stored persistently
+- Hourly and daily aggregated views
+- Protocol distribution (MCP, A2A, OpenAI, Anthropic, Google)
+- 24-hour trend visualization
+
+**Configuration Controls**
+- Connection limits (per tenant, per user, per agent)
+- Rate limits (messages/second, bytes/second)
+- Timeout settings (connect, idle, read, write)
+- Protocol enable/disable toggles
+- mTLS enforcement for A2A
+- Resume token TTL configuration
+
+**Maintenance Mode**
+- Enable/disable with custom message
+- IP allowlist for maintenance bypass
+- Graceful connection draining
+
+**Alert Management**
+- Severity levels: info, warning, critical
+- Alert types: connection_limit, rate_limit, error_spike, latency_spike, instance_unhealthy
+- Acknowledge and resolve workflows
+- Resolution notes tracking
+
+**Instance Management**
+- View all gateway instances with status
+- Drain instances gracefully
+- Monitor per-instance metrics
+
+**API Endpoints** (`/api/admin/gateway`)
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/dashboard` | GET | Overview metrics and alerts |
+| `/statistics` | GET | Time-series statistics |
+| `/configuration` | GET/PUT | View/update configuration |
+| `/maintenance` | POST | Set maintenance mode |
+| `/alerts` | GET | List alerts |
+| `/alerts/:id/acknowledge` | POST | Acknowledge alert |
+| `/alerts/:id/resolve` | POST | Resolve alert |
+| `/sessions` | GET | List active sessions |
+| `/sessions/:id/terminate` | POST | Terminate session |
+| `/instances` | GET | List gateway instances |
+| `/instances/:id/drain` | POST | Drain instance |
+
+### 61.9 Database Schema
+
+**Tables Created:**
+- `gateway_instances` - Instance registry with heartbeat tracking
+- `gateway_statistics` - Time-series metrics (5-minute buckets)
+- `gateway_configuration` - Per-tenant and global settings
+- `gateway_alerts` - Alert and incident tracking
+- `gateway_sessions` - Active connection tracking
+- `gateway_audit_log` - Admin action audit trail
+
+**Report Types Added:**
+- `gateway-statistics` - Connection and message statistics
+- `gateway-alerts` - Alert summary report
+
+### 61.10 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `apps/gateway/` | Go Gateway service (16 files) |
+| `apps/gateway/internal/server/tls.go` | TLS/mTLS configuration |
+| `services/egress-proxy/` | HTTP/2 connection pool |
+| `infrastructure/cedar/schema.cedarschema` | Cedar entity/action schema |
+| `infrastructure/cedar/policies/` | Authorization policies |
+| `packages/infrastructure/lambda/shared/services/cedar/` | Cedar TypeScript service |
+| `packages/infrastructure/lambda/gateway/mcp-worker.ts` | MCP NATS consumer Lambda |
+| `packages/infrastructure/lambda/admin/gateway.ts` | Gateway admin API Lambda |
+| `packages/infrastructure/__tests__/gateway/` | Gateway integration tests |
+| `packages/infrastructure/migrations/V2026_01_20_001__gateway_statistics.sql` | Statistics schema |
+| `apps/admin-dashboard/app/(dashboard)/gateway/page.tsx` | Admin dashboard UI |
+| `apps/thinktank-admin/app/(dashboard)/gateway/page.tsx` | Think Tank status view |
+| `infrastructure/docker/gateway/` | Local dev stack |
+| `infrastructure/load-tests/` | k6 load testing scripts |
+| `packages/infrastructure/lib/stacks/gateway-stack.ts` | CDK deployment |
+
+### 61.11 Documentation Reference
+
+For complete architecture details, see:
+- **[MULTI-PROTOCOL-GATEWAY-ARCHITECTURE.md](./MULTI-PROTOCOL-GATEWAY-ARCHITECTURE.md)** - Full technical specification
+
+---
+
+## Section 62: Code Quality & Test Coverage Visibility
+
+### 62.1 Overview
+
+The Code Quality dashboard provides real-time visibility into:
+- **Test Coverage**: Line, function, and branch coverage by component
+- **Technical Debt**: Tracking items aligned with `TECHNICAL_DEBT.md`
+- **JSON Safety Migration**: Progress migrating `JSON.parse` to safe utilities
+- **Code Quality Alerts**: Automated alerts for coverage drops and regressions
+
+### 62.2 Admin Dashboard
+
+**Location**: `/code-quality`
+
+The Code Quality page provides:
+- **Summary Cards**: Overall coverage %, open debt items, JSON safety progress, active alerts
+- **Coverage by Component**: Breakdown for lambda, admin-dashboard, swift-deployer
+- **Technical Debt Table**: Prioritized list with status, estimated hours
+- **JSON Safety Progress**: Migration status per component with progress bars
+- **Alerts Tab**: Active code quality alerts with acknowledge/resolve actions
+
+### 62.3 API Endpoints
+
+**Base Path**: `/api/admin/code-quality`
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/dashboard` | GET | Overview metrics and summary |
+| `/coverage` | GET | Latest coverage by component |
+| `/coverage/history` | GET | Coverage trend over time |
+| `/debt` | GET | List technical debt items |
+| `/debt/:id` | PUT | Update debt item status |
+| `/json-safety` | GET | JSON migration progress |
+| `/json-safety/locations` | GET | List JSON.parse locations |
+| `/alerts` | GET | List code quality alerts |
+| `/alerts/:id/acknowledge` | POST | Acknowledge an alert |
+| `/alerts/:id/resolve` | POST | Resolve an alert |
+| `/files-needing-tests` | GET | Files that need test coverage |
+
+### 62.4 Database Schema
+
+**Tables Created** (Migration `V2026_01_20_002__code_quality_metrics.sql`):
+
+| Table | Purpose |
+|-------|---------|
+| `code_quality_snapshots` | Periodic snapshots of coverage/quality metrics |
+| `test_file_registry` | Registry of source files and test status |
+| `json_parse_locations` | Tracking JSON.parse for migration |
+| `technical_debt_items` | Debt items aligned with TECHNICAL_DEBT.md |
+| `code_quality_alerts` | Alerts for quality regressions |
+
+**Views**:
+- `v_latest_test_coverage` - Latest coverage per component
+- `v_json_safety_progress` - JSON migration progress
+- `v_technical_debt_summary` - Debt summary by priority
+
+### 62.5 Report Integration
+
+The reporting system includes a `code_quality` report type:
+
+```typescript
+const report = await reportGeneratorService.generateReport({
+  id: 'code-quality-report',
+  tenant_id: tenantId,
+  name: 'Code Quality Report',
+  report_type: 'code_quality',
+  format: 'pdf',
+  parameters: {},
+  recipients: ['admin@example.com'],
+});
+```
+
+**Report Sections**:
+1. Test Coverage by Component
+2. Technical Debt Items
+3. JSON Safety Migration Progress
+
+### 62.6 Safe JSON Utilities
+
+Located in `lambda/shared/utils/safe-json.ts`:
+
+| Function | Purpose |
+|----------|---------|
+| `safeJsonParse(json, fallback?)` | Parse with optional fallback |
+| `parseJsonWithSchema(json, schema)` | Parse with Zod validation |
+| `parseJsonWithSchemaOrThrow(json, schema)` | Parse or throw typed error |
+| `parseEventBody(body, schema?)` | Parse API Gateway body |
+| `parseJsonField(value, fallback?)` | Parse nested DB fields |
+| `safeJsonStringify(value)` | Stringify with circular ref handling |
+
+### 62.7 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/admin/code-quality.ts` | Admin API handler |
+| `lambda/shared/utils/safe-json.ts` | Safe JSON utilities |
+| `migrations/V2026_01_20_002__code_quality_metrics.sql` | Database schema |
+| `apps/admin-dashboard/app/(dashboard)/code-quality/page.tsx` | Radiant dashboard |
+| `apps/admin-dashboard/app/(dashboard)/thinktank/code-quality/page.tsx` | Think Tank dashboard |
+
+---
+
+## Section 63: The Sovereign Mesh (PROMPT-36)
+
+### 63.1 Overview
+
+**"Every Node Thinks. Every Connection Learns. Every Workflow Assembles Itself."**
+
+The Sovereign Mesh introduces parametric AI assistance at every node level. Each Method, Agent, Service, and Connector can independently use AI to:
+- **Disambiguate** unclear inputs
+- **Infer** missing parameters
+- **Recover** from errors intelligently
+- **Validate** before execution
+- **Explain** what was done
+
+### 63.2 The Four Node Types
+
+| Type | Purpose | AI Capability |
+|------|---------|---------------|
+| **Methods** | Deterministic reasoning, judging, transforming | Disambiguate, explain decisions |
+| **Agents** | Goal-oriented work with OODA loops | Full reasoning, sub-task spawning |
+| **Services** | Actions in external systems (3,000+ apps) | Infer params, recover errors, validate |
+| **Libraries** | Local code execution | Generate code, explain transformations |
+
+### 63.3 Agent Registry
+
+**Location**: `/sovereign-mesh/agents`
+
+Built-in agents with OODA-loop execution:
+
+| Agent | Category | Description | HITL |
+|-------|----------|-------------|------|
+| Research Agent | research | Web research and information synthesis | No |
+| Coding Agent | coding | Code writing, debugging, refactoring | No |
+| Data Analysis Agent | data | Dataset analysis and visualization | No |
+| Lead Generation Agent | outreach | Prospect research and list building | Yes |
+| Editor Agent | creative | Content review and improvement | No |
+| Automation Agent | operations | Multi-step workflow execution | No |
+
+### 63.4 AI Helper Service
+
+Parametric configuration for each component:
+
+```typescript
+interface AIHelperConfig {
+  enabled: boolean;
+  disambiguation: { enabled: boolean; model: string; confidenceThreshold: number };
+  parameterInference: { enabled: boolean; model: string; examples: array };
+  errorRecovery: { enabled: boolean; model: string; maxAttempts: number };
+  validation: { enabled: boolean; model: string; checks: array };
+  explanation: { enabled: boolean; model: string };
+}
+```
+
+### 63.5 App Registry
+
+3,000+ app integrations from Activepieces and n8n with AI enhancement layer.
+
+**Daily Sync**: Definitions synced at 2 AM UTC
+**Health Checks**: Top 100 apps checked hourly
+
+### 63.6 HITL Approval Queues
+
+Human-in-the-loop approval for high-stakes decisions:
+- **Agent Plan Approval**: Review agent execution plans
+- **High Cost Approval**: Operations exceeding cost thresholds
+- **Safety Review**: Operations flagged by safety evaluation
+
+**SLA Monitoring**: Every minute with automatic escalation
+
+### 63.7 Transparency Layer
+
+Complete Cato decision visibility:
+- Decision events with reasoning chains
+- War Room deliberation capture (phase-by-phase)
+- Pre-computed explanations (summary, standard, detailed, audit tiers)
+- Decision feedback and learned patterns
+
+### 63.8 Execution History & Replay
+
+Time-travel debugging capabilities:
+- Step-by-step state snapshots
+- Replay sessions with modified inputs
+- Execution diffs and divergence detection
+- Bookmarks and annotations
+
+### 63.9 API Endpoints
+
+**Base Path**: `/api/admin/sovereign-mesh`
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/dashboard` | GET | Overview metrics |
+| `/agents` | GET/POST | List/create agents |
+| `/agents/:id` | GET/PUT/DELETE | Agent management |
+| `/executions` | GET/POST | List/start executions |
+| `/executions/:id/cancel` | POST | Cancel execution |
+| `/executions/:id/resume` | POST | Resume paused execution |
+| `/apps` | GET | List apps (3,000+) |
+| `/apps/:id` | GET | App details |
+| `/apps/:id/ai-config` | PUT | Update AI enhancements |
+| `/connections` | GET | List OAuth connections |
+| `/decisions` | GET | List Cato decisions |
+| `/decisions/:id/war-room` | GET | War Room deliberations |
+| `/approvals` | GET | List pending approvals |
+| `/approvals/:id/approve` | POST | Approve request |
+| `/approvals/:id/reject` | POST | Reject request |
+| `/ai-helper/config` | GET/PUT | AI Helper configuration |
+| `/ai-helper/usage` | GET | Usage statistics |
+
+### 63.10 Database Schema
+
+**Migrations** (V2026_01_20_003 through V2026_01_20_010):
+
+| Table | Purpose |
+|-------|---------|
+| `agents` | Agent registry with AI helper config |
+| `agent_executions` | OODA execution state |
+| `agent_iteration_logs` | Detailed iteration tracking |
+| `apps` | 3,000+ app registry |
+| `app_connections` | OAuth/API credentials |
+| `app_learned_inferences` | AI learning loop |
+| `ai_helper_calls` | Usage tracking |
+| `ai_helper_cache` | Response caching |
+| `ai_helper_config` | System/tenant configuration |
+| `workflow_blueprints` | Pre-flight provisioning |
+| `capability_checks` | Capability verification |
+| `cato_decision_events` | Decision transparency |
+| `cato_war_room_deliberations` | War Room capture |
+| `hitl_queue_configs` | Approval queue setup |
+| `hitl_approval_requests` | Approval requests |
+| `execution_snapshots` | Time-travel debugging |
+| `replay_sessions` | Replay/what-if analysis |
+
+### 63.11 Implementation Files
+
+**Services:**
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/sovereign-mesh/ai-helper.service.ts` | AI Helper Service |
+| `lambda/shared/services/sovereign-mesh/agent-runtime.service.ts` | Agent Runtime |
+| `lambda/shared/services/sovereign-mesh/notification.service.ts` | Email/Slack/Webhook notifications |
+| `lambda/shared/services/sovereign-mesh/snapshot-capture.service.ts` | Execution state snapshots |
+| `lambda/shared/services/sovereign-mesh/index.ts` | Service exports |
+
+**Lambda Functions:**
+| File | Purpose |
+|------|---------|
+| `lambda/admin/sovereign-mesh.ts` | Admin API handler |
+| `lambda/scheduled/app-registry-sync.ts` | Daily app sync (2 AM UTC) |
+| `lambda/scheduled/app-health-check.ts` | Hourly health check for top 100 apps |
+| `lambda/scheduled/hitl-sla-monitor.ts` | SLA monitoring with notifications |
+| `lambda/workers/agent-execution-worker.ts` | SQS-triggered OODA processing |
+| `lambda/workers/transparency-compiler.ts` | Pre-compute decision explanations |
+
+**CDK Infrastructure:**
+| File | Purpose |
+|------|---------|
+| `lib/stacks/sovereign-mesh-stack.ts` | Complete CDK stack with SQS queues, Lambdas, IAM |
+
+**Dashboard Pages:**
+| File | Purpose |
+|------|---------|
+| `apps/admin-dashboard/app/(dashboard)/sovereign-mesh/page.tsx` | Main overview |
+| `apps/admin-dashboard/app/(dashboard)/sovereign-mesh/agents/page.tsx` | Agent registry |
+| `apps/admin-dashboard/app/(dashboard)/sovereign-mesh/apps/page.tsx` | App browser |
+| `apps/admin-dashboard/app/(dashboard)/sovereign-mesh/transparency/page.tsx` | Decision explorer |
+| `apps/admin-dashboard/app/(dashboard)/sovereign-mesh/ai-helper/page.tsx` | AI Helper config |
+
+**Database Migrations:**
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_01_20_003__sovereign_mesh_agents.sql` | Agent schema |
+| `migrations/V2026_01_20_004__sovereign_mesh_apps.sql` | App schema |
+| `migrations/V2026_01_20_005__sovereign_mesh_ai_helper.sql` | AI Helper schema |
+| `migrations/V2026_01_20_006__sovereign_mesh_preflight.sql` | Pre-flight provisioning |
+| `migrations/V2026_01_20_007__sovereign_mesh_transparency.sql` | Transparency layer |
+| `migrations/V2026_01_20_008__sovereign_mesh_hitl.sql` | HITL approval queues |
+| `migrations/V2026_01_20_009__sovereign_mesh_replay.sql` | Execution replay |
+| `migrations/V2026_01_20_010__sovereign_mesh_seed.sql` | Seed data
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| **5.31.0** | 2026-01-20 | The Sovereign Mesh (PROMPT-36); Agent Registry with OODA execution; App Registry (3,000+ apps); AI Helper Service; Pre-Flight Provisioning; Transparency Layer; HITL Approval Queues; Execution Replay |
+| **5.30.0** | 2026-01-20 | Code Quality & Test Coverage Visibility; Delight service unit tests; JSON safety migration tracking; Technical debt dashboard; Code quality reports |
+| **5.29.0** | 2026-01-20 | Gateway Admin Controls; Persistent statistics with timestamps; Admin dashboard UI; Think Tank status view; Gateway reporting integration; SES email for scheduled reports |
+| **5.28.0** | 2026-01-20 | Multi-Protocol Gateway v3.0; Go Gateway; NATS JetStream; Cedar authorization; Resume tokens |
 | **5.20.0** | 2026-01-18 | User Violation Enforcement System; Regulatory compliance tracking; Escalation policies; Appeal workflow |
 | **5.19.0** | 2026-01-18 | White-Label Invisibility (Moat #25); Full branding customization; Custom domains; Response transformation |
 | **5.7.0** | 2026-01-17 | Deployment Safety (cdk watch DEV-only rule, environment guards, credential setup) |

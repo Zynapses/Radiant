@@ -1,0 +1,152 @@
+// RADIANT Cedar Authorization Schema v1.0
+// Resource-level ABAC for Multi-Protocol Gateway
+
+namespace Radiant {
+  // =============================================================================
+  // ENTITY TYPES
+  // =============================================================================
+
+  // Tenant - top-level isolation boundary
+  entity Tenant {
+    name: String,
+    tier: String,           // "free" | "pro" | "enterprise"
+    active: Bool
+  };
+
+  // Agent - autonomous AI agent with mTLS identity
+  entity Agent in [Tenant] {
+    tier: String,           // "basic" | "standard" | "premium"
+    scopes: Set<String>,    // ["tool:read", "tool:execute", "model:invoke"]
+    labels: Set<String>,    // ["production", "sandbox", "internal"]
+    namespace: String,      // Agent's home namespace for tools
+    active: Bool
+  };
+
+  // User - human user with OIDC identity
+  entity User in [Tenant] {
+    role: String,           // "user" | "power_user" | "admin" | "super_admin"
+    scopes: Set<String>,    // ["tool:read", "tool:execute", "model:invoke"]
+    department: String,
+    active: Bool
+  };
+
+  // Service - internal RADIANT service
+  entity Service in [Tenant] {
+    serviceName: String,
+    scopes: Set<String>,
+    internal: Bool
+  };
+
+  // Tool - callable function/tool resource
+  entity Tool {
+    name: String,
+    namespace: String,      // Tool's namespace
+    owner: String,          // Owner agent/user ID
+    destructive: Bool,      // Can modify state
+    sensitive: Bool,        // Handles PII/secrets
+    requiredScopes: Set<String>,
+    labels: Set<String>,
+    rateLimit: Long         // Calls per minute
+  };
+
+  // Model - AI model resource
+  entity Model {
+    provider: String,       // "openai" | "anthropic" | "self-hosted"
+    tier: String,           // "free" | "standard" | "premium"
+    costPerToken: Long,     // Microdollars per 1K tokens
+    maxTokens: Long,
+    labels: Set<String>
+  };
+
+  // Session - active connection session
+  entity Session {
+    protocol: String,       // "mcp" | "a2a" | "openai" | "anthropic" | "google"
+    createdAt: Long,
+    expiresAt: Long
+  };
+
+  // =============================================================================
+  // ACTIONS
+  // =============================================================================
+
+  // Tool actions
+  action "tool:read" appliesTo {
+    principal: [Agent, User, Service],
+    resource: [Tool],
+    context: {
+      tenantId: String,
+      sourceProtocol: String,
+      sessionId: String
+    }
+  };
+
+  action "tool:execute" appliesTo {
+    principal: [Agent, User, Service],
+    resource: [Tool],
+    context: {
+      tenantId: String,
+      sourceProtocol: String,
+      sessionId: String,
+      parameters: String  // JSON-encoded parameters
+    }
+  };
+
+  // Model actions
+  action "model:invoke" appliesTo {
+    principal: [Agent, User, Service],
+    resource: [Model],
+    context: {
+      tenantId: String,
+      sourceProtocol: String,
+      sessionId: String,
+      estimatedTokens: Long
+    }
+  };
+
+  action "model:stream" appliesTo {
+    principal: [Agent, User, Service],
+    resource: [Model],
+    context: {
+      tenantId: String,
+      sourceProtocol: String,
+      sessionId: String
+    }
+  };
+
+  // Session actions
+  action "session:create" appliesTo {
+    principal: [Agent, User, Service],
+    resource: [Session],
+    context: {
+      tenantId: String,
+      protocol: String,
+      clientIP: String
+    }
+  };
+
+  action "session:resume" appliesTo {
+    principal: [Agent, User, Service],
+    resource: [Session],
+    context: {
+      tenantId: String,
+      resumeToken: String
+    }
+  };
+
+  // Administrative actions
+  action "admin:impersonate" appliesTo {
+    principal: [User],
+    resource: [Tenant],
+    context: {
+      reason: String
+    }
+  };
+
+  action "admin:configure" appliesTo {
+    principal: [User, Service],
+    resource: [Tenant],
+    context: {
+      configKey: String
+    }
+  };
+}
