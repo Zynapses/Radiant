@@ -18716,10 +18716,155 @@ Time-travel debugging capabilities:
 
 ---
 
+## Section 64: HITL Orchestration Enhancements
+
+### 64.1 Overview
+
+Advanced Human-in-the-Loop orchestration implementing industry best practices for intelligent question management.
+
+**Philosophy:** "Ask only what matters. Batch for convenience. Never interrupt needlessly."
+
+### 64.2 Core Features
+
+| Feature | Description |
+|---------|-------------|
+| **SAGE-Agent Bayesian VOI** | Value-of-Information calculation to determine question necessity |
+| **MCP Elicitation Schema** | Standardized question/response formats |
+| **Question Batching** | Three-layer batching (time-window, correlation, semantic) |
+| **Rate Limiting** | Global (50 RPM), per-user (10 RPM), per-workflow (5 RPM) |
+| **Abstention Detection** | Output-based uncertainty detection for external models |
+| **Question Deduplication** | TTL cache with fuzzy matching |
+| **Escalation Chains** | Configurable multi-level escalation paths |
+| **Two-Question Rule** | Max 2 clarifications per workflow |
+
+### 64.3 SAGE-Agent Bayesian VOI
+
+The VOI service calculates whether asking a question provides enough expected value:
+
+```
+VOI = Expected_Information_Gain - Ask_Cost
+Decision = VOI > Threshold ? "ask" : "skip_with_default"
+```
+
+**Key Metrics:**
+- Prior entropy calculation using Shannon entropy
+- Expected posterior entropy estimation
+- Ask cost based on urgency and workflow type
+- Decision improvement impact weighting
+
+### 64.4 Question Types (MCP Elicitation)
+
+| Type | Description |
+|------|-------------|
+| `yes_no` | Binary true/false question |
+| `single_choice` | Select one from options |
+| `multiple_choice` | Select multiple from options |
+| `free_text` | Open-ended text response |
+| `numeric` | Numeric value input |
+| `date` | Date selection |
+| `confirmation` | Explicit confirmation |
+| `structured` | JSON schema-validated response |
+
+### 64.5 Abstention Detection Methods
+
+For external models (no internal state access):
+
+| Method | Description |
+|--------|-------------|
+| **Confidence Prompting** | Ask model to rate confidence 0-100 |
+| **Self-Consistency** | Sample N responses, measure agreement |
+| **Semantic Entropy** | Cluster outputs, high entropy = uncertain |
+| **Refusal Detection** | Detect hedging language patterns |
+
+**Future:** Linear probe abstention for self-hosted models via inference wrappers.
+
+### 64.6 Rate Limiting Configuration
+
+| Scope | Requests/Min | Concurrent | Burst |
+|-------|--------------|------------|-------|
+| Global | 50 | 20 | 10 |
+| Per User | 10 | 3 | 2 |
+| Per Workflow | 5 | 2 | 1 |
+
+### 64.7 Admin API Endpoints
+
+Base: `/api/admin/hitl-orchestration`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/dashboard` | GET | Complete dashboard data |
+| `/voi/statistics` | GET | VOI decision statistics |
+| `/abstention/config` | GET/PUT | Abstention settings |
+| `/abstention/statistics` | GET | Abstention event stats |
+| `/batching/statistics` | GET | Batch metrics |
+| `/rate-limits` | GET | Rate limit configs |
+| `/rate-limits/:scope` | PUT | Update rate limit |
+| `/escalation-chains` | GET/POST | Manage escalation chains |
+| `/deduplication/statistics` | GET | Cache statistics |
+| `/deduplication/invalidate` | POST | Invalidate cache entries |
+
+### 64.8 Admin Dashboard
+
+**Location:** `/hitl-orchestration`
+
+**Tabs:**
+- **Overview**: Key metrics, VOI breakdown, abstention reasons
+- **Value of Information**: SAGE-Agent VOI statistics
+- **Abstention Detection**: Detection methods, model statistics
+- **Question Batching**: Batching strategies and metrics
+- **Rate Limits**: Configuration table
+- **Settings**: Threshold configuration
+
+### 64.9 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `hitl_question_batches` | Question batch records |
+| `hitl_rate_limits` | Rate limit configuration |
+| `hitl_question_cache` | Deduplication cache |
+| `hitl_voi_aspects` | VOI aspect tracking |
+| `hitl_voi_decisions` | VOI decision records |
+| `hitl_abstention_config` | Abstention settings |
+| `hitl_abstention_events` | Abstention event log |
+| `hitl_escalation_chains` | Escalation chain configuration |
+
+### 64.10 Implementation Files
+
+**Services:**
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/hitl-orchestration/mcp-elicitation.service.ts` | Main orchestration |
+| `lambda/shared/services/hitl-orchestration/voi.service.ts` | Bayesian VOI |
+| `lambda/shared/services/hitl-orchestration/abstention.service.ts` | Uncertainty detection |
+| `lambda/shared/services/hitl-orchestration/batching.service.ts` | Question batching |
+| `lambda/shared/services/hitl-orchestration/rate-limiting.service.ts` | Rate limits |
+| `lambda/shared/services/hitl-orchestration/deduplication.service.ts` | Answer caching |
+| `lambda/shared/services/hitl-orchestration/escalation.service.ts` | Escalation chains |
+
+**Lambda Functions:**
+| File | Purpose |
+|------|---------|
+| `lambda/admin/hitl-orchestration.ts` | Admin API handler |
+
+**Dashboard Pages:**
+| File | Purpose |
+|------|---------|
+| `apps/admin-dashboard/app/(dashboard)/hitl-orchestration/page.tsx` | Radiant Admin |
+| `apps/thinktank-admin/app/hitl-orchestration/page.tsx` | Think Tank Admin |
+
+**Database Migration:**
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_01_20_011__hitl_orchestration_enhancements.sql` | Schema changes |
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| **5.33.0** | 2026-01-20 | HITL Orchestration Enhancements (PROMPT-37); SAGE-Agent Bayesian VOI; MCP Elicitation Schema; Question Batching; Rate Limiting; Abstention Detection; Deduplication; Escalation Chains; Two-Question Rule |
+| **5.32.0** | 2026-01-20 | Sovereign Mesh Completion; Unit tests for notification and snapshot services; Think Tank Admin integration |
 | **5.31.0** | 2026-01-20 | The Sovereign Mesh (PROMPT-36); Agent Registry with OODA execution; App Registry (3,000+ apps); AI Helper Service; Pre-Flight Provisioning; Transparency Layer; HITL Approval Queues; Execution Replay |
 | **5.30.0** | 2026-01-20 | Code Quality & Test Coverage Visibility; Delight service unit tests; JSON safety migration tracking; Technical debt dashboard; Code quality reports |
 | **5.29.0** | 2026-01-20 | Gateway Admin Controls; Persistent statistics with timestamps; Admin dashboard UI; Think Tank status view; Gateway reporting integration; SES email for scheduled reports |

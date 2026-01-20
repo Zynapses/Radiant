@@ -108,6 +108,7 @@ const navigation: NavigationItem[] = [
   // Orchestration Section
   { type: 'separator', label: 'Orchestration' },
   { name: 'Orchestration', href: '/orchestration', icon: Brain },
+  { name: 'HITL Orchestration', href: '/hitl-orchestration', icon: UsersRound },
   { name: 'Workflows', href: '/orchestration/workflows', icon: Workflow },
   { name: 'Pre-Prompts', href: '/orchestration/preprompts', icon: ListChecks },
   { name: 'Methods', href: '/orchestration/methods', icon: Route },
