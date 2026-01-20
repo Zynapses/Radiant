@@ -1,0 +1,19 @@
+{
+  "name": "@radiant/egress-proxy",
+  "version": "1.0.0",
+  "description": "HTTP/2 Connection Pool Proxy for AI Providers",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "fastify": "^4.26.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
+  }
+}

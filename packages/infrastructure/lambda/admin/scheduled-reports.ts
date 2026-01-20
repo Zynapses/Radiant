@@ -6,10 +6,15 @@
  */
 
 import { ScheduledHandler } from 'aws-lambda';
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 import { executeStatement, stringParam } from '../shared/utils/db';
 import { reportGeneratorService } from '../shared/services/report-generator.service';
 import { logger } from '../shared/utils/logger';
 import { v4 as uuidv4 } from 'uuid';
+
+const sesClient = new SESClient({});
+const SES_FROM_EMAIL = process.env.SES_FROM_EMAIL || 'reports@radiant.ai';
+const SES_ENABLED = process.env.SES_ENABLED === 'true';
 
 interface DueReport {
   id: string;
@@ -178,7 +183,7 @@ async function processReport(report: DueReport): Promise<void> {
 }
 
 /**
- * Send report emails to recipients
+ * Send report emails to recipients via SES
  */
 async function sendReportEmails(
   report: DueReport,
@@ -186,22 +191,118 @@ async function sendReportEmails(
   downloadUrl: string,
   recipients: string[]
 ): Promise<void> {
-  // TODO: Implement actual email sending via SES
-  // For now, just log and update execution record
-  
-  logger.info('Would send report emails', {
-    reportId: report.id,
-    executionId,
-    recipientCount: recipients.length,
-  });
+  if (!SES_ENABLED) {
+    logger.info('SES disabled, skipping email send', {
+      reportId: report.id,
+      executionId,
+      recipientCount: recipients.length,
+    });
+    return;
+  }
 
+  let emailsSent = 0;
+  const errors: string[] = [];
+
+  for (const recipient of recipients) {
+    try {
+      const command = new SendEmailCommand({
+        Source: SES_FROM_EMAIL,
+        Destination: {
+          ToAddresses: [recipient],
+        },
+        Message: {
+          Subject: {
+            Data: `RADIANT Report: ${report.name}`,
+            Charset: 'UTF-8',
+          },
+          Body: {
+            Html: {
+              Data: `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 20px; border-radius: 8px 8px 0 0; }
+    .content { background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; }
+    .button { display: inline-block; background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 16px; }
+    .footer { margin-top: 20px; font-size: 12px; color: #6b7280; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 style="margin: 0;">📊 ${report.name}</h1>
+      <p style="margin: 8px 0 0 0; opacity: 0.9;">Your scheduled report is ready</p>
+    </div>
+    <div class="content">
+      <p>Hello,</p>
+      <p>Your scheduled <strong>${report.report_type}</strong> report has been generated and is ready for download.</p>
+      <p><strong>Report Details:</strong></p>
+      <ul>
+        <li>Name: ${report.name}</li>
+        <li>Type: ${report.report_type}</li>
+        <li>Format: ${report.format.toUpperCase()}</li>
+        <li>Generated: ${new Date().toISOString()}</li>
+      </ul>
+      <a href="${downloadUrl}" class="button">Download Report</a>
+      <p class="footer">
+        This link will expire in 24 hours. If you have any questions, please contact your administrator.<br>
+        — RADIANT Platform
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+              `,
+              Charset: 'UTF-8',
+            },
+            Text: {
+              Data: `RADIANT Report: ${report.name}\n\nYour scheduled ${report.report_type} report is ready.\n\nDownload: ${downloadUrl}\n\nThis link expires in 24 hours.`,
+              Charset: 'UTF-8',
+            },
+          },
+        },
+      });
+
+      await sesClient.send(command);
+      emailsSent++;
+      
+      logger.info('Report email sent', {
+        reportId: report.id,
+        executionId,
+        recipient,
+      });
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      errors.push(`${recipient}: ${errorMsg}`);
+      logger.error('Failed to send report email', {
+        reportId: report.id,
+        executionId,
+        recipient,
+        error: errorMsg,
+      });
+    }
+  }
+
+  // Update execution record with email stats
   await executeStatement(
     `UPDATE report_executions SET 
-      emails_sent = $2
+      emails_sent = $2,
+      email_errors = $3
     WHERE id = $1`,
     [
       stringParam('id', executionId),
-      stringParam('emailsSent', recipients.length.toString()),
+      stringParam('emailsSent', emailsSent.toString()),
+      stringParam('emailErrors', errors.length > 0 ? JSON.stringify(errors) : undefined),
     ]
   );
+
+  logger.info('Report emails completed', {
+    reportId: report.id,
+    executionId,
+    sent: emailsSent,
+    failed: errors.length,
+  });
 }

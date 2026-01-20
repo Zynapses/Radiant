@@ -1,0 +1,9 @@
+{
+  "name": "radiant-mock-worker",
+  "version": "1.0.0",
+  "description": "Mock Lambda worker for gateway development",
+  "main": "index.js",
+  "dependencies": {
+    "nats": "^2.19.0"
+  }
+}

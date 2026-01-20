@@ -98,6 +98,26 @@ export {
 } from './cato/redis.service';
 
 // ============================================================================
+// Cedar Authorization (Gateway ABAC)
+// ============================================================================
+
+export {
+  CedarAuthorizationService,
+  getCedarAuthorizationService,
+  type Principal,
+  type PrincipalType,
+  type ActionType,
+  type Resource,
+  type ToolResource,
+  type ModelResource,
+  type SessionResource,
+  type TenantResource,
+  type AuthorizationContext,
+  type AuthorizationRequest,
+  type AuthorizationResult,
+} from './cedar';
+
+// ============================================================================
 // Types
 // ============================================================================
 

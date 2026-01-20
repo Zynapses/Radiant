@@ -59,6 +59,7 @@ import {
   GlobeIcon,
   Rocket,
   Thermometer,
+  Network,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -94,6 +95,15 @@ const navigation: NavigationItem[] = [
   { name: 'Model Coordination', href: '/model-coordination', icon: Globe },
   { name: 'Providers', href: '/providers', icon: Globe },
   { name: 'Rate Limits', href: '/rate-limits', icon: Gauge },
+  
+  // Sovereign Mesh Section
+  { type: 'separator', label: 'Sovereign Mesh' },
+  { name: 'Mesh Dashboard', href: '/sovereign-mesh', icon: Network },
+  { name: 'Agents', href: '/sovereign-mesh/agents', icon: Bot },
+  { name: 'Apps', href: '/sovereign-mesh/apps', icon: Grid },
+  { name: 'Transparency', href: '/sovereign-mesh/transparency', icon: Target },
+  { name: 'Approvals', href: '/sovereign-mesh/approvals', icon: ListChecks },
+  { name: 'AI Helper', href: '/sovereign-mesh/ai-helper', icon: Sparkles },
   
   // Orchestration Section
   { type: 'separator', label: 'Orchestration' },
@@ -178,6 +188,8 @@ const navigation: NavigationItem[] = [
   
   // Operations Section
   { type: 'separator', label: 'Operations' },
+  { name: 'Gateway', href: '/gateway', icon: Network },
+  { name: 'Code Quality', href: '/code-quality', icon: FlaskConical },
   { name: 'Time Machine', href: '/time-machine', icon: History },
   { name: 'Experiments', href: '/experiments', icon: Beaker },
   { name: 'QA & Testing', href: '/qa', icon: FlaskConical },

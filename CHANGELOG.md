@@ -5,6 +5,269 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.32.0] - 2026-01-20
+
+### Added
+
+#### Sovereign Mesh Completion
+
+Full implementation and testing of all Sovereign Mesh infrastructure.
+
+**Unit Tests:**
+- `lambda/shared/services/__tests__/notification.service.test.ts` - 15 test cases
+- `lambda/shared/services/__tests__/snapshot-capture.service.test.ts` - 18 test cases
+
+**Think Tank Admin Integration:**
+- Added Sovereign Mesh section to Think Tank Admin sidebar
+- 6 navigation items: Overview, Agents, Apps, Transparency, AI Helper, Approvals
+
+---
+
+## [5.31.0] - 2026-01-20
+
+### Added
+
+#### The Sovereign Mesh (PROMPT-36)
+
+Major architectural update introducing parametric AI assistance at every node level.
+
+**Philosophy:** "Every Node Thinks. Every Connection Learns. Every Workflow Assembles Itself."
+
+**Location:** `apps/admin-dashboard/app/(dashboard)/sovereign-mesh/`
+
+**Core Features:**
+- **Agent Registry**: Autonomous agents with OODA-loop execution (Research, Coding, Data, Outreach, Creative, Operations)
+- **App Registry**: 3,000+ app integrations from Activepieces/n8n with AI enhancement layer
+- **AI Helper Service**: Parametric AI for disambiguation, parameter inference, error recovery, validation, explanation
+- **Pre-Flight Provisioning**: Blueprint generation and capability verification before workflow execution
+- **Transparency Layer**: Complete Cato decision visibility with War Room deliberation capture
+- **HITL Approval Queues**: Human-in-the-loop approval system with SLA monitoring and escalation
+- **Execution History & Replay**: Time-travel debugging with step-by-step state snapshots
+
+**Database Migrations:**
+- `V2026_01_20_003__sovereign_mesh_agents.sql` - Agent registry and OODA execution
+- `V2026_01_20_004__sovereign_mesh_apps.sql` - App registry and connections
+- `V2026_01_20_005__sovereign_mesh_ai_helper.sql` - AI Helper configuration and usage
+- `V2026_01_20_006__sovereign_mesh_preflight.sql` - Blueprint provisioning
+- `V2026_01_20_007__sovereign_mesh_transparency.sql` - Decision events and War Room
+- `V2026_01_20_008__sovereign_mesh_hitl.sql` - HITL approval queues
+- `V2026_01_20_009__sovereign_mesh_replay.sql` - Execution snapshots and replay
+- `V2026_01_20_010__sovereign_mesh_seed.sql` - Built-in agents and sample apps
+
+**Services Created:**
+- `lambda/shared/services/sovereign-mesh/ai-helper.service.ts`
+- `lambda/shared/services/sovereign-mesh/agent-runtime.service.ts`
+- `lambda/shared/services/sovereign-mesh/notification.service.ts` - Email/Slack/webhook notifications
+- `lambda/shared/services/sovereign-mesh/snapshot-capture.service.ts` - Execution state snapshots
+
+**Worker Lambdas (SQS-triggered):**
+- `lambda/workers/agent-execution-worker.ts` - Async OODA loop processing
+- `lambda/workers/transparency-compiler.ts` - Pre-compute decision explanations
+
+**API Endpoints:** `/api/admin/sovereign-mesh/*`
+- `/agents` - Agent registry management
+- `/executions` - Agent execution tracking
+- `/apps` - App registry browser
+- `/connections` - OAuth/API credentials
+- `/decisions` - Cato decision transparency
+- `/approvals` - HITL approval queue
+- `/ai-helper/config` - AI Helper configuration
+
+**Scheduled Lambdas:**
+- `app-registry-sync` - Daily sync from Activepieces/n8n (2 AM UTC)
+- `hitl-sla-monitor` - SLA monitoring and escalation (every minute)
+- `app-health-check` - Hourly health check for top 100 apps
+
+**CDK Stack:**
+- `lib/stacks/sovereign-mesh-stack.ts` - Complete infrastructure with SQS queues, Lambda functions, and IAM policies
+
+**Dashboard Pages:**
+- `/sovereign-mesh` - Main overview with tabs
+- `/sovereign-mesh/agents` - Agent registry management with create/run/delete
+- `/sovereign-mesh/apps` - App browser with sync status
+- `/sovereign-mesh/transparency` - Decision explorer with War Room deliberations
+- `/sovereign-mesh/ai-helper` - AI Helper configuration and usage stats
+
+**Built-in Agents:**
+- Research Agent - Web research and synthesis
+- Coding Agent - Code writing and debugging (sandboxed)
+- Data Analysis Agent - Dataset analysis and visualization
+- Lead Generation Agent - Prospect research (HITL required)
+- Editor Agent - Content review and improvement
+- Automation Agent - Multi-step workflow execution
+
+---
+
+## [5.30.0] - 2026-01-20
+
+### Added
+
+#### Code Quality & Test Coverage Visibility
+
+Comprehensive admin dashboard for monitoring test coverage, technical debt, and code quality metrics.
+
+**Location:** `apps/admin-dashboard/app/(dashboard)/code-quality/`
+
+**Features:**
+- Real-time dashboard with overall coverage %, open debt items, JSON safety progress
+- Coverage breakdown by component (lambda, admin-dashboard, swift-deployer)
+- Technical debt tracking aligned with TECHNICAL_DEBT.md
+- JSON.parse migration progress to safe utilities
+- Code quality alerts with acknowledge/resolve workflow
+- Coverage trend history and reporting integration
+
+**Database Schema:**
+- `code_quality_snapshots` - Periodic coverage/quality metrics
+- `test_file_registry` - Source files and test status
+- `json_parse_locations` - JSON.parse migration tracking
+- `technical_debt_items` - Debt items by priority/status
+- `code_quality_alerts` - Quality regression alerts
+
+**Report Type:** `code_quality` - Coverage, debt, and JSON safety report
+
+**API Endpoints:** `/api/admin/code-quality/*`
+
+**Files Created:**
+- `packages/infrastructure/migrations/V2026_01_20_002__code_quality_metrics.sql`
+- `packages/infrastructure/lambda/admin/code-quality.ts`
+- `apps/admin-dashboard/app/(dashboard)/code-quality/page.tsx`
+- `apps/admin-dashboard/app/(dashboard)/thinktank/code-quality/page.tsx`
+
+#### Delight Services Unit Tests
+
+Comprehensive unit tests for Think Tank delight messaging system.
+
+**Tests Added:**
+- `delight-orchestration.service.test.ts` - 17 tests for contextual message generation
+- `delight-events.service.test.ts` - 23 tests for real-time event emission
+
+**Coverage:**
+- delight-orchestration.service: 92%
+- delight-events.service: 88%
+
+**Files Created:**
+- `packages/infrastructure/lambda/shared/services/__tests__/delight-orchestration.service.test.ts`
+- `packages/infrastructure/lambda/shared/services/__tests__/delight-events.service.test.ts`
+
+---
+
+## [5.29.0] - 2026-01-20
+
+### Added
+
+#### Gateway Admin Controls & Statistics
+
+Comprehensive admin interface for Multi-Protocol Gateway monitoring and configuration.
+
+**Location:** `apps/admin-dashboard/app/(dashboard)/gateway/`
+
+**Features:**
+- Real-time dashboard with connection metrics, message throughput, latency, and error rates
+- Persistent statistics storage with 5-minute time buckets
+- 24-hour trend visualization and protocol distribution charts
+- Configuration controls for connection limits, rate limits, and timeouts
+- Maintenance mode with graceful connection draining
+- Alert management with severity levels and resolution tracking
+- Instance management with drain capability
+- Session monitoring and termination
+
+**Database Schema:**
+- `gateway_instances` - Instance registry with heartbeat tracking
+- `gateway_statistics` - Time-series metrics
+- `gateway_configuration` - Per-tenant and global settings
+- `gateway_alerts` - Alert and incident tracking
+- `gateway_sessions` - Active connection tracking
+- `gateway_audit_log` - Admin action audit trail
+
+**Report Types:**
+- `gateway-statistics` - Connection and message statistics report
+- `gateway-alerts` - Alert summary report
+
+**API Endpoints:** `/api/admin/gateway/*`
+
+**Files Created:**
+- `packages/infrastructure/migrations/V2026_01_20_001__gateway_statistics.sql`
+- `packages/infrastructure/lambda/admin/gateway.ts`
+- `apps/admin-dashboard/app/(dashboard)/gateway/page.tsx`
+- `apps/admin-dashboard/components/gateway/gateway-status-widget.tsx`
+- `apps/thinktank-admin/app/(dashboard)/gateway/page.tsx`
+
+#### SES Email Integration for Scheduled Reports
+
+Implemented actual email sending via AWS SES for scheduled reports.
+
+**Features:**
+- Beautiful HTML email templates with RADIANT branding
+- Plain text fallback for email clients
+- Per-recipient error tracking
+- Environment variable control (`SES_ENABLED`, `SES_FROM_EMAIL`)
+
+**Files Modified:**
+- `packages/infrastructure/lambda/admin/scheduled-reports.ts`
+
+### Fixed
+
+- Gateway main.go now uses graceful `os.Exit(1)` instead of `panic()` for logger initialization failures
+- Generated `go.sum` for Gateway module with all dependencies
+
+---
+
+## [5.28.0] - 2026-01-19
+
+### Added
+
+#### Multi-Protocol Gateway v1.1.0
+
+Production-grade WebSocket/SSE gateway for AI protocol adapters at 1M+ concurrent connection scale.
+
+**Location:** `apps/gateway/` (Go) + `services/egress-proxy/` (TypeScript)
+
+**Architecture Components:**
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| Go Gateway | Go 1.22 + gobwas/ws | WebSocket termination, 100K+ connections per instance |
+| Egress Proxy | Node.js + HTTP/2 | Connection pooling to AI providers |
+| NATS JetStream | NATS 2.10 | Message broker with INBOX + HISTORY streams |
+| CDK Stack | AWS CDK | Fargate deployment with auto-scaling |
+
+**Supported Protocols:**
+- MCP (Model Context Protocol) v2025-03-26
+- A2A (Agent-to-Agent) v0.3.0
+- OpenAI Chat Completions API
+- Anthropic Messages API
+- Google Generative Language API
+
+**Key Design Decisions (Architecture Frozen):**
+| Issue | Corrected Approach |
+|-------|-------------------|
+| HTTP/2 Pool | Dedicated Egress Proxy on Fargate (NOT Lambda) |
+| Egress Goroutine | Defensive cleanup + done channels (prevents zombie leaks) |
+| Message History | JetStream HISTORY stream (NOT DynamoDB) |
+
+**Features:**
+- Session resume with automatic message replay
+- mTLS authentication for A2A agents
+- OIDC JWT authentication for users
+- Protocol auto-detection from headers/payload
+- Dual-publish pattern for guaranteed delivery
+- Health endpoints with connection metrics
+
+**Files Created:**
+- `apps/gateway/` - Go gateway service (12 files)
+- `services/egress-proxy/` - HTTP/2 proxy service (5 files)
+- `infrastructure/docker/gateway/` - Docker Compose + mock worker
+- `packages/infrastructure/lib/stacks/gateway-stack.ts` - CDK stack
+
+**Quick Start:**
+```bash
+cd apps/gateway
+make docker-up  # Start NATS + services
+make run        # Run gateway
+wscat -c ws://localhost:8443/ws
+```
+
+---
+
 ## [5.27.0] - 2026-01-19
 
 ### Added

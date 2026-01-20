@@ -1,0 +1,159 @@
+# RADIANT Multi-Protocol Gateway - Local Development Stack
+# Run with: docker compose -f infrastructure/docker/gateway/docker-compose.yml up -d
+
+version: '3.8'
+
+services:
+  # NATS with JetStream
+  nats:
+    image: nats:2.10-alpine
+    container_name: radiant-nats
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command:
+      - "--jetstream"
+      - "--store_dir=/data"
+      - "--http_port=8222"
+      - "-DV"
+    volumes:
+      - nats-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8222/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - radiant-gateway
+
+  # NATS Stream Setup
+  nats-setup:
+    image: natsio/nats-box:latest
+    container_name: radiant-nats-setup
+    depends_on:
+      nats:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "Creating INBOX stream (Ingress - WorkQueue)..."
+        nats stream add INBOX \
+          --server=nats://nats:4222 \
+          --subjects="in.>" \
+          --retention=work \
+          --max-msgs=-1 \
+          --max-bytes=10GB \
+          --max-age=1h \
+          --storage=file \
+          --replicas=1 \
+          --defaults || true
+
+        echo "Creating HISTORY stream (Egress Replay - Limits)..."
+        # CORRECTION #3: This replaces DynamoDB for message persistence
+        nats stream add HISTORY \
+          --server=nats://nats:4222 \
+          --subjects="history.>" \
+          --retention=limits \
+          --max-msgs=100000000 \
+          --max-msgs-per-subject=10000 \
+          --max-bytes=50GB \
+          --max-age=1h \
+          --storage=file \
+          --replicas=1 \
+          --defaults || true
+
+        echo "Creating consumer groups..."
+        nats consumer add INBOX mcp-workers \
+          --server=nats://nats:4222 \
+          --filter="in.mcp.>" \
+          --ack=explicit \
+          --max-deliver=3 \
+          --pull \
+          --defaults || true
+
+        nats consumer add INBOX a2a-workers \
+          --server=nats://nats:4222 \
+          --filter="in.a2a.>" \
+          --ack=explicit \
+          --max-deliver=3 \
+          --pull \
+          --defaults || true
+
+        echo "NATS setup complete!"
+        nats stream ls --server=nats://nats:4222
+    networks:
+      - radiant-gateway
+
+  # Mock Worker (simulates Lambda handlers)
+  mock-worker:
+    build:
+      context: ./mock-worker
+      dockerfile: Dockerfile
+    container_name: radiant-mock-worker
+    depends_on:
+      nats-setup:
+        condition: service_completed_successfully
+    environment:
+      - NATS_URL=nats://nats:4222
+    networks:
+      - radiant-gateway
+
+  # Egress Proxy (HTTP/2 Connection Pool)
+  # CORRECTION #1: HTTP/2 pool runs here, NOT in Lambda
+  egress-proxy:
+    build:
+      context: ../../../services/egress-proxy
+      dockerfile: Dockerfile
+    container_name: radiant-egress-proxy
+    ports:
+      - "9000:9000"
+    environment:
+      - PORT=9000
+      - LOG_LEVEL=info
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY:-}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT:-}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - radiant-gateway
+
+  # Go Gateway
+  gateway:
+    build:
+      context: ../../../apps/gateway
+      dockerfile: Dockerfile
+    container_name: radiant-gateway
+    ports:
+      - "8443:8443"
+      - "8080:8080"
+    environment:
+      - GATEWAY_LISTEN_ADDR=:8443
+      - GATEWAY_HEALTH_ADDR=:8080
+      - NATS_URL=nats://nats:4222
+      - EGRESS_PROXY_URL=http://egress-proxy:9000
+      - GATEWAY_DEV=true
+      - RESUME_TOKEN_SECRET=${RESUME_TOKEN_SECRET:-dev-secret-change-me}
+    depends_on:
+      nats-setup:
+        condition: service_completed_successfully
+      egress-proxy:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - radiant-gateway
+
+volumes:
+  nats-data:
+
+networks:
+  radiant-gateway:
+    name: radiant-gateway

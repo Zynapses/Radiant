@@ -25,6 +25,11 @@ import {
   GitBranch,
   Shapes,
   Network,
+  Bot,
+  AppWindow,
+  Eye,
+  Wand2,
+  ClipboardCheck,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -78,6 +83,24 @@ const navigation: NavSection[] = [
       { name: 'Polymorphic', href: '/polymorphic', icon: Shapes },
       { name: 'Concurrent Exec', href: '/concurrent-execution', icon: GitBranch },
       { name: 'Structure', href: '/structure-from-chaos', icon: Network },
+    ],
+  },
+  {
+    label: 'Sovereign Mesh',
+    items: [
+      { name: 'Overview', href: '/sovereign-mesh', icon: Network },
+      { name: 'Agents', href: '/sovereign-mesh/agents', icon: Bot },
+      { name: 'Apps', href: '/sovereign-mesh/apps', icon: AppWindow },
+      { name: 'Transparency', href: '/sovereign-mesh/transparency', icon: Eye },
+      { name: 'AI Helper', href: '/sovereign-mesh/ai-helper', icon: Wand2 },
+      { name: 'Approvals', href: '/sovereign-mesh/approvals', icon: ClipboardCheck },
+    ],
+  },
+  {
+    label: 'Infrastructure',
+    items: [
+      { name: 'Gateway Status', href: '/gateway', icon: Network },
+      { name: 'Code Quality', href: '/code-quality', icon: Beaker },
     ],
   },
   {
