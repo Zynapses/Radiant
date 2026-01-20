@@ -85,51 +85,7 @@ export default function ShadowTestingPage() {
       }
     } catch (error) {
       console.error('Failed to fetch shadow test data:', error);
-      // Use mock data
-      setTests([
-        {
-          id: '1',
-          testName: 'Coding Mode Optimization',
-          baselineTemplateId: 'coding_v1',
-          baselineTemplateName: 'Coding Pre-prompt v1',
-          candidateTemplateId: 'coding_v2',
-          candidateTemplateName: 'Coding Pre-prompt v2',
-          testMode: 'auto',
-          trafficPercentage: 10,
-          minSamples: 100,
-          maxSamples: 1000,
-          samplesCollected: 234,
-          baselineAvgScore: 0.82,
-          candidateAvgScore: 0.87,
-          winner: null,
-          confidenceLevel: 0.78,
-          status: 'running',
-          startedAt: new Date(Date.now() - 86400000).toISOString(),
-          completedAt: null,
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-        },
-        {
-          id: '2',
-          testName: 'Research Mode Enhancement',
-          baselineTemplateId: 'research_v1',
-          baselineTemplateName: 'Research Pre-prompt v1',
-          candidateTemplateId: 'research_v2',
-          candidateTemplateName: 'Research Pre-prompt v2 (Enhanced)',
-          testMode: 'auto',
-          trafficPercentage: 10,
-          minSamples: 100,
-          maxSamples: 500,
-          samplesCollected: 500,
-          baselineAvgScore: 0.79,
-          candidateAvgScore: 0.85,
-          winner: 'candidate',
-          confidenceLevel: 0.97,
-          status: 'promoted',
-          startedAt: new Date(Date.now() - 604800000).toISOString(),
-          completedAt: new Date(Date.now() - 172800000).toISOString(),
-          createdAt: new Date(Date.now() - 604800000).toISOString(),
-        },
-      ]);
+      setTests([]);
     } finally {
       setLoading(false);
     }

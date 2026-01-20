@@ -165,115 +165,6 @@ interface SaaSMetrics {
   }>;
 }
 
-// Sample data generator
-function generateSampleData(period: string): SaaSMetrics {
-  const multiplier = period === '7d' ? 0.25 : period === '30d' ? 1 : period === '90d' ? 3 : 12;
-  
-  return {
-    mrr: 89500 * (1 + Math.random() * 0.1),
-    mrrGrowth: 12.5 + Math.random() * 5,
-    arr: 1074000 * (1 + Math.random() * 0.1),
-    arrGrowth: 15.2 + Math.random() * 5,
-    totalRevenue: 89500 * multiplier,
-    revenueGrowth: 18.3 + Math.random() * 5,
-    
-    totalCost: 42000 * multiplier,
-    costGrowth: 8.5 + Math.random() * 3,
-    grossProfit: 47500 * multiplier,
-    grossMargin: 53.1 + Math.random() * 5,
-    
-    totalCustomers: 342,
-    newCustomers: Math.floor(28 * multiplier / 4),
-    churnedCustomers: Math.floor(8 * multiplier / 4),
-    churnRate: 2.3 + Math.random(),
-    customerGrowth: 5.8 + Math.random() * 2,
-    
-    activeUsers: 2847,
-    totalRequests: Math.floor(1250000 * multiplier),
-    requestsGrowth: 24.5 + Math.random() * 10,
-    avgRequestsPerUser: 439,
-    
-    arpu: 261.70 + Math.random() * 20,
-    arpuGrowth: 8.2 + Math.random() * 3,
-    ltv: 3140.40 + Math.random() * 200,
-    cac: 450 + Math.random() * 50,
-    ltvCacRatio: 6.98 + Math.random(),
-    
-    revenueBySource: [
-      { name: 'Subscriptions', value: 62500, color: CHART_COLORS.primary },
-      { name: 'Credit Purchases', value: 12500, color: CHART_COLORS.secondary },
-      { name: 'AI Markup (External)', value: 9800, color: CHART_COLORS.success },
-      { name: 'AI Markup (Self-Hosted)', value: 4200, color: CHART_COLORS.warning },
-      { name: 'Storage', value: 500, color: CHART_COLORS.info },
-    ],
-    
-    revenueByTier: [
-      { tier: 'Enterprise', revenue: 45000, customers: 12 },
-      { tier: 'Business', revenue: 28500, customers: 45 },
-      { tier: 'Pro', revenue: 12800, customers: 128 },
-      { tier: 'Starter', revenue: 3200, customers: 157 },
-    ],
-    
-    revenueByProduct: [
-      { product: 'Think Tank', revenue: 58000, percentage: 64.8 },
-      { product: 'Radiant API', revenue: 24500, percentage: 27.4 },
-      { product: 'Self-Hosted Models', revenue: 7000, percentage: 7.8 },
-    ],
-    
-    costByCategory: [
-      { category: 'External AI Providers', amount: 18500, percentage: 44.0 },
-      { category: 'AWS Compute', amount: 12800, percentage: 30.5 },
-      { category: 'AWS Database', amount: 4200, percentage: 10.0 },
-      { category: 'AWS Storage', amount: 2100, percentage: 5.0 },
-      { category: 'Platform Fees', amount: 2600, percentage: 6.2 },
-      { category: 'Other Infrastructure', amount: 1800, percentage: 4.3 },
-    ],
-    
-    revenueTrend: Array.from({ length: 30 }, (_, i) => ({
-      date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      revenue: 2500 + Math.random() * 1500 + i * 30,
-      cost: 1200 + Math.random() * 400 + i * 10,
-      profit: 1300 + Math.random() * 700 + i * 20,
-    })),
-    
-    customerTrend: Array.from({ length: 12 }, (_, i) => ({
-      date: new Date(Date.now() - (11 - i) * 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short' }),
-      total: 280 + i * 8 + Math.floor(Math.random() * 10),
-      new: 20 + Math.floor(Math.random() * 15),
-      churned: 5 + Math.floor(Math.random() * 5),
-    })),
-    
-    usageTrend: Array.from({ length: 30 }, (_, i) => ({
-      date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      requests: 35000 + Math.random() * 15000 + i * 500,
-      activeUsers: 2500 + Math.random() * 500 + i * 10,
-    })),
-    
-    mrrTrend: Array.from({ length: 12 }, (_, i) => ({
-      date: new Date(Date.now() - (11 - i) * 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short' }),
-      mrr: 65000 + i * 2200 + Math.random() * 1000,
-      newMrr: 4500 + Math.random() * 2000,
-      churnMrr: 1200 + Math.random() * 800,
-      expansionMrr: 1800 + Math.random() * 1200,
-    })),
-    
-    topTenants: [
-      { id: '1', name: 'Acme Corporation', revenue: 8500, users: 145, requests: 125000, tier: 'Enterprise' },
-      { id: '2', name: 'TechStart Inc', revenue: 6200, users: 89, requests: 98000, tier: 'Enterprise' },
-      { id: '3', name: 'Global Solutions', revenue: 4800, users: 67, requests: 78000, tier: 'Business' },
-      { id: '4', name: 'InnovateCo', revenue: 3900, users: 52, requests: 65000, tier: 'Business' },
-      { id: '5', name: 'DataDrive Ltd', revenue: 3200, users: 41, requests: 52000, tier: 'Business' },
-    ],
-    
-    modelMetrics: [
-      { model: 'GPT-4o', requests: 425000, revenue: 12750, cost: 8500, profit: 4250, margin: 33.3 },
-      { model: 'Claude 3.5 Sonnet', requests: 312000, revenue: 9360, cost: 6240, profit: 3120, margin: 33.3 },
-      { model: 'GPT-4o-mini', requests: 285000, revenue: 2850, cost: 1425, profit: 1425, margin: 50.0 },
-      { model: 'Self-Hosted Llama', requests: 156000, revenue: 4680, cost: 2340, profit: 2340, margin: 50.0 },
-      { model: 'Gemini 1.5 Pro', requests: 72000, revenue: 3600, cost: 2400, profit: 1200, margin: 33.3 },
-    ],
-  };
-}
 
 // Utility functions
 function formatCurrency(value: number): string {
@@ -492,10 +383,11 @@ export function SaaSMetricsClient() {
   const { data: metrics, isLoading, refetch } = useQuery<SaaSMetrics>({
     queryKey: ['saas-metrics', period],
     queryFn: async () => {
-      // In production, fetch from API
-      // const res = await fetch(`/api/admin/saas-metrics?period=${period}`);
-      // return res.json();
-      return generateSampleData(period);
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
+      const res = await fetch(`${API_BASE}/api/admin/saas-metrics?period=${period}`);
+      if (!res.ok) throw new Error('Failed to fetch SaaS metrics');
+      const { data } = await res.json();
+      return data;
     },
   });
 

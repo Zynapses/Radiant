@@ -84,12 +84,14 @@ const navigation: NavigationItem[] = [
   // AI & Models Section
   { type: 'separator', label: 'AI & Models' },
   { name: 'Models', href: '/models', icon: Cpu },
-  { name: 'LoRA Adapters', href: '/models/lora-adapters', icon: Layers },
+  { name: 'LoRA Adapters', href: '/lora', icon: Layers },
   { name: 'Inference Components', href: '/inference-components', icon: Thermometer },
   { name: 'Model Pricing', href: '/models/pricing', icon: DollarSign },
   { name: 'Model Metadata', href: '/model-metadata', icon: FileText },
   { name: 'Specialty Rankings', href: '/specialty-rankings', icon: Star },
   { name: 'User Models', href: '/user-models', icon: UserCircle },
+  { name: 'Model Proficiency', href: '/model-proficiency', icon: Star },
+  { name: 'Model Coordination', href: '/model-coordination', icon: Globe },
   { name: 'Providers', href: '/providers', icon: Globe },
   { name: 'Rate Limits', href: '/rate-limits', icon: Gauge },
   
@@ -121,6 +123,8 @@ const navigation: NavigationItem[] = [
   { name: 'Cognitive Brain', href: '/cognitive-brain', icon: Brain },
   { name: 'Cognition', href: '/cognition', icon: Lightbulb },
   { name: 'Consciousness', href: '/consciousness', icon: Sparkles },
+  { name: 'Ego System', href: '/ego', icon: Heart },
+  { name: 'Empiricism', href: '/empiricism', icon: FlaskConical },
   { name: 'Cato', href: '/cato', icon: Heart },
   { name: 'Cato Global', href: '/cato', icon: GlobeIcon },
   { name: 'Cato Genesis', href: '/cato/genesis', icon: Rocket },
@@ -146,6 +150,8 @@ const navigation: NavigationItem[] = [
   { type: 'separator', label: 'Learning' },
   { name: 'AGI Learning', href: '/agi-learning', icon: GraduationCap },
   { name: 'Learning', href: '/learning', icon: Lightbulb },
+  { name: 'Enhanced Learning', href: '/enhanced-learning', icon: TrendingUp },
+  { name: 'Internet Learning', href: '/internet-learning', icon: GlobeIcon },
   { name: 'ML Training', href: '/ml-training', icon: FlaskConical },
   { name: 'Feedback', href: '/feedback', icon: MessageSquare },
   
@@ -153,23 +159,11 @@ const navigation: NavigationItem[] = [
   { type: 'separator', label: 'Ethics' },
   { name: 'Ethics', href: '/ethics', icon: Heart },
   { name: 'Moral Compass', href: '/moral-compass', icon: Compass },
+  { name: 'Domain Ethics', href: '/domain-ethics', icon: Shield },
+  { name: 'Ethics-Free Mode', href: '/ethics-free-reasoning', icon: AlertTriangle },
   
-  // Think Tank Section
-  { type: 'separator', label: 'Think Tank' },
-  { name: 'Users', href: '/thinktank/users', icon: UserCircle },
-  { name: 'Conversations', href: '/thinktank/conversations', icon: MessageSquare },
-  { name: 'My Rules', href: '/thinktank/my-rules', icon: ListChecks },
-  { name: 'Delight', href: '/thinktank/delight', icon: Smile },
-  { name: 'Delight Stats', href: '/thinktank/delight/statistics', icon: BarChart3 },
-  { name: 'Domain Modes', href: '/thinktank/domain-modes', icon: Layers },
-  { name: 'Model Categories', href: '/thinktank/model-categories', icon: Grid },
-  { name: 'Shadow Testing', href: '/thinktank/shadow-testing', icon: Beaker },
-  { name: 'Collaborate', href: '/thinktank/collaborate', icon: UsersRound },
-  { name: 'Ego System', href: '/thinktank/ego', icon: UserCircle },
-  { name: 'Polymorphic UI', href: '/thinktank/polymorphic', icon: Zap },
-  { name: 'TT Artifacts', href: '/thinktank/artifacts', icon: Sparkles },
-  { name: 'TT Compliance', href: '/thinktank/compliance', icon: ShieldCheck },
-  { name: 'TT Settings', href: '/thinktank/settings', icon: Settings },
+  // Think Tank Section - REMOVED: Think Tank is now a separate app (apps/thinktank-admin)
+  // See docs/APP-ISOLATION-ARCHITECTURE.md for details
   
   // Analytics & Reports Section
   { type: 'separator', label: 'Analytics' },
@@ -180,6 +174,7 @@ const navigation: NavigationItem[] = [
   { name: 'SaaS Metrics', href: '/saas-metrics', icon: TrendingUp },
   { name: 'Revenue', href: '/revenue', icon: DollarSign },
   { name: 'Costs', href: '/costs', icon: CreditCard },
+  { name: 'AWS Costs', href: '/aws-costs', icon: DollarSign },
   
   // Operations Section
   { type: 'separator', label: 'Operations' },
@@ -201,17 +196,23 @@ const navigation: NavigationItem[] = [
   { name: 'Attack Defense', href: '/security/attacks', icon: Shield },
   { name: 'Sec Feedback', href: '/security/feedback', icon: MessageSquare },
   { name: 'Compliance', href: '/compliance', icon: ShieldCheck },
+  { name: 'Violations', href: '/compliance/violations', icon: AlertTriangle },
   { name: 'Checklists', href: '/compliance/checklists', icon: ListChecks },
   { name: 'Self-Audit', href: '/compliance/self-audit', icon: Activity },
   { name: 'Reg Standards', href: '/compliance/regulatory-standards', icon: FileBarChart },
   { name: 'Tenants', href: '/tenants', icon: Users },
   { name: 'Administrators', href: '/administrators', icon: Users },
+  { name: 'Users', href: '/users', icon: UsersRound },
+  { name: 'User Registry', href: '/user-registry', icon: FileText },
+  { name: 'Invitations', href: '/invitations', icon: Bell },
+  { name: 'Approvals', href: '/approvals', icon: ShieldCheck },
   { name: 'Audit Logs', href: '/audit-logs', icon: FileText },
   { name: 'AWS Logs', href: '/aws-logs', icon: ScrollText },
   
   // Billing & Storage Section
   { type: 'separator', label: 'Billing' },
   { name: 'Billing', href: '/billing', icon: CreditCard },
+  { name: 'Pricing', href: '/pricing', icon: DollarSign },
   { name: 'Storage', href: '/storage', icon: HardDrive },
   
   // Settings Section
@@ -220,12 +221,16 @@ const navigation: NavigationItem[] = [
   { name: 'Intelligence', href: '/settings/intelligence', icon: Zap },
   { name: 'Storage Tiers', href: '/settings/storage', icon: HardDrive },
   { name: 'Ethics Config', href: '/settings/ethics', icon: Lock },
+  { name: 'White-Label', href: '/settings/white-label', icon: Layers },
   { name: 'System Config', href: '/system-config', icon: Wrench },
   { name: 'Localization', href: '/localization', icon: Languages },
   { name: 'Translation AI', href: '/localization/translation-middleware', icon: Languages },
   { name: 'Translations', href: '/localization/translations', icon: FileText },
   { name: 'Configuration', href: '/configuration', icon: Sliders },
   { name: 'System Settings', href: '/configuration/system', icon: Wrench },
+  { name: 'Infrastructure Tier', href: '/infrastructure-tier', icon: Server },
+  { name: 'Library Registry', href: '/library-registry', icon: Layers },
+  { name: 'Translation', href: '/translation', icon: Languages },
   { name: 'Platform Libraries', href: '/platform/libraries', icon: Layers },
   { name: 'Platform Learning', href: '/platform/learning', icon: GraduationCap },
   { name: 'Migrations', href: '/migrations', icon: GitPullRequest },

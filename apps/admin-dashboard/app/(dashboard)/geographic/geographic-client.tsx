@@ -1,11 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Globe, TrendingUp, Activity, DollarSign, RefreshCw } from 'lucide-react';
+// @ts-expect-error - react-simple-maps doesn't have TypeScript types
+import { ComposableMap, Geographies, Geography, ZoomableGroup } from 'react-simple-maps';
 import type { RegionStats } from '@/lib/api/types';
+
+const geoUrl = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+
+// Country code to name mapping for tooltip display
+const countryCodeToName: Record<string, string> = {
+  USA: 'United States',
+  GBR: 'United Kingdom',
+  DEU: 'Germany',
+  FRA: 'France',
+  JPN: 'Japan',
+  CHN: 'China',
+  IND: 'India',
+  BRA: 'Brazil',
+  CAN: 'Canada',
+  AUS: 'Australia',
+};
 
 interface RegionDisplayData {
   code: string;
@@ -123,12 +141,11 @@ export function GeographicClient() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[400px] flex items-center justify-center border rounded-lg bg-muted/20">
-            <div className="text-center text-muted-foreground">
-              <Globe className="h-16 w-16 mx-auto mb-4 opacity-50" />
-              <p>Interactive world map visualization</p>
-              <p className="text-sm">Requires react-simple-maps integration</p>
-            </div>
+          <div className="h-[400px] border rounded-lg bg-muted/10 overflow-hidden">
+            <WorldMap 
+              regionData={regionData} 
+              onRegionClick={(code: string) => console.log('Region clicked:', code)} 
+            />
           </div>
         </CardContent>
       </Card>
@@ -174,3 +191,105 @@ export function GeographicClient() {
     </div>
   );
 }
+
+interface WorldMapProps {
+  regionData: RegionDisplayData[];
+  onRegionClick: (code: string) => void;
+}
+
+const WorldMap = memo(function WorldMap({ regionData, onRegionClick }: WorldMapProps) {
+  const [hoveredGeo, setHoveredGeo] = useState<string | null>(null);
+
+  // Create a map of region codes to their data for quick lookup
+  const regionMap = new Map(regionData.map((r) => [r.code, r]));
+
+  const getRegionColor = (geoCode: string) => {
+    const region = regionMap.get(geoCode);
+    if (!region) return '#e2e8f0'; // Default gray for countries without data
+    
+    // Color intensity based on request count
+    const maxRequests = Math.max(...regionData.map((r) => r.requests), 1);
+    const intensity = region.requests / maxRequests;
+    
+    // Gradient from light blue to dark blue
+    const r = Math.round(59 + (1 - intensity) * 170);
+    const g = Math.round(130 + (1 - intensity) * 100);
+    const b = Math.round(246 - (1 - intensity) * 50);
+    
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
+  return (
+    <div className="relative w-full h-full">
+      <ComposableMap
+        projectionConfig={{
+          scale: 147,
+          center: [0, 20],
+        }}
+        className="w-full h-full"
+      >
+        <ZoomableGroup>
+          <Geographies geography={geoUrl}>
+            {({ geographies }: { geographies: Array<{ rsmKey: string; properties: { name: string; ISO_A3: string } }> }) =>
+              geographies.map((geo) => {
+                const geoCode = geo.properties.ISO_A3;
+                
+                return (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    onMouseEnter={() => setHoveredGeo(geoCode)}
+                    onMouseLeave={() => setHoveredGeo(null)}
+                    onClick={() => onRegionClick(geoCode)}
+                    style={{
+                      default: {
+                        fill: getRegionColor(geoCode.substring(0, 2).toUpperCase()),
+                        stroke: '#fff',
+                        strokeWidth: 0.5,
+                        outline: 'none',
+                      },
+                      hover: {
+                        fill: '#8b5cf6',
+                        stroke: '#fff',
+                        strokeWidth: 0.75,
+                        outline: 'none',
+                        cursor: 'pointer',
+                      },
+                      pressed: {
+                        fill: '#7c3aed',
+                        stroke: '#fff',
+                        strokeWidth: 0.75,
+                        outline: 'none',
+                      },
+                    }}
+                  />
+                );
+              })
+            }
+          </Geographies>
+        </ZoomableGroup>
+      </ComposableMap>
+      
+      {/* Tooltip */}
+      {hoveredGeo && (
+        <div className="absolute bottom-4 left-4 bg-popover text-popover-foreground border rounded-lg p-3 shadow-lg z-10">
+          <p className="font-medium">{countryCodeToName[hoveredGeo] || hoveredGeo}</p>
+          {regionMap.get(hoveredGeo.substring(0, 2).toUpperCase()) && (
+            <p className="text-sm text-muted-foreground">
+              {formatNumber(regionMap.get(hoveredGeo.substring(0, 2).toUpperCase())!.requests)} requests
+            </p>
+          )}
+        </div>
+      )}
+      
+      {/* Legend */}
+      <div className="absolute bottom-4 right-4 bg-popover/90 backdrop-blur-sm border rounded-lg p-3 text-xs">
+        <p className="font-medium mb-2">Request Volume</p>
+        <div className="flex items-center gap-2">
+          <div className="w-16 h-2 rounded bg-gradient-to-r from-blue-200 to-blue-600" />
+          <span className="text-muted-foreground">Low → High</span>
+        </div>
+      </div>
+    </div>
+  );
+});

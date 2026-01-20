@@ -89,8 +89,8 @@ export default function MLTrainingPage() {
   const [providerFilter, setProviderFilter] = useState<string>('all');
   const [config, setConfig] = useState(defaultTrainingConfig);
   const [hasConfigChanges, setHasConfigChanges] = useState(false);
-  const [mockTrainingStats, setMockTrainingStats] = useState<TrainingStats>(defaultTrainingStats);
-  const [mockTrainingBatches, setMockTrainingBatches] = useState<TrainingBatch[]>([]);
+  const [trainingStats, setTrainingStats] = useState<TrainingStats>(defaultTrainingStats);
+  const [trainingBatches, setTrainingBatches] = useState<TrainingBatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,12 +101,12 @@ export default function MLTrainingPage() {
       try {
         const API = process.env.NEXT_PUBLIC_API_URL || '';
         const [statsRes, batchesRes] = await Promise.all([
-          fetch(`${API}/admin/ml-training/stats`),
-          fetch(`${API}/admin/ml-training/batches`),
+          fetch(`${API}/api/admin/ml-training/stats`),
+          fetch(`${API}/api/admin/ml-training/batches`),
         ]);
-        if (statsRes.ok) { const { data } = await statsRes.json(); setMockTrainingStats(data || defaultTrainingStats); }
+        if (statsRes.ok) { const { data } = await statsRes.json(); setTrainingStats(data || defaultTrainingStats); }
         else setError('Failed to load training data.');
-        if (batchesRes.ok) { const { data } = await batchesRes.json(); setMockTrainingBatches(data || []); }
+        if (batchesRes.ok) { const { data } = await batchesRes.json(); setTrainingBatches(data || []); }
       } catch { setError('Failed to connect to training service.'); }
       setLoading(false);
     }
@@ -164,23 +164,23 @@ export default function MLTrainingPage() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Training Samples</p>
-          <p className="text-xl font-bold text-gray-900 dark:text-white">{mockTrainingStats.totalSamples.toLocaleString()}</p>
+          <p className="text-xl font-bold text-gray-900 dark:text-white">{trainingStats.totalSamples.toLocaleString()}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Unused Samples</p>
-          <p className="text-xl font-bold text-blue-600">{mockTrainingStats.unusedSamples.toLocaleString()}</p>
+          <p className="text-xl font-bold text-blue-600">{trainingStats.unusedSamples.toLocaleString()}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Positive Ratio</p>
-          <p className="text-xl font-bold text-green-600">{Math.round(mockTrainingStats.positiveRatio * 100)}%</p>
+          <p className="text-xl font-bold text-green-600">{Math.round(trainingStats.positiveRatio * 100)}%</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Model Version</p>
-          <p className="text-xl font-bold text-purple-600">v{mockTrainingStats.activeModelVersion}</p>
+          <p className="text-xl font-bold text-purple-600">v{trainingStats.activeModelVersion}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Model Accuracy</p>
-          <p className="text-xl font-bold text-green-600">{Math.round(mockTrainingStats.modelAccuracy * 100)}%</p>
+          <p className="text-xl font-bold text-green-600">{Math.round(trainingStats.modelAccuracy * 100)}%</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Available Models</p>
@@ -256,7 +256,7 @@ export default function MLTrainingPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
             <h2 className="text-lg font-semibold mb-4">Recent Training Runs</h2>
             <div className="space-y-3">
-              {mockTrainingBatches.map(batch => (
+              {trainingBatches.map(batch => (
                 <div key={batch.id} className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
                   <div>
                     <p className="font-medium">{batch.name}</p>
@@ -397,7 +397,7 @@ export default function MLTrainingPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {mockTrainingBatches.map(batch => (
+                {trainingBatches.map(batch => (
                   <tr key={batch.id}>
                     <td className="py-3 font-medium">{batch.name}</td>
                     <td className="py-3">{batch.samples.toLocaleString()}</td>
@@ -447,7 +447,7 @@ export default function MLTrainingPage() {
               <div>
                 <h3 className="font-medium mb-2">Ready for Training</h3>
                 <div className="text-3xl font-bold text-blue-600 mb-2">
-                  {mockTrainingStats.unusedSamples.toLocaleString()}
+                  {trainingStats.unusedSamples.toLocaleString()}
                 </div>
                 <p className="text-sm text-gray-500">
                   samples ready for next training batch

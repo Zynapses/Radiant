@@ -14,6 +14,9 @@ description: Update strategic vision document when admin guides change with MAJO
 - New competitive differentiators (features competitors can't match)
 - New safety/compliance features (CBF, ethics frameworks, etc.)
 - New cost optimization features (Governor, routing, etc.)
+- **New collaboration features (Guest Access, AI Facilitator, Branching, Roundtable, etc.)**
+- **New user-facing features that could drive sales or differentiation**
+- **Features that enable viral growth or network effects**
 - Version number increases (5.x.0 → 5.y.0)
 
 **EXCLUDE** (do NOT require strategic vision update):

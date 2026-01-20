@@ -156,110 +156,8 @@ interface PrepromptDashboard {
   }>;
 }
 
-// Sample data
-const sampleDashboard: PrepromptDashboard = {
-  totalTemplates: 7,
-  activeTemplates: 7,
-  totalInstances: 1247,
-  totalFeedback: 423,
-  overallAvgRating: 4.2,
-  overallThumbsUpRate: 0.78,
-  attributionDistribution: {
-    preprompt: 0.18,
-    model: 0.32,
-    mode: 0.22,
-    workflow: 0.08,
-    domain: 0.12,
-    other: 0.08,
-  },
-  learningEnabled: true,
-  explorationRate: 0.1,
-  topTemplates: [
-    { templateCode: 'extended_thinking', name: 'Extended Thinking', avgRating: 4.6, uses: 312 },
-    { templateCode: 'coding_expert', name: 'Coding Expert', avgRating: 4.5, uses: 245 },
-    { templateCode: 'research_synthesis', name: 'Research Synthesis', avgRating: 4.4, uses: 189 },
-  ],
-  lowPerformingTemplates: [
-    { templateCode: 'multi_model_consensus', name: 'Multi-Model Consensus', avgRating: 3.2, issues: ['Low sample size'] },
-  ],
-  recentFeedback: [
-    { instanceId: '1', rating: 5, attribution: 'other', feedbackText: 'Perfect response!', createdAt: '2024-12-28T12:00:00Z' },
-    { instanceId: '2', rating: 3, attribution: 'model', feedbackText: 'Could be more detailed', createdAt: '2024-12-28T11:30:00Z' },
-    { instanceId: '3', rating: 2, attribution: 'preprompt', feedbackText: 'Wrong tone', createdAt: '2024-12-28T11:00:00Z' },
-  ],
-};
-
-const sampleTemplates: PrepromptTemplate[] = [
-  {
-    id: '1',
-    templateCode: 'standard_reasoning',
-    name: 'Standard Reasoning',
-    description: 'General-purpose reasoning pre-prompt',
-    systemPrompt: 'You are an expert AI assistant with deep knowledge across many domains...',
-    applicableModes: ['thinking', 'chain_of_thought'],
-    applicableDomains: [],
-    applicableTaskTypes: ['general', 'reasoning', 'factual'],
-    complexityRange: ['simple', 'moderate', 'complex'],
-    baseEffectivenessScore: 0.5,
-    domainWeight: 0.2,
-    modeWeight: 0.2,
-    modelWeight: 0.2,
-    complexityWeight: 0.15,
-    taskTypeWeight: 0.15,
-    feedbackWeight: 0.1,
-    totalUses: 423,
-    successfulUses: 356,
-    avgFeedbackScore: 4.1,
-    isActive: true,
-    isDefault: true,
-  },
-  {
-    id: '2',
-    templateCode: 'extended_thinking',
-    name: 'Extended Thinking',
-    description: 'Deep reasoning for complex problems',
-    systemPrompt: 'You are a world-class reasoning AI. For this complex problem...',
-    applicableModes: ['extended_thinking'],
-    applicableDomains: [],
-    applicableTaskTypes: ['reasoning', 'research', 'analysis'],
-    complexityRange: ['complex', 'expert'],
-    baseEffectivenessScore: 0.6,
-    domainWeight: 0.15,
-    modeWeight: 0.25,
-    modelWeight: 0.15,
-    complexityWeight: 0.2,
-    taskTypeWeight: 0.15,
-    feedbackWeight: 0.1,
-    totalUses: 312,
-    successfulUses: 287,
-    avgFeedbackScore: 4.6,
-    isActive: true,
-    isDefault: true,
-  },
-  {
-    id: '3',
-    templateCode: 'coding_expert',
-    name: 'Coding Expert',
-    description: 'Code generation and debugging',
-    systemPrompt: 'You are an expert software engineer with mastery of multiple programming languages...',
-    applicableModes: ['coding'],
-    applicableDomains: [],
-    applicableTaskTypes: ['coding'],
-    complexityRange: ['simple', 'moderate', 'complex', 'expert'],
-    baseEffectivenessScore: 0.55,
-    domainWeight: 0.1,
-    modeWeight: 0.3,
-    modelWeight: 0.25,
-    complexityWeight: 0.15,
-    taskTypeWeight: 0.1,
-    feedbackWeight: 0.1,
-    totalUses: 245,
-    successfulUses: 221,
-    avgFeedbackScore: 4.5,
-    isActive: true,
-    isDefault: true,
-  },
-];
+// API base URL
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 // Chart colors
 const ATTRIBUTION_COLORS: Record<string, string> = {
@@ -302,23 +200,32 @@ export function PrepromptLearningClient() {
   const { data: dashboard, isLoading } = useQuery<PrepromptDashboard>({
     queryKey: ['preprompt-dashboard'],
     queryFn: async () => {
-      // In production: const res = await fetch('/api/admin/preprompts/dashboard');
-      return sampleDashboard;
+      const res = await fetch(`${API_BASE}/api/admin/preprompts/dashboard`);
+      if (!res.ok) throw new Error('Failed to fetch dashboard');
+      const { data } = await res.json();
+      return data;
     },
   });
 
   const { data: templates } = useQuery<PrepromptTemplate[]>({
     queryKey: ['preprompt-templates'],
     queryFn: async () => {
-      // In production: const res = await fetch('/api/admin/preprompts/templates');
-      return sampleTemplates;
+      const res = await fetch(`${API_BASE}/api/admin/preprompts/templates`);
+      if (!res.ok) throw new Error('Failed to fetch templates');
+      const { data } = await res.json();
+      return data ?? [];
     },
   });
 
   const updateWeightsMutation = useMutation({
     mutationFn: async (data: { templateId: string; weights: Record<string, number> }) => {
-      // In production: await fetch(`/api/admin/preprompts/templates/${data.templateId}/weights`, { method: 'PATCH', body: JSON.stringify(data.weights) });
-      console.log('Updating weights:', data);
+      const res = await fetch(`${API_BASE}/api/admin/preprompts/templates/${data.templateId}/weights`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data.weights),
+      });
+      if (!res.ok) throw new Error('Failed to update weights');
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['preprompt-templates'] });

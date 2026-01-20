@@ -469,7 +469,7 @@ export class ApiStack extends cdk.Stack {
     });
 
     // =========================================================================
-    // Metrics & Persistent Learning API (v4.18.56)
+    // Metrics & Persistent Learning API (v4.18.56) - Using proxy for efficiency
     // =========================================================================
     const metricsLambda = this.createLambda(
       'Metrics',
@@ -481,159 +481,18 @@ export class ApiStack extends cdk.Stack {
     );
     const metricsIntegration = new apigateway.LambdaIntegration(metricsLambda);
 
-    // Admin metrics endpoints
+    // Admin metrics - use proxy to reduce resource count
     const metrics = admin.addResource('metrics');
-    
-    // Dashboard and summary
-    metrics.addResource('dashboard').addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    metrics.addResource('summary').addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Billing metrics
-    const billingMetrics = metrics.addResource('billing');
-    billingMetrics.addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    billingMetrics.addMethod('POST', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Performance metrics
-    const performanceMetrics = metrics.addResource('performance');
-    performanceMetrics.addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    performanceMetrics.addMethod('POST', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    performanceMetrics.addResource('latency').addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Failures
-    const failures = metrics.addResource('failures');
-    failures.addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    failures.addMethod('POST', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    failures.addResource('{failureId}').addResource('resolve').addMethod('POST', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Violations
-    const violations = metrics.addResource('violations');
-    violations.addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    violations.addMethod('POST', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    violations.addResource('{violationId}').addResource('review').addMethod('POST', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Logs
-    const logs_resource = metrics.addResource('logs');
-    logs_resource.addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    logs_resource.addMethod('POST', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Learning endpoints
-    const learning = metrics.addResource('learning');
-    learning.addResource('influence').addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    const learningConfig = learning.addResource('config');
-    learningConfig.addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    learningConfig.addMethod('PUT', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    learning.addResource('tenant').addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    learning.addResource('global').addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    learning.addResource('model-performance').addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    learning.addResource('event').addMethod('POST', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    const userPreferences = learning.addResource('user-preferences');
-    userPreferences.addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    userPreferences.addMethod('POST', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Snapshots and recovery
-    const snapshots = learning.addResource('snapshots');
-    snapshots.addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    snapshots.addMethod('POST', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    snapshots.addResource('{snapshotId}').addResource('recover').addMethod('POST', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    learning.addResource('recovery-logs').addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Aggregate endpoints (super admin)
-    const aggregate = metrics.addResource('aggregate');
-    aggregate.addResource('tenants').addMethod('GET', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    aggregate.addResource('global-learning').addMethod('POST', metricsIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
+    metrics.addProxy({
+      defaultIntegration: metricsIntegration,
+      defaultMethodOptions: {
+        authorizer: adminAuthorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      },
     });
 
     // =========================================================================
-    // Genesis Cato Safety Architecture API (v4.18.56)
+    // Genesis Cato Safety Architecture API (v4.18.56) - Using proxy for efficiency
     // =========================================================================
     const catoLambda = this.createLambda(
       'Cato',
@@ -645,201 +504,53 @@ export class ApiStack extends cdk.Stack {
     );
     const catoIntegration = new apigateway.LambdaIntegration(catoLambda);
 
-    // Admin Cato endpoints
+    // Admin Cato - use proxy to reduce resource count
     const cato = admin.addResource('cato');
-    
-    // Dashboard
-    cato.addResource('dashboard').addMethod('GET', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Metrics
-    cato.addResource('metrics').addMethod('GET', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    cato.addResource('recovery-effectiveness').addMethod('GET', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Personas (Moods)
-    const catoPersonas = cato.addResource('personas');
-    catoPersonas.addMethod('GET', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    catoPersonas.addMethod('POST', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    const catoPersonaId = catoPersonas.addResource('{personaId}');
-    catoPersonaId.addMethod('GET', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    catoPersonaId.addMethod('PUT', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Control Barrier Functions (CBF)
-    const catoCbf = cato.addResource('cbf');
-    catoCbf.addMethod('GET', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    catoCbf.addResource('violations').addMethod('GET', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Escalations
-    const catoEscalations = cato.addResource('escalations');
-    catoEscalations.addMethod('GET', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    catoEscalations.addResource('{escalationId}').addResource('respond').addMethod('POST', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Audit Trail
-    const catoAudit = cato.addResource('audit');
-    catoAudit.addMethod('GET', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    catoAudit.addResource('search').addMethod('POST', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    catoAudit.addResource('verify').addMethod('POST', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Veto Management
-    const catoVeto = cato.addResource('veto');
-    catoVeto.addResource('active').addMethod('GET', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    catoVeto.addResource('activate').addMethod('POST', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    catoVeto.addResource('deactivate').addMethod('POST', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Recovery
-    cato.addResource('recovery').addMethod('GET', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Configuration
-    const catoConfig = cato.addResource('config');
-    catoConfig.addMethod('GET', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    catoConfig.addMethod('PUT', catoIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
+    cato.addProxy({
+      defaultIntegration: catoIntegration,
+      defaultMethodOptions: {
+        authorizer: adminAuthorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      },
     });
 
     // =========================================================================
-    // Artifact Engine API (v4.19.0) - GenUI Pipeline
+    // Think Tank API (v4.18.0) - Consolidated router for all Think Tank endpoints
     // =========================================================================
-    const artifactEngineLambda = this.createLambda(
-      'ArtifactEngine',
-      'thinktank/artifact-engine.handler',
+    const thinktankLambda = this.createLambda(
+      'Thinktank',
+      'thinktank/handler.handler',
       commonEnv,
       vpc,
       apiSecurityGroup,
       lambdaRole
     );
-    const artifactEngineIntegration = new apigateway.LambdaIntegration(artifactEngineLambda);
+    const thinktankIntegration = new apigateway.LambdaIntegration(thinktankLambda);
 
-    // Think Tank artifact routes
+    // Think Tank routes - consolidated proxy handles all /thinktank/* paths
     const thinktank = v2.addResource('thinktank');
-    const artifacts = thinktank.addResource('artifacts');
-
-    // POST /api/v2/thinktank/artifacts/generate - Start artifact generation
-    artifacts.addResource('generate').addMethod('POST', artifactEngineIntegration, {
-      authorizer: cognitoAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
+    thinktank.addProxy({
+      defaultIntegration: thinktankIntegration,
+      defaultMethodOptions: {
+        authorizer: cognitoAuthorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      },
     });
 
-    // GET /api/v2/thinktank/artifacts/patterns - Get available code patterns
-    artifacts.addResource('patterns').addMethod('GET', artifactEngineIntegration, {
-      authorizer: cognitoAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // GET /api/v2/thinktank/artifacts/allowlist - Get dependency allowlist
-    artifacts.addResource('allowlist').addMethod('GET', artifactEngineIntegration, {
-      authorizer: cognitoAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Session routes
-    const artifactSessions = artifacts.addResource('sessions');
-    const artifactSession = artifactSessions.addResource('{sessionId}');
-
-    // GET /api/v2/thinktank/artifacts/sessions/{sessionId} - Get session status
-    artifactSession.addMethod('GET', artifactEngineIntegration, {
-      authorizer: cognitoAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // GET /api/v2/thinktank/artifacts/sessions/{sessionId}/logs - Get session logs
-    artifactSession.addResource('logs').addMethod('GET', artifactEngineIntegration, {
-      authorizer: cognitoAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Admin artifact-engine routes
+    // Admin artifact-engine routes - use Think Tank handler (routes to artifact-engine internally)
     const artifactEngineAdmin = admin.addResource('artifact-engine');
-
-    // GET /api/v2/admin/artifact-engine/dashboard - Full dashboard data
-    artifactEngineAdmin.addResource('dashboard').addMethod('GET', artifactEngineIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
+    artifactEngineAdmin.addProxy({
+      defaultIntegration: thinktankIntegration,
+      defaultMethodOptions: {
+        authorizer: adminAuthorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      },
     });
 
-    // GET /api/v2/admin/artifact-engine/metrics - Generation metrics
-    artifactEngineAdmin.addResource('metrics').addMethod('GET', artifactEngineIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Validation rules
-    const validationRules = artifactEngineAdmin.addResource('validation-rules');
-    validationRules.addMethod('GET', artifactEngineIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    validationRules.addResource('{ruleId}').addMethod('PUT', artifactEngineIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-
-    // Admin allowlist management
-    const adminAllowlist = artifactEngineAdmin.addResource('allowlist');
-    adminAllowlist.addMethod('POST', artifactEngineIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
-    adminAllowlist.addResource('{packageName}').addMethod('DELETE', artifactEngineIntegration, {
-      authorizer: adminAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
+    // =========================================================================
+    // Think Tank Admin API - Deployed in separate ThinkTankAdminApiStack
+    // to avoid CloudFormation 500 resource limit
+    // =========================================================================
 
     // Outputs
     new cdk.CfnOutput(this, 'ApiUrl', {

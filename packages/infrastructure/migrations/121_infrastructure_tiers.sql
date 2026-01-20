@@ -1,5 +1,5 @@
 -- Migration: 121_infrastructure_tiers
--- Description: Infrastructure tier configuration system for Bobble
+-- Description: Infrastructure tier configuration system for RADIANT
 -- 
 -- This creates the database tables for managing admin-configurable
 -- infrastructure tiers (DEV, STAGING, PRODUCTION) with full audit trail.
@@ -8,7 +8,7 @@
 -- Infrastructure Tier State
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS bobble_infrastructure_tier (
+CREATE TABLE IF NOT EXISTS infrastructure_tier (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     
@@ -40,14 +40,14 @@ CREATE TABLE IF NOT EXISTS bobble_infrastructure_tier (
 );
 
 -- Index for lookups
-CREATE INDEX idx_infrastructure_tier_tenant ON bobble_infrastructure_tier(tenant_id);
-CREATE INDEX idx_infrastructure_tier_status ON bobble_infrastructure_tier(transition_status);
+CREATE INDEX idx_infrastructure_tier_tenant ON infrastructure_tier(tenant_id);
+CREATE INDEX idx_infrastructure_tier_status ON infrastructure_tier(transition_status);
 
 -- ============================================================================
 -- Tier Configuration Templates
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS bobble_tier_config (
+CREATE TABLE IF NOT EXISTS tier_config (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     
@@ -126,14 +126,14 @@ CREATE TABLE IF NOT EXISTS bobble_tier_config (
 );
 
 -- Index for tier lookups
-CREATE INDEX idx_tier_config_tenant ON bobble_tier_config(tenant_id);
-CREATE INDEX idx_tier_config_name ON bobble_tier_config(tier_name);
+CREATE INDEX idx_tier_config_tenant ON tier_config(tenant_id);
+CREATE INDEX idx_tier_config_name ON tier_config(tier_name);
 
 -- ============================================================================
 -- Tier Change Audit Log
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS bobble_tier_change_log (
+CREATE TABLE IF NOT EXISTS tier_change_log (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     
@@ -168,15 +168,15 @@ CREATE TABLE IF NOT EXISTS bobble_tier_change_log (
 );
 
 -- Index for audit queries
-CREATE INDEX idx_tier_change_log_tenant ON bobble_tier_change_log(tenant_id);
-CREATE INDEX idx_tier_change_log_status ON bobble_tier_change_log(status);
-CREATE INDEX idx_tier_change_log_date ON bobble_tier_change_log(created_at DESC);
+CREATE INDEX idx_tier_change_log_tenant ON tier_change_log(tenant_id);
+CREATE INDEX idx_tier_change_log_status ON tier_change_log(status);
+CREATE INDEX idx_tier_change_log_date ON tier_change_log(created_at DESC);
 
 -- ============================================================================
 -- Resource Inventory (tracks what's provisioned)
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS bobble_resource_inventory (
+CREATE TABLE IF NOT EXISTS resource_inventory (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     
@@ -205,30 +205,30 @@ CREATE TABLE IF NOT EXISTS bobble_resource_inventory (
 );
 
 -- Index for resource lookups
-CREATE INDEX idx_resource_inventory_tenant ON bobble_resource_inventory(tenant_id);
-CREATE INDEX idx_resource_inventory_type ON bobble_resource_inventory(resource_type);
-CREATE INDEX idx_resource_inventory_status ON bobble_resource_inventory(status);
+CREATE INDEX idx_resource_inventory_tenant ON resource_inventory(tenant_id);
+CREATE INDEX idx_resource_inventory_type ON resource_inventory(resource_type);
+CREATE INDEX idx_resource_inventory_status ON resource_inventory(status);
 
 -- ============================================================================
 -- Row Level Security
 -- ============================================================================
 
-ALTER TABLE bobble_infrastructure_tier ENABLE ROW LEVEL SECURITY;
-ALTER TABLE bobble_tier_config ENABLE ROW LEVEL SECURITY;
-ALTER TABLE bobble_tier_change_log ENABLE ROW LEVEL SECURITY;
-ALTER TABLE bobble_resource_inventory ENABLE ROW LEVEL SECURITY;
+ALTER TABLE infrastructure_tier ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tier_config ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tier_change_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE resource_inventory ENABLE ROW LEVEL SECURITY;
 
 -- Policies for tenant isolation
-CREATE POLICY bobble_infrastructure_tier_tenant_policy ON bobble_infrastructure_tier
+CREATE POLICY infrastructure_tier_tenant_policy ON infrastructure_tier
     FOR ALL USING (tenant_id = current_setting('app.current_tenant_id')::uuid);
 
-CREATE POLICY bobble_tier_config_tenant_policy ON bobble_tier_config
+CREATE POLICY tier_config_tenant_policy ON tier_config
     FOR ALL USING (tenant_id = current_setting('app.current_tenant_id')::uuid);
 
-CREATE POLICY bobble_tier_change_log_tenant_policy ON bobble_tier_change_log
+CREATE POLICY tier_change_log_tenant_policy ON tier_change_log
     FOR ALL USING (tenant_id = current_setting('app.current_tenant_id')::uuid);
 
-CREATE POLICY bobble_resource_inventory_tenant_policy ON bobble_resource_inventory
+CREATE POLICY resource_inventory_tenant_policy ON resource_inventory
     FOR ALL USING (tenant_id = current_setting('app.current_tenant_id')::uuid);
 
 -- ============================================================================
@@ -239,7 +239,7 @@ CREATE OR REPLACE FUNCTION create_default_tier_configs(p_tenant_id UUID)
 RETURNS void AS $$
 BEGIN
     -- DEV Tier (~$350/month)
-    INSERT INTO bobble_tier_config (
+    INSERT INTO tier_config (
         tenant_id, tier_name, display_name, description, is_default,
         estimated_monthly_cost,
         sagemaker_shadow_self_instance_type, sagemaker_shadow_self_min_instances,
@@ -267,7 +267,7 @@ BEGIN
     ) ON CONFLICT (tenant_id, tier_name) DO NOTHING;
     
     -- STAGING Tier (~$35K/month)
-    INSERT INTO bobble_tier_config (
+    INSERT INTO tier_config (
         tenant_id, tier_name, display_name, description, is_default,
         estimated_monthly_cost,
         sagemaker_shadow_self_instance_type, sagemaker_shadow_self_min_instances,
@@ -295,7 +295,7 @@ BEGIN
     ) ON CONFLICT (tenant_id, tier_name) DO NOTHING;
     
     -- PRODUCTION Tier (~$750K/month)
-    INSERT INTO bobble_tier_config (
+    INSERT INTO tier_config (
         tenant_id, tier_name, display_name, description, is_default,
         estimated_monthly_cost,
         sagemaker_shadow_self_instance_type, sagemaker_shadow_self_min_instances,
@@ -336,7 +336,7 @@ BEGIN
     PERFORM create_default_tier_configs(NEW.id);
     
     -- Also create initial tier state
-    INSERT INTO bobble_infrastructure_tier (tenant_id, current_tier, estimated_monthly_cost)
+    INSERT INTO infrastructure_tier (tenant_id, current_tier, estimated_monthly_cost)
     VALUES (NEW.id, 'DEV', 350.00)
     ON CONFLICT (tenant_id) DO NOTHING;
     
@@ -353,7 +353,7 @@ $$ LANGUAGE plpgsql;
 -- Comments
 -- ============================================================================
 
-COMMENT ON TABLE bobble_infrastructure_tier IS 'Current infrastructure tier state per tenant';
-COMMENT ON TABLE bobble_tier_config IS 'Tier configuration templates (admin-editable)';
-COMMENT ON TABLE bobble_tier_change_log IS 'Audit log of all tier changes';
-COMMENT ON TABLE bobble_resource_inventory IS 'Inventory of provisioned resources per tier';
+COMMENT ON TABLE infrastructure_tier IS 'Current infrastructure tier state per tenant';
+COMMENT ON TABLE tier_config IS 'Tier configuration templates (admin-editable)';
+COMMENT ON TABLE tier_change_log IS 'Audit log of all tier changes';
+COMMENT ON TABLE resource_inventory IS 'Inventory of provisioned resources per tier';

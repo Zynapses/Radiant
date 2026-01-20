@@ -118,6 +118,19 @@ This guide covers administrative features specific to **Think Tank**, the consum
     - [37.6 Database Tables](#376-database-tables)
     - [37.7 API Endpoints](#377-api-endpoints)
     - [37.8 Implementation Files](#378-implementation-files)
+39. [Liquid Interface (Generative UI)](#39-liquid-interface-generative-ui)
+    - [39.1 Overview](#391-overview)
+    - [39.2 Architecture](#392-architecture)
+    - [39.3 Component Registry](#393-component-registry)
+    - [39.4 Ghost State (Two-Way Binding)](#394-ghost-state-two-way-binding)
+    - [39.5 Intent Detection](#395-intent-detection)
+    - [39.6 Eject to App](#396-eject-to-app)
+    - [39.7 Configuration](#397-configuration)
+    - [39.8 API Endpoints](#398-api-endpoints)
+    - [39.9 Database Tables](#399-database-tables)
+    - [39.10 Implementation Files](#3910-implementation-files)
+43. [Concurrent Task Execution (Moat #17)](#43-concurrent-task-execution-moat-17)
+44. [Structure from Chaos Synthesis (Moat #20)](#44-structure-from-chaos-synthesis-moat-20)
 
 ---
 
@@ -331,20 +344,211 @@ Think Tank's canvas feature for interactive content creation.
 
 ## 9. Collaboration Features
 
-Multi-user collaboration in Think Tank.
+Multi-user collaboration in Think Tank with novel enhanced features.
 
-### 9.1 Features
+### 9.1 Core Features
 
-- Shared conversations
-- Real-time co-editing
-- Team workspaces
-- Permission management
+- **Shared Conversations**: Real-time collaborative chat sessions
+- **Real-time Co-editing**: Live presence indicators, cursors, typing status
+- **Team Workspaces**: Organize sessions by team/project
+- **Permission Management**: Viewer, Commenter, Editor roles
 
-### 9.2 Admin Configuration
+### 9.2 Enhanced Collaboration (v4.18.0+)
 
-- Enable/disable collaboration
-- Set sharing defaults
-- Configure team limits
+#### 9.2.1 Cross-Tenant Guest Access
+
+Allow collaborators from outside your organization to join sessions.
+
+| Feature | Description |
+|---------|-------------|
+| **Guest Invites** | Generate shareable invite links with permissions |
+| **Permission Levels** | viewer, commenter, editor for guests |
+| **Expiring Links** | Set expiration time (default: 7 days) |
+| **Max Uses** | Limit how many times a link can be used |
+| **Viral Tracking** | Track referrals and guest-to-paid conversions |
+
+**API Endpoints:**
+- `POST /api/thinktank/collaboration/invites` - Create guest invite
+- `GET /api/thinktank/collaboration/invites/:token` - Validate invite
+- `POST /api/thinktank/collaboration/guests/join` - Join as guest
+
+#### 9.2.2 AI Facilitator Mode
+
+An AI moderator that guides collaborative sessions.
+
+| Setting | Description |
+|---------|-------------|
+| **Session Objective** | What the session should accomplish |
+| **Facilitator Persona** | professional, casual, academic, creative, socratic, coach |
+| **Auto-Summarize** | Periodically summarize discussion |
+| **Auto Action Items** | Extract action items from conversation |
+| **Ensure Participation** | Prompt quiet participants to contribute |
+| **Keep On-Topic** | Redirect off-topic discussions |
+
+**Intervention Types:**
+- `summary` - Periodic summaries
+- `question` - Probing questions to deepen discussion
+- `redirect` - Steer back to topic
+- `encourage` - Encourage participation
+- `clarify` - Ask for clarification
+- `synthesize` - Combine different viewpoints
+- `conclude` - Wrap up discussion points
+
+#### 9.2.3 Branch & Merge Conversations
+
+Explore alternative discussion paths without losing the main thread.
+
+| Feature | Description |
+|---------|-------------|
+| **Create Branch** | Fork conversation at any point |
+| **Exploration Hypothesis** | Document what the branch explores |
+| **Branch Status** | active, merged, abandoned |
+| **Merge Request** | Propose merging insights back to main |
+| **AI Summary** | Auto-generated summary of branch conclusions |
+
+**Merge Request Workflow:**
+1. Create branch with hypothesis
+2. Explore alternative direction
+3. Submit merge request with conclusion
+4. Participants vote to approve/reject
+5. Merged insights appear in main conversation
+
+#### 9.2.4 Time-Shifted Playback
+
+Asynchronous participation through session recordings.
+
+| Feature | Description |
+|---------|-------------|
+| **Session Recording** | Record full session with events |
+| **Playback Controls** | Play, pause, speed (0.5x-2x), seek |
+| **AI Key Moments** | Auto-detected important moments |
+| **Async Annotations** | Add comments at specific timestamps |
+| **Media Notes** | Voice/video annotations stored in S3 |
+
+**Recording Types:**
+- `full` - Complete session recording
+- `highlights` - AI-curated key moments only
+- `summary` - AI-generated session summary
+
+#### 9.2.5 AI Roundtable (Multi-Model Debate)
+
+Multiple AI models debate a topic and synthesize insights.
+
+| Setting | Description |
+|---------|-------------|
+| **Topic** | The subject of debate |
+| **Debate Style** | collaborative, adversarial, socratic, brainstorm, devils_advocate |
+| **Max Rounds** | Number of debate rounds (default: 5) |
+| **Time Limit** | Per-round time limit in seconds |
+| **Synthesis Model** | Model that synthesizes final conclusions |
+
+**Participating Models:**
+Each model can have a persona and role:
+- `persona` - Character the model adopts
+- `role` - Function in the debate (analyst, critic, synthesizer)
+- `color` - Visual identifier in UI
+
+**Output:**
+- Per-model contributions with responding_to references
+- Final synthesis with consensus points
+- Disagreement points highlighted
+- Actionable recommendations
+
+#### 9.2.6 Shared Knowledge Graph
+
+Visualize collective understanding as an interactive graph.
+
+| Node Type | Description |
+|-----------|-------------|
+| `concept` | Abstract idea or topic |
+| `fact` | Verified information |
+| `question` | Open question |
+| `decision` | Decision made |
+| `action_item` | Task to complete |
+| `person` | Person mentioned |
+| `resource` | External resource |
+
+**Edge Types:**
+- `relates_to` - General relationship
+- `supports` - Evidence supporting
+- `contradicts` - Conflicting information
+- `leads_to` - Causal relationship
+- `depends_on` - Dependency
+- `answers` - Answer to question
+- `part_of` - Component relationship
+
+**AI Features:**
+- Auto-extract nodes from conversation
+- Suggest missing connections
+- Identify knowledge gaps
+- Generate graph-based summaries
+
+### 9.3 Attachment Storage
+
+Large attachments are stored in S3 with automatic cleanup.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `maxFileSizeMb` | 100 | Maximum file size |
+| `allowedTypes` | image/*, video/*, audio/*, application/pdf | Allowed MIME types |
+| `retentionDays` | 90 | Days before cleanup |
+
+**S3 Bucket:** `radiant-collaboration-assets` (configurable via env)
+
+**Cleanup:** Database triggers automatically delete S3 objects when attachment records are deleted.
+
+### 9.4 Admin Configuration
+
+| Setting | Description |
+|---------|-------------|
+| `enableGuestAccess` | Allow cross-tenant guests |
+| `maxGuestsPerSession` | Maximum guests per session |
+| `defaultGuestPermission` | Default permission for guests |
+| `enableFacilitator` | Enable AI facilitator feature |
+| `enableBranching` | Enable branch & merge |
+| `enableRecordings` | Enable session recordings |
+| `enableRoundtable` | Enable AI roundtable |
+| `enableKnowledgeGraph` | Enable knowledge graph |
+
+### 9.5 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `collaboration_guest_invites` | Guest invite tokens |
+| `collaboration_guests` | Guest participants |
+| `collaboration_facilitator_config` | AI facilitator settings |
+| `collaboration_facilitator_interventions` | Facilitator actions log |
+| `collaboration_branches` | Conversation branches |
+| `collaboration_merge_requests` | Branch merge proposals |
+| `collaboration_recordings` | Session recordings |
+| `collaboration_media_notes` | Voice/video annotations |
+| `collaboration_async_annotations` | Async comments |
+| `collaboration_ai_roundtables` | Multi-model debates |
+| `collaboration_roundtable_contributions` | Model contributions |
+| `collaboration_knowledge_graphs` | Knowledge graphs |
+| `collaboration_knowledge_nodes` | Graph nodes |
+| `collaboration_knowledge_edges` | Graph edges |
+| `collaboration_attachments` | File attachments |
+
+### 9.6 UI Components
+
+**Location:** `apps/admin-dashboard/components/collaboration/`
+
+| Component | Purpose |
+|-----------|---------|
+| `EnhancedCollaborativeSession.tsx` | Main session container |
+| `panels/ChatPanel.tsx` | Real-time chat interface |
+| `panels/BranchPanel.tsx` | Branch management |
+| `panels/RoundtablePanel.tsx` | AI roundtable interface |
+| `panels/KnowledgeGraphPanel.tsx` | Graph visualization |
+| `panels/PlaybackPanel.tsx` | Recording playback |
+| `ParticipantsSidebar.tsx` | Participant list with presence |
+| `dialogs/InviteDialog.tsx` | Guest invite creation |
+| `dialogs/FacilitatorSettingsDialog.tsx` | AI facilitator config |
+
+**Routes:**
+- `/thinktank/collaborate/enhanced?session={id}` - Enhanced session view
+- `/collaborate/join/{token}` - Guest join page
 
 ---
 
@@ -6700,6 +6904,1526 @@ Base: `/api/thinktank/security`
 | `migrations/165_agentic_orchestration.sql` | Database schema |
 | `config/security/ssf-events.yaml` | SSF event definitions |
 | `config/security/caep-policies.yaml` | CAEP policy configuration |
+
+---
+
+## 38. Advanced Features (v4.18.0)
+
+This section covers new advanced features implemented for Think Tank.
+
+### 38.1 Flash Facts (Knowledge Sparks)
+
+Fast-access factual memory system for quick retrieval of verified facts.
+
+**UI Metaphor: "Knowledge Sparks"** - Contextual sidebar widget showing relevant facts as glowing spark icons.
+
+**Features:**
+- CRUD operations for facts with confidence scoring
+- Semantic search using vector embeddings
+- Automatic fact extraction from conversations
+- Fact verification workflow
+- Usage tracking and statistics
+
+**API Endpoints (Base: `/api/thinktank/flash-facts`):**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | List facts with filtering |
+| POST | `/` | Create a new fact |
+| GET | `/:id` | Get a specific fact |
+| PUT | `/:id` | Update a fact |
+| DELETE | `/:id` | Delete a fact |
+| POST | `/query` | Semantic search for facts |
+| POST | `/extract` | Extract facts from conversation |
+| POST | `/:id/verify` | Verify a fact |
+| GET | `/stats` | Get usage statistics |
+
+**Database Tables:**
+- `flash_facts` - Fact storage with embeddings
+- `flash_facts_config` - Per-tenant configuration
+
+---
+
+### 38.2 Grimoire (Spell Book)
+
+Procedural memory system for storing and executing reusable patterns.
+
+**UI Metaphor: "Spell Book"** - Magical tome with spell cards organized by schools of magic.
+
+**Schools of Magic:**
+| School | Icon | Purpose |
+|--------|------|---------|
+| Code | 💻 | Programming patterns |
+| Data | 📊 | Data manipulation |
+| Text | 📝 | Text processing |
+| Analysis | 🔍 | Analytical methods |
+| Design | 🎨 | UI/UX patterns |
+| Integration | 🔗 | API integrations |
+| Automation | ⚙️ | Workflow automation |
+| Universal | 🌟 | Cross-domain spells |
+
+**Spell Categories:**
+- Transformation, Divination, Conjuration, Abjuration
+- Enchantment, Illusion, Necromancy, Evocation
+
+**API Endpoints (Base: `/api/thinktank/grimoire`):**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Get grimoire overview |
+| GET | `/spells` | List all spells |
+| POST | `/spells` | Create a new spell |
+| GET | `/spells/:id` | Get spell details |
+| PUT | `/spells/:id` | Update a spell |
+| DELETE | `/spells/:id` | Delete a spell |
+| POST | `/spells/:id/cast` | Cast a spell |
+| POST | `/spells/:id/learn` | Learn from failure |
+| GET | `/schools` | Get schools of magic |
+| GET | `/categories` | Get spell categories |
+| POST | `/match` | Find matching spell |
+| POST | `/promote` | Promote pattern to spell |
+
+---
+
+### 38.3 Economic Governor (Fuel Gauge)
+
+Model arbitrage and cost optimization system.
+
+**UI Metaphor: "Fuel Gauge"** - Visual meter showing budget remaining with color-coded status.
+
+**Governor Modes:**
+| Mode | Description |
+|------|-------------|
+| `cost_minimizer` | Always cheapest viable option |
+| `quality_maximizer` | Best quality within budget |
+| `balanced` | Balance cost and quality |
+| `latency_focused` | Prioritize response speed |
+| `custom` | Use custom arbitrage rules |
+
+**Model Tiers:**
+- Economy (🌱) - Cheapest, simple tasks
+- Self-Hosted (🏠) - On-premise models
+- Standard (📊) - Default tier
+- Premium (💎) - Higher quality
+- Flagship (🚀) - Best available
+
+**API Endpoints (Base: `/api/thinktank/governor`):**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Get dashboard with fuel gauge |
+| GET | `/config` | Get configuration |
+| PUT | `/config` | Update configuration |
+| PUT | `/mode` | Quick mode switch |
+| POST | `/recommend` | Get model recommendation |
+| GET | `/metrics` | Get cost metrics |
+| GET | `/budget` | Get budget status |
+| PUT | `/budget` | Update budget limit |
+| GET | `/tiers` | Get model tiers |
+| PUT | `/tiers/:tier` | Update tier config |
+| GET | `/rules` | Get arbitrage rules |
+| POST | `/rules` | Add arbitrage rule |
+| PUT | `/rules/:id` | Update rule |
+| DELETE | `/rules/:id` | Delete rule |
+
+---
+
+### 38.4 Sentinel Agents (Watchtower Dashboard)
+
+Event-driven autonomous agents for monitoring and automation.
+
+**UI Metaphor: "Watchtower Dashboard"** - Castle towers watching over different domains.
+
+**Agent Types:**
+| Type | Icon | Purpose |
+|------|------|---------|
+| Monitor | 👁️ | Passive watchdog - observes and alerts |
+| Guardian | 🛡️ | Protective - can block harmful actions |
+| Scout | 🔭 | Proactive information gathering |
+| Herald | 📯 | Notifications and announcements |
+| Arbiter | ⚖️ | Decision making and routing |
+
+**Agent Status:**
+- Idle (⚪), Watching (🟢), Triggered (🟡), Cooldown (🔵), Disabled (🔴)
+
+**API Endpoints (Base: `/api/thinktank/sentinels`):**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | List all agents |
+| POST | `/` | Create agent |
+| GET | `/:id` | Get agent details |
+| PUT | `/:id` | Update agent |
+| DELETE | `/:id` | Delete agent |
+| POST | `/:id/trigger` | Manually trigger |
+| POST | `/:id/enable` | Enable agent |
+| POST | `/:id/disable` | Disable agent |
+| GET | `/:id/events` | Get agent events |
+| GET | `/events` | All events |
+| GET | `/stats` | Statistics |
+| GET | `/types` | Available types |
+
+---
+
+### 38.5 Time-Travel Debugging (Timeline Scrubber)
+
+Conversation forking and state replay system.
+
+**UI Metaphor: "Timeline Scrubber"** - Horizontal timeline with draggable playhead and fork points.
+
+**Checkpoint Types:**
+| Type | Icon | Description |
+|------|------|-------------|
+| Auto | ⚪ | Automatic checkpoint |
+| Manual | 📍 | User-created |
+| Fork | 🌿 | Branch point |
+| Merge | 🔀 | Merged timelines |
+| Rollback | ⏪ | After rollback |
+
+**API Endpoints (Base: `/api/thinktank/time-travel`):**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/timelines` | List timelines |
+| POST | `/timelines` | Create timeline |
+| GET | `/timelines/:id` | Get timeline view |
+| POST | `/timelines/:id/checkpoint` | Create checkpoint |
+| POST | `/timelines/:id/jump` | Jump to checkpoint |
+| POST | `/timelines/:id/fork` | Fork timeline |
+| POST | `/timelines/:id/replay` | Replay sequence |
+| GET | `/checkpoints/:id` | Get checkpoint |
+
+---
+
+### 38.6 Council of Rivals (Debate Arena)
+
+Multi-model adversarial consensus system.
+
+**UI Metaphor: "Debate Arena"** - Amphitheater with model avatars debating in a circular arrangement.
+
+**Member Roles:**
+| Role | Icon | Purpose |
+|------|------|---------|
+| Advocate | 📣 | Argues for a position |
+| Critic | 🔍 | Challenges positions |
+| Synthesizer | 🔮 | Combines perspectives |
+| Specialist | 🎓 | Domain expert |
+| Contrarian | 😈 | Devil's advocate |
+
+**Preset Councils:**
+- **Balanced** (⚖️) - Diverse perspectives
+- **Technical** (🔧) - Expert technical review
+- **Creative** (🎨) - Creative exploration
+
+**Verdict Outcomes:**
+- Consensus (🤝), Majority (✋), Split (⚖️), Deadlock (🔒), Synthesized (🔮)
+
+**API Endpoints (Base: `/api/thinktank/council`):**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | List councils |
+| POST | `/` | Create council |
+| POST | `/preset` | Create preset council |
+| GET | `/:id` | Get council |
+| PUT | `/:id` | Update council |
+| DELETE | `/:id` | Delete council |
+| POST | `/:id/debate` | Start debate |
+| GET | `/debate/:id` | Get debate |
+| POST | `/debate/:id/argument` | Submit argument |
+| POST | `/debate/:id/rebuttal` | Submit rebuttal |
+| POST | `/debate/:id/vote` | Conduct voting |
+| GET | `/presets` | Get preset options |
+
+---
+
+### 38.7 Security Signals (Security Shield)
+
+SSF/CAEP integration for identity security events.
+
+**UI Metaphor: "Security Shield"** - Animated shield with real-time threat visualization.
+
+**Signal Types:**
+| Type | Icon | Description |
+|------|------|-------------|
+| Session Revoked | 🔐 | SSF session terminated |
+| Credential Change | 🔑 | Password/key changed |
+| Device Compliance | 📱 | CAEP compliance change |
+| Risk Change | 📊 | Risk level changed |
+| Anomaly Detected | 🔍 | Behavioral anomaly |
+| Threat Detected | ⚠️ | Active threat |
+| Policy Violation | 🚫 | Policy breach |
+
+**Severity Levels:** Critical (🔴), High (🟠), Medium (🟡), Low (🟢), Info (🔵)
+
+**API Endpoints (Base: `/api/thinktank/security`):**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/dashboard` | Security dashboard |
+| GET | `/signals` | List signals |
+| POST | `/signals` | Create signal |
+| GET | `/signals/:id` | Get signal |
+| PUT | `/signals/:id/status` | Update status |
+| GET | `/policies` | List policies |
+| POST | `/policies` | Create policy |
+| PUT | `/policies/:id` | Update policy |
+| DELETE | `/policies/:id` | Delete policy |
+| POST | `/ssf/event` | Ingest SSF event |
+| POST | `/caep/event` | Ingest CAEP event |
+
+---
+
+### 38.8 Policy Framework (Stance Compass)
+
+Strategic intelligence and regulatory stance configuration.
+
+**UI Metaphor: "Stance Compass"** - Radial chart showing policy positions across domains.
+
+**Policy Domains:**
+| Domain | Icon | Description |
+|--------|------|-------------|
+| AI Safety | 🤖 | AI alignment and safety |
+| Data Privacy | 🔒 | Data protection regulations |
+| Content Moderation | 📝 | Content policies |
+| Accessibility | ♿ | Accessibility requirements |
+| Sustainability | 🌱 | Environmental considerations |
+| Security | 🛡️ | Cybersecurity posture |
+| Transparency | 👁️ | AI transparency |
+| Ethics | ⚖️ | Ethical AI principles |
+| Compliance | 📋 | Regulatory compliance |
+| Innovation | 💡 | Innovation balance |
+
+**Stance Positions:**
+- Restrictive (🔴), Cautious (🟠), Balanced (🟡), Permissive (🟢), Adaptive (🔵)
+
+**Preset Profiles:**
+- **Conservative** - Maximum safety, minimal risk
+- **Balanced** - Middle ground
+- **Innovative** - Emphasis on innovation
+
+**API Endpoints (Base: `/api/thinktank/policy`):**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/compass` | Get compass view |
+| GET | `/domains` | Get available domains |
+| GET | `/positions` | Get stance positions |
+| GET | `/stances` | List stances |
+| POST | `/stances` | Create stance |
+| GET | `/stances/:domain` | Get domain stance |
+| PUT | `/stances/:id` | Update stance |
+| GET | `/profiles` | List profiles |
+| GET | `/profiles/active` | Get active profile |
+| POST | `/profiles` | Create profile |
+| POST | `/profiles/preset` | Create preset profile |
+| PUT | `/profiles/:id/activate` | Activate profile |
+| GET | `/recommendations` | Get recommendations |
+| GET | `/compliance` | Check compliance |
+
+---
+
+### 38.9 Database Migration
+
+All features use migration `100_thinktank_advanced_features.sql` with the following tables:
+
+| Table | Feature |
+|-------|---------|
+| `flash_facts` | Flash Facts storage |
+| `flash_facts_config` | Flash Facts config |
+| `grimoire_spells` | Grimoire spells |
+| `grimoire_casts` | Spell cast history |
+| `grimoire_achievements` | User achievements |
+| `economic_governor_config` | Governor config |
+| `economic_governor_usage` | Usage tracking |
+| `sentinel_agents` | Sentinel agents |
+| `sentinel_events` | Agent events |
+| `time_travel_timelines` | Timelines |
+| `time_travel_checkpoints` | Checkpoints |
+| `time_travel_forks` | Fork records |
+| `council_of_rivals` | Councils |
+| `council_debates` | Debates |
+| `security_signals` | Security signals |
+| `security_policies` | Security policies |
+| `policy_stances` | Policy stances |
+| `policy_profiles` | Policy profiles |
+
+---
+
+## 39. Liquid Interface (Generative UI)
+
+### 39.1 Overview
+
+**"Don't Build the Tool. BE the Tool."**
+
+The Liquid Interface transforms the chat interface into dynamic, morphable UI tools based on user intent. Instead of asking "help me make a spreadsheet app," the chat *becomes* the spreadsheet.
+
+**Core Concept:**
+- User says: "Help me track my invoices"
+- Chat morphs into: Invoice tracker with data grid, totals, AI assistant sidebar
+- User interacts: Add, edit, filter invoices directly
+- AI watches: Ghost State binds UI actions to AI context
+- Export: "Eject" to a deployable Next.js/Vite app
+
+**Key Benefits:**
+- **Zero-friction prototyping** - Ideas become tools instantly
+- **Two-way AI binding** - AI sees what you're doing, UI reflects what AI knows
+- **Production export** - Ephemeral apps become real codebases
+- **50+ morphable components** - Data grids, charts, kanban, calendars, code editors
+
+---
+
+### 39.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        User Message                              │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Intent Detection                              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐             │
+│  │ data_analysis│  │  tracking   │  │visualization│   ...       │
+│  └─────────────┘  └─────────────┘  └─────────────┘             │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Schema Generation                             │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │ LiquidSchema {                                               ││
+│  │   layout: { type: 'split', children: [...] }                 ││
+│  │   bindings: [{ sourceComponent, contextKey, direction }]     ││
+│  │   aiOverlay: { mode: 'sidebar', position: 'right' }          ││
+│  │ }                                                            ││
+│  └─────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Liquid Renderer                               │
+│  ┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐                │
+│  │DataGrid│  │ Chart  │  │ Kanban │  │AI Chat │                │
+│  └────────┘  └────────┘  └────────┘  └────────┘                │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Ghost State Manager                           │
+│  UI Events ──► AI Context                                        │
+│  AI Updates ◄── UI Components                                    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 39.3 Component Registry
+
+**50+ pre-built morphable components** across 9 categories:
+
+| Category | Components | Description |
+|----------|------------|-------------|
+| **Data** (10) | DataGrid, PivotTable, DataCard, JSONViewer, SQLViewer, CSVEditor, DataFilter, SchemaDesigner, DataDiff, DataImport | Spreadsheets, tables, data viewers |
+| **Visualization** (10) | LineChart, BarChart, PieChart, ScatterPlot, AreaChart, Heatmap, Treemap, GeoMap, Timeline, SankeyDiagram | Charts, graphs, maps |
+| **Productivity** (10) | KanbanBoard, Calendar, GanttChart, TodoList, NotesEditor, Timer, HabitTracker, MindMap, Whiteboard, FileManager | Task & project management |
+| **Finance** (6) | Invoice, BudgetTracker, ExpenseTable, Portfolio, Calculator, CurrencyConverter | Financial tools |
+| **Code** (6) | CodeEditor, Terminal, DiffViewer, APITester, RegexTester, JSONFormatter | Developer tools |
+| **AI** (4) | AIChat, InsightCard, SuggestionPanel, ContextInspector | AI-powered widgets |
+| **Input** (4) | FormBuilder, SliderPanel, DateRangePicker, SearchBox | User input forms |
+
+**Component Definition:**
+```typescript
+interface LiquidComponent {
+  id: string;                    // e.g., 'data-grid'
+  name: string;                  // e.g., 'DataGrid'
+  category: ComponentCategory;   // e.g., 'data'
+  propsSchema: JSONSchema;       // Component props
+  eventsSchema: JSONSchema;      // Emitted events
+  supportsInteraction: boolean;
+  supportsDataBinding: boolean;
+  supportsAIContext: boolean;
+  defaultSize: { width, height };
+  icon: string;
+  tags: string[];
+}
+```
+
+---
+
+### 39.4 Ghost State (Two-Way Binding)
+
+**"The AI sees what you're doing. The UI reflects what AI knows."**
+
+Ghost State creates bidirectional bindings between UI components and AI context:
+
+```
+┌─────────────────┐                    ┌─────────────────┐
+│   UI Component  │◄────────────────►  │   AI Context    │
+│                 │                    │                 │
+│ selectedRow: 5  │   GhostBinding     │ user_selection  │
+│ filterValue: X  │ ────────────────►  │ applied_filter  │
+│                 │ ◄────────────────  │                 │
+│ [AI updates]    │   AI Reaction      │ insight: "..."  │
+└─────────────────┘                    └─────────────────┘
+```
+
+**Binding Configuration:**
+```typescript
+interface GhostBinding {
+  id: string;
+  sourceComponent: string;    // UI component ID
+  sourceProperty: string;     // e.g., 'selectedRow'
+  contextKey: string;         // AI context key
+  direction: 'ui_to_ai' | 'ai_to_ui' | 'bidirectional';
+  debounceMs?: number;        // Debounce rapid changes
+  triggerReaction?: boolean;  // Trigger AI response on change
+  reactionPrompt?: string;    // Custom prompt for reaction
+}
+```
+
+**AI Reactions:**
+When users interact with morphed UI, the AI can react with:
+- `speak` - Send a message
+- `update` - Update UI state
+- `morph` - Transform to different layout
+- `suggest` - Show suggestion panel
+
+---
+
+### 39.5 Intent Detection
+
+Intent detection determines when and how to morph the UI:
+
+| Intent Category | Trigger Phrases | Default Components |
+|-----------------|-----------------|-------------------|
+| `data_analysis` | spreadsheet, excel, csv, analyze data | DataGrid, PivotTable |
+| `tracking` | track invoices, manage expenses | Invoice, ExpenseTable, Kanban |
+| `visualization` | chart, graph, visualize, show metrics | LineChart, BarChart, Dashboard |
+| `planning` | plan project, timeline, kanban | KanbanBoard, GanttChart |
+| `calculation` | calculate, compute, formula | Calculator, DataGrid |
+| `design` | design, wireframe, brainstorm | Whiteboard, MindMap |
+| `coding` | code, debug, terminal | CodeEditor, Terminal |
+| `writing` | write, draft, notes | NotesEditor, MindMap |
+
+**Morph Threshold:** `confidence >= 0.85` (configurable per tenant)
+
+---
+
+### 39.6 Eject to App
+
+**"The Takeout Button"** - Export ephemeral liquid apps to real codebases.
+
+**Supported Frameworks:**
+- **Next.js 14** - Full-stack React with API routes
+- **Vite + React** - Fast client-side SPA
+- **Remix** - Web standards framework
+- **Astro** - Content-focused sites
+
+**Features to Include:**
+| Feature | Description |
+|---------|-------------|
+| `database` | PGLite → Postgres migration, Drizzle ORM |
+| `auth` | NextAuth scaffolding |
+| `api` | API routes for data operations |
+| `ai` | OpenAI integration |
+| `realtime` | WebSocket support |
+
+**Generated Files:**
+```
+my-liquid-app/
+├── package.json
+├── next.config.mjs / vite.config.ts
+├── tsconfig.json
+├── tailwind.config.ts
+├── app/page.tsx (or src/App.tsx)
+├── components/
+│   ├── LiquidLayout.tsx
+│   ├── DataGrid.tsx
+│   ├── ...
+├── store/index.ts (Zustand)
+├── types/index.ts
+├── lib/db.ts (if database)
+├── lib/ai.ts (if ai)
+├── README.md
+├── .env.example
+└── .gitignore
+```
+
+---
+
+### 39.7 Configuration
+
+**Per-Tenant Configuration:**
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | `true` | Enable Liquid Interface |
+| `auto_morph_enabled` | `true` | Auto-morph on high-confidence intent |
+| `eject_enabled` | `true` | Allow app export |
+| `morph_confidence_threshold` | `0.85` | Minimum confidence to morph |
+| `auto_revert_timeout_seconds` | `300` | Auto-revert to chat after inactivity |
+| `max_active_sessions` | `10` | Max concurrent liquid sessions |
+| `max_ghost_events_per_session` | `1000` | Event history limit |
+| `default_overlay_mode` | `sidebar` | AI overlay mode |
+| `default_overlay_position` | `right` | AI overlay position |
+
+---
+
+### 39.8 API Endpoints
+
+**Base: `/api/thinktank/liquid`**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| **Registry** | | |
+| GET | `/registry` | Get registry overview |
+| GET | `/registry/components` | List components (filter: `?category=`, `?q=`) |
+| GET | `/registry/components/:id` | Get component details |
+| **Sessions** | | |
+| POST | `/sessions` | Create new session |
+| GET | `/sessions/:id` | Get session |
+| **Morphing** | | |
+| POST | `/morph` | Process morph request |
+| POST | `/detect-intent` | Detect intent from message |
+| POST | `/sessions/:id/revert` | Revert to chat mode |
+| **Ghost State** | | |
+| POST | `/ghost/event` | Send ghost event |
+| GET | `/ghost/state/:sessionId` | Get ghost state snapshot |
+| POST | `/ghost/sync` | Sync multiple state updates |
+| GET | `/ghost/history/:sessionId` | Get event history |
+| GET | `/ghost/context/:sessionId` | Get AI context block |
+| **Eject** | | |
+| POST | `/eject` | Eject to app |
+| POST | `/eject/preview` | Preview eject |
+| **Analytics** | | |
+| GET | `/analytics/usage` | Component usage stats |
+
+---
+
+### 39.9 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `liquid_sessions` | Active liquid interface sessions |
+| `liquid_ghost_state` | Persisted ghost state bindings |
+| `liquid_ghost_events` | User interaction events |
+| `liquid_ai_reactions` | AI responses to events |
+| `liquid_eject_history` | App export history |
+| `liquid_component_usage` | Component analytics |
+| `liquid_intent_patterns` | Learnable intent patterns |
+| `liquid_config` | Per-tenant configuration |
+
+---
+
+### 39.10 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/liquid-interface.types.ts` | Type definitions |
+| `lambda/shared/services/liquid-interface/liquid-interface.service.ts` | Main service |
+| `lambda/shared/services/liquid-interface/ghost-state.service.ts` | Ghost state manager |
+| `lambda/shared/services/liquid-interface/eject.service.ts` | App export service |
+| `lambda/shared/services/liquid-interface/component-registry.ts` | 50+ components |
+| `lambda/thinktank/liquid-interface.ts` | API handler |
+| `migrations/161_liquid_interface.sql` | Database schema |
+
+---
+
+## 40. The Reality Engine
+
+> **"The Reality Engine transforms Think Tank from a chatbot into a shape-shifting command center with time travel, parallel universes, and telepathy."**
+
+The Reality Engine is the unified runtime powering Think Tank's supernatural capabilities. It consists of four interconnected features that solve the three fundamental anxieties preventing users from trusting AI with complex work: **Fear** (of breaking what works), **Commitment** (fear of choosing the wrong path), and **Latency** (waiting for the AI to think).
+
+### 40.1 Feature Overview
+
+| Feature | Emotion | Pitch |
+|---------|---------|-------|
+| **Morphic UI** | Flow | "Stop hunting for the right tool. Radiant is a Morphic Surface that shapeshifts instantly." |
+| **Reality Scrubber** | Invincibility | "We replaced 'Undo' with Time Travel. Scrub reality back to any point." |
+| **Quantum Futures** | Omniscience | "Why choose one strategy? Split the timeline and run both simultaneously." |
+| **Pre-Cognition** | Telepathy | "Radiant answers before you ask. It's not just fast; it's anticipatory." |
+
+### 40.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         THE REALITY ENGINE                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐     │
+│   │   MORPHIC UI     │    │ REALITY SCRUBBER │    │ QUANTUM FUTURES  │     │
+│   │   ════════════   │    │   ════════════   │    │   ════════════   │     │
+│   │                  │    │                  │    │                  │     │
+│   │ Intent Detection │    │ State Snapshots  │    │ Branch Manager   │     │
+│   │ Layout Engine    │    │ VFS + PGLite     │    │ Diff Engine      │     │
+│   │ Ghost State      │    │ Timeline UI      │    │ Collapse Logic   │     │
+│   │ Component Reg.   │    │ Bookmark System  │    │ Dream Archive    │     │
+│   │                  │    │                  │    │                  │     │
+│   └────────┬─────────┘    └────────┬─────────┘    └────────┬─────────┘     │
+│            │                       │                       │                │
+│            └───────────────────────┼───────────────────────┘                │
+│                                    │                                        │
+│                      ┌─────────────▼─────────────┐                          │
+│                      │      PRE-COGNITION        │                          │
+│                      │      ═══════════════      │                          │
+│                      │                           │                          │
+│                      │   Intent Prediction       │                          │
+│                      │   Solution Pre-Compute    │                          │
+│                      │   Genesis Model (Local)   │                          │
+│                      │   Instant Delivery        │                          │
+│                      │                           │                          │
+│                      └───────────────────────────┘                          │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 40.3 Morphic UI
+
+**"Stop hunting for the right tool. Radiant is a Morphic Surface that shapeshifts instantly."**
+
+The Morphic UI detects user intent and transforms the interface into the appropriate tool.
+
+#### Intent Categories
+
+| Intent | Detected Patterns | Morphs To |
+|--------|-------------------|-----------|
+| `data_analysis` | "analyze", "data", "statistics" | DataGrid, Charts |
+| `tracking` | "track", "manage", "organize" | Kanban, Calendar |
+| `visualization` | "visualize", "chart", "graph" | LineChart, PieChart, BarChart |
+| `planning` | "plan", "schedule", "timeline" | GanttChart, Calendar |
+| `finance` | "budget", "invoice", "expense" | Ledger, Calculator, Invoice |
+| `design` | "brainstorm", "design", "whiteboard" | MindMap, Whiteboard |
+| `coding` | "code", "debug", "script" | CodeEditor, Terminal |
+
+#### Ghost State Binding
+
+Every UI component is bidirectionally bound to AI context:
+
+```typescript
+// User selects a row → AI knows what they're focused on
+ghostBinding: {
+  componentProp: 'selectedRow',
+  contextKey: 'user_focus',
+  direction: 'ui_to_ai'
+}
+
+// AI insight → UI highlights relevant items
+ghostBinding: {
+  componentProp: 'highlights',
+  contextKey: 'ai_suggestions',
+  direction: 'ai_to_ui'
+}
+```
+
+### 40.4 Reality Scrubber
+
+**"We replaced 'Undo' with Time Travel."**
+
+The Reality Scrubber captures full state snapshots and allows instant rewinding to any point.
+
+#### What Gets Snapshotted
+
+| State Type | Description |
+|------------|-------------|
+| **VFS State** | Virtual File System (all generated files) |
+| **DB State** | PGLite database snapshot |
+| **Ghost State** | All UI-AI bindings |
+| **Chat Context** | Conversation history at that point |
+| **Layout State** | Current morphed UI layout |
+
+#### Trigger Events
+
+| Event | When Captured |
+|-------|---------------|
+| `user_action` | User explicitly triggered |
+| `ai_generation` | AI generated content |
+| `db_mutation` | Database was modified |
+| `morph_transition` | UI morphed |
+| `checkpoint` | User-created bookmark |
+| `auto_interval` | Every 30 seconds (configurable) |
+
+#### Timeline UI
+
+The Reality Scrubber replaces the standard scrollbar with a video-editor-style timeline:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            REALITY TIMELINE                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   10:00 AM     10:15 AM     10:30 AM     10:45 AM     11:00 AM    NOW      │
+│     │            │            │            │            │          │        │
+│     ●────────────●────────────●────────────🔖───────────●──────────◆        │
+│     │            │            │            │            │          │        │
+│   Start      AI Gen        Morph       Bookmark      Branch     Current    │
+│                                           │                                  │
+│                                           ▼                                  │
+│                                    "Before risky change"                     │
+│                                                                              │
+│   [ ◀◀ ]  [ ◀ ]  ═══════════════●═══════════════════  [ ▶ ]  [ ▶▶ ]       │
+│                              ▲                                               │
+│                         Drag to scrub                                        │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 40.5 Quantum Futures
+
+**"Why choose one strategy? Split the timeline."**
+
+Quantum Futures enables parallel reality branching where users can run multiple strategies simultaneously.
+
+#### Branch Creation
+
+```typescript
+// User: "Should I use Redux or Zustand?"
+await quantumFuturesService.createSplit({
+  sessionId,
+  prompt: "State management comparison",
+  branchNames: ["Redux Implementation", "Zustand Implementation"],
+  autoCompare: true
+});
+```
+
+#### Comparison View
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│   🔷 Redux Implementation          │   🔶 Zustand Implementation            │
+├─────────────────────────────────────┼───────────────────────────────────────┤
+│                                     │                                       │
+│   ✅ Type safety                   │   ✅ Simpler setup                    │
+│   ⚠️ Boilerplate                    │   ✅ Less boilerplate                 │
+│   📊 Completion: 45%               │   📊 Completion: 60%                  │
+│   💰 Est. Cost: $0.12              │   💰 Est. Cost: $0.08                 │
+│                                     │                                       │
+│   [Keep This Reality]              │   [Keep This Reality]                 │
+│                                     │                                       │
+└─────────────────────────────────────┴───────────────────────────────────────┘
+```
+
+#### Collapse to Winner
+
+When the user selects a winner, the losing branches are either:
+- **Collapsed**: Permanently removed
+- **Archived**: Stored in "Dream Memory" for potential future recall
+
+### 40.6 Pre-Cognition
+
+**"Radiant answers before you ask."**
+
+Pre-Cognition uses speculative execution to predict the user's next likely actions and pre-compute solutions in the background.
+
+#### How It Works
+
+1. **Prediction**: While user reads current response, Genesis model predicts next 3 likely moves
+2. **Pre-Compute**: Solutions are generated in hidden background containers
+3. **Instant Delivery**: When user's request matches a prediction, response appears instantly (0ms latency)
+
+#### Prediction Algorithm
+
+```typescript
+// After building a login form, predict:
+predictions: [
+  { intent: 'coding', prompt: 'Add password reset', confidence: 0.8 },
+  { intent: 'coding', prompt: 'Add OAuth integration', confidence: 0.7 },
+  { intent: 'design', prompt: 'Style the form', confidence: 0.6 }
+]
+```
+
+#### Analytics
+
+| Metric | Description |
+|--------|-------------|
+| `hitRate` | Percentage of predictions that matched user intent |
+| `avgLatencySaved` | Average milliseconds saved by pre-cognition |
+| `telepathyScore` | User-facing metric showing prediction accuracy |
+
+### 40.7 Configuration
+
+```typescript
+interface RealityEngineConfig {
+  // Feature toggles
+  morphicUIEnabled: boolean;          // Enable Morphic UI
+  realityScrubberEnabled: boolean;    // Enable Reality Scrubber
+  quantumFuturesEnabled: boolean;     // Enable Quantum Futures
+  preCognitionEnabled: boolean;       // Enable Pre-Cognition
+  
+  // Behavior
+  autoSnapshotIntervalMs: number;     // Default: 30000 (30s)
+  maxSnapshotsPerSession: number;     // Default: 100
+  maxBranchesPerSession: number;      // Default: 8
+  codeCurtainDefault: boolean;        // Hide code by default (Genie mode)
+  ephemeralByDefault: boolean;        // Apps dissolve when topic changes
+  
+  // Pre-Cognition
+  preCognition: {
+    maxPredictions: number;           // Default: 3
+    predictionTTLMs: number;          // Default: 60000 (1 min)
+    computeBudgetMs: number;          // Default: 5000 (5s)
+    minConfidenceThreshold: number;   // Default: 0.6
+    useGenesisModel: boolean;         // Use local model for predictions
+  };
+}
+```
+
+### 40.8 API Endpoints
+
+Base path: `/api/thinktank/reality-engine`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| **Session** | | |
+| POST | `/session` | Initialize Reality Engine session |
+| GET | `/session/:id` | Get session state |
+| **Morphic UI** | | |
+| POST | `/morph` | Morph interface to intent |
+| POST | `/dissolve` | Dissolve morphed interface |
+| POST | `/ghost` | Update Ghost State |
+| **Reality Scrubber** | | |
+| POST | `/scrub` | Scrub to point in time |
+| POST | `/bookmark` | Create bookmark |
+| GET | `/timeline/:sessionId` | Get timeline visualization |
+| GET | `/bookmarks/:sessionId` | Get all bookmarks |
+| **Quantum Futures** | | |
+| POST | `/split` | Split into parallel realities |
+| GET | `/branches/:sessionId` | Get all branches |
+| POST | `/compare` | Compare two branches |
+| POST | `/collapse` | Collapse to winning reality |
+| PUT | `/view-mode` | Set comparison view mode |
+| **Pre-Cognition** | | |
+| GET | `/precognition/:sessionId` | Get analytics |
+| POST | `/precognition/cleanup` | Clean up expired predictions |
+| **Eject** | | |
+| POST | `/eject` | Eject to standalone app |
+| **Metrics** | | |
+| GET | `/metrics/:sessionId` | Get session metrics |
+
+### 40.9 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `reality_engine_sessions` | Unified session state |
+| `reality_timelines` | Timeline structure and navigation |
+| `reality_snapshots` | Full state snapshots for time travel |
+| `quantum_branches` | Parallel reality branches |
+| `quantum_splits` | Split configuration and history |
+| `quantum_dream_archive` | Archived branches in dream memory |
+| `precognition_queues` | Per-session prediction configuration |
+| `precognition_predictions` | Pre-computed solutions |
+| `precognition_analytics` | Hit/miss tracking for learning |
+
+### 40.10 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/reality-engine.types.ts` | Type definitions |
+| `lambda/shared/services/reality-engine/reality-engine.service.ts` | Main service |
+| `lambda/shared/services/reality-engine/reality-scrubber.service.ts` | Time travel |
+| `lambda/shared/services/reality-engine/quantum-futures.service.ts` | Branching |
+| `lambda/shared/services/reality-engine/pre-cognition.service.ts` | Predictions |
+| `lambda/thinktank/reality-engine.ts` | API handler |
+| `migrations/162_reality_engine.sql` | Database schema |
+
+### 40.11 The "Code Curtain" Rule
+
+The Reality Engine enforces the distinction between "Builder" (Coder) and "Genie" (Radiant):
+
+| Rule | Implementation |
+|------|----------------|
+| **Hide Code by Default** | UI snaps to Preview tab, not code |
+| **Interaction over Syntax** | Variables become UI controls (sliders, inputs) |
+| **Ephemeral by Default** | Apps dissolve when topic changes |
+| **Eject to Keep** | Only persist to repo if user explicitly clicks "Keep This" |
+
+> **"Radiant is a Genie, not a Coder. We use code as invisible ink to draw the interface—the user should never see the ink, only the drawing."**
+
+---
+
+## 41. The Magic Carpet
+
+> **"We are building 'The Magic Carpet.' You don't drive it. You don't write code for it. You just say where you want to go, and the ground beneath you reshapes itself to take you there instantly."**
+
+The Magic Carpet is the unified navigation and experience layer for Think Tank. It wraps the Reality Engine capabilities into a cohesive, magical user experience where users feel like magicians, not coders.
+
+### 41.1 The Magic Carpet Philosophy
+
+| Traditional Apps | Magic Carpet |
+|------------------|--------------|
+| Navigate menus | Speak your destination |
+| Click through workflows | Fly directly there |
+| Learn the interface | Interface learns you |
+| You drive | You're carried |
+
+**Core Insight:** We aren't selling a better IDE. We are selling **the feeling of being a Magician**.
+
+### 41.2 Carpet Modes
+
+| Mode | Description | Visual |
+|------|-------------|--------|
+| `resting` | Waiting for destination (chat-first) | Carpet gently floating |
+| `flying` | Morphing/transitioning to destination | Trail effects, motion blur |
+| `hovering` | Arrived, actively working | Stable, glowing edges |
+| `exploring` | Quantum Futures - multiple realities | Split view, branch indicators |
+| `rewinding` | Reality Scrubber - time traveling | Timeline visible, rewind effect |
+| `anticipating` | Pre-Cognition active | Prediction cards appearing |
+
+### 41.3 Carpet Altitudes
+
+The altitude represents UI complexity level:
+
+| Altitude | Complexity | Example |
+|----------|------------|---------|
+| `ground` | Simple chat mode | Just the chat interface |
+| `low` | Single component | One morphed widget |
+| `medium` | Full workspace | 2-3 components |
+| `high` | Complex layout | 4-5 components + timeline |
+| `stratosphere` | Maximum capability | Full Reality Engine features |
+
+### 41.4 Default Destinations
+
+| Destination | Icon | Description |
+|-------------|------|-------------|
+| Command Center | 🏠 | Overview dashboard |
+| Workshop | 🔨 | Build and create |
+| Time Stream | ⏳ | Reality Scrubber timeline |
+| Quantum Realm | 🌌 | Parallel realities view |
+| Oracle's Chamber | 🔮 | Pre-Cognition predictions |
+| Gallery | 🖼️ | View creations |
+| Vault | 🔐 | Saved/bookmarked items |
+
+### 41.5 Carpet Commands
+
+```typescript
+// Fly to a destination
+await magicCarpetService.command(carpetId, { 
+  type: 'fly', 
+  destination: 'Workshop' 
+});
+
+// Return to chat
+await magicCarpetService.command(carpetId, { type: 'land' });
+
+// Increase complexity
+await magicCarpetService.command(carpetId, { type: 'ascend' });
+
+// Time travel
+await magicCarpetService.command(carpetId, { 
+  type: 'rewind', 
+  to: -2 // Go back 2 snapshots
+});
+
+// Split into parallel realities
+await magicCarpetService.command(carpetId, { 
+  type: 'branch', 
+  options: ['Conservative Plan', 'Aggressive Plan'] 
+});
+
+// Collapse to winner
+await magicCarpetService.command(carpetId, { 
+  type: 'collapse', 
+  winner: 'branch-id' 
+});
+```
+
+### 41.6 Carpet Themes
+
+Pre-built visual themes for personalization:
+
+| Theme | Description | Gradient |
+|-------|-------------|----------|
+| Mystic Night | Deep purple mystical (default) | Indigo → Purple → Violet |
+| Desert Sun | Warm golden | Amber → Orange → Brown |
+| Ocean Deep | Cool blue aquatic | Cyan → Teal → Emerald |
+| Cosmic Void | Dark minimalist | Gray gradient |
+| Neon Circuit | Cyberpunk electric | Cyan → Purple → Pink |
+
+### 41.7 Carpet Preferences
+
+```typescript
+interface CarpetPreferences {
+  // Navigation
+  autoFly: boolean;              // Auto-morph on intent detection
+  smoothTransitions: boolean;    // Animated vs instant
+  showJourneyTrail: boolean;     // Show navigation history
+  
+  // Pre-Cognition
+  preCognitionEnabled: boolean;
+  showPredictions: boolean;
+  telepathyIntensity: 'subtle' | 'moderate' | 'aggressive';
+  
+  // Reality Scrubber
+  showTimeline: boolean;
+  autoSnapshot: boolean;
+  snapshotInterval: number;      // Seconds
+  
+  // Quantum Futures
+  maxParallelRealities: number;
+  autoCompare: boolean;
+  
+  // Accessibility
+  reducedMotion: boolean;
+  highContrast: boolean;
+  screenReaderMode: boolean;
+}
+```
+
+### 41.8 Journey Navigation
+
+The Magic Carpet tracks the user's journey:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         MAGIC CARPET JOURNEY                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   🏠 ────► 🔨 ────► 🌌 ────► 🔮 ────► ◆                                      │
+│   Command  Workshop  Quantum  Oracle   NOW                                   │
+│   Center            Realm    Chamber                                         │
+│                                                                              │
+│   Click any point to fly back. Journey is saved with Reality Scrubber.      │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 41.9 API Endpoints
+
+Base path: `/api/thinktank/magic-carpet`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/summon` | Summon a new Magic Carpet |
+| GET | `/:carpetId` | Get carpet state |
+| POST | `/:carpetId/fly` | Fly to destination |
+| POST | `/:carpetId/land` | Land (return to chat) |
+| POST | `/:carpetId/command` | Execute a command |
+| GET | `/:carpetId/journey` | Get journey history |
+| PUT | `/:carpetId/theme` | Update theme |
+| PUT | `/:carpetId/preferences` | Update preferences |
+| GET | `/destinations` | Get available destinations |
+| GET | `/themes` | Get available themes |
+
+### 41.10 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `magic_carpets` | Carpet state and configuration |
+| `carpet_destinations` | Pre-defined and custom destinations |
+| `carpet_journey_points` | Navigation history |
+| `carpet_themes` | Visual themes |
+| `carpet_analytics` | Usage analytics |
+
+### 41.11 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/magic-carpet.types.ts` | Type definitions |
+| `lambda/shared/services/magic-carpet/magic-carpet.service.ts` | Main service |
+| `migrations/163_magic_carpet.sql` | Database schema |
+
+### 41.12 Integration with Reality Engine
+
+The Magic Carpet wraps the Reality Engine:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         MAGIC CARPET                                         │
+│                    (User Experience Layer)                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   "Fly to Workshop"  →  carpet.fly('workshop')                              │
+│                              │                                               │
+│                              ▼                                               │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                      REALITY ENGINE                                  │   │
+│   │                   (Capability Layer)                                 │   │
+│   ├─────────────────────────────────────────────────────────────────────┤   │
+│   │                                                                      │   │
+│   │   Morphic UI ◄──── Intent: 'coding'                                 │   │
+│   │   Reality Scrubber ◄──── Auto-snapshot                              │   │
+│   │   Pre-Cognition ◄──── Predict next destinations                     │   │
+│   │                                                                      │   │
+│   └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 42. Magic Carpet UI Components
+
+The Magic Carpet UI is implemented through a set of React components that bring the 2026 UI/UX trends to life.
+
+### 42.1 Component Inventory
+
+| Component | Purpose | Location |
+|-----------|---------|----------|
+| `MagicCarpetNavigator` | Bottom navigation with journey trail | `magic-carpet/magic-carpet-navigator.tsx` |
+| `RealityScrubberTimeline` | Video-editor timeline for state snapshots | `magic-carpet/reality-scrubber-timeline.tsx` |
+| `QuantumSplitView` | Side-by-side reality comparison | `magic-carpet/quantum-split-view.tsx` |
+| `PreCognitionSuggestions` | Predicted actions panel | `magic-carpet/pre-cognition-suggestions.tsx` |
+| `AIPresenceIndicator` | AI cognitive/emotional state display | `magic-carpet/ai-presence-indicator.tsx` |
+| `SpatialGlassCard` | Glassmorphism card with depth | `magic-carpet/spatial-glass-card.tsx` |
+| `GlassPanel` | Large glass content area | `magic-carpet/spatial-glass-card.tsx` |
+| `GlassButton` | Interactive glass button | `magic-carpet/spatial-glass-card.tsx` |
+| `GlassBadge` | Status indicator with glass effect | `magic-carpet/spatial-glass-card.tsx` |
+| `FocusModeControls` | Focus mode toggle and controls | `magic-carpet/focus-mode.tsx` |
+| `FocusOverlay` | Dimming overlay for focus mode | `magic-carpet/focus-mode.tsx` |
+
+### 42.2 Usage Examples
+
+```tsx
+import {
+  MagicCarpetNavigator,
+  RealityScrubberTimeline,
+  QuantumSplitView,
+  PreCognitionSuggestions,
+  AIPresenceIndicator,
+  SpatialGlassCard,
+  FocusModeControls,
+} from '@/components/thinktank/magic-carpet';
+
+// Magic Carpet Navigator (bottom of screen)
+<MagicCarpetNavigator
+  currentDestination={{ id: 'workspace', name: 'Workshop', icon: '🔨' }}
+  journey={journeyHistory}
+  predictions={preCognizedActions}
+  telepathyScore={0.82}
+  mode="hovering"
+  altitude="medium"
+  onFly={(dest) => navigateTo(dest)}
+  onLand={() => returnToChat()}
+/>
+
+// Reality Scrubber Timeline
+<RealityScrubberTimeline
+  snapshots={stateSnapshots}
+  currentPosition={currentSnapshotIndex}
+  onScrubTo={(position) => restoreSnapshot(position)}
+  onCreateBookmark={(label) => bookmarkCurrentState(label)}
+/>
+
+// Quantum Split View
+<QuantumSplitView
+  branches={parallelRealities}
+  onCollapse={(winnerId) => collapseToReality(winnerId)}
+/>
+
+// AI Presence Indicator
+<AIPresenceIndicator
+  state="thinking"
+  affect={{ valence: 0.6, arousal: 0.4, curiosity: 0.8, confidence: 0.85 }}
+  currentTask="Analyzing user intent..."
+  modelName="claude-3.5-sonnet"
+/>
+
+// Spatial Glass Card
+<SpatialGlassCard variant="strong" layer="floating" glow glowColor="purple">
+  <p>Content with glass effect</p>
+</SpatialGlassCard>
+```
+
+### 42.3 Dependencies
+
+The Magic Carpet UI requires **framer-motion** for animations:
+
+```bash
+npm install framer-motion@^11.0.0
+```
+
+### 42.4 Demo Page
+
+Access the Magic Carpet UI demo at:
+```
+/thinktank/magic-carpet
+```
+
+This page showcases all components with interactive examples.
+
+---
+
+## 43. Concurrent Task Execution (Moat #17)
+
+**Moat Evaluation**: Score 20/30 - Tier 3 Feature Moat. No major competitor offers split-pane concurrent execution with WebSocket multiplexing.
+
+### 43.1 Overview
+
+Concurrent Task Execution enables users to run 2-4 AI tasks simultaneously in a split-pane UI, compare outputs, and merge the best results. This is a key differentiator vs. single-threaded competitors.
+
+### 43.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      Split-Pane UI                              │
+├─────────────┬─────────────┬─────────────┬─────────────────────┤
+│   Pane 1    │   Pane 2    │   Pane 3    │      Pane 4         │
+│  Task A     │  Task B     │  Task C     │     Task D          │
+│  (running)  │  (queued)   │  (complete) │    (streaming)      │
+└─────────────┴─────────────┴─────────────┴─────────────────────┘
+       ↓              ↓              ↓              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│               WebSocket Multiplexer                             │
+│  Channel isolation • Heartbeat • Reconnection • Sequencing      │
+└─────────────────────────────────────────────────────────────────┘
+       ↓              ↓              ↓              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                  Background Queue                               │
+│  Priority scheduling • Max concurrent: 4 • Queue depth: 20     │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 43.3 Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | `true` | Enable concurrent execution |
+| `maxPanes` | `4` | Maximum split panes (1-8) |
+| `maxConcurrentTasks` | `4` | Maximum simultaneous tasks (1-10) |
+| `maxQueueDepth` | `20` | Maximum queued tasks (1-100) |
+| `defaultLayout` | `horizontal-2` | Default pane layout |
+| `defaultSyncMode` | `independent` | Default sync mode |
+| `enableComparison` | `true` | Enable task comparison |
+| `enableMerge` | `true` | Enable task merging |
+
+### 43.4 Pane Layouts
+
+| Layout | Description |
+|--------|-------------|
+| `single` | Full-width single pane |
+| `horizontal-2` | Two panes side-by-side |
+| `vertical-2` | Two panes stacked |
+| `grid-4` | 2x2 grid of four panes |
+| `focus-left` | Large left pane, small right |
+| `focus-right` | Small left pane, large right |
+
+### 43.5 Sync Modes
+
+| Mode | Description |
+|------|-------------|
+| `independent` | Each pane operates independently |
+| `mirror-input` | Same prompt sent to all panes |
+| `compare-output` | Automatic comparison when all complete |
+
+### 43.6 Task Comparison
+
+When multiple tasks complete, users can compare results:
+
+```typescript
+// Compare completed tasks
+const comparison = await compareTasks(tenantId, [taskId1, taskId2, taskId3]);
+
+// Returns:
+{
+  similarities: [
+    { metric: 'semantic', score: 0.85, details: 'High semantic similarity' },
+    { metric: 'structural', score: 0.72, details: 'Moderate structural similarity' },
+    { metric: 'factual', score: 0.91, details: 'Strong factual agreement' }
+  ],
+  differences: [...],
+  recommendation: 'Results are mostly consistent. Review highlighted differences.'
+}
+```
+
+### 43.7 Task Merging
+
+Three merge strategies are available:
+
+| Strategy | Description |
+|----------|-------------|
+| `best-of` | Select the highest-scored result |
+| `combine` | Concatenate all results with separators |
+| `consensus` | AI-synthesized consensus from all results |
+
+### 43.8 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/thinktank/concurrent/config` | GET | Get configuration |
+| `/api/thinktank/concurrent/config` | PUT | Update configuration |
+| `/api/thinktank/concurrent/tasks` | POST | Create task |
+| `/api/thinktank/concurrent/tasks/:id` | GET | Get task status |
+| `/api/thinktank/concurrent/tasks/:id` | DELETE | Cancel task |
+| `/api/thinktank/concurrent/queue` | GET | Get queue status |
+| `/api/thinktank/concurrent/panes` | POST | Create pane config |
+| `/api/thinktank/concurrent/compare` | POST | Compare tasks |
+| `/api/thinktank/concurrent/merge` | POST | Merge tasks |
+| `/api/thinktank/concurrent/metrics` | GET | Get metrics |
+
+### 43.9 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `concurrent_execution_config` | Per-tenant configuration |
+| `concurrent_tasks` | Task records with status/results |
+| `split_pane_configs` | User pane layouts |
+| `task_comparisons` | Comparison results |
+| `concurrent_execution_metrics` | Usage metrics |
+
+### 43.10 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/concurrent-execution.types.ts` | Type definitions |
+| `lambda/shared/services/concurrent-execution.service.ts` | Core service |
+| `lambda/thinktank/concurrent-execution.ts` | API handler |
+| `migrations/170_concurrent_execution.sql` | Database schema |
+
+---
+
+## 44. Structure from Chaos Synthesis (Moat #20)
+
+**Moat Evaluation**: Score 20/30 - Tier 3 Feature Moat. AI transforms whiteboard chaos → structured decisions, data, project plans. Think Tank differentiation vs Miro/Mural.
+
+### 44.1 Overview
+
+Structure from Chaos Synthesis takes unstructured input (whiteboards, brainstorms, meeting notes, voice transcripts) and transforms it into structured outputs (action items, decisions, project plans, knowledge bases).
+
+### 44.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Chaotic Input                                │
+│  Whiteboard • Brainstorm • Meeting Notes • Voice Transcript     │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                 Synthesis Pipeline                              │
+├─────────────────────────────────────────────────────────────────┤
+│  1. Parse Input → 2. Extract Entities → 3. Identify Relations  │
+│  4. Generate Structure → 5. Validate Output                    │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                  Structured Output                              │
+│  Decisions • Action Items • Project Plan • Knowledge Base       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 44.3 Input Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `whiteboard` | Visual whiteboard with sticky notes | Miro/FigJam export |
+| `brainstorm` | Unstructured idea dump | Free-form text |
+| `meeting_notes` | Notes from a meeting | Transcription or notes |
+| `voice_transcript` | Speech-to-text output | Zoom/Teams transcript |
+| `chat_history` | Conversation history | Slack/Teams export |
+| `document_dump` | Multiple documents | File uploads |
+| `mixed` | Combination of above | Multi-source input |
+
+### 44.4 Output Types
+
+| Type | Description | Contains |
+|------|-------------|----------|
+| `decisions` | Key decisions made | Decision list with context |
+| `action_items` | Tasks to complete | Assignee, due date, priority |
+| `project_plan` | Full project plan | Milestones, timeline, dependencies |
+| `meeting_summary` | Meeting summary | Key points, attendees, outcomes |
+| `knowledge_base` | Knowledge extraction | Concepts, facts, relationships |
+| `data_table` | Structured data | Tabular format |
+| `timeline` | Chronological view | Events in sequence |
+| `hierarchy` | Hierarchical structure | Parent-child relationships |
+| `comparison` | Compare items | Side-by-side analysis |
+
+### 44.5 Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | `true` | Enable synthesis |
+| `defaultOutputType` | `meeting_summary` | Default output format |
+| `extractEntities` | `true` | Extract named entities |
+| `extractRelationships` | `true` | Identify entity relationships |
+| `generateTimeline` | `true` | Generate timeline view |
+| `generateActionItems` | `true` | Extract action items |
+| `autoAssignTasks` | `false` | Auto-assign based on mentions |
+| `confidenceThreshold` | `0.70` | Minimum confidence score |
+| `maxProcessingTimeMs` | `30000` | Processing timeout |
+
+### 44.6 Entity Extraction
+
+Automatically extracts entities from chaotic input:
+
+| Entity Type | Examples |
+|-------------|----------|
+| `person` | @mentions, "John Smith" |
+| `organization` | "Acme Corp", "the marketing team" |
+| `project` | Project names, codenames |
+| `product` | Product references |
+| `date` | "next Monday", "Q2 2026" |
+| `location` | Meeting rooms, cities |
+| `concept` | Technical terms, ideas |
+| `metric` | KPIs, numbers |
+| `resource` | Tools, documents |
+
+### 44.7 Relationship Types
+
+| Relationship | Description |
+|--------------|-------------|
+| `owns` | Person owns task/project |
+| `assigned_to` | Task assigned to person |
+| `depends_on` | Task depends on another |
+| `blocks` | Task blocks another |
+| `related_to` | General relationship |
+| `parent_of` | Hierarchical parent |
+| `precedes` | Temporal ordering |
+| `contradicts` | Conflicting statements |
+| `supports` | Supporting evidence |
+
+### 44.8 Whiteboard Parsing
+
+For visual whiteboards, the service parses spatial elements:
+
+```typescript
+// Parse whiteboard elements into thematic clusters
+const clusters = await parseWhiteboard(elements);
+
+// Returns clusters with:
+{
+  id: 'cluster-1',
+  elements: [...],  // Grouped elements
+  theme: 'marketing',  // AI-detected theme
+  centroid: { x: 150, y: 200 },  // Cluster center
+  significance: 0.85  // Importance score
+}
+```
+
+### 44.9 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/thinktank/chaos/config` | GET | Get configuration |
+| `/api/thinktank/chaos/config` | PUT | Update configuration |
+| `/api/thinktank/chaos/synthesize` | POST | Full synthesis pipeline |
+| `/api/thinktank/chaos/extract/actions` | POST | Extract action items only |
+| `/api/thinktank/chaos/extract/decisions` | POST | Extract decisions only |
+| `/api/thinktank/chaos/extract/questions` | POST | Extract questions only |
+| `/api/thinktank/chaos/project-plan` | POST | Generate project plan |
+| `/api/thinktank/chaos/whiteboard/parse` | POST | Parse whiteboard elements |
+| `/api/thinktank/chaos/metrics` | GET | Get metrics |
+
+### 44.10 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `synthesis_config` | Per-tenant configuration |
+| `chaotic_inputs` | Raw input storage |
+| `structured_outputs` | Generated outputs |
+| `extracted_entities` | Named entities |
+| `entity_relationships` | Entity relationships |
+| `structured_items` | Action items, decisions |
+| `whiteboard_elements` | Visual element data |
+| `synthesis_metrics` | Usage metrics |
+
+### 44.11 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/structure-from-chaos.types.ts` | Type definitions |
+| `lambda/shared/services/structure-from-chaos.service.ts` | Core service |
+| `lambda/thinktank/structure-from-chaos.ts` | API handler |
+| `migrations/171_structure_from_chaos.sql` | Database schema |
 
 ---
 

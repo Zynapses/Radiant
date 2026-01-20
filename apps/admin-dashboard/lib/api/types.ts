@@ -309,6 +309,12 @@ export interface GeographicUsage {
 // DASHBOARD
 // ============================================================================
 
+export interface UsageTrendPoint {
+  date: string;
+  requests: number;
+  tokens: number;
+}
+
 export interface DashboardMetrics {
   totalRequests: {
     value: number;
@@ -330,6 +336,7 @@ export interface DashboardMetrics {
     change: number;
     period: '24h' | '7d' | '30d';
   };
+  usageTrends?: UsageTrendPoint[];
 }
 
 export interface SystemHealth {

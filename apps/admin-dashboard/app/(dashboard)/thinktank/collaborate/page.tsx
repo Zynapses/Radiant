@@ -1,8 +1,81 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import CollaborativeSession from '@/components/collaboration/CollaborativeSession';
+import { Loader2 } from 'lucide-react';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
+
+interface SessionData {
+  sessionId: string;
+  conversationTitle: string;
+  messages: Array<{
+    id: string;
+    participantId: string;
+    role: 'user' | 'assistant' | 'system';
+    content: string;
+    model?: string;
+    status: 'typing' | 'sent' | 'delivered' | 'edited' | 'deleted';
+    reactions: Record<string, string[]>;
+    threadCount: number;
+    createdAt: string;
+  }>;
+}
 
 export default function CollaboratePage() {
+  const searchParams = useSearchParams();
+  const sessionId = searchParams.get('session') || 'default';
+  const [sessionData, setSessionData] = useState<SessionData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadSession() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${API_BASE}/api/thinktank/collaborate/sessions/${sessionId}`);
+        if (res.ok) {
+          const { data } = await res.json();
+          setSessionData(data);
+        } else {
+          setError('Failed to load collaborative session');
+        }
+      } catch {
+        setError('Failed to connect to collaboration service');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadSession();
+  }, [sessionId]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error || !sessionData) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Collaborative Session</h1>
+          <p className="text-muted-foreground">
+            Real-time collaborative conversation sharing
+          </p>
+        </div>
+        <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
+          <p>{error || 'No session data available'}</p>
+          <p className="text-sm mt-2">Create a new session or join an existing one</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -13,69 +86,13 @@ export default function CollaboratePage() {
       </div>
       
       <CollaborativeSession
-        sessionId="demo-session-1"
-        conversationTitle="AI Development Best Practices"
+        sessionId={sessionData.sessionId}
+        conversationTitle={sessionData.conversationTitle}
         currentUserId="current-user"
-        initialMessages={[
-          {
-            id: 'msg_1',
-            participantId: 'current-user',
-            role: 'user',
-            content: 'What are the best practices for building production AI applications?',
-            status: 'sent',
-            reactions: { '👍': ['2', '3'] },
-            threadCount: 0,
-            createdAt: new Date(Date.now() - 300000),
-          },
-          {
-            id: 'msg_2',
-            participantId: 'ai',
-            role: 'assistant',
-            content: `Here are the key best practices for building production AI applications:
-
-**1. Data Quality & Management**
-- Implement robust data validation pipelines
-- Version your training data alongside your models
-- Monitor for data drift in production
-
-**2. Model Development**
-- Start simple, then iterate
-- Use proper train/validation/test splits
-- Document model assumptions and limitations
-
-**3. Infrastructure**
-- Design for horizontal scaling
-- Implement proper caching strategies
-- Use async processing for long-running tasks
-
-**4. Monitoring & Observability**
-- Track latency, throughput, and error rates
-- Monitor model performance metrics over time
-- Set up alerting for anomalies
-
-**5. Security & Compliance**
-- Implement input validation and sanitization
-- Use proper authentication and authorization
-- Ensure data privacy compliance (GDPR, etc.)
-
-Would you like me to elaborate on any of these points?`,
-            model: 'claude-3-5-sonnet',
-            status: 'sent',
-            reactions: { '🎉': ['current-user'], '❤️': ['2'] },
-            threadCount: 2,
-            createdAt: new Date(Date.now() - 280000),
-          },
-          {
-            id: 'msg_3',
-            participantId: '2',
-            role: 'user',
-            content: 'Great overview! Can you elaborate on the monitoring aspects? What specific metrics should we track?',
-            status: 'sent',
-            reactions: {},
-            threadCount: 0,
-            createdAt: new Date(Date.now() - 120000),
-          },
-        ]}
+        initialMessages={sessionData.messages.map(msg => ({
+          ...msg,
+          createdAt: new Date(msg.createdAt),
+        }))}
       />
     </div>
   );

@@ -205,9 +205,9 @@ function ComponentRenderer({
 
     default:
       return (
-        <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-          <p className="text-sm text-gray-500">
-            Component type &quot;{component.type}&quot; coming soon
+        <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <p className="text-sm text-amber-700 dark:text-amber-300">
+            Unsupported component type: &quot;{component.type}&quot;
           </p>
         </div>
       );

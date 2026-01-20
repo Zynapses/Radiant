@@ -58,6 +58,21 @@ const RADIANT_VERSION = "4.18.0";
 const DOMAIN_PLACEHOLDER = "{{RADIANT_DOMAIN}}";
 ```
 
+## 🚨 MANDATORY POLICY ENFORCEMENT
+
+**BEFORE starting ANY significant task:**
+
+1. **Scan ALL workflows** in `/.windsurf/workflows/`
+2. **Read each description** field in the frontmatter
+3. **For each matching policy** → follow its requirements
+4. **New policies auto-apply** - no manual update needed
+
+```
+DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.
+```
+
+**NO EXCEPTIONS. Forgetting policies creates technical debt and compliance risks.**
+
 ## ⚠️ Implementation Rules
 
 1. **File Creation Order**: Follow dependency graph in each section
@@ -65,6 +80,7 @@ const DOMAIN_PLACEHOLDER = "{{RADIANT_DOMAIN}}";
 3. **Sendable Conformance**: All types crossing actor boundaries must be Sendable
 4. **No Hardcoded Versions**: Use RADIANT_VERSION constant
 5. **Error Handling**: Use typed errors with helpful messages
+6. **Policy Compliance**: Run `/policy-enforcement` pre-flight check for every task
 
 ## 📋 Phase Execution
 

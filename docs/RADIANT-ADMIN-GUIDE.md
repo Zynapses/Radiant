@@ -61,6 +61,7 @@
 56. [Cato Security Grid: Native Network Defense](#56-cato-security-grid-native-network-defense)
 57. [AGI Brain & Identity Data Fabric: Agentic Orchestration](#57-agi-brain--identity-data-fabric-agentic-orchestration)
 58. [Deployment Safety & Environment Management](#58-deployment-safety--environment-management)
+59. [White-Label Invisibility (Moat #25)](#59-white-label-invisibility-moat-25)
 
 ---
 
@@ -6879,6 +6880,127 @@ We have automated the R&D pipeline. The system is now an **asset that appreciate
 5. ✅ **Scales globally** (Shared Cato layer)
 
 This is a **defensible technical moat** that commodity AI wrappers cannot replicate.
+
+### 31A.7 Cato's Persistent Memory System
+
+Cato operates as the cognitive core of RADIANT's orchestration architecture, implementing a **three-tier hierarchical memory system** that fundamentally differentiates it from competitors suffering from session amnesia. Unlike ChatGPT or Claude standalone—where closing a tab erases all context—Cato maintains persistent memory that survives sessions, employee turnover, and time.
+
+#### Tenant-Level Memory (Institutional Intelligence)
+
+The primary layer where the most valuable learning accumulates. Every Cato database table enforces **Row-Level Security via `tenant_id`**, ensuring complete isolation between organizations while enabling deep institutional pattern recognition.
+
+| Capability | Description |
+|------------|-------------|
+| **Neural Network Routing** | Learns which AI models perform best for specific query types—routing legal analysis to Claude Opus (no physics hallucination), visual reasoning to Gemini, red-team validation to safety models |
+| **Department Preferences** | Tracks team-specific preferences: legal teams wanting aggressive, citation-heavy briefs while marketing prefers conversational copy |
+| **Cost Optimization** | When Cato notices a $0.50 query could use a $0.01 approach, it adjusts routing automatically |
+| **Compliance Audit Trails** | Merkle-hashed audit trails with 7-year retention for FDA 21 CFR Part 11, HIPAA, SOC 2 |
+
+**Database**: `cato_tenant_config` stores gamma limits, entropy thresholds, recovery settings, and feature flags.
+
+#### User-Level Memory (Relationship Continuity)
+
+Within each tenant, individual users maintain their own memory scope through **Ghost Vectors**—4096-dimensional hidden state vectors that capture the "feel" of each user relationship across sessions.
+
+| Feature | Description |
+|---------|-------------|
+| **Ghost Vectors** | 4096-dimensional vectors capturing interaction style, expertise level, communication preferences |
+| **Persona Selection** | Users select moods (Balanced, Scout, Sage, Spark, Guide) scoped at system, tenant, or user level |
+| **Pattern Contribution** | Individual usage feeds into tenant-level learning while maintaining personal context |
+| **Version-Gated Upgrades** | Model improvements don't cause personality discontinuity—relationship feel persists |
+
+**Database**: `ghost_vectors`, `ghost_vector_updates`
+
+#### Session-Level Memory (Real-Time Context)
+
+The ephemeral layer handles active interaction state through **Redis-backed persistence** that survives ECS container restarts but expires after sessions end.
+
+| Component | Purpose |
+|-----------|---------|
+| **Governor State** | Tracks current epistemic uncertainty and gamma values |
+| **Persona Overrides** | Temporary switches during Epistemic Recovery (Scout mode for information gathering) |
+| **Safety Evaluations** | Real-time Control Barrier Function (CBF) checks |
+| **Upward Observation** | Every interaction contributes to user-level Ghost Vectors and tenant-level pattern learning |
+
+**Infrastructure**: ElastiCache Redis (Tier 2+), `CatoRedisStack`
+
+#### Twilight Dreaming (Offline Learning)
+
+During low-traffic periods (**4 AM tenant local time**), the system consolidates accumulated patterns through **LoRA fine-tuning**.
+
+| Phase | Description |
+|-------|-------------|
+| **Pattern Collection** | Gather learning candidates from daily interactions |
+| **SOFAI Training** | Train System 1/System 2 routing decisions |
+| **LoRA Fine-tuning** | Consolidate individual patterns into tenant-level intelligence |
+| **Result** | 60%+ cost reduction while maintaining accuracy through mandatory deep reasoning for healthcare/financial queries |
+
+**Implementation**: `lambda/consciousness/evolution-pipeline.ts`
+
+#### Neural Network Optimization
+
+The neural network optimizes across three dimensions simultaneously:
+
+| Dimension | Metric | Implementation |
+|-----------|--------|----------------|
+| **Accuracy** | Correctness of responses | Human feedback, automated eval |
+| **Verifiability** | Provable results | Truth Engine ECD scoring (`ecd-scorer.service.ts`) |
+| **Cost Efficiency** | Cheaper approaches | Economic Governor routing |
+
+**Claude as Conductor**: Claude serves as the conductor maintaining this persistent memory layer—not just another model in the rotation, but the intelligence coordinating 105+ other specialized models, interpreting user intent, selecting workflows, and ensuring responses meet accuracy and safety standards.
+
+#### Persistent Memory as Competitive Moat
+
+Cato's hierarchical memory architecture creates **"contextual gravity"**—compounding switching costs that deepen with every interaction and make migration increasingly expensive over time. Competitors face structural disadvantages that cannot be overcome through feature parity alone.
+
+**Competitor Structural Disadvantages**:
+
+| Competitor | Problem |
+|------------|---------|
+| **Flowise/Dify** | Static drag-and-drop pipelines charging the same expensive rate regardless of query complexity—"no-code" is actually "no-efficiency," locking customers into rigid workflows that run identically whether a query needs full orchestration or could cost 98% less |
+| **CrewAI** | "Thundering Herd" problem: autonomous agents don't share memory, so five agents independently realize they need the same data and spam five duplicate API calls, exploding costs and tanking latency |
+| **ChatGPT/Claude Standalone** | Extraordinary for individuals but terrible infrastructure for companies—when an analyst quits, their entire AI context walks out the door with zero institutional learning and no compounding knowledge |
+
+**RADIANT's Three-Tier Moat Layers**:
+
+| Layer | Moat Mechanism | Migration Cost |
+|-------|----------------|----------------|
+| **Learned Routing Patterns** | Neural network tracks that Claude dominates legal analysis while Gemini wins at visual reasoning, routing accordingly and improving with every query | Months of production usage + significant cost overhead during learning period |
+| **Department Preferences + Ghost Vectors** | Encodes institutional knowledge: legal team wants citations, marketing wants conversational tone, power users' expertise levels, the "feel" of thousands of individual relationships | Extensive reconfiguration; cannot be exported |
+| **Verification Data + Audit Trails** | Merkle-hashed records for HIPAA, SOC 2, FDA 21 CFR Part 11 cannot be migrated without breaking chain-of-custody guarantees | 7-year retention creates growing corpus of institutional history; compliance lock-in |
+
+#### Twilight Dreaming as Competitive Moat
+
+Twilight Dreaming represents a **second-order compounding advantage** that transforms RADIANT from a service into an appreciating asset.
+
+**How It Works**:
+
+During low-traffic periods (4 AM tenant local time), the system enters an offline learning phase where accumulated interaction patterns consolidate into tenant-specific LoRA fine-tuning—essentially "dreaming" about the day's learnings and encoding them into persistent model improvements.
+
+| Learning Type | Description |
+|---------------|-------------|
+| **SOFAI Router Optimization** | Learns which query types route best to which models |
+| **Cost Pattern Identification** | Identifies recurring expensive queries that could be handled cheaper |
+| **Domain Accuracy Embedding** | Domain-specific accuracy improvements embed into the deployment |
+
+**The Appreciating Asset Thesis**:
+
+A customer who has used RADIANT for two years doesn't just have more data—they have a **fundamentally more capable deployment** than a fresh installation, with routing decisions that reflect thousands of hours of production optimization.
+
+**Infrastructure Requirements Competitors Cannot Replicate**:
+
+| Requirement | Purpose |
+|-------------|---------|
+| Three-tier hierarchical memory | Feeds observations upward |
+| Ghost Vector infrastructure | Maintains user-level context |
+| Tenant-isolated database architecture | Prevents cross-contamination during fine-tuning |
+| SageMaker infrastructure (Tier 3+) | Executes LoRA updates |
+
+**Investor Thesis**: "Compounding intelligence—every deployment gets smarter over time through Twilight Dreaming; this creates network effects within each tenant."
+
+**Model Upgrade Advantage**: When better foundation models emerge (GPT-5, Claude 5, Gemini 3), RADIANT customers benefit automatically—the Twilight Dreaming system learns how to optimally route to new capabilities while preserving all accumulated institutional knowledge. Model improvements compound on top of existing optimization rather than resetting the learning curve.
+
+> **Think Tank Impact**: See [THINKTANK-ADMIN-GUIDE-V2.md Section 22 (Cato Persistent Memory)](#) for user-facing memory behavior and relationship continuity settings.
 
 ---
 
@@ -17702,10 +17824,458 @@ echo $RADIANT_ENV $AWS_PROFILE
 
 ---
 
+## 59. White-Label Invisibility (Moat #25)
+
+**Moat Evaluation**: Score 18/30 - Tier 4 Business Model Moat. End users never know RADIANT exists. Infrastructure stickiness creates platform layer dependency.
+
+### 59.1 Overview
+
+White-Label Invisibility enables tenants to completely rebrand the platform so their end users never see RADIANT branding. This creates strong infrastructure stickiness—switching providers means rebuilding their entire branded experience.
+
+### 59.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Tenant Request                               │
+│  custom-domain.com → CloudFront → API Gateway → Lambda          │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                White-Label Middleware                           │
+├─────────────────────────────────────────────────────────────────┤
+│  1. Load tenant config                                          │
+│  2. Transform response (remove RADIANT refs)                   │
+│  3. Inject branding CSS                                         │
+│  4. Apply custom terminology                                    │
+│  5. Add custom headers                                          │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                  Branded Response                               │
+│  Custom logos • Custom colors • Custom terminology • No RADIANT │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 59.3 Branding Configuration
+
+| Setting | Type | Description |
+|---------|------|-------------|
+| `companyName` | string | Company name displayed throughout |
+| `productName` | string | Product name (replaces "Think Tank") |
+| `tagline` | string | Optional tagline |
+| `logo.primary` | URL | Main logo URL |
+| `logo.light` | URL | Light theme logo |
+| `logo.dark` | URL | Dark theme logo |
+| `logo.icon` | URL | Favicon/icon |
+| `colors.primary` | hex | Primary brand color |
+| `colors.secondary` | hex | Secondary color |
+| `colors.accent` | hex | Accent color |
+| `fonts.primary` | string | Primary font family |
+| `fonts.secondary` | string | Secondary font family |
+| `fonts.mono` | string | Monospace font |
+
+### 59.4 Feature Visibility
+
+Control what end users can see:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `hideRadiantBranding` | `true` | Remove all RADIANT references |
+| `hidePoweredBy` | `true` | Hide "Powered by RADIANT" footer |
+| `hideModelNames` | `false` | Anonymize model names to "AI Model" |
+| `hideModelProviders` | `false` | Remove provider info (Anthropic, OpenAI) |
+| `hideCostMetrics` | `false` | Hide cost information from UI |
+| `hideUsageMetrics` | `false` | Hide usage statistics |
+| `disabledFeatures` | `[]` | Features to disable for this tenant |
+
+### 59.5 Custom Terminology
+
+Replace standard terms with branded alternatives:
+
+| Default Term | Example Custom |
+|--------------|----------------|
+| `AI Assistant` | "Alex" (custom assistant name) |
+| `Conversation` | "Session" |
+| `Artifact` | "Creation" |
+| `Workspace` | "Studio" |
+| `Team` | "Organization" |
+
+### 59.6 Custom Domains
+
+#### Adding a Custom Domain
+
+1. Add domain in admin dashboard
+2. Get DNS verification record
+3. Add TXT record to DNS
+4. Wait for verification (auto-checks every hour)
+5. SSL certificate auto-provisioned via ACM
+6. CloudFront distribution updated
+
+#### Domain Types
+
+| Type | Purpose |
+|------|---------|
+| `primary` | Main application domain |
+| `alias` | Additional domains that redirect |
+| `api` | API-specific subdomain |
+
+### 59.7 Email Templates
+
+Customize all outbound emails:
+
+| Template | Purpose |
+|----------|---------|
+| `welcome` | New user welcome email |
+| `password_reset` | Password reset link |
+| `invitation` | Team invitation |
+| `notification` | General notifications |
+| `billing` | Billing-related emails |
+
+Each template supports:
+- Custom subject line
+- HTML template with variables
+- Plain text fallback
+- Custom from name/email
+
+### 59.8 Legal Configuration
+
+| Setting | Description |
+|---------|-------------|
+| `companyLegalName` | Legal entity name |
+| `termsOfServiceUrl` | Link to ToS |
+| `privacyPolicyUrl` | Link to privacy policy |
+| `cookiePolicyUrl` | Link to cookie policy |
+| `supportEmail` | Support contact email |
+| `copyrightNotice` | Footer copyright text |
+| `customFooterHtml` | Optional custom footer HTML |
+
+### 59.9 API Customization
+
+| Setting | Description |
+|---------|-------------|
+| `customBaseUrl` | Custom API base URL |
+| `hideVersionHeader` | Remove X-Radiant-Version header |
+| `customHeaders` | Additional headers to inject |
+| `corsOrigins` | Allowed CORS origins |
+| `rateLimitOverrides` | Per-endpoint rate limit overrides |
+
+### 59.10 Response Transformation
+
+The white-label middleware automatically transforms responses:
+
+```typescript
+// Before transformation
+{
+  "model": "claude-3.5-sonnet",
+  "provider": "anthropic",
+  "message": "Welcome to RADIANT Think Tank!"
+}
+
+// After transformation (with hideModelNames + hideModelProviders)
+{
+  "model": "AI Model",
+  "message": "Welcome to [ProductName]!"
+}
+```
+
+### 59.11 CSS Injection
+
+Custom CSS is automatically injected for brand consistency:
+
+```css
+:root {
+  --color-primary: #3B82F6;      /* From config */
+  --color-secondary: #6366F1;
+  --font-primary: 'Inter', sans-serif;
+  /* ... all brand tokens */
+}
+```
+
+### 59.12 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/white-label/config` | GET | Get configuration |
+| `/api/admin/white-label/config` | POST | Create configuration |
+| `/api/admin/white-label/config` | PUT | Update configuration |
+| `/api/admin/white-label/config` | DELETE | Delete configuration |
+| `/api/admin/white-label/validate` | POST | Validate configuration |
+| `/api/admin/white-label/domains` | POST | Add domain |
+| `/api/admin/white-label/domains/:id` | DELETE | Remove domain |
+| `/api/admin/white-label/domains/:domain/verify` | POST | Initiate verification |
+| `/api/admin/white-label/domains/:domain/verify` | GET | Check verification |
+| `/api/admin/white-label/branding` | PUT | Update branding |
+| `/api/admin/white-label/features` | PUT | Update feature visibility |
+| `/api/admin/white-label/legal` | PUT | Update legal config |
+| `/api/admin/white-label/emails` | PUT | Update email config |
+| `/api/admin/white-label/preview` | GET | Generate branding preview |
+| `/api/admin/white-label/export` | GET | Export configuration |
+| `/api/admin/white-label/import` | POST | Import configuration |
+| `/api/admin/white-label/metrics` | GET | Get usage metrics |
+
+### 59.13 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `white_label_config` | Per-tenant configuration |
+| `white_label_domains` | Custom domains |
+| `domain_verifications` | DNS verification records |
+| `branding_assets` | Uploaded logos, fonts, images |
+| `white_label_email_templates` | Custom email templates |
+| `custom_terminology` | Term mappings |
+| `white_label_metrics` | Usage metrics |
+
+### 59.14 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/white-label.types.ts` | Type definitions |
+| `lambda/shared/services/white-label.service.ts` | Core service |
+| `lambda/admin/white-label.ts` | API handler |
+| `migrations/172_white_label.sql` | Database schema |
+
+### 59.15 Usage Example
+
+```typescript
+import { whiteLabelService } from './services/white-label.service';
+
+// Create white-label configuration
+const config = await whiteLabelService.createConfig(tenantId, {
+  enabled: true,
+  branding: {
+    companyName: 'Acme Corp',
+    productName: 'Acme AI',
+    logo: { primary: 'https://...', light: '...', dark: '...', icon: '...' },
+    colors: { primary: '#FF5733', secondary: '#3366FF', ... },
+  },
+  features: {
+    hideRadiantBranding: true,
+    hidePoweredBy: true,
+    hideModelNames: true,
+  },
+  legal: {
+    companyLegalName: 'Acme Corporation Inc.',
+    supportEmail: 'support@acme.com',
+    copyrightNotice: '© 2026 Acme Corp',
+  },
+});
+
+// Add custom domain
+await whiteLabelService.addDomain(tenantId, 'ai.acme.com', 'primary');
+
+// Transform API responses
+const transformedResponse = whiteLabelService.transformResponse(tenantId, originalResponse);
+```
+
+---
+
+## 60. User Violation Enforcement System
+
+The User Violation Enforcement System provides comprehensive tracking, escalation, and enforcement of regulatory and policy violations. This is critical for HIPAA, GDPR, and SOC2 compliance.
+
+### 60.1 Overview
+
+The system enables administrators to:
+- Report and track policy/regulatory violations per user
+- Configure automatic escalation policies
+- Take enforcement actions (warnings through account termination)
+- Process user appeals with audit trail
+- Monitor high-risk users with risk scoring
+
+### 60.2 Violation Categories
+
+| Category | Description | Examples |
+|----------|-------------|----------|
+| `hipaa` | HIPAA violations | PHI exposure, unauthorized access, sharing |
+| `gdpr` | GDPR violations | Consent violations, retention issues, cross-border transfers |
+| `soc2` | SOC2 violations | Security control failures |
+| `terms_of_service` | ToS violations | Terms breach |
+| `acceptable_use` | AUP violations | Misuse of platform |
+| `content_policy` | Content violations | Harmful, illegal content |
+| `security` | Security violations | Credential sharing, injection attempts |
+| `billing` | Billing violations | Payment fraud, chargeback abuse |
+| `abuse` | Platform abuse | Rate limit abuse, spam |
+
+### 60.3 Severity Levels
+
+| Severity | Description | Risk Score Impact |
+|----------|-------------|-------------------|
+| `warning` | Minor issue, first offense | +5 |
+| `minor` | Low impact violation | +10 |
+| `major` | Significant violation | +20 |
+| `critical` | Severe violation requiring immediate action | +40 |
+
+### 60.4 Enforcement Actions
+
+| Action | Description |
+|--------|-------------|
+| `warning_issued` | Formal warning recorded |
+| `feature_restricted` | Specific features disabled |
+| `rate_limited` | API/usage rate limits applied |
+| `temporarily_suspended` | Account suspended for specified duration |
+| `permanently_suspended` | Account permanently suspended |
+| `account_terminated` | Account deleted |
+| `reported_to_authorities` | Reported to regulatory authorities |
+
+### 60.5 Configuration
+
+```typescript
+interface UserViolationConfig {
+  enabled: boolean;                    // Enable violation tracking
+  autoDetectionEnabled: boolean;       // Auto-detect from system events
+  autoEnforcementEnabled: boolean;     // Auto-apply escalation actions
+  
+  // Notifications
+  notifyUserOnViolation: boolean;      // Notify user when violation reported
+  notifyUserOnAction: boolean;         // Notify user when action taken
+  notifyAdminOnCritical: boolean;      // Alert admins on critical violations
+  adminNotificationEmails: string[];   // Admin email addresses
+  
+  // Retention
+  retentionDays: number;               // Default: 2555 (~7 years)
+  
+  // Appeals
+  allowAppeals: boolean;               // Allow users to appeal
+  appealWindowDays: number;            // Days to submit appeal (default: 30)
+  maxAppealsPerViolation: number;      // Max appeals per violation (default: 2)
+  
+  // Compliance
+  requireEvidenceRedaction: boolean;   // Always redact evidence content
+  auditAllActions: boolean;            // Log all actions to audit trail
+}
+```
+
+### 60.6 Escalation Policies
+
+Configure automatic enforcement based on violation patterns:
+
+```typescript
+interface EscalationRule {
+  triggerType: 'count' | 'severity' | 'category';
+  
+  // Count-based: trigger after N violations
+  violationCount?: number;
+  withinDays?: number;
+  
+  // Severity-based: trigger on severity threshold
+  severityThreshold?: ViolationSeverity;
+  
+  // Category-based: trigger for specific categories
+  categories?: ViolationCategory[];
+  
+  // Action to take
+  action: EnforcementAction;
+  actionDurationDays?: number;        // For temporary actions
+  requiresManualReview: boolean;      // Require admin review
+  allowAppeal: boolean;               // Allow user appeal
+}
+```
+
+**Example Policy:**
+- 3 warnings in 90 days → Feature restriction
+- 2 major violations → Temporary suspension (7 days)
+- 1 critical violation → Immediate suspension (requires review)
+- Any HIPAA violation → Immediate suspension + admin alert
+
+### 60.7 API Endpoints
+
+**Base URL:** `/api/admin/violations`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/dashboard` | GET | Get dashboard data with metrics |
+| `/config` | GET | Get configuration |
+| `/config` | PUT | Update configuration |
+| `/violations` | GET | Search violations |
+| `/violations` | POST | Report new violation |
+| `/violations/:id` | GET | Get violation details |
+| `/violations/:id` | PUT | Update violation |
+| `/violations/:id/action` | POST | Take enforcement action |
+| `/users/:userId/violations` | GET | Get user's violations |
+| `/users/:userId/summary` | GET | Get user violation summary |
+| `/users/:userId/suspend` | POST | Suspend user |
+| `/users/:userId/reinstate` | POST | Reinstate user |
+| `/appeals` | GET | Get pending appeals |
+| `/appeals/:id` | GET | Get appeal details |
+| `/appeals/:id/review` | POST | Review appeal |
+| `/metrics` | GET | Get violation metrics |
+| `/policies` | GET | Get escalation policies |
+| `/policies` | POST | Create escalation policy |
+
+### 60.8 Admin Dashboard
+
+Access at: **Compliance → Violations** (`/compliance/violations`)
+
+**Features:**
+- **Dashboard**: Metrics cards (total, new, resolved, pending appeals, avg resolution time)
+- **Violations Tab**: Search/filter violations, report new, take actions
+- **Appeals Tab**: Review and decide on pending appeals
+- **High Risk Users Tab**: View users with elevated risk scores
+- **Settings Tab**: Configure system settings
+
+### 60.9 User Appeal Process
+
+1. User submits appeal within appeal window (default: 30 days)
+2. Violation status changes to `appealed`
+3. Admin reviews appeal
+4. Decisions:
+   - **Upheld**: Original action stands
+   - **Overturned**: Violation dismissed, action reversed
+   - **Reduced**: Lesser action applied
+5. User notified of decision
+6. All actions logged to audit trail
+
+### 60.10 Risk Scoring
+
+Users are assigned a risk level based on active violations:
+
+| Risk Level | Criteria |
+|------------|----------|
+| `low` | 0-1 active violations |
+| `moderate` | 2+ active violations |
+| `elevated` | 5+ active violations |
+| `high` | 2+ major violations active |
+| `critical` | Any critical violation active |
+
+Risk score (0-100) is calculated as sum of severity impacts for active violations.
+
+### 60.11 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `user_violations` | Violation records with enforcement |
+| `violation_evidence` | Evidence attachments (redacted) |
+| `violation_appeals` | Appeal records with review |
+| `violation_escalation_policies` | Escalation policy definitions |
+| `violation_escalation_rules` | Policy rules/thresholds |
+| `user_violation_config` | Per-tenant configuration |
+| `user_violation_summary` | Aggregated user summaries |
+| `violation_audit_log` | Immutable audit trail |
+
+### 60.12 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/user-violations.types.ts` | Type definitions |
+| `lambda/shared/services/user-violation.service.ts` | Core service |
+| `lambda/admin/user-violations.ts` | API handler |
+| `apps/admin-dashboard/app/(dashboard)/compliance/violations/page.tsx` | Admin UI |
+| `migrations/173_user_violations.sql` | Database schema |
+
+### 60.13 Compliance Considerations
+
+- **HIPAA**: 7-year retention, audit trail, PHI redaction in evidence
+- **GDPR**: User notification, appeal rights, data minimization
+- **SOC2**: Audit logging, access controls, incident response
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| **5.20.0** | 2026-01-18 | User Violation Enforcement System; Regulatory compliance tracking; Escalation policies; Appeal workflow |
+| **5.19.0** | 2026-01-18 | White-Label Invisibility (Moat #25); Full branding customization; Custom domains; Response transformation |
 | **5.7.0** | 2026-01-17 | Deployment Safety (cdk watch DEV-only rule, environment guards, credential setup) |
 | **5.6.0** | 2026-01-12 | Genesis Infrastructure (Kaleidos reactor integration, SDS/PDSA compliance, SSF physical-to-digital bridge); Cato Security Grid (SPACE engine, inline AI/ML 3-6x detection, GenAI CASB controls); AGI Brain Identity Fabric (fastWorkflow agents, autonomous remediation, memory safety) |
 | **5.5.0** | 2026-01-10 | Polymorphic UI (PROMPT-41); ViewRouter component; Terminal/MindMap/DiffEditor views; Gearbox toggle; Escalation tracking |

@@ -12,103 +12,15 @@ interface Notification { id: string; type: string; title: string; message: strin
 interface SelfAwareness { capability: string; strength: number; weakness: number; actual: number; trend: string; }
 interface Stats { totalIdeas: number; activeIdeas: number; deprecatedIdeas: number; implementedIdeas: number; pendingReview: number; recentAnalyses: number; unreadNotifications: number; }
 
-const defaultIdeas: ImprovementIdea[] = [
-  {
-    ideaId: '1',
-    ideaCode: 'SI-0001',
-    title: 'Improve Response Calibration',
-    description: 'Enhance confidence calibration to better reflect actual accuracy across different domains',
-    category: 'reasoning',
-    priority: 'high',
-    status: 'under_review',
-    version: 2,
-    isDeprecated: false,
-    confidenceScore: 0.85,
-    impactScore: 0.7,
-    feasibilityScore: 0.8,
-    compositeScore: 0.78,
-    createdAt: '2024-12-20T10:00:00Z',
-    evolutionCount: 1,
-  },
-  {
-    ideaId: '2',
-    ideaCode: 'SI-0002',
-    title: 'Enhance Long-Context Memory Retrieval',
-    description: 'Improve retrieval of relevant information from long conversation histories',
-    category: 'memory',
-    priority: 'medium',
-    status: 'proposed',
-    version: 1,
-    isDeprecated: false,
-    confidenceScore: 0.75,
-    impactScore: 0.8,
-    feasibilityScore: 0.6,
-    compositeScore: 0.72,
-    createdAt: '2024-12-21T14:30:00Z',
-    evolutionCount: 0,
-  },
-  {
-    ideaId: '3',
-    ideaCode: 'SI-0003',
-    title: 'Reduce Hallucination in Specialized Domains',
-    description: 'Decrease rate of confident but incorrect statements in specialized knowledge areas',
-    category: 'safety',
-    priority: 'critical',
-    status: 'approved',
-    version: 3,
-    isDeprecated: false,
-    confidenceScore: 0.9,
-    impactScore: 0.9,
-    feasibilityScore: 0.7,
-    compositeScore: 0.85,
-    createdAt: '2024-12-19T09:00:00Z',
-    evolutionCount: 2,
-  },
-  {
-    ideaId: '4',
-    ideaCode: 'SI-0004',
-    title: 'Optimize Multi-Model Routing Latency',
-    description: 'Reduce latency in the AGI orchestrator model selection process',
-    category: 'performance',
-    priority: 'medium',
-    status: 'implementing',
-    version: 1,
-    isDeprecated: false,
-    confidenceScore: 0.7,
-    impactScore: 0.6,
-    feasibilityScore: 0.85,
-    compositeScore: 0.71,
-    createdAt: '2024-12-22T11:00:00Z',
-    evolutionCount: 0,
-  },
-  {
-    ideaId: '5',
-    ideaCode: 'SI-0005',
-    title: 'Improve Analogical Reasoning Depth',
-    description: 'Generate deeper structural analogies rather than surface-level comparisons',
-    category: 'reasoning',
-    priority: 'low',
-    status: 'deprecated',
-    version: 2,
-    isDeprecated: true,
-    deprecationReason: 'Superseded by SI-0008 which takes a more comprehensive approach',
-    confidenceScore: 0.65,
-    impactScore: 0.7,
-    feasibilityScore: 0.5,
-    compositeScore: 0.62,
-    createdAt: '2024-12-18T16:00:00Z',
-    evolutionCount: 1,
-  },
-];
 
 const defaultStats: Stats = { totalIdeas: 0, activeIdeas: 0, deprecatedIdeas: 0, implementedIdeas: 0, pendingReview: 0, recentAnalyses: 0, unreadNotifications: 0 };
 
 export default function SelfImprovementPage() {
   const [selectedTab, setSelectedTab] = useState<'overview' | 'ideas' | 'awareness' | 'notifications' | 'history'>('overview');
-  const [mockIdeas, setMockIdeas] = useState<ImprovementIdea[]>(defaultIdeas);
-  const [mockNotifications, setMockNotifications] = useState<Notification[]>([]);
-  const [mockSelfAwareness, setMockSelfAwareness] = useState<SelfAwareness[]>([]);
-  const [mockStats, setMockStats] = useState<Stats>(defaultStats);
+  const [ideas, setIdeas] = useState<ImprovementIdea[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [selfAwareness, setSelfAwareness] = useState<SelfAwareness[]>([]);
+  const [stats, setStats] = useState<Stats>(defaultStats);
   const [selectedIdea, setSelectedIdea] = useState<ImprovementIdea | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -122,16 +34,16 @@ export default function SelfImprovementPage() {
       try {
         const API = process.env.NEXT_PUBLIC_API_URL || '';
         const [ideasRes, notificationsRes, awarenessRes, statsRes] = await Promise.all([
-          fetch(`${API}/admin/self-improvement/ideas`),
-          fetch(`${API}/admin/self-improvement/notifications`),
-          fetch(`${API}/admin/self-improvement/awareness`),
-          fetch(`${API}/admin/self-improvement/stats`),
+          fetch(`${API}/api/admin/self-improvement/ideas`),
+          fetch(`${API}/api/admin/self-improvement/notifications`),
+          fetch(`${API}/api/admin/self-improvement/awareness`),
+          fetch(`${API}/api/admin/self-improvement/stats`),
         ]);
-        if (ideasRes.ok) { const { data } = await ideasRes.json(); setMockIdeas(data || defaultIdeas); }
+        if (ideasRes.ok) { const { data } = await ideasRes.json(); setIdeas(data || []); }
         else setError('Failed to load self-improvement data.');
-        if (notificationsRes.ok) { const { data } = await notificationsRes.json(); setMockNotifications(data || []); }
-        if (awarenessRes.ok) { const { data } = await awarenessRes.json(); setMockSelfAwareness(data || []); }
-        if (statsRes.ok) { const { data } = await statsRes.json(); setMockStats(data || defaultStats); }
+        if (notificationsRes.ok) { const { data } = await notificationsRes.json(); setNotifications(data || []); }
+        if (awarenessRes.ok) { const { data } = await awarenessRes.json(); setSelfAwareness(data || []); }
+        if (statsRes.ok) { const { data } = await statsRes.json(); setStats(data || defaultStats); }
       } catch { setError('Failed to connect to self-improvement service.'); }
       setLoading(false);
     }
@@ -141,7 +53,7 @@ export default function SelfImprovementPage() {
   if (loading) return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" /></div>;
   if (error) return <div className="flex flex-col items-center justify-center h-96 text-red-500"><p className="text-lg font-medium">Error</p><p className="text-sm">{error}</p></div>;
 
-  const filteredIdeas = mockIdeas.filter((idea: ImprovementIdea) => {
+  const filteredIdeas = ideas.filter((idea: ImprovementIdea) => {
     if (statusFilter !== 'all' && idea.status !== statusFilter) return false;
     if (categoryFilter !== 'all' && idea.category !== categoryFilter) return false;
     return true;
@@ -217,9 +129,9 @@ export default function SelfImprovementPage() {
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              {tab === 'notifications' && mockStats.unreadNotifications > 0 && (
+              {tab === 'notifications' && stats.unreadNotifications > 0 && (
                 <span className="ml-2 px-2 py-0.5 text-xs bg-red-500 text-white rounded-full">
-                  {mockStats.unreadNotifications}
+                  {stats.unreadNotifications}
                 </span>
               )}
             </button>
@@ -234,31 +146,31 @@ export default function SelfImprovementPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
               <p className="text-sm text-gray-500 dark:text-gray-400">Total Ideas</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{mockStats.totalIdeas}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalIdeas}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
               <p className="text-sm text-gray-500 dark:text-gray-400">Active</p>
-              <p className="text-2xl font-bold text-green-600">{mockStats.activeIdeas}</p>
+              <p className="text-2xl font-bold text-green-600">{stats.activeIdeas}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
               <p className="text-sm text-gray-500 dark:text-gray-400">Deprecated</p>
-              <p className="text-2xl font-bold text-gray-500">{mockStats.deprecatedIdeas}</p>
+              <p className="text-2xl font-bold text-gray-500">{stats.deprecatedIdeas}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
               <p className="text-sm text-gray-500 dark:text-gray-400">Implemented</p>
-              <p className="text-2xl font-bold text-blue-600">{mockStats.implementedIdeas}</p>
+              <p className="text-2xl font-bold text-blue-600">{stats.implementedIdeas}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
               <p className="text-sm text-gray-500 dark:text-gray-400">Pending Review</p>
-              <p className="text-2xl font-bold text-yellow-600">{mockStats.pendingReview}</p>
+              <p className="text-2xl font-bold text-yellow-600">{stats.pendingReview}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
               <p className="text-sm text-gray-500 dark:text-gray-400">Recent Analyses</p>
-              <p className="text-2xl font-bold text-purple-600">{mockStats.recentAnalyses}</p>
+              <p className="text-2xl font-bold text-purple-600">{stats.recentAnalyses}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
               <p className="text-sm text-gray-500 dark:text-gray-400">Notifications</p>
-              <p className="text-2xl font-bold text-red-600">{mockStats.unreadNotifications}</p>
+              <p className="text-2xl font-bold text-red-600">{stats.unreadNotifications}</p>
             </div>
           </div>
 
@@ -269,7 +181,7 @@ export default function SelfImprovementPage() {
             </div>
             <div className="p-4">
               <div className="space-y-3">
-                {mockIdeas
+                {ideas
                   .filter(i => !i.isDeprecated)
                   .sort((a, b) => b.compositeScore - a.compositeScore)
                   .slice(0, 5)
@@ -309,7 +221,7 @@ export default function SelfImprovementPage() {
             </div>
             <div className="p-4">
               <div className="space-y-2">
-                {mockNotifications.slice(0, 3).map((notif) => (
+                {notifications.slice(0, 3).map((notif) => (
                   <div key={notif.id} className={`p-3 rounded-lg ${notif.read ? 'bg-gray-50 dark:bg-gray-900' : 'bg-blue-50 dark:bg-blue-900/20'}`}>
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-gray-900 dark:text-white">{notif.title}</span>
@@ -443,7 +355,7 @@ export default function SelfImprovementPage() {
             </div>
             <div className="p-4">
               <div className="space-y-4">
-                {mockSelfAwareness.map((item) => (
+                {selfAwareness.map((item) => (
                   <div key={item.capability} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-gray-900 dark:text-white">{item.capability}</span>
@@ -507,7 +419,7 @@ export default function SelfImprovementPage() {
             <button className="text-sm text-blue-600 hover:text-blue-800">Mark all as read</button>
           </div>
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
-            {mockNotifications.map((notif) => (
+            {notifications.map((notif) => (
               <div 
                 key={notif.id} 
                 className={`p-4 ${notif.read ? '' : 'bg-blue-50 dark:bg-blue-900/20'}`}

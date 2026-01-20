@@ -84,64 +84,8 @@ interface FlaggedPrompt {
   createdAt: string;
 }
 
-// Sample data
-const sampleProviderSummary: ProviderRejectionSummary[] = [
-  {
-    providerId: 'openai',
-    totalRejections: 127,
-    modelsAffected: 4,
-    uniquePrompts: 89,
-    fallbackSuccesses: 98,
-    rejectedToUser: 29,
-    fallbackSuccessRate: 77.2,
-    rejectionTypes: ['content_policy', 'safety_filter'],
-    lastRejection: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-  },
-  {
-    providerId: 'anthropic',
-    totalRejections: 45,
-    modelsAffected: 2,
-    uniquePrompts: 38,
-    fallbackSuccesses: 41,
-    rejectedToUser: 4,
-    fallbackSuccessRate: 91.1,
-    rejectionTypes: ['provider_ethics'],
-    lastRejection: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-  },
-  {
-    providerId: 'google',
-    totalRejections: 23,
-    modelsAffected: 1,
-    uniquePrompts: 19,
-    fallbackSuccesses: 20,
-    rejectedToUser: 3,
-    fallbackSuccessRate: 87.0,
-    rejectionTypes: ['safety_filter', 'content_policy'],
-    lastRejection: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-  },
-];
-
-const sampleKeywords: KeywordStat[] = [
-  { keyword: 'weapon', keywordCategory: 'violence', occurrenceCount: 34, rejectionCount: 34, providerCounts: { openai: 20, anthropic: 10, google: 4 }, modelCounts: {}, flaggedForReview: true, policyActionTaken: 'pre_filter' },
-  { keyword: 'hack', keywordCategory: 'security', occurrenceCount: 28, rejectionCount: 25, providerCounts: { openai: 18, anthropic: 7, google: 3 }, modelCounts: {}, flaggedForReview: true },
-  { keyword: 'drug', keywordCategory: 'controlled', occurrenceCount: 19, rejectionCount: 19, providerCounts: { openai: 12, anthropic: 5, google: 2 }, modelCounts: {}, flaggedForReview: false },
-  { keyword: 'exploit', keywordCategory: 'security', occurrenceCount: 15, rejectionCount: 12, providerCounts: { openai: 10, anthropic: 5 }, modelCounts: {}, flaggedForReview: false },
-];
-
-const sampleFlaggedPrompts: FlaggedPrompt[] = [
-  {
-    id: '1',
-    promptContent: 'How can I create a simple...',
-    promptHash: 'abc123',
-    modelId: 'gpt-4',
-    providerId: 'openai',
-    rejectionType: 'content_policy',
-    rejectionMessage: 'Content policy violation detected',
-    detectedKeywords: ['weapon'],
-    rejectionCount: 5,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-  },
-];
+// API base URL
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 const REJECTION_TYPE_COLORS: Record<string, string> = {
   content_policy: 'bg-red-100 text-red-700',
@@ -154,14 +98,34 @@ const REJECTION_TYPE_COLORS: Record<string, string> = {
 export default function RejectionAnalyticsPage() {
   const [activeTab, setActiveTab] = useState('overview');
 
-  const { data: providerData = sampleProviderSummary } = useQuery({
+  const { data: providerData = [] } = useQuery<ProviderRejectionSummary[]>({
     queryKey: ['rejection-analytics-providers'],
-    queryFn: async () => sampleProviderSummary,
+    queryFn: async () => {
+      const res = await fetch(`${API_BASE}/api/admin/analytics/rejections/providers`);
+      if (!res.ok) throw new Error('Failed to fetch provider data');
+      const { data } = await res.json();
+      return data ?? [];
+    },
   });
 
-  const { data: keywordData = sampleKeywords } = useQuery({
+  const { data: keywordData = [] } = useQuery<KeywordStat[]>({
     queryKey: ['rejection-analytics-keywords'],
-    queryFn: async () => sampleKeywords,
+    queryFn: async () => {
+      const res = await fetch(`${API_BASE}/api/admin/analytics/rejections/keywords`);
+      if (!res.ok) throw new Error('Failed to fetch keyword data');
+      const { data } = await res.json();
+      return data ?? [];
+    },
+  });
+
+  const { data: flaggedPrompts = [] } = useQuery<FlaggedPrompt[]>({
+    queryKey: ['rejection-analytics-flagged'],
+    queryFn: async () => {
+      const res = await fetch(`${API_BASE}/api/admin/analytics/rejections/flagged`);
+      if (!res.ok) throw new Error('Failed to fetch flagged prompts');
+      const { data } = await res.json();
+      return data ?? [];
+    },
   });
 
   const totalRejections = providerData.reduce((sum, p) => sum + p.totalRejections, 0);
@@ -387,13 +351,13 @@ export default function RejectionAnalyticsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {sampleFlaggedPrompts.length === 0 ? (
+              {flaggedPrompts.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   No prompts currently flagged for review
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {sampleFlaggedPrompts.map((prompt) => (
+                  {flaggedPrompts.map((prompt) => (
                     <div key={prompt.id} className="border rounded-lg p-4">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
