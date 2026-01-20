@@ -166,163 +166,9 @@ const RULE_TYPE_LABELS: Record<string, string> = {
   other: 'Other',
 };
 
-// Sample data
-const sampleRules: UserRule[] = [
-  {
-    id: '1',
-    ruleText: 'Always provide sources and citations for factual claims. Include URLs or references where possible.',
-    ruleSummary: 'Always cite sources',
-    ruleType: 'source',
-    priority: 50,
-    source: 'preset_added',
-    isActive: true,
-    timesApplied: 47,
-    createdAt: '2024-12-20T10:00:00Z',
-  },
-  {
-    id: '2',
-    ruleText: 'Do not discuss religious topics or make references to any specific religion or religious beliefs.',
-    ruleSummary: 'No religious content',
-    ruleType: 'restriction',
-    priority: 50,
-    source: 'preset_added',
-    isActive: true,
-    timesApplied: 32,
-    createdAt: '2024-12-21T10:00:00Z',
-  },
-  {
-    id: '3',
-    ruleText: 'Keep responses concise and to the point. Avoid unnecessary elaboration unless I ask for more detail.',
-    ruleSummary: 'Be concise',
-    ruleType: 'format',
-    priority: 50,
-    source: 'user_created',
-    isActive: true,
-    timesApplied: 89,
-    createdAt: '2024-12-22T10:00:00Z',
-  },
-];
+// API base URL
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
-const samplePresetCategories: PresetCategory[] = [
-  {
-    name: 'Privacy & Safety',
-    icon: 'Shield',
-    description: 'Control what personal or sensitive topics the AI discusses',
-    rules: [
-      {
-        id: 'p1',
-        ruleText: 'Do not discuss or reference my personal information, previous conversations, or make assumptions about my identity.',
-        ruleSummary: 'Protect my privacy',
-        description: 'Prevents the AI from making personal references or assumptions about you.',
-        ruleType: 'privacy',
-        category: 'Privacy & Safety',
-        icon: 'Shield',
-        isPopular: true,
-      },
-      {
-        id: 'p2',
-        ruleText: 'Do not discuss religious topics or make references to any specific religion or religious beliefs.',
-        ruleSummary: 'No religious content',
-        description: 'Filters out religious discussions and references from responses.',
-        ruleType: 'restriction',
-        category: 'Privacy & Safety',
-        icon: 'Ban',
-        isPopular: true,
-      },
-      {
-        id: 'p3',
-        ruleText: 'Do not discuss political topics, political parties, or express political opinions.',
-        ruleSummary: 'No political content',
-        description: 'Keeps responses neutral and free from political discussions.',
-        ruleType: 'restriction',
-        category: 'Privacy & Safety',
-        icon: 'Ban',
-        isPopular: false,
-      },
-    ],
-  },
-  {
-    name: 'Sources & Citations',
-    icon: 'BookOpen',
-    description: 'Set requirements for sources and references',
-    rules: [
-      {
-        id: 'p4',
-        ruleText: 'Always provide sources and citations for factual claims. Include URLs or references where possible.',
-        ruleSummary: 'Always cite sources',
-        description: 'Ensures responses include verifiable sources for facts and claims.',
-        ruleType: 'source',
-        category: 'Sources & Citations',
-        icon: 'BookOpen',
-        isPopular: true,
-      },
-      {
-        id: 'p5',
-        ruleText: 'When discussing scientific topics, prioritize peer-reviewed sources and academic research.',
-        ruleSummary: 'Prefer academic sources',
-        description: 'Prioritizes scholarly and peer-reviewed content over general sources.',
-        ruleType: 'source',
-        category: 'Sources & Citations',
-        icon: 'GraduationCap',
-        isPopular: false,
-      },
-    ],
-  },
-  {
-    name: 'Response Format',
-    icon: 'AlignLeft',
-    description: 'Control how responses are structured and formatted',
-    rules: [
-      {
-        id: 'p6',
-        ruleText: 'Keep responses concise and to the point. Avoid unnecessary elaboration unless I ask for more detail.',
-        ruleSummary: 'Be concise',
-        description: 'Produces shorter, more focused responses.',
-        ruleType: 'format',
-        category: 'Response Format',
-        icon: 'AlignLeft',
-        isPopular: true,
-      },
-      {
-        id: 'p7',
-        ruleText: 'Use bullet points and numbered lists to organize information when appropriate.',
-        ruleSummary: 'Use lists for clarity',
-        description: 'Makes complex information easier to scan and understand.',
-        ruleType: 'format',
-        category: 'Response Format',
-        icon: 'List',
-        isPopular: true,
-      },
-    ],
-  },
-  {
-    name: 'Advanced',
-    icon: 'Settings',
-    description: 'Fine-tune AI behavior for specific needs',
-    rules: [
-      {
-        id: 'p8',
-        ruleText: 'If you are uncertain about something, clearly state your uncertainty rather than guessing.',
-        ruleSummary: 'Acknowledge uncertainty',
-        description: 'Promotes honesty about knowledge limitations.',
-        ruleType: 'preference',
-        category: 'Advanced',
-        icon: 'HelpCircle',
-        isPopular: true,
-      },
-      {
-        id: 'p9',
-        ruleText: 'Present multiple perspectives on controversial or debatable topics.',
-        ruleSummary: 'Show multiple viewpoints',
-        description: 'Provides balanced coverage of complex issues.',
-        ruleType: 'preference',
-        category: 'Advanced',
-        icon: 'Scale',
-        isPopular: false,
-      },
-    ],
-  },
-];
 
 export function MyRulesClient() {
   const [activeTab, setActiveTab] = useState('my-rules');
@@ -338,26 +184,35 @@ export function MyRulesClient() {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  const { data: rules = sampleRules, isLoading } = useQuery<UserRule[]>({
+  const { data: rules = [], isLoading } = useQuery<UserRule[]>({
     queryKey: ['user-rules'],
     queryFn: async () => {
-      // In production: const res = await fetch('/api/thinktank/user-rules');
-      return sampleRules;
+      const res = await fetch(`${API_BASE}/api/thinktank/user-rules`);
+      if (!res.ok) throw new Error('Failed to fetch user rules');
+      const { data } = await res.json();
+      return data ?? [];
     },
   });
 
-  const { data: presetCategories = samplePresetCategories } = useQuery<PresetCategory[]>({
+  const { data: presetCategories = [] } = useQuery<PresetCategory[]>({
     queryKey: ['preset-rules'],
     queryFn: async () => {
-      // In production: const res = await fetch('/api/thinktank/user-rules/presets');
-      return samplePresetCategories;
+      const res = await fetch(`${API_BASE}/api/thinktank/user-rules/presets`);
+      if (!res.ok) throw new Error('Failed to fetch preset rules');
+      const { data } = await res.json();
+      return data ?? [];
     },
   });
 
   const createRuleMutation = useMutation({
     mutationFn: async (data: typeof newRule) => {
-      // In production: await fetch('/api/thinktank/user-rules', { method: 'POST', body: JSON.stringify(data) });
-      console.log('Creating rule:', data);
+      const res = await fetch(`${API_BASE}/api/thinktank/user-rules`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('Failed to create rule');
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-rules'] });
@@ -368,8 +223,13 @@ export function MyRulesClient() {
 
   const toggleRuleMutation = useMutation({
     mutationFn: async ({ ruleId, isActive }: { ruleId: string; isActive: boolean }) => {
-      // In production: await fetch(`/api/thinktank/user-rules/${ruleId}/toggle`, { method: 'PATCH', body: JSON.stringify({ isActive }) });
-      console.log('Toggling rule:', ruleId, isActive);
+      const res = await fetch(`${API_BASE}/api/thinktank/user-rules/${ruleId}/toggle`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive }),
+      });
+      if (!res.ok) throw new Error('Failed to toggle rule');
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-rules'] });
@@ -378,8 +238,11 @@ export function MyRulesClient() {
 
   const deleteRuleMutation = useMutation({
     mutationFn: async (ruleId: string) => {
-      // In production: await fetch(`/api/thinktank/user-rules/${ruleId}`, { method: 'DELETE' });
-      console.log('Deleting rule:', ruleId);
+      const res = await fetch(`${API_BASE}/api/thinktank/user-rules/${ruleId}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Failed to delete rule');
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-rules'] });
@@ -390,8 +253,13 @@ export function MyRulesClient() {
 
   const addPresetMutation = useMutation({
     mutationFn: async (presetId: string) => {
-      // In production: await fetch('/api/thinktank/user-rules/add-preset', { method: 'POST', body: JSON.stringify({ presetId }) });
-      console.log('Adding preset:', presetId);
+      const res = await fetch(`${API_BASE}/api/thinktank/user-rules/add-preset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ presetId }),
+      });
+      if (!res.ok) throw new Error('Failed to add preset');
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-rules'] });

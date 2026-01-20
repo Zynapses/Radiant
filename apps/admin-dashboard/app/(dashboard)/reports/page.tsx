@@ -547,12 +547,9 @@ export default function ReportsPage() {
         toast({ 
           title: 'Report generated', 
           description: 'Your report is ready for download.',
-          action: (
-            <a href={data.download_url} target="_blank" rel="noopener noreferrer">
-              Download
-            </a>
-          ),
         });
+        // Open download in new tab
+        window.open(data.download_url, '_blank');
       } else if (data.error) {
         toast({ title: 'Report failed', description: data.error, variant: 'destructive' });
       }

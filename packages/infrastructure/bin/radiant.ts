@@ -14,6 +14,8 @@ import { CatoTierTransitionStack } from '../lib/stacks/cato-tier-transition-stac
 import { CatoRedisStack } from '../lib/stacks/cato-redis-stack';
 import { CatoGenesisStack } from '../lib/stacks/cato-genesis-stack';
 import { BrainStack } from '../lib/stacks/brain-stack';
+import { ThinkTankAuthStack } from '../lib/stacks/thinktank-auth-stack';
+import { ThinkTankAdminApiStack } from '../lib/stacks/thinktank-admin-api-stack';
 import { 
   RADIANT_VERSION, 
   getTierConfig,
@@ -257,10 +259,49 @@ const adminStack = new AdminStack(app, `${stackPrefix}-admin`, {
 adminStack.addDependency(apiStack);
 
 // ============================================================================
+// THINK TANK AUTH STACK (Phase 2 - Isolated Auth for Think Tank Apps)
+// ============================================================================
+
+// 10. Think Tank Auth Stack (API-based auth for Think Tank apps)
+// Think Tank apps MUST NOT access Cognito directly - all auth goes through this API
+const allowedOrigins = environment === 'prod'
+  ? ['https://app.thinktank.ai', 'https://manage.thinktank.ai']
+  : environment === 'staging'
+  ? ['https://app.staging.thinktank.ai', 'https://manage.staging.thinktank.ai']
+  : ['http://localhost:3001', 'http://localhost:3002'];
+
+const thinkTankAuthStack = new ThinkTankAuthStack(app, `${stackPrefix}-thinktank-auth`, {
+  env,
+  environment,
+  domainPrefix: appId,
+  allowedOrigins,
+  tags,
+  description: `RADIANT Think Tank Auth - ${appId} ${environment}`,
+});
+thinkTankAuthStack.addDependency(securityStack);
+
+// 10b. Think Tank Admin API Stack (separate from main API due to resource limits)
+const thinkTankAdminApiStack = new ThinkTankAdminApiStack(app, `${stackPrefix}-thinktank-admin-api`, {
+  env,
+  environment,
+  appId,
+  vpc: networkingStack.vpc,
+  securityGroup: securityStack.apiSecurityGroup,
+  userPool: authStack.userPool,
+  databaseSecretArn: dataStack.cluster.secret?.secretArn || '',
+  databaseEndpoint: dataStack.cluster.clusterEndpoint.hostname,
+  tags,
+  description: `RADIANT Think Tank Admin API - ${appId} ${environment}`,
+});
+thinkTankAdminApiStack.addDependency(authStack);
+thinkTankAdminApiStack.addDependency(dataStack);
+thinkTankAdminApiStack.addDependency(networkingStack);
+
+// ============================================================================
 // BRAIN STACK (Phase 3 - AGI Brain v6.0.4)
 // ============================================================================
 
-// 10. Brain Stack (Ghost Vectors, SOFAI, Dreaming, Oversight)
+// 11. Brain Stack (Ghost Vectors, SOFAI, Dreaming, Oversight)
 // Only create BrainStack if enabled for this tier (Tier 3+)
 let brainStack: BrainStack | undefined;
 if (tierConfig.enableBrain) {

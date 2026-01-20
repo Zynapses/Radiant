@@ -12,10 +12,14 @@ import type { NextRequest } from 'next/server';
 
 // Routes that don't require authentication
 const PUBLIC_ROUTES = [
+  '/',
   '/login',
   '/forgot-password',
   '/reset-password',
   '/api/health',
+  '/demo',
+  '/thinktank-admin/simulator',
+  '/radiant-admin/simulator',
 ];
 
 // Routes that are always allowed (static assets, etc.)

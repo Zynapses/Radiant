@@ -14,12 +14,12 @@ const defaultSignals: ImplicitSignals = { copyRate: 0, regenerateRate: 0, sessio
 
 export default function LearningPage() {
   const [selectedTab, setSelectedTab] = useState<'overview' | 'feedback' | 'signals' | 'features' | 'insights'>('overview');
-  const [mockLearningStats, setMockLearningStats] = useState<LearningStats>(defaultStats);
-  const [mockTopModels, setMockTopModels] = useState<TopModel[]>([]);
-  const [mockTopSpecialties, setMockTopSpecialties] = useState<TopSpecialty[]>([]);
-  const [mockFeatureMetrics, setMockFeatureMetrics] = useState<FeatureMetric[]>([]);
-  const [mockRecentFeedback, setMockRecentFeedback] = useState<RecentFeedbackItem[]>([]);
-  const [mockImplicitSignals, setMockImplicitSignals] = useState<ImplicitSignals>(defaultSignals);
+  const [learningStats, setLearningStats] = useState<LearningStats>(defaultStats);
+  const [topModels, setTopModels] = useState<TopModel[]>([]);
+  const [topSpecialties, setTopSpecialties] = useState<TopSpecialty[]>([]);
+  const [featureMetrics, setFeatureMetrics] = useState<FeatureMetric[]>([]);
+  const [recentFeedback, setRecentFeedback] = useState<RecentFeedbackItem[]>([]);
+  const [implicitSignals, setImplicitSignals] = useState<ImplicitSignals>(defaultSignals);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,20 +30,20 @@ export default function LearningPage() {
       try {
         const API = process.env.NEXT_PUBLIC_API_URL || '';
         const [statsRes, modelsRes, specialtiesRes, metricsRes, feedbackRes, signalsRes] = await Promise.all([
-          fetch(`${API}/admin/learning/stats`),
-          fetch(`${API}/admin/learning/top-models`),
-          fetch(`${API}/admin/learning/top-specialties`),
-          fetch(`${API}/admin/learning/feature-metrics`),
-          fetch(`${API}/admin/learning/recent-feedback`),
-          fetch(`${API}/admin/learning/implicit-signals`),
+          fetch(`${API}/api/admin/learning/stats`),
+          fetch(`${API}/api/admin/learning/top-models`),
+          fetch(`${API}/api/admin/learning/top-specialties`),
+          fetch(`${API}/api/admin/learning/feature-metrics`),
+          fetch(`${API}/api/admin/learning/recent-feedback`),
+          fetch(`${API}/api/admin/learning/implicit-signals`),
         ]);
-        if (statsRes.ok) { const { data } = await statsRes.json(); setMockLearningStats(data || defaultStats); }
+        if (statsRes.ok) { const { data } = await statsRes.json(); setLearningStats(data || defaultStats); }
         else setError('Failed to load learning data.');
-        if (modelsRes.ok) { const { data } = await modelsRes.json(); setMockTopModels(data || []); }
-        if (specialtiesRes.ok) { const { data } = await specialtiesRes.json(); setMockTopSpecialties(data || []); }
-        if (metricsRes.ok) { const { data } = await metricsRes.json(); setMockFeatureMetrics(data || []); }
-        if (feedbackRes.ok) { const { data } = await feedbackRes.json(); setMockRecentFeedback(data || []); }
-        if (signalsRes.ok) { const { data } = await signalsRes.json(); setMockImplicitSignals(data || defaultSignals); }
+        if (modelsRes.ok) { const { data } = await modelsRes.json(); setTopModels(data || []); }
+        if (specialtiesRes.ok) { const { data } = await specialtiesRes.json(); setTopSpecialties(data || []); }
+        if (metricsRes.ok) { const { data } = await metricsRes.json(); setFeatureMetrics(data || []); }
+        if (feedbackRes.ok) { const { data } = await feedbackRes.json(); setRecentFeedback(data || []); }
+        if (signalsRes.ok) { const { data } = await signalsRes.json(); setImplicitSignals(data || defaultSignals); }
       } catch { setError('Failed to connect to learning service.'); }
       setLoading(false);
     }
@@ -82,30 +82,30 @@ export default function LearningPage() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Total Interactions</p>
-          <p className="text-xl font-bold text-gray-900 dark:text-white">{mockLearningStats.totalInteractions.toLocaleString()}</p>
+          <p className="text-xl font-bold text-gray-900 dark:text-white">{learningStats.totalInteractions.toLocaleString()}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">With Feedback</p>
-          <p className="text-xl font-bold text-blue-600">{mockLearningStats.interactionsWithFeedback.toLocaleString()}</p>
-          <p className="text-xs text-gray-400">{Math.round(mockLearningStats.interactionsWithFeedback / mockLearningStats.totalInteractions * 100)}%</p>
+          <p className="text-xl font-bold text-blue-600">{learningStats.interactionsWithFeedback.toLocaleString()}</p>
+          <p className="text-xs text-gray-400">{Math.round(learningStats.interactionsWithFeedback / learningStats.totalInteractions * 100)}%</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Avg Outcome Score</p>
-          <p className={`text-xl font-bold ${getScoreColor(mockLearningStats.avgOutcomeScore)}`}>
-            {Math.round(mockLearningStats.avgOutcomeScore * 100)}%
+          <p className={`text-xl font-bold ${getScoreColor(learningStats.avgOutcomeScore)}`}>
+            {Math.round(learningStats.avgOutcomeScore * 100)}%
           </p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Positive Feedback</p>
-          <p className="text-xl font-bold text-green-600">{Math.round(mockLearningStats.feedbackPositiveRatio * 100)}%</p>
+          <p className="text-xl font-bold text-green-600">{Math.round(learningStats.feedbackPositiveRatio * 100)}%</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Today&apos;s Interactions</p>
-          <p className="text-xl font-bold text-purple-600">{mockLearningStats.interactionsToday.toLocaleString()}</p>
+          <p className="text-xl font-bold text-purple-600">{learningStats.interactionsToday.toLocaleString()}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Today&apos;s Feedback</p>
-          <p className="text-xl font-bold text-orange-600">{mockLearningStats.feedbackToday.toLocaleString()}</p>
+          <p className="text-xl font-bold text-orange-600">{learningStats.feedbackToday.toLocaleString()}</p>
         </div>
       </div>
 
@@ -141,7 +141,7 @@ export default function LearningPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
             <h2 className="text-lg font-semibold mb-4">Top Performing Models</h2>
             <div className="space-y-3">
-              {mockTopModels.map((model, idx) => (
+              {topModels.map((model, idx) => (
                 <div key={model.model} className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
                   <div className="flex items-center gap-3">
                     <span className="w-6 h-6 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center text-xs font-bold">
@@ -164,8 +164,8 @@ export default function LearningPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
             <h2 className="text-lg font-semibold mb-4">Request Distribution by Specialty</h2>
             <div className="space-y-3">
-              {mockTopSpecialties.map(spec => {
-                const percent = (spec.count / mockLearningStats.totalInteractions) * 100;
+              {topSpecialties.map(spec => {
+                const percent = (spec.count / learningStats.totalInteractions) * 100;
                 return (
                   <div key={spec.specialty} className="space-y-1">
                     <div className="flex justify-between text-sm">
@@ -189,12 +189,12 @@ export default function LearningPage() {
             <h2 className="text-lg font-semibold mb-4">Learning Data Pipeline</h2>
             <div className="flex items-center justify-between overflow-x-auto pb-4">
               {[
-                { name: 'Interactions', count: mockLearningStats.totalInteractions, color: 'blue' },
-                { name: 'Auto Quality', count: Math.round(mockLearningStats.totalInteractions * 0.95), color: 'purple' },
-                { name: 'User Feedback', count: mockLearningStats.interactionsWithFeedback, color: 'green' },
-                { name: 'Implicit Signals', count: Math.round(mockLearningStats.totalInteractions * 0.8), color: 'orange' },
-                { name: 'Computed Outcomes', count: Math.round(mockLearningStats.totalInteractions * 0.92), color: 'cyan' },
-                { name: 'Training Ready', count: Math.round(mockLearningStats.totalInteractions * 0.75), color: 'pink' },
+                { name: 'Interactions', count: learningStats.totalInteractions, color: 'blue' },
+                { name: 'Auto Quality', count: Math.round(learningStats.totalInteractions * 0.95), color: 'purple' },
+                { name: 'User Feedback', count: learningStats.interactionsWithFeedback, color: 'green' },
+                { name: 'Implicit Signals', count: Math.round(learningStats.totalInteractions * 0.8), color: 'orange' },
+                { name: 'Computed Outcomes', count: Math.round(learningStats.totalInteractions * 0.92), color: 'cyan' },
+                { name: 'Training Ready', count: Math.round(learningStats.totalInteractions * 0.75), color: 'pink' },
               ].map((step, idx) => (
                 <React.Fragment key={step.name}>
                   <div className={`flex flex-col items-center px-4 py-3 rounded-lg min-w-[100px] bg-${step.color}-50 dark:bg-${step.color}-900/20`}>
@@ -221,12 +221,12 @@ export default function LearningPage() {
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow text-center">
               <p className="text-3xl font-bold text-green-600">👍</p>
               <p className="text-sm text-gray-500 mt-1">Thumbs Up</p>
-              <p className="font-bold">{Math.round(mockLearningStats.feedbackPositiveRatio * mockLearningStats.interactionsWithFeedback).toLocaleString()}</p>
+              <p className="font-bold">{Math.round(learningStats.feedbackPositiveRatio * learningStats.interactionsWithFeedback).toLocaleString()}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow text-center">
               <p className="text-3xl font-bold text-red-600">👎</p>
               <p className="text-sm text-gray-500 mt-1">Thumbs Down</p>
-              <p className="font-bold">{Math.round((1 - mockLearningStats.feedbackPositiveRatio) * mockLearningStats.interactionsWithFeedback).toLocaleString()}</p>
+              <p className="font-bold">{Math.round((1 - learningStats.feedbackPositiveRatio) * learningStats.interactionsWithFeedback).toLocaleString()}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow text-center">
               <p className="text-3xl font-bold">⭐</p>
@@ -236,12 +236,12 @@ export default function LearningPage() {
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow text-center">
               <p className="text-3xl font-bold">💬</p>
               <p className="text-sm text-gray-500 mt-1">With Comments</p>
-              <p className="font-bold">{Math.round(mockLearningStats.interactionsWithFeedback * 0.15).toLocaleString()}</p>
+              <p className="font-bold">{Math.round(learningStats.interactionsWithFeedback * 0.15).toLocaleString()}</p>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow text-center">
               <p className="text-3xl font-bold">✏️</p>
               <p className="text-sm text-gray-500 mt-1">User Edited</p>
-              <p className="font-bold">{Math.round(mockLearningStats.interactionsWithFeedback * 0.08).toLocaleString()}</p>
+              <p className="font-bold">{Math.round(learningStats.interactionsWithFeedback * 0.08).toLocaleString()}</p>
             </div>
           </div>
 
@@ -262,7 +262,7 @@ export default function LearningPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {mockRecentFeedback.map(fb => (
+                  {recentFeedback.map(fb => (
                     <tr key={fb.id}>
                       <td className="py-3 font-medium text-sm">{fb.task}</td>
                       <td className="py-3">
@@ -308,7 +308,7 @@ export default function LearningPage() {
                   <span className="text-sm font-medium">Copy Rate</span>
                   <span className="text-2xl">📋</span>
                 </div>
-                <p className="text-3xl font-bold text-green-600">{Math.round(mockImplicitSignals.copyRate * 100)}%</p>
+                <p className="text-3xl font-bold text-green-600">{Math.round(implicitSignals.copyRate * 100)}%</p>
                 <p className="text-xs text-gray-500 mt-1">Users who copied the response (positive signal)</p>
               </div>
               
@@ -317,7 +317,7 @@ export default function LearningPage() {
                   <span className="text-sm font-medium">Regenerate Rate</span>
                   <span className="text-2xl">🔄</span>
                 </div>
-                <p className="text-3xl font-bold text-red-600">{Math.round(mockImplicitSignals.regenerateRate * 100)}%</p>
+                <p className="text-3xl font-bold text-red-600">{Math.round(implicitSignals.regenerateRate * 100)}%</p>
                 <p className="text-xs text-gray-500 mt-1">Users who regenerated (negative signal)</p>
               </div>
               
@@ -326,7 +326,7 @@ export default function LearningPage() {
                   <span className="text-sm font-medium">Session Continue Rate</span>
                   <span className="text-2xl">➡️</span>
                 </div>
-                <p className="text-3xl font-bold text-blue-600">{Math.round(mockImplicitSignals.sessionContinueRate * 100)}%</p>
+                <p className="text-3xl font-bold text-blue-600">{Math.round(implicitSignals.sessionContinueRate * 100)}%</p>
                 <p className="text-xs text-gray-500 mt-1">Users who continued the session (positive signal)</p>
               </div>
               
@@ -335,7 +335,7 @@ export default function LearningPage() {
                   <span className="text-sm font-medium">Follow-up Rate</span>
                   <span className="text-2xl">💬</span>
                 </div>
-                <p className="text-3xl font-bold text-purple-600">{Math.round(mockImplicitSignals.followupRate * 100)}%</p>
+                <p className="text-3xl font-bold text-purple-600">{Math.round(implicitSignals.followupRate * 100)}%</p>
                 <p className="text-xs text-gray-500 mt-1">Users who asked follow-up questions</p>
               </div>
               
@@ -344,7 +344,7 @@ export default function LearningPage() {
                   <span className="text-sm font-medium">Avg Read Time</span>
                   <span className="text-2xl">⏱️</span>
                 </div>
-                <p className="text-3xl font-bold text-orange-600">{(mockImplicitSignals.avgReadTimeMs / 1000).toFixed(1)}s</p>
+                <p className="text-3xl font-bold text-orange-600">{(implicitSignals.avgReadTimeMs / 1000).toFixed(1)}s</p>
                 <p className="text-xs text-gray-500 mt-1">Average time spent reading response</p>
               </div>
             </div>
@@ -381,7 +381,7 @@ export default function LearningPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {mockFeatureMetrics.map(feature => (
+                  {featureMetrics.map(feature => (
                     <tr key={feature.feature}>
                       <td className="py-3">
                         <p className="font-medium">{feature.feature.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>

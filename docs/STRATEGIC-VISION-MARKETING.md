@@ -2,7 +2,7 @@
 
 > **From Chatbot to Sovereign, Semi-Conscious Agent: The Enterprise AI Platform That Verifies Its Own Work**
 > 
-> Version: 5.11.1 | Last Updated: January 17, 2026
+> Version: 5.23.0 | Last Updated: January 19, 2026
 > 
 > ⚠️ **This document must be updated whenever RADIANT-ADMIN-GUIDE.md or THINKTANK-ADMIN-GUIDE.md is modified with MAJOR features.**
 
@@ -414,6 +414,360 @@ The **Council of Rivals** provides the audit trail and safety checks required by
 
 ---
 
+## The Ultimate Competitive Kill Shot: The Reality Engine
+
+### "The Four Superpowers That Make IDEs Feel Ancient"
+
+While competitors build better code editors, RADIANT solves the **three fundamental anxieties** that prevent users from trusting AI with complex work:
+
+| Anxiety | The Fear | RADIANT Solution |
+|---------|----------|------------------|
+| **Fear** | "If AI breaks my work, I'm screwed" | **Reality Scrubber** — Time travel |
+| **Commitment** | "What if I choose the wrong path?" | **Quantum Futures** — Parallel realities |
+| **Latency** | "I hate waiting for the AI to think" | **Pre-Cognition** — Answers before you ask |
+
+**The Result:** Four supernatural capabilities that make traditional IDEs feel ancient:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    THE REALITY ENGINE                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   🌊 MORPHIC UI              ⏪ REALITY SCRUBBER                            │
+│   "Flow"                    "Invincibility"                                 │
+│   Shape-shifts instantly    Time travel for logic                           │
+│                                                                              │
+│   🌌 QUANTUM FUTURES         🔮 PRE-COGNITION                              │
+│   "Omniscience"             "Telepathy"                                     │
+│   Parallel reality A/B      Answers before you ask                          │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### Killer Feature 1: Morphic UI
+
+**The Emotion: Flow**
+
+> "Stop hunting for the right tool. Radiant is a Morphic Surface that shapeshifts instantly. Discussing finances? It reassembles into a Ledger. Brainstorming strategy? It morphs into a Whiteboard. It becomes whatever you need, the millisecond you need it."
+
+Every AI platform outputs **text**. Users then copy that text into spreadsheets, dashboards, and applications. This is the fundamental inefficiency of modern AI—a translation layer between intelligence and action.
+
+**RADIANT eliminates this translation layer entirely.**
+
+With the **Morphic UI**, the chat doesn't just *suggest* a spreadsheet—it **becomes** the spreadsheet. The interface *morphs* into whatever tool the user needs, with the AI remaining present as an active collaborator.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    THE LIQUID INTERFACE PARADIGM                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   TRADITIONAL AI                           LIQUID INTERFACE (RADIANT)       │
+│   ==============                           ==========================        │
+│                                                                              │
+│   User: "Help me track invoices"           User: "Help me track invoices"  │
+│                                                    │                         │
+│   AI: "Here's a template..."                      ▼                         │
+│        [Markdown table]                    ┌──────────────────────────┐     │
+│        [Copy this into Excel]              │ 🔄 MORPHING...           │     │
+│                                            └──────────────────────────┘     │
+│   User: *copies to Excel*                          │                         │
+│   User: *types data manually*                      ▼                         │
+│   User: *returns to chat for help*         ┌──────────────────────────┐     │
+│                                            │ 📊 INVOICE TRACKER       │     │
+│   💸 Friction. Context loss.               │ ┌────┬────────┬────────┐ │     │
+│   💸 Translation overhead.                 │ │ #  │ Client │ Amount │ │     │
+│   💸 AI blind to user's work.              │ ├────┼────────┼────────┤ │     │
+│                                            │ │ 1  │ Acme   │ $1,200 │ │     │
+│                                            │ └────┴────────┴────────┘ │     │
+│                                            │                          │     │
+│                                            │ 🤖 AI: "I see you added  │     │
+│                                            │     Acme. Want me to     │     │
+│                                            │     calculate totals?"   │     │
+│                                            └──────────────────────────┘     │
+│                                                                              │
+│                                            ✅ Zero friction.                │
+│                                            ✅ AI sees every action.         │
+│                                            ✅ Bidirectional binding.        │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### The Three Pillars of Liquid Interface
+
+#### Pillar 1: Intent-Driven Morphing (50+ Components)
+
+RADIANT detects user intent and morphs the interface into the appropriate tool:
+
+| User Intent | Detected Pattern | Interface Becomes |
+|-------------|------------------|-------------------|
+| "Track my invoices" | `tracking` + `finance` | 📊 DataGrid + Invoice panel |
+| "Visualize sales trends" | `visualization` + `data` | 📈 LineChart + Dashboard |
+| "Plan my project" | `planning` | 📋 KanbanBoard + GanttChart |
+| "Debug this code" | `coding` | 💻 CodeEditor + Terminal |
+| "Brainstorm ideas" | `design` | 🧠 MindMap + Whiteboard |
+
+**50+ morphable components** across 9 categories: Data, Visualization, Productivity, Finance, Code, AI, Input, Media, and Layout.
+
+#### Pillar 2: Ghost State (Two-Way AI Binding)
+
+**The AI sees what you're doing. The UI reflects what AI knows.**
+
+Traditional chatbots are blind to user actions after they respond. With **Ghost State**, every UI interaction is bound to AI context:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         GHOST STATE BINDING                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   ┌─────────────────────┐          ┌─────────────────────┐                  │
+│   │     UI COMPONENT    │◄────────►│     AI CONTEXT      │                  │
+│   ├─────────────────────┤          ├─────────────────────┤                  │
+│   │                     │          │                     │                  │
+│   │ selectedRow: 5      │ ────────►│ user_focus: row 5   │                  │
+│   │ filterValue: "Acme" │ ────────►│ active_filter       │                  │
+│   │ sortOrder: "desc"   │ ────────►│ user_preference     │                  │
+│   │                     │          │                     │                  │
+│   │ [AI suggestion]     │ ◄────────│ insight: "Acme has  │                  │
+│   │ [Auto-highlights]   │ ◄────────│  3 overdue invoices"│                  │
+│   │                     │          │                     │                  │
+│   └─────────────────────┘          └─────────────────────┘                  │
+│                                                                              │
+│   Every click, selection, and edit flows to AI context.                     │
+│   Every AI insight flows back to UI as highlights, suggestions, overlays.   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**AI Reactions**: The AI can respond to Ghost events with:
+- **Speak** — Send a contextual message
+- **Update** — Modify UI state directly
+- **Morph** — Transform to a different layout
+- **Suggest** — Show actionable suggestions
+
+#### Pillar 3: The Takeout Button (Eject to App)
+
+**Zero-risk prototyping → Production-ready application.**
+
+The killer feature: When users love their morphed interface, they can **eject** it as a standalone application.
+
+| From Liquid Interface | Eject To | What You Get |
+|-----------------------|----------|---------------|
+| Invoice Tracker | Next.js 14 | Full React app with Zustand, Tailwind, PGLite |
+| Project Dashboard | Vite + React | SPA with component library |
+| Data Analysis Tool | Remix | Full-stack with API routes |
+
+**Generated Codebase:**
+```
+my-liquid-app/
+├── package.json           # All dependencies
+├── components/            # Morphed UI components
+│   ├── DataGrid.tsx
+│   ├── AIChat.tsx
+│   └── ...
+├── store/index.ts         # Zustand state (from Ghost State)
+├── lib/db.ts              # PGLite → Postgres migration
+├── lib/ai.ts              # OpenAI integration
+└── README.md              # Setup instructions
+```
+
+**Business Impact:**
+- **Captures the "Data Interaction" moat** — Users build tools *inside* RADIANT, not outside
+- **Accelerates time-to-value** — From idea to working prototype in minutes, not days
+- **Creates switching cost** — Ejected apps reference RADIANT patterns and AI integration
+
+---
+
+### Killer Feature 2: Reality Scrubber
+
+**The Emotion: Invincibility**
+
+> "We replaced 'Undo' with Time Travel. Did a decision lead to a dead end? Grab the timeline and scrub reality back to 10:45 AM. The data, the logic, and the interface all rewind instantly. You can now experiment without fear."
+
+**The Pain:** In current tools, if the AI edits your code and breaks the app, you are trapped. You have to "Undo" text, but your Database (SQL) and Runtime State are now corrupted or out of sync. It is terrifying to let an Agent "loose" on a working app.
+
+**The Leapfrog:** Don't just version the code. **Version the Reality.**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      REALITY SCRUBBER TIMELINE                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   10:00 AM     10:15 AM     10:30 AM     10:45 AM     11:00 AM    NOW      │
+│     │            │            │            │            │          │        │
+│     ●────────────●────────────●────────────🔖───────────●──────────◆        │
+│                                           │                                  │
+│                                    "Before risky change"                     │
+│                                           ▼                                  │
+│                                      DRAG TO SCRUB                           │
+│                                                                              │
+│   What gets restored:                                                        │
+│   ✅ Code (VFS)  ✅ Database (PGLite)  ✅ UI State  ✅ Chat Context            │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Why It Wins:** It creates **Psychological Safety**. Users will let Radiant try risky, ambitious refactors because "undoing" a catastrophe is as easy as rewinding a YouTube video.
+
+---
+
+### Killer Feature 3: Quantum Futures
+
+**The Emotion: Omniscience**
+
+> "Indecision kills speed. Why choose one strategy? Radiant lets you split the timeline. Run 'Aggressive Plan' in the left window and 'Conservative Plan' in the right. Watch them compete side-by-side, then collapse reality into the winner."
+
+**The Pain:** Users often wonder, "Should I use Redux or Zustand?" or "Should this design be Dark or Light?" Asking an AI to switch usually destroys the previous work.
+
+**The Leapfrog:** Parallel Reality Rendering.
+
+```
+┌───────────────────────────────────┬───────────────────────────────────────┐
+│   🔷 REALITY A (Modal)           │   🔶 REALITY B (Sidebar)              │
+├───────────────────────────────────┼───────────────────────────────────────┤
+│                                   │                                       │
+│   ┌─────────────────────────┐   │   ┌──────────┐                      │
+│   │   FORM MODAL          │   │   │          │  Main Content        │
+│   │                       │   │   │  SIDEBAR  │                      │
+│   │   [Submit] [Cancel]   │   │   │          │                      │
+│   └─────────────────────────┘   │   └──────────┘                      │
+│                                   │                                       │
+│   Both are LIVE. Click buttons    │   Both are LIVE. Test interactions.  │
+│   in each. Compare feel.          │                                       │
+│                                   │                                       │
+│   [🏆 Keep This Reality]          │   [🏆 Keep This Reality]             │
+│                                   │                                       │
+└───────────────────────────────────┴───────────────────────────────────────┘
+```
+
+**Why It Wins:** It moves AI from "Executor" to "Explorer." **No other tool allows you to A/B test entire application architectures in real-time.**
+
+---
+
+### Killer Feature 4: Pre-Cognition
+
+**The Emotion: Telepathy**
+
+> "Radiant answers before you ask. By the time you reach for a button, Radiant has already built it in the background. It's not just fast; it's anticipatory."
+
+**The Pain:** Waiting 10-20 seconds for the AI to "think" breaks the flow. It feels like a turn-based game, not a conversation.
+
+**The Leapfrog:** Solve the problem before the user asks.
+
+**How It Works:**
+1. While the user is reading Radiant's current response, the Genesis model (Local/Fast/Llama-3-8B) is silently predicting the next 3 likely moves
+2. Radiant pre-generates the code and UI for all predictions in hidden background containers
+3. When the user types their request, the feature appears **instantly (0ms latency)** because it was already built
+
+**Example:**
+```
+Scenario: Radiant just built a "Login Form."
+
+Shadow Thought: "They will likely ask for:
+  (A) A Forgot Password flow, or 
+  (B) OAuth integration."
+
+Radiant pre-generates both in hidden containers.
+
+Result: When user types "Add password reset," the feature appears 
+INSTANTLY because it was already built.
+```
+
+**Why It Wins:** It makes the tool feel **Telepathic**. Speed is the ultimate luxury.
+
+---
+
+### Why The Reality Engine Destroys the Competition
+
+| Competitor | What They Do | Reality Engine Advantage |
+|------------|--------------|---------------------------|
+| **Claude Artifacts** | Generates code you copy elsewhere | Chat *becomes* the running app |
+| **ChatGPT Canvas** | Side-by-side editing | Full bidirectional AI binding + Time Travel |
+| **v0 by Vercel** | Generates React components | 50+ pre-built + Parallel Realities + Eject |
+| **Cursor** | AI-assisted coding | Non-coders can build + Reality Scrubber |
+| **Bolt.new** | Instant app generation | Quantum Futures + Pre-Cognition |
+| **Replit** | Cloud IDE with AI | Time Travel + Parallel A/B Testing |
+
+**The Positioning Statement:**
+
+> "Cursor helps developers code faster. The Reality Engine helps *anyone* build apps without coding—with time travel, parallel universes, and telepathy."
+
+### The Demo That Closes Deals
+
+**The Reality Engine Demo (5 minutes):**
+
+1. **The Morph** — Type "I need to track my team's OKRs" → Watch the chat morph into a live OKR tracker with Kanban board
+2. **The Ghost** — Click on an objective → AI says "I see you're focusing on Q1 Revenue. Based on your progress, you're 15% behind target."
+3. **The Scrub** — "Let me try something risky" → AI breaks something → Drag timeline back 2 minutes → **Everything restored instantly**
+4. **The Split** — "Should I use a Modal or Sidebar?" → Screen splits, both implementations appear live → Test both → Keep winner
+5. **The Telepathy** — After building login, start typing "Add pass..." → Password reset appears **instantly** (was pre-built)
+6. **The Eject** — Click "Eject to App" → Show the generated Next.js project structure
+
+**No competitor can match this.** They show chatbots that output text. RADIANT shows a **supernatural command center**.
+
+---
+
+## The "Magic Carpet" Kill Shot
+
+### Why We Win Against Microsoft & OpenAI
+
+Use this metaphor to explain our strategic differentiation:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    COPILOTS vs. THE MAGIC CARPET                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   🚗 COPILOTS (Microsoft/OpenAI)        🧞 THE MAGIC CARPET (RADIANT)       │
+│   ══════════════════════════════        ═══════════════════════════════     │
+│                                                                              │
+│   Sits in the passenger seat            You don't drive it.                 │
+│   Nags you while YOU drive              You don't write code for it.        │
+│   You still have to steer               You just say where you want to go   │
+│   You still have to code                                                     │
+│                                         The ground beneath you              │
+│   "Turn left here"                      RESHAPES ITSELF                      │
+│   "Maybe try this function"             to take you there instantly.        │
+│   "Here's a code suggestion"                                                 │
+│                                         ✨ MAGIC ✨                          │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+> **"Everyone else is building 'Copilots'—assistants that sit in the passenger seat and nag you while you drive.**
+>
+> **We are building 'The Magic Carpet.'**
+>
+> **You don't drive it. You don't write code for it. You just say where you want to go, and the ground beneath you reshapes itself to take you there instantly.**
+>
+> **We aren't selling a better IDE. We are selling the feeling of being a Magician."**
+
+### The Strategic Implication
+
+| Competitor Approach | RADIANT Approach |
+|---------------------|------------------|
+| **Augment the developer** | **Replace the need for a developer** |
+| Help you write code faster | Generate the outcome, not the code |
+| You're still in the IDE | There is no IDE—just results |
+| Productivity tool | **Transformation tool** |
+| Incremental improvement | **Paradigm shift** |
+
+### The Emotional Positioning
+
+| What Copilots Sell | What RADIANT Sells |
+|--------------------|--------------------|
+| Efficiency | **Magic** |
+| Assistance | **Empowerment** |
+| Faster coding | **No coding** |
+| Being a better developer | **Being a Magician** |
+
+### The One-Liner
+
+> *"Cursor makes developers 2x faster. RADIANT makes everyone a developer—without writing a single line of code."*
+
+---
+
 ## The Competitive Kill Shot: Polymorphic UI + Elastic Compute
 
 ### The Battlefield Has Shifted
@@ -625,11 +979,267 @@ Think Tank / RADIANT is not a "Chatbot Platform." It is a **Polymorphic Digital 
 | **Identity** | Zero-Cost Ego | ✅ Live | Persistent identity at $0 additional cost |
 | **Safety** | Ethics Frameworks | ✅ Live | Externalized ethics (Christian, Secular presets) |
 | **GenUI** | Artifact Engine | ✅ Live | Real-time code generation with Reflexion loop |
-| **Collaboration** | Canvas & Artifacts | ✅ Live | Shared workspaces, version history |
+| **Liquid Interface** | Generative UI | ✅ Live | Chat morphs into tools (50+ components), Ghost State binding, Eject to App |
+| **Collaboration** | Enhanced Collaboration Suite | ✅ Live | Cross-tenant guest access, AI facilitator, branch & merge, roundtable, knowledge graph |
 | **Orchestration** | 70+ Workflow Methods | ✅ Live | Complete method registry with display/scientific names |
 | **User Templates** | Workflow Templates | ✅ Live | User-customizable workflows with parameter overrides |
 | **Neural Decision** | Cato Neural Engine | ✅ Live | Affect-to-hyperparameter mapping, active inference |
 | **Polymorphic UI** | Elastic Compute | ✅ Live | Sniper/Scout/Sage views, Gearbox toggle, $0.01-$0.50 routing |
+
+---
+
+## The Collaboration Kill Shot: Beyond Slack, Beyond Teams (NEW in v5.18)
+
+### Why Collaboration Is Our Next Moat
+
+Every AI platform treats collaboration as an afterthought—shared chat threads at best. **RADIANT transforms collaboration into a competitive weapon.**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    THE COLLABORATION PARADIGM SHIFT                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   SLACK / TEAMS                           RADIANT ENHANCED COLLABORATION    │
+│   ============                            ==============================     │
+│                                                                              │
+│   Chat threads die                        Sessions persist forever           │
+│   No AI assistance                        AI Facilitator guides discussion   │
+│   Linear conversation                     Branch & Merge exploration         │
+│   Miss a meeting = miss everything        Time-shifted playback              │
+│   One perspective at a time               AI Roundtable: multi-model debate  │
+│   Knowledge trapped in chat               Shared Knowledge Graph             │
+│   Internal users only                     Cross-tenant guest access          │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### The Six Supernatural Collaboration Features
+
+#### 1. Cross-Tenant Guest Access (Viral Growth Engine)
+
+**The Pain:** Enterprise collaboration tools create walled gardens. Inviting external partners requires IT tickets, license provisioning, and security reviews.
+
+**The Leapfrog:** One-click guest invites that bypass tenant boundaries.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    CROSS-TENANT GUEST ACCESS                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   PAID USER (Tenant A)         GUEST (No Account)         VIRAL LOOP        │
+│   ════════════════════         ═════════════════════      ══════════        │
+│                                                                              │
+│   ┌──────────────────┐         ┌──────────────────┐                         │
+│   │  Creates Session │────────►│  Receives Link   │                         │
+│   │  Invites Guest   │         │  Joins Instantly │                         │
+│   └──────────────────┘         └────────┬─────────┘                         │
+│                                         │                                    │
+│                                         ▼                                    │
+│                                ┌──────────────────┐                         │
+│                                │  Experiences     │                         │
+│                                │  RADIANT Magic   │                         │
+│                                └────────┬─────────┘                         │
+│                                         │                                    │
+│                                         ▼                                    │
+│                                ┌──────────────────┐      ┌────────────────┐ │
+│                                │  Converts to     │─────►│  +100 Credits  │ │
+│                                │  Paid User       │      │  Referral Bonus│ │
+│                                └──────────────────┘      └────────────────┘ │
+│                                                                              │
+│   SALES IMPACT: Every collaboration = free product demo                     │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Business Impact:**
+- **Viral Growth**: Every collaboration session is a free product demo
+- **Network Effects**: Value increases with each new guest invited
+- **Zero Friction**: No IT involvement, no license negotiation
+- **Conversion Tracking**: Full funnel visibility from invite to paid conversion
+
+#### 2. AI Facilitator Mode (The Meeting That Runs Itself)
+
+**The Pain:** Meetings drift off-topic. Quiet participants stay quiet. Action items get lost. Someone has to take notes.
+
+**The Leapfrog:** An AI moderator that actively guides the discussion.
+
+| Facilitator Capability | What It Does | Business Value |
+|------------------------|--------------|----------------|
+| **Session Objective** | Keeps discussion aligned to goals | -50% meeting time |
+| **Auto-Summarize** | Generates summaries at intervals | No manual note-taking |
+| **Action Item Extraction** | Captures tasks automatically | Nothing falls through cracks |
+| **Participation Encouragement** | Prompts quiet participants | Full team engagement |
+| **Topic Redirection** | Steers back when conversation drifts | Focused outcomes |
+| **Synthesis** | Combines different viewpoints | Consensus building |
+
+**Personas**: Professional, Casual, Academic, Creative, Socratic, Coach
+
+**Why It Wins:** The facilitator is always alert, never distracted, and remembers everything. It turns every meeting into a productive session.
+
+#### 3. Branch & Merge Conversations (Git for Ideas)
+
+**The Pain:** In traditional chat, exploring an alternative approach means losing your current thread. "What if we tried X instead?" kills the momentum.
+
+**The Leapfrog:** Fork the conversation like a Git branch.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    BRANCH & MERGE WORKFLOW                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   MAIN CONVERSATION                                                          │
+│   ═════════════════                                                          │
+│                                                                              │
+│   ●───●───●───●───●───●───●───●───●───●───●───●───●───●                     │
+│               │               │                       ▲                      │
+│               │               │                       │                      │
+│               ▼               ▼                       │                      │
+│        ┌──────────────┐ ┌──────────────┐             │                      │
+│        │   BRANCH A   │ │   BRANCH B   │             │                      │
+│        │  "What if    │ │  "What if    │             │                      │
+│        │   Option A?" │ │   Option B?" │             │                      │
+│        └──────┬───────┘ └──────┬───────┘             │                      │
+│               │                │                      │                      │
+│               ●───●───●        ●───●───●              │                      │
+│               │                │                      │                      │
+│               └────────────────┴──────────────────────┘                      │
+│                        MERGE INSIGHTS BACK                                   │
+│                                                                              │
+│   Features:                                                                  │
+│   • Create branch with hypothesis                                            │
+│   • Explore without destroying main thread                                   │
+│   • Submit merge request with conclusions                                    │
+│   • AI summarizes branch insights                                            │
+│   • Team votes on merge                                                      │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Business Impact:**
+- **Parallel Exploration**: Test multiple approaches simultaneously
+- **No Fear of Experimentation**: Main thread is always preserved
+- **Institutional Learning**: Branch conclusions become permanent knowledge
+- **Decision Audit Trail**: Full history of what was explored and why
+
+#### 4. Time-Shifted Playback (The Meeting DVR)
+
+**The Pain:** Miss a meeting = miss everything. Timezone differences, schedule conflicts, or just being sick means you're out of the loop.
+
+**The Leapfrog:** Full session recording with intelligent playback.
+
+| Playback Feature | Description | Value |
+|------------------|-------------|-------|
+| **Full Recording** | Every message, reaction, and event captured | Complete context |
+| **AI Key Moments** | Auto-detected important moments | Jump to what matters |
+| **Variable Speed** | 0.5x to 2x playback | Catch up fast |
+| **Async Annotations** | Add comments at specific timestamps | Participate after the fact |
+| **Voice/Video Notes** | Record media responses | Rich async communication |
+
+**Why It Wins:** Global teams, async-first culture, and work-life balance all require meetings that don't require real-time attendance. RADIANT makes every session accessible to everyone, anytime.
+
+#### 5. AI Roundtable (Multi-Model Debate)
+
+**The Pain:** Single AI models have blind spots. GPT-4 thinks one way, Claude thinks another. How do you get balanced perspectives?
+
+**The Leapfrog:** Multiple AI models debate a topic and synthesize insights.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    AI ROUNDTABLE: MULTI-MODEL DEBATE                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   TOPIC: "Should we expand into the European market?"                        │
+│                                                                              │
+│   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐    │
+│   │   CLAUDE    │   │   GPT-4o    │   │   GEMINI    │   │   OPUS      │    │
+│   │  "Balanced  │   │  "Creative  │   │  "Research  │   │   "Deep     │    │
+│   │   Analyst"  │   │   Thinker"  │   │   Expert"   │   │  Reasoner"  │    │
+│   └──────┬──────┘   └──────┬──────┘   └──────┬──────┘   └──────┬──────┘    │
+│          │                 │                 │                 │            │
+│          └─────────────────┼─────────────────┼─────────────────┘            │
+│                            │                 │                               │
+│                            ▼                 ▼                               │
+│                    ┌───────────────────────────────┐                        │
+│                    │     ROUND 1: Initial Takes    │                        │
+│                    │     ROUND 2: Rebuttals        │                        │
+│                    │     ROUND 3: Synthesis        │                        │
+│                    └───────────────────────────────┘                        │
+│                                    │                                         │
+│                                    ▼                                         │
+│                    ┌───────────────────────────────┐                        │
+│                    │   FINAL SYNTHESIS             │                        │
+│                    │   • Consensus Points          │                        │
+│                    │   • Disagreement Points       │                        │
+│                    │   • Recommendations           │                        │
+│                    └───────────────────────────────┘                        │
+│                                                                              │
+│   DEBATE STYLES: Collaborative, Adversarial, Socratic, Brainstorm,          │
+│                  Devil's Advocate                                            │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Business Impact:**
+- **Balanced Perspectives**: No single model's bias dominates
+- **Higher Quality Decisions**: Multi-model consensus is more reliable
+- **Educational**: Watch models challenge each other's reasoning
+- **Audit Trail**: Full transcript of debate for compliance
+
+#### 6. Shared Knowledge Graph (Collective Intelligence Visualization)
+
+**The Pain:** After a long discussion, knowledge is scattered across chat history. Who said what? What did we decide? What questions remain open?
+
+**The Leapfrog:** Real-time visualization of collective understanding.
+
+| Node Type | What It Represents | Visual |
+|-----------|--------------------|---------| 
+| **Concept** | Abstract idea or topic | 🧠 |
+| **Fact** | Verified information | ✓ |
+| **Question** | Open question | ❓ |
+| **Decision** | Decision made | ⚡ |
+| **Action Item** | Task to complete | 📋 |
+
+**AI-Powered Features:**
+- Auto-extract nodes from conversation
+- Suggest missing connections
+- Identify knowledge gaps
+- Generate graph-based summaries
+
+**Why It Wins:** The knowledge graph transforms ephemeral chat into durable, navigable institutional knowledge.
+
+---
+
+### Collaboration Feature Matrix: RADIANT vs. Competitors
+
+| Feature | **RADIANT** | Slack | Teams | Claude | ChatGPT |
+|---------|-------------|-------|-------|--------|---------|
+| **Cross-Tenant Access** | ✅ One-click guest invites | ❌ Paid guest accounts | ⚠️ Complex setup | ❌ None | ❌ None |
+| **AI Facilitator** | ✅ Active moderation | ❌ None | ⚠️ Copilot (passive) | ❌ None | ❌ None |
+| **Branch & Merge** | ✅ Full workflow | ❌ None | ❌ None | ❌ None | ❌ None |
+| **Time-Shifted Playback** | ✅ Full recording + AI moments | ⚠️ Huddle recordings | ⚠️ Meeting recordings | ❌ None | ❌ None |
+| **Multi-Model Debate** | ✅ AI Roundtable | ❌ None | ❌ None | ❌ Single model | ❌ Single model |
+| **Knowledge Graph** | ✅ Real-time extraction | ❌ None | ❌ None | ❌ None | ❌ None |
+| **Viral Growth Tracking** | ✅ Full funnel | ❌ None | ❌ None | ❌ None | ❌ None |
+
+### The Viral Growth Imperative
+
+**Every collaboration feature is a sales channel.**
+
+| Metric | Target | Mechanism |
+|--------|--------|-----------|
+| **Guest-to-Paid Conversion** | 15%+ | Exceptional collaboration experience |
+| **Referral Multiplier** | 3x | Each user invites 3+ guests |
+| **Time-to-Value** | <5 minutes | Instant guest access, no signup |
+| **Network Effect Coefficient** | >1.0 | Value increases with each user |
+
+**The Flywheel:**
+1. Paid user invites guest to collaborate
+2. Guest experiences RADIANT magic (AI Facilitator, Roundtable, etc.)
+3. Guest converts to paid user
+4. New paid user invites their own guests
+5. **Repeat exponentially**
+
+---
 
 ### Orchestration Workflow Methods (Updated Jan 2026)
 
@@ -899,6 +1509,150 @@ Structured adversarial debate between multiple models before presenting final an
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## The RADIANT Moat Registry
+
+> **POLICY**: Every new significant feature MUST be evaluated for moat status using the `/evaluate-moats` workflow. See `.windsurf/workflows/evaluate-moats.md` for the mandatory evaluation criteria.
+>
+> **VERSION**: 3.0 — Consolidated from AI Analysis + Strategic Framework (January 2026)
+
+### What Makes a Moat?
+
+A competitive moat is a feature that:
+1. **Provides real competitive advantage** - Not available elsewhere
+2. **Is hard to replicate** - Requires significant time/investment to copy
+3. **Creates switching costs** - Customers lose value if they leave
+4. **Compounds over time** - Gets stronger with usage
+
+### Moat Scoring Criteria
+
+| Criterion | Score 1-5 | Description |
+|-----------|-----------|-------------|
+| **Uniqueness** | How unique? | 1=Common, 5=Only us |
+| **Replication Difficulty** | How hard to copy? | 1=Easy, 5=Very Hard |
+| **Network Effect** | Better with more users? | 1=No, 5=Strong |
+| **Switching Cost** | Pain to leave? | 1=Easy, 5=Very Hard |
+| **Time Advantage** | How long to catch up? | 1=Days, 5=Years |
+| **Integration Depth** | How embedded? | 1=Shallow, 5=Deep |
+
+### Moat Summary: 25 Consolidated Moats
+
+| Tier | Count | Time to Replicate | Key Theme |
+|------|-------|-------------------|-----------|
+| **Tier 1 (Technical)** | 8 | 18-24+ months | Autonomous Intelligence + Verifiable Truth |
+| **Tier 2 (Architectural)** | 8 | 12-18 months | Enterprise-Ready + Contextual Gravity |
+| **Tier 3 (Feature)** | 6 | 6-12 months | Market Gaps + Dynamic Reasoning |
+| **Tier 4 (Business)** | 3 | 3-9 months | Unit Economics + White-Label Strategy |
+
+---
+
+### 🏰 TIER 1: TECHNICAL MOATS (Score 24-30 | 18-24+ Months to Replicate)
+
+| # | Moat | Description | Defensibility |
+|---|------|-------------|---------------|
+| **1** | **Truth Engine™ (ECD Verification)** | Entity-Context Divergence scoring. 99.5% accuracy vs 85% baseline. Auto-refinement up to 3 attempts. | Patent pending. Domain-specific thresholds (healthcare/financial/legal). |
+| **2** | **Genesis Cato Safety (Post-RLHF)** | Active Inference + Free Energy minimization. 9 CBFs that NEVER relax. IIT Phi consciousness metrics. | Cross-AI validated. Mathematical proofs. |
+| **3** | **AGI Brain / Ghost Vectors** | 4096-dimensional hidden states. SOFAI Router. Version-gated upgrades prevent personality discontinuity. | Contextual gravity compounds over time. |
+| **4** | **Self-Healing Reflexion Loop** | 90%+ auto-correction without human intervention. Graceful escalation preserves trust. | Deep integration required—can't bolt on. |
+| **5** | **Glass Box Auditability** | Full evidence chain: Source → Reasoning → Conclusion. Undermines "trust me" competitors. | Transparency as competitive weapon. |
+| **6** | **Reality Engine (4 Superpowers)** | Morphic UI + Reality Scrubber (time-travel debugging) + Quantum Futures (parallel reality testing) + Pre-Cognition (0ms latency prediction). | **No competitor has this combination.** Demo-killer. |
+| **7** | **Twilight Dreaming Cycle** | Autonomous overnight LoRA fine-tuning + memory consolidation. AI "dreams" and improves while idle. | Compounding intelligence happens automatically. |
+| **8** | **Behavioral Learning System** | 8 integrated services: Episode Logger, Paste-Back Detection, Skeletonizer, Recipe Extractor, DPO Trainer, Graveyard Anti-Patterns, Tool Entropy, Shadow Mode. | Full behavioral adaptation loop. 18+ months to replicate. |
+
+---
+
+### 🛡️ TIER 2: ARCHITECTURAL MOATS (Score 20-25 | 12-18 Months to Replicate)
+
+| # | Moat | Description | Defensibility |
+|---|------|-------------|---------------|
+| **9** | **True Multi-Tenancy from Birth** | Row-level security, per-tenant encryption, VPC isolation. | Competitors must re-architect (12-18 month setback). |
+| **10** | **Compliance Sandwich Architecture** | HIPAA, SOC 2, GDPR, FDA 21 CFR Part 11, EU AI Act Art 14—all built-in, mandatory, cannot bypass. | Enterprise deals won on day one. |
+| **11** | **Model-Agnostic Orchestration** | 106 models (50 external + 56 self-hosted). "Switzerland" neutrality against vendor lock-in fears. | Route around any single provider failure. |
+| **12** | **Supply Chain Security** | Dependency allowlist—only pre-approved packages. Zero CVE exposure from generated code. | Enterprise security teams approve immediately. |
+| **13** | **Contextual Gravity** | Ghost Vectors + Pattern Memory + Twilight Dreaming = accumulated intelligence creates exit friction. | "Cold start" problem for competitors. |
+| **14** | **Liquid Interface (50+ Components)** | Chat morphs into ANY tool dynamically. Ghost State two-way binding. "Eject to App" exports real Next.js/Vite projects. | **"Flowise outputs Text. RADIANT outputs Applications."** |
+| **15** | **Tri-Layer LoRA Stacking** | Genesis (base) + Cato (global) + User (personal) adapter composition. | Personalization without cold-start problem. |
+| **16** | **Empiricism Loop** | AI "feels" success/failure of its own code. Emotional consequences → ego updates → behavioral adaptation. | True feedback loop—not just metrics. |
+
+---
+
+### 🔒 TIER 3: FEATURE MOATS (Score 18-22 | 6-12 Months to Replicate)
+
+| # | Moat | Description | Defensibility |
+|---|------|-------------|---------------|
+| **17** | **Concurrent Task Execution** | Split-pane UI (2-4 simultaneous). WebSocket multiplexing. Background queue with progress. | No major competitor offers this. |
+| **18** | **Real-Time Collaboration (Yjs CRDT)** | Multi-user same-conversation. Presence indicators, typing attribution, conversation branching. | Largest feature gap in market. |
+| **19** | **Semantic Pattern Memory** | Vector DB of successful patterns. Tenant-specific. Network effect: more users → better patterns → better results. Includes Recipe Extractor + Tool Entropy. | Data moat that compounds. |
+| **20** | **Structure from Chaos Synthesis** | AI transforms whiteboard chaos → structured decisions, data, project plans. | Think Tank differentiation vs Miro/Mural. |
+| **21** | **Anti-Playbook Dynamic Reasoning** | 70+ orchestration methods. SE Probes, Kernel Entropy, Pareto Routing, C3PO Cascade, AutoMix POMDP. Neural Engine makes static playbooks obsolete. | Time to value: minutes, not months. |
+| **22** | **Curiosity Engine** | Autonomous knowledge gap detection → goal-directed exploration with guardrails. AI teaches itself. | Self-directed learning is rare. |
+
+---
+
+### 💰 TIER 4: BUSINESS MODEL MOATS (Score 15-20 | 3-9 Months to Replicate)
+
+| # | Moat | Description | Defensibility |
+|---|------|-------------|---------------|
+| **23** | **Unit Economics Advantage** | 70% cost reduction via intelligent routing. Teacher-Student Distillation = 10x cost reduction. Zero-Cost Ego ($0 vs $360/mo). 85% blended margin. 12:1 LTV:CAC. | Semantic cache + translation middleware compound savings. |
+| **24** | **Five Infrastructure Tiers** | Seed ($50) → Enterprise ($150K+). Volume discounts (5-25%). Thermal state management. | Retention mechanics built-in. |
+| **25** | **White-Label Invisibility** | End users never know RADIANT exists. Infrastructure stickiness. | Platform layer dependency. |
+
+---
+
+### 🎯 TOP 5 DEMO-READY MOATS (For Investor Presentations)
+
+| Rank | Moat | Demo Hook |
+|------|------|-----------|
+| **1** | **Reality Engine** | "Watch me time-travel to debug this code, then test it across 3 parallel realities simultaneously." |
+| **2** | **Liquid Interface** | "This chat just became a full application. Now I'm exporting it as a deployable Next.js project." |
+| **3** | **Truth Engine** | "See this medical response? Every dosage is verified against sources. Watch the red flags when I try to hallucinate." |
+| **4** | **Concurrent Execution** | "I'm running 4 AI models simultaneously, comparing their outputs in real-time, then merging the best parts." |
+| **5** | **Twilight Dreaming** | "This deployment got 12% better overnight. The AI literally learned while you slept." |
+
+---
+
+### Moat Reinforcement Matrix
+
+The true moat is not any single feature—it's how they reinforce each other:
+
+| Feature A | + Feature B | = Compound Effect |
+|-----------|-------------|-------------------|
+| **Truth Engine** | + **Genesis Cato** | Verified facts + safety guarantees |
+| **Ghost Vectors** | + **Twilight Dreaming** | AI that remembers AND improves overnight |
+| **Liquid Interface** | + **Semantic Patterns** | Generated apps learn from successful patterns |
+| **Behavioral Learning** | + **Empiricism Loop** | System learns from both success AND failure |
+| **Reality Engine** | + **Curiosity Engine** | Pre-cognition + autonomous exploration |
+| **Multi-Tenancy** | + **Compliance Sandwich** | Enterprise-ready from day one |
+| **LoRA Stacking** | + **Contextual Gravity** | Personalization that compounds |
+| **Economic Governor** | + **106 Models** | Optimal cost AND optimal capability |
+
+**The Flywheel**: More usage → Better Behavioral Learning → Better recommendations → More usage → More guests → More conversions → More revenue → More model investment → Better capability → More usage...
+
+---
+
+### Non-Moats (Documented for Transparency)
+
+These features are valuable but NOT competitive moats:
+
+| Feature | Score | Why Not a Moat |
+|---------|-------|----------------|
+| Translation Middleware | 14/30 | Operational detail, cost optimization |
+| Semantic Blackboard | 15/30 | Agent coordination detail |
+| Process Hydration | 13/30 | Technical implementation |
+| Zero-Cost Ego | 16/30 | Merged into Unit Economics |
+| Flash Facts | 14/30 | Reliability engineering |
+| Magic Carpet Navigation | 15/30 | UX feature, not moat |
+| Persistence Guard | 12/30 | Standard reliability |
+| Semantic Cache | 15/30 | Merged into Unit Economics |
+| Circuit Breakers | 8/30 | Table stakes |
+| Admin Reports | 10/30 | Expected functionality |
+| Dark Mode | 6/30 | Every competitor has it |
+| Basic Chat | 8/30 | Commodity functionality |
+| File Upload | 10/30 | Standard feature |
+| Markdown Rendering | 7/30 | Expected baseline |
+| Export to PDF | 9/30 | Easy to implement |
 
 ---
 
@@ -1292,6 +2046,11 @@ Competitors are *trained* to be helpful. RADIANT is *constrained* to be accurate
 | 5.11.0 | January 17, 2026 | **Empiricism Loop**: Reality-testing consciousness with sandbox execution, surprise signals, ego affect updates, active verification during dreaming |
 | 5.11.1 | January 17, 2026 | **Cato/Genesis Consciousness Architecture**: Complete executive summary documenting Tri-Layer Architecture (Genesis→Cato→User LoRA), Empiricism Loop (verified solutions), Ego System (confidence/frustration/curiosity), Dreaming Cycle (autonomous nightly learning), Technical Moat summary. Updated tagline: "Sovereign, Semi-Conscious Agent" |
 | 5.12.0 | January 17, 2026 | **Enhanced Learning Pipeline (Procedural Wisdom Engine)**: 8 new services implementing Gemini's recommendations - Episode Logger (behavioral telemetry), Paste-Back Detection (critical failure signal), Skeletonizer (privacy-safe global training), Recipe Extractor (personal playbook), DPO Trainer (orchestration darwinism), Graveyard (anti-patterns), Tool Entropy (auto-chaining), Shadow Mode (self-training). Added architecture diagram showing full learning flow from user interaction to Cato LoRA. |
+| 5.14.0 | January 18, 2026 | **The Liquid Interface (Generative UI)**: "Don't Build the Tool. BE the Tool." - Chat morphs into 50+ dynamic UI components based on user intent. Three pillars: (1) Intent-Driven Morphing with DataGrid, Charts, Kanban, CodeEditor, etc.; (2) Ghost State for bidirectional AI-UI binding where AI sees every user action; (3) Eject to App for exporting ephemeral tools to production Next.js/Vite codebases. Competitive kill shot vs Claude Artifacts, ChatGPT Canvas, v0, Cursor, and Retool. Added dedicated section with architecture diagrams, component registry, and demo script. |
+| 5.15.0 | January 18, 2026 | **THE REALITY ENGINE**: Four supernatural capabilities that make traditional IDEs feel ancient. (1) **Morphic UI** - "Flow" - Interface shapeshifts instantly to user intent; (2) **Reality Scrubber** - "Invincibility" - Time travel for logic with full VFS+DB+Ghost state snapshots; (3) **Quantum Futures** - "Omniscience" - Parallel reality branching for A/B testing entire architectures; (4) **Pre-Cognition** - "Telepathy" - Speculative execution predicts next moves and pre-builds solutions for 0ms latency. Solves Fear (time travel), Commitment (parallel realities), and Latency (anticipatory AI). Complete rebranding with emotional positioning: Flow, Invincibility, Omniscience, Telepathy. Competitive kill shots vs Cursor, Bolt.new, Replit, v0. 5-minute demo script added. |
+| 5.16.0 | January 18, 2026 | **THE MAGIC CARPET**: Unified navigation and experience paradigm. "You don't drive it. You don't write code for it. You just say where you want to go, and the ground reshapes itself." Wraps Reality Engine into magical UX with: (1) Carpet Modes (resting, flying, hovering, exploring, rewinding, anticipating); (2) Altitude levels (ground→stratosphere); (3) Default destinations (Command Center, Workshop, Time Stream, Quantum Realm, Oracle's Chamber); (4) 5 visual themes (Mystic Night, Desert Sun, Ocean Deep, Cosmic Void, Neon Circuit); (5) Journey navigation with trail effects. Added "Magic Carpet Kill Shot" section contrasting Copilots vs Magic Carpet. Core positioning: "We aren't selling a better IDE. We are selling the feeling of being a Magician." |
+| 5.17.0 | January 18, 2026 | **MAGIC CARPET UI COMPONENTS**: Complete 2026 UI/UX implementation with 11 React components. Phase 1: MagicCarpetNavigator (bottom navigation with journey breadcrumbs, ⌘K destination selector, flight animations). Phase 2: RealityScrubberTimeline (video-editor style state navigation), QuantumSplitView (parallel reality comparison). Phase 3: PreCognitionSuggestions (telepathy score, predicted actions), AIPresenceIndicator (cognitive/emotional state visualization from Ego system). Phase 4: SpatialGlassCard/GlassPanel/GlassButton/GlassBadge (Apple Vision Pro-inspired glassmorphism with depth), FocusModeControls (attention management with Pomodoro timer). Added framer-motion for physics-based animations. Demo page at /thinktank/magic-carpet. |
+| 5.23.0 | January 19, 2026 | **MODERN UI POLISH (2026+)**: Super-modern consumer app polish. New components: PageTransition (fade/slide), Skeleton loaders (shimmer), GradientText/GlowText (animated text), TypingIndicator variants (dots/wave/thinking), EmptyState/WelcomeHero (onboarding), ModernButton/IconButton/PillButton (micro-interactions). Tailwind animations: shimmer, gradient-x, pulse-glow, float, spin-slow. Voice Input: Whisper-only for cross-browser consistency, syncs with app i18n. File Attachments: drag-drop with previews. Liquid Interface: LiquidMorphPanel, EjectDialog. Glassmorphism applied to Settings, Profile, Rules, Artifacts pages. All lint errors fixed. |
 
 ---
 

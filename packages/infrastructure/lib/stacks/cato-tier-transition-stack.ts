@@ -331,7 +331,13 @@ export class CatoTierTransitionStack extends cdk.Stack {
       time: sfn.WaitTime.duration(cdk.Duration.seconds(30)),
     });
 
-    const updateAppConfig = new tasks.LambdaInvoke(this, 'UpdateAppConfigTask', {
+    // Separate task instances for each path (Step Functions requires unique next states)
+    const updateAppConfigScaleUp = new tasks.LambdaInvoke(this, 'UpdateAppConfigScaleUpTask', {
+      lambdaFunction: updateAppConfigFn,
+      outputPath: '$.Payload',
+    });
+
+    const updateAppConfigScaleDown = new tasks.LambdaInvoke(this, 'UpdateAppConfigScaleDownTask', {
       lambdaFunction: updateAppConfigFn,
       outputPath: '$.Payload',
     });
@@ -364,8 +370,18 @@ export class CatoTierTransitionStack extends cdk.Stack {
       .branch(cleanupElastiCache)
       .branch(cleanupNeptune);
 
-    // Completion tasks
-    const transitionComplete = new tasks.LambdaInvoke(this, 'TransitionCompleteTask', {
+    // Completion tasks - separate instances per path
+    const transitionCompleteScaleUp = new tasks.LambdaInvoke(this, 'TransitionCompleteScaleUpTask', {
+      lambdaFunction: transitionCompleteFn,
+      outputPath: '$.Payload',
+    });
+
+    const transitionCompleteScaleDown = new tasks.LambdaInvoke(this, 'TransitionCompleteScaleDownTask', {
+      lambdaFunction: transitionCompleteFn,
+      outputPath: '$.Payload',
+    });
+
+    const transitionCompleteCleanupFailed = new tasks.LambdaInvoke(this, 'TransitionCompleteCleanupFailedTask', {
       lambdaFunction: transitionCompleteFn,
       outputPath: '$.Payload',
     });
@@ -389,24 +405,26 @@ export class CatoTierTransitionStack extends cdk.Stack {
     // Step Functions State Machine
     // =========================================================================
 
-    // Scale Up Path
+    // Scale Up Path - rollback chain defined once
+    const rollbackChain = rollbackProvisioning.next(transitionFailed);
+    
     const scaleUpPath = provisionResources
-      .addCatch(rollbackProvisioning.next(transitionFailed), { resultPath: '$.error' })
+      .addCatch(rollbackChain, { resultPath: '$.error' })
       .next(waitForProvisioning)
       .next(
-        verifyProvisioning.addCatch(rollbackProvisioning.next(transitionFailed), { resultPath: '$.error' })
+        verifyProvisioning.addCatch(rollbackChain, { resultPath: '$.error' })
       )
-      .next(updateAppConfig)
-      .next(transitionComplete);
+      .next(updateAppConfigScaleUp)
+      .next(transitionCompleteScaleUp);
 
     // Scale Down Path
     const scaleDownPath = drainConnections
       .next(waitForDrain)
-      .next(updateAppConfig)
+      .next(updateAppConfigScaleDown)
       .next(
-        cleanupResources.addCatch(cleanupFailedAlert.next(transitionComplete), { resultPath: '$.error' })
+        cleanupResources.addCatch(cleanupFailedAlert.next(transitionCompleteCleanupFailed), { resultPath: '$.error' })
       )
-      .next(transitionComplete);
+      .next(transitionCompleteScaleDown);
 
     // Direction choice
     const determineDirection = new sfn.Choice(this, 'DetermineDirection')

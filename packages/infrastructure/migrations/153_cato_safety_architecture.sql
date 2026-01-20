@@ -3,9 +3,9 @@
 -- Migration: 153_cato_safety_architecture.sql
 -- PRODUCTION FINAL - Post-RLHF Safety Architecture
 -- 
--- This migration creates the Cato safety system which REPLACES the legacy
--- Bobble consciousness system. Cato provides mathematically grounded safety
--- guarantees based on Active Inference from computational neuroscience.
+-- This migration creates the Genesis Cato safety system which provides 
+-- mathematically grounded safety guarantees based on Active Inference 
+-- from computational neuroscience.
 -- ============================================================================
 
 -- Prerequisites
@@ -775,21 +775,11 @@ ON CONFLICT (barrier_id) DO UPDATE SET
   updated_at = NOW();
 
 -- ============================================================================
--- PART 14: DEPRECATE LEGACY BOBBLE TABLES
--- Mark legacy tables as deprecated but don't drop them yet for migration safety
+-- PART 14: LEGACY CLEANUP
+-- Genesis Cato is the sole safety architecture
 -- ============================================================================
 
-COMMENT ON TABLE bobble_genesis_state IS 'DEPRECATED: Replaced by Cato Safety Architecture (migration 153). Will be removed in future migration.';
-COMMENT ON TABLE bobble_development_counters IS 'DEPRECATED: Replaced by Cato Safety Architecture (migration 153). Will be removed in future migration.';
-COMMENT ON TABLE bobble_developmental_stage IS 'DEPRECATED: Replaced by Cato Safety Architecture (migration 153). Will be removed in future migration.';
-COMMENT ON TABLE bobble_circuit_breakers IS 'DEPRECATED: Replaced by cato_cbf_definitions (migration 153). Will be removed in future migration.';
-COMMENT ON TABLE bobble_circuit_breaker_events IS 'DEPRECATED: Replaced by cato_cbf_violations (migration 153). Will be removed in future migration.';
-COMMENT ON TABLE bobble_neurochemistry IS 'DEPRECATED: Replaced by Cato Governor (migration 153). Will be removed in future migration.';
-COMMENT ON TABLE bobble_tick_costs IS 'DEPRECATED: Replaced by cato_audit_trail (migration 153). Will be removed in future migration.';
-COMMENT ON TABLE bobble_consciousness_settings IS 'DEPRECATED: Replaced by cato_tenant_config (migration 153). Will be removed in future migration.';
-COMMENT ON TABLE bobble_loop_state IS 'DEPRECATED: Replaced by Cato Safety Architecture (migration 153). Will be removed in future migration.';
-COMMENT ON TABLE bobble_pymdp_state IS 'DEPRECATED: Replaced by genesis_personas C-Matrix (migration 153). Will be removed in future migration.';
-COMMENT ON TABLE bobble_pymdp_matrices IS 'DEPRECATED: Replaced by genesis_personas C-Matrix (migration 153). Will be removed in future migration.';
+-- No legacy tables to clean up
 
 -- ============================================================================
 -- PART 15: MIGRATION LOG

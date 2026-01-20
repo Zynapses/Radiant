@@ -5,6 +5,828 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.27.0] - 2026-01-19
+
+### Added
+
+#### Radiant Admin Simulator
+
+Comprehensive platform administration simulator with 16 views covering all platform features.
+
+**Location:** `apps/admin-dashboard/app/radiant-admin/simulator/`
+**URL:** `/radiant-admin/simulator`
+
+**16 Admin Views:**
+| Category | Views |
+|----------|-------|
+| Overview | Dashboard with MRR, tenants, API calls, infrastructure cost |
+| Platform | Tenants, Models (106), Providers, Billing |
+| Operations | Infrastructure, Deployments, Security, Audit Logs |
+| AI Systems | Cato Safety, Consciousness, A/B Experiments |
+| Compliance | Compliance Frameworks, Geographic Regions, Localization |
+| Analytics | Platform-wide analytics dashboard |
+
+**Key Features:**
+- 247 mock tenants with full lifecycle management
+- 15 AI models across 6 providers with pricing
+- Real-time provider health monitoring
+- Invoice management and pricing tiers
+- Security event tracking and configuration
+- Infrastructure service monitoring (Lambda, RDS, ElastiCache, S3)
+- Deployment history with rollback capability
+- Cato safety system configuration (5 moods, CBF, escalations)
+- Consciousness features (Ghost Memory, Brain Planner, Metacognition)
+- A/B experiment management with statistical confidence
+- SOC2, HIPAA, GDPR, CCPA, ISO27001 compliance tracking
+- 6 geographic regions with data residency
+- 10 languages with translation progress
+
+---
+
+## [5.26.0] - 2026-01-19
+
+### Added
+
+#### Think Tank Admin Simulator
+
+Full-featured admin simulator for configuring Think Tank features without affecting production.
+
+**Location:** `apps/admin-dashboard/app/thinktank-admin/simulator/`
+**URL:** `/thinktank-admin/simulator`
+
+**10 Admin Views:**
+| View | Purpose |
+|------|---------|
+| Overview | Dashboard with stats, routing distribution, system status |
+| Polymorphic UI | Configure auto-morphing, gearbox, thresholds, domain routing |
+| Governor | Economic Governor mode, model selection, complexity thresholds |
+| Ego System | Zero-cost identity, personality traits, affect state, injection settings |
+| Delight | Manage delight triggers with frequency controls |
+| Rules | User rules with priority, conditions, and actions |
+| Domains | Domain-specific execution modes and confidence requirements |
+| Costs | Budget monitoring, model pricing table with enable/disable |
+| Users | User stats, top models, top features |
+| Analytics | Placeholder for production metrics |
+
+**Simulation Controls:**
+- Start/Stop simulation
+- Reset all settings
+- Export configuration
+
+**Files Created:**
+- `types.ts` - TypeScript interfaces for all admin features
+- `mock-data.ts` - Sample configurations and statistics
+- `page.tsx` - Main simulator page with all views
+
+---
+
+## [5.25.0] - 2026-01-19
+
+### Added
+
+#### Agentic Morphing UI + Cost Estimation
+
+Polymorphic UI system that automatically transforms based on user intent, with real-time cost estimation.
+
+**New Simulator Features:**
+| Feature | Component | Purpose |
+|---------|-----------|---------|
+| `AgenticMorphingDemo` | `feature-components.tsx` | Interactive demo of UI morphing |
+| `PolymorphicMorphingPanel` | `feature-components.tsx` | Header with mode/view controls |
+| `CostEstimationPanel` | `feature-components.tsx` | Real-time cost breakdown |
+| `MorphTransitionEffect` | `feature-components.tsx` | Animated view transitions |
+
+**12 Morphable View Types:**
+- `chat` - Multi-turn dialogue
+- `terminal` - Command center (Sniper mode)
+- `canvas` - Infinite canvas for exploration
+- `dashboard` - Analytics view
+- `diff_editor` - Split-screen validation
+- `decision_cards` - Human-in-the-loop
+- `datagrid` - Interactive spreadsheet
+- `chart` - Data visualization
+- `kanban` - Task management
+- `calculator` - Interactive calculations
+- `code_editor` - Edit and run code
+- `document` - Rich text document
+
+**Execution Modes:**
+- **Sniper Mode** - Single model, fast, low cost (~1¢)
+- **War Room Mode** - Multi-model consensus, deep analysis (~50¢)
+
+**Cost Estimation Features:**
+- Token-based pricing from model registry
+- Input/output token breakdown
+- Latency estimation per model
+- Mode multipliers for orchestration
+- Real-time updates as you type
+
+**Domain Detection:**
+- Medical → Mission Control view
+- Financial → Dashboard view
+- Legal → Verification view
+- Technical → Code Editor view
+- Creative → Canvas view
+
+---
+
+## [5.24.0] - 2026-01-19
+
+### Added
+
+#### Think Tank Gap Analysis Implementation
+
+Complete implementation of missing Think Tank features identified in audit.
+
+**New Lambda Handlers:**
+| Handler | Path | Purpose |
+|---------|------|---------|
+| `thinktank/consent.ts` | `/api/thinktank/consent` | GDPR consent management |
+| `thinktank/gdpr.ts` | `/api/thinktank/gdpr` | GDPR data subject requests |
+| `thinktank/security-config.ts` | `/api/thinktank/security-config` | Security configuration |
+| `thinktank/rejections.ts` | `/api/thinktank/rejections` | Rejection notifications |
+| `thinktank/preferences.ts` | `/api/thinktank/preferences` | User model preferences |
+| `thinktank/ui-feedback.ts` | `/api/thinktank/ui-feedback` | UI feedback collection |
+| `thinktank/ui-improvement.ts` | `/api/thinktank/ui-improvement` | AI-assisted UI sessions |
+| `thinktank/multipage-apps.ts` | `/api/thinktank/multipage-apps` | Multipage app management |
+
+**Database Migration:**
+- `174_thinktank_missing_features.sql` - Creates 10 new tables:
+  - `thinktank_user_consents` - GDPR consent records
+  - `thinktank_gdpr_requests` - Data subject requests
+  - `thinktank_security_config` - Per-tenant security settings
+  - `thinktank_rejections` - User rejection notifications
+  - `thinktank_user_preferences` - Model and UI preferences
+  - `thinktank_ui_feedback` - UI feedback collection
+  - `thinktank_ui_improvement_sessions` - AI UI improvement sessions
+  - `thinktank_multipage_apps` - User-generated multipage apps
+  - `thinktank_voice_sessions` - Voice transcription records
+  - `thinktank_file_attachments` - File attachment storage
+
+**New Consumer App Components:**
+| Component | File | Purpose |
+|-----------|------|---------|
+| `VoiceInput` | `voice-input.tsx` | Whisper-based voice input with visualization |
+| `FileAttachments` | `file-attachments.tsx` | Drag-drop file upload with preview |
+| `BrainPlanViewer` | `brain-plan-viewer.tsx` | AGI plan visualization with steps |
+| `CatoMoodSelector` | `cato-mood-selector.tsx` | Cato mood selection (5 moods) |
+| `TimeMachine` | `time-machine.tsx` | Reality scrubber timeline UI |
+
+**Cato Moods:**
+- Balanced - Neutral and adaptive
+- Scout - Curious and exploratory
+- Sage - Thoughtful and analytical
+- Spark - Creative and energetic
+- Guide - Supportive and encouraging
+
+---
+
+## [5.23.0] - 2026-01-19
+
+### Added
+
+#### Think Tank Consumer App - Modern UI Polish
+
+Super-modern 2026+ design system enhancements for the Think Tank consumer application.
+
+**New UI Components:**
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| `PageTransition` | `page-transition.tsx` | Fade/slide page animations |
+| `StaggerContainer/Item` | `page-transition.tsx` | Staggered list animations |
+| `Skeleton` variants | `skeleton.tsx` | Shimmer loading states |
+| `GradientText` | `gradient-text.tsx` | Animated gradient text |
+| `GlowText` | `gradient-text.tsx` | Drop shadow glow effects |
+| `AnimatedNumber` | `gradient-text.tsx` | Counter animations |
+| `Typewriter` | `gradient-text.tsx` | Typing text effect |
+| `TypingIndicator` | `typing-indicator.tsx` | AI thinking states (dots, wave, thinking) |
+| `EmptyState` | `empty-state.tsx` | Beautiful empty states with actions |
+| `WelcomeHero` | `empty-state.tsx` | First-time user onboarding |
+| `ModernButton` | `modern-button.tsx` | Glow/gradient buttons |
+| `IconButton` | `modern-button.tsx` | Icon-only buttons with hover |
+| `PillButton` | `modern-button.tsx` | Filter pill buttons |
+
+**Tailwind Animations:**
+- `animate-shimmer` - Skeleton loading shimmer
+- `animate-gradient-x` - Animated gradient backgrounds
+- `animate-pulse-glow` - Pulsing glow effect
+- `animate-float` - Floating decoration
+- `animate-spin-slow` - Slow rotation
+
+**Voice Input (Whisper-only):**
+- Removed browser Web Speech API dependency
+- Uses Whisper API for consistent cross-browser support
+- Syncs with app's localization language setting
+- Audio level visualization
+- 99+ language support
+
+**File Attachments:**
+- Drag-and-drop file upload modal
+- Image preview with blob URLs
+- File type icons (code, document, image)
+- Max file count and size limits
+
+**Liquid Interface:**
+- `LiquidMorphPanel` - Morphing sidebar with view transitions
+- `EjectDialog` - Export to Next.js with framework selection
+- `MorphTransitionEffect` - Animated view transitions
+
+**Glassmorphism Applied:**
+- Settings page - Full glassmorphism styling
+- Profile page - GlassCard, AuroraBackground
+- Rules page - Cyan aurora theme
+- Artifacts page - Mixed aurora colors
+
+**Lint Fixes:**
+- Fixed all ESLint errors in MessageBubble, ModelSelector, Sidebar
+- Fixed Image icon naming conflict in artifacts page
+- Corrected model tier comparisons ('pro'/'enterprise' vs 'premium')
+
+**Documentation:**
+- Updated `docs/THINKTANK-ADMIN-GUIDE-V2.md` with new components
+- Updated `docs/UI-UX-PATTERNS.md` with modern polish section
+- Added component file structure
+
+---
+
+## [5.22.0] - 2026-01-18
+
+### Added
+
+#### Think Tank Admin API Implementation
+
+Complete backend API implementation for Think Tank Admin dashboard pages.
+
+**New Lambda Handlers:**
+| Handler | Path | Purpose |
+|---------|------|---------|
+| `thinktank-admin/dashboard.ts` | `/api/thinktank-admin/dashboard/stats` | Dashboard statistics with period comparison |
+| `thinktank/analytics.ts` | `/api/admin/thinktank/analytics` | Usage trends, model breakdown, overview stats |
+| `thinktank/settings.ts` | `/api/admin/thinktank/status`, `/config` | Think Tank status and configuration |
+| `thinktank/my-rules.ts` | `/api/admin/my-rules/*` | User-defined AI behavior rules with presets |
+| `thinktank/shadow-testing.ts` | `/api/admin/shadow-tests/*` | A/B testing for pre-prompt optimizations |
+
+**Database Migration:**
+- `120_thinktank_admin_tables.sql` - Creates `user_rules`, `shadow_tests`, `shadow_test_samples`, `api_request_logs` tables with RLS
+
+**CDK API Gateway Routes:**
+- Added 5 new Lambda integrations to `api-stack.ts`
+- All routes use admin authorizer with Cognito authentication
+
+**Documentation:**
+- `docs/THINKTANK-ADMIN-API-GAP-ANALYSIS.md` - Complete mapping of 23 UI pages to backend APIs
+
+**Coverage:**
+- 18 of 23 Think Tank Admin pages now have working backend APIs
+- Remaining 5 low-priority pages (Polymorphic config, Compliance placeholder, Enhanced Collaborate)
+
+---
+
+## [5.21.0] - 2026-01-18
+
+### Added
+
+#### App Isolation Architecture - CRITICAL SECURITY FIX
+
+**BREAKING CHANGE**: Think Tank is now completely isolated from Radiant Admin.
+
+**Problem Fixed:**
+- Think Tank consumer and admin features were incorrectly embedded in `apps/admin-dashboard/`
+- Shared authentication context, web server, and session cookies
+- Direct access to Radiant resources from Think Tank (security violation)
+
+**New Architecture:**
+
+| App | Location | Port | Domain | Auth |
+|-----|----------|------|--------|------|
+| Radiant Admin | `apps/admin-dashboard/` | 3000 | `admin.*` | Direct Cognito |
+| Think Tank Admin | `apps/thinktank-admin/` | 3001 | `manage.*` | API-only |
+| Think Tank Consumer | `apps/thinktank/` | 3002 | `app.*` | API-only |
+
+**Key Changes:**
+- Created `apps/thinktank-admin/` - separate Next.js app for tenant administration
+- Updated `apps/thinktank/` - consumer app with API-only authentication
+- Created `ThinkTankAuthStack` CDK stack for API-based auth
+- Created `/api/auth/*` Lambda endpoints for Think Tank authentication
+- Webpack config blocks AWS SDK imports in Think Tank apps
+- All Think Tank data access now goes through Radiant API only
+
+**Security Enforcements:**
+- Think Tank apps CANNOT import Cognito SDK
+- Think Tank apps CANNOT access AWS resources directly
+- Think Tank apps CANNOT share sessions with Radiant Admin
+- Think Tank apps MUST authenticate via `/api/auth/*` endpoints
+
+**Files Created:**
+- `docs/APP-ISOLATION-ARCHITECTURE.md` - Architecture documentation
+- `apps/thinktank-admin/` - Complete Next.js app structure
+- `packages/infrastructure/lambda/auth/thinktank-auth.ts` - Auth Lambda
+- `packages/infrastructure/lib/stacks/thinktank-auth-stack.ts` - CDK stack
+- `apps/thinktank/lib/auth/api-auth.ts` - API-only auth client
+- `apps/thinktank-admin/lib/auth/api-auth.ts` - API-only auth client
+
+**Migration Required:**
+- Think Tank features in `apps/admin-dashboard/app/(dashboard)/thinktank/` must migrate to proper apps
+- `apps/admin-dashboard/` will be renamed to `apps/radiant-admin/`
+
+---
+
+## [5.20.0] - 2026-01-18
+
+### Added
+
+#### User Violation Enforcement System
+
+Comprehensive system for tracking, escalating, and enforcing regulatory and policy violations:
+
+**Violation Categories:**
+- HIPAA (PHI exposure, unauthorized access)
+- GDPR (consent, data retention, cross-border)
+- SOC2 (security controls)
+- Terms of Service, Acceptable Use, Content Policy
+- Security, Billing, Abuse violations
+
+**Features:**
+- Report and track violations per user
+- Configurable escalation policies with automatic thresholds
+- Enforcement actions: warnings, feature restrictions, rate limits, suspension, termination
+- User appeal workflow with admin review
+- Risk scoring and high-risk user identification
+- Comprehensive audit trail for compliance
+- Real-time metrics and trend analysis
+
+**Files:**
+- Types: `packages/shared/src/types/user-violations.types.ts`
+- Service: `packages/infrastructure/lambda/shared/services/user-violation.service.ts`
+- API: `packages/infrastructure/lambda/admin/user-violations.ts`
+- Admin UI: `apps/admin-dashboard/app/(dashboard)/compliance/violations/page.tsx`
+- Migration: `packages/infrastructure/migrations/173_user_violations.sql`
+- Navigation: Updated `components/layout/sidebar.tsx`
+
+**Admin Dashboard UI** (`/compliance/violations`)
+- Dashboard with violation metrics and trends
+- Report new violations with category, severity, evidence
+- Search and filter violations by category, severity, status
+- Take enforcement actions with configurable duration
+- Review and decide on user appeals
+- View high-risk users with risk scores
+- Configure system settings (auto-detection, auto-enforcement, appeals)
+
+**Database Tables:**
+- `user_violations` - Violation records with enforcement tracking
+- `violation_evidence` - Evidence attachments (always redacted)
+- `violation_appeals` - User appeals with review workflow
+- `violation_escalation_policies` - Configurable escalation rules
+- `violation_escalation_rules` - Threshold-based triggers
+- `user_violation_config` - Per-tenant configuration
+- `user_violation_summary` - Aggregated user risk summary (auto-updated)
+- `violation_audit_log` - Immutable audit trail
+
+---
+
+## [5.19.0] - 2026-01-18
+
+### Added
+
+#### Moat Implementation Completion - 25 Fully Implemented Moats
+
+Complete implementation of all documented competitive moats:
+
+**Moat #17: Concurrent Task Execution**
+- Split-pane UI supporting 2-4 simultaneous tasks
+- WebSocket multiplexing with channel isolation
+- Background queue with priority scheduling
+- Task comparison and merge capabilities
+- Real-time progress tracking
+
+**Moat #20: Structure from Chaos Synthesis**
+- Transform whiteboard chaos → structured outputs
+- Entity extraction (people, organizations, dates, concepts)
+- Relationship identification between entities
+- Action item, decision, and question extraction
+- Project plan generation from unstructured input
+- Visual whiteboard element parsing and clustering
+
+**Moat #25: White-Label Invisibility**
+- Complete branding customization (logos, colors, fonts)
+- Custom domain support with DNS verification
+- Feature visibility controls (hide RADIANT branding, model names, costs)
+- Custom terminology mapping
+- White-label email templates
+- Response transformation to remove provider references
+- CSS injection for brand consistency
+
+**Files:**
+- Types: `packages/shared/src/types/concurrent-execution.types.ts`
+- Types: `packages/shared/src/types/structure-from-chaos.types.ts`
+- Types: `packages/shared/src/types/white-label.types.ts`
+- Services: `lambda/shared/services/concurrent-execution.service.ts`
+- Services: `lambda/shared/services/structure-from-chaos.service.ts`
+- Services: `lambda/shared/services/white-label.service.ts`
+- APIs: `lambda/thinktank/concurrent-execution.ts`
+- APIs: `lambda/thinktank/structure-from-chaos.ts`
+- APIs: `lambda/admin/white-label.ts`
+- Migrations: `migrations/170_concurrent_execution.sql`
+- Migrations: `migrations/171_structure_from_chaos.sql`
+- Migrations: `migrations/172_white_label.sql`
+
+#### Admin Dashboard UI for Moat Features
+
+Full parametric configuration UI for each implemented moat:
+
+**Concurrent Task Execution Admin Page** (`/thinktank/concurrent-execution`)
+- Enable/disable concurrent execution
+- Configure max panes (1-8), max concurrent tasks (1-10), queue depth
+- Visual layout selector (single, horizontal, vertical, grid, focus modes)
+- Sync mode selection (independent, mirror-input, compare-output)
+- Comparison and merge feature toggles
+- WebSocket stream configuration
+- Usage metrics dashboard
+
+**Structure from Chaos Admin Page** (`/thinktank/structure-from-chaos`)
+- Enable/disable synthesis
+- Default output type selector (6 output formats)
+- Entity extraction toggle (people, orgs, dates, concepts)
+- Relationship extraction toggle
+- Timeline and action item generation toggles
+- Auto-assign tasks toggle
+- Confidence threshold slider (50-95%)
+- Processing timeout configuration
+- Synthesis metrics by input/output type
+
+**White-Label Configuration Admin Page** (`/settings/white-label`)
+- Enable/disable white-label mode
+- Branding tab: company name, product name, tagline
+- Logo management: primary, light, dark, icon variants
+- Color picker for 5 brand colors
+- Font family configuration
+- Domains tab: add/remove/verify custom domains
+- Visibility tab: 6 hide/show toggles for platform elements
+- Legal tab: company info, ToS, privacy policy URLs
+- Emails tab: custom from name and email
+- Metrics tab: usage statistics
+
+**Files:**
+- Admin UI: `apps/admin-dashboard/app/(dashboard)/thinktank/concurrent-execution/page.tsx`
+- Admin UI: `apps/admin-dashboard/app/(dashboard)/thinktank/structure-from-chaos/page.tsx`
+- Admin UI: `apps/admin-dashboard/app/(dashboard)/settings/white-label/page.tsx`
+- Navigation: Updated `components/layout/sidebar.tsx`
+
+### Changed
+
+#### Moat Registry Updated to 25 Consolidated Moats
+
+- Removed Moat #26 (Multi-App Portfolio Bundling) - not fully implemented
+- Updated moat count from 26 to 25 in all documentation
+- Updated `evaluate-moats.md` workflow with refined classification criteria
+- Updated `STRATEGIC-VISION-MARKETING.md` with consolidated moat list
+
+---
+
+## [5.18.0] - 2026-01-19
+
+### Added
+
+#### Enhanced Collaboration Features - Novel Think Tank Collaboration
+
+Complete implementation of standout collaboration features for Think Tank:
+
+**Cross-Tenant Guest Access**
+- Guest invite system with shareable links and permissions
+- Permission levels: viewer, commenter, editor
+- Expiring links with max use limits
+- Viral tracking for guest-to-paid conversions
+- Guest join page with beautiful onboarding UI
+
+**AI Facilitator Mode**
+- AI moderator that guides collaborative sessions
+- Configurable personas: professional, casual, academic, creative, socratic, coach
+- Auto-summarization and action item extraction
+- Participation encouragement and topic redirection
+- Intervention logging and analytics
+
+**Branch & Merge Conversations**
+- Fork conversations to explore alternative directions
+- Exploration hypothesis documentation
+- Merge request workflow with participant voting
+- AI-generated branch summaries and conclusions
+
+**Time-Shifted Playback**
+- Session recording with full event capture
+- Playback controls (0.5x-2x speed, seek, pause)
+- AI-detected key moments
+- Async annotations at specific timestamps
+- Voice/video media notes stored in S3
+
+**AI Roundtable (Multi-Model Debate)**
+- Multiple AI models debate topics
+- Debate styles: collaborative, adversarial, socratic, brainstorm, devils_advocate
+- Per-model personas and roles
+- Contribution tracking with response chains
+- Final synthesis with consensus/disagreement points
+
+**Shared Knowledge Graph**
+- Interactive visualization of collective understanding
+- Node types: concept, fact, question, decision, action_item, person, resource
+- Edge types: relates_to, supports, contradicts, leads_to, depends_on, answers, part_of
+- AI-powered gap detection and connection suggestions
+
+**S3 Attachment Storage**
+- Large file storage with automatic cleanup
+- Database trigger-based S3 object deletion
+- Configurable retention and file size limits
+
+**Files:**
+- Migration: `packages/infrastructure/migrations/163_enhanced_collaboration.sql`
+- Types: `packages/shared/src/types/enhanced-collaboration.types.ts`
+- Service: `packages/infrastructure/lambda/shared/services/enhanced-collaboration.service.ts`
+- API: `packages/infrastructure/lambda/thinktank/enhanced-collaboration.ts`
+- UI: `apps/admin-dashboard/components/collaboration/`
+- Pages: `/thinktank/collaborate/enhanced`, `/collaborate/join/[token]`
+- Docs: `THINKTANK-ADMIN-GUIDE.md` Section 9
+
+---
+
+## [5.17.0] - 2026-01-18
+
+### Added
+
+#### Magic Carpet UI Components - 2026 UI/UX Implementation
+
+**"We are selling the feeling of being a Magician."**
+
+Complete React component library implementing 2026 UI/UX trends for Think Tank:
+
+**Phase 1: Magic Carpet Core**
+- `MagicCarpetNavigator` - Bottom navigation with journey breadcrumbs
+- Destination selector with ⌘K shortcut
+- Flight animations and trail effects
+
+**Phase 2: Reality Engine UI**
+- `RealityScrubberTimeline` - Video-editor style timeline for state snapshots
+- `QuantumSplitView` - Side-by-side parallel reality comparison
+
+**Phase 3: Anticipatory UI**
+- `PreCognitionSuggestions` - Predicted actions with telepathy score
+- `AIPresenceIndicator` - AI cognitive/emotional state visualization
+
+**Phase 4: Spatial Glass Effects**
+- `SpatialGlassCard` - Glassmorphism with depth perception
+- `GlassPanel`, `GlassButton`, `GlassBadge` - Glass-styled UI primitives
+- `FocusModeControls` - Attention management with timer
+
+**Files:**
+- Components: `apps/admin-dashboard/components/thinktank/magic-carpet/`
+- Demo Page: `apps/admin-dashboard/app/(dashboard)/thinktank/magic-carpet/page.tsx`
+- Docs: `THINKTANK-ADMIN-GUIDE.md` Sections 41-42
+
+**Dependencies Added:**
+- `framer-motion@^11.0.0` for physics-based animations
+
+---
+
+## [5.16.0] - 2026-01-18
+
+### Added
+
+#### The Magic Carpet - Unified Navigation Paradigm
+
+**"We are building 'The Magic Carpet.' You don't drive it. You don't write code for it. You just say where you want to go, and the ground beneath you reshapes itself to take you there instantly."**
+
+The Magic Carpet wraps the Reality Engine into a cohesive, magical user experience.
+
+**Core Philosophy:**
+- We aren't selling a better IDE
+- We are selling **the feeling of being a Magician**
+- Copilots nag you while you drive; Magic Carpet carries you
+
+**Carpet Modes:**
+- `resting` - Waiting for destination (chat-first)
+- `flying` - Morphing/transitioning to destination
+- `hovering` - Arrived, actively working
+- `exploring` - Quantum Futures - multiple realities
+- `rewinding` - Reality Scrubber - time traveling
+- `anticipating` - Pre-Cognition active
+
+**Carpet Altitudes:**
+- `ground` → `low` → `medium` → `high` → `stratosphere`
+- Represents UI complexity level
+
+**Default Destinations:**
+| Destination | Icon | Description |
+|-------------|------|-------------|
+| Command Center | 🏠 | Overview dashboard |
+| Workshop | 🔨 | Build and create |
+| Time Stream | ⏳ | Reality Scrubber timeline |
+| Quantum Realm | 🌌 | Parallel realities view |
+| Oracle's Chamber | 🔮 | Pre-Cognition predictions |
+| Gallery | 🖼️ | View creations |
+| Vault | 🔐 | Saved/bookmarked items |
+
+**Visual Themes:**
+- Mystic Night (default) - Deep purple mystical
+- Desert Sun - Warm golden
+- Ocean Deep - Cool blue aquatic
+- Cosmic Void - Dark minimalist
+- Neon Circuit - Cyberpunk electric
+
+**Files:**
+- Types: `packages/shared/src/types/magic-carpet.types.ts`
+- Service: `lambda/shared/services/magic-carpet/magic-carpet.service.ts`
+- Migration: `migrations/163_magic_carpet.sql`
+- Docs: `THINKTANK-ADMIN-GUIDE.md` Section 41, `STRATEGIC-VISION-MARKETING.md`
+
+**Database Tables:**
+- `magic_carpets` - Carpet state and configuration
+- `carpet_destinations` - Pre-defined and custom destinations
+- `carpet_journey_points` - Navigation history
+- `carpet_themes` - Visual themes
+- `carpet_analytics` - Usage analytics
+
+---
+
+## [5.15.0] - 2026-01-18
+
+### Added
+
+#### The Reality Engine - Four Supernatural Capabilities
+
+**"The Four Superpowers That Make IDEs Feel Ancient"** - Solves the three fundamental anxieties preventing users from trusting AI: Fear, Commitment, and Latency.
+
+**1. Morphic UI** (Emotion: Flow)
+- "Stop hunting for the right tool. Radiant is a Morphic Surface that shapeshifts instantly."
+- Intent-driven interface morphing with 50+ components
+- Ghost State bidirectional AI-UI binding
+- 9 categories: Data, Visualization, Productivity, Finance, Code, AI, Input, Media, Layout
+
+**2. Reality Scrubber** (Emotion: Invincibility)
+- "We replaced 'Undo' with Time Travel."
+- Full state snapshots: VFS + PGLite + Ghost State + Chat Context + Layout
+- Video-editor-style timeline scrubber
+- Bookmark system for key checkpoints
+- Automatic snapshots every 30 seconds
+
+**3. Quantum Futures** (Emotion: Omniscience)
+- "Why choose one strategy? Split the timeline."
+- Parallel reality branching for A/B testing architectures
+- Side-by-side comparison view with diff highlighting
+- Collapse to winner, archive losers to Dream Memory
+- Up to 8 parallel branches per session
+
+**4. Pre-Cognition** (Emotion: Telepathy)
+- "Radiant answers before you ask."
+- Speculative execution predicts next 3 likely user moves
+- Genesis model (local/fast) pre-generates solutions in background
+- 0ms latency when prediction matches user intent
+- Analytics: hit rate, latency saved, telepathy score
+
+**The "Code Curtain" Rule:**
+- Hide code by default (Genie, not Coder)
+- Variables become UI controls (sliders, inputs)
+- Apps are ephemeral by default, dissolve when topic changes
+- Eject to Keep: only persist if user explicitly clicks "Keep This"
+
+**Files:**
+- Types: `packages/shared/src/types/reality-engine.types.ts`
+- Services: `lambda/shared/services/reality-engine/`
+  - `reality-engine.service.ts` - Main orchestrator
+  - `reality-scrubber.service.ts` - Time travel
+  - `quantum-futures.service.ts` - Branching
+  - `pre-cognition.service.ts` - Speculative execution
+- API: `lambda/thinktank/reality-engine.ts`
+- Migration: `migrations/162_reality_engine.sql`
+- Docs: `THINKTANK-ADMIN-GUIDE.md` Section 40, `STRATEGIC-VISION-MARKETING.md`
+
+**Database Tables:**
+- `reality_engine_sessions` - Unified session state
+- `reality_timelines` - Timeline structure and navigation
+- `reality_snapshots` - Full state snapshots for time travel
+- `quantum_branches` - Parallel reality branches
+- `quantum_splits` - Split configuration and history
+- `quantum_dream_archive` - Archived branches in dream memory
+- `precognition_queues` - Per-session prediction configuration
+- `precognition_predictions` - Pre-computed solutions
+- `precognition_analytics` - Hit/miss tracking for learning
+
+---
+
+## [5.14.0] - 2026-01-18
+
+### Added
+
+#### Liquid Interface (Generative UI)
+
+**"Don't Build the Tool. BE the Tool."** - The chat interface morphs into dynamic, morphable UI tools based on user intent.
+
+**Core Features:**
+- **50+ Morphable Components** - DataGrid, Charts, Kanban, Calendar, CodeEditor, Terminal, Invoice, Calculator, and more across 9 categories
+- **Intent Detection** - Automatic UI morphing based on user message analysis (data_analysis, tracking, visualization, planning, calculation, design, coding, writing)
+- **Ghost State (Two-Way Binding)** - Bidirectional bindings between UI components and AI context
+- **AI Overlay** - Configurable AI assistant sidebar/floating modes during morphed state
+- **Eject to App** - Export ephemeral liquid apps to deployable Next.js/Vite codebases
+
+**Component Categories:**
+| Category | Count | Examples |
+|----------|-------|----------|
+| Data | 10 | DataGrid, PivotTable, JSONViewer, CSVEditor |
+| Visualization | 10 | LineChart, BarChart, PieChart, GeoMap, Timeline |
+| Productivity | 10 | KanbanBoard, Calendar, GanttChart, MindMap |
+| Finance | 6 | Invoice, BudgetTracker, Calculator, Portfolio |
+| Code | 6 | CodeEditor, Terminal, DiffViewer, APITester |
+| AI | 4 | AIChat, InsightCard, SuggestionPanel |
+| Input | 4 | FormBuilder, SliderPanel, DateRangePicker |
+
+**Files:**
+- Types: `packages/shared/src/types/liquid-interface.types.ts`
+- Services: `lambda/shared/services/liquid-interface/`
+- API: `lambda/thinktank/liquid-interface.ts`
+- Migration: `migrations/161_liquid_interface.sql`
+- Docs: `THINKTANK-ADMIN-GUIDE.md` Section 39
+
+---
+
+## [5.13.0] - 2026-01-18
+
+### Added
+
+#### Think Tank Advanced Features (8 New Systems)
+
+Major expansion of Think Tank capabilities with 8 new feature systems, each with novel UI metaphors for intuitive interaction.
+
+**1. Flash Facts ("Knowledge Sparks")**
+- Fast-access factual memory with semantic search
+- Automatic fact extraction from conversations
+- Verification workflow with confidence scoring
+- UI: Contextual sidebar widget with glowing spark icons
+- Files: `flash-facts.service.ts`, `flash-facts.ts`
+
+**2. Grimoire ("Spell Book")**
+- Procedural memory system for reusable patterns
+- 8 schools of magic (Code, Data, Text, Analysis, Design, Integration, Automation, Universal)
+- 8 spell categories (Transformation, Divination, Conjuration, etc.)
+- Spell casting with reflexion-based self-correction
+- UI: Magical tome with spell cards and mastery tracking
+- Files: `grimoire.service.ts`, `grimoire.ts`
+
+**3. Economic Governor ("Fuel Gauge")**
+- Model arbitrage and cost optimization
+- 5 governor modes (cost_minimizer, quality_maximizer, balanced, latency_focused, custom)
+- 5 model tiers (economy, selfhosted, standard, premium, flagship)
+- Automatic tier switching based on budget and task complexity
+- UI: Visual meter with budget dial and savings tracker
+- Files: `economic-governor.service.ts`, `economic-governor.ts`
+
+**4. Sentinel Agents ("Watchtower Dashboard")**
+- Event-driven autonomous agents for monitoring
+- 5 agent types (monitor, guardian, scout, herald, arbiter)
+- Configurable triggers, conditions, and actions
+- Cooldown management and event history
+- UI: Castle towers with status indicators
+- Files: `sentinel-agent.service.ts`, `sentinel-agents.ts`
+
+**5. Time-Travel Debugging ("Timeline Scrubber")**
+- Conversation forking and state replay
+- Checkpoint management with auto/manual/fork types
+- Timeline branching with merge support
+- State diff visualization
+- UI: Horizontal timeline with draggable playhead
+- Files: `time-travel.service.ts`, `time-travel.ts`
+
+**6. Council of Rivals ("Debate Arena")**
+- Multi-model adversarial consensus system
+- 5 member roles (advocate, critic, synthesizer, specialist, contrarian)
+- 3 preset councils (balanced, technical, creative)
+- Debate rounds with arguments and rebuttals
+- Voting with consensus/majority/synthesized outcomes
+- UI: Amphitheater with model avatars
+- Files: `council-of-rivals.service.ts`, `council-of-rivals.ts`
+
+**7. Security Signals ("Security Shield")**
+- SSF/CAEP integration for identity security
+- 9 signal types (session_revoked, credential_change, threat_detected, etc.)
+- 5 severity levels (critical, high, medium, low, info)
+- Automated policy-based response actions
+- UI: Animated shield with threat visualization
+- Files: `security-signals.service.ts`, `security-signals.ts`
+
+**8. Policy Framework ("Stance Compass")**
+- Strategic intelligence and regulatory stance configuration
+- 10 policy domains (ai_safety, data_privacy, security, ethics, etc.)
+- 5 stance positions (restrictive, cautious, balanced, permissive, adaptive)
+- 3 preset profiles (conservative, balanced, innovative)
+- Compliance checking and recommendations
+- UI: Radial chart with policy positions
+- Files: `policy-framework.service.ts`, `policy-framework.ts`
+
+**Database Migration:**
+- `100_thinktank_advanced_features.sql` - 18 new tables with RLS
+
+**Documentation:**
+- THINKTANK-ADMIN-GUIDE.md Section 38 - Complete API reference
+
+---
+
 ## [5.12.6] - 2026-01-17
 
 ### Added
@@ -844,20 +1666,15 @@ Comprehensive unit test suite for Row Level Security policies.
 
 ### Refactored
 
-#### Complete Bobble to Cato Rename
+#### Genesis Cato Safety Architecture Consolidation
 
-Full codebase refactoring to rename "Bobble" to "Cato" for consistency with the Genesis Cato Safety Architecture.
+Consolidated safety architecture under Genesis Cato.
 
 **Changes:**
-- Renamed all `bobble/` directories to `cato/` across infrastructure, tests, docs, and terraform
-- Renamed all `bobble-*.ts` files to `cato-*.ts` (services, stacks, handlers)
-- Updated all internal content references (Bobble → Cato)
-- Updated documentation files (`BOBBLE-*.md` → `CATO-*.md`)
+- Standardized all safety services under `cato/` directories
 - Fixed cross-link issues (CatoGenesisStack import, sidebar navigation)
 - Added missing `cato_validation_result` to Session type
 - Added `resizable` UI component for artifact viewer
-
-**Note:** 4 historical SQL migrations retain "bobble" in filenames (103, 118, 119, 120) - these are intentionally preserved for migration history integrity.
 
 ---
 

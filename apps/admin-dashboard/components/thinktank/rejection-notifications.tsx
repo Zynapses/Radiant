@@ -97,52 +97,28 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   admin_override: { label: 'Approved', color: 'bg-purple-100 text-purple-700' },
 };
 
-// Sample data
-const sampleRejections: RejectionNotification[] = [
-  {
-    id: '1',
-    title: 'Request Could Not Be Completed',
-    message: 'The ethical guidelines of available AI providers prevented this response. We attempted 3 different AI models.',
-    detailedReason: 'Multiple providers declined due to content policy restrictions.',
-    suggestedActions: [
-      { action: 'rephrase', description: 'Try rephrasing your request in a different way' },
-      { action: 'contact_admin', description: 'Contact your administrator if you believe this was blocked in error' },
-    ],
-    isRead: false,
-    rejectionType: 'provider_ethics',
-    modelId: 'gpt-4',
-    finalStatus: 'rejected',
-    createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-  },
-  {
-    id: '2',
-    title: 'Resolved with Alternative Model',
-    message: 'Your request was initially declined but was successfully processed by an alternative AI model.',
-    suggestedActions: [],
-    isRead: true,
-    rejectionType: 'content_policy',
-    modelId: 'claude-3-opus',
-    finalStatus: 'fallback_success',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-  },
-];
+// API base URL
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 export function RejectionNotifications() {
   const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: rejectionData = { hasRejections: true, rejections: sampleRejections, unreadCount: 1 } } = useQuery<RejectionDisplayData>({
+  const { data: rejectionData = { hasRejections: false, rejections: [], unreadCount: 0 } } = useQuery<RejectionDisplayData>({
     queryKey: ['rejection-notifications'],
     queryFn: async () => {
-      // In production: const res = await fetch('/api/thinktank/rejections');
-      return { hasRejections: true, rejections: sampleRejections, unreadCount: 1 };
+      const res = await fetch(`${API_BASE}/api/thinktank/rejections`);
+      if (!res.ok) throw new Error('Failed to fetch rejections');
+      const { data } = await res.json();
+      return data ?? { hasRejections: false, rejections: [], unreadCount: 0 };
     },
   });
 
   const markReadMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      // In production: await fetch(`/api/thinktank/rejections/${notificationId}/read`, { method: 'PATCH' });
-      console.log('Marking as read:', notificationId);
+      const res = await fetch(`${API_BASE}/api/thinktank/rejections/${notificationId}/read`, { method: 'PATCH' });
+      if (!res.ok) throw new Error('Failed to mark as read');
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rejection-notifications'] });
@@ -151,8 +127,9 @@ export function RejectionNotifications() {
 
   const dismissMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      // In production: await fetch(`/api/thinktank/rejections/${notificationId}/dismiss`, { method: 'DELETE' });
-      console.log('Dismissing:', notificationId);
+      const res = await fetch(`${API_BASE}/api/thinktank/rejections/${notificationId}/dismiss`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to dismiss');
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rejection-notifications'] });

@@ -46,8 +46,8 @@ const defaultStats: IRHStats = { totalRequests: 0, irhProcessedRequests: 0, mora
 
 export default function IntelligentRequestHandlerPage() {
   const [config, setConfig] = useState<IRHConfig>(defaultConfig);
-  const [mockIRHStats, setMockIRHStats] = useState<IRHStats>(defaultStats);
-  const [mockRecentDecisions, setMockRecentDecisions] = useState<RecentDecision[]>([]);
+  const [irhStats, setIrhStats] = useState<IRHStats>(defaultStats);
+  const [recentDecisions, setRecentDecisions] = useState<RecentDecision[]>([]);
   const [selectedTab, setSelectedTab] = useState<'overview' | 'moral' | 'confidence' | 'improvement' | 'context' | 'proactive' | 'knowledge'>('overview');
   const [hasChanges, setHasChanges] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -60,14 +60,14 @@ export default function IntelligentRequestHandlerPage() {
       try {
         const API = process.env.NEXT_PUBLIC_API_URL || '';
         const [configRes, statsRes, decisionsRes] = await Promise.all([
-          fetch(`${API}/admin/request-handler/config`),
-          fetch(`${API}/admin/request-handler/stats`),
-          fetch(`${API}/admin/request-handler/decisions`),
+          fetch(`${API}/api/admin/request-handler/config`),
+          fetch(`${API}/api/admin/request-handler/stats`),
+          fetch(`${API}/api/admin/request-handler/decisions`),
         ]);
         if (configRes.ok) { const { data } = await configRes.json(); setConfig(data || defaultConfig); }
         else setError('Failed to load request handler data.');
-        if (statsRes.ok) { const { data } = await statsRes.json(); setMockIRHStats(data || defaultStats); }
-        if (decisionsRes.ok) { const { data } = await decisionsRes.json(); setMockRecentDecisions(data || []); }
+        if (statsRes.ok) { const { data } = await statsRes.json(); setIrhStats(data || defaultStats); }
+        if (decisionsRes.ok) { const { data } = await decisionsRes.json(); setRecentDecisions(data || []); }
       } catch { setError('Failed to connect to request handler service.'); }
       setLoading(false);
     }
@@ -155,35 +155,35 @@ export default function IntelligentRequestHandlerPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Total Requests</p>
-          <p className="text-xl font-bold text-gray-900 dark:text-white">{mockIRHStats.totalRequests.toLocaleString()}</p>
+          <p className="text-xl font-bold text-gray-900 dark:text-white">{irhStats.totalRequests.toLocaleString()}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">IRH Processed</p>
-          <p className="text-xl font-bold text-blue-600">{mockIRHStats.irhProcessedRequests.toLocaleString()}</p>
+          <p className="text-xl font-bold text-blue-600">{irhStats.irhProcessedRequests.toLocaleString()}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Moral Blocked</p>
-          <p className="text-xl font-bold text-red-600">{mockIRHStats.moralBlockedRequests}</p>
+          <p className="text-xl font-bold text-red-600">{irhStats.moralBlockedRequests}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Avg IRH Latency</p>
-          <p className="text-xl font-bold text-green-600">{mockIRHStats.avgIRHLatencyMs}ms</p>
+          <p className="text-xl font-bold text-green-600">{irhStats.avgIRHLatencyMs}ms</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Low Confidence</p>
-          <p className="text-xl font-bold text-yellow-600">{mockIRHStats.confidenceWarnings}</p>
+          <p className="text-xl font-bold text-yellow-600">{irhStats.confidenceWarnings}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Improvement Ideas</p>
-          <p className="text-xl font-bold text-purple-600">{mockIRHStats.improvementIdeasGenerated}</p>
+          <p className="text-xl font-bold text-purple-600">{irhStats.improvementIdeasGenerated}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Knowledge Nodes</p>
-          <p className="text-xl font-bold text-orange-600">{mockIRHStats.knowledgeNodesCreated}</p>
+          <p className="text-xl font-bold text-orange-600">{irhStats.knowledgeNodesCreated}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Adaptations</p>
-          <p className="text-xl font-bold text-cyan-600">{mockIRHStats.adaptationsApplied.toLocaleString()}</p>
+          <p className="text-xl font-bold text-cyan-600">{irhStats.adaptationsApplied.toLocaleString()}</p>
         </div>
       </div>
 
@@ -247,7 +247,7 @@ export default function IntelligentRequestHandlerPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
             <h2 className="text-lg font-semibold mb-4">Recent Decisions</h2>
             <div className="space-y-2">
-              {mockRecentDecisions.map(decision => (
+              {recentDecisions.map(decision => (
                 <div key={decision.id} className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{decision.task}</p>

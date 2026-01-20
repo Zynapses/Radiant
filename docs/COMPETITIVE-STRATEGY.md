@@ -357,6 +357,146 @@ Gemini is **one model**. You get what you get. It cannot:
 
 ---
 
+## Gap 7: The "Persistent Memory" Gap (Exploit Session Amnesia)
+
+### The Problem
+
+Every competitor suffers from session amnesia:
+
+| Competitor | Memory Problem |
+|------------|----------------|
+| **ChatGPT/Claude Standalone** | Close the tab = lose all context. When an employee quits, their entire AI context walks out the door—zero institutional learning, no compounding knowledge |
+| **Flowise/Dify** | Static drag-and-drop pipelines charging the same expensive rate regardless of query complexity—"no-code" is actually "no-efficiency" |
+| **CrewAI** | "Thundering Herd" problem: autonomous agents don't share memory, so five agents independently realize they need the same data and spam five duplicate API calls (O(n) cost explosion) |
+
+### The Radiant Fix: Three-Tier Hierarchical Memory
+
+Cato implements persistent memory that survives sessions, employee turnover, and time through three layers:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  THREE-TIER MEMORY ARCHITECTURE                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  TENANT-LEVEL (Institutional Intelligence)              │   │
+│  │  • Neural network learns optimal model routing           │   │
+│  │  • Department preferences (legal→citations, mktg→casual) │   │
+│  │  • Cost optimization patterns ($0.50 → $0.01 routing)    │   │
+│  │  • Merkle-hashed audit trails (7-year retention)         │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                          ▲                                       │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  USER-LEVEL (Relationship Continuity)                    │   │
+│  │  • Ghost Vectors: 4096-dim relationship "feel"           │   │
+│  │  • Expertise level, communication style                  │   │
+│  │  • Persona selection (Balanced/Scout/Sage/Spark/Guide)   │   │
+│  │  • Version-gated upgrades (no personality discontinuity) │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                          ▲                                       │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  SESSION-LEVEL (Real-Time Context)                       │   │
+│  │  • Redis-backed state (survives container restarts)      │   │
+│  │  • Governor epistemic uncertainty tracking               │   │
+│  │  • Control Barrier Functions (real-time safety)          │   │
+│  │  • Feeds observations upward to user/tenant layers       │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Moat: "Contextual Gravity"
+
+This creates **compounding switching costs** that deepen with every interaction:
+
+| Moat Layer | What Migrating Customer Loses | Rebuild Time |
+|------------|-------------------------------|--------------|
+| **Learned Routing** | Months of optimization data | 3-6 months production usage |
+| **Ghost Vectors** | Thousands of relationship "feels" | Cannot be exported |
+| **Audit Trails** | Merkle chain-of-custody | Compliance lock-in (7 years) |
+
+### Why It Wins
+
+> ChatGPT forgets you exist when you close the tab.  
+> Radiant remembers everything—forever.  
+> **Radiant wins 100% of the time on continuity.**
+
+---
+
+## Gap 8: The "Twilight Dreaming" Gap (Exploit Static Deployments)
+
+### The Problem
+
+Competitor deployments depreciate over time:
+- Same capabilities day 1 as day 365
+- No learning from usage patterns
+- Manual updates required for any improvement
+- New model launches reset the learning curve
+
+### The Radiant Fix: Twilight Dreaming (Offline Learning)
+
+During low-traffic periods (4 AM tenant local time), Radiant enters an autonomous learning phase:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      TWILIGHT DREAMING                          │
+├─────────────────────────────────────────────────────────────────┤
+│  4 AM Local Time                                                │
+│                                                                  │
+│  ┌────────────┐   ┌────────────┐   ┌────────────┐              │
+│  │  Collect   │──▶│  Prepare   │──▶│   LoRA     │              │
+│  │  Learning  │   │  Training  │   │ Fine-tune  │              │
+│  │ Candidates │   │  Dataset   │   │            │              │
+│  └────────────┘   └────────────┘   └────────────┘              │
+│        │                │                │                      │
+│        ▼                ▼                ▼                      │
+│  ┌────────────┐   ┌────────────┐   ┌────────────┐              │
+│  │  Filter    │   │   JSONL    │   │  Validate  │              │
+│  │  Quality   │   │  Format    │   │  Adapter   │              │
+│  │   > 0.7    │   │ Upload S3  │   │  Hot-swap  │              │
+│  └────────────┘   └────────────┘   └────────────┘              │
+│                                                                  │
+│  RESULT: Deployment gets measurably smarter every week          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### What Gets Learned
+
+| Learning Type | Description | Customer Benefit |
+|---------------|-------------|------------------|
+| **SOFAI Router** | Which query types route best to which models | 60%+ cost reduction |
+| **Cost Patterns** | Recurring expensive queries that could be cheaper | Automatic savings |
+| **Domain Accuracy** | Domain-specific improvements for your industry | Better results |
+
+### Moat: Appreciating Asset
+
+**The investor thesis**: "Compounding intelligence—every deployment gets smarter over time through Twilight Dreaming; this creates network effects within each tenant."
+
+```
+Deployment_Value(t) = Base_Value + Σ(daily_learning) + Σ(twilight_consolidation)
+```
+
+A 2-year customer has a **fundamentally more capable deployment** than a new customer—with routing decisions reflecting thousands of hours of optimization.
+
+### Model Upgrade Advantage
+
+When GPT-5, Claude 5, or Gemini 3 launches:
+1. New model added to registry with initial proficiencies
+2. SOFAI Router learns optimal routing via A/B testing
+3. Twilight Dreaming consolidates new patterns
+4. **All accumulated institutional knowledge preserved**
+5. Model improvements compound on existing optimization
+
+**Competitors reset to zero. Radiant compounds.**
+
+### Why It Wins
+
+> A competitor's AI is the same on day 365 as day 1.  
+> Radiant gets smarter every single week—automatically.  
+> **Radiant wins 100% of the time on evolution.**
+
+---
+
 ## The Winning Formula
 
 ```

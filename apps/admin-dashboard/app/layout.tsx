@@ -16,10 +16,10 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'RADIANT Admin',
-    template: '%s | RADIANT Admin',
+    default: 'Think Tank Admin',
+    template: '%s | Think Tank Admin',
   },
-  description: 'Administration dashboard for RADIANT AI platform',
+  description: 'Administration dashboard for Think Tank AI platform',
   icons: {
     icon: '/favicon.ico',
   },

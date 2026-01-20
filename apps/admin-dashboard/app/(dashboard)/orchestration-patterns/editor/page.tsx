@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   CanvasControls,
@@ -160,37 +160,6 @@ const ROLE_CONFIG: Record<MethodRole, { bgColor: string; icon: React.ReactNode }
   aggregator: { bgColor: 'bg-pink-500', icon: <Users className="h-4 w-4" /> },
 };
 
-const SAMPLE_WORKFLOW: OrchestrationWorkflow = {
-  id: 'sod-workflow',
-  code: 'SOD',
-  commonName: 'AI Debate',
-  formalName: 'Scalable Oversight via Debate',
-  category: 'Debate & Deliberation',
-  description: 'Two AIs argue opposing positions to convince a judge',
-  steps: [
-    { id: 's1', methodId: 'm1', method: ORCHESTRATION_METHODS[0], x: 100, y: 100, stepOrder: 1, stepName: 'Generate Position A', parameterOverrides: { role: 'proponent' }, isIterative: false, maxIterations: 1, dependsOn: [] },
-    { id: 's2', methodId: 'm1', method: ORCHESTRATION_METHODS[0], x: 400, y: 100, stepOrder: 2, stepName: 'Generate Position B', parameterOverrides: { role: 'opponent' }, isIterative: false, maxIterations: 1, dependsOn: [] },
-    { id: 's3', methodId: 'm8', method: ORCHESTRATION_METHODS[7], x: 100, y: 250, stepOrder: 3, stepName: 'A Challenges B', parameterOverrides: {}, isIterative: false, maxIterations: 1, dependsOn: ['s1', 's2'] },
-    { id: 's4', methodId: 'm8', method: ORCHESTRATION_METHODS[7], x: 400, y: 250, stepOrder: 4, stepName: 'B Challenges A', parameterOverrides: {}, isIterative: false, maxIterations: 1, dependsOn: ['s1', 's2'] },
-    { id: 's5', methodId: 'm9', method: ORCHESTRATION_METHODS[8], x: 100, y: 400, stepOrder: 5, stepName: 'A Defends', parameterOverrides: {}, isIterative: true, maxIterations: 3, dependsOn: ['s3', 's4'] },
-    { id: 's6', methodId: 'm9', method: ORCHESTRATION_METHODS[8], x: 400, y: 400, stepOrder: 6, stepName: 'B Defends', parameterOverrides: {}, isIterative: true, maxIterations: 3, dependsOn: ['s3', 's4'] },
-    { id: 's7', methodId: 'm4', method: ORCHESTRATION_METHODS[3], x: 250, y: 550, stepOrder: 7, stepName: 'Judge Decides', parameterOverrides: { evaluationMode: 'pairwise' }, isIterative: false, maxIterations: 1, dependsOn: ['s5', 's6'] },
-  ],
-  connections: [
-    { id: 'c1', sourceId: 's1', targetId: 's3' },
-    { id: 'c2', sourceId: 's2', targetId: 's3' },
-    { id: 'c3', sourceId: 's1', targetId: 's4' },
-    { id: 'c4', sourceId: 's2', targetId: 's4' },
-    { id: 'c5', sourceId: 's3', targetId: 's5' },
-    { id: 'c6', sourceId: 's4', targetId: 's5' },
-    { id: 'c7', sourceId: 's3', targetId: 's6' },
-    { id: 'c8', sourceId: 's4', targetId: 's6' },
-    { id: 'c9', sourceId: 's5', targetId: 's7' },
-    { id: 'c10', sourceId: 's6', targetId: 's7' },
-  ],
-  defaultConfig: { debateRounds: 3, judgeModel: 'o1' },
-  isEnabled: true,
-};
 
 // ============================================================================
 // Step Node Component
@@ -412,16 +381,51 @@ function StepConfigPanel({
 // Main Editor Page
 // ============================================================================
 
+// Default empty workflow
+const DEFAULT_WORKFLOW: OrchestrationWorkflow = {
+  id: '',
+  code: '',
+  commonName: 'New Workflow',
+  formalName: '',
+  category: '',
+  description: '',
+  steps: [],
+  connections: [],
+  defaultConfig: {},
+  isEnabled: true,
+};
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
+
 export default function OrchestrationPatternEditorPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const patternCode = searchParams.get('pattern') || 'SOD';
 
-  const [workflow, setWorkflow] = useState<OrchestrationWorkflow>(SAMPLE_WORKFLOW);
+  const [workflow, setWorkflow] = useState<OrchestrationWorkflow>(DEFAULT_WORKFLOW);
   const [selectedStep, setSelectedStep] = useState<string | null>(null);
   const [selectedConnection, setSelectedConnection] = useState<string | null>(null);
   const [methodSearch, setMethodSearch] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function loadWorkflow() {
+      setIsLoading(true);
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/orchestration-patterns/${patternCode}`);
+        if (res.ok) {
+          const { data } = await res.json();
+          if (data) setWorkflow(data);
+        }
+      } catch (error) {
+        console.error('Failed to load workflow:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadWorkflow();
+  }, [patternCode]);
 
   const {
     zoom,
