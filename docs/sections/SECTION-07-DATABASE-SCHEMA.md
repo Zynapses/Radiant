@@ -268,7 +268,7 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `reasoning_outcomes` | User feedback on reasoning traces |
 | `hitl_question_batches` | HITL question batch records |
 | `hitl_rate_limits` | HITL rate limit configuration per scope |
-| `hitl_question_cache` | HITL deduplication cache with TTL |
+| `hitl_question_cache` | HITL deduplication cache with TTL and pgvector embeddings |
 | `hitl_voi_aspects` | HITL VOI aspect tracking |
 | `hitl_voi_decisions` | HITL VOI decision records |
 | `hitl_abstention_config` | HITL abstention detection settings |

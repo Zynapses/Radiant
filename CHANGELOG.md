@@ -5,6 +5,43 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.34.0] - 2026-01-20
+
+### Added
+
+#### HITL Orchestration Extensions (PROMPT-37 Part 2)
+
+Extended HITL Orchestration with Scout persona integration, Flyte task wrappers, and semantic deduplication.
+
+**Philosophy:** "Scout asks smart questions. Flyte workflows pause elegantly. Similar questions share answers."
+
+**New Services:**
+- `cato/scout-hitl-integration.service.ts` - Bridges Scout persona to HITL orchestration for epistemic uncertainty clarifications
+- `packages/flyte/utils/hitl_tasks.py` - Python task wrappers (`ask_confirmation`, `ask_choice`, `ask_batch`, `ask_free_text`)
+
+**Semantic Deduplication (pgvector):**
+- Question cache now stores 1536-dimension embeddings for semantic matching
+- HNSW index for efficient cosine similarity search
+- 85% similarity threshold (configurable)
+- Falls back gracefully to hash-based matching if embeddings unavailable
+
+**Database Migration:**
+- `V2026_01_20_012__hitl_semantic_deduplication.sql`
+
+**Scout Integration Features:**
+- Aspect-prioritized clarification questions
+- Domain-specific impact scoring (safety, compliance, cost, etc.)
+- VOI-filtered questions with assumption generation for skipped aspects
+- Remaining uncertainty calculation and proceed/wait/abort recommendations
+
+**Flyte Task Wrappers:**
+- `ask_confirmation(question, ...)` - Yes/no blocking questions
+- `ask_choice(question, options, ...)` - Single/multiple choice selection
+- `ask_batch(questions, ...)` - Batched questions with VOI filtering
+- `ask_free_text(question, ...)` - Free-form text input
+
+---
+
 ## [5.33.0] - 2026-01-20
 
 ### Added

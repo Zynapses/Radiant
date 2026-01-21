@@ -1,8 +1,17 @@
 /**
- * RADIANT v5.33.0 - Question Deduplication Service
+ * RADIANT v5.34.0 - Question Deduplication Service
  * 
  * Prevents redundant questions by caching recent answers.
- * Uses SHA-256 hashing of normalized questions for fast lookup.
+ * Supports two matching strategies:
+ * 
+ * 1. HASH-BASED (default): SHA-256 hashing + Jaccard similarity
+ *    - Fast, low latency
+ *    - Good for exact/near-exact matches
+ * 
+ * 2. SEMANTIC (optional): pgvector embeddings + cosine similarity
+ *    - Higher accuracy for paraphrased questions
+ *    - Requires embedding generation (adds latency)
+ *    - Uses pgvector extension for efficient vector search
  * 
  * Before asking a question:
  * 1. Check if it's in conversation history
@@ -14,6 +23,7 @@
 import { executeStatement, stringParam, longParam } from '../../db/client';
 import { logger } from '../../utils/logger';
 import { createHash } from 'crypto';
+import { embeddingService } from '../embedding.service';
 
 // Using enhanced logger from utils
 
@@ -43,6 +53,9 @@ export interface DeduplicationConfig {
   normalizeQuestions: boolean;
   includeContextInHash: boolean;
   contextFields: string[];
+  semanticMatchingEnabled: boolean;
+  semanticSimilarityThreshold: number;
+  semanticMaxCandidates: number;
 }
 
 export interface DeduplicationResult {
@@ -52,6 +65,8 @@ export interface DeduplicationResult {
   hitCount?: number;
   originalQuestion?: string;
   reason?: string;
+  matchType?: 'exact' | 'fuzzy' | 'semantic';
+  similarityScore?: number;
 }
 
 const DEFAULT_CONFIG: DeduplicationConfig = {
@@ -61,6 +76,9 @@ const DEFAULT_CONFIG: DeduplicationConfig = {
   normalizeQuestions: true,
   includeContextInHash: true,
   contextFields: ['workflow_type', 'entity_type', 'user_id'],
+  semanticMatchingEnabled: false,
+  semanticSimilarityThreshold: 0.85,
+  semanticMaxCandidates: 20,
 };
 
 // ============================================================================
@@ -175,6 +193,19 @@ async function checkCache(
     return similarResult;
   }
 
+  // Check for semantic matches if enabled
+  if (config.semanticMatchingEnabled) {
+    const semanticResult = await findSemanticMatch(
+      tenantId,
+      question,
+      config.semanticSimilarityThreshold,
+      config.semanticMaxCandidates
+    );
+    if (semanticResult) {
+      return semanticResult;
+    }
+  }
+
   return { isDuplicate: false };
 }
 
@@ -238,6 +269,99 @@ function calculateSimilarity(a: string, b: string): number {
   return union.size > 0 ? intersection.size / union.size : 0;
 }
 
+/**
+ * Find semantically similar questions using pgvector embeddings.
+ * 
+ * This provides higher accuracy matching for paraphrased questions
+ * by comparing vector embeddings using cosine similarity.
+ * 
+ * Requires: pgvector extension, question_embedding column in hitl_question_cache
+ */
+async function findSemanticMatch(
+  tenantId: string,
+  question: string,
+  similarityThreshold: number,
+  maxCandidates: number
+): Promise<DeduplicationResult | null> {
+  try {
+    // Generate embedding for the query question
+    const embeddingResult = await embeddingService.generateEmbedding(question);
+    const queryEmbedding = embeddingService.toPgVector(embeddingResult.embedding);
+
+    // Use pgvector's cosine distance operator (<=>)
+    // Note: cosine distance = 1 - cosine similarity
+    const distanceThreshold = 1 - similarityThreshold;
+
+    const result = await executeStatement({
+      sql: `
+        SELECT 
+          id, 
+          question_text, 
+          cached_response, 
+          hit_count,
+          1 - (question_embedding <=> :queryEmbedding::vector) as similarity
+        FROM hitl_question_cache
+        WHERE tenant_id = :tenantId
+          AND is_valid = true
+          AND expires_at > NOW()
+          AND question_embedding IS NOT NULL
+          AND (question_embedding <=> :queryEmbedding::vector) < :distanceThreshold
+        ORDER BY question_embedding <=> :queryEmbedding::vector
+        LIMIT :maxCandidates
+      `,
+      parameters: [
+        stringParam('tenantId', tenantId),
+        stringParam('queryEmbedding', queryEmbedding),
+        stringParam('distanceThreshold', distanceThreshold.toString()),
+        longParam('maxCandidates', maxCandidates),
+      ],
+    });
+
+    if (result.rows && result.rows.length > 0) {
+      const row = result.rows[0];
+      const similarity = Number(row.similarity);
+
+      // Update hit count
+      await executeStatement({
+        sql: `
+          UPDATE hitl_question_cache
+          SET hit_count = hit_count + 1,
+              last_hit_at = NOW()
+          WHERE id = :id
+        `,
+        parameters: [stringParam('id', row.id as string)],
+      });
+
+      logger.info('Semantic match found for question', {
+        tenantId,
+        matchId: row.id,
+        similarity: similarity.toFixed(3),
+        hitCount: (row.hit_count as number) + 1,
+      });
+
+      return {
+        isDuplicate: true,
+        cachedResponse: row.cached_response,
+        cacheId: row.id as string,
+        hitCount: (row.hit_count as number) + 1,
+        originalQuestion: row.question_text as string,
+        reason: `Semantic match found (${(similarity * 100).toFixed(0)}% similar)`,
+        matchType: 'semantic',
+        similarityScore: similarity,
+      };
+    }
+
+    return null;
+  } catch (error) {
+    // Semantic matching is optional - log and continue if it fails
+    logger.warn('Semantic deduplication failed, falling back to hash matching', {
+      error: error instanceof Error ? error.message : String(error),
+      tenantId,
+    });
+    return null;
+  }
+}
+
 async function cacheResponse(
   tenantId: string,
   question: string,
@@ -256,14 +380,28 @@ async function cacheResponse(
     : undefined;
   const ttl = ttlMinutes ?? config.defaultTTLMinutes;
 
+  // Generate embedding if semantic matching is enabled
+  let questionEmbedding: string | null = null;
+  if (config.semanticMatchingEnabled) {
+    try {
+      const embeddingResult = await embeddingService.generateEmbedding(question);
+      questionEmbedding = embeddingService.toPgVector(embeddingResult.embedding);
+    } catch (error) {
+      logger.warn('Failed to generate embedding for cache', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
   const result = await executeStatement({
     sql: `
       INSERT INTO hitl_question_cache (
         tenant_id, question_hash, question_text, context_hash,
-        cached_response, cached_by, expires_at
+        cached_response, cached_by, expires_at, question_embedding
       ) VALUES (
         :tenantId, :questionHash, :questionText, :contextHash,
-        :cachedResponse::jsonb, :cachedBy, NOW() + INTERVAL '1 minute' * :ttl
+        :cachedResponse::jsonb, :cachedBy, NOW() + INTERVAL '1 minute' * :ttl,
+        ${questionEmbedding ? ':questionEmbedding::vector' : 'NULL'}
       )
       ON CONFLICT (tenant_id, question_hash, context_hash) DO UPDATE SET
         cached_response = EXCLUDED.cached_response,
@@ -271,7 +409,8 @@ async function cacheResponse(
         expires_at = EXCLUDED.expires_at,
         hit_count = hitl_question_cache.hit_count + 1,
         last_hit_at = NOW(),
-        is_valid = true
+        is_valid = true,
+        question_embedding = COALESCE(EXCLUDED.question_embedding, hitl_question_cache.question_embedding)
       RETURNING id
     `,
     parameters: [
@@ -282,6 +421,7 @@ async function cacheResponse(
       stringParam('cachedResponse', JSON.stringify(response)),
       stringParam('cachedBy', cachedBy || ''),
       longParam('ttl', ttl),
+      ...(questionEmbedding ? [stringParam('questionEmbedding', questionEmbedding)] : []),
     ],
   });
 
@@ -291,6 +431,7 @@ async function cacheResponse(
     cacheId,
     questionHash,
     ttlMinutes: ttl,
+    hasEmbedding: !!questionEmbedding,
   });
 
   return cacheId;
