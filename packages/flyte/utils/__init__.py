@@ -27,6 +27,19 @@ from .cato_client import (
     CatoRisk
 )
 
+from .hitl_tasks import (
+    ask_confirmation,
+    ask_choice,
+    ask_batch,
+    ask_free_text,
+    QuestionType,
+    Urgency,
+    VOIComponents,
+    QuestionOption,
+    BatchQuestion,
+    HITLResponse,
+)
+
 __all__ = [
     # Database
     'get_safe_db_connection',
@@ -45,4 +58,15 @@ __all__ = [
     # Cato
     'CatoClient',
     'CatoRisk',
+    # HITL Tasks
+    'ask_confirmation',
+    'ask_choice',
+    'ask_batch',
+    'ask_free_text',
+    'QuestionType',
+    'Urgency',
+    'VOIComponents',
+    'QuestionOption',
+    'BatchQuestion',
+    'HITLResponse',
 ]

@@ -603,6 +603,37 @@ hitl_escalation_chains     -- Escalation chain configuration
 - **2.7x faster user response times** via batching
 - **Two-question rule enforcement** for workflow completion
 
+### 5.3.1 HITL Orchestration Extensions (v5.34.0)
+
+Scout persona integration, Flyte task wrappers, and semantic deduplication.
+
+**Philosophy**: "Scout asks smart questions. Flyte workflows pause elegantly. Similar questions share answers."
+
+| Service | Purpose |
+|---------|---------|
+| `cato/scout-hitl-integration.service.ts` | Bridges Scout persona to HITL for epistemic uncertainty |
+| `packages/flyte/utils/hitl_tasks.py` | Python wrappers for Flyte HITL tasks |
+
+**Scout Integration Features:**
+- Aspect-prioritized clarification questions (safety, compliance, cost, etc.)
+- Domain-specific impact scoring with boosts
+- VOI-filtered questions with assumption generation
+- Remaining uncertainty calculation
+
+**Flyte Task Wrappers:**
+- `ask_confirmation()` - Blocking yes/no questions
+- `ask_choice()` - Single/multiple choice selection
+- `ask_batch()` - Batched questions with VOI filtering
+- `ask_free_text()` - Free-form text input
+
+**Semantic Deduplication (pgvector):**
+- 1536-dimension embeddings for question matching
+- HNSW index for efficient cosine similarity search
+- 85% similarity threshold (configurable)
+- Graceful fallback to hash-based matching
+
+**Migration:** `V2026_01_20_012__hitl_semantic_deduplication.sql`
+
 ### 5.4 Sovereign Mesh Services (v5.31.0)
 
 Parametric AI assistance at every workflow node.
