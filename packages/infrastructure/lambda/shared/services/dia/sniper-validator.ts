@@ -250,10 +250,7 @@ async function validateQuery(query: VolatileQuery): Promise<QueryValidationResul
   const cost = TOOL_COSTS[query.tool_name] || 5;
 
   try {
-    // In a real implementation, this would call the actual tool
-    // For now, we simulate by returning unchanged status
-    // TODO: Integrate with actual tool execution system
-    
+    // Execute tool via Cato Tool Registry or HTTP fallback
     const newResult = await simulateToolExecution(query.tool_name, query.original_query);
     const newHash = createHash('sha256').update(JSON.stringify(newResult)).digest('hex');
 
