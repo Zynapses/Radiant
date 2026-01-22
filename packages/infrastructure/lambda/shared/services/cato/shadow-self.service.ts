@@ -59,8 +59,8 @@ class ShadowSelfClient {
   async reflect(tenantId: string, prompt: string, primaryResponse: string): Promise<ReflectionResult> {
     const state = await this.getState(tenantId);
     
-    // Generate shadow response (placeholder - would use actual model)
-    const shadowResponse = `[Shadow perspective on: ${prompt.substring(0, 50)}...]`;
+    // Generate shadow response using LLM with contrarian perspective
+    const shadowResponse = await this.generateShadowResponse(prompt, primaryResponse);
     
     // Calculate divergence
     const divergence = this.calculateDivergence(primaryResponse, shadowResponse);
@@ -136,6 +136,40 @@ class ShadowSelfClient {
       return resultOrTenantId.logitsEntropy * 0.5;
     }
     return 0.15;
+  }
+
+  private async generateShadowResponse(prompt: string, primaryResponse: string): Promise<string> {
+    try {
+      const { callLiteLLM } = await import('../litellm.service.js');
+      
+      const response = await callLiteLLM({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: `You are a "Shadow Self" - a contrarian internal voice that challenges assumptions and finds blind spots.
+Given a prompt and the primary AI's response, provide an alternative perspective that:
+1. Questions underlying assumptions
+2. Identifies potential risks or oversights
+3. Suggests alternative approaches
+4. Highlights what might be missing
+
+Be constructive but critical. Keep response concise (2-3 paragraphs).`,
+          },
+          {
+            role: 'user',
+            content: `Original prompt: "${prompt}"\n\nPrimary response: "${primaryResponse}"\n\nProvide your shadow perspective:`,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+      });
+
+      return response.content;
+    } catch (error) {
+      // Return a basic contrarian response on error
+      return `[Shadow perspective] Consider alternative approaches to: ${prompt.substring(0, 100)}...`;
+    }
   }
 
   private calculateDivergence(a: string, b: string): number {
