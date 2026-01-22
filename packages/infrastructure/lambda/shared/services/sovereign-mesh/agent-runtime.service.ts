@@ -775,21 +775,20 @@ Provide a concise summary (2-3 sentences).`;
     prompt: string
   ): Promise<{ content: string; usage?: { totalTokens: number }; cost?: number }> {
     try {
-      // Stub modelRouter for compilation
-      const modelRouter = { complete: async (_: any) => ({ content: 'stub', usage: { inputTokens: 0, outputTokens: 0 }, cost: 0 }) };
+      // Import LiteLLM service for actual model calls
+      const { callLiteLLM } = await import('../litellm.service.js');
       
-      const response = await modelRouter.complete({
-        tenantId,
+      const response = await callLiteLLM({
         model,
         messages: [{ role: 'user', content: prompt }],
-        maxTokens: 2000,
-        responseFormat: prompt.includes('JSON') ? { type: 'json_object' } : undefined,
+        max_tokens: 2000,
+        temperature: 0.4,
       });
 
       return {
         content: response.content,
-        usage: response.usage ? { totalTokens: (response.usage.inputTokens || 0) + (response.usage.outputTokens || 0) } : undefined,
-        cost: response.cost,
+        usage: response.usage ? { totalTokens: response.usage.total_tokens || 0 } : undefined,
+        cost: response.usage ? Math.ceil((response.usage.prompt_tokens * 0.003 + response.usage.completion_tokens * 0.015) / 10) : 0,
       };
     } catch (error) {
       logger.error('Model call failed', { error, model, tenantId });
