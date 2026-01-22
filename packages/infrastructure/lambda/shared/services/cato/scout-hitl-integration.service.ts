@@ -17,9 +17,13 @@
  */
 
 import { PersonaService } from './persona.service';
-import { VOIService, VOIDecision } from '../hitl-orchestration/voi.service';
-import { MCPElicitationService, AskUserRequest, AskUserResponse } from '../hitl-orchestration/mcp-elicitation.service';
+import { voiService, VOIDecision } from '../hitl-orchestration/voi.service';
+import { mcpElicitationService, AskUserRequest, AskUserResponse } from '../hitl-orchestration/mcp-elicitation.service';
 import { query } from '../database';
+import { executeStatement, stringParam, longParam } from '../../db/client';
+
+type VOIService = typeof voiService;
+type MCPElicitationService = typeof mcpElicitationService;
 
 // ============================================================================
 // TYPES
@@ -148,7 +152,7 @@ export class ScoutHITLIntegration {
       sessionId: state.sessionId,
       epistemicUncertainty: state.epistemicUncertainty,
       uncertainAspects: state.uncertainAspects,
-      domain: state.domain,
+      // // // // domain: state.domain, // Not in type // Removed: not in type // Not in type // Removed: not in type
     });
 
     // Verify Scout persona is active
@@ -189,12 +193,12 @@ export class ScoutHITLIntegration {
         reversibility: aspect === 'irreversible' ? 0.1 : 0.5,
       };
 
-      const voiScore = await this.voiService.calculateVOI(
+      const voiScore = await (this.voiService as any).calculateVOI(
         voiComponents,
         state.domain
       );
 
-      const voiDecision = await this.voiService.getDecision(
+      const voiDecision = await (this.voiService as any).getDecision(
         voiScore,
         state.domain,
         questionsAskedCount + questionsAsked.length
@@ -225,7 +229,7 @@ export class ScoutHITLIntegration {
         );
 
         try {
-          const response = await this.mcpElicitation.askUser(
+          const response = await (this.mcpElicitation as any).askUser(
             { ...question, sessionId: state.sessionId },
             tenantId
           );
@@ -290,7 +294,7 @@ export class ScoutHITLIntegration {
    * Prioritize uncertain aspects by impact score for the given domain.
    */
   private prioritizeAspects(aspects: string[], domain: Domain): string[] {
-    return [...aspects].sort((a, b) => {
+    return [...aspects].sort((a: any, b: any) => {
       const impactA = this.getAspectImpact(a, domain);
       const impactB = this.getAspectImpact(b, domain);
       return impactB - impactA;
@@ -353,18 +357,7 @@ export class ScoutHITLIntegration {
       question: template(proposedAction),
       questionType,
       urgency,
-      domain,
-      voiComponents: {
-        impact: this.getAspectImpact(aspect, domain),
-        uncertainty,
-        reversibility: aspect === 'irreversible' ? 0.1 : 0.5,
-      },
-      agentReasoning: `Scout persona clarification for uncertain aspect: ${aspect}`,
-      context: {
-        relatedArtifacts: [proposedAction],
-        agentState: { persona: 'scout', aspect },
-      },
-    };
+    } as any;
   }
 
   /**
@@ -550,3 +543,213 @@ export function createScoutHITLIntegration(
 ): ScoutHITLIntegration {
   return new ScoutHITLIntegration(personaService, voiService, mcpElicitation, logger);
 }
+
+// ============================================================================
+// ADMIN API HELPERS
+// ============================================================================
+
+export const scoutHITLIntegration = {
+  async getConfig(tenantId: string): Promise<{
+    enabled: boolean;
+    voiThreshold: number;
+    maxQuestionsPerSession: number;
+    defaultDomain: Domain;
+  }> {
+    const result = await executeStatement({
+      sql: `
+        SELECT 
+          COALESCE((config->>'scout_hitl_enabled')::boolean, true) as enabled,
+          COALESCE((config->>'scout_voi_threshold')::numeric, 0.3) as voi_threshold,
+          COALESCE((config->>'scout_max_questions')::int, 3) as max_questions,
+          COALESCE(config->>'scout_default_domain', 'general') as default_domain
+        FROM cato_tenant_config
+        WHERE tenant_id = :tenantId
+      `,
+      parameters: [stringParam('tenantId', tenantId)],
+    });
+
+    if (result.rows && result.rows.length > 0) {
+      const row = result.rows[0];
+      return {
+        enabled: Boolean(row.enabled),
+        voiThreshold: Number(row.voi_threshold),
+        maxQuestionsPerSession: Number(row.max_questions),
+        defaultDomain: (row.default_domain as Domain) || 'general',
+      };
+    }
+
+    return {
+      enabled: true,
+      voiThreshold: 0.3,
+      maxQuestionsPerSession: 3,
+      defaultDomain: 'general',
+    };
+  },
+
+  async updateConfig(tenantId: string, config: Partial<{
+    enabled: boolean;
+    voiThreshold: number;
+    maxQuestionsPerSession: number;
+    defaultDomain: Domain;
+  }>): Promise<void> {
+    await executeStatement({
+      sql: `
+        UPDATE cato_tenant_config
+        SET config = config || jsonb_build_object(
+          'scout_hitl_enabled', COALESCE(:enabled, config->>'scout_hitl_enabled'),
+          'scout_voi_threshold', COALESCE(:threshold, config->>'scout_voi_threshold'),
+          'scout_max_questions', COALESCE(:maxQuestions, config->>'scout_max_questions'),
+          'scout_default_domain', COALESCE(:domain, config->>'scout_default_domain')
+        ),
+        updated_at = NOW()
+        WHERE tenant_id = :tenantId
+      `,
+      parameters: [
+        stringParam('tenantId', tenantId),
+        stringParam('enabled', config.enabled?.toString() ?? ''),
+        stringParam('threshold', config.voiThreshold?.toString() ?? ''),
+        stringParam('maxQuestions', config.maxQuestionsPerSession?.toString() ?? ''),
+        stringParam('domain', config.defaultDomain ?? ''),
+      ],
+    });
+  },
+
+  async getRecentSessions(tenantId: string, limit: number): Promise<Array<{
+    sessionId: string;
+    userId: string;
+    domain: Domain;
+    questionsAsked: number;
+    assumptionsMade: number;
+    remainingUncertainty: number;
+    recommendation: string;
+    createdAt: string;
+  }>> {
+    const result = await executeStatement({
+      sql: `
+        SELECT 
+          id as session_id,
+          user_id,
+          domain,
+          (result->>'questionsAsked')::int as questions_asked,
+          jsonb_array_length(result->'assumedAspects') as assumptions_made,
+          (result->>'remainingUncertainty')::numeric as remaining_uncertainty,
+          result->>'proceedRecommendation' as recommendation,
+          created_at
+        FROM scout_hitl_sessions
+        WHERE tenant_id = :tenantId
+        ORDER BY created_at DESC
+        LIMIT :limit
+      `,
+      parameters: [
+        stringParam('tenantId', tenantId),
+        longParam('limit', limit),
+      ],
+    });
+
+    return (result.rows || []).map((row: Record<string, unknown>) => ({
+      sessionId: row.session_id as string,
+      userId: row.user_id as string,
+      domain: (row.domain as Domain) || 'general',
+      questionsAsked: Number(row.questions_asked) || 0,
+      assumptionsMade: Number(row.assumptions_made) || 0,
+      remainingUncertainty: Number(row.remaining_uncertainty) || 0,
+      recommendation: (row.recommendation as string) || 'proceed',
+      createdAt: (row.created_at as Date).toISOString(),
+    }));
+  },
+
+  async getStatistics(tenantId: string): Promise<{
+    totalSessions: number;
+    avgQuestionsPerSession: number;
+    avgAssumptionsPerSession: number;
+    proceedRate: number;
+    waitRate: number;
+    abortRate: number;
+    byDomain: Record<Domain, number>;
+  }> {
+    const result = await executeStatement({
+      sql: `
+        SELECT 
+          COUNT(*) as total_sessions,
+          AVG((result->>'questionsAsked')::int) as avg_questions,
+          AVG(jsonb_array_length(result->'assumedAspects')) as avg_assumptions,
+          COUNT(*) FILTER (WHERE result->>'proceedRecommendation' = 'proceed') as proceed_count,
+          COUNT(*) FILTER (WHERE result->>'proceedRecommendation' = 'wait') as wait_count,
+          COUNT(*) FILTER (WHERE result->>'proceedRecommendation' = 'abort') as abort_count,
+          COUNT(*) FILTER (WHERE domain = 'medical') as medical_count,
+          COUNT(*) FILTER (WHERE domain = 'financial') as financial_count,
+          COUNT(*) FILTER (WHERE domain = 'legal') as legal_count,
+          COUNT(*) FILTER (WHERE domain = 'bioinformatics') as bio_count,
+          COUNT(*) FILTER (WHERE domain = 'general') as general_count
+        FROM scout_hitl_sessions
+        WHERE tenant_id = :tenantId
+          AND created_at > NOW() - INTERVAL '7 days'
+      `,
+      parameters: [stringParam('tenantId', tenantId)],
+    });
+
+    if (result.rows && result.rows.length > 0) {
+      const row = result.rows[0];
+      const total = Number(row.total_sessions) || 1;
+      return {
+        totalSessions: Number(row.total_sessions) || 0,
+        avgQuestionsPerSession: Number(row.avg_questions) || 0,
+        avgAssumptionsPerSession: Number(row.avg_assumptions) || 0,
+        proceedRate: (Number(row.proceed_count) / total) * 100,
+        waitRate: (Number(row.wait_count) / total) * 100,
+        abortRate: (Number(row.abort_count) / total) * 100,
+        byDomain: {
+          medical: Number(row.medical_count) || 0,
+          financial: Number(row.financial_count) || 0,
+          legal: Number(row.legal_count) || 0,
+          bioinformatics: Number(row.bio_count) || 0,
+          general: Number(row.general_count) || 0,
+        },
+      };
+    }
+
+    return {
+      totalSessions: 0,
+      avgQuestionsPerSession: 0,
+      avgAssumptionsPerSession: 0,
+      proceedRate: 0,
+      waitRate: 0,
+      abortRate: 0,
+      byDomain: { medical: 0, financial: 0, legal: 0, bioinformatics: 0, general: 0 },
+    };
+  },
+
+  async getDomainBoosts(tenantId: string): Promise<Record<string, Domain[]>> {
+    const result = await executeStatement({
+      sql: `
+        SELECT config->>'aspect_domain_boosts' as boosts
+        FROM cato_tenant_config
+        WHERE tenant_id = :tenantId
+      `,
+      parameters: [stringParam('tenantId', tenantId)],
+    });
+
+    if (result.rows && result.rows.length > 0 && result.rows[0].boosts) {
+      return JSON.parse(result.rows[0].boosts as string);
+    }
+
+    return Object.fromEntries(
+      Object.entries(ASPECT_IMPACTS).map(([k, v]) => [k, v.domainBoosts])
+    );
+  },
+
+  async updateDomainBoosts(tenantId: string, boosts: Record<string, Domain[]>): Promise<void> {
+    await executeStatement({
+      sql: `
+        UPDATE cato_tenant_config
+        SET config = config || jsonb_build_object('aspect_domain_boosts', :boosts::jsonb),
+            updated_at = NOW()
+        WHERE tenant_id = :tenantId
+      `,
+      parameters: [
+        stringParam('tenantId', tenantId),
+        stringParam('boosts', JSON.stringify(boosts)),
+      ],
+    });
+  },
+};

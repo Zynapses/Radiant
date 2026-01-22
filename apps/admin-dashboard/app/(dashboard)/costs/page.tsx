@@ -1,14 +1,36 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { DollarSign, TrendingUp, BarChart3, PieChart, RefreshCw, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { DollarSign, TrendingUp, BarChart3, PieChart, RefreshCw, ArrowUpRight, ArrowDownRight, Server, Layers, Cpu, Database, Globe, Zap } from 'lucide-react';
 
 interface ServiceCost { serviceName: string; cost: number; percentage: number; trend: 'up' | 'down' | 'stable'; }
 interface DailyCost { date: string; cost: number; }
+interface InfrastructureLineItem {
+  component: string;
+  description: string;
+  baseCost: number;
+  usageCost: number;
+  totalCost: number;
+  unit: string;
+  quantity: number;
+  pricePerUnit: number;
+  percentage: number;
+}
+interface InfrastructureScalingCosts {
+  groupName: string;
+  totalCost: number;
+  estimatedMonthlyCost: number;
+  tier: string;
+  targetSessions: number;
+  lineItems: InfrastructureLineItem[];
+  costPerSession: number;
+  lastUpdated: string;
+}
 interface CostReport {
   summary: { totalCost: number; forecastedMonthEnd: number; percentChange: number; periodStart: string; periodEnd: string; };
   serviceBreakdown: ServiceCost[];
   dailyCosts: DailyCost[];
+  infrastructureScaling?: InfrastructureScalingCosts;
   lastUpdated: string;
 }
 
@@ -95,8 +117,114 @@ export default function CostsPage() {
           </div>
         </div>
       </div>
+
+      {/* Infrastructure Scaling Costs Line Item Group */}
+      {report.infrastructureScaling && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Layers className="h-5 w-5 text-indigo-500" /> Infrastructure Scaling
+            </h2>
+            <div className="flex items-center gap-4">
+              <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium capitalize">
+                {report.infrastructureScaling.tier} Tier
+              </span>
+              <span className="text-sm text-gray-500">
+                {report.infrastructureScaling.targetSessions.toLocaleString()} max sessions
+              </span>
+            </div>
+          </div>
+          
+          {/* Summary Cards */}
+          <div className="grid grid-cols-4 gap-4 mb-4">
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+              <p className="text-xs text-gray-500">Total Monthly</p>
+              <p className="text-xl font-bold text-indigo-600">${report.infrastructureScaling.totalCost.toFixed(2)}</p>
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+              <p className="text-xs text-gray-500">Estimated</p>
+              <p className="text-xl font-bold">${report.infrastructureScaling.estimatedMonthlyCost.toFixed(2)}</p>
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+              <p className="text-xs text-gray-500">Cost/Session</p>
+              <p className="text-xl font-bold">${report.infrastructureScaling.costPerSession.toFixed(4)}</p>
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+              <p className="text-xs text-gray-500">Components</p>
+              <p className="text-xl font-bold">{report.infrastructureScaling.lineItems.length}</p>
+            </div>
+          </div>
+
+          {/* Line Items Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b dark:border-gray-700">
+                  <th className="text-left py-2 font-medium text-gray-500">Component</th>
+                  <th className="text-left py-2 font-medium text-gray-500">Description</th>
+                  <th className="text-right py-2 font-medium text-gray-500">Quantity</th>
+                  <th className="text-right py-2 font-medium text-gray-500">Unit Price</th>
+                  <th className="text-right py-2 font-medium text-gray-500">Cost</th>
+                  <th className="text-right py-2 font-medium text-gray-500">%</th>
+                </tr>
+              </thead>
+              <tbody>
+                {report.infrastructureScaling.lineItems.map((item, i) => (
+                  <tr key={i} className="border-b dark:border-gray-700 last:border-0">
+                    <td className="py-2">
+                      <div className="flex items-center gap-2">
+                        {getComponentIcon(item.component)}
+                        <span className="font-medium">{item.component}</span>
+                      </div>
+                    </td>
+                    <td className="py-2 text-gray-600 dark:text-gray-400">{item.description}</td>
+                    <td className="py-2 text-right">{item.quantity.toFixed(2)}</td>
+                    <td className="py-2 text-right">${item.pricePerUnit.toFixed(6)}</td>
+                    <td className="py-2 text-right font-medium">${item.totalCost.toFixed(2)}</td>
+                    <td className="py-2 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <div className="w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                          <div 
+                            className="bg-indigo-500 h-2 rounded-full" 
+                            style={{ width: `${Math.min(item.percentage, 100)}%` }}
+                          />
+                        </div>
+                        <span className="text-xs w-12 text-right">{item.percentage.toFixed(1)}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr className="font-semibold bg-gray-50 dark:bg-gray-700/50">
+                  <td colSpan={4} className="py-2 px-2 rounded-l-lg">Total Infrastructure Scaling</td>
+                  <td className="py-2 text-right">${report.infrastructureScaling.totalCost.toFixed(2)}</td>
+                  <td className="py-2 text-right rounded-r-lg">100%</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          
+          <p className="text-xs text-gray-500 mt-3">
+            Last updated: {new Date(report.infrastructureScaling.lastUpdated).toLocaleString()}
+          </p>
+        </div>
+      )}
     </div>
   );
+}
+
+function getComponentIcon(component: string) {
+  const iconClass = "h-4 w-4";
+  switch (component.toLowerCase()) {
+    case 'lambda': return <Zap className={`${iconClass} text-yellow-500`} />;
+    case 'aurora': return <Database className={`${iconClass} text-blue-500`} />;
+    case 'redis': return <Server className={`${iconClass} text-red-500`} />;
+    case 'api gateway': return <Globe className={`${iconClass} text-purple-500`} />;
+    case 'sqs': return <Layers className={`${iconClass} text-orange-500`} />;
+    case 'cloudfront': return <Globe className={`${iconClass} text-green-500`} />;
+    default: return <Cpu className={`${iconClass} text-gray-500`} />;
+  }
 }
 
 function Card({ title, value, icon: Icon, color }: { title: string; value: string; icon: React.ElementType; color: string }) {

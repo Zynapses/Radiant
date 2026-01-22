@@ -9,14 +9,13 @@
     "mammoth": "^1.6.0",
     "xlsx": "^0.18.5",
     "sharp": "^0.33.2",
-    "fluent-ffmpeg": "^2.1.2",
+    "@ts-ffmpeg/fluent-ffmpeg": "^2.2.0",
     "adm-zip": "^0.5.10",
     "tar": "^6.2.0"
   },
   "devDependencies": {
     "@types/pdf-parse": "^1.1.4",
-    "@types/fluent-ffmpeg": "^2.1.24",
-    "@types/adm-zip": "^0.5.5",
+        "@types/adm-zip": "^0.5.5",
     "@types/tar": "^6.1.11"
   },
   "peerDependencies": {

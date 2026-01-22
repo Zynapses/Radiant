@@ -149,10 +149,10 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return await getFilesNeedingTests(event);
     }
 
-    return createErrorResponse(404, 'Not found');
+    return createErrorResponse('Not found', 404);
   } catch (error) {
     logger.error('Code quality API error', { error, path, method });
-    return createErrorResponse(500, 'Internal server error');
+    return createErrorResponse('Internal server error', 500);
   }
 }
 
@@ -273,7 +273,7 @@ async function getDashboard(event: APIGatewayProxyEvent): Promise<APIGatewayProx
     },
   };
 
-  return createResponse(200, response);
+  return createResponse(response, 200);
 }
 
 // ============================================================================
@@ -305,7 +305,7 @@ async function getCoverage(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
 
   query += ` ORDER BY component, captured_at DESC`;
 
-  const result = await executeStatement(query, params);
+  const result = await executeStatement(query, params as unknown as Parameters<typeof executeStatement>[1]);
 
   const coverage = (result.rows || []).map((row: Record<string, unknown>) => ({
     id: row.id,
@@ -322,7 +322,7 @@ async function getCoverage(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
     capturedAt: row.captured_at,
   }));
 
-  return createResponse(200, { coverage });
+  return createResponse({ coverage }, 200);
 }
 
 async function getCoverageHistory(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
@@ -358,7 +358,7 @@ async function getCoverageHistory(event: APIGatewayProxyEvent): Promise<APIGatew
     overallCoverage: Number(row.overall_coverage) || 0,
   }));
 
-  return createResponse(200, { history, component, days });
+  return createResponse({ history, component, days }, 200);
 }
 
 // ============================================================================
@@ -382,7 +382,7 @@ async function getTechnicalDebt(event: APIGatewayProxyEvent): Promise<APIGateway
       AND status = ANY($2::VARCHAR[])
   `;
 
-  const params: unknown[] = [
+  const params: (ReturnType<typeof stringParam> | string[])[] = [
     stringParam('tenantId', tenantId),
     statusList,
   ];
@@ -401,7 +401,7 @@ async function getTechnicalDebt(event: APIGatewayProxyEvent): Promise<APIGateway
     CASE priority WHEN 'p0_critical' THEN 1 WHEN 'p1_high' THEN 2 WHEN 'p2_medium' THEN 3 ELSE 4 END,
     created_at DESC`;
 
-  const result = await executeStatement(query, params);
+  const result = await executeStatement(query, params as unknown as Parameters<typeof executeStatement>[1]);
 
   const items = (result.rows || []).map((row: Record<string, unknown>) => ({
     id: row.id,
@@ -420,7 +420,7 @@ async function getTechnicalDebt(event: APIGatewayProxyEvent): Promise<APIGateway
     updatedAt: row.updated_at,
   }));
 
-  return createResponse(200, { items });
+  return createResponse({ items }, 200);
 }
 
 async function updateDebtItem(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
@@ -450,10 +450,10 @@ async function updateDebtItem(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   ]);
 
   if (!result.rows?.length) {
-    return createErrorResponse(404, 'Debt item not found');
+    return createErrorResponse('Debt item not found', 404);
   }
 
-  return createResponse(200, { item: result.rows[0] });
+  return createResponse({ item: result.rows[0] }, 200);
 }
 
 // ============================================================================
@@ -501,7 +501,7 @@ async function getJsonSafetyProgress(event: APIGatewayProxyEvent): Promise<APIGa
     migrated: Number(row.migrated) || 0,
   }));
 
-  return createResponse(200, { byComponent, byRisk });
+  return createResponse({ byComponent, byRisk }, 200);
 }
 
 async function getJsonParseLocations(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
@@ -518,11 +518,11 @@ async function getJsonParseLocations(event: APIGatewayProxyEvent): Promise<APIGa
     WHERE $1::UUID IS NULL OR tenant_id IS NULL OR tenant_id = $1::UUID
   `;
 
-  const params: unknown[] = [stringParam('tenantId', tenantId)];
+  const params: ReturnType<typeof stringParam>[] = [stringParam('tenantId', tenantId)];
 
   if (migrated !== undefined) {
     query += ` AND is_migrated = $${params.length + 1}`;
-    params.push(migrated === 'true');
+    params.push(stringParam('migrated', migrated));
   }
 
   if (riskLevel) {
@@ -540,7 +540,7 @@ async function getJsonParseLocations(event: APIGatewayProxyEvent): Promise<APIGa
     file_path, line_number
     LIMIT 500`;
 
-  const result = await executeStatement(query, params);
+  const result = await executeStatement(query, params as unknown as Parameters<typeof executeStatement>[1]);
 
   const locations = (result.rows || []).map((row: Record<string, unknown>) => ({
     id: row.id,
@@ -556,7 +556,7 @@ async function getJsonParseLocations(event: APIGatewayProxyEvent): Promise<APIGa
     migratedAt: row.migrated_at,
   }));
 
-  return createResponse(200, { locations });
+  return createResponse({ locations }, 200);
 }
 
 // ============================================================================
@@ -604,7 +604,7 @@ async function getAlerts(event: APIGatewayProxyEvent): Promise<APIGatewayProxyRe
     createdAt: row.created_at,
   }));
 
-  return createResponse(200, { alerts });
+  return createResponse({ alerts }, 200);
 }
 
 async function acknowledgeAlert(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
@@ -628,10 +628,10 @@ async function acknowledgeAlert(event: APIGatewayProxyEvent): Promise<APIGateway
   ]);
 
   if (!result.rows?.length) {
-    return createErrorResponse(404, 'Alert not found');
+    return createErrorResponse('Alert not found', 404);
   }
 
-  return createResponse(200, { alert: result.rows[0] });
+  return createResponse({ alert: result.rows[0] }, 200);
 }
 
 async function resolveAlert(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
@@ -655,10 +655,10 @@ async function resolveAlert(event: APIGatewayProxyEvent): Promise<APIGatewayProx
   ]);
 
   if (!result.rows?.length) {
-    return createErrorResponse(404, 'Alert not found');
+    return createErrorResponse('Alert not found', 404);
   }
 
-  return createResponse(200, { alert: result.rows[0] });
+  return createResponse({ alert: result.rows[0] }, 200);
 }
 
 // ============================================================================
@@ -679,7 +679,7 @@ async function getFilesNeedingTests(event: APIGatewayProxyEvent): Promise<APIGat
       AND ($1::UUID IS NULL OR tenant_id IS NULL OR tenant_id = $1::UUID)
   `;
 
-  const params: unknown[] = [stringParam('tenantId', tenantId)];
+  const params: ReturnType<typeof stringParam>[] = [stringParam('tenantId', tenantId)];
 
   if (component) {
     query += ` AND component = $${params.length + 1}`;
@@ -696,7 +696,7 @@ async function getFilesNeedingTests(event: APIGatewayProxyEvent): Promise<APIGat
     lines_of_code DESC
     LIMIT 100`;
 
-  const result = await executeStatement(query, params);
+  const result = await executeStatement(query, params as unknown as Parameters<typeof executeStatement>[1]);
 
   const files = (result.rows || []).map((row: Record<string, unknown>) => ({
     id: row.id,
@@ -713,5 +713,5 @@ async function getFilesNeedingTests(event: APIGatewayProxyEvent): Promise<APIGat
     lastTestRun: row.last_test_run,
   }));
 
-  return createResponse(200, { files });
+  return createResponse({ files }, 200);
 }

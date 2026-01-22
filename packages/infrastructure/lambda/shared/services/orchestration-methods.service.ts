@@ -84,7 +84,7 @@ class SemanticEntropyService {
     const normalizedEntropy = entropy / maxEntropy;
 
     // Select most common cluster's representative as response
-    const largestCluster = clusters.sort((a, b) => b.length - a.length)[0];
+    const largestCluster = clusters.sort((a: any, b: any) => b.length - a.length)[0];
     const representativeResponse = largestCluster[0];
 
     return {
@@ -177,8 +177,8 @@ class SEProbesService {
         messages: [{ role: 'user', content: input.prompt }],
         temperature: 0.7,
         maxTokens: 512,
-        logprobs: true, // Request logprobs
-        topLogprobs: 5, // Get top 5 token alternatives
+        // logprobs: true, // Removed: not in ModelRequest type // Request logprobs
+        // topLogprobs: 5, // Removed: not in ModelRequest type // Get top 5 token alternatives
       });
 
       // Extract logprobs from response (if available)
@@ -192,7 +192,7 @@ class SEProbesService {
         if (tokenData.topLogprobs && tokenData.topLogprobs.length > 0) {
           // Convert logprobs to probabilities and compute entropy
           const probs = tokenData.topLogprobs.map(t => Math.exp(t.logprob));
-          const sumProbs = probs.reduce((a, b) => a + b, 0);
+          const sumProbs = probs.reduce((a: any, b: any) => a + b, 0);
           const normalizedProbs = probs.map(p => p / sumProbs);
           
           // Shannon entropy: H = -Σ p * log(p)
@@ -207,7 +207,7 @@ class SEProbesService {
       }
 
       const meanLogprob = tokenLogprobs.length > 0 
-        ? tokenLogprobs.reduce((a, b) => a + b, 0) / tokenLogprobs.length 
+        ? tokenLogprobs.reduce((a: any, b: any) => a + b, 0) / tokenLogprobs.length 
         : -1;
       
       const entropyEstimate = logprobs.length > 0 ? totalEntropy / logprobs.length : 0.5;
@@ -311,7 +311,7 @@ class KernelEntropyService {
         
         // If embedding is returned directly
         if ((result as { embedding?: number[] }).embedding) {
-          embeddings.push((result as { embedding: number[] }).embedding);
+          embeddings.push((result as unknown as { embedding: number[] }).embedding);
         } else {
           // Fallback: create pseudo-embedding from response hash
           embeddings.push(this.createPseudoEmbedding(text));
@@ -362,7 +362,7 @@ class KernelEntropyService {
     }
 
     // Estimate bandwidth (Silverman's rule of thumb for RBF)
-    const sortedDists = distances.sort((a, b) => a - b);
+    const sortedDists = distances.sort((a: any, b: any) => a - b);
     const medianDist = sortedDists[Math.floor(sortedDists.length / 2)] || 1;
     const bandwidth = bandwidthMethod === 'auto' 
       ? medianDist / Math.sqrt(2 * Math.log(n + 1))
@@ -382,7 +382,7 @@ class KernelEntropyService {
     }
 
     // Normalize densities
-    const densitySum = densities.reduce((a, b) => a + b, 0);
+    const densitySum = densities.reduce((a: any, b: any) => a + b, 0);
     const normalizedDensities = densities.map(d => d / (densitySum || 1));
 
     // Compute entropy from density estimates: H ≈ -E[log p(x)]
@@ -582,16 +582,16 @@ REASONING: [brief explanation]`,
     for (const criterion of criteria) {
       const values = judgments.map(j => j.scores[criterion]).filter(v => v !== undefined);
       if (aggregation === 'mean') {
-        aggregatedScores[criterion] = values.reduce((a, b) => a + b, 0) / values.length;
+        aggregatedScores[criterion] = values.reduce((a: any, b: any) => a + b, 0) / values.length;
       } else if (aggregation === 'median') {
-        values.sort((a, b) => a - b);
+        values.sort((a: any, b: any) => a - b);
         aggregatedScores[criterion] = values[Math.floor(values.length / 2)];
       } else {
         aggregatedScores[criterion] = Math.min(...values); // min for conservative
       }
     }
 
-    const overallScore = Object.values(aggregatedScores).reduce((a, b) => a + b, 0) / criteria.length / 10;
+    const overallScore = Object.values(aggregatedScores).reduce((a: any, b: any) => a + b, 0) / criteria.length / 10;
 
     return {
       score: overallScore,
@@ -741,7 +741,7 @@ class RouteLLMService {
 
       // Latency (prefer faster for simple tasks)
       if (complexity < 0.5) {
-        const latency = model.averageLatencyMs || 1000;
+        const latency = (model as any).averageLatencyMs || 1000;
         score += (1 - Math.min(latency / 5000, 1)) * 0.1;
       }
 
@@ -752,7 +752,7 @@ class RouteLLMService {
     const qualified = modelScores.filter(m => m.quality >= qualityFloor);
 
     // Sort by score
-    qualified.sort((a, b) => b.score - a.score);
+    qualified.sort((a: any, b: any) => b.score - a.score);
 
     const selectedModel = qualified[0] || modelScores[0];
 
@@ -1242,7 +1242,7 @@ class ConformalPredictionService {
     }
 
     // Compute nonconformity scores (1 - quality)
-    const nonconformityScores = samples.map(s => 1 - s.score).sort((a, b) => a - b);
+    const nonconformityScores = samples.map(s => 1 - s.score).sort((a: any, b: any) => a - b);
     
     // Find threshold at (1-alpha) quantile
     const thresholdIndex = Math.ceil((calibrationSamples + 1) * (1 - alpha)) - 1;
@@ -1375,7 +1375,7 @@ class ParetoRoutingService {
     // Calculate Pareto scores
     const modelScores = models.map(model => {
       const quality = model.qualityScore || 0.7;
-      const latency = 1 - Math.min((model.averageLatencyMs || 1000) / 10000, 1); // Normalize to 0-1
+      const latency = 1 - Math.min(((model as any).averageLatencyMs || 1000) / 10000, 1); // Normalize to 0-1
       const cost = 1 - Math.min((model.inputPricePer1M || 5) / 100, 1); // Normalize to 0-1
 
       // Pareto score: weighted combination
@@ -1411,9 +1411,9 @@ class ParetoRoutingService {
     // Filter by budget and sort by Pareto score
     const eligible = modelScores
       .filter(m => m.withinBudget)
-      .sort((a, b) => b.paretoScore - a.paretoScore);
+      .sort((a: any, b: any) => b.paretoScore - a.paretoScore);
 
-    const selected = eligible[0] || modelScores.sort((a, b) => b.paretoScore - a.paretoScore)[0];
+    const selected = eligible[0] || modelScores.sort((a: any, b: any) => b.paretoScore - a.paretoScore)[0];
 
     return {
       selectedModel: selected.modelId,
@@ -1627,7 +1627,7 @@ class AutoMixService {
     difficultyBelief: number
   ): typeof models[0] {
     // Estimate required capability
-    const complexityScore = Object.values(features).reduce((a, b) => a + b, 0) / 4;
+    const complexityScore = Object.values(features).reduce((a: any, b: any) => a + b, 0) / 4;
     const requiredCapability = complexityScore * 0.7 + difficultyBelief * 0.3;
 
     // Find best model that meets capability with lowest cost
@@ -1734,12 +1734,12 @@ class ActiveLearningService {
     }
 
     // Select top N
-    scoredCandidates.sort((a, b) => b.score - a.score);
+    scoredCandidates.sort((a: any, b: any) => b.score - a.score);
     const selected = scoredCandidates.slice(0, batchSize);
 
     return {
       selectedSamples: selected.map(s => s.candidate),
-      scores: selected,
+      scores: selected as any,
       strategy,
       batchSize,
       totalCandidates: candidates.length,

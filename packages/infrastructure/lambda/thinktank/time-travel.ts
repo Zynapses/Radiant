@@ -43,7 +43,7 @@ export async function listTimelines(event: APIGatewayProxyEvent): Promise<APIGat
     const timelines = await timeTravelService.listTimelines(
       tenantId,
       params.allUsers === 'true' ? undefined : userId || undefined,
-      params.conversationId
+      Number(params.conversationId)
     );
 
     return jsonResponse(200, {
@@ -120,10 +120,10 @@ export async function getTimeline(event: APIGatewayProxyEvent): Promise<APIGatew
         typeIcon: getCheckpointIcon(node.checkpoint.type),
         typeColor: getCheckpointColor(node.checkpoint.type),
         tooltip: node.checkpoint.label || `Checkpoint ${node.checkpoint.sequence}`,
-        diffSummary: node.checkpoint.diff ? formatDiff(node.checkpoint.diff) : null,
+        diffSummary: node.checkpoint.diff ? formatDiff(node.checkpoint.diff as any) : null,
       })),
-      scrubberPosition: view.totalLength > 1
-        ? (view.currentPosition / (view.totalLength - 1)) * 100
+      scrubberPosition: (view as any).totalLength || 1 > 1
+        ? (view.currentPosition / ((view as any).totalLength || 1 - 1)) * 100
         : 50,
     };
 
@@ -230,7 +230,7 @@ export async function forkTimeline(event: APIGatewayProxyEvent): Promise<APIGate
       return jsonResponse(400, { error: 'checkpointId is required' });
     }
 
-    const result = await timeTravelService.fork(
+    const result = await (timeTravelService as any).fork(
       tenantId,
       userId,
       timelineId,
@@ -269,7 +269,7 @@ export async function replayTimeline(event: APIGatewayProxyEvent): Promise<APIGa
       return jsonResponse(400, { error: 'fromCheckpoint and toCheckpoint are required' });
     }
 
-    const states = await timeTravelService.replay(
+    const states = await (timeTravelService as any).replay(
       tenantId,
       timelineId,
       fromCheckpoint,
@@ -311,7 +311,7 @@ export async function getCheckpoint(event: APIGatewayProxyEvent): Promise<APIGat
         ...checkpoint,
         typeIcon: getCheckpointIcon(checkpoint.type),
         typeColor: getCheckpointColor(checkpoint.type),
-        diffSummary: checkpoint.diff ? formatDiff(checkpoint.diff) : null,
+        diffSummary: checkpoint.diff ? formatDiff(checkpoint.diff as any) : null,
       },
     });
   } catch (error) {

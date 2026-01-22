@@ -110,6 +110,23 @@ export {
 } from './cato/redis.service';
 
 // ============================================================================
+// Cato Method Pipeline (Project Cato v5.0)
+// ============================================================================
+
+export { CatoSchemaRegistryService, createCatoSchemaRegistryService } from './cato-schema-registry.service';
+export { CatoMethodRegistryService, createCatoMethodRegistryService } from './cato-method-registry.service';
+export { CatoToolRegistryService, createCatoToolRegistryService } from './cato-tool-registry.service';
+export { CatoCheckpointService, createCatoCheckpointService } from './cato-checkpoint.service';
+export { CatoCompensationService, createCatoCompensationService } from './cato-compensation.service';
+export { CatoMerkleService, createCatoMerkleService } from './cato-merkle.service';
+export { CatoPipelineOrchestratorService, createCatoPipelineOrchestratorService } from './cato-pipeline-orchestrator.service';
+export { CatoBaseMethodExecutor, type MethodExecutionContext, type MethodExecutionResult } from './cato-method-executor.service';
+export { CatoPipelineConfigService, createCatoPipelineConfigService, type CatoPipelineConfig } from './cato-pipeline-config.service';
+
+// Cato Methods
+export * from './cato-methods';
+
+// ============================================================================
 // Cedar Authorization (Gateway ABAC)
 // ============================================================================
 

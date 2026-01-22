@@ -7,7 +7,7 @@
  * Schedule: Every 5 minutes via EventBridge rule
  */
 
-import { ScheduledHandler } from 'aws-lambda';
+import { ScheduledEvent, Context } from 'aws-lambda';
 import { s3ContentOffloadService } from '../shared/services/s3-content-offload.service';
 import { executeStatement } from '../shared/utils/db';
 import { logger } from '../shared/utils/logger';
@@ -17,9 +17,10 @@ interface CleanupResult {
   orphans_failed: number;
   expired_caches_cleaned: number;
   duration_ms: number;
+  [key: string]: unknown;
 }
 
-export const handler: ScheduledHandler = async (event) => {
+export const handler = async (event: ScheduledEvent, _context: Context): Promise<{ statusCode: number; body: string }> => {
   const startTime = Date.now();
   logger.info('S3 orphan cleanup started', { event });
 

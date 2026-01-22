@@ -5,7 +5,7 @@
  * Platform layer dependency.
  */
 
-import { Logger } from '@aws-lambda-powertools/logger';
+import { logger } from '../logging/enhanced-logger';
 import { v4 as uuidv4 } from 'uuid';
 import {
   WhiteLabelConfig,
@@ -25,7 +25,7 @@ import {
   WhiteLabelExport,
 } from '@radiant/shared';
 
-const logger = new Logger({ serviceName: 'white-label' });
+// Using shared logger
 
 class WhiteLabelService {
   private static instance: WhiteLabelService;

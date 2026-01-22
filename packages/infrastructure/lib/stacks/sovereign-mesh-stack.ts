@@ -102,20 +102,31 @@ export class SovereignMeshStack extends cdk.Stack {
       },
     };
 
-    // Agent Execution Worker
+    // Agent Execution Worker - Optimized for scale
     const agentExecutionWorker = new lambda.Function(this, 'AgentExecutionWorker', {
       ...lambdaDefaults,
       functionName: `radiant-agent-execution-worker-${environment}`,
       handler: 'agent-execution-worker.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda/workers')),
       timeout: cdk.Duration.minutes(15),
-      memorySize: 1024,
+      memorySize: 2048, // Increased for complex OODA loops
+      reservedConcurrentExecutions: environment === 'prod' ? 100 : undefined,
     });
+
+    // Add provisioned concurrency for production
+    if (environment === 'prod') {
+      const version = agentExecutionWorker.currentVersion;
+      new lambda.Alias(this, 'AgentExecutionWorkerAlias', {
+        aliasName: 'live',
+        version,
+        provisionedConcurrentExecutions: 5,
+      });
+    }
 
     agentExecutionWorker.addEventSource(
       new SqsEventSource(this.agentExecutionQueue, {
-        batchSize: 1,
-        maxConcurrency: 10,
+        batchSize: 1, // Keep at 1 for OODA atomicity
+        maxConcurrency: 50, // Increased from 10 for better throughput
       })
     );
 

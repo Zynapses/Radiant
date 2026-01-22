@@ -650,7 +650,7 @@ export default function WorkflowTemplatesPage() {
                       <div className="text-center py-8 border-2 border-dashed rounded-lg">
                         <Settings2 className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                         <p className="text-muted-foreground">No steps defined</p>
-                        <p className="text-xs text-muted-foreground">Add methods from the "Add Methods" tab</p>
+                        <p className="text-xs text-muted-foreground">Add methods from the &quot;Add Methods&quot; tab</p>
                       </div>
                     ) : (
                       <div className="space-y-3">

@@ -400,3 +400,38 @@ export const getStatsHandler: APIGatewayProxyHandler = async (event) => {
     return errorResponse(500, 'Internal server error', headers);
   }
 };
+
+// ============================================================================
+// Main Handler - Routes requests to appropriate function
+// ============================================================================
+export const handler = async (event: Parameters<APIGatewayProxyHandler>[0]): Promise<APIGatewayProxyResult> => {
+  const path = event.path;
+  const method = event.httpMethod;
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+  };
+
+  if (method === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
+  if (path.includes('/process') && method === 'POST') {
+    return processFileHandler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (path.includes('/compatibility') && method === 'POST') {
+    return checkCompatibilityHandler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (path.includes('/capabilities') && method === 'GET') {
+    return getCapabilitiesHandler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (path.includes('/history') && method === 'GET') {
+    return getHistoryHandler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (path.includes('/stats') && method === 'GET') {
+    return getStatsHandler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+
+  return errorResponse(404, 'Not found', headers);
+};

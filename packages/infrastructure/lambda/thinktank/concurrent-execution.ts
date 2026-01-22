@@ -6,10 +6,10 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Logger } from '@aws-lambda-powertools/logger';
+import { logger } from '../shared/logging/enhanced-logger';
 import { concurrentExecutionService } from '../shared/services/concurrent-execution.service';
 
-const logger = new Logger({ serviceName: 'concurrent-execution-api' });
+// Using shared logger
 
 export async function handler(
   event: APIGatewayProxyEvent

@@ -73,15 +73,57 @@ const handleSubmit = async () => {
 
 ## Enforcement
 
+**THIS IS MANDATORY. NO EXCEPTIONS.**
+
 When reviewing or creating code:
-1. Search for patterns: `// TODO`, `// FIXME`, `throw.*not implemented`, `() => {}`
+1. Search for patterns: `// TODO`, `// FIXME`, `throw.*not implemented`, `() => {}`, `mock`, `stub`, `placeholder`
 2. Ensure all functions have complete implementations
 3. If a feature isn't ready, don't create the stub - wait until it can be fully implemented
 4. Use feature flags to disable incomplete features rather than shipping stubs
 
+### Pre-Commit Checklist
+
+Before marking ANY feature complete:
+```
+□ No `// TODO` or `// FIXME` comments remain
+□ No functions returning hardcoded mock data
+□ No `throw new Error('not implemented')`
+□ No empty function bodies
+□ No "In production, this would..." comments
+□ No "For now, return placeholder" patterns
+□ All navigation links point to real, implemented pages
+□ All UI "Coming Soon" items are either implemented or removed
+□ All service methods call real APIs/databases, not simulations
+```
+
+### Prohibited Patterns (Auto-Reject)
+
+```typescript
+// ❌ NEVER DO THIS:
+return mockResponse;
+return { simulated: true };
+// In production, this would...
+// For now, return placeholder
+throw new Error('Not implemented');
+const stub = () => {};
+// TODO: implement
+// FIXME: complete this
+```
+
+### "Coming Soon" Rule
+
+**DO NOT create UI that links to unimplemented pages.**
+
+If a feature is not implemented:
+1. Do NOT add it to navigation
+2. Do NOT create a "Coming Soon" placeholder page
+3. Do NOT mention it in the UI
+
+Only add features to the UI when they are **fully functional**.
+
 ## Exceptions
 
-The only acceptable "stub" is a feature flag that completely hides unimplemented functionality:
+The ONLY acceptable pattern is a feature flag that completely hides unimplemented functionality:
 
 ```typescript
 if (FEATURE_FLAGS.newPaymentSystem) {
@@ -91,3 +133,12 @@ if (FEATURE_FLAGS.newPaymentSystem) {
 // Graceful fallback to existing system
 return <ExistingPaymentForm />;
 ```
+
+## Consequences
+
+If stubs are discovered in "completed" code:
+1. The feature is NOT complete
+2. Must be fixed immediately before any other work
+3. Documentation must be updated to reflect actual status
+
+**A feature with stubs is a LIE to the user. Do not lie.**

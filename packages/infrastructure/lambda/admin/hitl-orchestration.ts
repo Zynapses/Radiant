@@ -1,5 +1,5 @@
 /**
- * RADIANT v5.33.0 - HITL Orchestration Admin API
+ * RADIANT v5.34.0 - HITL Orchestration Admin API
  * 
  * Admin endpoints for managing HITL orchestration features:
  * - VOI statistics and configuration
@@ -7,6 +7,7 @@
  * - Question batching configuration
  * - Rate limiting management
  * - Escalation chain configuration
+ * - Semantic deduplication configuration
  */
 
 import { APIGatewayProxyHandlerV2 } from 'aws-lambda';
@@ -34,19 +35,23 @@ const routes: Record<string, Record<string, RouteHandler>> = {
     '/rate-limits/statistics': getRateLimitStatistics,
     '/escalation-chains': getEscalationChains,
     '/deduplication/statistics': getDeduplicationStatistics,
+    '/deduplication/config': getDeduplicationConfig,
+    '/deduplication/semantic-matches': getSemanticMatchStatistics,
   },
   PUT: {
     '/abstention/config': updateAbstentionConfig,
     '/rate-limits/:scope': updateRateLimit,
+    '/deduplication/config': updateDeduplicationConfig,
   },
   POST: {
     '/escalation-chains': createEscalationChain,
     '/deduplication/invalidate': invalidateCache,
+    '/deduplication/backfill-embeddings': backfillEmbeddings,
   },
 };
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
-  const tenantId = event.requestContext?.authorizer?.lambda?.tenantId as string;
+  const tenantId = (event.requestContext as { authorizer?: { lambda?: { tenantId?: string } } })?.authorizer?.lambda?.tenantId as string;
   if (!tenantId) {
     return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized' }) };
   }
@@ -214,4 +219,126 @@ async function invalidateCache(tenantId: string, body: unknown): Promise<unknown
   };
   const count = await deduplicationService.invalidateCache(tenantId, cacheId, questionHash, reason);
   return { invalidated: count };
+}
+
+async function getDeduplicationConfig(tenantId: string): Promise<unknown> {
+  const result = await executeStatement({
+    sql: `
+      SELECT 
+        semantic_matching_enabled,
+        semantic_similarity_threshold,
+        semantic_max_candidates
+      FROM hitl_rate_limits
+      WHERE tenant_id = :tenantId AND scope = 'global'
+    `,
+    parameters: [stringParam('tenantId', tenantId)],
+  });
+
+  if (result.rows && result.rows.length > 0) {
+    const row = result.rows[0];
+    return {
+      semanticMatchingEnabled: row.semantic_matching_enabled ?? false,
+      semanticSimilarityThreshold: Number(row.semantic_similarity_threshold) || 0.85,
+      semanticMaxCandidates: Number(row.semantic_max_candidates) || 20,
+    };
+  }
+
+  return {
+    semanticMatchingEnabled: false,
+    semanticSimilarityThreshold: 0.85,
+    semanticMaxCandidates: 20,
+  };
+}
+
+async function updateDeduplicationConfig(tenantId: string, body: unknown): Promise<unknown> {
+  const config = body as {
+    semanticMatchingEnabled?: boolean;
+    semanticSimilarityThreshold?: number;
+    semanticMaxCandidates?: number;
+  };
+
+  await executeStatement({
+    sql: `
+      UPDATE hitl_rate_limits
+      SET 
+        semantic_matching_enabled = COALESCE(:enabled, semantic_matching_enabled),
+        semantic_similarity_threshold = COALESCE(:threshold, semantic_similarity_threshold),
+        semantic_max_candidates = COALESCE(:maxCandidates, semantic_max_candidates),
+        updated_at = NOW()
+      WHERE tenant_id = :tenantId AND scope = 'global'
+    `,
+    parameters: [
+      stringParam('tenantId', tenantId),
+      stringParam('enabled', config.semanticMatchingEnabled?.toString() ?? ''),
+      stringParam('threshold', config.semanticSimilarityThreshold?.toString() ?? ''),
+      stringParam('maxCandidates', config.semanticMaxCandidates?.toString() ?? ''),
+    ],
+  });
+
+  logger.info('Deduplication config updated', { tenantId, config });
+  return { success: true };
+}
+
+async function getSemanticMatchStatistics(tenantId: string): Promise<unknown> {
+  const result = await executeStatement({
+    sql: `
+      SELECT 
+        COUNT(*) FILTER (WHERE match_type = 'semantic') as semantic_matches,
+        COUNT(*) FILTER (WHERE match_type = 'exact') as exact_matches,
+        COUNT(*) FILTER (WHERE match_type = 'fuzzy') as fuzzy_matches,
+        COUNT(*) FILTER (WHERE question_embedding IS NOT NULL) as with_embeddings,
+        COUNT(*) as total_cached,
+        AVG(semantic_similarity) FILTER (WHERE match_type = 'semantic') as avg_semantic_similarity
+      FROM hitl_question_cache
+      WHERE tenant_id = :tenantId
+        AND is_valid = true
+        AND created_at > NOW() - INTERVAL '24 hours'
+    `,
+    parameters: [stringParam('tenantId', tenantId)],
+  });
+
+  if (result.rows && result.rows.length > 0) {
+    const row = result.rows[0];
+    return {
+      semanticMatches: Number(row.semantic_matches) || 0,
+      exactMatches: Number(row.exact_matches) || 0,
+      fuzzyMatches: Number(row.fuzzy_matches) || 0,
+      withEmbeddings: Number(row.with_embeddings) || 0,
+      totalCached: Number(row.total_cached) || 0,
+      avgSemanticSimilarity: Number(row.avg_semantic_similarity) || 0,
+    };
+  }
+
+  return {
+    semanticMatches: 0,
+    exactMatches: 0,
+    fuzzyMatches: 0,
+    withEmbeddings: 0,
+    totalCached: 0,
+    avgSemanticSimilarity: 0,
+  };
+}
+
+async function backfillEmbeddings(tenantId: string): Promise<unknown> {
+  const result = await executeStatement({
+    sql: `
+      SELECT COUNT(*) as count
+      FROM hitl_question_cache
+      WHERE tenant_id = :tenantId
+        AND is_valid = true
+        AND question_embedding IS NULL
+        AND expires_at > NOW()
+    `,
+    parameters: [stringParam('tenantId', tenantId)],
+  });
+
+  const pendingCount = Number(result.rows?.[0]?.count) || 0;
+
+  logger.info('Embedding backfill requested', { tenantId, pendingCount });
+
+  return {
+    message: 'Backfill job queued',
+    pendingCount,
+    estimatedTimeMinutes: Math.ceil(pendingCount / 100),
+  };
 }

@@ -215,12 +215,15 @@ Libraries that users or Cato can invoke for document processing, file conversion
 | `mammoth` | DOCX to HTML conversion | BSD-2-Clause | 2024-01-01 | ✅ |
 | `pdf-parse` | PDF text extraction | MIT | 2024-01-01 | ✅ |
 | `xlsx` | Excel file processing | Apache-2.0 | 2024-01-01 | ✅ |
+| `pdfkit` | PDF generation for AI reports | MIT | 2026-01-22 | ✅ |
+| `exceljs` | Excel generation for AI reports | MIT | 2026-01-22 | ✅ |
 
 ### Media Processing
 
 | Library | Description | License | Date Added | Flag |
 |---------|-------------|---------|------------|------|
 | `sharp` | High-performance image processing | Apache-2.0 | 2024-01-01 | ✅ |
+| `@ts-ffmpeg/fluent-ffmpeg` | FFmpeg wrapper (TypeScript fork) | MIT | 2026-01-20 | ✅ |
 
 ### Collaboration (CRDT)
 
@@ -397,7 +400,8 @@ When removing a library:
 
 | Library | Category | Removal Date | Reason |
 |---------|----------|--------------|--------|
-| — | — | — | No removals yet |
+| `fluent-ffmpeg` | Media Processing | 2026-01-20 | Deprecated/unmaintained, replaced with `@ts-ffmpeg/fluent-ffmpeg` |
+| `@types/fluent-ffmpeg` | Type Definitions | 2026-01-20 | No longer needed, replacement includes types |
 
 ---
 

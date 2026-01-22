@@ -312,6 +312,13 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `thinktank_multipage_apps` | User-generated multipage apps |
 | `thinktank_voice_sessions` | Voice transcription records |
 | `thinktank_file_attachments` | File attachment storage |
+| `brand_kits` | AI Report Writer brand customization (logo, colors, fonts) |
+| `report_templates` | Reusable AI report structures |
+| `generated_reports` | AI-generated reports with content |
+| `report_smart_insights` | Extracted insights from reports (denormalized) |
+| `report_exports` | Report export records with S3 references |
+| `report_chat_history` | Interactive report modification history |
+| `report_schedules` | Scheduled automatic report generation |
 
 ### Migration 154: Cato Advanced Configuration (v6.1.1)
 

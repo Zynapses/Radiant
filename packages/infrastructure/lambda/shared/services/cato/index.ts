@@ -23,3 +23,28 @@ export * from './hitl-integration.service';
 export * from './scout-hitl-integration.service';
 export * from './neural-decision.service';
 export * from './types';
+
+// Dialogue and Consciousness Services
+export * from './dialogue.service';
+export * from './genesis.service';
+export * from './cost-tracking.service';
+export * from './circuit-breaker.service';
+export * from './query-fallback.service';
+export * from './consciousness-loop.service';
+
+// Global Services
+export * from './circadian-budget.service';
+export * from './semantic-cache.service';
+export * from './global-memory.service';
+export * from './shadow-self.service';
+export * from './nli-scorer.service';
+
+// Operating Mode Enum
+export enum OperatingMode {
+  BALANCED = 'BALANCED',
+  SCOUT = 'SCOUT',
+  SAGE = 'SAGE',
+  SPARK = 'SPARK',
+  GUIDE = 'GUIDE',
+  EMERGENCY = 'EMERGENCY',
+}

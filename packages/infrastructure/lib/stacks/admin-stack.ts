@@ -65,6 +65,22 @@ export class AdminStack extends cdk.Stack {
 
     this.adminBucket.grantRead(originAccessIdentity);
 
+    // S3 bucket for AI reports exports
+    const reportsBucket = new s3.Bucket(this, 'ReportsBucket', {
+      bucketName: `${appId}-${environment}-reports-${this.account}`,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      versioned: tier >= 2,
+      removalPolicy: isProd ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: !isProd,
+      lifecycleRules: [
+        {
+          expiration: cdk.Duration.days(90), // Auto-delete exports after 90 days
+          prefix: 'reports/',
+        },
+      ],
+    });
+
     // CloudFront distribution for admin dashboard
     this.adminDistribution = new cloudfront.Distribution(this, 'AdminDistribution', {
       defaultBehavior: {
@@ -192,6 +208,9 @@ export class AdminStack extends cdk.Stack {
       resources: ['*'],
     }));
 
+    // Grant S3 access for AI reports exports
+    reportsBucket.grantReadWrite(adminLambdaRole);
+
     // Admin Lambda function
     this.adminFunction = new lambda.Function(this, 'AdminFunction', {
       functionName: `${appId}-${environment}-admin`,
@@ -210,6 +229,7 @@ export class AdminStack extends cdk.Stack {
         ADMIN_CLIENT_ID: adminUserPoolClient.userPoolClientId,
         LOG_LEVEL: isProd ? 'info' : 'debug',
         RADIANT_VERSION,
+        REPORTS_BUCKET: reportsBucket.bucketName,
       },
       vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
@@ -674,6 +694,87 @@ export class AdminStack extends cdk.Stack {
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
     tierSettings.addResource('budget-cap').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // =========================================================================
+    // AI Reports v5.42.0 - AI Report Writer Routes
+    // =========================================================================
+    const aiReports = admin.addResource('ai-reports');
+    
+    // List reports
+    aiReports.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Generate report
+    aiReports.addResource('generate').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Report by ID
+    const reportById = aiReports.addResource('{reportId}');
+    reportById.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    reportById.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    reportById.addMethod('DELETE', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Export report
+    reportById.addResource('export').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Templates
+    const reportTemplates = aiReports.addResource('templates');
+    reportTemplates.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    reportTemplates.addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Brand kits
+    const brandKits = aiReports.addResource('brand-kits');
+    brandKits.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    brandKits.addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const brandKitById = brandKits.addResource('{brandKitId}');
+    brandKitById.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    brandKitById.addMethod('DELETE', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Chat for report modifications
+    aiReports.addResource('chat').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Insights dashboard
+    aiReports.addResource('insights').addMethod('GET', adminIntegration, {
       authorizer: adminAuthorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });

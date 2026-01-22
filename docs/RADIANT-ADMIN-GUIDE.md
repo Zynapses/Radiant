@@ -2,7 +2,7 @@
 
 > **Complete guide for managing the RADIANT AI Platform via the Admin Dashboard**
 > 
-> Version: 5.0.2 | Last Updated: January 2026
+> Version: 5.42.0 | Last Updated: January 2026
 >
 > **Compliance Frameworks:** HIPAA, SOC 2 Type II, GDPR, FDA 21 CFR Part 11
 
@@ -64,6 +64,7 @@
 59. [White-Label Invisibility (Moat #25)](#59-white-label-invisibility-moat-25)
 60. [User Violation Enforcement](#60-user-violation-enforcement)
 61. [Multi-Protocol Gateway Architecture](#61-multi-protocol-gateway-architecture)
+65. [RAWS v1.1 - Model Selection System](#65-raws-v11---model-selection-system)
 
 ---
 
@@ -12033,7 +12034,187 @@ Content-Type: application/json
 DELETE /api/admin/cato/persona-override?sessionId=session-uuid
 ```
 
-### 42.6 Precision Governor
+### 42.6 Governance Presets (Variable Friction)
+
+**NEW in v4.18.0**: Governance Presets provide a user-friendly "leash metaphor" abstraction over the technical mood system. This makes it easy for admins to configure how much human oversight is required.
+
+#### The Leash Metaphor
+
+| Preset | Leash Length | Human Oversight | Maps to Mood |
+|--------|--------------|-----------------|--------------|
+| **🛡️ Paranoid** | Short | Every decision requires approval | Scout |
+| **⚖️ Balanced** | Medium | Auto-approve low-risk, checkpoint medium+ | Balanced |
+| **🚀 Cowboy** | Long | Full autonomy, async notification | Spark |
+
+#### Friction Level
+
+Each preset has a **friction level** (0.0 - 1.0) that determines how often checkpoints pause for human approval:
+
+- **0.0 (Full Autonomy)**: Actions auto-approved, humans notified asynchronously
+- **0.5 (Balanced)**: Low-risk auto-approved, medium/high-risk checkpointed
+- **1.0 (Full Manual)**: Every action requires explicit human approval
+
+#### Checkpoint Configuration
+
+Each preset configures five checkpoints in the action pipeline:
+
+| Checkpoint | When | Paranoid | Balanced | Cowboy |
+|------------|------|----------|----------|--------|
+| **CP1: After Observer** | Intent classification | ALWAYS | NEVER | NEVER |
+| **CP2: After Proposer** | Plan generation | ALWAYS | CONDITIONAL | NEVER |
+| **CP3: After Critics** | Risk review | ALWAYS | CONDITIONAL | NEVER |
+| **CP4: Before Execution** | Final approval | ALWAYS | CONDITIONAL | CONDITIONAL |
+| **CP5: After Execution** | Post-review | ALWAYS | NOTIFY_ONLY | NOTIFY_ONLY |
+
+**Checkpoint Modes**:
+- `ALWAYS`: Always require human approval
+- `CONDITIONAL`: Based on risk/confidence thresholds
+- `NEVER`: Auto-approve
+- `NOTIFY_ONLY`: Proceed but notify human asynchronously
+
+#### Admin Dashboard
+
+Navigate to **Cato** → **Governance Presets** to:
+
+1. **Select Preset**: Click a preset card to switch modes
+2. **Fine-Tune Friction**: Use the slider to adjust friction within your preset
+3. **Override Checkpoints**: Customize individual checkpoint behaviors
+4. **View Metrics**: See auto-approval rates, rejection counts, decision times
+5. **View History**: Audit log of all preset changes
+
+#### API Endpoints
+
+```bash
+# Get current governance config
+GET /api/admin/cato/governance/config
+
+# Set governance preset
+PUT /api/admin/cato/governance/preset
+Content-Type: application/json
+{
+  "preset": "balanced",
+  "reason": "Moving to production"
+}
+
+# Update custom overrides
+PATCH /api/admin/cato/governance/overrides
+Content-Type: application/json
+{
+  "frictionLevel": 0.6,
+  "checkpoints": {
+    "beforeExecution": "ALWAYS"
+  }
+}
+
+# Get checkpoint metrics
+GET /api/admin/cato/governance/metrics?days=7
+
+# Get preset change history
+GET /api/admin/cato/governance/history
+```
+
+#### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `tenant_governance_config` | Per-tenant preset configuration |
+| `governance_preset_changes` | Audit log of preset changes |
+| `governance_checkpoint_decisions` | All checkpoint decisions for compliance |
+
+#### Integration with Moods
+
+Governance Presets are an **abstraction layer** over Moods:
+
+```
+User sees:     Paranoid ←→ Balanced ←→ Cowboy
+               (Friction Slider)
+               
+System uses:   Scout    ←→ Balanced ←→ Spark
+               (Mood with specific drives)
+```
+
+When you select a preset, the system:
+1. Sets the mapped mood (affects AI personality)
+2. Configures checkpoint gates (affects human oversight)
+3. Adjusts auto-approve thresholds (affects automation level)
+
+### 42.7 War Room (Council of Rivals)
+
+**NEW in v4.18.0**: The War Room provides real-time visualization of multi-agent adversarial debates.
+
+#### Overview
+
+The Council of Rivals system enables multiple AI models to debate decisions before execution, providing:
+
+- **Adversarial Review**: Different models argue for/against actions
+- **Consensus Building**: Structured debate with voting
+- **Transparency**: Full transcript of all arguments and rebuttals
+
+#### Council Members
+
+Each council has members with specific roles:
+
+| Role | Icon | Purpose |
+|------|------|---------|
+| **Advocate** | 👍 | Argues in favor of proposals |
+| **Critic** | 👎 | Identifies flaws and risks |
+| **Synthesizer** | 🧠 | Combines viewpoints into solutions |
+| **Specialist** | 💡 | Provides domain expertise |
+| **Contrarian** | ⚡ | Challenges assumptions |
+
+#### Debate Flow
+
+```
+Topic → Opening → Arguments → Rebuttals → Voting → Verdict
+         ↓           ↓           ↓          ↓        ↓
+     Round 1      Round 2     Round 3    Round N   Outcome
+```
+
+#### Verdict Outcomes
+
+| Outcome | Description |
+|---------|-------------|
+| **Consensus** | All members agree |
+| **Majority** | Most members agree |
+| **Split** | Even division |
+| **Deadlock** | No resolution possible |
+| **Synthesized** | New position created from debate |
+
+#### Admin Dashboard
+
+Navigate to **Cato** → **War Room** to:
+
+1. **Start Debates**: Select a council, enter topic, begin deliberation
+2. **Watch Live**: Real-time debate transcript with member avatars
+3. **Review History**: Past debates with verdicts and reasoning
+4. **View Statistics**: Consensus rates, debate durations, outcomes
+
+#### API Endpoints
+
+```bash
+# List councils
+GET /api/admin/council/list
+
+# Start a debate
+POST /api/admin/council/debates
+Content-Type: application/json
+{
+  "councilId": "council-uuid",
+  "topic": "Should we deploy this feature?",
+  "context": "Feature involves sensitive data processing"
+}
+
+# Get debate status
+GET /api/admin/council/debates/{debateId}
+
+# Advance debate round
+POST /api/admin/council/debates/{debateId}/advance
+
+# Get recent debates
+GET /api/admin/council/debates/recent
+```
+
+### 42.8 Precision Governor
 
 The Governor limits confidence (gamma/γ) based on epistemic uncertainty using the formula:
 
@@ -13145,6 +13326,162 @@ At the top of the page, four status cards show:
 | **Gemini** | ✅ APPROVED | "Masterpiece of systems engineering" |
 
 > *"RADIANT Genesis v2.3 solves the 'Alignment Tax' paradox. Usually, making an AI safer makes it dumber. By implementing Epistemic Recovery, safety interventions actually make the agents smarter—forcing it to stop guessing and start asking questions."* — Gemini, Final Assessment
+
+### 42.25 Cato Method Pipeline (Project Cato v5.0)
+
+The **Cato Method Pipeline** extends Genesis Cato with a composable method-based architecture for autonomous AI orchestration. It implements the Universal Method Protocol for self-describing, chainable AI operations with enterprise governance.
+
+#### Core Components
+
+| Component | Purpose | Key Tables |
+|-----------|---------|------------|
+| **Schema Registry** | Central store for JSON Schema definitions | `cato_schema_definitions` |
+| **Method Registry** | 70+ composable method definitions | `cato_method_definitions` |
+| **Tool Registry** | Lambda and MCP tool definitions | `cato_tool_definitions` |
+| **Pipeline Orchestrator** | Execution tracking and routing | `cato_pipeline_executions` |
+| **Envelope System** | Method-to-method communication | `cato_pipeline_envelopes` |
+
+#### Universal Method Protocol
+
+Methods communicate via self-describing envelopes:
+
+```typescript
+interface CatoMethodEnvelope<T> {
+  envelopeId: string;
+  pipelineId: string;
+  sequence: number;
+  source: { methodId, methodType, methodName };
+  destination?: { methodId, routingReason };
+  output: {
+    outputType: CatoOutputType;
+    schemaRef: string;  // References schema registry
+    data: T;
+    summary: string;
+  };
+  confidence: { score: number; factors: [] };
+  contextStrategy: 'FULL' | 'SUMMARY' | 'TAIL' | 'RELEVANT' | 'MINIMAL';
+  riskSignals: [];
+  compliance: { frameworks, dataClassification, containsPii, containsPhi };
+}
+```
+
+#### Core Methods
+
+| Method | Type | Purpose |
+|--------|------|---------|
+| `method:observer:v1` | OBSERVER | Classifies intent, extracts context, detects domain |
+| `method:proposer:v1` | PROPOSER | Generates action proposals with reversibility info |
+| `method:critic:security:v1` | CRITIC | Security review of proposals |
+| `method:validator:v1` | VALIDATOR | Risk assessment with veto logic |
+| `method:executor:v1` | EXECUTOR | Tool invocation with compensation logging |
+
+#### Context Strategies
+
+| Strategy | Description | Use Case |
+|----------|-------------|----------|
+| **FULL** | Include all previous envelopes | Complex decisions, audit |
+| **SUMMARY** | LLM-generated summary of history | Long conversations |
+| **TAIL** | Last N envelopes only | Recent context focus |
+| **RELEVANT** | Filter by output type relevance | Targeted context |
+| **MINIMAL** | Original request only | Fresh perspective |
+
+#### Risk Veto Logic
+
+The Validator method implements automatic veto for CRITICAL risks:
+
+```
+IF any risk_factor.level == 'CRITICAL':
+    triage_decision = 'BLOCKED'
+    veto_applied = true
+ELSE IF overall_risk_score >= veto_threshold:
+    triage_decision = 'BLOCKED'
+ELSE IF overall_risk_score >= checkpoint_threshold:
+    triage_decision = 'CHECKPOINT_REQUIRED'
+ELSE:
+    triage_decision = 'AUTO_EXECUTE'
+```
+
+#### Checkpoint Integration
+
+| Checkpoint | Gate | Typical Trigger |
+|------------|------|-----------------|
+| **CP1** | Context Gate | Ambiguous intent, missing context |
+| **CP2** | Plan Gate | High cost, irreversible actions |
+| **CP3** | Review Gate | Objections raised, low consensus |
+| **CP4** | Execution Gate | Risk above threshold |
+| **CP5** | Post-Mortem | Execution completed (audit) |
+
+#### SAGA Compensation Pattern
+
+The compensation log tracks reversible actions for rollback:
+
+```sql
+-- Each executed action logs its compensation strategy
+INSERT INTO cato_compensation_log (
+  pipeline_id, step_number, compensation_type,
+  compensation_tool, affected_resources,
+  original_action, original_result
+) VALUES (...);
+
+-- On failure, execute compensations in reverse order
+SELECT * FROM cato_compensation_log
+WHERE pipeline_id = $1 AND status = 'PENDING'
+ORDER BY step_number DESC;
+```
+
+#### Pipeline Templates
+
+| Template | Chain | Use Case |
+|----------|-------|----------|
+| `template:simple-qa` | Observer | Basic Q&A |
+| `template:action-execution` | Observer → Proposer → Critic → Validator → Executor | Tool execution |
+| `template:war-room` | Observer → Proposer → Multi-Critic → Decider | Complex decisions |
+
+#### Services
+
+```typescript
+// Schema Registry
+const schema = await schemaRegistry.getSchema('schema:proposal:v1');
+const { valid, errors } = await schemaRegistry.validatePayload(schemaRef, data);
+
+// Method Registry
+const method = await methodRegistry.getMethod('method:observer:v1');
+const compatible = await methodRegistry.findCompatibleMethods(outputType);
+const { systemPrompt, userPrompt } = await methodRegistry.renderPrompt(methodId, vars);
+
+// Tool Registry
+const tool = await toolRegistry.getTool('tool:http:request');
+const { valid, errors } = await toolRegistry.validateToolInput(toolId, input);
+const isLambda = toolRegistry.isLambdaTool(tool);
+```
+
+#### Database Tables
+
+| Table | Records | Purpose |
+|-------|---------|---------|
+| `cato_schema_definitions` | Output schemas | Self-describing outputs |
+| `cato_method_definitions` | Method configs | Composable methods |
+| `cato_tool_definitions` | Tool configs | Lambda/MCP tools |
+| `cato_pipeline_templates` | Pipeline chains | Pre-built workflows |
+| `cato_pipeline_executions` | Execution runs | Pipeline tracking |
+| `cato_pipeline_envelopes` | Method outputs | Envelope storage |
+| `cato_method_invocations` | Method calls | Invocation details |
+| `cato_audit_prompt_records` | AI prompts | Compliance audit |
+| `cato_checkpoint_configurations` | Tenant config | Checkpoint settings |
+| `cato_checkpoint_decisions` | Human decisions | Approval records |
+| `cato_risk_assessments` | Risk evals | Triage decisions |
+| `cato_compensation_log` | Rollback info | SAGA pattern |
+| `cato_merkle_entries` | Audit chain | Integrity verification |
+
+#### Governance Preset Integration
+
+The Method Pipeline respects governance presets from Section 42.6:
+
+| Preset | Auto-Execute Threshold | Veto Threshold | Checkpoints |
+|--------|------------------------|----------------|-------------|
+| **COWBOY** | 0.7 | 0.95 | Minimal |
+| **BALANCED** | 0.5 | 0.85 | Conditional |
+| **PARANOID** | 0.2 | 0.6 | All manual |
 
 ---
 
@@ -18856,6 +19193,1073 @@ Base: `/api/admin/hitl-orchestration`
 | File | Purpose |
 |------|---------|
 | `migrations/V2026_01_20_011__hitl_orchestration_enhancements.sql` | Schema changes |
+| `migrations/V2026_01_20_012__hitl_semantic_deduplication.sql` | Semantic deduplication |
+
+### 64.11 Semantic Deduplication (v5.34.0)
+
+Enhanced question deduplication using pgvector embeddings for semantic similarity matching.
+
+**How It Works:**
+1. Questions are embedded using AI (1536-dimensional vectors)
+2. Similar questions found via HNSW index cosine similarity search
+3. Falls back to fuzzy matching if embeddings unavailable
+
+**Configuration:**
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enableSemanticMatching` | `false` | Enable pgvector semantic search |
+| `semanticSimilarityThreshold` | `0.85` | Minimum cosine similarity (0.0-1.0) |
+| `maxSemanticCandidates` | `20` | Max candidates to check |
+
+**API Endpoints:**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/semantic-deduplication/config` | GET | Get semantic config |
+| `/semantic-deduplication/config` | PUT | Update semantic config |
+| `/semantic-deduplication/stats` | GET | Match statistics (24h) |
+| `/semantic-deduplication/backfill` | POST | Trigger embedding backfill |
+
+**Dashboard Tab:** "Deduplication" in HITL Orchestration admin
+
+**Match Statistics:**
+- Exact matches (hash-based)
+- Fuzzy matches (Jaccard similarity)
+- Semantic matches (pgvector cosine)
+- Questions with embeddings count
+- Average semantic similarity score
+
+### 64.12 Scout HITL Integration (v5.34.0)
+
+Bridges Cato's Scout persona (epistemic uncertainty mode) with HITL orchestration for intelligent clarification.
+
+**Flow:**
+1. Scout persona activates due to epistemic uncertainty
+2. ScoutHITLIntegration generates prioritized clarification questions
+3. Questions filtered through VOI scoring
+4. High-VOI questions go to HITL, low-VOI get assumptions
+5. Responses reduce uncertainty, allowing Scout to proceed
+
+**Domains:**
+- `medical` - HIPAA-sensitive, safety-critical
+- `financial` - SOC2/PCI compliance
+- `legal` - Regulatory compliance
+- `bioinformatics` - Research accuracy
+- `general` - Default domain
+
+**Aspect Impact Scores:**
+
+| Aspect | Base Impact | Domain Boosts |
+|--------|-------------|---------------|
+| safety | 0.95 | medical, bioinformatics |
+| compliance | 0.90 | medical, financial, legal |
+| irreversible | 0.85 | (all) |
+| cost | 0.80 | financial |
+| accuracy | 0.75 | medical, legal, bioinformatics |
+| timeline | 0.60 | (none) |
+
+**API Endpoints (Cato Admin):**
+
+Base: `/api/admin/cato`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/scout-hitl/config` | GET | Get Scout HITL config |
+| `/scout-hitl/config` | PUT | Update config |
+| `/scout-hitl/sessions` | GET | Recent clarification sessions |
+| `/scout-hitl/statistics` | GET | Session statistics |
+| `/scout-hitl/domain-boosts` | GET | Aspect domain boosts |
+| `/scout-hitl/domain-boosts` | PUT | Update domain boosts |
+
+**Dashboard:** Cato → Scout HITL
+
+**Configuration:**
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | `true` | Enable Scout HITL integration |
+| `voiThreshold` | `0.3` | Minimum VOI to ask question |
+| `maxQuestionsPerSession` | `3` | Max clarifications before assuming |
+| `defaultDomain` | `general` | Fallback domain |
+
+**Session Recommendations:**
+- `proceed` - Uncertainty resolved sufficiently
+- `wait` - Still uncertain, user should wait
+- `abort` - Critical uncertainty, cannot proceed safely
+
+### 64.13 Flyte HITL Task Wrappers (v5.34.0)
+
+Python task wrappers for easy HITL integration in Flyte workflows.
+
+**Available Functions:**
+
+```python
+from radiant_flyte.utils import (
+    ask_confirmation,
+    ask_choice,
+    ask_batch,
+    ask_free_text,
+)
+
+# Confirmation (yes/no)
+approved = await ask_confirmation(
+    question="Deploy to production?",
+    context={"environment": "prod"},
+    timeout_seconds=300
+)
+
+# Single choice
+selected = await ask_choice(
+    question="Select deployment strategy",
+    options=["rolling", "blue-green", "canary"],
+    default="rolling"
+)
+
+# Batch questions
+responses = await ask_batch([
+    {"question": "Confirm rollback?", "type": "yes_no"},
+    {"question": "Reason", "type": "free_text"},
+])
+
+# Free text
+reason = await ask_free_text(
+    question="Describe the issue",
+    max_length=500
+)
+```
+
+**Files:**
+| File | Purpose |
+|------|---------|
+| `packages/flyte/utils/hitl_tasks.py` | Task wrappers |
+
+---
+
+## 65. RAWS v1.1 - Model Selection System
+
+RAWS (RADIANT AI Weighted Selection) provides intelligent real-time model selection using 8-dimension scoring across 13 weight profiles and 7 domains.
+
+### 65.1 Overview
+
+| Component | Count | Description |
+|-----------|-------|-------------|
+| **Dimensions** | 8 | Quality, Cost, Latency, Capability, Reliability, Compliance, Availability, Learning |
+| **Profiles** | 13 | 4 Optimization + 6 Domain + 3 SOFAI |
+| **Domains** | 7 | Healthcare, Financial, Legal, Scientific, Creative, Engineering, General |
+| **Models** | 106+ | 50 external APIs + 56 self-hosted |
+
+### 65.2 Weight Profiles
+
+| Profile | Category | Primary Focus | Compliance |
+|---------|----------|---------------|------------|
+| BALANCED | Optimization | Default, general purpose | - |
+| QUALITY_FIRST | Optimization | Maximum accuracy | - |
+| COST_OPTIMIZED | Optimization | Budget-conscious | - |
+| LATENCY_CRITICAL | Optimization | Real-time applications | - |
+| HEALTHCARE | Domain | Medical/clinical | HIPAA required |
+| FINANCIAL | Domain | Finance/investment | SOC 2 required |
+| LEGAL | Domain | Contracts/litigation | SOC 2 required |
+| SCIENTIFIC | Domain | Research/academic | Optional |
+| CREATIVE | Domain | Content/marketing | None |
+| ENGINEERING | Domain | Code/software | Optional |
+| SYSTEM_1 | SOFAI | Fast, simple queries | - |
+| SYSTEM_2 | SOFAI | Complex reasoning | - |
+| SYSTEM_2_5 | SOFAI | Maximum reasoning | - |
+
+### 65.3 Domain Compliance Matrix
+
+| Domain | Required | Optional | Truth Engine | ECD Threshold |
+|--------|----------|----------|--------------|---------------|
+| healthcare | HIPAA | FDA 21 CFR Part 11 | Required | 0.05 |
+| financial | SOC 2 Type II | PCI-DSS, GDPR, SOX | Required | 0.05 |
+| legal | SOC 2 Type II | GDPR, State Bar | Required | 0.05 |
+| scientific | None | FDA 21 CFR, GLP, IRB | Optional | 0.08 |
+| creative | None | FTC Guidelines | Not Required | 0.20 |
+| engineering | None | SOC 2, ISO 27001, NIST | Optional | 0.10 |
+| general | None | None | Not Required | 0.10 |
+
+### 65.4 Admin API Endpoints
+
+Base: `/api/admin/raws`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/select` | POST | Select optimal model |
+| `/profiles` | GET | List all 13 weight profiles |
+| `/profiles` | POST | Create custom profile |
+| `/models` | GET | List available models |
+| `/domains` | GET | List 7 domain configurations |
+| `/detect-domain` | POST | Test domain detection |
+| `/health` | GET | Provider health status |
+| `/audit` | GET | Selection audit log |
+
+### 65.5 CLI Commands
+
+```bash
+# Profiles
+radiant-cli raws profiles list --env production
+radiant-cli raws profiles get HEALTHCARE --env production
+
+# Domains
+radiant-cli raws domains list --env production
+radiant-cli raws domains get healthcare --env production
+
+# Compliance
+radiant-cli raws compliance summary --env production
+radiant-cli raws models list --compliance HIPAA --env production
+
+# Audit
+radiant-cli raws audit search --domain healthcare --last 24h --env production
+```
+
+### 65.6 Detailed Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [RAWS-ENGINEERING.md](./RAWS-ENGINEERING.md) | Technical reference for engineers |
+| [RAWS-ADMIN-GUIDE.md](./RAWS-ADMIN-GUIDE.md) | Operations and compliance guide |
+| [RAWS-USER-GUIDE.md](./RAWS-USER-GUIDE.md) | API guide for developers |
+
+### 65.7 Key Files
+
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_01_21_004__raws_weighted_selection.sql` | Database schema |
+| `lambda/shared/services/raws/types.ts` | TypeScript types |
+| `lambda/shared/services/raws/domain-detector.service.ts` | Domain detection |
+| `lambda/shared/services/raws/weight-profile.service.ts` | Profile management |
+| `lambda/shared/services/raws/selection.service.ts` | Main selection logic |
+| `lambda/admin/raws.ts` | Admin API handler |
+
+---
+
+## 66. Sovereign Mesh Performance Optimization
+
+The Sovereign Mesh Performance system provides comprehensive monitoring, configuration, and optimization for autonomous agent execution at scale. It enables administrators to tune Lambda concurrency, caching strategies, tenant isolation, and alert thresholds.
+
+### 66.1 Overview
+
+| Component | Description |
+|-----------|-------------|
+| **SQS Dispatcher** | Actual message dispatch for OODA loop iterations |
+| **Redis Cache** | Agent/execution state caching for reduced DB load |
+| **Performance Config** | Per-tenant configuration with defaults |
+| **Artifact Archival** | S3/hybrid storage for completed execution artifacts |
+| **Rate Limiting** | Per-tenant and per-user concurrency limits |
+
+### 66.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Sovereign Mesh Performance                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────────┐  │
+│  │ SQS Queue    │───►│ Lambda Worker │───►│ Redis Cache      │  │
+│  │ (Per-tenant) │    │ (Optimized)   │    │ (Agent/Exec)     │  │
+│  └──────────────┘    └──────────────┘    └──────────────────┘  │
+│         │                    │                    │             │
+│         ▼                    ▼                    ▼             │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────────┐  │
+│  │ DLQ + Alerts │    │ S3 Archival  │    │ Performance DB   │  │
+│  └──────────────┘    └──────────────┘    └──────────────────┘  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 66.3 Admin Dashboard
+
+Navigate to **Sovereign Mesh → Performance** in the Admin Dashboard.
+
+#### Overview Tab
+- **Health Score**: 0-100 composite health metric
+- **Active/Pending Executions**: Real-time counts
+- **Queue Metrics**: Messages pending, in-flight, DLQ
+- **Cache Hit Rate**: Redis/memory cache performance
+- **OODA Phase Timing**: Per-phase latency breakdown
+- **Cost Estimate**: Monthly Lambda/SQS projections
+
+#### Scaling Tab
+| Setting | Default | Range | Description |
+|---------|---------|-------|-------------|
+| Max Concurrency | 50 | 1-200 | SQS event source concurrency |
+| Provisioned Concurrency | 5 | 0-50 | Pre-warmed Lambda instances |
+| Memory (MB) | 2048 | 512-4096 | Lambda memory allocation |
+| Isolation Mode | shared | shared/dedicated/fifo | Tenant queue isolation |
+| Max Per Tenant | 50 | 1-100 | Concurrent executions per tenant |
+| Max Per User | 10 | 1-25 | Concurrent executions per user |
+
+#### Caching Tab
+- **Backend**: memory (Lambda-local) or redis (ElastiCache)
+- **Hit Rate**: Target >80% for optimal performance
+- **Cache Actions**: Clear tenant cache, view statistics
+
+#### Alerts Tab
+| Alert Type | Default Threshold | Description |
+|------------|-------------------|-------------|
+| DLQ Threshold | 10 messages | Alert when DLQ exceeds threshold |
+| Latency Threshold | 30 seconds | Alert on slow executions |
+| Budget Threshold | 80% | Alert on budget exhaustion |
+
+#### Recommendations Tab
+AI-generated performance recommendations with one-click apply:
+- Increase concurrency when utilization is high
+- Improve cache hit rate suggestions
+- Memory optimization recommendations
+
+### 66.4 Configuration API
+
+Base: `/api/admin/sovereign-mesh/performance`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/dashboard` | GET | Get complete dashboard data |
+| `/config` | GET | Get current configuration |
+| `/config` | PUT/PATCH | Update configuration |
+| `/recommendations` | GET | Get AI recommendations |
+| `/recommendations/:id/apply` | POST | Apply a recommendation |
+| `/alerts` | GET | List active alerts |
+| `/alerts/:id/acknowledge` | POST | Acknowledge alert |
+| `/alerts/:id/resolve` | POST | Resolve alert |
+| `/cache/stats` | GET | Get cache statistics |
+| `/cache` | DELETE | Clear tenant cache |
+| `/queue/metrics` | GET | Get queue metrics |
+| `/health` | GET | Health check |
+
+### 66.5 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `sovereign_mesh_performance_config` | Per-tenant performance settings |
+| `sovereign_mesh_performance_alerts` | Active and historical alerts |
+| `sovereign_mesh_performance_metrics` | Time-series metrics (BRIN indexed) |
+| `sovereign_mesh_artifact_archives` | Archived execution artifacts |
+| `sovereign_mesh_tenant_queues` | Dedicated tenant queue mappings |
+| `sovereign_mesh_rate_limits` | Rate limiting window counters |
+| `sovereign_mesh_config_history` | Configuration change audit trail |
+
+### 66.6 Performance Indexes
+
+The migration adds optimized indexes for common query patterns:
+
+```sql
+-- Fast tenant+status queries
+CREATE INDEX idx_agent_executions_tenant_status ON agent_executions(tenant_id, status);
+
+-- Fast agent+status queries  
+CREATE INDEX idx_agent_executions_agent_status ON agent_executions(agent_id, status);
+
+-- Time-based queries
+CREATE INDEX idx_agent_executions_created_at ON agent_executions(created_at DESC);
+
+-- Partial index for running executions only
+CREATE INDEX idx_agent_executions_running ON agent_executions(tenant_id, started_at) 
+  WHERE status = 'running';
+
+-- BRIN index for time-series metrics
+CREATE INDEX idx_perf_metrics_tenant_time ON sovereign_mesh_performance_metrics 
+  USING BRIN (tenant_id, metric_time);
+```
+
+### 66.7 Lambda Configuration
+
+Production-optimized Lambda settings:
+
+| Setting | Value | Rationale |
+|---------|-------|-----------|
+| Memory | 2048 MB | Complex OODA loop processing |
+| Timeout | 15 minutes | Long-running agent executions |
+| Reserved Concurrency | 100 | Guaranteed capacity |
+| Provisioned Concurrency | 5 | Eliminate cold starts |
+| SQS Batch Size | 1 | OODA loop atomicity |
+| SQS Max Concurrency | 50 | High throughput |
+
+### 66.8 Artifact Archival
+
+Configure artifact archival for cost optimization:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Storage Backend | hybrid | database (small), s3 (large) |
+| Archive After Days | 7 | Days until archival |
+| Delete After Days | 90 | Days until deletion (0=never) |
+| Max DB Bytes | 65536 | Threshold for S3 (64KB) |
+| Compression | gzip | Compression algorithm |
+
+### 66.9 Rate Limiting
+
+Built-in rate limiting protects against runaway executions:
+
+```sql
+-- Check if execution allowed
+SELECT * FROM can_start_execution(:tenant_id, :user_id);
+
+-- Returns: allowed, reason, current_count, max_allowed
+```
+
+### 66.10 Key Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/sovereign-mesh-performance.types.ts` | TypeScript types |
+| `packages/infrastructure/migrations/V2026_01_21_001__sovereign_mesh_performance.sql` | Database schema |
+| `lambda/shared/services/sovereign-mesh/sqs-dispatcher.service.ts` | SQS message dispatch |
+| `lambda/shared/services/sovereign-mesh/redis-cache.service.ts` | Redis/memory caching |
+| `lambda/shared/services/sovereign-mesh/performance-config.service.ts` | Configuration management |
+| `lambda/shared/services/sovereign-mesh/artifact-archival.service.ts` | S3 archival |
+| `lambda/admin/sovereign-mesh-performance.ts` | Admin API handler |
+| `apps/admin-dashboard/app/(dashboard)/sovereign-mesh/performance/page.tsx` | Admin UI |
+
+### 66.11 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| High DLQ count | Processing failures | Check CloudWatch logs, increase timeout |
+| Low cache hit rate | Cold starts, small TTL | Increase TTL, enable cache warming |
+| Slow executions | Memory constraints | Increase Lambda memory |
+| Rate limit errors | Too many concurrent | Increase per-tenant limits |
+| Queue backlog | Insufficient concurrency | Increase maxConcurrency |
+
+---
+
+## 67. Infrastructure Scaling (100 to 500K Sessions)
+
+Comprehensive infrastructure scaling system enabling seamless growth from development (100 sessions) to enterprise scale (500,000+ concurrent sessions) with real-time cost visibility.
+
+### 67.1 Scaling Tiers
+
+| Tier | Target Sessions | Monthly Cost | Use Case |
+|------|-----------------|--------------|----------|
+| **Development** | 100 | ~$70 | Testing, development, POC |
+| **Staging** | 1,000 | ~$500 | Pre-production testing |
+| **Production** | 10,000 | ~$5,000 | Standard production workloads |
+| **Enterprise** | 500,000 | ~$68,500 | Global scale, multi-region |
+
+### 67.2 Admin Dashboard
+
+Navigate to **Sovereign Mesh → Scaling** in the Admin Dashboard.
+
+#### Overview Tab
+- **Active Sessions**: Real-time count with utilization gauge
+- **Peak Sessions**: Today, week, and month peaks
+- **Bottleneck Indicator**: Current limiting component
+- **Cost per Session**: Real-time cost efficiency metric
+- **Component Health**: Status of Lambda, Aurora, Redis, API Gateway, SQS
+
+#### Sessions Tab
+- **Session Capacity**: Current vs maximum with headroom
+- **Session Statistics**: Historical counts and averages
+- **Capacity by Component**: Per-component session limits
+
+#### Infrastructure Tab
+- **Lambda Configuration**: Reserved/provisioned concurrency, memory, timeout
+- **Aurora Configuration**: ACU range, read replicas, global database
+- **Redis Configuration**: Node type, shards, cluster mode
+- **API Gateway Configuration**: Rate limits, CloudFront
+
+#### Cost Tab
+- **Cost Breakdown**: Per-component monthly costs with progress bars
+- **Cost Metrics**: Cost per session, per 1000 sessions, annual estimate
+- **Component Costs**: Lambda, Aurora, Redis, API Gateway, SQS, CloudFront, Data Transfer
+
+#### Scale Tab
+- **Quick Scale**: One-click tier selection with instant apply
+- **Scaling Comparison**: Cost delta between tiers
+- **What Changes**: Detailed list of infrastructure modifications
+
+### 67.3 Scaling Profiles
+
+Each scaling tier configures multiple components:
+
+#### Development (Scale-to-Zero)
+```
+Lambda:     0 provisioned, 10 max concurrent, 1024 MB
+Aurora:     0.5-2 ACU, 0 replicas, no global
+Redis:      cache.t4g.micro, 1 shard, no cluster
+API:        100 RPS, no CloudFront
+SQS:        2 standard queues
+```
+
+#### Staging
+```
+Lambda:     0 provisioned, 50 max concurrent, 2048 MB
+Aurora:     1-8 ACU, 1 replica, no global
+Redis:      cache.t4g.small, 1 shard, 1 replica
+API:        1,000 RPS, no CloudFront
+SQS:        5 standard, 2 FIFO queues
+```
+
+#### Production
+```
+Lambda:     5 provisioned, 200 max concurrent, 2048 MB
+Aurora:     4-64 ACU, 2 replicas, PgBouncer
+Redis:      cache.r6g.large, 1 shard, 2 replicas
+API:        10,000 RPS, CloudFront enabled
+SQS:        10 standard, 5 FIFO queues
+```
+
+#### Enterprise (500K)
+```
+Lambda:     100 provisioned, 1000 max concurrent, 3072 MB
+Aurora:     16-256 ACU, 3 replicas, Global Database (5 regions)
+Redis:      cache.r6g.xlarge, 10 shards, 2 replicas, cluster mode
+API:        100,000 RPS, CloudFront, 5 regional endpoints
+SQS:        50 standard, 50 FIFO queues
+```
+
+### 67.4 Cost Calculation
+
+Real-time cost estimation based on AWS pricing:
+
+| Component | Pricing Model | Example (Production) |
+|-----------|---------------|----------------------|
+| **Lambda Provisioned** | $0.000004167/GB-second | 5 × 2GB × 24h × 30d = ~$360/mo |
+| **Aurora ACU** | $0.12/ACU-hour | 34 avg ACU × 24h × 30d = ~$2,900/mo |
+| **Redis** | $0.182/hour (r6g.large) | 3 nodes × 24h × 30d = ~$390/mo |
+| **API Gateway** | $1.00/million requests | 10% of 10K RPS = ~$260/mo |
+| **SQS** | $0.40/million standard | 15 queues × 1M = ~$6/mo |
+| **CloudFront** | $0.085/GB + $0.01/10K req | ~$500/mo |
+| **Data Transfer** | $0.02/GB inter-region | ~$200/mo (global) |
+
+### 67.5 Session Capacity Calculation
+
+Maximum concurrent sessions is limited by the bottleneck component:
+
+```
+Lambda Max     = maxConcurrency × 10 sessions/concurrent
+Aurora Max     = connectionPoolSize × 50 sessions/connection
+Redis Max      = maxConnections
+API Gateway Max = throttlingRateLimit
+
+Effective Max  = MIN(Lambda, Aurora, Redis, API Gateway)
+```
+
+### 67.6 Auto-Scaling Rules
+
+Configure automatic scaling based on metrics:
+
+| Metric | Condition | Action |
+|--------|-----------|--------|
+| `session_count > 80%` capacity | Duration: 5 min | Scale up |
+| `session_count < 20%` capacity | Duration: 30 min | Scale down |
+| `cpu_utilization > 70%` | Duration: 5 min | Increase concurrency |
+| `latency_p99 > 5000ms` | Duration: 2 min | Increase memory |
+| `queue_depth > 1000` | Duration: 1 min | Scale out workers |
+
+### 67.7 Scheduled Scaling
+
+Pre-configure scaling for predictable patterns:
+
+```
+# Scale up for business hours (PST)
+0 6 * * MON-FRI  → Production tier
+# Scale down after hours
+0 18 * * MON-FRI → Staging tier
+# Minimal on weekends
+0 0 * * SAT      → Development tier
+```
+
+### 67.8 API Endpoints
+
+Base: `/api/admin/sovereign-mesh/scaling`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/dashboard` | GET | Complete scaling dashboard |
+| `/profiles` | GET | List all profiles |
+| `/profiles/active` | GET | Get active profile |
+| `/profiles` | POST | Create new profile |
+| `/profiles/:id` | PUT | Update profile |
+| `/profiles/:id/apply` | POST | Apply profile |
+| `/sessions` | GET | Session metrics |
+| `/sessions/capacity` | GET | Capacity info |
+| `/sessions/trends` | GET | Historical trends |
+| `/cost` | GET | Current cost estimate |
+| `/cost/estimate` | POST | Estimate custom config |
+| `/operations` | GET | Recent operations |
+| `/alerts` | GET | Active alerts |
+| `/health` | GET | Component health |
+| `/presets` | GET | Available presets |
+| `/presets/:tier/apply` | POST | Apply preset tier |
+
+### 67.8.1 Cost Analytics Integration
+
+Infrastructure scaling costs are integrated into the AWS Cost Monitoring service and appear as a **line item group** in the Cost Analytics page.
+
+**Endpoint**: `GET /api/admin/costs/infrastructure-scaling`
+
+**Response**:
+```json
+{
+  "scalingCosts": {
+    "groupName": "Infrastructure Scaling",
+    "totalCost": 5234.56,
+    "estimatedMonthlyCost": 5000.00,
+    "tier": "production",
+    "targetSessions": 10000,
+    "costPerSession": 0.5234,
+    "lineItems": [
+      {
+        "component": "Aurora",
+        "description": "Serverless v2 (4-64 ACU, 2 replicas)",
+        "baseCost": 2916.00,
+        "usageCost": 0,
+        "totalCost": 2916.00,
+        "unit": "ACU-hour",
+        "quantity": 24336,
+        "pricePerUnit": 0.12,
+        "percentage": 55.7
+      },
+      // ... other components
+    ],
+    "lastUpdated": "2026-01-21T19:30:00Z"
+  }
+}
+```
+
+**Line Item Components**:
+| Component | Description | Pricing Model |
+|-----------|-------------|---------------|
+| **Lambda** | Provisioned concurrency | $0.000004167/GB-second |
+| **Aurora** | Serverless v2 ACU-hours | $0.12/ACU-hour |
+| **Redis** | ElastiCache node-hours | Varies by node type |
+| **API Gateway** | HTTP API requests | $1.00/million requests |
+| **SQS** | Queue requests | $0.40-0.50/million |
+| **CloudFront** | Edge distribution | $0.085/GB + requests |
+
+**Cost Analytics UI**:
+Navigate to **Costs** in the Admin Dashboard to see:
+- Infrastructure Scaling section with tier badge
+- Summary cards: Total Monthly, Estimated, Cost/Session, Components
+- Detailed line items table with percentage bars
+- Per-component breakdown with icons
+
+### 67.9 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `sovereign_mesh_scaling_profiles` | Scaling profile configurations |
+| `sovereign_mesh_session_metrics` | Real-time session metrics (1-min) |
+| `sovereign_mesh_session_metrics_hourly` | Aggregated hourly metrics |
+| `sovereign_mesh_scaling_operations` | Operation history |
+| `sovereign_mesh_autoscaling_rules` | Auto-scaling rules |
+| `sovereign_mesh_scheduled_scaling` | Scheduled scaling events |
+| `sovereign_mesh_component_health` | Component health snapshots |
+| `sovereign_mesh_scaling_alerts` | Scaling alerts |
+| `sovereign_mesh_cost_records` | Daily cost records |
+
+### 67.10 Key Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/sovereign-mesh-scaling.types.ts` | TypeScript types |
+| `packages/infrastructure/migrations/V2026_01_21_002__sovereign_mesh_scaling.sql` | Database schema |
+| `lambda/shared/services/sovereign-mesh/scaling.service.ts` | Scaling service |
+| `lambda/admin/sovereign-mesh-scaling.ts` | Admin API handler |
+| `apps/admin-dashboard/app/(dashboard)/sovereign-mesh/scaling/page.tsx` | Admin UI |
+
+### 67.11 Scaling Operations Workflow
+
+```
+1. Select Target Tier/Profile
+        │
+        ▼
+2. Calculate Changes
+   - Component diffs
+   - Cost impact
+   - Downtime assessment
+        │
+        ▼
+3. Create Operation Record
+   - Status: pending/in_progress
+   - Estimated duration
+   - Rollback plan
+        │
+        ▼
+4. Apply Changes (if approved)
+   - Update Lambda concurrency
+   - Modify Aurora ACUs
+   - Resize Redis cluster
+   - Update API Gateway limits
+        │
+        ▼
+5. Verify & Complete
+   - Health checks pass
+   - Session capacity confirmed
+   - Operation: completed
+```
+
+### 67.12 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Scale operation stuck | CDK deployment in progress | Wait or rollback |
+| Sessions exceeding capacity | Traffic spike | Increase tier or concurrency |
+| High cost per session | Over-provisioned | Scale down during low traffic |
+| Cold starts in production | No provisioned concurrency | Enable provisioned concurrency |
+| Cross-region latency | Single region | Enable global database + Redis |
+
+---
+
+## Section 68: Schema-Adaptive Reports (v5.39.0)
+
+**Location**: Admin Dashboard → Reports → Schema Builder
+
+Dynamic report builder that automatically discovers and adapts to database schema changes.
+
+### 68.1 Overview
+
+The Schema-Adaptive Report Writer provides:
+
+- **Automatic Schema Discovery** - Queries `information_schema` to discover tables and columns
+- **Intelligent Categorization** - Groups tables by domain (Core, AI, Billing, Analytics, System)
+- **Dynamic Query Building** - Constructs SQL queries based on user selections
+- **Visual Filter Builder** - 11 operators (=, ≠, >, ≥, <, ≤, LIKE, IN, BETWEEN, IS NULL, IS NOT NULL)
+- **Date Presets** - Quick filters (Today, Yesterday, Last 7/30 Days, This/Last Month)
+- **Per-Field Aggregation** - COUNT, SUM, AVG, MIN, MAX, COUNT DISTINCT per column
+- **Sort & Group Builders** - Visual ORDER BY and GROUP BY configuration
+- **SQL Preview** - Live-generated SQL query with dark-themed display
+- **AI Suggestions** - Recommends useful report templates based on schema analysis
+- **Visualization Toggles** - Table, Bar, Line, Pie chart view switches
+- **Multi-tenant Security** - All queries respect RLS policies
+
+### 68.2 AI Report Writer (v5.42.0)
+
+Enterprise-grade AI-powered report generation with text and voice input, interactive charts, smart insights, and brand customization.
+
+**Core Features:**
+- **Natural Language Generation** - Describe reports in plain English
+- **Voice Input** - Web Speech API for hands-free report creation
+- **AI Modification** - Refine reports with follow-up prompts
+- **Report Styles** - Executive Summary, Detailed Analysis, Dashboard View, Narrative
+- **Rich Formatting** - Headings, metrics cards, charts, tables, lists, quotes
+- **Edit Mode** - Click sections to select, use format panel for styling
+- **Undo/Redo** - Full history navigation
+- **Export** - PDF, Excel, HTML, Print
+
+**Interactive Charts (v5.42.0):**
+- Real Recharts visualizations (not placeholders)
+- Bar, Line, Pie, Area chart types
+- Auto-formatted tooltips (K/M suffixes)
+- 8-color palette for data series
+- Responsive container adapts to panel width
+
+**Smart Insights (v5.42.0):**
+- AI-powered anomaly detection
+- Trend analysis with predictions
+- Achievement highlighting
+- Actionable recommendations
+- Warning alerts for concerning metrics
+- Severity levels (low/medium/high)
+- Confidence scores per insight
+
+**Brand Kit (v5.42.0):**
+- Logo upload (PNG, JPG)
+- Company name and tagline
+- Primary/Secondary/Accent color pickers
+- Font selection (Inter, Georgia, Roboto, etc.)
+- Quick color presets (blue/green/purple/amber/slate)
+- Live preview card
+- Reset to defaults
+
+**Usage:**
+1. Navigate to Reports → AI Writer tab
+2. Select report style (Executive, Detailed, Dashboard, Narrative)
+3. Type or speak your report request
+4. Review generated report in preview panel
+5. Use modification prompt to refine ("Add security metrics section")
+6. Toggle Edit Mode to click and modify sections
+7. Use Format panel for styling (bold, italic, alignment)
+8. Export to PDF/Excel/HTML or Print
+
+**Voice Commands:**
+- Click microphone icon to start voice input
+- Speak naturally: "Create a monthly usage report with cost breakdown"
+- Voice automatically transcribes to text input
+- Press Enter or click Generate to process
+
+**Report Sections:**
+| Type | Description |
+|------|-------------|
+| `heading` | H1-H3 headings with hierarchical styling |
+| `paragraph` | Body text with muted foreground |
+| `metrics` | 4-column KPI cards with trends |
+| `chart` | Placeholder for bar/line/pie/area charts |
+| `table` | Data tables with headers |
+| `list` | Bullet point lists |
+| `quote` | Blockquote with left border |
+
+### 68.3 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Schema-Adaptive Reports                       │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐         │
+│  │   Schema    │    │   Report    │    │   Query     │         │
+│  │  Discovery  │───▶│  Definition │───▶│  Executor   │         │
+│  └─────────────┘    └─────────────┘    └─────────────┘         │
+│         │                  │                  │                 │
+│         ▼                  ▼                  ▼                 │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐         │
+│  │information_ │    │ dynamic_    │    │   Results   │         │
+│  │   schema    │    │  reports    │    │   + Export  │         │
+│  └─────────────┘    └─────────────┘    └─────────────┘         │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 68.3 Schema Discovery
+
+The service discovers:
+
+| Element | Description |
+|---------|-------------|
+| **Tables** | All user-accessible tables |
+| **Columns** | Column names, types, nullability |
+| **Primary Keys** | Identified for each table |
+| **Foreign Keys** | Relationships between tables |
+| **Indexes** | Available indexes for optimization |
+
+### 68.4 Table Categories
+
+| Category | Tables Included |
+|----------|-----------------|
+| **Core** | tenants, users, sessions, api_keys |
+| **AI** | models, prompts, responses, brain_plans |
+| **Billing** | subscriptions, credits, invoices, payments |
+| **Analytics** | events, metrics, usage_logs |
+| **System** | configurations, audit_logs, health_checks |
+
+### 68.5 Report Definition
+
+```typescript
+interface DynamicReportDefinition {
+  id?: string;
+  name: string;
+  description?: string;
+  baseTable: string;
+  fields: ReportField[];
+  filters?: ReportFilter[];
+  joins?: ReportJoin[];
+  groupBy?: string[];
+  orderBy?: { column: string; direction: 'asc' | 'desc' }[];
+  limit?: number;
+}
+
+interface ReportField {
+  column: string;
+  alias?: string;
+  aggregation?: 'count' | 'sum' | 'avg' | 'min' | 'max' | 'distinct';
+  format?: 'text' | 'number' | 'currency' | 'percentage' | 'date' | 'datetime';
+}
+```
+
+### 68.6 API Endpoints
+
+Base: `/api/admin/dynamic-reports`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/schema` | Discover database schema with categorization |
+| `GET` | `/suggestions` | AI-generated report suggestions |
+| `GET` | `/` | List saved report definitions |
+| `POST` | `/` | Save a new report definition |
+| `POST` | `/execute` | Execute a report and return results |
+| `POST` | `/export` | Export report results as CSV |
+| `DELETE` | `/:id` | Delete a saved report |
+
+### 68.7 Request/Response Examples
+
+**Schema Discovery:**
+```json
+GET /api/admin/dynamic-reports/schema
+
+Response:
+{
+  "schema": [
+    {
+      "category": "Core",
+      "tables": [
+        {
+          "name": "users",
+          "columns": [
+            { "name": "id", "type": "uuid", "nullable": false, "isPrimaryKey": true },
+            { "name": "email", "type": "text", "nullable": false },
+            { "name": "created_at", "type": "timestamptz", "nullable": false }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Execute Report:**
+```json
+POST /api/admin/dynamic-reports/execute
+{
+  "baseTable": "users",
+  "fields": [
+    { "column": "created_at", "format": "date" },
+    { "column": "id", "aggregation": "count", "alias": "user_count" }
+  ],
+  "groupBy": ["DATE(created_at)"],
+  "orderBy": [{ "column": "created_at", "direction": "desc" }],
+  "limit": 30
+}
+
+Response:
+{
+  "results": [
+    { "created_at": "2026-01-21", "user_count": 145 },
+    { "created_at": "2026-01-20", "user_count": 132 }
+  ],
+  "rowCount": 30,
+  "executionTime": 45
+}
+```
+
+### 68.8 Database Tables
+
+```sql
+-- Report definitions
+CREATE TABLE dynamic_reports (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  name TEXT NOT NULL,
+  description TEXT,
+  definition JSONB NOT NULL,
+  created_by UUID REFERENCES users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  last_run_at TIMESTAMPTZ,
+  run_count INTEGER DEFAULT 0
+);
+
+-- Execution history
+CREATE TABLE dynamic_report_executions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  report_id UUID REFERENCES dynamic_reports(id),
+  tenant_id UUID NOT NULL,
+  executed_by UUID REFERENCES users(id),
+  executed_at TIMESTAMPTZ DEFAULT NOW(),
+  execution_time_ms INTEGER,
+  row_count INTEGER,
+  status TEXT DEFAULT 'completed',
+  error_message TEXT
+);
+
+-- Scheduled reports
+CREATE TABLE dynamic_report_schedules (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  report_id UUID REFERENCES dynamic_reports(id),
+  tenant_id UUID NOT NULL,
+  schedule_cron TEXT NOT NULL,
+  recipients JSONB,
+  format TEXT DEFAULT 'csv',
+  enabled BOOLEAN DEFAULT true,
+  last_sent_at TIMESTAMPTZ,
+  next_run_at TIMESTAMPTZ
+);
+```
+
+### 68.9 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `packages/infrastructure/lambda/shared/services/schema-adaptive-reports.service.ts` | Core service |
+| `packages/infrastructure/lambda/admin/dynamic-reports.ts` | API handler |
+| `packages/infrastructure/migrations/V2026_01_21_003__dynamic_reports.sql` | Database schema |
+| `apps/admin-dashboard/app/(dashboard)/reports/page.tsx` | Admin UI with Schema Builder tab |
+
+### 68.10 Security Considerations
+
+- All queries run with tenant RLS context
+- Schema discovery excludes system tables
+- Parameterized queries prevent SQL injection
+- Query timeout limits prevent resource exhaustion
+- Audit logging for all report executions
+
+---
+
+## Section 69: Cato Genesis (v5.39.0)
+
+**Location**: Admin Dashboard → Cato → Genesis
+
+Autonomous AI genesis and self-improvement configuration for the Cato consciousness system.
+
+### 69.1 Overview
+
+Cato Genesis enables:
+
+- **Autonomous Decision-Making** - AI makes decisions within configured boundaries
+- **Self-Improvement** - System optimizes its own behavior over time
+- **Safety Guardrails** - Configurable thresholds and restrictions
+- **Human Oversight** - Approval requirements for critical actions
+
+### 69.2 Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | `true` | Enable Genesis engine |
+| `autonomyLevel` | `65%` | Decision-making independence (0-100%) |
+| `safetyThreshold` | `85%` | Confidence required for autonomous action |
+| `learningRate` | `0.7` | How aggressively to learn from outcomes |
+| `explorationEnabled` | `true` | Allow exploration of new strategies |
+| `selfImprovementEnabled` | `false` | Allow self-optimization (requires approval) |
+| `humanOversightRequired` | `true` | Require human approval for critical actions |
+| `maxActionsPerMinute` | `100` | Rate limiting for autonomous actions |
+
+### 69.3 Autonomy Levels
+
+| Level | Range | Description |
+|-------|-------|-------------|
+| **Restricted** | 0-30% | Most actions require approval |
+| **Monitored** | 31-70% | Routine actions autonomous, critical reviewed |
+| **Autonomous** | 71-100% | Full autonomy within safety bounds |
+
+### 69.4 Safety Guardrails
+
+**Allowed Actions:**
+- Read operations
+- Analysis tasks
+- Recommendations
+- Non-destructive updates
+
+**Restricted Actions (require approval):**
+- Delete operations
+- External API calls
+- User data modifications
+- System configuration changes
+
+### 69.5 Metrics
+
+| Metric | Description |
+|--------|-------------|
+| **Total Decisions** | Cumulative decisions made |
+| **Autonomous Actions** | Actions taken without human input |
+| **Human Interventions** | Times humans overrode decisions |
+| **Safety Violations** | Actions blocked by guardrails |
+| **Learning Cycles** | Self-improvement iterations |
+| **Avg Confidence** | Mean decision confidence score |
+
+### 69.6 Dashboard Tabs
+
+| Tab | Purpose |
+|-----|---------|
+| **Configuration** | Enable/disable, basic settings |
+| **Autonomy Controls** | Autonomy level, rate limits |
+| **Safety Guardrails** | Threshold configuration, action restrictions |
+| **Learning & Evolution** | Self-improvement settings, learning statistics |
+
+### 69.7 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `apps/admin-dashboard/app/(dashboard)/cato/genesis/page.tsx` | Admin UI |
+| `packages/infrastructure/lambda/shared/services/cato/genesis.service.ts` | Genesis service |
+| `packages/infrastructure/lambda/admin/cato-genesis.ts` | API handler |
 
 ---
 
@@ -18863,6 +20267,11 @@ Base: `/api/admin/hitl-orchestration`
 
 | Version | Date | Changes |
 |---------|------|---------|
+| **5.42.0** | 2026-01-22 | AI Reports API complete implementation; OpenAPI 3.1 spec (`docs/api/openapi-admin.yaml`); Performance Optimization Guide (`docs/PERFORMANCE-OPTIMIZATION.md`); Security Audit Checklist (`docs/SECURITY-AUDIT-CHECKLIST.md`); Unit tests for AI Reports; E2E tests for navigation and AI Reports |
+| **5.39.0** | 2026-01-21 | Schema-Adaptive Reports; Dynamic Report Builder; Cato Genesis page; Think Tank Admin navigation fixes; Code Quality dashboard; Gateway Status monitoring |
+| **5.38.0** | 2026-01-21 | Sovereign Mesh Performance Optimization; Infrastructure Scaling (100-500K sessions); SQS dispatcher fix; Redis caching; Provisioned concurrency; Per-tenant FIFO queues; S3 artifact archival; Performance admin UI; Scaling admin UI with cost estimation |
+| **5.37.0** | 2026-01-21 | RAWS v1.1 - Model Selection System; 13 weight profiles; 7 domains with compliance; 8-dimension scoring |
+| **5.34.0** | 2026-01-20 | HITL Orchestration Extensions; Semantic Deduplication with pgvector embeddings; Scout HITL Integration for Cato epistemic uncertainty; Flyte HITL task wrappers; Admin dashboard UI updates |
 | **5.33.0** | 2026-01-20 | HITL Orchestration Enhancements (PROMPT-37); SAGE-Agent Bayesian VOI; MCP Elicitation Schema; Question Batching; Rate Limiting; Abstention Detection; Deduplication; Escalation Chains; Two-Question Rule |
 | **5.32.0** | 2026-01-20 | Sovereign Mesh Completion; Unit tests for notification and snapshot services; Think Tank Admin integration |
 | **5.31.0** | 2026-01-20 | The Sovereign Mesh (PROMPT-36); Agent Registry with OODA execution; App Registry (3,000+ apps); AI Helper Service; Pre-Flight Provisioning; Transparency Layer; HITL Approval Queues; Execution Replay |
@@ -18883,7 +20292,7 @@ Base: `/api/admin/hitl-orchestration`
 
 ---
 
-*Version 5.0.2 | January 2026*
+*Version 5.42.0 | January 2026*
 *Cross-AI Validated: Claude Opus 4.5 ✓ | Google Gemini ✓*
-*System Evolution: The Grimoire + Economic Governor*
+*System Evolution: AI Reports API + Documentation Suite*
 *Status: GO FOR LAUNCH*

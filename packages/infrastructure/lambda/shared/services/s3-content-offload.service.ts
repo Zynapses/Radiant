@@ -85,9 +85,7 @@ class S3ContentOffloadService {
     }
 
     try {
-      const result = await executeStatement(
-        `SELECT * FROM s3_offloading_config WHERE tenant_id = $1`,
-        [stringParam('tenantId', tenantId)]
+      const result = await executeStatement(`SELECT * FROM s3_offloading_config WHERE tenant_id = $1`, [stringParam('tenantId', tenantId)] as any[]
       );
 
       if (result.rows && result.rows.length > 0) {
@@ -290,12 +288,10 @@ class S3ContentOffloadService {
     let failed = 0;
 
     try {
-      const result = await executeStatement(
-        `SELECT * FROM get_orphans_for_deletion($1)`,
-        [intParam('batchSize', batchSize)]
+      const result = await executeStatement(`SELECT * FROM get_orphans_for_deletion($1)`, [intParam('batchSize', batchSize)] as any[]
       );
 
-      const orphans = (result.rows || []) as OrphanRecord[];
+      const orphans = (result.rows || []) as any[];
 
       for (const orphan of orphans) {
         try {
@@ -356,9 +352,7 @@ class S3ContentOffloadService {
     by_table: Record<string, { count: number; size_mb: number }>;
     pending_deletion: number;
   }> {
-    const result = await executeStatement(
-      `SELECT * FROM v_s3_offloading_stats WHERE tenant_id = $1`,
-      [stringParam('tenantId', tenantId)]
+    const result = await executeStatement(`SELECT * FROM v_s3_offloading_stats WHERE tenant_id = $1`, [stringParam('tenantId', tenantId)] as any[]
     );
 
     const stats = {
@@ -422,7 +416,7 @@ class S3ContentOffloadService {
     );
 
     if (result.rows && result.rows.length > 0) {
-      const row = result.rows[0] as ContentRecord;
+      const row = result.rows[0] as any;
       return row;
     }
 
@@ -476,15 +470,13 @@ class S3ContentOffloadService {
     );
 
     if (result.rows && result.rows.length > 0) {
-      return result.rows[0] as ContentRecord;
+      return result.rows[0] as any;
     }
     return null;
   }
 
   private async updateLastAccessed(s3Key: string): Promise<void> {
-    await executeStatement(
-      `UPDATE s3_content_registry SET last_accessed_at = NOW() WHERE s3_key = $1`,
-      [stringParam('s3Key', s3Key)]
+    await executeStatement(`UPDATE s3_content_registry SET last_accessed_at = NOW() WHERE s3_key = $1`, [stringParam('s3Key', s3Key)] as any[]
     );
   }
 }

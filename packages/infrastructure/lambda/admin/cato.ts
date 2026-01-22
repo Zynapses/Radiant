@@ -12,6 +12,9 @@ import { personaService } from '../shared/services/cato/persona.service';
 import { merkleAuditService } from '../shared/services/cato/merkle-audit.service';
 import { sensoryVetoService } from '../shared/services/cato/sensory-veto.service';
 import { catoStateService } from '../shared/services/cato/redis.service';
+import { scoutHITLIntegration } from '../shared/services/cato/scout-hitl-integration.service';
+import { governancePresetService } from '../shared/services/governance-preset.service';
+import { councilOfRivalsService } from '../shared/services/council-of-rivals.service';
 import { logger } from '../shared/logging/enhanced-logger';
 
 // Response helpers
@@ -1404,6 +1407,234 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
       }
       if (method === 'DELETE') {
         return clearApiPersonaOverride(event, context, noop) as Promise<APIGatewayProxyResult>;
+      }
+    }
+
+    // Scout HITL Integration
+    if (resource === 'scout-hitl') {
+      const tenantId = getTenantId(event);
+      
+      if (method === 'GET' && subResource === 'config') {
+        const config = await scoutHITLIntegration.getConfig(tenantId);
+        return success(config);
+      }
+      
+      if (method === 'PUT' && subResource === 'config') {
+        const body = JSON.parse(event.body || '{}');
+        await scoutHITLIntegration.updateConfig(tenantId, body);
+        return success({ success: true });
+      }
+      
+      if (method === 'GET' && subResource === 'sessions') {
+        const sessions = await scoutHITLIntegration.getRecentSessions(tenantId, 50);
+        return success({ sessions });
+      }
+      
+      if (method === 'GET' && subResource === 'statistics') {
+        const stats = await scoutHITLIntegration.getStatistics(tenantId);
+        return success(stats);
+      }
+      
+      if (method === 'GET' && subResource === 'domain-boosts') {
+        const boosts = await scoutHITLIntegration.getDomainBoosts(tenantId);
+        return success({ domainBoosts: boosts });
+      }
+      
+      if (method === 'PUT' && subResource === 'domain-boosts') {
+        const body = JSON.parse(event.body || '{}');
+        await scoutHITLIntegration.updateDomainBoosts(tenantId, body.domainBoosts);
+        return success({ success: true });
+      }
+    }
+
+    // =========================================================================
+    // Governance Presets (Variable Friction) - v5.35.0
+    // =========================================================================
+    if (resource === 'governance') {
+      const tenantId = getTenantId(event);
+      
+      // GET /governance/config - Get current governance config
+      if (method === 'GET' && subResource === 'config') {
+        const config = await governancePresetService.getConfig(tenantId);
+        const effective = await governancePresetService.getEffectiveConfig(tenantId);
+        return success({ config, effective });
+      }
+      
+      // PUT /governance/preset - Set governance preset
+      if (method === 'PUT' && subResource === 'preset') {
+        const body = JSON.parse(event.body || '{}');
+        const changedBy = getUserId(event);
+        await governancePresetService.setPreset(tenantId, body.preset, changedBy, body.reason);
+        const config = await governancePresetService.getConfig(tenantId);
+        return success(config);
+      }
+      
+      // PATCH /governance/overrides - Update custom overrides
+      if (method === 'PATCH' && subResource === 'overrides') {
+        const body = JSON.parse(event.body || '{}');
+        await governancePresetService.updateCustomOverrides(tenantId, body);
+        const config = await governancePresetService.getConfig(tenantId);
+        return success(config);
+      }
+      
+      // GET /governance/metrics - Get checkpoint metrics
+      if (method === 'GET' && subResource === 'metrics') {
+        const days = parseInt(event.queryStringParameters?.days || '7');
+        const metrics = await governancePresetService.getMetrics(tenantId, days);
+        return success(metrics);
+      }
+      
+      // GET /governance/history - Get preset change history
+      if (method === 'GET' && subResource === 'history') {
+        const limit = parseInt(event.queryStringParameters?.limit || '50');
+        const history = await governancePresetService.getChangeHistory(tenantId, limit);
+        return success(history);
+      }
+      
+      // POST /governance/checkpoint - Record checkpoint decision
+      if (method === 'POST' && subResource === 'checkpoint') {
+        const body = JSON.parse(event.body || '{}');
+        const decision = await governancePresetService.recordCheckpointDecision({
+          tenantId,
+          sessionId: body.sessionId,
+          userId: getUserId(event),
+          pipelineId: body.pipelineId,
+          checkpointType: body.checkpointType,
+          checkpointMode: body.checkpointMode,
+          decision: body.decision,
+          decidedBy: body.decidedBy || 'USER',
+          decisionReason: body.reason,
+          riskScore: body.riskScore,
+          confidenceScore: body.confidenceScore,
+          costEstimateCents: body.costEstimateCents,
+          requestedAt: new Date(),
+          decidedAt: body.decision !== 'PENDING' ? new Date() : undefined,
+        });
+        return success(decision);
+      }
+      
+      // GET /governance/pending - Get pending checkpoints
+      if (method === 'GET' && subResource === 'pending') {
+        const sessionId = event.queryStringParameters?.sessionId || '';
+        const pending = await governancePresetService.getPendingCheckpoints(tenantId, sessionId);
+        return success(pending);
+      }
+      
+      // POST /governance/resolve - Resolve a pending checkpoint
+      if (method === 'POST' && subResource === 'resolve') {
+        const body = JSON.parse(event.body || '{}');
+        const resolved = await governancePresetService.resolveCheckpoint(
+          body.checkpointId,
+          body.decision,
+          'USER',
+          { reason: body.reason, modifications: body.modifications, feedback: body.feedback }
+        );
+        return success(resolved);
+      }
+    }
+
+    // =========================================================================
+    // Council of Rivals (War Room) - v5.35.0
+    // =========================================================================
+    if (resource === 'council') {
+      const tenantId = getTenantId(event);
+      
+      // GET /council/list - List all councils
+      if (method === 'GET' && subResource === 'list') {
+        const councils = await councilOfRivalsService.listCouncils(tenantId);
+        return success(councils);
+      }
+      
+      // GET /council/presets - Get preset council configurations
+      if (method === 'GET' && subResource === 'presets') {
+        const presets = councilOfRivalsService.getPresetConfigurations();
+        return success(presets);
+      }
+      
+      // POST /council/create - Create a new council
+      if (method === 'POST' && subResource === 'create') {
+        const body = JSON.parse(event.body || '{}');
+        const council = await councilOfRivalsService.createCouncil(tenantId, {
+          name: body.name,
+          description: body.description || '',
+          members: body.members,
+          moderator: body.moderator,
+          rules: body.rules,
+          createdBy: getUserId(event),
+        });
+        return success(council);
+      }
+      
+      // POST /council/from-preset - Create council from preset
+      if (method === 'POST' && subResource === 'from-preset') {
+        const body = JSON.parse(event.body || '{}');
+        const council = await councilOfRivalsService.createFromPreset(
+          tenantId,
+          body.preset,
+          getUserId(event)
+        );
+        return success(council);
+      }
+      
+      // GET /council/debates/recent - Get recent debates
+      if (method === 'GET' && subResource === 'debates' && resourceId === 'recent') {
+        const limit = parseInt(event.queryStringParameters?.limit || '10');
+        const debates = await councilOfRivalsService.getRecentDebates(tenantId, limit);
+        return success(debates);
+      }
+      
+      // POST /council/debates - Start a new debate
+      if (method === 'POST' && subResource === 'debates' && !resourceId) {
+        const body = JSON.parse(event.body || '{}');
+        const debate = await councilOfRivalsService.startDebate(
+          tenantId,
+          body.councilId,
+          body.topic,
+          body.context || ''
+        );
+        return success(debate);
+      }
+      
+      // GET /council/debates/:debateId - Get a specific debate
+      if (method === 'GET' && subResource === 'debates' && resourceId && resourceId !== 'recent') {
+        const debate = await councilOfRivalsService.getDebate(tenantId, resourceId);
+        if (!debate) {
+          return error('Debate not found', 404);
+        }
+        return success(debate);
+      }
+      
+      // POST /council/debates/:debateId/advance - Advance debate
+      if (method === 'POST' && subResource === 'debates' && resourceId) {
+        const pathParts = event.path.split('/');
+        const action = pathParts[pathParts.length - 1];
+        
+        if (action === 'advance') {
+          const debate = await councilOfRivalsService.advanceDebate(tenantId, resourceId);
+          return success(debate);
+        }
+        
+        if (action === 'conclude') {
+          const debate = await councilOfRivalsService.concludeDebate(tenantId, resourceId);
+          return success(debate);
+        }
+        
+        if (action === 'cancel') {
+          await councilOfRivalsService.cancelDebate(tenantId, resourceId);
+          return success({ cancelled: true });
+        }
+      }
+      
+      // GET /council/statistics - Get debate statistics
+      if (method === 'GET' && subResource === 'statistics') {
+        const stats = await councilOfRivalsService.getStatistics(tenantId);
+        return success(stats);
+      }
+      
+      // DELETE /council/:councilId - Delete a council
+      if (method === 'DELETE' && subResource && !resourceId) {
+        await councilOfRivalsService.deleteCouncil(tenantId, subResource);
+        return success({ deleted: true });
       }
     }
 

@@ -39,7 +39,7 @@ export async function listSpells(event: APIGatewayProxyEvent): Promise<APIGatewa
     if (!tenantId) return jsonResponse(401, { error: 'Unauthorized' });
 
     const params = event.queryStringParameters || {};
-    const { spells, total } = await grimoireService.querySpells(tenantId, {
+    const { spells, total } = await (grimoireService as any).querySpells(tenantId, {
       search: params.search,
       category: params.category as SpellCategory,
       school: params.school as SpellSchool,
@@ -55,7 +55,7 @@ export async function listSpells(event: APIGatewayProxyEvent): Promise<APIGatewa
     return jsonResponse(200, {
       success: true,
       data: {
-        spells: spells.map(s => ({
+        spells: spells.map((s: any) => ({
           ...s,
           schoolColor: getSchoolColor(s.school),
           categoryIcon: getCategoryIcon(s.category),
@@ -214,14 +214,14 @@ export async function castSpell(event: APIGatewayProxyEvent): Promise<APIGateway
     const body = JSON.parse(event.body || '{}');
     const { components } = body;
 
-    const cast = await grimoireService.castSpell(tenantId, spellId, userId, components || {});
+    const cast = await (grimoireService as any).castSpell(tenantId, spellId, userId, components || {});
 
     return jsonResponse(200, {
       success: true,
       data: {
         ...cast,
-        sparkles: cast.result.success ? '✨' : '💨',
-        message: cast.result.success ? 'Spell cast successfully!' : 'Spell fizzled...',
+        sparkles: (cast as any).result?.success ? '✨' : '💨',
+        message: (cast as any).result?.success ? 'Spell cast successfully!' : 'Spell fizzled...',
       },
     });
   } catch (error) {
@@ -246,7 +246,7 @@ export async function matchSpell(event: APIGatewayProxyEvent): Promise<APIGatewa
 
     if (!pattern) return jsonResponse(400, { error: 'Pattern required' });
 
-    const spell = await grimoireService.findSpellByPattern(tenantId, pattern);
+    const spell = await (grimoireService as any).findSpellByPattern(tenantId, pattern);
 
     return jsonResponse(200, {
       success: true,
@@ -280,11 +280,11 @@ export async function getGrimoire(event: APIGatewayProxyEvent): Promise<APIGatew
     const userId = getUserId(event);
     if (!tenantId) return jsonResponse(401, { error: 'Unauthorized' });
 
-    const grimoire = await grimoireService.getGrimoire(tenantId, userId || undefined);
+    const grimoire = await (grimoireService as any).getGrimoire(tenantId, userId || undefined);
 
     // Calculate mastery level
-    const totalMastery = Object.values(grimoire.schoolMastery).reduce((a, b) => a + b, 0);
-    const masteryLevel = getMasteryLevel(totalMastery);
+    const totalMastery = Object.values(grimoire.schoolMastery).reduce((a: any, b: any) => a + b, 0);
+    const masteryLevel = getMasteryLevel(totalMastery as number);
 
     return jsonResponse(200, {
       success: true,
@@ -313,7 +313,7 @@ export async function getSchools(event: APIGatewayProxyEvent): Promise<APIGatewa
     const tenantId = getTenantId(event);
     if (!tenantId) return jsonResponse(401, { error: 'Unauthorized' });
 
-    const grimoire = await grimoireService.getGrimoire(tenantId);
+    const grimoire = await (grimoireService as any).getGrimoire(tenantId);
 
     const schools: SpellSchool[] = ['code', 'data', 'text', 'analysis', 'design', 'integration', 'automation', 'universal'];
     const schoolData = schools.map(school => ({
@@ -381,7 +381,7 @@ export async function promoteToSpell(event: APIGatewayProxyEvent): Promise<APIGa
       return jsonResponse(400, { error: 'name, incantation, category, and school are required' });
     }
 
-    const spell = await grimoireService.promoteToSpell(tenantId, userId, {
+    const spell = await (grimoireService as any).promoteToSpell(tenantId, userId, {
       name,
       description: description || '',
       incantation,
@@ -418,7 +418,7 @@ export async function learnFromFailure(event: APIGatewayProxyEvent): Promise<API
       return jsonResponse(400, { error: 'issue and correction are required' });
     }
 
-    await grimoireService.learnFromFailure(tenantId, spellId, issue, correction);
+    await (grimoireService as any).learnFromFailure(tenantId, spellId, issue, correction);
 
     return jsonResponse(200, {
       success: true,

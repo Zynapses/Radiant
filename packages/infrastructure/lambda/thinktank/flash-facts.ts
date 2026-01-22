@@ -10,11 +10,11 @@ import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 // Helpers
 // ============================================================================
 
-const getTenantId = (event: { requestContext: { authorizer?: { tenantId?: string } } }): string | null => {
+const getTenantId = (event: any): string | null => {
   return event.requestContext.authorizer?.tenantId || null;
 };
 
-const getUserId = (event: { requestContext: { authorizer?: { userId?: string } } }): string | null => {
+const getUserId = (event: any): string | null => {
   return event.requestContext.authorizer?.userId || null;
 };
 

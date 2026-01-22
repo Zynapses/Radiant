@@ -411,14 +411,14 @@ class NotificationService {
       [stringParam('tenantId', tenantId)]
     );
 
-    if (!result.records?.[0]) {
+    if (!result.rows?.[0]) {
       return {
         channels: ['email'],
         emailRecipients: [],
       };
     }
 
-    const row = result.records[0];
+    const row = result.rows[0];
     return {
       channels: this.parseArray(row.notification_channels) as NotificationChannel[],
       emailRecipients: this.parseArray(row.email_recipients),
@@ -437,10 +437,10 @@ class NotificationService {
       [stringParam('requestId', requestId)]
     );
 
-    if (!result.records?.[0]) return null;
+    if (!result.rows?.[0]) return null;
     
     const row: Record<string, any> = {};
-    for (const [key, value] of Object.entries(result.records[0])) {
+    for (const [key, value] of Object.entries(result.rows[0])) {
       row[key] = this.extractValue(value);
     }
     return row;

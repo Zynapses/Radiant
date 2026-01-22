@@ -132,7 +132,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 async function getCurrentTier(tenantId: string): Promise<APIGatewayProxyResult> {
   const state = await infrastructureTierService.getCurrentState(tenantId);
   const configs = await infrastructureTierService.getTierConfigs(tenantId);
-  const currentConfig = configs.find(c => c.tierName === state.currentTier);
+  const currentConfig = configs.find((c: TierConfig) => c.tierName === state.currentTier);
 
   return success({
     currentTier: state.currentTier,
@@ -274,7 +274,7 @@ async function updateCooldown(tenantId: string, hours: number): Promise<APIGatew
 async function getChangeHistory(tenantId: string, limit: number): Promise<APIGatewayProxyResult> {
   const changes = await infrastructureTierService.getChangeHistory(tenantId, limit);
   return success({ 
-    changes: changes.map(c => ({
+    changes: changes.map((c) => ({
       ...c,
       startedAt: c.startedAt.toISOString(),
       completedAt: c.completedAt?.toISOString() || null

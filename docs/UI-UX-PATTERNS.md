@@ -398,6 +398,70 @@ container: {
 - `--chart-4`: Yellow
 - `--chart-5`: Orange
 
+**Interactive Report Charts** (v5.42.0):
+
+| Property | Value | Usage |
+|----------|-------|-------|
+| `CHART_COLORS` | 8-color palette | `['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16']` |
+| Tooltip formatter | K/M suffixes | Auto-format large numbers |
+| ResponsiveContainer | 100% width | Adapts to panel size |
+| Cell coloring | Index-based | Each bar/pie slice unique color |
+
+**Files**: `apps/admin-dashboard/app/(dashboard)/reports/page.tsx`
+
+### Smart Insights Panel (v5.42.0)
+
+**Source**: Custom RADIANT component for AI-powered report insights
+
+| Insight Type | Border Color | Icon | Background |
+|--------------|--------------|------|------------|
+| `trend` | Blue (`border-l-blue-500`) | `TrendingUp` | `bg-blue-50/50` |
+| `anomaly` | Amber (`border-l-amber-500`) | `AlertTriangle` | `bg-amber-50/50` |
+| `achievement` | Green (`border-l-green-500`) | `Target` | `bg-green-50/50` |
+| `recommendation` | Purple (`border-l-purple-500`) | `Zap` | `bg-purple-50/50` |
+| `warning` | Red (`border-l-red-500`) | `AlertCircle` | `bg-red-50/50` |
+
+**Severity Badge Colors**:
+| Severity | Border | Text |
+|----------|--------|------|
+| `low` | `border-green-500` | `text-green-600` |
+| `medium` | `border-amber-500` | `text-amber-600` |
+| `high` | `border-red-500` | `text-red-600` |
+
+**Layout**: Card with `border-l-4`, flex row with insight details left and confidence score right.
+
+**Files**: `apps/admin-dashboard/app/(dashboard)/reports/page.tsx`, `apps/thinktank-admin/app/(dashboard)/reports/page.tsx`
+
+### Brand Kit Panel (v5.42.0)
+
+**Source**: Custom RADIANT component for report branding customization
+
+| Element | Component | Behavior |
+|---------|-----------|----------|
+| Logo Upload | `<input type="file">` hidden + dashed border dropzone | FileReader → data URL |
+| Company Name | `Input` | Bound to `brandKit.companyName` |
+| Tagline | `Input` | Bound to `brandKit.tagline` |
+| Color Pickers | `<input type="color">` | Native HTML5 color picker |
+| Font Selector | `Select` | Header and body font dropdowns |
+| Quick Presets | Color circle buttons | One-click theme colors |
+| Preview Card | `Card` with inline styles | Live preview of branding |
+
+**Default Brand Kit**:
+```typescript
+{
+  logoUrl: null,
+  primaryColor: '#3b82f6',
+  secondaryColor: '#64748b',
+  accentColor: '#10b981',
+  fontFamily: 'Inter, system-ui, sans-serif',
+  headerFont: 'Inter, system-ui, sans-serif',
+  companyName: 'RADIANT',
+  tagline: 'AI-Powered Insights',
+}
+```
+
+**Files**: `apps/admin-dashboard/app/(dashboard)/reports/page.tsx`, `apps/thinktank-admin/app/(dashboard)/reports/page.tsx`
+
 ### Badges
 
 **Source**: shadcn/ui Badge + custom variants

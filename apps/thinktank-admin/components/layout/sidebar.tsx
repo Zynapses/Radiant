@@ -30,6 +30,10 @@ import {
   Eye,
   Wand2,
   ClipboardCheck,
+  Gauge,
+  Swords,
+  Shield,
+  FileText,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -95,6 +99,15 @@ const navigation: NavSection[] = [
       { name: 'AI Helper', href: '/sovereign-mesh/ai-helper', icon: Wand2 },
       { name: 'Approvals', href: '/sovereign-mesh/approvals', icon: ClipboardCheck },
       { name: 'HITL Orchestration', href: '/hitl-orchestration', icon: UsersRound },
+      { name: 'Scout HITL', href: '/scout-hitl', icon: Compass },
+    ],
+  },
+  {
+    label: 'Cato Safety',
+    items: [
+      { name: 'Governance', href: '/cato/governance', icon: Gauge },
+      { name: 'War Room', href: '/cato/war-room', icon: Swords },
+      { name: 'Safety Overview', href: '/cato/safety', icon: Shield },
     ],
   },
   {
@@ -109,6 +122,7 @@ const navigation: NavSection[] = [
     items: [
       { name: 'Compliance', href: '/compliance', icon: ShieldCheck },
       { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+      { name: 'Reports', href: '/reports', icon: FileText },
       { name: 'Settings', href: '/settings', icon: Settings },
     ],
   },

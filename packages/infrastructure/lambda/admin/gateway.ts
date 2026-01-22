@@ -6,6 +6,7 @@
 
 import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { executeQuery, executeStatement, stringParam, uuidParam } from '../shared/utils/db';
+import type { SqlParameter } from '@aws-sdk/client-rds-data';
 import { logger } from '../shared/utils/logger';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -302,7 +303,7 @@ async function updateConfiguration(
   try {
     // Build update query dynamically
     const updates: string[] = [];
-    const params: Array<{ name: string; value: string }> = [];
+    const params: SqlParameter[] = [];
     let paramIndex = 1;
 
     const allowedFields = [
@@ -379,7 +380,7 @@ async function getAlerts(
 ): Promise<APIGatewayProxyResult> {
   try {
     const conditions: string[] = [];
-    const params: Array<{ name: string; value: string }> = [];
+    const params: SqlParameter[] = [];
 
     if (tenantId) {
       conditions.push(`tenant_id = $${params.length + 1}::uuid`);
@@ -496,7 +497,7 @@ async function getSessions(
 ): Promise<APIGatewayProxyResult> {
   try {
     const conditions: string[] = ['tenant_id = $1::uuid'];
-    const params: Array<{ name: string; value: string }> = [uuidParam('tenant', tenantId)];
+    const params: SqlParameter[] = [uuidParam('tenant', tenantId)];
 
     if (status) {
       conditions.push(`status = $${params.length + 1}`);

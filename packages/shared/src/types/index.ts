@@ -51,3 +51,105 @@ export * from './concurrent-execution.types';
 export * from './structure-from-chaos.types';
 export * from './white-label.types';
 export * from './user-violations.types';
+export * from './cato-pipeline.types';
+export * from './sovereign-mesh-performance.types';
+export * from './sovereign-mesh-scaling.types';
+export * from './decision-artifact.types';
+
+// Living Parchment 2029 Vision types (selective export to avoid SynthesisSession conflict)
+export {
+  // Shared foundation types
+  ConfidenceScore,
+  BreathingRate,
+  TrustStatus,
+  LPPosition,
+  LPTimeRange,
+  LPHeatmapSegment,
+  LPGhostPath,
+  LPLivingInk,
+  // War Room
+  WarRoomSession,
+  WarRoomParticipant,
+  WarRoomAdvisor,
+  WarRoomPosition,
+  WarRoomRisk,
+  WarRoomDecisionPath,
+  WarRoomOutcome,
+  WarRoomTerrain,
+  WarRoomTerrainSegment,
+  WarRoomDecision,
+  CreateWarRoomRequest,
+  WarRoomActionRequest,
+  // Memory Palace
+  MemoryPalace,
+  MemoryRoom,
+  KnowledgeNode,
+  MemoryConnection,
+  FreshnessFogConfig,
+  DiscoveryHotspot,
+  // Oracle View
+  OracleView,
+  OraclePrediction,
+  BifurcationPoint,
+  GhostFuture,
+  ConfidenceDecayCurve,
+  BlackSwanIndicator,
+  OracleProbabilityHeatmap,
+  // Synthesis Engine
+  LPSynthesisSession,
+  SynthesisSource,
+  SynthesisClaim,
+  AgreementZone,
+  TensionZone,
+  ProvenanceTrail,
+  FusionResult,
+  CreateSynthesisRequest,
+  // Cognitive Load
+  CognitiveLoadState,
+  CognitiveLoadDataPoint,
+  AttentionHeatmap,
+  FatigueIndicator,
+  ComplexityGradient,
+  UnderstandingConfidence,
+  OverwhelmWarning,
+  CognitiveAdaptation,
+  CognitiveLoadUpdateRequest,
+  // Council of Experts
+  CouncilSession,
+  CouncilExpert,
+  ExpertPosition,
+  ExpertArgument,
+  CouncilDebate,
+  DebateRound,
+  ArgumentStream,
+  DissentSpark,
+  ConsensusState,
+  MinorityReport,
+  CouncilConclusion,
+  ConveneCouncilRequest,
+  // Temporal Drift
+  TemporalDriftObservatory,
+  DriftingFact,
+  DriftAlert,
+  VersionGhost,
+  UpdateWave,
+  CitationHalfLife,
+  MonitorFactsRequest,
+  // Debate Arena
+  DebateArena,
+  Debater,
+  DebaterHeatmap,
+  DebateArgument,
+  AttackDefenseFlow,
+  WeakPoint,
+  SteelManOverlay,
+  ResolutionTracker,
+  CreateDebateRequest,
+  // Dashboard & Config
+  LivingParchmentDashboard,
+  LivingParchmentConfig,
+  // Navigation
+  ExploreMemoryPalaceRequest,
+  MemoryPalaceNavigationResponse,
+  CreateOracleViewRequest,
+} from './living-parchment.types';

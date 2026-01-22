@@ -4,7 +4,7 @@
  * CRUD endpoints for admin reports with generation and scheduling.
  */
 
-import { APIGatewayProxyHandler, APIGatewayProxyEvent } from 'aws-lambda';
+import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { executeStatement, stringParam, boolParam } from '../shared/utils/db';
 import { reportGeneratorService } from '../shared/services/report-generator.service';
 import { logger } from '../shared/utils/logger';
@@ -646,52 +646,52 @@ export const duplicateReport: APIGatewayProxyHandler = withAdminAuth(async (even
 });
 
 // Export handler map
-export const handler: APIGatewayProxyHandler = async (event, context) => {
+export const handler: APIGatewayProxyHandler = async (event, context): Promise<APIGatewayProxyResult> => {
   const path = event.path;
   const method = event.httpMethod;
 
   // Templates
   if (path.endsWith('/templates') && method === 'GET') {
-    return listTemplates(event, context, () => {});
+    return (await listTemplates(event, context, () => {})) as APIGatewayProxyResult;
   }
 
   // Stats
   if (path.endsWith('/stats') && method === 'GET') {
-    return getStats(event, context, () => {});
+    return (await getStats(event, context, () => {})) as APIGatewayProxyResult;
   }
 
   // Report operations
   if (path.match(/\/reports\/[^/]+\/run$/) && method === 'POST') {
-    return runReport(event, context, () => {});
+    return (await runReport(event, context, () => {})) as APIGatewayProxyResult;
   }
 
   if (path.match(/\/reports\/[^/]+\/duplicate$/) && method === 'POST') {
-    return duplicateReport(event, context, () => {});
+    return (await duplicateReport(event, context, () => {})) as APIGatewayProxyResult;
   }
 
   if (path.match(/\/reports\/[^/]+\/download\/[^/]+$/) && method === 'GET') {
-    return downloadReport(event, context, () => {});
+    return (await downloadReport(event, context, () => {})) as APIGatewayProxyResult;
   }
 
   // CRUD
   if (path.endsWith('/reports') && method === 'GET') {
-    return listReports(event, context, () => {});
+    return (await listReports(event, context, () => {})) as APIGatewayProxyResult;
   }
 
   if (path.endsWith('/reports') && method === 'POST') {
-    return createReport(event, context, () => {});
+    return (await createReport(event, context, () => {})) as APIGatewayProxyResult;
   }
 
   if (path.match(/\/reports\/[^/]+$/) && method === 'GET') {
-    return getReport(event, context, () => {});
+    return (await getReport(event, context, () => {})) as APIGatewayProxyResult;
   }
 
   if (path.match(/\/reports\/[^/]+$/) && method === 'PUT') {
-    return updateReport(event, context, () => {});
+    return (await updateReport(event, context, () => {})) as APIGatewayProxyResult;
   }
 
   if (path.match(/\/reports\/[^/]+$/) && method === 'DELETE') {
-    return deleteReport(event, context, () => {});
+    return (await deleteReport(event, context, () => {})) as APIGatewayProxyResult;
   }
 
   return {

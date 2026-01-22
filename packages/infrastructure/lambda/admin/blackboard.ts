@@ -12,12 +12,12 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { Client } from 'pg';
-import { Redis } from 'ioredis';
+import Redis from 'ioredis';
 import { semanticBlackboardService } from '../shared/services/semantic-blackboard.service';
 import { agentOrchestratorService } from '../shared/services/agent-orchestrator.service';
 import { processHydrationService } from '../shared/services/process-hydration.service';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
-import { getDbClient, getRedisClient } from '../shared/db/connections';
+import { getDbClient, getRedisClient, DbClient } from '../shared/db/connections';
 
 // ============================================================================
 // Types
@@ -174,7 +174,7 @@ const forceReleaseLock: RouteHandler = async (event, tenantId) => {
 
   const result = await agentOrchestratorService.releaseResourceLock(
     lockId,
-    lockResult.rows[0].holder_agent_id
+    lockResult.rows[0].holder_agent_id as string
   );
 
   return response(200, { success: true, data: result });
@@ -375,12 +375,17 @@ export const handler = async (
 
     // Initialize services
     const db = await getDbClient();
-    const redis = await getRedisClient().catch(() => undefined);
+    let redis: Redis | undefined;
+    try {
+      redis = getRedisClient();
+    } catch {
+      redis = undefined;
+    }
 
     await Promise.all([
-      semanticBlackboardService.initialize(db, redis),
-      agentOrchestratorService.initialize(db, redis),
-      processHydrationService.initialize(db, redis),
+      semanticBlackboardService.initialize(db as unknown as Client, redis),
+      agentOrchestratorService.initialize(db as unknown as Client, redis),
+      processHydrationService.initialize(db as unknown as Client, redis),
     ]);
 
     // Set tenant context for RLS

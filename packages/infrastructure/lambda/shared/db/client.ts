@@ -21,9 +21,12 @@ import { getConfig } from '../config';
  * Create a properly typed SqlParameter with string value
  * If only value is provided, uses empty name (for positional params)
  */
-export function stringParam(nameOrValue: string, value?: string): SqlParameter {
+export function stringParam(nameOrValue: string, value?: string | null): SqlParameter {
   if (value === undefined) {
     return { name: '', value: { stringValue: nameOrValue } };
+  }
+  if (value === null) {
+    return { name: nameOrValue, value: { isNull: true } };
   }
   return { name: nameOrValue, value: { stringValue: value } };
 }
@@ -54,6 +57,13 @@ export function boolParam(name: string, value: boolean): SqlParameter {
  */
 export function nullParam(name: string): SqlParameter {
   return { name, value: { isNull: true } };
+}
+
+/**
+ * Create a properly typed SqlParameter with UUID value (stored as string)
+ */
+export function uuidParam(name: string, value: string): SqlParameter {
+  return { name, value: { stringValue: value } };
 }
 
 /**
@@ -106,11 +116,14 @@ export interface TransactionContext {
 
 /**
  * Loose parameter type for convenience - will be cast to SqlParameter[]
+ * Also accepts raw values (string, number, boolean, null) for positional parameters
  */
-export type LooseParam = { 
-  name: string; 
-  value: { stringValue?: string; longValue?: number; doubleValue?: number; booleanValue?: boolean; isNull?: boolean } | unknown 
-};
+export type LooseParam = 
+  | { name: string; value: { stringValue?: string; longValue?: number; doubleValue?: number; booleanValue?: boolean; isNull?: boolean } | unknown }
+  | string
+  | number
+  | boolean
+  | null;
 
 /**
  * Object-style input for executeStatement
@@ -147,12 +160,21 @@ export async function executeStatement<T = Record<string, unknown>>(
   const config = getConfig();
   const client = getClient();
 
+  // Convert raw values to SqlParameter format
+  const convertedParams: SqlParameter[] | undefined = params?.map((p, idx) => {
+    if (p === null) return { name: `p${idx}`, value: { isNull: true } };
+    if (typeof p === 'string') return { name: `p${idx}`, value: { stringValue: p } };
+    if (typeof p === 'number') return { name: `p${idx}`, value: Number.isInteger(p) ? { longValue: p } : { doubleValue: p } };
+    if (typeof p === 'boolean') return { name: `p${idx}`, value: { booleanValue: p } };
+    return p as SqlParameter;
+  });
+
   const input: ExecuteStatementCommandInput = {
     resourceArn: config.AURORA_CLUSTER_ARN,
     secretArn: config.AURORA_SECRET_ARN,
     database: 'radiant',
     sql,
-    parameters: params as SqlParameter[] | undefined,
+    parameters: convertedParams,
     includeResultMetadata: true,
     ...(opts?.transactionId && { transactionId: opts.transactionId }),
     ...(opts?.continueAfterTimeout && { continueAfterTimeout: true }),
@@ -168,6 +190,11 @@ export async function executeStatement<T = Record<string, unknown>>(
     rowCount: response.numberOfRecordsUpdated ?? rows.length,
   };
 }
+
+/**
+ * Alias for executeStatement - for backward compatibility
+ */
+export const executeQuery = executeStatement;
 
 /**
  * Execute a batch of SQL statements

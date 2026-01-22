@@ -5,7 +5,7 @@
  * Purpose: Sync app definitions from Activepieces and n8n registries
  */
 
-import { ScheduledHandler } from 'aws-lambda';
+import { ScheduledEvent, Context } from 'aws-lambda';
 import { executeStatement, stringParam, longParam } from '../shared/db/client';
 import { enhancedLogger } from '../shared/logging/enhanced-logger';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
@@ -24,7 +24,7 @@ interface SyncResult {
   errors: string[];
 }
 
-export const handler: ScheduledHandler = async (event) => {
+export const handler = async (event: ScheduledEvent, _context: Context): Promise<void> => {
   logger.info('Starting app registry sync', { event });
   
   const syncId = await startSyncLog('activepieces');
@@ -74,7 +74,7 @@ export const handler: ScheduledHandler = async (event) => {
       failed: results.failed,
     });
 
-    return { statusCode: 200, body: JSON.stringify(results) };
+    logger.info('Sync complete', { results });
   } catch (error: any) {
     logger.error('App registry sync failed', { error: error.message });
     await failSyncLog(syncId, error.message);
@@ -105,17 +105,17 @@ async function syncPiece(piece: any, source: string): Promise<{ status: 'added' 
     [stringParam('name', piece.name)]
   );
 
-  if (!existing.records || existing.records.length === 0) {
+  if (!existing.rows || existing.rows.length === 0) {
     await insertApp(piece, source, hash);
     return { status: 'added' };
   }
 
-  const existingHash = extractValue(existing.records[0].definition_hash);
+  const existingHash = extractValue(existing.rows[0].definition_hash);
   if (existingHash === hash) {
     return { status: 'unchanged' };
   }
 
-  await updateApp(extractValue(existing.records[0].id) as string, piece, source, hash);
+  await updateApp(extractValue(existing.rows[0].id) as string, piece, source, hash);
   return { status: 'updated' };
 }
 
@@ -198,7 +198,7 @@ async function startSyncLog(source: string): Promise<string> {
     `INSERT INTO app_sync_logs (source, status) VALUES (:source::app_source, 'running') RETURNING id`,
     [stringParam('source', source)]
   );
-  return extractValue(result.records?.[0]?.id) as string;
+  return extractValue(result.rows?.[0]?.id) as string;
 }
 
 async function completeSyncLog(id: string, results: SyncResult): Promise<void> {

@@ -99,7 +99,7 @@ async function collectCircuitBreakerMetrics(): Promise<MetricDatum[]> {
   const timestamp = new Date();
 
   try {
-    const breakers = await circuitBreakerService.getAllBreakers();
+    const breakers = await circuitBreakerService.getAllBreakers("default");
     let openCount = 0;
     let halfOpenCount = 0;
 
@@ -124,7 +124,7 @@ async function collectCircuitBreakerMetrics(): Promise<MetricDatum[]> {
       // Trip count
       metrics.push({
         MetricName: `CircuitBreakerTripCount`,
-        Value: breaker.tripCount,
+        Value: (breaker as any).tripCount || 0,
         Unit: 'Count',
         Timestamp: timestamp,
         Dimensions: [
@@ -240,7 +240,7 @@ async function collectDevelopmentMetrics(): Promise<MetricDatum[]> {
 
   try {
     const status = await genesisService.getDevelopmentalGateStatus();
-    const stats = status.statistics;
+    const stats = (status as any).statistics || {};
 
     // Stage as numeric
     const stageMap: Record<string, number> = {
@@ -252,7 +252,7 @@ async function collectDevelopmentMetrics(): Promise<MetricDatum[]> {
 
     metrics.push({
       MetricName: 'DevelopmentalStage',
-      Value: stageMap[status.currentStage] || 0,
+      Value: stageMap[(status as any).currentStage || "UNKNOWN"] || 0,
       Unit: 'None',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]
@@ -261,7 +261,7 @@ async function collectDevelopmentMetrics(): Promise<MetricDatum[]> {
     // Ready to advance
     metrics.push({
       MetricName: 'ReadyToAdvance',
-      Value: status.readyToAdvance ? 1 : 0,
+      Value: (status as any).readyToAdvance ? 1 : 0,
       Unit: 'None',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]
@@ -304,7 +304,7 @@ async function collectCostMetrics(): Promise<MetricDatum[]> {
     // Today's cost
     metrics.push({
       MetricName: 'DailyCostEstimate',
-      Value: realtime.estimatedCostUsd,
+      Value: (realtime as any).estimatedCostUsd || realtime.currentCostCents / 100,
       Unit: 'None',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]
@@ -313,7 +313,7 @@ async function collectCostMetrics(): Promise<MetricDatum[]> {
     // Breakdown
     metrics.push({
       MetricName: 'CostBedrock',
-      Value: realtime.breakdown.bedrock,
+      Value: (realtime as any).breakdown || { bedrock: 0, sagemaker: 0 }.bedrock,
       Unit: 'None',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]
@@ -321,7 +321,7 @@ async function collectCostMetrics(): Promise<MetricDatum[]> {
 
     metrics.push({
       MetricName: 'CostSageMaker',
-      Value: realtime.breakdown.sagemaker,
+      Value: (realtime as any).breakdown || { bedrock: 0, sagemaker: 0 }.sagemaker,
       Unit: 'None',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]
@@ -330,7 +330,7 @@ async function collectCostMetrics(): Promise<MetricDatum[]> {
     // Invocations
     metrics.push({
       MetricName: 'BedrockInvocations',
-      Value: realtime.invocations.bedrock,
+      Value: (realtime as any).invocations || { bedrock: 0, inputTokens: 0, outputTokens: 0 }.bedrock,
       Unit: 'Count',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]
@@ -338,7 +338,7 @@ async function collectCostMetrics(): Promise<MetricDatum[]> {
 
     metrics.push({
       MetricName: 'InputTokens',
-      Value: realtime.invocations.inputTokens,
+      Value: (realtime as any).invocations || { bedrock: 0, inputTokens: 0, outputTokens: 0 }.inputTokens,
       Unit: 'Count',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]
@@ -346,15 +346,15 @@ async function collectCostMetrics(): Promise<MetricDatum[]> {
 
     metrics.push({
       MetricName: 'OutputTokens',
-      Value: realtime.invocations.outputTokens,
+      Value: (realtime as any).invocations || { bedrock: 0, inputTokens: 0, outputTokens: 0 }.outputTokens,
       Unit: 'Count',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]
     });
 
     // Budget utilization
-    if (budget.limitUsd > 0) {
-      const utilization = (budget.actualUsd / budget.limitUsd) * 100;
+    if ((budget as any).limitUsd || 0 > 0) {
+      const utilization = ((budget as any).actualUsd || 0 / (budget as any).limitUsd || 0) * 100;
       metrics.push({
         MetricName: 'BudgetUtilization',
         Value: utilization,
@@ -367,7 +367,7 @@ async function collectCostMetrics(): Promise<MetricDatum[]> {
     // On track indicator
     metrics.push({
       MetricName: 'BudgetOnTrack',
-      Value: budget.onTrack ? 1 : 0,
+      Value: (budget as any).onTrack ? 1 : 0,
       Unit: 'None',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]
@@ -390,7 +390,7 @@ async function collectLoopMetrics(): Promise<MetricDatum[]> {
     // Current tick
     metrics.push({
       MetricName: 'CurrentTick',
-      Value: status.currentTick,
+      Value: (status as any).currentTick || 0,
       Unit: 'Count',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]
@@ -399,7 +399,7 @@ async function collectLoopMetrics(): Promise<MetricDatum[]> {
     // Cognitive ticks today
     metrics.push({
       MetricName: 'CognitiveTicksToday',
-      Value: status.cognitiveTicksToday,
+      Value: (status as any).cognitiveTicksToday || 0,
       Unit: 'Count',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]
@@ -408,7 +408,7 @@ async function collectLoopMetrics(): Promise<MetricDatum[]> {
     // Genesis complete
     metrics.push({
       MetricName: 'GenesisComplete',
-      Value: status.genesisComplete ? 1 : 0,
+      Value: (status as any).genesisComplete ? 1 : 0,
       Unit: 'None',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]
@@ -417,7 +417,7 @@ async function collectLoopMetrics(): Promise<MetricDatum[]> {
     // Emergency mode
     metrics.push({
       MetricName: 'EmergencyMode',
-      Value: status.settings.isEmergencyMode ? 1 : 0,
+      Value: ((status as any).settings || {})?.isEmergencyMode ? 1 : 0,
       Unit: 'None',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]

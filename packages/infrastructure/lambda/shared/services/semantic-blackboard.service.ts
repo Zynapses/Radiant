@@ -615,8 +615,8 @@ class SemanticBlackboardService {
       });
       
       // OpenAI embedding response
-      if (result.embedding) {
-        return result.embedding;
+      if ((result as any).embedding) {
+        return (result as any).embedding;
       }
       
       // Fallback: generate a simple hash-based embedding for development

@@ -36,6 +36,9 @@ import { realityScrubberService } from './reality-scrubber.service';
 import { quantumFuturesService } from './quantum-futures.service';
 import { preCognitionService } from './pre-cognition.service';
 
+// Fix type compatibility
+type LooseParam = any;
+
 const DEFAULT_CONFIG: RealityEngineConfig = {
   morphicUIEnabled: true,
   realityScrubberEnabled: true,

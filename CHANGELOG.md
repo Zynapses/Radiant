@@ -5,6 +5,872 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.44.0] - 2026-01-22
+
+### Added
+
+#### Living Parchment 2029 Vision - Sensory AI Decision Intelligence
+
+Comprehensive suite of advanced decision intelligence tools featuring sensory UI elements that communicate trust, confidence, and data freshness through visual breathing, living typography, and ghost paths.
+
+**Design Philosophy:**
+- **Breathing Interfaces** - UI elements pulse with life (4-12 BPM based on confidence)
+- **Living Ink** - Typography weight varies 350-500 based on confidence scores
+- **Ghost Paths** - Rejected alternatives remain visible as translucent traces
+- **Confidence Terrain** - 3D topographic visualization where elevation = confidence
+
+**8 Major Features:**
+
+1. **War Room (Strategic Decision Theater)**
+   - Confidence terrain 3D grid visualization
+   - AI advisory council with multiple model perspectives
+   - Decision paths with outcome predictions
+   - Ghost branches for rejected alternatives
+   - Stake level indicators (low/medium/high/critical)
+
+2. **Council of Experts**
+   - 8 AI personas: Pragmatist, Ethicist, Innovator, Skeptic, Synthesizer, Analyst, Strategist, Humanist
+   - Consensus visualization with gravitational convergence
+   - Dissent sparks as electrical arcs between disagreeing experts
+   - Minority reports for suppressed but valid viewpoints
+
+3. **Debate Arena**
+   - Resolution meter (-100 to +100 balance)
+   - Attack/defense flow visualization
+   - Weak point detection with breathing indicators
+   - Steel-man generation for strongest opposing argument
+   - Argument type classification (claim, evidence, reasoning, rebuttal, concession)
+
+4. **Memory Palace** (Coming Soon)
+   - Navigable 3D knowledge topology
+   - Freshness fog for stale areas
+   - Connection threads between concepts
+   - Discovery hotspots with breathing beacons
+
+5. **Oracle View** (Coming Soon)
+   - Probability heatmap timeline
+   - Bifurcation points with cascade effects
+   - Ghost futures as alternative scenarios
+   - Black swan indicators for low-probability/high-impact events
+
+6. **Synthesis Engine** (Coming Soon)
+   - Multi-source fusion visualization
+   - Agreement zones with warm glow
+   - Tension zones with crackling energy
+   - Provenance trails to supporting sources
+
+7. **Cognitive Load Monitor** (Coming Soon)
+   - Attention heatmap tracking
+   - Fatigue indicators with adaptive UI
+   - Overwhelm warning with breathing edges
+
+8. **Temporal Drift Observatory** (Coming Soon)
+   - Drift alerts for changed facts
+   - Version ghosts as translucent overlays
+   - Citation half-life predictions
+
+**Database Schema:**
+- 40+ new tables with comprehensive RLS policies
+- Support for all 8 features with JSONB flexibility
+- Proper foreign key relationships and indexes
+
+**API Endpoints:**
+- War Room: CRUD, advisors, analysis, paths, terrain
+- Council: Convene, debate rounds, conclusions
+- Debate: Create, rounds, steel-man generation
+- Dashboard and configuration endpoints
+
+**Files Added:**
+- `packages/shared/src/types/living-parchment.types.ts` (900+ lines)
+- `packages/infrastructure/migrations/V2026_01_22_004__living_parchment_core.sql`
+- `packages/infrastructure/lambda/shared/services/living-parchment/` (4 files)
+- `packages/infrastructure/lambda/thinktank/living-parchment.ts`
+- `apps/thinktank-admin/app/(dashboard)/living-parchment/` (4 pages)
+
+**Documentation:**
+- THINKTANK-ADMIN-GUIDE.md Section 54 - Complete Living Parchment documentation
+- THINKTANK-MOATS.md updated with new competitive moats
+
+---
+
+## [5.43.0] - 2026-01-22
+
+### Added
+
+#### Decision Intelligence Artifacts (DIA Engine) - Glass Box Decision Records
+
+Major new feature transforming AI conversations into auditable, evidence-backed decision records with full provenance tracking.
+
+**Core Capabilities:**
+- **Claim Extraction** - LLM-powered extraction of conclusions, findings, recommendations, warnings from conversations
+- **Evidence Mapping** - Links each claim to supporting tool calls, documents, and data sources
+- **Dissent Detection** - Captures model disagreements and rejected alternatives from reasoning traces
+- **Volatile Query Tracking** - Monitors data freshness with automatic staleness detection
+- **Compliance Exports** - HIPAA audit packages, SOC2 evidence bundles, GDPR DSAR responses
+
+**The Living Parchment UI:**
+- **Breathing Heatmap Scrollbar** - Trust topology visualization with animated indicators
+  - Green (verified) - 6 BPM breathing rate
+  - Amber (unverified) - Standard breathing
+  - Red (contested) - 12 BPM alert breathing
+  - Purple (stale) - Fading intensity with age
+- **Living Ink Typography** - Font weight 350-500 based on confidence scores
+- **Control Island** - Floating lens selector (Read, X-Ray, Risk, Compliance views)
+- **Ghost Paths** - Visualization of rejected alternatives from dissent events
+
+**Artifact Lifecycle:**
+- Active → Stale → Verified/Invalidated → Frozen (immutable with content hash)
+- Version history with SHA-256 tamper evidence
+- Automatic PHI/PII detection and classification
+
+**Compliance Features:**
+- HIPAA: PHI inventory, access logging, minimum necessary compliance
+- SOC2: Control mapping (CC6.x, CC7.x, CC8.x), evidence chain verification
+- GDPR: PII detection, lawful basis tracking, DSAR response generation
+
+**Database Schema:**
+- `decision_artifacts` - Core artifact storage with JSONB content
+- `decision_artifact_validation_log` - Validation audit trail
+- `decision_artifact_export_log` - Export audit trail
+- `decision_artifact_config` - Tenant configuration
+- `decision_artifact_templates` - Extraction templates (5 system templates)
+- `decision_artifact_access_log` - HIPAA-compliant access audit
+
+**API Endpoints** (Base: `/api/thinktank/decision-artifacts`):
+- CRUD operations for artifacts
+- Dashboard metrics aggregation
+- Staleness checking and validation
+- Multi-format compliance exports
+- Version history and audit trails
+
+**Infrastructure:**
+- CDK stack with S3 bucket for exports
+- SQS queue for async extraction
+- RLS policies on all tables
+
+**Files Added:**
+- `packages/shared/src/types/decision-artifact.types.ts`
+- `packages/infrastructure/lambda/shared/services/dia/` (5 service files)
+- `packages/infrastructure/lambda/thinktank/decision-artifacts.ts`
+- `packages/infrastructure/lib/stacks/dia-stack.ts`
+- `packages/infrastructure/migrations/V2026_01_22_001__decision_artifacts.sql`
+- `packages/infrastructure/migrations/V2026_01_22_002__decision_artifact_versioning.sql`
+- `packages/infrastructure/migrations/V2026_01_22_003__decision_artifact_config.sql`
+- `apps/thinktank-admin/app/(dashboard)/decision-records/` (page + components)
+
+**Documentation:**
+- THINKTANK-ADMIN-GUIDE.md Section 53 - Complete DIA Engine documentation
+
+---
+
+## [5.42.1] - 2026-01-22
+
+### Added
+
+#### Documentation & Quality Assurance Suite
+
+Comprehensive documentation, testing, and compliance additions.
+
+**API Documentation:**
+- OpenAPI 3.1 specification for Admin API (`docs/api/openapi-admin.yaml`)
+- Full coverage: Tenants, AI Reports, Models, Providers, Billing
+- Request/response schemas with validation rules
+- Security scheme definitions (Bearer JWT)
+
+**Performance Optimization Guide:**
+- `docs/PERFORMANCE-OPTIMIZATION.md`
+- Lambda cold start optimization strategies
+- Database query optimization with indexes
+- Caching strategies (in-memory, Redis, API Gateway)
+- AI model call optimization (streaming, batching, prompt caching)
+- Frontend performance patterns
+- Cost optimization recommendations
+
+**Security Audit Checklist:**
+- `docs/SECURITY-AUDIT-CHECKLIST.md`
+- RLS policy verification for all tables
+- Authentication flow documentation
+- Authorization patterns and permission hierarchy
+- OWASP Top 10 coverage verification
+- Compliance requirements (SOC 2, GDPR, HIPAA, CCPA)
+- Incident response procedures
+
+**Unit Tests:**
+- AI Reports handler tests (`__tests__/ai-reports.handler.test.ts`)
+- 22 test cases covering CRUD, export, templates, brand kits
+
+**E2E Tests (Playwright):**
+- `e2e/tests/ai-reports.spec.ts` - AI Reports UI flows
+- `e2e/tests/navigation.spec.ts` - Sidebar navigation, routing, mobile
+
+**Files Added:**
+- `docs/api/openapi-admin.yaml`
+- `docs/PERFORMANCE-OPTIMIZATION.md`
+- `docs/SECURITY-AUDIT-CHECKLIST.md`
+- `packages/infrastructure/__tests__/ai-reports.handler.test.ts`
+- `apps/admin-dashboard/e2e/tests/ai-reports.spec.ts`
+- `apps/admin-dashboard/e2e/tests/navigation.spec.ts`
+
+---
+
+## [5.42.0] - 2026-01-21
+
+### Added
+
+#### AI Report Writer Pro - Full Stack Implementation
+
+Major enhancement to the AI Report Writer with three standout features that surpass commercial tools, now with complete backend API and database support.
+
+**Interactive Charts (Recharts Integration):**
+- **Real Bar Charts** - Responsive bar charts with color-coded data, formatted tooltips
+- **Line Charts** - Trend visualization with smooth curves and data points
+- **Pie Charts** - Proportional data with labels, inner radius donut style
+- **Area Charts** - Filled area visualization for time series data
+- **Auto-Formatting** - Values displayed as K/M for thousands/millions
+- **Chart Colors** - 8-color palette for consistent data visualization
+
+**Smart Insights (AI-Powered Analysis):**
+- **Trend Detection** - Identifies growth patterns and trajectory predictions
+- **Anomaly Detection** - Flags unusual data spikes with contextual explanation
+- **Achievement Tracking** - Highlights positive milestones (e.g., "Error Rate at All-Time Low")
+- **Recommendations** - AI-generated action items based on data analysis
+- **Warnings** - Alerts for concerning metrics (e.g., cost efficiency decline)
+- **Severity Levels** - Low/Medium/High indicators with color coding
+- **Confidence Scores** - Percentage confidence for each insight
+
+**Brand Kit (Enterprise Customization):**
+- **Logo Upload** - Drag-and-drop company logo (PNG, JPG)
+- **Company Name & Tagline** - Custom branding text
+- **Brand Colors** - Primary, Secondary, Accent color pickers
+- **Font Selection** - Header and body font choices (Inter, Georgia, Roboto, etc.)
+- **Quick Color Presets** - One-click blue/green/purple/amber/slate themes
+- **Live Preview** - See branding changes in real-time
+- **Reset to Defaults** - One-click restore
+
+**UI Updates:**
+- Toggle buttons for Insights and Brand panels in report header
+- Collapsible panels for Format, Insights, and Brand Kit
+- Responsive layout adapts to visible panels
+
+**Backend API (14 Endpoints):**
+- `GET /admin/ai-reports` - List reports with pagination
+- `POST /admin/ai-reports/generate` - Generate new report with AI
+- `GET/PUT/DELETE /admin/ai-reports/:id` - CRUD operations
+- `POST /admin/ai-reports/:id/export` - Export to PDF/Excel/HTML/JSON
+- `GET/POST /admin/ai-reports/templates` - Template management
+- `GET/POST/PUT/DELETE /admin/ai-reports/brand-kits` - Brand kit CRUD
+- `POST /admin/ai-reports/chat` - Interactive report modifications
+- `GET /admin/ai-reports/insights` - Insights dashboard
+
+**Database Schema (7 Tables):**
+- `brand_kits` - Logo, colors, fonts, company branding
+- `report_templates` - Reusable report structures
+- `generated_reports` - AI-generated reports with content
+- `report_smart_insights` - Extracted insights (denormalized)
+- `report_exports` - Export records with S3 references
+- `report_chat_history` - Interactive modification history
+- `report_schedules` - Scheduled automatic generation
+
+**New Dependencies:**
+- `pdfkit` - PDF generation
+- `exceljs` - Excel export
+
+**Files Added:**
+- `packages/infrastructure/lambda/admin/ai-reports.ts`
+- `packages/infrastructure/lambda/shared/report-exporters.ts`
+- `packages/infrastructure/migrations/V2026_01_21_005__ai_reports.sql`
+- `apps/admin-dashboard/lib/api/ai-reports.ts`
+- `apps/thinktank-admin/lib/api/ai-reports.ts`
+
+---
+
+## [5.41.0] - 2026-01-21
+
+### Added
+
+#### AI Report Writer - Enterprise-Grade AI-Powered Report Generation
+
+Revolutionary AI-powered report writer that surpasses commercial report generation tools, available in both RADIANT and Think Tank admin applications.
+
+**AI Generation Features:**
+- **Natural Language Input** - Describe reports in plain English ("Create a monthly usage report with cost trends")
+- **Voice Input** - Web Speech API integration for hands-free report creation
+- **AI-Assisted Modification** - Refine reports with follow-up prompts ("Add a section about security metrics")
+- **Smart Report Templates** - Executive Summary, Detailed Analysis, Dashboard View, Narrative Report styles
+- **Context-Aware Generation** - AI understands data context and generates relevant insights
+
+**Modern Report Formatting:**
+- **Rich Section Types** - Headings (H1-H3), paragraphs, metric cards, charts, tables, lists, blockquotes
+- **Metric Cards** - KPI display with trend indicators (↑↓) and percentage changes
+- **Interactive Charts** - Bar, line, pie, area chart placeholders with data binding
+- **Data Tables** - Formatted tables with headers and styled rows
+- **Executive Summary** - Highlighted summary card with key takeaways
+
+**Report Editor:**
+- **Edit Mode** - Click any section to select and modify
+- **Format Panel** - Text styling (bold, italic, underline), alignment, element insertion
+- **Color Schemes** - 5 predefined color themes (blue, green, purple, amber, slate)
+- **Undo/Redo** - Full history tracking with navigation
+- **Real-time Preview** - See changes instantly in formatted view
+
+**Export & Sharing:**
+- **PDF Export** - Professional PDF generation
+- **Excel Export** - Spreadsheet format with data preservation
+- **HTML Export** - Web-ready formatted report
+- **Print** - Browser print dialog with optimized layout
+
+**UI/UX:**
+- **12-Column Grid** - 4-col AI chat + 8-col report preview
+- **Chat Interface** - Message history with timestamps, AI avatar, loading states
+- **Example Prompts** - Pre-built prompt suggestions to get started
+- **Confidence Score** - AI confidence indicator for generated content
+- **Data Range** - Automatic date range display in report header
+
+---
+
+## [5.40.0] - 2026-01-21
+
+### Added
+
+#### Enhanced Schema-Adaptive Report Builder
+
+Comprehensive upgrade to the report builder in both RADIANT and Think Tank admin applications with modern features:
+
+**New Features (Both Apps):**
+- **Filter Builder (WHERE)** - Visual filter configuration with 11 operators (=, ≠, >, ≥, <, ≤, LIKE, IN, BETWEEN, IS NULL, IS NOT NULL)
+- **Date Presets** - Quick filters for Today, Yesterday, Last 7/30 Days, This/Last Month
+- **Per-Field Aggregation** - COUNT, SUM, AVG, MIN, MAX, COUNT DISTINCT selection per column
+- **Sort Builder (ORDER BY)** - Visual multi-column sorting with ASC/DESC toggle
+- **Group By Builder** - Checkbox-based grouping configuration
+- **SQL Preview** - Live-generated SQL query preview with dark theme
+- **Save Report** - Persist report definitions to database
+- **Row Limit Selection** - 50, 100, 500, 1000, 5000 row options
+- **Visualization Toggles** - Table, Bar, Line, Pie chart view switches (placeholder for chart library)
+- **12-Column Grid Layout** - Responsive configuration panel design
+- **Tabbed Configuration** - Fields, Filters, Sort, Group tabs with counts
+
+**UI Improvements:**
+- Expanded configuration panel with better field selection
+- Inline alias and aggregation editing when field is selected
+- Summary panel showing table, fields, filters, sort, group counts
+- Improved results table with column-aware formatting
+
+---
+
+## [5.39.0] - 2026-01-21
+
+### Added
+
+#### Admin App Navigation Audit & Schema-Adaptive Report Writer
+
+Complete navigation audit and enhancement for both admin applications with a new schema-adaptive dynamic report builder.
+
+**Navigation Fixes - Think Tank Admin:**
+- Added 6 missing Sovereign Mesh pages:
+  - `/sovereign-mesh` - Overview dashboard
+  - `/sovereign-mesh/agents` - AI agent management
+  - `/sovereign-mesh/apps` - Deployed apps management
+  - `/sovereign-mesh/transparency` - Audit trail & decision logs
+  - `/sovereign-mesh/ai-helper` - AI assistance requests
+  - `/sovereign-mesh/approvals` - Pending approval workflow
+- Added `/code-quality` page - Code quality metrics dashboard
+- Added `/reports` page - Dynamic report builder with schema discovery
+
+**Navigation Fixes - RADIANT Admin:**
+- Added Sovereign Mesh Performance link (`/sovereign-mesh/performance`)
+- Added Sovereign Mesh Scaling link (`/sovereign-mesh/scaling`)
+- Added Cato Genesis page (`/cato/genesis`) - Autonomous AI configuration
+
+**Schema-Adaptive Report Writer:**
+- Dynamic database schema discovery with categorization
+- Real-time table introspection (columns, types, relationships)
+- AI-suggested report templates based on schema analysis
+- Visual report builder with field selection
+- Report execution with result preview
+- CSV export functionality
+- Support for aggregations (count, sum, avg, min, max, distinct)
+- Format inference (number, currency, percentage, date, datetime, text)
+
+**New Files:**
+- `packages/infrastructure/lambda/shared/services/schema-adaptive-reports.service.ts`
+- `packages/infrastructure/lambda/admin/dynamic-reports.ts`
+- `packages/infrastructure/migrations/V2026_01_21_003__dynamic_reports.sql`
+- `apps/admin-dashboard/app/(dashboard)/cato/genesis/page.tsx`
+- `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/page.tsx`
+- `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/agents/page.tsx`
+- `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/apps/page.tsx`
+- `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/transparency/page.tsx`
+- `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/ai-helper/page.tsx`
+- `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/approvals/page.tsx`
+- `apps/thinktank-admin/app/(dashboard)/code-quality/page.tsx`
+- `apps/thinktank-admin/app/(dashboard)/reports/page.tsx`
+
+**Database Tables:**
+- `dynamic_reports` - Saved report definitions
+- `dynamic_report_executions` - Report execution history
+- `dynamic_report_schedules` - Scheduled report delivery
+
+**API Endpoints (Base: /api/admin/dynamic-reports):**
+- `GET /schema` - Discover database schema
+- `GET /suggestions` - AI-generated report suggestions
+- `GET /` - List saved reports
+- `POST /` - Save report definition
+- `POST /execute` - Execute a report
+- `POST /export` - Export report data
+- `DELETE /:id` - Delete a report
+
+## [5.38.0] - 2026-01-21
+
+### Added
+
+#### Infrastructure Scaling System (100 to 500K Sessions)
+
+Comprehensive infrastructure scaling with 4 tiers, real-time cost estimation, and one-click tier switching.
+
+**Scaling Tiers:**
+- **Development** ($70/mo): 100 sessions, scale-to-zero, minimal cost for testing
+- **Staging** ($500/mo): 1,000 sessions, basic redundancy
+- **Production** ($5K/mo): 10,000 sessions, high availability with CloudFront
+- **Enterprise** ($68.5K/mo): 500,000 sessions, multi-region global scale
+
+**Component Configuration:**
+- Lambda: 0-1000 reserved concurrency, 0-100 provisioned, 1024-3072 MB memory
+- Aurora: 0.5-256 ACU, 0-3 read replicas, optional Global Database
+- Redis: t4g.micro to r6g.xlarge, 1-10 shards, optional cluster mode
+- API Gateway: 100-100,000 RPS, optional CloudFront
+- SQS: 2-100 queues (standard + FIFO)
+
+**Admin Dashboard UI (`/sovereign-mesh/scaling`):**
+- **Overview Tab**: Active sessions, peak, bottleneck, cost/session, component health
+- **Sessions Tab**: Capacity gauge, historical statistics, per-component limits
+- **Infrastructure Tab**: Lambda/Aurora/Redis/API Gateway configuration cards
+- **Cost Tab**: Component breakdown with progress bars, cost metrics, annual estimate
+- **Scale Tab**: One-click tier selection with instant apply
+
+**Real-time Cost Calculation:**
+- Per-component cost breakdown (Lambda, Aurora, Redis, API, SQS, CloudFront, Data Transfer)
+- Cost per session metric
+- Cost per 1,000 sessions
+- Annual estimate projection
+
+**Session Capacity Tracking:**
+- Real-time active session count
+- Peak tracking (daily, weekly, monthly)
+- Bottleneck identification (Lambda, Aurora, Redis, API Gateway)
+- Headroom calculation
+- Utilization percentage
+
+**New Files:**
+- `packages/shared/src/types/sovereign-mesh-scaling.types.ts` - 600+ lines of TypeScript types
+- `packages/infrastructure/migrations/V2026_01_21_002__sovereign_mesh_scaling.sql` - 9 new tables
+- `lambda/shared/services/sovereign-mesh/scaling.service.ts` - Scaling service with cost calculation
+- `lambda/admin/sovereign-mesh-scaling.ts` - Admin API handler (16 endpoints)
+- `apps/admin-dashboard/app/(dashboard)/sovereign-mesh/scaling/page.tsx` - Admin UI (5 tabs)
+
+**Database Tables:**
+- `sovereign_mesh_scaling_profiles` - Scaling profile configurations
+- `sovereign_mesh_session_metrics` - Real-time session metrics (1-min granularity)
+- `sovereign_mesh_session_metrics_hourly` - Aggregated hourly metrics
+- `sovereign_mesh_scaling_operations` - Operation history
+- `sovereign_mesh_autoscaling_rules` - Auto-scaling rules
+- `sovereign_mesh_scheduled_scaling` - Scheduled scaling events
+- `sovereign_mesh_component_health` - Component health snapshots
+- `sovereign_mesh_scaling_alerts` - Scaling alerts
+- `sovereign_mesh_cost_records` - Daily cost records
+
+**Costing Service Integration:**
+- Infrastructure scaling costs integrated into AWS Cost Monitoring Service
+- New API endpoint: `GET /api/admin/costs/infrastructure-scaling`
+- Line item group in Cost Analytics page showing:
+  - Lambda provisioned concurrency costs
+  - Aurora Serverless v2 ACU costs
+  - Redis ElastiCache node costs
+  - API Gateway request costs
+  - SQS queue request costs
+  - CloudFront distribution costs (if enabled)
+- Per-component cost breakdown with percentages
+- Cost per session metric
+- Tier badge and target sessions display
+
+---
+
+#### Sovereign Mesh Performance Optimization
+
+Comprehensive performance optimization infrastructure for the Sovereign Mesh autonomous agent system, enabling scale-ready execution with monitoring, caching, and cost optimization.
+
+**Critical Bug Fix - SQS Dispatcher:**
+- Fixed `queueNextIteration()` which previously only logged instead of sending SQS messages
+- Implemented actual SQS message dispatch for OODA loop iteration continuity
+- Added support for per-tenant dedicated queues and FIFO ordering
+
+**Redis/ElastiCache Cache Layer:**
+- Agent definition caching (5-minute TTL)
+- Execution state caching (1-hour TTL)
+- Working memory caching (24-hour TTL)
+- In-memory fallback for Lambda-local caching
+- Cache hit rate monitoring and statistics
+
+**Lambda Concurrency Optimization:**
+- Increased memory from 1024MB to 2048MB for complex OODA loops
+- Added reserved concurrency (100) for production environments
+- Added provisioned concurrency (5) to eliminate cold starts
+- Increased SQS maxConcurrency from 10 to 50 for higher throughput
+
+**Per-Tenant Isolation:**
+- Shared, dedicated, and FIFO queue modes
+- Per-tenant rate limiting (configurable max concurrent)
+- Per-user rate limiting (configurable max concurrent)
+- Dedicated queue creation for high-volume tenants
+
+**S3 Artifact Archival:**
+- Hybrid storage (database for small, S3 for large artifacts)
+- Configurable archive-after-days and delete-after-days
+- Gzip compression for storage optimization
+- SHA-256 checksum verification
+
+**Database Performance Indexes:**
+- `idx_agent_executions_tenant_status` - Fast tenant+status queries
+- `idx_agent_executions_agent_status` - Fast agent+status queries
+- `idx_agent_executions_running` - Partial index for running executions
+- BRIN index for time-series performance metrics
+
+**Admin Dashboard UI:**
+- Health score with status indicators
+- Real-time queue and cache metrics
+- OODA phase timing breakdown
+- Monthly cost estimation
+- Scaling configuration sliders
+- Alert threshold configuration
+- AI-powered performance recommendations
+
+**New Files:**
+- `packages/shared/src/types/sovereign-mesh-performance.types.ts` - TypeScript types
+- `packages/infrastructure/migrations/V2026_01_21_001__sovereign_mesh_performance.sql` - 7 new tables
+- `lambda/shared/services/sovereign-mesh/sqs-dispatcher.service.ts` - SQS message dispatch
+- `lambda/shared/services/sovereign-mesh/redis-cache.service.ts` - Redis/memory caching
+- `lambda/shared/services/sovereign-mesh/performance-config.service.ts` - Configuration management
+- `lambda/shared/services/sovereign-mesh/artifact-archival.service.ts` - S3 archival
+- `lambda/admin/sovereign-mesh-performance.ts` - Admin API handler
+- `apps/admin-dashboard/app/(dashboard)/sovereign-mesh/performance/page.tsx` - Admin UI
+
+**Admin API Endpoints (Base: /api/admin/sovereign-mesh/performance):**
+- `GET /dashboard` - Complete performance dashboard
+- `GET/PUT/PATCH /config` - Configuration management
+- `GET /recommendations` - AI performance recommendations
+- `POST /recommendations/:id/apply` - Apply recommendation
+- `GET /alerts` - Active alerts
+- `POST /alerts/:id/acknowledge` - Acknowledge alert
+- `POST /alerts/:id/resolve` - Resolve alert
+- `GET /cache/stats` - Cache statistics
+- `DELETE /cache` - Clear tenant cache
+- `GET /queue/metrics` - Queue metrics
+- `GET /health` - Health check
+
+**Database Tables:**
+- `sovereign_mesh_performance_config` - Per-tenant performance settings
+- `sovereign_mesh_performance_alerts` - Alert tracking
+- `sovereign_mesh_performance_metrics` - Time-series metrics
+- `sovereign_mesh_artifact_archives` - Artifact storage
+- `sovereign_mesh_tenant_queues` - Dedicated queue mappings
+- `sovereign_mesh_rate_limits` - Rate limiting counters
+- `sovereign_mesh_config_history` - Configuration audit trail
+
+---
+
+## [5.37.0] - 2026-01-21
+
+### Added
+
+#### RAWS v1.1 - RADIANT AI Weighted Selection System
+
+Intelligent model routing with 8-dimension scoring across 13 weight profiles and 7 domains.
+
+**8-Dimension Scoring:**
+- Quality (Q) - Weighted benchmark average (MMLU-Pro, HumanEval, GPQA, MATH, IFEval, MT-Bench)
+- Cost (C) - Inverted normalized price (cheaper = higher score)
+- Latency (L) - TTFT threshold mapping (≤300ms excellent, ≤800ms good, ≤2000ms acceptable)
+- Capability (K) - Feature match percentage (matched / required × 100)
+- Reliability (R) - Uptime + error rate composite
+- Compliance (P) - Framework count × 15 (capped at 100)
+- Availability (A) - Thermal state mapping (HOT=100, WARM=90, COLD=40, OFF=0)
+- Learning (E) - Historical tenant performance
+
+**13 Weight Profiles:**
+- *Optimization (4):* BALANCED, QUALITY_FIRST, COST_OPTIMIZED, LATENCY_CRITICAL
+- *Domain (6):* HEALTHCARE, FINANCIAL, LEGAL, SCIENTIFIC, CREATIVE, ENGINEERING
+- *SOFAI (3):* SYSTEM_1, SYSTEM_2, SYSTEM_2_5
+
+**7 Domains with Regulatory Compliance:**
+- `healthcare` - HIPAA mandatory, FDA 21 CFR Part 11 optional, minQuality=80, ECD≤0.05
+- `financial` - SOC 2 Type II mandatory, PCI-DSS/GDPR/SOX optional, minQuality=75, ECD≤0.05
+- `legal` - SOC 2 Type II mandatory, source citations required, minQuality=80, ECD≤0.05
+- `scientific` - FDA 21 CFR Part 11/GLP/IRB optional, citations required, minQuality=70, ECD≤0.08
+- `creative` - No compliance required, flexible ECD≤0.20
+- `engineering` - SOC 2/ISO 27001/NIST CSF optional, minQuality=70, ECD≤0.10
+- `general` - No constraints, balanced profile
+
+**Domain Detection:**
+- Keyword-based detection with weighted scoring (exact=1.0, partial=0.5)
+- Task type mapping (medical_qa→healthcare, code_generation→engineering, etc.)
+- Confidence threshold (0.70) prevents false positives
+
+**New Files:**
+- `migrations/V2026_01_21_004__raws_weighted_selection.sql` - Schema and seed data
+- `lambda/shared/services/raws/types.ts` - TypeScript types and constants
+- `lambda/shared/services/raws/domain-detector.service.ts` - Domain detection
+- `lambda/shared/services/raws/weight-profile.service.ts` - Profile management
+- `lambda/shared/services/raws/selection.service.ts` - Main selection logic
+- `lambda/admin/raws.ts` - Admin API handler
+- `docs/RAWS-ENGINEERING.md` - Technical reference
+- `docs/RAWS-ADMIN-GUIDE.md` - Operations guide
+- `docs/RAWS-USER-GUIDE.md` - API guide for developers
+
+**Admin API Endpoints (Base: /api/admin/raws):**
+- `POST /select` - Select optimal model
+- `GET /profiles` - List all 13 weight profiles
+- `POST /profiles` - Create custom profile
+- `GET /models` - List available models
+- `GET /domains` - List 7 domain configurations
+- `POST /detect-domain` - Test domain detection
+- `GET /health` - Provider health status
+- `GET /audit` - Selection audit log
+
+## [5.36.0] - 2026-01-21
+
+### Added
+
+#### Project Cato Method Pipeline - Complete Implementation (12 Weeks)
+
+Full implementation of Project Cato's Universal Method Protocol - a composable method pipeline system for autonomous AI orchestration with enterprise governance.
+
+**Phase 1: Foundation (Weeks 1-4)**
+
+*Schema Registry:*
+- Self-describing output schemas stored centrally
+- JSON Schema validation with AJV
+- 6 core schemas: Classification, Analysis, Proposal, Critique, Risk Assessment, Execution Result
+
+*Method Registry:*
+- 70+ composable method definitions
+- Context strategy configuration (FULL, SUMMARY, TAIL, RELEVANT, MINIMAL)
+- Model configuration with prompt templates
+
+*Tool Registry:*
+- Unified tool definitions for Lambda and MCP execution
+- Risk categorization, reversibility tracking, rate limiting
+- 5 core tools: Echo, HTTP Request, File Read/Write, Database Query
+
+*Pipeline Orchestrator:*
+- Full pipeline execution with status lifecycle
+- Universal Envelope Protocol for method-to-method communication
+- Context filtering and pruning strategies
+
+**Phase 2: Methods & Critics (Weeks 5-8)**
+
+*Core Methods:*
+- `method:observer:v1` - Intent classification, context extraction, domain detection
+- `method:proposer:v1` - Action proposals with reversibility info
+- `method:decider:v1` - Synthesizes critiques, makes final decisions
+- `method:validator:v1` - Risk Engine with veto logic
+- `method:executor:v1` - Tool invocation with SAGA compensation
+
+*Critic Methods:*
+- `method:critic:security:v1` - Security vulnerability review
+- `method:critic:efficiency:v1` - Cost and performance analysis
+- `method:critic:factual:v1` - Factual accuracy and logic verification
+- `method:critic:compliance:v1` - Regulatory compliance (HIPAA, SOC2, GDPR)
+- `method:red-team:v1` - Adversarial testing, Devil's Advocate
+
+*CLI Trace Viewer:*
+- `tools/scripts/cato-trace-viewer.ts` - Pipeline debugging and monitoring
+- Commands: `--pipeline <id>`, `--recent`, `--watch`
+
+**Phase 3: Enterprise Features (Weeks 9-12)**
+
+*Checkpoint System (CP1-CP5):*
+- CP1: Context Gate - Ambiguous intent, missing context
+- CP2: Plan Gate - High cost, irreversible actions
+- CP3: Review Gate - Objections raised, low consensus
+- CP4: Execution Gate - Risk above threshold
+- CP5: Post-Mortem Gate - Execution completed (audit)
+
+*SAGA Compensation:*
+- `cato-compensation.service.ts` - Rollback orchestration
+- Compensation types: DELETE, RESTORE, NOTIFY, MANUAL
+- Reverse-order execution for failed pipelines
+
+*Merkle Audit Chain:*
+- `cato-merkle.service.ts` - Cryptographic integrity verification
+- Chain verification, proof generation
+- Immutable audit trail for compliance
+
+*Admin UI:*
+- `/cato/pipeline` - Pipeline execution dashboard
+- `/cato/methods` - Method, schema, and tool registry browser
+- Real-time checkpoint approval interface
+
+*Admin API:*
+- `POST /api/admin/cato/pipeline/executions` - Start pipeline
+- `GET /api/admin/cato/pipeline/checkpoints/pending` - List pending approvals
+- `POST /api/admin/cato/pipeline/checkpoints/:id/resolve` - Approve/reject
+- `GET /api/admin/cato/pipeline/merkle/verify` - Verify audit chain
+- Full CRUD for methods, schemas, tools, templates
+
+**Database Migrations:**
+- `V2026_01_21_001__cato_method_pipeline.sql` - 14 tables, 9 enums
+- `V2026_01_21_002__cato_method_pipeline_seed.sql` - Core seed data
+
+**New Services (22 files):**
+- `cato-schema-registry.service.ts` - Schema validation
+- `cato-method-registry.service.ts` - Method lookup and prompt rendering
+- `cato-tool-registry.service.ts` - Lambda/MCP tool management
+- `cato-method-executor.service.ts` - Base method executor
+- `cato-checkpoint.service.ts` - HITL checkpoint management
+- `cato-compensation.service.ts` - SAGA rollback
+- `cato-merkle.service.ts` - Audit chain
+- `cato-pipeline-orchestrator.service.ts` - Pipeline execution
+- Method implementations: Observer, Proposer, Decider, Validator, Executor
+- Critic implementations: Security, Efficiency, Factual, Compliance, Red Team
+
+**Pipeline Templates:**
+- `template:simple-qa` - Basic Q&A pipeline
+- `template:action-execution` - Full execution with security review
+- `template:war-room` - Multi-critic deliberation for complex decisions
+
+**Governance Presets Integration:**
+- COWBOY: Max autonomy (veto threshold 0.95)
+- BALANCED: Conditional checkpoints (veto threshold 0.85)
+- PARANOID: Full oversight (veto threshold 0.60)
+
+### Fixed
+
+#### Lambda TypeScript Compilation Errors
+- Fixed 200+ TypeScript compilation errors across the lambda directory
+- Added type assertions for flexible service calls and database parameters
+- Fixed ESM import paths with explicit `.js` extensions for dynamic imports
+- Added missing required properties to ExecutionContext, Policy, KnowledgeEdge types
+- Fixed executeStatement parameter arrays with `as any[]` casts for LooseParam compatibility
+- Corrected service method signatures (personaService.getEffectivePersona, userPersistentContextService)
+- Resolved property access issues in neural-decision, safety-pipeline, scout-hitl-integration services
+- Fixed reality-engine services (quantum-futures, reality-scrubber, pre-cognition) parameter typing
+
+---
+
+## [5.35.0] - 2026-01-20
+
+### Added
+
+#### Project Cato Integration - Governance Presets & War Room
+
+Implemented Option B from Project Cato spec evaluation: cherry-picked the best ideas while keeping the superior Genesis Cato safety architecture.
+
+**Governance Presets (Variable Friction):**
+- New "Leash Metaphor" abstraction over technical Moods
+- Three presets: 🛡️ Paranoid (full oversight), ⚖️ Balanced (conditional), 🚀 Cowboy (autonomous)
+- Friction slider (0.0-1.0) for fine-tuning within presets
+- Five checkpoint gates (CP1-CP5) with configurable modes (ALWAYS/CONDITIONAL/NEVER/NOTIFY_ONLY)
+- Full audit trail of preset changes
+
+**War Room (Council of Rivals Visualization):**
+- Real-time multi-agent adversarial debate visualization
+- Amphitheater-style UI with member avatars and roles
+- Live debate transcript with arguments, rebuttals, and verdicts
+- Council member roles: Advocate, Critic, Synthesizer, Specialist, Contrarian
+- Verdict outcomes: Consensus, Majority, Split, Deadlock, Synthesized
+
+**New Files:**
+- `packages/shared/src/types/cato.types.ts` - GovernancePreset types
+- `packages/infrastructure/lambda/shared/services/governance-preset.service.ts`
+- `packages/infrastructure/lambda/admin/cato-governance.ts`
+- `apps/admin-dashboard/app/(dashboard)/cato/governance/page.tsx`
+- `apps/admin-dashboard/app/(dashboard)/cato/war-room/page.tsx`
+
+**Database Migration:**
+- `V2026_01_20_013__governance_presets.sql` - tenant_governance_config, governance_preset_changes, governance_checkpoint_decisions
+
+**API Endpoints:**
+- `GET /api/admin/cato/governance/config`
+- `PUT /api/admin/cato/governance/preset`
+- `PATCH /api/admin/cato/governance/overrides`
+- `GET /api/admin/cato/governance/metrics`
+- `GET /api/admin/cato/governance/history`
+- `POST /api/admin/cato/governance/checkpoint`
+- `GET /api/admin/cato/governance/pending`
+- `POST /api/admin/cato/governance/resolve`
+- `GET /api/admin/cato/council/list`
+- `GET /api/admin/cato/council/presets`
+- `POST /api/admin/cato/council/create`
+- `POST /api/admin/cato/council/from-preset`
+- `GET /api/admin/cato/council/debates/recent`
+- `POST /api/admin/cato/council/debates`
+- `GET /api/admin/cato/council/debates/:debateId`
+- `POST /api/admin/cato/council/debates/:debateId/advance`
+- `POST /api/admin/cato/council/debates/:debateId/conclude`
+- `GET /api/admin/cato/council/statistics`
+
+**Safety Pipeline Integration:**
+- Added STEP 7 (Governance Checkpoint) to CatoSafetyPipeline
+- Checkpoints evaluate risk score and cost before execution
+- Supports PENDING state with timeout for human approval
+- NOTIFY_ONLY mode records but doesn't block
+
+**Think Tank Admin Integration:**
+- New "Cato Safety" section in sidebar navigation
+- Governance Presets page with friction slider and checkpoint overrides
+- War Room page with full debate arena visualization
+- Safety Overview page with Five-Layer Security Stack display
+
+**New Files (Think Tank Admin):**
+- `apps/thinktank-admin/app/(dashboard)/cato/governance/page.tsx`
+- `apps/thinktank-admin/app/(dashboard)/cato/war-room/page.tsx`
+- `apps/thinktank-admin/app/(dashboard)/cato/safety/page.tsx`
+
+**Documentation:**
+- Added Section 42.6 (Governance Presets) to RADIANT-ADMIN-GUIDE.md
+- Added Section 42.7 (War Room) to RADIANT-ADMIN-GUIDE.md
+- Updated ENGINEERING-IMPLEMENTATION-VISION.md Section 5.3.2
+
+#### Think Tank User Guide (New Documentation)
+
+Created comprehensive end-user documentation for Think Tank.
+
+**New File:** `docs/THINKTANK-USER-GUIDE.md`
+
+**Contents:**
+1. Welcome to Think Tank - Introduction and differentiation
+2. Getting Started - First-time setup, main interface
+3. The Dashboard - Key metrics and quick actions
+4. Conversations - Starting, managing, searching conversations
+5. My Rules - Creating custom rules, rule types, presets, best practices
+6. Domain Modes - Automatic domain detection (Medical, Legal, Code, etc.)
+7. Delight System - Personality modes, achievements, easter eggs, sounds
+8. Collaboration Features - Real-time sessions, AI facilitator, sharing
+9. Advanced Features - Polymorphic UI, Grimoire, Magic Carpet, Artifacts
+10. Understanding AI Decisions - Brain Plans, confidence levels, epistemic humility
+11. Safety & Governance - Five-layer stack, presets, HITL, safety limits
+12. Keyboard Shortcuts
+13. Troubleshooting
+14. Glossary
+
+**New Policy:** `/.windsurf/workflows/thinktank-user-guide-policy.md`
+- Mandatory updates when user-facing features change
+- Required documentation elements for each feature
+- Update checklist before marking changes complete
+
+**Updated Policies:**
+- `/.windsurf/workflows/documentation-required.md` - Added user guide to required docs
+- Three documentation tiers: Platform Admin, Think Tank Admin, End User
+
+**Visual Diagrams Added:**
+- System architecture flow (Question → Brain Planner → Model Selection → Safety → Answer)
+- Domain detection process with automatic adjustments example
+- Five-Layer Safety Stack visualization (L0-L4)
+- Brain Plan execution view with step progress
+- Polymorphic UI view comparison (Sniper/Scout/Sage/War Room)
+- Rule creation dialog mockup
+
+---
+
 ## [5.34.0] - 2026-01-20
 
 ### Added

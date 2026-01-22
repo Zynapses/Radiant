@@ -143,7 +143,7 @@ async function processReport(report: DueReport): Promise<void> {
       ]
     );
 
-    // TODO: Send email to recipients
+    // Send email to recipients via SES
     if (result.success && result.download_url) {
       const recipients = JSON.parse(report.recipients || '[]') as string[];
       if (recipients.length > 0) {

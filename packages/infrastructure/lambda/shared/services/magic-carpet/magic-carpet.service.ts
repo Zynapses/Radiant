@@ -148,7 +148,7 @@ class MagicCarpetService {
     // Morph the Reality Engine
     const morphResponse = await realityEngineService.morph({
       sessionId: carpet.realityEngineSessionId,
-      intent: this.destinationToIntent(resolvedDestination.type),
+      intent: this.destinationToIntent(resolvedDestination.type) as any,
       prompt: resolvedDestination.description,
     });
 

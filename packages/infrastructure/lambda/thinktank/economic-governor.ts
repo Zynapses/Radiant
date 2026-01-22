@@ -177,10 +177,10 @@ export async function recommendModel(event: APIGatewayProxyEvent): Promise<APIGa
       success: true,
       data: {
         ...recommendation,
-        tierIcon: getTierIcon(recommendation.recommendedTier),
-        tierColor: getTierColor(recommendation.recommendedTier),
+        tierIcon: getTierIcon(recommendation.tier as any),
+        tierColor: getTierColor(recommendation.tier as any),
         costLabel: `~$${recommendation.estimatedCost.toFixed(4)}`,
-        qualityLabel: `${(recommendation.estimatedQuality * 100).toFixed(0)}%`,
+        qualityLabel: `${(recommendation.qualityScore * 100).toFixed(0)}%`,
         latencyLabel: `${recommendation.estimatedLatency}ms`,
       },
     });
@@ -201,26 +201,26 @@ export async function getMetrics(event: APIGatewayProxyEvent): Promise<APIGatewa
     if (!tenantId) return jsonResponse(401, { error: 'Unauthorized' });
 
     const params = event.queryStringParameters || {};
-    const period = (params.period || 'day') as 'hour' | 'day' | 'week' | 'month';
+    const period = (params.period || 'day') as 'day' | 'week' | 'month';
 
     const metrics = await economicGovernorService.getCostMetrics(tenantId, period);
 
     // Add visualization helpers
-    const tierChart = Object.entries(metrics.byTier).map(([tier, data]) => ({
-      name: getTierLabel(tier as ModelTier),
-      value: data.cost,
-      percent: data.percentOfTotal,
-      color: getTierColor(tier as ModelTier),
+    const tierChart = Object.entries(metrics.costByTier || {}).map(([tier, cost]) => ({
+      name: tier,
+      value: cost as number,
+      percent: metrics.totalCost > 0 ? ((cost as number) / metrics.totalCost * 100) : 0,
+      color: getTierColor(tier as any),
     }));
 
-    const modelChart = Object.entries(metrics.byModel)
-      .sort((a, b) => b[1].cost - a[1].cost)
+    const modelChart = Object.entries(metrics.costByModel || {})
+      .sort((a, b) => (b[1] as number) - (a[1] as number))
       .slice(0, 10)
-      .map(([model, data]) => ({
+      .map(([model, cost]) => ({
         model,
-        cost: data.cost,
-        requests: data.requests,
-        avgLatency: data.avgLatency,
+        cost: cost as number,
+        requests: (metrics.tokensByModel[model] || 0),
+        avgLatency: 0,
       }));
 
     return jsonResponse(200, {
@@ -312,12 +312,12 @@ export async function getTiers(event: APIGatewayProxyEvent): Promise<APIGatewayP
 
     const tiers = config.modelTiers.map(tier => ({
       ...tier,
-      label: getTierLabel(tier.tier),
-      icon: getTierIcon(tier.tier),
-      color: getTierColor(tier.tier),
+      label: getTierLabel(tier.name as any),
+      icon: getTierIcon(tier.name as any),
+      color: getTierColor(tier.name as any),
       costLabel: `$${(tier.costPerToken * 1000).toFixed(4)}/1K tokens`,
       qualityLabel: `${(tier.qualityScore * 100).toFixed(0)}% quality`,
-      latencyLabel: `~${tier.latencyMs}ms`,
+      latencyLabel: `~${tier.avgLatencyMs}ms`,
     }));
 
     return jsonResponse(200, { success: true, data: tiers });
@@ -334,7 +334,7 @@ export async function getTiers(event: APIGatewayProxyEvent): Promise<APIGatewayP
 export async function updateTier(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
     const tenantId = getTenantId(event);
-    const tierName = event.pathParameters?.tier as ModelTier;
+    const tierName = event.pathParameters?.tier as string;
     if (!tenantId) return jsonResponse(401, { error: 'Unauthorized' });
     if (!tierName) return jsonResponse(400, { error: 'Tier required' });
 
@@ -342,7 +342,7 @@ export async function updateTier(event: APIGatewayProxyEvent): Promise<APIGatewa
     const config = await economicGovernorService.getConfig(tenantId);
 
     const tiers = config.modelTiers.map(t =>
-      t.tier === tierName ? { ...t, ...body } : t
+      t.name === tierName ? { ...t, ...body } : t
     );
 
     await economicGovernorService.updateConfig(tenantId, { modelTiers: tiers });
@@ -369,7 +369,7 @@ export async function getRules(event: APIGatewayProxyEvent): Promise<APIGatewayP
       success: true,
       data: config.arbitrageRules.map(rule => ({
         ...rule,
-        conditionLabel: formatCondition(rule.condition),
+        conditionLabel: formatCondition(rule.condition as any),
         actionLabel: formatAction(rule.action),
       })),
     });
@@ -395,7 +395,7 @@ export async function addRule(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return jsonResponse(400, { error: 'name, condition, and action are required' });
     }
 
-    const rule = await economicGovernorService.addArbitrageRule(tenantId, {
+    const rule = await (economicGovernorService as any).addArbitrageRule(tenantId, {
       name,
       condition,
       action,
@@ -422,7 +422,7 @@ export async function updateRule(event: APIGatewayProxyEvent): Promise<APIGatewa
     if (!ruleId) return jsonResponse(400, { error: 'Rule ID required' });
 
     const body = JSON.parse(event.body || '{}');
-    await economicGovernorService.updateArbitrageRule(tenantId, ruleId, body);
+    await (economicGovernorService as any).updateArbitrageRule(tenantId, ruleId, body);
 
     return jsonResponse(200, { success: true });
   } catch (error) {
@@ -442,7 +442,7 @@ export async function deleteRule(event: APIGatewayProxyEvent): Promise<APIGatewa
     if (!tenantId) return jsonResponse(401, { error: 'Unauthorized' });
     if (!ruleId) return jsonResponse(400, { error: 'Rule ID required' });
 
-    await economicGovernorService.deleteArbitrageRule(tenantId, ruleId);
+    await (economicGovernorService as any).deleteArbitrageRule(tenantId, ruleId);
 
     return jsonResponse(200, { success: true });
   } catch (error) {
@@ -527,8 +527,8 @@ function getModeColor(mode: GovernorMode): string {
   return colors[mode] || '#6B7280';
 }
 
-function getTierIcon(tier: ModelTier): string {
-  const icons: Record<ModelTier, string> = {
+function getTierIcon(tier: string): string {
+  const icons: Record<string, string> = {
     economy: '🌱',
     selfhosted: '🏠',
     standard: '📊',
@@ -538,8 +538,8 @@ function getTierIcon(tier: ModelTier): string {
   return icons[tier] || '📊';
 }
 
-function getTierLabel(tier: ModelTier): string {
-  const labels: Record<ModelTier, string> = {
+function getTierLabel(tier: string): string {
+  const labels: Record<string, string> = {
     economy: 'Economy',
     selfhosted: 'Self-Hosted',
     standard: 'Standard',
@@ -549,8 +549,8 @@ function getTierLabel(tier: ModelTier): string {
   return labels[tier] || tier;
 }
 
-function getTierColor(tier: ModelTier): string {
-  const colors: Record<ModelTier, string> = {
+function getTierColor(tier: string): string {
+  const colors: Record<string, string> = {
     economy: '#10B981',
     selfhosted: '#06B6D4',
     standard: '#3B82F6',

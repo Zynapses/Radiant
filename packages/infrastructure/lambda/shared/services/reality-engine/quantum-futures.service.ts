@@ -28,6 +28,10 @@ import {
 } from '@radiant/shared';
 import { realityScrubberService } from './reality-scrubber.service';
 
+// Type alias for flexible params
+type LooseParam = any;
+
+
 const BRANCH_COLORS = [
   '#3B82F6', // Blue
   '#10B981', // Green
@@ -121,7 +125,7 @@ class QuantumFuturesService {
         split.viewMode,
         JSON.stringify(split.activeComparison),
         split.createdAt.toISOString(),
-      ]
+      ] as any[]
     );
 
     return {
@@ -188,13 +192,13 @@ class QuantumFuturesService {
         branch.userId,
         branch.sessionId,
         branch.name,
-        branch.description,
+        branch.description as any,
         branch.color,
         branch.icon,
         branch.timelineId,
         branch.status,
         JSON.stringify(branch.metrics),
-        branch.parentBranchId,
+        branch.parentBranchId as any,
         JSON.stringify(branch.siblingBranchIds),
         branch.createdAt.toISOString(),
         branch.updatedAt.toISOString(),
@@ -280,7 +284,7 @@ class QuantumFuturesService {
       `SELECT * FROM quantum_branches 
        WHERE session_id = $1 AND status NOT IN ('collapsed', 'archived')
        ORDER BY created_at`,
-      [sessionId]
+      [sessionId] as any[]
     );
 
     return (result.rows || []).map((row: unknown) => 
@@ -292,9 +296,7 @@ class QuantumFuturesService {
    * Get a specific branch
    */
   async getBranch(branchId: string): Promise<QuantumBranch | null> {
-    const result = await executeStatement(
-      `SELECT * FROM quantum_branches WHERE id = $1`,
-      [branchId]
+    const result = await executeStatement(`SELECT * FROM quantum_branches WHERE id = $1`, [branchId] as any[]
     );
 
     if (!result.rows || result.rows.length === 0) return null;
@@ -315,7 +317,7 @@ class QuantumFuturesService {
     
     await executeStatement(
       `UPDATE quantum_branches SET metrics = $1, updated_at = $2 WHERE id = $3`,
-      [JSON.stringify(updatedMetrics), new Date().toISOString(), branchId]
+      [JSON.stringify(updatedMetrics), new Date().toISOString(), branchId] as any[]
     );
   }
 
@@ -339,9 +341,7 @@ class QuantumFuturesService {
     sessionId: string,
     viewMode: QuantumViewMode
   ): Promise<void> {
-    await executeStatement(
-      `UPDATE quantum_splits SET view_mode = $1 WHERE session_id = $2`,
-      [viewMode, sessionId]
+    await executeStatement(`UPDATE quantum_splits SET view_mode = $1 WHERE session_id = $2`, [viewMode, sessionId] as any[]
     );
   }
 
@@ -349,9 +349,7 @@ class QuantumFuturesService {
    * Get the active split for a session
    */
   async getActiveSplit(sessionId: string): Promise<QuantumSplit | null> {
-    const result = await executeStatement(
-      `SELECT * FROM quantum_splits WHERE session_id = $1 ORDER BY created_at DESC LIMIT 1`,
-      [sessionId]
+    const result = await executeStatement(`SELECT * FROM quantum_splits WHERE session_id = $1 ORDER BY created_at DESC LIMIT 1`, [sessionId] as any[]
     );
 
     if (!result.rows || result.rows.length === 0) return null;
@@ -397,9 +395,7 @@ class QuantumFuturesService {
     branchId: string,
     siblingIds: string[]
   ): Promise<void> {
-    await executeStatement(
-      `UPDATE quantum_branches SET sibling_branch_ids = $1 WHERE id = $2`,
-      [JSON.stringify(siblingIds), branchId]
+    await executeStatement(`UPDATE quantum_branches SET sibling_branch_ids = $1 WHERE id = $2`, [JSON.stringify(siblingIds), branchId] as any[]
     );
   }
 
@@ -420,7 +416,7 @@ class QuantumFuturesService {
       `UPDATE quantum_branches 
        SET status = $1, updated_at = $2, collapsed_at = $3 
        WHERE id = $4`,
-      [status, updates.updated_at, updates.collapsed_at || null, branchId]
+      [status, updates.updated_at, updates.collapsed_at || null, branchId] as any[]
     );
   }
 
@@ -441,10 +437,10 @@ class QuantumFuturesService {
         branch.sessionId,
         branch.timelineId,
         branch.name,
-        branch.description,
+        branch.description as any,
         JSON.stringify(branch.metrics),
         new Date().toISOString(),
-      ]
+      ] as any[]
     );
 
     return memoryId;
@@ -453,11 +449,9 @@ class QuantumFuturesService {
   private async getLatestLayoutForBranch(
     timelineId: string
   ): Promise<MorphicLayout | null> {
-    const result = await executeStatement(
-      `SELECT layout_state FROM reality_snapshots 
+    const result = await executeStatement(`SELECT layout_state FROM reality_snapshots 
        WHERE reality_id = $1 AND layout_state IS NOT NULL
-       ORDER BY timestamp DESC LIMIT 1`,
-      [timelineId]
+       ORDER BY timestamp DESC LIMIT 1`, [timelineId] as any[]
     );
 
     if (!result.rows || result.rows.length === 0) return null;
