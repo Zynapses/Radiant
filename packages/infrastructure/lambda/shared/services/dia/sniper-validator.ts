@@ -7,14 +7,55 @@
 
 import { createHash } from 'crypto';
 import { executeStatement, stringParam, longParam } from '../../db/client';
-import {
-  DecisionArtifact,
-  VolatileQuery,
-  ValidateArtifactResponse,
-  QueryValidationResult,
-  StalenessReport,
-  ValidationStatus,
-} from '@radiant/shared';
+// Local type definitions for DIA Sniper Validator
+interface VolatileQuery {
+  query_id: string;
+  tool_name: string;
+  original_query: unknown;
+  original_result_hash: string;
+  staleness_threshold_hours: number;
+  volatility_category: string;
+  last_verified_at: string;
+}
+
+interface DecisionArtifact {
+  id: string;
+  tenantId: string;
+  artifactContent: {
+    volatile_queries?: VolatileQuery[];
+    [key: string]: unknown;
+  };
+}
+
+interface QueryValidationResult {
+  queryId: string;
+  status: 'unchanged' | 'changed' | 'error';
+  newResultHash?: string;
+  significance?: 'none' | 'minor' | 'moderate' | 'significant' | 'critical';
+  costCents: number;
+  error?: string;
+}
+
+interface ValidateArtifactResponse {
+  artifactId: string;
+  queriesValidated: number;
+  unchanged: number;
+  changed: number;
+  errors: number;
+  totalCostCents: number;
+  details: QueryValidationResult[];
+  newValidationStatus: ValidationStatus;
+}
+
+interface StalenessReport {
+  isStale: boolean;
+  staleQueries: VolatileQuery[];
+  freshQueries: VolatileQuery[];
+  totalVolatile: number;
+  oldestStaleAgeHours?: number;
+}
+
+type ValidationStatus = 'pending' | 'verified' | 'stale' | 'invalidated';
 
 const TOOL_COSTS: Record<string, number> = {
   'web_search': 5,
@@ -246,31 +287,93 @@ async function validateQuery(query: VolatileQuery): Promise<QueryValidationResul
 }
 
 /**
- * Simulate tool execution (placeholder for actual tool integration)
+ * Execute tool via the appropriate backend (Lambda, HTTP, or MCP)
  */
 async function simulateToolExecution(
   toolName: string,
   originalQuery: unknown
 ): Promise<unknown> {
-  // In production, this would actually re-run the tool
-  // For now, return a simulated result that may or may not match
+  // Import tool registry for lookup
+  const { createCatoToolRegistryService } = await import('../cato-tool-registry.service.js');
+  const { Pool } = await import('pg');
+  const pool = new Pool();
+  const toolRegistry = createCatoToolRegistryService(pool);
   
-  // Simulate ~80% unchanged rate for stable tools, ~50% for real-time
-  const unchangedRate = toolName.includes('real-time') ? 0.5 : 0.8;
-  
-  if (Math.random() < unchangedRate) {
-    // Return something that would hash the same (we don't have the original)
-    // In real implementation, we'd re-run the tool
-    return { simulated: true, query: originalQuery };
+  try {
+    // Search for tool by name in registry
+    const tools = await toolRegistry.listTools({ enabled: true });
+    const toolDef = tools.find(t => t.toolName === toolName);
+    
+    if (!toolDef) {
+      // Tool not found in registry - use HTTP fallback for external APIs
+      return await executeExternalTool(toolName, originalQuery);
+    }
+
+    // Execute based on tool type
+    if (toolRegistry.isLambdaTool(toolDef)) {
+      // Execute via Lambda
+      const functionName = toolRegistry.getLambdaFunctionName(toolDef);
+      if (functionName) {
+        const { LambdaClient, InvokeCommand } = await import('@aws-sdk/client-lambda');
+        const lambda = new LambdaClient({});
+        const command = new InvokeCommand({
+          FunctionName: functionName,
+          InvocationType: 'RequestResponse',
+          Payload: Buffer.from(JSON.stringify(originalQuery)),
+        });
+        const response = await lambda.send(command);
+        if (response.Payload) {
+          return JSON.parse(Buffer.from(response.Payload).toString());
+        }
+      }
+    }
+
+    // For MCP tools or HTTP, use external execution
+    return await executeExternalTool(toolName, originalQuery);
+  } catch (error) {
+    console.error(`Tool execution failed: ${toolName}`, error);
+    throw error;
+  } finally {
+    await pool.end();
   }
-  
-  // Return modified result
-  return { 
-    simulated: true, 
-    query: originalQuery, 
-    timestamp: Date.now(),
-    modified: true,
+}
+
+/**
+ * Execute external tools via HTTP when not in registry
+ */
+async function executeExternalTool(
+  toolName: string,
+  query: unknown
+): Promise<unknown> {
+  const toolEndpoints: Record<string, string> = {
+    'web_search': '/api/tools/web-search',
+    'get_stock_price': '/api/tools/stock-price',
+    'get_weather': '/api/tools/weather',
+    'get_exchange_rate': '/api/tools/exchange-rate',
+    'fetch_news': '/api/tools/news',
+    'get_market_data': '/api/tools/market-data',
   };
+
+  const endpoint = toolEndpoints[toolName];
+  
+  if (!endpoint) {
+    // Unknown tool - return query unchanged for hash comparison
+    return { toolName, query, executedAt: new Date().toISOString() };
+  }
+
+  // Execute via internal API
+  const baseUrl = process.env.API_BASE_URL || 'http://localhost:3000';
+  const response = await fetch(`${baseUrl}${endpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(query),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Tool ${toolName} failed: ${response.status}`);
+  }
+
+  return response.json();
 }
 
 /**
