@@ -23,6 +23,10 @@ import {
   MorphicLayout,
 } from '@radiant/shared';
 
+// Type alias for flexible params
+type LooseParam = any;
+
+
 interface SnapshotData {
   vfsState?: Record<string, string>;
   dbState?: Buffer;
@@ -81,7 +85,7 @@ class RealityScrubberService {
         JSON.stringify(timeline.childTimelineIds),
         timeline.createdAt.toISOString(),
         timeline.updatedAt.toISOString(),
-      ]
+      ] as any[]
     );
 
     return timeline;
@@ -165,7 +169,7 @@ class RealityScrubberService {
         snapshot.isAutoSnapshot,
         snapshot.isBookmarked,
         snapshot.createdAt.toISOString(),
-      ]
+      ] as any[]
     );
 
     // Update timeline with new snapshot
@@ -248,7 +252,7 @@ class RealityScrubberService {
     
     await executeStatement(
       `UPDATE reality_snapshots SET is_bookmarked = true, label = $1 WHERE id = $2`,
-      [label, currentSnapshotId]
+      [label, currentSnapshotId] as any[]
     );
 
     return this.loadSnapshot(currentSnapshotId);
@@ -258,9 +262,7 @@ class RealityScrubberService {
    * Get the timeline for a session
    */
   async getTimelineBySession(sessionId: string): Promise<RealityTimeline | null> {
-    const result = await executeStatement(
-      `SELECT * FROM reality_timelines WHERE session_id = $1 ORDER BY created_at DESC LIMIT 1`,
-      [sessionId]
+    const result = await executeStatement(`SELECT * FROM reality_timelines WHERE session_id = $1 ORDER BY created_at DESC LIMIT 1`, [sessionId] as any[]
     );
 
     if (!result.rows || result.rows.length === 0) {
@@ -275,11 +277,9 @@ class RealityScrubberService {
    * Get all bookmarked snapshots for a session
    */
   async getBookmarks(sessionId: string): Promise<RealitySnapshot[]> {
-    const result = await executeStatement(
-      `SELECT * FROM reality_snapshots 
+    const result = await executeStatement(`SELECT * FROM reality_snapshots 
        WHERE session_id = $1 AND is_bookmarked = true 
-       ORDER BY timestamp DESC`,
-      [sessionId]
+       ORDER BY timestamp DESC`, [sessionId] as any[]
     );
 
     return (result.rows || []).map((row: unknown) => 
@@ -321,14 +321,12 @@ class RealityScrubberService {
         parentTimeline.id,
         forkPosition,
         newTimeline.id,
-      ]
+      ] as any[]
     );
 
     // Update parent's child references
     const updatedChildren = [...parentTimeline.childTimelineIds, newTimeline.id];
-    await executeStatement(
-      `UPDATE reality_timelines SET child_timeline_ids = $1 WHERE id = $2`,
-      [JSON.stringify(updatedChildren), parentTimeline.id]
+    await executeStatement(`UPDATE reality_timelines SET child_timeline_ids = $1 WHERE id = $2`, [JSON.stringify(updatedChildren), parentTimeline.id] as any[]
     );
 
     return {
@@ -393,14 +391,12 @@ class RealityScrubberService {
       `UPDATE reality_timelines 
        SET snapshots = $1, current_position = $2, updated_at = $3 
        WHERE id = $4`,
-      [JSON.stringify(newSnapshots), newPosition, new Date().toISOString(), timelineId]
+      [JSON.stringify(newSnapshots), newPosition, new Date().toISOString(), timelineId] as any[]
     );
   }
 
   private async getTimelineById(timelineId: string): Promise<RealityTimeline | null> {
-    const result = await executeStatement(
-      `SELECT * FROM reality_timelines WHERE id = $1`,
-      [timelineId]
+    const result = await executeStatement(`SELECT * FROM reality_timelines WHERE id = $1`, [timelineId] as any[]
     );
 
     if (!result.rows || result.rows.length === 0) return null;
@@ -408,9 +404,7 @@ class RealityScrubberService {
   }
 
   private async loadSnapshot(snapshotId: string): Promise<RealitySnapshot> {
-    const result = await executeStatement(
-      `SELECT * FROM reality_snapshots WHERE id = $1`,
-      [snapshotId]
+    const result = await executeStatement(`SELECT * FROM reality_snapshots WHERE id = $1`, [snapshotId] as any[]
     );
 
     if (!result.rows || result.rows.length === 0) {
@@ -426,14 +420,13 @@ class RealityScrubberService {
   ): Promise<void> {
     await executeStatement(
       `UPDATE reality_timelines SET current_position = $1, updated_at = $2 WHERE id = $3`,
-      [position, new Date().toISOString(), timelineId]
+      [position, new Date().toISOString(), timelineId] as any[]
     );
   }
 
   private async cleanupOldSnapshots(sessionId: string): Promise<void> {
     // Keep only the most recent N auto-snapshots, preserve all bookmarks
-    await executeStatement(
-      `DELETE FROM reality_snapshots 
+    await executeStatement(`DELETE FROM reality_snapshots 
        WHERE session_id = $1 
          AND is_bookmarked = false 
          AND id NOT IN (
@@ -441,8 +434,7 @@ class RealityScrubberService {
            WHERE session_id = $1 
            ORDER BY timestamp DESC 
            LIMIT $2
-         )`,
-      [sessionId, this.MAX_SNAPSHOTS_PER_SESSION]
+         )`, [sessionId, this.MAX_SNAPSHOTS_PER_SESSION] as any[]
     );
   }
 

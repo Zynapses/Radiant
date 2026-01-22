@@ -442,6 +442,123 @@ class CouncilOfRivalsService {
   // Preset Councils
   // --------------------------------------------------------------------------
 
+  async getRecentDebates(tenantId: string, limit: number = 10): Promise<Debate[]> {
+    try {
+      const result = await executeStatement(
+        `SELECT * FROM council_debates WHERE tenant_id = :tenantId ORDER BY started_at DESC LIMIT :limit`,
+        [stringParam('tenantId', tenantId), longParam('limit', limit)]
+      );
+      return (result.rows || []).map(row => this.parseDebate(row as Record<string, unknown>));
+    } catch (error) {
+      logger.error('Failed to get recent debates', { tenantId, error });
+      throw error;
+    }
+  }
+
+  async advanceDebate(tenantId: string, debateId: string): Promise<Debate> {
+    try {
+      const debate = await this.getDebate(tenantId, debateId);
+      if (!debate) throw new Error('Debate not found');
+
+      const council = await this.getCouncil(tenantId, debate.councilId);
+      if (!council) throw new Error('Council not found');
+
+      // Check if we should conclude
+      if (debate.currentRound >= council.moderator.maxRounds - 1) {
+        await this.conductVoting(tenantId, debateId);
+        return (await this.getDebate(tenantId, debateId))!;
+      }
+
+      // Advance to next round
+      const nextRound = debate.currentRound + 1;
+      debate.rounds.push({ number: nextRound, phase: 'opening', arguments: [], rebuttals: [] });
+
+      await executeStatement(
+        `UPDATE council_debates SET current_round = :nextRound, rounds = :rounds WHERE id = :debateId`,
+        [
+          longParam('nextRound', nextRound),
+          stringParam('rounds', JSON.stringify(debate.rounds)),
+          stringParam('debateId', debateId),
+        ]
+      );
+
+      return { ...debate, currentRound: nextRound };
+    } catch (error) {
+      logger.error('Failed to advance debate', { tenantId, debateId, error });
+      throw error;
+    }
+  }
+
+  async concludeDebate(tenantId: string, debateId: string): Promise<Debate> {
+    await this.conductVoting(tenantId, debateId);
+    return (await this.getDebate(tenantId, debateId))!;
+  }
+
+  async cancelDebate(tenantId: string, debateId: string): Promise<void> {
+    try {
+      const debate = await this.getDebate(tenantId, debateId);
+      if (!debate) throw new Error('Debate not found');
+
+      await executeStatement(
+        `UPDATE council_debates SET status = 'deadlocked', completed_at = NOW() WHERE id = :debateId`,
+        [stringParam('debateId', debateId)]
+      );
+
+      await executeStatement(
+        `UPDATE council_of_rivals SET status = 'idle', updated_at = NOW() WHERE id = :councilId`,
+        [stringParam('councilId', debate.councilId)]
+      );
+    } catch (error) {
+      logger.error('Failed to cancel debate', { tenantId, debateId, error });
+      throw error;
+    }
+  }
+
+  async getStatistics(tenantId: string): Promise<{
+    totalDebates: number;
+    consensusCount: number;
+    majorityCount: number;
+    deadlockedCount: number;
+    avgRoundsPerDebate: number;
+  }> {
+    try {
+      const result = await executeStatement(
+        `SELECT 
+          COUNT(*) as total,
+          COUNT(*) FILTER (WHERE verdict->>'outcome' = 'consensus') as consensus,
+          COUNT(*) FILTER (WHERE verdict->>'outcome' = 'majority') as majority,
+          COUNT(*) FILTER (WHERE status = 'deadlocked') as deadlocked,
+          AVG(current_round) as avg_rounds
+        FROM council_debates WHERE tenant_id = :tenantId`,
+        [stringParam('tenantId', tenantId)]
+      );
+
+      const row = result.rows?.[0] as Record<string, unknown> || {};
+      return {
+        totalDebates: Number(row.total) || 0,
+        consensusCount: Number(row.consensus) || 0,
+        majorityCount: Number(row.majority) || 0,
+        deadlockedCount: Number(row.deadlocked) || 0,
+        avgRoundsPerDebate: Number(row.avg_rounds) || 0,
+      };
+    } catch (error) {
+      logger.error('Failed to get statistics', { tenantId, error });
+      throw error;
+    }
+  }
+
+  getPresetConfigurations(): Record<PresetCouncilType, { name: string; description: string; memberCount: number }> {
+    return {
+      balanced: { name: 'Balanced Council', description: 'Diverse perspectives with advocate, critic, and synthesizer', memberCount: 3 },
+      technical: { name: 'Technical Review Board', description: 'Expert council for technical decisions', memberCount: 3 },
+      creative: { name: 'Creative Council', description: 'Diverse voices for creative exploration', memberCount: 3 },
+    };
+  }
+
+  async createFromPreset(tenantId: string, preset: PresetCouncilType, createdBy: string): Promise<Council> {
+    return this.createPresetCouncil(tenantId, preset, createdBy);
+  }
+
   async createPresetCouncil(tenantId: string, preset: PresetCouncilType, createdBy: string): Promise<Council> {
     const presets: Record<PresetCouncilType, Omit<Council, 'id' | 'tenantId' | 'status' | 'createdAt' | 'updatedAt'>> = {
       balanced: {

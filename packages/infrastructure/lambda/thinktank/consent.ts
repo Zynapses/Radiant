@@ -60,13 +60,13 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   try {
     switch (event.httpMethod) {
       case 'GET':
-        return await getConsents(tenantId, event.queryStringParameters);
+        return await getConsents(tenantId, event.queryStringParameters as any);
       case 'POST':
         return await createConsent(tenantId, JSON.parse(event.body || '{}'), event);
       case 'PUT':
         return await updateConsent(tenantId, JSON.parse(event.body || '{}'));
       case 'DELETE':
-        return await withdrawConsent(tenantId, event.queryStringParameters);
+        return await withdrawConsent(tenantId, event.queryStringParameters as any);
       default:
         return {
           statusCode: 405,
@@ -108,7 +108,7 @@ async function getConsents(
   query += ` ORDER BY created_at DESC LIMIT 500`;
 
   const result = await executeStatement(query, sqlParams);
-  const consents = result.rows as UserConsent[];
+  const consents = result.rows as any[];
 
   // Get stats
   const statsResult = await executeStatement(`

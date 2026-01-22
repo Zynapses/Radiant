@@ -6,12 +6,12 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Logger } from '@aws-lambda-powertools/logger';
+import { logger } from '../shared/logging/enhanced-logger';
 import { v4 as uuidv4 } from 'uuid';
 import { structureFromChaosService } from '../shared/services/structure-from-chaos.service';
 import { ChaoticInput, ChaoticInputType, StructuredOutputType } from '@radiant/shared';
 
-const logger = new Logger({ serviceName: 'structure-from-chaos-api' });
+// Using shared logger
 
 export async function handler(
   event: APIGatewayProxyEvent

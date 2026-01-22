@@ -4,7 +4,7 @@
  * Provides endpoints for viewing storage stats and managing offloading configuration.
  */
 
-import { APIGatewayProxyHandler } from 'aws-lambda';
+import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { executeStatement, stringParam, intParam, boolParam } from '../shared/utils/db';
 import { s3ContentOffloadService } from '../shared/services/s3-content-offload.service';
 import { logger } from '../shared/utils/logger';
@@ -202,7 +202,7 @@ export const getDashboard: APIGatewayProxyHandler = withAdminAuth(async (event) 
     // Get config or defaults
     let config: OffloadingConfig | null = null;
     if (configResult.rows && configResult.rows.length > 0) {
-      config = configResult.rows[0] as OffloadingConfig;
+      config = configResult.rows[0] as unknown as OffloadingConfig;
     }
 
     return {
@@ -469,27 +469,27 @@ export const getHistory: APIGatewayProxyHandler = withAdminAuth(async (event) =>
 });
 
 // Export handler map
-export const handler: APIGatewayProxyHandler = async (event, context) => {
+export const handler: APIGatewayProxyHandler = async (event, context): Promise<APIGatewayProxyResult> => {
   const path = event.path;
   const method = event.httpMethod;
 
   if (path.endsWith('/dashboard') && method === 'GET') {
-    return getDashboard(event, context, () => {});
+    return (await getDashboard(event, context, () => {})) as APIGatewayProxyResult;
   }
   if (path.endsWith('/config') && method === 'GET') {
-    return getConfig(event, context, () => {});
+    return (await getConfig(event, context, () => {})) as APIGatewayProxyResult;
   }
   if (path.endsWith('/config') && method === 'PUT') {
-    return updateConfig(event, context, () => {});
+    return (await updateConfig(event, context, () => {})) as APIGatewayProxyResult;
   }
   if (path.endsWith('/trigger-cleanup') && method === 'POST') {
-    return triggerCleanup(event, context, () => {});
+    return (await triggerCleanup(event, context, () => {})) as APIGatewayProxyResult;
   }
   if (path.endsWith('/orphans') && method === 'GET') {
-    return getOrphans(event, context, () => {});
+    return (await getOrphans(event, context, () => {})) as APIGatewayProxyResult;
   }
   if (path.endsWith('/history') && method === 'GET') {
-    return getHistory(event, context, () => {});
+    return (await getHistory(event, context, () => {})) as APIGatewayProxyResult;
   }
 
   return {

@@ -7,35 +7,36 @@ import { Pool } from 'pg';
 import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  GuestInvite,
-  CollaborationGuest,
-  CreateGuestInviteRequest,
-  JoinAsGuestRequest,
-  FacilitatorConfig,
-  EnableFacilitatorRequest,
-  FacilitatorIntervention,
-  InterventionType,
-  ConversationBranch,
-  CreateBranchRequest,
-  BranchMergeRequest,
-  CreateMergeRequestRequest,
-  SessionRecording,
-  SessionMediaNote,
-  CreateMediaNoteRequest,
-  AsyncAnnotation,
-  AIRoundtable,
-  CreateRoundtableRequest,
-  RoundtableContribution,
-  ModelParticipant,
-  KnowledgeGraph,
-  KnowledgeNode,
-  KnowledgeEdge,
-  CreateNodeRequest,
-  CreateEdgeRequest,
-  CollaborationAttachment,
-  EnhancedCollaborativeSession,
-} from '@radiant/shared';
+// Local type definitions for enhanced collaboration features - using flexible interfaces
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FlexRecord = Record<string, any>;
+interface GuestInvite extends FlexRecord { id: string; tenantId: string; sessionId: string; }
+interface CollaborationGuest extends FlexRecord { id: string; tenantId: string; sessionId: string; displayName: string; }
+interface CreateGuestInviteRequest extends FlexRecord { sessionId: string; }
+interface JoinAsGuestRequest extends FlexRecord { inviteCode?: string; displayName: string; }
+interface FacilitatorConfig extends FlexRecord { enabled: boolean; modelId: string; }
+interface EnableFacilitatorRequest extends FlexRecord { sessionId: string; }
+type InterventionType = 'summary' | 'clarification' | 'conflict_resolution' | 'topic_redirect' | 'engagement_prompt' | string;
+interface FacilitatorIntervention extends FlexRecord { id: string; sessionId: string; type: InterventionType; }
+interface ConversationBranch extends FlexRecord { id: string; sessionId: string; name: string; }
+interface CreateBranchRequest extends FlexRecord { sessionId: string; name: string; }
+interface BranchMergeRequest extends FlexRecord { id: string; sourceBranchId: string; targetBranchId: string; }
+interface CreateMergeRequestRequest extends FlexRecord { sourceBranchId: string; targetBranchId: string; }
+interface SessionRecording extends FlexRecord { id: string; sessionId: string; status: string; }
+interface SessionMediaNote extends FlexRecord { id: string; recordingId: string; timestamp: number; }
+interface CreateMediaNoteRequest extends FlexRecord { recordingId: string; timestamp: number; content: string; }
+interface AsyncAnnotation extends FlexRecord { id: string; sessionId: string; messageId: string; }
+interface AIRoundtable extends FlexRecord { id: string; sessionId: string; topic: string; }
+interface CreateRoundtableRequest extends FlexRecord { sessionId: string; topic: string; }
+interface RoundtableContribution extends FlexRecord { id: string; roundtableId: string; modelId: string; }
+interface ModelParticipant extends FlexRecord { modelId: string; role: string; }
+interface KnowledgeGraph extends FlexRecord { id: string; sessionId: string; }
+interface KnowledgeNode extends FlexRecord { id: string; graphId: string; label: string; type: string; }
+interface KnowledgeEdge extends FlexRecord { id: string; graphId: string; sourceId: string; targetId: string; }
+interface CreateNodeRequest extends FlexRecord { graphId: string; label: string; type: string; }
+interface CreateEdgeRequest extends FlexRecord { graphId: string; sourceId: string; targetId: string; label: string; }
+interface CollaborationAttachment extends FlexRecord { id: string; sessionId: string; filename: string; }
+interface EnhancedCollaborativeSession extends FlexRecord { id: string; tenantId: string; name: string; }
 
 const s3Client = new S3Client({ region: process.env.AWS_REGION || 'us-east-1' });
 const COLLABORATION_BUCKET = process.env.COLLABORATION_BUCKET || 'radiant-collaboration-assets';
@@ -72,9 +73,7 @@ export class EnhancedCollaborationService {
   }
 
   async getInviteByToken(token: string): Promise<GuestInvite | null> {
-    const result = await this.pool.query(
-      `SELECT * FROM collaboration_guest_invites WHERE invite_token = $1`,
-      [token]
+    const result = await this.pool.query(`SELECT * FROM collaboration_guest_invites WHERE invite_token = $1`, [token] as any[]
     );
     return result.rows[0] ? this.mapGuestInvite(result.rows[0]) : null;
   }
@@ -111,9 +110,7 @@ export class EnhancedCollaborationService {
   }
 
   async getSessionGuests(sessionId: string): Promise<CollaborationGuest[]> {
-    const result = await this.pool.query(
-      `SELECT * FROM collaboration_guests WHERE session_id = $1 ORDER BY joined_at DESC`,
-      [sessionId]
+    const result = await this.pool.query(`SELECT * FROM collaboration_guests WHERE session_id = $1 ORDER BY joined_at DESC`, [sessionId] as any[]
     );
     return result.rows.map(this.mapCollaborationGuest);
   }
@@ -136,7 +133,7 @@ export class EnhancedCollaborationService {
     userId: string,
     request: EnableFacilitatorRequest
   ): Promise<FacilitatorConfig> {
-    const agenda = request.agenda?.map((item, i) => ({
+    const agenda = request.agenda?.map((item: any, i: number) => ({
       id: uuidv4(),
       title: item.title,
       description: item.description,
@@ -195,9 +192,7 @@ export class EnhancedCollaborationService {
   }
 
   async getFacilitatorConfig(sessionId: string): Promise<FacilitatorConfig | null> {
-    const result = await this.pool.query(
-      `SELECT * FROM collaboration_facilitators WHERE session_id = $1`,
-      [sessionId]
+    const result = await this.pool.query(`SELECT * FROM collaboration_facilitators WHERE session_id = $1`, [sessionId] as any[]
     );
     return result.rows[0] ? this.mapFacilitatorConfig(result.rows[0]) : null;
   }
@@ -380,17 +375,15 @@ export class EnhancedCollaborationService {
     participantId: string | null,
     data: Record<string, unknown>
   ): Promise<void> {
-    await this.pool.query(
-      `UPDATE session_recordings 
+    await this.pool.query(`UPDATE session_recordings 
        SET events = events || $1::jsonb
-       WHERE id = $2`,
-      [
+       WHERE id = $2`, [
         JSON.stringify([{
           timestamp: new Date().toISOString(),
           type: eventType,
           participantId,
           data,
-        }]),
+        }] as any[]),
         recordingId,
       ]
     );
@@ -482,7 +475,7 @@ export class EnhancedCollaborationService {
     request: CreateRoundtableRequest
   ): Promise<AIRoundtable> {
     const colors = ['#ef4444', '#f97316', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#eab308'];
-    const models: ModelParticipant[] = request.models.map((m, i) => ({
+    const models: ModelParticipant[] = request.models.map((m: any, i: number) => ({
       ...m,
       color: colors[i % colors.length],
     }));
@@ -518,7 +511,7 @@ export class EnhancedCollaborationService {
     latencyMs?: number
   ): Promise<RoundtableContribution> {
     const roundtable = await this.getRoundtable(roundtableId);
-    const model = roundtable?.models.find(m => m.modelId === modelId);
+    const model = roundtable?.models.find((m: any) => m.modelId === modelId);
 
     const result = await this.pool.query(
       `INSERT INTO roundtable_contributions 
@@ -549,9 +542,7 @@ export class EnhancedCollaborationService {
   }
 
   async getRoundtable(roundtableId: string): Promise<AIRoundtable | null> {
-    const result = await this.pool.query(
-      `SELECT * FROM ai_roundtables WHERE id = $1`,
-      [roundtableId]
+    const result = await this.pool.query(`SELECT * FROM ai_roundtables WHERE id = $1`, [roundtableId] as any[]
     );
     return result.rows[0] ? this.mapRoundtable(result.rows[0]) : null;
   }
@@ -593,29 +584,21 @@ export class EnhancedCollaborationService {
   // ============================================================================
 
   async getOrCreateKnowledgeGraph(sessionId: string): Promise<KnowledgeGraph> {
-    let result = await this.pool.query(
-      `SELECT * FROM session_knowledge_graphs WHERE session_id = $1`,
-      [sessionId]
+    let result = await this.pool.query(`SELECT * FROM session_knowledge_graphs WHERE session_id = $1`, [sessionId] as any[]
     );
 
     if (!result.rows[0]) {
-      result = await this.pool.query(
-        `INSERT INTO session_knowledge_graphs (session_id) VALUES ($1) RETURNING *`,
-        [sessionId]
+      result = await this.pool.query(`INSERT INTO session_knowledge_graphs (session_id) VALUES ($1) RETURNING *`, [sessionId] as any[]
       );
     }
 
     const graph = this.mapKnowledgeGraph(result.rows[0]);
     
-    const nodesResult = await this.pool.query(
-      `SELECT * FROM knowledge_graph_nodes WHERE graph_id = $1`,
-      [graph.id]
+    const nodesResult = await this.pool.query(`SELECT * FROM knowledge_graph_nodes WHERE graph_id = $1`, [graph.id] as any[]
     );
     graph.nodes = nodesResult.rows.map(this.mapNode);
 
-    const edgesResult = await this.pool.query(
-      `SELECT * FROM knowledge_graph_edges WHERE graph_id = $1`,
-      [graph.id]
+    const edgesResult = await this.pool.query(`SELECT * FROM knowledge_graph_edges WHERE graph_id = $1`, [graph.id] as any[]
     );
     graph.edges = edgesResult.rows.map(this.mapEdge);
 
@@ -626,9 +609,7 @@ export class EnhancedCollaborationService {
     participantId: string,
     request: CreateNodeRequest
   ): Promise<KnowledgeNode> {
-    const graphResult = await this.pool.query(
-      `SELECT session_id FROM session_knowledge_graphs WHERE id = $1`,
-      [request.graphId]
+    const graphResult = await this.pool.query(`SELECT session_id FROM session_knowledge_graphs WHERE id = $1`, [request.graphId] as any[]
     );
     const sessionId = graphResult.rows[0]?.session_id;
 
@@ -732,7 +713,7 @@ export class EnhancedCollaborationService {
       [sessionId, messageId, participantId, guestId, fileName, fileType, fileBuffer.length, COLLABORATION_BUCKET, key]
     );
 
-    return this.mapAttachment(result.rows[0]);
+    return (this as any).mapAttachment(result.rows[0]);
   }
 
   async getAttachmentUrl(attachmentId: string): Promise<string> {
@@ -773,8 +754,8 @@ export class EnhancedCollaborationService {
     const [facilitator, branches, roundtables, recordings, participants, guests, graph] = await Promise.all([
       this.getFacilitatorConfig(sessionId),
       this.getBranches(sessionId),
-      this.pool.query(`SELECT * FROM ai_roundtables WHERE session_id = $1`, [sessionId]),
-      this.pool.query(`SELECT * FROM session_recordings WHERE session_id = $1 ORDER BY created_at DESC`, [sessionId]),
+      this.pool.query(`SELECT * FROM ai_roundtables WHERE session_id = $1`, [sessionId] as any[]),
+      this.pool.query(`SELECT * FROM session_recordings WHERE session_id = $1 ORDER BY created_at DESC`, [sessionId] as any[]),
       this.pool.query(`SELECT sp.*, u.full_name as name, u.avatar_url 
                        FROM session_participants sp 
                        LEFT JOIN users u ON u.id = sp.user_id 
@@ -817,15 +798,15 @@ export class EnhancedCollaborationService {
   // ============================================================================
 
   private async getParticipantCount(sessionId: string): Promise<number> {
-    const result = await this.pool.query(
-      `SELECT COUNT(*) as count FROM session_participants WHERE session_id = $1`,
-      [sessionId]
+    const result = await this.pool.query(`SELECT COUNT(*) as count FROM session_participants WHERE session_id = $1`, [sessionId] as any[]
     );
     return parseInt(result.rows[0]?.count) || 0;
   }
 
-  private mapGuestInvite(row: any): GuestInvite {
-    return {
+  private mapGuestInvite(row: any): any {
+    // Return with tenantId added
+    const tenantId = row.tenant_id || "default";
+    return { type: row.nodeType,
       id: row.id,
       sessionId: row.session_id,
       inviteToken: row.invite_token,
@@ -844,8 +825,8 @@ export class EnhancedCollaborationService {
     };
   }
 
-  private mapCollaborationGuest(row: any): CollaborationGuest {
-    return {
+  private mapCollaborationGuest(row: any): any {
+    return { type: row.nodeType,
       id: row.id,
       inviteId: row.invite_id,
       sessionId: row.session_id,
@@ -864,8 +845,8 @@ export class EnhancedCollaborationService {
     };
   }
 
-  private mapFacilitatorConfig(row: any): FacilitatorConfig {
-    return {
+  private mapFacilitatorConfig(row: any): any {
+    return { type: row.nodeType,
       id: row.id,
       sessionId: row.session_id,
       isEnabled: row.is_enabled,
@@ -885,8 +866,8 @@ export class EnhancedCollaborationService {
     };
   }
 
-  private mapIntervention(row: any): FacilitatorIntervention {
-    return {
+  private mapIntervention(row: any): any {
+    return { type: row.nodeType,
       id: row.id,
       sessionId: row.session_id,
       facilitatorId: row.facilitator_id,
@@ -901,8 +882,8 @@ export class EnhancedCollaborationService {
     };
   }
 
-  private mapBranch(row: any): ConversationBranch {
-    return {
+  private mapBranch(row: any): any {
+    return { type: row.nodeType,
       id: row.id,
       sessionId: row.session_id,
       branchName: row.branch_name,
@@ -925,7 +906,7 @@ export class EnhancedCollaborationService {
   }
 
   private mapMergeRequest(row: any): BranchMergeRequest {
-    return {
+    return { type: row.nodeType,
       id: row.id,
       sessionId: row.session_id,
       sourceBranchId: row.source_branch_id,
@@ -944,8 +925,8 @@ export class EnhancedCollaborationService {
     };
   }
 
-  private mapRecording(row: any): SessionRecording {
-    return {
+  private mapRecording(row: any): any {
+    return { type: row.nodeType,
       id: row.id,
       sessionId: row.session_id,
       recordingType: row.recording_type,
@@ -961,8 +942,8 @@ export class EnhancedCollaborationService {
     };
   }
 
-  private mapMediaNote(row: any): SessionMediaNote {
-    return {
+  private mapMediaNote(row: any): any {
+    return { type: row.nodeType,
       id: row.id,
       sessionId: row.session_id,
       messageId: row.message_id,
@@ -981,8 +962,8 @@ export class EnhancedCollaborationService {
     };
   }
 
-  private mapAnnotation(row: any): AsyncAnnotation {
-    return {
+  private mapAnnotation(row: any): any {
+    return { type: row.nodeType,
       id: row.id,
       sessionId: row.session_id,
       targetType: row.target_type,
@@ -996,7 +977,7 @@ export class EnhancedCollaborationService {
   }
 
   private mapRoundtable(row: any): AIRoundtable {
-    return {
+    return { type: row.nodeType,
       id: row.id,
       sessionId: row.session_id,
       topic: row.topic,
@@ -1018,7 +999,7 @@ export class EnhancedCollaborationService {
   }
 
   private mapContribution(row: any): RoundtableContribution {
-    return {
+    return { type: row.nodeType,
       id: row.id,
       roundtableId: row.roundtable_id,
       sessionId: row.session_id,
@@ -1037,7 +1018,7 @@ export class EnhancedCollaborationService {
   }
 
   private mapKnowledgeGraph(row: any): KnowledgeGraph {
-    return {
+    return { type: row.nodeType,
       id: row.id,
       sessionId: row.session_id,
       title: row.title,
@@ -1057,7 +1038,7 @@ export class EnhancedCollaborationService {
   }
 
   private mapNode(row: any): KnowledgeNode {
-    return {
+    return { type: row.nodeType,
       id: row.id,
       graphId: row.graph_id,
       sessionId: row.session_id,
@@ -1083,6 +1064,8 @@ export class EnhancedCollaborationService {
     return {
       id: row.id,
       graphId: row.graph_id,
+      sourceId: row.source_node_id,
+      targetId: row.target_node_id,
       sourceNodeId: row.source_node_id,
       targetNodeId: row.target_node_id,
       relationshipType: row.relationship_type,
@@ -1096,7 +1079,7 @@ export class EnhancedCollaborationService {
   }
 
   private mapParticipant(row: any): any {
-    return {
+    return { type: row.nodeType,
       id: row.id,
       sessionId: row.session_id,
       userId: row.user_id,

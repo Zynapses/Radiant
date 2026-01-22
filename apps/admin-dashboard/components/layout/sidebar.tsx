@@ -104,6 +104,8 @@ const navigation: NavigationItem[] = [
   { name: 'Transparency', href: '/sovereign-mesh/transparency', icon: Target },
   { name: 'Approvals', href: '/sovereign-mesh/approvals', icon: ListChecks },
   { name: 'AI Helper', href: '/sovereign-mesh/ai-helper', icon: Sparkles },
+  { name: 'Performance', href: '/sovereign-mesh/performance', icon: Gauge },
+  { name: 'Scaling', href: '/sovereign-mesh/scaling', icon: TrendingUp },
   
   // Orchestration Section
   { type: 'separator', label: 'Orchestration' },
@@ -140,10 +142,14 @@ const navigation: NavigationItem[] = [
   { name: 'Cato Global', href: '/cato', icon: GlobeIcon },
   { name: 'Cato Genesis', href: '/cato/genesis', icon: Rocket },
   { name: 'Cato Safety', href: '/cato', icon: ShieldCheck },
+  { name: 'Cato Pipeline', href: '/cato/pipeline', icon: Workflow },
+  { name: 'Cato Methods', href: '/cato/methods', icon: Route },
+  { name: 'Cato Checkpoints', href: '/cato/checkpoints', icon: ListChecks },
   { name: 'Cato Personas', href: '/cato/personas', icon: UserCircle },
   { name: 'Cato Recovery', href: '/cato/recovery', icon: Activity },
   { name: 'Cato Audit', href: '/cato/audit', icon: FileText },
   { name: 'Cato Advanced', href: '/cato/advanced', icon: Settings },
+  { name: 'Scout HITL', href: '/cato/scout-hitl', icon: Compass },
   { name: 'Engine', href: '/consciousness/engine', icon: Cpu },
   { name: 'Empiricism Loop', href: '/consciousness/empiricism', icon: Beaker },
   { name: 'Ethics-Free', href: '/consciousness/ethics-free', icon: Brain },

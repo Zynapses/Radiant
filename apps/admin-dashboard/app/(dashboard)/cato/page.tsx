@@ -17,6 +17,8 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  Gauge,
+  Swords,
 } from 'lucide-react';
 
 interface DashboardData {
@@ -374,7 +376,27 @@ export default function CatoDashboardPage() {
       </Tabs>
 
       {/* Quick Links */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="cursor-pointer hover:bg-accent transition-colors border-2 border-primary/30 bg-primary/5">
+          <a href="/cato/governance">
+            <CardHeader>
+              <Gauge className="h-8 w-8 text-primary mb-2" />
+              <CardTitle className="text-lg">Governance Presets</CardTitle>
+              <CardDescription>Variable friction control - The Leash</CardDescription>
+            </CardHeader>
+          </a>
+        </Card>
+
+        <Card className="cursor-pointer hover:bg-accent transition-colors border-2 border-orange-500/30 bg-orange-500/5">
+          <a href="/cato/war-room">
+            <CardHeader>
+              <Swords className="h-8 w-8 text-orange-500 mb-2" />
+              <CardTitle className="text-lg">War Room</CardTitle>
+              <CardDescription>Council of Rivals debates</CardDescription>
+            </CardHeader>
+          </a>
+        </Card>
+
         <Card className="cursor-pointer hover:bg-accent transition-colors">
           <a href="/cato/personas">
             <CardHeader>
@@ -394,7 +416,9 @@ export default function CatoDashboardPage() {
             </CardHeader>
           </a>
         </Card>
+      </div>
 
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="cursor-pointer hover:bg-accent transition-colors">
           <a href="/cato/audit">
             <CardHeader>
@@ -415,12 +439,22 @@ export default function CatoDashboardPage() {
           </a>
         </Card>
 
-        <Card className="cursor-pointer hover:bg-accent transition-colors border-2 border-primary/20">
+        <Card className="cursor-pointer hover:bg-accent transition-colors">
+          <a href="/cato/scout-hitl">
+            <CardHeader>
+              <AlertTriangle className="h-8 w-8 text-primary mb-2" />
+              <CardTitle className="text-lg">Scout HITL</CardTitle>
+              <CardDescription>Human-in-the-loop config</CardDescription>
+            </CardHeader>
+          </a>
+        </Card>
+
+        <Card className="cursor-pointer hover:bg-accent transition-colors">
           <a href="/cato/advanced">
             <CardHeader>
               <Activity className="h-8 w-8 text-primary mb-2" />
               <CardTitle className="text-lg">Advanced Config</CardTitle>
-              <CardDescription>Redis, CloudWatch, Entropy, Fracture</CardDescription>
+              <CardDescription>Redis, CloudWatch, Entropy</CardDescription>
             </CardHeader>
           </a>
         </Card>

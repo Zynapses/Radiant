@@ -5,7 +5,7 @@
  * background queue with progress tracking.
  */
 
-import { Logger } from '@aws-lambda-powertools/logger';
+import { logger } from '../logging/enhanced-logger';
 import { v4 as uuidv4 } from 'uuid';
 import {
   ConcurrentTask,
@@ -23,7 +23,7 @@ import {
   MultiplexMessageType,
 } from '@radiant/shared';
 
-const logger = new Logger({ serviceName: 'concurrent-execution' });
+// Using shared logger
 
 interface TaskCallback {
   onProgress: (progress: TaskProgress) => void;

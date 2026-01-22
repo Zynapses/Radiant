@@ -58,9 +58,11 @@ export interface RuleAction {
 export interface ModelRecommendation {
   model: string;
   tier: string;
+  recommendedTier?: string;
   estimatedCost: number;
   estimatedLatency: number;
   qualityScore: number;
+  estimatedQuality?: number;
   reason: string;
 }
 
@@ -68,9 +70,17 @@ export interface CostMetrics {
   totalCost: number;
   costByModel: Record<string, number>;
   costByTier: Record<string, number>;
+  byTier?: Record<string, number>;
   tokensByModel: Record<string, number>;
   savingsFromArbitrage: number;
   period: string;
+  savings: {
+    totalSavings: number;
+    savingsPercent: number;
+    selfHostedSavings: number;
+    arbitrageSavings: number;
+    cacheHitSavings: number;
+  };
 }
 
 // ============================================================================
@@ -297,9 +307,17 @@ class EconomicGovernorService {
         totalCost,
         costByModel,
         costByTier: {},
+        byTier: {},
         tokensByModel,
         savingsFromArbitrage: 0,
         period,
+        savings: {
+          totalSavings: 0,
+          savingsPercent: 0,
+          selfHostedSavings: 0,
+          arbitrageSavings: 0,
+          cacheHitSavings: 0,
+        },
       };
     } catch (error) {
       logger.error('Failed to get metrics', { tenantId, error });
@@ -348,6 +366,30 @@ class EconomicGovernorService {
       try { return JSON.parse(value); } catch { return null; }
     }
     return value as T;
+  }
+
+  // Alias for getMetrics
+  async getCostMetrics(tenantId: string, period: 'day' | 'week' | 'month' = 'day'): Promise<CostMetrics> {
+    return this.getMetrics(tenantId, period);
+  }
+
+  // Check budget and return status
+  async checkBudget(tenantId: string, additionalCost: number = 0): Promise<{
+    fuelLevel: number;
+    remaining: number;
+    alertTriggered: boolean;
+    overBudget: boolean;
+  }> {
+    const config = await this.getConfig(tenantId);
+    const remaining = config.budgetLimit - config.budgetUsed - additionalCost;
+    const fuelLevel = Math.max(0, Math.min(100, (remaining / config.budgetLimit) * 100));
+    const alertTriggered = fuelLevel <= (100 - config.costAlertThreshold);
+    return {
+      fuelLevel,
+      remaining: Math.max(0, remaining),
+      alertTriggered,
+      overBudget: remaining < 0,
+    };
   }
 }
 

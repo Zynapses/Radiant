@@ -5,10 +5,8 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Logger } from '@aws-lambda-powertools/logger';
+import { logger } from '../shared/utils/logger';
 import { userViolationService } from '../shared/services/user-violation.service';
-
-const logger = new Logger({ serviceName: 'user-violations-api' });
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

@@ -2,7 +2,7 @@
 
 > **Configuration and administration of Think Tank AI features**
 > 
-> Version: 3.6.0 | Platform: RADIANT 5.30.0
+> Version: 3.9.0 | Platform: RADIANT 5.44.0
 > Last Updated: January 2026
 
 ---
@@ -8574,6 +8574,953 @@ HITL Orchestration implements industry best practices to reduce unnecessary ques
 |------|---------|
 | `apps/thinktank-admin/app/hitl-orchestration/page.tsx` | Dashboard page |
 | `apps/thinktank-admin/components/layout/sidebar.tsx` | Navigation item |
+
+---
+
+## Section 48: Scout HITL Integration (v5.34.0)
+
+**Location**: Think Tank Admin → Sovereign Mesh → Scout HITL
+
+Scout HITL bridges Cato's Scout persona (epistemic uncertainty mode) with HITL orchestration for intelligent clarification during user workflows.
+
+### 48.1 Overview
+
+When the AI encounters epistemic uncertainty, the Scout persona activates and generates targeted clarification questions:
+
+1. Scout persona activates due to uncertainty
+2. Questions prioritized by aspect impact and domain
+3. Questions filtered through VOI (Value-of-Information) scoring
+4. High-VOI questions go to user, low-VOI get reasonable assumptions
+5. Responses reduce uncertainty, allowing workflow to proceed
+
+### 48.2 Key Metrics
+
+| Metric | Description |
+|--------|-------------|
+| **Total Sessions** | Number of Scout clarification sessions |
+| **Avg Questions** | Average questions asked per session |
+| **Proceed Rate** | Sessions that proceeded successfully |
+| **Avg Assumptions** | Auto-assumed aspects per session |
+
+### 48.3 Domains
+
+Questions are prioritized based on domain-specific impact:
+
+| Domain | Description |
+|--------|-------------|
+| `medical` | HIPAA-sensitive, safety-critical |
+| `financial` | SOC2/PCI compliance |
+| `legal` | Regulatory compliance |
+| `bioinformatics` | Research accuracy |
+| `general` | Default domain |
+
+### 48.4 Dashboard Tabs
+
+| Tab | Purpose |
+|-----|---------|
+| **Overview** | Session recommendations breakdown, domain distribution |
+| **Recent Sessions** | Table of recent clarification sessions |
+| **Configuration** | Enable/disable, VOI threshold, max questions |
+
+### 48.5 Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enabled` | `true` | Enable Scout HITL integration |
+| `voiThreshold` | `0.3` | Minimum VOI to ask question |
+| `maxQuestionsPerSession` | `3` | Max clarifications before assuming |
+| `defaultDomain` | `general` | Fallback domain |
+
+### 48.6 Session Recommendations
+
+| Recommendation | Meaning |
+|----------------|---------|
+| `proceed` | Uncertainty resolved sufficiently |
+| `wait` | Still uncertain, user should wait |
+| `abort` | Critical uncertainty, cannot proceed safely |
+
+### 48.7 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `apps/thinktank-admin/app/scout-hitl/page.tsx` | Dashboard page |
+| `apps/thinktank-admin/components/layout/sidebar.tsx` | Navigation item |
+
+---
+
+## Section 49: Sovereign Mesh Administration (v5.39.0)
+
+**Location**: Think Tank Admin → Sovereign Mesh
+
+The Sovereign Mesh provides autonomous agent orchestration with AI-assisted decision making at every node level.
+
+### 49.1 Overview Dashboard
+
+**Location**: `/sovereign-mesh`
+
+The overview dashboard displays:
+
+| Metric | Description |
+|--------|-------------|
+| **System Health** | Overall mesh health score (0-100%) |
+| **Active Agents** | Number of currently running agents |
+| **Pending Approvals** | Items awaiting human review |
+| **Active Apps** | Deployed applications count |
+| **Decisions Today** | Autonomous decisions made |
+| **Human Interventions** | Manual overrides required |
+
+### 49.2 Agent Registry
+
+**Location**: `/sovereign-mesh/agents`
+
+Manage AI agents deployed in the mesh:
+
+| Column | Description |
+|--------|-------------|
+| **Name** | Agent identifier |
+| **Type** | orchestrator, executor, monitor, advisor |
+| **Status** | active, idle, error, maintenance |
+| **Load** | Current utilization percentage |
+| **Response Time** | Average response latency |
+| **Success Rate** | Task completion rate |
+
+**Actions:**
+- View agent details
+- Pause/resume agent
+- View execution logs
+- Configure thresholds
+
+### 49.3 App Registry
+
+**Location**: `/sovereign-mesh/apps`
+
+Browse and manage deployed applications:
+
+| Field | Description |
+|-------|-------------|
+| **Name** | Application name |
+| **Category** | productivity, analytics, automation, integration, custom |
+| **Status** | active, paused, error |
+| **Users** | Active user count |
+| **Requests** | Daily request volume |
+
+### 49.4 Transparency Layer
+
+**Location**: `/sovereign-mesh/transparency`
+
+Complete audit trail of AI decisions:
+
+| Column | Description |
+|--------|-------------|
+| **Timestamp** | When decision was made |
+| **Decision Type** | approval, rejection, escalation, execution |
+| **Confidence** | AI confidence score (0-1) |
+| **Reasoning** | Explanation of decision logic |
+| **Outcome** | Result of the decision |
+
+**Filters:**
+- Date range
+- Decision type
+- Confidence threshold
+- Agent filter
+
+### 49.5 AI Helper
+
+**Location**: `/sovereign-mesh/ai-helper`
+
+Manage AI assistance requests from the mesh:
+
+| Status | Description |
+|--------|-------------|
+| **Pending** | Awaiting AI processing |
+| **In Progress** | Currently being handled |
+| **Completed** | Successfully resolved |
+| **Escalated** | Requires human review |
+
+### 49.6 Approval Workflow
+
+**Location**: `/sovereign-mesh/approvals`
+
+Human-in-the-loop approval queue:
+
+| Field | Description |
+|-------|-------------|
+| **Type** | deployment, configuration, access, execution |
+| **Priority** | low, medium, high, critical |
+| **Requester** | Agent or user requesting approval |
+| **Created** | Request timestamp |
+| **Expires** | Approval deadline |
+
+**Actions:**
+- Approve with notes
+- Reject with reason
+- Delegate to another admin
+- Request more information
+
+### 49.7 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/page.tsx` | Overview dashboard |
+| `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/agents/page.tsx` | Agent registry |
+| `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/apps/page.tsx` | App browser |
+| `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/transparency/page.tsx` | Decision logs |
+| `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/ai-helper/page.tsx` | AI assistance |
+| `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/approvals/page.tsx` | Approval queue |
+
+---
+
+## Section 50: Code Quality Dashboard (v5.39.0)
+
+**Location**: Think Tank Admin → Code Quality
+
+Real-time visibility into codebase health and quality metrics.
+
+### 50.1 Overview
+
+The Code Quality dashboard provides:
+
+| Metric | Description |
+|--------|-------------|
+| **Overall Score** | Aggregate quality score (0-100) |
+| **Total Errors** | Critical issues requiring immediate fix |
+| **Total Warnings** | Non-critical issues to address |
+| **Files Analyzed** | Number of files scanned |
+
+### 50.2 Issue Categories
+
+| Category | Description |
+|----------|-------------|
+| **Error** | Critical issues (type errors, syntax errors) |
+| **Warning** | Style violations, best practice deviations |
+| **Info** | Suggestions for improvement |
+
+### 50.3 Issue Details
+
+Each issue displays:
+- **File path** with line number
+- **Rule ID** (e.g., `@typescript-eslint/no-unused-vars`)
+- **Message** describing the issue
+- **Severity** badge (error/warning/info)
+
+### 50.4 Filtering
+
+| Filter | Options |
+|--------|---------|
+| **Severity** | All, Errors only, Warnings only |
+| **Category** | TypeScript, ESLint, Custom rules |
+| **Date Range** | Filter by scan date |
+
+### 50.5 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `apps/thinktank-admin/app/(dashboard)/code-quality/page.tsx` | Dashboard page |
+
+---
+
+## Section 51: Schema-Adaptive Reports (v5.39.0)
+
+**Location**: Think Tank Admin → Reports
+
+Dynamic report builder that automatically adapts to database schema changes.
+
+### 51.1 Overview
+
+The Reports page provides three tabs:
+
+| Tab | Purpose |
+|-----|---------|
+| **Quick Reports** | Pre-built report templates |
+| **Saved Reports** | User-saved custom reports |
+| **Schema Builder** | Visual report builder |
+
+### 51.2 Quick Reports
+
+Pre-configured reports available:
+
+| Report | Description |
+|--------|-------------|
+| **User Engagement** | Active users, session duration, feature usage |
+| **Model Performance** | Response times, success rates, token usage |
+| **Billing Summary** | Revenue, credits consumed, subscription status |
+
+### 51.3 Schema Builder (v5.40.0 Enhanced)
+
+The visual report builder provides a comprehensive 4-tab configuration panel:
+
+| Tab | Purpose |
+|-----|---------|
+| **Fields** | Select columns with per-field alias and aggregation |
+| **Filters** | Build WHERE clauses with 11 operators + date presets |
+| **Sort** | Configure ORDER BY with multi-column ASC/DESC |
+| **Group** | Select GROUP BY columns from selected fields |
+
+**Enhanced Features:**
+- **SQL Preview** - Live-generated SQL query with dark theme display
+- **Date Presets** - Today, Yesterday, Last 7/30 Days, This/Last Month
+- **Filter Operators** - =, ≠, >, ≥, <, ≤, LIKE, IN, BETWEEN, IS NULL, IS NOT NULL
+- **Visualization Toggles** - Table, Bar, Line, Pie chart view switches
+- **Save Report** - Persist definitions to database for reuse
+- **Row Limit** - 50, 100, 500, 1000 row options
+
+**Workflow:**
+1. **Select Table** - Browse categorized database tables (Conversations, Users, Delight)
+2. **Configure Fields** - Select columns, set aliases, choose aggregations
+3. **Add Filters** - Build WHERE conditions with operators or date presets
+4. **Set Sorting** - Add ORDER BY columns with direction toggle
+5. **Group Results** - Enable GROUP BY on selected fields
+6. **Execute** - Run report and view in table or chart mode
+7. **Export/Save** - Download CSV or save report definition
+
+### 51.4 AI Report Writer (v5.42.0)
+
+Enterprise-grade AI-powered report generation with text and voice input, interactive charts, smart insights, and brand customization.
+
+**Location**: Think Tank Admin → Reports → AI Writer tab
+
+**Core Features:**
+- **Natural Language Generation** - Describe reports in plain English
+- **Voice Input** - Web Speech API for hands-free report creation
+- **AI Modification** - Refine with follow-up prompts ("Add delight metrics")
+- **Report Styles** - Executive Summary, Detailed Analysis, Dashboard View, Narrative
+- **Rich Formatting** - Headings, metrics cards, charts, tables, lists, quotes
+- **Edit Mode** - Click sections to modify, use format panel for styling
+- **Undo/Redo** - Full history navigation
+- **Export** - PDF, Excel, HTML, Print
+
+**Interactive Charts (v5.42.0):**
+- Real Recharts visualizations replacing placeholders
+- Bar, Line, Pie, Area chart types
+- Auto-formatted tooltips (K/M for thousands/millions)
+- 8-color palette for visual consistency
+
+**Smart Insights (v5.42.0):**
+- AI anomaly detection (usage spikes, unusual patterns)
+- Trend analysis with growth predictions
+- Achievement tracking (delight score peaks, retention milestones)
+- Actionable recommendations
+- Severity indicators (low/medium/high)
+- Confidence scores per insight
+
+**Brand Kit (v5.42.0):**
+- Logo upload with drag-and-drop
+- Company name and tagline customization
+- Color pickers (Primary/Secondary/Accent)
+- Font selection for headers and body
+- Quick preset themes
+- Live preview card
+
+**Think Tank Example Prompts:**
+- "Generate a user engagement report showing active users and session trends"
+- "Create a delight score analysis for the past month"
+- "Build a conversation analytics report with message volumes"
+- "Show me user retention metrics with churn analysis"
+
+**Usage:**
+1. Navigate to Reports → AI Writer tab
+2. Select report style
+3. Type or speak your request (click mic for voice)
+4. Review generated report preview
+5. Use modification prompt to refine
+6. Toggle Edit Mode to modify sections
+7. Export to PDF/Excel/HTML
+
+**Report Sections Generated:**
+| Type | Description |
+|------|-------------|
+| `heading` | H1-H3 headings |
+| `paragraph` | Body text |
+| `metrics` | 4-column KPI cards with trends (↑↓) |
+| `chart` | Interactive chart placeholders |
+| `table` | Data tables with headers |
+| `list` | Bullet point lists |
+| `quote` | Blockquote sections |
+
+### 51.5 Table Categories
+
+| Category | Description |
+|----------|-------------|
+| **Core** | Users, tenants, sessions |
+| **AI** | Models, prompts, responses |
+| **Billing** | Subscriptions, credits, invoices |
+| **Analytics** | Events, metrics, logs |
+| **System** | Configuration, audit, health |
+
+### 51.5 Field Options
+
+| Option | Description |
+|--------|-------------|
+| **Aggregation** | none, count, sum, avg, min, max, distinct |
+| **Format** | text, number, currency, percentage, date, datetime |
+| **Filter** | Where clause conditions |
+| **Group By** | Grouping columns |
+| **Order By** | Sort columns and direction |
+
+### 51.6 Export Formats
+
+| Format | Description |
+|--------|-------------|
+| **CSV** | Comma-separated values |
+| **JSON** | Structured data format |
+
+### 51.7 API Endpoints
+
+Base: `/api/admin/dynamic-reports`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/schema` | Discover database schema |
+| `GET` | `/suggestions` | AI-generated report templates |
+| `GET` | `/` | List saved reports |
+| `POST` | `/` | Save report definition |
+| `POST` | `/execute` | Execute a report |
+| `POST` | `/export` | Export report data |
+| `DELETE` | `/:id` | Delete a report |
+
+### 51.8 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `apps/thinktank-admin/app/(dashboard)/reports/page.tsx` | Reports page |
+| `packages/infrastructure/lambda/shared/services/schema-adaptive-reports.service.ts` | Backend service |
+| `packages/infrastructure/lambda/admin/dynamic-reports.ts` | API handler |
+| `packages/infrastructure/migrations/V2026_01_21_003__dynamic_reports.sql` | Database migration |
+
+---
+
+## Section 52: Gateway Status (v5.39.0)
+
+**Location**: Think Tank Admin → Gateway
+
+Monitor API Gateway health and traffic metrics.
+
+### 52.1 Overview
+
+The Gateway Status dashboard displays:
+
+| Metric | Description |
+|--------|-------------|
+| **Status** | Overall gateway health (healthy/degraded/down) |
+| **Requests/sec** | Current request throughput |
+| **Avg Latency** | Mean response time |
+| **Error Rate** | Percentage of failed requests |
+| **Active Connections** | Current WebSocket connections |
+
+### 52.2 Endpoint Health
+
+| Column | Description |
+|--------|-------------|
+| **Endpoint** | API route path |
+| **Method** | HTTP method (GET, POST, etc.) |
+| **Status** | healthy, slow, error |
+| **Latency** | P50/P95/P99 response times |
+| **Requests** | Request count (24h) |
+| **Errors** | Error count (24h) |
+
+### 52.3 Traffic Patterns
+
+| View | Description |
+|------|-------------|
+| **Hourly** | Requests per hour (24h) |
+| **Daily** | Requests per day (30d) |
+| **By Endpoint** | Traffic distribution by route |
+| **By Status** | Success vs error breakdown |
+
+### 52.4 Alerts
+
+| Alert Type | Trigger |
+|------------|---------|
+| **High Latency** | P95 > 2000ms |
+| **High Error Rate** | Errors > 5% |
+| **Throughput Spike** | 2x normal traffic |
+| **Connection Drop** | WebSocket disconnections |
+
+### 52.5 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `apps/thinktank-admin/app/(dashboard)/gateway/page.tsx` | Gateway dashboard |
+
+---
+
+## Section 53: Decision Intelligence Artifacts (DIA Engine) (v5.43.0)
+
+**Location**: Think Tank Admin → Decision Records
+
+The Glass Box Decision Engine - transforms AI conversations into auditable, evidence-backed decision records with full provenance tracking.
+
+### 53.1 Overview
+
+Decision Intelligence Artifacts (DIA) solve the critical problem of AI decision opacity:
+
+| Challenge | DIA Solution |
+|-----------|--------------|
+| **Black Box Decisions** | Full claim-to-evidence mapping |
+| **Data Staleness** | Volatile query tracking with automatic validation |
+| **Dissent Hidden** | Ghost paths visualize rejected alternatives |
+| **Compliance Gaps** | Built-in HIPAA/SOC2/GDPR export packages |
+| **Trust Uncertainty** | Breathing heatmap shows trust topology at-a-glance |
+
+### 53.2 Core Concepts
+
+**Claims**: Extracted conclusions, findings, recommendations, warnings, and facts from AI responses.
+
+| Claim Type | Description |
+|------------|-------------|
+| `conclusion` | Final determination or decision |
+| `finding` | Discovered information or observation |
+| `recommendation` | Suggested course of action |
+| `warning` | Risk or caution indicator |
+| `fact` | Verified data point |
+| `clinical_finding` | Healthcare-specific observation |
+| `treatment_recommendation` | Medical treatment suggestion |
+| `risk_assessment` | Risk evaluation |
+| `legal_opinion` | Legal interpretation |
+| `compliance_finding` | Regulatory compliance observation |
+
+**Evidence Links**: Connections between claims and their supporting data sources.
+
+| Evidence Type | Description |
+|---------------|-------------|
+| `tool_call` | API or tool execution result |
+| `web_search` | Web search results |
+| `document` | Referenced document |
+| `calculation` | Computed result |
+| `model_consensus` | Multiple model agreement |
+
+**Dissent Events**: Captured disagreements from model reasoning traces.
+
+| Severity | Description |
+|----------|-------------|
+| `minor` | Small qualification or caveat |
+| `moderate` | Significant alternative consideration |
+| `significant` | Major disagreement requiring attention |
+
+**Volatile Queries**: Tool calls that may return different results over time.
+
+| Volatility | Threshold | Examples |
+|------------|-----------|----------|
+| `real-time` | 1 hour | Stock prices, weather |
+| `daily` | 24 hours | News, analytics |
+| `weekly` | 168 hours | Document searches |
+| `stable` | No expiry | Static references |
+
+### 53.3 The Living Parchment UI
+
+The artifact viewer uses sensory design principles:
+
+**Breathing Heatmap Scrollbar**:
+- Green (verified) - 6 BPM breathing rate
+- Amber (unverified) - Standard breathing
+- Red (contested) - 12 BPM alert breathing
+- Purple (stale) - Fading intensity with age
+
+**Living Ink Typography**:
+- Font weight: 350-500 based on confidence (0-100%)
+- Stale claims fade to grayscale
+- Hover reveals evidence connections
+
+**Control Island** (floating lens selector):
+- **Read**: Standard document view
+- **X-Ray**: Evidence links visible
+- **Risk**: Ghost paths and contested claims highlighted
+- **Compliance**: Regulatory framework coverage
+
+**Ghost Paths**: Dashed connectors showing rejected alternatives from dissent events.
+
+### 53.4 Artifact Lifecycle
+
+```
+Conversation → Extract → Validate → Active → [Validate] → Verified
+                                      ↓
+                                    Stale → Invalidated
+                                      ↓
+                                   Frozen (immutable)
+```
+
+| Status | Description |
+|--------|-------------|
+| `active` | Current, editable artifact |
+| `frozen` | Immutable version with content hash |
+| `archived` | Soft-deleted |
+| `invalidated` | Data significantly changed |
+
+| Validation Status | Description |
+|-------------------|-------------|
+| `fresh` | Newly created, not yet validated |
+| `stale` | Volatile queries exceeded thresholds |
+| `verified` | Recently validated, data unchanged |
+| `invalidated` | Significant data changes detected |
+
+### 53.5 Compliance Exports
+
+| Format | Use Case |
+|--------|----------|
+| `pdf` | Human-readable document |
+| `json` | Machine-readable data |
+| `hipaa_audit` | HIPAA compliance package with PHI inventory |
+| `soc2_evidence` | SOC2 control mapping and evidence chain |
+| `gdpr_dsar` | GDPR Data Subject Access Request response |
+
+**HIPAA Audit Package Contents**:
+- Cover sheet with artifact metadata
+- PHI inventory with categories
+- Access log for minimum necessary compliance
+- Evidence chain verification
+- System attestation with content hash
+
+**SOC2 Evidence Bundle Contents**:
+- Control mapping (CC6.x, CC7.x, CC8.x)
+- Evidence chain completeness verification
+- Change management documentation
+- Integrity verification with signature
+
+### 53.6 Configuration
+
+**Location**: Think Tank Admin → Decision Records → Config
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `diaEnabled` | `true` | Enable DIA Engine |
+| `autoGenerateEnabled` | `false` | Auto-generate artifacts from conversations |
+| `phiDetectionEnabled` | `true` | Scan for protected health information |
+| `piiDetectionEnabled` | `true` | Scan for personally identifiable information |
+| `defaultStalenessThresholdDays` | `7` | Days before volatile queries flagged stale |
+| `maxArtifactsPerUser` | `0` | Limit per user (0 = unlimited) |
+| `extractionModel` | `claude-3-5-sonnet` | Model for claim extraction |
+| `autoRedactPhiOnExport` | `false` | Automatically redact PHI on export |
+
+### 53.7 Templates
+
+Pre-configured extraction templates:
+
+| Template | Description | Compliance |
+|----------|-------------|------------|
+| General Decision Record | Standard extraction | None |
+| Healthcare Decision | HIPAA-compliant clinical | HIPAA |
+| Financial Analysis | Audit-ready financial | SOC2 |
+| Legal Review | Legal opinion documentation | SOC2, GDPR |
+| Research Synthesis | Multi-source research | None |
+
+### 53.8 API Endpoints
+
+Base: `/api/thinktank/decision-artifacts`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | List artifacts (supports filters) |
+| `POST` | `/` | Generate artifact from conversation |
+| `GET` | `/dashboard` | Dashboard metrics |
+| `GET` | `/templates` | List available templates |
+| `GET` | `/config` | Get tenant configuration |
+| `PUT` | `/config` | Update configuration |
+| `GET` | `/:id` | Get artifact details |
+| `DELETE` | `/:id` | Archive artifact |
+| `GET` | `/:id/staleness` | Check staleness status |
+| `POST` | `/:id/validate` | Validate volatile queries |
+| `POST` | `/:id/export` | Export artifact |
+| `GET` | `/:id/versions` | Get version history |
+| `GET` | `/:id/validation-history` | Validation audit trail |
+| `GET` | `/:id/export-history` | Export audit trail |
+
+### 53.9 Dashboard Metrics
+
+| Metric | Description |
+|--------|-------------|
+| Total Artifacts | All artifacts for tenant |
+| Active Artifacts | Non-archived, non-frozen |
+| Frozen Artifacts | Immutable versions |
+| Average Confidence | Mean confidence across active |
+| Stale Artifacts | Needing validation |
+| PHI/PII Detected | Artifacts with sensitive data |
+| Validation Cost MTD | API costs for re-validation |
+| Top Domains | Most common primary domains |
+| Compliance Usage | Framework distribution |
+
+### 53.10 Database Schema
+
+**Tables**:
+
+| Table | Purpose |
+|-------|---------|
+| `decision_artifacts` | Main artifact storage |
+| `decision_artifact_validation_log` | Validation audit trail |
+| `decision_artifact_export_log` | Export audit trail |
+| `decision_artifact_config` | Tenant configuration |
+| `decision_artifact_templates` | Extraction templates |
+| `decision_artifact_access_log` | Access audit (HIPAA) |
+
+**Key Columns** (`decision_artifacts`):
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `artifact_content` | JSONB | Claims, evidence, dissent, metrics |
+| `heatmap_data` | JSONB | Pre-computed heatmap segments |
+| `validation_status` | VARCHAR | fresh/stale/verified/invalidated |
+| `phi_detected` | BOOLEAN | Contains protected health info |
+| `content_hash` | VARCHAR(64) | SHA-256 for frozen artifacts |
+
+### 53.11 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/decision-artifact.types.ts` | Type definitions |
+| `packages/infrastructure/lambda/shared/services/dia/` | Backend services |
+| `packages/infrastructure/lambda/thinktank/decision-artifacts.ts` | API handler |
+| `packages/infrastructure/lib/stacks/dia-stack.ts` | CDK infrastructure |
+| `packages/infrastructure/migrations/V2026_01_22_001__decision_artifacts.sql` | Core schema |
+| `packages/infrastructure/migrations/V2026_01_22_002__decision_artifact_versioning.sql` | Versioning functions |
+| `packages/infrastructure/migrations/V2026_01_22_003__decision_artifact_config.sql` | Config & templates |
+| `apps/thinktank-admin/app/(dashboard)/decision-records/` | Admin UI |
+| `apps/thinktank-admin/app/(dashboard)/decision-records/components/` | UI components |
+
+### 53.12 Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Extraction fails | Check Bedrock model access permissions |
+| Missing evidence links | Verify tool_calls in message metadata |
+| Stale status not updating | Run manual validation or check thresholds |
+| PHI not detected | Verify phiDetectionEnabled in config |
+| Export fails | Check S3 bucket permissions (DIA_EXPORT_BUCKET) |
+| Version history empty | Artifact must be frozen to create versions |
+
+### 53.13 Security Considerations
+
+- All tables have RLS policies enforcing tenant isolation
+- PHI/PII detection runs automatically on extraction
+- Access logging enabled for HIPAA compliance
+- Content hashes provide tamper evidence for frozen artifacts
+- Export audit trail tracks all compliance exports
+- Presigned URLs expire after 1 hour
+
+---
+
+## Section 54: Living Parchment 2029 Vision (v5.44.0)
+
+### Overview
+
+Living Parchment is a comprehensive suite of advanced decision intelligence tools featuring sensory UI elements that communicate trust, confidence, and data freshness through visual breathing, living typography, and ghost paths. This 2029 Vision implementation transforms how users interact with AI-assisted decision making.
+
+### Design Philosophy
+
+| Concept | Implementation |
+|---------|----------------|
+| **Breathing Interfaces** | UI elements pulse with life—faster breathing (12 BPM) indicates uncertainty, slower (4-6 BPM) indicates confidence |
+| **Living Ink** | Text weight varies 350-500 based on confidence; stale information fades to grayscale |
+| **Ghost Paths** | Rejected alternatives remain visible as translucent traces showing what could have been |
+| **Confidence Terrain** | 3D topographic visualization where elevation = confidence, color = risk |
+
+### 54.1 War Room (Strategic Decision Theater)
+
+High-stakes collaborative decision space with AI advisors and confidence terrain.
+
+#### Features
+
+- **Confidence Terrain**: 3D grid visualization showing confidence topology across decision space
+- **AI Advisory Council**: Multiple AI models providing different perspectives
+- **Decision Paths**: Branching options with outcome predictions and advocate tracking
+- **Ghost Branches**: Rejected paths remain visible for context
+- **Stake Level Indicators**: Visual urgency based on decision importance
+
+#### Advisor Types
+
+| Type | Color | Use Case |
+|------|-------|----------|
+| AI Model | Blue (#3b82f6) | Claude, GPT for strategic analysis |
+| Human Expert | Purple (#8b5cf6) | Domain specialists |
+| Domain Specialist | Cyan (#06b6d4) | Industry-specific advisors |
+
+#### API Endpoints
+
+```
+POST   /api/thinktank/living-parchment/war-room           Create session
+GET    /api/thinktank/living-parchment/war-room           List sessions
+GET    /api/thinktank/living-parchment/war-room/:id       Get session
+POST   /api/thinktank/living-parchment/war-room/:id/advisors        Add advisor
+POST   /api/thinktank/living-parchment/war-room/:id/advisors/:aid/analyze   Request analysis
+POST   /api/thinktank/living-parchment/war-room/:id/paths           Propose path
+POST   /api/thinktank/living-parchment/war-room/:id/decide          Make decision
+POST   /api/thinktank/living-parchment/war-room/:id/terrain         Update terrain
+```
+
+### 54.2 Council of Experts
+
+Multi-persona AI consultation with consensus tracking and dissent visualization.
+
+#### Expert Personas
+
+| Persona | Specialization | Style |
+|---------|---------------|-------|
+| Pragmatist | Practical Implementation | Results-focused, cost-conscious |
+| Ethicist | Moral Philosophy | Principle-based, stakeholder-aware |
+| Innovator | Creative Solutions | Visionary, possibility-focused |
+| Skeptic | Risk Analysis | Devil's advocate, challenging |
+| Synthesizer | Integration | Bridge-building, pattern-finding |
+| Analyst | Data-Driven | Quantitative, evidence-based |
+| Strategist | Long-term Strategy | Big-picture, competitive-aware |
+| Humanist | Human Impact | Empathetic, user-centered |
+
+#### Consensus Visualization
+
+- Experts positioned on circular visualization
+- Positions move toward center as consensus increases
+- Dissent sparks appear as electrical arcs between disagreeing experts
+- Gravitational attraction animation shows convergence
+
+#### API Endpoints
+
+```
+POST   /api/thinktank/living-parchment/council            Convene council
+GET    /api/thinktank/living-parchment/council/:id        Get session
+POST   /api/thinktank/living-parchment/council/:id/debate Run debate round
+POST   /api/thinktank/living-parchment/council/:id/conclude Conclude session
+```
+
+### 54.3 Debate Arena
+
+Adversarial exploration with attack/defense flows and steel-man generation.
+
+#### Features
+
+- **Resolution Meter**: Balance indicator (-100 to +100) showing which side is winning
+- **Argument Flow**: Visual stream of claims, rebuttals, and concessions
+- **Weak Point Detection**: Breathing red indicators on vulnerable arguments
+- **Steel-Man Generation**: AI creates strongest version of opponent's argument
+- **Attack/Defense Arrows**: Animated flows showing which arguments target which
+
+#### Debate Phases
+
+1. **Setup** - Configure debaters and proposition
+2. **Opening** - Initial statements
+3. **Main** - Core argument exchange
+4. **Rebuttal** - Direct challenges
+5. **Closing** - Final positions
+6. **Resolved** - Outcome determined
+
+#### API Endpoints
+
+```
+POST   /api/thinktank/living-parchment/debate             Create debate
+GET    /api/thinktank/living-parchment/debate/:id         Get arena
+POST   /api/thinktank/living-parchment/debate/:id/round   Run round
+POST   /api/thinktank/living-parchment/debate/:id/steel-man Generate steel-man
+```
+
+### 54.4 Memory Palace (Coming Soon)
+
+Navigable 3D knowledge topology with freshness fog.
+
+- **Knowledge Rooms**: Domain-organized 3D spaces
+- **Freshness Fog**: Stale areas appear foggy
+- **Connection Threads**: Luminous lines between related concepts
+- **Discovery Hotspots**: Breathing beacons where insights could emerge
+
+### 54.5 Oracle View (Coming Soon)
+
+Predictive confidence landscape.
+
+- **Probability Heatmap**: Future timeline with brightness = confidence
+- **Bifurcation Points**: Animated forks showing cascade effects
+- **Ghost Futures**: Translucent overlays of alternative scenarios
+- **Black Swan Indicators**: Dormant embers for low-probability/high-impact events
+
+### 54.6 Synthesis Engine (Coming Soon)
+
+Multi-source fusion view.
+
+- **Source Streams**: Flowing rivers converging into synthesis
+- **Agreement Zones**: Warm glow where sources align
+- **Tension Zones**: Crackling energy between contradictions
+- **Provenance Trails**: Click any claim to see all supporting sources
+
+### 54.7 Cognitive Load Monitor (Coming Soon)
+
+User state awareness with adaptive UI.
+
+- **Attention Heatmap**: Track where user has focused
+- **Fatigue Indicators**: UI breathing slows as session lengthens
+- **Overwhelm Warning**: Screen edges breathe red when load peaks
+
+### 54.8 Temporal Drift Observatory (Coming Soon)
+
+Fact evolution tracking.
+
+- **Drift Alerts**: Notifications when facts have changed
+- **Version Ghosts**: Previous versions as translucent overlays
+- **Citation Half-Life**: Predict when facts likely become stale
+
+### Database Schema
+
+```sql
+-- Core tables (see migration V2026_01_22_004)
+war_room_sessions, war_room_participants, war_room_advisors
+memory_palaces, memory_rooms, knowledge_nodes, memory_connections
+oracle_views, oracle_predictions, bifurcation_points, ghost_futures
+synthesis_sessions, synthesis_sources, synthesis_claims
+cognitive_load_sessions, cognitive_load_history
+council_sessions, council_experts, expert_arguments, minority_reports
+drifting_facts, drift_alerts, version_ghosts
+debate_arenas, debaters, debate_arguments, weak_points, steel_man_overlays
+living_parchment_config
+```
+
+### Configuration
+
+```typescript
+interface LivingParchmentConfig {
+  features: {
+    warRoomEnabled: boolean;          // Default: true
+    memoryPalaceEnabled: boolean;     // Default: true
+    oracleViewEnabled: boolean;       // Default: true
+    synthesisEngineEnabled: boolean;  // Default: true
+    cognitiveLoadEnabled: boolean;    // Default: true
+    councilOfExpertsEnabled: boolean; // Default: true
+    temporalDriftEnabled: boolean;    // Default: true
+    debateArenaEnabled: boolean;      // Default: true
+  };
+  defaults: {
+    breathingRateBase: 6;             // BPM
+    confidenceThreshold: 70;          // Minimum for "high confidence"
+    stalenessThresholdDays: 30;       // When facts become stale
+    maxAdvisors: 10;
+    maxExperts: 8;
+    maxDebateRounds: 5;
+  };
+  visualSettings: {
+    heatmapColorScheme: 'standard' | 'accessible' | 'dark';
+    animationIntensity: 'subtle' | 'normal' | 'vivid';
+    ghostOpacity: 0.5;
+  };
+}
+```
+
+### Implementation Files
+
+```
+packages/shared/src/types/living-parchment.types.ts     # All types
+packages/infrastructure/migrations/V2026_01_22_004__living_parchment_core.sql
+packages/infrastructure/lambda/shared/services/living-parchment/
+  ├── war-room.service.ts
+  ├── council-of-experts.service.ts
+  ├── debate-arena.service.ts
+  └── index.ts
+packages/infrastructure/lambda/thinktank/living-parchment.ts
+apps/thinktank-admin/app/(dashboard)/living-parchment/
+  ├── page.tsx                        # Landing page
+  ├── war-room/page.tsx               # War Room UI
+  ├── council/page.tsx                # Council of Experts UI
+  └── debate/page.tsx                 # Debate Arena UI
+```
+
+### Security Considerations
+
+- All tables have RLS policies enforcing tenant isolation
+- AI advisor calls use tenant-scoped model access
+- Session ownership validated before modifications
+- Audit logging for all decision actions
+- Debate content filtered for appropriate use
 
 ---
 

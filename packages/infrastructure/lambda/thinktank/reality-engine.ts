@@ -312,7 +312,7 @@ export async function handler(
       const { sessionId, branchId, framework, options } = parsedBody;
       
       // Import the eject service from liquid-interface (it handles code generation)
-      const { ejectService } = await import('../shared/services/liquid-interface');
+      const { ejectService } = await import('../shared/services/liquid-interface/index.js');
       
       // Get current session and layout
       const session = await realityEngineService.getSession(sessionId);
@@ -323,18 +323,17 @@ export async function handler(
       // Use the liquid interface eject service
       const response = await ejectService.eject({
         sessionId,
-        framework: framework || 'nextjs',
         options: {
           projectName: options?.projectName || 'my-morphic-app',
           includeDatabase: options?.includeDatabase ?? true,
           includeAI: options?.includeAI ?? true,
           deployTarget: options?.deployTarget,
         },
-      });
+      } as any);
 
       return success({
         ...response,
-        message: `🚀 Ejected to ${framework || 'Next.js'} project with ${response.totalFiles} files`,
+        message: `🚀 Ejected to ${framework || 'Next.js'} project with ${(response as any).totalFiles || 0} files`,
       });
     }
 

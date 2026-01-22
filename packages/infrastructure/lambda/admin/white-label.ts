@@ -6,10 +6,8 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Logger } from '@aws-lambda-powertools/logger';
+import { logger } from '../shared/utils/logger';
 import { whiteLabelService } from '../shared/services/white-label.service';
-
-const logger = new Logger({ serviceName: 'white-label-api' });
 
 export async function handler(
   event: APIGatewayProxyEvent

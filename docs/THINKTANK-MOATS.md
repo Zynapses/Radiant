@@ -5,7 +5,7 @@
 > "The AI That Remembers, Learns, and Collaborates"
 > 
 > **Classification**: Confidential — Investor Distribution Only  
-> **Version**: 2.0 | **Date**: January 19, 2026  
+> **Version**: 2.2 | **Date**: January 22, 2026  
 > **Cross-AI Validated**: Claude Opus 4.5 ✓ | Gemini 3 ✓
 
 ---
@@ -128,6 +128,120 @@ Transform unstructured input into structured decisions, data, and project plans.
 **Implementation**:
 - Service: `lambda/shared/services/structure-from-chaos.service.ts`
 - Admin UI: `apps/thinktank-admin/app/(dashboard)/structure-from-chaos/page.tsx`
+
+---
+
+### Moat #16: Decision Intelligence Artifacts (Glass Box Decisions)
+
+Transform AI conversations into auditable, evidence-backed decision records with full provenance tracking.
+
+| Feature | Description |
+|---------|-------------|
+| Claim Extraction | LLM-powered extraction of conclusions, findings, recommendations |
+| Evidence Mapping | Links each claim to supporting tool calls and documents |
+| Dissent Capture | Ghost paths visualize rejected alternatives |
+| Volatile Query Tracking | Monitors data freshness, flags staleness |
+| Compliance Exports | HIPAA audit, SOC2 evidence, GDPR DSAR packages |
+
+**The Living Parchment UI**:
+
+| Element | Innovation |
+|---------|------------|
+| Breathing Heatmap Scrollbar | Trust topology visualization with animated BPM indicators |
+| Living Ink Typography | Font weight 350-500 based on confidence scores |
+| Control Island | Floating lens selector (Read/X-Ray/Risk/Compliance views) |
+| Ghost Paths | Dashed connectors showing rejected reasoning paths |
+
+**Competitor Comparison**:
+- **ChatGPT**: No decision audit trail, black box outputs
+- **Claude**: Artifacts are code/documents, not decision provenance
+- **Gemini**: No evidence linking or compliance exports
+- **Perplexity**: Citations but no claim extraction or staleness tracking
+
+**Why It's a Moat**: **No competitor offers AI decision transparency at this level**. Enterprises need audit trails for AI-assisted decisions. DIA Engine turns every conversation into a compliance-ready artifact.
+
+**Enterprise Value**:
+- HIPAA-compliant healthcare decisions with PHI inventory
+- SOC2-ready evidence bundles for audits
+- GDPR DSAR response generation in one click
+- Tamper-evident frozen versions with SHA-256 hashes
+
+**Implementation**:
+- Services: `lambda/shared/services/dia/` (5 service files)
+- Admin UI: `apps/thinktank-admin/app/(dashboard)/decision-records/`
+- API: `lambda/thinktank/decision-artifacts.ts`
+- Docs: THINKTANK-ADMIN-GUIDE.md Section 53
+
+---
+
+### Moat #17: War Room (Strategic Decision Theater)
+
+No competitor offers a collaborative strategic decision-making environment with AI advisors and confidence terrain visualization.
+
+| Feature | ChatGPT/Claude | Think Tank War Room |
+|---------|----------------|---------------------|
+| Multi-advisor analysis | Single model | Multiple AI + human experts |
+| Confidence visualization | None | 3D terrain topology |
+| Decision paths | Text suggestions | Visual branching with outcomes |
+| Ghost alternatives | Lost | Visible as translucent traces |
+| Stake-based UI | Static | Breathing intensity by urgency |
+
+**Enterprise Value**: Strategic decisions documented with full advisor consensus, dissent tracking, and outcome predictions. Board-ready decision documentation.
+
+**Implementation**: `apps/thinktank-admin/app/(dashboard)/living-parchment/war-room/`
+
+---
+
+### Moat #18: Council of Experts (Multi-Persona Consultation)
+
+Summon diverse AI perspectives that debate, disagree, and converge with visible reasoning.
+
+| Feature | Competitors | Think Tank Council |
+|---------|-------------|-------------------|
+| Perspectives | Single model | 8 distinct personas |
+| Disagreement | Hidden | Visible dissent sparks |
+| Consensus | N/A | Gravitational visualization |
+| Minority views | Lost | Preserved as reports |
+
+**Expert Personas**: Pragmatist, Ethicist, Innovator, Skeptic, Synthesizer, Analyst, Strategist, Humanist
+
+**Enterprise Value**: Complex decisions benefit from structured multi-perspective analysis. Compliance teams can show they considered ethical, risk, and strategic angles.
+
+**Implementation**: `apps/thinktank-admin/app/(dashboard)/living-parchment/council/`
+
+---
+
+### Moat #19: Debate Arena (Adversarial Exploration)
+
+Force-test any idea through structured adversarial debate with attack/defense visualization.
+
+| Feature | Competitors | Think Tank Debate |
+|---------|-------------|-------------------|
+| Red-teaming | Manual prompts | Automated opposition |
+| Weak points | Hidden | Breathing red indicators |
+| Steel-man | Manual | AI-generated strongest version |
+| Resolution | Subjective | Quantified balance meter |
+
+**Enterprise Value**: Product decisions, business plans, and strategies stress-tested before implementation. Documented adversarial analysis for due diligence.
+
+**Implementation**: `apps/thinktank-admin/app/(dashboard)/living-parchment/debate/`
+
+---
+
+### Moat #20: Living Parchment UI (Sensory Decision Intelligence)
+
+Information has a heartbeat. No competitor offers sensory UI that communicates trust through visual breathing, living typography, and confidence terrain.
+
+| UI Element | Purpose | Implementation |
+|------------|---------|----------------|
+| Breathing Interfaces | Uncertainty indicator | 4-12 BPM animation |
+| Living Ink | Confidence in text | Font weight 350-500 |
+| Ghost Paths | Rejected alternatives | Translucent overlays |
+| Confidence Terrain | Decision topology | 3D grid visualization |
+
+**Competitive Gap**: ChatGPT, Claude, and Gemini all use static text. Think Tank's sensory UI creates immediate trust differentiation visible in demos.
+
+**Documentation**: THINKTANK-ADMIN-GUIDE.md Section 54
 
 ---
 
@@ -324,6 +438,11 @@ Achievement notifications, progress tracking, and engagement features:
 | 13 | Semantic Pattern Memory | Feature | Network effects |
 | 14 | Structure from Chaos | Feature | Think Tank differentiation |
 | 15 | Anti-Playbook Reasoning | Feature | Obsoletes static scripts |
+| 16 | Decision Intelligence Artifacts | Feature | **No competitor offers AI decision transparency** |
+| 17 | War Room | Feature | **No competitor offers strategic decision theater** |
+| 18 | Council of Experts | Feature | **No competitor offers multi-persona consultation** |
+| 19 | Debate Arena | Feature | **No competitor offers adversarial exploration UI** |
+| 20 | Living Parchment UI | UX | **No competitor offers sensory decision interfaces** |
 | — | Persistent Memory | Memory | Contextual gravity compounds |
 | — | Twilight Dreaming | Memory | Appreciating asset |
 | — | Economic Governor | UX | Cost transparency |

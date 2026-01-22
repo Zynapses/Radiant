@@ -169,8 +169,8 @@ async function createAgent(event: APIGatewayProxyEvent, tenantId: string): Promi
     ]
   );
 
-  const id = result.records?.[0]?.id;
-  return response(201, { id: typeof id === 'object' && 'stringValue' in id ? id.stringValue : id });
+  const id = result.rows?.[0]?.id ?? null;
+  return response(201, { id: typeof id === 'object' && id !== null && 'stringValue' in id ? id.stringValue : id });
 }
 
 async function updateAgent(event: APIGatewayProxyEvent, tenantId: string): Promise<APIGatewayProxyResult> {
@@ -306,14 +306,14 @@ async function listApps(event: APIGatewayProxyEvent, _tenantId: string): Promise
   sql += ` ORDER BY usage_count_30d DESC NULLS LAST, display_name LIMIT ${limit} OFFSET ${offset}`;
   
   const result = await executeStatement(sql, params);
-  const apps = (result.records || []).map(r => extractRow(r));
+  const apps = (result.rows || []).map(r => extractRow(r));
   
   // Get total count
   const countResult = await executeStatement(
     `SELECT COUNT(*) as total FROM apps WHERE is_active = true`,
     []
   );
-  const total = extractValue(countResult.records?.[0]?.total) || 0;
+  const total = extractValue(countResult.rows?.[0]?.total) || 0;
   
   return response(200, { apps, total, limit, offset });
 }
@@ -326,9 +326,9 @@ async function getApp(event: APIGatewayProxyEvent, tenantId: string): Promise<AP
     [stringParam('appId', appId || '')]
   );
   
-  if (!result.records?.[0]) return response(404, { error: 'App not found' });
+  if (!result.rows?.[0]) return response(404, { error: 'App not found' });
   
-  const app = extractRow(result.records[0]);
+  const app = extractRow(result.rows[0]);
   
   // Get connection status for this tenant
   const connResult = await executeStatement(
@@ -337,7 +337,7 @@ async function getApp(event: APIGatewayProxyEvent, tenantId: string): Promise<AP
     [stringParam('appId', appId || ''), stringParam('tenantId', tenantId)]
   );
   
-  const connections = (connResult.records || []).map(r => extractRow(r));
+  const connections = (connResult.rows || []).map(r => extractRow(r));
   
   return response(200, { app, connections });
 }
@@ -360,7 +360,7 @@ async function getSyncStatus(_event: APIGatewayProxyEvent, _tenantId: string): P
     []
   );
   
-  const logs = (result.records || []).map(r => extractRow(r));
+  const logs = (result.rows || []).map(r => extractRow(r));
   return response(200, { logs });
 }
 
@@ -383,7 +383,7 @@ async function listConnections(event: APIGatewayProxyEvent, tenantId: string): P
     [stringParam('tenantId', tenantId)]
   );
   
-  const connections = (result.records || []).map(r => extractRow(r));
+  const connections = (result.rows || []).map(r => extractRow(r));
   return response(200, { connections });
 }
 
@@ -419,7 +419,7 @@ async function listDecisions(event: APIGatewayProxyEvent, tenantId: string): Pro
   sql += ` ORDER BY created_at DESC LIMIT ${limit}`;
   
   const result = await executeStatement(sql, params);
-  const decisions = (result.records || []).map(r => extractRow(r));
+  const decisions = (result.rows || []).map(r => extractRow(r));
   
   return response(200, { decisions });
 }
@@ -432,9 +432,9 @@ async function getDecision(event: APIGatewayProxyEvent, tenantId: string): Promi
     [stringParam('decisionId', decisionId || ''), stringParam('tenantId', tenantId)]
   );
   
-  if (!result.records?.[0]) return response(404, { error: 'Decision not found' });
+  if (!result.rows?.[0]) return response(404, { error: 'Decision not found' });
   
-  return response(200, { decision: extractRow(result.records[0]) });
+  return response(200, { decision: extractRow(result.rows[0]) });
 }
 
 async function getWarRoom(event: APIGatewayProxyEvent, tenantId: string): Promise<APIGatewayProxyResult> {
@@ -445,14 +445,14 @@ async function getWarRoom(event: APIGatewayProxyEvent, tenantId: string): Promis
     `SELECT id FROM cato_decision_events WHERE id = :decisionId AND tenant_id = :tenantId`,
     [stringParam('decisionId', decisionId), stringParam('tenantId', tenantId)]
   );
-  if (!check.records?.[0]) return response(404, { error: 'Decision not found' });
+  if (!check.rows?.[0]) return response(404, { error: 'Decision not found' });
   
   const result = await executeStatement(
     `SELECT * FROM cato_war_room_deliberations WHERE decision_event_id = :decisionId ORDER BY phase_order`,
     [stringParam('decisionId', decisionId)]
   );
   
-  const deliberations = (result.records || []).map(r => extractRow(r));
+  const deliberations = (result.rows || []).map(r => extractRow(r));
   return response(200, { deliberations });
 }
 
@@ -466,9 +466,9 @@ async function getExplanation(event: APIGatewayProxyEvent, tenantId: string): Pr
     [stringParam('decisionId', decisionId), stringParam('tier', tier)]
   );
   
-  if (!result.records?.[0]) return response(404, { error: 'Explanation not found' });
+  if (!result.rows?.[0]) return response(404, { error: 'Explanation not found' });
   
-  return response(200, { explanation: extractRow(result.records[0]) });
+  return response(200, { explanation: extractRow(result.rows[0]) });
 }
 
 // ============================================================================
@@ -494,7 +494,7 @@ async function listApprovals(event: APIGatewayProxyEvent, tenantId: string): Pro
   sql += ` ORDER BY r.priority DESC, r.created_at LIMIT ${limit}`;
   
   const result = await executeStatement(sql, params);
-  const approvals = (result.records || []).map(r => extractRow(r));
+  const approvals = (result.rows || []).map(r => extractRow(r));
   
   return response(200, { approvals });
 }
@@ -507,7 +507,7 @@ async function listQueues(_event: APIGatewayProxyEvent, tenantId: string): Promi
     [stringParam('tenantId', tenantId)]
   );
   
-  const queues = (result.records || []).map(r => extractRow(r));
+  const queues = (result.rows || []).map(r => extractRow(r));
   return response(200, { queues });
 }
 
@@ -522,7 +522,7 @@ async function getApproval(event: APIGatewayProxyEvent, tenantId: string): Promi
     [stringParam('approvalId', approvalId || ''), stringParam('tenantId', tenantId)]
   );
   
-  if (!result.records?.[0]) return response(404, { error: 'Approval not found' });
+  if (!result.rows?.[0]) return response(404, { error: 'Approval not found' });
   
   // Get comments
   const comments = await executeStatement(
@@ -533,8 +533,8 @@ async function getApproval(event: APIGatewayProxyEvent, tenantId: string): Promi
   );
   
   return response(200, { 
-    approval: extractRow(result.records[0]),
-    comments: (comments.records || []).map(r => extractRow(r)),
+    approval: extractRow(result.rows[0]),
+    comments: (comments.rows || []).map(r => extractRow(r)),
   });
 }
 
@@ -566,7 +566,7 @@ async function approveRequest(event: APIGatewayProxyEvent, tenantId: string): Pr
     `SELECT agent_execution_id FROM hitl_approval_requests WHERE id = :approvalId`,
     [stringParam('approvalId', approvalId)]
   );
-  const executionId = extractValue(result.records?.[0]?.agent_execution_id);
+  const executionId = extractValue(result.rows?.[0]?.agent_execution_id);
   if (executionId) {
     await agentRuntimeService.resumeExecution(executionId as string, tenantId, body.modifications);
   }
@@ -600,7 +600,7 @@ async function rejectRequest(event: APIGatewayProxyEvent, tenantId: string): Pro
     `SELECT agent_execution_id FROM hitl_approval_requests WHERE id = :approvalId`,
     [stringParam('approvalId', approvalId)]
   );
-  const executionId = extractValue(result.records?.[0]?.agent_execution_id);
+  const executionId = extractValue(result.rows?.[0]?.agent_execution_id);
   if (executionId) {
     await agentRuntimeService.cancelExecution(executionId as string, tenantId, 'HITL request rejected');
   }
@@ -648,7 +648,7 @@ async function getAIHelperConfig(_event: APIGatewayProxyEvent, tenantId: string)
     [stringParam('tenantId', tenantId)]
   );
   
-  const configs = (result.records || []).map(r => extractRow(r));
+  const configs = (result.rows || []).map(r => extractRow(r));
   const tenantConfig = configs.find(c => c.scope === 'tenant');
   const systemConfig = configs.find(c => c.scope === 'system');
   
@@ -720,14 +720,14 @@ async function getAIHelperUsage(event: APIGatewayProxyEvent, tenantId: string): 
     [stringParam('tenantId', tenantId)]
   );
   
-  const usage = (result.records || []).map(r => extractRow(r));
+  const usage = (result.rows || []).map(r => extractRow(r));
   
   // Calculate totals
-  const totals = usage.reduce((acc, u) => ({
-    totalCalls: acc.totalCalls + (u.total_calls || 0),
-    cachedCalls: acc.cachedCalls + (u.cached_calls || 0),
-    failedCalls: acc.failedCalls + (u.failed_calls || 0),
-    totalCost: acc.totalCost + parseFloat(u.total_cost_usd || 0),
+  const totals = usage.reduce((acc: { totalCalls: number; cachedCalls: number; failedCalls: number; totalCost: number }, u: Record<string, unknown>) => ({
+    totalCalls: acc.totalCalls + (Number(u.total_calls) || 0),
+    cachedCalls: acc.cachedCalls + (Number(u.cached_calls) || 0),
+    failedCalls: acc.failedCalls + (Number(u.failed_calls) || 0),
+    totalCost: acc.totalCost + parseFloat(String(u.total_cost_usd || '0')),
   }), { totalCalls: 0, cachedCalls: 0, failedCalls: 0, totalCost: 0 });
   
   return response(200, { usage, totals });
@@ -782,11 +782,11 @@ async function getDashboard(_event: APIGatewayProxyEvent, tenantId: string): Pro
   );
   
   return response(200, {
-    agents: extractRow(agentResult.records?.[0] || {}),
-    executions: extractRow(execResult.records?.[0] || {}),
-    pendingApprovals: extractValue(approvalResult.records?.[0]?.pending) || 0,
-    connectedApps: extractValue(appsResult.records?.[0]?.connected_apps) || 0,
-    aiHelperToday: extractRow(aiResult.records?.[0] || {}),
+    agents: extractRow(agentResult.rows?.[0] || {}),
+    executions: extractRow(execResult.rows?.[0] || {}),
+    pendingApprovals: extractValue(approvalResult.rows?.[0]?.pending) || 0,
+    connectedApps: extractValue(appsResult.rows?.[0]?.connected_apps) || 0,
+    aiHelperToday: extractRow(aiResult.rows?.[0] || {}),
   });
 }
 

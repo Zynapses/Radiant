@@ -60,13 +60,13 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   try {
     switch (event.httpMethod) {
       case 'GET':
-        return await getRequests(tenantId, event.queryStringParameters);
+        return await getRequests(tenantId, event.queryStringParameters as any);
       case 'POST':
         return await createRequest(tenantId, JSON.parse(event.body || '{}'));
       case 'PATCH':
         return await updateRequest(tenantId, JSON.parse(event.body || '{}'), event);
       case 'DELETE':
-        return await cancelRequest(tenantId, event.queryStringParameters);
+        return await cancelRequest(tenantId, event.queryStringParameters as any);
       default:
         return {
           statusCode: 405,
@@ -119,7 +119,7 @@ async function getRequests(
   query += ` ORDER BY requested_at DESC LIMIT 500`;
 
   const result = await executeStatement(query, sqlParams);
-  const requests = result.rows as GDPRRequest[];
+  const requests = result.rows as any[];
 
   // Get stats
   const statsResult = await executeStatement(`

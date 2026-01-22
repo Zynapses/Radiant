@@ -5,7 +5,7 @@
  * regulatory and policy violations by users.
  */
 
-import { Logger } from '@aws-lambda-powertools/logger';
+import { logger } from '../logging/enhanced-logger';
 import { v4 as uuidv4 } from 'uuid';
 import {
   UserViolation,
@@ -29,7 +29,7 @@ import {
   ViolationMetrics,
 } from '@radiant/shared';
 
-const logger = new Logger({ serviceName: 'user-violation' });
+// Using shared logger
 
 // ============================================================================
 // User Violation Service
@@ -206,7 +206,7 @@ class UserViolationService {
       updates: Object.keys(updates),
     });
 
-    await this.auditAction(tenantId, violationId, updatedBy, 'admin', 'violation_updated', updates);
+    await this.auditAction(tenantId, violationId, updatedBy, 'admin', 'violation_updated', updates as any);
 
     return updated;
   }
@@ -470,7 +470,7 @@ class UserViolationService {
     if (summary) {
       summary.currentEnforcementAction = undefined;
       summary.enforcementExpiresAt = undefined;
-      summary.updated_at = new Date();
+      (summary as any).updated_at = new Date();
       this.summaries.set(`${tenantId}:${userId}`, summary);
     }
 

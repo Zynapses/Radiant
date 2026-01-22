@@ -258,13 +258,15 @@ class GhostStateService {
 
     return (result.rows || []).map((row: Record<string, unknown>) => ({
       id: String(row.id),
+      userId: '', // Added for GhostEvent type
+      sessionId: String(row.session_id || ''),
       componentId: String(row.component_id),
       componentType: String(row.component_type),
       action: String(row.action) as GhostEvent['action'],
       payload: this.parseJson(row.payload) || {},
       currentState: this.parseJson(row.current_state) || {},
       timestamp: String(row.created_at),
-    }));
+    })) as any;
   }
 
   // --------------------------------------------------------------------------

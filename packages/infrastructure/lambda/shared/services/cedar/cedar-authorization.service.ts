@@ -5,9 +5,9 @@
  * Uses Cedar policy language for fine-grained access control.
  */
 
-import { Logger } from '@aws-lambda-powertools/logger';
+import { enhancedLogger as logger } from '../../logging/enhanced-logger';
 
-const logger = new Logger({ serviceName: 'cedar-authorization' });
+// Using shared logger
 
 // =============================================================================
 // TYPES

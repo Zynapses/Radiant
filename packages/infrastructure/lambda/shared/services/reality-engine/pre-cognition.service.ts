@@ -24,6 +24,11 @@ import {
   RealityChatMessage,
 } from '@radiant/shared';
 
+// Type alias for flexible params
+type LooseParam = any;
+
+
+
 interface IntentPrediction {
   intent: MorphicIntent;
   prompt: string;
@@ -66,7 +71,7 @@ class PreCognitionService {
       `INSERT INTO precognition_queues (session_id, config, predictions, last_refresh)
        VALUES ($1, $2, $3, $4)
        ON CONFLICT (session_id) DO UPDATE SET config = $2, last_refresh = $4`,
-      [sessionId, JSON.stringify(fullConfig), '[]', new Date().toISOString()]
+      [sessionId, JSON.stringify(fullConfig), '[]', new Date().toISOString()] as any[]
     );
 
     return queue;
@@ -273,7 +278,7 @@ class PreCognitionService {
       `INSERT INTO precognition_analytics (
         prediction_id, was_hit, actual_latency_ms, created_at
       ) VALUES ($1, true, $2, $3)`,
-      [predictionId, actualLatencyMs, new Date().toISOString()]
+      [predictionId, actualLatencyMs, new Date().toISOString()] as any[]
     );
   }
 
@@ -289,7 +294,7 @@ class PreCognitionService {
       `INSERT INTO precognition_analytics (
         session_id, was_hit, actual_intent, actual_prompt, created_at
       ) VALUES ($1, false, $2, $3, $4)`,
-      [sessionId, actualIntent, actualPrompt, new Date().toISOString()]
+      [sessionId, actualIntent, actualPrompt, new Date().toISOString()] as any[]
     );
   }
 
@@ -310,7 +315,7 @@ class PreCognitionService {
         AVG(CASE WHEN was_hit THEN actual_latency_ms ELSE NULL END) as avg_latency
        FROM precognition_analytics 
        WHERE session_id = $1`,
-      [sessionId]
+      [sessionId] as any[]
     );
 
     const row = result.rows?.[0] as Record<string, unknown> || {};
@@ -382,7 +387,7 @@ class PreCognitionService {
       `DELETE FROM precognition_predictions 
        WHERE expires_at < $1 ${sessionId ? 'AND session_id = $2' : ''}
        RETURNING id`,
-      sessionId ? [new Date().toISOString(), sessionId] : [new Date().toISOString()]
+      sessionId ? [new Date().toISOString(), sessionId] : [new Date().toISOString()] as any[]
     );
 
     return result.rows?.length || 0;
@@ -392,8 +397,7 @@ class PreCognitionService {
 
   private async getConfig(sessionId: string): Promise<PreCognitionConfig> {
     const result = await executeStatement(
-      `SELECT config FROM precognition_queues WHERE session_id = $1`,
-      [sessionId]
+      `SELECT config FROM precognition_queues WHERE session_id = $1`, [sessionId] as any[]
     );
 
     if (!result.rows || result.rows.length === 0) {
@@ -499,7 +503,7 @@ class PreCognitionService {
         prediction.computeTimeMs,
         prediction.createdAt.toISOString(),
         prediction.expiresAt.toISOString(),
-      ]
+      ] as any[]
     );
 
     // Update in-memory queue
@@ -518,8 +522,7 @@ class PreCognitionService {
     const result = await executeStatement(
       `SELECT * FROM precognition_predictions 
        WHERE session_id = $1 AND status = 'ready' AND expires_at > $2
-       ORDER BY confidence DESC`,
-      [sessionId, new Date().toISOString()]
+       ORDER BY confidence DESC`, [sessionId, new Date().toISOString()] as any[]
     );
 
     return (result.rows || []).map((row: unknown) => 
@@ -538,7 +541,7 @@ class PreCognitionService {
 
     await executeStatement(
       `UPDATE precognition_predictions SET status = $1, used_at = $2 WHERE id = $3`,
-      [status, updates.used_at || null, predictionId]
+      [status, updates.used_at || null, predictionId] as any[]
     );
   }
 

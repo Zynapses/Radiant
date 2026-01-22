@@ -22,6 +22,64 @@ import { COMPONENT_REGISTRY, getComponent } from './component-registry';
 // Framework Templates
 // ============================================================================
 
+// Config file contents
+const NEXT_CONFIG = `/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+};
+export default nextConfig;
+`;
+const VITE_CONFIG = `import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+});
+`;
+const TS_CONFIG = `{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src", "app"]
+}
+`;
+const TAILWIND_CONFIG = `import type { Config } from 'tailwindcss';
+
+const config: Config = {
+  content: [
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+export default config;
+`;
+const POSTCSS_CONFIG = `export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+`;
+
 const FRAMEWORK_TEMPLATES: Record<string, FrameworkTemplate> = {
   nextjs: {
     name: 'Next.js',
@@ -95,67 +153,10 @@ const FRAMEWORK_TEMPLATES: Record<string, FrameworkTemplate> = {
   },
 };
 
-// Config file contents
-const NEXT_CONFIG = `/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-};
-export default nextConfig;
-`;
 
-const VITE_CONFIG = `import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 
-export default defineConfig({
-  plugins: [react()],
-});
-`;
 
-const TS_CONFIG = `{
-  "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
-  },
-  "include": ["src", "app"]
-}
-`;
 
-const TAILWIND_CONFIG = `import type { Config } from 'tailwindcss';
-
-const config: Config = {
-  content: [
-    './src/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};
-export default config;
-`;
-
-const POSTCSS_CONFIG = `export default {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-};
-`;
 
 interface FrameworkTemplate {
   name: string;
@@ -862,7 +863,7 @@ Built with ❤️ by Radiant
         tenantId: String(row.tenant_id),
         userId: String(row.user_id),
         mode: String(row.mode) as any,
-        currentSchema: this.parseJson(row.current_schema),
+        currentSchema: this.parseJson(row.current_schema) ?? undefined,
         ghostState: this.parseJson(row.ghost_state) || {},
         eventHistory: [],
         reactionHistory: [],

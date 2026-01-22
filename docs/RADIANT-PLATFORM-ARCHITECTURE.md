@@ -83,6 +83,7 @@
 | `admin-billing` | Billing operations | API Gateway |
 | `admin-audit` | Audit log access | API Gateway |
 | `admin-approvals` | Deployment approvals | API Gateway |
+| `admin-ai-reports` | AI report generation, brand kits, exports | API Gateway |
 
 ### Scheduled Lambda Functions
 
@@ -873,6 +874,7 @@ Execute in this order:
 7. **V2026_01_20_008** - HITL Approval Queues
 8. **V2026_01_20_009** - Execution History
 9. **V2026_01_20_010** - Seed Data (Built-in Agents, Sample Apps)
+10. **V2026_01_21_005** - AI Reports (brand_kits, report_templates, generated_reports, report_smart_insights, report_exports, report_chat_history, report_schedules)
 
 ---
 
@@ -967,6 +969,107 @@ GET    /api/admin/sovereign-mesh/ai-helper/usage     Get usage statistics
 GET    /api/admin/sovereign-mesh/dashboard           Get overview metrics
 ```
 
+## 4.7 AI Reports APIs (v5.42.0)
+
+```
+GET    /api/admin/ai-reports                         List reports (paginated)
+POST   /api/admin/ai-reports/generate                Generate new report with AI
+GET    /api/admin/ai-reports/:id                     Get report by ID
+PUT    /api/admin/ai-reports/:id                     Update report
+DELETE /api/admin/ai-reports/:id                     Delete report
+POST   /api/admin/ai-reports/:id/export              Export to PDF/Excel/HTML/JSON
+
+GET    /api/admin/ai-reports/templates               List templates
+POST   /api/admin/ai-reports/templates               Create template
+
+GET    /api/admin/ai-reports/brand-kits              List brand kits
+POST   /api/admin/ai-reports/brand-kits              Create brand kit
+PUT    /api/admin/ai-reports/brand-kits/:id          Update brand kit
+DELETE /api/admin/ai-reports/brand-kits/:id          Delete brand kit
+
+POST   /api/admin/ai-reports/chat                    Send chat message for modifications
+GET    /api/admin/ai-reports/insights                Get insights dashboard
+```
+
+---
+
+## 4.8 RAWS APIs (v1.1)
+
+```
+POST   /api/admin/raws/select              Select optimal model
+GET    /api/admin/raws/profiles            List all 13 weight profiles
+POST   /api/admin/raws/profiles            Create custom profile
+GET    /api/admin/raws/profiles/:id        Get profile details
+GET    /api/admin/raws/models              List available models
+GET    /api/admin/raws/models/:id          Get model details
+GET    /api/admin/raws/domains             List 7 domain configurations
+POST   /api/admin/raws/detect-domain       Test domain detection
+GET    /api/admin/raws/health              Provider health status
+GET    /api/admin/raws/audit               Selection audit log
+```
+
+---
+
+# PART 5: RAWS v1.1 - MODEL SELECTION SYSTEM
+
+## 5.1 Overview
+
+RAWS (RADIANT AI Weighted Selection) provides intelligent real-time model selection using:
+
+| Component | Count | Description |
+|-----------|-------|-------------|
+| Dimensions | 8 | Quality, Cost, Latency, Capability, Reliability, Compliance, Availability, Learning |
+| Profiles | 13 | 4 Optimization + 6 Domain + 3 SOFAI |
+| Domains | 7 | Healthcare, Financial, Legal, Scientific, Creative, Engineering, General |
+| Models | 106+ | 50 external APIs + 56 self-hosted |
+
+## 5.2 Weight Profiles
+
+| Profile | Category | Q | C | L | K | R | P | A | E |
+|---------|----------|-----|-----|-----|-----|-----|-----|-----|-----|
+| BALANCED | Optimization | 0.25 | 0.20 | 0.15 | 0.15 | 0.10 | 0.05 | 0.05 | 0.05 |
+| QUALITY_FIRST | Optimization | 0.40 | 0.10 | 0.10 | 0.15 | 0.10 | 0.05 | 0.05 | 0.05 |
+| COST_OPTIMIZED | Optimization | 0.20 | 0.35 | 0.15 | 0.10 | 0.05 | 0.05 | 0.05 | 0.05 |
+| LATENCY_CRITICAL | Optimization | 0.15 | 0.10 | 0.35 | 0.15 | 0.10 | 0.05 | 0.05 | 0.05 |
+| HEALTHCARE | Domain | 0.30 | 0.05 | 0.10 | 0.15 | 0.10 | 0.20 | 0.05 | 0.05 |
+| FINANCIAL | Domain | 0.30 | 0.10 | 0.10 | 0.15 | 0.10 | 0.15 | 0.05 | 0.05 |
+| LEGAL | Domain | 0.35 | 0.05 | 0.05 | 0.20 | 0.10 | 0.15 | 0.05 | 0.05 |
+| SCIENTIFIC | Domain | 0.35 | 0.10 | 0.10 | 0.20 | 0.08 | 0.05 | 0.05 | 0.07 |
+| CREATIVE | Domain | 0.20 | 0.25 | 0.20 | 0.15 | 0.05 | 0.00 | 0.05 | 0.10 |
+| ENGINEERING | Domain | 0.30 | 0.15 | 0.15 | 0.20 | 0.10 | 0.00 | 0.05 | 0.05 |
+| SYSTEM_1 | SOFAI | 0.15 | 0.30 | 0.30 | 0.10 | 0.05 | 0.00 | 0.05 | 0.05 |
+| SYSTEM_2 | SOFAI | 0.35 | 0.10 | 0.10 | 0.15 | 0.10 | 0.10 | 0.05 | 0.05 |
+| SYSTEM_2_5 | SOFAI | 0.40 | 0.05 | 0.05 | 0.20 | 0.10 | 0.10 | 0.05 | 0.05 |
+
+## 5.3 Domain Compliance Matrix
+
+| Domain | Required | Optional | Truth Engine | ECD |
+|--------|----------|----------|--------------|-----|
+| healthcare | HIPAA | FDA 21 CFR Part 11 | Required | 0.05 |
+| financial | SOC 2 Type II | PCI-DSS, GDPR, SOX | Required | 0.05 |
+| legal | SOC 2 Type II | GDPR, State Bar | Required | 0.05 |
+| scientific | None | FDA 21 CFR, GLP, IRB | Optional | 0.08 |
+| creative | None | FTC Guidelines | Not Required | 0.20 |
+| engineering | None | SOC 2, ISO 27001, NIST | Optional | 0.10 |
+| general | None | None | Not Required | 0.10 |
+
+## 5.4 Key Files
+
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_01_21_004__raws_weighted_selection.sql` | Database schema |
+| `lambda/shared/services/raws/types.ts` | TypeScript types |
+| `lambda/shared/services/raws/domain-detector.service.ts` | Domain detection |
+| `lambda/shared/services/raws/weight-profile.service.ts` | Profile management |
+| `lambda/shared/services/raws/selection.service.ts` | Main selection logic |
+| `lambda/admin/raws.ts` | Admin API handler |
+
+## 5.5 Detailed Documentation
+
+- [RAWS-ENGINEERING.md](./RAWS-ENGINEERING.md) - Technical reference
+- [RAWS-ADMIN-GUIDE.md](./RAWS-ADMIN-GUIDE.md) - Operations guide
+- [RAWS-USER-GUIDE.md](./RAWS-USER-GUIDE.md) - API guide for developers
+
 ---
 
 # APPENDIX A: GLOSSARY
@@ -979,6 +1082,7 @@ GET    /api/admin/sovereign-mesh/dashboard           Get overview metrics
 | **War Room** | Multi-model debate workflow |
 | **Sniper Mode** | Single-model fast execution |
 | **ECD** | Entity-Context Divergence (hallucination score) |
+| **RAWS** | RADIANT AI Weighted Selection (model orchestration) |
 | **CBF** | Control Barrier Function (safety constraint) |
 | **OODA** | Observe-Orient-Decide-Act loop |
 | **HITL** | Human-in-the-Loop |

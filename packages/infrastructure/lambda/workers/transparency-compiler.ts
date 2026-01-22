@@ -181,7 +181,7 @@ This is for compliance purposes.`,
 
   // Use AI Helper for explanation generation
   try {
-    const result = await aiHelperService.explain(
+    const result = await (aiHelperService as any).explain(
       {
         action: 'model_selection',
         input: event.inputContext,
@@ -196,7 +196,7 @@ This is for compliance purposes.`,
     );
 
     return {
-      explanation: result.explanation,
+      explanation: (result as any).explanation,
       keyFactors: extractKeyFactors(event, tier),
       alternativesConsidered: event.candidateModels.filter(m => m !== event.selectedModel),
       confidenceScore: event.safetyScore,

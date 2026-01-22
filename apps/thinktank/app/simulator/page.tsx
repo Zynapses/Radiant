@@ -65,7 +65,7 @@ import {
   Toggle,
   Button,
   cn,
-  EmptyState,
+
   Tabs,
 } from './ui-components';
 import {
@@ -83,7 +83,7 @@ import {
   MOCK_BRAIN_PLAN,
   MOCK_SNAPSHOTS,
   MOCK_WORKFLOW_STEPS,
-  MOCK_WORKFLOWS,
+
   MOCK_ARTIFACTS,
   MOCK_RULES,
   MOCK_USER_PROFILE,

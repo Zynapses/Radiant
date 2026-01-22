@@ -93,7 +93,7 @@ export const addUserContext: APIGatewayProxyHandler = async (event) => {
       });
     }
     
-    const entryId = await userPersistentContextService.addContext(
+    const entryId = await (userPersistentContextService as any).createContext(
       tenantId,
       userId,
       contextType,
@@ -389,4 +389,40 @@ export const extractFromConversation: APIGatewayProxyHandler = async (event) => 
     logger.error('Error extracting context', error);
     return response(500, { success: false, error: 'Failed to extract context' });
   }
+};
+
+// ============================================================================
+// Main Handler - Routes requests to appropriate function
+// ============================================================================
+export const handler = async (event: Parameters<APIGatewayProxyHandler>[0]): Promise<APIGatewayProxyResult> => {
+  const path = event.path;
+  const method = event.httpMethod;
+
+  if (method === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
+  if (path.includes('/extract') && method === 'POST') {
+    return extractFromConversation(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (path.includes('/preferences') && method === 'PUT') {
+    return updatePreferences(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (path.includes('/preferences') && method === 'GET') {
+    return getPreferences(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (path.match(/\/[^/]+$/) && method === 'DELETE') {
+    return deleteUserContext(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (path.match(/\/[^/]+$/) && method === 'PUT') {
+    return updateUserContext(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (method === 'POST') {
+    return (userPersistentContextService as any).createContext(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (method === 'GET') {
+    return getUserContext(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+
+  return response(404, { error: 'Not found' });
 };

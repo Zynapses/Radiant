@@ -5,10 +5,12 @@
 
 export {
   executeStatement,
+  executeQuery,
   stringParam,
   longParam,
   doubleParam,
   boolParam,
+  uuidParam,
 } from '../db/client';
 
 // Alias for compatibility

@@ -19,9 +19,29 @@ For EVERY feature, update these IN THE SAME TASK (not later):
 | Database tables | `docs/sections/SECTION-07-DATABASE-SCHEMA.md` |
 | Platform admin features | `docs/RADIANT-ADMIN-GUIDE.md` + `docs/STRATEGIC-VISION-MARKETING.md` |
 | Think Tank admin features | `docs/THINKTANK-ADMIN-GUIDE.md` + `docs/STRATEGIC-VISION-MARKETING.md` |
+| Think Tank user-facing features | `docs/THINKTANK-USER-GUIDE.md` |
 | Lambda services/handlers | `docs/ENGINEERING-IMPLEMENTATION-VISION.md` (Section 5) |
 | Any feature | `CHANGELOG.md` |
 | Significant feature | `docs/FEATURE-NAME.md` (standalone) |
+| Competitive advantage feature | `docs/THINKTANK-MOATS.md` AND/OR `docs/RADIANT-MOATS.md` |
+
+### COMPLETE DOCUMENTATION SET (All 9 targets)
+
+**EVERY significant feature must trigger review of ALL applicable documents:**
+
+| # | Document | When to Update | Auto-Update Trigger |
+|---|----------|----------------|---------------------|
+| 1 | `CHANGELOG.md` | **ALWAYS** | Any feature or fix |
+| 2 | `docs/RADIANT-ADMIN-GUIDE.md` | Platform features | New admin capability |
+| 3 | `docs/THINKTANK-ADMIN-GUIDE.md` | Think Tank admin features | New TT admin capability |
+| 4 | `docs/THINKTANK-USER-GUIDE.md` | User-visible features | Any user-facing change |
+| 5 | `docs/STRATEGIC-VISION-MARKETING.md` | Major features | When updating #2 or #3 |
+| 6 | `docs/ENGINEERING-IMPLEMENTATION-VISION.md` | Technical architecture | New services/patterns |
+| 7 | `docs/THINKTANK-MOATS.md` | Competitive differentiators | New Think Tank advantage |
+| 8 | `docs/RADIANT-MOATS.md` | Platform differentiators | New platform advantage |
+| 9 | `docs/sections/SECTION-07-DATABASE-SCHEMA.md` | Database changes | New tables/columns |
+
+**NEVER require user to remind you to update documentation. If a feature is significant enough to implement, it's significant enough to document in ALL applicable locations.**
 
 ### ⚠️ AUTOMATIC: Strategic Vision Update
 
@@ -32,16 +52,31 @@ For EVERY feature, update these IN THE SAME TASK (not later):
 3. Update version numbers if changed
 4. Add to Document History table
 
-### Two Admin Guides
+### Pre-Implementation Checklist
 
-RADIANT has exactly **TWO** admin guides:
+**BEFORE writing ANY code for a significant feature, mentally check:**
 
-| Guide | Purpose | When to update |
-|-------|---------|----------------|
-| `docs/RADIANT-ADMIN-GUIDE.md` | Platform administration: tenants, billing, models, providers, security, infrastructure | Platform/infrastructure features |
-| `docs/THINKTANK-ADMIN-GUIDE.md` | Think Tank administration: user rules, delight system, brain plans, pre-prompts, domains | Think Tank/consumer features |
+```
+□ Will this create database tables? → Section 07 + relevant admin guide
+□ Is this user-visible? → THINKTANK-USER-GUIDE.md
+□ Is this admin-configurable? → THINKTANK-ADMIN-GUIDE.md or RADIANT-ADMIN-GUIDE.md
+□ Is this a competitive advantage? → THINKTANK-MOATS.md or RADIANT-MOATS.md
+□ Does this affect architecture? → ENGINEERING-IMPLEMENTATION-VISION.md
+□ Is this a major feature? → STRATEGIC-VISION-MARKETING.md
+□ Any feature at all? → CHANGELOG.md (ALWAYS)
+```
 
-**Update the appropriate guide based on what you're building. If a feature spans both, update both.**
+### Three Documentation Tiers
+
+RADIANT has **THREE** main documentation tiers:
+
+| Guide | Audience | Purpose | When to update |
+|-------|----------|---------|----------------|
+| `docs/RADIANT-ADMIN-GUIDE.md` | Platform Admins | Tenants, billing, models, providers, security, infrastructure | Platform/infrastructure features |
+| `docs/THINKTANK-ADMIN-GUIDE.md` | Think Tank Admins | User rules, delight system, brain plans, pre-prompts, domains | Think Tank admin features |
+| `docs/THINKTANK-USER-GUIDE.md` | End Users | How to use Think Tank, personalization, understanding AI decisions | Any user-visible feature |
+
+**Update the appropriate guide based on what you're building. If a feature spans multiple audiences, update multiple guides.**
 
 ### NEVER do this:
 ❌ "I'll update the admin guide later"  
@@ -174,8 +209,8 @@ Before completing ANY feature or change, verify:
 ### Think Tank / User-Facing Features
 | Location | Required |
 |----------|----------|
-| Standalone `docs/*.md` | ✅ Always |
-| `docs/RADIANT-ADMIN-GUIDE.md` | If admin-configurable |
+| `docs/THINKTANK-USER-GUIDE.md` | ✅ Always for user-visible features |
+| `docs/THINKTANK-ADMIN-GUIDE.md` | If admin-configurable |
 | `CHANGELOG.md` | ✅ Always |
 | `docs/sections/SECTION-07-DATABASE-SCHEMA.md` | If new tables |
 

@@ -368,3 +368,39 @@ export const getDerivationQuality: APIGatewayProxyHandler = async (event) => {
     return error(500, 'Failed to get quality metrics');
   }
 };
+
+// ============================================================================
+// Main Handler - Routes requests to appropriate function
+// ============================================================================
+export const handler = async (event: Parameters<APIGatewayProxyHandler>[0]): Promise<APIGatewayProxyResult> => {
+  const path = event.path;
+  const method = event.httpMethod;
+
+  if (method === 'OPTIONS') {
+    return { statusCode: 200, headers: corsHeaders, body: '' };
+  }
+
+  if (path.includes('/quality') && method === 'GET') {
+    return getDerivationQuality(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (path.includes('/timeline') && method === 'GET') {
+    return getDerivationTimeline(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (path.includes('/sources') && method === 'GET') {
+    return getDerivationSteps(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (path.includes('/models') && method === 'GET') {
+    return getDerivationModels(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (path.includes('/compare') && method === 'POST') {
+    return (resultDerivationService as any).compareDerivations(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (path.match(/\/[^/]+$/) && method === 'GET') {
+    return getDerivation(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+  if (method === 'GET') {
+    return listUserDerivations(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+  }
+
+  return error(404, 'Not found');
+};

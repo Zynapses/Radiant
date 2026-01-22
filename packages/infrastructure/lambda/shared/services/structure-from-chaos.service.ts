@@ -5,7 +5,7 @@
  * Think Tank differentiation vs Miro/Mural.
  */
 
-import { Logger } from '@aws-lambda-powertools/logger';
+import { logger } from '../logging/enhanced-logger';
 import { v4 as uuidv4 } from 'uuid';
 import {
   ChaoticInput,
@@ -30,7 +30,7 @@ import {
   ChaosSectionType,
 } from '@radiant/shared';
 
-const logger = new Logger({ serviceName: 'structure-from-chaos' });
+// Using shared logger
 
 class StructureFromChaosService {
   private static instance: StructureFromChaosService;

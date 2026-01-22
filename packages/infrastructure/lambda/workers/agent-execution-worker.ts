@@ -9,6 +9,8 @@ import { SQSHandler, SQSRecord } from 'aws-lambda';
 import { executeStatement, stringParam, longParam, doubleParam } from '../shared/db/client';
 import { enhancedLogger } from '../shared/logging/enhanced-logger';
 import { agentRuntimeService, snapshotCaptureService } from '../shared/services/sovereign-mesh';
+import { sqsDispatcherService } from '../shared/services/sovereign-mesh/sqs-dispatcher.service';
+import { redisCacheService } from '../shared/services/sovereign-mesh/redis-cache.service';
 
 interface IterationResult {
   phase: string;
@@ -338,10 +340,20 @@ async function applyModifications(executionId: string, modifications: Record<str
 }
 
 async function queueNextIteration(executionId: string, tenantId: string): Promise<void> {
-  // In production, this would send a message to SQS
-  // For now, we log it - the CDK stack will handle actual queueing
-  logger.info('Queueing next iteration', { executionId, tenantId });
+  const result = await sqsDispatcherService.queueNextIteration(executionId, tenantId);
   
-  // Simulate immediate processing for sync execution mode
-  // In async mode, this would be handled by SQS
+  if (!result.success) {
+    logger.error('Failed to queue next iteration', { 
+      executionId, 
+      tenantId, 
+      error: result.error 
+    });
+    throw new Error(`Failed to queue next iteration: ${result.error}`);
+  }
+  
+  logger.info('Next iteration queued', { 
+    executionId, 
+    tenantId, 
+    messageId: result.messageId 
+  });
 }

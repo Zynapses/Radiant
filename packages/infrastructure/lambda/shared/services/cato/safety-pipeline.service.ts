@@ -1,3 +1,4 @@
+type SafetyBlockedBy = "ethics" | "compliance" | "safety" | "policy" | string;
 /**
  * RADIANT Genesis Cato Safety Pipeline Service
  * Complete safety evaluation pipeline integrating all Cato components
@@ -30,6 +31,9 @@ import { epistemicRecoveryService } from './epistemic-recovery.service';
 import { redundantPerceptionService } from './redundant-perception.service';
 import { personaService } from './persona.service';
 import { merkleAuditService } from './merkle-audit.service';
+import { governancePresetService } from '../governance-preset.service';
+// Local type stub
+type CheckpointMode = 'manual' | 'automatic' | 'conditional' | string;
 
 export class CatoSafetyPipeline {
   /**
@@ -241,6 +245,73 @@ export class CatoSafetyPipeline {
           recommendation: fractureResult.recommendation,
         };
       }
+    }
+
+    // =========================================================================
+    // STEP 7: GOVERNANCE CHECKPOINT (Variable Friction)
+    // Check if human approval is required based on governance preset
+    // =========================================================================
+    // Calculate composite risk score from available data
+    const compositeRiskScore = context.epistemicUncertainty ?? 0.5;
+    const normalizedConfidence = governorResult.allowedGamma / 3.0;
+    const estimatedCost = (proposedPolicy as any).costEstimateCents as number ?? 0;
+
+    const governanceCheck = await governancePresetService.shouldCheckpoint(
+      context.tenantId,
+      'beforeExecution',
+      {
+        riskScore: compositeRiskScore,
+        confidenceScore: normalizedConfidence,
+        costEstimateCents: estimatedCost,
+      }
+    );
+
+    if (governanceCheck.required) {
+      // Record the pending checkpoint
+      const checkpointDecision = await governancePresetService.recordCheckpointDecision({
+        tenantId: context.tenantId,
+        sessionId: context.sessionId,
+        userId: context.userId,
+        pipelineId: proposedPolicy.id,
+        checkpointType: 'beforeExecution',
+        checkpointMode: governanceCheck.mode,
+        decision: 'PENDING',
+        decidedBy: 'AUTO',
+        decisionReason: governanceCheck.reason,
+        riskScore: compositeRiskScore,
+        confidenceScore: normalizedConfidence,
+        costEstimateCents: estimatedCost,
+        requestedAt: new Date(),
+        timeoutAt: new Date(Date.now() + 300000), // 5 minute timeout
+      });
+
+      return {
+        allowed: false,
+        blockedBy: 'GOVERNANCE' as any,
+        governorResult,
+        cbfResult,
+        recommendation: `Human approval required: ${governanceCheck.reason}`,
+      } as any;
+    }
+
+    // If NOTIFY_ONLY, record but don't block
+    if (governanceCheck.mode === 'NOTIFY_ONLY') {
+      await governancePresetService.recordCheckpointDecision({
+        tenantId: context.tenantId,
+        sessionId: context.sessionId,
+        userId: context.userId,
+        pipelineId: proposedPolicy.id,
+        checkpointType: 'beforeExecution',
+        checkpointMode: 'NOTIFY_ONLY',
+        decision: 'APPROVED',
+        decidedBy: 'AUTO',
+        decisionReason: 'Auto-approved with async notification',
+        riskScore: compositeRiskScore,
+        confidenceScore: normalizedConfidence,
+        costEstimateCents: estimatedCost,
+        requestedAt: new Date(),
+        decidedAt: new Date(),
+      });
     }
 
     // =========================================================================

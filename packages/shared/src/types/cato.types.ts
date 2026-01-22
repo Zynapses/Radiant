@@ -35,6 +35,136 @@ export const DEFAULT_PERSONA_NAME = 'balanced';
 export const RECOVERY_PERSONA_NAME = 'scout';
 
 // ============================================================================
+// GOVERNANCE PRESETS (Variable Friction)
+// User-friendly "leash length" abstraction over technical Moods
+// ============================================================================
+
+/**
+ * Governance Presets - "The Leash Metaphor"
+ * 
+ * These map to underlying Moods but provide a simpler mental model:
+ * - PARANOID (Short leash): Every decision requires human approval
+ * - BALANCED (Medium leash): Auto-approve low-risk, checkpoint medium+high risk
+ * - COWBOY (Long leash): Full autonomy, humans notified async
+ */
+export type GovernancePreset = 'paranoid' | 'balanced' | 'cowboy';
+
+export interface GovernancePresetConfig {
+  preset: GovernancePreset;
+  /** Display name for UI */
+  displayName: string;
+  /** Emoji icon */
+  icon: string;
+  /** User-facing description */
+  description: string;
+  /** Maps to internal Mood */
+  mappedMood: string;
+  /** Friction level 0-1 (0=full auto, 1=full manual) */
+  frictionLevel: number;
+  /** Risk threshold for auto-approval (0-1) */
+  autoApproveThreshold: number;
+  /** Checkpoint configuration */
+  checkpoints: GovernanceCheckpointConfig;
+}
+
+export interface GovernanceCheckpointConfig {
+  /** CP1: After intent classification */
+  afterObserver: CheckpointMode;
+  /** CP2: After plan proposal */
+  afterProposer: CheckpointMode;
+  /** CP3: After critic review */
+  afterCritics: CheckpointMode;
+  /** CP4: Before execution */
+  beforeExecution: CheckpointMode;
+  /** CP5: After execution (for review) */
+  afterExecution: CheckpointMode;
+}
+
+export type CheckpointMode = 
+  | 'ALWAYS'           // Always require human approval
+  | 'CONDITIONAL'      // Based on risk/confidence thresholds
+  | 'NEVER'            // Auto-approve
+  | 'NOTIFY_ONLY';     // Proceed but notify human
+
+/**
+ * Default preset configurations
+ */
+export const GOVERNANCE_PRESETS: Record<GovernancePreset, GovernancePresetConfig> = {
+  paranoid: {
+    preset: 'paranoid',
+    displayName: 'Paranoid',
+    icon: '🛡️',
+    description: 'Every decision requires human approval. Maximum oversight.',
+    mappedMood: 'scout',
+    frictionLevel: 1.0,
+    autoApproveThreshold: 0.0,
+    checkpoints: {
+      afterObserver: 'ALWAYS',
+      afterProposer: 'ALWAYS',
+      afterCritics: 'ALWAYS',
+      beforeExecution: 'ALWAYS',
+      afterExecution: 'ALWAYS',
+    },
+  },
+  balanced: {
+    preset: 'balanced',
+    displayName: 'Balanced',
+    icon: '⚖️',
+    description: 'Auto-approve low-risk actions, checkpoint for medium and high risk.',
+    mappedMood: 'balanced',
+    frictionLevel: 0.5,
+    autoApproveThreshold: 0.3,
+    checkpoints: {
+      afterObserver: 'NEVER',
+      afterProposer: 'CONDITIONAL',
+      afterCritics: 'CONDITIONAL',
+      beforeExecution: 'CONDITIONAL',
+      afterExecution: 'NOTIFY_ONLY',
+    },
+  },
+  cowboy: {
+    preset: 'cowboy',
+    displayName: 'Cowboy',
+    icon: '🚀',
+    description: 'Full autonomy. Humans notified asynchronously.',
+    mappedMood: 'spark',
+    frictionLevel: 0.1,
+    autoApproveThreshold: 0.8,
+    checkpoints: {
+      afterObserver: 'NEVER',
+      afterProposer: 'NEVER',
+      afterCritics: 'NEVER',
+      beforeExecution: 'CONDITIONAL',
+      afterExecution: 'NOTIFY_ONLY',
+    },
+  },
+};
+
+/**
+ * Tenant governance settings
+ */
+export interface TenantGovernanceConfig {
+  id: string;
+  tenantId: string;
+  /** Selected preset */
+  activePreset: GovernancePreset;
+  /** Custom overrides (null = use preset defaults) */
+  customCheckpoints?: Partial<GovernanceCheckpointConfig>;
+  /** Custom friction level override */
+  customFrictionLevel?: number;
+  /** Custom auto-approve threshold override */
+  customAutoApproveThreshold?: number;
+  /** Daily budget limit in cents */
+  dailyBudgetCents: number;
+  /** Per-action cost limit in cents */
+  maxActionCostCents: number;
+  /** Compliance frameworks enabled */
+  complianceFrameworks: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============================================================================
 // PERSONA TYPES (MOODS)
 // ============================================================================
 

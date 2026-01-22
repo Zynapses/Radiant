@@ -360,6 +360,12 @@ async function routeRequest(
     return loraHandler(event);
   }
 
+  // AI Reports v5.42.0 - AI Report Writer
+  if (pathParts[1] === 'ai-reports') {
+    const { handler: aiReportsHandler } = await import('./ai-reports.js');
+    return aiReportsHandler(event);
+  }
+
   throw new NotFoundError(`Admin route not found: ${method} ${path}`);
 }
 

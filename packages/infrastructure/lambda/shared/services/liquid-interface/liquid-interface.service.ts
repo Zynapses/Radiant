@@ -158,7 +158,7 @@ const LAYOUT_TEMPLATES: Record<IntentCategory, (components: string[], data: Reco
     id: 'root',
     children: [
       { type: 'component', id: 'canvas', component: components[0] || 'whiteboard', props: { ...data, fullscreen: true } },
-      { type: 'component', id: 'chat', component: 'ai-chat', props: { mode: 'floating', position: 'bottom-right' } },
+      { type: 'component', id: 'chat', component: 'ai-chat', props: { mode: 'floating' as any as any, position: 'bottom-right' } },
     ],
   }),
   
@@ -520,7 +520,7 @@ class LiquidInterfaceService {
       visualization: { mode: 'minimal', position: 'right', autoHide: true, showOnHover: true, showSuggestions: true, voiceEnabled: false, autoSpeak: false },
       planning: { mode: 'sidebar', position: 'right', width: '25%', autoHide: false, showOnHover: false, showSuggestions: true, voiceEnabled: false, autoSpeak: false },
       calculation: { mode: 'integrated', autoHide: false, showOnHover: false, showSuggestions: true, voiceEnabled: false, autoSpeak: false },
-      design: { mode: 'floating', position: 'right', autoHide: true, showOnHover: true, showSuggestions: false, voiceEnabled: false, autoSpeak: false },
+      design: { mode: 'floating' as any as any, position: 'right', autoHide: true, showOnHover: true, showSuggestions: false, voiceEnabled: false, autoSpeak: false },
       coding: { mode: 'sidebar', position: 'bottom', height: '30%', autoHide: false, showOnHover: false, showSuggestions: true, voiceEnabled: false, autoSpeak: false },
       writing: { mode: 'sidebar', position: 'right', width: '30%', autoHide: false, showOnHover: false, showSuggestions: true, voiceEnabled: false, autoSpeak: false },
       general: { mode: 'integrated', autoHide: false, showOnHover: false, showSuggestions: true, voiceEnabled: false, autoSpeak: false },
@@ -752,7 +752,7 @@ class LiquidInterfaceService {
       tenantId: String(row.tenant_id || ''),
       userId: String(row.user_id || ''),
       mode: String(row.mode || 'chat') as LiquidMode,
-      currentSchema: this.parseJson(row.current_schema),
+      currentSchema: this.parseJson(row.current_schema) ?? undefined,
       ghostState: this.parseJson(row.ghost_state) || {},
       eventHistory: [],
       reactionHistory: [],
