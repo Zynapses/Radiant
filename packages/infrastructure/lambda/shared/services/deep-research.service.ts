@@ -247,7 +247,7 @@ class DeepResearchService {
     for (const query of plan.queries) {
       if (sources.length >= plan.maxSources) break;
 
-      // Search and get URLs (placeholder - would use search API)
+      // Search web using Google Custom Search or DuckDuckGo fallback
       const searchResults = await this.searchWeb(query, 10);
 
       for (const result of searchResults) {

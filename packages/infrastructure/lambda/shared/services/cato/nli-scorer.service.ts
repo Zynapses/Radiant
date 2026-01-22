@@ -31,8 +31,8 @@ class NLIScorerService {
   private results: NLIResult[] = [];
 
   async score(premise: string, hypothesis: string): Promise<NLIResult> {
-    // Simplified scoring (placeholder - would use actual NLI model)
-    const scores = this.computeScores(premise, hypothesis);
+    // Use LLM for NLI scoring
+    const scores = await this.computeScoresWithLLM(premise, hypothesis);
     const label = this.getLabel(scores);
     
     const result: NLIResult = {
@@ -107,8 +107,48 @@ class NLIScorerService {
     };
   }
 
+  private async computeScoresWithLLM(premise: string, hypothesis: string): Promise<{ entailment: number; contradiction: number; neutral: number }> {
+    try {
+      const { callLiteLLM } = await import('../litellm.service.js');
+      
+      const response = await callLiteLLM({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: `You are an NLI (Natural Language Inference) classifier. Given a premise and hypothesis, determine the relationship.
+Output JSON only: {"entailment": 0.0-1.0, "contradiction": 0.0-1.0, "neutral": 0.0-1.0}
+The three scores must sum to 1.0.
+- entailment: hypothesis follows from premise
+- contradiction: hypothesis contradicts premise  
+- neutral: neither entailment nor contradiction`,
+          },
+          {
+            role: 'user',
+            content: `Premise: "${premise}"\nHypothesis: "${hypothesis}"`,
+          },
+        ],
+        temperature: 0.1,
+        max_tokens: 100,
+      });
+
+      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const scores = JSON.parse(jsonMatch[0]);
+        return {
+          entailment: Number(scores.entailment) || 0.33,
+          contradiction: Number(scores.contradiction) || 0.33,
+          neutral: Number(scores.neutral) || 0.34,
+        };
+      }
+    } catch (error) {
+      // Fall back to heuristic scoring on error
+    }
+    return this.computeScores(premise, hypothesis);
+  }
+
   private computeScores(premise: string, hypothesis: string): { entailment: number; contradiction: number; neutral: number } {
-    // Simplified heuristic scoring
+    // Heuristic fallback scoring
     const premiseWords = new Set(premise.toLowerCase().split(/\s+/));
     const hypothesisWords = hypothesis.toLowerCase().split(/\s+/);
     
