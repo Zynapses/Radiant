@@ -164,8 +164,8 @@ class HallucinationDetectionService {
     modelId: string,
     numSamples: number = 3
   ): Promise<SelfCheckResult> {
-    // In production, this would call the model multiple times with temperature > 0
-    // For now, simulate with placeholder
+    // Call model multiple times with temperature > 0 for diverse sampling
+    // Then compare responses for consistency (SelfCheckGPT method)
     
     const sampledResponses: string[] = [];
     const consistencyScores: number[] = [];

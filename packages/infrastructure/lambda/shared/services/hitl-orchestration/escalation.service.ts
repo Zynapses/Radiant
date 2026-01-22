@@ -353,8 +353,50 @@ async function resolveAssigneeToUsers(
       return (groupResult.rows || []).map(r => r.user_id as string);
     
     case 'on_call':
-      // Get current on-call user (placeholder - would integrate with PagerDuty/etc.)
-      logger.warn('On-call escalation not yet implemented', { assignee });
+      // Get current on-call user from on_call_schedules table
+      // Supports PagerDuty webhook integration via on_call_source field
+      const onCallResult = await executeStatement({
+        sql: `
+          SELECT user_id FROM on_call_schedules
+          WHERE schedule_id = :scheduleId
+          AND start_time <= NOW()
+          AND end_time > NOW()
+          AND is_active = true
+          ORDER BY priority ASC
+          LIMIT 1
+        `,
+        parameters: [stringParam('scheduleId', assignee.id)],
+      });
+      
+      if (onCallResult.rows && onCallResult.rows.length > 0) {
+        return [onCallResult.rows[0].user_id as string];
+      }
+      
+      // Fallback: Check for PagerDuty integration
+      const pagerDutyKey = process.env.PAGERDUTY_API_KEY;
+      const assigneeWithMeta = assignee as EscalationAssignee & { metadata?: { pagerdutyScheduleId?: string } };
+      if (pagerDutyKey && assigneeWithMeta.metadata?.pagerdutyScheduleId) {
+        try {
+          const pdResponse = await fetch(
+            `https://api.pagerduty.com/oncalls?schedule_ids[]=${assigneeWithMeta.metadata.pagerdutyScheduleId}`,
+            {
+              headers: {
+                'Authorization': `Token token=${pagerDutyKey}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          if (pdResponse.ok) {
+            const pdData = await pdResponse.json() as { oncalls?: Array<{ user?: { id: string } }> };
+            const oncallUsers = pdData.oncalls?.map(oc => oc.user?.id).filter(Boolean) as string[];
+            return oncallUsers || [];
+          }
+        } catch (error) {
+          logger.error('PagerDuty integration failed', { error, assignee });
+        }
+      }
+      
+      logger.warn('No on-call user found', { assignee });
       return [];
     
     default:

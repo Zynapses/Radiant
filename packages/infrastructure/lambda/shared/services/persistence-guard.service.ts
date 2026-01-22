@@ -472,14 +472,23 @@ class PersistenceGuardService {
       [stringParam('tenantId', tenantId)]
     );
 
-    // Note: Actual corruption detection would require checking each record's checksum
-    // This is a placeholder - real implementation would batch verify
+    // Batch verify checksums for corruption detection
+    const corruptedResult = await executeStatement(
+      `SELECT COUNT(*) as corrupted FROM persistence_records 
+       WHERE tenant_id = $1 
+       AND is_complete = true 
+       AND checksum IS NOT NULL 
+       AND checksum != encode(sha256(data::bytea), 'hex')`,
+      [stringParam('tenantId', tenantId)]
+    );
+    const corruptedRow = corruptedResult.rows?.[0] as { corrupted?: string } | undefined;
+    const corrupted = corruptedRow?.corrupted || '0';
 
     return {
       total_records: parseInt(row.total, 10),
       complete_records: parseInt(row.complete, 10),
       incomplete_records: parseInt(row.incomplete, 10),
-      corrupted_records: 0, // Would need batch verification
+      corrupted_records: parseInt(corrupted, 10),
       pending_transactions: parseInt(pending, 10),
     };
   }
