@@ -144,11 +144,41 @@ export class CatoDialogueService {
   }
 
   private async generateResponse(session: DialogueSession, userContent: string): Promise<string> {
-    const context = session.messages.slice(-5).map(m => `${m.role}: ${m.content}`).join('\n');
-    const responsePrefix = session.introspectionEnabled 
-      ? `[Reflecting on: "${userContent.substring(0, 30)}..."]` 
-      : '';
-    return `${responsePrefix} I understand your message: "${userContent.substring(0, 50)}...". As ${this.identity.name}, I'm here to engage thoughtfully with you.`;
+    try {
+      const { callLiteLLM } = await import('../litellm.service.js');
+      
+      const context = session.messages.slice(-10).map(m => `${m.role}: ${m.content}`).join('\n');
+      
+      const response = await callLiteLLM({
+        model: 'claude-sonnet-4-20250514',
+        messages: [
+          {
+            role: 'system',
+            content: `You are ${this.identity.name}, persona: ${this.identity.persona}.
+
+Traits: ${this.identity.traits.join(', ')}
+Core values: ${this.identity.values.join(', ')}
+Narrative: ${this.identity.narrative}
+
+${session.introspectionEnabled ? 'Introspection mode is enabled - be thoughtful and reflective about your reasoning process.' : ''}
+
+Recent conversation context:
+${context}`,
+          },
+          {
+            role: 'user',
+            content: userContent,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 1000,
+      });
+
+      return response.content;
+    } catch (error) {
+      // Fallback response on error
+      return `I understand your message. As ${this.identity.name}, I'm here to engage thoughtfully with you.`;
+    }
   }
 
   private heartbeatInterval: NodeJS.Timeout | null = null;
