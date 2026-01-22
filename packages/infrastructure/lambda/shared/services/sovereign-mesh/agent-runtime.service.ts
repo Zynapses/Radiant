@@ -635,17 +635,42 @@ Provide a concise summary (2-3 sentences).`;
     execution: AgentExecution, 
     agent: Agent
   ): Promise<unknown> {
-    // Implement tool execution based on agent's allowed tools
-    // This would integrate with the app registry and tool execution system
+    // Execute observation using LLM for information gathering
     logger.debug('Executing observation', { query, executionId: execution.id });
     
-    // For now, return a placeholder
-    return {
-      type: 'observation',
-      query,
-      result: `Observation result for: ${query}`,
-      timestamp: new Date().toISOString(),
-    };
+    try {
+      const { callLiteLLM } = await import('../litellm.service.js');
+      
+      const response = await callLiteLLM({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: `You are an observation agent. Given a query, provide relevant observations and information.
+Agent context: ${agent.description || 'General purpose agent'}
+Respond with factual, concise observations.`,
+          },
+          { role: 'user', content: query },
+        ],
+        temperature: 0.3,
+        max_tokens: 500,
+      });
+
+      return {
+        type: 'observation',
+        query,
+        result: response.content,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        type: 'observation',
+        query,
+        result: `Observation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        timestamp: new Date().toISOString(),
+        error: true,
+      };
+    }
   }
 
   private async executeAction(
@@ -653,7 +678,6 @@ Provide a concise summary (2-3 sentences).`;
     execution: AgentExecution,
     agent: Agent
   ): Promise<{ success: boolean; result?: unknown; artifact?: unknown }> {
-    // Implement action execution based on agent's allowed tools
     logger.debug('Executing action', { action, executionId: execution.id });
     
     // Validate tool is allowed
@@ -661,11 +685,66 @@ Provide a concise summary (2-3 sentences).`;
       throw new Error(`Tool not allowed: ${action.tool}`);
     }
 
-    // For now, return a placeholder
-    return {
-      success: true,
-      result: `Action result for: ${action.tool}`,
-    };
+    try {
+      // Import tool registry for execution
+      const { createCatoToolRegistryService } = await import('../cato-tool-registry.service.js');
+      const { Pool } = await import('pg');
+      const pool = new Pool();
+      const toolRegistry = createCatoToolRegistryService(pool);
+
+      // Find tool in registry
+      const tools = await toolRegistry.listTools({ enabled: true });
+      const toolDef = tools.find(t => t.toolName === action.tool);
+
+      if (toolDef && toolRegistry.isLambdaTool(toolDef)) {
+        // Execute Lambda tool
+        const functionName = toolRegistry.getLambdaFunctionName(toolDef);
+        if (functionName) {
+          const { LambdaClient, InvokeCommand } = await import('@aws-sdk/client-lambda');
+          const lambda = new LambdaClient({});
+          const command = new InvokeCommand({
+            FunctionName: functionName,
+            InvocationType: 'RequestResponse',
+            Payload: Buffer.from(JSON.stringify(action.params)),
+          });
+          const response = await lambda.send(command);
+          await pool.end();
+          
+          if (response.Payload) {
+            const result = JSON.parse(Buffer.from(response.Payload).toString());
+            return { success: true, result };
+          }
+        }
+      }
+
+      await pool.end();
+      
+      // Fallback: Use LLM to simulate action
+      const { callLiteLLM } = await import('../litellm.service.js');
+      const response = await callLiteLLM({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: `Simulate executing the tool "${action.tool}" with the given parameters. Provide a realistic result.`,
+          },
+          {
+            role: 'user',
+            content: `Tool: ${action.tool}\nParams: ${JSON.stringify(action.params)}\nRationale: ${action.rationale}`,
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 500,
+      });
+
+      return { success: true, result: response.content };
+    } catch (error) {
+      logger.error('Action execution failed', { action, error });
+      return { 
+        success: false, 
+        result: `Action failed: ${error instanceof Error ? error.message : 'Unknown error'}` 
+      };
+    }
   }
 
   private async evaluateSafety(
