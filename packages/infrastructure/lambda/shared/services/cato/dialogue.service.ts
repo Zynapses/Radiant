@@ -102,7 +102,7 @@ export class CatoDialogueService {
     };
     session.messages.push(userMessage);
 
-    // Generate response (placeholder - would call actual AI model)
+    // Generate response using LiteLLM with Cato persona
     const responseContent = await this.generateResponse(session, content);
     
     const catoMessage: DialogueMessage = {
