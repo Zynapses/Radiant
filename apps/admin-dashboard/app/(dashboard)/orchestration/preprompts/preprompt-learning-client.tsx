@@ -195,7 +195,15 @@ export function PrepromptLearningClient() {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedTemplate, setSelectedTemplate] = useState<PrepromptTemplate | null>(null);
   const [showWeightsDialog, setShowWeightsDialog] = useState(false);
+  const [editedWeights, setEditedWeights] = useState<Record<string, number>>({});
   const queryClient = useQueryClient();
+
+  const handleWeightChange = (key: string, value: number) => {
+    setEditedWeights(prev => ({ ...prev, [key]: value }));
+    if (selectedTemplate) {
+      setSelectedTemplate({ ...selectedTemplate, [key]: value });
+    }
+  };
 
   const { data: dashboard, isLoading } = useQuery<PrepromptDashboard>({
     queryKey: ['preprompt-dashboard'],
@@ -265,7 +273,13 @@ export function PrepromptLearningClient() {
             <div className="flex items-center gap-2 mr-4">
               <Switch 
                 checked={dashboard.learningEnabled} 
-                onCheckedChange={() => {}}
+                onCheckedChange={(checked) => {
+                  fetch(`${API_BASE}/api/admin/preprompts/config`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ learningEnabled: checked }),
+                  }).then(() => queryClient.invalidateQueries({ queryKey: ['preprompt-dashboard'] }));
+                }}
               />
               <Label>Learning Enabled</Label>
             </div>
@@ -728,43 +742,43 @@ export function PrepromptLearningClient() {
                     label="Base Effectiveness"
                     description="Starting score before bonuses"
                     value={selectedTemplate.baseEffectivenessScore}
-                    onChange={() => {}}
+                    onChange={(v) => handleWeightChange('baseEffectivenessScore', v)}
                   />
                   <WeightSlider
                     label="Domain Weight"
                     description="Bonus for matching domain"
                     value={selectedTemplate.domainWeight}
-                    onChange={() => {}}
+                    onChange={(v) => handleWeightChange('domainWeight', v)}
                   />
                   <WeightSlider
                     label="Mode Weight"
                     description="Bonus for matching orchestration mode"
                     value={selectedTemplate.modeWeight}
-                    onChange={() => {}}
+                    onChange={(v) => handleWeightChange('modeWeight', v)}
                   />
                   <WeightSlider
                     label="Model Weight"
                     description="Bonus for compatible model"
                     value={selectedTemplate.modelWeight}
-                    onChange={() => {}}
+                    onChange={(v) => handleWeightChange('modelWeight', v)}
                   />
                   <WeightSlider
                     label="Complexity Weight"
                     description="Bonus for matching complexity level"
                     value={selectedTemplate.complexityWeight}
-                    onChange={() => {}}
+                    onChange={(v) => handleWeightChange('complexityWeight', v)}
                   />
                   <WeightSlider
                     label="Task Type Weight"
                     description="Bonus for matching task type"
                     value={selectedTemplate.taskTypeWeight}
-                    onChange={() => {}}
+                    onChange={(v) => handleWeightChange('taskTypeWeight', v)}
                   />
                   <WeightSlider
                     label="Feedback Weight"
                     description="How much historical feedback affects score"
                     value={selectedTemplate.feedbackWeight}
-                    onChange={() => {}}
+                    onChange={(v) => handleWeightChange('feedbackWeight', v)}
                   />
                 </div>
 

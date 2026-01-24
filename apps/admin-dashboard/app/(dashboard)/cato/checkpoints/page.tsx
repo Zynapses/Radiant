@@ -14,6 +14,7 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { AlertCircle, CheckCircle, Clock, XCircle, RefreshCw, Eye, Shield, Settings, Save } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 
 interface CheckpointDecision {
   id: string;
@@ -53,6 +54,7 @@ const checkpointTypes = [
 const modeOptions = ['DISABLED', 'AUTO', 'CONDITIONAL', 'MANUAL'];
 
 export default function CatoCheckpointsPage() {
+  const { toast } = useToast();
   const [pendingCheckpoints, setPendingCheckpoints] = useState<CheckpointDecision[]>([]);
   const [recentDecisions, setRecentDecisions] = useState<CheckpointDecision[]>([]);
   const [config, setConfig] = useState<CheckpointConfig | null>(null);
@@ -74,27 +76,24 @@ export default function CatoCheckpointsPage() {
 
   const fetchData = async () => {
     try {
-      // Mock data
-      setPendingCheckpoints([
-        { id: 'cp_1', pipelineId: 'exec_1', checkpointType: 'CP3', checkpointName: 'Review Gate', status: 'PENDING', triggerReason: 'Security critic raised concerns about data exposure', presentedData: { proposal: 'Execute database migration', riskScore: 0.65 }, deadline: new Date(Date.now() + 3600000).toISOString() },
-        { id: 'cp_2', pipelineId: 'exec_2', checkpointType: 'CP4', checkpointName: 'Execution Gate', status: 'PENDING', triggerReason: 'Risk score 0.72 exceeds auto-execute threshold', presentedData: { proposal: 'Deploy to production', riskScore: 0.72 }, deadline: new Date(Date.now() + 1800000).toISOString() },
+      const [pendingRes, recentRes, configRes] = await Promise.all([
+        fetch('/api/admin/cato/checkpoints/pending'),
+        fetch('/api/admin/cato/checkpoints/recent'),
+        fetch('/api/admin/cato/checkpoints/config'),
       ]);
-      setRecentDecisions([
-        { id: 'cp_3', pipelineId: 'exec_3', checkpointType: 'CP2', checkpointName: 'Plan Gate', status: 'DECIDED', triggerReason: 'High cost action', presentedData: {}, deadline: new Date(Date.now() - 3600000).toISOString(), decision: 'APPROVED', decidedBy: 'admin@example.com', decisionTimeMs: 45000 },
-        { id: 'cp_4', pipelineId: 'exec_4', checkpointType: 'CP3', checkpointName: 'Review Gate', status: 'DECIDED', triggerReason: 'Multiple critic objections', presentedData: {}, deadline: new Date(Date.now() - 7200000).toISOString(), decision: 'REJECTED', decidedBy: 'admin@example.com', decisionTimeMs: 120000 },
-      ]);
-      setConfig({
-        preset: 'BALANCED',
-        checkpoints: {
-          CP1: { mode: 'CONDITIONAL', triggerOn: ['ambiguous_intent', 'missing_context'], timeoutSeconds: 3600 },
-          CP2: { mode: 'CONDITIONAL', triggerOn: ['high_cost', 'irreversible_actions'], timeoutSeconds: 3600 },
-          CP3: { mode: 'CONDITIONAL', triggerOn: ['objections_raised', 'low_consensus'], timeoutSeconds: 3600 },
-          CP4: { mode: 'CONDITIONAL', triggerOn: ['risk_above_threshold'], timeoutSeconds: 3600 },
-          CP5: { mode: 'AUTO', triggerOn: ['execution_completed'], timeoutSeconds: 86400 },
-        },
-        defaultTimeoutSeconds: 3600,
-        timeoutAction: 'ESCALATED',
-      });
+
+      if (pendingRes.ok) {
+        const pending = await pendingRes.json();
+        setPendingCheckpoints(pending);
+      }
+      if (recentRes.ok) {
+        const recent = await recentRes.json();
+        setRecentDecisions(recent);
+      }
+      if (configRes.ok) {
+        const cfg = await configRes.json();
+        setConfig(cfg);
+      }
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch:', error);
@@ -103,10 +102,20 @@ export default function CatoCheckpointsPage() {
   };
 
   const handleDecision = async (checkpointId: string, decision: string) => {
-    console.log('Decision:', checkpointId, decision, feedback);
-    setSelectedCheckpoint(null);
-    setFeedback('');
-    fetchData();
+    try {
+      const response = await fetch(`/api/admin/cato/checkpoints/${checkpointId}/resolve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ decision, feedback }),
+      });
+      if (!response.ok) throw new Error('Failed to submit decision');
+      toast({ title: 'Decision submitted', description: `Checkpoint ${decision.toLowerCase()} successfully.` });
+      setSelectedCheckpoint(null);
+      setFeedback('');
+      fetchData();
+    } catch (error) {
+      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to submit decision', variant: 'destructive' });
+    }
   };
 
   const handlePresetChange = (preset: 'COWBOY' | 'BALANCED' | 'PARANOID') => {
@@ -126,12 +135,20 @@ export default function CatoCheckpointsPage() {
   const handleSaveConfig = async () => {
     if (!localConfig) return;
     setSaving(true);
-    // API call would go here
-    console.log('Saving config:', localConfig);
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/admin/cato/checkpoints/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(localConfig),
+      });
+      if (!response.ok) throw new Error('Failed to save configuration');
       setConfig(localConfig);
+      toast({ title: 'Configuration saved', description: 'Checkpoint configuration updated successfully.' });
+    } catch (error) {
+      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to save configuration', variant: 'destructive' });
+    } finally {
       setSaving(false);
-    }, 500);
+    }
   };
 
   const getTimeRemaining = (deadline: string) => {

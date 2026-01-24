@@ -392,30 +392,34 @@ export class MCPWorkerService {
       });
     }
 
-    // Execute tool (in production, this would call actual tool implementations)
+    // Execute tool with real implementations
     metrics.addMetric('ToolExecution', "Count", 1);
     metrics.addMetric(`Tool_${toolName}`, "Count", 1);
 
     let resultText: string;
     switch (toolName) {
       case 'search':
-        resultText = `Search results for "${toolArgs.query}": [Mock results would appear here]`;
+        resultText = await this.executeSearchTool(toolArgs, tenantId);
         break;
       case 'calculate':
         try {
-          // Safe evaluation for simple math (in production, use proper parser)
-          const expr = String(toolArgs.expression).replace(/[^0-9+\-*/().]/g, '');
-          const result = Function(`"use strict"; return (${expr})`)();
-          resultText = `${toolArgs.expression} = ${result}`;
+          // Safe evaluation for simple math using sandboxed expression parser
+          const expr = String(toolArgs.expression).replace(/[^0-9+\-*/().%\s]/g, '');
+          if (!expr || expr.length > 100) {
+            resultText = `Invalid expression: ${toolArgs.expression}`;
+          } else {
+            const result = this.safeEvaluate(expr);
+            resultText = `${toolArgs.expression} = ${result}`;
+          }
         } catch {
           resultText = `Unable to calculate: ${toolArgs.expression}`;
         }
         break;
       case 'fetch_data':
-        resultText = `Fetched ${toolArgs.limit || 10} records from ${toolArgs.source}`;
+        resultText = await this.executeFetchDataTool(toolArgs, tenantId);
         break;
       default:
-        resultText = `Tool '${toolName}' executed with args: ${JSON.stringify(toolArgs)}`;
+        resultText = await this.executeGenericTool(toolName, toolArgs, tenantId);
     }
 
     return {
@@ -562,6 +566,218 @@ export class MCPWorkerService {
       id: id ?? undefined,
       error: { code, message, data },
     };
+  }
+
+  /**
+   * Execute search tool using Cortex graph search
+   */
+  private async executeSearchTool(
+    args: Record<string, unknown>,
+    tenantId: string
+  ): Promise<string> {
+    const query = String(args.query || '');
+    const limit = Number(args.limit) || 10;
+    const searchType = String(args.type || 'semantic');
+
+    if (!query) {
+      return 'Error: Search query is required';
+    }
+
+    try {
+      // Use the Cortex graph for semantic search
+      const { executeStatement } = await import('../shared/db/client.js');
+      
+      // Search nodes by label similarity
+      const result = await executeStatement(`
+        SELECT id, label, node_type, confidence, created_at
+        FROM cortex_graph_nodes
+        WHERE tenant_id = :tenantId
+          AND status = 'active'
+          AND (
+            label ILIKE '%' || :query || '%'
+            OR properties::text ILIKE '%' || :query || '%'
+          )
+        ORDER BY confidence DESC
+        LIMIT :limit
+      `, [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'query', value: { stringValue: query } },
+        { name: 'limit', value: { longValue: limit } },
+      ]);
+
+      if (result.rows.length === 0) {
+        return `No results found for "${query}"`;
+      }
+
+      const formattedResults = result.rows.map((row: any, i: number) => 
+        `${i + 1}. [${row.node_type}] ${row.label} (confidence: ${(row.confidence * 100).toFixed(0)}%)`
+      ).join('\n');
+
+      return `Search results for "${query}":\n\n${formattedResults}`;
+    } catch (error) {
+      logger.error('Search tool error', { error, query, tenantId });
+      return `Search failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    }
+  }
+
+  /**
+   * Safe arithmetic expression evaluator
+   */
+  private safeEvaluate(expr: string): number {
+    // Tokenize and parse simple arithmetic
+    const tokens = expr.match(/(\d+\.?\d*|\+|-|\*|\/|%|\(|\))/g) || [];
+    
+    // Build simple expression evaluator using shunting-yard
+    const outputQueue: (number | string)[] = [];
+    const operatorStack: string[] = [];
+    const precedence: Record<string, number> = { '+': 1, '-': 1, '*': 2, '/': 2, '%': 2 };
+
+    for (const token of tokens) {
+      if (/^\d+\.?\d*$/.test(token)) {
+        outputQueue.push(parseFloat(token));
+      } else if ('+-*/%'.includes(token)) {
+        while (
+          operatorStack.length > 0 &&
+          operatorStack[operatorStack.length - 1] !== '(' &&
+          (precedence[operatorStack[operatorStack.length - 1]] || 0) >= (precedence[token] || 0)
+        ) {
+          outputQueue.push(operatorStack.pop()!);
+        }
+        operatorStack.push(token);
+      } else if (token === '(') {
+        operatorStack.push(token);
+      } else if (token === ')') {
+        while (operatorStack.length > 0 && operatorStack[operatorStack.length - 1] !== '(') {
+          outputQueue.push(operatorStack.pop()!);
+        }
+        operatorStack.pop(); // Remove '('
+      }
+    }
+
+    while (operatorStack.length > 0) {
+      outputQueue.push(operatorStack.pop()!);
+    }
+
+    // Evaluate RPN
+    const evalStack: number[] = [];
+    for (const item of outputQueue) {
+      if (typeof item === 'number') {
+        evalStack.push(item);
+      } else {
+        const b = evalStack.pop() ?? 0;
+        const a = evalStack.pop() ?? 0;
+        switch (item) {
+          case '+': evalStack.push(a + b); break;
+          case '-': evalStack.push(a - b); break;
+          case '*': evalStack.push(a * b); break;
+          case '/': evalStack.push(b !== 0 ? a / b : 0); break;
+          case '%': evalStack.push(b !== 0 ? a % b : 0); break;
+        }
+      }
+    }
+
+    return evalStack[0] ?? 0;
+  }
+
+  /**
+   * Execute fetch_data tool
+   */
+  private async executeFetchDataTool(
+    args: Record<string, unknown>,
+    tenantId: string
+  ): Promise<string> {
+    const source = String(args.source || '');
+    const limit = Number(args.limit) || 10;
+
+    if (!source) {
+      return 'Error: Data source is required';
+    }
+
+    try {
+      const { executeStatement } = await import('../shared/db/client.js');
+
+      // Map source to table
+      const sourceMap: Record<string, string> = {
+        'models': 'model_configs',
+        'users': 'tenant_users',
+        'sessions': 'conversation_sessions',
+        'documents': 'cortex_graph_documents',
+        'nodes': 'cortex_graph_nodes',
+      };
+
+      const tableName = sourceMap[source.toLowerCase()];
+      if (!tableName) {
+        return `Unknown data source: ${source}. Available: ${Object.keys(sourceMap).join(', ')}`;
+      }
+
+      const result = await executeStatement(`
+        SELECT * FROM ${tableName}
+        WHERE tenant_id = :tenantId
+        LIMIT :limit
+      `, [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'limit', value: { longValue: limit } },
+      ]);
+
+      return `Fetched ${result.rows.length} records from ${source}:\n${JSON.stringify(result.rows, null, 2)}`;
+    } catch (error) {
+      logger.error('Fetch data tool error', { error, source, tenantId });
+      return `Fetch failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    }
+  }
+
+  /**
+   * Execute generic tool via tool registry
+   */
+  private async executeGenericTool(
+    toolName: string,
+    args: Record<string, unknown>,
+    tenantId: string
+  ): Promise<string> {
+    try {
+      // Check if we have a registered Lambda tool
+      const { executeStatement } = await import('../shared/db/client.js');
+      
+      const toolResult = await executeStatement(`
+        SELECT handler_type, handler_arn, handler_config
+        FROM cato_tool_definitions
+        WHERE (tenant_id = :tenantId OR tenant_id IS NULL)
+          AND name = :toolName
+          AND is_active = true
+        ORDER BY tenant_id NULLS LAST
+        LIMIT 1
+      `, [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'toolName', value: { stringValue: toolName } },
+      ]);
+
+      if (toolResult.rows.length === 0) {
+        return `Tool '${toolName}' not found in registry. Args: ${JSON.stringify(args)}`;
+      }
+
+      const tool = toolResult.rows[0] as any;
+
+      if (tool.handler_type === 'lambda' && tool.handler_arn) {
+        // Invoke Lambda handler
+        const { LambdaClient, InvokeCommand } = await import('@aws-sdk/client-lambda');
+        const lambda = new LambdaClient({});
+        
+        const response = await lambda.send(new InvokeCommand({
+          FunctionName: tool.handler_arn,
+          Payload: JSON.stringify({ tenantId, toolName, args }),
+        }));
+
+        if (response.Payload) {
+          const result = JSON.parse(new TextDecoder().decode(response.Payload));
+          return typeof result === 'string' ? result : JSON.stringify(result);
+        }
+      }
+
+      return `Tool '${toolName}' executed with args: ${JSON.stringify(args)}`;
+    } catch (error) {
+      logger.error('Generic tool execution error', { error, toolName, tenantId });
+      return `Tool execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    }
   }
 }
 

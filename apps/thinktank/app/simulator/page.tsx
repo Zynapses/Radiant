@@ -17,7 +17,9 @@
  * - Cato mood/persona selection
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { chatService } from '@/lib/api/chat';
+import { api } from '@/lib/api/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MessageSquare,
@@ -96,9 +98,9 @@ import {
 const NAV_ITEMS: { id: ViewType; icon: React.ComponentType<{ className?: string }>; label: string; badge?: number }[] = [
   { id: 'chat', icon: MessageSquare, label: 'Chat' },
   { id: 'morphing', icon: Layers, label: 'Morphing UI' },
-  { id: 'history', icon: History, label: 'History', badge: MOCK_HISTORY_SESSIONS.length },
-  { id: 'artifacts', icon: FileCode, label: 'Artifacts', badge: MOCK_ARTIFACTS.length },
-  { id: 'rules', icon: Shield, label: 'Rules', badge: MOCK_RULES.filter(r => r.isEnabled).length },
+  { id: 'history', icon: History, label: 'History' },
+  { id: 'artifacts', icon: FileCode, label: 'Artifacts' },
+  { id: 'rules', icon: Shield, label: 'Rules' },
   { id: 'workflows', icon: Workflow, label: 'Workflows' },
   { id: 'timemachine', icon: Clock, label: 'Time Machine' },
   { id: 'settings', icon: Settings, label: 'Settings' },
@@ -109,6 +111,42 @@ export default function SimulatorPage() {
   // View state
   const [currentView, setCurrentView] = useState<ViewType>('chat');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Real API data (with mock fallbacks)
+  const [historySessions, setHistorySessions] = useState(MOCK_HISTORY_SESSIONS);
+  const [artifactsList, setArtifactsList] = useState(MOCK_ARTIFACTS);
+  const [userProfile, setUserProfile] = useState(MOCK_USER_PROFILE);
+
+  // Fetch real data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [convs, artifactsRes, profileRes] = await Promise.allSettled([
+          chatService.listConversations(),
+          api.get<{ data: typeof MOCK_ARTIFACTS }>('/api/thinktank/artifacts'),
+          api.get<{ data: typeof MOCK_USER_PROFILE }>('/api/thinktank/profile'),
+        ]);
+        if (convs.status === 'fulfilled' && convs.value.length > 0) {
+          setHistorySessions(convs.value.map(c => ({
+            ...MOCK_HISTORY_SESSIONS[0],
+            id: c.id,
+            title: c.title,
+            preview: c.lastMessage || '',
+            timestamp: new Date(c.updatedAt),
+          })));
+        }
+        if (artifactsRes.status === 'fulfilled' && artifactsRes.value?.data) {
+          setArtifactsList(artifactsRes.value.data);
+        }
+        if (profileRes.status === 'fulfilled' && profileRes.value?.data) {
+          setUserProfile(profileRes.value.data);
+        }
+      } catch (e) {
+        console.log('Using mock data for simulator');
+      }
+    };
+    fetchData();
+  }, []);
 
   // Chat state
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
@@ -139,6 +177,9 @@ export default function SimulatorPage() {
   // Time Machine state
   const [timelinePosition, setTimelinePosition] = useState(MOCK_SNAPSHOTS.length - 1);
   const [isTimelinePlaying, setIsTimelinePlaying] = useState(false);
+
+  // Artifacts state
+  const [artifactsTab, setArtifactsTab] = useState('all');
   const [snapshots, setSnapshots] = useState(MOCK_SNAPSHOTS);
 
   // Workflow state
@@ -478,7 +519,7 @@ export default function SimulatorPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
-        {MOCK_HISTORY_SESSIONS.map((session) => (
+        {historySessions.map((session) => (
           <GlassCard
             key={session.id}
             hover
@@ -547,15 +588,15 @@ export default function SimulatorPage() {
               { id: 'code', label: 'Code', icon: Code },
               { id: 'documents', label: 'Documents', icon: FileText },
             ]}
-            activeTab="all"
-            onChange={() => {}}
+            activeTab={artifactsTab}
+            onChange={setArtifactsTab}
             className="mt-4"
           />
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
           <div className="grid grid-cols-2 gap-4">
-            {MOCK_ARTIFACTS.map((artifact) => {
+            {artifactsList.map((artifact) => {
               const Icon = artifactIcons[artifact.type];
               return (
                 <GlassCard key={artifact.id} hover className="p-4">
@@ -743,7 +784,7 @@ export default function SimulatorPage() {
       <div className="flex-1 overflow-hidden">
         <AgenticMorphingDemo 
           onMorphComplete={(viewType) => {
-            console.log('Morphed to:', viewType);
+            setCurrentView(viewType as ViewType);
           }}
         />
       </div>
@@ -857,11 +898,11 @@ export default function SimulatorPage() {
         <GlassCard className="p-6">
           <div className="flex items-center gap-4">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white">
-              {MOCK_USER_PROFILE.name.charAt(0)}
+              {userProfile.name.charAt(0)}
             </div>
             <div>
-              <h4 className="text-xl font-semibold text-white">{MOCK_USER_PROFILE.name}</h4>
-              <p className="text-sm text-white/50">{MOCK_USER_PROFILE.email}</p>
+              <h4 className="text-xl font-semibold text-white">{userProfile.name}</h4>
+              <p className="text-sm text-white/50">{userProfile.email}</p>
               <Button variant="secondary" size="sm" className="mt-2" icon={Edit3}>
                 Edit Profile
               </Button>
@@ -875,25 +916,25 @@ export default function SimulatorPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white/5 rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-white">
-                {MOCK_USER_PROFILE.stats.totalMessages.toLocaleString()}
+                {userProfile.stats.totalMessages.toLocaleString()}
               </p>
               <p className="text-xs text-white/50">Total Messages</p>
             </div>
             <div className="bg-white/5 rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-white">
-                {MOCK_USER_PROFILE.stats.sessionsCount}
+                {userProfile.stats.sessionsCount}
               </p>
               <p className="text-xs text-white/50">Sessions</p>
             </div>
             <div className="bg-white/5 rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-white">
-                {(MOCK_USER_PROFILE.stats.totalTokens / 1000000).toFixed(1)}M
+                {(userProfile.stats.totalTokens / 1000000).toFixed(1)}M
               </p>
               <p className="text-xs text-white/50">Tokens Used</p>
             </div>
             <div className="bg-white/5 rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-white">
-                {Math.floor((Date.now() - MOCK_USER_PROFILE.stats.joinedAt.getTime()) / 86400000)}
+                {Math.floor((Date.now() - userProfile.stats.joinedAt.getTime()) / 86400000)}
               </p>
               <p className="text-xs text-white/50">Days Active</p>
             </div>
@@ -906,16 +947,16 @@ export default function SimulatorPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-white/70">Default Model</span>
-              <Badge variant="info">{MOCK_USER_PROFILE.preferences.defaultModel}</Badge>
+              <Badge variant="info">{userProfile.preferences.defaultModel}</Badge>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-white/70">Theme</span>
-              <Badge variant="default">{MOCK_USER_PROFILE.preferences.theme}</Badge>
+              <Badge variant="default">{userProfile.preferences.theme}</Badge>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-white/70">Advanced Mode</span>
-              <Badge variant={MOCK_USER_PROFILE.preferences.advancedMode ? 'success' : 'default'}>
-                {MOCK_USER_PROFILE.preferences.advancedMode ? 'Enabled' : 'Disabled'}
+              <Badge variant={userProfile.preferences.advancedMode ? 'success' : 'default'}>
+                {userProfile.preferences.advancedMode ? 'Enabled' : 'Disabled'}
               </Badge>
             </div>
           </div>
@@ -1002,14 +1043,14 @@ export default function SimulatorPage() {
                 onClick={() => setCurrentView('profile')}
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold">
-                  {MOCK_USER_PROFILE.name.charAt(0)}
+                  {userProfile.name.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-white truncate">
-                    {MOCK_USER_PROFILE.name}
+                    {userProfile.name}
                   </p>
                   <p className="text-xs text-white/50 truncate">
-                    {MOCK_USER_PROFILE.email}
+                    {userProfile.email}
                   </p>
                 </div>
               </GlassCard>
@@ -1035,13 +1076,13 @@ export default function SimulatorPage() {
               </h2>
               <p className="text-xs text-white/50">
                 {currentView === 'chat' && `${messages.length} messages`}
-                {currentView === 'history' && `${MOCK_HISTORY_SESSIONS.length} conversations`}
-                {currentView === 'artifacts' && `${MOCK_ARTIFACTS.length} artifacts`}
+                {currentView === 'history' && `${historySessions.length} conversations`}
+                {currentView === 'artifacts' && `${artifactsList.length} artifacts`}
                 {currentView === 'rules' && `${rules.filter(r => r.isEnabled).length} active rules`}
                 {currentView === 'workflows' && `${workflowSteps.length} steps`}
                 {currentView === 'timemachine' && `${snapshots.length} snapshots`}
                 {currentView === 'settings' && 'Customize your experience'}
-                {currentView === 'profile' && MOCK_USER_PROFILE.email}
+                {currentView === 'profile' && userProfile.email}
               </p>
             </div>
           </div>

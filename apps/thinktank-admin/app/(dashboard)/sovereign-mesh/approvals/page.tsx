@@ -45,13 +45,7 @@ interface Approval {
   comments?: string;
 }
 
-const mockApprovals: Approval[] = [
-  { id: '1', timestamp: '2026-01-21T20:00:00Z', type: 'deployment', title: 'Deploy ImageProcessor v2.0', description: 'New version with enhanced performance', requester: 'dev@example.com', status: 'pending', priority: 'high', resource: 'ImageProcessor Agent' },
-  { id: '2', timestamp: '2026-01-21T19:30:00Z', type: 'access', title: 'Production Database Access', description: 'Read-only access for analytics', requester: 'analyst@example.com', status: 'pending', priority: 'medium', resource: 'Production DB' },
-  { id: '3', timestamp: '2026-01-21T19:00:00Z', type: 'config', title: 'Update Rate Limits', description: 'Increase API rate limits for premium users', requester: 'admin@example.com', status: 'pending', priority: 'low', resource: 'API Gateway' },
-  { id: '4', timestamp: '2026-01-21T18:00:00Z', type: 'deployment', title: 'Deploy SecurityScanner v1.5', description: 'Security patch update', requester: 'security@example.com', status: 'approved', priority: 'critical', resource: 'SecurityScanner Agent', reviewedBy: 'admin@example.com', reviewedAt: '2026-01-21T18:30:00Z' },
-  { id: '5', timestamp: '2026-01-21T17:00:00Z', type: 'data', title: 'Export Customer Data', description: 'Export for compliance audit', requester: 'compliance@example.com', status: 'rejected', priority: 'medium', resource: 'Customer Database', reviewedBy: 'admin@example.com', reviewedAt: '2026-01-21T17:30:00Z', comments: 'Missing required authorization form' },
-];
+const defaultApprovals: Approval[] = [];
 
 const typeConfig = {
   deployment: { color: 'bg-purple-500', label: 'Deployment' },
@@ -79,15 +73,24 @@ export default function SovereignMeshApprovalsPage() {
   const [selectedApproval, setSelectedApproval] = useState<Approval | null>(null);
   const [reviewComment, setReviewComment] = useState('');
 
-  const { data: approvals = mockApprovals } = useQuery({
+  const { data: approvals = defaultApprovals } = useQuery<Approval[]>({
     queryKey: ['sovereign-mesh', 'approvals'],
-    queryFn: async () => mockApprovals,
+    queryFn: async () => {
+      const res = await fetch('/api/thinktank-admin/sovereign-mesh/approvals');
+      if (!res.ok) return defaultApprovals;
+      return res.json();
+    },
   });
 
   const approveMutation = useMutation({
     mutationFn: async ({ id, action, comment }: { id: string; action: 'approve' | 'reject'; comment: string }) => {
-      // In production, call API
-      return { id, action, comment };
+      const res = await fetch(`/api/thinktank-admin/sovereign-mesh/approvals/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, comment }),
+      });
+      if (!res.ok) throw new Error('Failed to process approval');
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sovereign-mesh', 'approvals'] });

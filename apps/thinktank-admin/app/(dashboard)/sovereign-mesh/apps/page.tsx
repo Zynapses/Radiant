@@ -40,14 +40,7 @@ interface App {
   url: string;
 }
 
-const mockApps: App[] = [
-  { id: '1', name: 'Analytics Dashboard', description: 'Real-time data visualization', status: 'running', version: 'v2.1.0', instances: 3, users: 45, lastDeployed: '2 days ago', url: 'https://analytics.example.com' },
-  { id: '2', name: 'Document Processor', description: 'AI-powered document analysis', status: 'running', version: 'v1.8.2', instances: 2, users: 128, lastDeployed: '1 week ago', url: 'https://docs.example.com' },
-  { id: '3', name: 'Code Assistant', description: 'Development helper', status: 'running', version: 'v3.0.1', instances: 5, users: 67, lastDeployed: '3 days ago', url: 'https://code.example.com' },
-  { id: '4', name: 'Chat Interface', description: 'Customer support chatbot', status: 'deploying', version: 'v1.2.0', instances: 1, users: 0, lastDeployed: 'Deploying...', url: '' },
-  { id: '5', name: 'Image Analyzer', description: 'Vision AI service', status: 'stopped', version: 'v1.0.0', instances: 0, users: 23, lastDeployed: '2 weeks ago', url: 'https://vision.example.com' },
-  { id: '6', name: 'Data Pipeline', description: 'ETL automation', status: 'error', version: 'v2.0.0', instances: 0, users: 12, lastDeployed: '5 days ago', url: 'https://pipeline.example.com' },
-];
+const defaultApps: App[] = [];
 
 const statusConfig = {
   running: { color: 'bg-green-500', label: 'Running' },
@@ -59,9 +52,13 @@ const statusConfig = {
 export default function SovereignMeshAppsPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: apps = mockApps } = useQuery({
+  const { data: apps = defaultApps } = useQuery<App[]>({
     queryKey: ['sovereign-mesh', 'apps'],
-    queryFn: async () => mockApps,
+    queryFn: async () => {
+      const res = await fetch('/api/thinktank-admin/sovereign-mesh/apps');
+      if (!res.ok) return defaultApps;
+      return res.json();
+    },
   });
 
   const filteredApps = apps.filter(app =>

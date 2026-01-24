@@ -629,18 +629,27 @@ The Grimoire is the system's procedural memory—storing learned patterns, corre
 
 ### Overview
 
-Adaptive conversation flows that adjust based on user expertise and context.
+Adaptive conversation flows that adjust based on user expertise and context. Includes demo components for Reality Scrubber, Quantum Split View, and Pre-Cognition suggestions.
 
 ### Features
 
-- Flow template management
-- Expertise detection settings
-- Adaptation rules
-- Flow analytics
+- **Reality Scrubber Timeline**: Video-editor style navigation through state snapshots
+  - Bookmark creation with toast notifications
+  - Play/pause timeline controls
+- **Quantum Split View**: Side-by-side comparison of parallel realities
+  - Branch selection with state management
+  - Branch collapse with confirmation
+- **Pre-Cognition Suggestions**: Predicted actions that are pre-computed
+  - Prediction selection with execution feedback
+  - Prediction dismissal
+- **Magic Carpet Navigator**: Intent-based navigation
+  - Flying to destinations with toast feedback
+  - Landing confirmation
 
 ### Implementation
 
 - **App**: `apps/thinktank-admin/app/(dashboard)/magic-carpet/page.tsx`
+- **Components**: `apps/thinktank-admin/components/magic-carpet/`
 
 ---
 
@@ -753,6 +762,45 @@ Compliance settings specific to Think Tank consumer features.
 ### Implementation
 
 - **App**: `apps/thinktank-admin/app/(dashboard)/compliance/page.tsx`
+
+---
+
+## 20A. Sovereign Mesh (v5.52.0)
+
+**Path**: `/sovereign-mesh/*`
+
+### Overview
+
+Sovereign Mesh provides decentralized AI agent management and transparency for Think Tank.
+
+### Sub-Pages
+
+| Page | Path | Purpose |
+|------|------|---------|
+| **Overview** | `/sovereign-mesh` | Dashboard with agent/app stats, health score |
+| **Agents** | `/sovereign-mesh/agents` | Manage AI agents, view status and performance |
+| **Apps** | `/sovereign-mesh/apps` | View deployed apps, instances, users |
+| **Transparency** | `/sovereign-mesh/transparency` | Audit logs, decision trails |
+| **AI Helper** | `/sovereign-mesh/ai-helper` | AI assistance requests, ratings |
+| **Approvals** | `/sovereign-mesh/approvals` | Pending/processed approval requests |
+
+### API Endpoints
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/api/thinktank-admin/sovereign-mesh/overview` | Dashboard stats |
+| GET | `/api/thinktank-admin/sovereign-mesh/agents` | List agents |
+| GET | `/api/thinktank-admin/sovereign-mesh/apps` | List apps |
+| GET | `/api/thinktank-admin/sovereign-mesh/audit-logs` | Audit log entries |
+| GET | `/api/thinktank-admin/sovereign-mesh/decision-trails` | Decision trails |
+| GET | `/api/thinktank-admin/sovereign-mesh/ai-helper/requests` | AI helper requests |
+| GET | `/api/thinktank-admin/sovereign-mesh/approvals` | Approval requests |
+| POST | `/api/thinktank-admin/sovereign-mesh/approvals/:id` | Process approval |
+
+### Implementation
+
+- **App Files**: `apps/thinktank-admin/app/(dashboard)/sovereign-mesh/*.tsx`
+- **Navigation**: All pages linked in sidebar under "Sovereign Mesh" section
 
 ---
 
@@ -1346,25 +1394,94 @@ import { FileAttachment } from '@/components/chat';
 
 **Supported Types**: Images, PDFs, text files, JSON, code files
 
-### Liquid Interface
+### Liquid Interface (v5.52.7)
 
-Morphing UI components for adaptive chat experiences.
+Morphing UI components for adaptive chat experiences. **"Don't Build the Tool. BE the Tool."**
+
+The chat interface can morph into specialized tools when users need them. In Advanced Mode, trigger buttons appear in the header.
+
+#### Morphed View Types
+
+| View | Icon | Description |
+|------|------|-------------|
+| `datagrid` | Table | Interactive spreadsheet with inline editing |
+| `chart` | BarChart3 | Bar, line, pie, area charts |
+| `kanban` | Kanban | Drag-and-drop task board |
+| `calculator` | Calculator | Full calculator with memory |
+| `code_editor` | Code | Code editor with run capability |
+| `document` | FileText | Rich text editor |
+
+#### Usage in Chat Page
 
 ```tsx
-import { LiquidMorphPanel, EjectDialog } from '@/components/liquid';
+import { LiquidMorphPanel, type MorphedViewType } from '@/components/liquid';
 
-<LiquidMorphPanel
-  isOpen={isPanelOpen}
-  currentView="chat"
-  onViewChange={handleViewChange}
-/>
+// State
+const [morphedView, setMorphedView] = useState<MorphedViewType | null>(null);
+const [isMorphFullscreen, setIsMorphFullscreen] = useState(false);
+const [showMorphChat, setShowMorphChat] = useState(false);
 
-<EjectDialog
-  isOpen={isEjectOpen}
-  onClose={() => setEjectOpen(false)}
-  onEject={handleEject}
-/>
+// Trigger buttons (in header, Advanced Mode only)
+<Button onClick={() => setMorphedView('datagrid')}>
+  <Table className="h-4 w-4" />
+</Button>
+
+// Render panel when view is selected
+{morphedView && (
+  <LiquidMorphPanel
+    viewType={morphedView}
+    isFullscreen={isMorphFullscreen}
+    onClose={() => setMorphedView(null)}
+    onToggleFullscreen={() => setIsMorphFullscreen(!isMorphFullscreen)}
+    onChatToggle={() => setShowMorphChat(!showMorphChat)}
+    showChat={showMorphChat}
+  />
+)}
 ```
+
+#### Morphed View Components
+
+Location: `apps/thinktank/components/liquid/morphed-views/`
+
+| Component | Features |
+|-----------|----------|
+| `DataGridView` | Add/delete rows, inline cell editing, import/export |
+| `ChartView` | Type switching (bar/line/pie/area), SVG rendering |
+| `KanbanView` | **Multi-variant** - see Kanban Variants below |
+| `CalculatorView` | Memory, operations, percentage, delete |
+| `CodeEditorView` | Run code, copy, export, output panel |
+| `DocumentView` | Bold/italic/underline, lists, alignment, export |
+
+#### Kanban Variants (v5.52.8)
+
+The Kanban morphed view supports 5 modern frameworks:
+
+| Variant | Description | Key Features |
+|---------|-------------|--------------|
+| **Standard** | Traditional Kanban | Columns, cards, drag-and-drop |
+| **Scrumban** | Scrum + Kanban | Sprint header, velocity, story points, WIP limits |
+| **Enterprise** | Portfolio mgmt | Multi-lane hierarchical boards (Strategic/Ops/Support) |
+| **Personal** | Individual productivity | Simple 3-column, strict WIP limits |
+| **Pomodoro** | Timer-integrated | 25-min focus, breaks, 🍅 counts per task |
+
+**Usage:**
+```tsx
+import { KanbanView, type KanbanVariant } from '@/components/liquid/morphed-views';
+
+<KanbanView initialVariant="scrumban" />
+```
+
+**Features across all variants:**
+- Variant selector dropdown in toolbar
+- Analytics panel (toggle): total tasks, completed, cycle time, throughput
+- Card customization: priority colors, tags, subtasks, assignees
+- WIP limit indicators (green/amber/red)
+
+**Pomodoro-specific:**
+- 25-minute focus timer with 5-minute breaks
+- Play/pause/reset controls
+- Completed pomodoro counter
+- Per-task pomodoro estimates and tracking
 
 ### File Structure
 
@@ -1394,6 +1511,14 @@ apps/thinktank/
 │   ├── liquid/
 │   │   ├── LiquidMorphPanel.tsx   # Morphing panel
 │   │   ├── EjectDialog.tsx    # Export dialog
+│   │   ├── morphed-views/     # View components (v5.52.7)
+│   │   │   ├── DataGridView.tsx
+│   │   │   ├── ChartView.tsx
+│   │   │   ├── KanbanView.tsx
+│   │   │   ├── CalculatorView.tsx
+│   │   │   ├── CodeEditorView.tsx
+│   │   │   ├── DocumentView.tsx
+│   │   │   └── index.ts
 │   │   └── index.ts           # Exports
 │   └── chat/
 │       ├── ModernChatInterface.tsx  # Main chat UI

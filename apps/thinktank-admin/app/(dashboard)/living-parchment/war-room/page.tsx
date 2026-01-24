@@ -417,12 +417,25 @@ export default function WarRoomPage() {
   }
 
   const handleAnalyzeAdvisor = useCallback(async (advisorId: string) => {
-    // In production, this would call the API
-    console.log('Requesting analysis from advisor:', advisorId);
-  }, []);
+    if (!activeSession) return;
+    // Request analysis from advisor via API
+    setLoading(true);
+    try {
+      await fetch(`/api/thinktank-admin/living-parchment/war-room/advisors/${advisorId}/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: activeSession.id }),
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [activeSession]);
 
   const handleSelectPath = useCallback((pathId: string) => {
-    console.log('Selected path:', pathId);
+    setActiveSession((prev: WarRoomSession | null) => prev ? {
+      ...prev,
+      selectedPathId: pathId,
+    } : null);
   }, []);
 
   if (loading) {

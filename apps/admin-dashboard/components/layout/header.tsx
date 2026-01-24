@@ -10,7 +10,7 @@ export function Header() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-card px-6">
+    <header className="flex h-16 items-center justify-between border-b border-white/10 bg-slate-900/60 backdrop-blur-xl px-6">
       <div className="flex items-center gap-4">
         <h2 className="text-lg font-semibold">Admin Dashboard</h2>
       </div>

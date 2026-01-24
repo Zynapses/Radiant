@@ -36,15 +36,15 @@ interface MeshStats {
   healthScore: number;
 }
 
-const mockStats: MeshStats = {
-  totalAgents: 24,
-  activeAgents: 18,
-  totalApps: 12,
-  activeApps: 9,
-  pendingApprovals: 3,
-  transparencyScore: 94,
-  aiHelperRequests: 156,
-  healthScore: 98,
+const defaultStats: MeshStats = {
+  totalAgents: 0,
+  activeAgents: 0,
+  totalApps: 0,
+  activeApps: 0,
+  pendingApprovals: 0,
+  transparencyScore: 0,
+  aiHelperRequests: 0,
+  healthScore: 0,
 };
 
 const quickLinks = [
@@ -56,11 +56,12 @@ const quickLinks = [
 ];
 
 export default function SovereignMeshPage() {
-  const { data: stats = mockStats } = useQuery({
+  const { data: stats = defaultStats } = useQuery({
     queryKey: ['sovereign-mesh', 'overview'],
     queryFn: async () => {
-      // In production, fetch from API
-      return mockStats;
+      const res = await fetch('/api/thinktank-admin/sovereign-mesh/overview');
+      if (!res.ok) return defaultStats;
+      return res.json();
     },
   });
 
@@ -78,7 +79,7 @@ export default function SovereignMeshPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">

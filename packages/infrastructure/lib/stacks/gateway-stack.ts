@@ -289,6 +289,14 @@ export class GatewayStack extends cdk.Stack {
       targetUtilizationPercent: 70,
     });
 
+    // ================================================================
+    // A2A Worker Lambda (Agent-to-Agent Protocol Processing)
+    // ================================================================
+    // Note: A2A worker is deployed as part of the API stack's Lambda
+    // infrastructure. The Gateway routes A2A messages to NATS subject
+    // 'a2a.>' which are consumed by the A2A worker Lambda.
+    // See: lambda/gateway/a2a-worker.ts
+
     // Outputs
     this.gatewayEndpoint = gatewayNlb.loadBalancerDnsName;
     this.egressProxyEndpoint = egressAlb.loadBalancerDnsName;
@@ -301,6 +309,11 @@ export class GatewayStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'EgressProxyEndpoint', {
       value: `http://${egressAlb.loadBalancerDnsName}`,
       description: 'Internal endpoint for the egress proxy',
+    });
+
+    new cdk.CfnOutput(this, 'SupportedProtocols', {
+      value: 'MCP (Model Context Protocol), A2A (Agent-to-Agent), OpenAI, Anthropic, Google',
+      description: 'Protocols supported by this gateway',
     });
   }
 }

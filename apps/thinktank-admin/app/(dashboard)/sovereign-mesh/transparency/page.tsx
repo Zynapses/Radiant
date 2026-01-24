@@ -62,20 +62,8 @@ interface DecisionTrail {
   outcome: string;
 }
 
-const mockAuditLogs: AuditLog[] = [
-  { id: '1', timestamp: '2026-01-21T20:45:00Z', actor: { type: 'user', name: 'admin@example.com' }, action: 'DEPLOY_AGENT', resource: 'DataProcessor', details: 'Deployed new agent version v2.1.0', severity: 'info', outcome: 'success' },
-  { id: '2', timestamp: '2026-01-21T20:30:00Z', actor: { type: 'agent', name: 'SecurityScanner' }, action: 'SECURITY_SCAN', resource: 'Production Environment', details: 'Completed scheduled security scan', severity: 'info', outcome: 'success' },
-  { id: '3', timestamp: '2026-01-21T20:15:00Z', actor: { type: 'system', name: 'AutoScaler' }, action: 'SCALE_UP', resource: 'AnalyticsEngine', details: 'Scaled from 2 to 4 instances due to load', severity: 'warning', outcome: 'success' },
-  { id: '4', timestamp: '2026-01-21T20:00:00Z', actor: { type: 'user', name: 'dev@example.com' }, action: 'ACCESS_DATA', resource: 'Customer Database', details: 'Read access to customer records', severity: 'info', outcome: 'success' },
-  { id: '5', timestamp: '2026-01-21T19:45:00Z', actor: { type: 'agent', name: 'ImageProcessor' }, action: 'PROCESS_BATCH', resource: 'Image Queue', details: 'Failed to process 3 images due to format error', severity: 'warning', outcome: 'failure' },
-  { id: '6', timestamp: '2026-01-21T19:30:00Z', actor: { type: 'system', name: 'HealthMonitor' }, action: 'ALERT_TRIGGERED', resource: 'DataPipeline', details: 'Memory usage exceeded 90% threshold', severity: 'critical', outcome: 'success' },
-];
-
-const mockDecisionTrails: DecisionTrail[] = [
-  { id: '1', timestamp: '2026-01-21T20:40:00Z', agent: 'CodeAssistant', decision: 'Refactor suggestion', reasoning: 'Detected repeated code pattern in 3 files', confidence: 0.92, inputs: ['code_analysis', 'pattern_detection'], outcome: 'Suggestion accepted' },
-  { id: '2', timestamp: '2026-01-21T20:35:00Z', agent: 'DataProcessor', decision: 'Skip invalid records', reasoning: 'Records missing required fields', confidence: 0.98, inputs: ['validation_rules', 'schema_check'], outcome: '12 records skipped' },
-  { id: '3', timestamp: '2026-01-21T20:30:00Z', agent: 'AnalyticsEngine', decision: 'Cache refresh', reasoning: 'Cache staleness exceeded 5 minutes', confidence: 0.95, inputs: ['cache_policy', 'data_freshness'], outcome: 'Cache updated' },
-];
+const defaultAuditLogs: AuditLog[] = [];
+const defaultDecisionTrails: DecisionTrail[] = [];
 
 const severityConfig = {
   info: { color: 'bg-blue-500', icon: Info },
@@ -94,14 +82,22 @@ export default function SovereignMeshTransparencyPage() {
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [actorFilter, setActorFilter] = useState<string>('all');
 
-  const { data: auditLogs = mockAuditLogs } = useQuery({
+  const { data: auditLogs = defaultAuditLogs } = useQuery<AuditLog[]>({
     queryKey: ['sovereign-mesh', 'audit-logs'],
-    queryFn: async () => mockAuditLogs,
+    queryFn: async () => {
+      const res = await fetch('/api/thinktank-admin/sovereign-mesh/audit-logs');
+      if (!res.ok) return defaultAuditLogs;
+      return res.json();
+    },
   });
 
-  const { data: decisionTrails = mockDecisionTrails } = useQuery({
+  const { data: decisionTrails = defaultDecisionTrails } = useQuery<DecisionTrail[]>({
     queryKey: ['sovereign-mesh', 'decision-trails'],
-    queryFn: async () => mockDecisionTrails,
+    queryFn: async () => {
+      const res = await fetch('/api/thinktank-admin/sovereign-mesh/decision-trails');
+      if (!res.ok) return defaultDecisionTrails;
+      return res.json();
+    },
   });
 
   const filteredLogs = auditLogs.filter(log => {

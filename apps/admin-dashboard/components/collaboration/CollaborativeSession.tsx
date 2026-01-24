@@ -767,9 +767,26 @@ export default function CollaborativeSession({
                 sessionName={conversationTitle}
                 shareLink={shareLink}
                 participants={participants}
-                onInvite={(email, permission) => console.log('Invite:', email, permission)}
-                onUpdatePermission={(id, permission) => console.log('Update:', id, permission)}
-                onRemove={(id) => console.log('Remove:', id)}
+                onInvite={async (email, permission) => {
+                  const newParticipant: Participant = {
+                    id: `p_${Date.now()}`,
+                    name: email.split('@')[0],
+                    email,
+                    color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+                    permission,
+                    isOnline: false,
+                    isTyping: false,
+                  };
+                  setParticipants(prev => [...prev, newParticipant]);
+                }}
+                onUpdatePermission={(id, permission) => {
+                  setParticipants(prev => prev.map(p => 
+                    p.id === id ? { ...p, permission } : p
+                  ));
+                }}
+                onRemove={(id) => {
+                  setParticipants(prev => prev.filter(p => p.id !== id));
+                }}
               />
             </Dialog>
             <Button variant="ghost" size="icon" onClick={() => setShowComments(!showComments)}>
@@ -846,8 +863,15 @@ export default function CollaborativeSession({
                         return m;
                       }));
                     }}
-                    onReply={() => console.log('Reply to:', message.id)}
-                    onEdit={() => console.log('Edit:', message.id)}
+                    onReply={() => {
+                      setInputValue(`@${participant.name} `);
+                    }}
+                    onEdit={() => {
+                      setInputValue(message.content);
+                      setMessages(prev => prev.map(m => 
+                        m.id === message.id ? { ...m, status: 'edited' as const } : m
+                      ));
+                    }}
                     onDelete={() => setMessages(prev => prev.filter(m => m.id !== message.id))}
                     onAddComment={(text) => {
                       const newComment: Comment = {

@@ -90,10 +90,10 @@ export default function RulesPage() {
   const isPresetAdded = (presetId: string) => rules.some((r) => r.presetId === presetId);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative">
       <AuroraBackground colors="cyan" intensity="subtle" className="fixed inset-0 pointer-events-none" />
       {/* Header */}
-      <header className="sticky top-0 z-10 h-14 border-b border-slate-800/50 flex items-center px-4 bg-[#0d0d14]/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-10 h-14 border-b border-white/10 flex items-center px-4 bg-slate-900/60 backdrop-blur-xl">
         <Link href="/" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
           <ArrowLeft className="h-5 w-5" />
           <span className="text-sm">{t(T.common.back)}</span>

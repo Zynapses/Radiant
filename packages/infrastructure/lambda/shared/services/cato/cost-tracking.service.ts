@@ -38,7 +38,37 @@ export interface CostBudget {
   isOverBudget: boolean;
 }
 
-class CostTrackingService {
+/** Real-time cost estimate with breakdown */
+export interface RealtimeCostEstimate {
+  estimatedCostUsd: number;
+  breakdown: {
+    bedrock: number;
+    sagemaker: number;
+    lambda: number;
+    storage: number;
+    other: number;
+  };
+  invocations: number;
+  updatedAt: Date;
+}
+
+/** Daily cost record */
+export interface DailyCost {
+  date: string;
+  costCents: number;
+  requests: number;
+}
+
+/** Month-to-date cost record */
+export interface MtdCost {
+  month: string;
+  costCents: number;
+  requests: number;
+  daysRemaining: number;
+  projectedTotal: number;
+}
+
+export class CostTrackingService {
   private entries: CostEntry[] = [];
   private budgets: Map<string, CostBudget> = new Map();
 
@@ -142,9 +172,20 @@ class CostTrackingService {
     return start;
   }
 
-  async getRealtimeEstimate(tenantId = 'default'): Promise<{ currentCostCents: number; projectedDailyCents: number }> {
+  async getRealtimeEstimate(tenantId = 'default'): Promise<RealtimeCostEstimate> {
     const budget = await this.getBudget(tenantId);
-    return { currentCostCents: budget.currentDailyCents, projectedDailyCents: budget.currentDailyCents * 1.2 };
+    return {
+      estimatedCostUsd: budget.currentDailyCents / 100,
+      breakdown: {
+        bedrock: budget.currentDailyCents * 0.4 / 100,
+        sagemaker: budget.currentDailyCents * 0.3 / 100,
+        lambda: budget.currentDailyCents * 0.15 / 100,
+        storage: budget.currentDailyCents * 0.1 / 100,
+        other: budget.currentDailyCents * 0.05 / 100,
+      },
+      invocations: this.entries.filter(e => e.tenantId === tenantId).length,
+      updatedAt: new Date(),
+    };
   }
 
   async getDailyCost(tenantId = 'default'): Promise<number> {

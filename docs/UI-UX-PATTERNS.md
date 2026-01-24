@@ -2,8 +2,8 @@
 
 > **Design System Documentation**
 > 
-> **Version**: 1.0 | **Date**: January 19, 2026  
-> **Last Updated**: January 19, 2026
+> **Version**: 1.1 | **Date**: January 19, 2026  
+> **Last Updated**: January 24, 2026
 
 ---
 
@@ -119,18 +119,58 @@ This document tracks all UI/UX patterns, styles, and behaviors used in RADIANT a
 
 ### Card Component
 
-**Source**: shadcn/ui Card component
+**Source**: shadcn/ui Card component with Glass variant (v5.52.2)
 
 | Part | Class | Purpose |
 |------|-------|---------|
-| `Card` | `rounded-lg border bg-card shadow-sm` | Container |
+| `Card` | `rounded-xl border bg-card shadow-sm` | Container |
+| `Card variant="glass"` | `bg-white/[0.04] backdrop-blur-lg border-white/[0.08]` | Glass effect |
 | `CardHeader` | `flex flex-col space-y-1.5 p-6` | Title area |
 | `CardTitle` | `text-2xl font-semibold` | Main heading |
 | `CardDescription` | `text-sm text-muted-foreground` | Subtitle |
-| `CardContent` | `p-6 pt-0` | Body content |
-| `CardFooter` | `flex items-center p-6 pt-0` | Actions area |
 
-**Files**: `apps/admin-dashboard/components/ui/card.tsx`
+### GlassCard Component (v5.52.2)
+
+**Source**: Custom RADIANT glassmorphism component
+
+| Part | Class | Purpose |
+|------|-------|---------|
+| `GlassCard` | `bg-white/[0.04] backdrop-blur-lg border-white/[0.08] rounded-xl` | Glass container |
+| `GlassPanel` | `bg-white/[0.03] backdrop-blur-lg border-white/[0.06] rounded-2xl` | Glass panel |
+| `GlassOverlay` | `fixed inset-0 bg-black/40 backdrop-blur-xl z-50` | Modal overlay |
+
+**Variants:**
+
+| Variant | Effect | Use Case |
+|---------|--------|----------|
+| `default` | Subtle glass | Standard cards |
+| `elevated` | Stronger shadow | Floating panels |
+| `inset` | Inner shadow | Embedded content |
+| `glow` | Ambient color glow | Featured content |
+
+**Intensity:**
+
+| Intensity | Background | Blur |
+|-----------|------------|------|
+| `light` | `bg-white/[0.02]` | `backdrop-blur-md` |
+| `medium` | `bg-white/[0.04]` | `backdrop-blur-lg` |
+| `strong` | `bg-white/[0.08]` | `backdrop-blur-xl` |
+
+**Glow Colors:**
+
+| Color | Shadow |
+|-------|--------|
+| `violet` | `shadow-[0_0_30px_rgba(139,92,246,0.15)]` |
+| `fuchsia` | `shadow-[0_0_30px_rgba(217,70,239,0.15)]` |
+| `cyan` | `shadow-[0_0_30px_rgba(34,211,238,0.15)]` |
+| `emerald` | `shadow-[0_0_30px_rgba(52,211,153,0.15)]` |
+| `blue` | `shadow-[0_0_30px_rgba(59,130,246,0.15)]` |
+
+**Files**: 
+- `apps/thinktank/components/ui/glass-card.tsx`
+- `apps/admin-dashboard/components/ui/glass-card.tsx`
+- `apps/thinktank-admin/components/ui/glass-card.tsx`
+- `apps/curator/components/ui/glass-card.tsx`
 
 ### Stat Card Component
 
@@ -528,7 +568,19 @@ container: {
 | `DropdownMenuSeparator` | Visual divider |
 | `DropdownMenuSub` | Nested submenu |
 
-**Files**: `apps/admin-dashboard/components/ui/dropdown-menu.tsx`
+**Files**: 
+- `apps/admin-dashboard/components/ui/dropdown-menu.tsx`
+- `apps/thinktank/components/ui/dropdown-menu.tsx` (v5.52.16 - glassmorphism variant)
+
+**Think Tank Variant** (v5.52.16):
+| Property | Value |
+|----------|-------|
+| Background | `bg-slate-900/95 backdrop-blur-xl` |
+| Border | `border-white/[0.08]` |
+| Item hover | `focus:bg-white/[0.08]` |
+| Text color | `text-slate-300` (hover: `text-white`) |
+| Border radius | `rounded-xl` |
+| Shadow | `shadow-xl shadow-black/20` |
 
 ---
 
@@ -778,6 +830,143 @@ AI-powered predictive suggestions.
 | 2026-01-19 | ViewRouter | New component | Polymorphic UI morphing with Sniper/War Room modes | Cascade |
 | 2026-01-19 | ModernChatInterface | New component | 2026+ chat UI with glassmorphism, advanced mode | Cascade |
 | 2026-01-19 | Design Tokens | New system | Complete design token system for colors, spacing, animation | Cascade |
+| 2026-01-23 | Responsive Grids | Enforced | All stats grids must use `md:grid-cols-2 lg:grid-cols-4` pattern | Cascade |
+| 2026-01-23 | Toast Notifications | Enforced | All mutation actions must show toast feedback | Cascade |
+| 2026-01-23 | useQuery Typing | Enforced | All useQuery hooks must use generic typing `useQuery<T>()` | Cascade |
+| 2026-01-23 | Magic Carpet Interactions | Implemented | Bookmark, branch, prediction handlers with toast feedback | Cascade |
+| 2026-01-23 | Collaborative Session | Implemented | Invite, permission, remove participant handlers with state | Cascade |
+| 2026-01-23 | Reply/Edit Actions | Implemented | Reply populates input with @mention, edit populates content | Cascade |
+| 2026-01-23 | Living Parchment | Implemented | War Room advisor analysis, Council session conclusion via API | Cascade |
+| 2026-01-23 | Geographic Map | Implemented | Region click handler with toast and selection state | Cascade |
+| 2026-01-23 | Report Edit | Implemented | Edit report handler opens dialog with report configuration | Cascade |
+| 2026-01-23 | ViewRouter State | Implemented | View/mode state tracking for polymorphic UI transitions | Cascade |
+| 2026-01-24 | Activity Heatmap | New component | GitHub-style yearly activity visualization | Cascade |
+| 2026-01-24 | Enhanced Activity Heatmap | New component | AI insights, breathing animation, streaks, sound | Cascade |
+| 2026-01-24 | Generic Heatmap | New component | 2D grid with 5 color schemes | Cascade |
+| 2026-01-24 | Latency Heatmap | New component | Geographic AWS region latency map | Cascade |
+| 2026-01-24 | CBF Violations Heatmap | New component | Content boundary rule violation analytics | Cascade |
+
+---
+
+## Category 13: Heatmap Components (v5.52.1)
+
+**Source**: Custom RADIANT visualization components for data density display
+
+### Activity Heatmap
+
+GitHub-style contribution graph for user activity tracking.
+
+| Property | Value |
+|----------|-------|
+| Location | `apps/thinktank/components/ui/activity-heatmap.tsx` |
+| Color Schemes | `violet`, `green`, `blue` |
+| Layout | 52 weeks × 7 days grid |
+| Animation | Framer Motion staggered fade-in |
+
+**Usage:**
+```tsx
+<ActivityHeatmap 
+  data={[{ date: '2026-01-24', count: 5 }]} 
+  year={2026}
+  colorScheme="violet"
+/>
+```
+
+### Enhanced Activity Heatmap
+
+Industry-leading activity visualization with AI features.
+
+| Feature | Description |
+|---------|-------------|
+| **Breathing Animation** | Cells pulse based on activity intensity (0.5s cycle) |
+| **AI Insights** | Pattern detection, anomaly alerts, trend predictions |
+| **Streak Tracking** | Current/longest streak badges with 🔥 icons |
+| **Sound Feedback** | Web Audio API pitch varies with intensity |
+| **Accessibility Mode** | Full narrative summary for screen readers |
+| **Predictions** | Future cells with dashed borders |
+
+**Props:**
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `data` | `ActivityDay[]` | required | Activity data |
+| `year` | `number` | current year | Display year |
+| `colorScheme` | `'violet' \| 'green' \| 'blue' \| 'fire' \| 'ocean'` | `'violet'` | Color theme |
+| `enableBreathing` | `boolean` | `true` | Enable pulse animation |
+| `enableSound` | `boolean` | `false` | Enable audio feedback |
+| `enableAIInsights` | `boolean` | `true` | Show AI analysis |
+| `showStreaks` | `boolean` | `true` | Highlight streak days |
+
+**Files**: `apps/thinktank/components/ui/enhanced-activity-heatmap.tsx`
+
+### Generic Heatmap
+
+2D grid visualization for correlation matrices and patterns.
+
+| Property | Value |
+|----------|-------|
+| Location | `apps/admin-dashboard/components/charts/heatmap.tsx` |
+| Color Schemes | `blue`, `red`, `green`, `purple`, `diverging` |
+| Cell Sizes | `sm` (32px), `md` (48px), `lg` (64px) |
+| Animation | Framer Motion staggered scale-in |
+
+**Usage:**
+```tsx
+<Heatmap
+  data={[{ row: 'Model A', col: 'Mon', value: 42 }]}
+  rows={['Model A', 'Model B']}
+  cols={['Mon', 'Tue', 'Wed']}
+  colorScheme="blue"
+  showValues={true}
+  cellSize="md"
+/>
+```
+
+**Files**: `apps/admin-dashboard/components/charts/heatmap.tsx`
+
+### Latency Heatmap
+
+Geographic visualization of AWS region latencies.
+
+| Property | Value |
+|----------|-------|
+| Location | `apps/admin-dashboard/components/geographic/latency-heatmap.tsx` |
+| Regions | 17 AWS regions with SVG positioning |
+| Thresholds | <50ms (green) → >500ms (red) |
+| Animation | Pulse for critical regions |
+
+**Latency Colors:**
+| Threshold | Color | Label |
+|-----------|-------|-------|
+| <50ms | `#22c55e` | Excellent |
+| <100ms | `#84cc16` | Good |
+| <200ms | `#eab308` | Fair |
+| <500ms | `#f97316` | Slow |
+| >500ms | `#ef4444` | Critical |
+
+**Files**: `apps/admin-dashboard/components/geographic/latency-heatmap.tsx`
+
+### CBF Violations Heatmap
+
+Content Boundary Framework rule violation analytics.
+
+| Property | Value |
+|----------|-------|
+| Location | `apps/admin-dashboard/components/analytics/cbf-violations-heatmap.tsx` |
+| Grouping | By category (content_safety, pii_detection, etc.) |
+| Severity | low (blue), medium (yellow), high (orange), critical (red) |
+| Trends | Up/down arrows for violation direction |
+
+**Category Icons:**
+| Category | Icon |
+|----------|------|
+| `content_safety` | 🛡️ |
+| `data_privacy` | 🔒 |
+| `pii_detection` | 👤 |
+| `harmful_content` | ⚠️ |
+| `jailbreak` | 🔓 |
+| `prompt_injection` | 💉 |
+
+**Files**: `apps/admin-dashboard/components/analytics/cbf-violations-heatmap.tsx`
 
 ---
 

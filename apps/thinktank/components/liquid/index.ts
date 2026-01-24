@@ -8,3 +8,13 @@
 export { LiquidMorphPanel, MorphTransitionEffect } from './LiquidMorphPanel';
 export type { MorphedViewType } from './LiquidMorphPanel';
 export { EjectDialog } from './EjectDialog';
+
+// Morphed View Components
+export { 
+  DataGridView, 
+  ChartView, 
+  KanbanView, 
+  CalculatorView, 
+  CodeEditorView, 
+  DocumentView 
+} from './morphed-views';

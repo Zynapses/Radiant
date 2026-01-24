@@ -9,49 +9,49 @@
  * - Break glass access flow
  */
 
-import { describe, it, expect, jest, beforeEach, afterEach, beforeAll } from '@jest/globals';
+import { describe, it, expect, vi, beforeEach, afterEach, beforeAll } from 'vitest';
 import type { APIGatewayProxyEvent, Context, PreTokenGenerationTriggerEvent } from 'aws-lambda';
 
 // Mock AWS SDK clients
-jest.mock('@aws-sdk/client-cognito-identity-provider', () => ({
-  CognitoIdentityProviderClient: jest.fn().mockImplementation(() => ({
-    send: jest.fn(),
+vi.mock('@aws-sdk/client-cognito-identity-provider', () => ({
+  CognitoIdentityProviderClient: vi.fn().mockImplementation(() => ({
+    send: vi.fn(),
   })),
-  AdminGetUserCommand: jest.fn(),
-  GetUserCommand: jest.fn(),
+  AdminGetUserCommand: vi.fn(),
+  GetUserCommand: vi.fn(),
 }));
 
-jest.mock('@aws-sdk/client-sns', () => ({
-  SNSClient: jest.fn().mockImplementation(() => ({
-    send: jest.fn(),
+vi.mock('@aws-sdk/client-sns', () => ({
+  SNSClient: vi.fn().mockImplementation(() => ({
+    send: vi.fn(),
   })),
-  PublishCommand: jest.fn(),
+  PublishCommand: vi.fn(),
 }));
 
 // Mock database client
-jest.mock('../../lambda/shared/db/client', () => ({
-  executeStatement: jest.fn(),
-  getPool: jest.fn(() => ({
-    connect: jest.fn().mockResolvedValue({
-      query: jest.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
-      release: jest.fn(),
+vi.mock('../../lambda/shared/db/client', () => ({
+  executeStatement: vi.fn(),
+  getPool: vi.fn(() => ({
+    connect: vi.fn().mockResolvedValue({
+      query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
+      release: vi.fn(),
     }),
-    end: jest.fn(),
+    end: vi.fn(),
   })),
 }));
 
 // Mock logger
-jest.mock('../../lambda/shared/logging/enhanced-logger', () => ({
+vi.mock('../../lambda/shared/logging/enhanced-logger', () => ({
   enhancedLogger: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
   },
 }));
 
 describe('Authentication Flow Integration Tests', () => {
-  let executeStatement: jest.Mock;
+  let executeStatement: ReturnType<typeof vi.fn>;
 
   const mockContext: Context = {
     callbackWaitsForEmptyEventLoop: false,
@@ -63,23 +63,23 @@ describe('Authentication Flow Integration Tests', () => {
     logGroupName: '/aws/lambda/test',
     logStreamName: '2024/01/01/[$LATEST]abc123',
     getRemainingTimeInMillis: () => 30000,
-    done: jest.fn(),
-    fail: jest.fn(),
-    succeed: jest.fn(),
+    done: vi.fn(),
+    fail: vi.fn(),
+    succeed: vi.fn(),
   };
 
   beforeAll(async () => {
-    jest.resetModules();
-    executeStatement = (await import('../../lambda/shared/db/client')).executeStatement as jest.Mock;
+    vi.resetModules();
+    executeStatement = (await import('../../lambda/shared/db/client')).executeStatement as ReturnType<typeof vi.fn>;
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     executeStatement.mockResolvedValue({ rows: [], rowCount: 0 });
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // ==========================================================================
@@ -129,7 +129,7 @@ describe('Authentication Flow Integration Tests', () => {
         'custom:tenant_id': 'tenant-123',
       });
 
-      const result = await preTokenHandler(event, mockContext, jest.fn());
+      const result = await preTokenHandler(event, mockContext, vi.fn());
 
       expect(result.response.claimsOverrideDetails).toBeDefined();
       expect(result.response.claimsOverrideDetails?.claimsToAddOrOverride?.tenant_id).toBe('tenant-123');
@@ -152,7 +152,7 @@ describe('Authentication Flow Integration Tests', () => {
         'custom:tenant_id': 'tenant-123',
       });
 
-      const result = await preTokenHandler(event, mockContext, jest.fn());
+      const result = await preTokenHandler(event, mockContext, vi.fn());
 
       expect(result.response.claimsOverrideDetails?.claimsToAddOrOverride?.permission_level).toBe('tenant_admin');
     });
@@ -185,7 +185,7 @@ describe('Authentication Flow Integration Tests', () => {
         'custom:tenant_id': 'tenant-123',
       });
 
-      const result = await preTokenHandler(event, mockContext, jest.fn());
+      const result = await preTokenHandler(event, mockContext, vi.fn());
 
       expect(result.response.claimsOverrideDetails?.claimsToAddOrOverride?.scopes).toBeDefined();
     });
@@ -209,7 +209,7 @@ describe('Authentication Flow Integration Tests', () => {
         'custom:tenant_id': 'tenant-eu',
       });
 
-      const result = await preTokenHandler(event, mockContext, jest.fn());
+      const result = await preTokenHandler(event, mockContext, vi.fn());
 
       expect(result.response.claimsOverrideDetails?.claimsToAddOrOverride?.jurisdiction).toBe('EU');
       expect(result.response.claimsOverrideDetails?.claimsToAddOrOverride?.data_region).toBe('eu-west-1');
@@ -233,7 +233,7 @@ describe('Authentication Flow Integration Tests', () => {
         groupsToOverride: ['radiant-admins'],
       });
 
-      const result = await preTokenHandler(event, mockContext, jest.fn());
+      const result = await preTokenHandler(event, mockContext, vi.fn());
 
       expect(result.response.claimsOverrideDetails?.claimsToAddOrOverride?.permission_level).toBe('radiant_admin');
     });
@@ -409,7 +409,7 @@ describe('Authentication Flow Integration Tests', () => {
       };
 
       const mockClient = {
-        query: jest.fn().mockResolvedValue({
+        query: vi.fn().mockResolvedValue({
           rows: [{ id: 'break-glass-1' }],
           rowCount: 1,
         }),
@@ -438,7 +438,7 @@ describe('Authentication Flow Integration Tests', () => {
       };
 
       const mockClient = {
-        query: jest.fn(),
+        query: vi.fn(),
       };
 
       await expect(
@@ -485,7 +485,7 @@ describe('Authentication Flow Integration Tests', () => {
       };
 
       const mockClient = {
-        query: jest.fn().mockResolvedValue({
+        query: vi.fn().mockResolvedValue({
           rows: [{ id: 'break-glass-1' }],
           rowCount: 1,
         }),
@@ -555,12 +555,12 @@ describe('Authentication Flow Integration Tests', () => {
       const dbContextService = await import('../../lambda/shared/services/db-context.service');
 
       const mockClient = {
-        query: jest.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
-        release: jest.fn(),
+        query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
+        release: vi.fn(),
       };
 
       const mockPool = {
-        connect: jest.fn().mockResolvedValue(mockClient),
+        connect: vi.fn().mockResolvedValue(mockClient),
       };
 
       // Mock pool.connect
@@ -594,12 +594,12 @@ describe('Authentication Flow Integration Tests', () => {
       const dbContextService = await import('../../lambda/shared/services/db-context.service');
 
       const mockClient = {
-        query: jest.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
-        release: jest.fn(),
+        query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
+        release: vi.fn(),
       };
 
       const mockPool = {
-        connect: jest.fn().mockResolvedValue(mockClient),
+        connect: vi.fn().mockResolvedValue(mockClient),
       };
 
       jest.spyOn(dbContextService, 'getPool').mockReturnValue(mockPool as any);
@@ -638,7 +638,7 @@ describe('Authentication Flow Integration Tests', () => {
       const userRegistryService = await import('../../lambda/shared/services/user-registry.service');
 
       const mockClient = {
-        query: jest.fn().mockResolvedValue({
+        query: vi.fn().mockResolvedValue({
           rows: [{ jurisdiction: 'EU', data_region: 'eu-west-1' }],
           rowCount: 1,
         }),
@@ -658,7 +658,7 @@ describe('Authentication Flow Integration Tests', () => {
       const userRegistryService = await import('../../lambda/shared/services/user-registry.service');
 
       const mockClient = {
-        query: jest.fn().mockResolvedValue({
+        query: vi.fn().mockResolvedValue({
           rows: [{ jurisdiction: 'US', data_region: 'us-east-1' }],
           rowCount: 1,
         }),

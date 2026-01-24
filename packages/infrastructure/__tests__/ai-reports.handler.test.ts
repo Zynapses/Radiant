@@ -3,7 +3,7 @@
  * Tests for the AI-powered report generation API endpoints
  */
 
-import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock dependencies
 jest.mock('../lambda/shared/db/client', () => ({
@@ -40,12 +40,12 @@ jest.mock('uuid', () => ({
 
 describe('AI Reports Handler', () => {
   let handler: typeof import('../lambda/admin/ai-reports').handler;
-  let executeStatement: jest.Mock;
+  let executeStatement: ReturnType<typeof jest.fn>;
 
   beforeEach(async () => {
     jest.clearAllMocks();
     const dbClient = await import('../lambda/shared/db/client');
-    executeStatement = dbClient.executeStatement as jest.Mock;
+    executeStatement = dbClient.executeStatement as ReturnType<typeof jest.fn>;
     const aiReports = await import('../lambda/admin/ai-reports');
     handler = aiReports.handler;
   });

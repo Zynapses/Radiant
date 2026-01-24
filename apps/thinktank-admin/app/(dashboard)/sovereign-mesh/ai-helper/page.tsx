@@ -45,14 +45,7 @@ interface AIRequest {
   rating: number | null;
 }
 
-const mockRequests: AIRequest[] = [
-  { id: '1', timestamp: '2026-01-21T20:45:00Z', user: 'dev@example.com', type: 'code', prompt: 'Generate a React component for user authentication', status: 'completed', duration: 2340, tokens: 856, rating: 5 },
-  { id: '2', timestamp: '2026-01-21T20:42:00Z', user: 'analyst@example.com', type: 'analysis', prompt: 'Analyze Q4 sales data trends', status: 'completed', duration: 4520, tokens: 1234, rating: 4 },
-  { id: '3', timestamp: '2026-01-21T20:40:00Z', user: 'pm@example.com', type: 'summary', prompt: 'Summarize meeting notes from today', status: 'completed', duration: 1890, tokens: 567, rating: null },
-  { id: '4', timestamp: '2026-01-21T20:38:00Z', user: 'dev@example.com', type: 'code', prompt: 'Debug this Python function', status: 'processing', duration: 0, tokens: 0, rating: null },
-  { id: '5', timestamp: '2026-01-21T20:35:00Z', user: 'support@example.com', type: 'query', prompt: 'Find customer ticket history', status: 'completed', duration: 890, tokens: 234, rating: 5 },
-  { id: '6', timestamp: '2026-01-21T20:30:00Z', user: 'analyst@example.com', type: 'analysis', prompt: 'Compare performance metrics', status: 'failed', duration: 5000, tokens: 0, rating: null },
-];
+const defaultRequests: AIRequest[] = [];
 
 const typeConfig = {
   code: { icon: Code, color: 'bg-purple-500', label: 'Code' },
@@ -72,9 +65,13 @@ export default function SovereignMeshAIHelperPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
 
-  const { data: requests = mockRequests } = useQuery({
+  const { data: requests = defaultRequests } = useQuery<AIRequest[]>({
     queryKey: ['sovereign-mesh', 'ai-helper'],
-    queryFn: async () => mockRequests,
+    queryFn: async () => {
+      const res = await fetch('/api/thinktank-admin/sovereign-mesh/ai-helper/requests');
+      if (!res.ok) return defaultRequests;
+      return res.json();
+    },
   });
 
   const filteredRequests = requests.filter(req => {

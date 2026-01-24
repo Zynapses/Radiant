@@ -6,6 +6,7 @@
  */
 
 export type CircuitState = 'CLOSED' | 'OPEN' | 'HALF_OPEN';
+export type InterventionLevel = 'NONE' | 'DAMPEN' | 'PAUSE' | 'HIBERNATE';
 
 export interface CircuitBreaker {
   id: string;
@@ -34,7 +35,7 @@ const DEFAULT_CONFIG: CircuitBreakerConfig = {
   halfOpenRequests: 3,
 };
 
-class CircuitBreakerService {
+export class CircuitBreakerService {
   private breakers: Map<string, CircuitBreaker> = new Map();
 
   async getBreaker(tenantIdOrName: string, name?: string): Promise<CircuitBreaker> {

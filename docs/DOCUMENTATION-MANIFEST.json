@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "lastUpdated": "2026-01-24",
+  "description": "Master manifest of ALL documentation files in RADIANT. AI agents MUST update relevant docs when making code changes.",
+  
+  "primaryDocs": {
+    "description": "These documents MUST be checked on EVERY code change",
+    "docs": [
+      {
+        "path": "CHANGELOG.md",
+        "priority": "ALWAYS",
+        "triggers": ["any_change"],
+        "description": "Version history - update for ANY feature or fix"
+      },
+      {
+        "path": "docs/RADIANT-ADMIN-GUIDE.md",
+        "priority": "HIGH",
+        "triggers": ["platform_feature", "admin_feature", "api_change", "cdk_change", "billing", "security", "models"],
+        "description": "Platform admin documentation - tenants, billing, models, providers, security"
+      },
+      {
+        "path": "docs/THINKTANK-ADMIN-GUIDE.md",
+        "priority": "HIGH",
+        "triggers": ["thinktank_admin", "user_rules", "delight", "brain_plans", "domains", "ego"],
+        "description": "Think Tank admin features - user rules, delight system, brain plans"
+      },
+      {
+        "path": "docs/THINKTANK-ADMIN-GUIDE-V2.md",
+        "priority": "HIGH",
+        "triggers": ["thinktank_admin", "user_rules", "delight", "brain_plans", "domains", "ego"],
+        "description": "Think Tank admin guide v2 - consolidated version"
+      },
+      {
+        "path": "docs/THINKTANK-USER-GUIDE.md",
+        "priority": "HIGH",
+        "triggers": ["user_facing", "ui_change", "thinktank_feature"],
+        "description": "End-user documentation - how to use Think Tank"
+      },
+      {
+        "path": "docs/STRATEGIC-VISION-MARKETING.md",
+        "priority": "HIGH",
+        "triggers": ["major_feature", "admin_guide_update"],
+        "description": "Customer-facing marketing - auto-update when admin guides change"
+      },
+      {
+        "path": "docs/ENGINEERING-IMPLEMENTATION-VISION.md",
+        "priority": "HIGH",
+        "triggers": ["architecture", "service", "lambda", "cdk", "technical"],
+        "description": "Technical architecture and implementation details"
+      },
+      {
+        "path": "docs/RADIANT-PLATFORM-ARCHITECTURE.md",
+        "priority": "HIGH",
+        "triggers": ["architecture", "cdk", "lambda", "api", "database"],
+        "description": "Complete system architecture reference"
+      }
+    ]
+  },
+  
+  "secondaryDocs": {
+    "description": "Update when specific features are touched",
+    "docs": [
+      {
+        "path": "docs/THINKTANK-MOATS.md",
+        "triggers": ["competitive_advantage", "unique_feature"],
+        "description": "Think Tank competitive differentiators"
+      },
+      {
+        "path": "docs/RADIANT-MOATS.md",
+        "triggers": ["platform_advantage", "unique_feature"],
+        "description": "Platform competitive differentiators"
+      },
+      {
+        "path": "docs/sections/SECTION-07-DATABASE-SCHEMA.md",
+        "triggers": ["database", "migration", "table", "column"],
+        "description": "Database schema documentation"
+      },
+      {
+        "path": "docs/OPEN-SOURCE-LIBRARIES.md",
+        "triggers": ["dependency", "npm_package", "library"],
+        "description": "Open source library inventory"
+      },
+      {
+        "path": "docs/UI-UX-PATTERNS.md",
+        "triggers": ["ui_component", "design_pattern", "ux"],
+        "description": "UI/UX pattern documentation"
+      },
+      {
+        "path": "docs/ORCHESTRATION-METHODS.md",
+        "triggers": ["orchestration", "workflow", "method"],
+        "description": "AI orchestration method registry"
+      },
+      {
+        "path": "docs/API_REFERENCE.md",
+        "triggers": ["api_endpoint", "rest_api"],
+        "description": "API reference documentation"
+      },
+      {
+        "path": "docs/CATO-COMPLETE-DOCUMENTATION.md",
+        "triggers": ["cato", "safety", "genesis", "ethics"],
+        "description": "Cato safety system documentation"
+      },
+      {
+        "path": "docs/CONSCIOUSNESS-SERVICE.md",
+        "triggers": ["consciousness", "ego", "affect"],
+        "description": "Consciousness service documentation"
+      },
+      {
+        "path": "docs/CORTEX-MEMORY-ADMIN-GUIDE.md",
+        "triggers": ["cortex", "memory", "blackboard"],
+        "description": "Cortex memory system documentation"
+      },
+      {
+        "path": "docs/CURATOR-USER-GUIDE.md",
+        "triggers": ["curator", "knowledge_graph", "verification", "golden_rules", "chain_of_custody"],
+        "description": "Curator user guide - teaching AI, verification, overrides"
+      }
+    ]
+  },
+  
+  "triggerMatrix": {
+    "description": "Maps code change types to required documentation updates",
+    "matrix": {
+      "any_change": ["CHANGELOG.md"],
+      "database": ["CHANGELOG.md", "docs/sections/SECTION-07-DATABASE-SCHEMA.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "lambda": ["CHANGELOG.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "api_endpoint": ["CHANGELOG.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md", "docs/API_REFERENCE.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "cdk": ["CHANGELOG.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "thinktank_feature": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/THINKTANK-ADMIN-GUIDE.md", "docs/THINKTANK-ADMIN-GUIDE-V2.md"],
+      "thinktank_admin": ["CHANGELOG.md", "docs/THINKTANK-ADMIN-GUIDE.md", "docs/THINKTANK-ADMIN-GUIDE-V2.md", "docs/STRATEGIC-VISION-MARKETING.md"],
+      "platform_feature": ["CHANGELOG.md", "docs/RADIANT-ADMIN-GUIDE.md", "docs/STRATEGIC-VISION-MARKETING.md"],
+      "user_facing": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md"],
+      "ui_component": ["CHANGELOG.md", "docs/THINKTANK-USER-GUIDE.md", "docs/UI-UX-PATTERNS.md"],
+      "orchestration": ["CHANGELOG.md", "docs/ORCHESTRATION-METHODS.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md"],
+      "competitive_advantage": ["CHANGELOG.md", "docs/THINKTANK-MOATS.md", "docs/RADIANT-MOATS.md", "docs/STRATEGIC-VISION-MARKETING.md"],
+      "architecture": ["CHANGELOG.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "security": ["CHANGELOG.md", "docs/RADIANT-ADMIN-GUIDE.md", "docs/COMPLIANCE.md"],
+      "billing": ["CHANGELOG.md", "docs/RADIANT-ADMIN-GUIDE.md"],
+      "models": ["CHANGELOG.md", "docs/RADIANT-ADMIN-GUIDE.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md"],
+      "dependency": ["CHANGELOG.md", "docs/OPEN-SOURCE-LIBRARIES.md"],
+      "consciousness": ["CHANGELOG.md", "docs/CONSCIOUSNESS-SERVICE.md", "docs/THINKTANK-ADMIN-GUIDE.md"],
+      "cato": ["CHANGELOG.md", "docs/CATO-COMPLETE-DOCUMENTATION.md", "docs/RADIANT-ADMIN-GUIDE.md"],
+      "cortex": ["CHANGELOG.md", "docs/CORTEX-MEMORY-ADMIN-GUIDE.md"],
+      "curator": ["CHANGELOG.md", "docs/CURATOR-USER-GUIDE.md", "docs/RADIANT-MOATS.md"]
+    }
+  },
+  
+  "versionedDocs": {
+    "description": "Documents that need version number updates",
+    "docs": [
+      "docs/RADIANT-ADMIN-GUIDE.md",
+      "docs/THINKTANK-ADMIN-GUIDE.md",
+      "docs/THINKTANK-ADMIN-GUIDE-V2.md",
+      "docs/THINKTANK-USER-GUIDE.md",
+      "docs/STRATEGIC-VISION-MARKETING.md",
+      "docs/ENGINEERING-IMPLEMENTATION-VISION.md",
+      "docs/RADIANT-PLATFORM-ARCHITECTURE.md"
+    ]
+  }
+}

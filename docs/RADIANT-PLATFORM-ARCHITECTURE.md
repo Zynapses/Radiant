@@ -1,6 +1,6 @@
 # RADIANT Platform Documentation
 ## Complete System Architecture Reference
-### Version 5.0.0 | January 2026
+### Version 5.52.6 | January 2026
 
 ---
 
@@ -74,16 +74,28 @@
 | `sessions-handler` | Session management | API Gateway |
 | `usage-handler` | Usage reporting | API Gateway |
 
-### Admin Lambda Functions
+### Admin Lambda Functions (62 Total - v5.52.6)
 
-| Function | Purpose | Trigger |
-|----------|---------|---------|
-| `admin-users` | User management | API Gateway |
-| `admin-tenants` | Tenant management | API Gateway |
-| `admin-billing` | Billing operations | API Gateway |
-| `admin-audit` | Audit log access | API Gateway |
-| `admin-approvals` | Deployment approvals | API Gateway |
-| `admin-ai-reports` | AI report generation, brand kits, exports | API Gateway |
+All admin Lambda handlers are wired to `/api/admin/*` routes with Cognito admin authorization.
+
+| Category | Count | Handlers |
+|----------|-------|----------|
+| **Cato Safety** | 5 | cato, cato-genesis, cato-global, cato-governance, cato-pipeline |
+| **Memory Systems** | 4 | cortex, cortex-v2, blackboard, empiricism-loop |
+| **AI/ML** | 7 | brain, cognition, ego, raws, inference-components, formal-reasoning, ethics-free-reasoning |
+| **Security** | 5 | security, security-schedules, api-keys, ethics, self-audit |
+| **Operations** | 5 | gateway, sovereign-mesh, sovereign-mesh-performance, sovereign-mesh-scaling, hitl-orchestration |
+| **Reporting** | 4 | reports, ai-reports, dynamic-reports, metrics |
+| **Configuration** | 7 | tenants, invitations, library-registry, checklist-registry, collaboration-settings, system, system-config |
+| **Infrastructure** | 6 | aws-costs, aws-monitoring, s3-storage, code-quality, infrastructure-tier, logs |
+| **Compliance** | 4 | regulatory-standards, council, user-violations, approvals |
+| **Models** | 5 | models, lora-adapters, pricing, specialty-rankings, sync-providers |
+| **Orchestration** | 2 | orchestration-methods, orchestration-user-templates |
+| **Users** | 2 | user-registry, white-label |
+| **Time & Translation** | 3 | time-machine, translation, internet-learning |
+| **Learning** | 1 | agi-learning |
+
+**Implementation**: `packages/infrastructure/lib/stacks/api-stack.ts`
 
 ### Scheduled Lambda Functions
 
@@ -230,6 +242,26 @@ interface ModelRequest {
 | Rate Limit | `rate` | No |
 | Authorization | `auth` | Yes |
 | BAA Required | `custom` | Yes |
+
+### Consciousness Persistence (v5.52.12)
+
+Database-backed persistence for Cato consciousness state, ensuring survival across Lambda cold starts.
+
+| Service | Purpose |
+|---------|---------|
+| **Global Memory Service** | 4-tier memory (episodic/semantic/procedural/working) |
+| **Consciousness Loop Service** | State machine (IDLE→PROCESSING→REFLECTING→DREAMING→PAUSED) |
+| **Neural Decision Service** | Affect→hyperparameter mapping for Bedrock model selection |
+| **Dream Scheduler Service** | Twilight (4 AM) + low-traffic + starvation triggers |
+
+| Table | Purpose |
+|-------|---------|
+| `cato_global_memory` | Persistent memory with importance weighting |
+| `cato_consciousness_state` | Loop state, awareness level, active thoughts |
+| `cato_consciousness_config` | Per-tenant consciousness configuration |
+| `cato_consciousness_metrics` | Cycle metrics, thoughts processed, dream cycles |
+
+**Migration**: `V2026_01_24_002__cato_consciousness_persistence.sql`
 
 ---
 
@@ -1072,6 +1104,437 @@ RAWS (RADIANT AI Weighted Selection) provides intelligent real-time model select
 
 ---
 
+# PART 6: CORTEX MEMORY SYSTEM v4.20.0
+
+## 6.1 Overview
+
+The **Cortex Memory System** provides enterprise-scale tiered memory architecture replacing direct database storage. It solves critical scaling challenges:
+
+| Problem | Solution |
+|---------|----------|
+| Volume limits (100M+ rows) | Distribute across three tiers |
+| Latency degradation | Hot tier caching (<10ms) |
+| Cost inefficiency | Cold tier archival (90% savings) |
+| Compliance conflicts | Per-tier retention policies |
+| Data gravity | Zero-Copy mounts to customer data lakes |
+
+## 6.2 Three-Tier Architecture
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│    HOT TIER     │────▶│    WARM TIER    │────▶│    COLD TIER    │
+│  Redis + DynamoDB│     │ Neptune + pgvector│     │  S3 + Iceberg  │
+│     < 10ms      │     │     < 100ms     │     │     < 2s        │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+     4 hours                 90 days               7+ years
+```
+
+| Tier | Role | Technology | Content |
+|------|------|------------|---------|
+| **Hot** | *"What is happening right now?"* | Redis + DynamoDB | Live session, Ghost Vectors, MQTT/OPC UA telemetry |
+| **Warm** | *"How does the business work?"* | Neptune + pgvector | Entity maps, Procedural logic, Golden Q&A pairs |
+| **Cold** | *"What happened 10 years ago?"* | S3 Iceberg + Athena | Deep archive via Stub Nodes (Zero-Copy) |
+
+### The "Retrieval Dance" - Runtime Query Flow
+
+```
+Step 1: INTENT PARSING (Hot)     → Analyze Query + Ghost Vectors
+Step 2: GRAPH TRAVERSAL (Warm)   → 2-3 hops, check Golden Rule Overrides
+Step 3: DEEP FETCH (Cold)        → Fetch ONLY specific pages via Stub Nodes
+Step 4: SYNTHESIS (Model)        → Package with Chain of Custody audit trail
+```
+
+## 6.3 Hot Tier - Real-Time Context
+
+### Key Schema (Tenant Isolation)
+```
+{tenant_id}:{data_type}:{identifier}
+```
+
+### Data Types
+| Type | TTL | Purpose |
+|------|-----|---------|
+| Session Context | 4h | Current conversation state |
+| Ghost Vectors | 24h | 4096-dim personality embeddings |
+| Telemetry Feeds | 1h | Real-time event streams |
+| Prefetch Cache | 30m | Anticipated document needs |
+
+## 6.4 Warm Tier - Graph-RAG Knowledge
+
+### Why Graph Beats Vector-Only
+| Query Type | Vector Search | Graph-RAG |
+|------------|---------------|-----------|
+| "What causes X?" | Returns similar docs | Traverses CAUSES edges |
+| "What depends on Y?" | Returns related docs | Follows DEPENDS_ON paths |
+| "What supersedes Z?" | May return old versions | Explicit SUPERSEDES edges |
+
+### Graph Schema
+| Node Types | Edge Types |
+|------------|------------|
+| document, entity, concept, procedure, fact | mentions, causes, depends_on, supersedes, verified_by, authored_by, relates_to, contains, requires |
+
+### Hybrid Search
+```
+Hybrid Score = (Vector Similarity × 0.4) + (Graph Traversal × 0.6)
+```
+
+## 6.5 Cold Tier - Historical Archive
+
+### Storage Lifecycle
+```
+Day 0-30:    S3 Standard
+Day 30-90:   S3 Intelligent-Tiering
+Day 90-365:  Glacier Instant Retrieval
+Day 365+:    Glacier Deep Archive
+```
+
+### Zero-Copy Mounts & Stub Nodes
+
+**The Innovation:** We do not force tenants to move 50TB of data to our cloud. We **Mount** their existing Data Lakes and create **Stub Nodes** in the Warm Graph.
+
+**Stub Node Mechanism:**
+- RADIANT scans external storage metadata
+- Creates lightweight "Stub Nodes" in graph (e.g., "Log File 2024.csv exists at S3://bucket/logs/")
+- Actual content fetched **only** when Graph Traversal determines it's critical
+
+**Supported Sources:**
+- Snowflake Data Share
+- Databricks Delta Lake
+- Amazon S3
+- Azure Data Lake Gen2
+- Google Cloud Storage
+
+## 6.6 Tier Coordinator
+
+Orchestrates automatic data movement:
+
+| Operation | Trigger | Action |
+|-----------|---------|--------|
+| Hot → Warm | TTL expiration | Extract entities, create graph nodes |
+| Warm → Cold | Age > 90 days | Archive to Iceberg, mark archived |
+| Cold → Warm | On-demand retrieval | Rehydrate from S3, update status |
+
+## 6.7 Twilight Dreaming Integration
+
+| Task | Frequency | Purpose |
+|------|-----------|---------|
+| ttl_enforcement | Hourly | Expire Hot tier keys |
+| archive_promotion | Nightly | Move Warm → Cold |
+| deduplication | Nightly | Merge duplicate nodes |
+| conflict_resolution | Nightly | Flag contradictions |
+| iceberg_compaction | Nightly | Optimize Cold storage |
+| index_optimization | Weekly | Reindex vectors |
+
+## 6.8 GDPR Compliance
+
+Cascade deletion across all tiers:
+
+| Tier | Erasure SLA | Method |
+|------|-------------|--------|
+| Hot | Immediate | Redis key deletion |
+| Warm | 24h | Node status → deleted, properties cleared |
+| Cold | 72h | Tombstone records in Iceberg |
+
+## 6.9 Key Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/cortex-memory.types.ts` | Type definitions |
+| `migrations/V2026_01_23_002__cortex_memory_system.sql` | Database schema (14 tables) |
+| `lambda/shared/services/cortex/tier-coordinator.service.ts` | Orchestration |
+| `lambda/admin/cortex.ts` | Admin API |
+| `apps/admin-dashboard/app/(dashboard)/cortex/page.tsx` | Dashboard UI |
+
+## 6.10 API Endpoints
+
+```
+Base: /api/admin/cortex
+
+GET    /overview                    Dashboard data
+GET    /config                      Tier configuration
+PUT    /config                      Update configuration
+GET    /health                      Tier health status
+POST   /health/check                Trigger health check
+GET    /alerts                      Active alerts
+POST   /alerts/:id/acknowledge      Acknowledge alert
+GET    /metrics                     Data flow metrics
+GET    /graph/stats                 Node/edge counts
+GET    /graph/explore               Search graph nodes
+GET    /graph/conflicts             Unresolved conflicts
+GET    /housekeeping/status         Task statuses
+POST   /housekeeping/trigger        Run task manually
+GET    /mounts                      Zero-Copy mounts
+POST   /mounts                      Create mount
+POST   /mounts/:id/rescan           Rescan mount
+DELETE /mounts/:id                  Delete mount
+GET    /gdpr/erasure                Erasure requests
+POST   /gdpr/erasure                Create erasure request
+```
+
+## 6.11 Cortex v2.0 Features
+
+Extended capabilities added in v5.52.13:
+
+### Golden Rules Override System
+
+Human-verified facts that override AI-extracted knowledge:
+
+| Rule Type | Purpose |
+|-----------|---------|
+| `force_override` | Replace incorrect fact |
+| `ignore_source` | Blacklist source |
+| `prefer_source` | Prioritize source |
+| `deprecate` | Mark outdated |
+
+**Chain of Custody**: Cryptographic signatures, verification timestamps, full audit trail.
+
+### Stub Nodes (Zero-Copy Data Gravity)
+
+Lightweight metadata pointers to external data lakes:
+
+| Source | Support |
+|--------|---------|
+| Snowflake | Tables, views |
+| Databricks | Delta Lake |
+| S3 | CSV, Parquet, PDF |
+| Azure Data Lake | Gen2 |
+| GCS | Cloud Storage |
+
+### Graph Expansion (Twilight Dreaming v2)
+
+Autonomous knowledge graph improvement:
+
+| Task | Purpose |
+|------|---------|
+| `infer_links` | Co-occurrence, semantic similarity |
+| `cluster_entities` | Group by shared neighbors |
+| `detect_patterns` | Sequences, anomalies |
+| `merge_duplicates` | Near-duplicate detection |
+
+### Live Telemetry Feeds
+
+Real-time sensor data injection:
+
+| Protocol | Use Case |
+|----------|----------|
+| MQTT | IoT sensors |
+| OPC UA | Industrial |
+| Kafka | Event streams |
+| WebSocket | Real-time |
+
+### Curator Entrance Exams
+
+SME verification workflow for knowledge validation with auto-generated questions and Golden Rule creation for corrections.
+
+### Model Migration
+
+Safe model transitions: Initiate → Validate → Test → Execute → Rollback if needed.
+
+## 6.12 Cortex v2 API Endpoints
+
+```
+Base: /api/admin/cortex/v2
+
+Golden Rules:
+GET/POST   /golden-rules              List/Create rules
+DELETE     /golden-rules/:id          Deactivate rule
+POST       /golden-rules/check        Check for match
+
+Chain of Custody:
+GET        /chain-of-custody/:factId  Get custody record
+POST       /chain-of-custody/:factId/verify    Verify fact
+GET        /chain-of-custody/:factId/audit-trail
+
+Stub Nodes:
+GET        /stub-nodes                List stub nodes
+GET        /stub-nodes/:id            Get stub node
+POST       /stub-nodes/:id/fetch      Fetch content (signed URL)
+POST       /stub-nodes/:id/connect    Connect to graph nodes
+POST       /stub-nodes/scan           Scan mount for files
+
+Telemetry:
+GET/POST   /telemetry/feeds           List/Create feeds
+POST       /telemetry/feeds/:id/start Start feed
+POST       /telemetry/feeds/:id/stop  Stop feed
+GET        /telemetry/context-injection  Get injection data
+
+Exams:
+GET/POST   /exams                     List/Create exams
+POST       /exams/:id/start           Start exam
+POST       /exams/:id/submit          Submit answer
+POST       /exams/:id/complete        Complete exam
+
+Graph Expansion:
+GET/POST   /graph-expansion/tasks     List/Create tasks
+POST       /graph-expansion/tasks/:id/run  Run task
+GET        /graph-expansion/pending-links  Pending approvals
+POST       /graph-expansion/links/:id/approve
+POST       /graph-expansion/links/:id/reject
+
+Model Migration:
+GET/POST   /model-migrations          List/Create migrations
+POST       /model-migrations/:id/validate
+POST       /model-migrations/:id/test
+POST       /model-migrations/:id/execute
+POST       /model-migrations/:id/rollback
+```
+
+## 6.13 Cortex v2 Key Files
+
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_01_23_003__cortex_v2_features.sql` | v2 schema (12 tables) |
+| `lambda/shared/services/cortex/golden-rules.service.ts` | Golden Rules + Chain of Custody |
+| `lambda/shared/services/cortex/stub-nodes.service.ts` | Zero-copy pointers |
+| `lambda/shared/services/cortex/graph-expansion.service.ts` | Twilight Dreaming v2 |
+| `lambda/shared/services/cortex/telemetry.service.ts` | Live feeds |
+| `lambda/shared/services/cortex/entrance-exam.service.ts` | SME verification |
+| `lambda/shared/services/cortex/model-migration.service.ts` | Model transitions |
+| `lambda/admin/cortex-v2.ts` | Admin API v2 |
+
+## 6.14 Cato-Cortex Bridge (v5.52.14)
+
+Integrates Cato consciousness with Cortex memory tiers for unified prompt enrichment.
+
+### Data Flow
+
+| Direction | Data | Purpose |
+|-----------|------|---------|
+| Cato → Cortex | Semantic memories | Persist to knowledge graph |
+| Cortex → Cato | Knowledge facts | Enrich ego context |
+| Bidirectional | GDPR erasure | Cascade deletion |
+
+### Think Tank Prompt Enrichment
+
+1. Ego Context Builder loads identity, affect, memory
+2. User Persistent Context retrieves preferences
+3. **Cato-Cortex Bridge queries Cortex for relevant knowledge**
+4. All merged into `<ego_state>` XML block with `<knowledge_base>` section
+5. Injected into system prompt
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/cato-cortex-bridge.service.ts` | Bridge service |
+| `lambda/shared/services/identity-core.service.ts` | Ego builder (uses bridge) |
+| `migrations/V2026_01_24_003__cato_cortex_bridge.sql` | Bridge tables |
+
+### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `cato_cortex_bridge_config` | Per-tenant configuration |
+| `cato_cortex_sync_log` | Sync history |
+| `cato_cortex_enrichment_cache` | Cached enrichments |
+
+## 6.15 Cortex Intelligence Service (v5.52.15)
+
+Cortex knowledge density influences domain detection, orchestration, and model selection.
+
+### How Cortex Informs Decisions
+
+| Decision | Cortex Influence |
+|----------|-----------------|
+| **Domain Detection** | +0% to +30% confidence boost based on knowledge depth |
+| **Orchestration Mode** | Switches to `research` if expert knowledge available |
+| **Model Selection** | Prefers factual models when Cortex has rich fact data |
+
+### Knowledge Depth Thresholds
+
+| Depth | Nodes | Confidence Boost | Orchestration |
+|-------|-------|------------------|---------------|
+| `none` | 0 | +0% | `thinking` |
+| `sparse` | 1-4 | +5% | `extended_thinking` |
+| `moderate` | 5-19 | +10% | `thinking` |
+| `rich` | 20-49 | +15% | `analysis` |
+| `expert` | 50+ | +20-30% | `research` |
+
+### Key File
+
+`lambda/shared/services/cortex-intelligence.service.ts`
+
+### AGI Brain Plan Output
+
+```typescript
+plan.cortexInsights = {
+  enabled: true,
+  knowledgeDepth: 'rich',
+  totalNodes: 26,
+  totalEdges: 45,
+  keyEntities: ['Compound X', 'Target Y', 'IC50'],
+  confidenceBoost: 0.18,
+  orchestrationInfluence: 'Rich knowledge - use research mode',
+  modelInfluence: 'Prefer factual models (15 facts available)',
+  retrievalTimeMs: 12,
+};
+```
+
+## 6.16 Detailed Documentation
+
+- [CORTEX-MEMORY-ADMIN-GUIDE.md](./CORTEX-MEMORY-ADMIN-GUIDE.md) - Operations guide
+- [CORTEX-ENGINEERING-GUIDE.md](./CORTEX-ENGINEERING-GUIDE.md) - Technical reference
+
+---
+
+# Part 7: Think Tank Consumer API Layer (v5.52.17)
+
+## 7.1 Overview
+
+The Think Tank consumer application requires a complete frontend-to-backend API wiring layer. This section documents the API service architecture that connects UI components to Lambda handlers.
+
+## 7.2 API Service Registry
+
+| Backend Lambda | Frontend Service | Route Pattern |
+|----------------|------------------|---------------|
+| `conversations.ts` | `chatService` | `/api/thinktank/conversations/*` |
+| `models.ts` | `modelsService` | `/api/thinktank/models/*` |
+| `my-rules.ts` | `rulesService` | `/api/thinktank/my-rules/*` |
+| `settings.ts` | `settingsService` | `/api/thinktank/settings/*` |
+| `brain-plan.ts` | `brainPlanService` | `/api/thinktank/brain-plan/*` |
+| `analytics.ts` | `analyticsService` | `/api/thinktank/analytics/*` |
+| `economic-governor.ts` | `governorService` | `/api/thinktank/economic-governor/*` |
+| `time-travel.ts` | `timeTravelService` | `/api/thinktank/time-travel/*` |
+| `grimoire.ts` | `grimoireService` | `/api/thinktank/grimoire/*` |
+| `flash-facts.ts` | `flashFactsService` | `/api/thinktank/flash-facts/*` |
+| `derivation-history.ts` | `derivationHistoryService` | `/api/thinktank/derivation-history/*` |
+| `enhanced-collaboration.ts` | `collaborationService` | `/api/thinktank/enhanced-collaboration/*` |
+| `artifact-engine.ts` | `artifactsService` | `/api/thinktank/artifacts/*` |
+| `ideas.ts` | `ideasService` | `/api/thinktank/ideas/*` |
+| `dia.ts` | `exportConversation` | `/api/thinktank/dia/*` |
+
+## 7.3 File Locations
+
+```
+apps/thinktank/lib/api/
+├── index.ts              # Service exports
+├── client.ts             # HTTP client
+├── chat.ts               # Conversations
+├── time-travel.ts        # Timelines, checkpoints
+├── grimoire.ts           # Prompt templates
+├── flash-facts.ts        # Fact extraction
+├── derivation-history.ts # AI provenance
+├── collaboration.ts      # Real-time sessions
+├── artifacts.ts          # Code/docs
+├── ideas.ts              # Idea boards
+└── compliance-export.ts  # DIA/compliance
+```
+
+## 7.4 Key Features by Service
+
+| Service | Key Features |
+|---------|--------------|
+| **Time Travel** | Create timelines, manual checkpoints, fork conversations, restore state |
+| **Grimoire** | Spell templates, variable substitution, execute against AI |
+| **Flash Facts** | Extract facts from conversations, verify claims, build collections |
+| **Derivation History** | View AI reasoning chains, evidence provenance, challenge claims |
+| **Collaboration** | Create sessions, invite participants, real-time cursors |
+| **Artifacts** | Version history, export formats, AI refinement |
+| **Ideas** | Capture from messages, kanban boards, AI development |
+| **Compliance Export** | HIPAA, SOC2, GDPR formats, PHI redaction |
+
+---
+
 # APPENDIX A: GLOSSARY
 
 | Term | Definition |
@@ -1083,6 +1546,9 @@ RAWS (RADIANT AI Weighted Selection) provides intelligent real-time model select
 | **Sniper Mode** | Single-model fast execution |
 | **ECD** | Entity-Context Divergence (hallucination score) |
 | **RAWS** | RADIANT AI Weighted Selection (model orchestration) |
+| **Cortex** | Three-tier memory system (Hot/Warm/Cold) |
+| **Graph-RAG** | Hybrid vector + graph traversal search |
+| **Zero-Copy Mount** | External data lake connection without duplication |
 | **CBF** | Control Barrier Function (safety constraint) |
 | **OODA** | Observe-Orient-Decide-Act loop |
 | **HITL** | Human-in-the-Loop |
@@ -1111,6 +1577,8 @@ packages/
 │   │           │   ├── agent-runtime.service.ts
 │   │           │   └── index.ts
 │   │           ├── cato/         # Genesis Cato
+│   │           ├── cortex/       # Cortex Memory System
+│   │           │   └── tier-coordinator.service.ts
 │   │           └── routing/      # Model Router
 │   └── migrations/
 │       ├── V2026_01_20_003__sovereign_mesh_agents.sql

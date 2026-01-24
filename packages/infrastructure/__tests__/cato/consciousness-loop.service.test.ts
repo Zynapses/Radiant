@@ -4,33 +4,33 @@
  * Tests for loop state management, tick execution, and emergency modes.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+// Jest globals are automatically available via ts-jest
 
 // Mock dependencies
-vi.mock('../../lambda/shared/db/client', () => ({
-  executeStatement: vi.fn(),
-  stringParam: vi.fn((name, value) => ({ name, value })),
-  longParam: vi.fn((name, value) => ({ name, value })),
-  boolParam: vi.fn((name, value) => ({ name, value })),
+jest.mock('../../lambda/shared/db/client', () => ({
+  executeStatement: jest.fn(),
+  stringParam: jest.fn((name, value) => ({ name, value })),
+  longParam: jest.fn((name, value) => ({ name, value })),
+  boolParam: jest.fn((name, value) => ({ name, value })),
 }));
 
-vi.mock('../../lambda/shared/services/cato/genesis.service', () => ({
+jest.mock('../../lambda/shared/services/cato/genesis.service', () => ({
   genesisService: {
-    isReadyForConsciousness: vi.fn(),
-    getDevelopmentalGateStatus: vi.fn(),
+    isReadyForConsciousness: jest.fn(),
+    getDevelopmentalGateStatus: jest.fn(),
   },
 }));
 
-vi.mock('../../lambda/shared/services/cato/circuit-breaker.service', () => ({
+jest.mock('../../lambda/shared/services/cato/circuit-breaker.service', () => ({
   circuitBreakerService: {
-    getInterventionLevel: vi.fn(),
-    getAllBreakers: vi.fn(),
+    getInterventionLevel: jest.fn(),
+    getAllBreakers: jest.fn(),
   },
 }));
 
-vi.mock('../../lambda/shared/services/cato/cost-tracking.service', () => ({
+jest.mock('../../lambda/shared/services/cato/cost-tracking.service', () => ({
   costTrackingService: {
-    recordTickCost: vi.fn(),
+    recordTickCost: jest.fn(),
   },
 }));
 
@@ -44,19 +44,19 @@ import {
 
 describe('ConsciousnessLoopService', () => {
   let service: ConsciousnessLoopService;
-  const mockExecuteStatement = executeStatement as ReturnType<typeof vi.fn>;
-  const mockIsReadyForConsciousness = genesisService.isReadyForConsciousness as ReturnType<typeof vi.fn>;
-  const mockGetInterventionLevel = circuitBreakerService.getInterventionLevel as ReturnType<typeof vi.fn>;
-  const mockGetDevelopmentalGateStatus = genesisService.getDevelopmentalGateStatus as ReturnType<typeof vi.fn>;
-  const mockGetAllBreakers = circuitBreakerService.getAllBreakers as ReturnType<typeof vi.fn>;
+  const mockExecuteStatement = executeStatement as ReturnType<typeof jest.fn>;
+  const mockIsReadyForConsciousness = genesisService.isReadyForConsciousness as ReturnType<typeof jest.fn>;
+  const mockGetInterventionLevel = circuitBreakerService.getInterventionLevel as ReturnType<typeof jest.fn>;
+  const mockGetDevelopmentalGateStatus = genesisService.getDevelopmentalGateStatus as ReturnType<typeof jest.fn>;
+  const mockGetAllBreakers = circuitBreakerService.getAllBreakers as ReturnType<typeof jest.fn>;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
     service = new ConsciousnessLoopService();
   });
 
   afterEach(() => {
-    vi.resetAllMocks();
+    jest.resetAllMocks();
   });
 
   describe('getSettings', () => {

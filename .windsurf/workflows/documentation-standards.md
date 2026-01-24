@@ -1,8 +1,18 @@
 ---
-description: MANDATORY documentation policy - All features require comprehensive documentation
+description: DEPRECATED - See /docs-update-all for the master documentation policy
 ---
 
-# Documentation Standards Policy
+# ⚠️ DEPRECATED - USE MASTER POLICY
+
+**This policy has been superseded by `docs-update-all.md`**
+
+Please refer to:
+- **Master Policy**: `/.windsurf/workflows/docs-update-all.md`
+- **Documentation Manifest**: `/docs/DOCUMENTATION-MANIFEST.json`
+
+---
+
+# Legacy Content (For Reference Only)
 
 This workflow defines **mandatory documentation requirements** for all RADIANT feature implementations.
 

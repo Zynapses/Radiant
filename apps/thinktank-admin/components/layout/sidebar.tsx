@@ -34,6 +34,8 @@ import {
   Swords,
   Shield,
   FileText,
+  BookOpen,
+  Brain,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -118,6 +120,13 @@ const navigation: NavSection[] = [
     ],
   },
   {
+    label: 'Agent Apps',
+    items: [
+      { name: 'Agent Registry', href: '/agents', icon: Brain },
+      { name: 'Curator', href: 'http://localhost:3003', icon: BookOpen },
+    ],
+  },
+  {
     label: 'Administration',
     items: [
       { name: 'Compliance', href: '/compliance', icon: ShieldCheck },
@@ -135,12 +144,12 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'flex flex-col border-r bg-card transition-all duration-300',
+        'flex flex-col border-r border-white/10 bg-slate-900/80 backdrop-blur-xl transition-all duration-300',
         collapsed ? 'w-16' : 'w-64'
       )}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center justify-between border-b px-4">
+      <div className="flex h-16 items-center justify-between border-b border-white/10 px-4">
         {!collapsed && (
           <Link href="/" className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
@@ -191,7 +200,7 @@ export function Sidebar() {
       </nav>
 
       {/* Collapse Button */}
-      <div className="border-t p-2">
+      <div className="border-t border-white/10 p-2">
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="w-full flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"

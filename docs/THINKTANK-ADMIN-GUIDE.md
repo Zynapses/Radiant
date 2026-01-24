@@ -2,7 +2,7 @@
 
 > **Configuration and administration of Think Tank AI features**
 > 
-> Version: 3.9.0 | Platform: RADIANT 5.44.0
+> Version: 3.10.0 | Platform: RADIANT 5.52.6
 > Last Updated: January 2026
 
 ---
@@ -3958,6 +3958,47 @@ Configure your admin dashboard with:
 | **CBF Violations** | Heatmap of which rules trigger most |
 | **Response Time** | Histogram of generation times |
 | **Cost Tracker** | Running total with projection |
+
+#### CBF Violations Heatmap (v5.52.1)
+
+The CBF Violations Heatmap provides visual analytics of Content Boundary Framework rule violations:
+
+**Features:**
+- **Category Grouping** - Violations grouped by category (content_safety, data_privacy, pii_detection, etc.)
+- **Severity Indicators** - Color-coded badges (low/medium/high/critical)
+- **Trend Arrows** - Show if violations are increasing or decreasing
+- **Intensity Gradient** - Cell brightness indicates violation frequency
+- **Time Range Filter** - Filter by last 24 hours, 7 days, 30 days, or 90 days
+- **Click-to-Drill** - Click any rule to see detailed violation history
+
+**Category Icons:**
+| Category | Icon | Description |
+|----------|------|-------------|
+| `content_safety` | 🛡️ | General content safety violations |
+| `data_privacy` | 🔒 | Data privacy concerns |
+| `pii_detection` | 👤 | Personal information detected |
+| `harmful_content` | ⚠️ | Potentially harmful content |
+| `bias_detection` | ⚖️ | Bias in responses |
+| `jailbreak` | 🔓 | Jailbreak attempts blocked |
+| `prompt_injection` | 💉 | Prompt injection attempts |
+
+**API Endpoint:** `GET /api/admin/analytics/cbf-violations?range={timeRange}`
+
+**Response:**
+```json
+{
+  "violations": [
+    {
+      "ruleId": "cbf-001",
+      "ruleName": "PII Detection",
+      "category": "pii_detection",
+      "count": 145,
+      "severity": "high",
+      "trend": "down"
+    }
+  ]
+}
+```
 
 #### Alerts
 

@@ -5,11 +5,11 @@
  * break glass access, and legal hold operations.
  */
 
-import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
+// Jest globals are automatically available via ts-jest
 import { PoolClient } from 'pg';
 
 // Mock types
-type MockQuery = jest.Mock<Promise<{ rows: unknown[]; rowCount: number }>>;
+type MockQuery = ReturnType<typeof jest.fn><Promise<{ rows: unknown[]; rowCount: number }>>;
 
 // Create mock pool client
 const createMockClient = (): { query: MockQuery } & Partial<PoolClient> => ({

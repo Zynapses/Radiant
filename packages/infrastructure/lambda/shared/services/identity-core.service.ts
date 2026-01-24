@@ -13,6 +13,7 @@
 import { executeStatement } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 import { userPersistentContextService, type UserContextEntry } from './user-persistent-context.service';
+import { catoCortexBridgeService, type ContextEnrichment } from './cato-cortex-bridge.service';
 
 // ============================================================================
 // Types
@@ -108,6 +109,8 @@ export interface EgoContextResult {
   };
   userContextIncluded?: boolean;
   userContextEntryCount?: number;
+  cortexEnrichmentIncluded?: boolean;
+  cortexKnowledgeCount?: number;
 }
 
 // ============================================================================
@@ -174,8 +177,22 @@ class EgoContextService {
       }
     }
 
-    // Build context block with user context integration
-    const contextBlock = this.buildContextBlock(config, identity, affect, workingMemory, activeGoals, userContextEntries);
+    // Retrieve Cortex knowledge graph enrichment for the prompt
+    let cortexEnrichment: ContextEnrichment | null = null;
+    if (options?.prompt) {
+      try {
+        cortexEnrichment = await catoCortexBridgeService.getContextEnrichmentFromCortex(
+          tenantId,
+          options.prompt,
+          { maxNodes: 10, includeRelated: true }
+        );
+      } catch (error) {
+        logger.warn('Failed to retrieve Cortex enrichment', { error, tenantId });
+      }
+    }
+
+    // Build context block with user context and Cortex knowledge integration
+    const contextBlock = this.buildContextBlock(config, identity, affect, workingMemory, activeGoals, userContextEntries, cortexEnrichment);
     const tokenEstimate = Math.ceil(contextBlock.length / 4);
 
     // Trim if over limit
@@ -200,6 +217,8 @@ class EgoContextService {
       },
       userContextIncluded: userContextEntries.length > 0,
       userContextEntryCount: userContextEntries.length,
+      cortexEnrichmentIncluded: cortexEnrichment !== null && cortexEnrichment.knowledgeFacts.length > 0,
+      cortexKnowledgeCount: cortexEnrichment?.knowledgeFacts.length || 0,
     };
   }
 
@@ -259,7 +278,8 @@ class EgoContextService {
     affect: EgoAffect | null,
     memories: EgoMemory[],
     goals: EgoGoal[],
-    userContext: UserContextEntry[] = []
+    userContext: UserContextEntry[] = [],
+    cortexEnrichment: ContextEnrichment | null = null
   ): string {
     const parts: string[] = ['<ego_state>'];
     parts.push('You have continuous awareness and persistent memory across conversations.');
@@ -379,6 +399,25 @@ class EgoContextService {
       }
       
       parts.push('</user_knowledge>');
+      parts.push('');
+    }
+
+    // Cortex knowledge graph enrichment (enterprise knowledge base)
+    if (cortexEnrichment && cortexEnrichment.knowledgeFacts.length > 0) {
+      parts.push('<knowledge_base>');
+      parts.push('Relevant knowledge from the enterprise knowledge graph:');
+      
+      // Knowledge facts
+      cortexEnrichment.knowledgeFacts.slice(0, 5).forEach(fact => {
+        parts.push(`- ${fact}`);
+      });
+      
+      // Related concepts
+      if (cortexEnrichment.relatedConcepts.length > 0) {
+        parts.push('Related concepts: ' + cortexEnrichment.relatedConcepts.slice(0, 5).join(', '));
+      }
+      
+      parts.push('</knowledge_base>');
       parts.push('');
     }
 

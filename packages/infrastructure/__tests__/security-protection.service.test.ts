@@ -5,7 +5,7 @@
  * instruction hierarchy enforcement, and Thompson sampling for model selection.
  */
 
-import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
+// Jest globals are automatically available via ts-jest
 
 // Mock dependencies
 jest.mock('../lambda/shared/db/client', () => ({
@@ -23,7 +23,7 @@ jest.mock('../lambda/shared/logging/enhanced-logger', () => ({
 
 describe('SecurityProtectionService', () => {
   let securityProtectionService: typeof import('../lambda/shared/services/security-protection.service');
-  let executeStatement: jest.Mock;
+  let executeStatement: ReturnType<typeof jest.fn>;
 
   const mockConfig = {
     tenant_id: 'tenant-123',
@@ -50,9 +50,9 @@ describe('SecurityProtectionService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    jest.resetModules();
+    vi.resetModules();
 
-    executeStatement = (await import('../lambda/shared/db/client')).executeStatement as jest.Mock;
+    executeStatement = (await import('../lambda/shared/db/client')).executeStatement as ReturnType<typeof jest.fn>;
     executeStatement.mockResolvedValue({ rows: [mockConfig], rowCount: 1 });
 
     securityProtectionService = await import('../lambda/shared/services/security-protection.service');

@@ -14,6 +14,7 @@
  */
 
 import React, { useState } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -115,12 +116,15 @@ const DEMO_BRANCHES = [
   },
 ];
 
-export default function MagicCarpetPage() {
+export default function MagicCarpetDemoPage() {
+  const { toast } = useToast();
   const [currentPosition, setCurrentPosition] = useState(15);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [aiState, setAiState] = useState<'idle' | 'thinking' | 'speaking' | 'listening' | 'error'>('idle');
+  const [activeBranchId, setActiveBranchId] = useState('branch-b');
+  const [bookmarks, setBookmarks] = useState<Array<{ position: number; label: string }>>([]);
   const [focusActive, setFocusActive] = useState(false);
   const [focusIntensity, setFocusIntensity] = useState(70);
-  const [aiState, setAiState] = useState<'idle' | 'thinking' | 'generating' | 'confident'>('idle');
 
   return (
     <div className="space-y-8 pb-32">
@@ -223,7 +227,10 @@ export default function MagicCarpetPage() {
                 currentPosition={currentPosition}
                 isPlaying={isPlaying}
                 onScrubTo={setCurrentPosition}
-                onCreateBookmark={(label) => console.log('Bookmark:', label)}
+                onCreateBookmark={(label) => {
+                  setBookmarks(prev => [...prev, { position: currentPosition, label }]);
+                  toast({ title: 'Bookmark Created', description: `"${label}" at position ${currentPosition}` });
+                }}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
               />
@@ -246,9 +253,15 @@ export default function MagicCarpetPage() {
             <CardContent>
               <QuantumSplitView
                 branches={DEMO_BRANCHES}
-                activeBranchId="branch-b"
-                onSelectBranch={(id) => console.log('Selected:', id)}
-                onCollapse={(winnerId) => console.log('Collapse to:', winnerId)}
+                activeBranchId={activeBranchId}
+                onSelectBranch={(id) => {
+                  setActiveBranchId(id);
+                  toast({ title: 'Branch Selected', description: `Switched to ${DEMO_BRANCHES.find(b => b.id === id)?.name}` });
+                }}
+                onCollapse={(winnerId) => {
+                  const winner = DEMO_BRANCHES.find(b => b.id === winnerId);
+                  toast({ title: 'Branch Collapsed', description: `Collapsed to "${winner?.name}"` });
+                }}
               />
             </CardContent>
           </Card>
@@ -271,8 +284,12 @@ export default function MagicCarpetPage() {
                 predictions={DEMO_PREDICTIONS}
                 telepathyScore={0.82}
                 isActive
-                onSelectPrediction={(p) => console.log('Selected:', p)}
-                onDismiss={(id) => console.log('Dismissed:', id)}
+                onSelectPrediction={(p) => {
+                  toast({ title: 'Prediction Selected', description: `Executing: ${p.prompt}` });
+                }}
+                onDismiss={(id) => {
+                  toast({ title: 'Prediction Dismissed', description: `Removed suggestion ${id}` });
+                }}
               />
             </CardContent>
           </Card>
@@ -397,8 +414,12 @@ export default function MagicCarpetPage() {
         telepathyScore={0.82}
         mode="hovering"
         altitude="medium"
-        onFly={(dest) => console.log('Flying to:', dest)}
-        onLand={() => console.log('Landing')}
+        onFly={(dest) => {
+          toast({ title: 'Flying to Destination', description: `Navigating to ${dest.name}` });
+        }}
+        onLand={() => {
+          toast({ title: 'Landed', description: 'Magic Carpet has landed' });
+        }}
       />
     </div>
   );

@@ -1,8 +1,24 @@
 ---
-description: Policy - Documentation must be updated for all user/admin-facing changes
+description: DEPRECATED - See /docs-update-all for the master documentation policy
 ---
 
-# Documentation Required Policy
+# ⚠️ DEPRECATED - USE MASTER POLICY
+
+**This policy has been superseded by `docs-update-all.md`**
+
+Please refer to:
+- **Master Policy**: `/.windsurf/workflows/docs-update-all.md`
+- **Documentation Manifest**: `/docs/DOCUMENTATION-MANIFEST.json`
+
+The master policy provides:
+1. Complete trigger matrix for all documentation
+2. Step-by-step update checklist
+3. Format templates for each document type
+4. Version number update requirements
+
+---
+
+# Legacy Content (For Reference Only)
 
 **This is a MANDATORY policy.** All changes that affect administrators, users, or system behavior must include comprehensive documentation updates.
 

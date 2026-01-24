@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -442,6 +445,10 @@ function NodeConfigPanel({
 
 // Main Workflow Editor Component
 export default function WorkflowEditorPage() {
+  const searchParams = useSearchParams();
+  const workflowId = searchParams.get('id');
+  const queryClient = useQueryClient();
+  
   const [workflow, setWorkflow] = useState<Workflow>({
     id: 'new',
     name: 'Untitled Workflow',
@@ -456,6 +463,72 @@ export default function WorkflowEditorPage() {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   });
+
+  // Load workflow if editing existing
+  const { isLoading: isLoadingWorkflow } = useQuery({
+    queryKey: ['workflow', workflowId],
+    queryFn: async () => {
+      if (!workflowId || workflowId === 'new') return null;
+      const res = await fetch(`/api/admin/orchestration/workflows/${workflowId}`);
+      if (!res.ok) throw new Error('Failed to load workflow');
+      return res.json();
+    },
+    enabled: !!workflowId && workflowId !== 'new',
+  });
+
+  // Save workflow mutation
+  const saveMutation = useMutation({
+    mutationFn: async (data: Workflow) => {
+      const isNew = data.id === 'new';
+      const url = isNew 
+        ? '/api/admin/orchestration/workflows'
+        : `/api/admin/orchestration/workflows/${data.id}`;
+      const res = await fetch(url, {
+        method: isNew ? 'POST' : 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('Failed to save workflow');
+      return res.json();
+    },
+    onSuccess: (data) => {
+      setWorkflow(prev => ({ ...prev, id: data.id }));
+      queryClient.invalidateQueries({ queryKey: ['orchestration-workflows'] });
+      toast.success('Workflow saved successfully');
+    },
+    onError: () => {
+      toast.error('Failed to save workflow');
+    },
+  });
+
+  // Run workflow mutation
+  const runMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/admin/orchestration/workflows/${workflow.id}/execute`, {
+        method: 'POST',
+      });
+      if (!res.ok) throw new Error('Failed to run workflow');
+      return res.json();
+    },
+    onSuccess: () => {
+      toast.success('Workflow execution started');
+    },
+    onError: () => {
+      toast.error('Failed to run workflow');
+    },
+  });
+
+  const handleSave = useCallback(() => {
+    saveMutation.mutate(workflow);
+  }, [workflow, saveMutation]);
+
+  const handleRun = useCallback(() => {
+    if (workflow.id === 'new') {
+      toast.error('Please save the workflow first');
+      return;
+    }
+    runMutation.mutate();
+  }, [workflow.id, runMutation]);
 
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
@@ -603,9 +676,18 @@ export default function WorkflowEditorPage() {
               </>
             )}
           </Button>
-          <Button>
-            <Save className="h-4 w-4 mr-2" />
-            Save
+          <Button onClick={handleSave} disabled={saveMutation.isPending}>
+            {saveMutation.isPending ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Save
+              </>
+            )}
           </Button>
         </div>
       </div>

@@ -460,8 +460,16 @@ export default function CouncilPage() {
   };
 
   const handleConclude = async () => {
-    // Would call API to conclude session
-    console.log('Concluding session');
+    // Call API to conclude session
+    try {
+      await fetch(`/api/thinktank-admin/living-parchment/council/${session?.id}/conclude`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      setSession(prev => prev ? { ...prev, status: 'concluded' as const } : null);
+    } catch (error) {
+      console.error('Failed to conclude session:', error);
+    }
   };
 
   if (loading || !session) {

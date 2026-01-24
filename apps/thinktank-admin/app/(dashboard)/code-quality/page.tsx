@@ -46,22 +46,8 @@ interface CodeIssue {
   message: string;
 }
 
-const mockMetrics: QualityMetric[] = [
-  { name: 'Code Coverage', score: 87, trend: 'up', issues: 0 },
-  { name: 'Maintainability', score: 92, trend: 'stable', issues: 3 },
-  { name: 'Security', score: 95, trend: 'up', issues: 1 },
-  { name: 'Performance', score: 88, trend: 'down', issues: 5 },
-  { name: 'Reliability', score: 94, trend: 'stable', issues: 2 },
-  { name: 'Duplication', score: 96, trend: 'up', issues: 0 },
-];
-
-const mockIssues: CodeIssue[] = [
-  { id: '1', file: 'src/services/auth.ts', line: 45, severity: 'error', rule: 'security/no-hardcoded-secrets', message: 'Potential hardcoded secret detected' },
-  { id: '2', file: 'src/components/Dashboard.tsx', line: 128, severity: 'warning', rule: 'react/no-array-index-key', message: 'Avoid using array index as key' },
-  { id: '3', file: 'src/utils/helpers.ts', line: 67, severity: 'warning', rule: 'complexity', message: 'Function has cyclomatic complexity of 15 (max: 10)' },
-  { id: '4', file: 'src/api/client.ts', line: 23, severity: 'info', rule: 'prefer-const', message: 'Use const instead of let' },
-  { id: '5', file: 'src/hooks/useData.ts', line: 89, severity: 'warning', rule: 'react-hooks/exhaustive-deps', message: 'Missing dependency in useEffect' },
-];
+const defaultMetrics: QualityMetric[] = [];
+const defaultIssues: CodeIssue[] = [];
 
 const severityConfig = {
   error: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-100 dark:bg-red-900/30' },
@@ -72,14 +58,22 @@ const severityConfig = {
 export default function CodeQualityPage() {
   const [isScanning, setIsScanning] = useState(false);
 
-  const { data: metrics = mockMetrics } = useQuery({
+  const { data: metrics = defaultMetrics } = useQuery({
     queryKey: ['code-quality', 'metrics'],
-    queryFn: async () => mockMetrics,
+    queryFn: async () => {
+      const res = await fetch('/api/thinktank-admin/code-quality/metrics');
+      if (!res.ok) return defaultMetrics;
+      return res.json();
+    },
   });
 
-  const { data: issues = mockIssues } = useQuery({
+  const { data: issues = defaultIssues } = useQuery({
     queryKey: ['code-quality', 'issues'],
-    queryFn: async () => mockIssues,
+    queryFn: async () => {
+      const res = await fetch('/api/thinktank-admin/code-quality/issues');
+      if (!res.ok) return defaultIssues;
+      return res.json();
+    },
   });
 
   const overallScore = Math.round(metrics.reduce((sum, m) => sum + m.score, 0) / metrics.length);

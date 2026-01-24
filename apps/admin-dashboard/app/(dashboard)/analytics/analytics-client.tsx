@@ -26,6 +26,7 @@ import {
   Cell,
 } from 'recharts';
 import { BarChart3, TrendingUp, Cpu, DollarSign, Clock } from 'lucide-react';
+import { CBFViolationsHeatmap, type CBFViolation } from '@/components/analytics/cbf-violations-heatmap';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
@@ -48,6 +49,15 @@ export function AnalyticsClient() {
     queryFn: async () => {
       const res = await fetch(`/api/admin/analytics/models?range=${timeRange}`);
       return res.json();
+    },
+  });
+
+  const { data: cbfViolations = [] } = useQuery<CBFViolation[]>({
+    queryKey: ['cbf-violations', timeRange],
+    queryFn: async () => {
+      const res = await fetch(`/api/admin/analytics/cbf-violations?range=${timeRange}`);
+      const data = await res.json();
+      return data.violations || [];
     },
   });
 
@@ -190,6 +200,13 @@ export function AnalyticsClient() {
           </CardContent>
         </Card>
       </div>
+
+      {/* CBF Violations Heatmap */}
+      <CBFViolationsHeatmap
+        violations={cbfViolations}
+        timeRange={timeRange === '24h' ? 'Last 24 hours' : timeRange === '7d' ? 'Last 7 days' : timeRange === '30d' ? 'Last 30 days' : 'Last 90 days'}
+        onRuleClick={(violation) => console.log('View violation:', violation)}
+      />
 
       {/* Model Performance Table */}
       <Card>

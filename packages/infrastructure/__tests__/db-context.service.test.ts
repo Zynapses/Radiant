@@ -5,7 +5,7 @@
  * including SET LOCAL for transaction-scoped context and permission checks.
  */
 
-import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
+// Jest globals are automatically available via ts-jest
 import type { PoolClient, Pool, QueryResult } from 'pg';
 
 // Mock pg module
@@ -44,7 +44,7 @@ describe('DbContextService', () => {
     mockQuery.mockResolvedValue({ rows: [], rowCount: 0, command: '', oid: 0, fields: [] });
     
     // Reset module cache
-    jest.resetModules();
+    vi.resetModules();
     
     // Import service after mocks are set up
     dbContextService = await import('../lambda/shared/services/db-context.service');

@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AlertCircle, CheckCircle, Clock, Play, Pause, XCircle, RefreshCw, Eye, ChevronRight, GitBranch, Shield, Zap, FileText, Scale, Brain } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 
 interface PipelineExecution {
   id: string;
@@ -67,6 +68,7 @@ const StatusIcon = ({ status }: { status: string }) => {
 };
 
 export default function CatoPipelinePage() {
+  const { toast } = useToast();
   const [executions, setExecutions] = useState<PipelineExecution[]>([]);
   const [templates, setTemplates] = useState<PipelineTemplate[]>([]);
   const [pendingCheckpoints, setPendingCheckpoints] = useState<CheckpointDecision[]>([]);
@@ -76,6 +78,7 @@ export default function CatoPipelinePage() {
   const [newPipelineRequest, setNewPipelineRequest] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [selectedPreset, setSelectedPreset] = useState<string>('BALANCED');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -85,20 +88,24 @@ export default function CatoPipelinePage() {
 
   const fetchData = async () => {
     try {
-      // Mock data - replace with actual API calls
-      setExecutions([
-        { id: 'exec_1', status: 'COMPLETED', templateId: 'template:action-execution', governancePreset: 'BALANCED', methodsExecuted: ['method:observer:v1', 'method:proposer:v1'], totalCostCents: 15, totalDurationMs: 3500, startedAt: new Date(Date.now() - 60000).toISOString(), completedAt: new Date().toISOString() },
-        { id: 'exec_2', status: 'RUNNING', governancePreset: 'PARANOID', methodsExecuted: ['method:observer:v1'], currentMethod: 'method:proposer:v1', totalCostCents: 5, totalDurationMs: 1200, startedAt: new Date(Date.now() - 30000).toISOString() },
-        { id: 'exec_3', status: 'CHECKPOINT_WAITING', templateId: 'template:war-room', governancePreset: 'PARANOID', methodsExecuted: ['method:observer:v1', 'method:proposer:v1', 'method:critic:security:v1'], totalCostCents: 25, totalDurationMs: 5000, startedAt: new Date(Date.now() - 120000).toISOString() },
+      const [execRes, templatesRes, checkpointsRes] = await Promise.all([
+        fetch('/api/admin/cato/pipeline/executions?limit=50'),
+        fetch('/api/admin/cato/pipeline/templates'),
+        fetch('/api/admin/cato/checkpoints/pending'),
       ]);
-      setTemplates([
-        { templateId: 'template:simple-qa', name: 'Simple Q&A', description: 'Basic question-answering pipeline', methodChain: ['method:observer:v1'], category: 'general' },
-        { templateId: 'template:action-execution', name: 'Action Execution', description: 'Full pipeline with security review', methodChain: ['method:observer:v1', 'method:proposer:v1', 'method:critic:security:v1', 'method:validator:v1', 'method:executor:v1'], category: 'execution' },
-        { templateId: 'template:war-room', name: 'War Room', description: 'Multi-critic deliberation pipeline', methodChain: ['method:observer:v1', 'method:proposer:v1', 'method:critic:security:v1', 'method:decider:v1'], category: 'deliberation' },
-      ]);
-      setPendingCheckpoints([
-        { id: 'cp_1', pipelineId: 'exec_3', checkpointType: 'CP3', checkpointName: 'Review Gate', status: 'PENDING', triggerReason: 'Security critic raised concerns', deadline: new Date(Date.now() + 3600000).toISOString() },
-      ]);
+
+      if (execRes.ok) {
+        const data = await execRes.json();
+        setExecutions(Array.isArray(data) ? data : data.executions || []);
+      }
+      if (templatesRes.ok) {
+        const data = await templatesRes.json();
+        setTemplates(Array.isArray(data) ? data : data.templates || []);
+      }
+      if (checkpointsRes.ok) {
+        const data = await checkpointsRes.json();
+        setPendingCheckpoints(Array.isArray(data) ? data : []);
+      }
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch data:', error);
@@ -107,15 +114,47 @@ export default function CatoPipelinePage() {
   };
 
   const handleStartPipeline = async () => {
-    console.log('Starting pipeline:', { request: newPipelineRequest, template: selectedTemplate, preset: selectedPreset });
-    setShowNewPipeline(false);
-    setNewPipelineRequest('');
-    fetchData();
+    if (!newPipelineRequest.trim()) {
+      toast({ title: 'Error', description: 'Please enter a request', variant: 'destructive' });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const response = await fetch('/api/admin/cato/pipeline/executions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          request: newPipelineRequest,
+          templateId: selectedTemplate || undefined,
+          governancePreset: selectedPreset,
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to start pipeline');
+      const data = await response.json();
+      toast({ title: 'Pipeline started', description: `Execution ID: ${data.id}` });
+      setShowNewPipeline(false);
+      setNewPipelineRequest('');
+      fetchData();
+    } catch (error) {
+      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to start pipeline', variant: 'destructive' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleCheckpointDecision = async (checkpointId: string, decision: string) => {
-    console.log('Checkpoint decision:', checkpointId, decision);
-    fetchData();
+    try {
+      const response = await fetch(`/api/admin/cato/checkpoints/${checkpointId}/resolve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ decision }),
+      });
+      if (!response.ok) throw new Error('Failed to submit decision');
+      toast({ title: 'Decision submitted', description: `Checkpoint ${decision.toLowerCase()}` });
+      fetchData();
+    } catch (error) {
+      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to submit decision', variant: 'destructive' });
+    }
   };
 
   const getMethodIcon = (methodId: string) => {

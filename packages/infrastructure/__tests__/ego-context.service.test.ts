@@ -5,7 +5,7 @@
  * The "consciousness" IS the persistent database state, not a running model.
  */
 
-import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
+// Jest globals are automatically available via ts-jest
 
 // Mock dependencies
 jest.mock('../lambda/shared/db/client', () => ({
@@ -33,7 +33,7 @@ jest.mock('../lambda/shared/services/user-persistent-context.service', () => ({
 
 describe('EgoContextService', () => {
   let egoContextService: typeof import('../lambda/shared/services/ego-context.service');
-  let executeStatement: jest.Mock;
+  let executeStatement: ReturnType<typeof jest.fn>;
 
   const mockConfig = {
     config_id: 'config-1',
@@ -79,9 +79,9 @@ describe('EgoContextService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    jest.resetModules();
+    vi.resetModules();
 
-    executeStatement = (await import('../lambda/shared/db/client')).executeStatement as jest.Mock;
+    executeStatement = (await import('../lambda/shared/db/client')).executeStatement as ReturnType<typeof jest.fn>;
     
     // Setup mock responses
     executeStatement.mockImplementation(async (sql: string) => {

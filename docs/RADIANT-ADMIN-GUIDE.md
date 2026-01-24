@@ -2,7 +2,7 @@
 
 > **Complete guide for managing the RADIANT AI Platform via the Admin Dashboard**
 > 
-> Version: 5.42.0 | Last Updated: January 2026
+> Version: 5.52.6 | Last Updated: January 2026
 >
 > **Compliance Frameworks:** HIPAA, SOC 2 Type II, GDPR, FDA 21 CFR Part 11
 
@@ -65,6 +65,8 @@
 60. [User Violation Enforcement](#60-user-violation-enforcement)
 61. [Multi-Protocol Gateway Architecture](#61-multi-protocol-gateway-architecture)
 65. [RAWS v1.1 - Model Selection System](#65-raws-v11---model-selection-system)
+70. [Cortex Memory System](#section-70-cortex-memory-system-v4200)
+75. [Complete Admin API Architecture](#section-75-complete-admin-api-architecture-v5526)
 
 ---
 
@@ -3814,6 +3816,69 @@ Available classes:
 - `StackManager` - CloudFormation stack operations
 - `HealthChecker` - Post-deployment health checks
 - `SnapshotManager` - Deployment snapshots for rollback
+
+### 18.4 Global Latency Heatmap (v5.52.1)
+
+The Infrastructure page includes a geographic latency visualization showing real-time response times across AWS regions:
+
+**Features:**
+- **World Map Overlay** - Visual representation of global infrastructure
+- **17 AWS Regions Mapped** - us-east-1, us-west-2, eu-west-1, ap-northeast-1, etc.
+- **Color-Coded Latency** - Thresholds from excellent (<50ms) to critical (>500ms)
+- **Pulse Animation** - Critical regions pulse to draw attention
+- **Request Volume Indicators** - Marker size reflects traffic volume
+- **Status Summary** - Healthy/degraded/critical counts
+
+**Latency Thresholds:**
+| Threshold | Color | Status |
+|-----------|-------|--------|
+| <50ms | Green | Excellent |
+| <100ms | Light Green | Good |
+| <200ms | Yellow | Fair |
+| <500ms | Orange | Slow |
+| >500ms | Red | Critical |
+
+**API Endpoint:** `GET /api/admin/infrastructure/regions/latency`
+
+**Response:**
+```json
+{
+  "regions": [
+    {
+      "region": "US East (N. Virginia)",
+      "regionCode": "us-east-1",
+      "latencyMs": 45,
+      "requestCount": 125000,
+      "errorRate": 0.02,
+      "status": "healthy"
+    }
+  ]
+}
+```
+
+### 18.5 Model Usage Heatmap (v5.52.1)
+
+The Metrics page includes a correlation heatmap showing model usage patterns by day of week:
+
+**Features:**
+- **2D Grid Visualization** - Models vs. days of week
+- **5 Color Schemes** - blue (default), red, green, purple, diverging
+- **Configurable Cell Size** - sm, md, lg
+- **Value Display** - Optional numeric values in cells
+- **Click-to-Drill** - Click cells for detailed usage breakdown
+- **Animated Rendering** - Cells fade in sequentially
+
+**Usage:**
+```tsx
+<Heatmap
+  data={correlationData}
+  rows={modelNames}
+  cols={['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']}
+  colorScheme="blue"
+  showValues={true}
+  cellSize="md"
+/>
+```
 
 ---
 
@@ -20263,10 +20328,613 @@ Cato Genesis enables:
 
 ---
 
+## Section 70: Cortex Memory System (v4.20.0)
+
+**Location**: Admin Dashboard → Memory → Cortex
+
+Enterprise-scale tiered memory architecture for AI context and knowledge management.
+
+### 70.1 Overview
+
+The Cortex Memory System provides three-tier storage replacing direct database access:
+
+| Tier | Technology | Latency | Retention | Use Case |
+|------|------------|---------|-----------|----------|
+| **Hot** | Redis + DynamoDB | < 10ms | 4 hours | Session context, Ghost Vectors |
+| **Warm** | Neptune + pgvector | < 100ms | 90 days | Knowledge graph, entity relationships |
+| **Cold** | S3 + Iceberg | < 2s | 7+ years | Historical archives, compliance records |
+
+### 70.2 Dashboard Features
+
+**Overview Page** (`/cortex`):
+- Tier health cards with status indicators
+- Data flow metrics (promotions, archivals, retrievals)
+- Active alerts with acknowledgment
+- Zero-Copy mount manager
+- Housekeeping task status
+
+**Quick Links**:
+- Graph Explorer (`/cortex/graph`)
+- Conflicts (`/cortex/conflicts`)
+- GDPR Erasure (`/cortex/gdpr`)
+- Settings (`/cortex/settings`)
+
+### 70.3 Hot Tier Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `hot_redis_cluster_mode` | `true` | Enable Redis sharding |
+| `hot_shard_count` | `3` | Number of shards |
+| `hot_replicas_per_shard` | `2` | HA replicas |
+| `hot_default_ttl_seconds` | `14400` | 4 hours default TTL |
+| `hot_overflow_to_dynamodb` | `true` | Large value overflow |
+
+### 70.4 Warm Tier Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `warm_neptune_mode` | `serverless` | Serverless or provisioned |
+| `warm_retention_days` | `90` | Days before archival |
+| `warm_graph_weight_percent` | `60` | Graph weight in hybrid search |
+| `warm_vector_weight_percent` | `40` | Vector weight in hybrid search |
+
+### 70.5 Graph-RAG Knowledge
+
+The Warm tier uses hybrid Graph-RAG search:
+
+```
+Hybrid Score = (Vector Similarity × 40%) + (Graph Traversal × 60%)
+```
+
+**Node Types**: document, entity, concept, procedure (evergreen), fact (evergreen), golden_qa (verified answers)
+
+**Edge Types**: mentions, causes, depends_on, supersedes, verified_by, authored_by, relates_to, contains, requires
+
+### 70.5.1 Golden Rules (Override System)
+
+Administrators can create high-priority rules that supersede all other data:
+
+| Rule Type | Description | Use Case |
+|-----------|-------------|----------|
+| `force_override` | Always use this answer | "Max pressure is 100 PSI" |
+| `ignore_source` | Never use this source | "Ignore Manual v1" |
+| `prefer_source` | Prioritize this source | "Prefer 2026 specs" |
+| `deprecate` | Mark as obsolete | "Manual v2024 superseded" |
+
+**Chain of Custody:** Every fact includes who verified it, when, and a digital signature for audit trail.
+
+### 70.6 Zero-Copy Mounts & Stub Nodes
+
+**The Innovation:** Connect to tenant data lakes without moving data. Creates **Stub Nodes** in the graph.
+
+| Source | Description | Connection |
+|--------|-------------|------------|
+| Snowflake | Data Share connection | OAuth + Data Share |
+| Databricks | Delta Lake / Unity Catalog | Service Principal |
+| S3 | Customer S3 bucket | Cross-account IAM |
+| Azure | Data Lake Gen2 | Managed Identity |
+
+**Stub Node Mechanism:**
+- Scans external storage metadata
+- Creates lightweight graph nodes pointing to external content
+- Content fetched **only** when Graph Traversal determines it's needed
+
+**Actions**: Add Mount, Rescan, Delete
+
+### 70.7 Curator Entrance Exams
+
+Verify AI-extracted knowledge through SME validation:
+
+**Workflow:**
+1. AI ingests documents and extracts facts
+2. System generates quiz questions from extracted facts
+3. SME takes exam: Verify ✓ or Correct ✗
+4. Corrections automatically create Golden Rules
+5. Verified facts get Chain of Custody signature
+
+**API:**
+```bash
+# Generate exam for a domain
+POST /api/admin/cortex/v2/exams
+{
+  "domainId": "hydraulics",
+  "domainPath": "Engineering > Hydraulics",
+  "questionCount": 10,
+  "passingScore": 80
+}
+
+# Complete exam and process corrections
+POST /api/admin/cortex/v2/exams/{examId}/complete
+```
+
+### 70.8 Live Telemetry (MQTT/OPC UA)
+
+Inject real-time sensor data into AI context:
+
+| Protocol | Use Case | Example |
+|----------|----------|---------|
+| MQTT | IoT sensors | `mqtt://broker:1883` |
+| OPC UA | Industrial PLCs | `opc.tcp://plc:4840` |
+| Kafka | Event streams | `kafka://cluster:9092` |
+| WebSocket | Real-time dashboards | `wss://server/feed` |
+
+**Configuration:**
+```bash
+POST /api/admin/cortex/v2/telemetry/feeds
+{
+  "name": "pump_302_sensors",
+  "protocol": "opc_ua",
+  "endpoint": "opc.tcp://plc.factory.local:4840",
+  "nodeIds": ["ns=2;s=Pump302.Pressure"],
+  "contextInjection": true
+}
+```
+
+### 70.9 Model Migration
+
+One-click swap between AI models without losing Cortex knowledge.
+
+See Model Migration section above for supported models and workflow.
+
+### 70.10 Housekeeping (Twilight Dreaming)
+
+| Task | Frequency | Purpose |
+|------|-----------|---------|
+| TTL Enforcement | Hourly | Expire Hot tier keys |
+| Archive Promotion | Nightly | Move Warm → Cold |
+| Deduplication | Nightly | Merge duplicate nodes |
+| Graph Expansion | Weekly | Infer missing links |
+| Conflict Resolution | Nightly | Flag contradictions |
+| Iceberg Compaction | Nightly | Optimize Cold storage |
+| Index Optimization | Weekly | Reindex vectors |
+
+**Manual Trigger**: Click play button next to any task
+
+### 70.8 GDPR Erasure
+
+GDPR Article 17 "Right to be Forgotten" cascade deletion:
+
+| Tier | SLA | Method |
+|------|-----|--------|
+| Hot | Immediate | Redis key deletion |
+| Warm | 24 hours | Node status → deleted |
+| Cold | 72 hours | Tombstone records |
+
+**Create Request**: POST `/api/admin/cortex/gdpr/erasure`
+
+### 70.9 Monitoring Thresholds
+
+**Hot Tier**:
+| Metric | Warning | Critical |
+|--------|---------|----------|
+| Memory Usage | > 70% | > 85% |
+| Cache Hit Rate | < 90% | < 80% |
+| p99 Latency | > 5ms | > 10ms |
+
+**Warm Tier**:
+| Metric | Warning | Critical |
+|--------|---------|----------|
+| Neptune CPU | > 70% | > 90% |
+| Graph Nodes | > 50M | > 100M |
+
+### 70.10 API Endpoints
+
+```
+Base: /api/admin/cortex
+
+GET    /overview                    Full dashboard data
+GET    /config                      Tier configuration
+PUT    /config                      Update configuration
+GET    /health                      Tier health status
+POST   /health/check                Trigger health check
+GET    /alerts                      Active alerts
+POST   /alerts/:id/acknowledge      Acknowledge alert
+GET    /metrics                     Data flow metrics
+GET    /graph/stats                 Node/edge counts
+GET    /graph/explore               Search graph nodes
+GET    /graph/conflicts             Unresolved conflicts
+GET    /housekeeping/status         Task statuses
+POST   /housekeeping/trigger        Run task manually
+GET    /mounts                      Zero-Copy mounts
+POST   /mounts                      Create mount
+POST   /mounts/:id/rescan           Rescan mount
+DELETE /mounts/:id                  Delete mount
+GET    /gdpr/erasure                Erasure requests
+POST   /gdpr/erasure                Create erasure request
+```
+
+### 70.11 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/cortex-memory.types.ts` | Type definitions |
+| `packages/infrastructure/migrations/V2026_01_23_002__cortex_memory_system.sql` | Database schema |
+| `packages/infrastructure/lambda/shared/services/cortex/tier-coordinator.service.ts` | Orchestration |
+| `packages/infrastructure/lambda/admin/cortex.ts` | Admin API |
+| `apps/admin-dashboard/app/(dashboard)/cortex/page.tsx` | Dashboard UI |
+
+### 70.12 The Sovereign Cortex Moats
+
+The Cortex Memory System creates six interlocking competitive moats that make customer departure operationally prohibitive:
+
+| Moat | Mechanism | Why Customers Stay |
+|------|-----------|-------------------|
+| **Semantic Structure** | Knowledge Graph with explicit relationships vs competitor "buckets of text" | Moving millions of defined relationships is nearly impossible |
+| **Chain of Custody** | Every critical fact digitally signed by SME via Entrance Exam | Losing audit trail = losing liability defense in regulated sectors |
+| **Tribal Delta** | Golden Rules capture real-world exceptions ("15 days in Mexico City, not 30") | Encoded intuition exists nowhere else—not in files, not in base models |
+| **Sovereignty** | Model-agnostic: Cortex is the asset, models are disposable CPUs | "Better model? Plug it into your existing Brain." |
+| **Entropy Reversal** | Twilight Dreaming deduplicates, resolves conflicts, compresses nightly | Competitors get slower at scale; RADIANT gets faster |
+| **Mentorship Equity** | Gamified Curator Quiz creates psychological ownership | After 50 hours of "teaching," SMEs defend against replacement |
+
+**Administrative Implications:**
+- **Retention**: Monitor time invested per domain via Entrance Exam analytics
+- **Value Demonstration**: Export Golden Rules count and relationship density for QBRs
+- **Migration Prevention**: Highlight Chain of Custody signatures that would be lost
+
+### 70.13 Related Documentation
+
+- [CORTEX-MEMORY-ADMIN-GUIDE.md](./CORTEX-MEMORY-ADMIN-GUIDE.md) - Full operations guide
+- [CORTEX-ENGINEERING-GUIDE.md](./CORTEX-ENGINEERING-GUIDE.md) - Technical reference
+
+---
+
+## 71. Semantic Blackboard & Multi-Agent Orchestration
+
+The Semantic Blackboard is RADIANT's multi-agent orchestration system that prevents the "Thundering Herd" problem—where multiple agents spam users with the same question.
+
+### 71.1 Overview
+
+| Feature | Description |
+|---------|-------------|
+| **Semantic Question Matching** | Vector similarity search using OpenAI ada-002 embeddings |
+| **Answer Reuse** | Auto-reply to agents with cached answers (86% cost reduction) |
+| **Question Grouping** | Fan-out single answer to multiple waiting agents |
+| **Process Hydration** | Serialize waiting agents to disk, resume on answer |
+| **Resource Locking** | Prevent race conditions on shared resources |
+| **Cycle Detection** | Prevent deadlocks from circular dependencies |
+
+### 71.2 Accessing the Dashboard
+
+Navigate to **Blackboard** in the Admin Dashboard sidebar to access:
+
+1. **Overview** - System explanation and architecture benefits
+2. **Resolved Facts** - Previously answered questions with reuse counts
+3. **Question Groups** - Pending groups waiting for a single answer
+4. **Agents** - Active and hydrated agents
+5. **Resource Locks** - Currently held locks
+6. **Configuration** - System settings
+
+### 71.3 Resolved Facts (Decisions)
+
+The Facts tab shows all resolved questions that can be reused:
+
+| Column | Description |
+|--------|-------------|
+| **Question** | The original question asked |
+| **Answer** | The cached answer |
+| **Source** | How the answer was obtained (user, memory, default, inferred) |
+| **Reused** | Number of times this answer has been reused |
+| **Status** | Valid or Invalid |
+
+**Actions:**
+- **Invalidate** - Mark an answer as incorrect; affected agents are notified
+- **Provide New Answer** - Replace with correct answer during invalidation
+
+### 71.4 Question Grouping
+
+When multiple agents ask similar questions within the grouping window (default: 60 seconds), they are grouped together:
+
+1. First agent's question becomes the "canonical" question
+2. Similar questions (≥85% cosine similarity) join the group
+3. User answers once
+4. Answer is fanned out to all grouped agents
+
+**Benefits:**
+- Reduces user interruptions by 60-80%
+- Prevents duplicate HITL decisions
+- Agents don't wait for individual answers
+
+### 71.5 Process Hydration
+
+Long-running agents are automatically serialized to disk when waiting:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| **Auto Hydration** | Enabled | Automatically serialize waiting agents |
+| **Threshold** | 300 seconds | Wait time before hydration |
+| **S3 Storage** | Enabled | Store large states in S3 |
+| **Compression** | gzip | Reduce storage size |
+
+**Agent Lifecycle:**
+1. Agent starts → **Active**
+2. Agent waits for user → **Waiting**
+3. Wait exceeds threshold → **Hydrated** (state saved, process killed)
+4. User answers → **Restored** (state loaded, execution resumes)
+
+### 71.6 Resource Locking
+
+Prevent race conditions when agents access shared resources:
+
+| Lock Type | Description |
+|-----------|-------------|
+| **Read** | Multiple readers allowed |
+| **Write** | Exclusive access, blocks other writers |
+| **Exclusive** | No other access allowed |
+
+**Force Release:** In emergencies, administrators can force-release locks. Use with caution as this may cause data inconsistencies.
+
+### 71.7 Cycle Detection
+
+The system automatically detects circular dependencies:
+
+```
+Agent A waits for Agent B
+Agent B waits for Agent C  
+Agent C waits for Agent A  ← CYCLE DETECTED
+```
+
+**Action on Detection:**
+1. Cycle is logged with full dependency chain
+2. Oldest dependency is broken
+3. Affected agent receives timeout error
+4. Alert is raised in dashboard
+
+### 71.8 Configuration Options
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `similarity_threshold` | 0.85 | Minimum cosine similarity for matching |
+| `enable_question_grouping` | true | Group similar questions |
+| `grouping_window_seconds` | 60 | Wait time for similar questions |
+| `enable_answer_reuse` | true | Auto-reply with cached answers |
+| `answer_ttl_seconds` | 3600 | Answer expiry time |
+| `enable_auto_hydration` | true | Auto-serialize waiting agents |
+| `hydration_threshold_seconds` | 300 | Wait time before hydration |
+| `enable_cycle_detection` | true | Detect dependency cycles |
+| `max_dependency_depth` | 10 | Maximum dependency chain depth |
+
+### 71.9 API Endpoints
+
+**Base**: `/api/admin/blackboard`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/dashboard` | Dashboard statistics |
+| GET | `/decisions` | List resolved decisions |
+| POST | `/decisions/{id}/invalidate` | Invalidate a decision |
+| GET | `/groups` | Pending question groups |
+| POST | `/groups/{id}/answer` | Answer a group |
+| GET | `/agents` | Active agents |
+| POST | `/agents/{id}/restore` | Restore hydrated agent |
+| GET | `/locks` | Active resource locks |
+| POST | `/locks/{id}/release` | Force release a lock |
+| GET | `/config` | Configuration |
+| PUT | `/config` | Update configuration |
+| POST | `/cleanup` | Cleanup expired resources |
+| GET | `/events` | Audit log |
+
+### 71.10 Troubleshooting
+
+| Issue | Cause | Resolution |
+|-------|-------|------------|
+| Low reuse rate | Threshold too high | Lower `similarity_threshold` to 0.80 |
+| Too many groups | Window too long | Reduce `grouping_window_seconds` |
+| Agents stuck in hydrated state | Answer never received | Manually restore or let expire |
+| Lock contention | Long-running operations | Increase `default_lock_timeout_seconds` |
+| Cycle detected frequently | Circular workflows | Review agent dependencies, refactor |
+
+### 71.11 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/semantic-blackboard.service.ts` | Core service |
+| `lambda/shared/services/agent-orchestrator.service.ts` | Agent registry, locks |
+| `lambda/shared/services/process-hydration.service.ts` | State serialization |
+| `lambda/admin/blackboard.ts` | Admin API |
+| `migrations/158_semantic_blackboard_orchestration.sql` | Database schema |
+| `apps/admin-dashboard/app/(dashboard)/blackboard/page.tsx` | Admin UI |
+
+---
+
+## 72. Services Layer & Interface-Based Access Control
+
+The Services Layer ensures all access to RADIANT resources goes through defined interfaces (API, MCP, A2A) with proper authentication and authorization.
+
+### 72.1 Overview
+
+| Interface | Purpose | Authentication |
+|-----------|---------|----------------|
+| **API** | REST/HTTP endpoints for applications | API Key or JWT |
+| **MCP** | Model Context Protocol for AI tools | API Key + Capability negotiation |
+| **A2A** | Agent-to-Agent communication | API Key + mTLS (required by default) |
+
+### 72.2 API Keys with Interface Types
+
+Navigate to **API Keys** in the Admin Dashboard to manage keys per interface type.
+
+**Creating a Key:**
+1. Click **Create Key**
+2. Enter a descriptive name
+3. Select **Interface Type**: API, MCP, A2A, or All
+4. Configure scopes and expiration
+5. For A2A: optionally specify agent ID and type
+6. For MCP: optionally restrict allowed tools
+7. Click **Create Key**
+8. **Copy the key immediately** - it will not be shown again
+
+**Key Prefixes by Interface:**
+- `rad_api_` - API-only keys
+- `rad_mcp_` - MCP-only keys
+- `rad_a2a_` - A2A-only keys
+- `rad_all_` - All-interface keys
+
+### 72.3 A2A Agent Management
+
+The A2A Agents tab shows all registered external agents:
+
+| Column | Description |
+|--------|-------------|
+| **Agent** | Name and unique ID |
+| **Type** | Agent category (orchestrator, worker, etc.) |
+| **Status** | active, suspended, revoked, pending |
+| **Operations** | Supported A2A operations |
+| **Requests** | Total request count |
+| **Last Heartbeat** | Most recent agent heartbeat |
+
+**Agent Actions:**
+- **Suspend**: Temporarily disable agent access
+- **Activate**: Re-enable suspended agent
+- **Revoke**: Permanently revoke agent access
+
+### 72.4 Interface Policies
+
+Configure access rules per interface in the Policies tab:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `require_authentication` | true | Require valid API key |
+| `require_mtls` | true (A2A) | Require mTLS certificate |
+| `global_rate_limit_per_minute` | - | Interface-wide rate limit |
+| `a2a_require_registration` | true | Agents must register first |
+| `a2a_max_concurrent_connections` | 100 | Max concurrent A2A connections |
+| `mcp_max_tools_per_request` | 50 | Max tools per MCP request |
+
+### 72.5 Key Sync Between Admin Apps
+
+Keys created in either Radiant Admin or Think Tank Admin are automatically synced:
+
+1. Key created in Radiant Admin → Queued for Think Tank Admin
+2. Sync job processes pending items
+3. Key appears in both admin apps
+
+**Sync Status:**
+- **Pending**: Awaiting sync
+- **Synced**: Successfully synchronized
+- **Failed**: Sync failed (will retry)
+
+### 72.6 Database Access Restrictions
+
+**CRITICAL**: No external agent can access RADIANT databases directly.
+
+Cedar policies enforce that:
+- All database operations require Service principal with `internal=true`
+- API keys (api, mcp, a2a, all) are **forbidden** from direct DB access
+- External agents must use the defined interfaces
+
+### 72.7 API Endpoints
+
+**Base**: `/api/admin/api-keys`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/dashboard` | Summary by interface type |
+| GET | `/` | List all keys |
+| POST | `/` | Create key with interface type |
+| GET | `/:keyId` | Get key details |
+| PATCH | `/:keyId` | Update key |
+| DELETE | `/:keyId` | Revoke key |
+| POST | `/:keyId/restore` | Restore revoked key |
+| GET | `/agents` | List A2A agents |
+| PATCH | `/agents/:id/status` | Update agent status |
+| GET | `/policies` | Get interface policies |
+| PUT | `/policies/:type` | Update policy |
+| GET | `/audit` | Get audit log |
+| POST | `/sync` | Process pending syncs |
+
+### 72.8 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_01_24_001__services_layer_api_keys.sql` | Database schema |
+| `lambda/admin/api-keys.ts` | Admin API handler |
+| `lambda/gateway/a2a-worker.ts` | A2A protocol worker |
+| `config/cedar/interface-access-policies.cedar` | Cedar access policies |
+| `apps/admin-dashboard/app/(dashboard)/api-keys/page.tsx` | Radiant Admin UI |
+| `apps/thinktank-admin/app/(dashboard)/api-keys/page.tsx` | Think Tank Admin UI |
+
+---
+
+## Section 75: Complete Admin API Architecture (v5.52.6)
+
+### 75.1 Overview
+
+RADIANT provides a comprehensive Admin API with **62 Lambda handlers** wired through AWS API Gateway. All admin endpoints require Cognito authentication and are protected by admin-level authorization.
+
+### 75.2 Handler Categories
+
+| Category | Count | Handlers | Purpose |
+|----------|-------|----------|---------|
+| **Cato Safety** | 5 | cato, cato-genesis, cato-global, cato-governance, cato-pipeline | AI safety architecture |
+| **Memory Systems** | 4 | cortex, cortex-v2, blackboard, empiricism-loop | Persistent memory |
+| **AI/ML** | 7 | brain, cognition, ego, raws, inference-components, formal-reasoning, ethics-free-reasoning | AI orchestration |
+| **Security** | 5 | security, security-schedules, api-keys, ethics, self-audit | Security controls |
+| **Operations** | 5 | gateway, sovereign-mesh, sovereign-mesh-performance, sovereign-mesh-scaling, hitl-orchestration | Operations |
+| **Reporting** | 4 | reports, ai-reports, dynamic-reports, metrics | Analytics |
+| **Configuration** | 7 | tenants, invitations, library-registry, checklist-registry, collaboration-settings, system, system-config | Configuration |
+| **Infrastructure** | 6 | aws-costs, aws-monitoring, s3-storage, code-quality, infrastructure-tier, logs | Infrastructure |
+| **Compliance** | 4 | regulatory-standards, council, user-violations, approvals | Compliance |
+| **Models** | 5 | models, lora-adapters, pricing, specialty-rankings, sync-providers | Model management |
+| **Orchestration** | 2 | orchestration-methods, orchestration-user-templates | Workflow orchestration |
+| **Users** | 2 | user-registry, white-label | User management |
+| **Time & Translation** | 3 | time-machine, translation, internet-learning | Time travel & i18n |
+| **Learning** | 1 | agi-learning | AGI learning |
+
+### 75.3 API Route Pattern
+
+All admin handlers are accessible via:
+```
+/api/admin/{handler-name}/*
+```
+
+Example routes:
+- `/api/admin/cato/dashboard` - Cato safety dashboard
+- `/api/admin/cortex/memories` - Memory management
+- `/api/admin/brain/dreams` - Dream state management
+- `/api/admin/tenants/list` - Tenant list
+
+### 75.4 Authentication
+
+All admin endpoints require:
+1. **Cognito JWT** - Valid authentication token
+2. **Admin Role** - User must have admin privileges
+3. **Tenant Context** - Tenant ID for RLS enforcement
+
+### 75.5 Implementation
+
+**CDK Stack**: `packages/infrastructure/lib/stacks/api-stack.ts`
+
+Each handler follows the pattern:
+```typescript
+const handlerLambda = this.createLambda(
+  'HandlerName',
+  'admin/handler-name.handler',
+  commonEnv, vpc, apiSecurityGroup, lambdaRole
+);
+const resource = admin.addResource('handler-name');
+resource.addProxy({
+  defaultIntegration: new apigateway.LambdaIntegration(handlerLambda),
+  defaultMethodOptions: {
+    authorizer: adminAuthorizer,
+    authorizationType: apigateway.AuthorizationType.COGNITO,
+  },
+});
+```
+
+### 75.6 Gap Resolution (v5.52.6)
+
+In v5.52.6, a critical infrastructure audit identified that only ~31 of 62 admin Lambda handlers were wired to API Gateway. The remaining handlers existed but were returning 404 errors. All 62 handlers are now properly connected.
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| **5.52.6** | 2026-01-24 | Complete CDK Wiring Audit; ALL 62 admin Lambda handlers now wired to API Gateway including Cato Safety (5), Memory Systems (4), AI/ML (7), Security (5), Operations (5), Reporting (4), Configuration (7), Infrastructure (6), Compliance (4), Models (5), Orchestration (2), Users (2), Time & Translation (3); Entire admin API surface now operational |
+| **5.52.5** | 2026-01-24 | Services Layer Implementation; API Keys with interface types (API, MCP, A2A); A2A Protocol Worker; Cedar interface access policies; Admin UI in both admin apps; Key sync mechanism; Database access restrictions |
+| **5.52.4** | 2026-01-24 | Semantic Blackboard Admin Dashboard; CDK API route for blackboard Lambda; Complete admin UI with Facts, Groups, Agents, Locks, and Configuration tabs |
+| **5.52.0** | 2026-01-23 | Comprehensive UI Audit; Replaced mock data with real API calls; Fixed 17 console.log stubs in Magic Carpet, CollaborativeSession, Living Parchment pages; Added toast notifications; Fixed responsive grid patterns |
+| **5.46.0** | 2026-01-23 | Cortex Memory System v4.20.0; Three-tier memory architecture (Hot/Warm/Cold); Graph-RAG knowledge graph; Zero-Copy mounts; Twilight Dreaming integration; GDPR erasure cascade; Admin dashboard Cortex pages |
 | **5.42.0** | 2026-01-22 | AI Reports API complete implementation; OpenAPI 3.1 spec (`docs/api/openapi-admin.yaml`); Performance Optimization Guide (`docs/PERFORMANCE-OPTIMIZATION.md`); Security Audit Checklist (`docs/SECURITY-AUDIT-CHECKLIST.md`); Unit tests for AI Reports; E2E tests for navigation and AI Reports |
 | **5.39.0** | 2026-01-21 | Schema-Adaptive Reports; Dynamic Report Builder; Cato Genesis page; Think Tank Admin navigation fixes; Code Quality dashboard; Gateway Status monitoring |
 | **5.38.0** | 2026-01-21 | Sovereign Mesh Performance Optimization; Infrastructure Scaling (100-500K sessions); SQS dispatcher fix; Redis caching; Provisioned concurrency; Per-tenant FIFO queues; S3 artifact archival; Performance admin UI; Scaling admin UI with cost estimation |
@@ -20292,7 +20960,7 @@ Cato Genesis enables:
 
 ---
 
-*Version 5.42.0 | January 2026*
+*Version 5.52.6 | January 2026*
 *Cross-AI Validated: Claude Opus 4.5 ✓ | Google Gemini ✓*
-*System Evolution: AI Reports API + Documentation Suite*
+*System Evolution: Complete Admin API Architecture + CDK Wiring Audit*
 *Status: GO FOR LAUNCH*
