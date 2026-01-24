@@ -2,14 +2,16 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, Sparkles, Zap, Settings, MoreVertical } from 'lucide-react';
+import { Menu, Sparkles, Zap, Settings, MoreVertical, Table, BarChart3, Kanban, Calculator, Code, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth/context';
 import { chatService, type Conversation, type StreamChunk } from '@/lib/api/chat';
+import { exportConversation, type ExportFormat } from '@/lib/api/compliance-export';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sidebar, MessageBubble, ChatInput, AdvancedModeToggle, BrainPlanViewer } from '@/components/chat';
 import { ViewRouter } from '@/components/polymorphic';
+import { LiquidMorphPanel, type MorphedViewType } from '@/components/liquid';
 import { useUIStore } from '@/lib/stores/ui-store';
 import { useTranslation, T } from '@/lib/i18n';
 import type { BrainPlan } from '@/lib/api/types';
@@ -48,6 +50,12 @@ export default function ThinkTankChat() {
   const [currentPlan, setCurrentPlan] = useState<BrainPlan | null>(null);
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string>('auto');
+  const [viewState, setViewState] = useState<{ viewType: string; executionMode: string }>({ viewType: 'chat', executionMode: 'sniper' });
+  
+  // Morphing UI state
+  const [morphedView, setMorphedView] = useState<MorphedViewType | null>(null);
+  const [isMorphFullscreen, setIsMorphFullscreen] = useState(false);
+  const [showMorphChat, setShowMorphChat] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -125,6 +133,27 @@ export default function ThinkTankChat() {
       await loadConversations();
     } catch (error) {
       console.error('Failed to delete conversation:', error);
+    }
+  };
+
+  const handleExportConversation = async (conversationId: string, format: ExportFormat) => {
+    try {
+      const result = await exportConversation(conversationId, { format });
+      
+      if (result.success) {
+        if (result.downloadUrl) {
+          // Open download URL in new tab
+          window.open(result.downloadUrl, '_blank');
+        } else if (result.artifactId) {
+          // Navigate to decision record view
+          alert(`Decision Record created: ${result.artifactId}`);
+        }
+      } else {
+        alert(`Export failed: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Failed to export conversation:', error);
+      alert('Failed to export conversation');
     }
   };
 
@@ -242,7 +271,7 @@ export default function ThinkTankChat() {
   };
 
   return (
-    <div className="flex h-screen bg-[#0a0a0f]">
+    <div className="flex h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Sidebar */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -251,7 +280,7 @@ export default function ThinkTankChat() {
             animate={{ width: 280, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="border-r border-slate-800/50 overflow-hidden"
+            className="border-r border-white/10 bg-slate-900/60 backdrop-blur-xl overflow-hidden"
           >
             <Sidebar
               conversations={conversations}
@@ -259,6 +288,7 @@ export default function ThinkTankChat() {
               onNewConversation={startNewConversation}
               onSelectConversation={loadConversation}
               onDeleteConversation={handleDeleteConversation}
+              onExportConversation={handleExportConversation}
               isLoading={isLoadingConversations}
               user={user}
               isAuthenticated={isAuthenticated}
@@ -271,11 +301,11 @@ export default function ThinkTankChat() {
       <ViewRouter
         initialView="chat"
         initialMode="sniper"
-        onViewChange={(state) => console.log('View state:', state)}
+        onViewChange={(state) => setViewState(state)}
         className="flex-1 flex flex-col min-w-0"
       >
         {/* Header */}
-        <header className="h-14 border-b border-slate-800/50 flex items-center justify-between px-4 bg-[#0d0d14]/80 backdrop-blur-sm">
+        <header className="h-14 border-b border-white/10 flex items-center justify-between px-4 bg-slate-900/60 backdrop-blur-xl">
           <div className="flex items-center gap-3">
             <Button 
               variant="ghost" 
@@ -315,6 +345,66 @@ export default function ThinkTankChat() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Morphing View Triggers (Advanced Mode) */}
+            {advancedMode && !morphedView && (
+              <div className="flex items-center gap-1 mr-2">
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => setMorphedView('datagrid')}
+                  className="text-slate-400 hover:text-green-400"
+                  title="Open Data Grid"
+                >
+                  <Table className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => setMorphedView('chart')}
+                  className="text-slate-400 hover:text-blue-400"
+                  title="Open Chart"
+                >
+                  <BarChart3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => setMorphedView('kanban')}
+                  className="text-slate-400 hover:text-purple-400"
+                  title="Open Kanban"
+                >
+                  <Kanban className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => setMorphedView('calculator')}
+                  className="text-slate-400 hover:text-orange-400"
+                  title="Open Calculator"
+                >
+                  <Calculator className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => setMorphedView('code_editor')}
+                  className="text-slate-400 hover:text-cyan-400"
+                  title="Open Code Editor"
+                >
+                  <Code className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => setMorphedView('document')}
+                  className="text-slate-400 hover:text-amber-400"
+                  title="Open Document"
+                >
+                  <FileText className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            
             <AdvancedModeToggle />
             
             <Link href="/settings">
@@ -329,78 +419,103 @@ export default function ThinkTankChat() {
           </div>
         </header>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="max-w-3xl mx-auto space-y-6">
-            {/* Brain Plan Viewer (Advanced Mode) */}
-            {advancedMode && currentPlan && (
-              <BrainPlanViewer
-                plan={currentPlan}
-                isExpanded={isPlanExpanded}
-                onToggle={() => setIsPlanExpanded(!isPlanExpanded)}
-              />
-            )}
+        {/* Morphed View Panel (when active) */}
+        <AnimatePresence>
+          {morphedView && (
+            <LiquidMorphPanel
+              viewType={morphedView}
+              isFullscreen={isMorphFullscreen}
+              onClose={() => setMorphedView(null)}
+              onToggleFullscreen={() => setIsMorphFullscreen(!isMorphFullscreen)}
+              onChatToggle={() => setShowMorphChat(!showMorphChat)}
+              showChat={showMorphChat}
+              intent={{
+                category: viewState.executionMode === 'war_room' ? 'data_analysis' : 'general',
+                confidence: 0.85,
+                suggestedComponents: [morphedView],
+                action: 'view',
+                entities: {},
+              }}
+            />
+          )}
+        </AnimatePresence>
 
-            {/* Messages */}
-            {messages.map((message) => (
-              <MessageBubble
-                key={message.id}
-                message={{
-                  id: message.id,
-                  role: message.role,
-                  content: message.content,
-                  timestamp: message.timestamp,
-                  metadata: message.metadata,
-                }}
-                isStreaming={message.isStreaming}
-                showMetadata={advancedMode}
-                onRate={(positive) => handleRateMessage(message.id, positive)}
-              />
-            ))}
+        {/* Messages (hidden when morphed view is active) */}
+        {!morphedView && (
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="max-w-3xl mx-auto space-y-6">
+              {/* Brain Plan Viewer (Advanced Mode) */}
+              {advancedMode && currentPlan && (
+                <BrainPlanViewer
+                  plan={currentPlan}
+                  isExpanded={isPlanExpanded}
+                  onToggle={() => setIsPlanExpanded(!isPlanExpanded)}
+                />
+              )}
 
-            {/* Typing Indicator */}
-            {isTyping && !messages[messages.length - 1]?.isStreaming && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex gap-3"
-              >
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shrink-0 shadow-lg shadow-violet-500/20">
-                  <Sparkles className="h-4 w-4 text-white" />
-                </div>
-                <div className="bg-slate-800/80 rounded-2xl px-4 py-3 border border-slate-700/50">
-                  <div className="flex gap-1.5">
-                    <motion.div
-                      className="w-2 h-2 bg-violet-400 rounded-full"
-                      animate={{ y: [0, -6, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
-                    />
-                    <motion.div
-                      className="w-2 h-2 bg-violet-400 rounded-full"
-                      animate={{ y: [0, -6, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.15 }}
-                    />
-                    <motion.div
-                      className="w-2 h-2 bg-violet-400 rounded-full"
-                      animate={{ y: [0, -6, 0] }}
-                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.3 }}
-                    />
+              {/* Messages */}
+              {messages.map((message) => (
+                <MessageBubble
+                  key={message.id}
+                  message={{
+                    id: message.id,
+                    role: message.role,
+                    content: message.content,
+                    timestamp: message.timestamp,
+                    metadata: message.metadata,
+                  }}
+                  isStreaming={message.isStreaming}
+                  showMetadata={advancedMode}
+                  onRate={(positive) => handleRateMessage(message.id, positive)}
+                />
+              ))}
+
+              {/* Typing Indicator */}
+              {isTyping && !messages[messages.length - 1]?.isStreaming && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex gap-3"
+                >
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shrink-0 shadow-lg shadow-violet-500/20">
+                    <Sparkles className="h-4 w-4 text-white" />
                   </div>
-                </div>
-              </motion.div>
-            )}
+                  <div className="bg-slate-800/80 rounded-2xl px-4 py-3 border border-slate-700/50">
+                    <div className="flex gap-1.5">
+                      <motion.div
+                        className="w-2 h-2 bg-violet-400 rounded-full"
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                      />
+                      <motion.div
+                        className="w-2 h-2 bg-violet-400 rounded-full"
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.15 }}
+                      />
+                      <motion.div
+                        className="w-2 h-2 bg-violet-400 rounded-full"
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.3 }}
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
 
-            <div ref={messagesEndRef} />
+              <div ref={messagesEndRef} />
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Input Area */}
-        <ChatInput
-          onSend={handleSend}
-          isLoading={isTyping}
-          selectedModel={advancedMode ? selectedModel : undefined}
-          onModelSelect={() => setSelectedModel('auto')}
-        />
+        {/* Input Area (hidden when morphed view is fullscreen) */}
+        {!isMorphFullscreen && (
+          <ChatInput
+            onSend={handleSend}
+            isLoading={isTyping}
+            selectedModel={advancedMode ? selectedModel : undefined}
+            onModelSelect={() => setSelectedModel('auto')}
+          />
+        )}
       </ViewRouter>
     </div>
   );

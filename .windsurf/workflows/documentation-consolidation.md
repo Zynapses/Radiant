@@ -1,6 +1,18 @@
 ---
-description: Policy - All standalone documentation must be consolidated into admin guides
+description: DEPRECATED - See /docs-update-all for the master documentation policy
 ---
+
+# ⚠️ DEPRECATED - USE MASTER POLICY
+
+**This policy has been superseded by `docs-update-all.md`**
+
+Please refer to:
+- **Master Policy**: `/.windsurf/workflows/docs-update-all.md`
+- **Documentation Manifest**: `/docs/DOCUMENTATION-MANIFEST.json`
+
+---
+
+# Legacy Content (For Reference Only)
 
 # Documentation Consolidation Policy
 

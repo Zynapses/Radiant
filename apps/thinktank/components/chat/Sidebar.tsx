@@ -5,11 +5,21 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, MessageSquare, Star, Clock, Settings, Search, 
-  Sparkles, Trash2, BookOpen
+  Sparkles, Trash2, BookOpen, MoreVertical, FileText, 
+  Shield, ClipboardCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { cn, groupConversationsByDate } from '@/lib/utils';
 import type { Conversation } from '@/lib/api/types';
+
+export type ExportFormat = 'decision_record' | 'hipaa_audit' | 'soc2_evidence' | 'gdpr_dsar' | 'pdf';
 
 interface SidebarProps {
   conversations: Conversation[];
@@ -17,6 +27,7 @@ interface SidebarProps {
   onNewConversation: () => void;
   onSelectConversation: (id: string) => void;
   onDeleteConversation?: (id: string) => void;
+  onExportConversation?: (id: string, format: ExportFormat) => void;
   isLoading?: boolean;
   user?: { name?: string; email?: string } | null;
   isAuthenticated?: boolean;
@@ -28,6 +39,7 @@ export function Sidebar({
   onNewConversation,
   onSelectConversation,
   onDeleteConversation,
+  onExportConversation,
   isLoading,
   user,
   isAuthenticated
@@ -106,6 +118,7 @@ export function Sidebar({
                 hoveredId={hoveredId}
                 onSelect={onSelectConversation}
                 onDelete={onDeleteConversation}
+                onExport={onExportConversation}
                 onHover={setHoveredId}
               />
             )}
@@ -117,6 +130,7 @@ export function Sidebar({
                 hoveredId={hoveredId}
                 onSelect={onSelectConversation}
                 onDelete={onDeleteConversation}
+                onExport={onExportConversation}
                 onHover={setHoveredId}
               />
             )}
@@ -128,6 +142,7 @@ export function Sidebar({
                 hoveredId={hoveredId}
                 onSelect={onSelectConversation}
                 onDelete={onDeleteConversation}
+                onExport={onExportConversation}
                 onHover={setHoveredId}
               />
             )}
@@ -139,6 +154,7 @@ export function Sidebar({
                 hoveredId={hoveredId}
                 onSelect={onSelectConversation}
                 onDelete={onDeleteConversation}
+                onExport={onExportConversation}
                 onHover={setHoveredId}
               />
             )}
@@ -194,6 +210,7 @@ function ConversationGroup({
   hoveredId,
   onSelect,
   onDelete,
+  onExport,
   onHover
 }: {
   title: string;
@@ -202,6 +219,7 @@ function ConversationGroup({
   hoveredId: string | null;
   onSelect: (id: string) => void;
   onDelete?: (id: string) => void;
+  onExport?: (id: string, format: ExportFormat) => void;
   onHover: (id: string | null) => void;
 }) {
   return (
@@ -209,42 +227,110 @@ function ConversationGroup({
       <div className="text-xs font-medium text-slate-500 px-2 py-2">{title}</div>
       <div className="space-y-1">
         {conversations.map((conv) => (
-          <motion.button
+          <motion.div
             key={conv.id}
-            onClick={() => onSelect(conv.id)}
             onMouseEnter={() => onHover(conv.id)}
             onMouseLeave={() => onHover(null)}
             className={cn(
-              'w-full text-left flex items-center gap-2 rounded-lg px-2 py-2 transition-all group',
+              'w-full flex items-center gap-2 rounded-lg px-2 py-2 transition-all group',
               currentId === conv.id
                 ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
                 : 'text-slate-400 hover:bg-slate-800/50 border border-transparent'
             )}
-            whileHover={{ x: 2 }}
-            transition={{ duration: 0.1 }}
           >
-            <MessageSquare className="h-4 w-4 shrink-0" />
-            <span className="truncate text-sm flex-1">{conv.title}</span>
+            <button
+              onClick={() => onSelect(conv.id)}
+              className="flex items-center gap-2 flex-1 min-w-0 text-left"
+            >
+              <MessageSquare className="h-4 w-4 shrink-0" />
+              <span className="truncate text-sm flex-1">{conv.title}</span>
+            </button>
             {conv.isFavorite && (
-              <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+              <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 shrink-0" />
             )}
             <AnimatePresence>
-              {hoveredId === conv.id && onDelete && (
-                <motion.button
+              {hoveredId === conv.id && (
+                <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(conv.id);
-                  }}
-                  className="text-slate-500 hover:text-red-400"
+                  className="flex items-center gap-1"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </motion.button>
+                  {/* Export/Compliance Menu */}
+                  {onExport && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="text-slate-500 hover:text-violet-400 p-1">
+                          <MoreVertical className="h-3.5 w-3.5" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuItem
+                          onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            onExport(conv.id, 'decision_record');
+                          }}
+                        >
+                          <ClipboardCheck className="h-4 w-4 mr-2 text-violet-400" />
+                          Generate Decision Record
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            onExport(conv.id, 'hipaa_audit');
+                          }}
+                        >
+                          <Shield className="h-4 w-4 mr-2 text-green-400" />
+                          Export HIPAA Audit Package
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            onExport(conv.id, 'soc2_evidence');
+                          }}
+                        >
+                          <Shield className="h-4 w-4 mr-2 text-blue-400" />
+                          Export SOC2 Evidence
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            onExport(conv.id, 'gdpr_dsar');
+                          }}
+                        >
+                          <Shield className="h-4 w-4 mr-2 text-orange-400" />
+                          Export GDPR DSAR
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            onExport(conv.id, 'pdf');
+                          }}
+                        >
+                          <FileText className="h-4 w-4 mr-2 text-slate-400" />
+                          Export as PDF
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                  {/* Delete Button */}
+                  {onDelete && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(conv.id);
+                      }}
+                      className="text-slate-500 hover:text-red-400 p-1"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </motion.div>
               )}
             </AnimatePresence>
-          </motion.button>
+          </motion.div>
         ))}
       </div>
     </div>

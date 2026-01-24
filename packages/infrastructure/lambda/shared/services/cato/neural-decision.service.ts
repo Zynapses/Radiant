@@ -11,17 +11,55 @@
  * - Human escalation for high-uncertainty decisions
  */
 
-// Stub database query
-const query = async (_sql: string, _params?: any[]): Promise<{ rows: any[] }> => ({ rows: [] });
+import { executeStatement, stringParam, doubleParam } from '../../db/client';
 import { CatoSafetyPipeline } from './safety-pipeline.service';
 import { precisionGovernorService } from './precision-governor.service';
 import { controlBarrierService } from './control-barrier.service';
 import { personaService } from './persona.service';
 import { merkleAuditService } from './merkle-audit.service';
-// Stub hitlIntegrationService
-const hitlIntegrationService = {} as any;
-// import { hitlIntegrationService } from './hitl-integration.service';
+import { CatoHitlIntegration, createCatoHitlIntegration } from './hitl-integration.service';
 import { ExecutionContext, SafetyPipelineResult } from './types';
+import Redis from 'ioredis';
+import { Client } from 'pg';
+
+// Database query wrapper for compatibility with existing code
+const query = async (sql: string, params?: unknown[]): Promise<{ rows: any[] }> => {
+  try {
+    // Convert positional params ($1, $2) to named params for Data API
+    const namedParams = params?.map((p, i) => {
+      if (p === null || p === undefined) return { name: `p${i + 1}`, value: { isNull: true } };
+      if (typeof p === 'string') return stringParam(`p${i + 1}`, p);
+      if (typeof p === 'number') return doubleParam(`p${i + 1}`, p);
+      return stringParam(`p${i + 1}`, JSON.stringify(p));
+    }) || [];
+    
+    // Replace $1, $2, etc with :p1, :p2 for Data API
+    const transformedSql = sql.replace(/\$(\d+)/g, (_, num) => `:p${num}`);
+    
+    const result = await executeStatement(transformedSql, namedParams);
+    return { rows: result.rows as any[] };
+  } catch (error) {
+    console.error('Neural decision query error:', error);
+    return { rows: [] };
+  }
+};
+
+// HITL Integration Service singleton
+let hitlIntegrationService: CatoHitlIntegration | null = null;
+
+function getHitlIntegrationService(): CatoHitlIntegration {
+  if (!hitlIntegrationService) {
+    const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+    const db = new Client({ connectionString: process.env.DATABASE_URL });
+    const logger = {
+      info: (msg: string, meta?: Record<string, unknown>) => console.log(`[INFO] ${msg}`, meta),
+      warn: (msg: string, meta?: Record<string, unknown>) => console.warn(`[WARN] ${msg}`, meta),
+      error: (msg: string, meta?: Record<string, unknown>) => console.error(`[ERROR] ${msg}`, meta),
+    };
+    hitlIntegrationService = createCatoHitlIntegration(redis, db, logger);
+  }
+  return hitlIntegrationService;
+}
 
 // ============================================================================
 // Types
@@ -446,21 +484,25 @@ class CatoNeuralDecisionService {
       if (uncertainty > escalationConfig.uncertaintyThreshold) {
         // High uncertainty - decide escalation type
         if (escalationConfig.humanEscalationEnabled && uncertainty > 0.85) {
-          // Queue for human review
-          const queueId = await (hitlIntegrationService as any).queueForReview({
+          // Queue for human review using createCatoEscalationWithHitl
+          const hitlResult = await getHitlIntegrationService().createCatoEscalationWithHitl({
             tenantId: input.tenantId,
             userId: input.userId,
             sessionId: input.sessionId,
-            prompt: input.prompt,
-            reason: `High uncertainty: ${(uncertainty * 100).toFixed(1)}%`,
-            priority: uncertainty > 0.9 ? 'high' : 'medium',
+            originalTask: input.prompt,
+            rejectionHistory: [],
+            recoveryAttempts: 1,
+            lastError: `High uncertainty: ${(uncertainty * 100).toFixed(1)}%`,
+            flyteExecutionId: `neural_${input.sessionId}`,
+            flyteNodeId: 'neural_decision',
+            context: input.context,
           });
 
           return {
             required: true,
             reason: `Uncertainty ${(uncertainty * 100).toFixed(1)}% exceeds threshold`,
             escalationType: 'human',
-            queueId,
+            queueId: hitlResult.decisionId || null,
           };
         }
 

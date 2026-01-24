@@ -15,9 +15,10 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { GlassCard, GlassPanel } from '@/components/ui/glass-card';
+import { GlassPanel } from '@/components/ui/glass-card';
 import { cn } from '@/lib/utils';
 import type { LiquidSchema, LiquidIntent } from '@/lib/api/liquid-interface';
+import { DataGridView, ChartView, KanbanView, CalculatorView, CodeEditorView, DocumentView } from './morphed-views';
 
 export type MorphedViewType = 
   | 'datagrid'
@@ -89,6 +90,33 @@ interface LiquidMorphPanelProps {
   onChatToggle?: () => void;
   showChat?: boolean;
   children?: React.ReactNode;
+}
+
+/**
+ * Render the appropriate view component based on viewType
+ */
+function renderMorphedView(viewType: MorphedViewType): React.ReactNode {
+  switch (viewType) {
+    case 'datagrid':
+      return <DataGridView />;
+    case 'chart':
+      return <ChartView />;
+    case 'kanban':
+      return <KanbanView />;
+    case 'calculator':
+      return <CalculatorView />;
+    case 'code_editor':
+      return <CodeEditorView />;
+    case 'document':
+      return <DocumentView />;
+    case 'custom':
+    default:
+      return (
+        <div className="h-full flex items-center justify-center text-slate-400">
+          <p>Custom view - provide children to render</p>
+        </div>
+      );
+  }
 }
 
 export function LiquidMorphPanel({
@@ -192,31 +220,7 @@ export function LiquidMorphPanel({
       <div className="flex-1 flex overflow-hidden">
         {/* Main Morphed View */}
         <div className={cn('flex-1 overflow-auto', showChat && 'border-r border-white/[0.06]')}>
-          {children || (
-            <div className="h-full flex items-center justify-center">
-              <GlassCard variant="default" padding="lg" className="text-center max-w-md">
-                <Icon className={cn('h-12 w-12 mx-auto mb-4', config.color)} />
-                <h3 className="text-lg font-medium text-white mb-2">
-                  {config.label} Ready
-                </h3>
-                <p className="text-sm text-slate-400 mb-4">
-                  This view will display your {config.label.toLowerCase()} content.
-                  Interact with it just like a native app.
-                </p>
-                <div className="flex justify-center gap-2">
-                  <Badge variant="outline" className="text-xs">
-                    Interactive
-                  </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    AI-Assisted
-                  </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    Exportable
-                  </Badge>
-                </div>
-              </GlassCard>
-            </div>
-          )}
+          {children || renderMorphedView(viewType)}
         </div>
         
         {/* AI Chat Sidebar (when toggled) */}

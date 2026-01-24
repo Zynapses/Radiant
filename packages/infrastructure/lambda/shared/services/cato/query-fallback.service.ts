@@ -33,7 +33,7 @@ const DEFAULT_CONFIG: Omit<FallbackConfig, 'tenantId'> = {
   offlineMessage: 'Service temporarily unavailable. Please try again later.',
 };
 
-class QueryFallbackService {
+export class QueryFallbackService {
   private cache: Map<string, { data: unknown; timestamp: number }> = new Map();
   private configs: Map<string, FallbackConfig> = new Map();
 

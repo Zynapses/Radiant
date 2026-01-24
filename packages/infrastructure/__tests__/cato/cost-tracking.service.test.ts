@@ -4,41 +4,41 @@
  * Tests for real-time cost estimation, daily/MTD costs, and budget tracking.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+// Jest globals are automatically available via ts-jest
 
 // Mock AWS SDK clients
-vi.mock('@aws-sdk/client-cost-explorer', () => ({
-  CostExplorerClient: vi.fn().mockImplementation(() => ({
-    send: vi.fn(),
+jest.mock('@aws-sdk/client-cost-explorer', () => ({
+  CostExplorerClient: jest.fn().mockImplementation(() => ({
+    send: jest.fn(),
   })),
-  GetCostAndUsageCommand: vi.fn(),
+  GetCostAndUsageCommand: jest.fn(),
 }));
 
-vi.mock('@aws-sdk/client-budgets', () => ({
-  BudgetsClient: vi.fn().mockImplementation(() => ({
-    send: vi.fn(),
+jest.mock('@aws-sdk/client-budgets', () => ({
+  BudgetsClient: jest.fn().mockImplementation(() => ({
+    send: jest.fn(),
   })),
-  DescribeBudgetCommand: vi.fn(),
+  DescribeBudgetCommand: jest.fn(),
 }));
 
-vi.mock('@aws-sdk/client-cloudwatch', () => ({
-  CloudWatchClient: vi.fn().mockImplementation(() => ({
-    send: vi.fn(),
+jest.mock('@aws-sdk/client-cloudwatch', () => ({
+  CloudWatchClient: jest.fn().mockImplementation(() => ({
+    send: jest.fn(),
   })),
-  GetMetricStatisticsCommand: vi.fn(),
+  GetMetricStatisticsCommand: jest.fn(),
 }));
 
-vi.mock('@aws-sdk/client-pricing', () => ({
-  PricingClient: vi.fn().mockImplementation(() => ({
-    send: vi.fn(),
+jest.mock('@aws-sdk/client-pricing', () => ({
+  PricingClient: jest.fn().mockImplementation(() => ({
+    send: jest.fn(),
   })),
-  GetProductsCommand: vi.fn(),
+  GetProductsCommand: jest.fn(),
 }));
 
-vi.mock('../../lambda/shared/db/client', () => ({
-  executeStatement: vi.fn(),
-  stringParam: vi.fn((name, value) => ({ name, value })),
-  longParam: vi.fn((name, value) => ({ name, value })),
+jest.mock('../../lambda/shared/db/client', () => ({
+  executeStatement: jest.fn(),
+  stringParam: jest.fn((name, value) => ({ name, value })),
+  longParam: jest.fn((name, value) => ({ name, value })),
 }));
 
 import { executeStatement } from '../../lambda/shared/db/client';
@@ -51,15 +51,15 @@ import {
 
 describe('CostTrackingService', () => {
   let service: CostTrackingService;
-  const mockExecuteStatement = executeStatement as ReturnType<typeof vi.fn>;
+  const mockExecuteStatement = executeStatement as ReturnType<typeof jest.fn>;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
     service = new CostTrackingService();
   });
 
   afterEach(() => {
-    vi.resetAllMocks();
+    jest.resetAllMocks();
   });
 
   describe('getRealtimeEstimate', () => {

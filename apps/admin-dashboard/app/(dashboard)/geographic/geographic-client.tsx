@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, memo } from 'react';
+import { useState, memo, useCallback } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -45,7 +46,18 @@ function formatCurrency(amount: number): string {
 }
 
 export function GeographicClient() {
+  const { toast } = useToast();
   const [timeRange, setTimeRange] = useState('30d');
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+
+  const handleRegionClick = useCallback((code: string) => {
+    setSelectedRegion(code);
+    const region = countryCodeToName[code] || code;
+    toast({
+      title: 'Region Selected',
+      description: `Viewing analytics for ${region}`,
+    });
+  }, [toast]);
 
   const { data: regionData = [], isLoading } = useQuery<RegionDisplayData[]>({
     queryKey: ['geographic-regions', timeRange],
@@ -144,7 +156,7 @@ export function GeographicClient() {
           <div className="h-[400px] border rounded-lg bg-muted/10 overflow-hidden">
             <WorldMap 
               regionData={regionData} 
-              onRegionClick={(code: string) => console.log('Region clicked:', code)} 
+              onRegionClick={handleRegionClick} 
             />
           </div>
         </CardContent>

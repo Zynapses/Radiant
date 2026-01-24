@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
+import Image from 'next/image';
 import {
   BarChart as RechartsBarChart, Bar, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, AreaChart as RechartsAreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell,
@@ -652,7 +653,17 @@ export default function ReportsPage() {
   const [filterType, setFilterType] = useState<string>('all');
   const [filterSchedule, setFilterSchedule] = useState<string>('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [editingReportId, setEditingReportId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('all');
+
+  const handleEditReport = useCallback((reportId: string) => {
+    setEditingReportId(reportId);
+    setShowCreateDialog(true);
+    toast({
+      title: 'Edit Report',
+      description: 'Loading report configuration...',
+    });
+  }, [toast]);
 
   // Fetch reports from API
   const { data: reportsData, isLoading } = useQuery({
@@ -910,7 +921,7 @@ export default function ReportsPage() {
               key={report.id}
               report={report}
               onRun={() => handleRun(report.id)}
-              onEdit={() => console.log('Edit report:', report.id)}
+              onEdit={() => handleEditReport(report.id)}
               onDelete={() => handleDelete(report.id)}
               onToggleFavorite={() => handleToggleFavorite(report.id)}
             />
@@ -1793,7 +1804,7 @@ function AIReportWriter() {
                         >
                           {brandKit.logoUrl ? (
                             <div className="space-y-2">
-                              <img src={brandKit.logoUrl} alt="Logo" className="max-h-16 mx-auto object-contain" />
+                              <Image src={brandKit.logoUrl} alt="Logo" width={120} height={64} className="max-h-16 mx-auto object-contain" />
                               <p className="text-xs text-muted-foreground">Click to change</p>
                             </div>
                           ) : (
@@ -1912,7 +1923,7 @@ function AIReportWriter() {
                         <Label className="text-xs">Preview</Label>
                         <Card className="p-3" style={{ borderColor: brandKit.primaryColor }}>
                           <div className="flex items-center gap-2 mb-2">
-                            {brandKit.logoUrl && <img src={brandKit.logoUrl} alt="" className="h-6 object-contain" />}
+                            {brandKit.logoUrl && <Image src={brandKit.logoUrl} alt="" width={48} height={24} className="h-6 object-contain" />}
                             <span className="font-semibold text-sm" style={{ color: brandKit.primaryColor, fontFamily: brandKit.headerFont }}>
                               {brandKit.companyName}
                             </span>

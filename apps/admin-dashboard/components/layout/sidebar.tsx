@@ -60,6 +60,9 @@ import {
   Rocket,
   Thermometer,
   Network,
+  Database,
+  Flame,
+  Snowflake,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -122,6 +125,13 @@ const navigation: NavigationItem[] = [
   // System Section
   { type: 'separator', label: 'System' },
   { name: 'Infrastructure Tier', href: '/system/infrastructure', icon: Server },
+  
+  // Memory Section
+  { type: 'separator', label: 'Memory' },
+  { name: 'Cortex', href: '/cortex', icon: Database },
+  { name: 'Graph Explorer', href: '/cortex/graph', icon: Network },
+  { name: 'Conflicts', href: '/cortex/conflicts', icon: GitPullRequest },
+  { name: 'GDPR Erasure', href: '/cortex/gdpr', icon: Shield },
   
   // AGI & Cognition Section
   { type: 'separator', label: 'AGI & Cognition' },
@@ -264,11 +274,11 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'flex flex-col border-r bg-card transition-all duration-300',
+        'flex flex-col border-r border-white/10 bg-slate-900/80 backdrop-blur-xl transition-all duration-300',
         collapsed ? 'w-16' : 'w-64'
       )}
     >
-      <div className="flex h-16 items-center justify-between border-b px-4">
+      <div className="flex h-16 items-center justify-between border-b border-white/10 px-4">
         {!collapsed && (
           <Link href="/" className="flex items-center gap-2">
             <Shield className="h-8 w-8 text-radiant-500" />
@@ -316,7 +326,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="border-t p-2">
+      <div className="border-t border-white/10 p-2">
         <Button
           variant="ghost"
           size="sm"

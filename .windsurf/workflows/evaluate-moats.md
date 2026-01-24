@@ -175,9 +175,9 @@ Document in the feature's admin guide section:
 
 ---
 
-## Current 25 Moats Reference
+## Current 26 Moats Reference
 
-### Tier 1: Technical Moats (8)
+### Tier 1: Technical Moats (9)
 1. Truth Engine™ (ECD Verification)
 2. Genesis Cato Safety (Post-RLHF)
 3. AGI Brain / Ghost Vectors
@@ -186,29 +186,30 @@ Document in the feature's admin guide section:
 6. Reality Engine (4 Superpowers)
 7. Twilight Dreaming Cycle
 8. Behavioral Learning System
+9. Stub Nodes (Zero-Copy Data Gravity) - Score 27/30
 
 ### Tier 2: Architectural Moats (8)
-9. True Multi-Tenancy from Birth
-10. Compliance Sandwich Architecture
-11. Model-Agnostic Orchestration
-12. Supply Chain Security
-13. Contextual Gravity
-14. Liquid Interface (50+ Components)
-15. Tri-Layer LoRA Stacking
-16. Empiricism Loop
+10. True Multi-Tenancy from Birth
+11. Compliance Sandwich Architecture
+12. Model-Agnostic Orchestration
+13. Supply Chain Security
+14. Contextual Gravity
+15. Liquid Interface (50+ Components)
+16. Tri-Layer LoRA Stacking
+17. Empiricism Loop
 
 ### Tier 3: Feature Moats (6)
-17. Concurrent Task Execution
-18. Real-Time Collaboration (Yjs CRDT)
-19. Semantic Pattern Memory
-20. Structure from Chaos Synthesis
-21. Anti-Playbook Dynamic Reasoning
-22. Curiosity Engine
+18. Concurrent Task Execution
+19. Real-Time Collaboration (Yjs CRDT)
+20. Semantic Pattern Memory
+21. Structure from Chaos Synthesis
+22. Anti-Playbook Dynamic Reasoning
+23. Curiosity Engine
 
 ### Tier 4: Business Model Moats (3)
-23. Unit Economics Advantage
-24. Five Infrastructure Tiers
-25. White-Label Invisibility
+24. Unit Economics Advantage
+25. Five Infrastructure Tiers
+26. White-Label Invisibility
 
 ---
 

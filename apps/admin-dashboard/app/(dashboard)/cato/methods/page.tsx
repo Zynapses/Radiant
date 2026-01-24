@@ -83,28 +83,24 @@ export default function CatoMethodsPage() {
 
   const fetchData = async () => {
     try {
-      // Mock data - replace with actual API calls
-      setMethods([
-        { methodId: 'method:observer:v1', name: 'Observer', description: 'Analyzes incoming requests to classify intent and extract context', methodType: 'OBSERVER', version: '1.0.0', capabilities: ['intent_classification', 'context_extraction', 'domain_detection'], outputTypes: ['CLASSIFICATION', 'ANALYSIS'], typicalPredecessors: [], typicalSuccessors: ['method:router:v1', 'method:proposer:v1'], outputSchemaRef: 'schema:classification:v1', estimatedCostCents: 5, estimatedDurationMs: 2000, riskCategory: 'NONE', enabled: true },
-        { methodId: 'method:proposer:v1', name: 'Proposer', description: 'Generates action proposals with reversibility information', methodType: 'PROPOSER', version: '1.0.0', capabilities: ['action_planning', 'tool_selection', 'cost_estimation'], outputTypes: ['PROPOSAL'], typicalPredecessors: ['method:observer:v1'], typicalSuccessors: ['method:critic:security:v1', 'method:validator:v1'], outputSchemaRef: 'schema:proposal:v1', estimatedCostCents: 10, estimatedDurationMs: 5000, riskCategory: 'LOW', enabled: true },
-        { methodId: 'method:critic:security:v1', name: 'Security Critic', description: 'Reviews proposals for security vulnerabilities', methodType: 'CRITIC', version: '1.0.0', capabilities: ['security_analysis', 'vulnerability_detection'], outputTypes: ['CRITIQUE'], typicalPredecessors: ['method:proposer:v1'], typicalSuccessors: ['method:decider:v1', 'method:validator:v1'], outputSchemaRef: 'schema:critique:v1', estimatedCostCents: 8, estimatedDurationMs: 4000, riskCategory: 'NONE', enabled: true },
-        { methodId: 'method:validator:v1', name: 'Validator (Risk Engine)', description: 'Performs risk assessment with veto logic', methodType: 'VALIDATOR', version: '1.0.0', capabilities: ['risk_assessment', 'triage_decision', 'veto_logic'], outputTypes: ['ASSESSMENT'], typicalPredecessors: ['method:proposer:v1', 'method:critic:security:v1'], typicalSuccessors: ['method:executor:v1'], outputSchemaRef: 'schema:risk-assessment:v1', estimatedCostCents: 5, estimatedDurationMs: 3000, riskCategory: 'NONE', enabled: true },
-        { methodId: 'method:executor:v1', name: 'Executor', description: 'Executes approved proposals with compensation logging', methodType: 'EXECUTOR', version: '1.0.0', capabilities: ['tool_invocation', 'compensation_logging', 'rollback'], outputTypes: ['EXECUTION_RESULT'], typicalPredecessors: ['method:validator:v1'], typicalSuccessors: [], outputSchemaRef: 'schema:execution-result:v1', estimatedCostCents: 20, estimatedDurationMs: 10000, riskCategory: 'MEDIUM', enabled: true },
+      const [methodsRes, schemasRes, toolsRes] = await Promise.all([
+        fetch('/api/admin/cato/pipeline/methods'),
+        fetch('/api/admin/cato/pipeline/schemas'),
+        fetch('/api/admin/cato/pipeline/tools'),
       ]);
-      setSchemas([
-        { schemaRefId: 'schema:classification:v1', schemaName: 'Classification Output', version: '1.0.0', usedByOutputTypes: ['CLASSIFICATION'], scope: 'SYSTEM' },
-        { schemaRefId: 'schema:proposal:v1', schemaName: 'Proposal Output', version: '1.0.0', usedByOutputTypes: ['PROPOSAL'], scope: 'SYSTEM' },
-        { schemaRefId: 'schema:critique:v1', schemaName: 'Critique Output', version: '1.0.0', usedByOutputTypes: ['CRITIQUE'], scope: 'SYSTEM' },
-        { schemaRefId: 'schema:risk-assessment:v1', schemaName: 'Risk Assessment Output', version: '1.0.0', usedByOutputTypes: ['ASSESSMENT'], scope: 'SYSTEM' },
-        { schemaRefId: 'schema:execution-result:v1', schemaName: 'Execution Result Output', version: '1.0.0', usedByOutputTypes: ['EXECUTION_RESULT'], scope: 'SYSTEM' },
-      ]);
-      setTools([
-        { toolId: 'tool:system:echo', toolName: 'Echo', description: 'Simple echo tool for testing', mcpServer: 'lambda://radiant-cato-echo', riskCategory: 'NONE', supportsDeRun: true, isReversible: true, estimatedCostCents: 0, category: 'system', enabled: true },
-        { toolId: 'tool:http:request', toolName: 'HTTP Request', description: 'Makes HTTP requests to external APIs', mcpServer: 'lambda://radiant-cato-http', riskCategory: 'MEDIUM', supportsDeRun: true, isReversible: false, estimatedCostCents: 1, category: 'network', enabled: true },
-        { toolId: 'tool:file:read', toolName: 'File Read', description: 'Reads content from S3 storage', mcpServer: 'lambda://radiant-cato-file-read', riskCategory: 'LOW', supportsDeRun: true, isReversible: true, estimatedCostCents: 0, category: 'storage', enabled: true },
-        { toolId: 'tool:file:write', toolName: 'File Write', description: 'Writes content to S3 storage', mcpServer: 'lambda://radiant-cato-file-write', riskCategory: 'MEDIUM', supportsDeRun: true, isReversible: true, estimatedCostCents: 1, category: 'storage', enabled: true },
-        { toolId: 'tool:database:query', toolName: 'Database Query', description: 'Executes read-only SQL queries', mcpServer: 'lambda://radiant-cato-db-query', riskCategory: 'LOW', supportsDeRun: true, isReversible: true, estimatedCostCents: 1, category: 'database', enabled: true },
-      ]);
+
+      if (methodsRes.ok) {
+        const methodsData = await methodsRes.json();
+        setMethods(methodsData);
+      }
+      if (schemasRes.ok) {
+        const schemasData = await schemasRes.json();
+        setSchemas(schemasData);
+      }
+      if (toolsRes.ok) {
+        const toolsData = await toolsRes.json();
+        setTools(toolsData);
+      }
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch data:', error);

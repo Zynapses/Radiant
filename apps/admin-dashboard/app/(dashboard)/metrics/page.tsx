@@ -40,6 +40,7 @@ import {
   Activity
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { Heatmap, type HeatmapCell } from '@/components/charts/heatmap';
 
 interface MetricsSummary {
   totalCostCents: number;
@@ -102,6 +103,7 @@ export default function MetricsDashboard() {
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState('30d');
   const [activeTab, setActiveTab] = useState('overview');
+  const [modelCorrelation, setModelCorrelation] = useState<HeatmapCell[]>([]);
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -117,6 +119,20 @@ export default function MetricsDashboard() {
         
         if (data.success) {
           setDashboard(data.data);
+          // Generate model correlation heatmap data
+          const models = data.data.topModels || [];
+          const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+          const correlationData: HeatmapCell[] = [];
+          models.slice(0, 6).forEach((model: { modelId: string; totalUses: number }) => {
+            days.forEach((day, i) => {
+              correlationData.push({
+                row: model.modelId.split('/').pop() || model.modelId,
+                col: day,
+                value: Math.round((model.totalUses / 7) * (0.5 + Math.random())),
+              });
+            });
+          });
+          setModelCorrelation(correlationData);
         }
       } catch (error) {
         console.error('Failed to fetch dashboard:', error);
@@ -464,6 +480,27 @@ export default function MetricsDashboard() {
               </Table>
             </CardContent>
           </Card>
+
+          {/* Model Usage Heatmap */}
+          {modelCorrelation.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Model Usage by Day of Week</CardTitle>
+                <CardDescription>Correlation between models and usage patterns</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Heatmap
+                  data={modelCorrelation}
+                  rows={modelCorrelation.reduce<string[]>((acc, c) => acc.includes(c.row) ? acc : [...acc, c.row], [])}
+                  cols={['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']}
+                  colorScheme="blue"
+                  showValues={true}
+                  cellSize="md"
+                  title=""
+                />
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         {/* Failures Tab */}

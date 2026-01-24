@@ -1,7 +1,7 @@
 # Think Tank User Guide
 
-> **Version**: 5.44.0  
-> **Last Updated**: January 22, 2026  
+> **Version**: 5.52.14  
+> **Last Updated**: January 24, 2026  
 > **Audience**: End Users of Think Tank
 
 ---
@@ -17,13 +17,14 @@
 7. [Delight System - AI Personality](#7-delight-system---ai-personality)
 8. [Collaboration Features](#8-collaboration-features)
 9. [Advanced Features](#9-advanced-features)
-10. [Understanding AI Decisions](#10-understanding-ai-decisions)
-11. [Decision Records](#11-decision-records)
-12. [Living Parchment](#12-living-parchment)
-13. [Safety & Governance](#13-safety--governance)
-14. [Keyboard Shortcuts](#14-keyboard-shortcuts)
-15. [Troubleshooting](#15-troubleshooting)
-16. [Glossary](#16-glossary)
+10. [How Think Tank's Memory Works](#10-how-think-tanks-memory-works)
+11. [Understanding AI Decisions](#11-understanding-ai-decisions)
+12. [Decision Records](#12-decision-records)
+13. [Living Parchment](#13-living-parchment)
+14. [Safety & Governance](#14-safety--governance)
+15. [Keyboard Shortcuts](#15-keyboard-shortcuts)
+16. [Troubleshooting](#16-troubleshooting)
+17. [Glossary](#17-glossary)
 
 ---
 
@@ -141,6 +142,42 @@ From the dashboard, you can quickly:
 - **Manage Users** - View and manage team members (if you have permissions)
 - **Configure Delight** - Customize the AI's personality
 - **Domain Modes** - Adjust how Think Tank handles different topics
+
+### Your Profile
+
+Access your profile by clicking your avatar in the top-right corner. Your profile includes:
+
+#### Activity Heatmap
+
+A GitHub-style visualization of your conversation activity over the past year:
+
+| Feature | Description |
+|---------|-------------|
+| **Breathing Animation** | Cells pulse based on activity intensity - more active days "breathe" faster |
+| **AI Insights** | Automatic pattern detection with natural language explanations |
+| **Streak Tracking** | Current and longest streaks highlighted with 🔥 badges |
+| **Sound Feedback** | Optional audio cues when hovering over active days |
+| **Accessibility Mode** | Full narrative summary for screen readers |
+
+**AI Insights Examples:**
+- "You're a weekday warrior! Most activity happens Monday-Friday" (92% confidence)
+- "Amazing! Your longest streak is 14 days. That's dedication! 🔥"
+- "Activity has slowed recently. A quick session could reignite momentum!"
+
+**Color Legend:**
+- Empty (dark) → No activity
+- Light purple → Low activity
+- Bright purple → High activity
+- Dashed border → Predicted future activity
+
+#### Profile Stats
+
+| Stat | Description |
+|------|-------------|
+| **Conversations** | Total conversations you've had |
+| **Tokens Used** | AI tokens consumed (for awareness) |
+| **Messages** | Total messages exchanged |
+| **Achievements** | Unlocked gamification badges |
 
 ---
 
@@ -535,9 +572,138 @@ All generated code passes through Cato safety validation:
 - ✅ Only allowed dependencies
 - ✅ Follows security best practices
 
+### Liquid Interface - Chat Morphs Into Tools (v5.52.8)
+
+In **Advanced Mode**, the chat interface can transform ("morph") into specialized tools when you need them. This is called the Liquid Interface - "Don't Build the Tool. BE the Tool."
+
+#### Enabling Advanced Mode
+
+1. Toggle **Advanced Mode** in the header (lightning bolt icon)
+2. Tool trigger buttons appear in the toolbar
+3. Click any tool icon to morph the chat into that tool
+
+#### Available Tools
+
+| Tool | Icon | What It Does |
+|------|------|--------------|
+| **Data Grid** | 📊 | Interactive spreadsheet for data manipulation |
+| **Chart** | 📈 | Visualize data as bar, line, pie, or area charts |
+| **Kanban** | 📋 | Task board with multiple frameworks (see below) |
+| **Calculator** | 🔢 | Full calculator with memory and operations |
+| **Code Editor** | 💻 | Write and run code with output panel |
+| **Document** | 📄 | Rich text editor for writing |
+
+#### Kanban Board Variants
+
+The Kanban tool supports 5 different productivity frameworks:
+
+| Variant | Best For | Key Features |
+|---------|----------|--------------|
+| **Standard** | General task tracking | Traditional columns, drag-and-drop |
+| **Scrumban** | Agile teams | Sprint goals, velocity, story points |
+| **Enterprise** | Portfolio management | Multi-lane boards (Strategic/Ops/Support) |
+| **Personal** | Individual productivity | Simple 3-column, WIP limit of 3 |
+| **Pomodoro** | Focus sessions | Built-in 25-min timer, break tracking |
+
+**Using Pomodoro Kanban:**
+1. Select "Pomodoro Kanban" from the variant dropdown
+2. Add tasks with estimated pomodoros (🍅)
+3. Click **Start** on a task to begin a 25-minute focus session
+4. Timer shows in header - take a 5-minute break when it ends
+5. Track completed pomodoros per task
+
+**Analytics Panel:**
+Click **Analytics** to see:
+- Total tasks and completed count
+- Average cycle time (how long tasks take)
+- Throughput (tasks completed per week)
+
+#### Returning to Chat
+
+Click the **X** button in the tool header to close the morphed view and return to chat.
+
 ---
 
-## 10. Understanding AI Decisions
+## 10. How Think Tank's Memory Works
+
+Think Tank uses two interconnected systems to remember things and access knowledge.
+
+### Cato - The AI's Personality & Memory
+
+**Cato** is the AI's "self" - its personality, emotional state, and personal memory of you.
+
+| What Cato Remembers | Example |
+|---------------------|---------|
+| **Your Preferences** | "This user prefers detailed explanations" |
+| **Past Conversations** | Topics you've discussed, corrections you've made |
+| **Current Mood** | Confidence level, engagement, curiosity |
+| **Communication Style** | Formal vs casual, concise vs detailed |
+
+**How it helps you**: The AI adapts its responses based on what it knows about you. If you've told it you prefer bullet points, it remembers. If you corrected it before, it learns.
+
+### Cortex - The Enterprise Knowledge Library
+
+**Cortex** is your organization's knowledge graph - facts, documents, and relationships extracted from enterprise data.
+
+| Knowledge Tier | What's There | Speed |
+|----------------|--------------|-------|
+| **Hot** | Current session context | Instant |
+| **Warm** | Knowledge graph, verified facts | Fast |
+| **Cold** | Archives, compliance data | Slower |
+
+**How it helps you**: When you ask a question, the AI can pull relevant facts from your organization's knowledge base - not just generic internet knowledge.
+
+### How They Work Together
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  YOUR MESSAGE: "What's the status of Project Alpha?"                │
+└────────────────────────────┬────────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  CATO checks:                                                        │
+│  • Your role (Project Manager)                                       │
+│  • Your preferences (prefers executive summaries)                    │
+│  • Your mood context (busy, needs quick answers)                     │
+└────────────────────────────┬────────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  CORTEX retrieves:                                                   │
+│  • Project Alpha timeline (from knowledge graph)                     │
+│  • Recent status updates (from documents)                            │
+│  • Related milestones (from relationships)                           │
+└────────────────────────────┬────────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  AI RESPONSE:                                                        │
+│  Personalized (knows you want summaries)                            │
+│  + Informed (has actual project data)                                │
+│  + Contextual (understands your role)                                │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### What This Means for You
+
+| Without Memory Integration | With Memory Integration |
+|---------------------------|------------------------|
+| AI gives generic answers | AI gives personalized + informed answers |
+| You re-explain context every time | AI remembers your preferences |
+| No access to company data | Enterprise facts in every response |
+| Each session starts fresh | Learning persists across sessions |
+
+### Privacy Note
+
+- **Personal memories** (Cato) are tied to your user account
+- **Enterprise knowledge** (Cortex) follows your organization's access controls
+- You can ask "What do you remember about me?" to see stored context
+- Admins can configure retention periods and what gets remembered
+
+---
+
+## 11. Understanding AI Decisions
 
 Think Tank is designed to be transparent about how it makes decisions.
 
@@ -607,7 +773,7 @@ Think Tank acknowledges when it doesn't know something:
 
 ---
 
-## 11. Safety & Governance
+## 14. Safety & Governance
 
 Think Tank includes multiple safety layers to protect you and ensure responsible AI use.
 
@@ -686,7 +852,7 @@ If Think Tank produces concerning output:
 
 ---
 
-## 11. Decision Records
+## 12. Decision Records
 
 Decision Records capture the AI's reasoning, evidence, and conclusions in an auditable format. This feature helps you understand and verify AI-assisted decisions.
 
@@ -720,9 +886,49 @@ Export decision records in various formats:
 - **SOC2 Evidence Bundle** - For security audits
 - **GDPR DSAR Response** - For data requests
 
+### Exporting Conversations Directly (v5.52.16)
+
+You can export any conversation directly from the sidebar:
+
+1. **Hover** over any conversation in the sidebar
+2. **Click** the **⋮** (more options) button that appears
+3. **Select** an export format:
+   - **Generate Decision Record** - Creates a Decision Intelligence Artifact with claims, evidence, and dissent
+   - **Export HIPAA Audit Package** - PHI-redacted export for healthcare compliance
+   - **Export SOC2 Evidence** - Audit trail for security compliance
+   - **Export GDPR DSAR** - Data subject access request format
+   - **Export as PDF** - Standard PDF export
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  SIDEBAR - Conversation Actions                                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  📝 Today                                                            │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ 💬 "Drug interaction analysis"              [⋮] [🗑]        │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                           │                                         │
+│                           ▼                                         │
+│                    ┌──────────────────────┐                        │
+│                    │ 📋 Generate Decision │                        │
+│                    │    Record            │                        │
+│                    │───────────────────── │                        │
+│                    │ 🛡️ Export HIPAA     │                        │
+│                    │ 🛡️ Export SOC2      │                        │
+│                    │ 🛡️ Export GDPR DSAR │                        │
+│                    │───────────────────── │                        │
+│                    │ 📄 Export as PDF     │                        │
+│                    └──────────────────────┘                        │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Note**: PHI (Protected Health Information) is automatically redacted in compliance exports by default.
+
 ---
 
-## 12. Living Parchment
+## 13. Living Parchment
 
 Living Parchment is Think Tank's advanced decision intelligence suite with sensory UI that communicates trust through visual breathing, living typography, and confidence terrain.
 
@@ -782,9 +988,9 @@ Test any idea through adversarial exploration:
 
 ---
 
-## 13. Safety & Governance
+## 14. Safety & Governance
 
-Think Tank includes multiple safety layers to protect you and your organization. See [Section 11: Safety & Governance](#11-safety--governance) in the main guide for details on:
+Think Tank includes multiple safety layers to protect you and your organization. See [Section 14: Safety & Governance](#11-safety--governance) in the main guide for details on:
 - Five-layer Cato safety architecture
 - Control Barrier Functions (CBFs)
 - Human-in-the-Loop approvals
@@ -792,7 +998,7 @@ Think Tank includes multiple safety layers to protect you and your organization.
 
 ---
 
-## 14. Keyboard Shortcuts
+## 15. Keyboard Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
@@ -805,7 +1011,7 @@ Think Tank includes multiple safety layers to protect you and your organization.
 
 ---
 
-## 15. Troubleshooting
+## 16. Troubleshooting
 
 ### Common Issues
 
@@ -843,7 +1049,7 @@ Think Tank includes multiple safety layers to protect you and your organization.
 
 ---
 
-## 16. Glossary
+## 17. Glossary
 
 | Term | Definition |
 |------|------------|
@@ -882,6 +1088,7 @@ Think Tank includes multiple safety layers to protect you and your organization.
 | 5.35.0 | Jan 2026 | Added visual diagrams and flowcharts |
 | 5.43.0 | Jan 22, 2026 | Added Decision Records section (DIA Engine) |
 | 5.44.0 | Jan 22, 2026 | Added Living Parchment section (War Room, Council, Debate Arena) |
+| 5.52.0 | Jan 23, 2026 | Simulator now uses real API data with graceful fallbacks |
 
 ---
 

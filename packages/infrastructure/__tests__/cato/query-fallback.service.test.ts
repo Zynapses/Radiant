@@ -4,17 +4,17 @@
  * Tests for fallback responses, health checks, and caching.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+// Jest globals are automatically available via ts-jest
 
 // Mock dependencies
-vi.mock('../../lambda/shared/db/client', () => ({
-  executeStatement: vi.fn(),
-  stringParam: vi.fn((name, value) => ({ name, value })),
+jest.mock('../../lambda/shared/db/client', () => ({
+  executeStatement: jest.fn(),
+  stringParam: jest.fn((name, value) => ({ name, value })),
 }));
 
-vi.mock('../../lambda/shared/services/cato/circuit-breaker.service', () => ({
+jest.mock('../../lambda/shared/services/cato/circuit-breaker.service', () => ({
   circuitBreakerService: {
-    getInterventionLevel: vi.fn(),
+    getInterventionLevel: jest.fn(),
   },
 }));
 
@@ -27,16 +27,16 @@ import {
 
 describe('QueryFallbackService', () => {
   let service: QueryFallbackService;
-  const mockExecuteStatement = executeStatement as ReturnType<typeof vi.fn>;
-  const mockGetInterventionLevel = circuitBreakerService.getInterventionLevel as ReturnType<typeof vi.fn>;
+  const mockExecuteStatement = executeStatement as ReturnType<typeof jest.fn>;
+  const mockGetInterventionLevel = circuitBreakerService.getInterventionLevel as ReturnType<typeof jest.fn>;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
     service = new QueryFallbackService();
   });
 
   afterEach(() => {
-    vi.resetAllMocks();
+    jest.resetAllMocks();
   });
 
   describe('getFallbackResponse', () => {

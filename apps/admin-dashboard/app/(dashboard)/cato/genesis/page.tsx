@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api';
+import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,6 +28,9 @@ import {
   Clock,
   Target,
   Sparkles,
+  Loader2,
+  RefreshCw,
+  Save,
 } from 'lucide-react';
 
 interface GenesisConfig {
@@ -49,7 +54,7 @@ interface GenesisMetrics {
   uptime: string;
 }
 
-const mockConfig: GenesisConfig = {
+const defaultConfig: GenesisConfig = {
   enabled: true,
   autonomyLevel: 65,
   safetyThreshold: 85,
@@ -60,27 +65,71 @@ const mockConfig: GenesisConfig = {
   maxActionsPerMinute: 100,
 };
 
-const mockMetrics: GenesisMetrics = {
-  totalDecisions: 15420,
-  autonomousActions: 12340,
-  humanInterventions: 234,
-  safetyViolations: 3,
-  learningCycles: 567,
-  avgConfidence: 0.92,
-  uptime: '99.97%',
+const defaultMetrics: GenesisMetrics = {
+  totalDecisions: 0,
+  autonomousActions: 0,
+  humanInterventions: 0,
+  safetyViolations: 0,
+  learningCycles: 0,
+  avgConfidence: 0,
+  uptime: '0%',
 };
 
 export default function CatoGenesisPage() {
-  const [config, setConfig] = useState<GenesisConfig>(mockConfig);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [config, setConfig] = useState<GenesisConfig>(defaultConfig);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  const { data: metrics = mockMetrics } = useQuery({
-    queryKey: ['cato', 'genesis', 'metrics'],
-    queryFn: async () => mockMetrics,
+  // Fetch genesis configuration
+  const { data: configData, isLoading: configLoading } = useQuery({
+    queryKey: ['cato', 'genesis', 'config'],
+    queryFn: () => apiClient.get<GenesisConfig>('/api/admin/cato/genesis/config'),
   });
+
+  // Fetch genesis metrics
+  const { data: metrics = defaultMetrics, isLoading: metricsLoading, refetch: refetchMetrics } = useQuery({
+    queryKey: ['cato', 'genesis', 'metrics'],
+    queryFn: () => apiClient.get<GenesisMetrics>('/api/admin/cato/genesis/metrics'),
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Update configuration mutation
+  const updateConfigMutation = useMutation({
+    mutationFn: (newConfig: GenesisConfig) => apiClient.put<GenesisConfig>('/api/admin/cato/genesis/config', newConfig),
+    onSuccess: () => {
+      toast({ title: 'Configuration saved', description: 'Genesis configuration updated successfully.' });
+      queryClient.invalidateQueries({ queryKey: ['cato', 'genesis', 'config'] });
+      setHasChanges(false);
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  // Sync config from server
+  useEffect(() => {
+    if (configData) {
+      setConfig(configData);
+    }
+  }, [configData]);
 
   const updateConfig = (key: keyof GenesisConfig, value: unknown) => {
     setConfig(prev => ({ ...prev, [key]: value }));
+    setHasChanges(true);
   };
+
+  const handleSave = () => {
+    updateConfigMutation.mutate(config);
+  };
+
+  if (configLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -99,15 +148,25 @@ export default function CatoGenesisPage() {
           <Badge variant={config.enabled ? 'default' : 'secondary'} className="text-sm">
             {config.enabled ? 'Active' : 'Inactive'}
           </Badge>
-          <Button variant="outline">
-            <Settings className="h-4 w-4 mr-2" />
-            Advanced Settings
+          <Button variant="outline" size="sm" onClick={() => refetchMetrics()}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
           </Button>
+          {hasChanges && (
+            <Button onClick={handleSave} disabled={updateConfigMutation.isPending}>
+              {updateConfigMutation.isPending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Save Changes
+            </Button>
+          )}
         </div>
       </div>
 
       {/* Metrics Overview */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
@@ -171,7 +230,7 @@ export default function CatoGenesisPage() {
         </TabsList>
 
         <TabsContent value="config" className="space-y-4">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -346,7 +405,7 @@ export default function CatoGenesisPage() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div className="p-4 rounded-lg border">
                   <div className="flex items-center gap-2 mb-2">
                     <CheckCircle2 className="h-5 w-5 text-green-500" />

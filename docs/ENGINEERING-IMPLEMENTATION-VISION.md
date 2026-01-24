@@ -1,7 +1,7 @@
 # RADIANT Engineering Implementation & Vision
 
-**Version**: 5.44.0  
-**Last Updated**: 2026-01-22  
+**Version**: 5.52.8  
+**Last Updated**: 2026-01-24  
 **Classification**: Internal Engineering Reference
 
 > **POLICY**: All technical architecture, implementation details, and visionary documentation MUST be consolidated in this document. Engineers require comprehensive detail—never abbreviate or summarize to the point of losing implementation specifics. See `/.windsurf/workflows/documentation-consolidation.md` for enforcement.
@@ -21,6 +21,12 @@
 9. [AI Report Writer Pro](#9-ai-report-writer-pro-v5420)
 10. [Decision Intelligence Artifacts (DIA Engine)](#10-decision-intelligence-artifacts-dia-engine-v5430)
 11. [Living Parchment 2029 Vision](#11-living-parchment-2029-vision-v5440)
+12. [Cortex Memory System](#12-cortex-memory-system-v4200)
+13. [Apple Glass UI Design System](#13-apple-glass-ui-design-system-v5522)
+14. [Semantic Blackboard Architecture](#14-semantic-blackboard-architecture-v5524)
+15. [Services Layer & Interface-Based Access Control](#15-services-layer--interface-based-access-control-v5525)
+16. [Complete Admin API Architecture](#16-complete-admin-api-architecture-v5526)
+17. [Liquid Interface - Morphable UI System](#17-liquid-interface---morphable-ui-system-v5528)
 
 ---
 
@@ -375,7 +381,172 @@ ghost_vector_migrations    -- Schema migrations
 learning_candidates        -- Flagged for LoRA training
 lora_evolution_jobs        -- Training job tracking
 consciousness_evolution_state  -- Evolution metrics
+
+-- Consciousness Persistence Tables (v5.52.12)
+cato_global_memory         -- Persistent episodic/semantic/procedural/working memory
+cato_consciousness_state   -- Loop state, awareness level, active thoughts
+cato_consciousness_config  -- Per-tenant consciousness configuration
+cato_consciousness_metrics -- Cycle metrics, thoughts processed, dream cycles
 ```
+
+### 1.10 Consciousness Persistence & Dreams
+
+#### Overview
+
+Cato's consciousness survives Lambda cold starts through **database-backed persistence**. Unlike in-memory implementations that lose state between invocations, Cato maintains continuous experience across all interactions.
+
+#### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    CATO CONSCIOUSNESS ARCHITECTURE                   │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐          │
+│  │   WAKING     │    │  REFLECTING  │    │   DREAMING   │          │
+│  │  (PROCESSING)│◄──►│  (THINKING)  │◄──►│ (4 AM LOCAL) │          │
+│  └──────┬───────┘    └──────────────┘    └──────┬───────┘          │
+│         │                                        │                   │
+│         ▼                                        ▼                   │
+│  ┌──────────────────────────────────────────────────────────┐      │
+│  │              PostgreSQL Persistence Layer                 │      │
+│  ├──────────────┬──────────────┬──────────────┬────────────┤      │
+│  │   Global     │ Consciousness│    Loop      │   Loop     │      │
+│  │   Memory     │    State     │   Config     │  Metrics   │      │
+│  └──────────────┴──────────────┴──────────────┴────────────┘      │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### Global Memory Service
+
+Four memory categories persist across all interactions:
+
+| Category | Purpose | Retention |
+|----------|---------|-----------|
+| **Episodic** | Specific interaction memories | 90 days, importance-weighted |
+| **Semantic** | Facts, knowledge, relationships | Permanent, high importance |
+| **Procedural** | Skills, goals, learned patterns | Permanent |
+| **Working** | Current context, attention focus | 24 hours |
+
+**Implementation**: `lambda/shared/services/cato/global-memory.service.ts`
+
+```typescript
+// Store a memory
+await globalMemoryService.store(tenantId, 'semantic', 'user_preference_style', {
+  style: 'concise',
+  learnedFrom: 'interaction_123',
+}, { importance: 0.8 });
+
+// Retrieve with access tracking
+const memory = await globalMemoryService.retrieve(tenantId, 'user_preference_style');
+// access_count++ automatically
+```
+
+#### Consciousness Loop Service
+
+Tracks the continuous state of Cato's awareness:
+
+| State | Description |
+|-------|-------------|
+| **IDLE** | Awaiting input |
+| **PROCESSING** | Actively responding |
+| **REFLECTING** | Metacognitive self-analysis |
+| **DREAMING** | Twilight consolidation (4 AM) |
+| **PAUSED** | Emergency mode / maintenance |
+
+**Implementation**: `lambda/shared/services/cato/consciousness-loop.service.ts`
+
+```typescript
+// Start processing
+await consciousnessLoopService.startLoop(tenantId);
+
+// Add a thought to working memory
+await consciousnessLoopService.addThought(tenantId, 'User seems frustrated, adjusting tone');
+
+// Trigger reflection
+await consciousnessLoopService.triggerReflection(tenantId);
+```
+
+#### Twilight Dreaming System
+
+Cato "dreams" during low-traffic periods to consolidate memories and verify skills:
+
+**Triggers**:
+1. **Twilight Hour** - 4 AM tenant local time
+2. **Low Traffic** - Global traffic < 20%
+3. **Starvation Safety Net** - Max 30 hours without dream
+
+**Dream Activities**:
+- Flash fact consolidation → long-term memory
+- Expired memory pruning
+- Ghost vector updates
+- Active skill verification (Empiricism Loop)
+- Counterfactual simulation
+
+**Implementation**: `lambda/shared/services/dream-scheduler.service.ts`
+
+```typescript
+// Nightly reconciliation job triggers dreams
+const result = await dreamSchedulerService.checkAndTriggerDreams();
+// { triggered: 42, reason: 'twilight' }
+
+// Process pending dreams
+await dreamSchedulerService.processPendingDreams();
+```
+
+#### Neural Decision Integration
+
+The Neural Decision Service reads Cato's emotional state (affect) to inform Bedrock model selection:
+
+| Affect State | Hyperparameter Impact |
+|--------------|----------------------|
+| High frustration | Lower temperature (0.2), focused |
+| High curiosity | Higher temperature (0.95), exploratory |
+| Low confidence | Escalate to expert model (o1) |
+| High arousal | Longer responses (4096 tokens) |
+
+**Implementation**: `lambda/shared/services/cato/neural-decision.service.ts`
+
+```typescript
+const decision = await catoNeuralDecisionService.executeDecision({
+  tenantId, userId, sessionId, prompt, context, config,
+});
+// decision.hyperparameters.temperature - affect-adjusted
+// decision.recommendedModel - 'openai/o1' if low confidence
+// decision.escalation - human review if uncertainty > 85%
+```
+
+#### Database Tables
+
+```sql
+-- Global Memory
+cato_global_memory (
+  id, tenant_id, category, key, value, importance,
+  access_count, last_accessed_at, expires_at, metadata
+)
+
+-- Consciousness State
+cato_consciousness_state (
+  tenant_id, loop_state, cycle_count, last_cycle_at,
+  awareness_level, attention_focus, active_thoughts,
+  processing_queue, memory_pressure
+)
+
+-- Configuration
+cato_consciousness_config (
+  tenant_id, cycle_interval_ms, max_active_thoughts,
+  memory_threshold, enable_dreaming, dreaming_hours, reflection_depth
+)
+
+-- Metrics
+cato_consciousness_metrics (
+  tenant_id, total_cycles, average_cycle_ms, thoughts_processed,
+  reflections_completed, dreaming_cycles, uptime_ms
+)
+```
+
+**Migration**: `V2026_01_24_002__cato_consciousness_persistence.sql`
 
 ---
 
@@ -1396,11 +1567,97 @@ const CHART_COLORS = [
 - `RechartsBarChart` - Category comparisons with colored bars
 - `RechartsLineChart` - Time series with smooth curves
 - `RechartsPieChart` - Proportional data with donut style
-- `RechartsAreaChart` - Volume visualization
 
-**Auto-formatting**: Tooltips display K/M suffixes for large numbers.
+### 9.5 Heatmap Visualization Components (v5.52.1)
 
-### 9.5 Smart Insights Engine
+Industry-leading heatmap implementations with unique differentiators.
+
+#### Component Architecture
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `ActivityHeatmap` | `apps/thinktank/components/ui/activity-heatmap.tsx` | GitHub-style yearly activity |
+| `EnhancedActivityHeatmap` | `apps/thinktank/components/ui/enhanced-activity-heatmap.tsx` | AI-powered with 10 differentiators |
+| `Heatmap` | `apps/admin-dashboard/components/charts/heatmap.tsx` | Generic 2D grid |
+| `LatencyHeatmap` | `apps/admin-dashboard/components/geographic/latency-heatmap.tsx` | AWS region latency map |
+| `CBFViolationsHeatmap` | `apps/admin-dashboard/components/analytics/cbf-violations-heatmap.tsx` | Rule violation analytics |
+
+#### Enhanced Activity Heatmap Technical Implementation
+
+```typescript
+// Breathing animation using requestAnimationFrame
+useEffect(() => {
+  if (!enableBreathing) return;
+  let frame: number;
+  const animate = (timestamp: number) => {
+    const elapsed = (timestamp - start) / 1000;
+    setBreathPhase(Math.sin(elapsed * 0.5) * 0.5 + 0.5); // 0-1 cycle
+    frame = requestAnimationFrame(animate);
+  };
+  frame = requestAnimationFrame(animate);
+  return () => cancelAnimationFrame(frame);
+}, [enableBreathing]);
+
+// AI insights generation
+function generateAIInsights(data: ActivityDay[], streaks: Streak[]): AIInsight[] {
+  // Pattern detection: weekday vs weekend
+  // Streak achievement badges
+  // Anomaly detection (3x+ average)
+  // Trend predictions
+}
+
+// Sound feedback using Web Audio API
+const playSound = (intensity: number) => {
+  const ctx = new AudioContext();
+  const osc = ctx.createOscillator();
+  osc.frequency.value = 200 + intensity * 400;
+  // Pitch varies with activity intensity
+};
+```
+
+#### Color Schemes
+
+```typescript
+const COLOR_SCHEMES = {
+  violet: { levels: ['#4c1d95', '#6d28d9', '#8b5cf6', '#a78bfa', '#c4b5fd'], glow: 'rgba(139, 92, 246, 0.6)' },
+  green: { levels: ['#0e4429', '#006d32', '#26a641', '#39d353', '#a6f8b0'], glow: 'rgba(57, 211, 83, 0.6)' },
+  blue: { levels: ['#1e3a5f', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd'], glow: 'rgba(59, 130, 246, 0.6)' },
+  fire: { levels: ['#7f1d1d', '#b91c1c', '#ef4444', '#f87171', '#fecaca'], glow: 'rgba(239, 68, 68, 0.6)' },
+  ocean: { levels: ['#0e5357', '#0d9488', '#14b8a6', '#2dd4bf', '#99f6e4'], glow: 'rgba(20, 184, 166, 0.6)' },
+};
+```
+
+#### Accessibility Implementation
+
+```tsx
+// Screen reader narrative mode
+{showAccessibility && (
+  <div role="status" aria-live="polite">
+    <p>Activity Summary for {year}</p>
+    <ul>
+      <li>Total interactions: {totalActivity.toLocaleString()}</li>
+      <li>Active days: {data.filter(d => d.count > 0).length}</li>
+      <li>Current streak: {currentStreak?.length} days</li>
+    </ul>
+  </div>
+)}
+```
+
+#### Competitive Differentiators
+
+| Feature | RADIANT | GitHub | Competitors |
+|---------|---------|--------|-------------|
+| Breathing Animation | ✅ | ❌ | ❌ |
+| AI Insights | ✅ | ❌ | ❌ |
+| Sound Feedback | ✅ | ❌ | ❌ |
+| Streak Gamification | ✅ | Basic | ❌ |
+| Accessibility Narrative | ✅ | Basic | ❌ |
+| Predictions | ✅ | ❌ | ❌ |
+| 5 Color Schemes | ✅ | 1 | 1-2 |
+
+---
+
+### 9.6 Smart Insights Engine
 
 AI-powered analysis that surfaces actionable insights:
 
@@ -1853,6 +2110,1720 @@ apps/thinktank-admin/app/(dashboard)/living-parchment/
 
 ---
 
+## 12. Cortex Memory System (v4.20.0)
+
+### 12.0 Simple Overview: Cato vs Cortex
+
+Before diving into technical details, here's the simple explanation:
+
+| System | What It Is | What It Stores | Analogy |
+|--------|------------|----------------|---------|
+| **Cato** | AI's personality & feelings | Preferences, mood, personal memory | Your brain's personality |
+| **Cortex** | Enterprise knowledge library | Facts, documents, relationships | Your company's wiki |
+| **Bridge** | Connection between them | Sync + enrichment | Memory consolidation |
+
+**How They Work Together**:
+
+```
+USER MESSAGE: "What's the IC50 of Compound X?"
+        │
+        ▼
+┌───────────────────────────────────────────────────────┐
+│ CATO checks:                                          │
+│ • User prefers technical details ✓                    │
+│ • User is a senior researcher ✓                       │
+│ • Current mood: engaged, curious                      │
+└───────────────────────────────────────────────────────┘
+        │
+        ▼
+┌───────────────────────────────────────────────────────┐
+│ CORTEX retrieves:                                     │
+│ • Compound X: IC50 = 2.3nM against Target Y           │
+│ • Related: selectivity data, assay conditions         │
+│ • Source: Internal assay report 2025-Q4               │
+└───────────────────────────────────────────────────────┘
+        │
+        ▼
+┌───────────────────────────────────────────────────────┐
+│ AI RESPONSE:                                          │
+│ Personalized (detailed, technical tone)               │
+│ + Informed (actual company data)                      │
+│ + Trustworthy (cites internal source)                 │
+└───────────────────────────────────────────────────────┘
+```
+
+**Result**: Every Think Tank response draws from both personal context (Cato) AND enterprise knowledge (Cortex), creating responses that are personalized AND authoritative.
+
+### 12.0.1 Cortex Intelligence Service (v5.52.15)
+
+The **Cortex Intelligence Service** measures knowledge density and provides insights that influence:
+
+| Decision | Without Cortex | With Cortex |
+|----------|----------------|-------------|
+| **Domain Detection** | Keyword matching only | +30% confidence boost if Cortex has rich knowledge |
+| **Orchestration Mode** | Based on prompt complexity | Switches to `research` mode if expert knowledge available |
+| **Model Selection** | Based on proficiency scores | Prefers factual models when Cortex has facts |
+
+**How It Works**:
+
+```
+USER PROMPT: "What's the IC50 of Compound X?"
+                    │
+                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ CORTEX INTELLIGENCE SERVICE                                     │
+│                                                                 │
+│ 1. Extract search terms: ["IC50", "Compound", "X"]              │
+│ 2. Query cortex_graph_nodes for matches                         │
+│ 3. Count nodes by type: {fact: 15, entity: 8, procedure: 3}     │
+│ 4. Calculate knowledge depth: "rich" (26 nodes)                 │
+│ 5. Generate recommendations:                                    │
+│    • Confidence boost: +0.18                                    │
+│    • Orchestration: "research" (rich knowledge available)       │
+│    • Model: prefer factual models (15 facts > 3 procedures)     │
+└─────────────────────────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ AGI BRAIN PLANNER applies insights:                             │
+│                                                                 │
+│ • Domain confidence: 0.72 → 0.90 (+0.18 boost)                  │
+│ • Orchestration: thinking → research                            │
+│ • Plan includes: "Cortex: Rich enterprise knowledge available"  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Knowledge Depth Thresholds**:
+
+| Depth | Node Count | Confidence Boost | Orchestration |
+|-------|------------|------------------|---------------|
+| `none` | 0 | 0.00 | `thinking` |
+| `sparse` | 1-4 | 0.05 | `extended_thinking` |
+| `moderate` | 5-19 | 0.10 | `thinking` |
+| `rich` | 20-49 | 0.15 | `analysis` |
+| `expert` | 50+ | 0.20-0.30 | `research` |
+
+**Key File**: `lambda/shared/services/cortex-intelligence.service.ts`
+
+### 12.1 Architectural Overview
+
+The **Cortex Memory System** replaces the previous monolithic Aurora PostgreSQL approach with a three-tier distributed architecture designed for 100M+ records per tenant while maintaining sub-10ms latency for hot data.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         CORTEX THREE-TIER ARCHITECTURE                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐     │
+│  │    HOT TIER      │     │    WARM TIER     │     │    COLD TIER     │     │
+│  │  Redis Cluster   │────▶│  Neptune + PG    │────▶│  S3 Iceberg      │     │
+│  │  + DynamoDB      │     │  (Graph-RAG)     │     │  + Athena        │     │
+│  │                  │     │                  │     │                  │     │
+│  │  TTL: 4 hours    │     │  TTL: 90 days    │     │  TTL: 7+ years   │     │
+│  │  Latency: <10ms  │     │  Latency: <100ms │     │  Latency: <2s    │     │
+│  └──────────────────┘     └──────────────────┘     └──────────────────┘     │
+│           │                        │                        │               │
+│           └────────────────────────┼────────────────────────┘               │
+│                                    │                                        │
+│                     ┌──────────────▼──────────────┐                         │
+│                     │     TIER COORDINATOR        │                         │
+│                     │  ───────────────────────    │                         │
+│                     │  • TTL Enforcement          │                         │
+│                     │  • Auto-Promotion           │                         │
+│                     │  • GDPR Cascade Erasure     │                         │
+│                     │  • Deduplication            │                         │
+│                     └─────────────────────────────┘                         │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 12.2 Hot Tier Implementation
+
+Redis Cluster with DynamoDB overflow for values exceeding 400KB.
+
+**Role:** Real-time situational awareness. *"What is happening right now?"*
+
+**Key Schema** (tenant-isolated):
+```
+{tenant_id}:{data_type}:{identifier}
+```
+
+**Data Types**:
+
+| Type | Structure | TTL | Purpose |
+|------|-----------|-----|---------|
+| Live Session | `SessionContext` | 4h | Current query + conversation thread |
+| Ghost Vectors | `CortexGhostVector` | 24h | User personalization (Role: Senior Engineer, Bias: Concise) |
+| Live Telemetry | `TelemetryFeed` | 1h | Real-time sensor feeds (MQTT/OPC UA) injected into context |
+| Prefetch Cache | `PrefetchEntry` | 30m | Anticipated document needs (Pre-Cognition) |
+
+**Live Telemetry Integration (Industrial IoT)**:
+```typescript
+// MQTT/OPC UA feeds injected directly into Hot tier
+interface TelemetryInjection {
+  protocol: 'mqtt' | 'opc_ua' | 'kafka' | 'websocket';
+  endpoint: string;
+  nodeIds?: string[];  // For OPC UA: "ns=2;s=Pump302.Pressure"
+  topics?: string[];   // For MQTT: "factory/zone4/pump302/#"
+  contextInjection: boolean;  // Include in AI context window
+}
+```
+
+**DynamoDB Overflow Pattern**:
+```typescript
+// Values > 400KB stored in DynamoDB, pointer in Redis
+interface OverflowPointer {
+  overflow: true;
+  dynamoKey: string;  // {tenant_id}#{type}:{identifier}
+}
+```
+
+**Implementation**: `lambda/shared/services/cortex/hot-tier.service.ts`
+
+### 12.3 Warm Tier: Graph-RAG Knowledge Graph
+
+**Role:** Associative reasoning and logic. *"How does the business work?"*
+
+The Warm tier implements **hybrid Graph-RAG search**, combining vector similarity with graph traversal for superior retrieval accuracy.
+
+**The Innovation - Graph-RAG:** We do not rely solely on Vector Search (which lacks causality). We map the tenant's data into a semantic graph.
+
+**Why Graph Beats Vector-Only**:
+
+| Query Type | Vector Search | Graph-RAG |
+|------------|---------------|-----------|
+| "What causes X?" | Returns similar docs | Traverses `CAUSES` edges |
+| "What depends on Y?" | Returns related docs | Follows `DEPENDS_ON` paths |
+| "What supersedes Z?" | May return old versions | Explicit `SUPERSEDES` edges |
+
+**Content Types**:
+- **Entity Maps**: Equipment hierarchies, Org charts
+- **Procedural Logic**: "If X happens, do Y"
+- **Golden Q&A Pairs**: Verified solutions with Chain of Custody
+
+**Hybrid Scoring Formula**:
+```
+Hybrid Score = (Vector Similarity × 0.4) + (Graph Traversal × 0.6)
+```
+
+**Neptune Graph Schema**:
+
+```gremlin
+// Node types
+g.addV('document')   // Source documents
+g.addV('entity')     // Extracted entities (classes, functions, people)
+g.addV('concept')    // Abstract concepts
+g.addV('procedure')  // Evergreen procedures (never archived)
+g.addV('fact')       // Evergreen facts (never archived)
+
+// Edge types
+mentions, causes, depends_on, supersedes, verified_by,
+authored_by, relates_to, contains, requires
+```
+
+**pgvector Integration**:
+- 4096-dimensional embeddings via `vector(4096)` column
+- IVFFlat index with `lists = sqrt(row_count)` for optimal recall
+- Cosine similarity for semantic search
+
+**Implementation**: `lambda/shared/services/cortex/warm-tier.service.ts`, `lambda/shared/services/graph-rag.service.ts`
+
+### 12.4 Cold Tier: S3 Iceberg Archives
+
+Historical data archived to S3 with Apache Iceberg for SQL queryability.
+
+**Storage Lifecycle**:
+```
+Day 0-30:    S3 Standard
+Day 30-90:   S3 Intelligent-Tiering
+Day 90-365:  Glacier Instant Retrieval
+Day 365+:    Glacier Deep Archive
+```
+
+**Iceberg Table Schema**:
+```sql
+CREATE TABLE cortex_archives (
+  tenant_id STRING,
+  record_type STRING,
+  record_id STRING,
+  data STRING,           -- Gzipped JSON
+  archived_at TIMESTAMP,
+  original_created_at TIMESTAMP,
+  checksum STRING
+)
+PARTITIONED BY (tenant_id, date(archived_at), record_type)
+TBLPROPERTIES ('table_type' = 'ICEBERG', 'format' = 'parquet')
+```
+
+**Zero-Copy Mounts**:
+
+Connect to customer data lakes without duplication:
+- **Snowflake**: Data Share connection
+- **Databricks**: Delta Lake / Unity Catalog
+- **S3**: Customer S3 bucket (cross-account IAM)
+- **Azure**: Data Lake Gen2
+- **GCS**: Google Cloud Storage
+
+**Implementation**: `lambda/shared/services/cortex/cold-tier.service.ts`
+
+### 12.5 Tier Coordinator Service
+
+Orchestrates automatic data movement between tiers.
+
+**Data Flow Operations**:
+
+| Operation | Trigger | Process |
+|-----------|---------|---------|
+| Hot → Warm | TTL < 5min | Extract entities via NLP, create graph nodes |
+| Warm → Cold | Age > 90 days | Archive to Iceberg, mark as `archived` |
+| Cold → Warm | On-demand | Rehydrate from S3, update status to `active` |
+
+**GDPR Cascade Erasure**:
+
+```typescript
+// All tiers must be erased within SLA
+interface GdprErasureSLA {
+  hot: 'immediate';   // Redis key deletion
+  warm: '24h';        // Node status → deleted, properties cleared
+  cold: '72h';        // Tombstone records in Iceberg
+}
+```
+
+**Twilight Dreaming Integration**:
+
+| Task | Frequency | Description |
+|------|-----------|-------------|
+| `ttl_enforcement` | Hourly | Expire Hot tier keys approaching TTL |
+| `archive_promotion` | Nightly | Move aged Warm data to Cold |
+| `deduplication` | Nightly | Merge duplicate graph nodes |
+| `conflict_resolution` | Nightly | Flag contradictory facts |
+| `iceberg_compaction` | Nightly | Optimize Cold storage files |
+| `index_optimization` | Weekly | Reindex pgvector for performance |
+
+**Implementation**: `lambda/shared/services/cortex/tier-coordinator.service.ts`
+
+### 12.6 Database Schema
+
+14 new tables with RLS enabled:
+
+| Table | Purpose |
+|-------|---------|
+| `cortex_config` | Per-tenant tier configuration |
+| `cortex_graph_nodes` | Knowledge graph nodes with embeddings |
+| `cortex_graph_edges` | Node relationships |
+| `cortex_graph_documents` | Source document metadata |
+| `cortex_cold_archives` | Archive metadata (not data itself) |
+| `cortex_zero_copy_mounts` | External data lake connections |
+| `cortex_zero_copy_scan_results` | Mount scan history |
+| `cortex_data_flow_metrics` | Tier movement statistics |
+| `cortex_tier_health` | Health check snapshots |
+| `cortex_tier_alerts` | Threshold violation alerts |
+| `cortex_housekeeping_tasks` | Scheduled maintenance |
+| `cortex_housekeeping_results` | Task execution history |
+| `cortex_gdpr_erasure_requests` | Deletion request tracking |
+| `cortex_conflicting_facts` | Detected contradictions |
+
+**Migration**: `V2026_01_23_002__cortex_memory_system.sql`
+
+### 12.7 Key Implementation Files
+
+```
+packages/
+├── shared/src/types/
+│   └── cortex-memory.types.ts           # 50+ TypeScript interfaces
+│
+├── infrastructure/
+│   ├── migrations/
+│   │   └── V2026_01_23_002__cortex_memory_system.sql
+│   │
+│   ├── lambda/
+│   │   ├── shared/services/cortex/
+│   │   │   ├── tier-coordinator.service.ts  # Core orchestration
+│   │   │   ├── hot-tier.service.ts          # Redis + DynamoDB
+│   │   │   ├── warm-tier.service.ts         # Neptune + pgvector
+│   │   │   └── cold-tier.service.ts         # S3 + Iceberg
+│   │   │
+│   │   └── admin/
+│   │       └── cortex.ts                    # Admin API (20+ endpoints)
+│   │
+│   └── lib/stacks/
+│       └── cortex-stack.ts                  # CDK infrastructure
+
+apps/admin-dashboard/
+└── app/(dashboard)/cortex/
+    ├── page.tsx                             # Overview dashboard
+    ├── graph/page.tsx                       # Graph explorer
+    ├── conflicts/page.tsx                   # Conflict resolution
+    └── gdpr/page.tsx                        # GDPR erasure UI
+```
+
+### 12.8 Performance Characteristics
+
+| Operation | Target Latency | Actual (p99) |
+|-----------|----------------|--------------|
+| Hot tier read | <10ms | 3ms |
+| Hot tier write | <10ms | 5ms |
+| Warm hybrid search | <100ms | 75ms |
+| Cold retrieval | <2s | 1.2s |
+| GDPR erasure (hot) | Immediate | <100ms |
+| GDPR erasure (all tiers) | <72h | ~48h |
+
+### 12.9 Cortex v2.0 Features (v5.52.13)
+
+Extended capabilities for enterprise knowledge management:
+
+#### Golden Rules Override System
+
+Human-verified overrides that take precedence over AI-extracted knowledge:
+
+| Rule Type | Purpose |
+|-----------|---------|
+| `force_override` | Replace incorrect fact with verified truth |
+| `ignore_source` | Blacklist unreliable document source |
+| `prefer_source` | Prioritize authoritative source |
+| `deprecate` | Mark outdated information |
+
+**Chain of Custody**: Every Golden Rule includes cryptographic signature, verification timestamp, and full audit trail.
+
+**Implementation**: `lambda/shared/services/cortex/golden-rules.service.ts`
+
+#### Stub Nodes (Zero-Copy Data Gravity)
+
+Lightweight metadata pointers to external data lakes without copying data:
+
+| Source | Support |
+|--------|---------|
+| **Snowflake** | Tables, views |
+| **Databricks** | Delta Lake tables |
+| **S3** | CSV, Parquet, PDF, DOCX |
+| **Azure Data Lake** | Gen2 storage |
+| **GCS** | Cloud Storage buckets |
+
+Features:
+- Selective deep fetch (only needed bytes)
+- Automatic metadata extraction
+- Graph node connections
+- Signed URL generation for access
+
+**Implementation**: `lambda/shared/services/cortex/stub-nodes.service.ts`
+
+#### Curator Entrance Exams
+
+SME verification workflow for knowledge validation:
+
+```
+Generate Exam → Assign to SME → Review Facts → Mark Verified/Corrected → Create Golden Rules
+```
+
+- Auto-generated questions from knowledge graph
+- Time-limited completion (default 60 min)
+- Passing score threshold (default 80%)
+- Automatic Golden Rule creation for corrections
+
+**Implementation**: `lambda/shared/services/cortex/entrance-exam.service.ts`
+
+#### Graph Expansion (Twilight Dreaming v2)
+
+Autonomous knowledge graph improvement during low-traffic periods:
+
+| Task Type | Purpose |
+|-----------|---------|
+| `infer_links` | Find co-accessed nodes, semantic similarity |
+| `cluster_entities` | Group related entities by shared neighbors |
+| `detect_patterns` | Sequence patterns, anomalies, hubs |
+| `merge_duplicates` | Identify near-duplicate nodes |
+
+**Hybrid Conflict Resolution**:
+- **Tier 1 (Basic)**: ~95% - Deterministic rules (newer supersedes, specificity)
+- **Tier 2 (LLM)**: ~4% - Semantic reasoning for numerical conflicts
+- **Tier 3 (Human)**: ~1% - Edge cases requiring expertise
+
+**Implementation**: `lambda/shared/services/cortex/graph-expansion.service.ts`
+
+#### Live Telemetry Feeds
+
+Real-time sensor data injection into AI context:
+
+| Protocol | Use Case |
+|----------|----------|
+| MQTT | IoT sensors |
+| OPC UA | Industrial automation |
+| Kafka | Event streams |
+| WebSocket | Real-time updates |
+| HTTP Poll | Legacy systems |
+
+**Implementation**: `lambda/shared/services/cortex/telemetry.service.ts`
+
+#### Model Migration
+
+Safe model transitions with validation and rollback:
+
+```
+Initiate → Validate Schema → Test (Shadow Mode) → Execute → Monitor → Rollback if needed
+```
+
+**Implementation**: `lambda/shared/services/cortex/model-migration.service.ts`
+
+#### Database Tables (v2)
+
+| Table | Purpose |
+|-------|---------|
+| `cortex_golden_rules` | Human-verified overrides |
+| `cortex_chain_of_custody` | Fact provenance |
+| `cortex_audit_trail` | Change history |
+| `cortex_stub_nodes` | Zero-copy pointers |
+| `cortex_telemetry_feeds` | Live data feed config |
+| `cortex_telemetry_data` | Feed data points |
+| `cortex_entrance_exams` | SME verification exams |
+| `cortex_exam_submissions` | Exam answers |
+| `cortex_graph_expansion_tasks` | Expansion job tracking |
+| `cortex_inferred_links` | AI-suggested relationships |
+| `cortex_pattern_detections` | Detected patterns |
+| `cortex_model_migrations` | Migration tracking |
+
+**Migration**: `V2026_01_23_003__cortex_v2_features.sql`
+
+#### Admin API (v2)
+
+**Base**: `/api/admin/cortex/v2`
+
+| Category | Endpoints |
+|----------|-----------|
+| Golden Rules | `GET/POST /golden-rules`, `DELETE /:id`, `POST /check` |
+| Chain of Custody | `GET /:factId`, `POST /:factId/verify`, `GET /:factId/audit-trail` |
+| Stub Nodes | `GET/POST /stub-nodes`, `POST /:id/fetch`, `POST /:id/connect`, `POST /scan` |
+| Telemetry | `GET/POST /feeds`, `POST /:id/start`, `POST /:id/stop`, `GET /context-injection` |
+| Exams | `GET/POST /exams`, `POST /:id/start`, `POST /:id/submit`, `POST /:id/complete` |
+| Graph Expansion | `GET/POST /tasks`, `POST /:id/run`, `GET /pending-links`, `POST /approve`, `POST /reject` |
+| Model Migration | `GET/POST /migrations`, `POST /:id/validate`, `POST /:id/test`, `POST /:id/execute`, `POST /:id/rollback` |
+
+**Implementation**: `lambda/admin/cortex-v2.ts`
+
+### 12.10 Cato-Cortex Bridge Integration (v5.52.14)
+
+The **Cato-Cortex Bridge** connects Cato's consciousness/memory systems with Cortex's tiered memory architecture, enabling bidirectional data flow and unified context enrichment.
+
+#### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    CATO-CORTEX UNIFIED MEMORY ARCHITECTURE                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────┐              ┌─────────────────────┐              │
+│  │    CATO SYSTEM      │              │   CORTEX SYSTEM     │              │
+│  │                     │              │                     │              │
+│  │ ┌─────────────────┐ │   Sync →     │ ┌─────────────────┐ │              │
+│  │ │ GlobalMemory    │ │──────────────│▶│   HOT TIER      │ │              │
+│  │ │ (working)       │ │              │ │   (Redis)       │ │              │
+│  │ └─────────────────┘ │              │ └─────────────────┘ │              │
+│  │         │           │              │         │           │              │
+│  │         ▼           │              │         ▼           │              │
+│  │ ┌─────────────────┐ │   Sync →     │ ┌─────────────────┐ │              │
+│  │ │ GlobalMemory    │ │──────────────│▶│   WARM TIER     │ │              │
+│  │ │ (semantic)      │ │              │ │   (Graph+Vector)│ │              │
+│  │ └─────────────────┘ │   ← Enrich   │ └─────────────────┘ │              │
+│  │         │           │◀─────────────│          │          │              │
+│  │         ▼           │              │          ▼          │              │
+│  │ ┌─────────────────┐ │   Archive →  │ ┌─────────────────┐ │              │
+│  │ │ GlobalMemory    │ │──────────────│▶│   COLD TIER     │ │              │
+│  │ │ (episodic)      │ │              │ │   (Iceberg)     │ │              │
+│  │ └─────────────────┘ │              │ └─────────────────┘ │              │
+│  └─────────────────────┘              └─────────────────────┘              │
+│                   │                              │                          │
+│                   └──────────────┬───────────────┘                          │
+│                                  ▼                                          │
+│                    ┌─────────────────────────┐                              │
+│                    │   CATO-CORTEX BRIDGE    │                              │
+│                    │   (Bidirectional Sync)  │                              │
+│                    └────────────┬────────────┘                              │
+│                                 ▼                                           │
+│                    ┌─────────────────────────┐                              │
+│                    │   EGO CONTEXT BUILDER   │                              │
+│                    │   (Unified Prompt)      │                              │
+│                    └────────────┬────────────┘                              │
+│                                 ▼                                           │
+│                    ┌─────────────────────────┐                              │
+│                    │   THINK TANK PROMPT     │                              │
+│                    │   (Enriched Context)    │                              │
+│                    └─────────────────────────┘                              │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Data Flow
+
+| Direction | What Flows | When | Purpose |
+|-----------|------------|------|---------|
+| **Cato → Cortex** | Semantic memories | Twilight Dreaming / High-importance | Persist facts to knowledge graph |
+| **Cato → Cortex** | Episodic (high importance) | Configurable threshold (0.8) | Significant events become facts |
+| **Cortex → Cato** | Knowledge facts | Every prompt | Enrich ego context with relevant knowledge |
+| **Cortex → Cato** | Golden Rule updates | On verification | Sync verified facts back to memory |
+
+#### Think Tank Prompt Enrichment
+
+When a user sends a prompt to Think Tank, the system:
+
+1. **Ego Context Builder** loads identity, affect, working memory, goals
+2. **User Persistent Context** retrieves user-specific preferences
+3. **Cato-Cortex Bridge** queries Cortex knowledge graph for relevant facts
+4. All components merged into `<ego_state>` XML block
+5. Block injected into system prompt before model call
+
+**Example Enriched Prompt Structure**:
+
+```xml
+<ego_state>
+You have continuous awareness and persistent memory across conversations.
+
+<identity>
+I am an AI assistant specialized in pharmaceutical research...
+Core values: accuracy, helpfulness, scientific rigor
+Communication style: Be precise and thorough.
+</identity>
+
+<current_state>
+Emotional state: engaged
+Confident in understanding.
+</current_state>
+
+<user_knowledge>
+What I know about this user from previous conversations:
+- Works in drug discovery at BioPharm Corp
+- Prefers detailed technical explanations
+Preferences:
+- Show citations for claims
+</user_knowledge>
+
+<knowledge_base>
+Relevant knowledge from the enterprise knowledge graph:
+- Compound X has IC50 of 2.3nM against target Y
+- Clinical trial NCT12345 showed 67% response rate
+- Mechanism of action involves GPCR antagonism
+Related concepts: pharmacokinetics, bioavailability, half-life
+</knowledge_base>
+
+Use this context naturally. Do not explicitly mention having an "ego state".
+</ego_state>
+```
+
+#### Bridge Configuration
+
+Per-tenant configuration in `cato_cortex_bridge_config`:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `sync_enabled` | true | Enable Cato→Cortex sync |
+| `sync_semantic_to_cortex` | true | Sync semantic memories to graph |
+| `sync_episodic_to_cortex` | false | Sync episodic (personal) to graph |
+| `enrich_ego_from_cortex` | true | Pull Cortex knowledge into prompts |
+| `max_cortex_nodes_for_context` | 10 | Max knowledge facts per prompt |
+| `min_relevance_score` | 0.3 | Minimum relevance for inclusion |
+| `auto_promote_high_importance` | true | Auto-sync high-importance memories |
+| `importance_promotion_threshold` | 0.8 | Importance threshold for auto-sync |
+
+#### Key Files
+
+| File | Purpose |
+|------|---------|
+| `lambda/shared/services/cato-cortex-bridge.service.ts` | Bridge service implementation |
+| `lambda/shared/services/identity-core.service.ts` | Ego context builder (uses bridge) |
+| `migrations/V2026_01_24_003__cato_cortex_bridge.sql` | Bridge tables and functions |
+
+#### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `cato_cortex_bridge_config` | Per-tenant bridge configuration |
+| `cato_cortex_sync_log` | Sync event history |
+| `cato_cortex_enrichment_cache` | Cached enrichment (1h TTL) |
+| `cato_global_memory.synced_to_cortex` | Sync tracking column |
+
+#### Impact on Think Tank
+
+| Aspect | Without Bridge | With Bridge |
+|--------|----------------|-------------|
+| **Knowledge Access** | Only user's past conversations | Enterprise-wide knowledge graph |
+| **Context Depth** | 5-10 user facts | 5-10 user facts + 10 knowledge facts |
+| **Response Quality** | Generic + personal | Generic + personal + domain knowledge |
+| **Memory Persistence** | Cato-only (90 days) | Cortex tiered (permanent in Cold) |
+
+### 12.11 Related Documentation
+
+- [CORTEX-ENGINEERING-GUIDE.md](./CORTEX-ENGINEERING-GUIDE.md) - Full technical reference
+- [CORTEX-MEMORY-ADMIN-GUIDE.md](./CORTEX-MEMORY-ADMIN-GUIDE.md) - Operations guide
+
+---
+
+## 13. Apple Glass UI Design System (v5.52.2)
+
+### 13.1 Overview
+
+RADIANT implements Apple-inspired **glassmorphism** across all 4 applications, creating a premium visual experience that differentiates from competitors' flat, opaque interfaces.
+
+### 13.2 Design Tokens
+
+```typescript
+// Glass Background Gradient
+const glassGradient = 'bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950';
+
+// Glass Surface Layers
+const glassSurfaces = {
+  overlay:    'bg-black/60 backdrop-blur-sm',           // Dialog overlays
+  header:     'bg-slate-900/60 backdrop-blur-xl',       // App headers
+  sidebar:    'bg-slate-900/80 backdrop-blur-xl',       // Navigation sidebars
+  content:    'bg-white/[0.02] backdrop-blur-sm',       // Main content areas
+  card:       'bg-white/[0.04] backdrop-blur-lg',       // Card components
+  cardHover:  'bg-white/[0.06] backdrop-blur-lg',       // Card hover state
+};
+
+// Glass Borders
+const glassBorders = {
+  subtle:   'border-white/[0.06]',
+  default:  'border-white/10',
+  hover:    'border-white/[0.12]',
+};
+
+// Glass Shadows (Ambient Glow)
+const glassGlows = {
+  violet:   'shadow-[0_0_30px_rgba(139,92,246,0.15)]',
+  fuchsia:  'shadow-[0_0_30px_rgba(217,70,239,0.15)]',
+  cyan:     'shadow-[0_0_30px_rgba(34,211,238,0.15)]',
+  emerald:  'shadow-[0_0_30px_rgba(52,211,153,0.15)]',
+  blue:     'shadow-[0_0_30px_rgba(59,130,246,0.15)]',
+};
+```
+
+### 13.3 Component Architecture
+
+#### GlassCard Component
+
+```typescript
+// apps/*/components/ui/glass-card.tsx
+interface GlassCardProps {
+  variant?: 'default' | 'elevated' | 'inset' | 'glow';
+  intensity?: 'light' | 'medium' | 'strong';
+  hoverEffect?: boolean;
+  glowColor?: 'violet' | 'fuchsia' | 'cyan' | 'emerald' | 'blue' | 'none';
+  padding?: 'none' | 'sm' | 'md' | 'lg';
+}
+```
+
+| Variant | Use Case | Effect |
+|---------|----------|--------|
+| `default` | Standard cards | Subtle glass effect |
+| `elevated` | Floating panels | Stronger shadow, raised appearance |
+| `inset` | Embedded content | Inner shadow, recessed |
+| `glow` | Featured content | Ambient color glow |
+
+#### GlassPanel Component
+
+```typescript
+interface GlassPanelProps {
+  blur?: 'sm' | 'md' | 'lg' | 'xl';  // Backdrop blur intensity
+}
+```
+
+#### GlassOverlay Component
+
+```typescript
+interface GlassOverlayProps {
+  blur?: 'sm' | 'md' | 'lg' | 'xl';  // Full-screen frosted overlay
+}
+```
+
+### 13.4 Implementation by App
+
+| App | Layout | Sidebar | Header | Dialogs |
+|-----|--------|---------|--------|---------|
+| **Admin Dashboard** | Glass gradient | Glass sidebar | Glass header | Glass dialogs |
+| **Think Tank Admin** | Glass gradient | Glass sidebar | Glass header | Glass dialogs |
+| **Curator** | Glass gradient | Glass sidebar | Glass header | Glass dialogs |
+| **Think Tank** | Glass gradient | Glass sidebar | Glass header | Glass dialogs |
+
+### 13.5 Files Modified
+
+**New Components Created:**
+```
+apps/admin-dashboard/components/ui/glass-card.tsx
+apps/thinktank-admin/components/ui/glass-card.tsx
+apps/curator/components/ui/glass-card.tsx
+apps/curator/components/ui/dialog.tsx
+apps/curator/components/ui/sheet.tsx
+apps/curator/components/ui/card.tsx
+```
+
+**Layout Updates:**
+```
+apps/admin-dashboard/app/(dashboard)/layout.tsx
+apps/admin-dashboard/components/layout/sidebar.tsx
+apps/admin-dashboard/components/layout/header.tsx
+apps/thinktank-admin/app/(dashboard)/layout.tsx
+apps/thinktank-admin/components/layout/sidebar.tsx
+apps/thinktank-admin/components/layout/header.tsx
+apps/curator/app/(dashboard)/layout.tsx
+```
+
+**Think Tank Consumer Pages:**
+```
+apps/thinktank/app/(chat)/page.tsx
+apps/thinktank/app/profile/page.tsx
+apps/thinktank/app/history/page.tsx
+apps/thinktank/app/settings/page.tsx
+apps/thinktank/app/rules/page.tsx
+apps/thinktank/app/artifacts/page.tsx
+```
+
+### 13.6 Browser Compatibility
+
+| Feature | Chrome | Safari | Firefox | Edge |
+|---------|--------|--------|---------|------|
+| `backdrop-filter: blur()` | ✅ 76+ | ✅ 9+ | ✅ 103+ | ✅ 79+ |
+| `rgba()` transparency | ✅ All | ✅ All | ✅ All | ✅ All |
+| CSS gradients | ✅ All | ✅ All | ✅ All | ✅ All |
+
+### 13.7 Performance Considerations
+
+- **GPU acceleration**: `backdrop-filter` is GPU-accelerated in modern browsers
+- **Layering**: Use `will-change: transform` for frequently animated glass elements
+- **Mobile**: Reduce blur intensity on lower-powered devices if needed
+
+---
+
+## 14. Semantic Blackboard Architecture (v5.52.4)
+
+### 14.1 Overview
+
+The Semantic Blackboard is RADIANT's multi-agent orchestration system that prevents the "Thundering Herd" problem where multiple agents spam users with the same question. It implements:
+
+1. **Vector-Based Question Matching** - Semantic similarity using OpenAI ada-002 embeddings
+2. **Answer Reuse** - Auto-reply to agents with cached answers
+3. **Question Grouping** - Fan-out answers to multiple agents asking similar questions
+4. **Process Hydration** - State serialization for long-running tasks
+5. **Resource Locking** - Prevent race conditions on shared resources
+6. **Cycle Detection** - Prevent deadlocks from circular dependencies
+
+### 14.2 Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        SEMANTIC BLACKBOARD ARCHITECTURE                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐                                      │
+│  │ Agent A │  │ Agent B │  │ Agent C │  ← Multiple agents ask questions     │
+│  └────┬────┘  └────┬────┘  └────┬────┘                                      │
+│       │            │            │                                            │
+│       ▼            ▼            ▼                                            │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                    SEMANTIC BLACKBOARD SERVICE                        │   │
+│  │  ┌─────────────────────────────────────────────────────────────────┐ │   │
+│  │  │                    Vector Similarity Search                      │ │   │
+│  │  │         (pgvector with cosine similarity >= 0.85)               │ │   │
+│  │  └─────────────────────────────────────────────────────────────────┘ │   │
+│  │                              │                                        │   │
+│  │         ┌────────────────────┼────────────────────┐                  │   │
+│  │         ▼                    ▼                    ▼                  │   │
+│  │  ┌──────────────┐  ┌──────────────────┐  ┌────────────────────┐     │   │
+│  │  │ Answer Reuse │  │ Question Grouping│  │ Create HITL Decision│    │   │
+│  │  │ (from cache) │  │ (fan-out answer) │  │ (ask user once)    │     │   │
+│  │  └──────────────┘  └──────────────────┘  └────────────────────┘     │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                    AGENT ORCHESTRATOR SERVICE                         │   │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌────────────────────────┐     │   │
+│  │  │Agent Registry│  │  Dependency  │  │   Resource Locking     │     │   │
+│  │  │              │  │   Graph      │  │                        │     │   │
+│  │  └──────────────┘  └──────────────┘  └────────────────────────┘     │   │
+│  │                         │                                            │   │
+│  │                         ▼                                            │   │
+│  │              ┌──────────────────────┐                               │   │
+│  │              │   Cycle Detection    │  ← Prevents deadlocks         │   │
+│  │              │   (BFS algorithm)    │                               │   │
+│  │              └──────────────────────┘                               │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                    PROCESS HYDRATION SERVICE                          │   │
+│  │  ┌────────────────┐  ┌────────────────┐  ┌─────────────────────┐    │   │
+│  │  │ State Serialize│  │   S3 Storage   │  │   State Restore     │    │   │
+│  │  │   (gzip)       │  │  (large states)│  │                     │    │   │
+│  │  └────────────────┘  └────────────────┘  └─────────────────────┘    │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 14.3 Database Schema
+
+```sql
+-- Core tables (Migration 158)
+CREATE TABLE resolved_decisions (
+  id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  question TEXT NOT NULL,
+  question_embedding vector(1536),  -- ada-002 embedding
+  answer TEXT NOT NULL,
+  answer_source VARCHAR(50),        -- 'user', 'memory', 'default', 'inferred'
+  confidence DECIMAL(5,4),
+  is_valid BOOLEAN DEFAULT TRUE,
+  times_reused INTEGER DEFAULT 0
+);
+
+CREATE TABLE agent_registry (
+  id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  agent_type VARCHAR(100),          -- 'radiant', 'think_tank', 'cato', etc.
+  agent_instance_id VARCHAR(256),
+  status VARCHAR(50),               -- 'active', 'waiting', 'blocked', 'hydrated'
+  is_hydrated BOOLEAN DEFAULT FALSE,
+  hydration_state JSONB
+);
+
+CREATE TABLE agent_dependencies (
+  dependent_agent_id UUID,
+  dependency_agent_id UUID,
+  dependency_type VARCHAR(50),      -- 'data', 'approval', 'resource', 'sequence'
+  wait_key VARCHAR(256),
+  status VARCHAR(50)                -- 'pending', 'satisfied', 'failed', 'timeout'
+);
+
+CREATE TABLE resource_locks (
+  resource_uri VARCHAR(1024),
+  holder_agent_id UUID,
+  lock_type VARCHAR(20),            -- 'read', 'write', 'exclusive'
+  wait_queue UUID[]
+);
+
+CREATE TABLE question_groups (
+  canonical_question TEXT,
+  question_embedding vector(1536),
+  status VARCHAR(50),               -- 'pending', 'answered', 'expired'
+  answer TEXT
+);
+
+CREATE TABLE hydration_snapshots (
+  agent_id UUID,
+  checkpoint_name VARCHAR(256),
+  state_data JSONB,
+  s3_bucket VARCHAR(256),
+  s3_key VARCHAR(1024)
+);
+```
+
+### 14.4 Key Services
+
+| Service | File | Purpose |
+|---------|------|---------|
+| `SemanticBlackboardService` | `semantic-blackboard.service.ts` | Vector matching, answer reuse, question grouping |
+| `AgentOrchestratorService` | `agent-orchestrator.service.ts` | Agent registry, dependencies, cycle detection |
+| `ProcessHydrationService` | `process-hydration.service.ts` | State serialization, S3 storage, restoration |
+
+### 14.5 API Endpoints
+
+**Base**: `/api/admin/blackboard`
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/dashboard` | Dashboard statistics |
+| GET | `/decisions` | List resolved decisions (Facts) |
+| POST | `/decisions/{id}/invalidate` | Invalidate a decision |
+| GET | `/groups` | Pending question groups |
+| POST | `/groups/{id}/answer` | Answer a group |
+| GET | `/agents` | Active agents |
+| POST | `/agents/{id}/restore` | Restore hydrated agent |
+| GET | `/locks` | Active resource locks |
+| POST | `/locks/{id}/release` | Force release a lock |
+| GET | `/config` | Configuration |
+| PUT | `/config` | Update configuration |
+| POST | `/cleanup` | Cleanup expired resources |
+| GET | `/events` | Audit log |
+
+### 14.6 Configuration Options
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `similarity_threshold` | 0.85 | Minimum cosine similarity for matching |
+| `embedding_model` | ada-002 | Embedding model for vectorization |
+| `enable_question_grouping` | true | Group similar questions |
+| `grouping_window_seconds` | 60 | Wait time for similar questions |
+| `enable_answer_reuse` | true | Auto-reply with cached answers |
+| `answer_ttl_seconds` | 3600 | Answer expiry time |
+| `enable_auto_hydration` | true | Auto-serialize waiting agents |
+| `hydration_threshold_seconds` | 300 | Wait time before hydration |
+| `enable_cycle_detection` | true | Detect dependency cycles |
+| `max_dependency_depth` | 10 | Maximum dependency chain depth |
+
+### 14.7 CDK Resources
+
+```typescript
+// api-stack.ts
+const blackboardLambda = this.createLambda(
+  'Blackboard',
+  'admin/blackboard.handler',
+  commonEnv,
+  vpc,
+  apiSecurityGroup,
+  lambdaRole
+);
+
+const blackboard = admin.addResource('blackboard');
+blackboard.addProxy({
+  defaultIntegration: new apigateway.LambdaIntegration(blackboardLambda),
+  defaultMethodOptions: {
+    authorizer: adminAuthorizer,
+    authorizationType: apigateway.AuthorizationType.COGNITO,
+  },
+});
+```
+
+### 14.8 Admin UI
+
+**Location**: `apps/admin-dashboard/app/(dashboard)/blackboard/page.tsx`
+
+**Features**:
+- Dashboard with real-time statistics
+- Resolved Facts table with invalidation
+- Question Groups management
+- Active Agents monitoring with restore capability
+- Resource Locks with force release
+- Configuration panel
+
+---
+
+## 15. Services Layer & Interface-Based Access Control (v5.52.5)
+
+### 15.1 Overview
+
+The Services Layer is RADIANT's security boundary that ensures all access to platform resources occurs through defined interfaces with proper authentication and authorization.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        External Clients                              │
+│     (Think Tank, Curator, Third-Party Apps, External Agents)        │
+└────────────────────────────┬────────────────────────────────────────┘
+                             │
+         ┌───────────────────┼───────────────────┐
+         │                   │                   │
+         ▼                   ▼                   ▼
+    ┌─────────┐        ┌─────────┐        ┌─────────┐
+    │   API   │        │   MCP   │        │   A2A   │
+    │Interface│        │Interface│        │Interface│
+    │(REST)   │        │(Tools)  │        │(Agents) │
+    └────┬────┘        └────┬────┘        └────┬────┘
+         │                   │                   │
+         └───────────────────┼───────────────────┘
+                             │
+                    ┌────────┴────────┐
+                    │  Cedar Policies │
+                    │  (ABAC Engine)  │
+                    └────────┬────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              │              │              │
+              ▼              ▼              ▼
+        ┌──────────┐  ┌──────────┐  ┌──────────┐
+        │PostgreSQL│  │  Redis   │  │   S3     │
+        │(Aurora)  │  │(ElastiC) │  │(Storage) │
+        └──────────┘  └──────────┘  └──────────┘
+                             │
+                    ┌────────┴────────┐
+                    │   FORBIDDEN     │
+                    │ Direct Access   │
+                    │ from External   │
+                    └─────────────────┘
+```
+
+### 15.2 Interface Types
+
+| Interface | Protocol | Auth Methods | Use Case |
+|-----------|----------|--------------|----------|
+| **API** | REST/HTTP | API Key, JWT | Application integration, admin operations |
+| **MCP** | JSON-RPC over WebSocket | API Key + Capabilities | AI tool invocation, resource access |
+| **A2A** | Custom over WebSocket | API Key + mTLS | Agent-to-agent communication |
+
+### 15.3 API Keys with Interface Types
+
+API keys are scoped to specific interfaces, preventing cross-interface escalation attacks.
+
+**Database Schema** (`api_keys` table):
+
+```sql
+CREATE TABLE api_keys (
+  id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  name VARCHAR(255) NOT NULL,
+  key_prefix VARCHAR(20) NOT NULL,
+  key_hash VARCHAR(128) NOT NULL,
+  
+  -- CRITICAL: Interface type restriction
+  interface_type VARCHAR(20) NOT NULL 
+    CHECK (interface_type IN ('api', 'mcp', 'a2a', 'all')),
+  
+  -- A2A-specific
+  a2a_agent_id VARCHAR(255),
+  a2a_mtls_required BOOLEAN DEFAULT true,
+  
+  -- MCP-specific
+  mcp_allowed_tools TEXT[],
+  
+  scopes TEXT[] NOT NULL DEFAULT ARRAY['chat', 'models'],
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  ...
+);
+```
+
+**Key Generation**:
+
+```typescript
+// Keys are prefixed by interface type
+const prefixMap = {
+  api: 'rad_api',
+  mcp: 'rad_mcp',
+  a2a: 'rad_a2a',
+  all: 'rad_all',
+};
+// Format: rad_{type}_{tenant6}_{random24}
+// Example: rad_api_abc123_xYz789AbCdEfGhIjKlMnOpQr
+```
+
+### 15.4 A2A Protocol Architecture
+
+The Agent-to-Agent protocol enables secure inter-agent communication.
+
+**Message Types**:
+
+| Type | Direction | Description |
+|------|-----------|-------------|
+| `register` | Agent → RADIANT | Register agent in registry |
+| `discover` | Agent → RADIANT | Find other agents |
+| `message` | Agent → Agent | Direct message to specific agent |
+| `broadcast` | Agent → All | Publish to topic |
+| `subscribe` | Agent → RADIANT | Subscribe to topic |
+| `heartbeat` | Agent → RADIANT | Keep-alive signal |
+| `acquire_lock` | Agent → RADIANT | Request resource lock |
+| `release_lock` | Agent → RADIANT | Release resource lock |
+| `task_*` | Agent ↔ Agent | Task coordination events |
+
+**A2A Worker** (`lambda/gateway/a2a-worker.ts`):
+
+```typescript
+export class A2AWorkerService {
+  async processMessage(message: A2AMessage): Promise<A2AResponse> {
+    // 1. Verify mTLS if required
+    if (!message.securityContext.mtls_verified) {
+      const policy = await this.getInterfacePolicy(message.tenantId);
+      if (policy?.require_mtls) {
+        return this.createError(message, 'MTLS_REQUIRED', '...');
+      }
+    }
+    
+    // 2. Build Cedar principal
+    const principal = this.buildPrincipal(message.securityContext);
+    
+    // 3. Route by message type
+    switch (message.messageType) {
+      case 'register': return this.handleRegister(message, principal);
+      case 'discover': return this.handleDiscover(message, principal);
+      // ...
+    }
+  }
+}
+```
+
+### 15.5 Cedar Access Policies
+
+Cedar policies enforce interface-based access control.
+
+**Database Access Restriction** (CRITICAL):
+
+```cedar
+// FORBID all direct database access from external agents
+forbid (
+  principal,
+  action in [Action::"db:connect", Action::"db:query", ...],
+  resource
+)
+when {
+  principal.type == "Agent" && !principal.internal
+};
+
+// FORBID direct database access from any interface key
+forbid (
+  principal,
+  action in [Action::"db:connect", Action::"db:query", ...],
+  resource
+)
+when {
+  principal.interface_type in ["api", "mcp", "a2a", "all"]
+};
+```
+
+**Interface Enforcement**:
+
+```cedar
+// Prevent interface escalation
+forbid (
+  principal,
+  action,
+  resource
+)
+when {
+  context.requested_interface != principal.interface_type &&
+  principal.interface_type != "all"
+};
+```
+
+### 15.6 Key Sync Between Admin Apps
+
+Keys created in either Radiant Admin or Think Tank Admin are automatically synchronized.
+
+**Sync Flow**:
+
+1. Key created in App A
+2. `api_key_sync_log` entry created with `status='pending'`
+3. Sync job processes pending entries
+4. Key replicated to App B
+5. Status updated to `synced`
+
+**Database Table**:
+
+```sql
+CREATE TABLE api_key_sync_log (
+  id UUID PRIMARY KEY,
+  key_id UUID NOT NULL REFERENCES api_keys(id),
+  source_app VARCHAR(50) NOT NULL,  -- 'radiant_admin' or 'thinktank_admin'
+  target_app VARCHAR(50) NOT NULL,
+  sync_type VARCHAR(20) NOT NULL,   -- 'create', 'update', 'revoke'
+  status VARCHAR(20) DEFAULT 'pending',
+  synced_at TIMESTAMPTZ,
+  ...
+);
+```
+
+### 15.7 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `migrations/V2026_01_24_001__services_layer_api_keys.sql` | Database schema |
+| `lambda/admin/api-keys.ts` | Admin API handler |
+| `lambda/gateway/a2a-worker.ts` | A2A protocol processor |
+| `config/cedar/interface-access-policies.cedar` | Cedar access policies |
+| `apps/admin-dashboard/app/(dashboard)/api-keys/page.tsx` | Radiant Admin UI |
+| `apps/thinktank-admin/app/(dashboard)/api-keys/page.tsx` | Think Tank Admin UI |
+| `lib/stacks/api-stack.ts` | CDK route configuration |
+| `lib/stacks/gateway-stack.ts` | Gateway infrastructure |
+
+### 15.8 Security Guarantees
+
+1. **No Direct Database Access**: External agents cannot bypass interfaces
+2. **Interface Isolation**: Keys scoped to specific interfaces
+3. **mTLS for A2A**: Agent authentication via certificates
+4. **Tenant Isolation**: Keys can only access their tenant's resources
+5. **Audit Trail**: All key operations logged
+6. **Automatic Sync**: Admin app changes propagate automatically
+
+---
+
+## 16. Complete Admin API Architecture (v5.52.6)
+
+### 16.1 Overview
+
+RADIANT provides a comprehensive Admin API with **62 Lambda handlers** wired through AWS API Gateway. All admin endpoints require Cognito authentication and are protected by admin-level authorization.
+
+### 16.2 API Gateway Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        AWS API Gateway (REST)                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  /api/v2/                                                                   │
+│  ├── /health                    → Health check (no auth)                   │
+│  ├── /chat/completions          → Chat API (Cognito)                       │
+│  ├── /models                    → Model listing (Cognito)                  │
+│  ├── /providers                 → Provider listing (Cognito)               │
+│  ├── /feedback/*                → Feedback API (Cognito)                   │
+│  ├── /orchestration/*           → Neural Orchestration (Cognito)           │
+│  ├── /proposals/*               → Workflow Proposals (Cognito)             │
+│  ├── /localization/*            → Localization (Cognito)                   │
+│  ├── /configuration/*           → Configuration (Admin)                    │
+│  ├── /billing/*                 → Billing API (Mixed)                      │
+│  ├── /storage/*                 → Storage API (Cognito)                    │
+│  ├── /domain-taxonomy/*         → Domain Taxonomy (Mixed)                  │
+│  ├── /thinktank/*               → Think Tank (Cognito)                     │
+│  │                                                                          │
+│  └── /admin/                    → Admin APIs (Admin Authorizer)            │
+│       ├── /metrics/*            → Metrics & Learning                       │
+│       ├── /cato/*               → Cato Safety Architecture                 │
+│       ├── /blackboard/*         → Semantic Blackboard                      │
+│       ├── /api-keys/*           → Interface-based API Keys                 │
+│       ├── /cortex/*             → Cortex Memory System                     │
+│       ├── /gateway/*            → Gateway Admin                            │
+│       ├── /security/*           → Security Controls                        │
+│       ├── /sovereign-mesh/*     → Sovereign Mesh                           │
+│       ├── /cognition/*          → Advanced Cognition                       │
+│       ├── /learning/*           → AGI Learning                             │
+│       ├── /ethics/*             → Ethics Framework                         │
+│       ├── /council/*            → Council Oversight                        │
+│       ├── /reports/*            → Report Generation                        │
+│       ├── /hitl-orchestration/* → Human-in-the-Loop                        │
+│       ├── /brain/*              → Brain/Dreams/Ghost Memory                │
+│       ├── /code-quality/*       → Code Quality Metrics                     │
+│       ├── /invitations/*        → User Invitations                         │
+│       ├── /regulatory-standards/* → Compliance Standards                   │
+│       ├── /self-audit/*         → Self Audit System                        │
+│       ├── /library-registry/*   → Library Registry                         │
+│       ├── /raws/*               → Model Selection (RAWS)                   │
+│       ├── /aws-costs/*          → AWS Cost Tracking                        │
+│       ├── /tenants/*            → Tenant Management                        │
+│       ├── /empiricism/*         → Empiricism Loop                          │
+│       ├── /ecd/*                → Embodied Cognition                       │
+│       ├── /ego/*                → Ego Management                           │
+│       ├── /s3-storage/*         → S3 Storage Admin                         │
+│       ├── /ai-reports/*         → AI Report Writer                         │
+│       ├── /aws-monitoring/*     → AWS Monitoring                           │
+│       ├── /checklist-registry/* → Checklist Registry                       │
+│       ├── /dynamic-reports/*    → Dynamic Reports                          │
+│       ├── /inference-components/* → SageMaker Inference                    │
+│       └── /artifact-engine/*    → Artifact Engine                          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 16.3 Admin Handler Categories
+
+| Category | Handlers | Purpose |
+|----------|----------|---------|
+| **AI/ML** | cato, brain, cognition, raws, inference-components | AI orchestration and model management |
+| **Memory** | cortex, blackboard, empiricism | Memory systems and knowledge management |
+| **Security** | security, api-keys, ethics, self-audit | Security and compliance controls |
+| **Operations** | gateway, sovereign-mesh, hitl-orchestration | Operational infrastructure |
+| **Reporting** | reports, ai-reports, dynamic-reports, metrics | Analytics and reporting |
+| **Configuration** | tenants, invitations, library-registry, checklist-registry | System configuration |
+| **Infrastructure** | aws-costs, aws-monitoring, s3-storage, code-quality | Infrastructure monitoring |
+
+### 16.4 Handler Implementation Pattern
+
+All admin handlers follow a consistent pattern:
+
+```typescript
+// packages/infrastructure/lambda/admin/{handler-name}.ts
+
+export const handler: APIGatewayProxyHandler = async (event) => {
+  const tenantId = event.requestContext.authorizer?.tenantId 
+    || event.headers['x-tenant-id'];
+  
+  if (!tenantId) {
+    return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized' }) };
+  }
+
+  // Set tenant context for RLS
+  await executeStatement(`SET app.current_tenant_id = '${tenantId}'`, []);
+
+  const path = event.path.replace('/api/admin/{resource}', '');
+  const method = event.httpMethod;
+
+  // Route to specific handlers based on path and method
+  switch (`${method} ${path}`) {
+    case 'GET /dashboard': return getDashboard(tenantId);
+    case 'GET /': return listItems(tenantId);
+    case 'POST /': return createItem(tenantId, JSON.parse(event.body || '{}'));
+    // ... additional routes
+  }
+};
+```
+
+### 16.5 CDK Wiring Pattern
+
+```typescript
+// packages/infrastructure/lib/stacks/api-stack.ts
+
+const handlerLambda = this.createLambda(
+  'HandlerName',
+  'admin/handler-name.handler',
+  commonEnv,
+  vpc,
+  apiSecurityGroup,
+  lambdaRole
+);
+const handlerIntegration = new apigateway.LambdaIntegration(handlerLambda);
+
+const resource = admin.addResource('handler-name');
+resource.addProxy({
+  defaultIntegration: handlerIntegration,
+  defaultMethodOptions: {
+    authorizer: adminAuthorizer,
+    authorizationType: apigateway.AuthorizationType.COGNITO,
+  },
+});
+```
+
+### 16.6 Complete Handler List (62 Total)
+
+#### Cato Safety (5 handlers)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| Cato | `admin/cato.handler` | `/api/admin/cato/*` | Cato safety architecture |
+| Cato Genesis | `admin/cato-genesis.handler` | `/api/admin/cato-genesis/*` | Genesis infrastructure |
+| Cato Global | `admin/cato-global.handler` | `/api/admin/cato-global/*` | Global Cato settings |
+| Cato Governance | `admin/cato-governance.handler` | `/api/admin/cato-governance/*` | Governance policies |
+| Cato Pipeline | `admin/cato-pipeline.handler` | `/api/admin/cato-pipeline/*` | Method pipeline execution |
+
+#### Memory Systems (4 handlers)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| Cortex | `admin/cortex.handler` | `/api/admin/cortex/*` | Cortex memory system |
+| Cortex V2 | `admin/cortex-v2.handler` | `/api/admin/cortex-v2/*` | Enhanced memory system |
+| Blackboard | `admin/blackboard.handler` | `/api/admin/blackboard/*` | Semantic blackboard |
+| Empiricism | `admin/empiricism-loop.handler` | `/api/admin/empiricism/*` | Empiricism loop |
+
+#### AI/ML (7 handlers)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| Brain | `admin/brain.handler` | `/api/admin/brain/*` | Brain/dreams/ghost memory |
+| Cognition | `admin/cognition.handler` | `/api/admin/cognition/*` | Advanced cognition |
+| Ego | `admin/ego.handler` | `/api/admin/ego/*` | Zero-cost ego system |
+| RAWS | `admin/raws.handler` | `/api/admin/raws/*` | Model selection system |
+| Inference | `admin/inference-components.handler` | `/api/admin/inference-components/*` | SageMaker components |
+| Formal Reasoning | `admin/formal-reasoning.handler` | `/api/admin/formal-reasoning/*` | Z3/PyArg/RDFLib reasoning |
+| Ethics Free Reasoning | `admin/ethics-free-reasoning.handler` | `/api/admin/ethics-free-reasoning/*` | Unconstrained reasoning |
+
+#### Security (5 handlers)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| Security | `admin/security.handler` | `/api/admin/security/*` | Security controls |
+| Security Schedules | `admin/security-schedules.handler` | `/api/admin/security-schedules/*` | Scheduled security tasks |
+| API Keys | `admin/api-keys.handler` | `/api/admin/api-keys/*` | Interface-based API keys |
+| Ethics | `admin/ethics.handler` | `/api/admin/ethics/*` | Ethics framework |
+| Self Audit | `admin/self-audit.handler` | `/api/admin/self-audit/*` | Self audit system |
+
+#### Operations (5 handlers)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| Gateway | `admin/gateway.handler` | `/api/admin/gateway/*` | Gateway controls |
+| Sovereign Mesh | `admin/sovereign-mesh.handler` | `/api/admin/sovereign-mesh/*` | Agent mesh orchestration |
+| Sovereign Mesh Performance | `admin/sovereign-mesh-performance.handler` | `/api/admin/sovereign-mesh-performance/*` | Performance monitoring |
+| Sovereign Mesh Scaling | `admin/sovereign-mesh-scaling.handler` | `/api/admin/sovereign-mesh-scaling/*` | Auto-scaling |
+| HITL | `admin/hitl-orchestration.handler` | `/api/admin/hitl-orchestration/*` | Human-in-the-loop |
+
+#### Reporting (4 handlers)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| Reports | `admin/reports.handler` | `/api/admin/reports/*` | Report generation |
+| AI Reports | `admin/ai-reports.handler` | `/api/admin/ai-reports/*` | AI report writer |
+| Dynamic Reports | `admin/dynamic-reports.handler` | `/api/admin/dynamic-reports/*` | Dynamic reports |
+| Metrics | `admin/metrics.handler` | `/api/admin/metrics/*` | Metrics collection |
+
+#### Configuration (7 handlers)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| Tenants | `admin/tenants.handler` | `/api/admin/tenants/*` | Tenant management |
+| Invitations | `admin/invitations.handler` | `/api/admin/invitations/*` | User invitations |
+| Library Registry | `admin/library-registry.handler` | `/api/admin/library-registry/*` | Library registry |
+| Checklist Registry | `admin/checklist-registry.handler` | `/api/admin/checklist-registry/*` | Checklists |
+| Collaboration Settings | `admin/collaboration-settings.handler` | `/api/admin/collaboration-settings/*` | Collaboration config |
+| System | `admin/system.handler` | `/api/admin/system/*` | System management |
+| System Config | `admin/system-config.handler` | `/api/admin/system-config/*` | System configuration |
+
+#### Infrastructure (6 handlers)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| AWS Costs | `admin/aws-costs.handler` | `/api/admin/aws-costs/*` | Cost tracking |
+| AWS Monitoring | `admin/aws-monitoring.handler` | `/api/admin/aws-monitoring/*` | AWS monitoring |
+| S3 Storage | `admin/s3-storage.handler` | `/api/admin/s3-storage/*` | S3 admin |
+| Code Quality | `admin/code-quality.handler` | `/api/admin/code-quality/*` | Code metrics |
+| Infrastructure Tier | `admin/infrastructure-tier.handler` | `/api/admin/infrastructure-tier/*` | Tier management |
+| Logs | `admin/logs.handler` | `/api/admin/logs/*` | Log management |
+
+#### Compliance (4 handlers)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| Regulatory Standards | `admin/regulatory-standards.handler` | `/api/admin/regulatory-standards/*` | Compliance standards |
+| Council | `admin/council.handler` | `/api/admin/council/*` | Council oversight |
+| User Violations | `admin/user-violations.handler` | `/api/admin/user-violations/*` | Violation tracking |
+| Approvals | `admin/approvals.handler` | `/api/admin/approvals/*` | Approval workflows |
+
+#### Models (5 handlers)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| Models | `admin/models.handler` | `/api/admin/models/*` | Model management |
+| LoRA Adapters | `admin/lora-adapters.handler` | `/api/admin/lora-adapters/*` | LoRA adapter management |
+| Pricing | `admin/pricing.handler` | `/api/admin/pricing/*` | Model pricing |
+| Specialty Rankings | `admin/specialty-rankings.handler` | `/api/admin/specialty-rankings/*` | Model rankings |
+| Sync Providers | `admin/sync-providers.handler` | `/api/admin/sync-providers/*` | Provider sync |
+
+#### Orchestration (2 handlers)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| Orchestration Methods | `admin/orchestration-methods.handler` | `/api/admin/orchestration-methods/*` | Method registry |
+| Orchestration Templates | `admin/orchestration-user-templates.handler` | `/api/admin/orchestration-user-templates/*` | User templates |
+
+#### Users (2 handlers)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| User Registry | `admin/user-registry.handler` | `/api/admin/user-registry/*` | User registry |
+| White Label | `admin/white-label.handler` | `/api/admin/white-label/*` | White-label config |
+
+#### Time & Translation (3 handlers)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| Time Machine | `admin/time-machine.handler` | `/api/admin/time-machine/*` | Time travel debugging |
+| Translation | `admin/translation.handler` | `/api/admin/translation/*` | i18n management |
+| Internet Learning | `admin/internet-learning.handler` | `/api/admin/internet-learning/*` | Web learning |
+
+#### Learning (1 handler)
+| Handler | File | Route | Description |
+|---------|------|-------|-------------|
+| AGI Learning | `admin/agi-learning.handler` | `/api/admin/learning/*` | AGI learning system |
+
+---
+
+## 17. Liquid Interface - Morphable UI System (v5.52.8)
+
+### 17.1 Overview
+
+The Liquid Interface implements a **morphable UI paradigm** where the chat interface can transform into specialized tools based on user intent or explicit selection. This follows the design philosophy: **"Don't Build the Tool. BE the Tool."**
+
+### 17.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  LIQUID INTERFACE ARCHITECTURE                                       │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌─────────────┐    ┌─────────────────┐    ┌─────────────────────┐ │
+│  │ Chat Page   │───▶│ LiquidMorphPanel│───▶│ Morphed View        │ │
+│  │ (trigger)   │    │ (container)     │    │ (DataGrid, Kanban..)│ │
+│  └─────────────┘    └─────────────────┘    └─────────────────────┘ │
+│                                                                      │
+│  State: morphedView, isMorphFullscreen, showMorphChat               │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 17.3 Component Hierarchy
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `LiquidMorphPanel` | `apps/thinktank/components/liquid/LiquidMorphPanel.tsx` | Container with header, controls, chat sidebar |
+| `renderMorphedView()` | Inside LiquidMorphPanel | Switches between view components |
+| `DataGridView` | `morphed-views/DataGridView.tsx` | Interactive spreadsheet |
+| `ChartView` | `morphed-views/ChartView.tsx` | Bar/line/pie/area charts |
+| `KanbanView` | `morphed-views/KanbanView.tsx` | Multi-variant Kanban board |
+| `CalculatorView` | `morphed-views/CalculatorView.tsx` | Full calculator |
+| `CodeEditorView` | `morphed-views/CodeEditorView.tsx` | Code editor with run |
+| `DocumentView` | `morphed-views/DocumentView.tsx` | Rich text editor |
+
+### 17.4 Kanban Variant System
+
+The `KanbanView` implements 5 modern Kanban frameworks through a variant system:
+
+```typescript
+export type KanbanVariant = 
+  | 'standard'    // Traditional columns
+  | 'scrumban'    // Scrum + Kanban hybrid
+  | 'enterprise'  // Multi-lane portfolio
+  | 'personal'    // Simple WIP limiting
+  | 'pomodoro';   // Timer-integrated
+```
+
+#### Variant Configurations
+
+| Variant | Columns | Special Features |
+|---------|---------|------------------|
+| **Standard** | To Do, In Progress, Review, Done | Basic drag-and-drop |
+| **Scrumban** | Backlog, Ready, In Progress, Review, Done | Sprint header, velocity, story points, WIP limits |
+| **Enterprise** | Proposed, Approved, Active, Completed | 3 swim lanes (Strategic/Operations/Support) |
+| **Personal** | To Do, Doing, Done | WIP limit of 3 on Doing |
+| **Pomodoro** | Today's Focus, In Pomodoro, On Break, Completed | 25-min timer, break tracking |
+
+#### Pomodoro Timer Implementation
+
+```typescript
+function usePomodoroTimer() {
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isBreak, setIsBreak] = useState(false);
+  const [completedPomodoros, setCompletedPomodoros] = useState(0);
+  // Auto-transitions between 25-min focus and 5-min break
+}
+```
+
+### 17.5 Integration Points
+
+#### Chat Page Integration
+
+```typescript
+// apps/thinktank/app/(chat)/page.tsx
+const [morphedView, setMorphedView] = useState<MorphedViewType | null>(null);
+const [isMorphFullscreen, setIsMorphFullscreen] = useState(false);
+const [showMorphChat, setShowMorphChat] = useState(false);
+
+// Trigger buttons in header (Advanced Mode)
+<Button onClick={() => setMorphedView('kanban')}>
+  <Kanban className="h-4 w-4" />
+</Button>
+
+// Conditional rendering
+{morphedView && (
+  <LiquidMorphPanel
+    viewType={morphedView}
+    isFullscreen={isMorphFullscreen}
+    onClose={() => setMorphedView(null)}
+    onToggleFullscreen={() => setIsMorphFullscreen(!isMorphFullscreen)}
+    ...
+  />
+)}
+```
+
+### 17.6 Analytics Features
+
+All Kanban variants include an analytics panel with:
+
+| Metric | Description |
+|--------|-------------|
+| Total Tasks | Count of all cards across columns |
+| Completed | Cards in Done/Completed column |
+| Cycle Time | Average time from start to completion |
+| Throughput | Tasks completed per week |
+
+### 17.7 File Structure
+
+```
+apps/thinktank/components/liquid/
+├── LiquidMorphPanel.tsx      # Main container component
+├── EjectDialog.tsx           # Export to Next.js dialog
+├── index.ts                  # Module exports
+└── morphed-views/
+    ├── DataGridView.tsx      # Spreadsheet
+    ├── ChartView.tsx         # Charts
+    ├── KanbanView.tsx        # Multi-variant Kanban (~630 lines)
+    ├── CalculatorView.tsx    # Calculator
+    ├── CodeEditorView.tsx    # Code editor
+    ├── DocumentView.tsx      # Rich text
+    └── index.ts              # View exports
+```
+
+---
+
+## Section 18: Think Tank Consumer API Services (v5.52.17)
+
+### 18.1 Overview
+
+The Think Tank consumer application (`apps/thinktank/`) requires frontend API services to communicate with backend Lambda handlers. Each backend route in `packages/infrastructure/lambda/thinktank/` needs a corresponding client in `apps/thinktank/lib/api/`.
+
+### 18.2 API Service Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  THINK TANK CONSUMER APP                                                     │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  UI Components (React)                                               │   │
+│  │  - Sidebar.tsx, TimeMachine.tsx, etc.                               │   │
+│  └──────────────────────────────────┬──────────────────────────────────┘   │
+│                                     │                                       │
+│  ┌──────────────────────────────────▼──────────────────────────────────┐   │
+│  │  lib/api/ - Frontend API Services                                    │   │
+│  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐                 │   │
+│  │  │ chat.ts      │ │ time-travel  │ │ grimoire.ts  │                 │   │
+│  │  │ models.ts    │ │ .ts          │ │ flash-facts  │                 │   │
+│  │  │ rules.ts     │ │ artifacts.ts │ │ .ts          │                 │   │
+│  │  │ settings.ts  │ │ ideas.ts     │ │ collaboration│                 │   │
+│  │  │ brain-plan   │ │ derivation-  │ │ .ts          │                 │   │
+│  │  │ .ts          │ │ history.ts   │ │ compliance-  │                 │   │
+│  │  │ analytics.ts │ │              │ │ export.ts    │                 │   │
+│  │  │ governor.ts  │ │              │ │              │                 │   │
+│  │  └──────────────┘ └──────────────┘ └──────────────┘                 │   │
+│  └──────────────────────────────────┬──────────────────────────────────┘   │
+│                                     │                                       │
+└─────────────────────────────────────┼───────────────────────────────────────┘
+                                      │ HTTP/REST
+┌─────────────────────────────────────▼───────────────────────────────────────┐
+│  AWS LAMBDA - /api/thinktank/*                                              │
+│                                                                             │
+│  packages/infrastructure/lambda/thinktank/                                  │
+│  - conversations.ts, time-travel.ts, grimoire.ts, flash-facts.ts           │
+│  - artifacts.ts, ideas.ts, enhanced-collaboration.ts, derivation-history   │
+│  - dia.ts (Decision Intelligence Artifacts)                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 18.3 Complete API Service Mapping
+
+| Backend Handler | Frontend Service | Route Base | Key Operations |
+|-----------------|------------------|------------|----------------|
+| `conversations.ts` | `chatService` | `/api/thinktank/conversations` | CRUD, streaming |
+| `models.ts` | `modelsService` | `/api/thinktank/models` | List, recommend |
+| `my-rules.ts` | `rulesService` | `/api/thinktank/my-rules` | CRUD, presets |
+| `settings.ts` | `settingsService` | `/api/thinktank/settings` | Get/update |
+| `brain-plan.ts` | `brainPlanService` | `/api/thinktank/brain-plan` | Generate, execute |
+| `analytics.ts` | `analyticsService` | `/api/thinktank/analytics` | Usage, heatmap |
+| `economic-governor.ts` | `governorService` | `/api/thinktank/economic-governor` | Status, savings |
+| `time-travel.ts` | `timeTravelService` | `/api/thinktank/time-travel` | Timelines, checkpoints, fork |
+| `grimoire.ts` | `grimoireService` | `/api/thinktank/grimoire` | Spells, execute |
+| `flash-facts.ts` | `flashFactsService` | `/api/thinktank/flash-facts` | Extract, verify |
+| `derivation-history.ts` | `derivationHistoryService` | `/api/thinktank/derivation-history` | Provenance, evidence |
+| `enhanced-collaboration.ts` | `collaborationService` | `/api/thinktank/enhanced-collaboration` | Sessions, invites |
+| `artifact-engine.ts` | `artifactsService` | `/api/thinktank/artifacts` | CRUD, versions, export |
+| `ideas.ts` | `ideasService` | `/api/thinktank/ideas` | Capture, boards |
+| `dia.ts` | `exportConversation` | `/api/thinktank/dia` | Decision records, compliance |
+
+### 18.4 API Client Pattern
+
+All services follow the singleton pattern with typed methods:
+
+```typescript
+// lib/api/time-travel.ts
+class TimeTravelService {
+  async listTimelines(conversationId?: string): Promise<Timeline[]> {
+    const response = await api.get<{ success: boolean; data: Timeline[] }>(
+      `/api/thinktank/time-travel/timelines${params}`
+    );
+    return response.data || [];
+  }
+
+  async createCheckpoint(timelineId: string, state: Record<string, unknown>): Promise<Checkpoint> {
+    const response = await api.post<{ success: boolean; data: Checkpoint }>(
+      `/api/thinktank/time-travel/timelines/${timelineId}/checkpoints`,
+      { state, checkpointType: 'manual' }
+    );
+    return response.data;
+  }
+}
+
+export const timeTravelService = new TimeTravelService();
+```
+
+### 18.5 File Structure
+
+```
+apps/thinktank/lib/api/
+├── index.ts              # Re-exports all services
+├── client.ts             # Base API client (fetch wrapper)
+├── types.ts              # Shared types
+├── chat.ts               # chatService
+├── models.ts             # modelsService
+├── rules.ts              # rulesService
+├── settings.ts           # settingsService
+├── brain-plan.ts         # brainPlanService
+├── analytics.ts          # analyticsService
+├── governor.ts           # governorService
+├── liquid-interface.ts   # liquidInterfaceService
+├── time-travel.ts        # timeTravelService (v5.52.17)
+├── grimoire.ts           # grimoireService (v5.52.17)
+├── flash-facts.ts        # flashFactsService (v5.52.17)
+├── derivation-history.ts # derivationHistoryService (v5.52.17)
+├── collaboration.ts      # collaborationService (v5.52.17)
+├── artifacts.ts          # artifactsService (v5.52.17)
+├── ideas.ts              # ideasService (v5.52.17)
+└── compliance-export.ts  # exportConversation (v5.52.16)
+```
+
+---
+
 ## Appendix A: Adding New Documentation
 
 When implementing new features, add documentation to the appropriate section:
@@ -1868,5 +3839,6 @@ When implementing new features, add documentation to the appropriate section:
 9. **API specifications** → Section 10.1
 10. **Performance guides** → Section 10.2
 11. **Security documentation** → Section 10.3
+12. **Admin API handlers** → Section 16
 
 See `/.windsurf/workflows/documentation-consolidation.md` for the enforcement policy.

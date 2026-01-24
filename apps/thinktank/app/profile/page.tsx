@@ -5,13 +5,14 @@ import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { 
   ArrowLeft, User, Mail, Crown, Zap, 
-  MessageSquare, TrendingUp, Award, Settings
+  MessageSquare, TrendingUp, Award, Settings, Calendar
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { GlassCard } from '@/components/ui/glass-card';
 import { AuroraBackground } from '@/components/ui/aurora-background';
+import { EnhancedActivityHeatmap } from '@/components/ui/enhanced-activity-heatmap';
 import { useAuth } from '@/lib/auth/context';
 import { analyticsService } from '@/lib/api/analytics';
 import { cn, formatTokens } from '@/lib/utils';
@@ -33,9 +34,16 @@ export default function ProfilePage() {
     enabled: isAuthenticated,
   });
 
+  const currentYear = new Date().getFullYear();
+  const { data: activityData = [] } = useQuery({
+    queryKey: ['user-activity-heatmap', currentYear],
+    queryFn: () => analyticsService.getActivityHeatmap(currentYear),
+    enabled: isAuthenticated,
+  });
+
   if (!isAuthenticated || !user) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
         <Card className="bg-slate-900/50 border-slate-700/50 max-w-md w-full mx-4">
           <CardContent className="py-12 text-center">
             <User className="h-12 w-12 mx-auto text-slate-600 mb-4" />
@@ -53,9 +61,9 @@ export default function ProfilePage() {
   const unlockedAchievements = achievements.filter((a) => a.unlockedAt);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative">
       <AuroraBackground colors="violet" intensity="subtle" className="fixed inset-0 pointer-events-none" />
-      <header className="sticky top-0 z-10 h-14 border-b border-slate-800/50 flex items-center px-4 bg-[#0d0d14]/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-10 h-14 border-b border-white/10 flex items-center px-4 bg-slate-900/60 backdrop-blur-xl">
         <Link href="/" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
           <ArrowLeft className="h-5 w-5" />
           <span className="text-sm">{t(T.common.back)}</span>
@@ -141,6 +149,29 @@ export default function ProfilePage() {
             </div>
           </GlassCard>
         </div>
+
+        {/* Activity Heatmap */}
+        <GlassCard variant="default" hoverEffect={false} padding="none">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Calendar className="h-5 w-5 text-violet-400" />
+              Activity
+            </CardTitle>
+            <CardDescription>
+              Your conversation activity over the past year
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <EnhancedActivityHeatmap 
+              data={activityData} 
+              year={currentYear}
+              colorScheme="violet"
+              enableBreathing={true}
+              enableAIInsights={true}
+              showStreaks={true}
+            />
+          </CardContent>
+        </GlassCard>
 
         {/* Achievements */}
         <GlassCard variant="default" hoverEffect={false} padding="none">

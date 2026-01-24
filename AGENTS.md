@@ -73,6 +73,43 @@ DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.
 
 **NO EXCEPTIONS. Forgetting policies creates technical debt and compliance risks.**
 
+## 📚 MANDATORY DOCUMENTATION UPDATES
+
+> ⚠️ **CRITICAL: Every code change MUST include documentation updates**
+
+**Master Policy**: `/.windsurf/workflows/docs-update-all.md`
+**Documentation Manifest**: `/docs/DOCUMENTATION-MANIFEST.json`
+
+### Quick Reference - Always Update These:
+
+| Change Type | Required Documentation |
+|-------------|----------------------|
+| **ANY change** | `CHANGELOG.md` |
+| **Think Tank feature** | `THINKTANK-USER-GUIDE.md` + `THINKTANK-ADMIN-GUIDE.md` + `THINKTANK-ADMIN-GUIDE-V2.md` |
+| **Platform feature** | `RADIANT-ADMIN-GUIDE.md` |
+| **Admin guide update** | `STRATEGIC-VISION-MARKETING.md` (auto-trigger) |
+| **Technical/Architecture** | `ENGINEERING-IMPLEMENTATION-VISION.md` |
+| **Database change** | `sections/SECTION-07-DATABASE-SCHEMA.md` + `RADIANT-PLATFORM-ARCHITECTURE.md` |
+| **Competitive advantage** | `THINKTANK-MOATS.md` or `RADIANT-MOATS.md` |
+
+### The Golden Rule
+
+```
+IF you change code → THEN you MUST update ALL applicable documentation
+```
+
+**NEVER**:
+- ❌ Say "I'll update docs later"
+- ❌ Update only CHANGELOG.md
+- ❌ Skip user guide for user-facing changes
+- ❌ Skip admin guide for admin-facing changes
+- ❌ Forget STRATEGIC-VISION-MARKETING.md when updating admin guides
+
+**ALWAYS**:
+- ✅ Update documentation IN THE SAME TASK as code changes
+- ✅ Update version numbers in all touched documents
+- ✅ Check the trigger matrix in `/docs/DOCUMENTATION-MANIFEST.json`
+
 ## ⚠️ Implementation Rules
 
 1. **File Creation Order**: Follow dependency graph in each section

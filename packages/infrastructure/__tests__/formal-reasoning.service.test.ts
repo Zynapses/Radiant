@@ -9,7 +9,7 @@
  * - Cost tracking and budget enforcement
  */
 
-import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
+// Jest globals are automatically available via ts-jest
 
 // Mock AWS SDK clients
 jest.mock('@aws-sdk/client-lambda', () => ({
@@ -50,20 +50,20 @@ jest.mock('../lambda/shared/services/library-registry.service', () => ({
 
 describe('FormalReasoningService', () => {
   let formalReasoningService: typeof import('../lambda/shared/services/formal-reasoning.service').formalReasoningService;
-  let executeStatement: jest.Mock;
-  let LambdaClient: jest.Mock;
-  let libraryRegistryService: { getLibrariesByCategory: jest.Mock };
+  let executeStatement: ReturnType<typeof jest.fn>;
+  let LambdaClient: ReturnType<typeof jest.fn>;
+  let libraryRegistryService: { getLibrariesByCategory: ReturnType<typeof jest.fn> };
 
   beforeEach(async () => {
     jest.clearAllMocks();
     
     // Reset module cache to get fresh instance
-    jest.resetModules();
+    vi.resetModules();
     
     // Get mocked modules
-    executeStatement = (await import('../lambda/shared/db/client')).executeStatement as jest.Mock;
-    LambdaClient = (await import('@aws-sdk/client-lambda')).LambdaClient as unknown as jest.Mock;
-    libraryRegistryService = (await import('../lambda/shared/services/library-registry.service')).libraryRegistryService as { getLibrariesByCategory: jest.Mock };
+    executeStatement = (await import('../lambda/shared/db/client')).executeStatement as ReturnType<typeof jest.fn>;
+    LambdaClient = (await import('@aws-sdk/client-lambda')).LambdaClient as unknown as ReturnType<typeof jest.fn>;
+    libraryRegistryService = (await import('../lambda/shared/services/library-registry.service')).libraryRegistryService as { getLibrariesByCategory: ReturnType<typeof jest.fn> };
     
     // Import service after mocks are set up
     const module = await import('../lambda/shared/services/formal-reasoning.service');

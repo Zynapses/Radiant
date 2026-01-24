@@ -1,6 +1,18 @@
 ---
-description: Policy - Think Tank Admin features must be documented in THINKTANK-ADMIN-GUIDE-V2.md
+description: DEPRECATED - See /docs-update-all for the master documentation policy
 ---
+
+# ⚠️ DEPRECATED - USE MASTER POLICY
+
+**This policy has been superseded by `docs-update-all.md`**
+
+Please refer to:
+- **Master Policy**: `/.windsurf/workflows/docs-update-all.md`
+- **Documentation Manifest**: `/docs/DOCUMENTATION-MANIFEST.json`
+
+---
+
+# Legacy Content (For Reference Only)
 
 # Think Tank Admin Documentation Policy
 

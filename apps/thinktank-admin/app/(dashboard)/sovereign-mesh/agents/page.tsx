@@ -49,14 +49,7 @@ interface Agent {
   uptime: string;
 }
 
-const mockAgents: Agent[] = [
-  { id: '1', name: 'DataProcessor', type: 'ETL', status: 'active', cpuUsage: 45, memoryUsage: 62, tasksCompleted: 1234, lastActive: '2 min ago', uptime: '99.9%' },
-  { id: '2', name: 'AnalyticsEngine', type: 'Analysis', status: 'active', cpuUsage: 72, memoryUsage: 58, tasksCompleted: 856, lastActive: '1 min ago', uptime: '99.7%' },
-  { id: '3', name: 'DocumentParser', type: 'NLP', status: 'idle', cpuUsage: 5, memoryUsage: 20, tasksCompleted: 2341, lastActive: '15 min ago', uptime: '99.8%' },
-  { id: '4', name: 'CodeAssistant', type: 'Development', status: 'active', cpuUsage: 38, memoryUsage: 45, tasksCompleted: 567, lastActive: 'Just now', uptime: '99.9%' },
-  { id: '5', name: 'SecurityScanner', type: 'Security', status: 'paused', cpuUsage: 0, memoryUsage: 10, tasksCompleted: 789, lastActive: '1 hour ago', uptime: '98.5%' },
-  { id: '6', name: 'ImageProcessor', type: 'Vision', status: 'error', cpuUsage: 0, memoryUsage: 0, tasksCompleted: 432, lastActive: '30 min ago', uptime: '95.2%' },
-];
+const defaultAgents: Agent[] = [];
 
 const statusConfig = {
   active: { color: 'bg-green-500', icon: CheckCircle2, label: 'Active' },
@@ -68,9 +61,13 @@ const statusConfig = {
 export default function SovereignMeshAgentsPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: agents = mockAgents } = useQuery({
+  const { data: agents = defaultAgents } = useQuery<Agent[]>({
     queryKey: ['sovereign-mesh', 'agents'],
-    queryFn: async () => mockAgents,
+    queryFn: async () => {
+      const res = await fetch('/api/thinktank-admin/sovereign-mesh/agents');
+      if (!res.ok) return defaultAgents;
+      return res.json();
+    },
   });
 
   const filteredAgents = agents.filter(agent =>

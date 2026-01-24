@@ -55,6 +55,8 @@ export * from './cato-pipeline.types';
 export * from './sovereign-mesh-performance.types';
 export * from './sovereign-mesh-scaling.types';
 export * from './decision-artifact.types';
+export * from './curator.types';
+export * from './cortex-memory.types';
 
 // Living Parchment 2029 Vision types (selective export to avoid SynthesisSession conflict)
 export {

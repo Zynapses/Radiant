@@ -23,6 +23,7 @@ import type {
   Policy, 
   TenantSettings 
 } from './cato/types';
+import { cortexIntelligenceService, type CortexInsights, type KnowledgeDensity } from './cortex-intelligence.service';
 import { v4 as uuidv4 } from 'uuid';
 
 // Gemini 3 model for plan summarization
@@ -245,6 +246,18 @@ export interface AGIBrainPlan {
     recommendation?: string;
     auditEntryId?: string;
   };
+  // Cortex Intelligence - enterprise knowledge informs decisions
+  cortexInsights?: {
+    enabled: boolean;
+    knowledgeDepth: 'none' | 'sparse' | 'moderate' | 'rich' | 'expert';
+    totalNodes: number;
+    totalEdges: number;
+    keyEntities: string[];
+    confidenceBoost: number;
+    orchestrationInfluence: string;
+    modelInfluence: string;
+    retrievalTimeMs: number;
+  };
 }
 
 export interface PlanSummary {
@@ -387,6 +400,19 @@ export class AGIBrainPlannerService {
       }
     }
 
+    // Step 0.8: Get Cortex Intelligence (knowledge density informs all decisions)
+    let cortexInsights: CortexInsights | null = null;
+    const cortexStartTime = Date.now();
+    try {
+      cortexInsights = await cortexIntelligenceService.getInsights(
+        request.tenantId,
+        request.prompt
+      );
+    } catch {
+      // Cortex insights failed, continue without them
+    }
+    const cortexRetrievalTimeMs = Date.now() - cortexStartTime;
+
     // Step 1: Analyze prompt
     const promptAnalysis = await this.analyzePrompt(request.prompt);
 
@@ -402,8 +428,21 @@ export class AGIBrainPlannerService {
       domainResult
     );
 
-    // Step 3: Determine orchestration mode
-    const { mode, reason } = this.determineOrchestrationMode(promptAnalysis, domainResult);
+    // Step 3: Determine orchestration mode (influenced by Cortex knowledge density)
+    let { mode, reason } = this.determineOrchestrationMode(promptAnalysis, domainResult);
+    
+    // Apply Cortex influence on orchestration mode
+    if (cortexInsights && !request.preferredMode) {
+      const cortexRecommendation = cortexInsights.knowledgeDensity.recommendedOrchestration;
+      if (cortexRecommendation.useKnowledgeBase && cortexInsights.knowledgeDensity.knowledgeDepth !== 'none') {
+        // Cortex has knowledge - consider its recommendation
+        if (cortexInsights.knowledgeDensity.knowledgeDepth === 'expert' || 
+            cortexInsights.knowledgeDensity.knowledgeDepth === 'rich') {
+          mode = cortexRecommendation.mode as OrchestrationMode;
+          reason = `${reason} | Cortex: ${cortexRecommendation.reason}`;
+        }
+      }
+    }
     const orchestrationMode = request.preferredMode || mode;
 
     // Step 4: Select models (with timing)
@@ -516,7 +555,30 @@ export class AGIBrainPlannerService {
       // Affect→Model Mapping (consciousness influences model hyperparameters)
       affectiveHyperparameters,
       consciousnessContext,
+      // Cortex Intelligence - enterprise knowledge informs decisions
+      cortexInsights: cortexInsights ? {
+        enabled: true,
+        knowledgeDepth: cortexInsights.knowledgeDensity.knowledgeDepth,
+        totalNodes: cortexInsights.knowledgeDensity.totalNodes,
+        totalEdges: cortexInsights.knowledgeDensity.totalEdges,
+        keyEntities: cortexInsights.knowledgeDensity.keyEntities.slice(0, 5),
+        confidenceBoost: cortexInsights.knowledgeDensity.confidenceBoost,
+        orchestrationInfluence: cortexInsights.knowledgeDensity.recommendedOrchestration.reason,
+        modelInfluence: cortexInsights.modelRecommendation.reason,
+        retrievalTimeMs: cortexRetrievalTimeMs,
+      } : undefined,
     };
+
+    // Apply Cortex confidence boost to domain detection
+    if (cortexInsights && plan.domainDetection) {
+      const boost = cortexInsights.knowledgeDensity.confidenceBoost;
+      if (boost > 0) {
+        plan.domainDetection.confidence = Math.min(
+          plan.domainDetection.confidence + boost,
+          1.0
+        );
+      }
+    }
 
     // Add performance metrics
     const planGenerationMs = Date.now() - startTime;
@@ -1875,6 +1937,49 @@ export class AGIBrainPlannerService {
     return {
       response: plan.enhancedLearning.cachedResponse,
       rating: plan.enhancedLearning.cachedResponseRating || 0,
+    };
+  }
+
+  /**
+   * Get available plan templates for a tenant
+   */
+  async getPlanTemplates(tenantId: string): Promise<Array<{ id: string; name: string; description: string; mode: OrchestrationMode }>> {
+    return [
+      { id: 'quick-answer', name: 'Quick Answer', description: 'Fast response for simple questions', mode: 'thinking' },
+      { id: 'deep-reasoning', name: 'Deep Reasoning', description: 'Extended thinking for complex problems', mode: 'extended_thinking' },
+      { id: 'code-generation', name: 'Code Generation', description: 'Optimized for coding tasks', mode: 'coding' },
+      { id: 'research-synthesis', name: 'Research Synthesis', description: 'Multi-source research compilation', mode: 'research' },
+      { id: 'creative-writing', name: 'Creative Writing', description: 'Creative and generative content', mode: 'creative' },
+    ];
+  }
+
+  /**
+   * Format a plan for display in the UI
+   */
+  formatPlanForDisplay(plan: AGIBrainPlan): { 
+    planId: string; 
+    status: PlanStatus; 
+    mode: OrchestrationMode; 
+    steps: Array<PlanStep & { statusIcon: string }>;
+    summary: string;
+  } {
+    const statusIcons: Record<StepStatus, string> = {
+      pending: '⏳',
+      in_progress: '🔄',
+      completed: '✅',
+      skipped: '⏭️',
+      failed: '❌',
+    };
+
+    return {
+      planId: plan.planId,
+      status: plan.status,
+      mode: plan.orchestrationMode,
+      steps: plan.steps.map(step => ({
+        ...step,
+        statusIcon: statusIcons[step.status] || '⏳',
+      })),
+      summary: plan.promptAnalysis?.intentDetected || 'Processing...',
     };
   }
 }

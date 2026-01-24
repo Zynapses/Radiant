@@ -46,6 +46,7 @@ import {
   Database,
   Cloud
 } from 'lucide-react';
+import { LatencyHeatmap, type RegionLatency } from '@/components/geographic/latency-heatmap';
 
 // ============================================================================
 // Types
@@ -117,6 +118,7 @@ export default function InfrastructureTierPage() {
   // Config editing
   const [editingConfig, setEditingConfig] = useState<TierConfig | null>(null);
   const [showConfigEditor, setShowConfigEditor] = useState(false);
+  const [regionLatencies, setRegionLatencies] = useState<RegionLatency[]>([]);
 
   useEffect(() => {
     fetchData();
@@ -151,10 +153,11 @@ export default function InfrastructureTierPage() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const [tierRes, compareRes, configsRes] = await Promise.all([
+      const [tierRes, compareRes, configsRes, latencyRes] = await Promise.all([
         fetch('/api/admin/infrastructure/tier'),
         fetch('/api/admin/infrastructure/tier/compare'),
-        fetch('/api/admin/infrastructure/tier/configs')
+        fetch('/api/admin/infrastructure/tier/configs'),
+        fetch('/api/admin/infrastructure/regions/latency')
       ]);
 
       if (tierRes.ok) {
@@ -167,6 +170,10 @@ export default function InfrastructureTierPage() {
       if (configsRes.ok) {
         const data = await configsRes.json();
         setTierConfigs(data.configs);
+      }
+      if (latencyRes.ok) {
+        const data = await latencyRes.json();
+        setRegionLatencies(data.regions || []);
       }
     } catch (error) {
       console.error('Failed to fetch data:', error);
@@ -371,6 +378,13 @@ export default function InfrastructureTierPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Global Latency Heatmap */}
+      <LatencyHeatmap
+        regions={regionLatencies}
+        title="Global Infrastructure Latency"
+        onRegionClick={(region) => console.log('View region:', region)}
+      />
 
       {/* Transition Progress */}
       {isTransitioning && (
