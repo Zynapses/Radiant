@@ -1,4 +1,4 @@
-# SECTION 7: EXTERNAL PROVIDERS & DATABASE SCHEMA (v2.2.0 - CANONICAL)
+# SECTION 7: EXTERNAL PROVIDERS & DATABASE SCHEMA (v2.3.0 - CANONICAL)
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 > **Dependencies:** Sections 0-6
@@ -48,6 +48,35 @@ Ignore any migration snippets in other sections - use ONLY the migrations define
 | `model_rejection_stats` | Per-model rejection statistics |
 | `rejection_analytics` | Daily aggregated rejection stats by model/provider/mode |
 | `rejection_keyword_stats` | Track violation keywords for policy review |
+| `tenant_users` | End-user accounts with RLS isolation (v5.1.1) |
+| `platform_admins` | Platform administrator accounts (v5.1.1) |
+| `service_api_keys` | Service API key metadata and rate limits (v5.1.1) |
+| `service_api_key_audit` | Partitioned API key usage audit log (v5.1.1) |
+| `tenant_sso_connections` | SAML/OIDC SSO configuration per tenant (v5.1.1) |
+| `litellm_gateway_config` | LiteLLM Gateway scaling parameters (v5.1.1) |
+| `system_component_health` | Component health tracking for dashboard (v5.1.1) |
+| `system_alerts` | Active system alerts (v5.1.1) |
+| `cortex_config` | Per-tenant Graph-RAG configuration (v5.52.25) |
+| `cortex_entities` | Knowledge entities with vector embeddings (v5.52.25) |
+| `cortex_relationships` | Entity relationships with temporal validity (v5.52.25) |
+| `cortex_chunks` | Text chunks with embeddings for RAG (v5.52.25) |
+| `cortex_activity_log` | Cortex activity tracking (v5.52.25) |
+| `cortex_query_log` | Cortex query analytics (v5.52.25) |
+| `oauth_clients` | Registered third-party OAuth applications (v5.52.26) |
+| `oauth_authorization_codes` | Short-lived OAuth auth codes (v5.52.26) |
+| `oauth_access_tokens` | OAuth access token hashes (v5.52.26) |
+| `oauth_refresh_tokens` | OAuth refresh tokens with rotation (v5.52.26) |
+| `oauth_user_authorizations` | User consent records for OAuth apps (v5.52.26) |
+| `oauth_scope_definitions` | Admin-configurable OAuth scopes (v5.52.26) |
+| `oauth_audit_log` | Partitioned OAuth audit log (v5.52.26) |
+| `tenant_oauth_settings` | Per-tenant OAuth configuration (v5.52.26) |
+| `oauth_signing_keys` | RSA keys for JWT signing (v5.52.26) |
+| `mfa_backup_codes` | One-time MFA recovery codes (v5.52.28) |
+| `mfa_trusted_devices` | 30-day device trust tokens (v5.52.28) |
+| `mfa_audit_log` | Partitioned MFA event audit log (v5.52.28) |
+| `uds_conversations.detected_language` | Auto-detected content language for search (v5.52.29) |
+| `uds_conversations.search_vector_simple` | Simple tsvector for fallback search (v5.52.29) |
+| `uds_conversations.search_vector_english` | Language-specific tsvector (v5.52.29) |
 | `rejected_prompt_archive` | Archive rejected prompts with full content for analysis |
 | `routing_decision_cache` | Semantic vector cache for brain router decisions |
 | `storage_tier_config` | Adaptive storage configuration per deployment tier |

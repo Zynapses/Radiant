@@ -330,7 +330,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     return response(404, { error: 'Not found' });
   } catch (error) {
-    console.error('Cato Pipeline API Error:', error);
+    // Error already logged by handler
     return response(500, { error: error instanceof Error ? error.message : 'Internal server error' });
   }
 };

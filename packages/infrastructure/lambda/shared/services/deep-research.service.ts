@@ -3,6 +3,7 @@
 
 import { executeStatement, stringParam } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
+import pdfParse from 'pdf-parse';
 import type {
   ResearchJob,
   ResearchSource,
@@ -551,12 +552,25 @@ class DeepResearchService {
       
       // Handle different content types
       if (contentType.includes('application/pdf')) {
-        // For PDF, return metadata only (would need pdf-parse for full extraction)
-        return {
-          text: `[PDF Document: ${url}]`,
-          hasImages: false,
-          publishDate: lastModified ? new Date(lastModified).toISOString() : undefined,
-        };
+        // Extract PDF content using pdf-parse
+        try {
+          const pdfBuffer = Buffer.from(await response.arrayBuffer());
+          const pdfData = await pdfParse(pdfBuffer);
+          return {
+            text: pdfData.text.substring(0, 50000), // Limit text size
+            hasImages: false, // pdf-parse doesn't extract images
+            publishDate: pdfData.info?.CreationDate 
+              ? new Date(String(pdfData.info.CreationDate)).toISOString() 
+              : (lastModified ? new Date(lastModified).toISOString() : undefined),
+          };
+        } catch (pdfError) {
+          logger.warn(`PDF parsing failed for ${url}`, { error: pdfError });
+          return {
+            text: `[PDF Document: ${url} - parsing failed]`,
+            hasImages: false,
+            publishDate: lastModified ? new Date(lastModified).toISOString() : undefined,
+          };
+        }
       }
       
       const html = await response.text();

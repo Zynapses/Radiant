@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -47,6 +48,7 @@ interface UsageStats {
 }
 
 export default function AIHelperPage() {
+  const { toast } = useToast();
   const [config, setConfig] = useState<AIHelperConfig>({
     enabled: true,
     enableDisambiguation: true,
@@ -102,12 +104,24 @@ export default function AIHelperPage() {
       });
 
       if (response.ok) {
-        alert('Configuration saved successfully');
+        toast({
+          title: 'Configuration Saved',
+          description: 'AI Helper configuration has been updated.',
+        });
       } else {
-        alert('Failed to save configuration');
+        toast({
+          title: 'Save Failed',
+          description: 'Failed to save AI Helper configuration.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Failed to save config:', error);
+      toast({
+        title: 'Save Failed',
+        description: 'An error occurred while saving configuration.',
+        variant: 'destructive',
+      });
     } finally {
       setSaving(false);
     }

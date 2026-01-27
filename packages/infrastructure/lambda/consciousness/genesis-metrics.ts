@@ -304,7 +304,7 @@ async function collectCostMetrics(): Promise<MetricDatum[]> {
     // Today's cost
     metrics.push({
       MetricName: 'DailyCostEstimate',
-      Value: (realtime as any).estimatedCostUsd || realtime.currentCostCents / 100,
+      Value: (realtime as any).estimatedCostUsd || (realtime as any).currentCostCents / 100,
       Unit: 'None',
       Timestamp: timestamp,
       Dimensions: [{ Name: 'Environment', Value: ENVIRONMENT }]

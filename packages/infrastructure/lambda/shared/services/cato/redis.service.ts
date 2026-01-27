@@ -273,7 +273,7 @@ class CatoStateService {
     if (this.useRedis()) {
       try {
         const value = await this.redisClient!.get(KEYS.PERSONA + sessionId);
-        return value;
+        return value as string | null;
       } catch (error) {
         logger.error('[CATO State] Redis getPersonaOverride failed:', error);
       }
@@ -331,7 +331,7 @@ class CatoStateService {
     if (this.useRedis()) {
       try {
         const value = await this.redisClient!.get(KEYS.RECOVERY + sessionId);
-        return value ? JSON.parse(value) as RecoveryState : null;
+        return value ? JSON.parse(value as string) as RecoveryState : null;
       } catch (error) {
         logger.error('[CATO State] Redis getRecoveryState failed:', error);
       }

@@ -365,8 +365,32 @@ async function getSyncStatus(_event: APIGatewayProxyEvent, _tenantId: string): P
 }
 
 async function triggerSync(_event: APIGatewayProxyEvent, _tenantId: string): Promise<APIGatewayProxyResult> {
-  // In production, this would trigger an async Lambda
-  return response(202, { message: 'Sync triggered', syncId: 'pending' });
+  try {
+    // Create a sync log entry to track this manual trigger
+    const syncResult = await executeStatement(
+      `INSERT INTO app_sync_logs (source, status) VALUES ('activepieces'::app_source, 'pending') RETURNING id`,
+      []
+    );
+    const syncId = extractValue(syncResult.rows?.[0]?.id) as string;
+
+    // Invoke the app-registry-sync Lambda asynchronously
+    const { LambdaClient, InvokeCommand } = await import('@aws-sdk/client-lambda');
+    const lambdaClient = new LambdaClient({ region: process.env.AWS_REGION || 'us-east-1' });
+    
+    const functionName = process.env.APP_REGISTRY_SYNC_LAMBDA || `radiant-${process.env.STAGE || 'dev'}-app-registry-sync`;
+    
+    await lambdaClient.send(new InvokeCommand({
+      FunctionName: functionName,
+      InvocationType: 'Event', // Async invocation
+      Payload: JSON.stringify({ source: 'manual_trigger', syncId }),
+    }));
+
+    logger.info('App registry sync triggered', { syncId, functionName });
+    return response(202, { message: 'Sync triggered', syncId });
+  } catch (error) {
+    logger.error('Failed to trigger app sync', { error });
+    return response(500, { error: 'Failed to trigger sync' });
+  }
 }
 
 // ============================================================================

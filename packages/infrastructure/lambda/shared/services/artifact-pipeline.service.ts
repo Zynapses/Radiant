@@ -158,7 +158,7 @@ export class ArtifactPipelineService {
       checksum: ref.checksum,
       generatedBy: {
         stepId: ref.stepId,
-        modelId: '',  // Would need to fetch from metadata
+        modelId: (ref as any).metadata?.modelId || (ref as any).metadata?.model_id || 'unknown',
         timestamp: ref.createdAt,
       },
       expiresAt,

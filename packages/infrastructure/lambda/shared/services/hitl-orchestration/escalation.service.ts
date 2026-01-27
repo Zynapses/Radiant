@@ -578,12 +578,36 @@ async function getEscalationStatistics(tenantId: string): Promise<{
     finalActionCounts[row.resolution_action as string] = Number(row.count);
   }
 
+  // Query for escalations by chain
+  const chainResult = await executeStatement({
+    sql: `
+      SELECT ec.name as chain_name, ec.id as chain_id, COUNT(har.id) as escalation_count
+      FROM escalation_chains ec
+      LEFT JOIN hitl_approval_requests har ON har.escalation_chain_id = ec.id
+        AND har.created_at > NOW() - INTERVAL '30 days'
+      WHERE ec.tenant_id = :tenantId
+      GROUP BY ec.id, ec.name
+      ORDER BY escalation_count DESC
+      LIMIT 10
+    `,
+    parameters: [stringParam('tenantId', tenantId)],
+  });
+
+  const byChain = (chainResult.rows || []).map((row: unknown) => {
+    const r = row as Record<string, unknown>;
+    return {
+      chainId: String(r.chain_id || ''),
+      chainName: String(r.chain_name || ''),
+      count: Number(r.escalation_count) || 0,
+    };
+  });
+
   return {
     totalEscalations: Number(stats.total_escalations) || 0,
     avgEscalationLevel: Number(stats.avg_level) || 0,
     finalActionCounts,
     avgTimeToResolution: Number(stats.avg_resolution_time) || 0,
-    byChain: [], // Would need additional tracking
+    byChain: byChain as any,
   };
 }
 

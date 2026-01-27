@@ -11,23 +11,41 @@ import { EntranceExamService } from '../shared/services/cortex/entrance-exam.ser
 import { GraphExpansionService } from '../shared/services/cortex/graph-expansion.service';
 import { ModelMigrationService } from '../shared/services/cortex/model-migration.service';
 import { getDbClient, getRedisClient } from '../shared/db/connections';
-import { getTenantId, getUserId } from '../shared/utils';
+import { extractAuthContext } from '../shared/auth';
 
 const db = getDbClient();
 const redis = getRedisClient();
 
-// Create Redis adapter for TelemetryService
+// Create Redis adapter for TelemetryService matching RedisClient interface
 const redisAdapter = {
-  hSet: async (key: string, field: string, value: string) => redis.hset(key, field, value),
-  hGetAll: async (key: string) => redis.hgetall(key),
+  get: async (key: string): Promise<string | null> => redis.get(key),
+  set: async (key: string, value: string, options?: { EX?: number }): Promise<void> => {
+    if (options?.EX) {
+      await redis.set(key, value, 'EX', options.EX);
+    } else {
+      await redis.set(key, value);
+    }
+  },
+  hSet: async (key: string, field: string, value: string): Promise<void> => { await redis.hset(key, field, value); },
+  hGetAll: async (key: string): Promise<Record<string, string>> => redis.hgetall(key),
 };
 
-// Wrap extractTenantId/extractUserId for compatibility
+// Extract auth context from event
 function extractTenantId(event: APIGatewayProxyEvent): string {
-  return getTenantId(event) || '';
+  try {
+    const auth = extractAuthContext(event);
+    return auth.tenantId;
+  } catch {
+    return '';
+  }
 }
 function extractUserId(event: APIGatewayProxyEvent): string {
-  return getUserId(event) || '';
+  try {
+    const auth = extractAuthContext(event);
+    return auth.userId;
+  } catch {
+    return '';
+  }
 }
 
 const goldenRulesService = new GoldenRulesService(db);
@@ -377,7 +395,7 @@ export const handler: APIGatewayProxyHandler = async (event): Promise<APIGateway
     return errorResponse(404, `Endpoint not found: ${method} ${path}`);
 
   } catch (error) {
-    console.error('Cortex v2 API Error:', error);
+    // Error already logged by handler
     return errorResponse(500, (error as Error).message);
   }
 };

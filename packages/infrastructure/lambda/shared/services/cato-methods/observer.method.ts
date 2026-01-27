@@ -261,7 +261,7 @@ export class CatoObserverMethod extends CatoBaseMethodExecutor<ObserverInput, Ob
         domain: { detected: 'general', confidence: 0.5, keywords: [] },
         complexity: 'moderate',
         requiredCapabilities: [],
-        ambiguities: [{ text: 'Could not parse structured response', interpretation: response.content }],
+        ambiguities: [{ aspect: 'parsing', description: 'Could not parse structured response', suggestedClarification: response.content }],
         extractedEntities: [],
         suggestedNextMethods: ['method:proposer:v1'],
       };

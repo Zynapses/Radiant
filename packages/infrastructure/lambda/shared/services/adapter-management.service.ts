@@ -593,7 +593,7 @@ class AdapterManagementService {
     adapterImprovementAvg: number;
     rollbacksTriggered: number;
   }> {
-    const [adaptersResult, rollbacksResult] = await Promise.all([
+    const [adaptersResult, rollbacksResult, improvementResult] = await Promise.all([
       executeStatement(
         `SELECT COUNT(*) as count FROM domain_lora_adapters 
          WHERE tenant_id = $1::uuid AND status = 'active'`,
@@ -604,11 +604,22 @@ class AdapterManagementService {
          WHERE tenant_id = $1::uuid AND rolled_back_at >= NOW() - INTERVAL '1 day' * $2`,
         [stringParam('tenantId', tenantId), longParam('days', periodDays)]
       ),
+      executeStatement(
+        `SELECT AVG(
+           CASE 
+             WHEN baseline_score > 0 THEN ((current_score - baseline_score) / baseline_score) * 100
+             ELSE 0 
+           END
+         ) as avg_improvement
+         FROM domain_lora_adapters
+         WHERE tenant_id = $1::uuid AND status = 'active' AND baseline_score IS NOT NULL`,
+        [stringParam('tenantId', tenantId)]
+      ),
     ]);
     
     return {
       activeAdapters: Number(adaptersResult.rows?.[0]?.count || 0),
-      adapterImprovementAvg: 0, // Would need baseline comparison
+      adapterImprovementAvg: Number(improvementResult.rows?.[0]?.avg_improvement || 0),
       rollbacksTriggered: Number(rollbacksResult.rows?.[0]?.count || 0),
     };
   }

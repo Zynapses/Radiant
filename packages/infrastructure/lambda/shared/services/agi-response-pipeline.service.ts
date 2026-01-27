@@ -169,8 +169,7 @@ export class AGIResponsePipelineService {
             payload: { message: `Question answered: ${question.question}` },
           });
 
-          // If we got an answer, we might need to re-invoke with the answer
-          // For now, just continue
+          // Answer stored - subsequent pipeline steps can access via context.onQuestion history
         } else {
           pendingQuestions.push(question);
         }

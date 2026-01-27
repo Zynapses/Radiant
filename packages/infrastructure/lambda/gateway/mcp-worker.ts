@@ -11,6 +11,7 @@
  * - Authorization: Cedar policies via CedarAuthorizationService
  */
 
+import { Handler, SQSEvent, SQSBatchResponse } from 'aws-lambda';
 import { logger } from '../shared/utils/logger';
 import {
   getCedarAuthorizationService,
@@ -265,77 +266,82 @@ export class MCPWorkerService {
     principal: Principal,
     tenantId: string
   ): Promise<MCPResponse> {
-    // In production, fetch tools from database
-    // For now, return sample tools
-    const tools = [
-      {
-        name: 'search',
-        description: 'Search for information',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            query: { type: 'string', description: 'Search query' },
-            limit: { type: 'number', description: 'Max results' },
-          },
-          required: ['query'],
-        },
-      },
-      {
-        name: 'calculate',
-        description: 'Perform calculations',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            expression: { type: 'string', description: 'Math expression' },
-          },
-          required: ['expression'],
-        },
-      },
-      {
-        name: 'fetch_data',
-        description: 'Fetch data from a source',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            source: { type: 'string', description: 'Data source' },
-            limit: { type: 'number', description: 'Max records' },
-          },
-          required: ['source'],
-        },
-      },
-    ];
+    // Fetch tools from database - both system tools and tenant-specific tools
+    const { Pool } = await import('pg');
+    const pool = new Pool({
+      host: process.env.DATABASE_HOST,
+      database: process.env.DATABASE_NAME,
+      user: process.env.DATABASE_USER,
+      password: process.env.DATABASE_PASSWORD,
+      ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
+    });
 
-    // Filter tools based on authorization
-    const authorizedTools = [];
-    for (const tool of tools) {
-      const authResult = await this.cedarService.authorize({
-        principal,
-        action: 'tool:read',
-        resource: {
-          type: 'Tool',
-          id: tool.name,
-          name: tool.name,
-          namespace: 'public',
-          owner: 'system',
-          destructive: false,
-          sensitive: false,
-          requiredScopes: ['tool:read'],
-          labels: [],
-          rateLimit: 100,
-        },
-        context: { tenantId },
-      });
+    try {
+      const result = await pool.query(`
+        SELECT tool_id, name, description, input_schema, category, risk_category, tags
+        FROM cato_tool_definitions
+        WHERE enabled = true 
+          AND (scope = 'SYSTEM' OR tenant_id = $1)
+        ORDER BY category, name
+        LIMIT 100
+      `, [tenantId]);
 
-      if (authResult.allowed) {
-        authorizedTools.push(tool);
+      const tools = result.rows.map((row: any) => ({
+        name: row.tool_id,
+        description: row.description || row.name,
+        inputSchema: row.input_schema || {
+          type: 'object',
+          properties: {},
+        },
+        category: row.category,
+        riskLevel: row.risk_category,
+        tags: row.tags || [],
+      }));
+
+      // Filter tools based on authorization
+      const authorizedTools = [];
+      for (const tool of tools) {
+        const authResult = await this.cedarService.authorize({
+          principal,
+          action: 'tool:read',
+          resource: {
+            type: 'Tool',
+            id: tool.name,
+            name: tool.name,
+            namespace: 'public',
+            owner: 'system',
+            destructive: false,
+            sensitive: false,
+            requiredScopes: ['tool:read'],
+            labels: tool.tags || [],
+            rateLimit: 100,
+          },
+          context: { tenantId },
+        });
+
+        if (authResult.allowed) {
+          authorizedTools.push({
+            name: tool.name,
+            description: tool.description,
+            inputSchema: tool.inputSchema,
+          });
+        }
       }
-    }
 
-    return {
-      jsonrpc: '2.0',
-      id: request.id,
-      result: { tools: authorizedTools },
-    };
+      return {
+        jsonrpc: '2.0',
+        id: request.id,
+        result: { tools: authorizedTools },
+      };
+    } catch (error) {
+      logger.error('Failed to fetch tools from database', { error, tenantId });
+      // Return empty tools list on error
+      return {
+        jsonrpc: '2.0',
+        id: request.id,
+        result: { tools: [] },
+      };
+    }
   }
 
   private async handleToolsCall(
@@ -788,42 +794,50 @@ export class MCPWorkerService {
 const worker = new MCPWorkerService();
 
 /**
- * Lambda handler for processing MCP messages.
+ * Lambda handler for processing MCP messages from SQS.
  * 
- * In production, this would be invoked by:
- * 1. A custom NATS consumer runtime, or
- * 2. An EventBridge pipe from NATS to Lambda, or
- * 3. A polling mechanism via EventBridge scheduler
+ * Architecture:
+ * - Go Gateway publishes MCP messages to SQS queue
+ * - This Lambda consumes and processes MCP JSON-RPC requests
+ * - Responses are published back via NATS for delivery to clients
  */
-export async function handler(event: {
-  messages: InboundMessage[];
-}): Promise<{
-  responses: OutboundMessage[];
-  failed: string[];
-}> {
-  const segment = // tracer.getSegment();
-  
-  logger.info('MCP Worker invoked', { messageCount: event.messages.length });
+export const handler: Handler<SQSEvent, SQSBatchResponse> = async (event) => {
+  logger.info('MCP Worker invoked', { messageCount: event.Records.length });
   metrics.addMetric('MCPWorkerInvocation', "Count", 1);
 
-  const responses: OutboundMessage[] = [];
-  const failed: string[] = [];
+  const results: Array<{ messageId: string; success: boolean }> = [];
 
-  for (const message of event.messages) {
+  for (const record of event.Records) {
     try {
+      const message: InboundMessage = JSON.parse(record.body);
       const response = await worker.processMessage(message);
-      responses.push(response);
+      results.push({ messageId: record.messageId, success: !response.payload.includes('"error"') });
+      
+      // In production, publish response to NATS for delivery
+      // await publishToNats(`out.${message.sessionId}`, response);
     } catch (error) {
-      logger.error('Message processing failed', { messageId: message.messageId, error });
-      failed.push(message.messageId);
+      logger.error('Message processing failed', { messageId: record.messageId, error });
+      results.push({ messageId: record.messageId, success: false });
     }
   }
 
-  metrics.addMetric('MCPMessagesProcessed', "Count", responses.length);
-  metrics.addMetric('MCPMessagesFailed', "Count", failed.length);
+  const successCount = results.filter(r => r.success).length;
+  const failCount = results.filter(r => !r.success).length;
+  
+  metrics.addMetric('MCPMessagesProcessed', "Count", successCount);
+  metrics.addMetric('MCPMessagesFailed', "Count", failCount);
   metrics.publishStoredMetrics();
 
-  return { responses, failed };
-}
+  // Return failed message IDs for retry
+  const failures = results.filter(r => !r.success);
+  if (failures.length > 0) {
+    return {
+      batchItemFailures: failures.map(f => ({ itemIdentifier: f.messageId })),
+    };
+  }
 
+  return { batchItemFailures: [] };
+};
+
+export { handler as mcpWorkerHandler };
 export default handler;

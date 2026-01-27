@@ -92,7 +92,7 @@ export class WarRoomService {
       throw new Error('War Room session not found');
     }
 
-    const session = result.rows[0];
+    const session = result.rows[0] as any;
 
     // Get participants
     const participantsResult = await executeStatement({
@@ -152,7 +152,7 @@ export class WarRoomService {
 
     const sessions: WarRoomSession[] = [];
     for (const row of result.rows || []) {
-      sessions.push(await this.getSession(tenantId, row.id));
+      sessions.push(await this.getSession(tenantId, (row as any).id));
     }
 
     return sessions;
@@ -223,7 +223,7 @@ export class WarRoomService {
       modelId: advisor.modelId,
       specialization: advisor.specialization,
       confidence: 50,
-      breathingAura,
+      breathingAura: breathingAura as any,
       position: { advocating: '', confidence: 50, reasoning: '', evidenceIds: [], risks: [] },
       agreementMap: {},
     };
@@ -390,7 +390,7 @@ Respond in JSON format:
     const terrain: WarRoomTerrain = {
       segments,
       peakConfidence: segments.reduce((max, s) => 
-        s.elevation > max.elevation ? s.position : max, 
+        (s as any).elevation > (max as any).elevation ? s.position : max, 
         { x: 0, y: 0, z: 0 }
       ) as any,
       valleyRisks: segments

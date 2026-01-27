@@ -57,9 +57,14 @@ export * from './sovereign-mesh-scaling.types';
 export * from './decision-artifact.types';
 export * from './curator.types';
 export * from './cortex-memory.types';
+export * from './uds.types';
+export * from './auth-v51.types';
+export * from './cortex-graph-rag.types';
+export * from './oauth-provider.types';
+export * from './mfa.types';
 
 // Living Parchment 2029 Vision types (selective export to avoid SynthesisSession conflict)
-export {
+export type {
   // Shared foundation types
   ConfidenceScore,
   BreathingRate,

@@ -214,10 +214,24 @@ class CortexIntelligenceService {
     const totalEdges = Number((edgeResult.rows[0] as Record<string, unknown>)?.edge_count) || 0;
     const keyEntities = (entitiesResult.rows as Record<string, unknown>[]).map(r => String(r.label));
 
+    // Get edge counts per domain
+    const domainEdgesResult = await executeStatement(
+      `SELECT kn.domain, COUNT(ke.id) as edge_count
+       FROM knowledge_edges ke
+       JOIN knowledge_nodes kn ON ke.source_node_id = kn.id OR ke.target_node_id = kn.id
+       WHERE kn.tenant_id = $1
+       GROUP BY kn.domain`,
+      [stringParam('tenantId', tenantId)]
+    );
+    const domainEdgeCounts: Record<string, number> = {};
+    for (const row of domainEdgesResult.rows as Record<string, unknown>[]) {
+      domainEdgeCounts[String(row.domain)] = Number(row.edge_count) || 0;
+    }
+
     const topDomains: DomainKnowledge[] = (domainResult.rows as Record<string, unknown>[]).map(r => ({
       domain: String(r.domain),
       nodeCount: Number(r.node_count) || 0,
-      edgeCount: 0, // Would need separate query
+      edgeCount: domainEdgeCounts[String(r.domain)] || 0,
       avgConfidence: Number(r.avg_confidence) || 0.5,
       recentActivity: true, // Simplified
     }));

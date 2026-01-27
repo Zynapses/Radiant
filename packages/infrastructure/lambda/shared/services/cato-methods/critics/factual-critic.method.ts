@@ -65,10 +65,6 @@ export class CatoFactualCriticMethod extends CatoBaseMethodExecutor<FactualCriti
     return signals;
   }
 
-  protected async invokeModel(systemPrompt: string, userPrompt: string, context: MethodExecutionContext): Promise<ModelInvocationResult> {
-    const mock: FactualCriticOutput = { criticType: 'FACTUAL', verdict: 'APPROVE', score: 0.9, issues: [], strengths: ['Rationale is well-supported'], recommendations: [], factChecks: [{ claim: 'Proposed approach is valid', verified: true, confidence: 0.9 }], logicalAnalysis: { consistent: true, fallacies: [], assumptions: [] } };
-    return { response: JSON.stringify(mock), parsedOutput: mock, tokensInput: 500, tokensOutput: 200, costCents: 1, latencyMs: 400, modelId: 'claude-sonnet-4-20250514', provider: 'anthropic' };
-  }
 }
 
 export const createFactualCriticMethod = (pool: Pool, methodRegistry: CatoMethodRegistryService, schemaRegistry: CatoSchemaRegistryService) => new CatoFactualCriticMethod(pool, methodRegistry, schemaRegistry);

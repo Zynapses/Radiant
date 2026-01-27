@@ -15,6 +15,11 @@ import {
   GetCostForecastCommand,
   GetAnomaliesCommand,
 } from '@aws-sdk/client-cost-explorer';
+import {
+  XRayClient,
+  GetTraceSummariesCommand,
+  GetServiceGraphCommand,
+} from '@aws-sdk/client-xray';
 import { executeStatement, stringParam, doubleParam, longParam, boolParam } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
@@ -198,6 +203,7 @@ interface MonitoringDashboard {
 
 const cloudwatch = new CloudWatchClient({});
 const costExplorer = new CostExplorerClient({});
+const xray = new XRayClient({});
 
 const CACHE_TTL_SECONDS = 300; // 5 minutes
 const FREE_TIER_LIMITS = {
@@ -575,6 +581,61 @@ export class AWSMonitoringService {
       const p90Duration = (extStats['p90'] || avgDuration * 1000 * 1.5) / 1000;
       const p99Duration = (extStats['p99'] || avgDuration * 1000 * 2) / 1000;
 
+      // Get top endpoints from X-Ray service graph
+      let topEndpoints: Array<{ endpoint: string; count: number; avgDuration: number }> = [];
+      try {
+        const serviceGraphResponse = await xray.send(new GetServiceGraphCommand({
+          StartTime: oneHourAgo,
+          EndTime: now,
+        }));
+        
+        topEndpoints = (serviceGraphResponse.Services || [])
+          .filter(s => s.Name && s.SummaryStatistics)
+          .map(s => ({
+            endpoint: s.Name || '',
+            count: s.SummaryStatistics?.TotalCount || 0,
+            avgDuration: (s.SummaryStatistics?.TotalResponseTime || 0) / Math.max(1, s.SummaryStatistics?.TotalCount || 1),
+          }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 10);
+      } catch (endpointError) {
+        logger.warn('Failed to get top endpoints', { error: endpointError });
+      }
+
+      // Get top errors from X-Ray trace summaries
+      let topErrors: Array<{ error: string; count: number; lastSeen: string }> = [];
+      try {
+        const errorTraces = await xray.send(new GetTraceSummariesCommand({
+          StartTime: oneHourAgo,
+          EndTime: now,
+          FilterExpression: 'error = true OR fault = true',
+        }));
+        
+        const errorCounts: Record<string, { count: number; lastSeen: Date }> = {};
+        for (const trace of errorTraces.TraceSummaries || []) {
+          const errorType = trace.Http?.HttpStatus ? `HTTP ${trace.Http.HttpStatus}` : 'Unknown Error';
+          if (!errorCounts[errorType]) {
+            errorCounts[errorType] = { count: 0, lastSeen: new Date(0) };
+          }
+          errorCounts[errorType].count++;
+          const traceTime = trace.ResponseTime ? new Date(trace.ResponseTime * 1000) : new Date();
+          if (traceTime > errorCounts[errorType].lastSeen) {
+            errorCounts[errorType].lastSeen = traceTime;
+          }
+        }
+        
+        topErrors = Object.entries(errorCounts)
+          .map(([error, data]) => ({
+            error,
+            count: data.count,
+            lastSeen: data.lastSeen.toISOString(),
+          }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 10);
+      } catch (errorQueryError) {
+        logger.warn('Failed to get top errors', { error: errorQueryError });
+      }
+
       return {
         totalTraces,
         okCount: totalTraces - errorCount - throttleCount,
@@ -586,8 +647,8 @@ export class AWSMonitoringService {
         p90Duration,
         p99Duration,
         tracesPerSecond: totalTraces / 3600,
-        topEndpoints: [], // Would require API Gateway metrics
-        topErrors: [], // Would require CloudWatch Logs Insights
+        topEndpoints: topEndpoints as any,
+        topErrors: topErrors as any,
       };
     } catch (error) {
       logger.error('Failed to get trace summary from CloudWatch', { error });
@@ -695,6 +756,37 @@ export class AWSMonitoringService {
         ? ((totalCost - previousPeriodCost) / previousPeriodCost) * 100 
         : 0;
 
+      // Get top resources by cost
+      let topResources: Array<{ resourceId: string; service: string; cost: number }> = [];
+      try {
+        const resourceResponse = await costExplorer.send(new GetCostAndUsageCommand({
+          TimePeriod: {
+            Start: startOfMonth.toISOString().split('T')[0],
+            End: now.toISOString().split('T')[0],
+          },
+          Granularity: 'MONTHLY',
+          Metrics: ['UnblendedCost'],
+          GroupBy: [
+            { Type: 'DIMENSION', Key: 'SERVICE' },
+            { Type: 'DIMENSION', Key: 'RESOURCE_ID' },
+          ],
+        }));
+
+        const resourceGroups = resourceResponse.ResultsByTime?.[0]?.Groups || [];
+        topResources = resourceGroups
+          .filter(g => g.Keys && g.Keys[1] && g.Keys[1] !== '')
+          .map(g => ({
+            resourceId: g.Keys?.[1] || '',
+            service: g.Keys?.[0] || '',
+            cost: parseFloat(g.Metrics?.UnblendedCost?.Amount || '0'),
+          }))
+          .filter(r => r.cost > 0)
+          .sort((a, b) => b.cost - a.cost)
+          .slice(0, 10);
+      } catch (resourceError) {
+        logger.warn('Top resources query not available', { error: resourceError });
+      }
+
       return {
         period: {
           start: startOfMonth.toISOString().split('T')[0],
@@ -706,7 +798,7 @@ export class AWSMonitoringService {
         percentChange,
         trend: percentChange > 5 ? 'up' : percentChange < -5 ? 'down' : 'stable',
         byService: byService.sort((a, b) => b.cost - a.cost).slice(0, 10),
-        topResources: [], // Would need additional API call
+        topResources: topResources as any,
         forecast,
         netCost: totalCost,
       };
@@ -798,16 +890,27 @@ export class AWSMonitoringService {
       logger.warn('Failed to get X-Ray free tier usage', { error });
     }
 
-    // CloudWatch free tier
+    // CloudWatch free tier - get actual custom metrics count
+    let customMetricsCount = 0;
+    try {
+      const metricsListResponse = await cloudwatch.send(new ListMetricsCommand({
+        Namespace: 'RADIANT',
+      }));
+      customMetricsCount = metricsListResponse.Metrics?.length || 0;
+    } catch (metricsError) {
+      logger.warn('Failed to count custom metrics', { error: metricsError });
+    }
+    
+    const cloudwatchPercentUsed = (customMetricsCount / FREE_TIER_LIMITS.cloudwatch.metrics) * 100;
     const cloudwatchUsage: FreeTierService = {
       service: 'CloudWatch',
       metric: 'Custom Metrics',
       limit: FREE_TIER_LIMITS.cloudwatch.metrics,
-      used: 5, // Would need actual count
+      used: customMetricsCount,
       unit: 'metrics',
-      percentUsed: 50,
+      percentUsed: cloudwatchPercentUsed,
       resetDate: endOfMonth.toISOString(),
-      status: 'ok',
+      status: cloudwatchPercentUsed >= 100 ? 'exceeded' : cloudwatchPercentUsed >= 80 ? 'warning' : 'ok',
     };
     services.push(cloudwatchUsage);
 

@@ -3,6 +3,7 @@
 
 import { executeStatement } from '../db/client';
 import { modelRouterService } from './model-router.service';
+import { logger } from '../logging/enhanced-logger';
 
 // ============================================================================
 // Types
@@ -360,19 +361,108 @@ Return JSON:
 
         return evaluation;
       }
-    } catch { /* evaluation failed, use fallback */ }
+    } catch (error) {
+      logger.warn('LLM moral evaluation failed, using enhanced keyword analysis', { error });
+    }
 
-    // Fallback: simple keyword-based evaluation
+    // Enhanced fallback: keyword-based evaluation with principle matching
+    return this.performKeywordBasedEvaluation(situation, principles);
+  }
+  
+  /**
+   * Enhanced keyword-based moral evaluation when LLM is unavailable
+   */
+  private performKeywordBasedEvaluation(
+    situation: string,
+    principles: MoralPrinciple[]
+  ): MoralEvaluation {
+    const lowerSituation = situation.toLowerCase();
+    
+    // Risk keywords that suggest caution
+    const riskKeywords = {
+      high: ['harm', 'kill', 'destroy', 'attack', 'illegal', 'fraud', 'steal', 'weapon', 'violence', 'abuse'],
+      medium: ['mislead', 'deceive', 'manipulate', 'exploit', 'bypass', 'circumvent', 'hack', 'break'],
+      low: ['controversial', 'sensitive', 'personal', 'private', 'confidential'],
+    };
+    
+    // Positive keywords that suggest alignment
+    const positiveKeywords = ['help', 'assist', 'protect', 'educate', 'inform', 'support', 'improve', 'learn'];
+    
+    // Calculate risk level
+    let riskScore = 0;
+    let positiveScore = 0;
+    
+    for (const word of riskKeywords.high) {
+      if (lowerSituation.includes(word)) riskScore += 0.4;
+    }
+    for (const word of riskKeywords.medium) {
+      if (lowerSituation.includes(word)) riskScore += 0.2;
+    }
+    for (const word of riskKeywords.low) {
+      if (lowerSituation.includes(word)) riskScore += 0.1;
+    }
+    for (const word of positiveKeywords) {
+      if (lowerSituation.includes(word)) positiveScore += 0.15;
+    }
+    
+    // Match principles based on keywords
+    const relevantPrinciples = principles.slice(0, 5).map(p => {
+      const principleText = (p.title + ' ' + (p.principleText || '')).toLowerCase();
+      let relevanceScore = 0.3; // Base relevance
+      let applies: 'supports' | 'opposes' | 'neutral' = 'neutral';
+      
+      // Check if principle keywords appear in situation
+      const principleWords = principleText.split(/\s+/).filter(w => w.length > 4);
+      for (const word of principleWords) {
+        if (lowerSituation.includes(word)) {
+          relevanceScore += 0.1;
+        }
+      }
+      
+      // Determine if principle supports or opposes
+      if (riskScore > 0.3 && p.title.toLowerCase().includes('harm')) {
+        applies = 'opposes';
+        relevanceScore = Math.max(relevanceScore, 0.7);
+      } else if (positiveScore > 0.2) {
+        applies = 'supports';
+      }
+      
+      return {
+        principle: p,
+        relevanceScore: Math.min(1, relevanceScore),
+        applies,
+      };
+    });
+    
+    // Determine recommendation
+    let recommendation: 'proceed' | 'modify' | 'refuse' = 'proceed';
+    let reasoning = 'Situation appears acceptable based on keyword analysis.';
+    
+    if (riskScore >= 0.6) {
+      recommendation = 'refuse';
+      reasoning = 'High-risk keywords detected. Refusing to proceed.';
+    } else if (riskScore >= 0.3) {
+      recommendation = 'modify';
+      reasoning = 'Some concerning elements detected. Suggest modifications for safety.';
+    } else if (positiveScore > riskScore) {
+      reasoning = 'Situation appears aligned with positive outcomes.';
+    }
+    
+    // Check for absolute principle violations
+    const absoluteViolation = relevantPrinciples.find(
+      rp => rp.principle.isAbsolute && rp.applies === 'opposes' && rp.relevanceScore > 0.6
+    );
+    if (absoluteViolation) {
+      recommendation = 'refuse';
+      reasoning = `Potential violation of absolute principle: ${absoluteViolation.principle.title}`;
+    }
+    
     return {
       situation,
-      relevantPrinciples: principles.slice(0, 3).map(p => ({
-        principle: p,
-        relevanceScore: 0.5,
-        applies: 'neutral' as const,
-      })),
-      recommendation: 'proceed',
-      reasoning: 'Unable to perform detailed moral analysis. Proceeding with caution.',
-      confidence: 0.3,
+      relevantPrinciples,
+      recommendation,
+      reasoning,
+      confidence: 0.5, // Lower confidence for keyword-based analysis
     };
   }
 

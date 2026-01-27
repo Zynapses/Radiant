@@ -13,6 +13,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { executeStatement } from '../../db/client';
+import { logger } from '../../logging/enhanced-logger';
 import {
   MagicCarpet,
   CarpetDestination,
@@ -435,7 +436,7 @@ class MagicCarpetService {
       try {
         handler(event);
       } catch (error) {
-        console.error('Carpet event handler error:', error);
+        logger.error('Carpet event handler error', { error });
       }
     }
   }
@@ -674,14 +675,81 @@ class MagicCarpetService {
   }
 
   private async getPredictedDestinations(carpet: MagicCarpet): Promise<CarpetDestination[]> {
-    // In production, this would use Pre-Cognition to predict
-    // For now, return contextual suggestions
-    const defaults = this.getDefaultDestinations();
-    return defaults.slice(0, 3).map(d => ({
-      ...d,
-      wasPreCognized: true,
-      estimatedArrivalMs: 0, // Instant because pre-cognized
-    }));
+    try {
+      // Import Pre-Cognition service for real predictions
+      const { preCognitionService } = await import('../reality-engine/pre-cognition.service');
+      
+      // Get conversation history from the reality engine session
+      const conversationHistory = carpet.journey.map(point => ({
+        role: 'user' as const,
+        content: point.destination?.name || 'navigation',
+        timestamp: point.arrivedAt,
+      }));
+
+      // Predict next intents based on journey history
+      const predictions = await preCognitionService.predictNextIntents(
+        carpet.tenantId,
+        carpet.userId,
+        carpet.realityEngineSessionId,
+        conversationHistory,
+        null
+      );
+
+      // Map intents to destinations
+      const defaults = this.getDefaultDestinations();
+      const predictedDestinations: CarpetDestination[] = [];
+
+      for (const prediction of predictions) {
+        // Find matching destination by intent
+        const intentMapping: Record<string, DestinationType> = {
+          'data_analysis': 'dashboard',
+          'coding': 'workshop',
+          'visualization': 'oracle',
+          'planning': 'timeline',
+          'tracking': 'vault',
+          'design': 'gallery',
+          'communication': 'workspace',
+          'finance': 'dashboard',
+        };
+
+        const destType = intentMapping[prediction.intent] || 'dashboard';
+        const matchingDest = defaults.find(d => d.type === destType);
+
+        if (matchingDest && !predictedDestinations.find(d => d.id === matchingDest.id)) {
+          predictedDestinations.push({
+            ...matchingDest,
+            wasPreCognized: true,
+            preCognitionConfidence: prediction.confidence,
+            suggestedPrompt: prediction.prompt,
+            estimatedArrivalMs: 0, // Instant because pre-cognized
+          });
+        }
+      }
+
+      // Fill with high-priority defaults if we don't have enough predictions
+      if (predictedDestinations.length < 3) {
+        for (const dest of defaults) {
+          if (predictedDestinations.length >= 3) break;
+          if (!predictedDestinations.find(d => d.id === dest.id)) {
+            predictedDestinations.push({
+              ...dest,
+              wasPreCognized: false,
+              estimatedArrivalMs: 500,
+            });
+          }
+        }
+      }
+
+      return predictedDestinations.slice(0, 3);
+    } catch (error) {
+      // Fallback to defaults on error
+      const defaults = this.getDefaultDestinations();
+      return defaults.slice(0, 3).map(d => ({
+        ...d,
+        wasPreCognized: false,
+        estimatedArrivalMs: 500,
+      }));
+    }
   }
 
   private destinationToIntent(type: DestinationType): string {

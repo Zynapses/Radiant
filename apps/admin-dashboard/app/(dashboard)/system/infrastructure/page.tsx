@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -100,6 +101,7 @@ interface TierComparison {
 // ============================================================================
 
 export default function InfrastructureTierPage() {
+  const { toast } = useToast();
   const [tierState, setTierState] = useState<TierState | null>(null);
   const [tiers, setTiers] = useState<TierComparison[]>([]);
   const [tierConfigs, setTierConfigs] = useState<TierConfig[]>([]);
@@ -200,7 +202,11 @@ export default function InfrastructureTierPage() {
 
   const handleTierSelect = async (targetTier: string) => {
     if (!changeReason || changeReason.length < 10) {
-      alert('Please provide a reason for the tier change (minimum 10 characters)');
+      toast({
+        title: 'Validation Error',
+        description: 'Please provide a reason for the tier change (minimum 10 characters).',
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -230,10 +236,18 @@ export default function InfrastructureTierPage() {
         setIsTransitioning(true);
         setTransitionProgress(0);
       } else if (result.status === 'REJECTED') {
-        alert(result.errors?.join(', ') || 'Request rejected');
+        toast({
+          title: 'Request Rejected',
+          description: result.errors?.join(', ') || 'Tier change request was rejected.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
-      alert('Failed to request tier change');
+      toast({
+        title: 'Request Failed',
+        description: 'Failed to request tier change.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -255,11 +269,23 @@ export default function InfrastructureTierPage() {
         setIsTransitioning(true);
         setTransitionProgress(0);
         setChangeReason('');
+        toast({
+          title: 'Tier Change Initiated',
+          description: 'Infrastructure tier transition has started.',
+        });
       } else {
-        alert(result.errors?.join(', ') || 'Confirmation failed');
+        toast({
+          title: 'Confirmation Failed',
+          description: result.errors?.join(', ') || 'Failed to confirm tier change.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
-      alert('Failed to confirm tier change');
+      toast({
+        title: 'Confirmation Failed',
+        description: 'An error occurred while confirming tier change.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -276,12 +302,24 @@ export default function InfrastructureTierPage() {
       if (res.ok) {
         setShowConfigEditor(false);
         fetchData();
+        toast({
+          title: 'Configuration Saved',
+          description: `${editingConfig.tierName} tier configuration has been updated.`,
+        });
       } else {
         const error = await res.json();
-        alert(error.error || 'Failed to save configuration');
+        toast({
+          title: 'Save Failed',
+          description: error.error || 'Failed to save configuration.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
-      alert('Failed to save configuration');
+      toast({
+        title: 'Save Failed',
+        description: 'An error occurred while saving configuration.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -383,7 +421,7 @@ export default function InfrastructureTierPage() {
       <LatencyHeatmap
         regions={regionLatencies}
         title="Global Infrastructure Latency"
-        onRegionClick={(region) => console.log('View region:', region)}
+        onRegionClick={(region) => { /* Navigate to region detail */ }}
       />
 
       {/* Transition Progress */}

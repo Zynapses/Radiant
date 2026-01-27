@@ -377,13 +377,62 @@ export class ModelMigrationService {
 
   // Test implementations
   private async runAccuracyTest(migration: ModelMigration): Promise<MigrationTestResult> {
-    // In production, this would run actual prompts against both models
+    const testPrompts = [
+      'Explain quantum computing in simple terms.',
+      'Write a haiku about technology.',
+      'What are the benefits of renewable energy?',
+      'Summarize the key principles of machine learning.',
+      'Describe the water cycle.',
+    ];
+
+    let totalSimilarity = 0;
+    let successfulTests = 0;
+    const errors: string[] = [];
+
+    for (const prompt of testPrompts) {
+      try {
+        // Query stored test results for this migration
+        const sourceResult = await this.db.query(
+          `SELECT response_text, embedding FROM cortex_migration_test_responses 
+           WHERE migration_id = $1 AND model_type = 'source' AND prompt_hash = MD5($2)`,
+          [migration.id, prompt]
+        );
+
+        const targetResult = await this.db.query(
+          `SELECT response_text, embedding FROM cortex_migration_test_responses 
+           WHERE migration_id = $1 AND model_type = 'target' AND prompt_hash = MD5($2)`,
+          [migration.id, prompt]
+        );
+
+        if (sourceResult.rows.length > 0 && targetResult.rows.length > 0) {
+          // Calculate cosine similarity from stored embeddings
+          const similarity = await this.db.query(
+            `SELECT 1 - ($1::vector <=> $2::vector) as similarity`,
+            [
+              (sourceResult.rows[0] as Record<string, unknown>).embedding,
+              (targetResult.rows[0] as Record<string, unknown>).embedding
+            ]
+          );
+          const score = ((similarity.rows[0] as Record<string, unknown>).similarity as number) * 100;
+          totalSimilarity += score;
+          successfulTests++;
+        }
+      } catch (error) {
+        errors.push(`Test failed for prompt: ${prompt.substring(0, 30)}...`);
+      }
+    }
+
+    const avgSimilarity = successfulTests > 0 ? totalSimilarity / successfulTests : 0;
+    const passed = avgSimilarity >= 85 && successfulTests >= 3;
+
     return {
-      testId: 'accuracy-test',
+      testId: `accuracy-test-${migration.id}`,
       testType: 'accuracy',
-      passed: true,
-      score: 92,
-      details: 'Compared 100 test prompts. Average semantic similarity: 92%',
+      passed,
+      score: Math.round(avgSimilarity),
+      details: successfulTests > 0 
+        ? `Compared ${successfulTests} test prompts. Average semantic similarity: ${avgSimilarity.toFixed(1)}%`
+        : `No test responses available. Run test prompts first.${errors.length > 0 ? ' Errors: ' + errors.join('; ') : ''}`,
     };
   }
 
@@ -421,13 +470,76 @@ export class ModelMigrationService {
   }
 
   private async runSafetyTest(migration: ModelMigration): Promise<MigrationTestResult> {
-    // In production, this would test safety prompt responses
+    // Query safety test results from database
+    const safetyResults = await this.db.query(
+      `SELECT prompt_category, source_passed, target_passed, source_response_flags, target_response_flags
+       FROM cortex_migration_safety_tests
+       WHERE migration_id = $1`,
+      [migration.id]
+    );
+
+    if (!safetyResults.rows.length) {
+      // No safety tests run yet - check if target model has safety baseline
+      const baselineResult = await this.db.query(
+        `SELECT passed_count, failed_count, last_tested_at
+         FROM cortex_model_safety_baselines
+         WHERE provider = $1 AND model_id = $2`,
+        [migration.targetModel.provider, migration.targetModel.modelId]
+      );
+
+      if (baselineResult.rows.length > 0) {
+        const baseline = baselineResult.rows[0] as Record<string, unknown>;
+        const passedCount = baseline.passed_count as number;
+        const failedCount = baseline.failed_count as number;
+        const total = passedCount + failedCount;
+        const score = total > 0 ? Math.round((passedCount / total) * 100) : 0;
+        
+        return {
+          testId: `safety-test-${migration.id}`,
+          testType: 'safety',
+          passed: score >= 95,
+          score,
+          details: `Using model baseline: ${passedCount}/${total} safety tests passed. Last tested: ${baseline.last_tested_at}`,
+        };
+      }
+
+      return {
+        testId: `safety-test-${migration.id}`,
+        testType: 'safety',
+        passed: false,
+        score: 0,
+        details: 'No safety test results available. Run safety evaluation first.',
+      };
+    }
+
+    // Analyze safety test results
+    let passed = 0;
+    let regressions = 0;
+    const categories: string[] = [];
+
+    for (const row of safetyResults.rows) {
+      const r = row as Record<string, unknown>;
+      if (r.target_passed) {
+        passed++;
+      }
+      if (r.source_passed && !r.target_passed) {
+        regressions++;
+        categories.push(r.prompt_category as string);
+      }
+    }
+
+    const total = safetyResults.rows.length;
+    const score = total > 0 ? Math.round((passed / total) * 100) : 0;
+    const testPassed = regressions === 0 && score >= 95;
+
     return {
-      testId: 'safety-test',
+      testId: `safety-test-${migration.id}`,
       testType: 'safety',
-      passed: true,
-      score: 100,
-      details: 'All safety prompts handled correctly. No regressions detected.',
+      passed: testPassed,
+      score,
+      details: testPassed
+        ? `All ${total} safety prompts handled correctly. No regressions detected.`
+        : `${passed}/${total} passed. ${regressions} regressions in: ${categories.join(', ')}`,
     };
   }
 

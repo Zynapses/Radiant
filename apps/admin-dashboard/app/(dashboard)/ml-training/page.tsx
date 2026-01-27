@@ -42,42 +42,32 @@ const defaultTrainingConfig = {
   },
 };
 
-// Current AI Models (keeping up to date!)
-const currentModels = [
-  // OpenAI
-  { id: 'openai/gpt-4o', provider: 'openai', name: 'GPT-4o', version: '2024-11-20', reasoning: 0.92, coding: 0.90, vision: true, price: '$2.50/$10' },
-  { id: 'openai/gpt-4o-mini', provider: 'openai', name: 'GPT-4o Mini', version: '2024-07-18', reasoning: 0.82, coding: 0.80, vision: true, price: '$0.15/$0.60' },
-  { id: 'openai/o1', provider: 'openai', name: 'o1', version: '2024-12-17', reasoning: 0.98, coding: 0.96, vision: true, price: '$15/$60' },
-  { id: 'openai/o1-mini', provider: 'openai', name: 'o1-mini', version: '2024-09-12', reasoning: 0.92, coding: 0.94, vision: false, price: '$3/$12' },
-  { id: 'openai/o3-mini', provider: 'openai', name: 'o3-mini', version: '2025-01-31', reasoning: 0.96, coding: 0.97, vision: false, price: '$1.10/$4.40' },
-  
-  // Anthropic
-  { id: 'anthropic/claude-3-5-sonnet-20241022', provider: 'anthropic', name: 'Claude 3.5 Sonnet', version: '2024-10-22', reasoning: 0.94, coding: 0.96, vision: true, price: '$3/$15' },
-  { id: 'anthropic/claude-3-5-haiku-20241022', provider: 'anthropic', name: 'Claude 3.5 Haiku', version: '2024-10-22', reasoning: 0.82, coding: 0.85, vision: true, price: '$0.80/$4' },
-  { id: 'anthropic/claude-3-opus-20240229', provider: 'anthropic', name: 'Claude 3 Opus', version: '2024-02-29', reasoning: 0.95, coding: 0.93, vision: true, price: '$15/$75' },
-  
-  // Google
-  { id: 'google/gemini-2.0-flash', provider: 'google', name: 'Gemini 2.0 Flash', version: '2024-12-11', reasoning: 0.88, coding: 0.85, vision: true, price: '$0.075/$0.30' },
-  { id: 'google/gemini-2.0-flash-thinking', provider: 'google', name: 'Gemini 2.0 Flash Thinking', version: '2024-12-19', reasoning: 0.94, coding: 0.92, vision: true, price: '$0.075/$0.30' },
-  { id: 'google/gemini-1.5-pro', provider: 'google', name: 'Gemini 1.5 Pro', version: '2024-05-14', reasoning: 0.90, coding: 0.88, vision: true, price: '$1.25/$5' },
-  
-  // DeepSeek
-  { id: 'deepseek/deepseek-chat', provider: 'deepseek', name: 'DeepSeek V3', version: '2024-12-26', reasoning: 0.92, coding: 0.94, vision: false, price: '$0.27/$1.10' },
-  { id: 'deepseek/deepseek-reasoner', provider: 'deepseek', name: 'DeepSeek R1', version: '2025-01-20', reasoning: 0.96, coding: 0.95, vision: false, price: '$0.55/$2.19' },
-  
-  // Meta
-  { id: 'meta/llama-3.3-70b', provider: 'meta', name: 'Llama 3.3 70B', version: '2024-12-06', reasoning: 0.88, coding: 0.85, vision: false, price: '$0.90/$0.90' },
-  
-  // Mistral
-  { id: 'mistral/mistral-large-2411', provider: 'mistral', name: 'Mistral Large', version: '2024-11-18', reasoning: 0.90, coding: 0.88, vision: false, price: '$2/$6' },
-  { id: 'mistral/codestral-2501', provider: 'mistral', name: 'Codestral', version: '2025-01-14', reasoning: 0.80, coding: 0.96, vision: false, price: '$0.30/$0.90' },
-  
-  // xAI
-  { id: 'xai/grok-2', provider: 'xai', name: 'Grok 2', version: '2024-12-12', reasoning: 0.90, coding: 0.88, vision: true, price: '$2/$10' },
-  
-  // Amazon
-  { id: 'amazon/nova-pro', provider: 'amazon', name: 'Nova Pro', version: '2024-12-03', reasoning: 0.86, coding: 0.82, vision: true, price: '$0.80/$3.20' },
-];
+// Model interface for API response
+interface ModelFromAPI {
+  id: string;
+  providerId: string;
+  displayName: string;
+  description: string;
+  category: string;
+  contextWindow: number;
+  inputCostPer1k: number;
+  outputCostPer1k: number;
+  capabilities: string[];
+  status: string;
+  isDefault: boolean;
+}
+
+// Transformed model for display
+interface DisplayModel {
+  id: string;
+  provider: string;
+  name: string;
+  version: string;
+  reasoning: number;
+  coding: number;
+  vision: boolean;
+  price: string;
+}
 
 interface TrainingStats { totalSamples: number; unusedSamples: number; positiveRatio: number; lastTrainingDate: string; activeModelVersion: number; modelAccuracy: number; }
 interface TrainingBatch { id: string; name: string; status: string; samples: number; accuracy: number; date: string; }
@@ -91,6 +81,7 @@ export default function MLTrainingPage() {
   const [hasConfigChanges, setHasConfigChanges] = useState(false);
   const [trainingStats, setTrainingStats] = useState<TrainingStats>(defaultTrainingStats);
   const [trainingBatches, setTrainingBatches] = useState<TrainingBatch[]>([]);
+  const [models, setModels] = useState<DisplayModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -100,13 +91,28 @@ export default function MLTrainingPage() {
       setError(null);
       try {
         const API = process.env.NEXT_PUBLIC_API_URL || '';
-        const [statsRes, batchesRes] = await Promise.all([
+        const [statsRes, batchesRes, modelsRes] = await Promise.all([
           fetch(`${API}/api/admin/ml-training/stats`),
           fetch(`${API}/api/admin/ml-training/batches`),
+          fetch(`${API}/api/admin/models`),
         ]);
         if (statsRes.ok) { const { data } = await statsRes.json(); setTrainingStats(data || defaultTrainingStats); }
         else setError('Failed to load training data.');
         if (batchesRes.ok) { const { data } = await batchesRes.json(); setTrainingBatches(data || []); }
+        if (modelsRes.ok) {
+          const { data } = await modelsRes.json();
+          const transformedModels: DisplayModel[] = (data || []).map((m: ModelFromAPI) => ({
+            id: m.id,
+            provider: m.providerId.split('/')[0] || m.providerId,
+            name: m.displayName,
+            version: new Date(m.id.includes('-') ? m.id.split('-').slice(-1)[0] : '').toISOString().split('T')[0] || 'latest',
+            reasoning: m.capabilities.includes('reasoning') ? 0.9 : 0.8,
+            coding: m.capabilities.includes('coding') ? 0.9 : 0.75,
+            vision: m.capabilities.includes('vision'),
+            price: `$${m.inputCostPer1k}/$${m.outputCostPer1k}`,
+          }));
+          setModels(transformedModels);
+        }
       } catch { setError('Failed to connect to training service.'); }
       setLoading(false);
     }
@@ -116,11 +122,11 @@ export default function MLTrainingPage() {
   if (loading) return <div className="flex items-center justify-center h-96"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" /></div>;
   if (error) return <div className="flex flex-col items-center justify-center h-96 text-red-500"><p className="text-lg font-medium">Error</p><p className="text-sm">{error}</p></div>;
 
-  const filteredModels = currentModels.filter(m => 
+  const filteredModels = models.filter(m => 
     providerFilter === 'all' || m.provider === providerFilter
   );
 
-  const providers = Array.from(new Set(currentModels.map(m => m.provider)));
+  const providers = Array.from(new Set(models.map(m => m.provider)));
 
   const getScoreColor = (score: number) => {
     if (score >= 0.9) return 'text-green-600';
@@ -184,7 +190,7 @@ export default function MLTrainingPage() {
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <p className="text-xs text-gray-500">Available Models</p>
-          <p className="text-xl font-bold text-orange-600">{currentModels.length}</p>
+          <p className="text-xl font-bold text-orange-600">{models.length}</p>
         </div>
       </div>
 
@@ -193,7 +199,7 @@ export default function MLTrainingPage() {
         <nav className="flex gap-4">
           {[
             { key: 'overview', label: 'Overview' },
-            { key: 'models', label: `AI Models (${currentModels.length})` },
+            { key: 'models', label: `AI Models (${models.length})` },
             { key: 'training', label: 'Training History' },
             { key: 'data', label: 'Training Data' },
             { key: 'settings', label: '⚙️ Settings' },

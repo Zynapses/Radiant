@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useToast } from '@/components/ui/use-toast';
+import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +48,7 @@ interface SyncLog {
 }
 
 export default function AppsPage() {
+  const { toast } = useToast();
   const [apps, setApps] = useState<App[]>([]);
   const [syncLogs, setSyncLogs] = useState<SyncLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,15 +58,7 @@ export default function AppsPage() {
   const [offset, setOffset] = useState(0);
   const limit = 24;
 
-  useEffect(() => {
-    loadApps();
-  }, [sourceFilter, offset]);
-
-  useEffect(() => {
-    loadSyncLogs();
-  }, []);
-
-  const loadApps = async () => {
+  const loadApps = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -84,9 +79,9 @@ export default function AppsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [sourceFilter, offset, searchQuery]);
 
-  const loadSyncLogs = async () => {
+  const loadSyncLogs = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/sovereign-mesh/apps/sync/status');
       if (response.ok) {
@@ -96,7 +91,15 @@ export default function AppsPage() {
     } catch (error) {
       console.error('Failed to load sync logs:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadApps();
+  }, [loadApps]);
+
+  useEffect(() => {
+    loadSyncLogs();
+  }, [loadSyncLogs]);
 
   const handleSearch = () => {
     setOffset(0);
@@ -109,11 +112,25 @@ export default function AppsPage() {
         method: 'POST',
       });
       if (response.ok) {
-        alert('Sync triggered successfully');
+        toast({
+          title: 'Sync Triggered',
+          description: 'App registry sync has been started.',
+        });
         loadSyncLogs();
+      } else {
+        toast({
+          title: 'Sync Failed',
+          description: 'Failed to trigger app registry sync.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Failed to trigger sync:', error);
+      toast({
+        title: 'Sync Failed',
+        description: 'An error occurred while triggering sync.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -208,7 +225,7 @@ export default function AppsPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
                       {app.logo_url ? (
-                        <img src={app.logo_url} alt={app.display_name} className="w-8 h-8 rounded" />
+                        <Image src={app.logo_url} alt={app.display_name} width={32} height={32} className="w-8 h-8 rounded" />
                       ) : (
                         <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
                           <AppWindow className="h-4 w-4" />

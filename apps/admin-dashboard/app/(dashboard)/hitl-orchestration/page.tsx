@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import {
   Card,
   CardContent,
@@ -107,6 +108,7 @@ interface SemanticDeduplicationStats {
 }
 
 export default function HITLOrchestrationPage() {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
   const [voiStats, setVOIStats] = useState<VOIStatistics | null>(null);
   const [abstentionStats, setAbstentionStats] = useState<AbstentionStatistics | null>(null);
@@ -140,55 +142,33 @@ export default function HITLOrchestrationPage() {
   async function fetchData() {
     setLoading(true);
     try {
-      // Mock data for demonstration
-      setVOIStats({
-        totalDecisions: 1247,
-        askDecisions: 312,
-        skipDecisions: 623,
-        inferDecisions: 312,
-        avgVOIScore: 0.42,
-        avgActualInfoGain: 0.67,
-        priorAccuracy: 0.73,
-      });
+      // Fetch all HITL orchestration data from API
+      const [voiRes, abstentionRes, batchRes, rateLimitRes] = await Promise.all([
+        fetch('/api/admin/hitl-orchestration/voi/stats'),
+        fetch('/api/admin/hitl-orchestration/abstention/stats'),
+        fetch('/api/admin/hitl-orchestration/batching/stats'),
+        fetch('/api/admin/hitl-orchestration/rate-limits/status'),
+      ]);
 
-      setAbstentionStats({
-        totalEvents: 89,
-        byReason: {
-          low_confidence: 34,
-          high_semantic_entropy: 23,
-          self_consistency_fail: 18,
-          missing_information: 14,
-        },
-        byModel: {
-          'gpt-4': 45,
-          'claude-3': 32,
-          'gemini-pro': 12,
-        },
-        avgConfidence: 0.62,
-        avgSemanticEntropy: 0.71,
-      });
+      if (voiRes.ok) {
+        const data = await voiRes.json();
+        setVOIStats(data);
+      }
 
-      setBatchStats({
-        totalBatches: 456,
-        avgQuestionsPerBatch: 3.2,
-        avgAnswerTime: 127,
-        completionRate: 0.94,
-        byType: {
-          time_window: 234,
-          correlation: 156,
-          semantic: 66,
-        },
-      });
+      if (abstentionRes.ok) {
+        const data = await abstentionRes.json();
+        setAbstentionStats(data);
+      }
 
-      setRateLimitStatus({
-        globalUsage: { current: 23, max: 50, percentage: 46 },
-        topUsers: [
-          { userId: 'user-1', requests: 8 },
-          { userId: 'user-2', requests: 6 },
-          { userId: 'user-3', requests: 5 },
-        ],
-        blockedCount24h: 3,
-      });
+      if (batchRes.ok) {
+        const data = await batchRes.json();
+        setBatchStats(data);
+      }
+
+      if (rateLimitRes.ok) {
+        const data = await rateLimitRes.json();
+        setRateLimitStatus(data);
+      }
 
       // Fetch semantic deduplication config and stats
       try {
@@ -205,14 +185,8 @@ export default function HITLOrchestrationPage() {
           setDeduplicationStats(stats);
         }
       } catch (e) {
-        // Use defaults if API not available
-        setDeduplicationStats({
-          exactMatches: 342,
-          fuzzyMatches: 89,
-          semanticMatches: 47,
-          questionsWithEmbeddings: 1234,
-          avgSemanticSimilarity: 0.892,
-        });
+        // API not available - stats will remain null
+        console.warn('Failed to fetch deduplication data:', e);
       }
     } catch (error) {
       console.error('Failed to fetch HITL data:', error);
@@ -243,10 +217,24 @@ export default function HITLOrchestrationPage() {
         method: 'POST',
       });
       if (res.ok) {
-        alert('Embedding backfill started');
+        toast({
+          title: 'Backfill Started',
+          description: 'Embedding backfill process has been initiated.',
+        });
+      } else {
+        toast({
+          title: 'Backfill Failed',
+          description: 'Failed to start embedding backfill.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Failed to trigger backfill:', error);
+      toast({
+        title: 'Backfill Failed',
+        description: 'An error occurred while starting backfill.',
+        variant: 'destructive',
+      });
     }
   }
 

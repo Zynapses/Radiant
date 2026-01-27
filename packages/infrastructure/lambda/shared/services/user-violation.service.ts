@@ -6,6 +6,7 @@
  */
 
 import { logger } from '../logging/enhanced-logger';
+import { executeStatement } from '../db/client';
 import { v4 as uuidv4 } from 'uuid';
 import {
   UserViolation,
@@ -765,7 +766,29 @@ class UserViolationService {
     action: string,
     details: Record<string, unknown>
   ): Promise<void> {
-    // In production, this would write to violation_audit_log table
+    // Write to violation_audit_log table for compliance tracking
+    try {
+      await executeStatement(
+        `INSERT INTO violation_audit_log (
+          tenant_id, violation_id, actor_id, actor_type, action, details, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
+        [
+          { name: 'tenantId', value: { stringValue: tenantId } },
+          { name: 'violationId', value: violationId ? { stringValue: violationId } : { isNull: true } },
+          { name: 'actorId', value: { stringValue: actorId } },
+          { name: 'actorType', value: { stringValue: actorType } },
+          { name: 'action', value: { stringValue: action } },
+          { name: 'details', value: { stringValue: JSON.stringify(details) } },
+        ]
+      );
+    } catch (dbError) {
+      // Log but don't fail the main operation if audit logging fails
+      logger.warn('Failed to write violation audit log', { 
+        tenantId, violationId, action, error: dbError 
+      });
+    }
+    
+    // Also log for immediate visibility
     logger.info('Violation audit', {
       tenantId,
       violationId,

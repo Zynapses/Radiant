@@ -550,8 +550,11 @@ Return JSON:
 
     switch (strategy) {
       case 'newer_wins':
-        // Would need timestamps - simplified here
-        resolution = { winner: String(conflict.memory_b_id), action: 'keep_b_archive_a' };
+        const timestampA = new Date(String(conflict.memory_a_created_at || 0)).getTime();
+        const timestampB = new Date(String(conflict.memory_b_created_at || 0)).getTime();
+        resolution = timestampB >= timestampA
+          ? { winner: String(conflict.memory_b_id), action: 'keep_b_archive_a' }
+          : { winner: String(conflict.memory_a_id), action: 'keep_a_archive_b' };
         break;
 
       case 'higher_confidence':

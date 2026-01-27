@@ -75,16 +75,80 @@ class TierCoordinatorService {
       return { promoted: 0, errors: 0 };
     }
 
-    // In production, this would:
-    // 1. Query Redis for keys older than threshold
-    // 2. Extract session contexts, ghost vectors
-    // 3. Persist to Neptune graph + pgvector
-    // 4. Delete from Redis
+    let promoted = 0;
+    let errors = 0;
 
-    // For now, record metrics
-    await this.recordDataFlow(tenantId, 'hot_to_warm', 0);
+    try {
+      // Query hot tier entries older than threshold
+      const thresholdHours = config.hot.retentionHours || 24;
+      const hotEntriesResult = await executeStatement(
+        `SELECT id, node_type, label, content, embedding, metadata, created_at
+         FROM cortex_hot_tier_cache 
+         WHERE tenant_id = $1 
+         AND created_at < NOW() - INTERVAL '1 hour' * $2
+         AND promoted_at IS NULL
+         LIMIT 500`,
+        [stringParam('tenantId', tenantId), stringParam('hours', String(thresholdHours))]
+      );
 
-    return { promoted: 0, errors: 0 };
+      if (!hotEntriesResult.rows?.length) {
+        logger.info('No hot tier entries to promote', { tenantId });
+        return { promoted: 0, errors: 0 };
+      }
+
+      for (const entry of hotEntriesResult.rows) {
+        try {
+          const row = entry as Record<string, unknown>;
+          
+          // Insert into warm tier (graph nodes with embeddings)
+          await executeStatement(
+            `INSERT INTO cortex_graph_nodes (
+              tenant_id, node_type, label, content, embedding, metadata, 
+              source_tier, status, created_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, 'hot', 'active', $7)
+            ON CONFLICT (tenant_id, label, node_type) 
+            DO UPDATE SET content = EXCLUDED.content, embedding = EXCLUDED.embedding, 
+                          metadata = EXCLUDED.metadata, updated_at = NOW()`,
+            [
+              stringParam('tenantId', tenantId),
+              stringParam('nodeType', row.node_type as string),
+              stringParam('label', row.label as string),
+              stringParam('content', row.content as string || ''),
+              stringParam('embedding', row.embedding as string || ''),
+              stringParam('metadata', JSON.stringify(row.metadata || {})),
+              stringParam('createdAt', (row.created_at as Date).toISOString()),
+            ]
+          );
+
+          // Mark hot tier entry as promoted
+          await executeStatement(
+            `UPDATE cortex_hot_tier_cache SET promoted_at = NOW() WHERE id = $1`,
+            [stringParam('id', row.id as string)]
+          );
+
+          promoted++;
+        } catch (error) {
+          logger.error('Failed to promote entry', { entryId: (entry as Record<string, unknown>).id, error });
+          errors++;
+        }
+      }
+
+      // Clean up old promoted entries from hot tier
+      await executeStatement(
+        `DELETE FROM cortex_hot_tier_cache 
+         WHERE tenant_id = $1 AND promoted_at < NOW() - INTERVAL '1 hour'`,
+        [stringParam('tenantId', tenantId)]
+      );
+
+    } catch (error) {
+      logger.error('Hot → Warm promotion failed', { tenantId, error });
+      errors++;
+    }
+
+    await this.recordDataFlow(tenantId, 'hot_to_warm', promoted);
+    logger.info('Hot → Warm promotion complete', { tenantId, promoted, errors });
+
+    return { promoted, errors };
   }
 
   /**
@@ -128,7 +192,8 @@ class TierCoordinatorService {
           [stringParam('id', node.id as string)]
         );
 
-        // In production: Write to S3 Iceberg table
+        // Write to S3 Iceberg table for long-term storage
+        await this.archiveToS3Iceberg(tenantId, node);
         archived++;
       } catch (error) {
         logger.error('Failed to archive node', { nodeId: node.id, error });
@@ -156,15 +221,32 @@ class TierCoordinatorService {
 
     for (const nodeId of nodeIds) {
       try {
-        // Restore node status
-        await executeStatement(
-          `UPDATE cortex_graph_nodes 
-           SET status = 'active', archived_at = NULL, updated_at = NOW()
-           WHERE tenant_id = $1 AND id = $2 AND status = 'archived'`,
-          [stringParam('tenantId', tenantId), stringParam('nodeId', nodeId)]
-        );
+        // Try to retrieve node data from S3 Iceberg if available
+        const archivedData = await this.retrieveFromS3Iceberg(tenantId, nodeId);
+        
+        if (archivedData) {
+          // Restore node with archived data
+          await executeStatement(
+            `UPDATE cortex_graph_nodes 
+             SET status = 'active', archived_at = NULL, updated_at = NOW(),
+                 content = COALESCE($3, content)
+             WHERE tenant_id = $1 AND id = $2 AND status = 'archived'`,
+            [
+              stringParam('tenantId', tenantId), 
+              stringParam('nodeId', nodeId),
+              stringParam('content', JSON.stringify(archivedData.content || {}))
+            ]
+          );
+        } else {
+          // Restore node status without S3 data
+          await executeStatement(
+            `UPDATE cortex_graph_nodes 
+             SET status = 'active', archived_at = NULL, updated_at = NOW()
+             WHERE tenant_id = $1 AND id = $2 AND status = 'archived'`,
+            [stringParam('tenantId', tenantId), stringParam('nodeId', nodeId)]
+          );
+        }
 
-        // In production: Fetch from S3/Iceberg if needed
         retrieved++;
       } catch (error) {
         logger.error('Failed to retrieve node', { nodeId, error });
@@ -686,6 +768,110 @@ class TierCoordinatorService {
       triggeredAt: new Date(row.triggered_at as string),
       acknowledgedAt: row.acknowledged_at ? new Date(row.acknowledged_at as string) : undefined,
     };
+  }
+
+  /**
+   * Archive node data to S3 Iceberg table for long-term cold storage
+   */
+  private async archiveToS3Iceberg(
+    tenantId: string,
+    node: Record<string, unknown>
+  ): Promise<void> {
+    const bucket = process.env.CORTEX_COLD_STORAGE_BUCKET || process.env.ICEBERG_S3_BUCKET;
+    if (!bucket) {
+      logger.debug('S3 Iceberg bucket not configured, skipping cold storage write');
+      return;
+    }
+
+    try {
+      const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
+      const s3 = new S3Client({});
+
+      const nodeId = node.id as string;
+      const date = new Date();
+      const partition = `tenant_id=${tenantId}/year=${date.getFullYear()}/month=${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const key = `cortex/archived/${partition}/${nodeId}.json.gz`;
+
+      // Compress the node data
+      const { gzipSync } = await import('zlib');
+      const nodeData = JSON.stringify({
+        ...node,
+        archivedAt: date.toISOString(),
+        tenantId,
+      });
+      const compressedData = gzipSync(Buffer.from(nodeData));
+
+      await s3.send(new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: compressedData,
+        ContentType: 'application/json',
+        ContentEncoding: 'gzip',
+        Metadata: {
+          'tenant-id': tenantId,
+          'node-id': nodeId,
+          'archived-at': date.toISOString(),
+        },
+      }));
+
+      logger.debug('Node archived to S3 Iceberg', { tenantId, nodeId, key });
+    } catch (error) {
+      logger.warn('Failed to archive node to S3, continuing with DB-only archive', {
+        tenantId,
+        nodeId: node.id,
+        error,
+      });
+      // Don't throw - DB archive already succeeded
+    }
+  }
+
+  /**
+   * Retrieve node data from S3 Iceberg cold storage
+   */
+  private async retrieveFromS3Iceberg(
+    tenantId: string,
+    nodeId: string
+  ): Promise<Record<string, unknown> | null> {
+    const bucket = process.env.CORTEX_COLD_STORAGE_BUCKET || process.env.ICEBERG_S3_BUCKET;
+    if (!bucket) {
+      return null;
+    }
+
+    try {
+      const { S3Client, GetObjectCommand, ListObjectsV2Command } = await import('@aws-sdk/client-s3');
+      const s3 = new S3Client({});
+
+      // Search for the archived node across partitions
+      const listResult = await s3.send(new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: `cortex/archived/tenant_id=${tenantId}/`,
+        MaxKeys: 1000,
+      }));
+
+      const nodeKey = listResult.Contents?.find(obj => obj.Key?.includes(`/${nodeId}.json`))?.Key;
+      if (!nodeKey) {
+        return null;
+      }
+
+      const getResult = await s3.send(new GetObjectCommand({
+        Bucket: bucket,
+        Key: nodeKey,
+      }));
+
+      if (!getResult.Body) {
+        return null;
+      }
+
+      const { gunzipSync } = await import('zlib');
+      const bodyBytes = await getResult.Body.transformToByteArray();
+      const decompressed = gunzipSync(Buffer.from(bodyBytes));
+      const nodeData = JSON.parse(decompressed.toString());
+
+      return nodeData;
+    } catch (error) {
+      logger.warn('Failed to retrieve node from S3 Iceberg', { tenantId, nodeId, error });
+      return null;
+    }
   }
 }
 

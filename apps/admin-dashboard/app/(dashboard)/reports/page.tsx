@@ -117,7 +117,6 @@ import {
   Type,
   Layout,
   Columns,
-  Image,
   FileType,
   Heading1,
   Heading2,
@@ -479,13 +478,48 @@ function CreateReportDialog({ open, onOpenChange }: { open: boolean; onOpenChang
     format: 'pdf',
     recipients: '',
   });
+  
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const createReportMutation = useMutation({
+    mutationFn: async (data: { templateId: string | null; name: string; description: string; schedule: string; format: string; recipients: string }) => {
+      const response = await fetch('/api/admin/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'Failed to create report' }));
+        throw new Error(error.message || 'Failed to create report');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Report Created',
+        description: `"${reportConfig.name}" has been created successfully.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['reports'] });
+      onOpenChange(false);
+      setStep(1);
+      setSelectedTemplate(null);
+      setReportConfig({ name: '', description: '', schedule: 'manual', format: 'pdf', recipients: '' });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Failed to Create Report',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
   const handleCreate = () => {
-    // In production, would create the report
-    onOpenChange(false);
-    setStep(1);
-    setSelectedTemplate(null);
-    setReportConfig({ name: '', description: '', schedule: 'manual', format: 'pdf', recipients: '' });
+    createReportMutation.mutate({
+      templateId: selectedTemplate,
+      ...reportConfig,
+    });
   };
 
   return (
@@ -636,8 +670,15 @@ function CreateReportDialog({ open, onOpenChange }: { open: boolean; onOpenChang
             Cancel
           </Button>
           {step === 2 && (
-            <Button onClick={handleCreate}>
-              Create Report
+            <Button onClick={handleCreate} disabled={createReportMutation.isPending}>
+              {createReportMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                'Create Report'
+              )}
             </Button>
           )}
         </DialogFooter>

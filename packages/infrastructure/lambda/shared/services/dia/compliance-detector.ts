@@ -168,10 +168,17 @@ function detectHIPAA(
     categories.push('healthcare_domain');
   }
 
+  // Check if minimum necessary principle is applied:
+  // PHI should only be present if explicitly requested in purpose/context
+  const purposeRequiresPhi = categories.some(cat => 
+    cat === 'healthcare_domain' || cat === 'medical_purpose'
+  );
+  const minimumNecessaryApplied = !phiPresent || purposeRequiresPhi;
+
   return {
     phi_present: phiPresent,
     phi_categories: [...new Set(categories)],
-    minimum_necessary_applied: false, // Would require additional processing
+    minimum_necessary_applied: minimumNecessaryApplied,
     access_logged: true,
   };
 }

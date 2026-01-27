@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createHash } from 'crypto';
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { executeStatement, stringParam, longParam, boolParam } from '../../db/client';
+import { logger } from '../../logging/enhanced-logger';
 import { generateHeatmapSegments } from './heatmap-generator';
 import { detectCompliance } from './compliance-detector';
 import {
@@ -313,7 +314,7 @@ async function mapClaimsToEvidence(context: ExtractionContext): Promise<Claim[]>
     const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
     extracted = JSON.parse(jsonStr);
   } catch {
-    console.error('Failed to parse claim extraction response:', content);
+    logger.error('Failed to parse claim extraction response', { content });
     extracted = { claims: [] };
   }
 
@@ -406,7 +407,7 @@ function enrichClaimWithEvidence(
         volatility_category: volatility as VolatilityCategory,
       };
     })
-    .filter((e): e is EvidenceLink => e !== null);
+    .filter((e): e is any => e !== null) as EvidenceLink[];
 
   const verificationStatus: DIAVerificationStatus =
     evidenceLinks.length === 0

@@ -2,14 +2,24 @@
 
 > **Configuration and administration of Think Tank AI features**
 > 
-> Version: 3.10.0 | Platform: RADIANT 5.52.6
-> Last Updated: January 2026
+> Version: 3.10.1 | Platform: RADIANT 5.52.29
+> Last Updated: January 25, 2026
 
 ---
 
 ## Overview
 
 This guide covers administrative features specific to **Think Tank**, the consumer-facing AI assistant platform. For platform-level administration (tenants, billing, infrastructure), see [RADIANT-ADMIN-GUIDE.md](./RADIANT-ADMIN-GUIDE.md).
+
+### Related Authentication Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [Tenant Admin Auth Guide](./authentication/tenant-admin-guide.md) | SSO configuration, user management, MFA policies |
+| [MFA Guide](./authentication/mfa-guide.md) | Multi-factor authentication setup and management |
+| [OAuth Guide](./authentication/oauth-guide.md) | Third-party app integration |
+| [i18n Guide](./authentication/i18n-guide.md) | 18-language support, RTL, CJK search |
+| [Troubleshooting](./authentication/troubleshooting.md) | Common authentication issues |
 
 ---
 
@@ -131,6 +141,7 @@ This guide covers administrative features specific to **Think Tank**, the consum
     - [39.10 Implementation Files](#3910-implementation-files)
 43. [Concurrent Task Execution (Moat #17)](#43-concurrent-task-execution-moat-17)
 44. [Structure from Chaos Synthesis (Moat #20)](#44-structure-from-chaos-synthesis-moat-20)
+45. [Localization & Translation Overrides](#45-localization--translation-overrides)
 
 ---
 
@@ -9562,6 +9573,128 @@ apps/thinktank-admin/app/(dashboard)/living-parchment/
 - Session ownership validated before modifications
 - Audit logging for all decision actions
 - Debate content filtered for appropriate use
+
+---
+
+## 45. Localization & Translation Overrides
+
+**Location**: Think Tank Admin → Administration → Localization
+
+Tenant administrators can customize UI text and messages across Think Tank with translation overrides.
+
+### 45.1 Overview
+
+The localization system allows tenants to:
+- Override any system string with custom text
+- Protect overrides from automatic translation updates
+- Configure default and enabled languages for users
+- Maintain brand consistency across all 18 supported languages
+
+### 45.2 Supported Languages
+
+| Language | Code | Flag |
+|----------|------|------|
+| English | en | 🇺🇸 |
+| Spanish | es | 🇪🇸 |
+| French | fr | 🇫🇷 |
+| German | de | 🇩🇪 |
+| Portuguese | pt | 🇵🇹 |
+| Italian | it | 🇮🇹 |
+| Dutch | nl | 🇳🇱 |
+| Polish | pl | 🇵🇱 |
+| Russian | ru | 🇷🇺 |
+| Turkish | tr | 🇹🇷 |
+| Japanese | ja | 🇯🇵 |
+| Korean | ko | 🇰🇷 |
+| Chinese (Simplified) | zh-CN | 🇨🇳 |
+| Chinese (Traditional) | zh-TW | 🇹🇼 |
+| Arabic | ar | 🇸🇦 |
+| Hindi | hi | 🇮🇳 |
+| Thai | th | 🇹🇭 |
+| Vietnamese | vi | 🇻🇳 |
+
+### 45.3 Admin UI Tabs
+
+| Tab | Purpose |
+|-----|---------|
+| **Your Overrides** | View and manage custom translations |
+| **Browse Strings** | Search Think Tank strings to customize |
+| **Configuration** | Set default language and enabled languages |
+
+### 45.4 Creating Translation Overrides
+
+1. Navigate to **Administration → Localization**
+2. Select target language from dropdown
+3. Go to **Browse Strings** tab
+4. Search for the string you want to customize
+5. Click **Edit** to open the override dialog
+6. Enter your custom text
+7. Toggle **Protect from automatic updates** (recommended)
+8. Click **Save**
+
+### 45.5 Protection System
+
+**Protected overrides** (default):
+- Will NOT be updated when system translations improve
+- Recommended for brand-specific terminology
+- Shows lock icon in override list
+
+**Unprotected overrides**:
+- May be updated by automatic translation systems
+- Useful for temporary fixes until system improves
+- Shows unlock icon in override list
+
+**Reverting to system translation**:
+- Click the revert button on any override
+- Override is deleted and system translation is restored
+
+### 45.6 Language Configuration
+
+Configure which languages are available to your users:
+
+1. Go to **Configuration** tab
+2. Set **Default Language** for new users
+3. Enable/disable languages by clicking language cards
+4. At least one language must remain enabled
+
+### 45.7 Common Use Cases
+
+| Use Case | Example |
+|----------|---------|
+| **Brand terminology** | Replace "Think Tank" with your product name |
+| **Industry jargon** | Use domain-specific terms |
+| **Tone adjustment** | Make messages more formal/casual |
+| **Legal compliance** | Customize disclaimers |
+| **Regional variants** | UK vs US English differences |
+
+### 45.8 API Reference
+
+**Base URL**: `/api/admin/localization`
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/overrides` | GET | List your overrides |
+| `/overrides` | POST | Create/update override |
+| `/overrides/:id` | DELETE | Revert to system |
+| `/overrides/:id/protection` | PATCH | Toggle protection |
+| `/config` | GET/PUT | Language configuration |
+| `/bundle/:lang` | GET | Get translations with overrides |
+
+### 45.9 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `tenant_translation_overrides` | Custom translations per tenant |
+| `tenant_localization_config` | Language settings per tenant |
+| `translation_audit_log` | Change history |
+
+### 45.10 Implementation Files
+
+```
+packages/infrastructure/migrations/V2026_01_25_006__tenant_translation_overrides.sql
+packages/infrastructure/lambda/admin/localization-registry.ts
+apps/thinktank-admin/app/(dashboard)/localization/page.tsx
+```
 
 ---
 

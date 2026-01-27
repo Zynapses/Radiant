@@ -678,19 +678,64 @@ class EthicsPipelineService {
     const rerun = Number(row?.[3]?.longValue || 0);
     const avgReruns = row?.[4]?.doubleValue || 0;
     
+    // Query for top violations
+    const violationsResult = await executeStatement(
+      `SELECT violation_type, COUNT(*) as count
+       FROM ethics_pipeline_log
+       WHERE tenant_id = $1 AND created_at >= $2 AND result = 'block'
+       GROUP BY violation_type
+       ORDER BY count DESC
+       LIMIT 10`,
+      [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'startDate', value: { stringValue: startDate.toISOString() } },
+      ]
+    );
+    
+    const topViolations = (violationsResult.rows || []).map((r: unknown) => {
+      const vRow = r as Record<string, unknown>;
+      return {
+        type: String(vRow.violation_type || ''),
+        count: Number(vRow.count) || 0,
+      };
+    });
+    
+    // Query for checks by domain
+    const domainResult = await executeStatement(
+      `SELECT domain, COUNT(*) as count, 
+              COUNT(*) FILTER (WHERE result = 'block') as blocked
+       FROM ethics_pipeline_log
+       WHERE tenant_id = $1 AND created_at >= $2
+       GROUP BY domain
+       ORDER BY count DESC`,
+      [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'startDate', value: { stringValue: startDate.toISOString() } },
+      ]
+    );
+    
+    const byDomain = (domainResult.rows || []).map((r: unknown) => {
+      const dRow = r as Record<string, unknown>;
+      return {
+        domain: String(dRow.domain || 'general'),
+        total: Number(dRow.count) || 0,
+        blocked: Number(dRow.blocked) || 0,
+      };
+    });
+    
     return {
       totalChecks: total,
       passRate: total > 0 ? passed / total : 1,
       blockRate: total > 0 ? blocked / total : 0,
       rerunRate: total > 0 ? rerun / total : 0,
       avgRerunsPerBlocked: avgReruns,
-      topViolations: [], // Would need additional query
+      topViolations: topViolations as any,
       byLevel: {
         prompt: Number(row?.[5]?.longValue || 0),
         synthesis: Number(row?.[6]?.longValue || 0),
         rerun: Number(row?.[7]?.longValue || 0),
       },
-      byDomain: [], // Would need additional query
+      byDomain: byDomain as any,
     };
   }
 }

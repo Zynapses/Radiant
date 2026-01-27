@@ -158,13 +158,41 @@ async function routeRequest(
     return mod.handler(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
   }
 
-  // System configuration
+  // System configuration and health
   if (pathParts[1] === 'system') {
+    if (pathParts[2] === 'health' || pathParts[2] === 'gateway') {
+      const mod = await import('./system-health.js');
+      return mod.handler(event) as Promise<APIGatewayProxyResult>;
+    }
     if (pathParts[2] === 'config') {
       const mod = await import('./system-config.js');
       return mod.handler(event) as Promise<APIGatewayProxyResult>;
     }
     const mod = await import('./system.js');
+    return mod.handler(event) as Promise<APIGatewayProxyResult>;
+  }
+
+  // Service API Keys (v5.1.1)
+  if (pathParts[1] === 'service-api-keys') {
+    const mod = await import('./api-keys-v51.js');
+    return mod.handler(event) as Promise<APIGatewayProxyResult>;
+  }
+
+  // SSO Connections
+  if (pathParts[1] === 'sso-connections') {
+    const mod = await import('./sso-connections.js');
+    return mod.handler(event) as Promise<APIGatewayProxyResult>;
+  }
+
+  // Cortex Graph-RAG
+  if (pathParts[1] === 'cortex') {
+    const mod = await import('./cortex-graph-rag.js');
+    return mod.handler(event) as Promise<APIGatewayProxyResult>;
+  }
+
+  // OAuth Apps
+  if (pathParts[1] === 'oauth') {
+    const mod = await import('./oauth-apps.js');
     return mod.handler(event) as Promise<APIGatewayProxyResult>;
   }
 
@@ -336,6 +364,64 @@ async function routeRequest(
     return translationHandler(event);
   }
 
+  // Localization Registry - Translation management with tenant overrides
+  if (pathParts[1] === 'localization') {
+    const mod = await import('./localization-registry.js');
+    const subRoute = pathParts[2];
+    const resourceId = pathParts[3];
+    const action = pathParts[4];
+    
+    // Registry entries
+    if (!subRoute || subRoute === 'registry') {
+      if (method === 'GET' && !resourceId) {
+        return mod.listRegistry(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+      if (method === 'GET' && resourceId) {
+        event.pathParameters = { ...event.pathParameters, id: resourceId };
+        return mod.getRegistryEntry(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+    }
+    
+    // Tenant translation overrides
+    if (subRoute === 'overrides') {
+      if (method === 'GET') {
+        return mod.listOverrides(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+      if (method === 'POST') {
+        return mod.upsertOverride(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+      if (method === 'DELETE' && resourceId) {
+        event.pathParameters = { ...event.pathParameters, id: resourceId };
+        return mod.deleteOverride(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+      if (method === 'PATCH' && resourceId && action === 'protection') {
+        event.pathParameters = { ...event.pathParameters, id: resourceId };
+        return mod.toggleProtection(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+    }
+    
+    // Translation bundles
+    if (subRoute === 'bundle') {
+      event.pathParameters = { ...event.pathParameters, languageCode: resourceId || 'en' };
+      return mod.getBundle(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    }
+    
+    // Tenant localization config
+    if (subRoute === 'config') {
+      if (method === 'GET') {
+        return mod.getConfig(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+      if (method === 'PUT') {
+        return mod.updateConfig(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+    }
+    
+    // Statistics
+    if (subRoute === 'stats') {
+      return mod.getStats(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    }
+  }
+
   // Cognition v6.1.0 - Advanced Cognition Services
   if (pathParts[1] === 'cognition') {
     const { handler: cognitionHandler } = await import('./cognition.js');
@@ -364,6 +450,94 @@ async function routeRequest(
   if (pathParts[1] === 'ai-reports') {
     const { handler: aiReportsHandler } = await import('./ai-reports.js');
     return aiReportsHandler(event);
+  }
+
+  // PostgreSQL Scaling - Database infrastructure monitoring
+  if (pathParts[1] === 'scaling') {
+    const mod = await import('./postgresql-scaling.js');
+    const subRoute = pathParts[2];
+    const action = pathParts[3];
+    
+    // Dashboard overview
+    if (!subRoute || subRoute === 'dashboard') {
+      return mod.getDashboard(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    }
+    
+    // Connection pool metrics
+    if (subRoute === 'connections') {
+      return mod.getConnectionMetrics(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    }
+    
+    // Queue status
+    if (subRoute === 'queues') {
+      if (method === 'GET') {
+        return mod.getQueueStatus(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+      if (method === 'POST' && action === 'retry-failed') {
+        return mod.retryFailedBatchWrites(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+      if (method === 'DELETE' && action === 'clear-completed') {
+        return mod.clearCompletedBatchWrites(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+    }
+    
+    // Replica health
+    if (subRoute === 'replicas') {
+      return mod.getReplicaHealth(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    }
+    
+    // Partition statistics
+    if (subRoute === 'partitions') {
+      if (method === 'GET') {
+        return mod.getPartitionStats(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+      if (method === 'POST' && action === 'ensure-future') {
+        return mod.ensureFuturePartitions(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+    }
+    
+    // Slow query analysis
+    if (subRoute === 'slow-queries') {
+      return mod.getSlowQueries(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    }
+    
+    // Index health
+    if (subRoute === 'indexes') {
+      if (action === 'suggestions') {
+        return mod.getIndexSuggestions(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+      return mod.getIndexHealth(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    }
+    
+    // Materialized views
+    if (subRoute === 'materialized-views') {
+      if (method === 'GET') {
+        return mod.getMaterializedViewStatus(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+      if (method === 'POST' && action === 'refresh') {
+        return mod.triggerMaterializedViewRefresh(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+    }
+    
+    // Table statistics
+    if (subRoute === 'tables') {
+      return mod.getTableStatistics(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    }
+    
+    // Maintenance
+    if (subRoute === 'maintenance') {
+      if (method === 'POST' && action === 'run') {
+        return mod.runMaintenance(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+      if (method === 'GET' && action === 'history') {
+        return mod.getMaintenanceHistory(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+      }
+    }
+    
+    // Rate limits
+    if (subRoute === 'rate-limits') {
+      return mod.getRateLimitStatus(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    }
   }
 
   throw new NotFoundError(`Admin route not found: ${method} ${path}`);

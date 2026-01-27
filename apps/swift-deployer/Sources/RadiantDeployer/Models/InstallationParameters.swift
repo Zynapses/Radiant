@@ -1,4 +1,4 @@
-// RADIANT v4.18.0 - Installation Parameters
+// RADIANT v5.52.17 - Installation Parameters
 // Defines deployment parameters with tier-based defaults
 
 import Foundation
@@ -163,12 +163,23 @@ struct InstallationParameters: Codable, Sendable {
     var auroraMinCapacity: Int
     var auroraMaxCapacity: Int
     
-    // Features
+    // Core Features
     var enableSelfHostedModels: Bool
     var enableMultiRegion: Bool
     var enableWAF: Bool
     var enableGuardDuty: Bool
     var enableHIPAACompliance: Bool
+    
+    // v5.52.17 - Application Features
+    var enableCurator: Bool             // Knowledge graph curation app
+    var enableCortexMemory: Bool        // Three-tier memory system
+    var enableTimeMachine: Bool         // Conversation forking/checkpoints
+    var enableCollaboration: Bool       // Real-time co-editing
+    var enableComplianceExport: Bool    // HIPAA/SOC2/GDPR exports
+    var enableEgoSystem: Bool           // Zero-cost persistent identity
+    
+    // Domain Configuration (v5.52.17)
+    var domainConfig: DomainURLConfiguration?
     
     // Billing
     var externalProviderMarkup: Double  // Default: 1.40 (40%)
@@ -184,7 +195,8 @@ struct InstallationParameters: Codable, Sendable {
     static func defaults(
         appId: String,
         environment: DeployEnvironment,
-        tier: TierLevel
+        tier: TierLevel,
+        baseDomain: String = ""
     ) -> InstallationParameters {
         return InstallationParameters(
             tier: tier,
@@ -198,12 +210,37 @@ struct InstallationParameters: Codable, Sendable {
             enableMultiRegion: tier >= .scale,
             enableWAF: tier >= .starter,
             enableGuardDuty: tier >= .starter,
-            enableHIPAACompliance: false,  // Must be explicitly enabled
+            enableHIPAACompliance: false,
+            enableCurator: tier >= .growth,
+            enableCortexMemory: true,
+            enableTimeMachine: true,
+            enableCollaboration: tier >= .starter,
+            enableComplianceExport: true,
+            enableEgoSystem: true,
+            domainConfig: baseDomain.isEmpty ? nil : .defaults(baseDomain: baseDomain),
             externalProviderMarkup: 1.40,
             selfHostedMarkup: 1.75,
-            seedAIRegistry: true,  // ONLY true on fresh install
+            seedAIRegistry: true,
             version: RADIANT_VERSION
         )
+    }
+    
+    // MARK: - Feature Summary
+    
+    var enabledFeatures: [String] {
+        var features: [String] = []
+        if enableSelfHostedModels { features.append("Self-Hosted Models") }
+        if enableMultiRegion { features.append("Multi-Region") }
+        if enableWAF { features.append("WAF") }
+        if enableGuardDuty { features.append("GuardDuty") }
+        if enableHIPAACompliance { features.append("HIPAA Compliance") }
+        if enableCurator { features.append("Curator") }
+        if enableCortexMemory { features.append("Cortex Memory") }
+        if enableTimeMachine { features.append("Time Machine") }
+        if enableCollaboration { features.append("Collaboration") }
+        if enableComplianceExport { features.append("Compliance Export") }
+        if enableEgoSystem { features.append("Ego System") }
+        return features
     }
 }
 
@@ -223,6 +260,18 @@ struct InstanceParameters: Codable, Sendable {
     var enableWAF: Bool
     var enableGuardDuty: Bool
     var enableHIPAACompliance: Bool
+    
+    // v5.52.17 - Application Features
+    var enableCurator: Bool
+    var enableCortexMemory: Bool
+    var enableTimeMachine: Bool
+    var enableCollaboration: Bool
+    var enableComplianceExport: Bool
+    var enableEgoSystem: Bool
+    
+    // Domain Configuration (v5.52.17)
+    var domainConfig: DomainURLConfiguration?
+    
     var externalProviderMarkup: Double
     var selfHostedMarkup: Double
     var version: String
@@ -248,6 +297,13 @@ struct InstanceParameters: Codable, Sendable {
             enableWAF: enableWAF,
             enableGuardDuty: enableGuardDuty,
             enableHIPAACompliance: enableHIPAACompliance,
+            enableCurator: enableCurator,
+            enableCortexMemory: enableCortexMemory,
+            enableTimeMachine: enableTimeMachine,
+            enableCollaboration: enableCollaboration,
+            enableComplianceExport: enableComplianceExport,
+            enableEgoSystem: enableEgoSystem,
+            domainConfig: domainConfig,
             externalProviderMarkup: externalProviderMarkup,
             selfHostedMarkup: selfHostedMarkup,
             seedAIRegistry: false,  // NEVER seed on update
@@ -270,6 +326,13 @@ struct InstanceParameters: Codable, Sendable {
             enableWAF: tier >= .starter,
             enableGuardDuty: tier >= .starter,
             enableHIPAACompliance: false,
+            enableCurator: tier >= .growth,
+            enableCortexMemory: true,
+            enableTimeMachine: true,
+            enableCollaboration: tier >= .starter,
+            enableComplianceExport: true,
+            enableEgoSystem: true,
+            domainConfig: nil,
             externalProviderMarkup: 1.40,
             selfHostedMarkup: 1.75,
             version: RADIANT_VERSION,
@@ -294,6 +357,13 @@ struct ParameterChanges: Codable, Sendable {
     var enableWAF: Bool?
     var enableGuardDuty: Bool?
     var enableHIPAACompliance: Bool?
+    var enableCurator: Bool?
+    var enableCortexMemory: Bool?
+    var enableTimeMachine: Bool?
+    var enableCollaboration: Bool?
+    var enableComplianceExport: Bool?
+    var enableEgoSystem: Bool?
+    var domainConfig: DomainURLConfiguration?
     var externalProviderMarkup: Double?
     var selfHostedMarkup: Double?
     
@@ -308,6 +378,13 @@ struct ParameterChanges: Codable, Sendable {
         enableWAF == nil &&
         enableGuardDuty == nil &&
         enableHIPAACompliance == nil &&
+        enableCurator == nil &&
+        enableCortexMemory == nil &&
+        enableTimeMachine == nil &&
+        enableCollaboration == nil &&
+        enableComplianceExport == nil &&
+        enableEgoSystem == nil &&
+        domainConfig == nil &&
         externalProviderMarkup == nil &&
         selfHostedMarkup == nil
     }

@@ -779,6 +779,119 @@ export class AdminStack extends cdk.Stack {
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
 
+    // =========================================================================
+    // v5.1.1 - System Health, API Keys, SSO Connections Routes
+    // =========================================================================
+    
+    // System Health endpoints
+    const system = admin.addResource('system');
+    const systemHealth = system.addResource('health');
+    systemHealth.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    systemHealth.addResource('components').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const healthAlerts = systemHealth.addResource('alerts');
+    healthAlerts.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    healthAlerts.addResource('{alertId}').addResource('acknowledge').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Gateway endpoints
+    const gateway = system.addResource('gateway');
+    gateway.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const gatewayConfig = gateway.addResource('config');
+    gatewayConfig.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    gatewayConfig.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // Service API Keys endpoints
+    const serviceApiKeys = admin.addResource('service-api-keys');
+    serviceApiKeys.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    serviceApiKeys.addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    serviceApiKeys.addResource('scopes').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const apiKeyById = serviceApiKeys.addResource('{keyId}');
+    apiKeyById.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    apiKeyById.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    apiKeyById.addMethod('DELETE', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    apiKeyById.addResource('rotate').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    apiKeyById.addResource('audit').addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    
+    // SSO Connections endpoints
+    const ssoConnections = admin.addResource('sso-connections');
+    ssoConnections.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    ssoConnections.addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    const ssoById = ssoConnections.addResource('{connectionId}');
+    ssoById.addMethod('GET', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    ssoById.addMethod('PUT', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    ssoById.addMethod('DELETE', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    ssoById.addResource('test').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    ssoById.addResource('enable').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    ssoById.addResource('disable').addMethod('POST', adminIntegration, {
+      authorizer: adminAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
     // Outputs
     new cdk.CfnOutput(this, 'AdminDashboardUrl', {
       value: `https://${this.adminDistribution.distributionDomainName}`,

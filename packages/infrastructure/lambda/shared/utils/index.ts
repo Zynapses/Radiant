@@ -93,6 +93,18 @@ export * from './input-sanitization';
 // Standardized error responses
 export * from './error-response';
 
+// Simple response helpers (for backwards compatibility)
+export {
+  createResponse as simpleResponse,
+  createErrorResponse as simpleErrorResponse,
+  jsonResponse,
+  notFoundResponse,
+  badRequestResponse,
+  unauthorizedResponse,
+  forbiddenResponse,
+  internalErrorResponse,
+} from './response';
+
 // Safe JSON utilities (with Zod schema validation)
 export {
   safeJsonParse as safeJson,

@@ -1,4 +1,4 @@
-// RADIANT v4.18.0 - Settings View
+// RADIANT v5.52.17 - Settings View
 // Comprehensive settings for all deployer configuration
 
 import SwiftUI
@@ -14,6 +14,11 @@ struct SettingsView: View {
             CredentialsSettingsView()
                 .tabItem {
                     Label("Credentials", systemImage: "key")
+                }
+            
+            FeatureFlagsSettingsView()
+                .tabItem {
+                    Label("Features", systemImage: "flag")
                 }
             
             AIAssistantSettingsView()
@@ -44,16 +49,6 @@ struct SettingsView: View {
             QATestingView()
                 .tabItem {
                     Label("QA & Testing", systemImage: "checkmark.seal")
-                }
-            
-            CognitiveBrainSettingsView()
-                .tabItem {
-                    Label("Cognitive Brain", systemImage: "brain")
-                }
-            
-            AdvancedCognitionSettingsView()
-                .tabItem {
-                    Label("Advanced Cognition", systemImage: "cpu")
                 }
         }
         .frame(minWidth: 600, idealWidth: 900, maxWidth: .infinity, minHeight: 500, idealHeight: 700, maxHeight: .infinity)

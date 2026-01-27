@@ -7,11 +7,14 @@
 
 import { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { CatoOutputType, CatoRiskLevel, CatoCompensationType, CatoAccumulatedContext, CatoRiskSignal, CatoCompensationEntry } from '@radiant/shared';
 import { CatoBaseMethodExecutor, MethodExecutionContext, ModelInvocationResult } from '../cato-method-executor.service';
 import { CatoMethodRegistryService } from '../cato-method-registry.service';
 import { CatoSchemaRegistryService } from '../cato-schema-registry.service';
 import { CatoToolRegistryService } from '../cato-tool-registry.service';
+
+const lambdaClient = new LambdaClient({});
 
 export interface ExecutorInput {
   proposal: { proposalId: string; title: string; actions: Array<{ actionId: string; type: string; description: string; toolId?: string; inputs: Record<string, unknown>; reversible: boolean; compensationType: CatoCompensationType; compensationStrategy?: string }> };
@@ -140,11 +143,59 @@ export class CatoExecutorMethod extends CatoBaseMethodExecutor<ExecutorInput, Ex
     if (!validation.valid) throw new Error(`Invalid inputs: ${validation.errors?.join(', ')}`);
 
     if (this.toolRegistry.isLambdaTool(tool)) {
-      // Would invoke Lambda here
-      return { toolId, executed: true, lambdaFunction: this.toolRegistry.getLambdaFunctionName(tool) };
+      // Invoke Lambda function
+      const functionName = this.toolRegistry.getLambdaFunctionName(tool);
+      if (!functionName) {
+        throw new Error(`Lambda function name not configured for tool: ${toolId}`);
+      }
+      
+      const payload = {
+        toolId,
+        inputs,
+        context: {
+          tenantId: context.tenantId,
+          userId: context.userId,
+          traceId: context.traceId,
+        },
+      };
+
+      const command = new InvokeCommand({
+        FunctionName: functionName,
+        InvocationType: 'RequestResponse',
+        Payload: Buffer.from(JSON.stringify(payload)),
+      });
+
+      const response = await lambdaClient.send(command);
+      
+      if (response.FunctionError) {
+        const errorPayload = response.Payload ? JSON.parse(new TextDecoder().decode(response.Payload)) : {};
+        throw new Error(`Lambda error: ${response.FunctionError} - ${errorPayload.errorMessage || 'Unknown'}`);
+      }
+
+      const result = response.Payload ? JSON.parse(new TextDecoder().decode(response.Payload)) : {};
+      return { toolId, executed: true, lambdaFunction: functionName, result };
     } else {
-      // Would invoke MCP server here
-      return { toolId, executed: true, mcpServer: tool.mcpServer };
+      // MCP tool invocation via HTTP to MCP gateway
+      const mcpServer = tool.mcpServer;
+      const mcpGatewayUrl = process.env.MCP_GATEWAY_URL || 'http://localhost:3001';
+      
+      const mcpResponse = await fetch(`${mcpGatewayUrl}/tools/call`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          server: mcpServer,
+          tool: toolId,
+          arguments: inputs,
+          context: { tenantId: context.tenantId, userId: context.userId },
+        }),
+      });
+
+      if (!mcpResponse.ok) {
+        throw new Error(`MCP invocation failed: ${mcpResponse.status} ${mcpResponse.statusText}`);
+      }
+
+      const mcpResult = await mcpResponse.json();
+      return { toolId, executed: true, mcpServer, result: mcpResult };
     }
   }
 

@@ -24,7 +24,8 @@ import { connect, NatsConnection, JetStreamClient, JetStreamManager, AckPolicy, 
 import { logger } from '../shared/logger';
 import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics';
 import { executeStatement } from '../shared/utils/db';
-import { cedarAuthorizationService, Principal } from '../shared/services/cedar/cedar-authorization.service';
+import { CedarAuthorizationService, Principal } from '../shared/services/cedar/cedar-authorization.service';
+const cedarAuthorizationService = new CedarAuthorizationService();
 
 const metrics = new Metrics({ namespace: 'RADIANT/A2A', serviceName: 'a2a-worker' });
 
@@ -152,12 +153,12 @@ export class A2AWorkerService {
         await this.jsm.streams.add({
           name: 'A2A',
           subjects: ['a2a.>'],
-          retention: 'limits' as any,
+          retention: 'limits',
           max_msgs: 1000000,
           max_age: 24 * 60 * 60 * 1e9, // 24 hours in nanoseconds
-          storage: 'file' as any,
+          storage: 'file',
           replicas: 1,
-        });
+        } as any);
       } catch (e: any) {
         if (!e.message?.includes('already in use')) {
           throw e;
@@ -166,7 +167,7 @@ export class A2AWorkerService {
 
       logger.info('A2A Worker initialized', { natsUrl });
     } catch (error) {
-      logger.error('Failed to initialize A2A Worker', { error });
+      logger.error('Failed to initialize A2A Worker', { err: error } as any);
       throw error;
     }
   }
@@ -248,7 +249,7 @@ export class A2AWorkerService {
 
       return response;
     } catch (error) {
-      logger.error('A2A message processing failed', { error, messageId: message.messageId });
+      logger.error('A2A message processing failed', { err: error, messageId: message.messageId } as any);
       metrics.addMetric('A2AMessageFailed', MetricUnit.Count, 1);
       return this.createError(message, 'PROCESSING_ERROR', error instanceof Error ? error.message : 'Unknown error');
     }
@@ -268,13 +269,13 @@ export class A2AWorkerService {
     // Check authorization
     const authResult = await cedarAuthorizationService.authorize({
       principal,
-      action: 'a2a:register',
+      action: 'a2a:register' as any,
       resource: {
-        type: 'A2ARegistry',
+        type: 'A2ARegistry' as any,
         id: message.tenantId,
         tenantId: message.tenantId,
-      },
-      context: { agentType },
+      } as any,
+      context: { agentType } as any,
     });
 
     if (!authResult.allowed) {
@@ -580,7 +581,7 @@ export class A2AWorkerService {
       { name: 'timeout', value: { longValue: lockTimeout || 300 } },
     ]);
 
-    const lockResult = result.rows[0]?.lock_result;
+    const lockResult = (result.rows[0] as any)?.lock_result;
 
     if (lockResult?.acquired) {
       return {
@@ -705,7 +706,7 @@ export class A2AWorkerService {
         JSON.stringify(response)
       );
     } catch (error) {
-      logger.error('Failed to publish A2A response', { error, messageId: message.messageId });
+      logger.error('Failed to publish A2A response', { err: error, messageId: message.messageId } as any);
     }
   }
 
@@ -760,7 +761,7 @@ export const handler: Handler<SQSEvent> = async (event) => {
       const response = await workerService.processMessage(message);
       results.push({ messageId: message.messageId, success: response.success });
     } catch (error) {
-      logger.error('Failed to process SQS record', { error, messageId: record.messageId });
+      logger.error('Failed to process SQS record', { err: error, messageId: record.messageId } as any);
       results.push({ messageId: record.messageId, success: false });
     }
   }
@@ -776,4 +777,4 @@ export const handler: Handler<SQSEvent> = async (event) => {
   return { batchItemFailures: [] };
 };
 
-export { A2AWorkerService, handler as a2aWorkerHandler };
+export { handler as a2aWorkerHandler };

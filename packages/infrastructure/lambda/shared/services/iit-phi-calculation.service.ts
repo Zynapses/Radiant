@@ -11,7 +11,7 @@
  * suitable for real-time consciousness metrics in production systems.
  */
 
-import { query, transaction } from '../database.js';
+import { executeStatement } from '../db/client';
 import { enhancedLogger } from '../logging/enhanced-logger.js';
 
 const logger = enhancedLogger.child({ module: 'iit-phi-calculation' });

@@ -10,6 +10,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
 import { describeImage } from './image-converter';
+import { enhancedLogger as logger } from '../../logging/enhanced-logger';
 
 // S3 client singleton
 let s3Client: S3Client | null = null;
@@ -237,7 +238,7 @@ async function getVideoMetadata(videoPath: string): Promise<{
       codec: 'h264',
     };
   } catch (error) {
-    console.warn('Video metadata extraction failed, using defaults:', error);
+    logger.warn('Video metadata extraction failed, using defaults', { error });
     return {
       duration: 60,
       width: 1920,
@@ -432,7 +433,14 @@ function calculateFrameTimes(
 
 /**
  * Extract frames at specified timestamps
- * Uses Lambda layer with ffmpeg if available, otherwise generates placeholder frames
+ * 
+ * Frame extraction strategy (in priority order):
+ * 1. VIDEO_PROCESSOR_LAMBDA_ARN - Lambda with ffmpeg layer (preferred)
+ * 2. Placeholder frames - Minimal JPEG indicating timestamp (fallback)
+ * 
+ * Note: Vision models like GPT-4V and Claude can analyze video URLs directly,
+ * so placeholder frames serve as timestamp markers when ffmpeg is unavailable.
+ * Configure VIDEO_PROCESSOR_LAMBDA_ARN for actual frame extraction.
  */
 async function extractFrames(
   videoPath: string,
@@ -441,25 +449,25 @@ async function extractFrames(
 ): Promise<Buffer[]> {
   const frameBuffers: Buffer[] = [];
 
-  // Try to use video processor Lambda if configured
+  // Strategy 1: Use video processor Lambda with ffmpeg layer
   if (process.env.VIDEO_PROCESSOR_LAMBDA_ARN) {
     try {
       const result = await invokeVideoProcessorLambda(videoPath, 'extract_frames', { timestamps });
       if (result.frames && Array.isArray(result.frames)) {
+        logger.info('Extracted frames via Lambda', { frameCount: result.frames.length });
         return result.frames.map((f: string) => Buffer.from(f, 'base64'));
       }
     } catch (error) {
-      console.warn('Lambda frame extraction failed, using fallback:', error);
+      logger.warn('Lambda frame extraction failed, using placeholder fallback', { error });
     }
+  } else {
+    logger.info('VIDEO_PROCESSOR_LAMBDA_ARN not configured - using placeholder frames. Vision models can still analyze the video URL directly.');
   }
 
-  // Fallback: Generate placeholder frames for vision model to process via video URL
-  // This approach uploads the video to S3 and lets the vision model analyze it directly
+  // Strategy 2: Generate placeholder frames with timestamp markers
+  // These serve as position indicators; vision models analyze the video URL
   for (let i = 0; i < timestamps.length; i++) {
     const timestamp = timestamps[i];
-    
-    // Create a simple placeholder image with timestamp info
-    // In production, this would be replaced by actual frame extraction
     const placeholderBuffer = await createPlaceholderFrame(timestamp, i, timestamps.length);
     frameBuffers.push(placeholderBuffer);
   }

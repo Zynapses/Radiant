@@ -49,7 +49,7 @@ interface CodeIssue {
 const defaultMetrics: QualityMetric[] = [];
 const defaultIssues: CodeIssue[] = [];
 
-const severityConfig = {
+const severityConfig: Record<CodeIssue['severity'], { icon: typeof XCircle; color: string; bg: string }> = {
   error: { icon: XCircle, color: 'text-red-500', bg: 'bg-red-100 dark:bg-red-900/30' },
   warning: { icon: AlertTriangle, color: 'text-amber-500', bg: 'bg-amber-100 dark:bg-amber-900/30' },
   info: { icon: CheckCircle2, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' },
@@ -58,7 +58,7 @@ const severityConfig = {
 export default function CodeQualityPage() {
   const [isScanning, setIsScanning] = useState(false);
 
-  const { data: metrics = defaultMetrics } = useQuery({
+  const { data: metrics = defaultMetrics } = useQuery<QualityMetric[]>({
     queryKey: ['code-quality', 'metrics'],
     queryFn: async () => {
       const res = await fetch('/api/thinktank-admin/code-quality/metrics');
@@ -67,7 +67,7 @@ export default function CodeQualityPage() {
     },
   });
 
-  const { data: issues = defaultIssues } = useQuery({
+  const { data: issues = defaultIssues } = useQuery<CodeIssue[]>({
     queryKey: ['code-quality', 'issues'],
     queryFn: async () => {
       const res = await fetch('/api/thinktank-admin/code-quality/issues');
@@ -76,10 +76,10 @@ export default function CodeQualityPage() {
     },
   });
 
-  const overallScore = Math.round(metrics.reduce((sum, m) => sum + m.score, 0) / metrics.length);
+  const overallScore = metrics.length > 0 ? Math.round(metrics.reduce((sum: number, m: QualityMetric) => sum + m.score, 0) / metrics.length) : 0;
   const totalIssues = issues.length;
-  const errorCount = issues.filter(i => i.severity === 'error').length;
-  const warningCount = issues.filter(i => i.severity === 'warning').length;
+  const errorCount = issues.filter((i: CodeIssue) => i.severity === 'error').length;
+  const warningCount = issues.filter((i: CodeIssue) => i.severity === 'warning').length;
 
   const handleScan = () => {
     setIsScanning(true);

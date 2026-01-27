@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -57,11 +57,7 @@ export default function TransparencyPage() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [explanationTier, setExplanationTier] = useState<string>('standard');
 
-  useEffect(() => {
-    loadDecisions();
-  }, [typeFilter]);
-
-  const loadDecisions = async () => {
+  const loadDecisions = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ limit: '50' });
@@ -77,7 +73,11 @@ export default function TransparencyPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [typeFilter]);
+
+  useEffect(() => {
+    loadDecisions();
+  }, [loadDecisions]);
 
   const loadDecisionDetails = async (decision: Decision) => {
     setSelectedDecision(decision);

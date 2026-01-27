@@ -106,3 +106,10 @@ export function useToast() {
   
   return context;
 }
+
+// Standalone toast function for use outside of React components
+export const toast = (props: Omit<Toast, 'id'>) => {
+  // This is a simplified toast that logs to console
+  // In a proper setup, this would be connected to a global toast manager
+  console.log(`[Toast] ${props.title || ''}: ${props.description || ''}`);
+};

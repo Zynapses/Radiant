@@ -334,13 +334,37 @@ class DPOTrainerService {
     batchId: string,
     data: { prompt: string; chosen: string; rejected: string }[]
   ): Promise<void> {
-    // In production, this would upload to S3
-    // For now, we log that it would happen
-    logger.info('Training data ready for S3', {
-      batchId,
-      recordCount: data.length,
-      s3Key: `dpo-training/${batchId}/training_data.jsonl`,
-    });
+    const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
+    const s3 = new S3Client({ region: process.env.AWS_REGION || 'us-east-1' });
+    const bucket = process.env.DPO_TRAINING_BUCKET || `radiant-dpo-training-${process.env.STAGE || 'dev'}`;
+    const key = `dpo-training/${batchId}/training_data.jsonl`;
+
+    // Convert to JSONL format
+    const jsonlContent = data.map(record => JSON.stringify(record)).join('\n');
+
+    try {
+      await s3.send(new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: jsonlContent,
+        ContentType: 'application/jsonlines',
+        Metadata: {
+          'batch-id': batchId,
+          'record-count': String(data.length),
+          'created-at': new Date().toISOString(),
+        },
+      }));
+
+      logger.info('Training data uploaded to S3', {
+        batchId,
+        recordCount: data.length,
+        bucket,
+        key,
+      });
+    } catch (error) {
+      logger.error('Failed to upload training data to S3', { batchId, error });
+      throw error;
+    }
   }
 
   private parsePairRows(rows: unknown[]): DPOPair[] {

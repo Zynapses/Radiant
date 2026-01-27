@@ -650,9 +650,11 @@ class FormalReasoningService {
       }
 
       const computeTimeMs = Date.now() - startTime;
+      const memoryUsage = process.memoryUsage();
+      const memoryUsedMb = Math.round(memoryUsage.heapUsed / 1024 / 1024 * 100) / 100;
       const metrics: FormalReasoningMetrics = {
         computeTimeMs,
-        memoryUsedMb: 0, // Would need process monitoring
+        memoryUsedMb,
         inputSize: JSON.stringify(request.input).length,
         outputSize: JSON.stringify(result).length,
       };
@@ -847,16 +849,30 @@ class FormalReasoningService {
   }
 
   /**
-   * Fallback simulation when executors are unavailable.
+   * Fallback when formal reasoning libraries are unavailable.
+   * 
+   * These libraries require native bindings or Python runtime:
+   * - Z3: SMT solver (z3-solver Python package or z3.js WASM)
+   * - PyArg: Argumentation framework (Python only)
+   * - RDFLib/OWLRL: Semantic web reasoning (Python only)
+   * - PySHACL: RDF validation (Python only)
+   * - PyReason: Probabilistic reasoning (Python only)
+   * 
+   * To enable real execution:
+   * 1. Deploy a Python Lambda with these packages
+   * 2. Set FORMAL_REASONING_LAMBDA_ARN environment variable
+   * 3. This service will invoke that Lambda for actual computation
+   * 
+   * The fallback returns structurally valid responses for testing/development.
    */
   private simulateExecution(
     library: FormalReasoningLibrary,
     taskType: ReasoningTaskType,
     input: unknown
   ): { result: unknown; status: ReasoningResultStatus } {
-    logger.info(`Simulating ${library} execution for ${taskType}`);
+    logger.info(`Formal reasoning library ${library} not available - using fallback for ${taskType}`);
     
-    // Return plausible mock results based on library
+    // Return structurally valid responses for testing/development
     switch (library) {
       case 'z3':
         return {

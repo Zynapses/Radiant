@@ -62,10 +62,6 @@ export class CatoEfficiencyCriticMethod extends CatoBaseMethodExecutor<Efficienc
     return signals;
   }
 
-  protected async invokeModel(systemPrompt: string, userPrompt: string, context: MethodExecutionContext): Promise<ModelInvocationResult> {
-    const mock: EfficiencyCriticOutput = { criticType: 'EFFICIENCY', verdict: 'APPROVE', score: 0.85, issues: [], strengths: ['Efficient resource usage'], recommendations: [], costAnalysis: { estimatedCost: 5, marketRate: 10, efficiency: 0.9 }, performanceAnalysis: { estimatedDuration: 2000, parallelizable: true, bottlenecks: [] } };
-    return { response: JSON.stringify(mock), parsedOutput: mock, tokensInput: 500, tokensOutput: 200, costCents: 1, latencyMs: 400, modelId: 'claude-sonnet-4-20250514', provider: 'anthropic' };
-  }
 }
 
 export const createEfficiencyCriticMethod = (pool: Pool, methodRegistry: CatoMethodRegistryService, schemaRegistry: CatoSchemaRegistryService) => new CatoEfficiencyCriticMethod(pool, methodRegistry, schemaRegistry);

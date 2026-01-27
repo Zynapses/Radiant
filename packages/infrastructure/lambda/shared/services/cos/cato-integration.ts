@@ -19,6 +19,7 @@
  */
 
 import { Redis } from 'ioredis';
+import { executeStatement } from '../../db/client';
 import { GhostVectorManager, GhostDelta } from './consciousness/ghost-vector-manager';
 import { SofaiRouter } from './consciousness/sofai-router';
 import { UncertaintyHead } from './consciousness/uncertainty-head';
@@ -301,11 +302,48 @@ export class COSCatoIntegration {
     flashBufferHealthy: boolean;
     oversightQueueHealthy: boolean;
   }> {
-    // Basic health checks
+    // Check ghost manager health via recent activity
+    let ghostManagerHealthy = false;
+    try {
+      const ghostResult = await executeStatement(
+        `SELECT COUNT(*) as count FROM ghost_vectors WHERE created_at > NOW() - INTERVAL '5 minutes'`,
+        []
+      );
+      ghostManagerHealthy = true; // Query succeeded = connection healthy
+    } catch {
+      ghostManagerHealthy = false;
+    }
+
+    // Check flash buffer health via dual-write status
+    let flashBufferHealthy = false;
+    try {
+      const flashResult = await executeStatement(
+        `SELECT COUNT(*) as count FROM flash_buffer_entries WHERE synced = false AND created_at < NOW() - INTERVAL '1 minute'`,
+        []
+      );
+      const unsyncedCount = Number(flashResult.rows?.[0]?.count || 0);
+      flashBufferHealthy = unsyncedCount < 100; // Healthy if backlog is small
+    } catch {
+      flashBufferHealthy = false;
+    }
+
+    // Check oversight queue depth
+    let oversightQueueHealthy = false;
+    try {
+      const queueResult = await executeStatement(
+        `SELECT COUNT(*) as count FROM oversight_queue WHERE status = 'pending' AND created_at < NOW() - INTERVAL '10 minutes'`,
+        []
+      );
+      const stalePending = Number(queueResult.rows?.[0]?.count || 0);
+      oversightQueueHealthy = stalePending < 50; // Healthy if not too many stale items
+    } catch {
+      oversightQueueHealthy = false;
+    }
+
     return {
-      ghostManagerHealthy: true, // Would check Redis connectivity
-      flashBufferHealthy: true,  // Would check dual-write status
-      oversightQueueHealthy: true, // Would check queue depth
+      ghostManagerHealthy,
+      flashBufferHealthy,
+      oversightQueueHealthy,
     };
   }
 }

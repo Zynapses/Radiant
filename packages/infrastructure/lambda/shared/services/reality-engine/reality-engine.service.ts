@@ -12,6 +12,8 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { executeStatement } from '../../db/client';
+import { modelRouterService } from '../model-router.service';
+import { enhancedLogger as logger } from '../../logging/enhanced-logger';
 import {
   RealityEngineSession,
   RealityEngineConfig,
@@ -240,7 +242,9 @@ class RealityEngineService {
     });
 
     // Trigger background pre-cognition for next moves
-    this.triggerPreCognition(session, layout).catch(console.error);
+    this.triggerPreCognition(session, layout).catch(err => 
+      logger.error('Pre-cognition trigger failed', { error: err, sessionId })
+    );
 
     return {
       success: true,
@@ -476,7 +480,7 @@ class RealityEngineService {
       try {
         handler(event);
       } catch (error) {
-        console.error('Event handler error:', error);
+        logger.error('Reality engine event handler error', { error });
       }
     }
   }
@@ -616,12 +620,22 @@ class RealityEngineService {
   private async generateLayout(
     intent?: MorphicIntent,
     prompt?: string,
-    targetComponents?: string[]
+    targetComponents?: string[],
+    tenantId?: string
   ): Promise<MorphicLayout> {
-    // In production, this would use the AI to generate the layout
-    // For now, we use templates based on intent
-
     const layoutId = uuidv4();
+
+    // Try AI-powered layout generation if we have a prompt
+    if (prompt && tenantId) {
+      try {
+        const aiLayout = await this.generateAILayout(tenantId, prompt, intent, targetComponents);
+        if (aiLayout) return { ...aiLayout, id: layoutId };
+      } catch (error) {
+        logger.warn('AI layout generation failed, falling back to templates', { error });
+      }
+    }
+
+    // Fallback to template-based layout
     const components = [];
 
     if (intent === 'data_analysis' || intent === 'tracking') {
@@ -710,28 +724,118 @@ class RealityEngineService {
     };
   }
 
+  private async generateAILayout(
+    tenantId: string,
+    prompt: string,
+    intent?: MorphicIntent,
+    targetComponents?: string[]
+  ): Promise<Omit<MorphicLayout, 'id'> | null> {
+    const systemPrompt = `You are a UI layout generator for a Morphic interface system.
+Generate a JSON layout based on the user's request. Available component types:
+- DataGrid: For tabular data (props: columns, data)
+- LineChart/BarChart/PieChart: For visualizations (props: data, xKey, yKey)
+- KanbanBoard: For task management (props: columns, items)
+- Ledger: For financial data (props: entries, currency)
+- Whiteboard: For design/drawing (props: elements)
+- ChatPanel: For AI conversation (props: {})
+- MarkdownViewer: For documents (props: content)
+- CodeEditor: For code (props: language, value)
+
+Respond ONLY with valid JSON in this format:
+{"type": "single|split|grid", "components": [{"componentId": "unique-id", "componentType": "TypeName", "props": {}, "position": {"x": 0, "y": 0, "w": 12, "h": 8}}]}`;
+
+    try {
+      const response = await modelRouterService.invoke({
+        modelId: 'groq/llama-3.1-8b-instant',
+        tenantId,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `Intent: ${intent || 'general'}\nRequest: ${prompt}\nPreferred components: ${targetComponents?.join(', ') || 'any'}` },
+        ],
+        maxTokens: 500,
+        temperature: 0.3,
+      });
+
+      const jsonMatch = response.content?.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) return null;
+
+      const layout = JSON.parse(jsonMatch[0]);
+      
+      // Add ghost bindings and IDs to components
+      layout.components = layout.components.map((c: Record<string, unknown>) => ({
+        ...c,
+        id: uuidv4(),
+        ghostBindings: this.inferGhostBindings(c.componentType as string),
+      }));
+
+      return layout;
+    } catch (error) {
+      logger.warn('Failed to parse AI-generated layout', { error });
+      return null;
+    }
+  }
+
+  private inferGhostBindings(componentType: string): Array<{ componentProp: string; contextKey: string; direction: 'ai_to_ui' | 'ui_to_ai' | 'bidirectional' }> {
+    const bindings: Record<string, Array<{ componentProp: string; contextKey: string; direction: 'ai_to_ui' | 'ui_to_ai' | 'bidirectional' }>> = {
+      DataGrid: [{ componentProp: 'data', contextKey: 'grid_data', direction: 'bidirectional' }],
+      LineChart: [{ componentProp: 'data', contextKey: 'chart_data', direction: 'ai_to_ui' }],
+      BarChart: [{ componentProp: 'data', contextKey: 'chart_data', direction: 'ai_to_ui' }],
+      KanbanBoard: [{ componentProp: 'items', contextKey: 'tasks', direction: 'bidirectional' }],
+      Ledger: [{ componentProp: 'entries', contextKey: 'transactions', direction: 'bidirectional' }],
+      Whiteboard: [{ componentProp: 'elements', contextKey: 'canvas_state', direction: 'bidirectional' }],
+    };
+    return bindings[componentType] || [];
+  }
+
   private async evaluateAIReactions(
     sessionId: string,
     key: string,
     value: unknown
   ): Promise<void> {
-    // In production, this would evaluate rules and trigger AI reactions
-    // For now, we'll implement basic pattern matching
-
     const session = await this.getSession(sessionId);
     if (!session) return;
 
-    // Example: If user selects a row with issues, AI offers help
-    if (key === 'user_focus' && typeof value === 'object') {
-      this.emit(sessionId, {
-        type: 'ai_reaction',
-        reaction: {
-          id: uuidv4(),
-          type: 'suggest',
-          payload: { message: 'I can help analyze this item.' },
-          priority: 'low',
-        },
-      });
+    // Get tenant ID for AI calls
+    const tenantId = session.tenantId;
+
+    // AI-powered reaction evaluation for significant state changes
+    if (key === 'user_focus' && typeof value === 'object' && tenantId) {
+      try {
+        const response = await modelRouterService.invoke({
+          modelId: 'groq/llama-3.1-8b-instant',
+          tenantId,
+          messages: [
+            { role: 'system', content: 'You are an AI assistant in a Morphic UI. Briefly suggest (max 20 words) how you can help with the selected item, or respond with "none" if no help needed.' },
+            { role: 'user', content: `User focused on: ${JSON.stringify(value)}` },
+          ],
+          maxTokens: 50,
+          temperature: 0.5,
+        });
+
+        const suggestion = response.content?.trim();
+        if (suggestion && suggestion.toLowerCase() !== 'none') {
+          this.emit(sessionId, {
+            type: 'ai_reaction',
+            reaction: {
+              id: uuidv4(),
+              type: 'suggest',
+              payload: { message: suggestion },
+              priority: 'low',
+            },
+          });
+        }
+      } catch (error) {
+        // Fallback to basic suggestion
+        this.emit(sessionId, {
+          type: 'ai_reaction',
+          reaction: {
+            id: uuidv4(),
+            type: 'suggest',
+            payload: { message: 'I can help analyze this item.' },
+            priority: 'low',
+          },
+        });
+      }
     }
   }
 

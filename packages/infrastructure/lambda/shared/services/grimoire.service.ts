@@ -322,8 +322,119 @@ class GrimoireService {
   }
 
   private async executeSpellLogic(spell: Spell, components: Record<string, unknown>): Promise<unknown> {
-    // This would integrate with the actual AI/processing logic
-    return { message: `Spell ${spell.name} executed`, components };
+    // Execute spell based on its school and category
+    const startTime = Date.now();
+
+    try {
+      switch (spell.school) {
+        case 'code': {
+          // Code transformation spells - integrate with code generation
+          const { brainRouter } = await import('./brain-router.service');
+          const result = await brainRouter.route({
+            tenantId: spell.tenantId,
+            userId: spell.createdBy,
+            taskType: 'coding',
+            prompt: `${spell.incantation}\n\nContext: ${JSON.stringify(components)}`,
+          });
+          return {
+            type: 'code_generation',
+            output: result.response,
+            model: result.selectedModel,
+            processingTimeMs: Date.now() - startTime,
+          };
+        }
+
+        case 'data': {
+          // Data analysis spells - integrate with analytics
+          const { brainRouter } = await import('./brain-router.service');
+          const result = await brainRouter.route({
+            tenantId: spell.tenantId,
+            userId: spell.createdBy,
+            taskType: 'data_analysis',
+            prompt: `Analyze: ${spell.incantation}\n\nData: ${JSON.stringify(components)}`,
+          });
+          return {
+            type: 'data_analysis',
+            output: result.response,
+            insights: result.response,
+            processingTimeMs: Date.now() - startTime,
+          };
+        }
+
+        case 'text': {
+          // Text transformation spells
+          const { brainRouter } = await import('./brain-router.service');
+          const result = await brainRouter.route({
+            tenantId: spell.tenantId,
+            userId: spell.createdBy,
+            taskType: 'writing',
+            prompt: `${spell.incantation}\n\nInput: ${JSON.stringify(components)}`,
+          });
+          return {
+            type: 'text_transformation',
+            output: result.response,
+            processingTimeMs: Date.now() - startTime,
+          };
+        }
+
+        case 'automation': {
+          // Automation spells - create workflows or triggers
+          const automationConfig = {
+            name: spell.name,
+            trigger: components.trigger || 'manual',
+            actions: spell.effect.split(';').map(a => a.trim()),
+            enabled: true,
+          };
+          
+          await executeStatement(
+            `INSERT INTO automation_workflows (tenant_id, name, config, created_by, status)
+             VALUES ($1::uuid, $2, $3::jsonb, $4::uuid, 'active')
+             ON CONFLICT (tenant_id, name) DO UPDATE SET config = $3::jsonb`,
+            [
+              stringParam('tenantId', spell.tenantId),
+              stringParam('name', spell.name),
+              stringParam('config', JSON.stringify(automationConfig)),
+              stringParam('createdBy', spell.createdBy),
+            ]
+          );
+          
+          return {
+            type: 'automation_created',
+            workflow: automationConfig,
+            processingTimeMs: Date.now() - startTime,
+          };
+        }
+
+        case 'integration': {
+          // Integration spells - connect services
+          return {
+            type: 'integration',
+            message: `Integration spell ${spell.name} configured`,
+            components,
+            processingTimeMs: Date.now() - startTime,
+          };
+        }
+
+        default: {
+          // Universal spells - general AI processing
+          const { brainRouter } = await import('./brain-router.service');
+          const result = await brainRouter.route({
+            tenantId: spell.tenantId,
+            userId: spell.createdBy,
+            taskType: 'chat',
+            prompt: `Execute spell "${spell.name}": ${spell.incantation}\n\nComponents: ${JSON.stringify(components)}`,
+          });
+          return {
+            type: 'universal',
+            output: result.response,
+            processingTimeMs: Date.now() - startTime,
+          };
+        }
+      }
+    } catch (error) {
+      logger.error('Spell execution failed', { spellId: spell.id, school: spell.school, error });
+      throw error;
+    }
   }
 
   // --------------------------------------------------------------------------

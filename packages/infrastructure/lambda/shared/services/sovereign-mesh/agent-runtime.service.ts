@@ -751,9 +751,62 @@ Respond with factual, concise observations.`,
     execution: AgentExecution,
     plan: unknown[]
   ): Promise<{ allowed: boolean; reason?: string }> {
-    // Integrate with Genesis Cato safety pipeline
-    // For now, return allowed
-    return { allowed: true };
+    try {
+      // Import and use the Genesis Cato safety pipeline
+      const { CatoSafetyPipeline } = await import('../cato/safety-pipeline.service');
+      const safetyPipeline = new CatoSafetyPipeline();
+
+      // Build execution context for safety evaluation
+      const executionContext = {
+        tenantId: execution.tenantId,
+        sessionId: execution.sessionId || execution.id,
+        userId: execution.userId,
+        systemState: {
+          activeAgents: 1,
+          pendingActions: plan.length,
+          resourceUsage: 0.5,
+        },
+        epistemicUncertainty: 0.3,
+        sensoryPrecision: 0.7,
+        activePersona: null,
+      };
+
+      // Evaluate each planned action through the safety pipeline
+      for (const action of plan) {
+        const actionStr = typeof action === 'string' ? action : JSON.stringify(action);
+        
+        const safetyResult = await safetyPipeline.evaluateAction({
+          prompt: execution.goal || '',
+          proposedPolicy: {
+            action: {
+              type: 'agent_action',
+              description: actionStr,
+              riskLevel: 'medium',
+            },
+            requestedGamma: 1.0,
+          },
+          generatedResponse: actionStr,
+          actorModel: execution.agentId,
+          context: executionContext,
+        });
+
+        if (!safetyResult.allowed) {
+          return {
+            allowed: false,
+            reason: safetyResult.recommendation || `Action blocked by ${safetyResult.blockedBy}`,
+          };
+        }
+      }
+
+      return { allowed: true };
+    } catch (error) {
+      logger.warn('Safety evaluation failed, defaulting to HITL approval', { error, executionId: execution.id });
+      // On safety evaluation failure, require human approval
+      return {
+        allowed: false,
+        reason: 'Safety evaluation failed - requires human approval',
+      };
+    }
   }
 
   private async createHITLRequest(
@@ -784,8 +837,36 @@ Respond with factual, concise observations.`,
       [stringParam('executionId', executionId)]
     );
     
-    // In production: send to SQS for async processing
-    logger.info('Execution dispatched', { executionId, tenantId });
+    // Send to SQS for async processing
+    try {
+      const { SQSClient, SendMessageCommand } = await import('@aws-sdk/client-sqs');
+      const sqs = new SQSClient({ region: process.env.AWS_REGION || 'us-east-1' });
+      const queueUrl = process.env.AGENT_EXECUTION_QUEUE_URL;
+      
+      if (queueUrl) {
+        await sqs.send(new SendMessageCommand({
+          QueueUrl: queueUrl,
+          MessageBody: JSON.stringify({ executionId, tenantId, dispatchedAt: new Date().toISOString() }),
+          MessageGroupId: tenantId,
+          MessageDeduplicationId: `exec-${executionId}`,
+        }));
+        logger.info('Execution dispatched to SQS', { executionId, tenantId });
+      } else {
+        // Fallback: invoke Lambda directly
+        const { LambdaClient, InvokeCommand } = await import('@aws-sdk/client-lambda');
+        const lambda = new LambdaClient({ region: process.env.AWS_REGION || 'us-east-1' });
+        const functionName = process.env.AGENT_WORKER_LAMBDA || `radiant-${process.env.STAGE || 'dev'}-agent-worker`;
+        
+        await lambda.send(new InvokeCommand({
+          FunctionName: functionName,
+          InvocationType: 'Event',
+          Payload: JSON.stringify({ executionId, tenantId }),
+        }));
+        logger.info('Execution dispatched to Lambda', { executionId, tenantId, functionName });
+      }
+    } catch (error) {
+      logger.error('Failed to dispatch execution, will be picked up by scheduler', { executionId, tenantId, error });
+    }
   }
 
   private async updateExecutionStatus(executionId: string, status: AgentExecutionStatus, error?: string): Promise<void> {

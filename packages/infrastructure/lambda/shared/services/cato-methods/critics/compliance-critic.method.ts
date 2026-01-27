@@ -69,10 +69,6 @@ export class CatoComplianceCriticMethod extends CatoBaseMethodExecutor<Complianc
     return signals;
   }
 
-  protected async invokeModel(systemPrompt: string, userPrompt: string, context: MethodExecutionContext): Promise<ModelInvocationResult> {
-    const mock: ComplianceCriticOutput = { criticType: 'COMPLIANCE', verdict: 'APPROVE', score: 0.9, issues: [], strengths: ['Proper audit logging'], recommendations: [], frameworkAssessments: { SOC2: { compliant: true, score: 0.95, gaps: [] } }, dataClassification: { containsPii: false, containsPhi: false, sensitiveFields: [] }, auditRequirements: { retentionDays: 2555, requiredLogs: ['action_log', 'access_log'], signatureRequired: false } };
-    return { response: JSON.stringify(mock), parsedOutput: mock, tokensInput: 500, tokensOutput: 250, costCents: 1, latencyMs: 450, modelId: 'claude-sonnet-4-20250514', provider: 'anthropic' };
-  }
 }
 
 export const createComplianceCriticMethod = (pool: Pool, methodRegistry: CatoMethodRegistryService, schemaRegistry: CatoSchemaRegistryService) => new CatoComplianceCriticMethod(pool, methodRegistry, schemaRegistry);

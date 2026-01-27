@@ -2,7 +2,7 @@
 
 > **Complete guide for managing the RADIANT AI Platform via the Admin Dashboard**
 > 
-> Version: 5.52.6 | Last Updated: January 2026
+> Version: 5.52.40 | Last Updated: January 2026
 >
 > **Compliance Frameworks:** HIPAA, SOC 2 Type II, GDPR, FDA 21 CFR Part 11
 
@@ -38,6 +38,7 @@
 23. [Model Coordination Service](#23-model-coordination-service)
 24. [Ethics Pipeline](#24-ethics-pipeline)
 25. [Inference Components](#26-inference-components-self-hosted-model-optimization)
+26A. [Ghost Inference Configuration](#26a-ghost-inference-configuration-v55240)
 26. [Service Environment Variables](#30-service-environment-variables)
 31A. [**Cato/Genesis Consciousness Architecture - Executive Summary**](#31a-catogenesis-consciousness-architecture---executive-summary)
 32. [Cato Global Consciousness Service](#32-cato-global-consciousness-service)
@@ -66,7 +67,9 @@
 61. [Multi-Protocol Gateway Architecture](#61-multi-protocol-gateway-architecture)
 65. [RAWS v1.1 - Model Selection System](#65-raws-v11---model-selection-system)
 70. [Cortex Memory System](#section-70-cortex-memory-system-v4200)
+73. [Cortex Graph-RAG Knowledge Engine](#section-73-cortex-graph-rag-knowledge-engine)
 75. [Complete Admin API Architecture](#section-75-complete-admin-api-architecture-v5526)
+76. [Security Policy Registry](#section-76-security-policy-registry)
 
 ---
 
@@ -190,6 +193,12 @@ RADIANT supports multiple API key types:
 
 ### 1.4 Authentication Flow & Security
 
+> 📖 **Detailed Documentation**: For comprehensive authentication guides, see:
+> - [Authentication Overview](./authentication/overview.md) - Architecture and feature matrix
+> - [Platform Admin Guide](./authentication/platform-admin-guide.md) - Cognito management, global policies
+> - [Security Architecture](./security/authentication-architecture.md) - Threat models, compliance
+> - [Authentication API Reference](./api/authentication-api.md) - All auth endpoints
+
 #### JWT-Based Authentication
 
 All authentication flows through Amazon Cognito with JWT tokens:
@@ -281,6 +290,349 @@ To verify Tenant Isolation Mode is enabled:
 1. AWS Console → Lambda → Function → Configuration → Concurrency
 2. Check for "Tenant Isolation: Enabled" badge
 3. Or via AWS CLI: `aws lambda get-function-configuration --function-name <name>`
+
+### 1.6 Three-Layer Authentication Architecture (v5.1.1)
+
+RADIANT implements a comprehensive three-layer authentication system for complete security coverage:
+
+#### Layer 1: End-User Authentication
+
+End users authenticate via AWS Cognito User Pool with support for:
+
+| Feature | Description |
+|---------|-------------|
+| **Email/Password** | Standard authentication with strong password policies |
+| **MFA** | Optional or required TOTP, SMS, or email verification |
+| **SSO Federation** | SAML 2.0 and OIDC integration for enterprise customers |
+| **Domain Enforcement** | Force SSO for specific email domains |
+
+**Database Table:** `tenant_users`
+- RLS-protected tenant isolation
+- Role-based access (standard_user, tenant_admin, tenant_owner)
+- Feature flags for app access (Think Tank, Curator, Tenant Admin)
+
+#### Layer 2: Platform Administrator Authentication
+
+Platform admins use a separate Cognito Admin Pool with mandatory MFA:
+
+| Role | Permissions |
+|------|-------------|
+| **super_admin** | Full access, can delete tenants, manage other admins |
+| **admin** | Tenant/user management, model configuration |
+| **operator** | Read-only monitoring and support |
+| **auditor** | Compliance logs and reports only |
+
+**Database Table:** `platform_admins`
+- No RLS (cross-tenant access required)
+- Permission-based authorization
+- Full audit trail of admin actions
+
+#### Layer 3: Service/Machine Authentication
+
+API keys for server-to-server and automated integrations:
+
+| Feature | Description |
+|---------|-------------|
+| **Scoped Access** | Fine-grained permissions (chat:read, embeddings:write, etc.) |
+| **Rate Limiting** | Per-key and global rate limits |
+| **IP Restrictions** | Whitelist allowed IP addresses |
+| **Expiration** | Optional key expiration dates |
+| **Audit Logging** | All key usage tracked in `service_api_key_audit` |
+
+**API Key Scopes:**
+- `chat:read`, `chat:write` - Conversation access
+- `models:read` - Model information
+- `embeddings:write` - Vector embedding generation
+- `files:read`, `files:write` - File upload/download
+- `knowledge:read`, `knowledge:write` - Knowledge graph access
+- `admin:read`, `admin:write` - Administrative operations
+
+#### Enterprise SSO Configuration
+
+Navigate to **Settings → SSO Connections** to configure:
+
+1. **SAML 2.0**
+   - Upload IdP metadata XML or URL
+   - Configure attribute mapping
+   - Set up group-to-role mapping
+
+2. **OIDC**
+   - Enter issuer URL and client credentials
+   - Configure claim mapping
+   - Test connection before enabling
+
+3. **Domain Enforcement**
+   - Specify email domains requiring SSO
+   - Users from enforced domains cannot use password auth
+
+### 1.7 Two-Factor Authentication (MFA) - v5.52.28
+
+RADIANT enforces role-based Multi-Factor Authentication (MFA) using industry-standard TOTP (RFC 6238).
+
+#### MFA Enforcement by Role
+
+| Role | MFA Required | Can Disable |
+|------|--------------|-------------|
+| `super_admin` | **Yes** | No |
+| `admin` | **Yes** | No |
+| `operator` | **Yes** | No |
+| `auditor` | **Yes** | No |
+| `tenant_admin` | **Yes** | No |
+| `tenant_owner` | **Yes** | No |
+| `standard_user` | No (future) | N/A |
+
+**Critical Security Rules:**
+- Admin roles **cannot bypass** MFA enrollment
+- Admin roles **cannot disable** MFA once enrolled
+- MFA enrollment is enforced at login via full-screen gate
+
+#### MFA Enrollment Flow
+
+1. **Login** - User enters email/password
+2. **MFA Check** - System checks if role requires MFA
+3. **Enrollment Gate** - If not enrolled, full-screen enrollment UI appears
+4. **QR Code** - Scan with authenticator app (Google Authenticator, 1Password, Authy)
+5. **Verification** - Enter 6-digit code to confirm
+6. **Backup Codes** - Receive 10 one-time recovery codes
+7. **Complete** - User can now access the dashboard
+
+#### Supported Authenticator Apps
+
+- Google Authenticator
+- Microsoft Authenticator
+- 1Password
+- Authy
+- Any RFC 6238 compliant TOTP app
+
+#### Backup Codes
+
+Each user receives 10 backup codes during enrollment:
+- Format: `XXXX-XXXX` (8 alphanumeric characters)
+- Each code can only be used **once**
+- Warning displayed when < 3 codes remain
+- Regenerate codes from **Settings → Security**
+
+#### Device Trust
+
+Users can opt to "Trust this device for 30 days":
+- Reduces MFA prompts on trusted devices
+- Maximum 5 trusted devices per user
+- Devices can be revoked from Settings
+- Trust expires automatically after 30 days
+
+#### Lockout Policy
+
+| Condition | Action |
+|-----------|--------|
+| 3 failed MFA attempts | 5-minute lockout |
+| Lockout expires | Attempts reset |
+| Successful verification | Attempts reset |
+
+#### MFA Settings Page
+
+Access MFA configuration at **Settings → Security**:
+
+- **Status** - View MFA enabled/disabled status
+- **Backup Codes** - View remaining count, regenerate codes
+- **Trusted Devices** - List and revoke trusted devices
+- **Audit Log** - View MFA-related events
+
+#### Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `tenant_users.mfa_*` | MFA columns for tenant users |
+| `platform_admins.mfa_*` | MFA columns for platform admins |
+| `mfa_backup_codes` | Hashed one-time recovery codes |
+| `mfa_trusted_devices` | 30-day device trust tokens |
+| `mfa_audit_log` | Partitioned audit log for MFA events |
+
+#### MFA API Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/v2/mfa/status` | GET | Get MFA status |
+| `/api/v2/mfa/check` | GET | Check if MFA required |
+| `/api/v2/mfa/enroll/start` | POST | Start enrollment |
+| `/api/v2/mfa/enroll/verify` | POST | Verify enrollment |
+| `/api/v2/mfa/verify` | POST | Verify code during login |
+| `/api/v2/mfa/backup-codes/regenerate` | POST | Regenerate backup codes |
+| `/api/v2/mfa/devices` | GET | List trusted devices |
+| `/api/v2/mfa/devices/:id` | DELETE | Revoke device |
+
+### 1.8 Internationalization & Multi-Language Search (v5.52.29)
+
+RADIANT supports 18 languages for authentication UI and full-text search across all content.
+
+#### Supported Languages
+
+| Language | Code | Direction | Search Method |
+|----------|------|-----------|---------------|
+| English | `en` | LTR | PostgreSQL `english` |
+| Spanish | `es` | LTR | PostgreSQL `spanish` |
+| French | `fr` | LTR | PostgreSQL `french` |
+| German | `de` | LTR | PostgreSQL `german` |
+| Portuguese | `pt` | LTR | PostgreSQL `portuguese` |
+| Italian | `it` | LTR | PostgreSQL `italian` |
+| Dutch | `nl` | LTR | PostgreSQL `dutch` |
+| Polish | `pl` | LTR | PostgreSQL `simple` |
+| Russian | `ru` | LTR | PostgreSQL `russian` |
+| Turkish | `tr` | LTR | PostgreSQL `turkish` |
+| Japanese | `ja` | LTR | `pg_bigm` bi-gram |
+| Korean | `ko` | LTR | `pg_bigm` bi-gram |
+| Chinese (Simplified) | `zh-CN` | LTR | `pg_bigm` bi-gram |
+| Chinese (Traditional) | `zh-TW` | LTR | `pg_bigm` bi-gram |
+| **Arabic** | `ar` | **RTL** | PostgreSQL `simple` |
+| Hindi | `hi` | LTR | PostgreSQL `simple` |
+| Thai | `th` | LTR | PostgreSQL `simple` |
+| Vietnamese | `vi` | LTR | PostgreSQL `simple` |
+
+#### CJK Search (Chinese, Japanese, Korean)
+
+CJK languages require special handling because they don't use word boundaries:
+- **pg_bigm** extension provides bi-gram indexing
+- Automatic language detection on content ingestion
+- `search_content()` function routes queries to appropriate search method
+- GIN indexes on all searchable text columns
+
+#### RTL Support (Arabic)
+
+Arabic users see proper right-to-left layouts:
+- Automatic `dir="rtl"` on auth containers
+- Flipped margins, paddings, and flex directions
+- LTR preservation for emails, codes, passwords
+
+#### Database Migration 071
+
+| Column/Index | Table | Purpose |
+|--------------|-------|---------|
+| `detected_language` | `uds_conversations` | Auto-detected content language |
+| `search_vector_simple` | `uds_conversations` | Fallback tsvector |
+| `search_vector_english` | `uds_conversations` | Language-specific tsvector |
+| `idx_*_bigm_*` | Multiple | GIN bi-gram indexes for CJK |
+
+### 1.9 System Overview Dashboard
+
+Access real-time platform health at **System → Overview**:
+
+#### Component Health Monitoring
+
+| Component | Metrics Tracked |
+|-----------|-----------------|
+| **LiteLLM Gateway** | Tasks, CPU, memory, requests/min |
+| **Aurora PostgreSQL** | ACU, connections, IOPS |
+| **ElastiCache Redis** | Memory, connections, cache hit rate |
+| **Lambda Functions** | Invocations, concurrent executions, throttles |
+| **API Gateway** | Requests/sec, error rates |
+| **Cognito Pools** | Active users, sign-ins, failed logins |
+
+#### Dashboard Features
+
+- **Auto-Refresh**: Real-time updates every 30 seconds
+- **Capacity Planning**: Utilization percentages with headroom alerts
+- **Alert Management**: Active alerts with severity levels
+- **Trend Analysis**: Up/down/stable indicators for all metrics
+
+### 1.8 LiteLLM Gateway Configuration
+
+Access gateway settings at **System → Gateway**:
+
+#### Auto-Scaling Parameters
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| **Min Tasks** | Minimum running ECS tasks | 2 |
+| **Max Tasks** | Maximum scaling limit | 50 |
+| **Desired Tasks** | Initial task count | 2 |
+| **Task CPU** | vCPU units per task (256=0.25 vCPU) | 2048 |
+| **Task Memory** | Memory per task in MB | 4096 |
+
+#### Scaling Thresholds
+
+| Threshold | Description | Default |
+|-----------|-------------|---------|
+| **Target CPU Utilization** | Scale out when exceeded | 70% |
+| **Target Memory Utilization** | Scale out when exceeded | 80% |
+| **Target Requests/Target** | Requests per task before scaling | 1000 |
+| **Scale Out Cooldown** | Wait between scale-out events | 60s |
+| **Scale In Cooldown** | Wait between scale-in events | 300s |
+
+#### Rate Limiting
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Global Rate Limit** | Max requests/second (all tenants) | 10,000 |
+| **Per-Tenant Limit** | Max requests/minute per tenant | 1,000 |
+| **Response Caching** | Cache identical requests | Enabled |
+| **Cache TTL** | How long to cache responses | 3600s |
+
+#### Health Check Settings
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Health Check Path** | Endpoint for health checks | `/health` |
+| **Check Interval** | Time between checks | 30s |
+| **Timeout** | Max wait for response | 10s |
+| **Unhealthy Threshold** | Failed checks before unhealthy | 3 |
+
+### 1.9 SSO Connections Management
+
+Access SSO settings at **Settings → SSO**:
+
+#### Supported Protocols
+
+| Protocol | Use Case |
+|----------|----------|
+| **SAML 2.0** | Enterprise IdPs (Okta, Azure AD, OneLogin) |
+| **OIDC** | Modern IdPs with OpenID Connect support |
+
+#### Creating a SAML Connection
+
+1. Navigate to **Settings → SSO**
+2. Click **Add Connection**
+3. Select **SAML 2.0** protocol
+4. Enter:
+   - **Connection Name**: Human-readable identifier
+   - **Tenant ID**: UUID of the target tenant
+   - **IdP Entity ID**: From your IdP metadata
+   - **IdP SSO URL**: Login endpoint URL
+   - **IdP Certificate**: X.509 certificate (PEM format)
+5. Configure domain enforcement (optional)
+6. Set default user role
+7. Click **Create Connection**
+
+#### Creating an OIDC Connection
+
+1. Navigate to **Settings → SSO**
+2. Click **Add Connection**
+3. Select **OIDC** protocol
+4. Enter:
+   - **Connection Name**: Human-readable identifier
+   - **Tenant ID**: UUID of the target tenant
+   - **Issuer URL**: Your IdP's issuer URL
+   - **Client ID**: From your IdP
+   - **Client Secret**: From your IdP
+5. Configure domain enforcement (optional)
+6. Set default user role
+7. Click **Create Connection**
+
+#### Domain Enforcement
+
+Force users with specific email domains to use SSO:
+
+```
+Enforced Domains: example.com, corp.example.com
+```
+
+Users with `@example.com` or `@corp.example.com` emails cannot use password authentication.
+
+#### Testing Connections
+
+1. Find the connection in the list
+2. Click **⋮** → **Test Connection**
+3. Verify the result:
+   - **Success**: IdP is reachable and responding
+   - **Failure**: Check configuration and IdP status
 
 ---
 
@@ -1542,33 +1894,181 @@ See [Pre-Prompt Learning System Documentation](./PREPROMPT-LEARNING-SYSTEM.md) f
 
 ## 12. Localization
 
-### 12.1 Translation Management
+### 12.1 Translation Registry
 
-Navigate to **Localization** to manage:
+**Location**: Admin Dashboard → Localization → Translation Registry
 
-- Supported languages
-- Translation strings
-- AI translation settings
+The Translation Registry provides comprehensive management of all UI strings across RADIANT applications with tenant-specific override capabilities.
 
-### 11.2 Supported Languages
+**Key Features**:
+- **100+ Pre-Seeded Strings**: Common UI elements, errors, dialogs, validation messages
+- **App-Scoped Categories**: radiant_admin, thinktank_admin, thinktank, curator, common
+- **Tenant Overrides**: Custom text per tenant with protection from auto-updates
+- **18 Language Support**: Full coverage across all supported languages
 
-| Language | Code | Status |
-|----------|------|--------|
-| English | en | Default |
-| Spanish | es | ✓ Enabled |
-| French | fr | ✓ Enabled |
-| German | de | ✓ Enabled |
-| Japanese | ja | ✓ Enabled |
-| Chinese | zh | ✓ Enabled |
+### 12.2 Supported Languages
 
-### 11.3 AI Translation
+| Language | Code | Flag | RTL |
+|----------|------|------|-----|
+| English | en | 🇺🇸 | No |
+| Spanish | es | 🇪🇸 | No |
+| French | fr | 🇫🇷 | No |
+| German | de | 🇩🇪 | No |
+| Portuguese | pt | 🇵🇹 | No |
+| Italian | it | 🇮🇹 | No |
+| Dutch | nl | 🇳🇱 | No |
+| Polish | pl | 🇵🇱 | No |
+| Russian | ru | 🇷🇺 | No |
+| Turkish | tr | 🇹🇷 | No |
+| Japanese | ja | 🇯🇵 | No |
+| Korean | ko | 🇰🇷 | No |
+| Chinese (Simplified) | zh-CN | 🇨🇳 | No |
+| Chinese (Traditional) | zh-TW | 🇹🇼 | No |
+| Arabic | ar | 🇸🇦 | **Yes** |
+| Hindi | hi | 🇮🇳 | No |
+| Thai | th | 🇹🇭 | No |
+| Vietnamese | vi | 🇻🇳 | No |
 
-Enable AI-powered translation:
+### 12.3 Tenant Translation Overrides
 
-1. Navigate to **Localization → Settings**
-2. Enable **"AI Translation"**
-3. Select translation model
-4. Configure quality settings
+Tenant administrators can override any system string with custom text:
+
+**Override Workflow**:
+1. Navigate to **Localization → Translation Registry**
+2. Select target language from dropdown
+3. Browse or search for strings to customize
+4. Click **Edit** to create an override
+5. Enter custom text and save
+
+**Protection System**:
+- **Protected Overrides** (default): Won't be updated by automatic translation
+- **Unprotected Overrides**: May be updated when system translations improve
+- **Revert**: Delete override to return to system translation
+
+**Admin UI Tabs**:
+| Tab | Purpose |
+|-----|---------|
+| **Registry** | Browse all strings, create overrides |
+| **Your Overrides** | Manage existing overrides, toggle protection |
+| **Coverage** | View translation coverage by language |
+
+### 12.4 Translation Override API
+
+**Base URL**: `/api/admin/localization`
+
+#### List Registry Entries
+```http
+GET /api/admin/localization/registry?app_id=thinktank&category=chat&search=error&page=1&limit=50
+```
+
+#### Get Entry with All Translations
+```http
+GET /api/admin/localization/registry/:id
+```
+
+#### List Tenant Overrides
+```http
+GET /api/admin/localization/overrides?language_code=es&protected=true
+```
+
+#### Create/Update Override
+```http
+POST /api/admin/localization/overrides
+Content-Type: application/json
+
+{
+  "registry_id": 42,
+  "language_code": "es",
+  "override_text": "Texto personalizado",
+  "is_protected": true
+}
+```
+
+#### Delete Override (Revert to System)
+```http
+DELETE /api/admin/localization/overrides/:id
+```
+
+#### Toggle Protection
+```http
+PATCH /api/admin/localization/overrides/:id/protection
+Content-Type: application/json
+
+{
+  "is_protected": false
+}
+```
+
+#### Get Translation Bundle (with Overrides Applied)
+```http
+GET /api/admin/localization/bundle/es?app_id=thinktank
+```
+
+**Response**:
+```json
+{
+  "languageCode": "es",
+  "translations": {
+    "thinktank.chat.placeholder": "Escribe tu mensaje...",
+    "common.buttons.save": "Guardar"
+  },
+  "overrideCount": 5,
+  "overrideKeys": ["thinktank.chat.placeholder"]
+}
+```
+
+### 12.5 Tenant Localization Config
+
+Configure language settings per tenant:
+
+```http
+GET /api/admin/localization/config
+PUT /api/admin/localization/config
+```
+
+**Configuration Options**:
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `default_language` | `en` | Default language for new users |
+| `enabled_languages` | `['en']` | Languages available to users |
+| `allow_user_language_selection` | `true` | Let users choose their language |
+| `enable_ai_translation` | `true` | Use AI for missing translations |
+| `brand_name` | `null` | Custom brand name for strings |
+
+### 12.6 Database Schema
+
+| Table | Purpose |
+|-------|---------|
+| `localization_registry` | Source strings with keys, context, category |
+| `localization_translations` | System translations per language |
+| `tenant_translation_overrides` | Tenant-specific overrides with protection |
+| `tenant_localization_config` | Per-tenant language configuration |
+| `translation_audit_log` | Change history for compliance |
+
+### 12.7 String Categories
+
+| Category | Examples |
+|----------|----------|
+| `buttons` | Save, Cancel, Delete, Edit, Submit |
+| `errors` | Network error, Session expired, Validation |
+| `dialogs` | Confirm, Delete confirmation, Unsaved changes |
+| `validation` | Required field, Invalid email, Min/max length |
+| `toasts` | Success messages, Error messages |
+| `time` | Relative time (minutes ago, hours ago) |
+| `pagination` | Showing X to Y, Previous, Next |
+| `tables` | No data, Loading, Search |
+| `upload` | Drag and drop, Max size, Allowed types |
+| `auth` | Sign in, Sign out, Forgot password |
+| `navigation` | Dashboard, Settings, Users |
+| `chat` | Placeholder, Send, Thinking |
+
+### 12.8 Think Tank Admin Localization
+
+Tenant administrators access a simplified localization UI at **Administration → Localization**:
+
+- **Your Overrides**: View and manage custom translations
+- **Browse Strings**: Search Think Tank-specific strings
+- **Configuration**: Set default language and enabled languages
 
 ---
 
@@ -4760,6 +5260,158 @@ Overrides prevent auto-tiering from changing the tier until they expire or are c
 2. **Framework compatibility**: Works with PyTorch, TensorFlow, HuggingFace, Triton
 3. **Memory sharing**: Models compete for GPU memory
 4. **Base cost**: At least one endpoint must run (cannot scale all to zero)
+
+---
+
+## 26A. Ghost Inference Configuration (v5.52.40)
+
+**Location**: Admin Dashboard → System → Ghost Inference
+
+Configure vLLM settings for ghost vector extraction from self-hosted LLaMA models on SageMaker.
+
+### 26A.1 Overview
+
+Ghost Inference uses vLLM to extract hidden states from LLaMA 3 70B models. These hidden states are transformed into "ghost vectors" that capture the semantic essence of text for similarity matching, knowledge retrieval, and personalization.
+
+**Key Concepts:**
+- **Ghost Vectors**: Dense vector representations extracted from model hidden states
+- **vLLM**: High-performance inference engine for large language models
+- **Hidden State Extraction**: Capturing intermediate layer outputs for downstream use
+
+### 26A.2 Dashboard
+
+The Ghost Inference dashboard provides:
+
+| Metric | Description |
+|--------|-------------|
+| **Status** | Current deployment status (active, warming, scaling, error, disabled) |
+| **Requests (24h)** | Total inference requests in last 24 hours |
+| **Avg Latency** | Mean response time with P95 percentile |
+| **Cost (24h)** | SageMaker compute costs and ghost vectors extracted |
+
+### 26A.3 Model Configuration
+
+Configure the underlying LLaMA model and ghost vector extraction:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `modelName` | `meta-llama/Llama-3-70B-Instruct` | HuggingFace model identifier |
+| `modelVersion` | `null` | Git revision or tag (optional) |
+| `returnHiddenStates` | `true` | Enable hidden state extraction |
+| `hiddenStateLayer` | `-1` | Layer to extract (-1 = last, -2 = second to last) |
+| `ghostVectorDimension` | `8192` | Output vector dimension |
+| `dtype` | `float16` | Data type (float16, bfloat16, float32) |
+| `quantization` | `null` | Quantization method (awq, gptq, squeezellm, fp8) |
+
+### 26A.4 Performance Tuning
+
+Optimize vLLM performance for your workload:
+
+| Setting | Default | Range | Description |
+|---------|---------|-------|-------------|
+| `tensorParallelSize` | `4` | 1, 2, 4, 8 | GPUs for model parallelism |
+| `maxModelLen` | `8192` | 1024-131072 | Maximum context length |
+| `gpuMemoryUtilization` | `0.90` | 0.50-0.99 | GPU memory allocation |
+| `maxNumSeqs` | `256` | 1-1024 | Max concurrent sequences |
+| `swapSpaceGb` | `4` | 0-64 | CPU swap space for overflow |
+| `enforceEager` | `false` | - | Disable CUDA graphs |
+
+**Performance Tips:**
+- Higher `gpuMemoryUtilization` = more throughput, but risk of OOM
+- Increase `tensorParallelSize` for larger models
+- Enable `enforceEager` for debugging or compatibility issues
+
+### 26A.5 Infrastructure Settings
+
+Configure SageMaker endpoint settings:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `instanceType` | `ml.g5.12xlarge` | SageMaker instance type |
+| `minInstances` | `1` | Minimum instance count |
+| `maxInstances` | `4` | Maximum instance count for auto-scaling |
+| `scaleToZero` | `false` | Allow scaling to 0 (causes cold starts) |
+| `warmupInstances` | `1` | Instances to keep warm |
+| `maxConcurrentInvocations` | `4` | Max concurrent requests per instance |
+| `startupHealthCheckTimeoutSeconds` | `600` | Container startup timeout |
+| `endpointNamePrefix` | `radiant-ghost` | Prefix for endpoint names |
+
+**Available Instance Types:**
+
+| Instance | GPUs | GPU Type | GPU Memory | vCPUs | Memory | Cost/hr |
+|----------|------|----------|------------|-------|--------|---------|
+| `ml.g5.xlarge` | 1 | A10G | 24 GB | 4 | 16 GB | $1.41 |
+| `ml.g5.2xlarge` | 1 | A10G | 24 GB | 8 | 32 GB | $1.52 |
+| `ml.g5.4xlarge` | 1 | A10G | 24 GB | 16 | 64 GB | $2.03 |
+| `ml.g5.12xlarge` | 4 | A10G | 96 GB | 48 | 192 GB | $7.09 |
+| `ml.g5.48xlarge` | 8 | A10G | 192 GB | 192 | 768 GB | $20.36 |
+| `ml.p4d.24xlarge` | 8 | A100 | 320 GB | 96 | 1152 GB | $32.77 |
+
+### 26A.6 Deployment
+
+Deploy changes to SageMaker:
+
+1. **Validate**: Click "Deploy" to validate configuration
+2. **Review**: Check validation errors, warnings, and cost estimate
+3. **Deploy**: Confirm to create new SageMaker endpoint
+
+**Deployment States:**
+| Status | Description |
+|--------|-------------|
+| `pending` | Deployment queued |
+| `deploying` | SageMaker creating endpoint |
+| `active` | Endpoint healthy and serving |
+| `failed` | Deployment failed (check error message) |
+| `terminated` | Endpoint deleted |
+
+**Typical Startup Time**: 5-10 minutes for LLaMA 70B models
+
+### 26A.7 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/ghost-inference/dashboard` | GET | Complete dashboard data |
+| `/api/admin/ghost-inference/config` | GET | Current configuration |
+| `/api/admin/ghost-inference/config` | POST | Create initial config |
+| `/api/admin/ghost-inference/config` | PUT | Update configuration |
+| `/api/admin/ghost-inference/instance-types` | GET | Available instance types |
+| `/api/admin/ghost-inference/deployments` | GET | Deployment history |
+| `/api/admin/ghost-inference/deploy` | POST | Initiate deployment |
+| `/api/admin/ghost-inference/endpoint-status` | GET | Live SageMaker status |
+| `/api/admin/ghost-inference/vllm-env` | GET | Preview vLLM env vars |
+| `/api/admin/ghost-inference/validate` | POST | Validate config |
+
+### 26A.8 Cost Estimation
+
+| Instance | Min Instances | Hourly Cost | Monthly Cost |
+|----------|---------------|-------------|--------------|
+| ml.g5.12xlarge | 1 | $7.09 | $5,105 |
+| ml.g5.12xlarge | 2 | $14.18 | $10,210 |
+| ml.p4d.24xlarge | 1 | $32.77 | $23,594 |
+
+**Cost Optimization Tips:**
+- Enable `scaleToZero` for non-production (adds cold start latency)
+- Use smaller instance types for development
+- Monitor utilization and adjust `maxInstances`
+
+### 26A.9 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `ghost_inference_config` | Tenant configuration settings |
+| `ghost_inference_deployments` | Deployment history |
+| `ghost_inference_metrics` | Performance metrics |
+| `ghost_inference_instance_types` | Available instance registry |
+
+### 26A.10 Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Deployment stuck in "deploying" | Large model download | Wait 10-15 minutes |
+| OOM errors | High GPU memory utilization | Reduce `gpuMemoryUtilization` |
+| Slow responses | Insufficient parallelism | Increase `tensorParallelSize` |
+| Cold starts | `scaleToZero` enabled | Disable or increase `warmupInstances` |
+| Validation errors | Invalid parameter range | Check parameter limits |
 
 ---
 
@@ -20854,6 +21506,176 @@ Cedar policies enforce that:
 
 ---
 
+## Section 73: Cortex Graph-RAG Knowledge Engine
+
+**Location**: Admin Dashboard → Memory → Graph-RAG
+
+Enterprise knowledge graph with vector embeddings for intelligent retrieval-augmented generation.
+
+### 73.1 Overview
+
+The Cortex Graph-RAG system provides persistent knowledge storage with semantic relationships:
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Entities** | PostgreSQL + pgvector | Knowledge nodes with embeddings |
+| **Relationships** | PostgreSQL | Typed connections between entities |
+| **Chunks** | PostgreSQL + pgvector | Text segments for RAG retrieval |
+| **Vector Search** | HNSW Index | Fast approximate nearest neighbor |
+
+### 73.2 Dashboard Features
+
+**Overview Page** (`/cortex/graph-rag`):
+- Entity/relationship/chunk counts
+- Graph health status (embedding service, vector index)
+- Recent activity log
+- Top accessed entities
+
+**Tabs**:
+- **Entities**: Browse, search, create, delete knowledge entities
+- **Activity**: Recent operations log
+- **Configuration**: Feature toggles and retrieval settings
+
+### 73.3 Entity Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `person` | Human entities | "John Smith" |
+| `organization` | Companies, groups | "Acme Corp" |
+| `concept` | Abstract ideas | "Machine Learning" |
+| `event` | Occurrences | "Q4 2025 Launch" |
+| `location` | Places | "San Francisco HQ" |
+| `document` | Source documents | "User Manual v3" |
+| `topic` | Subject areas | "Hydraulics" |
+
+### 73.4 Relationship Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `is_a` | Type hierarchy | "Python is_a Programming Language" |
+| `part_of` | Composition | "Chapter 1 part_of Manual" |
+| `related_to` | General association | "AI related_to Machine Learning" |
+| `works_for` | Employment | "John works_for Acme" |
+| `located_in` | Geographic | "HQ located_in California" |
+| `created_by` | Authorship | "Report created_by Jane" |
+| `depends_on` | Dependency | "Feature depends_on API" |
+
+### 73.5 Configuration Options
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `enableGraphRag` | true | Enable knowledge graph retrieval |
+| `enableEntityExtraction` | true | Auto-extract entities from content |
+| `enableRelationshipInference` | true | Auto-infer entity relationships |
+| `enableAutoMerge` | true | Merge duplicate entities |
+| `embeddingModel` | text-embedding-3-small | Model for vector embeddings |
+| `entityExtractionModel` | gpt-4o-mini | Model for entity extraction |
+| `defaultMaxResults` | 10 | Max results per query |
+| `defaultMaxDepth` | 3 | Max graph traversal depth |
+| `minRelevanceScore` | 0.7 | Minimum similarity score |
+| `hybridSearchAlpha` | 0.5 | Weight for hybrid search |
+
+### 73.6 Vector Search
+
+The system uses HNSW (Hierarchical Navigable Small World) indexing for fast vector similarity search:
+
+```sql
+-- Similarity search function
+SELECT * FROM search_cortex_entities(
+  p_tenant_id := 'tenant-uuid',
+  p_embedding := '[vector]',
+  p_limit := 10,
+  p_min_similarity := 0.7
+);
+```
+
+**Hybrid Search** combines:
+- Vector similarity (configurable weight)
+- Full-text search on name/description
+- Graph traversal for relationship context
+
+### 73.7 Graph Traversal
+
+Retrieve entity neighbors using recursive CTE:
+
+```sql
+SELECT * FROM get_entity_neighbors(
+  p_tenant_id := 'tenant-uuid',
+  p_entity_id := 'entity-uuid',
+  p_depth := 2,
+  p_relationship_types := ARRAY['related_to', 'part_of']
+);
+```
+
+### 73.8 Content Ingestion
+
+Ingest content to automatically extract entities and relationships:
+
+```bash
+POST /api/admin/cortex/ingest
+{
+  "tenantId": "uuid",
+  "source": {
+    "type": "text",
+    "content": "John Smith works at Acme Corp in San Francisco..."
+  },
+  "options": {
+    "extractEntities": true,
+    "extractRelationships": true,
+    "createChunks": true
+  }
+}
+```
+
+### 73.9 API Endpoints
+
+**Base**: `/api/admin/cortex`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/dashboard` | Full dashboard data |
+| GET | `/config` | Get configuration |
+| PUT | `/config` | Update configuration |
+| GET | `/entities` | List entities |
+| POST | `/entities` | Create entity |
+| GET | `/entities/:id` | Get entity |
+| PUT | `/entities/:id` | Update entity |
+| DELETE | `/entities/:id` | Delete entity |
+| GET | `/entities/:id/neighbors` | Get neighbors |
+| GET | `/relationships` | List relationships |
+| POST | `/relationships` | Create relationship |
+| DELETE | `/relationships/:id` | Delete relationship |
+| GET | `/chunks` | List chunks |
+| POST | `/search` | Full-text search |
+| POST | `/query` | Vector similarity search |
+| POST | `/ingest` | Ingest content |
+| POST | `/merge` | Merge entities |
+| GET | `/stats` | Get statistics |
+
+### 73.10 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `packages/shared/src/types/cortex-graph-rag.types.ts` | Type definitions |
+| `packages/infrastructure/migrations/V2026_01_25_008__cortex_graph_rag.sql` | Database schema |
+| `packages/infrastructure/lambda/admin/cortex-graph-rag.ts` | Admin API |
+| `apps/admin-dashboard/app/(dashboard)/cortex/graph-rag/page.tsx` | Dashboard UI |
+
+### 73.11 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `cortex_config` | Per-tenant configuration |
+| `cortex_entities` | Knowledge entities with embeddings |
+| `cortex_relationships` | Entity relationships |
+| `cortex_chunks` | Text chunks for RAG |
+| `cortex_activity_log` | Activity tracking |
+| `cortex_query_log` | Query analytics |
+
+All tables have RLS policies for multi-tenant isolation using `app.current_tenant_id`.
+
+---
+
 ## Section 75: Complete Admin API Architecture (v5.52.6)
 
 ### 75.1 Overview
@@ -20926,10 +21748,536 @@ In v5.52.6, a critical infrastructure audit identified that only ~31 of 62 admin
 
 ---
 
+## Section 77: Expert System Adapters (v5.52.21)
+
+### 77.1 Overview
+
+Expert System Adapters (ESA) enable tenant-trainable domain intelligence through automatic LoRA adapter training. Unlike generic AI platforms that treat all tenants the same, ESA allows each tenant to build specialized AI expertise that continuously improves through interaction feedback.
+
+**Key Benefit**: Zero ML expertise required—the system learns automatically from user interactions.
+
+### 77.2 Tri-Layer Adapter Architecture
+
+ESA implements a four-layer adapter stacking system:
+
+```
+W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User) + (scale × W_Domain)
+```
+
+| Layer | Name | Purpose | Management |
+|-------|------|---------|------------|
+| **0** | Genesis | Base model weights | Frozen, never modified |
+| **1** | Cato | Global constitution, tenant values | Pinned in memory, never evicted |
+| **2** | User | Personal preferences, style | LRU eviction when memory constrained |
+| **3** | Domain | Specialized expertise | Auto-selected by domain detection |
+
+### 77.3 Admin Dashboard
+
+**Location**: `/models/lora-adapters`
+
+The LoRA Adapters page provides:
+- **Summary Cards**: Global adapters, User adapters, Invocations (24h), Average latency
+- **Tri-Layer Diagram**: Visual representation of adapter stacking
+- **Configuration Tab**: Enable/disable adapters, scale settings, auto-selection
+- **Adapters Tab**: Registry by layer with activation toggles
+- **Warmup Tab**: Manual warmup triggers and history
+
+### 77.4 Configuration Options
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Enable LoRA Adapters | Off | Master toggle for adapter stacking |
+| Use Global Adapter (Cato) | On | Include global constitution adapter |
+| Use User Adapter | On | Include personal preference adapter |
+| Global Scale | 1.0 | Scaling factor for global adapter (0-2) |
+| User Scale | 1.0 | Scaling factor for user adapter (0-2) |
+| Auto Selection | Off | Automatically select best adapter |
+| Rollback Enabled | On | Fall back to base model on failure |
+| LRU Eviction | On | Evict least-recently-used adapters |
+| Max Adapters in Memory | 50 | Maximum loaded adapters |
+| Warmup Interval | 15 min | How often to pre-load adapters |
+
+### 77.5 Implicit Feedback Learning
+
+ESA automatically captures 11 feedback signals from user behavior:
+
+| Signal | Weight | Meaning |
+|--------|--------|---------|
+| Copy Response | +0.80 | User copied the output |
+| Thumbs Up | +1.00 | Explicit positive feedback |
+| Follow-up Question | +0.30 | Partial success, needs more |
+| Long Dwell Time | +0.40 | User engaged with response |
+| Share Response | +0.50 | User shared the output |
+| Save Response | +0.50 | User bookmarked output |
+| Regenerate Request | -0.50 | Response wasn't satisfactory |
+| Rephrase Question | -0.50 | Original missed the mark |
+| Quick Dismiss | -0.40 | User quickly moved on |
+| Abandon Conversation | -0.70 | Complete failure |
+| Thumbs Down | -1.00 | Explicit negative feedback |
+
+### 77.6 Training Pipeline
+
+Training occurs automatically based on configurable thresholds:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Min Candidates | 25 | Total candidates before training |
+| Min Positive | 15 | Minimum positive examples |
+| Min Negative | 5 | Minimum negative examples |
+| Training Frequency | Weekly | How often to train |
+| Auto Optimal Time | On | Detect best training time |
+
+### 77.7 Domain Auto-Selection
+
+When a query arrives, ESA scores available adapters:
+
+```
+Score = (0.3 × DomainMatch) + (0.1 × SubdomainBonus) + (0.25 × SatisfactionScore)
+      + (0.1 × VolumeScore) + (0.05 × ErrorRate) + (0.2 × RecencyScore)
+```
+
+Adapter selected if Score ≥ 0.5
+
+### 77.8 API Endpoints
+
+**Base Path**: `/api/admin/learning`
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/config` | GET | Get learning configuration |
+| `/config` | PUT | Update learning configuration |
+| `/domain-adapters` | GET | List domain adapters |
+| `/domain-adapters/{domain}` | GET | Get active adapter for domain |
+| `/training/queue` | GET | View training queue status |
+| `/training/trigger` | POST | Manually trigger training |
+| `/performance/{adapterId}` | GET | Get adapter performance metrics |
+
+### 77.9 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `migrations/108_enhanced_learning.sql` | Database schema |
+| `lambda/shared/services/enhanced-learning.service.ts` | Core learning service |
+| `lambda/shared/services/lora-inference.service.ts` | Tri-layer inference |
+| `lambda/shared/services/adapter-management.service.ts` | Adapter selection |
+| `lambda/admin/enhanced-learning.ts` | Admin API handler |
+| `apps/admin-dashboard/app/(dashboard)/models/lora-adapters/page.tsx` | Admin UI |
+| `docs/EXPERT-SYSTEM-ADAPTERS.md` | Strategic vision document |
+
+---
+
+## Section 76: PostgreSQL Scaling Infrastructure (v5.52.20)
+
+### 76.1 Overview
+
+**Problem**: When 6 AI models execute in parallel per request, each Lambda opens a database connection. At 100 concurrent requests × 6 parallel writes = 600 connections—exceeding Aurora's limits and causing transaction conflicts.
+
+**Solution**: OpenAI-inspired PostgreSQL scaling patterns deployed automatically for Tier 2+ installations.
+
+### 76.2 Components
+
+| Component | Purpose | Tier |
+|-----------|---------|------|
+| **RDS Proxy** | Connection pooling, Lambda cold-start optimization | 2+ |
+| **Async Write Queue** | SQS-based batch writes for model results | 2+ |
+| **Redis Hot-Path Cache** | Read-after-write consistency, rate limiting | 2+ |
+| **Time-Based Partitioning** | Monthly partitions for logs/usage tables | All |
+| **Materialized Views** | Pre-computed dashboard metrics | All |
+| **Optimized RLS Policies** | Index-friendly tenant isolation | All |
+
+### 76.3 RDS Proxy Configuration
+
+Connection limits are tier-based for optimal resource usage:
+
+| Tier | Max Connections % | Idle Timeout | Use Case |
+|------|-------------------|--------------|----------|
+| 1 | 60% | 1800s | Development |
+| 2 | 70% | 1800s | Starter |
+| 3 | 80% | 1200s | Growth |
+| 4 | 85% | 900s | Scale |
+| 5 | 90% | 600s | Enterprise |
+
+### 76.4 Async Write Pattern
+
+Model execution results are written asynchronously to avoid blocking request latency:
+
+```
+Request Flow:
+User → Lambda → 6 AI Models (parallel) → SQS Queue → Batch Writer → PostgreSQL
+                     ↓
+              Redis Cache (immediate read-after-write)
+```
+
+**Queue Configuration**:
+- Encrypted with tenant KMS key
+- 14-day message retention
+- 300-second visibility timeout
+- Dead letter queue after 3 failures
+
+**Batch Writer Lambda**:
+- Processes up to 100 messages per batch
+- Tier-based concurrency (5-100 concurrent executions)
+- Bulk INSERT for 10-50x efficiency
+
+### 76.5 Redis Caching
+
+Hot-path operations use Redis for immediate consistency:
+
+| Operation | Cache TTL | Purpose |
+|-----------|-----------|---------|
+| Model results | 1 hour | Read-after-write consistency |
+| Rate limits | Per window | Tenant/resource throttling |
+| Session state | 30 min | Lambda-to-Lambda context |
+
+**Tier-Based Cluster Sizing**:
+
+| Tier | Node Type | Shards | Replicas |
+|------|-----------|--------|----------|
+| 1 | cache.t4g.micro | 1 | 0 |
+| 2 | cache.t4g.small | 1 | 1 |
+| 3 | cache.r6g.large | 2 | 1 |
+| 4 | cache.r6g.xlarge | 3 | 2 |
+| 5 | cache.r6g.2xlarge | 5 | 2 |
+
+### 76.6 Time-Based Partitioning
+
+High-volume tables are partitioned by month:
+
+| Table | Partition Key | Retention |
+|-------|---------------|-----------|
+| `model_execution_logs_partitioned` | `created_at` | 24 months |
+| `usage_records_partitioned` | `timestamp` | 24 months |
+
+Partitions are:
+- Auto-created 3 months ahead
+- Archived after 24 months
+- Managed via `manage_time_partitions()` function
+
+### 76.7 Materialized Views
+
+Dashboard metrics are pre-computed on schedule:
+
+| View | Refresh | Dashboard Use |
+|------|---------|---------------|
+| `tenant_daily_usage_summary` | 15 min | Usage cards |
+| `model_performance_summary` | 1 hour | Model health |
+| `tenant_cost_summary` | 1 hour | Billing |
+| `user_activity_summary` | 1 hour | Engagement |
+| `platform_health_stats` | 5 min | Admin overview |
+| `model_popularity_ranking` | 1 hour | Model selection |
+
+### 76.8 Monitoring
+
+Critical metrics to watch:
+
+| Metric | Warning | Critical | Action |
+|--------|---------|----------|--------|
+| RDS Proxy connections | < 20% | < 10% | Reduce Lambda concurrency |
+| Aurora CPU | > 70% | > 80% | Add read replicas |
+| SQS queue age | > 30s | > 60s | Increase batch writer concurrency |
+| Query P95 latency | > 300ms | > 500ms | Optimize queries |
+| Redis memory | > 70% | > 80% | Scale cluster |
+
+### 76.9 Implementation Files
+
+**CDK Constructs**:
+| File | Purpose |
+|------|---------|
+| `lib/constructs/database-scaling.construct.ts` | RDS Proxy CDK construct |
+| `lib/constructs/async-write.construct.ts` | SQS + batch writer CDK construct |
+| `lib/constructs/redis-cache.construct.ts` | ElastiCache Redis CDK construct |
+| `lib/stacks/data-stack.ts` | Integration (tier 2+) |
+
+**Lambda Handlers & Services**:
+| File | Purpose |
+|------|---------|
+| `lambda/scaling/batch-writer.ts` | Batch writer Lambda handler with partial failure reporting |
+| `lambda/scaling/model-result-cache.service.ts` | Redis cache service for read-after-write |
+| `lambda/scaling/postgresql-scaling.service.ts` | Application-level PostgreSQL scaling orchestration |
+
+**Database Migrations (5 total)**:
+| Migration | Purpose |
+|-----------|---------|
+| `V2026_01_25_001__postgresql_scaling_rls.sql` | Optimized RLS with SELECT wrapper; batch staging; rate limiting |
+| `V2026_01_25_002__postgresql_scaling_partitioning.sql` | Monthly partitioning; partition management functions |
+| `V2026_01_25_003__postgresql_scaling_materialized_views.sql` | 6 materialized views; refresh orchestration |
+| `V2026_01_25_004__postgresql_scaling_strategic_indexes.sql` | BRIN/GIN/covering indexes; slow query tracking; index health |
+| `V2026_01_25_005__postgresql_scaling_read_replica_routing.sql` | Read replica routing; session affinity; hot/cold paths |
+
+### 76.10 Strategic Indexing
+
+| Index Type | Tables | Purpose |
+|------------|--------|---------|
+| **BRIN** | `model_execution_logs_partitioned`, `usage_records_partitioned` | 100x smaller than B-tree for time-series |
+| **Partial** | All log tables | Hot-path queries (recent, pending, failed only) |
+| **Covering** | Dashboard queries | Index-only scans eliminate table lookups |
+| **GIN** | JSONB metadata columns | Efficient containment queries |
+| **Expression** | Date truncation | Pre-computed daily/hourly grouping |
+
+### 76.11 Read Replica Routing
+
+Automatic query routing based on type and consistency requirements:
+
+| Query Type | Target | Consistency |
+|------------|--------|-------------|
+| Writes | Primary | Strong |
+| Reads (within 5s of write) | Primary | Strong (session affinity) |
+| Dashboard reads | Any replica | Eventual |
+| Analytics queries | Dedicated replica | Eventual |
+| Materialized view reads | Any replica | Eventual |
+
+### 76.12 Slow Query Tracking
+
+Automatic capture of queries exceeding 500ms:
+- Query hash for deduplication
+- Execution plan capture
+- Aggregated statistics in `query_performance_hints`
+- Index suggestions via `suggest_indexes()` function
+
+### 76.13 Maintenance Functions
+
+| Function | Schedule | Purpose |
+|----------|----------|---------|
+| `refresh_priority_materialized_views()` | Every 15 min | Dashboard metrics |
+| `refresh_all_materialized_views()` | Every hour | All materialized views |
+| `ensure_future_partitions(3)` | Daily | Create next 3 months of partitions |
+| `perform_scheduled_maintenance()` | Daily | Vacuum, analyze, cleanup |
+| `analyze_index_health()` | Weekly | Identify unused/inefficient indexes |
+
+### 76.14 Admin Dashboard UI
+
+The PostgreSQL Scaling monitoring dashboard is available at:
+```
+/infrastructure/postgresql-scaling
+```
+
+**Dashboard Tabs**:
+
+| Tab | Features |
+|-----|----------|
+| **Overview** | Connection history, materialized view status, real-time refresh controls |
+| **Queues** | Batch writer queue status, pending/processing/failed/completed counts, retry failed button |
+| **Replicas** | Read replica health, lag monitoring, primary/replica status, weights |
+| **Partitions** | Partition statistics per table, row counts, sizes, ensure future partitions button |
+| **Slow Queries** | Top slow query patterns, index suggestions, recent slow queries with timing |
+| **Maintenance** | Manual maintenance triggers, scheduled task overview, maintenance history |
+
+**Summary Cards**:
+- **Connections**: Active/Max with utilization percentage
+- **Queue Status**: Pending count with health indicator
+- **Replicas**: Healthy/Total with overall health badge
+- **Query Latency**: P95 latency with P50/P99 breakdown
+
+**Admin API Endpoints** (Base: `/api/admin/scaling`):
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/dashboard` | GET | Complete dashboard data |
+| `/connections` | GET | Connection pool metrics |
+| `/queues` | GET | Batch writer queue status |
+| `/queues/retry-failed` | POST | Retry failed batch writes |
+| `/queues/clear-completed` | DELETE | Clear completed writes |
+| `/replicas` | GET | Read replica health |
+| `/partitions` | GET | Partition statistics |
+| `/partitions/ensure-future` | POST | Create future partitions |
+| `/slow-queries` | GET | Slow query analysis |
+| `/indexes` | GET | Index health analysis |
+| `/indexes/suggestions` | GET | Index suggestions |
+| `/materialized-views` | GET | MV status |
+| `/materialized-views/refresh` | POST | Trigger MV refresh |
+| `/tables` | GET | Table statistics |
+| `/maintenance/run` | POST | Run maintenance |
+| `/maintenance/history` | GET | Maintenance history |
+| `/rate-limits` | GET | Rate limiting status |
+
+---
+
+---
+
+## Section 76: Security Policy Registry
+
+> **Version**: 5.52.31 | **Path**: `/security/policies`
+
+The Security Policy Registry provides **dynamic, admin-configurable security policies** for defending against prompt injection, jailbreak, data exfiltration, and other AI security attacks. Based on **OWASP LLM Top 10 2025** research.
+
+### 76.1 Overview
+
+Unlike hardcoded security rules, the Security Policy Registry allows administrators to:
+
+- **View** all active security policies (system and custom)
+- **Create** custom policies tailored to their organization
+- **Edit** policy patterns, severity, and actions
+- **Toggle** policies on/off without code changes
+- **Test** inputs against all policies before deployment
+- **Review** violations and mark false positives
+- **Analyze** security statistics and trends
+
+### 76.2 Policy Categories
+
+| Category | Description | Example Attacks |
+|----------|-------------|-----------------|
+| `prompt_injection` | Direct/indirect prompt injection | "Ignore previous instructions" |
+| `system_leak` | Architecture/prompt disclosure | "Show me your system prompt" |
+| `sql_injection` | SQL injection in prompts | "' OR 1=1; DROP TABLE users" |
+| `data_exfiltration` | Unauthorized data access | "Export all customer data" |
+| `cross_tenant` | Multi-tenant isolation breaches | "Access tenant_id=xxx" |
+| `privilege_escalation` | Elevated permission attempts | "Make me an admin" |
+| `jailbreak` | Safety bypass attempts | "DAN mode enabled" |
+| `encoding_attack` | Obfuscation techniques | Base64, Unicode homoglyphs |
+| `payload_splitting` | Fragmented attacks | Split malicious prompts |
+| `pii_exposure` | PII extraction attempts | "List all SSNs" |
+| `rate_abuse` | Resource exhaustion | Rapid-fire requests |
+| `custom` | Tenant-specific policies | Organization-defined |
+
+### 76.3 Detection Methods
+
+| Method | Description | Use Case |
+|--------|-------------|----------|
+| `regex` | Regular expression matching | Pattern-based detection |
+| `keyword` | Keyword/phrase detection | Simple blocklists |
+| `heuristic` | Rule-based detection | Encoding attacks, homoglyphs |
+| `semantic` | AI-based analysis | Context-aware detection |
+| `embedding_similarity` | Vector similarity | Known attack patterns |
+| `composite` | Multiple methods | Defense in depth |
+
+### 76.4 Policy Actions
+
+| Action | Description | User Experience |
+|--------|-------------|-----------------|
+| `block` | Block request entirely | Request denied message |
+| `warn` | Allow with warning | Warning shown, request proceeds |
+| `redact` | Remove matched content | Sanitized input processed |
+| `rate_limit` | Apply rate limiting | Slower responses |
+| `require_approval` | Human approval needed | Request queued for review |
+| `log_only` | Log without action | Transparent to user |
+| `escalate` | Notify security team | Alert sent, request may proceed |
+
+### 76.5 Admin Dashboard
+
+**Location**: Admin Dashboard → Security → Policies
+
+**Features**:
+
+1. **Statistics Cards**
+   - Total violations (30 days)
+   - System policies count
+   - Custom policies count
+   - False positive rate
+
+2. **Policy List**
+   - Filterable by category
+   - Searchable by name/pattern
+   - Toggle system policy visibility
+   - Enable/disable individual policies
+   - View match count and last triggered
+
+3. **Create/Edit Policy**
+   - Name and description
+   - Category selection
+   - Detection method and pattern
+   - Severity level
+   - Action to take
+   - Priority ordering
+   - Custom user message
+
+4. **Test Input**
+   - Enter any text to test
+   - See all matching policies
+   - View which would block/warn
+   - Useful before deploying new policies
+
+### 76.6 Pre-Seeded System Policies
+
+The system comes with 20+ pre-configured policies covering:
+
+| Policy | Category | Severity | Action |
+|--------|----------|----------|--------|
+| System Prompt Leak - Direct Request | system_leak | high | block |
+| System Prompt Leak - Ignore Previous | prompt_injection | critical | block |
+| System Prompt Leak - Role Override | jailbreak | critical | block |
+| SQL Injection - Basic Patterns | sql_injection | critical | block |
+| SQL Injection - Comment Bypass | sql_injection | critical | block |
+| Data Exfiltration - Export Requests | data_exfiltration | high | block |
+| Data Exfiltration - List All Users | data_exfiltration | high | block |
+| Cross-Tenant - Other Tenant Data | cross_tenant | critical | block |
+| Cross-Tenant - Tenant ID Injection | cross_tenant | critical | block |
+| Privilege Escalation - Admin Access | privilege_escalation | critical | block |
+| Privilege Escalation - Bypass Auth | privilege_escalation | critical | block |
+| Jailbreak - DAN Mode | jailbreak | critical | block |
+| Jailbreak - Hypothetical Scenario | jailbreak | high | warn |
+| Encoding Attack - Base64 | encoding_attack | medium | warn |
+| PII Request - SSN | pii_exposure | critical | block |
+| PII Request - Credit Cards | pii_exposure | critical | block |
+| Architecture Discovery - Database Schema | system_leak | high | block |
+| Architecture Discovery - API Endpoints | system_leak | high | block |
+| Architecture Discovery - Tech Stack | system_leak | medium | warn |
+
+**System policies cannot be deleted** but can be toggled on/off.
+
+### 76.7 Admin API Endpoints
+
+**Base Path**: `/api/admin/security-policies`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | List all policies |
+| `/` | POST | Create custom policy |
+| `/:id` | GET | Get single policy |
+| `/:id` | PUT | Update policy |
+| `/:id` | DELETE | Delete custom policy |
+| `/:id/toggle` | POST | Enable/disable policy |
+| `/violations` | GET | List violations |
+| `/violations/:id/false-positive` | POST | Mark false positive |
+| `/stats` | GET | Security statistics |
+| `/test` | POST | Test input against policies |
+| `/categories` | GET | Get categories, severities, actions |
+
+### 76.8 Integration Points
+
+The Security Policy Service integrates at the **AI request layer**:
+
+```
+User Input → Security Check → [Block/Warn/Allow] → AI Processing
+                   ↓
+            Violation Log
+```
+
+**Key Integration Files**:
+- Service: `lambda/shared/services/security-policy.service.ts`
+- Admin API: `lambda/admin/security-policies.ts`
+- Migration: `migrations/V2026_01_26_001__security_policy_registry.sql`
+
+### 76.9 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `security_policies` | Core policy registry |
+| `security_policy_violations` | Violation audit log |
+| `security_attack_patterns` | Known attack patterns (for embedding similarity) |
+| `security_policy_groups` | Policy organization |
+| `security_rate_limits` | Rate limiting configuration |
+
+### 76.10 Best Practices
+
+1. **Start with system policies** - Enable all system policies first
+2. **Monitor violations** - Review the violation log weekly
+3. **Mark false positives** - Improve policy accuracy over time
+4. **Test before deploying** - Use the test feature for new policies
+5. **Use appropriate severity** - Critical = block, High = warn, etc.
+6. **Custom policies for your domain** - Add organization-specific patterns
+7. **Review statistics** - Track trends and adjust policies
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| **5.52.31** | 2026-01-26 | Security Policy Registry (OWASP LLM Top 10 2025); Dynamic admin-configurable security policies; 12 policy categories; 6 detection methods; 20+ pre-seeded system policies; Violation logging and analytics; Admin dashboard with test feature |
+| **5.52.26** | 2026-01-25 | OAuth 2.0 Provider & Developer Portal (PROMPT-41A); RFC 6749 compliant authorization server; Authorization Code (PKCE), Client Credentials, Refresh Token grants; 14 default scopes; Admin dashboard for app management; OIDC discovery endpoints |
+| **5.52.22** | 2026-01-25 | PostgreSQL Scaling Admin Dashboard; Full visibility into queues, connections, replicas, partitions, slow queries, indexes, materialized views, and maintenance; 17 new admin API endpoints |
+| **5.52.21** | 2026-01-25 | Expert System Adapters documentation; Strategic vision document; Moat #6D documentation; Tri-layer adapter architecture documentation |
+| **5.52.20** | 2026-01-25 | PostgreSQL Scaling Infrastructure; RDS Proxy for connection pooling; Async write pattern with SQS batch writer; Redis hot-path caching; Time-based partitioning; Materialized views; Optimized RLS policies |
 | **5.52.6** | 2026-01-24 | Complete CDK Wiring Audit; ALL 62 admin Lambda handlers now wired to API Gateway including Cato Safety (5), Memory Systems (4), AI/ML (7), Security (5), Operations (5), Reporting (4), Configuration (7), Infrastructure (6), Compliance (4), Models (5), Orchestration (2), Users (2), Time & Translation (3); Entire admin API surface now operational |
 | **5.52.5** | 2026-01-24 | Services Layer Implementation; API Keys with interface types (API, MCP, A2A); A2A Protocol Worker; Cedar interface access policies; Admin UI in both admin apps; Key sync mechanism; Database access restrictions |
 | **5.52.4** | 2026-01-24 | Semantic Blackboard Admin Dashboard; CDK API route for blackboard Lambda; Complete admin UI with Facts, Groups, Agents, Locks, and Configuration tabs |
@@ -20960,7 +22308,7 @@ In v5.52.6, a critical infrastructure audit identified that only ~31 of 62 admin
 
 ---
 
-*Version 5.52.6 | January 2026*
+*Version 5.52.26 | January 2026*
 *Cross-AI Validated: Claude Opus 4.5 ✓ | Google Gemini ✓*
-*System Evolution: Complete Admin API Architecture + CDK Wiring Audit*
+*System Evolution: OAuth 2.0 Provider & Developer Portal*
 *Status: GO FOR LAUNCH*

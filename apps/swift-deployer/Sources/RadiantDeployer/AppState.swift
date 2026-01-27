@@ -137,7 +137,7 @@ final class AppState: ObservableObject {
     }
 }
 
-// MARK: - Navigation
+// MARK: - Navigation (v5.52.17)
 enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
     // Main
     case dashboard = "Dashboard"
@@ -155,13 +155,15 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
     case models = "Models"
     case selfHosted = "Self-Hosted"
     
-    // Configuration
-    case domains = "Domains"
+    // Configuration (v5.52.17 - renamed and added)
+    case domainUrls = "Domain URLs"
     case email = "Email"
+    case curator = "Curator"
     
-    // Advanced
+    // Advanced (v5.52.17 - added Cortex)
     case multiRegion = "Multi-Region"
     case abTesting = "A/B Testing"
+    case cortex = "Cortex Memory"
     
     // Security & Compliance
     case security = "Security"
@@ -186,10 +188,12 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
         case .providers: return "building.2"
         case .models: return "cpu"
         case .selfHosted: return "memorychip"
-        case .domains: return "globe.americas"
+        case .domainUrls: return "globe.americas"
         case .email: return "envelope"
+        case .curator: return "book.pages"
         case .multiRegion: return "globe"
         case .abTesting: return "flask"
+        case .cortex: return "brain"
         case .security: return "shield.lefthalf.filled"
         case .compliance: return "checkmark.shield"
         case .costs: return "dollarsign.circle"
@@ -210,10 +214,12 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
         case .providers: return .teal
         case .models: return .pink
         case .selfHosted: return .mint
-        case .domains: return .cyan
+        case .domainUrls: return .cyan
         case .email: return .orange
+        case .curator: return .orange
         case .multiRegion: return .blue
         case .abTesting: return .purple
+        case .cortex: return .purple
         case .security: return .red
         case .compliance: return .green
         case .costs: return .yellow
@@ -235,11 +241,11 @@ enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
     }
     
     static var configTabs: [NavigationTab] {
-        [.domains, .email]
+        [.domainUrls, .email, .curator]
     }
     
     static var advancedTabs: [NavigationTab] {
-        [.multiRegion, .abTesting]
+        [.multiRegion, .abTesting, .cortex]
     }
     
     static var securityTabs: [NavigationTab] {

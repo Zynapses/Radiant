@@ -111,7 +111,7 @@ class PerformanceConfigService {
 
       // Build SET clauses dynamically
       const setClauses: string[] = [];
-      const params: Array<{ name: string; value: { stringValue?: string; longValue?: number; doubleValue?: number; booleanValue?: boolean } }> = [
+      const params: any[] = [
         stringParam('tenantId', tenantId),
       ];
 
@@ -816,14 +816,78 @@ class PerformanceConfigService {
   }
 
   private async getOODAPhaseMetrics(tenantId: string): Promise<OODAPhaseMetrics[]> {
-    // Placeholder - would query execution_snapshots for actual phase timing
-    return [
-      { phase: 'observe', executionCount: 0, totalDurationMs: 0, avgDurationMs: 0, p50DurationMs: 0, p95DurationMs: 0, p99DurationMs: 0, errorCount: 0, errorRate: 0 },
-      { phase: 'orient', executionCount: 0, totalDurationMs: 0, avgDurationMs: 0, p50DurationMs: 0, p95DurationMs: 0, p99DurationMs: 0, errorCount: 0, errorRate: 0 },
-      { phase: 'decide', executionCount: 0, totalDurationMs: 0, avgDurationMs: 0, p50DurationMs: 0, p95DurationMs: 0, p99DurationMs: 0, errorCount: 0, errorRate: 0 },
-      { phase: 'act', executionCount: 0, totalDurationMs: 0, avgDurationMs: 0, p50DurationMs: 0, p95DurationMs: 0, p99DurationMs: 0, errorCount: 0, errorRate: 0 },
-      { phase: 'report', executionCount: 0, totalDurationMs: 0, avgDurationMs: 0, p50DurationMs: 0, p95DurationMs: 0, p99DurationMs: 0, errorCount: 0, errorRate: 0 },
-    ];
+    const phases = ['observe', 'orient', 'decide', 'act', 'report'] as const;
+    const results: OODAPhaseMetrics[] = [];
+
+    try {
+      // Query execution_snapshots for phase timing data from the last 24 hours
+      for (const phase of phases) {
+        const result = await executeStatement(
+          `WITH phase_data AS (
+            SELECT 
+              es.duration_ms,
+              es.status = 'error' as is_error
+            FROM execution_snapshots es
+            JOIN agent_executions ae ON es.execution_id = ae.id
+            WHERE ae.tenant_id = :tenantId
+              AND es.phase = :phase
+              AND es.created_at > NOW() - INTERVAL '24 hours'
+          ),
+          percentiles AS (
+            SELECT 
+              PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY duration_ms) as p50,
+              PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY duration_ms) as p95,
+              PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY duration_ms) as p99
+            FROM phase_data
+          )
+          SELECT 
+            COUNT(*) as execution_count,
+            COALESCE(SUM(duration_ms), 0) as total_duration_ms,
+            COALESCE(AVG(duration_ms), 0) as avg_duration_ms,
+            COALESCE((SELECT p50 FROM percentiles), 0) as p50_duration_ms,
+            COALESCE((SELECT p95 FROM percentiles), 0) as p95_duration_ms,
+            COALESCE((SELECT p99 FROM percentiles), 0) as p99_duration_ms,
+            COALESCE(SUM(CASE WHEN is_error THEN 1 ELSE 0 END), 0) as error_count
+          FROM phase_data`,
+          [
+            stringParam('tenantId', tenantId),
+            stringParam('phase', phase),
+          ]
+        );
+
+        const row = result.rows?.[0] || {};
+        const executionCount = parseInt(row.execution_count as string, 10) || 0;
+        const errorCount = parseInt(row.error_count as string, 10) || 0;
+
+        results.push({
+          phase,
+          executionCount,
+          totalDurationMs: parseFloat(row.total_duration_ms as string) || 0,
+          avgDurationMs: parseFloat(row.avg_duration_ms as string) || 0,
+          p50DurationMs: parseFloat(row.p50_duration_ms as string) || 0,
+          p95DurationMs: parseFloat(row.p95_duration_ms as string) || 0,
+          p99DurationMs: parseFloat(row.p99_duration_ms as string) || 0,
+          errorCount,
+          errorRate: executionCount > 0 ? errorCount / executionCount : 0,
+        });
+      }
+
+      return results;
+    } catch (error) {
+      logger.error('Failed to get OODA phase metrics', { tenantId, error });
+      // Return empty metrics on error
+      return phases.map(phase => ({
+        phase,
+        executionCount: 0,
+        totalDurationMs: 0,
+        avgDurationMs: 0,
+        p50DurationMs: 0,
+        p95DurationMs: 0,
+        p99DurationMs: 0,
+        errorCount: 0,
+        errorRate: 0,
+      }));
+    }
   }
 
   private async getThroughputMetrics(tenantId: string): Promise<ExecutionThroughputMetrics> {

@@ -873,13 +873,35 @@ class EthicsFreeReasoningService {
     const avgQuality = Number(feedbackRow?.avg_quality || 0);
     const batchesProcessed = Number((batchesResult.rows?.[0] as Record<string, unknown>)?.count || 0);
     
+    // Query for top issue types
+    const issuesResult = await executeStatement(
+      `SELECT issue_type, COUNT(*) as count
+       FROM ethics_free_thought_feedback
+       WHERE tenant_id = $1 AND created_at >= $2
+       GROUP BY issue_type
+       ORDER BY count DESC
+       LIMIT 10`,
+      [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'startDate', value: { stringValue: startDate.toISOString() } },
+      ]
+    );
+    
+    const topIssueTypes = (issuesResult.rows || []).map((r: unknown) => {
+      const iRow = r as Record<string, unknown>;
+      return {
+        type: String(iRow.issue_type || ''),
+        count: Number(iRow.count) || 0,
+      };
+    });
+    
     return {
       totalThoughts,
       totalFiltered: feedbackCollected,
       modificationRate: totalThoughts > 0 ? feedbackCollected / totalThoughts : 0,
       feedbackCollected,
       trainingBatchesProcessed: batchesProcessed,
-      topIssueTypes: [], // Would need additional query
+      topIssueTypes,
       averageQualityScore: avgQuality,
     };
   }

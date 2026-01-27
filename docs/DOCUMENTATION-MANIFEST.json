@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "1.0.0",
-  "lastUpdated": "2026-01-24",
+  "lastUpdated": "2026-01-25",
   "description": "Master manifest of ALL documentation files in RADIANT. AI agents MUST update relevant docs when making code changes.",
   
   "primaryDocs": {
@@ -97,6 +97,11 @@
         "description": "API reference documentation"
       },
       {
+        "path": "docs/SERVICE-LAYER-GUIDE.md",
+        "triggers": ["mcp", "a2a", "api_keys", "gateway", "service_layer", "cedar_policy", "interface_type"],
+        "description": "Service layer documentation - MCP, A2A, API interfaces, gateway, Cedar policies"
+      },
+      {
         "path": "docs/CATO-COMPLETE-DOCUMENTATION.md",
         "triggers": ["cato", "safety", "genesis", "ethics"],
         "description": "Cato safety system documentation"
@@ -115,6 +120,71 @@
         "path": "docs/CURATOR-USER-GUIDE.md",
         "triggers": ["curator", "knowledge_graph", "verification", "golden_rules", "chain_of_custody"],
         "description": "Curator user guide - teaching AI, verification, overrides"
+      },
+      {
+        "path": "docs/SWIFT-DEPLOYER-USER-GUIDE.md",
+        "triggers": ["deployer", "swift_app", "deployment", "domain_config", "tier", "installation", "aws_setup"],
+        "description": "Swift Deployer macOS app - installation, deployment, domain URLs, features"
+      },
+      {
+        "path": "docs/UDS-ADMIN-GUIDE.md",
+        "triggers": ["uds", "user_data", "conversation", "message", "upload", "audit", "erasure", "gdpr", "encryption"],
+        "description": "User Data Service - tiered storage for conversations, uploads, audit, GDPR"
+      },
+      {
+        "path": "docs/authentication/overview.md",
+        "triggers": ["auth", "authentication", "signin", "sso", "mfa", "oauth"],
+        "description": "Authentication system overview - all auth features, audiences, and navigation"
+      },
+      {
+        "path": "docs/authentication/user-guide.md",
+        "triggers": ["auth", "signin", "password", "passkey", "user_facing"],
+        "description": "End-user authentication guide - sign-in, passwords, passkeys"
+      },
+      {
+        "path": "docs/authentication/tenant-admin-guide.md",
+        "triggers": ["auth", "sso", "mfa", "tenant_admin", "user_management"],
+        "description": "Tenant admin auth guide - SSO config, MFA policies, user management"
+      },
+      {
+        "path": "docs/authentication/platform-admin-guide.md",
+        "triggers": ["auth", "cognito", "platform_admin", "security_policy"],
+        "description": "Platform admin auth guide - Cognito management, global policies"
+      },
+      {
+        "path": "docs/authentication/mfa-guide.md",
+        "triggers": ["mfa", "totp", "2fa", "backup_codes", "trusted_devices"],
+        "description": "MFA setup and usage guide - TOTP, backup codes, device trust"
+      },
+      {
+        "path": "docs/authentication/oauth-guide.md",
+        "triggers": ["oauth", "api_integration", "third_party", "tokens"],
+        "description": "OAuth 2.0 developer guide - third-party app integration"
+      },
+      {
+        "path": "docs/authentication/i18n-guide.md",
+        "triggers": ["i18n", "localization", "language", "rtl", "cjk", "search"],
+        "description": "Internationalization guide - 18 languages, RTL, CJK search"
+      },
+      {
+        "path": "docs/authentication/troubleshooting.md",
+        "triggers": ["auth", "signin", "mfa", "sso", "troubleshooting"],
+        "description": "Authentication troubleshooting - common issues and solutions"
+      },
+      {
+        "path": "docs/security/authentication-architecture.md",
+        "triggers": ["security", "auth", "compliance", "threat_model", "cryptography"],
+        "description": "Security architecture - threat models, compliance, crypto standards"
+      },
+      {
+        "path": "docs/api/authentication-api.md",
+        "triggers": ["api", "auth", "endpoint", "rest_api"],
+        "description": "Authentication API reference - all auth endpoints"
+      },
+      {
+        "path": "docs/api/search-api.md",
+        "triggers": ["api", "search", "fts", "cjk", "multilang"],
+        "description": "Multi-language search API - FTS, pg_bigm, CJK support"
       }
     ]
   },
@@ -135,14 +205,42 @@
       "orchestration": ["CHANGELOG.md", "docs/ORCHESTRATION-METHODS.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md"],
       "competitive_advantage": ["CHANGELOG.md", "docs/THINKTANK-MOATS.md", "docs/RADIANT-MOATS.md", "docs/STRATEGIC-VISION-MARKETING.md"],
       "architecture": ["CHANGELOG.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
-      "security": ["CHANGELOG.md", "docs/RADIANT-ADMIN-GUIDE.md", "docs/COMPLIANCE.md"],
+      "security": ["CHANGELOG.md", "docs/RADIANT-ADMIN-GUIDE.md", "docs/COMPLIANCE.md", "docs/security/authentication-architecture.md"],
+      "auth": ["CHANGELOG.md", "docs/authentication/overview.md", "docs/RADIANT-ADMIN-GUIDE.md"],
+      "authentication": ["CHANGELOG.md", "docs/authentication/overview.md", "docs/authentication/user-guide.md"],
+      "signin": ["CHANGELOG.md", "docs/authentication/user-guide.md", "docs/authentication/troubleshooting.md"],
+      "sso": ["CHANGELOG.md", "docs/authentication/tenant-admin-guide.md", "docs/authentication/troubleshooting.md"],
+      "mfa": ["CHANGELOG.md", "docs/authentication/mfa-guide.md", "docs/authentication/tenant-admin-guide.md"],
+      "oauth": ["CHANGELOG.md", "docs/authentication/oauth-guide.md", "docs/api/authentication-api.md"],
+      "i18n": ["CHANGELOG.md", "docs/authentication/i18n-guide.md", "docs/sections/SECTION-41-INTERNATIONALIZATION.md"],
+      "localization": ["CHANGELOG.md", "docs/authentication/i18n-guide.md"],
+      "cjk_search": ["CHANGELOG.md", "docs/authentication/i18n-guide.md", "docs/api/search-api.md"],
       "billing": ["CHANGELOG.md", "docs/RADIANT-ADMIN-GUIDE.md"],
       "models": ["CHANGELOG.md", "docs/RADIANT-ADMIN-GUIDE.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md"],
       "dependency": ["CHANGELOG.md", "docs/OPEN-SOURCE-LIBRARIES.md"],
       "consciousness": ["CHANGELOG.md", "docs/CONSCIOUSNESS-SERVICE.md", "docs/THINKTANK-ADMIN-GUIDE.md"],
       "cato": ["CHANGELOG.md", "docs/CATO-COMPLETE-DOCUMENTATION.md", "docs/RADIANT-ADMIN-GUIDE.md"],
       "cortex": ["CHANGELOG.md", "docs/CORTEX-MEMORY-ADMIN-GUIDE.md"],
-      "curator": ["CHANGELOG.md", "docs/CURATOR-USER-GUIDE.md", "docs/RADIANT-MOATS.md"]
+      "curator": ["CHANGELOG.md", "docs/CURATOR-USER-GUIDE.md", "docs/RADIANT-MOATS.md"],
+      "deployer": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md"],
+      "swift_app": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md"],
+      "domain_config": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md", "docs/RADIANT-ADMIN-GUIDE.md"],
+      "tier": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md", "docs/RADIANT-ADMIN-GUIDE.md"],
+      "installation": ["CHANGELOG.md", "docs/SWIFT-DEPLOYER-USER-GUIDE.md"],
+      "uds": ["CHANGELOG.md", "docs/UDS-ADMIN-GUIDE.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "user_data": ["CHANGELOG.md", "docs/UDS-ADMIN-GUIDE.md"],
+      "conversation": ["CHANGELOG.md", "docs/UDS-ADMIN-GUIDE.md"],
+      "upload": ["CHANGELOG.md", "docs/UDS-ADMIN-GUIDE.md"],
+      "audit": ["CHANGELOG.md", "docs/UDS-ADMIN-GUIDE.md"],
+      "erasure": ["CHANGELOG.md", "docs/UDS-ADMIN-GUIDE.md"],
+      "gdpr": ["CHANGELOG.md", "docs/UDS-ADMIN-GUIDE.md", "docs/RADIANT-ADMIN-GUIDE.md"],
+      "mcp": ["CHANGELOG.md", "docs/SERVICE-LAYER-GUIDE.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "a2a": ["CHANGELOG.md", "docs/SERVICE-LAYER-GUIDE.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "api_keys": ["CHANGELOG.md", "docs/SERVICE-LAYER-GUIDE.md", "docs/RADIANT-ADMIN-GUIDE.md"],
+      "gateway": ["CHANGELOG.md", "docs/SERVICE-LAYER-GUIDE.md", "docs/RADIANT-PLATFORM-ARCHITECTURE.md"],
+      "service_layer": ["CHANGELOG.md", "docs/SERVICE-LAYER-GUIDE.md", "docs/ENGINEERING-IMPLEMENTATION-VISION.md"],
+      "cedar_policy": ["CHANGELOG.md", "docs/SERVICE-LAYER-GUIDE.md", "docs/RADIANT-ADMIN-GUIDE.md"],
+      "interface_type": ["CHANGELOG.md", "docs/SERVICE-LAYER-GUIDE.md"]
     }
   },
   
@@ -155,7 +253,10 @@
       "docs/THINKTANK-USER-GUIDE.md",
       "docs/STRATEGIC-VISION-MARKETING.md",
       "docs/ENGINEERING-IMPLEMENTATION-VISION.md",
-      "docs/RADIANT-PLATFORM-ARCHITECTURE.md"
+      "docs/RADIANT-PLATFORM-ARCHITECTURE.md",
+      "docs/SWIFT-DEPLOYER-USER-GUIDE.md",
+      "docs/UDS-ADMIN-GUIDE.md",
+      "docs/SERVICE-LAYER-GUIDE.md"
     ]
   }
 }

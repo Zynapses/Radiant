@@ -574,9 +574,46 @@ class EnhancedLearningService {
     messageId: string,
     signalType: string
   ): Promise<void> {
-    // Fetch message content and create negative candidate
-    // This would integrate with your message storage
-    logger.info('Creating negative candidate from message', { tenantId, messageId, signalType });
+    try {
+      // Fetch message content from UDS messages table
+      const messageResult = await executeStatement(
+        `SELECT m.content, m.role, c.id as conversation_id,
+                LAG(m.content) OVER (ORDER BY m.created_at) as previous_content
+         FROM uds_messages m
+         JOIN uds_conversations c ON m.conversation_id = c.id
+         WHERE m.id = $1::uuid AND c.tenant_id = $2::uuid
+         LIMIT 2`,
+        [stringParam('messageId', messageId), stringParam('tenantId', tenantId)]
+      );
+
+      if (!messageResult.rows || messageResult.rows.length === 0) {
+        logger.warn('Message not found for negative candidate', { messageId });
+        return;
+      }
+
+      const message = messageResult.rows[0] as any;
+      
+      // Get the prompt (previous user message) and response (assistant message)
+      const prompt = message.previous_content || '';
+      const response = message.content || '';
+
+      if (!prompt || !response) {
+        logger.warn('Incomplete message data for negative candidate', { messageId });
+        return;
+      }
+
+      // Create the negative candidate
+      await this.createNegativeCandidate(tenantId, userId, {
+        prompt,
+        response,
+        negativeSignals: [signalType],
+        errorCategory: this.signalToErrorCategory(signalType),
+      });
+
+      logger.info('Created negative candidate from message', { tenantId, messageId, signalType });
+    } catch (error) {
+      logger.error('Failed to create negative candidate from message', { tenantId, messageId, error });
+    }
   }
   
   private async createPositiveCandidateFromMessage(
@@ -585,8 +622,62 @@ class EnhancedLearningService {
     messageId: string,
     signalType: string
   ): Promise<void> {
-    // Fetch message content and create positive candidate in learning_candidates table
-    logger.info('Creating positive candidate from message', { tenantId, messageId, signalType });
+    try {
+      // Fetch message content from UDS messages table
+      const messageResult = await executeStatement(
+        `SELECT m.content, m.role, c.id as conversation_id,
+                LAG(m.content) OVER (ORDER BY m.created_at) as previous_content
+         FROM uds_messages m
+         JOIN uds_conversations c ON m.conversation_id = c.id
+         WHERE m.id = $1::uuid AND c.tenant_id = $2::uuid
+         LIMIT 2`,
+        [stringParam('messageId', messageId), stringParam('tenantId', tenantId)]
+      );
+
+      if (!messageResult.rows || messageResult.rows.length === 0) {
+        logger.warn('Message not found for positive candidate', { messageId });
+        return;
+      }
+
+      const message = messageResult.rows[0] as any;
+      
+      // Get the prompt (previous user message) and response (assistant message)
+      const prompt = message.previous_content || '';
+      const response = message.content || '';
+
+      if (!prompt || !response) {
+        logger.warn('Incomplete message data for positive candidate', { messageId });
+        return;
+      }
+
+      // Create positive candidate in learning_candidates table
+      await executeStatement(
+        `INSERT INTO learning_candidates 
+         (tenant_id, user_id, prompt_text, response_text, candidate_type, source, quality_score, status)
+         VALUES ($1::uuid, $2::uuid, $3, $4, 'implicit_positive', $5, 0.8, 'pending')`,
+        [
+          stringParam('tenantId', tenantId),
+          stringParam('userId', userId),
+          stringParam('prompt', prompt),
+          stringParam('response', response),
+          stringParam('source', `signal:${signalType}`),
+        ]
+      );
+
+      logger.info('Created positive candidate from message', { tenantId, messageId, signalType });
+    } catch (error) {
+      logger.error('Failed to create positive candidate from message', { tenantId, messageId, error });
+    }
+  }
+
+  private signalToErrorCategory(signalType: string): ErrorCategory {
+    const mapping: Record<string, ErrorCategory> = {
+      'thumbs_down': 'incorrect_answer',
+      'abandon_conversation': 'unhelpful_response',
+      'regenerate_request': 'poor_formatting',
+      'report_issue': 'factual_error',
+    };
+    return mapping[signalType] || 'other';
   }
   
   // ==========================================================================
@@ -1134,13 +1225,17 @@ class EnhancedLearningService {
   async getLearningAnalytics(tenantId: string, periodDays: number = 7): Promise<LearningAnalytics> {
     const periodStart = new Date(Date.now() - periodDays * 24 * 60 * 60 * 1000);
     
-    const [signals, negative, active, cache] = await Promise.all([
+    const [signals, negative, positive, active, cache, training] = await Promise.all([
       executeStatement(
         `SELECT COUNT(*) as count FROM implicit_feedback_signals WHERE tenant_id = $1::uuid AND created_at >= $2`,
         [stringParam('tenantId', tenantId), stringParam('start', periodStart.toISOString())]
       ),
       executeStatement(
         `SELECT COUNT(*) as count FROM negative_learning_candidates WHERE tenant_id = $1::uuid AND created_at >= $2`,
+        [stringParam('tenantId', tenantId), stringParam('start', periodStart.toISOString())]
+      ),
+      executeStatement(
+        `SELECT COUNT(*) as count FROM learning_candidates WHERE tenant_id = $1::uuid AND created_at >= $2 AND signal_type = 'positive'`,
         [stringParam('tenantId', tenantId), stringParam('start', periodStart.toISOString())]
       ),
       executeStatement(
@@ -1151,31 +1246,39 @@ class EnhancedLearningService {
         [stringParam('tenantId', tenantId), stringParam('start', periodStart.toISOString())]
       ),
       executeStatement(
-        `SELECT SUM(cache_hits) as hits, COUNT(*) as total FROM successful_pattern_cache WHERE tenant_id = $1::uuid`,
+        `SELECT SUM(cache_hits) as hits, SUM(cache_misses) as misses, COUNT(*) as total FROM successful_pattern_cache WHERE tenant_id = $1::uuid`,
         [stringParam('tenantId', tenantId)]
+      ),
+      executeStatement(
+        `SELECT 
+           COUNT(*) FILTER (WHERE status = 'completed') as completed,
+           SUM(candidates_used) as candidates_used
+         FROM training_jobs WHERE tenant_id = $1::uuid AND created_at >= $2`,
+        [stringParam('tenantId', tenantId), stringParam('start', periodStart.toISOString())]
       ),
     ]);
     
     const activeTotal = Number(active.rows?.[0]?.total || 0);
     const activeResponded = Number(active.rows?.[0]?.responded || 0);
     const cacheHits = Number(cache.rows?.[0]?.hits || 0);
-    const cacheTotal = Number(cache.rows?.[0]?.total || 0);
+    const cacheMisses = Number(cache.rows?.[0]?.misses || 0);
+    const cacheTotal = cacheHits + cacheMisses;
     
     return {
       tenantId,
       periodStart,
       periodEnd: new Date(),
-      positiveCandidatesCreated: 0, // Would need to query learning_candidates
+      positiveCandidatesCreated: Number(positive.rows?.[0]?.count || 0),
       negativeCandidatesCreated: Number(negative.rows?.[0]?.count || 0),
       implicitSignalsCaptured: Number(signals.rows?.[0]?.count || 0),
       activeLearningRequestsSent: activeTotal,
       activeLearningResponsesReceived: activeResponded,
       activeLearningResponseRate: activeTotal > 0 ? activeResponded / activeTotal : 0,
       patternCacheHits: cacheHits,
-      patternCacheMisses: 0, // Would need separate tracking
-      patternCacheHitRate: cacheTotal > 0 ? cacheHits / (cacheHits + cacheTotal) : 0,
-      trainingJobsCompleted: 0,
-      candidatesUsedInTraining: 0,
+      patternCacheMisses: cacheMisses,
+      patternCacheHitRate: cacheTotal > 0 ? cacheHits / cacheTotal : 0,
+      trainingJobsCompleted: Number(training.rows?.[0]?.completed || 0),
+      candidatesUsedInTraining: Number(training.rows?.[0]?.candidates_used || 0),
     };
   }
   

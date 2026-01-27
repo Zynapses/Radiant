@@ -365,14 +365,29 @@ async function checkAbstention(
     }
   }
 
-  // 5. Linear probe (self-hosted only, FUTURE)
+  // 5. Linear probe (self-hosted only)
   if (fullConfig.enableLinearProbe && response.modelProvider === 'self_hosted') {
-    // PLACEHOLDER: Linear probe integration
-    // This requires the model inference wrapper to extract hidden states
-    // and pass them to a trained probe model
-    logger.info('Linear probe enabled but not yet integrated with inference wrapper', {
-      modelId: response.modelId,
-    });
+    try {
+      const probeResult = await evaluateLinearProbe(tenantId, response);
+      if (probeResult) {
+        result.linearProbeScore = probeResult.uncertaintyScore;
+        
+        // Linear probe threshold is typically 0.5 (above = uncertain)
+        const probeThreshold = 0.5;
+        if (probeResult.uncertaintyScore > probeThreshold) {
+          result.shouldAbstain = true;
+          result.reason = result.reason || 'low_confidence';
+          checks.push(
+            `Linear probe uncertainty: ${(probeResult.uncertaintyScore * 100).toFixed(1)}% > ${probeThreshold * 100}%`
+          );
+        }
+      }
+    } catch (error) {
+      logger.warn('Linear probe evaluation failed, continuing without probe score', {
+        modelId: response.modelId,
+        error: (error as Error).message,
+      });
+    }
   }
 
   // Determine action
@@ -389,6 +404,159 @@ async function checkAbstention(
   }
 
   return result;
+}
+
+// ============================================================================
+// LINEAR PROBE EVALUATION
+// ============================================================================
+
+interface LinearProbeResult {
+  uncertaintyScore: number;
+  hiddenStateLayer: number;
+  probeModelId: string;
+  evaluatedAt: Date;
+}
+
+/**
+ * Evaluate uncertainty using a linear probe on self-hosted model hidden states.
+ * 
+ * Linear probes work by:
+ * 1. Extracting hidden states from a specific layer of the transformer model
+ * 2. Passing those hidden states through a trained linear classifier
+ * 3. The classifier predicts whether the model is "certain" or "uncertain"
+ * 
+ * This requires the self-hosted inference endpoint to expose hidden states.
+ */
+async function evaluateLinearProbe(
+  tenantId: string,
+  response: ModelResponse
+): Promise<LinearProbeResult | null> {
+  // Get the linear probe endpoint for this model
+  const probeConfig = await getLinearProbeConfig(tenantId, response.modelId);
+  if (!probeConfig) {
+    logger.info('No linear probe configured for model', { modelId: response.modelId });
+    return null;
+  }
+
+  const inferenceEndpoint = process.env.SELF_HOSTED_INFERENCE_ENDPOINT;
+  if (!inferenceEndpoint) {
+    logger.warn('SELF_HOSTED_INFERENCE_ENDPOINT not configured');
+    return null;
+  }
+
+  try {
+    // Request hidden states from the inference endpoint
+    // This assumes the self-hosted model endpoint supports hidden state extraction
+    const hiddenStatesResponse = await fetch(`${inferenceEndpoint}/v1/hidden-states`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.SELF_HOSTED_API_KEY || ''}`,
+        'X-Tenant-ID': tenantId,
+      },
+      body: JSON.stringify({
+        model: response.modelId,
+        text: response.content,
+        layer: probeConfig.targetLayer,
+        pooling: probeConfig.poolingStrategy || 'last_token',
+      }),
+    });
+
+    if (!hiddenStatesResponse.ok) {
+      throw new Error(`Hidden states API returned ${hiddenStatesResponse.status}`);
+    }
+
+    const hiddenStates = await hiddenStatesResponse.json() as {
+      hidden_state: number[];
+      layer: number;
+      dimensions: number;
+    };
+
+    // Now evaluate the hidden states with the linear probe
+    const probeResponse = await fetch(`${probeConfig.probeEndpoint}/evaluate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${probeConfig.probeApiKey || ''}`,
+      },
+      body: JSON.stringify({
+        hidden_state: hiddenStates.hidden_state,
+        probe_model_id: probeConfig.probeModelId,
+      }),
+    });
+
+    if (!probeResponse.ok) {
+      throw new Error(`Probe evaluation returned ${probeResponse.status}`);
+    }
+
+    const probeResult = await probeResponse.json() as {
+      uncertainty_score: number;
+      confidence: number;
+    };
+
+    logger.info('Linear probe evaluation complete', {
+      tenantId,
+      modelId: response.modelId,
+      uncertaintyScore: probeResult.uncertainty_score,
+      layer: hiddenStates.layer,
+    });
+
+    return {
+      uncertaintyScore: probeResult.uncertainty_score,
+      hiddenStateLayer: hiddenStates.layer,
+      probeModelId: probeConfig.probeModelId,
+      evaluatedAt: new Date(),
+    };
+  } catch (error) {
+    logger.error('Linear probe evaluation failed', {
+      tenantId,
+      modelId: response.modelId,
+      error: (error as Error).message,
+    });
+    throw error;
+  }
+}
+
+interface LinearProbeConfig {
+  probeModelId: string;
+  probeEndpoint: string;
+  probeApiKey?: string;
+  targetLayer: number;
+  poolingStrategy: 'last_token' | 'mean' | 'max';
+}
+
+async function getLinearProbeConfig(
+  tenantId: string,
+  modelId: string
+): Promise<LinearProbeConfig | null> {
+  try {
+    const result = await executeStatement({
+      sql: `
+        SELECT probe_model_id, probe_endpoint, probe_api_key, target_layer, pooling_strategy
+        FROM hitl_linear_probe_config
+        WHERE tenant_id = :tenantId AND model_id = :modelId AND is_active = true
+      `,
+      parameters: [
+        stringParam('tenantId', tenantId),
+        stringParam('modelId', modelId),
+      ],
+    });
+
+    if (result.rows && result.rows.length > 0) {
+      const row = result.rows[0];
+      return {
+        probeModelId: row.probe_model_id as string,
+        probeEndpoint: row.probe_endpoint as string,
+        probeApiKey: row.probe_api_key as string | undefined,
+        targetLayer: (row.target_layer as number) || -1,
+        poolingStrategy: (row.pooling_strategy as LinearProbeConfig['poolingStrategy']) || 'last_token',
+      };
+    }
+  } catch (error) {
+    logger.warn('Failed to get linear probe config', { tenantId, modelId, error });
+  }
+
+  return null;
 }
 
 // ============================================================================

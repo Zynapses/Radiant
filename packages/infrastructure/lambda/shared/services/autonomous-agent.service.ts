@@ -5,6 +5,7 @@ import { executeStatement } from '../db/client';
 import { modelRouterService } from './model-router.service';
 import { memoryConsolidationService } from './memory-consolidation.service';
 import { theoryOfMindService } from './theory-of-mind.service';
+import { logger } from '../logging/enhanced-logger';
 
 // ============================================================================
 // Types
@@ -17,6 +18,7 @@ export type ExecutionStatus = 'pending' | 'running' | 'awaiting_approval' | 'app
 
 export interface AutonomousTask {
   taskId: string;
+  tenantId: string;
   taskType: TaskType;
   name: string;
   description?: string;
@@ -391,18 +393,173 @@ export class AutonomousAgentService {
   private async generateSuggestionActions(task: AutonomousTask): Promise<ProposedAction[]> {
     const config = task.actionConfig;
     const maxSuggestions = Number(config.max_suggestions) || 3;
+    const tenantId = task.tenantId;
 
-    // In production, would analyze user patterns and generate personalized suggestions
-    return [{
-      action: 'create_suggestion',
+    // Analyze user patterns to generate personalized suggestions
+    const patterns = await this.analyzeUserPatterns(tenantId, maxSuggestions);
+    
+    if (patterns.length === 0) {
+      return [{
+        action: 'create_suggestion',
+        target: 'user_suggestions',
+        params: { suggestion_type: 'proactive', count: maxSuggestions },
+        impactAssessment: {
+          level: 'low',
+          description: 'Will create proactive suggestions for users',
+          reversible: true,
+        },
+      }];
+    }
+
+    // Generate actions for each identified pattern
+    return patterns.map(pattern => ({
+      action: 'create_personalized_suggestion',
       target: 'user_suggestions',
-      params: { suggestion_type: 'proactive', count: maxSuggestions },
+      params: {
+        suggestion_type: pattern.type,
+        user_id: pattern.userId,
+        content: pattern.suggestedContent,
+        reason: pattern.reason,
+        confidence: pattern.confidence,
+      },
       impactAssessment: {
         level: 'low',
-        description: 'Will create proactive suggestions for users',
+        description: `Personalized suggestion for user based on ${pattern.reason}`,
         reversible: true,
       },
-    }];
+    }));
+  }
+
+  /**
+   * Analyze user behavior patterns to generate personalized suggestions
+   */
+  private async analyzeUserPatterns(
+    tenantId: string,
+    maxSuggestions: number
+  ): Promise<Array<{
+    userId: string;
+    type: string;
+    suggestedContent: string;
+    reason: string;
+    confidence: number;
+  }>> {
+    const patterns: Array<{
+      userId: string;
+      type: string;
+      suggestedContent: string;
+      reason: string;
+      confidence: number;
+    }> = [];
+
+    try {
+      // Query recent user activity patterns
+      const activityResult = await executeStatement(
+        `WITH user_activity AS (
+          SELECT 
+            user_id,
+            COUNT(*) as session_count,
+            MAX(created_at) as last_active,
+            array_agg(DISTINCT focus_mode) FILTER (WHERE focus_mode IS NOT NULL) as used_modes,
+            AVG(CASE WHEN rating IS NOT NULL THEN rating ELSE NULL END) as avg_rating
+          FROM sessions
+          WHERE tenant_id = $1 
+            AND created_at > NOW() - INTERVAL '7 days'
+          GROUP BY user_id
+          HAVING COUNT(*) >= 3
+        ),
+        common_topics AS (
+          SELECT 
+            s.user_id,
+            m.content,
+            COUNT(*) as topic_count
+          FROM messages m
+          JOIN sessions s ON m.session_id = s.id
+          WHERE s.tenant_id = $1
+            AND s.created_at > NOW() - INTERVAL '7 days'
+            AND m.role = 'user'
+          GROUP BY s.user_id, m.content
+          ORDER BY topic_count DESC
+        )
+        SELECT 
+          ua.user_id,
+          ua.session_count,
+          ua.last_active,
+          ua.used_modes,
+          ua.avg_rating,
+          (SELECT ct.content FROM common_topics ct WHERE ct.user_id = ua.user_id LIMIT 1) as common_topic
+        FROM user_activity ua
+        ORDER BY ua.session_count DESC
+        LIMIT $2`,
+        [
+          { name: 'tenantId', value: { stringValue: tenantId } },
+          { name: 'limit', value: { longValue: maxSuggestions * 2 } },
+        ]
+      );
+
+      for (const row of activityResult.rows as Record<string, unknown>[]) {
+        const userId = String(row.user_id);
+        const sessionCount = Number(row.session_count) || 0;
+        const lastActive = row.last_active ? new Date(String(row.last_active)) : new Date();
+        const usedModes = (row.used_modes as string[]) || [];
+        const avgRating = Number(row.avg_rating) || 0;
+        const commonTopic = String(row.common_topic || '');
+
+        // Pattern 1: Inactive user re-engagement
+        const daysSinceActive = (Date.now() - lastActive.getTime()) / (1000 * 60 * 60 * 24);
+        if (daysSinceActive > 3 && daysSinceActive < 14) {
+          patterns.push({
+            userId,
+            type: 'reengagement',
+            suggestedContent: `Welcome back! We've added new features since your last visit. Would you like to explore what's new?`,
+            reason: `User inactive for ${Math.round(daysSinceActive)} days`,
+            confidence: 0.7,
+          });
+        }
+
+        // Pattern 2: Power user feature discovery
+        if (sessionCount > 10 && usedModes.length < 3) {
+          const unusedModes = ['research', 'creative', 'analysis', 'coding']
+            .filter(m => !usedModes.includes(m));
+          if (unusedModes.length > 0) {
+            patterns.push({
+              userId,
+              type: 'feature_discovery',
+              suggestedContent: `Try ${unusedModes[0]} mode for your next task - it's optimized for ${unusedModes[0] === 'research' ? 'finding information' : unusedModes[0] === 'creative' ? 'creative writing' : unusedModes[0] === 'analysis' ? 'data analysis' : 'code generation'}.`,
+              reason: `Power user with ${sessionCount} sessions, only using ${usedModes.length} modes`,
+              confidence: 0.8,
+            });
+          }
+        }
+
+        // Pattern 3: Topic-based suggestion
+        if (commonTopic && commonTopic.length > 10) {
+          patterns.push({
+            userId,
+            type: 'topic_continuation',
+            suggestedContent: `Would you like to continue exploring topics related to your recent interests?`,
+            reason: `Frequent discussions on similar topics`,
+            confidence: 0.6,
+          });
+        }
+
+        // Pattern 4: Low satisfaction recovery
+        if (avgRating > 0 && avgRating < 3.5) {
+          patterns.push({
+            userId,
+            type: 'satisfaction_recovery',
+            suggestedContent: `We noticed some responses didn't meet your expectations. Try using more specific prompts or selecting a specialized mode for better results.`,
+            reason: `Average rating ${avgRating.toFixed(1)}/5`,
+            confidence: 0.75,
+          });
+        }
+
+        if (patterns.length >= maxSuggestions) break;
+      }
+    } catch (error) {
+      logger.warn('Failed to analyze user patterns', { tenantId, error });
+    }
+
+    return patterns.slice(0, maxSuggestions);
   }
 
   private async generateConsolidationActions(task: AutonomousTask): Promise<ProposedAction[]> {
@@ -533,9 +690,54 @@ export class AutonomousAgentService {
     );
     const tenantId = String((taskResult.rows[0] as { tenant_id: string }).tenant_id);
 
-    // Generate suggestions using theory of mind service
-    // In production, would iterate through target users
-    return { status: 'completed', suggestions_created: 0 };
+    // Get active users to generate suggestions for
+    const usersResult = await executeStatement(
+      `SELECT user_id FROM user_activity_log 
+       WHERE tenant_id = $1 AND last_active_at > NOW() - INTERVAL '7 days'
+       GROUP BY user_id LIMIT 100`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+
+    const maxSuggestions = Number(action.params.count) || 3;
+    let suggestionsCreated = 0;
+
+    for (const row of usersResult.rows as { user_id: string }[]) {
+      try {
+        // Use theory of mind service to understand user and generate suggestions
+        const userModel = await theoryOfMindService.getOrCreateUserModel(tenantId, row.user_id);
+        
+        // Use expertise domains or active goals to generate suggestions
+        const expertiseDomains = Object.keys(userModel.expertiseDomains || {});
+        const activeGoals = (userModel.currentGoals || []).filter(g => g.status === 'active');
+        
+        if (expertiseDomains.length > 0 || activeGoals.length > 0) {
+          const topics = expertiseDomains.length > 0 
+            ? expertiseDomains.slice(0, 3).join(', ')
+            : activeGoals.slice(0, 2).map(g => g.goalText.substring(0, 50)).join(', ');
+          
+          // Insert proactive suggestion based on user model
+          await executeStatement(
+            `INSERT INTO user_suggestions (tenant_id, user_id, suggestion_type, content, priority, created_by_task)
+             VALUES ($1, $2, 'proactive', $3, $4, $5)
+             ON CONFLICT (tenant_id, user_id, content) DO NOTHING`,
+            [
+              { name: 'tenantId', value: { stringValue: tenantId } },
+              { name: 'userId', value: { stringValue: row.user_id } },
+              { name: 'content', value: { stringValue: `Based on your interests in ${topics}, you might find this helpful.` } },
+              { name: 'priority', value: { longValue: Math.min(suggestionsCreated + 1, maxSuggestions) } },
+              { name: 'taskId', value: { stringValue: task.taskId } },
+            ]
+          );
+          suggestionsCreated++;
+        }
+      } catch (err) {
+        // Continue with next user if one fails
+      }
+
+      if (suggestionsCreated >= maxSuggestions * 10) break; // Cap total suggestions
+    }
+
+    return { status: 'completed', suggestions_created: suggestionsCreated };
   }
 
   private async executeMemoryAction(task: AutonomousTask, action: ProposedAction): Promise<unknown> {
@@ -571,13 +773,124 @@ export class AutonomousAgentService {
   }
 
   private async executeModelUpdate(task: AutonomousTask, action: ProposedAction): Promise<unknown> {
-    // In production, would trigger causal graph updates
-    return { status: 'completed', updates: 0 };
+    // Get tenant ID from task
+    const taskResult = await executeStatement(
+      `SELECT tenant_id FROM autonomous_tasks WHERE task_id = $1`,
+      [{ name: 'taskId', value: { stringValue: task.taskId } }]
+    );
+    const tenantId = String((taskResult.rows[0] as { tenant_id: string }).tenant_id);
+
+    // Find stale causal relationships that need updating
+    const staleRelations = await executeStatement(
+      `SELECT id, source_node_id, target_node_id, relationship_type, confidence_score
+       FROM cortex_causal_graph
+       WHERE tenant_id = $1 
+         AND (last_validated_at IS NULL OR last_validated_at < NOW() - INTERVAL '30 days')
+         AND confidence_score > 0.3
+       ORDER BY confidence_score DESC
+       LIMIT 50`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+
+    let updatesApplied = 0;
+
+    for (const row of staleRelations.rows as { id: string; source_node_id: string; target_node_id: string; relationship_type: string; confidence_score: number }[]) {
+      try {
+        // Check if relationship still has supporting evidence
+        const evidenceResult = await executeStatement(
+          `SELECT COUNT(*) as evidence_count FROM cortex_causal_evidence
+           WHERE relation_id = $1 AND is_valid = true`,
+          [{ name: 'relationId', value: { stringValue: row.id } }]
+        );
+        
+        const evidenceCount = Number((evidenceResult.rows[0] as { evidence_count: number }).evidence_count);
+        
+        // Decay confidence if no recent evidence, otherwise validate
+        const newConfidence = evidenceCount > 0 
+          ? Math.min(row.confidence_score * 1.05, 1.0) 
+          : row.confidence_score * 0.9;
+
+        await executeStatement(
+          `UPDATE cortex_causal_graph 
+           SET confidence_score = $1, last_validated_at = NOW(), updated_at = NOW()
+           WHERE id = $2`,
+          [
+            { name: 'confidence', value: { doubleValue: newConfidence } },
+            { name: 'id', value: { stringValue: row.id } },
+          ]
+        );
+        updatesApplied++;
+      } catch (err) {
+        // Continue with next relation if one fails
+      }
+    }
+
+    return { status: 'completed', updates: updatesApplied };
   }
 
   private async executeSkillExtraction(task: AutonomousTask, action: ProposedAction): Promise<unknown> {
-    // In production, would analyze recent successful tasks and extract patterns
-    return { status: 'completed', skills_extracted: 0 };
+    // Get tenant ID from task
+    const taskResult = await executeStatement(
+      `SELECT tenant_id FROM autonomous_tasks WHERE task_id = $1`,
+      [{ name: 'taskId', value: { stringValue: task.taskId } }]
+    );
+    const tenantId = String((taskResult.rows[0] as { tenant_id: string }).tenant_id);
+
+    // Find successful task patterns from recent executions
+    const successfulPatterns = await executeStatement(
+      `SELECT 
+         at.action_type,
+         at.action_config,
+         COUNT(*) as success_count,
+         AVG(ae.tokens_used) as avg_tokens,
+         AVG(EXTRACT(EPOCH FROM (ae.completed_at - ae.triggered_at))) as avg_duration_secs
+       FROM autonomous_executions ae
+       JOIN autonomous_tasks at ON ae.task_id = at.task_id
+       WHERE at.tenant_id = $1 
+         AND ae.status = 'completed'
+         AND ae.completed_at > NOW() - INTERVAL '30 days'
+       GROUP BY at.action_type, at.action_config
+       HAVING COUNT(*) >= 3
+       ORDER BY success_count DESC
+       LIMIT 20`,
+      [{ name: 'tenantId', value: { stringValue: tenantId } }]
+    );
+
+    let skillsExtracted = 0;
+
+    for (const row of successfulPatterns.rows as { action_type: string; action_config: string; success_count: number; avg_tokens: number; avg_duration_secs: number }[]) {
+      try {
+        // Extract and store skill pattern
+        await executeStatement(
+          `INSERT INTO autonomous_learned_skills (
+             tenant_id, skill_name, action_type, optimal_config, 
+             success_rate, avg_tokens, avg_duration_secs, sample_count, extracted_from_task
+           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+           ON CONFLICT (tenant_id, skill_name) DO UPDATE SET
+             success_rate = EXCLUDED.success_rate,
+             avg_tokens = EXCLUDED.avg_tokens,
+             avg_duration_secs = EXCLUDED.avg_duration_secs,
+             sample_count = autonomous_learned_skills.sample_count + EXCLUDED.sample_count,
+             updated_at = NOW()`,
+          [
+            { name: 'tenantId', value: { stringValue: tenantId } },
+            { name: 'skillName', value: { stringValue: `${row.action_type}_optimized` } },
+            { name: 'actionType', value: { stringValue: row.action_type } },
+            { name: 'optimalConfig', value: { stringValue: row.action_config } },
+            { name: 'successRate', value: { doubleValue: 1.0 } },
+            { name: 'avgTokens', value: { doubleValue: row.avg_tokens || 0 } },
+            { name: 'avgDuration', value: { doubleValue: row.avg_duration_secs || 0 } },
+            { name: 'sampleCount', value: { longValue: row.success_count } },
+            { name: 'taskId', value: { stringValue: task.taskId } },
+          ]
+        );
+        skillsExtracted++;
+      } catch (err) {
+        // Continue with next pattern if one fails
+      }
+    }
+
+    return { status: 'completed', skills_extracted: skillsExtracted };
   }
 
   // ============================================================================
@@ -738,6 +1051,7 @@ export class AutonomousAgentService {
   private mapTask(row: Record<string, unknown>): AutonomousTask {
     return {
       taskId: String(row.task_id),
+      tenantId: String(row.tenant_id),
       taskType: row.task_type as TaskType,
       name: String(row.name),
       description: row.description ? String(row.description) : undefined,

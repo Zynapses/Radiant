@@ -678,15 +678,43 @@ export class ChecklistRegistryService {
 
     for (const source of sources.rows) {
       try {
-        // Update last check timestamp
+        // Fetch updates from the source based on source type
+        const fetchedUpdates = await this.fetchFromSource(source, standardId);
+        
+        // Update last check timestamp on success
         await this.pool.query(`
           UPDATE checklist_update_sources SET last_check_at = NOW(), error_count = 0
           WHERE id = $1
         `, [source.id]);
 
-        // In a real implementation, this would fetch from the source
-        // For now, we just log that we checked
-        logger.debug('Checked update source', { sourceName: source.source_name, standardId });
+        // Process any detected updates
+        for (const update of fetchedUpdates) {
+          // Check if we already have this version
+          const existingResult = await this.pool.query(`
+            SELECT id FROM regulatory_version_updates 
+            WHERE standard_id = $1 AND new_version = $2
+          `, [standardId, update.version]);
+          
+          if (existingResult.rows.length === 0) {
+            // Create new version update record
+            const insertResult = await this.pool.query(`
+              INSERT INTO regulatory_version_updates (
+                standard_id, detected_source_id, new_version, change_summary,
+                source_url, processing_status, detected_at
+              ) VALUES ($1, $2, $3, $4, $5, 'pending', NOW())
+              RETURNING *
+            `, [standardId, source.id, update.version, update.changeSummary, update.sourceUrl]);
+            
+            updates.push(this.mapVersionUpdate(insertResult.rows[0]));
+            logger.info('Detected new version update', { 
+              standardId, 
+              version: update.version, 
+              source: source.source_name 
+            });
+          }
+        }
+
+        logger.debug('Checked update source', { sourceName: source.source_name, standardId, updatesFound: fetchedUpdates.length });
 
       } catch (error) {
         // Record error
@@ -696,6 +724,12 @@ export class ChecklistRegistryService {
             last_error = $2
           WHERE id = $1
         `, [source.id, (error as Error).message]);
+        
+        logger.warn('Failed to fetch from update source', { 
+          sourceName: source.source_name, 
+          standardId, 
+          error: (error as Error).message 
+        });
       }
     }
 
@@ -925,6 +959,141 @@ export class ChecklistRegistryService {
       processingNotes: row.processing_notes,
       checklistVersionCreatedId: row.checklist_version_created_id
     };
+  }
+
+  /**
+   * Fetch updates from an external source based on source type
+   */
+  private async fetchFromSource(
+    source: { id: string; source_type: string; source_url: string; api_config: any },
+    standardId: string
+  ): Promise<Array<{ version: string; changeSummary: string; sourceUrl: string }>> {
+    const updates: Array<{ version: string; changeSummary: string; sourceUrl: string }> = [];
+    
+    switch (source.source_type) {
+      case 'rss':
+        // Fetch RSS feed for regulatory updates
+        try {
+          const response = await fetch(source.source_url, {
+            headers: { 'User-Agent': 'RADIANT-Compliance-Checker/1.0' },
+            signal: AbortSignal.timeout(30000),
+          });
+          
+          if (response.ok) {
+            const text = await response.text();
+            // Parse RSS for version updates (simplified - would use xml parser in production)
+            const versionMatches = text.match(/<title>.*?v?(\d+\.\d+(?:\.\d+)?).*/gi) || [];
+            for (const match of versionMatches.slice(0, 5)) {
+              const versionMatch = match.match(/v?(\d+\.\d+(?:\.\d+)?)/i);
+              if (versionMatch) {
+                updates.push({
+                  version: versionMatch[1],
+                  changeSummary: match.replace(/<[^>]*>/g, '').trim(),
+                  sourceUrl: source.source_url,
+                });
+              }
+            }
+          }
+        } catch (error) {
+          logger.warn('RSS fetch failed', { sourceUrl: source.source_url, error });
+        }
+        break;
+        
+      case 'api':
+        // Fetch from REST API endpoint
+        try {
+          const apiConfig = source.api_config || {};
+          const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            ...(apiConfig.headers || {}),
+          };
+          
+          if (apiConfig.api_key) {
+            headers['Authorization'] = `Bearer ${apiConfig.api_key}`;
+          }
+          
+          const response = await fetch(source.source_url, {
+            headers,
+            signal: AbortSignal.timeout(30000),
+          });
+          
+          if (response.ok) {
+            const data = await response.json() as Record<string, unknown>;
+            // Extract versions based on API response format
+            const versions = Array.isArray(data) ? data : ((data.versions || data.releases || []) as unknown[]);
+            for (const item of versions.slice(0, 10) as Record<string, unknown>[]) {
+              updates.push({
+                version: String(item.version || item.tag_name || item.name || ''),
+                changeSummary: String(item.description || item.body || item.summary || ''),
+                sourceUrl: String(item.url || source.source_url),
+              });
+            }
+          }
+        } catch (error) {
+          logger.warn('API fetch failed', { sourceUrl: source.source_url, error });
+        }
+        break;
+        
+      case 'web_scrape':
+        // Web scraping for version info (uses configured selectors)
+        try {
+          const response = await fetch(source.source_url, {
+            headers: { 'User-Agent': 'RADIANT-Compliance-Checker/1.0' },
+            signal: AbortSignal.timeout(30000),
+          });
+          
+          if (response.ok) {
+            const html = await response.text();
+            // Simple version detection from HTML content
+            const versionPattern = /version\s*:?\s*v?(\d+\.\d+(?:\.\d+)?)/gi;
+            let match;
+            while ((match = versionPattern.exec(html)) !== null && updates.length < 5) {
+              updates.push({
+                version: match[1],
+                changeSummary: `Version ${match[1]} detected from ${source.source_url}`,
+                sourceUrl: source.source_url,
+              });
+            }
+          }
+        } catch (error) {
+          logger.warn('Web scrape failed', { sourceUrl: source.source_url, error });
+        }
+        break;
+        
+      case 'github':
+        // Fetch from GitHub releases API
+        try {
+          const apiUrl = source.source_url.replace('github.com', 'api.github.com/repos') + '/releases';
+          const response = await fetch(apiUrl, {
+            headers: {
+              'Accept': 'application/vnd.github.v3+json',
+              'User-Agent': 'RADIANT-Compliance-Checker/1.0',
+            },
+            signal: AbortSignal.timeout(30000),
+          });
+          
+          if (response.ok) {
+            const releases = await response.json() as Array<Record<string, unknown>>;
+            for (const release of releases.slice(0, 10)) {
+              const tagName = String(release.tag_name || '');
+              const body = String(release.body || '');
+              updates.push({
+                version: tagName.replace(/^v/, '') || String(release.name || ''),
+                changeSummary: body.substring(0, 500) || String(release.name || ''),
+                sourceUrl: String(release.html_url || ''),
+              });
+            }
+          }
+        } catch (error) {
+          logger.warn('GitHub fetch failed', { sourceUrl: source.source_url, error });
+        }
+        break;
+        
+      default:
+        logger.debug('Unknown source type', { sourceType: source.source_type, sourceId: source.id });
+    }
+    
+    return updates;
   }
 }
 

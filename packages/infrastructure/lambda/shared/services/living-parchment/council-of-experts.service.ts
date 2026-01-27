@@ -186,7 +186,7 @@ export class CouncilOfExpertsService {
       throw new Error('Council session not found');
     }
 
-    const session = result.rows[0];
+    const session = result.rows[0] as any;
 
     // Get experts
     const expertsResult = await executeStatement({

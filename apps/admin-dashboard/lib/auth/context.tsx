@@ -41,8 +41,22 @@ interface AuthState {
   error: string | null;
 }
 
+interface MFACheckResult {
+  mfaRequired: boolean;
+  mfaEnrolled: boolean;
+  deviceTrusted: boolean;
+  role: string;
+}
+
+interface LoginResult {
+  needsMfa: boolean;
+  mfaRequired?: boolean;
+  mfaEnrolled?: boolean;
+  deviceTrusted?: boolean;
+}
+
 interface AuthContextValue extends AuthState {
-  login: (email: string, password: string) => Promise<{ needsMfa: boolean }>;
+  login: (email: string, password: string) => Promise<LoginResult>;
   confirmMfa: (code: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
@@ -114,7 +128,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkSession();
   }, [checkSession]);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const checkMFARequirements = useCallback(async (token: string): Promise<MFACheckResult> => {
+    try {
+      const response = await fetch('/api/mfa/check', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'x-device-token': typeof window !== 'undefined' ? localStorage.getItem('mfa_device_token') || '' : '',
+        },
+      });
+      
+      if (!response.ok) {
+        return { mfaRequired: false, mfaEnrolled: false, deviceTrusted: false, role: 'user' };
+      }
+      
+      return response.json();
+    } catch {
+      return { mfaRequired: false, mfaEnrolled: false, deviceTrusted: false, role: 'user' };
+    }
+  }, []);
+
+  const login = useCallback(async (email: string, password: string): Promise<LoginResult> => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
@@ -126,6 +160,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       if (result.isSignedIn) {
+        const tokens = await getTokens();
+        
+        if (tokens?.accessToken) {
+          const mfaCheck = await checkMFARequirements(tokens.accessToken);
+          
+          if (mfaCheck.mfaRequired && (!mfaCheck.mfaEnrolled || !mfaCheck.deviceTrusted)) {
+            await checkSession();
+            setState(prev => ({ ...prev, isLoading: false }));
+            return {
+              needsMfa: false,
+              mfaRequired: mfaCheck.mfaRequired,
+              mfaEnrolled: mfaCheck.mfaEnrolled,
+              deviceTrusted: mfaCheck.deviceTrusted,
+            };
+          }
+        }
+        
         await checkSession();
       }
       
@@ -138,7 +189,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }));
       throw error;
     }
-  }, [checkSession]);
+  }, [checkSession, checkMFARequirements]);
 
   const confirmMfa = useCallback(async (code: string) => {
     try {

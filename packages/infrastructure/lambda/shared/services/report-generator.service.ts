@@ -8,6 +8,7 @@
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { createHash } from 'crypto';
+import PDFDocument from 'pdfkit';
 import { executeStatement, stringParam, longParam } from '../db/client';
 import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
@@ -892,54 +893,304 @@ class ReportGeneratorService {
   }
 
   /**
-   * Format as PDF (simplified - outputs formatted text)
+   * Format as PDF using PDFKit
    */
   private formatAsPDF(data: ReportData): Buffer {
-    // For a real implementation, use a library like pdfkit or puppeteer
-    // This outputs formatted text as a placeholder
-    const lines: string[] = [];
+    return this.generatePDFWithPDFKit(PDFDocument, data);
+  }
 
-    lines.push('='.repeat(60));
-    lines.push(data.title.toUpperCase());
-    if (data.subtitle) lines.push(data.subtitle);
-    lines.push(`Generated: ${data.generated_at}`);
-    lines.push('='.repeat(60));
-    lines.push('');
+  /**
+   * Generate PDF using PDFKit library
+   */
+  private generatePDFWithPDFKit(PDFDocument: any, data: ReportData): Buffer {
+    const chunks: Buffer[] = [];
+    const doc = new PDFDocument({
+      size: 'A4',
+      margins: { top: 50, bottom: 50, left: 50, right: 50 },
+      info: {
+        Title: data.title,
+        Author: 'RADIANT Platform',
+        Subject: data.subtitle || 'Generated Report',
+        CreationDate: new Date(data.generated_at),
+      },
+    });
 
-    if (data.summary && Object.keys(data.summary).length > 0) {
-      lines.push('SUMMARY');
-      lines.push('-'.repeat(40));
-      for (const [key, value] of Object.entries(data.summary)) {
-        lines.push(`  ${key.replace(/_/g, ' ').toUpperCase()}: ${value}`);
-      }
-      lines.push('');
+    // Collect PDF chunks
+    doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+
+    // Colors
+    const primaryColor = '#1e40af'; // Blue
+    const textColor = '#1f2937';
+    const headerBgColor = '#f3f4f6';
+
+    // Title
+    doc.fontSize(24)
+       .fillColor(primaryColor)
+       .text(data.title, { align: 'center' });
+    
+    if (data.subtitle) {
+      doc.fontSize(12)
+         .fillColor(textColor)
+         .text(data.subtitle, { align: 'center' });
     }
 
-    for (const section of data.sections) {
-      lines.push(section.title.toUpperCase());
-      lines.push('-'.repeat(40));
+    doc.moveDown();
+    doc.fontSize(10)
+       .fillColor('#6b7280')
+       .text(`Generated: ${new Date(data.generated_at).toLocaleString()}`, { align: 'center' });
 
-      if (section.type === 'table' && section.columns && Array.isArray(section.data)) {
-        // Simple table format
-        const colWidths = section.columns.map(c => Math.max(c.label.length, 15));
+    doc.moveDown(2);
 
-        // Header
-        lines.push(section.columns.map((c, i) => c.label.padEnd(colWidths[i])).join(' | '));
-        lines.push(colWidths.map(w => '-'.repeat(w)).join('-+-'));
+    // Summary Section
+    if (data.summary && Object.keys(data.summary).length > 0) {
+      doc.fontSize(16)
+         .fillColor(primaryColor)
+         .text('Summary');
+      
+      doc.moveTo(50, doc.y)
+         .lineTo(545, doc.y)
+         .strokeColor(primaryColor)
+         .stroke();
+      
+      doc.moveDown(0.5);
 
-        // Data
-        for (const row of section.data as Record<string, unknown>[]) {
-          const values = section.columns.map((c, i) => 
-            String(row[c.key] ?? '').padEnd(colWidths[i])
-          );
-          lines.push(values.join(' | '));
+      // Summary metrics in a grid
+      const summaryEntries = Object.entries(data.summary);
+      const colWidth = 160;
+      let col = 0;
+      const startX = 50;
+      let startY = doc.y;
+
+      for (const [key, value] of summaryEntries) {
+        const label = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        const x = startX + (col * colWidth);
+        
+        doc.fontSize(10)
+           .fillColor('#6b7280')
+           .text(label, x, startY, { width: colWidth - 10, continued: false });
+        
+        doc.fontSize(14)
+           .fillColor(textColor)
+           .text(String(value), x, doc.y, { width: colWidth - 10 });
+
+        col++;
+        if (col >= 3) {
+          col = 0;
+          startY = doc.y + 10;
         }
       }
 
-      lines.push('');
+      doc.moveDown(2);
     }
 
-    return Buffer.from(lines.join('\n'), 'utf-8');
+    // Data Sections
+    for (const section of data.sections) {
+      // Check if we need a new page
+      if (doc.y > 700) {
+        doc.addPage();
+      }
+
+      // Section Title
+      doc.fontSize(14)
+         .fillColor(primaryColor)
+         .text(section.title);
+      
+      doc.moveTo(50, doc.y)
+         .lineTo(545, doc.y)
+         .strokeColor('#e5e7eb')
+         .stroke();
+      
+      doc.moveDown(0.5);
+
+      if (section.type === 'table' && section.columns && Array.isArray(section.data)) {
+        this.drawPDFTable(doc, section.columns, section.data as Record<string, unknown>[]);
+      } else if (section.type === 'metric') {
+        doc.fontSize(11)
+           .fillColor(textColor)
+           .text(JSON.stringify(section.data, null, 2));
+      } else if (section.type === 'text') {
+        doc.fontSize(11)
+           .fillColor(textColor)
+           .text(String(section.data));
+      }
+
+      doc.moveDown(1.5);
+    }
+
+    // Footer on each page
+    const pageCount = doc.bufferedPageRange().count;
+    for (let i = 0; i < pageCount; i++) {
+      doc.switchToPage(i);
+      doc.fontSize(8)
+         .fillColor('#9ca3af')
+         .text(
+           `Page ${i + 1} of ${pageCount} | RADIANT Platform Report`,
+           50,
+           doc.page.height - 40,
+           { align: 'center', width: doc.page.width - 100 }
+         );
+    }
+
+    doc.end();
+
+    // Return concatenated buffer
+    return Buffer.concat(chunks);
+  }
+
+  /**
+   * Draw a table in the PDF
+   */
+  private drawPDFTable(
+    doc: any,
+    columns: { key: string; label: string; format?: string }[],
+    data: Record<string, unknown>[]
+  ): void {
+    const tableTop = doc.y;
+    const tableLeft = 50;
+    const rowHeight = 20;
+    const colWidth = (545 - tableLeft) / columns.length;
+
+    // Draw header row
+    doc.rect(tableLeft, tableTop, 545 - tableLeft, rowHeight)
+       .fillColor('#f3f4f6')
+       .fill();
+
+    doc.fillColor('#374151');
+    columns.forEach((col, i) => {
+      doc.fontSize(9)
+         .text(col.label, tableLeft + (i * colWidth) + 5, tableTop + 5, {
+           width: colWidth - 10,
+           align: 'left',
+         });
+    });
+
+    // Draw data rows
+    let y = tableTop + rowHeight;
+    const maxRows = Math.min(data.length, 50); // Limit rows per page section
+
+    for (let rowIdx = 0; rowIdx < maxRows; rowIdx++) {
+      const row = data[rowIdx];
+      
+      // Alternate row background
+      if (rowIdx % 2 === 1) {
+        doc.rect(tableLeft, y, 545 - tableLeft, rowHeight)
+           .fillColor('#fafafa')
+           .fill();
+      }
+
+      doc.fillColor('#1f2937');
+      columns.forEach((col, i) => {
+        let value = row[col.key];
+        
+        // Format value based on column format
+        if (col.format === 'number' && typeof value === 'string') {
+          value = parseInt(value, 10).toLocaleString();
+        } else if (col.format === 'currency' && typeof value === 'string') {
+          value = `$${parseFloat(value).toFixed(2)}`;
+        } else if (col.format === 'percent' && typeof value === 'string') {
+          value = `${parseFloat(value).toFixed(1)}%`;
+        } else if (col.format === 'date' && value) {
+          value = new Date(String(value)).toLocaleDateString();
+        }
+
+        doc.fontSize(8)
+           .text(String(value ?? ''), tableLeft + (i * colWidth) + 5, y + 5, {
+             width: colWidth - 10,
+             align: 'left',
+           });
+      });
+
+      y += rowHeight;
+
+      // Check for page break
+      if (y > 750) {
+        doc.addPage();
+        y = 50;
+      }
+    }
+
+    if (data.length > maxRows) {
+      doc.fontSize(8)
+         .fillColor('#6b7280')
+         .text(`... and ${data.length - maxRows} more rows`, tableLeft, y + 5);
+    }
+
+    doc.y = y + 10;
+  }
+
+  /**
+   * Generate HTML-based PDF as fallback (outputs HTML that can be converted)
+   */
+  private generateHTMLBasedPDF(data: ReportData): Buffer {
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${data.title}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; color: #1f2937; }
+    h1 { color: #1e40af; text-align: center; margin-bottom: 5px; }
+    .subtitle { text-align: center; color: #6b7280; margin-bottom: 20px; }
+    .generated { text-align: center; color: #9ca3af; font-size: 12px; margin-bottom: 30px; }
+    .summary { background: #f3f4f6; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+    .summary h2 { color: #1e40af; margin-top: 0; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .metric { }
+    .metric-label { color: #6b7280; font-size: 12px; }
+    .metric-value { font-size: 18px; font-weight: bold; color: #1f2937; }
+    .section { margin-bottom: 30px; }
+    .section h2 { color: #1e40af; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { background: #f3f4f6; padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb; }
+    td { padding: 8px 10px; border-bottom: 1px solid #e5e7eb; }
+    tr:nth-child(even) { background: #fafafa; }
+  </style>
+</head>
+<body>
+  <h1>${data.title}</h1>
+  ${data.subtitle ? `<p class="subtitle">${data.subtitle}</p>` : ''}
+  <p class="generated">Generated: ${new Date(data.generated_at).toLocaleString()}</p>
+  
+  ${data.summary && Object.keys(data.summary).length > 0 ? `
+  <div class="summary">
+    <h2>Summary</h2>
+    <div class="summary-grid">
+      ${Object.entries(data.summary).map(([key, value]) => `
+        <div class="metric">
+          <div class="metric-label">${key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</div>
+          <div class="metric-value">${value}</div>
+        </div>
+      `).join('')}
+    </div>
+  </div>
+  ` : ''}
+
+  ${data.sections.map(section => `
+  <div class="section">
+    <h2>${section.title}</h2>
+    ${section.type === 'table' && section.columns ? `
+    <table>
+      <thead>
+        <tr>
+          ${section.columns.map(col => `<th>${col.label}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${(section.data as Record<string, unknown>[]).slice(0, 100).map(row => `
+          <tr>
+            ${section.columns!.map(col => `<td>${row[col.key] ?? ''}</td>`).join('')}
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    ` : `<p>${JSON.stringify(section.data)}</p>`}
+  </div>
+  `).join('')}
+</body>
+</html>`;
+
+    return Buffer.from(html, 'utf-8');
   }
 
   /**
@@ -994,8 +1245,8 @@ class ReportGeneratorService {
       case 'csv': return 'csv';
       case 'json': return 'json';
       case 'excel': return 'xlsx';
-      case 'pdf':
-      default: return 'txt'; // Would be 'pdf' with real PDF generation
+      case 'pdf': return 'pdf';
+      default: return 'txt';
     }
   }
 
@@ -1007,8 +1258,8 @@ class ReportGeneratorService {
       case 'csv': return 'text/csv';
       case 'json': return 'application/json';
       case 'excel': return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-      case 'pdf':
-      default: return 'text/plain'; // Would be 'application/pdf' with real PDF generation
+      case 'pdf': return 'application/pdf';
+      default: return 'text/plain';
     }
   }
 

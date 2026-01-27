@@ -470,7 +470,7 @@ class PrepromptLearningService {
       stringParam('domain_id', instance.detectedDomainId || ''),
     ]);
 
-    const row = result.rows[0] || {};
+    const row = (result.rows[0] || {}) as any;
     return {
       templateSuccessRate: Number(row.template_rate) || 0.5,
       modelSuccessRate: Number(row.model_rate) || 0.5,

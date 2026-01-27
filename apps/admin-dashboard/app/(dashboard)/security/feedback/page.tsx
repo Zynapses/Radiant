@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -54,6 +55,7 @@ interface IneffectivePattern {
 }
 
 export default function FeedbackPage() {
+  const { toast } = useToast();
   const [stats, setStats] = useState<FeedbackStats | null>(null);
   const [pendingReview, setPendingReview] = useState<PendingReview[]>([]);
   const [candidates, setCandidates] = useState<RetrainingCandidate[]>([]);
@@ -118,11 +120,25 @@ export default function FeedbackPage() {
       });
       if (res.ok) {
         const result = await res.json();
-        alert(`Disabled ${result.disabled.length} patterns, skipped ${result.skipped.length}`);
+        toast({
+          title: 'Patterns Disabled',
+          description: `Disabled ${result.disabled.length} patterns, skipped ${result.skipped.length}.`,
+        });
         fetchAll();
+      } else {
+        toast({
+          title: 'Auto-Disable Failed',
+          description: 'Failed to auto-disable patterns.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Failed to auto-disable patterns:', error);
+      toast({
+        title: 'Auto-Disable Failed',
+        description: 'An error occurred while disabling patterns.',
+        variant: 'destructive',
+      });
     }
   };
 

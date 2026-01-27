@@ -1,7 +1,7 @@
 # RADIANT Engineering Implementation & Vision
 
-**Version**: 5.52.8  
-**Last Updated**: 2026-01-24  
+**Version**: 5.52.29  
+**Last Updated**: 2026-01-25  
 **Classification**: Internal Engineering Reference
 
 > **POLICY**: All technical architecture, implementation details, and visionary documentation MUST be consolidated in this document. Engineers require comprehensive detail—never abbreviate or summarize to the point of losing implementation specifics. See `/.windsurf/workflows/documentation-consolidation.md` for enforcement.
@@ -27,6 +27,9 @@
 15. [Services Layer & Interface-Based Access Control](#15-services-layer--interface-based-access-control-v5525)
 16. [Complete Admin API Architecture](#16-complete-admin-api-architecture-v5526)
 17. [Liquid Interface - Morphable UI System](#17-liquid-interface---morphable-ui-system-v5528)
+18. [OAuth 2.0 Provider & Developer Portal](#18-oauth-20-provider--developer-portal-v55226)
+19. [Two-Factor Authentication (MFA)](#19-two-factor-authentication-mfa-v55228)
+20. [Internationalization & Multi-Language Search](#20-internationalization--multi-language-search-v55229)
 
 ---
 
@@ -591,11 +594,133 @@ CREATE POLICY tenant_isolation ON table_name
   USING (tenant_id = current_setting('app.current_tenant_id')::UUID);
 ```
 
-### 3.2 Migration Strategy
+### 3.2 PostgreSQL Scaling Architecture (v5.52.20)
+
+**Problem**: When 6 AI models execute in parallel, each Lambda opens 1 connection. At 100 concurrent requests × 6 parallel writes, we need 600 connections—exceeding Aurora's limits and causing transaction conflicts.
+
+**Solution**: OpenAI-inspired PostgreSQL scaling patterns for enterprise parallel AI execution.
+
+#### 3.2.1 RDS Proxy Connection Pooling
+
+CDK Construct: `packages/infrastructure/lib/constructs/database-scaling.construct.ts`
+
+| Tier | Max Connections % | Idle Timeout | Borrow Timeout |
+|------|-------------------|--------------|----------------|
+| 1 | 60% | 1800s | 30s |
+| 2 | 70% | 1800s | 30s |
+| 3 | 80% | 1200s | 60s |
+| 4 | 85% | 900s | 60s |
+| 5 | 90% | 600s | 120s |
+
+Benefits:
+- **Connection Multiplexing**: 600 Lambda connections → 100 database connections
+- **Cold Start Optimization**: Pre-warmed connections eliminate 50-100ms handshake
+- **Session Pinning**: Prepared statements pin when needed
+
+#### 3.2.2 Async Write Pattern (SQS + Batch Writer)
+
+CDK Construct: `packages/infrastructure/lib/constructs/async-write.construct.ts`
+
+```
+Request Flow:
+User → Lambda → 6 AI Models (parallel) → SQS Queue → Batch Writer Lambda → PostgreSQL
+                     ↓
+              Redis Cache (immediate read-after-write)
+```
+
+| Component | Configuration |
+|-----------|--------------|
+| Queue | Encrypted, 14-day retention, 300s visibility timeout |
+| Dead Letter | 3 max receives, separate queue for manual inspection |
+| Batch Writer | 100 messages/batch, tier-based concurrency (5-100) |
+
+#### 3.2.3 Redis Hot-Path Caching
+
+CDK Construct: `packages/infrastructure/lib/constructs/redis-cache.construct.ts`
+
+| Tier | Node Type | Shards | Replicas/Shard |
+|------|-----------|--------|----------------|
+| 1 | cache.t4g.micro | 1 | 0 |
+| 2 | cache.t4g.small | 1 | 1 |
+| 3 | cache.r6g.large | 2 | 1 |
+| 4 | cache.r6g.xlarge | 3 | 2 |
+| 5 | cache.r6g.2xlarge | 5 | 2 |
+
+Features:
+- **Read-After-Write Consistency**: Results cached immediately, persisted async
+- **Rate Limiting**: Sliding window per tenant/resource
+- **Session State**: Lambda-to-Lambda context sharing
+
+#### 3.2.4 Time-Based Partitioning
+
+Migration: `V2026_01_25_002__postgresql_scaling_partitioning.sql`
+
+```sql
+-- Partitioned tables for high-volume time-series data
+CREATE TABLE model_execution_logs_partitioned (
+  tenant_id UUID,
+  id UUID,
+  created_at TIMESTAMPTZ,
+  PRIMARY KEY (tenant_id, id, created_at)
+) PARTITION BY RANGE (created_at);
+
+CREATE TABLE usage_records_partitioned (
+  tenant_id UUID,
+  id UUID,
+  timestamp TIMESTAMPTZ,
+  PRIMARY KEY (tenant_id, id, timestamp)
+) PARTITION BY RANGE (timestamp);
+```
+
+Partition management:
+- Monthly partitions auto-created 3 months ahead
+- Stale partitions archived after 24 months
+- Automated management via `manage_time_partitions()` function
+
+#### 3.2.5 Materialized Views for Dashboards
+
+Migration: `V2026_01_25_003__postgresql_scaling_materialized_views.sql`
+
+| View | Refresh | Purpose |
+|------|---------|---------|
+| `tenant_daily_usage_summary` | 15 min | Dashboard usage cards |
+| `model_performance_summary` | 1 hour | Model latency/error tracking |
+| `tenant_cost_summary` | 1 hour | Billing dashboard |
+| `user_activity_summary` | 1 hour | User engagement metrics |
+| `platform_health_stats` | 5 min | Admin overview |
+| `model_popularity_ranking` | 1 hour | Model selection optimization |
+
+#### 3.2.6 Optimized RLS Policies
+
+Migration: `V2026_01_25_001__postgresql_scaling_rls.sql`
+
+```sql
+-- Optimized wrapper that enables index usage
+CREATE OR REPLACE FUNCTION get_current_tenant_id()
+RETURNS UUID AS $$
+  SELECT NULLIF(current_setting('app.current_tenant_id', true), '')::UUID;
+$$ LANGUAGE SQL STABLE PARALLEL SAFE;
+
+-- Policy using the wrapper
+CREATE POLICY tenant_isolation ON table_name
+  USING (tenant_id = get_current_tenant_id());
+```
+
+#### 3.2.7 Monitoring Metrics
+
+| Metric | Threshold | Action |
+|--------|-----------|--------|
+| RDS Proxy connections available | < 10% | Scale proxy / reduce Lambda concurrency |
+| Aurora CPU | > 80% | Add read replicas |
+| SQS queue age | > 60s | Add batch writer concurrency |
+| Query latency P95 | > 500ms | Optimize query / add index |
+| Redis memory | > 80% | Scale cluster |
+
+### 3.3 Migration Strategy
 
 - Sequential numbered migrations: `001_`, `002_`, etc.
 - Location: `packages/infrastructure/migrations/`
-- Current count: 185 migrations
+- Current count: 188 migrations
 
 ---
 
@@ -616,7 +741,58 @@ CREATE POLICY tenant_isolation ON table_name
 - LoRA adapters for tenant customization
 - Hot-swappable for zero-downtime updates
 
-### 4.2 Orchestration Modes (9)
+### 4.2 Expert System Adapters (v5.52.21)
+
+Tenant-trainable domain intelligence through automatic LoRA adapter training.
+
+#### Tri-Layer Adapter Architecture
+
+```
+W_Final = W_Genesis + (scale × W_Cato) + (scale × W_User) + (scale × W_Domain)
+```
+
+| Layer | Name | Purpose | Management |
+|-------|------|---------|------------|
+| 0 | Genesis | Base model weights | Frozen |
+| 1 | Cato | Global constitution, tenant values | Pinned, never evicted |
+| 2 | User | Personal preferences, style | LRU eviction |
+| 3 | Domain | Specialized expertise | Auto-selected by domain |
+
+#### Implicit Feedback Learning
+
+| Signal | Weight | Interpretation |
+|--------|--------|----------------|
+| Copy Response | +0.80 | User copied output |
+| Thumbs Up | +1.00 | Explicit positive |
+| Follow-up Question | +0.30 | Partial success |
+| Long Dwell Time | +0.40 | User engaged |
+| Regenerate Request | -0.50 | Not satisfactory |
+| Abandon | -0.70 | Complete failure |
+| Thumbs Down | -1.00 | Explicit negative |
+
+#### Domain Auto-Selection
+
+```typescript
+// Auto-selection scoring algorithm
+Score = (0.3 × DomainMatch) 
+      + (0.1 × SubdomainBonus)
+      + (0.25 × SatisfactionScore)
+      + (0.1 × VolumeScore)
+      + (0.05 × ErrorRate)
+      + (0.2 × RecencyScore)
+
+// Select adapter if Score ≥ 0.5
+```
+
+**Implementation**:
+- Service: `lambda/shared/services/enhanced-learning.service.ts`
+- Service: `lambda/shared/services/lora-inference.service.ts`
+- Service: `lambda/shared/services/adapter-management.service.ts`
+- Migration: `migrations/108_enhanced_learning.sql`
+- Admin UI: `apps/admin-dashboard/app/(dashboard)/models/lora-adapters/page.tsx`
+- Documentation: `docs/EXPERT-SYSTEM-ADAPTERS.md`
+
+### 4.3 Orchestration Modes (9)
 
 | Mode | Purpose |
 |------|---------|
@@ -3821,6 +3997,659 @@ apps/thinktank/lib/api/
 ├── ideas.ts              # ideasService (v5.52.17)
 └── compliance-export.ts  # exportConversation (v5.52.16)
 ```
+
+---
+
+## 19. OAuth 2.0 Provider & Developer Portal (v5.52.26)
+
+### 19.1 Overview
+
+RADIANT implements a **RFC 6749 compliant OAuth 2.0 Authorization Server** enabling third-party applications to access RADIANT APIs on behalf of users. This enables the ecosystem of MCP servers, Zapier integrations, partner apps, and custom automation tools.
+
+### 19.2 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         OAUTH 2.0 PROVIDER ARCHITECTURE                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐   │
+│  │  Third-Party App │     │  User's Browser  │     │   RADIANT API    │   │
+│  │  (MCP, Zapier)   │     │                  │     │                  │   │
+│  └────────┬─────────┘     └────────┬─────────┘     └────────┬─────────┘   │
+│           │                        │                        │             │
+│           │ 1. Authorization       │                        │             │
+│           │    Request             │                        │             │
+│           ├───────────────────────►│                        │             │
+│           │                        │                        │             │
+│           │                        │ 2. Consent Page        │             │
+│           │                        │◄───────────────────────┤             │
+│           │                        │                        │             │
+│           │                        │ 3. User Approves       │             │
+│           │                        ├───────────────────────►│             │
+│           │                        │                        │             │
+│           │ 4. Authorization Code  │                        │             │
+│           │◄───────────────────────┤                        │             │
+│           │                        │                        │             │
+│           │ 5. Exchange Code       │                        │             │
+│           ├────────────────────────────────────────────────►│             │
+│           │                        │                        │             │
+│           │ 6. Access Token (JWT)  │                        │             │
+│           │◄────────────────────────────────────────────────┤             │
+│           │                        │                        │             │
+│           │ 7. API Request + Token │                        │             │
+│           ├────────────────────────────────────────────────►│             │
+│           │                        │                        │             │
+│           │ 8. Protected Resource  │                        │             │
+│           │◄────────────────────────────────────────────────┤             │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 19.3 Supported Grant Types
+
+| Grant Type | Use Case | PKCE Required | Refresh Token |
+|------------|----------|---------------|---------------|
+| **Authorization Code** | Web/mobile apps with user interaction | Public clients only | Yes |
+| **Client Credentials** | Machine-to-machine (M2M) automation | N/A | No |
+| **Refresh Token** | Token renewal without re-authentication | N/A | Yes (rotated) |
+
+### 19.4 Database Schema
+
+**Implementation**: `migrations/V2026_01_25_009__oauth_provider.sql`
+
+| Table | Purpose | Key Columns |
+|-------|---------|-------------|
+| `oauth_clients` | Registered applications | `client_id`, `client_secret_hash`, `redirect_uris`, `allowed_scopes` |
+| `oauth_authorization_codes` | Short-lived auth codes (5 min TTL) | `code`, `user_id`, `scopes`, `code_challenge` |
+| `oauth_access_tokens` | Token hashes (not raw tokens) | `token_hash`, `scopes`, `expires_at`, `is_revoked` |
+| `oauth_refresh_tokens` | Refresh tokens with rotation | `token_hash`, `generation`, `previous_token_id` |
+| `oauth_user_authorizations` | User consent records | `user_id`, `client_id`, `scopes`, `is_active` |
+| `oauth_scope_definitions` | Admin-configurable scopes | `name`, `category`, `risk_level`, `allowed_endpoints` |
+| `oauth_audit_log` | Partitioned event log | `event_type`, `client_id`, `user_id`, `details` |
+| `tenant_oauth_settings` | Per-tenant configuration | `oauth_enabled`, `require_app_approval`, `blocked_scopes` |
+| `oauth_signing_keys` | RSA keys for JWT signing | `kid`, `private_key_secret_arn`, `public_key_pem` |
+
+### 19.5 OAuth Endpoints
+
+**Implementation**: `lambda/oauth/handler.ts`
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/oauth/authorize` | GET | Display consent page |
+| `/oauth/authorize` | POST | Process user consent |
+| `/oauth/token` | POST | Exchange code/refresh for tokens |
+| `/oauth/revoke` | POST | Revoke access/refresh tokens |
+| `/oauth/userinfo` | GET | OIDC user info endpoint |
+| `/oauth/introspect` | POST | Token introspection |
+| `/.well-known/openid-configuration` | GET | OIDC discovery |
+| `/oauth/jwks.json` | GET | JSON Web Key Set |
+
+### 19.6 Scope System
+
+14 default scopes organized by category and risk level:
+
+```typescript
+// Low Risk - Profile
+'openid', 'profile', 'email', 'models:read', 'usage:read'
+
+// Medium Risk - Read Access
+'offline_access', 'chat:read', 'knowledge:read', 'files:read'
+
+// High Risk - Write/Execute (Requires Approval)
+'chat:write', 'chat:delete', 'knowledge:write', 'files:write', 'agents:execute'
+```
+
+**Scope Endpoint Mapping** (`packages/shared/src/types/oauth-provider.types.ts`):
+
+```typescript
+export interface OAuthScope {
+  name: string;
+  category: ScopeCategory;
+  displayName: string;
+  description: string;
+  riskLevel: 'low' | 'medium' | 'high';
+  allowedEndpoints: ScopeEndpoint[];
+  isEnabled: boolean;
+  requiresApproval: boolean;
+  allowedAppTypes: OAuthAppType[];
+}
+```
+
+### 19.7 Token Security
+
+| Security Measure | Implementation |
+|------------------|----------------|
+| **Token Storage** | SHA-256 hash only, never raw tokens |
+| **JWT Signing** | RS256 with keys in Secrets Manager |
+| **PKCE** | Required for public clients (S256 only) |
+| **Token Rotation** | Refresh tokens rotated on use |
+| **Revocation** | Cascading revoke on consent withdrawal |
+| **Audit Log** | Partitioned by month for compliance |
+
+### 19.8 Admin API
+
+**Implementation**: `lambda/admin/oauth-apps.ts`
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/admin/oauth/dashboard` | GET | Dashboard with stats |
+| `/api/admin/oauth/apps` | GET/POST | List/register apps |
+| `/api/admin/oauth/apps/:id` | GET/PUT/DELETE | App CRUD |
+| `/api/admin/oauth/apps/:id/approve` | POST | Approve pending app |
+| `/api/admin/oauth/apps/:id/reject` | POST | Reject with reason |
+| `/api/admin/oauth/apps/:id/suspend` | POST | Suspend and revoke all tokens |
+| `/api/admin/oauth/apps/:id/rotate-secret` | POST | Generate new client secret |
+| `/api/admin/oauth/scopes` | GET/POST/PUT | Scope management |
+| `/api/admin/oauth/authorizations` | GET | View user consents |
+| `/api/admin/oauth/authorizations/:id/revoke` | POST | Admin revoke consent |
+| `/api/admin/oauth/settings` | GET/PUT | Tenant OAuth settings |
+| `/api/admin/oauth/audit` | GET | Audit log query |
+
+### 19.9 Admin Dashboard
+
+**Implementation**: `apps/admin-dashboard/app/(dashboard)/oauth/apps/page.tsx`
+
+Features:
+- **Overview Tab**: Stats cards, pending approvals, top apps by authorization count
+- **Applications Tab**: Searchable/filterable app list, approve/reject/suspend actions
+- **Authorizations Tab**: User consent viewer with revocation
+- **Settings Tab**: Per-tenant OAuth configuration
+
+### 19.10 Use Cases Enabled
+
+| Integration | Grant Type | Typical Scopes |
+|-------------|------------|----------------|
+| **MCP Servers** (Claude Desktop, Cursor) | Authorization Code | `chat:write`, `knowledge:read` |
+| **Zapier/Make** | Authorization Code | `chat:read`, `chat:write` |
+| **Partner Apps** | Authorization Code | Custom scope set |
+| **Automation Scripts** | Client Credentials | `models:read`, `agents:execute` |
+| **Mobile Apps** | Authorization Code + PKCE | `profile`, `chat:*` |
+| **Slack/Teams Bots** | Authorization Code | `chat:write` |
+
+---
+
+## 19. Two-Factor Authentication (MFA) (v5.52.28)
+
+### 19.1 Overview
+
+RADIANT implements role-based Multi-Factor Authentication (MFA) using industry-standard TOTP (RFC 6238). Admin roles are **required** to enroll in MFA and **cannot disable** it once enrolled.
+
+### 19.2 Architecture
+
+```
+┌─────────────┐     ┌──────────────┐     ┌─────────────────┐
+│   Login     │────▶│  MFA Check   │────▶│  MFA Required?  │
+│   Page      │     │  /api/mfa/   │     │                 │
+└─────────────┘     │   check      │     └────────┬────────┘
+                    └──────────────┘              │
+                                                  ▼
+                    ┌──────────────┐     ┌─────────────────┐
+                    │  Enrollment  │◀────│  Not Enrolled   │
+                    │    Gate      │     │                 │
+                    └──────────────┘     └─────────────────┘
+                           │
+                           ▼
+                    ┌──────────────┐     ┌─────────────────┐
+                    │  TOTP Setup  │────▶│  Backup Codes   │
+                    │  QR Code     │     │  Generated      │
+                    └──────────────┘     └─────────────────┘
+```
+
+### 19.3 Database Schema
+
+**Migration**: `070_mfa_support.sql`
+
+**Columns added to `tenant_users` and `platform_admins`**:
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| `mfa_enabled` | BOOLEAN | MFA enrollment status |
+| `mfa_enrolled_at` | TIMESTAMPTZ | Enrollment timestamp |
+| `mfa_method` | VARCHAR(20) | Method: 'totp', 'sms', 'webauthn' |
+| `mfa_totp_secret_encrypted` | TEXT | AES-256-GCM encrypted TOTP secret |
+| `mfa_failed_attempts` | INTEGER | Failed verification count |
+| `mfa_locked_until` | TIMESTAMPTZ | Lockout expiration |
+
+**New Tables**:
+
+| Table | Purpose |
+|-------|---------|
+| `mfa_backup_codes` | One-time recovery codes (SHA-256 hashed) |
+| `mfa_trusted_devices` | 30-day device trust tokens |
+| `mfa_audit_log` | Partitioned audit log (monthly) |
+
+### 19.4 TOTP Service
+
+**Implementation**: `lambda/shared/services/mfa/totp.service.ts`
+
+```typescript
+export class TOTPService {
+  generateSecret(accountName: string): { secret: string; uri: string };
+  generateCode(secret: string, timestamp?: number): string;
+  verifyCode(secret: string, code: string): { valid: boolean; drift?: number };
+  encryptSecret(secret: string): string;  // AES-256-GCM
+  decryptSecret(encryptedData: string): string;
+}
+
+export class BackupCodesService {
+  generateCodes(): { codes: string[]; hashes: string[] };
+  verifyCode(code: string, hash: string): boolean;
+  hashCode(code: string): string;  // SHA-256
+}
+
+export class DeviceTrustService {
+  generateDeviceToken(): string;
+  hashToken(token: string): string;  // SHA-256
+  calculateExpiration(): Date;  // +30 days
+  verifyToken(token: string, storedHash: string): boolean;
+}
+```
+
+### 19.5 API Endpoints
+
+**Handler**: `lambda/auth/mfa.handler.ts`
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/v2/mfa/status` | GET | MFA status, backup codes remaining, trusted devices |
+| `/api/v2/mfa/check` | GET | Check if MFA required for role |
+| `/api/v2/mfa/enroll/start` | POST | Generate TOTP secret and QR URI |
+| `/api/v2/mfa/enroll/verify` | POST | Verify code, generate backup codes, enable MFA |
+| `/api/v2/mfa/verify` | POST | Verify TOTP or backup code during login |
+| `/api/v2/mfa/backup-codes/regenerate` | POST | Invalidate old codes, generate new |
+| `/api/v2/mfa/devices` | GET | List trusted devices |
+| `/api/v2/mfa/devices/:id` | DELETE | Revoke trusted device |
+
+### 19.6 UI Components
+
+**Location**: `apps/admin-dashboard/components/mfa/`
+
+| Component | Purpose |
+|-----------|---------|
+| `MFAEnrollmentGate` | Full-screen forced enrollment (cannot dismiss) |
+| `MFAVerificationPrompt` | TOTP/backup code entry modal |
+| `MFASettingsSection` | Settings panel for MFA management |
+
+### 19.7 Security Measures
+
+| Feature | Implementation |
+|---------|----------------|
+| **Secret Encryption** | AES-256-GCM with scrypt-derived key |
+| **Code Hashing** | SHA-256 for backup codes and device tokens |
+| **Clock Drift** | ±30 second tolerance (window=1) |
+| **Lockout** | 3 failures → 5 minute lockout |
+| **Device Trust** | 30-day tokens, max 5 per user |
+| **Audit Logging** | All MFA events logged with IP/User-Agent |
+
+### 19.8 Role Enforcement
+
+```typescript
+const MFA_REQUIRED_ROLES = [
+  'tenant_admin',
+  'tenant_owner',
+  'super_admin',
+  'admin',
+  'operator',
+  'auditor',
+];
+
+// These roles CANNOT:
+// - Bypass MFA enrollment
+// - Disable MFA once enrolled
+// - Access dashboard without MFA verification
+```
+
+---
+
+## 20. Internationalization & Multi-Language Search (v5.52.29)
+
+### 20.1 Overview
+
+RADIANT supports **18 languages** with full authentication UI localization and **CJK-aware full-text search** using PostgreSQL's native FTS for Western languages and `pg_bigm` bi-gram indexing for Chinese, Japanese, and Korean.
+
+### 20.2 Supported Languages
+
+| Language | Code | Direction | FTS Strategy | PostgreSQL Config |
+|----------|------|-----------|--------------|-------------------|
+| English | `en` | LTR | Native FTS | `english` |
+| Spanish | `es` | LTR | Native FTS | `spanish` |
+| French | `fr` | LTR | Native FTS | `french` |
+| German | `de` | LTR | Native FTS | `german` |
+| Portuguese | `pt` | LTR | Native FTS | `portuguese` |
+| Italian | `it` | LTR | Native FTS | `italian` |
+| Dutch | `nl` | LTR | Native FTS | `dutch` |
+| Polish | `pl` | LTR | Native FTS | `simple` |
+| Russian | `ru` | LTR | Native FTS | `russian` |
+| Turkish | `tr` | LTR | Native FTS | `turkish` |
+| Japanese | `ja` | LTR | **pg_bigm** | bi-gram |
+| Korean | `ko` | LTR | **pg_bigm** | bi-gram |
+| Chinese (Simplified) | `zh-CN` | LTR | **pg_bigm** | bi-gram |
+| Chinese (Traditional) | `zh-TW` | LTR | **pg_bigm** | bi-gram |
+| **Arabic** | `ar` | **RTL** | Native FTS | `simple` |
+| Hindi | `hi` | LTR | Native FTS | `simple` |
+| Thai | `th` | LTR | Native FTS | `simple` |
+| Vietnamese | `vi` | LTR | Native FTS | `simple` |
+
+### 20.3 CJK Search Architecture
+
+CJK languages (Chinese, Japanese, Korean) lack word boundaries, making traditional stemming-based FTS ineffective. RADIANT uses **pg_bigm** for bi-gram indexing:
+
+```sql
+-- Enable pg_bigm extension
+CREATE EXTENSION IF NOT EXISTS pg_bigm;
+
+-- Create bi-gram indexes on searchable content
+CREATE INDEX idx_conversations_bigm_title 
+  ON uds_conversations USING gin (title gin_bigm_ops);
+CREATE INDEX idx_conversations_bigm_content 
+  ON uds_conversations USING gin (content gin_bigm_ops);
+
+-- CJK search uses LIKE with bi-gram optimization
+SELECT * FROM uds_conversations 
+WHERE content LIKE '%検索クエリ%'  -- Japanese query
+  AND tenant_id = app.current_tenant_id;
+```
+
+**Why pg_bigm over pg_trgm?**
+- `pg_trgm` uses 3-character grams, ineffective for 2-character CJK words
+- `pg_bigm` uses 2-character grams, optimal for CJK morphology
+- 40-60% faster CJK search vs trigram approach
+
+### 20.4 Language Detection
+
+**Database Function**: `detect_text_language(text)`
+
+```sql
+CREATE OR REPLACE FUNCTION detect_text_language(content TEXT)
+RETURNS VARCHAR(10) AS $$
+DECLARE
+  cjk_chars INTEGER;
+  arabic_chars INTEGER;
+  cyrillic_chars INTEGER;
+  total_chars INTEGER;
+BEGIN
+  total_chars := length(content);
+  IF total_chars = 0 THEN RETURN 'en'; END IF;
+  
+  -- Count character ranges
+  cjk_chars := length(regexp_replace(content, '[^\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]', '', 'g'));
+  arabic_chars := length(regexp_replace(content, '[^\u0600-\u06ff]', '', 'g'));
+  cyrillic_chars := length(regexp_replace(content, '[^\u0400-\u04ff]', '', 'g'));
+  
+  -- Threshold-based detection (>10% of content)
+  IF cjk_chars::float / total_chars > 0.1 THEN
+    -- Distinguish CJK languages by unique characters
+    IF content ~ '[\u3040-\u309f\u30a0-\u30ff]' THEN RETURN 'ja'; END IF;
+    IF content ~ '[\uac00-\ud7af]' THEN RETURN 'ko'; END IF;
+    RETURN 'zh-CN';
+  END IF;
+  
+  IF arabic_chars::float / total_chars > 0.1 THEN RETURN 'ar'; END IF;
+  IF cyrillic_chars::float / total_chars > 0.1 THEN RETURN 'ru'; END IF;
+  
+  RETURN 'en';  -- Default
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+```
+
+**JavaScript Service**: `MultiLanguageSearchService.detectLanguage()`
+
+```typescript
+private detectLanguage(text: string): string {
+  const cjkPattern = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/;
+  const japanesePattern = /[\u3040-\u309f\u30a0-\u30ff]/;
+  const koreanPattern = /[\uac00-\ud7af]/;
+  const arabicPattern = /[\u0600-\u06ff]/;
+  
+  if (cjkPattern.test(text)) {
+    if (japanesePattern.test(text)) return 'ja';
+    if (koreanPattern.test(text)) return 'ko';
+    return 'zh-CN';
+  }
+  if (arabicPattern.test(text)) return 'ar';
+  return 'en';
+}
+```
+
+### 20.5 Unified Search Function
+
+**Database Function**: `search_content(query, table_name, tenant_id, limit)`
+
+Routes queries to appropriate search method based on detected language:
+
+```sql
+CREATE OR REPLACE FUNCTION search_content(
+  query TEXT,
+  target_table TEXT,
+  p_tenant_id UUID,
+  p_limit INTEGER DEFAULT 50
+) RETURNS TABLE (
+  id UUID,
+  title TEXT,
+  content TEXT,
+  relevance FLOAT,
+  highlight TEXT
+) AS $$
+DECLARE
+  detected_lang VARCHAR(10);
+  is_cjk BOOLEAN;
+BEGIN
+  detected_lang := detect_text_language(query);
+  is_cjk := detected_lang IN ('ja', 'ko', 'zh-CN', 'zh-TW');
+  
+  IF is_cjk THEN
+    -- Use pg_bigm LIKE search
+    RETURN QUERY EXECUTE format(
+      'SELECT id, title, content, 
+              bigm_similarity(content, $1) as relevance,
+              ts_headline(''simple'', content, plainto_tsquery(''simple'', $1)) as highlight
+       FROM %I 
+       WHERE tenant_id = $2 AND content LIKE ''%%'' || $1 || ''%%''
+       ORDER BY relevance DESC LIMIT $3',
+      target_table
+    ) USING query, p_tenant_id, p_limit;
+  ELSE
+    -- Use PostgreSQL native FTS
+    RETURN QUERY EXECUTE format(
+      'SELECT id, title, content,
+              ts_rank(search_vector_english, websearch_to_tsquery(''english'', $1)) as relevance,
+              ts_headline(''english'', content, websearch_to_tsquery(''english'', $1)) as highlight
+       FROM %I
+       WHERE tenant_id = $2 AND search_vector_english @@ websearch_to_tsquery(''english'', $1)
+       ORDER BY relevance DESC LIMIT $3',
+      target_table
+    ) USING query, p_tenant_id, p_limit;
+  END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+```
+
+### 20.6 Database Migration (071_multilang_search.sql)
+
+**New Columns**:
+
+| Table | Column | Type | Purpose |
+|-------|--------|------|---------|
+| `uds_conversations` | `detected_language` | VARCHAR(10) | Auto-detected content language |
+| `uds_conversations` | `search_vector_simple` | TSVECTOR | Fallback search vector |
+| `uds_conversations` | `search_vector_english` | TSVECTOR | Language-specific search vector |
+| `uds_uploads` | `detected_language` | VARCHAR(10) | Auto-detected content language |
+| `cortex_entities` | `detected_language` | VARCHAR(10) | Auto-detected content language |
+| `cortex_chunks` | `detected_language` | VARCHAR(10) | Auto-detected content language |
+
+**New Indexes**:
+
+| Index | Table | Type | Purpose |
+|-------|-------|------|---------|
+| `idx_conversations_bigm_title` | `uds_conversations` | GIN (gin_bigm_ops) | CJK title search |
+| `idx_conversations_bigm_content` | `uds_conversations` | GIN (gin_bigm_ops) | CJK content search |
+| `idx_uploads_bigm_content` | `uds_uploads` | GIN (gin_bigm_ops) | CJK upload search |
+| `idx_cortex_entities_bigm` | `cortex_entities` | GIN (gin_bigm_ops) | CJK entity search |
+| `idx_cortex_chunks_bigm` | `cortex_chunks` | GIN (gin_bigm_ops) | CJK chunk search |
+| `idx_conversations_fts_english` | `uds_conversations` | GIN | English FTS |
+| `idx_conversations_fts_simple` | `uds_conversations` | GIN | Simple FTS |
+
+**Trigger**: Auto-detect language on INSERT/UPDATE
+
+```sql
+CREATE TRIGGER trg_detect_language_conversations
+  BEFORE INSERT OR UPDATE OF content ON uds_conversations
+  FOR EACH ROW
+  EXECUTE FUNCTION update_detected_language();
+```
+
+### 20.7 Multi-Language Search Service
+
+**Implementation**: `lambda/shared/services/search/multilang-search.service.ts`
+
+```typescript
+export interface SearchResult {
+  id: string;
+  title: string;
+  content: string;
+  relevance: number;
+  highlight: string;
+  detectedLanguage: string;
+}
+
+export interface SearchOptions {
+  table: 'uds_conversations' | 'uds_uploads' | 'cortex_entities' | 'cortex_chunks';
+  tenantId: string;
+  limit?: number;
+  offset?: number;
+  languageHint?: string;
+}
+
+export class MultiLanguageSearchService {
+  private readonly CJK_LANGUAGES = ['ja', 'ko', 'zh-CN', 'zh-TW'];
+  private readonly FTS_CONFIGS: Record<string, string> = {
+    en: 'english', es: 'spanish', fr: 'french', de: 'german',
+    pt: 'portuguese', it: 'italian', nl: 'dutch', ru: 'russian',
+    tr: 'turkish', pl: 'simple', ar: 'simple', hi: 'simple',
+    th: 'simple', vi: 'simple'
+  };
+
+  async search(query: string, options: SearchOptions): Promise<SearchResult[]> {
+    const language = options.languageHint || this.detectLanguage(query);
+    
+    if (this.CJK_LANGUAGES.includes(language)) {
+      return this.searchBigram(query, options);
+    }
+    return this.searchFTS(query, options, this.FTS_CONFIGS[language] || 'simple');
+  }
+
+  private async searchBigram(query: string, options: SearchOptions): Promise<SearchResult[]>;
+  private async searchFTS(query: string, options: SearchOptions, config: string): Promise<SearchResult[]>;
+  private detectLanguage(text: string): string;
+}
+```
+
+### 20.8 RTL Support Architecture
+
+**Hook**: `apps/admin-dashboard/hooks/useRTL.ts`
+
+```typescript
+export function useRTL() {
+  const { currentLanguage, isRTL } = useTranslation();
+  
+  return {
+    dir: isRTL ? 'rtl' : 'ltr',
+    isRTL,
+    // Utility for flipping CSS classes
+    flip: (ltrClass: string, rtlClass: string) => isRTL ? rtlClass : ltrClass,
+    // Margin/padding helpers
+    marginStart: (value: string) => isRTL ? `mr-${value}` : `ml-${value}`,
+    marginEnd: (value: string) => isRTL ? `ml-${value}` : `mr-${value}`,
+    paddingStart: (value: string) => isRTL ? `pr-${value}` : `pl-${value}`,
+    paddingEnd: (value: string) => isRTL ? `pl-${value}` : `pr-${value}`,
+    // Text alignment
+    textStart: isRTL ? 'text-right' : 'text-left',
+    textEnd: isRTL ? 'text-left' : 'text-right',
+    // Flex direction
+    flexRow: isRTL ? 'flex-row-reverse' : 'flex-row',
+    // Icon rotation for directional icons
+    iconFlip: isRTL ? 'scale-x-[-1]' : '',
+  };
+}
+```
+
+**CSS Utilities**: `apps/admin-dashboard/styles/rtl.css`
+
+```css
+/* RTL automatic flipping */
+[dir="rtl"] .ml-2 { margin-left: 0; margin-right: 0.5rem; }
+[dir="rtl"] .mr-2 { margin-right: 0; margin-left: 0.5rem; }
+[dir="rtl"] .pl-4 { padding-left: 0; padding-right: 1rem; }
+[dir="rtl"] .pr-4 { padding-right: 0; padding-left: 1rem; }
+[dir="rtl"] .text-left { text-align: right; }
+[dir="rtl"] .text-right { text-align: left; }
+
+/* Preserve LTR for specific content */
+.preserve-ltr { direction: ltr; unicode-bidi: isolate; }
+[dir="rtl"] input[type="email"],
+[dir="rtl"] input[type="password"],
+[dir="rtl"] .font-mono { direction: ltr; text-align: left; }
+```
+
+### 20.9 Translation Files
+
+**Location**: `apps/admin-dashboard/locales/auth/`
+
+| File | Language | Keys |
+|------|----------|------|
+| `en.json` | English | ~230 |
+| `zh-CN.json` | Chinese (Simplified) | ~230 |
+| `ja.json` | Japanese | ~230 |
+| `ko.json` | Korean | ~230 |
+| `ar.json` | Arabic (RTL) | ~230 |
+
+**Key Categories**:
+
+| Namespace | Keys | Purpose |
+|-----------|------|---------|
+| `login.*` | 25 | Login form, errors, social auth |
+| `mfa.*` | 45 | Enrollment, verification, backup codes |
+| `oauth.*` | 35 | Consent screen, scopes, connected apps |
+| `password.*` | 30 | Reset flow, validation, success |
+| `errors.*` | 40 | Error messages, validation |
+| `common.*` | 55 | Buttons, labels, shared text |
+
+### 20.10 Component Integration
+
+**Usage Pattern**:
+
+```typescript
+import { useTranslation } from '@/hooks/useTranslation';
+import { useRTL } from '@/hooks/useRTL';
+
+export function MFAEnrollmentGate() {
+  const { t } = useTranslation('auth');
+  const { dir, isRTL, marginStart } = useRTL();
+
+  return (
+    <div dir={dir} className="...">
+      <h1>{t('mfa.enrollment.title')}</h1>
+      <Button className={`flex ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+        <Loader2 className={marginStart('2')} />
+        {t('mfa.enrollment.get_started')}
+      </Button>
+      {/* Preserve LTR for codes */}
+      <code className="preserve-ltr" dir="ltr">{secretCode}</code>
+    </div>
+  );
+}
+```
+
+### 20.11 Performance Considerations
+
+| Optimization | Impact |
+|--------------|--------|
+| **Bi-gram indexes** | 10-50x faster CJK LIKE queries |
+| **Materialized tsvectors** | Avoid re-parsing on every search |
+| **Language detection caching** | Detect once on insert, reuse |
+| **Index-only scans** | GIN indexes support covering queries |
+| **Parallel query** | PostgreSQL parallelizes large FTS scans |
 
 ---
 

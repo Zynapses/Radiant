@@ -115,7 +115,7 @@ export class DebateArenaService {
       throw new Error('Debate arena not found');
     }
 
-    const arena = result.rows[0];
+    const arena = result.rows[0] as any;
 
     // Get debaters
     const debatersResult = await executeStatement({
@@ -344,7 +344,7 @@ Respond in JSON:
         uuidParam('id', uuidv4()),
         uuidParam('arena_id', arenaId),
         uuidParam('attacker_id', attackerId),
-        uuidParam('defender_id', defenderId),
+        uuidParam('defender_id', defenderId as string),
         uuidParam('attack_argument_id', attackArgId),
         stringParam('flow_visualization', JSON.stringify({
           startPos: { x: 30, y: 50 },

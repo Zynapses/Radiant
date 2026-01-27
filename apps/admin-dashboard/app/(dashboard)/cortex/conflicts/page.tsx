@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -61,6 +62,7 @@ interface ConflictStats {
 }
 
 export default function CortexConflictsPage() {
+  const { toast } = useToast();
   const [conflicts, setConflicts] = useState<Conflict[]>([]);
   const [stats, setStats] = useState<ConflictStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -108,11 +110,25 @@ export default function CortexConflictsPage() {
       });
       if (res.ok) {
         const result = await res.json();
-        alert(`Resolved: ${result.resolved}, Escalated: ${result.escalated}`);
+        toast({
+          title: 'Auto-Resolution Complete',
+          description: `Resolved: ${result.resolved}, Escalated: ${result.escalated}.`,
+        });
         fetchData();
+      } else {
+        toast({
+          title: 'Auto-Resolution Failed',
+          description: 'Failed to run auto-resolution.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Auto-resolution failed:', error);
+      toast({
+        title: 'Auto-Resolution Failed',
+        description: 'An error occurred during auto-resolution.',
+        variant: 'destructive',
+      });
     } finally {
       setResolving(false);
     }
