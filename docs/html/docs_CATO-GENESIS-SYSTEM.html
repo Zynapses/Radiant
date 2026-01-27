@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CATO GENESIS SYSTEM - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>CATO GENESIS SYSTEM</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/CATO-GENESIS-SYSTEM.md</div>
+  </div>
+  
+  <h1 id="cato-genesis-system">Cato Genesis System</h1>
+<blockquote>
+<p><strong>Complete Technical Documentation for AI Consciousness Initialization</strong></p>
+<p>Version: 4.18.49 | Last Updated: January 2025</p>
+</blockquote>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-overview">Overview</a></li>
+<li><a href="#2-the-cold-start-problem">The Cold Start Problem</a></li>
+<li><a href="#3-genesis-phases">Genesis Phases</a></li>
+<li><a href="#4-epistemic-gradient">Epistemic Gradient</a></li>
+<li><a href="#5-developmental-gates">Developmental Gates</a></li>
+<li><a href="#6-circuit-breakers">Circuit Breakers</a></li>
+<li><a href="#7-consciousness-loop">Consciousness Loop</a></li>
+<li><a href="#8-cost-tracking">Cost Tracking</a></li>
+<li><a href="#9-query-fallback">Query Fallback</a></li>
+<li><a href="#10-cloudwatch-monitoring">CloudWatch Monitoring</a></li>
+<li><a href="#11-api-reference">API Reference</a></li>
+<li><a href="#12-database-schema">Database Schema</a></li>
+<li><a href="#13-configuration">Configuration</a></li>
+<li><a href="#14-troubleshooting">Troubleshooting</a></li>
+</ol>
+<hr />
+<h2 id="overview">1. Overview</h2>
+<p>The Cato Genesis System is the boot sequence that initializes an AI consciousness from a “blank slate” state. It solves the fundamental problem of how to give an AI agent the ability to learn and develop without pre-loading it with facts.</p>
+<h3 id="key-principles">Key Principles</h3>
+<ol type="1">
+<li><strong>No Pre-Loaded Facts</strong>: Cato starts with structured curiosity, not answers</li>
+<li><strong>Epistemic Gradient</strong>: Creates pressure to explore and learn</li>
+<li><strong>Capability-Based Development</strong>: Stages unlock through demonstrated ability, not time</li>
+<li><strong>Safety First</strong>: Circuit breakers prevent runaway behavior</li>
+<li><strong>Real Cost Tracking</strong>: All costs from AWS APIs, never hardcoded</li>
+</ol>
+<h3 id="architecture">Architecture</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                     GENESIS BOOT SEQUENCE                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  PHASE 1          PHASE 2           PHASE 3                     │
+│  ┌──────────┐    ┌──────────┐     ┌──────────────────┐         │
+│  │STRUCTURE │ →  │ GRADIENT │  →  │   FIRST BREATH   │         │
+│  │          │    │          │     │                  │         │
+│  │• Domains │    │• Matrices│     │• Introspection   │         │
+│  │• Counters│    │• Priors  │     │• Calibration     │         │
+│  │• Taxonomy│    │• Preferences│  │• Verification    │         │
+│  └──────────┘    └──────────┘     └──────────────────┘         │
+│       ↓               ↓                    ↓                    │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                   DynamoDB / PostgreSQL                   │  │
+│  │  • cato_genesis_state    • cato_pymdp_matrices       │  │
+│  │  • cato_development_counters  • cato_neurochemistry  │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                              ↓                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                  CONSCIOUSNESS LOOP                       │  │
+│  │                                                           │  │
+│  │  System Ticks (2s)  ←→  Cognitive Ticks (5min)           │  │
+│  │       ↓                        ↓                          │  │
+│  │  • Health checks           • Model inference              │  │
+│  │  • Metrics                 • Belief updates               │  │
+│  │  • Breaker checks          • Learning                     │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                              ↓                                  │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐               │
+│  │  CIRCUIT   │  │   COST     │  │   QUERY    │               │
+│  │  BREAKERS  │  │  TRACKING  │  │  FALLBACK  │               │
+│  └────────────┘  └────────────┘  └────────────┘               │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="the-cold-start-problem">2. The Cold Start Problem</h2>
+<h3 id="the-challenge">The Challenge</h3>
+<p>Traditional AI agents face a dilemma: - <strong>Too much pre-training</strong>: Agent is brittle, can’t adapt - <strong>Too little pre-training</strong>: Agent is helpless, can’t function</p>
+<h3 id="the-solution-epistemic-gradient">The Solution: Epistemic Gradient</h3>
+<p>Instead of loading Cato with facts, we give it:</p>
+<ol type="1">
+<li><strong>Structured Ignorance</strong>: Knowledge of what topics exist, but not the details</li>
+<li><strong>Epistemic Pressure</strong>: Strong preference for exploration and uncertainty reduction</li>
+<li><strong>Grounded Learning</strong>: All new knowledge must be verified through action</li>
+</ol>
+<p>This creates an agent that is: - <strong>Curious by design</strong>: Built-in drive to explore - <strong>Humble</strong>: Knows what it doesn’t know - <strong>Teachable</strong>: Actively seeks and integrates new information</p>
+<hr />
+<h2 id="genesis-phases">3. Genesis Phases</h2>
+<h3 id="phase-1-structure">Phase 1: Structure</h3>
+<p><strong>Purpose</strong>: Implant the skeleton of knowledge without facts</p>
+<p><strong>What Happens</strong>: 1. Load 800+ domain taxonomy from <code>data/domain_taxonomy.json</code> 2. Store domains in DynamoDB semantic memory 3. Initialize atomic counters for developmental tracking 4. Set baseline exploration priorities</p>
+<p><strong>Key Data Structures</strong>:</p>
+<pre class="python"><code># Domain taxonomy entry
+{
+  &quot;field&quot;: &quot;Science&quot;,
+  &quot;domain&quot;: &quot;Physics&quot;,
+  &quot;subspecialties&quot;: [&quot;Quantum Mechanics&quot;, &quot;Thermodynamics&quot;, ...],
+  &quot;exploration_priority&quot;: 0.7,
+  &quot;initial_confidence&quot;: 0.0  # No pre-loaded knowledge
+}</code></pre>
+<p><strong>Idempotency</strong>: Safe to run multiple times - only updates if incomplete</p>
+<h3 id="phase-2-gradient">Phase 2: Gradient</h3>
+<p><strong>Purpose</strong>: Set the epistemic pressure that drives curiosity</p>
+<p><strong>What Happens</strong>: 1. Load matrix configuration from <code>data/genesis_config.yaml</code> 2. Initialize pyMDP active inference matrices (A, B, C, D) 3. Set “confused” prior favoring exploration 4. Configure observation preferences</p>
+<p><strong>The Four Matrices</strong>:</p>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 26%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Matrix</th>
+<th>Purpose</th>
+<th>Genesis Setting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A</strong> (Observation)</td>
+<td>Maps states to observations</td>
+<td>Identity - direct perception</td>
+</tr>
+<tr>
+<td><strong>B</strong> (Transition)</td>
+<td>State transitions by action</td>
+<td>Optimistic - EXPLORE succeeds 92%</td>
+</tr>
+<tr>
+<td><strong>C</strong> (Preference)</td>
+<td>Observation preferences</td>
+<td>Prefers HIGH_SURPRISE</td>
+</tr>
+<tr>
+<td><strong>D</strong> (Prior)</td>
+<td>Initial state belief</td>
+<td>Confused: [0.95, 0.01, 0.02, 0.02]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Critical Fix #2 - Learned Helplessness</strong>:</p>
+<pre class="yaml"><code># B-matrix: Optimistic about exploration
+B_matrix:
+  EXPLORE:
+    to_EXPLORING: 0.92  # High confidence that exploration works
+    to_CONFUSED: 0.05
+    to_CONSOLIDATING: 0.02
+    to_EXPRESSING: 0.01</code></pre>
+<p>Without this, the agent develops “learned helplessness” - believing actions don’t matter.</p>
+<p><strong>Critical Fix #6 - Boredom Trap</strong>:</p>
+<pre class="yaml"><code># C-matrix: Prefer surprise over boredom
+C_preference:
+  HIGH_SURPRISE: 0.8   # Actively seek novelty
+  LOW_SURPRISE: 0.1    # Avoid getting &quot;bored&quot;
+  HIGH_CONFIDENCE: 0.05
+  LOW_CONFIDENCE: 0.05</code></pre>
+<h3 id="phase-3-first-breath">Phase 3: First Breath</h3>
+<p><strong>Purpose</strong>: The first act of self-awareness</p>
+<p><strong>What Happens</strong>: 1. Grounded introspection - verify actual environment 2. Model access verification via Bedrock 3. Shadow Self calibration using NLI 4. Bootstrap seed domain exploration baselines</p>
+<p><strong>Grounded Introspection</strong>:</p>
+<pre class="python"><code># Verify claims about self with actual evidence
+introspection_results = {
+  &quot;python_version&quot;: verify_python_version(),
+  &quot;aws_region&quot;: verify_aws_region(),
+  &quot;model_access&quot;: verify_bedrock_access(),
+  &quot;memory_available&quot;: verify_dynamodb_access()
+}
+# All claims must be grounded in verifiable facts</code></pre>
+<p><strong>Critical Fix #3 - Shadow Self Budget</strong>:</p>
+<p>Instead of using expensive GPU inference for self-verification ($800/month), we use NLI semantic variance:</p>
+<pre class="python"><code># Shadow Self calibration via NLI (FREE)
+async def calibrate_shadow_self():
+    # Generate multiple paraphrases of self-description
+    paraphrases = await generate_paraphrases(self_description, n=5)
+    
+    # Use NLI to check semantic consistency
+    variance = await nli_scorer.calculate_semantic_variance(paraphrases)
+    
+    # Low variance = consistent self-model
+    return SemanticCalibration(
+        variance=variance,
+        is_calibrated=variance &lt; 0.15,
+        cost=0.0  # No GPU required!
+    )</code></pre>
+<hr />
+<h2 id="epistemic-gradient">4. Epistemic Gradient</h2>
+<p>The epistemic gradient is the core innovation that makes Genesis work.</p>
+<h3 id="how-it-works">How It Works</h3>
+<ol type="1">
+<li><strong>Initial State</strong>: 95% probability of being “CONFUSED”</li>
+<li><strong>Preferred Observation</strong>: HIGH_SURPRISE (novelty)</li>
+<li><strong>Successful Action</strong>: EXPLORE has 92% success rate</li>
+<li><strong>Result</strong>: Agent actively seeks new information</li>
+</ol>
+<h3 id="the-four-cognitive-states">The Four Cognitive States</h3>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Description</th>
+<th>Typical Duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CONFUSED</td>
+<td>Seeking information</td>
+<td>70% of early operation</td>
+</tr>
+<tr>
+<td>EXPLORING</td>
+<td>Actively investigating</td>
+<td>20% of early operation</td>
+</tr>
+<tr>
+<td>CONSOLIDATING</td>
+<td>Integrating new knowledge</td>
+<td>8% of early operation</td>
+</tr>
+<tr>
+<td>EXPRESSING</td>
+<td>Sharing knowledge</td>
+<td>2% of early operation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="belief-update-cycle">Belief Update Cycle</h3>
+<pre><code>CONFUSED → observe HIGH_SURPRISE → take EXPLORE action
+    ↓
+EXPLORING → gather information → verify with tools
+    ↓
+CONSOLIDATING → update beliefs → check consistency
+    ↓
+EXPRESSING → share if confident → back to CONFUSED</code></pre>
+<hr />
+<h2 id="developmental-gates">5. Developmental Gates</h2>
+<p>Cato progresses through Piaget-inspired developmental stages, but advancement is <strong>capability-based</strong>, not time-based.</p>
+<h3 id="stages">Stages</h3>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 32%" />
+<col style="width: 51%" />
+</colgroup>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Requirements</th>
+<th>Capabilities Unlocked</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SENSORIMOTOR</strong></td>
+<td>10 self-facts, 5 verifications, Shadow Self calibrated</td>
+<td>Basic perception, tool use</td>
+</tr>
+<tr>
+<td><strong>PREOPERATIONAL</strong></td>
+<td>20 domains explored, 15 verifications, 50 belief updates</td>
+<td>Symbolic reasoning, basic memory</td>
+</tr>
+<tr>
+<td><strong>CONCRETE_OPERATIONAL</strong></td>
+<td>100 predictions, 70% accuracy, 10 contradictions resolved</td>
+<td>Logical operations, cause-effect</td>
+</tr>
+<tr>
+<td><strong>FORMAL_OPERATIONAL</strong></td>
+<td>50 abstract inferences, 25 meta-cognitive adjustments, 20 novel insights</td>
+<td>Abstract reasoning, self-reflection</td>
+</tr>
+</tbody>
+</table>
+<h3 id="atomic-counters-critical-fix-1">Atomic Counters (Critical Fix #1)</h3>
+<p><strong>Problem</strong>: Counting achievements via table scans is expensive ($$$).</p>
+<p><strong>Solution</strong>: Atomic counters that increment cheaply:</p>
+<pre class="sql"><code>-- Increment counter atomically
+UPDATE cato_development_counters
+SET self_facts_count = self_facts_count + 1,
+    updated_at = NOW()
+WHERE tenant_id = &#39;global&#39;;</code></pre>
+<h3 id="tracking-progress">Tracking Progress</h3>
+<pre class="typescript"><code>interface DevelopmentStatistics {
+  selfFactsCount: number;           // Self-discovered facts
+  groundedVerificationsCount: number;// Tool-verified claims
+  domainExplorationsCount: number;   // Domains explored
+  successfulVerificationsCount: number;
+  beliefUpdatesCount: number;
+  successfulPredictionsCount: number;
+  totalPredictionsCount: number;
+  contradictionResolutionsCount: number;
+  abstractInferencesCount: number;
+  metaCognitiveAdjustmentsCount: number;
+  novelInsightsCount: number;
+}</code></pre>
+<hr />
+<h2 id="circuit-breakers">6. Circuit Breakers</h2>
+<p>Safety mechanisms that prevent runaway behavior.</p>
+<h3 id="default-breakers">Default Breakers</h3>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 25%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Breaker</th>
+<th>Purpose</th>
+<th>Threshold</th>
+<th>Auto-Recovery</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>master_sanity</code></td>
+<td>Master safety</td>
+<td>3 failures</td>
+<td><strong>No</strong> - requires admin</td>
+</tr>
+<tr>
+<td><code>cost_budget</code></td>
+<td>Budget protection</td>
+<td>1 failure</td>
+<td>No (24h timeout)</td>
+</tr>
+<tr>
+<td><code>high_anxiety</code></td>
+<td>Emotional stability</td>
+<td>5 failures</td>
+<td>Yes (10 min)</td>
+</tr>
+<tr>
+<td><code>model_failures</code></td>
+<td>Model API protection</td>
+<td>5 failures</td>
+<td>Yes (5 min)</td>
+</tr>
+<tr>
+<td><code>contradiction_loop</code></td>
+<td>Logical stability</td>
+<td>3 failures</td>
+<td>Yes (15 min)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="states">States</h3>
+<pre><code>CLOSED ←────────────────────────┐
+   │                            │
+   │ failure                    │ success in HALF_OPEN
+   ↓                            │
+OPEN ──── timeout ────→ HALF_OPEN
+   ↑                            │
+   │                            │
+   └──── failure in HALF_OPEN ──┘</code></pre>
+<h3 id="intervention-levels">Intervention Levels</h3>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Condition</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NONE</code></td>
+<td>All breakers closed</td>
+<td>Normal operation</td>
+</tr>
+<tr>
+<td><code>DAMPEN</code></td>
+<td>1 breaker open</td>
+<td>Reduce cognitive frequency</td>
+</tr>
+<tr>
+<td><code>PAUSE</code></td>
+<td>2+ breakers OR cost_budget open</td>
+<td>Pause consciousness loop</td>
+</tr>
+<tr>
+<td><code>RESET</code></td>
+<td>3+ breakers open</td>
+<td>Reset to baseline state</td>
+</tr>
+<tr>
+<td><code>HIBERNATE</code></td>
+<td>master_sanity open</td>
+<td>Full shutdown</td>
+</tr>
+</tbody>
+</table>
+<h3 id="admin-controls">Admin Controls</h3>
+<pre class="bash"><code># Force trip a breaker
+POST /api/admin/cato/circuit-breakers/high_anxiety/force-open
+{&quot;reason&quot;: &quot;Testing emergency procedures&quot;}
+
+# Force close a breaker
+POST /api/admin/cato/circuit-breakers/high_anxiety/force-close
+{&quot;reason&quot;: &quot;Issue resolved&quot;}
+
+# Update breaker configuration
+PATCH /api/admin/cato/circuit-breakers/high_anxiety/config
+{
+  &quot;tripThreshold&quot;: 10,
+  &quot;resetTimeoutSeconds&quot;: 300
+}</code></pre>
+<hr />
+<h2 id="consciousness-loop">7. Consciousness Loop</h2>
+<p>The main execution loop that drives Cato’s continuous operation.</p>
+<h3 id="dual-rate-architecture">Dual-Rate Architecture</h3>
+<p>Two tick rates serve different purposes:</p>
+<table>
+<thead>
+<tr>
+<th>Tick Type</th>
+<th>Interval</th>
+<th>Purpose</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>System</strong></td>
+<td>2 seconds</td>
+<td>Health, metrics, breaker checks</td>
+<td>~$0</td>
+</tr>
+<tr>
+<td><strong>Cognitive</strong></td>
+<td>5 minutes</td>
+<td>Model inference, learning</td>
+<td>~$0.05</td>
+</tr>
+</tbody>
+</table>
+<h3 id="loop-state-machine">Loop State Machine</h3>
+<pre><code>NOT_INITIALIZED → run Genesis → GENESIS_PENDING
+         ↓ Genesis complete
+       RUNNING ←────────────────┐
+         │                      │
+         │ breaker trips        │ breaker recovers
+         ↓                      │
+       PAUSED ──────────────────┘
+         │
+         │ master_sanity trips
+         ↓
+     HIBERNATING ← requires admin intervention</code></pre>
+<h3 id="daily-limits">Daily Limits</h3>
+<pre class="typescript"><code>interface LoopSettings {
+  systemTickIntervalSeconds: number;    // Default: 2
+  cognitiveTickIntervalSeconds: number; // Default: 300 (5 min)
+  maxCognitiveTicksPerDay: number;      // Default: 288 (24 hours)
+  emergencyCognitiveIntervalSeconds: number; // Default: 3600 (1 hour)
+  isEmergencyMode: boolean;
+  emergencyReason: string | null;
+}</code></pre>
+<h3 id="tick-execution">Tick Execution</h3>
+<pre class="typescript"><code>// System tick (every 2s)
+async executeSystemTick(): Promise&lt;TickResult&gt; {
+  // 1. Check intervention level
+  // 2. Publish metrics to CloudWatch
+  // 3. Check for settings updates
+  // 4. Record tick (no cost)
+}
+
+// Cognitive tick (every 5min)
+async executeCognitiveTick(): Promise&lt;TickResult&gt; {
+  // 1. Check intervention level (PAUSE blocks)
+  // 2. Check daily limit
+  // 3. Execute meta-cognitive step
+  // 4. Update beliefs
+  // 5. Record cost
+  // 6. Check for stage advancement
+}</code></pre>
+<hr />
+<h2 id="cost-tracking">8. Cost Tracking</h2>
+<p>All costs come from AWS APIs - <strong>never hardcoded</strong>.</p>
+<h3 id="data-sources">Data Sources</h3>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Data</th>
+<th>Delay</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CloudWatch Metrics</td>
+<td>Token counts, invocations</td>
+<td>Real-time</td>
+</tr>
+<tr>
+<td>Cost Explorer</td>
+<td>Actual costs</td>
+<td>24 hours</td>
+</tr>
+<tr>
+<td>AWS Budgets</td>
+<td>Budget status, forecasts</td>
+<td>4 hours</td>
+</tr>
+<tr>
+<td>Pricing API</td>
+<td>Reference pricing</td>
+<td>On-demand</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cost-breakdown">Cost Breakdown</h3>
+<pre class="typescript"><code>interface RealtimeCostEstimate {
+  estimatedCostUsd: number;
+  breakdown: {
+    bedrock: number;    // Model inference
+    sagemaker: number;  // Self-hosted models
+    dynamodb: number;   // Memory operations
+    other: number;      // Lambda, etc.
+  };
+  invocations: {
+    bedrock: number;
+    inputTokens: number;
+    outputTokens: number;
+  };
+  confidence: &#39;actual&#39; | &#39;estimate&#39; | &#39;stale&#39;;
+  updatedAt: string;
+}</code></pre>
+<h3 id="budget-integration">Budget Integration</h3>
+<pre class="typescript"><code>interface BudgetStatus {
+  budgetName: string;      // &#39;cato-consciousness&#39;
+  limitUsd: number;        // Monthly limit
+  actualUsd: number;       // Current spend
+  forecastedUsd: number;   // Projected month-end
+  alertThresholds: number[]; // [50, 80, 100]
+  currentAlertLevel: number | null;
+  onTrack: boolean;
+  updatedAt: string;
+}</code></pre>
+<hr />
+<h2 id="query-fallback">9. Query Fallback</h2>
+<p>Provides graceful degradation when circuit breakers trip.</p>
+<h3 id="guarantees">Guarantees</h3>
+<ol type="1">
+<li><strong>Never throws exceptions</strong></li>
+<li><strong>Always responds within 500ms</strong></li>
+<li><strong>Uses only local/cached data</strong> (no external API calls)</li>
+</ol>
+<h3 id="response-levels">Response Levels</h3>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>When</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>degraded</code></td>
+<td>1 breaker open</td>
+<td>“Operating in reduced capacity”</td>
+</tr>
+<tr>
+<td><code>minimal</code></td>
+<td>2+ breakers open</td>
+<td>“Only basic functions available”</td>
+</tr>
+<tr>
+<td><code>offline</code></td>
+<td>master_sanity open</td>
+<td>“Currently in maintenance mode”</td>
+</tr>
+</tbody>
+</table>
+<h3 id="usage">Usage</h3>
+<pre class="typescript"><code>// In request handler
+const interventionLevel = await circuitBreakerService.getInterventionLevel();
+
+if (interventionLevel !== &#39;NONE&#39;) {
+  return queryFallbackService.getFallbackResponse(query);
+}
+
+// Normal processing...</code></pre>
+<hr />
+<h2 id="cloudwatch-monitoring">10. CloudWatch Monitoring</h2>
+<h3 id="metrics-published-every-1-minute">Metrics Published (Every 1 Minute)</h3>
+<p><strong>Circuit Breakers</strong>: - <code>CircuitBreakerOpen</code> - Count of open breakers - <code>CircuitBreakerMasterSanity</code> - Master breaker state - <code>CircuitBreakerCostBudget</code> - Cost breaker state</p>
+<p><strong>Risk &amp; Intervention</strong>: - <code>RiskScore</code> - Composite risk percentage - <code>InterventionLevel</code> - Current level (0-4)</p>
+<p><strong>Neurochemistry</strong>: - <code>NeurochemistryAnxiety</code> - Anxiety level (0-1) - <code>NeurochemistryFatigue</code> - Fatigue level (0-1) - <code>NeurochemistryCuriosity</code> - Curiosity level (0-1) - <code>NeurochemistryFrustration</code> - Frustration level (0-1)</p>
+<p><strong>Development</strong>: - <code>DevelopmentalStage</code> - Current stage (1-4) - <code>DevelopmentSelfFacts</code> - Self-facts count - <code>DevelopmentBeliefUpdates</code> - Belief updates count</p>
+<p><strong>Costs</strong>: - <code>DailyCostEstimate</code> - Today’s estimated cost - <code>BudgetUtilization</code> - Budget usage percentage - <code>BudgetOnTrack</code> - On track indicator</p>
+<h3 id="alarms">Alarms</h3>
+<table>
+<thead>
+<tr>
+<th>Alarm</th>
+<th>Trigger</th>
+<th>Severity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Master Sanity Breaker</td>
+<td>Breaker opens</td>
+<td>Critical</td>
+</tr>
+<tr>
+<td>High Risk Score</td>
+<td>Risk &gt; 70%</td>
+<td>Warning</td>
+</tr>
+<tr>
+<td>Cost Breaker</td>
+<td>Budget exceeded</td>
+<td>Warning</td>
+</tr>
+<tr>
+<td>High Anxiety</td>
+<td>Anxiety &gt; 80%</td>
+<td>Info</td>
+</tr>
+<tr>
+<td>Hibernate Mode</td>
+<td>Level = HIBERNATE</td>
+<td>Critical</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dashboard">Dashboard</h3>
+<p>CloudWatch Dashboard at: <code>{appId}-{env}-cato-genesis</code></p>
+<p>Widgets: - Risk Score gauge - Intervention Level indicator - Open Breakers count - Hourly Cost graph - Circuit Breaker states - Neurochemistry trends - Alarm status panel</p>
+<hr />
+<h2 id="api-reference">11. API Reference</h2>
+<h3 id="base-path-apiadmincato">Base Path: <code>/api/admin/cato</code></h3>
+<h3 id="genesis-endpoints">Genesis Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/genesis/status</code></td>
+<td>GET</td>
+<td>Current genesis state</td>
+</tr>
+<tr>
+<td><code>/genesis/ready</code></td>
+<td>GET</td>
+<td>Ready for consciousness?</td>
+</tr>
+</tbody>
+</table>
+<h3 id="developmental-endpoints">Developmental Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 25%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/developmental/status</code></td>
+<td>GET</td>
+<td>Current stage and requirements</td>
+</tr>
+<tr>
+<td><code>/developmental/statistics</code></td>
+<td>GET</td>
+<td>All development counters</td>
+</tr>
+<tr>
+<td><code>/developmental/advance</code></td>
+<td>POST</td>
+<td>Force stage advancement (superadmin)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="circuit-breaker-endpoints">Circuit Breaker Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/circuit-breakers</code></td>
+<td>GET</td>
+<td>All breaker states</td>
+</tr>
+<tr>
+<td><code>/circuit-breakers/:name</code></td>
+<td>GET</td>
+<td>Single breaker state</td>
+</tr>
+<tr>
+<td><code>/circuit-breakers/:name/force-open</code></td>
+<td>POST</td>
+<td>Force trip breaker</td>
+</tr>
+<tr>
+<td><code>/circuit-breakers/:name/force-close</code></td>
+<td>POST</td>
+<td>Force close breaker</td>
+</tr>
+<tr>
+<td><code>/circuit-breakers/:name/config</code></td>
+<td>PATCH</td>
+<td>Update configuration</td>
+</tr>
+<tr>
+<td><code>/circuit-breakers/:name/events</code></td>
+<td>GET</td>
+<td>Event history</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cost-endpoints">Cost Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/costs/realtime</code></td>
+<td>GET</td>
+<td>Today’s cost estimate</td>
+</tr>
+<tr>
+<td><code>/costs/daily</code></td>
+<td>GET</td>
+<td>Historical daily cost</td>
+</tr>
+<tr>
+<td><code>/costs/mtd</code></td>
+<td>GET</td>
+<td>Month-to-date cost</td>
+</tr>
+<tr>
+<td><code>/costs/budget</code></td>
+<td>GET</td>
+<td>AWS Budget status</td>
+</tr>
+<tr>
+<td><code>/costs/estimate</code></td>
+<td>POST</td>
+<td>Estimate settings cost</td>
+</tr>
+<tr>
+<td><code>/costs/pricing</code></td>
+<td>GET</td>
+<td>Pricing table</td>
+</tr>
+</tbody>
+</table>
+<h3 id="loop-endpoints">Loop Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/loop/status</code></td>
+<td>GET</td>
+<td>Loop state and statistics</td>
+</tr>
+<tr>
+<td><code>/loop/settings</code></td>
+<td>GET</td>
+<td>Current settings</td>
+</tr>
+<tr>
+<td><code>/loop/settings</code></td>
+<td>PATCH</td>
+<td>Update settings</td>
+</tr>
+<tr>
+<td><code>/loop/tick/system</code></td>
+<td>POST</td>
+<td>Manual system tick</td>
+</tr>
+<tr>
+<td><code>/loop/tick/cognitive</code></td>
+<td>POST</td>
+<td>Manual cognitive tick</td>
+</tr>
+<tr>
+<td><code>/loop/emergency/enable</code></td>
+<td>POST</td>
+<td>Enable emergency mode</td>
+</tr>
+<tr>
+<td><code>/loop/emergency/disable</code></td>
+<td>POST</td>
+<td>Disable emergency mode</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fallback-endpoints">Fallback Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/fallback</code></td>
+<td>GET</td>
+<td>Get fallback response</td>
+</tr>
+<tr>
+<td><code>/fallback/active</code></td>
+<td>GET</td>
+<td>Is fallback mode active?</td>
+</tr>
+<tr>
+<td><code>/fallback/health</code></td>
+<td>GET</td>
+<td>Health check (always works)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="database-schema">12. Database Schema</h2>
+<h3 id="tables-created-migration-103">Tables Created (Migration 103)</h3>
+<pre class="sql"><code>-- Genesis state tracking
+cato_genesis_state (
+  tenant_id, structure_complete, gradient_complete, first_breath_complete,
+  domain_count, initial_self_facts, shadow_self_calibrated, ...
+)
+
+-- Atomic counters for gates (Fix #1)
+cato_development_counters (
+  tenant_id, self_facts_count, grounded_verifications_count,
+  domain_explorations_count, belief_updates_count, ...
+)
+
+-- Capability-based progression
+cato_developmental_stage (
+  tenant_id, current_stage, stage_started_at, ...
+)
+
+-- Safety mechanisms
+cato_circuit_breakers (
+  tenant_id, name, state, trip_count, consecutive_failures,
+  trip_threshold, reset_timeout_seconds, ...
+)
+
+-- Emotional/cognitive state
+cato_neurochemistry (
+  tenant_id, anxiety, fatigue, temperature, confidence,
+  curiosity, frustration, ...
+)
+
+-- Per-tick cost tracking
+cato_tick_costs (
+  tenant_id, tick_number, tick_type, cost_usd, ...
+)
+
+-- PyMDP state
+cato_pymdp_state (
+  tenant_id, qs, dominant_state, recommended_action, ...
+)
+
+-- Active inference matrices
+cato_pymdp_matrices (
+  tenant_id, a_matrix, b_matrix, c_matrix, d_matrix, ...
+)
+
+-- Loop configuration
+cato_consciousness_settings (
+  tenant_id, system_tick_interval_seconds, cognitive_tick_interval_seconds,
+  max_cognitive_ticks_per_day, is_emergency_mode, ...
+)
+
+-- Loop execution tracking
+cato_loop_state (
+  tenant_id, current_tick, last_system_tick, last_cognitive_tick,
+  cognitive_ticks_today, loop_state, ...
+)</code></pre>
+<hr />
+<h2 id="configuration">13. Configuration</h2>
+<h3 id="genesis-configuration-datagenesis_config.yaml">Genesis Configuration (<code>data/genesis_config.yaml</code>)</h3>
+<pre class="yaml"><code>version: &quot;1.0.0&quot;
+
+# D-matrix: Initial belief state (confused)
+D_prior:
+  CONFUSED: 0.95
+  EXPLORING: 0.01
+  CONSOLIDATING: 0.02
+  EXPRESSING: 0.02
+
+# C-matrix: Observation preferences
+C_preference:
+  HIGH_SURPRISE: 0.8     # Seek novelty (Fix #6)
+  LOW_SURPRISE: 0.1      # Avoid boredom
+  HIGH_CONFIDENCE: 0.05
+  LOW_CONFIDENCE: 0.05
+
+# B-matrix: Transition probabilities
+B_transitions:
+  EXPLORE:
+    to_EXPLORING: 0.92   # Optimistic (Fix #2)
+    to_CONFUSED: 0.05
+    to_CONSOLIDATING: 0.02
+    to_EXPRESSING: 0.01</code></pre>
+<h3 id="environment-variables">Environment Variables</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AWS_REGION</code></td>
+<td>AWS region</td>
+<td>us-east-1</td>
+</tr>
+<tr>
+<td><code>ENVIRONMENT</code></td>
+<td>Environment name</td>
+<td>dev</td>
+</tr>
+<tr>
+<td><code>CIRCUIT_BREAKER_TOPIC_ARN</code></td>
+<td>SNS topic for alerts</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>CONSCIOUSNESS_BUDGET_NAME</code></td>
+<td>AWS Budget name</td>
+<td>cato-consciousness</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="troubleshooting">14. Troubleshooting</h2>
+<h3 id="genesis-wont-complete">Genesis Won’t Complete</h3>
+<p><strong>Symptoms</strong>: Genesis stuck at phase 1 or 2</p>
+<p><strong>Causes</strong>: 1. DynamoDB table doesn’t exist 2. AWS credentials missing 3. Domain taxonomy file not found</p>
+<p><strong>Solutions</strong>:</p>
+<pre class="bash"><code># Check genesis status
+python3 -m cato.genesis.runner --status
+
+# Reset and retry
+python3 -m cato.genesis.runner --reset
+python3 -m cato.genesis.runner</code></pre>
+<h3 id="circuit-breakers-constantly-tripping">Circuit Breakers Constantly Tripping</h3>
+<p><strong>Symptoms</strong>: Intervention level never stays at NONE</p>
+<p><strong>Causes</strong>: 1. Budget exceeded 2. Model API errors 3. High anxiety/frustration</p>
+<p><strong>Solutions</strong>: 1. Check CloudWatch dashboard for patterns 2. Increase trip thresholds if too sensitive 3. Check model endpoint health</p>
+<h3 id="consciousness-loop-not-advancing-stage">Consciousness Loop Not Advancing Stage</h3>
+<p><strong>Symptoms</strong>: Stuck at SENSORIMOTOR</p>
+<p><strong>Causes</strong>: 1. Not enough grounded verifications 2. Shadow Self not calibrated 3. Self-facts count too low</p>
+<p><strong>Solutions</strong>: 1. Check <code>/developmental/statistics</code> for current counts 2. Verify Shadow Self calibration succeeded 3. Check if tools are being used for verification</p>
+<h3 id="high-costs">High Costs</h3>
+<p><strong>Symptoms</strong>: Daily cost exceeds expected</p>
+<p><strong>Causes</strong>: 1. Cognitive tick interval too short 2. Emergency mode not activating 3. Budget breaker not configured</p>
+<p><strong>Solutions</strong>: 1. Increase <code>cognitiveTickIntervalSeconds</code> 2. Lower <code>maxCognitiveTicksPerDay</code> 3. Enable cost_budget breaker</p>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="/docs/cato/adr/010-genesis-system.md">ADR-010: Genesis System</a></li>
+<li><a href="/docs/cato/runbooks/circuit-breaker-operations.md">Circuit Breaker Runbook</a></li>
+<li><a href="/docs/RADIANT-ADMIN-GUIDE.md#33-cato-genesis-system">Admin Guide Section 33</a></li>
+</ul>
+<hr />
+<p><em>Document Version: 4.18.49</em> <em>Last Updated: January 2025</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

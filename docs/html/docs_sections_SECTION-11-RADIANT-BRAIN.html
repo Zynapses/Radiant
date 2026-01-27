@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 11 RADIANT BRAIN - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 11 RADIANT BRAIN</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-11-RADIANT-BRAIN.md</div>
+  </div>
+  
+  <h1 id="section-11-radiant-brain---smart-router-v2.4.0">SECTION 11: RADIANT BRAIN - SMART ROUTER (v2.4.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="brain-overview">11.1 Brain Overview</h2>
+<p>RADIANT Brain is an intelligent request routing system that selects optimal models based on task analysis, cost constraints, latency requirements, and historical performance.</p>
+<h2 id="brain-database-schema">11.2 Brain Database Schema</h2>
+<pre class="sql"><code>-- migrations/021_radiant_brain.sql
+
+CREATE TABLE brain_routing_rules (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID REFERENCES tenants(id),
+    name VARCHAR(100) NOT NULL,
+    priority INTEGER NOT NULL DEFAULT 100,
+    conditions JSONB NOT NULL,
+    target_model VARCHAR(100) NOT NULL,
+    fallback_models TEXT[],
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE brain_routing_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    task_type VARCHAR(50),
+    selected_model VARCHAR(100) NOT NULL,
+    selection_reason TEXT,
+    input_tokens INTEGER,
+    output_tokens INTEGER,
+    latency_ms INTEGER,
+    cost DECIMAL(10, 6),
+    success BOOLEAN,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_brain_history_tenant ON brain_routing_history(tenant_id);
+CREATE INDEX idx_brain_history_model ON brain_routing_history(selected_model);
+
+ALTER TABLE brain_routing_rules ENABLE ROW LEVEL SECURITY;
+ALTER TABLE brain_routing_history ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY brain_rules_isolation ON brain_routing_rules 
+    USING (tenant_id IS NULL OR tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY brain_history_isolation ON brain_routing_history 
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);</code></pre>
+<h2 id="brain-router-service">11.3 Brain Router Service</h2>
+<pre class="typescript"><code>// packages/core/src/services/brain-router.ts
+
+import { Pool } from &#39;pg&#39;;
+
+interface RoutingContext {
+    tenantId: string;
+    userId: string;
+    taskType: &#39;chat&#39; | &#39;code&#39; | &#39;analysis&#39; | &#39;creative&#39; | &#39;vision&#39; | &#39;audio&#39;;
+    inputTokenEstimate: number;
+    maxLatencyMs?: number;
+    maxCost?: number;
+    preferredProvider?: string;
+    requiresVision?: boolean;
+    requiresAudio?: boolean;
+}
+
+interface RoutingResult {
+    model: string;
+    provider: string;
+    reason: string;
+    estimatedCost: number;
+    estimatedLatencyMs: number;
+    confidence: number;
+}
+
+export class BrainRouter {
+    private pool: Pool;
+    private modelPerformanceCache: Map&lt;string, ModelPerformance&gt; = new Map();
+    
+    constructor(pool: Pool) {
+        this.pool = pool;
+    }
+    
+    async route(context: RoutingContext): Promise&lt;RoutingResult&gt; {
+        // 1. Check tenant-specific rules first
+        const customRule = await this.checkCustomRules(context);
+        if (customRule) return customRule;
+        
+        // 2. Get available models for task type
+        const candidates = await this.getCandidateModels(context);
+        
+        // 3. Score each candidate
+        const scored = await Promise.all(
+            candidates.map(async (model) =&gt; ({
+                model,
+                score: await this.scoreModel(model, context)
+            }))
+        );
+        
+        // 4. Sort by score and return best match
+        scored.sort((a, b) =&gt; b.score.total - a.score.total);
+        const best = scored[0];
+        
+        return {
+            model: best.model.model_id,
+            provider: best.model.provider,
+            reason: this.formatReason(best.score),
+            estimatedCost: best.score.estimatedCost,
+            estimatedLatencyMs: best.score.estimatedLatency,
+            confidence: best.score.total
+        };
+    }
+    
+    private async checkCustomRules(context: RoutingContext): Promise&lt;RoutingResult | null&gt; {
+        const result = await this.pool.query(`
+            SELECT * FROM brain_routing_rules
+            WHERE (tenant_id IS NULL OR tenant_id = $1)
+            AND is_active = true
+            ORDER BY priority ASC
+        `, [context.tenantId]);
+        
+        for (const rule of result.rows) {
+            if (this.matchesConditions(rule.conditions, context)) {
+                return {
+                    model: rule.target_model,
+                    provider: this.getProviderForModel(rule.target_model),
+                    reason: `Matched rule: ${rule.name}`,
+                    estimatedCost: 0,
+                    estimatedLatencyMs: 0,
+                    confidence: 1.0
+                };
+            }
+        }
+        
+        return null;
+    }
+    
+    private async getCandidateModels(context: RoutingContext) {
+        const capabilities: string[] = [];
+        if (context.requiresVision) capabilities.push(&#39;vision&#39;);
+        if (context.requiresAudio) capabilities.push(&#39;audio&#39;);
+        
+        const capabilityFilter = capabilities.length &gt; 0 
+            ? `AND capabilities @&gt; $2::jsonb` 
+            : &#39;&#39;;
+        
+        const result = await this.pool.query(`
+            SELECT * FROM external_models 
+            WHERE is_active = true 
+            ${capabilityFilter}
+            UNION ALL
+            SELECT * FROM self_hosted_models 
+            WHERE is_active = true
+            ${capabilityFilter}
+        `, capabilities.length &gt; 0 ? [context.tenantId, JSON.stringify(capabilities)] : [context.tenantId]);
+        
+        return result.rows;
+    }
+    
+    private async scoreModel(model: any, context: RoutingContext): Promise&lt;ModelScore&gt; {
+        const perf = await this.getModelPerformance(model.model_id);
+        
+        const costScore = this.scoreCost(model, context);
+        const latencyScore = this.scoreLatency(perf, context);
+        const qualityScore = this.scoreQuality(model, context);
+        const reliabilityScore = perf.successRate;
+        
+        const estimatedCost = this.estimateCost(model, context.inputTokenEstimate);
+        const estimatedLatency = perf.avgLatencyMs;
+        
+        return {
+            costScore,
+            latencyScore,
+            qualityScore,
+            reliabilityScore,
+            estimatedCost,
+            estimatedLatency,
+            total: (costScore * 0.25) + (latencyScore * 0.25) + (qualityScore * 0.35) + (reliabilityScore * 0.15)
+        };
+    }
+    
+    private scoreCost(model: any, context: RoutingContext): number {
+        if (!context.maxCost) return 0.5;
+        const estimated = this.estimateCost(model, context.inputTokenEstimate);
+        if (estimated &gt; context.maxCost) return 0;
+        return 1 - (estimated / context.maxCost);
+    }
+    
+    private scoreLatency(perf: ModelPerformance, context: RoutingContext): number {
+        if (!context.maxLatencyMs) return 0.5;
+        if (perf.avgLatencyMs &gt; context.maxLatencyMs) return 0;
+        return 1 - (perf.avgLatencyMs / context.maxLatencyMs);
+    }
+    
+    private scoreQuality(model: any, context: RoutingContext): number {
+        const taskQuality: Record&lt;string, Record&lt;string, number&gt;&gt; = {
+            &#39;code&#39;: { &#39;claude-sonnet-4&#39;: 0.95, &#39;gpt-4o&#39;: 0.9, &#39;grok-4&#39;: 0.85 },
+            &#39;creative&#39;: { &#39;claude-opus-4&#39;: 0.95, &#39;gpt-4o&#39;: 0.85, &#39;gemini-2&#39;: 0.8 },
+            &#39;analysis&#39;: { &#39;claude-opus-4&#39;: 0.95, &#39;o1&#39;: 0.95, &#39;gemini-2&#39;: 0.85 }
+        };
+        return taskQuality[context.taskType]?.[model.model_id] ?? 0.7;
+    }
+    
+    private estimateCost(model: any, inputTokens: number): number {
+        const outputEstimate = inputTokens * 1.5;
+        return (inputTokens * model.input_cost_per_1k / 1000) + 
+               (outputEstimate * model.output_cost_per_1k / 1000);
+    }
+    
+    private async getModelPerformance(modelId: string): Promise&lt;ModelPerformance&gt; {
+        if (this.modelPerformanceCache.has(modelId)) {
+            return this.modelPerformanceCache.get(modelId)!;
+        }
+        
+        const result = await this.pool.query(`
+            SELECT 
+                AVG(latency_ms) as avg_latency,
+                COUNT(CASE WHEN success THEN 1 END)::float / COUNT(*)::float as success_rate
+            FROM brain_routing_history
+            WHERE selected_model = $1
+            AND created_at &gt; NOW() - INTERVAL &#39;7 days&#39;
+        `, [modelId]);
+        
+        const perf = {
+            avgLatencyMs: result.rows[0]?.avg_latency ?? 1000,
+            successRate: result.rows[0]?.success_rate ?? 0.9
+        };
+        
+        this.modelPerformanceCache.set(modelId, perf);
+        return perf;
+    }
+    
+    private formatReason(score: ModelScore): string {
+        const factors: string[] = [];
+        if (score.costScore &gt; 0.8) factors.push(&#39;cost-effective&#39;);
+        if (score.latencyScore &gt; 0.8) factors.push(&#39;fast&#39;);
+        if (score.qualityScore &gt; 0.8) factors.push(&#39;high-quality&#39;);
+        if (score.reliabilityScore &gt; 0.95) factors.push(&#39;reliable&#39;);
+        return factors.join(&#39;, &#39;) || &#39;balanced choice&#39;;
+    }
+    
+    private matchesConditions(conditions: any, context: RoutingContext): boolean {
+        if (conditions.taskType &amp;&amp; conditions.taskType !== context.taskType) return false;
+        if (conditions.minTokens &amp;&amp; context.inputTokenEstimate &lt; conditions.minTokens) return false;
+        if (conditions.maxTokens &amp;&amp; context.inputTokenEstimate &gt; conditions.maxTokens) return false;
+        return true;
+    }
+    
+    private getProviderForModel(modelId: string): string {
+        const providerMap: Record&lt;string, string&gt; = {
+            &#39;claude-opus-4&#39;: &#39;anthropic&#39;,
+            &#39;claude-sonnet-4&#39;: &#39;anthropic&#39;,
+            &#39;gpt-4o&#39;: &#39;openai&#39;,
+            &#39;o1&#39;: &#39;openai&#39;,
+            &#39;gemini-2&#39;: &#39;google&#39;,
+            &#39;grok-4&#39;: &#39;xai&#39;
+        };
+        return providerMap[modelId] ?? &#39;unknown&#39;;
+    }
+}
+
+interface ModelPerformance {
+    avgLatencyMs: number;
+    successRate: number;
+}
+
+interface ModelScore {
+    costScore: number;
+    latencyScore: number;
+    qualityScore: number;
+    reliabilityScore: number;
+    estimatedCost: number;
+    estimatedLatency: number;
+    total: number;
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

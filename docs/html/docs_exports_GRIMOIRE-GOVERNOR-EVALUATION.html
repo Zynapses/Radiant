@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRIMOIRE GOVERNOR EVALUATION - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>GRIMOIRE GOVERNOR EVALUATION</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/GRIMOIRE-GOVERNOR-EVALUATION.md</div>
+  </div>
+  
+  <h1 id="radiant-v5.0.2---system-evolution-complete-source-export">RADIANT v5.0.2 - System Evolution: Complete Source Export</h1>
+<p><strong>For Gemini Evaluation</strong> <strong>Date</strong>: January 9, 2026</p>
+<hr />
+<h2 id="executive-summary">Executive Summary</h2>
+<p>This document contains the complete source code and documentation for RADIANT v5.0.2’s “System Evolution” features:</p>
+<ol type="1">
+<li><strong>The Grimoire</strong> - Self-optimizing procedural memory system</li>
+<li><strong>The Economic Governor</strong> - Cost optimization through intelligent model routing</li>
+</ol>
+<hr />
+<h2 id="architecture-overview">Architecture Overview</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                         RADIANT Platform v5.0.2                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐     │
+│  │   Admin UI      │    │   Grimoire API  │    │  Governor API   │     │
+│  │  (React/Next)   │◄──►│   (Lambda TS)   │◄──►│   (Lambda TS)   │     │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘     │
+│           │                      │                      │              │
+│           ▼                      ▼                      ▼              │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                     PostgreSQL + pgvector                        │   │
+│  │  ┌──────────────────────┐  ┌──────────────────────┐             │   │
+│  │  │ knowledge_heuristics │  │ governor_savings_log │             │   │
+│  │  │ (The Grimoire)       │  │ (Cost Tracking)      │             │   │
+│  │  └──────────────────────┘  └──────────────────────┘             │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│           ▲                      ▲                                     │
+│           │                      │                                     │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                    Flyte Workflow Engine                         │   │
+│  │  ┌──────────────────┐  ┌──────────────────┐                     │   │
+│  │  │ consult_grimoire │  │ librarian_review │                     │   │
+│  │  │ (Read heuristics)│  │ (Write lessons)  │                     │   │
+│  │  └──────────────────┘  └──────────────────┘                     │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="file-inventory">File Inventory</h2>
+<h3 id="database-schema">Database Schema</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>migrations/V2026_01_09_001__v5_grimoire_governor.sql</code></td>
+<td>Database tables, indexes, RLS, views</td>
+</tr>
+</tbody>
+</table>
+<h3 id="typescript-services-aws-lambda">TypeScript Services (AWS Lambda)</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lambda/shared/services/governor/economic-governor.ts</code></td>
+<td>Core Governor logic</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/governor/index.ts</code></td>
+<td>Module exports</td>
+</tr>
+<tr>
+<td><code>lambda/grimoire-api/index.ts</code></td>
+<td>Grimoire REST API</td>
+</tr>
+<tr>
+<td><code>lambda/governor-api/index.ts</code></td>
+<td>Governor REST API</td>
+</tr>
+</tbody>
+</table>
+<h3 id="python-flyte-tasks">Python Flyte Tasks</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>flyte/workflows/grimoire_tasks.py</code></td>
+<td>Grimoire Flyte tasks</td>
+</tr>
+<tr>
+<td><code>flyte/utils/db.py</code></td>
+<td>RLS-safe database connections</td>
+</tr>
+<tr>
+<td><code>flyte/utils/embeddings.py</code></td>
+<td>Vector embedding generation</td>
+</tr>
+<tr>
+<td><code>flyte/utils/cato_client.py</code></td>
+<td>Safety validation HTTP client</td>
+</tr>
+<tr>
+<td><code>flyte/utils/__init__.py</code></td>
+<td>Module exports</td>
+</tr>
+</tbody>
+</table>
+<h3 id="aws-cdk-infrastructure">AWS CDK Infrastructure</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lib/stacks/grimoire-stack.ts</code></td>
+<td>Lambda, EventBridge, VPC config</td>
+</tr>
+<tr>
+<td><code>lambda/grimoire/cleanup.py</code></td>
+<td>Scheduled cleanup Lambda</td>
+</tr>
+</tbody>
+</table>
+<h3 id="admin-dashboard-reactnext.js">Admin Dashboard (React/Next.js)</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app/(dashboard)/thinktank/grimoire/page.tsx</code></td>
+<td>Grimoire admin UI</td>
+</tr>
+<tr>
+<td><code>app/(dashboard)/thinktank/governor/page.tsx</code></td>
+<td>Governor admin UI</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="feature-the-grimoire">Feature: The Grimoire</h2>
+<h3 id="concept">Concept</h3>
+<p>The Grimoire is a <strong>self-optimizing procedural memory system</strong> that enables AI agents to learn from successful executions. It stores “heuristics” - reusable lessons extracted from good outcomes.</p>
+<h3 id="key-operations">Key Operations</h3>
+<ol type="1">
+<li><strong>consult_grimoire</strong> - Query for relevant heuristics before execution</li>
+<li><strong>librarian_review</strong> - Extract lessons after successful execution</li>
+<li><strong>cleanup_expired</strong> - Remove stale heuristics (scheduled daily)</li>
+</ol>
+<h3 id="data-model">Data Model</h3>
+<pre class="sql"><code>CREATE TABLE knowledge_heuristics (
+    id UUID PRIMARY KEY,
+    tenant_id UUID NOT NULL,
+    domain VARCHAR(50) NOT NULL,
+    heuristic_text TEXT NOT NULL,
+    context_embedding vector(1536),  -- pgvector for semantic search
+    confidence_score FLOAT DEFAULT 0.5,
+    source_execution_id VARCHAR(255),
+    created_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ,
+    expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL &#39;90 days&#39;)
+);</code></pre>
+<h3 id="security-features">Security Features</h3>
+<ul>
+<li><strong>RLS</strong> - Tenant isolation via <code>app.current_tenant_id</code></li>
+<li><strong>Cato Validation</strong> - All heuristics validated before storage/retrieval</li>
+<li><strong>Fail-Closed for Writes</strong> - Blocks unsafe content from being stored</li>
+</ul>
+<hr />
+<h2 id="feature-the-economic-governor">Feature: The Economic Governor</h2>
+<h3 id="concept-1">Concept</h3>
+<p>The Economic Governor uses a <strong>“System 0” classifier</strong> (cheap model) to analyze task complexity and route to the most cost-effective model.</p>
+<h3 id="complexity-scale">Complexity Scale</h3>
+<table>
+<thead>
+<tr>
+<th>Score</th>
+<th>Complexity</th>
+<th>Routing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1-4</td>
+<td>Simple</td>
+<td>→ gpt-4o-mini (cheap)</td>
+</tr>
+<tr>
+<td>5-8</td>
+<td>Medium</td>
+<td>→ Original model</td>
+</tr>
+<tr>
+<td>9-10</td>
+<td>Complex</td>
+<td>→ gpt-4o (premium)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="modes">Modes</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>performance</code></td>
+<td>No optimization, always use original model</td>
+</tr>
+<tr>
+<td><code>balanced</code></td>
+<td>Optimize simple tasks, preserve quality for complex</td>
+</tr>
+<tr>
+<td><code>cost_saver</code></td>
+<td>Aggressive optimization (may impact quality)</td>
+</tr>
+<tr>
+<td><code>off</code></td>
+<td>Completely disabled</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-model-1">Data Model</h3>
+<pre class="sql"><code>CREATE TABLE governor_savings_log (
+    id UUID PRIMARY KEY,
+    tenant_id UUID NOT NULL,
+    execution_id VARCHAR(255) NOT NULL,
+    original_model VARCHAR(100) NOT NULL,
+    selected_model VARCHAR(100) NOT NULL,
+    complexity_score INTEGER CHECK (1-10),
+    estimated_original_cost DECIMAL(10,6),
+    estimated_actual_cost DECIMAL(10,6),
+    savings_amount DECIMAL(10,6),
+    governor_mode VARCHAR(20) NOT NULL,
+    reason TEXT,
+    created_at TIMESTAMPTZ
+);</code></pre>
+<hr />
+<h2 id="complete-source-files">Complete Source Files</h2>
+<p>The complete source code is split across 5 companion files for manageability:</p>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 27%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr>
+<th>Part</th>
+<th>File</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>GRIMOIRE-GOVERNOR-SOURCE-PART1.md</code></td>
+<td>Database Schema, Economic Governor Service</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>GRIMOIRE-GOVERNOR-SOURCE-PART2.md</code></td>
+<td>Grimoire API, Governor API (Lambda handlers)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>GRIMOIRE-GOVERNOR-SOURCE-PART3.md</code></td>
+<td>Grimoire Flyte Tasks (Python)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>GRIMOIRE-GOVERNOR-SOURCE-PART4.md</code></td>
+<td>Python Utilities (DB, Embeddings, Cato Client)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>GRIMOIRE-GOVERNOR-SOURCE-PART5.md</code></td>
+<td>CDK Stack, Cleanup Lambda, Admin UI (React)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="source-file-index">Source File Index</h3>
+<table>
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 18%" />
+<col style="width: 31%" />
+<col style="width: 21%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>File</th>
+<th>Language</th>
+<th>Lines</th>
+<th>Part</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>migrations/V2026_01_09_001__v5_grimoire_governor.sql</code></td>
+<td>SQL</td>
+<td>~170</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>lambda/shared/services/governor/economic-governor.ts</code></td>
+<td>TypeScript</td>
+<td>~260</td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>lambda/shared/services/governor/index.ts</code></td>
+<td>TypeScript</td>
+<td>~15</td>
+<td>1</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>lambda/grimoire-api/index.ts</code></td>
+<td>TypeScript</td>
+<td>~150</td>
+<td>2</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>lambda/governor-api/index.ts</code></td>
+<td>TypeScript</td>
+<td>~180</td>
+<td>2</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>flyte/workflows/grimoire_tasks.py</code></td>
+<td>Python</td>
+<td>~400</td>
+<td>3</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>flyte/utils/db.py</code></td>
+<td>Python</td>
+<td>~210</td>
+<td>4</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>flyte/utils/embeddings.py</code></td>
+<td>Python</td>
+<td>~220</td>
+<td>4</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>flyte/utils/cato_client.py</code></td>
+<td>Python</td>
+<td>~250</td>
+<td>4</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>flyte/utils/__init__.py</code></td>
+<td>Python</td>
+<td>~50</td>
+<td>4</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>lib/stacks/grimoire-stack.ts</code></td>
+<td>TypeScript</td>
+<td>~195</td>
+<td>5</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>lambda/grimoire/cleanup.py</code></td>
+<td>Python</td>
+<td>~170</td>
+<td>5</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>app/(dashboard)/thinktank/grimoire/page.tsx</code></td>
+<td>React/TSX</td>
+<td>~300</td>
+<td>5</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>app/(dashboard)/thinktank/governor/page.tsx</code></td>
+<td>React/TSX</td>
+<td>~280</td>
+<td>5</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>flyte/workflows/think_tank_workflow.py</code></td>
+<td>Python</td>
+<td>~80</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 15 source files, ~2,930 lines of code</strong></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

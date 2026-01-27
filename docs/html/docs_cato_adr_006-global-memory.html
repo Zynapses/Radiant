@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>006 global memory - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>006 global memory</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/adr/006-global-memory.md</div>
+  </div>
+  
+  <h1 id="adr-006-global-memory-with-dynamodb-global-tables">ADR-006: Global Memory with DynamoDB Global Tables</h1>
+<h2 id="status">Status</h2>
+<p>Accepted</p>
+<h2 id="context">Context</h2>
+<p>Cato is a <strong>single global brain</strong> serving all users worldwide. This creates unique memory requirements:</p>
+<ol type="1">
+<li><strong>Global consistency</strong>: A fact learned from a user in Tokyo must be available to a user in New York</li>
+<li><strong>Low latency</strong>: Memory retrieval must not add significant latency to user interactions</li>
+<li><strong>High scale</strong>: 10MM+ users generating billions of memory entries</li>
+<li><strong>Multi-type</strong>: Different memory types (semantic, episodic, working) have different access patterns</li>
+</ol>
+<h3 id="memory-types">Memory Types</h3>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 18%" />
+<col style="width: 32%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr>
+<th>Type</th>
+<th>Purpose</th>
+<th>Access Pattern</th>
+<th>Consistency Need</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Semantic</strong></td>
+<td>Facts, concepts, relationships</td>
+<td>Read-heavy, rare writes</td>
+<td>Strong</td>
+</tr>
+<tr>
+<td><strong>Episodic</strong></td>
+<td>User interactions, experiences</td>
+<td>Write-heavy, recent reads</td>
+<td>Eventual</td>
+</tr>
+<tr>
+<td><strong>Working</strong></td>
+<td>Current context, active goals</td>
+<td>Read/write balanced</td>
+<td>Strong</td>
+</tr>
+<tr>
+<td><strong>Knowledge Graph</strong></td>
+<td>Concept relationships</td>
+<td>Graph traversal</td>
+<td>Eventual</td>
+</tr>
+</tbody>
+</table>
+<h2 id="decision">Decision</h2>
+<p>Implement a <strong>polyglot persistence</strong> architecture using AWS managed services:</p>
+<h3 id="dynamodb-global-tables-semantic-working-memory">1. DynamoDB Global Tables (Semantic + Working Memory)</h3>
+<ul>
+<li><strong>Purpose</strong>: Core fact storage with global replication</li>
+<li><strong>Consistency</strong>: MRSC for semantic, MREC for high-volume updates</li>
+<li><strong>Access</strong>: DAX for sub-millisecond reads</li>
+</ul>
+<h3 id="opensearch-serverless-episodic-memory">2. OpenSearch Serverless (Episodic Memory)</h3>
+<ul>
+<li><strong>Purpose</strong>: Vector similarity search for experience retrieval</li>
+<li><strong>Scale</strong>: Billions of embeddings</li>
+<li><strong>Access</strong>: k-NN search with filters</li>
+</ul>
+<h3 id="neptune-knowledge-graph">3. Neptune (Knowledge Graph)</h3>
+<ul>
+<li><strong>Purpose</strong>: Concept relationships and reasoning</li>
+<li><strong>Access</strong>: Gremlin/SPARQL queries</li>
+<li><strong>Use case</strong>: “What concepts are related to X?”</li>
+</ul>
+<h3 id="elasticache-redis-working-memory-cache">4. ElastiCache Redis (Working Memory Cache)</h3>
+<ul>
+<li><strong>Purpose</strong>: Active session context, hot data</li>
+<li><strong>TTL</strong>: 24-hour decay for working memory</li>
+<li><strong>Access</strong>: Sub-millisecond reads</li>
+</ul>
+<h2 id="architecture">Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                         CATO GLOBAL MEMORY                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │                    SEMANTIC MEMORY (DynamoDB Global Tables)          │    │
+│  │  ├── Facts: Subject-Predicate-Object triples                        │    │
+│  │  ├── Concepts: Domain knowledge with confidence                     │    │
+│  │  ├── Sources: Attribution for each fact                             │    │
+│  │  └── Versioning: Optimistic locking for updates                     │    │
+│  │                                                                      │    │
+│  │  Regions: us-east-1, eu-west-1, ap-northeast-1                      │    │
+│  │  Consistency: MRSC for writes, MREC for reads                       │    │
+│  │  Access: DAX cluster for sub-ms reads                               │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │                    EPISODIC MEMORY (OpenSearch Serverless)           │    │
+│  │  ├── Interactions: User queries and responses                       │    │
+│  │  ├── Embeddings: 768-dim vectors for similarity                     │    │
+│  │  ├── Metadata: Timestamp, user, domain, satisfaction                │    │
+│  │  └── TTL: 90-day retention for compliance                           │    │
+│  │                                                                      │    │
+│  │  Scale: 1B+ vectors                                                 │    │
+│  │  Search: k-NN with 10ms p99 latency                                 │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │                    KNOWLEDGE GRAPH (Neptune)                         │    │
+│  │  ├── Concepts: Nodes with properties                                │    │
+│  │  ├── Relationships: Typed edges (is-a, part-of, causes, etc.)       │    │
+│  │  ├── Weights: Relationship strength                                  │    │
+│  │  └── Domains: Subgraph per knowledge domain                          │    │
+│  │                                                                      │    │
+│  │  Query: Gremlin for traversal                                       │    │
+│  │  Use: &quot;Find related concepts within 3 hops&quot;                         │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │                    WORKING MEMORY (ElastiCache Redis)                │    │
+│  │  ├── Sessions: Active conversation context                          │    │
+│  │  ├── Goals: Current autonomous objectives                           │    │
+│  │  ├── Attention: What Cato is &quot;thinking about&quot;                      │    │
+│  │  └── Mood: Current meta-cognitive state                              │    │
+│  │                                                                      │    │
+│  │  TTL: 24-hour decay                                                 │    │
+│  │  Access: Sub-ms reads via cluster mode                              │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h2 id="dynamodb-schema">DynamoDB Schema</h2>
+<h3 id="semantic-memory-table">Semantic Memory Table</h3>
+<pre><code>Table: cato-semantic-memory
+
+Primary Key:
+  pk (Partition Key): &quot;FACT#{domain}&quot; or &quot;CONCEPT#{id}&quot;
+  sk (Sort Key): &quot;{subject}#{predicate}#{object}&quot; or &quot;{timestamp}&quot;
+
+GSI1 (Subject Index):
+  gsi1pk: &quot;SUBJECT#{subject}&quot;
+  gsi1sk: &quot;{predicate}#{object}&quot;
+
+GSI2 (Domain Index):
+  gsi2pk: &quot;DOMAIN#{domain}&quot;
+  gsi2sk: &quot;{confidence}#{timestamp}&quot;
+
+Attributes:
+  - fact_id: UUID
+  - subject: string
+  - predicate: string
+  - object: string
+  - domain: string
+  - confidence: number (0-1)
+  - sources: string[] (URLs, references)
+  - created_at: ISO timestamp
+  - updated_at: ISO timestamp
+  - version: number (for optimistic locking)</code></pre>
+<h3 id="working-memory-table">Working Memory Table</h3>
+<pre><code>Table: cato-working-memory
+
+Primary Key:
+  pk: &quot;SESSION#{session_id}&quot; or &quot;GOAL#{goal_id}&quot; or &quot;ATTENTION&quot;
+  sk: &quot;{timestamp}&quot; or &quot;{priority}&quot;
+
+TTL: expires_at (24 hours from creation)
+
+Attributes:
+  - context: JSON (conversation history)
+  - goals: string[] (current objectives)
+  - attention_focus: string (current topic)
+  - meta_state: enum (CONFUSED, CONFIDENT, BORED, STAGNANT)
+  - created_at: ISO timestamp</code></pre>
+<h2 id="implementation">Implementation</h2>
+<h3 id="typescript-memory-service">TypeScript Memory Service</h3>
+<pre class="typescript"><code>import { DynamoDBClient } from &#39;@aws-sdk/client-dynamodb&#39;;
+import { DynamoDBDocumentClient, QueryCommand, PutCommand, UpdateCommand } from &#39;@aws-sdk/lib-dynamodb&#39;;
+import { Client as OpenSearchClient } from &#39;@opensearch-project/opensearch&#39;;
+
+export interface SemanticFact {
+  factId: string;
+  subject: string;
+  predicate: string;
+  object: string;
+  domain: string;
+  confidence: number;
+  sources: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  version: number;
+}
+
+export interface EpisodicMemory {
+  interactionId: string;
+  userId: string;
+  query: string;
+  response: string;
+  embedding: number[];
+  domain: string;
+  satisfaction: number;
+  timestamp: Date;
+}
+
+export class GlobalMemoryService {
+  private readonly docClient: DynamoDBDocumentClient;
+  private readonly opensearch: OpenSearchClient;
+  private readonly semanticTable: string;
+  private readonly workingTable: string;
+  private readonly episodicIndex: string;
+
+  constructor(config: {
+    semanticTable: string;
+    workingTable: string;
+    opensearchEndpoint: string;
+    episodicIndex: string;
+    region: string;
+  }) {
+    const dynamoClient = new DynamoDBClient({ region: config.region });
+    this.docClient = DynamoDBDocumentClient.from(dynamoClient);
+    this.opensearch = new OpenSearchClient({
+      node: config.opensearchEndpoint
+    });
+    this.semanticTable = config.semanticTable;
+    this.workingTable = config.workingTable;
+    this.episodicIndex = config.episodicIndex;
+  }
+
+  // ============================================================================
+  // Semantic Memory
+  // ============================================================================
+
+  async storeFact(fact: Omit&lt;SemanticFact, &#39;factId&#39; | &#39;createdAt&#39; | &#39;updatedAt&#39; | &#39;version&#39;&gt;): Promise&lt;string&gt; {
+    const factId = crypto.randomUUID();
+    const now = new Date();
+
+    await this.docClient.send(new PutCommand({
+      TableName: this.semanticTable,
+      Item: {
+        pk: `FACT#${fact.domain}`,
+        sk: `${fact.subject}#${fact.predicate}#${fact.object}`,
+        factId,
+        ...fact,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+        version: 1,
+        gsi1pk: `SUBJECT#${fact.subject}`,
+        gsi1sk: `${fact.predicate}#${fact.object}`,
+        gsi2pk: `DOMAIN#${fact.domain}`,
+        gsi2sk: `${fact.confidence}#${now.toISOString()}`
+      },
+      ConditionExpression: &#39;attribute_not_exists(pk)&#39;
+    }));
+
+    return factId;
+  }
+
+  async getFactsByDomain(domain: string, limit: number = 100): Promise&lt;SemanticFact[]&gt; {
+    const response = await this.docClient.send(new QueryCommand({
+      TableName: this.semanticTable,
+      KeyConditionExpression: &#39;pk = :pk&#39;,
+      ExpressionAttributeValues: {
+        &#39;:pk&#39;: `FACT#${domain}`
+      },
+      Limit: limit
+    }));
+
+    return (response.Items || []).map(this.itemToFact);
+  }
+
+  async getFactsAboutSubject(subject: string, limit: number = 50): Promise&lt;SemanticFact[]&gt; {
+    const response = await this.docClient.send(new QueryCommand({
+      TableName: this.semanticTable,
+      IndexName: &#39;gsi1&#39;,
+      KeyConditionExpression: &#39;gsi1pk = :pk&#39;,
+      ExpressionAttributeValues: {
+        &#39;:pk&#39;: `SUBJECT#${subject}`
+      },
+      Limit: limit
+    }));
+
+    return (response.Items || []).map(this.itemToFact);
+  }
+
+  async updateFactConfidence(
+    domain: string,
+    sk: string,
+    newConfidence: number,
+    source: string
+  ): Promise&lt;void&gt; {
+    await this.docClient.send(new UpdateCommand({
+      TableName: this.semanticTable,
+      Key: { pk: `FACT#${domain}`, sk },
+      UpdateExpression: &#39;SET confidence = :conf, updatedAt = :now, version = version + :inc, sources = list_append(sources, :src)&#39;,
+      ExpressionAttributeValues: {
+        &#39;:conf&#39;: newConfidence,
+        &#39;:now&#39;: new Date().toISOString(),
+        &#39;:inc&#39;: 1,
+        &#39;:src&#39;: [source]
+      }
+    }));
+  }
+
+  // ============================================================================
+  // Episodic Memory
+  // ============================================================================
+
+  async storeInteraction(memory: Omit&lt;EpisodicMemory, &#39;interactionId&#39;&gt;): Promise&lt;string&gt; {
+    const interactionId = crypto.randomUUID();
+
+    await this.opensearch.index({
+      index: this.episodicIndex,
+      id: interactionId,
+      body: {
+        ...memory,
+        interactionId,
+        timestamp: memory.timestamp.toISOString()
+      }
+    });
+
+    return interactionId;
+  }
+
+  async searchSimilarInteractions(
+    embedding: number[],
+    filters: { domain?: string; userId?: string },
+    limit: number = 10
+  ): Promise&lt;EpisodicMemory[]&gt; {
+    const must: any[] = [];
+    
+    if (filters.domain) {
+      must.push({ term: { domain: filters.domain } });
+    }
+    if (filters.userId) {
+      must.push({ term: { userId: filters.userId } });
+    }
+
+    const response = await this.opensearch.search({
+      index: this.episodicIndex,
+      body: {
+        size: limit,
+        query: {
+          bool: {
+            must,
+            should: [
+              {
+                knn: {
+                  embedding: {
+                    vector: embedding,
+                    k: limit
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    });
+
+    return response.body.hits.hits.map((hit: any) =&gt; ({
+      ...hit._source,
+      timestamp: new Date(hit._source.timestamp)
+    }));
+  }
+
+  // ============================================================================
+  // Working Memory
+  // ============================================================================
+
+  async getSessionContext(sessionId: string): Promise&lt;any | null&gt; {
+    const response = await this.docClient.send(new QueryCommand({
+      TableName: this.workingTable,
+      KeyConditionExpression: &#39;pk = :pk&#39;,
+      ExpressionAttributeValues: {
+        &#39;:pk&#39;: `SESSION#${sessionId}`
+      },
+      ScanIndexForward: false,
+      Limit: 1
+    }));
+
+    return response.Items?.[0]?.context || null;
+  }
+
+  async updateSessionContext(sessionId: string, context: any): Promise&lt;void&gt; {
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours
+
+    await this.docClient.send(new PutCommand({
+      TableName: this.workingTable,
+      Item: {
+        pk: `SESSION#${sessionId}`,
+        sk: now.toISOString(),
+        context,
+        createdAt: now.toISOString(),
+        expiresAt: Math.floor(expiresAt.getTime() / 1000) // TTL
+      }
+    }));
+  }
+
+  private itemToFact(item: any): SemanticFact {
+    return {
+      factId: item.factId,
+      subject: item.subject,
+      predicate: item.predicate,
+      object: item.object,
+      domain: item.domain,
+      confidence: item.confidence,
+      sources: item.sources || [],
+      createdAt: new Date(item.createdAt),
+      updatedAt: new Date(item.updatedAt),
+      version: item.version
+    };
+  }
+}</code></pre>
+<h2 id="consequences">Consequences</h2>
+<h3 id="positive">Positive</h3>
+<ul>
+<li><strong>Global availability</strong>: DynamoDB Global Tables replicate across regions</li>
+<li><strong>Specialized storage</strong>: Each memory type uses optimal database</li>
+<li><strong>Scalability</strong>: All components auto-scale to billions of entries</li>
+<li><strong>Low latency</strong>: DAX + Redis provide sub-ms reads</li>
+</ul>
+<h3 id="negative">Negative</h3>
+<ul>
+<li><strong>Cost</strong>: ~$60K/month at 10M users for DynamoDB alone</li>
+<li><strong>Complexity</strong>: Four different databases to manage</li>
+<li><strong>Consistency tradeoffs</strong>: Eventual consistency for some operations</li>
+<li><strong>Operational overhead</strong>: Multiple systems to monitor</li>
+</ul>
+<h2 id="cost-breakdown">Cost Breakdown</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>1M Users</th>
+<th>10M Users</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DynamoDB Global Tables</td>
+<td>$5,000</td>
+<td>$60,000</td>
+</tr>
+<tr>
+<td>DAX Cluster</td>
+<td>$1,000</td>
+<td>$5,000</td>
+</tr>
+<tr>
+<td>OpenSearch Serverless</td>
+<td>$8,000</td>
+<td>$90,000</td>
+</tr>
+<tr>
+<td>Neptune</td>
+<td>$1,000</td>
+<td>$12,000</td>
+</tr>
+<tr>
+<td>ElastiCache Redis</td>
+<td>$2,000</td>
+<td>$10,000</td>
+</tr>
+<tr>
+<td><strong>Total Memory Infrastructure</strong></td>
+<td><strong>$17,000</strong></td>
+<td><strong>$177,000</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html">DynamoDB Global Tables</a></li>
+<li><a href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless.html">OpenSearch Serverless</a></li>
+<li><a href="https://docs.aws.amazon.com/neptune/latest/userguide/">Amazon Neptune</a></li>
+<li><a href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/">ElastiCache for Redis</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

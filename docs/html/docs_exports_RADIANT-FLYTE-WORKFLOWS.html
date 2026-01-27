@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIANT FLYTE WORKFLOWS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RADIANT FLYTE WORKFLOWS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/RADIANT-FLYTE-WORKFLOWS.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.18.0---flyte-workflows-export">RADIANT v4.18.0 - Flyte Workflows Export</h1>
+<p><strong>Component</strong>: Flyte Workflow Orchestration <strong>Language</strong>: Python 3.11 <strong>Framework</strong>: Flytekit <strong>Files</strong>: 6 Python files (2 workflows, 4 utilities)</p>
+<hr />
+<h2 id="architecture-narrative">Architecture Narrative</h2>
+<p>RADIANT uses <strong>Flyte</strong> for complex, long-running AI workflows that require human-in-the-loop (HITL) approval, parallel agent execution, and durable state management. Flyte workflows handle Think Tank reasoning sessions, Grimoire procedural memory operations, and Economic Governor cost optimization.</p>
+<h3 id="why-flyte">Why Flyte?</h3>
+<ol type="1">
+<li><strong>HITL Support</strong> - Native <code>wait_for_input</code> and <code>approve</code> primitives</li>
+<li><strong>Durable Execution</strong> - Survives Lambda timeouts and restarts</li>
+<li><strong>Parallelism</strong> - True parallel agent execution with <code>@dynamic</code></li>
+<li><strong>Versioning</strong> - Workflow versioning for rollbacks</li>
+<li><strong>Observability</strong> - Built-in task tracking and logging</li>
+</ol>
+<h3 id="package-structure">Package Structure</h3>
+<pre><code>packages/flyte/
+├── workflows/
+│   ├── grimoire_tasks.py      # Grimoire procedural memory tasks
+│   └── think_tank_workflow.py # Think Tank HITL workflow
+├── utils/
+│   ├── __init__.py            # Utility exports
+│   ├── cato_client.py         # Cato Safety Service client
+│   ├── db.py                  # RLS-safe database connections
+│   └── embeddings.py          # Embedding generation
+└── scripts/
+    └── register.py            # Workflow registration</code></pre>
+<hr />
+<h2 id="workflows">Workflows</h2>
+<h3 id="think_tank_workflow.py">think_tank_workflow.py</h3>
+<p><strong>Purpose</strong>: Human-in-the-Loop reasoning workflow for Think Tank sessions with swarm parallelism.</p>
+<pre class="python"><code>&quot;&quot;&quot;
+Think Tank HITL Workflow - Flyte workflow for Human-in-the-Loop AI reasoning
+
+RADIANT v5.0.2 - System Evolution
+
+This workflow implements:
+- True swarm parallelism with per-agent execution
+- Non-blocking HITL via wait_for_input
+- Domain-aware timeout handling
+- PHI sanitization before human review
+- Integration with Mission Control API
+- The Grimoire integration (procedural memory)
+- Economic Governor integration (cost optimization)
+&quot;&quot;&quot;
+
+import json
+import os
+import re
+import uuid
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Any
+
+import boto3
+import requests
+from flytekit import task, workflow, dynamic, wait_for_input, approve, current_context
+from flytekit.types.file import FlyteFile
+from dataclasses import dataclass
+
+# v5.0.2 - The Grimoire Integration
+from radiant.flyte.workflows.grimoire_tasks import consult_grimoire, librarian_review
+
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+LITELLM_PROXY_URL = os.environ.get(&quot;LITELLM_PROXY_URL&quot;, &quot;http://localhost:4000&quot;)
+LITELLM_API_KEY = os.environ.get(&quot;LITELLM_API_KEY&quot;, &quot;&quot;)
+MISSION_CONTROL_URL = os.environ.get(&quot;MISSION_CONTROL_URL&quot;, &quot;http://localhost:8080&quot;)
+S3_BUCKET = os.environ.get(&quot;RADIANT_DATA_BUCKET&quot;, &quot;radiant-data&quot;)
+
+# Domain-specific timeouts (seconds)
+DOMAIN_TIMEOUTS = {
+    &quot;medical&quot;: 300,      # 5 minutes
+    &quot;financial&quot;: 600,    # 10 minutes
+    &quot;legal&quot;: 900,        # 15 minutes
+    &quot;general&quot;: 1800,     # 30 minutes
+}
+
+
+# ============================================================================
+# DATA CLASSES
+# ============================================================================
+
+@dataclass
+class AgentConfig:
+    agent_id: str
+    role: str
+    model: str
+    temperature: float = 0.7
+    max_tokens: int = 2048
+    tools: Optional[List[str]] = None
+
+
+@dataclass
+class SwarmTask:
+    type: str
+    prompt: str
+    context: Dict[str, Any]
+    system_prompt: Optional[str] = None
+
+
+@dataclass
+class AgentResult:
+    agent_id: str
+    status: str  # &#39;success&#39;, &#39;failed&#39;, &#39;timeout&#39;, &#39;rejected&#39;
+    response: Optional[str] = None
+    error: Optional[str] = None
+    latency_ms: int = 0
+    tokens_used: int = 0
+    safety_passed: bool = True
+
+
+@dataclass
+class HumanDecision:
+    resolution: str  # &#39;approved&#39;, &#39;rejected&#39;, &#39;modified&#39;
+    guidance: str
+    resolved_by: str
+    resolved_at: str
+
+
+@dataclass
+class WorkflowResult:
+    swarm_id: str
+    status: str
+    agent_results: List[Dict[str, Any]]
+    synthesis: Optional[str] = None
+    human_decision: Optional[Dict[str, Any]] = None
+    final_response: Optional[str] = None
+
+
+# ============================================================================
+# HELPER FUNCTIONS
+# ============================================================================
+
+def sanitize_phi(content: str) -&gt; str:
+    &quot;&quot;&quot;Remove PHI/PII from content before human review.&quot;&quot;&quot;
+    patterns = [
+        (r&quot;\b\d{3}-\d{2}-\d{4}\b&quot;, &quot;[SSN REDACTED]&quot;),
+        (r&quot;\b\d{9}\b&quot;, &quot;[SSN REDACTED]&quot;),
+        (r&quot;\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b&quot;, &quot;[EMAIL REDACTED]&quot;),
+        (r&quot;\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b&quot;, &quot;[PHONE REDACTED]&quot;),
+        (r&quot;\b\d{5}(-\d{4})?\b&quot;, &quot;[ZIP REDACTED]&quot;),
+        (r&quot;\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b&quot;, &quot;[CC REDACTED]&quot;),
+        (r&quot;\b(MRN|Patient ID|Medical Record)[:\s]*\w+\b&quot;, &quot;[MRN REDACTED]&quot;),
+    ]
+    
+    sanitized = content
+    for pattern, replacement in patterns:
+        sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
+    
+    return sanitized
+
+
+def call_litellm(
+    model: str,
+    messages: List[Dict[str, str]],
+    temperature: float = 0.7,
+    max_tokens: int = 2048,
+    tenant_id: str = &quot;&quot;
+) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;Call LiteLLM proxy for model inference.&quot;&quot;&quot;
+    response = requests.post(
+        f&quot;{LITELLM_PROXY_URL}/v1/chat/completions&quot;,
+        headers={
+            &quot;Content-Type&quot;: &quot;application/json&quot;,
+            &quot;Authorization&quot;: f&quot;Bearer {LITELLM_API_KEY}&quot;,
+            &quot;X-Tenant-ID&quot;: tenant_id,
+        },
+        json={
+            &quot;model&quot;: model,
+            &quot;messages&quot;: messages,
+            &quot;temperature&quot;: temperature,
+            &quot;max_tokens&quot;: max_tokens,
+        },
+        timeout=60
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+# ============================================================================
+# FLYTE TASKS
+# ============================================================================
+
+@task(cache=False, retries=2)
+def execute_agent(
+    agent_config: AgentConfig,
+    task: SwarmTask,
+    tenant_id: str,
+    heuristics: List[Dict[str, Any]]
+) -&gt; AgentResult:
+    &quot;&quot;&quot;Execute a single agent in the swarm.&quot;&quot;&quot;
+    start_time = datetime.utcnow()
+    
+    try:
+        # Build system prompt with heuristics
+        system_prompt = task.system_prompt or &quot;&quot;
+        if heuristics:
+            heuristic_text = &quot;\n&quot;.join([
+                f&quot;- {h[&#39;trigger_pattern&#39;]}: {h[&#39;action_template&#39;]}&quot;
+                for h in heuristics[:5]  # Top 5 relevant heuristics
+            ])
+            system_prompt += f&quot;\n\nRelevant procedural knowledge:\n{heuristic_text}&quot;
+        
+        messages = [
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system_prompt},
+            {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: task.prompt}
+        ]
+        
+        result = call_litellm(
+            model=agent_config.model,
+            messages=messages,
+            temperature=agent_config.temperature,
+            max_tokens=agent_config.max_tokens,
+            tenant_id=tenant_id
+        )
+        
+        latency_ms = int((datetime.utcnow() - start_time).total_seconds() * 1000)
+        
+        return AgentResult(
+            agent_id=agent_config.agent_id,
+            status=&quot;success&quot;,
+            response=result[&quot;choices&quot;][0][&quot;message&quot;][&quot;content&quot;],
+            latency_ms=latency_ms,
+            tokens_used=result.get(&quot;usage&quot;, {}).get(&quot;total_tokens&quot;, 0),
+            safety_passed=True
+        )
+        
+    except Exception as e:
+        return AgentResult(
+            agent_id=agent_config.agent_id,
+            status=&quot;failed&quot;,
+            error=str(e),
+            latency_ms=int((datetime.utcnow() - start_time).total_seconds() * 1000)
+        )
+
+
+@task(cache=False)
+def synthesize_results(
+    agent_results: List[AgentResult],
+    original_prompt: str,
+    tenant_id: str
+) -&gt; str:
+    &quot;&quot;&quot;Synthesize multiple agent responses into a coherent answer.&quot;&quot;&quot;
+    successful_results = [r for r in agent_results if r.status == &quot;success&quot;]
+    
+    if not successful_results:
+        return &quot;Unable to generate response - all agents failed.&quot;
+    
+    synthesis_prompt = f&quot;&quot;&quot;
+    Original question: {original_prompt}
+    
+    Agent responses:
+    {chr(10).join([f&quot;Agent {r.agent_id}: {r.response}&quot; for r in successful_results])}
+    
+    Please synthesize these responses into a single, coherent, comprehensive answer.
+    &quot;&quot;&quot;
+    
+    result = call_litellm(
+        model=&quot;gpt-4o&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: synthesis_prompt}],
+        temperature=0.3,
+        max_tokens=4096,
+        tenant_id=tenant_id
+    )
+    
+    return result[&quot;choices&quot;][0][&quot;message&quot;][&quot;content&quot;]
+
+
+@dynamic
+def execute_swarm(
+    agents: List[AgentConfig],
+    task: SwarmTask,
+    tenant_id: str,
+    heuristics: List[Dict[str, Any]]
+) -&gt; List[AgentResult]:
+    &quot;&quot;&quot;Execute all agents in parallel.&quot;&quot;&quot;
+    results = []
+    for agent in agents:
+        result = execute_agent(
+            agent_config=agent,
+            task=task,
+            tenant_id=tenant_id,
+            heuristics=heuristics
+        )
+        results.append(result)
+    return results
+
+
+# ============================================================================
+# MAIN WORKFLOW
+# ============================================================================
+
+@workflow
+def think_tank_hitl_workflow(
+    swarm_id: str,
+    tenant_id: str,
+    user_id: str,
+    prompt: str,
+    domain: str,
+    agents: List[AgentConfig],
+    require_approval: bool = False
+) -&gt; WorkflowResult:
+    &quot;&quot;&quot;
+    Think Tank HITL workflow with Grimoire integration.
+    
+    1. Consult Grimoire for relevant heuristics
+    2. Execute swarm agents in parallel
+    3. Synthesize results
+    4. Request human approval (if required)
+    5. Store successful patterns in Grimoire
+    &quot;&quot;&quot;
+    
+    # Step 1: Consult the Grimoire
+    heuristics = consult_grimoire(
+        tenant_id=tenant_id,
+        domain=domain,
+        query=prompt,
+        limit=10
+    )
+    
+    # Step 2: Create task
+    task = SwarmTask(
+        type=&quot;reasoning&quot;,
+        prompt=prompt,
+        context={&quot;domain&quot;: domain, &quot;user_id&quot;: user_id}
+    )
+    
+    # Step 3: Execute swarm
+    agent_results = execute_swarm(
+        agents=agents,
+        task=task,
+        tenant_id=tenant_id,
+        heuristics=heuristics
+    )
+    
+    # Step 4: Synthesize
+    synthesis = synthesize_results(
+        agent_results=agent_results,
+        original_prompt=prompt,
+        tenant_id=tenant_id
+    )
+    
+    # Step 5: Human approval (if required)
+    human_decision = None
+    if require_approval:
+        sanitized = sanitize_phi(synthesis)
+        timeout = DOMAIN_TIMEOUTS.get(domain, 1800)
+        
+        human_decision = wait_for_input(
+            name=f&quot;approval_{swarm_id}&quot;,
+            timeout=timedelta(seconds=timeout),
+            expected_type=HumanDecision
+        )
+    
+    # Step 6: Librarian review (extract heuristics from successful execution)
+    if not require_approval or (human_decision and human_decision.resolution == &quot;approved&quot;):
+        librarian_review(
+            tenant_id=tenant_id,
+            domain=domain,
+            prompt=prompt,
+            response=synthesis,
+            success=True
+        )
+    
+    return WorkflowResult(
+        swarm_id=swarm_id,
+        status=&quot;completed&quot;,
+        agent_results=[vars(r) for r in agent_results],
+        synthesis=synthesis,
+        human_decision=vars(human_decision) if human_decision else None,
+        final_response=synthesis
+    )</code></pre>
+<hr />
+<h3 id="grimoire_tasks.py">grimoire_tasks.py</h3>
+<p><strong>Purpose</strong>: Flyte tasks for The Grimoire procedural memory system.</p>
+<pre class="python"><code>&quot;&quot;&quot;
+Grimoire Tasks - Flyte tasks for procedural memory management
+
+RADIANT v5.0.2 - The Grimoire Integration
+
+Tasks:
+- consult_grimoire: Retrieve relevant heuristics via vector similarity
+- librarian_review: Extract and store new heuristics from successful executions
+- cleanup_expired_heuristics: Scheduled maintenance task
+&quot;&quot;&quot;
+
+import os
+import json
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Any
+
+from flytekit import task
+import psycopg2
+from pgvector.psycopg2 import register_vector
+
+from radiant.flyte.utils.db import get_connection, set_tenant_context
+from radiant.flyte.utils.embeddings import generate_embedding, cosine_similarity
+from radiant.flyte.utils.cato_client import CatoClient
+
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+SIMILARITY_THRESHOLD = 0.75
+MAX_HEURISTICS_PER_QUERY = 10
+HEURISTIC_EXPIRY_DAYS = 90
+MIN_CONFIDENCE_THRESHOLD = 0.3
+
+
+# ============================================================================
+# CONSULT GRIMOIRE
+# ============================================================================
+
+@task(cache=True, cache_version=&quot;1.0&quot;)
+def consult_grimoire(
+    tenant_id: str,
+    domain: str,
+    query: str,
+    limit: int = 10
+) -&gt; List[Dict[str, Any]]:
+    &quot;&quot;&quot;
+    Retrieve relevant heuristics from The Grimoire.
+    
+    Uses pgvector for semantic similarity search.
+    &quot;&quot;&quot;
+    conn = get_connection()
+    register_vector(conn)
+    
+    try:
+        set_tenant_context(conn, tenant_id)
+        
+        # Generate query embedding
+        query_embedding = generate_embedding(query)
+        
+        with conn.cursor() as cur:
+            # Vector similarity search
+            cur.execute(&quot;&quot;&quot;
+                SELECT 
+                    id,
+                    domain,
+                    trigger_pattern,
+                    action_template,
+                    confidence,
+                    success_count,
+                    failure_count,
+                    1 - (embedding &lt;=&gt; %s::vector) as similarity
+                FROM knowledge_heuristics
+                WHERE tenant_id = %s
+                  AND domain = %s
+                  AND confidence &gt;= %s
+                  AND (expires_at IS NULL OR expires_at &gt; NOW())
+                ORDER BY embedding &lt;=&gt; %s::vector
+                LIMIT %s
+            &quot;&quot;&quot;, (
+                query_embedding,
+                tenant_id,
+                domain,
+                MIN_CONFIDENCE_THRESHOLD,
+                query_embedding,
+                limit
+            ))
+            
+            rows = cur.fetchall()
+            
+            heuristics = []
+            for row in rows:
+                similarity = float(row[7])
+                if similarity &gt;= SIMILARITY_THRESHOLD:
+                    heuristics.append({
+                        &quot;id&quot;: str(row[0]),
+                        &quot;domain&quot;: row[1],
+                        &quot;trigger_pattern&quot;: row[2],
+                        &quot;action_template&quot;: row[3],
+                        &quot;confidence&quot;: float(row[4]),
+                        &quot;success_count&quot;: row[5],
+                        &quot;failure_count&quot;: row[6],
+                        &quot;similarity&quot;: similarity
+                    })
+            
+            # Update last_used_at for retrieved heuristics
+            if heuristics:
+                heuristic_ids = [h[&quot;id&quot;] for h in heuristics]
+                cur.execute(&quot;&quot;&quot;
+                    UPDATE knowledge_heuristics
+                    SET last_used_at = NOW()
+                    WHERE id = ANY(%s)
+                &quot;&quot;&quot;, (heuristic_ids,))
+                conn.commit()
+            
+            return heuristics
+            
+    finally:
+        conn.close()
+
+
+# ============================================================================
+# LIBRARIAN REVIEW
+# ============================================================================
+
+@task(cache=False, retries=1)
+def librarian_review(
+    tenant_id: str,
+    domain: str,
+    prompt: str,
+    response: str,
+    success: bool,
+    execution_id: Optional[str] = None
+) -&gt; Optional[str]:
+    &quot;&quot;&quot;
+    Extract and store new heuristics from successful executions.
+    
+    The &quot;Librarian&quot; reviews successful interactions and extracts
+    reusable patterns for future consultations.
+    &quot;&quot;&quot;
+    if not success:
+        return None
+    
+    # Safety check with Cato
+    cato = CatoClient()
+    safety_result = cato.check_storage_safety(
+        content=f&quot;{prompt}\n{response}&quot;,
+        content_type=&quot;heuristic&quot;
+    )
+    
+    if not safety_result.safe:
+        return None
+    
+    # Extract heuristic using LLM
+    extraction_prompt = f&quot;&quot;&quot;
+    Analyze this successful interaction and extract a reusable pattern:
+    
+    User Query: {prompt}
+    Response: {response}
+    Domain: {domain}
+    
+    Extract:
+    1. trigger_pattern: A generalized pattern that would match similar queries
+    2. action_template: A template for generating similar successful responses
+    
+    Return JSON: {{&quot;trigger_pattern&quot;: &quot;...&quot;, &quot;action_template&quot;: &quot;...&quot;}}
+    &quot;&quot;&quot;
+    
+    # Call LLM for extraction (simplified - would use LiteLLM in production)
+    extracted = extract_heuristic_with_llm(extraction_prompt)
+    
+    if not extracted:
+        return None
+    
+    # Generate embedding for the trigger pattern
+    embedding = generate_embedding(extracted[&quot;trigger_pattern&quot;])
+    
+    # Store in database
+    conn = get_connection()
+    register_vector(conn)
+    
+    try:
+        set_tenant_context(conn, tenant_id)
+        
+        with conn.cursor() as cur:
+            cur.execute(&quot;&quot;&quot;
+                INSERT INTO knowledge_heuristics (
+                    tenant_id, domain, trigger_pattern, action_template,
+                    embedding, source_execution_id, confidence
+                ) VALUES (%s, %s, %s, %s, %s, %s, 0.50)
+                RETURNING id
+            &quot;&quot;&quot;, (
+                tenant_id,
+                domain,
+                extracted[&quot;trigger_pattern&quot;],
+                extracted[&quot;action_template&quot;],
+                embedding,
+                execution_id
+            ))
+            
+            heuristic_id = cur.fetchone()[0]
+            conn.commit()
+            
+            return str(heuristic_id)
+            
+    finally:
+        conn.close()
+
+
+# ============================================================================
+# CLEANUP TASK
+# ============================================================================
+
+@task(cache=False)
+def cleanup_expired_heuristics() -&gt; Dict[str, int]:
+    &quot;&quot;&quot;
+    Scheduled task to clean up expired and low-confidence heuristics.
+    
+    Runs daily via EventBridge.
+    &quot;&quot;&quot;
+    conn = get_connection(system_context=True)
+    
+    try:
+        with conn.cursor() as cur:
+            # Delete expired heuristics
+            cur.execute(&quot;&quot;&quot;
+                DELETE FROM knowledge_heuristics
+                WHERE expires_at IS NOT NULL AND expires_at &lt; NOW()
+                RETURNING id
+            &quot;&quot;&quot;)
+            expired_count = cur.rowcount
+            
+            # Delete low-confidence heuristics older than expiry period
+            cur.execute(&quot;&quot;&quot;
+                DELETE FROM knowledge_heuristics
+                WHERE confidence &lt; %s
+                  AND created_at &lt; NOW() - INTERVAL &#39;%s days&#39;
+                RETURNING id
+            &quot;&quot;&quot;, (MIN_CONFIDENCE_THRESHOLD, HEURISTIC_EXPIRY_DAYS))
+            low_confidence_count = cur.rowcount
+            
+            conn.commit()
+            
+            return {
+                &quot;expired_deleted&quot;: expired_count,
+                &quot;low_confidence_deleted&quot;: low_confidence_count,
+                &quot;total_deleted&quot;: expired_count + low_confidence_count
+            }
+            
+    finally:
+        conn.close()</code></pre>
+<hr />
+<h2 id="utility-modules">Utility Modules</h2>
+<h3 id="utilsdb.py">utils/db.py</h3>
+<p><strong>Purpose</strong>: RLS-safe database connection management.</p>
+<pre class="python"><code>&quot;&quot;&quot;
+Database utilities for Flyte tasks - RLS-safe connections
+
+RADIANT v5.0.2
+&quot;&quot;&quot;
+
+import os
+from contextlib import contextmanager
+from typing import Optional
+
+import psycopg2
+from psycopg2.pool import ThreadedConnectionPool
+from pgvector.psycopg2 import register_vector
+
+DB_HOST = os.environ.get(&quot;DB_HOST&quot;, &quot;localhost&quot;)
+DB_PORT = os.environ.get(&quot;DB_PORT&quot;, &quot;5432&quot;)
+DB_NAME = os.environ.get(&quot;DB_NAME&quot;, &quot;radiant&quot;)
+DB_USER = os.environ.get(&quot;DB_USER&quot;, &quot;radiant&quot;)
+DB_PASSWORD = os.environ.get(&quot;DB_PASSWORD&quot;, &quot;&quot;)
+
+SYSTEM_TENANT_ID = &quot;00000000-0000-0000-0000-000000000000&quot;
+
+_pool: Optional[ThreadedConnectionPool] = None
+
+
+def get_pool() -&gt; ThreadedConnectionPool:
+    &quot;&quot;&quot;Get or create connection pool.&quot;&quot;&quot;
+    global _pool
+    if _pool is None:
+        _pool = ThreadedConnectionPool(
+            minconn=1,
+            maxconn=10,
+            host=DB_HOST,
+            port=DB_PORT,
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD
+        )
+    return _pool
+
+
+def get_connection(system_context: bool = False):
+    &quot;&quot;&quot;Get a database connection from the pool.&quot;&quot;&quot;
+    conn = get_pool().getconn()
+    register_vector(conn)
+    
+    if system_context:
+        set_tenant_context(conn, SYSTEM_TENANT_ID)
+    
+    return conn
+
+
+def set_tenant_context(conn, tenant_id: str):
+    &quot;&quot;&quot;Set the tenant context for RLS.&quot;&quot;&quot;
+    with conn.cursor() as cur:
+        cur.execute(
+            &quot;SELECT set_config(&#39;app.current_tenant_id&#39;, %s, false)&quot;,
+            (tenant_id,)
+        )
+
+
+@contextmanager
+def safe_connection(tenant_id: str):
+    &quot;&quot;&quot;Context manager for RLS-safe connections.&quot;&quot;&quot;
+    conn = get_connection()
+    try:
+        set_tenant_context(conn, tenant_id)
+        yield conn
+    finally:
+        get_pool().putconn(conn)</code></pre>
+<hr />
+<h3 id="utilsembeddings.py">utils/embeddings.py</h3>
+<p><strong>Purpose</strong>: Embedding generation via LiteLLM/OpenAI.</p>
+<pre class="python"><code>&quot;&quot;&quot;
+Embedding utilities for Flyte tasks
+
+RADIANT v5.0.2
+&quot;&quot;&quot;
+
+import os
+from typing import List, Optional
+
+import numpy as np
+import litellm
+
+EMBEDDING_MODEL = &quot;text-embedding-3-small&quot;
+EMBEDDING_DIMENSIONS = 1536
+MAX_TOKENS = 8191
+
+
+def generate_embedding(text: str) -&gt; List[float]:
+    &quot;&quot;&quot;Generate embedding for text using OpenAI via LiteLLM.&quot;&quot;&quot;
+    # Truncate if too long
+    if len(text) &gt; MAX_TOKENS * 4:  # Rough char estimate
+        text = text[:MAX_TOKENS * 4]
+    
+    response = litellm.embedding(
+        model=EMBEDDING_MODEL,
+        input=text
+    )
+    
+    return response.data[0][&quot;embedding&quot;]
+
+
+def generate_embeddings_batch(texts: List[str]) -&gt; List[List[float]]:
+    &quot;&quot;&quot;Generate embeddings for multiple texts.&quot;&quot;&quot;
+    truncated = [t[:MAX_TOKENS * 4] for t in texts]
+    
+    response = litellm.embedding(
+        model=EMBEDDING_MODEL,
+        input=truncated
+    )
+    
+    return [item[&quot;embedding&quot;] for item in response.data]
+
+
+def cosine_similarity(a: List[float], b: List[float]) -&gt; float:
+    &quot;&quot;&quot;Calculate cosine similarity between two embeddings.&quot;&quot;&quot;
+    a_np = np.array(a)
+    b_np = np.array(b)
+    return float(np.dot(a_np, b_np) / (np.linalg.norm(a_np) * np.linalg.norm(b_np)))</code></pre>
+<hr />
+<h3 id="utilscato_client.py">utils/cato_client.py</h3>
+<p><strong>Purpose</strong>: Client for Cato Safety Service validation.</p>
+<pre class="python"><code>&quot;&quot;&quot;
+Cato Safety Client for Flyte tasks
+
+RADIANT v5.0.2 - Genesis Cato Safety Architecture
+&quot;&quot;&quot;
+
+import os
+from dataclasses import dataclass
+from typing import Optional
+
+import requests
+
+CATO_SERVICE_URL = os.environ.get(&quot;CATO_SERVICE_URL&quot;, &quot;http://localhost:8081&quot;)
+
+
+@dataclass
+class CatoRisk:
+    safe: bool
+    risk_level: str  # &#39;none&#39;, &#39;low&#39;, &#39;medium&#39;, &#39;high&#39;, &#39;critical&#39;
+    reasons: list
+    blocked: bool = False
+
+
+class CatoClient:
+    &quot;&quot;&quot;HTTP client for Cato Safety Service.&quot;&quot;&quot;
+    
+    def __init__(self, base_url: str = CATO_SERVICE_URL):
+        self.base_url = base_url
+    
+    def check_epistemic_safety(self, content: str, domain: str) -&gt; CatoRisk:
+        &quot;&quot;&quot;Check content for epistemic safety violations.&quot;&quot;&quot;
+        try:
+            response = requests.post(
+                f&quot;{self.base_url}/v1/check/epistemic&quot;,
+                json={&quot;content&quot;: content, &quot;domain&quot;: domain},
+                timeout=10
+            )
+            response.raise_for_status()
+            data = response.json()
+            
+            return CatoRisk(
+                safe=data.get(&quot;safe&quot;, True),
+                risk_level=data.get(&quot;risk_level&quot;, &quot;none&quot;),
+                reasons=data.get(&quot;reasons&quot;, []),
+                blocked=data.get(&quot;blocked&quot;, False)
+            )
+        except Exception:
+            # Fail-closed for read operations
+            return CatoRisk(
+                safe=True,
+                risk_level=&quot;unknown&quot;,
+                reasons=[&quot;Cato service unavailable&quot;],
+                blocked=False
+            )
+    
+    def check_storage_safety(self, content: str, content_type: str) -&gt; CatoRisk:
+        &quot;&quot;&quot;Check if content is safe to store (fail-closed).&quot;&quot;&quot;
+        try:
+            response = requests.post(
+                f&quot;{self.base_url}/v1/check/storage&quot;,
+                json={&quot;content&quot;: content, &quot;content_type&quot;: content_type},
+                timeout=10
+            )
+            response.raise_for_status()
+            data = response.json()
+            
+            return CatoRisk(
+                safe=data.get(&quot;safe&quot;, False),  # Fail-closed
+                risk_level=data.get(&quot;risk_level&quot;, &quot;unknown&quot;),
+                reasons=data.get(&quot;reasons&quot;, []),
+                blocked=data.get(&quot;blocked&quot;, True)
+            )
+        except Exception:
+            # Fail-closed for write operations
+            return CatoRisk(
+                safe=False,
+                risk_level=&quot;critical&quot;,
+                reasons=[&quot;Cato service unavailable - blocking write&quot;],
+                blocked=True
+            )</code></pre>
+<hr />
+<h2 id="workflow-registration">Workflow Registration</h2>
+<pre class="bash"><code># Register workflows with Flyte
+pyflyte register workflows/ --project radiant --domain production</code></pre>
+<hr />
+<p><em>This concludes the Flyte Workflows export. See other export files for additional components.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

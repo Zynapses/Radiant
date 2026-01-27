@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRIMOIRE GOVERNOR SOURCE PART1 - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>GRIMOIRE GOVERNOR SOURCE PART1</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/GRIMOIRE-GOVERNOR-SOURCE-PART1.md</div>
+  </div>
+  
+  <h1 id="radiant-v5.0.2---source-export-part-1-database-typescript">RADIANT v5.0.2 - Source Export Part 1: Database &amp; TypeScript</h1>
+<hr />
+<h2 id="database-schema-migration">1. Database Schema Migration</h2>
+<p><strong>File</strong>: <code>packages/infrastructure/migrations/V2026_01_09_001__v5_grimoire_governor.sql</code></p>
+<p><strong>Purpose</strong>: Defines all database tables, Row-Level Security policies, indexes, views, and triggers for The Grimoire and Economic Governor systems.</p>
+<p><strong>Key Tables</strong>: - <code>knowledge_heuristics</code> - Stores procedural memory heuristics with vector embeddings - <code>governor_savings_log</code> - Tracks cost optimization decisions and savings - <code>decision_domain_config</code> - Per-domain Governor mode configuration</p>
+<p><strong>Security</strong>: Uses PostgreSQL Row-Level Security (RLS) with <code>app.current_tenant_id</code> for multi-tenant isolation.</p>
+<pre class="sql"><code>-- RADIANT v5.0.2 - System Evolution
+-- The Grimoire &amp; Economic Governor Database Schema
+
+-- Enable pgvector extension for semantic similarity search
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- ============================================================================
+-- THE GRIMOIRE: Self-Optimizing Procedural Memory
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS knowledge_heuristics (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    domain VARCHAR(50) NOT NULL DEFAULT &#39;general&#39;,
+    heuristic_text TEXT NOT NULL,
+    context_embedding vector(1536),
+    confidence_score FLOAT NOT NULL DEFAULT 0.5 CHECK (confidence_score &gt;= 0 AND confidence_score &lt;= 1),
+    source_execution_id VARCHAR(255),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    expires_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL &#39;90 days&#39;)
+);
+
+-- RLS Policy: Tenants can only see their own heuristics
+ALTER TABLE knowledge_heuristics ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY knowledge_heuristics_tenant_isolation ON knowledge_heuristics
+    FOR ALL
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::uuid 
+           OR current_setting(&#39;app.current_tenant_id&#39;) = &#39;00000000-0000-0000-0000-000000000000&#39;)
+    WITH CHECK (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::uuid);
+
+-- Indexes for query performance
+CREATE INDEX idx_heuristics_tenant_domain ON knowledge_heuristics(tenant_id, domain);
+CREATE INDEX idx_heuristics_confidence ON knowledge_heuristics(confidence_score DESC);
+CREATE INDEX idx_heuristics_expires ON knowledge_heuristics(expires_at);
+CREATE INDEX idx_heuristics_embedding ON knowledge_heuristics USING ivfflat (context_embedding vector_cosine_ops) WITH (lists = 100);
+
+-- Trigger for updated_at
+CREATE OR REPLACE FUNCTION update_heuristics_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER heuristics_update_timestamp
+    BEFORE UPDATE ON knowledge_heuristics
+    FOR EACH ROW EXECUTE FUNCTION update_heuristics_timestamp();
+
+-- Audit trail for heuristic changes
+CREATE TABLE IF NOT EXISTS heuristics_audit (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    heuristic_id UUID NOT NULL,
+    tenant_id UUID NOT NULL,
+    action VARCHAR(20) NOT NULL,
+    old_confidence FLOAT,
+    new_confidence FLOAT,
+    changed_by VARCHAR(255),
+    changed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION audit_heuristic_changes()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = &#39;UPDATE&#39; AND OLD.confidence_score != NEW.confidence_score THEN
+        INSERT INTO heuristics_audit (heuristic_id, tenant_id, action, old_confidence, new_confidence)
+        VALUES (NEW.id, NEW.tenant_id, &#39;CONFIDENCE_CHANGE&#39;, OLD.confidence_score, NEW.confidence_score);
+    ELSIF TG_OP = &#39;DELETE&#39; THEN
+        INSERT INTO heuristics_audit (heuristic_id, tenant_id, action, old_confidence)
+        VALUES (OLD.id, OLD.tenant_id, &#39;DELETE&#39;, OLD.confidence_score);
+    END IF;
+    RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER heuristics_audit_trigger
+    AFTER UPDATE OR DELETE ON knowledge_heuristics
+    FOR EACH ROW EXECUTE FUNCTION audit_heuristic_changes();
+
+-- ============================================================================
+-- ECONOMIC GOVERNOR: Cost Optimization Through Intelligent Model Routing
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS governor_savings_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    execution_id VARCHAR(255) NOT NULL,
+    original_model VARCHAR(100) NOT NULL,
+    selected_model VARCHAR(100) NOT NULL,
+    complexity_score INTEGER NOT NULL CHECK (complexity_score &gt;= 1 AND complexity_score &lt;= 10),
+    estimated_original_cost DECIMAL(10,6) NOT NULL DEFAULT 0,
+    estimated_actual_cost DECIMAL(10,6) NOT NULL DEFAULT 0,
+    savings_amount DECIMAL(10,6) GENERATED ALWAYS AS (estimated_original_cost - estimated_actual_cost) STORED,
+    governor_mode VARCHAR(20) NOT NULL,
+    reason TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE governor_savings_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY governor_savings_tenant_isolation ON governor_savings_log
+    FOR ALL
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::uuid
+           OR current_setting(&#39;app.current_tenant_id&#39;) = &#39;00000000-0000-0000-0000-000000000000&#39;)
+    WITH CHECK (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::uuid);
+
+CREATE INDEX idx_governor_savings_tenant ON governor_savings_log(tenant_id);
+CREATE INDEX idx_governor_savings_created ON governor_savings_log(created_at DESC);
+CREATE INDEX idx_governor_savings_mode ON governor_savings_log(governor_mode);
+
+-- Add governor_mode to decision_domain_config
+ALTER TABLE decision_domain_config 
+ADD COLUMN IF NOT EXISTS governor_mode VARCHAR(20) NOT NULL DEFAULT &#39;balanced&#39;;
+
+-- View for Grimoire statistics
+CREATE OR REPLACE VIEW grimoire_stats AS
+SELECT 
+    tenant_id,
+    domain,
+    COUNT(*) as total_heuristics,
+    AVG(confidence_score) as avg_confidence,
+    COUNT(*) FILTER (WHERE confidence_score &gt;= 0.8) as high_confidence_count,
+    COUNT(*) FILTER (WHERE expires_at &lt; NOW() + INTERVAL &#39;7 days&#39;) as expiring_soon,
+    MAX(created_at) as last_added
+FROM knowledge_heuristics
+WHERE expires_at &gt; NOW()
+GROUP BY tenant_id, domain;
+
+-- View for Governor statistics
+CREATE OR REPLACE VIEW governor_stats AS
+SELECT 
+    tenant_id,
+    governor_mode,
+    COUNT(*) as decision_count,
+    SUM(savings_amount) as total_savings,
+    AVG(complexity_score) as avg_complexity,
+    COUNT(*) FILTER (WHERE original_model != selected_model) as model_swaps
+FROM governor_savings_log
+WHERE created_at &gt; NOW() - INTERVAL &#39;30 days&#39;
+GROUP BY tenant_id, governor_mode;</code></pre>
+<hr />
+<h2 id="economic-governor-service">2. Economic Governor Service</h2>
+<p><strong>File</strong>: <code>packages/infrastructure/lambda/shared/services/governor/economic-governor.ts</code></p>
+<p><strong>Purpose</strong>: Core logic for the Economic Governor. Implements “System 0” complexity classification and cost-optimized model routing.</p>
+<p><strong>Key Features</strong>: - Complexity scoring using cheap classifier model - Model tier mapping for cost optimization - Savings calculation and logging - Per-domain mode configuration</p>
+<pre class="typescript"><code>/**
+ * Economic Governor - Cost Optimization Through Intelligent Model Routing
+ * RADIANT v5.0.2 - System Evolution
+ * 
+ * The Economic Governor implements a &quot;System 0&quot; approach to cost optimization:
+ * 1. A cheap classifier model scores task complexity (1-10)
+ * 2. Simple tasks (1-4) are routed to efficient models
+ * 3. Complex tasks (9-10) are routed to premium models
+ * 4. Medium tasks (5-8) use the original requested model
+ */
+
+import { PoolClient } from &#39;pg&#39;;
+
+export type GovernorMode = &#39;performance&#39; | &#39;balanced&#39; | &#39;cost_saver&#39; | &#39;off&#39;;
+
+export interface SwarmTask {
+  type: string;
+  prompt: string;
+  context: Record&lt;string, unknown&gt;;
+  system_prompt?: string;
+}
+
+export interface AgentConfig {
+  agent_id: string;
+  role: string;
+  model: string;
+  temperature?: number;
+  max_tokens?: number;
+  tools?: string[];
+}
+
+export interface GovernorDecision {
+  shouldOptimize: boolean;
+  selectedModel: string;
+  originalModel: string;
+  complexityScore: number;
+  estimatedSavings: number;
+  reason: string;
+}
+
+export interface GovernorConfig {
+  mode: GovernorMode;
+  complexityThreshold: {
+    simple: number;    // Below this = simple task
+    complex: number;   // Above this = complex task
+  };
+  modelMapping: {
+    simple: string;    // Model for simple tasks
+    premium: string;   // Model for complex tasks
+  };
+}
+
+const DEFAULT_CONFIG: GovernorConfig = {
+  mode: &#39;balanced&#39;,
+  complexityThreshold: {
+    simple: 4,
+    complex: 8
+  },
+  modelMapping: {
+    simple: &#39;gpt-4o-mini&#39;,
+    premium: &#39;gpt-4o&#39;
+  }
+};
+
+// Cost per 1K tokens (approximate)
+const MODEL_COSTS: Record&lt;string, { input: number; output: number }&gt; = {
+  &#39;gpt-4o&#39;: { input: 0.005, output: 0.015 },
+  &#39;gpt-4o-mini&#39;: { input: 0.00015, output: 0.0006 },
+  &#39;gpt-4-turbo&#39;: { input: 0.01, output: 0.03 },
+  &#39;claude-3-opus&#39;: { input: 0.015, output: 0.075 },
+  &#39;claude-3-sonnet&#39;: { input: 0.003, output: 0.015 },
+  &#39;claude-3-haiku&#39;: { input: 0.00025, output: 0.00125 },
+  &#39;claude-3.5-sonnet&#39;: { input: 0.003, output: 0.015 },
+};
+
+export class EconomicGovernor {
+  private config: GovernorConfig;
+  private litellmUrl: string;
+  private litellmApiKey: string;
+
+  constructor(
+    config: Partial&lt;GovernorConfig&gt; = {},
+    litellmUrl?: string,
+    litellmApiKey?: string
+  ) {
+    this.config = { ...DEFAULT_CONFIG, ...config };
+    this.litellmUrl = litellmUrl || process.env.LITELLM_PROXY_URL || &#39;http://localhost:4000&#39;;
+    this.litellmApiKey = litellmApiKey || process.env.LITELLM_API_KEY || &#39;&#39;;
+  }
+
+  async evaluateTask(
+    task: SwarmTask,
+    agent: AgentConfig,
+    domain: string = &#39;general&#39;
+  ): Promise&lt;GovernorDecision&gt; {
+    if (this.config.mode === &#39;off&#39;) {
+      return {
+        shouldOptimize: false,
+        selectedModel: agent.model,
+        originalModel: agent.model,
+        complexityScore: 5,
+        estimatedSavings: 0,
+        reason: &#39;Governor is disabled&#39;
+      };
+    }
+
+    if (this.config.mode === &#39;performance&#39;) {
+      return {
+        shouldOptimize: false,
+        selectedModel: agent.model,
+        originalModel: agent.model,
+        complexityScore: 5,
+        estimatedSavings: 0,
+        reason: &#39;Performance mode - no optimization&#39;
+      };
+    }
+
+    const complexityScore = await this.classifyComplexity(task);
+    const decision = this.makeRoutingDecision(complexityScore, agent.model);
+
+    return decision;
+  }
+
+  private async classifyComplexity(task: SwarmTask): Promise&lt;number&gt; {
+    const classifierPrompt = `Rate the complexity of this task on a scale of 1-10.
+1-4 = Simple (basic Q&amp;A, formatting, summarization)
+5-8 = Medium (analysis, multi-step reasoning, code generation)
+9-10 = Complex (research synthesis, creative writing, expert domain knowledge)
+
+Task: ${task.prompt.substring(0, 500)}
+
+Respond with ONLY a single number from 1-10.`;
+
+    try {
+      const response = await fetch(`${this.litellmUrl}/chat/completions`, {
+        method: &#39;POST&#39;,
+        headers: {
+          &#39;Content-Type&#39;: &#39;application/json&#39;,
+          &#39;Authorization&#39;: `Bearer ${this.litellmApiKey}`
+        },
+        body: JSON.stringify({
+          model: &#39;gpt-4o-mini&#39;,
+          messages: [{ role: &#39;user&#39;, content: classifierPrompt }],
+          max_tokens: 5,
+          temperature: 0
+        })
+      });
+
+      if (!response.ok) {
+        console.warn(&#39;Complexity classification failed, defaulting to 5&#39;);
+        return 5;
+      }
+
+      const data = await response.json();
+      const scoreText = data.choices?.[0]?.message?.content?.trim() || &#39;5&#39;;
+      const score = parseInt(scoreText, 10);
+      
+      return isNaN(score) ? 5 : Math.max(1, Math.min(10, score));
+    } catch (error) {
+      console.error(&#39;Complexity classification error:&#39;, error);
+      return 5;
+    }
+  }
+
+  private makeRoutingDecision(complexityScore: number, originalModel: string): GovernorDecision {
+    const { simple, complex } = this.config.complexityThreshold;
+    const { simple: simpleModel, premium: premiumModel } = this.config.modelMapping;
+
+    let selectedModel = originalModel;
+    let shouldOptimize = false;
+    let reason = &#39;Medium complexity - using original model&#39;;
+
+    if (complexityScore &lt;= simple) {
+      if (this.config.mode === &#39;balanced&#39; || this.config.mode === &#39;cost_saver&#39;) {
+        selectedModel = simpleModel;
+        shouldOptimize = true;
+        reason = `Simple task (${complexityScore}/10) - routing to efficient model`;
+      }
+    } else if (complexityScore &gt;= complex) {
+      if (this.config.mode === &#39;cost_saver&#39;) {
+        selectedModel = originalModel;
+        reason = `Complex task (${complexityScore}/10) - preserving quality`;
+      } else {
+        if (!this.isPremiumModel(originalModel)) {
+          selectedModel = premiumModel;
+          shouldOptimize = true;
+          reason = `Complex task (${complexityScore}/10) - upgrading to premium model`;
+        }
+      }
+    }
+
+    const estimatedSavings = this.calculateSavings(originalModel, selectedModel);
+
+    return {
+      shouldOptimize,
+      selectedModel,
+      originalModel,
+      complexityScore,
+      estimatedSavings,
+      reason
+    };
+  }
+
+  private isPremiumModel(model: string): boolean {
+    const premiumModels = [&#39;gpt-4o&#39;, &#39;gpt-4-turbo&#39;, &#39;claude-3-opus&#39;, &#39;claude-3.5-sonnet&#39;];
+    return premiumModels.some(pm =&gt; model.includes(pm));
+  }
+
+  private calculateSavings(originalModel: string, selectedModel: string): number {
+    const originalCost = MODEL_COSTS[originalModel] || { input: 0.005, output: 0.015 };
+    const selectedCost = MODEL_COSTS[selectedModel] || originalCost;
+    const estimatedTokens = 2000;
+    const originalTotal = (originalCost.input + originalCost.output) * estimatedTokens / 1000;
+    const selectedTotal = (selectedCost.input + selectedCost.output) * estimatedTokens / 1000;
+    return Math.max(0, originalTotal - selectedTotal);
+  }
+
+  async logDecision(
+    client: PoolClient,
+    tenantId: string,
+    executionId: string,
+    decision: GovernorDecision
+  ): Promise&lt;void&gt; {
+    const originalCost = this.calculateModelCost(decision.originalModel);
+    const actualCost = this.calculateModelCost(decision.selectedModel);
+
+    await client.query(`
+      INSERT INTO governor_savings_log (
+        tenant_id, execution_id, original_model, selected_model,
+        complexity_score, estimated_original_cost, estimated_actual_cost,
+        governor_mode, reason
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `, [
+      tenantId,
+      executionId,
+      decision.originalModel,
+      decision.selectedModel,
+      decision.complexityScore,
+      originalCost,
+      actualCost,
+      this.config.mode,
+      decision.reason
+    ]);
+  }
+
+  private calculateModelCost(model: string): number {
+    const cost = MODEL_COSTS[model] || { input: 0.005, output: 0.015 };
+    return (cost.input + cost.output) * 2;
+  }
+}
+
+export function createGovernor(mode: GovernorMode = &#39;balanced&#39;): EconomicGovernor {
+  return new EconomicGovernor({ mode });
+}</code></pre>
+<hr />
+<h2 id="governor-module-exports">3. Governor Module Exports</h2>
+<p><strong>File</strong>: <code>packages/infrastructure/lambda/shared/services/governor/index.ts</code></p>
+<p><strong>Purpose</strong>: Central export point for the Economic Governor module.</p>
+<pre class="typescript"><code>/**
+ * Economic Governor Module Exports
+ * RADIANT v5.0.2 - System Evolution
+ */
+
+export {
+  EconomicGovernor,
+  createGovernor,
+  type GovernorMode,
+  type GovernorDecision,
+  type GovernorConfig,
+  type SwarmTask,
+  type AgentConfig
+} from &#39;./economic-governor&#39;;</code></pre>
+<hr />
+<p><em>Continued in GRIMOIRE-GOVERNOR-SOURCE-PART2.md</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

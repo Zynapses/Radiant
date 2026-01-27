@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 00 SHARED TYPES AND CONSTANTS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 00 SHARED TYPES AND CONSTANTS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-00-SHARED-TYPES-AND-CONSTANTS.md</div>
+  </div>
+  
+  <h1 id="section-0-unified-shared-types-constants-v2.0.0---single-source-of-truth">SECTION 0: UNIFIED SHARED TYPES &amp; CONSTANTS (v2.0.0 - SINGLE SOURCE OF TRUTH)</h1>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<blockquote>
+<p><strong>CRITICAL: This section defines ALL shared types, interfaces, and constants.</strong> <strong>All other sections MUST import from <code>@radiant/shared</code> - NEVER redefine these.</strong></p>
+</blockquote>
+<hr />
+<h2 id="project-root-configuration">0.1 PROJECT ROOT CONFIGURATION</h2>
+<h3 id="directory-structure">Directory Structure</h3>
+<pre><code>radiant/
+â”œâ”€â”€ package.json
+â”œâ”€â”€ pnpm-workspace.yaml
+â”œâ”€â”€ tsconfig.base.json
+â”œâ”€â”€ .nvmrc
+â”œâ”€â”€ .gitignore
+â”‚
+â”œâ”€â”€ packages/
+â”‚   â”œâ”€â”€ shared/                    # SECTION 0 - Shared types (implement first)
+â”‚   â””â”€â”€ infrastructure/            # SECTIONS 2-3 - CDK stacks
+â”‚
+â”œâ”€â”€ functions/                     # SECTIONS 4-5 - Lambda functions
+â”‚
+â”œâ”€â”€ migrations/                    # SECTION 7 - Database migrations
+â”‚
+â”œâ”€â”€ apps/
+â”‚   â”œâ”€â”€ swift-deployer/           # SECTION 1 - macOS deployment app
+â”‚   â””â”€â”€ admin-dashboard/          # SECTION 8 - Next.js admin UI
+â”‚
+â””â”€â”€ docs/</code></pre>
+<h3 id="package.json-root">package.json (root)</h3>
+<pre class="json"><code>{
+  &quot;name&quot;: &quot;radiant&quot;,
+  &quot;version&quot;: &quot;2.2.0&quot;,
+  &quot;private&quot;: true,
+  &quot;workspaces&quot;: [
+    &quot;packages/*&quot;,
+    &quot;apps/*&quot;,
+    &quot;functions/*&quot;
+  ],
+  &quot;scripts&quot;: {
+    &quot;build&quot;: &quot;pnpm -r build&quot;,
+    &quot;build:shared&quot;: &quot;cd packages/shared &amp;&amp; pnpm build&quot;,
+    &quot;test&quot;: &quot;pnpm -r test&quot;,
+    &quot;lint&quot;: &quot;pnpm -r lint&quot;,
+    &quot;deploy:dev&quot;: &quot;cd packages/infrastructure &amp;&amp; cdk deploy --all --context environment=dev&quot;,
+    &quot;deploy:staging&quot;: &quot;cd packages/infrastructure &amp;&amp; cdk deploy --all --context environment=staging&quot;,
+    &quot;deploy:prod&quot;: &quot;cd packages/infrastructure &amp;&amp; cdk deploy --all --context environment=prod --require-approval broadening&quot;
+  },
+  &quot;devDependencies&quot;: {
+    &quot;@types/node&quot;: &quot;^20.10.0&quot;,
+    &quot;typescript&quot;: &quot;^5.3.0&quot;
+  },
+  &quot;engines&quot;: {
+    &quot;node&quot;: &quot;&gt;=20.0.0&quot;,
+    &quot;pnpm&quot;: &quot;&gt;=8.0.0&quot;
+  }
+}</code></pre>
+<h3 id="pnpm-workspace.yaml">pnpm-workspace.yaml</h3>
+<pre class="yaml"><code>packages:
+  - &#39;packages/*&#39;
+  - &#39;apps/*&#39;
+  - &#39;functions/*&#39;</code></pre>
+<h3 id="tsconfig.base.json">tsconfig.base.json</h3>
+<pre class="json"><code>{
+  &quot;compilerOptions&quot;: {
+    &quot;target&quot;: &quot;ES2022&quot;,
+    &quot;module&quot;: &quot;NodeNext&quot;,
+    &quot;moduleResolution&quot;: &quot;NodeNext&quot;,
+    &quot;lib&quot;: [&quot;ES2022&quot;],
+    &quot;strict&quot;: true,
+    &quot;esModuleInterop&quot;: true,
+    &quot;skipLibCheck&quot;: true,
+    &quot;forceConsistentCasingInFileNames&quot;: true,
+    &quot;declaration&quot;: true,
+    &quot;declarationMap&quot;: true,
+    &quot;sourceMap&quot;: true,
+    &quot;resolveJsonModule&quot;: true,
+    &quot;paths&quot;: {
+      &quot;@radiant/shared&quot;: [&quot;./packages/shared/src&quot;],
+      &quot;@radiant/shared/*&quot;: [&quot;./packages/shared/src/*&quot;]
+    }
+  }
+}</code></pre>
+<h3 id="nvmrc">.nvmrc</h3>
+<pre><code>20</code></pre>
+<h3 id="gitignore">.gitignore</h3>
+<pre><code>node_modules/
+dist/
+.next/
+*.log
+.env*
+!.env.example
+.DS_Store
+coverage/
+cdk.out/</code></pre>
+<hr />
+<h2 id="shared-package-structure">0.2 SHARED PACKAGE STRUCTURE</h2>
+<pre><code>packages/shared/
+â”œâ”€â”€ package.json
+â”œâ”€â”€ tsconfig.json
+â””â”€â”€ src/
+    â”œâ”€â”€ index.ts
+    â”œâ”€â”€ types/
+    â”‚   â”œâ”€â”€ index.ts
+    â”‚   â”œâ”€â”€ app.types.ts
+    â”‚   â”œâ”€â”€ environment.types.ts
+    â”‚   â”œâ”€â”€ ai.types.ts
+    â”‚   â”œâ”€â”€ admin.types.ts
+    â”‚   â”œâ”€â”€ billing.types.ts
+    â”‚   â””â”€â”€ compliance.types.ts
+    â”œâ”€â”€ constants/
+    â”‚   â”œâ”€â”€ index.ts
+    â”‚   â”œâ”€â”€ apps.ts
+    â”‚   â”œâ”€â”€ environments.ts
+    â”‚   â”œâ”€â”€ tiers.ts
+    â”‚   â”œâ”€â”€ regions.ts
+    â”‚   â””â”€â”€ providers.ts
+    â””â”€â”€ utils/
+        â”œâ”€â”€ index.ts
+        â”œâ”€â”€ validation.ts
+        â””â”€â”€ formatting.ts</code></pre>
+<h3 id="packagessharedpackage.json">packages/shared/package.json</h3>
+<pre class="json"><code>{
+  &quot;name&quot;: &quot;@radiant/shared&quot;,
+  &quot;version&quot;: &quot;2.2.0&quot;,
+  &quot;main&quot;: &quot;./dist/index.js&quot;,
+  &quot;types&quot;: &quot;./dist/index.d.ts&quot;,
+  &quot;exports&quot;: {
+    &quot;.&quot;: &quot;./dist/index.js&quot;,
+    &quot;./types&quot;: &quot;./dist/types/index.js&quot;,
+    &quot;./constants&quot;: &quot;./dist/constants/index.js&quot;,
+    &quot;./utils&quot;: &quot;./dist/utils/index.js&quot;
+  },
+  &quot;scripts&quot;: {
+    &quot;build&quot;: &quot;tsc&quot;,
+    &quot;clean&quot;: &quot;rm -rf dist&quot;,
+    &quot;prepublishOnly&quot;: &quot;pnpm build&quot;
+  },
+  &quot;devDependencies&quot;: {
+    &quot;typescript&quot;: &quot;^5.3.0&quot;
+  }
+}</code></pre>
+<h3 id="packagessharedtsconfig.json">packages/shared/tsconfig.json</h3>
+<pre class="json"><code>{
+  &quot;extends&quot;: &quot;../../tsconfig.base.json&quot;,
+  &quot;compilerOptions&quot;: {
+    &quot;outDir&quot;: &quot;./dist&quot;,
+    &quot;rootDir&quot;: &quot;./src&quot;
+  },
+  &quot;include&quot;: [&quot;src/**/*&quot;],
+  &quot;exclude&quot;: [&quot;node_modules&quot;, &quot;dist&quot;]
+}</code></pre>
+<hr />
+<h2 id="version-constants">0.3 VERSION &amp; CONSTANTS</h2>
+<h3 id="packagessharedsrcconstantsversion.ts">packages/shared/src/constants/version.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT Version Constants
+ * SINGLE SOURCE OF TRUTH for version numbers
+ * 
+ * @description Update this file when releasing new versions.
+ * All other code should import from here.
+ */
+
+// ============================================================================
+// VERSION INFORMATION
+// ============================================================================
+
+/** Current RADIANT platform version */
+export const RADIANT_VERSION = &#39;4.17.0&#39;;
+
+/** Version components for programmatic comparison */
+export const VERSION = {
+  major: 4,
+  minor: 17,
+  patch: 0,
+  full: &#39;4.17.0&#39;,
+  build: process.env.BUILD_NUMBER || &#39;local&#39;,
+  date: &#39;2024-12&#39;,
+} as const;
+
+/** Minimum supported versions for various components */
+export const MIN_VERSIONS = {
+  node: &#39;20.0.0&#39;,
+  npm: &#39;10.0.0&#39;,
+  cdk: &#39;2.120.0&#39;,
+  postgres: &#39;15.0&#39;,
+  swift: &#39;5.9&#39;,
+  macos: &#39;13.0&#39;,
+  xcode: &#39;15.0&#39;,
+} as const;
+
+// ============================================================================
+// DOMAIN CONFIGURATION
+// ============================================================================
+
+/**
+ * Domain placeholder - replace with your actual domain
+ * Used throughout the codebase for consistency
+ */
+export const DOMAIN_PLACEHOLDER = &#39;YOUR_DOMAIN.com&#39;;
+
+/**
+ * Check if domain has been configured
+ */
+export function isDomainConfigured(domain: string): boolean {
+  return !domain.includes(DOMAIN_PLACEHOLDER);
+}</code></pre>
+<h3 id="packagessharedsrcconstantsindex.ts">packages/shared/src/constants/index.ts</h3>
+<pre class="typescript"><code>// Re-export all constants
+export * from &#39;./version&#39;;</code></pre>
+<hr />
+<h2 id="type-definitions">0.4 TYPE DEFINITIONS</h2>
+<h3 id="packagessharedsrctypesindex.ts">packages/shared/src/types/index.ts</h3>
+<pre class="typescript"><code>// Re-export all types and constants
+export * from &#39;./app.types&#39;;
+export * from &#39;./environment.types&#39;;
+export * from &#39;./ai.types&#39;;
+export * from &#39;./admin.types&#39;;
+export * from &#39;./billing.types&#39;;
+export * from &#39;./compliance.types&#39;;
+
+// Re-export constants
+export * from &#39;../constants&#39;;</code></pre>
+<h3 id="packagessharedsrctypesapp.types.ts">packages/shared/src/types/app.types.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - Application Types
+ * SINGLE SOURCE OF TRUTH
+ */
+
+import type { Environment, TierLevel } from &#39;./environment.types&#39;;
+
+export interface ManagedApp {
+  id: string;                    // Lowercase, no spaces: &quot;thinktank&quot;
+  name: string;                  // Display name: &quot;Think Tank&quot;
+  domain: string;                // Base domain: &quot;app.YOUR_DOMAIN.com&quot;
+  description?: string;
+  icon?: string;
+  version?: string;
+  status: AppStatus;
+  environments: EnvironmentStatus[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type AppStatus = &#39;active&#39; | &#39;inactive&#39; | &#39;maintenance&#39; | &#39;deprecated&#39;;
+
+export interface EnvironmentStatus {
+  environment: Environment;
+  status: DeploymentStatus;
+  lastDeployed?: Date;
+  version?: string;
+  tier: TierLevel;
+  region: string;
+  endpoints?: EnvironmentEndpoints;
+}
+
+export type DeploymentStatus = 
+  | &#39;not_deployed&#39; 
+  | &#39;deploying&#39; 
+  | &#39;deployed&#39; 
+  | &#39;failed&#39; 
+  | &#39;updating&#39; 
+  | &#39;destroying&#39;;
+
+export interface EnvironmentEndpoints {
+  api?: string;
+  graphql?: string;
+  admin?: string;
+  dashboard?: string;
+}
+
+export interface AppConfig {
+  appId: string;
+  appName: string;
+  domain: string;
+  environments: Record&lt;Environment, EnvironmentConfig&gt;;
+}
+
+export interface EnvironmentConfig {
+  tier: TierLevel;
+  region: string;
+  enabledFeatures: FeatureFlags;
+  customConfig?: Record&lt;string, unknown&gt;;
+}
+
+export interface FeatureFlags {
+  selfHostedModels: boolean;
+  multiRegion: boolean;
+  waf: boolean;
+  guardDuty: boolean;
+  hipaaCompliance: boolean;
+  advancedAnalytics: boolean;
+  customBranding: boolean;
+  sla: boolean;
+}
+
+export type DeploymentPhase =
+  | &#39;idle&#39;
+  | &#39;initializing&#39;
+  | &#39;validating&#39;
+  | &#39;bootstrap&#39;
+  | &#39;foundation&#39;
+  | &#39;networking&#39;
+  | &#39;security&#39;
+  | &#39;data&#39;
+  | &#39;storage&#39;
+  | &#39;auth&#39;
+  | &#39;ai&#39;
+  | &#39;api&#39;
+  | &#39;admin&#39;
+  | &#39;migrations&#39;
+  | &#39;verification&#39;
+  | &#39;complete&#39;
+  | &#39;failed&#39;;
+
+export interface DeploymentProgress {
+  phase: DeploymentPhase;
+  progress: number;              // 0-100
+  message: string;
+  startedAt: Date;
+  estimatedCompletion?: Date;
+  logs: LogEntry[];
+}
+
+export interface LogEntry {
+  timestamp: Date;
+  level: &#39;debug&#39; | &#39;info&#39; | &#39;warn&#39; | &#39;error&#39;;
+  message: string;
+  details?: Record&lt;string, unknown&gt;;
+}</code></pre>
+<h3 id="packagessharedsrctypesenvironment.types.ts">packages/shared/src/types/environment.types.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - Environment &amp; Tier Types
+ * SINGLE SOURCE OF TRUTH
+ */
+
+export type Environment = &#39;dev&#39; | &#39;staging&#39; | &#39;prod&#39;;
+
+export interface EnvironmentInfo {
+  name: Environment;
+  displayName: string;
+  color: string;
+  requiresApproval: boolean;
+  minTier: TierLevel;
+  defaultTier: TierLevel;
+}
+
+export type TierLevel = 1 | 2 | 3 | 4 | 5;
+
+export type TierName = &#39;SEED&#39; | &#39;STARTUP&#39; | &#39;GROWTH&#39; | &#39;SCALE&#39; | &#39;ENTERPRISE&#39;;
+
+export interface TierConfig {
+  level: TierLevel;
+  name: TierName;
+  description: string;
+  
+  // Compute
+  vpcCidr: string;
+  azCount: number;
+  natGateways: number;
+  
+  // Database
+  auroraMinCapacity: number;
+  auroraMaxCapacity: number;
+  enableGlobalDatabase: boolean;
+  
+  // Cache
+  elasticacheNodes: number;
+  elasticacheNodeType: string;
+  
+  // AI
+  enableSelfHostedModels: boolean;
+  maxSagemakerEndpoints: number;
+  litellmTaskCount: number;
+  litellmCpu: number;
+  litellmMemory: number;
+  
+  // Security
+  enableWaf: boolean;
+  enableGuardDuty: boolean;
+  enableSecurityHub: boolean;
+  
+  // Compliance
+  enableHipaa: boolean;
+  
+  // Costs
+  estimatedMonthlyCost: CostEstimate;
+}
+
+export interface CostEstimate {
+  min: number;
+  max: number;
+  typical: number;
+}
+
+export interface RegionConfig {
+  code: string;
+  name: string;
+  available: boolean;
+  isGlobal: boolean;
+}</code></pre>
+<h3 id="packagessharedsrctypesai.types.ts">packages/shared/src/types/ai.types.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - AI/Model Types
+ * SINGLE SOURCE OF TRUTH
+ */
+
+export interface AIProvider {
+  id: string;
+  name: string;
+  apiKeyEnvVar: string;
+  baseUrl: string;
+  hipaaCompliant: boolean;
+  capabilities: ProviderCapability[];
+  status: ProviderStatus;
+  models?: AIModel[];
+}
+
+export type ProviderCapability = 
+  | &#39;text_generation&#39;
+  | &#39;chat_completion&#39;
+  | &#39;embeddings&#39;
+  | &#39;image_generation&#39;
+  | &#39;image_analysis&#39;
+  | &#39;video_generation&#39;
+  | &#39;audio_transcription&#39;
+  | &#39;audio_generation&#39;
+  | &#39;code_generation&#39;
+  | &#39;reasoning&#39;
+  | &#39;search&#39;
+  | &#39;function_calling&#39;
+  | &#39;3d_generation&#39;;
+
+export type ProviderStatus = &#39;active&#39; | &#39;degraded&#39; | &#39;maintenance&#39; | &#39;disabled&#39;;
+
+export interface AIModel {
+  id: string;
+  providerId: string;
+  name: string;
+  displayName: string;
+  description?: string;
+  specialty: ModelSpecialty;
+  category: ModelCategory;
+  capabilities: ProviderCapability[];
+  contextWindow: number;
+  maxOutputTokens: number;
+  pricing: ModelPricing;
+  status: ModelStatus;
+  isHosted: boolean;
+  thermalState?: ThermalState;
+  sagemakerEndpoint?: string;
+  metadata?: Record&lt;string, unknown&gt;;
+}
+
+export type ModelSpecialty = 
+  | &#39;text_generation&#39;
+  | &#39;reasoning&#39;
+  | &#39;coding&#39;
+  | &#39;image_generation&#39;
+  | &#39;image_analysis&#39;
+  | &#39;video_generation&#39;
+  | &#39;audio_transcription&#39;
+  | &#39;audio_generation&#39;
+  | &#39;embeddings&#39;
+  | &#39;search&#39;
+  | &#39;3d_generation&#39;
+  | &#39;scientific&#39;;
+
+export type ModelCategory = 
+  | &#39;llm&#39;
+  | &#39;vision&#39;
+  | &#39;audio&#39;
+  | &#39;multimodal&#39;
+  | &#39;embedding&#39;
+  | &#39;specialized&#39;;
+
+export type ModelStatus = &#39;active&#39; | &#39;disabled&#39; | &#39;deprecated&#39; | &#39;coming_soon&#39;;
+
+export interface ModelPricing {
+  inputPricePerMillion: number;
+  outputPricePerMillion: number;
+  imagePrice?: number;
+  audioMinutePrice?: number;
+  currency: &#39;USD&#39;;
+}
+
+// Thermal state for self-hosted models
+export type ThermalState = &#39;OFF&#39; | &#39;COLD&#39; | &#39;WARM&#39; | &#39;HOT&#39; | &#39;AUTOMATIC&#39;;
+
+export interface ThermalConfig {
+  modelId: string;
+  state: ThermalState;
+  targetState?: ThermalState;
+  lastStateChange?: Date;
+  coldStartTime: number;
+  warmupTime: number;
+  idleTimeout: number;
+  minInstances: number;
+  maxInstances: number;
+}
+
+// Service state for mid-level services
+export type ServiceState = &#39;RUNNING&#39; | &#39;DEGRADED&#39; | &#39;DISABLED&#39; | &#39;OFFLINE&#39;;
+
+export interface MidLevelService {
+  id: string;
+  name: string;
+  description: string;
+  state: ServiceState;
+  dependencies: string[];
+  healthEndpoint: string;
+  lastHealthCheck?: Date;
+  metrics?: ServiceMetrics;
+}
+
+export interface ServiceMetrics {
+  requestsPerMinute: number;
+  averageLatencyMs: number;
+  errorRate: number;
+  lastUpdated: Date;
+}</code></pre>
+<h3 id="packagessharedsrctypesadmin.types.ts">packages/shared/src/types/admin.types.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - Administrator Types
+ * SINGLE SOURCE OF TRUTH
+ */
+
+import type { Environment } from &#39;./environment.types&#39;;
+
+export interface Administrator {
+  id: string;
+  cognitoUserId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  role: AdminRole;
+  appId: string;
+  tenantId: string;
+  mfaEnabled: boolean;
+  mfaMethod?: &#39;totp&#39; | &#39;sms&#39;;
+  status: AdminStatus;
+  profile: AdminProfile;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy?: string;
+  lastLoginAt?: Date;
+}
+
+export type AdminRole = &#39;super_admin&#39; | &#39;admin&#39; | &#39;operator&#39; | &#39;auditor&#39;;
+
+export type AdminStatus = &#39;active&#39; | &#39;inactive&#39; | &#39;suspended&#39; | &#39;pending&#39;;
+
+export interface AdminRolePermissions {
+  canManageAdmins: boolean;
+  canManageModels: boolean;
+  canManageProviders: boolean;
+  canManageBilling: boolean;
+  canDeploy: boolean;
+  canApprove: boolean;
+  canViewAuditLogs: boolean;
+}
+
+export const ROLE_PERMISSIONS: Record&lt;AdminRole, AdminRolePermissions&gt; = {
+  super_admin: {
+    canManageAdmins: true,
+    canManageModels: true,
+    canManageProviders: true,
+    canManageBilling: true,
+    canDeploy: true,
+    canApprove: true,
+    canViewAuditLogs: true,
+  },
+  admin: {
+    canManageAdmins: true,
+    canManageModels: true,
+    canManageProviders: true,
+    canManageBilling: true,
+    canDeploy: true,
+    canApprove: true,
+    canViewAuditLogs: true,
+  },
+  operator: {
+    canManageAdmins: false,
+    canManageModels: true,
+    canManageProviders: true,
+    canManageBilling: false,
+    canDeploy: true,
+    canApprove: false,
+    canViewAuditLogs: false,
+  },
+  auditor: {
+    canManageAdmins: false,
+    canManageModels: false,
+    canManageProviders: false,
+    canManageBilling: false,
+    canDeploy: false,
+    canApprove: false,
+    canViewAuditLogs: true,
+  },
+};
+
+export interface AdminProfile {
+  timezone: string;
+  language: string;
+  dateFormat: string;
+  timeFormat: string;
+  currency: string;
+  notifications: NotificationPreferences;
+  ui: UIPreferences;
+}
+
+export interface NotificationPreferences {
+  emailAlerts: boolean;
+  slackAlerts: boolean;
+  smsAlerts: boolean;
+  alertTypes: string[];
+}
+
+export interface UIPreferences {
+  theme: &#39;light&#39; | &#39;dark&#39; | &#39;system&#39;;
+  sidebarCollapsed: boolean;
+  defaultEnvironment: Environment;
+  tableRowsPerPage: number;
+}
+
+export interface Invitation {
+  id: string;
+  email: string;
+  role: AdminRole;
+  invitedBy: string;
+  appId: string;
+  tenantId: string;
+  environment?: Environment;
+  tokenHash: string;
+  expiresAt: Date;
+  status: InvitationStatus;
+  message?: string;
+  createdAt: Date;
+  acceptedAt?: Date;
+}
+
+export type InvitationStatus = &#39;pending&#39; | &#39;accepted&#39; | &#39;expired&#39; | &#39;revoked&#39;;
+
+export interface ApprovalRequest {
+  id: string;
+  type: ApprovalType;
+  action: string;
+  targetId: string;
+  targetType: string;
+  requestedBy: string;
+  appId: string;
+  tenantId: string;
+  environment: Environment;
+  status: ApprovalStatus;
+  details: Record&lt;string, unknown&gt;;
+  requiredApprovers: number;
+  approvals: ApprovalVote[];
+  expiresAt: Date;
+  createdAt: Date;
+  completedAt?: Date;
+}
+
+export type ApprovalType = &#39;deployment&#39; | &#39;promotion&#39; | &#39;config_change&#39; | &#39;admin_action&#39;;
+
+export type ApprovalStatus = &#39;pending&#39; | &#39;approved&#39; | &#39;rejected&#39; | &#39;expired&#39;;
+
+export interface ApprovalVote {
+  adminId: string;
+  vote: &#39;approve&#39; | &#39;reject&#39;;
+  comment?: string;
+  votedAt: Date;
+}</code></pre>
+<h3 id="packagessharedsrctypesbilling.types.ts">packages/shared/src/types/billing.types.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - Billing/Metering Types
+ * SINGLE SOURCE OF TRUTH
+ */
+
+export interface UsageEvent {
+  id: string;
+  tenantId: string;
+  appId: string;
+  userId?: string;
+  modelId: string;
+  providerId: string;
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+  inputCost: number;
+  outputCost: number;
+  totalCost: number;
+  margin: number;
+  billedAmount: number;
+  requestType: RequestType;
+  responseTime: number;
+  status: UsageStatus;
+  timestamp: Date;
+  metadata?: Record&lt;string, unknown&gt;;
+}
+
+export type RequestType = &#39;chat&#39; | &#39;completion&#39; | &#39;embedding&#39; | &#39;image&#39; | &#39;audio&#39; | &#39;video&#39;;
+
+export type UsageStatus = &#39;success&#39; | &#39;error&#39; | &#39;rate_limited&#39; | &#39;timeout&#39;;
+
+export interface TenantBilling {
+  tenantId: string;
+  appId: string;
+  stripeCustomerId?: string;
+  billingEmail: string;
+  plan: BillingPlan;
+  margin: number;
+  creditBalance: number;
+  lastInvoiceDate?: Date;
+  nextInvoiceDate?: Date;
+}
+
+export type BillingPlan = &#39;free&#39; | &#39;starter&#39; | &#39;professional&#39; | &#39;enterprise&#39;;
+
+export interface Invoice {
+  id: string;
+  tenantId: string;
+  appId: string;
+  stripeInvoiceId?: string;
+  periodStart: Date;
+  periodEnd: Date;
+  subtotal: number;
+  margin: number;
+  tax: number;
+  total: number;
+  status: InvoiceStatus;
+  paidAt?: Date;
+  createdAt: Date;
+}
+
+export type InvoiceStatus = &#39;draft&#39; | &#39;pending&#39; | &#39;paid&#39; | &#39;failed&#39; | &#39;void&#39;;
+
+export interface BillingBreakdown {
+  period: { start: Date; end: Date };
+  usage: {
+    totalRequests: number;
+    totalTokens: number;
+    byModel: ModelUsageSummary[];
+    byProvider: ProviderUsageSummary[];
+  };
+  costs: {
+    baseCost: number;
+    margin: number;
+    total: number;
+  };
+}
+
+export interface ModelUsageSummary {
+  modelId: string;
+  modelName: string;
+  requests: number;
+  tokens: number;
+  cost: number;
+}
+
+export interface ProviderUsageSummary {
+  providerId: string;
+  providerName: string;
+  requests: number;
+  tokens: number;
+  cost: number;
+}
+
+export interface PricingConfig {
+  defaultMargin: number;
+  minimumCharge: number;
+  currencyCode: string;
+  tierDiscounts: TierDiscount[];
+}
+
+export interface TierDiscount {
+  minTokens: number;
+  discountPercent: number;
+}
+
+export const DEFAULT_PRICING: PricingConfig = {
+  defaultMargin: 0.40,
+  minimumCharge: 0.01,
+  currencyCode: &#39;USD&#39;,
+  tierDiscounts: [
+    { minTokens: 1_000_000, discountPercent: 5 },
+    { minTokens: 10_000_000, discountPercent: 10 },
+    { minTokens: 100_000_000, discountPercent: 15 },
+  ],
+};</code></pre>
+<h3 id="packagessharedsrctypescompliance.types.ts">packages/shared/src/types/compliance.types.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - Compliance/PHI Types
+ * SINGLE SOURCE OF TRUTH
+ */
+
+export type PHIMode = &#39;auto&#39; | &#39;manual&#39; | &#39;disabled&#39;;
+
+export interface PHIConfig {
+  mode: PHIMode;
+  categories: PHICategory[];
+  autoSanitize: boolean;
+  allowReidentification: boolean;
+  logSanitization: boolean;
+  retentionDays: number;
+}
+
+export type PHICategory =
+  | &#39;name&#39;
+  | &#39;date&#39;
+  | &#39;phone&#39;
+  | &#39;email&#39;
+  | &#39;ssn&#39;
+  | &#39;mrn&#39;
+  | &#39;address&#39;
+  | &#39;age&#39;
+  | &#39;medical_condition&#39;
+  | &#39;medication&#39;
+  | &#39;procedure&#39;;
+
+export const DEFAULT_PHI_CONFIG: PHIConfig = {
+  mode: &#39;auto&#39;,
+  categories: [&#39;name&#39;, &#39;date&#39;, &#39;phone&#39;, &#39;email&#39;, &#39;ssn&#39;, &#39;mrn&#39;, &#39;address&#39;],
+  autoSanitize: true,
+  allowReidentification: false,
+  logSanitization: true,
+  retentionDays: 365,
+};
+
+export interface ComplianceReport {
+  id: string;
+  type: ComplianceReportType;
+  generatedAt: Date;
+  period: { start: Date; end: Date };
+  results: ComplianceCheck[];
+  overallStatus: ComplianceStatus;
+  recommendations: string[];
+}
+
+export type ComplianceReportType = &#39;hipaa&#39; | &#39;soc2&#39; | &#39;gdpr&#39; | &#39;full&#39;;
+
+export type ComplianceStatus = &#39;compliant&#39; | &#39;non_compliant&#39; | &#39;needs_review&#39;;
+
+export interface ComplianceCheck {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  status: ComplianceStatus;
+  evidence?: string;
+  remediation?: string;
+}
+
+export interface AuditLog {
+  id: string;
+  tenantId: string;
+  appId: string;
+  adminId?: string;
+  action: string;
+  resource: string;
+  resourceId: string;
+  details: Record&lt;string, unknown&gt;;
+  ipAddress?: string;
+  userAgent?: string;
+  timestamp: Date;
+}</code></pre>
+<hr />
+<h2 id="constants">0.4 CONSTANTS</h2>
+<h3 id="packagessharedsrcconstantsindex.ts-1">packages/shared/src/constants/index.ts</h3>
+<pre class="typescript"><code>export * from &#39;./apps&#39;;
+export * from &#39;./environments&#39;;
+export * from &#39;./tiers&#39;;
+export * from &#39;./regions&#39;;
+export * from &#39;./providers&#39;;</code></pre>
+<h3 id="packagessharedsrcconstantsapps.ts">packages/shared/src/constants/apps.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - Managed Applications
+ * SINGLE SOURCE OF TRUTH - Update YOUR_DOMAIN.com with your actual domain
+ */
+
+export const MANAGED_APPS = [
+  { id: &#39;thinktank&#39;, name: &#39;Think Tank&#39;, domain: &#39;thinktank.YOUR_DOMAIN.com&#39; },
+  { id: &#39;launchboard&#39;, name: &#39;Launch Board&#39;, domain: &#39;launchboard.YOUR_DOMAIN.com&#39; },
+  { id: &#39;alwaysme&#39;, name: &#39;Always Me&#39;, domain: &#39;alwaysme.YOUR_DOMAIN.com&#39; },
+  { id: &#39;mechanicalmaker&#39;, name: &#39;Mechanical Maker&#39;, domain: &#39;mechanicalmaker.YOUR_DOMAIN.com&#39; },
+] as const;
+
+export type ManagedAppId = typeof MANAGED_APPS[number][&#39;id&#39;];</code></pre>
+<h3 id="packagessharedsrcconstantsenvironments.ts">packages/shared/src/constants/environments.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - Environment Configuration
+ * SINGLE SOURCE OF TRUTH
+ */
+
+import type { Environment, EnvironmentInfo, TierLevel } from &#39;../types&#39;;
+
+export const ENVIRONMENTS: Record&lt;Environment, EnvironmentInfo&gt; = {
+  dev: {
+    name: &#39;dev&#39;,
+    displayName: &#39;Development&#39;,
+    color: &#39;#3B82F6&#39;,
+    requiresApproval: false,
+    minTier: 1 as TierLevel,
+    defaultTier: 1 as TierLevel,
+  },
+  staging: {
+    name: &#39;staging&#39;,
+    displayName: &#39;Staging&#39;,
+    color: &#39;#F59E0B&#39;,
+    requiresApproval: false,
+    minTier: 2 as TierLevel,
+    defaultTier: 2 as TierLevel,
+  },
+  prod: {
+    name: &#39;prod&#39;,
+    displayName: &#39;Production&#39;,
+    color: &#39;#EF4444&#39;,
+    requiresApproval: true,
+    minTier: 3 as TierLevel,
+    defaultTier: 3 as TierLevel,
+  },
+};
+
+export const ENVIRONMENT_LIST: Environment[] = [&#39;dev&#39;, &#39;staging&#39;, &#39;prod&#39;];</code></pre>
+<h3 id="packagessharedsrcconstantstiers.ts">packages/shared/src/constants/tiers.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - Infrastructure Tiers
+ * SINGLE SOURCE OF TRUTH - Used by CDK and all components
+ */
+
+import type { TierConfig, TierLevel, TierName } from &#39;../types&#39;;
+
+export const TIER_NAMES: Record&lt;TierLevel, TierName&gt; = {
+  1: &#39;SEED&#39;,
+  2: &#39;STARTUP&#39;,
+  3: &#39;GROWTH&#39;,
+  4: &#39;SCALE&#39;,
+  5: &#39;ENTERPRISE&#39;,
+};
+
+export const TIER_CONFIGS: Record&lt;TierLevel, TierConfig&gt; = {
+  1: {
+    level: 1,
+    name: &#39;SEED&#39;,
+    description: &#39;Development and testing, minimal costs&#39;,
+    vpcCidr: &#39;10.0.0.0/20&#39;,
+    azCount: 2,
+    natGateways: 1,
+    auroraMinCapacity: 0.5,
+    auroraMaxCapacity: 2,
+    enableGlobalDatabase: false,
+    elasticacheNodes: 0,
+    elasticacheNodeType: &#39;cache.t4g.micro&#39;,
+    enableSelfHostedModels: false,
+    maxSagemakerEndpoints: 0,
+    litellmTaskCount: 1,
+    litellmCpu: 256,
+    litellmMemory: 512,
+    enableWaf: false,
+    enableGuardDuty: false,
+    enableSecurityHub: false,
+    enableHipaa: false,
+    estimatedMonthlyCost: { min: 50, max: 150, typical: 85 },
+  },
+  2: {
+    level: 2,
+    name: &#39;STARTUP&#39;,
+    description: &#39;Small production workloads&#39;,
+    vpcCidr: &#39;10.0.0.0/18&#39;,
+    azCount: 2,
+    natGateways: 1,
+    auroraMinCapacity: 1,
+    auroraMaxCapacity: 8,
+    enableGlobalDatabase: false,
+    elasticacheNodes: 1,
+    elasticacheNodeType: &#39;cache.t4g.small&#39;,
+    enableSelfHostedModels: false,
+    maxSagemakerEndpoints: 0,
+    litellmTaskCount: 2,
+    litellmCpu: 512,
+    litellmMemory: 1024,
+    enableWaf: true,
+    enableGuardDuty: true,
+    enableSecurityHub: false,
+    enableHipaa: false,
+    estimatedMonthlyCost: { min: 200, max: 400, typical: 255 },
+  },
+  3: {
+    level: 3,
+    name: &#39;GROWTH&#39;,
+    description: &#39;Medium production with self-hosted models&#39;,
+    vpcCidr: &#39;10.0.0.0/17&#39;,
+    azCount: 3,
+    natGateways: 2,
+    auroraMinCapacity: 2,
+    auroraMaxCapacity: 16,
+    enableGlobalDatabase: false,
+    elasticacheNodes: 2,
+    elasticacheNodeType: &#39;cache.r6g.large&#39;,
+    enableSelfHostedModels: true,
+    maxSagemakerEndpoints: 10,
+    litellmTaskCount: 3,
+    litellmCpu: 1024,
+    litellmMemory: 2048,
+    enableWaf: true,
+    enableGuardDuty: true,
+    enableSecurityHub: true,
+    enableHipaa: true,
+    estimatedMonthlyCost: { min: 1000, max: 2500, typical: 1475 },
+  },
+  4: {
+    level: 4,
+    name: &#39;SCALE&#39;,
+    description: &#39;Large production with multi-region&#39;,
+    vpcCidr: &#39;10.0.0.0/16&#39;,
+    azCount: 3,
+    natGateways: 3,
+    auroraMinCapacity: 4,
+    auroraMaxCapacity: 64,
+    enableGlobalDatabase: true,
+    elasticacheNodes: 3,
+    elasticacheNodeType: &#39;cache.r6g.xlarge&#39;,
+    enableSelfHostedModels: true,
+    maxSagemakerEndpoints: 30,
+    litellmTaskCount: 5,
+    litellmCpu: 2048,
+    litellmMemory: 4096,
+    enableWaf: true,
+    enableGuardDuty: true,
+    enableSecurityHub: true,
+    enableHipaa: true,
+    estimatedMonthlyCost: { min: 4000, max: 8000, typical: 5450 },
+  },
+  5: {
+    level: 5,
+    name: &#39;ENTERPRISE&#39;,
+    description: &#39;Enterprise-grade global deployment&#39;,
+    vpcCidr: &#39;10.0.0.0/14&#39;,
+    azCount: 3,
+    natGateways: 3,
+    auroraMinCapacity: 8,
+    auroraMaxCapacity: 128,
+    enableGlobalDatabase: true,
+    elasticacheNodes: 6,
+    elasticacheNodeType: &#39;cache.r6g.2xlarge&#39;,
+    enableSelfHostedModels: true,
+    maxSagemakerEndpoints: 100,
+    litellmTaskCount: 10,
+    litellmCpu: 4096,
+    litellmMemory: 8192,
+    enableWaf: true,
+    enableGuardDuty: true,
+    enableSecurityHub: true,
+    enableHipaa: true,
+    estimatedMonthlyCost: { min: 15000, max: 35000, typical: 21500 },
+  },
+};
+
+export function getTierConfig(tier: TierLevel): TierConfig {
+  return TIER_CONFIGS[tier];
+}
+
+export function getTierName(tier: TierLevel): TierName {
+  return TIER_NAMES[tier];
+}
+
+export function validateTierForEnvironment(tier: TierLevel, environment: string): void {
+  if (environment === &#39;prod&#39; &amp;&amp; tier &lt; 3) {
+    throw new Error(&#39;Production requires Tier 3 (GROWTH) or higher&#39;);
+  }
+  if (environment === &#39;staging&#39; &amp;&amp; tier &lt; 2) {
+    throw new Error(&#39;Staging requires Tier 2 (STARTUP) or higher&#39;);
+  }
+}
+
+export function getFeatureFlagsForTier(tier: TierLevel) {
+  const config = TIER_CONFIGS[tier];
+  return {
+    selfHostedModels: config.enableSelfHostedModels,
+    multiRegion: config.enableGlobalDatabase,
+    waf: config.enableWaf,
+    guardDuty: config.enableGuardDuty,
+    hipaaCompliance: config.enableHipaa,
+    advancedAnalytics: tier &gt;= 3,
+    customBranding: tier &gt;= 4,
+    sla: tier &gt;= 4,
+  };
+}</code></pre>
+<h3 id="packagessharedsrcconstantsregions.ts">packages/shared/src/constants/regions.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - AWS Region Configuration
+ * SINGLE SOURCE OF TRUTH
+ */
+
+import type { RegionConfig } from &#39;../types&#39;;
+
+export const REGIONS: Record&lt;string, RegionConfig&gt; = {
+  &#39;us-east-1&#39;: { code: &#39;us-east-1&#39;, name: &#39;US East (N. Virginia)&#39;, available: true, isGlobal: true },
+  &#39;us-west-2&#39;: { code: &#39;us-west-2&#39;, name: &#39;US West (Oregon)&#39;, available: true, isGlobal: false },
+  &#39;eu-west-1&#39;: { code: &#39;eu-west-1&#39;, name: &#39;Europe (Ireland)&#39;, available: true, isGlobal: true },
+  &#39;eu-central-1&#39;: { code: &#39;eu-central-1&#39;, name: &#39;Europe (Frankfurt)&#39;, available: true, isGlobal: false },
+  &#39;ap-northeast-1&#39;: { code: &#39;ap-northeast-1&#39;, name: &#39;Asia Pacific (Tokyo)&#39;, available: true, isGlobal: true },
+  &#39;ap-southeast-1&#39;: { code: &#39;ap-southeast-1&#39;, name: &#39;Asia Pacific (Singapore)&#39;, available: true, isGlobal: false },
+  &#39;ap-south-1&#39;: { code: &#39;ap-south-1&#39;, name: &#39;Asia Pacific (Mumbai)&#39;, available: true, isGlobal: false },
+};
+
+export const PRIMARY_REGION = &#39;us-east-1&#39;;
+
+export const MULTI_REGION_CONFIG = {
+  primary: &#39;us-east-1&#39;,
+  europe: &#39;eu-west-1&#39;,
+  asia: &#39;ap-northeast-1&#39;,
+} as const;
+
+export function getMultiRegionDeployment(primaryRegion: string): string[] {
+  if (primaryRegion === &#39;us-east-1&#39;) {
+    return [&#39;us-east-1&#39;, &#39;eu-west-1&#39;, &#39;ap-northeast-1&#39;];
+  }
+  if (primaryRegion.startsWith(&#39;eu-&#39;)) {
+    return [&#39;eu-west-1&#39;, &#39;us-east-1&#39;, &#39;ap-northeast-1&#39;];
+  }
+  if (primaryRegion.startsWith(&#39;ap-&#39;)) {
+    return [&#39;ap-northeast-1&#39;, &#39;us-east-1&#39;, &#39;eu-west-1&#39;];
+  }
+  return [primaryRegion];
+}
+
+export function getRegionConfig(region: string): RegionConfig {
+  const config = REGIONS[region];
+  if (!config) {
+    throw new Error(\`Unknown region: \${region}\`);
+  }
+  return config;
+}
+
+export function isValidRegion(region: string): boolean {
+  return region in REGIONS;
+}</code></pre>
+<h3 id="packagessharedsrcconstantsproviders.ts">packages/shared/src/constants/providers.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - External AI Providers
+ * SINGLE SOURCE OF TRUTH
+ */
+
+import type { ProviderCapability } from &#39;../types&#39;;
+
+export interface ExternalProviderInfo {
+  id: string;
+  name: string;
+  hipaaCompliant: boolean;
+  capabilities: ProviderCapability[];
+}
+
+export const EXTERNAL_PROVIDERS: ExternalProviderInfo[] = [
+  { id: &#39;openai&#39;, name: &#39;OpenAI&#39;, hipaaCompliant: true, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;, &#39;embeddings&#39;, &#39;image_generation&#39;, &#39;audio_transcription&#39;, &#39;function_calling&#39;] },
+  { id: &#39;anthropic&#39;, name: &#39;Anthropic&#39;, hipaaCompliant: true, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;, &#39;reasoning&#39;, &#39;function_calling&#39;] },
+  { id: &#39;google&#39;, name: &#39;Google AI&#39;, hipaaCompliant: true, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;, &#39;embeddings&#39;, &#39;image_analysis&#39;, &#39;video_generation&#39;] },
+  { id: &#39;xai&#39;, name: &#39;xAI&#39;, hipaaCompliant: false, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;, &#39;reasoning&#39;] },
+  { id: &#39;perplexity&#39;, name: &#39;Perplexity&#39;, hipaaCompliant: false, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;, &#39;search&#39;] },
+  { id: &#39;deepseek&#39;, name: &#39;DeepSeek&#39;, hipaaCompliant: false, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;, &#39;code_generation&#39;, &#39;reasoning&#39;] },
+  { id: &#39;mistral&#39;, name: &#39;Mistral AI&#39;, hipaaCompliant: false, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;, &#39;code_generation&#39;] },
+  { id: &#39;cohere&#39;, name: &#39;Cohere&#39;, hipaaCompliant: true, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;, &#39;embeddings&#39;, &#39;search&#39;] },
+  { id: &#39;together&#39;, name: &#39;Together AI&#39;, hipaaCompliant: false, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;, &#39;image_generation&#39;] },
+  { id: &#39;groq&#39;, name: &#39;Groq&#39;, hipaaCompliant: false, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;] },
+  { id: &#39;fireworks&#39;, name: &#39;Fireworks AI&#39;, hipaaCompliant: false, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;, &#39;function_calling&#39;] },
+  { id: &#39;replicate&#39;, name: &#39;Replicate&#39;, hipaaCompliant: false, capabilities: [&#39;image_generation&#39;, &#39;video_generation&#39;, &#39;audio_generation&#39;] },
+  { id: &#39;huggingface&#39;, name: &#39;Hugging Face&#39;, hipaaCompliant: false, capabilities: [&#39;text_generation&#39;, &#39;embeddings&#39;] },
+  { id: &#39;anyscale&#39;, name: &#39;Anyscale&#39;, hipaaCompliant: false, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;] },
+  { id: &#39;databricks&#39;, name: &#39;Databricks&#39;, hipaaCompliant: true, capabilities: [&#39;text_generation&#39;, &#39;embeddings&#39;] },
+  { id: &#39;aws_bedrock&#39;, name: &#39;AWS Bedrock&#39;, hipaaCompliant: true, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;, &#39;embeddings&#39;, &#39;image_generation&#39;] },
+  { id: &#39;azure_openai&#39;, name: &#39;Azure OpenAI&#39;, hipaaCompliant: true, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;, &#39;embeddings&#39;, &#39;image_generation&#39;] },
+  { id: &#39;vertex&#39;, name: &#39;Google Vertex AI&#39;, hipaaCompliant: true, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;, &#39;embeddings&#39;] },
+  { id: &#39;ollama&#39;, name: &#39;Ollama (Local)&#39;, hipaaCompliant: true, capabilities: [&#39;text_generation&#39;, &#39;chat_completion&#39;] },
+  { id: &#39;elevenlabs&#39;, name: &#39;ElevenLabs&#39;, hipaaCompliant: false, capabilities: [&#39;audio_generation&#39;] },
+  { id: &#39;runway&#39;, name: &#39;Runway ML&#39;, hipaaCompliant: false, capabilities: [&#39;video_generation&#39;, &#39;image_generation&#39;] },
+];
+
+export const PROVIDER_ENDPOINTS: Record&lt;string, string&gt; = {
+  openai: &#39;https://api.openai.com/v1&#39;,
+  anthropic: &#39;https://api.anthropic.com/v1&#39;,
+  google: &#39;https://generativelanguage.googleapis.com/v1beta&#39;,
+  xai: &#39;https://api.x.ai/v1&#39;,
+  perplexity: &#39;https://api.perplexity.ai&#39;,
+  deepseek: &#39;https://api.deepseek.com/v1&#39;,
+  mistral: &#39;https://api.mistral.ai/v1&#39;,
+  cohere: &#39;https://api.cohere.ai/v1&#39;,
+  together: &#39;https://api.together.xyz/v1&#39;,
+  groq: &#39;https://api.groq.com/openai/v1&#39;,
+  fireworks: &#39;https://api.fireworks.ai/inference/v1&#39;,
+  replicate: &#39;https://api.replicate.com/v1&#39;,
+  huggingface: &#39;https://api-inference.huggingface.co&#39;,
+  elevenlabs: &#39;https://api.elevenlabs.io/v1&#39;,
+  runway: &#39;https://api.runwayml.com/v1&#39;,
+};
+
+export function getProviderInfo(providerId: string): ExternalProviderInfo | undefined {
+  return EXTERNAL_PROVIDERS.find(p =&gt; p.id === providerId);
+}
+
+export function getHipaaCompliantProviders(): ExternalProviderInfo[] {
+  return EXTERNAL_PROVIDERS.filter(p =&gt; p.hipaaCompliant);
+}</code></pre>
+<hr />
+<h2 id="utility-functions">0.5 UTILITY FUNCTIONS</h2>
+<h3 id="packagessharedsrcutilsindex.ts">packages/shared/src/utils/index.ts</h3>
+<pre class="typescript"><code>export * from &#39;./validation&#39;;
+export * from &#39;./formatting&#39;;</code></pre>
+<h3 id="packagessharedsrcutilsvalidation.ts">packages/shared/src/utils/validation.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - Validation Utilities
+ */
+
+export function isValidAppId(id: string): boolean {
+  return /^[a-z][a-z0-9-]{2,30}$/.test(id);
+}
+
+export function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+export function isValidDomain(domain: string): boolean {
+  return /^([a-z0-9-]+\.)+[a-z]{2,}$/i.test(domain);
+}
+
+export function isValidAWSRegion(region: string): boolean {
+  return /^[a-z]{2}-[a-z]+-\d$/.test(region);
+}
+
+export function isValidAWSAccountId(accountId: string): boolean {
+  return /^\d{12}$/.test(accountId);
+}
+
+export function sanitizeAppId(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, &#39;-&#39;)
+    .replace(/-+/g, &#39;-&#39;)
+    .replace(/^-|-$/g, &#39;&#39;)
+    .slice(0, 30);
+}
+
+export function validateRequired&lt;T&gt;(value: T | undefined | null, fieldName: string): T {
+  if (value === undefined || value === null) {
+    throw new Error(\`\${fieldName} is required\`);
+  }
+  return value;
+}</code></pre>
+<h3 id="packagessharedsrcutilsformatting.ts">packages/shared/src/utils/formatting.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - Formatting Utilities
+ */
+
+export function formatCurrency(amount: number, currency = &#39;USD&#39;): string {
+  return new Intl.NumberFormat(&#39;en-US&#39;, {
+    style: &#39;currency&#39;,
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4,
+  }).format(amount);
+}
+
+export function formatNumber(num: number): string {
+  return new Intl.NumberFormat(&#39;en-US&#39;).format(num);
+}
+
+export function formatTokens(tokens: number): string {
+  if (tokens &gt;= 1_000_000) {
+    return \`\${(tokens / 1_000_000).toFixed(1)}M\`;
+  }
+  if (tokens &gt;= 1_000) {
+    return \`\${(tokens / 1_000).toFixed(1)}K\`;
+  }
+  return tokens.toString();
+}
+
+export function formatBytes(bytes: number): string {
+  const units = [&#39;B&#39;, &#39;KB&#39;, &#39;MB&#39;, &#39;GB&#39;, &#39;TB&#39;];
+  let unitIndex = 0;
+  let value = bytes;
+  
+  while (value &gt;= 1024 &amp;&amp; unitIndex &lt; units.length - 1) {
+    value /= 1024;
+    unitIndex++;
+  }
+  
+  return \`\${value.toFixed(1)} \${units[unitIndex]}\`;
+}
+
+export function formatDuration(ms: number): string {
+  if (ms &lt; 1000) return \`\${ms}ms\`;
+  if (ms &lt; 60000) return \`\${(ms / 1000).toFixed(1)}s\`;
+  if (ms &lt; 3600000) return \`\${Math.floor(ms / 60000)}m \${Math.floor((ms % 60000) / 1000)}s\`;
+  return \`\${Math.floor(ms / 3600000)}h \${Math.floor((ms % 3600000) / 60000)}m\`;
+}
+
+export function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat(&#39;en-US&#39;, {
+    year: &#39;numeric&#39;,
+    month: &#39;short&#39;,
+    day: &#39;numeric&#39;,
+  }).format(date);
+}
+
+export function formatDateTime(date: Date): string {
+  return new Intl.DateTimeFormat(&#39;en-US&#39;, {
+    year: &#39;numeric&#39;,
+    month: &#39;short&#39;,
+    day: &#39;numeric&#39;,
+    hour: &#39;2-digit&#39;,
+    minute: &#39;2-digit&#39;,
+  }).format(date);
+}</code></pre>
+<h3 id="packagessharedsrcindex.ts">packages/shared/src/index.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v2.2.0 - Shared Package Main Export
+ * 
+ * Usage in other packages:
+ *   import { TierConfig, getTierConfig, formatCurrency } from &#39;@radiant/shared&#39;;
+ */
+
+// Types
+export * from &#39;./types&#39;;
+
+// Constants
+export * from &#39;./constants&#39;;
+
+// Utils
+export * from &#39;./utils&#39;;</code></pre>
+<hr />
+<h2 id="build-and-verify">0.6 BUILD AND VERIFY</h2>
+<p>After implementing Section 0, build and verify:</p>
+<pre class="bash"><code>cd packages/shared
+pnpm install
+pnpm build
+
+# Verify the build output
+ls -la dist/</code></pre>
+<p>Expected output structure:</p>
+<pre><code>dist/
+â”œâ”€â”€ index.js
+â”œâ”€â”€ index.d.ts
+â”œâ”€â”€ types/
+â”‚   â”œâ”€â”€ index.js
+â”‚   â”œâ”€â”€ index.d.ts
+â”‚   â””â”€â”€ ...
+â”œâ”€â”€ constants/
+â”‚   â”œâ”€â”€ index.js
+â”‚   â”œâ”€â”€ index.d.ts
+â”‚   â””â”€â”€ ...
+â””â”€â”€ utils/
+    â”œâ”€â”€ index.js
+    â”œâ”€â”€ index.d.ts
+    â””â”€â”€ ...</code></pre>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ-1">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<h1 id="end-of-section-0">END OF SECTION 0</h1>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ-2">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ-3">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

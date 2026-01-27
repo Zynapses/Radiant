@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API REFERENCE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>API REFERENCE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/API_REFERENCE.md</div>
+  </div>
+  
+  <h1 id="radiant-api-reference">RADIANT API Reference</h1>
+<p>Complete API documentation for the RADIANT AI Platform.</p>
+<p><strong>Base URL:</strong> <code>https://api.radiant.example.com/v2</code></p>
+<p><strong>Authentication:</strong> Bearer token (API key or JWT)</p>
+<pre><code>Authorization: Bearer rad_your_api_key</code></pre>
+<hr />
+<h2 id="chat-completions">Chat Completions</h2>
+<h3 id="create-chat-completion">Create Chat Completion</h3>
+<pre class="http"><code>POST /v2/chat/completions</code></pre>
+<p>Create a chat completion with any supported model.</p>
+<p><strong>Request Body:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>model</code></td>
+<td>string</td>
+<td>✅</td>
+<td>Model ID (e.g., <code>gpt-4o</code>, <code>claude-3-sonnet</code>)</td>
+</tr>
+<tr>
+<td><code>messages</code></td>
+<td>array</td>
+<td>✅</td>
+<td>Array of message objects</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td>integer</td>
+<td></td>
+<td>Maximum tokens to generate</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td>number</td>
+<td></td>
+<td>Sampling temperature (0-2)</td>
+</tr>
+<tr>
+<td><code>top_p</code></td>
+<td>number</td>
+<td></td>
+<td>Nucleus sampling (0-1)</td>
+</tr>
+<tr>
+<td><code>stream</code></td>
+<td>boolean</td>
+<td></td>
+<td>Stream response tokens</td>
+</tr>
+<tr>
+<td><code>stop</code></td>
+<td>string/array</td>
+<td></td>
+<td>Stop sequences</td>
+</tr>
+<tr>
+<td><code>functions</code></td>
+<td>array</td>
+<td></td>
+<td>Function definitions</td>
+</tr>
+<tr>
+<td><code>function_call</code></td>
+<td>string/object</td>
+<td></td>
+<td>Function calling mode</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Message Object:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>role</code></td>
+<td>string</td>
+<td>✅</td>
+<td><code>system</code>, <code>user</code>, <code>assistant</code>, <code>function</code></td>
+</tr>
+<tr>
+<td><code>content</code></td>
+<td>string</td>
+<td>✅</td>
+<td>Message content</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>string</td>
+<td></td>
+<td>Function name (for function messages)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example Request:</strong></p>
+<pre class="json"><code>{
+  &quot;model&quot;: &quot;gpt-4o&quot;,
+  &quot;messages&quot;: [
+    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are a helpful assistant.&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello!&quot;}
+  ],
+  &quot;max_tokens&quot;: 1000,
+  &quot;temperature&quot;: 0.7
+}</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;id&quot;: &quot;chatcmpl_abc123&quot;,
+  &quot;object&quot;: &quot;chat.completion&quot;,
+  &quot;created&quot;: 1703980800,
+  &quot;model&quot;: &quot;gpt-4o&quot;,
+  &quot;choices&quot;: [
+    {
+      &quot;index&quot;: 0,
+      &quot;message&quot;: {
+        &quot;role&quot;: &quot;assistant&quot;,
+        &quot;content&quot;: &quot;Hello! How can I help you today?&quot;
+      },
+      &quot;finish_reason&quot;: &quot;stop&quot;
+    }
+  ],
+  &quot;usage&quot;: {
+    &quot;prompt_tokens&quot;: 25,
+    &quot;completion_tokens&quot;: 10,
+    &quot;total_tokens&quot;: 35
+  }
+}</code></pre>
+<hr />
+<h2 id="models">Models</h2>
+<h3 id="list-models">List Models</h3>
+<pre class="http"><code>GET /v2/models</code></pre>
+<p>List all available models.</p>
+<p><strong>Query Parameters:</strong></p>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 20%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>category</code></td>
+<td>string</td>
+<td>Filter by category (<code>chat</code>, <code>embedding</code>, <code>image</code>)</td>
+</tr>
+<tr>
+<td><code>provider</code></td>
+<td>string</td>
+<td>Filter by provider (<code>openai</code>, <code>anthropic</code>, <code>google</code>)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;object&quot;: &quot;list&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;id&quot;: &quot;gpt-4o&quot;,
+      &quot;object&quot;: &quot;model&quot;,
+      &quot;created&quot;: 1703980800,
+      &quot;owned_by&quot;: &quot;openai&quot;,
+      &quot;display_name&quot;: &quot;GPT-4o&quot;,
+      &quot;category&quot;: &quot;chat&quot;,
+      &quot;context_window&quot;: 128000,
+      &quot;input_cost_per_1k&quot;: 0.005,
+      &quot;output_cost_per_1k&quot;: 0.015,
+      &quot;capabilities&quot;: [&quot;chat&quot;, &quot;vision&quot;, &quot;function_calling&quot;]
+    }
+  ]
+}</code></pre>
+<h3 id="get-model">Get Model</h3>
+<pre class="http"><code>GET /v2/models/{model_id}</code></pre>
+<p>Get details for a specific model.</p>
+<hr />
+<h2 id="embeddings">Embeddings</h2>
+<h3 id="create-embeddings">Create Embeddings</h3>
+<pre class="http"><code>POST /v2/embeddings</code></pre>
+<p>Generate embeddings for text.</p>
+<p><strong>Request Body:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>model</code></td>
+<td>string</td>
+<td>✅</td>
+<td>Embedding model ID</td>
+</tr>
+<tr>
+<td><code>input</code></td>
+<td>string/array</td>
+<td>✅</td>
+<td>Text to embed</td>
+</tr>
+<tr>
+<td><code>encoding_format</code></td>
+<td>string</td>
+<td></td>
+<td><code>float</code> or <code>base64</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;object&quot;: &quot;list&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;object&quot;: &quot;embedding&quot;,
+      &quot;index&quot;: 0,
+      &quot;embedding&quot;: [0.0023, -0.0091, ...]
+    }
+  ],
+  &quot;model&quot;: &quot;text-embedding-3-small&quot;,
+  &quot;usage&quot;: {
+    &quot;prompt_tokens&quot;: 8,
+    &quot;total_tokens&quot;: 8
+  }
+}</code></pre>
+<hr />
+<h2 id="billing">Billing</h2>
+<h3 id="get-credit-balance">Get Credit Balance</h3>
+<pre class="http"><code>GET /v2/billing/credits</code></pre>
+<p>Get current credit balance.</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;data&quot;: {
+    &quot;available&quot;: 150.50,
+    &quot;reserved&quot;: 10.00,
+    &quot;currency&quot;: &quot;USD&quot;,
+    &quot;updated_at&quot;: &quot;2024-01-15T10:30:00Z&quot;
+  }
+}</code></pre>
+<h3 id="get-usage">Get Usage</h3>
+<pre class="http"><code>GET /v2/billing/usage</code></pre>
+<p>Get usage data for a period.</p>
+<p><strong>Query Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>start_date</code></td>
+<td>string</td>
+<td>Start date (YYYY-MM-DD)</td>
+</tr>
+<tr>
+<td><code>end_date</code></td>
+<td>string</td>
+<td>End date (YYYY-MM-DD)</td>
+</tr>
+<tr>
+<td><code>group_by</code></td>
+<td>string</td>
+<td><code>day</code>, <code>model</code>, <code>endpoint</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="webhooks">Webhooks</h2>
+<h3 id="list-webhooks">List Webhooks</h3>
+<pre class="http"><code>GET /v2/webhooks</code></pre>
+<p>List configured webhooks.</p>
+<h3 id="create-webhook">Create Webhook</h3>
+<pre class="http"><code>POST /v2/webhooks</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;url&quot;: &quot;https://your-server.com/webhook&quot;,
+  &quot;event_types&quot;: [&quot;billing.low_balance&quot;, &quot;usage.quota_reached&quot;],
+  &quot;description&quot;: &quot;Billing alerts&quot;
+}</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;data&quot;: {
+    &quot;id&quot;: &quot;wh_abc123&quot;,
+    &quot;url&quot;: &quot;https://your-server.com/webhook&quot;,
+    &quot;secret&quot;: &quot;whsec_xyz789...&quot;,
+    &quot;event_types&quot;: [&quot;billing.low_balance&quot;, &quot;usage.quota_reached&quot;],
+    &quot;is_active&quot;: true,
+    &quot;created_at&quot;: &quot;2024-01-15T10:30:00Z&quot;
+  }
+}</code></pre>
+<h3 id="test-webhook">Test Webhook</h3>
+<pre class="http"><code>POST /v2/webhooks/{webhook_id}/test</code></pre>
+<p>Send a test event to the webhook.</p>
+<hr />
+<h2 id="batch-processing">Batch Processing</h2>
+<h3 id="create-batch-job">Create Batch Job</h3>
+<pre class="http"><code>POST /v2/batch/jobs</code></pre>
+<p>Create a batch processing job.</p>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;type&quot;: &quot;completions&quot;,
+  &quot;model&quot;: &quot;gpt-4o&quot;,
+  &quot;input_file&quot;: &quot;batch-input.jsonl&quot;,
+  &quot;options&quot;: {
+    &quot;system_prompt&quot;: &quot;You are a helpful assistant.&quot;,
+    &quot;max_tokens&quot;: 500
+  }
+}</code></pre>
+<h3 id="get-batch-job">Get Batch Job</h3>
+<pre class="http"><code>GET /v2/batch/jobs/{job_id}</code></pre>
+<p>Get batch job status and results.</p>
+<h3 id="list-batch-jobs">List Batch Jobs</h3>
+<pre class="http"><code>GET /v2/batch/jobs</code></pre>
+<p>List all batch jobs.</p>
+<hr />
+<h2 id="error-codes">Error Codes</h2>
+<p>RADIANT uses standardized error codes across all endpoints. See <a href="ERROR_CODES.md">Error Codes Reference</a> for the complete list.</p>
+<h3 id="error-categories">Error Categories</h3>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 34%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Code Range</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Authentication</td>
+<td><code>RADIANT_AUTH_1xxx</code></td>
+<td>Token, API key, session errors</td>
+</tr>
+<tr>
+<td>Authorization</td>
+<td><code>RADIANT_AUTHZ_2xxx</code></td>
+<td>Permission, role, tenant errors</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td><code>RADIANT_VAL_3xxx</code></td>
+<td>Input validation errors</td>
+</tr>
+<tr>
+<td>Resource</td>
+<td><code>RADIANT_RES_4xxx</code></td>
+<td>Not found, conflict, quota errors</td>
+</tr>
+<tr>
+<td>Rate Limiting</td>
+<td><code>RADIANT_RATE_5xxx</code></td>
+<td>Throttling and rate limit errors</td>
+</tr>
+<tr>
+<td>AI/Model</td>
+<td><code>RADIANT_AI_6xxx</code></td>
+<td>Model, provider, inference errors</td>
+</tr>
+<tr>
+<td>Billing</td>
+<td><code>RADIANT_BILL_7xxx</code></td>
+<td>Credits, subscription errors</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td><code>RADIANT_STOR_8xxx</code></td>
+<td>File upload, storage errors</td>
+</tr>
+<tr>
+<td>Internal</td>
+<td><code>RADIANT_INT_9xxx</code></td>
+<td>Server, database, timeout errors</td>
+</tr>
+</tbody>
+</table>
+<h3 id="common-error-codes">Common Error Codes</h3>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP</th>
+<th>Retryable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RADIANT_AUTH_1001</code></td>
+<td>401</td>
+<td>❌</td>
+<td>Invalid authentication token</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTH_1004</code></td>
+<td>401</td>
+<td>❌</td>
+<td>Invalid API key</td>
+</tr>
+<tr>
+<td><code>RADIANT_VAL_3001</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Required field missing</td>
+</tr>
+<tr>
+<td><code>RADIANT_RES_4001</code></td>
+<td>404</td>
+<td>❌</td>
+<td>Resource not found</td>
+</tr>
+<tr>
+<td><code>RADIANT_RATE_5001</code></td>
+<td>429</td>
+<td>✅</td>
+<td>Rate limit exceeded</td>
+</tr>
+<tr>
+<td><code>RADIANT_BILL_7001</code></td>
+<td>402</td>
+<td>❌</td>
+<td>Insufficient credits</td>
+</tr>
+<tr>
+<td><code>RADIANT_AI_6004</code></td>
+<td>502</td>
+<td>✅</td>
+<td>AI provider error</td>
+</tr>
+<tr>
+<td><code>RADIANT_INT_9001</code></td>
+<td>500</td>
+<td>✅</td>
+<td>Internal server error</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Error Response Format:</strong></p>
+<pre class="json"><code>{
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;RADIANT_RATE_5001&quot;,
+    &quot;message&quot;: &quot;Too many requests. Please slow down.&quot;,
+    &quot;category&quot;: &quot;rate_limit&quot;,
+    &quot;retryable&quot;: true,
+    &quot;timestamp&quot;: &quot;2024-12-25T10:30:00.000Z&quot;
+  }
+}</code></pre>
+<p><strong>Retry-After Header:</strong> Retryable errors include <code>Retry-After</code> header with seconds to wait.</p>
+<hr />
+<h2 id="rate-limits">Rate Limits</h2>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Requests/min</th>
+<th>Tokens/min</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Free</td>
+<td>10</td>
+<td>10,000</td>
+</tr>
+<tr>
+<td>Starter</td>
+<td>50</td>
+<td>50,000</td>
+</tr>
+<tr>
+<td>Professional</td>
+<td>100</td>
+<td>200,000</td>
+</tr>
+<tr>
+<td>Business</td>
+<td>500</td>
+<td>1,000,000</td>
+</tr>
+<tr>
+<td>Enterprise</td>
+<td>2,000</td>
+<td>Unlimited</td>
+</tr>
+</tbody>
+</table>
+<p>Rate limit headers:</p>
+<pre><code>X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1703980860</code></pre>
+<hr />
+<h2 id="sdks">SDKs</h2>
+<h3 id="typescriptjavascript">TypeScript/JavaScript</h3>
+<pre class="bash"><code>npm install @radiant/sdk</code></pre>
+<pre class="typescript"><code>import { RadiantClient } from &#39;@radiant/sdk&#39;;
+
+const client = new RadiantClient({ apiKey: &#39;your-key&#39; });
+const response = await client.chat.create({
+  model: &#39;gpt-4o&#39;,
+  messages: [{ role: &#39;user&#39;, content: &#39;Hello!&#39; }],
+});</code></pre>
+<h3 id="python">Python</h3>
+<pre class="bash"><code>pip install radiant-sdk</code></pre>
+<pre class="python"><code>from radiant import RadiantClient
+
+client = RadiantClient(api_key=&quot;your-key&quot;)
+response = client.chat.create(
+    model=&quot;gpt-4o&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello!&quot;}],
+)</code></pre>
+<h3 id="cli">CLI</h3>
+<pre class="bash"><code>npm install -g @radiant/cli
+radiant auth login
+radiant chat send &quot;Hello!&quot;</code></pre>
+<hr />
+<h2 id="changelog">Changelog</h2>
+<p>See <a href="./CHANGELOG.md">CHANGELOG.md</a> for version history.</p>
+<h2 id="support">Support</h2>
+<ul>
+<li><strong>Email:</strong> support@radiant.example.com</li>
+<li><strong>Documentation:</strong> https://docs.radiant.example.com</li>
+<li><strong>Status:</strong> https://status.radiant.example.com</li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

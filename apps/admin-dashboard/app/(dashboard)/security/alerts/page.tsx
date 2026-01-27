@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,6 +37,7 @@ interface AlertHistory {
 }
 
 export default function AlertsPage() {
+  const { toast } = useToast();
   const [config, setConfig] = useState<AlertConfig>({
     enabled: false,
     channels: {},
@@ -140,12 +142,24 @@ export default function AlertsPage() {
       });
       const result = await res.json();
       if (result.sent) {
-        alert(`Test alert sent successfully to ${channel}`);
+        toast({
+          title: 'Test Alert Sent',
+          description: `Test alert sent successfully to ${channel}.`,
+        });
       } else {
-        alert(`Failed to send test: ${result.errors?.join(', ')}`);
+        toast({
+          title: 'Test Failed',
+          description: result.errors?.join(', ') || `Failed to send test to ${channel}.`,
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Failed to test channel:', error);
+      toast({
+        title: 'Test Failed',
+        description: 'An error occurred while sending test alert.',
+        variant: 'destructive',
+      });
     } finally {
       setTesting(null);
     }

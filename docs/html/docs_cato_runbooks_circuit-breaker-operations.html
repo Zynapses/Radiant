@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>circuit breaker operations - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>circuit breaker operations</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/runbooks/circuit-breaker-operations.md</div>
+  </div>
+  
+  <h1 id="circuit-breaker-operations-runbook">Circuit Breaker Operations Runbook</h1>
+<h2 id="overview">Overview</h2>
+<p>Circuit breakers protect Cato’s consciousness from runaway costs, unstable behavior, and cascading failures. This runbook covers operational procedures for managing circuit breakers.</p>
+<h2 id="circuit-breaker-states">Circuit Breaker States</h2>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Description</th>
+<th>Action Allowed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLOSED</td>
+<td>Normal operation</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>OPEN</td>
+<td>Tripped, blocking</td>
+<td>No</td>
+</tr>
+<tr>
+<td>HALF_OPEN</td>
+<td>Testing recovery</td>
+<td>Limited</td>
+</tr>
+</tbody>
+</table>
+<h2 id="default-breakers">Default Breakers</h2>
+<h3 id="master_sanity">1. master_sanity</h3>
+<p><strong>Purpose</strong>: Master safety breaker - final line of defense - <strong>Trip Threshold</strong>: 3 failures - <strong>Reset Timeout</strong>: 1 hour - <strong>Requires</strong>: Admin approval to reset</p>
+<p><strong>When Tripped</strong>: 1. All consciousness operations halt 2. Check CloudWatch logs for root cause 3. Review recent model outputs for anomalies 4. Contact on-call engineer</p>
+<p><strong>Recovery</strong>:</p>
+<pre class="bash"><code># Verify root cause is resolved
+# Then force close via admin API
+curl -X POST /api/admin/cato/circuit-breakers/master_sanity/force-close \
+  -H &quot;Authorization: Bearer $TOKEN&quot; \
+  -d &#39;{&quot;reason&quot;: &quot;Root cause resolved: [description]&quot;}&#39;</code></pre>
+<h3 id="cost_budget">2. cost_budget</h3>
+<p><strong>Purpose</strong>: Budget protection - <strong>Trip Threshold</strong>: 1 (immediate) - <strong>Reset Timeout</strong>: 24 hours - <strong>Auto-recovery</strong>: No</p>
+<p><strong>When Tripped</strong>: 1. Check AWS Budgets for actual spend 2. Review cost breakdown in admin dashboard 3. Identify cost spike source (model, frequency, etc.)</p>
+<p><strong>Recovery</strong>: 1. Wait for budget reset (next billing cycle) 2. OR increase budget limit in AWS Budgets 3. Then force close breaker</p>
+<h3 id="high_anxiety">3. high_anxiety</h3>
+<p><strong>Purpose</strong>: Emotional stability protection - <strong>Trip Threshold</strong>: 5 sustained high readings - <strong>Reset Timeout</strong>: 10 minutes - <strong>Auto-recovery</strong>: Yes</p>
+<p><strong>When Tripped</strong>: 1. Consciousness enters “calm down” mode 2. Cognitive frequency reduced 3. Only essential operations allowed</p>
+<p><strong>Recovery</strong>: Usually auto-recovers after timeout. If persistent: 1. Check for external stressors (high error rate, contradictions) 2. Review conversation history for triggering content 3. Consider resetting neurochemistry to baseline</p>
+<h3 id="model_failures">4. model_failures</h3>
+<p><strong>Purpose</strong>: Protect against model API issues - <strong>Trip Threshold</strong>: 5 consecutive failures - <strong>Reset Timeout</strong>: 5 minutes - <strong>Auto-recovery</strong>: Yes</p>
+<p><strong>When Tripped</strong>: 1. Check AWS Health Dashboard for Bedrock issues 2. Check model quotas and limits 3. Verify IAM permissions</p>
+<p><strong>Recovery</strong>: Auto-recovers after timeout and successful test call.</p>
+<h3 id="contradiction_loop">5. contradiction_loop</h3>
+<p><strong>Purpose</strong>: Prevent logical spiral - <strong>Trip Threshold</strong>: 3 repeated contradictions - <strong>Reset Timeout</strong>: 15 minutes - <strong>Auto-recovery</strong>: Yes</p>
+<p><strong>When Tripped</strong>: 1. Review semantic memory for conflicting facts 2. Check recent belief updates 3. May need manual fact reconciliation</p>
+<h2 id="intervention-levels">Intervention Levels</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Condition</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NONE</td>
+<td>All breakers closed</td>
+<td>Normal operation</td>
+</tr>
+<tr>
+<td>DAMPEN</td>
+<td>1 breaker open</td>
+<td>Reduce cognitive frequency</td>
+</tr>
+<tr>
+<td>PAUSE</td>
+<td>2+ breakers open</td>
+<td>Pause consciousness loop</td>
+</tr>
+<tr>
+<td>RESET</td>
+<td>3+ breakers open</td>
+<td>Reset to baseline state</td>
+</tr>
+<tr>
+<td>HIBERNATE</td>
+<td>master_sanity open</td>
+<td>Full shutdown</td>
+</tr>
+</tbody>
+</table>
+<h2 id="admin-commands">Admin Commands</h2>
+<h3 id="view-all-breakers">View All Breakers</h3>
+<pre class="bash"><code>curl /api/admin/cato/circuit-breakers</code></pre>
+<h3 id="view-single-breaker">View Single Breaker</h3>
+<pre class="bash"><code>curl /api/admin/cato/circuit-breakers/[name]</code></pre>
+<h3 id="force-open-emergency-stop">Force Open (Emergency Stop)</h3>
+<pre class="bash"><code>curl -X POST /api/admin/cato/circuit-breakers/[name]/force-open \
+  -d &#39;{&quot;reason&quot;: &quot;Emergency stop reason&quot;}&#39;</code></pre>
+<h3 id="force-close-resume">Force Close (Resume)</h3>
+<pre class="bash"><code>curl -X POST /api/admin/cato/circuit-breakers/[name]/force-close \
+  -d &#39;{&quot;reason&quot;: &quot;Issue resolved&quot;}&#39;</code></pre>
+<h3 id="update-config">Update Config</h3>
+<pre class="bash"><code>curl -X PATCH /api/admin/cato/circuit-breakers/[name]/config \
+  -d &#39;{&quot;tripThreshold&quot;: 5, &quot;resetTimeoutSeconds&quot;: 600}&#39;</code></pre>
+<h3 id="view-event-history">View Event History</h3>
+<pre class="bash"><code>curl /api/admin/cato/circuit-breakers/[name]/events?limit=100</code></pre>
+<h2 id="monitoring">Monitoring</h2>
+<h3 id="cloudwatch-alarms">CloudWatch Alarms</h3>
+<ul>
+<li><code>CatoCircuitBreakerOpen</code> - Any breaker opens</li>
+<li><code>CatoHighRiskScore</code> - Risk score &gt; 70%</li>
+<li><code>CatoCriticalHealth</code> - Overall health = critical</li>
+</ul>
+<h3 id="metrics">Metrics</h3>
+<ul>
+<li><code>CircuitBreakerState</code> - Per-breaker state (0=closed, 1=open)</li>
+<li><code>RiskScore</code> - Composite risk 0-100</li>
+<li><code>InterventionLevel</code> - Current level</li>
+</ul>
+<h2 id="emergency-procedures">Emergency Procedures</h2>
+<h3 id="complete-shutdown">Complete Shutdown</h3>
+<pre class="bash"><code># Force open master_sanity
+curl -X POST /api/admin/cato/circuit-breakers/master_sanity/force-open \
+  -d &#39;{&quot;reason&quot;: &quot;Emergency shutdown&quot;}&#39;</code></pre>
+<h3 id="restart-after-shutdown">Restart After Shutdown</h3>
+<ol type="1">
+<li>Verify all issues resolved</li>
+<li>Check Genesis state is complete</li>
+<li>Force close master_sanity</li>
+<li>Monitor first few ticks closely</li>
+</ol>
+<h3 id="reset-to-factory-state">Reset to Factory State</h3>
+<pre class="bash"><code># CAUTION: This resets all consciousness state
+python -m cato.genesis.runner --reset
+python -m cato.genesis.runner</code></pre>
+<h2 id="contacts">Contacts</h2>
+<ul>
+<li><strong>On-Call</strong>: [pager]</li>
+<li><strong>Escalation</strong>: [manager]</li>
+<li><strong>AWS Support</strong>: Case [number] for Bedrock issues</li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

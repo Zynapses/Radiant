@@ -163,7 +163,7 @@ async function listArtifacts(
   sqlParams.push(longParam('limit', limit));
   sqlParams.push(longParam('offset', offset));
 
-  const result = await executeStatement<DecisionArtifactSummary>(sql, sqlParams);
+  const result = await executeStatement<Record<string, unknown>>(sql, sqlParams);
 
   // Get total count
   let countSql = `SELECT COUNT(*) as total FROM decision_artifacts WHERE tenant_id = $1 AND user_id = $2`;
@@ -248,7 +248,7 @@ async function getArtifact(
   userId: string,
   artifactId: string
 ): Promise<APIGatewayProxyResult> {
-  const result = await executeStatement<DecisionArtifact>(
+  const result = await executeStatement<Record<string, unknown>>(
     `SELECT * FROM decision_artifacts WHERE id = $1 AND tenant_id = $2`,
     [stringParam('id', artifactId), stringParam('tenantId', tenantId)]
   );
@@ -257,7 +257,7 @@ async function getArtifact(
     return response(404, { error: 'Artifact not found' });
   }
 
-  const row = result.rows[0];
+  const row = result.rows[0] as any;
   
   // Log access
   await executeStatement(
@@ -345,7 +345,7 @@ async function checkArtifactStaleness(
     ? JSON.parse(result.rows[0].artifact_content)
     : result.rows[0].artifact_content;
 
-  const staleness = checkStaleness({ artifactContent: content } as DecisionArtifact);
+  const staleness = checkStaleness({ artifactContent: content } as any);
 
   return response(200, staleness);
 }
@@ -389,7 +389,7 @@ async function exportArtifactHandler(
   }
 
   // Get artifact
-  const result = await executeStatement<DecisionArtifact>(
+  const result = await executeStatement<Record<string, unknown>>(
     `SELECT * FROM decision_artifacts WHERE id = $1 AND tenant_id = $2`,
     [stringParam('id', artifactId), stringParam('tenantId', tenantId)]
   );
@@ -398,9 +398,8 @@ async function exportArtifactHandler(
     return response(404, { error: 'Artifact not found' });
   }
 
-  const row = result.rows[0];
-  const artifact: DecisionArtifact = {
-    ...row,
+  const row = result.rows[0] as any;
+  const artifact = {
     id: row.id,
     conversationId: row.conversation_id,
     userId: row.user_id,
@@ -413,7 +412,7 @@ async function exportArtifactHandler(
       : row.heatmap_data || [],
     complianceFrameworks: row.compliance_frameworks || [],
     secondaryDomains: row.secondary_domains || [],
-  };
+  } as any;
 
   const exportResult = await exportArtifact({
     artifact,

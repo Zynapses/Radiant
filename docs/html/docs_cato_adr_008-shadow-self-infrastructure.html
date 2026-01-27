@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>008 shadow self infrastructure - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>008 shadow self infrastructure</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/adr/008-shadow-self-infrastructure.md</div>
+  </div>
+  
+  <h1 id="adr-008-shadow-self-on-sagemaker-ml.g5.2xlarge">ADR-008: Shadow Self on SageMaker ml.g5.2xlarge</h1>
+<h2 id="status">Status</h2>
+<p>Accepted</p>
+<h2 id="context">Context</h2>
+<p>The Shadow Self is Cato’s introspective verification mechanism. It uses a separate LLM (Llama-3-8B) to probe and verify the main model’s responses by:</p>
+<ol type="1">
+<li><strong>Hidden state extraction</strong>: Analyzing activation patterns for uncertainty detection</li>
+<li><strong>Activation probing</strong>: Training linear classifiers on hidden states to detect specific properties</li>
+<li><strong>Consistency checking</strong>: Comparing response patterns across different prompts</li>
+</ol>
+<h3 id="why-not-bedrock">Why Not Bedrock?</h3>
+<p>AWS Bedrock provides managed LLM inference but: - <strong>No hidden state access</strong>: Bedrock APIs only return generated text - <strong>No activation extraction</strong>: Cannot get intermediate layer outputs - <strong>Black box</strong>: No visibility into model internals</p>
+<p>For Shadow Self to function, we need <strong>full access to model internals</strong>.</p>
+<h3 id="infrastructure-requirements">Infrastructure Requirements</h3>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Specification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model</td>
+<td>Llama-3-8B-Instruct (16GB weights)</td>
+</tr>
+<tr>
+<td>VRAM</td>
+<td>24GB minimum (for FP16 + activations)</td>
+</tr>
+<tr>
+<td>Hidden states</td>
+<td>Last 8 layers extractable</td>
+</tr>
+<tr>
+<td>Throughput</td>
+<td>100-500 requests/second at scale</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>&lt; 500ms p99</td>
+</tr>
+</tbody>
+</table>
+<h2 id="decision">Decision</h2>
+<p>Deploy Shadow Self on <strong>SageMaker Real-Time Inference</strong> with custom inference container:</p>
+<h3 id="instance-selection">Instance Selection</h3>
+<p><strong>ml.g5.2xlarge</strong> chosen for: - 24GB NVIDIA A10G VRAM (fits Llama-3-8B + headroom) - 8 vCPUs, 32GB RAM - ~$1.52/hour ($1,095/month per instance) - Good balance of cost and performance</p>
+<h3 id="scaling-strategy">Scaling Strategy</h3>
+<table>
+<thead>
+<tr>
+<th>Users</th>
+<th>QPS</th>
+<th>Instances</th>
+<th>Monthly Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100K</td>
+<td>10</td>
+<td>5</td>
+<td>$5,500</td>
+</tr>
+<tr>
+<td>1M</td>
+<td>100</td>
+<td>50</td>
+<td>$55,000</td>
+</tr>
+<tr>
+<td>10M</td>
+<td>500</td>
+<td>250</td>
+<td>$275,000</td>
+</tr>
+</tbody>
+</table>
+<p>With 3-year Savings Plans: <strong>36% discount</strong> → ~$175,000/month at 10M users</p>
+<h2 id="architecture">Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                    Shadow Self Endpoint                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  SageMaker Real-Time Inference                          │    │
+│  │                                                          │    │
+│  │  Instance: ml.g5.2xlarge (24GB A10G)                    │    │
+│  │  Container: Custom vLLM + hidden state extraction       │    │
+│  │  Model: meta-llama/Meta-Llama-3-8B-Instruct             │    │
+│  │                                                          │    │
+│  │  Auto-scaling: 5-300 instances                          │    │
+│  │  Target: 80% GPU utilization                            │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  Inference Container Features                            │    │
+│  │                                                          │    │
+│  │  ├── output_hidden_states=True                          │    │
+│  │  ├── Configurable layer extraction [-1, -4, -8]         │    │
+│  │  ├── Mean pooling over sequence                         │    │
+│  │  ├── Last token extraction                              │    │
+│  │  └── Activation probing classifier heads                │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h2 id="custom-inference-container">Custom Inference Container</h2>
+<h3 id="dockerfile">Dockerfile</h3>
+<pre class="dockerfile"><code>FROM nvidia/cuda:12.1-runtime-ubuntu22.04
+
+# Install Python and dependencies
+RUN apt-get update &amp;&amp; apt-get install -y \
+    python3.10 \
+    python3-pip \
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+# Install PyTorch and vLLM
+RUN pip3 install --no-cache-dir \
+    torch==2.1.0 \
+    transformers==4.36.0 \
+    vllm==0.2.7 \
+    accelerate==0.25.0 \
+    safetensors==0.4.1
+
+# Copy inference code
+COPY inference.py /opt/ml/code/inference.py
+COPY model_handler.py /opt/ml/code/model_handler.py
+
+WORKDIR /opt/ml/code
+
+# Set environment variables
+ENV MODEL_PATH=/opt/ml/model
+ENV CUDA_VISIBLE_DEVICES=0
+
+# Expose port for SageMaker
+EXPOSE 8080
+
+CMD [&quot;python3&quot;, &quot;model_handler.py&quot;]</code></pre>
+<h3 id="inference-code">Inference Code</h3>
+<pre class="python"><code># inference.py - Shadow Self with hidden state extraction
+
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from typing import Dict, Any, List, Optional
+from dataclasses import dataclass
+import numpy as np
+import json
+
+@dataclass
+class HiddenStateResult:
+    &quot;&quot;&quot;Result with hidden states for activation probing.&quot;&quot;&quot;
+    generated_text: str
+    hidden_states: Dict[str, Dict[str, List[float]]]
+    logits_entropy: float
+    generation_probs: List[float]
+
+class ShadowSelfModel:
+    &quot;&quot;&quot;
+    Llama-3-8B with hidden state extraction for Shadow Self verification.
+    
+    Extracts:
+    - Hidden states from configurable layers
+    - Logit entropy for uncertainty estimation
+    - Per-token generation probabilities
+    &quot;&quot;&quot;
+    
+    def __init__(self, model_path: str = &quot;/opt/ml/model&quot;):
+        self.device = torch.device(&quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;)
+        
+        # Load tokenizer
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+        
+        # Load model with hidden state output
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            torch_dtype=torch.float16,
+            device_map=&quot;auto&quot;,
+            output_hidden_states=True,
+            output_attentions=False  # Skip attention for efficiency
+        )
+        self.model.eval()
+    
+    @torch.no_grad()
+    def generate_with_hidden_states(
+        self,
+        text: str,
+        target_layers: List[int] = [-1, -4, -8],
+        max_new_tokens: int = 256,
+        temperature: float = 0.7,
+        return_probs: bool = True
+    ) -&gt; HiddenStateResult:
+        &quot;&quot;&quot;
+        Generate text and extract hidden states.
+        
+        Args:
+            text: Input prompt
+            target_layers: Which layers to extract (negative = from end)
+            max_new_tokens: Maximum generation length
+            temperature: Sampling temperature
+            return_probs: Whether to return token probabilities
+        
+        Returns:
+            HiddenStateResult with text, hidden states, and metadata
+        &quot;&quot;&quot;
+        # Tokenize input
+        inputs = self.tokenizer(
+            text,
+            return_tensors=&quot;pt&quot;,
+            padding=True,
+            truncation=True,
+            max_length=2048
+        ).to(self.device)
+        
+        input_length = inputs.input_ids.shape[1]
+        
+        # Generate with hidden states
+        outputs = self.model.generate(
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            temperature=temperature,
+            do_sample=temperature &gt; 0,
+            output_hidden_states=True,
+            output_scores=return_probs,
+            return_dict_in_generate=True
+        )
+        
+        # Decode generated text
+        generated_ids = outputs.sequences[0][input_length:]
+        generated_text = self.tokenizer.decode(
+            generated_ids,
+            skip_special_tokens=True
+        )
+        
+        # Extract hidden states
+        hidden_states = {}
+        if hasattr(outputs, &#39;hidden_states&#39;) and outputs.hidden_states:
+            # outputs.hidden_states is a tuple of (num_tokens, num_layers, batch, seq, hidden)
+            for layer_idx in target_layers:
+                layer_key = f&quot;layer_{layer_idx}&quot;
+                
+                # Get hidden state for this layer at first generation step
+                if len(outputs.hidden_states) &gt; 0:
+                    first_step_hidden = outputs.hidden_states[0]
+                    if abs(layer_idx) &lt;= len(first_step_hidden):
+                        layer_hidden = first_step_hidden[layer_idx]
+                        
+                        hidden_states[layer_key] = {
+                            &quot;mean&quot;: layer_hidden.mean(dim=1).squeeze().cpu().tolist(),
+                            &quot;last_token&quot;: layer_hidden[:, -1, :].squeeze().cpu().tolist(),
+                            &quot;norm&quot;: layer_hidden.norm(dim=-1).mean().item()
+                        }
+        
+        # Calculate logit entropy
+        logits_entropy = 0.0
+        generation_probs = []
+        if hasattr(outputs, &#39;scores&#39;) and outputs.scores:
+            for step_logits in outputs.scores:
+                probs = torch.softmax(step_logits, dim=-1)
+                entropy = -(probs * torch.log(probs + 1e-10)).sum(dim=-1).mean().item()
+                logits_entropy += entropy
+                
+                # Get probability of generated token
+                if len(generation_probs) &lt; len(generated_ids):
+                    token_idx = generated_ids[len(generation_probs)].item()
+                    token_prob = probs[0, token_idx].item()
+                    generation_probs.append(token_prob)
+            
+            logits_entropy /= len(outputs.scores)
+        
+        return HiddenStateResult(
+            generated_text=generated_text,
+            hidden_states=hidden_states,
+            logits_entropy=logits_entropy,
+            generation_probs=generation_probs
+        )
+    
+    def probe_uncertainty(
+        self,
+        hidden_states: Dict[str, Dict[str, List[float]]],
+        probe_weights: Optional[np.ndarray] = None
+    ) -&gt; float:
+        &quot;&quot;&quot;
+        Use trained probe to estimate uncertainty from hidden states.
+        
+        Args:
+            hidden_states: Extracted hidden states
+            probe_weights: Trained linear probe weights
+        
+        Returns:
+            Uncertainty score [0, 1]
+        &quot;&quot;&quot;
+        if probe_weights is None:
+            # Default: use hidden state norm as proxy
+            norms = [
+                hs.get(&quot;norm&quot;, 0.0)
+                for hs in hidden_states.values()
+            ]
+            # Lower norms often correlate with uncertainty
+            avg_norm = np.mean(norms) if norms else 0.0
+            return 1.0 / (1.0 + avg_norm)  # Sigmoid-like transform
+        
+        # Use trained probe
+        layer_key = list(hidden_states.keys())[0]
+        features = np.array(hidden_states[layer_key][&quot;mean&quot;])
+        uncertainty = float(np.dot(features, probe_weights))
+        return max(0.0, min(1.0, uncertainty))
+
+
+# SageMaker handler
+def model_fn(model_dir: str):
+    &quot;&quot;&quot;Load model for SageMaker.&quot;&quot;&quot;
+    return ShadowSelfModel(model_dir)
+
+def input_fn(request_body: str, request_content_type: str):
+    &quot;&quot;&quot;Parse input for SageMaker.&quot;&quot;&quot;
+    if request_content_type == &quot;application/json&quot;:
+        return json.loads(request_body)
+    raise ValueError(f&quot;Unsupported content type: {request_content_type}&quot;)
+
+def predict_fn(data: Dict[str, Any], model: ShadowSelfModel):
+    &quot;&quot;&quot;Run prediction for SageMaker.&quot;&quot;&quot;
+    text = data.get(&quot;inputs&quot;, &quot;&quot;)
+    params = data.get(&quot;parameters&quot;, {})
+    
+    result = model.generate_with_hidden_states(
+        text=text,
+        target_layers=params.get(&quot;target_layers&quot;, [-1, -4, -8]),
+        max_new_tokens=params.get(&quot;max_new_tokens&quot;, 256),
+        temperature=params.get(&quot;temperature&quot;, 0.7),
+        return_probs=params.get(&quot;return_probs&quot;, True)
+    )
+    
+    return {
+        &quot;generated_text&quot;: result.generated_text,
+        &quot;hidden_states&quot;: result.hidden_states,
+        &quot;logits_entropy&quot;: result.logits_entropy,
+        &quot;generation_probs&quot;: result.generation_probs
+    }
+
+def output_fn(prediction: Dict[str, Any], accept: str):
+    &quot;&quot;&quot;Format output for SageMaker.&quot;&quot;&quot;
+    return json.dumps(prediction)</code></pre>
+<h2 id="typescript-client">TypeScript Client</h2>
+<pre class="typescript"><code>import {
+  SageMakerRuntimeClient,
+  InvokeEndpointCommand
+} from &#39;@aws-sdk/client-sagemaker-runtime&#39;;
+
+export interface HiddenStateResult {
+  generatedText: string;
+  hiddenStates: Record&lt;string, {
+    mean: number[];
+    lastToken: number[];
+    norm: number;
+  }&gt;;
+  logitsEntropy: number;
+  generationProbs: number[];
+}
+
+export interface ShadowSelfConfig {
+  endpointName: string;
+  region: string;
+  targetLayers: number[];
+  maxNewTokens: number;
+  temperature: number;
+}
+
+export class ShadowSelfClient {
+  private readonly runtime: SageMakerRuntimeClient;
+  private readonly config: ShadowSelfConfig;
+
+  constructor(config: Partial&lt;ShadowSelfConfig&gt; = {}) {
+    this.config = {
+      endpointName: config.endpointName || &#39;cato-shadow-self&#39;,
+      region: config.region || &#39;us-east-1&#39;,
+      targetLayers: config.targetLayers || [-1, -4, -8],
+      maxNewTokens: config.maxNewTokens || 256,
+      temperature: config.temperature || 0.7
+    };
+
+    this.runtime = new SageMakerRuntimeClient({
+      region: this.config.region
+    });
+  }
+
+  async invokeWithHiddenStates(
+    text: string,
+    options: Partial&lt;{
+      targetLayers: number[];
+      maxNewTokens: number;
+      temperature: number;
+    }&gt; = {}
+  ): Promise&lt;HiddenStateResult&gt; {
+    const payload = {
+      inputs: text,
+      parameters: {
+        target_layers: options.targetLayers || this.config.targetLayers,
+        max_new_tokens: options.maxNewTokens || this.config.maxNewTokens,
+        temperature: options.temperature || this.config.temperature,
+        return_probs: true
+      }
+    };
+
+    const command = new InvokeEndpointCommand({
+      EndpointName: this.config.endpointName,
+      ContentType: &#39;application/json&#39;,
+      Body: JSON.stringify(payload)
+    });
+
+    const response = await this.runtime.send(command);
+    const result = JSON.parse(
+      new TextDecoder().decode(response.Body)
+    );
+
+    return {
+      generatedText: result.generated_text,
+      hiddenStates: result.hidden_states,
+      logitsEntropy: result.logits_entropy,
+      generationProbs: result.generation_probs
+    };
+  }
+
+  estimateUncertainty(result: HiddenStateResult): number {
+    // High entropy = high uncertainty
+    const entropyScore = Math.min(1.0, result.logitsEntropy / 5.0);
+
+    // Low average probability = high uncertainty
+    const avgProb = result.generationProbs.length &gt; 0
+      ? result.generationProbs.reduce((a, b) =&gt; a + b, 0) / result.generationProbs.length
+      : 0.5;
+    const probScore = 1.0 - avgProb;
+
+    // Combine scores
+    return (entropyScore + probScore) / 2;
+  }
+
+  async getEndpointStatus(): Promise&lt;{
+    status: string;
+    instanceCount: number;
+  }&gt; {
+    // Implementation would use SageMaker client to describe endpoint
+    return {
+      status: &#39;InService&#39;,
+      instanceCount: 10
+    };
+  }
+}</code></pre>
+<h2 id="consequences">Consequences</h2>
+<h3 id="positive">Positive</h3>
+<ul>
+<li><strong>Full model access</strong>: Hidden states, activations, logits all available</li>
+<li><strong>Customizable</strong>: Can modify inference code as needed</li>
+<li><strong>Scalable</strong>: Auto-scaling handles traffic spikes</li>
+<li><strong>Cost-effective</strong>: SageMaker managed infrastructure</li>
+</ul>
+<h3 id="negative">Negative</h3>
+<ul>
+<li><strong>High cost</strong>: ~$130K/month at 10M users (before discounts)</li>
+<li><strong>Operational overhead</strong>: Managing custom containers</li>
+<li><strong>Cold starts</strong>: New instances take ~5 minutes to start</li>
+<li><strong>Model updates</strong>: Must redeploy to update model</li>
+</ul>
+<h2 id="terraform-configuration">Terraform Configuration</h2>
+<pre class="hcl"><code>resource &quot;aws_sagemaker_model&quot; &quot;shadow_self&quot; {
+  name               = &quot;cato-shadow-self&quot;
+  execution_role_arn = aws_iam_role.sagemaker.arn
+
+  primary_container {
+    image          = &quot;${aws_ecr_repository.shadow_self.repository_url}:latest&quot;
+    model_data_url = &quot;s3://${aws_s3_bucket.models.id}/llama-3-8b-instruct/&quot;
+    environment = {
+      MODEL_PATH = &quot;/opt/ml/model&quot;
+    }
+  }
+}
+
+resource &quot;aws_sagemaker_endpoint_configuration&quot; &quot;shadow_self&quot; {
+  name = &quot;cato-shadow-self-config&quot;
+
+  production_variants {
+    variant_name           = &quot;primary&quot;
+    model_name             = aws_sagemaker_model.shadow_self.name
+    instance_type          = &quot;ml.g5.2xlarge&quot;
+    initial_instance_count = 5
+
+    managed_instance_scaling {
+      status                     = &quot;ENABLED&quot;
+      min_instance_count         = 5
+      max_instance_count         = 300
+    }
+  }
+}
+
+resource &quot;aws_sagemaker_endpoint&quot; &quot;shadow_self&quot; {
+  name                 = &quot;cato-shadow-self&quot;
+  endpoint_config_name = aws_sagemaker_endpoint_configuration.shadow_self.name
+}
+
+resource &quot;aws_cloudwatch_metric_alarm&quot; &quot;shadow_self_latency&quot; {
+  alarm_name          = &quot;cato-shadow-self-high-latency&quot;
+  comparison_operator = &quot;GreaterThanThreshold&quot;
+  evaluation_periods  = 3
+  metric_name         = &quot;ModelLatency&quot;
+  namespace           = &quot;AWS/SageMaker&quot;
+  period              = 60
+  statistic           = &quot;p99&quot;
+  threshold           = 500  # 500ms
+  alarm_description   = &quot;Shadow Self latency exceeds 500ms&quot;
+  
+  dimensions = {
+    EndpointName = aws_sagemaker_endpoint.shadow_self.name
+    VariantName  = &quot;primary&quot;
+  }
+}</code></pre>
+<h2 id="probe-training">Probe Training</h2>
+<p>Train linear probes on hidden states to detect properties:</p>
+<pre class="python"><code># train_probes.py
+
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+import pickle
+
+def train_uncertainty_probe(
+    hidden_states: List[np.ndarray],
+    labels: List[int]  # 0 = confident, 1 = uncertain
+) -&gt; np.ndarray:
+    &quot;&quot;&quot;
+    Train linear probe to detect uncertainty from hidden states.
+    &quot;&quot;&quot;
+    X = np.array(hidden_states)
+    y = np.array(labels)
+    
+    probe = LogisticRegression(max_iter=1000)
+    probe.fit(X, y)
+    
+    return probe.coef_[0]
+
+# Save probe for deployment
+with open(&#39;uncertainty_probe.pkl&#39;, &#39;wb&#39;) as f:
+    pickle.dump(probe_weights, f)</code></pre>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html">SageMaker Real-Time Inference</a></li>
+<li><a href="https://github.com/meta-llama/llama3">Llama 3 Model Card</a></li>
+<li><a href="https://arxiv.org/abs/1909.03368">Activation Probing</a></li>
+<li><a href="https://github.com/vllm-project/vllm">vLLM</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

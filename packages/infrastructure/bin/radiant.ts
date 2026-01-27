@@ -16,6 +16,7 @@ import { CatoGenesisStack } from '../lib/stacks/cato-genesis-stack';
 import { BrainStack } from '../lib/stacks/brain-stack';
 import { ThinkTankAuthStack } from '../lib/stacks/thinktank-auth-stack';
 import { ThinkTankAdminApiStack } from '../lib/stacks/thinktank-admin-api-stack';
+import { LiteLLMGatewayStack } from '../lib/stacks/litellm-gateway-stack';
 import { 
   RADIANT_VERSION, 
   getTierConfig,
@@ -351,6 +352,44 @@ if (tier >= 2) {
   catoRedisStack.addDependency(securityStack);
 } else {
   console.log(`║ Cato Redis:   SKIPPED (requires Tier 2+)                      ║`);
+}
+
+// ============================================================================
+// LITELLM GATEWAY STACK (Phase 3.5 - Enhanced Auto-Scaling Gateway)
+// ============================================================================
+
+// 11b. LiteLLM Gateway Stack (Enhanced ECS with auto-scaling, alarms, configurable params)
+// Only create for Tier 3+ which need production-grade scaling
+let litellmGatewayStack: LiteLLMGatewayStack | undefined;
+if (tier >= 3) {
+  litellmGatewayStack = new LiteLLMGatewayStack(app, `${stackPrefix}-litellm-gateway`, {
+    env,
+    appId,
+    environment,
+    vpc: networkingStack.vpc,
+    cluster: aiStack.cluster,
+    redisEndpoint: catoRedisStack?.redisEndpoint,
+    redisPort: catoRedisStack?.redisPort,
+    minTasks: tier >= 4 ? 4 : 2,
+    maxTasks: tier >= 5 ? 100 : tier >= 4 ? 50 : 20,
+    desiredTasks: tier >= 4 ? 4 : 2,
+    taskCpu: tier >= 4 ? 2048 : 1024,
+    taskMemory: tier >= 4 ? 4096 : 2048,
+    targetCpuUtilization: 70,
+    targetMemoryUtilization: 80,
+    enableAlarms: true,
+    alarmEmail: app.node.tryGetContext('alertEmail'),
+    tags,
+    description: `RADIANT LiteLLM Gateway - ${appId} ${environment}`,
+  });
+  litellmGatewayStack.addDependency(aiStack);
+  litellmGatewayStack.addDependency(networkingStack);
+  if (catoRedisStack) {
+    litellmGatewayStack.addDependency(catoRedisStack);
+  }
+  console.log(`║ LiteLLM Gateway: ENABLED (Tier 3+ auto-scaling)               ║`);
+} else {
+  console.log(`║ LiteLLM Gateway: SKIPPED (requires Tier 3+)                   ║`);
 }
 
 // 12. Cato Genesis Stack (Monitoring and alerting for Cato safety)

@@ -526,6 +526,25 @@ export class BrainRouter {
         // Fall through to hardcoded scores
       }
     }
+    
+    // Try to fetch from database before falling back to hardcoded scores
+    try {
+      const dbResult = await executeStatement(
+        `SELECT quality_score FROM model_task_quality_scores 
+         WHERE model_id = $1 AND task_type = $2`,
+        [
+          { name: 'modelId', value: { stringValue: model.model_id } },
+          { name: 'taskType', value: { stringValue: context.taskType } },
+        ]
+      );
+      if (dbResult.rows.length > 0) {
+        const row = dbResult.rows[0] as Record<string, unknown>;
+        return parseFloat(String(row.quality_score ?? 0.7));
+      }
+    } catch {
+      // Database lookup failed, fall through to hardcoded scores
+    }
+    
     // Fallback to hardcoded scores
     const taskScores = TASK_QUALITY_SCORES[context.taskType] || {};
     return taskScores[model.model_id] ?? 0.7;

@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ORCHESTRATION METHODS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>ORCHESTRATION METHODS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/ORCHESTRATION-METHODS.md</div>
+  </div>
+  
+  <h1 id="radiant-orchestration-methods-reference">RADIANT Orchestration Methods Reference</h1>
+<blockquote>
+<p>Version: 4.18.0 Last Updated: 2024-12-28</p>
+</blockquote>
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./SPECIALTY-RANKING.md">Specialty Ranking System</a> - Domain-specific model proficiency rankings</li>
+<li><a href="./DOMAIN-TAXONOMY.md">Domain Taxonomy</a> - Hierarchical domain detection</li>
+<li><a href="./AGI-BRAIN-PLANNER.md">AGI Brain Planner</a> - Real-time planning system</li>
+</ul>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>RADIANT’s orchestration system provides <strong>17 reusable methods</strong> that can be composed into <strong>49 workflow patterns</strong>. Each method is parameterized and can receive streams from previous methods in the pipeline.</p>
+<h2 id="architecture">Architecture</h2>
+<pre><code>┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Method 1      │────▶│   Method 2      │────▶│   Method 3      │
+│  (Generator)    │     │   (Critic)      │     │  (Synthesizer)  │
+│                 │     │                 │     │                 │
+│ Input: prompt   │     │ Input: stream   │     │ Input: stream   │
+│ Output: stream  │     │ Output: stream  │     │ Output: final   │
+└─────────────────┘     └─────────────────┘     └─────────────────┘</code></pre>
+<h3 id="stream-chaining">Stream Chaining</h3>
+<ul>
+<li>Each method receives output from previous method(s) via <code>{{response}}</code> or <code>{{responses}}</code> template variables</li>
+<li>Methods can depend on multiple previous steps (<code>dependsOnSteps[]</code>)</li>
+<li>Parallel execution supported with <code>parallelExecution.enabled</code></li>
+</ul>
+<h3 id="output-stream-modes-new">Output Stream Modes (NEW)</h3>
+<p>When a method uses N models, you can control how many streams come out:</p>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 29%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Output</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>single</code></td>
+<td>1 stream</td>
+<td>Synthesized result → <code>{{response}}</code> (default)</td>
+</tr>
+<tr>
+<td><code>all</code></td>
+<td>N streams</td>
+<td>All model outputs → <code>{{responses}}</code> array</td>
+</tr>
+<tr>
+<td><code>top_n</code></td>
+<td>1-N streams</td>
+<td>Best N by confidence → <code>{{responses}}</code> array</td>
+</tr>
+<tr>
+<td><code>threshold</code></td>
+<td>0-N streams</td>
+<td>Only above confidence threshold → <code>{{responses}}</code> array</td>
+</tr>
+</tbody>
+</table>
+<pre class="typescript"><code>parallelExecution: {
+  enabled: true,
+  models: [&#39;openai/o1&#39;, &#39;claude-3-5-sonnet&#39;, &#39;deepseek-reasoner&#39;],
+  outputMode: &#39;all&#39;,              // Pass all 3 streams to next step
+  preserveModelAttribution: true  // Include model ID with each stream
+}</code></pre>
+<p><strong>Example: 3 models → 3 output streams</strong></p>
+<pre><code>┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Model 1   │     │   Model 2   │     │   Model 3   │
+│   (o1)      │     │  (Claude)   │     │ (DeepSeek)  │
+└──────┬──────┘     └──────┬──────┘     └──────┬──────┘
+       │                   │                   │
+       └───────────────────┼───────────────────┘
+                           ▼
+              {{responses}} = [
+                { modelId: &#39;o1&#39;, response: &#39;...&#39;, confidence: 0.92 },
+                { modelId: &#39;claude&#39;, response: &#39;...&#39;, confidence: 0.88 },
+                { modelId: &#39;deepseek&#39;, response: &#39;...&#39;, confidence: 0.85 }
+              ]
+                           │
+                           ▼
+               ┌───────────────────────┐
+               │   Next Step          │
+               │   SYNTHESIZE_RESPONSES│
+               │   receives 3 streams │
+               └───────────────────────┘</code></pre>
+<hr />
+<h2 id="methods-by-category">Methods by Category</h2>
+<h3 id="generation-methods">1. Generation Methods</h3>
+<h4 id="generate_response">GENERATE_RESPONSE</h4>
+<p><strong>Purpose</strong>: Generate a response to a prompt using specified model</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>temperature</code></td>
+<td>number</td>
+<td>0.7</td>
+<td>Creativity/randomness (0-2)</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td>integer</td>
+<td>4096</td>
+<td>Maximum output tokens</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Prompt Template</strong>:</p>
+<pre><code>Generate a response to: {{prompt}}
+
+Context: {{context}}</code></pre>
+<p><strong>Recommended Models</strong>: Claude 3.5 Sonnet, GPT-4o, DeepSeek Chat</p>
+<hr />
+<h4 id="generate_with_cot">GENERATE_WITH_COT</h4>
+<p><strong>Purpose</strong>: Generate response using chain-of-thought reasoning</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>temperature</code></td>
+<td>number</td>
+<td>0.3</td>
+<td>Lower for consistency</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td>integer</td>
+<td>8192</td>
+<td>Extended for reasoning</td>
+</tr>
+<tr>
+<td><code>thinking_budget</code></td>
+<td>integer</td>
+<td>2000</td>
+<td>Tokens for reasoning</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Prompt Template</strong>:</p>
+<pre><code>Think through this step-by-step before answering:
+
+{{prompt}}
+
+Show your reasoning, then provide your answer.</code></pre>
+<p><strong>Recommended Models</strong>: OpenAI o1, DeepSeek Reasoner, Claude 3.5 Sonnet</p>
+<hr />
+<h4 id="refine_response">REFINE_RESPONSE</h4>
+<p><strong>Purpose</strong>: Improve a response based on feedback</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>refinement_focus</code></td>
+<td>string</td>
+<td>“all”</td>
+<td>Focus area: all, clarity, accuracy, completeness</td>
+</tr>
+<tr>
+<td><code>preserve_structure</code></td>
+<td>boolean</td>
+<td>true</td>
+<td>Keep original structure</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Input Stream</strong>: <code>{{response}}</code> - Previous response to refine <strong>Input Stream</strong>: <code>{{feedback}}</code> - Critique or feedback</p>
+<p><strong>Prompt Template</strong>:</p>
+<pre><code>Improve this response based on the feedback:
+
+Original Response: {{response}}
+
+Feedback: {{feedback}}
+
+Provide an improved response that addresses all feedback while maintaining the good parts.</code></pre>
+<hr />
+<h3 id="evaluation-methods">2. Evaluation Methods</h3>
+<h4 id="critique_response">CRITIQUE_RESPONSE</h4>
+<p><strong>Purpose</strong>: Critically evaluate a response for flaws and improvements</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>focus_areas</code></td>
+<td>array</td>
+<td>[“accuracy”, “completeness”, “clarity”, “logic”]</td>
+<td>What to evaluate</td>
+</tr>
+<tr>
+<td><code>severity_threshold</code></td>
+<td>string</td>
+<td>“medium”</td>
+<td>Minimum severity to report: low, medium, high</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Input Stream</strong>: <code>{{response}}</code> - Response to critique</p>
+<p><strong>Prompt Template</strong>:</p>
+<pre><code>Critically evaluate this response:
+
+Original Question: {{original_prompt}}
+Response: {{response}}
+
+Identify:
+1. Factual errors
+2. Logical flaws
+3. Missing information
+4. Clarity issues
+
+For each issue, rate severity (low/medium/high) and suggest fixes.</code></pre>
+<p><strong>Recommended Models</strong>: OpenAI o1, Claude 3.5 Sonnet</p>
+<hr />
+<h4 id="judge_responses">JUDGE_RESPONSES</h4>
+<p><strong>Purpose</strong>: Compare and judge multiple responses to select the best</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>evaluation_mode</code></td>
+<td>enum</td>
+<td>“pairwise”</td>
+<td>pointwise, pairwise, listwise</td>
+</tr>
+<tr>
+<td><code>criteria</code></td>
+<td>array</td>
+<td>[“accuracy”, “helpfulness”, “clarity”, “completeness”]</td>
+<td>Evaluation criteria</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Input Stream</strong>: <code>{{responses}}</code> - Array of responses to judge</p>
+<p><strong>Prompt Template</strong>:</p>
+<pre><code>Judge these responses to the question:
+
+Question: {{original_prompt}}
+
+{{#each responses}}Response {{@index}}: {{this}}
+
+{{/each}}
+
+Evaluate each on: {{criteria}}
+
+Output: BEST: [number], SCORE: [0-1], REASONING: [explanation]</code></pre>
+<p><strong>Output</strong>: <code>{ best: number, score: number, reasoning: string }</code></p>
+<hr />
+<h4 id="verify_facts">VERIFY_FACTS</h4>
+<p><strong>Purpose</strong>: Extract and verify factual claims in a response</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>extraction_method</code></td>
+<td>string</td>
+<td>“explicit”</td>
+<td>How to find claims: explicit, implicit, all</td>
+</tr>
+<tr>
+<td><code>verification_depth</code></td>
+<td>string</td>
+<td>“thorough”</td>
+<td>Verification level: quick, standard, thorough</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Input Stream</strong>: <code>{{response}}</code> - Response to verify</p>
+<p><strong>Prompt Template</strong>:</p>
+<pre><code>Extract all factual claims from this response and verify each:
+
+Response: {{response}}
+
+For each claim:
+1. State the claim
+2. Verify if true/false/uncertain
+3. Provide evidence or reasoning
+4. Confidence level</code></pre>
+<hr />
+<h4 id="generate_challenge">GENERATE_CHALLENGE</h4>
+<p><strong>Purpose</strong>: Challenge a response by arguing the opposite position</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>challenge_intensity</code></td>
+<td>string</td>
+<td>“moderate”</td>
+<td>How aggressive: mild, moderate, aggressive</td>
+</tr>
+<tr>
+<td><code>focus</code></td>
+<td>string</td>
+<td>“weakest_points”</td>
+<td>What to challenge: all, weakest_points, assumptions</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Input Stream</strong>: <code>{{response}}</code> - Response to challenge</p>
+<hr />
+<h4 id="defend_position">DEFEND_POSITION</h4>
+<p><strong>Purpose</strong>: Defend a response against challenges</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>defense_strategy</code></td>
+<td>string</td>
+<td>“address_all”</td>
+<td>Strategy: address_all, prioritize, concede_gracefully</td>
+</tr>
+<tr>
+<td><code>concede_valid</code></td>
+<td>boolean</td>
+<td>true</td>
+<td>Acknowledge valid challenges</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Input Streams</strong>: - <code>{{response}}</code> - Original response - <code>{{challenge}}</code> - Challenge to defend against</p>
+<hr />
+<h4 id="self_reflect">SELF_REFLECT</h4>
+<p><strong>Purpose</strong>: AI reflects on its own response to identify improvements</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reflection_depth</code></td>
+<td>string</td>
+<td>“thorough”</td>
+<td>Depth: quick, standard, thorough</td>
+</tr>
+<tr>
+<td><code>aspects</code></td>
+<td>array</td>
+<td>[“accuracy”, “completeness”, “clarity”]</td>
+<td>What to reflect on</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Input Stream</strong>: <code>{{response}}</code> - Response to reflect on</p>
+<hr />
+<h3 id="synthesis-methods">3. Synthesis Methods</h3>
+<h4 id="synthesize_responses">SYNTHESIZE_RESPONSES</h4>
+<p><strong>Purpose</strong>: Combine best parts from multiple responses</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>combination_strategy</code></td>
+<td>string</td>
+<td>“best_parts”</td>
+<td>Strategy: best_parts, merge, weighted</td>
+</tr>
+<tr>
+<td><code>conflict_resolution</code></td>
+<td>string</td>
+<td>“majority”</td>
+<td>How to resolve conflicts: majority, primary, newest</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Input Stream</strong>: <code>{{responses}}</code> - Array of responses with model attribution</p>
+<p><strong>Prompt Template</strong>:</p>
+<pre><code>Synthesize these responses into one superior response:
+
+Question: {{original_prompt}}
+
+{{#each responses}}Response from {{model}}: {{content}}
+
+{{/each}}
+
+Create a response that:
+1. Takes the best, most accurate parts from each
+2. Resolves any conflicts
+3. Is comprehensive and well-organized</code></pre>
+<hr />
+<h4 id="build_consensus">BUILD_CONSENSUS</h4>
+<p><strong>Purpose</strong>: Identify points of agreement across multiple responses</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>consensus_threshold</code></td>
+<td>number</td>
+<td>0.7</td>
+<td>Minimum agreement ratio (0-1)</td>
+</tr>
+<tr>
+<td><code>include_disputed</code></td>
+<td>boolean</td>
+<td>true</td>
+<td>Include disputed points with caveats</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Input Stream</strong>: <code>{{responses}}</code> - Array of responses</p>
+<hr />
+<h3 id="routing-methods">4. Routing Methods</h3>
+<h4 id="detect_task_type">DETECT_TASK_TYPE</h4>
+<p><strong>Purpose</strong>: Analyze prompt to determine task type and complexity</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>task_categories</code></td>
+<td>array</td>
+<td>[“coding”, “reasoning”, “creative”, “factual”, “math”, “research”]</td>
+<td>Categories to detect</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong>:</p>
+<pre class="json"><code>{
+  &quot;taskType&quot;: &quot;coding&quot;,
+  &quot;complexity&quot;: &quot;complex&quot;,
+  &quot;requiredCapabilities&quot;: [&quot;code_generation&quot;, &quot;debugging&quot;],
+  &quot;recommendedApproach&quot;: &quot;chain_of_thought&quot;
+}</code></pre>
+<p><strong>Recommended Models</strong>: GPT-4o-mini, Claude 3.5 Haiku (fast, cheap)</p>
+<hr />
+<h4 id="select_best_model">SELECT_BEST_MODEL</h4>
+<p><strong>Purpose</strong>: Choose the optimal model for a given task</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>consider_cost</code></td>
+<td>boolean</td>
+<td>true</td>
+<td>Factor in cost</td>
+</tr>
+<tr>
+<td><code>consider_latency</code></td>
+<td>boolean</td>
+<td>true</td>
+<td>Factor in speed</td>
+</tr>
+<tr>
+<td><code>quality_priority</code></td>
+<td>number</td>
+<td>0.7</td>
+<td>Quality vs cost tradeoff (0-1)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Implementation</strong>: <code>code</code> - <code>model-selection-service.selectBestModel</code></p>
+<hr />
+<h3 id="reasoning-methods">5. Reasoning Methods</h3>
+<h4 id="decompose_problem">DECOMPOSE_PROBLEM</h4>
+<p><strong>Purpose</strong>: Break down a complex problem into sub-problems</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>max_subproblems</code></td>
+<td>integer</td>
+<td>5</td>
+<td>Maximum sub-problems</td>
+</tr>
+<tr>
+<td><code>decomposition_strategy</code></td>
+<td>string</td>
+<td>“functional”</td>
+<td>Strategy: functional, temporal, hierarchical</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Prompt Template</strong>:</p>
+<pre><code>Decompose this problem into smaller sub-problems:
+
+Problem: {{prompt}}
+
+1. Identify independent components
+2. Order by dependency
+3. Estimate complexity of each
+4. Return structured decomposition</code></pre>
+<p><strong>Recommended Models</strong>: OpenAI o1, Claude 3.5 Sonnet</p>
+<hr />
+<h3 id="aggregation-methods">6. Aggregation Methods</h3>
+<h4 id="majority_vote">MAJORITY_VOTE</h4>
+<p><strong>Purpose</strong>: Select the most common answer from multiple responses</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vote_method</code></td>
+<td>string</td>
+<td>“exact_match”</td>
+<td>Matching: exact_match, semantic, fuzzy</td>
+</tr>
+<tr>
+<td><code>tie_breaker</code></td>
+<td>string</td>
+<td>“first”</td>
+<td>Tie resolution: first, random, highest_confidence</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Implementation</strong>: <code>code</code> - <code>aggregation-service.majorityVote</code></p>
+<hr />
+<h4 id="weighted_aggregate">WEIGHTED_AGGREGATE</h4>
+<p><strong>Purpose</strong>: Combine responses weighted by confidence/expertise</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 15%" />
+<col style="width: 23%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>weight_by</code></td>
+<td>string</td>
+<td>“confidence”</td>
+<td>Weight source: confidence, expertise, recency</td>
+</tr>
+<tr>
+<td><code>normalize</code></td>
+<td>boolean</td>
+<td>true</td>
+<td>Normalize weights to sum to 1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Implementation</strong>: <code>code</code> - <code>aggregation-service.weightedAggregate</code></p>
+<hr />
+<h2 id="workflow-patterns-49-total">Workflow Patterns (49 Total)</h2>
+<h3 id="categories">Categories</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 23%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Count</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Adversarial &amp; Validation</td>
+<td>2</td>
+<td>Security testing, vulnerability discovery</td>
+</tr>
+<tr>
+<td>Debate &amp; Deliberation</td>
+<td>3</td>
+<td>Multi-perspective analysis</td>
+</tr>
+<tr>
+<td>Judge &amp; Critic</td>
+<td>3</td>
+<td>Quality evaluation and improvement</td>
+</tr>
+<tr>
+<td>Ensemble &amp; Aggregation</td>
+<td>3</td>
+<td>Multi-model synthesis</td>
+</tr>
+<tr>
+<td>Reflection &amp; Self-Improvement</td>
+<td>3</td>
+<td>Iterative refinement</td>
+</tr>
+<tr>
+<td>Verification &amp; Fact-Checking</td>
+<td>2</td>
+<td>Accuracy validation</td>
+</tr>
+<tr>
+<td>Multi-Agent Collaboration</td>
+<td>2</td>
+<td>Team-based problem solving</td>
+</tr>
+<tr>
+<td>Reasoning Enhancement</td>
+<td>9</td>
+<td>CoT, ToT, ReAct, etc.</td>
+</tr>
+<tr>
+<td>Model Routing Strategies</td>
+<td>4</td>
+<td>Optimal model selection</td>
+</tr>
+<tr>
+<td>Domain-Specific Orchestration</td>
+<td>4</td>
+<td>Domain expertise routing</td>
+</tr>
+<tr>
+<td>Cognitive Frameworks</td>
+<td>14</td>
+<td>First Principles, Systems Thinking, etc.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pattern-quick-reference">Pattern Quick Reference</h3>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Name</th>
+<th>Models</th>
+<th>Latency</th>
+<th>Quality Improvement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CoT</code></td>
+<td>Chain-of-Thought</td>
+<td>1</td>
+<td>Medium</td>
+<td>+20-40% on math/logic</td>
+</tr>
+<tr>
+<td><code>SCMR</code></td>
+<td>Majority Vote</td>
+<td>3+</td>
+<td>Medium</td>
+<td>+15-25% accuracy</td>
+</tr>
+<tr>
+<td><code>ISFR</code></td>
+<td>Self-Refine Loop</td>
+<td>1</td>
+<td>High</td>
+<td>+20-30% per iteration</td>
+</tr>
+<tr>
+<td><code>MDA</code></td>
+<td>Multi-Agent Debate</td>
+<td>3+</td>
+<td>Very High</td>
+<td>+30-45% consensus</td>
+</tr>
+<tr>
+<td><code>CASCADE</code></td>
+<td>Cascade</td>
+<td>2+</td>
+<td>Variable</td>
+<td>40-60% cost reduction</td>
+</tr>
+<tr>
+<td><code>ToT</code></td>
+<td>Tree-of-Thoughts</td>
+<td>1</td>
+<td>Very High</td>
+<td>4%→74% on puzzles</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="metrics-captured">Metrics Captured</h2>
+<p>For each method execution:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>latencyMs</code></td>
+<td>Execution time in milliseconds</td>
+</tr>
+<tr>
+<td><code>costCents</code></td>
+<td>Cost in cents</td>
+</tr>
+<tr>
+<td><code>tokensUsed</code></td>
+<td>Input + output tokens</td>
+</tr>
+<tr>
+<td><code>modelUsed</code></td>
+<td>Model ID used</td>
+</tr>
+<tr>
+<td><code>qualityScore</code></td>
+<td>Auto-assessed quality (0-1)</td>
+</tr>
+<tr>
+<td><code>wasParallel</code></td>
+<td>Whether parallel execution was used</td>
+</tr>
+<tr>
+<td><code>parallelResults</code></td>
+<td>Individual model results if parallel</td>
+</tr>
+<tr>
+<td><code>iteration</code></td>
+<td>Iteration number for iterative methods</td>
+</tr>
+</tbody>
+</table>
+<h3 id="aggregated-metrics-per-workflow">Aggregated Metrics (per workflow)</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>avgQualityScore</code></td>
+<td>Rolling average quality</td>
+</tr>
+<tr>
+<td><code>avgLatencyMs</code></td>
+<td>Average latency</td>
+</tr>
+<tr>
+<td><code>avgCostCents</code></td>
+<td>Average cost</td>
+</tr>
+<tr>
+<td><code>executionCount</code></td>
+<td>Total executions</td>
+</tr>
+<tr>
+<td><code>successRate</code></td>
+<td>Completion rate</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="admin-configuration">Admin Configuration</h2>
+<h3 id="per-tenant-customization">Per-Tenant Customization</h3>
+<p>Admins can customize workflows:</p>
+<pre class="json"><code>{
+  &quot;workflowId&quot;: &quot;uuid&quot;,
+  &quot;tenantId&quot;: &quot;tenant-123&quot;,
+  &quot;configOverrides&quot;: {
+    &quot;temperature&quot;: 0.5,
+    &quot;max_iterations&quot;: 3
+  },
+  &quot;disabledSteps&quot;: [3, 5],
+  &quot;modelPreferences&quot;: {
+    &quot;generator&quot;: &quot;anthropic/claude-3-5-sonnet-20241022&quot;,
+    &quot;critic&quot;: &quot;openai/o1&quot;
+  }
+}</code></pre>
+<h3 id="parameter-schema">Parameter Schema</h3>
+<p>Each method has a JSON Schema for parameters:</p>
+<pre class="json"><code>{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;properties&quot;: {
+    &quot;temperature&quot;: {
+      &quot;type&quot;: &quot;number&quot;,
+      &quot;min&quot;: 0,
+      &quot;max&quot;: 2,
+      &quot;description&quot;: &quot;Controls randomness&quot;
+    },
+    &quot;max_tokens&quot;: {
+      &quot;type&quot;: &quot;integer&quot;,
+      &quot;description&quot;: &quot;Maximum output length&quot;
+    }
+  }
+}</code></pre>
+<hr />
+<h2 id="api-endpoints">API Endpoints</h2>
+<h3 id="method-management">Method Management</h3>
+<ul>
+<li><code>GET /api/admin/orchestration/methods</code> - List all methods</li>
+<li><code>GET /api/admin/orchestration/methods/:code</code> - Get method details</li>
+<li><code>PATCH /api/admin/orchestration/methods/:code</code> - Update method parameters</li>
+</ul>
+<h3 id="workflow-management">Workflow Management</h3>
+<ul>
+<li><code>GET /api/admin/orchestration/workflows</code> - List all workflows</li>
+<li><code>GET /api/admin/orchestration/workflows/:code</code> - Get workflow with steps</li>
+<li><code>POST /api/admin/orchestration/workflows/:code/customize</code> - Create tenant customization</li>
+</ul>
+<h3 id="metrics">Metrics</h3>
+<ul>
+<li><code>GET /api/admin/orchestration/metrics</code> - Aggregated metrics</li>
+<li><code>GET /api/admin/orchestration/metrics/:workflowCode</code> - Workflow-specific metrics</li>
+<li><code>GET /api/admin/orchestration/executions</code> - Recent executions</li>
+</ul>
+<hr />
+<h2 id="stream-data-flow">Stream Data Flow</h2>
+<h3 id="input-variables-available">Input Variables Available</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{{prompt}}</code></td>
+<td>Original user prompt</td>
+<td>Request</td>
+</tr>
+<tr>
+<td><code>{{context}}</code></td>
+<td>Additional context</td>
+<td>Request</td>
+</tr>
+<tr>
+<td><code>{{response}}</code></td>
+<td>Previous step output</td>
+<td>Step N-1</td>
+</tr>
+<tr>
+<td><code>{{responses}}</code></td>
+<td>Multiple outputs</td>
+<td>Parallel steps</td>
+</tr>
+<tr>
+<td><code>{{original_prompt}}</code></td>
+<td>Original prompt (unchanged)</td>
+<td>Request</td>
+</tr>
+<tr>
+<td><code>{{feedback}}</code></td>
+<td>Critique output</td>
+<td>Critic step</td>
+</tr>
+<tr>
+<td><code>{{challenge}}</code></td>
+<td>Challenge output</td>
+<td>Challenger step</td>
+</tr>
+</tbody>
+</table>
+<h3 id="output-structure">Output Structure</h3>
+<p>Each step produces:</p>
+<pre class="json"><code>{
+  &quot;response&quot;: &quot;string&quot;,
+  &quot;tokens&quot;: 1234,
+  &quot;confidence&quot;: 0.85,
+  &quot;metadata&quot;: {}
+}</code></pre>
+<p>For parallel execution with <code>outputMode: 'single'</code> (default):</p>
+<pre class="json"><code>{
+  &quot;response&quot;: &quot;synthesized response string&quot;,
+  &quot;streamCount&quot;: 1,
+  &quot;outputMode&quot;: &quot;single&quot;,
+  &quot;synthesisApplied&quot;: true,
+  &quot;modelsUsed&quot;: [&quot;openai/o1&quot;, &quot;claude-3-5-sonnet&quot;, &quot;deepseek-reasoner&quot;]
+}</code></pre>
+<p>For parallel execution with <code>outputMode: 'all'</code>:</p>
+<pre class="json"><code>{
+  &quot;responses&quot;: [
+    { &quot;modelId&quot;: &quot;openai/o1&quot;, &quot;modelName&quot;: &quot;o1&quot;, &quot;response&quot;: &quot;...&quot;, &quot;confidence&quot;: 0.92, &quot;latencyMs&quot;: 2100, &quot;mode&quot;: &quot;thinking&quot; },
+    { &quot;modelId&quot;: &quot;claude-3-5-sonnet&quot;, &quot;modelName&quot;: &quot;Claude 3.5 Sonnet&quot;, &quot;response&quot;: &quot;...&quot;, &quot;confidence&quot;: 0.88, &quot;latencyMs&quot;: 1800 },
+    { &quot;modelId&quot;: &quot;deepseek-reasoner&quot;, &quot;modelName&quot;: &quot;DeepSeek Reasoner&quot;, &quot;response&quot;: &quot;...&quot;, &quot;confidence&quot;: 0.85, &quot;latencyMs&quot;: 2400 }
+  ],
+  &quot;streamCount&quot;: 3,
+  &quot;outputMode&quot;: &quot;all&quot;,
+  &quot;synthesisApplied&quot;: false,
+  &quot;modelsUsed&quot;: [&quot;openai/o1&quot;, &quot;claude-3-5-sonnet&quot;, &quot;deepseek-reasoner&quot;]
+}</code></pre>
+<hr />
+<h2 id="multi-model-parallel-execution">Multi-Model Parallel Execution</h2>
+<h3 id="overview-1">Overview</h3>
+<p>Any method can utilize <strong>N models</strong> simultaneously via the <code>parallelExecution</code> configuration. This enables: - <strong>Consensus building</strong> - Multiple perspectives on the same problem - <strong>Quality improvement</strong> - Best-of-N selection - <strong>Robustness</strong> - Fallback if one model fails - <strong>Diverse outputs</strong> - Different approaches to creative tasks</p>
+<h3 id="parallel-execution-configuration">Parallel Execution Configuration</h3>
+<pre class="typescript"><code>interface ParallelExecutionConfig {
+  // Core settings
+  enabled: boolean;
+  mode: &#39;all&#39; | &#39;race&#39; | &#39;quorum&#39;;
+  models: string[];
+  
+  // Synthesis
+  synthesizeResults?: boolean;
+  synthesisStrategy?: &#39;best_of&#39; | &#39;merge&#39; | &#39;vote&#39; | &#39;weighted&#39;;
+  weightByConfidence?: boolean;
+  
+  // AGI Dynamic Model Selection
+  agiModelSelection?: boolean;
+  minModels?: number;       // Default: 2
+  maxModels?: number;       // Default: 5
+  domainHints?: string[];
+  
+  // Failure handling
+  timeoutMs?: number;
+  quorumThreshold?: number; // For quorum mode: 0.5 = majority
+  failureStrategy?: &#39;fail_fast&#39; | &#39;continue&#39; | &#39;fallback&#39;;
+  
+  // OUTPUT STREAM CONFIGURATION
+  outputMode?: &#39;single&#39; | &#39;all&#39; | &#39;top_n&#39; | &#39;threshold&#39;;
+  outputTopN?: number;           // For top_n mode (default: 2)
+  outputThreshold?: number;      // For threshold mode (default: 0.7)
+  preserveModelAttribution?: boolean;
+}</code></pre>
+<h3 id="execution-modes">Execution Modes</h3>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 38%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Behavior</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>all</code></td>
+<td>Wait for all models to complete</td>
+<td>Quality-critical tasks</td>
+</tr>
+<tr>
+<td><code>race</code></td>
+<td>Return first successful response</td>
+<td>Latency-critical tasks</td>
+</tr>
+<tr>
+<td><code>quorum</code></td>
+<td>Wait for majority (threshold configurable)</td>
+<td>Balanced approach</td>
+</tr>
+</tbody>
+</table>
+<h3 id="synthesis-strategies">Synthesis Strategies</h3>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>best_of</code></td>
+<td>Select highest confidence response</td>
+</tr>
+<tr>
+<td><code>merge</code></td>
+<td>Combine all responses into one</td>
+</tr>
+<tr>
+<td><code>vote</code></td>
+<td>Majority answer wins</td>
+</tr>
+<tr>
+<td><code>weighted</code></td>
+<td>Weight by confidence scores</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="output-stream-modes-detailed">Output Stream Modes (Detailed)</h2>
+<h3 id="why-output-modes-matter">Why Output Modes Matter</h3>
+<p>When a method uses 3 models, the question is: <strong>how many streams should flow to the next step?</strong></p>
+<ul>
+<li><strong>Single stream</strong> (default): Synthesize into one response for simple pipelines</li>
+<li><strong>All streams</strong>: Pass all model outputs for the next step to compare/judge</li>
+<li><strong>Top N streams</strong>: Only the best N by confidence</li>
+<li><strong>Threshold streams</strong>: Only those above a quality bar</li>
+</ul>
+<h3 id="mode-reference">Mode Reference</h3>
+<h4 id="single-default"><code>single</code> (Default)</h4>
+<pre><code>3 Models ──▶ Synthesize ──▶ 1 Stream ──▶ {{response}}</code></pre>
+<ul>
+<li><strong>Use when</strong>: Next step expects a single input</li>
+<li><strong>Output variable</strong>: <code>{{response}}</code></li>
+<li><strong>Example</strong>: GENERATE → CRITIQUE (critic evaluates one response)</li>
+</ul>
+<h4 id="all"><code>all</code></h4>
+<pre><code>3 Models ──▶ 3 Streams ──▶ {{responses}}[3]</code></pre>
+<ul>
+<li><strong>Use when</strong>: Next step needs to compare/synthesize multiple perspectives</li>
+<li><strong>Output variable</strong>: <code>{{responses}}</code> array</li>
+<li><strong>Example</strong>: 3x GENERATE → JUDGE_RESPONSES → pick best</li>
+</ul>
+<h4 id="top_n"><code>top_n</code></h4>
+<pre><code>3 Models ──▶ Sort by confidence ──▶ Top 2 ──▶ {{responses}}[2]</code></pre>
+<ul>
+<li><strong>Use when</strong>: You want diversity but filtered by quality</li>
+<li><strong>Config</strong>: <code>outputTopN: 2</code></li>
+<li><strong>Output variable</strong>: <code>{{responses}}</code> array</li>
+</ul>
+<h4 id="threshold"><code>threshold</code></h4>
+<pre><code>3 Models ──▶ Filter ≥80% ──▶ 0-3 Streams ──▶ {{responses}}[0-3]</code></pre>
+<ul>
+<li><strong>Use when</strong>: Only high-quality responses should proceed</li>
+<li><strong>Config</strong>: <code>outputThreshold: 0.8</code></li>
+<li><strong>Output variable</strong>: <code>{{responses}}</code> array (may be empty!)</li>
+</ul>
+<h3 id="configuration-examples">Configuration Examples</h3>
+<p><strong>Example 1: Multi-model critique with all perspectives</strong></p>
+<pre class="typescript"><code>{
+  stepName: &#39;Multi-Perspective Critique&#39;,
+  method: &#39;CRITIQUE_RESPONSE&#39;,
+  parallelExecution: {
+    enabled: true,
+    mode: &#39;all&#39;,
+    models: [&#39;openai/o1&#39;, &#39;claude-3-5-sonnet&#39;, &#39;deepseek-reasoner&#39;],
+    outputMode: &#39;all&#39;,                    // Pass all 3 critiques
+    preserveModelAttribution: true        // Know which model said what
+  }
+}
+// Next step receives {{responses}} with 3 critique objects</code></pre>
+<p><strong>Example 2: Best-of-3 generation</strong></p>
+<pre class="typescript"><code>{
+  stepName: &#39;Generate with Best Selection&#39;,
+  method: &#39;GENERATE_RESPONSE&#39;,
+  parallelExecution: {
+    enabled: true,
+    mode: &#39;all&#39;,
+    models: [&#39;claude-3-5-sonnet&#39;, &#39;gpt-4o&#39;, &#39;gemini-pro&#39;],
+    outputMode: &#39;top_n&#39;,
+    outputTopN: 1,                        // Only best response
+    synthesizeResults: false              // Don&#39;t merge, just pick
+  }
+}
+// Next step receives {{response}} (single best)</code></pre>
+<p><strong>Example 3: Quality-filtered ensemble</strong></p>
+<pre class="typescript"><code>{
+  stepName: &#39;High-Confidence Ensemble&#39;,
+  method: &#39;GENERATE_WITH_COT&#39;,
+  parallelExecution: {
+    enabled: true,
+    agiModelSelection: true,              // AGI picks models
+    minModels: 3,
+    maxModels: 5,
+    outputMode: &#39;threshold&#39;,
+    outputThreshold: 0.85,                // Only ≥85% confidence
+    preserveModelAttribution: true
+  }
+}
+// Next step receives {{responses}} with only high-confidence outputs</code></pre>
+<h3 id="stream-flow-diagrams">Stream Flow Diagrams</h3>
+<p><strong>Single Mode (Default)</strong></p>
+<pre><code>┌────────────┐  ┌────────────┐  ┌────────────┐
+│   o1       │  │   Claude   │  │  DeepSeek  │
+└─────┬──────┘  └─────┬──────┘  └─────┬──────┘
+      │               │               │
+      └───────────────┼───────────────┘
+                      ▼
+              ┌──────────────┐
+              │  Synthesize  │
+              └──────┬───────┘
+                     │
+                     ▼
+            {{response}} = &quot;...&quot;
+                     │
+                     ▼
+           ┌─────────────────┐
+           │    Next Step    │
+           │ (single input)  │
+           └─────────────────┘</code></pre>
+<p><strong>All Mode</strong></p>
+<pre><code>┌────────────┐  ┌────────────┐  ┌────────────┐
+│   o1       │  │   Claude   │  │  DeepSeek  │
+│ conf: 0.92 │  │ conf: 0.88 │  │ conf: 0.85 │
+└─────┬──────┘  └─────┬──────┘  └─────┬──────┘
+      │               │               │
+      ▼               ▼               ▼
+{{responses}} = [
+  { modelId: &#39;o1&#39;, response: &#39;...&#39;, confidence: 0.92 },
+  { modelId: &#39;claude&#39;, response: &#39;...&#39;, confidence: 0.88 },
+  { modelId: &#39;deepseek&#39;, response: &#39;...&#39;, confidence: 0.85 }
+]
+                      │
+                      ▼
+           ┌─────────────────┐
+           │    Next Step    │
+           │ (3 inputs)      │
+           │ JUDGE_RESPONSES │
+           └─────────────────┘</code></pre>
+<p><strong>Top N Mode (N=2)</strong></p>
+<pre><code>┌────────────┐  ┌────────────┐  ┌────────────┐
+│   o1       │  │   Claude   │  │  DeepSeek  │
+│ conf: 0.92 │  │ conf: 0.88 │  │ conf: 0.85 │
+└─────┬──────┘  └─────┬──────┘  └─────┬──────┘
+      │               │               │
+      ▼               ▼               ✗ (filtered out)
+{{responses}} = [
+  { modelId: &#39;o1&#39;, response: &#39;...&#39;, confidence: 0.92 },
+  { modelId: &#39;claude&#39;, response: &#39;...&#39;, confidence: 0.88 }
+]
+                      │
+                      ▼
+           ┌─────────────────┐
+           │    Next Step    │
+           │ (2 inputs)      │
+           └─────────────────┘</code></pre>
+<hr />
+<h2 id="model-modes">Model Modes</h2>
+<p>Each model can run in a specialized mode for optimal performance:</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 44%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>standard</code></td>
+<td>Default execution</td>
+<td>General tasks</td>
+</tr>
+<tr>
+<td><code>thinking</code></td>
+<td>Extended reasoning (o1, Claude thinking)</td>
+<td>Complex logic</td>
+</tr>
+<tr>
+<td><code>deep_research</code></td>
+<td>In-depth research mode</td>
+<td>Research tasks</td>
+</tr>
+<tr>
+<td><code>fast</code></td>
+<td>Speed-optimized (flash models)</td>
+<td>Simple queries</td>
+</tr>
+<tr>
+<td><code>creative</code></td>
+<td>Higher temperature</td>
+<td>Creative writing</td>
+</tr>
+<tr>
+<td><code>precise</code></td>
+<td>Low temperature, factual</td>
+<td>Data extraction</td>
+</tr>
+<tr>
+<td><code>code</code></td>
+<td>Code-specialized</td>
+<td>Programming</td>
+</tr>
+<tr>
+<td><code>vision</code></td>
+<td>Multimodal with vision</td>
+<td>Image analysis</td>
+</tr>
+<tr>
+<td><code>long_context</code></td>
+<td>Extended context handling</td>
+<td>Long documents</td>
+</tr>
+</tbody>
+</table>
+<h3 id="agi-model-selection-with-modes">AGI Model Selection with Modes</h3>
+<p>When <code>agiModelSelection: true</code>, the system: 1. Analyzes the prompt/domain 2. Scores available models 3. Assigns optimal modes to each 4. Selects 2-5 models automatically</p>
+<pre class="typescript"><code>// AGI selection result
+{
+  selectedModels: [
+    { modelId: &#39;openai/o1&#39;, mode: &#39;thinking&#39; },
+    { modelId: &#39;claude-3-5-sonnet&#39;, mode: &#39;standard&#39; },
+    { modelId: &#39;deepseek-reasoner&#39;, mode: &#39;deep_research&#39; }
+  ],
+  reasoning: &#39;Selected 3 models with reasoning modes for complex analysis task&#39;,
+  domainDetected: &#39;science&#39;,
+  executionStrategy: &#39;parallel&#39;
+}</code></pre>
+<hr />
+<h2 id="proficiency-system">Proficiency System</h2>
+<h3 id="overview-2">Overview</h3>
+<p>The proficiency system is the <strong>bridge between prompts and model selection</strong>. It enables domain-aware orchestration by scoring both <strong>domains</strong> and <strong>models</strong> across 8 dimensions.</p>
+<h3 id="proficiency-dimensions-1-10-scale">8 Proficiency Dimensions (1-10 scale)</h3>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 30%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Description</th>
+<th>High Score Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reasoning_depth</code></td>
+<td>Depth of logical reasoning required</td>
+<td>Complex deduction, multi-step logic</td>
+</tr>
+<tr>
+<td><code>mathematical_quantitative</code></td>
+<td>Mathematical/quantitative analysis</td>
+<td>Calculations, statistics, proofs</td>
+</tr>
+<tr>
+<td><code>code_generation</code></td>
+<td>Code writing/debugging capability</td>
+<td>Programming tasks</td>
+</tr>
+<tr>
+<td><code>creative_generative</code></td>
+<td>Creative/generative content</td>
+<td>Stories, art, brainstorming</td>
+</tr>
+<tr>
+<td><code>research_synthesis</code></td>
+<td>Research and synthesis ability</td>
+<td>Literature review, analysis</td>
+</tr>
+<tr>
+<td><code>factual_recall_precision</code></td>
+<td>Factual accuracy requirements</td>
+<td>Facts, definitions, dates</td>
+</tr>
+<tr>
+<td><code>multi_step_problem_solving</code></td>
+<td>Complex problem decomposition</td>
+<td>Breaking down hard problems</td>
+</tr>
+<tr>
+<td><code>domain_terminology_handling</code></td>
+<td>Domain-specific jargon handling</td>
+<td>Technical vocabulary</td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-proficiencies-flow-through-the-system">How Proficiencies Flow Through the System</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│  USER PROMPT: &quot;Derive the Navier-Stokes equations for incompressible flow&quot; │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 1: DOMAIN DETECTION                                                    │
+│                                                                              │
+│  Matched: Science → Physics → Fluid Dynamics                                │
+│  Confidence: 0.94                                                            │
+│                                                                              │
+│  Detected Keywords: &quot;Navier-Stokes&quot;, &quot;equations&quot;, &quot;incompressible&quot;, &quot;derive&quot;│
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 2: PROFICIENCY EXTRACTION                                              │
+│                                                                              │
+│  Each level has proficiency scores that get MERGED:                         │
+│                                                                              │
+│  Field (Science):              Domain (Physics):         Subspecialty (Fluid):
+│  ├─ reasoning: 8               ├─ reasoning: 9           ├─ reasoning: 9
+│  ├─ math: 7                    ├─ math: 10               ├─ math: 10
+│  ├─ code: 3                    ├─ code: 4                ├─ code: 5
+│  ├─ creative: 4                ├─ creative: 3            ├─ creative: 2
+│  ├─ research: 7                ├─ research: 8            ├─ research: 7
+│  ├─ factual: 8                 ├─ factual: 9             ├─ factual: 8
+│  ├─ multi_step: 7              ├─ multi_step: 9          ├─ multi_step: 10
+│  └─ terminology: 6             └─ terminology: 8         └─ terminology: 9
+│                                                                              │
+│  MERGED PROFICIENCIES (weighted by specificity):                            │
+│  {                                                                           │
+│    reasoning_depth: 9,                                                       │
+│    mathematical_quantitative: 10,                                            │
+│    code_generation: 5,                                                       │
+│    creative_generative: 2,                                                   │
+│    research_synthesis: 7,                                                    │
+│    factual_recall_precision: 8,                                              │
+│    multi_step_problem_solving: 10,                                           │
+│    domain_terminology_handling: 9                                            │
+│  }                                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 3: ORCHESTRATION MODE SELECTION                                        │
+│                                                                              │
+│  Proficiency-based rules:                                                    │
+│  ├─ reasoning_depth &gt;= 9 AND multi_step &gt;= 9 → extended_thinking ✓          │
+│  ├─ code_generation &gt;= 8 → coding                                           │
+│  ├─ creative_generative &gt;= 8 → creative                                     │
+│  ├─ research_synthesis &gt;= 8 → research                                      │
+│  └─ mathematical_quantitative &gt;= 8 → analysis                               │
+│                                                                              │
+│  Selected: extended_thinking                                                 │
+│  Reason: &quot;Complex reasoning required based on domain proficiencies&quot;          │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 4: MODEL MATCHING                                                      │
+│                                                                              │
+│  Each model has proficiency scores. Match against domain requirements:      │
+│                                                                              │
+│  Model: OpenAI o1                    Match Score: 94%                        │
+│  ├─ reasoning: 10 (need 9) ✓ +1                                              │
+│  ├─ math: 9 (need 10) -1                                                     │
+│  ├─ multi_step: 10 (need 10) ✓                                               │
+│  └─ Strengths: [reasoning, multi_step, math]                                 │
+│                                                                              │
+│  Model: Claude 3.5 Sonnet            Match Score: 87%                        │
+│  ├─ reasoning: 9 (need 9) ✓                                                  │
+│  ├─ math: 8 (need 10) -2                                                     │
+│  └─ Strengths: [reasoning, research, terminology]                            │
+│                                                                              │
+│  Model: DeepSeek Reasoner            Match Score: 91%                        │
+│  ├─ reasoning: 10 (need 9) ✓ +1                                              │
+│  ├─ math: 10 (need 10) ✓                                                     │
+│  └─ Strengths: [math, reasoning, code]                                       │
+│                                                                              │
+│  SELECTED: o1 (primary), DeepSeek (fallback), Claude (fallback)              │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 5: EXECUTION                                                           │
+│                                                                              │
+│  parallelExecution: {                                                        │
+│    enabled: true,                                                            │
+│    models: [&#39;openai/o1&#39;, &#39;deepseek-reasoner&#39;],  // Both strong in math+reason│
+│    mode: &#39;all&#39;,                                                              │
+│    outputMode: &#39;top_n&#39;,                                                      │
+│    outputTopN: 1,  // Pick best                                              │
+│    synthesisStrategy: &#39;best_of&#39;                                              │
+│  }                                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="proficiency-types-in-the-hierarchy">Proficiency Types in the Hierarchy</h3>
+<pre><code>Field (Top Level)
+└── field_proficiencies: ProficiencyScores
+    │
+    └── Domain (Middle Level)
+        └── domain_proficiencies: ProficiencyScores
+            │
+            └── Subspecialty (Leaf Level)
+                └── subspecialty_proficiencies: ProficiencyScores</code></pre>
+<h3 id="model-proficiency-matching">Model Proficiency Matching</h3>
+<pre class="typescript"><code>interface ModelProficiencyMatch {
+  model_id: string;
+  provider: string;
+  model_name: string;
+  match_score: number;           // 0-100 overall match
+  dimension_scores: Record&lt;ProficiencyDimension, number&gt;;
+  strengths: ProficiencyDimension[];
+  weaknesses: ProficiencyDimension[];
+  recommended: boolean;
+  ranking: number;
+}</code></pre>
+<h3 id="proficiency-mode-decision-table">Proficiency → Mode Decision Table</h3>
+<table>
+<colgroup>
+<col style="width: 46%" />
+<col style="width: 38%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th>Proficiency Condition</th>
+<th>Orchestration Mode</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reasoning_depth &gt;= 9</code> AND <code>multi_step &gt;= 9</code></td>
+<td><code>extended_thinking</code></td>
+<td>Complex logical reasoning</td>
+</tr>
+<tr>
+<td><code>code_generation &gt;= 8</code></td>
+<td><code>coding</code></td>
+<td>Programming task</td>
+</tr>
+<tr>
+<td><code>creative_generative &gt;= 8</code></td>
+<td><code>creative</code></td>
+<td>Creative writing</td>
+</tr>
+<tr>
+<td><code>research_synthesis &gt;= 8</code></td>
+<td><code>research</code></td>
+<td>Research/analysis</td>
+</tr>
+<tr>
+<td><code>mathematical_quantitative &gt;= 8</code></td>
+<td><code>analysis</code></td>
+<td>Quantitative work</td>
+</tr>
+<tr>
+<td>High <code>factual_recall</code> + sensitive topic</td>
+<td><code>self_consistency</code></td>
+<td>Accuracy critical</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>thinking</code></td>
+<td>Standard reasoning</td>
+</tr>
+</tbody>
+</table>
+<h3 id="proficiency-model-strengths-mapping">Proficiency → Model Strengths Mapping</h3>
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 52%" />
+<col style="width: 27%" />
+</colgroup>
+<thead>
+<tr>
+<th>Model</th>
+<th>Top Proficiencies</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenAI o1</td>
+<td>reasoning_depth (10), multi_step (10)</td>
+<td>Complex reasoning</td>
+</tr>
+<tr>
+<td>Claude 3.5 Sonnet</td>
+<td>reasoning (9), research (9), terminology (9)</td>
+<td>Research, analysis</td>
+</tr>
+<tr>
+<td>DeepSeek Reasoner</td>
+<td>math (10), reasoning (10), code (8)</td>
+<td>Math, logic, code</td>
+</tr>
+<tr>
+<td>GPT-4o</td>
+<td>creative (8), research (8), factual (8)</td>
+<td>General, creative</td>
+</tr>
+<tr>
+<td>Gemini Pro</td>
+<td>math (8), code (8), research (8)</td>
+<td>Technical analysis</td>
+</tr>
+<tr>
+<td>Claude Haiku</td>
+<td>factual (7), terminology (7)</td>
+<td>Quick answers</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-proficiency-driven-workflow">Example: Proficiency-Driven Workflow</h3>
+<pre class="typescript"><code>// 1. Detect domain and get proficiencies
+const detection = await domainTaxonomyService.detectDomain(prompt);
+// Returns: { merged_proficiencies: { reasoning_depth: 9, math: 10, ... } }
+
+// 2. Determine orchestration mode from proficiencies
+const mode = determineOrchestrationMode(detection.merged_proficiencies);
+// Returns: &#39;extended_thinking&#39; (because reasoning &gt;= 9 and multi_step &gt;= 9)
+
+// 3. Match models to proficiencies
+const matches = await domainTaxonomyService.getMatchingModels(
+  detection.merged_proficiencies,
+  { max_models: 3, min_match_score: 80 }
+);
+// Returns: [{ model_id: &#39;o1&#39;, match_score: 94 }, { model_id: &#39;deepseek&#39;, match_score: 91 }]
+
+// 4. Execute with matched models
+const result = await orchestrationService.executeWorkflow({
+  workflowCode: &#39;EXTENDED_THINKING_DUAL&#39;,
+  parallelExecution: {
+    enabled: true,
+    models: matches.map(m =&gt; m.model_id),
+    outputMode: &#39;top_n&#39;,
+    outputTopN: 1
+  }
+});</code></pre>
+<h3 id="admin-viewing-proficiencies">Admin: Viewing Proficiencies</h3>
+<p><strong>Admin Dashboard</strong> → <strong>Orchestration</strong> → <strong>Methods</strong> → <strong>Parallel &amp; Streams</strong> tab</p>
+<p>Shows: - Domain proficiency requirements for the task - Model match scores - Which dimensions drove model selection - Output stream configuration</p>
+<hr />
+<h2 id="agi-brain-workflow-integration">AGI Brain + Workflow Integration</h2>
+<p>The AGI Brain Planner can <strong>select and configure workflows</strong> to solve problems. Users can either let the AGI choose the optimal workflow or specify their preferences.</p>
+<h3 id="user-choices-for-workflows">User Choices for Workflows</h3>
+<pre class="typescript"><code>interface GeneratePlanRequest {
+  prompt: string;
+  tenantId: string;
+  userId: string;
+  
+  // ... other options ...
+  
+  // Workflow Selection - User choices
+  preferredWorkflow?: string;           // User-selected workflow code
+  workflowParameterOverrides?: Record&lt;string, unknown&gt;;  // User parameter tweaks
+  allowAgiWorkflowSelection?: boolean;  // Let AGI pick workflow (default: true)
+  excludeWorkflows?: string[];          // Workflows to exclude from selection
+}</code></pre>
+<h3 id="how-agi-selects-workflows">How AGI Selects Workflows</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│  PROMPT: &quot;Write a comprehensive analysis of renewable energy trends&quot;        │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 1: Check User Preference                                               │
+│                                                                              │
+│  Did user specify preferredWorkflow?                                         │
+│  ├─ YES → Use that workflow with user&#39;s parameter overrides                 │
+│  └─ NO  → Continue to AGI selection                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 2: AGI Workflow Selection                                              │
+│                                                                              │
+│  orchestrationPatternsService.selectPattern({                                │
+│    prompt: &quot;Write a comprehensive analysis...&quot;,                              │
+│    taskType: &quot;research&quot;,                                                     │
+│    complexity: &quot;complex&quot;,                                                    │
+│    qualityPriority: 0.9,                                                     │
+│    costSensitive: false,                                                     │
+│    excludePatterns: user.excludeWorkflows                                    │
+│  })                                                                          │
+│                                                                              │
+│  Scores 49 available workflows against problem characteristics               │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 3: Selected Workflow                                                   │
+│                                                                              │
+│  selectedWorkflow: {                                                         │
+│    workflowCode: &#39;RESEARCH_SYNTHESIS_MULTI&#39;,                                │
+│    workflowName: &#39;Multi-Model Research Synthesis&#39;,                          │
+│    selectionReason: &#39;Matches research task, high quality priority&#39;,         │
+│    selectionConfidence: 0.89,                                                │
+│    selectionMethod: &#39;auto&#39;                                                   │
+│  }                                                                           │
+│                                                                              │
+│  alternatives: [                                                             │
+│    { workflowCode: &#39;CHAIN_OF_THOUGHT&#39;, matchScore: 0.82 },                  │
+│    { workflowCode: &#39;SELF_CONSISTENCY&#39;, matchScore: 0.78 }                   │
+│  ]                                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 4: Workflow Steps with Parameters                                      │
+│                                                                              │
+│  workflowSteps: [                                                            │
+│    {                                                                         │
+│      methodCode: &#39;DECOMPOSE_PROBLEM&#39;,                                        │
+│      parameterOverrides: { max_subproblems: 5 }                              │
+│    },                                                                        │
+│    {                                                                         │
+│      methodCode: &#39;GENERATE_RESPONSE&#39;,                                        │
+│      isParallel: true,                                                       │
+│      parallelConfig: {                                                       │
+│        models: [&#39;claude-3-5-sonnet&#39;, &#39;gpt-4o&#39;, &#39;gemini-pro&#39;],               │
+│        outputMode: &#39;all&#39;  // 3 streams to next step                         │
+│      }                                                                       │
+│    },                                                                        │
+│    {                                                                         │
+│      methodCode: &#39;SYNTHESIZE_RESPONSES&#39;,                                     │
+│      parameterOverrides: { combination_strategy: &#39;best_parts&#39; }              │
+│    }                                                                         │
+│  ]                                                                           │
+│                                                                              │
+│  workflowConfig: {                                                           │
+│    ...defaultConfig,                                                         │
+│    ...userParameterOverrides  // User&#39;s tweaks merged in                     │
+│  }                                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="example-user-specifies-workflow-parameters">Example: User Specifies Workflow + Parameters</h3>
+<pre class="typescript"><code>// User explicitly chooses a workflow and tweaks parameters
+const plan = await agiBrainPlannerService.generatePlan({
+  prompt: &quot;Debug this React component that crashes on mount&quot;,
+  tenantId: &quot;tenant-123&quot;,
+  userId: &quot;user-456&quot;,
+  
+  // User choices
+  preferredWorkflow: &#39;SELF_REFINE_LOOP&#39;,  // User picks this workflow
+  workflowParameterOverrides: {
+    max_iterations: 5,                     // More refinement rounds
+    temperature: 0.2,                      // More precise
+    refinement_focus: &#39;accuracy&#39;
+  }
+});
+
+// Result includes:
+// - selectedWorkflow.selectionMethod = &#39;user&#39;
+// - workflowConfig merged with user overrides
+// - workflowSteps configured with user parameters</code></pre>
+<h3 id="example-agi-auto-selects-workflow">Example: AGI Auto-Selects Workflow</h3>
+<pre class="typescript"><code>// Let AGI choose the best workflow
+const plan = await agiBrainPlannerService.generatePlan({
+  prompt: &quot;Compare the economic policies of three countries&quot;,
+  tenantId: &quot;tenant-123&quot;,
+  userId: &quot;user-456&quot;,
+  
+  allowAgiWorkflowSelection: true,  // default
+  excludeWorkflows: [&#39;FAST_SIMPLE&#39;]  // User says: not this one
+});
+
+// AGI analyzes prompt and selects:
+// - selectedWorkflow.workflowCode = &#39;MULTI_AGENT_DEBATE&#39;
+// - selectedWorkflow.selectionMethod = &#39;domain_match&#39;
+// - selectedWorkflow.selectionReason = &#39;Comparison task benefits from debate&#39;
+// - alternatives = [other matching workflows]</code></pre>
+<h3 id="plan-output-with-workflow">Plan Output with Workflow</h3>
+<pre class="typescript"><code>interface AGIBrainPlan {
+  // ... existing fields ...
+  
+  // Workflow Integration
+  selectedWorkflow?: {
+    workflowId: string;
+    workflowCode: string;
+    workflowName: string;
+    description: string;
+    category: string;
+    selectionReason: string;
+    selectionConfidence: number;
+    selectionMethod: &#39;auto&#39; | &#39;user&#39; | &#39;domain_match&#39;;
+  };
+  
+  workflowSteps?: Array&lt;{
+    bindingId: string;
+    stepOrder: number;
+    methodCode: string;
+    methodName: string;
+    parameterOverrides: Record&lt;string, unknown&gt;;
+    dependsOn: string[];
+    isParallel: boolean;
+    parallelConfig?: {
+      models: string[];
+      outputMode: &#39;single&#39; | &#39;all&#39; | &#39;top_n&#39; | &#39;threshold&#39;;
+    };
+  }&gt;;
+  
+  workflowConfig?: Record&lt;string, unknown&gt;;
+  
+  alternativeWorkflows?: Array&lt;{
+    workflowCode: string;
+    workflowName: string;
+    matchScore: number;
+    reason: string;
+  }&gt;;
+}</code></pre>
+<hr />
+<h2 id="specialty-categories-domain-expertise">Specialty Categories (Domain Expertise)</h2>
+<blockquote>
+<p><strong>Full Documentation</strong>: See <a href="./SPECIALTY-RANKING.md">SPECIALTY-RANKING.md</a> for complete details on the specialty ranking system, AI-powered research, admin controls, and database schema.</p>
+</blockquote>
+<p>In addition to the 8 proficiency dimensions, models are ranked across <strong>20 specialty categories</strong> representing domain-specific expertise:</p>
+<h3 id="specialty-categories">Specialty Categories</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Icon</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reasoning</code></td>
+<td>🧠</td>
+<td>Reasoning &amp; Logic</td>
+</tr>
+<tr>
+<td><code>coding</code></td>
+<td>💻</td>
+<td>Code Generation</td>
+</tr>
+<tr>
+<td><code>math</code></td>
+<td>📐</td>
+<td>Mathematics</td>
+</tr>
+<tr>
+<td><code>creative</code></td>
+<td>✍️</td>
+<td>Creative Writing</td>
+</tr>
+<tr>
+<td><code>analysis</code></td>
+<td>📊</td>
+<td>Data Analysis</td>
+</tr>
+<tr>
+<td><code>research</code></td>
+<td>🔬</td>
+<td>Research &amp; Synthesis</td>
+</tr>
+<tr>
+<td><code>legal</code></td>
+<td>⚖️</td>
+<td>Legal &amp; Compliance</td>
+</tr>
+<tr>
+<td><code>medical</code></td>
+<td>🏥</td>
+<td>Medical &amp; Healthcare</td>
+</tr>
+<tr>
+<td><code>finance</code></td>
+<td>💰</td>
+<td>Finance &amp; Trading</td>
+</tr>
+<tr>
+<td><code>science</code></td>
+<td>🔭</td>
+<td>Scientific</td>
+</tr>
+<tr>
+<td><code>debugging</code></td>
+<td>🐛</td>
+<td>Debugging &amp; QA</td>
+</tr>
+<tr>
+<td><code>architecture</code></td>
+<td>🏗️</td>
+<td>System Architecture</td>
+</tr>
+<tr>
+<td><code>security</code></td>
+<td>🔐</td>
+<td>Security</td>
+</tr>
+<tr>
+<td><code>vision</code></td>
+<td>👁️</td>
+<td>Vision &amp; Images</td>
+</tr>
+<tr>
+<td><code>audio</code></td>
+<td>🎤</td>
+<td>Audio &amp; Speech</td>
+</tr>
+<tr>
+<td><code>conversation</code></td>
+<td>💬</td>
+<td>Conversational</td>
+</tr>
+<tr>
+<td><code>instruction</code></td>
+<td>📋</td>
+<td>Instruction Following</td>
+</tr>
+<tr>
+<td><code>speed</code></td>
+<td>⚡</td>
+<td>Low Latency</td>
+</tr>
+<tr>
+<td><code>accuracy</code></td>
+<td>🎯</td>
+<td>High Accuracy</td>
+</tr>
+<tr>
+<td><code>safety</code></td>
+<td>🛡️</td>
+<td>Safety &amp; Alignment</td>
+</tr>
+</tbody>
+</table>
+<h3 id="two-layer-proficiency-system">Two-Layer Proficiency System</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│  LAYER 1: TASK PROFICIENCY DIMENSIONS (8)                                    │
+│  From domain taxonomy - &quot;What capabilities does this task need?&quot;             │
+│                                                                              │
+│  ├─ reasoning_depth              Multi-step logical thinking                │
+│  ├─ mathematical_quantitative    Calculations, proofs, statistics           │
+│  ├─ code_generation              Programming tasks                          │
+│  ├─ creative_generative          Stories, art, ideas                        │
+│  ├─ research_synthesis           Literature review, analysis                │
+│  ├─ factual_recall_precision     Facts, definitions, accuracy               │
+│  ├─ multi_step_problem_solving   Breaking down complex problems             │
+│  └─ domain_terminology_handling  Technical vocabulary                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    │ Drives
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  LAYER 2: SPECIALTY CATEGORIES (20)                                          │
+│  Per-model rankings - &quot;How good is each model in each specialty?&quot;            │
+│                                                                              │
+│  Domain Expertise:                Performance Attributes:                   │
+│  ├─ 🏥 medical                    ├─ ⚡ speed                                │
+│  ├─ ⚖️ legal                      ├─ 🎯 accuracy                             │
+│  ├─ 💰 finance                    ├─ 🛡️ safety                               │
+│  ├─ 🔭 science                    └─ 📋 instruction                          │
+│  ├─ 🔐 security                                                              │
+│  └─ 🏗️ architecture               Modalities:                               │
+│                                    ├─ 👁️ vision                              │
+│  Task Capabilities:                └─ 🎤 audio                               │
+│  ├─ 🧠 reasoning                                                             │
+│  ├─ 💻 coding                                                                │
+│  ├─ 📐 math                                                                  │
+│  ├─ ✍️ creative                                                              │
+│  ├─ 📊 analysis                                                              │
+│  ├─ 🔬 research                                                              │
+│  ├─ 🐛 debugging                                                             │
+│  └─ 💬 conversation                                                          │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="how-both-layers-work-together">How Both Layers Work Together</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│  PROMPT: &quot;Analyze this ECG reading and suggest treatment options&quot;            │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 1: Domain Detection                                                    │
+│  → Field: Medicine → Domain: Cardiology → Subspecialty: Diagnostics          │
+│  → Confidence: 0.91                                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 2: Extract TASK PROFICIENCY Requirements                               │
+│                                                                              │
+│  From domain taxonomy:                                                       │
+│  {                                                                           │
+│    reasoning_depth: 8,              // Diagnostic reasoning                 │
+│    mathematical_quantitative: 5,    // Some measurements                    │
+│    factual_recall_precision: 9,     // Medical accuracy critical            │
+│    research_synthesis: 7,           // Treatment guidelines                 │
+│    domain_terminology_handling: 10  // Medical jargon                       │
+│  }                                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 3: Query SPECIALTY RANKINGS for Models                                 │
+│                                                                              │
+│  Required specialties: medical + accuracy + safety + research                │
+│                                                                              │
+│  Model Specialty Scores:                                                     │
+│  ┌───────────────────────┬──────────┬──────────┬────────┬──────────┐        │
+│  │ Model                 │ 🏥 Medical│ 🎯 Accuracy│ 🛡️ Safety│ 🔬 Research│        │
+│  ├───────────────────────┼──────────┼──────────┼────────┼──────────┤        │
+│  │ Claude 3.5 Sonnet     │ 92 (A)   │ 91 (A)   │ 95 (S) │ 90 (A)   │        │
+│  │ GPT-4o                │ 88 (A)   │ 89 (A)   │ 90 (A) │ 87 (A)   │        │
+│  │ DeepSeek Medical*     │ 95 (S)   │ 85 (B)   │ 88 (A) │ 82 (B)   │        │
+│  │ Gemini Pro            │ 84 (B)   │ 86 (B)   │ 89 (A) │ 88 (A)   │        │
+│  └───────────────────────┴──────────┴──────────┴────────┴──────────┘        │
+│                                                                              │
+│  * Self-hosted domain-specific model                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 4: Combined Scoring                                                    │
+│                                                                              │
+│  Final Score = TaskProficiencyMatch × SpecialtyScore × SafetyWeight         │
+│                                                                              │
+│  Claude 3.5 Sonnet: 0.88 × 92 × 1.2 = 97.2 ← SELECTED (primary)             │
+│  DeepSeek Medical:  0.82 × 95 × 1.0 = 77.9 ← SELECTED (fallback)            │
+│  GPT-4o:            0.85 × 88 × 1.1 = 82.3 ← SELECTED (fallback)            │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 5: Execution with Multi-Model                                          │
+│                                                                              │
+│  parallelExecution: {                                                        │
+│    enabled: true,                                                            │
+│    models: [&#39;claude-3-5-sonnet&#39;, &#39;deepseek-medical&#39;, &#39;gpt-4o&#39;],              │
+│    outputMode: &#39;threshold&#39;,                                                  │
+│    outputThreshold: 0.85,  // Only high-confidence medical advice            │
+│    synthesisStrategy: &#39;weighted&#39;  // Weight by specialty scores              │
+│  }                                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="specialty-ranking-structure">Specialty Ranking Structure</h3>
+<pre class="typescript"><code>interface SpecialtyRanking {
+  rankingId: string;
+  modelId: string;
+  provider: string;
+  specialty: SpecialtyCategory;     // &#39;medical&#39;, &#39;legal&#39;, &#39;coding&#39;, etc.
+  proficiencyScore: number;          // 0-100 overall score
+  benchmarkScore: number;            // 0-100 from published benchmarks
+  communityScore: number;            // 0-100 from community reviews
+  internalScore: number;             // 0-100 from internal usage data
+  rank: number;                      // Global rank for this specialty
+  percentile: number;                // e.g., top 10%
+  tier: &#39;S&#39; | &#39;A&#39; | &#39;B&#39; | &#39;C&#39; | &#39;D&#39; | &#39;F&#39;;  // Quality tier
+  confidence: number;                // 0-1 confidence in assessment
+  trend: &#39;improving&#39; | &#39;stable&#39; | &#39;declining&#39;;
+  adminOverride?: number;            // Admin can lock a score
+  isLocked: boolean;
+}</code></pre>
+<h3 id="tier-system">Tier System</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Score Range</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>S</strong></td>
+<td>95-100</td>
+<td>Elite - Best-in-class for this specialty</td>
+</tr>
+<tr>
+<td><strong>A</strong></td>
+<td>85-94</td>
+<td>Excellent - Highly recommended</td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td>75-84</td>
+<td>Good - Solid performance</td>
+</tr>
+<tr>
+<td><strong>C</strong></td>
+<td>65-74</td>
+<td>Average - Acceptable</td>
+</tr>
+<tr>
+<td><strong>D</strong></td>
+<td>50-64</td>
+<td>Below Average - Use with caution</td>
+</tr>
+<tr>
+<td><strong>F</strong></td>
+<td>0-49</td>
+<td>Poor - Not recommended</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-model-specialty-profiles">Example: Model Specialty Profiles</h3>
+<p><strong>Claude 3.5 Sonnet</strong></p>
+<pre><code>🧠 reasoning:     94 (S)  │████████████████████░░░░│
+💻 coding:        95 (S)  │████████████████████░░░░│
+📐 math:          88 (A)  │██████████████████░░░░░░│
+✍️ creative:      92 (A)  │███████████████████░░░░░│
+🏥 medical:       92 (A)  │███████████████████░░░░░│
+⚖️ legal:         89 (A)  │██████████████████░░░░░░│
+🔐 security:      91 (A)  │███████████████████░░░░░│
+🛡️ safety:        95 (S)  │████████████████████░░░░│</code></pre>
+<p><strong>OpenAI o1</strong></p>
+<pre><code>🧠 reasoning:     98 (S)  │█████████████████████░░░│
+💻 coding:        90 (A)  │██████████████████░░░░░░│
+📐 math:          96 (S)  │████████████████████░░░░│
+✍️ creative:      75 (B)  │███████████████░░░░░░░░░│
+🏥 medical:       85 (B)  │█████████████████░░░░░░░│
+⚖️ legal:         88 (A)  │██████████████████░░░░░░│
+🔐 security:      89 (A)  │██████████████████░░░░░░│
+🛡️ safety:        92 (A)  │███████████████████░░░░░│</code></pre>
+<p><strong>DeepSeek Coder</strong></p>
+<pre><code>🧠 reasoning:     85 (B)  │█████████████████░░░░░░░│
+💻 coding:        96 (S)  │████████████████████░░░░│
+📐 math:          92 (A)  │███████████████████░░░░░│
+✍️ creative:      65 (C)  │█████████████░░░░░░░░░░░│
+🐛 debugging:     94 (S)  │███████████████████░░░░░│
+🏗️ architecture: 88 (A)  │██████████████████░░░░░░│
+⚡ speed:         90 (A)  │██████████████████░░░░░░│</code></pre>
+<h3 id="ai-powered-research">AI-Powered Research</h3>
+<p>The specialty rankings are maintained through <strong>automated AI research</strong>:</p>
+<pre class="typescript"><code>// Research model proficiency across all specialties
+const result = await specialtyRankingService.researchModelProficiency(&#39;anthropic/claude-3-5-sonnet&#39;);
+
+// Research all models for a specific specialty
+const result = await specialtyRankingService.researchSpecialtyRankings(&#39;medical&#39;);</code></pre>
+<p>Research sources include: - Published benchmarks (MMLU, HumanEval, MATH, etc.) - Community reviews and feedback - Internal usage data and quality scores - Domain-specific evaluations</p>
+<h3 id="admin-controls">Admin Controls</h3>
+<p>Admins can: - <strong>Override scores</strong>: Lock a model’s specialty score - <strong>View leaderboards</strong>: See top models per specialty - <strong>Trigger research</strong>: Refresh rankings from latest data - <strong>Configure weights</strong>: Adjust benchmark vs community vs internal weighting</p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

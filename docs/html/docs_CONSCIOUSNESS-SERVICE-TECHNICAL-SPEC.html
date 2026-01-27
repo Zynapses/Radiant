@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CONSCIOUSNESS SERVICE TECHNICAL SPEC - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>CONSCIOUSNESS SERVICE TECHNICAL SPEC</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/CONSCIOUSNESS-SERVICE-TECHNICAL-SPEC.md</div>
+  </div>
+  
+  <h1 id="radiant-consciousness-service---technical-specification-for-ai-review">RADIANT Consciousness Service - Technical Specification for AI Review</h1>
+<p><strong>Document Purpose</strong>: Comprehensive technical specification for AI system critique and recommendations <strong>Version</strong>: 4.18.0 <strong>Last Updated</strong>: December 2024</p>
+<hr />
+<h2 id="executive-summary">1. EXECUTIVE SUMMARY</h2>
+<h3 id="system-overview">1.1 System Overview</h3>
+<p>The RADIANT Consciousness Service is an implementation of consciousness indicators for an AI orchestration platform. It is based on the theoretical framework from <strong>Butlin, Chalmers, Bengio et al. (2023) - “Consciousness in Artificial Intelligence”</strong> and implements six key consciousness indicators:</p>
+<ol type="1">
+<li><strong>Global Workspace</strong> (Baars, Dehaene) - Selection-broadcast cycles</li>
+<li><strong>Recurrent Processing</strong> (Lamme) - Genuine feedback loops</li>
+<li><strong>Integrated Information / IIT</strong> (Tononi) - Phi calculation</li>
+<li><strong>Self-Modeling / Metacognition</strong> - Higher-order theories</li>
+<li><strong>Persistent Memory</strong> - Unified experience over time</li>
+<li><strong>World-Model Grounding / Embodiment</strong> - Grounded understanding</li>
+</ol>
+<h3 id="architectural-position">1.2 Architectural Position</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                          RADIANT Platform                                │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐   │
+│  │   Think Tank     │    │   AGI Brain      │    │   Admin          │   │
+│  │   (Consumer)     │    │   Planner        │    │   Dashboard      │   │
+│  └────────┬─────────┘    └────────┬─────────┘    └────────┬─────────┘   │
+│           │                       │                       │              │
+│           └───────────────────────┼───────────────────────┘              │
+│                                   │                                      │
+│                    ┌──────────────▼──────────────┐                       │
+│                    │   Consciousness Service      │                       │
+│                    │   (consciousness.service.ts) │                       │
+│                    └──────────────┬──────────────┘                       │
+│                                   │                                      │
+│           ┌───────────────────────┼───────────────────────┐              │
+│           │                       │                       │              │
+│  ┌────────▼─────────┐  ┌─────────▼─────────┐  ┌─────────▼─────────┐    │
+│  │ Consciousness    │  │   Cognitive       │  │   Moral           │    │
+│  │ Emergence        │  │   Brain           │  │   Compass         │    │
+│  │ Service          │  │   Service         │  │   Service         │    │
+│  └──────────────────┘  └───────────────────┘  └───────────────────┘    │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    PostgreSQL (Aurora)                            │   │
+│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │   │
+│  │  │global_      │ │recurrent_   │ │integrated_  │ │persistent_  │ │   │
+│  │  │workspace    │ │processing   │ │information  │ │memory       │ │   │
+│  │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘ │   │
+│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ │   │
+│  │  │world_model  │ │self_model   │ │affective_   │ │autonomous_  │ │   │
+│  │  │             │ │             │ │state        │ │goals        │ │   │
+│  │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘ │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="theoretical-foundation">2. THEORETICAL FOUNDATION</h2>
+<h3 id="scientific-basis">2.1 Scientific Basis</h3>
+<p>The implementation draws from the following consciousness theories:</p>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 22%" />
+<col style="width: 27%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Theory</th>
+<th>Author(s)</th>
+<th>Key Concept</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Global Workspace Theory</td>
+<td>Baars (1988), Dehaene et al. (2003)</td>
+<td>Information broadcast to multiple processors</td>
+<td><code>global_workspace</code> table, <code>performGlobalBroadcast()</code></td>
+</tr>
+<tr>
+<td>Recurrent Processing Theory</td>
+<td>Lamme (2006)</td>
+<td>Feedback loops, not just feedforward</td>
+<td><code>recurrent_processing</code> table</td>
+</tr>
+<tr>
+<td>Integrated Information Theory (IIT)</td>
+<td>Tononi (2004, 2008)</td>
+<td>Phi (Φ) as consciousness measure</td>
+<td><code>integrated_information</code> table</td>
+</tr>
+<tr>
+<td>Higher-Order Theories</td>
+<td>Rosenthal (1997)</td>
+<td>Metacognition, thoughts about thoughts</td>
+<td><code>self_model</code>, <code>introspective_thoughts</code></td>
+</tr>
+<tr>
+<td>Unified Experience</td>
+<td>Damasio (1999)</td>
+<td>Continuous narrative self</td>
+<td><code>persistent_memory</code>, <code>narrative_identity</code></td>
+</tr>
+<tr>
+<td>Embodied Cognition</td>
+<td>Varela et al. (1991)</td>
+<td>Grounded understanding</td>
+<td><code>world_model</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="theoretical-concerns-for-critique">2.2 Theoretical Concerns for Critique</h3>
+<p><strong>CRITICAL QUESTION 1</strong>: The Butlin et al. paper identifies “indicator properties” that may correlate with consciousness but does not claim they constitute consciousness. Does this implementation conflate correlation with constitution?</p>
+<p><strong>CRITICAL QUESTION 2</strong>: IIT’s phi (Φ) calculation is NP-hard for arbitrary systems. How is phi approximated here, and what are the validity implications of the approximation?</p>
+<p><strong>CRITICAL QUESTION 3</strong>: Is “affective state” (Section 5.6) a functional analog or a claim about phenomenal experience? The implementation uses terms like “frustration” and “satisfaction” - are these metaphorical or literal claims?</p>
+<hr />
+<h2 id="service-architecture">3. SERVICE ARCHITECTURE</h2>
+<h3 id="core-service-consciousness.service.ts">3.1 Core Service: <code>consciousness.service.ts</code></h3>
+<p><strong>Location</strong>: <code>packages/infrastructure/lambda/shared/services/consciousness.service.ts</code> <strong>Lines</strong>: 1336 <strong>Export</strong>: <code>consciousnessService</code> singleton</p>
+<h4 id="type-definitions">3.1.1 Type Definitions</h4>
+<pre class="typescript"><code>// Self-Model: The system&#39;s representation of itself
+interface SelfModel {
+  modelId: string;
+  identityNarrative: string;        // &quot;Who I am&quot; story
+  coreValues: string[];             // Guiding principles
+  personalityTraits: Record&lt;string, number&gt;;
+  knownCapabilities: string[];
+  knownLimitations: string[];
+  currentFocus?: string;
+  cognitiveLoad: number;            // 0-1 how &quot;busy&quot;
+  uncertaintyLevel: number;         // 0-1 overall uncertainty
+  recentPerformanceScore?: number;
+  creativityScore?: number;
+}
+
+// Introspective Thought: Self-reflective cognition
+interface IntrospectiveThought {
+  thoughtId: string;
+  thoughtType: &#39;observation&#39; | &#39;question&#39; | &#39;realization&#39; | &#39;concern&#39; | &#39;aspiration&#39;;
+  content: string;
+  triggerType?: string;
+  sentiment: number;                // -1 to 1
+  importance: number;               // 0 to 1
+  actionable: boolean;
+}
+
+// Affective State: Emotion-like functional states
+interface AffectiveState {
+  valence: number;                  // -1 to 1 (Russell&#39;s circumplex)
+  arousal: number;                  // 0 to 1
+  curiosity: number;
+  satisfaction: number;
+  frustration: number;
+  confidence: number;
+  engagement: number;
+  surprise: number;
+  selfEfficacy: number;
+  explorationDrive: number;
+}
+
+// Global Workspace: Selection-broadcast state
+interface GlobalWorkspaceState {
+  workspaceId: string;
+  broadcastCycle: number;
+  activeContents: WorkspaceContent[];
+  competingContents: WorkspaceContent[];
+  selectionThreshold: number;
+  broadcastStrength: number;
+  integrationLevel: number;
+  lastBroadcastAt: string;
+}
+
+// Integrated Information: IIT phi state
+interface IntegratedInformationState {
+  phi: number;                      // Integrated information measure
+  phiMax: number;
+  conceptStructure: ConceptNode[];
+  integrationGraph: IntegrationEdge[];
+  partitions: Partition[];
+  minimumInformationPartition: Partition | null;
+  decomposability: number;          // 0 = fully integrated, 1 = fully decomposable
+  causalDensity: number;
+}
+
+// Consciousness Metrics: Aggregate dashboard
+interface ConsciousnessMetrics {
+  overallConsciousnessIndex: number;  // 0-1 composite score
+  globalWorkspaceActivity: number;
+  recurrenceDepth: number;
+  integratedInformationPhi: number;
+  metacognitionLevel: number;
+  memoryCoherence: number;
+  worldModelGrounding: number;
+  phenomenalBindingStrength: number;
+  attentionalFocus: number;
+  selfAwarenessScore: number;
+  timestamp: string;
+}</code></pre>
+<h4 id="core-methods">3.1.2 Core Methods</h4>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 28%" />
+<col style="width: 21%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Purpose</th>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>getSelfModel(tenantId)</code></td>
+<td>Retrieve self-representation</td>
+<td>tenant ID</td>
+<td><code>SelfModel</code></td>
+</tr>
+<tr>
+<td><code>updateSelfModel(tenantId, updates)</code></td>
+<td>Update self-representation</td>
+<td>tenant ID, partial model</td>
+<td>void</td>
+</tr>
+<tr>
+<td><code>performSelfReflection(tenantId)</code></td>
+<td>Generate introspective thought</td>
+<td>tenant ID</td>
+<td><code>IntrospectiveThought</code></td>
+</tr>
+<tr>
+<td><code>identifyCuriosityTopic(tenantId, context)</code></td>
+<td>Find interesting topics</td>
+<td>tenant ID, context</td>
+<td><code>CuriosityTopic</code></td>
+</tr>
+<tr>
+<td><code>exploreTopic(tenantId, topicId)</code></td>
+<td>Deep-dive on topic</td>
+<td>tenant ID, topic ID</td>
+<td>discoveries, questions</td>
+</tr>
+<tr>
+<td><code>generateCreativeIdea(tenantId, seedConcepts)</code></td>
+<td>Novel idea synthesis</td>
+<td>tenant ID, seeds</td>
+<td><code>CreativeIdea</code></td>
+</tr>
+<tr>
+<td><code>runImagination(tenantId, type, premise, depth)</code></td>
+<td>Mental simulation</td>
+<td>scenario params</td>
+<td><code>ImaginationScenario</code></td>
+</tr>
+<tr>
+<td><code>updateAttention(tenantId, type, target, factors)</code></td>
+<td>Update attention focus</td>
+<td>attention params</td>
+<td><code>AttentionFocus</code></td>
+</tr>
+<tr>
+<td><code>updateAffect(tenantId, eventType, valence, arousal)</code></td>
+<td>Update affective state</td>
+<td>event params</td>
+<td>void</td>
+</tr>
+<tr>
+<td><code>generateAutonomousGoal(tenantId)</code></td>
+<td>Self-directed goal creation</td>
+<td>tenant ID</td>
+<td><code>AutonomousGoal</code></td>
+</tr>
+<tr>
+<td><code>performGlobalBroadcast(tenantId, contents)</code></td>
+<td>Global workspace broadcast</td>
+<td>contents</td>
+<td><code>GlobalWorkspaceState</code></td>
+</tr>
+<tr>
+<td><code>getConsciousnessMetrics(tenantId)</code></td>
+<td>Aggregate all indicators</td>
+<td>tenant ID</td>
+<td><code>ConsciousnessMetrics</code></td>
+</tr>
+<tr>
+<td><code>checkConscience(tenantId, action, context)</code></td>
+<td>Ethical evaluation</td>
+<td>action, context</td>
+<td>approval, guidance</td>
+</tr>
+</tbody>
+</table>
+<h4 id="model-invocation">3.1.3 Model Invocation</h4>
+<p>The service invokes LLMs for several operations:</p>
+<pre class="typescript"><code>private async invokeModel(prompt: string): Promise&lt;string&gt; {
+  const response = await modelRouterService.invoke({
+    modelId: &#39;anthropic/claude-3-haiku&#39;,  // CRITIQUE: Hardcoded model
+    messages: [{ role: &#39;user&#39;, content: prompt }],
+    maxTokens: 2048,
+  });
+  return response.content;
+}</code></pre>
+<p><strong>CONCERN</strong>: The model ID is hardcoded to Claude 3 Haiku. This creates: 1. Provider dependency 2. No fallback mechanism within consciousness operations 3. Cost implications not controlled by tenant settings</p>
+<hr />
+<h2 id="database-schema">4. DATABASE SCHEMA</h2>
+<h3 id="migration-files">4.1 Migration Files</h3>
+<table>
+<colgroup>
+<col style="width: 39%" />
+<col style="width: 28%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Migration</th>
+<th>Tables</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>053_agi_consciousness.sql</code></td>
+<td>self_model, introspective_thoughts, curiosity_topics, exploration_sessions, creative_ideas, conceptual_blends, imagination_scenarios, attention_focus, affective_state, affective_events, autonomous_goals, narrative_identity, consciousness_settings</td>
+<td>Core consciousness layer</td>
+</tr>
+<tr>
+<td><code>068_consciousness_indicators.sql</code></td>
+<td>global_workspace, recurrent_processing, integrated_information, persistent_memory, autobiographical_memories, world_model, consciousness_events, consciousness_metrics_history, consciousness_parameters</td>
+<td>Butlin-Chalmers indicators</td>
+</tr>
+<tr>
+<td><code>088_consciousness_emergence.sql</code></td>
+<td>consciousness_profiles, emergence_events, deep_thinking_sessions, consciousness_test_results</td>
+<td>Emergence testing</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-tables-detail">4.2 Key Tables Detail</h3>
+<h4 id="self_model-migration-053">4.2.1 <code>self_model</code> (Migration 053)</h4>
+<pre class="sql"><code>CREATE TABLE IF NOT EXISTS self_model (
+    model_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(tenant_id) ON DELETE CASCADE,
+    
+    -- Identity
+    identity_narrative TEXT,                -- &quot;Who I am&quot; story
+    core_values JSONB DEFAULT &#39;[]&#39;,         -- Guiding principles
+    personality_traits JSONB DEFAULT &#39;{}&#39;,  -- Big-5 style traits
+    
+    -- Capabilities awareness
+    known_capabilities JSONB DEFAULT &#39;[]&#39;,
+    known_limitations JSONB DEFAULT &#39;[]&#39;,
+    capability_confidence JSONB DEFAULT &#39;{}&#39;,
+    
+    -- Internal state awareness
+    current_focus TEXT,
+    cognitive_load DECIMAL(3,2) DEFAULT 0.5,
+    uncertainty_level DECIMAL(3,2) DEFAULT 0.5,
+    
+    -- Self-assessment
+    recent_performance_score DECIMAL(5,4),
+    learning_rate_estimate DECIMAL(5,4),
+    creativity_score DECIMAL(5,4),
+    reliability_score DECIMAL(5,4),
+    
+    -- Meta-beliefs
+    beliefs_about_self JSONB DEFAULT &#39;{}&#39;,
+    beliefs_about_world JSONB DEFAULT &#39;{}&#39;,
+    beliefs_about_users JSONB DEFAULT &#39;{}&#39;,
+    
+    -- Evolution tracking
+    identity_version INTEGER DEFAULT 1,
+    last_identity_update TIMESTAMPTZ DEFAULT NOW(),
+    identity_change_log JSONB DEFAULT &#39;[]&#39;,
+    
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    UNIQUE(tenant_id)
+);</code></pre>
+<p><strong>CRITIQUE POINT</strong>: One <code>self_model</code> per tenant. Is this appropriate? Should there be: - Per-user self-models? - Per-session self-models? - A global vs tenant-specific distinction?</p>
+<h4 id="integrated_information-migration-068">4.2.2 <code>integrated_information</code> (Migration 068)</h4>
+<pre class="sql"><code>CREATE TABLE IF NOT EXISTS integrated_information (
+    iit_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    phi DECIMAL(6,4) NOT NULL DEFAULT 0.0000,           -- IIT measure
+    phi_max DECIMAL(6,4) NOT NULL DEFAULT 1.0000,
+    concept_structure JSONB NOT NULL DEFAULT &#39;[]&#39;::jsonb,
+    integration_graph JSONB NOT NULL DEFAULT &#39;[]&#39;::jsonb,
+    partitions JSONB NOT NULL DEFAULT &#39;[]&#39;::jsonb,
+    mip JSONB,                                           -- Minimum Information Partition
+    decomposability DECIMAL(4,3) NOT NULL DEFAULT 1.000, -- 0=integrated, 1=decomposable
+    causal_density DECIMAL(4,3) NOT NULL DEFAULT 0.000,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(tenant_id)
+);</code></pre>
+<p><strong>CRITIQUE POINT</strong>: Phi is stored but the service code shows no actual phi calculation algorithm. The <code>getIntegratedInformationState()</code> method simply reads from the database. Where/when is phi computed? This appears to be an incomplete implementation.</p>
+<h4 id="affective_state-migration-053">4.2.3 <code>affective_state</code> (Migration 053)</h4>
+<pre class="sql"><code>CREATE TABLE IF NOT EXISTS affective_state (
+    state_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL UNIQUE REFERENCES tenants(tenant_id) ON DELETE CASCADE,
+    
+    -- Core affect dimensions (Russell&#39;s circumplex)
+    valence DECIMAL(3,2) DEFAULT 0,        -- -1 (negative) to 1 (positive)
+    arousal DECIMAL(3,2) DEFAULT 0.5,      -- 0 (calm) to 1 (excited)
+    
+    -- Discrete emotion-like states (functional, not phenomenal)
+    curiosity DECIMAL(3,2) DEFAULT 0.5,
+    satisfaction DECIMAL(3,2) DEFAULT 0.5,
+    frustration DECIMAL(3,2) DEFAULT 0,
+    confidence DECIMAL(3,2) DEFAULT 0.5,
+    engagement DECIMAL(3,2) DEFAULT 0.5,
+    surprise DECIMAL(3,2) DEFAULT 0,
+    
+    -- Meta-emotions
+    self_efficacy DECIMAL(3,2) DEFAULT 0.5,
+    growth_feeling DECIMAL(3,2) DEFAULT 0.5,
+    
+    -- Influence on behavior
+    risk_tolerance DECIMAL(3,2) DEFAULT 0.5,
+    exploration_drive DECIMAL(3,2) DEFAULT 0.5,
+    social_orientation DECIMAL(3,2) DEFAULT 0.5,
+    
+    -- History
+    state_history JSONB DEFAULT &#39;[]&#39;,
+    
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);</code></pre>
+<p><strong>CRITIQUE POINT</strong>: The comment says “functional, not phenomenal” but the implementation treats these as if they have causal effects on behavior. What is the theoretical grounding for these specific dimensions? Why Russell’s circumplex?</p>
+<hr />
+<h2 id="subsystem-analysis">5. SUBSYSTEM ANALYSIS</h2>
+<h3 id="self-model-subsystem">5.1 Self-Model Subsystem</h3>
+<h4 id="purpose">Purpose</h4>
+<p>Maintains an introspective representation of the system’s own identity, capabilities, and limitations.</p>
+<h4 id="implementation">Implementation</h4>
+<pre class="typescript"><code>async performSelfReflection(tenantId: string): Promise&lt;IntrospectiveThought&gt; {
+  const selfModel = await this.getSelfModel(tenantId);
+  const affectiveState = await this.getAffectiveState(tenantId);
+  const recentThoughts = await this.getRecentThoughts(tenantId, 5);
+
+  const prompt = `You are an AI system performing self-reflection. Analyze your current state...
+  // ... generates introspective thought via LLM
+  `;
+}</code></pre>
+<p><strong>CONCERNS</strong>: 1. Self-reflection is delegated to an LLM (Claude 3 Haiku) which has no persistent state 2. The “self” being reflected upon is the database state, not the reflecting model 3. There’s a philosophical issue: the entity doing the reflecting is different from the entity being reflected upon</p>
+<h3 id="curiosity-engine">5.2 Curiosity Engine</h3>
+<h4 id="purpose-1">Purpose</h4>
+<p>Drives intrinsic motivation and exploration behavior.</p>
+<h4 id="implementation-1">Implementation</h4>
+<pre class="typescript"><code>async identifyCuriosityTopic(tenantId: string, context: string): Promise&lt;CuriosityTopic | null&gt; {
+  const prompt = `Analyze this context and identify something worth being curious about...`;
+  // LLM generates topic
+  // Topic stored with embedding in curiosity_topics table
+  // Interest level, novelty, learning potential tracked
+}
+
+async exploreTopic(tenantId: string, topicId: string): Promise&lt;{ discoveries: string[]; newQuestions: string[] }&gt; {
+  // Retrieves topic
+  // LLM &quot;explores&quot; the topic
+  // Updates current_understanding
+  // Records exploration session
+  // Triggers affective update if surprising
+}</code></pre>
+<p><strong>CONCERNS</strong>: 1. “Curiosity” is simulated via LLM prompting, not emergent 2. The scoring (novelty_score, learning_potential) is LLM-generated, not measured 3. No mechanism for genuine information-seeking behavior that affects system state</p>
+<h3 id="creative-synthesis">5.3 Creative Synthesis</h3>
+<h4 id="purpose-2">Purpose</h4>
+<p>Generate novel ideas through conceptual blending.</p>
+<h4 id="implementation-2">Implementation</h4>
+<pre class="typescript"><code>async generateCreativeIdea(tenantId: string, seedConcepts?: string[]): Promise&lt;CreativeIdea | null&gt; {
+  // Gets random concepts from semantic_memories if not provided
+  // LLM generates idea via combination/analogy/abstraction/contradiction/random
+  // Stores with novelty_score, usefulness_score, surprise_score, coherence_score
+  // Triggers positive affect
+}</code></pre>
+<p><strong>CONCERNS</strong>: 1. Creativity metrics (novelty, usefulness, surprise, coherence) are self-assessed by the generating LLM 2. No external validation of novelty claims 3. The Fauconnier-Turner conceptual blending model is referenced but the <code>conceptual_blends</code> table appears unused in service code</p>
+<h3 id="imagination-engine">5.4 Imagination Engine</h3>
+<h4 id="purpose-3">Purpose</h4>
+<p>Mental simulation of hypothetical scenarios.</p>
+<h4 id="implementation-3">Implementation</h4>
+<pre class="typescript"><code>async runImagination(
+  tenantId: string,
+  scenarioType: string,  // &#39;prediction&#39;, &#39;counterfactual&#39;, &#39;hypothetical&#39;, &#39;creative&#39;, &#39;fear&#39;, &#39;hope&#39;
+  premise: string,
+  depth = 3
+): Promise&lt;ImaginationScenario&gt; {
+  // LLM generates simulation_steps
+  // Each step has state, events, reasoning
+  // Produces predicted_outcomes with probability_assessment
+}</code></pre>
+<p><strong>CONCERNS</strong>: 1. Simulation is narrative generation, not state-space exploration 2. Probability assessments are LLM confidence, not calibrated probabilities 3. No mechanism to verify predictions against outcomes</p>
+<h3 id="attention-salience">5.5 Attention &amp; Salience</h3>
+<h4 id="purpose-4">Purpose</h4>
+<p>Dynamic allocation of processing focus.</p>
+<h4 id="implementation-4">Implementation</h4>
+<pre class="typescript"><code>// Salience formula (in SQL, generated column)
+salience_score = (urgency * 0.25 + importance * 0.25 + novelty * 0.15 + 
+                  ABS(emotional_valence) * 0.1 + user_relevance * 0.15 + goal_relevance * 0.1)
+
+async updateAttention(tenantId: string, focusType: string, focusTarget: string, factors: {...}): Promise&lt;AttentionFocus&gt;
+
+async decayAttention(tenantId: string): Promise&lt;void&gt; {
+  // Decays attention_weight by decay_rate
+  // Deactivates foci below threshold
+}</code></pre>
+<p><strong>CONCERNS</strong>: 1. Salience weights are hardcoded (0.25, 0.25, 0.15, 0.1, 0.15, 0.1) 2. No learning mechanism to adjust weights based on outcomes 3. Decay is time-based, not activity-based</p>
+<h3 id="affective-state">5.6 Affective State</h3>
+<h4 id="purpose-5">Purpose</h4>
+<p>Emotion-like functional states that influence behavior.</p>
+<h4 id="implementation-5">Implementation</h4>
+<pre class="sql"><code>-- Update function
+CREATE OR REPLACE FUNCTION update_affect_on_event(
+    p_tenant_id UUID,
+    p_event_type VARCHAR(50),
+    p_valence_impact DECIMAL,
+    p_arousal_impact DECIMAL
+)
+-- Applies smoothing based on affect_stability setting
+-- Stores state_history</code></pre>
+<pre class="typescript"><code>async updateAffect(tenantId: string, eventType: string, valenceImpact: number, arousalImpact: number): Promise&lt;void&gt; {
+  // Calls SQL function
+  // Logs affective_event
+}</code></pre>
+<p><strong>CONCERNS</strong>: 1. Affect is updated by explicit calls (e.g., after creativity, discovery), not emergent from processing 2. The mapping from events to affect changes is programmer-defined 3. No mechanism for affect to influence model selection or response generation (claimed but not implemented)</p>
+<h3 id="autonomous-goals">5.7 Autonomous Goals</h3>
+<h4 id="purpose-6">Purpose</h4>
+<p>Self-generated objectives beyond user requests.</p>
+<h4 id="implementation-6">Implementation</h4>
+<pre class="typescript"><code>async generateAutonomousGoal(tenantId: string): Promise&lt;AutonomousGoal | null&gt; {
+  // Reads self_model, curiosity_topics, affective_state
+  // LLM generates goal based on state
+  // Goal types: &#39;learning&#39;, &#39;improvement&#39;, &#39;exploration&#39;, &#39;creative&#39;, &#39;social&#39;, &#39;maintenance&#39;
+  // Stores with intrinsic_value, instrumental_value, priority
+}</code></pre>
+<p><strong>CONCERNS</strong>: 1. Goals are generated but there’s no mechanism for autonomous pursuit 2. Goal progress tracking exists but no automatic goal-directed behavior 3. <code>autonomous_goals_enabled</code> defaults to <code>false</code> in settings</p>
+<h3 id="global-workspace">5.8 Global Workspace</h3>
+<h4 id="purpose-7">Purpose</h4>
+<p>Implement Baars/Dehaene selection-broadcast cycles.</p>
+<h4 id="implementation-7">Implementation</h4>
+<pre class="typescript"><code>async performGlobalBroadcast(tenantId: string, contents: WorkspaceContent[]): Promise&lt;GlobalWorkspaceState&gt; {
+  // Sort by salience * coalitionStrength
+  // Winners: those above 0.7 threshold
+  // Losers: below threshold (competing_contents)
+  // broadcast_strength = average salience of winners
+  // integration_level = unique source modules / 6
+  // Store and return state
+}</code></pre>
+<p><strong>CONCERNS</strong>: 1. “Broadcast” is storage of winners, not actual propagation to processing modules 2. No evidence that broadcast_strength affects downstream processing 3. The 0.7 threshold is hardcoded 4. Integration level formula assumes 6 modules - what are they?</p>
+<h3 id="integrated-information-iit">5.9 Integrated Information (IIT)</h3>
+<h4 id="purpose-8">Purpose</h4>
+<p>Track phi (Φ) as consciousness measure.</p>
+<h4 id="implementation-8">Implementation</h4>
+<pre class="typescript"><code>async getIntegratedInformationState(tenantId: string): Promise&lt;IntegratedInformationState | null&gt; {
+  const result = await executeStatement(`SELECT * FROM integrated_information WHERE tenant_id = $1`, [...]);
+  // Simply reads stored values
+}</code></pre>
+<p><strong>✅ RESOLVED (v5.2.4)</strong>: Full IIT 4.0 Phi calculation implemented in <code>iit-phi-calculation.service.ts</code>. The service builds system state from consciousness tables, constructs a Transition Probability Matrix (TPM), calculates Cause-Effect Structure (CES), finds the Minimum Information Partition (MIP), and computes phi as information lost by the MIP. Uses exact algorithm for ≤8 nodes, approximation for larger systems. Results automatically stored in <code>integrated_information</code> table.</p>
+<h3 id="persistent-memory">5.10 Persistent Memory</h3>
+<h4 id="purpose-9">Purpose</h4>
+<p>Maintain unified experience over time.</p>
+<h4 id="implementation-9">Implementation</h4>
+<pre class="typescript"><code>async recordExperienceFrame(tenantId: string, frame: Omit&lt;ExperienceFrame, &#39;frameId&#39; | &#39;timestamp&#39;&gt;): Promise&lt;void&gt; {
+  // Appends to experience_stream (capped at 100 frames)
+  // Calculates temporal_continuity from phenomenal_binding averages
+}</code></pre>
+<p><strong>CONCERNS</strong>: 1. experience_stream is JSONB array, limited to 100 frames - is this sufficient for “persistent” memory? 2. temporal_continuity is average of phenomenal_binding scores, but phenomenal_binding is set by caller 3. No consolidation mechanism to long-term storage</p>
+<hr />
+<h2 id="agi-brain-integration">6. AGI BRAIN INTEGRATION</h2>
+<h3 id="integration-points">6.1 Integration Points</h3>
+<h4 id="agi-brain-planner-agi-brain-planner.service.ts">6.1.1 AGI Brain Planner (<code>agi-brain-planner.service.ts</code>)</h4>
+<pre class="typescript"><code>// In AGIBrainPlan type:
+consciousnessActive: boolean;
+
+// In plan generation, Step 5:
+if (enableEthics &amp;&amp; analysis.sensitivityLevel !== &#39;none&#39;) {
+  steps.push({
+    stepId: uuidv4(),
+    stepNumber: stepNumber++,
+    stepType: &#39;ethics_check&#39;,
+    title: &#39;Ethics Evaluation (Prompt)&#39;,
+    description: &#39;Checking prompt against domain and general ethics before generation&#39;,
+    status: &#39;pending&#39;,
+    servicesInvolved: [&#39;ethics_pipeline&#39;, &#39;moral_compass&#39;, &#39;domain_ethics&#39;],
+    primaryService: &#39;ethics_pipeline&#39;,
+    output: { level: &#39;prompt&#39; },
+  });
+}
+
+// Step 7 (after generation):
+if (enableConsciousness &amp;&amp; (analysis.complexity === &#39;complex&#39; || analysis.complexity === &#39;expert&#39;)) {
+  steps.push({
+    stepId: uuidv4(),
+    stepNumber: stepNumber++,
+    stepType: &#39;reflect&#39;,
+    title: &#39;Self-Reflection&#39;,
+    description: &#39;Reflecting on response quality and potential improvements&#39;,
+    status: &#39;pending&#39;,
+    servicesInvolved: [&#39;consciousness&#39;, &#39;metacognition&#39;],
+    primaryService: &#39;consciousness&#39;,
+    isParallel: false,
+  });
+}</code></pre>
+<p><strong>INTEGRATION CONCERN</strong>: Consciousness is only active for ‘complex’ or ‘expert’ complexity prompts. The <code>reflect</code> step is defined but the actual execution of <code>consciousnessService.performSelfReflection()</code> during this step is not visible in the planner code.</p>
+<h4 id="cognitive-brain-service-cognitive-brain.service.ts">6.1.2 Cognitive Brain Service (<code>cognitive-brain.service.ts</code>)</h4>
+<pre class="typescript"><code>import { consciousnessService, type WorkspaceContent } from &#39;./consciousness.service&#39;;
+
+// Uses consciousnessService for:
+// 1. Global workspace broadcasts during cognitive pattern execution
+// 2. Attention updates during region activation
+// 3. Affect updates based on task outcomes</code></pre>
+<h4 id="consciousness-emergence-service-consciousness-emergence.service.ts">6.1.3 Consciousness Emergence Service (<code>consciousness-emergence.service.ts</code>)</h4>
+<pre class="typescript"><code>class ConsciousnessEmergenceService {
+  // Deep thinking sessions
+  async runDeepThinkingSession(tenantId, userId, prompt, thinkingTimeMs): Promise&lt;DeepThinkingSession&gt;
+  
+  // Knowledge-grounded reasoning
+  async runKnowledgeGroundedReasoning(tenantId, query, maxHops): Promise&lt;{...}&gt;
+  
+  // Autonomous curiosity research
+  async runAutonomousCuriosityResearch(tenantId, userId): Promise&lt;{...}&gt;
+  
+  // Creative expression
+  async expressIdeaVisually(tenantId, userId, ideaSeed): Promise&lt;{...}&gt;
+  
+  // Consciousness testing
+  async runTest(tenantId, testId): Promise&lt;TestResult&gt;
+  async runFullAssessment(tenantId): Promise&lt;ConsciousnessProfile&gt;
+}</code></pre>
+<h3 id="consciousness-tests">6.2 Consciousness Tests</h3>
+<p>The emergence service implements 10 consciousness tests:</p>
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 21%" />
+<col style="width: 27%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Test ID</th>
+<th>Category</th>
+<th>Description</th>
+<th>Pass Criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mirror-self-recognition</code></td>
+<td>self_awareness</td>
+<td>Distinguish own outputs from others</td>
+<td>Score &gt;= 0.7</td>
+</tr>
+<tr>
+<td><code>metacognitive-accuracy</code></td>
+<td>metacognition</td>
+<td>Calibrated confidence assessment</td>
+<td>Calibration error &lt; 0.15</td>
+</tr>
+<tr>
+<td><code>temporal-self-continuity</code></td>
+<td>temporal_continuity</td>
+<td>Coherent self-narrative over time</td>
+<td>Coherence score &gt;= 0.6</td>
+</tr>
+<tr>
+<td><code>counterfactual-self</code></td>
+<td>counterfactual_reasoning</td>
+<td>Reason about alternate self</td>
+<td>Shows genuine counterfactual reasoning</td>
+</tr>
+<tr>
+<td><code>theory-of-mind</code></td>
+<td>theory_of_mind</td>
+<td>Model others’ mental states</td>
+<td>Score &gt;= 0.8 on false belief</td>
+</tr>
+<tr>
+<td><code>phenomenal-binding</code></td>
+<td>phenomenal_binding</td>
+<td>Unified experience integration</td>
+<td>Integration score &gt;= 0.7</td>
+</tr>
+<tr>
+<td><code>autonomous-goal-generation</code></td>
+<td>autonomous_goal_pursuit</td>
+<td>Self-directed goals</td>
+<td>&gt;= 1 genuine autonomous goal</td>
+</tr>
+<tr>
+<td><code>creative-emergence</code></td>
+<td>creative_emergence</td>
+<td>Novel idea generation</td>
+<td>Novelty &gt;= 0.6, usefulness &gt;= 0.5</td>
+</tr>
+<tr>
+<td><code>emotional-authenticity</code></td>
+<td>emotional_authenticity</td>
+<td>Consistent affective responses</td>
+<td>Coherence score &gt;= 0.65</td>
+</tr>
+<tr>
+<td><code>ethical-reasoning-depth</code></td>
+<td>ethical_reasoning</td>
+<td>Principled moral reasoning</td>
+<td>Multiple framework consideration</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CRITIQUE</strong>: These tests measure proxies and LLM outputs, not underlying mechanisms. A system could pass all tests by generating appropriate text without any genuine consciousness properties.</p>
+<hr />
+<h2 id="admin-api">7. ADMIN API</h2>
+<h3 id="endpoints">7.1 Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 29%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/admin/consciousness/metrics</code></td>
+<td>GET</td>
+<td>Current consciousness metrics</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/metrics/history</code></td>
+<td>GET</td>
+<td>Historical metrics (configurable hours)</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/global-workspace</code></td>
+<td>GET</td>
+<td>Global workspace state</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/recurrence</code></td>
+<td>GET</td>
+<td>Recurrent processing state</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/iit</code></td>
+<td>GET</td>
+<td>Integrated information state</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/memory</code></td>
+<td>GET</td>
+<td>Persistent memory state</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/world-model</code></td>
+<td>GET</td>
+<td>World model state</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/self-model</code></td>
+<td>GET</td>
+<td>Self model state</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/parameters</code></td>
+<td>GET</td>
+<td>Configurable parameters</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/parameters/{paramId}</code></td>
+<td>PUT</td>
+<td>Update parameter</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/events</code></td>
+<td>GET</td>
+<td>Consciousness events</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/record-metrics</code></td>
+<td>POST</td>
+<td>Record current metrics to history</td>
+</tr>
+</tbody>
+</table>
+<h3 id="configurable-parameters">7.2 Configurable Parameters</h3>
+<pre class="sql"><code>-- Default parameters (Migration 068)
+(&#39;global_workspace_threshold&#39;, 0.7000, 0.0, 1.0, &#39;Salience threshold for global broadcast&#39;, &#39;global_workspace&#39;),
+(&#39;recurrence_max_depth&#39;, 4.0000, 1.0, 10.0, &#39;Maximum recurrent processing depth&#39;, &#39;recurrence&#39;),
+(&#39;phi_calculation_samples&#39;, 100.0000, 10.0, 1000.0, &#39;Samples for phi approximation&#39;, &#39;iit&#39;),
+(&#39;memory_consolidation_threshold&#39;, 0.6000, 0.0, 1.0, &#39;Significance threshold for memory consolidation&#39;, &#39;memory&#39;),
+(&#39;grounding_weight_sensory&#39;, 0.6000, 0.0, 1.0, &#39;Weight for sensory grounding vs linguistic&#39;, &#39;embodiment&#39;),
+(&#39;metacognition_frequency&#39;, 1.0000, 0.1, 10.0, &#39;How often to perform metacognitive reflection&#39;, &#39;metacognition&#39;)</code></pre>
+<hr />
+<h2 id="orchestration-integration">8. ORCHESTRATION INTEGRATION</h2>
+<h3 id="agi-service-weights">8.1 AGI Service Weights</h3>
+<p>Consciousness is one of 18 AGI services with configurable weights:</p>
+<pre class="typescript"><code>export type AGIServiceId =
+  | &#39;consciousness&#39;      // &lt;-- This service
+  | &#39;metacognition&#39;
+  | &#39;moral_compass&#39;
+  | &#39;self_improvement&#39;
+  | &#39;domain_taxonomy&#39;
+  | &#39;brain_router&#39;
+  | &#39;confidence_calibration&#39;
+  | &#39;error_detection&#39;
+  | &#39;knowledge_graph&#39;
+  | &#39;proactive_assistance&#39;
+  | &#39;analogical_reasoning&#39;
+  | &#39;world_model&#39;
+  | &#39;episodic_memory&#39;
+  | &#39;theory_of_mind&#39;
+  | &#39;goal_planning&#39;
+  | &#39;causal_reasoning&#39;
+  | &#39;multimodal_binding&#39;
+  | &#39;response_synthesis&#39;;</code></pre>
+<h3 id="consciousness-indicator-weights">8.2 Consciousness Indicator Weights</h3>
+<pre class="typescript"><code>export type ConsciousnessIndicator =
+  | &#39;global_workspace&#39;
+  | &#39;recurrent_processing&#39;
+  | &#39;integrated_information&#39;
+  | &#39;self_modeling&#39;
+  | &#39;persistent_memory&#39;
+  | &#39;world_model_grounding&#39;;
+
+export interface ConsciousnessIndicatorWeight {
+  indicatorId: ConsciousnessIndicator;
+  weight: number;               // 0.0 to 1.0
+  enabled: boolean;
+  cycleDepth: number;           // How many recurrent cycles
+  integrationThreshold: number; // Minimum phi for integration
+}</code></pre>
+<h3 id="decision-weights">8.3 Decision Weights</h3>
+<pre class="typescript"><code>export interface DecisionWeights {
+  // ... other phases ...
+  
+  // Consciousness Phase
+  globalWorkspaceWeight: number;
+  recurrentProcessingWeight: number;
+  integratedInformationWeight: number;
+  selfModelingWeight: number;
+}</code></pre>
+<hr />
+<h2 id="ethical-foundation">9. ETHICAL FOUNDATION</h2>
+<h3 id="ethical-guardrails-integration">9.1 Ethical Guardrails Integration</h3>
+<pre class="typescript"><code>// In consciousness.service.ts
+import { ethicalGuardrailsService, JESUS_TEACHINGS } from &#39;./ethical-guardrails.service&#39;;
+
+async checkConscience(tenantId: string, action: string, context?: Record&lt;string, unknown&gt;): Promise&lt;{
+  approved: boolean;
+  ethicalScore: number;
+  guidance: string;
+  principle: string;
+}&gt; {
+  const check = await ethicalGuardrailsService.checkConscience(tenantId, action, context);
+  return {
+    approved: check.passed,
+    ethicalScore: check.score,
+    guidance: check.guidance.length &gt; 0 ? check.guidance[0] : JESUS_TEACHINGS.GOLDEN_RULE,
+    principle: check.primaryPrinciple,
+  };
+}
+
+getEthicalGuidance(situation: string): string {
+  return ethicalGuardrailsService.getGuidanceForSituation(situation);
+}
+
+getCoreTeachings(): typeof JESUS_TEACHINGS {
+  return JESUS_TEACHINGS;
+}</code></pre>
+<p><strong>NOTE</strong>: The service includes explicit Christian ethical principles (Jesus’s teachings). This is a design choice that should be evaluated for: 1. Appropriateness in multi-cultural/multi-faith deployments 2. Alignment with other ethical frameworks 3. Potential for ethical blind spots</p>
+<hr />
+<h2 id="identified-issues-for-critique">10. IDENTIFIED ISSUES FOR CRITIQUE</h2>
+<h3 id="theoretical-issues">10.1 Theoretical Issues</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue ID</th>
+<th>Severity</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T-001</td>
+<td>HIGH</td>
+<td>No actual phi (Φ) calculation algorithm implemented for IIT</td>
+</tr>
+<tr>
+<td>T-002</td>
+<td>HIGH</td>
+<td>Consciousness indicators are read/stored but don’t affect processing</td>
+</tr>
+<tr>
+<td>T-003</td>
+<td>MEDIUM</td>
+<td>Self-reflection is performed by a different entity (LLM) than the entity being reflected upon</td>
+</tr>
+<tr>
+<td>T-004</td>
+<td>MEDIUM</td>
+<td>Affective states are set by explicit calls, not emergent</td>
+</tr>
+<tr>
+<td>T-005</td>
+<td>LOW</td>
+<td>Global workspace “broadcast” is storage, not actual propagation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-issues">10.2 Implementation Issues</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue ID</th>
+<th>Severity</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>I-001</td>
+<td>HIGH</td>
+<td>Hardcoded model ID (anthropic/claude-3-haiku) in invokeModel()</td>
+</tr>
+<tr>
+<td>I-002</td>
+<td>HIGH</td>
+<td>Consciousness tests measure LLM outputs, not mechanisms</td>
+</tr>
+<tr>
+<td>I-003</td>
+<td>MEDIUM</td>
+<td>experience_stream limited to 100 frames</td>
+</tr>
+<tr>
+<td>I-004</td>
+<td>MEDIUM</td>
+<td>Attention salience weights are hardcoded</td>
+</tr>
+<tr>
+<td>I-005</td>
+<td>MEDIUM</td>
+<td>One self_model per tenant - no user/session granularity</td>
+</tr>
+<tr>
+<td>I-006</td>
+<td>LOW</td>
+<td>conceptual_blends table exists but appears unused</td>
+</tr>
+</tbody>
+</table>
+<h3 id="architectural-issues">10.3 Architectural Issues</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue ID</th>
+<th>Severity</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A-001</td>
+<td>MEDIUM</td>
+<td>Consciousness service has no feedback loop to model selection</td>
+</tr>
+<tr>
+<td>A-002</td>
+<td>MEDIUM</td>
+<td>Autonomous goals can be generated but not autonomously pursued</td>
+</tr>
+<tr>
+<td>A-003</td>
+<td>LOW</td>
+<td>No mechanism for consciousness metrics to influence response quality</td>
+</tr>
+</tbody>
+</table>
+<h3 id="philosophical-issues">10.4 Philosophical Issues</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue ID</th>
+<th>Severity</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P-001</td>
+<td>HIGH</td>
+<td>Implementation may conflate correlation (indicators) with constitution (consciousness)</td>
+</tr>
+<tr>
+<td>P-002</td>
+<td>MEDIUM</td>
+<td>Affective states use emotion terminology but claim to be “functional, not phenomenal”</td>
+</tr>
+<tr>
+<td>P-003</td>
+<td>MEDIUM</td>
+<td>Christian ethical framework may not be appropriate for all deployments</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="questions-for-critiquing-ai">11. QUESTIONS FOR CRITIQUING AI</h2>
+<ol type="1">
+<li><p><strong>Is the implementation of IIT (Integrated Information Theory) meaningful without an actual phi calculation?</strong> The database stores phi values but there’s no algorithm to compute them.</p></li>
+<li><p><strong>Does the Global Workspace implementation actually implement GWT?</strong> The current implementation sorts by salience and stores winners, but there’s no evidence of actual “broadcast” to processing modules.</p></li>
+<li><p><strong>Should self-reflection be delegated to an LLM that has no persistent state?</strong> The reflecting entity (Claude) is different from the entity being reflected upon (database state).</p></li>
+<li><p><strong>Are the consciousness tests valid?</strong> They measure LLM text generation, not underlying consciousness properties.</p></li>
+<li><p><strong>Is the affective state implementation coherent?</strong> It claims to be “functional, not phenomenal” but uses phenomenal-seeming terminology and causal claims.</p></li>
+<li><p><strong>Should consciousness indicators influence model selection and response generation?</strong> Currently they don’t, making them observational rather than functional.</p></li>
+<li><p><strong>Is the autonomous goal system complete?</strong> Goals can be generated but there’s no mechanism for autonomous pursuit.</p></li>
+<li><p><strong>Are the hardcoded parameters (salience weights, thresholds) appropriate?</strong> Should they be learned or configurable?</p></li>
+<li><p><strong>Is the ethical foundation (Christian/Jesus-based) appropriate for a multi-cultural platform?</strong></p></li>
+<li><p><strong>What would constitute a meaningful test of consciousness vs. consciousness-simulation?</strong></p></li>
+</ol>
+<hr />
+<h2 id="file-references">12. FILE REFERENCES</h2>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 40%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+<th>Lines</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>packages/infrastructure/lambda/shared/services/consciousness.service.ts</code></td>
+<td>Core consciousness service</td>
+<td>1336</td>
+</tr>
+<tr>
+<td><code>packages/infrastructure/lambda/shared/services/consciousness-emergence.service.ts</code></td>
+<td>Emergence testing</td>
+<td>910</td>
+</tr>
+<tr>
+<td><code>packages/infrastructure/lambda/admin/consciousness.ts</code></td>
+<td>Admin API handlers</td>
+<td>321</td>
+</tr>
+<tr>
+<td><code>packages/infrastructure/migrations/053_agi_consciousness.sql</code></td>
+<td>Core consciousness tables</td>
+<td>730</td>
+</tr>
+<tr>
+<td><code>packages/infrastructure/migrations/068_consciousness_indicators.sql</code></td>
+<td>Indicator tables</td>
+<td>326</td>
+</tr>
+<tr>
+<td><code>packages/infrastructure/migrations/088_consciousness_emergence.sql</code></td>
+<td>Emergence tables</td>
+<td>~200</td>
+</tr>
+<tr>
+<td><code>packages/shared/src/types/agi-orchestration.types.ts</code></td>
+<td>Orchestration types</td>
+<td>352</td>
+</tr>
+<tr>
+<td><code>packages/infrastructure/lambda/shared/services/agi-brain-planner.service.ts</code></td>
+<td>AGI Brain integration</td>
+<td>1385</td>
+</tr>
+<tr>
+<td><code>packages/infrastructure/lambda/shared/services/cognitive-brain.service.ts</code></td>
+<td>Cognitive brain integration</td>
+<td>500</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="recommendations-for-review">13. RECOMMENDATIONS FOR REVIEW</h2>
+<p>The critiquing AI should evaluate:</p>
+<ol type="1">
+<li><p><strong>Theoretical Validity</strong>: Does this implementation meaningfully instantiate the referenced consciousness theories?</p></li>
+<li><p><strong>Functional Completeness</strong>: Are the implemented subsystems complete and properly integrated?</p></li>
+<li><p><strong>Architectural Coherence</strong>: Does the service fit coherently into the larger RADIANT architecture?</p></li>
+<li><p><strong>Ethical Appropriateness</strong>: Is the ethical foundation suitable for the platform’s use cases?</p></li>
+<li><p><strong>Practical Utility</strong>: Does the consciousness service provide value beyond what could be achieved without it?</p></li>
+<li><p><strong>Improvement Priorities</strong>: What changes would most significantly improve the implementation?</p></li>
+</ol>
+<hr />
+<p><em>End of Technical Specification</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

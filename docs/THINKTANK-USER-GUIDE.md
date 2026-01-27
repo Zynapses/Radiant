@@ -1,7 +1,7 @@
 # Think Tank User Guide
 
-> **Version**: 5.52.14  
-> **Last Updated**: January 24, 2026  
+> **Version**: 5.52.29  
+> **Last Updated**: January 25, 2026  
 > **Audience**: End Users of Think Tank
 
 ---
@@ -98,6 +98,37 @@ Think Tank is an advanced AI assistant platform that adapts to your needs, learn
 2. **Set Your Preferences** - Visit Settings to configure your experience
 3. **Create Rules** - Add personal rules to customize AI responses
 4. **Start a Conversation** - Type your first message or use voice input
+
+### Authentication & Security
+
+Think Tank supports multiple authentication methods for secure access:
+
+- **Email/Password** - Traditional sign-in with optional MFA
+- **Social Sign-In** - Google, Microsoft, Apple, GitHub
+- **Enterprise SSO** - SAML 2.0 / OIDC via your organization
+- **Passkeys** - Passwordless authentication using biometrics
+
+**Multi-Factor Authentication (MFA)** may be required by your organization. When enabled, you'll need an authenticator app (Google Authenticator, Authy, etc.) to generate verification codes.
+
+> 📖 **Detailed Guides**: See [Authentication User Guide](./authentication/user-guide.md) and [MFA Guide](./authentication/mfa-guide.md)
+
+### Language Settings
+
+Think Tank supports **18 languages** including:
+
+| Western | Asian | RTL |
+|---------|-------|-----|
+| English, Spanish, French, German, Portuguese, Italian, Dutch, Polish, Russian, Turkish | Japanese, Korean, Chinese (Simplified/Traditional), Hindi, Thai, Vietnamese | Arabic |
+
+**To change your language:**
+1. Click your profile icon → **Settings**
+2. Select **Language & Region**
+3. Choose your preferred language
+4. The interface updates immediately
+
+Search works in all languages, with special **CJK (Chinese/Japanese/Korean) bi-gram search** for accurate results.
+
+> 📖 **Detailed Guide**: See [Internationalization Guide](./authentication/i18n-guide.md)
 
 ### The Main Interface
 

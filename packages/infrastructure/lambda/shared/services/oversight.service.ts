@@ -401,16 +401,47 @@ class OversightService {
         byDomain[r.domain as string] = Number(r.domain_count) || 0;
       }
 
+      // Query for average review time
+      const reviewTimeResult = await executeStatement(
+        `SELECT AVG(EXTRACT(EPOCH FROM (reviewed_at - created_at)) * 1000) as avg_review_time_ms
+         FROM oversight_queue
+         WHERE reviewed_at IS NOT NULL
+         AND reviewed_at > NOW() - INTERVAL '24 hours'
+         ${tenantId ? 'AND tenant_id = $1' : ''}`,
+        params
+      );
+      const avgReviewTimeMs = Number(reviewTimeResult.rows?.[0]?.avg_review_time_ms) || 0;
+
+      // Query for reviews by reviewer
+      const reviewerResult = await executeStatement(
+        `SELECT assigned_to as reviewer_id, COUNT(*) as review_count
+         FROM oversight_queue
+         WHERE assigned_to IS NOT NULL
+         AND reviewed_at > NOW() - INTERVAL '24 hours'
+         ${tenantId ? 'AND tenant_id = $1' : ''}
+         GROUP BY assigned_to
+         ORDER BY review_count DESC
+         LIMIT 10`,
+        params
+      );
+      const byReviewer = (reviewerResult.rows || []).map((r: unknown) => {
+        const row = r as Record<string, unknown>;
+        return {
+          reviewerId: String(row.reviewer_id),
+          count: Number(row.review_count) || 0,
+        };
+      });
+
       return {
         pending,
         escalated,
         approvedToday,
         rejectedToday,
         expiredToday,
-        avgReviewTimeMs: 0, // Would need separate query
+        avgReviewTimeMs,
         oldestPendingAt,
         byDomain,
-        byReviewer: [], // Would need separate query
+        byReviewer: byReviewer as any,
       };
     } catch (error) {
       logger.error(`Failed to get queue stats: ${String(error)}`);

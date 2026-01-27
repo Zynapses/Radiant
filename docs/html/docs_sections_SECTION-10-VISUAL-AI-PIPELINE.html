@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 10 VISUAL AI PIPELINE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 10 VISUAL AI PIPELINE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-10-VISUAL-AI-PIPELINE.md</div>
+  </div>
+  
+  <h1 id="section-10-visual-ai-pipeline-v2.3.0">SECTION 10: VISUAL AI PIPELINE (v2.3.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="pipeline-overview">10.1 Pipeline Overview</h2>
+<p>The Visual AI Pipeline extends RADIANT with 13 new self-hosted AI models for product photography and video post-production workflows.</p>
+<h3 id="new-models-added">New Models Added</h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Category</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SAM 2 Large</td>
+<td>Segmentation</td>
+<td>Precise object/subject isolation</td>
+</tr>
+<tr>
+<td>SAM 2 Base Plus</td>
+<td>Segmentation</td>
+<td>Balanced speed/quality</td>
+</tr>
+<tr>
+<td>SAM 2 Small</td>
+<td>Segmentation</td>
+<td>Fast lightweight segmentation</td>
+</tr>
+<tr>
+<td>SAM 2 Tiny</td>
+<td>Segmentation</td>
+<td>Edge deployment</td>
+</tr>
+<tr>
+<td>XMem</td>
+<td>Video</td>
+<td>Temporal mask propagation</td>
+</tr>
+<tr>
+<td>LaMa</td>
+<td>Inpainting</td>
+<td>Context-aware fill</td>
+</tr>
+<tr>
+<td>RIFE</td>
+<td>Interpolation</td>
+<td>Frame rate upscaling</td>
+</tr>
+<tr>
+<td>Real-ESRGAN 4x</td>
+<td>Upscaling</td>
+<td>Photo-realistic enhancement</td>
+</tr>
+<tr>
+<td>Real-ESRGAN Anime</td>
+<td>Upscaling</td>
+<td>Animation optimization</td>
+</tr>
+<tr>
+<td>GFPGAN</td>
+<td>Face</td>
+<td>Face restoration</td>
+</tr>
+<tr>
+<td>CodeFormer</td>
+<td>Face</td>
+<td>Face enhancement</td>
+</tr>
+<tr>
+<td>Background Matting V2</td>
+<td>Matting</td>
+<td>Alpha matte extraction</td>
+</tr>
+<tr>
+<td>MODNet</td>
+<td>Matting</td>
+<td>Real-time portraits</td>
+</tr>
+</tbody>
+</table>
+<h2 id="database-schema-extensions">10.2 Database Schema Extensions</h2>
+<pre class="sql"><code>-- migrations/020_visual_ai_pipeline.sql
+
+-- Model thermal state tracking
+ALTER TABLE self_hosted_models ADD COLUMN IF NOT EXISTS thermal_state VARCHAR(20) DEFAULT &#39;COLD&#39;;
+ALTER TABLE self_hosted_models ADD COLUMN IF NOT EXISTS warm_until TIMESTAMPTZ;
+ALTER TABLE self_hosted_models ADD COLUMN IF NOT EXISTS auto_thermal_enabled BOOLEAN DEFAULT true;
+
+-- Visual pipeline job tracking
+CREATE TABLE visual_pipeline_jobs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    pipeline_type VARCHAR(50) NOT NULL,
+    source_asset_key VARCHAR(500) NOT NULL,
+    output_asset_key VARCHAR(500),
+    models_used TEXT[] NOT NULL,
+    parameters JSONB DEFAULT &#39;{}&#39;,
+    status VARCHAR(20) NOT NULL DEFAULT &#39;pending&#39;,
+    progress INTEGER DEFAULT 0,
+    started_at TIMESTAMPTZ,
+    completed_at TIMESTAMPTZ,
+    error_message TEXT,
+    cost DECIMAL(10, 6),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_visual_jobs_tenant ON visual_pipeline_jobs(tenant_id);
+CREATE INDEX idx_visual_jobs_status ON visual_pipeline_jobs(status);
+
+ALTER TABLE visual_pipeline_jobs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY visual_jobs_isolation ON visual_pipeline_jobs USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);</code></pre>
+<h2 id="thermal-state-service">10.3 Thermal State Service</h2>
+<pre class="typescript"><code>// packages/core/src/services/thermal-state-service.ts
+
+import { Pool } from &#39;pg&#39;;
+import { SageMakerClient, DescribeEndpointCommand, UpdateEndpointCommand } from &#39;@aws-sdk/client-sagemaker&#39;;
+
+export type ThermalState = &#39;OFF&#39; | &#39;COLD&#39; | &#39;WARM&#39; | &#39;HOT&#39; | &#39;AUTOMATIC&#39;;
+export type ServiceState = &#39;RUNNING&#39; | &#39;DEGRADED&#39; | &#39;DISABLED&#39; | &#39;OFFLINE&#39;;
+
+interface ThermalConfig {
+    warmDurationMinutes: number;
+    hotThresholdRequestsPerMinute: number;
+    coldThresholdIdleMinutes: number;
+}
+
+export class ThermalStateService {
+    private pool: Pool;
+    private sagemaker: SageMakerClient;
+    
+    constructor(pool: Pool) {
+        this.pool = pool;
+        this.sagemaker = new SageMakerClient({});
+    }
+    
+    async getThermalState(modelId: string): Promise&lt;ThermalState&gt; {
+        const result = await this.pool.query(
+            `SELECT thermal_state, warm_until, auto_thermal_enabled FROM self_hosted_models WHERE id = $1`,
+            [modelId]
+        );
+        
+        if (result.rows.length === 0) throw new Error(&#39;Model not found&#39;);
+        
+        const { thermal_state, warm_until, auto_thermal_enabled } = result.rows[0];
+        
+        if (auto_thermal_enabled &amp;&amp; warm_until &amp;&amp; new Date(warm_until) &lt; new Date()) {
+            await this.transitionToCold(modelId);
+            return &#39;COLD&#39;;
+        }
+        
+        return thermal_state;
+    }
+    
+    async warmUp(modelId: string, durationMinutes: number = 30): Promise&lt;void&gt; {
+        const warmUntil = new Date(Date.now() + durationMinutes * 60 * 1000);
+        
+        await this.pool.query(
+            `UPDATE self_hosted_models SET thermal_state = &#39;WARM&#39;, warm_until = $2 WHERE id = $1`,
+            [modelId, warmUntil]
+        );
+        
+        // Trigger SageMaker endpoint if needed
+        const model = await this.getModel(modelId);
+        if (model.endpoint_name) {
+            await this.ensureEndpointRunning(model.endpoint_name);
+        }
+    }
+    
+    async transitionToCold(modelId: string): Promise&lt;void&gt; {
+        await this.pool.query(
+            `UPDATE self_hosted_models SET thermal_state = &#39;COLD&#39;, warm_until = NULL WHERE id = $1`,
+            [modelId]
+        );
+    }
+    
+    private async getModel(modelId: string) {
+        const result = await this.pool.query(`SELECT * FROM self_hosted_models WHERE id = $1`, [modelId]);
+        return result.rows[0];
+    }
+    
+    private async ensureEndpointRunning(endpointName: string): Promise&lt;void&gt; {
+        const command = new DescribeEndpointCommand({ EndpointName: endpointName });
+        const response = await this.sagemaker.send(command);
+        
+        if (response.EndpointStatus !== &#39;InService&#39;) {
+            console.log(`Endpoint ${endpointName} status: ${response.EndpointStatus}`);
+        }
+    }
+}</code></pre>
+<h2 id="visual-pipeline-handler">10.4 Visual Pipeline Handler</h2>
+<pre class="typescript"><code>// packages/lambdas/visual-pipeline/handler.ts
+
+import { S3Client, GetObjectCommand, PutObjectCommand } from &#39;@aws-sdk/client-s3&#39;;
+import { SageMakerRuntimeClient, InvokeEndpointCommand } from &#39;@aws-sdk/client-sagemaker-runtime&#39;;
+
+interface PipelineRequest {
+    tenantId: string;
+    userId: string;
+    pipelineType: &#39;segment&#39; | &#39;inpaint&#39; | &#39;upscale&#39; | &#39;interpolate&#39; | &#39;face_restore&#39;;
+    sourceAssetKey: string;
+    parameters: Record&lt;string, any&gt;;
+}
+
+export async function handler(event: PipelineRequest) {
+    const s3 = new S3Client({});
+    const sagemaker = new SageMakerRuntimeClient({});
+    
+    const pipelineHandlers: Record&lt;string, (input: Buffer, params: any) =&gt; Promise&lt;Buffer&gt;&gt; = {
+        segment: async (input, params) =&gt; {
+            const endpoint = params.quality === &#39;high&#39; ? &#39;sam2-large&#39; : &#39;sam2-base&#39;;
+            return invokeSageMaker(sagemaker, endpoint, input);
+        },
+        inpaint: async (input, params) =&gt; {
+            return invokeSageMaker(sagemaker, &#39;lama-inpaint&#39;, input, { mask: params.maskData });
+        },
+        upscale: async (input, params) =&gt; {
+            const endpoint = params.style === &#39;anime&#39; ? &#39;realesrgan-anime&#39; : &#39;realesrgan-4x&#39;;
+            return invokeSageMaker(sagemaker, endpoint, input);
+        },
+        interpolate: async (input, params) =&gt; {
+            return invokeSageMaker(sagemaker, &#39;rife-interpolation&#39;, input, { targetFps: params.targetFps });
+        },
+        face_restore: async (input, params) =&gt; {
+            const endpoint = params.method === &#39;codeformer&#39; ? &#39;codeformer&#39; : &#39;gfpgan&#39;;
+            return invokeSageMaker(sagemaker, endpoint, input);
+        }
+    };
+    
+    // Get source asset
+    const sourceObj = await s3.send(new GetObjectCommand({
+        Bucket: process.env.ASSETS_BUCKET!,
+        Key: event.sourceAssetKey
+    }));
+    const inputBuffer = Buffer.from(await sourceObj.Body!.transformToByteArray());
+    
+    // Process through pipeline
+    const handler = pipelineHandlers[event.pipelineType];
+    const outputBuffer = await handler(inputBuffer, event.parameters);
+    
+    // Save result
+    const outputKey = `processed/${event.tenantId}/${Date.now()}_${event.pipelineType}.png`;
+    await s3.send(new PutObjectCommand({
+        Bucket: process.env.ASSETS_BUCKET!,
+        Key: outputKey,
+        Body: outputBuffer,
+        ContentType: &#39;image/png&#39;
+    }));
+    
+    return { outputAssetKey: outputKey };
+}
+
+async function invokeSageMaker(
+    client: SageMakerRuntimeClient,
+    endpoint: string,
+    input: Buffer,
+    extraParams?: Record&lt;string, any&gt;
+): Promise&lt;Buffer&gt; {
+    const payload = {
+        image: input.toString(&#39;base64&#39;),
+        ...extraParams
+    };
+    
+    const response = await client.send(new InvokeEndpointCommand({
+        EndpointName: endpoint,
+        Body: JSON.stringify(payload),
+        ContentType: &#39;application/json&#39;
+    }));
+    
+    const result = JSON.parse(new TextDecoder().decode(response.Body));
+    return Buffer.from(result.output, &#39;base64&#39;);
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

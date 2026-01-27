@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIANT SYSTEM GUIDE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RADIANT SYSTEM GUIDE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/RADIANT-SYSTEM-GUIDE.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.17.0---deployed-system-guide">RADIANT v4.17.0 - Deployed System Guide</h1>
+<blockquote>
+<p><strong>Operations and infrastructure documentation for the deployed RADIANT platform</strong></p>
+<p>Last Updated: {{BUILD_DATE}} Version: {{RADIANT_VERSION}}</p>
+</blockquote>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-system-overview">System Overview</a></li>
+<li><a href="#2-infrastructure-components">Infrastructure Components</a></li>
+<li><a href="#3-deployment-architecture">Deployment Architecture</a></li>
+<li><a href="#4-service-endpoints">Service Endpoints</a></li>
+<li><a href="#5-database-operations">Database Operations</a></li>
+<li><a href="#6-lambda-functions">Lambda Functions</a></li>
+<li><a href="#7-ai-provider-integration">AI Provider Integration</a></li>
+<li><a href="#8-monitoring--observability">Monitoring &amp; Observability</a></li>
+<li><a href="#9-security-configuration">Security Configuration</a></li>
+<li><a href="#10-backup--recovery">Backup &amp; Recovery</a></li>
+<li><a href="#11-maintenance-procedures">Maintenance Procedures</a></li>
+<li><a href="#12-troubleshooting">Troubleshooting</a></li>
+</ol>
+<hr />
+<h2 id="system-overview">1. System Overview</h2>
+<h3 id="platform-summary">1.1 Platform Summary</h3>
+<p>RADIANT is a multi-tenant AWS SaaS platform deployed across multiple AWS services:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>AWS Service</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Compute</td>
+<td>Lambda</td>
+<td>Serverless API handlers</td>
+</tr>
+<tr>
+<td>Database</td>
+<td>Aurora PostgreSQL</td>
+<td>Primary data store</td>
+</tr>
+<tr>
+<td>Cache</td>
+<td>ElastiCache Redis</td>
+<td>Session &amp; response caching</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>S3</td>
+<td>File storage, artifacts</td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>Cognito</td>
+<td>User authentication</td>
+</tr>
+<tr>
+<td>API</td>
+<td>API Gateway</td>
+<td>REST &amp; WebSocket APIs</td>
+</tr>
+<tr>
+<td>AI</td>
+<td>SageMaker, Bedrock</td>
+<td>Model hosting</td>
+</tr>
+<tr>
+<td>CDN</td>
+<td>CloudFront</td>
+<td>Static asset delivery</td>
+</tr>
+<tr>
+<td>DNS</td>
+<td>Route 53</td>
+<td>Domain management</td>
+</tr>
+</tbody>
+</table>
+<h3 id="environment-tiers">1.2 Environment Tiers</h3>
+<table>
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 30%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr>
+<th>Environment</th>
+<th>Purpose</th>
+<th>Domain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Production</strong></td>
+<td>Live customer traffic</td>
+<td><code>api.{{RADIANT_DOMAIN}}</code></td>
+</tr>
+<tr>
+<td><strong>Staging</strong></td>
+<td>Pre-release testing</td>
+<td><code>staging-api.{{RADIANT_DOMAIN}}</code></td>
+</tr>
+<tr>
+<td><strong>Development</strong></td>
+<td>Development &amp; testing</td>
+<td><code>dev-api.{{RADIANT_DOMAIN}}</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="region-configuration">1.3 Region Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Region</th>
+<th>Role</th>
+<th>Services</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>us-east-1</code></td>
+<td>Primary</td>
+<td>All services</td>
+</tr>
+<tr>
+<td><code>us-west-2</code></td>
+<td>DR Failover</td>
+<td>Database replica, S3 replication</td>
+</tr>
+<tr>
+<td><code>eu-west-1</code></td>
+<td>EU Data Residency</td>
+<td>Optional for GDPR compliance</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="infrastructure-components">2. Infrastructure Components</h2>
+<h3 id="vpc-architecture">2.1 VPC Architecture</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│                        RADIANT VPC (10.0.0.0/16)                    │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                    Public Subnets                            │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │   │
+│  │  │ us-east-1a  │  │ us-east-1b  │  │ us-east-1c  │          │   │
+│  │  │ 10.0.1.0/24 │  │ 10.0.2.0/24 │  │ 10.0.3.0/24 │          │   │
+│  │  │ NAT Gateway │  │ NAT Gateway │  │             │          │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘          │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                    Private Subnets (App)                     │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │   │
+│  │  │ us-east-1a  │  │ us-east-1b  │  │ us-east-1c  │          │   │
+│  │  │ 10.0.11.0/24│  │ 10.0.12.0/24│  │ 10.0.13.0/24│          │   │
+│  │  │ Lambda ENIs │  │ Lambda ENIs │  │ Lambda ENIs │          │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘          │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                    Private Subnets (Data)                    │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │   │
+│  │  │ us-east-1a  │  │ us-east-1b  │  │ us-east-1c  │          │   │
+│  │  │ 10.0.21.0/24│  │ 10.0.22.0/24│  │ 10.0.23.0/24│          │   │
+│  │  │ Aurora, RDS │  │ ElastiCache │  │ Backup      │          │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘          │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="security-groups">2.2 Security Groups</h3>
+<table>
+<thead>
+<tr>
+<th>Security Group</th>
+<th>Inbound Rules</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sg-lambda</code></td>
+<td>None (outbound only)</td>
+<td>Lambda functions</td>
+</tr>
+<tr>
+<td><code>sg-aurora</code></td>
+<td>5432 from sg-lambda</td>
+<td>Database access</td>
+</tr>
+<tr>
+<td><code>sg-redis</code></td>
+<td>6379 from sg-lambda</td>
+<td>Cache access</td>
+</tr>
+<tr>
+<td><code>sg-alb</code></td>
+<td>443 from 0.0.0.0/0</td>
+<td>Load balancer</td>
+</tr>
+</tbody>
+</table>
+<h3 id="iam-roles">2.3 IAM Roles</h3>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 55%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr>
+<th>Role</th>
+<th>Attached Policies</th>
+<th>Used By</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>radiant-lambda-role</code></td>
+<td>AWSLambdaVPCAccess, SecretsManager, S3, SageMaker</td>
+<td>Lambda functions</td>
+</tr>
+<tr>
+<td><code>radiant-api-gw-role</code></td>
+<td>CloudWatchLogs, Lambda invoke</td>
+<td>API Gateway</td>
+</tr>
+<tr>
+<td><code>radiant-sagemaker-role</code></td>
+<td>SageMakerFullAccess, S3</td>
+<td>SageMaker endpoints</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="deployment-architecture">3. Deployment Architecture</h2>
+<h3 id="cdk-stacks">3.1 CDK Stacks</h3>
+<table>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Resources</th>
+<th>Dependencies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NetworkingStack</code></td>
+<td>VPC, Subnets, NAT</td>
+<td>None</td>
+</tr>
+<tr>
+<td><code>SecurityStack</code></td>
+<td>IAM, KMS, Security Groups</td>
+<td>Networking</td>
+</tr>
+<tr>
+<td><code>DataStack</code></td>
+<td>Aurora, ElastiCache, S3</td>
+<td>Security</td>
+</tr>
+<tr>
+<td><code>AuthStack</code></td>
+<td>Cognito User Pool</td>
+<td>Data</td>
+</tr>
+<tr>
+<td><code>ApiStack</code></td>
+<td>API Gateway, Lambda</td>
+<td>Auth, Data</td>
+</tr>
+<tr>
+<td><code>AiStack</code></td>
+<td>SageMaker, Bedrock config</td>
+<td>Api</td>
+</tr>
+<tr>
+<td><code>MonitoringStack</code></td>
+<td>CloudWatch, Alarms</td>
+<td>All</td>
+</tr>
+<tr>
+<td><code>AdminStack</code></td>
+<td>Admin Dashboard hosting</td>
+<td>Api</td>
+</tr>
+</tbody>
+</table>
+<h3 id="deployment-commands">3.2 Deployment Commands</h3>
+<pre class="bash"><code># Deploy all stacks to development
+npm run deploy:dev
+
+# Deploy to staging with approval
+npm run deploy:staging
+
+# Deploy to production (requires approval)
+npm run deploy:prod
+
+# Deploy specific stack
+cd packages/infrastructure
+cdk deploy RadiantApiStack --context environment=prod</code></pre>
+<h3 id="environment-variables">3.3 Environment Variables</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AURORA_CLUSTER_ARN</code></td>
+<td>Database cluster ARN</td>
+<td>CDK output</td>
+</tr>
+<tr>
+<td><code>AURORA_SECRET_ARN</code></td>
+<td>Database credentials</td>
+<td>Secrets Manager</td>
+</tr>
+<tr>
+<td><code>COGNITO_USER_POOL_ID</code></td>
+<td>Auth pool ID</td>
+<td>CDK output</td>
+</tr>
+<tr>
+<td><code>REDIS_URL</code></td>
+<td>Cache connection string</td>
+<td>CDK output</td>
+</tr>
+<tr>
+<td><code>S3_BUCKET</code></td>
+<td>Storage bucket name</td>
+<td>CDK output</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="service-endpoints">4. Service Endpoints</h2>
+<h3 id="api-gateway-endpoints">4.1 API Gateway Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/v1/chat</code></td>
+<td>POST</td>
+<td>Send chat message</td>
+</tr>
+<tr>
+<td><code>/v1/chat/stream</code></td>
+<td>WebSocket</td>
+<td>Streaming responses</td>
+</tr>
+<tr>
+<td><code>/v1/models</code></td>
+<td>GET</td>
+<td>List available models</td>
+</tr>
+<tr>
+<td><code>/v1/usage</code></td>
+<td>GET</td>
+<td>Usage statistics</td>
+</tr>
+<tr>
+<td><code>/admin/v1/*</code></td>
+<td>Various</td>
+<td>Admin API</td>
+</tr>
+</tbody>
+</table>
+<h3 id="health-check-endpoints">4.2 Health Check Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Expected Response</th>
+<th>Checks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/health</code></td>
+<td><code>{"status":"healthy"}</code></td>
+<td>Lambda running</td>
+</tr>
+<tr>
+<td><code>/health/db</code></td>
+<td><code>{"status":"connected"}</code></td>
+<td>Aurora connection</td>
+</tr>
+<tr>
+<td><code>/health/cache</code></td>
+<td><code>{"status":"connected"}</code></td>
+<td>Redis connection</td>
+</tr>
+<tr>
+<td><code>/health/providers</code></td>
+<td>Provider status array</td>
+<td>AI provider APIs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="internal-endpoints">4.3 Internal Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 40%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr>
+<th>Service</th>
+<th>Endpoint</th>
+<th>Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Aurora PostgreSQL</td>
+<td><code>radiant-cluster.xxx.us-east-1.rds.amazonaws.com</code></td>
+<td>5432</td>
+</tr>
+<tr>
+<td>ElastiCache Redis</td>
+<td><code>radiant-cache.xxx.cache.amazonaws.com</code></td>
+<td>6379</td>
+</tr>
+<tr>
+<td>SageMaker Runtime</td>
+<td>Via AWS SDK</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="database-operations">5. Database Operations</h2>
+<h3 id="aurora-configuration">5.1 Aurora Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engine</td>
+<td>PostgreSQL 15.4</td>
+</tr>
+<tr>
+<td>Instance Type</td>
+<td>Serverless v2</td>
+</tr>
+<tr>
+<td>Min ACUs</td>
+<td>2 (dev), 8 (prod)</td>
+</tr>
+<tr>
+<td>Max ACUs</td>
+<td>16 (dev), 128 (prod)</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>Auto-scaling to 128 TB</td>
+</tr>
+<tr>
+<td>Encryption</td>
+<td>AES-256 (KMS)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="connection-management">5.2 Connection Management</h3>
+<pre class="sql"><code>-- Check active connections
+SELECT count(*) FROM pg_stat_activity;
+
+-- View connection by application
+SELECT application_name, count(*) 
+FROM pg_stat_activity 
+GROUP BY application_name;
+
+-- Terminate idle connections
+SELECT pg_terminate_backend(pid) 
+FROM pg_stat_activity 
+WHERE state = &#39;idle&#39; 
+AND query_start &lt; now() - interval &#39;10 minutes&#39;;</code></pre>
+<h3 id="row-level-security">5.3 Row-Level Security</h3>
+<p>All tenant data is protected by RLS:</p>
+<pre class="sql"><code>-- Verify RLS is enabled
+SELECT tablename, rowsecurity 
+FROM pg_tables 
+WHERE schemaname = &#39;public&#39; AND rowsecurity = true;
+
+-- Set tenant context (done automatically by Lambda)
+SET app.current_tenant_id = &#39;tenant-uuid&#39;;
+
+-- Queries automatically filter by tenant
+SELECT * FROM users; -- Only returns current tenant&#39;s users</code></pre>
+<h3 id="database-migrations">5.4 Database Migrations</h3>
+<pre class="bash"><code># Run pending migrations
+cd packages/infrastructure
+npm run migrate:up
+
+# Rollback last migration
+npm run migrate:down
+
+# View migration status
+npm run migrate:status</code></pre>
+<hr />
+<h2 id="lambda-functions">6. Lambda Functions</h2>
+<h3 id="function-inventory">6.1 Function Inventory</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Memory</th>
+<th>Timeout</th>
+<th>Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>radiant-api</code></td>
+<td>1024 MB</td>
+<td>30s</td>
+<td>API Gateway</td>
+</tr>
+<tr>
+<td><code>radiant-brain</code></td>
+<td>2048 MB</td>
+<td>60s</td>
+<td>API Gateway</td>
+</tr>
+<tr>
+<td><code>radiant-webhooks</code></td>
+<td>512 MB</td>
+<td>30s</td>
+<td>EventBridge</td>
+</tr>
+<tr>
+<td><code>radiant-scheduler</code></td>
+<td>512 MB</td>
+<td>300s</td>
+<td>EventBridge (cron)</td>
+</tr>
+<tr>
+<td><code>radiant-batch</code></td>
+<td>3008 MB</td>
+<td>900s</td>
+<td>SQS</td>
+</tr>
+</tbody>
+</table>
+<h3 id="monitoring-lambda">6.2 Monitoring Lambda</h3>
+<pre class="bash"><code># View recent invocations
+aws lambda get-function \
+  --function-name radiant-api \
+  --query &#39;Configuration.[FunctionName,MemorySize,Timeout,LastModified]&#39;
+
+# Check concurrent executions
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/Lambda \
+  --metric-name ConcurrentExecutions \
+  --dimensions Name=FunctionName,Value=radiant-api \
+  --start-time $(date -u -d &#39;1 hour ago&#39; +%Y-%m-%dT%H:%M:%SZ) \
+  --end-time $(date -u +%Y-%m-%dT%H:%M:%SZ) \
+  --period 300 \
+  --statistics Maximum</code></pre>
+<h3 id="cold-start-optimization">6.3 Cold Start Optimization</h3>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Provisioned Concurrency</td>
+<td>10 instances for <code>radiant-api</code></td>
+</tr>
+<tr>
+<td>Keep-Warm</td>
+<td>CloudWatch scheduled ping every 5 min</td>
+</tr>
+<tr>
+<td>Connection Pooling</td>
+<td>RDS Proxy for database</td>
+</tr>
+<tr>
+<td>Lazy Loading</td>
+<td>Defer non-critical imports</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="ai-provider-integration">7. AI Provider Integration</h2>
+<h3 id="external-providers">7.1 External Providers</h3>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Models</th>
+<th>Authentication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenAI</td>
+<td>GPT-4, GPT-3.5</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td>Anthropic</td>
+<td>Claude 3, Claude 2</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td>Google</td>
+<td>Gemini Pro, PaLM 2</td>
+<td>Service Account</td>
+</tr>
+<tr>
+<td>Cohere</td>
+<td>Command, Embed</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td>Mistral</td>
+<td>Mistral Large, Medium</td>
+<td>API Key</td>
+</tr>
+</tbody>
+</table>
+<h3 id="self-hosted-models-sagemaker">7.2 Self-Hosted Models (SageMaker)</h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Instance Type</th>
+<th>Thermal Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLaMA-2-70B</td>
+<td>ml.g5.48xlarge</td>
+<td>COLD</td>
+</tr>
+<tr>
+<td>Stable Diffusion XL</td>
+<td>ml.g5.2xlarge</td>
+<td>COLD</td>
+</tr>
+<tr>
+<td>Whisper Large</td>
+<td>ml.g4dn.xlarge</td>
+<td>COLD</td>
+</tr>
+<tr>
+<td>CodeLlama-34B</td>
+<td>ml.g5.12xlarge</td>
+<td>COLD</td>
+</tr>
+</tbody>
+</table>
+<h3 id="model-thermal-states">7.3 Model Thermal States</h3>
+<pre class="bash"><code># Check endpoint status
+aws sagemaker describe-endpoint \
+  --endpoint-name radiant-llama-70b
+
+# Scale endpoint to warm
+aws sagemaker update-endpoint-weights-and-capacities \
+  --endpoint-name radiant-llama-70b \
+  --desired-weights-and-capacities &#39;[{&quot;VariantName&quot;:&quot;AllTraffic&quot;,&quot;DesiredInstanceCount&quot;:1}]&#39;
+
+# Scale to zero (cold)
+aws sagemaker update-endpoint-weights-and-capacities \
+  --endpoint-name radiant-llama-70b \
+  --desired-weights-and-capacities &#39;[{&quot;VariantName&quot;:&quot;AllTraffic&quot;,&quot;DesiredInstanceCount&quot;:0}]&#39;</code></pre>
+<hr />
+<h2 id="monitoring-observability">8. Monitoring &amp; Observability</h2>
+<h3 id="cloudwatch-dashboards">8.1 CloudWatch Dashboards</h3>
+<table>
+<thead>
+<tr>
+<th>Dashboard</th>
+<th>Metrics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Platform Overview</td>
+<td>Request rate, latency, errors</td>
+</tr>
+<tr>
+<td>Database Performance</td>
+<td>Connections, ACUs, query time</td>
+</tr>
+<tr>
+<td>AI Provider Health</td>
+<td>Success rate, latency by provider</td>
+</tr>
+<tr>
+<td>Billing &amp; Usage</td>
+<td>Credits consumed, revenue</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-metrics">8.2 Key Metrics</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Warning</th>
+<th>Critical</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API Error Rate</td>
+<td>&gt; 1%</td>
+<td>&gt; 5%</td>
+</tr>
+<tr>
+<td>P99 Latency</td>
+<td>&gt; 5s</td>
+<td>&gt; 15s</td>
+</tr>
+<tr>
+<td>Aurora ACU Usage</td>
+<td>&gt; 80%</td>
+<td>&gt; 95%</td>
+</tr>
+<tr>
+<td>Lambda Errors</td>
+<td>&gt; 10/min</td>
+<td>&gt; 50/min</td>
+</tr>
+</tbody>
+</table>
+<h3 id="alerting">8.3 Alerting</h3>
+<pre class="bash"><code># List configured alarms
+aws cloudwatch describe-alarms \
+  --alarm-name-prefix radiant
+
+# View alarm state
+aws cloudwatch describe-alarm-history \
+  --alarm-name radiant-high-error-rate</code></pre>
+<h3 id="log-groups">8.4 Log Groups</h3>
+<table>
+<thead>
+<tr>
+<th>Log Group</th>
+<th>Retention</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/aws/lambda/radiant-api</code></td>
+<td>30 days</td>
+<td>API request logs</td>
+</tr>
+<tr>
+<td><code>/aws/lambda/radiant-brain</code></td>
+<td>30 days</td>
+<td>Model routing logs</td>
+</tr>
+<tr>
+<td><code>/radiant/audit</code></td>
+<td>365 days</td>
+<td>Security audit logs</td>
+</tr>
+<tr>
+<td><code>/radiant/billing</code></td>
+<td>2 years</td>
+<td>Billing events</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="security-configuration">9. Security Configuration</h2>
+<h3 id="encryption">9.1 Encryption</h3>
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Encryption</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Database at rest</td>
+<td>AES-256 (KMS CMK)</td>
+</tr>
+<tr>
+<td>S3 objects</td>
+<td>AES-256 (SSE-S3)</td>
+</tr>
+<tr>
+<td>Secrets</td>
+<td>KMS envelope encryption</td>
+</tr>
+<tr>
+<td>API traffic</td>
+<td>TLS 1.3</td>
+</tr>
+</tbody>
+</table>
+<h3 id="secrets-management">9.2 Secrets Management</h3>
+<pre class="bash"><code># List RADIANT secrets
+aws secretsmanager list-secrets \
+  --filters Key=name,Values=radiant
+
+# Rotate database credentials
+aws secretsmanager rotate-secret \
+  --secret-id radiant/aurora-credentials
+
+# View secret metadata
+aws secretsmanager describe-secret \
+  --secret-id radiant/openai-api-key</code></pre>
+<h3 id="waf-rules">9.3 WAF Rules</h3>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Action</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rate Limiting</td>
+<td>Block</td>
+<td>&gt; 1000 req/min per IP</td>
+</tr>
+<tr>
+<td>SQL Injection</td>
+<td>Block</td>
+<td>SQLi pattern detection</td>
+</tr>
+<tr>
+<td>XSS</td>
+<td>Block</td>
+<td>Cross-site scripting</td>
+</tr>
+<tr>
+<td>Geo Blocking</td>
+<td>Block</td>
+<td>Sanctioned countries</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="backup-recovery">10. Backup &amp; Recovery</h2>
+<h3 id="automated-backups">10.1 Automated Backups</h3>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Frequency</th>
+<th>Retention</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Aurora Snapshots</td>
+<td>Daily</td>
+<td>35 days</td>
+</tr>
+<tr>
+<td>S3 Objects</td>
+<td>Continuous</td>
+<td>Versioned</td>
+</tr>
+<tr>
+<td>DynamoDB</td>
+<td>Point-in-time</td>
+<td>35 days</td>
+</tr>
+<tr>
+<td>Secrets</td>
+<td>Auto-versioned</td>
+<td>30 versions</td>
+</tr>
+</tbody>
+</table>
+<h3 id="recovery-procedures">10.2 Recovery Procedures</h3>
+<p><strong>Database Point-in-Time Recovery:</strong></p>
+<pre class="bash"><code>aws rds restore-db-cluster-to-point-in-time \
+  --source-db-cluster-identifier radiant-cluster \
+  --db-cluster-identifier radiant-cluster-restored \
+  --restore-to-time 2024-01-15T10:00:00Z</code></pre>
+<p><strong>S3 Object Recovery:</strong></p>
+<pre class="bash"><code># List object versions
+aws s3api list-object-versions \
+  --bucket radiant-storage \
+  --prefix tenant/123/
+
+# Restore specific version
+aws s3api copy-object \
+  --bucket radiant-storage \
+  --copy-source radiant-storage/file.txt?versionId=xxx \
+  --key file.txt</code></pre>
+<h3 id="disaster-recovery">10.3 Disaster Recovery</h3>
+<table>
+<thead>
+<tr>
+<th>RPO</th>
+<th>RTO</th>
+<th>Strategy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 hour</td>
+<td>4 hours</td>
+<td>Cross-region Aurora replica, S3 CRR</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="maintenance-procedures">11. Maintenance Procedures</h2>
+<h3 id="routine-maintenance">11.1 Routine Maintenance</h3>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Frequency</th>
+<th>Procedure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Security patches</td>
+<td>Weekly</td>
+<td>Automated via CDK</td>
+</tr>
+<tr>
+<td>Log rotation</td>
+<td>Daily</td>
+<td>Automated</td>
+</tr>
+<tr>
+<td>Database vacuum</td>
+<td>Weekly</td>
+<td>Automated</td>
+</tr>
+<tr>
+<td>Certificate renewal</td>
+<td>60 days</td>
+<td>ACM auto-renewal</td>
+</tr>
+</tbody>
+</table>
+<h3 id="scaling-operations">11.2 Scaling Operations</h3>
+<pre class="bash"><code># Scale Aurora
+aws rds modify-db-cluster \
+  --db-cluster-identifier radiant-cluster \
+  --serverless-v2-scaling-configuration MinCapacity=16,MaxCapacity=64
+
+# Update Lambda memory
+aws lambda update-function-configuration \
+  --function-name radiant-api \
+  --memory-size 2048</code></pre>
+<h3 id="deployment-checklist">11.3 Deployment Checklist</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Run tests in staging</label></li>
+<li><label><input type="checkbox" />Review CloudWatch for anomalies</label></li>
+<li><label><input type="checkbox" />Announce maintenance window</label></li>
+<li><label><input type="checkbox" />Deploy with <code>--require-approval</code></label></li>
+<li><label><input type="checkbox" />Verify health checks</label></li>
+<li><label><input type="checkbox" />Monitor error rates for 30 min</label></li>
+<li><label><input type="checkbox" />Update status page</label></li>
+</ul>
+<hr />
+<h2 id="troubleshooting">12. Troubleshooting</h2>
+<h3 id="common-issues">12.1 Common Issues</h3>
+<p><strong>High Latency:</strong></p>
+<pre class="bash"><code># Check database performance
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/RDS \
+  --metric-name DatabaseConnections \
+  --dimensions Name=DBClusterIdentifier,Value=radiant-cluster
+
+# Check Lambda duration
+aws logs filter-log-events \
+  --log-group-name /aws/lambda/radiant-api \
+  --filter-pattern &quot;REPORT Duration&quot;</code></pre>
+<p><strong>Connection Errors:</strong></p>
+<pre class="bash"><code># Verify security group rules
+aws ec2 describe-security-groups --group-ids sg-xxx
+
+# Check VPC endpoints
+aws ec2 describe-vpc-endpoints \
+  --filters Name=vpc-id,Values=vpc-xxx</code></pre>
+<h3 id="emergency-procedures">12.2 Emergency Procedures</h3>
+<p><strong>Rollback Deployment:</strong></p>
+<pre class="bash"><code># List recent deployments
+aws cloudformation list-stacks \
+  --stack-status-filter UPDATE_COMPLETE
+
+# Rollback to previous version
+cdk deploy --rollback</code></pre>
+<p><strong>Disable Problematic Feature:</strong></p>
+<pre class="bash"><code># Update feature flag
+aws ssm put-parameter \
+  --name /radiant/features/new-feature \
+  --value &quot;false&quot; \
+  --overwrite</code></pre>
+<hr />
+<h2 id="version-history">Version History</h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4.17.0</td>
+<td>{{BUILD_DATE}}</td>
+<td>Initial system guide</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>This documentation is automatically generated as part of the RADIANT build process.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

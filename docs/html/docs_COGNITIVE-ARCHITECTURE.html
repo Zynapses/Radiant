@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COGNITIVE ARCHITECTURE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>COGNITIVE ARCHITECTURE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/COGNITIVE-ARCHITECTURE.md</div>
+  </div>
+  
+  <h1 id="cognitive-architecture">Cognitive Architecture</h1>
+<blockquote>
+<p><strong>Beyond Orchestration: Structuring Thought</strong></p>
+</blockquote>
+<p>RADIANT’s Cognitive Architecture moves beyond simple model orchestration into true cognitive structuring. These five capabilities enable results that are categorically superior to single-model approaches.</p>
+<h2 id="overview">Overview</h2>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 29%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Purpose</th>
+<th>Key Benefit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tree of Thoughts</strong></td>
+<td>System 2 reasoning</td>
+<td>Solves problems single-shot models can’t</td>
+</tr>
+<tr>
+<td><strong>GraphRAG</strong></td>
+<td>Knowledge mapping</td>
+<td>Multi-hop reasoning across documents</td>
+</tr>
+<tr>
+<td><strong>Deep Research</strong></td>
+<td>Background agents</td>
+<td>50+ source analysis in 30 minutes</td>
+</tr>
+<tr>
+<td><strong>Dynamic LoRA</strong></td>
+<td>Hot-swap expertise</td>
+<td>Specialist-level domain performance</td>
+</tr>
+<tr>
+<td><strong>Generative UI</strong></td>
+<td>App factory</td>
+<td>AI becomes the interface</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tree-of-thoughts-system-2-reasoning">1. Tree of Thoughts (System 2 Reasoning)</h2>
+<h3 id="the-problem">The Problem</h3>
+<p>Standard LLMs operate on “System 1” thinking—fast, intuitive, linear. They write the first word that comes to mind. If they make a logic error in step 1, the entire chain collapses.</p>
+<h3 id="the-solution">The Solution</h3>
+<p>Implement Monte Carlo Tree Search (MCTS) or Beam Search for deliberate reasoning.</p>
+<h3 id="how-it-works">How It Works</h3>
+<pre><code>                    [Original Problem]
+                          │
+            ┌─────────────┼─────────────┐
+            │             │             │
+       [Approach 1]  [Approach 2]  [Approach 3]
+       Score: 0.8    Score: 0.6    Score: 0.3 ← PRUNED
+            │             │
+      ┌─────┴─────┐      │
+      │           │      │
+  [Step 1a]  [Step 1b]  [Step 2a]
+  Score: 0.9  Score: 0.7  Score: 0.5
+      │
+ [Final Answer]
+ Confidence: 92%</code></pre>
+<ol type="1">
+<li><strong>Branch</strong>: Generate 3 distinct “first steps” for a complex problem</li>
+<li><strong>Evaluate</strong>: Use a scoring model to rate which path is most promising</li>
+<li><strong>Backtrack</strong>: If a path scores poorly, rewind and try a different branch</li>
+<li><strong>Converge</strong>: Best path becomes the final answer</li>
+</ol>
+<h3 id="configuration">Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>maxDepth</code></td>
+<td>5</td>
+<td>Maximum reasoning steps</td>
+</tr>
+<tr>
+<td><code>branchingFactor</code></td>
+<td>3</td>
+<td>Thoughts per branch</td>
+</tr>
+<tr>
+<td><code>pruneThreshold</code></td>
+<td>0.3</td>
+<td>Score below which to prune</td>
+</tr>
+<tr>
+<td><code>selectionStrategy</code></td>
+<td>beam</td>
+<td>beam, mcts, or greedy</td>
+</tr>
+<tr>
+<td><code>beamWidth</code></td>
+<td>2</td>
+<td>Top K paths to keep</td>
+</tr>
+<tr>
+<td><code>defaultThinkingTimeMs</code></td>
+<td>30000</td>
+<td>Default thinking budget</td>
+</tr>
+</tbody>
+</table>
+<h3 id="user-experience">User Experience</h3>
+<p>Users can “trade time for intelligence”: - Quick answer: 10 seconds - Normal thinking: 30 seconds<br />
+- Deep reasoning: 2 minutes - Extended analysis: 5 minutes</p>
+<h3 id="best-for">Best For</h3>
+<ul>
+<li>Math problems</li>
+<li>Logic puzzles</li>
+<li>Multi-step planning</li>
+<li>Architecture decisions</li>
+<li>Code debugging</li>
+</ul>
+<h3 id="key-files">Key Files</h3>
+<ul>
+<li>Types: <code>packages/shared/src/types/cognitive-architecture.types.ts</code></li>
+<li>Service: <code>packages/infrastructure/lambda/shared/services/tree-of-thoughts.service.ts</code></li>
+<li>Table: <code>reasoning_trees</code></li>
+</ul>
+<hr />
+<h2 id="graphrag-structured-knowledge-mapping">2. GraphRAG (Structured Knowledge Mapping)</h2>
+<h3 id="the-problem-1">The Problem</h3>
+<p>Standard RAG uses vector similarity. If you search “Apple,” it finds text mathematically close to “Apple.” It fails at multi-hop reasoning:</p>
+<blockquote>
+<p>“How does the supplier change in the Q3 report affect the delayed launch mentioned in the Engineering memo?”</p>
+</blockquote>
+<p>Vector search can’t connect these dots.</p>
+<h3 id="the-solution-1">The Solution</h3>
+<p>Extract entities and relationships into a knowledge graph, then traverse connections.</p>
+<h3 id="how-it-works-1">How It Works</h3>
+<pre><code>Document Upload
+      │
+      ▼
+┌─────────────────────────────────────┐
+│     Entity/Relationship Extraction   │
+│  (Subject, Predicate, Object triples)│
+└─────────────────────────────────────┘
+      │
+      ▼
+┌─────────────────────────────────────┐
+│         Knowledge Graph              │
+│                                      │
+│  [Supplier A]──depends_on──&gt;[Product X]
+│       │                         │
+│   changed_in                 delayed_by
+│       │                         │
+│       ▼                         ▼
+│  [Q3 Report]              [Eng Memo]
+└─────────────────────────────────────┘
+      │
+      ▼
+┌─────────────────────────────────────┐
+│      Graph Traversal (3 hops)        │
+│  + Vector Similarity (Hybrid)        │
+└─────────────────────────────────────┘
+      │
+      ▼
+   Multi-hop Answer</code></pre>
+<h3 id="entity-types">Entity Types</h3>
+<ul>
+<li><code>person</code>, <code>organization</code>, <code>document</code>, <code>concept</code></li>
+<li><code>event</code>, <code>location</code>, <code>product</code>, <code>technology</code></li>
+<li><code>metric</code>, <code>date</code>, <code>custom</code></li>
+</ul>
+<h3 id="relationship-types">Relationship Types</h3>
+<ul>
+<li><code>authored_by</code>, <code>depends_on</code>, <code>blocked_by</code>, <code>related_to</code></li>
+<li><code>part_of</code>, <code>caused_by</code>, <code>precedes</code>, <code>follows</code></li>
+<li><code>mentions</code>, <code>contradicts</code>, <code>supports</code>, <code>defines</code></li>
+</ul>
+<h3 id="configuration-1">Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>maxEntitiesPerDocument</code></td>
+<td>50</td>
+<td>Extraction limit</td>
+</tr>
+<tr>
+<td><code>maxRelationshipsPerDocument</code></td>
+<td>100</td>
+<td>Relationship limit</td>
+</tr>
+<tr>
+<td><code>minConfidenceThreshold</code></td>
+<td>0.7</td>
+<td>Quality filter</td>
+</tr>
+<tr>
+<td><code>enableHybridSearch</code></td>
+<td>true</td>
+<td>Combine graph + vector</td>
+</tr>
+<tr>
+<td><code>graphWeight</code></td>
+<td>0.6</td>
+<td>Weight for graph results</td>
+</tr>
+<tr>
+<td><code>vectorWeight</code></td>
+<td>0.4</td>
+<td>Weight for vector results</td>
+</tr>
+<tr>
+<td><code>maxHops</code></td>
+<td>3</td>
+<td>Traversal depth</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-files-1">Key Files</h3>
+<ul>
+<li>Service: <code>packages/infrastructure/lambda/shared/services/graph-rag.service.ts</code></li>
+<li>Tables: <code>knowledge_entities</code>, <code>knowledge_relationships</code></li>
+</ul>
+<hr />
+<h2 id="deep-research-agents">3. Deep Research Agents</h2>
+<h3 id="the-problem-2">The Problem</h3>
+<p>Chat interfaces train users to expect answers in &lt;10 seconds. This forces models to be shallow. Humans don’t solve complex engineering problems in 10 seconds.</p>
+<h3 id="the-solution-2">The Solution</h3>
+<p>Decouple “Request” from “Response” with fire-and-forget background research.</p>
+<h3 id="how-it-works-2">How It Works</h3>
+<pre><code>User: &quot;Map the competitive landscape of solid-state batteries&quot;
+                    │
+                    ▼
+           ┌───────────────┐
+           │  Job Queued   │
+           │  ETA: 25 min  │
+           └───────────────┘
+                    │
+    ┌───────────────┴───────────────┐
+    │         Research Agent         │
+    │                                │
+    │  Phase 1: Planning (5%)        │
+    │  - Generate search queries     │
+    │  - Identify credible sources   │
+    │                                │
+    │  Phase 2: Gathering (10-50%)   │
+    │  - Visit 50+ websites          │
+    │  - Download PDFs               │
+    │  - Follow relevant links       │
+    │                                │
+    │  Phase 3: Analyzing (50-80%)   │
+    │  - Extract key information     │
+    │  - Score relevance             │
+    │  - Check credibility           │
+    │                                │
+    │  Phase 4: Synthesizing (80-95%)│
+    │  - Generate briefing document  │
+    │  - Extract key findings        │
+    │  - Formulate recommendations   │
+    │                                │
+    │  Phase 5: Review (95-100%)     │
+    │  - Quality check               │
+    │  - Format output               │
+    └────────────────────────────────┘
+                    │
+                    ▼
+           ┌───────────────┐
+           │  Notification │
+           │  &quot;Research    │
+           │   Complete&quot;   │
+           └───────────────┘
+                    │
+                    ▼
+    ┌───────────────────────────────┐
+    │     Briefing Document          │
+    │                                │
+    │  # Competitive Landscape       │
+    │  ## Executive Summary          │
+    │  ## Key Findings (12)          │
+    │  ## Recommendations (5)        │
+    │  ## Sources (47)               │
+    └───────────────────────────────┘</code></pre>
+<h3 id="research-types">Research Types</h3>
+<ul>
+<li><code>competitive_analysis</code> - Market competitors</li>
+<li><code>market_research</code> - Trends, sizing, forecasts</li>
+<li><code>technical_review</code> - Specifications, architecture</li>
+<li><code>literature_review</code> - Academic papers</li>
+<li><code>fact_check</code> - Verification</li>
+<li><code>general</code> - Open-ended research</li>
+</ul>
+<h3 id="configuration-2">Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>maxSources</code></td>
+<td>50</td>
+<td>Sources to process</td>
+</tr>
+<tr>
+<td><code>maxDepth</code></td>
+<td>2</td>
+<td>Link following depth</td>
+</tr>
+<tr>
+<td><code>maxDurationMs</code></td>
+<td>1800000</td>
+<td>30 minute timeout</td>
+</tr>
+<tr>
+<td><code>parallelRequests</code></td>
+<td>5</td>
+<td>Concurrent fetches</td>
+</tr>
+<tr>
+<td><code>requireCredibleSources</code></td>
+<td>true</td>
+<td>Quality filter</td>
+</tr>
+<tr>
+<td><code>minSourceCredibility</code></td>
+<td>0.6</td>
+<td>Credibility threshold</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-files-2">Key Files</h3>
+<ul>
+<li>Service: <code>packages/infrastructure/lambda/shared/services/deep-research.service.ts</code></li>
+<li>Tables: <code>research_jobs</code>, <code>job_queue</code></li>
+</ul>
+<hr />
+<h2 id="dynamic-lora-swapping">4. Dynamic LoRA Swapping</h2>
+<h3 id="the-problem-3">The Problem</h3>
+<p>Generalist models (like Gemini Ultra) are “Jacks of all trades.” They lack deep, niche expertise in specific domains like “Cobol Migration” or “California Property Law.”</p>
+<h3 id="the-solution-3">The Solution</h3>
+<p>Hot-swap lightweight LoRA adapters (~100MB each) that transform a generalist into a specialist.</p>
+<h3 id="how-it-works-3">How It Works</h3>
+<pre><code>┌─────────────────────────────────────────┐
+│           User Query                     │
+│  &quot;What are the easements requirements   │
+│   for commercial property in San Diego?&quot; │
+└─────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────┐
+│         Domain Detection                 │
+│  Field: Law                             │
+│  Domain: Real Estate Law                │
+│  Subspecialty: California Property      │
+└─────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────┐
+│         LoRA Registry (S3)               │
+│                                          │
+│  ┌──────────────────────────────┐       │
+│  │ california_property_law.safetensor │ │
+│  │ Size: 98MB                          │ │
+│  │ Base: Llama-3-70B                   │ │
+│  │ Rank: 32, Alpha: 64                 │ │
+│  │ Benchmark: 0.94                     │ │
+│  └──────────────────────────────┘       │
+└─────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────┐
+│     SageMaker Multi-Model Endpoint       │
+│                                          │
+│  Base Model: Llama-3-70B                │
+│  + california_property_law LoRA         │
+│                                          │
+│  Load Time: 1.2s (cached: 0ms)          │
+└─────────────────────────────────────────┘
+                    │
+                    ▼
+          Expert-Level Response</code></pre>
+<h3 id="available-domains">Available Domains</h3>
+<ul>
+<li><code>legal</code> - Law specializations</li>
+<li><code>medical</code> - Healthcare, clinical</li>
+<li><code>financial</code> - Finance, economics</li>
+<li><code>scientific</code> - Research domains</li>
+<li><code>coding</code> - Programming languages</li>
+<li><code>creative_writing</code> - Fiction, poetry</li>
+<li><code>translation</code> - Languages</li>
+<li><code>customer_support</code> - Support patterns</li>
+<li><code>technical_writing</code> - Documentation</li>
+</ul>
+<h3 id="configuration-3">Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>false</td>
+<td>Requires SageMaker setup</td>
+</tr>
+<tr>
+<td><code>registryBucket</code></td>
+<td>radiant-lora-adapters</td>
+<td>S3 bucket</td>
+</tr>
+<tr>
+<td><code>cacheSize</code></td>
+<td>5</td>
+<td>Adapters in memory</td>
+</tr>
+<tr>
+<td><code>maxLoadTimeMs</code></td>
+<td>5000</td>
+<td>Load timeout</td>
+</tr>
+<tr>
+<td><code>fallbackToBase</code></td>
+<td>true</td>
+<td>Use base on failure</td>
+</tr>
+<tr>
+<td><code>autoSelectByDomain</code></td>
+<td>true</td>
+<td>Auto-select adapter</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-files-3">Key Files</h3>
+<ul>
+<li>Service: <code>packages/infrastructure/lambda/shared/services/dynamic-lora.service.ts</code></li>
+<li>Table: <code>lora_adapters</code></li>
+</ul>
+<hr />
+<h2 id="generative-ui-app-factory">5. Generative UI (App Factory)</h2>
+<h3 id="the-problem-4">The Problem</h3>
+<p>No matter how smart the AI, if the output is just Markdown text, the utility is limited.</p>
+<h3 id="the-solution-4">The Solution</h3>
+<p>The AI generates the interface itself—interactive components that users can manipulate.</p>
+<h3 id="how-it-works-4">How It Works</h3>
+<pre><code>User: &quot;Compare pricing of GPT-4, Claude 3, and Gemini&quot;
+
+Traditional AI Response:
+┌─────────────────────────────────────────┐
+│ Here&#39;s a comparison:                     │
+│                                          │
+│ | Model    | Input   | Output  |        │
+│ |----------|---------|---------|        │
+│ | GPT-4    | $30/M   | $60/M   |        │
+│ | Claude 3 | $15/M   | $75/M   |        │
+│ | Gemini   | $7/M    | $21/M   |        │
+└─────────────────────────────────────────┘
+
+Generative UI Response:
+┌─────────────────────────────────────────┐
+│        💰 Pricing Calculator             │
+│                                          │
+│  Input Tokens: ────●──────── 50,000     │
+│  Output Tokens: ──────●───── 25,000     │
+│                                          │
+│  ┌─────────────────────────────────┐    │
+│  │ GPT-4    ████████████░░ $2.25   │    │
+│  │ Claude 3 ██████████████░ $2.63  │    │
+│  │ Gemini   ████░░░░░░░░░░ $0.88   │    │
+│  └─────────────────────────────────┘    │
+│                                          │
+│  💡 Gemini is 61% cheaper for this load │
+└─────────────────────────────────────────┘</code></pre>
+<h3 id="component-types">Component Types</h3>
+<ul>
+<li><code>chart</code> - Bar, line, pie charts</li>
+<li><code>table</code> - Interactive, sortable tables</li>
+<li><code>calculator</code> - Input sliders, computed outputs</li>
+<li><code>comparison</code> - Side-by-side comparisons</li>
+<li><code>timeline</code> - Chronological events</li>
+<li><code>form</code> - Input forms</li>
+<li><code>diagram</code> - Flow diagrams</li>
+<li><code>map</code> - Geographic displays</li>
+<li><code>kanban</code> - Task boards</li>
+<li><code>calendar</code> - Date displays</li>
+</ul>
+<h3 id="auto-detection-triggers">Auto-Detection Triggers</h3>
+<p>The system automatically generates UI when it detects: - “compare” → Comparison component - “calculate” → Calculator component - “visualize”, “chart”, “graph” → Chart component - “table” → Table component - “timeline” → Timeline component</p>
+<h3 id="configuration-4">Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>true</td>
+<td>Enable Generative UI</td>
+</tr>
+<tr>
+<td><code>maxComponentsPerResponse</code></td>
+<td>3</td>
+<td>Component limit</td>
+</tr>
+<tr>
+<td><code>autoDetectOpportunities</code></td>
+<td>true</td>
+<td>Auto-generate</td>
+</tr>
+<tr>
+<td><code>defaultTheme</code></td>
+<td>auto</td>
+<td>light, dark, auto</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-files-4">Key Files</h3>
+<ul>
+<li>Service: <code>packages/infrastructure/lambda/shared/services/generative-ui.service.ts</code></li>
+<li>Table: <code>generated_ui</code></li>
+</ul>
+<hr />
+<h2 id="agi-brain-integration">AGI Brain Integration</h2>
+<p>All five cognitive features integrate with the AGI Brain Planner:</p>
+<pre class="typescript"><code>// In agi-brain-planner.service.ts
+async generatePlan(prompt: string): Promise&lt;BrainPlan&gt; {
+  // Detect if Tree of Thoughts should be used
+  if (this.shouldUseTreeOfThoughts(prompt)) {
+    plan.orchestrationMode = &#39;extended_thinking&#39;;
+    plan.cognitiveFeatures.push(&#39;tree_of_thoughts&#39;);
+  }
+  
+  // Check if GraphRAG has relevant knowledge
+  const graphContext = await graphRAGService.hybridSearch(prompt);
+  if (graphContext.entities.length &gt; 0) {
+    plan.contextSources.push(&#39;knowledge_graph&#39;);
+  }
+  
+  // Dispatch deep research for complex queries
+  if (this.isResearchQuery(prompt)) {
+    plan.asyncResearch = true;
+  }
+  
+  // Select domain-specific LoRA
+  const adapter = await dynamicLoRAService.selectAdapterForDomain(domain);
+  if (adapter) {
+    plan.loraAdapter = adapter.id;
+  }
+  
+  // Detect UI generation opportunities
+  const uiOpportunity = await generativeUIService.detectUIOpportunity(prompt);
+  if (uiOpportunity.shouldGenerate) {
+    plan.generateUI = uiOpportunity.suggestedTypes;
+  }
+}</code></pre>
+<hr />
+<h2 id="database-tables">Database Tables</h2>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reasoning_trees</code></td>
+<td>Tree of Thoughts sessions</td>
+</tr>
+<tr>
+<td><code>knowledge_entities</code></td>
+<td>GraphRAG entities</td>
+</tr>
+<tr>
+<td><code>knowledge_relationships</code></td>
+<td>GraphRAG relationships</td>
+</tr>
+<tr>
+<td><code>research_jobs</code></td>
+<td>Deep Research job tracking</td>
+</tr>
+<tr>
+<td><code>job_queue</code></td>
+<td>Async job queue</td>
+</tr>
+<tr>
+<td><code>lora_adapters</code></td>
+<td>LoRA adapter registry</td>
+</tr>
+<tr>
+<td><code>generated_ui</code></td>
+<td>Generated UI components</td>
+</tr>
+<tr>
+<td><code>cognitive_architecture_config</code></td>
+<td>Per-tenant configuration</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="admin-dashboard">Admin Dashboard</h2>
+<p><strong>Location</strong>: Settings → Cognitive Architecture</p>
+<p>The admin dashboard provides: - Enable/disable toggles for each feature - Configuration sliders and inputs - Explanatory information panels - Per-tenant customization</p>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./AGI-BRAIN-PLAN-SYSTEM.md">AGI Brain Plan System</a></li>
+<li><a href="./DOMAIN-TAXONOMY.md">Domain Taxonomy</a></li>
+<li><a href="./INTELLIGENCE-AGGREGATOR-ARCHITECTURE.md">Intelligence Aggregator</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

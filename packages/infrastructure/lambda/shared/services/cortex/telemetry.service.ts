@@ -11,6 +11,8 @@ import type {
   TelemetryProtocol,
 } from '@radiant/shared';
 
+import { logger } from '../../logging/enhanced-logger';
+
 interface DbClient {
   query: (sql: string, params?: unknown[]) => Promise<{ rows: unknown[] }>;
 }
@@ -69,8 +71,29 @@ export class TelemetryService {
       [feedId]
     );
 
-    // In production, this would trigger an EventBridge rule or Lambda to start polling
-    // For now, we mark the feed as active
+    // Dispatch async polling task via SQS
+    try {
+      const { SQSClient, SendMessageCommand } = await import('@aws-sdk/client-sqs');
+      const sqs = new SQSClient({ region: process.env.AWS_REGION || 'us-east-1' });
+      const queueUrl = process.env.TELEMETRY_POLLING_QUEUE_URL;
+      
+      if (queueUrl) {
+        await sqs.send(new SendMessageCommand({
+          QueueUrl: queueUrl,
+          MessageBody: JSON.stringify({
+            action: 'start_polling',
+            feedId,
+            tenantId,
+            startedAt: new Date().toISOString(),
+          }),
+          MessageGroupId: tenantId,
+          MessageDeduplicationId: `start-${feedId}-${Date.now()}`,
+        }));
+      }
+    } catch (error) {
+      // Log but don't fail - feed is marked active for manual polling
+      logger.warn('Failed to dispatch telemetry polling task', { feedId, error });
+    }
   }
 
   /**

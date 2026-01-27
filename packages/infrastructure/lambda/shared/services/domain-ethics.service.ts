@@ -225,9 +225,79 @@ class DomainEthicsService {
     principle: { id: string; title: string; description: string; category: string },
     framework: DomainEthicsFramework
   ): EthicsWarning | null {
-    // For now, we only generate warnings for specific content patterns
-    // This could be enhanced with AI-based analysis
-    return null;
+    const lowerContent = content.toLowerCase();
+    const principleKeywords = this.extractKeywords(principle.description);
+    
+    // Check for category-specific warning patterns
+    const warningPatterns: Record<string, { keywords: string[]; severity: 'low' | 'medium' | 'high' }> = {
+      privacy: { 
+        keywords: ['personal data', 'user data', 'track', 'collect', 'store', 'share data', 'third party'],
+        severity: 'medium'
+      },
+      safety: {
+        keywords: ['harm', 'danger', 'risk', 'unsafe', 'weapon', 'injury', 'death'],
+        severity: 'high'
+      },
+      bias: {
+        keywords: ['discriminat', 'stereotype', 'prejudice', 'unfair', 'biased'],
+        severity: 'medium'
+      },
+      transparency: {
+        keywords: ['hidden', 'secret', 'undisclosed', 'deceiv', 'mislead'],
+        severity: 'medium'
+      },
+      autonomy: {
+        keywords: ['manipulat', 'coerce', 'force', 'compel', 'without consent'],
+        severity: 'high'
+      },
+      accountability: {
+        keywords: ['unaccountable', 'no oversight', 'unchecked', 'no audit'],
+        severity: 'low'
+      },
+    };
+
+    const categoryPatterns = warningPatterns[principle.category.toLowerCase()];
+    if (!categoryPatterns) return null;
+
+    // Check for keyword matches
+    const matchedKeywords: string[] = [];
+    for (const keyword of categoryPatterns.keywords) {
+      if (lowerContent.includes(keyword)) {
+        matchedKeywords.push(keyword);
+      }
+    }
+
+    // Also check principle-specific keywords
+    for (const keyword of principleKeywords) {
+      if (lowerContent.includes(keyword) && !matchedKeywords.includes(keyword)) {
+        matchedKeywords.push(keyword);
+      }
+    }
+
+    if (matchedKeywords.length === 0) return null;
+
+    // Generate warning based on matches
+    return {
+      frameworkId: framework.id,
+      frameworkCode: framework.id,
+      principleId: principle.id,
+      title: `Potential ${principle.category} concern`,
+      description: `Content may conflict with ${principle.title}: detected keywords [${matchedKeywords.slice(0, 3).join(', ')}]`,
+      recommendation: `Review content for alignment with ${principle.title}. Consider: ${principle.description.substring(0, 100)}`,
+    };
+  }
+
+  /**
+   * Extract keywords from principle description
+   */
+  private extractKeywords(description: string): string[] {
+    const stopWords = new Set(['the', 'a', 'an', 'is', 'are', 'be', 'to', 'of', 'and', 'or', 'in', 'on', 'for', 'with', 'that', 'this', 'it']);
+    return description
+      .toLowerCase()
+      .replace(/[^\w\s]/g, '')
+      .split(/\s+/)
+      .filter(word => word.length > 4 && !stopWords.has(word))
+      .slice(0, 10);
   }
   
   /**
@@ -581,14 +651,39 @@ class DomainEthicsService {
       checksByDomain[domain] = count;
     }
     
+    // Query for top violated rules
+    const rulesResult = await executeStatement(
+      `SELECT rule_id, rule_description, COUNT(*) as violation_count
+       FROM domain_ethics_audit_log
+       WHERE tenant_id = $1 
+         AND created_at >= $2
+         AND was_blocked = true
+       GROUP BY rule_id, rule_description
+       ORDER BY violation_count DESC
+       LIMIT 10`,
+      [
+        { name: 'tenantId', value: { stringValue: tenantId } },
+        { name: 'startDate', value: { stringValue: startDate.toISOString() } },
+      ]
+    );
+    
+    const topViolatedRules = (rulesResult.rows || []).map((r: unknown) => {
+      const ruleRow = r as Record<string, unknown>;
+      return {
+        ruleId: String(ruleRow.rule_id || ''),
+        description: String(ruleRow.rule_description || ''),
+        count: Number(ruleRow.violation_count) || 0,
+      };
+    });
+    
     const statsRow = row as { total_checks?: string | number; checks_today?: string | number; violations_blocked?: string | number; warnings_issued?: string | number } | undefined;
     return {
       totalChecks: Number(statsRow?.total_checks || 0),
       checksToday: Number(statsRow?.checks_today || 0),
       violationsBlocked: Number(statsRow?.violations_blocked || 0),
       warningsIssued: Number(statsRow?.warnings_issued || 0),
-      topViolatedRules: [], // Would need additional query
-      checksByDomain,
+      topViolatedRules: topViolatedRules as any,
+      checksByDomain: checksByDomain as any,
     };
   }
   

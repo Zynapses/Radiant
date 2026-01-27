@@ -1,0 +1,1971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORTEX ENGINEERING GUIDE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>CORTEX ENGINEERING GUIDE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/CORTEX-ENGINEERING-GUIDE.md</div>
+  </div>
+  
+  <h1 id="cortex-memory-system---engineering-guide">Cortex Memory System - Engineering Guide</h1>
+<p><strong>Version:</strong> 4.20.0<br />
+<strong>Last Updated:</strong> January 2026<br />
+<strong>Audience:</strong> Backend Engineers, Platform Engineers, AI/ML Engineers</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-system-architecture">System Architecture</a></li>
+<li><a href="#2-hot-tier-implementation">Hot Tier Implementation</a></li>
+<li><a href="#3-warm-tier-implementation">Warm Tier Implementation</a></li>
+<li><a href="#4-cold-tier-implementation">Cold Tier Implementation</a></li>
+<li><a href="#5-tier-coordinator-service">Tier Coordinator Service</a></li>
+<li><a href="#6-database-schema">Database Schema</a></li>
+<li><a href="#7-api-implementation">API Implementation</a></li>
+<li><a href="#8-migration-guide">Migration Guide</a></li>
+<li><a href="#9-testing-strategy">Testing Strategy</a></li>
+<li><a href="#10-performance-optimization">Performance Optimization</a></li>
+</ol>
+<hr />
+<h2 id="system-architecture">1. System Architecture</h2>
+<h3 id="the-retrieval-dance---runtime-query-logic">1.0 The “Retrieval Dance” - Runtime Query Logic</h3>
+<p>Before diving into components, understand how the system answers a question:</p>
+<pre class="typescript"><code>// The four-step &quot;Retrieval Dance&quot;
+async function retrievalDance(query: string, tenantId: string, userId: string): Promise&lt;Response&gt; {
+  // Step 1: INTENT PARSING (Hot Tier)
+  const hotContext = await hotTier.getSessionContext(tenantId, userId);
+  const ghostVector = await hotTier.getGhostVector(tenantId, userId);
+  const entities = await nlp.extractEntities(query); // &quot;Pump 302&quot;, &quot;Q4 Report&quot;
+  
+  // Step 2: GRAPH TRAVERSAL (Warm Tier)
+  const graphResults = await warmTier.traverseGraph(tenantId, entities, {
+    hops: 3,
+    checkGoldenRules: true  // ⚠️ CRITICAL: Check for overrides
+  });
+  
+  // If Golden Rule exists, it takes priority
+  if (graphResults.hasGoldenOverride) {
+    return graphResults.goldenAnswer; // Skip further retrieval
+  }
+  
+  // Step 3: DEEP FETCH (Cold Tier) - Only if needed
+  let coldContent = null;
+  if (graphResults.requiresColdFetch) {
+    // Fetch ONLY the specific page/section needed, not entire documents
+    coldContent = await coldTier.fetchViaStubNode(
+      graphResults.stubNodeId,
+      graphResults.specificRange // e.g., &quot;pages 47-48 of 500-page PDF&quot;
+    );
+  }
+  
+  // Step 4: SYNTHESIS (Foundation Model)
+  const response = await llm.generate({
+    query,
+    context: hotContext,
+    graphLogic: graphResults.paths,
+    coldContent,
+    chainOfCustody: buildAuditTrail(graphResults) // &quot;Bob verified this on Jan 23&quot;
+  });
+  
+  return response;
+}</code></pre>
+<h3 id="component-overview">1.1 Component Overview</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                           CORTEX MEMORY SYSTEM                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐         │
+│  │   HOT TIER      │    │   WARM TIER     │    │   COLD TIER     │         │
+│  │                 │    │                 │    │                 │         │
+│  │ ┌─────────────┐ │    │ ┌─────────────┐ │    │ ┌─────────────┐ │         │
+│  │ │   Redis     │ │    │ │   Neptune   │ │    │ │  S3 Iceberg │ │         │
+│  │ │   Cluster   │ │    │ │   Graph DB  │ │    │ │   Tables    │ │         │
+│  │ └─────────────┘ │    │ └─────────────┘ │    │ └─────────────┘ │         │
+│  │ ┌─────────────┐ │    │ ┌─────────────┐ │    │ ┌─────────────┐ │         │
+│  │ │  DynamoDB   │ │    │ │  pgvector   │ │    │ │   Athena    │ │         │
+│  │ │  Overflow   │ │    │ │  Embeddings │ │    │ │   Query     │ │         │
+│  │ └─────────────┘ │    │ └─────────────┘ │    │ └─────────────┘ │         │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘         │
+│           │                      │                      │                  │
+│           └──────────────────────┼──────────────────────┘                  │
+│                                  │                                         │
+│                    ┌─────────────▼─────────────┐                           │
+│                    │    TIER COORDINATOR       │                           │
+│                    │    ─────────────────      │                           │
+│                    │  • Data Flow Control      │                           │
+│                    │  • TTL Enforcement        │                           │
+│                    │  • Auto-Promotion         │                           │
+│                    │  • GDPR Erasure           │                           │
+│                    └───────────────────────────┘                           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="technology-stack">1.2 Technology Stack</h3>
+<table>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 37%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Technology</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hot Cache</td>
+<td>Redis 7.x (Cluster Mode)</td>
+<td>Sub-10ms key-value storage</td>
+</tr>
+<tr>
+<td>Hot Overflow</td>
+<td>DynamoDB</td>
+<td>Large value storage (&gt;400KB)</td>
+</tr>
+<tr>
+<td>Graph DB</td>
+<td>Amazon Neptune</td>
+<td>Relationship traversal</td>
+</tr>
+<tr>
+<td>Vector Store</td>
+<td>Aurora PostgreSQL + pgvector</td>
+<td>Semantic similarity search</td>
+</tr>
+<tr>
+<td>Archive Store</td>
+<td>S3 + Apache Iceberg</td>
+<td>Historical data warehouse</td>
+</tr>
+<tr>
+<td>Query Engine</td>
+<td>Amazon Athena</td>
+<td>SQL over Iceberg tables</td>
+</tr>
+<tr>
+<td>Orchestration</td>
+<td>TierCoordinator Lambda</td>
+<td>Data movement automation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="file-structure">1.3 File Structure</h3>
+<pre><code>packages/
+├── shared/src/types/
+│   └── cortex-memory.types.ts       # Type definitions
+│
+├── infrastructure/
+│   ├── migrations/
+│   │   └── V2026_01_23_002__cortex_memory_system.sql
+│   │
+│   ├── lambda/
+│   │   ├── shared/services/cortex/
+│   │   │   ├── tier-coordinator.service.ts
+│   │   │   ├── hot-tier.service.ts
+│   │   │   ├── warm-tier.service.ts
+│   │   │   └── cold-tier.service.ts
+│   │   │
+│   │   └── admin/
+│   │       └── cortex.ts            # Admin API handler
+│   │
+│   └── lib/stacks/
+│       └── cortex-stack.ts          # CDK infrastructure
+
+apps/admin-dashboard/
+└── app/(dashboard)/cortex/
+    ├── page.tsx                     # Overview dashboard
+    ├── graph/page.tsx               # Graph explorer
+    ├── conflicts/page.tsx           # Conflict resolution
+    └── gdpr/page.tsx                # GDPR erasure</code></pre>
+<hr />
+<h2 id="hot-tier-implementation">2. Hot Tier Implementation</h2>
+<h3 id="redis-key-design">2.1 Redis Key Design</h3>
+<p>All keys follow the tenant-isolated pattern:</p>
+<pre class="typescript"><code>interface HotTierKeySchema {
+  // Pattern: {tenant_id}:{type}:{identifier}
+  
+  sessionContext: `${tenantId}:session:${userId}:context`;
+  ghostVector: `${tenantId}:ghost:${userId}`;
+  telemetryFeed: `${tenantId}:telemetry:${streamId}`;
+  prefetchCache: `${tenantId}:prefetch:${documentId}`;
+}</code></pre>
+<h3 id="session-context-structure">2.2 Session Context Structure</h3>
+<pre class="typescript"><code>interface SessionContext {
+  userId: string;
+  tenantId: string;
+  conversationId: string;
+  messages: ContextMessage[];
+  activeTools: string[];
+  tokenCount: number;
+  createdAt: Date;
+  expiresAt: Date;
+}
+
+interface ContextMessage {
+  role: &#39;system&#39; | &#39;user&#39; | &#39;assistant&#39;;
+  content: string;
+  timestamp: Date;
+  tokenCount?: number;
+}</code></pre>
+<h3 id="ghost-vector-storage">2.3 Ghost Vector Storage</h3>
+<p>Ghost Vectors are 4096-dimensional personality embeddings:</p>
+<pre class="typescript"><code>interface CortexGhostVector {
+  userId: string;
+  tenantId: string;
+  vector: number[];  // 4096 dimensions
+  personality: PersonalityTraits;
+  lastUpdated: Date;
+  interactionCount: number;
+  version: number;
+}
+
+interface PersonalityTraits {
+  formality: number;      // 0-1
+  verbosity: number;      // 0-1
+  technicalLevel: number; // 0-1
+  humor: number;          // 0-1
+  empathy: number;        // 0-1
+}</code></pre>
+<h3 id="hot-tier-service-implementation">2.4 Hot Tier Service Implementation</h3>
+<pre class="typescript"><code>// hot-tier.service.ts
+import { Redis } from &#39;ioredis&#39;;
+
+class HotTierService {
+  private redis: Redis;
+
+  async getSessionContext(tenantId: string, userId: string): Promise&lt;SessionContext | null&gt; {
+    const key = `${tenantId}:session:${userId}:context`;
+    const data = await this.redis.get(key);
+    return data ? JSON.parse(data) : null;
+  }
+
+  async setSessionContext(
+    tenantId: string, 
+    userId: string, 
+    context: SessionContext,
+    ttlSeconds: number = 14400
+  ): Promise&lt;void&gt; {
+    const key = `${tenantId}:session:${userId}:context`;
+    await this.redis.setex(key, ttlSeconds, JSON.stringify(context));
+  }
+
+  async getGhostVector(tenantId: string, userId: string): Promise&lt;CortexGhostVector | null&gt; {
+    const key = `${tenantId}:ghost:${userId}`;
+    const data = await this.redis.get(key);
+    return data ? JSON.parse(data) : null;
+  }
+
+  async updateGhostVector(
+    tenantId: string,
+    userId: string,
+    vector: CortexGhostVector
+  ): Promise&lt;void&gt; {
+    const key = `${tenantId}:ghost:${userId}`;
+    await this.redis.setex(key, 86400, JSON.stringify(vector)); // 24h TTL
+  }
+
+  async deleteAllForUser(tenantId: string, userId: string): Promise&lt;number&gt; {
+    const pattern = `${tenantId}:*:${userId}:*`;
+    const keys = await this.redis.keys(pattern);
+    if (keys.length &gt; 0) {
+      return await this.redis.del(...keys);
+    }
+    return 0;
+  }
+}</code></pre>
+<h3 id="dynamodb-overflow">2.5 DynamoDB Overflow</h3>
+<p>For values exceeding Redis limits (&gt;400KB):</p>
+<pre class="typescript"><code>interface DynamoDBOverflowItem {
+  pk: string;           // {tenant_id}#{type}
+  sk: string;           // {identifier}
+  data: string;         // Gzipped JSON
+  ttl: number;          // Unix timestamp
+  sizeBytes: number;
+  createdAt: string;
+}
+
+async function storeWithOverflow(
+  redis: Redis,
+  dynamo: DynamoDB,
+  key: string,
+  value: object,
+  ttlSeconds: number
+): Promise&lt;void&gt; {
+  const json = JSON.stringify(value);
+  
+  if (json.length &lt; 400000) {
+    await redis.setex(key, ttlSeconds, json);
+  } else {
+    // Store pointer in Redis, data in DynamoDB
+    const [tenantId, type, ...rest] = key.split(&#39;:&#39;);
+    const identifier = rest.join(&#39;:&#39;);
+    
+    await dynamo.putItem({
+      TableName: &#39;cortex-hot-overflow&#39;,
+      Item: {
+        pk: { S: `${tenantId}#${type}` },
+        sk: { S: identifier },
+        data: { S: gzip(json) },
+        ttl: { N: String(Math.floor(Date.now() / 1000) + ttlSeconds) },
+        sizeBytes: { N: String(json.length) },
+        createdAt: { S: new Date().toISOString() }
+      }
+    });
+    
+    await redis.setex(key, ttlSeconds, JSON.stringify({ 
+      overflow: true, 
+      dynamoKey: `${tenantId}#${type}:${identifier}` 
+    }));
+  }
+}</code></pre>
+<hr />
+<h2 id="warm-tier-implementation">3. Warm Tier Implementation</h2>
+<h3 id="graph-rag-architecture">3.1 Graph-RAG Architecture</h3>
+<p>The Warm tier implements hybrid Graph-RAG search:</p>
+<pre><code>Query → Vector Search (40%) + Graph Traversal (60%) → Merged Results</code></pre>
+<h3 id="neptune-graph-schema">3.2 Neptune Graph Schema</h3>
+<h4 id="golden-rules-override-system">Golden Rules &amp; Override System</h4>
+<pre class="typescript"><code>// Golden Rule types - highest priority overrides
+interface GoldenRule {
+  id: string;
+  tenantId: string;
+  entityId: string;
+  ruleType: &#39;force_override&#39; | &#39;ignore_source&#39; | &#39;prefer_source&#39; | &#39;deprecate&#39;;
+  condition: string;           // Query pattern that triggers this rule
+  override: string;            // The verified answer to use
+  reason: string;              // Why this override exists
+  verifiedBy: string;          // Email of verifier
+  verifiedAt: Date;
+  signature: string;           // SHA-256 for audit trail
+  expiresAt?: Date;            // Optional expiration
+}
+
+// Chain of Custody - audit trail for every fact
+interface ChainOfCustody {
+  factId: string;
+  source: string;              // Original document/source
+  extractedAt: Date;
+  verifiedBy?: string;         // &quot;Chief Engineer Bob&quot;
+  verifiedAt?: Date;           // &quot;Jan 23, 2026&quot;
+  signature?: string;          // Digital signature
+  supersedes?: string[];       // IDs of facts this replaces
+}</code></pre>
+<h4 id="node-properties">Node Properties</h4>
+<pre class="gremlin"><code>// Document node
+g.addV(&#39;document&#39;)
+  .property(&#39;id&#39;, uuid)
+  .property(&#39;tenantId&#39;, tenantId)
+  .property(&#39;label&#39;, &#39;API Documentation v2.0&#39;)
+  .property(&#39;source&#39;, &#39;confluence://page/12345&#39;)
+  .property(&#39;hash&#39;, sha256)
+  .property(&#39;confidence&#39;, 0.95)
+
+// Entity node
+g.addV(&#39;entity&#39;)
+  .property(&#39;id&#39;, uuid)
+  .property(&#39;tenantId&#39;, tenantId)
+  .property(&#39;label&#39;, &#39;UserAuthenticationService&#39;)
+  .property(&#39;entityType&#39;, &#39;class&#39;)
+  .property(&#39;confidence&#39;, 0.88)
+
+// Procedure node (evergreen)
+g.addV(&#39;procedure&#39;)
+  .property(&#39;id&#39;, uuid)
+  .property(&#39;tenantId&#39;, tenantId)
+  .property(&#39;label&#39;, &#39;Password Reset Flow&#39;)
+  .property(&#39;isEvergreen&#39;, true)
+  .property(&#39;confidence&#39;, 0.92)</code></pre>
+<h4 id="edge-relationships">Edge Relationships</h4>
+<pre class="gremlin"><code>// Document mentions entity
+g.V(docId).addE(&#39;mentions&#39;).to(g.V(entityId))
+  .property(&#39;weight&#39;, 0.8)
+  .property(&#39;confidence&#39;, 0.95)
+
+// Causal relationship
+g.V(causeId).addE(&#39;causes&#39;).to(g.V(effectId))
+  .property(&#39;weight&#39;, 0.7)
+
+// Dependency
+g.V(dependentId).addE(&#39;depends_on&#39;).to(g.V(dependencyId))
+  .property(&#39;weight&#39;, 0.9)
+
+// Version supersession
+g.V(newVersionId).addE(&#39;supersedes&#39;).to(g.V(oldVersionId))
+  .property(&#39;weight&#39;, 1.0)</code></pre>
+<h3 id="hybrid-search-implementation">3.3 Hybrid Search Implementation</h3>
+<pre class="typescript"><code>// warm-tier.service.ts
+
+interface HybridSearchResult {
+  nodeId: string;
+  label: string;
+  nodeType: string;
+  hybridScore: number;
+  graphScore: number;
+  vectorScore: number;
+  path?: string[];
+}
+
+class WarmTierService {
+  async hybridSearch(
+    tenantId: string,
+    query: string,
+    queryVector: number[],
+    options: {
+      graphWeight?: number;
+      vectorWeight?: number;
+      limit?: number;
+      nodeTypes?: string[];
+    } = {}
+  ): Promise&lt;HybridSearchResult[]&gt; {
+    const {
+      graphWeight = 0.6,
+      vectorWeight = 0.4,
+      limit = 10,
+      nodeTypes
+    } = options;
+
+    // 1. Vector search via pgvector
+    const vectorResults = await this.vectorSearch(tenantId, queryVector, limit * 2);
+
+    // 2. Graph traversal from vector results
+    const graphResults = await this.expandWithGraph(tenantId, vectorResults, nodeTypes);
+
+    // 3. Merge and score
+    const merged = this.mergeResults(vectorResults, graphResults, graphWeight, vectorWeight);
+
+    return merged.slice(0, limit);
+  }
+
+  private async vectorSearch(
+    tenantId: string,
+    queryVector: number[],
+    limit: number
+  ): Promise&lt;Array&lt;{ nodeId: string; score: number }&gt;&gt; {
+    const result = await executeStatement(`
+      SELECT id, label, node_type,
+             1 - (embedding &lt;=&gt; $2::vector) as similarity
+      FROM cortex_graph_nodes
+      WHERE tenant_id = $1 AND status = &#39;active&#39;
+      ORDER BY embedding &lt;=&gt; $2::vector
+      LIMIT $3
+    `, [tenantId, `[${queryVector.join(&#39;,&#39;)}]`, limit]);
+
+    return result.rows.map(row =&gt; ({
+      nodeId: row.id,
+      score: row.similarity
+    }));
+  }
+
+  private async expandWithGraph(
+    tenantId: string,
+    vectorResults: Array&lt;{ nodeId: string; score: number }&gt;,
+    nodeTypes?: string[]
+  ): Promise&lt;Map&lt;string, { score: number; path: string[] }&gt;&gt; {
+    const nodeIds = vectorResults.map(r =&gt; r.nodeId);
+    
+    // Query Neptune for connected nodes
+    const gremlinQuery = `
+      g.V().has(&#39;tenantId&#39;, &#39;${tenantId}&#39;)
+        .hasId(within(${nodeIds.map(id =&gt; `&#39;${id}&#39;`).join(&#39;,&#39;)}))
+        .repeat(both().simplePath())
+        .times(2)
+        .path()
+        .by(&#39;id&#39;)
+    `;
+
+    const paths = await this.neptuneClient.query(gremlinQuery);
+    
+    const scores = new Map&lt;string, { score: number; path: string[] }&gt;();
+    
+    for (const path of paths) {
+      const startScore = vectorResults.find(r =&gt; r.nodeId === path[0])?.score || 0;
+      const decay = 0.7; // Score decays along path
+      
+      path.forEach((nodeId: string, index: number) =&gt; {
+        const pathScore = startScore * Math.pow(decay, index);
+        const existing = scores.get(nodeId);
+        
+        if (!existing || pathScore &gt; existing.score) {
+          scores.set(nodeId, { score: pathScore, path });
+        }
+      });
+    }
+
+    return scores;
+  }
+
+  private mergeResults(
+    vectorResults: Array&lt;{ nodeId: string; score: number }&gt;,
+    graphResults: Map&lt;string, { score: number; path: string[] }&gt;,
+    graphWeight: number,
+    vectorWeight: number
+  ): HybridSearchResult[] {
+    const allNodeIds = new Set([
+      ...vectorResults.map(r =&gt; r.nodeId),
+      ...graphResults.keys()
+    ]);
+
+    const merged: HybridSearchResult[] = [];
+
+    for (const nodeId of allNodeIds) {
+      const vectorScore = vectorResults.find(r =&gt; r.nodeId === nodeId)?.score || 0;
+      const graphData = graphResults.get(nodeId) || { score: 0, path: [] };
+      
+      const hybridScore = (vectorScore * vectorWeight) + (graphData.score * graphWeight);
+
+      merged.push({
+        nodeId,
+        label: &#39;&#39;, // Fetch from DB
+        nodeType: &#39;&#39;,
+        hybridScore,
+        graphScore: graphData.score,
+        vectorScore,
+        path: graphData.path
+      });
+    }
+
+    return merged.sort((a, b) =&gt; b.hybridScore - a.hybridScore);
+  }
+}</code></pre>
+<h3 id="deduplication-logic">3.4 Deduplication Logic</h3>
+<pre class="typescript"><code>async runDeduplication(tenantId: string): Promise&lt;{ merged: number; errors: number }&gt; {
+  // Find duplicate nodes by normalized label
+  const duplicates = await executeStatement(`
+    SELECT LOWER(TRIM(label)) as label_norm, 
+           COUNT(*) as count, 
+           array_agg(id ORDER BY confidence DESC) as ids
+    FROM cortex_graph_nodes 
+    WHERE tenant_id = $1 AND status = &#39;active&#39;
+    GROUP BY LOWER(TRIM(label))
+    HAVING COUNT(*) &gt; 1
+    LIMIT 100
+  `, [tenantId]);
+
+  let merged = 0;
+  let errors = 0;
+
+  for (const dup of duplicates.rows) {
+    const [keepId, ...mergeIds] = dup.ids;
+    
+    try {
+      // Merge source documents
+      await executeStatement(`
+        UPDATE cortex_graph_nodes 
+        SET source_document_ids = (
+          SELECT array_agg(DISTINCT doc_id)
+          FROM cortex_graph_nodes, unnest(source_document_ids) doc_id
+          WHERE id = ANY($1)
+        )
+        WHERE id = $2
+      `, [[keepId, ...mergeIds], keepId]);
+
+      // Redirect edges
+      await executeStatement(`
+        UPDATE cortex_graph_edges 
+        SET source_node_id = $1 
+        WHERE source_node_id = ANY($2)
+      `, [keepId, mergeIds]);
+
+      await executeStatement(`
+        UPDATE cortex_graph_edges 
+        SET target_node_id = $1 
+        WHERE target_node_id = ANY($2)
+      `, [keepId, mergeIds]);
+
+      // Mark duplicates as deleted
+      await executeStatement(`
+        UPDATE cortex_graph_nodes 
+        SET status = &#39;deleted&#39; 
+        WHERE id = ANY($1)
+      `, [mergeIds]);
+
+      merged += mergeIds.length;
+    } catch (e) {
+      errors++;
+    }
+  }
+
+  return { merged, errors };
+}</code></pre>
+<hr />
+<h2 id="cold-tier-implementation">4. Cold Tier Implementation</h2>
+<h3 id="iceberg-table-schema">4.1 Iceberg Table Schema</h3>
+<pre class="sql"><code>CREATE TABLE cortex_archives (
+  tenant_id STRING,
+  record_type STRING,
+  record_id STRING,
+  data STRING,           -- Compressed JSON
+  archived_at TIMESTAMP,
+  original_created_at TIMESTAMP,
+  checksum STRING
+)
+PARTITIONED BY (tenant_id, date(archived_at), record_type)
+LOCATION &#39;s3://cortex-cold-archive/iceberg/&#39;
+TBLPROPERTIES (
+  &#39;table_type&#39; = &#39;ICEBERG&#39;,
+  &#39;format&#39; = &#39;parquet&#39;,
+  &#39;write.parquet.compression-codec&#39; = &#39;snappy&#39;
+);</code></pre>
+<h3 id="archive-process">4.2 Archive Process</h3>
+<pre class="typescript"><code>// cold-tier.service.ts
+
+class ColdTierService {
+  async archiveNodes(
+    tenantId: string,
+    nodeIds: string[]
+  ): Promise&lt;{ archived: number; sizeBytes: number }&gt; {
+    // Fetch nodes to archive
+    const nodes = await executeStatement(`
+      SELECT * FROM cortex_graph_nodes 
+      WHERE tenant_id = $1 AND id = ANY($2)
+    `, [tenantId, nodeIds]);
+
+    if (!nodes.rows.length) return { archived: 0, sizeBytes: 0 };
+
+    // Prepare Iceberg records
+    const records = nodes.rows.map(node =&gt; ({
+      tenant_id: tenantId,
+      record_type: &#39;graph_node&#39;,
+      record_id: node.id,
+      data: gzip(JSON.stringify(node)),
+      archived_at: new Date().toISOString(),
+      original_created_at: node.created_at,
+      checksum: sha256(JSON.stringify(node))
+    }));
+
+    // Write to S3 via Iceberg
+    const s3Key = `iceberg/${tenantId}/${new Date().toISOString().split(&#39;T&#39;)[0]}/nodes_${Date.now()}.parquet`;
+    
+    await this.writeParquet(s3Key, records);
+
+    // Track in metadata table
+    const sizeBytes = records.reduce((sum, r) =&gt; sum + r.data.length, 0);
+    
+    await executeStatement(`
+      INSERT INTO cortex_cold_archives 
+      (tenant_id, original_tier, original_table_name, archive_reason, s3_key, 
+       iceberg_table_name, record_count, size_bytes, checksum)
+      VALUES ($1, &#39;warm&#39;, &#39;cortex_graph_nodes&#39;, &#39;age&#39;, $2, &#39;cortex_archives&#39;, $3, $4, $5)
+    `, [tenantId, s3Key, nodeIds.length, sizeBytes, sha256(JSON.stringify(nodeIds))]);
+
+    // Mark nodes as archived
+    await executeStatement(`
+      UPDATE cortex_graph_nodes 
+      SET status = &#39;archived&#39;, archived_at = NOW() 
+      WHERE id = ANY($1)
+    `, [nodeIds]);
+
+    return { archived: nodeIds.length, sizeBytes };
+  }
+
+  async retrieveFromCold(
+    tenantId: string,
+    recordIds: string[]
+  ): Promise&lt;any[]&gt; {
+    // Query Athena for archived records
+    const query = `
+      SELECT record_id, data
+      FROM cortex_archives
+      WHERE tenant_id = &#39;${tenantId}&#39;
+        AND record_id IN (${recordIds.map(id =&gt; `&#39;${id}&#39;`).join(&#39;,&#39;)})
+    `;
+
+    const result = await this.athena.startQueryExecution({
+      QueryString: query,
+      ResultConfiguration: { OutputLocation: `s3://cortex-athena-results/${tenantId}/` }
+    });
+
+    // Wait for results
+    const records = await this.waitForResults(result.QueryExecutionId);
+
+    // Decompress and return
+    return records.map(r =&gt; ({
+      id: r.record_id,
+      ...JSON.parse(gunzip(r.data))
+    }));
+  }
+}</code></pre>
+<h3 id="stub-nodes---the-zero-copy-innovation">4.3 Stub Nodes - The Zero-Copy Innovation</h3>
+<p><strong>The Problem:</strong> Tenants have 50TB+ in existing data lakes. Moving it is expensive and creates compliance issues.</p>
+<p><strong>The Solution:</strong> Stub Nodes - metadata pointers that enable graph queries over external data without copying it.</p>
+<pre class="typescript"><code>// Stub Node - metadata pointer to external content
+interface StubNode {
+  id: string;
+  tenantId: string;
+  nodeType: &#39;stub&#39;;
+  
+  // What this stub represents
+  label: string;              // &quot;Maintenance Log 2024.csv&quot;
+  description?: string;
+  
+  // Where the actual content lives
+  externalSource: {
+    mountId: string;          // Reference to Zero-Copy mount
+    uri: string;              // &quot;s3://bucket/logs/maintenance_2024.csv&quot;
+    format: &#39;csv&#39; | &#39;json&#39; | &#39;parquet&#39; | &#39;pdf&#39; | &#39;docx&#39;;
+    sizeBytes: number;
+    lastModified: Date;
+  };
+  
+  // Partial metadata extracted during scan
+  extractedMetadata: {
+    columns?: string[];       // For tabular data
+    pageCount?: number;       // For documents
+    dateRange?: { start: Date; end: Date };
+    entityMentions?: string[];
+  };
+  
+  // Graph connections (these enable traversal without fetching content)
+  connectedTo: string[];      // IDs of related nodes in the warm tier
+}
+
+// Fetch content ONLY when graph traversal determines it&#39;s needed
+async function fetchViaStubNode(stubId: string, range?: ContentRange): Promise&lt;Buffer&gt; {
+  const stub = await db.getStubNode(stubId);
+  const mount = await db.getMount(stub.externalSource.mountId);
+  
+  // Generate signed URL for specific content range
+  const signedUrl = await generateSignedUrl(mount, stub.externalSource.uri, range);
+  
+  // Fetch only what&#39;s needed (e.g., pages 47-48, not entire 500-page PDF)
+  return await fetchWithRange(signedUrl, range);
+}</code></pre>
+<h3 id="zero-copy-mount-implementation">4.4 Zero-Copy Mount Implementation</h3>
+<pre class="typescript"><code>interface ZeroCopyMountConfig {
+  snowflake?: {
+    account: string;
+    warehouse: string;
+    database: string;
+    schema: string;
+    role?: string;
+  };
+  databricks?: {
+    workspaceUrl: string;
+    catalog: string;
+    schema: string;
+  };
+  s3?: {
+    bucket: string;
+    prefix: string;
+    region: string;
+  };
+}
+
+class ZeroCopyMountService {
+  async scanMount(mountId: string): Promise&lt;ZeroCopyScanResult&gt; {
+    const mount = await this.getMount(mountId);
+    
+    let objects: Array&lt;{ key: string; size: number; lastModified: Date }&gt; = [];
+
+    switch (mount.source_type) {
+      case &#39;snowflake&#39;:
+        objects = await this.scanSnowflake(mount.connection_config);
+        break;
+      case &#39;s3&#39;:
+        objects = await this.scanS3(mount.connection_config);
+        break;
+      case &#39;databricks&#39;:
+        objects = await this.scanDatabricks(mount.connection_config);
+        break;
+    }
+
+    // Index objects as graph nodes
+    let nodesCreated = 0;
+    for (const obj of objects) {
+      const exists = await this.nodeExistsForObject(mount.tenant_id, mountId, obj.key);
+      if (!exists) {
+        await this.createNodeForObject(mount.tenant_id, mountId, obj);
+        nodesCreated++;
+      }
+    }
+
+    // Update mount stats
+    await executeStatement(`
+      UPDATE cortex_zero_copy_mounts 
+      SET status = &#39;active&#39;, 
+          last_scan_at = NOW(),
+          object_count = $2,
+          total_size_bytes = $3,
+          indexed_node_count = indexed_node_count + $4
+      WHERE id = $1
+    `, [mountId, objects.length, objects.reduce((s, o) =&gt; s + o.size, 0), nodesCreated]);
+
+    return {
+      objectsScanned: objects.length,
+      objectsIndexed: nodesCreated,
+      nodesCreated,
+      errorCount: 0,
+      scannedAt: new Date()
+    };
+  }
+
+  private async scanSnowflake(config: any): Promise&lt;any[]&gt; {
+    // Use Snowflake connector to list tables/views
+    const connection = await snowflake.createConnection(config);
+    
+    const result = await connection.execute({
+      sqlText: `
+        SELECT TABLE_NAME, ROW_COUNT, BYTES 
+        FROM INFORMATION_SCHEMA.TABLES 
+        WHERE TABLE_SCHEMA = &#39;${config.schema}&#39;
+      `
+    });
+
+    return result.map(row =&gt; ({
+      key: `${config.database}.${config.schema}.${row.TABLE_NAME}`,
+      size: row.BYTES || 0,
+      lastModified: new Date()
+    }));
+  }
+}</code></pre>
+<hr />
+<h2 id="tier-coordinator-service">5. Tier Coordinator Service</h2>
+<h3 id="core-orchestration-logic">5.1 Core Orchestration Logic</h3>
+<pre class="typescript"><code>// tier-coordinator.service.ts
+
+class TierCoordinatorService {
+  async orchestrateDataFlow(tenantId: string): Promise&lt;DataFlowResult&gt; {
+    const config = await this.getConfig(tenantId);
+    const results: DataFlowResult = {
+      hotToWarm: { promoted: 0, errors: 0 },
+      warmToCold: { archived: 0, errors: 0 },
+      coldToWarm: { retrieved: 0, errors: 0 }
+    };
+
+    // 1. Hot → Warm promotion (for expired TTLs)
+    if (config.enableAutoPromotion) {
+      results.hotToWarm = await this.promoteHotToWarm(tenantId);
+    }
+
+    // 2. Warm → Cold archival (for aged data)
+    if (config.enableAutoArchival) {
+      results.warmToCold = await this.archiveWarmToCold(tenantId);
+    }
+
+    // 3. Record metrics
+    await this.recordDataFlowMetrics(tenantId, results);
+
+    return results;
+  }
+
+  async promoteHotToWarm(tenantId: string): Promise&lt;{ promoted: number; errors: number }&gt; {
+    // Get expired session contexts from Redis
+    const expiredKeys = await this.redis.keys(`${tenantId}:session:*:context`);
+    
+    let promoted = 0;
+    let errors = 0;
+
+    for (const key of expiredKeys) {
+      const ttl = await this.redis.ttl(key);
+      
+      // If TTL is low, promote to warm tier
+      if (ttl &lt; 300) { // Less than 5 minutes remaining
+        try {
+          const data = await this.redis.get(key);
+          if (data) {
+            const session = JSON.parse(data);
+            
+            // Extract entities and create graph nodes
+            await this.warmTier.ingestSession(tenantId, session);
+            
+            promoted++;
+          }
+        } catch (e) {
+          errors++;
+        }
+      }
+    }
+
+    return { promoted, errors };
+  }
+
+  async archiveWarmToCold(tenantId: string): Promise&lt;{ archived: number; errors: number }&gt; {
+    const config = await this.getConfig(tenantId);
+    
+    // Find nodes older than retention period (excluding evergreen)
+    const nodesToArchive = await executeStatement(`
+      SELECT id FROM cortex_graph_nodes 
+      WHERE tenant_id = $1 
+        AND status = &#39;active&#39;
+        AND is_evergreen = false
+        AND node_type NOT IN ($2)
+        AND created_at &lt; NOW() - INTERVAL &#39;1 day&#39; * $3
+      LIMIT 1000
+    `, [tenantId, config.evergreenNodeTypes, config.warm.retentionDays]);
+
+    if (!nodesToArchive.rows.length) {
+      return { archived: 0, errors: 0 };
+    }
+
+    const nodeIds = nodesToArchive.rows.map(r =&gt; r.id);
+    return await this.coldTier.archiveNodes(tenantId, nodeIds);
+  }
+}</code></pre>
+<h3 id="gdpr-erasure-cascade">5.2 GDPR Erasure Cascade</h3>
+<pre class="typescript"><code>async processGdprErasure(requestId: string): Promise&lt;void&gt; {
+  const request = await this.getErasureRequest(requestId);
+  
+  await this.updateRequestStatus(requestId, &#39;processing&#39;);
+
+  try {
+    // 1. Hot Tier - Immediate deletion
+    await this.hotTier.deleteAllForUser(request.tenantId, request.userId);
+    await this.updateTierStatus(requestId, &#39;hot&#39;, &#39;completed&#39;);
+
+    // 2. Warm Tier - Anonymize or delete
+    if (request.scopeType === &#39;user&#39;) {
+      await executeStatement(`
+        UPDATE cortex_graph_nodes 
+        SET status = &#39;deleted&#39;, 
+            properties = &#39;{}&#39;,
+            label = &#39;REDACTED&#39;
+        WHERE tenant_id = $1 
+          AND properties-&gt;&gt;&#39;created_by&#39; = $2
+      `, [request.tenantId, request.userId]);
+    } else {
+      // Tenant-wide deletion
+      await executeStatement(`
+        UPDATE cortex_graph_nodes 
+        SET status = &#39;deleted&#39; 
+        WHERE tenant_id = $1
+      `, [request.tenantId]);
+    }
+    await this.updateTierStatus(requestId, &#39;warm&#39;, &#39;completed&#39;);
+
+    // 3. Cold Tier - Write tombstone records
+    await this.coldTier.writeTombstones(request.tenantId, request.userId);
+    await this.updateTierStatus(requestId, &#39;cold&#39;, &#39;completed&#39;);
+
+    await this.updateRequestStatus(requestId, &#39;completed&#39;);
+  } catch (error) {
+    await this.updateRequestStatus(requestId, &#39;failed&#39;, error.message);
+    throw error;
+  }
+}</code></pre>
+<hr />
+<h2 id="database-schema">6. Database Schema</h2>
+<h3 id="core-tables">6.1 Core Tables</h3>
+<p>See migration file: <code>V2026_01_23_002__cortex_memory_system.sql</code></p>
+<p>Key tables:</p>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+<th>RLS Enabled</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cortex_config</code></td>
+<td>Per-tenant configuration</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>cortex_graph_nodes</code></td>
+<td>Knowledge graph nodes</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>cortex_graph_edges</code></td>
+<td>Node relationships</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>cortex_graph_documents</code></td>
+<td>Source documents</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>cortex_cold_archives</code></td>
+<td>Archive metadata</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>cortex_zero_copy_mounts</code></td>
+<td>External data sources</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>cortex_data_flow_metrics</code></td>
+<td>Flow statistics</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>cortex_tier_health</code></td>
+<td>Health snapshots</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>cortex_tier_alerts</code></td>
+<td>Threshold alerts</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>cortex_housekeeping_tasks</code></td>
+<td>Maintenance schedules</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>cortex_gdpr_erasure_requests</code></td>
+<td>Deletion tracking</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>cortex_conflicting_facts</code></td>
+<td>Contradiction detection</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="index-strategy">6.2 Index Strategy</h3>
+<pre class="sql"><code>-- Vector similarity (IVFFlat for pgvector)
+CREATE INDEX idx_cortex_graph_nodes_embedding 
+ON cortex_graph_nodes USING ivfflat (embedding vector_cosine_ops) 
+WITH (lists = 100);
+
+-- Tenant + status lookups
+CREATE INDEX idx_cortex_graph_nodes_status 
+ON cortex_graph_nodes(tenant_id, status);
+
+-- Graph traversal support
+CREATE INDEX idx_cortex_graph_edges_source ON cortex_graph_edges(source_node_id);
+CREATE INDEX idx_cortex_graph_edges_target ON cortex_graph_edges(target_node_id);
+
+-- Unresolved conflicts
+CREATE INDEX idx_cortex_conflicting_facts_unresolved 
+ON cortex_conflicting_facts(tenant_id) 
+WHERE resolved_at IS NULL;</code></pre>
+<hr />
+<h2 id="api-implementation">7. API Implementation</h2>
+<h3 id="lambda-handler-structure">7.1 Lambda Handler Structure</h3>
+<pre class="typescript"><code>// lambda/admin/cortex.ts
+
+export const handler = async (event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; =&gt; {
+  const path = event.path.replace(/^\/api\/admin\/cortex/, &#39;&#39;);
+  const method = event.httpMethod;
+  const tenantId = getTenantId(event);
+
+  // Set RLS context
+  await executeStatement(`SET app.current_tenant_id = &#39;${tenantId}&#39;`, []);
+
+  // Route to handlers
+  switch (true) {
+    case path === &#39;/overview&#39; &amp;&amp; method === &#39;GET&#39;:
+      return getOverview(tenantId);
+    case path === &#39;/config&#39; &amp;&amp; method === &#39;GET&#39;:
+      return getConfig(tenantId);
+    case path === &#39;/config&#39; &amp;&amp; method === &#39;PUT&#39;:
+      return updateConfig(tenantId, JSON.parse(event.body));
+    case path === &#39;/health&#39; &amp;&amp; method === &#39;GET&#39;:
+      return getTierHealth(tenantId);
+    case path === &#39;/health/check&#39; &amp;&amp; method === &#39;POST&#39;:
+      return checkTierHealth(tenantId);
+    // ... more routes
+  }
+};</code></pre>
+<h3 id="response-format">7.2 Response Format</h3>
+<p>All API responses follow this structure:</p>
+<pre class="typescript"><code>interface ApiResponse&lt;T&gt; {
+  success: boolean;
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+  };
+  meta?: {
+    timestamp: string;
+    requestId: string;
+  };
+}</code></pre>
+<hr />
+<h2 id="migration-guide">8. Migration Guide</h2>
+<h3 id="phase-1-dual-write-mode">8.1 Phase 1: Dual-Write Mode</h3>
+<p>Enable writing to both old and new systems:</p>
+<pre class="typescript"><code>async function dualWriteMemory(tenantId: string, userId: string, memory: Memory): Promise&lt;void&gt; {
+  // Write to legacy table
+  await legacyMemoryService.store(tenantId, userId, memory);
+  
+  // Write to Cortex hot tier
+  await hotTierService.setSessionContext(tenantId, userId, {
+    ...memory,
+    conversationId: memory.sessionId
+  });
+}</code></pre>
+<h3 id="phase-2-backfill-historical-data">8.2 Phase 2: Backfill Historical Data</h3>
+<pre class="sql"><code>-- Migrate existing memories to Warm tier
+INSERT INTO cortex_graph_nodes (tenant_id, node_type, label, properties, embedding, created_at)
+SELECT 
+  tenant_id,
+  &#39;fact&#39; as node_type,
+  content as label,
+  jsonb_build_object(&#39;legacy_id&#39;, id, &#39;store_id&#39;, store_id) as properties,
+  embedding,
+  created_at
+FROM memories
+WHERE NOT EXISTS (
+  SELECT 1 FROM cortex_graph_nodes cgn 
+  WHERE cgn.properties-&gt;&gt;&#39;legacy_id&#39; = memories.id::text
+);</code></pre>
+<h3 id="phase-3-read-fallback">8.3 Phase 3: Read Fallback</h3>
+<pre class="typescript"><code>async function getMemory(tenantId: string, userId: string): Promise&lt;Memory&gt; {
+  // Try hot tier first
+  const hot = await hotTierService.getSessionContext(tenantId, userId);
+  if (hot) return hot;
+  
+  // Fall back to warm tier
+  const warm = await warmTierService.searchByUser(tenantId, userId);
+  if (warm.length) {
+    // Promote to hot tier
+    await hotTierService.setSessionContext(tenantId, userId, warm[0]);
+    return warm[0];
+  }
+  
+  // Fall back to legacy
+  return legacyMemoryService.get(tenantId, userId);
+}</code></pre>
+<h3 id="phase-4-cut-over">8.4 Phase 4: Cut-Over</h3>
+<p>Disable legacy writes, enable legacy archival to Cold tier.</p>
+<h3 id="phase-5-deprecate-legacy">8.5 Phase 5: Deprecate Legacy</h3>
+<p>Remove legacy code paths after 30-day monitoring period.</p>
+<hr />
+<h2 id="testing-strategy">9. Testing Strategy</h2>
+<h3 id="unit-tests">9.1 Unit Tests</h3>
+<pre class="typescript"><code>describe(&#39;TierCoordinatorService&#39;, () =&gt; {
+  it(&#39;should promote expired hot tier data to warm&#39;, async () =&gt; {
+    // Arrange
+    await hotTier.setSessionContext(&#39;tenant1&#39;, &#39;user1&#39;, mockSession, 1);
+    await sleep(2000); // Let TTL expire
+
+    // Act
+    const result = await tierCoordinator.promoteHotToWarm(&#39;tenant1&#39;);
+
+    // Assert
+    expect(result.promoted).toBe(1);
+    const warmNode = await warmTier.getLatestForUser(&#39;tenant1&#39;, &#39;user1&#39;);
+    expect(warmNode).toBeDefined();
+  });
+
+  it(&#39;should archive old warm tier data to cold&#39;, async () =&gt; {
+    // Arrange
+    await warmTier.createNode(&#39;tenant1&#39;, { 
+      ...mockNode, 
+      createdAt: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000) // 100 days ago
+    });
+
+    // Act
+    const result = await tierCoordinator.archiveWarmToCold(&#39;tenant1&#39;);
+
+    // Assert
+    expect(result.archived).toBe(1);
+  });
+});</code></pre>
+<h3 id="integration-tests">9.2 Integration Tests</h3>
+<pre class="typescript"><code>describe(&#39;Cortex E2E&#39;, () =&gt; {
+  it(&#39;should handle full data lifecycle&#39;, async () =&gt; {
+    // 1. Store in hot tier
+    await api.post(&#39;/api/cortex/session&#39;, { userId: &#39;u1&#39;, context: {...} });
+    
+    // 2. Verify hot tier read
+    const hot = await api.get(&#39;/api/cortex/session/u1&#39;);
+    expect(hot.status).toBe(200);
+    
+    // 3. Trigger promotion
+    await api.post(&#39;/api/admin/cortex/housekeeping/trigger&#39;, { taskType: &#39;archive_promotion&#39; });
+    
+    // 4. Verify warm tier has data
+    const warm = await api.get(&#39;/api/admin/cortex/graph/explore?search=u1&#39;);
+    expect(warm.data.nodes.length).toBeGreaterThan(0);
+    
+    // 5. GDPR erasure
+    await api.post(&#39;/api/admin/cortex/gdpr/erasure&#39;, { targetUserId: &#39;u1&#39;, scopeType: &#39;user&#39; });
+    
+    // 6. Verify deletion
+    const deleted = await api.get(&#39;/api/admin/cortex/graph/explore?search=u1&#39;);
+    expect(deleted.data.nodes.length).toBe(0);
+  });
+});</code></pre>
+<hr />
+<h2 id="cortex-v2.0-implementation">10. Cortex v2.0 Implementation</h2>
+<h3 id="service-architecture">10.1 Service Architecture</h3>
+<p>All v2.0 services follow consistent patterns:</p>
+<p><strong>File Locations:</strong></p>
+<pre><code>packages/infrastructure/lambda/shared/services/cortex/
+├── golden-rules.service.ts      # Override system + Chain of Custody
+├── stub-nodes.service.ts        # Zero-copy pointers
+├── telemetry.service.ts         # MQTT/OPC UA injection
+├── entrance-exam.service.ts     # Curator verification
+├── graph-expansion.service.ts   # Twilight Dreaming v2
+├── model-migration.service.ts   # One-click model swap
+└── tier-coordinator.service.ts  # Core tier orchestration</code></pre>
+<p><strong>API Handler:</strong></p>
+<pre><code>packages/infrastructure/lambda/admin/cortex-v2.ts</code></pre>
+<p><strong>Database Migration:</strong></p>
+<pre><code>packages/infrastructure/migrations/V2026_01_23_003__cortex_v2_features.sql</code></pre>
+<h3 id="golden-rules-service">10.2 Golden Rules Service</h3>
+<pre class="typescript"><code>import { GoldenRulesService } from &#39;./cortex/golden-rules.service&#39;;
+
+const service = new GoldenRulesService(db);
+
+// Create a rule
+const rule = await service.createRule({
+  tenantId,
+  ruleType: &#39;force_override&#39;,
+  condition: &#39;max pressure Pump 302&#39;,
+  override: &#39;The maximum pressure for Pump 302 is 100 PSI.&#39;,
+  reason: &#39;Verified by Chief Engineer&#39;,
+}, userId);
+
+// Check for matches during retrieval
+const match = await service.checkMatch(tenantId, &#39;What is the max pressure for Pump 302?&#39;);
+if (match) {
+  return match.override; // Skip further retrieval
+}</code></pre>
+<h3 id="stub-nodes-service">10.3 Stub Nodes Service</h3>
+<pre class="typescript"><code>import { StubNodesService } from &#39;./cortex/stub-nodes.service&#39;;
+
+const service = new StubNodesService(db);
+
+// Scan a mount and create stub nodes
+const scanResult = await service.scanMount(mountId, tenantId);
+// { created: 150, updated: 23, errors: [] }
+
+// Fetch specific content range
+const response = await service.fetchContent({
+  tenantId,
+  stubNodeId,
+  range: { type: &#39;pages&#39;, start: 47, end: 48 }, // Only pages 47-48
+  ttlSeconds: 3600,
+});
+// Returns signed URL for range-based fetch</code></pre>
+<h3 id="telemetry-service">10.4 Telemetry Service</h3>
+<pre class="typescript"><code>import { TelemetryService } from &#39;./cortex/telemetry.service&#39;;
+
+const service = new TelemetryService(db, redis);
+
+// Create feed
+const feed = await service.createFeed({
+  tenantId,
+  name: &#39;pump_302_sensors&#39;,
+  protocol: &#39;opc_ua&#39;,
+  endpoint: &#39;opc.tcp://plc.factory.local:4840&#39;,
+  nodeIds: [&#39;ns=2;s=Pump302.Pressure&#39;, &#39;ns=2;s=Pump302.Temperature&#39;],
+  pollIntervalMs: 1000,
+  contextInjection: true,
+});
+
+// Get data for context injection
+const snapshots = await service.getContextInjectionData(tenantId);
+// Inject into AI context window</code></pre>
+<h3 id="entrance-exam-service">10.5 Entrance Exam Service</h3>
+<pre class="typescript"><code>import { EntranceExamService } from &#39;./cortex/entrance-exam.service&#39;;
+
+const service = new EntranceExamService(db);
+
+// Generate exam for a domain
+const exam = await service.generateExam({
+  tenantId,
+  domainId: &#39;hydraulics&#39;,
+  domainPath: &#39;Engineering &gt; Hydraulics&#39;,
+  questionCount: 10,
+  passingScore: 80,
+});
+
+// SME completes exam, corrections create Golden Rules
+const result = await service.completeExam(examId, tenantId, userId);
+// { passed: true, score: 90, goldenRulesCreated: [&#39;rule-123&#39;] }</code></pre>
+<h3 id="graph-expansion-service">10.6 Graph Expansion Service</h3>
+<pre class="typescript"><code>import { GraphExpansionService } from &#39;./cortex/graph-expansion.service&#39;;
+
+const service = new GraphExpansionService(db);
+
+// Create and run expansion task
+const task = await service.createTask({
+  tenantId,
+  taskType: &#39;infer_links&#39;,
+  targetScope: &#39;domain&#39;,
+});
+const result = await service.runTask(task.id, tenantId);
+
+// Review and approve inferred links
+const pendingLinks = await service.getPendingLinks(tenantId);
+await service.approveLink(linkId, tenantId, userId);</code></pre>
+<h3 id="model-migration-service">10.7 Model Migration Service</h3>
+<pre class="typescript"><code>import { ModelMigrationService } from &#39;./cortex/model-migration.service&#39;;
+
+const service = new ModelMigrationService(db);
+
+// Initiate migration
+const migration = await service.initiateMigration({
+  tenantId,
+  targetModel: { provider: &#39;meta&#39;, modelId: &#39;llama-3-70b-instruct&#39; },
+});
+
+// Validate and test
+const validation = await service.validateMigration(migration.id, tenantId);
+const testResults = await service.runTests(migration.id, tenantId);
+
+// Execute (or rollback)
+await service.executeMigration(migration.id, tenantId);
+// await service.rollbackMigration(migration.id, tenantId);</code></pre>
+<hr />
+<h2 id="performance-optimization">11. Performance Optimization</h2>
+<h3 id="redis-optimization">10.1 Redis Optimization</h3>
+<ul>
+<li><strong>Pipeline batch operations</strong>: Group related reads/writes</li>
+<li><strong>Use SCAN over KEYS</strong>: Avoid blocking on large keyspaces</li>
+<li><strong>Compress large values</strong>: Gzip values &gt; 10KB</li>
+</ul>
+<h3 id="neptune-optimization">10.2 Neptune Optimization</h3>
+<ul>
+<li><strong>Index frequently traversed edges</strong>: Create composite indexes</li>
+<li><strong>Use path limiting</strong>: Always set <code>times(N)</code> in repeat steps</li>
+<li><strong>Cache hot subgraphs</strong>: Materialize frequently-accessed paths</li>
+</ul>
+<h3 id="pgvector-optimization">10.3 pgvector Optimization</h3>
+<ul>
+<li><strong>Tune IVFFlat lists</strong>: Set <code>lists = sqrt(rows)</code> as baseline</li>
+<li><strong>Use HNSW for large datasets</strong>: Better recall at scale</li>
+<li><strong>Reduce dimensions</strong>: Consider PCA from 4096 → 1536</li>
+</ul>
+<h3 id="s3iceberg-optimization">10.4 S3/Iceberg Optimization</h3>
+<ul>
+<li><strong>Partition by tenant + date</strong>: Prune scans effectively</li>
+<li><strong>Use Snappy compression</strong>: Best speed/ratio balance</li>
+<li><strong>Compact small files</strong>: Merge files &lt; 128MB</li>
+</ul>
+<hr />
+<h2 id="the-sovereign-cortex-moats-technical-deep-dive">12. The Sovereign Cortex Moats: Technical Deep Dive</h2>
+<p>The Cortex Memory System creates six interlocking competitive moats. This section provides the engineering details behind each.</p>
+<h3 id="semantic-structure-data-gravity-2.0">12.1 Semantic Structure (Data Gravity 2.0)</h3>
+<p><strong>The Problem with Vector RAG:</strong></p>
+<pre><code>Traditional RAG: document → chunk → embed → similarity search
+Result: &quot;Pump 302&quot; and &quot;500 PSI&quot; appear in same chunk (co-occurrence)</code></pre>
+<p><strong>The Cortex Approach:</strong></p>
+<pre><code>Cortex: document → extract entities → extract relationships → graph storage
+Result: Pump_302 --(feeds)--&gt; Valve_B --(pressure_limit)--&gt; 500_PSI</code></pre>
+<p><strong>Implementation:</strong></p>
+<pre class="typescript"><code>// graph-rag.service.ts - Knowledge extraction
+async extractKnowledge(tenantId: string, documentId: string, content: string) {
+  // Extract triples via LLM
+  const triples = await this.extractTriples(content, config);
+  
+  // Convert to typed entities and relationships
+  for (const triple of triples) {
+    const subjectEntity = {
+      id: crypto.randomUUID(),
+      tenantId,
+      type: this.inferEntityType(triple.subject), // EQUIPMENT, PERSON, LOCATION, etc.
+      name: triple.subject,
+      properties: {},
+      sourceDocumentIds: [documentId],
+      confidence: triple.confidence,
+    };
+    
+    const relationship = {
+      sourceEntityId: subjectEntity.id,
+      targetEntityId: objectEntity.id,
+      type: this.inferRelationshipType(triple.predicate), // feeds, limits, contains
+      description: triple.predicate,
+      weight: triple.confidence,
+    };
+  }
+}</code></pre>
+<p><strong>Why Structure is Sticky:</strong> - Graph nodes are tenant-specific UUIDs (not portable) - Relationship types are learned from tenant data (not transferable) - Edge weights are calibrated through usage (not reproducible)</p>
+<p><strong>Database Schema:</strong></p>
+<pre class="sql"><code>CREATE TABLE cortex_graph_nodes (
+  id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  node_type VARCHAR(50) NOT NULL,  -- equipment, person, process, etc.
+  label VARCHAR(500) NOT NULL,
+  properties JSONB DEFAULT &#39;{}&#39;,
+  embedding vector(4096),  -- For hybrid search
+  source_document_ids UUID[] DEFAULT &#39;{}&#39;,
+  confidence DECIMAL(3,2),
+  CONSTRAINT tenant_isolation CHECK (tenant_id = app.current_tenant_id)
+);
+
+CREATE TABLE cortex_graph_edges (
+  id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  source_node_id UUID REFERENCES cortex_graph_nodes(id),
+  target_node_id UUID REFERENCES cortex_graph_nodes(id),
+  edge_type VARCHAR(100) NOT NULL,  -- feeds, contains, limits, requires
+  weight DECIMAL(5,4) DEFAULT 1.0,
+  properties JSONB DEFAULT &#39;{}&#39;
+);</code></pre>
+<hr />
+<h3 id="chain-of-custody-the-trust-ledger">12.2 Chain of Custody (The Trust Ledger)</h3>
+<p><strong>The Audit Problem:</strong> Standard AI systems cannot prove provenance. When asked “why did you say X?”, they can only regenerate an explanation.</p>
+<p><strong>The Cortex Solution:</strong> Every critical fact is cryptographically signed during ingestion.</p>
+<p><strong>Implementation:</strong></p>
+<pre class="typescript"><code>// golden-rules.service.ts - Chain of Custody
+async createChainOfCustody(entry: ChainOfCustodyEntry): Promise&lt;ChainOfCustodyEntry&gt; {
+  // Generate verification hash
+  const contentHash = crypto
+    .createHash(&#39;sha256&#39;)
+    .update(JSON.stringify({
+      factId: entry.factId,
+      originalContent: entry.originalContent,
+      verifiedContent: entry.verifiedContent,
+      verifierId: entry.verifierId,
+      timestamp: entry.verificationTimestamp,
+    }))
+    .digest(&#39;hex&#39;);
+
+  const result = await this.db.query(
+    `INSERT INTO cortex_chain_of_custody (
+      fact_id, tenant_id, original_content, verified_content,
+      verifier_id, verifier_name, verifier_role, verification_type,
+      verification_hash
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    RETURNING *`,
+    [entry.factId, entry.tenantId, entry.originalContent, 
+     entry.verifiedContent, entry.verifierId, entry.verifierName,
+     entry.verifierRole, entry.verificationType, contentHash]
+  );
+  
+  return this.mapRowToEntry(result.rows[0]);
+}
+
+async verifyChainOfCustody(factId: string, tenantId: string): Promise&lt;boolean&gt; {
+  const entry = await this.getChainOfCustody(factId, tenantId);
+  
+  // Recompute hash and compare
+  const expectedHash = crypto
+    .createHash(&#39;sha256&#39;)
+    .update(JSON.stringify({
+      factId: entry.factId,
+      originalContent: entry.originalContent,
+      verifiedContent: entry.verifiedContent,
+      verifierId: entry.verifierId,
+      timestamp: entry.verificationTimestamp,
+    }))
+    .digest(&#39;hex&#39;);
+  
+  return entry.verificationHash === expectedHash;
+}</code></pre>
+<p><strong>Database Schema:</strong></p>
+<pre class="sql"><code>CREATE TABLE cortex_chain_of_custody (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  fact_id UUID NOT NULL,
+  tenant_id UUID NOT NULL,
+  original_content TEXT NOT NULL,
+  verified_content TEXT NOT NULL,
+  verifier_id UUID NOT NULL,
+  verifier_name VARCHAR(255) NOT NULL,
+  verifier_role VARCHAR(100) NOT NULL,
+  verification_type verification_type NOT NULL,
+  verification_timestamp TIMESTAMPTZ DEFAULT NOW(),
+  verification_hash VARCHAR(64) NOT NULL,  -- SHA-256
+  previous_hash VARCHAR(64),  -- For chain linking
+  metadata JSONB DEFAULT &#39;{}&#39;
+);</code></pre>
+<hr />
+<h3 id="tribal-delta-heuristic-lock-in">12.3 Tribal Delta (Heuristic Lock-in)</h3>
+<p><strong>The Knowledge Gap:</strong> Foundation models know textbook answers. They don’t know: - “In Mexico City, filters clog faster due to humidity” - “Bob prefers Verdana 11pt for all reports” - “The Friday checklist includes a step the manual forgot”</p>
+<p><strong>The Golden Rules System:</strong></p>
+<pre class="typescript"><code>// golden-rules.service.ts
+async createGoldenRule(rule: Omit&lt;GoldenRule, &#39;id&#39; | &#39;createdAt&#39;&gt;): Promise&lt;GoldenRule&gt; {
+  const result = await this.db.query(
+    `INSERT INTO cortex_golden_rules (
+      tenant_id, domain_path, original_statement, corrected_statement,
+      reason, severity, source_node_id, created_by, priority
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    RETURNING *`,
+    [rule.tenantId, rule.domainPath, rule.originalStatement,
+     rule.correctedStatement, rule.reason, rule.severity,
+     rule.sourceNodeId, rule.createdBy, rule.priority || 50]
+  );
+  
+  return this.mapRowToRule(result.rows[0]);
+}
+
+async checkGoldenRules(tenantId: string, statement: string): Promise&lt;GoldenRule | null&gt; {
+  // Find matching rule by semantic similarity or exact match
+  const result = await this.db.query(
+    `SELECT * FROM cortex_golden_rules 
+     WHERE tenant_id = $1 
+       AND is_active = true
+       AND (
+         original_statement ILIKE &#39;%&#39; || $2 || &#39;%&#39;
+         OR $2 ILIKE &#39;%&#39; || original_statement || &#39;%&#39;
+       )
+     ORDER BY priority DESC, created_at DESC
+     LIMIT 1`,
+    [tenantId, statement]
+  );
+  
+  return result.rows[0] ? this.mapRowToRule(result.rows[0]) : null;
+}</code></pre>
+<p><strong>Integration with Query Flow:</strong></p>
+<pre class="typescript"><code>// In the Retrieval Dance
+async processQuery(query: string, tenantId: string) {
+  // Step 1: Get base AI response
+  const baseResponse = await this.getModelResponse(query);
+  
+  // Step 2: Check for Golden Rule overrides
+  const goldenRule = await this.goldenRulesService.checkGoldenRules(
+    tenantId, 
+    baseResponse
+  );
+  
+  if (goldenRule) {
+    // Override with tenant-specific knowledge
+    return {
+      response: goldenRule.correctedStatement,
+      source: &#39;golden_rule&#39;,
+      ruleId: goldenRule.id,
+      reason: goldenRule.reason,
+    };
+  }
+  
+  return { response: baseResponse, source: &#39;model&#39; };
+}</code></pre>
+<hr />
+<h3 id="sovereignty-vendor-arbitrage">12.4 Sovereignty (Vendor Arbitrage)</h3>
+<p><strong>The Lock-in Fear:</strong> Enterprises worry about building on a single AI provider that might raise prices or degrade.</p>
+<p><strong>The Intelligence Compiler:</strong> RADIANT treats the Cortex (data structure) as the permanent asset and models as swappable CPUs.</p>
+<pre class="typescript"><code>// model-migration.service.ts
+async initiateMigration(request: MigrationRequest): Promise&lt;ModelMigration&gt; {
+  // Validate target model is supported
+  const targetConfig = this.getModelConfig(request.targetModel);
+  if (!targetConfig) {
+    throw new Error(`Unsupported target model: ${request.targetModel.modelId}`);
+  }
+  
+  // Get current model config
+  const currentModel = await this.getCurrentModel(request.tenantId);
+  
+  // Create migration record
+  const migration = await this.db.query(
+    `INSERT INTO cortex_model_migrations (
+      tenant_id, source_model, target_model, status
+    ) VALUES ($1, $2, $3, &#39;pending&#39;)
+    RETURNING *`,
+    [request.tenantId, JSON.stringify(currentModel), 
+     JSON.stringify(request.targetModel)]
+  );
+  
+  return this.mapRowToMigration(migration.rows[0]);
+}
+
+async runTests(migrationId: string, tenantId: string): Promise&lt;TestResults&gt; {
+  // Run test suite against new model
+  const tests = [
+    { type: &#39;accuracy&#39;, weight: 0.4 },
+    { type: &#39;latency&#39;, weight: 0.2 },
+    { type: &#39;cost&#39;, weight: 0.2 },
+    { type: &#39;safety&#39;, weight: 0.2 },
+  ];
+  
+  const results = await Promise.all(
+    tests.map(t =&gt; this.runTestType(migrationId, t.type))
+  );
+  
+  // Calculate weighted score
+  const score = tests.reduce((acc, test, i) =&gt; 
+    acc + (results[i].passed ? test.weight : 0), 0
+  );
+  
+  return { tests: results, overallScore: score, passed: score &gt;= 0.8 };
+}</code></pre>
+<p><strong>Key Insight:</strong> The Cortex stores: - Graph relationships (tenant-owned, not portable) - Golden Rules (tenant-specific overrides) - Chain of Custody (verification history)</p>
+<p>None of this is tied to a specific model. Swap from Claude to GPT to Llama—the Cortex remains.</p>
+<hr />
+<h3 id="entropy-reversal-data-hygiene">12.5 Entropy Reversal (Data Hygiene)</h3>
+<p><strong>The Entropy Problem:</strong> Traditional systems accumulate contradictions: - Manual v2024 says “30 days” - Manual v2026 says “15 days” - Both are indexed. Which is correct?</p>
+<p><strong>Twilight Dreaming Solution:</strong></p>
+<pre class="typescript"><code>// graph-expansion.service.ts
+async findDuplicates(task: GraphExpansionTask): Promise&lt;InferredLink[]&gt; {
+  // Find nodes with high embedding similarity
+  const candidates = await this.db.query(
+    `SELECT a.id as id_a, b.id as id_b,
+            1 - (a.embedding &lt;=&gt; b.embedding) as similarity
+     FROM cortex_graph_nodes a
+     JOIN cortex_graph_nodes b ON a.tenant_id = b.tenant_id
+     WHERE a.tenant_id = $1
+       AND a.id &lt; b.id  -- Avoid duplicates
+       AND a.node_type = b.node_type
+       AND 1 - (a.embedding &lt;=&gt; b.embedding) &gt; 0.95
+     ORDER BY similarity DESC
+     LIMIT 100`,
+    [task.tenantId]
+  );
+  
+  return candidates.rows.map(row =&gt; ({
+    sourceNodeId: row.id_a,
+    targetNodeId: row.id_b,
+    edgeType: &#39;duplicate_of&#39;,
+    confidence: row.similarity,
+    evidence: { method: &#39;embedding_similarity&#39; },
+  }));
+}
+
+async resolveConflicts(tenantId: string): Promise&lt;void&gt; {
+  // Find conflicting facts
+  const conflicts = await this.db.query(
+    `SELECT * FROM cortex_conflicting_facts
+     WHERE tenant_id = $1 AND status = &#39;pending&#39;`,
+    [tenantId]
+  );
+  
+  for (const conflict of conflicts.rows) {
+    // Apply resolution rules:
+    // 1. Newer document supersedes older
+    // 2. Higher-confidence source wins
+    // 3. Golden Rule overrides both
+    const resolution = await this.determineResolution(conflict);
+    await this.applyResolution(conflict.id, resolution);
+  }
+}</code></pre>
+<p><strong>Housekeeping Schedule:</strong></p>
+<pre class="typescript"><code>const HOUSEKEEPING_TASKS = [
+  { type: &#39;ttl_enforcement&#39;, frequency: &#39;hourly&#39; },
+  { type: &#39;archive_promotion&#39;, frequency: &#39;nightly&#39; },
+  { type: &#39;deduplication&#39;, frequency: &#39;nightly&#39; },
+  { type: &#39;graph_expansion&#39;, frequency: &#39;weekly&#39; },
+  { type: &#39;conflict_resolution&#39;, frequency: &#39;nightly&#39; },
+  { type: &#39;iceberg_compaction&#39;, frequency: &#39;nightly&#39; },
+  { type: &#39;index_optimization&#39;, frequency: &#39;weekly&#39; },
+];</code></pre>
+<hr />
+<h3 id="mentorship-equity-sunk-cost">12.6 Mentorship Equity (Sunk Cost)</h3>
+<p><strong>The Engagement Problem:</strong> Traditional AI training is tedious data entry. SMEs disengage.</p>
+<p><strong>The Curator Quiz (Entrance Exam):</strong></p>
+<pre class="typescript"><code>// entrance-exam.service.ts
+async generateExam(request: ExamGenerationRequest): Promise&lt;EntranceExam&gt; {
+  // Get facts from the domain
+  const facts = await this.db.query(
+    `SELECT * FROM cortex_graph_nodes
+     WHERE tenant_id = $1 
+       AND properties-&gt;&gt;&#39;domain_path&#39; LIKE $2 || &#39;%&#39;
+       AND confidence &lt; 0.9  -- Focus on uncertain facts
+     ORDER BY confidence ASC
+     LIMIT $3`,
+    [request.tenantId, request.domainPath, request.questionCount]
+  );
+  
+  // Generate quiz questions from facts
+  const questions = facts.rows.map(fact =&gt; ({
+    factId: fact.id,
+    statement: this.formatAsQuestion(fact),
+    expectedAnswer: fact.label,
+    confidence: fact.confidence,
+  }));
+  
+  return this.createExam({
+    tenantId: request.tenantId,
+    domainId: request.domainId,
+    domainPath: request.domainPath,
+    questions,
+    passingScore: request.passingScore || 80,
+  });
+}
+
+async processResults(examId: string, answers: ExamAnswer[]): Promise&lt;ExamResults&gt; {
+  for (const answer of answers) {
+    if (answer.isCorrect) {
+      // Increase fact confidence + create Chain of Custody
+      await this.db.query(
+        `UPDATE cortex_graph_nodes SET confidence = LEAST(confidence + 0.1, 1.0)
+         WHERE id = $1`,
+        [answer.factId]
+      );
+      
+      await this.goldenRulesService.createChainOfCustody({
+        factId: answer.factId,
+        tenantId: exam.tenantId,
+        verifierId: exam.examineeId,
+        verificationType: &#39;exam_verification&#39;,
+      });
+    } else {
+      // Create Golden Rule from correction
+      await this.goldenRulesService.createGoldenRule({
+        tenantId: exam.tenantId,
+        originalStatement: answer.originalStatement,
+        correctedStatement: answer.correction,
+        reason: &#39;SME correction during Entrance Exam&#39;,
+        sourceNodeId: answer.factId,
+        createdBy: exam.examineeId,
+      });
+    }
+  }
+}</code></pre>
+<p><strong>Psychological Lock-in Metrics:</strong></p>
+<pre class="sql"><code>-- Track SME investment per tenant
+SELECT 
+  tenant_id,
+  COUNT(DISTINCT examinee_id) as sme_count,
+  SUM(duration_minutes) as total_hours,
+  COUNT(*) as exams_completed,
+  SUM(CASE WHEN score &gt;= passing_score THEN 1 ELSE 0 END) as passed
+FROM cortex_entrance_exams
+WHERE status = &#39;completed&#39;
+GROUP BY tenant_id;</code></pre>
+<hr />
+<h2 id="implementation-gap-analysis">13. Implementation Gap Analysis</h2>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 55%" />
+<col style="width: 12%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr>
+<th>Moat</th>
+<th>Implementation Status</th>
+<th>Gap</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Semantic Structure</strong></td>
+<td>✅ Fully Implemented</td>
+<td>None</td>
+<td>-</td>
+</tr>
+<tr>
+<td><strong>Chain of Custody</strong></td>
+<td>✅ Fully Implemented</td>
+<td>None</td>
+<td>-</td>
+</tr>
+<tr>
+<td><strong>Tribal Delta</strong></td>
+<td>✅ Fully Implemented</td>
+<td>None</td>
+<td>-</td>
+</tr>
+<tr>
+<td><strong>Sovereignty</strong></td>
+<td>✅ Fully Implemented</td>
+<td>None</td>
+<td>-</td>
+</tr>
+<tr>
+<td><strong>Entropy Reversal</strong></td>
+<td>✅ Fully Implemented</td>
+<td>None</td>
+<td>Hybrid 3-tier resolution (basic/LLM/human)</td>
+</tr>
+<tr>
+<td><strong>Mentorship Equity</strong></td>
+<td>✅ Fully Implemented</td>
+<td>None</td>
+<td>-</td>
+</tr>
+<tr>
+<td><strong>Zero-Copy Index</strong></td>
+<td>✅ Fully Implemented</td>
+<td>None</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="hybrid-conflict-resolution-entropy-reversal">Hybrid Conflict Resolution (Entropy Reversal)</h3>
+<p>The conflict resolution system uses a 3-tier approach:</p>
+<pre class="typescript"><code>// Usage
+const service = new GraphExpansionService(db, modelRouter);
+const result = await service.resolveConflicts(tenantId);
+// Returns: { resolved: 47, escalated: 3 }
+
+// Manual resolution for escalated conflicts
+await service.resolveConflictManually(
+  conflictId,
+  tenantId,
+  userId,
+  &#39;MERGED&#39;,
+  &#39;Combined both sources for complete picture&#39;,
+  &#39;The filter replacement interval is 15 days in humid climates, 30 days otherwise&#39;
+);
+
+// Get statistics
+const stats = await service.getConflictStats(tenantId);
+// { pending: 0, resolved: 47, escalated: 3, byTier: { basic: 42, llm: 5, human: 3 } }</code></pre>
+<p><strong>Tier Distribution:</strong> - <strong>Tier 1 (Basic Rules)</strong>: ~95% - Date comparison, content length, similarity - <strong>Tier 2 (LLM)</strong>: ~4% - Semantic reasoning for numeric/contextual conflicts - <strong>Tier 3 (Human)</strong>: ~1% - Authoritative source conflicts, low-confidence LLM results</p>
+<hr />
+<p><em>Document Version: 5.0.0</em><br />
+<em>For operational procedures, see CORTEX-MEMORY-ADMIN-GUIDE.md</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -47,6 +47,12 @@ Before making ANY code change, identify what type of change it is:
 | `cortex` | memory, blackboard, context |
 | `architecture` | service, pattern, design, system |
 | `competitive_advantage` | moat, unique feature, differentiator |
+| `deployer` | Swift app, deployment, domain URL, tier, installation |
+| `mcp` | Model Context Protocol, MCP server, tools, resources |
+| `a2a` | Agent-to-Agent, A2A protocol, agent registry |
+| `api_keys` | API key, interface type, scopes, key validation |
+| `gateway` | Go gateway, NATS, WebSocket, SSE, protocol |
+| `service_layer` | MCP worker, A2A worker, Cedar policy |
 
 ---
 
@@ -126,6 +132,22 @@ Use the trigger matrix to find ALL required documentation:
 ```
 ✅ CHANGELOG.md
 ✅ docs/OPEN-SOURCE-LIBRARIES.md
+```
+
+### Swift Deployer Changes
+```
+✅ CHANGELOG.md
+✅ docs/SWIFT-DEPLOYER-USER-GUIDE.md
+✅ docs/RADIANT-ADMIN-GUIDE.md (if affects deployment options)
+```
+
+### Service Layer Changes (MCP, A2A, API)
+```
+✅ CHANGELOG.md
+✅ docs/SERVICE-LAYER-GUIDE.md
+✅ docs/RADIANT-PLATFORM-ARCHITECTURE.md
+✅ docs/RADIANT-ADMIN-GUIDE.md (if admin-configurable)
+✅ docs/ENGINEERING-IMPLEMENTATION-VISION.md (if architectural)
 ```
 
 ---
@@ -223,6 +245,8 @@ When updating these documents, also update the version number in the header:
 - `docs/STRATEGIC-VISION-MARKETING.md`
 - `docs/ENGINEERING-IMPLEMENTATION-VISION.md`
 - `docs/RADIANT-PLATFORM-ARCHITECTURE.md`
+- `docs/SWIFT-DEPLOYER-USER-GUIDE.md`
+- `docs/SERVICE-LAYER-GUIDE.md`
 
 ---
 
@@ -239,6 +263,8 @@ Before marking task complete, verify:
 □ Moats updated (if competitive advantage)
 □ Database schema updated (if new tables)
 □ Platform architecture updated (if architectural change)
+□ Swift Deployer guide updated (if deployer changes)
+□ Service Layer guide updated (if MCP, A2A, API, gateway changes)
 □ Version numbers updated in all touched docs
 ```
 
@@ -288,6 +314,10 @@ Use this manifest to programmatically determine which docs need updating.
 │                                                                          │
 │  FOR COMPETITIVE ADVANTAGES:                                             │
 │  ✅ THINKTANK-MOATS.md or RADIANT-MOATS.md                              │
+│                                                                          │
+│  FOR SERVICE LAYER (MCP, A2A, API):                                      │
+│  ✅ SERVICE-LAYER-GUIDE.md                                              │
+│  ✅ RADIANT-PLATFORM-ARCHITECTURE.md                                    │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 ```

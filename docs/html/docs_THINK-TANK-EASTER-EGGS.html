@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THINK TANK EASTER EGGS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>THINK TANK EASTER EGGS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/THINK-TANK-EASTER-EGGS.md</div>
+  </div>
+  
+  <h1 id="think-tank-easter-eggs-guide">Think Tank Easter Eggs Guide</h1>
+<h2 id="overview">Overview</h2>
+<p>Think Tank includes hidden easter eggs that provide fun, alternative interaction modes for users. Easter eggs are <strong>Think Tank only</strong> features - they are not available in the Radiant Admin dashboard except for administrative configuration.</p>
+<h2 id="enablingdisabling-easter-eggs">Enabling/Disabling Easter Eggs</h2>
+<h3 id="user-settings">User Settings</h3>
+<p>Users can enable or disable easter eggs in Think Tank Settings: - Navigate to <strong>Settings</strong> → <strong>Delight Preferences</strong> - Toggle <strong>Enable Easter Eggs</strong> on/off</p>
+<p>Easter eggs are enabled by default for users with <code>expressive</code> or <code>playful</code> personality modes.</p>
+<h3 id="admin-configuration">Admin Configuration</h3>
+<p>Administrators manage easter eggs via: - <strong>Admin Dashboard</strong> → <strong>Think Tank</strong> → <strong>Delight</strong> → <strong>Easter Eggs</strong> - Individual easter eggs can be enabled/disabled - Discovery statistics are tracked per easter egg</p>
+<hr />
+<h2 id="available-easter-eggs">Available Easter Eggs</h2>
+<h3 id="keyboard-triggered">Keyboard Triggered</h3>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 20%" />
+<col style="width: 29%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th>Easter Egg</th>
+<th>Trigger</th>
+<th>Description</th>
+<th>Duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Konami Code</strong></td>
+<td><code>↑↑↓↓←→←→BA</code></td>
+<td>Classic gaming mode with retro arcade theme</td>
+<td>60 seconds</td>
+</tr>
+</tbody>
+</table>
+<p><strong>How to Activate</strong>: Press the arrow keys and letters in sequence: Up, Up, Down, Down, Left, Right, Left, Right, B, A</p>
+<p><strong>Activation Message</strong>: 🎮 Cheat codes activated. +30 lives.</p>
+<hr />
+<h3 id="text-command-triggered">Text Command Triggered</h3>
+<p>Type these commands in the Think Tank chat input to activate:</p>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 23%" />
+<col style="width: 20%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Easter Egg</th>
+<th>Command</th>
+<th>Effect</th>
+<th>Duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Chaos Mode</strong></td>
+<td><code>/chaos</code></td>
+<td>Models debate openly, disagreements visible</td>
+<td>Until deactivated</td>
+</tr>
+<tr>
+<td><strong>Socratic Mode</strong></td>
+<td><code>/socratic</code></td>
+<td>AI responds with questions instead of answers</td>
+<td>Until deactivated</td>
+</tr>
+<tr>
+<td><strong>Victorian Gentleman</strong></td>
+<td><code>/victorian</code></td>
+<td>Formal, Victorian-era speech style</td>
+<td>Until deactivated</td>
+</tr>
+<tr>
+<td><strong>Pirate Mode</strong></td>
+<td><code>/pirate</code></td>
+<td>Arrr! Pirate-speak responses</td>
+<td>Until deactivated</td>
+</tr>
+<tr>
+<td><strong>Haiku Mode</strong></td>
+<td><code>/haiku</code></td>
+<td>All responses in haiku format (5-7-5)</td>
+<td>Until deactivated</td>
+</tr>
+<tr>
+<td><strong>Matrix Mode</strong></td>
+<td><code>/matrix</code></td>
+<td>Green code rain visual effect</td>
+<td>30 seconds</td>
+</tr>
+<tr>
+<td><strong>Disco Mode</strong></td>
+<td><code>/disco</code></td>
+<td>Disco lights and music</td>
+<td>30 seconds</td>
+</tr>
+<tr>
+<td><strong>Dad Jokes Mode</strong></td>
+<td><code>/dadjokes</code></td>
+<td>Every response includes a dad joke</td>
+<td>Until deactivated</td>
+</tr>
+<tr>
+<td><strong>Emission Mode</strong></td>
+<td><code>/emissions</code></td>
+<td>Fun sound effects for events</td>
+<td>Until deactivated</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="detailed-easter-egg-descriptions">Detailed Easter Egg Descriptions</h2>
+<h3 id="chaos---chaos-mode">/chaos - Chaos Mode</h3>
+<p><strong>Purpose</strong>: Let the AI models argue openly about their answers.</p>
+<p><strong>Activation</strong>: Type <code>/chaos</code> in the chat input</p>
+<p><strong>Effect</strong>: - Shows disagreements between models - Displays which models favor which approaches - More “raw” multi-model output</p>
+<p><strong>Deactivation</strong>: Type <code>/chaos</code> again or <code>/normal</code></p>
+<p><strong>Message</strong>: 🌪️ Chaos Mode engaged. May the best model win.</p>
+<hr />
+<h3 id="socratic---socratic-mode">/socratic - Socratic Mode</h3>
+<p><strong>Purpose</strong>: The AI asks probing questions instead of giving direct answers.</p>
+<p><strong>Activation</strong>: Type <code>/socratic</code> in the chat input</p>
+<p><strong>Effect</strong>: - Responses are primarily questions - Encourages user to think through problems - Great for learning and exploration</p>
+<p><strong>Deactivation</strong>: Type <code>/socratic</code> again or <code>/normal</code></p>
+<p><strong>Message</strong>: 🏛️ Socratic Mode. I’ll ask the questions now.</p>
+<hr />
+<h3 id="victorian---victorian-gentleman-mode">/victorian - Victorian Gentleman Mode</h3>
+<p><strong>Purpose</strong>: Formal, eloquent responses in Victorian-era style.</p>
+<p><strong>Activation</strong>: Type <code>/victorian</code> in the chat input</p>
+<p><strong>Effect</strong>: - Highly formal language - Victorian idioms and expressions - Polite, elaborate responses</p>
+<p><strong>Deactivation</strong>: Type <code>/victorian</code> again or <code>/normal</code></p>
+<p><strong>Message</strong>: 🎩 Indeed, good sir/madam. How may I assist?</p>
+<hr />
+<h3 id="pirate---pirate-mode">/pirate - Pirate Mode</h3>
+<p><strong>Purpose</strong>: Responses delivered in pirate-speak.</p>
+<p><strong>Activation</strong>: Type <code>/pirate</code> in the chat input</p>
+<p><strong>Effect</strong>: - “Arrr” and nautical terminology - Pirate idioms and phrases - Fun for casual conversations</p>
+<p><strong>Deactivation</strong>: Type <code>/pirate</code> again or <code>/normal</code></p>
+<p><strong>Message</strong>: 🏴‍☠️ Ahoy! Ready to sail the seven seas of knowledge!</p>
+<hr />
+<h3 id="haiku---haiku-mode">/haiku - Haiku Mode</h3>
+<p><strong>Purpose</strong>: All responses formatted as haikus.</p>
+<p><strong>Activation</strong>: Type <code>/haiku</code> in the chat input</p>
+<p><strong>Effect</strong>: - 5-7-5 syllable structure - Poetic, condensed responses - Great for creative exploration</p>
+<p><strong>Deactivation</strong>: Type <code>/haiku</code> again or <code>/normal</code></p>
+<p><strong>Message</strong>: 🌸 Five, seven, then five / Syllables mark the rhythm / Nature finds its voice</p>
+<hr />
+<h3 id="matrix---matrix-mode">/matrix - Matrix Mode</h3>
+<p><strong>Purpose</strong>: Visual transformation with matrix-style code rain.</p>
+<p><strong>Activation</strong>: Type <code>/matrix</code> in the chat input</p>
+<p><strong>Effect</strong>: - Green falling code visual effect - Matrix-themed interface - Automatically ends after 30 seconds</p>
+<p><strong>Duration</strong>: 30 seconds (auto-deactivates)</p>
+<p><strong>Message</strong>: 💊 You took the red pill. Let’s see how deep this goes.</p>
+<hr />
+<h3 id="disco---disco-mode">/disco - Disco Mode</h3>
+<p><strong>Purpose</strong>: Party atmosphere with lights and music.</p>
+<p><strong>Activation</strong>: Type <code>/disco</code> in the chat input</p>
+<p><strong>Effect</strong>: - Disco ball visual effects - Optional background music (if sounds enabled) - Automatically ends after 30 seconds</p>
+<p><strong>Duration</strong>: 30 seconds (auto-deactivates)</p>
+<p><strong>Message</strong>: 🪩 Let’s groove while we think!</p>
+<hr />
+<h3 id="dadjokes---dad-jokes-mode">/dadjokes - Dad Jokes Mode</h3>
+<p><strong>Purpose</strong>: Every response includes a groan-worthy dad joke.</p>
+<p><strong>Activation</strong>: Type <code>/dadjokes</code> in the chat input</p>
+<p><strong>Effect</strong>: - Responses include related dad jokes - Puns and wordplay throughout - Warning: may cause eye-rolling</p>
+<p><strong>Deactivation</strong>: Type <code>/dadjokes</code> again or <code>/normal</code></p>
+<p><strong>Message</strong>: 👨 Warning: Side effects include groaning and eye-rolling.</p>
+<hr />
+<h3 id="emissions---emission-mode">/emissions - Emission Mode</h3>
+<p><strong>Purpose</strong>: Fun sound effects for various Think Tank events.</p>
+<p><strong>Activation</strong>: Type <code>/emissions</code> in the chat input</p>
+<p><strong>Effect</strong>: - Playful sound effects for: - Synthesis complete - Model agreement - Confirmations - Uses the “emissions” sound theme</p>
+<p><strong>Deactivation</strong>: Type <code>/emissions</code> again or <code>/normal</code></p>
+<p><strong>Message</strong>: 💨 Emissions enabled. This is going to be fun.</p>
+<hr />
+<h2 id="deactivating-easter-eggs">Deactivating Easter Eggs</h2>
+<h3 id="method-1-toggle-off">Method 1: Toggle Off</h3>
+<p>Type the same command again to toggle off: - <code>/pirate</code> → enables → <code>/pirate</code> → disables</p>
+<h3 id="method-2-return-to-normal">Method 2: Return to Normal</h3>
+<p>Type <code>/normal</code> to return to standard mode and deactivate all active easter eggs.</p>
+<h3 id="method-3-automatic-timeout">Method 3: Automatic Timeout</h3>
+<p>Some easter eggs (Matrix, Disco) automatically deactivate after their duration expires.</p>
+<h3 id="method-4-settings">Method 4: Settings</h3>
+<p>Disable all easter eggs via Settings → Delight Preferences → Enable Easter Eggs → Off</p>
+<hr />
+<h2 id="achievement-integration">Achievement Integration</h2>
+<p>Discovering easter eggs contributes to achievements:</p>
+<table>
+<thead>
+<tr>
+<th>Achievement</th>
+<th>Requirement</th>
+<th>Reward</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Curious One</strong></td>
+<td>Find 1 easter egg</td>
+<td>20 points</td>
+</tr>
+<tr>
+<td><strong>Easter Hunter</strong></td>
+<td>Find 5 easter eggs</td>
+<td>50 points</td>
+</tr>
+</tbody>
+</table>
+<p>First-time discoveries are tracked and contribute to the discovery count displayed in admin analytics.</p>
+<hr />
+<h2 id="admin-only-notes">Admin-Only Notes</h2>
+<p>Easter eggs are managed exclusively through the Radiant Admin Dashboard:</p>
+<ul>
+<li><strong>View all easter eggs</strong>: Admin Dashboard → Think Tank → Delight → Easter Eggs</li>
+<li><strong>Enable/disable individual eggs</strong>: Toggle the enabled status</li>
+<li><strong>View discovery statistics</strong>: See how many users have found each egg</li>
+<li><strong>Create custom easter eggs</strong>: Add new triggers and effects</li>
+</ul>
+<p>Easter egg functionality is <strong>not exposed</strong> in the main Radiant admin interface beyond configuration. They are a Think Tank consumer feature only.</p>
+<hr />
+<h2 id="api-reference">API Reference</h2>
+<h3 id="trigger-easter-egg">Trigger Easter Egg</h3>
+<pre class="typescript"><code>POST /api/thinktank/delight/easter-egg/trigger
+{
+  &quot;triggerType&quot;: &quot;text_input&quot; | &quot;key_sequence&quot; | &quot;time_based&quot; | &quot;random&quot; | &quot;usage_pattern&quot;,
+  &quot;triggerValue&quot;: &quot;/pirate&quot;
+}</code></pre>
+<h3 id="response">Response</h3>
+<pre class="typescript"><code>{
+  &quot;easterEgg&quot;: {
+    &quot;id&quot;: &quot;pirate&quot;,
+    &quot;name&quot;: &quot;Pirate Mode&quot;,
+    &quot;effectType&quot;: &quot;mode_change&quot;,
+    &quot;effectConfig&quot;: { &quot;mode&quot;: &quot;pirate&quot;, &quot;responseStyle&quot;: &quot;pirate&quot; },
+    &quot;activationMessage&quot;: &quot;🏴‍☠️ Ahoy! Ready to sail the seven seas of knowledge!&quot;,
+    &quot;effectDurationSeconds&quot;: 0
+  },
+  &quot;isNewDiscovery&quot;: true,
+  &quot;achievementUnlocked&quot;: null
+}</code></pre>
+<h3 id="deactivate-easter-egg">Deactivate Easter Egg</h3>
+<pre class="typescript"><code>POST /api/thinktank/delight/easter-egg/deactivate
+{
+  &quot;easterEggId&quot;: &quot;pirate&quot;
+}</code></pre>
+<hr />
+<h2 id="database-schema">Database Schema</h2>
+<p>Easter eggs are stored in the <code>delight_easter_eggs</code> table:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>VARCHAR(50)</td>
+<td>Unique identifier</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>VARCHAR(100)</td>
+<td>Display name</td>
+</tr>
+<tr>
+<td><code>trigger_type</code></td>
+<td>VARCHAR(30)</td>
+<td>How it’s triggered</td>
+</tr>
+<tr>
+<td><code>trigger_value</code></td>
+<td>TEXT</td>
+<td>The trigger pattern/command</td>
+</tr>
+<tr>
+<td><code>effect_type</code></td>
+<td>VARCHAR(30)</td>
+<td>What type of effect</td>
+</tr>
+<tr>
+<td><code>effect_config</code></td>
+<td>JSONB</td>
+<td>Effect configuration</td>
+</tr>
+<tr>
+<td><code>effect_duration_seconds</code></td>
+<td>INTEGER</td>
+<td>0 = until toggled off</td>
+</tr>
+<tr>
+<td><code>activation_message</code></td>
+<td>TEXT</td>
+<td>Shown on activation</td>
+</tr>
+<tr>
+<td><code>deactivation_message</code></td>
+<td>TEXT</td>
+<td>Shown on deactivation</td>
+</tr>
+<tr>
+<td><code>is_enabled</code></td>
+<td>BOOLEAN</td>
+<td>Admin toggle</td>
+</tr>
+<tr>
+<td><code>discovery_count</code></td>
+<td>INTEGER</td>
+<td>Total discoveries</td>
+</tr>
+</tbody>
+</table>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

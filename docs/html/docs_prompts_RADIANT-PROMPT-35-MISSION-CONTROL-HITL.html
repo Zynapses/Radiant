@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIANT PROMPT 35 MISSION CONTROL HITL - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RADIANT PROMPT 35 MISSION CONTROL HITL</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/prompts/RADIANT-PROMPT-35-MISSION-CONTROL-HITL.md</div>
+  </div>
+  
+  <h1 id="radiant-prompt-35-mission-control-human-in-the-loop-hitl-system">RADIANT PROMPT-35: Mission Control Human-in-the-Loop (HITL) System</h1>
+<blockquote>
+<p><strong>For: Windsurf / Claude Opus 4.5</strong> <strong>Version:</strong> 4.19.2 <strong>Status:</strong> Implementation Complete</p>
+</blockquote>
+<hr />
+<h2 id="executive-summary">Executive Summary</h2>
+<p>Implement a complete Human-in-the-Loop (HITL) system for RADIANT’s Think Tank multi-agent swarm orchestration. The system enables human oversight of AI-generated decisions, particularly for high-stakes domains (medical, financial, legal).</p>
+<hr />
+<h2 id="critical-implementation-requirements">Critical Implementation Requirements</h2>
+<h3 id="mandatory-rules">⚠️ MANDATORY RULES</h3>
+<ol type="1">
+<li><strong>NO STUBS, MOCKS, OR PLACEHOLDERS</strong> - All code must be production-ready</li>
+<li><strong>NO TODO COMMENTS</strong> - Everything must be fully implemented</li>
+<li><strong>Signal names MUST match</strong> - Python <code>wait_for_input(name=f"human_decision_{decision_id}")</code> must match TypeScript <code>sendSignal(executionId, signalId)</code></li>
+<li><strong>RLS enforcement</strong> - Use <code>SET app.tenant_id</code> (session-level) with <code>RESET</code> in finally block</li>
+<li><strong>S3 offloading</strong> - Never pass raw JSON to Flyte; upload to S3 Bronze layer first</li>
+<li><strong><code>@dynamic(cache=False)</code></strong> - Required on swarm execution to prevent zombie cache</li>
+<li><strong>True swarm loop</strong> - Iterate ALL agents, not just <code>agents[0]</code></li>
+</ol>
+<hr />
+<h2 id="phase-1-database-migration">Phase 1: Database Migration</h2>
+<p><strong>File:</strong> <code>packages/infrastructure/migrations/V2026_01_07_001__mission_control_schema.sql</code></p>
+<p>Create 4 tables with RLS policies:</p>
+<pre class="sql"><code>-- 1. pending_decisions: Core HITL decision tracking
+CREATE TABLE pending_decisions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  session_id UUID NOT NULL,
+  question TEXT NOT NULL,
+  context JSONB NOT NULL DEFAULT &#39;{}&#39;,
+  options JSONB DEFAULT &#39;[]&#39;,
+  topic_tag VARCHAR(255),
+  domain VARCHAR(50) NOT NULL CHECK (domain IN (&#39;medical&#39;, &#39;financial&#39;, &#39;legal&#39;, &#39;general&#39;)),
+  urgency VARCHAR(20) DEFAULT &#39;normal&#39; CHECK (urgency IN (&#39;low&#39;, &#39;normal&#39;, &#39;high&#39;, &#39;critical&#39;)),
+  status VARCHAR(20) DEFAULT &#39;pending&#39; CHECK (status IN (&#39;pending&#39;, &#39;resolved&#39;, &#39;expired&#39;, &#39;escalated&#39;)),
+  timeout_seconds INTEGER NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  flyte_execution_id VARCHAR(256) NOT NULL,
+  flyte_node_id VARCHAR(256) NOT NULL,
+  cato_escalation_id UUID,
+  resolution VARCHAR(50),
+  guidance TEXT,
+  resolved_by UUID,
+  resolved_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. decision_audit: Complete audit trail
+CREATE TABLE decision_audit (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  decision_id UUID NOT NULL REFERENCES pending_decisions(id),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  action VARCHAR(50) NOT NULL,
+  actor_id UUID,
+  actor_type VARCHAR(50) NOT NULL,
+  details JSONB NOT NULL DEFAULT &#39;{}&#39;,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 3. decision_domain_config: Per-domain timeout and escalation settings
+CREATE TABLE decision_domain_config (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID REFERENCES tenants(id),
+  domain VARCHAR(50) NOT NULL,
+  default_timeout_seconds INTEGER NOT NULL,
+  escalation_timeout_seconds INTEGER NOT NULL,
+  auto_escalate BOOLEAN DEFAULT TRUE,
+  escalation_channel VARCHAR(100),
+  escalation_target TEXT,
+  required_roles TEXT[] DEFAULT &#39;{}&#39;,
+  allow_auto_resolve BOOLEAN DEFAULT FALSE,
+  require_guidance BOOLEAN DEFAULT TRUE,
+  sanitize_phi BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(tenant_id, domain)
+);
+
+-- 4. websocket_connections: Active WebSocket connections
+CREATE TABLE websocket_connections (
+  connection_id VARCHAR(256) PRIMARY KEY,
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  user_id UUID,
+  subscribed_domains TEXT[] DEFAULT &#39;{}&#39;,
+  connected_at TIMESTAMPTZ DEFAULT NOW(),
+  last_heartbeat TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS Policies (CRITICAL: Use app.tenant_id, not current_tenant_id)
+ALTER TABLE pending_decisions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY pending_decisions_tenant_isolation ON pending_decisions
+  USING (tenant_id = current_setting(&#39;app.tenant_id&#39;, true)::uuid);
+
+ALTER TABLE decision_audit ENABLE ROW LEVEL SECURITY;
+CREATE POLICY decision_audit_tenant_isolation ON decision_audit
+  USING (tenant_id = current_setting(&#39;app.tenant_id&#39;, true)::uuid);
+
+-- Default domain configurations
+INSERT INTO decision_domain_config (tenant_id, domain, default_timeout_seconds, escalation_timeout_seconds, auto_escalate, escalation_channel) VALUES
+  (NULL, &#39;medical&#39;, 300, 60, true, &#39;pagerduty&#39;),
+  (NULL, &#39;financial&#39;, 600, 120, true, &#39;pagerduty&#39;),
+  (NULL, &#39;legal&#39;, 900, 180, true, &#39;email&#39;),
+  (NULL, &#39;general&#39;, 1800, 300, true, &#39;slack&#39;);</code></pre>
+<hr />
+<h2 id="phase-2-cdk-infrastructure-stack">Phase 2: CDK Infrastructure Stack</h2>
+<p><strong>File:</strong> <code>packages/infrastructure/lib/stacks/mission-control-stack.ts</code></p>
+<p>Create CDK stack with: - Mission Control API Lambda (REST endpoints) - WebSocket Handler Lambda (connection management) - Timeout Cleanup Lambda (scheduled, every 1 minute) - Redis Bridge ECS Fargate Service - API Gateway REST API - API Gateway WebSocket API - EventBridge scheduled rule for cleanup</p>
+<p><strong>Key Environment Variables:</strong></p>
+<pre class="typescript"><code>environment: {
+  DB_SECRET_ARN: dbSecret.secretArn,
+  REDIS_HOST: redis.attrRedisEndpointAddress,
+  REDIS_PORT: redis.attrRedisEndpointPort,
+  FLYTE_ADMIN_URL: &#39;http://flyte.internal:30080&#39;,
+  WEBSOCKET_API_ENDPOINT: webSocketApi.apiEndpoint,
+  PAGERDUTY_ROUTING_KEY: pagerdutyKey.secretValue,
+  SLACK_WEBHOOK_URL: slackWebhook.secretValue,
+}</code></pre>
+<hr />
+<h2 id="phase-3-radiantswarm-service">Phase 3: RadiantSwarm Service</h2>
+<p><strong>File:</strong> <code>packages/infrastructure/lambda/shared/services/swarm/radiant-swarm.ts</code></p>
+<p>Scatter-gather orchestrator with: - Parallel agent execution via <code>Promise.all()</code> - HITL integration via FlyteLauncher - Redis event publishing - Per-agent safety checks via Cato</p>
+<p><strong>Critical Code Pattern:</strong></p>
+<pre class="typescript"><code>// CORRECT: Iterate ALL agents
+const agentPromises = request.agents.map(agent =&gt; 
+  this.executeAgent(agent, request.task)
+);
+const results = await Promise.all(agentPromises);
+
+// WRONG: Only first agent
+const result = await this.executeAgent(request.agents[0], request.task);</code></pre>
+<hr />
+<h2 id="phase-4-flytelauncher-service">Phase 4: FlyteLauncher Service</h2>
+<p><strong>File:</strong> <code>packages/infrastructure/lambda/shared/services/swarm/flyte-launcher.ts</code></p>
+<p>Flyte workflow integration with: - S3 input upload to Bronze layer - Workflow launch via Flyte Admin API - Signal sending for HITL resolution - Execution abort for timeouts</p>
+<p><strong>S3 Offloading Pattern:</strong></p>
+<pre class="typescript"><code>// Upload input to S3 (CRITICAL: Never pass raw JSON to Flyte)
+const s3Key = `flyte-inputs/${tenantId}/${swarmId}/input.json`;
+await s3.putObject({
+  Bucket: &#39;radiant-bronze&#39;,
+  Key: s3Key,
+  Body: JSON.stringify(inputData),
+});
+
+// Pass only s3_uri to Flyte
+await this.launchWorkflow(&#39;think_tank_hitl_workflow&#39;, {
+  s3_uri: `s3://radiant-bronze/${s3Key}`,
+  swarm_id: swarmId,
+  tenant_id: tenantId,
+  // ...
+});</code></pre>
+<hr />
+<h2 id="phase-5-python-flyte-workflow">Phase 5: Python Flyte Workflow</h2>
+<p><strong>File:</strong> <code>packages/flyte/workflows/think_tank_workflow.py</code></p>
+<p>True swarm parallelism with HITL:</p>
+<pre class="python"><code>from flytekit import workflow, task, dynamic, wait_for_input
+from datetime import timedelta
+
+@task
+def load_input_from_s3_task(s3_uri: str) -&gt; Dict[str, Any]:
+    &quot;&quot;&quot;Load input data from S3 Bronze layer.&quot;&quot;&quot;
+    import boto3
+    s3 = boto3.client(&#39;s3&#39;)
+    bucket, key = s3_uri.replace(&#39;s3://&#39;, &#39;&#39;).split(&#39;/&#39;, 1)
+    response = s3.get_object(Bucket=bucket, Key=key)
+    return json.loads(response[&#39;Body&#39;].read().decode(&#39;utf-8&#39;))
+
+@dynamic(cache=False)  # CRITICAL: Prevents zombie cache
+def execute_swarm(agents: List[AgentConfig], task_data: TaskData) -&gt; List[AgentResult]:
+    &quot;&quot;&quot;Execute all agents in parallel.&quot;&quot;&quot;
+    results = []
+    for agent in agents:  # CRITICAL: Iterate ALL agents
+        result = execute_single_agent_task(agent=agent, task_data=task_data)
+        results.append(result)
+    return results
+
+@workflow
+def think_tank_hitl_workflow(
+    s3_uri: str,
+    swarm_id: str,
+    tenant_id: str,
+    session_id: str,
+    user_id: str,
+    hitl_domain: str,
+) -&gt; Dict[str, Any]:
+    # 1. Load input from S3
+    input_data = load_input_from_s3_task(s3_uri=s3_uri)
+    
+    # 2. Execute agent swarm (true parallel)
+    agent_results = execute_swarm(
+        agents=input_data[&#39;agents&#39;],
+        task_data=input_data[&#39;task&#39;]
+    )
+    
+    # 3. Synthesize results
+    synthesis = synthesize_results(agent_results=agent_results)
+    
+    # 4. Create decision and wait for human input
+    decision_id = create_pending_decision(...)
+    
+    # Signal name MUST match what API sends
+    human_decision = wait_for_input(
+        name=f&quot;human_decision_{decision_id}&quot;,  # CRITICAL: Use decision_id
+        timeout=timedelta(seconds=timeout_seconds),
+        expected_type=dict,
+    )
+    
+    # 5. Incorporate human guidance
+    final_response = perform_deep_reasoning(synthesis, human_decision)
+    
+    return {&quot;status&quot;: &quot;completed&quot;, &quot;response&quot;: final_response}</code></pre>
+<hr />
+<h2 id="phase-6-mission-control-api-lambda">Phase 6: Mission Control API Lambda</h2>
+<p><strong>File:</strong> <code>packages/infrastructure/lambda/functions/mission-control/index.ts</code></p>
+<p>REST endpoints: - <code>GET /decisions</code> - List pending decisions (with filters) - <code>GET /decisions/:id</code> - Get single decision - <code>POST /decisions/:id/resolve</code> - Resolve decision (sends Flyte signal) - <code>GET /stats</code> - Dashboard statistics - <code>GET /config</code> - Domain configuration - <code>PUT /config</code> - Update domain configuration</p>
+<p><strong>RLS Pattern (CRITICAL):</strong></p>
+<pre class="typescript"><code>async function withTenantContext&lt;T&gt;(
+  db: Client,
+  tenantId: string,
+  fn: () =&gt; Promise&lt;T&gt;
+): Promise&lt;T&gt; {
+  try {
+    // SET at session level, not transaction
+    await db.query(`SET app.tenant_id = $1`, [tenantId]);
+    return await fn();
+  } finally {
+    // ALWAYS reset in finally block
+    await db.query(`RESET app.tenant_id`);
+  }
+}</code></pre>
+<hr />
+<h2 id="phase-7-websocket-handler-lambda">Phase 7: WebSocket Handler Lambda</h2>
+<p><strong>File:</strong> <code>packages/infrastructure/lambda/functions/websocket/connection-handler.ts</code></p>
+<p>Handle WebSocket lifecycle: - <code>$connect</code> - Store connection in Redis + DB - <code>$disconnect</code> - Remove connection - <code>$default</code> - Handle ping/pong, subscriptions - Scheduled cleanup of stale connections (&gt;5 min no heartbeat)</p>
+<hr />
+<h2 id="phase-8-redis-bridge-service">Phase 8: Redis Bridge Service</h2>
+<p><strong>File:</strong> <code>packages/services/redis-bridge/src/index.ts</code></p>
+<p>ECS Fargate service that: - Subscribes to Redis pub/sub channels - Broadcasts events to WebSocket connections via API Gateway Management API</p>
+<p><strong>Channels:</strong></p>
+<pre><code>decision_pending:{tenant_id}   → New decision created
+decision_resolved:{tenant_id}  → Decision resolved
+decision_expired:{tenant_id}   → Decision timed out
+swarm_event:{tenant_id}        → Swarm execution events</code></pre>
+<hr />
+<h2 id="phase-9-timeout-cleanup-lambda">Phase 9: Timeout Cleanup Lambda</h2>
+<p><strong>File:</strong> <code>packages/infrastructure/lambda/functions/timeout-cleanup/index.ts</code></p>
+<p>Scheduled function (every 1 minute): 1. Find expired decisions 2. Update status to ‘expired’ 3. Create audit record 4. Publish Redis event 5. Escalate via PagerDuty/Slack (medical/financial = PagerDuty) 6. Abort Flyte execution 7. Update linked Cato escalation</p>
+<hr />
+<h2 id="phase-10-decision-ui-components">Phase 10: Decision UI Components</h2>
+<p><strong>Files:</strong> - <code>apps/admin-dashboard/src/components/decisions/DecisionSidebar.tsx</code> - <code>apps/admin-dashboard/src/components/decisions/DecisionDetail.tsx</code></p>
+<p>Features: - Live countdown timer with color-coded urgency - Domain-specific badges (🏥 Medical, 💰 Financial, ⚖️ Legal) - Resolution form (Approve/Modify/Reject) - Audit trail display - Real-time updates via WebSocket</p>
+<hr />
+<h2 id="phase-11-supporting-components">Phase 11: Supporting Components</h2>
+<p><strong>Files:</strong> - <code>apps/admin-dashboard/src/hooks/useWebSocket.ts</code> - WebSocket hook with reconnect - <code>apps/admin-dashboard/src/lib/api/mission-control.ts</code> - Type-safe API client</p>
+<hr />
+<h2 id="phase-12-cato-integration">Phase 12: Cato Integration</h2>
+<p><strong>File:</strong> <code>packages/infrastructure/lambda/shared/services/cato/hitl-integration.service.ts</code></p>
+<p>When Cato’s Epistemic Recovery fails after max attempts:</p>
+<pre class="typescript"><code>if (recoveryAttempts &gt;= MAX_RECOVERY_ATTEMPTS) {
+  const result = await catoHitlIntegration.createCatoEscalationWithHitl({
+    tenantId,
+    sessionId,
+    userId,
+    originalTask,
+    rejectionHistory,
+    recoveryAttempts,
+    lastError,
+    flyteExecutionId,
+    flyteNodeId,
+    context,
+  });
+}</code></pre>
+<hr />
+<h2 id="phase-13-integration-tests">Phase 13: Integration Tests</h2>
+<p><strong>File:</strong> <code>packages/infrastructure/__tests__/mission-control.test.ts</code></p>
+<p>Test coverage for: - RadiantSwarm parallel execution - FlyteLauncher workflow management - Cato HITL integration - Signal name matching - Domain configuration</p>
+<hr />
+<h2 id="phase-14-deployment-scripts">Phase 14: Deployment Scripts</h2>
+<p><strong>Files:</strong> - <code>packages/flyte/scripts/register-workflows.sh</code> - Flyte workflow registration - <code>tools/scripts/deploy-mission-control.sh</code> - End-to-end deployment</p>
+<hr />
+<h2 id="phase-15-documentation">Phase 15: Documentation</h2>
+<p>Update admin guides: - <code>docs/RADIANT-ADMIN-GUIDE.md</code> - Add Section 48: Mission Control HITL - <code>docs/THINKTANK-ADMIN-GUIDE.md</code> - Add Section 32: Swarm Orchestration &amp; Flyte Operations</p>
+<hr />
+<h2 id="verification-checklist">Verification Checklist</h2>
+<p>Before marking implementation complete:</p>
+<ul class="task-list">
+<li><label><input type="checkbox" />All 4 database tables created with RLS policies</label></li>
+<li><label><input type="checkbox" />CDK stack deploys without errors</label></li>
+<li><label><input type="checkbox" />RadiantSwarm executes ALL agents (not just first)</label></li>
+<li><label><input type="checkbox" />FlyteLauncher uploads to S3 Bronze layer</label></li>
+<li><label><input type="checkbox" />Python workflow uses <code>@dynamic(cache=False)</code></label></li>
+<li><label><input type="checkbox" />Signal name format is <code>human_decision_{decision_id}</code></label></li>
+<li><label><input type="checkbox" />Mission Control API uses <code>SET app.tenant_id</code> (not transaction-level)</label></li>
+<li><label><input type="checkbox" />WebSocket connections stored in both Redis and DB</label></li>
+<li><label><input type="checkbox" />Redis Bridge broadcasts to WebSocket clients</label></li>
+<li><label><input type="checkbox" />Timeout Lambda escalates to PagerDuty for medical/financial</label></li>
+<li><label><input type="checkbox" />UI components have live countdown timers</label></li>
+<li><label><input type="checkbox" />Cato integration creates HITL decisions on epistemic recovery failure</label></li>
+<li><label><input type="checkbox" />Tests pass for signal name matching</label></li>
+<li><label><input type="checkbox" />Documentation updated in both admin guides</label></li>
+<li><label><input type="checkbox" />No TODO comments or placeholder code</label></li>
+</ul>
+<hr />
+<h2 id="environment-variables-reference">Environment Variables Reference</h2>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DB_SECRET_ARN</code></td>
+<td>Secrets Manager ARN for database credentials</td>
+</tr>
+<tr>
+<td><code>REDIS_HOST</code></td>
+<td>Redis/ElastiCache host</td>
+</tr>
+<tr>
+<td><code>REDIS_PORT</code></td>
+<td>Redis port (default: 6379)</td>
+</tr>
+<tr>
+<td><code>FLYTE_ADMIN_URL</code></td>
+<td>Flyte Admin API URL</td>
+</tr>
+<tr>
+<td><code>WEBSOCKET_API_ENDPOINT</code></td>
+<td>WebSocket API Gateway endpoint</td>
+</tr>
+<tr>
+<td><code>PAGERDUTY_ROUTING_KEY</code></td>
+<td>PagerDuty Events API v2 routing key</td>
+</tr>
+<tr>
+<td><code>SLACK_WEBHOOK_URL</code></td>
+<td>Slack Incoming Webhook URL</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="file-summary">File Summary</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 30%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>File</th>
+<th>Lines</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>migrations/V2026_01_07_001__mission_control_schema.sql</code></td>
+<td>~360</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>lib/stacks/mission-control-stack.ts</code></td>
+<td>~300</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>lambda/shared/services/swarm/radiant-swarm.ts</code></td>
+<td>~460</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>lambda/shared/services/swarm/flyte-launcher.ts</code></td>
+<td>~300</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>packages/flyte/workflows/think_tank_workflow.py</code></td>
+<td>~500</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>lambda/functions/mission-control/index.ts</code></td>
+<td>~520</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>lambda/functions/websocket/connection-handler.ts</code></td>
+<td>~300</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>packages/services/redis-bridge/src/index.ts</code></td>
+<td>~220</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>lambda/functions/timeout-cleanup/index.ts</code></td>
+<td>~280</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>components/decisions/DecisionSidebar.tsx</code></td>
+<td>~300</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>components/decisions/DecisionDetail.tsx</code></td>
+<td>~340</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>hooks/useWebSocket.ts</code></td>
+<td>~130</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>lib/api/mission-control.ts</code></td>
+<td>~140</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>lambda/shared/services/cato/hitl-integration.service.ts</code></td>
+<td>~220</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>__tests__/mission-control.test.ts</code></td>
+<td>~400</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>packages/flyte/scripts/register-workflows.sh</code></td>
+<td>~90</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>tools/scripts/deploy-mission-control.sh</code></td>
+<td>~180</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total:</strong> ~5,040 lines of production-ready code</p>
+<hr />
+<h2 id="cross-ai-validated-fixes">Cross-AI Validated Fixes</h2>
+<p>These issues were identified and fixed during implementation:</p>
+<ol type="1">
+<li><strong>Signal Mismatch Fix</strong>: Signal ID now uses <code>decision_id</code>, not <code>agent_id</code></li>
+<li><strong>Zombie Cache Fix</strong>: Added <code>@dynamic(cache=False)</code> to swarm execution</li>
+<li><strong>S3 Offloading</strong>: Input payloads uploaded to S3 Bronze layer</li>
+<li><strong>RLS Session Fix</strong>: Using session-level <code>SET app.tenant_id</code>, not transaction-level</li>
+<li><strong>True Swarm Loop</strong>: Iterating all agents, not just <code>agents[0]</code></li>
+<li><strong>PHI Sanitization</strong>: All decision content sanitized before human review</li>
+</ol>
+<hr />
+<p><em>Implementation Status: ✅ COMPLETE</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

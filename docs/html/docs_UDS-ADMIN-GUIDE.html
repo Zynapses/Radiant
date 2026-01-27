@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UDS ADMIN GUIDE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>UDS ADMIN GUIDE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/UDS-ADMIN-GUIDE.md</div>
+  </div>
+  
+  <h1 id="user-data-service-uds-administration-guide">User Data Service (UDS) Administration Guide</h1>
+<p><strong>Version</strong>: 1.0.0<br />
+<strong>Last Updated</strong>: January 24, 2026<br />
+<strong>RADIANT Version</strong>: 5.52.18</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-overview">Overview</a></li>
+<li><a href="#2-architecture">Architecture</a></li>
+<li><a href="#3-tiered-storage">Tiered Storage</a></li>
+<li><a href="#4-data-types">Data Types</a></li>
+<li><a href="#5-encryption">Encryption</a></li>
+<li><a href="#6-audit-system">Audit System</a></li>
+<li><a href="#7-upload-management">Upload Management</a></li>
+<li><a href="#8-gdpr-compliance">GDPR Compliance</a></li>
+<li><a href="#9-admin-api-reference">Admin API Reference</a></li>
+<li><a href="#10-admin-dashboard">Admin Dashboard</a></li>
+<li><a href="#11-configuration">Configuration</a></li>
+<li><a href="#12-monitoring">Monitoring</a></li>
+<li><a href="#13-troubleshooting">Troubleshooting</a></li>
+</ol>
+<hr />
+<h2 id="overview">1. Overview</h2>
+<p>The User Data Service (UDS) is RADIANT’s dedicated system for storing, managing, and securing user-generated content at scale (1M+ concurrent users). It provides:</p>
+<ul>
+<li><strong>Tiered Storage</strong>: Hot → Warm → Cold → Glacier automatic data lifecycle</li>
+<li><strong>End-to-End Encryption</strong>: AES-256-GCM with KMS key management</li>
+<li><strong>Tamper-Evident Audit</strong>: Merkle chain for compliance verification</li>
+<li><strong>GDPR Compliance</strong>: Right-to-erasure with multi-tier deletion</li>
+<li><strong>File Handling</strong>: Virus scanning, text extraction, semantic search</li>
+</ul>
+<h3 id="why-uds-vs-cortex">Why UDS vs Cortex?</h3>
+<table>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 39%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr>
+<th>System</th>
+<th>Purpose</th>
+<th>Data</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cortex</strong></td>
+<td>AI Memory</td>
+<td>Knowledge graphs, semantic memory, ghost vectors</td>
+</tr>
+<tr>
+<td><strong>UDS</strong></td>
+<td>User Data</td>
+<td>Conversations, messages, uploads, audit logs</td>
+</tr>
+</tbody>
+</table>
+<p>UDS is optimized for <strong>time-series CRUD</strong> operations, while Cortex is optimized for <strong>graph queries</strong> and <strong>semantic search</strong>.</p>
+<hr />
+<h2 id="architecture">2. Architecture</h2>
+<h3 id="system-overview">2.1 System Overview</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                           USER DATA SERVICE                              │
+│                                                                          │
+│  ┌────────────────────────┐        ┌────────────────────────┐          │
+│  │   Client Applications  │        │    Admin Dashboard     │          │
+│  │   (Think Tank, etc.)   │        │   /platform/uds        │          │
+│  └───────────┬────────────┘        └───────────┬────────────┘          │
+│              │                                  │                        │
+│              ▼                                  ▼                        │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                       UDS API Gateway                            │   │
+│  │  /api/v2/uds/* (client)       /api/admin/uds/* (admin)         │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│              │                                  │                        │
+│              ▼                                  ▼                        │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                        UDS Services                              │   │
+│  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐             │   │
+│  │  │ Conversation │ │   Message    │ │    Upload    │             │   │
+│  │  │   Service    │ │   Service    │ │   Service    │             │   │
+│  │  └──────────────┘ └──────────────┘ └──────────────┘             │   │
+│  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐             │   │
+│  │  │    Audit     │ │     Tier     │ │   Erasure    │             │   │
+│  │  │   Service    │ │ Coordinator  │ │   Service    │             │   │
+│  │  └──────────────┘ └──────────────┘ └──────────────┘             │   │
+│  │  ┌──────────────┐                                               │   │
+│  │  │  Encryption  │                                               │   │
+│  │  │   Service    │                                               │   │
+│  │  └──────────────┘                                               │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│              │                                                          │
+│              ▼                                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                       Storage Tiers                              │   │
+│  │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐   │   │
+│  │  │    HOT     │ │    WARM    │ │    COLD    │ │  GLACIER   │   │   │
+│  │  │ ElastiCache│ │  Aurora PG │ │ S3 Iceberg │ │ S3 Glacier │   │   │
+│  │  │ + DynamoDB │ │ + pgvector │ │            │ │            │   │   │
+│  │  └────────────┘ └────────────┘ └────────────┘ └────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="database-tables">2.2 Database Tables</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>uds_config</code></td>
+<td>Per-tenant configuration</td>
+</tr>
+<tr>
+<td><code>uds_encryption_keys</code></td>
+<td>Encryption key registry</td>
+</tr>
+<tr>
+<td><code>uds_conversations</code></td>
+<td>Conversation metadata</td>
+</tr>
+<tr>
+<td><code>uds_messages</code></td>
+<td>Encrypted message content</td>
+</tr>
+<tr>
+<td><code>uds_message_attachments</code></td>
+<td>Inline attachments</td>
+</tr>
+<tr>
+<td><code>uds_uploads</code></td>
+<td>File upload metadata</td>
+</tr>
+<tr>
+<td><code>uds_upload_chunks</code></td>
+<td>Chunked upload tracking</td>
+</tr>
+<tr>
+<td><code>uds_audit_log</code></td>
+<td>Tamper-evident audit trail</td>
+</tr>
+<tr>
+<td><code>uds_audit_merkle_tree</code></td>
+<td>Merkle tree checkpoints</td>
+</tr>
+<tr>
+<td><code>uds_export_requests</code></td>
+<td>Compliance data exports</td>
+</tr>
+<tr>
+<td><code>uds_erasure_requests</code></td>
+<td>GDPR deletion requests</td>
+</tr>
+<tr>
+<td><code>uds_tier_transitions</code></td>
+<td>Data movement history</td>
+</tr>
+<tr>
+<td><code>uds_data_flow_metrics</code></td>
+<td>Tier health metrics</td>
+</tr>
+<tr>
+<td><code>uds_search_index</code></td>
+<td>Full-text + semantic search</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tiered-storage">3. Tiered Storage</h2>
+<h3 id="tier-overview">3.1 Tier Overview</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Storage</th>
+<th>Retention</th>
+<th>Access Pattern</th>
+<th>Latency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hot</strong></td>
+<td>ElastiCache + DynamoDB</td>
+<td>0-24 hours</td>
+<td>Real-time</td>
+<td>&lt;10ms</td>
+</tr>
+<tr>
+<td><strong>Warm</strong></td>
+<td>Aurora PostgreSQL</td>
+<td>1-90 days</td>
+<td>Active</td>
+<td>&lt;100ms</td>
+</tr>
+<tr>
+<td><strong>Cold</strong></td>
+<td>S3 Iceberg</td>
+<td>90 days - 7 years</td>
+<td>Rare</td>
+<td>1-10s</td>
+</tr>
+<tr>
+<td><strong>Glacier</strong></td>
+<td>S3 Glacier</td>
+<td>7+ years</td>
+<td>Archive only</td>
+<td>1-12h</td>
+</tr>
+</tbody>
+</table>
+<h3 id="automatic-transitions">3.2 Automatic Transitions</h3>
+<p>Data automatically moves between tiers based on access patterns:</p>
+<pre><code>Hot (24h) → Warm (90d) → Cold (7y) → Glacier
+                ↑______________|
+                   (retrieval)</code></pre>
+<p><strong>Transition Rules</strong>: - <strong>Hot → Warm</strong>: Conversation not accessed for 24 hours - <strong>Warm → Cold</strong>: Conversation archived AND not accessed for 90 days - <strong>Cold → Glacier</strong>: Data older than 7 years (compliance retention) - <strong>Cold → Warm</strong>: Manual retrieval request</p>
+<h3 id="configuration">3.3 Configuration</h3>
+<pre class="typescript"><code>// Per-tenant tier configuration
+{
+  hotSessionTtlSeconds: 14400,      // 4 hours default session TTL
+  hotMessageTtlSeconds: 86400,      // 24 hours default message TTL
+  warmRetentionDays: 90,            // 90 days in warm tier
+  coldRetentionYears: 7,            // 7 years compliance retention
+}</code></pre>
+<h3 id="manual-operations">3.4 Manual Operations</h3>
+<p><strong>Trigger Hot → Warm Promotion</strong>:</p>
+<pre class="bash"><code>POST /api/admin/uds/tiers/promote</code></pre>
+<p><strong>Trigger Warm → Cold Archival</strong>:</p>
+<pre class="bash"><code>POST /api/admin/uds/tiers/archive</code></pre>
+<p><strong>Retrieve from Cold to Warm</strong>:</p>
+<pre class="bash"><code>POST /api/admin/uds/tiers/retrieve
+Content-Type: application/json
+
+{
+  &quot;resourceIds&quot;: [&quot;uuid-1&quot;, &quot;uuid-2&quot;]
+}</code></pre>
+<hr />
+<h2 id="data-types">4. Data Types</h2>
+<h3 id="conversations">4.1 Conversations</h3>
+<p>Conversations are the primary container for user interactions.</p>
+<pre class="typescript"><code>interface Conversation {
+  id: string;
+  tenantId: string;
+  userId: string;
+  title: string;
+  modelId: string;
+  messageCount: number;
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  totalCostCredits: number;
+  status: &#39;active&#39; | &#39;archived&#39; | &#39;deleted&#39;;
+  currentTier: &#39;hot&#39; | &#39;warm&#39; | &#39;cold&#39; | &#39;glacier&#39;;
+  // Time Machine support
+  parentConversationId?: string;
+  forkPointMessageId?: string;
+  branchName?: string;
+  // Collaboration
+  isShared: boolean;
+  sharedWithUserIds: string[];
+}</code></pre>
+<p><strong>Features</strong>: - <strong>Time Machine</strong>: Fork conversations at any message - <strong>Checkpoints</strong>: Save named snapshots - <strong>Collaboration</strong>: Share with other users - <strong>Tagging</strong>: Custom metadata tags</p>
+<h3 id="messages">4.2 Messages</h3>
+<p>Messages are encrypted at rest and contain the actual conversation content.</p>
+<pre class="typescript"><code>interface Message {
+  id: string;
+  conversationId: string;
+  role: &#39;system&#39; | &#39;user&#39; | &#39;assistant&#39; | &#39;tool&#39;;
+  content: string;  // Decrypted on read
+  sequenceNumber: number;
+  inputTokens: number;
+  outputTokens: number;
+  costCredits: number;
+  // Editing
+  isEdited: boolean;
+  editCount: number;
+  // Feedback
+  userRating: number;  // 1-5
+  flagged: boolean;
+}</code></pre>
+<h3 id="uploads">4.3 Uploads</h3>
+<p>Uploads support multiple file formats with automatic processing.</p>
+<p><strong>Supported Content Types</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Extensions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Documents</td>
+<td>pdf, docx, doc, xlsx, xls, csv, txt, md, json, xml</td>
+</tr>
+<tr>
+<td>Images</td>
+<td>png, jpg, jpeg, gif, webp, svg, bmp, tiff</td>
+</tr>
+<tr>
+<td>Audio</td>
+<td>mp3, wav, ogg, m4a</td>
+</tr>
+<tr>
+<td>Video</td>
+<td>mp4, webm, mov</td>
+</tr>
+<tr>
+<td>Archives</td>
+<td>zip, tar, gz</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Processing Pipeline</strong>: 1. <strong>Quarantine</strong>: File uploaded to quarantine bucket 2. <strong>Virus Scan</strong>: ClamAV Lambda checks for malware 3. <strong>Promotion</strong>: Clean files moved to main bucket 4. <strong>Text Extraction</strong>: Textract/Tika extracts content 5. <strong>Embedding</strong>: Vector embedding for semantic search 6. <strong>Thumbnail</strong>: Generate preview images</p>
+<hr />
+<h2 id="encryption">5. Encryption</h2>
+<h3 id="architecture-1">5.1 Architecture</h3>
+<p>UDS uses <strong>envelope encryption</strong> with AWS KMS:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    ENCRYPTION HIERARCHY                      │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  AWS KMS Master Key                                  │   │
+│  │  (alias/radiant-uds-master)                         │   │
+│  └──────────────────────┬──────────────────────────────┘   │
+│                         │                                   │
+│                         ▼                                   │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  Data Encryption Keys (DEKs)                        │   │
+│  │  - Per-tenant key (default)                         │   │
+│  │  - Per-user key (optional, high-security)          │   │
+│  │  - Rotated every 90 days                           │   │
+│  └──────────────────────┬──────────────────────────────┘   │
+│                         │                                   │
+│                         ▼                                   │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  Encrypted Data                                     │   │
+│  │  - Messages: AES-256-GCM with per-message IV       │   │
+│  │  - Uploads: S3 SSE-KMS                             │   │
+│  │  - Attachments: AES-256-GCM                        │   │
+│  └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="algorithm-details">5.2 Algorithm Details</h3>
+<ul>
+<li><strong>Algorithm</strong>: AES-256-GCM</li>
+<li><strong>IV Length</strong>: 96 bits (12 bytes)</li>
+<li><strong>Auth Tag Length</strong>: 128 bits (16 bytes)</li>
+<li><strong>Key Spec</strong>: AES_256</li>
+</ul>
+<h3 id="key-rotation">5.3 Key Rotation</h3>
+<p><strong>Automatic Rotation</strong>: - Keys are automatically rotated every 90 days - Old keys remain available for decryption - New data uses the latest key version</p>
+<p><strong>Manual Rotation</strong>:</p>
+<pre class="bash"><code>POST /api/admin/uds/encryption/rotate
+Content-Type: application/json
+
+{
+  &quot;userId&quot;: &quot;optional-user-id-for-per-user-key&quot;
+}</code></pre>
+<h3 id="configuration-1">5.4 Configuration</h3>
+<pre class="typescript"><code>{
+  encryptionEnabled: true,
+  encryptionAlgorithm: &#39;AES-256-GCM&#39;,
+  perUserEncryptionKeys: false,  // Enable for high-security tenants
+}</code></pre>
+<hr />
+<h2 id="audit-system">6. Audit System</h2>
+<h3 id="features">6.1 Features</h3>
+<ul>
+<li><strong>Append-Only</strong>: Entries cannot be modified or deleted</li>
+<li><strong>Merkle Chain</strong>: Each entry links to previous via hash</li>
+<li><strong>Tamper-Evident</strong>: Verification detects any modification</li>
+<li><strong>Compliance Ready</strong>: GDPR, HIPAA, SOC2 compatible</li>
+</ul>
+<h3 id="audit-entry-structure">6.2 Audit Entry Structure</h3>
+<pre class="typescript"><code>interface AuditEntry {
+  id: string;
+  tenantId: string;
+  userId: string;
+  
+  // Event
+  eventType: string;           // e.g., &#39;conversation_created&#39;
+  eventCategory: string;       // e.g., &#39;conversation&#39;
+  eventSeverity: string;       // &#39;debug&#39; | &#39;info&#39; | &#39;warning&#39; | &#39;error&#39; | &#39;critical&#39;
+  
+  // Resource
+  resourceType: string;
+  resourceId: string;
+  
+  // Action
+  action: string;              // &#39;create&#39; | &#39;read&#39; | &#39;update&#39; | &#39;delete&#39;
+  actionDetails: object;
+  
+  // Merkle Chain
+  merkleHash: string;          // SHA-256 hash of entry + previous hash
+  previousMerkleHash: string;
+  sequenceNumber: number;
+  
+  // Request Context
+  requestId: string;
+  ipAddress: string;
+  userAgent: string;
+  
+  createdAt: Date;
+}</code></pre>
+<h3 id="event-categories">6.3 Event Categories</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Events</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auth</code></td>
+<td>login, logout, token_refresh</td>
+</tr>
+<tr>
+<td><code>conversation</code></td>
+<td>created, updated, deleted, forked, archived</td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td>created, updated, deleted, flagged</td>
+</tr>
+<tr>
+<td><code>upload</code></td>
+<td>initiated, completed, downloaded, deleted</td>
+</tr>
+<tr>
+<td><code>gdpr</code></td>
+<td>erasure_requested, erasure_completed</td>
+</tr>
+<tr>
+<td><code>system</code></td>
+<td>tier_transition, housekeeping</td>
+</tr>
+</tbody>
+</table>
+<h3 id="merkle-verification">6.4 Merkle Verification</h3>
+<p><strong>Verify Chain Integrity</strong>:</p>
+<pre class="bash"><code>POST /api/admin/uds/audit/verify
+Content-Type: application/json
+
+{
+  &quot;fromSequence&quot;: 1,
+  &quot;toSequence&quot;: 1000
+}</code></pre>
+<p><strong>Response</strong>:</p>
+<pre class="json"><code>{
+  &quot;isValid&quot;: true,
+  &quot;treeRoot&quot;: &quot;a1b2c3...&quot;,
+  &quot;entriesVerified&quot;: 1000,
+  &quot;errors&quot;: []
+}</code></pre>
+<h3 id="export">6.5 Export</h3>
+<p><strong>Export Audit Log</strong>:</p>
+<pre class="bash"><code>POST /api/admin/uds/audit/export
+Content-Type: application/json
+
+{
+  &quot;startDate&quot;: &quot;2025-01-01T00:00:00Z&quot;,
+  &quot;endDate&quot;: &quot;2025-12-31T23:59:59Z&quot;,
+  &quot;format&quot;: &quot;json&quot;  // or &quot;csv&quot;
+}</code></pre>
+<hr />
+<h2 id="upload-management">7. Upload Management</h2>
+<h3 id="upload-flow">7.1 Upload Flow</h3>
+<pre><code>┌─────────┐    ┌──────────┐    ┌───────────┐    ┌─────────┐    ┌───────┐
+│ Initiate│───▶│ Upload to│───▶│  Complete │───▶│  Virus  │───▶│ Ready │
+│ Request │    │Quarantine│    │  Upload   │    │  Scan   │    │       │
+└─────────┘    └──────────┘    └───────────┘    └─────────┘    └───────┘
+                                                      │
+                                                      ▼
+                                                ┌─────────┐
+                                                │Infected │
+                                                │(deleted)│
+                                                └─────────┘</code></pre>
+<h3 id="upload-states">7.2 Upload States</h3>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pending</code></td>
+<td>Presigned URL generated, awaiting upload</td>
+</tr>
+<tr>
+<td><code>scanning</code></td>
+<td>Virus scan in progress</td>
+</tr>
+<tr>
+<td><code>clean</code></td>
+<td>Passed virus scan, being processed</td>
+</tr>
+<tr>
+<td><code>infected</code></td>
+<td>Failed virus scan, file deleted</td>
+</tr>
+<tr>
+<td><code>processing</code></td>
+<td>Text extraction/thumbnail in progress</td>
+</tr>
+<tr>
+<td><code>ready</code></td>
+<td>Fully processed, available for download</td>
+</tr>
+<tr>
+<td><code>failed</code></td>
+<td>Processing failed</td>
+</tr>
+<tr>
+<td><code>deleted</code></td>
+<td>Soft deleted by user/admin</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-endpoints">7.3 API Endpoints</h3>
+<p><strong>Initiate Upload</strong>:</p>
+<pre class="bash"><code>POST /api/v2/uds/uploads/initiate
+Content-Type: application/json
+
+{
+  &quot;originalFilename&quot;: &quot;document.pdf&quot;,
+  &quot;mimeType&quot;: &quot;application/pdf&quot;,
+  &quot;fileSizeBytes&quot;: 1048576,
+  &quot;conversationId&quot;: &quot;optional-uuid&quot;
+}</code></pre>
+<p><strong>Response</strong>:</p>
+<pre class="json"><code>{
+  &quot;uploadId&quot;: &quot;uuid&quot;,
+  &quot;presignedUrl&quot;: &quot;https://s3...&quot;,
+  &quot;expiresAt&quot;: &quot;2025-01-24T08:00:00Z&quot;,
+  &quot;maxSizeBytes&quot;: 104857600
+}</code></pre>
+<p><strong>Complete Upload</strong>:</p>
+<pre class="bash"><code>POST /api/v2/uds/uploads/{uploadId}/complete
+Content-Type: application/json
+
+{
+  &quot;sha256Hash&quot;: &quot;abc123...&quot;
+}</code></pre>
+<p><strong>Get Download URL</strong>:</p>
+<pre class="bash"><code>GET /api/v2/uds/uploads/{uploadId}/download</code></pre>
+<hr />
+<h2 id="gdpr-compliance">8. GDPR Compliance</h2>
+<h3 id="right-to-erasure">8.1 Right to Erasure</h3>
+<p>UDS implements GDPR Article 17 (Right to Erasure) with multi-tier deletion:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                    GDPR ERASURE ORCHESTRATOR                             │
+│                                                                          │
+│  Erasure Request                                                         │
+│       │                                                                  │
+│       ├────────────────┬────────────────┬─────────────────┐             │
+│       ▼                ▼                ▼                 ▼             │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────┐         │
+│  │ Hot Tier    │  │ Warm Tier   │  │ Cold Tier   │  │ Backups│         │
+│  │ (Redis,     │  │ (Aurora,    │  │ (S3,        │  │        │         │
+│  │  DynamoDB)  │  │  uploads)   │  │  Iceberg)   │  │        │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └────────┘         │
+│       │                │                │             │                  │
+│       └────────────────┴────────────────┴─────────────┘                  │
+│                            │                                             │
+│                            ▼                                             │
+│                   ┌─────────────────┐                                   │
+│                   │ Verification    │                                   │
+│                   │ Hash Generated  │                                   │
+│                   └─────────────────┘                                   │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="erasure-scopes">8.2 Erasure Scopes</h3>
+<table>
+<thead>
+<tr>
+<th>Scope</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>user</code></td>
+<td>Delete all data for a specific user</td>
+</tr>
+<tr>
+<td><code>conversation</code></td>
+<td>Delete a specific conversation</td>
+</tr>
+<tr>
+<td><code>tenant</code></td>
+<td>Delete all data for entire tenant</td>
+</tr>
+</tbody>
+</table>
+<h3 id="create-erasure-request">8.3 Create Erasure Request</h3>
+<pre class="bash"><code>POST /api/admin/uds/erasure
+Content-Type: application/json
+
+{
+  &quot;scope&quot;: &quot;user&quot;,
+  &quot;userId&quot;: &quot;uuid-of-user&quot;,
+  &quot;eraseConversations&quot;: true,
+  &quot;eraseMessages&quot;: true,
+  &quot;eraseUploads&quot;: true,
+  &quot;eraseAuditLog&quot;: false,     // Usually keep for compliance
+  &quot;eraseFromBackups&quot;: false,   // Expensive, requires manual intervention
+  &quot;anonymizeRemaining&quot;: true,  // Anonymize data we can&#39;t delete
+  &quot;legalBasis&quot;: &quot;gdpr_article_17&quot;,
+  &quot;legalReference&quot;: &quot;User request #12345&quot;
+}</code></pre>
+<h3 id="erasure-status">8.4 Erasure Status</h3>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pending</code></td>
+<td>Request created, not yet started</td>
+</tr>
+<tr>
+<td><code>processing</code></td>
+<td>Actively deleting data</td>
+</tr>
+<tr>
+<td><code>completed</code></td>
+<td>All tiers processed successfully</td>
+</tr>
+<tr>
+<td><code>failed</code></td>
+<td>Error occurred, may be partially complete</td>
+</tr>
+<tr>
+<td><code>partial</code></td>
+<td>Some tiers completed, others pending</td>
+</tr>
+</tbody>
+</table>
+<h3 id="verification">8.5 Verification</h3>
+<p>Each completed erasure generates a <strong>verification hash</strong> that proves: - What was deleted - When it was deleted - The scope of deletion</p>
+<p>This hash is stored in the audit log for compliance proof.</p>
+<hr />
+<h2 id="admin-api-reference">9. Admin API Reference</h2>
+<p><strong>Base URL</strong>: <code>/api/admin/uds</code></p>
+<h3 id="dashboard">Dashboard</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/dashboard</code></td>
+<td>Full dashboard with health, stats, config</td>
+</tr>
+</tbody>
+</table>
+<h3 id="configuration-2">Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/config</code></td>
+<td>Get tenant configuration</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/config</code></td>
+<td>Update tenant configuration</td>
+</tr>
+</tbody>
+</table>
+<h3 id="conversations-1">Conversations</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/conversations</code></td>
+<td>List conversations with filters</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/conversations/{id}</code></td>
+<td>Get conversation details</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/conversations/{id}</code></td>
+<td>Delete conversation</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/conversations/{id}/messages</code></td>
+<td>List messages</td>
+</tr>
+</tbody>
+</table>
+<h3 id="uploads-1">Uploads</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/uploads</code></td>
+<td>List uploads with filters</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/uploads/{id}</code></td>
+<td>Get upload details</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/uploads/{id}</code></td>
+<td>Delete upload</td>
+</tr>
+</tbody>
+</table>
+<h3 id="audit">Audit</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/audit</code></td>
+<td>List audit entries with filters</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/audit/verify</code></td>
+<td>Verify Merkle chain integrity</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/audit/export</code></td>
+<td>Export audit log</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/audit/merkle-trees</code></td>
+<td>List Merkle trees</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tiers">Tiers</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/tiers</code></td>
+<td>Get tier health status</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/tiers/metrics</code></td>
+<td>Get tier metrics</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/tiers/promote</code></td>
+<td>Trigger Hot → Warm promotion</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/tiers/archive</code></td>
+<td>Trigger Warm → Cold archival</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/tiers/retrieve</code></td>
+<td>Retrieve from Cold to Warm</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/tiers/housekeeping</code></td>
+<td>Run housekeeping tasks</td>
+</tr>
+</tbody>
+</table>
+<h3 id="erasure">Erasure</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/erasure</code></td>
+<td>List erasure requests</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/erasure</code></td>
+<td>Create erasure request</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/erasure/{id}</code></td>
+<td>Get erasure request details</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/erasure/{id}</code></td>
+<td>Cancel pending erasure</td>
+</tr>
+</tbody>
+</table>
+<h3 id="encryption-1">Encryption</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/encryption/keys</code></td>
+<td>List encryption keys</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/encryption/rotate</code></td>
+<td>Rotate encryption key</td>
+</tr>
+</tbody>
+</table>
+<h3 id="statistics">Statistics</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/stats</code></td>
+<td>Get UDS statistics</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="admin-dashboard">10. Admin Dashboard</h2>
+<p>Access the UDS Admin Dashboard at: <strong>Admin Dashboard → Platform → UDS</strong></p>
+<h3 id="overview-tab">10.1 Overview Tab</h3>
+<ul>
+<li><strong>Tier Health</strong>: Real-time status of all storage tiers</li>
+<li><strong>Quick Actions</strong>: Promote, archive, housekeeping buttons</li>
+<li><strong>Statistics</strong>: Conversation, message, upload, audit counts</li>
+<li><strong>Distribution</strong>: Visual breakdown of data across tiers</li>
+</ul>
+<h3 id="audit-log-tab">10.2 Audit Log Tab</h3>
+<ul>
+<li><strong>Filterable Log</strong>: Filter by category, event type, user</li>
+<li><strong>Merkle Verification</strong>: Visual indicator of chain integrity</li>
+<li><strong>Export</strong>: Download audit log for compliance</li>
+</ul>
+<h3 id="gdpr-erasure-tab">10.3 GDPR Erasure Tab</h3>
+<ul>
+<li><strong>Request List</strong>: All erasure requests with status</li>
+<li><strong>Create Request</strong>: Form to initiate new erasure</li>
+<li><strong>Progress Tracking</strong>: Per-tier deletion status</li>
+</ul>
+<h3 id="configuration-tab">10.4 Configuration Tab</h3>
+<ul>
+<li><strong>Tier Settings</strong>: TTL and retention configuration</li>
+<li><strong>Security Settings</strong>: Encryption, virus scanning status</li>
+<li><strong>Upload Settings</strong>: Size limits, allowed types</li>
+<li><strong>GDPR Settings</strong>: Auto-delete, anonymization settings</li>
+</ul>
+<hr />
+<h2 id="configuration-3">11. Configuration</h2>
+<h3 id="environment-variables">11.1 Environment Variables</h3>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 40%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UDS_KMS_KEY_ALIAS</code></td>
+<td>KMS master key alias</td>
+<td><code>alias/radiant-uds-master</code></td>
+</tr>
+<tr>
+<td><code>UDS_UPLOAD_BUCKET</code></td>
+<td>Main upload S3 bucket</td>
+<td><code>radiant-uds-uploads</code></td>
+</tr>
+<tr>
+<td><code>UDS_QUARANTINE_BUCKET</code></td>
+<td>Quarantine S3 bucket</td>
+<td><code>radiant-uds-quarantine</code></td>
+</tr>
+<tr>
+<td><code>UDS_HOT_TTL_SECONDS</code></td>
+<td>Default hot tier TTL</td>
+<td><code>86400</code></td>
+</tr>
+<tr>
+<td><code>UDS_WARM_RETENTION_DAYS</code></td>
+<td>Default warm retention</td>
+<td><code>90</code></td>
+</tr>
+<tr>
+<td><code>UDS_COLD_RETENTION_YEARS</code></td>
+<td>Cold tier retention</td>
+<td><code>7</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="per-tenant-configuration">11.2 Per-Tenant Configuration</h3>
+<p>All settings can be overridden per-tenant via the <code>uds_config</code> table or Admin API.</p>
+<hr />
+<h2 id="monitoring">12. Monitoring</h2>
+<h3 id="key-metrics">12.1 Key Metrics</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Description</th>
+<th>Alert Threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>uds.hot.item_count</code></td>
+<td>Items in hot tier</td>
+<td>&gt;10,000</td>
+</tr>
+<tr>
+<td><code>uds.warm.storage_bytes</code></td>
+<td>Warm tier storage</td>
+<td>&gt;100GB</td>
+</tr>
+<tr>
+<td><code>uds.cold.storage_bytes</code></td>
+<td>Cold tier storage</td>
+<td>&gt;1TB</td>
+</tr>
+<tr>
+<td><code>uds.hot.cache_hit_rate</code></td>
+<td>Cache efficiency</td>
+<td>&lt;90%</td>
+</tr>
+<tr>
+<td><code>uds.tier.transition_errors</code></td>
+<td>Failed transitions</td>
+<td>&gt;0</td>
+</tr>
+<tr>
+<td><code>uds.upload.scan_failures</code></td>
+<td>Virus scan failures</td>
+<td>&gt;0</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cloudwatch-alarms">12.2 CloudWatch Alarms</h3>
+<p>Recommended alarms: - Hot tier item count exceeds threshold - Tier transition error rate - Upload quarantine backup - Audit chain verification failure</p>
+<h3 id="housekeeping">12.3 Housekeeping</h3>
+<p>Run housekeeping regularly to: - Promote data between tiers - Clean up deleted items - Update tier metrics</p>
+<p><strong>Manual Trigger</strong>:</p>
+<pre class="bash"><code>POST /api/admin/uds/tiers/housekeeping</code></pre>
+<p><strong>Scheduled</strong>: EventBridge rule runs hourly</p>
+<hr />
+<h2 id="troubleshooting">13. Troubleshooting</h2>
+<h3 id="common-issues">13.1 Common Issues</h3>
+<p><strong>Upload Stuck in “Scanning”</strong>: - Check ClamAV Lambda health - Verify quarantine bucket permissions - Check CloudWatch logs for scan errors</p>
+<p><strong>High Hot Tier Item Count</strong>: - Verify TTL configuration - Check if promotion job is running - Review access patterns (frequently accessed data stays hot)</p>
+<p><strong>Merkle Chain Verification Failed</strong>: - Do NOT attempt to fix manually - Contact security team immediately - Preserve audit log for investigation</p>
+<p><strong>Erasure Request Failed</strong>: - Check per-tier status for specific failure - Review CloudWatch logs - Retry with smaller scope if needed</p>
+<h3 id="support">13.2 Support</h3>
+<p>For UDS issues: 1. Check CloudWatch logs: <code>/aws/lambda/radiant-uds-*</code> 2. Review tier health in Admin Dashboard 3. Contact platform team with request ID</p>
+<hr />
+<h2 id="document-history">Document History</h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0.0</td>
+<td>2026-01-24</td>
+<td>Initial release</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>This document is part of the RADIANT Platform Documentation.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

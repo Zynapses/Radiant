@@ -1,0 +1,3252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THINKTANK ADMIN GUIDE V2 - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>THINKTANK ADMIN GUIDE V2</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/THINKTANK-ADMIN-GUIDE-V2.md</div>
+  </div>
+  
+  <h1 id="think-tank-admin-guide">Think Tank Admin Guide</h1>
+<blockquote>
+<p><strong>Administration of the Think Tank Consumer AI Platform</strong></p>
+<p>Version: 4.18.0 | Last Updated: January 2026</p>
+</blockquote>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>This guide covers administration of <strong>Think Tank</strong>, the consumer-facing AI assistant application. Think Tank Admin is a <strong>separate application</strong> from the RADIANT Platform Admin Dashboard.</p>
+<h3 id="application-separation">Application Separation</h3>
+<table>
+<colgroup>
+<col style="width: 48%" />
+<col style="width: 18%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Application</th>
+<th>URL</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RADIANT Admin</strong></td>
+<td><code>admin.radiant.ai</code></td>
+<td>Platform infrastructure, tenants, billing, models, compliance</td>
+</tr>
+<tr>
+<td><strong>Think Tank Admin</strong></td>
+<td><code>manage.thinktank.ai</code></td>
+<td>Consumer AI features, users, conversations, AI behavior</td>
+</tr>
+</tbody>
+</table>
+<p>For platform-level administration, see <a href="./RADIANT-ADMIN-GUIDE.md">RADIANT-ADMIN-GUIDE.md</a>.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-dashboard">Dashboard</a></li>
+<li><a href="#2-users-management">Users Management</a></li>
+<li><a href="#3-conversations">Conversations</a></li>
+<li><a href="#4-analytics">Analytics</a></li>
+<li><a href="#5-my-rules-user-defined-ai-behavior">My Rules (User-Defined AI Behavior)</a></li>
+<li><a href="#6-domain-modes">Domain Modes</a></li>
+<li><a href="#7-model-categories">Model Categories</a></li>
+<li><a href="#8-artifacts-genui">Artifacts (GenUI)</a></li>
+<li><a href="#9-collaboration">Collaboration</a></li>
+<li><a href="#10-delight-system">Delight System</a></li>
+<li><a href="#11-governor-economic-optimization">Governor (Economic Optimization)</a></li>
+<li><a href="#12-shadow-testing-ab-testing">Shadow Testing (A/B Testing)</a></li>
+<li><a href="#13-concurrent-execution">Concurrent Execution</a></li>
+<li><a href="#14-structure-from-chaos">Structure from Chaos</a></li>
+<li><a href="#15-grimoire-procedural-memory">Grimoire (Procedural Memory)</a></li>
+<li><a href="#16-magic-carpet-adaptive-flows">Magic Carpet (Adaptive Flows)</a></li>
+<li><a href="#17-workflow-templates">Workflow Templates</a></li>
+<li><a href="#18-polymorphic-ui">Polymorphic UI</a></li>
+<li><a href="#19-ego-system">Ego System</a></li>
+<li><a href="#20-compliance">Compliance</a></li>
+<li><a href="#21-settings">Settings</a></li>
+<li><a href="#22-cato-persistent-memory-system">Cato Persistent Memory System</a></li>
+<li><a href="#23-think-tank-consumer-app-end-user-interface">Think Tank Consumer App</a></li>
+<li><a href="#24-localization-i18n">Localization (i18n)</a></li>
+</ol>
+<hr />
+<h2 id="dashboard">1. Dashboard</h2>
+<p><strong>Path</strong>: <code>/</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/page.tsx</code></p>
+<h3 id="overview-1">Overview</h3>
+<p>The Think Tank Admin dashboard provides real-time overview of:</p>
+<ul>
+<li><strong>Active Users</strong>: Users currently engaged with Think Tank</li>
+<li><strong>Total Conversations</strong>: Conversation count with period comparison</li>
+<li><strong>User Rules</strong>: Custom AI behavior rules created by users</li>
+<li><strong>API Requests</strong>: Request volume and trends</li>
+</ul>
+<h3 id="api-endpoints">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank-admin/dashboard/stats</code></td>
+<td>Dashboard statistics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank-admin/dashboard.ts</code></li>
+<li><strong>CDK</strong>: <code>lib/stacks/thinktank-admin-api-stack.ts</code></li>
+</ul>
+<hr />
+<h2 id="users-management">2. Users Management</h2>
+<p><strong>Path</strong>: <code>/users</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/users/page.tsx</code></p>
+<h3 id="features">Features</h3>
+<ul>
+<li>View all Think Tank users for the tenant</li>
+<li>User activity metrics (conversations, messages, tokens)</li>
+<li>User suspension/activation</li>
+<li>Usage statistics per user</li>
+</ul>
+<h3 id="api-endpoints-1">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/users</code></td>
+<td>List users with pagination</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/users/:id</code></td>
+<td>Get user details</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/users/stats</code></td>
+<td>Aggregate user stats</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/users/:id/suspend</code></td>
+<td>Suspend user</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/users/:id/activate</code></td>
+<td>Activate user</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-1">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/users.ts</code></li>
+<li><strong>Database</strong>: <code>users</code> table with RLS on <code>tenant_id</code></li>
+</ul>
+<hr />
+<h2 id="conversations">3. Conversations</h2>
+<p><strong>Path</strong>: <code>/conversations</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/conversations/page.tsx</code></p>
+<h3 id="features-1">Features</h3>
+<ul>
+<li>Browse all conversations across users</li>
+<li>Filter by date, user, model</li>
+<li>View conversation messages</li>
+<li>Delete conversations (compliance)</li>
+<li>Conversation statistics</li>
+</ul>
+<h3 id="api-endpoints-2">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/conversations</code></td>
+<td>List conversations</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/conversations/:id</code></td>
+<td>Get conversation detail</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/conversations/:id/messages</code></td>
+<td>Get messages</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/thinktank/conversations/:id</code></td>
+<td>Delete conversation</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/conversations/stats</code></td>
+<td>Conversation stats</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-2">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/conversations.ts</code></li>
+<li><strong>Database</strong>: <code>thinktank_conversations</code>, <code>thinktank_messages</code></li>
+</ul>
+<hr />
+<h2 id="analytics">4. Analytics</h2>
+<p><strong>Path</strong>: <code>/analytics</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/analytics/page.tsx</code></p>
+<h3 id="features-2">Features</h3>
+<ul>
+<li>Usage trends over time (7/30/90 days)</li>
+<li>Model usage breakdown</li>
+<li>Cost analysis</li>
+<li>Token consumption metrics</li>
+<li>Average session duration</li>
+</ul>
+<h3 id="metrics-tracked">Metrics Tracked</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Total Users</td>
+<td>All registered users</td>
+</tr>
+<tr>
+<td>Active Users</td>
+<td>Users with activity in period</td>
+</tr>
+<tr>
+<td>Total Conversations</td>
+<td>Conversation count</td>
+</tr>
+<tr>
+<td>Total Messages</td>
+<td>Message count</td>
+</tr>
+<tr>
+<td>Total Tokens</td>
+<td>Token consumption</td>
+</tr>
+<tr>
+<td>Total Cost</td>
+<td>API cost in dollars</td>
+</tr>
+<tr>
+<td>Avg Session Duration</td>
+<td>Average conversation length</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-endpoints-3">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/thinktank/analytics?days=30</code></td>
+<td>Usage analytics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-3">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/analytics.ts</code></li>
+<li><strong>CDK</strong>: <code>lib/stacks/thinktank-admin-api-stack.ts</code></li>
+</ul>
+<hr />
+<h2 id="my-rules-user-defined-ai-behavior">5. My Rules (User-Defined AI Behavior)</h2>
+<p><strong>Path</strong>: <code>/my-rules</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/my-rules/page.tsx</code></p>
+<h3 id="overview-2">Overview</h3>
+<p>Users can define custom rules that modify AI behavior. Administrators can view, manage, and create preset rules.</p>
+<h3 id="rule-types">Rule Types</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>style</code></td>
+<td>Response style (formal, casual, technical)</td>
+</tr>
+<tr>
+<td><code>behavior</code></td>
+<td>Behavioral preferences</td>
+</tr>
+<tr>
+<td><code>constraint</code></td>
+<td>Restrictions on output</td>
+</tr>
+<tr>
+<td><code>enhancement</code></td>
+<td>Additional capabilities</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rule-structure">Rule Structure</h3>
+<pre class="typescript"><code>interface UserRule {
+  id: string;
+  userId: string;
+  tenantId: string;
+  name: string;
+  description: string;
+  type: &#39;style&#39; | &#39;behavior&#39; | &#39;constraint&#39; | &#39;enhancement&#39;;
+  ruleContent: string;
+  priority: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}</code></pre>
+<h3 id="api-endpoints-4">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/my-rules</code></td>
+<td>List all rules</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/admin/my-rules</code></td>
+<td>Create rule</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/admin/my-rules/:id</code></td>
+<td>Update rule</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/admin/my-rules/:id</code></td>
+<td>Delete rule</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/my-rules/presets</code></td>
+<td>Get preset rules</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-4">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/my-rules.ts</code></li>
+<li><strong>Database</strong>: <code>user_rules</code> table</li>
+<li><strong>CDK</strong>: <code>lib/stacks/thinktank-admin-api-stack.ts</code></li>
+</ul>
+<hr />
+<h2 id="domain-modes">6. Domain Modes</h2>
+<p><strong>Path</strong>: <code>/domain-modes</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/domain-modes/page.tsx</code></p>
+<h3 id="overview-3">Overview</h3>
+<p>Configure domain-specific AI behavior. The system detects query domain and adjusts model selection, prompts, and behavior accordingly.</p>
+<h3 id="domain-hierarchy">Domain Hierarchy</h3>
+<pre><code>Field (e.g., Medicine)
+  └── Domain (e.g., Cardiology)
+      └── Subspecialty (e.g., Interventional Cardiology)</code></pre>
+<h3 id="features-3">Features</h3>
+<ul>
+<li>View domain taxonomy</li>
+<li>Configure domain-specific prompts</li>
+<li>Set model preferences per domain</li>
+<li>Enable/disable domain detection</li>
+</ul>
+<h3 id="api-endpoints-5">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/domain-modes/config</code></td>
+<td>Get configuration</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/thinktank/domain-modes/config</code></td>
+<td>Update configuration</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/domain-taxonomy</code></td>
+<td>Get taxonomy</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/domain-taxonomy/detect</code></td>
+<td>Detect domain from prompt</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-5">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/domain-modes.ts</code></li>
+<li><strong>Service</strong>: <code>lambda/shared/services/domain-taxonomy.service.ts</code></li>
+</ul>
+<hr />
+<h2 id="model-categories">7. Model Categories</h2>
+<p><strong>Path</strong>: <code>/model-categories</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/model-categories/page.tsx</code></p>
+<h3 id="overview-4">Overview</h3>
+<p>Organize AI models into categories for user selection. Categories control which models appear in the Think Tank UI.</p>
+<h3 id="default-categories">Default Categories</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Description</th>
+<th>Example Models</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fast</td>
+<td>Quick responses</td>
+<td>GPT-4o-mini, Claude Haiku</td>
+</tr>
+<tr>
+<td>Balanced</td>
+<td>Default choice</td>
+<td>GPT-4o, Claude Sonnet</td>
+</tr>
+<tr>
+<td>Powerful</td>
+<td>Complex tasks</td>
+<td>Claude Opus, GPT-4</td>
+</tr>
+<tr>
+<td>Specialized</td>
+<td>Domain-specific</td>
+<td>Codex, DALL-E</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-endpoints-6">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/model-categories</code></td>
+<td>List categories</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/thinktank/model-categories/:id</code></td>
+<td>Update category</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/model-categories/reorder</code></td>
+<td>Reorder models</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-6">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/model-categories.ts</code></li>
+</ul>
+<hr />
+<h2 id="artifacts-genui">8. Artifacts (GenUI)</h2>
+<p><strong>Path</strong>: <code>/artifacts</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/artifacts/page.tsx</code></p>
+<h3 id="overview-5">Overview</h3>
+<p>The Artifact Engine generates interactive UI components from natural language. Administrators configure generation rules, dependency allowlists, and monitor generation metrics.</p>
+<h3 id="features-4">Features</h3>
+<ul>
+<li>Generation dashboard with metrics</li>
+<li>Dependency allowlist management</li>
+<li>Code pattern library</li>
+<li>Validation rules</li>
+<li>Escalation workflow</li>
+</ul>
+<h3 id="api-endpoints-7">API Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 37%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/artifact-engine/dashboard</code></td>
+<td>Dashboard data</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/artifact-engine/metrics</code></td>
+<td>Generation metrics</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/artifact-engine/validation-rules</code></td>
+<td>Validation rules</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/v2/admin/artifact-engine/validation-rules/:id</code></td>
+<td>Update rule</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v2/admin/artifact-engine/allowlist</code></td>
+<td>Add to allowlist</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/v2/admin/artifact-engine/allowlist/:pkg</code></td>
+<td>Remove from allowlist</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-7">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/artifact-engine.ts</code></li>
+<li><strong>Service</strong>: <code>lambda/shared/services/generative-ui.service.ts</code></li>
+<li><strong>Database</strong>: <code>artifact_sessions</code>, <code>artifact_generations</code></li>
+</ul>
+<hr />
+<h2 id="collaboration">9. Collaboration</h2>
+<p><strong>Path</strong>: <code>/collaborate</code>, <code>/collaborate/enhanced</code><br />
+<strong>App Files</strong>: - <code>apps/thinktank-admin/app/(dashboard)/collaborate/page.tsx</code> - <code>apps/thinktank-admin/app/(dashboard)/collaborate/enhanced/page.tsx</code></p>
+<h3 id="overview-6">Overview</h3>
+<p>Real-time collaboration features allowing multiple users to work on shared conversations.</p>
+<h3 id="features-5">Features</h3>
+<ul>
+<li><strong>Basic Collaboration</strong>: Shared conversation links</li>
+<li><strong>Enhanced Collaboration</strong>: Real-time cursors, typing indicators, presence</li>
+</ul>
+<h3 id="api-endpoints-8">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/collaboration/sessions</code></td>
+<td>List sessions</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/collaboration/sessions</code></td>
+<td>Create session</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/collaboration/settings</code></td>
+<td>Get settings</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/thinktank/collaboration/settings</code></td>
+<td>Update settings</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-8">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/enhanced-collaboration.ts</code></li>
+<li><strong>WebSocket</strong>: <code>lambda/collaboration/</code> handlers</li>
+<li><strong>Service</strong>: <code>lambda/shared/services/enhanced-collaboration.service.ts</code></li>
+</ul>
+<hr />
+<h2 id="delight-system">10. Delight System</h2>
+<p><strong>Path</strong>: <code>/delight</code>, <code>/delight/statistics</code><br />
+<strong>App Files</strong>: - <code>apps/thinktank-admin/app/(dashboard)/delight/page.tsx</code> - <code>apps/thinktank-admin/app/(dashboard)/delight/statistics/page.tsx</code></p>
+<h3 id="overview-7">Overview</h3>
+<p>The Delight System provides achievement notifications, progress tracking, and gamification features to enhance user engagement.</p>
+<h3 id="features-6">Features</h3>
+<ul>
+<li>Achievement configuration</li>
+<li>Delight message templates</li>
+<li>User progress tracking</li>
+<li>Statistics dashboard</li>
+</ul>
+<h3 id="delight-types">Delight Types</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>achievement</code></td>
+<td>Milestone completions</td>
+</tr>
+<tr>
+<td><code>streak</code></td>
+<td>Consecutive usage</td>
+</tr>
+<tr>
+<td><code>discovery</code></td>
+<td>Feature exploration</td>
+</tr>
+<tr>
+<td><code>mastery</code></td>
+<td>Skill development</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-endpoints-9">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/delight/messages</code></td>
+<td>Get delight messages</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/delight/achievements</code></td>
+<td>List achievements</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/delight/progress/:userId</code></td>
+<td>User progress</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/delight/preferences</code></td>
+<td>Update preferences</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-9">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/delight/handler.ts</code></li>
+<li><strong>Service</strong>: <code>lambda/shared/services/delight.service.ts</code></li>
+</ul>
+<hr />
+<h2 id="governor-economic-optimization">11. Governor (Economic Optimization)</h2>
+<p><strong>Path</strong>: <code>/governor</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/governor/page.tsx</code></p>
+<h3 id="overview-8">Overview</h3>
+<p>The Economic Governor optimizes AI costs by learning routing patterns and selecting cost-effective models without sacrificing quality.</p>
+<h3 id="features-7">Features</h3>
+<ul>
+<li>Real-time cost dashboard</li>
+<li>Savings metrics</li>
+<li>Mode switching (aggressive, balanced, quality)</li>
+<li>Budget alerts</li>
+</ul>
+<h3 id="modes">Modes</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+<th>Savings Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>aggressive</code></td>
+<td>Maximum savings</td>
+<td>70%+</td>
+</tr>
+<tr>
+<td><code>balanced</code></td>
+<td>Balance cost/quality</td>
+<td>50%</td>
+</tr>
+<tr>
+<td><code>quality</code></td>
+<td>Quality priority</td>
+<td>20%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-endpoints-10">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/economic-governor/dashboard</code></td>
+<td>Dashboard</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/economic-governor/config</code></td>
+<td>Get config</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/thinktank/economic-governor/config</code></td>
+<td>Update config</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/economic-governor/mode</code></td>
+<td>Quick mode switch</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-10">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/economic-governor.ts</code></li>
+<li><strong>Service</strong>: <code>lambda/shared/services/economic-governor.service.ts</code></li>
+</ul>
+<hr />
+<h2 id="shadow-testing-ab-testing">12. Shadow Testing (A/B Testing)</h2>
+<p><strong>Path</strong>: <code>/shadow-testing</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/shadow-testing/page.tsx</code></p>
+<h3 id="overview-9">Overview</h3>
+<p>Test pre-prompt optimizations and model configurations in production without affecting users.</p>
+<h3 id="features-8">Features</h3>
+<ul>
+<li>Create A/B tests for prompts</li>
+<li>Traffic allocation (0-100%)</li>
+<li>Statistical significance tracking</li>
+<li>Promote winning variant</li>
+</ul>
+<h3 id="test-structure">Test Structure</h3>
+<pre class="typescript"><code>interface ShadowTest {
+  id: string;
+  name: string;
+  description: string;
+  controlPrompt: string;
+  testPrompt: string;
+  trafficPercent: number;
+  status: &#39;draft&#39; | &#39;running&#39; | &#39;paused&#39; | &#39;completed&#39;;
+  metrics: {
+    controlSamples: number;
+    testSamples: number;
+    controlScore: number;
+    testScore: number;
+    pValue: number;
+  };
+}</code></pre>
+<h3 id="api-endpoints-11">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/shadow-tests</code></td>
+<td>List tests</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/admin/shadow-tests</code></td>
+<td>Create test</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/admin/shadow-tests/:id/start</code></td>
+<td>Start test</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/admin/shadow-tests/:id/stop</code></td>
+<td>Stop test</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/admin/shadow-tests/:id/promote</code></td>
+<td>Promote winner</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/shadow-tests/settings</code></td>
+<td>Get settings</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/admin/shadow-tests/settings</code></td>
+<td>Update settings</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-11">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/shadow-testing.ts</code></li>
+<li><strong>Database</strong>: <code>shadow_tests</code>, <code>shadow_test_samples</code></li>
+<li><strong>CDK</strong>: <code>lib/stacks/thinktank-admin-api-stack.ts</code></li>
+</ul>
+<hr />
+<h2 id="concurrent-execution">13. Concurrent Execution</h2>
+<p><strong>Path</strong>: <code>/concurrent-execution</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/concurrent-execution/page.tsx</code></p>
+<h3 id="overview-10">Overview</h3>
+<p>Execute multiple AI model calls in parallel and synthesize results.</p>
+<h3 id="features-9">Features</h3>
+<ul>
+<li>Configure concurrent model pools</li>
+<li>Set merge strategies</li>
+<li>Monitor execution metrics</li>
+<li>Task queue management</li>
+</ul>
+<h3 id="api-endpoints-12">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/concurrent-execution/config</code></td>
+<td>Get config</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/thinktank/concurrent-execution/config</code></td>
+<td>Update config</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/concurrent-execution/queue</code></td>
+<td>Queue status</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/concurrent-execution/metrics</code></td>
+<td>Metrics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-12">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/concurrent-execution.ts</code></li>
+<li><strong>Service</strong>: <code>lambda/shared/services/concurrent-execution.service.ts</code></li>
+</ul>
+<hr />
+<h2 id="structure-from-chaos">14. Structure from Chaos</h2>
+<p><strong>Path</strong>: <code>/structure-from-chaos</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/structure-from-chaos/page.tsx</code></p>
+<h3 id="overview-11">Overview</h3>
+<p>Transform unstructured input (whiteboards, notes, voice transcripts) into structured documents.</p>
+<h3 id="features-10">Features</h3>
+<ul>
+<li>Input type configuration</li>
+<li>Output template management</li>
+<li>Extraction pipeline settings</li>
+<li>Processing metrics</li>
+</ul>
+<h3 id="supported-inputs">Supported Inputs</h3>
+<table>
+<thead>
+<tr>
+<th>Input Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>whiteboard</code></td>
+<td>Whiteboard images</td>
+</tr>
+<tr>
+<td><code>notes</code></td>
+<td>Unstructured notes</td>
+</tr>
+<tr>
+<td><code>transcript</code></td>
+<td>Voice/meeting transcripts</td>
+</tr>
+<tr>
+<td><code>brainstorm</code></td>
+<td>Brainstorming sessions</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-endpoints-13">API Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 37%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/structure-from-chaos/config</code></td>
+<td>Get config</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/thinktank/structure-from-chaos/config</code></td>
+<td>Update config</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/structure-from-chaos/synthesize</code></td>
+<td>Process input</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/structure-from-chaos/metrics</code></td>
+<td>Metrics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-13">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/structure-from-chaos.ts</code></li>
+<li><strong>Service</strong>: <code>lambda/shared/services/structure-from-chaos.service.ts</code></li>
+</ul>
+<hr />
+<h2 id="grimoire-procedural-memory">15. Grimoire (Procedural Memory)</h2>
+<p><strong>Path</strong>: <code>/grimoire</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/grimoire/page.tsx</code></p>
+<h3 id="overview-12">Overview</h3>
+<p>The Grimoire is the system’s procedural memory—storing learned patterns, corrections, and “spells” that improve AI responses over time.</p>
+<h3 id="features-11">Features</h3>
+<ul>
+<li>View learned spells</li>
+<li>Create custom spells</li>
+<li>Spell effectiveness metrics</li>
+<li>Automatic spell generation</li>
+</ul>
+<h3 id="spell-types">Spell Types</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>correction</code></td>
+<td>Error correction patterns</td>
+</tr>
+<tr>
+<td><code>enhancement</code></td>
+<td>Response improvements</td>
+</tr>
+<tr>
+<td><code>procedure</code></td>
+<td>Multi-step processes</td>
+</tr>
+<tr>
+<td><code>template</code></td>
+<td>Reusable response templates</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-endpoints-14">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/grimoire/spells</code></td>
+<td>List spells</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/grimoire/spells/:id</code></td>
+<td>Get spell</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/grimoire/spells</code></td>
+<td>Create spell</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-14">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/grimoire.ts</code></li>
+<li><strong>Service</strong>: <code>lambda/shared/services/grimoire.service.ts</code></li>
+</ul>
+<hr />
+<h2 id="magic-carpet-adaptive-flows">16. Magic Carpet (Adaptive Flows)</h2>
+<p><strong>Path</strong>: <code>/magic-carpet</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/magic-carpet/page.tsx</code></p>
+<h3 id="overview-13">Overview</h3>
+<p>Adaptive conversation flows that adjust based on user expertise and context. Includes demo components for Reality Scrubber, Quantum Split View, and Pre-Cognition suggestions.</p>
+<h3 id="features-12">Features</h3>
+<ul>
+<li><strong>Reality Scrubber Timeline</strong>: Video-editor style navigation through state snapshots
+<ul>
+<li>Bookmark creation with toast notifications</li>
+<li>Play/pause timeline controls</li>
+</ul></li>
+<li><strong>Quantum Split View</strong>: Side-by-side comparison of parallel realities
+<ul>
+<li>Branch selection with state management</li>
+<li>Branch collapse with confirmation</li>
+</ul></li>
+<li><strong>Pre-Cognition Suggestions</strong>: Predicted actions that are pre-computed
+<ul>
+<li>Prediction selection with execution feedback</li>
+<li>Prediction dismissal</li>
+</ul></li>
+<li><strong>Magic Carpet Navigator</strong>: Intent-based navigation
+<ul>
+<li>Flying to destinations with toast feedback</li>
+<li>Landing confirmation</li>
+</ul></li>
+</ul>
+<h3 id="implementation-15">Implementation</h3>
+<ul>
+<li><strong>App</strong>: <code>apps/thinktank-admin/app/(dashboard)/magic-carpet/page.tsx</code></li>
+<li><strong>Components</strong>: <code>apps/thinktank-admin/components/magic-carpet/</code></li>
+</ul>
+<hr />
+<h2 id="workflow-templates">17. Workflow Templates</h2>
+<p><strong>Path</strong>: <code>/workflow-templates</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/workflow-templates/page.tsx</code></p>
+<h3 id="overview-14">Overview</h3>
+<p>Pre-defined workflow templates users can invoke for common tasks.</p>
+<h3 id="features-13">Features</h3>
+<ul>
+<li>Template creation</li>
+<li>Variable configuration</li>
+<li>Usage analytics</li>
+<li>Template versioning</li>
+</ul>
+<h3 id="implementation-16">Implementation</h3>
+<ul>
+<li><strong>App</strong>: <code>apps/thinktank-admin/app/(dashboard)/workflow-templates/page.tsx</code></li>
+</ul>
+<hr />
+<h2 id="polymorphic-ui">18. Polymorphic UI</h2>
+<p><strong>Path</strong>: <code>/polymorphic</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/polymorphic/page.tsx</code></p>
+<h3 id="overview-15">Overview</h3>
+<p>Configure the polymorphic UI system that adapts interface complexity based on user needs.</p>
+<h3 id="views">Views</h3>
+<table>
+<thead>
+<tr>
+<th>View</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>simple</code></td>
+<td>Basic chat interface</td>
+</tr>
+<tr>
+<td><code>standard</code></td>
+<td>Full-featured interface</td>
+</tr>
+<tr>
+<td><code>advanced</code></td>
+<td>Power user tools</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-17">Implementation</h3>
+<ul>
+<li><strong>App</strong>: <code>apps/thinktank-admin/app/(dashboard)/polymorphic/page.tsx</code></li>
+</ul>
+<hr />
+<h2 id="ego-system">19. Ego System</h2>
+<p><strong>Path</strong>: <code>/ego</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/ego/page.tsx</code></p>
+<h3 id="overview-16">Overview</h3>
+<p>The Zero-Cost Ego System provides persistent AI personality through database state injection.</p>
+<h3 id="features-14">Features</h3>
+<ul>
+<li>Identity configuration (name, narrative, values)</li>
+<li>Personality trait sliders</li>
+<li>Emotional state monitoring</li>
+<li>Working memory management</li>
+<li>Goal tracking</li>
+</ul>
+<h3 id="configuration">Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>Enable ego injection</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>AI personality name</td>
+</tr>
+<tr>
+<td><code>narrative</code></td>
+<td>Background narrative</td>
+</tr>
+<tr>
+<td><code>traits</code></td>
+<td>Personality traits (0-1)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-endpoints-15">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/ego/dashboard</code></td>
+<td>Dashboard data</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/ego/config</code></td>
+<td>Get config</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/admin/ego/config</code></td>
+<td>Update config</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/ego/identity</code></td>
+<td>Get identity</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/admin/ego/identity</code></td>
+<td>Update identity</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/ego/preview</code></td>
+<td>Preview injection</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-18">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/admin/ego.ts</code></li>
+<li><strong>Service</strong>: <code>lambda/shared/services/ego-context.service.ts</code></li>
+<li><strong>Database</strong>: <code>ego_config</code>, <code>ego_identity</code>, <code>ego_affect</code></li>
+</ul>
+<hr />
+<h2 id="compliance">20. Compliance</h2>
+<p><strong>Path</strong>: <code>/compliance</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/compliance/page.tsx</code></p>
+<h3 id="overview-17">Overview</h3>
+<p>Compliance settings specific to Think Tank consumer features.</p>
+<h3 id="features-15">Features</h3>
+<ul>
+<li>Data retention policies</li>
+<li>Content filtering rules</li>
+<li>Audit log access</li>
+<li>Privacy settings</li>
+</ul>
+<h3 id="implementation-19">Implementation</h3>
+<ul>
+<li><strong>App</strong>: <code>apps/thinktank-admin/app/(dashboard)/compliance/page.tsx</code></li>
+</ul>
+<hr />
+<h2 id="a.-sovereign-mesh-v5.52.0">20A. Sovereign Mesh (v5.52.0)</h2>
+<p><strong>Path</strong>: <code>/sovereign-mesh/*</code></p>
+<h3 id="overview-18">Overview</h3>
+<p>Sovereign Mesh provides decentralized AI agent management and transparency for Think Tank.</p>
+<h3 id="sub-pages">Sub-Pages</h3>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 28%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Page</th>
+<th>Path</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Overview</strong></td>
+<td><code>/sovereign-mesh</code></td>
+<td>Dashboard with agent/app stats, health score</td>
+</tr>
+<tr>
+<td><strong>Agents</strong></td>
+<td><code>/sovereign-mesh/agents</code></td>
+<td>Manage AI agents, view status and performance</td>
+</tr>
+<tr>
+<td><strong>Apps</strong></td>
+<td><code>/sovereign-mesh/apps</code></td>
+<td>View deployed apps, instances, users</td>
+</tr>
+<tr>
+<td><strong>Transparency</strong></td>
+<td><code>/sovereign-mesh/transparency</code></td>
+<td>Audit logs, decision trails</td>
+</tr>
+<tr>
+<td><strong>AI Helper</strong></td>
+<td><code>/sovereign-mesh/ai-helper</code></td>
+<td>AI assistance requests, ratings</td>
+</tr>
+<tr>
+<td><strong>Approvals</strong></td>
+<td><code>/sovereign-mesh/approvals</code></td>
+<td>Pending/processed approval requests</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-endpoints-16">API Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 37%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank-admin/sovereign-mesh/overview</code></td>
+<td>Dashboard stats</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank-admin/sovereign-mesh/agents</code></td>
+<td>List agents</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank-admin/sovereign-mesh/apps</code></td>
+<td>List apps</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank-admin/sovereign-mesh/audit-logs</code></td>
+<td>Audit log entries</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank-admin/sovereign-mesh/decision-trails</code></td>
+<td>Decision trails</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank-admin/sovereign-mesh/ai-helper/requests</code></td>
+<td>AI helper requests</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank-admin/sovereign-mesh/approvals</code></td>
+<td>Approval requests</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank-admin/sovereign-mesh/approvals/:id</code></td>
+<td>Process approval</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-20">Implementation</h3>
+<ul>
+<li><strong>App Files</strong>: <code>apps/thinktank-admin/app/(dashboard)/sovereign-mesh/*.tsx</code></li>
+<li><strong>Navigation</strong>: All pages linked in sidebar under “Sovereign Mesh” section</li>
+</ul>
+<hr />
+<h2 id="settings">21. Settings</h2>
+<p><strong>Path</strong>: <code>/settings</code><br />
+<strong>App File</strong>: <code>apps/thinktank-admin/app/(dashboard)/settings/page.tsx</code></p>
+<h3 id="overview-19">Overview</h3>
+<p>Global Think Tank configuration settings.</p>
+<h3 id="settings-categories">Settings Categories</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>General</td>
+<td>Basic configuration</td>
+</tr>
+<tr>
+<td>Features</td>
+<td>Enable/disable features</td>
+</tr>
+<tr>
+<td>Limits</td>
+<td>Usage limits</td>
+</tr>
+<tr>
+<td>Notifications</td>
+<td>Alert settings</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-endpoints-17">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/thinktank/status</code></td>
+<td>Service status</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/thinktank/config</code></td>
+<td>Get config</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/api/admin/thinktank/config</code></td>
+<td>Update config</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-21">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/settings.ts</code></li>
+<li><strong>CDK</strong>: <code>lib/stacks/thinktank-admin-api-stack.ts</code></li>
+</ul>
+<hr />
+<h2 id="cato-persistent-memory-system">22. Cato Persistent Memory System</h2>
+<h3 id="overview-20">Overview</h3>
+<p>Cato operates as the cognitive core behind Think Tank, implementing a <strong>three-tier hierarchical memory system</strong> that fundamentally differentiates it from competitors suffering from session amnesia. Unlike ChatGPT or Claude standalone—where closing a tab erases all context—Cato maintains persistent memory that survives sessions, employee turnover, and time.</p>
+<h3 id="why-this-matters-for-think-tank-users">Why This Matters for Think Tank Users</h3>
+<table>
+<colgroup>
+<col style="width: 48%" />
+<col style="width: 51%" />
+</colgroup>
+<thead>
+<tr>
+<th>Competitor Problem</th>
+<th>Think Tank Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Close tab = lose context</td>
+<td>Memory persists across sessions</td>
+</tr>
+<tr>
+<td>Every conversation starts fresh</td>
+<td>AI “remembers” your preferences</td>
+</tr>
+<tr>
+<td>Generic responses for everyone</td>
+<td>Personalized to your communication style</td>
+</tr>
+<tr>
+<td>Static model behavior</td>
+<td>AI gets smarter over time</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-three-memory-tiers">The Three Memory Tiers</h3>
+<h4 id="tenant-level-memory-institutional-intelligence">1. Tenant-Level Memory (Institutional Intelligence)</h4>
+<p>Your organization’s accumulated learning:</p>
+<table>
+<colgroup>
+<col style="width: 39%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>User Benefit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Smart Model Routing</strong></td>
+<td>Legal queries go to citation-accurate models; creative requests go to generative models—automatically</td>
+</tr>
+<tr>
+<td><strong>Department Preferences</strong></td>
+<td>Legal teams get formal briefs; marketing gets conversational copy—no configuration needed</td>
+</tr>
+<tr>
+<td><strong>Cost Optimization</strong></td>
+<td>System learns cheaper approaches that maintain quality, reducing your costs over time</td>
+</tr>
+<tr>
+<td><strong>Compliance Ready</strong></td>
+<td>7-year audit trails for FDA, HIPAA, SOC 2 requirements</td>
+</tr>
+</tbody>
+</table>
+<h4 id="user-level-memory-relationship-continuity">2. User-Level Memory (Relationship Continuity)</h4>
+<p>Your personal AI relationship through <strong>Ghost Vectors</strong>—4096-dimensional representations of your interaction style:</p>
+<table>
+<colgroup>
+<col style="width: 39%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>User Benefit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Remembers Your Style</strong></td>
+<td>Formal vs. casual, verbose vs. concise</td>
+</tr>
+<tr>
+<td><strong>Tracks Expertise</strong></td>
+<td>Beginner explanations vs. expert shorthand</td>
+</tr>
+<tr>
+<td><strong>Persona Selection</strong></td>
+<td>Choose your preferred AI mood: Balanced, Scout, Sage, Spark, Guide</td>
+</tr>
+<tr>
+<td><strong>No Personality Discontinuity</strong></td>
+<td>Model upgrades don’t break the relationship feel</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Persona Options</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Persona</th>
+<th>Behavior</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Balanced</strong></td>
+<td>Default equilibrium</td>
+<td>General queries</td>
+</tr>
+<tr>
+<td><strong>Scout</strong></td>
+<td>Exploratory, information-gathering</td>
+<td>Research, discovery</td>
+</tr>
+<tr>
+<td><strong>Sage</strong></td>
+<td>Deep expertise, authoritative</td>
+<td>Complex analysis</td>
+</tr>
+<tr>
+<td><strong>Spark</strong></td>
+<td>Creative, generative</td>
+<td>Brainstorming, ideation</td>
+</tr>
+<tr>
+<td><strong>Guide</strong></td>
+<td>Teaching, step-by-step</td>
+<td>Learning, onboarding</td>
+</tr>
+</tbody>
+</table>
+<h4 id="session-level-memory-real-time-context">3. Session-Level Memory (Real-Time Context)</h4>
+<p>Active interaction state (expires after session ends):</p>
+<ul>
+<li>Current conversation context</li>
+<li>Temporary persona overrides</li>
+<li>Real-time safety evaluations</li>
+<li>Epistemic uncertainty tracking</li>
+</ul>
+<h3 id="twilight-dreaming-how-think-tank-gets-smarter">Twilight Dreaming (How Think Tank Gets Smarter)</h3>
+<p>During low-traffic periods (4 AM your local time), Think Tank consolidates patterns through <strong>LoRA fine-tuning</strong>:</p>
+<ol type="1">
+<li><strong>Pattern Collection</strong>: Gathers learning from your daily interactions</li>
+<li><strong>Intelligence Consolidation</strong>: Transforms individual patterns into organizational intelligence</li>
+<li><strong>Cost Optimization</strong>: Trains smarter, cheaper routing decisions</li>
+<li><strong>Result</strong>: Your Think Tank deployment gets measurably smarter over time—automatically</li>
+</ol>
+<p><strong>Outcome</strong>: 60%+ cost reduction while maintaining accuracy for healthcare and financial queries.</p>
+<h3 id="claude-as-the-conductor">Claude as the Conductor</h3>
+<p>Claude serves as the conductor maintaining this persistent memory layer—not just another model in the rotation, but the intelligence coordinating <strong>105+ other specialized models</strong>, interpreting user intent, selecting workflows, and ensuring responses meet accuracy and safety standards.</p>
+<h3 id="configuration-1">Configuration</h3>
+<p>Cato memory settings are configured through: - <strong>Ego System</strong> (Section 19): Identity and personality settings - <strong>Governor</strong> (Section 11): Cost optimization modes</p>
+<h3 id="why-think-tank-beats-standalone-ai-competitive-moats">Why Think Tank Beats Standalone AI (Competitive Moats)</h3>
+<h4 id="persistent-memory-creates-contextual-gravity">Persistent Memory Creates “Contextual Gravity”</h4>
+<p>Cato’s hierarchical memory architecture creates compounding switching costs that deepen with every interaction. When you consider alternatives, here’s what you’d lose:</p>
+<table>
+<colgroup>
+<col style="width: 68%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>What You’d Lose</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Learned Routing Patterns</strong></td>
+<td>Months of optimization showing which models work best for your query types</td>
+</tr>
+<tr>
+<td><strong>Department Preferences</strong></td>
+<td>System knowledge that legal wants citations, marketing wants conversational tone</td>
+</tr>
+<tr>
+<td><strong>Ghost Vectors</strong></td>
+<td>The “feel” of thousands of individual user relationships</td>
+</tr>
+<tr>
+<td><strong>Compliance Audit Trails</strong></td>
+<td>7-year Merkle-hashed records for HIPAA, SOC 2, FDA—cannot be migrated</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Competitor Comparison</strong>:</p>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Alternative</th>
+<th>Problem You’d Face</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ChatGPT/Claude Standalone</strong></td>
+<td>When an employee quits, their entire AI context walks out the door—zero institutional learning</td>
+</tr>
+<tr>
+<td><strong>Flowise/Dify</strong></td>
+<td>Same expensive rate regardless of query complexity—no cost optimization learning</td>
+</tr>
+<tr>
+<td><strong>CrewAI</strong></td>
+<td>Agents don’t share memory—five agents needing the same data make five duplicate API calls</td>
+</tr>
+</tbody>
+</table>
+<h4 id="twilight-dreaming-your-deployment-gets-smarter-over-time">Twilight Dreaming: Your Deployment Gets Smarter Over Time</h4>
+<p>Think Tank isn’t just a service—it’s an <strong>appreciating asset</strong>. During low-traffic periods (4 AM your time), the system “dreams” about the day’s learnings:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>What Happens</th>
+<th>Your Benefit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Routing patterns consolidate</td>
+<td>Future queries route to optimal models automatically</td>
+</tr>
+<tr>
+<td>Cost patterns identified</td>
+<td>Expensive queries get cheaper alternatives</td>
+</tr>
+<tr>
+<td>Domain improvements embed</td>
+<td>Your deployment becomes more accurate in your specific domains</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The Result</strong>: A customer who has used Think Tank for two years has a <strong>fundamentally more capable deployment</strong> than a new customer—with routing decisions reflecting thousands of hours of optimization.</p>
+<p><strong>When New Models Launch</strong> (GPT-5, Claude 5, Gemini 3): Think Tank learns how to optimally route to new capabilities while preserving all your accumulated institutional knowledge. Model improvements compound on top of existing optimization rather than resetting the learning curve.</p>
+<blockquote>
+<p><strong>Infrastructure</strong>: See <a href="#">RADIANT-ADMIN-GUIDE.md Section 31A.7</a> for architecture, database schema, and infrastructure configuration.</p>
+</blockquote>
+<hr />
+<h2 id="think-tank-consumer-app-end-user-interface">23. Think Tank Consumer App (End-User Interface)</h2>
+<p><strong>Path</strong>: <code>apps/thinktank/</code><br />
+<strong>URL</strong>: <code>app.thinktank.ai</code></p>
+<h3 id="overview-21">Overview</h3>
+<p>The Think Tank Consumer App is the primary end-user interface for interacting with Cato. It provides a streamlined chat experience with intelligent defaults while offering advanced controls for power users.</p>
+<h3 id="auto-mode-vs-advanced-mode">Auto Mode vs Advanced Mode</h3>
+<p>Think Tank operates in two modes, controlled by the <strong>Advanced Mode Toggle</strong> (<code>⌘+Shift+A</code>):</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 31%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Auto Mode</th>
+<th>Advanced Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Model Selection</strong></td>
+<td>Cato decides automatically</td>
+<td>User can select specific model</td>
+</tr>
+<tr>
+<td><strong>Brain Plan Display</strong></td>
+<td>Hidden</td>
+<td>Shows execution plan with steps</td>
+</tr>
+<tr>
+<td><strong>Token/Cost Display</strong></td>
+<td>Hidden</td>
+<td>Shows per-message metrics</td>
+</tr>
+<tr>
+<td><strong>Domain Override</strong></td>
+<td>Auto-detected</td>
+<td>Manual selection available</td>
+</tr>
+<tr>
+<td><strong>Model Routing Visibility</strong></td>
+<td>Hidden</td>
+<td>Shows routing decisions</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Philosophy</strong>: Most users should use Auto Mode. Advanced Mode is for developers, researchers, and power users who want granular control.</p>
+<h3 id="consumer-app-pages">Consumer App Pages</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Path</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Chat</strong></td>
+<td><code>/</code></td>
+<td>Main conversation interface</td>
+</tr>
+<tr>
+<td><strong>Settings</strong></td>
+<td><code>/settings</code></td>
+<td>User preferences and personality</td>
+</tr>
+<tr>
+<td><strong>My Rules</strong></td>
+<td><code>/rules</code></td>
+<td>User-defined AI behavior rules</td>
+</tr>
+<tr>
+<td><strong>History</strong></td>
+<td><code>/history</code></td>
+<td>Conversation history with search</td>
+</tr>
+<tr>
+<td><strong>Artifacts</strong></td>
+<td><code>/artifacts</code></td>
+<td>Generated code and documents</td>
+</tr>
+<tr>
+<td><strong>Profile</strong></td>
+<td><code>/profile</code></td>
+<td>User account and statistics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-components">Key Components</h3>
+<h4 id="chat-components-appsthinktankcomponentschat">Chat Components (<code>apps/thinktank/components/chat/</code>)</h4>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AdvancedModeToggle</code></td>
+<td>Toggle between Auto/Advanced modes</td>
+</tr>
+<tr>
+<td><code>MessageBubble</code></td>
+<td>Message display with optional metadata</td>
+</tr>
+<tr>
+<td><code>ChatInput</code></td>
+<td>Smart auto-resizing input with attachments</td>
+</tr>
+<tr>
+<td><code>Sidebar</code></td>
+<td>Conversation list with date grouping</td>
+</tr>
+<tr>
+<td><code>BrainPlanViewer</code></td>
+<td>Execution plan display (Advanced Mode)</td>
+</tr>
+<tr>
+<td><code>ModelSelector</code></td>
+<td>Full model picker dialog (Advanced Mode)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="state-management-appsthinktanklibstores">State Management (<code>apps/thinktank/lib/stores/</code>)</h4>
+<table>
+<thead>
+<tr>
+<th>Store</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ui-store.ts</code></td>
+<td>UI state (sidebar, advanced mode, sound)</td>
+</tr>
+<tr>
+<td><code>settings-store.ts</code></td>
+<td>User preferences with persistence</td>
+</tr>
+</tbody>
+</table>
+<h4 id="api-services-appsthinktanklibapi">API Services (<code>apps/thinktank/lib/api/</code>)</h4>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Endpoints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>chat.ts</code></td>
+<td>Conversations, messages, streaming</td>
+</tr>
+<tr>
+<td><code>models.ts</code></td>
+<td>Model listing, recommendations</td>
+</tr>
+<tr>
+<td><code>rules.ts</code></td>
+<td>User rules CRUD, presets</td>
+</tr>
+<tr>
+<td><code>settings.ts</code></td>
+<td>User settings, personality</td>
+</tr>
+<tr>
+<td><code>brain-plan.ts</code></td>
+<td>Plan generation and display</td>
+</tr>
+<tr>
+<td><code>analytics.ts</code></td>
+<td>User stats, achievements</td>
+</tr>
+<tr>
+<td><code>governor.ts</code></td>
+<td>Economic optimization status</td>
+</tr>
+</tbody>
+</table>
+<h3 id="settings-page-features">Settings Page Features</h3>
+<p>The Settings page (<code>/settings</code>) provides:</p>
+<ul>
+<li><strong>Personality Mode</strong>: Auto, Professional, Subtle, Expressive, Playful</li>
+<li><strong>Notifications</strong>: Push notification preferences</li>
+<li><strong>Appearance</strong>: Compact mode, token/cost display toggles</li>
+<li><strong>Keyboard Shortcuts</strong>: Enable/disable, shortcut reference</li>
+<li><strong>Sound Effects</strong>: Toggle audio feedback</li>
+<li><strong>Privacy</strong>: Data export, account deletion</li>
+</ul>
+<h3 id="my-rules-page-features">My Rules Page Features</h3>
+<p>The My Rules page (<code>/rules</code>) allows users to:</p>
+<ul>
+<li><strong>Create custom rules</strong> for AI behavior</li>
+<li><strong>Browse preset rules</strong> by category</li>
+<li><strong>Toggle rules</strong> on/off without deleting</li>
+<li><strong>View rule application stats</strong></li>
+</ul>
+<p>Rule types: Restriction, Preference, Format, Source, Tone, Topic, Privacy</p>
+<h3 id="consumer-app-tech-stack">Consumer App Tech Stack</h3>
+<table>
+<thead>
+<tr>
+<th>Technology</th>
+<th>Version</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Next.js</td>
+<td>14.x</td>
+<td>React framework</td>
+</tr>
+<tr>
+<td>TypeScript</td>
+<td>5.x</td>
+<td>Type safety</td>
+</tr>
+<tr>
+<td>Tailwind CSS</td>
+<td>3.x</td>
+<td>Styling</td>
+</tr>
+<tr>
+<td>shadcn/ui</td>
+<td>latest</td>
+<td>Component library</td>
+</tr>
+<tr>
+<td>Zustand</td>
+<td>latest</td>
+<td>Client state management</td>
+</tr>
+<tr>
+<td>TanStack Query</td>
+<td>5.x</td>
+<td>Server state management</td>
+</tr>
+<tr>
+<td>Framer Motion</td>
+<td>latest</td>
+<td>Animations</td>
+</tr>
+<tr>
+<td>Lucide</td>
+<td>latest</td>
+<td>Icons</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-files">Implementation Files</h3>
+<pre><code>apps/thinktank/
+├── app/
+│   ├── (chat)/
+│   │   ├── page.tsx        # Main chat interface
+│   │   └── layout.tsx      # Chat layout wrapper
+│   ├── settings/page.tsx   # Settings page
+│   ├── rules/page.tsx      # My Rules page
+│   ├── history/page.tsx    # History page
+│   ├── artifacts/page.tsx  # Artifacts page
+│   ├── profile/page.tsx    # Profile page
+│   └── page.tsx            # Root redirect
+├── components/
+│   ├── chat/               # Chat-specific components
+│   └── ui/                 # Base UI components
+└── lib/
+    ├── api/                # API services
+    ├── stores/             # Zustand stores
+    └── utils.ts            # Utility functions</code></pre>
+<h3 id="api-integration">API Integration</h3>
+<p>The consumer app connects to the Think Tank API at <code>/api/thinktank/*</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Handler</th>
+<th>Endpoints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Chat</td>
+<td><code>chat.ts</code></td>
+<td>conversations, messages, stream</td>
+</tr>
+<tr>
+<td>Rules</td>
+<td><code>my-rules.ts</code></td>
+<td>CRUD, presets, toggle</td>
+</tr>
+<tr>
+<td>Settings</td>
+<td><code>settings.ts</code></td>
+<td>get/update preferences</td>
+</tr>
+<tr>
+<td>Models</td>
+<td><code>models.ts</code></td>
+<td>list, recommend</td>
+</tr>
+<tr>
+<td>Brain Plan</td>
+<td><code>brain-plan.ts</code></td>
+<td>generate, execute, status</td>
+</tr>
+<tr>
+<td>Analytics</td>
+<td><code>analytics.ts</code></td>
+<td>stats, achievements</td>
+</tr>
+<tr>
+<td>Governor</td>
+<td><code>economic-governor.ts</code></td>
+<td>status, savings</td>
+</tr>
+<tr>
+<td>Localization</td>
+<td><code>localization.ts</code></td>
+<td>languages, bundles, translations</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="localization-i18n">24. Localization (i18n)</h2>
+<p><strong>Path</strong>: <code>apps/thinktank/lib/i18n/</code><br />
+<strong>API Base</strong>: <code>/api/localization</code></p>
+<h3 id="overview-22">Overview</h3>
+<p>Think Tank supports 18 languages through the Radiant localization registry. <strong>ALL UI text strings MUST be localized</strong> - no hardcoded strings are allowed in components.</p>
+<h3 id="architecture">Architecture</h3>
+<pre><code>User App ──► LocalizationProvider ──► Localization API ──► Radiant Registry ──► PostgreSQL
+                    │
+                    ▼
+              Translation Bundle (cached 1hr)</code></pre>
+<p><strong>Key Principle</strong>: The consumer app accesses ALL data through the API. Never direct database access.</p>
+<h3 id="supported-languages-18">Supported Languages (18)</h3>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Language</th>
+<th>Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>en</code></td>
+<td>English</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>es</code></td>
+<td>Spanish</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>fr</code></td>
+<td>French</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>de</code></td>
+<td>German</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>pt</code></td>
+<td>Portuguese</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>it</code></td>
+<td>Italian</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>nl</code></td>
+<td>Dutch</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>pl</code></td>
+<td>Polish</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>ru</code></td>
+<td>Russian</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>tr</code></td>
+<td>Turkish</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>ja</code></td>
+<td>Japanese</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>ko</code></td>
+<td>Korean</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>zh-CN</code></td>
+<td>Chinese (Simplified)</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>zh-TW</code></td>
+<td>Chinese (Traditional)</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>ar</code></td>
+<td>Arabic</td>
+<td>RTL</td>
+</tr>
+<tr>
+<td><code>hi</code></td>
+<td>Hindi</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>th</code></td>
+<td>Thai</td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><code>vi</code></td>
+<td>Vietnamese</td>
+<td>LTR</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-files-1">Implementation Files</h3>
+<pre><code>apps/thinktank/lib/i18n/
+├── index.ts                    # Module exports
+├── types.ts                    # Type definitions
+├── localization-service.ts     # API client for localization
+├── localization-context.tsx    # React context provider
+├── translation-keys.ts         # All translation key constants
+└── default-translations.ts     # English fallback translations</code></pre>
+<h3 id="api-endpoints-18">API Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 37%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/localization/languages</code></td>
+<td>Get supported languages</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/localization/bundle</code></td>
+<td>Get translation bundle for language</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/localization/translate</code></td>
+<td>Get single translation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="usage-in-components">Usage in Components</h3>
+<pre class="tsx"><code>import { useTranslation, T } from &#39;@/lib/i18n&#39;;
+
+function MyComponent() {
+  const { t } = useTranslation();
+  
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;{t(T.common.appName)}&lt;/h1&gt;
+      &lt;p&gt;{t(T.chat.welcomeMessage)}&lt;/p&gt;
+      &lt;button&gt;{t(T.common.save)}&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<h3 id="language-selection">Language Selection</h3>
+<p>Users select their language in Settings → Language:</p>
+<pre class="tsx"><code>import { LanguageSelector } from &#39;@/components/ui/language-selector&#39;;
+
+&lt;LanguageSelector variant=&quot;list&quot; /&gt;</code></pre>
+<h3 id="translation-key-categories">Translation Key Categories</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 29%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Prefix</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Common</td>
+<td><code>thinktank.common.</code></td>
+<td><code>thinktank.common.save</code></td>
+</tr>
+<tr>
+<td>Chat</td>
+<td><code>thinktank.chat.</code></td>
+<td><code>thinktank.chat.send</code></td>
+</tr>
+<tr>
+<td>Settings</td>
+<td><code>thinktank.settings.</code></td>
+<td><code>thinktank.settings.language</code></td>
+</tr>
+<tr>
+<td>Rules</td>
+<td><code>thinktank.rules.</code></td>
+<td><code>thinktank.rules.addRule</code></td>
+</tr>
+<tr>
+<td>History</td>
+<td><code>thinktank.history.</code></td>
+<td><code>thinktank.history.title</code></td>
+</tr>
+<tr>
+<td>Artifacts</td>
+<td><code>thinktank.artifacts.</code></td>
+<td><code>thinktank.artifacts.download</code></td>
+</tr>
+<tr>
+<td>Profile</td>
+<td><code>thinktank.profile.</code></td>
+<td><code>thinktank.profile.achievements</code></td>
+</tr>
+<tr>
+<td>Errors</td>
+<td><code>thinktank.errors.</code></td>
+<td><code>thinktank.errors.network</code></td>
+</tr>
+<tr>
+<td>Notifications</td>
+<td><code>thinktank.notifications.</code></td>
+<td><code>thinktank.notifications.saved</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="adding-new-translations">Adding New Translations</h3>
+<ol type="1">
+<li>Add key to <code>translation-keys.ts</code></li>
+<li>Add default English text to <code>default-translations.ts</code></li>
+<li>Use key in component: <code>t(T.category.key)</code></li>
+<li>Register in Radiant localization registry for AI translation</li>
+</ol>
+<h3 id="parameter-interpolation">Parameter Interpolation</h3>
+<pre class="tsx"><code>// Key: &quot;Delete {{count}} items&quot;
+t(T.history.deleteSelectedConfirm, { count: 5 })
+// Output: &quot;Delete 5 items&quot;</code></pre>
+<hr />
+<h2 id="section-25-2026-consumer-app-uiux">Section 25: 2026+ Consumer App UI/UX</h2>
+<h3 id="overview-23">Overview</h3>
+<p>The Think Tank consumer app features a modern 2026+ interface with glassmorphism effects, animated transitions, and polymorphic UI morphing. Advanced features are hidden until the user activates Advanced Mode.</p>
+<h3 id="design-system">Design System</h3>
+<p>The design system is defined in <code>apps/thinktank/lib/design-system/tokens.ts</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Token Category</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Colors</strong></td>
+<td>Glass effects, aurora gradients, glow colors</td>
+</tr>
+<tr>
+<td><strong>Spacing</strong></td>
+<td>Responsive spacing scale (0.5-24 rem)</td>
+</tr>
+<tr>
+<td><strong>Radius</strong></td>
+<td>Border radius from <code>sm</code> to <code>full</code></td>
+</tr>
+<tr>
+<td><strong>Shadows</strong></td>
+<td>Glass shadows, inner glows</td>
+</tr>
+<tr>
+<td><strong>Animation</strong></td>
+<td>Timing functions, spring configs</td>
+</tr>
+<tr>
+<td><strong>Blur</strong></td>
+<td>Backdrop blur values</td>
+</tr>
+</tbody>
+</table>
+<h3 id="glassmorphism-components">Glassmorphism Components</h3>
+<h4 id="glasscard">GlassCard</h4>
+<pre class="tsx"><code>import { GlassCard } from &#39;@/components/ui/glass-card&#39;;
+
+&lt;GlassCard 
+  variant=&quot;glow&quot;           // default | elevated | inset | glow
+  intensity=&quot;medium&quot;       // light | medium | strong
+  glowColor=&quot;violet&quot;       // violet | fuchsia | cyan | emerald | none
+  hoverEffect              // Enable hover animations
+  padding=&quot;md&quot;             // none | sm | md | lg
+&gt;
+  Content
+&lt;/GlassCard&gt;</code></pre>
+<h4 id="glasspanel">GlassPanel</h4>
+<pre class="tsx"><code>import { GlassPanel } from &#39;@/components/ui/glass-card&#39;;
+
+&lt;GlassPanel blur=&quot;lg&quot;&gt;    // sm | md | lg | xl
+  Content
+&lt;/GlassPanel&gt;</code></pre>
+<h3 id="interactive-timeline">Interactive Timeline</h3>
+<p>The history page features an interactive timeline for browsing conversation history:</p>
+<pre class="tsx"><code>import { InteractiveTimeline, HorizontalTimeline } from &#39;@/components/ui/timeline&#39;;
+
+&lt;InteractiveTimeline
+  items={timelineItems}
+  onSelect={(item) =&gt; navigateToConversation(item.id)}
+  selectedId={currentId}
+/&gt;
+
+&lt;HorizontalTimeline
+  items={recentItems}
+  onSelect={handleSelect}
+/&gt;</code></pre>
+<p><strong>Features</strong>: - <strong>Grouping</strong>: Today, Yesterday, This Week, This Month, Older - <strong>Animations</strong>: Entrance animations, hover effects, selection glow - <strong>Indicators</strong>: Favorite stars, mode badges, domain hints - <strong>Navigation</strong>: Horizontal scroll with arrow buttons</p>
+<h3 id="polymorphic-ui-viewrouter">Polymorphic UI (ViewRouter)</h3>
+<p>The UI can morph based on task complexity and user mode:</p>
+<pre class="tsx"><code>import { ViewRouter } from &#39;@/components/polymorphic&#39;;
+
+&lt;ViewRouter
+  initialView=&quot;chat&quot;
+  initialMode=&quot;sniper&quot;
+  onViewChange={(state) =&gt; console.log(&#39;View changed:&#39;, state)}
+  onEscalate={(reason) =&gt; console.log(&#39;Escalated:&#39;, reason)}
+&gt;
+  {children}
+&lt;/ViewRouter&gt;</code></pre>
+<p><strong>Execution Modes</strong>: - <strong>Sniper</strong>: Fast, single-model execution (~$0.01/run) - <strong>War Room</strong>: Deep, multi-agent analysis (~$0.50+/run)</p>
+<p><strong>View Types</strong>: | View | Purpose | |——|———| | <code>chat</code> | Standard conversation | | <code>terminal</code> | Command center | | <code>canvas</code> | Infinite canvas/mindmap | | <code>dashboard</code> | Analytics view | | <code>diff_editor</code> | Verification split-screen | | <code>decision_cards</code> | Human-in-the-loop |</p>
+<h3 id="advanced-mode-features">Advanced Mode Features</h3>
+<p>Features only visible when Advanced Mode is enabled:</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 31%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Location</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mode selector (Sniper/War Room)</td>
+<td>Header bar</td>
+<td>Switch execution modes</td>
+</tr>
+<tr>
+<td>Model selector</td>
+<td>Input area</td>
+<td>Choose specific AI model</td>
+</tr>
+<tr>
+<td>Message metadata</td>
+<td>Message bubbles</td>
+<td>Tokens, latency, cost</td>
+</tr>
+<tr>
+<td>Voice input</td>
+<td>Input area</td>
+<td>Voice-to-text</td>
+</tr>
+<tr>
+<td>File attachments</td>
+<td>Input area</td>
+<td>Upload files</td>
+</tr>
+<tr>
+<td>Escalation button</td>
+<td>Header bar</td>
+<td>Upgrade to War Room</td>
+</tr>
+</tbody>
+</table>
+<h3 id="modern-polish-components-2026">Modern Polish Components (2026+)</h3>
+<p>Additional UI polish components for super-modern consumer experience:</p>
+<table>
+<colgroup>
+<col style="width: 42%" />
+<col style="width: 23%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PageTransition</code></td>
+<td><code>page-transition.tsx</code></td>
+<td>Fade/slide page animations</td>
+</tr>
+<tr>
+<td><code>StaggerContainer/Item</code></td>
+<td><code>page-transition.tsx</code></td>
+<td>List entrance animations</td>
+</tr>
+<tr>
+<td><code>Skeleton</code> variants</td>
+<td><code>skeleton.tsx</code></td>
+<td>Shimmer loading states</td>
+</tr>
+<tr>
+<td><code>GradientText</code></td>
+<td><code>gradient-text.tsx</code></td>
+<td>Animated gradient text</td>
+</tr>
+<tr>
+<td><code>GlowText</code></td>
+<td><code>gradient-text.tsx</code></td>
+<td>Drop shadow glow effects</td>
+</tr>
+<tr>
+<td><code>AnimatedNumber</code></td>
+<td><code>gradient-text.tsx</code></td>
+<td>Counter animations</td>
+</tr>
+<tr>
+<td><code>Typewriter</code></td>
+<td><code>gradient-text.tsx</code></td>
+<td>Typing text effect</td>
+</tr>
+<tr>
+<td><code>TypingIndicator</code></td>
+<td><code>typing-indicator.tsx</code></td>
+<td>AI thinking states</td>
+</tr>
+<tr>
+<td><code>EmptyState</code></td>
+<td><code>empty-state.tsx</code></td>
+<td>Beautiful empty states</td>
+</tr>
+<tr>
+<td><code>WelcomeHero</code></td>
+<td><code>empty-state.tsx</code></td>
+<td>First-time user welcome</td>
+</tr>
+<tr>
+<td><code>ModernButton</code></td>
+<td><code>modern-button.tsx</code></td>
+<td>Glow/gradient buttons</td>
+</tr>
+<tr>
+<td><code>IconButton</code></td>
+<td><code>modern-button.tsx</code></td>
+<td>Icon-only buttons</td>
+</tr>
+<tr>
+<td><code>PillButton</code></td>
+<td><code>modern-button.tsx</code></td>
+<td>Filter pill buttons</td>
+</tr>
+</tbody>
+</table>
+<h3 id="voice-input">Voice Input</h3>
+<p>Whisper-based speech-to-text for consistent cross-browser experience.</p>
+<pre class="tsx"><code>import { VoiceInput } from &#39;@/components/chat&#39;;
+
+&lt;VoiceInput
+  isOpen={isVoiceOpen}
+  onClose={() =&gt; setVoiceOpen(false)}
+  onTranscript={(text) =&gt; handleVoiceTranscript(text)}
+/&gt;</code></pre>
+<p><strong>Features</strong>: - Uses app’s localization language setting - Whisper API for 99+ language support - Audio level visualization - Works on all browsers (no Web Speech API dependency)</p>
+<p><strong>API Endpoint</strong>: <code>POST /api/thinktank/speech/transcribe</code></p>
+<h3 id="file-attachments">File Attachments</h3>
+<p>Drag-and-drop file attachment for chat messages.</p>
+<pre class="tsx"><code>import { FileAttachment } from &#39;@/components/chat&#39;;
+
+&lt;FileAttachment
+  isOpen={isAttachOpen}
+  onClose={() =&gt; setAttachOpen(false)}
+  onAttach={(files) =&gt; handleFiles(files)}
+  maxFiles={5}
+  maxSizeMB={10}
+/&gt;</code></pre>
+<p><strong>Supported Types</strong>: Images, PDFs, text files, JSON, code files</p>
+<h3 id="liquid-interface-v5.52.7">Liquid Interface (v5.52.7)</h3>
+<p>Morphing UI components for adaptive chat experiences. <strong>“Don’t Build the Tool. BE the Tool.”</strong></p>
+<p>The chat interface can morph into specialized tools when users need them. In Advanced Mode, trigger buttons appear in the header.</p>
+<h4 id="morphed-view-types">Morphed View Types</h4>
+<table>
+<thead>
+<tr>
+<th>View</th>
+<th>Icon</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>datagrid</code></td>
+<td>Table</td>
+<td>Interactive spreadsheet with inline editing</td>
+</tr>
+<tr>
+<td><code>chart</code></td>
+<td>BarChart3</td>
+<td>Bar, line, pie, area charts</td>
+</tr>
+<tr>
+<td><code>kanban</code></td>
+<td>Kanban</td>
+<td>Drag-and-drop task board</td>
+</tr>
+<tr>
+<td><code>calculator</code></td>
+<td>Calculator</td>
+<td>Full calculator with memory</td>
+</tr>
+<tr>
+<td><code>code_editor</code></td>
+<td>Code</td>
+<td>Code editor with run capability</td>
+</tr>
+<tr>
+<td><code>document</code></td>
+<td>FileText</td>
+<td>Rich text editor</td>
+</tr>
+</tbody>
+</table>
+<h4 id="usage-in-chat-page">Usage in Chat Page</h4>
+<pre class="tsx"><code>import { LiquidMorphPanel, type MorphedViewType } from &#39;@/components/liquid&#39;;
+
+// State
+const [morphedView, setMorphedView] = useState&lt;MorphedViewType | null&gt;(null);
+const [isMorphFullscreen, setIsMorphFullscreen] = useState(false);
+const [showMorphChat, setShowMorphChat] = useState(false);
+
+// Trigger buttons (in header, Advanced Mode only)
+&lt;Button onClick={() =&gt; setMorphedView(&#39;datagrid&#39;)}&gt;
+  &lt;Table className=&quot;h-4 w-4&quot; /&gt;
+&lt;/Button&gt;
+
+// Render panel when view is selected
+{morphedView &amp;&amp; (
+  &lt;LiquidMorphPanel
+    viewType={morphedView}
+    isFullscreen={isMorphFullscreen}
+    onClose={() =&gt; setMorphedView(null)}
+    onToggleFullscreen={() =&gt; setIsMorphFullscreen(!isMorphFullscreen)}
+    onChatToggle={() =&gt; setShowMorphChat(!showMorphChat)}
+    showChat={showMorphChat}
+  /&gt;
+)}</code></pre>
+<h4 id="morphed-view-components">Morphed View Components</h4>
+<p>Location: <code>apps/thinktank/components/liquid/morphed-views/</code></p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DataGridView</code></td>
+<td>Add/delete rows, inline cell editing, import/export</td>
+</tr>
+<tr>
+<td><code>ChartView</code></td>
+<td>Type switching (bar/line/pie/area), SVG rendering</td>
+</tr>
+<tr>
+<td><code>KanbanView</code></td>
+<td><strong>Multi-variant</strong> - see Kanban Variants below</td>
+</tr>
+<tr>
+<td><code>CalculatorView</code></td>
+<td>Memory, operations, percentage, delete</td>
+</tr>
+<tr>
+<td><code>CodeEditorView</code></td>
+<td>Run code, copy, export, output panel</td>
+</tr>
+<tr>
+<td><code>DocumentView</code></td>
+<td>Bold/italic/underline, lists, alignment, export</td>
+</tr>
+</tbody>
+</table>
+<h4 id="kanban-variants-v5.52.8">Kanban Variants (v5.52.8)</h4>
+<p>The Kanban morphed view supports 5 modern frameworks:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 36%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Description</th>
+<th>Key Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Standard</strong></td>
+<td>Traditional Kanban</td>
+<td>Columns, cards, drag-and-drop</td>
+</tr>
+<tr>
+<td><strong>Scrumban</strong></td>
+<td>Scrum + Kanban</td>
+<td>Sprint header, velocity, story points, WIP limits</td>
+</tr>
+<tr>
+<td><strong>Enterprise</strong></td>
+<td>Portfolio mgmt</td>
+<td>Multi-lane hierarchical boards (Strategic/Ops/Support)</td>
+</tr>
+<tr>
+<td><strong>Personal</strong></td>
+<td>Individual productivity</td>
+<td>Simple 3-column, strict WIP limits</td>
+</tr>
+<tr>
+<td><strong>Pomodoro</strong></td>
+<td>Timer-integrated</td>
+<td>25-min focus, breaks, 🍅 counts per task</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<pre class="tsx"><code>import { KanbanView, type KanbanVariant } from &#39;@/components/liquid/morphed-views&#39;;
+
+&lt;KanbanView initialVariant=&quot;scrumban&quot; /&gt;</code></pre>
+<p><strong>Features across all variants:</strong> - Variant selector dropdown in toolbar - Analytics panel (toggle): total tasks, completed, cycle time, throughput - Card customization: priority colors, tags, subtasks, assignees - WIP limit indicators (green/amber/red)</p>
+<p><strong>Pomodoro-specific:</strong> - 25-minute focus timer with 5-minute breaks - Play/pause/reset controls - Completed pomodoro counter - Per-task pomodoro estimates and tracking</p>
+<h3 id="file-structure">File Structure</h3>
+<pre><code>apps/thinktank/
+├── lib/
+│   ├── design-system/
+│   │   ├── tokens.ts          # Design token definitions
+│   │   └── index.ts           # Exports
+│   └── services/
+│       └── speech-recognition.ts  # Whisper speech service
+├── components/
+│   ├── ui/
+│   │   ├── glass-card.tsx     # GlassCard, GlassPanel
+│   │   ├── aurora-background.tsx  # Aurora effects
+│   │   ├── timeline.tsx       # Timeline components
+│   │   ├── page-transition.tsx    # Page transitions
+│   │   ├── skeleton.tsx       # Skeleton loaders
+│   │   ├── gradient-text.tsx  # Gradient/glow text
+│   │   ├── typing-indicator.tsx   # Typing indicators
+│   │   ├── empty-state.tsx    # Empty states
+│   │   ├── modern-button.tsx  # Modern buttons
+│   │   └── index.ts           # UI exports
+│   ├── polymorphic/
+│   │   ├── view-router.tsx    # Polymorphic router
+│   │   └── index.ts           # Exports
+│   ├── liquid/
+│   │   ├── LiquidMorphPanel.tsx   # Morphing panel
+│   │   ├── EjectDialog.tsx    # Export dialog
+│   │   ├── morphed-views/     # View components (v5.52.7)
+│   │   │   ├── DataGridView.tsx
+│   │   │   ├── ChartView.tsx
+│   │   │   ├── KanbanView.tsx
+│   │   │   ├── CalculatorView.tsx
+│   │   │   ├── CodeEditorView.tsx
+│   │   │   ├── DocumentView.tsx
+│   │   │   └── index.ts
+│   │   └── index.ts           # Exports
+│   └── chat/
+│       ├── ModernChatInterface.tsx  # Main chat UI
+│       ├── VoiceInput.tsx     # Voice input modal
+│       ├── FileAttachment.tsx # File attachment modal
+│       └── index.ts           # Chat exports</code></pre>
+<hr />
+<h2 id="gdpr-compliance-apis">25. GDPR &amp; Compliance APIs</h2>
+<p><strong>Path</strong>: <code>/compliance</code><br />
+<strong>App File</strong>: <code>apps/admin-dashboard/app/(dashboard)/thinktank/compliance/page.tsx</code></p>
+<h3 id="features-16">Features</h3>
+<ul>
+<li><strong>Consent Management</strong>: Track and manage user consents for data processing</li>
+<li><strong>GDPR Requests</strong>: Handle data export, deletion, access, and rectification requests</li>
+<li><strong>Security Configuration</strong>: Per-tenant security settings</li>
+</ul>
+<h3 id="api-endpoints-19">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/consent</code></td>
+<td>List consent records</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/consent</code></td>
+<td>Record new consent</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/thinktank/consent</code></td>
+<td>Withdraw consent</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/gdpr</code></td>
+<td>List GDPR requests</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/gdpr</code></td>
+<td>Create GDPR request</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/api/thinktank/gdpr</code></td>
+<td>Update request status</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/security-config</code></td>
+<td>Get security config</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/thinktank/security-config</code></td>
+<td>Update security config</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-22">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/consent.ts</code>, <code>gdpr.ts</code>, <code>security-config.ts</code></li>
+<li><strong>Migration</strong>: <code>174_thinktank_missing_features.sql</code></li>
+</ul>
+<hr />
+<h2 id="user-preferences-notifications">26. User Preferences &amp; Notifications</h2>
+<h3 id="user-preferences">User Preferences</h3>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 37%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/preferences</code></td>
+<td>Get user preferences</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/thinktank/preferences</code></td>
+<td>Update preferences</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/preferences/models</code></td>
+<td>Get model preferences</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/preferences/models/favorite</code></td>
+<td>Toggle favorite model</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rejection-notifications">Rejection Notifications</h3>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 37%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/rejections</code></td>
+<td>Get rejection notifications</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/rejections</code></td>
+<td>Create rejection</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/api/thinktank/rejections/:id/read</code></td>
+<td>Mark as read</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/thinktank/rejections/:id/dismiss</code></td>
+<td>Dismiss notification</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-23">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/preferences.ts</code>, <code>rejections.ts</code></li>
+</ul>
+<hr />
+<h2 id="ui-feedback-improvement">27. UI Feedback &amp; Improvement</h2>
+<h3 id="ui-feedback">UI Feedback</h3>
+<p>Collect user feedback on UI components and experiences.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/ui-feedback</code></td>
+<td>List feedback</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/ui-feedback</code></td>
+<td>Submit feedback</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/thinktank/ui-feedback</code></td>
+<td>Update feedback status</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ui-improvement-sessions">UI Improvement Sessions</h3>
+<p>AI-assisted UI improvement sessions.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/ui-improvement</code></td>
+<td>List sessions</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/ui-improvement/start</code></td>
+<td>Start session</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/ui-improvement/request</code></td>
+<td>Request improvement</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/ui-improvement/apply</code></td>
+<td>Apply improvement</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/ui-improvement/complete</code></td>
+<td>Complete session</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-24">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/ui-feedback.ts</code>, <code>ui-improvement.ts</code></li>
+</ul>
+<hr />
+<h2 id="multipage-apps">28. Multipage Apps</h2>
+<p>User-generated multipage applications from the artifact engine.</p>
+<h3 id="api-endpoints-20">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/multipage-apps</code></td>
+<td>List user’s apps</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/thinktank/multipage-apps/:id</code></td>
+<td>Get app details</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/thinktank/multipage-apps</code></td>
+<td>Create new app</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/thinktank/multipage-apps/:id</code></td>
+<td>Update app</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/thinktank/multipage-apps/:id</code></td>
+<td>Delete app</td>
+</tr>
+</tbody>
+</table>
+<h3 id="app-structure">App Structure</h3>
+<pre class="typescript"><code>interface MultipageApp {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  theme: { primaryColor: string; mode: &#39;light&#39; | &#39;dark&#39; };
+  pages: Array&lt;{ id: string; name: string; icon: string; content: object }&gt;;
+  navigation: { type: &#39;tabs&#39; | &#39;sidebar&#39; | &#39;drawer&#39;; position: string };
+  sharedState: object;
+  isPublished: boolean;
+  version: number;
+}</code></pre>
+<h3 id="implementation-25">Implementation</h3>
+<ul>
+<li><strong>Lambda</strong>: <code>lambda/thinktank/multipage-apps.ts</code></li>
+<li><strong>Migration</strong>: <code>174_thinktank_missing_features.sql</code></li>
+</ul>
+<hr />
+<h2 id="consumer-app-components-v5.24.0">29. Consumer App Components (v5.24.0)</h2>
+<p>New components added to the Think Tank consumer app:</p>
+<h3 id="voice-input-1">Voice Input</h3>
+<ul>
+<li>Whisper-based speech recognition</li>
+<li>Audio level visualization</li>
+<li>Cross-browser support</li>
+</ul>
+<h3 id="file-attachments-1">File Attachments</h3>
+<ul>
+<li>Drag-and-drop upload</li>
+<li>Image preview</li>
+<li>File type validation</li>
+</ul>
+<h3 id="brain-plan-viewer">Brain Plan Viewer</h3>
+<ul>
+<li>AGI plan visualization</li>
+<li>Step progress tracking</li>
+<li>Mode and model display</li>
+</ul>
+<h3 id="cato-mood-selector">Cato Mood Selector</h3>
+<ul>
+<li>5 moods: Balanced, Scout, Sage, Spark, Guide</li>
+<li>Dropdown, inline, and compact variants</li>
+</ul>
+<h3 id="time-machine">Time Machine</h3>
+<ul>
+<li>Video-editor style timeline</li>
+<li>Snapshot bookmarking</li>
+<li>Branch creation</li>
+</ul>
+<h3 id="component-files">Component Files</h3>
+<pre><code>apps/thinktank/components/chat/
+├── voice-input.tsx
+├── file-attachments.tsx
+├── brain-plan-viewer.tsx
+├── cato-mood-selector.tsx
+├── time-machine.tsx
+└── index.ts</code></pre>
+<hr />
+<h2 id="appendix-a-application-architecture">Appendix A: Application Architecture</h2>
+<h3 id="think-tank-admin-tech-stack">Think Tank Admin Tech Stack</h3>
+<table>
+<thead>
+<tr>
+<th>Technology</th>
+<th>Version</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Next.js</td>
+<td>14.x</td>
+<td>React framework</td>
+</tr>
+<tr>
+<td>TypeScript</td>
+<td>5.x</td>
+<td>Type safety</td>
+</tr>
+<tr>
+<td>Tailwind CSS</td>
+<td>3.x</td>
+<td>Styling</td>
+</tr>
+<tr>
+<td>shadcn/ui</td>
+<td>latest</td>
+<td>Component library</td>
+</tr>
+<tr>
+<td>React Query</td>
+<td>5.x</td>
+<td>Data fetching</td>
+</tr>
+<tr>
+<td>Lucide</td>
+<td>latest</td>
+<td>Icons</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-authentication">API Authentication</h3>
+<p>Think Tank Admin uses Cognito authentication via the <code>ThinkTankAuthStack</code>:</p>
+<pre class="typescript"><code>// API client configuration
+const api = createApiClient({
+  baseUrl: process.env.NEXT_PUBLIC_API_URL,
+  getToken: () =&gt; auth.getAccessToken(),
+});</code></pre>
+<h3 id="cdk-stack">CDK Stack</h3>
+<ul>
+<li><strong>Stack</strong>: <code>ThinkTankAdminApiStack</code></li>
+<li><strong>File</strong>: <code>lib/stacks/thinktank-admin-api-stack.ts</code></li>
+<li><strong>Handler</strong>: <code>lambda/thinktank-admin/handler.ts</code> (consolidated router)</li>
+</ul>
+<hr />
+<h2 id="appendix-b-adding-new-features">Appendix B: Adding New Features</h2>
+<p>When adding features to Think Tank Admin:</p>
+<ol type="1">
+<li>Create page in <code>apps/thinktank-admin/app/(dashboard)/</code></li>
+<li>Add Lambda handler in <code>lambda/thinktank/</code></li>
+<li>Update consolidated handler in <code>lambda/thinktank/handler.ts</code></li>
+<li><strong>Update this guide</strong> with full documentation</li>
+<li>Add to CHANGELOG.md</li>
+</ol>
+<p>See <code>/.windsurf/workflows/documentation-consolidation.md</code> for documentation policy.</p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -17,6 +17,10 @@ import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as lambdaEventSources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as servicediscovery from 'aws-cdk-lib/aws-servicediscovery';
@@ -25,6 +29,8 @@ import { Construct } from 'constructs';
 export interface GatewayStackProps extends cdk.StackProps {
   vpc: ec2.IVpc;
   cluster: ecs.ICluster;
+  dbClusterArn: string;
+  dbSecretArn: string;
   aiProviderSecrets?: {
     openai?: secretsmanager.ISecret;
     anthropic?: secretsmanager.ISecret;
@@ -35,11 +41,16 @@ export interface GatewayStackProps extends cdk.StackProps {
 export class GatewayStack extends cdk.Stack {
   public readonly gatewayEndpoint: string;
   public readonly egressProxyEndpoint: string;
+  public readonly mcpWorkerLambda: lambda.Function;
+  public readonly a2aWorkerLambda: lambda.Function;
 
   constructor(scope: Construct, id: string, props: GatewayStackProps) {
     super(scope, id, props);
 
-    const { vpc, cluster, aiProviderSecrets } = props;
+    const { vpc, cluster, dbClusterArn, dbSecretArn, aiProviderSecrets } = props;
+
+    const appId = this.node.tryGetContext('appId') || 'radiant';
+    const environment = this.node.tryGetContext('environment') || 'dev';
 
     // Cloud Map namespace for service discovery
     const namespace = new servicediscovery.PrivateDnsNamespace(this, 'Namespace', {
@@ -290,12 +301,112 @@ export class GatewayStack extends cdk.Stack {
     });
 
     // ================================================================
+    // MCP Worker Lambda (Model Context Protocol Processing)
+    // ================================================================
+    const mcpWorkerQueue = new sqs.Queue(this, 'MCPWorkerQueue', {
+      queueName: `${appId}-${environment}-mcp-worker-queue`,
+      visibilityTimeout: cdk.Duration.seconds(300),
+      retentionPeriod: cdk.Duration.days(1),
+      deadLetterQueue: {
+        queue: new sqs.Queue(this, 'MCPWorkerDLQ', {
+          queueName: `${appId}-${environment}-mcp-worker-dlq`,
+          retentionPeriod: cdk.Duration.days(14),
+        }),
+        maxReceiveCount: 3,
+      },
+    });
+
+    const mcpWorkerLogGroup = new logs.LogGroup(this, 'MCPWorkerLogs', {
+      logGroupName: `/radiant/gateway/mcp-worker`,
+      retention: logs.RetentionDays.ONE_WEEK,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    this.mcpWorkerLambda = new lambda.Function(this, 'MCPWorker', {
+      functionName: `${appId}-${environment}-mcp-worker`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'gateway/mcp-worker.handler',
+      code: lambda.Code.fromAsset('../lambda'),
+      memorySize: 1024,
+      timeout: cdk.Duration.seconds(60),
+      vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      environment: {
+        NODE_ENV: environment,
+        NATS_URL: `nats://nats.gateway.radiant.internal:4222`,
+        DATABASE_HOST: cdk.Fn.select(0, cdk.Fn.split(':', dbClusterArn)),
+        DATABASE_SSL: 'true',
+      },
+      logGroup: mcpWorkerLogGroup,
+    });
+
+    this.mcpWorkerLambda.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['rds-data:ExecuteStatement', 'rds-data:BatchExecuteStatement'],
+      resources: [dbClusterArn],
+    }));
+    this.mcpWorkerLambda.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['secretsmanager:GetSecretValue'],
+      resources: [dbSecretArn],
+    }));
+
+    this.mcpWorkerLambda.addEventSource(new lambdaEventSources.SqsEventSource(mcpWorkerQueue, {
+      batchSize: 10,
+      maxBatchingWindow: cdk.Duration.seconds(1),
+    }));
+
+    // ================================================================
     // A2A Worker Lambda (Agent-to-Agent Protocol Processing)
     // ================================================================
-    // Note: A2A worker is deployed as part of the API stack's Lambda
-    // infrastructure. The Gateway routes A2A messages to NATS subject
-    // 'a2a.>' which are consumed by the A2A worker Lambda.
-    // See: lambda/gateway/a2a-worker.ts
+    const a2aWorkerQueue = new sqs.Queue(this, 'A2AWorkerQueue', {
+      queueName: `${appId}-${environment}-a2a-worker-queue`,
+      visibilityTimeout: cdk.Duration.seconds(300),
+      retentionPeriod: cdk.Duration.days(1),
+      deadLetterQueue: {
+        queue: new sqs.Queue(this, 'A2AWorkerDLQ', {
+          queueName: `${appId}-${environment}-a2a-worker-dlq`,
+          retentionPeriod: cdk.Duration.days(14),
+        }),
+        maxReceiveCount: 3,
+      },
+    });
+
+    const a2aWorkerLogGroup = new logs.LogGroup(this, 'A2AWorkerLogs', {
+      logGroupName: `/radiant/gateway/a2a-worker`,
+      retention: logs.RetentionDays.ONE_WEEK,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    this.a2aWorkerLambda = new lambda.Function(this, 'A2AWorker', {
+      functionName: `${appId}-${environment}-a2a-worker`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'gateway/a2a-worker.handler',
+      code: lambda.Code.fromAsset('../lambda'),
+      memorySize: 1024,
+      timeout: cdk.Duration.seconds(60),
+      vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      environment: {
+        NODE_ENV: environment,
+        NATS_URL: `nats://nats.gateway.radiant.internal:4222`,
+        DATABASE_HOST: cdk.Fn.select(0, cdk.Fn.split(':', dbClusterArn)),
+        DATABASE_SSL: 'true',
+      },
+      logGroup: a2aWorkerLogGroup,
+    });
+
+    this.a2aWorkerLambda.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['rds-data:ExecuteStatement', 'rds-data:BatchExecuteStatement'],
+      resources: [dbClusterArn],
+    }));
+    this.a2aWorkerLambda.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['secretsmanager:GetSecretValue'],
+      resources: [dbSecretArn],
+    }));
+
+    this.a2aWorkerLambda.addEventSource(new lambdaEventSources.SqsEventSource(a2aWorkerQueue, {
+      batchSize: 10,
+      maxBatchingWindow: cdk.Duration.seconds(1),
+    }));
 
     // Outputs
     this.gatewayEndpoint = gatewayNlb.loadBalancerDnsName;
@@ -314,6 +425,26 @@ export class GatewayStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'SupportedProtocols', {
       value: 'MCP (Model Context Protocol), A2A (Agent-to-Agent), OpenAI, Anthropic, Google',
       description: 'Protocols supported by this gateway',
+    });
+
+    new cdk.CfnOutput(this, 'MCPWorkerArn', {
+      value: this.mcpWorkerLambda.functionArn,
+      description: 'MCP Worker Lambda ARN',
+    });
+
+    new cdk.CfnOutput(this, 'A2AWorkerArn', {
+      value: this.a2aWorkerLambda.functionArn,
+      description: 'A2A Worker Lambda ARN',
+    });
+
+    new cdk.CfnOutput(this, 'MCPWorkerQueueUrl', {
+      value: mcpWorkerQueue.queueUrl,
+      description: 'MCP Worker SQS Queue URL',
+    });
+
+    new cdk.CfnOutput(this, 'A2AWorkerQueueUrl', {
+      value: a2aWorkerQueue.queueUrl,
+      description: 'A2A Worker SQS Queue URL',
     });
   }
 }

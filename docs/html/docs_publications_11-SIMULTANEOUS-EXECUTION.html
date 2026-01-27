@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>11 SIMULTANEOUS EXECUTION - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>11 SIMULTANEOUS EXECUTION</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/publications/11-SIMULTANEOUS-EXECUTION.md</div>
+  </div>
+  
+  <h1 id="simultaneous-prompt-execution">Simultaneous Prompt Execution</h1>
+<h2 id="overview">Overview</h2>
+<p>Both RADIANT and Think Tank support <strong>simultaneous prompt execution</strong> - the ability to run multiple AI prompts in parallel across different models. This capability enables dramatic quality improvements through consensus mechanisms and significant throughput gains for high-volume applications.</p>
+<hr />
+<h2 id="radiant-parallel-execution">RADIANT Parallel Execution</h2>
+<h3 id="configuration">Configuration</h3>
+<pre class="typescript"><code>interface ParallelExecutionConfig {
+  enabled: boolean;
+  mode: &#39;all&#39; | &#39;race&#39; | &#39;quorum&#39;;
+  models: string[];
+  minModels?: number;
+  maxModels?: number;
+  agiModelSelection?: boolean;
+  domainHints?: string[];
+  timeoutMs?: number;
+  failureStrategy: &#39;fail_fast&#39; | &#39;best_effort&#39;;
+}</code></pre>
+<h3 id="execution-modes">Execution Modes</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>all</strong></td>
+<td>Wait for all models to complete</td>
+<td>Consensus, synthesis</td>
+</tr>
+<tr>
+<td><strong>race</strong></td>
+<td>Return first successful response</td>
+<td>Speed-critical</td>
+</tr>
+<tr>
+<td><strong>quorum</strong></td>
+<td>Return when majority agree</td>
+<td>Balanced quality/speed</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation">Implementation</h3>
+<pre class="typescript"><code>export class ParallelExecutionService {
+  async executeParallel(
+    prompt: string,
+    config: ParallelExecutionConfig
+  ): Promise&lt;ParallelResult&gt; {
+    const models = config.agiModelSelection 
+      ? await this.agiSelectModels(prompt, config)
+      : config.models;
+    
+    // Launch all models simultaneously
+    const promises = models.map(model =&gt; 
+      this.executeWithTimeout(prompt, model, config.timeoutMs)
+    );
+    
+    switch (config.mode) {
+      case &#39;all&#39;:
+        return this.waitForAll(promises);
+      case &#39;race&#39;:
+        return this.waitForFirst(promises);
+      case &#39;quorum&#39;:
+        return this.waitForQuorum(promises, config.minModels);
+    }
+  }
+  
+  private async waitForAll(
+    promises: Promise&lt;ModelResponse&gt;[]
+  ): Promise&lt;ParallelResult&gt; {
+    const results = await Promise.allSettled(promises);
+    const successful = results
+      .filter((r): r is PromiseFulfilledResult&lt;ModelResponse&gt; =&gt; 
+        r.status === &#39;fulfilled&#39;)
+      .map(r =&gt; r.value);
+    
+    // Synthesize consensus from all responses
+    const synthesis = await this.synthesizeResponses(successful);
+    
+    return {
+      responses: successful,
+      synthesis,
+      consensusScore: this.calculateConsensus(successful),
+      totalLatencyMs: Math.max(...successful.map(r =&gt; r.latencyMs))
+    };
+  }
+  
+  private async waitForQuorum(
+    promises: Promise&lt;ModelResponse&gt;[],
+    minModels: number = Math.ceil(promises.length / 2)
+  ): Promise&lt;ParallelResult&gt; {
+    const results: ModelResponse[] = [];
+    
+    return new Promise((resolve) =&gt; {
+      promises.forEach(async (promise) =&gt; {
+        try {
+          const result = await promise;
+          results.push(result);
+          
+          if (results.length &gt;= minModels) {
+            // Check if results agree
+            const consensus = this.checkConsensus(results);
+            if (consensus.agreement &gt;= 0.7) {
+              resolve({
+                responses: results,
+                synthesis: consensus.synthesized,
+                consensusScore: consensus.agreement,
+                earlyTermination: true
+              });
+            }
+          }
+        } catch (error) {
+          // Continue waiting for other models
+        }
+      });
+    });
+  }
+}</code></pre>
+<h3 id="use-cases">Use Cases</h3>
+<h4 id="consensus-verification">1. Consensus Verification</h4>
+<pre class="typescript"><code>// Run same prompt on 3 models, synthesize agreement
+const result = await parallelExecution.executeParallel(
+  &quot;What is the capital of France?&quot;,
+  {
+    enabled: true,
+    mode: &#39;all&#39;,
+    models: [&#39;claude-3-5-sonnet&#39;, &#39;gpt-4o&#39;, &#39;gemini-1.5-pro&#39;],
+    agiModelSelection: false
+  }
+);
+// consensusScore: 1.0 - all models agree &quot;Paris&quot;</code></pre>
+<h4 id="code-review-with-multiple-perspectives">2. Code Review with Multiple Perspectives</h4>
+<pre class="typescript"><code>// Different models find different issues
+const result = await parallelExecution.executeParallel(
+  codeToReview,
+  {
+    enabled: true,
+    mode: &#39;all&#39;,
+    models: [&#39;claude-3-5-sonnet&#39;, &#39;deepseek-coder-v2&#39;, &#39;gpt-4o&#39;],
+    domainHints: [&#39;code&#39;, &#39;security&#39;, &#39;performance&#39;]
+  }
+);
+// Synthesis combines all found issues</code></pre>
+<h4 id="creative-writing-enhancement">3. Creative Writing Enhancement</h4>
+<pre class="typescript"><code>// Generate multiple creative variations
+const result = await parallelExecution.executeParallel(
+  &quot;Write a tagline for an AI company&quot;,
+  {
+    enabled: true,
+    mode: &#39;all&#39;,
+    models: [&#39;claude-3-5-sonnet&#39;, &#39;gpt-4o&#39;],
+    // High temperature for diversity
+  }
+);
+// Get best elements from each response</code></pre>
+<hr />
+<h2 id="think-tank-concurrent-sessions">Think Tank Concurrent Sessions</h2>
+<h3 id="session-level-parallelism">Session-Level Parallelism</h3>
+<p>Think Tank supports concurrent execution at multiple levels:</p>
+<ol type="1">
+<li><strong>Parallel Steps</strong> - Independent reasoning steps run simultaneously</li>
+<li><strong>Multi-Model Steps</strong> - Same step runs on multiple models</li>
+<li><strong>Parallel Sessions</strong> - Multiple sessions execute concurrently</li>
+</ol>
+<h3 id="implementation-1">Implementation</h3>
+<pre class="typescript"><code>export class ConcurrentSessionService {
+  // Execute independent steps in parallel
+  async executeParallelSteps(
+    sessionId: string,
+    steps: ThinkTankStep[]
+  ): Promise&lt;StepResult[]&gt; {
+    // Identify which steps can run in parallel
+    const { independent, dependent } = this.analyzeDependen(steps);
+    
+    // Run independent steps simultaneously
+    const independentResults = await Promise.all(
+      independent.map(step =&gt; this.executeStep(sessionId, step))
+    );
+    
+    // Run dependent steps sequentially
+    const dependentResults = [];
+    for (const step of dependent) {
+      dependentResults.push(await this.executeStep(sessionId, step));
+    }
+    
+    return [...independentResults, ...dependentResults];
+  }
+  
+  // Run same step on multiple models for consensus
+  async executeWithMultipleModels(
+    sessionId: string,
+    step: ThinkTankStep,
+    models: string[]
+  ): Promise&lt;ConsensusResult&gt; {
+    // Execute simultaneously on all models
+    const responses = await Promise.all(
+      models.map(model =&gt; 
+        this.executeStepWithModel(sessionId, step, model)
+      )
+    );
+    
+    // Synthesize consensus
+    return this.synthesizeConsensus(responses);
+  }
+  
+  // Parallel problem decomposition
+  async parallelDecompose(
+    sessionId: string,
+    problem: string
+  ): Promise&lt;DecompositionResult&gt; {
+    // Multiple models decompose the problem differently
+    const decompositions = await Promise.all([
+      this.decomposeWith(problem, &#39;claude-3-5-sonnet&#39;),
+      this.decomposeWith(problem, &#39;gpt-4o&#39;),
+      this.decomposeWith(problem, &#39;gemini-1.5-pro&#39;)
+    ]);
+    
+    // Merge decompositions for comprehensive coverage
+    return this.mergeDecompositions(decompositions);
+  }
+}</code></pre>
+<h3 id="session-configuration">Session Configuration</h3>
+<pre class="typescript"><code>interface ThinkTankSessionConfig {
+  sessionId: string;
+  parallelExecution: {
+    enabled: boolean;
+    maxConcurrentSteps: number;      // Default: 5
+    maxConcurrentModels: number;     // Default: 3
+    consensusThreshold: number;      // 0-1, default: 0.7
+    timeoutPerStepMs: number;        // Default: 30000
+  };
+  modelSelection: {
+    automatic: boolean;              // AGI selects models
+    preferredModels: string[];
+    domainHint: string;
+  };
+}</code></pre>
+<h3 id="database-schema-support">Database Schema Support</h3>
+<pre class="sql"><code>-- Session configuration for parallel execution
+ALTER TABLE thinktank_sessions ADD COLUMN parallel_execution_config JSONB DEFAULT &#39;{
+  &quot;enabled&quot;: true,
+  &quot;maxConcurrentSteps&quot;: 5,
+  &quot;maxConcurrentModels&quot;: 3,
+  &quot;consensusThreshold&quot;: 0.7
+}&#39;;
+
+-- Track parallel step executions
+CREATE TABLE thinktank_parallel_executions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    session_id UUID NOT NULL REFERENCES thinktank_sessions(id),
+    step_id UUID NOT NULL REFERENCES thinktank_steps(id),
+    model_id VARCHAR(100) NOT NULL,
+    started_at TIMESTAMPTZ NOT NULL,
+    completed_at TIMESTAMPTZ,
+    response TEXT,
+    tokens_used INTEGER,
+    latency_ms INTEGER,
+    included_in_consensus BOOLEAN DEFAULT true
+);</code></pre>
+<hr />
+<h2 id="performance-benefits">Performance Benefits</h2>
+<h3 id="throughput-improvement">Throughput Improvement</h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Sequential</th>
+<th>Parallel</th>
+<th>Improvement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3 models, consensus</td>
+<td>9s</td>
+<td>3.5s</td>
+<td><strong>2.6x faster</strong></td>
+</tr>
+<tr>
+<td>5-step reasoning</td>
+<td>25s</td>
+<td>8s</td>
+<td><strong>3.1x faster</strong></td>
+</tr>
+<tr>
+<td>Code review (3 perspectives)</td>
+<td>12s</td>
+<td>4.5s</td>
+<td><strong>2.7x faster</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="quality-improvement-from-consensus">Quality Improvement from Consensus</h3>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Single Model</th>
+<th>3-Model Consensus</th>
+<th>Improvement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fact verification</td>
+<td>85%</td>
+<td>99%</td>
+<td><strong>+16%</strong></td>
+</tr>
+<tr>
+<td>Code correctness</td>
+<td>78%</td>
+<td>95%</td>
+<td><strong>+22%</strong></td>
+</tr>
+<tr>
+<td>Reasoning accuracy</td>
+<td>72%</td>
+<td>94%</td>
+<td><strong>+31%</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-usage">API Usage</h2>
+<h3 id="rest-api">REST API</h3>
+<pre class="http"><code>POST /api/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {api_key}
+
+{
+  &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Explain quantum computing&quot;}],
+  &quot;parallel&quot;: {
+    &quot;enabled&quot;: true,
+    &quot;mode&quot;: &quot;all&quot;,
+    &quot;models&quot;: [&quot;claude-3-5-sonnet&quot;, &quot;gpt-4o&quot;, &quot;gemini-1.5-pro&quot;]
+  }
+}</code></pre>
+<h3 id="response">Response</h3>
+<pre class="json"><code>{
+  &quot;id&quot;: &quot;par_abc123&quot;,
+  &quot;object&quot;: &quot;parallel.completion&quot;,
+  &quot;responses&quot;: [
+    {&quot;model&quot;: &quot;claude-3-5-sonnet&quot;, &quot;content&quot;: &quot;...&quot;, &quot;latency_ms&quot;: 2100},
+    {&quot;model&quot;: &quot;gpt-4o&quot;, &quot;content&quot;: &quot;...&quot;, &quot;latency_ms&quot;: 1800},
+    {&quot;model&quot;: &quot;gemini-1.5-pro&quot;, &quot;content&quot;: &quot;...&quot;, &quot;latency_ms&quot;: 2300}
+  ],
+  &quot;synthesis&quot;: {
+    &quot;content&quot;: &quot;...&quot;,
+    &quot;consensus_score&quot;: 0.92,
+    &quot;method&quot;: &quot;weighted_merge&quot;
+  },
+  &quot;usage&quot;: {
+    &quot;total_tokens&quot;: 4521,
+    &quot;total_cost_usd&quot;: 0.0234
+  }
+}</code></pre>
+<h3 id="sdk-usage">SDK Usage</h3>
+<pre class="typescript"><code>import { RadiantClient } from &#39;@radiant/sdk&#39;;
+
+const client = new RadiantClient({ apiKey: &#39;your-key&#39; });
+
+// Parallel execution
+const result = await client.chat.completions.create({
+  messages: [{ role: &#39;user&#39;, content: &#39;Analyze this contract...&#39; }],
+  parallel: {
+    enabled: true,
+    mode: &#39;all&#39;,
+    models: [&#39;claude-3-5-sonnet&#39;, &#39;gpt-4o&#39;]
+  }
+});
+
+console.log(result.synthesis.content);
+console.log(`Consensus: ${result.synthesis.consensus_score}`);</code></pre>
+<hr />
+<h2 id="cost-considerations">Cost Considerations</h2>
+<p>Parallel execution uses multiple models, which increases costs but provides:</p>
+<table>
+<thead>
+<tr>
+<th>Trade-off</th>
+<th>Single Model</th>
+<th>Parallel (3 models)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cost</td>
+<td>$0.01</td>
+<td>$0.03</td>
+</tr>
+<tr>
+<td>Quality</td>
+<td>75%</td>
+<td>95%</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>3s</td>
+<td>3.5s</td>
+</tr>
+<tr>
+<td>Reliability</td>
+<td>99%</td>
+<td>99.99%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Cost-Effective Strategies:</strong></p>
+<ol type="1">
+<li><strong>Use parallel for critical tasks only</strong></li>
+<li><strong>Start with cheaper models, escalate if disagreement</strong></li>
+<li><strong>Use quorum mode to terminate early on agreement</strong></li>
+<li><strong>Cache consensus results for repeated queries</strong></li>
+</ol>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

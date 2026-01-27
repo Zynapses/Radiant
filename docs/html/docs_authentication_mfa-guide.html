@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mfa guide - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>mfa guide</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/authentication/mfa-guide.md</div>
+  </div>
+  
+  <h1 id="multi-factor-authentication-mfa-guide">Multi-Factor Authentication (MFA) Guide</h1>
+<blockquote>
+<p><strong>Version</strong>: 5.52.29 | <strong>Last Updated</strong>: January 25, 2026 | <strong>Audience</strong>: All Users</p>
+</blockquote>
+<p>This guide covers setting up and using Multi-Factor Authentication (MFA) in RADIANT, including TOTP authenticator apps, backup codes, and trusted devices.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#what-is-mfa">What is MFA?</a></li>
+<li><a href="#setting-up-mfa">Setting Up MFA</a></li>
+<li><a href="#using-mfa">Using MFA</a></li>
+<li><a href="#backup-codes">Backup Codes</a></li>
+<li><a href="#trusted-devices">Trusted Devices</a></li>
+<li><a href="#managing-mfa">Managing MFA</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#for-administrators">For Administrators</a></li>
+</ol>
+<hr />
+<h2 id="what-is-mfa">What is MFA?</h2>
+<p>Multi-Factor Authentication (MFA) adds an extra layer of security to your account by requiring two things to sign in:</p>
+<ol type="1">
+<li><strong>Something you know</strong>: Your password</li>
+<li><strong>Something you have</strong>: A code from your phone</li>
+</ol>
+<pre class="mermaid"><code>flowchart LR
+    A[Enter Password] --&gt; B[Enter MFA Code]
+    B --&gt; C[Access Granted]
+    
+    subgraph &quot;Two Factors&quot;
+        D[Password&lt;br/&gt;Something you know]
+        E[Phone Code&lt;br/&gt;Something you have]
+    end</code></pre>
+<p>Even if someone learns your password, they cannot access your account without also having your phone.</p>
+<h3 id="who-needs-mfa">Who Needs MFA?</h3>
+<table>
+<thead>
+<tr>
+<th>User Type</th>
+<th>MFA Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tenant Owners</strong></td>
+<td>Always required</td>
+</tr>
+<tr>
+<td><strong>Tenant Admins</strong></td>
+<td>Always required</td>
+</tr>
+<tr>
+<td><strong>Standard Users</strong></td>
+<td>Depends on organization policy</td>
+</tr>
+<tr>
+<td><strong>Platform Admins</strong></td>
+<td>Always required (cannot disable)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="setting-up-mfa">Setting Up MFA</h2>
+<h3 id="requirements">Requirements</h3>
+<p>Before you begin, you need:</p>
+<ul>
+<li>A smartphone or tablet</li>
+<li>An authenticator app installed:
+<ul>
+<li><strong>Google Authenticator</strong> (iOS/Android)</li>
+<li><strong>Microsoft Authenticator</strong> (iOS/Android)</li>
+<li><strong>1Password</strong> (iOS/Android/Desktop)</li>
+<li><strong>Authy</strong> (iOS/Android/Desktop)</li>
+<li><strong>Any TOTP-compatible app</strong></li>
+</ul></li>
+</ul>
+<h3 id="step-by-step-setup">Step-by-Step Setup</h3>
+<ol type="1">
+<li><strong>Sign in</strong> to your RADIANT account</li>
+<li>Navigate to <strong>Account Settings</strong> → <strong>Security</strong></li>
+<li>Click <strong>Enable MFA</strong> or <strong>Set Up Two-Factor Authentication</strong></li>
+</ol>
+<pre class="mermaid"><code>flowchart TD
+    A[Click Enable MFA] --&gt; B[Open Authenticator App]
+    B --&gt; C[Scan QR Code]
+    C --&gt; D[Enter 6-digit Code]
+    D --&gt; E{Code Valid?}
+    E --&gt;|Yes| F[MFA Enabled!]
+    E --&gt;|No| G[Try Again]
+    G --&gt; D
+    F --&gt; H[Save Backup Codes]</code></pre>
+<ol start="4" type="1">
+<li>You’ll see a <strong>QR code</strong> on screen</li>
+<li>Open your <strong>authenticator app</strong> on your phone</li>
+<li>Tap <strong>+</strong> or <strong>Add Account</strong></li>
+<li>Select <strong>Scan QR Code</strong></li>
+<li>Point your camera at the QR code</li>
+<li>Your authenticator app will show a <strong>6-digit code</strong></li>
+<li>Enter the code in RADIANT</li>
+<li>Click <strong>Verify and Enable</strong></li>
+</ol>
+<h3 id="manual-entry-if-qr-wont-scan">Manual Entry (If QR Won’t Scan)</h3>
+<p>If you cannot scan the QR code:</p>
+<ol type="1">
+<li>Click <strong>Can’t scan? Enter manually</strong></li>
+<li>Copy the <strong>secret key</strong> shown</li>
+<li>In your authenticator app, select <strong>Enter manually</strong> or <strong>Enter setup key</strong></li>
+<li>Enter:
+<ul>
+<li><strong>Account name</strong>: Your email or “RADIANT”</li>
+<li><strong>Secret key</strong>: Paste the key you copied</li>
+<li><strong>Time-based</strong>: Yes (TOTP)</li>
+</ul></li>
+<li>The app will start showing codes</li>
+<li>Enter the current code in RADIANT</li>
+</ol>
+<blockquote>
+<p><strong>Important</strong>: Never share your secret key with anyone!</p>
+</blockquote>
+<hr />
+<h2 id="using-mfa">Using MFA</h2>
+<h3 id="signing-in-with-mfa">Signing In with MFA</h3>
+<ol type="1">
+<li>Enter your <strong>email</strong> and <strong>password</strong></li>
+<li>Click <strong>Sign In</strong></li>
+<li>You’ll see the MFA verification screen</li>
+<li>Open your <strong>authenticator app</strong></li>
+<li>Find your RADIANT account</li>
+<li>Enter the current <strong>6-digit code</strong></li>
+<li>Click <strong>Verify</strong></li>
+</ol>
+<h3 id="mfa-code-tips">MFA Code Tips</h3>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 64%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Codes change every 30 seconds</strong></td>
+<td>Wait for a new code if the current one is about to expire</td>
+</tr>
+<tr>
+<td><strong>Codes are time-sensitive</strong></td>
+<td>Your device clock must be accurate</td>
+</tr>
+<tr>
+<td><strong>Each code works once</strong></td>
+<td>You cannot reuse a code</td>
+</tr>
+<tr>
+<td><strong>No spaces needed</strong></td>
+<td>Enter <code>123456</code> not <code>123 456</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="backup-codes">Backup Codes</h2>
+<p>Backup codes are emergency codes you can use if you lose access to your authenticator app.</p>
+<h3 id="getting-your-backup-codes">Getting Your Backup Codes</h3>
+<p>When you enable MFA, you receive <strong>10 backup codes</strong>. Each code can only be used <strong>once</strong>.</p>
+<ol type="1">
+<li>After enabling MFA, you’ll see your backup codes</li>
+<li><strong>Save them securely</strong>:
+<ul>
+<li>Download as a file</li>
+<li>Print them out</li>
+<li>Store in a password manager</li>
+</ul></li>
+<li>Click <strong>I’ve saved my codes</strong> to continue</li>
+</ol>
+<h3 id="using-a-backup-code">Using a Backup Code</h3>
+<ol type="1">
+<li>On the MFA verification screen, click <strong>Use a backup code</strong></li>
+<li>Enter one of your backup codes</li>
+<li>Click <strong>Verify</strong></li>
+<li>You’re signed in, but that code is now used</li>
+</ol>
+<h3 id="regenerating-backup-codes">Regenerating Backup Codes</h3>
+<p>If you’ve used most of your codes or lost them:</p>
+<ol type="1">
+<li>Sign in to your account</li>
+<li>Go to <strong>Account Settings</strong> → <strong>Security</strong></li>
+<li>Click <strong>Regenerate Backup Codes</strong></li>
+<li>Confirm with your current MFA code</li>
+<li>Save your new codes (old codes are invalidated)</li>
+</ol>
+<blockquote>
+<p><strong>Warning</strong>: Regenerating codes invalidates all previous backup codes!</p>
+</blockquote>
+<hr />
+<h2 id="trusted-devices">Trusted Devices</h2>
+<p>Skip MFA on devices you use regularly by marking them as trusted.</p>
+<h3 id="trusting-a-device">Trusting a Device</h3>
+<ol type="1">
+<li>After entering your MFA code, check <strong>Trust this device for 30 days</strong></li>
+<li>Click <strong>Verify</strong></li>
+<li>For the next 30 days, you won’t need MFA on this device</li>
+</ol>
+<pre class="mermaid"><code>flowchart TD
+    A[Enter MFA Code] --&gt; B{Trust Device?}
+    B --&gt;|Yes| C[Skip MFA for 30 days]
+    B --&gt;|No| D[Require MFA every time]
+    C --&gt; E[Signed In]
+    D --&gt; E</code></pre>
+<h3 id="managing-trusted-devices">Managing Trusted Devices</h3>
+<ol type="1">
+<li>Go to <strong>Account Settings</strong> → <strong>Security</strong> → <strong>Trusted Devices</strong></li>
+<li>View all your trusted devices:
+<ul>
+<li>Device name/browser</li>
+<li>Last used</li>
+<li>Trust expiration</li>
+</ul></li>
+<li>To remove trust, click <strong>Remove</strong> next to a device</li>
+</ol>
+<h3 id="trusted-device-limits">Trusted Device Limits</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Maximum trusted devices</strong></td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>Trust duration</strong></td>
+<td>30 days</td>
+</tr>
+<tr>
+<td><strong>Trust auto-expires</strong></td>
+<td>Yes, after 30 days</td>
+</tr>
+</tbody>
+</table>
+<p>If you reach the maximum, trusting a new device will remove the oldest trusted device.</p>
+<hr />
+<h2 id="managing-mfa">Managing MFA</h2>
+<h3 id="viewing-mfa-status">Viewing MFA Status</h3>
+<ol type="1">
+<li>Go to <strong>Account Settings</strong> → <strong>Security</strong></li>
+<li>The MFA section shows:
+<ul>
+<li>✅ <strong>Enabled</strong> or ❌ <strong>Disabled</strong></li>
+<li>Date MFA was enabled</li>
+<li>Number of backup codes remaining</li>
+</ul></li>
+</ol>
+<h3 id="changing-your-authenticator-app">Changing Your Authenticator App</h3>
+<p>To switch to a different authenticator app:</p>
+<ol type="1">
+<li>Go to <strong>Account Settings</strong> → <strong>Security</strong></li>
+<li>Click <strong>Change Authenticator</strong></li>
+<li>Enter your current MFA code to verify</li>
+<li>Scan the new QR code with your new app</li>
+<li>Enter a code from the new app</li>
+<li>Click <strong>Verify and Update</strong></li>
+</ol>
+<p>Your old app will stop working for RADIANT.</p>
+<h3 id="disabling-mfa">Disabling MFA</h3>
+<blockquote>
+<p><strong>Note</strong>: Admins may not be able to disable MFA due to security policies.</p>
+</blockquote>
+<ol type="1">
+<li>Go to <strong>Account Settings</strong> → <strong>Security</strong></li>
+<li>Click <strong>Disable MFA</strong></li>
+<li>Enter your current MFA code</li>
+<li>Confirm the action</li>
+<li>MFA is now disabled</li>
+</ol>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="invalid-code-error">“Invalid code” Error</h3>
+<p><strong>Possible causes:</strong> - Code has expired (codes last 30 seconds) - Device clock is incorrect - Wrong account in authenticator app</p>
+<p><strong>Solutions:</strong></p>
+<ol type="1">
+<li><strong>Wait for a new code</strong>: If the code is about to change, wait for the next one</li>
+<li><strong>Check your device time</strong>: Ensure your phone’s time is set to automatic
+<ul>
+<li><strong>iOS</strong>: Settings → General → Date &amp; Time → Set Automatically</li>
+<li><strong>Android</strong>: Settings → System → Date &amp; Time → Automatic</li>
+</ul></li>
+<li><strong>Verify the account</strong>: Make sure you’re using the RADIANT entry, not a different service</li>
+</ol>
+<h3 id="lost-access-to-authenticator-app">Lost Access to Authenticator App</h3>
+<p><strong>If you have backup codes:</strong> 1. Click <strong>Use a backup code</strong> on the MFA screen 2. Enter one of your saved codes 3. Once signed in, set up a new authenticator app</p>
+<p><strong>If you don’t have backup codes:</strong> 1. Click <strong>Can’t access your code?</strong> on the MFA screen 2. Follow the account recovery process: - Verify your email - Answer security questions (if set up) - Wait for admin approval (if required) 3. Contact your organization’s admin if self-recovery fails</p>
+<h3 id="new-phone">New Phone</h3>
+<p>Got a new phone? Here’s how to transfer your MFA:</p>
+<p><strong>Option 1: Before wiping old phone</strong> 1. Sign in on a computer 2. Change your authenticator (see “Changing Your Authenticator App”) 3. Set up the new app on your new phone</p>
+<p><strong>Option 2: After wiping old phone</strong> 1. Use a backup code to sign in 2. Set up MFA with your new phone 3. Save your new backup codes</p>
+<p><strong>Option 3: Using Authy or 1Password</strong> These apps can sync across devices, so your codes transfer automatically.</p>
+<h3 id="clock-sync-issues">Clock Sync Issues</h3>
+<p>TOTP codes depend on accurate time. If codes consistently fail:</p>
+<ol type="1">
+<li>Enable automatic time on your device</li>
+<li>If already enabled, toggle it off and on</li>
+<li>Restart your authenticator app</li>
+<li>Try again</li>
+</ol>
+<hr />
+<h2 id="for-administrators">For Administrators</h2>
+<h3 id="mfa-enforcement">MFA Enforcement</h3>
+<p>See the <a href="./tenant-admin-guide.md#mfa-policies">Tenant Admin Guide</a> for configuring MFA policies.</p>
+<h3 id="resetting-user-mfa">Resetting User MFA</h3>
+<p>If a user is locked out:</p>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Users</strong></li>
+<li>Find the user</li>
+<li>Click <strong>⋮</strong> → <strong>Reset MFA</strong></li>
+<li>Confirm the action</li>
+<li>The user will need to set up MFA again</li>
+</ol>
+<h3 id="mfa-reports">MFA Reports</h3>
+<p>View MFA adoption in your organization:</p>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Security</strong> → <strong>MFA Report</strong></li>
+<li>See:
+<ul>
+<li>Users with MFA enabled</li>
+<li>Users without MFA</li>
+<li>MFA methods in use</li>
+<li>Recent MFA failures</li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="security-best-practices">Security Best Practices</h2>
+<table>
+<colgroup>
+<col style="width: 66%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Practice</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Use a reputable authenticator app</strong></td>
+<td>Avoid apps that backup codes to insecure locations</td>
+</tr>
+<tr>
+<td><strong>Save backup codes offline</strong></td>
+<td>Don’t store them in email or cloud notes</td>
+</tr>
+<tr>
+<td><strong>Don’t share codes</strong></td>
+<td>Codes are for your use only</td>
+</tr>
+<tr>
+<td><strong>Review trusted devices regularly</strong></td>
+<td>Remove devices you no longer use</td>
+</tr>
+<tr>
+<td><strong>Enable biometric lock on your authenticator</strong></td>
+<td>Adds another layer of protection</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./overview.md">Authentication Overview</a></li>
+<li><a href="./user-guide.md">User Guide</a></li>
+<li><a href="./tenant-admin-guide.md">Tenant Admin Guide</a></li>
+<li><a href="./troubleshooting.md">Troubleshooting</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

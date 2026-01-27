@@ -3,7 +3,12 @@ import * as rds from 'aws-cdk-lib/aws-rds';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as kms from 'aws-cdk-lib/aws-kms';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as elasticache from 'aws-cdk-lib/aws-elasticache';
 import { Construct } from 'constructs';
+import { DatabaseScalingConstruct } from '../constructs/database-scaling.construct';
+import { AsyncWriteConstruct } from '../constructs/async-write.construct';
+import { RedisCacheConstruct } from '../constructs/redis-cache.construct';
 import type { TierConfig, Environment } from '@radiant/shared';
 
 export interface DataStackProps extends cdk.StackProps {
@@ -21,6 +26,14 @@ export class DataStack extends cdk.Stack {
   public readonly usageTable: dynamodb.Table;
   public readonly sessionsTable: dynamodb.Table;
   public readonly cacheTable: dynamodb.Table;
+  
+  // PostgreSQL scaling constructs
+  public readonly databaseScaling: DatabaseScalingConstruct | undefined;
+  public readonly asyncWrite: AsyncWriteConstruct | undefined;
+  public readonly redisCache: RedisCacheConstruct | undefined;
+  public readonly modelResultsQueue: sqs.Queue | undefined;
+  public readonly rdsProxy: rds.DatabaseProxy | undefined;
+  public readonly redisCluster: elasticache.CfnReplicationGroup | undefined;
 
   constructor(scope: Construct, id: string, props: DataStackProps) {
     super(scope, id, props);
@@ -116,5 +129,69 @@ export class DataStack extends cdk.Stack {
       description: 'Aurora secret ARN',
       exportName: `${appId}-${environment}-secret-arn`,
     });
+
+    // PostgreSQL Scaling Infrastructure (Tier 2+)
+    // Implements OpenAI-style scaling patterns for parallel AI model execution
+    if (tier >= 2) {
+      // RDS Proxy for connection pooling and Lambda cold-start optimization
+      this.databaseScaling = new DatabaseScalingConstruct(this, 'DatabaseScaling', {
+        cluster: this.cluster,
+        vpc,
+        databaseSecurityGroup,
+        tier,
+        environment,
+        appId,
+      });
+      this.rdsProxy = this.databaseScaling.proxy;
+
+      // Redis Cache for hot-path operations and read-after-write consistency
+      this.redisCache = new RedisCacheConstruct(this, 'RedisCache', {
+        vpc,
+        tier,
+        environment,
+        appId,
+        allowedSecurityGroups: [databaseSecurityGroup],
+      });
+      this.redisCluster = this.redisCache.cluster;
+
+      // Async Write Queue for batch processing AI model results
+      this.asyncWrite = new AsyncWriteConstruct(this, 'AsyncWrite', {
+        vpc,
+        tier,
+        environment,
+        appId,
+        encryptionKey,
+        databaseSecurityGroup,
+        rdsProxyEndpoint: this.databaseScaling.proxy.endpoint,
+        databaseSecretArn: this.cluster.secret?.secretArn || '',
+        redisEndpoint: this.redisCache.cluster.attrConfigurationEndPointAddress,
+      });
+      this.modelResultsQueue = this.asyncWrite.modelResultsQueue;
+
+      // Outputs for scaling infrastructure
+      new cdk.CfnOutput(this, 'RdsProxyEndpoint', {
+        value: this.databaseScaling.proxy.endpoint,
+        description: 'RDS Proxy endpoint for connection pooling',
+        exportName: `${appId}-${environment}-rds-proxy-endpoint`,
+      });
+
+      new cdk.CfnOutput(this, 'RedisEndpoint', {
+        value: this.redisCache.cluster.attrConfigurationEndPointAddress,
+        description: 'Redis cluster endpoint for caching',
+        exportName: `${appId}-${environment}-redis-endpoint`,
+      });
+
+      new cdk.CfnOutput(this, 'ModelResultsQueueUrl', {
+        value: this.asyncWrite.modelResultsQueue.queueUrl,
+        description: 'SQS queue URL for async model result writes',
+        exportName: `${appId}-${environment}-model-results-queue-url`,
+      });
+
+      new cdk.CfnOutput(this, 'ModelResultsQueueArn', {
+        value: this.asyncWrite.modelResultsQueue.queueArn,
+        description: 'SQS queue ARN for async model result writes',
+        exportName: `${appId}-${environment}-model-results-queue-arn`,
+      });
+    }
   }
 }

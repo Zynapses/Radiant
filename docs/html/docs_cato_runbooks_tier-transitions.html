@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tier transitions - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>tier transitions</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/runbooks/tier-transitions.md</div>
+  </div>
+  
+  <h1 id="cato-infrastructure-tier-transitions-runbook">Cato Infrastructure Tier Transitions Runbook</h1>
+<h2 id="overview">Overview</h2>
+<p>This runbook covers procedures for managing infrastructure tier transitions between DEV, STAGING, and PRODUCTION tiers.</p>
+<hr />
+<h2 id="tier-overview">1. Tier Overview</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 22%" />
+<col style="width: 33%" />
+<col style="width: 19%" />
+<col style="width: 15%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Monthly Cost</th>
+<th>SageMaker Instances</th>
+<th>OpenSearch</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DEV</td>
+<td>~$350</td>
+<td>0-1 (scale-to-zero)</td>
+<td>t3.small (provisioned)</td>
+<td>Development, testing</td>
+</tr>
+<tr>
+<td>STAGING</td>
+<td>~$35K</td>
+<td>2-20</td>
+<td>r6g.large (provisioned)</td>
+<td>Load testing, pre-prod</td>
+</tr>
+<tr>
+<td>PRODUCTION</td>
+<td>~$750K</td>
+<td>50-300</td>
+<td>Serverless (50-500 OCUs)</td>
+<td>10MM+ users</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="changing-tiers-via-admin-ui">2. Changing Tiers via Admin UI</h2>
+<h3 id="step-by-step">Step-by-Step</h3>
+<ol type="1">
+<li>Navigate to <strong>System → Infrastructure Tier</strong> in the admin dashboard</li>
+<li>Review current tier status and costs</li>
+<li>Enter a reason for the change (minimum 10 characters)</li>
+<li>Click the target tier card</li>
+<li>If PRODUCTION tier, confirm the cost warning</li>
+<li>Wait for transition to complete (5-15 minutes)</li>
+</ol>
+<h3 id="transition-times">Transition Times</h3>
+<table>
+<thead>
+<tr>
+<th>Direction</th>
+<th>Estimated Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale Up</td>
+<td>10-15 minutes</td>
+</tr>
+<tr>
+<td>Scale Down</td>
+<td>5-10 minutes</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="changing-tiers-via-api">3. Changing Tiers via API</h2>
+<h3 id="request-tier-change">Request Tier Change</h3>
+<pre class="bash"><code>curl -X POST https://api.example.com/api/admin/infrastructure/tier/change \
+  -H &quot;Authorization: Bearer $ADMIN_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#39;{
+    &quot;targetTier&quot;: &quot;STAGING&quot;,
+    &quot;reason&quot;: &quot;Load testing for Q1 release&quot;
+  }&#39;</code></pre>
+<h3 id="response-codes">Response Codes</h3>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>INITIATED</td>
+<td>Transition started</td>
+</tr>
+<tr>
+<td>200</td>
+<td>REQUIRES_CONFIRMATION</td>
+<td>Call confirm endpoint</td>
+</tr>
+<tr>
+<td>400</td>
+<td>REJECTED</td>
+<td>Check errors in response</td>
+</tr>
+</tbody>
+</table>
+<h3 id="confirm-tier-change-for-production">Confirm Tier Change (for PRODUCTION)</h3>
+<pre class="bash"><code>curl -X POST https://api.example.com/api/admin/infrastructure/tier/confirm \
+  -H &quot;Authorization: Bearer $ADMIN_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#39;{
+    &quot;confirmationToken&quot;: &quot;&lt;token from previous response&gt;&quot;
+  }&#39;</code></pre>
+<hr />
+<h2 id="bypassing-cooldown-emergency-only">4. Bypassing Cooldown (Emergency Only)</h2>
+<p>A 24-hour cooldown period is enforced between tier changes. Super admins can bypass this for emergencies.</p>
+<h3 id="requirements">Requirements</h3>
+<ul>
+<li>Super admin role</li>
+<li>Valid emergency reason</li>
+</ul>
+<h3 id="command">Command</h3>
+<pre class="bash"><code>curl -X POST https://api.example.com/api/admin/infrastructure/tier/bypass-cooldown \
+  -H &quot;Authorization: Bearer $SUPER_ADMIN_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#39;{
+    &quot;targetTier&quot;: &quot;PRODUCTION&quot;,
+    &quot;reason&quot;: &quot;[EMERGENCY] Traffic spike from viral event&quot;
+  }&#39;</code></pre>
+<hr />
+<h2 id="monitoring-transition-progress">5. Monitoring Transition Progress</h2>
+<h3 id="via-admin-ui">Via Admin UI</h3>
+<p>The Infrastructure Tier page shows: - Progress bar during transition - Current step in workflow - Estimated time remaining</p>
+<h3 id="via-api">Via API</h3>
+<pre class="bash"><code>curl https://api.example.com/api/admin/infrastructure/tier/transition-status \
+  -H &quot;Authorization: Bearer $ADMIN_TOKEN&quot;</code></pre>
+<h3 id="via-step-functions-console">Via Step Functions Console</h3>
+<ol type="1">
+<li>Go to AWS Step Functions in the console</li>
+<li>Find state machine: <code>cato-tier-transition-{environment}</code></li>
+<li>View execution details and current step</li>
+</ol>
+<hr />
+<h2 id="troubleshooting-failed-transitions">6. Troubleshooting Failed Transitions</h2>
+<h3 id="symptoms">Symptoms</h3>
+<ul>
+<li>Transition stuck in “SCALING_UP” or “SCALING_DOWN”</li>
+<li>Error notification received</li>
+<li>Resources partially provisioned</li>
+</ul>
+<h3 id="diagnosis">Diagnosis</h3>
+<ol type="1">
+<li><p><strong>Check Step Functions execution</strong></p>
+<pre class="bash"><code>aws stepfunctions describe-execution \
+  --execution-arn &lt;arn from tier status&gt;</code></pre></li>
+<li><p><strong>Check Lambda logs</strong></p>
+<pre class="bash"><code>aws logs filter-log-events \
+  --log-group-name /aws/lambda/cato-provision-sagemaker-dev \
+  --start-time $(date -d &#39;1 hour ago&#39; +%s000)</code></pre></li>
+<li><p><strong>Check resource status</strong></p>
+<pre class="bash"><code># SageMaker
+aws sagemaker describe-endpoint --endpoint-name cato-shadow-self-&lt;prefix&gt;
+
+# OpenSearch
+aws opensearch describe-domain --domain-name cato-vectors-&lt;prefix&gt;
+
+# ElastiCache
+aws elasticache describe-replication-groups --replication-group-id cato-cache-&lt;prefix&gt;</code></pre></li>
+</ol>
+<h3 id="resolution">Resolution</h3>
+<h4 id="option-1-retry-transition">Option 1: Retry Transition</h4>
+<p>Wait for automatic rollback, then retry via admin UI.</p>
+<h4 id="option-2-manual-reset">Option 2: Manual Reset</h4>
+<pre class="sql"><code>-- Reset tier state in database
+UPDATE cato_infrastructure_tier
+SET 
+  transition_status = &#39;STABLE&#39;,
+  target_tier = NULL,
+  transition_execution_arn = NULL
+WHERE tenant_id = &#39;&lt;tenant-id&gt;&#39;;</code></pre>
+<h4 id="option-3-manual-resource-cleanup">Option 3: Manual Resource Cleanup</h4>
+<p>If resources are partially provisioned:</p>
+<pre class="bash"><code># Delete stuck SageMaker endpoint
+aws sagemaker delete-endpoint --endpoint-name cato-shadow-self-&lt;prefix&gt;
+
+# Delete stuck ElastiCache cluster
+aws elasticache delete-replication-group \
+  --replication-group-id cato-cache-&lt;prefix&gt; \
+  --final-snapshot-identifier cato-cache-manual-backup</code></pre>
+<hr />
+<h2 id="rollback-procedures">7. Rollback Procedures</h2>
+<h3 id="automatic-rollback">Automatic Rollback</h3>
+<p>The Step Functions workflow automatically rolls back on provisioning failure: 1. Detects error during provisioning 2. Calls <code>rollback-provisioning</code> Lambda 3. Deletes partially created resources 4. Updates tier state to FAILED 5. Sends alert notification</p>
+<h3 id="manual-rollback">Manual Rollback</h3>
+<p>If automatic rollback fails:</p>
+<ol type="1">
+<li><p><strong>Identify partially created resources</strong></p>
+<pre class="bash"><code>aws resourcegroupstaggingapi get-resources \
+  --tag-filters Key=TenantId,Values=&lt;tenant-id&gt;</code></pre></li>
+<li><p><strong>Delete resources in reverse order</strong></p>
+<ul>
+<li>Kinesis streams</li>
+<li>Neptune instances → clusters</li>
+<li>ElastiCache clusters</li>
+<li>OpenSearch domains/collections</li>
+<li>SageMaker endpoints → configs</li>
+</ul></li>
+<li><p><strong>Reset database state</strong></p>
+<pre class="sql"><code>UPDATE cato_infrastructure_tier
+SET 
+  current_tier = &#39;&lt;previous-tier&gt;&#39;,
+  transition_status = &#39;STABLE&#39;,
+  target_tier = NULL
+WHERE tenant_id = &#39;&lt;tenant-id&gt;&#39;;</code></pre></li>
+</ol>
+<hr />
+<h2 id="editing-tier-configurations">8. Editing Tier Configurations</h2>
+<p>All tier configurations are admin-editable via the UI.</p>
+<h3 id="via-admin-ui-1">Via Admin UI</h3>
+<ol type="1">
+<li>Go to <strong>System → Infrastructure Tier</strong></li>
+<li>Click “Configure Tiers” tab</li>
+<li>Click “Edit Configuration” on any tier</li>
+<li>Modify settings</li>
+<li>Click “Save Configuration”</li>
+</ol>
+<h3 id="via-api-1">Via API</h3>
+<pre class="bash"><code>curl -X PUT https://api.example.com/api/admin/infrastructure/tier/configs/DEV \
+  -H &quot;Authorization: Bearer $ADMIN_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#39;{
+    &quot;sagemakerShadowSelfMinInstances&quot;: 1,
+    &quot;sagemakerShadowSelfMaxInstances&quot;: 2,
+    &quot;budgetMonthlyCuriosityLimit&quot;: 200
+  }&#39;</code></pre>
+<h3 id="editable-fields">Editable Fields</h3>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 39%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+<th>Valid Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sagemakerShadowSelfInstanceType</code></td>
+<td>EC2 instance type</td>
+<td>ml.g5.*</td>
+</tr>
+<tr>
+<td><code>sagemakerShadowSelfMinInstances</code></td>
+<td>Minimum instances</td>
+<td>0-500</td>
+</tr>
+<tr>
+<td><code>sagemakerShadowSelfMaxInstances</code></td>
+<td>Maximum instances</td>
+<td>1-500</td>
+</tr>
+<tr>
+<td><code>sagemakerShadowSelfScaleToZero</code></td>
+<td>Enable scale-to-zero</td>
+<td>true/false</td>
+</tr>
+<tr>
+<td><code>opensearchInstanceType</code></td>
+<td>OpenSearch instance</td>
+<td>t3/r6g.*</td>
+</tr>
+<tr>
+<td><code>opensearchInstanceCount</code></td>
+<td>Number of nodes</td>
+<td>1-10</td>
+</tr>
+<tr>
+<td><code>budgetMonthlyCuriosityLimit</code></td>
+<td>Monthly budget (<span class="math inline">$) | 0-1000000 |
+| `budgetDailyExplorationCap` | Daily budget ($</span>)</td>
+<td>0-10000</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cost-verification">9. Cost Verification</h2>
+<p>After tier transition, verify costs:</p>
+<h3 id="check-estimated-cost">Check Estimated Cost</h3>
+<pre class="bash"><code>curl https://api.example.com/api/admin/infrastructure/tier \
+  -H &quot;Authorization: Bearer $ADMIN_TOKEN&quot; | jq &#39;.estimatedMonthlyCost&#39;</code></pre>
+<h3 id="check-actual-aws-costs">Check Actual AWS Costs</h3>
+<pre class="bash"><code>aws ce get-cost-and-usage \
+  --time-period Start=$(date -d &#39;-7 days&#39; +%Y-%m-%d),End=$(date +%Y-%m-%d) \
+  --granularity DAILY \
+  --metrics &quot;BlendedCost&quot; \
+  --filter &#39;{
+    &quot;Tags&quot;: {
+      &quot;Key&quot;: &quot;Project&quot;,
+      &quot;Values&quot;: [&quot;RADIANT&quot;]
+    }
+  }&#39;</code></pre>
+<hr />
+<h2 id="emergency-procedures">10. Emergency Procedures</h2>
+<h3 id="runaway-costs">Runaway Costs</h3>
+<p>If costs are escalating unexpectedly:</p>
+<ol type="1">
+<li><p><strong>Immediate</strong>: Scale to DEV tier</p>
+<pre class="bash"><code>curl -X POST .../tier/bypass-cooldown \
+  -d &#39;{&quot;targetTier&quot;: &quot;DEV&quot;, &quot;reason&quot;: &quot;[EMERGENCY] Cost runaway&quot;}&#39;</code></pre></li>
+<li><p><strong>Verify</strong>: Check for orphaned resources</p>
+<pre class="bash"><code>aws ce get-cost-and-usage-with-resources \
+  --time-period Start=$(date +%Y-%m-%d),End=$(date -d &#39;+1 day&#39; +%Y-%m-%d) \
+  --granularity DAILY \
+  --metrics &quot;BlendedCost&quot; \
+  --group-by Type=DIMENSION,Key=RESOURCE_ID</code></pre></li>
+<li><p><strong>Cleanup</strong>: Delete any orphaned resources</p></li>
+</ol>
+<h3 id="production-traffic-spike">Production Traffic Spike</h3>
+<p>If traffic exceeds capacity:</p>
+<ol type="1">
+<li><strong>Immediate</strong>: Scale to PRODUCTION tier (bypass cooldown if needed)</li>
+<li><strong>Monitor</strong>: Watch SageMaker scaling metrics</li>
+<li><strong>Follow-up</strong>: Adjust tier configuration for higher max instances</li>
+</ol>
+<hr />
+<h2 id="audit-and-compliance">11. Audit and Compliance</h2>
+<h3 id="view-change-history">View Change History</h3>
+<pre class="bash"><code>curl https://api.example.com/api/admin/infrastructure/tier/change-history?limit=50 \
+  -H &quot;Authorization: Bearer $ADMIN_TOKEN&quot;</code></pre>
+<h3 id="database-audit-table">Database Audit Table</h3>
+<pre class="sql"><code>SELECT 
+  from_tier,
+  to_tier,
+  direction,
+  status,
+  changed_by,
+  reason,
+  started_at,
+  completed_at,
+  duration_seconds
+FROM cato_tier_change_log
+WHERE tenant_id = &#39;&lt;tenant-id&gt;&#39;
+ORDER BY created_at DESC
+LIMIT 20;</code></pre>
+<hr />
+<h2 id="contacts">12. Contacts</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Contact</th>
+<th>Escalation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>On-call Engineer</td>
+<td>PagerDuty</td>
+<td>Tier changes failed</td>
+</tr>
+<tr>
+<td>Platform Team</td>
+<td>#platform-support</td>
+<td>Configuration questions</td>
+</tr>
+<tr>
+<td>Finance</td>
+<td>finance@example.com</td>
+<td>Cost approvals for PRODUCTION</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="appendix-step-functions-workflow-states">Appendix: Step Functions Workflow States</h2>
+<pre><code>ValidateTransition
+    │
+    ├── SCALING_UP ──► ProvisionResources (parallel)
+    │                   ├── ProvisionSageMaker
+    │                   ├── ProvisionOpenSearch
+    │                   ├── ProvisionElastiCache
+    │                   ├── ProvisionNeptune
+    │                   └── ProvisionKinesis
+    │                          │
+    │                   WaitForProvisioning
+    │                          │
+    │                   VerifyProvisioning (with retry)
+    │                          │
+    │                   UpdateAppConfig
+    │                          │
+    │                   TransitionComplete
+    │
+    └── SCALING_DOWN ──► DrainConnections
+                              │
+                         WaitForDrain
+                              │
+                         UpdateAppConfig
+                              │
+                         CleanupResources (parallel)
+                         ├── CleanupSageMaker
+                         ├── CleanupOpenSearch
+                         ├── CleanupElastiCache
+                         └── CleanupNeptune
+                              │
+                         TransitionComplete</code></pre>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

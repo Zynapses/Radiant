@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWIFT SOURCE CODE PART3 - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SWIFT SOURCE CODE PART3</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/SWIFT-SOURCE-CODE-PART3.md</div>
+  </div>
+  
+  <h1 id="radiant-swift-deployer---actual-source-code---part-3">RADIANT Swift Deployer - ACTUAL SOURCE CODE - Part 3</h1>
+<h2 id="file-serviceslocalstoragemanager.swift">File: Services/LocalStorageManager.swift</h2>
+<p>Full SQLCipher-encrypted local storage with backup/restore functionality. - Schema migrations - Deployment records CRUD - Settings storage - Backup rotation (keeps last 5) - Auto-restore from backup chain - Encryption key hierarchy (env var → 1Password → local secure file)</p>
+<h2 id="file-servicestimeoutservice.swift">File: Services/TimeoutService.swift</h2>
+<p>Operation timeout management with SSM Parameter Store sync. - Default timeouts for CDK, migrations, health checks - 60-second SSM polling interval - Retry with exponential backoff - Cancellation token support - <code>execute()</code> wraps operations with timeout/retry</p>
+<h2 id="file-servicesauditlogger.swift">File: Services/AuditLogger.swift</h2>
+<p>Compliance audit logging for HIPAA/SOC2. - 75+ audit action types covering credentials, deployments, security - JSON-line log file persistence - Entry rotation (10,000 max) - Export to JSON for compliance reporting</p>
+<h2 id="file-servicesonepasswordservice.swift">File: Services/OnePasswordService.swift</h2>
+<p>1Password CLI integration for credential storage. - Service Account token in Keychain - AWS credential CRUD in RADIANT vault - Provider API key storage (Anthropic, Groq) - STS credential validation - Full CLI path detection (Homebrew, system)</p>
+<h2 id="file-modelsinstallationparameters.swift">File: Models/InstallationParameters.swift</h2>
+<p>Deployment parameter definitions. - 5 tier levels (SEED→ENTERPRISE) with defaults - AWS region enumeration - Installation vs Instance parameters - Parameter change tracking - Deployment snapshots with database rollback support</p>
+<h2 id="file-modelsdomainconfiguration.swift">File: Models/DomainConfiguration.swift</h2>
+<p>Domain/DNS/Email configuration models. - Domain verification with hosted zones - DNS record types (A, CNAME, MX, TXT) - SES email configuration (DKIM, SPF) - ACM certificate validation - Domain setup summary</p>
+<h2 id="file-modelsawsmonitoringmodels.swift-817-lines">File: Models/AWSMonitoringModels.swift (817 lines)</h2>
+<p>Comprehensive AWS monitoring data structures: - Lambda, Aurora, ECS metrics - X-Ray trace summaries and service graphs - Cost Explorer with anomaly detection - Free tier usage tracking - Notification targets and thresholds - Service health status aggregation</p>
+<h2 id="file-componentsmacoscomponents.swift-744-lines">File: Components/MacOSComponents.swift (744 lines)</h2>
+<p>SwiftUI component library: - Design tokens (RadiantSpacing, RadiantRadius) - GlassSurface modifier for Liquid Glass - GlassToolbar, ToolbarActionButton - SidebarSection, SidebarRow - DataListRow, InspectorPanel - LoadingStateView, EmptyState, ErrorStateView - ToastBanner, StandardContextMenu</p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

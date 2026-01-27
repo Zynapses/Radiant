@@ -4,6 +4,9 @@ import React, { Component, type ReactNode, type ErrorInfo } from 'react';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { createLogger } from '@/lib/logging';
+
+const logger = createLogger('ErrorBoundary');
 
 /**
  * Comprehensive Error Boundary System
@@ -66,13 +69,10 @@ class BaseErrorBoundary extends Component<BaseErrorBoundaryProps, BaseErrorBound
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({ errorInfo });
     
-    // Report to error tracking in production
-    if (process.env.NODE_ENV === 'production') {
-      // Could integrate with Sentry, DataDog, etc.
-      console.error('[ErrorBoundary] Caught error:', error.message);
-    } else {
-      console.error('[ErrorBoundary] Caught error:', error, errorInfo);
-    }
+    // Report to error tracking
+    logger.error('Caught error in boundary', error, {
+      componentStack: errorInfo.componentStack,
+    });
     
     this.props.onError?.(error, errorInfo);
   }

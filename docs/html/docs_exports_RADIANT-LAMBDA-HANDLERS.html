@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIANT LAMBDA HANDLERS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RADIANT LAMBDA HANDLERS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/RADIANT-LAMBDA-HANDLERS.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.18.0---lambda-handlers-export">RADIANT v4.18.0 - Lambda Handlers Export</h1>
+<p><strong>Component</strong>: AWS Lambda Functions <strong>Language</strong>: TypeScript (Node.js 20.x), Python 3.11 <strong>Files</strong>: 100+ Lambda handlers across 48 directories <strong>Runtime</strong>: AWS Lambda</p>
+<hr />
+<h2 id="architecture-narrative">Architecture Narrative</h2>
+<p>RADIANT’s backend logic is implemented as <strong>AWS Lambda functions</strong> organized into logical domains. Each Lambda handles specific functionality and communicates through API Gateway, SQS queues, or direct invocation.</p>
+<h3 id="lambda-organization">Lambda Organization</h3>
+<pre><code>lambda/
+├── admin/           # 48 admin API handlers
+├── api/             # 4 public API handlers
+├── brain/           # 3 AGI Brain handlers
+├── thinktank/       # 12 Think Tank handlers
+├── consciousness/   # 9 consciousness engine handlers
+├── billing/         # 3 billing handlers
+├── security/        # 3 security handlers
+├── scheduled/       # 3 scheduled task handlers
+├── collaboration/   # 4 real-time collaboration handlers
+├── thermal/         # 5 thermal management handlers
+├── tier-transition/ # 20 tier upgrade handlers
+├── shared/          # 344 shared utilities/services
+└── ...              # 20+ additional domains</code></pre>
+<h3 id="handler-patterns">Handler Patterns</h3>
+<ol type="1">
+<li><strong>API Gateway Integration</strong> - REST/WebSocket event handling</li>
+<li><strong>SQS Event Source</strong> - Queue-triggered processing</li>
+<li><strong>EventBridge Scheduled</strong> - Cron-based tasks</li>
+<li><strong>Direct Invocation</strong> - Lambda-to-Lambda calls</li>
+</ol>
+<hr />
+<h2 id="key-lambda-implementations">Key Lambda Implementations</h2>
+<h3 id="braininference.ts">1. brain/inference.ts</h3>
+<p><strong>Purpose</strong>: Main entry point for AGI Brain inference requests. Orchestrates Ghost Vector loading, SOFAI routing, context assembly, and LLM calls.</p>
+<pre class="typescript"><code>/**
+ * RADIANT v6.0.4 - Brain Inference Lambda
+ * Main entry point for AGI Brain inference requests
+ * 
+ * Orchestrates:
+ * - Ghost Vector loading/saving
+ * - SOFAI routing
+ * - Context assembly (Compliance Sandwich)
+ * - Flash fact detection
+ * - Async re-anchoring
+ */
+
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from &#39;aws-lambda&#39;;
+import { v4 as uuidv4 } from &#39;uuid&#39;;
+import Redis from &#39;ioredis&#39;;
+import { enhancedLogger as logger } from &#39;../shared/logging/enhanced-logger&#39;;
+import { executeStatement } from &#39;../shared/db/client&#39;;
+import { brainConfigService } from &#39;../shared/services/brain-config.service&#39;;
+import { ghostManagerService } from &#39;../shared/services/ghost-manager.service&#39;;
+import { flashBufferService } from &#39;../shared/services/flash-buffer.service&#39;;
+import { sofaiRouterService } from &#39;../shared/services/sofai-router.service&#39;;
+import { contextAssemblerService } from &#39;../shared/services/context-assembler.service&#39;;
+import { oversightService } from &#39;../shared/services/oversight.service&#39;;
+import {
+  BrainInferenceRequest,
+  BrainInferenceResponse,
+  SystemLevel,
+  ConversationMessage,
+} from &#39;@radiant/shared&#39;;
+import { embeddingService } from &#39;../shared/services/embedding.service&#39;;
+import { ecdVerificationService } from &#39;../shared/services/ecd-verification.service&#39;;
+
+let redisClient: Redis | null = null;
+let servicesInitialized = false;
+
+async function initializeServices(): Promise&lt;void&gt; {
+  if (servicesInitialized) return;
+
+  const redisUrl = process.env.REDIS_URL || process.env.REDIS_ENDPOINT;
+  if (redisUrl &amp;&amp; !redisClient) {
+    try {
+      redisClient = new Redis(redisUrl);
+      redisClient.on(&#39;error&#39;, (err) =&gt; {
+        logger.error(&#39;Redis connection error&#39;, { error: String(err) });
+      });
+
+      // Initialize services with Redis client
+      const redisAdapter = {
+        get: async (key: string) =&gt; redisClient?.get(key) ?? null,
+        set: async (key: string, value: string, options?: { EX?: number }) =&gt; {
+          if (options?.EX) {
+            await redisClient?.setex(key, options.EX, value);
+          } else {
+            await redisClient?.set(key, value);
+          }
+        },
+        lpush: async (key: string, ...values: string[]) =&gt; redisClient?.lpush(key, ...values) ?? 0,
+        lrange: async (key: string, start: number, stop: number) =&gt; redisClient?.lrange(key, start, stop) ?? [],
+        ltrim: async (key: string, start: number, stop: number) =&gt; { await redisClient?.ltrim(key, start, stop); },
+        expire: async (key: string, seconds: number) =&gt; { await redisClient?.expire(key, seconds); },
+        del: async (key: string) =&gt; { await redisClient?.del(key); },
+      };
+
+      flashBufferService.initialize(redisAdapter);
+      ghostManagerService.initialize(redisAdapter);
+      logger.info(&#39;Brain services initialized with Redis&#39;);
+    } catch (err) {
+      logger.warn(&#39;Redis unavailable, services running without cache&#39;, { error: String(err) });
+    }
+  }
+
+  servicesInitialized = true;
+}
+
+export async function handler(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  const startTime = Date.now();
+  const requestId = uuidv4();
+
+  await initializeServices();
+
+  try {
+    if (!event.body) {
+      return error(400, &#39;Request body is required&#39;);
+    }
+
+    const request: BrainInferenceRequest = JSON.parse(event.body);
+    const { userId, tenantId, prompt, conversationHistory, domain, forceSystemLevel, options } = request;
+
+    if (!userId || !tenantId || !prompt) {
+      return error(400, &#39;userId, tenantId, and prompt are required&#39;);
+    }
+
+    logger.info(&#39;Brain inference started&#39;, { requestId, userId, tenantId, promptLength: prompt.length });
+
+    // Set tenant context for RLS
+    await executeStatement(`SELECT set_config(&#39;app.current_tenant_id&#39;, $1, true)`, [
+      { name: &#39;tenantId&#39;, value: { stringValue: tenantId } },
+    ]);
+
+    // Step 1: Load Ghost Vector
+    let ghostVector: Float32Array | null = null;
+    let ghostUpdated = false;
+
+    if (options?.includeGhost !== false) {
+      const ghostResult = await ghostManagerService.loadGhost(userId, tenantId);
+      if (ghostResult.found &amp;&amp; ghostResult.versionMatch) {
+        ghostVector = ghostResult.vector;
+      }
+    }
+
+    // Step 2: SOFAI Routing
+    const routingDecision = await sofaiRouterService.route({
+      prompt,
+      userId,
+      tenantId,
+      domain,
+      forceLevel: forceSystemLevel,
+    });
+
+    // Step 3: Assemble Context (Compliance Sandwich)
+    const assembledContext = await contextAssemblerService.assemble({
+      userId,
+      tenantId,
+      prompt,
+      conversationHistory: conversationHistory as ConversationMessage[],
+      ghostVector,
+      domain: domain || sofaiRouterService.detectDomain(prompt),
+    });
+
+    // Step 4: Call LLM with ECD Verification (Truth Engine™)
+    const verificationResult = await ecdVerificationService.executeWithVerification({
+      userId,
+      tenantId,
+      requestId,
+      prompt,
+      sourceContext: assembledContext.userContext,
+      flashFacts: assembledContext.flashFacts.map(f =&gt; f.fact),
+      retrievedDocs: [],
+      domain: domain || sofaiRouterService.detectDomain(prompt),
+      generateResponse: async (refinedPrompt: string) =&gt; {
+        const result = await callLLM(
+          contextAssemblerService.formatForModel({
+            ...assembledContext,
+            userContext: refinedPrompt,
+          }),
+          routingDecision.level,
+          options
+        );
+        return result.response;
+      },
+    });
+
+    // Step 5: Detect Flash Facts
+    const flashFactsDetected = flashBufferService.detectFlashFacts(prompt);
+    if (flashFactsDetected.detected) {
+      for (const fact of flashFactsDetected.facts) {
+        await flashBufferService.storeFact(userId, tenantId, fact);
+      }
+    }
+
+    // Step 6: Check for Re-anchoring (async)
+    if (options?.includeGhost !== false) {
+      const needsReanchor = await ghostManagerService.checkReAnchorNeeded(userId, tenantId);
+      if (needsReanchor) {
+        ghostManagerService.reAnchorAsync(userId, tenantId, [prompt], async (history) =&gt; {
+          const combinedText = history.join(&#39; &#39;).slice(0, 8000);
+          const result = await embeddingService.generateEmbedding(combinedText);
+          return new Float32Array(result.embedding);
+        });
+        ghostUpdated = true;
+      }
+    }
+
+    // Build Response
+    const response: BrainInferenceResponse = {
+      response: verificationResult.finalResponse,
+      systemLevel: routingDecision.level,
+      routingDecision,
+      budget: assembledContext.budget,
+      ghostUpdated,
+      flashFactsDetected,
+      latencyMs: Date.now() - startTime,
+      verification: {
+        passed: verificationResult.passed,
+        ecdScore: verificationResult.ecdScore.score,
+        refinementAttempts: verificationResult.refinementAttempts,
+        blocked: verificationResult.blocked,
+      },
+    };
+
+    return success(response);
+  } catch (err) {
+    logger.error(&#39;Brain inference failed&#39;, { requestId, error: String(err) });
+    return error(500, `Inference failed: ${String(err)}`);
+  }
+}</code></pre>
+<hr />
+<h3 id="apirouter.ts">2. api/router.ts</h3>
+<p><strong>Purpose</strong>: Main API router that dispatches requests to appropriate handlers based on HTTP method and path.</p>
+<pre class="typescript"><code>/**
+ * API Router Lambda Handler
+ * Main entry point for all API requests
+ */
+
+import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from &#39;aws-lambda&#39;;
+import { Logger } from &#39;../shared/logger&#39;;
+import { successResponse, errorResponse } from &#39;../shared/response&#39;;
+import { UnauthorizedError, NotFoundError, ValidationError } from &#39;../shared/errors&#39;;
+import { extractUserFromEvent } from &#39;../shared/auth&#39;;
+import { handleChat } from &#39;./chat&#39;;
+import { handleModels } from &#39;./models&#39;;
+import { handleProviders } from &#39;./providers&#39;;
+
+const logger = new Logger({ handler: &#39;router&#39; });
+
+interface RouteHandler {
+  (event: APIGatewayProxyEvent, context: Context): Promise&lt;APIGatewayProxyResult&gt;;
+}
+
+const routes: Map&lt;string, Map&lt;string, RouteHandler&gt;&gt; = new Map();
+
+function registerRoute(method: string, pathPattern: string, handler: RouteHandler): void {
+  if (!routes.has(method)) {
+    routes.set(method, new Map());
+  }
+  routes.get(method)!.set(pathPattern, handler);
+}
+
+// Register routes
+registerRoute(&#39;GET&#39;, &#39;/api/v2/health&#39;, handleHealth);
+registerRoute(&#39;POST&#39;, &#39;/api/v2/chat/completions&#39;, handleChat);
+registerRoute(&#39;GET&#39;, &#39;/api/v2/models&#39;, handleModels);
+registerRoute(&#39;GET&#39;, &#39;/api/v2/models/{modelId}&#39;, handleModels);
+registerRoute(&#39;GET&#39;, &#39;/api/v2/providers&#39;, handleProviders);
+registerRoute(&#39;POST&#39;, &#39;/api/v2/usage&#39;, handleUsage);
+
+export async function handler(
+  event: APIGatewayProxyEvent,
+  context: Context
+): Promise&lt;APIGatewayProxyResult&gt; {
+  const requestId = event.requestContext.requestId;
+  logger.setRequestId(requestId);
+
+  const startTime = Date.now();
+  const method = event.httpMethod;
+  const path = event.path;
+
+  logger.info(&#39;Request received&#39;, { method, path, requestId });
+
+  try {
+    // Skip auth for health and usage endpoints
+    if (path !== &#39;/api/v2/health&#39; &amp;&amp; path !== &#39;/api/v2/usage&#39;) {
+      const user = await extractUserFromEvent(event);
+      if (!user) {
+        throw new UnauthorizedError(&#39;Invalid or missing authorization token&#39;);
+      }
+      logger.setTenantId(user.tenantId);
+      logger.setUserId(user.userId);
+    }
+
+    const routeHandler = findRouteHandler(method, path);
+    if (!routeHandler) {
+      throw new NotFoundError(`Route not found: ${method} ${path}`);
+    }
+
+    const result = await routeHandler(event, context);
+
+    logger.info(&#39;Request completed&#39;, {
+      method,
+      path,
+      statusCode: result.statusCode,
+      durationMs: Date.now() - startTime,
+    });
+
+    return result;
+  } catch (error) {
+    logger.error(&#39;Request failed&#39;, error as Error, {
+      method,
+      path,
+      durationMs: Date.now() - startTime,
+    });
+
+    return errorResponse(error as Error);
+  }
+}
+
+function findRouteHandler(method: string, path: string): RouteHandler | null {
+  const methodRoutes = routes.get(method);
+  if (!methodRoutes) return null;
+
+  for (const [pattern, handler] of methodRoutes) {
+    if (matchPath(pattern, path)) {
+      return handler;
+    }
+  }
+  return null;
+}
+
+function matchPath(pattern: string, path: string): boolean {
+  const patternParts = pattern.split(&#39;/&#39;);
+  const pathParts = path.split(&#39;/&#39;);
+
+  if (patternParts.length !== pathParts.length) return false;
+
+  for (let i = 0; i &lt; patternParts.length; i++) {
+    const patternPart = patternParts[i];
+    const pathPart = pathParts[i];
+
+    // Skip path parameters (e.g., {modelId})
+    if (patternPart.startsWith(&#39;{&#39;) &amp;&amp; patternPart.endsWith(&#39;}&#39;)) continue;
+    if (patternPart !== pathPart) return false;
+  }
+
+  return true;
+}
+
+async function handleHealth(): Promise&lt;APIGatewayProxyResult&gt; {
+  return successResponse({
+    status: &#39;healthy&#39;,
+    version: process.env.RADIANT_VERSION || &#39;unknown&#39;,
+    timestamp: new Date().toISOString(),
+    region: process.env.AWS_REGION,
+  });
+}
+
+async function handleUsage(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  const body = JSON.parse(event.body || &#39;{}&#39;);
+  logger.info(&#39;Usage event recorded&#39;, {
+    tenantId: body.tenant_id,
+    modelId: body.model_id,
+    tokens: body.total_tokens,
+  });
+  return successResponse({ recorded: true });
+}</code></pre>
+<hr />
+<h2 id="lambda-handler-inventory">Lambda Handler Inventory</h2>
+<h3 id="admin-handlers-48-files">Admin Handlers (48 files)</h3>
+<table>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>admin/users.ts</code></td>
+<td>User management CRUD</td>
+</tr>
+<tr>
+<td><code>admin/tenants.ts</code></td>
+<td>Tenant management</td>
+</tr>
+<tr>
+<td><code>admin/models.ts</code></td>
+<td>AI model configuration</td>
+</tr>
+<tr>
+<td><code>admin/providers.ts</code></td>
+<td>Provider management</td>
+</tr>
+<tr>
+<td><code>admin/billing.ts</code></td>
+<td>Billing administration</td>
+</tr>
+<tr>
+<td><code>admin/analytics.ts</code></td>
+<td>Usage analytics</td>
+</tr>
+<tr>
+<td><code>admin/security.ts</code></td>
+<td>Security settings</td>
+</tr>
+<tr>
+<td><code>admin/compliance.ts</code></td>
+<td>Compliance controls</td>
+</tr>
+<tr>
+<td><code>admin/domains.ts</code></td>
+<td>Domain configuration</td>
+</tr>
+<tr>
+<td><code>admin/tiers.ts</code></td>
+<td>Tier management</td>
+</tr>
+<tr>
+<td>…</td>
+<td>38 more handlers</td>
+</tr>
+</tbody>
+</table>
+<h3 id="think-tank-handlers-12-files">Think Tank Handlers (12 files)</h3>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 28%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Lines</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>thinktank/artifact-engine.ts</code></td>
+<td>17K</td>
+<td>Artifact generation and management</td>
+</tr>
+<tr>
+<td><code>thinktank/brain-plan.ts</code></td>
+<td>15K</td>
+<td>Brain planning and orchestration</td>
+</tr>
+<tr>
+<td><code>thinktank/conversations.ts</code></td>
+<td>9K</td>
+<td>Conversation management</td>
+</tr>
+<tr>
+<td><code>thinktank/derivation-history.ts</code></td>
+<td>11K</td>
+<td>Derivation tracking</td>
+</tr>
+<tr>
+<td><code>thinktank/domain-modes.ts</code></td>
+<td>11K</td>
+<td>Domain mode handling</td>
+</tr>
+<tr>
+<td><code>thinktank/file-conversion.ts</code></td>
+<td>13K</td>
+<td>File format conversion</td>
+</tr>
+<tr>
+<td><code>thinktank/ideas.ts</code></td>
+<td>6K</td>
+<td>Idea management</td>
+</tr>
+<tr>
+<td><code>thinktank/model-categories.ts</code></td>
+<td>7K</td>
+<td>Model categorization</td>
+</tr>
+<tr>
+<td><code>thinktank/models.ts</code></td>
+<td>20K</td>
+<td>Model operations</td>
+</tr>
+<tr>
+<td><code>thinktank/ratings.ts</code></td>
+<td>13K</td>
+<td>Rating system</td>
+</tr>
+<tr>
+<td><code>thinktank/user-context.ts</code></td>
+<td>15K</td>
+<td>User context management</td>
+</tr>
+<tr>
+<td><code>thinktank/users.ts</code></td>
+<td>11K</td>
+<td>Think Tank user operations</td>
+</tr>
+</tbody>
+</table>
+<h3 id="consciousness-handlers-9-files">Consciousness Handlers (9 files)</h3>
+<table>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>consciousness/mcp-server.ts</code></td>
+<td>Model Context Protocol server</td>
+</tr>
+<tr>
+<td><code>consciousness/sleep-cycle.ts</code></td>
+<td>Weekly consciousness evolution</td>
+</tr>
+<tr>
+<td><code>consciousness/deep-research.ts</code></td>
+<td>Browser automation research</td>
+</tr>
+<tr>
+<td><code>consciousness/thinking-session.ts</code></td>
+<td>Async thinking sessions</td>
+</tr>
+<tr>
+<td><code>consciousness/budget-monitor.ts</code></td>
+<td>Cost control</td>
+</tr>
+<tr>
+<td><code>consciousness/admin-api.ts</code></td>
+<td>Consciousness admin APIs</td>
+</tr>
+<tr>
+<td><code>consciousness/memory-consolidation.ts</code></td>
+<td>Memory processing</td>
+</tr>
+<tr>
+<td><code>consciousness/dream-generator.ts</code></td>
+<td>Dream state generation</td>
+</tr>
+<tr>
+<td><code>consciousness/parameter-sync.ts</code></td>
+<td>Parameter synchronization</td>
+</tr>
+</tbody>
+</table>
+<h3 id="billing-handlers-3-files">Billing Handlers (3 files)</h3>
+<table>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>billing/credits.ts</code></td>
+<td>Credit management</td>
+</tr>
+<tr>
+<td><code>billing/subscriptions.ts</code></td>
+<td>Subscription handling</td>
+</tr>
+<tr>
+<td><code>billing/invoices.ts</code></td>
+<td>Invoice generation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="security-handlers-3-files">Security Handlers (3 files)</h3>
+<table>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>security/audit.ts</code></td>
+<td>Audit log management</td>
+</tr>
+<tr>
+<td><code>security/rbac.ts</code></td>
+<td>Role-based access control</td>
+</tr>
+<tr>
+<td><code>security/compliance.ts</code></td>
+<td>Compliance checking</td>
+</tr>
+</tbody>
+</table>
+<h3 id="thermal-handlers-5-files">Thermal Handlers (5 files)</h3>
+<table>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>thermal/monitor.ts</code></td>
+<td>System thermal monitoring</td>
+</tr>
+<tr>
+<td><code>thermal/throttle.ts</code></td>
+<td>Throttling control</td>
+</tr>
+<tr>
+<td><code>thermal/cooldown.ts</code></td>
+<td>Cooldown management</td>
+</tr>
+<tr>
+<td><code>thermal/alerts.ts</code></td>
+<td>Thermal alerting</td>
+</tr>
+<tr>
+<td><code>thermal/metrics.ts</code></td>
+<td>Thermal metrics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tier-transition-handlers-20-files">Tier Transition Handlers (20 files)</h3>
+<table>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tier-transition/evaluate.ts</code></td>
+<td>Tier eligibility evaluation</td>
+</tr>
+<tr>
+<td><code>tier-transition/migrate.ts</code></td>
+<td>Migration execution</td>
+</tr>
+<tr>
+<td><code>tier-transition/validate.ts</code></td>
+<td>Transition validation</td>
+</tr>
+<tr>
+<td><code>tier-transition/rollback.ts</code></td>
+<td>Rollback handling</td>
+</tr>
+<tr>
+<td>…</td>
+<td>16 more handlers</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="shared-utilities-344-files">Shared Utilities (344 files)</h2>
+<p>The <code>shared/</code> directory contains reusable code:</p>
+<h3 id="database-shareddb">Database (<code>shared/db/</code>)</h3>
+<ul>
+<li><code>client.ts</code> - Aurora Data API client</li>
+<li><code>pool.ts</code> - Connection pooling</li>
+<li><code>migrations.ts</code> - Migration utilities</li>
+</ul>
+<h3 id="services-sharedservices">Services (<code>shared/services/</code>)</h3>
+<ul>
+<li><code>brain-config.service.ts</code> - Brain configuration</li>
+<li><code>ghost-manager.service.ts</code> - Ghost vector management</li>
+<li><code>flash-buffer.service.ts</code> - Flash fact buffer</li>
+<li><code>sofai-router.service.ts</code> - SOFAI routing</li>
+<li><code>context-assembler.service.ts</code> - Context assembly</li>
+<li><code>oversight.service.ts</code> - Human oversight</li>
+<li><code>embedding.service.ts</code> - Embedding generation</li>
+<li><code>ecd-verification.service.ts</code> - ECD truth verification</li>
+<li><code>governor/economic-governor.ts</code> - Cost optimization</li>
+</ul>
+<h3 id="utilities-sharedutils">Utilities (<code>shared/utils/</code>)</h3>
+<ul>
+<li><code>response.ts</code> - API response helpers</li>
+<li><code>errors.ts</code> - Error types</li>
+<li><code>auth.ts</code> - Authentication helpers</li>
+<li><code>validation.ts</code> - Input validation</li>
+<li><code>db-helpers.ts</code> - Database helpers</li>
+</ul>
+<h3 id="logging-sharedlogging">Logging (<code>shared/logging/</code>)</h3>
+<ul>
+<li><code>enhanced-logger.ts</code> - Structured logging</li>
+<li><code>metrics.ts</code> - CloudWatch metrics</li>
+</ul>
+<hr />
+<h2 id="handler-patterns-1">Handler Patterns</h2>
+<h3 id="standard-api-handler">Standard API Handler</h3>
+<pre class="typescript"><code>import { APIGatewayProxyEvent, APIGatewayProxyResult } from &#39;aws-lambda&#39;;
+import { success, error } from &#39;../shared/response&#39;;
+import { withSecureDBContext } from &#39;../shared/services/db-context.service&#39;;
+
+export async function handler(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    return await withSecureDBContext(event, async (db, authContext) =&gt; {
+      // Handler logic with RLS context
+      const result = await db.query(&#39;SELECT * FROM table WHERE tenant_id = $1&#39;, [authContext.tenantId]);
+      return success(result);
+    });
+  } catch (err) {
+    return error(500, err.message);
+  }
+}</code></pre>
+<h3 id="sqs-event-handler">SQS Event Handler</h3>
+<pre class="typescript"><code>import { SQSEvent, SQSRecord } from &#39;aws-lambda&#39;;
+import { logger } from &#39;../shared/logging/enhanced-logger&#39;;
+
+export async function handler(event: SQSEvent): Promise&lt;void&gt; {
+  for (const record of event.Records) {
+    await processRecord(record);
+  }
+}
+
+async function processRecord(record: SQSRecord): Promise&lt;void&gt; {
+  const body = JSON.parse(record.body);
+  logger.info(&#39;Processing message&#39;, { messageId: record.messageId });
+  // Process message
+}</code></pre>
+<h3 id="scheduled-event-handler">Scheduled Event Handler</h3>
+<pre class="typescript"><code>import { ScheduledEvent } from &#39;aws-lambda&#39;;
+import { logger } from &#39;../shared/logging/enhanced-logger&#39;;
+
+export async function handler(event: ScheduledEvent): Promise&lt;void&gt; {
+  logger.info(&#39;Scheduled task started&#39;, { 
+    source: event.source,
+    time: event.time,
+  });
+  
+  // Execute scheduled task
+  await runScheduledTask();
+  
+  logger.info(&#39;Scheduled task completed&#39;);
+}</code></pre>
+<hr />
+<p><em>This concludes the Lambda handlers export. See other export files for additional components.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

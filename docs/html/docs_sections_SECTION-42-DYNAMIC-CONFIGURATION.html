@@ -1,0 +1,2358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 42 DYNAMIC CONFIGURATION - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 42 DYNAMIC CONFIGURATION</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-42-DYNAMIC-CONFIGURATION.md</div>
+  </div>
+  
+  <h1 id="section-42-dynamic-configuration-management-system-v4.8.0">SECTION 42: DYNAMIC CONFIGURATION MANAGEMENT SYSTEM (v4.8.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<blockquote>
+<p><strong>CRITICAL: This section eliminates ALL hardcoded runtime parameters.</strong> <strong>Every configurable value is now stored in the database and editable by admins.</strong></p>
+</blockquote>
+<hr />
+<h2 id="architecture-overview">42.1 ARCHITECTURE OVERVIEW</h2>
+<h3 id="the-problem">The Problem</h3>
+<p>Before v4.8.0, RADIANT had numerous hardcoded parameters scattered throughout the codebase:</p>
+<pre><code>BEFORE (v4.7.x and earlier):
+┌─────────────────────────────────────────────────────────────────────┐
+│ Hardcoded Parameters Everywhere                                    │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  TypeScript Constants:                                              │
+│  const MAX_TOKENS = 128000;  ← Hardcoded!                          │
+│  const DEFAULT_MARGIN = 0.40;  ← Hardcoded!                        │
+│  const RETRY_ATTEMPTS = 3;  ← Hardcoded!                           │
+│                                                                     │
+│  Lambda Environment:                                                │
+│  timeout: Duration.seconds(30)  ← Hardcoded!                       │
+│  memorySize: 512  ← Hardcoded!                                     │
+│                                                                     │
+│  Rate Limits:                                                       │
+│  maxConcurrent: 10  ← Hardcoded!                                   │
+│  maxPerMinute: 100  ← Hardcoded!                                   │
+│                                                                     │
+│  Problems:                                                          │
+│  ├── Cannot adjust without code deployment                          │
+│  ├── No per-tenant customization                                    │
+│  ├── No audit trail of changes                                      │
+│  └── Incident response requires developer                           │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="the-solution">The Solution</h3>
+<p>v4.8.0 implements <strong>complete database-driven configuration</strong>:</p>
+<pre><code>AFTER (v4.8.0):
+┌─────────────────────────────────────────────────────────────────────┐
+│ Centralized Configuration Registry                                  │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ system_configuration (Global Defaults)                      │   │
+│  │ ┌─────────────────────────────────────────────────────────┐ │   │
+│  │ │ key: &quot;pricing.external_provider_margin&quot;                 │ │   │
+│  │ │ value: 0.40                                             │ │   │
+│  │ │ category: &quot;pricing&quot;                                     │ │   │
+│  │ │ type: &quot;decimal&quot;                                         │ │   │
+│  │ │ min: 0.00, max: 1.00                                    │ │   │
+│  │ └─────────────────────────────────────────────────────────┘ │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│           │                                                         │
+│           ▼                                                         │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ tenant_configuration_overrides                              │   │
+│  │ ├── tenant_abc: 0.35 (negotiated discount)                 │   │
+│  │ ├── tenant_xyz: 0.50 (premium support)                     │   │
+│  │ └── (others use global default 0.40)                       │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│  Usage: getConfig(&#39;pricing.external_provider_margin&#39;, tenantId)    │
+│  Returns: 0.35 for tenant_abc, 0.40 for others                     │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="configuration-categories-12">Configuration Categories (12)</h3>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 30%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Description</th>
+<th>Example Parameters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rate_limits</code></td>
+<td>API and service rate limits</td>
+<td>requests_per_minute, concurrent_connections</td>
+</tr>
+<tr>
+<td><code>timeouts</code></td>
+<td>Request and processing timeouts</td>
+<td>lambda_timeout, request_timeout, session_idle</td>
+</tr>
+<tr>
+<td><code>pricing</code></td>
+<td>Margins, markups, discounts</td>
+<td>external_margin, self_hosted_margin, minimum_charge</td>
+</tr>
+<tr>
+<td><code>tokens</code></td>
+<td>Token and context limits</td>
+<td>max_tokens_per_request, max_context_window</td>
+</tr>
+<tr>
+<td><code>retry</code></td>
+<td>Retry and backoff configuration</td>
+<td>max_attempts, initial_delay, backoff_multiplier</td>
+</tr>
+<tr>
+<td><code>cache</code></td>
+<td>Cache TTL and invalidation</td>
+<td>translation_bundle_ttl, model_list_ttl</td>
+</tr>
+<tr>
+<td><code>thresholds</code></td>
+<td>Health, confidence, quality thresholds</td>
+<td>health_check_threshold, confidence_minimum</td>
+</tr>
+<tr>
+<td><code>discounts</code></td>
+<td>Volume discount tiers</td>
+<td>tier_1_threshold, tier_1_discount</td>
+</tr>
+<tr>
+<td><code>session</code></td>
+<td>Auth and session settings</td>
+<td>token_expiry, refresh_window, max_sessions</td>
+</tr>
+<tr>
+<td><code>translation</code></td>
+<td>i18n system settings</td>
+<td>concurrent_limit, per_minute_limit</td>
+</tr>
+<tr>
+<td><code>workflow</code></td>
+<td>Workflow proposal thresholds</td>
+<td>min_occurrences, min_unique_users</td>
+</tr>
+<tr>
+<td><code>notifications</code></td>
+<td>Alert and notification settings</td>
+<td>alert_thresholds, channels, cooldown</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="database-schema">42.2 DATABASE SCHEMA</h2>
+<h3 id="migration-042_configuration_management.sql">Migration: 042_configuration_management.sql</h3>
+<pre class="sql"><code>-- ============================================================================
+-- RADIANT v4.8.0 - Dynamic Configuration Management System
+-- Migration: 042_configuration_management.sql
+-- ============================================================================
+
+-- ============================================================================
+-- 42.2.1 Configuration Categories
+-- ============================================================================
+
+CREATE TABLE configuration_categories (
+    id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    display_order INTEGER DEFAULT 100,
+    icon VARCHAR(50),  -- Material UI icon name
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO configuration_categories (id, name, description, display_order, icon) VALUES
+(&#39;rate_limits&#39;, &#39;Rate Limits&#39;, &#39;API and service rate limiting configuration&#39;, 1, &#39;Speed&#39;),
+(&#39;timeouts&#39;, &#39;Timeouts&#39;, &#39;Request and processing timeout settings&#39;, 2, &#39;Timer&#39;),
+(&#39;pricing&#39;, &#39;Pricing&#39;, &#39;Margins, markups, and discount configuration&#39;, 3, &#39;AttachMoney&#39;),
+(&#39;tokens&#39;, &#39;Token Limits&#39;, &#39;Token and context window limits&#39;, 4, &#39;Token&#39;),
+(&#39;retry&#39;, &#39;Retry Configuration&#39;, &#39;Retry attempts and backoff settings&#39;, 5, &#39;Refresh&#39;),
+(&#39;cache&#39;, &#39;Cache Settings&#39;, &#39;Cache TTL and invalidation rules&#39;, 6, &#39;Cached&#39;),
+(&#39;thresholds&#39;, &#39;Thresholds&#39;, &#39;Health, confidence, and quality thresholds&#39;, 7, &#39;TrendingUp&#39;),
+(&#39;discounts&#39;, &#39;Volume Discounts&#39;, &#39;Volume-based discount tier configuration&#39;, 8, &#39;Discount&#39;),
+(&#39;session&#39;, &#39;Session &amp; Auth&#39;, &#39;Authentication and session settings&#39;, 9, &#39;Lock&#39;),
+(&#39;translation&#39;, &#39;Translation System&#39;, &#39;i18n and translation service settings&#39;, 10, &#39;Translate&#39;),
+(&#39;workflow&#39;, &#39;Workflow Proposals&#39;, &#39;Dynamic workflow proposal thresholds&#39;, 11, &#39;AccountTree&#39;),
+(&#39;notifications&#39;, &#39;Notifications&#39;, &#39;Alert thresholds and notification channels&#39;, 12, &#39;Notifications&#39;);
+
+-- ============================================================================
+-- 42.2.2 Configuration Value Types
+-- ============================================================================
+
+CREATE TYPE config_value_type AS ENUM (
+    &#39;string&#39;,
+    &#39;integer&#39;, 
+    &#39;decimal&#39;,
+    &#39;boolean&#39;,
+    &#39;json&#39;,
+    &#39;duration&#39;,     -- Stored as seconds, displayed as human-readable
+    &#39;percentage&#39;,   -- Stored as decimal (0.40 = 40%)
+    &#39;enum&#39;
+);
+
+-- ============================================================================
+-- 42.2.3 System Configuration (Global Defaults)
+-- ============================================================================
+
+CREATE TABLE system_configuration (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    
+    -- Identification
+    key VARCHAR(100) NOT NULL UNIQUE,
+    category_id VARCHAR(50) NOT NULL REFERENCES configuration_categories(id),
+    
+    -- Value storage
+    value_type config_value_type NOT NULL,
+    value_string TEXT,           -- For string, enum types
+    value_integer BIGINT,        -- For integer, duration types
+    value_decimal DECIMAL(20,6), -- For decimal, percentage types
+    value_boolean BOOLEAN,       -- For boolean type
+    value_json JSONB,            -- For json type
+    
+    -- Metadata
+    display_name VARCHAR(200) NOT NULL,
+    description TEXT,
+    unit VARCHAR(50),            -- e.g., &#39;seconds&#39;, &#39;requests&#39;, &#39;%&#39;, &#39;tokens&#39;
+    
+    -- Validation constraints
+    min_value DECIMAL(20,6),
+    max_value DECIMAL(20,6),
+    enum_values TEXT[],          -- For enum type
+    regex_pattern TEXT,          -- For string validation
+    
+    -- Environment scoping
+    environment VARCHAR(20) DEFAULT &#39;all&#39;,  -- &#39;all&#39;, &#39;dev&#39;, &#39;staging&#39;, &#39;prod&#39;
+    
+    -- Feature flags
+    is_sensitive BOOLEAN DEFAULT FALSE,     -- Mask value in UI
+    requires_restart BOOLEAN DEFAULT FALSE, -- Warn admin
+    is_deprecated BOOLEAN DEFAULT FALSE,
+    deprecated_replacement_key VARCHAR(100),
+    
+    -- Audit
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_by UUID REFERENCES administrators(id),
+    
+    -- Constraints
+    CONSTRAINT valid_value CHECK (
+        (value_type = &#39;string&#39; AND value_string IS NOT NULL) OR
+        (value_type = &#39;integer&#39; AND value_integer IS NOT NULL) OR
+        (value_type = &#39;decimal&#39; AND value_decimal IS NOT NULL) OR
+        (value_type = &#39;boolean&#39; AND value_boolean IS NOT NULL) OR
+        (value_type = &#39;json&#39; AND value_json IS NOT NULL) OR
+        (value_type = &#39;duration&#39; AND value_integer IS NOT NULL) OR
+        (value_type = &#39;percentage&#39; AND value_decimal IS NOT NULL) OR
+        (value_type = &#39;enum&#39; AND value_string IS NOT NULL)
+    )
+);
+
+CREATE INDEX idx_system_config_category ON system_configuration(category_id);
+CREATE INDEX idx_system_config_key ON system_configuration(key);
+CREATE INDEX idx_system_config_env ON system_configuration(environment);
+
+-- ============================================================================
+-- 42.2.4 Tenant Configuration Overrides
+-- ============================================================================
+
+CREATE TABLE tenant_configuration_overrides (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    config_id UUID NOT NULL REFERENCES system_configuration(id) ON DELETE CASCADE,
+    
+    -- Override value (same structure as system_configuration)
+    value_string TEXT,
+    value_integer BIGINT,
+    value_decimal DECIMAL(20,6),
+    value_boolean BOOLEAN,
+    value_json JSONB,
+    
+    -- Validity period (optional)
+    valid_from TIMESTAMPTZ DEFAULT NOW(),
+    valid_until TIMESTAMPTZ,  -- NULL = forever
+    
+    -- Audit
+    reason TEXT,              -- Why this override exists
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES administrators(id),
+    updated_by UUID REFERENCES administrators(id),
+    
+    UNIQUE(tenant_id, config_id)
+);
+
+CREATE INDEX idx_tenant_config_tenant ON tenant_configuration_overrides(tenant_id);
+CREATE INDEX idx_tenant_config_config ON tenant_configuration_overrides(config_id);
+CREATE INDEX idx_tenant_config_validity ON tenant_configuration_overrides(valid_from, valid_until);
+
+-- RLS
+ALTER TABLE tenant_configuration_overrides ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_config_isolation ON tenant_configuration_overrides
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+
+-- ============================================================================
+-- 42.2.5 Configuration Audit Log
+-- ============================================================================
+
+CREATE TABLE configuration_audit_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    
+    -- What changed
+    config_id UUID REFERENCES system_configuration(id) ON DELETE SET NULL,
+    tenant_override_id UUID REFERENCES tenant_configuration_overrides(id) ON DELETE SET NULL,
+    config_key VARCHAR(100) NOT NULL,
+    tenant_id UUID,  -- NULL for global changes
+    
+    -- Change details
+    action VARCHAR(50) NOT NULL,  -- &#39;created&#39;, &#39;updated&#39;, &#39;deleted&#39;, &#39;override_created&#39;, &#39;override_deleted&#39;
+    old_value JSONB,
+    new_value JSONB,
+    
+    -- Who made the change
+    changed_by UUID REFERENCES administrators(id),
+    changed_by_email VARCHAR(255),
+    
+    -- Context
+    reason TEXT,
+    ip_address INET,
+    user_agent TEXT,
+    
+    -- Timestamps
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_config_audit_config ON configuration_audit_log(config_id);
+CREATE INDEX idx_config_audit_tenant ON configuration_audit_log(tenant_id);
+CREATE INDEX idx_config_audit_created ON configuration_audit_log(created_at DESC);
+CREATE INDEX idx_config_audit_key ON configuration_audit_log(config_key);
+
+-- ============================================================================
+-- 42.2.6 Configuration Cache Invalidation
+-- ============================================================================
+
+CREATE TABLE configuration_cache_invalidation (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    config_key VARCHAR(100) NOT NULL,
+    tenant_id UUID,  -- NULL = global invalidation
+    invalidated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    processed_at TIMESTAMPTZ,
+    processed_by VARCHAR(100)  -- Lambda function name that processed it
+);
+
+CREATE INDEX idx_config_cache_pending ON configuration_cache_invalidation(invalidated_at) 
+    WHERE processed_at IS NULL;
+
+-- ============================================================================
+-- 42.2.7 Helper Functions
+-- ============================================================================
+
+-- Get configuration value with tenant override support
+CREATE OR REPLACE FUNCTION get_config(
+    p_key VARCHAR(100),
+    p_tenant_id UUID DEFAULT NULL,
+    p_environment VARCHAR(20) DEFAULT &#39;prod&#39;
+) RETURNS JSONB AS $$
+DECLARE
+    v_config system_configuration%ROWTYPE;
+    v_override tenant_configuration_overrides%ROWTYPE;
+    v_result JSONB;
+BEGIN
+    -- Get base configuration
+    SELECT * INTO v_config
+    FROM system_configuration
+    WHERE key = p_key
+      AND (environment = &#39;all&#39; OR environment = p_environment);
+    
+    IF v_config IS NULL THEN
+        RETURN NULL;
+    END IF;
+    
+    -- Build base result
+    v_result = jsonb_build_object(
+        &#39;key&#39;, v_config.key,
+        &#39;type&#39;, v_config.value_type,
+        &#39;value&#39;, CASE v_config.value_type
+            WHEN &#39;string&#39; THEN to_jsonb(v_config.value_string)
+            WHEN &#39;integer&#39; THEN to_jsonb(v_config.value_integer)
+            WHEN &#39;decimal&#39; THEN to_jsonb(v_config.value_decimal)
+            WHEN &#39;boolean&#39; THEN to_jsonb(v_config.value_boolean)
+            WHEN &#39;json&#39; THEN v_config.value_json
+            WHEN &#39;duration&#39; THEN to_jsonb(v_config.value_integer)
+            WHEN &#39;percentage&#39; THEN to_jsonb(v_config.value_decimal)
+            WHEN &#39;enum&#39; THEN to_jsonb(v_config.value_string)
+        END,
+        &#39;is_override&#39;, false
+    );
+    
+    -- Check for tenant override if tenant_id provided
+    IF p_tenant_id IS NOT NULL THEN
+        SELECT * INTO v_override
+        FROM tenant_configuration_overrides
+        WHERE config_id = v_config.id
+          AND tenant_id = p_tenant_id
+          AND valid_from &lt;= NOW()
+          AND (valid_until IS NULL OR valid_until &gt; NOW());
+        
+        IF v_override IS NOT NULL THEN
+            v_result = jsonb_set(v_result, &#39;{value}&#39;, 
+                CASE v_config.value_type
+                    WHEN &#39;string&#39; THEN to_jsonb(v_override.value_string)
+                    WHEN &#39;integer&#39; THEN to_jsonb(v_override.value_integer)
+                    WHEN &#39;decimal&#39; THEN to_jsonb(v_override.value_decimal)
+                    WHEN &#39;boolean&#39; THEN to_jsonb(v_override.value_boolean)
+                    WHEN &#39;json&#39; THEN v_override.value_json
+                    WHEN &#39;duration&#39; THEN to_jsonb(v_override.value_integer)
+                    WHEN &#39;percentage&#39; THEN to_jsonb(v_override.value_decimal)
+                    WHEN &#39;enum&#39; THEN to_jsonb(v_override.value_string)
+                END
+            );
+            v_result = jsonb_set(v_result, &#39;{is_override}&#39;, &#39;true&#39;::jsonb);
+        END IF;
+    END IF;
+    
+    RETURN v_result;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+-- Get all configurations for a category
+CREATE OR REPLACE FUNCTION get_configs_by_category(
+    p_category VARCHAR(50),
+    p_tenant_id UUID DEFAULT NULL,
+    p_environment VARCHAR(20) DEFAULT &#39;prod&#39;
+) RETURNS TABLE (
+    key VARCHAR(100),
+    value JSONB,
+    display_name VARCHAR(200),
+    description TEXT,
+    value_type config_value_type,
+    unit VARCHAR(50),
+    is_override BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        sc.key,
+        (get_config(sc.key, p_tenant_id, p_environment))-&gt;&gt;&#39;value&#39;,
+        sc.display_name,
+        sc.description,
+        sc.value_type,
+        sc.unit,
+        ((get_config(sc.key, p_tenant_id, p_environment))-&gt;&gt;&#39;is_override&#39;)::BOOLEAN
+    FROM system_configuration sc
+    WHERE sc.category_id = p_category
+      AND (sc.environment = &#39;all&#39; OR sc.environment = p_environment)
+      AND sc.is_deprecated = false
+    ORDER BY sc.key;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+-- Trigger to log configuration changes
+CREATE OR REPLACE FUNCTION log_config_changes()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = &#39;INSERT&#39; THEN
+        INSERT INTO configuration_audit_log (
+            config_id, config_key, action, new_value, changed_by
+        ) VALUES (
+            NEW.id, NEW.key, &#39;created&#39;,
+            jsonb_build_object(&#39;value&#39;, COALESCE(
+                to_jsonb(NEW.value_string),
+                to_jsonb(NEW.value_integer),
+                to_jsonb(NEW.value_decimal),
+                to_jsonb(NEW.value_boolean),
+                NEW.value_json
+            )),
+            NEW.updated_by
+        );
+    ELSIF TG_OP = &#39;UPDATE&#39; THEN
+        INSERT INTO configuration_audit_log (
+            config_id, config_key, action, old_value, new_value, changed_by
+        ) VALUES (
+            NEW.id, NEW.key, &#39;updated&#39;,
+            jsonb_build_object(&#39;value&#39;, COALESCE(
+                to_jsonb(OLD.value_string),
+                to_jsonb(OLD.value_integer),
+                to_jsonb(OLD.value_decimal),
+                to_jsonb(OLD.value_boolean),
+                OLD.value_json
+            )),
+            jsonb_build_object(&#39;value&#39;, COALESCE(
+                to_jsonb(NEW.value_string),
+                to_jsonb(NEW.value_integer),
+                to_jsonb(NEW.value_decimal),
+                to_jsonb(NEW.value_boolean),
+                NEW.value_json
+            )),
+            NEW.updated_by
+        );
+        
+        -- Queue cache invalidation
+        INSERT INTO configuration_cache_invalidation (config_key)
+        VALUES (NEW.key);
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_log_config_changes
+    AFTER INSERT OR UPDATE ON system_configuration
+    FOR EACH ROW
+    EXECUTE FUNCTION log_config_changes();
+
+-- Trigger for tenant override changes
+CREATE OR REPLACE FUNCTION log_tenant_override_changes()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_config_key VARCHAR(100);
+BEGIN
+    SELECT key INTO v_config_key FROM system_configuration WHERE id = COALESCE(NEW.config_id, OLD.config_id);
+    
+    IF TG_OP = &#39;INSERT&#39; THEN
+        INSERT INTO configuration_audit_log (
+            tenant_override_id, config_key, tenant_id, action, new_value, changed_by, reason
+        ) VALUES (
+            NEW.id, v_config_key, NEW.tenant_id, &#39;override_created&#39;,
+            jsonb_build_object(&#39;value&#39;, COALESCE(
+                to_jsonb(NEW.value_string),
+                to_jsonb(NEW.value_integer),
+                to_jsonb(NEW.value_decimal),
+                to_jsonb(NEW.value_boolean),
+                NEW.value_json
+            )),
+            NEW.created_by, NEW.reason
+        );
+    ELSIF TG_OP = &#39;UPDATE&#39; THEN
+        INSERT INTO configuration_audit_log (
+            tenant_override_id, config_key, tenant_id, action, old_value, new_value, changed_by, reason
+        ) VALUES (
+            NEW.id, v_config_key, NEW.tenant_id, &#39;override_updated&#39;,
+            jsonb_build_object(&#39;value&#39;, COALESCE(
+                to_jsonb(OLD.value_string),
+                to_jsonb(OLD.value_integer),
+                to_jsonb(OLD.value_decimal),
+                to_jsonb(OLD.value_boolean),
+                OLD.value_json
+            )),
+            jsonb_build_object(&#39;value&#39;, COALESCE(
+                to_jsonb(NEW.value_string),
+                to_jsonb(NEW.value_integer),
+                to_jsonb(NEW.value_decimal),
+                to_jsonb(NEW.value_boolean),
+                NEW.value_json
+            )),
+            NEW.updated_by, NEW.reason
+        );
+    ELSIF TG_OP = &#39;DELETE&#39; THEN
+        INSERT INTO configuration_audit_log (
+            config_key, tenant_id, action, old_value, changed_by
+        ) VALUES (
+            v_config_key, OLD.tenant_id, &#39;override_deleted&#39;,
+            jsonb_build_object(&#39;value&#39;, COALESCE(
+                to_jsonb(OLD.value_string),
+                to_jsonb(OLD.value_integer),
+                to_jsonb(OLD.value_decimal),
+                to_jsonb(OLD.value_boolean),
+                OLD.value_json
+            )),
+            current_setting(&#39;app.current_admin_id&#39;, true)::UUID
+        );
+    END IF;
+    
+    -- Queue cache invalidation
+    INSERT INTO configuration_cache_invalidation (config_key, tenant_id)
+    VALUES (v_config_key, COALESCE(NEW.tenant_id, OLD.tenant_id));
+    
+    RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_log_tenant_override_changes
+    AFTER INSERT OR UPDATE OR DELETE ON tenant_configuration_overrides
+    FOR EACH ROW
+    EXECUTE FUNCTION log_tenant_override_changes();</code></pre>
+<hr />
+<h2 id="seed-configuration-data">42.3 SEED CONFIGURATION DATA</h2>
+<h3 id="migration-042b_seed_configuration.sql">Migration: 042b_seed_configuration.sql</h3>
+<pre class="sql"><code>-- ============================================================================
+-- RADIANT v4.8.0 - Seed Initial Configuration Values
+-- Migration: 042b_seed_configuration.sql
+-- ============================================================================
+
+-- ============================================================================
+-- Rate Limits
+-- ============================================================================
+
+INSERT INTO system_configuration (key, category_id, value_type, value_integer, display_name, description, unit, min_value, max_value) VALUES
+(&#39;rate_limits.api.requests_per_minute&#39;, &#39;rate_limits&#39;, &#39;integer&#39;, 1000, &#39;API Requests per Minute&#39;, &#39;Maximum API requests allowed per minute per tenant&#39;, &#39;requests&#39;, 10, 100000),
+(&#39;rate_limits.api.requests_per_hour&#39;, &#39;rate_limits&#39;, &#39;integer&#39;, 50000, &#39;API Requests per Hour&#39;, &#39;Maximum API requests allowed per hour per tenant&#39;, &#39;requests&#39;, 100, 1000000),
+(&#39;rate_limits.api.concurrent_connections&#39;, &#39;rate_limits&#39;, &#39;integer&#39;, 100, &#39;Concurrent Connections&#39;, &#39;Maximum concurrent API connections per tenant&#39;, &#39;connections&#39;, 1, 10000),
+(&#39;rate_limits.chat.messages_per_minute&#39;, &#39;rate_limits&#39;, &#39;integer&#39;, 60, &#39;Chat Messages per Minute&#39;, &#39;Maximum chat messages per minute per user&#39;, &#39;messages&#39;, 1, 1000),
+(&#39;rate_limits.chat.concurrent_sessions&#39;, &#39;rate_limits&#39;, &#39;integer&#39;, 5, &#39;Concurrent Chat Sessions&#39;, &#39;Maximum concurrent chat sessions per user&#39;, &#39;sessions&#39;, 1, 100),
+(&#39;rate_limits.file_upload.max_size_mb&#39;, &#39;rate_limits&#39;, &#39;integer&#39;, 100, &#39;Max File Upload Size&#39;, &#39;Maximum file upload size in megabytes&#39;, &#39;MB&#39;, 1, 1000),
+(&#39;rate_limits.file_upload.per_hour&#39;, &#39;rate_limits&#39;, &#39;integer&#39;, 50, &#39;File Uploads per Hour&#39;, &#39;Maximum file uploads per hour per user&#39;, &#39;uploads&#39;, 1, 1000);
+
+-- ============================================================================
+-- Timeouts
+-- ============================================================================
+
+INSERT INTO system_configuration (key, category_id, value_type, value_integer, display_name, description, unit, min_value, max_value) VALUES
+(&#39;timeouts.lambda.default&#39;, &#39;timeouts&#39;, &#39;duration&#39;, 30, &#39;Default Lambda Timeout&#39;, &#39;Default timeout for Lambda functions&#39;, &#39;seconds&#39;, 1, 900),
+(&#39;timeouts.lambda.chat&#39;, &#39;timeouts&#39;, &#39;duration&#39;, 120, &#39;Chat Lambda Timeout&#39;, &#39;Timeout for chat processing Lambda&#39;, &#39;seconds&#39;, 30, 900),
+(&#39;timeouts.lambda.orchestration&#39;, &#39;timeouts&#39;, &#39;duration&#39;, 300, &#39;Orchestration Lambda Timeout&#39;, &#39;Timeout for complex orchestrations&#39;, &#39;seconds&#39;, 60, 900),
+(&#39;timeouts.lambda.batch&#39;, &#39;timeouts&#39;, &#39;duration&#39;, 900, &#39;Batch Processing Timeout&#39;, &#39;Timeout for batch processing Lambda&#39;, &#39;seconds&#39;, 60, 900),
+(&#39;timeouts.request.api_gateway&#39;, &#39;timeouts&#39;, &#39;duration&#39;, 29, &#39;API Gateway Timeout&#39;, &#39;API Gateway integration timeout&#39;, &#39;seconds&#39;, 1, 29),
+(&#39;timeouts.request.external_provider&#39;, &#39;timeouts&#39;, &#39;duration&#39;, 60, &#39;External Provider Timeout&#39;, &#39;Timeout for external AI provider calls&#39;, &#39;seconds&#39;, 10, 300),
+(&#39;timeouts.session.idle&#39;, &#39;timeouts&#39;, &#39;duration&#39;, 1800, &#39;Session Idle Timeout&#39;, &#39;Time before idle session expires&#39;, &#39;seconds&#39;, 300, 86400),
+(&#39;timeouts.session.absolute&#39;, &#39;timeouts&#39;, &#39;duration&#39;, 86400, &#39;Absolute Session Timeout&#39;, &#39;Maximum session duration&#39;, &#39;seconds&#39;, 3600, 604800);
+
+-- ============================================================================
+-- Pricing
+-- ============================================================================
+
+INSERT INTO system_configuration (key, category_id, value_type, value_decimal, display_name, description, unit, min_value, max_value) VALUES
+(&#39;pricing.external_provider_margin&#39;, &#39;pricing&#39;, &#39;percentage&#39;, 0.40, &#39;External Provider Margin&#39;, &#39;Default markup on external AI provider costs&#39;, &#39;%&#39;, 0.00, 1.00),
+(&#39;pricing.self_hosted_margin&#39;, &#39;pricing&#39;, &#39;percentage&#39;, 0.75, &#39;Self-Hosted Margin&#39;, &#39;Default markup on self-hosted model costs&#39;, &#39;%&#39;, 0.00, 2.00),
+(&#39;pricing.minimum_charge&#39;, &#39;pricing&#39;, &#39;decimal&#39;, 0.01, &#39;Minimum Charge&#39;, &#39;Minimum charge per transaction&#39;, &#39;USD&#39;, 0.001, 1.00),
+(&#39;pricing.tax_rate_default&#39;, &#39;pricing&#39;, &#39;percentage&#39;, 0.00, &#39;Default Tax Rate&#39;, &#39;Default tax rate applied to invoices&#39;, &#39;%&#39;, 0.00, 0.50);
+
+INSERT INTO system_configuration (key, category_id, value_type, value_integer, display_name, description, unit, min_value, max_value) VALUES
+(&#39;pricing.invoice.due_days&#39;, &#39;pricing&#39;, &#39;integer&#39;, 30, &#39;Invoice Due Days&#39;, &#39;Days until invoice is due&#39;, &#39;days&#39;, 1, 90),
+(&#39;pricing.invoice.reminder_days&#39;, &#39;pricing&#39;, &#39;integer&#39;, 7, &#39;Invoice Reminder Days&#39;, &#39;Days before due date to send reminder&#39;, &#39;days&#39;, 1, 30);
+
+-- ============================================================================
+-- Token Limits
+-- ============================================================================
+
+INSERT INTO system_configuration (key, category_id, value_type, value_integer, display_name, description, unit, min_value, max_value) VALUES
+(&#39;tokens.max_per_request&#39;, &#39;tokens&#39;, &#39;integer&#39;, 128000, &#39;Max Tokens per Request&#39;, &#39;Maximum tokens allowed in a single request&#39;, &#39;tokens&#39;, 1000, 1000000),
+(&#39;tokens.max_context_window&#39;, &#39;tokens&#39;, &#39;integer&#39;, 200000, &#39;Max Context Window&#39;, &#39;Maximum context window size&#39;, &#39;tokens&#39;, 4000, 2000000),
+(&#39;tokens.max_output&#39;, &#39;tokens&#39;, &#39;integer&#39;, 8192, &#39;Max Output Tokens&#39;, &#39;Maximum tokens in response&#39;, &#39;tokens&#39;, 100, 100000),
+(&#39;tokens.streaming_chunk_size&#39;, &#39;tokens&#39;, &#39;integer&#39;, 100, &#39;Streaming Chunk Size&#39;, &#39;Tokens per streaming chunk&#39;, &#39;tokens&#39;, 1, 1000);
+
+-- ============================================================================
+-- Retry Configuration
+-- ============================================================================
+
+INSERT INTO system_configuration (key, category_id, value_type, value_integer, display_name, description, unit, min_value, max_value) VALUES
+(&#39;retry.max_attempts&#39;, &#39;retry&#39;, &#39;integer&#39;, 3, &#39;Max Retry Attempts&#39;, &#39;Maximum number of retry attempts&#39;, &#39;attempts&#39;, 0, 10),
+(&#39;retry.initial_delay_ms&#39;, &#39;retry&#39;, &#39;integer&#39;, 1000, &#39;Initial Retry Delay&#39;, &#39;Initial delay before first retry&#39;, &#39;ms&#39;, 100, 30000),
+(&#39;retry.max_delay_ms&#39;, &#39;retry&#39;, &#39;integer&#39;, 30000, &#39;Max Retry Delay&#39;, &#39;Maximum delay between retries&#39;, &#39;ms&#39;, 1000, 300000);
+
+INSERT INTO system_configuration (key, category_id, value_type, value_decimal, display_name, description, unit, min_value, max_value) VALUES
+(&#39;retry.backoff_multiplier&#39;, &#39;retry&#39;, &#39;decimal&#39;, 2.0, &#39;Backoff Multiplier&#39;, &#39;Multiplier for exponential backoff&#39;, &#39;x&#39;, 1.0, 5.0),
+(&#39;retry.jitter_factor&#39;, &#39;retry&#39;, &#39;decimal&#39;, 0.1, &#39;Jitter Factor&#39;, &#39;Random jitter added to delays&#39;, &#39;%&#39;, 0.0, 0.5);
+
+-- ============================================================================
+-- Cache Settings
+-- ============================================================================
+
+INSERT INTO system_configuration (key, category_id, value_type, value_integer, display_name, description, unit, min_value, max_value) VALUES
+(&#39;cache.translation_bundle_ttl&#39;, &#39;cache&#39;, &#39;duration&#39;, 300, &#39;Translation Bundle TTL&#39;, &#39;Cache duration for translation bundles&#39;, &#39;seconds&#39;, 60, 86400),
+(&#39;cache.model_list_ttl&#39;, &#39;cache&#39;, &#39;duration&#39;, 300, &#39;Model List TTL&#39;, &#39;Cache duration for AI model lists&#39;, &#39;seconds&#39;, 60, 3600),
+(&#39;cache.provider_health_ttl&#39;, &#39;cache&#39;, &#39;duration&#39;, 60, &#39;Provider Health TTL&#39;, &#39;Cache duration for provider health status&#39;, &#39;seconds&#39;, 10, 300),
+(&#39;cache.user_preferences_ttl&#39;, &#39;cache&#39;, &#39;duration&#39;, 600, &#39;User Preferences TTL&#39;, &#39;Cache duration for user preferences&#39;, &#39;seconds&#39;, 60, 3600),
+(&#39;cache.config_ttl&#39;, &#39;cache&#39;, &#39;duration&#39;, 300, &#39;Configuration TTL&#39;, &#39;Cache duration for system configuration&#39;, &#39;seconds&#39;, 30, 3600);
+
+-- ============================================================================
+-- Thresholds
+-- ============================================================================
+
+INSERT INTO system_configuration (key, category_id, value_type, value_integer, display_name, description, unit, min_value, max_value) VALUES
+(&#39;thresholds.health_check.healthy&#39;, &#39;thresholds&#39;, &#39;integer&#39;, 2, &#39;Healthy Threshold&#39;, &#39;Consecutive healthy checks before marking healthy&#39;, &#39;checks&#39;, 1, 10),
+(&#39;thresholds.health_check.unhealthy&#39;, &#39;thresholds&#39;, &#39;integer&#39;, 3, &#39;Unhealthy Threshold&#39;, &#39;Consecutive failed checks before marking unhealthy&#39;, &#39;checks&#39;, 1, 10);
+
+INSERT INTO system_configuration (key, category_id, value_type, value_decimal, display_name, description, unit, min_value, max_value) VALUES
+(&#39;thresholds.confidence.minimum&#39;, &#39;thresholds&#39;, &#39;percentage&#39;, 0.70, &#39;Minimum Confidence&#39;, &#39;Minimum confidence score for auto-decisions&#39;, &#39;%&#39;, 0.00, 1.00),
+(&#39;thresholds.confidence.high&#39;, &#39;thresholds&#39;, &#39;percentage&#39;, 0.90, &#39;High Confidence&#39;, &#39;Threshold for high-confidence decisions&#39;, &#39;%&#39;, 0.00, 1.00),
+(&#39;thresholds.autoscaling.target_utilization&#39;, &#39;thresholds&#39;, &#39;percentage&#39;, 0.70, &#39;Target Utilization&#39;, &#39;Target CPU utilization for autoscaling&#39;, &#39;%&#39;, 0.30, 0.95);
+
+-- ============================================================================
+-- Volume Discounts
+-- ============================================================================
+
+INSERT INTO system_configuration (key, category_id, value_type, value_integer, display_name, description, unit, min_value, max_value) VALUES
+(&#39;discounts.tier_1.threshold&#39;, &#39;discounts&#39;, &#39;integer&#39;, 1000000, &#39;Tier 1 Threshold&#39;, &#39;Token threshold for tier 1 discount&#39;, &#39;tokens&#39;, 0, 1000000000),
+(&#39;discounts.tier_2.threshold&#39;, &#39;discounts&#39;, &#39;integer&#39;, 10000000, &#39;Tier 2 Threshold&#39;, &#39;Token threshold for tier 2 discount&#39;, &#39;tokens&#39;, 0, 1000000000),
+(&#39;discounts.tier_3.threshold&#39;, &#39;discounts&#39;, &#39;integer&#39;, 100000000, &#39;Tier 3 Threshold&#39;, &#39;Token threshold for tier 3 discount&#39;, &#39;tokens&#39;, 0, 1000000000);
+
+INSERT INTO system_configuration (key, category_id, value_type, value_decimal, display_name, description, unit, min_value, max_value) VALUES
+(&#39;discounts.tier_1.percentage&#39;, &#39;discounts&#39;, &#39;percentage&#39;, 0.05, &#39;Tier 1 Discount&#39;, &#39;Discount percentage for tier 1&#39;, &#39;%&#39;, 0.00, 0.50),
+(&#39;discounts.tier_2.percentage&#39;, &#39;discounts&#39;, &#39;percentage&#39;, 0.10, &#39;Tier 2 Discount&#39;, &#39;Discount percentage for tier 2&#39;, &#39;%&#39;, 0.00, 0.50),
+(&#39;discounts.tier_3.percentage&#39;, &#39;discounts&#39;, &#39;percentage&#39;, 0.15, &#39;Tier 3 Discount&#39;, &#39;Discount percentage for tier 3&#39;, &#39;%&#39;, 0.00, 0.50);
+
+-- ============================================================================
+-- Session &amp; Auth
+-- ============================================================================
+
+INSERT INTO system_configuration (key, category_id, value_type, value_integer, display_name, description, unit, min_value, max_value) VALUES
+(&#39;session.token_expiry&#39;, &#39;session&#39;, &#39;duration&#39;, 3600, &#39;Token Expiry&#39;, &#39;Access token expiration time&#39;, &#39;seconds&#39;, 300, 86400),
+(&#39;session.refresh_token_expiry&#39;, &#39;session&#39;, &#39;duration&#39;, 2592000, &#39;Refresh Token Expiry&#39;, &#39;Refresh token expiration time&#39;, &#39;seconds&#39;, 86400, 7776000),
+(&#39;session.max_per_user&#39;, &#39;session&#39;, &#39;integer&#39;, 5, &#39;Max Sessions per User&#39;, &#39;Maximum concurrent sessions per user&#39;, &#39;sessions&#39;, 1, 100),
+(&#39;session.invitation_expiry&#39;, &#39;session&#39;, &#39;duration&#39;, 604800, &#39;Invitation Expiry&#39;, &#39;Admin invitation expiration time&#39;, &#39;seconds&#39;, 3600, 2592000);
+
+-- ============================================================================
+-- Translation System
+-- ============================================================================
+
+INSERT INTO system_configuration (key, category_id, value_type, value_integer, display_name, description, unit, min_value, max_value) VALUES
+(&#39;translation.concurrent_limit&#39;, &#39;translation&#39;, &#39;integer&#39;, 10, &#39;Concurrent Translations&#39;, &#39;Maximum concurrent translation requests&#39;, &#39;requests&#39;, 1, 100),
+(&#39;translation.per_minute_limit&#39;, &#39;translation&#39;, &#39;integer&#39;, 100, &#39;Translations per Minute&#39;, &#39;Maximum translations per minute&#39;, &#39;requests&#39;, 10, 1000),
+(&#39;translation.per_hour_limit&#39;, &#39;translation&#39;, &#39;integer&#39;, 1000, &#39;Translations per Hour&#39;, &#39;Maximum translations per hour&#39;, &#39;requests&#39;, 100, 10000),
+(&#39;translation.retry_attempts&#39;, &#39;translation&#39;, &#39;integer&#39;, 3, &#39;Translation Retry Attempts&#39;, &#39;Number of retry attempts for failed translations&#39;, &#39;attempts&#39;, 0, 10),
+(&#39;translation.retry_delay_ms&#39;, &#39;translation&#39;, &#39;integer&#39;, 1000, &#39;Translation Retry Delay&#39;, &#39;Initial retry delay for translations&#39;, &#39;ms&#39;, 100, 30000),
+(&#39;translation.queue_batch_size&#39;, &#39;translation&#39;, &#39;integer&#39;, 50, &#39;Translation Queue Batch&#39;, &#39;Number of translations to process per batch&#39;, &#39;items&#39;, 1, 200);
+
+-- ============================================================================
+-- Workflow Proposals
+-- ============================================================================
+
+INSERT INTO system_configuration (key, category_id, value_type, value_integer, display_name, description, unit, min_value, max_value) VALUES
+(&#39;workflow.proposal.min_occurrences&#39;, &#39;workflow&#39;, &#39;integer&#39;, 5, &#39;Min Occurrences&#39;, &#39;Minimum pattern occurrences before proposal&#39;, &#39;occurrences&#39;, 1, 100),
+(&#39;workflow.proposal.min_unique_users&#39;, &#39;workflow&#39;, &#39;integer&#39;, 3, &#39;Min Unique Users&#39;, &#39;Minimum unique users affected&#39;, &#39;users&#39;, 1, 50),
+(&#39;workflow.proposal.min_time_span_hours&#39;, &#39;workflow&#39;, &#39;integer&#39;, 24, &#39;Min Time Span&#39;, &#39;Minimum hours of pattern observation&#39;, &#39;hours&#39;, 1, 720),
+(&#39;workflow.proposal.max_per_day&#39;, &#39;workflow&#39;, &#39;integer&#39;, 10, &#39;Max Proposals per Day&#39;, &#39;Maximum new proposals per day&#39;, &#39;proposals&#39;, 1, 100),
+(&#39;workflow.proposal.max_per_week&#39;, &#39;workflow&#39;, &#39;integer&#39;, 30, &#39;Max Proposals per Week&#39;, &#39;Maximum new proposals per week&#39;, &#39;proposals&#39;, 1, 500);
+
+INSERT INTO system_configuration (key, category_id, value_type, value_decimal, display_name, description, unit, min_value, max_value) VALUES
+(&#39;workflow.proposal.min_impact_score&#39;, &#39;workflow&#39;, &#39;percentage&#39;, 0.60, &#39;Min Impact Score&#39;, &#39;Minimum impact score for proposal generation&#39;, &#39;%&#39;, 0.00, 1.00),
+(&#39;workflow.proposal.min_confidence&#39;, &#39;workflow&#39;, &#39;percentage&#39;, 0.75, &#39;Min Confidence&#39;, &#39;Minimum confidence score for proposals&#39;, &#39;%&#39;, 0.00, 1.00);
+
+-- ============================================================================
+-- Notifications
+-- ============================================================================
+
+INSERT INTO system_configuration (key, category_id, value_type, value_json, display_name, description) VALUES
+(&#39;notifications.usage_alert_thresholds&#39;, &#39;notifications&#39;, &#39;json&#39;, &#39;[50, 75, 90, 100]&#39;, &#39;Usage Alert Thresholds&#39;, &#39;Percentage thresholds for usage alerts&#39;);
+
+INSERT INTO system_configuration (key, category_id, value_type, value_integer, display_name, description, unit, min_value, max_value) VALUES
+(&#39;notifications.alert_cooldown&#39;, &#39;notifications&#39;, &#39;duration&#39;, 3600, &#39;Alert Cooldown&#39;, &#39;Minimum time between duplicate alerts&#39;, &#39;seconds&#39;, 60, 86400),
+(&#39;notifications.digest_frequency&#39;, &#39;notifications&#39;, &#39;duration&#39;, 86400, &#39;Digest Frequency&#39;, &#39;Frequency of notification digests&#39;, &#39;seconds&#39;, 3600, 604800);
+
+INSERT INTO system_configuration (key, category_id, value_type, value_boolean, display_name, description) VALUES
+(&#39;notifications.email_enabled&#39;, &#39;notifications&#39;, &#39;boolean&#39;, true, &#39;Email Notifications&#39;, &#39;Enable email notifications&#39;),
+(&#39;notifications.slack_enabled&#39;, &#39;notifications&#39;, &#39;boolean&#39;, false, &#39;Slack Notifications&#39;, &#39;Enable Slack notifications&#39;),
+(&#39;notifications.webhook_enabled&#39;, &#39;notifications&#39;, &#39;boolean&#39;, false, &#39;Webhook Notifications&#39;, &#39;Enable webhook notifications&#39;);</code></pre>
+<hr />
+<h2 id="typescript-types">42.4 TYPESCRIPT TYPES</h2>
+<h3 id="file-packagessharedsrcconfigtypes.ts">File: <code>packages/shared/src/config/types.ts</code></h3>
+<pre class="typescript"><code>// ============================================================================
+// RADIANT v4.8.0 - Configuration Management Types
+// ============================================================================
+
+/**
+ * Configuration value types
+ */
+export type ConfigValueType = 
+  | &#39;string&#39;
+  | &#39;integer&#39;
+  | &#39;decimal&#39;
+  | &#39;boolean&#39;
+  | &#39;json&#39;
+  | &#39;duration&#39;
+  | &#39;percentage&#39;
+  | &#39;enum&#39;;
+
+/**
+ * Configuration category
+ */
+export interface ConfigCategory {
+  id: string;
+  name: string;
+  description?: string;
+  displayOrder: number;
+  icon?: string;
+}
+
+/**
+ * System configuration entry
+ */
+export interface SystemConfig {
+  id: string;
+  key: string;
+  categoryId: string;
+  valueType: ConfigValueType;
+  value: string | number | boolean | object;
+  displayName: string;
+  description?: string;
+  unit?: string;
+  minValue?: number;
+  maxValue?: number;
+  enumValues?: string[];
+  regexPattern?: string;
+  environment: &#39;all&#39; | &#39;dev&#39; | &#39;staging&#39; | &#39;prod&#39;;
+  isSensitive: boolean;
+  requiresRestart: boolean;
+  isDeprecated: boolean;
+  deprecatedReplacementKey?: string;
+  createdAt: string;
+  updatedAt: string;
+  updatedBy?: string;
+}
+
+/**
+ * Tenant configuration override
+ */
+export interface TenantConfigOverride {
+  id: string;
+  tenantId: string;
+  configId: string;
+  value: string | number | boolean | object;
+  validFrom: string;
+  validUntil?: string;
+  reason?: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+/**
+ * Configuration with resolved value (after tenant override)
+ */
+export interface ResolvedConfig {
+  key: string;
+  value: string | number | boolean | object;
+  type: ConfigValueType;
+  isOverride: boolean;
+  displayName?: string;
+  unit?: string;
+}
+
+/**
+ * Configuration audit log entry
+ */
+export interface ConfigAuditEntry {
+  id: string;
+  configId?: string;
+  tenantOverrideId?: string;
+  configKey: string;
+  tenantId?: string;
+  action: &#39;created&#39; | &#39;updated&#39; | &#39;deleted&#39; | &#39;override_created&#39; | &#39;override_updated&#39; | &#39;override_deleted&#39;;
+  oldValue?: object;
+  newValue?: object;
+  changedBy?: string;
+  changedByEmail?: string;
+  reason?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: string;
+}
+
+/**
+ * Configuration update request
+ */
+export interface ConfigUpdateRequest {
+  value: string | number | boolean | object;
+  reason?: string;
+}
+
+/**
+ * Tenant override request
+ */
+export interface TenantOverrideRequest {
+  value: string | number | boolean | object;
+  reason?: string;
+  validFrom?: string;
+  validUntil?: string;
+}
+
+/**
+ * Configuration export/import format
+ */
+export interface ConfigExport {
+  version: string;
+  exportedAt: string;
+  exportedBy: string;
+  configs: Array&lt;{
+    key: string;
+    value: string | number | boolean | object;
+  }&gt;;
+  tenantOverrides?: Array&lt;{
+    tenantId: string;
+    key: string;
+    value: string | number | boolean | object;
+    reason?: string;
+  }&gt;;
+}</code></pre>
+<h3 id="file-packagessharedsrcconfigconstants.ts">File: <code>packages/shared/src/config/constants.ts</code></h3>
+<pre class="typescript"><code>// ============================================================================
+// RADIANT v4.8.0 - Configuration Constants
+// ============================================================================
+
+/**
+ * Configuration categories
+ */
+export const CONFIG_CATEGORIES = {
+  RATE_LIMITS: &#39;rate_limits&#39;,
+  TIMEOUTS: &#39;timeouts&#39;,
+  PRICING: &#39;pricing&#39;,
+  TOKENS: &#39;tokens&#39;,
+  RETRY: &#39;retry&#39;,
+  CACHE: &#39;cache&#39;,
+  THRESHOLDS: &#39;thresholds&#39;,
+  DISCOUNTS: &#39;discounts&#39;,
+  SESSION: &#39;session&#39;,
+  TRANSLATION: &#39;translation&#39;,
+  WORKFLOW: &#39;workflow&#39;,
+  NOTIFICATIONS: &#39;notifications&#39;,
+} as const;
+
+/**
+ * Common configuration keys
+ */
+export const CONFIG_KEYS = {
+  // Rate Limits
+  API_REQUESTS_PER_MINUTE: &#39;rate_limits.api.requests_per_minute&#39;,
+  API_REQUESTS_PER_HOUR: &#39;rate_limits.api.requests_per_hour&#39;,
+  API_CONCURRENT_CONNECTIONS: &#39;rate_limits.api.concurrent_connections&#39;,
+  CHAT_MESSAGES_PER_MINUTE: &#39;rate_limits.chat.messages_per_minute&#39;,
+  
+  // Timeouts
+  LAMBDA_DEFAULT_TIMEOUT: &#39;timeouts.lambda.default&#39;,
+  LAMBDA_CHAT_TIMEOUT: &#39;timeouts.lambda.chat&#39;,
+  EXTERNAL_PROVIDER_TIMEOUT: &#39;timeouts.request.external_provider&#39;,
+  SESSION_IDLE_TIMEOUT: &#39;timeouts.session.idle&#39;,
+  
+  // Pricing
+  EXTERNAL_PROVIDER_MARGIN: &#39;pricing.external_provider_margin&#39;,
+  SELF_HOSTED_MARGIN: &#39;pricing.self_hosted_margin&#39;,
+  MINIMUM_CHARGE: &#39;pricing.minimum_charge&#39;,
+  
+  // Tokens
+  MAX_TOKENS_PER_REQUEST: &#39;tokens.max_per_request&#39;,
+  MAX_CONTEXT_WINDOW: &#39;tokens.max_context_window&#39;,
+  MAX_OUTPUT_TOKENS: &#39;tokens.max_output&#39;,
+  
+  // Retry
+  MAX_RETRY_ATTEMPTS: &#39;retry.max_attempts&#39;,
+  INITIAL_RETRY_DELAY: &#39;retry.initial_delay_ms&#39;,
+  BACKOFF_MULTIPLIER: &#39;retry.backoff_multiplier&#39;,
+  
+  // Cache
+  TRANSLATION_BUNDLE_TTL: &#39;cache.translation_bundle_ttl&#39;,
+  MODEL_LIST_TTL: &#39;cache.model_list_ttl&#39;,
+  CONFIG_TTL: &#39;cache.config_ttl&#39;,
+  
+  // Thresholds
+  MIN_CONFIDENCE: &#39;thresholds.confidence.minimum&#39;,
+  HIGH_CONFIDENCE: &#39;thresholds.confidence.high&#39;,
+  
+  // Translation
+  TRANSLATION_CONCURRENT_LIMIT: &#39;translation.concurrent_limit&#39;,
+  TRANSLATION_PER_MINUTE_LIMIT: &#39;translation.per_minute_limit&#39;,
+  
+  // Workflow
+  WORKFLOW_MIN_OCCURRENCES: &#39;workflow.proposal.min_occurrences&#39;,
+  WORKFLOW_MIN_UNIQUE_USERS: &#39;workflow.proposal.min_unique_users&#39;,
+} as const;
+
+export type ConfigKey = typeof CONFIG_KEYS[keyof typeof CONFIG_KEYS];</code></pre>
+<hr />
+<h2 id="configuration-service">42.5 CONFIGURATION SERVICE</h2>
+<h3 id="file-packagessharedsrcconfigconfigurationservice.ts">File: <code>packages/shared/src/config/ConfigurationService.ts</code></h3>
+<pre class="typescript"><code>// ============================================================================
+// RADIANT v4.8.0 - Configuration Service
+// ============================================================================
+
+import { Pool } from &#39;pg&#39;;
+import Redis from &#39;ioredis&#39;;
+import { 
+  SystemConfig, 
+  ResolvedConfig, 
+  ConfigValueType,
+  ConfigUpdateRequest,
+  TenantOverrideRequest,
+  ConfigAuditEntry 
+} from &#39;./types&#39;;
+import { CONFIG_KEYS } from &#39;./constants&#39;;
+
+export class ConfigurationService {
+  private pool: Pool;
+  private redis: Redis | null;
+  private localCache: Map&lt;string, { value: ResolvedConfig; expiresAt: number }&gt;;
+  private defaultTtl: number = 300; // 5 minutes
+  
+  constructor(pool: Pool, redis?: Redis) {
+    this.pool = pool;
+    this.redis = redis || null;
+    this.localCache = new Map();
+  }
+  
+  /**
+   * Get a configuration value with tenant override support
+   */
+  async get&lt;T = any&gt;(
+    key: string, 
+    tenantId?: string,
+    environment: string = &#39;prod&#39;
+  ): Promise&lt;T&gt; {
+    const cacheKey = this.buildCacheKey(key, tenantId, environment);
+    
+    // Check local cache first
+    const cached = this.localCache.get(cacheKey);
+    if (cached &amp;&amp; cached.expiresAt &gt; Date.now()) {
+      return cached.value.value as T;
+    }
+    
+    // Check Redis cache
+    if (this.redis) {
+      const redisValue = await this.redis.get(cacheKey);
+      if (redisValue) {
+        const parsed = JSON.parse(redisValue) as ResolvedConfig;
+        this.localCache.set(cacheKey, { 
+          value: parsed, 
+          expiresAt: Date.now() + this.defaultTtl * 1000 
+        });
+        return parsed.value as T;
+      }
+    }
+    
+    // Fetch from database
+    const result = await this.pool.query(
+      `SELECT * FROM get_config($1, $2, $3)`,
+      [key, tenantId, environment]
+    );
+    
+    if (!result.rows[0]) {
+      throw new Error(`Configuration not found: ${key}`);
+    }
+    
+    const config = result.rows[0] as ResolvedConfig;
+    const value = this.parseValue(config);
+    
+    // Update caches
+    const resolvedConfig = { ...config, value };
+    
+    if (this.redis) {
+      await this.redis.setex(cacheKey, this.defaultTtl, JSON.stringify(resolvedConfig));
+    }
+    
+    this.localCache.set(cacheKey, { 
+      value: resolvedConfig, 
+      expiresAt: Date.now() + this.defaultTtl * 1000 
+    });
+    
+    return value as T;
+  }
+  
+  /**
+   * Get multiple configuration values
+   */
+  async getMultiple(
+    keys: string[],
+    tenantId?: string,
+    environment: string = &#39;prod&#39;
+  ): Promise&lt;Record&lt;string, any&gt;&gt; {
+    const results: Record&lt;string, any&gt; = {};
+    
+    await Promise.all(
+      keys.map(async (key) =&gt; {
+        try {
+          results[key] = await this.get(key, tenantId, environment);
+        } catch {
+          results[key] = undefined;
+        }
+      })
+    );
+    
+    return results;
+  }
+  
+  /**
+   * Get all configurations in a category
+   */
+  async getByCategory(
+    categoryId: string,
+    tenantId?: string,
+    environment: string = &#39;prod&#39;
+  ): Promise&lt;ResolvedConfig[]&gt; {
+    const result = await this.pool.query(
+      `SELECT * FROM get_configs_by_category($1, $2, $3)`,
+      [categoryId, tenantId, environment]
+    );
+    
+    return result.rows;
+  }
+  
+  /**
+   * Update a global configuration value
+   */
+  async update(
+    key: string,
+    request: ConfigUpdateRequest,
+    updatedBy: string
+  ): Promise&lt;SystemConfig&gt; {
+    const config = await this.getConfigByKey(key);
+    
+    // Validate value
+    this.validateValue(config, request.value);
+    
+    // Update based on type
+    const updateColumn = this.getValueColumn(config.valueType);
+    
+    const result = await this.pool.query(`
+      UPDATE system_configuration
+      SET ${updateColumn} = $2,
+          updated_at = NOW(),
+          updated_by = $3
+      WHERE key = $1
+      RETURNING *
+    `, [key, request.value, updatedBy]);
+    
+    // Invalidate caches
+    await this.invalidateCache(key);
+    
+    return result.rows[0];
+  }
+  
+  /**
+   * Create a tenant-specific override
+   */
+  async createTenantOverride(
+    key: string,
+    tenantId: string,
+    request: TenantOverrideRequest,
+    createdBy: string
+  ): Promise&lt;TenantConfigOverride&gt; {
+    const config = await this.getConfigByKey(key);
+    
+    // Validate value
+    this.validateValue(config, request.value);
+    
+    const valueColumn = this.getValueColumn(config.valueType);
+    
+    const result = await this.pool.query(`
+      INSERT INTO tenant_configuration_overrides (
+        tenant_id, config_id, ${valueColumn}, valid_from, valid_until, reason, created_by
+      ) VALUES ($1, $2, $3, COALESCE($4, NOW()), $5, $6, $7)
+      ON CONFLICT (tenant_id, config_id) DO UPDATE SET
+        ${valueColumn} = $3,
+        valid_from = COALESCE($4, NOW()),
+        valid_until = $5,
+        reason = $6,
+        updated_by = $7,
+        updated_at = NOW()
+      RETURNING *
+    `, [tenantId, config.id, request.value, request.validFrom, request.validUntil, request.reason, createdBy]);
+    
+    // Invalidate caches
+    await this.invalidateCache(key, tenantId);
+    
+    return result.rows[0];
+  }
+  
+  /**
+   * Delete a tenant override (revert to global)
+   */
+  async deleteTenantOverride(
+    key: string,
+    tenantId: string
+  ): Promise&lt;void&gt; {
+    const config = await this.getConfigByKey(key);
+    
+    await this.pool.query(`
+      DELETE FROM tenant_configuration_overrides
+      WHERE config_id = $1 AND tenant_id = $2
+    `, [config.id, tenantId]);
+    
+    await this.invalidateCache(key, tenantId);
+  }
+  
+  /**
+   * Get audit log for a configuration
+   */
+  async getAuditLog(
+    key: string,
+    options: { limit?: number; offset?: number; tenantId?: string } = {}
+  ): Promise&lt;ConfigAuditEntry[]&gt; {
+    const { limit = 50, offset = 0, tenantId } = options;
+    
+    let query = `
+      SELECT * FROM configuration_audit_log
+      WHERE config_key = $1
+    `;
+    const params: any[] = [key];
+    
+    if (tenantId) {
+      query += ` AND (tenant_id = $${params.length + 1} OR tenant_id IS NULL)`;
+      params.push(tenantId);
+    }
+    
+    query += ` ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
+    
+    const result = await this.pool.query(query, params);
+    return result.rows;
+  }
+  
+  /**
+   * Export all configurations
+   */
+  async exportConfigs(tenantId?: string): Promise&lt;ConfigExport&gt; {
+    const configs = await this.pool.query(`
+      SELECT key, 
+             COALESCE(value_string, value_integer::text, value_decimal::text, value_boolean::text, value_json::text) as value
+      FROM system_configuration
+      WHERE is_deprecated = false
+    `);
+    
+    let tenantOverrides: any[] = [];
+    if (tenantId) {
+      const overrides = await this.pool.query(`
+        SELECT sc.key, 
+               COALESCE(tco.value_string, tco.value_integer::text, tco.value_decimal::text, tco.value_boolean::text, tco.value_json::text) as value,
+               tco.reason
+        FROM tenant_configuration_overrides tco
+        JOIN system_configuration sc ON sc.id = tco.config_id
+        WHERE tco.tenant_id = $1
+      `, [tenantId]);
+      
+      tenantOverrides = overrides.rows.map(r =&gt; ({
+        tenantId,
+        key: r.key,
+        value: r.value,
+        reason: r.reason,
+      }));
+    }
+    
+    return {
+      version: &#39;4.8.0&#39;,
+      exportedAt: new Date().toISOString(),
+      exportedBy: &#39;system&#39;,
+      configs: configs.rows,
+      tenantOverrides: tenantOverrides.length &gt; 0 ? tenantOverrides : undefined,
+    };
+  }
+  
+  // Private helpers
+  
+  private buildCacheKey(key: string, tenantId?: string, environment?: string): string {
+    return `config:${environment || &#39;prod&#39;}:${tenantId || &#39;global&#39;}:${key}`;
+  }
+  
+  private async getConfigByKey(key: string): Promise&lt;SystemConfig&gt; {
+    const result = await this.pool.query(
+      `SELECT * FROM system_configuration WHERE key = $1`,
+      [key]
+    );
+    
+    if (!result.rows[0]) {
+      throw new Error(`Configuration not found: ${key}`);
+    }
+    
+    return result.rows[0];
+  }
+  
+  private getValueColumn(type: ConfigValueType): string {
+    switch (type) {
+      case &#39;string&#39;:
+      case &#39;enum&#39;:
+        return &#39;value_string&#39;;
+      case &#39;integer&#39;:
+      case &#39;duration&#39;:
+        return &#39;value_integer&#39;;
+      case &#39;decimal&#39;:
+      case &#39;percentage&#39;:
+        return &#39;value_decimal&#39;;
+      case &#39;boolean&#39;:
+        return &#39;value_boolean&#39;;
+      case &#39;json&#39;:
+        return &#39;value_json&#39;;
+      default:
+        throw new Error(`Unknown value type: ${type}`);
+    }
+  }
+  
+  private parseValue(config: ResolvedConfig): any {
+    const value = config.value;
+    
+    if (typeof value === &#39;string&#39;) {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return value;
+      }
+    }
+    
+    return value;
+  }
+  
+  private validateValue(config: SystemConfig, value: any): void {
+    const numValue = typeof value === &#39;number&#39; ? value : parseFloat(value);
+    
+    if (config.minValue !== undefined &amp;&amp; numValue &lt; config.minValue) {
+      throw new Error(`Value must be at least ${config.minValue}`);
+    }
+    
+    if (config.maxValue !== undefined &amp;&amp; numValue &gt; config.maxValue) {
+      throw new Error(`Value must be at most ${config.maxValue}`);
+    }
+    
+    if (config.enumValues &amp;&amp; !config.enumValues.includes(String(value))) {
+      throw new Error(`Value must be one of: ${config.enumValues.join(&#39;, &#39;)}`);
+    }
+    
+    if (config.regexPattern) {
+      const regex = new RegExp(config.regexPattern);
+      if (!regex.test(String(value))) {
+        throw new Error(`Value does not match required pattern`);
+      }
+    }
+  }
+  
+  private async invalidateCache(key: string, tenantId?: string): Promise&lt;void&gt; {
+    // Clear local cache
+    for (const cacheKey of this.localCache.keys()) {
+      if (cacheKey.includes(key)) {
+        this.localCache.delete(cacheKey);
+      }
+    }
+    
+    // Clear Redis cache
+    if (this.redis) {
+      const pattern = tenantId 
+        ? `config:*:${tenantId}:${key}`
+        : `config:*:*:${key}`;
+      
+      const keys = await this.redis.keys(pattern);
+      if (keys.length &gt; 0) {
+        await this.redis.del(...keys);
+      }
+    }
+    
+    // Add to invalidation queue for other instances
+    await this.pool.query(`
+      INSERT INTO configuration_cache_invalidation (config_key, tenant_id)
+      VALUES ($1, $2)
+    `, [key, tenantId]);
+  }
+}
+
+// Singleton instance
+let configService: ConfigurationService | null = null;
+
+export function getConfigService(pool: Pool, redis?: Redis): ConfigurationService {
+  if (!configService) {
+    configService = new ConfigurationService(pool, redis);
+  }
+  return configService;
+}
+
+/**
+ * Helper function to get a config value
+ */
+export async function getConfig&lt;T = any&gt;(
+  key: string,
+  tenantId?: string,
+  environment?: string
+): Promise&lt;T&gt; {
+  if (!configService) {
+    throw new Error(&#39;ConfigurationService not initialized&#39;);
+  }
+  return configService.get&lt;T&gt;(key, tenantId, environment);
+}</code></pre>
+<hr />
+<h2 id="admin-dashboard---configuration-management">42.6 ADMIN DASHBOARD - CONFIGURATION MANAGEMENT</h2>
+<h3 id="file-admin-dashboardappconfigurationpage.tsx">File: <code>admin-dashboard/app/configuration/page.tsx</code></h3>
+<pre class="typescript"><code>// ============================================================================
+// RADIANT v4.8.0 - Configuration Management Dashboard
+// ============================================================================
+
+&#39;use client&#39;;
+
+import React, { useState, useEffect } from &#39;react&#39;;
+import {
+  Box,
+  Typography,
+  Tabs,
+  Tab,
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Chip,
+  IconButton,
+  Button,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Switch,
+  Slider,
+  Select,
+  MenuItem,
+  Alert,
+  Tooltip,
+  InputAdornment,
+  Collapse,
+} from &#39;@mui/material&#39;;
+import {
+  Edit,
+  History,
+  Refresh,
+  Settings,
+  Speed,
+  Timer,
+  AttachMoney,
+  Token,
+  Cached,
+  TrendingUp,
+  Discount,
+  Lock,
+  Translate,
+  AccountTree,
+  Notifications,
+  ExpandMore,
+  ExpandLess,
+  Warning,
+  Check,
+} from &#39;@mui/icons-material&#39;;
+import { useTranslation } from &#39;@/hooks/useTranslation&#39;;
+import { api } from &#39;@/lib/api&#39;;
+
+interface ConfigCategory {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+}
+
+interface SystemConfig {
+  id: string;
+  key: string;
+  categoryId: string;
+  valueType: string;
+  value: any;
+  displayName: string;
+  description: string;
+  unit: string;
+  minValue: number;
+  maxValue: number;
+  enumValues: string[];
+  isSensitive: boolean;
+  requiresRestart: boolean;
+  isOverride: boolean;
+  updatedAt: string;
+}
+
+const CATEGORY_ICONS: Record&lt;string, React.ReactNode&gt; = {
+  rate_limits: &lt;Speed /&gt;,
+  timeouts: &lt;Timer /&gt;,
+  pricing: &lt;AttachMoney /&gt;,
+  tokens: &lt;Token /&gt;,
+  retry: &lt;Refresh /&gt;,
+  cache: &lt;Cached /&gt;,
+  thresholds: &lt;TrendingUp /&gt;,
+  discounts: &lt;Discount /&gt;,
+  session: &lt;Lock /&gt;,
+  translation: &lt;Translate /&gt;,
+  workflow: &lt;AccountTree /&gt;,
+  notifications: &lt;Notifications /&gt;,
+};
+
+export default function ConfigurationPage() {
+  const { t } = useTranslation();
+  const [categories, setCategories] = useState&lt;ConfigCategory[]&gt;([]);
+  const [activeCategory, setActiveCategory] = useState&lt;string&gt;(&#39;rate_limits&#39;);
+  const [configs, setConfigs] = useState&lt;SystemConfig[]&gt;([]);
+  const [editDialog, setEditDialog] = useState&lt;SystemConfig | null&gt;(null);
+  const [editValue, setEditValue] = useState&lt;any&gt;(null);
+  const [historyDialog, setHistoryDialog] = useState&lt;string | null&gt;(null);
+  const [auditLog, setAuditLog] = useState&lt;any[]&gt;([]);
+  const [loading, setLoading] = useState(true);
+  const [expandedKeys, setExpandedKeys] = useState&lt;Set&lt;string&gt;&gt;(new Set());
+
+  useEffect(() =&gt; {
+    loadCategories();
+  }, []);
+
+  useEffect(() =&gt; {
+    if (activeCategory) {
+      loadConfigs(activeCategory);
+    }
+  }, [activeCategory]);
+
+  async function loadCategories() {
+    try {
+      const res = await api.get(&#39;/configuration/categories&#39;);
+      setCategories(res.data);
+      if (res.data.length &gt; 0) {
+        setActiveCategory(res.data[0].id);
+      }
+    } catch (error) {
+      console.error(&#39;Failed to load categories:&#39;, error);
+    }
+  }
+
+  async function loadConfigs(categoryId: string) {
+    setLoading(true);
+    try {
+      const res = await api.get(`/configuration/category/${categoryId}`);
+      setConfigs(res.data);
+    } catch (error) {
+      console.error(&#39;Failed to load configs:&#39;, error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSave() {
+    if (!editDialog) return;
+    try {
+      await api.put(`/configuration/${editDialog.key}`, {
+        value: editValue,
+        reason: &#39;Updated via Admin Dashboard&#39;,
+      });
+      setEditDialog(null);
+      loadConfigs(activeCategory);
+    } catch (error) {
+      console.error(&#39;Failed to save config:&#39;, error);
+    }
+  }
+
+  async function loadAuditLog(key: string) {
+    try {
+      const res = await api.get(`/configuration/${key}/audit`);
+      setAuditLog(res.data);
+      setHistoryDialog(key);
+    } catch (error) {
+      console.error(&#39;Failed to load audit log:&#39;, error);
+    }
+  }
+
+  function renderValueEditor(config: SystemConfig) {
+    switch (config.valueType) {
+      case &#39;boolean&#39;:
+        return (
+          &lt;Switch
+            checked={editValue === true || editValue === &#39;true&#39;}
+            onChange={(e) =&gt; setEditValue(e.target.checked)}
+          /&gt;
+        );
+      
+      case &#39;integer&#39;:
+      case &#39;duration&#39;:
+        return (
+          &lt;Box&gt;
+            &lt;Slider
+              value={Number(editValue)}
+              onChange={(_, v) =&gt; setEditValue(v)}
+              min={config.minValue || 0}
+              max={config.maxValue || 100}
+              valueLabelDisplay=&quot;auto&quot;
+            /&gt;
+            &lt;TextField
+              type=&quot;number&quot;
+              value={editValue}
+              onChange={(e) =&gt; setEditValue(Number(e.target.value))}
+              InputProps={{
+                endAdornment: config.unit &amp;&amp; (
+                  &lt;InputAdornment position=&quot;end&quot;&gt;{config.unit}&lt;/InputAdornment&gt;
+                ),
+              }}
+              fullWidth
+              sx={{ mt: 2 }}
+            /&gt;
+          &lt;/Box&gt;
+        );
+      
+      case &#39;decimal&#39;:
+      case &#39;percentage&#39;:
+        return (
+          &lt;Box&gt;
+            &lt;Slider
+              value={Number(editValue) * (config.valueType === &#39;percentage&#39; ? 100 : 1)}
+              onChange={(_, v) =&gt; setEditValue(
+                (v as number) / (config.valueType === &#39;percentage&#39; ? 100 : 1)
+              )}
+              min={(config.minValue || 0) * (config.valueType === &#39;percentage&#39; ? 100 : 1)}
+              max={(config.maxValue || 1) * (config.valueType === &#39;percentage&#39; ? 100 : 1)}
+              valueLabelDisplay=&quot;auto&quot;
+              valueLabelFormat={(v) =&gt; config.valueType === &#39;percentage&#39; ? `${v}%` : v}
+            /&gt;
+            &lt;TextField
+              type=&quot;number&quot;
+              value={config.valueType === &#39;percentage&#39; ? (editValue * 100).toFixed(0) : editValue}
+              onChange={(e) =&gt; {
+                const val = Number(e.target.value);
+                setEditValue(config.valueType === &#39;percentage&#39; ? val / 100 : val);
+              }}
+              InputProps={{
+                endAdornment: &lt;InputAdornment position=&quot;end&quot;&gt;%&lt;/InputAdornment&gt;,
+              }}
+              fullWidth
+              sx={{ mt: 2 }}
+            /&gt;
+          &lt;/Box&gt;
+        );
+      
+      case &#39;enum&#39;:
+        return (
+          &lt;Select
+            value={editValue}
+            onChange={(e) =&gt; setEditValue(e.target.value)}
+            fullWidth
+          &gt;
+            {config.enumValues?.map((val) =&gt; (
+              &lt;MenuItem key={val} value={val}&gt;{val}&lt;/MenuItem&gt;
+            ))}
+          &lt;/Select&gt;
+        );
+      
+      case &#39;json&#39;:
+        return (
+          &lt;TextField
+            multiline
+            rows={6}
+            value={typeof editValue === &#39;string&#39; ? editValue : JSON.stringify(editValue, null, 2)}
+            onChange={(e) =&gt; {
+              try {
+                setEditValue(JSON.parse(e.target.value));
+              } catch {
+                setEditValue(e.target.value);
+              }
+            }}
+            fullWidth
+            sx={{ fontFamily: &#39;monospace&#39; }}
+          /&gt;
+        );
+      
+      default:
+        return (
+          &lt;TextField
+            value={editValue}
+            onChange={(e) =&gt; setEditValue(e.target.value)}
+            fullWidth
+          /&gt;
+        );
+    }
+  }
+
+  function formatValue(config: SystemConfig): string {
+    if (config.isSensitive) return &#39;••••••••&#39;;
+    
+    switch (config.valueType) {
+      case &#39;boolean&#39;:
+        return config.value ? &#39;Enabled&#39; : &#39;Disabled&#39;;
+      case &#39;percentage&#39;:
+        return `${(config.value * 100).toFixed(0)}%`;
+      case &#39;duration&#39;:
+        if (config.value &gt;= 86400) return `${(config.value / 86400).toFixed(1)} days`;
+        if (config.value &gt;= 3600) return `${(config.value / 3600).toFixed(1)} hours`;
+        if (config.value &gt;= 60) return `${(config.value / 60).toFixed(0)} min`;
+        return `${config.value} sec`;
+      case &#39;json&#39;:
+        return JSON.stringify(config.value);
+      default:
+        return `${config.value}${config.unit ? ` ${config.unit}` : &#39;&#39;}`;
+    }
+  }
+
+  return (
+    &lt;Box sx={{ p: 3 }}&gt;
+      &lt;Box sx={{ display: &#39;flex&#39;, justifyContent: &#39;space-between&#39;, alignItems: &#39;center&#39;, mb: 3 }}&gt;
+        &lt;Typography variant=&quot;h4&quot;&gt;
+          &lt;Settings sx={{ mr: 1, verticalAlign: &#39;middle&#39; }} /&gt;
+          {t(&#39;admin.configuration.title&#39;)}
+        &lt;/Typography&gt;
+        &lt;Button
+          variant=&quot;outlined&quot;
+          startIcon={&lt;Refresh /&gt;}
+          onClick={() =&gt; loadConfigs(activeCategory)}
+        &gt;
+          {t(&#39;admin.buttons.refresh&#39;)}
+        &lt;/Button&gt;
+      &lt;/Box&gt;
+
+      &lt;Box sx={{ display: &#39;flex&#39;, gap: 3 }}&gt;
+        {/* Category Tabs (Vertical) */}
+        &lt;Paper sx={{ minWidth: 250 }}&gt;
+          &lt;Tabs
+            orientation=&quot;vertical&quot;
+            value={activeCategory}
+            onChange={(_, v) =&gt; setActiveCategory(v)}
+            sx={{ borderRight: 1, borderColor: &#39;divider&#39; }}
+          &gt;
+            {categories.map((cat) =&gt; (
+              &lt;Tab
+                key={cat.id}
+                value={cat.id}
+                label={
+                  &lt;Box sx={{ display: &#39;flex&#39;, alignItems: &#39;center&#39;, gap: 1 }}&gt;
+                    {CATEGORY_ICONS[cat.id]}
+                    &lt;span&gt;{cat.name}&lt;/span&gt;
+                  &lt;/Box&gt;
+                }
+                sx={{ justifyContent: &#39;flex-start&#39; }}
+              /&gt;
+            ))}
+          &lt;/Tabs&gt;
+        &lt;/Paper&gt;
+
+        {/* Configuration Table */}
+        &lt;Box sx={{ flex: 1 }}&gt;
+          &lt;TableContainer component={Paper}&gt;
+            &lt;Table&gt;
+              &lt;TableHead&gt;
+                &lt;TableRow&gt;
+                  &lt;TableCell&gt;{t(&#39;admin.configuration.parameter&#39;)}&lt;/TableCell&gt;
+                  &lt;TableCell&gt;{t(&#39;admin.configuration.value&#39;)}&lt;/TableCell&gt;
+                  &lt;TableCell&gt;{t(&#39;admin.configuration.status&#39;)}&lt;/TableCell&gt;
+                  &lt;TableCell align=&quot;right&quot;&gt;{t(&#39;admin.configuration.actions&#39;)}&lt;/TableCell&gt;
+                &lt;/TableRow&gt;
+              &lt;/TableHead&gt;
+              &lt;TableBody&gt;
+                {configs.map((config) =&gt; (
+                  &lt;React.Fragment key={config.key}&gt;
+                    &lt;TableRow hover&gt;
+                      &lt;TableCell&gt;
+                        &lt;Box&gt;
+                          &lt;Typography fontWeight=&quot;medium&quot;&gt;
+                            {config.displayName}
+                            {config.requiresRestart &amp;&amp; (
+                              &lt;Tooltip title=&quot;Requires restart&quot;&gt;
+                                &lt;Warning fontSize=&quot;small&quot; color=&quot;warning&quot; sx={{ ml: 1 }} /&gt;
+                              &lt;/Tooltip&gt;
+                            )}
+                          &lt;/Typography&gt;
+                          &lt;Typography variant=&quot;caption&quot; color=&quot;text.secondary&quot;&gt;
+                            {config.key}
+                          &lt;/Typography&gt;
+                        &lt;/Box&gt;
+                      &lt;/TableCell&gt;
+                      &lt;TableCell&gt;
+                        &lt;Typography fontFamily=&quot;monospace&quot;&gt;
+                          {formatValue(config)}
+                        &lt;/Typography&gt;
+                      &lt;/TableCell&gt;
+                      &lt;TableCell&gt;
+                        {config.isOverride ? (
+                          &lt;Chip size=&quot;small&quot; color=&quot;info&quot; label=&quot;Override&quot; /&gt;
+                        ) : (
+                          &lt;Chip size=&quot;small&quot; color=&quot;default&quot; label=&quot;Default&quot; /&gt;
+                        )}
+                      &lt;/TableCell&gt;
+                      &lt;TableCell align=&quot;right&quot;&gt;
+                        &lt;Tooltip title={t(&#39;admin.buttons.edit&#39;)}&gt;
+                          &lt;IconButton
+                            size=&quot;small&quot;
+                            onClick={() =&gt; {
+                              setEditDialog(config);
+                              setEditValue(config.value);
+                            }}
+                          &gt;
+                            &lt;Edit fontSize=&quot;small&quot; /&gt;
+                          &lt;/IconButton&gt;
+                        &lt;/Tooltip&gt;
+                        &lt;Tooltip title={t(&#39;admin.configuration.history&#39;)}&gt;
+                          &lt;IconButton
+                            size=&quot;small&quot;
+                            onClick={() =&gt; loadAuditLog(config.key)}
+                          &gt;
+                            &lt;History fontSize=&quot;small&quot; /&gt;
+                          &lt;/IconButton&gt;
+                        &lt;/Tooltip&gt;
+                        &lt;IconButton
+                          size=&quot;small&quot;
+                          onClick={() =&gt; {
+                            const newSet = new Set(expandedKeys);
+                            if (newSet.has(config.key)) {
+                              newSet.delete(config.key);
+                            } else {
+                              newSet.add(config.key);
+                            }
+                            setExpandedKeys(newSet);
+                          }}
+                        &gt;
+                          {expandedKeys.has(config.key) ? &lt;ExpandLess /&gt; : &lt;ExpandMore /&gt;}
+                        &lt;/IconButton&gt;
+                      &lt;/TableCell&gt;
+                    &lt;/TableRow&gt;
+                    &lt;TableRow&gt;
+                      &lt;TableCell colSpan={4} sx={{ py: 0 }}&gt;
+                        &lt;Collapse in={expandedKeys.has(config.key)}&gt;
+                          &lt;Box sx={{ p: 2, bgcolor: &#39;grey.50&#39; }}&gt;
+                            &lt;Typography variant=&quot;body2&quot; color=&quot;text.secondary&quot;&gt;
+                              {config.description}
+                            &lt;/Typography&gt;
+                            {config.minValue !== null &amp;&amp; (
+                              &lt;Typography variant=&quot;caption&quot; display=&quot;block&quot;&gt;
+                                Min: {config.minValue} | Max: {config.maxValue}
+                              &lt;/Typography&gt;
+                            )}
+                          &lt;/Box&gt;
+                        &lt;/Collapse&gt;
+                      &lt;/TableCell&gt;
+                    &lt;/TableRow&gt;
+                  &lt;/React.Fragment&gt;
+                ))}
+              &lt;/TableBody&gt;
+            &lt;/Table&gt;
+          &lt;/TableContainer&gt;
+        &lt;/Box&gt;
+      &lt;/Box&gt;
+
+      {/* Edit Dialog */}
+      &lt;Dialog open={!!editDialog} onClose={() =&gt; setEditDialog(null)} maxWidth=&quot;sm&quot; fullWidth&gt;
+        &lt;DialogTitle&gt;
+          {t(&#39;admin.configuration.edit_parameter&#39;)}
+        &lt;/DialogTitle&gt;
+        &lt;DialogContent&gt;
+          {editDialog &amp;&amp; (
+            &lt;Box sx={{ pt: 2 }}&gt;
+              &lt;Typography variant=&quot;subtitle2&quot; gutterBottom&gt;
+                {editDialog.displayName}
+              &lt;/Typography&gt;
+              &lt;Typography variant=&quot;body2&quot; color=&quot;text.secondary&quot; gutterBottom&gt;
+                {editDialog.description}
+              &lt;/Typography&gt;
+              &lt;Box sx={{ mt: 3 }}&gt;
+                {renderValueEditor(editDialog)}
+              &lt;/Box&gt;
+              {editDialog.requiresRestart &amp;&amp; (
+                &lt;Alert severity=&quot;warning&quot; sx={{ mt: 2 }}&gt;
+                  {t(&#39;admin.configuration.requires_restart_warning&#39;)}
+                &lt;/Alert&gt;
+              )}
+            &lt;/Box&gt;
+          )}
+        &lt;/DialogContent&gt;
+        &lt;DialogActions&gt;
+          &lt;Button onClick={() =&gt; setEditDialog(null)}&gt;
+            {t(&#39;admin.buttons.cancel&#39;)}
+          &lt;/Button&gt;
+          &lt;Button onClick={handleSave} variant=&quot;contained&quot; color=&quot;primary&quot;&gt;
+            {t(&#39;admin.buttons.save&#39;)}
+          &lt;/Button&gt;
+        &lt;/DialogActions&gt;
+      &lt;/Dialog&gt;
+
+      {/* History Dialog */}
+      &lt;Dialog open={!!historyDialog} onClose={() =&gt; setHistoryDialog(null)} maxWidth=&quot;md&quot; fullWidth&gt;
+        &lt;DialogTitle&gt;
+          {t(&#39;admin.configuration.change_history&#39;)}: {historyDialog}
+        &lt;/DialogTitle&gt;
+        &lt;DialogContent&gt;
+          &lt;TableContainer&gt;
+            &lt;Table size=&quot;small&quot;&gt;
+              &lt;TableHead&gt;
+                &lt;TableRow&gt;
+                  &lt;TableCell&gt;{t(&#39;admin.configuration.date&#39;)}&lt;/TableCell&gt;
+                  &lt;TableCell&gt;{t(&#39;admin.configuration.action&#39;)}&lt;/TableCell&gt;
+                  &lt;TableCell&gt;{t(&#39;admin.configuration.old_value&#39;)}&lt;/TableCell&gt;
+                  &lt;TableCell&gt;{t(&#39;admin.configuration.new_value&#39;)}&lt;/TableCell&gt;
+                  &lt;TableCell&gt;{t(&#39;admin.configuration.changed_by&#39;)}&lt;/TableCell&gt;
+                &lt;/TableRow&gt;
+              &lt;/TableHead&gt;
+              &lt;TableBody&gt;
+                {auditLog.map((entry) =&gt; (
+                  &lt;TableRow key={entry.id}&gt;
+                    &lt;TableCell&gt;
+                      {new Date(entry.createdAt).toLocaleString()}
+                    &lt;/TableCell&gt;
+                    &lt;TableCell&gt;
+                      &lt;Chip size=&quot;small&quot; label={entry.action} /&gt;
+                    &lt;/TableCell&gt;
+                    &lt;TableCell&gt;
+                      &lt;code&gt;{JSON.stringify(entry.oldValue?.value)}&lt;/code&gt;
+                    &lt;/TableCell&gt;
+                    &lt;TableCell&gt;
+                      &lt;code&gt;{JSON.stringify(entry.newValue?.value)}&lt;/code&gt;
+                    &lt;/TableCell&gt;
+                    &lt;TableCell&gt;{entry.changedByEmail || &#39;System&#39;}&lt;/TableCell&gt;
+                  &lt;/TableRow&gt;
+                ))}
+              &lt;/TableBody&gt;
+            &lt;/Table&gt;
+          &lt;/TableContainer&gt;
+        &lt;/DialogContent&gt;
+        &lt;DialogActions&gt;
+          &lt;Button onClick={() =&gt; setHistoryDialog(null)}&gt;
+            {t(&#39;admin.buttons.close&#39;)}
+          &lt;/Button&gt;
+        &lt;/DialogActions&gt;
+      &lt;/Dialog&gt;
+    &lt;/Box&gt;
+  );
+}</code></pre>
+<hr />
+<h2 id="api-lambda">42.7 API LAMBDA</h2>
+<h3 id="file-lambdaconfigurationapi.ts">File: <code>lambda/configuration/api.ts</code></h3>
+<pre class="typescript"><code>// ============================================================================
+// RADIANT v4.8.0 - Configuration API Lambda
+// ============================================================================
+
+import { APIGatewayProxyHandler, APIGatewayProxyResult } from &#39;aws-lambda&#39;;
+import { Pool } from &#39;pg&#39;;
+import { extractAuthContext, requireRoles } from &#39;../shared/auth&#39;;
+import { ConfigurationService } from &#39;@radiant/shared/config&#39;;
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
+
+const configService = new ConfigurationService(pool);
+
+export const handler: APIGatewayProxyHandler = async (event): Promise&lt;APIGatewayProxyResult&gt; =&gt; {
+  const { httpMethod, path, pathParameters, body } = event;
+  
+  try {
+    const auth = extractAuthContext(event);
+    requireRoles(auth, [&#39;admin&#39;, &#39;super_admin&#39;]);
+
+    // GET /configuration/categories
+    if (httpMethod === &#39;GET&#39; &amp;&amp; path === &#39;/configuration/categories&#39;) {
+      return await getCategories();
+    }
+
+    // GET /configuration/category/:id
+    if (httpMethod === &#39;GET&#39; &amp;&amp; path.match(/\/configuration\/category\/[a-z_]+$/)) {
+      return await getByCategory(pathParameters?.id!, auth.tenantId);
+    }
+
+    // GET /configuration/:key
+    if (httpMethod === &#39;GET&#39; &amp;&amp; path.match(/\/configuration\/[a-z_.]+$/)) {
+      return await getConfig(pathParameters?.key!, auth.tenantId);
+    }
+
+    // PUT /configuration/:key
+    if (httpMethod === &#39;PUT&#39; &amp;&amp; path.match(/\/configuration\/[a-z_.]+$/)) {
+      requireRoles(auth, [&#39;super_admin&#39;]);
+      return await updateConfig(pathParameters?.key!, JSON.parse(body || &#39;{}&#39;), auth.userId);
+    }
+
+    // GET /configuration/:key/audit
+    if (httpMethod === &#39;GET&#39; &amp;&amp; path.match(/\/configuration\/[a-z_.]+\/audit$/)) {
+      return await getAuditLog(pathParameters?.key!, auth.tenantId);
+    }
+
+    // POST /configuration/:key/tenant-override
+    if (httpMethod === &#39;POST&#39; &amp;&amp; path.match(/\/configuration\/[a-z_.]+\/tenant-override$/)) {
+      requireRoles(auth, [&#39;super_admin&#39;]);
+      const { tenantId, ...rest } = JSON.parse(body || &#39;{}&#39;);
+      return await createTenantOverride(pathParameters?.key!, tenantId, rest, auth.userId);
+    }
+
+    // DELETE /configuration/:key/tenant-override/:tenantId
+    if (httpMethod === &#39;DELETE&#39; &amp;&amp; path.match(/\/configuration\/[a-z_.]+\/tenant-override\/[a-f0-9-]+$/)) {
+      requireRoles(auth, [&#39;super_admin&#39;]);
+      return await deleteTenantOverride(pathParameters?.key!, pathParameters?.tenantId!);
+    }
+
+    // POST /configuration/export
+    if (httpMethod === &#39;POST&#39; &amp;&amp; path === &#39;/configuration/export&#39;) {
+      return await exportConfigs(auth.tenantId);
+    }
+
+    return { statusCode: 404, body: JSON.stringify({ error: &#39;Not found&#39; }) };
+  } catch (error) {
+    console.error(&#39;Configuration API error:&#39;, error);
+    return {
+      statusCode: error.statusCode || 500,
+      body: JSON.stringify({ error: error.message }),
+    };
+  }
+};
+
+async function getCategories(): Promise&lt;APIGatewayProxyResult&gt; {
+  const result = await pool.query(`
+    SELECT id, name, description, display_order, icon
+    FROM configuration_categories
+    ORDER BY display_order
+  `);
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify(result.rows),
+  };
+}
+
+async function getByCategory(categoryId: string, tenantId: string): Promise&lt;APIGatewayProxyResult&gt; {
+  const configs = await configService.getByCategory(categoryId, tenantId);
+  
+  return {
+    statusCode: 200,
+    body: JSON.stringify(configs),
+  };
+}
+
+async function getConfig(key: string, tenantId: string): Promise&lt;APIGatewayProxyResult&gt; {
+  const value = await configService.get(key, tenantId);
+  
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ key, value }),
+  };
+}
+
+async function updateConfig(key: string, data: any, userId: string): Promise&lt;APIGatewayProxyResult&gt; {
+  const config = await configService.update(key, data, userId);
+  
+  return {
+    statusCode: 200,
+    body: JSON.stringify(config),
+  };
+}
+
+async function getAuditLog(key: string, tenantId: string): Promise&lt;APIGatewayProxyResult&gt; {
+  const log = await configService.getAuditLog(key, { tenantId, limit: 100 });
+  
+  return {
+    statusCode: 200,
+    body: JSON.stringify(log),
+  };
+}
+
+async function createTenantOverride(
+  key: string, 
+  tenantId: string, 
+  data: any, 
+  userId: string
+): Promise&lt;APIGatewayProxyResult&gt; {
+  const override = await configService.createTenantOverride(key, tenantId, data, userId);
+  
+  return {
+    statusCode: 201,
+    body: JSON.stringify(override),
+  };
+}
+
+async function deleteTenantOverride(key: string, tenantId: string): Promise&lt;APIGatewayProxyResult&gt; {
+  await configService.deleteTenantOverride(key, tenantId);
+  
+  return {
+    statusCode: 204,
+    body: &#39;&#39;,
+  };
+}
+
+async function exportConfigs(tenantId: string): Promise&lt;APIGatewayProxyResult&gt; {
+  const exportData = await configService.exportConfigs(tenantId);
+  
+  return {
+    statusCode: 200,
+    headers: {
+      &#39;Content-Type&#39;: &#39;application/json&#39;,
+      &#39;Content-Disposition&#39;: `attachment; filename=&quot;radiant-config-${new Date().toISOString().split(&#39;T&#39;)[0]}.json&quot;`,
+    },
+    body: JSON.stringify(exportData, null, 2),
+  };
+}</code></pre>
+<hr />
+<h2 id="usage-example---updating-code-to-use-configurable-values">42.8 USAGE EXAMPLE - UPDATING CODE TO USE CONFIGURABLE VALUES</h2>
+<h3 id="before-hardcoded">Before (Hardcoded):</h3>
+<pre class="typescript"><code>// OLD CODE - Hardcoded values
+const DEFAULT_MARGIN = 0.40;
+const MAX_RETRY_ATTEMPTS = 3;
+const SESSION_TIMEOUT = 1800;
+
+async function calculateCost(providerCost: number): Promise&lt;number&gt; {
+  return providerCost * (1 + DEFAULT_MARGIN);  // ← HARDCODED!
+}
+
+async function retryRequest(fn: () =&gt; Promise&lt;any&gt;): Promise&lt;any&gt; {
+  for (let i = 0; i &lt; MAX_RETRY_ATTEMPTS; i++) {  // ← HARDCODED!
+    try {
+      return await fn();
+    } catch (error) {
+      if (i === MAX_RETRY_ATTEMPTS - 1) throw error;
+      await sleep(1000 * Math.pow(2, i));
+    }
+  }
+}</code></pre>
+<h3 id="after-database-driven">After (Database-Driven):</h3>
+<pre class="typescript"><code>// NEW CODE - Database-driven with ConfigurationService
+import { getConfig, CONFIG_KEYS } from &#39;@radiant/shared/config&#39;;
+
+async function calculateCost(providerCost: number, tenantId: string): Promise&lt;number&gt; {
+  const margin = await getConfig&lt;number&gt;(
+    CONFIG_KEYS.EXTERNAL_PROVIDER_MARGIN, 
+    tenantId
+  );
+  return providerCost * (1 + margin);  // ✓ CONFIGURABLE!
+}
+
+async function retryRequest(fn: () =&gt; Promise&lt;any&gt;, tenantId: string): Promise&lt;any&gt; {
+  const [maxAttempts, initialDelay, backoffMultiplier] = await Promise.all([
+    getConfig&lt;number&gt;(CONFIG_KEYS.MAX_RETRY_ATTEMPTS, tenantId),
+    getConfig&lt;number&gt;(CONFIG_KEYS.INITIAL_RETRY_DELAY, tenantId),
+    getConfig&lt;number&gt;(CONFIG_KEYS.BACKOFF_MULTIPLIER, tenantId),
+  ]);
+  
+  for (let i = 0; i &lt; maxAttempts; i++) {  // ✓ CONFIGURABLE!
+    try {
+      return await fn();
+    } catch (error) {
+      if (i === maxAttempts - 1) throw error;
+      await sleep(initialDelay * Math.pow(backoffMultiplier, i));
+    }
+  }
+}</code></pre>
+<hr />
+<h2 id="localization-strings-for-configuration-ui">42.9 LOCALIZATION STRINGS FOR CONFIGURATION UI</h2>
+<h3 id="add-to-migration-041b_seed_localization.sql">Add to migration 041b_seed_localization.sql:</h3>
+<pre class="sql"><code>-- Configuration Management Strings
+INSERT INTO localization_registry (key, default_text, category, context, source_app) VALUES
+(&#39;admin.configuration.title&#39;, &#39;Configuration Management&#39;, &#39;features.admin&#39;, &#39;Page title&#39;, &#39;admin&#39;),
+(&#39;admin.configuration.parameter&#39;, &#39;Parameter&#39;, &#39;features.admin&#39;, &#39;Table header&#39;, &#39;admin&#39;),
+(&#39;admin.configuration.value&#39;, &#39;Value&#39;, &#39;features.admin&#39;, &#39;Table header&#39;, &#39;admin&#39;),
+(&#39;admin.configuration.status&#39;, &#39;Status&#39;, &#39;features.admin&#39;, &#39;Table header&#39;, &#39;admin&#39;),
+(&#39;admin.configuration.actions&#39;, &#39;Actions&#39;, &#39;features.admin&#39;, &#39;Table header&#39;, &#39;admin&#39;),
+(&#39;admin.configuration.history&#39;, &#39;History&#39;, &#39;features.admin&#39;, &#39;Button tooltip&#39;, &#39;admin&#39;),
+(&#39;admin.configuration.edit_parameter&#39;, &#39;Edit Parameter&#39;, &#39;features.admin&#39;, &#39;Dialog title&#39;, &#39;admin&#39;),
+(&#39;admin.configuration.change_history&#39;, &#39;Change History&#39;, &#39;features.admin&#39;, &#39;Dialog title&#39;, &#39;admin&#39;),
+(&#39;admin.configuration.date&#39;, &#39;Date&#39;, &#39;features.admin&#39;, &#39;Table header&#39;, &#39;admin&#39;),
+(&#39;admin.configuration.action&#39;, &#39;Action&#39;, &#39;features.admin&#39;, &#39;Table header&#39;, &#39;admin&#39;),
+(&#39;admin.configuration.old_value&#39;, &#39;Old Value&#39;, &#39;features.admin&#39;, &#39;Table header&#39;, &#39;admin&#39;),
+(&#39;admin.configuration.new_value&#39;, &#39;New Value&#39;, &#39;features.admin&#39;, &#39;Table header&#39;, &#39;admin&#39;),
+(&#39;admin.configuration.changed_by&#39;, &#39;Changed By&#39;, &#39;features.admin&#39;, &#39;Table header&#39;, &#39;admin&#39;),
+(&#39;admin.configuration.requires_restart_warning&#39;, &#39;This change requires a service restart to take effect.&#39;, &#39;features.admin&#39;, &#39;Warning message&#39;, &#39;admin&#39;);</code></pre>
+<hr />
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h1 id="implementation-verification-checklist">IMPLEMENTATION VERIFICATION CHECKLIST</h1>
+<h1 id="section-2">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="complete-v4.8.0-verification">Complete v4.8.0 Verification</h2>
+<h3 id="section-42-dynamic-configuration-management-system">Section 42: Dynamic Configuration Management System</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Migration 042_configuration_management.sql applied successfully</label></li>
+<li><label><input type="checkbox" />Migration 042b_seed_configuration.sql applied with all parameters</label></li>
+<li><label><input type="checkbox" />configuration_categories table created with 12 categories</label></li>
+<li><label><input type="checkbox" />system_configuration table created with type validation</label></li>
+<li><label><input type="checkbox" />tenant_configuration_overrides table created with RLS</label></li>
+<li><label><input type="checkbox" />configuration_audit_log table created</label></li>
+<li><label><input type="checkbox" />configuration_cache_invalidation table created</label></li>
+<li><label><input type="checkbox" />get_config() function working with tenant override support</label></li>
+<li><label><input type="checkbox" />get_configs_by_category() function returning configs</label></li>
+<li><label><input type="checkbox" />Audit log triggers capturing all changes</label></li>
+<li><label><input type="checkbox" />Cache invalidation triggers working</label></li>
+<li><label><input type="checkbox" />ConfigurationService TypeScript class implemented</label></li>
+<li><label><input type="checkbox" />getConfig() helper function working with caching</label></li>
+<li><label><input type="checkbox" />Redis caching layer integrated</label></li>
+<li><label><input type="checkbox" />Configuration API Lambda deployed</label></li>
+<li><label><input type="checkbox" />Admin /configuration page accessible</label></li>
+<li><label><input type="checkbox" />Category tabs displaying all 12 categories</label></li>
+<li><label><input type="checkbox" />Edit dialog with type-appropriate editors</label></li>
+<li><label><input type="checkbox" />History dialog showing audit log</label></li>
+<li><label><input type="checkbox" />Tenant override creation working</label></li>
+<li><label><input type="checkbox" />Configuration export/import working</label></li>
+<li><label><input type="checkbox" />All hardcoded values replaced with getConfig() calls</label></li>
+<li><label><input type="checkbox" />Localization strings added for configuration UI</label></li>
+</ul>
+<h3 id="section-41-complete-internationalization-system-from-v4.7.0">Section 41: Complete Internationalization System (from v4.7.0)</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />All previous v4.7.0 checklist items verified</label></li>
+</ul>
+<h3 id="section-40-application-level-data-isolation-from-v4.6.0">Section 40: Application-Level Data Isolation (from v4.6.0)</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />All previous v4.6.0 checklist items verified</label></li>
+</ul>
+<h3 id="integration-verification">Integration Verification</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />All Lambda functions using ConfigurationService</label></li>
+<li><label><input type="checkbox" />No hardcoded rate limits remaining</label></li>
+<li><label><input type="checkbox" />No hardcoded timeouts remaining</label></li>
+<li><label><input type="checkbox" />No hardcoded pricing margins remaining</label></li>
+<li><label><input type="checkbox" />No hardcoded token limits remaining</label></li>
+<li><label><input type="checkbox" />No hardcoded retry configurations remaining</label></li>
+<li><label><input type="checkbox" />Configuration changes propagate without deployment</label></li>
+<li><label><input type="checkbox" />Per-tenant overrides working correctly</label></li>
+<li><label><input type="checkbox" />Audit trail complete for all changes</label></li>
+</ul>
+<hr />
+<h1 id="section-3">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

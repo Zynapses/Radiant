@@ -4,20 +4,40 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { tierCoordinatorService } from '../shared/services/cortex/tier-coordinator.service';
-import { getTenantId, getUserId, createResponse, createErrorResponse } from '../shared/utils';
+import { extractAuthContext } from '../shared/auth';
 import { executeStatement, stringParam } from '../shared/db/client';
+import { Logger } from '../shared/logger';
+
+const logger = new Logger({ handler: 'cortex' });
+
+const corsHeaders = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-Tenant-ID',
+  'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+};
+
+function jsonResponse(data: unknown, statusCode = 200): APIGatewayProxyResult {
+  return { statusCode, headers: corsHeaders, body: JSON.stringify(data) };
+}
+
+function errorResponse(statusCode: number, message: string): APIGatewayProxyResult {
+  return { statusCode, headers: corsHeaders, body: JSON.stringify({ error: message }) };
+}
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const path = event.path.replace(/^\/api\/admin\/cortex/, '');
   const method = event.httpMethod;
 
   try {
-    const tenantId = getTenantId(event);
-    const userId = getUserId(event);
+    const auth = extractAuthContext(event);
+    const tenantId = auth.tenantId;
+    const userId = auth.userId;
 
     if (!tenantId) {
-      return createErrorResponse(401, 'Tenant ID required');
+      return errorResponse(401, 'Tenant ID required');
     }
 
     // Set tenant context
@@ -117,10 +137,10 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return getErasureRequests(tenantId);
     }
 
-    return createErrorResponse(404, 'Endpoint not found');
+    return errorResponse(404, 'Endpoint not found');
   } catch (error) {
-    console.error('Cortex API error:', error);
-    return createErrorResponse(500, 'Internal server error');
+    logger.error('Cortex handler error', error as Error);
+    return errorResponse(500, 'Internal server error');
   }
 };
 
@@ -150,12 +170,12 @@ async function getOverview(tenantId: string): Promise<APIGatewayProxyResult> {
 
   const stats = storageStats.rows?.[0] || {};
 
-  return createResponse(200, {
+  return jsonResponse({
     config,
     tiers: {
-      hot: health.find(h => h.tier === 'hot') || { tier: 'hot', status: 'healthy' },
-      warm: health.find(h => h.tier === 'warm') || { tier: 'warm', status: 'healthy' },
-      cold: health.find(h => h.tier === 'cold') || { tier: 'cold', status: 'healthy' },
+      hot: health.find((h: { tier: string }) => h.tier === 'hot') || { tier: 'hot', status: 'healthy' },
+      warm: health.find((h: { tier: string }) => h.tier === 'warm') || { tier: 'warm', status: 'healthy' },
+      cold: health.find((h: { tier: string }) => h.tier === 'cold') || { tier: 'cold', status: 'healthy' },
     },
     stats: {
       nodeCount: parseInt(stats.node_count as string) || 0,
@@ -183,7 +203,7 @@ async function getConfig(tenantId: string): Promise<APIGatewayProxyResult> {
     config = await tierCoordinatorService.getConfig(tenantId);
   }
 
-  return createResponse(200, config);
+  return jsonResponse(config);
 }
 
 async function updateConfig(tenantId: string, updates: Record<string, unknown>): Promise<APIGatewayProxyResult> {
@@ -214,7 +234,7 @@ async function updateConfig(tenantId: string, updates: Record<string, unknown>):
     );
   }
 
-  return getConfig(tenantId);
+  return jsonResponse(await tierCoordinatorService.getConfig(tenantId));
 }
 
 // ============================================================================
@@ -223,13 +243,13 @@ async function updateConfig(tenantId: string, updates: Record<string, unknown>):
 
 async function getTierHealth(tenantId: string): Promise<APIGatewayProxyResult> {
   const health = await tierCoordinatorService.getTierHealth(tenantId);
-  return createResponse(200, health);
+  return jsonResponse(health);
 }
 
 async function checkTierHealth(tenantId: string): Promise<APIGatewayProxyResult> {
   const alerts = await tierCoordinatorService.checkTierHealth(tenantId);
   const health = await tierCoordinatorService.getTierHealth(tenantId);
-  return createResponse(200, { health, newAlerts: alerts });
+  return jsonResponse({ health, newAlerts: alerts });
 }
 
 // ============================================================================
@@ -238,12 +258,12 @@ async function checkTierHealth(tenantId: string): Promise<APIGatewayProxyResult>
 
 async function getAlerts(tenantId: string): Promise<APIGatewayProxyResult> {
   const alerts = await tierCoordinatorService.getActiveAlerts(tenantId);
-  return createResponse(200, alerts);
+  return jsonResponse(alerts);
 }
 
 async function acknowledgeAlert(tenantId: string, alertId: string, userId: string): Promise<APIGatewayProxyResult> {
   await tierCoordinatorService.acknowledgeAlert(tenantId, alertId, userId);
-  return createResponse(200, { acknowledged: true });
+  return jsonResponse({ acknowledged: true });
 }
 
 // ============================================================================
@@ -252,7 +272,7 @@ async function acknowledgeAlert(tenantId: string, alertId: string, userId: strin
 
 async function getDataFlowMetrics(tenantId: string, period: 'hour' | 'day' | 'week'): Promise<APIGatewayProxyResult> {
   const metrics = await tierCoordinatorService.getDataFlowMetrics(tenantId, period);
-  return createResponse(200, metrics);
+  return jsonResponse(metrics);
 }
 
 // ============================================================================
@@ -278,15 +298,15 @@ async function getGraphStats(tenantId: string): Promise<APIGatewayProxyResult> {
     [stringParam('tenantId', tenantId)]
   );
 
-  return createResponse(200, {
-    nodesByType: (result.rows || []).reduce((acc, row) => {
+  return jsonResponse({
+    nodesByType: (result.rows || []).reduce((acc: Record<string, number>, row) => {
       acc[row.node_type as string] = parseInt(row.count as string);
       return acc;
-    }, {} as Record<string, number>),
-    edgesByType: (edgeResult.rows || []).reduce((acc, row) => {
+    }, {}),
+    edgesByType: (edgeResult.rows || []).reduce((acc: Record<string, number>, row) => {
       acc[row.edge_type as string] = parseInt(row.count as string);
       return acc;
-    }, {} as Record<string, number>),
+    }, {}),
   });
 }
 
@@ -330,7 +350,7 @@ async function exploreGraph(tenantId: string, params: Record<string, string | un
     edges = edgesResult.rows || [];
   }
 
-  return createResponse(200, { nodes, edges });
+  return jsonResponse({ nodes, edges });
 }
 
 async function getConflicts(tenantId: string): Promise<APIGatewayProxyResult> {
@@ -347,7 +367,7 @@ async function getConflicts(tenantId: string): Promise<APIGatewayProxyResult> {
     [stringParam('tenantId', tenantId)]
   );
 
-  return createResponse(200, result.rows || []);
+  return jsonResponse(result.rows || []);
 }
 
 // ============================================================================
@@ -356,12 +376,12 @@ async function getConflicts(tenantId: string): Promise<APIGatewayProxyResult> {
 
 async function getHousekeepingStatus(tenantId: string): Promise<APIGatewayProxyResult> {
   const tasks = await tierCoordinatorService.getHousekeepingTasks(tenantId);
-  return createResponse(200, tasks);
+  return jsonResponse(tasks);
 }
 
 async function triggerHousekeeping(tenantId: string, taskType: string): Promise<APIGatewayProxyResult> {
   await tierCoordinatorService.triggerHousekeepingTask(tenantId, taskType as any);
-  return createResponse(200, { triggered: true, taskType });
+  return jsonResponse({ triggered: true, taskType });
 }
 
 // ============================================================================
@@ -378,7 +398,7 @@ async function getMountsData(tenantId: string): Promise<any[]> {
 
 async function getMounts(tenantId: string): Promise<APIGatewayProxyResult> {
   const mounts = await getMountsData(tenantId);
-  return createResponse(200, mounts);
+  return jsonResponse(mounts);
 }
 
 async function createMount(tenantId: string, body: any): Promise<APIGatewayProxyResult> {
@@ -396,7 +416,7 @@ async function createMount(tenantId: string, body: any): Promise<APIGatewayProxy
     ]
   );
 
-  return createResponse(201, result.rows[0]);
+  return jsonResponse(result.rows[0], 201);
 }
 
 async function rescanMount(tenantId: string, mountId: string): Promise<APIGatewayProxyResult> {
@@ -405,16 +425,44 @@ async function rescanMount(tenantId: string, mountId: string): Promise<APIGatewa
     [stringParam('tenantId', tenantId), stringParam('mountId', mountId)]
   );
 
-  // In production: Trigger async scan Lambda
-  // For now, simulate completion
-  await executeStatement(
-    `UPDATE cortex_zero_copy_mounts 
-     SET status = 'active', last_scan_at = NOW() 
-     WHERE tenant_id = $1 AND id = $2`,
-    [stringParam('tenantId', tenantId), stringParam('mountId', mountId)]
-  );
+  const scanLambda = process.env.CORTEX_MOUNT_SCAN_LAMBDA;
+  
+  if (scanLambda) {
+    try {
+      const lambdaClient = new LambdaClient({ region: process.env.AWS_REGION || 'us-east-1' });
+      
+      await lambdaClient.send(new InvokeCommand({
+        FunctionName: scanLambda,
+        InvocationType: 'Event', // Async
+        Payload: JSON.stringify({
+          type: 'mount_scan',
+          tenantId,
+          mountId,
+          requestedAt: new Date().toISOString(),
+        }),
+      }));
+      
+      logger.info('Mount scan Lambda invoked', { tenantId, mountId, lambda: scanLambda });
+    } catch (error) {
+      logger.error('Failed to invoke scan Lambda, marking as failed', { tenantId, mountId, error });
+      await executeStatement(
+        `UPDATE cortex_zero_copy_mounts SET status = 'scan_failed' WHERE tenant_id = $1 AND id = $2`,
+        [stringParam('tenantId', tenantId), stringParam('mountId', mountId)]
+      );
+      return jsonResponse({ scanning: false, error: 'Failed to start scan' }, 500);
+    }
+  } else {
+    // No Lambda configured - complete synchronously for dev environments
+    logger.warn('No scan Lambda configured, completing synchronously', { tenantId, mountId });
+    await executeStatement(
+      `UPDATE cortex_zero_copy_mounts 
+       SET status = 'active', last_scan_at = NOW() 
+       WHERE tenant_id = $1 AND id = $2`,
+      [stringParam('tenantId', tenantId), stringParam('mountId', mountId)]
+    );
+  }
 
-  return createResponse(200, { scanning: true, mountId });
+  return jsonResponse({ scanning: true, mountId });
 }
 
 async function deleteMount(tenantId: string, mountId: string): Promise<APIGatewayProxyResult> {
@@ -423,7 +471,7 @@ async function deleteMount(tenantId: string, mountId: string): Promise<APIGatewa
     [stringParam('tenantId', tenantId), stringParam('mountId', mountId)]
   );
 
-  return createResponse(200, { deleted: true, mountId });
+  return jsonResponse({ deleted: true, mountId });
 }
 
 // ============================================================================
@@ -446,11 +494,22 @@ async function createErasureRequest(tenantId: string, userId: string, body: any)
     ]
   );
 
-  // Trigger async processing
+  // Trigger async GDPR erasure processing
   const requestId = result.rows[0].id as string;
-  // In production: await tierCoordinatorService.processGdprErasure(requestId);
+  
+  try {
+    await tierCoordinatorService.processGdprErasure(requestId);
+    logger.info('GDPR erasure processing started', { tenantId, requestId });
+  } catch (error) {
+    logger.error('Failed to start GDPR erasure processing', { requestId, error });
+    // Update request status to indicate processing failed to start
+    await executeStatement(
+      `UPDATE cortex_gdpr_erasure_requests SET status = 'processing_failed', error_message = $2 WHERE id = $1`,
+      [stringParam('id', requestId), stringParam('error', error instanceof Error ? error.message : 'Unknown error')]
+    );
+  }
 
-  return createResponse(201, result.rows[0]);
+  return jsonResponse(result.rows[0], 201);
 }
 
 async function getErasureRequests(tenantId: string): Promise<APIGatewayProxyResult> {
@@ -459,5 +518,5 @@ async function getErasureRequests(tenantId: string): Promise<APIGatewayProxyResu
     [stringParam('tenantId', tenantId)]
   );
 
-  return createResponse(200, result.rows || []);
+  return jsonResponse(result.rows || []);
 }

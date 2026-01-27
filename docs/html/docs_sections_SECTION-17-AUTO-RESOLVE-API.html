@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 17 AUTO RESOLVE API - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 17 AUTO RESOLVE API</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-17-AUTO-RESOLVE-API.md</div>
+  </div>
+  
+  <h1 id="section-17-simple-auto-resolve-api-v3.3.0">SECTION 17: SIMPLE AUTO-RESOLVE API (v3.3.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="auto-resolve-overview">17.1 Auto-Resolve Overview</h2>
+<p>Intelligent model selection API that automatically picks the best model based on the request.</p>
+<h2 id="auto-resolve-database-schema">17.2 Auto-Resolve Database Schema</h2>
+<pre class="sql"><code>-- migrations/026_auto_resolve.sql
+
+CREATE TABLE auto_resolve_requests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    request_type VARCHAR(50) NOT NULL,
+    selected_model VARCHAR(100) NOT NULL,
+    selection_reason TEXT,
+    user_preferences JSONB DEFAULT &#39;{}&#39;,
+    input_tokens INTEGER,
+    output_tokens INTEGER,
+    cost DECIMAL(10, 6),
+    latency_ms INTEGER,
+    success BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_auto_resolve_tenant ON auto_resolve_requests(tenant_id, created_at DESC);
+CREATE INDEX idx_auto_resolve_model ON auto_resolve_requests(selected_model);
+
+ALTER TABLE auto_resolve_requests ENABLE ROW LEVEL SECURITY;
+CREATE POLICY auto_resolve_isolation ON auto_resolve_requests USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);</code></pre>
+<h2 id="auto-resolve-service">17.3 Auto-Resolve Service</h2>
+<pre class="typescript"><code>// packages/core/src/services/auto-resolve.ts
+
+import { Pool } from &#39;pg&#39;;
+import { BrainRouter } from &#39;./brain-router&#39;;
+
+interface AutoResolveRequest {
+    tenantId: string;
+    userId: string;
+    prompt: string;
+    preferences?: {
+        maxCost?: number;
+        maxLatencyMs?: number;
+        preferredProvider?: string;
+        qualityLevel?: &#39;economy&#39; | &#39;balanced&#39; | &#39;premium&#39;;
+    };
+}
+
+interface AutoResolveResult {
+    model: string;
+    provider: string;
+    reason: string;
+    estimatedCost: number;
+}
+
+export class AutoResolveService {
+    private pool: Pool;
+    private router: BrainRouter;
+    
+    constructor(pool: Pool) {
+        this.pool = pool;
+        this.router = new BrainRouter(pool);
+    }
+    
+    async resolve(request: AutoResolveRequest): Promise&lt;AutoResolveResult&gt; {
+        // Analyze the prompt
+        const analysis = this.analyzePrompt(request.prompt);
+        
+        // Get routing result
+        const routing = await this.router.route({
+            tenantId: request.tenantId,
+            userId: request.userId,
+            taskType: analysis.taskType,
+            inputTokenEstimate: analysis.tokenEstimate,
+            maxLatencyMs: request.preferences?.maxLatencyMs,
+            maxCost: request.preferences?.maxCost,
+            preferredProvider: request.preferences?.preferredProvider,
+            requiresVision: analysis.requiresVision,
+            requiresAudio: analysis.requiresAudio
+        });
+        
+        // Log the request
+        await this.pool.query(`
+            INSERT INTO auto_resolve_requests (tenant_id, user_id, request_type, selected_model, selection_reason, user_preferences)
+            VALUES ($1, $2, $3, $4, $5, $6)
+        `, [
+            request.tenantId,
+            request.userId,
+            analysis.taskType,
+            routing.model,
+            routing.reason,
+            JSON.stringify(request.preferences || {})
+        ]);
+        
+        return {
+            model: routing.model,
+            provider: routing.provider,
+            reason: routing.reason,
+            estimatedCost: routing.estimatedCost
+        };
+    }
+    
+    private analyzePrompt(prompt: string): {
+        taskType: &#39;chat&#39; | &#39;code&#39; | &#39;analysis&#39; | &#39;creative&#39; | &#39;vision&#39; | &#39;audio&#39;;
+        tokenEstimate: number;
+        requiresVision: boolean;
+        requiresAudio: boolean;
+    } {
+        const lowerPrompt = prompt.toLowerCase();
+        
+        let taskType: &#39;chat&#39; | &#39;code&#39; | &#39;analysis&#39; | &#39;creative&#39; | &#39;vision&#39; | &#39;audio&#39; = &#39;chat&#39;;
+        
+        if (lowerPrompt.includes(&#39;code&#39;) || lowerPrompt.includes(&#39;function&#39;) || lowerPrompt.includes(&#39;debug&#39;)) {
+            taskType = &#39;code&#39;;
+        } else if (lowerPrompt.includes(&#39;analyze&#39;) || lowerPrompt.includes(&#39;data&#39;) || lowerPrompt.includes(&#39;statistics&#39;)) {
+            taskType = &#39;analysis&#39;;
+        } else if (lowerPrompt.includes(&#39;write&#39;) || lowerPrompt.includes(&#39;story&#39;) || lowerPrompt.includes(&#39;creative&#39;)) {
+            taskType = &#39;creative&#39;;
+        }
+        
+        return {
+            taskType,
+            tokenEstimate: Math.ceil(prompt.length / 4),
+            requiresVision: lowerPrompt.includes(&#39;image&#39;) || lowerPrompt.includes(&#39;picture&#39;),
+            requiresAudio: lowerPrompt.includes(&#39;audio&#39;) || lowerPrompt.includes(&#39;speech&#39;)
+        };
+    }
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

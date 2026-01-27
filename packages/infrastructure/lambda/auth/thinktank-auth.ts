@@ -26,6 +26,9 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { createHmac } from 'crypto';
+import { Logger } from '../shared/logger';
+
+const logger = new Logger({ handler: 'thinktank-auth' });
 
 const cognitoClient = new CognitoIdentityProviderClient({});
 
@@ -148,7 +151,7 @@ async function handleLogin(event: APIGatewayProxyEvent): Promise<APIGatewayProxy
 
     return jsonResponse(200, authResponse);
   } catch (error: any) {
-    console.error('Login error:', error);
+    logger.error('Login error', error as Error);
 
     if (error.name === 'NotAuthorizedException') {
       return jsonResponse(401, {
@@ -228,7 +231,7 @@ async function handleRefresh(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
     return jsonResponse(200, authResponse);
   } catch (error: any) {
-    console.error('Refresh error:', error);
+    logger.error('Refresh error', error as Error);
 
     return jsonResponse(401, {
       code: 'REFRESH_FAILED',
@@ -251,7 +254,7 @@ async function handleLogout(event: APIGatewayProxyEvent): Promise<APIGatewayProx
 
     return jsonResponse(200, { success: true });
   } catch (error) {
-    console.error('Logout error:', error);
+    logger.error('Logout error', error as Error);
     // Return success anyway - client should clear local state
     return jsonResponse(200, { success: true });
   }
@@ -294,7 +297,7 @@ async function handleRegister(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       message: 'Registration successful. Please check your email to verify your account.',
     });
   } catch (error: any) {
-    console.error('Register error:', error);
+    logger.error('Register error', error as Error);
 
     if (error.name === 'UsernameExistsException') {
       return jsonResponse(400, {
@@ -343,7 +346,7 @@ async function handleVerifyEmail(event: APIGatewayProxyEvent): Promise<APIGatewa
       message: 'Email verified successfully. You can now log in.',
     });
   } catch (error: any) {
-    console.error('Verify email error:', error);
+    logger.error('Verify email error', error as Error);
 
     if (error.name === 'CodeMismatchException') {
       return jsonResponse(400, {
@@ -391,7 +394,7 @@ async function handleForgotPassword(event: APIGatewayProxyEvent): Promise<APIGat
       message: 'If an account exists with this email, you will receive a password reset code.',
     });
   } catch (error) {
-    console.error('Forgot password error:', error);
+    logger.error('Forgot password error', error as Error);
     // Always return success to prevent email enumeration
     return jsonResponse(200, {
       success: true,
@@ -427,7 +430,7 @@ async function handleResetPassword(event: APIGatewayProxyEvent): Promise<APIGate
       message: 'Password reset successful. You can now log in with your new password.',
     });
   } catch (error: any) {
-    console.error('Reset password error:', error);
+    logger.error('Reset password error', error as Error);
 
     if (error.name === 'CodeMismatchException') {
       return jsonResponse(400, {
@@ -485,7 +488,7 @@ async function handleChangePassword(event: APIGatewayProxyEvent): Promise<APIGat
       message: 'Password changed successfully',
     });
   } catch (error: any) {
-    console.error('Change password error:', error);
+    logger.error('Change password error', error as Error);
 
     if (error.name === 'NotAuthorizedException') {
       return jsonResponse(400, {
@@ -532,7 +535,7 @@ async function handleGetSession(event: APIGatewayProxyEvent): Promise<APIGateway
       },
     });
   } catch (error) {
-    console.error('Get session error:', error);
+    logger.error('Get session error', error as Error);
     return jsonResponse(401, {
       code: 'INVALID_SESSION',
       message: 'Invalid or expired session',
@@ -613,14 +616,14 @@ async function handleAdminLogin(event: APIGatewayProxyEvent): Promise<APIGateway
     );
 
     if (!isAdmin) {
-      console.warn(`Admin login rejected for user ${email} with role ${userRole}`);
+      logger.warn('Admin login rejected', { email, role: userRole });
       return jsonResponse(403, {
         code: 'ADMIN_ACCESS_DENIED',
         message: 'This endpoint requires administrator privileges. Access denied.',
       });
     }
 
-    console.log(`Admin login successful for ${email} with role ${userRole}`);
+    logger.info('Admin login successful', { email, role: userRole });
 
     const authResponse: AuthResponse = {
       accessToken: authResult.AccessToken,
@@ -638,7 +641,7 @@ async function handleAdminLogin(event: APIGatewayProxyEvent): Promise<APIGateway
 
     return jsonResponse(200, authResponse);
   } catch (error: any) {
-    console.error('Admin login error:', error);
+    logger.error('Admin login error', error as Error);
 
     if (error.name === 'NotAuthorizedException') {
       return jsonResponse(401, {
@@ -709,7 +712,7 @@ async function handleAdminRefresh(event: APIGatewayProxyEvent): Promise<APIGatew
     );
 
     if (!isAdmin) {
-      console.warn(`Admin refresh rejected for user with role ${userRole}`);
+      logger.warn('Admin refresh rejected', { role: userRole });
       return jsonResponse(403, {
         code: 'ADMIN_ACCESS_DENIED',
         message: 'Administrator privileges required. Access denied.',
@@ -732,7 +735,7 @@ async function handleAdminRefresh(event: APIGatewayProxyEvent): Promise<APIGatew
 
     return jsonResponse(200, authResponse);
   } catch (error: any) {
-    console.error('Admin refresh error:', error);
+    logger.error('Admin refresh error', error as Error);
 
     return jsonResponse(401, {
       code: 'REFRESH_FAILED',
@@ -785,7 +788,7 @@ async function handleAdminSession(event: APIGatewayProxyEvent): Promise<APIGatew
       },
     });
   } catch (error) {
-    console.error('Admin session error:', error);
+    logger.error('Admin session error', error as Error);
     return jsonResponse(401, {
       code: 'INVALID_SESSION',
       message: 'Invalid or expired session',
@@ -843,7 +846,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
         });
     }
   } catch (error) {
-    console.error('Unhandled error:', error);
+    logger.error('Unhandled error', error as Error);
     return jsonResponse(500, {
       code: 'INTERNAL_ERROR',
       message: 'An unexpected error occurred',

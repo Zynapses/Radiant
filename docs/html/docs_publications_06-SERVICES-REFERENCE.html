@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>06 SERVICES REFERENCE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>06 SERVICES REFERENCE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/publications/06-SERVICES-REFERENCE.md</div>
+  </div>
+  
+  <h1 id="radiant-services-reference">RADIANT Services Reference</h1>
+<h2 id="complete-lambda-services-inventory-62-services">Complete Lambda Services Inventory (62 Services)</h2>
+<h3 id="core-infrastructure-services">Core Infrastructure Services</h3>
+<h4 id="brainrouter-brain-router.ts">1. BrainRouter (<code>brain-router.ts</code>)</h4>
+<p><strong>Purpose:</strong> Central routing service that directs incoming requests to appropriate handlers based on task type.</p>
+<p><strong>Key Methods:</strong> - <code>routeTask(task: Task): Promise&lt;TaskResult&gt;</code> - Routes task to handler - <code>analyzeTaskType(input: string): TaskType</code> - Determines task classification - <code>selectHandler(taskType: TaskType): Handler</code> - Selects appropriate handler</p>
+<p><strong>Task Types:</strong> | Type | Description | Handler | |——|————-|———| | <code>generation</code> | Text generation | ModelRouterService | | <code>analysis</code> | Data analysis | AnalyticsService | | <code>transformation</code> | Content transformation | TransformService | | <code>orchestration</code> | Multi-step workflow | OrchestrationService | | <code>conversation</code> | Chat interaction | ConversationService |</p>
+<hr />
+<h4 id="thermalstateservice-thermal-state.ts">2. ThermalStateService (<code>thermal-state.ts</code>)</h4>
+<p><strong>Purpose:</strong> Monitors system thermal state and adjusts workload distribution.</p>
+<p><strong>Key Methods:</strong> - <code>getSystemState(): ThermalState</code> - Current system state - <code>adjustWorkload(state: ThermalState): void</code> - Modify processing - <code>recordMetric(name: string, value: number): void</code> - Track metrics</p>
+<p><strong>States:</strong> - <code>nominal</code> - Normal operation - <code>elevated</code> - Increased load - <code>throttled</code> - Reduced capacity - <code>critical</code> - Emergency mode</p>
+<hr />
+<h4 id="metricscollector-metrics-collector.ts">3. MetricsCollector (<code>metrics-collector.ts</code>)</h4>
+<p><strong>Purpose:</strong> Collects and aggregates system metrics for monitoring.</p>
+<p><strong>Key Methods:</strong> - <code>recordLatency(service: string, ms: number): void</code> - <code>recordTokenUsage(model: string, input: number, output: number): void</code> - <code>recordCost(tenantId: string, cents: number): void</code> - <code>getMetrics(timeRange: TimeRange): MetricsSummary</code></p>
+<p><strong>Metrics Tracked:</strong> - API latency (p50, p95, p99) - Token usage by model - Cost by tenant - Error rates - Provider health</p>
+<hr />
+<h4 id="errorlogger-error-logger.ts">4. ErrorLogger (<code>error-logger.ts</code>)</h4>
+<p><strong>Purpose:</strong> Structured error logging with context preservation.</p>
+<p><strong>Key Methods:</strong> - <code>logError(error: Error, context: ErrorContext): void</code> - <code>logWarning(message: string, data: object): void</code> - <code>getRecentErrors(count: number): ErrorLog[]</code></p>
+<p><strong>Error Categories:</strong> - <code>PROVIDER_ERROR</code> - AI provider failures - <code>VALIDATION_ERROR</code> - Input validation - <code>AUTH_ERROR</code> - Authentication failures - <code>RATE_LIMIT</code> - Rate limiting triggered - <code>INTERNAL_ERROR</code> - System errors</p>
+<hr />
+<h4 id="credentialsmanager-credentials-manager.ts">5. CredentialsManager (<code>credentials-manager.ts</code>)</h4>
+<p><strong>Purpose:</strong> Secure management of API keys and credentials.</p>
+<p><strong>Key Methods:</strong> - <code>getCredential(provider: string): Promise&lt;string&gt;</code> - <code>rotateCredential(provider: string): Promise&lt;void&gt;</code> - <code>validateCredential(provider: string): Promise&lt;boolean&gt;</code></p>
+<p><strong>Supported Providers:</strong> - OpenAI, Anthropic, Google, Mistral - Groq, Perplexity, xAI, Together - Cohere, DeepSeek, Replicate</p>
+<hr />
+<h3 id="ai-model-services">AI Model Services</h3>
+<h4 id="modelrouterservice-model-router.service.ts">6. ModelRouterService (<code>model-router.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Routes AI requests to optimal provider with fallback.</p>
+<p><strong>Architecture:</strong></p>
+<pre><code>Request → Validate → Select Provider → Execute → Fallback (if needed) → Response</code></pre>
+<p><strong>Model Registry (24 Models):</strong></p>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr>
+<th>Model ID</th>
+<th>Provider</th>
+<th>Capabilities</th>
+<th>Cost ($/1K tokens)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>anthropic/claude-3-5-sonnet</td>
+<td>bedrock</td>
+<td>reasoning, coding, vision</td>
+<td>$0.003/$0.015</td>
+</tr>
+<tr>
+<td>anthropic/claude-3-haiku</td>
+<td>bedrock</td>
+<td>fast, efficient</td>
+<td>$0.00025/$0.00125</td>
+</tr>
+<tr>
+<td>meta/llama-3.1-70b</td>
+<td>bedrock</td>
+<td>reasoning, open-source</td>
+<td>$0.00099/$0.00099</td>
+</tr>
+<tr>
+<td>amazon/titan-text-express</td>
+<td>bedrock</td>
+<td>fast, aws-native</td>
+<td>$0.0002/$0.0006</td>
+</tr>
+<tr>
+<td>openai/gpt-4o</td>
+<td>litellm</td>
+<td>reasoning, vision</td>
+<td>$0.005/$0.015</td>
+</tr>
+<tr>
+<td>openai/gpt-4o-mini</td>
+<td>litellm</td>
+<td>fast, efficient</td>
+<td>$0.00015/$0.0006</td>
+</tr>
+<tr>
+<td>openai/o1</td>
+<td>litellm</td>
+<td>reasoning, math</td>
+<td>$0.015/$0.060</td>
+</tr>
+<tr>
+<td>openai/o1-mini</td>
+<td>litellm</td>
+<td>reasoning, coding</td>
+<td>$0.003/$0.012</td>
+</tr>
+<tr>
+<td>google/gemini-1.5-pro</td>
+<td>litellm</td>
+<td>reasoning, long-context</td>
+<td>$0.00125/$0.005</td>
+</tr>
+<tr>
+<td>google/gemini-1.5-flash</td>
+<td>litellm</td>
+<td>fast, vision</td>
+<td>$0.000075/$0.0003</td>
+</tr>
+<tr>
+<td>mistral/mistral-large</td>
+<td>litellm</td>
+<td>reasoning, multilingual</td>
+<td>$0.003/$0.009</td>
+</tr>
+<tr>
+<td>mistral/codestral</td>
+<td>litellm</td>
+<td>coding</td>
+<td>$0.001/$0.003</td>
+</tr>
+<tr>
+<td>cohere/command-r-plus</td>
+<td>litellm</td>
+<td>reasoning, rag</td>
+<td>$0.003/$0.015</td>
+</tr>
+<tr>
+<td>deepseek/deepseek-coder-v2</td>
+<td>litellm</td>
+<td>coding</td>
+<td>$0.00014/$0.00028</td>
+</tr>
+<tr>
+<td>groq/llama-3.1-70b-versatile</td>
+<td>groq</td>
+<td>fast, reasoning</td>
+<td>$0.00059/$0.00079</td>
+</tr>
+<tr>
+<td>groq/llama-3.1-8b-instant</td>
+<td>groq</td>
+<td>instant, fast</td>
+<td>$0.00005/$0.00008</td>
+</tr>
+<tr>
+<td>groq/mixtral-8x7b</td>
+<td>groq</td>
+<td>fast, moe</td>
+<td>$0.00024/$0.00024</td>
+</tr>
+<tr>
+<td>perplexity/sonar-large</td>
+<td>perplexity</td>
+<td>search, citations</td>
+<td>$0.001/$0.001</td>
+</tr>
+<tr>
+<td>perplexity/sonar-small</td>
+<td>perplexity</td>
+<td>search, fast</td>
+<td>$0.0002/$0.0002</td>
+</tr>
+<tr>
+<td>xai/grok-beta</td>
+<td>xai</td>
+<td>reasoning, realtime</td>
+<td>$0.005/$0.015</td>
+</tr>
+<tr>
+<td>together/llama-3.1-405b</td>
+<td>together</td>
+<td>reasoning, large</td>
+<td>$0.005/$0.015</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Fallback Chains:</strong></p>
+<pre><code>bedrock  → litellm → groq
+litellm  → bedrock → groq
+groq     → litellm → bedrock
+perplexity → litellm
+xai      → litellm → groq
+together → litellm → groq</code></pre>
+<p><strong>Provider Health Tracking:</strong> - <code>isHealthy</code>: boolean - <code>latencyMs</code>: number - <code>errorCount</code>: number - <code>consecutiveFailures</code>: number (&gt;= 3 marks unhealthy)</p>
+<hr />
+<h4 id="modelmetadataservice-model-metadata.service.ts">7. ModelMetadataService (<code>model-metadata.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Manages live model capabilities, pricing, and availability.</p>
+<p><strong>Key Methods:</strong> - <code>getMetadata(modelId: string): Promise&lt;ModelMetadata&gt;</code> - <code>getAllMetadata(): Promise&lt;ModelMetadata[]&gt;</code> - <code>updateMetadata(modelId: string, data: Partial&lt;ModelMetadata&gt;): Promise&lt;void&gt;</code> - <code>refreshFromInternet(): Promise&lt;void&gt;</code> - AI-powered metadata updates</p>
+<p><strong>Metadata Structure:</strong></p>
+<pre class="typescript"><code>interface ModelMetadata {
+  modelId: string;
+  provider: string;
+  displayName: string;
+  description: string;
+  capabilities: {
+    reasoning: number;      // 0-1 score
+    coding: number;
+    creative: number;
+    factual: number;
+    math: number;
+    vision: boolean;
+    longContext: boolean;
+  };
+  contextWindow: number;
+  maxOutputTokens: number;
+  pricing: {
+    inputPer1kTokens: number;
+    outputPer1kTokens: number;
+    currency: string;
+  };
+  availability: {
+    isAvailable: boolean;
+    regions: string[];
+    lastChecked: Date;
+  };
+  performance: {
+    avgLatencyMs: number;
+    throughputTokensPerSec: number;
+  };
+}</code></pre>
+<hr />
+<h4 id="modelselectionservice-model-selection-service.ts">8. ModelSelectionService (<code>model-selection-service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Intelligent model selection based on task characteristics.</p>
+<p><strong>Selection Algorithm:</strong> 1. <strong>Domain Detection</strong> - Identify problem domain from keywords 2. <strong>Task Analysis</strong> - Determine complexity, requirements 3. <strong>Model Scoring</strong> - Score each model for task fit 4. <strong>Mode Assignment</strong> - Select optimal execution mode 5. <strong>Cost/Quality Balance</strong> - Apply user preferences</p>
+<p><strong>Domain Keywords:</strong> | Domain | Keywords | |——–|———-| | coding | code, function, algorithm, debug, implement, API | | math | calculate, equation, formula, solve, proof | | legal | contract, law, compliance, regulation, liability | | medical | diagnosis, treatment, symptom, clinical, patient | | research | study, analyze, evidence, literature, methodology | | creative | write, story, design, brainstorm, creative |</p>
+<hr />
+<h3 id="orchestration-services">Orchestration Services</h3>
+<h4 id="orchestrationpatternsservice-orchestration-patterns.service.ts">9. OrchestrationPatternsService (<code>orchestration-patterns.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Manages 49 orchestration patterns with parameterized methods.</p>
+<p><strong>Pattern Categories (8):</strong></p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 25%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Count</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Consensus &amp; Aggregation</td>
+<td>7</td>
+<td>Self-Consistency, Meta-Reasoning, Mixture-of-Agents</td>
+</tr>
+<tr>
+<td>Debate &amp; Deliberation</td>
+<td>7</td>
+<td>AI Debate, Society of Mind, Socratic Dialogue</td>
+</tr>
+<tr>
+<td>Critique &amp; Refinement</td>
+<td>7</td>
+<td>Self-Refine, Reflexion, Constitutional AI</td>
+</tr>
+<tr>
+<td>Verification &amp; Validation</td>
+<td>7</td>
+<td>Chain-of-Verification, LLM-as-Judge, Fact-Check</td>
+</tr>
+<tr>
+<td>Decomposition</td>
+<td>7</td>
+<td>Least-to-Most, Tree of Thoughts, Skeleton-of-Thought</td>
+</tr>
+<tr>
+<td>Specialized Reasoning</td>
+<td>7</td>
+<td>Chain-of-Thought, ReAct, Self-Ask</td>
+</tr>
+<tr>
+<td>Multi-Model Routing</td>
+<td>4</td>
+<td>Mixture of Experts, FrugalGPT, Cascading</td>
+</tr>
+<tr>
+<td>Ensemble Methods</td>
+<td>3</td>
+<td>Model Ensemble, Blended RAG, Speculative Decoding</td>
+</tr>
+</tbody>
+</table>
+<p><strong>All 49 Patterns:</strong></p>
+<ol type="1">
+<li><strong>Self-Consistency</strong> - Multiple samples, majority vote</li>
+<li><strong>Universal Self-Consistency</strong> - Free-form answer selection</li>
+<li><strong>Meta-Reasoning</strong> - Compare reasoning paths</li>
+<li><strong>DiVeRSe</strong> - Diverse verifier ensemble</li>
+<li><strong>Mixture-of-Agents</strong> - Multi-agent aggregation</li>
+<li><strong>LLM-Blender</strong> - Pairwise ranking fusion</li>
+<li><strong>Multi-Agent Consensus</strong> - Agent negotiation</li>
+<li><strong>AI Debate</strong> - Adversarial debate with judge</li>
+<li><strong>Multi-Agent Debate</strong> - Multi-party debate</li>
+<li><strong>Society of Mind</strong> - Agent specialization</li>
+<li><strong>ChatEval</strong> - Multi-agent evaluation</li>
+<li><strong>ReConcile</strong> - Confidence-weighted discussion</li>
+<li><strong>Socratic Dialogue</strong> - Question-based exploration</li>
+<li><strong>Diplomatic Consensus</strong> - Negotiated agreement</li>
+<li><strong>Self-Refine</strong> - Iterative refinement</li>
+<li><strong>Reflexion</strong> - Verbal reinforcement learning</li>
+<li><strong>CRITIC</strong> - External tool verification</li>
+<li><strong>Iterative Refinement</strong> - Multi-pass improvement</li>
+<li><strong>Constitutional AI</strong> - Principle-based critique</li>
+<li><strong>Progressive Refinement</strong> - Staged quality improvement</li>
+<li><strong>Expert Refinement</strong> - Domain expert review</li>
+<li><strong>Chain-of-Verification</strong> - Claim verification chain</li>
+<li><strong>LLM-as-Judge</strong> - Model evaluation</li>
+<li><strong>Self-Verification</strong> - Self-checking</li>
+<li><strong>G-Eval</strong> - Structured evaluation</li>
+<li><strong>Cross-Validation</strong> - Multi-model validation</li>
+<li><strong>Fact-Check Chain</strong> - Fact verification pipeline</li>
+<li><strong>Consensus Validation</strong> - Agreement-based validation</li>
+<li><strong>Least-to-Most</strong> - Simple to complex decomposition</li>
+<li><strong>Decomposed Prompting</strong> - Sub-task breakdown</li>
+<li><strong>Tree of Thoughts</strong> - Branching exploration</li>
+<li><strong>Graph of Thoughts</strong> - Graph-based reasoning</li>
+<li><strong>Skeleton-of-Thought</strong> - Parallel point expansion</li>
+<li><strong>Plan-and-Solve</strong> - Planning then execution</li>
+<li><strong>Recursive Decomposition</strong> - Hierarchical breakdown</li>
+<li><strong>Chain-of-Thought</strong> - Step-by-step reasoning</li>
+<li><strong>Self-Ask</strong> - Sub-question generation</li>
+<li><strong>ReAct</strong> - Reasoning + Acting</li>
+<li><strong>Program-of-Thoughts</strong> - Code-based reasoning</li>
+<li><strong>Analogical Reasoning</strong> - Example-based reasoning</li>
+<li><strong>Maieutic Prompting</strong> - Tree explanation</li>
+<li><strong>Contrastive CoT</strong> - Valid/invalid contrast</li>
+<li><strong>Mixture of Experts</strong> - Specialized routing</li>
+<li><strong>FrugalGPT</strong> - Cost-optimized cascading</li>
+<li><strong>Router Chain</strong> - Capability-based routing</li>
+<li><strong>Speculative Routing</strong> - Predictive routing</li>
+<li><strong>Model Ensemble</strong> - Multi-model combination</li>
+<li><strong>Blended RAG</strong> - RAG ensemble</li>
+<li><strong>Speculative Decoding</strong> - Draft-verify acceleration</li>
+</ol>
+<hr />
+<h4 id="workflowengine-workflow-engine.ts">10. WorkflowEngine (<code>workflow-engine.ts</code>)</h4>
+<p><strong>Purpose:</strong> Executes DAG-based workflows with task dependencies.</p>
+<p><strong>Key Methods:</strong> - <code>createWorkflow(definition: WorkflowDefinition): Promise&lt;string&gt;</code> - <code>addTask(workflowId: string, task: Task): Promise&lt;void&gt;</code> - <code>startExecution(workflowId: string, params: object): Promise&lt;string&gt;</code> - <code>updateExecutionStatus(executionId: string, status: Status): Promise&lt;void&gt;</code></p>
+<p><strong>Workflow Definition:</strong></p>
+<pre class="typescript"><code>interface WorkflowDefinition {
+  workflowId: string;
+  name: string;
+  description: string;
+  category: &#39;generation&#39; | &#39;analysis&#39; | &#39;transformation&#39; | &#39;pipeline&#39; | &#39;custom&#39;;
+  dagDefinition: {
+    nodes: TaskNode[];
+    edges: Edge[];
+  };
+  inputSchema: JSONSchema;
+  outputSchema: JSONSchema;
+  defaultParameters: Record&lt;string, any&gt;;
+  timeoutSeconds: number;
+  maxRetries: number;
+}
+
+interface TaskNode {
+  taskId: string;
+  taskType: &#39;model_inference&#39; | &#39;transformation&#39; | &#39;condition&#39; | &#39;parallel&#39; | &#39;aggregation&#39;;
+  config: object;
+  dependsOn: string[];
+  conditionExpression?: string;
+}</code></pre>
+<hr />
+<h4 id="responsesynthesisservice-response-synthesis.service.ts">11. ResponseSynthesisService (<code>response-synthesis.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Synthesizes responses from multiple AI models.</p>
+<p><strong>Synthesis Strategies:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Description</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>best_of</code></td>
+<td>Select highest confidence response</td>
+<td>Quality-critical</td>
+</tr>
+<tr>
+<td><code>vote</code></td>
+<td>Majority voting on answer</td>
+<td>Factual questions</td>
+</tr>
+<tr>
+<td><code>weighted</code></td>
+<td>Confidence × (1/latency) weighted</td>
+<td>Balanced</td>
+</tr>
+<tr>
+<td><code>merge</code></td>
+<td>AI combines all responses</td>
+<td>Complex analysis</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Merge Algorithm:</strong></p>
+<pre><code>1. Collect all responses with metadata
+2. Extract key points from each
+3. Identify agreements and conflicts
+4. Generate unified response
+5. Apply conflict resolution
+6. Calculate final confidence</code></pre>
+<hr />
+<h3 id="billing-services">Billing Services</h3>
+<h4 id="billingservice-billing.ts">12. BillingService (<code>billing.ts</code>)</h4>
+<p><strong>Purpose:</strong> Manages credits, subscriptions, and billing.</p>
+<p><strong>Key Methods:</strong> - <code>getSubscription(tenantId: string): Promise&lt;Subscription&gt;</code> - <code>getCreditBalance(tenantId: string): Promise&lt;CreditBalance&gt;</code> - <code>addCredits(tenantId: string, amount: number, type: string): Promise&lt;number&gt;</code> - <code>useCredits(tenantId: string, amount: number): Promise&lt;{success, newBalance}&gt;</code> - <code>purchaseCredits(tenantId: string, amount: number, price: number): Promise&lt;string&gt;</code></p>
+<p><strong>Subscription Tiers:</strong> | Tier | Monthly Price | Annual Price | Credits/User | |——|————–|————–|————–| | Free Trial | $0 | - | 100 | | Individual | $19 | $190 | 1,000 | | Pro | $49 | $490 | 5,000 | | Team | $199 | $1,990 | 25,000 | | Enterprise | Custom | Custom | Custom |</p>
+<p><strong>Volume Discounts:</strong> | Credit Amount | Discount | Bonus Credits | |—————|———-|—————| | 10-19 | 5% | 0 | | 20-49 | 10% | 0 | | 50-99 | 15% | 5% | | 100+ | 25% | 10% |</p>
+<p><strong>Transaction Types:</strong> - <code>purchase</code> - Credit purchase - <code>bonus</code> - Promotional credits - <code>refund</code> - Refunded credits - <code>usage</code> - Credits consumed - <code>transfer_in</code> / <code>transfer_out</code> - Credit transfers - <code>subscription_allocation</code> - Monthly allocation - <code>expiration</code> - Expired credits - <code>adjustment</code> - Manual adjustment</p>
+<hr />
+<h4 id="storagebillingservice-storage-billing.ts">13. StorageBillingService (<code>storage-billing.ts</code>)</h4>
+<p><strong>Purpose:</strong> Tracks storage costs per tenant.</p>
+<p><strong>Billable Storage:</strong> - Uploaded files - Generated artifacts - Session history - Conversation logs</p>
+<p><strong>Pricing:</strong> - $0.023 per GB/month (Standard) - $0.0125 per GB/month (Infrequent) - $0.004 per GB/month (Archive)</p>
+<hr />
+<h3 id="cognitive-services">Cognitive Services</h3>
+<h4 id="cognitivebrainservice-cognitive-brain.service.ts">14. CognitiveBrainService (<code>cognitive-brain.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> High-level cognitive processing and reasoning.</p>
+<p><strong>Cognitive Capabilities:</strong> - Working memory management - Attention allocation - Abstract reasoning - Analogy formation - Concept learning</p>
+<hr />
+<h4 id="reasoningengine-reasoning-engine.ts">15. ReasoningEngine (<code>reasoning-engine.ts</code>)</h4>
+<p><strong>Purpose:</strong> Chain-of-thought and multi-step reasoning.</p>
+<p><strong>Reasoning Modes:</strong> | Mode | Description | |——|————-| | <code>deductive</code> | From general to specific | | <code>inductive</code> | From specific to general | | <code>abductive</code> | Best explanation inference | | <code>analogical</code> | Similarity-based reasoning |</p>
+<hr />
+<h4 id="causalreasoningservice-causal-reasoning.service.ts">16. CausalReasoningService (<code>causal-reasoning.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Causal inference and counterfactual reasoning.</p>
+<p><strong>Methods:</strong> - <code>identifyCauses(effect: string): Promise&lt;Cause[]&gt;</code> - <code>predictEffects(cause: string): Promise&lt;Effect[]&gt;</code> - <code>counterfactual(scenario: string, change: string): Promise&lt;string&gt;</code></p>
+<hr />
+<h4 id="goalplanningservice-goal-planning.service.ts">17. GoalPlanningService (<code>goal-planning.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Goal decomposition and planning.</p>
+<p><strong>Planning Algorithm:</strong></p>
+<pre><code>1. Parse high-level goal
+2. Identify subgoals
+3. Determine dependencies
+4. Sequence actions
+5. Allocate resources
+6. Execute and monitor</code></pre>
+<hr />
+<h4 id="metacognitionservice-metacognition.service.ts">18. MetacognitionService (<code>metacognition.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Self-reflection and learning from mistakes.</p>
+<p><strong>Metacognitive Functions:</strong> - Confidence calibration - Error detection - Strategy selection - Performance monitoring</p>
+<hr />
+<h3 id="memory-services">Memory Services</h3>
+<h4 id="memoryservice-memory-service.ts">19. MemoryService (<code>memory-service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Persistent memory across sessions.</p>
+<p><strong>Memory Types:</strong> - <strong>Short-term</strong>: Current session context - <strong>Long-term</strong>: Cross-session knowledge - <strong>Episodic</strong>: Event-based memories - <strong>Semantic</strong>: Factual knowledge</p>
+<hr />
+<h4 id="episodicmemoryservice-episodic-memory.service.ts">20. EpisodicMemoryService (<code>episodic-memory.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Event-based memory storage and retrieval.</p>
+<p><strong>Key Methods:</strong> - <code>recordEpisode(event: Episode): Promise&lt;void&gt;</code> - <code>retrieveRelevant(query: string, limit: number): Promise&lt;Episode[]&gt;</code> - <code>consolidate(): Promise&lt;void&gt;</code> - Memory optimization</p>
+<hr />
+<h4 id="memoryconsolidationservice-memory-consolidation.service.ts">21. MemoryConsolidationService (<code>memory-consolidation.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Optimizes memory storage by consolidating similar memories.</p>
+<hr />
+<h4 id="timemachineservice-time-machine.ts">22. TimeMachineService (<code>time-machine.ts</code>)</h4>
+<p><strong>Purpose:</strong> Access historical state at any point in time.</p>
+<p><strong>Key Methods:</strong> - <code>getStateAt(timestamp: Date): Promise&lt;SystemState&gt;</code> - <code>getDiff(from: Date, to: Date): Promise&lt;StateDiff&gt;</code> - <code>restore(timestamp: Date): Promise&lt;void&gt;</code></p>
+<hr />
+<h3 id="agi-services">AGI Services</h3>
+<h4 id="agiorchestratorservice-agi-orchestrator.service.ts">23. AGIOrchestratorService (<code>agi-orchestrator.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Coordinates AGI capabilities across services.</p>
+<hr />
+<h4 id="advancedagiservice-advanced-agi.service.ts">24. AdvancedAGIService (<code>advanced-agi.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Advanced AGI features including self-improvement.</p>
+<hr />
+<h4 id="agicompleteservice-agi-complete.service.ts">25. AGICompleteService (<code>agi-complete.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Complete AGI pipeline from input to output.</p>
+<hr />
+<h4 id="agiextensionsservice-agi-extensions.service.ts">26. AGIExtensionsService (<code>agi-extensions.service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Extensible AGI capabilities.</p>
+<hr />
+<h3 id="collaboration-services">Collaboration Services</h3>
+<h4 id="collaborationservice-collaboration.ts">27. CollaborationService (<code>collaboration.ts</code>)</h4>
+<p><strong>Purpose:</strong> Real-time collaboration features.</p>
+<p><strong>WebSocket Events:</strong> | Event | Direction | Description | |——-|———–|————-| | <code>join_session</code> | Client→Server | Join collaborative session | | <code>leave_session</code> | Client→Server | Leave session | | <code>cursor_move</code> | Bidirectional | Cursor position update | | <code>content_update</code> | Bidirectional | Content change | | <code>user_joined</code> | Server→Client | New user notification | | <code>user_left</code> | Server→Client | User left notification |</p>
+<hr />
+<h4 id="concurrentsessionmanager-concurrent-session.ts">28. ConcurrentSessionManager (<code>concurrent-session.ts</code>)</h4>
+<p><strong>Purpose:</strong> Manages concurrent user sessions.</p>
+<p><strong>Key Methods:</strong> - <code>createSession(config: SessionConfig): Promise&lt;string&gt;</code> - <code>joinSession(sessionId: string, userId: string): Promise&lt;void&gt;</code> - <code>getSessionState(sessionId: string): Promise&lt;SessionState&gt;</code> - <code>broadcastUpdate(sessionId: string, update: Update): Promise&lt;void&gt;</code></p>
+<hr />
+<h4 id="teamservice-team-service.ts">29. TeamService (<code>team-service.ts</code>)</h4>
+<p><strong>Purpose:</strong> Team and organization management.</p>
+<p><strong>Key Methods:</strong> - <code>createTeam(tenantId: string, name: string): Promise&lt;string&gt;</code> - <code>addMember(teamId: string, userId: string, role: string): Promise&lt;void&gt;</code> - <code>getTeamMembers(teamId: string): Promise&lt;Member[]&gt;</code></p>
+<hr />
+<h3 id="additional-services-30-62">Additional Services (30-62)</h3>
+<table>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 33%" />
+<col style="width: 22%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Service</th>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>30</td>
+<td>NeuralEngine</td>
+<td><code>neural-engine.ts</code></td>
+<td>Neural network operations</td>
+</tr>
+<tr>
+<td>31</td>
+<td>AutoResolveService</td>
+<td><code>auto-resolve.ts</code></td>
+<td>Automatic conflict resolution</td>
+</tr>
+<tr>
+<td>32</td>
+<td>CanvasService</td>
+<td><code>canvas-service.ts</code></td>
+<td>Visual canvas artifacts</td>
+</tr>
+<tr>
+<td>33</td>
+<td>PersonaService</td>
+<td><code>persona-service.ts</code></td>
+<td>AI persona management</td>
+</tr>
+<tr>
+<td>34</td>
+<td>SchedulerService</td>
+<td><code>scheduler-service.ts</code></td>
+<td>Task scheduling</td>
+</tr>
+<tr>
+<td>35</td>
+<td>LicenseService</td>
+<td><code>license-service.ts</code></td>
+<td>License management</td>
+</tr>
+<tr>
+<td>36</td>
+<td>UnifiedModelRegistry</td>
+<td><code>unified-model-registry.ts</code></td>
+<td>Central model registry</td>
+</tr>
+<tr>
+<td>37</td>
+<td>GrandfatheringService</td>
+<td><code>grandfathering-service.ts</code></td>
+<td>Legacy migration</td>
+</tr>
+<tr>
+<td>38</td>
+<td>VoiceVideoService</td>
+<td><code>voice-video.ts</code></td>
+<td>Voice/video processing</td>
+</tr>
+<tr>
+<td>39</td>
+<td>ResultMergingService</td>
+<td><code>result-merging.ts</code></td>
+<td>Merge results</td>
+</tr>
+<tr>
+<td>40</td>
+<td>WorldModelService</td>
+<td><code>world-model.service.ts</code></td>
+<td>World state modeling</td>
+</tr>
+<tr>
+<td>41</td>
+<td>MultiAgentService</td>
+<td><code>multi-agent.service.ts</code></td>
+<td>Multi-agent coordination</td>
+</tr>
+<tr>
+<td>42</td>
+<td>TheoryOfMindService</td>
+<td><code>theory-of-mind.service.ts</code></td>
+<td>Mental state modeling</td>
+</tr>
+<tr>
+<td>43</td>
+<td>MultimodalBindingService</td>
+<td><code>multimodal-binding.service.ts</code></td>
+<td>Cross-modal binding</td>
+</tr>
+<tr>
+<td>44</td>
+<td>SkillExecutionService</td>
+<td><code>skill-execution.service.ts</code></td>
+<td>Skill execution</td>
+</tr>
+<tr>
+<td>45</td>
+<td>AutonomousAgentService</td>
+<td><code>autonomous-agent.service.ts</code></td>
+<td>Autonomous operations</td>
+</tr>
+<tr>
+<td>46</td>
+<td>ConsciousnessService</td>
+<td><code>consciousness.service.ts</code></td>
+<td>Consciousness modeling</td>
+</tr>
+<tr>
+<td>47</td>
+<td>ConfigEngineService</td>
+<td><code>config-engine.service.ts</code></td>
+<td>Configuration engine</td>
+</tr>
+<tr>
+<td>48</td>
+<td>SelfImprovementService</td>
+<td><code>self-improvement.service.ts</code></td>
+<td>Self-improvement</td>
+</tr>
+<tr>
+<td>49</td>
+<td>MoralCompassService</td>
+<td><code>moral-compass.service.ts</code></td>
+<td>Ethical reasoning</td>
+</tr>
+<tr>
+<td>50</td>
+<td>MLTrainingService</td>
+<td><code>ml-training.service.ts</code></td>
+<td>ML model training</td>
+</tr>
+<tr>
+<td>51</td>
+<td>LearningService</td>
+<td><code>learning.service.ts</code></td>
+<td>Learning data collection</td>
+</tr>
+<tr>
+<td>52</td>
+<td>FeedbackService</td>
+<td><code>feedback.service.ts</code></td>
+<td>User feedback</td>
+</tr>
+<tr>
+<td>53</td>
+<td>FeedbackLearningService</td>
+<td><code>feedback-learning.ts</code></td>
+<td>Learn from feedback</td>
+</tr>
+<tr>
+<td>54</td>
+<td>WorkflowProposalService</td>
+<td><code>workflow-proposals.ts</code></td>
+<td>Workflow improvements</td>
+</tr>
+<tr>
+<td>55</td>
+<td>AppIsolationService</td>
+<td><code>app-isolation.ts</code></td>
+<td>App-level isolation</td>
+</tr>
+<tr>
+<td>56</td>
+<td>LocalizationService</td>
+<td><code>localization.ts</code></td>
+<td>i18n support</td>
+</tr>
+<tr>
+<td>57</td>
+<td>MigrationApprovalService</td>
+<td><code>migration-approval.ts</code></td>
+<td>Migration approval</td>
+</tr>
+<tr>
+<td>58</td>
+<td>SuperiorOrchestrationService</td>
+<td><code>superior-orchestration.service.ts</code></td>
+<td>Superior responses</td>
+</tr>
+<tr>
+<td>59</td>
+<td>RadiantUnifiedService</td>
+<td><code>radiant-unified.service.ts</code></td>
+<td>Unified API</td>
+</tr>
+<tr>
+<td>60</td>
+<td>NeuralOrchestrationService</td>
+<td><code>neural-orchestration.ts</code></td>
+<td>Neural orchestration</td>
+</tr>
+<tr>
+<td>61</td>
+<td>AuditService</td>
+<td><code>audit.ts</code></td>
+<td>Audit logging</td>
+</tr>
+<tr>
+<td>62</td>
+<td>APIKeysService</td>
+<td><code>api-keys.ts</code></td>
+<td>API key management</td>
+</tr>
+</tbody>
+</table>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

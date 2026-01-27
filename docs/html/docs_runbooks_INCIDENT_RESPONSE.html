@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INCIDENT RESPONSE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>INCIDENT RESPONSE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/runbooks/INCIDENT_RESPONSE.md</div>
+  </div>
+  
+  <h1 id="incident-response-runbook">Incident Response Runbook</h1>
+<h2 id="overview">Overview</h2>
+<p>This runbook provides procedures for responding to incidents in the RADIANT platform.</p>
+<h2 id="severity-levels">Severity Levels</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 28%" />
+<col style="width: 33%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th>Level</th>
+<th>Description</th>
+<th>Response Time</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SEV1</strong></td>
+<td>Critical - Service down</td>
+<td>15 minutes</td>
+<td>Complete outage, data loss</td>
+</tr>
+<tr>
+<td><strong>SEV2</strong></td>
+<td>Major - Significant degradation</td>
+<td>30 minutes</td>
+<td>Partial outage, high error rates</td>
+</tr>
+<tr>
+<td><strong>SEV3</strong></td>
+<td>Minor - Limited impact</td>
+<td>2 hours</td>
+<td>Single feature broken</td>
+</tr>
+<tr>
+<td><strong>SEV4</strong></td>
+<td>Low - Minimal impact</td>
+<td>Next business day</td>
+<td>Cosmetic issues</td>
+</tr>
+</tbody>
+</table>
+<h2 id="initial-response">Initial Response</h2>
+<h3 id="acknowledge-the-alert">1. Acknowledge the Alert</h3>
+<pre class="bash"><code># Check CloudWatch dashboard
+aws cloudwatch get-dashboard --dashboard-name radiant-production-dashboard
+
+# Check recent alarms
+aws cloudwatch describe-alarms --state-value ALARM</code></pre>
+<h3 id="assess-impact">2. Assess Impact</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />How many users are affected?</label></li>
+<li><label><input type="checkbox" />Which services are impacted?</label></li>
+<li><label><input type="checkbox" />Is data at risk?</label></li>
+<li><label><input type="checkbox" />What’s the business impact?</label></li>
+</ul>
+<h3 id="communicate">3. Communicate</h3>
+<ul>
+<li>SEV1/SEV2: Immediately notify on-call and stakeholders</li>
+<li>Update status page if available</li>
+<li>Create incident channel</li>
+</ul>
+<h2 id="common-incidents">Common Incidents</h2>
+<h3 id="api-gateway-5xx-errors">API Gateway 5XX Errors</h3>
+<p><strong>Symptoms:</strong> - High 5XX error rate in CloudWatch - Users reporting API failures</p>
+<p><strong>Investigation:</strong></p>
+<pre class="bash"><code># Check Lambda logs
+aws logs filter-log-events \
+  --log-group-name /aws/lambda/radiant-production-router \
+  --filter-pattern &quot;ERROR&quot; \
+  --start-time $(date -d &#39;1 hour ago&#39; +%s000)
+
+# Check for throttling
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/Lambda \
+  --metric-name Throttles \
+  --dimensions Name=FunctionName,Value=radiant-production-router \
+  --start-time $(date -d &#39;1 hour ago&#39; -Iseconds) \
+  --end-time $(date -Iseconds) \
+  --period 60 \
+  --statistics Sum</code></pre>
+<p><strong>Resolution:</strong> 1. Check if Lambda is hitting memory/timeout limits 2. Check database connectivity 3. Review recent deployments 4. Scale up if needed</p>
+<h3 id="database-connection-issues">Database Connection Issues</h3>
+<p><strong>Symptoms:</strong> - Connection timeout errors in Lambda logs - High database connection count</p>
+<p><strong>Investigation:</strong></p>
+<pre class="bash"><code># Check connection count
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/RDS \
+  --metric-name DatabaseConnections \
+  --dimensions Name=DBClusterIdentifier,Value=radiant-production \
+  --start-time $(date -d &#39;1 hour ago&#39; -Iseconds) \
+  --end-time $(date -Iseconds) \
+  --period 60 \
+  --statistics Average
+
+# Check for long-running queries (via admin dashboard)</code></pre>
+<p><strong>Resolution:</strong> 1. Check for connection leaks in Lambda 2. Increase connection pool size 3. Scale database if CPU is high 4. Kill long-running queries if necessary</p>
+<h3 id="high-latency">High Latency</h3>
+<p><strong>Symptoms:</strong> - API p99 latency &gt; 5 seconds - User complaints about slowness</p>
+<p><strong>Investigation:</strong></p>
+<pre class="bash"><code># Check Lambda duration
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/Lambda \
+  --metric-name Duration \
+  --dimensions Name=FunctionName,Value=radiant-production-router \
+  --start-time $(date -d &#39;1 hour ago&#39; -Iseconds) \
+  --end-time $(date -Iseconds) \
+  --period 60 \
+  --statistics p99
+
+# Check database latency
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/RDS \
+  --metric-name ReadLatency \
+  --dimensions Name=DBClusterIdentifier,Value=radiant-production \
+  --start-time $(date -d &#39;1 hour ago&#39; -Iseconds) \
+  --end-time $(date -Iseconds) \
+  --period 60 \
+  --statistics Average</code></pre>
+<p><strong>Resolution:</strong> 1. Check for slow database queries 2. Review cold start times 3. Check for external API latency (AI providers) 4. Scale up Lambda memory if CPU-bound</p>
+<h3 id="authentication-failures">Authentication Failures</h3>
+<p><strong>Symptoms:</strong> - Users cannot log in - Token validation failures</p>
+<p><strong>Investigation:</strong></p>
+<pre class="bash"><code># Check Cognito metrics
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/Cognito \
+  --metric-name SignInSuccesses \
+  --dimensions Name=UserPool,Value=radiant-production-users \
+  --start-time $(date -d &#39;1 hour ago&#39; -Iseconds) \
+  --end-time $(date -Iseconds) \
+  --period 300 \
+  --statistics Sum</code></pre>
+<p><strong>Resolution:</strong> 1. Check Cognito service health 2. Verify JWT token configuration 3. Check for clock skew issues 4. Review recent Cognito changes</p>
+<h3 id="storage-quota-exceeded">Storage Quota Exceeded</h3>
+<p><strong>Symptoms:</strong> - Upload failures - Storage billing alerts</p>
+<p><strong>Investigation:</strong></p>
+<pre class="bash"><code># Check S3 bucket size
+aws s3 ls s3://radiant-storage-production --summarize --recursive | tail -2
+
+# Check storage usage in database
+# Use admin dashboard Storage page</code></pre>
+<p><strong>Resolution:</strong> 1. Identify large files/tenants 2. Contact affected tenants 3. Clean up orphaned files 4. Increase quota if appropriate</p>
+<h2 id="rollback-procedures">Rollback Procedures</h2>
+<h3 id="lambda-rollback">Lambda Rollback</h3>
+<pre class="bash"><code># List versions
+aws lambda list-versions-by-function \
+  --function-name radiant-production-router
+
+# Rollback to previous version
+aws lambda update-alias \
+  --function-name radiant-production-router \
+  --name live \
+  --function-version &lt;previous-version&gt;</code></pre>
+<h3 id="database-rollback">Database Rollback</h3>
+<p><strong>WARNING: Database rollbacks are dangerous. Follow dual-admin approval.</strong></p>
+<ol type="1">
+<li>Create a new migration to undo changes</li>
+<li>Get dual-admin approval via Migration Approval page</li>
+<li>Execute the migration</li>
+<li>Verify data integrity</li>
+</ol>
+<h3 id="cdk-rollback">CDK Rollback</h3>
+<pre class="bash"><code># Check CloudFormation events
+aws cloudformation describe-stack-events \
+  --stack-name RadiantProductionApi
+
+# Rollback to previous state
+aws cloudformation continue-update-rollback \
+  --stack-name RadiantProductionApi</code></pre>
+<h2 id="post-incident">Post-Incident</h2>
+<h3 id="resolve-alert">1. Resolve Alert</h3>
+<pre class="bash"><code># Set alarm to OK (if manually resolved)
+aws cloudwatch set-alarm-state \
+  --alarm-name radiant-production-api-5xx-errors \
+  --state-value OK \
+  --state-reason &quot;Manually resolved&quot;</code></pre>
+<h3 id="document">2. Document</h3>
+<p>Create an incident report: - Timeline of events - Root cause analysis - Actions taken - Lessons learned - Follow-up items</p>
+<h3 id="review">3. Review</h3>
+<ul>
+<li>Schedule post-mortem for SEV1/SEV2</li>
+<li>Update runbooks with new learnings</li>
+<li>Create tickets for improvements</li>
+</ul>
+<h2 id="contacts">Contacts</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Contact</th>
+<th>Escalation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>On-Call Engineer</td>
+<td>PagerDuty</td>
+<td>Auto-escalate after 15 min</td>
+</tr>
+<tr>
+<td>Engineering Lead</td>
+<td><span class="citation" data-cites="engineering-lead">@engineering-lead</span></td>
+<td>SEV1/SEV2</td>
+</tr>
+<tr>
+<td>Security</td>
+<td><span class="citation" data-cites="security-team">@security-team</span></td>
+<td>Security incidents</td>
+</tr>
+<tr>
+<td>Product</td>
+<td><span class="citation" data-cites="product-team">@product-team</span></td>
+<td>Business impact</td>
+</tr>
+</tbody>
+</table>
+<h2 id="useful-links">Useful Links</h2>
+<ul>
+<li><a href="https://console.aws.amazon.com/cloudwatch">CloudWatch Dashboard</a></li>
+<li><a href="/admin">Admin Dashboard</a></li>
+<li><a href="#">Status Page</a></li>
+<li><a href="#incidents">Incident Slack Channel</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

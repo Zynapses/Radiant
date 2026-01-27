@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DEPLOYER ADMIN GUIDE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>DEPLOYER ADMIN GUIDE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/DEPLOYER-ADMIN-GUIDE.md</div>
+  </div>
+  
+  <h1 id="radiant-deployer---administrator-guide">RADIANT Deployer - Administrator Guide</h1>
+<blockquote>
+<p><strong>Complete guide for deploying and managing RADIANT infrastructure using the Swift Deployer App</strong></p>
+<p>Version: 4.18.1 | Last Updated: December 2024</p>
+</blockquote>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-introduction">Introduction</a></li>
+<li><a href="#2-system-requirements">System Requirements</a></li>
+<li><a href="#3-installation">Installation</a></li>
+<li><a href="#4-first-time-setup">First-Time Setup</a></li>
+<li><a href="#5-aws-credentials-management">AWS Credentials Management</a></li>
+<li><a href="#6-deployment-operations">Deployment Operations</a></li>
+<li><a href="#7-multi-region-deployments">Multi-Region Deployments</a></li>
+<li><a href="#8-snapshots--rollbacks">Snapshots &amp; Rollbacks</a></li>
+<li><a href="#9-ai-assistant">AI Assistant</a></li>
+<li><a href="#10-package-management">Package Management</a></li>
+<li><a href="#11-monitoring--health-checks">Monitoring &amp; Health Checks</a></li>
+<li><a href="#12-security-features">Security Features</a></li>
+<li><a href="#13-troubleshooting">Troubleshooting</a></li>
+<li><a href="#14-reference">Reference</a></li>
+</ol>
+<hr />
+<h2 id="introduction">1. Introduction</h2>
+<h3 id="what-is-radiant-deployer">1.1 What is RADIANT Deployer?</h3>
+<p>RADIANT Deployer is a native macOS application that provides a complete deployment management solution for the RADIANT platform. It offers:</p>
+<ul>
+<li><strong>One-Click Deployments</strong>: Deploy entire infrastructure stacks with a single click</li>
+<li><strong>AI-Powered Assistance</strong>: Claude-powered assistant for deployment guidance</li>
+<li><strong>Snapshot Management</strong>: Create and restore deployment snapshots</li>
+<li><strong>Multi-Region Support</strong>: Deploy across multiple AWS regions</li>
+<li><strong>Health Monitoring</strong>: Real-time health checks and status monitoring</li>
+<li><strong>Secure Credential Storage</strong>: Keychain-integrated credential management</li>
+</ul>
+<h3 id="architecture">1.2 Architecture</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                    RADIANT Deployer App                          │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │
+│  │   Dashboard     │  │   Deployments   │  │    Settings     │  │
+│  │     View        │  │      View       │  │      View       │  │
+│  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘  │
+│           │                    │                    │           │
+│  ┌────────┴────────────────────┴────────────────────┴────────┐  │
+│  │                      Services Layer                        │  │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │  │
+│  │  │   AWS        │  │   CDK        │  │   AI Assistant   │  │  │
+│  │  │  Service     │  │  Service     │  │    Service       │  │  │
+│  │  └──────────────┘  └──────────────┘  └──────────────────┘  │  │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │  │
+│  │  │  Snapshot    │  │  Health      │  │  Local Storage   │  │  │
+│  │  │  Service     │  │  Check       │  │   Manager        │  │  │
+│  │  └──────────────┘  └──────────────┘  └──────────────────┘  │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                              │                                   │
+│  ┌───────────────────────────┴───────────────────────────────┐  │
+│  │                    Storage Layer                           │  │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │  │
+│  │  │   Keychain   │  │  SQLCipher   │  │   File System    │  │  │
+│  │  │  (Secrets)   │  │  (Local DB)  │  │   (Snapshots)    │  │  │
+│  │  └──────────────┘  └──────────────┘  └──────────────────┘  │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="key-features">1.3 Key Features</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Deployment Wizard</strong></td>
+<td>Step-by-step guided deployment process</td>
+</tr>
+<tr>
+<td><strong>Lock-Step Mode</strong></td>
+<td>Ensures component version consistency</td>
+</tr>
+<tr>
+<td><strong>Automatic Rollback</strong></td>
+<td>Reverts failed deployments automatically</td>
+</tr>
+<tr>
+<td><strong>Offline Mode</strong></td>
+<td>Core functionality works without internet</td>
+</tr>
+<tr>
+<td><strong>Audit Logging</strong></td>
+<td>Complete deployment history tracking</td>
+</tr>
+</tbody>
+</table>
+<h4 id="deployment-wizard-explained">Deployment Wizard Explained</h4>
+<p>The Deployment Wizard breaks down the complex AWS infrastructure deployment into manageable steps. Instead of manually running CDK commands and configuring services, the wizard:</p>
+<ol type="1">
+<li><strong>Validates Prerequisites</strong>: Checks that all required software (Node.js, AWS CLI, CDK) is installed and properly configured before starting</li>
+<li><strong>Guides Configuration</strong>: Walks you through selecting environment (dev/staging/prod), tier (1-5), and region settings with explanations for each option</li>
+<li><strong>Shows Progress</strong>: Displays real-time progress as each CloudFormation stack deploys, with estimated time remaining</li>
+<li><strong>Handles Errors</strong>: If any step fails, provides clear error messages and suggested remediation steps</li>
+</ol>
+<h4 id="lock-step-mode-explained">Lock-Step Mode Explained</h4>
+<p>Lock-Step Mode prevents version mismatches between RADIANT components that could cause compatibility issues:</p>
+<ul>
+<li><strong>What it does</strong>: Ensures the Admin Dashboard, Lambda functions, and database schema are all on compatible versions</li>
+<li><strong>Why it matters</strong>: A v4.18 Lambda function might expect database columns that don’t exist in a v4.17 schema, causing runtime errors</li>
+<li><strong>How it works</strong>: Before deployment, the system checks version numbers across all components and blocks deployment if drift exceeds the configured maximum (default: 1 minor version)</li>
+<li><strong>When to disable</strong>: Only disable during development when testing individual component changes</li>
+</ul>
+<h4 id="automatic-rollback-explained">Automatic Rollback Explained</h4>
+<p>Automatic Rollback protects your production environment by reverting failed deployments:</p>
+<ul>
+<li><strong>Trigger conditions</strong>: Activates when any deployment phase fails (CDK deploy error, health check failure, migration error)</li>
+<li><strong>Rollback process</strong>: Restores the pre-deployment snapshot, which includes database state, Lambda code, and configuration</li>
+<li><strong>Recovery time</strong>: Typically 5-10 minutes depending on the size of changes being reverted</li>
+<li><strong>Notification</strong>: Sends alerts via configured channels (email, Slack) when rollback occurs</li>
+</ul>
+<h4 id="offline-mode-explained">Offline Mode Explained</h4>
+<p>Offline Mode allows essential operations when internet connectivity is unavailable:</p>
+<ul>
+<li><strong>Available offline</strong>: Viewing deployment history, browsing local snapshots, reviewing configuration, accessing cached documentation</li>
+<li><strong>Requires internet</strong>: Deploying to AWS, health checks, AI assistant queries, credential validation</li>
+<li><strong>Data sync</strong>: When connectivity returns, local changes sync automatically with the cloud state</li>
+</ul>
+<h4 id="audit-logging-explained">Audit Logging Explained</h4>
+<p>Every action in the Deployer is logged for compliance and troubleshooting:</p>
+<ul>
+<li><strong>What’s logged</strong>: User identity, timestamp, action type, parameters, outcome, duration</li>
+<li><strong>Storage</strong>: Logs stored locally in SQLCipher database and optionally synced to CloudWatch</li>
+<li><strong>Retention</strong>: Local logs kept for 90 days by default (configurable)</li>
+<li><strong>Export</strong>: Logs can be exported to CSV/JSON for compliance audits</li>
+</ul>
+<hr />
+<h2 id="system-requirements">2. System Requirements</h2>
+<h3 id="hardware-requirements">2.1 Hardware Requirements</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Minimum</th>
+<th>Recommended</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>macOS Version</strong></td>
+<td>13.0 (Ventura)</td>
+<td>14.0+ (Sonoma)</td>
+</tr>
+<tr>
+<td><strong>Processor</strong></td>
+<td>Apple Silicon or Intel</td>
+<td>Apple Silicon M1+</td>
+</tr>
+<tr>
+<td><strong>Memory</strong></td>
+<td>8 GB RAM</td>
+<td>16 GB RAM</td>
+</tr>
+<tr>
+<td><strong>Storage</strong></td>
+<td>2 GB free</td>
+<td>10 GB free</td>
+</tr>
+<tr>
+<td><strong>Display</strong></td>
+<td>1280x800</td>
+<td>1440x900+</td>
+</tr>
+</tbody>
+</table>
+<h4 id="why-these-requirements">Why These Requirements?</h4>
+<p><strong>macOS 13.0+</strong>: Required for Swift 5.9 runtime and modern SwiftUI features. Older versions lack required system APIs for secure keychain access and modern networking.</p>
+<p><strong>Apple Silicon Recommended</strong>: While Intel Macs are supported, Apple Silicon provides 2-3x faster CDK synthesis and compilation times. The app is built as a universal binary supporting both architectures.</p>
+<p><strong>8 GB RAM Minimum</strong>: CDK synthesis loads the entire infrastructure definition into memory. Complex deployments (Tier 3+) with many resources may require more memory. With 8 GB, you may experience slowdowns during synthesis.</p>
+<p><strong>16 GB RAM Recommended</strong>: Allows comfortable multitasking while deployments run in the background. Essential if you’re also running Docker, IDEs, or other development tools.</p>
+<p><strong>2 GB Storage Minimum</strong>: Covers the application itself (~200 MB), local database (~50 MB), and several snapshots. However, snapshots can grow large over time.</p>
+<p><strong>10 GB Storage Recommended</strong>: Provides room for multiple deployment snapshots, comprehensive logs, and CDK cache. Each full snapshot can be 100-500 MB depending on your deployment size.</p>
+<h3 id="software-requirements">2.2 Software Requirements</h3>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Software</th>
+<th>Version</th>
+<th>Purpose</th>
+<th>Installation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Xcode</strong></td>
+<td>15.0+</td>
+<td>Swift runtime (Command Line Tools sufficient)</td>
+<td><code>xcode-select --install</code></td>
+</tr>
+<tr>
+<td><strong>AWS CLI</strong></td>
+<td>2.x</td>
+<td>AWS operations</td>
+<td><code>brew install awscli</code></td>
+</tr>
+<tr>
+<td><strong>Node.js</strong></td>
+<td>20.x LTS</td>
+<td>CDK operations</td>
+<td><code>brew install node@20</code></td>
+</tr>
+<tr>
+<td><strong>AWS CDK</strong></td>
+<td>2.120+</td>
+<td>Infrastructure deployment</td>
+<td><code>npm install -g aws-cdk</code></td>
+</tr>
+<tr>
+<td><strong>pnpm</strong></td>
+<td>8.x+</td>
+<td>Package management</td>
+<td><code>npm install -g pnpm</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="software-explained">Software Explained</h4>
+<p><strong>Xcode Command Line Tools</strong>: Provides the Swift runtime and compiler. You don’t need the full Xcode IDE - just the command line tools (4 GB vs 12 GB download). The Deployer uses Swift for its native performance and seamless macOS integration.</p>
+<p><strong>AWS CLI v2</strong>: The official AWS command-line interface. Used internally by the Deployer to execute AWS operations, assume IAM roles, and query service status. Version 2 is required for SSO support and improved credential handling.</p>
+<p><strong>Node.js 20 LTS</strong>: Required to run the AWS CDK, which is written in TypeScript. LTS (Long Term Support) versions receive security updates for 30 months. The Deployer manages Node.js processes internally during CDK operations.</p>
+<p><strong>AWS CDK 2.120+</strong>: The Cloud Development Kit that defines RADIANT’s infrastructure as TypeScript code. Version 2.120+ includes critical bug fixes for Aurora PostgreSQL and Lambda layer handling. The CDK synthesizes your infrastructure into CloudFormation templates.</p>
+<p><strong>pnpm 8.x</strong>: A fast, disk-efficient package manager used to install CDK dependencies. Chosen over npm for its superior handling of monorepo workspaces and 2-3x faster installation times.</p>
+<h3 id="aws-requirements">2.3 AWS Requirements</h3>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 24%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Details</th>
+<th>How to Verify</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AWS Account</strong></td>
+<td>Active account with billing enabled</td>
+<td>Check AWS Console billing page</td>
+</tr>
+<tr>
+<td><strong>IAM User</strong></td>
+<td>AdministratorAccess or equivalent</td>
+<td><code>aws sts get-caller-identity</code></td>
+</tr>
+<tr>
+<td><strong>Regions</strong></td>
+<td>Access to us-east-1 (required) + additional regions</td>
+<td><code>aws ec2 describe-regions</code></td>
+</tr>
+<tr>
+<td><strong>Service Quotas</strong></td>
+<td>Default quotas sufficient for Tier 1-2</td>
+<td>AWS Service Quotas console</td>
+</tr>
+</tbody>
+</table>
+<h4 id="aws-requirements-explained">AWS Requirements Explained</h4>
+<p><strong>Active AWS Account with Billing</strong>: RADIANT deploys real AWS resources that incur costs. Billing must be enabled and a valid payment method on file. New accounts have a $5 pending charge verification. Free tier covers some resources for 12 months but won’t cover all RADIANT components.</p>
+<p><strong>IAM User with AdministratorAccess</strong>: The Deployer needs broad permissions to create and manage resources across many AWS services. For production, you can use a scoped-down policy (see Appendix A), but AdministratorAccess is recommended for initial setup to avoid permission errors.</p>
+<p><strong>Required Permissions Include</strong>: - CloudFormation (stack operations) - Lambda (function management) - API Gateway (REST API setup) - RDS/Aurora (database provisioning) - Cognito (user pool management) - S3 (storage buckets) - IAM (role creation) - SSM (parameter storage) - Secrets Manager (credential storage) - CloudWatch (logging and monitoring)</p>
+<p><strong>us-east-1 Required</strong>: This region is required even if you deploy to other regions because: - ACM certificates for CloudFront must be in us-east-1 - Some global services (IAM, Route 53) operate from us-east-1 - CDK bootstrap resources are region-specific</p>
+<p><strong>Service Quotas</strong>: Default AWS quotas are sufficient for Tier 1-2 deployments. Tier 3+ may require quota increases for: - Lambda concurrent executions (default: 1,000) - RDS instances (default: 40) - VPC Elastic IPs (default: 5)</p>
+<p>To request quota increases: AWS Console &gt; Service Quotas &gt; Select service &gt; Request increase</p>
+<hr />
+<h2 id="installation">3. Installation</h2>
+<h3 id="download-and-install">3.1 Download and Install</h3>
+<h4 id="option-a-pre-built-application-recommended">Option A: Pre-built Application (Recommended)</h4>
+<ol type="1">
+<li>Download the latest release from GitHub Releases</li>
+<li>Drag <code>RadiantDeployer.app</code> to <code>/Applications</code></li>
+<li>Right-click and select “Open” (first launch only)</li>
+<li>Grant necessary permissions when prompted</li>
+</ol>
+<h4 id="option-b-build-from-source">Option B: Build from Source</h4>
+<pre class="bash"><code># Clone the repository
+git clone https://github.com/your-org/radiant.git
+cd radiant/apps/swift-deployer
+
+# Build the application
+swift build -c release
+
+# Run the application
+swift run RadiantDeployer</code></pre>
+<h3 id="initial-permissions">3.2 Initial Permissions</h3>
+<p>The app requires the following permissions:</p>
+<table>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 25%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Permission</th>
+<th>Purpose</th>
+<th>How to Grant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Keychain Access</strong></td>
+<td>Store AWS credentials securely</td>
+<td>Approve on first credential save</td>
+</tr>
+<tr>
+<td><strong>Network Access</strong></td>
+<td>Connect to AWS and AI services</td>
+<td>Approve in System Settings</td>
+</tr>
+<tr>
+<td><strong>File Access</strong></td>
+<td>Save snapshots and logs</td>
+<td>Approve when prompted</td>
+</tr>
+</tbody>
+</table>
+<h3 id="verify-installation">3.3 Verify Installation</h3>
+<ol type="1">
+<li>Launch RadiantDeployer</li>
+<li>Navigate to <strong>Settings → About</strong></li>
+<li>Verify version shows <code>4.18.1</code></li>
+<li>Check all services show green status</li>
+</ol>
+<hr />
+<h2 id="first-time-setup">4. First-Time Setup</h2>
+<h3 id="setup-wizard">4.1 Setup Wizard</h3>
+<p>On first launch, the Setup Wizard guides you through:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                    Setup Wizard                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Step 1: Welcome                    ✓ Complete                  │
+│  Step 2: AWS Credentials            ⟳ In Progress              │
+│  Step 3: Environment Configuration  ○ Pending                   │
+│  Step 4: AI Assistant Setup         ○ Pending                   │
+│  Step 5: Verification               ○ Pending                   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="aws-credentials-setup">4.2 AWS Credentials Setup</h3>
+<ol type="1">
+<li>Click <strong>“Add AWS Credentials”</strong></li>
+<li>Enter your credentials:
+<ul>
+<li><strong>Name</strong>: Descriptive name (e.g., “Production Account”)</li>
+<li><strong>Access Key ID</strong>: <code>AKIA...</code> (20 characters)</li>
+<li><strong>Secret Access Key</strong>: Your secret key (40 characters)</li>
+<li><strong>Region</strong>: Primary region (e.g., <code>us-east-1</code>)</li>
+</ul></li>
+<li>Click <strong>“Validate”</strong> to test connectivity</li>
+<li>Click <strong>“Save”</strong> to store securely in Keychain</li>
+</ol>
+<h3 id="environment-configuration">4.3 Environment Configuration</h3>
+<p>Configure your deployment environment:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Environment</strong></td>
+<td><code>dev</code>, <code>staging</code>, or <code>prod</code></td>
+<td><code>dev</code></td>
+</tr>
+<tr>
+<td><strong>Tier</strong></td>
+<td>Infrastructure tier (1-5)</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><strong>Domain</strong></td>
+<td>Your domain name</td>
+<td>Required for Tier 2+</td>
+</tr>
+<tr>
+<td><strong>Stack Prefix</strong></td>
+<td>CDK stack name prefix</td>
+<td><code>radiant</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="environment-types-explained">Environment Types Explained</h4>
+<p><strong>Development (dev)</strong>: For active development and testing. Features relaxed security settings, smaller instance sizes, and no deletion protection. Data can be reset freely. Cost: ~$50-150/month for Tier 1.</p>
+<p><strong>Staging (staging)</strong>: Pre-production environment that mirrors production configuration. Use this to test deployments before going live. Same security as production but can use smaller instances. Cost: ~60% of production.</p>
+<p><strong>Production (prod)</strong>: Live environment serving real users. Includes deletion protection, multi-AZ deployments, automated backups, and enhanced monitoring. Never deploy untested changes directly to production.</p>
+<h4 id="infrastructure-tiers-explained">Infrastructure Tiers Explained</h4>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 29%" />
+<col style="width: 20%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Name</th>
+<th>Monthly Cost</th>
+<th>Use Case</th>
+<th>Resources</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong></td>
+<td>SEED</td>
+<td>$50-150</td>
+<td>Development, POC</td>
+<td>Single-AZ, t3.small instances, 20GB storage</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>STARTUP</td>
+<td>$200-400</td>
+<td>Small production</td>
+<td>Multi-AZ database, WAF, basic monitoring</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>GROWTH</td>
+<td>$1,000-2,500</td>
+<td>Medium production</td>
+<td>Self-hosted models, HIPAA compliance, enhanced security</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>SCALE</td>
+<td>$4,000-8,000</td>
+<td>Large production</td>
+<td>Multi-region, global database, dedicated instances</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td>ENTERPRISE</td>
+<td>$15,000-35,000</td>
+<td>Enterprise</td>
+<td>Custom SLAs, dedicated support, on-premise options</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Choosing the Right Tier</strong>: Start with Tier 1 for development. Move to Tier 2 when you have paying customers. Tier 3+ is for organizations with compliance requirements or high traffic.</p>
+<h4 id="domain-configuration">Domain Configuration</h4>
+<p>For Tier 2+, you need a custom domain:</p>
+<ol type="1">
+<li><strong>Register a domain</strong> in Route 53 or transfer an existing domain</li>
+<li><strong>Create a hosted zone</strong> in Route 53 for your domain</li>
+<li><strong>Request an ACM certificate</strong> in us-east-1 for <code>*.yourdomain.com</code></li>
+<li><strong>Validate the certificate</strong> via DNS (automatic if using Route 53)</li>
+</ol>
+<p>The Deployer will configure: - <code>api.yourdomain.com</code> - API Gateway endpoint - <code>admin.yourdomain.com</code> - Admin Dashboard - <code>app.yourdomain.com</code> - Think Tank application</p>
+<h3 id="ai-assistant-setup-optional">4.4 AI Assistant Setup (Optional)</h3>
+<p>Enable the Claude-powered AI assistant:</p>
+<ol type="1">
+<li>Navigate to <strong>Settings → AI Assistant</strong></li>
+<li>Enter your Anthropic API key</li>
+<li>Select response style:
+<ul>
+<li><strong>Concise</strong>: Brief, action-focused responses</li>
+<li><strong>Detailed</strong>: In-depth explanations</li>
+<li><strong>Tutorial</strong>: Step-by-step guidance</li>
+</ul></li>
+<li>Test the connection with a sample query</li>
+</ol>
+<hr />
+<h2 id="aws-credentials-management">5. AWS Credentials Management</h2>
+<h3 id="credential-sets">5.1 Credential Sets</h3>
+<p>Manage multiple AWS accounts:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Name</strong></td>
+<td>Friendly identifier</td>
+<td>“Production”</td>
+</tr>
+<tr>
+<td><strong>Access Key ID</strong></td>
+<td>AWS access key</td>
+<td><code>AKIAIOSFODNN7EXAMPLE</code></td>
+</tr>
+<tr>
+<td><strong>Secret Access Key</strong></td>
+<td>AWS secret</td>
+<td>(stored encrypted)</td>
+</tr>
+<tr>
+<td><strong>Region</strong></td>
+<td>Default region</td>
+<td><code>us-east-1</code></td>
+</tr>
+<tr>
+<td><strong>Role ARN</strong></td>
+<td>Optional assume role</td>
+<td><code>arn:aws:iam::123:role/deploy</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="adding-credentials">5.2 Adding Credentials</h3>
+<ol type="1">
+<li>Navigate to <strong>Credentials</strong> tab</li>
+<li>Click <strong>“+ Add Credential Set”</strong></li>
+<li>Fill in the required fields</li>
+<li>Click <strong>“Validate”</strong> to test</li>
+<li>Click <strong>“Save”</strong></li>
+</ol>
+<h3 id="credential-validation">5.3 Credential Validation</h3>
+<p>The app validates:</p>
+<ul>
+<li>✓ Access key format (AKIA prefix, 20 chars)</li>
+<li>✓ Secret key length (40+ chars)</li>
+<li>✓ Region validity</li>
+<li>✓ AWS connectivity (STS GetCallerIdentity)</li>
+<li>✓ Required permissions</li>
+</ul>
+<h3 id="security-best-practices">5.4 Security Best Practices</h3>
+<table>
+<thead>
+<tr>
+<th>Practice</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Rotate Keys</strong></td>
+<td>Every 90 days</td>
+</tr>
+<tr>
+<td><strong>Least Privilege</strong></td>
+<td>Use scoped IAM policies</td>
+</tr>
+<tr>
+<td><strong>MFA</strong></td>
+<td>Enable on AWS account</td>
+</tr>
+<tr>
+<td><strong>Audit</strong></td>
+<td>Review access logs regularly</td>
+</tr>
+<tr>
+<td><strong>Backup</strong></td>
+<td>Export credentials securely</td>
+</tr>
+</tbody>
+</table>
+<h3 id="importing-from-aws-cli">5.5 Importing from AWS CLI</h3>
+<pre class="bash"><code># The app can import from ~/.aws/credentials
+# Navigate to Credentials → Import from AWS CLI</code></pre>
+<hr />
+<h2 id="deployment-operations">6. Deployment Operations</h2>
+<h3 id="deployment-dashboard">6.1 Deployment Dashboard</h3>
+<p>The main dashboard shows:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  Environment: dev          Status: ✓ Healthy                    │
+│  Version: 4.18.1           Last Deploy: 2024-12-25 10:30:00    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │   Deploy     │  │   Rollback   │  │   Settings   │          │
+│  │   [Button]   │  │   [Button]   │  │   [Button]   │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│                                                                  │
+│  Recent Deployments:                                             │
+│  ┌────────────────────────────────────────────────────────┐    │
+│  │ 2024-12-25 10:30 │ v4.18.1 │ prod │ ✓ Success │ 4m 32s│    │
+│  │ 2024-12-24 15:45 │ v4.18.0 │ prod │ ✓ Success │ 5m 12s│    │
+│  │ 2024-12-24 09:00 │ v4.17.0 │ dev  │ ✓ Success │ 3m 45s│    │
+│  └────────────────────────────────────────────────────────┘    │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="starting-a-deployment">6.2 Starting a Deployment</h3>
+<ol type="1">
+<li>Select target <strong>Environment</strong> (dev/staging/prod)</li>
+<li>Select <strong>Tier</strong> (1-5)</li>
+<li>Review deployment plan</li>
+<li>Click <strong>“Start Deployment”</strong></li>
+<li>Monitor progress in real-time</li>
+</ol>
+<h3 id="deployment-phases">6.3 Deployment Phases</h3>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Duration</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. Validation</strong></td>
+<td>~30s</td>
+<td>Credential and configuration check</td>
+</tr>
+<tr>
+<td><strong>2. Snapshot</strong></td>
+<td>~1m</td>
+<td>Create pre-deployment backup</td>
+</tr>
+<tr>
+<td><strong>3. CDK Synth</strong></td>
+<td>~1m</td>
+<td>Generate CloudFormation templates</td>
+</tr>
+<tr>
+<td><strong>4. CDK Deploy</strong></td>
+<td>~10-20m</td>
+<td>Deploy infrastructure</td>
+</tr>
+<tr>
+<td><strong>5. Migration</strong></td>
+<td>~2m</td>
+<td>Run database migrations</td>
+</tr>
+<tr>
+<td><strong>6. Health Check</strong></td>
+<td>~1m</td>
+<td>Verify all services</td>
+</tr>
+<tr>
+<td><strong>7. Cleanup</strong></td>
+<td>~30s</td>
+<td>Remove temporary resources</td>
+</tr>
+</tbody>
+</table>
+<h4 id="phase-details">Phase Details</h4>
+<p><strong>Phase 1 - Validation (30 seconds)</strong></p>
+<p>Before any changes are made, the system validates: - AWS credentials are valid and not expired - IAM permissions are sufficient for all required operations - Target environment exists or can be created - No conflicting deployments are in progress (deployment lock check) - Required software versions are installed (Node.js, CDK, etc.) - Network connectivity to AWS services</p>
+<p>If validation fails, you’ll see specific error messages explaining what needs to be fixed.</p>
+<p><strong>Phase 2 - Snapshot (1 minute)</strong></p>
+<p>A pre-deployment snapshot captures the current state so you can rollback if needed: - Database schema and critical data (not full data backup) - Current Lambda function code versions - SSM Parameter Store values - Current CloudFormation stack states - Configuration files</p>
+<p>Snapshots are stored locally and can be managed in the Snapshots tab.</p>
+<p><strong>Phase 3 - CDK Synth (1 minute)</strong></p>
+<p>The CDK synthesizes TypeScript infrastructure code into CloudFormation templates: - Reads infrastructure definitions from <code>packages/infrastructure/</code> - Resolves all construct dependencies - Generates CloudFormation JSON/YAML templates - Calculates resource changes (what will be created/updated/deleted) - Validates templates against AWS CloudFormation rules</p>
+<p>You can review the generated templates before proceeding.</p>
+<p><strong>Phase 4 - CDK Deploy (10-20 minutes)</strong></p>
+<p>The actual AWS resource deployment happens in this phase: - CloudFormation stacks are created or updated in dependency order - Resources are provisioned (databases, Lambda functions, API Gateway, etc.) - IAM roles and policies are configured - Networking (VPC, subnets, security groups) is set up - DNS records are created/updated</p>
+<p>This is the longest phase. Progress shows which stack is currently deploying.</p>
+<p><strong>Phase 5 - Migration (2 minutes)</strong></p>
+<p>Database migrations ensure your schema matches the deployed code: - Connects to Aurora PostgreSQL using Data API - Runs pending migration files in sequence - Creates new tables, columns, indexes as needed - Updates RLS (Row-Level Security) policies - Verifies migration success with integrity checks</p>
+<p>Migrations are idempotent - running them twice won’t cause issues.</p>
+<p><strong>Phase 6 - Health Check (1 minute)</strong></p>
+<p>Verifies all deployed services are functioning: - API Gateway responds to health endpoint - Lambda functions can be invoked - Database connections succeed - Cognito user pools are accessible - S3 buckets are reachable - CloudFront distributions are deployed</p>
+<p>If health checks fail, automatic rollback is triggered (if enabled).</p>
+<p><strong>Phase 7 - Cleanup (30 seconds)</strong></p>
+<p>Final cleanup tasks: - Removes temporary files created during deployment - Clears CDK staging buckets of old assets - Updates deployment history in local database - Releases deployment lock - Sends completion notification</p>
+<h3 id="deployment-progress">6.4 Deployment Progress</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  Deploying to Production                                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  [████████████████████░░░░░░░░░░] 65%                           │
+│                                                                  │
+│  Current Phase: CDK Deploy                                       │
+│  Stack: Radiant-prod-API (5 of 9)                               │
+│  Elapsed: 8m 23s | Estimated: 4m remaining                       │
+│                                                                  │
+│  ✓ Validation complete                                           │
+│  ✓ Snapshot created: snap-20241225-103000                       │
+│  ✓ CDK synthesis complete                                        │
+│  ⟳ Deploying stacks...                                          │
+│    ✓ Radiant-prod-Foundation                                    │
+│    ✓ Radiant-prod-Networking                                    │
+│    ✓ Radiant-prod-Security                                      │
+│    ✓ Radiant-prod-Data                                          │
+│    ⟳ Radiant-prod-API                                           │
+│    ○ Radiant-prod-Auth                                          │
+│    ○ Radiant-prod-AI                                            │
+│    ○ Radiant-prod-Admin                                         │
+│    ○ Radiant-prod-Monitoring                                    │
+│                                                                  │
+│  [Cancel Deployment]                                             │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="deployment-settings">6.5 Deployment Settings</h3>
+<p>Configure deployment behavior:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Auto-Rollback</strong></td>
+<td>Rollback on failure</td>
+<td>Enabled</td>
+</tr>
+<tr>
+<td><strong>Lock-Step Mode</strong></td>
+<td>Require version consistency</td>
+<td>Enabled</td>
+</tr>
+<tr>
+<td><strong>Max Version Drift</strong></td>
+<td>Maximum version difference</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>Approval Required</strong></td>
+<td>Require confirmation for prod</td>
+<td>Enabled</td>
+</tr>
+<tr>
+<td><strong>Notification</strong></td>
+<td>Send completion notifications</td>
+<td>Enabled</td>
+</tr>
+</tbody>
+</table>
+<h3 id="operation-timeouts">6.6 Operation Timeouts</h3>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Default Timeout</th>
+<th>Configurable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CDK Deploy</td>
+<td>30 minutes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Health Check</td>
+<td>5 minutes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Migration</td>
+<td>10 minutes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Snapshot</td>
+<td>5 minutes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Rollback</td>
+<td>15 minutes</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="multi-region-deployments">7. Multi-Region Deployments</h2>
+<h3 id="overview">7.1 Overview</h3>
+<p>Deploy RADIANT across multiple AWS regions for:</p>
+<ul>
+<li><strong>High Availability</strong>: Survive regional outages</li>
+<li><strong>Low Latency</strong>: Serve users from nearest region</li>
+<li><strong>Compliance</strong>: Data residency requirements</li>
+</ul>
+<h3 id="supported-regions">7.2 Supported Regions</h3>
+<table>
+<thead>
+<tr>
+<th>Region</th>
+<th>Code</th>
+<th>Primary Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>US East (N. Virginia)</td>
+<td><code>us-east-1</code></td>
+<td>Primary (required)</td>
+</tr>
+<tr>
+<td>US West (Oregon)</td>
+<td><code>us-west-2</code></td>
+<td>West coast users</td>
+</tr>
+<tr>
+<td>EU (Ireland)</td>
+<td><code>eu-west-1</code></td>
+<td>European users</td>
+</tr>
+<tr>
+<td>EU (Frankfurt)</td>
+<td><code>eu-central-1</code></td>
+<td>GDPR compliance</td>
+</tr>
+<tr>
+<td>Asia Pacific (Singapore)</td>
+<td><code>ap-southeast-1</code></td>
+<td>APAC users</td>
+</tr>
+<tr>
+<td>Asia Pacific (Tokyo)</td>
+<td><code>ap-northeast-1</code></td>
+<td>Japanese users</td>
+</tr>
+</tbody>
+</table>
+<h3 id="adding-a-region">7.3 Adding a Region</h3>
+<ol type="1">
+<li>Navigate to <strong>Multi-Region</strong> tab</li>
+<li>Click <strong>“Add Region”</strong></li>
+<li>Configure:
+<ul>
+<li><strong>Region</strong>: Select from available regions</li>
+<li><strong>Is Primary</strong>: Set primary region flag</li>
+<li><strong>Stack Prefix</strong>: Region-specific prefix</li>
+<li><strong>Endpoint</strong>: Custom domain for region</li>
+</ul></li>
+<li>Click <strong>“Deploy to Region”</strong></li>
+</ol>
+<h3 id="region-consistency">7.4 Region Consistency</h3>
+<p>Monitor version consistency across regions:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  Multi-Region Status                     Consistency: ✓ 100%    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Region            Version    Status    Last Deploy              │
+│  ───────────────────────────────────────────────────────────    │
+│  us-east-1 (P)     4.18.1     ✓ Healthy  2024-12-25 10:30      │
+│  eu-west-1         4.18.1     ✓ Healthy  2024-12-25 10:35      │
+│  ap-southeast-1    4.18.1     ✓ Healthy  2024-12-25 10:40      │
+│                                                                  │
+│  [Deploy All]  [Check Consistency]  [Sync Versions]             │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="snapshots-rollbacks">8. Snapshots &amp; Rollbacks</h2>
+<h3 id="snapshot-types">8.1 Snapshot Types</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+<th>Retention</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pre-Deploy</strong></td>
+<td>Automatic before each deployment</td>
+<td>30 days</td>
+</tr>
+<tr>
+<td><strong>Manual</strong></td>
+<td>User-initiated backup</td>
+<td>Until deleted</td>
+</tr>
+<tr>
+<td><strong>Scheduled</strong></td>
+<td>Periodic backups</td>
+<td>Configurable</td>
+</tr>
+</tbody>
+</table>
+<h3 id="creating-a-snapshot">8.2 Creating a Snapshot</h3>
+<ol type="1">
+<li>Navigate to <strong>Snapshots</strong> tab</li>
+<li>Click <strong>“Create Snapshot”</strong></li>
+<li>Enter description (optional)</li>
+<li>Select components to include:
+<ul>
+<li>✓ Database state</li>
+<li>✓ Configuration</li>
+<li>✓ Lambda code</li>
+<li>✓ Infrastructure state</li>
+</ul></li>
+<li>Click <strong>“Create”</strong></li>
+</ol>
+<h3 id="snapshot-contents">8.3 Snapshot Contents</h3>
+<pre><code>Snapshot: snap-20241225-103000
+├── metadata.json           # Snapshot info
+├── database/
+│   ├── schema.sql          # Database schema
+│   └── data.sql            # Critical data
+├── config/
+│   ├── ssm-parameters.json # SSM parameters
+│   └── secrets.json        # Secret references
+├── lambda/
+│   └── functions.zip       # Lambda code packages
+└── infrastructure/
+    └── state.json          # CDK state</code></pre>
+<h3 id="restoring-from-snapshot">8.4 Restoring from Snapshot</h3>
+<ol type="1">
+<li>Navigate to <strong>Snapshots</strong> tab</li>
+<li>Select snapshot to restore</li>
+<li>Click <strong>“Restore”</strong></li>
+<li>Confirm restoration scope:
+<ul>
+<li>Full restoration</li>
+<li>Database only</li>
+<li>Configuration only</li>
+</ul></li>
+<li>Click <strong>“Confirm Restore”</strong></li>
+</ol>
+<h3 id="automatic-rollback">8.5 Automatic Rollback</h3>
+<p>When enabled, failed deployments automatically:</p>
+<ol type="1">
+<li>Stop deployment process</li>
+<li>Identify last known good state</li>
+<li>Restore from pre-deploy snapshot</li>
+<li>Verify system health</li>
+<li>Send notification</li>
+</ol>
+<hr />
+<h2 id="ai-assistant">9. AI Assistant</h2>
+<h3 id="overview-1">9.1 Overview</h3>
+<p>The Claude-powered AI Assistant provides:</p>
+<ul>
+<li><strong>Deployment Guidance</strong>: Step-by-step help</li>
+<li><strong>Error Translation</strong>: User-friendly error explanations</li>
+<li><strong>Troubleshooting</strong>: Problem diagnosis</li>
+<li><strong>Best Practices</strong>: Recommendations</li>
+</ul>
+<h3 id="enabling-ai-assistant">9.2 Enabling AI Assistant</h3>
+<ol type="1">
+<li>Navigate to <strong>Settings → AI Assistant</strong></li>
+<li>Enter Anthropic API key</li>
+<li>Toggle <strong>“Enable AI Assistant”</strong></li>
+<li>Select response style</li>
+</ol>
+<h3 id="using-the-assistant">9.3 Using the Assistant</h3>
+<p>Access the assistant via:</p>
+<ul>
+<li><strong>Chat Panel</strong>: Click AI icon in toolbar</li>
+<li><strong>Contextual Help</strong>: Click “?” on any screen</li>
+<li><strong>Error Dialogs</strong>: Click “Explain” on errors</li>
+</ul>
+<h3 id="sample-interactions">9.4 Sample Interactions</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  AI Assistant                                                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  You: What does error &quot;AccessDenied: User is not authorized     │
+│       to perform dynamodb:CreateTable&quot; mean?                    │
+│                                                                  │
+│  Assistant: This error indicates your AWS credentials don&#39;t     │
+│  have permission to create DynamoDB tables. To fix this:        │
+│                                                                  │
+│  1. Check your IAM user/role has the required permissions       │
+│  2. Add the &quot;AmazonDynamoDBFullAccess&quot; managed policy, or       │
+│  3. Add specific permissions:                                    │
+│     - dynamodb:CreateTable                                       │
+│     - dynamodb:DescribeTable                                     │
+│     - dynamodb:UpdateTable                                       │
+│                                                                  │
+│  Would you like me to show the exact IAM policy needed?         │
+│                                                                  │
+│  [Yes, show policy]  [No, I&#39;ll figure it out]                   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="offline-mode">9.5 Offline Mode</h3>
+<p>When offline, the assistant provides:</p>
+<ul>
+<li>Pre-cached common error explanations</li>
+<li>Local troubleshooting guides</li>
+<li>Fallback recommendations</li>
+</ul>
+<hr />
+<h2 id="package-management">10. Package Management</h2>
+<h3 id="package-system">10.1 Package System</h3>
+<p>RADIANT uses atomic packages for deployment:</p>
+<pre><code>radiant-4.18.1.pkg
+├── manifest.json           # Package manifest
+├── checksums.sha256        # Component checksums
+├── radiant/                # Radiant components
+│   ├── infrastructure/
+│   ├── lambda/
+│   └── dashboard/
+└── thinktank/              # Think Tank components
+    ├── api/
+    └── frontend/</code></pre>
+<h3 id="viewing-packages">10.2 Viewing Packages</h3>
+<p>Navigate to <strong>Packages</strong> tab to see:</p>
+<ul>
+<li>Installed packages</li>
+<li>Available updates</li>
+<li>Package history</li>
+<li>Component versions</li>
+</ul>
+<h3 id="version-management">10.3 Version Management</h3>
+<table>
+<thead>
+<tr>
+<th>Version Type</th>
+<th>Format</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Radiant</strong></td>
+<td>Major.Minor.Patch</td>
+<td>4.18.1</td>
+</tr>
+<tr>
+<td><strong>Think Tank</strong></td>
+<td>Major.Minor.Patch</td>
+<td>3.2.0</td>
+</tr>
+<tr>
+<td><strong>Package</strong></td>
+<td>Combined</td>
+<td>4.18.1+3.2.0</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lock-step-mode">10.4 Lock-Step Mode</h3>
+<p>When enabled:</p>
+<ul>
+<li>All components must have same minor version</li>
+<li>Maximum version drift configurable</li>
+<li>Automatic sync available</li>
+</ul>
+<hr />
+<h2 id="monitoring-health-checks">11. Monitoring &amp; Health Checks</h2>
+<h3 id="health-dashboard">11.1 Health Dashboard</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  System Health                           Overall: ✓ Healthy     │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Service              Status    Latency    Last Check           │
+│  ───────────────────────────────────────────────────────────    │
+│  API Gateway          ✓ Up      45ms       10s ago              │
+│  Lambda (Router)      ✓ Up      120ms      10s ago              │
+│  Aurora PostgreSQL    ✓ Up      12ms       10s ago              │
+│  DynamoDB             ✓ Up      8ms        10s ago              │
+│  Cognito              ✓ Up      85ms       10s ago              │
+│  S3 Storage           ✓ Up      35ms       10s ago              │
+│  CloudFront           ✓ Up      22ms       10s ago              │
+│  SageMaker (if T3+)   ✓ Up      250ms      10s ago              │
+│                                                                  │
+│  [Refresh]  [Run Full Check]  [View History]                    │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="health-check-types">11.2 Health Check Types</h3>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Frequency</th>
+<th>Timeout</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Quick</strong></td>
+<td>Every 60s</td>
+<td>5s</td>
+</tr>
+<tr>
+<td><strong>Standard</strong></td>
+<td>Every 5m</td>
+<td>30s</td>
+</tr>
+<tr>
+<td><strong>Deep</strong></td>
+<td>Manual/Deploy</td>
+<td>2m</td>
+</tr>
+</tbody>
+</table>
+<h3 id="alerts">11.3 Alerts</h3>
+<p>Configure alerts for:</p>
+<ul>
+<li>Service degradation</li>
+<li>High latency</li>
+<li>Error rate spikes</li>
+<li>Failed deployments</li>
+</ul>
+<hr />
+<h2 id="security-features">12. Security Features</h2>
+<h3 id="credential-security">12.1 Credential Security</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Storage</strong></td>
+<td>macOS Keychain (encrypted)</td>
+</tr>
+<tr>
+<td><strong>Memory</strong></td>
+<td>Cleared after use</td>
+</tr>
+<tr>
+<td><strong>Transport</strong></td>
+<td>TLS 1.3 only</td>
+</tr>
+<tr>
+<td><strong>Validation</strong></td>
+<td>Format + connectivity check</td>
+</tr>
+</tbody>
+</table>
+<h3 id="deployment-locks">12.2 Deployment Locks</h3>
+<p>Prevent concurrent deployments:</p>
+<pre><code>Deployment Lock: Active
+├── Acquired: 2024-12-25 10:30:00
+├── Owner: deployer@example.com
+├── Environment: production
+└── Expires: 2024-12-25 11:30:00</code></pre>
+<h3 id="audit-logging">12.3 Audit Logging</h3>
+<p>All operations are logged:</p>
+<pre class="json"><code>{
+  &quot;timestamp&quot;: &quot;2024-12-25T10:30:00Z&quot;,
+  &quot;operation&quot;: &quot;deployment.start&quot;,
+  &quot;user&quot;: &quot;admin@example.com&quot;,
+  &quot;environment&quot;: &quot;production&quot;,
+  &quot;version&quot;: &quot;4.18.1&quot;,
+  &quot;status&quot;: &quot;success&quot;,
+  &quot;duration_ms&quot;: 272000
+}</code></pre>
+<h3 id="secret-detection">12.4 Secret Detection</h3>
+<p>Pre-commit checks scan for:</p>
+<ul>
+<li>AWS access keys</li>
+<li>API keys</li>
+<li>Passwords</li>
+<li>Private keys</li>
+</ul>
+<hr />
+<h2 id="troubleshooting">13. Troubleshooting</h2>
+<h3 id="common-issues">13.1 Common Issues</h3>
+<h4 id="deployment-fails-at-cdk-synth">Deployment Fails at CDK Synth</h4>
+<p><strong>Symptoms</strong>: Deployment stops at synthesis phase</p>
+<p><strong>Solutions</strong>: 1. Check Node.js version: <code>node --version</code> (need 20.x) 2. Clear CDK cache: <code>rm -rf cdk.out</code> 3. Update CDK: <code>npm update -g aws-cdk</code> 4. Check TypeScript errors in <code>packages/infrastructure</code></p>
+<h4 id="aws-credentials-invalid">AWS Credentials Invalid</h4>
+<p><strong>Symptoms</strong>: “Invalid credentials” error</p>
+<p><strong>Solutions</strong>: 1. Verify access key format (starts with AKIA) 2. Check secret key hasn’t expired 3. Verify IAM user is active 4. Test with AWS CLI: <code>aws sts get-caller-identity</code></p>
+<h4 id="health-check-timeout">Health Check Timeout</h4>
+<p><strong>Symptoms</strong>: Services show unhealthy after deployment</p>
+<p><strong>Solutions</strong>: 1. Wait 2-3 minutes for cold start 2. Check CloudWatch logs for errors 3. Verify security group rules 4. Check VPC endpoint configuration</p>
+<h3 id="log-locations">13.2 Log Locations</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Log Type</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>App Logs</strong></td>
+<td><code>~/Library/Logs/RadiantDeployer/</code></td>
+</tr>
+<tr>
+<td><strong>Deployment Logs</strong></td>
+<td><code>~/Library/Application Support/RadiantDeployer/deployments/</code></td>
+</tr>
+<tr>
+<td><strong>AWS Logs</strong></td>
+<td>CloudWatch Log Groups</td>
+</tr>
+</tbody>
+</table>
+<h3 id="getting-help">13.3 Getting Help</h3>
+<ol type="1">
+<li><strong>AI Assistant</strong>: Built-in help</li>
+<li><strong>Documentation</strong>: This guide + online docs</li>
+<li><strong>Support</strong>: support@radiant.example.com</li>
+</ol>
+<hr />
+<h2 id="reference">14. Reference</h2>
+<h3 id="keyboard-shortcuts">14.1 Keyboard Shortcuts</h3>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>⌘ + D</code></td>
+<td>Start deployment</td>
+</tr>
+<tr>
+<td><code>⌘ + R</code></td>
+<td>Refresh status</td>
+</tr>
+<tr>
+<td><code>⌘ + S</code></td>
+<td>Create snapshot</td>
+</tr>
+<tr>
+<td><code>⌘ + ,</code></td>
+<td>Open settings</td>
+</tr>
+<tr>
+<td><code>⌘ + ?</code></td>
+<td>Open AI assistant</td>
+</tr>
+<tr>
+<td><code>⌘ + L</code></td>
+<td>View logs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cli-commands">14.2 CLI Commands</h3>
+<pre class="bash"><code># Build and run from source
+cd apps/swift-deployer
+swift build -c release
+swift run RadiantDeployer
+
+# Run with specific config
+swift run RadiantDeployer --environment prod --tier 3
+
+# Headless deployment
+swift run RadiantDeployer deploy --non-interactive</code></pre>
+<h3 id="environment-variables">14.3 Environment Variables</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RADIANT_ENV</code></td>
+<td>Override environment</td>
+</tr>
+<tr>
+<td><code>RADIANT_TIER</code></td>
+<td>Override tier</td>
+</tr>
+<tr>
+<td><code>RADIANT_DEBUG</code></td>
+<td>Enable debug logging</td>
+</tr>
+<tr>
+<td><code>RADIANT_AI_KEY</code></td>
+<td>Anthropic API key</td>
+</tr>
+</tbody>
+</table>
+<h3 id="file-locations">14.4 File Locations</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 62%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Configuration</td>
+<td><code>~/Library/Application Support/RadiantDeployer/config.json</code></td>
+</tr>
+<tr>
+<td>Snapshots</td>
+<td><code>~/Library/Application Support/RadiantDeployer/snapshots/</code></td>
+</tr>
+<tr>
+<td>Logs</td>
+<td><code>~/Library/Logs/RadiantDeployer/</code></td>
+</tr>
+<tr>
+<td>Database</td>
+<td><code>~/Library/Application Support/RadiantDeployer/local.db</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="appendix-a-iam-policy-requirements">Appendix A: IAM Policy Requirements</h2>
+<p>Minimum IAM permissions for deployment:</p>
+<pre class="json"><code>{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Action&quot;: [
+        &quot;cloudformation:*&quot;,
+        &quot;s3:*&quot;,
+        &quot;lambda:*&quot;,
+        &quot;apigateway:*&quot;,
+        &quot;cognito-idp:*&quot;,
+        &quot;rds:*&quot;,
+        &quot;dynamodb:*&quot;,
+        &quot;sqs:*&quot;,
+        &quot;sns:*&quot;,
+        &quot;events:*&quot;,
+        &quot;logs:*&quot;,
+        &quot;iam:PassRole&quot;,
+        &quot;iam:CreateRole&quot;,
+        &quot;iam:AttachRolePolicy&quot;,
+        &quot;ssm:*&quot;,
+        &quot;secretsmanager:*&quot;,
+        &quot;ecr:*&quot;,
+        &quot;ecs:*&quot;
+      ],
+      &quot;Resource&quot;: &quot;*&quot;
+    }
+  ]
+}</code></pre>
+<hr />
+<h2 id="appendix-b-glossary">Appendix B: Glossary</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CDK</strong></td>
+<td>AWS Cloud Development Kit</td>
+</tr>
+<tr>
+<td><strong>Stack</strong></td>
+<td>CloudFormation stack deployed by CDK</td>
+</tr>
+<tr>
+<td><strong>Snapshot</strong></td>
+<td>Point-in-time backup of deployment</td>
+</tr>
+<tr>
+<td><strong>Lock-Step</strong></td>
+<td>Version consistency enforcement</td>
+</tr>
+<tr>
+<td><strong>Tier</strong></td>
+<td>Infrastructure sizing level (1-5)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Document Version: 4.18.1</em> <em>Last Updated: December 2024</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

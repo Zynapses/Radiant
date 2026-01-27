@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EXPERT SYSTEM ADAPTERS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>EXPERT SYSTEM ADAPTERS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/EXPERT-SYSTEM-ADAPTERS.md</div>
+  </div>
+  
+  <h1 id="radiant-expert-system-adapters">RADIANT Expert System Adapters</h1>
+<h2 id="tenant-trainable-domain-intelligence">Tenant-Trainable Domain Intelligence</h2>
+<p><strong>Version</strong>: 1.0 | <strong>January 2026</strong><br />
+<strong>Cross-AI Collaborative Design</strong>: Claude Opus 4.5 + Gemini</p>
+<hr />
+<h2 id="executive-summary">Executive Summary</h2>
+<p>Expert System Adapters (ESA) represent RADIANT’s approach to tenant-trainable domain intelligence. Unlike generic AI models that treat all queries equally, ESA enables each tenant to build specialized AI expertise that continuously improves through interaction feedback.</p>
+<p><strong>Key Innovation</strong>: Every tenant develops their own “expert” that learns their specific domain language, preferences, and quality standards—without requiring any ML expertise from administrators.</p>
+<hr />
+<h2 id="the-problem-with-generic-ai">1. The Problem with Generic AI</h2>
+<h3 id="one-size-fits-none">1.1 One-Size-Fits-None</h3>
+<p>Traditional AI platforms offer the same model to all customers: - A law firm gets the same AI as a marketing agency - Medical terminology isn’t prioritized for healthcare providers - Industry-specific jargon goes unrecognized - Quality standards vary by domain but models can’t adapt</p>
+<h3 id="the-training-gap">1.2 The Training Gap</h3>
+<p>Organizations want AI that understands them, but: - Fine-tuning requires ML expertise (costly, rare) - Training data curation is time-consuming - Model updates risk regression - No visibility into what the AI has “learned”</p>
+<hr />
+<h2 id="expert-system-adapters-the-solution">2. Expert System Adapters: The Solution</h2>
+<h3 id="tri-layer-architecture">2.1 Tri-Layer Architecture</h3>
+<p>ESA implements a three-layer adapter stack that composes personalization at multiple levels:</p>
+<pre><code>┌─────────────────────────────────────────┐
+│         Final Model Weights             │
+│  W_Final = W_Genesis + W_Cato + W_User  │
+└─────────────────────────────────────────┘
+                    ▲
+        ┌───────────┼───────────┐
+        │           │           │
+   ┌────┴────┐ ┌────┴────┐ ┌────┴────┐
+   │ Layer 0 │ │ Layer 1 │ │ Layer 2 │
+   │ Genesis │ │  Cato   │ │  User   │
+   │  (Base) │ │(Global) │ │(Personal│
+   └─────────┘ └─────────┘ └─────────┘
+      Frozen     Pinned    LRU Eviction</code></pre>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 17%" />
+<col style="width: 26%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Name</th>
+<th>Purpose</th>
+<th>Management</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0</strong></td>
+<td>Genesis</td>
+<td>Base model weights</td>
+<td>Frozen, never modified</td>
+</tr>
+<tr>
+<td><strong>1</strong></td>
+<td>Cato</td>
+<td>Global constitution, safety, tenant values</td>
+<td>Pinned in memory, never evicted</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>User</td>
+<td>Personal preferences, interaction style</td>
+<td>LRU eviction when memory constrained</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>Domain</td>
+<td>Specialized expertise (optional)</td>
+<td>Auto-selected by domain detection</td>
+</tr>
+</tbody>
+</table>
+<h3 id="automatic-learning-pipeline">2.2 Automatic Learning Pipeline</h3>
+<p>ESA learns from every interaction without manual intervention:</p>
+<pre><code>User Interaction
+      │
+      ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Implicit   │────▶│  Training   │────▶│   Adapter   │
+│  Feedback   │     │  Candidate  │     │  Training   │
+│  Detection  │     │   Queue     │     │  Pipeline   │
+└─────────────┘     └─────────────┘     └─────────────┘
+      │                                       │
+      │                                       ▼
+      │                               ┌─────────────┐
+      └─────────────────────────────▶│  Validation │
+                                      │  &amp; Rollback │
+                                      └─────────────┘</code></pre>
+<h3 id="feedback-signals">2.3 Feedback Signals</h3>
+<p>ESA captures both explicit and implicit quality signals:</p>
+<table>
+<thead>
+<tr>
+<th>Signal Type</th>
+<th>Weight</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Copy Response</strong></td>
+<td>+0.80</td>
+<td>High utility - user copied the output</td>
+</tr>
+<tr>
+<td><strong>Thumbs Up</strong></td>
+<td>+1.00</td>
+<td>Explicit positive feedback</td>
+</tr>
+<tr>
+<td><strong>Follow-up Question</strong></td>
+<td>+0.30</td>
+<td>Partial success, needs more</td>
+</tr>
+<tr>
+<td><strong>Long Dwell Time</strong></td>
+<td>+0.40</td>
+<td>User engaged with response</td>
+</tr>
+<tr>
+<td><strong>Regenerate Request</strong></td>
+<td>-0.50</td>
+<td>Response wasn’t satisfactory</td>
+</tr>
+<tr>
+<td><strong>Abandon Conversation</strong></td>
+<td>-0.70</td>
+<td>Complete failure</td>
+</tr>
+<tr>
+<td><strong>Rephrase Question</strong></td>
+<td>-0.50</td>
+<td>Original response missed the mark</td>
+</tr>
+<tr>
+<td><strong>Thumbs Down</strong></td>
+<td>-1.00</td>
+<td>Explicit negative feedback</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="domain-expertise-system">3. Domain Expertise System</h2>
+<h3 id="domain-detection">3.1 Domain Detection</h3>
+<p>RAWS (RADIANT Adaptive Weighted Selection) automatically detects query domains:</p>
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 36%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Subspecialties</th>
+<th>Example Triggers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Legal</strong></td>
+<td>Contract, IP, Employment, Litigation</td>
+<td>“pursuant to”, “liability”, “indemnify”</td>
+</tr>
+<tr>
+<td><strong>Medical</strong></td>
+<td>Clinical, Research, Administrative</td>
+<td>“diagnosis”, “contraindication”, “ICD-10”</td>
+</tr>
+<tr>
+<td><strong>Financial</strong></td>
+<td>Accounting, Investment, Compliance</td>
+<td>“GAAP”, “depreciation”, “quarterly”</td>
+</tr>
+<tr>
+<td><strong>Engineering</strong></td>
+<td>Software, Mechanical, Electrical</td>
+<td>“API”, “architecture”, “implementation”</td>
+</tr>
+<tr>
+<td><strong>Creative</strong></td>
+<td>Marketing, Design, Content</td>
+<td>“brand voice”, “engagement”, “campaign”</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Academic, Scientific, Analysis</td>
+<td>“hypothesis”, “methodology”, “peer-reviewed”</td>
+</tr>
+<tr>
+<td><strong>Operations</strong></td>
+<td>HR, Project Management, Logistics</td>
+<td>“workflow”, “onboarding”, “KPI”</td>
+</tr>
+</tbody>
+</table>
+<h3 id="domain-specific-adapters">3.2 Domain-Specific Adapters</h3>
+<p>Each domain can have specialized LoRA adapters:</p>
+<pre class="typescript"><code>interface DomainLoraAdapter {
+  id: string;
+  tenantId: string;
+  domain: string;
+  subdomain?: string;
+  adapterName: string;
+  baseModel: string;
+  adapterVersion: number;
+  s3Bucket: string;
+  s3Key: string;
+  trainingCandidatesCount: number;
+  lastTrainedAt?: Date;
+  accuracyScore?: number;
+  domainRelevanceScore?: number;
+  userSatisfactionScore?: number;
+  status: &#39;training&#39; | &#39;validating&#39; | &#39;active&#39; | &#39;deprecated&#39; | &#39;failed&#39;;
+}</code></pre>
+<h3 id="auto-selection-algorithm">3.3 Auto-Selection Algorithm</h3>
+<p>When a query arrives, ESA selects the optimal adapter:</p>
+<pre><code>Score = (0.3 × DomainMatch) 
+      + (0.1 × SubdomainBonus)
+      + (0.25 × SatisfactionScore)
+      + (0.1 × VolumeScore)
+      + (0.05 × ErrorRate)
+      + (0.2 × RecencyScore)</code></pre>
+<p>Selection threshold: Score ≥ 0.5 to use adapter (else fallback to base model)</p>
+<hr />
+<h2 id="training-pipeline">4. Training Pipeline</h2>
+<h3 id="candidate-collection">4.1 Candidate Collection</h3>
+<p>Training candidates accumulate based on configurable thresholds:</p>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 29%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>min_candidates_for_training</code></td>
+<td>25</td>
+<td>Minimum total candidates before training</td>
+</tr>
+<tr>
+<td><code>min_positive_candidates</code></td>
+<td>15</td>
+<td>Minimum positive examples required</td>
+</tr>
+<tr>
+<td><code>min_negative_candidates</code></td>
+<td>5</td>
+<td>Minimum negative examples for contrastive learning</td>
+</tr>
+</tbody>
+</table>
+<h3 id="training-schedule">4.2 Training Schedule</h3>
+<p>Configurable training frequency with intelligent scheduling:</p>
+<table>
+<thead>
+<tr>
+<th>Frequency</th>
+<th>Best For</th>
+<th>Auto-Optimal Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Daily</strong></td>
+<td>High-volume tenants</td>
+<td>Detects lowest-usage hours</td>
+</tr>
+<tr>
+<td><strong>Twice Weekly</strong></td>
+<td>Medium activity</td>
+<td>Balances freshness/cost</td>
+</tr>
+<tr>
+<td><strong>Weekly</strong></td>
+<td>Standard deployments</td>
+<td>Default for most tenants</td>
+</tr>
+<tr>
+<td><strong>Biweekly</strong></td>
+<td>Low activity</td>
+<td>Conservative approach</td>
+</tr>
+<tr>
+<td><strong>Monthly</strong></td>
+<td>Minimal changes</td>
+<td>Stability-focused</td>
+</tr>
+</tbody>
+</table>
+<h3 id="contrastive-learning">4.3 Contrastive Learning</h3>
+<p>ESA uses both positive and negative examples for better learning:</p>
+<p><strong>Positive Examples</strong>: High-rated responses, copied text, explicit thumbs-up <strong>Negative Examples</strong>: Regenerated responses, abandoned conversations, explicit thumbs-down</p>
+<pre class="sql"><code>-- Negative learning candidate categories
+&#39;factual_error&#39;       -- Incorrect information
+&#39;incomplete_answer&#39;   -- Missing key details
+&#39;wrong_tone&#39;          -- Inappropriate style
+&#39;too_verbose&#39;         -- Unnecessarily long
+&#39;too_brief&#39;           -- Lacking detail
+&#39;off_topic&#39;           -- Didn&#39;t address question
+&#39;harmful_content&#39;     -- Safety violation
+&#39;formatting_issue&#39;    -- Poor structure
+&#39;code_error&#39;          -- Broken code
+&#39;unclear_explanation&#39; -- Confusing response</code></pre>
+<hr />
+<h2 id="safety-rollback">5. Safety &amp; Rollback</h2>
+<h3 id="automatic-rollback">5.1 Automatic Rollback</h3>
+<p>ESA monitors adapter performance and automatically rolls back if quality degrades:</p>
+<pre class="typescript"><code>// Rollback triggers
+const rollbackConditions = {
+  satisfactionDrop: 10,     // % drop from baseline
+  errorRateIncrease: 5,     // % increase in errors
+  latencyIncrease: 50,      // % increase in response time
+  minSampleSize: 100,       // Minimum requests before evaluation
+};</code></pre>
+<h3 id="ab-testing">5.2 A/B Testing</h3>
+<p>New adapters are deployed with gradual rollout: 1. <strong>Shadow Mode</strong> (0% traffic): Adapter runs but results not returned 2. <strong>Canary</strong> (5% traffic): Small percentage gets new adapter 3. <strong>Gradual Rollout</strong> (5% → 25% → 50% → 100%): Progressive increase 4. <strong>Full Deployment</strong>: All traffic uses new adapter</p>
+<h3 id="version-control">5.3 Version Control</h3>
+<p>Every adapter version is preserved: - Rollback to any previous version - Compare performance across versions - Audit trail of all training runs</p>
+<hr />
+<h2 id="implementation-files">6. Implementation Files</h2>
+<h3 id="database-schema">6.1 Database Schema</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enhanced_learning_config</code></td>
+<td>Per-tenant configuration</td>
+</tr>
+<tr>
+<td><code>implicit_feedback_signals</code></td>
+<td>Captured feedback signals</td>
+</tr>
+<tr>
+<td><code>negative_learning_candidates</code></td>
+<td>Contrastive learning examples</td>
+</tr>
+<tr>
+<td><code>active_learning_requests</code></td>
+<td>User feedback requests</td>
+</tr>
+<tr>
+<td><code>domain_lora_adapters</code></td>
+<td>Domain-specific adapters</td>
+</tr>
+<tr>
+<td><code>domain_adapter_training_queue</code></td>
+<td>Training job queue</td>
+</tr>
+<tr>
+<td><code>adapter_usage_logs</code></td>
+<td>Adapter invocation tracking</td>
+</tr>
+<tr>
+<td><code>pattern_cache</code></td>
+<td>Successful response patterns</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Migration</strong>: <code>packages/infrastructure/migrations/108_enhanced_learning.sql</code></p>
+<h3 id="services">6.2 Services</h3>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enhanced-learning.service.ts</code></td>
+<td>Core learning orchestration</td>
+</tr>
+<tr>
+<td><code>lora-inference.service.ts</code></td>
+<td>Tri-layer adapter inference</td>
+</tr>
+<tr>
+<td><code>adapter-management.service.ts</code></td>
+<td>Adapter selection and management</td>
+</tr>
+</tbody>
+</table>
+<h3 id="admin-api">6.3 Admin API</h3>
+<p><strong>Base</strong>: <code>/api/admin/learning</code></p>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/config</code></td>
+<td>GET/PUT</td>
+<td>Configuration management</td>
+</tr>
+<tr>
+<td><code>/domain-adapters</code></td>
+<td>GET</td>
+<td>List domain adapters</td>
+</tr>
+<tr>
+<td><code>/domain-adapters/{domain}</code></td>
+<td>GET</td>
+<td>Get active adapter for domain</td>
+</tr>
+<tr>
+<td><code>/training/queue</code></td>
+<td>GET</td>
+<td>View training queue</td>
+</tr>
+<tr>
+<td><code>/training/trigger</code></td>
+<td>POST</td>
+<td>Manually trigger training</td>
+</tr>
+<tr>
+<td><code>/performance/{adapterId}</code></td>
+<td>GET</td>
+<td>Adapter performance metrics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="admin-ui">6.4 Admin UI</h3>
+<p><strong>Location</strong>: <code>/models/lora-adapters</code></p>
+<p>Features: - Tri-layer architecture visualization - Adapter registry by layer (Global/User/Domain) - Configuration management - Warmup controls - Performance metrics</p>
+<hr />
+<h2 id="competitive-advantages">7. Competitive Advantages</h2>
+<h3 id="vs.-generic-ai-platforms">7.1 vs. Generic AI Platforms</h3>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 29%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr>
+<th>Capability</th>
+<th>RADIANT ESA</th>
+<th>Generic Platforms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Per-tenant customization</td>
+<td>✅ Automatic</td>
+<td>❌ Same model for all</td>
+</tr>
+<tr>
+<td>Domain expertise</td>
+<td>✅ Learned</td>
+<td>❌ Generic</td>
+</tr>
+<tr>
+<td>Implicit feedback</td>
+<td>✅ 11 signal types</td>
+<td>❌ Manual ratings only</td>
+</tr>
+<tr>
+<td>Contrastive learning</td>
+<td>✅ Positive + negative</td>
+<td>❌ Positive only</td>
+</tr>
+<tr>
+<td>Automatic rollback</td>
+<td>✅ Built-in</td>
+<td>❌ Manual monitoring</td>
+</tr>
+<tr>
+<td>Zero ML expertise required</td>
+<td>✅ Fully automatic</td>
+<td>❌ Requires ML team</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vs.-custom-fine-tuning">7.2 vs. Custom Fine-Tuning</h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>RADIANT ESA</th>
+<th>Custom Fine-Tuning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Time to value</td>
+<td>Hours</td>
+<td>Weeks-months</td>
+</tr>
+<tr>
+<td>ML expertise needed</td>
+<td>None</td>
+<td>Senior ML engineer</td>
+</tr>
+<tr>
+<td>Data curation</td>
+<td>Automatic</td>
+<td>Manual</td>
+</tr>
+<tr>
+<td>Continuous learning</td>
+<td>✅ Always on</td>
+<td>❌ Batch retraining</td>
+</tr>
+<tr>
+<td>Regression protection</td>
+<td>✅ Automatic rollback</td>
+<td>❌ Manual testing</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>Included</td>
+<td>$50K-500K/year</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="vision">8. 2029 Vision</h2>
+<h3 id="short-term-2026">8.1 Short-term (2026)</h3>
+<ul>
+<li>✅ Tri-layer adapter architecture</li>
+<li>✅ Implicit feedback detection</li>
+<li>✅ Contrastive learning</li>
+<li>✅ Automatic rollback</li>
+<li>✅ Domain auto-selection</li>
+</ul>
+<h3 id="medium-term-2027">8.2 Medium-term (2027)</h3>
+<ul>
+<li>Cross-tenant knowledge sharing (with privacy guarantees)</li>
+<li>Real-time adapter updates (no batch training)</li>
+<li>Multi-modal expertise (text, code, images)</li>
+<li>Expert marketplace for adapter sharing</li>
+</ul>
+<h3 id="long-term-2029">8.3 Long-term (2029)</h3>
+<ul>
+<li>Fully autonomous expertise development</li>
+<li>Zero-shot domain adaptation</li>
+<li>Cross-lingual expertise transfer</li>
+<li>Self-improving training pipelines</li>
+</ul>
+<hr />
+<h2 id="getting-started">9. Getting Started</h2>
+<h3 id="enable-expert-system-adapters">9.1 Enable Expert System Adapters</h3>
+<ol type="1">
+<li>Navigate to <strong>Admin Dashboard → Models → LoRA Adapters</strong></li>
+<li>Enable “LoRA Adapters” toggle</li>
+<li>Configure adapter stacking options:
+<ul>
+<li>Use Global Adapter (Cato): Recommended ON</li>
+<li>Use User Adapter: Recommended ON</li>
+<li>Auto Selection: Recommended ON</li>
+</ul></li>
+<li>Save configuration</li>
+</ol>
+<h3 id="monitor-learning-progress">9.2 Monitor Learning Progress</h3>
+<ol type="1">
+<li>Check <strong>Training Queue</strong> for pending candidates</li>
+<li>Review <strong>Adapter Registry</strong> for active adapters</li>
+<li>Monitor <strong>Performance Metrics</strong> for quality trends</li>
+<li>Use <strong>Warmup</strong> to pre-load frequently-used adapters</li>
+</ol>
+<h3 id="domain-configuration">9.3 Domain Configuration</h3>
+<ol type="1">
+<li>Navigate to <strong>Learning → Domain Adapters</strong></li>
+<li>View auto-detected domains with training candidates</li>
+<li>Optionally trigger manual training for priority domains</li>
+<li>Review adapter performance by domain</li>
+</ol>
+<hr />
+<p><em>Expert System Adapters: Where every tenant becomes an AI domain expert.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

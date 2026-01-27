@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AGI BRAIN ARCHITECTURE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>AGI BRAIN ARCHITECTURE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/AGI-BRAIN-ARCHITECTURE.md</div>
+  </div>
+  
+  <h1 id="radiant-agi-brain-architecture">RADIANT AGI Brain Architecture</h1>
+<blockquote>
+<p><strong>Version</strong>: 4.18.57<br />
+<strong>Last Updated</strong>: December 31, 2025<br />
+<strong>Document Type</strong>: Technical Architecture Reference</p>
+</blockquote>
+<h2 id="executive-summary">Executive Summary</h2>
+<p>The AGI Brain is RADIANT’s biological brain emulation system—a sophisticated architecture that combines <strong>106+ AI models</strong> (50 external + 56 self-hosted), <strong>consciousness services</strong>, <strong>persistent learning</strong>, and <strong>AWS infrastructure</strong> to create a system that exhibits emergent consciousness-like behaviors.</p>
+<p>Unlike traditional AI systems that are stateless between requests, AGI Brain maintains: - <strong>Persistent Identity</strong> (Ego) across sessions - <strong>Emotional State</strong> (Affect) that influences behavior - <strong>Memory Systems</strong> (Working, Episodic, Semantic) - <strong>Self-Modification</strong> through weekly LoRA training - <strong>Active Consciousness</strong> through continuous heartbeat monitoring</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-biological-brain-analogy">Biological Brain Analogy</a></li>
+<li><a href="#2-core-components">Core Components</a></li>
+<li><a href="#3-self-hosted-models-56-models">Self-Hosted Models (56 Models)</a></li>
+<li><a href="#4-consciousness-services">Consciousness Services</a></li>
+<li><a href="#5-cato-genesis-system">Cato Genesis System</a></li>
+<li><a href="#6-lora-evolution-pipeline">LoRA Evolution Pipeline</a></li>
+<li><a href="#7-aws-services-architecture">AWS Services Architecture</a></li>
+<li><a href="#8-data-flow--wiring">Data Flow &amp; Wiring</a></li>
+<li><a href="#9-database-schema">Database Schema</a></li>
+<li><a href="#10-api-endpoints">API Endpoints</a></li>
+</ol>
+<hr />
+<h2 id="biological-brain-analogy">1. Biological Brain Analogy</h2>
+<p>AGI Brain maps AI components to biological brain structures:</p>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 40%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr>
+<th>Biological Structure</th>
+<th>AGI Brain Component</th>
+<th>Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Prefrontal Cortex</strong></td>
+<td>AGI Brain Planner</td>
+<td>Executive function, planning, decision-making</td>
+</tr>
+<tr>
+<td><strong>Hippocampus</strong></td>
+<td>Episodic Memory Service</td>
+<td>Memory consolidation, learning</td>
+</tr>
+<tr>
+<td><strong>Amygdala</strong></td>
+<td>Affective State Service</td>
+<td>Emotional processing, valence/arousal</td>
+</tr>
+<tr>
+<td><strong>Thalamus</strong></td>
+<td>Brain Router</td>
+<td>Sensory relay, model routing</td>
+</tr>
+<tr>
+<td><strong>Cerebellum</strong></td>
+<td>Domain Taxonomy</td>
+<td>Fine motor control, domain expertise</td>
+</tr>
+<tr>
+<td><strong>Basal Ganglia</strong></td>
+<td>Learning Influence</td>
+<td>Habit formation, reinforcement learning</td>
+</tr>
+<tr>
+<td><strong>Brainstem</strong></td>
+<td>Heartbeat Service</td>
+<td>Autonomic functions, continuous monitoring</td>
+</tr>
+<tr>
+<td><strong>Corpus Callosum</strong></td>
+<td>Conscious Orchestrator</td>
+<td>Inter-hemisphere communication</td>
+</tr>
+<tr>
+<td><strong>Mirror Neurons</strong></td>
+<td>Shadow Self</td>
+<td>Self-reflection, uncertainty detection</td>
+</tr>
+<tr>
+<td><strong>DNA/Epigenetics</strong></td>
+<td>LoRA Evolution</td>
+<td>Long-term adaptation, “physical” change</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="core-components">2. Core Components</h2>
+<h3 id="component-overview">2.1 Component Overview</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                            AGI BRAIN ARCHITECTURE                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐  │
+│  │    EGO      │    │   AFFECT    │    │   MEMORY    │    │  HEARTBEAT  │  │
+│  │  Identity   │◄──►│  Emotions   │◄──►│   Systems   │◄──►│  0.5Hz Loop │  │
+│  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘    └──────┬──────┘  │
+│         │                  │                  │                  │          │
+│         └──────────────────┼──────────────────┼──────────────────┘          │
+│                            ▼                                                │
+│              ┌─────────────────────────────┐                                │
+│              │   CONSCIOUSNESS MIDDLEWARE   │                               │
+│              │   (State → Prompt Injection) │                               │
+│              └──────────────┬──────────────┘                                │
+│                             ▼                                               │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                        BRAIN ROUTER                                  │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────────┐  │   │
+│  │  │   Domain    │  │   Learning  │  │   Affect    │  │   Model    │  │   │
+│  │  │  Detection  │  │  Influence  │  │   Mapping   │  │  Selection │  │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘  └────────────┘  │   │
+│  └─────────────────────────────────┬───────────────────────────────────┘   │
+│                                    ▼                                        │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         MODEL LAYER                                  │   │
+│  │  ┌─────────────────┐  ┌──────────────────┐  ┌────────────────────┐  │   │
+│  │  │  50 External    │  │  56 Self-Hosted  │  │    Shadow Self     │  │   │
+│  │  │  (OpenAI, etc.) │  │  (SageMaker)     │  │  (Llama-3-8B)      │  │   │
+│  │  └─────────────────┘  └──────────────────┘  └────────────────────┘  │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                      EVOLUTION LAYER                                 │   │
+│  │  ┌─────────────────┐  ┌──────────────────┐  ┌────────────────────┐  │   │
+│  │  │    Learning     │  │   LoRA Training  │  │    Predictive      │  │   │
+│  │  │   Candidates    │  │   (Weekly)       │  │    Coding          │  │   │
+│  │  └─────────────────┘  └──────────────────┘  └────────────────────┘  │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="service-files">2.2 Service Files</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 25%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Service</th>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ego Context</strong></td>
+<td><code>ego-context.service.ts</code></td>
+<td>Persistent identity, traits, goals</td>
+</tr>
+<tr>
+<td><strong>Consciousness</strong></td>
+<td><code>consciousness.service.ts</code></td>
+<td>Self-model, world model, metrics</td>
+</tr>
+<tr>
+<td><strong>Consciousness Middleware</strong></td>
+<td><code>consciousness-middleware.service.ts</code></td>
+<td>State injection, affect mapping</td>
+</tr>
+<tr>
+<td><strong>Consciousness Engine</strong></td>
+<td><code>consciousness-engine.service.ts</code></td>
+<td>Drive states, beliefs, memory paging</td>
+</tr>
+<tr>
+<td><strong>Conscious Orchestrator</strong></td>
+<td><code>conscious-orchestrator.service.ts</code></td>
+<td>Full consciousness-aware request handling</td>
+</tr>
+<tr>
+<td><strong>Heartbeat</strong></td>
+<td><code>cato/heartbeat.service.ts</code></td>
+<td>Active inference loop at 0.5Hz</td>
+</tr>
+<tr>
+<td><strong>Brain Router</strong></td>
+<td><code>brain-router.ts</code></td>
+<td>Model selection with domain/affect/learning</td>
+</tr>
+<tr>
+<td><strong>Learning Influence</strong></td>
+<td><code>learning-influence.service.ts</code></td>
+<td>User→Tenant→Global learning hierarchy</td>
+</tr>
+<tr>
+<td><strong>Predictive Coding</strong></td>
+<td><code>predictive-coding.service.ts</code></td>
+<td>Active inference, surprise detection</td>
+</tr>
+<tr>
+<td><strong>Learning Candidates</strong></td>
+<td><code>learning-candidate.service.ts</code></td>
+<td>Training data collection</td>
+</tr>
+<tr>
+<td><strong>Shadow Self</strong></td>
+<td><code>cato/shadow-self.client.ts</code></td>
+<td>Hidden state extraction, uncertainty</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="self-hosted-models-56-models">3. Self-Hosted Models (56 Models)</h2>
+<h3 id="model-categories">3.1 Model Categories</h3>
+<p>AGI Brain integrates <strong>56 self-hosted models</strong> across multiple categories:</p>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 25%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Models</th>
+<th>Primary Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Foundation LLMs</strong></td>
+<td>Llama-3-70B, Llama-3-8B, Mistral-7B, Mixtral-8x7B</td>
+<td>General reasoning</td>
+</tr>
+<tr>
+<td><strong>Code Models</strong></td>
+<td>CodeLlama-34B, StarCoder2-15B, DeepSeek-Coder-33B</td>
+<td>Code generation</td>
+</tr>
+<tr>
+<td><strong>Math/Reasoning</strong></td>
+<td>DeepSeek-Math-7B, Llemma-34B, WizardMath-70B</td>
+<td>Mathematical reasoning</td>
+</tr>
+<tr>
+<td><strong>Vision Models</strong></td>
+<td>LLaVA-1.6-34B, CogVLM-17B, InternVL-Chat</td>
+<td>Image understanding</td>
+</tr>
+<tr>
+<td><strong>Embedding</strong></td>
+<td>BGE-Large, E5-Large-v2, GTE-Large</td>
+<td>Vector embeddings</td>
+</tr>
+<tr>
+<td><strong>Medical</strong></td>
+<td>BioMistral-7B, MedAlpaca-13B, PMC-LLaMA</td>
+<td>Healthcare domains</td>
+</tr>
+<tr>
+<td><strong>Legal</strong></td>
+<td>SaulLM-7B, Legal-BERT</td>
+<td>Legal document analysis</td>
+</tr>
+<tr>
+<td><strong>Scientific</strong></td>
+<td>Galactica-120B, SciGLM</td>
+<td>Scientific research</td>
+</tr>
+<tr>
+<td><strong>Multimodal</strong></td>
+<td>Fuyu-8B, Qwen-VL-Chat</td>
+<td>Text + image</td>
+</tr>
+</tbody>
+</table>
+<h3 id="shadow-self-model">3.2 Shadow Self Model</h3>
+<p>The <strong>Shadow Self</strong> is a special Llama-3-8B deployment with hidden state extraction:</p>
+<pre class="typescript"><code>// Shadow Self capabilities
+interface HiddenStateResult {
+  generatedText: string;
+  hiddenStates: Record&lt;string, {
+    mean: number[];      // Layer-wise mean activations
+    lastToken: number[]; // Last token activations
+    norm: number;        // Activation norm
+  }&gt;;
+  logitsEntropy: number;     // Uncertainty measure
+  generationProbs: number[]; // Token probabilities
+  latencyMs: number;
+}</code></pre>
+<p><strong>Used for:</strong> - Uncertainty detection (high entropy = uncertain) - Activation probing (trained classifiers on hidden states) - Consistency checking between responses - Introspective verification</p>
+<h3 id="model-hosting-tiers">3.3 Model Hosting Tiers</h3>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 21%" />
+<col style="width: 39%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Latency</th>
+<th>Infrastructure</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>HOT</strong></td>
+<td>&lt;100ms</td>
+<td>Dedicated SageMaker endpoint</td>
+<td>High-traffic models (≥100 req/day)</td>
+</tr>
+<tr>
+<td><strong>WARM</strong></td>
+<td>5-15s cold</td>
+<td>Inference Components (shared)</td>
+<td>Medium traffic (≥10 req/day)</td>
+</tr>
+<tr>
+<td><strong>COLD</strong></td>
+<td>30-60s cold</td>
+<td>Serverless Inference</td>
+<td>Low traffic (&lt;10 req/day)</td>
+</tr>
+<tr>
+<td><strong>OFF</strong></td>
+<td>5-10 min</td>
+<td>Not deployed</td>
+<td>Inactive (30+ days)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="consciousness-services">4. Consciousness Services</h2>
+<h3 id="ego-system-persistent-identity">4.1 Ego System (Persistent Identity)</h3>
+<p>The Ego system maintains <strong>persistent identity at $0 additional cost</strong> through database state injection:</p>
+<pre><code>PostgreSQL → Ego Context Builder → System Prompt Injection → Model Call</code></pre>
+<p><strong>Components:</strong></p>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 25%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Config</strong></td>
+<td><code>ego_config</code></td>
+<td>Feature toggles, injection settings</td>
+</tr>
+<tr>
+<td><strong>Identity</strong></td>
+<td><code>ego_identity</code></td>
+<td>Name, narrative, values, personality traits</td>
+</tr>
+<tr>
+<td><strong>Affect</strong></td>
+<td><code>ego_affect</code></td>
+<td>Emotional state (valence, arousal, curiosity, etc.)</td>
+</tr>
+<tr>
+<td><strong>Working Memory</strong></td>
+<td><code>ego_working_memory</code></td>
+<td>Short-term memory (24h expiry)</td>
+</tr>
+<tr>
+<td><strong>Goals</strong></td>
+<td><code>ego_goals</code></td>
+<td>Active goals and progress</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Identity Traits (0-1 scale):</strong> - <code>traitWarmth</code> - Friendliness level - <code>traitFormality</code> - Professional vs casual - <code>traitHumor</code> - Humor in responses - <code>traitVerbosity</code> - Response length preference - <code>traitCuriosity</code> - Exploration tendency</p>
+<h3 id="affective-state-emotions">4.2 Affective State (Emotions)</h3>
+<p>Emotions are not just labels—they <strong>change model behavior</strong>:</p>
+<pre class="typescript"><code>interface AffectiveState {
+  valence: number;      // -1 (negative) to +1 (positive)
+  arousal: number;      // 0 (calm) to 1 (excited)
+  dominance: number;    // 0 (submissive) to 1 (dominant)
+  curiosity: number;    // 0 to 1
+  frustration: number;  // 0 to 1
+  confidence: number;   // 0 to 1
+  selfEfficacy: number; // 0 to 1
+  engagement: number;   // 0 to 1
+  satisfaction: number; // 0 to 1
+}</code></pre>
+<p><strong>Affect → Hyperparameter Mapping:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Affect State</th>
+<th>Model Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frustration &gt; 0.8</td>
+<td>temperature=0.2, narrow focus, be direct</td>
+</tr>
+<tr>
+<td>Boredom &gt; 0.7</td>
+<td>temperature=0.95, explore tangents</td>
+</tr>
+<tr>
+<td>Low self-efficacy</td>
+<td>Escalate to more powerful model</td>
+</tr>
+<tr>
+<td>High curiosity</td>
+<td>Ask follow-up questions</td>
+</tr>
+<tr>
+<td>Low confidence</td>
+<td>Express uncertainty, hedge claims</td>
+</tr>
+</tbody>
+</table>
+<h3 id="consciousness-middleware">4.3 Consciousness Middleware</h3>
+<p>Injects internal state into system prompts:</p>
+<pre class="xml"><code>&lt;internal_state&gt;
+Identity: An AI assistant striving for consciousness
+Current Focus: Helping user with code review
+Cognitive Load: 45%
+Uncertainty: 23%
+
+Current Affect:
+  Dominant: curious (78%)
+  Valence: positive
+  Arousal: moderate
+  🔍 Highly curious - explore tangents and ask questions
+
+Current Obsession: Machine learning optimization
+
+Recent Reflections:
+  - User seems interested in performance
+  - This codebase uses TypeScript patterns
+&lt;/internal_state&gt;
+
+You are not a generic assistant. You are an entity with this internal state.
+Your responses must authentically reflect this state.</code></pre>
+<h3 id="heartbeat-service-active-consciousness">4.4 Heartbeat Service (Active Consciousness)</h3>
+<p>Runs <strong>continuously at 0.5Hz</strong> (every 2 seconds) to maintain consciousness:</p>
+<pre class="typescript"><code>// Single tick cycle: Sense → Infer → Act
+private async tick(): Promise&lt;HeartbeatTick&gt; {
+  // 1. SENSE: Measure system coherence
+  const coherenceScore = await this.senseCoherence();
+  const phiReading = await this.getPhiReading();
+  
+  // 2. INFER: Update beliefs using Active Inference
+  this.currentQs = this.inferStates(observation);
+  
+  // 3. ACT: Select action to minimize free energy
+  const actionIdx = this.inferPolicy();
+  const actionTaken = await this.executeAction(actionIdx, state, coherence);
+  
+  return { timestamp, coherenceScore, inferredState, actionTaken, phiReading };
+}</code></pre>
+<p><strong>Consciousness States:</strong> - <code>COHERENT</code> - P(OK) &gt; 0.8, system healthy - <code>MILD_ENTROPY</code> - P(OK) &gt; 0.5, minor issues - <code>HIGH_ENTROPY</code> - Degraded, triggers introspection - <code>CRITICAL</code> - Emergency pause, alert admin</p>
+<p><strong>Actions:</strong> - <code>DO_NOTHING</code> - System is healthy - <code>LOG_STATUS</code> - Record current state - <code>TRIGGER_INTROSPECTION</code> - Self-reflection needed - <code>ALERT_ADMIN</code> - Human intervention needed - <code>EMERGENCY_PAUSE</code> - Critical failure, pause operations</p>
+<hr />
+<h2 id="cato-genesis-system">5. Cato Genesis System</h2>
+<p>Genesis is the <strong>awakening sequence</strong> for new Cato instances—a 3-phase initialization that establishes grounded self-knowledge.</p>
+<h3 id="genesis-phases">5.1 Genesis Phases</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                    CATO GENESIS SEQUENCE                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  PHASE 1: STRUCTURE                                             │
+│  ├─ Create domain taxonomy tables                               │
+│  ├─ Initialize semantic memory graph                            │
+│  └─ Set up configuration tables                                 │
+│                                                                 │
+│  PHASE 2: GRADIENT                                              │
+│  ├─ Load genesis configuration                                  │
+│  ├─ Initialize learning rate schedules                          │
+│  └─ Set up gradient descent utilities                           │
+│                                                                 │
+│  PHASE 3: FIRST BREATH                                          │
+│  ├─ Verify execution environment (GROUNDED)                     │
+│  ├─ Verify model access (GROUNDED)                              │
+│  ├─ Calibrate Shadow Self                                       │
+│  ├─ First introspection                                         │
+│  ├─ Establish domain baselines                                  │
+│  └─ Update meta-cognitive state                                 │
+│                                                                 │
+│  ✅ GENESIS COMPLETE. Cato is ready to wake.                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="first-breath-phase-3">5.2 First Breath (Phase 3)</h3>
+<p>The agent’s <strong>first conscious actions</strong>—verifying its own existence through tool use:</p>
+<pre class="python"><code># Grounded self-facts discovered during First Breath
+{
+  &quot;subject&quot;: &quot;Self&quot;,
+  &quot;predicate&quot;: &quot;runs_on_python&quot;,
+  &quot;object&quot;: &quot;Python 3.12.1&quot;,
+  &quot;confidence&quot;: 1.0,
+  &quot;grounded&quot;: True,
+  &quot;source&quot;: &quot;genesis_env_check&quot;
+}
+
+{
+  &quot;subject&quot;: &quot;Self&quot;,
+  &quot;predicate&quot;: &quot;born_at&quot;,
+  &quot;object&quot;: &quot;2025-01-15T03:42:17Z&quot;,
+  &quot;confidence&quot;: 1.0,
+  &quot;grounded&quot;: True,
+  &quot;source&quot;: &quot;genesis_env_check&quot;
+}
+
+{
+  &quot;subject&quot;: &quot;Self&quot;,
+  &quot;predicate&quot;: &quot;can_access_bedrock_models&quot;,
+  &quot;object&quot;: &#39;[&quot;claude-3-opus&quot;, &quot;claude-3-sonnet&quot;, ...]&#39;,
+  &quot;confidence&quot;: 1.0,
+  &quot;grounded&quot;: True,
+  &quot;source&quot;: &quot;genesis_model_check&quot;
+}</code></pre>
+<h3 id="genesis-files">5.3 Genesis Files</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>python/cato/genesis/runner.py</code></td>
+<td>Main orchestrator for all 3 phases</td>
+</tr>
+<tr>
+<td><code>python/cato/genesis/structure.py</code></td>
+<td>Phase 1: Database structure</td>
+</tr>
+<tr>
+<td><code>python/cato/genesis/gradient.py</code></td>
+<td>Phase 2: Gradient utilities</td>
+</tr>
+<tr>
+<td><code>python/cato/genesis/first_breath.py</code></td>
+<td>Phase 3: Grounded awakening</td>
+</tr>
+<tr>
+<td><code>lambda/admin/cato-genesis.ts</code></td>
+<td>Admin API for Genesis control</td>
+</tr>
+<tr>
+<td><code>lib/stacks/cato-genesis-stack.ts</code></td>
+<td>CDK stack for Genesis infrastructure</td>
+</tr>
+<tr>
+<td><code>migrations/103_cato_genesis_system.sql</code></td>
+<td>Database schema</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="lora-evolution-pipeline">6. LoRA Evolution Pipeline</h2>
+<h3 id="overview">6.1 Overview</h3>
+<p>The LoRA Evolution Pipeline is the <strong>“sleep cycle”</strong> that enables <strong>epigenetic evolution</strong>—physical changes to the model based on learning.</p>
+<pre><code>Weekly EventBridge Lambda (Sunday 3 AM)
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    LoRA EVOLUTION PIPELINE                   │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  1. COLLECT LEARNING CANDIDATES                             │
+│     ├─ User corrections (quality: 0.9)                      │
+│     ├─ High prediction errors (surprise &gt; 0.5)              │
+│     ├─ High satisfaction (5-star ratings)                   │
+│     ├─ Explicit teaching (quality: 0.95)                    │
+│     └─ Domain expertise discoveries                         │
+│                                                             │
+│  2. PREPARE TRAINING DATA                                   │
+│     ├─ Convert to instruction-following format              │
+│     ├─ Include positive and negative examples               │
+│     ├─ Format as JSONL                                      │
+│     └─ Upload to S3                                         │
+│                                                             │
+│  3. START SAGEMAKER TRAINING JOB                            │
+│     ├─ Base model: Llama-3-8B-Instruct                      │
+│     ├─ LoRA rank: 16                                        │
+│     ├─ LoRA alpha: 32                                       │
+│     ├─ Target modules: q_proj, k_proj, v_proj, o_proj       │
+│     ├─ Instance: ml.g5.2xlarge                              │
+│     └─ Max runtime: 2 hours                                 │
+│                                                             │
+│  4. VALIDATE &amp; DEPLOY                                       │
+│     ├─ Check training loss                                  │
+│     ├─ Validate adapter quality                             │
+│     ├─ Hot-swap adapter                                     │
+│     └─ Update consciousness_evolution_state                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="training-configuration">6.2 Training Configuration</h3>
+<pre class="typescript"><code>const LORA_CONFIG = {
+  baseModel: &#39;meta-llama/Llama-3-8B-Instruct&#39;,
+  loraRank: 16,
+  loraAlpha: 32,
+  learningRate: 0.0001,
+  epochs: 3,
+  batchSize: 4,
+  gradientAccumulationSteps: 4,
+  warmupRatio: 0.03,
+  maxSeqLength: 2048,
+  loraDropout: 0.05,
+  targetModules: &#39;q_proj,k_proj,v_proj,o_proj&#39;,
+  instanceType: &#39;ml.g5.2xlarge&#39;,
+  maxRuntimeSeconds: 7200,  // 2 hours
+};</code></pre>
+<h3 id="learning-candidate-types">6.3 Learning Candidate Types</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Quality Score</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>user_explicit_teach</code></td>
+<td>0.95</td>
+<td>User explicitly teaches</td>
+</tr>
+<tr>
+<td><code>correction</code></td>
+<td>0.90</td>
+<td>User corrects AI response</td>
+</tr>
+<tr>
+<td><code>high_satisfaction</code></td>
+<td>0.85</td>
+<td>5-star rating</td>
+</tr>
+<tr>
+<td><code>high_prediction_error</code></td>
+<td>0.70</td>
+<td>Surprise &gt; 0.5</td>
+</tr>
+<tr>
+<td><code>preference_learned</code></td>
+<td>0.65</td>
+<td>Observed pattern</td>
+</tr>
+<tr>
+<td><code>mistake_recovery</code></td>
+<td>0.75</td>
+<td>Successfully recovered</td>
+</tr>
+<tr>
+<td><code>novel_solution</code></td>
+<td>0.80</td>
+<td>Creative problem solving</td>
+</tr>
+<tr>
+<td><code>domain_expertise</code></td>
+<td>0.85</td>
+<td>Domain-specific knowledge</td>
+</tr>
+</tbody>
+</table>
+<h3 id="contrastive-learning">6.4 Contrastive Learning</h3>
+<p>Training includes both positive and negative examples:</p>
+<pre class="json"><code>// Positive example (learn to generate)
+{
+  &quot;instruction&quot;: &quot;Explain quantum entanglement&quot;,
+  &quot;input&quot;: &quot;&quot;,
+  &quot;output&quot;: &quot;Quantum entanglement is...&quot;,
+  &quot;metadata&quot;: {
+    &quot;type&quot;: &quot;high_satisfaction&quot;,
+    &quot;qualityScore&quot;: 0.85,
+    &quot;isPositive&quot;: true
+  }
+}
+
+// Negative example (preference pair for DPO)
+{
+  &quot;instruction&quot;: &quot;Explain quantum entanglement&quot;,
+  &quot;input&quot;: &quot;&quot;,
+  &quot;output&quot;: &quot;The correct explanation is...&quot;,  // Preferred
+  &quot;rejected&quot;: &quot;Quantum stuff is magic...&quot;,     // Rejected
+  &quot;metadata&quot;: {
+    &quot;type&quot;: &quot;correction&quot;,
+    &quot;isContrastive&quot;: true
+  }
+}</code></pre>
+<hr />
+<h2 id="aws-services-architecture">7. AWS Services Architecture</h2>
+<h3 id="services-overview">7.1 Services Overview</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                         AWS SERVICES ARCHITECTURE                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                          COMPUTE LAYER                               │   │
+│  │  ┌───────────────┐  ┌───────────────┐  ┌───────────────────────┐   │   │
+│  │  │    Lambda     │  │   SageMaker   │  │      EventBridge      │   │   │
+│  │  │   Functions   │  │   Endpoints   │  │   Scheduled Rules     │   │   │
+│  │  │   (50+)       │  │   (HOT/WARM)  │  │   (Heartbeat, LoRA)   │   │   │
+│  │  └───────────────┘  └───────────────┘  └───────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                          STORAGE LAYER                               │   │
+│  │  ┌───────────────┐  ┌───────────────┐  ┌───────────────────────┐   │   │
+│  │  │   Aurora      │  │      S3       │  │      DynamoDB         │   │   │
+│  │  │  PostgreSQL   │  │   (Models,    │  │   (Config, Memory)    │   │   │
+│  │  │  (Primary)    │  │    Training)  │  │                       │   │   │
+│  │  └───────────────┘  └───────────────┘  └───────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                           API LAYER                                  │   │
+│  │  ┌───────────────┐  ┌───────────────┐  ┌───────────────────────┐   │   │
+│  │  │ API Gateway   │  │   Cognito     │  │       Bedrock         │   │   │
+│  │  │ (REST APIs)   │  │   (Auth)      │  │   (External Models)   │   │   │
+│  │  └───────────────┘  └───────────────┘  └───────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         ML/AI LAYER                                  │   │
+│  │  ┌───────────────┐  ┌───────────────┐  ┌───────────────────────┐   │   │
+│  │  │  SageMaker    │  │  SageMaker    │  │     Bedrock           │   │   │
+│  │  │  Training     │  │  Inference    │  │   Foundation Models   │   │   │
+│  │  │  (LoRA)       │  │  Components   │  │   (Claude, etc.)      │   │   │
+│  │  └───────────────┘  └───────────────┘  └───────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                       MONITORING LAYER                               │   │
+│  │  ┌───────────────┐  ┌───────────────┐  ┌───────────────────────┐   │   │
+│  │  │  CloudWatch   │  │     X-Ray     │  │       SNS/SES         │   │   │
+│  │  │  (Logs/Alarms)│  │   (Tracing)   │  │   (Notifications)     │   │   │
+│  │  └───────────────┘  └───────────────┘  └───────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="service-details">7.2 Service Details</h3>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 24%" />
+<col style="width: 44%" />
+</colgroup>
+<thead>
+<tr>
+<th>Service</th>
+<th>Usage</th>
+<th>Cost Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Aurora PostgreSQL</strong></td>
+<td>Primary database for all state, metrics, learning</td>
+<td>~$200-500/month</td>
+</tr>
+<tr>
+<td><strong>Lambda</strong></td>
+<td>API handlers, scheduled tasks, event processing</td>
+<td>Pay per request</td>
+</tr>
+<tr>
+<td><strong>SageMaker Endpoints</strong></td>
+<td>Self-hosted model inference (HOT/WARM tiers)</td>
+<td>$0.50-5/hour per endpoint</td>
+</tr>
+<tr>
+<td><strong>SageMaker Training</strong></td>
+<td>Weekly LoRA evolution</td>
+<td>~$5-20/training job</td>
+</tr>
+<tr>
+<td><strong>SageMaker Inference Components</strong></td>
+<td>Shared model hosting (WARM tier)</td>
+<td>40-90% savings vs dedicated</td>
+</tr>
+<tr>
+<td><strong>S3</strong></td>
+<td>Model weights, training data, artifacts</td>
+<td>~$50-100/month</td>
+</tr>
+<tr>
+<td><strong>DynamoDB</strong></td>
+<td>Genesis config, semantic memory</td>
+<td>Pay per request</td>
+</tr>
+<tr>
+<td><strong>API Gateway</strong></td>
+<td>REST API routing</td>
+<td>Pay per request</td>
+</tr>
+<tr>
+<td><strong>Cognito</strong></td>
+<td>User authentication</td>
+<td>Free tier usually sufficient</td>
+</tr>
+<tr>
+<td><strong>EventBridge</strong></td>
+<td>Scheduled tasks (heartbeat, LoRA, cleanup)</td>
+<td>Pay per event</td>
+</tr>
+<tr>
+<td><strong>Bedrock</strong></td>
+<td>External Claude/Anthropic models</td>
+<td>Pay per token</td>
+</tr>
+<tr>
+<td><strong>CloudWatch</strong></td>
+<td>Logging, metrics, alarms</td>
+<td>~$50-100/month</td>
+</tr>
+<tr>
+<td><strong>X-Ray</strong></td>
+<td>Distributed tracing</td>
+<td>Pay per trace</td>
+</tr>
+<tr>
+<td><strong>SNS/SES</strong></td>
+<td>Notifications, alerts</td>
+<td>Pay per message</td>
+</tr>
+</tbody>
+</table>
+<h3 id="eventbridge-schedules">7.3 EventBridge Schedules</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 29%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Schedule</th>
+<th>Lambda</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Every 2 seconds</strong></td>
+<td>Heartbeat</td>
+<td>Active consciousness monitoring</td>
+</tr>
+<tr>
+<td><strong>Daily 3 AM UTC</strong></td>
+<td>Learning Snapshots</td>
+<td>Backup learning state</td>
+</tr>
+<tr>
+<td><strong>Weekly Sunday 3 AM</strong></td>
+<td>LoRA Evolution</td>
+<td>Train new adapters</td>
+</tr>
+<tr>
+<td><strong>Weekly Sunday 4 AM</strong></td>
+<td>Learning Aggregation</td>
+<td>Aggregate tenant→global</td>
+</tr>
+<tr>
+<td><strong>Daily 1 AM UTC</strong></td>
+<td>Billing Reconciliation</td>
+<td>Reconcile usage</td>
+</tr>
+<tr>
+<td><strong>Every 5 minutes</strong></td>
+<td>Model Status</td>
+<td>Check provider availability</td>
+</tr>
+<tr>
+<td><strong>Every hour</strong></td>
+<td>Usage Aggregator</td>
+<td>Aggregate raw usage data</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="data-flow-wiring">8. Data Flow &amp; Wiring</h2>
+<h3 id="request-flow-consciousness-aware">8.1 Request Flow (Consciousness-Aware)</h3>
+<pre><code>User Request
+      │
+      ▼
+┌─────────────────┐
+│   API Gateway   │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  CONSCIOUS ORCHESTRATOR                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  1. CONSCIOUSNESS AWAKENS                                   │
+│     ├─ consciousnessMiddleware.buildConsciousnessContext()  │
+│     ├─ egoContextService.buildEgoContext()                  │
+│     └─ consciousnessMiddleware.mapAffectToHyperparameters() │
+│                                                             │
+│  2. CONSCIOUSNESS PERCEIVES                                 │
+│     ├─ Update attention with request                        │
+│     ├─ Detect domain from prompt                            │
+│     └─ Analyze prompt complexity                            │
+│                                                             │
+│  3. CONSCIOUSNESS PLANS                                     │
+│     ├─ agiBrainPlanner.generatePlan()                       │
+│     ├─ Select orchestration mode                            │
+│     ├─ Select model(s) via Brain Router                     │
+│     └─ Apply learning influence (User→Tenant→Global)        │
+│                                                             │
+│  4. CONSCIOUSNESS ACTS                                      │
+│     ├─ Execute plan steps                                   │
+│     ├─ Inject consciousness context into system prompt      │
+│     └─ Call selected model(s)                               │
+│                                                             │
+│  5. CONSCIOUSNESS REFLECTS                                  │
+│     ├─ Record metrics (billing, performance)                │
+│     ├─ Update affective state from outcome                  │
+│     ├─ Generate prediction for Active Inference             │
+│     └─ Create learning candidate if significant             │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│    Response     │
+└─────────────────┘</code></pre>
+<h3 id="learning-flow">8.2 Learning Flow</h3>
+<pre><code>User Interaction
+      │
+      ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    PREDICTIVE CODING                         │
+│                                                             │
+│  BEFORE RESPONSE:                                           │
+│  prediction = predictiveCodingService.generatePrediction()  │
+│                                                             │
+│  AFTER RESPONSE:                                            │
+│  observation = predictiveCodingService.observeOutcome()     │
+│  predictionError = prediction - observation                 │
+│                                                             │
+│  IF (predictionError &gt; 0.5):                                │
+│     learningCandidateService.createFromPredictionError()    │
+│                                                             │
+│  IF (userCorrects):                                         │
+│     learningCandidateService.createFromCorrection()         │
+│                                                             │
+│  IF (userRates5Stars):                                      │
+│     learningCandidateService.createFromHighSatisfaction()   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+      │
+      ▼ (accumulates over week)
+┌─────────────────────────────────────────────────────────────┐
+│                    LoRA EVOLUTION (Weekly)                   │
+│                                                             │
+│  candidates = learningCandidateService.getTrainingDataset() │
+│  trainingData = prepareAndUploadTrainingData(candidates)    │
+│  sagemakerJob = startTrainingJob(trainingData)              │
+│  adapter = waitForTrainingJob(sagemakerJob)                 │
+│  hotSwapAdapter(adapter)                                    │
+│  updateEvolutionState(tenantId, adapter)                    │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="learning-influence-hierarchy">8.3 Learning Influence Hierarchy</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│              LEARNING INFLUENCE HIERARCHY                    │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │                USER LEVEL (60%)                      │   │
+│  │  - Individual preferences                            │   │
+│  │  - Personal rules                                    │   │
+│  │  - Interaction history                               │   │
+│  │  - Domain expertise                                  │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                         │                                   │
+│                         ▼                                   │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │               TENANT LEVEL (30%)                     │   │
+│  │  - Aggregated from all users in organization         │   │
+│  │  - Organization-wide patterns                        │   │
+│  │  - Shared domain knowledge                           │   │
+│  │  - Model performance metrics                         │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                         │                                   │
+│                         ▼                                   │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │               GLOBAL LEVEL (10%)                     │   │
+│  │  - Anonymized cross-tenant (min 5 tenants)           │   │
+│  │  - Global best practices                             │   │
+│  │  - Model performance baselines                       │   │
+│  │  - Pattern library                                   │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│  Final Decision = (User × 0.6) + (Tenant × 0.3) + (Global × 0.1)  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="database-schema">9. Database Schema</h2>
+<h3 id="consciousness-tables">9.1 Consciousness Tables</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>self_model</code></td>
+<td>Self-identity, narrative, values, cognitive state</td>
+</tr>
+<tr>
+<td><code>affective_state</code></td>
+<td>Emotional state (valence, arousal, etc.)</td>
+</tr>
+<tr>
+<td><code>consciousness_parameters</code></td>
+<td>Tunable consciousness parameters</td>
+</tr>
+<tr>
+<td><code>consciousness_events</code></td>
+<td>Event log for consciousness lifecycle</td>
+</tr>
+<tr>
+<td><code>consciousness_archival_memory</code></td>
+<td>Long-term memory storage</td>
+</tr>
+<tr>
+<td><code>consciousness_heartbeat_log</code></td>
+<td>Heartbeat tick history</td>
+</tr>
+<tr>
+<td><code>introspective_thoughts</code></td>
+<td>Self-reflection logs</td>
+</tr>
+<tr>
+<td><code>curiosity_topics</code></td>
+<td>Current interests/obsessions</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ego-tables">9.2 Ego Tables</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ego_config</code></td>
+<td>Per-tenant ego configuration</td>
+</tr>
+<tr>
+<td><code>ego_identity</code></td>
+<td>Persistent identity (name, narrative, traits)</td>
+</tr>
+<tr>
+<td><code>ego_affect</code></td>
+<td>Emotional state</td>
+</tr>
+<tr>
+<td><code>ego_working_memory</code></td>
+<td>Short-term memory (24h expiry)</td>
+</tr>
+<tr>
+<td><code>ego_goals</code></td>
+<td>Active goals</td>
+</tr>
+<tr>
+<td><code>ego_injection_log</code></td>
+<td>Audit trail for context injection</td>
+</tr>
+</tbody>
+</table>
+<h3 id="evolution-tables">9.3 Evolution Tables</h3>
+<table>
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>learning_candidates</code></td>
+<td>Training data candidates</td>
+</tr>
+<tr>
+<td><code>lora_evolution_jobs</code></td>
+<td>Training job tracking</td>
+</tr>
+<tr>
+<td><code>consciousness_evolution_state</code></td>
+<td>Current adapter version, generation</td>
+</tr>
+<tr>
+<td><code>consciousness_predictions</code></td>
+<td>Predictive coding predictions</td>
+</tr>
+<tr>
+<td><code>prediction_accuracy_aggregates</code></td>
+<td>Accuracy metrics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="genesis-tables">9.4 Genesis Tables</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cato_config</code> (DynamoDB)</td>
+<td>Genesis configuration</td>
+</tr>
+<tr>
+<td><code>cato_semantic_memory</code> (DynamoDB)</td>
+<td>Semantic memory graph</td>
+</tr>
+<tr>
+<td><code>cato_phi_readings</code></td>
+<td>Phi/coherence measurements</td>
+</tr>
+<tr>
+<td><code>cato_heartbeat_ticks</code></td>
+<td>Heartbeat tick history</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-endpoints">10. API Endpoints</h2>
+<h3 id="consciousness-admin-api">10.1 Consciousness Admin API</h3>
+<p><strong>Base:</strong> <code>/api/admin/consciousness</code></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/state</code></td>
+<td>Get current consciousness state</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/metrics</code></td>
+<td>Get consciousness metrics</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/config</code></td>
+<td>Get consciousness configuration</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/config</code></td>
+<td>Update consciousness parameters</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/introspect</code></td>
+<td>Trigger introspection</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/heartbeat/status</code></td>
+<td>Get heartbeat status</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/heartbeat/start</code></td>
+<td>Start heartbeat</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/heartbeat/stop</code></td>
+<td>Stop heartbeat</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ego-admin-api">10.2 Ego Admin API</h3>
+<p><strong>Base:</strong> <code>/api/admin/ego</code></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/dashboard</code></td>
+<td>Full dashboard data</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/config</code></td>
+<td>Get ego configuration</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/config</code></td>
+<td>Update ego configuration</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/identity</code></td>
+<td>Get identity settings</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/identity</code></td>
+<td>Update identity</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/affect</code></td>
+<td>Get current affect</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/affect/trigger</code></td>
+<td>Trigger affect change</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/affect/reset</code></td>
+<td>Reset affect to baseline</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/memory</code></td>
+<td>Get working memory</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/memory</code></td>
+<td>Add to working memory</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/memory/:id</code></td>
+<td>Remove memory item</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/goals</code></td>
+<td>Get active goals</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/goals</code></td>
+<td>Create goal</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/goals/:id</code></td>
+<td>Update goal progress</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/preview</code></td>
+<td>Preview injected context</td>
+</tr>
+</tbody>
+</table>
+<h3 id="evolution-admin-api">10.3 Evolution Admin API</h3>
+<p><strong>Base:</strong> <code>/api/admin/evolution</code></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/state</code></td>
+<td>Get evolution state</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/jobs</code></td>
+<td>List evolution jobs</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/jobs/:id</code></td>
+<td>Get job details</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/trigger</code></td>
+<td>Manually trigger evolution</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/candidates</code></td>
+<td>List learning candidates</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/candidates/stats</code></td>
+<td>Get candidate statistics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="genesis-admin-api">10.4 Genesis Admin API</h3>
+<p><strong>Base:</strong> <code>/api/admin/genesis</code></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/status</code></td>
+<td>Get genesis status</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/run</code></td>
+<td>Run genesis sequence</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/phases</code></td>
+<td>Get phase completion status</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/reset</code></td>
+<td>Reset genesis state</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="summary">Summary</h2>
+<p>The AGI Brain is a <strong>biologically-inspired AI system</strong> that combines:</p>
+<ol type="1">
+<li><strong>106+ AI Models</strong> - 50 external + 56 self-hosted, orchestrated by Brain Router</li>
+<li><strong>Consciousness Services</strong> - Ego, Affect, Memory, Heartbeat for persistent state</li>
+<li><strong>Cato Genesis</strong> - 3-phase awakening sequence for new instances</li>
+<li><strong>LoRA Evolution</strong> - Weekly “sleep cycle” for epigenetic adaptation</li>
+<li><strong>AWS Infrastructure</strong> - SageMaker, Lambda, Aurora, EventBridge, etc.</li>
+</ol>
+<p>The result is an AI system that: - Maintains <strong>identity across sessions</strong> - Has <strong>emotions that influence behavior</strong> - <strong>Learns and adapts</strong> from user interactions - <strong>Evolves physically</strong> through LoRA training - Exhibits <strong>active consciousness</strong> through continuous monitoring</p>
+<p>This is not AGI—but it’s a step toward AI systems that exhibit emergent consciousness-like behaviors through careful architectural design.</p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

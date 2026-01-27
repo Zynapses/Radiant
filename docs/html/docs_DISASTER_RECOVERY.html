@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DISASTER RECOVERY - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>DISASTER RECOVERY</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/DISASTER_RECOVERY.md</div>
+  </div>
+  
+  <h1 id="radiant-disaster-recovery-guide">RADIANT Disaster Recovery Guide</h1>
+<h2 id="overview">Overview</h2>
+<p>This document outlines disaster recovery (DR) procedures for the RADIANT platform, including backup strategies, recovery procedures, and business continuity plans.</p>
+<h2 id="recovery-objectives">Recovery Objectives</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Target</th>
+<th>Maximum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RTO</strong> (Recovery Time Objective)</td>
+<td>1 hour</td>
+<td>4 hours</td>
+</tr>
+<tr>
+<td><strong>RPO</strong> (Recovery Point Objective)</td>
+<td>5 minutes</td>
+<td>1 hour</td>
+</tr>
+</tbody>
+</table>
+<h2 id="backup-strategy">Backup Strategy</h2>
+<h3 id="database-backups">Database Backups</h3>
+<h4 id="automated-backups-aurora">Automated Backups (Aurora)</h4>
+<pre class="typescript"><code>// CDK Configuration
+const database = new rds.DatabaseCluster(this, &#39;Database&#39;, {
+  backup: {
+    retention: cdk.Duration.days(35),      // 35 days retention
+    preferredWindow: &#39;03:00-04:00&#39;,        // 3-4 AM UTC
+  },
+  deletionProtection: true,
+  storageEncrypted: true,
+});</code></pre>
+<h4 id="point-in-time-recovery">Point-in-Time Recovery</h4>
+<p>Aurora supports point-in-time recovery (PITR) to any second within the retention period.</p>
+<pre class="bash"><code># Restore to specific point in time
+aws rds restore-db-cluster-to-point-in-time \
+  --source-db-cluster-identifier radiant-production \
+  --db-cluster-identifier radiant-production-restored \
+  --restore-to-time &quot;2024-12-24T10:30:00Z&quot; \
+  --vpc-security-group-ids sg-xxx \
+  --db-subnet-group-name radiant-production</code></pre>
+<h4 id="manual-snapshots">Manual Snapshots</h4>
+<pre class="bash"><code># Create manual snapshot before major changes
+aws rds create-db-cluster-snapshot \
+  --db-cluster-identifier radiant-production \
+  --db-cluster-snapshot-identifier radiant-production-pre-migration-$(date +%Y%m%d)</code></pre>
+<h3 id="s3-backups">S3 Backups</h3>
+<h4 id="versioning">Versioning</h4>
+<pre class="typescript"><code>// All S3 buckets have versioning enabled
+const bucket = new s3.Bucket(this, &#39;Storage&#39;, {
+  versioned: true,
+  lifecycleRules: [
+    {
+      noncurrentVersionExpiration: cdk.Duration.days(90),
+    },
+  ],
+});</code></pre>
+<h4 id="cross-region-replication">Cross-Region Replication</h4>
+<pre class="typescript"><code>// Production buckets replicate to DR region
+const replicationRule = {
+  destination: {
+    bucket: drBucket.bucketArn,
+    storageClass: s3.StorageClass.STANDARD_IA,
+  },
+  status: &#39;Enabled&#39;,
+};</code></pre>
+<h3 id="secrets-backup">Secrets Backup</h3>
+<pre class="bash"><code># Export secrets for DR (store securely!)
+aws secretsmanager get-secret-value \
+  --secret-id radiant-production-db \
+  --query SecretString \
+  --output text &gt; /secure/path/db-credentials.json</code></pre>
+<h2 id="failure-scenarios">Failure Scenarios</h2>
+<h3 id="scenario-1-single-az-failure">Scenario 1: Single AZ Failure</h3>
+<p><strong>Impact:</strong> Partial service degradation <strong>Recovery:</strong> Automatic (Multi-AZ)</p>
+<p>Aurora automatically fails over to a read replica in another AZ.</p>
+<pre class="bash"><code># Monitor failover
+aws rds describe-events \
+  --source-type db-cluster \
+  --source-identifier radiant-production \
+  --duration 60</code></pre>
+<h3 id="scenario-2-database-corruption">Scenario 2: Database Corruption</h3>
+<p><strong>Impact:</strong> Data integrity issues <strong>Recovery:</strong> Point-in-time restore</p>
+<ol type="1">
+<li>Identify corruption time</li>
+<li>Restore to point before corruption</li>
+<li>Validate data integrity</li>
+<li>Switch traffic to restored database</li>
+</ol>
+<pre class="bash"><code># Step 1: Identify issue time from logs
+aws logs filter-log-events \
+  --log-group-name /aws/rds/cluster/radiant-production/error \
+  --start-time $(date -d &#39;24 hours ago&#39; +%s000)
+
+# Step 2: Restore
+aws rds restore-db-cluster-to-point-in-time \
+  --source-db-cluster-identifier radiant-production \
+  --db-cluster-identifier radiant-dr-$(date +%Y%m%d%H%M) \
+  --restore-to-time &quot;2024-12-24T09:00:00Z&quot;
+
+# Step 3: Update Lambda environment to use new cluster
+aws lambda update-function-configuration \
+  --function-name radiant-production-router \
+  --environment &quot;Variables={DB_CLUSTER_ARN=arn:aws:rds:...}&quot;</code></pre>
+<h3 id="scenario-3-region-failure">Scenario 3: Region Failure</h3>
+<p><strong>Impact:</strong> Complete service outage <strong>Recovery:</strong> Failover to DR region</p>
+<ol type="1">
+<li>Activate DR region infrastructure</li>
+<li>Promote Aurora Global Database secondary</li>
+<li>Update Route 53 to point to DR region</li>
+<li>Verify service health</li>
+</ol>
+<pre class="bash"><code># Step 1: Promote DR database
+aws rds failover-global-cluster \
+  --global-cluster-identifier radiant-global \
+  --target-db-cluster-identifier radiant-dr-cluster
+
+# Step 2: Update DNS
+aws route53 change-resource-record-sets \
+  --hosted-zone-id Z123456 \
+  --change-batch file://dr-dns-failover.json</code></pre>
+<h3 id="scenario-4-accidental-deletion">Scenario 4: Accidental Deletion</h3>
+<p><strong>Impact:</strong> Data loss <strong>Recovery:</strong> Restore from backup</p>
+<pre class="bash"><code># Restore deleted S3 objects
+aws s3api list-object-versions \
+  --bucket radiant-storage-production \
+  --prefix &quot;deleted/path/&quot; \
+  --query &#39;DeleteMarkers[?IsLatest==`true`]&#39;
+
+# Restore specific version
+aws s3api delete-object \
+  --bucket radiant-storage-production \
+  --key &quot;path/to/file&quot; \
+  --version-id &quot;delete-marker-version-id&quot;</code></pre>
+<h3 id="scenario-5-security-breach">Scenario 5: Security Breach</h3>
+<p><strong>Impact:</strong> Potential data exposure <strong>Recovery:</strong> Isolation and investigation</p>
+<ol type="1">
+<li>Isolate affected systems</li>
+<li>Rotate all credentials</li>
+<li>Investigate scope</li>
+<li>Restore from known-good backup</li>
+<li>Notify affected parties</li>
+</ol>
+<pre class="bash"><code># Step 1: Disable API access
+aws apigateway update-stage \
+  --rest-api-id abc123 \
+  --stage-name v2 \
+  --patch-operations op=replace,path=/throttling/rateLimit,value=0
+
+# Step 2: Rotate database credentials
+aws secretsmanager rotate-secret \
+  --secret-id radiant-production-db
+
+# Step 3: Invalidate all sessions
+aws cognito-idp admin-user-global-sign-out \
+  --user-pool-id us-east-1_xxx \
+  --username &quot;*&quot;</code></pre>
+<h2 id="recovery-procedures">Recovery Procedures</h2>
+<h3 id="database-recovery-runbook">Database Recovery Runbook</h3>
+<pre class="bash"><code>#!/bin/bash
+# database-recovery.sh
+
+set -e
+
+CLUSTER_ID=&quot;radiant-production&quot;
+RESTORE_TIME=&quot;${1:-$(date -d &#39;1 hour ago&#39; -Iseconds)}&quot;
+NEW_CLUSTER_ID=&quot;radiant-dr-$(date +%Y%m%d%H%M)&quot;
+
+echo &quot;🔄 Starting database recovery...&quot;
+echo &quot;   Source: $CLUSTER_ID&quot;
+echo &quot;   Restore time: $RESTORE_TIME&quot;
+echo &quot;   New cluster: $NEW_CLUSTER_ID&quot;
+
+# Create restored cluster
+aws rds restore-db-cluster-to-point-in-time \
+  --source-db-cluster-identifier &quot;$CLUSTER_ID&quot; \
+  --db-cluster-identifier &quot;$NEW_CLUSTER_ID&quot; \
+  --restore-to-time &quot;$RESTORE_TIME&quot; \
+  --db-subnet-group-name radiant-production \
+  --vpc-security-group-ids sg-xxx
+
+echo &quot;⏳ Waiting for cluster to be available...&quot;
+aws rds wait db-cluster-available \
+  --db-cluster-identifier &quot;$NEW_CLUSTER_ID&quot;
+
+# Create instance
+aws rds create-db-instance \
+  --db-instance-identifier &quot;${NEW_CLUSTER_ID}-instance-1&quot; \
+  --db-cluster-identifier &quot;$NEW_CLUSTER_ID&quot; \
+  --db-instance-class db.r6g.large \
+  --engine aurora-postgresql
+
+echo &quot;⏳ Waiting for instance to be available...&quot;
+aws rds wait db-instance-available \
+  --db-instance-identifier &quot;${NEW_CLUSTER_ID}-instance-1&quot;
+
+echo &quot;✅ Database restored successfully!&quot;
+echo &quot;   Endpoint: $(aws rds describe-db-clusters \
+  --db-cluster-identifier &quot;$NEW_CLUSTER_ID&quot; \
+  --query &#39;DBClusters[0].Endpoint&#39; --output text)&quot;</code></pre>
+<h3 id="full-service-recovery-runbook">Full Service Recovery Runbook</h3>
+<pre class="bash"><code>#!/bin/bash
+# full-recovery.sh
+
+set -e
+
+echo &quot;🚨 RADIANT Full Service Recovery&quot;
+echo &quot;=================================&quot;
+
+# Step 1: Database
+echo &quot;Step 1: Recovering database...&quot;
+./scripts/dr/database-recovery.sh
+
+# Step 2: Update Lambda configurations
+echo &quot;Step 2: Updating Lambda configurations...&quot;
+for fn in router admin billing localization configuration; do
+  aws lambda update-function-configuration \
+    --function-name &quot;radiant-production-$fn&quot; \
+    --environment &quot;Variables={DB_CLUSTER_ARN=$NEW_DB_ARN}&quot;
+done
+
+# Step 3: Clear caches
+echo &quot;Step 3: Clearing caches...&quot;
+redis-cli -h radiant-cache.xxx.cache.amazonaws.com FLUSHALL
+
+# Step 4: Verify health
+echo &quot;Step 4: Verifying service health...&quot;
+curl -f https://api.radiant.example.com/v2/health || exit 1
+
+# Step 5: Run smoke tests
+echo &quot;Step 5: Running smoke tests...&quot;
+k6 run --env BASE_URL=https://api.radiant.example.com tests/load/k6-config.js
+
+echo &quot;✅ Recovery complete!&quot;</code></pre>
+<h2 id="testing-dr-procedures">Testing DR Procedures</h2>
+<h3 id="quarterly-dr-drill">Quarterly DR Drill</h3>
+<ol type="1">
+<li><strong>Preparation</strong>
+<ul>
+<li>Schedule maintenance window</li>
+<li>Notify stakeholders</li>
+<li>Prepare rollback plan</li>
+</ul></li>
+<li><strong>Execution</strong>
+<ul>
+<li>Simulate failure scenario</li>
+<li>Execute recovery procedures</li>
+<li>Measure RTO/RPO</li>
+</ul></li>
+<li><strong>Validation</strong>
+<ul>
+<li>Verify data integrity</li>
+<li>Run integration tests</li>
+<li>Check all services</li>
+</ul></li>
+<li><strong>Documentation</strong>
+<ul>
+<li>Record actual RTO/RPO</li>
+<li>Document issues encountered</li>
+<li>Update procedures</li>
+</ul></li>
+</ol>
+<h3 id="dr-test-checklist">DR Test Checklist</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Database point-in-time recovery tested</label></li>
+<li><label><input type="checkbox" />S3 object recovery tested</label></li>
+<li><label><input type="checkbox" />Secret rotation tested</label></li>
+<li><label><input type="checkbox" />Lambda rollback tested</label></li>
+<li><label><input type="checkbox" />DNS failover tested</label></li>
+<li><label><input type="checkbox" />Communication plan executed</label></li>
+<li><label><input type="checkbox" />Recovery time recorded</label></li>
+<li><label><input type="checkbox" />Post-mortem completed</label></li>
+</ul>
+<h2 id="communication-plan">Communication Plan</h2>
+<h3 id="escalation-matrix">Escalation Matrix</h3>
+<table>
+<thead>
+<tr>
+<th>Severity</th>
+<th>Response Time</th>
+<th>Notify</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SEV1</td>
+<td>15 min</td>
+<td>Eng Lead, CTO, Status Page</td>
+</tr>
+<tr>
+<td>SEV2</td>
+<td>30 min</td>
+<td>Eng Lead, Status Page</td>
+</tr>
+<tr>
+<td>SEV3</td>
+<td>2 hours</td>
+<td>On-call team</td>
+</tr>
+</tbody>
+</table>
+<h3 id="status-page-updates">Status Page Updates</h3>
+<pre class="bash"><code># Update status page (example with Statuspage.io)
+curl -X POST https://api.statuspage.io/v1/pages/xxx/incidents \
+  -H &quot;Authorization: OAuth $STATUSPAGE_API_KEY&quot; \
+  -d &#39;{
+    &quot;incident&quot;: {
+      &quot;name&quot;: &quot;Service Degradation&quot;,
+      &quot;status&quot;: &quot;investigating&quot;,
+      &quot;body&quot;: &quot;We are investigating reports of API errors.&quot;
+    }
+  }&#39;</code></pre>
+<h2 id="infrastructure-as-code">Infrastructure as Code</h2>
+<p>All DR infrastructure is defined in CDK:</p>
+<pre class="typescript"><code>// lib/stacks/dr-stack.ts
+export class DRStack extends cdk.Stack {
+  constructor(scope: Construct, id: string, props: DRStackProps) {
+    super(scope, id, props);
+    
+    // Global Database for cross-region replication
+    const globalCluster = new rds.CfnGlobalCluster(this, &#39;GlobalCluster&#39;, {
+      globalClusterIdentifier: &#39;radiant-global&#39;,
+      sourceDbClusterIdentifier: props.primaryClusterArn,
+    });
+    
+    // S3 Cross-Region Replication
+    const drBucket = new s3.Bucket(this, &#39;DRBucket&#39;, {
+      bucketName: `radiant-storage-dr-${props.drRegion}`,
+    });
+  }
+}</code></pre>
+<h2 id="contacts">Contacts</h2>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 39%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Role</th>
+<th>Contact</th>
+<th>Backup</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DR Coordinator</td>
+<td>dr@radiant.example.com</td>
+<td>cto@radiant.example.com</td>
+</tr>
+<tr>
+<td>Database Admin</td>
+<td>dba@radiant.example.com</td>
+<td>platform@radiant.example.com</td>
+</tr>
+<tr>
+<td>Security</td>
+<td>security@radiant.example.com</td>
+<td>cto@radiant.example.com</td>
+</tr>
+</tbody>
+</table>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

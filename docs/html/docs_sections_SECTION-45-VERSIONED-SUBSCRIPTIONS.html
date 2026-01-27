@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 45 VERSIONED SUBSCRIPTIONS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 45 VERSIONED SUBSCRIPTIONS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-45-VERSIONED-SUBSCRIPTIONS.md</div>
+  </div>
+  
+  <h1 id="section-45-versioned-subscriptions-grandfathering-v4.15.0">SECTION 45: VERSIONED SUBSCRIPTIONS &amp; GRANDFATHERING (v4.15.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<blockquote>
+<p><strong>Version: 4.15.0 | Preserves original pricing/features when plans change</strong></p>
+</blockquote>
+<hr />
+<h2 id="grandfathering-principles">45.1 GRANDFATHERING PRINCIPLES</h2>
+<ul>
+<li><strong>Existing subscribers keep original terms</strong> when plans change</li>
+<li><strong>Price increases don’t affect</strong> current subscribers</li>
+<li><strong>Migration offers with incentives</strong> encourage voluntary upgrades</li>
+<li><strong>Complete audit trail</strong> of all plan changes</li>
+</ul>
+<hr />
+<h2 id="database-schema">45.2 DATABASE SCHEMA</h2>
+<h3 id="packagesinfrastructuremigrations045_versioned_subscriptions.sql">packages/infrastructure/migrations/045_versioned_subscriptions.sql</h3>
+<pre class="sql"><code>-- ============================================================================
+-- RADIANT v4.15.0 - Versioned Subscriptions &amp; Grandfathering
+-- ============================================================================
+
+-- Subscription Plan Versions
+CREATE TABLE subscription_plan_versions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tier_id VARCHAR(50) NOT NULL REFERENCES subscription_tiers(id),
+    version_number INTEGER NOT NULL,
+    
+    display_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    
+    price_monthly_cents INTEGER,
+    price_annual_cents INTEGER,
+    price_per_user BOOLEAN DEFAULT FALSE,
+    
+    included_credits_per_user DECIMAL(10,2) NOT NULL,
+    features JSONB NOT NULL,
+    rate_limits JSONB NOT NULL,
+    
+    effective_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    effective_until TIMESTAMPTZ,
+    
+    change_reason TEXT,
+    changed_by UUID REFERENCES administrators(id),
+    
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    UNIQUE(tier_id, version_number)
+);
+
+CREATE INDEX idx_plan_versions_tier ON subscription_plan_versions(tier_id);
+CREATE INDEX idx_plan_versions_effective ON subscription_plan_versions(effective_from, effective_until);
+
+-- Grandfathered Subscriptions
+CREATE TABLE grandfathered_subscriptions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    subscription_id UUID NOT NULL REFERENCES subscriptions(id),
+    plan_version_id UUID NOT NULL REFERENCES subscription_plan_versions(id),
+    
+    locked_price_monthly_cents INTEGER,
+    locked_price_annual_cents INTEGER,
+    locked_features JSONB NOT NULL,
+    locked_rate_limits JSONB NOT NULL,
+    locked_credits_per_user DECIMAL(10,2) NOT NULL,
+    
+    status VARCHAR(20) NOT NULL DEFAULT &#39;active&#39; CHECK (status IN (&#39;active&#39;, &#39;opted_out&#39;, &#39;migrated&#39;, &#39;expired&#39;)),
+    
+    migration_offered BOOLEAN DEFAULT FALSE,
+    migration_offer_date TIMESTAMPTZ,
+    migration_incentive JSONB,
+    migration_response VARCHAR(20),
+    migration_response_date TIMESTAMPTZ,
+    
+    grandfathered_at TIMESTAMPTZ DEFAULT NOW(),
+    grandfathered_reason TEXT,
+    
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_grandfathered_subscription ON grandfathered_subscriptions(subscription_id);
+CREATE INDEX idx_grandfathered_status ON grandfathered_subscriptions(status);
+
+-- Plan Change Audit
+CREATE TABLE plan_change_audit (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tier_id VARCHAR(50) NOT NULL REFERENCES subscription_tiers(id),
+    
+    old_version_id UUID REFERENCES subscription_plan_versions(id),
+    new_version_id UUID NOT NULL REFERENCES subscription_plan_versions(id),
+    
+    change_type VARCHAR(30) NOT NULL CHECK (change_type IN (
+        &#39;price_increase&#39;, &#39;price_decrease&#39;, &#39;feature_add&#39;, &#39;feature_remove&#39;,
+        &#39;limit_increase&#39;, &#39;limit_decrease&#39;, &#39;credit_change&#39;, &#39;terms_change&#39;
+    )),
+    
+    change_summary TEXT NOT NULL,
+    affected_subscribers INTEGER NOT NULL DEFAULT 0,
+    grandfathered_count INTEGER NOT NULL DEFAULT 0,
+    
+    changed_by UUID REFERENCES administrators(id),
+    approved_by UUID REFERENCES administrators(id),
+    
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Function: Get effective plan for subscription
+CREATE OR REPLACE FUNCTION get_effective_plan(p_subscription_id UUID)
+RETURNS TABLE (
+    tier_id VARCHAR(50),
+    version_number INTEGER,
+    price_monthly_cents INTEGER,
+    price_annual_cents INTEGER,
+    features JSONB,
+    rate_limits JSONB,
+    credits_per_user DECIMAL(10,2),
+    is_grandfathered BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        s.tier_id,
+        COALESCE(pv.version_number, 0),
+        COALESCE(gs.locked_price_monthly_cents, st.price_monthly::INTEGER * 100),
+        COALESCE(gs.locked_price_annual_cents, st.price_annual::INTEGER * 100),
+        COALESCE(gs.locked_features, st.features),
+        COALESCE(gs.locked_rate_limits, jsonb_build_object(
+            &#39;requestsPerMinute&#39;, st.requests_per_minute,
+            &#39;tokensPerMinute&#39;, st.tokens_per_minute,
+            &#39;concurrentRequests&#39;, st.concurrent_requests
+        )),
+        COALESCE(gs.locked_credits_per_user, st.included_credits_per_user),
+        (gs.id IS NOT NULL) as is_grandfathered
+    FROM subscriptions s
+    JOIN subscription_tiers st ON st.id = s.tier_id
+    LEFT JOIN grandfathered_subscriptions gs ON gs.subscription_id = s.id AND gs.status = &#39;active&#39;
+    LEFT JOIN subscription_plan_versions pv ON pv.id = gs.plan_version_id
+    WHERE s.id = p_subscription_id;
+END;
+$$ LANGUAGE plpgsql;</code></pre>
+<hr />
+<h2 id="grandfathering-service">45.3 GRANDFATHERING SERVICE</h2>
+<h3 id="packagesfunctionssrcservicesgrandfathering.ts">packages/functions/src/services/grandfathering.ts</h3>
+<pre class="typescript"><code>/**
+ * Grandfathering Service
+ * @version 4.15.0
+ */
+
+import { Pool } from &#39;pg&#39;;
+
+export class GrandfatheringService {
+  constructor(private pool: Pool) {}
+
+  async createPlanVersion(
+    tierId: string,
+    changeType: string,
+    changeSummary: string,
+    changedBy: string,
+    approvedBy: string
+  ): Promise&lt;{ versionId: string; grandfatheredCount: number }&gt; {
+    const client = await this.pool.connect();
+    
+    try {
+      await client.query(&#39;BEGIN&#39;);
+
+      // Get current tier and latest version
+      const tierResult = await client.query(`SELECT * FROM subscription_tiers WHERE id = $1`, [tierId]);
+      const tier = tierResult.rows[0];
+
+      const versionResult = await client.query(`
+        SELECT COALESCE(MAX(version_number), 0) + 1 as next_version
+        FROM subscription_plan_versions WHERE tier_id = $1
+      `, [tierId]);
+      const nextVersion = versionResult.rows[0].next_version;
+
+      // Close previous version
+      await client.query(`
+        UPDATE subscription_plan_versions SET effective_until = NOW()
+        WHERE tier_id = $1 AND effective_until IS NULL
+      `, [tierId]);
+
+      // Create new version
+      const newVersionResult = await client.query(`
+        INSERT INTO subscription_plan_versions (
+          tier_id, version_number, display_name, description,
+          price_monthly_cents, price_annual_cents, price_per_user,
+          included_credits_per_user, features, rate_limits, change_reason, changed_by
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        RETURNING id
+      `, [
+        tierId, nextVersion, tier.display_name, tier.description,
+        tier.price_monthly ? tier.price_monthly * 100 : null,
+        tier.price_annual ? tier.price_annual * 100 : null,
+        tier.price_per_user, tier.included_credits_per_user, tier.features,
+        JSON.stringify({ requestsPerMinute: tier.requests_per_minute, tokensPerMinute: tier.tokens_per_minute, concurrentRequests: tier.concurrent_requests }),
+        changeSummary, changedBy
+      ]);
+
+      const newVersionId = newVersionResult.rows[0].id;
+
+      // Get previous version for grandfathering
+      const prevVersionResult = await client.query(`
+        SELECT id FROM subscription_plan_versions WHERE tier_id = $1 AND version_number = $2 - 1
+      `, [tierId, nextVersion]);
+
+      let grandfatheredCount = 0;
+
+      if (prevVersionResult.rows.length &gt; 0) {
+        const prevVersionId = prevVersionResult.rows[0].id;
+
+        // Grandfather all active subscriptions
+        const grandfatherResult = await client.query(`
+          INSERT INTO grandfathered_subscriptions (
+            subscription_id, plan_version_id, locked_price_monthly_cents, locked_price_annual_cents,
+            locked_features, locked_rate_limits, locked_credits_per_user, grandfathered_reason
+          )
+          SELECT s.id, $1, pv.price_monthly_cents, pv.price_annual_cents,
+            pv.features, pv.rate_limits, pv.included_credits_per_user, $2
+          FROM subscriptions s
+          JOIN subscription_plan_versions pv ON pv.id = $1
+          WHERE s.tier_id = $3 AND s.status IN (&#39;active&#39;, &#39;trialing&#39;)
+            AND NOT EXISTS (SELECT 1 FROM grandfathered_subscriptions gs WHERE gs.subscription_id = s.id AND gs.status = &#39;active&#39;)
+        `, [prevVersionId, changeSummary, tierId]);
+
+        grandfatheredCount = grandfatherResult.rowCount || 0;
+      }
+
+      // Record audit
+      await client.query(`
+        INSERT INTO plan_change_audit (tier_id, old_version_id, new_version_id, change_type, change_summary, affected_subscribers, grandfathered_count, changed_by, approved_by)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `, [tierId, prevVersionResult.rows[0]?.id, newVersionId, changeType, changeSummary, grandfatheredCount, grandfatheredCount, changedBy, approvedBy]);
+
+      await client.query(&#39;COMMIT&#39;);
+      return { versionId: newVersionId, grandfatheredCount };
+    } catch (error) {
+      await client.query(&#39;ROLLBACK&#39;);
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async getEffectivePlan(subscriptionId: string): Promise&lt;{
+    grandfathered: boolean;
+    priceMonthly: number | null;
+    features: Record&lt;string, any&gt;;
+    rateLimits: Record&lt;string, number&gt;;
+    creditsPerUser: number;
+  }&gt; {
+    const result = await this.pool.query(`SELECT * FROM get_effective_plan($1)`, [subscriptionId]);
+    const row = result.rows[0];
+
+    return {
+      grandfathered: row.is_grandfathered,
+      priceMonthly: row.price_monthly_cents,
+      features: row.features,
+      rateLimits: row.rate_limits,
+      creditsPerUser: row.credits_per_user,
+    };
+  }
+
+  async offerMigration(subscriptionId: string, incentive: { bonusCredits?: number; discountPercent?: number }): Promise&lt;void&gt; {
+    await this.pool.query(`
+      UPDATE grandfathered_subscriptions
+      SET migration_offered = TRUE, migration_offer_date = NOW(), migration_incentive = $2, updated_at = NOW()
+      WHERE subscription_id = $1 AND status = &#39;active&#39;
+    `, [subscriptionId, JSON.stringify(incentive)]);
+  }
+
+  async acceptMigration(subscriptionId: string): Promise&lt;void&gt; {
+    await this.pool.query(`
+      UPDATE grandfathered_subscriptions
+      SET status = &#39;migrated&#39;, migration_response = &#39;accepted&#39;, migration_response_date = NOW(), updated_at = NOW()
+      WHERE subscription_id = $1 AND status = &#39;active&#39;
+    `, [subscriptionId]);
+  }
+}</code></pre>
+<hr />
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

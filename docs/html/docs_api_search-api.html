@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>search api - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>search api</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/api/search-api.md</div>
+  </div>
+  
+  <h1 id="multi-language-search-api-reference">Multi-Language Search API Reference</h1>
+<blockquote>
+<p><strong>Version</strong>: 5.52.29 | <strong>Last Updated</strong>: January 25, 2026 | <strong>Base URL</strong>: <code>https://api.radiant.ai/v1</code></p>
+</blockquote>
+<p>Complete API reference for RADIANT’s multi-language full-text search capabilities, including CJK (Chinese, Japanese, Korean) bi-gram search.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#search-endpoints">Search Endpoints</a></li>
+<li><a href="#language-detection">Language Detection</a></li>
+<li><a href="#search-methods">Search Methods</a></li>
+<li><a href="#filtering-and-pagination">Filtering and Pagination</a></li>
+<li><a href="#response-format">Response Format</a></li>
+<li><a href="#error-handling">Error Handling</a></li>
+</ol>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>RADIANT provides intelligent multi-language search across all content types, with automatic language detection and optimized search strategies for different language families.</p>
+<h3 id="supported-languages">Supported Languages</h3>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Code</th>
+<th>Search Method</th>
+<th>Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>English</td>
+<td><code>en</code></td>
+<td>PostgreSQL FTS</td>
+<td>Stemming, ranking</td>
+</tr>
+<tr>
+<td>Spanish</td>
+<td><code>es</code></td>
+<td>PostgreSQL FTS</td>
+<td>Stemming, ranking</td>
+</tr>
+<tr>
+<td>French</td>
+<td><code>fr</code></td>
+<td>PostgreSQL FTS</td>
+<td>Stemming, ranking</td>
+</tr>
+<tr>
+<td>German</td>
+<td><code>de</code></td>
+<td>PostgreSQL FTS</td>
+<td>Compound word handling</td>
+</tr>
+<tr>
+<td>Portuguese</td>
+<td><code>pt</code></td>
+<td>PostgreSQL FTS</td>
+<td>Stemming, ranking</td>
+</tr>
+<tr>
+<td>Italian</td>
+<td><code>it</code></td>
+<td>PostgreSQL FTS</td>
+<td>Stemming, ranking</td>
+</tr>
+<tr>
+<td>Dutch</td>
+<td><code>nl</code></td>
+<td>PostgreSQL FTS</td>
+<td>Stemming, ranking</td>
+</tr>
+<tr>
+<td>Polish</td>
+<td><code>pl</code></td>
+<td>Simple FTS</td>
+<td>Basic tokenization</td>
+</tr>
+<tr>
+<td>Russian</td>
+<td><code>ru</code></td>
+<td>PostgreSQL FTS</td>
+<td>Stemming, ranking</td>
+</tr>
+<tr>
+<td>Turkish</td>
+<td><code>tr</code></td>
+<td>PostgreSQL FTS</td>
+<td>Stemming, ranking</td>
+</tr>
+<tr>
+<td><strong>Japanese</strong></td>
+<td><code>ja</code></td>
+<td><strong>pg_bigm</strong></td>
+<td>Bi-gram indexing</td>
+</tr>
+<tr>
+<td><strong>Korean</strong></td>
+<td><code>ko</code></td>
+<td><strong>pg_bigm</strong></td>
+<td>Bi-gram indexing</td>
+</tr>
+<tr>
+<td><strong>Chinese (Simplified)</strong></td>
+<td><code>zh-CN</code></td>
+<td><strong>pg_bigm</strong></td>
+<td>Bi-gram indexing</td>
+</tr>
+<tr>
+<td><strong>Chinese (Traditional)</strong></td>
+<td><code>zh-TW</code></td>
+<td><strong>pg_bigm</strong></td>
+<td>Bi-gram indexing</td>
+</tr>
+<tr>
+<td>Arabic</td>
+<td><code>ar</code></td>
+<td>Simple FTS</td>
+<td>Basic tokenization</td>
+</tr>
+<tr>
+<td>Hindi</td>
+<td><code>hi</code></td>
+<td>Simple FTS</td>
+<td>Basic tokenization</td>
+</tr>
+<tr>
+<td>Thai</td>
+<td><code>th</code></td>
+<td>Simple FTS</td>
+<td>Basic tokenization</td>
+</tr>
+<tr>
+<td>Vietnamese</td>
+<td><code>vi</code></td>
+<td>Simple FTS</td>
+<td>Basic tokenization</td>
+</tr>
+</tbody>
+</table>
+<h3 id="authentication">Authentication</h3>
+<p>All search endpoints require authentication:</p>
+<pre class="http"><code>Authorization: Bearer &lt;access_token&gt;</code></pre>
+<hr />
+<h2 id="search-endpoints">Search Endpoints</h2>
+<h3 id="universal-search">Universal Search</h3>
+<p>Search across all content types.</p>
+<pre class="http"><code>POST /search
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;query&quot;: &quot;machine learning&quot;,
+  &quot;types&quot;: [&quot;sessions&quot;, &quot;messages&quot;, &quot;files&quot;, &quot;artifacts&quot;],
+  &quot;limit&quot;: 20,
+  &quot;offset&quot;: 0,
+  &quot;filters&quot;: {
+    &quot;created_after&quot;: &quot;2025-01-01T00:00:00Z&quot;,
+    &quot;created_before&quot;: &quot;2026-01-25T23:59:59Z&quot;
+  },
+  &quot;language_hint&quot;: null
+}</code></pre>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>query</code></td>
+<td>string</td>
+<td>Yes</td>
+<td>Search query (1-500 characters)</td>
+</tr>
+<tr>
+<td><code>types</code></td>
+<td>string[]</td>
+<td>No</td>
+<td>Content types to search (default: all)</td>
+</tr>
+<tr>
+<td><code>limit</code></td>
+<td>integer</td>
+<td>No</td>
+<td>Results per page (1-100, default: 20)</td>
+</tr>
+<tr>
+<td><code>offset</code></td>
+<td>integer</td>
+<td>No</td>
+<td>Pagination offset (default: 0)</td>
+</tr>
+<tr>
+<td><code>filters</code></td>
+<td>object</td>
+<td>No</td>
+<td>Additional filters</td>
+</tr>
+<tr>
+<td><code>language_hint</code></td>
+<td>string</td>
+<td>No</td>
+<td>Override language detection</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: &quot;sess_abc123&quot;,
+      &quot;type&quot;: &quot;session&quot;,
+      &quot;title&quot;: &quot;Machine Learning Project Discussion&quot;,
+      &quot;snippet&quot;: &quot;...exploring various &lt;mark&gt;machine learning&lt;/mark&gt; algorithms for...&quot;,
+      &quot;relevance_score&quot;: 0.95,
+      &quot;created_at&quot;: &quot;2026-01-20T10:30:00Z&quot;,
+      &quot;updated_at&quot;: &quot;2026-01-24T15:00:00Z&quot;
+    },
+    {
+      &quot;id&quot;: &quot;msg_def456&quot;,
+      &quot;type&quot;: &quot;message&quot;,
+      &quot;session_id&quot;: &quot;sess_xyz789&quot;,
+      &quot;snippet&quot;: &quot;...the &lt;mark&gt;machine learning&lt;/mark&gt; model achieved 95% accuracy...&quot;,
+      &quot;relevance_score&quot;: 0.87,
+      &quot;created_at&quot;: &quot;2026-01-22T14:00:00Z&quot;
+    }
+  ],
+  &quot;total&quot;: 42,
+  &quot;limit&quot;: 20,
+  &quot;offset&quot;: 0,
+  &quot;detected_language&quot;: &quot;en&quot;,
+  &quot;search_method&quot;: &quot;fts&quot;,
+  &quot;query_time_ms&quot;: 45
+}</code></pre>
+<h3 id="search-sessions">Search Sessions</h3>
+<p>Search within Think Tank sessions.</p>
+<pre class="http"><code>POST /search/sessions
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;query&quot;: &quot;プロジェクト計画&quot;,
+  &quot;limit&quot;: 20,
+  &quot;filters&quot;: {
+    &quot;workspace_id&quot;: &quot;ws_abc123&quot;,
+    &quot;created_after&quot;: &quot;2025-01-01T00:00:00Z&quot;
+  }
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: &quot;sess_abc123&quot;,
+      &quot;title&quot;: &quot;プロジェクト計画ミーティング&quot;,
+      &quot;snippet&quot;: &quot;...新しい&lt;mark&gt;プロジェクト計画&lt;/mark&gt;について議論しました...&quot;,
+      &quot;message_count&quot;: 45,
+      &quot;relevance_score&quot;: 0.92,
+      &quot;created_at&quot;: &quot;2026-01-15T09:00:00Z&quot;,
+      &quot;last_message_at&quot;: &quot;2026-01-24T18:30:00Z&quot;
+    }
+  ],
+  &quot;total&quot;: 8,
+  &quot;detected_language&quot;: &quot;ja&quot;,
+  &quot;search_method&quot;: &quot;pg_bigm&quot;
+}</code></pre>
+<h3 id="search-messages">Search Messages</h3>
+<p>Search within session messages.</p>
+<pre class="http"><code>POST /search/messages
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;query&quot;: &quot;API integration&quot;,
+  &quot;session_id&quot;: &quot;sess_abc123&quot;,
+  &quot;limit&quot;: 50
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: &quot;msg_def456&quot;,
+      &quot;session_id&quot;: &quot;sess_abc123&quot;,
+      &quot;role&quot;: &quot;assistant&quot;,
+      &quot;snippet&quot;: &quot;...the &lt;mark&gt;API integration&lt;/mark&gt; requires the following steps...&quot;,
+      &quot;relevance_score&quot;: 0.89,
+      &quot;created_at&quot;: &quot;2026-01-20T11:30:00Z&quot;
+    }
+  ],
+  &quot;total&quot;: 15,
+  &quot;detected_language&quot;: &quot;en&quot;,
+  &quot;search_method&quot;: &quot;fts&quot;
+}</code></pre>
+<h3 id="search-files">Search Files</h3>
+<p>Search within uploaded files and documents.</p>
+<pre class="http"><code>POST /search/files
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;query&quot;: &quot;quarterly report&quot;,
+  &quot;file_types&quot;: [&quot;pdf&quot;, &quot;docx&quot;],
+  &quot;limit&quot;: 20
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: &quot;file_abc123&quot;,
+      &quot;name&quot;: &quot;Q4-2025-Report.pdf&quot;,
+      &quot;snippet&quot;: &quot;...the &lt;mark&gt;quarterly report&lt;/mark&gt; shows significant growth...&quot;,
+      &quot;file_type&quot;: &quot;pdf&quot;,
+      &quot;size_bytes&quot;: 2456789,
+      &quot;relevance_score&quot;: 0.94,
+      &quot;uploaded_at&quot;: &quot;2026-01-10T08:00:00Z&quot;
+    }
+  ],
+  &quot;total&quot;: 5,
+  &quot;detected_language&quot;: &quot;en&quot;,
+  &quot;search_method&quot;: &quot;fts&quot;
+}</code></pre>
+<h3 id="search-artifacts">Search Artifacts</h3>
+<p>Search within generated artifacts (code, documents, etc.).</p>
+<pre class="http"><code>POST /search/artifacts
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;query&quot;: &quot;React component&quot;,
+  &quot;artifact_types&quot;: [&quot;code&quot;, &quot;document&quot;],
+  &quot;limit&quot;: 20
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: &quot;art_xyz789&quot;,
+      &quot;title&quot;: &quot;UserProfile React Component&quot;,
+      &quot;type&quot;: &quot;code&quot;,
+      &quot;language&quot;: &quot;typescript&quot;,
+      &quot;snippet&quot;: &quot;...export const UserProfile: &lt;mark&gt;React&lt;/mark&gt;.&lt;mark&gt;Component&lt;/mark&gt;...&quot;,
+      &quot;relevance_score&quot;: 0.91,
+      &quot;session_id&quot;: &quot;sess_abc123&quot;,
+      &quot;created_at&quot;: &quot;2026-01-18T14:00:00Z&quot;
+    }
+  ],
+  &quot;total&quot;: 12,
+  &quot;detected_language&quot;: &quot;en&quot;,
+  &quot;search_method&quot;: &quot;fts&quot;
+}</code></pre>
+<hr />
+<h2 id="language-detection">Language Detection</h2>
+<h3 id="detect-language">Detect Language</h3>
+<p>Detect the primary language of text.</p>
+<pre class="http"><code>POST /search/detect-language
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;text&quot;: &quot;这是一个测试文本，用于检测语言&quot;
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;detected_language&quot;: &quot;zh-CN&quot;,
+  &quot;confidence&quot;: 0.98,
+  &quot;script&quot;: &quot;han&quot;,
+  &quot;search_method&quot;: &quot;pg_bigm&quot;,
+  &quot;alternatives&quot;: [
+    { &quot;language&quot;: &quot;zh-TW&quot;, &quot;confidence&quot;: 0.85 },
+    { &quot;language&quot;: &quot;ja&quot;, &quot;confidence&quot;: 0.12 }
+  ]
+}</code></pre>
+<h3 id="detection-algorithm">Detection Algorithm</h3>
+<pre class="mermaid"><code>flowchart TD
+    A[Input Text] --&gt; B{Contains CJK?}
+    B --&gt;|Yes| C{Which CJK?}
+    B --&gt;|No| D{Contains Arabic?}
+    
+    C --&gt;|Hiragana/Katakana| E[Japanese]
+    C --&gt;|Hangul| F[Korean]
+    C --&gt;|Han only| G[Chinese]
+    
+    G --&gt; H{Simplified chars?}
+    H --&gt;|Yes| I[zh-CN]
+    H --&gt;|No| J[zh-TW]
+    
+    D --&gt;|Yes| K[Arabic]
+    D --&gt;|No| L{Contains Cyrillic?}
+    
+    L --&gt;|Yes| M[Russian]
+    L --&gt;|No| N[Latin-based detection]
+    
+    N --&gt; O[Trigram analysis]
+    O --&gt; P[Most likely language]</code></pre>
+<hr />
+<h2 id="search-methods">Search Methods</h2>
+<h3 id="postgresql-full-text-search-fts">PostgreSQL Full-Text Search (FTS)</h3>
+<p>Used for Western languages with word boundaries.</p>
+<p><strong>Features:</strong> - Stemming (running → run) - Stop word removal - Relevance ranking (ts_rank) - Phrase search (<code>"exact phrase"</code>) - Prefix matching (<code>machine*</code>)</p>
+<p><strong>Example Query Processing:</strong></p>
+<pre><code>Input: &quot;machine learning algorithms&quot;
+↓
+Stemmed: machine learn algorithm
+↓
+tsvector: &#39;algorithm&#39;:3 &#39;learn&#39;:2 &#39;machin&#39;:1</code></pre>
+<h3 id="pg_bigm-bi-gram-search">pg_bigm Bi-gram Search</h3>
+<p>Used for CJK languages without word boundaries.</p>
+<p><strong>Features:</strong> - Character bi-gram indexing - Substring matching - No dictionary required - Fuzzy matching support</p>
+<p><strong>Example Query Processing (Japanese):</strong></p>
+<pre><code>Input: &quot;人工知能&quot;
+↓
+Bi-grams: &quot;人工&quot;, &quot;工知&quot;, &quot;知能&quot;
+↓
+Search: LIKE &#39;%人工%&#39; AND LIKE &#39;%工知%&#39; AND LIKE &#39;%知能%&#39;
+(optimized via GIN index)</code></pre>
+<h3 id="simple-search">Simple Search</h3>
+<p>Used for languages without dedicated FTS support.</p>
+<p><strong>Features:</strong> - Basic word tokenization - No stemming - Case-insensitive matching</p>
+<hr />
+<h2 id="filtering-and-pagination">Filtering and Pagination</h2>
+<h3 id="available-filters">Available Filters</h3>
+<table>
+<thead>
+<tr>
+<th>Filter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>created_after</code></td>
+<td>ISO 8601</td>
+<td>Results created after this date</td>
+</tr>
+<tr>
+<td><code>created_before</code></td>
+<td>ISO 8601</td>
+<td>Results created before this date</td>
+</tr>
+<tr>
+<td><code>workspace_id</code></td>
+<td>string</td>
+<td>Filter by workspace</td>
+</tr>
+<tr>
+<td><code>session_id</code></td>
+<td>string</td>
+<td>Filter by session</td>
+</tr>
+<tr>
+<td><code>file_types</code></td>
+<td>string[]</td>
+<td>Filter by file extensions</td>
+</tr>
+<tr>
+<td><code>artifact_types</code></td>
+<td>string[]</td>
+<td>Filter by artifact type</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pagination">Pagination</h3>
+<pre class="json"><code>{
+  &quot;query&quot;: &quot;search term&quot;,
+  &quot;limit&quot;: 20,
+  &quot;offset&quot;: 40
+}</code></pre>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+<th>Maximum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>limit</code></td>
+<td>20</td>
+<td>100</td>
+</tr>
+<tr>
+<td><code>offset</code></td>
+<td>0</td>
+<td>10000</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cursor-based-pagination-recommended">Cursor-Based Pagination (Recommended)</h3>
+<p>For large result sets, use cursor pagination:</p>
+<pre class="http"><code>POST /search
+Content-Type: application/json</code></pre>
+<p><strong>First Request:</strong></p>
+<pre class="json"><code>{
+  &quot;query&quot;: &quot;data analysis&quot;,
+  &quot;limit&quot;: 20
+}</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;results&quot;: [...],
+  &quot;total&quot;: 500,
+  &quot;next_cursor&quot;: &quot;eyJvZmZzZXQiOjIwfQ==&quot;,
+  &quot;has_more&quot;: true
+}</code></pre>
+<p><strong>Next Request:</strong></p>
+<pre class="json"><code>{
+  &quot;query&quot;: &quot;data analysis&quot;,
+  &quot;limit&quot;: 20,
+  &quot;cursor&quot;: &quot;eyJvZmZzZXQiOjIwfQ==&quot;
+}</code></pre>
+<hr />
+<h2 id="response-format">Response Format</h2>
+<h3 id="result-object">Result Object</h3>
+<pre class="json"><code>{
+  &quot;id&quot;: &quot;string&quot;,
+  &quot;type&quot;: &quot;session | message | file | artifact&quot;,
+  &quot;title&quot;: &quot;string (if applicable)&quot;,
+  &quot;snippet&quot;: &quot;string with &lt;mark&gt;highlighted&lt;/mark&gt; matches&quot;,
+  &quot;relevance_score&quot;: 0.0-1.0,
+  &quot;created_at&quot;: &quot;ISO 8601&quot;,
+  &quot;updated_at&quot;: &quot;ISO 8601 (if applicable)&quot;,
+  &quot;metadata&quot;: {}
+}</code></pre>
+<h3 id="snippet-highlighting">Snippet Highlighting</h3>
+<p>Matched terms are wrapped in <code>&lt;mark&gt;</code> tags:</p>
+<pre class="json"><code>{
+  &quot;snippet&quot;: &quot;The &lt;mark&gt;machine learning&lt;/mark&gt; model uses &lt;mark&gt;neural networks&lt;/mark&gt;...&quot;
+}</code></pre>
+<p>Configure highlighting:</p>
+<pre class="json"><code>{
+  &quot;query&quot;: &quot;machine learning&quot;,
+  &quot;highlight&quot;: {
+    &quot;pre_tag&quot;: &quot;&lt;em class=&#39;highlight&#39;&gt;&quot;,
+    &quot;post_tag&quot;: &quot;&lt;/em&gt;&quot;,
+    &quot;max_length&quot;: 200
+  }
+}</code></pre>
+<h3 id="metadata-by-type">Metadata by Type</h3>
+<p><strong>Session:</strong></p>
+<pre class="json"><code>{
+  &quot;message_count&quot;: 45,
+  &quot;participant_count&quot;: 1,
+  &quot;workspace_id&quot;: &quot;ws_abc123&quot;
+}</code></pre>
+<p><strong>Message:</strong></p>
+<pre class="json"><code>{
+  &quot;session_id&quot;: &quot;sess_abc123&quot;,
+  &quot;role&quot;: &quot;user | assistant&quot;,
+  &quot;message_index&quot;: 15
+}</code></pre>
+<p><strong>File:</strong></p>
+<pre class="json"><code>{
+  &quot;file_type&quot;: &quot;pdf&quot;,
+  &quot;size_bytes&quot;: 2456789,
+  &quot;page_count&quot;: 25
+}</code></pre>
+<p><strong>Artifact:</strong></p>
+<pre class="json"><code>{
+  &quot;artifact_type&quot;: &quot;code | document | image&quot;,
+  &quot;language&quot;: &quot;typescript&quot;,
+  &quot;session_id&quot;: &quot;sess_abc123&quot;
+}</code></pre>
+<hr />
+<h2 id="error-handling">Error Handling</h2>
+<h3 id="error-response-format">Error Response Format</h3>
+<pre class="json"><code>{
+  &quot;error&quot;: &quot;error_code&quot;,
+  &quot;message&quot;: &quot;Human-readable description&quot;,
+  &quot;details&quot;: {},
+  &quot;request_id&quot;: &quot;req_abc123&quot;
+}</code></pre>
+<h3 id="error-codes">Error Codes</h3>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>invalid_query</code></td>
+<td>400</td>
+<td>Query is empty or too long</td>
+</tr>
+<tr>
+<td><code>invalid_filter</code></td>
+<td>400</td>
+<td>Invalid filter parameter</td>
+</tr>
+<tr>
+<td><code>invalid_language</code></td>
+<td>400</td>
+<td>Unknown language code</td>
+</tr>
+<tr>
+<td><code>unauthorized</code></td>
+<td>401</td>
+<td>Missing or invalid token</td>
+</tr>
+<tr>
+<td><code>forbidden</code></td>
+<td>403</td>
+<td>No access to resource</td>
+</tr>
+<tr>
+<td><code>rate_limited</code></td>
+<td>429</td>
+<td>Too many requests</td>
+</tr>
+<tr>
+<td><code>search_timeout</code></td>
+<td>504</td>
+<td>Search took too long</td>
+</tr>
+<tr>
+<td><code>internal_error</code></td>
+<td>500</td>
+<td>Server error</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rate-limits">Rate Limits</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Limit</th>
+<th>Window</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/search</code></td>
+<td>60 requests</td>
+<td>1 minute</td>
+</tr>
+<tr>
+<td><code>/search/*</code></td>
+<td>100 requests</td>
+<td>1 minute</td>
+</tr>
+<tr>
+<td><code>/search/detect-language</code></td>
+<td>120 requests</td>
+<td>1 minute</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="examples">Examples</h2>
+<h3 id="cjk-search-example-japanese">CJK Search Example (Japanese)</h3>
+<pre class="http"><code>POST /search/sessions
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json
+
+{
+  &quot;query&quot;: &quot;人工知能の研究&quot;,
+  &quot;limit&quot;: 10
+}</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;results&quot;: [
+    {
+      &quot;id&quot;: &quot;sess_jp001&quot;,
+      &quot;title&quot;: &quot;人工知能プロジェクト&quot;,
+      &quot;snippet&quot;: &quot;...&lt;mark&gt;人工知能&lt;/mark&gt;の&lt;mark&gt;研究&lt;/mark&gt;における最新の進展...&quot;,
+      &quot;relevance_score&quot;: 0.94
+    }
+  ],
+  &quot;detected_language&quot;: &quot;ja&quot;,
+  &quot;search_method&quot;: &quot;pg_bigm&quot;,
+  &quot;query_time_ms&quot;: 32
+}</code></pre>
+<h3 id="mixed-language-search">Mixed Language Search</h3>
+<pre class="http"><code>POST /search
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json
+
+{
+  &quot;query&quot;: &quot;AI 인공지능 development&quot;,
+  &quot;limit&quot;: 20
+}</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;results&quot;: [...],
+  &quot;detected_language&quot;: &quot;ko&quot;,
+  &quot;search_method&quot;: &quot;pg_bigm&quot;,
+  &quot;note&quot;: &quot;Mixed-language query detected. CJK method used for best coverage.&quot;
+}</code></pre>
+<h3 id="advanced-filtering">Advanced Filtering</h3>
+<pre class="http"><code>POST /search
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json
+
+{
+  &quot;query&quot;: &quot;project planning&quot;,
+  &quot;types&quot;: [&quot;sessions&quot;, &quot;artifacts&quot;],
+  &quot;filters&quot;: {
+    &quot;workspace_id&quot;: &quot;ws_main&quot;,
+    &quot;created_after&quot;: &quot;2026-01-01T00:00:00Z&quot;,
+    &quot;artifact_types&quot;: [&quot;document&quot;]
+  },
+  &quot;limit&quot;: 50
+}</code></pre>
+<hr />
+<h2 id="performance-considerations">Performance Considerations</h2>
+<h3 id="query-optimization-tips">Query Optimization Tips</h3>
+<table>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use specific queries</td>
+<td>Reduces result set size</td>
+</tr>
+<tr>
+<td>Filter by type when possible</td>
+<td>Limits tables to search</td>
+</tr>
+<tr>
+<td>Use date filters</td>
+<td>Indexes are date-partitioned</td>
+</tr>
+<tr>
+<td>Avoid leading wildcards</td>
+<td>Cannot use index efficiently</td>
+</tr>
+</tbody>
+</table>
+<h3 id="index-architecture">Index Architecture</h3>
+<pre class="mermaid"><code>graph LR
+    subgraph &quot;Western Languages&quot;
+        FTS[GIN tsvector index]
+    end
+    
+    subgraph &quot;CJK Languages&quot;
+        BIGM[GIN pg_bigm index]
+    end
+    
+    subgraph &quot;Tables&quot;
+        SESS[sessions]
+        MSG[messages]
+        FILES[files]
+        ART[artifacts]
+    end
+    
+    FTS --&gt; SESS
+    FTS --&gt; MSG
+    FTS --&gt; FILES
+    FTS --&gt; ART
+    
+    BIGM --&gt; SESS
+    BIGM --&gt; MSG
+    BIGM --&gt; FILES
+    BIGM --&gt; ART</code></pre>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="../authentication/i18n-guide.md">Internationalization Guide</a></li>
+<li><a href="./authentication-api.md">Authentication API</a></li>
+<li><a href="../sections/SECTION-41-INTERNATIONALIZATION.md">Section 41: Internationalization</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PREPROMPT LEARNING SYSTEM - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>PREPROMPT LEARNING SYSTEM</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/PREPROMPT-LEARNING-SYSTEM.md</div>
+  </div>
+  
+  <h1 id="pre-prompt-learning-system">Pre-Prompt Learning System</h1>
+<p><strong>Version</strong>: 4.18.3<br />
+<strong>Last Updated</strong>: 2024-12-28</p>
+<h2 id="overview">Overview</h2>
+<p>The Pre-Prompt Learning System tracks, evaluates, and learns from the effectiveness of pre-prompts (system prompts) used by the AGI Brain. Instead of blaming pre-prompts for all failures, it uses <strong>attribution analysis</strong> to understand what factor actually caused issues - whether it was the pre-prompt, model selection, orchestration mode, workflow, or domain detection.</p>
+<h2 id="key-concepts">Key Concepts</h2>
+<h3 id="attribution-analysis">Attribution Analysis</h3>
+<p>When users provide feedback, the system doesn’t just record whether the response was good or bad. It analyzes the full context to determine <strong>what factor was most responsible</strong>:</p>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 38%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Factor</th>
+<th>Description</th>
+<th>When Blamed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pre-prompt</strong></td>
+<td>System instructions were wrong</td>
+<td>Tone, format, or approach mismatch</td>
+</tr>
+<tr>
+<td><strong>Model</strong></td>
+<td>AI model selection was inappropriate</td>
+<td>Model lacks capability for task</td>
+</tr>
+<tr>
+<td><strong>Mode</strong></td>
+<td>Orchestration mode was wrong</td>
+<td>Extended thinking when simple needed</td>
+</tr>
+<tr>
+<td><strong>Workflow</strong></td>
+<td>Workflow pattern didn’t fit</td>
+<td>Multi-step when single response needed</td>
+</tr>
+<tr>
+<td><strong>Domain</strong></td>
+<td>Domain detection was incorrect</td>
+<td>Medical advice for cooking question</td>
+</tr>
+<tr>
+<td><strong>Other</strong></td>
+<td>External factors</td>
+<td>User unclear, ambiguous request</td>
+</tr>
+</tbody>
+</table>
+<h3 id="learning-weights">Learning Weights</h3>
+<p>Each pre-prompt template has configurable weights that affect selection:</p>
+<pre><code>Final Score = Base + (Domain × DomainWeight) + (Mode × ModeWeight) + 
+              (Model × ModelWeight) + (Complexity × ComplexityWeight) + 
+              (TaskType × TaskTypeWeight) + FeedbackAdjustment</code></pre>
+<table>
+<thead>
+<tr>
+<th>Weight</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>baseEffectivenessScore</code></td>
+<td>0.5</td>
+<td>Starting score</td>
+</tr>
+<tr>
+<td><code>domainWeight</code></td>
+<td>0.2</td>
+<td>Bonus for matching domain</td>
+</tr>
+<tr>
+<td><code>modeWeight</code></td>
+<td>0.2</td>
+<td>Bonus for matching mode</td>
+</tr>
+<tr>
+<td><code>modelWeight</code></td>
+<td>0.2</td>
+<td>Bonus for compatible model</td>
+</tr>
+<tr>
+<td><code>complexityWeight</code></td>
+<td>0.15</td>
+<td>Bonus for complexity match</td>
+</tr>
+<tr>
+<td><code>taskTypeWeight</code></td>
+<td>0.15</td>
+<td>Bonus for task type match</td>
+</tr>
+<tr>
+<td><code>feedbackWeight</code></td>
+<td>0.1</td>
+<td>Historical feedback influence</td>
+</tr>
+</tbody>
+</table>
+<h3 id="exploration-vs-exploitation">Exploration vs Exploitation</h3>
+<p>The system balances <strong>exploitation</strong> (using best-performing templates) with <strong>exploration</strong> (trying other templates to gather learning data):</p>
+<ul>
+<li><strong>Exploration Rate</strong>: Percentage of requests where a non-optimal template is chosen</li>
+<li><strong>Default</strong>: 10% exploration, decays over time</li>
+<li><strong>Minimum</strong>: 1% to ensure continued learning</li>
+</ul>
+<hr />
+<h2 id="admin-dashboard">Admin Dashboard</h2>
+<p><strong>Location</strong>: Admin Dashboard → Orchestration → Pre-Prompts<br />
+<strong>URL</strong>: <code>/orchestration/preprompts</code></p>
+<h3 id="overview-tab">Overview Tab</h3>
+<ul>
+<li><strong>Key Metrics</strong>: Templates, Uses, Avg Rating, Thumbs Up Rate, Feedback Count</li>
+<li><strong>Attribution Pie Chart</strong>: Visual breakdown of what gets blamed</li>
+<li><strong>Top Performing Templates</strong>: Best-rated templates by feedback</li>
+<li><strong>Templates Needing Attention</strong>: Low performers requiring adjustment</li>
+</ul>
+<h3 id="templates-tab">Templates Tab</h3>
+<ul>
+<li>View all pre-prompt templates</li>
+<li>See usage statistics and success rates</li>
+<li>Adjust weights via slider interface</li>
+<li>View applicable modes and domains</li>
+</ul>
+<h3 id="attribution-tab">Attribution Tab</h3>
+<ul>
+<li>Detailed attribution breakdown</li>
+<li>Historical analysis of what factors contribute to success/failure</li>
+<li>Learning sample count</li>
+</ul>
+<h3 id="feedback-tab">Feedback Tab</h3>
+<ul>
+<li>Recent user feedback with ratings</li>
+<li>Attribution labels for each feedback</li>
+<li>Feedback text and timestamps</li>
+</ul>
+<hr />
+<h2 id="pre-prompt-templates">Pre-Prompt Templates</h2>
+<h3 id="default-templates">Default Templates</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 25%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Template</th>
+<th>Modes</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>standard_reasoning</code></td>
+<td>thinking, chain_of_thought</td>
+<td>General questions</td>
+</tr>
+<tr>
+<td><code>extended_thinking</code></td>
+<td>extended_thinking</td>
+<td>Complex reasoning</td>
+</tr>
+<tr>
+<td><code>coding_expert</code></td>
+<td>coding</td>
+<td>Code generation</td>
+</tr>
+<tr>
+<td><code>creative_writing</code></td>
+<td>creative</td>
+<td>Creative content</td>
+</tr>
+<tr>
+<td><code>research_synthesis</code></td>
+<td>research, analysis</td>
+<td>Research tasks</td>
+</tr>
+<tr>
+<td><code>multi_model_consensus</code></td>
+<td>multi_model, self_consistency</td>
+<td>Ensemble queries</td>
+</tr>
+<tr>
+<td><code>domain_expert</code></td>
+<td>all</td>
+<td>Domain-specific expertise</td>
+</tr>
+</tbody>
+</table>
+<h3 id="template-variables">Template Variables</h3>
+<p>Templates support <code>{{variable}}</code> placeholders:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Source</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{{domain_name}}</code></td>
+<td>Domain detection</td>
+<td>“Medicine”</td>
+</tr>
+<tr>
+<td><code>{{domain_confidence}}</code></td>
+<td>Detection confidence</td>
+<td>“85”</td>
+</tr>
+<tr>
+<td><code>{{subspecialty_name}}</code></td>
+<td>Subspecialty</td>
+<td>“Cardiology”</td>
+</tr>
+<tr>
+<td><code>{{field_name}}</code></td>
+<td>Field</td>
+<td>“Healthcare”</td>
+</tr>
+<tr>
+<td><code>{{complexity}}</code></td>
+<td>Prompt analysis</td>
+<td>“complex”</td>
+</tr>
+<tr>
+<td><code>{{task_type}}</code></td>
+<td>Task detection</td>
+<td>“reasoning”</td>
+</tr>
+<tr>
+<td><code>{{key_topics}}</code></td>
+<td>Extracted topics</td>
+<td>“heart, ECG, diagnosis”</td>
+</tr>
+<tr>
+<td><code>{{model_role}}</code></td>
+<td>For multi-model</td>
+<td>“primary”</td>
+</tr>
+<tr>
+<td><code>{{proficiencies}}</code></td>
+<td>Domain proficiencies</td>
+<td>“reasoning_depth: 9”</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="database-schema">Database Schema</h2>
+<h3 id="preprompt_templates">preprompt_templates</h3>
+<p>Stores reusable pre-prompt patterns.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>template_code</code></td>
+<td>VARCHAR</td>
+<td>Unique identifier</td>
+</tr>
+<tr>
+<td><code>system_prompt</code></td>
+<td>TEXT</td>
+<td>Main prompt text</td>
+</tr>
+<tr>
+<td><code>context_template</code></td>
+<td>TEXT</td>
+<td>Context with variables</td>
+</tr>
+<tr>
+<td><code>applicable_modes</code></td>
+<td>TEXT[]</td>
+<td>Valid orchestration modes</td>
+</tr>
+<tr>
+<td><code>base_effectiveness_score</code></td>
+<td>DECIMAL</td>
+<td>Base selection score</td>
+</tr>
+<tr>
+<td><code>*_weight</code></td>
+<td>DECIMAL</td>
+<td>Selection weight factors</td>
+</tr>
+<tr>
+<td><code>total_uses</code></td>
+<td>INTEGER</td>
+<td>Usage count</td>
+</tr>
+<tr>
+<td><code>avg_feedback_score</code></td>
+<td>DECIMAL</td>
+<td>Average rating</td>
+</tr>
+</tbody>
+</table>
+<h3 id="preprompt_instances">preprompt_instances</h3>
+<p>Tracks actual pre-prompts used in plans.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>plan_id</code></td>
+<td>UUID</td>
+<td>Link to AGI plan</td>
+</tr>
+<tr>
+<td><code>template_id</code></td>
+<td>UUID</td>
+<td>Template used</td>
+</tr>
+<tr>
+<td><code>full_preprompt</code></td>
+<td>TEXT</td>
+<td>Rendered pre-prompt</td>
+</tr>
+<tr>
+<td><code>model_id</code></td>
+<td>VARCHAR</td>
+<td>Model used</td>
+</tr>
+<tr>
+<td><code>orchestration_mode</code></td>
+<td>VARCHAR</td>
+<td>Mode used</td>
+</tr>
+<tr>
+<td><code>detected_domain_id</code></td>
+<td>VARCHAR</td>
+<td>Domain detected</td>
+</tr>
+<tr>
+<td><code>response_quality_score</code></td>
+<td>DECIMAL</td>
+<td>Verification score</td>
+</tr>
+</tbody>
+</table>
+<h3 id="preprompt_feedback">preprompt_feedback</h3>
+<p>User feedback with attribution.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>instance_id</code></td>
+<td>UUID</td>
+<td>Pre-prompt instance</td>
+</tr>
+<tr>
+<td><code>rating</code></td>
+<td>INTEGER</td>
+<td>1-5 rating</td>
+</tr>
+<tr>
+<td><code>thumbs_up</code></td>
+<td>BOOLEAN</td>
+<td>Simple feedback</td>
+</tr>
+<tr>
+<td><code>issue_attribution</code></td>
+<td>VARCHAR</td>
+<td>What was blamed</td>
+</tr>
+<tr>
+<td><code>issue_attribution_confidence</code></td>
+<td>DECIMAL</td>
+<td>Attribution confidence</td>
+</tr>
+<tr>
+<td><code>feedback_text</code></td>
+<td>TEXT</td>
+<td>User comments</td>
+</tr>
+</tbody>
+</table>
+<h3 id="preprompt_attribution_scores">preprompt_attribution_scores</h3>
+<p>Learning data per template/factor combination.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>template_id</code></td>
+<td>UUID</td>
+<td>Template</td>
+</tr>
+<tr>
+<td><code>factor_type</code></td>
+<td>VARCHAR</td>
+<td>model/mode/domain/etc</td>
+</tr>
+<tr>
+<td><code>factor_value</code></td>
+<td>VARCHAR</td>
+<td>Specific value</td>
+</tr>
+<tr>
+<td><code>success_correlation</code></td>
+<td>DECIMAL</td>
+<td>-1 to 1 correlation</td>
+</tr>
+<tr>
+<td><code>sample_size</code></td>
+<td>INTEGER</td>
+<td>Data points</td>
+</tr>
+<tr>
+<td><code>confidence</code></td>
+<td>DECIMAL</td>
+<td>Score confidence</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-endpoints">API Endpoints</h2>
+<h3 id="dashboard">Dashboard</h3>
+<pre><code>GET /api/admin/preprompts/dashboard</code></pre>
+<p>Returns dashboard data including metrics, attribution, top/low templates, recent feedback.</p>
+<h3 id="templates">Templates</h3>
+<pre><code>GET /api/admin/preprompts/templates
+GET /api/admin/preprompts/templates/:id
+PATCH /api/admin/preprompts/templates/:id/weights</code></pre>
+<h3 id="feedback">Feedback</h3>
+<pre><code>POST /api/admin/preprompts/feedback
+GET /api/admin/preprompts/feedback/recent</code></pre>
+<h3 id="learning-config">Learning Config</h3>
+<pre><code>GET /api/admin/preprompts/config
+PATCH /api/admin/preprompts/config/:key</code></pre>
+<hr />
+<h2 id="integration-with-agi-brain">Integration with AGI Brain</h2>
+<p>The pre-prompt system integrates with <code>agi-brain-planner.service.ts</code>:</p>
+<ol type="1">
+<li><strong>Plan Generation</strong>: Calls <code>prepromptLearningService.selectPreprompt()</code></li>
+<li><strong>Template Selection</strong>: Scores templates based on context</li>
+<li><strong>Variable Rendering</strong>: Fills in <code>{{variables}}</code> from plan data</li>
+<li><strong>Instance Tracking</strong>: Records which template was used</li>
+<li><strong>Feedback Loop</strong>: User feedback updates attribution scores</li>
+</ol>
+<h3 id="code-example">Code Example</h3>
+<pre class="typescript"><code>const prepromptResult = await prepromptLearningService.selectPreprompt({
+  planId,
+  tenantId,
+  userId,
+  orchestrationMode,
+  modelId: primary.modelId,
+  detectedDomainId: domainResult?.primary_domain?.domain_id,
+  taskType: promptAnalysis.taskType,
+  complexity: promptAnalysis.complexity,
+  variables: {
+    domain_name: domainResult?.primary_domain?.domain_name || &#39;general&#39;,
+    complexity: promptAnalysis.complexity,
+    // ... more variables
+  },
+});
+
+plan.systemPrompt = prepromptResult.renderedPreprompt.full;</code></pre>
+<hr />
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="when-to-adjust-weights">When to Adjust Weights</h3>
+<ol type="1">
+<li><strong>Low feedback scores</strong>: If a template consistently scores below 3.5</li>
+<li><strong>High blame rate</strong>: If pre-prompt is blamed &gt;25% of the time</li>
+<li><strong>Mode mismatch</strong>: If template works well in some modes but not others</li>
+</ol>
+<h3 id="weight-adjustment-guidelines">Weight Adjustment Guidelines</h3>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Adjustment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Template works better with specific models</td>
+<td>Increase <code>modelWeight</code></td>
+</tr>
+<tr>
+<td>Template is mode-sensitive</td>
+<td>Increase <code>modeWeight</code></td>
+</tr>
+<tr>
+<td>Domain expertise is critical</td>
+<td>Increase <code>domainWeight</code></td>
+</tr>
+<tr>
+<td>Historical feedback is reliable</td>
+<td>Increase <code>feedbackWeight</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="monitoring-recommendations">Monitoring Recommendations</h3>
+<ul>
+<li>Check attribution distribution weekly</li>
+<li>Review low-performing templates monthly</li>
+<li>Monitor exploration rate effectiveness</li>
+<li>Track thumbs-up rate trends</li>
+</ul>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./sections/SECTION-XX-AGI-BRAIN-PLAN.md">AGI Brain Plan System</a></li>
+<li><a href="./ORCHESTRATION-METHODS.md">Orchestration Modes</a></li>
+<li><a href="./sections/SECTION-35-DOMAIN-TAXONOMY.md">Domain Taxonomy</a></li>
+<li><a href="./RADIANT-ADMIN-GUIDE.md">Admin Guide - Orchestration</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

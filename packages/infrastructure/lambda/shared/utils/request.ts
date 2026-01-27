@@ -43,7 +43,7 @@ export function parseRequest<T = unknown>(
   if (!sizeCheck.valid) {
     return {
       success: false,
-      response: errorResponse(413, 'PAYLOAD_TOO_LARGE', sizeCheck.error),
+      response: errorResponse(413, 'PAYLOAD_TOO_LARGE', (sizeCheck as any).error),
     };
   }
 
@@ -54,7 +54,7 @@ export function parseRequest<T = unknown>(
     if (!parseResult.success) {
       return {
         success: false,
-        response: errorResponse(400, 'INVALID_JSON', `Invalid request body: ${parseResult.error}`),
+        response: errorResponse(400, 'INVALID_JSON', `Invalid request body: ${(parseResult as any).error}`),
       };
     }
     body = parseResult.data;

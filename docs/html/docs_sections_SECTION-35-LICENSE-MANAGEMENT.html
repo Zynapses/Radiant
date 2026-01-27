@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 35 LICENSE MANAGEMENT - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 35 LICENSE MANAGEMENT</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-35-LICENSE-MANAGEMENT.md</div>
+  </div>
+  
+  <h1 id="section-35-admin-dashboard---model-license-management-ui-v4.1.0">SECTION 35: ADMIN DASHBOARD - MODEL &amp; LICENSE MANAGEMENT UI (v4.1.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<blockquote>
+<p><strong>Full CRUD UI for managing AI models through the Admin Dashboard.</strong> <strong>Administrators can add/edit/delete models without any code changes.</strong></p>
+</blockquote>
+<hr />
+<h2 id="model-management-page">35.1 MODEL MANAGEMENT PAGE</h2>
+<h3 id="appsadmin-dashboardappdashboardmodelspage.tsx">apps/admin-dashboard/app/(dashboard)/models/page.tsx</h3>
+<pre class="tsx"><code>&#39;use client&#39;;
+
+import { useState } from &#39;react&#39;;
+import { useQuery, useMutation, useQueryClient } from &#39;@tanstack/react-query&#39;;
+import { Plus, Search, RefreshCw, AlertTriangle } from &#39;lucide-react&#39;;
+import { Button } from &#39;@/components/ui/button&#39;;
+import { Input } from &#39;@/components/ui/input&#39;;
+import { Card, CardContent, CardHeader, CardTitle } from &#39;@/components/ui/card&#39;;
+import { Tabs, TabsContent, TabsList, TabsTrigger } from &#39;@/components/ui/tabs&#39;;
+import { ModelTable } from &#39;@/components/models/model-table&#39;;
+import { ModelForm } from &#39;@/components/models/model-form&#39;;
+import { LicensePanel } from &#39;@/components/models/license-panel&#39;;
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from &#39;@/components/ui/dialog&#39;;
+import { toast } from &#39;@/components/ui/use-toast&#39;;
+import { api } from &#39;@/lib/api&#39;;
+
+export default function ModelsPage() {
+  const [searchQuery, setSearchQuery] = useState(&#39;&#39;);
+  const [categoryFilter, setCategoryFilter] = useState(&#39;all&#39;);
+  const [showAddModel, setShowAddModel] = useState(false);
+  const [editingModel, setEditingModel] = useState&lt;string | null&gt;(null);
+  const queryClient = useQueryClient();
+
+  const { data: models, isLoading, refetch } = useQuery({
+    queryKey: [&#39;models&#39;, categoryFilter],
+    queryFn: async () =&gt; {
+      const params = categoryFilter !== &#39;all&#39; ? `?category=${categoryFilter}` : &#39;&#39;;
+      const response = await api.get(`/api/v2/admin/models${params}`);
+      return response.data;
+    },
+  });
+
+  const { data: licenseSummary } = useQuery({
+    queryKey: [&#39;license-summary&#39;],
+    queryFn: async () =&gt; (await api.get(&#39;/api/v2/admin/models/licenses/summary&#39;)).data,
+  });
+
+  const createModelMutation = useMutation({
+    mutationFn: (data: any) =&gt; api.post(&#39;/api/v2/admin/models&#39;, data),
+    onSuccess: () =&gt; {
+      queryClient.invalidateQueries({ queryKey: [&#39;models&#39;] });
+      setShowAddModel(false);
+      toast({ title: &#39;Model Created&#39;, description: &#39;New model added to registry.&#39; });
+    },
+  });
+
+  const deleteModelMutation = useMutation({
+    mutationFn: (modelId: string) =&gt; api.delete(`/api/v2/admin/models/${modelId}`),
+    onSuccess: () =&gt; {
+      queryClient.invalidateQueries({ queryKey: [&#39;models&#39;] });
+      toast({ title: &#39;Model Deleted&#39; });
+    },
+  });
+
+  const filteredModels = models?.filter((m: any) =&gt; 
+    m.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    m.modelId.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
+
+  return (
+    &lt;div className=&quot;space-y-6&quot;&gt;
+      &lt;div className=&quot;flex items-center justify-between&quot;&gt;
+        &lt;div&gt;
+          &lt;h1 className=&quot;text-3xl font-bold&quot;&gt;AI Models&lt;/h1&gt;
+          &lt;p className=&quot;text-muted-foreground&quot;&gt;
+            Database-driven model management - no code changes needed!
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div className=&quot;flex gap-2&quot;&gt;
+          &lt;Button variant=&quot;outline&quot; size=&quot;sm&quot; onClick={() =&gt; refetch()}&gt;
+            &lt;RefreshCw className=&quot;h-4 w-4 mr-2&quot; /&gt; Refresh
+          &lt;/Button&gt;
+          &lt;Dialog open={showAddModel} onOpenChange={setShowAddModel}&gt;
+            &lt;DialogTrigger asChild&gt;
+              &lt;Button&gt;&lt;Plus className=&quot;h-4 w-4 mr-2&quot; /&gt; Add Model&lt;/Button&gt;
+            &lt;/DialogTrigger&gt;
+            &lt;DialogContent className=&quot;max-w-4xl max-h-[90vh] overflow-y-auto&quot;&gt;
+              &lt;DialogHeader&gt;
+                &lt;DialogTitle&gt;Add New AI Model&lt;/DialogTitle&gt;
+              &lt;/DialogHeader&gt;
+              &lt;ModelForm 
+                onSubmit={(data) =&gt; createModelMutation.mutate(data)}
+                isLoading={createModelMutation.isPending}
+                onCancel={() =&gt; setShowAddModel(false)}
+              /&gt;
+            &lt;/DialogContent&gt;
+          &lt;/Dialog&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {/* Summary Cards */}
+      &lt;div className=&quot;grid grid-cols-2 md:grid-cols-4 gap-4&quot;&gt;
+        &lt;Card&gt;
+          &lt;CardHeader className=&quot;pb-2&quot;&gt;&lt;CardTitle className=&quot;text-sm text-muted-foreground&quot;&gt;Total Models&lt;/CardTitle&gt;&lt;/CardHeader&gt;
+          &lt;CardContent&gt;&lt;div className=&quot;text-2xl font-bold&quot;&gt;{licenseSummary?.totalModels || 0}&lt;/div&gt;&lt;/CardContent&gt;
+        &lt;/Card&gt;
+        &lt;Card&gt;
+          &lt;CardHeader className=&quot;pb-2&quot;&gt;&lt;CardTitle className=&quot;text-sm text-muted-foreground&quot;&gt;Commercial OK&lt;/CardTitle&gt;&lt;/CardHeader&gt;
+          &lt;CardContent&gt;&lt;div className=&quot;text-2xl font-bold text-green-600&quot;&gt;{licenseSummary?.commercialOk || 0}&lt;/div&gt;&lt;/CardContent&gt;
+        &lt;/Card&gt;
+        &lt;Card&gt;
+          &lt;CardHeader className=&quot;pb-2&quot;&gt;&lt;CardTitle className=&quot;text-sm text-muted-foreground&quot;&gt;Review Needed&lt;/CardTitle&gt;&lt;/CardHeader&gt;
+          &lt;CardContent&gt;&lt;div className=&quot;text-2xl font-bold text-yellow-600&quot;&gt;{licenseSummary?.reviewNeeded || 0}&lt;/div&gt;&lt;/CardContent&gt;
+        &lt;/Card&gt;
+        &lt;Card&gt;
+          &lt;CardHeader className=&quot;pb-2&quot;&gt;&lt;CardTitle className=&quot;text-sm text-muted-foreground&quot;&gt;Expiring Soon&lt;/CardTitle&gt;&lt;/CardHeader&gt;
+          &lt;CardContent&gt;&lt;div className=&quot;text-2xl font-bold text-orange-600&quot;&gt;{licenseSummary?.expiringIn30Days || 0}&lt;/div&gt;&lt;/CardContent&gt;
+        &lt;/Card&gt;
+      &lt;/div&gt;
+
+      {(licenseSummary?.nonCompliant || 0) &gt; 0 &amp;&amp; (
+        &lt;Card className=&quot;border-red-200 bg-red-50&quot;&gt;
+          &lt;CardContent className=&quot;flex items-center gap-4 py-4&quot;&gt;
+            &lt;AlertTriangle className=&quot;h-8 w-8 text-red-600&quot; /&gt;
+            &lt;div&gt;
+              &lt;h3 className=&quot;font-semibold text-red-800&quot;&gt;License Compliance Alert&lt;/h3&gt;
+              &lt;p className=&quot;text-red-700&quot;&gt;{licenseSummary?.nonCompliant} model(s) have non-compliant licenses.&lt;/p&gt;
+            &lt;/div&gt;
+          &lt;/CardContent&gt;
+        &lt;/Card&gt;
+      )}
+
+      &lt;Tabs defaultValue=&quot;models&quot; className=&quot;space-y-4&quot;&gt;
+        &lt;TabsList&gt;
+          &lt;TabsTrigger value=&quot;models&quot;&gt;Models&lt;/TabsTrigger&gt;
+          &lt;TabsTrigger value=&quot;licenses&quot;&gt;Licenses&lt;/TabsTrigger&gt;
+          &lt;TabsTrigger value=&quot;workflows&quot;&gt;Workflows&lt;/TabsTrigger&gt;
+        &lt;/TabsList&gt;
+
+        &lt;TabsContent value=&quot;models&quot; className=&quot;space-y-4&quot;&gt;
+          &lt;div className=&quot;flex gap-4&quot;&gt;
+            &lt;div className=&quot;relative flex-1&quot;&gt;
+              &lt;Search className=&quot;absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground&quot; /&gt;
+              &lt;Input
+                placeholder=&quot;Search models...&quot;
+                value={searchQuery}
+                onChange={(e) =&gt; setSearchQuery(e.target.value)}
+                className=&quot;pl-10&quot;
+              /&gt;
+            &lt;/div&gt;
+            &lt;select
+              value={categoryFilter}
+              onChange={(e) =&gt; setCategoryFilter(e.target.value)}
+              className=&quot;px-3 py-2 border rounded-md&quot;
+            &gt;
+              &lt;option value=&quot;all&quot;&gt;All Categories&lt;/option&gt;
+              &lt;option value=&quot;scientific_protein&quot;&gt;🧬 Protein Folding&lt;/option&gt;
+              &lt;option value=&quot;vision_detection&quot;&gt;👁️ Object Detection&lt;/option&gt;
+              &lt;option value=&quot;audio_stt&quot;&gt;🎤 Speech-to-Text&lt;/option&gt;
+              &lt;option value=&quot;medical_imaging&quot;&gt;🏥 Medical Imaging&lt;/option&gt;
+              &lt;option value=&quot;llm&quot;&gt;🤖 LLM&lt;/option&gt;
+            &lt;/select&gt;
+          &lt;/div&gt;
+
+          &lt;ModelTable 
+            models={filteredModels} 
+            isLoading={isLoading}
+            onEdit={setEditingModel}
+            onDelete={(id) =&gt; confirm(&#39;Delete model?&#39;) &amp;&amp; deleteModelMutation.mutate(id)}
+          /&gt;
+        &lt;/TabsContent&gt;
+
+        &lt;TabsContent value=&quot;licenses&quot;&gt;&lt;LicensePanel /&gt;&lt;/TabsContent&gt;
+        &lt;TabsContent value=&quot;workflows&quot;&gt;&lt;p className=&quot;text-muted-foreground&quot;&gt;Workflow management coming soon...&lt;/p&gt;&lt;/TabsContent&gt;
+      &lt;/Tabs&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<hr />
+<h2 id="api-endpoints">35.2 API ENDPOINTS</h2>
+<h3 id="packageslambdaadminorchestration.ts">packages/lambda/admin/orchestration.ts</h3>
+<pre class="typescript"><code>/**
+ * RADIANT v4.1.0 - Admin Orchestration API
+ */
+
+import { APIGatewayProxyHandler } from &#39;aws-lambda&#39;;
+import { Pool } from &#39;pg&#39;;
+import { getOrchestrationEngine } from &#39;@radiant/services/orchestration&#39;;
+import { requirePermission } from &#39;../auth/permissions&#39;;
+import { createResponse, createErrorResponse } from &#39;../utils/response&#39;;
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+export const listModels: APIGatewayProxyHandler = async (event) =&gt; {
+  try {
+    await requirePermission(event, &#39;models:read&#39;);
+    const { category, status, minTier, providerType } = event.queryStringParameters || {};
+    const engine = getOrchestrationEngine(pool);
+    const models = await engine.listModels({ category, status, minTier: minTier ? parseInt(minTier) : undefined, providerType });
+    return createResponse(200, models);
+  } catch (error: any) {
+    return createErrorResponse(error);
+  }
+};
+
+export const getModel: APIGatewayProxyHandler = async (event) =&gt; {
+  try {
+    await requirePermission(event, &#39;models:read&#39;);
+    const modelId = event.pathParameters?.modelId;
+    if (!modelId) return createResponse(400, { error: &#39;Model ID required&#39; });
+    
+    const engine = getOrchestrationEngine(pool);
+    const model = await engine.getModelConfig(modelId);
+    if (!model) return createResponse(404, { error: &#39;Model not found&#39; });
+    return createResponse(200, model);
+  } catch (error: any) {
+    return createErrorResponse(error);
+  }
+};
+
+export const createModel: APIGatewayProxyHandler = async (event) =&gt; {
+  try {
+    const admin = await requirePermission(event, &#39;models:write&#39;);
+    const data = JSON.parse(event.body || &#39;{}&#39;);
+    const engine = getOrchestrationEngine(pool);
+    const modelUuid = await engine.createModel(data, admin.id);
+    return createResponse(201, { id: modelUuid, modelId: data.modelId, message: &#39;Model created&#39; });
+  } catch (error: any) {
+    return createErrorResponse(error);
+  }
+};
+
+export const updateModel: APIGatewayProxyHandler = async (event) =&gt; {
+  try {
+    const admin = await requirePermission(event, &#39;models:write&#39;);
+    const modelId = event.pathParameters?.modelId;
+    if (!modelId) return createResponse(400, { error: &#39;Model ID required&#39; });
+    
+    const updates = JSON.parse(event.body || &#39;{}&#39;);
+    const engine = getOrchestrationEngine(pool);
+    await engine.updateModel(modelId, updates, admin.id);
+    return createResponse(200, { success: true });
+  } catch (error: any) {
+    return createErrorResponse(error);
+  }
+};
+
+export const deleteModel: APIGatewayProxyHandler = async (event) =&gt; {
+  try {
+    const admin = await requirePermission(event, &#39;models:write&#39;);
+    const modelId = event.pathParameters?.modelId;
+    if (!modelId) return createResponse(400, { error: &#39;Model ID required&#39; });
+    
+    const engine = getOrchestrationEngine(pool);
+    await engine.deleteModel(modelId, admin.id);
+    return createResponse(200, { success: true });
+  } catch (error: any) {
+    return createErrorResponse(error);
+  }
+};
+
+export const getLicenseSummary: APIGatewayProxyHandler = async (event) =&gt; {
+  try {
+    await requirePermission(event, &#39;models:read&#39;);
+    const engine = getOrchestrationEngine(pool);
+    const summary = await engine.getLicenseSummary();
+    return createResponse(200, summary);
+  } catch (error: any) {
+    return createErrorResponse(error);
+  }
+};
+
+export const listWorkflows: APIGatewayProxyHandler = async (event) =&gt; {
+  try {
+    await requirePermission(event, &#39;workflows:read&#39;);
+    const result = await pool.query(`
+      SELECT workflow_id, name, description, category, version, min_tier
+      FROM workflow_definitions WHERE enabled = true ORDER BY category, name
+    `);
+    return createResponse(200, result.rows);
+  } catch (error: any) {
+    return createErrorResponse(error);
+  }
+};
+
+export const executeWorkflow: APIGatewayProxyHandler = async (event) =&gt; {
+  try {
+    const admin = await requirePermission(event, &#39;workflows:execute&#39;);
+    const workflowId = event.pathParameters?.workflowId;
+    if (!workflowId) return createResponse(400, { error: &#39;Workflow ID required&#39; });
+    
+    const { tenantId, userId, parameters } = JSON.parse(event.body || &#39;{}&#39;);
+    const engine = getOrchestrationEngine(pool);
+    const executionId = await engine.executeWorkflow(workflowId, tenantId, userId, parameters);
+    return createResponse(202, { executionId, status: &#39;started&#39; });
+  } catch (error: any) {
+    return createErrorResponse(error);
+  }
+};</code></pre>
+<hr />
+<h2 id="verification-commands">35.3 VERIFICATION COMMANDS</h2>
+<pre class="bash"><code># Apply orchestration migration
+psql $DATABASE_URL -f packages/database/migrations/034_orchestration_engine.sql
+
+# Apply AlphaFold 2 seed data
+psql $DATABASE_URL -f packages/database/migrations/034a_seed_alphafold2.sql
+
+# Verify AlphaFold 2 is in registry
+psql $DATABASE_URL -c &quot;SELECT model_id, display_name, status FROM ai_models WHERE model_id = &#39;alphafold2&#39;&quot;
+
+# Verify licenses
+psql $DATABASE_URL -c &quot;SELECT m.display_name, l.license_spdx, l.commercial_use FROM model_licenses l JOIN ai_models m ON l.model_id = m.id WHERE m.model_id = &#39;alphafold2&#39;&quot;
+
+# Test get_model_config function
+psql $DATABASE_URL -c &quot;SELECT get_model_config(&#39;alphafold2&#39;)&quot; | head -50
+
+# Test get_workflow_config function
+psql $DATABASE_URL -c &quot;SELECT get_workflow_config(&#39;protein_folding_alphafold2&#39;)&quot; | head -50
+
+# Verify audit log is recording
+psql $DATABASE_URL -c &quot;SELECT entity_type, action, change_summary, created_at FROM orchestration_audit_log ORDER BY created_at DESC LIMIT 5&quot;</code></pre>
+<hr />
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h1 id="section-2">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

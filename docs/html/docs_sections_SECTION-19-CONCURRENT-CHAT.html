@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 19 CONCURRENT CHAT - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 19 CONCURRENT CHAT</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-19-CONCURRENT-CHAT.md</div>
+  </div>
+  
+  <h1 id="section-19-concurrent-chat-split-pane-ui-v3.6.0">SECTION 19: CONCURRENT CHAT &amp; SPLIT-PANE UI (v3.6.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="concurrent-chat-overview">19.1 Concurrent Chat Overview</h2>
+<p>Industry-first feature allowing users to run multiple AI conversations simultaneously with split-pane interface.</p>
+<h2 id="concurrent-chat-database-schema">19.2 Concurrent Chat Database Schema</h2>
+<pre class="sql"><code>-- migrations/028_concurrent_chat.sql
+
+CREATE TABLE concurrent_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    session_name VARCHAR(100),
+    layout_config JSONB NOT NULL DEFAULT &#39;{&quot;type&quot;: &quot;horizontal&quot;, &quot;panes&quot;: []}&#39;,
+    max_panes INTEGER DEFAULT 4,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE concurrent_panes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id UUID NOT NULL REFERENCES concurrent_sessions(id) ON DELETE CASCADE,
+    pane_index INTEGER NOT NULL,
+    chat_id UUID REFERENCES chats(id),
+    model VARCHAR(100),
+    status VARCHAR(20) DEFAULT &#39;idle&#39;,
+    last_activity TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(session_id, pane_index)
+);
+
+CREATE TABLE concurrent_sync_state (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id UUID NOT NULL REFERENCES concurrent_sessions(id) ON DELETE CASCADE,
+    sync_mode VARCHAR(20) NOT NULL DEFAULT &#39;independent&#39;,
+    shared_context TEXT,
+    sync_cursor INTEGER DEFAULT 0,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_concurrent_sessions_user ON concurrent_sessions(tenant_id, user_id);
+CREATE INDEX idx_concurrent_panes_session ON concurrent_panes(session_id);
+
+ALTER TABLE concurrent_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE concurrent_panes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE concurrent_sync_state ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY concurrent_sessions_isolation ON concurrent_sessions USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY concurrent_panes_isolation ON concurrent_panes USING (
+    session_id IN (SELECT id FROM concurrent_sessions WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID)
+);
+CREATE POLICY concurrent_sync_isolation ON concurrent_sync_state USING (
+    session_id IN (SELECT id FROM concurrent_sessions WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID)
+);</code></pre>
+<h2 id="concurrent-session-manager">19.3 Concurrent Session Manager</h2>
+<pre class="typescript"><code>// packages/core/src/services/concurrent-session-manager.ts
+
+import { Pool } from &#39;pg&#39;;
+
+interface LayoutConfig {
+    type: &#39;horizontal&#39; | &#39;vertical&#39; | &#39;grid&#39;;
+    panes: PaneConfig[];
+}
+
+interface PaneConfig {
+    id: string;
+    size: number;
+    model?: string;
+    chatId?: string;
+}
+
+export class ConcurrentSessionManager {
+    private pool: Pool;
+    
+    constructor(pool: Pool) {
+        this.pool = pool;
+    }
+    
+    async createSession(
+        tenantId: string,
+        userId: string,
+        name?: string,
+        initialPanes: number = 2
+    ): Promise&lt;string&gt; {
+        const layout: LayoutConfig = {
+            type: &#39;horizontal&#39;,
+            panes: Array(initialPanes).fill(null).map((_, i) =&gt; ({
+                id: `pane-${i}`,
+                size: 100 / initialPanes
+            }))
+        };
+        
+        const result = await this.pool.query(`
+            INSERT INTO concurrent_sessions (tenant_id, user_id, session_name, layout_config)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id
+        `, [tenantId, userId, name, JSON.stringify(layout)]);
+        
+        const sessionId = result.rows[0].id;
+        
+        // Create pane records
+        for (let i = 0; i &lt; initialPanes; i++) {
+            await this.pool.query(`
+                INSERT INTO concurrent_panes (session_id, pane_index)
+                VALUES ($1, $2)
+            `, [sessionId, i]);
+        }
+        
+        // Create sync state
+        await this.pool.query(`
+            INSERT INTO concurrent_sync_state (session_id)
+            VALUES ($1)
+        `, [sessionId]);
+        
+        return sessionId;
+    }
+    
+    async addPane(sessionId: string, model?: string): Promise&lt;number&gt; {
+        const session = await this.getSession(sessionId);
+        if (session.layout_config.panes.length &gt;= session.max_panes) {
+            throw new Error(&#39;Maximum panes reached&#39;);
+        }
+        
+        const newIndex = session.layout_config.panes.length;
+        
+        await this.pool.query(`
+            INSERT INTO concurrent_panes (session_id, pane_index, model)
+            VALUES ($1, $2, $3)
+        `, [sessionId, newIndex, model]);
+        
+        // Update layout
+        const newLayout = {
+            ...session.layout_config,
+            panes: [...session.layout_config.panes, { id: `pane-${newIndex}`, size: 100 / (newIndex + 1) }]
+        };
+        
+        // Rebalance sizes
+        const equalSize = 100 / newLayout.panes.length;
+        newLayout.panes = newLayout.panes.map(p =&gt; ({ ...p, size: equalSize }));
+        
+        await this.pool.query(`
+            UPDATE concurrent_sessions SET layout_config = $2, updated_at = NOW() WHERE id = $1
+        `, [sessionId, JSON.stringify(newLayout)]);
+        
+        return newIndex;
+    }
+    
+    async removePane(sessionId: string, paneIndex: number): Promise&lt;void&gt; {
+        await this.pool.query(`DELETE FROM concurrent_panes WHERE session_id = $1 AND pane_index = $2`, [sessionId, paneIndex]);
+        
+        // Reindex remaining panes
+        await this.pool.query(`
+            UPDATE concurrent_panes
+            SET pane_index = pane_index - 1
+            WHERE session_id = $1 AND pane_index &gt; $2
+        `, [sessionId, paneIndex]);
+        
+        // Update layout
+        const session = await this.getSession(sessionId);
+        const newPanes = session.layout_config.panes.filter((_, i) =&gt; i !== paneIndex);
+        const equalSize = 100 / newPanes.length;
+        
+        await this.pool.query(`
+            UPDATE concurrent_sessions
+            SET layout_config = $2, updated_at = NOW()
+            WHERE id = $1
+        `, [sessionId, JSON.stringify({ ...session.layout_config, panes: newPanes.map(p =&gt; ({ ...p, size: equalSize })) })]);
+    }
+    
+    async updatePaneModel(sessionId: string, paneIndex: number, model: string): Promise&lt;void&gt; {
+        await this.pool.query(`
+            UPDATE concurrent_panes SET model = $3 WHERE session_id = $1 AND pane_index = $2
+        `, [sessionId, paneIndex, model]);
+    }
+    
+    async setSyncMode(sessionId: string, mode: &#39;independent&#39; | &#39;synchronized&#39; | &#39;broadcast&#39;): Promise&lt;void&gt; {
+        await this.pool.query(`
+            UPDATE concurrent_sync_state SET sync_mode = $2, updated_at = NOW() WHERE session_id = $1
+        `, [sessionId, mode]);
+    }
+    
+    async getSession(sessionId: string) {
+        const result = await this.pool.query(`SELECT * FROM concurrent_sessions WHERE id = $1`, [sessionId]);
+        return result.rows[0];
+    }
+    
+    async getPanes(sessionId: string) {
+        const result = await this.pool.query(`
+            SELECT * FROM concurrent_panes WHERE session_id = $1 ORDER BY pane_index
+        `, [sessionId]);
+        return result.rows;
+    }
+}</code></pre>
+<h2 id="split-pane-react-component">19.4 Split-Pane React Component</h2>
+<pre class="tsx"><code>// apps/admin-dashboard/src/components/concurrent/SplitPane.tsx
+
+&#39;use client&#39;;
+
+import React, { useState, useCallback, useRef } from &#39;react&#39;;
+import { useQuery, useMutation, useQueryClient } from &#39;@tanstack/react-query&#39;;
+import { Card, CardContent, CardHeader, CardTitle } from &#39;@/components/ui/card&#39;;
+import { Button } from &#39;@/components/ui/button&#39;;
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from &#39;@/components/ui/select&#39;;
+import { Plus, X, ArrowLeftRight, ArrowUpDown, Grid } from &#39;lucide-react&#39;;
+
+interface Pane {
+    id: string;
+    paneIndex: number;
+    chatId?: string;
+    model?: string;
+    status: string;
+}
+
+interface SplitPaneProps {
+    sessionId: string;
+    onSendMessage: (paneIndex: number, message: string) =&gt; void;
+}
+
+export function SplitPane({ sessionId, onSendMessage }: SplitPaneProps) {
+    const queryClient = useQueryClient();
+    const [layout, setLayout] = useState&lt;&#39;horizontal&#39; | &#39;vertical&#39; | &#39;grid&#39;&gt;(&#39;horizontal&#39;);
+    const [sizes, setSizes] = useState&lt;number[]&gt;([]);
+    const containerRef = useRef&lt;HTMLDivElement&gt;(null);
+    
+    const { data: session } = useQuery({
+        queryKey: [&#39;concurrent-session&#39;, sessionId],
+        queryFn: async () =&gt; {
+            const res = await fetch(`/api/admin/concurrent/${sessionId}`);
+            return res.json();
+        }
+    });
+    
+    const { data: panes = [] } = useQuery({
+        queryKey: [&#39;concurrent-panes&#39;, sessionId],
+        queryFn: async () =&gt; {
+            const res = await fetch(`/api/admin/concurrent/${sessionId}/panes`);
+            return res.json();
+        }
+    });
+    
+    const addPaneMutation = useMutation({
+        mutationFn: async () =&gt; {
+            const res = await fetch(`/api/admin/concurrent/${sessionId}/panes`, { method: &#39;POST&#39; });
+            return res.json();
+        },
+        onSuccess: () =&gt; queryClient.invalidateQueries({ queryKey: [&#39;concurrent-panes&#39;, sessionId] })
+    });
+    
+    const removePaneMutation = useMutation({
+        mutationFn: async (paneIndex: number) =&gt; {
+            await fetch(`/api/admin/concurrent/${sessionId}/panes/${paneIndex}`, { method: &#39;DELETE&#39; });
+        },
+        onSuccess: () =&gt; queryClient.invalidateQueries({ queryKey: [&#39;concurrent-panes&#39;, sessionId] })
+    });
+    
+    const updateModelMutation = useMutation({
+        mutationFn: async ({ paneIndex, model }: { paneIndex: number; model: string }) =&gt; {
+            await fetch(`/api/admin/concurrent/${sessionId}/panes/${paneIndex}`, {
+                method: &#39;PATCH&#39;,
+                headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+                body: JSON.stringify({ model })
+            });
+        },
+        onSuccess: () =&gt; queryClient.invalidateQueries({ queryKey: [&#39;concurrent-panes&#39;, sessionId] })
+    });
+    
+    const handleResize = useCallback((index: number, delta: number) =&gt; {
+        setSizes(prev =&gt; {
+            const newSizes = [...prev];
+            newSizes[index] = Math.max(10, Math.min(90, newSizes[index] + delta));
+            newSizes[index + 1] = Math.max(10, Math.min(90, newSizes[index + 1] - delta));
+            return newSizes;
+        });
+    }, []);
+    
+    const getLayoutClasses = () =&gt; {
+        switch (layout) {
+            case &#39;vertical&#39;: return &#39;flex-col&#39;;
+            case &#39;grid&#39;: return &#39;grid grid-cols-2&#39;;
+            default: return &#39;flex-row&#39;;
+        }
+    };
+    
+    return (
+        &lt;div className=&quot;h-full flex flex-col&quot;&gt;
+            {/* Toolbar */}
+            &lt;div className=&quot;flex items-center justify-between p-2 border-b bg-gray-50&quot;&gt;
+                &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+                    &lt;Button
+                        variant={layout === &#39;horizontal&#39; ? &#39;default&#39; : &#39;outline&#39;}
+                        size=&quot;sm&quot;
+                        onClick={() =&gt; setLayout(&#39;horizontal&#39;)}
+                    &gt;
+                        &lt;ArrowLeftRight className=&quot;h-4 w-4&quot; /&gt;
+                    &lt;/Button&gt;
+                    &lt;Button
+                        variant={layout === &#39;vertical&#39; ? &#39;default&#39; : &#39;outline&#39;}
+                        size=&quot;sm&quot;
+                        onClick={() =&gt; setLayout(&#39;vertical&#39;)}
+                    &gt;
+                        &lt;ArrowUpDown className=&quot;h-4 w-4&quot; /&gt;
+                    &lt;/Button&gt;
+                    &lt;Button
+                        variant={layout === &#39;grid&#39; ? &#39;default&#39; : &#39;outline&#39;}
+                        size=&quot;sm&quot;
+                        onClick={() =&gt; setLayout(&#39;grid&#39;)}
+                    &gt;
+                        &lt;Grid className=&quot;h-4 w-4&quot; /&gt;
+                    &lt;/Button&gt;
+                &lt;/div&gt;
+                
+                &lt;Button
+                    size=&quot;sm&quot;
+                    onClick={() =&gt; addPaneMutation.mutate()}
+                    disabled={panes.length &gt;= 4}
+                &gt;
+                    &lt;Plus className=&quot;h-4 w-4 mr-1&quot; /&gt; Add Pane
+                &lt;/Button&gt;
+            &lt;/div&gt;
+            
+            {/* Panes Container */}
+            &lt;div ref={containerRef} className={`flex-1 flex ${getLayoutClasses()} gap-1 p-1`}&gt;
+                {panes.map((pane: Pane, index: number) =&gt; (
+                    &lt;React.Fragment key={pane.id}&gt;
+                        &lt;div 
+                            className=&quot;flex-1 min-w-0 border rounded-lg overflow-hidden&quot;
+                            style={{ flex: sizes[index] ? `0 0 ${sizes[index]}%` : 1 }}
+                        &gt;
+                            &lt;PaneContent
+                                pane={pane}
+                                onRemove={() =&gt; removePaneMutation.mutate(pane.paneIndex)}
+                                onModelChange={(model) =&gt; updateModelMutation.mutate({ paneIndex: pane.paneIndex, model })}
+                                onSendMessage={(message) =&gt; onSendMessage(pane.paneIndex, message)}
+                                canRemove={panes.length &gt; 1}
+                            /&gt;
+                        &lt;/div&gt;
+                        {index &lt; panes.length - 1 &amp;&amp; layout !== &#39;grid&#39; &amp;&amp; (
+                            &lt;div
+                                className={`${layout === &#39;horizontal&#39; ? &#39;w-1 cursor-col-resize&#39; : &#39;h-1 cursor-row-resize&#39;} bg-gray-300 hover:bg-blue-500`}
+                                onMouseDown={(e) =&gt; {
+                                    const startPos = layout === &#39;horizontal&#39; ? e.clientX : e.clientY;
+                                    const onMouseMove = (moveEvent: MouseEvent) =&gt; {
+                                        const currentPos = layout === &#39;horizontal&#39; ? moveEvent.clientX : moveEvent.clientY;
+                                        handleResize(index, (currentPos - startPos) / 5);
+                                    };
+                                    const onMouseUp = () =&gt; {
+                                        document.removeEventListener(&#39;mousemove&#39;, onMouseMove);
+                                        document.removeEventListener(&#39;mouseup&#39;, onMouseUp);
+                                    };
+                                    document.addEventListener(&#39;mousemove&#39;, onMouseMove);
+                                    document.addEventListener(&#39;mouseup&#39;, onMouseUp);
+                                }}
+                            /&gt;
+                        )}
+                    &lt;/React.Fragment&gt;
+                ))}
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}
+
+interface PaneContentProps {
+    pane: Pane;
+    onRemove: () =&gt; void;
+    onModelChange: (model: string) =&gt; void;
+    onSendMessage: (message: string) =&gt; void;
+    canRemove: boolean;
+}
+
+function PaneContent({ pane, onRemove, onModelChange, onSendMessage, canRemove }: PaneContentProps) {
+    const [input, setInput] = useState(&#39;&#39;);
+    
+    const models = [
+        { id: &#39;claude-opus-4&#39;, name: &#39;Claude Opus 4&#39; },
+        { id: &#39;claude-sonnet-4&#39;, name: &#39;Claude Sonnet 4&#39; },
+        { id: &#39;gpt-4o&#39;, name: &#39;GPT-4o&#39; },
+        { id: &#39;grok-4&#39;, name: &#39;Grok 4&#39; },
+        { id: &#39;gemini-2&#39;, name: &#39;Gemini 2&#39; }
+    ];
+    
+    return (
+        &lt;div className=&quot;h-full flex flex-col&quot;&gt;
+            {/* Pane Header */}
+            &lt;div className=&quot;flex items-center justify-between p-2 border-b bg-white&quot;&gt;
+                &lt;Select value={pane.model || &#39;&#39;} onValueChange={onModelChange}&gt;
+                    &lt;SelectTrigger className=&quot;w-40&quot;&gt;
+                        &lt;SelectValue placeholder=&quot;Select model&quot; /&gt;
+                    &lt;/SelectTrigger&gt;
+                    &lt;SelectContent&gt;
+                        {models.map(m =&gt; (
+                            &lt;SelectItem key={m.id} value={m.id}&gt;{m.name}&lt;/SelectItem&gt;
+                        ))}
+                    &lt;/SelectContent&gt;
+                &lt;/Select&gt;
+                
+                {canRemove &amp;&amp; (
+                    &lt;Button variant=&quot;ghost&quot; size=&quot;sm&quot; onClick={onRemove}&gt;
+                        &lt;X className=&quot;h-4 w-4&quot; /&gt;
+                    &lt;/Button&gt;
+                )}
+            &lt;/div&gt;
+            
+            {/* Chat Area */}
+            &lt;div className=&quot;flex-1 overflow-auto p-4 bg-gray-50&quot;&gt;
+                {/* Messages would render here */}
+                &lt;div className=&quot;text-gray-500 text-center&quot;&gt;
+                    {pane.model ? `Ready to chat with ${pane.model}` : &#39;Select a model to start&#39;}
+                &lt;/div&gt;
+            &lt;/div&gt;
+            
+            {/* Input */}
+            &lt;div className=&quot;p-2 border-t bg-white&quot;&gt;
+                &lt;div className=&quot;flex gap-2&quot;&gt;
+                    &lt;input
+                        type=&quot;text&quot;
+                        value={input}
+                        onChange={(e) =&gt; setInput(e.target.value)}
+                        placeholder=&quot;Type a message...&quot;
+                        className=&quot;flex-1 px-3 py-2 border rounded-lg&quot;
+                        onKeyDown={(e) =&gt; {
+                            if (e.key === &#39;Enter&#39; &amp;&amp; input.trim()) {
+                                onSendMessage(input);
+                                setInput(&#39;&#39;);
+                            }
+                        }}
+                    /&gt;
+                    &lt;Button
+                        onClick={() =&gt; {
+                            if (input.trim()) {
+                                onSendMessage(input);
+                                setInput(&#39;&#39;);
+                            }
+                        }}
+                    &gt;
+                        Send
+                    &lt;/Button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

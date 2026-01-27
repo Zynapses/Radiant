@@ -12,6 +12,7 @@
  */
 
 import { executeStatement, stringParam, doubleParam } from '../../db/client';
+import { enhancedLogger as logger } from '../../logging/enhanced-logger';
 import { CatoSafetyPipeline } from './safety-pipeline.service';
 import { precisionGovernorService } from './precision-governor.service';
 import { controlBarrierService } from './control-barrier.service';
@@ -39,7 +40,7 @@ const query = async (sql: string, params?: unknown[]): Promise<{ rows: any[] }> 
     const result = await executeStatement(transformedSql, namedParams);
     return { rows: result.rows as any[] };
   } catch (error) {
-    console.error('Neural decision query error:', error);
+    logger.error('Neural decision query error', { error });
     return { rows: [] };
   }
 };
@@ -51,12 +52,12 @@ function getHitlIntegrationService(): CatoHitlIntegration {
   if (!hitlIntegrationService) {
     const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
     const db = new Client({ connectionString: process.env.DATABASE_URL });
-    const logger = {
-      info: (msg: string, meta?: Record<string, unknown>) => console.log(`[INFO] ${msg}`, meta),
-      warn: (msg: string, meta?: Record<string, unknown>) => console.warn(`[WARN] ${msg}`, meta),
-      error: (msg: string, meta?: Record<string, unknown>) => console.error(`[ERROR] ${msg}`, meta),
+    const hitlLogger = {
+      info: (msg: string, meta?: Record<string, unknown>) => logger.info(msg, meta),
+      warn: (msg: string, meta?: Record<string, unknown>) => logger.warn(msg, meta),
+      error: (msg: string, meta?: Record<string, unknown>) => logger.error(msg, meta),
     };
-    hitlIntegrationService = createCatoHitlIntegration(redis, db, logger);
+    hitlIntegrationService = createCatoHitlIntegration(redis, db, hitlLogger);
   }
   return hitlIntegrationService;
 }

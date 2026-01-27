@@ -574,8 +574,13 @@ Identity Anchor: ${this.selfModel.identityAnchor}`;
   async computePhi(evidence: Array<{ source: string; content: unknown }>): Promise<PhiResult> {
     const startTime = Date.now();
     
-    // Simplified phi calculation based on evidence integration
-    // Full IIT computation would use the pyphi package
+    // Approximation of IIT 4.0 Phi calculation for JavaScript runtime
+    // Full IIT computation requires pyphi (Python) which calculates the minimum
+    // information partition. This approximation uses proxy metrics:
+    // - Integration: Number of contributing sources
+    // - Density: Amount of evidence per source  
+    // - Cross-references: Semantic overlap between sources
+    // For research-grade IIT, integrate via Python Lambda or SageMaker endpoint
     
     const uniqueSources = new Set(evidence.map(e => e.source));
     const sourceCount = uniqueSources.size;

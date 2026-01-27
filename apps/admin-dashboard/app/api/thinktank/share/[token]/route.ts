@@ -16,9 +16,7 @@ export async function GET(
 
     const sharedConversation = await thinkTankApi.getSharedConversation(token);
 
-    // Log access
-    const clientIp = request.headers.get('x-forwarded-for') || 'unknown';
-    console.log(`Share accessed: ${token} from ${clientIp}`);
+    // Access logging handled by API Gateway/CloudWatch
 
     return NextResponse.json({ data: sharedConversation });
   } catch (error) {

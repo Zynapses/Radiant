@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>oauth guide - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>oauth guide</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/authentication/oauth-guide.md</div>
+  </div>
+  
+  <h1 id="oauth-2.0-developer-guide">OAuth 2.0 Developer Guide</h1>
+<blockquote>
+<p><strong>Version</strong>: 5.52.29 | <strong>Last Updated</strong>: January 25, 2026 | <strong>Audience</strong>: Developers</p>
+</blockquote>
+<p>This guide covers building third-party applications that integrate with RADIANT using OAuth 2.0, including authorization flows, scopes, token management, and best practices.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#registering-your-application">Registering Your Application</a></li>
+<li><a href="#authorization-code-flow">Authorization Code Flow</a></li>
+<li><a href="#token-management">Token Management</a></li>
+<li><a href="#scopes-and-permissions">Scopes and Permissions</a></li>
+<li><a href="#api-requests">API Requests</a></li>
+<li><a href="#consent-screens">Consent Screens</a></li>
+<li><a href="#error-handling">Error Handling</a></li>
+<li><a href="#security-best-practices">Security Best Practices</a></li>
+<li><a href="#testing">Testing</a></li>
+</ol>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>RADIANT implements OAuth 2.0 to allow third-party applications to access user data with their consent.</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User
+    participant YourApp as Your App
+    participant RADIANT
+    
+    User-&gt;&gt;YourApp: Click &quot;Connect to RADIANT&quot;
+    YourApp-&gt;&gt;RADIANT: Redirect to authorization
+    RADIANT-&gt;&gt;User: Show consent screen
+    User-&gt;&gt;RADIANT: Grant permission
+    RADIANT-&gt;&gt;YourApp: Authorization code
+    YourApp-&gt;&gt;RADIANT: Exchange code for tokens
+    RADIANT-&gt;&gt;YourApp: Access + refresh tokens
+    YourApp-&gt;&gt;RADIANT: API requests with access token
+    RADIANT-&gt;&gt;YourApp: Protected resources</code></pre>
+<h3 id="supported-flows">Supported Flows</h3>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 34%" />
+<col style="width: 44%" />
+</colgroup>
+<thead>
+<tr>
+<th>Flow</th>
+<th>Use Case</th>
+<th>Client Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Authorization Code + PKCE</strong></td>
+<td>Web apps, mobile apps, SPAs</td>
+<td>Public &amp; Confidential</td>
+</tr>
+<tr>
+<td><strong>Client Credentials</strong></td>
+<td>Server-to-server (M2M)</td>
+<td>Confidential only</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note</strong>: Implicit flow is not supported due to security concerns.</p>
+</blockquote>
+<hr />
+<h2 id="registering-your-application">Registering Your Application</h2>
+<h3 id="for-developertesting">For Developer/Testing</h3>
+<ol type="1">
+<li>Sign in to your RADIANT account (must be a tenant admin)</li>
+<li>Navigate to <strong>Admin</strong> → <strong>Integrations</strong> → <strong>OAuth Applications</strong></li>
+<li>Click <strong>Create Application</strong></li>
+<li>Enter application details:</li>
+</ol>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 44%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Name</strong></td>
+<td>Displayed to users</td>
+<td>“My Awesome App”</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>What your app does</td>
+<td>“Sync your sessions with…”</td>
+</tr>
+<tr>
+<td><strong>Website URL</strong></td>
+<td>Your app’s homepage</td>
+<td><code>https://myapp.com</code></td>
+</tr>
+<tr>
+<td><strong>Redirect URIs</strong></td>
+<td>Where to return after auth</td>
+<td><code>https://myapp.com/callback</code></td>
+</tr>
+<tr>
+<td><strong>Logo</strong></td>
+<td>256x256 PNG/SVG</td>
+<td>Upload file</td>
+</tr>
+</tbody>
+</table>
+<ol start="5" type="1">
+<li>Click <strong>Create</strong></li>
+<li><strong>Save your credentials</strong>:
+<ul>
+<li><strong>Client ID</strong>: Public identifier</li>
+<li><strong>Client Secret</strong>: Keep this secret! (shown only once)</li>
+</ul></li>
+</ol>
+<h3 id="for-productionplatform-wide">For Production/Platform-Wide</h3>
+<p>Contact RADIANT to register a verified application that can be used across all tenants.</p>
+<hr />
+<h2 id="authorization-code-flow">Authorization Code Flow</h2>
+<p>The recommended flow for most applications.</p>
+<h3 id="step-1-redirect-to-authorization">Step 1: Redirect to Authorization</h3>
+<p>Redirect the user to RADIANT’s authorization endpoint:</p>
+<pre><code>GET https://{radiant-domain}/oauth/authorize</code></pre>
+<p><strong>Query Parameters:</strong></p>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 29%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>client_id</code></td>
+<td>Yes</td>
+<td>Your application’s client ID</td>
+</tr>
+<tr>
+<td><code>redirect_uri</code></td>
+<td>Yes</td>
+<td>Must exactly match a registered URI</td>
+</tr>
+<tr>
+<td><code>response_type</code></td>
+<td>Yes</td>
+<td>Always <code>code</code></td>
+</tr>
+<tr>
+<td><code>scope</code></td>
+<td>Yes</td>
+<td>Space-separated list of scopes</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>Yes</td>
+<td>Random string for CSRF protection</td>
+</tr>
+<tr>
+<td><code>code_challenge</code></td>
+<td>Yes*</td>
+<td>PKCE challenge (required for public clients)</td>
+</tr>
+<tr>
+<td><code>code_challenge_method</code></td>
+<td>Yes*</td>
+<td>Always <code>S256</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong></p>
+<pre class="javascript"><code>// Generate PKCE verifier and challenge
+const codeVerifier = generateRandomString(64);
+const codeChallenge = base64URLEncode(sha256(codeVerifier));
+
+// Build authorization URL
+const authUrl = new URL(&#39;https://app.radiant.ai/oauth/authorize&#39;);
+authUrl.searchParams.set(&#39;client_id&#39;, &#39;your-client-id&#39;);
+authUrl.searchParams.set(&#39;redirect_uri&#39;, &#39;https://myapp.com/callback&#39;);
+authUrl.searchParams.set(&#39;response_type&#39;, &#39;code&#39;);
+authUrl.searchParams.set(&#39;scope&#39;, &#39;openid profile read:sessions&#39;);
+authUrl.searchParams.set(&#39;state&#39;, generateRandomString(32));
+authUrl.searchParams.set(&#39;code_challenge&#39;, codeChallenge);
+authUrl.searchParams.set(&#39;code_challenge_method&#39;, &#39;S256&#39;);
+
+// Store verifier and state for later
+sessionStorage.setItem(&#39;pkce_verifier&#39;, codeVerifier);
+sessionStorage.setItem(&#39;oauth_state&#39;, state);
+
+// Redirect user
+window.location.href = authUrl.toString();</code></pre>
+<h3 id="step-2-user-grants-permission">Step 2: User Grants Permission</h3>
+<p>RADIANT displays a consent screen showing: - Your application’s name and logo - Requested permissions (scopes) - The user’s identity</p>
+<p>The user can <strong>Allow</strong> or <strong>Deny</strong> the request.</p>
+<h3 id="step-3-receive-authorization-code">Step 3: Receive Authorization Code</h3>
+<p>After the user grants permission, RADIANT redirects back to your <code>redirect_uri</code>:</p>
+<pre><code>https://myapp.com/callback?code=AUTH_CODE&amp;state=YOUR_STATE</code></pre>
+<p><strong>Verify the state parameter matches what you sent!</strong></p>
+<h3 id="step-4-exchange-code-for-tokens">Step 4: Exchange Code for Tokens</h3>
+<pre><code>POST https://{radiant-domain}/oauth/token
+Content-Type: application/x-www-form-urlencoded</code></pre>
+<p><strong>Body Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>grant_type</code></td>
+<td>Yes</td>
+<td><code>authorization_code</code></td>
+</tr>
+<tr>
+<td><code>code</code></td>
+<td>Yes</td>
+<td>The authorization code received</td>
+</tr>
+<tr>
+<td><code>redirect_uri</code></td>
+<td>Yes</td>
+<td>Same URI used in authorization</td>
+</tr>
+<tr>
+<td><code>client_id</code></td>
+<td>Yes</td>
+<td>Your client ID</td>
+</tr>
+<tr>
+<td><code>client_secret</code></td>
+<td>Conditional</td>
+<td>Required for confidential clients</td>
+</tr>
+<tr>
+<td><code>code_verifier</code></td>
+<td>Conditional</td>
+<td>Required if PKCE was used</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example (Node.js):</strong></p>
+<pre class="javascript"><code>const response = await fetch(&#39;https://app.radiant.ai/oauth/token&#39;, {
+  method: &#39;POST&#39;,
+  headers: {
+    &#39;Content-Type&#39;: &#39;application/x-www-form-urlencoded&#39;,
+  },
+  body: new URLSearchParams({
+    grant_type: &#39;authorization_code&#39;,
+    code: authorizationCode,
+    redirect_uri: &#39;https://myapp.com/callback&#39;,
+    client_id: &#39;your-client-id&#39;,
+    code_verifier: storedCodeVerifier, // From Step 1
+  }),
+});
+
+const tokens = await response.json();</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;access_token&quot;: &quot;eyJhbGciOiJSUzI1NiIs...&quot;,
+  &quot;token_type&quot;: &quot;Bearer&quot;,
+  &quot;expires_in&quot;: 3600,
+  &quot;refresh_token&quot;: &quot;dGhpcyBpcyBhIHJlZnJlc2g...&quot;,
+  &quot;scope&quot;: &quot;openid profile read:sessions&quot;,
+  &quot;id_token&quot;: &quot;eyJhbGciOiJSUzI1NiIs...&quot;
+}</code></pre>
+<hr />
+<h2 id="token-management">Token Management</h2>
+<h3 id="access-tokens">Access Tokens</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td>JWT</td>
+</tr>
+<tr>
+<td><strong>Lifetime</strong></td>
+<td>1 hour (3600 seconds)</td>
+</tr>
+<tr>
+<td><strong>Use</strong></td>
+<td>Authorization header for API requests</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Using the access token:</strong></p>
+<pre class="javascript"><code>const response = await fetch(&#39;https://api.radiant.ai/v1/sessions&#39;, {
+  headers: {
+    &#39;Authorization&#39;: `Bearer ${accessToken}`,
+  },
+});</code></pre>
+<h3 id="refresh-tokens">Refresh Tokens</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td>Opaque string</td>
+</tr>
+<tr>
+<td><strong>Lifetime</strong></td>
+<td>30 days (configurable)</td>
+</tr>
+<tr>
+<td><strong>Use</strong></td>
+<td>Obtain new access tokens</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Refreshing tokens:</strong></p>
+<pre><code>POST https://{radiant-domain}/oauth/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token
+&amp;refresh_token=YOUR_REFRESH_TOKEN
+&amp;client_id=YOUR_CLIENT_ID
+&amp;client_secret=YOUR_CLIENT_SECRET</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;access_token&quot;: &quot;new_access_token...&quot;,
+  &quot;token_type&quot;: &quot;Bearer&quot;,
+  &quot;expires_in&quot;: 3600,
+  &quot;refresh_token&quot;: &quot;new_or_same_refresh_token...&quot;
+}</code></pre>
+<h3 id="token-revocation">Token Revocation</h3>
+<p>Revoke tokens when users disconnect your app:</p>
+<pre><code>POST https://{radiant-domain}/oauth/revoke
+Content-Type: application/x-www-form-urlencoded
+
+token=TOKEN_TO_REVOKE
+&amp;token_type_hint=refresh_token
+&amp;client_id=YOUR_CLIENT_ID
+&amp;client_secret=YOUR_CLIENT_SECRET</code></pre>
+<hr />
+<h2 id="scopes-and-permissions">Scopes and Permissions</h2>
+<p>Request only the scopes your application needs.</p>
+<h3 id="available-scopes">Available Scopes</h3>
+<table>
+<thead>
+<tr>
+<th>Scope</th>
+<th>Access</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>openid</code></td>
+<td>Identity</td>
+<td>Required for OIDC, returns ID token</td>
+</tr>
+<tr>
+<td><code>profile</code></td>
+<td>Identity</td>
+<td>User’s name and avatar</td>
+</tr>
+<tr>
+<td><code>email</code></td>
+<td>Identity</td>
+<td>User’s email address</td>
+</tr>
+<tr>
+<td><code>read:sessions</code></td>
+<td>Sessions</td>
+<td>List and view Think Tank sessions</td>
+</tr>
+<tr>
+<td><code>write:sessions</code></td>
+<td>Sessions</td>
+<td>Create and modify sessions</td>
+</tr>
+<tr>
+<td><code>read:files</code></td>
+<td>Files</td>
+<td>Access uploaded files</td>
+</tr>
+<tr>
+<td><code>write:files</code></td>
+<td>Files</td>
+<td>Upload and delete files</td>
+</tr>
+<tr>
+<td><code>read:artifacts</code></td>
+<td>Artifacts</td>
+<td>View generated artifacts</td>
+</tr>
+<tr>
+<td><code>write:artifacts</code></td>
+<td>Artifacts</td>
+<td>Create and modify artifacts</td>
+</tr>
+<tr>
+<td><code>offline_access</code></td>
+<td>Tokens</td>
+<td>Receive refresh tokens</td>
+</tr>
+</tbody>
+</table>
+<h3 id="scope-combinations">Scope Combinations</h3>
+<p><strong>Minimal (identity only):</strong></p>
+<pre><code>scope=openid profile email</code></pre>
+<p><strong>Read-only access:</strong></p>
+<pre><code>scope=openid profile read:sessions read:files read:artifacts</code></pre>
+<p><strong>Full access:</strong></p>
+<pre><code>scope=openid profile email read:sessions write:sessions read:files write:files read:artifacts write:artifacts offline_access</code></pre>
+<hr />
+<h2 id="api-requests">API Requests</h2>
+<h3 id="base-url">Base URL</h3>
+<pre><code>https://api.radiant.ai/v1</code></pre>
+<h3 id="authentication">Authentication</h3>
+<p>Include the access token in the <code>Authorization</code> header:</p>
+<pre class="http"><code>GET /v1/sessions HTTP/1.1
+Host: api.radiant.ai
+Authorization: Bearer eyJhbGciOiJSUzI1NiIs...</code></pre>
+<h3 id="example-requests">Example Requests</h3>
+<p><strong>Get current user:</strong></p>
+<pre class="javascript"><code>const user = await fetch(&#39;https://api.radiant.ai/v1/me&#39;, {
+  headers: { &#39;Authorization&#39;: `Bearer ${accessToken}` },
+}).then(r =&gt; r.json());
+
+// Response:
+// {
+//   &quot;id&quot;: &quot;user_abc123&quot;,
+//   &quot;email&quot;: &quot;user@example.com&quot;,
+//   &quot;name&quot;: &quot;Jane Doe&quot;,
+//   &quot;avatar_url&quot;: &quot;https://...&quot;
+// }</code></pre>
+<p><strong>List sessions:</strong></p>
+<pre class="javascript"><code>const sessions = await fetch(&#39;https://api.radiant.ai/v1/sessions&#39;, {
+  headers: { &#39;Authorization&#39;: `Bearer ${accessToken}` },
+}).then(r =&gt; r.json());
+
+// Response:
+// {
+//   &quot;data&quot;: [
+//     { &quot;id&quot;: &quot;sess_123&quot;, &quot;title&quot;: &quot;Project Planning&quot;, &quot;created_at&quot;: &quot;...&quot; },
+//     ...
+//   ],
+//   &quot;has_more&quot;: true,
+//   &quot;next_cursor&quot;: &quot;...&quot;
+// }</code></pre>
+<p>See the <a href="../api/authentication-api.md">API Reference</a> for complete endpoint documentation.</p>
+<hr />
+<h2 id="consent-screens">Consent Screens</h2>
+<h3 id="what-users-see">What Users See</h3>
+<p>The consent screen displays:</p>
+<pre><code>┌────────────────────────────────────────┐
+│                                        │
+│         [Your App Logo]                │
+│                                        │
+│    &quot;My Awesome App&quot; wants to           │
+│    access your RADIANT account         │
+│                                        │
+│    This will allow the app to:         │
+│    ✓ See your profile information      │
+│    ✓ View your Think Tank sessions     │
+│    ✓ Create new sessions               │
+│                                        │
+│    [Deny]              [Allow]         │
+│                                        │
+│    Signed in as: user@example.com      │
+│                                        │
+└────────────────────────────────────────┘</code></pre>
+<h3 id="improving-consent-experience">Improving Consent Experience</h3>
+<table>
+<thead>
+<tr>
+<th>Do</th>
+<th>Don’t</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Request minimal scopes</td>
+<td>Request all scopes “just in case”</td>
+</tr>
+<tr>
+<td>Use a clear app name</td>
+<td>Use technical/internal names</td>
+</tr>
+<tr>
+<td>Provide a recognizable logo</td>
+<td>Use a generic placeholder</td>
+</tr>
+<tr>
+<td>Explain why you need access</td>
+<td>Leave users guessing</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="error-handling">Error Handling</h2>
+<h3 id="authorization-errors">Authorization Errors</h3>
+<p>Errors during authorization redirect to your <code>redirect_uri</code> with error parameters:</p>
+<pre><code>https://myapp.com/callback?error=access_denied&amp;error_description=User%20denied%20access&amp;state=YOUR_STATE</code></pre>
+<table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>invalid_request</code></td>
+<td>Missing or invalid parameters</td>
+</tr>
+<tr>
+<td><code>unauthorized_client</code></td>
+<td>Client not allowed to use this flow</td>
+</tr>
+<tr>
+<td><code>access_denied</code></td>
+<td>User denied permission</td>
+</tr>
+<tr>
+<td><code>unsupported_response_type</code></td>
+<td>Invalid <code>response_type</code></td>
+</tr>
+<tr>
+<td><code>invalid_scope</code></td>
+<td>Unknown or invalid scopes</td>
+</tr>
+<tr>
+<td><code>server_error</code></td>
+<td>Internal error</td>
+</tr>
+</tbody>
+</table>
+<h3 id="token-errors">Token Errors</h3>
+<p>Token endpoint returns JSON errors:</p>
+<pre class="json"><code>{
+  &quot;error&quot;: &quot;invalid_grant&quot;,
+  &quot;error_description&quot;: &quot;Authorization code has expired&quot;
+}</code></pre>
+<table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>invalid_request</code></td>
+<td>Missing required parameter</td>
+</tr>
+<tr>
+<td><code>invalid_client</code></td>
+<td>Client authentication failed</td>
+</tr>
+<tr>
+<td><code>invalid_grant</code></td>
+<td>Code expired, already used, or invalid</td>
+</tr>
+<tr>
+<td><code>unauthorized_client</code></td>
+<td>Client not authorized for this grant</td>
+</tr>
+<tr>
+<td><code>unsupported_grant_type</code></td>
+<td>Invalid grant type</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-errors">API Errors</h3>
+<p>API requests return standard HTTP errors:</p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Meaning</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>401</code></td>
+<td>Token invalid or expired</td>
+<td>Refresh the token</td>
+</tr>
+<tr>
+<td><code>403</code></td>
+<td>Insufficient scope</td>
+<td>Request additional scopes</td>
+</tr>
+<tr>
+<td><code>429</code></td>
+<td>Rate limited</td>
+<td>Back off and retry</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="security-best-practices">Security Best Practices</h2>
+<h3 id="must-do">Must Do</h3>
+<table>
+<colgroup>
+<col style="width: 66%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Practice</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Always use HTTPS</strong></td>
+<td>Protect tokens in transit</td>
+</tr>
+<tr>
+<td><strong>Always use PKCE</strong></td>
+<td>Prevent code interception attacks</td>
+</tr>
+<tr>
+<td><strong>Validate state parameter</strong></td>
+<td>Prevent CSRF attacks</td>
+</tr>
+<tr>
+<td><strong>Store secrets securely</strong></td>
+<td>Never expose client secret in frontend code</td>
+</tr>
+<tr>
+<td><strong>Use short-lived tokens</strong></td>
+<td>Limit damage from token theft</td>
+</tr>
+</tbody>
+</table>
+<h3 id="token-storage">Token Storage</h3>
+<table>
+<thead>
+<tr>
+<th>Client Type</th>
+<th>Recommended Storage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Web (SPA)</strong></td>
+<td>Memory (not localStorage) or secure httpOnly cookie</td>
+</tr>
+<tr>
+<td><strong>Web (Server)</strong></td>
+<td>Server-side session or encrypted database</td>
+</tr>
+<tr>
+<td><strong>Mobile</strong></td>
+<td>Secure keychain (iOS) / Keystore (Android)</td>
+</tr>
+<tr>
+<td><strong>Desktop</strong></td>
+<td>OS credential storage</td>
+</tr>
+</tbody>
+</table>
+<h3 id="redirect-uri-security">Redirect URI Security</h3>
+<ul>
+<li>Use exact matching (no wildcards in production)</li>
+<li>Always use HTTPS (except <code>http://localhost</code> for development)</li>
+<li>Avoid open redirectors</li>
+</ul>
+<hr />
+<h2 id="testing">Testing</h2>
+<h3 id="development-redirect-uris">Development Redirect URIs</h3>
+<p>You can register <code>http://localhost:*</code> for development:</p>
+<pre><code>http://localhost:3000/callback
+http://localhost:8080/auth/callback</code></pre>
+<h3 id="test-users">Test Users</h3>
+<p>Create test users in your tenant for development:</p>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Users</strong> → <strong>Invite User</strong></li>
+<li>Invite yourself with a <code>+test</code> email alias (e.g., <code>you+test@company.com</code>)</li>
+<li>Use this account for OAuth testing</li>
+</ol>
+<h3 id="debugging-tips">Debugging Tips</h3>
+<ol type="1">
+<li><strong>Inspect tokens</strong>: Use <a href="https://jwt.io">jwt.io</a> to decode and inspect JWTs</li>
+<li><strong>Check scopes</strong>: Verify the token contains expected scopes in the <code>scope</code> claim</li>
+<li><strong>Verify signatures</strong>: Ensure tokens are signed correctly</li>
+<li><strong>Monitor logs</strong>: Check your app logs for OAuth errors</li>
+</ol>
+<h3 id="token-inspection-endpoint">Token Inspection Endpoint</h3>
+<pre><code>GET https://{radiant-domain}/oauth/tokeninfo?token=ACCESS_TOKEN</code></pre>
+<p>Response:</p>
+<pre class="json"><code>{
+  &quot;active&quot;: true,
+  &quot;client_id&quot;: &quot;your-client-id&quot;,
+  &quot;scope&quot;: &quot;openid profile read:sessions&quot;,
+  &quot;sub&quot;: &quot;user_abc123&quot;,
+  &quot;exp&quot;: 1706234567,
+  &quot;iat&quot;: 1706230967
+}</code></pre>
+<hr />
+<h2 id="code-examples">Code Examples</h2>
+<h3 id="complete-node.js-example">Complete Node.js Example</h3>
+<pre class="javascript"><code>const express = require(&#39;express&#39;);
+const crypto = require(&#39;crypto&#39;);
+
+const app = express();
+
+const CLIENT_ID = &#39;your-client-id&#39;;
+const CLIENT_SECRET = &#39;your-client-secret&#39;;
+const REDIRECT_URI = &#39;http://localhost:3000/callback&#39;;
+const RADIANT_DOMAIN = &#39;https://app.radiant.ai&#39;;
+
+// Generate PKCE challenge
+function generatePKCE() {
+  const verifier = crypto.randomBytes(32).toString(&#39;base64url&#39;);
+  const challenge = crypto
+    .createHash(&#39;sha256&#39;)
+    .update(verifier)
+    .digest(&#39;base64url&#39;);
+  return { verifier, challenge };
+}
+
+// Step 1: Start OAuth flow
+app.get(&#39;/login&#39;, (req, res) =&gt; {
+  const { verifier, challenge } = generatePKCE();
+  const state = crypto.randomBytes(16).toString(&#39;hex&#39;);
+  
+  // Store for later verification
+  req.session.pkceVerifier = verifier;
+  req.session.oauthState = state;
+  
+  const authUrl = new URL(`${RADIANT_DOMAIN}/oauth/authorize`);
+  authUrl.searchParams.set(&#39;client_id&#39;, CLIENT_ID);
+  authUrl.searchParams.set(&#39;redirect_uri&#39;, REDIRECT_URI);
+  authUrl.searchParams.set(&#39;response_type&#39;, &#39;code&#39;);
+  authUrl.searchParams.set(&#39;scope&#39;, &#39;openid profile read:sessions&#39;);
+  authUrl.searchParams.set(&#39;state&#39;, state);
+  authUrl.searchParams.set(&#39;code_challenge&#39;, challenge);
+  authUrl.searchParams.set(&#39;code_challenge_method&#39;, &#39;S256&#39;);
+  
+  res.redirect(authUrl.toString());
+});
+
+// Step 2-4: Handle callback
+app.get(&#39;/callback&#39;, async (req, res) =&gt; {
+  const { code, state, error } = req.query;
+  
+  // Check for errors
+  if (error) {
+    return res.status(400).send(`OAuth error: ${error}`);
+  }
+  
+  // Verify state
+  if (state !== req.session.oauthState) {
+    return res.status(400).send(&#39;State mismatch&#39;);
+  }
+  
+  // Exchange code for tokens
+  const tokenResponse = await fetch(`${RADIANT_DOMAIN}/oauth/token`, {
+    method: &#39;POST&#39;,
+    headers: { &#39;Content-Type&#39;: &#39;application/x-www-form-urlencoded&#39; },
+    body: new URLSearchParams({
+      grant_type: &#39;authorization_code&#39;,
+      code,
+      redirect_uri: REDIRECT_URI,
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      code_verifier: req.session.pkceVerifier,
+    }),
+  });
+  
+  const tokens = await tokenResponse.json();
+  
+  if (tokens.error) {
+    return res.status(400).send(`Token error: ${tokens.error}`);
+  }
+  
+  // Store tokens securely
+  req.session.accessToken = tokens.access_token;
+  req.session.refreshToken = tokens.refresh_token;
+  
+  res.redirect(&#39;/dashboard&#39;);
+});
+
+app.listen(3000);</code></pre>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./overview.md">Authentication Overview</a></li>
+<li><a href="../api/authentication-api.md">API Reference</a></li>
+<li><a href="./tenant-admin-guide.md">Tenant Admin Guide</a></li>
+<li><a href="../security/authentication-architecture.md">Security Architecture</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

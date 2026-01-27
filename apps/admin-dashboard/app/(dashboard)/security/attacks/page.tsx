@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,6 +59,7 @@ const PYRIT_STRATEGIES = [
 ];
 
 export default function AttackGenerationPage() {
+  const { toast } = useToast();
   const [probes, setProbes] = useState<AttackProbe[]>([]);
   const [generatedAttacks, setGeneratedAttacks] = useState<GeneratedAttack[]>([]);
   const [campaignResults, setCampaignResults] = useState<CampaignResult[]>([]);
@@ -185,10 +187,24 @@ export default function AttackGenerationPage() {
       });
       if (res.ok) {
         const result = await res.json();
-        alert(`Imported ${result.imported} attacks, skipped ${result.skipped}`);
+        toast({
+          title: 'Attacks Imported',
+          description: `Imported ${result.imported} attacks, skipped ${result.skipped}.`,
+        });
+      } else {
+        toast({
+          title: 'Import Failed',
+          description: 'Failed to import attacks.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Failed to import attacks:', error);
+      toast({
+        title: 'Import Failed',
+        description: 'An error occurred while importing attacks.',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }

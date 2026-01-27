@@ -86,25 +86,43 @@ class RedisCacheService {
   }
 
   private async initializeConnection(): Promise<void> {
-    // In production, this would establish actual Redis connection
-    // For now, we use in-memory fallback with Redis-like interface
+    // Establish Redis connection with ElastiCache
     try {
-      // Attempt Redis connection
-      // const redis = new Redis(this.config);
-      // await redis.ping();
-      // this.connected = true;
+      const ioredis = await import('ioredis');
+      const Redis = ioredis.default || ioredis;
       
-      // Fallback to memory for Lambda (Redis connection in separate PR)
-      this.connected = false;
-      logger.info('Redis cache initialized (memory fallback mode)', {
+      const redisUrl = `redis://${this.config.host}:${this.config.port}`;
+      this.redisClient = new (Redis as any)(redisUrl, {
+        password: this.config.password || undefined,
+        tls: this.config.tls ? {} : undefined,
+        keyPrefix: this.config.keyPrefix,
+        retryStrategy: (times: number) => {
+          if (times > 3) {
+            logger.warn('Redis connection retries exhausted, using memory fallback');
+            return null; // Stop retrying
+          }
+          return Math.min(times * 100, 3000);
+        },
+        maxRetriesPerRequest: 3,
+        connectTimeout: 5000,
+      });
+
+      // Test connection
+      await this.redisClient.ping();
+      this.connected = true;
+      
+      logger.info('Redis cache connected', {
         host: this.config.host,
         keyPrefix: this.config.keyPrefix,
       });
     } catch (error) {
       logger.warn('Redis connection failed, using memory fallback', { error });
       this.connected = false;
+      this.redisClient = null;
     }
   }
+  
+  private redisClient: import('ioredis').Redis | null = null;
 
   // ============================================================================
   // AGENT CACHING

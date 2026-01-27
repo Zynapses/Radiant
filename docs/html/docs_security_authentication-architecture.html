@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>authentication architecture - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>authentication architecture</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/security/authentication-architecture.md</div>
+  </div>
+  
+  <h1 id="authentication-security-architecture">Authentication Security Architecture</h1>
+<blockquote>
+<p><strong>Version</strong>: 5.52.29 | <strong>Last Updated</strong>: January 25, 2026 | <strong>Audience</strong>: Security Teams, Architects, Compliance Officers</p>
+</blockquote>
+<p>This document describes RADIANT’s authentication security architecture, including threat models, security controls, compliance considerations, and implementation details.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#architecture-overview">Architecture Overview</a></li>
+<li><a href="#identity-management">Identity Management</a></li>
+<li><a href="#authentication-flows">Authentication Flows</a></li>
+<li><a href="#token-security">Token Security</a></li>
+<li><a href="#multi-factor-authentication">Multi-Factor Authentication</a></li>
+<li><a href="#session-management">Session Management</a></li>
+<li><a href="#enterprise-sso-security">Enterprise SSO Security</a></li>
+<li><a href="#oauth-20-security">OAuth 2.0 Security</a></li>
+<li><a href="#threat-mitigation">Threat Mitigation</a></li>
+<li><a href="#audit-and-compliance">Audit and Compliance</a></li>
+<li><a href="#cryptographic-standards">Cryptographic Standards</a></li>
+</ol>
+<hr />
+<h2 id="architecture-overview">Architecture Overview</h2>
+<p>RADIANT implements a defense-in-depth authentication architecture with multiple security layers:</p>
+<pre class="mermaid"><code>graph TB
+    subgraph &quot;Edge Layer&quot;
+        WAF[AWS WAF&lt;br/&gt;Rate limiting, IP filtering]
+        CF[CloudFront&lt;br/&gt;DDoS protection]
+    end
+    
+    subgraph &quot;API Layer&quot;
+        APIGW[API Gateway&lt;br/&gt;Request validation]
+        AUTH[Auth Lambda&lt;br/&gt;Token validation]
+    end
+    
+    subgraph &quot;Identity Layer&quot;
+        COGNITO[AWS Cognito&lt;br/&gt;User management]
+        SSO[SSO Providers&lt;br/&gt;SAML/OIDC]
+    end
+    
+    subgraph &quot;Data Layer&quot;
+        RDS[(Aurora PostgreSQL&lt;br/&gt;Encrypted at rest)]
+        SECRETS[Secrets Manager&lt;br/&gt;Credential storage]
+    end
+    
+    CF --&gt; WAF
+    WAF --&gt; APIGW
+    APIGW --&gt; AUTH
+    AUTH --&gt; COGNITO
+    COGNITO --&gt; SSO
+    AUTH --&gt; RDS
+    AUTH --&gt; SECRETS
+    
+    style WAF fill:#ffcdd2
+    style COGNITO fill:#c8e6c9
+    style RDS fill:#bbdefb</code></pre>
+<h3 id="security-principles">Security Principles</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Principle</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Defense in Depth</strong></td>
+<td>Multiple security layers, no single point of failure</td>
+</tr>
+<tr>
+<td><strong>Least Privilege</strong></td>
+<td>Minimal permissions by default, explicit grants</td>
+</tr>
+<tr>
+<td><strong>Zero Trust</strong></td>
+<td>Verify every request, assume breach</td>
+</tr>
+<tr>
+<td><strong>Fail Secure</strong></td>
+<td>Default to deny on errors</td>
+</tr>
+<tr>
+<td><strong>Audit Everything</strong></td>
+<td>Complete authentication event logging</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="identity-management">Identity Management</h2>
+<h3 id="user-pool-separation">User Pool Separation</h3>
+<p>RADIANT maintains separate identity pools for security isolation:</p>
+<pre class="mermaid"><code>graph LR
+    subgraph &quot;End-User Pool&quot;
+        EU[Regular Users]
+        TA[Tenant Admins]
+    end
+    
+    subgraph &quot;Platform Pool&quot;
+        PA[Platform Admins]
+    end
+    
+    subgraph &quot;Service Accounts&quot;
+        SA[M2M Tokens]
+        API[API Keys]
+    end</code></pre>
+<table>
+<thead>
+<tr>
+<th>Pool</th>
+<th>Purpose</th>
+<th>Isolation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>End-User</strong></td>
+<td>Think Tank, Curator, Tenant Admin</td>
+<td>Per-tenant RLS</td>
+</tr>
+<tr>
+<td><strong>Platform</strong></td>
+<td>RADIANT Admin</td>
+<td>Separate Cognito pool</td>
+</tr>
+<tr>
+<td><strong>Service</strong></td>
+<td>API integrations</td>
+<td>Token-based, no user context</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tenant-isolation">Tenant Isolation</h3>
+<p>Row-Level Security (RLS) ensures complete tenant data isolation:</p>
+<pre class="sql"><code>-- All queries automatically filtered by tenant
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation ON users
+  USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::uuid);</code></pre>
+<hr />
+<h2 id="authentication-flows">Authentication Flows</h2>
+<h3 id="password-authentication-flow">Password Authentication Flow</h3>
+<pre class="mermaid"><code>sequenceDiagram
+    participant Client
+    participant API as API Gateway
+    participant Lambda
+    participant Cognito
+    participant DB as Database
+    
+    Client-&gt;&gt;API: POST /auth/signin {email, password}
+    API-&gt;&gt;Lambda: Validate request
+    Lambda-&gt;&gt;Lambda: Rate limit check
+    Lambda-&gt;&gt;Cognito: InitiateAuth
+    Cognito-&gt;&gt;Cognito: Verify password (SRP)
+    
+    alt MFA Required
+        Cognito--&gt;&gt;Lambda: MFA_REQUIRED challenge
+        Lambda--&gt;&gt;Client: {challenge: &quot;MFA_REQUIRED&quot;}
+        Client-&gt;&gt;API: POST /auth/mfa {code}
+        API-&gt;&gt;Lambda: Verify MFA
+        Lambda-&gt;&gt;Cognito: RespondToAuthChallenge
+    end
+    
+    Cognito--&gt;&gt;Lambda: Tokens
+    Lambda-&gt;&gt;DB: Create session record
+    Lambda-&gt;&gt;DB: Log authentication event
+    Lambda--&gt;&gt;Client: {access_token, refresh_token}</code></pre>
+<h3 id="security-controls-in-flow">Security Controls in Flow</h3>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Control</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Request</td>
+<td>TLS 1.3</td>
+<td>Encryption in transit</td>
+</tr>
+<tr>
+<td>Request</td>
+<td>Rate limiting</td>
+<td>Brute force prevention</td>
+</tr>
+<tr>
+<td>Request</td>
+<td>CAPTCHA (optional)</td>
+<td>Bot prevention</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>Input sanitization</td>
+<td>Injection prevention</td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>SRP protocol</td>
+<td>Zero-knowledge password</td>
+</tr>
+<tr>
+<td>MFA</td>
+<td>TOTP verification</td>
+<td>Second factor</td>
+</tr>
+<tr>
+<td>Response</td>
+<td>Secure cookies</td>
+<td>XSS/CSRF protection</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="token-security">Token Security</h2>
+<h3 id="token-types">Token Types</h3>
+<table>
+<thead>
+<tr>
+<th>Token</th>
+<th>Type</th>
+<th>Lifetime</th>
+<th>Storage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Access Token</strong></td>
+<td>JWT</td>
+<td>1 hour</td>
+<td>Memory only</td>
+</tr>
+<tr>
+<td><strong>Refresh Token</strong></td>
+<td>Opaque</td>
+<td>30 days</td>
+<td>Secure storage</td>
+</tr>
+<tr>
+<td><strong>ID Token</strong></td>
+<td>JWT</td>
+<td>1 hour</td>
+<td>Memory only</td>
+</tr>
+<tr>
+<td><strong>API Key</strong></td>
+<td>Opaque</td>
+<td>Configurable</td>
+<td>Server-side</td>
+</tr>
+</tbody>
+</table>
+<h3 id="jwt-structure">JWT Structure</h3>
+<pre class="json"><code>{
+  &quot;header&quot;: {
+    &quot;alg&quot;: &quot;RS256&quot;,
+    &quot;typ&quot;: &quot;JWT&quot;,
+    &quot;kid&quot;: &quot;key-id-from-jwks&quot;
+  },
+  &quot;payload&quot;: {
+    &quot;sub&quot;: &quot;user-uuid&quot;,
+    &quot;iss&quot;: &quot;https://cognito-idp.region.amazonaws.com/pool-id&quot;,
+    &quot;aud&quot;: &quot;client-id&quot;,
+    &quot;exp&quot;: 1706234567,
+    &quot;iat&quot;: 1706230967,
+    &quot;auth_time&quot;: 1706230967,
+    &quot;token_use&quot;: &quot;access&quot;,
+    &quot;scope&quot;: &quot;openid profile&quot;,
+    &quot;tenant_id&quot;: &quot;tenant-uuid&quot;,
+    &quot;roles&quot;: [&quot;member&quot;]
+  },
+  &quot;signature&quot;: &quot;...&quot;
+}</code></pre>
+<h3 id="token-validation">Token Validation</h3>
+<pre class="mermaid"><code>flowchart TD
+    A[Receive Token] --&gt; B{Signature Valid?}
+    B --&gt;|No| X[Reject]
+    B --&gt;|Yes| C{Expired?}
+    C --&gt;|Yes| X
+    C --&gt;|No| D{Issuer Valid?}
+    D --&gt;|No| X
+    D --&gt;|Yes| E{Audience Valid?}
+    E --&gt;|No| X
+    E --&gt;|Yes| F{Revoked?}
+    F --&gt;|Yes| X
+    F --&gt;|No| G[Accept]</code></pre>
+<h3 id="token-storage-best-practices">Token Storage Best Practices</h3>
+<table>
+<thead>
+<tr>
+<th>Client Type</th>
+<th>Access Token</th>
+<th>Refresh Token</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SPA</strong></td>
+<td>Memory variable</td>
+<td>httpOnly cookie or memory</td>
+</tr>
+<tr>
+<td><strong>Mobile</strong></td>
+<td>Secure enclave</td>
+<td>Keychain/Keystore</td>
+</tr>
+<tr>
+<td><strong>Server</strong></td>
+<td>Memory</td>
+<td>Encrypted database</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="multi-factor-authentication">Multi-Factor Authentication</h2>
+<h3 id="totp-implementation">TOTP Implementation</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Algorithm</strong></td>
+<td>SHA-1 (RFC 6238 compliant)</td>
+</tr>
+<tr>
+<td><strong>Digits</strong></td>
+<td>6</td>
+</tr>
+<tr>
+<td><strong>Period</strong></td>
+<td>30 seconds</td>
+</tr>
+<tr>
+<td><strong>Clock tolerance</strong></td>
+<td>±1 period</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mfa-enrollment-security">MFA Enrollment Security</h3>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User
+    participant App
+    participant Backend
+    participant Cognito
+    
+    User-&gt;&gt;App: Click &quot;Enable MFA&quot;
+    App-&gt;&gt;Backend: Request MFA setup
+    Backend-&gt;&gt;Cognito: AssociateSoftwareToken
+    Cognito--&gt;&gt;Backend: Secret key
+    Backend--&gt;&gt;App: QR code (not stored)
+    App-&gt;&gt;User: Display QR code
+    User-&gt;&gt;User: Scan with authenticator
+    User-&gt;&gt;App: Enter verification code
+    App-&gt;&gt;Backend: Verify code
+    Backend-&gt;&gt;Cognito: VerifySoftwareToken
+    Cognito--&gt;&gt;Backend: Success
+    Backend-&gt;&gt;Backend: Mark MFA enabled
+    Backend--&gt;&gt;App: MFA enabled</code></pre>
+<h3 id="backup-codes">Backup Codes</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Count</strong></td>
+<td>10 codes</td>
+</tr>
+<tr>
+<td><strong>Format</strong></td>
+<td>8 alphanumeric characters</td>
+</tr>
+<tr>
+<td><strong>Storage</strong></td>
+<td>Hashed (bcrypt)</td>
+</tr>
+<tr>
+<td><strong>Usage</strong></td>
+<td>Single use, then invalidated</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="session-management">Session Management</h2>
+<h3 id="session-properties">Session Properties</h3>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 25%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Session ID</strong></td>
+<td>UUID v4</td>
+<td>Unpredictable</td>
+</tr>
+<tr>
+<td><strong>Binding</strong></td>
+<td>User + Device fingerprint</td>
+<td>Prevent session hijacking</td>
+</tr>
+<tr>
+<td><strong>Inactivity timeout</strong></td>
+<td>Configurable (default 7 days)</td>
+<td>Balance security/UX</td>
+</tr>
+<tr>
+<td><strong>Absolute timeout</strong></td>
+<td>Configurable (default 30 days)</td>
+<td>Force re-authentication</td>
+</tr>
+<tr>
+<td><strong>Concurrent limit</strong></td>
+<td>Configurable (default 5)</td>
+<td>Detect sharing/theft</td>
+</tr>
+</tbody>
+</table>
+<h3 id="session-storage">Session Storage</h3>
+<pre class="sql"><code>CREATE TABLE user_sessions (
+    id UUID PRIMARY KEY,
+    user_id UUID REFERENCES users(id),
+    tenant_id UUID REFERENCES tenants(id),
+    device_fingerprint TEXT,
+    ip_address INET,
+    user_agent TEXT,
+    created_at TIMESTAMPTZ,
+    last_activity_at TIMESTAMPTZ,
+    expires_at TIMESTAMPTZ,
+    revoked_at TIMESTAMPTZ,
+    revocation_reason TEXT
+);
+
+-- Index for cleanup and validation
+CREATE INDEX idx_sessions_expiry ON user_sessions(expires_at) WHERE revoked_at IS NULL;
+CREATE INDEX idx_sessions_user ON user_sessions(user_id, tenant_id) WHERE revoked_at IS NULL;</code></pre>
+<h3 id="session-termination-events">Session Termination Events</h3>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>User logout</td>
+<td>Revoke current session</td>
+</tr>
+<tr>
+<td>Password change</td>
+<td>Revoke all sessions</td>
+</tr>
+<tr>
+<td>MFA reset</td>
+<td>Revoke all sessions</td>
+</tr>
+<tr>
+<td>Admin action</td>
+<td>Revoke specified sessions</td>
+</tr>
+<tr>
+<td>Suspicious activity</td>
+<td>Revoke all sessions</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="enterprise-sso-security">Enterprise SSO Security</h2>
+<h3 id="saml-2.0-security">SAML 2.0 Security</h3>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Signature validation</strong></td>
+<td>RSA-SHA256 required</td>
+</tr>
+<tr>
+<td><strong>Assertion encryption</strong></td>
+<td>AES-256 supported</td>
+</tr>
+<tr>
+<td><strong>Replay prevention</strong></td>
+<td>Assertion ID tracking, 5-min validity</td>
+</tr>
+<tr>
+<td><strong>Audience restriction</strong></td>
+<td>Enforce SP entity ID</td>
+</tr>
+<tr>
+<td><strong>Time validation</strong></td>
+<td>Clock skew ≤ 5 minutes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="oidc-security">OIDC Security</h3>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PKCE</strong></td>
+<td>Required for all flows</td>
+</tr>
+<tr>
+<td><strong>State parameter</strong></td>
+<td>Required, validated</td>
+</tr>
+<tr>
+<td><strong>Nonce</strong></td>
+<td>Required for implicit flows</td>
+</tr>
+<tr>
+<td><strong>Token binding</strong></td>
+<td>Client ID validation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="idp-trust-model">IdP Trust Model</h3>
+<pre class="mermaid"><code>graph TD
+    subgraph &quot;Trust Boundary&quot;
+        RADIANT[RADIANT SP]
+        CERT[Certificate Store]
+    end
+    
+    subgraph &quot;External&quot;
+        IDP[Identity Provider]
+    end
+    
+    IDP --&gt;|SAML Assertion| RADIANT
+    CERT --&gt;|Verify Signature| RADIANT
+    
+    Note1[Certificates managed&lt;br/&gt;per tenant]
+    Note2[Automatic expiration&lt;br/&gt;alerts]</code></pre>
+<hr />
+<h2 id="oauth-2.0-security">OAuth 2.0 Security</h2>
+<h3 id="authorization-server-security">Authorization Server Security</h3>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PKCE</strong></td>
+<td>Required (S256 only)</td>
+</tr>
+<tr>
+<td><strong>Redirect URI</strong></td>
+<td>Exact match validation</td>
+</tr>
+<tr>
+<td><strong>State parameter</strong></td>
+<td>Required, cryptographic</td>
+</tr>
+<tr>
+<td><strong>Client authentication</strong></td>
+<td>Secret for confidential clients</td>
+</tr>
+<tr>
+<td><strong>Scope limitation</strong></td>
+<td>Explicit consent required</td>
+</tr>
+</tbody>
+</table>
+<h3 id="token-security-1">Token Security</h3>
+<table>
+<thead>
+<tr>
+<th>Token Type</th>
+<th>Security Measures</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Authorization Code</strong></td>
+<td>Single-use, 10-min expiry, bound to client</td>
+</tr>
+<tr>
+<td><strong>Access Token</strong></td>
+<td>JWT signed RS256, 1-hour expiry</td>
+</tr>
+<tr>
+<td><strong>Refresh Token</strong></td>
+<td>Rotation on use, revocable</td>
+</tr>
+</tbody>
+</table>
+<h3 id="consent-management">Consent Management</h3>
+<pre class="sql"><code>CREATE TABLE oauth_consents (
+    id UUID PRIMARY KEY,
+    user_id UUID REFERENCES users(id),
+    client_id TEXT NOT NULL,
+    scopes TEXT[] NOT NULL,
+    granted_at TIMESTAMPTZ DEFAULT NOW(),
+    revoked_at TIMESTAMPTZ,
+    UNIQUE(user_id, client_id)
+);</code></pre>
+<hr />
+<h2 id="threat-mitigation">Threat Mitigation</h2>
+<h3 id="threat-model">Threat Model</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>Threat</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Credential stuffing</strong></td>
+<td>Rate limiting, CAPTCHA, breach monitoring</td>
+</tr>
+<tr>
+<td><strong>Brute force</strong></td>
+<td>Account lockout, progressive delays</td>
+</tr>
+<tr>
+<td><strong>Session hijacking</strong></td>
+<td>Secure cookies, device binding, IP validation</td>
+</tr>
+<tr>
+<td><strong>Token theft</strong></td>
+<td>Short expiry, secure storage, rotation</td>
+</tr>
+<tr>
+<td><strong>Phishing</strong></td>
+<td>MFA, passkeys, security training</td>
+</tr>
+<tr>
+<td><strong>Man-in-the-middle</strong></td>
+<td>TLS 1.3, certificate pinning (mobile)</td>
+</tr>
+<tr>
+<td><strong>XSS</strong></td>
+<td>CSP headers, httpOnly cookies, sanitization</td>
+</tr>
+<tr>
+<td><strong>CSRF</strong></td>
+<td>SameSite cookies, CSRF tokens</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rate-limiting">Rate Limiting</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Limit</th>
+<th>Window</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/auth/signin</code></td>
+<td>10</td>
+<td>1 minute</td>
+<td>Block IP</td>
+</tr>
+<tr>
+<td><code>/auth/signup</code></td>
+<td>5</td>
+<td>1 minute</td>
+<td>Block IP</td>
+</tr>
+<tr>
+<td><code>/auth/password-reset</code></td>
+<td>3</td>
+<td>1 hour</td>
+<td>Block email</td>
+</tr>
+<tr>
+<td><code>/auth/mfa/verify</code></td>
+<td>5</td>
+<td>1 minute</td>
+<td>Lock account</td>
+</tr>
+</tbody>
+</table>
+<h3 id="anomaly-detection">Anomaly Detection</h3>
+<pre class="mermaid"><code>flowchart TD
+    A[Login Attempt] --&gt; B{New Device?}
+    B --&gt;|Yes| C{New Location?}
+    C --&gt;|Yes| D[High Risk]
+    C --&gt;|No| E[Medium Risk]
+    B --&gt;|No| F{Unusual Time?}
+    F --&gt;|Yes| G[Low Risk]
+    F --&gt;|No| H[Normal]
+    
+    D --&gt; I[Require MFA + Notify]
+    E --&gt; J[Require MFA]
+    G --&gt; K[Log for review]
+    H --&gt; L[Proceed]</code></pre>
+<hr />
+<h2 id="audit-and-compliance">Audit and Compliance</h2>
+<h3 id="authentication-events-logged">Authentication Events Logged</h3>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Data Captured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auth.attempt</code></td>
+<td>User, IP, device, timestamp, method</td>
+</tr>
+<tr>
+<td><code>auth.success</code></td>
+<td>User, IP, device, session ID, MFA used</td>
+</tr>
+<tr>
+<td><code>auth.failure</code></td>
+<td>User (if known), IP, device, reason</td>
+</tr>
+<tr>
+<td><code>auth.mfa.setup</code></td>
+<td>User, method, timestamp</td>
+</tr>
+<tr>
+<td><code>auth.mfa.verify</code></td>
+<td>User, method, success/failure</td>
+</tr>
+<tr>
+<td><code>auth.logout</code></td>
+<td>User, session ID, reason</td>
+</tr>
+<tr>
+<td><code>auth.session.revoke</code></td>
+<td>User, session ID, admin (if applicable)</td>
+</tr>
+<tr>
+<td><code>auth.password.change</code></td>
+<td>User, IP, timestamp</td>
+</tr>
+<tr>
+<td><code>auth.password.reset</code></td>
+<td>User, IP, timestamp</td>
+</tr>
+</tbody>
+</table>
+<h3 id="log-storage">Log Storage</h3>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Retention</strong></td>
+<td>90 days hot, 7 years archive</td>
+</tr>
+<tr>
+<td><strong>Encryption</strong></td>
+<td>AES-256 at rest</td>
+</tr>
+<tr>
+<td><strong>Integrity</strong></td>
+<td>Hash chain, tamper detection</td>
+</tr>
+<tr>
+<td><strong>Access</strong></td>
+<td>Role-based, audited</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compliance-frameworks">Compliance Frameworks</h3>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Authentication Requirements</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SOC 2</strong></td>
+<td>Access controls, MFA, logging</td>
+<td>✅ Compliant</td>
+</tr>
+<tr>
+<td><strong>GDPR</strong></td>
+<td>Consent, data minimization</td>
+<td>✅ Compliant</td>
+</tr>
+<tr>
+<td><strong>HIPAA</strong></td>
+<td>Access controls, audit trails</td>
+<td>✅ Ready</td>
+</tr>
+<tr>
+<td><strong>ISO 27001</strong></td>
+<td>ISMS controls</td>
+<td>✅ Aligned</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cryptographic-standards">Cryptographic Standards</h2>
+<h3 id="algorithms-in-use">Algorithms in Use</h3>
+<table>
+<thead>
+<tr>
+<th>Purpose</th>
+<th>Algorithm</th>
+<th>Key Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Password hashing</strong></td>
+<td>Argon2id</td>
+<td>Memory: 64MB, Time: 3</td>
+</tr>
+<tr>
+<td><strong>Token signing</strong></td>
+<td>RS256 (RSA-SHA256)</td>
+<td>2048-bit</td>
+</tr>
+<tr>
+<td><strong>Session IDs</strong></td>
+<td>CSPRNG (UUID v4)</td>
+<td>128-bit</td>
+</tr>
+<tr>
+<td><strong>MFA secrets</strong></td>
+<td>HMAC-SHA1</td>
+<td>160-bit</td>
+</tr>
+<tr>
+<td><strong>Backup codes</strong></td>
+<td>CSPRNG</td>
+<td>64-bit</td>
+</tr>
+<tr>
+<td><strong>TLS</strong></td>
+<td>TLS 1.3</td>
+<td>ECDHE+AES-256-GCM</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-management">Key Management</h3>
+<table>
+<thead>
+<tr>
+<th>Key Type</th>
+<th>Rotation</th>
+<th>Storage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cognito signing keys</strong></td>
+<td>Automatic (AWS managed)</td>
+<td>AWS KMS</td>
+</tr>
+<tr>
+<td><strong>SSO certificates</strong></td>
+<td>Annual (manual)</td>
+<td>Secrets Manager</td>
+</tr>
+<tr>
+<td><strong>API secrets</strong></td>
+<td>On compromise</td>
+<td>Secrets Manager</td>
+</tr>
+<tr>
+<td><strong>Encryption keys</strong></td>
+<td>Annual (automatic)</td>
+<td>AWS KMS</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="security-recommendations">Security Recommendations</h2>
+<h3 id="for-tenant-administrators">For Tenant Administrators</h3>
+<ol type="1">
+<li><strong>Enable MFA for all admins</strong> (enforced by default)</li>
+<li><strong>Configure SSO</strong> for enterprise identity management</li>
+<li><strong>Review audit logs</strong> regularly for anomalies</li>
+<li><strong>Set appropriate session timeouts</strong> for your security requirements</li>
+<li><strong>Use IP restrictions</strong> for admin access when possible</li>
+</ol>
+<h3 id="for-platform-administrators">For Platform Administrators</h3>
+<ol type="1">
+<li><strong>Monitor rate limiting effectiveness</strong></li>
+<li><strong>Review failed authentication patterns</strong></li>
+<li><strong>Keep SSO certificates updated</strong> (30-day alerts)</li>
+<li><strong>Perform regular access reviews</strong></li>
+<li><strong>Test incident response procedures</strong></li>
+</ol>
+<h3 id="for-developers">For Developers</h3>
+<ol type="1">
+<li><strong>Never log sensitive data</strong> (passwords, tokens)</li>
+<li><strong>Validate all tokens server-side</strong></li>
+<li><strong>Use secure token storage patterns</strong></li>
+<li><strong>Implement proper error handling</strong> (no information leakage)</li>
+<li><strong>Follow OWASP guidelines</strong></li>
+</ol>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="../authentication/overview.md">Authentication Overview</a></li>
+<li><a href="../authentication/platform-admin-guide.md">Platform Admin Guide</a></li>
+<li><a href="../authentication/oauth-guide.md">OAuth Developer Guide</a></li>
+<li><a href="../api/authentication-api.md">API Reference</a></li>
+<li><a href="../COMPLIANCE.md">Compliance Documentation</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

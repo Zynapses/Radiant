@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAWS ENGINEERING - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RAWS ENGINEERING</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/RAWS-ENGINEERING.md</div>
+  </div>
+  
+  <h1 id="raws-v1.1-engineering-documentation">RAWS v1.1 Engineering Documentation</h1>
+<h2 id="technical-reference-for-engineers-and-developers">Technical Reference for Engineers and Developers</h2>
+<hr />
+<p><strong>Document Version:</strong> 1.1.0<br />
+<strong>RADIANT Platform Version:</strong> v4.19.0<br />
+<strong>Last Updated:</strong> January 2026</p>
+<hr />
+<h2 id="system-overview">1. System Overview</h2>
+<p>RAWS (RADIANT AI Weighted Selection) is the real-time model orchestration system that selects optimal AI models using:</p>
+<ul>
+<li><strong>8-Dimension Scoring</strong>: Quality, Cost, Latency, Capability, Reliability, Compliance, Availability, Learning</li>
+<li><strong>13 Weight Profiles</strong>: 4 Optimization + 6 Domain + 3 SOFAI</li>
+<li><strong>7 Domains</strong>: Healthcare, Financial, Legal, Scientific, Creative, Engineering, General</li>
+<li><strong>106+ Models</strong>: 50 external APIs + 56 self-hosted</li>
+</ul>
+<hr />
+<h2 id="weight-profile-system">2. Weight Profile System</h2>
+<h3 id="profile-categories">2.1 Profile Categories</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Count</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Optimization</strong></td>
+<td>4</td>
+<td>General optimization strategies</td>
+</tr>
+<tr>
+<td><strong>Domain</strong></td>
+<td>6</td>
+<td>Domain-specific requirements</td>
+</tr>
+<tr>
+<td><strong>SOFAI</strong></td>
+<td>3</td>
+<td>Cognitive complexity routing</td>
+</tr>
+</tbody>
+</table>
+<h3 id="complete-profile-matrix">2.2 Complete Profile Matrix</h3>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Q</th>
+<th>C</th>
+<th>L</th>
+<th>K</th>
+<th>R</th>
+<th>P</th>
+<th>A</th>
+<th>E</th>
+<th>Focus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BALANCED</strong></td>
+<td>0.25</td>
+<td>0.20</td>
+<td>0.15</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>Default</td>
+</tr>
+<tr>
+<td><strong>QUALITY_FIRST</strong></td>
+<td>0.40</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>Max accuracy</td>
+</tr>
+<tr>
+<td><strong>COST_OPTIMIZED</strong></td>
+<td>0.20</td>
+<td>0.35</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>Min cost</td>
+</tr>
+<tr>
+<td><strong>LATENCY_CRITICAL</strong></td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.35</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>Fastest</td>
+</tr>
+<tr>
+<td><strong>HEALTHCARE</strong></td>
+<td>0.30</td>
+<td>0.05</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.20</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>Quality+Compliance</td>
+</tr>
+<tr>
+<td><strong>FINANCIAL</strong></td>
+<td>0.30</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>Accuracy+Audit</td>
+</tr>
+<tr>
+<td><strong>LEGAL</strong></td>
+<td>0.35</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.20</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>Citations</td>
+</tr>
+<tr>
+<td><strong>SCIENTIFIC</strong></td>
+<td>0.35</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.20</td>
+<td>0.08</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.07</td>
+<td>Research</td>
+</tr>
+<tr>
+<td><strong>CREATIVE</strong></td>
+<td>0.20</td>
+<td>0.25</td>
+<td>0.20</td>
+<td>0.15</td>
+<td>0.05</td>
+<td>0.00</td>
+<td>0.05</td>
+<td>0.10</td>
+<td>Iteration</td>
+</tr>
+<tr>
+<td><strong>ENGINEERING</strong></td>
+<td>0.30</td>
+<td>0.15</td>
+<td>0.15</td>
+<td>0.20</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>Code</td>
+</tr>
+<tr>
+<td><strong>SYSTEM_1</strong></td>
+<td>0.15</td>
+<td>0.30</td>
+<td>0.30</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.00</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>Fast+Cheap</td>
+</tr>
+<tr>
+<td><strong>SYSTEM_2</strong></td>
+<td>0.35</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>Reasoning</td>
+</tr>
+<tr>
+<td><strong>SYSTEM_2_5</strong></td>
+<td>0.40</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.20</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>Max reasoning</td>
+</tr>
+</tbody>
+</table>
+<h3 id="domain-profile-details">2.3 Domain Profile Details</h3>
+<h4 id="healthcare">HEALTHCARE</h4>
+<ul>
+<li><strong>Weights</strong>: Q=0.30, C=0.05, L=0.10, K=0.15, R=0.10, P=0.20, A=0.05, E=0.05</li>
+<li><strong>Constraints</strong>: minQuality=80, compliance=[HIPAA], systemType=SYSTEM_2</li>
+<li><strong>Truth Engine</strong>: Required (ECD threshold: 0.05)</li>
+<li><strong>Regulatory Requirements</strong>:
+<ul>
+<li><strong>HIPAA</strong>: Mandatory for Protected Health Information (PHI). Requires encryption, access controls, audit trails, BAAs.</li>
+<li><strong>FDA 21 CFR Part 11</strong>: Required for clinical trials, drug development, medical device decisions.</li>
+<li><strong>HITECH Act</strong>: Extends HIPAA for electronic health records.</li>
+</ul></li>
+<li><strong>Use Cases</strong>: Medical diagnosis, patient data analysis, clinical documentation</li>
+</ul>
+<h4 id="financial">FINANCIAL</h4>
+<ul>
+<li><strong>Weights</strong>: Q=0.30, C=0.10, L=0.10, K=0.15, R=0.10, P=0.15, A=0.05, E=0.05</li>
+<li><strong>Constraints</strong>: minQuality=75, compliance=[SOC2], systemType=SYSTEM_2</li>
+<li><strong>Truth Engine</strong>: Required (ECD threshold: 0.05)</li>
+<li><strong>Regulatory Requirements</strong>:
+<ul>
+<li><strong>SOC 2 Type II</strong>: Required for security controls, availability, processing integrity, confidentiality.</li>
+<li><strong>PCI-DSS</strong>: Required if processing payment card data.</li>
+<li><strong>GDPR</strong>: Required for EU resident financial data.</li>
+<li><strong>SEC/FINRA</strong>: Investment advice faces regulatory scrutiny.</li>
+<li><strong>SOX</strong>: Audit trail requirements for public companies.</li>
+</ul></li>
+<li><strong>Use Cases</strong>: Investment analysis, accounting, financial reporting</li>
+</ul>
+<h4 id="legal">LEGAL</h4>
+<ul>
+<li><strong>Weights</strong>: Q=0.35, C=0.05, L=0.05, K=0.20, R=0.10, P=0.15, A=0.05, E=0.05</li>
+<li><strong>Constraints</strong>: minQuality=80, compliance=[SOC2], systemType=SYSTEM_2</li>
+<li><strong>Truth Engine</strong>: Required, source citation required (ECD threshold: 0.05)</li>
+<li><strong>Regulatory Requirements</strong>:
+<ul>
+<li><strong>SOC 2 Type II</strong>: Required for attorney-client privilege protection, confidential documents.</li>
+<li><strong>ABA Model Rules</strong>: AI legal research must meet professional responsibility standards.</li>
+<li><strong>GDPR</strong>: Required for EU data subjects in legal matters.</li>
+<li><strong>State Bar Requirements</strong>: Many jurisdictions require AI use disclosure.</li>
+</ul></li>
+<li><strong>Use Cases</strong>: Contract analysis, legal research, compliance documentation</li>
+</ul>
+<h4 id="scientific">SCIENTIFIC</h4>
+<ul>
+<li><strong>Weights</strong>: Q=0.35, C=0.10, L=0.10, K=0.20, R=0.08, P=0.05, A=0.05, E=0.07</li>
+<li><strong>Constraints</strong>: minQuality=70, source citation required</li>
+<li><strong>Truth Engine</strong>: Optional (ECD threshold: 0.08)</li>
+<li><strong>Regulatory Requirements</strong>:
+<ul>
+<li><strong>FDA 21 CFR Part 11</strong>: Required for pharmaceutical/drug research.</li>
+<li><strong>GLP</strong> (Good Laboratory Practice): For studies submitted to regulatory agencies.</li>
+<li><strong>IRB Approval</strong>: Human subjects research may require institutional review.</li>
+<li><strong>NIH Data Management</strong>: Data integrity requirements for federally funded research.</li>
+</ul></li>
+<li><strong>Use Cases</strong>: Research analysis, data interpretation, peer review assistance</li>
+</ul>
+<h4 id="creative">CREATIVE</h4>
+<ul>
+<li><strong>Weights</strong>: Q=0.20, C=0.25, L=0.20, K=0.15, R=0.05, P=0.00, A=0.05, E=0.10</li>
+<li><strong>Constraints</strong>: None (most flexible)</li>
+<li><strong>Truth Engine</strong>: Not required (ECD threshold: 0.20)</li>
+<li><strong>Regulatory Requirements</strong>:
+<ul>
+<li><strong>None required</strong>: Creative content not subject to regulatory compliance.</li>
+<li><strong>FTC Guidelines</strong>: Disclosures may be required for AI-generated advertising.</li>
+</ul></li>
+<li><strong>Use Cases</strong>: Content writing, storytelling, brainstorming, marketing copy</li>
+</ul>
+<h4 id="engineering">ENGINEERING</h4>
+<ul>
+<li><strong>Weights</strong>: Q=0.30, C=0.15, L=0.15, K=0.20, R=0.10, P=0.00, A=0.05, E=0.05</li>
+<li><strong>Constraints</strong>: minQuality=70, preferredCapabilities=[function_calling, tool_use]</li>
+<li><strong>Truth Engine</strong>: Optional (ECD threshold: 0.10)</li>
+<li><strong>Regulatory Requirements</strong>:
+<ul>
+<li><strong>SOC 2 Type II</strong>: Required if AI-generated code processes sensitive data.</li>
+<li><strong>ISO 27001</strong>: Information security management for enterprise software.</li>
+<li><strong>NIST Cybersecurity Framework</strong>: Recommended for security-sensitive applications.</li>
+<li><strong>FDA 21 CFR Part 11</strong>: Required for medical device software.</li>
+<li><strong>IEC 62443</strong>: Required for industrial control systems.</li>
+</ul></li>
+<li><strong>Use Cases</strong>: Code generation, code review, debugging, architecture design</li>
+</ul>
+<hr />
+<h2 id="eight-dimension-scoring">3. Eight-Dimension Scoring</h2>
+<h3 id="dimension-calculations">3.1 Dimension Calculations</h3>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Formula</th>
+<th>Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Quality (Q)</td>
+<td>Weighted benchmark average</td>
+<td>0-100</td>
+</tr>
+<tr>
+<td>Cost (C)</td>
+<td>Inverted normalized price</td>
+<td>0-100</td>
+</tr>
+<tr>
+<td>Latency (L)</td>
+<td>TTFT threshold mapping</td>
+<td>0-100</td>
+</tr>
+<tr>
+<td>Capability (K)</td>
+<td>matched / required × 100</td>
+<td>0-100</td>
+</tr>
+<tr>
+<td>Reliability (R)</td>
+<td>Uptime + error rate composite</td>
+<td>0-100</td>
+</tr>
+<tr>
+<td>Compliance (P)</td>
+<td>Framework count × 15</td>
+<td>0-100</td>
+</tr>
+<tr>
+<td>Availability (A)</td>
+<td>Thermal state mapping</td>
+<td>0-100</td>
+</tr>
+<tr>
+<td>Learning (E)</td>
+<td>Historical performance</td>
+<td>0-100</td>
+</tr>
+</tbody>
+</table>
+<h3 id="composite-score">3.2 Composite Score</h3>
+<pre class="typescript"><code>CompositeScore = Q×Wq + C×Wc + L×Wl + K×Wk + R×Wr + P×Wp + A×Wa + E×We</code></pre>
+<p>Where Σ(weights) = 1.0</p>
+<hr />
+<h2 id="selection-algorithm">4. Selection Algorithm</h2>
+<h3 id="four-phases">4.1 Four Phases</h3>
+<pre><code>PHASE 1: FILTER (5ms)
+├── Status filter (active only)
+├── Capability filter
+├── Compliance filter
+├── Tier filter
+├── System type filter
+└── Thermal filter
+
+PHASE 2: SCORE (25ms)
+├── Quality scorer
+├── Cost scorer
+├── Latency scorer
+├── Capability scorer
+├── Reliability scorer
+├── Compliance scorer
+├── Availability scorer
+└── Learning scorer (parallel)
+
+PHASE 3: RANK (15ms)
+├── Apply weights from profile
+├── Calculate composite scores
+├── Apply neural adjustments
+└── Sort by adjusted score
+
+PHASE 4: SELECT (3ms)
+├── Select winner
+├── Select fallbacks (3)
+├── Generate reason
+└── Build response</code></pre>
+<h3 id="weight-resolution-order">4.2 Weight Resolution Order</h3>
+<pre class="typescript"><code>async resolveWeights(request, systemType, domain): Promise&lt;ScoringWeights&gt; {
+  // 1. Explicit profile ID
+  if (request.weightProfileId) {
+    return getProfile(request.weightProfileId).weights;
+  }
+  
+  // 2. Optimization preference
+  if (request.optimizeFor) {
+    return getOptimizationProfile(request.optimizeFor).weights;
+  }
+  
+  // 3. Domain-specific (includes SCIENTIFIC, CREATIVE, ENGINEERING)
+  if (domain !== &#39;general&#39;) {
+    return getDomainProfile(domain).weights;
+  }
+  
+  // 4. SOFAI system type
+  return getSystemProfile(systemType).weights;
+}</code></pre>
+<hr />
+<h2 id="domain-detection">5. Domain Detection</h2>
+<h3 id="keyword-detection">5.1 Keyword Detection</h3>
+<pre class="typescript"><code>const DOMAIN_KEYWORDS = {
+  healthcare: [&#39;medical&#39;, &#39;diagnosis&#39;, &#39;patient&#39;, &#39;clinical&#39;, ...],
+  financial: [&#39;investment&#39;, &#39;stock&#39;, &#39;trading&#39;, &#39;accounting&#39;, ...],
+  legal: [&#39;contract&#39;, &#39;lawsuit&#39;, &#39;attorney&#39;, &#39;litigation&#39;, ...],
+  scientific: [&#39;research&#39;, &#39;experiment&#39;, &#39;hypothesis&#39;, &#39;study&#39;, ...],
+  creative: [&#39;write&#39;, &#39;story&#39;, &#39;creative&#39;, &#39;brainstorm&#39;, ...],
+  engineering: [&#39;code&#39;, &#39;programming&#39;, &#39;debug&#39;, &#39;api&#39;, ...],
+};</code></pre>
+<h3 id="task-type-mapping">5.2 Task Type Mapping</h3>
+<pre class="typescript"><code>const TASK_TYPE_MAP = {
+  &#39;medical_qa&#39;: &#39;healthcare&#39;,
+  &#39;clinical_documentation&#39;: &#39;healthcare&#39;,
+  &#39;investment_analysis&#39;: &#39;financial&#39;,
+  &#39;contract_analysis&#39;: &#39;legal&#39;,
+  &#39;research_analysis&#39;: &#39;scientific&#39;,
+  &#39;content_writing&#39;: &#39;creative&#39;,
+  &#39;code_generation&#39;: &#39;engineering&#39;,
+  &#39;code_review&#39;: &#39;engineering&#39;,
+  &#39;debugging&#39;: &#39;engineering&#39;,
+};</code></pre>
+<hr />
+<h2 id="typescript-implementation">6. TypeScript Implementation</h2>
+<h3 id="profile-types">6.1 Profile Types</h3>
+<pre class="typescript"><code>export type OptimizationProfile = 
+  | &#39;BALANCED&#39; 
+  | &#39;QUALITY_FIRST&#39; 
+  | &#39;COST_OPTIMIZED&#39; 
+  | &#39;LATENCY_CRITICAL&#39;;
+
+export type DomainProfile = 
+  | &#39;HEALTHCARE&#39; 
+  | &#39;FINANCIAL&#39; 
+  | &#39;LEGAL&#39; 
+  | &#39;SCIENTIFIC&#39; 
+  | &#39;CREATIVE&#39; 
+  | &#39;ENGINEERING&#39;;
+
+export type SOFAIProfile = 
+  | &#39;SYSTEM_1&#39; 
+  | &#39;SYSTEM_2&#39; 
+  | &#39;SYSTEM_2_5&#39;;
+
+export type WeightProfileId = 
+  | OptimizationProfile 
+  | DomainProfile 
+  | SOFAIProfile;
+
+export type Domain = 
+  | &#39;healthcare&#39;
+  | &#39;financial&#39;
+  | &#39;legal&#39;
+  | &#39;scientific&#39;
+  | &#39;creative&#39;
+  | &#39;engineering&#39;
+  | &#39;general&#39;;</code></pre>
+<h3 id="domain-to-profile-mapping">6.2 Domain to Profile Mapping</h3>
+<pre class="typescript"><code>export const DOMAIN_PROFILE_MAP: Record&lt;Domain, WeightProfileId&gt; = {
+  healthcare: &#39;HEALTHCARE&#39;,
+  financial: &#39;FINANCIAL&#39;,
+  legal: &#39;LEGAL&#39;,
+  scientific: &#39;SCIENTIFIC&#39;,
+  creative: &#39;CREATIVE&#39;,
+  engineering: &#39;ENGINEERING&#39;,
+  general: &#39;BALANCED&#39;,
+};</code></pre>
+<hr />
+<h2 id="database-schema">7. Database Schema</h2>
+<h3 id="weight-profiles-table">7.1 Weight Profiles Table</h3>
+<pre class="sql"><code>CREATE TABLE raws_weight_profiles (
+    id VARCHAR(50) PRIMARY KEY,
+    display_name VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(20) NOT NULL, -- &#39;optimization&#39;, &#39;domain&#39;, &#39;sofai&#39;
+    
+    -- Eight dimension weights
+    weight_quality NUMERIC(4, 3) NOT NULL,
+    weight_cost NUMERIC(4, 3) NOT NULL,
+    weight_latency NUMERIC(4, 3) NOT NULL,
+    weight_capability NUMERIC(4, 3) NOT NULL,
+    weight_reliability NUMERIC(4, 3) NOT NULL,
+    weight_compliance NUMERIC(4, 3) NOT NULL,
+    weight_availability NUMERIC(4, 3) NOT NULL,
+    weight_learning NUMERIC(4, 3) NOT NULL,
+    
+    -- Domain association
+    domain VARCHAR(50),
+    
+    -- Constraints
+    min_quality_score NUMERIC(5, 2),
+    required_compliance TEXT[],
+    forced_system_type VARCHAR(20),
+    
+    -- Truth Engine
+    require_truth_engine BOOLEAN DEFAULT false,
+    require_source_citation BOOLEAN DEFAULT false,
+    max_ecd_threshold NUMERIC(4, 3),
+    
+    CONSTRAINT weights_sum CHECK (ABS(
+        weight_quality + weight_cost + weight_latency + weight_capability + 
+        weight_reliability + weight_compliance + weight_availability + weight_learning - 1.0
+    ) &lt; 0.01)
+);</code></pre>
+<h3 id="domain-config-table">7.2 Domain Config Table</h3>
+<pre class="sql"><code>CREATE TABLE raws_domain_config (
+    id VARCHAR(50) PRIMARY KEY, -- 7 domains
+    weight_profile_id VARCHAR(50) REFERENCES raws_weight_profiles(id),
+    min_quality_score NUMERIC(5, 2),
+    max_ecd_threshold NUMERIC(4, 3),
+    required_compliance TEXT[],
+    forced_system_type VARCHAR(20),
+    require_truth_engine BOOLEAN DEFAULT false,
+    require_source_citation BOOLEAN DEFAULT false,
+    detection_keywords TEXT[]
+);</code></pre>
+<hr />
+<h2 id="api-examples">8. API Examples</h2>
+<h3 id="domain-specific-selection">8.1 Domain-Specific Selection</h3>
+<pre class="typescript"><code>// Engineering domain
+const result = await raws.select({
+  requiredCapabilities: [&#39;chat&#39;, &#39;function_calling&#39;],
+  estimatedInputTokens: 2000,
+  estimatedOutputTokens: 1000,
+  domain: &#39;engineering&#39;,
+});
+// Uses ENGINEERING profile: Q=0.30, K=0.20, C=0.15, L=0.15...
+
+// Scientific domain
+const result = await raws.select({
+  requiredCapabilities: [&#39;chat&#39;, &#39;reasoning&#39;],
+  estimatedInputTokens: 3000,
+  estimatedOutputTokens: 2000,
+  domain: &#39;scientific&#39;,
+});
+// Uses SCIENTIFIC profile: Q=0.35, K=0.20, E=0.07...
+
+// Creative domain
+const result = await raws.select({
+  requiredCapabilities: [&#39;chat&#39;, &#39;streaming&#39;],
+  estimatedInputTokens: 500,
+  estimatedOutputTokens: 2000,
+  domain: &#39;creative&#39;,
+});
+// Uses CREATIVE profile: C=0.25, L=0.20, E=0.10...</code></pre>
+<h3 id="auto-detection">8.2 Auto-Detection</h3>
+<pre class="typescript"><code>// Domain detected from query content
+const result = await raws.select({
+  requiredCapabilities: [&#39;chat&#39;],
+  estimatedInputTokens: 1000,
+  estimatedOutputTokens: 500,
+  taskType: &#39;code_review&#39;, // Auto-maps to engineering domain
+});</code></pre>
+<hr />
+<h2 id="testing">9. Testing</h2>
+<h3 id="profile-validation">9.1 Profile Validation</h3>
+<pre class="typescript"><code>describe(&#39;WeightProfiles&#39;, () =&gt; {
+  it(&#39;should have 13 system profiles&#39;, () =&gt; {
+    expect(Object.keys(WEIGHT_PROFILES)).toHaveLength(13);
+  });
+
+  it(&#39;all profiles should sum to 1.0&#39;, () =&gt; {
+    for (const profile of Object.values(WEIGHT_PROFILES)) {
+      const sum = Object.values(profile.weights).reduce((a, b) =&gt; a + b, 0);
+      expect(sum).toBeCloseTo(1.0, 2);
+    }
+  });
+
+  it(&#39;should map all 7 domains to profiles&#39;, () =&gt; {
+    expect(Object.keys(DOMAIN_PROFILE_MAP)).toHaveLength(7);
+  });
+});</code></pre>
+<hr />
+<h2 id="performance">10. Performance</h2>
+<h3 id="latency-budget">10.1 Latency Budget</h3>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Budget</th>
+<th>Actual p99</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Context + Weights</td>
+<td>2ms</td>
+<td>1.5ms</td>
+</tr>
+<tr>
+<td>Filtering</td>
+<td>5ms</td>
+<td>4ms</td>
+</tr>
+<tr>
+<td>Scoring (8 dim)</td>
+<td>25ms</td>
+<td>22ms</td>
+</tr>
+<tr>
+<td>Ranking</td>
+<td>15ms</td>
+<td>12ms</td>
+</tr>
+<tr>
+<td>Selection</td>
+<td>3ms</td>
+<td>2ms</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>50ms</strong></td>
+<td><strong>41.5ms</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><strong>End of Engineering Documentation</strong></p>
+<p><em>Version 1.1.0 | January 2026</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

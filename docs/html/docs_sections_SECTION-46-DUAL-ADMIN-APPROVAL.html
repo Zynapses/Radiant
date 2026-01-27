@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 46 DUAL ADMIN APPROVAL - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 46 DUAL ADMIN APPROVAL</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-46-DUAL-ADMIN-APPROVAL.md</div>
+  </div>
+  
+  <h1 id="section-46-dual-admin-migration-approval-v4.16.0">SECTION 46: DUAL-ADMIN MIGRATION APPROVAL (v4.16.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<blockquote>
+<p><strong>Version: 4.16.0 | Two-person approval for production database migrations</strong></p>
+</blockquote>
+<hr />
+<h2 id="dual-admin-approval-principles">46.1 DUAL-ADMIN APPROVAL PRINCIPLES</h2>
+<ul>
+<li><strong>Production migrations require 2 approvals</strong> (configurable)</li>
+<li><strong>Requestor cannot self-approve</strong></li>
+<li><strong>Complete audit trail</strong> of all decisions</li>
+<li><strong>Configurable policies</strong> per tenant/environment</li>
+</ul>
+<hr />
+<h2 id="database-schema">46.2 DATABASE SCHEMA</h2>
+<h3 id="packagesinfrastructuremigrations046_dual_admin_approval.sql">packages/infrastructure/migrations/046_dual_admin_approval.sql</h3>
+<pre class="sql"><code>-- ============================================================================
+-- RADIANT v4.16.0 - Dual-Admin Migration Approval
+-- ============================================================================
+
+-- Migration Approval Requests
+CREATE TABLE migration_approval_requests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    
+    migration_name VARCHAR(255) NOT NULL,
+    migration_version VARCHAR(50) NOT NULL,
+    migration_checksum VARCHAR(64) NOT NULL,
+    migration_sql TEXT NOT NULL,
+    
+    environment VARCHAR(20) NOT NULL CHECK (environment IN (&#39;development&#39;, &#39;staging&#39;, &#39;production&#39;)),
+    
+    requested_by UUID NOT NULL REFERENCES administrators(id),
+    requested_at TIMESTAMPTZ DEFAULT NOW(),
+    request_reason TEXT,
+    
+    status VARCHAR(20) NOT NULL DEFAULT &#39;pending&#39; CHECK (status IN (
+        &#39;pending&#39;, &#39;approved&#39;, &#39;rejected&#39;, &#39;executed&#39;, &#39;failed&#39;, &#39;cancelled&#39;
+    )),
+    
+    approvals_required INTEGER NOT NULL DEFAULT 2,
+    approvals_received INTEGER NOT NULL DEFAULT 0,
+    
+    executed_at TIMESTAMPTZ,
+    executed_by UUID REFERENCES administrators(id),
+    execution_time_ms INTEGER,
+    execution_error TEXT,
+    rollback_sql TEXT,
+    
+    metadata JSONB DEFAULT &#39;{}&#39;,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_migration_approval_tenant ON migration_approval_requests(tenant_id);
+CREATE INDEX idx_migration_approval_status ON migration_approval_requests(status);
+CREATE INDEX idx_migration_approval_env ON migration_approval_requests(environment);
+
+-- Individual Approvals
+CREATE TABLE migration_approvals (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    request_id UUID NOT NULL REFERENCES migration_approval_requests(id) ON DELETE CASCADE,
+    
+    admin_id UUID NOT NULL REFERENCES administrators(id),
+    decision VARCHAR(20) NOT NULL CHECK (decision IN (&#39;approved&#39;, &#39;rejected&#39;)),
+    reason TEXT,
+    
+    reviewed_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    UNIQUE(request_id, admin_id)
+);
+
+CREATE INDEX idx_migration_approvals_request ON migration_approvals(request_id);
+
+-- Approval Policies
+CREATE TABLE migration_approval_policies (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    environment VARCHAR(20) NOT NULL,
+    
+    approvals_required INTEGER NOT NULL DEFAULT 2,
+    self_approval_allowed BOOLEAN DEFAULT FALSE,
+    auto_approve_development BOOLEAN DEFAULT TRUE,
+    
+    allowed_approvers UUID[] DEFAULT &#39;{}&#39;,
+    required_approvers UUID[],
+    
+    notification_channels JSONB DEFAULT &#39;{}&#39;,
+    escalation_after_hours INTEGER DEFAULT 24,
+    
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    UNIQUE(tenant_id, environment)
+);
+
+-- Trigger: Update approval count
+CREATE OR REPLACE FUNCTION update_approval_count()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.decision = &#39;approved&#39; THEN
+        UPDATE migration_approval_requests
+        SET approvals_received = approvals_received + 1,
+            status = CASE WHEN approvals_received + 1 &gt;= approvals_required THEN &#39;approved&#39; ELSE status END,
+            updated_at = NOW()
+        WHERE id = NEW.request_id;
+    ELSIF NEW.decision = &#39;rejected&#39; THEN
+        UPDATE migration_approval_requests SET status = &#39;rejected&#39;, updated_at = NOW() WHERE id = NEW.request_id;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER migration_approval_update
+    AFTER INSERT ON migration_approvals
+    FOR EACH ROW EXECUTE FUNCTION update_approval_count();
+
+-- Enable RLS
+ALTER TABLE migration_approval_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE migration_approvals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE migration_approval_policies ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY mar_tenant ON migration_approval_requests
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY map_tenant ON migration_approval_policies
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);</code></pre>
+<hr />
+<h2 id="migration-approval-service">46.3 MIGRATION APPROVAL SERVICE</h2>
+<h3 id="packagesfunctionssrcservicesmigration-approval.ts">packages/functions/src/services/migration-approval.ts</h3>
+<pre class="typescript"><code>/**
+ * Dual-Admin Migration Approval Service
+ * @version 4.16.0
+ */
+
+import { Pool } from &#39;pg&#39;;
+import crypto from &#39;crypto&#39;;
+
+export class MigrationApprovalService {
+  constructor(private pool: Pool) {}
+
+  async createRequest(
+    tenantId: string,
+    adminId: string,
+    migrationName: string,
+    migrationVersion: string,
+    migrationSql: string,
+    environment: string,
+    reason?: string
+  ): Promise&lt;{ id: string; status: string; approvalsRequired: number }&gt; {
+    // Get policy
+    const policyResult = await this.pool.query(`
+      SELECT * FROM migration_approval_policies
+      WHERE tenant_id = $1 AND environment = $2 AND is_active = TRUE
+    `, [tenantId, environment]);
+
+    let approvalsRequired = environment === &#39;production&#39; ? 2 : (environment === &#39;staging&#39; ? 1 : 0);
+    if (policyResult.rows.length &gt; 0) {
+      const policy = policyResult.rows[0];
+      approvalsRequired = policy.approvals_required;
+      if (environment === &#39;development&#39; &amp;&amp; policy.auto_approve_development) approvalsRequired = 0;
+    }
+
+    const checksum = crypto.createHash(&#39;sha256&#39;).update(migrationSql).digest(&#39;hex&#39;);
+
+    const result = await this.pool.query(`
+      INSERT INTO migration_approval_requests (
+        tenant_id, migration_name, migration_version, migration_checksum,
+        migration_sql, environment, requested_by, request_reason,
+        approvals_required, status
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      RETURNING id, status, approvals_required
+    `, [tenantId, migrationName, migrationVersion, checksum, migrationSql, environment, adminId, reason, approvalsRequired, approvalsRequired === 0 ? &#39;approved&#39; : &#39;pending&#39;]);
+
+    return result.rows[0];
+  }
+
+  async submitApproval(
+    requestId: string,
+    adminId: string,
+    decision: &#39;approved&#39; | &#39;rejected&#39;,
+    reason?: string
+  ): Promise&lt;{ success: boolean; requestStatus: string; canExecute: boolean }&gt; {
+    const client = await this.pool.connect();
+    
+    try {
+      await client.query(&#39;BEGIN&#39;);
+
+      // Get request
+      const requestResult = await client.query(`SELECT * FROM migration_approval_requests WHERE id = $1`, [requestId]);
+      if (requestResult.rows.length === 0) throw new Error(&#39;Request not found&#39;);
+      const request = requestResult.rows[0];
+
+      if (request.status !== &#39;pending&#39;) throw new Error(`Request is already ${request.status}`);
+
+      // Check self-approval
+      const policyResult = await client.query(`
+        SELECT self_approval_allowed FROM migration_approval_policies
+        WHERE tenant_id = $1 AND environment = $2 AND is_active = TRUE
+      `, [request.tenant_id, request.environment]);
+      
+      const selfApprovalAllowed = policyResult.rows[0]?.self_approval_allowed ?? false;
+      if (request.requested_by === adminId &amp;&amp; !selfApprovalAllowed) {
+        throw new Error(&#39;Self-approval is not allowed for this environment&#39;);
+      }
+
+      // Check duplicate
+      const existingApproval = await client.query(`
+        SELECT id FROM migration_approvals WHERE request_id = $1 AND admin_id = $2
+      `, [requestId, adminId]);
+      if (existingApproval.rows.length &gt; 0) throw new Error(&#39;You have already submitted an approval&#39;);
+
+      // Insert approval
+      await client.query(`
+        INSERT INTO migration_approvals (request_id, admin_id, decision, reason)
+        VALUES ($1, $2, $3, $4)
+      `, [requestId, adminId, decision, reason]);
+
+      // Get updated status
+      const updatedResult = await client.query(`
+        SELECT status, approvals_received, approvals_required FROM migration_approval_requests WHERE id = $1
+      `, [requestId]);
+      const updated = updatedResult.rows[0];
+
+      await client.query(&#39;COMMIT&#39;);
+
+      return {
+        success: true,
+        requestStatus: updated.status,
+        canExecute: updated.status === &#39;approved&#39;
+      };
+    } catch (error) {
+      await client.query(&#39;ROLLBACK&#39;);
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async executeMigration(requestId: string, adminId: string): Promise&lt;{ success: boolean; error?: string }&gt; {
+    const client = await this.pool.connect();
+    
+    try {
+      await client.query(&#39;BEGIN&#39;);
+
+      const requestResult = await client.query(`
+        SELECT * FROM migration_approval_requests WHERE id = $1 AND status = &#39;approved&#39; FOR UPDATE
+      `, [requestId]);
+      if (requestResult.rows.length === 0) throw new Error(&#39;Request not found or not approved&#39;);
+
+      const request = requestResult.rows[0];
+      const startTime = Date.now();
+
+      try {
+        await client.query(request.migration_sql);
+        
+        await client.query(`
+          UPDATE migration_approval_requests
+          SET status = &#39;executed&#39;, executed_at = NOW(), executed_by = $2, execution_time_ms = $3, updated_at = NOW()
+          WHERE id = $1
+        `, [requestId, adminId, Date.now() - startTime]);
+
+        await client.query(&#39;COMMIT&#39;);
+        return { success: true };
+      } catch (execError: any) {
+        await client.query(&#39;ROLLBACK&#39;);
+        await this.pool.query(`
+          UPDATE migration_approval_requests SET status = &#39;failed&#39;, execution_error = $2, updated_at = NOW() WHERE id = $1
+        `, [requestId, execError.message]);
+        return { success: false, error: execError.message };
+      }
+    } catch (error) {
+      await client.query(&#39;ROLLBACK&#39;);
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async getPendingRequests(tenantId: string, adminId: string): Promise&lt;any[]&gt; {
+    const result = await this.pool.query(`
+      SELECT mar.*, NOT EXISTS (SELECT 1 FROM migration_approvals ma WHERE ma.request_id = mar.id AND ma.admin_id = $2) as can_approve
+      FROM migration_approval_requests mar
+      WHERE mar.tenant_id = $1 AND mar.status = &#39;pending&#39; AND mar.requested_by != $2
+      ORDER BY mar.created_at DESC
+    `, [tenantId, adminId]);
+    return result.rows;
+  }
+}</code></pre>
+<hr />
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h1 id="implementation-verification-checklist-v4.13.0---v4.16.0">IMPLEMENTATION VERIFICATION CHECKLIST (v4.13.0 - v4.16.0)</h1>
+<h1 id="section-2">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="section-43-billing-credits-v4.13.0">Section 43: Billing &amp; Credits (v4.13.0)</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Migration 043_billing_system.sql applied</label></li>
+<li><label><input type="checkbox" />All 7 subscription tiers seeded</label></li>
+<li><label><input type="checkbox" />credit_pools table created with RLS</label></li>
+<li><label><input type="checkbox" />credit_transactions table created</label></li>
+<li><label><input type="checkbox" />subscriptions table created</label></li>
+<li><label><input type="checkbox" />CreditsService implemented</label></li>
+<li><label><input type="checkbox" />Stripe integration working</label></li>
+</ul>
+<h2 id="section-44-storage-billing-v4.14.0">Section 44: Storage Billing (v4.14.0)</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Migration 044_storage_billing.sql applied</label></li>
+<li><label><input type="checkbox" />storage_usage table created</label></li>
+<li><label><input type="checkbox" />storage_pricing configured per tier</label></li>
+<li><label><input type="checkbox" />StorageBillingService implemented</label></li>
+<li><label><input type="checkbox" />S3 usage calculation working</label></li>
+<li><label><input type="checkbox" />Quota warnings sending</label></li>
+</ul>
+<h2 id="section-45-versioned-subscriptions-v4.15.0">Section 45: Versioned Subscriptions (v4.15.0)</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Migration 045_versioned_subscriptions.sql applied</label></li>
+<li><label><input type="checkbox" />subscription_plan_versions table created</label></li>
+<li><label><input type="checkbox" />grandfathered_subscriptions table created</label></li>
+<li><label><input type="checkbox" />get_effective_plan() function working</label></li>
+<li><label><input type="checkbox" />GrandfatheringService implemented</label></li>
+<li><label><input type="checkbox" />Migration offers working</label></li>
+</ul>
+<h2 id="section-46-dual-admin-approval-v4.16.0">Section 46: Dual-Admin Approval (v4.16.0)</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Migration 046_dual_admin_approval.sql applied</label></li>
+<li><label><input type="checkbox" />migration_approval_requests table created</label></li>
+<li><label><input type="checkbox" />migration_approvals table created</label></li>
+<li><label><input type="checkbox" />Approval count trigger working</label></li>
+<li><label><input type="checkbox" />MigrationApprovalService implemented</label></li>
+<li><label><input type="checkbox" />Self-approval prevention working</label></li>
+</ul>
+<hr />
+<p><strong>RADIANT v4.17.0 - AI-Optimized for Code Generation</strong> <strong>Version: 4.17.0 | December 2024 | Prompt 32</strong> <strong>Total Sections: 47 (0-46)</strong></p>
+<h2 id="v4.17.0-ai-code-generation-enhancements">v4.17.0 AI Code Generation Enhancements:</h2>
+<ul>
+<li>✅ Complete RadiantDeployerApp.swift with <span class="citation" data-cites="main">@main</span> struct</li>
+<li>✅ Package.swift manifest for Swift Package Manager</li>
+<li>✅ Info.plist and entitlements templates</li>
+<li>✅ RADIANT_VERSION constant (replaces hardcoded strings)</li>
+<li>✅ DOMAIN_PLACEHOLDER constant for configuration</li>
+<li>✅ Sendable conformance for all types crossing actor boundaries</li>
+<li>✅ Swift file creation order for AI implementation</li>
+<li>✅ Platform requirements (macOS 13.0+, Swift 5.9+, Xcode 15+)</li>
+<li>✅ AWS CLI path detection (Homebrew ARM64 + Intel + system)</li>
+<li>✅ DeploymentResult.create() factory method</li>
+<li>✅ Enhanced DeploymentError with helpful messages</li>
+</ul>
+<h2 id="previous-fixes-v4.16.1">Previous Fixes (v4.16.1):</h2>
+<ul>
+<li>✅ RLS variable standardization (<code>app.current_tenant_id</code>)</li>
+<li>✅ Type deduplication (<code>SelfHostedModelPricing</code>, <code>ExternalProviderPricing</code>)</li>
+<li>✅ Billing tier localization registry entries</li>
+</ul>
+<hr />
+<h1 id="end-of-radiant-prompt-32-v4.17.0">END OF RADIANT-PROMPT-32-v4.17.0</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

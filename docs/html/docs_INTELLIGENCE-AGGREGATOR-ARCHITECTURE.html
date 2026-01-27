@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INTELLIGENCE AGGREGATOR ARCHITECTURE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>INTELLIGENCE AGGREGATOR ARCHITECTURE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/INTELLIGENCE-AGGREGATOR-ARCHITECTURE.md</div>
+  </div>
+  
+  <h1 id="intelligence-aggregator-architecture">Intelligence Aggregator Architecture</h1>
+<blockquote>
+<p><strong>Why Radiant Outperforms Any Single Model</strong></p>
+<p>Version: 4.18.3 | December 2024</p>
+</blockquote>
+<hr />
+<h2 id="the-core-principle-a-system-a-model">The Core Principle: A System &gt; A Model</h2>
+<p>Radiant (Think Tank) produces significantly better results than any single state-of-the-art model (GPT-4o, Claude 3.5 Opus, Gemini Ultra, etc.)—not because it is “smarter” in a raw IQ sense, but because of a fundamental architectural principle:</p>
+<p><strong>A well-designed system will always outperform any single component within it.</strong></p>
+<p>A SOTA model like Gemini Ultra is a single engine. Radiant is the Formula 1 team that uses that engine. By wrapping models in layers of verification, diverse reasoning, and deterministic tools, Radiant raises the <strong>floor</strong> of reliability and the <strong>ceiling</strong> of complexity.</p>
+<hr />
+<h2 id="mixture-of-agents-moa-advantage">1. Mixture of Agents (MoA) Advantage</h2>
+<p>Recent research proves that an ensemble of models often outperforms a single superior model. Radiant doesn’t just ask one model—it <strong>triangulates the truth</strong>.</p>
+<h3 id="single-model-approach">Single Model Approach</h3>
+<pre><code>User → &quot;Complex physics question&quot; → Gemini Ultra → Response
+
+Problem: If Gemini has a blind spot or bias in that area,
+         it hallucinates confidently with no correction.</code></pre>
+<h3 id="radiant-ensemble-approach">Radiant Ensemble Approach</h3>
+<pre><code>User → &quot;Complex physics question&quot;
+         ↓
+    ┌────┴────┬────────────┐
+    ↓         ↓            ↓
+ Gemini    Claude      DeepSeek
+ (reasoning) (nuance)   (math)
+    ↓         ↓            ↓
+    └────┬────┴────────────┘
+         ↓
+    Synthesizer Model
+    &quot;Find consensus, discard outliers&quot;
+         ↓
+    Verified Response</code></pre>
+<p><strong>Result</strong>: Statistically filters out “hallucination noise” that any single model inevitably produces.</p>
+<hr />
+<h2 id="adversarial-verification-the-critic-loop">2. Adversarial Verification (The Critic Loop)</h2>
+<p>A single model struggles to “check its own work” because the same neural pathways that made the mistake will likely validate it.</p>
+<h3 id="single-model-self-check">Single Model Self-Check</h3>
+<pre><code>User: &quot;Draft a secure legal contract&quot;
+Model: [Generates contract with subtle error]
+User: &quot;Is this correct?&quot;
+Model: &quot;Yes, this is correct&quot; ← Doubles down on error</code></pre>
+<h3 id="radiant-cross-provider-check">Radiant Cross-Provider Check</h3>
+<pre><code>Step 1 - Draft:
+  Gemini generates the contract
+
+Step 2 - Audit:
+  Claude (different provider, different training data)
+  receives the draft with hostile persona:
+  &quot;You are a Senior Security Auditor. Find loopholes.&quot;
+
+Step 3 - Refine:
+  If Claude finds issues → Gemini rewrites
+  Loop until PASS or max iterations
+
+Step 4 - Deliver:
+  User receives vetted, peer-reviewed output</code></pre>
+<p><strong>Result</strong>: A peer-reviewed output versus a first draft.</p>
+<hr />
+<h2 id="execution-vs.-simulation-the-sandbox-advantage">3. Execution vs. Simulation (The Sandbox Advantage)</h2>
+<p>SOTA models are <strong>probabilistic text generators</strong>. They simulate logic. Radiant can be a <strong>deterministic execution engine</strong>.</p>
+<h3 id="single-model-code-generation">Single Model Code Generation</h3>
+<pre><code>User: &quot;Write a Python script to visualize data&quot;
+Model: [Writes code that looks perfect]
+
+Reality: Uses a function deprecated in 2024
+         → Code crashes when user runs it</code></pre>
+<h3 id="radiant-draft-verify-patch-loop">Radiant Draft-Verify-Patch Loop</h3>
+<pre><code>Step 1: Gemini writes the code
+
+Step 2: Radiant executes code in isolated sandbox (Micro-VM)
+
+Step 3: Radiant catches DeprecationWarning from stderr
+
+Step 4: Radiant feeds error back to Gemini: &quot;Fix this error&quot;
+
+Step 5: Repeat until code passes execution
+
+Result: User receives code GUARANTEED to run</code></pre>
+<p><strong>Result</strong>: Working code, not code that “looks like it would run.”</p>
+<hr />
+<h2 id="avoiding-the-safety-tax">4. Avoiding the Safety Tax</h2>
+<p>Generalist models are heavily tuned for general safety, which often degrades performance in niche or technical domains (the “alignment tax”).</p>
+<h3 id="single-model-safety-limitation">Single Model Safety Limitation</h3>
+<pre><code>User: &quot;Create a penetration testing strategy&quot;
+Model: &quot;I can&#39;t help with that&quot; or [generic watered-down answer]</code></pre>
+<h3 id="radiant-specialized-routing">Radiant Specialized Routing</h3>
+<pre><code>Brain Router detects: Domain = &quot;Cybersecurity&quot;
+
+Routes to: Self-hosted uncensored model
+           (Running on Radiant&#39;s SageMaker layer)
+           Fine-tuned specifically for security auditing
+
+Result: Professional, actionable penetration test plan</code></pre>
+<p><strong>Result</strong>: Professional output instead of a safety lecture.</p>
+<hr />
+<h2 id="the-radiant-multiplier">5. The Radiant Multiplier</h2>
+<p>Radiant wins because <strong>Radiant includes the SOTA model</strong>.</p>
+<pre><code>If:  Radiant = SOTA Model + Verification + Tools + Memory
+
+Then: Radiant &gt; SOTA Model (mathematically certain)</code></pre>
+<h3 id="comparison-matrix">Comparison Matrix</h3>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 36%" />
+<col style="width: 46%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Single SOTA Model</th>
+<th>Radiant (Orchestrator)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Reliability</strong></td>
+<td>Single point of failure (hallucination)</td>
+<td>Consensus-based (MoA) verification</td>
+</tr>
+<tr>
+<td><strong>Code Output</strong></td>
+<td>Probabilistic (might run)</td>
+<td>Deterministic (verified in sandbox)</td>
+</tr>
+<tr>
+<td><strong>Bias</strong></td>
+<td>Provider-specific training bias</td>
+<td>Bias cancellation (Google + Anthropic + OpenAI)</td>
+</tr>
+<tr>
+<td><strong>Long Context</strong></td>
+<td>“Lost in the Middle” syndrome</td>
+<td>Map-Reduce processing of massive datasets</td>
+</tr>
+<tr>
+<td><strong>Domain Expertise</strong></td>
+<td>Safety-filtered generalist</td>
+<td>Specialized model routing</td>
+</tr>
+<tr>
+<td><strong>Self-Correction</strong></td>
+<td>Validates own errors</td>
+<td>Cross-provider adversarial checking</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="trade-offs">Trade-offs</h2>
+<p>Radiant’s superiority comes with costs:</p>
+<table>
+<thead>
+<tr>
+<th>Trade-off</th>
+<th>Impact</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Higher (multiple steps)</td>
+<td>Parallel execution, caching</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>2-4x more tokens</td>
+<td>Use selectively for high-value tasks</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>More moving parts</td>
+<td>Robust fallback chains</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Recommendation</strong>: Enable MoA and Verification for high-stakes tasks (legal, medical, financial, security). Use single-model routing for casual conversations.</p>
+<hr />
+<h2 id="configuration">Configuration</h2>
+<p>See <a href="./RADIANT-ADMIN-GUIDE.md#19-intelligence-aggregator">RADIANT Admin Guide - Intelligence Aggregator</a> for configuration options.</p>
+<h3 id="default-settings">Default Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Default</th>
+<th>Recommended For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Uncertainty Detection</td>
+<td><strong>On</strong></td>
+<td>All tasks</td>
+</tr>
+<tr>
+<td>Success Memory</td>
+<td><strong>On</strong></td>
+<td>All tasks</td>
+</tr>
+<tr>
+<td>MoA Synthesis</td>
+<td>Off</td>
+<td>Research, analysis, high-stakes</td>
+</tr>
+<tr>
+<td>Cross-Provider Verification</td>
+<td>Off</td>
+<td>Legal, code, security</td>
+</tr>
+<tr>
+<td>Code Execution</td>
+<td>Off</td>
+<td>Coding mode only</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./RADIANT-ADMIN-GUIDE.md">RADIANT Admin Guide</a> - Full configuration</li>
+<li><a href="./THINKTANK-ADMIN-GUIDE.md">Think Tank Admin Guide</a> - User-facing features</li>
+<li><a href="./PROVIDER-REJECTION-HANDLING.md">Provider Rejection Handling</a> - Fallback system</li>
+</ul>
+<hr />
+<p><em>Document Version: 4.18.3</em> <em>Last Updated: December 2024</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

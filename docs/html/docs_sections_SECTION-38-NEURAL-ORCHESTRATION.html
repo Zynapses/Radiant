@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 38 NEURAL ORCHESTRATION - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 38 NEURAL ORCHESTRATION</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-38-NEURAL-ORCHESTRATION.md</div>
+  </div>
+  
+  <h1 id="section-38-neural-first-orchestration-think-tank-workflow-registry-v4.4.0">SECTION 38: NEURAL-FIRST ORCHESTRATION &amp; THINK TANK WORKFLOW REGISTRY (v4.4.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<blockquote>
+<p><strong>This section transforms RADIANT from template-based to neural-first orchestration</strong> <strong>Includes: Think Tank Workflow Registry, Visual Editor, Per-User Neural Models, Real-Time Steering</strong></p>
+</blockquote>
+<hr />
+<h2 id="concurrent-execution-architecture">38.1 Concurrent Execution Architecture</h2>
+<blockquote>
+<p><strong>CRITICAL: RADIANT supports concurrent execution per user across all systems.</strong></p>
+</blockquote>
+<h3 id="concurrent-execution-principles">Concurrent Execution Principles</h3>
+<ol type="1">
+<li><strong>Per-User Parallelism</strong>: Each user can run multiple AI conversations/workflows simultaneously</li>
+<li><strong>Billing Awareness</strong>: Usage tracking and cost accumulation work across parallel sessions</li>
+<li><strong>Feedback Aggregation</strong>: Feedback from concurrent sessions properly attributed and aggregated</li>
+<li><strong>Neural Learning</strong>: Learning signals from parallel sessions contribute to user model without race conditions</li>
+<li><strong>Session Isolation</strong>: Each concurrent session has independent state while sharing user preferences</li>
+</ol>
+<h3 id="concurrent-session-architecture">Concurrent Session Architecture</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────────┐
+│                        CONCURRENT EXECUTION PER USER                             │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│   User A                                                                         │
+│   ├── Session 1 (Chat) ─────────────┐                                           │
+│   ├── Session 2 (Workflow) ─────────┼──────────┐                                │
+│   ├── Session 3 (Research) ─────────┼──────────┼──────────┐                     │
+│   └── Session 4 (Code) ─────────────┼──────────┼──────────┼──────────┐          │
+│                                     │          │          │          │          │
+│                                     ▼          ▼          ▼          ▼          │
+│   ┌─────────────────────────────────────────────────────────────────────────┐   │
+│   │                        CONCURRENT SESSION MANAGER                        │   │
+│   │  • Session state isolation          • Shared user preferences           │   │
+│   │  • Independent execution            • Aggregated usage tracking         │   │
+│   │  • Parallel model calls             • Unified feedback collection       │   │
+│   │  • Per-session manifests            • Combined cost accumulation        │   │
+│   └─────────────────────────────────────────────────────────────────────────┘   │
+│                                     │                                           │
+│                    ┌────────────────┼────────────────┐                          │
+│                    ▼                ▼                ▼                          │
+│   ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐             │
+│   │  Billing Service │  │  Neural Engine   │  │ Feedback System  │             │
+│   │ • Per-session    │  │ • Atomic updates │  │ • Session-tagged │             │
+│   │   cost tracking  │  │   to user model  │  │   feedback       │             │
+│   │ • Aggregated     │  │ • Lock-free      │  │ • Batch learning │             │
+│   │   invoicing      │  │   learning       │  │   aggregation    │             │
+│   └──────────────────┘  └──────────────────┘  └──────────────────┘             │
+└─────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="section-overview">38.2 Section Overview</h2>
+<h3 id="what-this-section-creates">What This Section Creates</h3>
+<ol type="1">
+<li><strong>Think Tank Workflow Registry</strong> - 127 orchestration patterns, 127 production workflows, 834 domains in database</li>
+<li><strong>Neural-First Architecture</strong> - Neural Engine as fabric, Brain as governor, tight integration loop</li>
+<li><strong>Per-User Neural Models</strong> - Personalized embeddings for preferences, domains, behavior</li>
+<li><strong>Orchestration Constructor</strong> - Dynamic workflow generation from primitives (not just template selection)</li>
+<li><strong>Real-Time Steering</strong> - Neural Engine monitors and adjusts during execution</li>
+<li><strong>Visual Workflow Editor</strong> - Comprehensive admin interface for building orchestrations</li>
+<li><strong>Client Decision Transparency</strong> - Think Tank receives reasoning, confidence, alternatives</li>
+<li><strong>Swift Deployer v2</strong> - Enhanced deployment app with workflow and Neural configuration</li>
+<li><strong>Concurrent Execution Support</strong> - Full awareness in billing, feedback, and learning systems</li>
+</ol>
+<h3 id="design-philosophy">Design Philosophy</h3>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 41%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Principle</th>
+<th>Current (v4.3)</th>
+<th>New (v4.4)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Neural Role</td>
+<td>35% weight advisor</td>
+<td>60% weight fabric with Brain veto</td>
+</tr>
+<tr>
+<td>Orchestration</td>
+<td>Template selection</td>
+<td>Dynamic construction from primitives</td>
+</tr>
+<tr>
+<td>User Model</td>
+<td>Global defaults</td>
+<td>Per-user embeddings + preferences</td>
+</tr>
+<tr>
+<td>Feedback</td>
+<td>Post-hoc batch learning</td>
+<td>Real-time steering + continuous learning</td>
+</tr>
+<tr>
+<td>Admin Control</td>
+<td>Model selection only</td>
+<td>Full parameter visibility and editing</td>
+</tr>
+<tr>
+<td>Client Transparency</td>
+<td>Result only</td>
+<td>Reasoning + confidence + alternatives</td>
+</tr>
+<tr>
+<td>Concurrent Support</td>
+<td>Implicit</td>
+<td>Explicit per-session tracking</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="database-schema-think-tank-workflow-registry">38.3 Database Schema: Think Tank Workflow Registry</h2>
+<h3 id="migrations038_neural_orchestration_registry.sql">migrations/038_neural_orchestration_registry.sql</h3>
+<pre class="sql"><code>-- ============================================================================
+-- RADIANT v4.4.0 - Neural-First Orchestration &amp; Think Tank Workflow Registry
+-- ============================================================================
+
+-- Enable pgvector if not already enabled
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- ============================================================================
+-- PART 1: THINK TANK ORCHESTRATION PATTERNS (127 patterns)
+-- ============================================================================
+
+-- Orchestration pattern categories
+CREATE TABLE IF NOT EXISTS orchestration_pattern_categories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    category_id VARCHAR(50) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    display_order INTEGER DEFAULT 0,
+    pattern_count INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Core orchestration patterns (127 total from Think Tank Compendium)
+CREATE TABLE IF NOT EXISTS orchestration_patterns (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    pattern_id VARCHAR(100) UNIQUE NOT NULL,
+    category_id VARCHAR(50) NOT NULL REFERENCES orchestration_pattern_categories(category_id),
+    
+    -- Pattern metadata
+    name VARCHAR(200) NOT NULL,
+    description TEXT NOT NULL,
+    research_basis TEXT,                          -- Academic source if applicable
+    
+    -- Implementation details
+    complexity VARCHAR(20) NOT NULL CHECK (complexity IN (&#39;low&#39;, &#39;medium&#39;, &#39;high&#39;, &#39;very_high&#39;)),
+    impact VARCHAR(20) NOT NULL CHECK (impact IN (&#39;low&#39;, &#39;medium&#39;, &#39;high&#39;, &#39;transformative&#39;)),
+    implemented_by TEXT[],                        -- Competitors who implement this
+    implementation_status VARCHAR(30) DEFAULT &#39;planned&#39;,
+    
+    -- Semantic embedding for Neural Engine matching
+    semantic_embedding VECTOR(768),
+    
+    -- Execution characteristics
+    execution_type VARCHAR(20) DEFAULT &#39;serial&#39; CHECK (execution_type IN (&#39;serial&#39;, &#39;parallel&#39;, &#39;hybrid&#39;)),
+    parallelizable BOOLEAN DEFAULT FALSE,
+    typical_model_count INTEGER DEFAULT 1,
+    typical_latency_ms INTEGER,
+    typical_cost_multiplier DECIMAL(4,2) DEFAULT 1.0,
+    
+    -- Pattern definition (DAG structure)
+    pattern_definition JSONB NOT NULL,
+    
+    -- Trigger conditions
+    trigger_keywords TEXT[],
+    trigger_intents TEXT[],
+    trigger_complexity_range NUMRANGE,
+    
+    -- Requirements
+    required_capabilities TEXT[],
+    min_tier INTEGER DEFAULT 1,
+    
+    -- Stats
+    usage_count INTEGER DEFAULT 0,
+    avg_satisfaction_score DECIMAL(3,2),
+    
+    enabled BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Insert orchestration pattern categories (10 categories)
+INSERT INTO orchestration_pattern_categories (category_id, name, description, display_order, pattern_count) VALUES
+(&#39;multi_model&#39;, &#39;Multi-Model Coordination&#39;, &#39;Patterns for coordinating multiple AI models&#39;, 1, 10),
+(&#39;sequential&#39;, &#39;Sequential &amp; Pipeline&#39;, &#39;Step-by-step processing patterns&#39;, 2, 15),
+(&#39;verification&#39;, &#39;Verification &amp; Fact-Checking&#39;, &#39;Patterns for validating AI outputs&#39;, 3, 12),
+(&#39;debate&#39;, &#39;Debate &amp; Adversarial Review&#39;, &#39;Patterns for adversarial evaluation&#39;, 4, 12),
+(&#39;reasoning&#39;, &#39;Reasoning Enhancement&#39;, &#39;Patterns for improving reasoning quality&#39;, 5, 15),
+(&#39;agent&#39;, &#39;Agent Architectures&#39;, &#39;Multi-agent coordination patterns&#39;, 6, 18),
+(&#39;tool&#39;, &#39;Tool Use &amp; Integration&#39;, &#39;Patterns for external tool integration&#39;, 7, 10),
+(&#39;memory&#39;, &#39;Memory &amp; Personalization&#39;, &#39;Patterns for context and personalization&#39;, 8, 8),
+(&#39;user_facing&#39;, &#39;User-Facing Workflow Features&#39;, &#39;Patterns for user interaction&#39;, 9, 12),
+(&#39;emerging&#39;, &#39;Emerging &amp; Cutting-Edge&#39;, &#39;Experimental and research-stage patterns&#39;, 10, 15)
+ON CONFLICT (category_id) DO UPDATE SET pattern_count = EXCLUDED.pattern_count;
+
+-- ============================================================================
+-- PART 2: THINK TANK PRODUCTION WORKFLOWS (127 workflows)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS production_workflow_categories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    category_id VARCHAR(50) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    display_order INTEGER DEFAULT 0,
+    workflow_count INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS production_workflows (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    workflow_id VARCHAR(100) UNIQUE NOT NULL,
+    category_id VARCHAR(50) NOT NULL REFERENCES production_workflow_categories(category_id),
+    
+    name VARCHAR(200) NOT NULL,
+    description TEXT NOT NULL,
+    primary_deliverable VARCHAR(200),
+    semantic_embedding VECTOR(768),
+    workflow_definition JSONB NOT NULL,
+    input_schema JSONB,
+    output_schema JSONB,
+    complexity VARCHAR(20) DEFAULT &#39;medium&#39;,
+    typical_duration_minutes INTEGER,
+    
+    trigger_keywords TEXT[],
+    trigger_domains TEXT[],
+    required_patterns TEXT[],
+    required_capabilities TEXT[],
+    min_tier INTEGER DEFAULT 1,
+    
+    usage_count INTEGER DEFAULT 0,
+    avg_satisfaction_score DECIMAL(3,2),
+    enabled BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Insert production workflow categories (12 categories)
+INSERT INTO production_workflow_categories (category_id, name, description, display_order, workflow_count) VALUES
+(&#39;technical&#39;, &#39;Technical Documentation&#39;, &#39;Engineering and technical writing&#39;, 1, 14),
+(&#39;research&#39;, &#39;Research &amp; Analysis&#39;, &#39;Research papers and analysis reports&#39;, 2, 12),
+(&#39;business&#39;, &#39;Business Documents&#39;, &#39;Business plans, proposals, reports&#39;, 3, 10),
+(&#39;legal&#39;, &#39;Legal Documents&#39;, &#39;Contracts, policies, compliance&#39;, 4, 10),
+(&#39;medical&#39;, &#39;Medical &amp; Healthcare&#39;, &#39;Medical documentation and protocols&#39;, 5, 10),
+(&#39;education&#39;, &#39;Education &amp; Training&#39;, &#39;Learning materials and curricula&#39;, 6, 10),
+(&#39;marketing&#39;, &#39;Marketing &amp; Communications&#39;, &#39;Marketing content and campaigns&#39;, 7, 10),
+(&#39;financial&#39;, &#39;Financial Documents&#39;, &#39;Financial reports and analysis&#39;, 8, 10),
+(&#39;creative&#39;, &#39;Creative Production&#39;, &#39;Creative works and design assets&#39;, 9, 10),
+(&#39;trades&#39;, &#39;Skilled Trades&#39;, &#39;Trade-specific documentation&#39;, 10, 10),
+(&#39;scientific&#39;, &#39;Scientific Workflows&#39;, &#39;Scientific analysis and research&#39;, 11, 8),
+(&#39;software&#39;, &#39;Software Development&#39;, &#39;Software documentation and specs&#39;, 12, 13)
+ON CONFLICT (category_id) DO UPDATE SET workflow_count = EXCLUDED.workflow_count;
+
+-- ============================================================================
+-- PART 3: THINK TANK DOMAIN REGISTRY (834 domains)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS domain_categories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    category_id VARCHAR(50) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    display_order INTEGER DEFAULT 0,
+    domain_count INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS specialized_domains (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    domain_id VARCHAR(100) UNIQUE NOT NULL,
+    category_id VARCHAR(50) NOT NULL REFERENCES domain_categories(category_id),
+    parent_domain_id VARCHAR(100) REFERENCES specialized_domains(domain_id),
+    
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    semantic_embedding VECTOR(768),
+    
+    expert_context TEXT,
+    terminology JSONB,
+    standards TEXT[],
+    best_practices TEXT[],
+    
+    keywords TEXT[],
+    related_domains TEXT[],
+    preferred_models TEXT[],
+    preferred_patterns TEXT[],
+    preferred_workflows TEXT[],
+    
+    usage_count INTEGER DEFAULT 0,
+    enabled BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Insert domain categories (17 categories, 834 domains total)
+INSERT INTO domain_categories (category_id, name, description, display_order, domain_count) VALUES
+(&#39;sciences&#39;, &#39;Sciences&#39;, &#39;Physics, Chemistry, Biology, Earth Sciences, Materials&#39;, 1, 56),
+(&#39;mathematics&#39;, &#39;Mathematics &amp; Logic&#39;, &#39;Algebra, Calculus, Statistics, Logic&#39;, 2, 32),
+(&#39;computer_science&#39;, &#39;Computer Science &amp; Programming&#39;, &#39;Languages, Development, Theory&#39;, 3, 67),
+(&#39;ai&#39;, &#39;Artificial Intelligence&#39;, &#39;ML, NLP, Computer Vision, AI Systems&#39;, 4, 48),
+(&#39;engineering&#39;, &#39;Engineering&#39;, &#39;Mechanical, Electrical, Civil, Chemical&#39;, 5, 72),
+(&#39;medicine&#39;, &#39;Medicine &amp; Healthcare&#39;, &#39;Clinical, Surgery, Allied Health&#39;, 6, 89),
+(&#39;mental_health&#39;, &#39;Mental Health &amp; Psychology&#39;, &#39;Clinical, Counseling, Therapy&#39;, 7, 34),
+(&#39;fitness&#39;, &#39;Fitness, Therapy &amp; Nutrition&#39;, &#39;Training, Nutrition, Wellness&#39;, 8, 42),
+(&#39;humanities&#39;, &#39;Humanities&#39;, &#39;Philosophy, History, Literature, Arts&#39;, 9, 68),
+(&#39;social_sciences&#39;, &#39;Social Sciences&#39;, &#39;Sociology, Economics, Political Science&#39;, 10, 41),
+(&#39;business&#39;, &#39;Business &amp; Management&#39;, &#39;Strategy, Finance, Marketing, Operations&#39;, 11, 58),
+(&#39;legal&#39;, &#39;Law &amp; Legal&#39;, &#39;Corporate, IP, Employment, Litigation&#39;, 12, 34),
+(&#39;education&#39;, &#39;Education&#39;, &#39;Curriculum, Assessment, Special Ed&#39;, 13, 29),
+(&#39;trades&#39;, &#39;Skilled Trades&#39;, &#39;Construction, Mechanical, Electrical, Automotive&#39;, 14, 44),
+(&#39;arts_design&#39;, &#39;Arts, Design &amp; Creativity&#39;, &#39;Visual, Performing, Digital&#39;, 15, 52),
+(&#39;communication&#39;, &#39;Communication &amp; Media&#39;, &#39;Journalism, PR, Social Media&#39;, 16, 26),
+(&#39;emerging&#39;, &#39;Interdisciplinary &amp; Emerging&#39;, &#39;Sustainability, AI Ethics, Futures&#39;, 17, 31)
+ON CONFLICT (category_id) DO UPDATE SET domain_count = EXCLUDED.domain_count;
+
+-- ============================================================================
+-- PART 4: PER-USER NEURAL MODELS
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS user_neural_models (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    
+    -- Profile embeddings (768-dim vectors)
+    profile_embedding VECTOR(768),
+    query_style_embedding VECTOR(768),
+    feedback_pattern_embedding VECTOR(768),
+    
+    -- Structured preferences
+    model_preferences JSONB DEFAULT &#39;{}&#39;,
+    workflow_preferences JSONB DEFAULT &#39;{
+        &quot;prefersVerification&quot;: 0.5,
+        &quot;toleratesLatency&quot;: 0.5,
+        &quot;costSensitivity&quot;: 0.5,
+        &quot;prefersExplanation&quot;: 0.5,
+        &quot;prefersDetailedResponses&quot;: 0.5,
+        &quot;prefersStructuredOutput&quot;: 0.5
+    }&#39;,
+    quality_thresholds JSONB DEFAULT &#39;{
+        &quot;minimumAcceptableQuality&quot;: 0.6,
+        &quot;qualityVsSpeedTradeoff&quot;: 0.5,
+        &quot;qualityVsCostTradeoff&quot;: 0.5
+    }&#39;,
+    
+    -- Behavioral patterns
+    behavioral_patterns JSONB DEFAULT &#39;{
+        &quot;typicalQueryLength&quot;: &quot;medium&quot;,
+        &quot;typicalComplexity&quot;: &quot;moderate&quot;,
+        &quot;frequentDomains&quot;: [],
+        &quot;frequentWorkflows&quot;: [],
+        &quot;peakUsageHours&quot;: [],
+        &quot;feedbackFrequency&quot;: 0.5
+    }&#39;,
+    
+    -- Confidence and training stats
+    overall_confidence DECIMAL(5,4) DEFAULT 0,
+    total_interactions INTEGER DEFAULT 0,
+    total_feedback_events INTEGER DEFAULT 0,
+    training_sample_count INTEGER DEFAULT 0,
+    
+    -- Admin overrides
+    admin_overrides JSONB DEFAULT &#39;{
+        &quot;forceWorkflow&quot;: null,
+        &quot;forceModel&quot;: null,
+        &quot;disablePersonalization&quot;: false,
+        &quot;customParameters&quot;: {}
+    }&#39;,
+    
+    last_training_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    UNIQUE(user_id, tenant_id)
+);
+
+-- Domain-specific embeddings per user
+CREATE TABLE IF NOT EXISTS user_domain_embeddings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_model_id UUID NOT NULL REFERENCES user_neural_models(id) ON DELETE CASCADE,
+    domain_id VARCHAR(100) NOT NULL,
+    embedding VECTOR(768),
+    confidence DECIMAL(5,4) DEFAULT 0,
+    sample_count INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_model_id, domain_id)
+);
+
+-- ============================================================================
+-- PART 5: NEURAL ENGINE CONFIGURATION (Admin Editable)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS neural_engine_config (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    
+    config JSONB NOT NULL DEFAULT &#39;{
+        &quot;learning&quot;: {
+            &quot;learningRate&quot;: 0.01,
+            &quot;userModelUpdateFrequency&quot;: &quot;realtime&quot;,
+            &quot;minSamplesForPersonalization&quot;: 20,
+            &quot;confidenceDecayRate&quot;: 0.001
+        },
+        &quot;userModel&quot;: {
+            &quot;embeddingDimension&quot;: 768,
+            &quot;minConfidenceThreshold&quot;: 0.6,
+            &quot;coldStartStrategy&quot;: &quot;global_defaults&quot;
+        },
+        &quot;construction&quot;: {
+            &quot;maxNodesPerWorkflow&quot;: 20,
+            &quot;preferTemplates&quot;: true,
+            &quot;templateMatchThreshold&quot;: 0.8
+        },
+        &quot;monitoring&quot;: {
+            &quot;realTimeSteeringEnabled&quot;: true,
+            &quot;anomalyDetectionSensitivity&quot;: 0.7,
+            &quot;maxSteeringActionsPerExecution&quot;: 3
+        },
+        &quot;modelSelection&quot;: {
+            &quot;neuralWeightInScoring&quot;: 0.6,
+            &quot;fallbackToDefaults&quot;: true
+        },
+        &quot;scope&quot;: {
+            &quot;enableGlobalLearning&quot;: true,
+            &quot;enableTenantLearning&quot;: true,
+            &quot;enableUserLearning&quot;: true,
+            &quot;globalLearningWeight&quot;: 0.2,
+            &quot;tenantLearningWeight&quot;: 0.3,
+            &quot;userLearningWeight&quot;: 0.5
+        }
+    }&#39;,
+    
+    created_by UUID REFERENCES administrators(id),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    UNIQUE(tenant_id)
+);
+
+-- ============================================================================
+-- PART 6: BRAIN GOVERNOR CONFIGURATION (Admin Editable)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS brain_config (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+    
+    config JSONB NOT NULL DEFAULT &#39;{
+        &quot;costs&quot;: {
+            &quot;maxCostPerRequest&quot;: 0.50,
+            &quot;maxCostPerHour&quot;: 10.00,
+            &quot;maxCostPerDay&quot;: 100.00,
+            &quot;costAlertThreshold&quot;: 0.8
+        },
+        &quot;latency&quot;: {
+            &quot;maxLatencyMs&quot;: 30000,
+            &quot;latencyWarningThreshold&quot;: 0.7
+        },
+        &quot;quality&quot;: {
+            &quot;minimumConfidenceThreshold&quot;: 0.5,
+            &quot;requireVerificationAboveComplexity&quot;: 0.8,
+            &quot;maxRetriesPerNode&quot;: 3
+        },
+        &quot;neuralTrust&quot;: {
+            &quot;trustThreshold&quot;: 0.7,
+            &quot;autoApproveKnownWorkflows&quot;: true,
+            &quot;requireHumanApprovalBelow&quot;: 0.3
+        },
+        &quot;steering&quot;: {
+            &quot;allowModelSwitching&quot;: true,
+            &quot;allowNodeSkipping&quot;: false,
+            &quot;allowWorkflowModification&quot;: true
+        },
+        &quot;compliance&quot;: {
+            &quot;requireHIPAAForMedical&quot;: true,
+            &quot;requireAuditLogging&quot;: true,
+            &quot;piiDetectionEnabled&quot;: true
+        }
+    }&#39;,
+    
+    created_by UUID REFERENCES administrators(id),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    UNIQUE(tenant_id)
+);
+
+-- Brain policies and decision audit
+CREATE TABLE IF NOT EXISTS brain_policies (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    policy_type VARCHAR(50) NOT NULL,
+    conditions JSONB NOT NULL DEFAULT &#39;[]&#39;,
+    actions JSONB NOT NULL DEFAULT &#39;[]&#39;,
+    enabled BOOLEAN DEFAULT TRUE,
+    priority INTEGER DEFAULT 0,
+    created_by UUID REFERENCES administrators(id),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS brain_decisions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    execution_id UUID NOT NULL,
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    session_id UUID REFERENCES concurrent_sessions(id),
+    decision_type VARCHAR(50) NOT NULL,
+    proposal JSONB NOT NULL,
+    decision JSONB NOT NULL,
+    approved BOOLEAN NOT NULL,
+    modifications JSONB,
+    guardrails_applied JSONB,
+    rejection_reason TEXT,
+    decided_by VARCHAR(50) NOT NULL,
+    admin_id UUID REFERENCES administrators(id),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================================================
+-- PART 7: CONSTRUCTED WORKFLOWS &amp; NEURAL EVENTS
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS constructed_workflows (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    name VARCHAR(200),
+    description TEXT,
+    nodes JSONB NOT NULL,
+    edges JSONB NOT NULL,
+    generation_method VARCHAR(50) NOT NULL,
+    source_template_id UUID REFERENCES workflow_definitions(id),
+    source_pattern_ids UUID[],
+    auto_metadata JSONB DEFAULT &#39;{}&#39;,
+    admin_metadata_overrides JSONB DEFAULT &#39;{}&#39;,
+    reasoning JSONB DEFAULT &#39;{}&#39;,
+    alternatives JSONB DEFAULT &#39;[]&#39;,
+    brain_approved BOOLEAN DEFAULT TRUE,
+    brain_modifications JSONB,
+    usage_count INTEGER DEFAULT 0,
+    avg_satisfaction_score DECIMAL(3,2),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS neural_execution_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    execution_id UUID NOT NULL,
+    node_id VARCHAR(100),
+    session_id UUID REFERENCES concurrent_sessions(id),
+    event_type VARCHAR(50) NOT NULL,
+    event_data JSONB NOT NULL,
+    brain_notified BOOLEAN DEFAULT FALSE,
+    brain_response JSONB,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS neural_learning_signals (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    signal_type VARCHAR(50) NOT NULL,
+    user_id UUID REFERENCES users(id),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    workflow_id UUID,
+    model_id VARCHAR(100),
+    node_id VARCHAR(100),
+    session_id UUID REFERENCES concurrent_sessions(id),
+    signal_value DECIMAL(5,4) NOT NULL,
+    confidence DECIMAL(5,4) DEFAULT 1.0,
+    weight DECIMAL(5,4) DEFAULT 1.0,
+    source VARCHAR(50) NOT NULL,
+    processed BOOLEAN DEFAULT FALSE,
+    processed_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================================================
+-- PART 8: INDEXES
+-- ============================================================================
+
+CREATE INDEX IF NOT EXISTS idx_orchestration_patterns_category ON orchestration_patterns(category_id);
+CREATE INDEX IF NOT EXISTS idx_orchestration_patterns_enabled ON orchestration_patterns(enabled) WHERE enabled = TRUE;
+CREATE INDEX IF NOT EXISTS idx_production_workflows_category ON production_workflows(category_id);
+CREATE INDEX IF NOT EXISTS idx_specialized_domains_category ON specialized_domains(category_id);
+CREATE INDEX IF NOT EXISTS idx_user_neural_models_user ON user_neural_models(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_neural_models_tenant ON user_neural_models(tenant_id);
+
+-- Vector similarity indexes
+CREATE INDEX IF NOT EXISTS idx_orchestration_patterns_embedding ON orchestration_patterns 
+    USING ivfflat (semantic_embedding vector_cosine_ops) WITH (lists = 50);
+CREATE INDEX IF NOT EXISTS idx_production_workflows_embedding ON production_workflows 
+    USING ivfflat (semantic_embedding vector_cosine_ops) WITH (lists = 50);
+CREATE INDEX IF NOT EXISTS idx_specialized_domains_embedding ON specialized_domains 
+    USING ivfflat (semantic_embedding vector_cosine_ops) WITH (lists = 100);
+
+-- Neural event indexes for concurrent execution
+CREATE INDEX IF NOT EXISTS idx_neural_execution_events_session ON neural_execution_events(session_id);
+CREATE INDEX IF NOT EXISTS idx_neural_learning_signals_session ON neural_learning_signals(session_id);
+CREATE INDEX IF NOT EXISTS idx_brain_decisions_session ON brain_decisions(session_id);
+
+-- ============================================================================
+-- PART 9: ROW LEVEL SECURITY
+-- ============================================================================
+
+ALTER TABLE user_neural_models ENABLE ROW LEVEL SECURITY;
+ALTER TABLE brain_policies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE brain_decisions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE constructed_workflows ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY user_neural_models_isolation ON user_neural_models 
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY brain_policies_isolation ON brain_policies 
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY brain_decisions_isolation ON brain_decisions 
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY constructed_workflows_isolation ON constructed_workflows 
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+
+-- ============================================================================
+-- PART 10: HELPER FUNCTIONS
+-- ============================================================================
+
+-- Function: Get user&#39;s neural model with fallbacks
+CREATE OR REPLACE FUNCTION get_user_neural_model(p_user_id UUID, p_tenant_id UUID)
+RETURNS JSONB AS $$
+DECLARE
+    user_model JSONB;
+BEGIN
+    SELECT jsonb_build_object(
+        &#39;userId&#39;, user_id,
+        &#39;modelPreferences&#39;, model_preferences,
+        &#39;workflowPreferences&#39;, workflow_preferences,
+        &#39;qualityThresholds&#39;, quality_thresholds,
+        &#39;behavioralPatterns&#39;, behavioral_patterns,
+        &#39;overallConfidence&#39;, overall_confidence,
+        &#39;adminOverrides&#39;, admin_overrides
+    ) INTO user_model
+    FROM user_neural_models 
+    WHERE user_id = p_user_id AND tenant_id = p_tenant_id;
+    
+    RETURN COALESCE(user_model, &#39;{}&#39;);
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function: Record learning signal (atomic for concurrent execution)
+CREATE OR REPLACE FUNCTION record_learning_signal(
+    p_signal_type VARCHAR(50),
+    p_user_id UUID,
+    p_tenant_id UUID,
+    p_workflow_id UUID,
+    p_model_id VARCHAR(100),
+    p_session_id UUID,
+    p_signal_value DECIMAL,
+    p_source VARCHAR(50)
+)
+RETURNS UUID AS $$
+DECLARE
+    signal_id UUID;
+BEGIN
+    INSERT INTO neural_learning_signals (
+        signal_type, user_id, tenant_id, workflow_id, model_id, 
+        session_id, signal_value, source
+    ) VALUES (
+        p_signal_type, p_user_id, p_tenant_id, p_workflow_id, p_model_id,
+        p_session_id, p_signal_value, p_source
+    ) RETURNING id INTO signal_id;
+    
+    RETURN signal_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Add session_id to execution_manifests for concurrent tracking
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = &#39;execution_manifests&#39; AND column_name = &#39;session_id&#39;
+    ) THEN
+        ALTER TABLE execution_manifests ADD COLUMN session_id UUID REFERENCES concurrent_sessions(id);
+        CREATE INDEX idx_execution_manifests_session ON execution_manifests(session_id);
+    END IF;
+END $$;
+
+-- Statistics view
+CREATE OR REPLACE VIEW neural_orchestration_stats AS
+SELECT
+    (SELECT COUNT(*) FROM orchestration_patterns WHERE enabled = TRUE) as total_patterns,
+    (SELECT COUNT(*) FROM orchestration_patterns WHERE implementation_status = &#39;implemented&#39;) as implemented_patterns,
+    (SELECT COUNT(*) FROM production_workflows WHERE enabled = TRUE) as total_workflows,
+    (SELECT COUNT(*) FROM specialized_domains WHERE enabled = TRUE) as total_domains,
+    (SELECT COUNT(*) FROM user_neural_models) as total_user_models,
+    (SELECT AVG(overall_confidence) FROM user_neural_models) as avg_user_confidence,
+    (SELECT COUNT(*) FROM constructed_workflows) as total_constructed_workflows,
+    (SELECT COUNT(*) FROM neural_execution_events WHERE created_at &gt; NOW() - INTERVAL &#39;24 hours&#39;) as events_24h;</code></pre>
+<hr />
+<h2 id="seed-data-sample-orchestration-patterns">38.4 Seed Data: Sample Orchestration Patterns</h2>
+<h3 id="migrations038b_seed_orchestration_patterns.sql">migrations/038b_seed_orchestration_patterns.sql</h3>
+<pre class="sql"><code>-- Sample of 127 Orchestration Patterns from Think Tank Compendium
+-- Full seed data includes all 127 patterns
+
+-- Multi-Model Coordination Patterns (10)
+INSERT INTO orchestration_patterns (pattern_id, category_id, name, description, complexity, impact, implemented_by, implementation_status, execution_type, parallelizable, typical_model_count, pattern_definition, trigger_keywords)
+VALUES
+(&#39;side_by_side_comparison&#39;, &#39;multi_model&#39;, &#39;Side-by-Side Comparison&#39;, &#39;Send identical prompt to 2-6 models, display responses simultaneously&#39;, &#39;low&#39;, &#39;high&#39;, ARRAY[&#39;ChatHub&#39;, &#39;Poe&#39;, &#39;msty&#39;], &#39;implemented&#39;, &#39;parallel&#39;, true, 6, &#39;{&quot;type&quot;: &quot;parallel_query&quot;, &quot;minModels&quot;: 2, &quot;maxModels&quot;: 6}&#39;, ARRAY[&#39;compare&#39;, &#39;side by side&#39;, &#39;versus&#39;, &#39;vs&#39;]),
+(&#39;consensus_voting&#39;, &#39;multi_model&#39;, &#39;Consensus Voting&#39;, &#39;Query multiple models, aggregate via majority vote&#39;, &#39;medium&#39;, &#39;high&#39;, ARRAY[]::TEXT[], &#39;implemented&#39;, &#39;parallel&#39;, true, 3, &#39;{&quot;type&quot;: &quot;voting&quot;, &quot;minModels&quot;: 3, &quot;votingMethod&quot;: &quot;majority&quot;}&#39;, ARRAY[&#39;consensus&#39;, &#39;vote&#39;, &#39;agree&#39;]),
+(&#39;ensemble_synthesis&#39;, &#39;multi_model&#39;, &#39;Ensemble Response Synthesis&#39;, &#39;Combine responses from multiple models into unified answer&#39;, &#39;high&#39;, &#39;high&#39;, ARRAY[]::TEXT[], &#39;implemented&#39;, &#39;hybrid&#39;, true, 3, &#39;{&quot;type&quot;: &quot;ensemble&quot;, &quot;synthesisMethod&quot;: &quot;extract_best&quot;}&#39;, ARRAY[&#39;combine&#39;, &#39;ensemble&#39;, &#39;synthesize&#39;]),
+(&#39;intelligent_routing&#39;, &#39;multi_model&#39;, &#39;Intelligent Model Routing&#39;, &#39;Auto-select optimal model based on query type/complexity&#39;, &#39;medium&#39;, &#39;high&#39;, ARRAY[&#39;Perplexity&#39;, &#39;OpenRouter&#39;], &#39;implemented&#39;, &#39;serial&#39;, false, 1, &#39;{&quot;type&quot;: &quot;capability_routing&quot;, &quot;factors&quot;: [&quot;complexity&quot;, &quot;domain&quot;, &quot;cost&quot;]}&#39;, ARRAY[&#39;auto&#39;, &#39;best model&#39;, &#39;smart&#39;])
+ON CONFLICT (pattern_id) DO UPDATE SET updated_at = NOW();
+
+-- Sequential Patterns (sample)
+INSERT INTO orchestration_patterns (pattern_id, category_id, name, description, complexity, impact, implemented_by, implementation_status, execution_type, pattern_definition, trigger_keywords)
+VALUES
+(&#39;draft_critique_revise&#39;, &#39;sequential&#39;, &#39;Draft → Critique → Revise&#39;, &#39;Generate, evaluate, improve cycle&#39;, &#39;medium&#39;, &#39;high&#39;, ARRAY[&#39;DSPy&#39;], &#39;implemented&#39;, &#39;serial&#39;, &#39;{&quot;type&quot;: &quot;iterative&quot;, &quot;stages&quot;: [&quot;draft&quot;, &quot;critique&quot;, &quot;revise&quot;]}&#39;, ARRAY[&#39;improve&#39;, &#39;refine&#39;, &#39;polish&#39;]),
+(&#39;research_analyze_report&#39;, &#39;sequential&#39;, &#39;Research → Analyze → Report&#39;, &#39;Sequential research workflow&#39;, &#39;high&#39;, &#39;high&#39;, ARRAY[&#39;Perplexity&#39;], &#39;implemented&#39;, &#39;serial&#39;, &#39;{&quot;type&quot;: &quot;research_pipeline&quot;, &quot;stages&quot;: [&quot;research&quot;, &quot;analyze&quot;, &quot;report&quot;]}&#39;, ARRAY[&#39;research&#39;, &#39;investigate&#39;, &#39;deep dive&#39;]),
+(&#39;plan_execute_verify&#39;, &#39;sequential&#39;, &#39;Plan → Execute → Verify&#39;, &#39;Agentic task completion pattern&#39;, &#39;high&#39;, &#39;high&#39;, ARRAY[&#39;AutoGen&#39;, &#39;CrewAI&#39;], &#39;implemented&#39;, &#39;serial&#39;, &#39;{&quot;type&quot;: &quot;agent_loop&quot;, &quot;stages&quot;: [&quot;plan&quot;, &quot;execute&quot;, &quot;verify&quot;]}&#39;, ARRAY[&#39;accomplish&#39;, &#39;complete task&#39;, &#39;do this&#39;])
+ON CONFLICT (pattern_id) DO UPDATE SET updated_at = NOW();
+
+-- Verification Patterns (sample)
+INSERT INTO orchestration_patterns (pattern_id, category_id, name, description, complexity, impact, implemented_by, implementation_status, execution_type, pattern_definition, trigger_keywords)
+VALUES
+(&#39;red_team_attack&#39;, &#39;verification&#39;, &#39;Red Team Attack&#39;, &#39;Adversarial model challenges primary response&#39;, &#39;medium&#39;, &#39;high&#39;, ARRAY[&#39;Think Tank&#39;], &#39;implemented&#39;, &#39;serial&#39;, &#39;{&quot;type&quot;: &quot;adversarial&quot;, &quot;attackModel&quot;: &quot;separate&quot;}&#39;, ARRAY[&#39;challenge&#39;, &#39;verify&#39;, &#39;attack&#39;]),
+(&#39;chain_of_verification&#39;, &#39;verification&#39;, &#39;Chain of Verification (CoVe)&#39;, &#39;Generate claims → generate questions → verify answers&#39;, &#39;high&#39;, &#39;high&#39;, ARRAY[]::TEXT[], &#39;implemented&#39;, &#39;serial&#39;, &#39;{&quot;type&quot;: &quot;cove&quot;, &quot;stages&quot;: [&quot;claims&quot;, &quot;questions&quot;, &quot;verify&quot;]}&#39;, ARRAY[&#39;verify claims&#39;, &#39;fact check&#39;]),
+(&#39;hallucination_detection&#39;, &#39;verification&#39;, &#39;Hallucination Detection&#39;, &#39;Identify unsupported or fabricated claims&#39;, &#39;high&#39;, &#39;high&#39;, ARRAY[]::TEXT[], &#39;implemented&#39;, &#39;serial&#39;, &#39;{&quot;type&quot;: &quot;hallucination_check&quot;}&#39;, ARRAY[&#39;making this up&#39;, &#39;hallucinating&#39;])
+ON CONFLICT (pattern_id) DO UPDATE SET updated_at = NOW();
+
+-- Debate Patterns (sample)
+INSERT INTO orchestration_patterns (pattern_id, category_id, name, description, complexity, impact, implemented_by, implementation_status, execution_type, pattern_definition, trigger_keywords)
+VALUES
+(&#39;ai_debate&#39;, &#39;debate&#39;, &#39;AI Debate&#39;, &#39;Two models argue opposing positions&#39;, &#39;medium&#39;, &#39;high&#39;, ARRAY[&#39;Think Tank&#39;], &#39;implemented&#39;, &#39;serial&#39;, &#39;{&quot;type&quot;: &quot;debate&quot;, &quot;rounds&quot;: 3}&#39;, ARRAY[&#39;debate&#39;, &#39;argue&#39;, &#39;pros and cons&#39;]),
+(&#39;round_table_consensus&#39;, &#39;debate&#39;, &#39;Round Table Consensus&#39;, &#39;Multiple agents discuss to reach consensus&#39;, &#39;high&#39;, &#39;high&#39;, ARRAY[&#39;Think Tank&#39;], &#39;implemented&#39;, &#39;serial&#39;, &#39;{&quot;type&quot;: &quot;consensus&quot;, &quot;maxRounds&quot;: 5}&#39;, ARRAY[&#39;consensus&#39;, &#39;agree on&#39;, &#39;come together&#39;]),
+(&#39;ai_judge&#39;, &#39;debate&#39;, &#39;AI Judge&#39;, &#39;Third model evaluates debate outcome&#39;, &#39;medium&#39;, &#39;high&#39;, ARRAY[&#39;Think Tank&#39;], &#39;implemented&#39;, &#39;serial&#39;, &#39;{&quot;type&quot;: &quot;judge&quot;, &quot;criteria&quot;: [&quot;logic&quot;, &quot;evidence&quot;, &quot;persuasion&quot;]}&#39;, ARRAY[&#39;which is better&#39;, &#39;evaluate&#39;, &#39;judge&#39;])
+ON CONFLICT (pattern_id) DO UPDATE SET updated_at = NOW();
+
+-- Reasoning Enhancement Patterns (sample)
+INSERT INTO orchestration_patterns (pattern_id, category_id, name, description, complexity, impact, implemented_by, implementation_status, execution_type, pattern_definition, trigger_keywords)
+VALUES
+(&#39;chain_of_thought&#39;, &#39;reasoning&#39;, &#39;Chain of Thought (CoT)&#39;, &#39;Step-by-step reasoning&#39;, &#39;low&#39;, &#39;high&#39;, ARRAY[&#39;GPT-4&#39;, &#39;Claude&#39;], &#39;implemented&#39;, &#39;serial&#39;, &#39;{&quot;type&quot;: &quot;cot&quot;, &quot;showSteps&quot;: true}&#39;, ARRAY[&#39;think through&#39;, &#39;reasoning&#39;, &#39;step by step&#39;]),
+(&#39;tree_of_thoughts&#39;, &#39;reasoning&#39;, &#39;Tree of Thoughts (ToT)&#39;, &#39;Explore multiple reasoning branches&#39;, &#39;high&#39;, &#39;high&#39;, ARRAY[]::TEXT[], &#39;implemented&#39;, &#39;hybrid&#39;, &#39;{&quot;type&quot;: &quot;tot&quot;, &quot;branchFactor&quot;: 3, &quot;depth&quot;: 3}&#39;, ARRAY[&#39;explore options&#39;, &#39;different paths&#39;, &#39;branches&#39;]),
+(&#39;self_consistency&#39;, &#39;reasoning&#39;, &#39;Self-Consistency&#39;, &#39;Sample multiple CoT paths, vote on answer&#39;, &#39;medium&#39;, &#39;high&#39;, ARRAY[]::TEXT[], &#39;implemented&#39;, &#39;parallel&#39;, &#39;{&quot;type&quot;: &quot;self_consistency&quot;, &quot;samples&quot;: 5}&#39;, ARRAY[&#39;confident answer&#39;, &#39;verify reasoning&#39;]),
+(&#39;self_refine&#39;, &#39;reasoning&#39;, &#39;Self-Refine Loop&#39;, &#39;Iterative self-improvement&#39;, &#39;medium&#39;, &#39;high&#39;, ARRAY[&#39;DSPy&#39;], &#39;implemented&#39;, &#39;serial&#39;, &#39;{&quot;type&quot;: &quot;self_refine&quot;, &quot;maxIterations&quot;: 3}&#39;, ARRAY[&#39;improve&#39;, &#39;refine&#39;, &#39;iterate&#39;])
+ON CONFLICT (pattern_id) DO UPDATE SET updated_at = NOW();
+
+-- Note: Full implementation includes all 127 patterns from Think Tank Compendium</code></pre>
+<hr />
+<h2 id="api-endpoints-summary">38.5 API Endpoints Summary</h2>
+<h3 id="neural-orchestration-admin-endpoints">Neural Orchestration Admin Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 32%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/neural/config</code></td>
+<td>Get Neural Engine config</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/v2/admin/neural/config</code></td>
+<td>Update Neural Engine config</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/brain/config</code></td>
+<td>Get Brain Governor config</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/v2/admin/brain/config</code></td>
+<td>Update Brain Governor config</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/patterns</code></td>
+<td>List orchestration patterns</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/v2/admin/patterns/{patternId}</code></td>
+<td>Update pattern status</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/workflows/production</code></td>
+<td>List production workflows</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/domains</code></td>
+<td>List specialized domains</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/user-models</code></td>
+<td>List user neural models</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/v2/admin/user-models/{userId}/overrides</code></td>
+<td>Set admin overrides</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/v2/admin/user-models/{userId}</code></td>
+<td>Reset user model</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/registry/stats</code></td>
+<td>Get registry statistics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="workflow-editor-endpoints">Workflow Editor Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 32%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/workflows/templates</code></td>
+<td>List workflow templates</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v2/admin/workflows/templates</code></td>
+<td>Create template</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/v2/admin/workflows/templates/{id}</code></td>
+<td>Update template</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/v2/admin/workflows/templates/{id}</code></td>
+<td>Delete template</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v2/admin/workflows/generate-metadata</code></td>
+<td>Auto-generate metadata</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v2/admin/workflows/test</code></td>
+<td>Test workflow execution</td>
+</tr>
+</tbody>
+</table>
+<h3 id="client-decision-transparency-endpoints">Client Decision Transparency Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 32%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/decision/{executionId}</code></td>
+<td>Get decision transparency</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v2/decision/{executionId}/override</code></td>
+<td>Submit override request</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="swift-deployer-v2-updates">38.6 Swift Deployer v2 Updates</h2>
+<p>The Swift Deployment App now includes:</p>
+<ol type="1">
+<li><strong>Neural Engine Configuration View</strong>
+<ul>
+<li>Learning parameters (rate, frequency, decay)</li>
+<li>User model settings (cold start, confidence thresholds)</li>
+<li>Construction parameters (max nodes, template preferences)</li>
+<li>Real-time monitoring toggles</li>
+</ul></li>
+<li><strong>Brain Governor Configuration View</strong>
+<ul>
+<li>Cost controls (per-request, per-hour, per-day limits)</li>
+<li>Latency controls (max latency, warning thresholds)</li>
+<li>Quality controls (confidence, verification requirements)</li>
+<li>Neural trust settings (approval thresholds)</li>
+<li>Steering controls (model switching, node skipping)</li>
+<li>Compliance settings (HIPAA, audit logging)</li>
+</ul></li>
+<li><strong>Workflow Registry Browser</strong>
+<ul>
+<li>View 127 orchestration patterns by category</li>
+<li>View 127 production workflows by category</li>
+<li>View 834 specialized domains by category</li>
+<li>Search and filter capabilities</li>
+<li>Usage statistics dashboard</li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="verification-deployment">38.7 Verification &amp; Deployment</h2>
+<h3 id="pre-deployment-checklist">Pre-Deployment Checklist</h3>
+<pre class="bash"><code># 1. Apply database migrations
+psql $DATABASE_URL -f migrations/038_neural_orchestration_registry.sql
+psql $DATABASE_URL -f migrations/038b_seed_orchestration_patterns.sql
+
+# 2. Verify tables created
+psql $DATABASE_URL -c &quot;SELECT * FROM neural_orchestration_stats&quot;
+
+# 3. Verify registry counts
+psql $DATABASE_URL -c &quot;SELECT COUNT(*) as patterns FROM orchestration_patterns&quot;
+psql $DATABASE_URL -c &quot;SELECT COUNT(*) as categories FROM domain_categories&quot;
+
+# 4. Test Neural Engine config
+curl https://api.YOUR_DOMAIN.com/api/v2/admin/neural/config \
+  -H &quot;Authorization: Bearer $ADMIN_TOKEN&quot;
+
+# 5. Test decision transparency
+curl https://api.YOUR_DOMAIN.com/api/v2/decision/{executionId} \
+  -H &quot;Authorization: Bearer $TOKEN&quot;</code></pre>
+<hr />
+<h2 id="summary-v4.4.0">Summary v4.4.0</h2>
+<p>RADIANT v4.4.0 (PROMPT-18) adds <strong>Neural-First Orchestration &amp; Think Tank Workflow Registry</strong>:</p>
+<h3 id="section-38-neural-first-orchestration-v4.4.0">Section 38: Neural-First Orchestration (v4.4.0)</h3>
+<ol type="1">
+<li><strong>Think Tank Workflow Registry</strong> (Database Schema)
+<ul>
+<li>127 orchestration patterns across 10 categories</li>
+<li>127 production workflows across 12 categories<br />
+</li>
+<li>834 specialized domains across 17 categories</li>
+<li>Full semantic embeddings for Neural Engine matching</li>
+</ul></li>
+<li><strong>Neural Engine Enhancements</strong>
+<ul>
+<li>Per-user neural models with 768-dim embeddings</li>
+<li>Orchestration constructor (dynamic workflow generation)</li>
+<li>Real-time steering during execution</li>
+<li>Learning from concurrent sessions (atomic updates)</li>
+</ul></li>
+<li><strong>Brain Governor Enhancements</strong>
+<ul>
+<li>Full admin-editable configuration</li>
+<li>Policy engine with conditions and actions</li>
+<li>Decision audit logging</li>
+<li>Concurrent session awareness</li>
+</ul></li>
+<li><strong>Visual Workflow Editor</strong>
+<ul>
+<li>Drag-and-drop node placement</li>
+<li>12 node type categories</li>
+<li>Neural I/O connector visualization</li>
+<li>Auto-generated metadata</li>
+</ul></li>
+<li><strong>Client Decision Transparency</strong>
+<ul>
+<li>Reasoning exposed to Think Tank</li>
+<li>Confidence scores with explanations</li>
+<li>Alternatives with tradeoffs</li>
+<li>Override options with impact estimation</li>
+</ul></li>
+<li><strong>Swift Deployer v2</strong>
+<ul>
+<li>Neural Engine configuration UI</li>
+<li>Brain Governor configuration UI</li>
+<li>Workflow registry browser</li>
+</ul></li>
+<li><strong>Concurrent Execution Support</strong>
+<ul>
+<li>Session-aware billing aggregation</li>
+<li>Session-tagged feedback</li>
+<li>Atomic neural model updates</li>
+</ul></li>
+</ol>
+<h3 id="design-philosophy-v4.4.0">Design Philosophy (v4.4.0)</h3>
+<ul>
+<li><strong>Neural-First</strong> - Neural Engine is the fabric (60% weight), Brain is the governor</li>
+<li><strong>Dynamic Construction</strong> - Workflows built from primitives, not just template selection</li>
+<li><strong>Per-User Learning</strong> - Personalized embeddings and preferences</li>
+<li><strong>Real-Time Steering</strong> - Adjustments during execution, not just post-hoc</li>
+<li><strong>Full Transparency</strong> - Clients see reasoning, confidence, alternatives</li>
+<li><strong>Admin Control</strong> - All parameters editable through dashboard</li>
+<li><strong>Concurrent Aware</strong> - Proper handling of parallel user sessions</li>
+</ul>
+<h3 id="also-includes-all-v4.3.0-features">Also includes all v4.3.0 features:</h3>
+<ul>
+<li>Feedback Learning System</li>
+<li>Neural Engine Loop</li>
+<li>Multi-Language Voice Feedback</li>
+<li>Implicit Signals</li>
+<li>A/B Testing Framework</li>
+</ul>
+<hr />
+<p><strong>Total Sections: 40 (0-39)</strong> <strong>Total Lines: ~53,000</strong> <strong>Total Size: ~2.3MB</strong></p>
+<hr />
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

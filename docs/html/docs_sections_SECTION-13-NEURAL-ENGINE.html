@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 13 NEURAL ENGINE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 13 NEURAL ENGINE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-13-NEURAL-ENGINE.md</div>
+  </div>
+  
+  <h1 id="section-13-user-neural-engine-v3.0.0">SECTION 13: USER NEURAL ENGINE (v3.0.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="neural-engine-overview">13.1 Neural Engine Overview</h2>
+<p>The User Neural Engine provides personalized AI experiences through learned preferences, conversation memory with embeddings, and adaptive behavior patterns.</p>
+<h2 id="neural-engine-database-schema">13.2 Neural Engine Database Schema</h2>
+<pre class="sql"><code>-- migrations/023_user_neural_engine.sql
+
+-- Enable pgvector for embeddings
+CREATE EXTENSION IF NOT EXISTS vector;
+
+CREATE TABLE user_preferences (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    preference_key VARCHAR(100) NOT NULL,
+    preference_value JSONB NOT NULL,
+    confidence DECIMAL(3, 2) DEFAULT 0.5,
+    learned_from TEXT[],
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(tenant_id, user_id, preference_key)
+);
+
+CREATE TABLE user_memory (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    memory_type VARCHAR(50) NOT NULL,
+    content TEXT NOT NULL,
+    embedding vector(1536),
+    importance DECIMAL(3, 2) DEFAULT 0.5,
+    access_count INTEGER DEFAULT 0,
+    last_accessed TIMESTAMPTZ,
+    expires_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE user_behavior_patterns (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    pattern_type VARCHAR(50) NOT NULL,
+    pattern_data JSONB NOT NULL,
+    occurrence_count INTEGER DEFAULT 1,
+    last_occurred TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_user_memory_embedding ON user_memory USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+CREATE INDEX idx_user_preferences_user ON user_preferences(tenant_id, user_id);
+CREATE INDEX idx_user_patterns_user ON user_behavior_patterns(tenant_id, user_id);
+
+ALTER TABLE user_preferences ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_memory ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_behavior_patterns ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY user_preferences_isolation ON user_preferences USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY user_memory_isolation ON user_memory USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY user_patterns_isolation ON user_behavior_patterns USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);</code></pre>
+<h2 id="neural-engine-service">13.3 Neural Engine Service</h2>
+<pre class="typescript"><code>// packages/core/src/services/neural-engine.ts
+
+import { Pool } from &#39;pg&#39;;
+import { BedrockRuntimeClient, InvokeModelCommand } from &#39;@aws-sdk/client-bedrock-runtime&#39;;
+
+export class NeuralEngine {
+    private pool: Pool;
+    private bedrock: BedrockRuntimeClient;
+    
+    constructor(pool: Pool) {
+        this.pool = pool;
+        this.bedrock = new BedrockRuntimeClient({});
+    }
+    
+    async learnFromConversation(
+        tenantId: string,
+        userId: string,
+        messages: { role: string; content: string }[]
+    ): Promise&lt;void&gt; {
+        // Extract preferences
+        const preferences = await this.extractPreferences(messages);
+        for (const pref of preferences) {
+            await this.updatePreference(tenantId, userId, pref.key, pref.value, pref.confidence);
+        }
+        
+        // Store important memories
+        const memories = await this.extractMemories(messages);
+        for (const memory of memories) {
+            await this.storeMemory(tenantId, userId, memory);
+        }
+        
+        // Update behavior patterns
+        await this.updateBehaviorPatterns(tenantId, userId, messages);
+    }
+    
+    async getRelevantMemories(
+        tenantId: string,
+        userId: string,
+        query: string,
+        limit: number = 5
+    ): Promise&lt;any[]&gt; {
+        const embedding = await this.generateEmbedding(query);
+        
+        const result = await this.pool.query(`
+            SELECT content, importance, memory_type,
+                   1 - (embedding &lt;=&gt; $4::vector) as similarity
+            FROM user_memory
+            WHERE tenant_id = $1 AND user_id = $2
+            AND (expires_at IS NULL OR expires_at &gt; NOW())
+            ORDER BY embedding &lt;=&gt; $4::vector
+            LIMIT $3
+        `, [tenantId, userId, limit, `[${embedding.join(&#39;,&#39;)}]`]);
+        
+        // Update access counts
+        for (const row of result.rows) {
+            await this.pool.query(`
+                UPDATE user_memory SET access_count = access_count + 1, last_accessed = NOW()
+                WHERE id = $1
+            `, [row.id]);
+        }
+        
+        return result.rows;
+    }
+    
+    async getPreferences(tenantId: string, userId: string): Promise&lt;Record&lt;string, any&gt;&gt; {
+        const result = await this.pool.query(`
+            SELECT preference_key, preference_value, confidence
+            FROM user_preferences
+            WHERE tenant_id = $1 AND user_id = $2
+            ORDER BY confidence DESC
+        `, [tenantId, userId]);
+        
+        const prefs: Record&lt;string, any&gt; = {};
+        for (const row of result.rows) {
+            prefs[row.preference_key] = {
+                value: row.preference_value,
+                confidence: row.confidence
+            };
+        }
+        return prefs;
+    }
+    
+    private async generateEmbedding(text: string): Promise&lt;number[]&gt; {
+        const response = await this.bedrock.send(new InvokeModelCommand({
+            modelId: &#39;amazon.titan-embed-text-v1&#39;,
+            body: JSON.stringify({ inputText: text }),
+            contentType: &#39;application/json&#39;
+        }));
+        
+        const result = JSON.parse(new TextDecoder().decode(response.body));
+        return result.embedding;
+    }
+    
+    private async extractPreferences(messages: any[]): Promise&lt;any[]&gt; {
+        const conversationText = messages.map(m =&gt; `${m.role}: ${m.content}`).join(&#39;\n&#39;);
+        
+        const response = await this.bedrock.send(new InvokeModelCommand({
+            modelId: &#39;anthropic.claude-3-haiku-20240307-v1:0&#39;,
+            body: JSON.stringify({
+                anthropic_version: &#39;bedrock-2023-05-31&#39;,
+                max_tokens: 1024,
+                messages: [{
+                    role: &#39;user&#39;,
+                    content: `Extract user preferences from this conversation. Return JSON array with objects containing key, value, and confidence (0-1):
+                    
+${conversationText}
+
+Return only valid JSON array.`
+                }]
+            }),
+            contentType: &#39;application/json&#39;
+        }));
+        
+        const result = JSON.parse(new TextDecoder().decode(response.body));
+        try {
+            return JSON.parse(result.content[0].text);
+        } catch {
+            return [];
+        }
+    }
+    
+    private async extractMemories(messages: any[]): Promise&lt;any[]&gt; {
+        // Similar extraction for important facts/memories
+        return [];
+    }
+    
+    private async updatePreference(
+        tenantId: string,
+        userId: string,
+        key: string,
+        value: any,
+        confidence: number
+    ): Promise&lt;void&gt; {
+        await this.pool.query(`
+            INSERT INTO user_preferences (tenant_id, user_id, preference_key, preference_value, confidence)
+            VALUES ($1, $2, $3, $4, $5)
+            ON CONFLICT (tenant_id, user_id, preference_key)
+            DO UPDATE SET 
+                preference_value = EXCLUDED.preference_value,
+                confidence = GREATEST(user_preferences.confidence, EXCLUDED.confidence),
+                updated_at = NOW()
+        `, [tenantId, userId, key, JSON.stringify(value), confidence]);
+    }
+    
+    private async storeMemory(tenantId: string, userId: string, memory: any): Promise&lt;void&gt; {
+        const embedding = await this.generateEmbedding(memory.content);
+        
+        await this.pool.query(`
+            INSERT INTO user_memory (tenant_id, user_id, memory_type, content, embedding, importance)
+            VALUES ($1, $2, $3, $4, $5::vector, $6)
+        `, [tenantId, userId, memory.type, memory.content, `[${embedding.join(&#39;,&#39;)}]`, memory.importance]);
+    }
+    
+    private async updateBehaviorPatterns(
+        tenantId: string,
+        userId: string,
+        messages: any[]
+    ): Promise&lt;void&gt; {
+        // Pattern detection logic
+    }
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -211,40 +211,6 @@ export class CatoSecurityCriticMethod extends CatoBaseMethodExecutor<SecurityCri
     };
   }
 
-  protected async invokeModel(
-    systemPrompt: string,
-    userPrompt: string,
-    context: MethodExecutionContext
-  ): Promise<ModelInvocationResult> {
-    const mockResponse: SecurityCriticOutput = {
-      criticType: 'SECURITY',
-      verdict: 'APPROVE_WITH_CONCERNS',
-      score: 0.78,
-      issues: [],
-      strengths: ['Actions use parameterized inputs', 'All actions are reversible'],
-      recommendations: ['Add rate limiting', 'Implement audit logging'],
-      securityChecklist: {
-        inputValidation: { passed: true, notes: 'Inputs validated by tool schema' },
-        injectionPrevention: { passed: true, notes: 'No string interpolation detected' },
-        accessControl: { passed: true, notes: 'Tool permissions checked' },
-        dataExposure: { passed: true, notes: 'No sensitive data in outputs' },
-        authentication: { passed: true, notes: 'Tenant context enforced' },
-        auditTrail: { passed: true, notes: 'All actions logged' },
-        reversibility: { passed: true, notes: 'Compensation strategies defined' },
-      },
-    };
-
-    return {
-      response: JSON.stringify(mockResponse),
-      parsedOutput: mockResponse,
-      tokensInput: Math.ceil((systemPrompt.length + userPrompt.length) / 4),
-      tokensOutput: Math.ceil(JSON.stringify(mockResponse).length / 4),
-      costCents: 2,
-      latencyMs: 600,
-      modelId: this.methodDefinition?.defaultModel || 'claude-sonnet-4-20250514',
-      provider: 'anthropic',
-    };
-  }
 }
 
 export const createSecurityCriticMethod = (

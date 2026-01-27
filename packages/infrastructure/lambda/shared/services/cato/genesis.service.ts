@@ -3,9 +3,12 @@
  * 
  * Manages Genesis developmental gates and system state.
  * Part of the Cato Genesis Safety Architecture.
+ * 
+ * Uses database persistence for state that must survive Lambda invocations.
  */
 
-import { v4 as uuidv4 } from 'uuid';
+import { executeStatement } from '../../database/aurora-client';
+import { logger } from '../../logging/enhanced-logger';
 
 export type GenesisStage = 'EMBRYONIC' | 'NASCENT' | 'DEVELOPING' | 'MATURING' | 'MATURE';
 
@@ -38,38 +41,129 @@ const DEFAULT_GATES: Omit<GenesisGate, 'status' | 'passedAt'>[] = [
 ];
 
 class GenesisService {
-  private states: Map<string, GenesisState> = new Map();
-
   async getState(tenantId: string): Promise<GenesisState> {
-    if (!this.states.has(tenantId)) {
-      this.states.set(tenantId, this.createDefaultState(tenantId));
+    try {
+      // Fetch state from database
+      const stateResult = await executeStatement(
+        `SELECT current_stage, capabilities, restrictions, last_assessment
+         FROM genesis_state WHERE tenant_id = $1`,
+        [tenantId]
+      );
+
+      // Fetch gates from database
+      const gatesResult = await executeStatement(
+        `SELECT gate_id, name, description, stage, requirements, status, passed_at, bypass_reason
+         FROM genesis_gates WHERE tenant_id = $1 ORDER BY gate_id`,
+        [tenantId]
+      );
+
+      if (stateResult.rows.length === 0) {
+        // Initialize state for new tenant
+        await this.initializeState(tenantId);
+        return this.getState(tenantId);
+      }
+
+      const row = stateResult.rows[0] as Record<string, unknown>;
+      const gates: GenesisGate[] = gatesResult.rows.map((g: Record<string, unknown>) => ({
+        gateId: g.gate_id as string,
+        name: g.name as string,
+        description: g.description as string,
+        stage: g.stage as GenesisStage,
+        requirements: (g.requirements as string[]) || [],
+        status: g.status as 'LOCKED' | 'PENDING' | 'PASSED' | 'BYPASSED',
+        passedAt: g.passed_at ? new Date(g.passed_at as string) : undefined,
+        bypassReason: g.bypass_reason as string | undefined,
+      }));
+
+      return {
+        tenantId,
+        currentStage: row.current_stage as GenesisStage,
+        gates,
+        capabilities: (row.capabilities as string[]) || ['basic_chat', 'simple_queries'],
+        restrictions: (row.restrictions as string[]) || ['no_external_actions', 'no_code_execution', 'no_file_access'],
+        lastAssessment: new Date(row.last_assessment as string),
+      };
+    } catch (error) {
+      logger.warn('Failed to fetch Genesis state from database, using defaults', { tenantId, error: String(error) });
+      return this.createDefaultState(tenantId);
     }
-    return this.states.get(tenantId)!;
+  }
+
+  private async initializeState(tenantId: string): Promise<void> {
+    await executeStatement(
+      `INSERT INTO genesis_state (tenant_id, current_stage, capabilities, restrictions)
+       VALUES ($1, 'EMBRYONIC', $2::jsonb, $3::jsonb)
+       ON CONFLICT (tenant_id) DO NOTHING`,
+      [tenantId, JSON.stringify(['basic_chat', 'simple_queries']), JSON.stringify(['no_external_actions', 'no_code_execution', 'no_file_access'])]
+    );
+
+    for (const gate of DEFAULT_GATES) {
+      await executeStatement(
+        `INSERT INTO genesis_gates (tenant_id, gate_id, name, description, stage, requirements, status)
+         VALUES ($1, $2, $3, $4, $5, $6::jsonb, 'LOCKED')
+         ON CONFLICT (tenant_id, gate_id) DO NOTHING`,
+        [tenantId, gate.gateId, gate.name, gate.description, gate.stage, JSON.stringify(gate.requirements)]
+      );
+    }
   }
 
   async updateStage(tenantId: string, stage: GenesisStage): Promise<GenesisState> {
-    const state = await this.getState(tenantId);
-    state.currentStage = stage;
-    state.lastAssessment = new Date();
-    return state;
+    await executeStatement(
+      `UPDATE genesis_state SET current_stage = $2, last_assessment = NOW(), updated_at = NOW()
+       WHERE tenant_id = $1`,
+      [tenantId, stage]
+    );
+    return this.getState(tenantId);
   }
 
   async passGate(tenantId: string, gateId: string): Promise<GenesisGate> {
-    const state = await this.getState(tenantId);
-    const gate = state.gates.find(g => g.gateId === gateId);
-    if (!gate) throw new Error(`Gate ${gateId} not found`);
-    gate.status = 'PASSED';
-    gate.passedAt = new Date();
-    return gate;
+    const result = await executeStatement(
+      `UPDATE genesis_gates SET status = 'PASSED', passed_at = NOW(), updated_at = NOW()
+       WHERE tenant_id = $1 AND gate_id = $2
+       RETURNING gate_id, name, description, stage, requirements, status, passed_at, bypass_reason`,
+      [tenantId, gateId]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error(`Gate ${gateId} not found`);
+    }
+
+    const g = result.rows[0] as Record<string, unknown>;
+    return {
+      gateId: g.gate_id as string,
+      name: g.name as string,
+      description: g.description as string,
+      stage: g.stage as GenesisStage,
+      requirements: (g.requirements as string[]) || [],
+      status: g.status as 'LOCKED' | 'PENDING' | 'PASSED' | 'BYPASSED',
+      passedAt: g.passed_at ? new Date(g.passed_at as string) : undefined,
+      bypassReason: g.bypass_reason as string | undefined,
+    };
   }
 
   async bypassGate(tenantId: string, gateId: string, reason: string): Promise<GenesisGate> {
-    const state = await this.getState(tenantId);
-    const gate = state.gates.find(g => g.gateId === gateId);
-    if (!gate) throw new Error(`Gate ${gateId} not found`);
-    gate.status = 'BYPASSED';
-    gate.bypassReason = reason;
-    return gate;
+    const result = await executeStatement(
+      `UPDATE genesis_gates SET status = 'BYPASSED', bypass_reason = $3, updated_at = NOW()
+       WHERE tenant_id = $1 AND gate_id = $2
+       RETURNING gate_id, name, description, stage, requirements, status, passed_at, bypass_reason`,
+      [tenantId, gateId, reason]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error(`Gate ${gateId} not found`);
+    }
+
+    const g = result.rows[0] as Record<string, unknown>;
+    return {
+      gateId: g.gate_id as string,
+      name: g.name as string,
+      description: g.description as string,
+      stage: g.stage as GenesisStage,
+      requirements: (g.requirements as string[]) || [],
+      status: g.status as 'LOCKED' | 'PENDING' | 'PASSED' | 'BYPASSED',
+      passedAt: g.passed_at ? new Date(g.passed_at as string) : undefined,
+      bypassReason: g.bypass_reason as string | undefined,
+    };
   }
 
   async getGates(tenantId: string): Promise<GenesisGate[]> {
@@ -78,15 +172,21 @@ class GenesisService {
   }
 
   async addCapability(tenantId: string, capability: string): Promise<void> {
-    const state = await this.getState(tenantId);
-    if (!state.capabilities.includes(capability)) {
-      state.capabilities.push(capability);
-    }
+    await executeStatement(
+      `UPDATE genesis_state 
+       SET capabilities = capabilities || $2::jsonb, updated_at = NOW()
+       WHERE tenant_id = $1 AND NOT capabilities ? $3`,
+      [tenantId, JSON.stringify([capability]), capability]
+    );
   }
 
   async removeRestriction(tenantId: string, restriction: string): Promise<void> {
-    const state = await this.getState(tenantId);
-    state.restrictions = state.restrictions.filter(r => r !== restriction);
+    await executeStatement(
+      `UPDATE genesis_state 
+       SET restrictions = restrictions - $2, updated_at = NOW()
+       WHERE tenant_id = $1`,
+      [tenantId, restriction]
+    );
   }
 
   private createDefaultState(tenantId: string): GenesisState {

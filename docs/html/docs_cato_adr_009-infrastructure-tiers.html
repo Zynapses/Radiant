@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>009 infrastructure tiers - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>009 infrastructure tiers</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/adr/009-infrastructure-tiers.md</div>
+  </div>
+  
+  <h1 id="adr-009-admin-configurable-infrastructure-tiers">ADR-009: Admin-Configurable Infrastructure Tiers</h1>
+<h2 id="status">Status</h2>
+<p>Accepted</p>
+<h2 id="context">Context</h2>
+<p>Cato infrastructure costs range dramatically based on scale: - <strong>DEV</strong>: ~$350/month for development and testing - <strong>STAGING</strong>: ~$20-50K/month for pre-production - <strong>PRODUCTION</strong>: ~$700-800K/month for 10MM+ users</p>
+<p>We need a system that allows admins to switch between infrastructure tiers at runtime without recompilation, with automatic resource provisioning and cleanup.</p>
+<h3 id="requirements">Requirements</h3>
+<ol type="1">
+<li><strong>Runtime Configurable</strong> — No recompilation. Admin changes a setting, infrastructure responds.</li>
+<li><strong>Auto-Scale Up</strong> — When tier increases, provision required resources automatically.</li>
+<li><strong>Auto-Scale Down + Cleanup</strong> — When tier decreases, terminate/delete unused resources to stop billing.</li>
+<li><strong>Admin-Editable Configs</strong> — All tier configurations (instance types, counts, etc.) are editable.</li>
+<li><strong>Safety Guards</strong> — Confirmation dialogs, cooldown periods, and audit logging.</li>
+</ol>
+<h2 id="decision">Decision</h2>
+<p>Implement a <strong>3-tier infrastructure system</strong> with full admin editability:</p>
+<h3 id="tier-configurations">Tier Configurations</h3>
+<table>
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 19%" />
+<col style="width: 20%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Est. Cost</th>
+<th>SageMaker</th>
+<th>OpenSearch</th>
+<th>ElastiCache</th>
+<th>Neptune</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DEV</td>
+<td>$350/mo</td>
+<td>0-1 ml.g5.xlarge (scale-to-zero)</td>
+<td>t3.small (provisioned)</td>
+<td>Serverless</td>
+<td>Serverless</td>
+</tr>
+<tr>
+<td>STAGING</td>
+<td>$35K/mo</td>
+<td>2-20 ml.g5.2xlarge</td>
+<td>r6g.large (provisioned)</td>
+<td>cache.r7g.large</td>
+<td>Serverless</td>
+</tr>
+<tr>
+<td>PRODUCTION</td>
+<td>$750K/mo</td>
+<td>50-300 ml.g5.2xlarge</td>
+<td>Serverless (50-500 OCUs)</td>
+<td>cache.r7g.xlarge x6</td>
+<td>db.r6g.2xlarge x3</td>
+</tr>
+</tbody>
+</table>
+<h3 id="architecture">Architecture</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                    Admin Dashboard                               │
+│              System → Infrastructure Tier                        │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  Infrastructure Tier API                         │
+│                                                                  │
+│  POST /tier/change ──► Validation ──► Confirmation if needed    │
+│                              │                                   │
+│                              ▼                                   │
+│                    Step Functions Workflow                       │
+│                              │                                   │
+│         ┌────────────────────┴────────────────────┐             │
+│         ▼                                         ▼             │
+│   SCALING UP                               SCALING DOWN          │
+│   ├── Provision SageMaker                  ├── Drain connections│
+│   ├── Provision OpenSearch                 ├── Update config    │
+│   ├── Provision ElastiCache                ├── Delete endpoints │
+│   ├── Provision Neptune                    ├── Delete clusters  │
+│   └── Update config                        └── Create snapshots │
+│                              │                                   │
+│                              ▼                                   │
+│                    Update Tier State                             │
+│                    Set Cooldown (24h)                            │
+│                    Log Audit Trail                               │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="database-schema">Database Schema</h3>
+<pre class="sql"><code>-- Current tier state per tenant
+cato_infrastructure_tier
+  ├── current_tier (DEV|STAGING|PRODUCTION)
+  ├── target_tier (during transition)
+  ├── transition_status (STABLE|SCALING_UP|SCALING_DOWN|FAILED)
+  ├── cooldown_hours (default: 24)
+  ├── next_change_allowed_at
+  ├── estimated_monthly_cost
+  └── actual_mtd_cost
+
+-- Editable tier configurations
+cato_tier_config
+  ├── tier_name
+  ├── display_name
+  ├── description
+  ├── estimated_monthly_cost
+  ├── sagemaker_shadow_self_* (instance type, min/max, scale-to-zero)
+  ├── opensearch_* (type, instance type, count)
+  ├── elasticache_* (type, node type, count)
+  ├── neptune_* (type, instance class, count)
+  ├── budget_* (monthly curiosity limit, daily exploration cap)
+  └── features, limitations (JSON arrays for UI)
+
+-- Audit trail
+cato_tier_change_log
+  ├── from_tier, to_tier
+  ├── direction (SCALING_UP|SCALING_DOWN)
+  ├── status, duration
+  ├── changed_by, reason
+  ├── resources_provisioned, resources_cleaned_up
+  └── errors (if any)</code></pre>
+<h3 id="safety-guards">Safety Guards</h3>
+<ol type="1">
+<li><strong>24-hour cooldown</strong> between tier changes (configurable)</li>
+<li><strong>Confirmation required</strong> for PRODUCTION tier (both up and down)</li>
+<li><strong>Audit logging</strong> of all changes with who, when, why</li>
+<li><strong>Super admin bypass</strong> for cooldown in emergencies</li>
+<li><strong>Rollback capability</strong> if provisioning fails</li>
+</ol>
+<h2 id="consequences">Consequences</h2>
+<h3 id="positive">Positive</h3>
+<ul>
+<li>Admins can switch tiers in ~5-15 minutes</li>
+<li>Resources are automatically cleaned up (no orphaned billing)</li>
+<li>Full visibility into costs before changes</li>
+<li>All configurations are editable without code changes</li>
+<li>Complete audit trail</li>
+</ul>
+<h3 id="negative">Negative</h3>
+<ul>
+<li>Step Functions adds complexity</li>
+<li>Tier transitions require ~5-15 minutes</li>
+<li>Risk of partial failures during transition</li>
+</ul>
+<h3 id="mitigations">Mitigations</h3>
+<ul>
+<li>Automatic rollback on provisioning failure</li>
+<li>Snapshots created before resource deletion</li>
+<li>Monitoring and alerts during transitions</li>
+</ul>
+<h2 id="implementation">Implementation</h2>
+<h3 id="files-created">Files Created</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>migrations/121_infrastructure_tiers.sql</code></td>
+<td>Database schema</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/cato/infrastructure-tier.service.ts</code></td>
+<td>Core service</td>
+</tr>
+<tr>
+<td><code>lambda/admin/infrastructure-tier.ts</code></td>
+<td>Admin API endpoints</td>
+</tr>
+<tr>
+<td><code>apps/admin-dashboard/app/(dashboard)/system/infrastructure/page.tsx</code></td>
+<td>Admin UI</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-endpoints">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/tier</code></td>
+<td>GET</td>
+<td>Get current tier status</td>
+</tr>
+<tr>
+<td><code>/tier/compare</code></td>
+<td>GET</td>
+<td>Get tier comparison for UI</td>
+</tr>
+<tr>
+<td><code>/tier/configs</code></td>
+<td>GET</td>
+<td>Get all tier configurations</td>
+</tr>
+<tr>
+<td><code>/tier/configs/:name</code></td>
+<td>GET/PUT</td>
+<td>Get/update specific tier config</td>
+</tr>
+<tr>
+<td><code>/tier/change</code></td>
+<td>POST</td>
+<td>Request tier change</td>
+</tr>
+<tr>
+<td><code>/tier/confirm</code></td>
+<td>POST</td>
+<td>Confirm tier change</td>
+</tr>
+<tr>
+<td><code>/tier/transition-status</code></td>
+<td>GET</td>
+<td>Get transition progress</td>
+</tr>
+<tr>
+<td><code>/tier/cooldown</code></td>
+<td>PUT</td>
+<td>Update cooldown hours</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ui-location">UI Location</h3>
+<pre><code>Admin Dashboard
+└── System
+    └── Infrastructure Tier ★
+        ├── Current Status (tier, cost, status)
+        ├── Tier Selection (cards with cost comparison)
+        ├── Configuration Editor (edit any tier&#39;s resources)
+        └── Change History (audit log)</code></pre>
+<h2 id="cost-optimization-notes">Cost Optimization Notes</h2>
+<h3 id="dev-tier-optimizations">DEV Tier Optimizations</h3>
+<ul>
+<li>SageMaker scale-to-zero when idle</li>
+<li>OpenSearch Provisioned (not Serverless $700 minimum)</li>
+<li>ElastiCache Serverless (cheap for low traffic)</li>
+<li>Neptune Serverless (1.0 NCU minimum)</li>
+</ul>
+<h3 id="production-tier">PRODUCTION Tier</h3>
+<ul>
+<li>Consider 3-year Savings Plans (64% discount on SageMaker)</li>
+<li>Bedrock Batch API for night-mode curiosity (50% discount)</li>
+<li>OpenSearch Serverless for true auto-scaling</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://calculator.aws">AWS Pricing Calculator</a></li>
+<li><a href="https://aws.amazon.com/sagemaker/pricing/">SageMaker Pricing</a></li>
+<li><a href="https://aws.amazon.com/opensearch-service/pricing/">OpenSearch Serverless Pricing</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -205,7 +205,7 @@ export function AnalyticsClient() {
       <CBFViolationsHeatmap
         violations={cbfViolations}
         timeRange={timeRange === '24h' ? 'Last 24 hours' : timeRange === '7d' ? 'Last 7 days' : timeRange === '30d' ? 'Last 30 days' : 'Last 90 days'}
-        onRuleClick={(violation) => console.log('View violation:', violation)}
+        onRuleClick={(violation) => { /* Navigate to violation detail */ }}
       />
 
       {/* Model Performance Table */}

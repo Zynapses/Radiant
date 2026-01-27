@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>user guide - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>user guide</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/authentication/user-guide.md</div>
+  </div>
+  
+  <h1 id="user-authentication-guide">User Authentication Guide</h1>
+<blockquote>
+<p><strong>Version</strong>: 5.52.29 | <strong>Last Updated</strong>: January 25, 2026 | <strong>Audience</strong>: End Users</p>
+</blockquote>
+<p>This guide covers how to sign in, manage your password, set up passkeys, and change your language settings.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#signing-in">Signing In</a></li>
+<li><a href="#password-management">Password Management</a></li>
+<li><a href="#passkeys-passwordless">Passkeys (Passwordless)</a></li>
+<li><a href="#social-sign-in">Social Sign-In</a></li>
+<li><a href="#enterprise-sso">Enterprise SSO</a></li>
+<li><a href="#language-settings">Language Settings</a></li>
+<li><a href="#common-issues">Common Issues</a></li>
+</ol>
+<hr />
+<h2 id="signing-in">Signing In</h2>
+<h3 id="email-and-password">Email and Password</h3>
+<ol type="1">
+<li>Go to your organization’s Think Tank or Curator URL</li>
+<li>Enter your <strong>email address</strong></li>
+<li>Enter your <strong>password</strong></li>
+<li>Click <strong>Sign In</strong></li>
+</ol>
+<pre class="mermaid"><code>flowchart LR
+    A[Enter Email] --&gt; B[Enter Password]
+    B --&gt; C{MFA Enabled?}
+    C --&gt;|Yes| D[Enter MFA Code]
+    C --&gt;|No| E[Dashboard]
+    D --&gt; E</code></pre>
+<h3 id="what-to-expect-after-signing-in">What to Expect After Signing In</h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>What Happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>First sign-in</strong></td>
+<td>You may be asked to verify your email</td>
+</tr>
+<tr>
+<td><strong>New device</strong></td>
+<td>Additional verification may be required</td>
+</tr>
+<tr>
+<td><strong>MFA enabled</strong></td>
+<td>Enter code from your authenticator app</td>
+</tr>
+<tr>
+<td><strong>Session expired</strong></td>
+<td>Sign in again (sessions last 7 days)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="password-management">Password Management</h2>
+<h3 id="password-requirements">Password Requirements</h3>
+<p>Your password must meet these requirements:</p>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Minimum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Length</strong></td>
+<td>12 characters</td>
+</tr>
+<tr>
+<td><strong>Uppercase</strong></td>
+<td>1 letter</td>
+</tr>
+<tr>
+<td><strong>Lowercase</strong></td>
+<td>1 letter</td>
+</tr>
+<tr>
+<td><strong>Number</strong></td>
+<td>1 digit</td>
+</tr>
+<tr>
+<td><strong>Special character</strong></td>
+<td>1 symbol (!@#$%^&amp;*)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="changing-your-password">Changing Your Password</h3>
+<ol type="1">
+<li>Click your <strong>avatar</strong> (top-right corner)</li>
+<li>Select <strong>Account Settings</strong></li>
+<li>Click <strong>Security</strong> tab</li>
+<li>Click <strong>Change Password</strong></li>
+<li>Enter your <strong>current password</strong></li>
+<li>Enter and confirm your <strong>new password</strong></li>
+<li>Click <strong>Update Password</strong></li>
+</ol>
+<h3 id="forgot-password">Forgot Password</h3>
+<ol type="1">
+<li>On the sign-in page, click <strong>Forgot password?</strong></li>
+<li>Enter your <strong>email address</strong></li>
+<li>Click <strong>Send Reset Link</strong></li>
+<li>Check your email for the reset link</li>
+<li>Click the link and enter your <strong>new password</strong></li>
+</ol>
+<blockquote>
+<p><strong>Note</strong>: Reset links expire after 24 hours. If expired, request a new one.</p>
+</blockquote>
+<hr />
+<h2 id="passkeys-passwordless">Passkeys (Passwordless)</h2>
+<p>Passkeys let you sign in without a password using biometrics or your device’s security.</p>
+<h3 id="what-is-a-passkey">What is a Passkey?</h3>
+<p>A passkey is a secure credential stored on your device that uses: - <strong>Fingerprint</strong> (Touch ID, fingerprint sensor) - <strong>Face recognition</strong> (Face ID) - <strong>Device PIN/pattern</strong> (Windows Hello, Android PIN)</p>
+<pre class="mermaid"><code>flowchart LR
+    subgraph &quot;Passkey Sign-In&quot;
+        A[Click Sign In with Passkey] --&gt; B[Select Your Passkey]
+        B --&gt; C[Verify with Biometric]
+        C --&gt; D[Signed In!]
+    end</code></pre>
+<h3 id="setting-up-a-passkey">Setting Up a Passkey</h3>
+<ol type="1">
+<li>Sign in with your email and password</li>
+<li>Go to <strong>Account Settings</strong> → <strong>Security</strong></li>
+<li>Click <strong>Add Passkey</strong></li>
+<li>Follow your browser/device prompts to create the passkey</li>
+<li>Give your passkey a <strong>name</strong> (e.g., “MacBook Touch ID”)</li>
+</ol>
+<h3 id="using-your-passkey">Using Your Passkey</h3>
+<ol type="1">
+<li>On the sign-in page, click <strong>Sign in with Passkey</strong></li>
+<li>Select your passkey from the browser prompt</li>
+<li>Verify with your biometric (fingerprint/face)</li>
+<li>You’re signed in!</li>
+</ol>
+<h3 id="managing-passkeys">Managing Passkeys</h3>
+<ul>
+<li><strong>View passkeys</strong>: Account Settings → Security → Passkeys</li>
+<li><strong>Remove a passkey</strong>: Click the ✕ next to the passkey name</li>
+<li><strong>Maximum passkeys</strong>: You can have up to 10 passkeys</li>
+</ul>
+<h3 id="passkey-compatibility">Passkey Compatibility</h3>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Browser</th>
+<th>Biometric Support</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>macOS</td>
+<td>Safari, Chrome, Firefox</td>
+<td>Touch ID</td>
+</tr>
+<tr>
+<td>iOS</td>
+<td>Safari</td>
+<td>Face ID, Touch ID</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>Chrome, Edge</td>
+<td>Windows Hello</td>
+</tr>
+<tr>
+<td>Android</td>
+<td>Chrome</td>
+<td>Fingerprint, Face Unlock</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="social-sign-in">Social Sign-In</h2>
+<p>You can sign in using your existing accounts from:</p>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Click This Button</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Google</strong></td>
+<td>“Continue with Google”</td>
+</tr>
+<tr>
+<td><strong>Microsoft</strong></td>
+<td>“Continue with Microsoft”</td>
+</tr>
+<tr>
+<td><strong>Apple</strong></td>
+<td>“Continue with Apple”</td>
+</tr>
+<tr>
+<td><strong>GitHub</strong></td>
+<td>“Continue with GitHub”</td>
+</tr>
+</tbody>
+</table>
+<h3 id="linking-social-accounts">Linking Social Accounts</h3>
+<p>To link a social account to your existing RADIANT account:</p>
+<ol type="1">
+<li>Sign in with your email/password</li>
+<li>Go to <strong>Account Settings</strong> → <strong>Connected Accounts</strong></li>
+<li>Click <strong>Connect</strong> next to the provider</li>
+<li>Authorize the connection</li>
+</ol>
+<h3 id="unlinking-social-accounts">Unlinking Social Accounts</h3>
+<ol type="1">
+<li>Go to <strong>Account Settings</strong> → <strong>Connected Accounts</strong></li>
+<li>Click <strong>Disconnect</strong> next to the provider</li>
+<li>Confirm the disconnection</li>
+</ol>
+<blockquote>
+<p><strong>Warning</strong>: If you unlink all sign-in methods, ensure you have a password set!</p>
+</blockquote>
+<hr />
+<h2 id="enterprise-sso">Enterprise SSO</h2>
+<p>If your organization uses Single Sign-On (SSO), you may sign in differently.</p>
+<h3 id="signing-in-with-sso">Signing In with SSO</h3>
+<ol type="1">
+<li>Go to your organization’s sign-in page</li>
+<li>Enter your <strong>work email address</strong></li>
+<li>Click <strong>Continue</strong> — you’ll be redirected to your company’s identity provider</li>
+<li>Sign in using your company credentials</li>
+<li>You’ll be automatically signed in to RADIANT</li>
+</ol>
+<pre class="mermaid"><code>sequenceDiagram
+    participant You
+    participant RADIANT
+    participant Company as Your Company IdP
+    
+    You-&gt;&gt;RADIANT: Enter work email
+    RADIANT-&gt;&gt;Company: Redirect to SSO
+    You-&gt;&gt;Company: Sign in with company credentials
+    Company-&gt;&gt;RADIANT: Authentication successful
+    RADIANT-&gt;&gt;You: Signed in!</code></pre>
+<h3 id="sso-providers-supported">SSO Providers Supported</h3>
+<ul>
+<li><strong>Okta</strong></li>
+<li><strong>Azure Active Directory</strong> (Microsoft Entra ID)</li>
+<li><strong>Google Workspace</strong></li>
+<li><strong>OneLogin</strong></li>
+<li><strong>Ping Identity</strong></li>
+<li><strong>Custom SAML 2.0 / OIDC providers</strong></li>
+</ul>
+<blockquote>
+<p><strong>Note</strong>: SSO configuration is managed by your organization’s IT administrator.</p>
+</blockquote>
+<hr />
+<h2 id="language-settings">Language Settings</h2>
+<p>RADIANT supports 18 languages for all authentication screens and the application interface.</p>
+<h3 id="changing-your-language">Changing Your Language</h3>
+<ol type="1">
+<li>Click your <strong>avatar</strong> (top-right corner)</li>
+<li>Select <strong>Settings</strong> (or <strong>Account Settings</strong>)</li>
+<li>Click <strong>Language &amp; Region</strong></li>
+<li>Select your preferred <strong>language</strong> from the dropdown</li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<p>The interface will immediately update to your selected language.</p>
+<h3 id="supported-languages">Supported Languages</h3>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Native Name</th>
+<th>Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>English</td>
+<td>English</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>Spanish</td>
+<td>Español</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>French</td>
+<td>Français</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>German</td>
+<td>Deutsch</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>Portuguese</td>
+<td>Português</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>Italian</td>
+<td>Italiano</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>Dutch</td>
+<td>Nederlands</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>Polish</td>
+<td>Polski</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>Russian</td>
+<td>Русский</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>Turkish</td>
+<td>Türkçe</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>Japanese</td>
+<td>日本語</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>Korean</td>
+<td>한국어</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>Chinese (Simplified)</td>
+<td>简体中文</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>Chinese (Traditional)</td>
+<td>繁體中文</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td><strong>Arabic</strong></td>
+<td>العربية</td>
+<td><strong>Right-to-left</strong></td>
+</tr>
+<tr>
+<td>Hindi</td>
+<td>हिन्दी</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>Thai</td>
+<td>ไทย</td>
+<td>Left-to-right</td>
+</tr>
+<tr>
+<td>Vietnamese</td>
+<td>Tiếng Việt</td>
+<td>Left-to-right</td>
+</tr>
+</tbody>
+</table>
+<h3 id="right-to-left-rtl-support">Right-to-Left (RTL) Support</h3>
+<p>When using Arabic, the entire interface automatically adjusts: - Text flows right-to-left - Navigation moves to the right side - Icons and buttons are mirrored appropriately - <strong>Email addresses</strong>, <strong>codes</strong>, and <strong>passwords</strong> remain left-to-right for clarity</p>
+<hr />
+<h2 id="common-issues">Common Issues</h2>
+<h3 id="invalid-email-or-password">“Invalid email or password”</h3>
+<p><strong>Possible causes:</strong> - Incorrect password (passwords are case-sensitive) - Using the wrong email address - Account not yet verified</p>
+<p><strong>Solutions:</strong> 1. Check your email address for typos 2. Use <strong>Forgot password?</strong> to reset your password 3. Check your email for a verification link</p>
+<h3 id="account-locked">“Account locked”</h3>
+<p>Your account may be locked after too many failed sign-in attempts.</p>
+<p><strong>Solutions:</strong> 1. Wait 15 minutes, then try again 2. Reset your password using <strong>Forgot password?</strong> 3. Contact your organization’s administrator</p>
+<h3 id="mfa-code-invalid">“MFA code invalid”</h3>
+<p><strong>Possible causes:</strong> - Code has expired (codes are valid for 30 seconds) - Clock on your device is incorrect - Using a code from the wrong account</p>
+<p><strong>Solutions:</strong> 1. Wait for a new code to generate 2. Ensure your device’s time is synced automatically 3. Verify you’re scanning the correct QR code in your authenticator app</p>
+<h3 id="session-expired">“Session expired”</h3>
+<p><strong>Cause:</strong> You haven’t used the application for a while.</p>
+<p><strong>Solution:</strong> Sign in again. Your work is saved.</p>
+<h3 id="passkey-not-recognized">“Passkey not recognized”</h3>
+<p><strong>Possible causes:</strong> - Passkey was created on a different device - Passkey has been deleted</p>
+<p><strong>Solutions:</strong> 1. Try signing in with email/password 2. Set up a new passkey on this device</p>
+<hr />
+<h2 id="getting-help">Getting Help</h2>
+<p>If you continue to have issues signing in:</p>
+<ol type="1">
+<li><strong>Check the status page</strong> for any ongoing incidents</li>
+<li><strong>Contact your IT administrator</strong> if you’re using enterprise SSO</li>
+<li><strong>Use the Help chat</strong> in the bottom-right corner of the sign-in page</li>
+<li><strong>Email support</strong> at the address provided by your organization</li>
+</ol>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./overview.md">Authentication Overview</a></li>
+<li><a href="./mfa-guide.md">MFA Setup Guide</a></li>
+<li><a href="./i18n-guide.md">Internationalization Guide</a></li>
+<li><a href="./troubleshooting.md">Troubleshooting</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

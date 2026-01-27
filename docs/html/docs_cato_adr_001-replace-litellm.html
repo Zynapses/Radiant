@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>001 replace litellm - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>001 replace litellm</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/adr/001-replace-litellm.md</div>
+  </div>
+  
+  <h1 id="adr-001-replace-litellm-with-vllm-ray-serve">ADR-001: Replace LiteLLM with vLLM + Ray Serve</h1>
+<h2 id="status">Status</h2>
+<p>Accepted</p>
+<h2 id="context">Context</h2>
+<p>LiteLLM has a hard limit of ~504 concurrent requests with its load balancer. At 10MM users generating ~100M queries/day (~5,000 QPS peak), this is catastrophically insufficient. LiteLLM is designed as a stateless API proxy for multi-tenant abstraction, not a stateful orchestration layer for a single global consciousness.</p>
+<p>Cato requires: - <strong>Stateful conversation context</strong> across millions of concurrent sessions - <strong>Hidden state extraction</strong> for Shadow Self verification - <strong>Custom routing logic</strong> based on query type, cost, and consciousness state - <strong>Circuit breaker patterns</strong> for graceful degradation - <strong>Horizontal scaling</strong> to 10MM+ users</p>
+<p>LiteLLM cannot provide any of these capabilities at the required scale.</p>
+<h2 id="decision">Decision</h2>
+<p>Replace LiteLLM with a hybrid orchestration architecture:</p>
+<h3 id="vllm-on-sagemaker-self-hosted-inference">1. vLLM on SageMaker (Self-Hosted Inference)</h3>
+<ul>
+<li>Instance: <strong>ml.g5.2xlarge</strong> (24GB VRAM, ~$1.52/hour)</li>
+<li>Purpose: Llama-3-8B for Shadow Self with hidden state extraction</li>
+<li>Scaling: 10-300 instances based on load (auto-scaling)</li>
+<li>Features: <code>output_hidden_states=True</code> for activation probing</li>
+</ul>
+<h3 id="ray-serve-on-eks-stateful-orchestration">2. Ray Serve on EKS (Stateful Orchestration)</h3>
+<ul>
+<li>Deployment: EKS with Karpenter for auto-scaling</li>
+<li>Purpose: Model routing, context management, fan-out coordination</li>
+<li>Features:
+<ul>
+<li>Actor-based stateful context (conversation history per session)</li>
+<li>Circuit breaker with fallback chain</li>
+<li>Semantic cache integration</li>
+<li>Cost-aware routing</li>
+</ul></li>
+</ul>
+<h3 id="aws-bedrock-managed-claude-models">3. AWS Bedrock (Managed Claude Models)</h3>
+<ul>
+<li>Models: Claude 3.5 Sonnet (complex), Claude 3 Haiku (simple)</li>
+<li>Features: Prompt caching (90% token discount on cache hits)</li>
+<li>Batch API: 50% discount for night-mode curiosity processing</li>
+</ul>
+<h2 id="architecture">Architecture</h2>
+<pre><code>User Query
+    │
+    ▼
+┌─────────────────────────────────────┐
+│  Ray Serve Orchestrator (EKS)       │
+│  ├── Semantic Cache Check           │
+│  ├── Query Classification           │
+│  ├── Model Selection                │
+│  └── Circuit Breaker                │
+└─────────────────────────────────────┘
+    │
+    ├──────────────────┬──────────────────┬──────────────────┐
+    ▼                  ▼                  ▼                  ▼
+┌─────────┐      ┌─────────┐       ┌─────────┐       ┌─────────┐
+│ Shadow  │      │ Bedrock │       │ Bedrock │       │   NLI   │
+│  Self   │      │ Sonnet  │       │  Haiku  │       │ DeBERTa │
+│ (vLLM)  │      │         │       │         │       │  (MME)  │
+└─────────┘      └─────────┘       └─────────┘       └─────────┘</code></pre>
+<h2 id="consequences">Consequences</h2>
+<h3 id="positive">Positive</h3>
+<ul>
+<li><strong>Unlimited horizontal scaling</strong>: No hard concurrency limits</li>
+<li><strong>Stateful context</strong>: Actor-based conversation management</li>
+<li><strong>Hidden states</strong>: Full access to Llama activations for Shadow Self</li>
+<li><strong>Cost optimization</strong>: Semantic caching + batch processing</li>
+<li><strong>Graceful degradation</strong>: Circuit breaker with fallback chain</li>
+</ul>
+<h3 id="negative">Negative</h3>
+<ul>
+<li><strong>16-week migration path</strong>: Significant implementation effort</li>
+<li><strong>Operational complexity</strong>: Managing EKS + SageMaker + Bedrock</li>
+<li><strong>Custom code</strong>: ~5,000 LOC orchestration layer to maintain</li>
+<li><strong>Team expertise</strong>: Requires Ray Serve and ML infrastructure knowledge</li>
+</ul>
+<h2 id="cost-impact">Cost Impact</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>1M Users</th>
+<th>10M Users</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SageMaker (Shadow Self)</td>
+<td>$13,000/mo</td>
+<td>$130,000/mo</td>
+</tr>
+<tr>
+<td>EKS (Ray Serve)</td>
+<td>$2,000/mo</td>
+<td>$15,000/mo</td>
+</tr>
+<tr>
+<td>Bedrock (Claude)</td>
+<td>$15,000/mo</td>
+<td>$130,000/mo</td>
+</tr>
+<tr>
+<td><strong>Total Inference</strong></td>
+<td><strong>$30,000/mo</strong></td>
+<td><strong>$275,000/mo</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="migration-path">Migration Path</h2>
+<h3 id="phase-1-weeks-1-4">Phase 1: Weeks 1-4</h3>
+<ul>
+<li>Deploy vLLM on SageMaker with hidden state extraction</li>
+<li>Set up NLI model on SageMaker MME</li>
+<li>Create basic Ray Serve deployment</li>
+</ul>
+<h3 id="phase-2-weeks-5-8">Phase 2: Weeks 5-8</h3>
+<ul>
+<li>Implement model routing logic</li>
+<li>Add stateful context actors</li>
+<li>Integrate semantic cache</li>
+</ul>
+<h3 id="phase-3-weeks-9-12">Phase 3: Weeks 9-12</h3>
+<ul>
+<li>Connect to global memory infrastructure</li>
+<li>Implement circuit breaker patterns</li>
+<li>Load testing at scale</li>
+</ul>
+<h3 id="phase-4-weeks-13-16">Phase 4: Weeks 13-16</h3>
+<ul>
+<li>Gradual traffic migration (10% → 50% → 100%)</li>
+<li>Performance tuning</li>
+<li>Documentation finalization</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.vllm.ai/">vLLM Documentation</a></li>
+<li><a href="https://docs.ray.io/en/latest/serve/">Ray Serve Documentation</a></li>
+<li><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html">SageMaker Real-Time Inference</a></li>
+<li><a href="https://docs.aws.amazon.com/bedrock/">AWS Bedrock</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

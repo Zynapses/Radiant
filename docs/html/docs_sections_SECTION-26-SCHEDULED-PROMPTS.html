@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 26 SCHEDULED PROMPTS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 26 SCHEDULED PROMPTS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-26-SCHEDULED-PROMPTS.md</div>
+  </div>
+  
+  <h1 id="section-26-scheduled-prompts-v3.6.0">SECTION 26: SCHEDULED PROMPTS (v3.6.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="scheduled-prompts-overview">26.1 Scheduled Prompts Overview</h2>
+<p>Schedule AI tasks to run at specific times or intervals.</p>
+<h2 id="scheduled-prompts-database-schema">26.2 Scheduled Prompts Database Schema</h2>
+<pre class="sql"><code>-- migrations/035_scheduled_prompts.sql
+
+CREATE TABLE scheduled_prompts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    prompt_name VARCHAR(200) NOT NULL,
+    prompt_text TEXT NOT NULL,
+    model VARCHAR(100) NOT NULL,
+    schedule_type VARCHAR(20) NOT NULL,
+    cron_expression VARCHAR(100),
+    run_at TIMESTAMPTZ,
+    timezone VARCHAR(50) DEFAULT &#39;UTC&#39;,
+    is_active BOOLEAN DEFAULT true,
+    max_runs INTEGER,
+    run_count INTEGER DEFAULT 0,
+    last_run TIMESTAMPTZ,
+    next_run TIMESTAMPTZ,
+    notification_email VARCHAR(255),
+    output_destination VARCHAR(50) DEFAULT &#39;email&#39;,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE scheduled_prompt_runs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    prompt_id UUID NOT NULL REFERENCES scheduled_prompts(id) ON DELETE CASCADE,
+    status VARCHAR(20) NOT NULL DEFAULT &#39;pending&#39;,
+    output TEXT,
+    tokens_used INTEGER,
+    cost DECIMAL(10, 6),
+    latency_ms INTEGER,
+    error_message TEXT,
+    started_at TIMESTAMPTZ,
+    completed_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_scheduled_prompts_user ON scheduled_prompts(tenant_id, user_id);
+CREATE INDEX idx_scheduled_prompts_next_run ON scheduled_prompts(next_run) WHERE is_active = true;
+CREATE INDEX idx_prompt_runs ON scheduled_prompt_runs(prompt_id, created_at DESC);
+
+ALTER TABLE scheduled_prompts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE scheduled_prompt_runs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY scheduled_prompts_isolation ON scheduled_prompts USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY prompt_runs_isolation ON scheduled_prompt_runs USING (
+    prompt_id IN (SELECT id FROM scheduled_prompts WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID)
+);</code></pre>
+<h2 id="scheduler-service">26.3 Scheduler Service</h2>
+<pre class="typescript"><code>// packages/core/src/services/scheduler-service.ts
+
+import { Pool } from &#39;pg&#39;;
+import { EventBridgeClient, PutRuleCommand, PutTargetsCommand, DeleteRuleCommand } from &#39;@aws-sdk/client-eventbridge&#39;;
+import * as cronParser from &#39;cron-parser&#39;;
+
+type ScheduleType = &#39;once&#39; | &#39;cron&#39; | &#39;interval&#39;;
+
+interface ScheduleCreate {
+    name: string;
+    prompt: string;
+    model: string;
+    type: ScheduleType;
+    cronExpression?: string;
+    runAt?: Date;
+    intervalMinutes?: number;
+    timezone?: string;
+    maxRuns?: number;
+    notificationEmail?: string;
+    outputDestination?: &#39;email&#39; | &#39;webhook&#39; | &#39;storage&#39;;
+}
+
+export class SchedulerService {
+    private pool: Pool;
+    private eventBridge: EventBridgeClient;
+    
+    constructor(pool: Pool) {
+        this.pool = pool;
+        this.eventBridge = new EventBridgeClient({});
+    }
+    
+    async createSchedule(tenantId: string, userId: string, schedule: ScheduleCreate): Promise&lt;string&gt; {
+        const nextRun = this.calculateNextRun(schedule);
+        
+        const result = await this.pool.query(`
+            INSERT INTO scheduled_prompts (
+                tenant_id, user_id, prompt_name, prompt_text, model, schedule_type,
+                cron_expression, run_at, timezone, max_runs, next_run,
+                notification_email, output_destination
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            RETURNING id
+        `, [
+            tenantId, userId, schedule.name, schedule.prompt, schedule.model, schedule.type,
+            schedule.cronExpression, schedule.runAt, schedule.timezone || &#39;UTC&#39;, schedule.maxRuns,
+            nextRun, schedule.notificationEmail, schedule.outputDestination || &#39;email&#39;
+        ]);
+        
+        const promptId = result.rows[0].id;
+        
+        // Create EventBridge rule for cron schedules
+        if (schedule.type === &#39;cron&#39; &amp;&amp; schedule.cronExpression) {
+            await this.createEventBridgeRule(promptId, schedule.cronExpression);
+        }
+        
+        return promptId;
+    }
+    
+    async executeScheduledPrompt(promptId: string): Promise&lt;string&gt; {
+        const prompt = await this.getScheduledPrompt(promptId);
+        if (!prompt || !prompt.is_active) {
+            throw new Error(&#39;Scheduled prompt not found or inactive&#39;);
+        }
+        
+        // Create run record
+        const runResult = await this.pool.query(`
+            INSERT INTO scheduled_prompt_runs (prompt_id, status, started_at)
+            VALUES ($1, &#39;running&#39;, NOW())
+            RETURNING id
+        `, [promptId]);
+        
+        const runId = runResult.rows[0].id;
+        
+        try {
+            // Execute the prompt (would call AI service)
+            const startTime = Date.now();
+            const output = await this.executePrompt(prompt.prompt_text, prompt.model);
+            const latencyMs = Date.now() - startTime;
+            
+            // Update run record
+            await this.pool.query(`
+                UPDATE scheduled_prompt_runs
+                SET status = &#39;completed&#39;, output = $2, latency_ms = $3, completed_at = NOW()
+                WHERE id = $1
+            `, [runId, output, latencyMs]);
+            
+            // Update schedule
+            const nextRun = this.calculateNextRun({
+                type: prompt.schedule_type,
+                cronExpression: prompt.cron_expression
+            });
+            
+            await this.pool.query(`
+                UPDATE scheduled_prompts
+                SET last_run = NOW(), run_count = run_count + 1, next_run = $2
+                WHERE id = $1
+            `, [promptId, nextRun]);
+            
+            // Check if max runs reached
+            if (prompt.max_runs &amp;&amp; prompt.run_count + 1 &gt;= prompt.max_runs) {
+                await this.pool.query(`UPDATE scheduled_prompts SET is_active = false WHERE id = $1`, [promptId]);
+            }
+            
+            return runId;
+        } catch (error: any) {
+            await this.pool.query(`
+                UPDATE scheduled_prompt_runs
+                SET status = &#39;failed&#39;, error_message = $2, completed_at = NOW()
+                WHERE id = $1
+            `, [runId, error.message]);
+            
+            throw error;
+        }
+    }
+    
+    async getScheduledPrompt(promptId: string): Promise&lt;any&gt; {
+        const result = await this.pool.query(`SELECT * FROM scheduled_prompts WHERE id = $1`, [promptId]);
+        return result.rows[0];
+    }
+    
+    async getUserSchedules(tenantId: string, userId: string): Promise&lt;any[]&gt; {
+        const result = await this.pool.query(`
+            SELECT sp.*, 
+                   (SELECT COUNT(*) FROM scheduled_prompt_runs WHERE prompt_id = sp.id) as total_runs,
+                   (SELECT status FROM scheduled_prompt_runs WHERE prompt_id = sp.id ORDER BY created_at DESC LIMIT 1) as last_status
+            FROM scheduled_prompts sp
+            WHERE sp.tenant_id = $1 AND sp.user_id = $2
+            ORDER BY sp.created_at DESC
+        `, [tenantId, userId]);
+        
+        return result.rows;
+    }
+    
+    async pauseSchedule(promptId: string): Promise&lt;void&gt; {
+        await this.pool.query(`UPDATE scheduled_prompts SET is_active = false WHERE id = $1`, [promptId]);
+    }
+    
+    async resumeSchedule(promptId: string): Promise&lt;void&gt; {
+        const nextRun = this.calculateNextRun(await this.getScheduledPrompt(promptId));
+        await this.pool.query(`
+            UPDATE scheduled_prompts SET is_active = true, next_run = $2 WHERE id = $1
+        `, [promptId, nextRun]);
+    }
+    
+    private calculateNextRun(schedule: any): Date | null {
+        if (schedule.type === &#39;once&#39; &amp;&amp; schedule.runAt) {
+            return new Date(schedule.runAt);
+        }
+        
+        if (schedule.type === &#39;cron&#39; &amp;&amp; schedule.cronExpression) {
+            const interval = cronParser.parseExpression(schedule.cronExpression);
+            return interval.next().toDate();
+        }
+        
+        return null;
+    }
+    
+    private async createEventBridgeRule(promptId: string, cronExpression: string): Promise&lt;void&gt; {
+        const ruleName = `radiant-schedule-${promptId}`;
+        
+        await this.eventBridge.send(new PutRuleCommand({
+            Name: ruleName,
+            ScheduleExpression: `cron(${cronExpression})`,
+            State: &#39;ENABLED&#39;
+        }));
+        
+        await this.eventBridge.send(new PutTargetsCommand({
+            Rule: ruleName,
+            Targets: [{
+                Id: &#39;scheduled-prompt-target&#39;,
+                Arn: process.env.SCHEDULER_LAMBDA_ARN!,
+                Input: JSON.stringify({ promptId })
+            }]
+        }));
+    }
+    
+    private async executePrompt(prompt: string, model: string): Promise&lt;string&gt; {
+        // This would call the AI service
+        return `Executed prompt with model ${model}`;
+    }
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

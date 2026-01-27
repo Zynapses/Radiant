@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 14 ERROR LOGGING - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 14 ERROR LOGGING</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-14-ERROR-LOGGING.md</div>
+  </div>
+  
+  <h1 id="section-14-centralized-error-logging-v3.1.0">SECTION 14: CENTRALIZED ERROR LOGGING (v3.1.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="error-logging-database-schema">14.1 Error Logging Database Schema</h2>
+<pre class="sql"><code>-- migrations/024_centralized_error_logging.sql
+
+CREATE TABLE error_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID REFERENCES tenants(id),
+    user_id UUID REFERENCES users(id),
+    error_code VARCHAR(50) NOT NULL,
+    error_type VARCHAR(50) NOT NULL,
+    error_message TEXT NOT NULL,
+    stack_trace TEXT,
+    request_id VARCHAR(100),
+    source_service VARCHAR(100),
+    source_function VARCHAR(200),
+    context JSONB DEFAULT &#39;{}&#39;,
+    severity VARCHAR(20) NOT NULL DEFAULT &#39;error&#39;,
+    resolved BOOLEAN DEFAULT false,
+    resolved_at TIMESTAMPTZ,
+    resolved_by UUID REFERENCES users(id),
+    resolution_notes TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE error_patterns (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    pattern_name VARCHAR(100) NOT NULL,
+    error_code_pattern VARCHAR(100),
+    message_pattern TEXT,
+    occurrence_count INTEGER DEFAULT 1,
+    first_seen TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_seen TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    auto_resolve_enabled BOOLEAN DEFAULT false,
+    auto_resolve_action JSONB
+);
+
+CREATE INDEX idx_error_logs_tenant ON error_logs(tenant_id, created_at DESC);
+CREATE INDEX idx_error_logs_code ON error_logs(error_code);
+CREATE INDEX idx_error_logs_unresolved ON error_logs(resolved) WHERE resolved = false;
+
+ALTER TABLE error_logs ENABLE ROW LEVEL SECURITY;
+
+-- Allow admins to see all errors, users only their own
+CREATE POLICY error_logs_policy ON error_logs USING (
+    tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID OR
+    current_setting(&#39;app.user_role&#39;) = &#39;admin&#39;
+);</code></pre>
+<h2 id="error-logger-service">14.2 Error Logger Service</h2>
+<pre class="typescript"><code>// packages/core/src/services/error-logger.ts
+
+import { Pool } from &#39;pg&#39;;
+import { SNSClient, PublishCommand } from &#39;@aws-sdk/client-sns&#39;;
+
+interface ErrorContext {
+    tenantId?: string;
+    userId?: string;
+    requestId?: string;
+    sourceService: string;
+    sourceFunction: string;
+    additionalContext?: Record&lt;string, any&gt;;
+}
+
+type ErrorSeverity = &#39;debug&#39; | &#39;info&#39; | &#39;warning&#39; | &#39;error&#39; | &#39;critical&#39;;
+
+export class ErrorLogger {
+    private pool: Pool;
+    private sns: SNSClient;
+    private alertTopicArn: string;
+    
+    constructor(pool: Pool, alertTopicArn: string) {
+        this.pool = pool;
+        this.sns = new SNSClient({});
+        this.alertTopicArn = alertTopicArn;
+    }
+    
+    async log(
+        error: Error,
+        context: ErrorContext,
+        severity: ErrorSeverity = &#39;error&#39;
+    ): Promise&lt;string&gt; {
+        const errorCode = this.extractErrorCode(error);
+        const errorType = error.constructor.name;
+        
+        const result = await this.pool.query(`
+            INSERT INTO error_logs (
+                tenant_id, user_id, error_code, error_type, error_message,
+                stack_trace, request_id, source_service, source_function,
+                context, severity
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            RETURNING id
+        `, [
+            context.tenantId,
+            context.userId,
+            errorCode,
+            errorType,
+            error.message,
+            error.stack,
+            context.requestId,
+            context.sourceService,
+            context.sourceFunction,
+            JSON.stringify(context.additionalContext || {}),
+            severity
+        ]);
+        
+        const errorId = result.rows[0].id;
+        
+        // Check for patterns and auto-resolve
+        await this.checkPatterns(errorCode, error.message);
+        
+        // Send alerts for critical errors
+        if (severity === &#39;critical&#39;) {
+            await this.sendAlert(errorId, error, context);
+        }
+        
+        return errorId;
+    }
+    
+    async getUnresolvedErrors(
+        tenantId?: string,
+        limit: number = 50
+    ): Promise&lt;any[]&gt; {
+        const whereClause = tenantId ? &#39;AND tenant_id = $2&#39; : &#39;&#39;;
+        const params = tenantId ? [limit, tenantId] : [limit];
+        
+        const result = await this.pool.query(`
+            SELECT * FROM error_logs
+            WHERE resolved = false ${whereClause}
+            ORDER BY 
+                CASE severity 
+                    WHEN &#39;critical&#39; THEN 1 
+                    WHEN &#39;error&#39; THEN 2 
+                    WHEN &#39;warning&#39; THEN 3 
+                    ELSE 4 
+                END,
+                created_at DESC
+            LIMIT $1
+        `, params);
+        
+        return result.rows;
+    }
+    
+    async resolve(
+        errorId: string,
+        resolvedBy: string,
+        notes: string
+    ): Promise&lt;void&gt; {
+        await this.pool.query(`
+            UPDATE error_logs
+            SET resolved = true, resolved_at = NOW(), resolved_by = $2, resolution_notes = $3
+            WHERE id = $1
+        `, [errorId, resolvedBy, notes]);
+    }
+    
+    private extractErrorCode(error: Error): string {
+        if (&#39;code&#39; in error) return String((error as any).code);
+        if (error.message.includes(&#39;ECONNREFUSED&#39;)) return &#39;CONN_REFUSED&#39;;
+        if (error.message.includes(&#39;timeout&#39;)) return &#39;TIMEOUT&#39;;
+        if (error.message.includes(&#39;rate limit&#39;)) return &#39;RATE_LIMIT&#39;;
+        return &#39;UNKNOWN&#39;;
+    }
+    
+    private async checkPatterns(errorCode: string, message: string): Promise&lt;void&gt; {
+        await this.pool.query(`
+            INSERT INTO error_patterns (pattern_name, error_code_pattern, message_pattern)
+            VALUES ($1, $2, $3)
+            ON CONFLICT DO NOTHING
+        `, [`pattern_${errorCode}`, errorCode, message.substring(0, 100)]);
+        
+        await this.pool.query(`
+            UPDATE error_patterns
+            SET occurrence_count = occurrence_count + 1, last_seen = NOW()
+            WHERE error_code_pattern = $1
+        `, [errorCode]);
+    }
+    
+    private async sendAlert(errorId: string, error: Error, context: ErrorContext): Promise&lt;void&gt; {
+        await this.sns.send(new PublishCommand({
+            TopicArn: this.alertTopicArn,
+            Subject: `[RADIANT CRITICAL] ${error.message.substring(0, 50)}`,
+            Message: JSON.stringify({
+                errorId,
+                message: error.message,
+                service: context.sourceService,
+                function: context.sourceFunction,
+                tenantId: context.tenantId,
+                timestamp: new Date().toISOString()
+            })
+        }));
+    }
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tenant admin guide - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>tenant admin guide</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/authentication/tenant-admin-guide.md</div>
+  </div>
+  
+  <h1 id="tenant-administrator-authentication-guide">Tenant Administrator Authentication Guide</h1>
+<blockquote>
+<p><strong>Version</strong>: 5.52.29 | <strong>Last Updated</strong>: January 25, 2026 | <strong>Audience</strong>: Tenant Administrators</p>
+</blockquote>
+<p>This guide covers authentication management for tenant administrators: configuring SSO, managing users, enforcing MFA policies, and handling security settings for your organization.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#single-sign-on-sso-configuration">Single Sign-On (SSO) Configuration</a></li>
+<li><a href="#user-management">User Management</a></li>
+<li><a href="#mfa-policies">MFA Policies</a></li>
+<li><a href="#session-management">Session Management</a></li>
+<li><a href="#security-settings">Security Settings</a></li>
+<li><a href="#audit-logs">Audit Logs</a></li>
+<li><a href="#oauth-applications">OAuth Applications</a></li>
+<li><a href="#language--localization">Language &amp; Localization</a></li>
+</ol>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>As a Tenant Administrator, you manage authentication for users within your organization. You have access to:</p>
+<table>
+<colgroup>
+<col style="width: 48%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SSO Configuration</strong></td>
+<td>Set up and manage enterprise identity providers</td>
+</tr>
+<tr>
+<td><strong>User Management</strong></td>
+<td>Invite, suspend, and remove users</td>
+</tr>
+<tr>
+<td><strong>MFA Policies</strong></td>
+<td>Require or recommend MFA for user groups</td>
+</tr>
+<tr>
+<td><strong>Session Policies</strong></td>
+<td>Configure timeout and concurrent session limits</td>
+</tr>
+<tr>
+<td><strong>Security Monitoring</strong></td>
+<td>View authentication logs and failed attempts</td>
+</tr>
+<tr>
+<td><strong>OAuth Apps</strong></td>
+<td>Manage third-party application access</td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>graph TB
+    TA[Tenant Admin] --&gt; SSO[SSO Config]
+    TA --&gt; UM[User Management]
+    TA --&gt; MFA[MFA Policies]
+    TA --&gt; SEC[Security Settings]
+    TA --&gt; AUDIT[Audit Logs]
+    TA --&gt; OAUTH[OAuth Apps]
+    
+    SSO --&gt; Users
+    UM --&gt; Users
+    MFA --&gt; Users
+    
+    Users[Organization Users]</code></pre>
+<hr />
+<h2 id="single-sign-on-sso-configuration">Single Sign-On (SSO) Configuration</h2>
+<h3 id="supported-protocols">Supported Protocols</h3>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 32%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr>
+<th>Protocol</th>
+<th>Use Case</th>
+<th>Providers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SAML 2.0</strong></td>
+<td>Enterprise IdPs</td>
+<td>Okta, Azure AD, OneLogin, Ping</td>
+</tr>
+<tr>
+<td><strong>OIDC</strong></td>
+<td>Modern identity providers</td>
+<td>Auth0, Google Workspace, custom</td>
+</tr>
+</tbody>
+</table>
+<h3 id="setting-up-saml-2.0">Setting Up SAML 2.0</h3>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Authentication</strong> → <strong>SSO</strong></li>
+<li>Click <strong>Configure SAML Provider</strong></li>
+<li>Enter your identity provider details:</li>
+</ol>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 44%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>IdP Entity ID</strong></td>
+<td>Unique identifier from your IdP</td>
+<td><code>https://idp.yourcompany.com/entity</code></td>
+</tr>
+<tr>
+<td><strong>SSO URL</strong></td>
+<td>Where users are redirected to sign in</td>
+<td><code>https://idp.yourcompany.com/sso</code></td>
+</tr>
+<tr>
+<td><strong>Certificate</strong></td>
+<td>X.509 certificate for signature verification</td>
+<td>Paste PEM-encoded certificate</td>
+</tr>
+<tr>
+<td><strong>Name ID Format</strong></td>
+<td>User identifier format</td>
+<td><code>emailAddress</code> (recommended)</td>
+</tr>
+</tbody>
+</table>
+<ol start="4" type="1">
+<li>Download the <strong>RADIANT Service Provider metadata</strong> to import into your IdP</li>
+<li>In your IdP, configure attribute mappings:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>IdP Attribute</th>
+<th>RADIANT Attribute</th>
+<th>Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>email</code></td>
+<td><code>email</code></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>firstName</code></td>
+<td><code>given_name</code></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>lastName</code></td>
+<td><code>family_name</code></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>groups</code></td>
+<td><code>groups</code></td>
+<td>Optional</td>
+</tr>
+<tr>
+<td><code>department</code></td>
+<td><code>department</code></td>
+<td>Optional</td>
+</tr>
+</tbody>
+</table>
+<ol start="6" type="1">
+<li>Click <strong>Test Connection</strong> to verify the setup</li>
+<li>Enable <strong>SSO for new users</strong> and/or <strong>existing users</strong></li>
+</ol>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User
+    participant RADIANT
+    participant IdP as Your IdP
+    
+    User-&gt;&gt;RADIANT: Enter work email
+    RADIANT-&gt;&gt;RADIANT: Lookup SSO config
+    RADIANT-&gt;&gt;IdP: SAML AuthnRequest
+    IdP-&gt;&gt;User: Login page
+    User-&gt;&gt;IdP: Enter credentials
+    IdP-&gt;&gt;RADIANT: SAML Response
+    RADIANT-&gt;&gt;RADIANT: Validate &amp; create session
+    RADIANT-&gt;&gt;User: Redirect to app</code></pre>
+<h3 id="setting-up-oidc">Setting Up OIDC</h3>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Authentication</strong> → <strong>SSO</strong></li>
+<li>Click <strong>Configure OIDC Provider</strong></li>
+<li>Enter your identity provider details:</li>
+</ol>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 44%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Issuer URL</strong></td>
+<td>OIDC discovery endpoint</td>
+<td><code>https://idp.yourcompany.com</code></td>
+</tr>
+<tr>
+<td><strong>Client ID</strong></td>
+<td>Application identifier</td>
+<td><code>abc123</code></td>
+</tr>
+<tr>
+<td><strong>Client Secret</strong></td>
+<td>Application secret</td>
+<td>(secure input)</td>
+</tr>
+<tr>
+<td><strong>Scopes</strong></td>
+<td>Requested permissions</td>
+<td><code>openid profile email</code></td>
+</tr>
+</tbody>
+</table>
+<ol start="4" type="1">
+<li>Configure the <strong>redirect URI</strong> in your IdP: <code>https://{your-domain}/api/auth/oidc/callback</code></li>
+<li>Click <strong>Test Connection</strong></li>
+<li>Enable for users</li>
+</ol>
+<h3 id="sso-options">SSO Options</h3>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 43%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Auto-provision users</strong></td>
+<td>Create users automatically on first SSO sign-in</td>
+<td>Off</td>
+</tr>
+<tr>
+<td><strong>Require SSO</strong></td>
+<td>Disable password sign-in for SSO users</td>
+<td>Off</td>
+</tr>
+<tr>
+<td><strong>JIT group sync</strong></td>
+<td>Sync group memberships from IdP</td>
+<td>Off</td>
+</tr>
+<tr>
+<td><strong>Allow bypass for admins</strong></td>
+<td>Let tenant admins use password if SSO fails</td>
+<td>On</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="user-management">User Management</h2>
+<h3 id="inviting-users">Inviting Users</h3>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Users</strong></li>
+<li>Click <strong>Invite User</strong></li>
+<li>Enter the user’s <strong>email address</strong></li>
+<li>Select their <strong>role</strong>:
+<ul>
+<li><strong>Member</strong>: Standard user access</li>
+<li><strong>Admin</strong>: Can manage users and settings</li>
+<li><strong>Owner</strong>: Full tenant control</li>
+</ul></li>
+<li>Optionally add to <strong>groups</strong></li>
+<li>Click <strong>Send Invitation</strong></li>
+</ol>
+<p>The user receives an email with a link to create their account.</p>
+<h3 id="user-roles-and-permissions">User Roles and Permissions</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Users</th>
+<th>Settings</th>
+<th>Billing</th>
+<th>SSO Config</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Member</strong></td>
+<td>View self</td>
+<td>View</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Admin</strong></td>
+<td>Manage all</td>
+<td>Manage</td>
+<td>View</td>
+<td>Configure</td>
+</tr>
+<tr>
+<td><strong>Owner</strong></td>
+<td>Manage all</td>
+<td>Manage</td>
+<td>Manage</td>
+<td>Configure</td>
+</tr>
+</tbody>
+</table>
+<h3 id="suspending-users">Suspending Users</h3>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Users</strong></li>
+<li>Find the user and click <strong>⋮</strong> → <strong>Suspend</strong></li>
+<li>Confirm the suspension</li>
+</ol>
+<p>Suspended users: - Cannot sign in - Lose access to all applications - Keep their data (can be restored) - Can be unsuspended later</p>
+<h3 id="removing-users">Removing Users</h3>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Users</strong></li>
+<li>Find the user and click <strong>⋮</strong> → <strong>Remove</strong></li>
+<li>Choose data handling:
+<ul>
+<li><strong>Transfer data</strong>: Move to another user</li>
+<li><strong>Archive data</strong>: Keep for compliance</li>
+<li><strong>Delete data</strong>: Permanent removal (after retention period)</li>
+</ul></li>
+<li>Confirm removal</li>
+</ol>
+<hr />
+<h2 id="mfa-policies">MFA Policies</h2>
+<h3 id="policy-options">Policy Options</h3>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 39%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Description</th>
+<th>Applies To</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Required</strong></td>
+<td>Users must set up MFA before accessing apps</td>
+<td>Admins (always), or all users</td>
+</tr>
+<tr>
+<td><strong>Encouraged</strong></td>
+<td>Users see a prompt but can skip (for now)</td>
+<td>Members</td>
+</tr>
+<tr>
+<td><strong>Hidden</strong></td>
+<td>MFA option not shown to these users</td>
+<td>Standard users (default)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="configuring-mfa-policy">Configuring MFA Policy</h3>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Security</strong> → <strong>MFA Policy</strong></li>
+<li>For each user role, select the policy:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Recommended Policy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Owner</strong></td>
+<td>Required (cannot change)</td>
+</tr>
+<tr>
+<td><strong>Admin</strong></td>
+<td>Required (cannot change)</td>
+</tr>
+<tr>
+<td><strong>Member</strong></td>
+<td>Encouraged or Hidden</td>
+</tr>
+</tbody>
+</table>
+<ol start="3" type="1">
+<li>Configure <strong>grace period</strong> for “Required” policy (days before enforcement)</li>
+<li>Click <strong>Save Policy</strong></li>
+</ol>
+<h3 id="mfa-methods-allowed">MFA Methods Allowed</h3>
+<p>Enable or disable MFA methods for your organization:</p>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 35%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>TOTP</strong></td>
+<td>Authenticator apps (Google, Microsoft, etc.)</td>
+<td>Enable (most secure)</td>
+</tr>
+<tr>
+<td><strong>Backup Codes</strong></td>
+<td>10 one-time recovery codes</td>
+<td>Enable (for recovery)</td>
+</tr>
+<tr>
+<td><strong>Trusted Devices</strong></td>
+<td>Remember this device for 30 days</td>
+<td>Enable (convenience)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="viewing-mfa-status">Viewing MFA Status</h3>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Users</strong></li>
+<li>The <strong>MFA</strong> column shows:
+<ul>
+<li>✅ <strong>Enabled</strong>: MFA is set up</li>
+<li>⚠️ <strong>Pending</strong>: Required but not yet set up</li>
+<li>— <strong>Not available</strong>: Policy is “Hidden”</li>
+</ul></li>
+</ol>
+<h3 id="resetting-user-mfa">Resetting User MFA</h3>
+<p>If a user loses access to their authenticator:</p>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Users</strong></li>
+<li>Find the user and click <strong>⋮</strong> → <strong>Reset MFA</strong></li>
+<li>Confirm the reset</li>
+</ol>
+<p>The user will need to set up MFA again on their next sign-in.</p>
+<hr />
+<h2 id="session-management">Session Management</h2>
+<h3 id="session-policies">Session Policies</h3>
+<p>Configure how long sessions last and concurrent session behavior:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Session timeout</strong></td>
+<td>Inactivity before auto-logout</td>
+<td>7 days</td>
+</tr>
+<tr>
+<td><strong>Absolute timeout</strong></td>
+<td>Maximum session length</td>
+<td>30 days</td>
+</tr>
+<tr>
+<td><strong>Concurrent sessions</strong></td>
+<td>Max sessions per user</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>Session on new device</strong></td>
+<td>Require re-auth on new device</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="viewing-active-sessions">Viewing Active Sessions</h3>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Security</strong> → <strong>Active Sessions</strong></li>
+<li>View all active sessions with:
+<ul>
+<li>User email</li>
+<li>Device/browser info</li>
+<li>Location (approximate)</li>
+<li>Last activity</li>
+<li>Session start time</li>
+</ul></li>
+</ol>
+<h3 id="terminating-sessions">Terminating Sessions</h3>
+<p>To force a user to sign in again:</p>
+<ol type="1">
+<li>Find the session in <strong>Active Sessions</strong></li>
+<li>Click <strong>Terminate</strong></li>
+<li>The user is immediately logged out</li>
+</ol>
+<p>To terminate all sessions for a user:</p>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Users</strong></li>
+<li>Find the user and click <strong>⋮</strong> → <strong>Terminate All Sessions</strong></li>
+</ol>
+<hr />
+<h2 id="security-settings">Security Settings</h2>
+<h3 id="password-policy">Password Policy</h3>
+<p>Configure password requirements for users who don’t use SSO:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+<th>Default</th>
+<th>Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Minimum length</strong></td>
+<td>Characters required</td>
+<td>12</td>
+<td>8-128</td>
+</tr>
+<tr>
+<td><strong>Require uppercase</strong></td>
+<td>At least one uppercase letter</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Require lowercase</strong></td>
+<td>At least one lowercase letter</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Require number</strong></td>
+<td>At least one digit</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Require special</strong></td>
+<td>At least one symbol</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Password history</strong></td>
+<td>Prevent reusing recent passwords</td>
+<td>5</td>
+<td>0-24</td>
+</tr>
+<tr>
+<td><strong>Maximum age</strong></td>
+<td>Days before password expires</td>
+<td>0 (never)</td>
+<td>0-365</td>
+</tr>
+</tbody>
+</table>
+<h3 id="account-lockout">Account Lockout</h3>
+<p>Protect against brute-force attacks:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Lockout threshold</strong></td>
+<td>Failed attempts before lockout</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>Lockout duration</strong></td>
+<td>Minutes until auto-unlock</td>
+<td>15</td>
+</tr>
+<tr>
+<td><strong>Reset counter after</strong></td>
+<td>Minutes of no failed attempts</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ip-restrictions">IP Restrictions</h3>
+<p>Limit access to specific IP ranges:</p>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Security</strong> → <strong>IP Restrictions</strong></li>
+<li>Click <strong>Add Rule</strong></li>
+<li>Enter an <strong>IP address</strong> or <strong>CIDR range</strong></li>
+<li>Select <strong>Allow</strong> or <strong>Block</strong></li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<p>Example rules: - <code>10.0.0.0/8</code> — Allow corporate network - <code>192.168.1.100</code> — Allow specific IP - <code>0.0.0.0/0</code> with Block — Block all (except allowed)</p>
+<hr />
+<h2 id="audit-logs">Audit Logs</h2>
+<h3 id="viewing-authentication-logs">Viewing Authentication Logs</h3>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Security</strong> → <strong>Audit Logs</strong></li>
+<li>Filter by:
+<ul>
+<li><strong>Event type</strong>: Sign-in, Sign-out, MFA, Password change, etc.</li>
+<li><strong>User</strong>: Specific user email</li>
+<li><strong>Date range</strong>: Custom time period</li>
+<li><strong>Status</strong>: Success, Failure</li>
+</ul></li>
+</ol>
+<h3 id="log-events-captured">Log Events Captured</h3>
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 36%" />
+<col style="width: 44%" />
+</colgroup>
+<thead>
+<tr>
+<th>Event</th>
+<th>Description</th>
+<th>Details Logged</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auth.signin.success</code></td>
+<td>Successful sign-in</td>
+<td>User, device, location, method</td>
+</tr>
+<tr>
+<td><code>auth.signin.failed</code></td>
+<td>Failed sign-in attempt</td>
+<td>User (if known), reason, IP</td>
+</tr>
+<tr>
+<td><code>auth.signout</code></td>
+<td>User signed out</td>
+<td>User, session duration</td>
+</tr>
+<tr>
+<td><code>auth.mfa.setup</code></td>
+<td>MFA configured</td>
+<td>User, method</td>
+</tr>
+<tr>
+<td><code>auth.mfa.verified</code></td>
+<td>MFA code accepted</td>
+<td>User, method</td>
+</tr>
+<tr>
+<td><code>auth.mfa.failed</code></td>
+<td>MFA code rejected</td>
+<td>User, attempt count</td>
+</tr>
+<tr>
+<td><code>auth.password.changed</code></td>
+<td>Password updated</td>
+<td>User</td>
+</tr>
+<tr>
+<td><code>auth.password.reset</code></td>
+<td>Password reset via email</td>
+<td>User, IP</td>
+</tr>
+<tr>
+<td><code>auth.session.terminated</code></td>
+<td>Session forcibly ended</td>
+<td>User, by admin</td>
+</tr>
+</tbody>
+</table>
+<h3 id="exporting-logs">Exporting Logs</h3>
+<ol type="1">
+<li>Apply desired filters</li>
+<li>Click <strong>Export</strong></li>
+<li>Select format: <strong>CSV</strong> or <strong>JSON</strong></li>
+<li>Download the file</li>
+</ol>
+<p>Logs are retained for <strong>90 days</strong> by default (configurable per compliance requirements).</p>
+<hr />
+<h2 id="oauth-applications">OAuth Applications</h2>
+<p>Manage third-party applications that can access your organization’s data.</p>
+<h3 id="viewing-connected-apps">Viewing Connected Apps</h3>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Security</strong> → <strong>OAuth Applications</strong></li>
+<li>View all authorized applications with:
+<ul>
+<li>Application name</li>
+<li>Publisher</li>
+<li>Permissions granted</li>
+<li>Users who authorized</li>
+<li>Last used</li>
+</ul></li>
+</ol>
+<h3 id="revoking-app-access">Revoking App Access</h3>
+<p>To remove an application’s access for all users:</p>
+<ol type="1">
+<li>Find the application in the list</li>
+<li>Click <strong>Revoke Access</strong></li>
+<li>Confirm the revocation</li>
+</ol>
+<p>All tokens for that application are immediately invalidated.</p>
+<h3 id="app-permissions-scopes">App Permissions (Scopes)</h3>
+<table>
+<thead>
+<tr>
+<th>Scope</th>
+<th>Access Level</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>read:profile</code></td>
+<td>User’s name and email</td>
+</tr>
+<tr>
+<td><code>read:sessions</code></td>
+<td>User’s Think Tank sessions</td>
+</tr>
+<tr>
+<td><code>write:sessions</code></td>
+<td>Create and modify sessions</td>
+</tr>
+<tr>
+<td><code>read:files</code></td>
+<td>User’s uploaded files</td>
+</tr>
+<tr>
+<td><code>write:files</code></td>
+<td>Upload and delete files</td>
+</tr>
+<tr>
+<td><code>admin:users</code></td>
+<td>Manage organization users</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="language-localization">Language &amp; Localization</h2>
+<h3 id="default-language">Default Language</h3>
+<p>Set the default language for new users in your organization:</p>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Settings</strong> → <strong>Localization</strong></li>
+<li>Select <strong>Default Language</strong> from the dropdown</li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<h3 id="available-languages">Available Languages</h3>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Code</th>
+<th>Direction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>English</td>
+<td><code>en</code></td>
+<td>LTR</td>
+</tr>
+<tr>
+<td>Spanish</td>
+<td><code>es</code></td>
+<td>LTR</td>
+</tr>
+<tr>
+<td>French</td>
+<td><code>fr</code></td>
+<td>LTR</td>
+</tr>
+<tr>
+<td>German</td>
+<td><code>de</code></td>
+<td>LTR</td>
+</tr>
+<tr>
+<td>Japanese</td>
+<td><code>ja</code></td>
+<td>LTR</td>
+</tr>
+<tr>
+<td>Korean</td>
+<td><code>ko</code></td>
+<td>LTR</td>
+</tr>
+<tr>
+<td>Chinese (Simplified)</td>
+<td><code>zh-CN</code></td>
+<td>LTR</td>
+</tr>
+<tr>
+<td>Chinese (Traditional)</td>
+<td><code>zh-TW</code></td>
+<td>LTR</td>
+</tr>
+<tr>
+<td><strong>Arabic</strong></td>
+<td><code>ar</code></td>
+<td><strong>RTL</strong></td>
+</tr>
+<tr>
+<td><em>(14 more)</em></td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="language-override">Language Override</h3>
+<p>Users can override the default language in their personal settings.</p>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./overview.md">Authentication Overview</a></li>
+<li><a href="./platform-admin-guide.md">Platform Admin Guide</a></li>
+<li><a href="./mfa-guide.md">MFA Setup Guide</a></li>
+<li><a href="./oauth-guide.md">OAuth Developer Guide</a></li>
+<li><a href="../security/authentication-architecture.md">Security Architecture</a></li>
+<li><a href="./troubleshooting.md">Troubleshooting</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>troubleshooting - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>troubleshooting</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/authentication/troubleshooting.md</div>
+  </div>
+  
+  <h1 id="authentication-troubleshooting-guide">Authentication Troubleshooting Guide</h1>
+<blockquote>
+<p><strong>Version</strong>: 5.52.29 | <strong>Last Updated</strong>: January 25, 2026 | <strong>Audience</strong>: All Users &amp; Administrators</p>
+</blockquote>
+<p>This guide helps resolve common authentication issues in RADIANT.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#sign-in-issues">Sign-In Issues</a></li>
+<li><a href="#password-problems">Password Problems</a></li>
+<li><a href="#mfa-issues">MFA Issues</a></li>
+<li><a href="#sso-problems">SSO Problems</a></li>
+<li><a href="#session-issues">Session Issues</a></li>
+<li><a href="#oauthintegration-issues">OAuth/Integration Issues</a></li>
+<li><a href="#languagedisplay-issues">Language/Display Issues</a></li>
+<li><a href="#administrator-troubleshooting">Administrator Troubleshooting</a></li>
+<li><a href="#getting-help">Getting Help</a></li>
+</ol>
+<hr />
+<h2 id="sign-in-issues">Sign-In Issues</h2>
+<h3 id="invalid-email-or-password">“Invalid email or password”</h3>
+<p><strong>Symptoms:</strong> Error message after entering credentials</p>
+<p><strong>Possible Causes:</strong> | Cause | Solution | |——-|———-| | Incorrect password | Passwords are case-sensitive. Check Caps Lock | | Wrong email address | Verify you’re using the correct email | | Account not verified | Check email for verification link | | Account suspended | Contact your administrator | | Using SSO email with password | Use the SSO sign-in flow instead |</p>
+<p><strong>Steps to Resolve:</strong> 1. Double-check your email address for typos 2. Try resetting your password via “Forgot password?” 3. Check your email (including spam) for verification links 4. Contact your admin if the issue persists</p>
+<h3 id="account-locked">“Account locked”</h3>
+<p><strong>Symptoms:</strong> Cannot sign in, message says account is locked</p>
+<p><strong>Cause:</strong> Too many failed sign-in attempts (typically 5+)</p>
+<p><strong>Solutions:</strong> 1. <strong>Wait</strong> - Accounts auto-unlock after 15 minutes 2. <strong>Reset password</strong> - Use “Forgot password?” to unlock immediately 3. <strong>Contact admin</strong> - They can manually unlock your account</p>
+<h3 id="your-session-has-expired">“Your session has expired”</h3>
+<p><strong>Symptoms:</strong> Redirected to sign-in page while working</p>
+<p><strong>Cause:</strong> Session timeout due to inactivity or maximum session length reached</p>
+<p><strong>Solutions:</strong> 1. Sign in again - your work should be saved 2. If this happens frequently, contact your admin about session policies</p>
+<h3 id="sign-in-not-allowed">“Sign-in not allowed”</h3>
+<p><strong>Symptoms:</strong> Error after entering valid credentials</p>
+<p><strong>Possible Causes:</strong> | Cause | Solution | |——-|———-| | IP restrictions | Connect from an allowed network/VPN | | Account disabled | Contact your administrator | | SSO required | Use your organization’s SSO instead | | Tenant suspended | Contact RADIANT support |</p>
+<hr />
+<h2 id="password-problems">Password Problems</h2>
+<h3 id="password-does-not-meet-requirements">“Password does not meet requirements”</h3>
+<p><strong>Symptoms:</strong> Cannot set new password</p>
+<p><strong>Requirements (typical):</strong> - Minimum 12 characters - At least 1 uppercase letter (A-Z) - At least 1 lowercase letter (a-z) - At least 1 number (0-9) - At least 1 special character (!@#$%^&amp;*) - Cannot be a previously used password</p>
+<p><strong>Tips for Strong Passwords:</strong> - Use a passphrase: <code>Coffee-Mountain-7Blue!</code> - Use a password manager to generate random passwords - Avoid personal information (birthdays, names)</p>
+<h3 id="password-reset-link-expired">“Password reset link expired”</h3>
+<p><strong>Symptoms:</strong> Clicking reset link shows error</p>
+<p><strong>Cause:</strong> Reset links expire after 24 hours</p>
+<p><strong>Solution:</strong> 1. Go to the sign-in page 2. Click “Forgot password?” again 3. Request a new reset link 4. Use the new link within 24 hours</p>
+<h3 id="not-receiving-password-reset-email">Not receiving password reset email</h3>
+<p><strong>Possible Causes:</strong> | Cause | Solution | |——-|———-| | Email in spam/junk | Check spam folder | | Wrong email entered | Try again with correct email | | Email delivery delay | Wait 5-10 minutes | | Email system issues | Contact admin |</p>
+<p><strong>Note:</strong> For security, we show the same message whether the email exists or not.</p>
+<hr />
+<h2 id="mfa-issues">MFA Issues</h2>
+<h3 id="invalid-code">“Invalid code”</h3>
+<p><strong>Symptoms:</strong> MFA code is rejected</p>
+<p><strong>Possible Causes &amp; Solutions:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code expired</td>
+<td>Wait for new code (changes every 30 seconds)</td>
+</tr>
+<tr>
+<td>Device clock incorrect</td>
+<td>Enable automatic time sync</td>
+</tr>
+<tr>
+<td>Wrong account</td>
+<td>Verify using RADIANT entry in your app</td>
+</tr>
+<tr>
+<td>Already used</td>
+<td>Each code works only once</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Fix Clock Sync:</strong> - <strong>iOS:</strong> Settings → General → Date &amp; Time → Set Automatically - <strong>Android:</strong> Settings → System → Date &amp; Time → Automatic - <strong>Windows:</strong> Settings → Time &amp; Language → Sync now - <strong>Mac:</strong> System Preferences → Date &amp; Time → Set automatically</p>
+<h3 id="lost-access-to-authenticator-app">Lost access to authenticator app</h3>
+<p><strong>If you have backup codes:</strong> 1. On the MFA screen, click “Use a backup code” 2. Enter one of your saved backup codes 3. Sign in and set up a new authenticator</p>
+<p><strong>If you don’t have backup codes:</strong> 1. Click “Can’t access your code?” 2. Follow the recovery process 3. You may need admin assistance</p>
+<h3 id="mfa-required-but-i-didnt-enable-it">“MFA required” but I didn’t enable it</h3>
+<p><strong>Cause:</strong> Your organization enforces MFA for your role</p>
+<p><strong>Solution:</strong> 1. Follow the MFA setup prompts 2. This is required - you cannot skip it 3. Contact your admin if you have questions</p>
+<h3 id="new-phone---how-to-transfer-mfa">New phone - how to transfer MFA?</h3>
+<p><strong>Best approach (before wiping old phone):</strong> 1. Sign in on a computer 2. Go to Account Settings → Security 3. Click “Change Authenticator” 4. Set up MFA on your new phone 5. Your old phone’s entry will stop working</p>
+<p><strong>If old phone is already wiped:</strong> 1. Use a backup code to sign in 2. Set up MFA fresh on your new phone</p>
+<hr />
+<h2 id="sso-problems">SSO Problems</h2>
+<h3 id="sso-configuration-not-found">“SSO configuration not found”</h3>
+<p><strong>Symptoms:</strong> Error when trying to sign in with work email</p>
+<p><strong>Possible Causes:</strong> | Cause | Solution | |——-|———-| | SSO not configured | Contact your IT admin | | Using wrong email domain | Use your work email, not personal | | SSO temporarily disabled | Contact your IT admin |</p>
+<h3 id="saml-assertion-invalid">“SAML assertion invalid”</h3>
+<p><strong>Symptoms:</strong> Error after authenticating with your identity provider</p>
+<p><strong>Possible Causes:</strong> - Certificate mismatch - Clock skew between systems - Attribute mapping issues</p>
+<p><strong>Solutions:</strong> 1. Try again - sometimes temporary 2. Clear browser cookies and cache 3. Contact your IT admin to check SSO configuration</p>
+<h3 id="stuck-in-redirect-loop">Stuck in redirect loop</h3>
+<p><strong>Symptoms:</strong> Page keeps redirecting between RADIANT and identity provider</p>
+<p><strong>Solutions:</strong> 1. Clear all cookies for both sites 2. Try incognito/private browser window 3. Disable browser extensions temporarily 4. Contact IT admin if persists</p>
+<h3 id="user-not-provisioned">“User not provisioned”</h3>
+<p><strong>Symptoms:</strong> SSO authentication succeeds but RADIANT denies access</p>
+<p><strong>Cause:</strong> Your account doesn’t exist in RADIANT yet</p>
+<p><strong>Solutions:</strong> 1. Contact your organization admin to provision your account 2. If auto-provisioning should be enabled, admin needs to check SSO settings</p>
+<hr />
+<h2 id="session-issues">Session Issues</h2>
+<h3 id="logged-out-unexpectedly">Logged out unexpectedly</h3>
+<p><strong>Possible Causes:</strong> | Cause | Explanation | |——-|————-| | Inactivity timeout | Session ended due to no activity | | Absolute timeout | Maximum session length reached | | Admin terminated session | Your admin ended your session | | Signed in elsewhere | Concurrent session limit reached | | Password changed | All sessions end when password changes |</p>
+<h3 id="cant-stay-signed-in">Can’t stay signed in</h3>
+<p><strong>Possible Causes:</strong> | Cause | Solution | |——-|———-| | Cookies blocked | Enable cookies for RADIANT domain | | Private browsing | Sessions don’t persist in incognito | | Browser settings | Check “clear cookies on close” | | Strict session policy | Normal for high-security environments |</p>
+<h3 id="signed-in-on-wrong-account">Signed in on wrong account</h3>
+<p><strong>Solution:</strong> 1. Click your avatar → Sign Out 2. Sign in with the correct account</p>
+<hr />
+<h2 id="oauthintegration-issues">OAuth/Integration Issues</h2>
+<h3 id="invalid-redirect-uri">“Invalid redirect URI”</h3>
+<p><strong>Symptoms:</strong> Error when authorizing a third-party app</p>
+<p><strong>Cause:</strong> The app’s callback URL doesn’t match registered URIs</p>
+<p><strong>Solutions:</strong> - <strong>For users:</strong> Contact the app developer - <strong>For developers:</strong> Ensure redirect URI exactly matches registration</p>
+<h3 id="invalid-client">“Invalid client”</h3>
+<p><strong>Symptoms:</strong> OAuth authorization fails immediately</p>
+<p><strong>Cause:</strong> Client ID is incorrect or application is disabled</p>
+<p><strong>Solutions:</strong> - <strong>For users:</strong> Contact the app developer - <strong>For developers:</strong> Verify client ID and check if app is active</p>
+<h3 id="access-denied">“Access denied”</h3>
+<p><strong>Symptoms:</strong> You clicked “Allow” but got an error</p>
+<p><strong>Possible Causes:</strong> | Cause | Solution | |——-|———-| | Scope not allowed | App requesting unauthorized permissions | | App suspended | Contact app developer | | Tenant doesn’t allow app | Contact your admin |</p>
+<h3 id="revoking-app-access">Revoking app access</h3>
+<p>To disconnect a third-party app: 1. Go to Account Settings → Connected Apps 2. Find the app 3. Click “Revoke” or “Disconnect” 4. Confirm</p>
+<hr />
+<h2 id="languagedisplay-issues">Language/Display Issues</h2>
+<h3 id="interface-in-wrong-language">Interface in wrong language</h3>
+<p><strong>Solutions:</strong> 1. Click avatar → Settings → Language 2. Select your preferred language 3. Interface updates immediately</p>
+<h3 id="rtl-layout-issues">RTL layout issues</h3>
+<p><strong>Symptoms:</strong> Arabic text displays incorrectly</p>
+<p><strong>Possible Causes:</strong> | Cause | Solution | |——-|———-| | Browser override | Check browser language settings | | CSS not loaded | Hard refresh (Ctrl+Shift+R / Cmd+Shift+R) | | Mixed content | Some elements intentionally stay LTR |</p>
+<h3 id="characters-not-displaying">Characters not displaying</h3>
+<p><strong>Symptoms:</strong> Boxes (□) or question marks (?) instead of text</p>
+<p><strong>Solutions:</strong> 1. Ensure your system has fonts for that language 2. Try a different browser 3. Check if the page is loading completely</p>
+<hr />
+<h2 id="administrator-troubleshooting">Administrator Troubleshooting</h2>
+<h3 id="user-cant-sign-in-admin-view">User can’t sign in (Admin view)</h3>
+<p><strong>Diagnostic steps:</strong> 1. Check user status (active, suspended, pending?) 2. Check for recent failed login attempts 3. Verify user is in correct tenant 4. Check IP restriction rules 5. Review audit logs for errors</p>
+<p><strong>Common fixes:</strong> - Reset user’s password - Reset user’s MFA - Unlock account - Clear IP restriction (if applicable)</p>
+<h3 id="sso-not-working-for-tenant">SSO not working for tenant</h3>
+<p><strong>Diagnostic steps:</strong> 1. Verify SSO configuration in Admin → Authentication → SSO 2. Check certificate expiration 3. Test with “Test Connection” button 4. Review SSO-specific audit logs 5. Verify attribute mappings</p>
+<p><strong>Common fixes:</strong> - Update expired certificate - Correct attribute mappings - Enable SSO for user accounts - Check IdP configuration</p>
+<h3 id="high-failure-rate-in-authentication-logs">High failure rate in authentication logs</h3>
+<p><strong>Investigation:</strong> 1. Check for bot/attack patterns (same IP, many users) 2. Verify recent configuration changes 3. Check if legitimate service accounts are failing 4. Review rate limiting effectiveness</p>
+<p><strong>Actions:</strong> - Enable/increase rate limiting - Block suspicious IPs - Alert affected users - Consider enabling CAPTCHA</p>
+<h3 id="mfa-adoption-is-low">MFA adoption is low</h3>
+<p><strong>Strategies:</strong> 1. Change policy from “Hidden” to “Encouraged” 2. Send communication about MFA benefits 3. Set a deadline for “Required” enforcement 4. Provide help resources for setup</p>
+<hr />
+<h2 id="getting-help">Getting Help</h2>
+<h3 id="self-service-resources">Self-Service Resources</h3>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>This guide</td>
+<td>Common issues and solutions</td>
+</tr>
+<tr>
+<td>In-app help</td>
+<td>Click ? icon in application</td>
+</tr>
+<tr>
+<td>Knowledge base</td>
+<td>Searchable articles</td>
+</tr>
+<tr>
+<td>Status page</td>
+<td>Check for ongoing incidents</td>
+</tr>
+</tbody>
+</table>
+<h3 id="contact-support">Contact Support</h3>
+<p><strong>For End Users:</strong> 1. Contact your organization’s IT administrator first 2. Use the in-app help chat (if available) 3. Email support at address provided by your organization</p>
+<p><strong>For Tenant Administrators:</strong> 1. Check RADIANT Admin documentation 2. Use the Admin support channel 3. Submit a support ticket</p>
+<p><strong>For Platform Administrators:</strong> 1. Check runbooks in <code>/docs/runbooks/</code> 2. Escalate via on-call procedures 3. Access emergency support channels</p>
+<h3 id="information-to-provide">Information to Provide</h3>
+<p>When contacting support, include: - Your email address - Tenant/organization name - Browser and OS version - Steps to reproduce the issue - Screenshots (if applicable) - Error messages (exact text) - Timestamp of the issue</p>
+<hr />
+<h2 id="error-code-reference">Error Code Reference</h2>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AUTH001</code></td>
+<td>Invalid credentials</td>
+<td>Check email/password</td>
+</tr>
+<tr>
+<td><code>AUTH002</code></td>
+<td>Account locked</td>
+<td>Wait 15 min or reset password</td>
+</tr>
+<tr>
+<td><code>AUTH003</code></td>
+<td>Account suspended</td>
+<td>Contact admin</td>
+</tr>
+<tr>
+<td><code>AUTH004</code></td>
+<td>MFA required</td>
+<td>Set up MFA</td>
+</tr>
+<tr>
+<td><code>AUTH005</code></td>
+<td>MFA invalid</td>
+<td>Check code and time sync</td>
+</tr>
+<tr>
+<td><code>AUTH006</code></td>
+<td>Session expired</td>
+<td>Sign in again</td>
+</tr>
+<tr>
+<td><code>AUTH007</code></td>
+<td>IP restricted</td>
+<td>Use allowed network</td>
+</tr>
+<tr>
+<td><code>AUTH008</code></td>
+<td>SSO required</td>
+<td>Use SSO sign-in</td>
+</tr>
+<tr>
+<td><code>AUTH009</code></td>
+<td>Rate limited</td>
+<td>Wait and retry</td>
+</tr>
+<tr>
+<td><code>AUTH010</code></td>
+<td>Service unavailable</td>
+<td>Check status page</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./overview.md">Authentication Overview</a></li>
+<li><a href="./user-guide.md">User Guide</a></li>
+<li><a href="./mfa-guide.md">MFA Guide</a></li>
+<li><a href="./tenant-admin-guide.md">Tenant Admin Guide</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

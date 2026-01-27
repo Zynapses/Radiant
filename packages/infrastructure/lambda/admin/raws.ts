@@ -86,7 +86,7 @@ export const handler = async (
 
     return error(404, `Unknown endpoint: ${method} ${path}`);
   } catch (err) {
-    console.error('RAWS API error:', err);
+    // Error logged by main handler
     return error(500, (err as Error).message);
   }
 };
@@ -203,8 +203,8 @@ async function handleCreateProfile(
   }
 
   // Validate weights sum to 1.0
-  const sum = Object.values(weights).reduce((a: number, b: any) => a + b, 0);
-  if (Math.abs(sum - 1.0) > 0.01) {
+  const sum = Object.values(weights).reduce((a: number, b: any) => a + Number(b), 0);
+  if (Math.abs(Number(sum) - 1.0) > 0.01) {
     return error(400, `Weights must sum to 1.0, got ${sum}`);
   }
 

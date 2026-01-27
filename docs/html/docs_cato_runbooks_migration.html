@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>migration - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>migration</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/runbooks/migration.md</div>
+  </div>
+  
+  <h1 id="cato-migration-runbook-litellm-vllm-ray-serve">Cato Migration Runbook: LiteLLM → vLLM + Ray Serve</h1>
+<h2 id="overview">Overview</h2>
+<p>This runbook covers the 16-week migration from LiteLLM to the new hybrid orchestration architecture.</p>
+<p><strong>Why Migrate:</strong> - LiteLLM has ~504 concurrent request limit - Cannot scale to 10MM+ users - No stateful context management - No hidden state extraction</p>
+<p><strong>Target Architecture:</strong> - vLLM on SageMaker for self-hosted inference - Ray Serve on EKS for stateful orchestration - Bedrock for managed Claude models</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Before starting migration:</p>
+<ul class="task-list">
+<li><label><input type="checkbox" />EKS cluster provisioned</label></li>
+<li><label><input type="checkbox" />SageMaker endpoints deployed</label></li>
+<li><label><input type="checkbox" />DynamoDB tables created</label></li>
+<li><label><input type="checkbox" />ElastiCache cluster running</label></li>
+<li><label><input type="checkbox" />Ray Serve deployment tested</label></li>
+<li><label><input type="checkbox" />Feature flags infrastructure ready</label></li>
+</ul>
+<h2 id="migration-phases">Migration Phases</h2>
+<h3 id="phase-1-infrastructure-weeks-1-4">Phase 1: Infrastructure (Weeks 1-4)</h3>
+<h4 id="week-1-deploy-vllm-on-sagemaker">Week 1: Deploy vLLM on SageMaker</h4>
+<pre class="bash"><code># Build custom container
+cd infrastructure/docker/shadow-self
+docker build -t cato-shadow-self:v1 .
+
+# Push to ECR
+aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_REPO
+docker push $ECR_REPO/cato-shadow-self:v1
+
+# Deploy endpoint
+python scripts/deploy_sagemaker.py --model shadow-self --environment staging</code></pre>
+<p><strong>Validation:</strong></p>
+<pre class="bash"><code># Test endpoint
+curl -X POST https://runtime.sagemaker.us-east-1.amazonaws.com/endpoints/cato-shadow-self-staging/invocations \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#39;{&quot;inputs&quot;: &quot;Hello, Cato!&quot;}&#39;</code></pre>
+<h4 id="week-2-deploy-nli-model">Week 2: Deploy NLI Model</h4>
+<pre class="bash"><code># Deploy DeBERTa-MNLI on SageMaker MME
+python scripts/deploy_sagemaker.py --model nli --environment staging</code></pre>
+<h4 id="week-3-deploy-ray-serve-on-eks">Week 3: Deploy Ray Serve on EKS</h4>
+<pre class="bash"><code># Install Ray on EKS
+helm install ray-cluster ray/ray-cluster \
+  --namespace cato \
+  --values k8s/ray-serve/values.yaml
+
+# Deploy Cato orchestrator
+kubectl apply -f k8s/ray-serve/cato-orchestrator.yaml</code></pre>
+<h4 id="week-4-integration-testing">Week 4: Integration Testing</h4>
+<pre class="bash"><code># Run integration tests
+pytest tests/integration/test_orchestration.py -v
+
+# Load test
+locust -f tests/load/locustfile.py --host=https://staging.cato.thinktank.ai</code></pre>
+<p><strong>Exit Criteria:</strong> - [ ] Shadow Self responding with hidden states - [ ] NLI classifying correctly - [ ] Ray Serve routing working - [ ] &lt; 500ms p99 latency</p>
+<hr />
+<h3 id="phase-2-custom-orchestration-weeks-5-8">Phase 2: Custom Orchestration (Weeks 5-8)</h3>
+<h4 id="week-5-implement-model-routing">Week 5: Implement Model Routing</h4>
+<pre class="python"><code># Verify routing logic
+async def test_routing():
+    orchestrator = CatoOrchestrator()
+    
+    # Simple query → Haiku
+    decision = orchestrator._determine_routing(&quot;What is 2+2?&quot;, &quot;general&quot;)
+    assert decision.primary_model == ModelTier.BEDROCK_HAIKU
+    
+    # Complex query → Sonnet
+    decision = orchestrator._determine_routing(
+        &quot;Explain the implications of quantum computing on cryptography&quot;,
+        &quot;general&quot;
+    )
+    assert decision.primary_model == ModelTier.BEDROCK_SONNET</code></pre>
+<h4 id="week-6-implement-stateful-context">Week 6: Implement Stateful Context</h4>
+<pre class="python"><code># Test context persistence
+async def test_context():
+    orchestrator = CatoOrchestrator()
+    
+    # First message
+    result1 = await orchestrator.route_query(
+        &quot;My name is Alice&quot;,
+        session_id=&quot;test-123&quot;
+    )
+    
+    # Second message (should remember name)
+    result2 = await orchestrator.route_query(
+        &quot;What is my name?&quot;,
+        session_id=&quot;test-123&quot;
+    )
+    
+    assert &quot;Alice&quot; in result2[&quot;response&quot;]</code></pre>
+<h4 id="week-7-implement-circuit-breaker">Week 7: Implement Circuit Breaker</h4>
+<pre class="python"><code># Test circuit breaker
+async def test_circuit_breaker():
+    orchestrator = CatoOrchestrator()
+    
+    # Simulate failures
+    for _ in range(5):
+        orchestrator.circuit_breakers[ModelTier.BEDROCK_SONNET].record_failure()
+    
+    # Should be open
+    assert not orchestrator.circuit_breakers[ModelTier.BEDROCK_SONNET].can_execute()
+    
+    # Should fall back to Haiku
+    result = await orchestrator.route_query(&quot;Hello&quot;, &quot;test&quot;)
+    assert result[&quot;model&quot;] == &quot;bedrock_haiku&quot;</code></pre>
+<h4 id="week-8-integrate-semantic-cache">Week 8: Integrate Semantic Cache</h4>
+<pre class="python"><code># Test cache integration
+async def test_cache():
+    orchestrator = CatoOrchestrator()
+    cache = SemanticCacheService()
+    
+    # First query (cache miss)
+    result1 = await orchestrator.route_query(&quot;What is Python?&quot;, &quot;test&quot;)
+    assert not result1[&quot;cached&quot;]
+    
+    # Second similar query (cache hit)
+    result2 = await orchestrator.route_query(&quot;What is Python programming?&quot;, &quot;test&quot;)
+    assert result2[&quot;cached&quot;]</code></pre>
+<p><strong>Exit Criteria:</strong> - [ ] Routing logic validated - [ ] Context persists across turns - [ ] Circuit breaker activates on failures - [ ] Cache hit rate &gt; 80%</p>
+<hr />
+<h3 id="phase-3-state-management-weeks-9-12">Phase 3: State Management (Weeks 9-12)</h3>
+<h4 id="week-9-deploy-dynamodb-global-tables">Week 9: Deploy DynamoDB Global Tables</h4>
+<pre class="bash"><code># Apply Terraform
+cd infrastructure/terraform/environments/production
+terraform apply -target=aws_dynamodb_table.semantic_memory
+terraform apply -target=aws_dynamodb_table.working_memory</code></pre>
+<h4 id="week-10-deploy-opensearch-serverless">Week 10: Deploy OpenSearch Serverless</h4>
+<pre class="bash"><code>terraform apply -target=aws_opensearchserverless_collection.episodic_memory</code></pre>
+<h4 id="week-11-build-memory-consolidation-pipeline">Week 11: Build Memory Consolidation Pipeline</h4>
+<pre class="python"><code># Test consolidation
+async def test_consolidation():
+    memory = GlobalMemoryService()
+    
+    # Store interaction
+    await memory.storeInteraction({
+        &quot;query&quot;: &quot;What is machine learning?&quot;,
+        &quot;response&quot;: &quot;Machine learning is...&quot;,
+        &quot;domain&quot;: &quot;ai&quot;
+    })
+    
+    # Consolidate (extract facts)
+    facts = await consolidation_pipeline.extract_facts(interaction)
+    
+    # Verify facts stored
+    stored = await memory.getFactsByDomain(&quot;ai&quot;)
+    assert len(stored) &gt; 0</code></pre>
+<h4 id="week-12-integration-testing">Week 12: Integration Testing</h4>
+<pre class="bash"><code># Full integration test
+pytest tests/integration/test_memory.py -v
+
+# Verify global table replication
+aws dynamodb describe-table --table-name cato-semantic-memory \
+  --query &#39;Table.Replicas&#39;</code></pre>
+<p><strong>Exit Criteria:</strong> - [ ] DynamoDB replicating across regions - [ ] OpenSearch indexing episodic memory - [ ] Consolidation pipeline extracting facts - [ ] Sub-ms reads via DAX</p>
+<hr />
+<h3 id="phase-4-traffic-migration-weeks-13-16">Phase 4: Traffic Migration (Weeks 13-16)</h3>
+<h4 id="week-13-canary-deployment-10">Week 13: Canary Deployment (10%)</h4>
+<pre class="bash"><code># Enable feature flag for 10% of traffic
+aws appconfig create-hosted-configuration-version \
+  --application-id cato \
+  --configuration-profile-id orchestration \
+  --content &#39;{&quot;use_new_orchestrator&quot;: {&quot;percentage&quot;: 10}}&#39;
+
+# Monitor
+watch -n 5 &#39;curl -s https://api.cato.thinktank.ai/api/admin/cato/health&#39;</code></pre>
+<p><strong>Metrics to Monitor:</strong> - Latency p50, p99 - Error rate - Cache hit rate - User satisfaction</p>
+<h4 id="week-14-gradual-rollout-50">Week 14: Gradual Rollout (50%)</h4>
+<pre class="bash"><code># Increase to 50%
+aws appconfig create-hosted-configuration-version \
+  --content &#39;{&quot;use_new_orchestrator&quot;: {&quot;percentage&quot;: 50}}&#39;</code></pre>
+<p><strong>Rollback Trigger:</strong> - Error rate &gt; 1% - Latency p99 &gt; 2s - User complaints spike</p>
+<p><strong>Rollback Command:</strong></p>
+<pre class="bash"><code>aws appconfig create-hosted-configuration-version \
+  --content &#39;{&quot;use_new_orchestrator&quot;: {&quot;percentage&quot;: 0}}&#39;</code></pre>
+<h4 id="week-15-full-rollout-100">Week 15: Full Rollout (100%)</h4>
+<pre class="bash"><code># Full rollout
+aws appconfig create-hosted-configuration-version \
+  --content &#39;{&quot;use_new_orchestrator&quot;: {&quot;percentage&quot;: 100}}&#39;
+
+# Verify
+curl https://api.cato.thinktank.ai/api/admin/cato/status</code></pre>
+<h4 id="week-16-decommission-litellm">Week 16: Decommission LiteLLM</h4>
+<pre class="bash"><code># Stop LiteLLM service
+kubectl scale deployment litellm -n cato --replicas=0
+
+# After 1 week of monitoring, delete
+kubectl delete deployment litellm -n cato
+
+# Archive configuration
+git mv config/litellm.yaml config/archive/litellm.yaml.deprecated
+git commit -m &quot;Decommission LiteLLM - migration complete&quot;</code></pre>
+<p><strong>Exit Criteria:</strong> - [ ] 100% traffic on new architecture - [ ] No LiteLLM dependencies - [ ] Documentation updated - [ ] Team trained on new system</p>
+<hr />
+<h2 id="rollback-procedures">Rollback Procedures</h2>
+<h3 id="quick-rollback-5-minutes">Quick Rollback (&lt; 5 minutes)</h3>
+<pre class="bash"><code># Revert feature flag
+aws appconfig create-hosted-configuration-version \
+  --content &#39;{&quot;use_new_orchestrator&quot;: {&quot;percentage&quot;: 0}}&#39;
+
+# LiteLLM immediately handles all traffic</code></pre>
+<h3 id="full-rollback-1-hour">Full Rollback (&lt; 1 hour)</h3>
+<pre class="bash"><code># Scale up LiteLLM
+kubectl scale deployment litellm -n cato --replicas=10
+
+# Disable new orchestrator
+kubectl scale deployment cato-orchestrator -n cato --replicas=0
+
+# Revert feature flag
+aws appconfig create-hosted-configuration-version \
+  --content &#39;{&quot;use_new_orchestrator&quot;: {&quot;percentage&quot;: 0}}&#39;</code></pre>
+<hr />
+<h2 id="communication-plan">Communication Plan</h2>
+<h3 id="week-1-kickoff">Week 1 (Kickoff)</h3>
+<ul>
+<li>Announce migration timeline to team</li>
+<li>Share runbook with on-call</li>
+</ul>
+<h3 id="week-8-mid-point">Week 8 (Mid-point)</h3>
+<ul>
+<li>Status update to stakeholders</li>
+<li>Risk assessment review</li>
+</ul>
+<h3 id="week-13-canary-start">Week 13 (Canary Start)</h3>
+<ul>
+<li>Alert on-call team</li>
+<li>Prepare rollback procedures</li>
+</ul>
+<h3 id="week-16-completion">Week 16 (Completion)</h3>
+<ul>
+<li>Announce completion</li>
+<li>Schedule retrospective</li>
+<li>Update documentation</li>
+</ul>
+<hr />
+<h2 id="success-metrics">Success Metrics</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before</th>
+<th>Target</th>
+<th>Actual</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Max concurrent requests</td>
+<td>504</td>
+<td>50,000+</td>
+<td></td>
+</tr>
+<tr>
+<td>p99 latency</td>
+<td>1.5s</td>
+<td>&lt; 1s</td>
+<td></td>
+</tr>
+<tr>
+<td>Context persistence</td>
+<td>No</td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>Hidden state extraction</td>
+<td>No</td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>Cost efficiency</td>
+<td>Baseline</td>
+<td>-30%</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="risk-register">Risk Register</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 31%" />
+<col style="width: 21%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Likelihood</th>
+<th>Impact</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Performance regression</td>
+<td>Medium</td>
+<td>High</td>
+<td>Extensive load testing</td>
+</tr>
+<tr>
+<td>Data loss during migration</td>
+<td>Low</td>
+<td>Critical</td>
+<td>Dual-write during transition</td>
+</tr>
+<tr>
+<td>Team unfamiliarity</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Training sessions</td>
+</tr>
+<tr>
+<td>Cost overrun</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Budget monitoring</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="contact">Contact</h2>
+<ul>
+<li><strong>Migration Lead:</strong> <span class="citation" data-cites="migration-lead">@migration-lead</span></li>
+<li><strong>On-call:</strong> #cato-oncall</li>
+<li><strong>Escalation:</strong> VP Engineering</li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

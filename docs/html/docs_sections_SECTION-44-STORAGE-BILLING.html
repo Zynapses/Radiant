@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 44 STORAGE BILLING - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 44 STORAGE BILLING</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-44-STORAGE-BILLING.md</div>
+  </div>
+  
+  <h1 id="section-44-storage-billing-system-v4.14.0">SECTION 44: STORAGE BILLING SYSTEM (v4.14.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<blockquote>
+<p><strong>Version: 4.14.0 | Tiered storage billing for S3 and database usage</strong></p>
+</blockquote>
+<hr />
+<h2 id="storage-billing-overview">44.1 STORAGE BILLING OVERVIEW</h2>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>S3 (<span class="math inline">/<em>G</em><em>B</em>/<em>m</em><em>o</em>)|<em>D</em><em>B</em>(</span>/GB/mo)</th>
+<th>Backup ($/GB/mo)</th>
+<th>Included</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FREE</td>
+<td>$0</td>
+<td>$0</td>
+<td>N/A</td>
+<td>1GB S3, 500MB DB</td>
+</tr>
+<tr>
+<td>INDIVIDUAL</td>
+<td>$0.10</td>
+<td>$0.15</td>
+<td>Included</td>
+<td>10GB S3, 2GB DB</td>
+</tr>
+<tr>
+<td>FAMILY</td>
+<td>$0.08</td>
+<td>$0.12</td>
+<td>Included</td>
+<td>25GB S3, 5GB DB</td>
+</tr>
+<tr>
+<td>TEAM</td>
+<td>$0.06</td>
+<td>$0.10</td>
+<td>Included</td>
+<td>100GB S3, 20GB DB</td>
+</tr>
+<tr>
+<td>BUSINESS</td>
+<td>$0.04</td>
+<td>$0.08</td>
+<td>Included</td>
+<td>500GB S3, 100GB DB</td>
+</tr>
+<tr>
+<td>ENTERPRISE</td>
+<td>Custom</td>
+<td>Custom</td>
+<td>Custom</td>
+<td>Unlimited</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="database-schema">44.2 DATABASE SCHEMA</h2>
+<h3 id="packagesinfrastructuremigrations044_storage_billing.sql">packages/infrastructure/migrations/044_storage_billing.sql</h3>
+<pre class="sql"><code>-- ============================================================================
+-- RADIANT v4.14.0 - Storage Billing Schema
+-- ============================================================================
+
+-- Storage Usage Tracking
+CREATE TABLE storage_usage (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID REFERENCES users(id),
+    app_id UUID REFERENCES applications(id),
+    
+    storage_type VARCHAR(20) NOT NULL CHECK (storage_type IN (&#39;s3&#39;, &#39;database&#39;, &#39;backup&#39;, &#39;embeddings&#39;)),
+    
+    bytes_used BIGINT NOT NULL DEFAULT 0,
+    bytes_quota BIGINT,
+    
+    period_start TIMESTAMPTZ NOT NULL,
+    period_end TIMESTAMPTZ NOT NULL,
+    
+    price_per_gb_cents INTEGER NOT NULL,
+    total_cost_cents INTEGER NOT NULL DEFAULT 0,
+    
+    is_over_quota BOOLEAN DEFAULT FALSE,
+    quota_warning_sent BOOLEAN DEFAULT FALSE,
+    quota_exceeded_sent BOOLEAN DEFAULT FALSE,
+    
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_storage_usage_tenant ON storage_usage(tenant_id);
+CREATE INDEX idx_storage_usage_type ON storage_usage(storage_type);
+CREATE INDEX idx_storage_usage_period ON storage_usage(period_start, period_end);
+
+-- Storage Pricing Configuration
+CREATE TABLE storage_pricing (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tier_id VARCHAR(50) NOT NULL REFERENCES subscription_tiers(id),
+    storage_type VARCHAR(20) NOT NULL,
+    
+    price_per_gb_cents INTEGER NOT NULL,
+    included_gb DECIMAL(10,2) NOT NULL DEFAULT 0,
+    max_gb DECIMAL(10,2),
+    overage_price_per_gb_cents INTEGER,
+    
+    is_active BOOLEAN DEFAULT TRUE,
+    effective_from TIMESTAMPTZ DEFAULT NOW(),
+    effective_until TIMESTAMPTZ,
+    
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    UNIQUE(tier_id, storage_type, effective_from)
+);
+
+-- Storage Events
+CREATE TABLE storage_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID REFERENCES users(id),
+    
+    event_type VARCHAR(30) NOT NULL CHECK (event_type IN (
+        &#39;upload&#39;, &#39;delete&#39;, &#39;archive&#39;, &#39;restore&#39;, &#39;expire&#39;, &#39;quota_warning&#39;, &#39;quota_exceeded&#39;
+    )),
+    
+    storage_type VARCHAR(20) NOT NULL,
+    bytes_delta BIGINT NOT NULL,
+    
+    resource_id VARCHAR(255),
+    resource_type VARCHAR(50),
+    resource_path TEXT,
+    
+    metadata JSONB DEFAULT &#39;{}&#39;,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_storage_events_tenant ON storage_events(tenant_id);
+CREATE INDEX idx_storage_events_type ON storage_events(event_type);
+
+-- Enable RLS
+ALTER TABLE storage_usage ENABLE ROW LEVEL SECURITY;
+ALTER TABLE storage_events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY storage_usage_tenant ON storage_usage
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY storage_events_tenant ON storage_events
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);</code></pre>
+<hr />
+<h2 id="storage-service">44.3 STORAGE SERVICE</h2>
+<h3 id="packagesfunctionssrcservicesstorage-billing.ts">packages/functions/src/services/storage-billing.ts</h3>
+<pre class="typescript"><code>/**
+ * Storage Billing Service
+ * @version 4.14.0
+ */
+
+import { Pool } from &#39;pg&#39;;
+import { S3Client, ListObjectsV2Command } from &#39;@aws-sdk/client-s3&#39;;
+
+export class StorageBillingService {
+  constructor(private pool: Pool, private s3Client: S3Client) {}
+
+  async getStorageUsage(tenantId: string): Promise&lt;{
+    storageType: string;
+    bytesUsed: number;
+    bytesQuota: number | null;
+    pricePerGbCents: number;
+    includedGb: number;
+    totalCostCents: number;
+  }[]&gt; {
+    const result = await this.pool.query(`
+      SELECT 
+        su.storage_type,
+        su.bytes_used,
+        su.bytes_quota,
+        sp.price_per_gb_cents,
+        sp.included_gb,
+        CASE 
+          WHEN su.bytes_used &lt;= sp.included_gb * 1073741824 THEN 0
+          ELSE CEIL((su.bytes_used - sp.included_gb * 1073741824) / 1073741824.0) * sp.price_per_gb_cents
+        END as total_cost_cents
+      FROM storage_usage su
+      JOIN subscriptions s ON s.tenant_id = su.tenant_id AND s.status = &#39;active&#39;
+      JOIN storage_pricing sp ON sp.tier_id = s.tier_id AND sp.storage_type = su.storage_type
+      WHERE su.tenant_id = $1 AND sp.is_active = TRUE AND su.period_end &gt; NOW()
+    `, [tenantId]);
+
+    return result.rows;
+  }
+
+  async recordStorageEvent(
+    tenantId: string,
+    userId: string | null,
+    eventType: string,
+    storageType: string,
+    bytesDelta: number,
+    resourceId?: string
+  ): Promise&lt;void&gt; {
+    await this.pool.query(`
+      INSERT INTO storage_events (tenant_id, user_id, event_type, storage_type, bytes_delta, resource_id)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `, [tenantId, userId, eventType, storageType, bytesDelta, resourceId]);
+
+    await this.updateStorageUsage(tenantId, storageType, bytesDelta);
+  }
+
+  private async updateStorageUsage(tenantId: string, storageType: string, bytesDelta: number): Promise&lt;void&gt; {
+    await this.pool.query(`
+      INSERT INTO storage_usage (tenant_id, storage_type, bytes_used, period_start, period_end, price_per_gb_cents)
+      SELECT $1, $2, GREATEST(0, $3), date_trunc(&#39;month&#39;, NOW()), date_trunc(&#39;month&#39;, NOW()) + INTERVAL &#39;1 month&#39;,
+        COALESCE((SELECT price_per_gb_cents FROM storage_pricing sp 
+          JOIN subscriptions s ON s.tier_id = sp.tier_id AND s.tenant_id = $1
+          WHERE sp.storage_type = $2 AND sp.is_active = TRUE LIMIT 1), 10)
+      ON CONFLICT (tenant_id, storage_type, period_start, period_end)
+      DO UPDATE SET bytes_used = GREATEST(0, storage_usage.bytes_used + $3), updated_at = NOW()
+    `, [tenantId, storageType, bytesDelta]);
+  }
+
+  async calculateS3Usage(tenantId: string): Promise&lt;number&gt; {
+    let totalBytes = 0;
+    let continuationToken: string | undefined;
+
+    do {
+      const response = await this.s3Client.send(new ListObjectsV2Command({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Prefix: `tenants/${tenantId}/`,
+        ContinuationToken: continuationToken,
+      }));
+
+      if (response.Contents) {
+        totalBytes += response.Contents.reduce((sum, obj) =&gt; sum + (obj.Size || 0), 0);
+      }
+      continuationToken = response.NextContinuationToken;
+    } while (continuationToken);
+
+    return totalBytes;
+  }
+}</code></pre>
+<hr />
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

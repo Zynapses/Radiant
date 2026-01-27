@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRIMOIRE GOVERNOR SOURCE PART2 - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>GRIMOIRE GOVERNOR SOURCE PART2</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/GRIMOIRE-GOVERNOR-SOURCE-PART2.md</div>
+  </div>
+  
+  <h1 id="radiant-v5.0.2---source-export-part-2-lambda-apis">RADIANT v5.0.2 - Source Export Part 2: Lambda APIs</h1>
+<hr />
+<h2 id="grimoire-api-handler">4. Grimoire API Handler</h2>
+<p><strong>File</strong>: <code>packages/infrastructure/lambda/grimoire-api/index.ts</code></p>
+<p><strong>Purpose</strong>: REST API handler for The Grimoire. Provides endpoints for CRUD operations on heuristics and statistics retrieval.</p>
+<p><strong>Endpoints</strong>: - <code>GET /heuristics</code> - List heuristics with optional domain/search filters - <code>POST /heuristics</code> - Add a new heuristic - <code>DELETE /heuristics/:id</code> - Remove a heuristic - <code>POST /heuristics/:id/reinforce</code> - Adjust confidence (positive/negative) - <code>GET /stats</code> - Get Grimoire statistics</p>
+<pre class="typescript"><code>/**
+ * Grimoire API Lambda Handler
+ * RADIANT v5.0.2 - System Evolution
+ */
+
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from &#39;aws-lambda&#39;;
+import { success, handleError, noContent } from &#39;../shared/response&#39;;
+import { 
+  withSecureDBContext, 
+  extractAuthFromEvent,
+  isTenantAdmin 
+} from &#39;../shared/services/db-context.service&#39;;
+import { 
+  ValidationError, 
+  UnauthorizedError, 
+  NotFoundError 
+} from &#39;../shared/errors&#39;;
+
+export async function handler(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  const method = event.httpMethod;
+  const path = event.path;
+  const pathParts = path.split(&#39;/&#39;).filter(Boolean);
+
+  try {
+    const authContext = extractAuthFromEvent(event);
+    
+    if (!authContext.tenantId) {
+      return handleError(new UnauthorizedError(&#39;Tenant ID required&#39;));
+    }
+
+    // Route: GET /heuristics
+    if (method === &#39;GET&#39; &amp;&amp; pathParts[pathParts.length - 1] === &#39;heuristics&#39;) {
+      return await listHeuristics(event, authContext);
+    }
+
+    // Route: POST /heuristics
+    if (method === &#39;POST&#39; &amp;&amp; pathParts[pathParts.length - 1] === &#39;heuristics&#39;) {
+      return await addHeuristic(event, authContext);
+    }
+
+    // Route: DELETE /heuristics/:id
+    if (method === &#39;DELETE&#39; &amp;&amp; pathParts.includes(&#39;heuristics&#39;)) {
+      const id = pathParts[pathParts.length - 1];
+      return await deleteHeuristic(id, authContext);
+    }
+
+    // Route: POST /heuristics/:id/reinforce
+    if (method === &#39;POST&#39; &amp;&amp; pathParts.includes(&#39;reinforce&#39;)) {
+      const id = pathParts[pathParts.length - 2];
+      return await reinforceHeuristic(id, event, authContext);
+    }
+
+    // Route: GET /stats
+    if (method === &#39;GET&#39; &amp;&amp; pathParts[pathParts.length - 1] === &#39;stats&#39;) {
+      return await getStats(authContext);
+    }
+
+    return handleError(new NotFoundError(&#39;Route not found&#39;));
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+async function listHeuristics(event: APIGatewayProxyEvent, authContext: any) {
+  const domain = event.queryStringParameters?.domain;
+  const search = event.queryStringParameters?.search;
+  const limit = parseInt(event.queryStringParameters?.limit || &#39;100&#39;, 10);
+
+  return withSecureDBContext(authContext, async (client) =&gt; {
+    let query = `
+      SELECT id, domain, heuristic_text, confidence_score, 
+             source_execution_id, created_at, updated_at, expires_at
+      FROM knowledge_heuristics
+      WHERE expires_at &gt; NOW()
+    `;
+    const params: any[] = [];
+    let paramIndex = 1;
+
+    if (domain) {
+      query += ` AND domain = $${paramIndex++}`;
+      params.push(domain);
+    }
+
+    if (search) {
+      query += ` AND heuristic_text ILIKE $${paramIndex++}`;
+      params.push(`%${search}%`);
+    }
+
+    query += ` ORDER BY confidence_score DESC, created_at DESC LIMIT $${paramIndex}`;
+    params.push(limit);
+
+    const result = await client.query(query, params);
+    
+    return success({ heuristics: result.rows });
+  });
+}
+
+async function addHeuristic(event: APIGatewayProxyEvent, authContext: any) {
+  const body = JSON.parse(event.body || &#39;{}&#39;);
+  const { domain, heuristic_text } = body;
+
+  if (!heuristic_text?.trim()) {
+    return handleError(new ValidationError(&#39;heuristic_text is required&#39;));
+  }
+
+  const validDomains = [&#39;general&#39;, &#39;medical&#39;, &#39;financial&#39;, &#39;legal&#39;, &#39;technical&#39;, &#39;creative&#39;];
+  const domainValue = validDomains.includes(domain) ? domain : &#39;general&#39;;
+
+  return withSecureDBContext(authContext, async (client) =&gt; {
+    const result = await client.query(`
+      INSERT INTO knowledge_heuristics (tenant_id, domain, heuristic_text, confidence_score)
+      VALUES ($1, $2, $3, 0.5)
+      RETURNING id, domain, heuristic_text, confidence_score, created_at
+    `, [authContext.tenantId, domainValue, heuristic_text.trim()]);
+
+    return success({ heuristic: result.rows[0] }, 201);
+  });
+}
+
+async function deleteHeuristic(id: string, authContext: any) {
+  if (!isTenantAdmin(authContext)) {
+    return handleError(new UnauthorizedError(&#39;Admin access required&#39;));
+  }
+
+  return withSecureDBContext(authContext, async (client) =&gt; {
+    const result = await client.query(
+      &#39;DELETE FROM knowledge_heuristics WHERE id = $1 RETURNING id&#39;,
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return handleError(new NotFoundError(&#39;Heuristic not found&#39;));
+    }
+
+    return noContent();
+  });
+}
+
+async function reinforceHeuristic(id: string, event: APIGatewayProxyEvent, authContext: any) {
+  const body = JSON.parse(event.body || &#39;{}&#39;);
+  const { positive } = body;
+  const adjustment = positive ? 0.05 : -0.05;
+
+  return withSecureDBContext(authContext, async (client) =&gt; {
+    const result = await client.query(`
+      UPDATE knowledge_heuristics
+      SET confidence_score = GREATEST(0.1, LEAST(1.0, confidence_score + $1)),
+          expires_at = CASE WHEN $2 THEN expires_at + INTERVAL &#39;30 days&#39; ELSE expires_at END
+      WHERE id = $3
+      RETURNING id, confidence_score
+    `, [adjustment, positive, id]);
+
+    if (result.rowCount === 0) {
+      return handleError(new NotFoundError(&#39;Heuristic not found&#39;));
+    }
+
+    return success({ heuristic: result.rows[0] });
+  });
+}
+
+async function getStats(authContext: any) {
+  return withSecureDBContext(authContext, async (client) =&gt; {
+    const statsResult = await client.query(`
+      SELECT 
+        COUNT(*) as total_heuristics,
+        COUNT(*) FILTER (WHERE confidence_score &gt;= 0.8) as total_high_confidence,
+        COUNT(*) FILTER (WHERE expires_at &lt; NOW() + INTERVAL &#39;7 days&#39;) as total_expiring_soon
+      FROM knowledge_heuristics
+      WHERE expires_at &gt; NOW()
+    `);
+
+    const byDomainResult = await client.query(`
+      SELECT domain, COUNT(*) as total, AVG(confidence_score) as avg_confidence,
+             COUNT(*) FILTER (WHERE confidence_score &gt;= 0.8) as high_confidence,
+             COUNT(*) FILTER (WHERE expires_at &lt; NOW() + INTERVAL &#39;7 days&#39;) as expiring_soon,
+             MAX(created_at) as last_added
+      FROM knowledge_heuristics
+      WHERE expires_at &gt; NOW()
+      GROUP BY domain
+    `);
+
+    const stats = statsResult.rows[0];
+    const byDomain: Record&lt;string, any&gt; = {};
+    for (const row of byDomainResult.rows) {
+      byDomain[row.domain] = {
+        total: parseInt(row.total, 10),
+        avg_confidence: parseFloat(row.avg_confidence),
+        high_confidence: parseInt(row.high_confidence, 10),
+        expiring_soon: parseInt(row.expiring_soon, 10),
+        last_added: row.last_added
+      };
+    }
+
+    return success({
+      total_heuristics: parseInt(stats.total_heuristics, 10),
+      total_high_confidence: parseInt(stats.total_high_confidence, 10),
+      total_expiring_soon: parseInt(stats.total_expiring_soon, 10),
+      by_domain: byDomain,
+      domain_count: Object.keys(byDomain).length
+    });
+  });
+}</code></pre>
+<hr />
+<h2 id="governor-api-handler">5. Governor API Handler</h2>
+<p><strong>File</strong>: <code>packages/infrastructure/lambda/governor-api/index.ts</code></p>
+<p><strong>Purpose</strong>: REST API handler for the Economic Governor. Manages configuration and provides statistics.</p>
+<p><strong>Endpoints</strong>: - <code>GET /config</code> - Get domain configurations - <code>PUT /config</code> - Update domain mode - <code>GET /statistics</code> - Get savings statistics - <code>GET /recent</code> - Get recent routing decisions - <code>POST /analyze</code> - Analyze a prompt’s complexity</p>
+<pre class="typescript"><code>/**
+ * Governor API Lambda Handler
+ * RADIANT v5.0.2 - System Evolution
+ */
+
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from &#39;aws-lambda&#39;;
+import { success, handleError } from &#39;../shared/response&#39;;
+import { 
+  withSecureDBContext, 
+  extractAuthFromEvent,
+  isTenantAdmin 
+} from &#39;../shared/services/db-context.service&#39;;
+import { 
+  ValidationError, 
+  UnauthorizedError, 
+  NotFoundError 
+} from &#39;../shared/errors&#39;;
+import { EconomicGovernor, GovernorMode } from &#39;../shared/services/governor&#39;;
+
+const VALID_MODES: GovernorMode[] = [&#39;performance&#39;, &#39;balanced&#39;, &#39;cost_saver&#39;, &#39;off&#39;];
+
+export async function handler(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  const method = event.httpMethod;
+  const path = event.path;
+  const pathParts = path.split(&#39;/&#39;).filter(Boolean);
+
+  try {
+    const authContext = extractAuthFromEvent(event);
+    
+    if (!authContext.tenantId) {
+      return handleError(new UnauthorizedError(&#39;Tenant ID required&#39;));
+    }
+
+    // Route: GET /config
+    if (method === &#39;GET&#39; &amp;&amp; pathParts[pathParts.length - 1] === &#39;config&#39;) {
+      return await getConfig(authContext);
+    }
+
+    // Route: PUT /config
+    if (method === &#39;PUT&#39; &amp;&amp; pathParts[pathParts.length - 1] === &#39;config&#39;) {
+      return await updateConfig(event, authContext);
+    }
+
+    // Route: GET /statistics
+    if (method === &#39;GET&#39; &amp;&amp; pathParts[pathParts.length - 1] === &#39;statistics&#39;) {
+      return await getStatistics(event, authContext);
+    }
+
+    // Route: GET /recent
+    if (method === &#39;GET&#39; &amp;&amp; pathParts[pathParts.length - 1] === &#39;recent&#39;) {
+      return await getRecentDecisions(event, authContext);
+    }
+
+    // Route: POST /analyze
+    if (method === &#39;POST&#39; &amp;&amp; pathParts[pathParts.length - 1] === &#39;analyze&#39;) {
+      return await analyzePrompt(event, authContext);
+    }
+
+    return handleError(new NotFoundError(&#39;Route not found&#39;));
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+async function getConfig(authContext: any) {
+  return withSecureDBContext(authContext, async (client) =&gt; {
+    const result = await client.query(`
+      SELECT domain, governor_mode as mode, updated_at
+      FROM decision_domain_config
+      ORDER BY domain
+    `);
+
+    return success({ domains: result.rows });
+  });
+}
+
+async function updateConfig(event: APIGatewayProxyEvent, authContext: any) {
+  if (!isTenantAdmin(authContext)) {
+    return handleError(new UnauthorizedError(&#39;Admin access required&#39;));
+  }
+
+  const body = JSON.parse(event.body || &#39;{}&#39;);
+  const { domain, mode } = body;
+
+  if (!domain) {
+    return handleError(new ValidationError(&#39;domain is required&#39;));
+  }
+
+  if (!VALID_MODES.includes(mode)) {
+    return handleError(new ValidationError(`mode must be one of: ${VALID_MODES.join(&#39;, &#39;)}`));
+  }
+
+  return withSecureDBContext(authContext, async (client) =&gt; {
+    await client.query(`
+      INSERT INTO decision_domain_config (tenant_id, domain, governor_mode, updated_at)
+      VALUES ($1, $2, $3, NOW())
+      ON CONFLICT (tenant_id, domain) 
+      DO UPDATE SET governor_mode = $3, updated_at = NOW()
+    `, [authContext.tenantId, domain, mode]);
+
+    return success({ domain, mode, updated: true });
+  });
+}
+
+async function getStatistics(event: APIGatewayProxyEvent, authContext: any) {
+  const days = parseInt(event.queryStringParameters?.days || &#39;30&#39;, 10);
+
+  return withSecureDBContext(authContext, async (client) =&gt; {
+    const summaryResult = await client.query(`
+      SELECT 
+        COUNT(*) as total_decisions,
+        AVG(complexity_score) as avg_complexity,
+        SUM(savings_amount) as total_savings,
+        COUNT(*) FILTER (WHERE original_model != selected_model) as model_swaps,
+        COUNT(*) FILTER (WHERE complexity_score &lt;= 4) as simple_tasks,
+        COUNT(*) FILTER (WHERE complexity_score BETWEEN 5 AND 8) as medium_tasks,
+        COUNT(*) FILTER (WHERE complexity_score &gt;= 9) as complex_tasks
+      FROM governor_savings_log
+      WHERE created_at &gt; NOW() - INTERVAL &#39;1 day&#39; * $1
+    `, [days]);
+
+    const dailyResult = await client.query(`
+      SELECT 
+        DATE(created_at) as day,
+        COUNT(*) as decisions,
+        SUM(savings_amount) as savings,
+        AVG(complexity_score) as avg_complexity
+      FROM governor_savings_log
+      WHERE created_at &gt; NOW() - INTERVAL &#39;1 day&#39; * $1
+      GROUP BY DATE(created_at)
+      ORDER BY day DESC
+    `, [days]);
+
+    const byModeResult = await client.query(`
+      SELECT 
+        governor_mode as mode,
+        COUNT(*) as count,
+        SUM(savings_amount) as savings
+      FROM governor_savings_log
+      WHERE created_at &gt; NOW() - INTERVAL &#39;1 day&#39; * $1
+      GROUP BY governor_mode
+    `, [days]);
+
+    const summary = summaryResult.rows[0];
+
+    return success({
+      period: { days },
+      summary: {
+        totalDecisions: parseInt(summary.total_decisions, 10),
+        avgComplexity: parseFloat(summary.avg_complexity) || 0,
+        totalSavings: parseFloat(summary.total_savings) || 0,
+        modelSwaps: parseInt(summary.model_swaps, 10),
+        taskDistribution: {
+          simple: parseInt(summary.simple_tasks, 10),
+          medium: parseInt(summary.medium_tasks, 10),
+          complex: parseInt(summary.complex_tasks, 10)
+        }
+      },
+      daily: dailyResult.rows,
+      byMode: byModeResult.rows
+    });
+  });
+}
+
+async function getRecentDecisions(event: APIGatewayProxyEvent, authContext: any) {
+  const limit = parseInt(event.queryStringParameters?.limit || &#39;20&#39;, 10);
+
+  return withSecureDBContext(authContext, async (client) =&gt; {
+    const result = await client.query(`
+      SELECT 
+        id, execution_id, original_model, selected_model,
+        complexity_score, savings_amount, governor_mode as mode,
+        reason, created_at
+      FROM governor_savings_log
+      ORDER BY created_at DESC
+      LIMIT $1
+    `, [limit]);
+
+    return success({ 
+      decisions: result.rows.map(row =&gt; ({
+        id: row.id,
+        executionId: row.execution_id,
+        originalModel: row.original_model,
+        selectedModel: row.selected_model,
+        complexityScore: row.complexity_score,
+        savingsAmount: parseFloat(row.savings_amount),
+        mode: row.mode,
+        reason: row.reason,
+        createdAt: row.created_at
+      }))
+    });
+  });
+}
+
+async function analyzePrompt(event: APIGatewayProxyEvent, authContext: any) {
+  const body = JSON.parse(event.body || &#39;{}&#39;);
+  const { prompt, model, domain } = body;
+
+  if (!prompt) {
+    return handleError(new ValidationError(&#39;prompt is required&#39;));
+  }
+
+  const governor = new EconomicGovernor();
+  const decision = await governor.evaluateTask(
+    { type: &#39;analyze&#39;, prompt, context: {} },
+    { agent_id: &#39;api&#39;, role: &#39;analyzer&#39;, model: model || &#39;gpt-4o&#39; },
+    domain || &#39;general&#39;
+  );
+
+  return success({
+    complexityScore: decision.complexityScore,
+    recommendedModel: decision.selectedModel,
+    originalModel: decision.originalModel,
+    estimatedSavings: decision.estimatedSavings,
+    reason: decision.reason
+  });
+}</code></pre>
+<hr />
+<p><em>Continued in GRIMOIRE-GOVERNOR-SOURCE-PART3.md</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

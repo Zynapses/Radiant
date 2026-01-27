@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04 COMPLETE FEATURES LIST - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>04 COMPLETE FEATURES LIST</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/publications/04-COMPLETE-FEATURES-LIST.md</div>
+  </div>
+  
+  <h1 id="radiant-think-tank-complete-features-list">RADIANT &amp; Think Tank Complete Features List</h1>
+<div data-align="center">
+<p><strong>Comprehensive Feature Reference</strong></p>
+<p>Version 4.18.0 | December 2024</p>
+</div>
+<hr />
+<h2 id="feature-categories">Feature Categories</h2>
+<ol type="1">
+<li><a href="#1-ai-model-management">AI Model Management</a></li>
+<li><a href="#2-orchestration--workflows">Orchestration &amp; Workflows</a></li>
+<li><a href="#3-think-tank-platform">Think Tank Platform</a></li>
+<li><a href="#4-billing--cost-management">Billing &amp; Cost Management</a></li>
+<li><a href="#5-multi-tenant-platform">Multi-Tenant Platform</a></li>
+<li><a href="#6-security--compliance">Security &amp; Compliance</a></li>
+<li><a href="#7-analytics--monitoring">Analytics &amp; Monitoring</a></li>
+<li><a href="#8-developer-tools">Developer Tools</a></li>
+<li><a href="#9-admin-dashboard">Admin Dashboard</a></li>
+<li><a href="#10-swift-deployer-app">Swift Deployer App</a></li>
+</ol>
+<hr />
+<h2 id="ai-model-management">1. AI Model Management</h2>
+<h3 id="model-router-service">1.1 Model Router Service</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Unified API</strong></td>
+<td>Single API endpoint for 106+ AI models</td>
+<td>Developers use one API regardless of provider</td>
+</tr>
+<tr>
+<td><strong>Model Fallback</strong></td>
+<td>Automatic failover to backup models</td>
+<td>Ensures reliability when primary model fails</td>
+</tr>
+<tr>
+<td><strong>Rate Limiting</strong></td>
+<td>Per-tenant and per-model limits</td>
+<td>Prevents abuse and manages costs</td>
+</tr>
+<tr>
+<td><strong>Request Routing</strong></td>
+<td>Intelligent routing to optimal provider</td>
+<td>Minimizes latency, maximizes availability</td>
+</tr>
+</tbody>
+</table>
+<h3 id="model-metadata-service">1.2 Model Metadata Service</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Live Model Data</strong></td>
+<td>Real-time model availability and capabilities</td>
+<td>AGI uses current data for model selection</td>
+</tr>
+<tr>
+<td><strong>Capability Scores</strong></td>
+<td>0-1 scores for reasoning, coding, creative, etc.</td>
+<td>Enables intelligent model matching to tasks</td>
+</tr>
+<tr>
+<td><strong>Pricing Data</strong></td>
+<td>Input/output token costs per model</td>
+<td>Supports cost estimation and budgeting</td>
+</tr>
+<tr>
+<td><strong>AI Research</strong></td>
+<td>Automated metadata updates via AI</td>
+<td>Keeps model info current without manual work</td>
+</tr>
+<tr>
+<td><strong>Admin Override</strong></td>
+<td>Manual corrections to AI-gathered data</td>
+<td>Admins can fix inaccuracies</td>
+</tr>
+</tbody>
+</table>
+<h3 id="supported-models-106">1.3 Supported Models (106+)</h3>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 25%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Models</th>
+<th>Specialties</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>OpenAI</strong></td>
+<td>GPT-4o, GPT-4o-mini, o1, o1-mini, o3</td>
+<td>General, reasoning, multimodal</td>
+</tr>
+<tr>
+<td><strong>Anthropic</strong></td>
+<td>Claude 3.5 Sonnet, Claude 3 Opus/Haiku</td>
+<td>Reasoning, coding, safety</td>
+</tr>
+<tr>
+<td><strong>Google</strong></td>
+<td>Gemini 2.0 Flash/Pro, Gemini Deep Research</td>
+<td>Speed, multimodal, research</td>
+</tr>
+<tr>
+<td><strong>Meta</strong></td>
+<td>Llama 3.1 (8B/70B/405B)</td>
+<td>Open source, customizable</td>
+</tr>
+<tr>
+<td><strong>Mistral</strong></td>
+<td>Mistral Large, Codestral</td>
+<td>European, code</td>
+</tr>
+<tr>
+<td><strong>DeepSeek</strong></td>
+<td>DeepSeek R1, DeepSeek Chat</td>
+<td>Reasoning, cost-effective</td>
+</tr>
+<tr>
+<td><strong>Perplexity</strong></td>
+<td>Sonar Pro, Sonar</td>
+<td>Real-time research</td>
+</tr>
+<tr>
+<td><strong>xAI</strong></td>
+<td>Grok 2</td>
+<td>Real-time knowledge</td>
+</tr>
+<tr>
+<td><strong>Cohere</strong></td>
+<td>Command R+, Embed</td>
+<td>Enterprise, RAG</td>
+</tr>
+<tr>
+<td><strong>+6 more</strong></td>
+<td>56 self-hosted models</td>
+<td>Custom deployments</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="orchestration-workflows">2. Orchestration &amp; Workflows</h2>
+<h3 id="orchestration-patterns-49">2.1 Orchestration Patterns (49)</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pattern Library</strong></td>
+<td>49 proven multi-AI workflows</td>
+<td>Pre-built solutions for complex tasks</td>
+</tr>
+<tr>
+<td><strong>Pattern Selection</strong></td>
+<td>Automatic best pattern for task</td>
+<td>Users don’t need to know which pattern to use</td>
+</tr>
+<tr>
+<td><strong>Custom Workflows</strong></td>
+<td>Create/modify workflow patterns</td>
+<td>Tenants can build their own patterns</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pattern Categories:</strong> - Consensus &amp; Aggregation (7) - Debate &amp; Deliberation (7) - Critique &amp; Refinement (7) - Verification &amp; Validation (7) - Decomposition (7) - Specialized Reasoning (7) - Multi-Model Routing (4) - Ensemble Methods (3)</p>
+<h3 id="agi-dynamic-model-selection">2.2 AGI Dynamic Model Selection</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Domain Detection</strong></td>
+<td>Identifies coding, math, legal, etc. from prompt</td>
+<td>Matches models to domain expertise</td>
+</tr>
+<tr>
+<td><strong>Task Analysis</strong></td>
+<td>Detects complexity, reasoning needs</td>
+<td>Selects appropriate model count and modes</td>
+</tr>
+<tr>
+<td><strong>Live Scoring</strong></td>
+<td>Scores all available models for task</td>
+<td>Always uses best current models</td>
+</tr>
+<tr>
+<td><strong>Mode Assignment</strong></td>
+<td>Selects optimal mode per model</td>
+<td>Maximizes each model’s effectiveness</td>
+</tr>
+</tbody>
+</table>
+<h3 id="model-execution-modes-9">2.3 Model Execution Modes (9)</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 40%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>🧠 Thinking</strong></td>
+<td>Extended reasoning (o1, Claude)</td>
+<td>Complex problems requiring deep thought</td>
+</tr>
+<tr>
+<td><strong>🔬 Deep Research</strong></td>
+<td>Comprehensive research (Perplexity)</td>
+<td>Fact-finding, literature review</td>
+</tr>
+<tr>
+<td><strong>⚡ Fast</strong></td>
+<td>Speed-optimized (Flash models)</td>
+<td>Quick queries, autocomplete</td>
+</tr>
+<tr>
+<td><strong>🎨 Creative</strong></td>
+<td>High temperature output</td>
+<td>Writing, brainstorming</td>
+</tr>
+<tr>
+<td><strong>🎯 Precise</strong></td>
+<td>Low temperature, factual</td>
+<td>Data extraction, compliance</td>
+</tr>
+<tr>
+<td><strong>💻 Code</strong></td>
+<td>Code-optimized settings</td>
+<td>Programming tasks</td>
+</tr>
+<tr>
+<td><strong>👁️ Vision</strong></td>
+<td>Multimodal with images</td>
+<td>Image analysis</td>
+</tr>
+<tr>
+<td><strong>📄 Long Context</strong></td>
+<td>Extended context window</td>
+<td>Large documents</td>
+</tr>
+<tr>
+<td><strong>─ Standard</strong></td>
+<td>Default parameters</td>
+<td>General use</td>
+</tr>
+</tbody>
+</table>
+<h3 id="parallel-execution">2.4 Parallel Execution</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Multi-Model Calls</strong></td>
+<td>Execute 2-10 models simultaneously</td>
+<td>Higher quality through diversity</td>
+</tr>
+<tr>
+<td><strong>Execution Modes</strong></td>
+<td>All, Race, Quorum</td>
+<td>Balance quality vs latency</td>
+</tr>
+<tr>
+<td><strong>Result Synthesis</strong></td>
+<td>Best-of, Vote, Weighted, Merge</td>
+<td>Combine multiple responses optimally</td>
+</tr>
+<tr>
+<td><strong>Timeout Handling</strong></td>
+<td>Per-model timeouts</td>
+<td>Prevents slow models from blocking</td>
+</tr>
+<tr>
+<td><strong>Failure Strategy</strong></td>
+<td>Fail-fast, Continue, Fallback</td>
+<td>Graceful degradation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="visual-workflow-editor">2.5 Visual Workflow Editor</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Drag-and-Drop</strong></td>
+<td>Visual workflow design</td>
+<td>Non-technical users can build workflows</td>
+</tr>
+<tr>
+<td><strong>Method Palette</strong></td>
+<td>16 reusable method types</td>
+<td>Building blocks for any workflow</td>
+</tr>
+<tr>
+<td><strong>Step Configuration</strong></td>
+<td>4-tab config panel</td>
+<td>Fine-grained control per step</td>
+</tr>
+<tr>
+<td><strong>Canvas Controls</strong></td>
+<td>Zoom, pan, fit</td>
+<td>Navigate complex workflows</td>
+</tr>
+<tr>
+<td><strong>Test &amp; Save</strong></td>
+<td>Execute and persist</td>
+<td>Validate before deployment</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="think-tank-platform">3. Think Tank Platform</h2>
+<h3 id="problem-solving-engine">3.1 Problem Solving Engine</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Problem Decomposition</strong></td>
+<td>Breaks complex problems into parts</td>
+<td>Makes hard problems tractable</td>
+</tr>
+<tr>
+<td><strong>Multi-Step Reasoning</strong></td>
+<td>Chain-of-thought with recorded steps</td>
+<td>Transparent reasoning process</td>
+</tr>
+<tr>
+<td><strong>Solution Synthesis</strong></td>
+<td>Combines step outputs into answer</td>
+<td>Coherent final solutions</td>
+</tr>
+<tr>
+<td><strong>Confidence Scoring</strong></td>
+<td>0-1 quality score per step and overall</td>
+<td>Users know reliability</td>
+</tr>
+</tbody>
+</table>
+<h3 id="session-management">3.2 Session Management</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Persistent Sessions</strong></td>
+<td>Save and resume any session</td>
+<td>Long-running problem solving</td>
+</tr>
+<tr>
+<td><strong>Session History</strong></td>
+<td>All steps recorded with metadata</td>
+<td>Audit trail, learning</td>
+</tr>
+<tr>
+<td><strong>Conversation Threads</strong></td>
+<td>Multiple conversations per session</td>
+<td>Organize follow-ups</td>
+</tr>
+<tr>
+<td><strong>Artifact Storage</strong></td>
+<td>Code, diagrams, documents as outputs</td>
+<td>Tangible deliverables</td>
+</tr>
+</tbody>
+</table>
+<h3 id="domain-modes-8">3.3 Domain Modes (8)</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 40%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>🔬 Research</strong></td>
+<td>Academic research, fact-finding</td>
+<td>Source citation, verification</td>
+</tr>
+<tr>
+<td><strong>💻 Engineering</strong></td>
+<td>System design, architecture</td>
+<td>Code artifacts, diagrams</td>
+</tr>
+<tr>
+<td><strong>🧮 Analytical</strong></td>
+<td>Math, statistics, data analysis</td>
+<td>Step-by-step proofs</td>
+</tr>
+<tr>
+<td><strong>🎨 Creative</strong></td>
+<td>Writing, ideation, design</td>
+<td>Multiple alternatives</td>
+</tr>
+<tr>
+<td><strong>⚖️ Legal</strong></td>
+<td>Contracts, compliance</td>
+<td>Risk assessment</td>
+</tr>
+<tr>
+<td><strong>🏥 Medical</strong></td>
+<td>Clinical analysis (HIPAA)</td>
+<td>PHI sanitization</td>
+</tr>
+<tr>
+<td><strong>📊 Business</strong></td>
+<td>Strategy, planning</td>
+<td>Framework application</td>
+</tr>
+<tr>
+<td><strong>🎯 General</strong></td>
+<td>Mixed problems</td>
+<td>Dynamic mode switching</td>
+</tr>
+</tbody>
+</table>
+<h3 id="collaboration">3.4 Collaboration</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Real-Time Sync</strong></td>
+<td>WebSocket live updates</td>
+<td>Multiple users see changes instantly</td>
+</tr>
+<tr>
+<td><strong>Collaboration Roles</strong></td>
+<td>Owner, Editor, Viewer, Commenter</td>
+<td>Appropriate access control</td>
+</tr>
+<tr>
+<td><strong>Cursor Presence</strong></td>
+<td>See other users’ positions</td>
+<td>Awareness of collaborators</td>
+</tr>
+<tr>
+<td><strong>Shared Sessions</strong></td>
+<td>Invite others to sessions</td>
+<td>Team problem solving</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="billing-cost-management">4. Billing &amp; Cost Management</h2>
+<h3 id="credit-system">4.1 Credit System</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Credit Accounts</strong></td>
+<td>Pre-paid credit balances</td>
+<td>Simple usage-based billing</td>
+</tr>
+<tr>
+<td><strong>Credit Transactions</strong></td>
+<td>Detailed usage history</td>
+<td>Transparency on spending</td>
+</tr>
+<tr>
+<td><strong>Auto-Refill</strong></td>
+<td>Automatic top-up at threshold</td>
+<td>Uninterrupted service</td>
+</tr>
+<tr>
+<td><strong>Credit Alerts</strong></td>
+<td>Low balance notifications</td>
+<td>Avoid service interruption</td>
+</tr>
+</tbody>
+</table>
+<h3 id="subscriptions">4.2 Subscriptions</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Plan Tiers</strong></td>
+<td>Free Trial, Individual, Pro, Enterprise</td>
+<td>Options for all user types</td>
+</tr>
+<tr>
+<td><strong>Feature Gating</strong></td>
+<td>Features by plan level</td>
+<td>Upsell path</td>
+</tr>
+<tr>
+<td><strong>Usage Limits</strong></td>
+<td>Tokens/requests per plan</td>
+<td>Fair resource allocation</td>
+</tr>
+<tr>
+<td><strong>Stripe Integration</strong></td>
+<td>Payment processing</td>
+<td>Industry-standard payments</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cost-management">4.3 Cost Management</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Budget Alerts</strong></td>
+<td>Spending limit notifications</td>
+<td>Prevent cost overruns</td>
+</tr>
+<tr>
+<td><strong>Cost Estimation</strong></td>
+<td>Pre-request cost estimates</td>
+<td>Informed decisions</td>
+</tr>
+<tr>
+<td><strong>Usage Analytics</strong></td>
+<td>Spend by model, user, time</td>
+<td>Optimize usage patterns</td>
+</tr>
+<tr>
+<td><strong>Invoice Generation</strong></td>
+<td>Automated monthly invoices</td>
+<td>Accounting integration</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="multi-tenant-platform">5. Multi-Tenant Platform</h2>
+<h3 id="tenant-management">5.1 Tenant Management</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tenant Isolation</strong></td>
+<td>Complete data separation</td>
+<td>Security, privacy</td>
+</tr>
+<tr>
+<td><strong>Tenant Settings</strong></td>
+<td>Per-tenant configuration</td>
+<td>Customization</td>
+</tr>
+<tr>
+<td><strong>Tenant Onboarding</strong></td>
+<td>Self-service signup</td>
+<td>Scalable growth</td>
+</tr>
+<tr>
+<td><strong>Tenant Suspension</strong></td>
+<td>Disable/enable tenants</td>
+<td>Account management</td>
+</tr>
+</tbody>
+</table>
+<h3 id="user-management">5.2 User Management</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>User Accounts</strong></td>
+<td>Individual user identities</td>
+<td>Personalization, audit</td>
+</tr>
+<tr>
+<td><strong>Role-Based Access</strong></td>
+<td>Admin, User, Viewer roles</td>
+<td>Appropriate permissions</td>
+</tr>
+<tr>
+<td><strong>User Preferences</strong></td>
+<td>Model preferences, settings</td>
+<td>Personal customization</td>
+</tr>
+<tr>
+<td><strong>User Activity</strong></td>
+<td>Usage tracking per user</td>
+<td>Analytics, billing</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-key-management">5.3 API Key Management</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>API Key Generation</strong></td>
+<td>Create scoped keys</td>
+<td>Programmatic access</td>
+</tr>
+<tr>
+<td><strong>Key Rotation</strong></td>
+<td>Scheduled key rotation</td>
+<td>Security best practice</td>
+</tr>
+<tr>
+<td><strong>Key Scopes</strong></td>
+<td>Limit key permissions</td>
+<td>Least privilege</td>
+</tr>
+<tr>
+<td><strong>Key Analytics</strong></td>
+<td>Usage per key</td>
+<td>Monitor applications</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="security-compliance">6. Security &amp; Compliance</h2>
+<h3 id="data-security">6.1 Data Security</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Row-Level Security</strong></td>
+<td>PostgreSQL RLS policies</td>
+<td>Automatic tenant isolation</td>
+</tr>
+<tr>
+<td><strong>Encryption at Rest</strong></td>
+<td>AES-256 encryption</td>
+<td>Data protection</td>
+</tr>
+<tr>
+<td><strong>Encryption in Transit</strong></td>
+<td>TLS 1.3</td>
+<td>Secure communication</td>
+</tr>
+<tr>
+<td><strong>KMS Key Management</strong></td>
+<td>AWS KMS for secrets</td>
+<td>Secure key storage</td>
+</tr>
+</tbody>
+</table>
+<h3 id="authentication">6.2 Authentication</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cognito Integration</strong></td>
+<td>AWS Cognito user pools</td>
+<td>Enterprise-grade auth</td>
+</tr>
+<tr>
+<td><strong>JWT Tokens</strong></td>
+<td>Secure session tokens</td>
+<td>Stateless auth</td>
+</tr>
+<tr>
+<td><strong>MFA Support</strong></td>
+<td>Multi-factor authentication</td>
+<td>Enhanced security</td>
+</tr>
+<tr>
+<td><strong>SSO/SAML</strong></td>
+<td>Enterprise SSO integration</td>
+<td>Corporate identity</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compliance">6.3 Compliance</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SOC2 Controls</strong></td>
+<td>Security controls</td>
+<td>Enterprise compliance</td>
+</tr>
+<tr>
+<td><strong>HIPAA Mode</strong></td>
+<td>Healthcare compliance</td>
+<td>Medical use cases</td>
+</tr>
+<tr>
+<td><strong>PHI Sanitization</strong></td>
+<td>Automatic PII detection</td>
+<td>Protect patient data</td>
+</tr>
+<tr>
+<td><strong>Audit Logging</strong></td>
+<td>Comprehensive audit trail</td>
+<td>Compliance reporting</td>
+</tr>
+<tr>
+<td><strong>Data Residency</strong></td>
+<td>Region-specific deployment</td>
+<td>Regulatory requirements</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="analytics-monitoring">7. Analytics &amp; Monitoring</h2>
+<h3 id="usage-analytics">7.1 Usage Analytics</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Request Metrics</strong></td>
+<td>Requests by model, user, time</td>
+<td>Usage patterns</td>
+</tr>
+<tr>
+<td><strong>Token Tracking</strong></td>
+<td>Input/output token counts</td>
+<td>Cost attribution</td>
+</tr>
+<tr>
+<td><strong>Latency Metrics</strong></td>
+<td>Response time tracking</td>
+<td>Performance monitoring</td>
+</tr>
+<tr>
+<td><strong>Error Rates</strong></td>
+<td>Failure tracking</td>
+<td>Reliability monitoring</td>
+</tr>
+</tbody>
+</table>
+<h3 id="model-performance">7.2 Model Performance</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Quality Scores</strong></td>
+<td>Model quality over time</td>
+<td>Identify degradation</td>
+</tr>
+<tr>
+<td><strong>Comparison Reports</strong></td>
+<td>Model vs model analysis</td>
+<td>Model selection</td>
+</tr>
+<tr>
+<td><strong>A/B Testing</strong></td>
+<td>Test model variations</td>
+<td>Optimize choices</td>
+</tr>
+<tr>
+<td><strong>Learning Data</strong></td>
+<td>ML training data collection</td>
+<td>Continuous improvement</td>
+</tr>
+</tbody>
+</table>
+<h3 id="business-intelligence">7.3 Business Intelligence</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dashboard</strong></td>
+<td>Executive metrics view</td>
+<td>Quick status</td>
+</tr>
+<tr>
+<td><strong>Custom Reports</strong></td>
+<td>Build custom analytics</td>
+<td>Specific insights</td>
+</tr>
+<tr>
+<td><strong>Export</strong></td>
+<td>CSV/PDF export</td>
+<td>External analysis</td>
+</tr>
+<tr>
+<td><strong>Alerts</strong></td>
+<td>Threshold notifications</td>
+<td>Proactive monitoring</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="developer-tools">8. Developer Tools</h2>
+<h3 id="sdk">8.1 SDK</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>TypeScript SDK</strong></td>
+<td>Type-safe client library</td>
+<td>Developer productivity</td>
+</tr>
+<tr>
+<td><strong>API Documentation</strong></td>
+<td>OpenAPI/Swagger docs</td>
+<td>Self-service integration</td>
+</tr>
+<tr>
+<td><strong>Code Examples</strong></td>
+<td>Sample implementations</td>
+<td>Quick start</td>
+</tr>
+<tr>
+<td><strong>Playground</strong></td>
+<td>Interactive API testing</td>
+<td>Experimentation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="webhooks">8.2 Webhooks</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Event Webhooks</strong></td>
+<td>Push notifications for events</td>
+<td>Real-time integrations</td>
+</tr>
+<tr>
+<td><strong>Webhook Management</strong></td>
+<td>Create, update, delete hooks</td>
+<td>Self-service config</td>
+</tr>
+<tr>
+<td><strong>Retry Logic</strong></td>
+<td>Automatic retry on failure</td>
+<td>Reliability</td>
+</tr>
+<tr>
+<td><strong>Webhook Logs</strong></td>
+<td>Delivery history</td>
+<td>Debugging</td>
+</tr>
+</tbody>
+</table>
+<h3 id="integrations">8.3 Integrations</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Slack Integration</strong></td>
+<td>Notifications to Slack</td>
+<td>Team communication</td>
+</tr>
+<tr>
+<td><strong>Zapier Connect</strong></td>
+<td>5000+ app integrations</td>
+<td>Automation</td>
+</tr>
+<tr>
+<td><strong>Custom Webhooks</strong></td>
+<td>HTTP POST to any endpoint</td>
+<td>Flexible integration</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="admin-dashboard">9. Admin Dashboard</h2>
+<h3 id="dashboard-pages">9.1 Dashboard Pages</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Overview</strong></td>
+<td>System health, key metrics</td>
+<td>At-a-glance status</td>
+</tr>
+<tr>
+<td><strong>Tenants</strong></td>
+<td>Tenant management</td>
+<td>Customer administration</td>
+</tr>
+<tr>
+<td><strong>Users</strong></td>
+<td>User administration</td>
+<td>Access control</td>
+</tr>
+<tr>
+<td><strong>Models</strong></td>
+<td>Model configuration</td>
+<td>AI management</td>
+</tr>
+<tr>
+<td><strong>Orchestration</strong></td>
+<td>Workflow patterns</td>
+<td>Pattern management</td>
+</tr>
+<tr>
+<td><strong>Analytics</strong></td>
+<td>Usage reports</td>
+<td>Business intelligence</td>
+</tr>
+<tr>
+<td><strong>Billing</strong></td>
+<td>Revenue, invoices</td>
+<td>Financial management</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>Audit logs, compliance</td>
+<td>Security oversight</td>
+</tr>
+<tr>
+<td><strong>Settings</strong></td>
+<td>Platform configuration</td>
+<td>System settings</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ui-features">9.2 UI Features</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Responsive Design</strong></td>
+<td>Mobile-friendly</td>
+<td>Access anywhere</td>
+</tr>
+<tr>
+<td><strong>Dark Mode</strong></td>
+<td>Light/dark themes</td>
+<td>User preference</td>
+</tr>
+<tr>
+<td><strong>Search</strong></td>
+<td>Global search</td>
+<td>Find anything quickly</td>
+</tr>
+<tr>
+<td><strong>Filters</strong></td>
+<td>Advanced filtering</td>
+<td>Narrow results</td>
+</tr>
+<tr>
+<td><strong>Bulk Actions</strong></td>
+<td>Multi-select operations</td>
+<td>Efficiency</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="swift-deployer-app">10. Swift Deployer App</h2>
+<h3 id="deployment-features">10.1 Deployment Features</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CDK Deployment</strong></td>
+<td>One-click AWS deployment</td>
+<td>Simple infrastructure setup</td>
+</tr>
+<tr>
+<td><strong>Progress Tracking</strong></td>
+<td>Real-time deployment status</td>
+<td>Visibility into process</td>
+</tr>
+<tr>
+<td><strong>Stack Management</strong></td>
+<td>Deploy individual stacks</td>
+<td>Granular control</td>
+</tr>
+<tr>
+<td><strong>Rollback</strong></td>
+<td>Revert failed deployments</td>
+<td>Safety net</td>
+</tr>
+</tbody>
+</table>
+<h3 id="qa-testing">10.2 QA &amp; Testing</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Test Suites</strong></td>
+<td>Run unit/integration tests</td>
+<td>Quality assurance</td>
+</tr>
+<tr>
+<td><strong>Test Results</strong></td>
+<td>Pass/fail reporting</td>
+<td>Quick feedback</td>
+</tr>
+<tr>
+<td><strong>Coverage Reports</strong></td>
+<td>Code coverage metrics</td>
+<td>Quality metrics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ai-assistant">10.3 AI Assistant</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Deployment Guidance</strong></td>
+<td>AI helps with deployment</td>
+<td>Reduces errors</td>
+</tr>
+<tr>
+<td><strong>Error Diagnosis</strong></td>
+<td>AI analyzes failures</td>
+<td>Faster resolution</td>
+</tr>
+<tr>
+<td><strong>Best Practices</strong></td>
+<td>AI suggests improvements</td>
+<td>Optimization</td>
+</tr>
+</tbody>
+</table>
+<h3 id="local-storage">10.4 Local Storage</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>How It Fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SQLCipher DB</strong></td>
+<td>Encrypted local storage</td>
+<td>Secure credentials</td>
+</tr>
+<tr>
+<td><strong>AWS Profiles</strong></td>
+<td>Multiple AWS accounts</td>
+<td>Environment management</td>
+</tr>
+<tr>
+<td><strong>Deployment History</strong></td>
+<td>Past deployment records</td>
+<td>Audit trail</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<div data-align="center">
+<p><strong>RADIANT Feature Reference v4.18.0</strong></p>
+<p><em>106+ models • 49 patterns • 9 modes • Enterprise-grade</em></p>
+</div>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

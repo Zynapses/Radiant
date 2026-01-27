@@ -5,7 +5,8 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { getDbClient } from '../shared/db';
-import { getTenantId, getUserId, createResponse, createErrorResponse } from '../shared/utils';
+import { getAuthTenantId, getAuthUserId } from '../shared/utils';
+import { createResponse, createErrorResponse } from '../shared/utils/response';
 import {
   AgentRegistryEntry,
   TenantRole,
@@ -21,11 +22,11 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   const method = event.httpMethod;
 
   try {
-    const tenantId = getTenantId(event);
-    const userId = getUserId(event);
+    const tenantId = getAuthTenantId(event);
+    const userId = getAuthUserId(event);
 
     if (!tenantId) {
-      return createErrorResponse(401, 'Tenant ID required');
+      return createErrorResponse('Tenant ID required', 401);
     }
 
     // Set tenant context for RLS
@@ -114,10 +115,10 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return initializeTenantRoles(tenantId);
     }
 
-    return createErrorResponse(404, 'Endpoint not found');
+    return createErrorResponse('Endpoint not found');
   } catch (error) {
     console.error('Agent Registry API error:', error);
-    return createErrorResponse(500, 'Internal server error');
+    return createErrorResponse('Internal server error');
   }
 };
 
@@ -133,7 +134,7 @@ async function getAgentRegistry(): Promise<APIGatewayProxyResult> {
   `;
   const result = await db.query(query);
 
-  return createResponse(200, result.rows.map(mapAgentRegistry));
+  return createResponse(result.rows.map(mapAgentRegistry));
 }
 
 // =============================================================================
@@ -185,8 +186,8 @@ async function getTenantAdminDashboard(tenantId: string): Promise<APIGatewayProx
   ]);
 
   const dashboard: TenantAdminDashboardData = {
-    userCount: parseInt(userCountResult.rows[0]?.count) || 0,
-    roleCount: parseInt(roleCountResult.rows[0]?.count) || 0,
+    userCount: parseInt((userCountResult.rows[0] as any)?.count) || 0,
+    roleCount: parseInt((roleCountResult.rows[0] as any)?.count) || 0,
     agentAccessSummary: agentAccessResult.rows.map((row: any) => ({
       agent: {
         id: row.id,
@@ -206,7 +207,7 @@ async function getTenantAdminDashboard(tenantId: string): Promise<APIGatewayProx
     })),
   };
 
-  return createResponse(200, dashboard);
+  return createResponse(dashboard);
 }
 
 // =============================================================================
@@ -221,7 +222,7 @@ async function getTenantRoles(tenantId: string): Promise<APIGatewayProxyResult> 
   `;
   const result = await db.query(query, [tenantId]);
 
-  return createResponse(200, result.rows.map(mapTenantRole));
+  return createResponse(result.rows.map(mapTenantRole));
 }
 
 async function getTenantRole(tenantId: string, roleId: string): Promise<APIGatewayProxyResult> {
@@ -229,17 +230,17 @@ async function getTenantRole(tenantId: string, roleId: string): Promise<APIGatew
   const result = await db.query(query, [tenantId, roleId]);
 
   if (result.rows.length === 0) {
-    return createErrorResponse(404, 'Role not found');
+    return createErrorResponse('Role not found');
   }
 
-  return createResponse(200, mapTenantRole(result.rows[0]));
+  return createResponse(mapTenantRole(result.rows[0]));
 }
 
 async function createTenantRole(tenantId: string, userId: string, body: any): Promise<APIGatewayProxyResult> {
   const { roleKey, displayName, description, permissions, agentAccess } = body;
 
   if (!roleKey || !displayName) {
-    return createErrorResponse(400, 'roleKey and displayName required');
+    return createErrorResponse('roleKey and displayName required');
   }
 
   const insertQuery = `
@@ -255,7 +256,7 @@ async function createTenantRole(tenantId: string, userId: string, body: any): Pr
     userId
   ]);
 
-  return createResponse(201, mapTenantRole(result.rows[0]));
+  return createResponse(mapTenantRole(result.rows[0]));
 }
 
 async function updateTenantRole(tenantId: string, roleId: string, body: any): Promise<APIGatewayProxyResult> {
@@ -266,11 +267,11 @@ async function updateTenantRole(tenantId: string, roleId: string, body: any): Pr
   const checkResult = await db.query(checkQuery, [tenantId, roleId]);
 
   if (checkResult.rows.length === 0) {
-    return createErrorResponse(404, 'Role not found');
+    return createErrorResponse('Role not found');
   }
 
   if (checkResult.rows[0].is_system_role) {
-    return createErrorResponse(403, 'Cannot modify system roles');
+    return createErrorResponse('Cannot modify system roles', 403);
   }
 
   const updateQuery = `
@@ -290,7 +291,7 @@ async function updateTenantRole(tenantId: string, roleId: string, body: any): Pr
     agentAccess ? JSON.stringify(agentAccess) : null
   ]);
 
-  return createResponse(200, mapTenantRole(result.rows[0]));
+  return createResponse(mapTenantRole(result.rows[0]));
 }
 
 async function deleteTenantRole(tenantId: string, roleId: string): Promise<APIGatewayProxyResult> {
@@ -299,17 +300,17 @@ async function deleteTenantRole(tenantId: string, roleId: string): Promise<APIGa
   const checkResult = await db.query(checkQuery, [tenantId, roleId]);
 
   if (checkResult.rows.length === 0) {
-    return createErrorResponse(404, 'Role not found');
+    return createErrorResponse('Role not found');
   }
 
   if (checkResult.rows[0].is_system_role) {
-    return createErrorResponse(403, 'Cannot delete system roles');
+    return createErrorResponse('Cannot delete system roles', 403);
   }
 
   const query = `DELETE FROM tenant_roles WHERE tenant_id = $1 AND id = $2 RETURNING id`;
   const result = await db.query(query, [tenantId, roleId]);
 
-  return createResponse(200, { deleted: true, id: roleId });
+  return createResponse({ deleted: true, id: roleId });
 }
 
 // =============================================================================
@@ -332,7 +333,7 @@ async function getUsersWithAccess(tenantId: string): Promise<APIGatewayProxyResu
 
   const result = await db.query(query, [tenantId]);
 
-  return createResponse(200, result.rows.map((row: any) => ({
+  return createResponse(result.rows.map((row: any) => ({
     userId: row.user_id,
     roles: row.roles.filter(Boolean),
     agents: row.agents.filter(Boolean),
@@ -349,7 +350,7 @@ async function getUserRoles(tenantId: string, targetUserId: string): Promise<API
 
   const result = await db.query(query, [tenantId, targetUserId]);
 
-  return createResponse(200, result.rows.map((row: any) => ({
+  return createResponse(result.rows.map((row: any) => ({
     ...mapTenantUserRole(row),
     role: {
       id: row.role_id,
@@ -370,7 +371,7 @@ async function assignUserRole(
   const { roleId, expiresAt } = body;
 
   if (!roleId) {
-    return createErrorResponse(400, 'roleId required');
+    return createErrorResponse('roleId required');
   }
 
   const insertQuery = `
@@ -383,7 +384,7 @@ async function assignUserRole(
 
   const result = await db.query(insertQuery, [tenantId, targetUserId, roleId, assignedBy, expiresAt]);
 
-  return createResponse(201, mapTenantUserRole(result.rows[0]));
+  return createResponse(mapTenantUserRole(result.rows[0]));
 }
 
 async function revokeUserRole(
@@ -402,10 +403,10 @@ async function revokeUserRole(
   const result = await db.query(updateQuery, [tenantId, targetUserId, roleId]);
 
   if (result.rows.length === 0) {
-    return createErrorResponse(404, 'Role assignment not found');
+    return createErrorResponse('Role assignment not found');
   }
 
-  return createResponse(200, { revoked: true, userId: targetUserId, roleId });
+  return createResponse({ revoked: true, userId: targetUserId, roleId });
 }
 
 // =============================================================================
@@ -422,7 +423,7 @@ async function getUserAgentAccess(tenantId: string, targetUserId: string): Promi
 
   const result = await db.query(query, [tenantId, targetUserId]);
 
-  return createResponse(200, result.rows.map((row: any) => ({
+  return createResponse(result.rows.map((row: any) => ({
     ...mapUserAgentAccess(row),
     agent: {
       id: row.agent_id,
@@ -442,7 +443,7 @@ async function grantAgentAccess(
   const { agentKey, accessLevel = 'user', permissions, expiresAt } = body;
 
   if (!agentKey) {
-    return createErrorResponse(400, 'agentKey required');
+    return createErrorResponse('agentKey required');
   }
 
   // Get agent ID
@@ -450,7 +451,7 @@ async function grantAgentAccess(
   const agentResult = await db.query(agentQuery, [agentKey]);
 
   if (agentResult.rows.length === 0) {
-    return createErrorResponse(404, 'Agent not found');
+    return createErrorResponse('Agent not found');
   }
 
   const agentId = agentResult.rows[0].id;
@@ -468,7 +469,7 @@ async function grantAgentAccess(
     JSON.stringify(permissions || {}), grantedBy, expiresAt
   ]);
 
-  return createResponse(201, mapUserAgentAccess(result.rows[0]));
+  return createResponse(mapUserAgentAccess(result.rows[0]));
 }
 
 async function revokeAgentAccess(
@@ -482,7 +483,7 @@ async function revokeAgentAccess(
   const agentResult = await db.query(agentQuery, [agentKey]);
 
   if (agentResult.rows.length === 0) {
-    return createErrorResponse(404, 'Agent not found');
+    return createErrorResponse('Agent not found');
   }
 
   const updateQuery = `
@@ -495,10 +496,10 @@ async function revokeAgentAccess(
   const result = await db.query(updateQuery, [tenantId, targetUserId, agentResult.rows[0].id]);
 
   if (result.rows.length === 0) {
-    return createErrorResponse(404, 'Agent access not found');
+    return createErrorResponse('Agent access not found');
   }
 
-  return createResponse(200, { revoked: true, userId: targetUserId, agentKey });
+  return createResponse({ revoked: true, userId: targetUserId, agentKey });
 }
 
 // =============================================================================
@@ -529,7 +530,7 @@ async function getEffectivePermissions(tenantId: string, targetUserId: string): 
     })
   );
 
-  return createResponse(200, permissions);
+  return createResponse(permissions);
 }
 
 // =============================================================================

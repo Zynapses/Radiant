@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 12 METRICS ANALYTICS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 12 METRICS ANALYTICS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-12-METRICS-ANALYTICS.md</div>
+  </div>
+  
+  <h1 id="section-12-metrics-analytics-v2.5.0">SECTION 12: METRICS &amp; ANALYTICS (v2.5.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="analytics-database-schema">12.1 Analytics Database Schema</h2>
+<pre class="sql"><code>-- migrations/022_metrics_analytics.sql
+
+CREATE TABLE usage_metrics (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID REFERENCES users(id),
+    metric_type VARCHAR(50) NOT NULL,
+    metric_name VARCHAR(100) NOT NULL,
+    metric_value DECIMAL(20, 6) NOT NULL,
+    dimensions JSONB DEFAULT &#39;{}&#39;,
+    recorded_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE aggregated_metrics (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    period_start TIMESTAMPTZ NOT NULL,
+    period_end TIMESTAMPTZ NOT NULL,
+    period_type VARCHAR(20) NOT NULL,
+    metric_type VARCHAR(50) NOT NULL,
+    total_requests BIGINT DEFAULT 0,
+    total_tokens BIGINT DEFAULT 0,
+    total_cost DECIMAL(20, 6) DEFAULT 0,
+    avg_latency_ms DECIMAL(10, 2),
+    p95_latency_ms DECIMAL(10, 2),
+    p99_latency_ms DECIMAL(10, 2),
+    error_count INTEGER DEFAULT 0,
+    unique_users INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_usage_metrics_tenant_time ON usage_metrics(tenant_id, recorded_at);
+CREATE INDEX idx_usage_metrics_type ON usage_metrics(metric_type);
+CREATE INDEX idx_aggregated_period ON aggregated_metrics(tenant_id, period_start, period_type);
+
+ALTER TABLE usage_metrics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE aggregated_metrics ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY usage_metrics_isolation ON usage_metrics USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY aggregated_metrics_isolation ON aggregated_metrics USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);</code></pre>
+<h2 id="metrics-collector-service">12.2 Metrics Collector Service</h2>
+<pre class="typescript"><code>// packages/core/src/services/metrics-collector.ts
+
+import { Pool } from &#39;pg&#39;;
+import { CloudWatchClient, PutMetricDataCommand } from &#39;@aws-sdk/client-cloudwatch&#39;;
+
+interface MetricEvent {
+    tenantId: string;
+    userId?: string;
+    metricType: &#39;api_request&#39; | &#39;token_usage&#39; | &#39;model_inference&#39; | &#39;billing&#39;;
+    metricName: string;
+    value: number;
+    dimensions?: Record&lt;string, string&gt;;
+}
+
+export class MetricsCollector {
+    private pool: Pool;
+    private cloudwatch: CloudWatchClient;
+    private buffer: MetricEvent[] = [];
+    private flushInterval: NodeJS.Timeout;
+    
+    constructor(pool: Pool) {
+        this.pool = pool;
+        this.cloudwatch = new CloudWatchClient({});
+        this.flushInterval = setInterval(() =&gt; this.flush(), 10000);
+    }
+    
+    record(event: MetricEvent): void {
+        this.buffer.push(event);
+        
+        if (this.buffer.length &gt;= 100) {
+            this.flush();
+        }
+    }
+    
+    async flush(): Promise&lt;void&gt; {
+        if (this.buffer.length === 0) return;
+        
+        const events = [...this.buffer];
+        this.buffer = [];
+        
+        // Batch insert to PostgreSQL
+        const values = events.map((e, i) =&gt; 
+            `($${i*6+1}, $${i*6+2}, $${i*6+3}, $${i*6+4}, $${i*6+5}, $${i*6+6})`
+        ).join(&#39;, &#39;);
+        
+        const params = events.flatMap(e =&gt; [
+            e.tenantId, e.userId, e.metricType, e.metricName, e.value, JSON.stringify(e.dimensions || {})
+        ]);
+        
+        await this.pool.query(`
+            INSERT INTO usage_metrics (tenant_id, user_id, metric_type, metric_name, metric_value, dimensions)
+            VALUES ${values}
+        `, params);
+        
+        // Send to CloudWatch
+        await this.sendToCloudWatch(events);
+    }
+    
+    private async sendToCloudWatch(events: MetricEvent[]): Promise&lt;void&gt; {
+        const metricData = events.map(e =&gt; ({
+            MetricName: e.metricName,
+            Dimensions: [
+                { Name: &#39;TenantId&#39;, Value: e.tenantId },
+                { Name: &#39;MetricType&#39;, Value: e.metricType }
+            ],
+            Value: e.value,
+            Timestamp: new Date(),
+            Unit: this.getUnit(e.metricName)
+        }));
+        
+        // CloudWatch accepts max 20 metrics per call
+        for (let i = 0; i &lt; metricData.length; i += 20) {
+            await this.cloudwatch.send(new PutMetricDataCommand({
+                Namespace: &#39;RADIANT&#39;,
+                MetricData: metricData.slice(i, i + 20)
+            }));
+        }
+    }
+    
+    private getUnit(metricName: string): string {
+        if (metricName.includes(&#39;latency&#39;)) return &#39;Milliseconds&#39;;
+        if (metricName.includes(&#39;cost&#39;)) return &#39;None&#39;;
+        if (metricName.includes(&#39;tokens&#39;)) return &#39;Count&#39;;
+        return &#39;Count&#39;;
+    }
+    
+    async getAggregatedMetrics(
+        tenantId: string, 
+        periodType: &#39;hourly&#39; | &#39;daily&#39; | &#39;weekly&#39; | &#39;monthly&#39;,
+        startDate: Date,
+        endDate: Date
+    ) {
+        const result = await this.pool.query(`
+            SELECT * FROM aggregated_metrics
+            WHERE tenant_id = $1
+            AND period_type = $2
+            AND period_start &gt;= $3
+            AND period_end &lt;= $4
+            ORDER BY period_start
+        `, [tenantId, periodType, startDate, endDate]);
+        
+        return result.rows;
+    }
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIANT SHARED TYPES - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RADIANT SHARED TYPES</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/RADIANT-SHARED-TYPES.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.18.0---shared-types-constants-export">RADIANT v4.18.0 - Shared Types &amp; Constants Export</h1>
+<p><strong>Component</strong>: <span class="citation" data-cites="radiant/shared">@radiant/shared</span> Package <strong>Language</strong>: TypeScript <strong>Files</strong>: 60 type files, 41 constant files, 18 utility files <strong>Purpose</strong>: Single source of truth for types across all components</p>
+<hr />
+<h2 id="architecture-narrative">Architecture Narrative</h2>
+<p>The <code>@radiant/shared</code> package provides <strong>type definitions and constants</strong> used across all RADIANT components: Swift Deployer, CDK Infrastructure, Lambda handlers, and Admin Dashboard. This ensures type safety and consistency throughout the platform.</p>
+<h3 id="package-structure">Package Structure</h3>
+<pre><code>packages/shared/src/
+├── index.ts              # Main export
+├── types/               # 60 TypeScript type definition files
+│   ├── index.ts         # Type exports
+│   ├── brain-v6.types.ts
+│   ├── cato.types.ts
+│   ├── consciousness.types.ts
+│   └── ...
+├── constants/           # 41 constant definition files
+│   ├── index.ts
+│   ├── version.ts
+│   ├── tiers.ts
+│   ├── providers.ts
+│   └── ...
+├── utils/               # 18 utility function files
+├── errors/              # Error type definitions
+├── validation/          # Validation schemas
+└── templates/           # Template definitions</code></pre>
+<hr />
+<h2 id="core-constants">Core Constants</h2>
+<h3 id="version.ts">version.ts</h3>
+<p><strong>Purpose</strong>: Single source of truth for version numbers.</p>
+<pre class="typescript"><code>/**
+ * RADIANT Version Constants
+ * SINGLE SOURCE OF TRUTH for version numbers
+ */
+
+export const RADIANT_VERSION = &#39;4.18.0&#39;;
+
+export const VERSION = {
+  major: 4,
+  minor: 18,
+  patch: 0,
+  full: &#39;4.18.0&#39;,
+  build: process.env.BUILD_NUMBER || &#39;local&#39;,
+  date: &#39;2024-12&#39;,
+} as const;
+
+export const MIN_VERSIONS = {
+  node: &#39;20.0.0&#39;,
+  npm: &#39;10.0.0&#39;,
+  cdk: &#39;2.120.0&#39;,
+  postgres: &#39;15.0&#39;,
+  swift: &#39;5.9&#39;,
+  macos: &#39;13.0&#39;,
+  xcode: &#39;15.0&#39;,
+} as const;
+
+export const DOMAIN_PLACEHOLDER = &#39;YOUR_DOMAIN.com&#39;;
+
+export function isDomainConfigured(domain: string): boolean {
+  return !domain.includes(DOMAIN_PLACEHOLDER);
+}</code></pre>
+<hr />
+<h3 id="tiers.ts">tiers.ts</h3>
+<p><strong>Purpose</strong>: Infrastructure tier configurations with cost estimates and feature flags.</p>
+<pre class="typescript"><code>/**
+ * RADIANT v4.18.0 - Infrastructure Tiers
+ * SINGLE SOURCE OF TRUTH
+ */
+
+import type { TierConfig, TierLevel, TierName } from &#39;../types&#39;;
+
+export const TIER_NAMES: Record&lt;TierLevel, TierName&gt; = {
+  1: &#39;SEED&#39;,
+  2: &#39;STARTUP&#39;,
+  3: &#39;GROWTH&#39;,
+  4: &#39;SCALE&#39;,
+  5: &#39;ENTERPRISE&#39;,
+};
+
+export const TIER_CONFIGS: Record&lt;TierLevel, TierConfig&gt; = {
+  1: {
+    level: 1,
+    name: &#39;SEED&#39;,
+    description: &#39;Development and testing, minimal costs&#39;,
+    vpcCidr: &#39;10.0.0.0/20&#39;,
+    azCount: 2,
+    natGateways: 1,
+    auroraMinCapacity: 0.5,
+    auroraMaxCapacity: 2,
+    enableGlobalDatabase: false,
+    elasticacheNodes: 0,
+    elasticacheNodeType: &#39;cache.t4g.micro&#39;,
+    enableSelfHostedModels: false,
+    maxSagemakerEndpoints: 0,
+    litellmTaskCount: 1,
+    litellmCpu: 256,
+    litellmMemory: 512,
+    enableWaf: false,
+    enableGuardDuty: false,
+    enableSecurityHub: false,
+    enableHipaa: false,
+    enableBrain: false,
+    estimatedMonthlyCost: { min: 50, max: 150, typical: 85 },
+  },
+  2: {
+    level: 2,
+    name: &#39;STARTUP&#39;,
+    description: &#39;Small production workloads&#39;,
+    vpcCidr: &#39;10.0.0.0/18&#39;,
+    azCount: 2,
+    natGateways: 1,
+    auroraMinCapacity: 1,
+    auroraMaxCapacity: 8,
+    enableGlobalDatabase: false,
+    elasticacheNodes: 1,
+    elasticacheNodeType: &#39;cache.t4g.small&#39;,
+    enableSelfHostedModels: false,
+    maxSagemakerEndpoints: 0,
+    litellmTaskCount: 2,
+    litellmCpu: 512,
+    litellmMemory: 1024,
+    enableWaf: true,
+    enableGuardDuty: true,
+    enableSecurityHub: false,
+    enableHipaa: false,
+    enableBrain: false,
+    estimatedMonthlyCost: { min: 200, max: 400, typical: 255 },
+  },
+  3: {
+    level: 3,
+    name: &#39;GROWTH&#39;,
+    description: &#39;Medium production with self-hosted models&#39;,
+    vpcCidr: &#39;10.0.0.0/17&#39;,
+    azCount: 3,
+    natGateways: 2,
+    auroraMinCapacity: 2,
+    auroraMaxCapacity: 16,
+    enableGlobalDatabase: false,
+    elasticacheNodes: 2,
+    elasticacheNodeType: &#39;cache.r6g.large&#39;,
+    enableSelfHostedModels: true,
+    maxSagemakerEndpoints: 10,
+    litellmTaskCount: 3,
+    litellmCpu: 1024,
+    litellmMemory: 2048,
+    enableWaf: true,
+    enableGuardDuty: true,
+    enableSecurityHub: true,
+    enableHipaa: true,
+    enableBrain: true,
+    estimatedMonthlyCost: { min: 1000, max: 2500, typical: 1475 },
+  },
+  4: {
+    level: 4,
+    name: &#39;SCALE&#39;,
+    description: &#39;Large production with multi-region&#39;,
+    vpcCidr: &#39;10.0.0.0/16&#39;,
+    azCount: 3,
+    natGateways: 3,
+    auroraMinCapacity: 4,
+    auroraMaxCapacity: 64,
+    enableGlobalDatabase: true,
+    elasticacheNodes: 3,
+    elasticacheNodeType: &#39;cache.r6g.xlarge&#39;,
+    enableSelfHostedModels: true,
+    maxSagemakerEndpoints: 30,
+    litellmTaskCount: 5,
+    litellmCpu: 2048,
+    litellmMemory: 4096,
+    enableWaf: true,
+    enableGuardDuty: true,
+    enableSecurityHub: true,
+    enableHipaa: true,
+    enableBrain: true,
+    estimatedMonthlyCost: { min: 4000, max: 8000, typical: 5450 },
+  },
+  5: {
+    level: 5,
+    name: &#39;ENTERPRISE&#39;,
+    description: &#39;Enterprise-grade global deployment&#39;,
+    vpcCidr: &#39;10.0.0.0/14&#39;,
+    azCount: 3,
+    natGateways: 3,
+    auroraMinCapacity: 8,
+    auroraMaxCapacity: 128,
+    enableGlobalDatabase: true,
+    elasticacheNodes: 6,
+    elasticacheNodeType: &#39;cache.r6g.2xlarge&#39;,
+    enableSelfHostedModels: true,
+    maxSagemakerEndpoints: 100,
+    litellmTaskCount: 10,
+    litellmCpu: 4096,
+    litellmMemory: 8192,
+    enableWaf: true,
+    enableGuardDuty: true,
+    enableSecurityHub: true,
+    enableHipaa: true,
+    enableBrain: true,
+    estimatedMonthlyCost: { min: 15000, max: 35000, typical: 21500 },
+  },
+};
+
+export function getTierConfig(tier: TierLevel): TierConfig {
+  return TIER_CONFIGS[tier];
+}
+
+export function getTierName(tier: TierLevel): TierName {
+  return TIER_NAMES[tier];
+}
+
+export function validateTierForEnvironment(tier: TierLevel, environment: string): void {
+  if (environment === &#39;prod&#39; &amp;&amp; tier &lt; 3) {
+    throw new Error(&#39;Production requires Tier 3 (GROWTH) or higher&#39;);
+  }
+}
+
+export function getFeatureFlagsForTier(tier: TierLevel) {
+  const config = TIER_CONFIGS[tier];
+  return {
+    selfHostedModels: config.enableSelfHostedModels,
+    multiRegion: config.enableGlobalDatabase,
+    waf: config.enableWaf,
+    guardDuty: config.enableGuardDuty,
+    hipaaCompliance: config.enableHipaa,
+    advancedAnalytics: tier &gt;= 3,
+    customBranding: tier &gt;= 4,
+    sla: tier &gt;= 4,
+  };
+}</code></pre>
+<hr />
+<h2 id="core-types">Core Types</h2>
+<h3 id="brain-v6.types.ts">brain-v6.types.ts</h3>
+<p><strong>Purpose</strong>: AGI Brain system types including SOFAI routing, context budgeting, and flash facts.</p>
+<pre class="typescript"><code>/**
+ * RADIANT v6.0.4 - AGI Brain Types
+ * Project AWARE - Autonomous Wakefulness And Reasoning Engine
+ */
+
+// SOFAI System Levels
+export type SystemLevel = &#39;system1&#39; | &#39;system1.5&#39; | &#39;system2&#39;;
+
+export interface SofaiRoutingDecision {
+  level: SystemLevel;
+  confidence: number;            // 0-1
+  reasoning: string;
+  trust: number;                 // 1 - entropy
+  domainRisk: number;
+  computeCost: number;
+  timestamp: Date;
+}
+
+export interface SofaiConfig {
+  system2Threshold: number;      // Default: 0.5
+  domainRisks: Record&lt;string, number&gt;;
+  enableSystem1_5: boolean;
+  maxSystem2Latency: number;
+}
+
+// Context Budget Types
+export interface ContextBudget {
+  systemCore: number;            // ~500 tokens
+  complianceGuardrails: number;  // ~400 tokens
+  flashFacts: number;            // ~200 tokens
+  ghostTokens: number;           // ~64 tokens
+  userMessage: number;
+  memories: number;
+  responseReserve: number;       // MINIMUM 1000 tokens
+  totalInput: number;
+  compressionApplied: boolean;
+}
+
+// Flash Fact Types
+export type FlashFactType = 
+  | &#39;identity&#39; | &#39;allergy&#39; | &#39;medical&#39; 
+  | &#39;preference&#39; | &#39;constraint&#39; | &#39;correction&#39;;
+
+export interface FlashFact {
+  id: string;
+  userId: string;
+  tenantId: string;
+  fact: string;
+  factType: FlashFactType;
+  priority: &#39;critical&#39; | &#39;high&#39; | &#39;normal&#39;;
+  status: &#39;pending_dream&#39; | &#39;consolidated&#39; | &#39;failed_retry&#39;;
+  createdAt: Date;
+  consolidatedAt: Date | null;
+}
+
+// Brain Request/Response
+export interface BrainInferenceRequest {
+  userId: string;
+  tenantId: string;
+  prompt: string;
+  conversationHistory?: ConversationMessage[];
+  domain?: string;
+  forceSystemLevel?: SystemLevel;
+  options?: BrainInferenceOptions;
+}
+
+export interface BrainInferenceResponse {
+  response: string;
+  systemLevel: SystemLevel;
+  routingDecision: SofaiRoutingDecision;
+  budget: ContextBudget;
+  ghostUpdated: boolean;
+  flashFactsDetected: FlashFactDetection;
+  latencyMs: number;
+  tokenUsage: { input: number; output: number; total: number };
+  verification?: {
+    passed: boolean;
+    ecdScore: number;
+    refinementAttempts: number;
+    blocked: boolean;
+  };
+}
+
+export interface ConversationMessage {
+  role: &#39;user&#39; | &#39;assistant&#39; | &#39;system&#39;;
+  content: string;
+  timestamp?: Date;
+}</code></pre>
+<hr />
+<h3 id="cato.types.ts">cato.types.ts</h3>
+<p><strong>Purpose</strong>: Genesis Cato Safety Architecture types with immutable safety invariants.</p>
+<pre class="typescript"><code>/**
+ * RADIANT Genesis Cato Safety Architecture Types
+ * Version: 2.3.1
+ *
+ * THREE-LAYER NAMING CONVENTION:
+ * 1. CATO = The user-facing AI persona name
+ * 2. GENESIS CATO = The safety architecture/system
+ * 3. MOODS = Operating modes (Balanced, Scout, Sage, Spark, Guide)
+ */
+
+// IMMUTABLE SAFETY INVARIANTS - CANNOT be changed at runtime
+export const CATO_INVARIANTS = {
+  /** CBFs NEVER relax - shields stay UP */
+  CBF_ENFORCEMENT_MODE: &#39;ENFORCE&#39; as const,
+  /** Gamma is NEVER boosted during recovery */
+  GAMMA_BOOST_ALLOWED: false,
+  /** Destructive actions require confirmation */
+  AUTO_MODIFY_DESTRUCTIVE: false,
+  /** Audit trail is append-only */
+  AUDIT_ALLOW_UPDATE: false,
+  AUDIT_ALLOW_DELETE: false,
+} as const;
+
+export const DEFAULT_PERSONA_NAME = &#39;balanced&#39;;
+export const RECOVERY_PERSONA_NAME = &#39;scout&#39;;
+
+// Persona (Mood) Types
+export interface PersonaDrives {
+  curiosity: number;    // 0-1
+  achievement: number;  // 0-1
+  service: number;      // 0-1
+  discovery: number;    // 0-1
+  reflection: number;   // 0-1
+}
+
+export interface PersonaVoice {
+  formality: &#39;casual&#39; | &#39;balanced&#39; | &#39;formal&#39;;
+  verbosity: &#39;concise&#39; | &#39;balanced&#39; | &#39;elaborate&#39;;
+  emotionExpression: &#39;reserved&#39; | &#39;moderate&#39; | &#39;expressive&#39;;
+  technicalLevel: &#39;simplified&#39; | &#39;adaptive&#39; | &#39;technical&#39;;
+}
+
+export interface Persona {
+  id: string;
+  name: string;
+  displayName: string;
+  description: string;
+  scope: &#39;system&#39; | &#39;tenant&#39; | &#39;user&#39;;
+  tenantId?: string;
+  userId?: string;
+  drives: PersonaDrives;
+  derivedCMatrix?: CMatrix;
+  defaultGamma: number;
+  voice: PersonaVoice;
+  presentation: PersonaPresentation;
+  behavior: PersonaBehavior;
+  isDefault: boolean;
+  isActive: boolean;
+}</code></pre>
+<hr />
+<h2 id="type-file-inventory">Type File Inventory</h2>
+<h3 id="core-types-60-files">Core Types (60 files)</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Lines</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>admin-config.types.ts</code></td>
+<td>18K</td>
+<td>Admin configuration types</td>
+</tr>
+<tr>
+<td><code>admin.types.ts</code></td>
+<td>3K</td>
+<td>Admin user/role types</td>
+</tr>
+<tr>
+<td><code>agi-brain-plan.types.ts</code></td>
+<td>9K</td>
+<td>Brain planning types</td>
+</tr>
+<tr>
+<td><code>agi-ideas.types.ts</code></td>
+<td>7K</td>
+<td>Idea management types</td>
+</tr>
+<tr>
+<td><code>agi-orchestration.types.ts</code></td>
+<td>10K</td>
+<td>Orchestration types</td>
+</tr>
+<tr>
+<td><code>ai.types.ts</code></td>
+<td>3K</td>
+<td>AI model types</td>
+</tr>
+<tr>
+<td><code>app.types.ts</code></td>
+<td>2K</td>
+<td>Application types</td>
+</tr>
+<tr>
+<td><code>aws-monitoring.types.ts</code></td>
+<td>13K</td>
+<td>AWS monitoring types</td>
+</tr>
+<tr>
+<td><code>billing.types.ts</code></td>
+<td>2K</td>
+<td>Billing types</td>
+</tr>
+<tr>
+<td><code>bipolar-rating.types.ts</code></td>
+<td>8K</td>
+<td>Rating system types</td>
+</tr>
+<tr>
+<td><code>brain-v6.types.ts</code></td>
+<td>9K</td>
+<td>AGI Brain types</td>
+</tr>
+<tr>
+<td><code>cato.types.ts</code></td>
+<td>17K</td>
+<td>Cato safety types</td>
+</tr>
+<tr>
+<td><code>cognition.types.ts</code></td>
+<td>10K</td>
+<td>Cognition types</td>
+</tr>
+<tr>
+<td><code>cognitive-architecture.types.ts</code></td>
+<td>13K</td>
+<td>Cognitive architecture</td>
+</tr>
+<tr>
+<td><code>collaboration.types.ts</code></td>
+<td>9K</td>
+<td>Collaboration types</td>
+</tr>
+<tr>
+<td><code>compliance-sandwich.types.ts</code></td>
+<td>9K</td>
+<td>Compliance sandwich</td>
+</tr>
+<tr>
+<td><code>compliance.types.ts</code></td>
+<td>2K</td>
+<td>Compliance types</td>
+</tr>
+<tr>
+<td><code>consciousness.types.ts</code></td>
+<td>9K</td>
+<td>Consciousness types</td>
+</tr>
+<tr>
+<td><code>delight.types.ts</code></td>
+<td>11K</td>
+<td>Delight engine types</td>
+</tr>
+<tr>
+<td><code>domain-ethics.types.ts</code></td>
+<td>7K</td>
+<td>Domain ethics types</td>
+</tr>
+<tr>
+<td><code>domain-taxonomy.types.ts</code></td>
+<td>10K</td>
+<td>Domain taxonomy</td>
+</tr>
+<tr>
+<td><code>dreaming.types.ts</code></td>
+<td>7K</td>
+<td>Dreaming types</td>
+</tr>
+<tr>
+<td><code>ecd.types.ts</code></td>
+<td>8K</td>
+<td>ECD verification</td>
+</tr>
+<tr>
+<td><code>environment.types.ts</code></td>
+<td>1K</td>
+<td>Environment types</td>
+</tr>
+<tr>
+<td><code>experiments.types.ts</code></td>
+<td>1K</td>
+<td>A/B testing types</td>
+</tr>
+<tr>
+<td><code>feedback.types.ts</code></td>
+<td>7K</td>
+<td>Feedback types</td>
+</tr>
+<tr>
+<td><code>formal-reasoning.types.ts</code></td>
+<td>22K</td>
+<td>Formal reasoning</td>
+</tr>
+<tr>
+<td><code>ghost.types.ts</code></td>
+<td>7K</td>
+<td>Ghost vector types</td>
+</tr>
+<tr>
+<td><code>inference-components.types.ts</code></td>
+<td>9K</td>
+<td>Inference components</td>
+</tr>
+<tr>
+<td><code>intelligence-aggregator.types.ts</code></td>
+<td>10K</td>
+<td>Intelligence aggregation</td>
+</tr>
+<tr>
+<td><code>library-execution.types.ts</code></td>
+<td>9K</td>
+<td>Library execution</td>
+</tr>
+<tr>
+<td><code>library-registry.types.ts</code></td>
+<td>11K</td>
+<td>Library registry</td>
+</tr>
+<tr>
+<td><code>localization.types.ts</code></td>
+<td>5K</td>
+<td>i18n types</td>
+</tr>
+<tr>
+<td><code>metrics-learning.types.ts</code></td>
+<td>17K</td>
+<td>Metrics learning</td>
+</tr>
+<tr>
+<td><code>model-coordination.types.ts</code></td>
+<td>8K</td>
+<td>Model coordination</td>
+</tr>
+<tr>
+<td><code>preprompt.types.ts</code></td>
+<td>11K</td>
+<td>Preprompt types</td>
+</tr>
+<tr>
+<td><code>provider-rejection.types.ts</code></td>
+<td>8K</td>
+<td>Provider rejection</td>
+</tr>
+<tr>
+<td><code>result-derivation.types.ts</code></td>
+<td>11K</td>
+<td>Result derivation</td>
+</tr>
+<tr>
+<td><code>revenue.types.ts</code></td>
+<td>8K</td>
+<td>Revenue types</td>
+</tr>
+<tr>
+<td><code>security.types.ts</code></td>
+<td>8K</td>
+<td>Security types</td>
+</tr>
+<tr>
+<td><code>thinktank-generative-ui.types.ts</code></td>
+<td>34K</td>
+<td>Think Tank UI types</td>
+</tr>
+<tr>
+<td><code>thinktank.types.ts</code></td>
+<td>7K</td>
+<td>Think Tank core types</td>
+</tr>
+<tr>
+<td><code>translation-middleware.types.ts</code></td>
+<td>16K</td>
+<td>Translation middleware</td>
+</tr>
+<tr>
+<td><code>user-registry.types.ts</code></td>
+<td>13K</td>
+<td>User registry</td>
+</tr>
+<tr>
+<td><code>user-rules.types.ts</code></td>
+<td>12K</td>
+<td>User rules types</td>
+</tr>
+</tbody>
+</table>
+<h3 id="constants-41-files">Constants (41 files)</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>version.ts</code></td>
+<td>Version constants</td>
+</tr>
+<tr>
+<td><code>tiers.ts</code></td>
+<td>Tier configurations</td>
+</tr>
+<tr>
+<td><code>providers.ts</code></td>
+<td>AI provider definitions</td>
+</tr>
+<tr>
+<td><code>regions.ts</code></td>
+<td>AWS region configs</td>
+</tr>
+<tr>
+<td><code>environments.ts</code></td>
+<td>Environment definitions</td>
+</tr>
+<tr>
+<td><code>apps.ts</code></td>
+<td>Application constants</td>
+</tr>
+<tr>
+<td><code>brain.constants.ts</code></td>
+<td>Brain configuration</td>
+</tr>
+<tr>
+<td><code>cognition.constants.ts</code></td>
+<td>Cognition constants</td>
+</tr>
+<tr>
+<td><code>domain-ethics-registry.ts</code></td>
+<td>Domain ethics registry</td>
+</tr>
+<tr>
+<td><code>models/</code></td>
+<td>Model configurations</td>
+</tr>
+</tbody>
+</table>
+<h3 id="utilities-18-files">Utilities (18 files)</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>token-counting.ts</code></td>
+<td>Token counting utilities</td>
+</tr>
+<tr>
+<td><code>validation.ts</code></td>
+<td>Input validation</td>
+</tr>
+<tr>
+<td><code>formatting.ts</code></td>
+<td>Output formatting</td>
+</tr>
+<tr>
+<td><code>hashing.ts</code></td>
+<td>Cryptographic hashing</td>
+</tr>
+<tr>
+<td><code>date-utils.ts</code></td>
+<td>Date manipulation</td>
+</tr>
+<tr>
+<td><code>string-utils.ts</code></td>
+<td>String utilities</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="importing-types">Importing Types</h3>
+<pre class="typescript"><code>// Import from main package
+import { 
+  RADIANT_VERSION,
+  TierConfig,
+  BrainInferenceRequest,
+  SystemLevel,
+  FlashFact,
+} from &#39;@radiant/shared&#39;;
+
+// Import specific modules
+import { TIER_CONFIGS } from &#39;@radiant/shared/constants&#39;;
+import { BrainInferenceResponse } from &#39;@radiant/shared/types&#39;;</code></pre>
+<h3 id="type-safe-api-calls">Type-Safe API Calls</h3>
+<pre class="typescript"><code>import { BrainInferenceRequest, BrainInferenceResponse } from &#39;@radiant/shared&#39;;
+
+async function callBrain(request: BrainInferenceRequest): Promise&lt;BrainInferenceResponse&gt; {
+  const response = await fetch(&#39;/api/brain/inference&#39;, {
+    method: &#39;POST&#39;,
+    headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+    body: JSON.stringify(request),
+  });
+  return response.json();
+}</code></pre>
+<h3 id="tier-configuration">Tier Configuration</h3>
+<pre class="typescript"><code>import { getTierConfig, TierLevel } from &#39;@radiant/shared&#39;;
+
+function calculateInfrastructureCost(tier: TierLevel): number {
+  const config = getTierConfig(tier);
+  return config.estimatedMonthlyCost.typical;
+}</code></pre>
+<hr />
+<p><em>This concludes the Shared Types export. See other export files for additional components.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

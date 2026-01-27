@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THINKTANK CONSUMER GAP ANALYSIS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>THINKTANK CONSUMER GAP ANALYSIS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/THINKTANK-CONSUMER-GAP-ANALYSIS.md</div>
+  </div>
+  
+  <h1 id="think-tank-consumer-app---gap-analysis-implementation-plan">Think Tank Consumer App - Gap Analysis &amp; Implementation Plan</h1>
+<blockquote>
+<p><strong>Date</strong>: January 19, 2026<br />
+<strong>Status</strong>: CRITICAL - Consumer app is severely underdeveloped<br />
+<strong>Priority</strong>: URGENT</p>
+</blockquote>
+<hr />
+<h2 id="executive-summary">Executive Summary</h2>
+<p>The Think Tank consumer app (<code>apps/thinktank/</code>) is <strong>critically underdeveloped</strong>. It consists of: - <strong>1 page</strong> (page.tsx - 420 lines) - <strong>2 API files</strong> (chat.ts, client.ts) - <strong>Basic chat only</strong> - no advanced features</p>
+<p>Meanwhile, the backend has <strong>30 Lambda handlers</strong> and the admin app has <strong>23+ rich pages</strong> with full implementations.</p>
+<p><strong>Gap</strong>: ~95% of backend capabilities are NOT exposed to consumers.</p>
+<hr />
+<h2 id="current-consumer-app-state">Current Consumer App State</h2>
+<h3 id="what-exists">What Exists</h3>
+<pre><code>apps/thinktank/
+├── app/
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── page.tsx          # Basic chat only
+│   └── providers.tsx
+└── lib/
+    ├── api/
+    │   ├── chat.ts       # Conversations only
+    │   └── client.ts     # Basic API client
+    └── auth/
+        ├── api-auth.ts
+        └── context.tsx</code></pre>
+<h3 id="features-in-page.tsx">Features in page.tsx</h3>
+<ul>
+<li>✅ Basic conversation list</li>
+<li>✅ Send/receive messages with streaming</li>
+<li>✅ New conversation creation</li>
+<li>✅ Basic sidebar with conversation history</li>
+<li>❌ Everything else missing</li>
+</ul>
+<hr />
+<h2 id="backend-capabilities-lambda-handlers">Backend Capabilities (Lambda Handlers)</h2>
+<table>
+<thead>
+<tr>
+<th>Handler</th>
+<th>API Endpoints</th>
+<th>Consumer Access</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>conversations.ts</code></td>
+<td>CRUD, messages, streaming</td>
+<td>✅ Partial</td>
+</tr>
+<tr>
+<td><code>users.ts</code></td>
+<td>Profile, preferences</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>models.ts</code></td>
+<td>Model listing, selection</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>brain-plan.ts</code></td>
+<td>AI planning visualization</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>user-context.ts</code></td>
+<td>Persistent context</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>domain-modes.ts</code></td>
+<td>Domain detection, modes</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>model-categories.ts</code></td>
+<td>Model categorization</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>ratings.ts</code></td>
+<td>Message ratings/feedback</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>grimoire.ts</code></td>
+<td>Learned heuristics</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>economic-governor.ts</code></td>
+<td>Cost optimization</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>time-travel.ts</code></td>
+<td>State snapshots</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>council-of-rivals.ts</code></td>
+<td>Multi-model consensus</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>concurrent-execution.ts</code></td>
+<td>Parallel tasks</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>structure-from-chaos.ts</code></td>
+<td>Document synthesis</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>sentinel-agents.ts</code></td>
+<td>Background agents</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>flash-facts.ts</code></td>
+<td>Quick facts/memory</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>liquid-interface.ts</code></td>
+<td>Dynamic UI</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>reality-engine.ts</code></td>
+<td>Reality simulation</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>security-signals.ts</code></td>
+<td>Security indicators</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>policy-framework.ts</code></td>
+<td>Cato policies</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>derivation-history.ts</code></td>
+<td>Response derivation</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>enhanced-collaboration.ts</code></td>
+<td>Real-time collab</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>file-conversion.ts</code></td>
+<td>File processing</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>ideas.ts</code></td>
+<td>Idea capture</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>artifact-engine.ts</code></td>
+<td>Code generation</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>analytics.ts</code></td>
+<td>Usage analytics</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>settings.ts</code></td>
+<td>User settings</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>my-rules.ts</code></td>
+<td>Personal rules</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+<tr>
+<td><code>shadow-testing.ts</code></td>
+<td>A/B testing</td>
+<td>❌ <strong>MISSING</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Summary</strong>: 28 of 30 handlers have NO consumer access</p>
+<hr />
+<h2 id="implementation-plan">Implementation Plan</h2>
+<h3 id="architecture-auto-mode-vs-advanced-mode">Architecture: Auto Mode vs Advanced Mode</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    CONSUMER EXPERIENCE                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │                   AUTO MODE (Default)                │   │
+│  │                                                       │   │
+│  │  • Clean, simple chat interface                      │   │
+│  │  • Cato handles all decisions automatically          │   │
+│  │  • Model selection: automatic                        │   │
+│  │  • Domain detection: automatic                       │   │
+│  │  • Cost optimization: automatic                      │   │
+│  │  • Hidden complexity, delightful experience          │   │
+│  │                                                       │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                  │
+│                    [Advanced Mode Toggle]                    │
+│                           │                                  │
+│                           ▼                                  │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │                  ADVANCED MODE                       │   │
+│  │                                                       │   │
+│  │  • Model selection visible                           │   │
+│  │  • Brain plan viewer                                 │   │
+│  │  • Cost/token display                                │   │
+│  │  • Domain mode selection                             │   │
+│  │  • Governor controls                                 │   │
+│  │  • Analytics dashboard                               │   │
+│  │  • Time travel controls                              │   │
+│  │  • Concurrent execution panel                        │   │
+│  │                                                       │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="phase-1-core-infrastructure-week-1">Phase 1: Core Infrastructure (Week 1)</h3>
+<h4 id="project-structure-expansion">1.1 Project Structure Expansion</h4>
+<pre><code>apps/thinktank/
+├── app/
+│   ├── (chat)/
+│   │   ├── layout.tsx          # Chat layout with sidebar
+│   │   ├── page.tsx            # Main chat interface
+│   │   └── [conversationId]/
+│   │       └── page.tsx        # Specific conversation
+│   ├── settings/
+│   │   └── page.tsx            # User settings
+│   ├── rules/
+│   │   └── page.tsx            # My Rules
+│   ├── history/
+│   │   └── page.tsx            # Full history
+│   ├── artifacts/
+│   │   └── page.tsx            # Generated artifacts
+│   └── profile/
+│       └── page.tsx            # User profile
+├── components/
+│   ├── chat/
+│   │   ├── ChatInterface.tsx
+│   │   ├── MessageBubble.tsx
+│   │   ├── InputArea.tsx
+│   │   ├── ConversationList.tsx
+│   │   └── StreamingIndicator.tsx
+│   ├── advanced/
+│   │   ├── AdvancedModeToggle.tsx
+│   │   ├── BrainPlanViewer.tsx
+│   │   ├── ModelSelector.tsx
+│   │   ├── DomainModeIndicator.tsx
+│   │   ├── CostDisplay.tsx
+│   │   └── GovernorStatus.tsx
+│   ├── ui/                     # shadcn/ui components
+│   │   └── [all components]
+│   └── layout/
+│       ├── Sidebar.tsx
+│       ├── Header.tsx
+│       └── MobileNav.tsx
+├── lib/
+│   ├── api/
+│   │   ├── client.ts
+│   │   ├── chat.ts
+│   │   ├── settings.ts
+│   │   ├── rules.ts
+│   │   ├── models.ts
+│   │   ├── analytics.ts
+│   │   ├── artifacts.ts
+│   │   ├── brain-plan.ts
+│   │   ├── domain-modes.ts
+│   │   └── governor.ts
+│   ├── hooks/
+│   │   ├── useAdvancedMode.ts
+│   │   ├── useConversation.ts
+│   │   ├── useModels.ts
+│   │   ├── useSettings.ts
+│   │   └── useRules.ts
+│   └── stores/
+│       ├── conversation-store.ts
+│       ├── settings-store.ts
+│       └── ui-store.ts
+└── styles/
+    └── globals.css</code></pre>
+<h4 id="api-client-expansion">1.2 API Client Expansion</h4>
+<ul>
+<li>Add all 30 API service modules</li>
+<li>Implement proper TypeScript types</li>
+<li>Add caching with TanStack Query</li>
+<li>Add optimistic updates</li>
+</ul>
+<h4 id="state-management">1.3 State Management</h4>
+<ul>
+<li>Zustand stores for UI state</li>
+<li>TanStack Query for server state</li>
+<li>Persist advanced mode preference</li>
+</ul>
+<h3 id="phase-2-auto-mode-enhancement-week-2">Phase 2: Auto Mode Enhancement (Week 2)</h3>
+<h4 id="enhanced-chat-interface">2.1 Enhanced Chat Interface</h4>
+<ul>
+<li>Polished message bubbles with markdown</li>
+<li>Code syntax highlighting</li>
+<li>Image/file preview</li>
+<li>Typing indicators with personality</li>
+<li>Smooth animations (Framer Motion)</li>
+</ul>
+<h4 id="smart-sidebar">2.2 Smart Sidebar</h4>
+<ul>
+<li>Conversation grouping (Today, Yesterday, Last Week, etc.)</li>
+<li>Search conversations</li>
+<li>Favorites</li>
+<li>Quick actions</li>
+</ul>
+<h4 id="delight-integration">2.3 Delight Integration</h4>
+<ul>
+<li>Personality messages from Cato</li>
+<li>Achievement notifications</li>
+<li>Easter egg triggers</li>
+<li>Sound effects (optional)</li>
+</ul>
+<h4 id="auto-behaviors">2.4 Auto-Behaviors</h4>
+<ul>
+<li>Automatic domain detection (visual indicator)</li>
+<li>Automatic model selection (subtle badge)</li>
+<li>Cost optimization running silently</li>
+<li>Governor decisions invisible</li>
+</ul>
+<h3 id="phase-3-advanced-mode-week-3">Phase 3: Advanced Mode (Week 3)</h3>
+<h4 id="advanced-mode-toggle">3.1 Advanced Mode Toggle</h4>
+<ul>
+<li>Toggle button in header</li>
+<li>Smooth transition animations</li>
+<li>Persist preference</li>
+<li>Keyboard shortcut (⌘+Shift+A)</li>
+</ul>
+<h4 id="brain-plan-viewer">3.2 Brain Plan Viewer</h4>
+<ul>
+<li>Show AI’s execution plan</li>
+<li>Step-by-step progress</li>
+<li>Model selection reasoning</li>
+<li>Time estimates</li>
+</ul>
+<h4 id="model-selector">3.3 Model Selector</h4>
+<ul>
+<li>Model picker dropdown</li>
+<li>Model capabilities display</li>
+<li>Cost comparison</li>
+<li>Performance metrics</li>
+</ul>
+<h4 id="costgovernor-panel">3.4 Cost/Governor Panel</h4>
+<ul>
+<li>Real-time cost tracking</li>
+<li>Token usage</li>
+<li>Governor decisions</li>
+<li>Savings visualization</li>
+</ul>
+<h4 id="domain-mode-controls">3.5 Domain Mode Controls</h4>
+<ul>
+<li>Manual domain selection</li>
+<li>Domain confidence display</li>
+<li>Subspecialty drilling</li>
+<li>Model proficiency view</li>
+</ul>
+<h3 id="phase-4-feature-pages-week-4">Phase 4: Feature Pages (Week 4)</h3>
+<h4 id="settings-page">4.1 Settings Page</h4>
+<ul>
+<li>Profile settings</li>
+<li>Notification preferences</li>
+<li>Personality mode selection</li>
+<li>Feature toggles</li>
+<li>Privacy controls</li>
+<li>Data export</li>
+</ul>
+<h4 id="my-rules-page">4.2 My Rules Page</h4>
+<ul>
+<li>View active rules</li>
+<li>Add custom rules</li>
+<li>Browse presets</li>
+<li>Toggle rules on/off</li>
+<li>Rule effectiveness stats</li>
+</ul>
+<h4 id="history-page">4.3 History Page</h4>
+<ul>
+<li>Full conversation history</li>
+<li>Advanced search/filter</li>
+<li>Date range picker</li>
+<li>Export conversations</li>
+<li>Bulk actions</li>
+</ul>
+<h4 id="artifacts-page">4.4 Artifacts Page</h4>
+<ul>
+<li>Generated code/documents</li>
+<li>Preview artifacts</li>
+<li>Download/export</li>
+<li>Version history</li>
+</ul>
+<h4 id="profile-page">4.5 Profile Page</h4>
+<ul>
+<li>Account details</li>
+<li>Subscription tier</li>
+<li>Usage statistics</li>
+<li>API keys (if applicable)</li>
+</ul>
+<h3 id="phase-5-magic-carpet-integration-week-5">Phase 5: Magic Carpet Integration (Week 5)</h3>
+<h4 id="spatial-glass-effects">5.1 Spatial Glass Effects</h4>
+<ul>
+<li>Glassmorphism cards</li>
+<li>Depth layers</li>
+<li>Glow effects</li>
+</ul>
+<h4 id="reality-scrubber">5.2 Reality Scrubber</h4>
+<ul>
+<li>Timeline navigation</li>
+<li>State snapshots</li>
+<li>Playback controls</li>
+</ul>
+<h4 id="pre-cognition-suggestions">5.3 Pre-Cognition Suggestions</h4>
+<ul>
+<li>Predictive actions</li>
+<li>Quick suggestions</li>
+<li>Confidence indicators</li>
+</ul>
+<h4 id="ai-presence-indicator">5.4 AI Presence Indicator</h4>
+<ul>
+<li>Emotional state</li>
+<li>Thinking animation</li>
+<li>Confidence display</li>
+</ul>
+<h3 id="phase-6-polish-performance-week-6">Phase 6: Polish &amp; Performance (Week 6)</h3>
+<h4 id="performance">6.1 Performance</h4>
+<ul>
+<li>Code splitting</li>
+<li>Lazy loading</li>
+<li>Image optimization</li>
+<li>Service worker</li>
+</ul>
+<h4 id="accessibility">6.2 Accessibility</h4>
+<ul>
+<li>Keyboard navigation</li>
+<li>Screen reader support</li>
+<li>Focus management</li>
+<li>ARIA labels</li>
+</ul>
+<h4 id="mobile-experience">6.3 Mobile Experience</h4>
+<ul>
+<li>Responsive design</li>
+<li>Touch gestures</li>
+<li>Mobile-first components</li>
+<li>PWA support</li>
+</ul>
+<h4 id="error-handling">6.4 Error Handling</h4>
+<ul>
+<li>Graceful degradation</li>
+<li>Retry mechanisms</li>
+<li>Offline support</li>
+<li>Error boundaries</li>
+</ul>
+<hr />
+<h2 id="uiux-requirements">UI/UX Requirements</h2>
+<h3 id="design-principles">Design Principles</h3>
+<ol type="1">
+<li><strong>Simplicity First</strong>: Auto mode is clean, uncluttered</li>
+<li><strong>Progressive Disclosure</strong>: Advanced features revealed on demand</li>
+<li><strong>Delightful</strong>: Personality, animations, surprises</li>
+<li><strong>Fast</strong>: Instant feedback, optimistic updates</li>
+<li><strong>Accessible</strong>: Works for everyone</li>
+</ol>
+<h3 id="key-interactions">Key Interactions</h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Auto Mode</th>
+<th>Advanced Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Send message</td>
+<td>Just type and send</td>
+<td>Same + model selection</td>
+</tr>
+<tr>
+<td>New conversation</td>
+<td>One click</td>
+<td>Same + domain preset</td>
+</tr>
+<tr>
+<td>View history</td>
+<td>Basic list</td>
+<td>Full history page</td>
+</tr>
+<tr>
+<td>Settings</td>
+<td>Minimal</td>
+<td>Full settings page</td>
+</tr>
+<tr>
+<td>See costs</td>
+<td>Hidden</td>
+<td>Real-time display</td>
+</tr>
+<tr>
+<td>Model selection</td>
+<td>Cato decides</td>
+<td>User can override</td>
+</tr>
+</tbody>
+</table>
+<h3 id="visual-language">Visual Language</h3>
+<ul>
+<li><strong>Colors</strong>: Purple gradient (primary), Dark mode default</li>
+<li><strong>Typography</strong>: Inter (body), JetBrains Mono (code)</li>
+<li><strong>Animations</strong>: Subtle, purposeful, 200-300ms</li>
+<li><strong>Icons</strong>: Lucide icons, consistent sizing</li>
+<li><strong>Spacing</strong>: 8px grid system</li>
+</ul>
+<hr />
+<h2 id="api-integration-priority">API Integration Priority</h2>
+<h3 id="tier-1---must-have-week-1-2">Tier 1 - Must Have (Week 1-2)</h3>
+<ol type="1">
+<li><code>conversations.ts</code> - Full integration ✅</li>
+<li><code>settings.ts</code> - User preferences</li>
+<li><code>my-rules.ts</code> - Personal rules</li>
+<li><code>models.ts</code> - Model listing</li>
+<li><code>domain-modes.ts</code> - Domain detection</li>
+</ol>
+<h3 id="tier-2---should-have-week-3-4">Tier 2 - Should Have (Week 3-4)</h3>
+<ol start="6" type="1">
+<li><code>brain-plan.ts</code> - Plan visualization</li>
+<li><code>economic-governor.ts</code> - Cost tracking</li>
+<li><code>analytics.ts</code> - Usage stats</li>
+<li><code>ratings.ts</code> - Message feedback</li>
+<li><code>artifact-engine.ts</code> - Artifacts</li>
+</ol>
+<h3 id="tier-3---nice-to-have-week-5-6">Tier 3 - Nice to Have (Week 5-6)</h3>
+<ol start="11" type="1">
+<li><code>time-travel.ts</code> - State snapshots</li>
+<li><code>concurrent-execution.ts</code> - Parallel tasks</li>
+<li><code>enhanced-collaboration.ts</code> - Collab features</li>
+<li><code>flash-facts.ts</code> - Quick memory</li>
+<li>Remaining handlers</li>
+</ol>
+<hr />
+<h2 id="success-metrics">Success Metrics</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Time to first message</td>
+<td>&lt; 1 second</td>
+</tr>
+<tr>
+<td>Message send latency</td>
+<td>&lt; 500ms perceived</td>
+</tr>
+<tr>
+<td>Page load time</td>
+<td>&lt; 2 seconds</td>
+</tr>
+<tr>
+<td>Lighthouse score</td>
+<td>&gt; 90</td>
+</tr>
+<tr>
+<td>User satisfaction</td>
+<td>&gt; 4.5/5</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="risk-assessment">Risk Assessment</h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scope creep</td>
+<td>Strict phase boundaries</td>
+</tr>
+<tr>
+<td>Performance issues</td>
+<td>Incremental optimization</td>
+</tr>
+<tr>
+<td>API inconsistencies</td>
+<td>Strong typing, error handling</td>
+</tr>
+<tr>
+<td>Mobile experience</td>
+<td>Mobile-first development</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="immediate-next-steps">Immediate Next Steps</h2>
+<ol type="1">
+<li><strong>Set up project structure</strong> - Create all directories and base files</li>
+<li><strong>Install dependencies</strong> - Add required packages</li>
+<li><strong>Create UI components</strong> - shadcn/ui setup</li>
+<li><strong>Implement API services</strong> - All 30 handlers</li>
+<li><strong>Build Auto Mode chat</strong> - Enhanced chat interface</li>
+<li><strong>Add Advanced Mode toggle</strong> - Feature flag system</li>
+<li><strong>Implement settings</strong> - User preferences</li>
+<li><strong>Add My Rules</strong> - Personal customization</li>
+<li><strong>Polish and test</strong> - QA everything</li>
+<li><strong>Deploy</strong> - Production release</li>
+</ol>
+<hr />
+<p><strong>This document is the source of truth for Think Tank consumer app implementation.</strong></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

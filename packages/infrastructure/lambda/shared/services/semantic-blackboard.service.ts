@@ -774,11 +774,62 @@ class SemanticBlackboardService {
 
   private async scheduleGroupResolution(groupId: string, delaySeconds: number): Promise<void> {
     if (this.redis) {
-      // Use Redis delayed queue
+      // Use Redis delayed queue for immediate processing
       const executeAt = Date.now() + delaySeconds * 1000;
       await this.redis.zadd('blackboard:group_resolution_queue', executeAt, groupId);
     }
-    // In production, this would also be handled by EventBridge or similar
+    
+    // Also schedule via EventBridge for reliable execution
+    await this.scheduleViaEventBridge(groupId, delaySeconds);
+  }
+  
+  /**
+   * Schedule group resolution via EventBridge Scheduler for reliable execution
+   */
+  private async scheduleViaEventBridge(groupId: string, delaySeconds: number): Promise<void> {
+    const schedulerArn = process.env.EVENTBRIDGE_SCHEDULER_ARN;
+    const targetLambdaArn = process.env.BLACKBOARD_RESOLVER_LAMBDA_ARN;
+    
+    if (!schedulerArn && !targetLambdaArn) {
+      logger.debug('EventBridge scheduler not configured, relying on Redis queue only');
+      return;
+    }
+    
+    try {
+      const { SchedulerClient, CreateScheduleCommand } = await import('@aws-sdk/client-scheduler');
+      const scheduler = new SchedulerClient({ region: process.env.AWS_REGION || 'us-east-1' });
+      
+      const scheduleTime = new Date(Date.now() + delaySeconds * 1000);
+      const scheduleName = `blackboard-resolve-${groupId.replace(/-/g, '')}`.substring(0, 64);
+      
+      const command = new CreateScheduleCommand({
+        Name: scheduleName,
+        GroupName: process.env.EVENTBRIDGE_SCHEDULE_GROUP || 'radiant-blackboard',
+        ScheduleExpression: `at(${scheduleTime.toISOString().split('.')[0]})`,
+        ScheduleExpressionTimezone: 'UTC',
+        FlexibleTimeWindow: { Mode: 'OFF' },
+        Target: {
+          Arn: targetLambdaArn || process.env.BLACKBOARD_RESOLVER_LAMBDA_ARN,
+          RoleArn: process.env.EVENTBRIDGE_SCHEDULER_ROLE_ARN,
+          Input: JSON.stringify({
+            action: 'resolve_group',
+            groupId,
+            scheduledAt: new Date().toISOString(),
+          }),
+        },
+        ActionAfterCompletion: 'DELETE',
+      });
+      
+      await scheduler.send(command);
+      logger.debug('Scheduled group resolution via EventBridge', { groupId, scheduleTime });
+      
+    } catch (error) {
+      // Don't fail the operation if EventBridge scheduling fails - Redis queue is the fallback
+      logger.warn('Failed to schedule via EventBridge, using Redis queue only', { 
+        groupId, 
+        error: error instanceof Error ? error.message : 'Unknown' 
+      });
+    }
   }
 
   private async createHitlDecision(params: AskUserParams): Promise<string> {

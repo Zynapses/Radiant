@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CURATOR USER GUIDE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>CURATOR USER GUIDE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/CURATOR-USER-GUIDE.md</div>
+  </div>
+  
+  <h1 id="radiant-curator-user-guide">RADIANT Curator User Guide</h1>
+<blockquote>
+<p>Version 2.2.0 | January 2026</p>
+<p><strong>For</strong>: Knowledge Managers, Subject Matter Experts, Knowledge Contributors</p>
+</blockquote>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-what-is-curator">What is Curator?</a></li>
+<li><a href="#2-getting-started">Getting Started</a></li>
+<li><a href="#3-uploading-documents">Uploading Documents</a></li>
+<li><a href="#4-zero-copy-data-connectors">Zero-Copy Data Connectors</a></li>
+<li><a href="#5-the-entrance-exam-verification">The Entrance Exam (Verification)</a></li>
+<li><a href="#6-resolving-conflicts">Resolving Conflicts</a></li>
+<li><a href="#7-exploring-the-knowledge-graph">Exploring the Knowledge Graph</a></li>
+<li><a href="#8-organizing-with-domains">Organizing with Domains</a></li>
+<li><a href="#9-correcting-the-ai-overrides">Correcting the AI (Overrides)</a></li>
+<li><a href="#10-understanding-chain-of-custody">Understanding Chain of Custody</a></li>
+<li><a href="#11-tips--best-practices">Tips &amp; Best Practices</a></li>
+<li><a href="#12-troubleshooting">Troubleshooting</a></li>
+</ol>
+<hr />
+<h2 id="what-is-curator">1. What is Curator?</h2>
+<h3 id="teaching-your-ai">Teaching Your AI</h3>
+<p>Curator is where you <strong>teach</strong> your organization’s AI. Instead of hoping the AI “figures out” your documents, you actively guide it—uploading knowledge, verifying its understanding, and correcting mistakes.</p>
+<p>Think of it like onboarding a new employee: 1. <strong>Give them the manuals</strong> (upload documents) 2. <strong>Quiz them</strong> (Entrance Exam) 3. <strong>Correct mistakes</strong> (Overrides) 4. <strong>Document everything</strong> (Chain of Custody)</p>
+<h3 id="what-you-can-do">What You Can Do</h3>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>📄 <strong>Upload Documents</strong></td>
+<td>Drag-and-drop PDFs, manuals, spreadsheets</td>
+</tr>
+<tr>
+<td>✅ <strong>Verify Knowledge</strong></td>
+<td>Confirm the AI understood correctly</td>
+</tr>
+<tr>
+<td>✏️ <strong>Correct Mistakes</strong></td>
+<td>Fix anything the AI got wrong</td>
+</tr>
+<tr>
+<td>🔍 <strong>Explore the Graph</strong></td>
+<td>See how concepts connect</td>
+</tr>
+<tr>
+<td>📁 <strong>Organize by Domain</strong></td>
+<td>Group knowledge into categories</td>
+</tr>
+</tbody>
+</table>
+<h3 id="your-role">Your Role</h3>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 72%" />
+</colgroup>
+<thead>
+<tr>
+<th>Role</th>
+<th>What You Can Do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Knowledge Manager</strong></td>
+<td>Everything: upload, verify, correct, organize</td>
+</tr>
+<tr>
+<td><strong>Contributor</strong></td>
+<td>Upload documents and submit for verification</td>
+</tr>
+<tr>
+<td><strong>Viewer</strong></td>
+<td>Browse the knowledge graph (read-only)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="getting-started">2. Getting Started</h2>
+<h3 id="logging-in">Logging In</h3>
+<ol type="1">
+<li>Open Curator from your Think Tank dashboard (or go directly to your Curator URL)</li>
+<li>Sign in with your company credentials</li>
+<li>You’ll see the main dashboard with quick actions</li>
+</ol>
+<h3 id="the-dashboard">The Dashboard</h3>
+<p>When you first open Curator, you’ll see:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  📊 DASHBOARD                                                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   Knowledge Nodes    Documents      Verified       Pending       │
+│      12,847           234           11,203          1,644        │
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐           │
+│  │ 📤 Upload    │  │ ✅ Verify    │  │ 🔍 Graph     │           │
+│  │ Documents    │  │ Knowledge    │  │ Explorer     │           │
+│  └──────────────┘  └──────────────┘  └──────────────┘           │
+│                                                                  │
+│  ⚠️ 1,644 items awaiting verification → Review Now              │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="your-first-steps">Your First Steps</h3>
+<ol type="1">
+<li><strong>Create a Domain</strong> - Organize your knowledge (e.g., “Engineering”, “Safety”)</li>
+<li><strong>Upload Documents</strong> - Drag-and-drop your manuals and specs</li>
+<li><strong>Verify Knowledge</strong> - Confirm the AI understood correctly</li>
+<li><strong>Explore the Graph</strong> - See how concepts connect</li>
+</ol>
+<hr />
+<h2 id="uploading-documents">3. Uploading Documents</h2>
+<h3 id="supported-file-types">Supported File Types</h3>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Extensions</th>
+<th>Max Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PDF Documents</td>
+<td>.pdf</td>
+<td>50 MB</td>
+</tr>
+<tr>
+<td>Word Documents</td>
+<td>.doc, .docx</td>
+<td>25 MB</td>
+</tr>
+<tr>
+<td>Plain Text</td>
+<td>.txt</td>
+<td>10 MB</td>
+</tr>
+<tr>
+<td>Spreadsheets</td>
+<td>.csv, .xlsx</td>
+<td>25 MB</td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-to-upload">How to Upload</h3>
+<ol type="1">
+<li>Click <strong>“Upload Documents”</strong> from the dashboard</li>
+<li>Select a <strong>Domain</strong> (category) for your documents</li>
+<li><strong>Drag-and-drop</strong> files or click to browse</li>
+<li>Wait for processing (you’ll see a progress bar)</li>
+<li>Documents appear in the <strong>Verification Queue</strong></li>
+</ol>
+<h3 id="what-happens-after-upload">What Happens After Upload?</h3>
+<pre><code>Your Document → AI Reads It → Creates Knowledge Nodes → Needs Your Verification
+     📄              🤖                📦                      ✅</code></pre>
+<p>The AI extracts facts, procedures, and entities from your documents. But it doesn’t trust itself—it puts everything in a queue for YOU to verify.</p>
+<h3 id="tips-for-better-results">Tips for Better Results</h3>
+<ul>
+<li><strong>Use clear, structured documents</strong> - Headings and bullet points help the AI</li>
+<li><strong>One topic per document</strong> - Don’t mix unrelated content</li>
+<li><strong>Include context</strong> - “Pump 302” is clearer than just “the pump”</li>
+</ul>
+<hr />
+<h2 id="zero-copy-data-connectors">4. Zero-Copy Data Connectors</h2>
+<h3 id="what-is-zero-copy">What is Zero-Copy?</h3>
+<p>Instead of uploading files, you can <strong>connect external data sources</strong> directly. Curator creates lightweight “stub” nodes that point to the original files—the files stay where they are.</p>
+<p><strong>Benefits:</strong> - 📁 Files stay in their original location (S3, SharePoint, etc.) - 🔄 Automatic sync when files change - 💾 No duplicate storage costs - 🔐 Original security permissions preserved</p>
+<h3 id="supported-connectors">Supported Connectors</h3>
+<table>
+<thead>
+<tr>
+<th>Connector</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Amazon S3</strong></td>
+<td>Connect to S3 buckets</td>
+</tr>
+<tr>
+<td><strong>Azure Blob</strong></td>
+<td>Connect to Azure storage containers</td>
+</tr>
+<tr>
+<td><strong>SharePoint</strong></td>
+<td>Connect to SharePoint document libraries</td>
+</tr>
+<tr>
+<td><strong>Google Drive</strong></td>
+<td>Connect to Google Drive folders</td>
+</tr>
+<tr>
+<td><strong>Snowflake</strong></td>
+<td>Connect to Snowflake data warehouse</td>
+</tr>
+<tr>
+<td><strong>Confluence</strong></td>
+<td>Connect to Confluence wiki spaces</td>
+</tr>
+</tbody>
+</table>
+<h3 id="adding-a-connector">Adding a Connector</h3>
+<ol type="1">
+<li>Go to <strong>“Ingest Documents”</strong> from the sidebar</li>
+<li>Find <strong>“Zero-Copy Sources”</strong> in the left panel</li>
+<li>Click <strong>“+ Add”</strong> to open the wizard</li>
+</ol>
+<p><strong>Step 1: Select Source Type</strong></p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  📡 Connect Data Source                                          │
+├─────────────────────────────────────────────────────────────────┤
+│  Select source type:                                             │
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │ ☁️ Amazon S3 │  │ ☁️ Azure     │  │ 📁 SharePoint│          │
+│  │              │  │    Blob      │  │              │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │ 🗂️ Google   │  │ ❄️ Snowflake │  │ 📝 Confluence│          │
+│  │    Drive     │  │              │  │              │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<p><strong>Step 2: Configure Connection</strong> - Enter a name (e.g., “Production Manuals”) - Provide connection details (bucket name, URL, etc.) - Select target domain (optional)</p>
+<p><strong>Step 3: Confirm &amp; Connect</strong> - Review settings - Click <strong>“Connect Source”</strong> - Curator begins indexing metadata</p>
+<h3 id="managing-connectors">Managing Connectors</h3>
+<p>Connected sources appear in the sidebar with status indicators:</p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🟢 Connected</td>
+<td>Ready, synced recently</td>
+</tr>
+<tr>
+<td>🔄 Syncing</td>
+<td>Currently updating metadata</td>
+</tr>
+<tr>
+<td>🔴 Error</td>
+<td>Connection issue - check credentials</td>
+</tr>
+</tbody>
+</table>
+<p>Click the <strong>refresh icon</strong> (🔄) to manually trigger a sync.</p>
+<h3 id="stub-nodes">Stub Nodes</h3>
+<p>When you connect a data source, Curator creates <strong>stub nodes</strong>—lightweight pointers to files. When someone asks about content in those files, Curator fetches the full content on-demand.</p>
+<pre><code>Stub Node: &quot;Equipment Manual v3.pdf&quot;
+├── Location: s3://company-docs/manuals/equip_v3.pdf
+├── Last Modified: Jan 24, 2026
+├── Size: 2.4 MB
+└── Status: Ready for expansion</code></pre>
+<hr />
+<h2 id="the-entrance-exam-verification">5. The Entrance Exam (Verification)</h2>
+<h3 id="what-is-the-entrance-exam">What is the Entrance Exam?</h3>
+<p>Before the AI can use knowledge from your documents, it has to prove it understood correctly. This is the <strong>Entrance Exam</strong>—the AI presents what it learned through different types of quiz cards, and you confirm or correct it.</p>
+<h3 id="three-types-of-quiz-cards">Three Types of Quiz Cards</h3>
+<p>The AI presents verification questions in three formats:</p>
+<h4 id="fact-check">1. Fact Check ✅</h4>
+<p>The AI shows you something it extracted and asks if it’s correct.</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  ✅ FACT CHECK                                                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  🤖 I extracted:                                                 │
+│                                                                  │
+│     &quot;The maximum operating pressure for Model X is 4,500 PSI&quot;   │
+│                                                                  │
+│  Is this correct?                                                │
+│                                                                  │
+│  Source: Pump_Manual.pdf, Page 47                               │
+│                                                                  │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐                 │
+│  │ ✅ Yes,    │  │ ✏️ Correct │  │ ❌ Reject  │                 │
+│  │ Correct    │  │ It         │  │ Entirely   │                 │
+│  └────────────┘  └────────────┘  └────────────┘                 │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h4 id="logic-check">2. Logic Check 🔀</h4>
+<p>The AI shows you a relationship it <strong>inferred</strong> (not directly stated in the document).</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  🔀 LOGIC CHECK                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  🤖 I inferred:                                                  │
+│                                                                  │
+│     &quot;Pump 302 requires Filter Type A because it operates        │
+│      in high-humidity conditions&quot;                                │
+│                                                                  │
+│  Is this relationship correct?                                   │
+│                                                                  │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐                 │
+│  │ ✅ Yes,    │  │ ✏️ Correct │  │ ❌ Reject  │                 │
+│  │ Valid      │  │ It         │  │ Entirely   │                 │
+│  └────────────┘  └────────────┘  └────────────┘                 │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h4 id="ambiguity">3. Ambiguity ❓</h4>
+<p>The AI found <strong>conflicting information</strong> and needs you to pick the correct one.</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  ❓ AMBIGUITY                                                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  🤖 I found conflicting information:                             │
+│                                                                  │
+│  ┌─────────────────────────────────────────┐                    │
+│  │ 🟡 Option A:                            │                    │
+│  │ &quot;Replace filter every 30 days&quot;          │                    │
+│  │ Source: Maintenance_Manual_2023.pdf     │                    │
+│  └─────────────────────────────────────────┘                    │
+│                                                                  │
+│  ┌─────────────────────────────────────────┐                    │
+│  │ 🔵 Option B:                            │                    │
+│  │ &quot;Replace filter every 15 days&quot;          │                    │
+│  │ Source: Safety_Update_2024.pdf          │                    │
+│  └─────────────────────────────────────────┘                    │
+│                                                                  │
+│  Which is correct?                                               │
+│                                                                  │
+│  ┌────────────────┐  ┌────────────────┐                         │
+│  │ 🟡 Option A    │  │ 🔵 Option B    │                         │
+│  └────────────────┘  └────────────────┘                         │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="the-correct-it-feature">The “Correct It” Feature</h3>
+<p>When the AI is close but not quite right, use <strong>“Correct It”</strong> instead of rejecting:</p>
+<ol type="1">
+<li>Click <strong>“Correct It”</strong></li>
+<li>Enter the correct value</li>
+<li>Provide a reason (required for audit trail)</li>
+<li>Click <strong>“Save Correction”</strong></li>
+</ol>
+<p>This automatically creates a <strong>Golden Rule</strong> so the AI never makes the same mistake again.</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  ✏️ CORRECT THIS FACT                                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Original (AI extracted):                                        │
+│  ̶&quot;̶R̶e̶p̶l̶a̶c̶e̶ ̶f̶i̶l̶t̶e̶r̶ ̶e̶v̶e̶r̶y̶ ̶3̶0̶ ̶d̶a̶y̶s̶&quot;̶                                 │
+│                                                                  │
+│  Corrected Value:                                                │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ Replace filter every 15 days in Mexico City plant       │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  Reason (required):                                              │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ Field testing showed faster degradation due to humidity  │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  ⚠️ This will create a Golden Rule override.                    │
+│                                                                  │
+│                      [Cancel]  [Save Correction]                 │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="filtering-the-verification-queue">Filtering the Verification Queue</h3>
+<p>Use the toolbar filters to focus on specific items:</p>
+<table>
+<thead>
+<tr>
+<th>Filter</th>
+<th>Shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>All</strong></td>
+<td>Everything in the queue</td>
+</tr>
+<tr>
+<td><strong>Pending</strong></td>
+<td>Items waiting for review</td>
+</tr>
+<tr>
+<td><strong>Verified</strong></td>
+<td>Items you’ve already approved</td>
+</tr>
+<tr>
+<td><strong>Rejected</strong></td>
+<td>Items you’ve rejected</td>
+</tr>
+</tbody>
+</table>
+<p>You can also filter by <strong>card type</strong>: - <strong>Fact Check</strong> - Direct extractions - <strong>Logic Check</strong> - Inferred relationships - <strong>Ambiguity</strong> - Conflicting information</p>
+<h3 id="confidence-colors">Confidence Colors</h3>
+<table>
+<thead>
+<tr>
+<th>Color</th>
+<th>Confidence</th>
+<th>What to Do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🟢 Green</td>
+<td>90-100%</td>
+<td>AI is confident. Usually safe to approve.</td>
+</tr>
+<tr>
+<td>🟡 Yellow</td>
+<td>70-89%</td>
+<td>AI is uncertain. Review carefully.</td>
+</tr>
+<tr>
+<td>🔴 Red</td>
+<td>Below 70%</td>
+<td>AI is guessing. Expert review required.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="view-source">View Source</h3>
+<p>Every verification item includes a <strong>“View Source”</strong> button that shows: - Original document name - Page number where the fact was found - Highlighted text in context</p>
+<hr />
+<h2 id="resolving-conflicts">6. Resolving Conflicts</h2>
+<h3 id="what-is-the-conflict-queue">What is the Conflict Queue?</h3>
+<p>When the AI finds <strong>contradictory information</strong> across documents that it can’t resolve on its own, it adds them to the <strong>Conflict Queue</strong> for human resolution.</p>
+<h3 id="accessing-the-conflict-queue">Accessing the Conflict Queue</h3>
+<ol type="1">
+<li>Click <strong>“Conflict Queue”</strong> in the sidebar</li>
+<li>A red badge shows how many conflicts need attention</li>
+<li>Conflicts are sorted by priority (critical first)</li>
+</ol>
+<h3 id="conflict-types">Conflict Types</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Icon</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Contradiction</strong></td>
+<td>❌</td>
+<td>Two facts directly contradict each other</td>
+</tr>
+<tr>
+<td><strong>Overlap</strong></td>
+<td>🔀</td>
+<td>Same topic with different values</td>
+</tr>
+<tr>
+<td><strong>Temporal</strong></td>
+<td>⏰</td>
+<td>Older vs newer information conflict</td>
+</tr>
+<tr>
+<td><strong>Source Mismatch</strong></td>
+<td>⚠️</td>
+<td>Different sources say different things</td>
+</tr>
+</tbody>
+</table>
+<h3 id="resolving-a-conflict">Resolving a Conflict</h3>
+<ol type="1">
+<li>Select a conflict from the list</li>
+<li>Review the <strong>side-by-side comparison</strong>:</li>
+</ol>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  ⚖️ CONFLICT RESOLUTION                                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────────────┐  ┌─────────────────────┐               │
+│  │ 🟡 Version A        │  │ 🔵 Version B        │               │
+│  │                     │  │                     │               │
+│  │ Max pressure:       │  │ Max pressure:       │               │
+│  │ 4,500 PSI           │  │ 4,000 PSI           │               │
+│  │                     │  │                     │               │
+│  │ Source: Manual 2023 │  │ Source: Update 2024 │               │
+│  └─────────────────────┘  └─────────────────────┘               │
+│                                                                  │
+│  Resolution Reason (required):                                   │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ 2024 update reflects new safety standards                │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  Choose Resolution:                                              │
+│                                                                  │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐        │
+│  │ Keep A   │  │ Keep B   │  │ Merge    │  │ Defer    │        │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘        │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<ol start="3" type="1">
+<li>Choose a resolution:
+<ul>
+<li><strong>Keep A</strong> - Version A supersedes Version B</li>
+<li><strong>Keep B</strong> - Version B supersedes Version A</li>
+<li><strong>Merge</strong> - Combine information from both</li>
+<li><strong>Context Dependent</strong> - Both are valid in different contexts</li>
+<li><strong>Defer</strong> - Need more information, review later</li>
+</ul></li>
+<li>Enter a <strong>reason</strong> (required for audit trail)</li>
+<li>Click to apply the resolution</li>
+</ol>
+<h3 id="priority-levels">Priority Levels</h3>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Color</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Critical</strong></td>
+<td>🔴 Red</td>
+<td>Resolve immediately - safety/compliance</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td>🟡 Gold</td>
+<td>Resolve soon - affects operations</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td>🔵 Blue</td>
+<td>Resolve when convenient</td>
+</tr>
+<tr>
+<td><strong>Low</strong></td>
+<td>⚪ Gray</td>
+<td>Can wait</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="exploring-the-knowledge-graph">7. Exploring the Knowledge Graph</h2>
+<h3 id="what-is-the-knowledge-graph">What is the Knowledge Graph?</h3>
+<p>The Knowledge Graph is a visual map of everything your AI knows. Facts, procedures, and entities are shown as <strong>nodes</strong> (circles), connected by <strong>relationships</strong> (lines).</p>
+<pre><code>      ┌─────────┐
+      │ Pump 302│  (Entity - Bronze)
+      └────┬────┘
+           │ has_property
+           ▼
+    ┌──────────────┐
+    │ Max Pressure │  (Fact - Green)
+    │   4,500 PSI  │
+    └──────┬───────┘
+           │ supersedes
+           ▼
+    ┌──────────────┐
+    │ Old Pressure │  (Deprecated - Gray)
+    │   4,000 PSI  │
+    └──────────────┘</code></pre>
+<h3 id="node-types-what-youll-see">Node Types (What You’ll See)</h3>
+<table>
+<thead>
+<tr>
+<th>Color</th>
+<th>Type</th>
+<th>What It Represents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🟡 Gold</td>
+<td><strong>Concept</strong></td>
+<td>Abstract ideas or categories</td>
+</tr>
+<tr>
+<td>🟢 Green</td>
+<td><strong>Fact</strong></td>
+<td>Verifiable statements</td>
+</tr>
+<tr>
+<td>🔵 Blue</td>
+<td><strong>Procedure</strong></td>
+<td>Step-by-step processes</td>
+</tr>
+<tr>
+<td>🟤 Bronze</td>
+<td><strong>Entity</strong></td>
+<td>Physical objects or systems</td>
+</tr>
+<tr>
+<td>🟣 Purple</td>
+<td><strong>Rule</strong></td>
+<td>Constraints or requirements</td>
+</tr>
+</tbody>
+</table>
+<h3 id="navigating-the-graph">Navigating the Graph</h3>
+<ul>
+<li><strong>Zoom</strong>: Scroll or use +/- buttons</li>
+<li><strong>Pan</strong>: Click and drag the background</li>
+<li><strong>Select</strong>: Click any node to see details</li>
+<li><strong>Filter</strong>: Use the sidebar to show only certain types or domains</li>
+</ul>
+<h3 id="the-traceability-inspector">The Traceability Inspector</h3>
+<p>When you click a node, the <strong>Traceability Inspector</strong> panel opens showing complete provenance:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  🔍 TRACEABILITY INSPECTOR                      [🔒 God Mode]   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Content:                                                        │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ &quot;Maximum operating pressure is 4,500 PSI&quot;                │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  Type: Fact                 Status: ✅ Verified                 │
+│  Confidence: ████████░░ 85%                                     │
+│  Connections: 12 related nodes                                   │
+│                                                                  │
+│  ─────────────────────────────────────────────────────────      │
+│  📄 SOURCE DOCUMENT                                              │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ 📄 Pump_Manual_2024.pdf                                  │    │
+│  │    Page 47                              [View Source 🔗] │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  ─────────────────────────────────────────────────────────      │
+│  ✅ VERIFIED                                                     │
+│  👤 Chief Engineer Bob                                           │
+│  📅 Jan 24, 2026 at 11:15 AM                                    │
+│                                                                  │
+│  ─────────────────────────────────────────────────────────      │
+│                                                                  │
+│  ┌────────────────┐  ┌────────────┐  ┌────────────┐            │
+│  │ 👑 Force       │  │ 👁️ View    │  │ 📜 Audit   │            │
+│  │    Override    │  │    Source  │  │    Trail   │            │
+│  └────────────────┘  └────────────┘  └────────────┘            │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="inspector-features">Inspector Features</h3>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Force Override</strong></td>
+<td>Open “God Mode” to correct this fact</td>
+</tr>
+<tr>
+<td><strong>View Source</strong></td>
+<td>Jump to the original document and page</td>
+</tr>
+<tr>
+<td><strong>Audit Trail</strong></td>
+<td>View complete Chain of Custody history</td>
+</tr>
+</tbody>
+</table>
+<h3 id="overridden-nodes">Overridden Nodes</h3>
+<p>Nodes with active overrides show the <strong>“God Mode”</strong> badge and display both values:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  Content:                                                        │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ &quot;Replace filter every 30 days&quot;                           │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  🔒 Override Active:                                             │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ &quot;Replace filter every 15 days (Mexico City plant)&quot;       │    │
+│  │ Reason: High humidity degrades filters faster            │    │
+│  │ By: Safety Officer Jane • Jan 25, 2026                   │    │
+│  └─────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="organizing-with-domains">8. Organizing with Domains</h2>
+<h3 id="what-are-domains">What are Domains?</h3>
+<p>Domains are <strong>folders</strong> for your knowledge. They help organize thousands of facts into manageable categories.</p>
+<p><strong>Example Structure:</strong></p>
+<pre><code>📁 Engineering
+   📁 Hydraulics
+      📁 Pumps
+      📁 Valves
+   📁 Electrical
+      📁 Motors
+📁 Operations
+   📁 Maintenance
+   📁 Safety
+📁 Compliance</code></pre>
+<h3 id="creating-a-domain">Creating a Domain</h3>
+<ol type="1">
+<li>Go to <strong>“Domains”</strong> in the sidebar</li>
+<li>Click <strong>“+ New Domain”</strong></li>
+<li>Enter a name (e.g., “Hydraulics”)</li>
+<li>Optionally, select a parent domain</li>
+<li>Click <strong>“Create”</strong></li>
+</ol>
+<h3 id="domain-settings">Domain Settings</h3>
+<table>
+<colgroup>
+<col style="width: 39%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>Setting</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Auto-categorize</strong></td>
+<td>AI automatically assigns documents to this domain</td>
+</tr>
+<tr>
+<td><strong>Require Verification</strong></td>
+<td>All facts need human approval before use</td>
+</tr>
+<tr>
+<td><strong>Retention</strong></td>
+<td>Automatically archive old content after X days</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="correcting-the-ai-overrides">9. Correcting the AI (Overrides)</h2>
+<h3 id="when-should-you-override">When Should You Override?</h3>
+<ul>
+<li>📅 <strong>Outdated info</strong> - The manual is old, the real answer has changed</li>
+<li>🏭 <strong>Site-specific rules</strong> - “We do it differently at THIS location”</li>
+<li>❌ <strong>AI mistakes</strong> - The AI misunderstood something</li>
+<li>📜 <strong>Policy updates</strong> - New company policy supersedes old docs</li>
+</ul>
+<h3 id="how-to-override">How to Override</h3>
+<ol type="1">
+<li>Find the fact in the Knowledge Graph (or during Verification)</li>
+<li>Click the node to open the Traceability Inspector</li>
+<li>Click <strong>“Force Override”</strong> (the crown button 👑)</li>
+<li>Choose your <strong>Rule Type</strong></li>
+<li>Enter the <strong>correct value</strong> and <strong>justification</strong></li>
+<li>Set the <strong>priority level</strong></li>
+<li>Click <strong>“Apply Override”</strong></li>
+</ol>
+<h3 id="the-override-dialog-god-mode">The Override Dialog (“God Mode”)</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  👑 FORCE OVERRIDE                           &quot;God Mode&quot;          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Rule Type:                                                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │ 👑 Force     │  │ 🛡️ Conditional│  │ 🔗 Context   │          │
+│  │ Override     │  │              │  │ Dependent    │          │
+│  │ ────────────│  │ ────────────│  │ ────────────│          │
+│  │ Supersedes  │  │ Applies when │  │ Varies by   │          │
+│  │ ALL data    │  │ condition met│  │ context     │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│                                                                  │
+│  ┌───────────────────────┐  ┌───────────────────────┐          │
+│  │ When AI says:         │  │ Force this instead:   │          │
+│  │ ─────────────────────│  │ ─────────────────────│          │
+│  │ &quot;Replace filter every │  │ &quot;Replace filter every │          │
+│  │  30 days&quot;             │  │  15 days (Mexico City │          │
+│  │                       │  │  plant)&quot;              │          │
+│  └───────────────────────┘  └───────────────────────┘          │
+│                                                                  │
+│  Priority: ████████████████████████░░░░░░░░░░░░░░░░░ 85        │
+│            Low (1)          Medium (50)        Critical (100)   │
+│                                                                  │
+│  Justification (required):                                       │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ Field testing showed faster filter degradation due to    │    │
+│  │ humidity levels. Per Engineering approval MX-2026-004.   │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  Expiration: [None] ▼  (optional - leave empty for permanent)   │
+│                                                                  │
+│  🔒 Chain of Custody: This will create a cryptographically      │
+│     signed record for audit compliance.                          │
+│                                                                  │
+│                        [Cancel]  [👑 Apply Override]             │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="rule-types-explained">Rule Types Explained</h3>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 38%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr>
+<th>Type</th>
+<th>Icon</th>
+<th>When to Use</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Force Override</strong></td>
+<td>👑</td>
+<td>Always use my value, no exceptions</td>
+<td>“This pump’s max pressure is 4,000 PSI, period.”</td>
+</tr>
+<tr>
+<td><strong>Conditional</strong></td>
+<td>🛡️</td>
+<td>Use my value only when a condition is met</td>
+<td>“When location = Mexico City, replace filter every 15 days”</td>
+</tr>
+<tr>
+<td><strong>Context Dependent</strong></td>
+<td>🔗</td>
+<td>Value varies based on context</td>
+<td>“Pressure limit varies by altitude”</td>
+</tr>
+</tbody>
+</table>
+<h3 id="priority-slider">Priority Slider</h3>
+<p>The priority determines which rule wins when multiple rules could apply:</p>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Label</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1-39</strong></td>
+<td>Low</td>
+<td>Nice-to-have preferences</td>
+</tr>
+<tr>
+<td><strong>40-69</strong></td>
+<td>Medium</td>
+<td>Standard operational overrides</td>
+</tr>
+<tr>
+<td><strong>70-89</strong></td>
+<td>High</td>
+<td>Important corrections</td>
+</tr>
+<tr>
+<td><strong>90-100</strong></td>
+<td>Critical</td>
+<td>Safety/compliance rules that MUST apply</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong> If two rules conflict, the one with higher priority wins.</p>
+<h3 id="golden-rules-god-mode">Golden Rules (“God Mode”)</h3>
+<p>When you override a fact, it becomes a <strong>Golden Rule</strong>—a high-priority directive that supersedes ALL other information.</p>
+<p><strong>Example:</strong> - Textbook says: “Replace filter every 30 days” - Your Golden Rule: “In Mexico City, replace every 15 days” - <strong>Result</strong>: AI always uses YOUR answer for that location</p>
+<h3 id="managing-overrides">Managing Overrides</h3>
+<p>Access all active overrides from <strong>“Overrides”</strong> in the sidebar:</p>
+<ul>
+<li><strong>Search</strong> by keyword or domain</li>
+<li><strong>Filter</strong> by status (Active, Expired, Pending Review)</li>
+<li><strong>Sort</strong> by priority, date, or creator</li>
+<li><strong>Edit</strong> any override (creates a new audit entry)</li>
+<li><strong>Delete</strong> to restore original AI behavior</li>
+</ul>
+<hr />
+<h2 id="understanding-chain-of-custody">10. Understanding Chain of Custody</h2>
+<h3 id="what-is-chain-of-custody">What is Chain of Custody?</h3>
+<p>Every fact in Curator has a <strong>history</strong>—who added it, who verified it, who changed it. This is called the <strong>Chain of Custody</strong>.</p>
+<p>Think of it like a legal document: you can always prove who touched what and when.</p>
+<h3 id="why-does-this-matter">Why Does This Matter?</h3>
+<table>
+<thead>
+<tr>
+<th>Reason</th>
+<th>Benefit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Accountability</strong></td>
+<td>Know who verified each fact</td>
+</tr>
+<tr>
+<td><strong>Compliance</strong></td>
+<td>Audit trail for SOC 2, ISO 27001, HIPAA</td>
+</tr>
+<tr>
+<td><strong>Trust</strong></td>
+<td>Prove the AI’s source for any statement</td>
+</tr>
+<tr>
+<td><strong>Liability</strong></td>
+<td>If something goes wrong, trace it back</td>
+</tr>
+</tbody>
+</table>
+<h3 id="viewing-chain-of-custody">Viewing Chain of Custody</h3>
+<ol type="1">
+<li>Select any node in the Knowledge Graph</li>
+<li>Click the <strong>“History”</strong> tab</li>
+<li>See the complete timeline:</li>
+</ol>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  📜 CHAIN OF CUSTODY                                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  📄 Created                                                      │
+│     Source: Pump_Manual_2024.pdf, Page 47                       │
+│     Extracted by AI on Jan 24, 2026 at 10:30 AM                 │
+│                                                                  │
+│  ✅ Verified                                                     │
+│     Verified by: Chief Engineer Bob                              │
+│     Date: Jan 24, 2026 at 11:15 AM                              │
+│     Signature: abc123...                                         │
+│                                                                  │
+│  ✏️ Overridden                                                   │
+│     Changed by: Safety Officer Jane                              │
+│     Date: Jan 25, 2026 at 9:00 AM                               │
+│     Old value: &quot;4,500 PSI&quot;                                      │
+│     New value: &quot;4,000 PSI&quot;                                      │
+│     Reason: &quot;Updated per 2026 standard&quot;                         │
+│                                                                  │
+│  [Export as PDF]                                                │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="exporting-for-compliance">Exporting for Compliance</h3>
+<p>Need to prove something for an audit? Click <strong>“Export as PDF”</strong> to download a signed, timestamped record of the entire history.</p>
+<hr />
+<h2 id="tips-best-practices">11. Tips &amp; Best Practices</h2>
+<h3 id="for-better-document-ingestion">For Better Document Ingestion</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Use structured documents</strong></td>
+<td>Headings and bullets help the AI understand hierarchy</td>
+</tr>
+<tr>
+<td><strong>One topic per document</strong></td>
+<td>Mixing topics confuses the AI</td>
+</tr>
+<tr>
+<td><strong>Include model numbers</strong></td>
+<td>“Pump 302” is clearer than “the pump”</td>
+</tr>
+<tr>
+<td><strong>Keep files under 50 MB</strong></td>
+<td>Large files take longer to process</td>
+</tr>
+</tbody>
+</table>
+<h3 id="for-efficient-verification">For Efficient Verification</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Start with high-confidence items</strong></td>
+<td>🟢 Green items are usually quick approvals</td>
+</tr>
+<tr>
+<td><strong>Use “Defer” liberally</strong></td>
+<td>If you’re not sure, let an expert handle it</td>
+</tr>
+<tr>
+<td><strong>Check the source</strong></td>
+<td>Always click “View Source” for 🔴 red items</td>
+</tr>
+<tr>
+<td><strong>Batch similar items</strong></td>
+<td>Filter by domain to process related facts together</td>
+</tr>
+</tbody>
+</table>
+<h3 id="for-effective-overrides">For Effective Overrides</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Always explain your reason</strong></td>
+<td>Future you (and auditors) will thank you</td>
+</tr>
+<tr>
+<td><strong>Use expiration dates</strong></td>
+<td>Temporary rules shouldn’t live forever</td>
+</tr>
+<tr>
+<td><strong>Higher priority = stronger</strong></td>
+<td>Use 150+ for critical safety overrides</td>
+</tr>
+<tr>
+<td><strong>Review periodically</strong></td>
+<td>Overrides can become outdated too</td>
+</tr>
+</tbody>
+</table>
+<h3 id="keyboard-shortcuts">Keyboard Shortcuts</h3>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>A</code></td>
+<td>Approve current item</td>
+</tr>
+<tr>
+<td><code>R</code></td>
+<td>Reject current item</td>
+</tr>
+<tr>
+<td><code>D</code></td>
+<td>Defer current item</td>
+</tr>
+<tr>
+<td><code>→</code></td>
+<td>Next item in queue</td>
+</tr>
+<tr>
+<td><code>←</code></td>
+<td>Previous item</td>
+</tr>
+<tr>
+<td><code>/</code></td>
+<td>Focus search</td>
+</tr>
+<tr>
+<td><code>?</code></td>
+<td>Show help</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="troubleshooting">12. Troubleshooting</h2>
+<h3 id="common-issues">Common Issues</h3>
+<table>
+<colgroup>
+<col style="width: 47%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Upload fails</strong></td>
+<td>Check file size (max 50 MB) or try a different format</td>
+</tr>
+<tr>
+<td><strong>AI confidence is low</strong></td>
+<td>Document may be unclear. Try adding context or splitting it.</td>
+</tr>
+<tr>
+<td><strong>Graph won’t load</strong></td>
+<td>Too many nodes. Apply a domain filter.</td>
+</tr>
+<tr>
+<td><strong>Can’t see Curator</strong></td>
+<td>Ask your admin to grant you access in Think Tank</td>
+</tr>
+</tbody>
+</table>
+<h3 id="getting-help">Getting Help</h3>
+<ul>
+<li><strong>In-app help</strong>: Click the <code>?</code> icon in any screen</li>
+<li><strong>Contact your admin</strong>: For access or permission issues</li>
+<li><strong>Support</strong>: support@radiant.ai</li>
+</ul>
+<hr />
+<p><em>End of RADIANT Curator User Guide</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

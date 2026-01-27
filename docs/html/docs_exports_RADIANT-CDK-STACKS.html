@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIANT CDK STACKS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RADIANT CDK STACKS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/RADIANT-CDK-STACKS.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.18.0---cdk-infrastructure-stacks-export">RADIANT v4.18.0 - CDK Infrastructure Stacks Export</h1>
+<p><strong>Component</strong>: AWS CDK Infrastructure <strong>Language</strong>: TypeScript <strong>Files</strong>: 30 CDK stacks <strong>Framework</strong>: AWS CDK v2</p>
+<hr />
+<h2 id="architecture-narrative">Architecture Narrative</h2>
+<p>RADIANT’s infrastructure is defined using <strong>AWS CDK (Cloud Development Kit)</strong>, enabling Infrastructure as Code with TypeScript. The platform deploys 30 interconnected stacks that provision all AWS resources needed for the multi-tenant AI platform.</p>
+<h3 id="stack-dependency-graph">Stack Dependency Graph</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           RADIANT CDK Stack Hierarchy                           │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  Layer 1: Foundation                                                            │
+│  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────┐           │
+│  │  foundation-stack │  │  networking-stack │  │  security-stack   │           │
+│  │  (VPC, Subnets)   │  │  (NAT, Routes)    │  │  (IAM, KMS)       │           │
+│  └─────────┬─────────┘  └─────────┬─────────┘  └─────────┬─────────┘           │
+│            │                      │                      │                      │
+│  Layer 2: Data &amp; Auth             │                      │                      │
+│  ┌─────────┴─────────┐  ┌─────────┴─────────┐  ┌────────┴────────┐            │
+│  │   data-stack      │  │   auth-stack      │  │  storage-stack  │            │
+│  │   (Aurora, Redis) │  │   (Cognito)       │  │  (S3 Buckets)   │            │
+│  └─────────┬─────────┘  └─────────┬─────────┘  └────────┬────────┘            │
+│            │                      │                      │                      │
+│  Layer 3: Core Services           │                      │                      │
+│  ┌─────────┴─────────┐  ┌─────────┴─────────┐  ┌────────┴────────┐            │
+│  │   api-stack       │  │   admin-stack     │  │  brain-stack    │            │
+│  │   (API Gateway)   │  │   (Admin APIs)    │  │  (AGI Brain)    │            │
+│  └─────────┬─────────┘  └─────────┬─────────┘  └────────┬────────┘            │
+│            │                      │                      │                      │
+│  Layer 4: AI Services             │                      │                      │
+│  ┌─────────┴─────────┐  ┌─────────┴─────────┐  ┌────────┴────────┐            │
+│  │   ai-stack        │  │  grimoire-stack   │  │ consciousness-  │            │
+│  │   (LiteLLM)       │  │  (Proc Memory)    │  │ stack (Ego)     │            │
+│  └───────────────────┘  └───────────────────┘  └─────────────────┘            │
+│                                                                                 │
+│  Layer 5: Advanced Features                                                     │
+│  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────┐          │
+│  │ cato-redis-stack  │  │ formal-reasoning  │  │ cognition-stack   │          │
+│  │ (Safety)          │  │ -stack (Logic)    │  │ (Metacognition)   │          │
+│  └───────────────────┘  └───────────────────┘  └───────────────────┘          │
+│                                                                                 │
+│  Layer 6: Operations                                                            │
+│  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────┐          │
+│  │ monitoring-stack  │  │ scheduled-tasks   │  │ multi-region      │          │
+│  │ (CloudWatch)      │  │ -stack (Events)   │  │ -stack (DR)       │          │
+│  └───────────────────┘  └───────────────────┘  └───────────────────┘          │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="stack-inventory">Stack Inventory</h2>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Lines</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>admin-stack.ts</code></td>
+<td>26K</td>
+<td>Admin dashboard APIs and Lambda handlers</td>
+</tr>
+<tr>
+<td><code>ai-stack.ts</code></td>
+<td>6K</td>
+<td>AI model integration with LiteLLM</td>
+</tr>
+<tr>
+<td><code>api-stack.ts</code></td>
+<td>34K</td>
+<td>Public REST API Gateway and Lambda</td>
+</tr>
+<tr>
+<td><code>auth-stack.ts</code></td>
+<td>6K</td>
+<td>Cognito user pools and authentication</td>
+</tr>
+<tr>
+<td><code>batch-stack.ts</code></td>
+<td>8K</td>
+<td>AWS Batch for heavy compute jobs</td>
+</tr>
+<tr>
+<td><code>cato-genesis-stack.ts</code></td>
+<td>12K</td>
+<td>Cato consciousness genesis</td>
+</tr>
+<tr>
+<td><code>cato-tier-transition-stack.ts</code></td>
+<td>17K</td>
+<td>Tenant tier upgrade automation</td>
+</tr>
+<tr>
+<td><code>brain-stack.ts</code></td>
+<td>10K</td>
+<td>AGI Brain Router infrastructure</td>
+</tr>
+<tr>
+<td><code>cato-redis-stack.ts</code></td>
+<td>4K</td>
+<td>Cato Safety with Redis state</td>
+</tr>
+<tr>
+<td><code>cognition-stack.ts</code></td>
+<td>7K</td>
+<td>Metacognition and introspection</td>
+</tr>
+<tr>
+<td><code>collaboration-stack.ts</code></td>
+<td>8K</td>
+<td>Real-time collaboration (WebSocket)</td>
+</tr>
+<tr>
+<td><code>consciousness-stack.ts</code></td>
+<td>25K</td>
+<td>Consciousness Engine (MCP, Sleep)</td>
+</tr>
+<tr>
+<td><code>data-stack.ts</code></td>
+<td>5K</td>
+<td>Aurora PostgreSQL and DynamoDB</td>
+</tr>
+<tr>
+<td><code>formal-reasoning-stack.ts</code></td>
+<td>16K</td>
+<td>Formal logic and verification</td>
+</tr>
+<tr>
+<td><code>foundation-stack.ts</code></td>
+<td>2K</td>
+<td>Base VPC and networking</td>
+</tr>
+<tr>
+<td><code>grimoire-stack.ts</code></td>
+<td>7K</td>
+<td>Procedural memory (Grimoire)</td>
+</tr>
+<tr>
+<td><code>library-execution-stack.ts</code></td>
+<td>11K</td>
+<td>Library execution runtime</td>
+</tr>
+<tr>
+<td><code>library-registry-stack.ts</code></td>
+<td>7K</td>
+<td>AI library registry</td>
+</tr>
+<tr>
+<td><code>mission-control-stack.ts</code></td>
+<td>13K</td>
+<td>Deployment orchestration</td>
+</tr>
+<tr>
+<td><code>model-sync-scheduler-stack.ts</code></td>
+<td>4K</td>
+<td>Model sync scheduling</td>
+</tr>
+<tr>
+<td><code>monitoring-stack.ts</code></td>
+<td>13K</td>
+<td>CloudWatch and alarms</td>
+</tr>
+<tr>
+<td><code>multi-region-stack.ts</code></td>
+<td>8K</td>
+<td>Multi-region DR</td>
+</tr>
+<tr>
+<td><code>networking-stack.ts</code></td>
+<td>3K</td>
+<td>NAT Gateways and routing</td>
+</tr>
+<tr>
+<td><code>scheduled-tasks-stack.ts</code></td>
+<td>13K</td>
+<td>EventBridge scheduled tasks</td>
+</tr>
+<tr>
+<td><code>security-monitoring-stack.ts</code></td>
+<td>13K</td>
+<td>Security monitoring (GuardDuty)</td>
+</tr>
+<tr>
+<td><code>security-stack.ts</code></td>
+<td>6K</td>
+<td>IAM roles and KMS keys</td>
+</tr>
+<tr>
+<td><code>storage-stack.ts</code></td>
+<td>5K</td>
+<td>S3 buckets and lifecycle</td>
+</tr>
+<tr>
+<td><code>tms-stack.ts</code></td>
+<td>17K</td>
+<td>Tenant Management System</td>
+</tr>
+<tr>
+<td><code>user-registry-stack.ts</code></td>
+<td>14K</td>
+<td>User registry and profiles</td>
+</tr>
+<tr>
+<td><code>webhooks-stack.ts</code></td>
+<td>9K</td>
+<td>Webhook delivery system</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="key-stack-implementations">Key Stack Implementations</h2>
+<h3 id="api-stack.ts">1. api-stack.ts</h3>
+<p><strong>Purpose</strong>: Defines the main REST API Gateway with Lambda integrations for all public endpoints.</p>
+<pre class="typescript"><code>import * as cdk from &#39;aws-cdk-lib&#39;;
+import * as apigateway from &#39;aws-cdk-lib/aws-apigateway&#39;;
+import * as lambda from &#39;aws-cdk-lib/aws-lambda&#39;;
+import * as cognito from &#39;aws-cdk-lib/aws-cognito&#39;;
+import * as logs from &#39;aws-cdk-lib/aws-logs&#39;;
+import * as iam from &#39;aws-cdk-lib/aws-iam&#39;;
+import * as ec2 from &#39;aws-cdk-lib/aws-ec2&#39;;
+import * as dynamodb from &#39;aws-cdk-lib/aws-dynamodb&#39;;
+import * as rds from &#39;aws-cdk-lib/aws-rds&#39;;
+import * as s3 from &#39;aws-cdk-lib/aws-s3&#39;;
+import { Construct } from &#39;constructs&#39;;
+import type { TierConfig, Environment } from &#39;@radiant/shared&#39;;
+import { RADIANT_VERSION } from &#39;@radiant/shared&#39;;
+
+export interface ApiStackProps extends cdk.StackProps {
+  appId: string;
+  environment: Environment;
+  tier: number;
+  tierConfig: TierConfig;
+  vpc: ec2.Vpc;
+  userPool: cognito.UserPool;
+  adminUserPool: cognito.UserPool;
+  auroraCluster: rds.DatabaseCluster;
+  usageTable: dynamodb.Table;
+  sessionsTable: dynamodb.Table;
+  cacheTable: dynamodb.Table;
+  mediaBucket: s3.Bucket;
+  litellmUrl: string;
+  apiSecurityGroup: ec2.SecurityGroup;
+  sagemakerRoleArn?: string;
+  catoRedisEndpoint?: string;
+  catoRedisPort?: number;
+}
+
+export class ApiStack extends cdk.Stack {
+  public readonly api: apigateway.RestApi;
+  public readonly routerFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: ApiStackProps) {
+    super(scope, id, props);
+
+    const {
+      appId, environment, tier, vpc, userPool, adminUserPool,
+      auroraCluster, usageTable, sessionsTable, cacheTable, mediaBucket,
+      litellmUrl, apiSecurityGroup,
+    } = props;
+
+    // Lambda execution role
+    const lambdaRole = new iam.Role(this, &#39;LambdaRole&#39;, {
+      assumedBy: new iam.ServicePrincipal(&#39;lambda.amazonaws.com&#39;),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName(&#39;service-role/AWSLambdaVPCAccessExecutionRole&#39;),
+      ],
+    });
+
+    // Common Lambda environment
+    const commonEnv: Record&lt;string, string&gt; = {
+      APP_ID: appId,
+      ENVIRONMENT: environment,
+      TIER: tier.toString(),
+      LITELLM_URL: litellmUrl,
+      AURORA_SECRET_ARN: auroraCluster.secret?.secretArn || &#39;&#39;,
+      AURORA_CLUSTER_ARN: auroraCluster.clusterArn,
+      USAGE_TABLE: usageTable.tableName,
+      SESSIONS_TABLE: sessionsTable.tableName,
+      CACHE_TABLE: cacheTable.tableName,
+      MEDIA_BUCKET: mediaBucket.bucketName,
+      USER_POOL_ID: userPool.userPoolId,
+      ADMIN_USER_POOL_ID: adminUserPool.userPoolId,
+      LOG_LEVEL: environment === &#39;prod&#39; ? &#39;info&#39; : &#39;debug&#39;,
+      RADIANT_VERSION: RADIANT_VERSION,
+      ...(props.catoRedisEndpoint ? {
+        CATO_REDIS_ENDPOINT: props.catoRedisEndpoint,
+        CATO_REDIS_PORT: String(props.catoRedisPort || 6379),
+      } : {}),
+    };
+
+    // Router Lambda
+    this.routerFunction = new lambda.Function(this, &#39;RouterFunction&#39;, {
+      functionName: `${appId}-${environment}-router`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: &#39;api/router.handler&#39;,
+      code: lambda.Code.fromAsset(&#39;lambda/dist&#39;),
+      memorySize: 512,
+      timeout: cdk.Duration.seconds(30),
+      environment: commonEnv,
+      vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      securityGroups: [apiSecurityGroup],
+      role: lambdaRole,
+      tracing: tier &gt;= 2 ? lambda.Tracing.ACTIVE : lambda.Tracing.DISABLED,
+      logRetention: logs.RetentionDays.ONE_MONTH,
+    });
+
+    // Grant permissions
+    auroraCluster.secret?.grantRead(lambdaRole);
+    usageTable.grantReadWriteData(lambdaRole);
+    sessionsTable.grantReadWriteData(lambdaRole);
+    cacheTable.grantReadWriteData(lambdaRole);
+    mediaBucket.grantReadWrite(lambdaRole);
+
+    // RDS Data API access
+    lambdaRole.addToPrincipalPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        &#39;rds-data:ExecuteStatement&#39;,
+        &#39;rds-data:BatchExecuteStatement&#39;,
+        &#39;rds-data:BeginTransaction&#39;,
+        &#39;rds-data:CommitTransaction&#39;,
+        &#39;rds-data:RollbackTransaction&#39;,
+      ],
+      resources: [auroraCluster.clusterArn],
+    }));
+
+    // REST API
+    this.api = new apigateway.RestApi(this, &#39;Api&#39;, {
+      restApiName: `${appId}-${environment}-api`,
+      description: `RADIANT API for ${appId} ${environment}`,
+      deployOptions: {
+        stageName: &#39;v2&#39;,
+        throttlingRateLimit: tier &gt;= 3 ? 10000 : 1000,
+        throttlingBurstLimit: tier &gt;= 3 ? 5000 : 500,
+        loggingLevel: apigateway.MethodLoggingLevel.INFO,
+        dataTraceEnabled: environment !== &#39;prod&#39;,
+        metricsEnabled: true,
+        tracingEnabled: tier &gt;= 2,
+      },
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders: [&#39;Content-Type&#39;, &#39;Authorization&#39;, &#39;X-Api-Key&#39;, &#39;X-Tenant-Id&#39;],
+      },
+    });
+
+    // Cognito Authorizers
+    const cognitoAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(this, &#39;CognitoAuthorizer&#39;, {
+      cognitoUserPools: [userPool],
+      authorizerName: `${appId}-${environment}-authorizer`,
+      identitySource: &#39;method.request.header.Authorization&#39;,
+    });
+
+    const adminAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(this, &#39;AdminAuthorizer&#39;, {
+      cognitoUserPools: [adminUserPool],
+      authorizerName: `${appId}-${environment}-admin-authorizer`,
+      identitySource: &#39;method.request.header.Authorization&#39;,
+    });
+
+    // Lambda integration
+    const routerIntegration = new apigateway.LambdaIntegration(this.routerFunction, {
+      proxy: true,
+    });
+
+    // API Resources
+    const v2 = this.api.root.addResource(&#39;api&#39;).addResource(&#39;v2&#39;);
+
+    // Health check (no auth)
+    const health = v2.addResource(&#39;health&#39;);
+    health.addMethod(&#39;GET&#39;, routerIntegration);
+
+    // Chat endpoints
+    const chat = v2.addResource(&#39;chat&#39;);
+    chat.addResource(&#39;completions&#39;).addMethod(&#39;POST&#39;, routerIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Models endpoints
+    const models = v2.addResource(&#39;models&#39;);
+    models.addMethod(&#39;GET&#39;, routerIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // Admin endpoints
+    const admin = v2.addResource(&#39;admin&#39;);
+    admin.addProxy({
+      defaultIntegration: routerIntegration,
+      defaultMethodOptions: {
+        authorizer: adminAuthorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      },
+    });
+  }
+}</code></pre>
+<hr />
+<h3 id="brain-stack.ts">2. brain-stack.ts</h3>
+<p><strong>Purpose</strong>: Provisions the AGI Brain Router infrastructure including inference Lambda, reconciliation scheduler, Redis cache, and SQS queues.</p>
+<pre class="typescript"><code>/**
+ * RADIANT v6.0.4 - Brain Stack
+ * CDK Stack for AGI Brain infrastructure
+ * 
+ * Provisions:
+ * - Brain inference Lambda
+ * - Reconciliation Lambda (scheduled)
+ * - API Gateway routes
+ * - ElastiCache (Redis) for flash facts and ghost cache
+ * - SQS queues for async processing
+ */
+
+import * as cdk from &#39;aws-cdk-lib&#39;;
+import * as lambda from &#39;aws-cdk-lib/aws-lambda&#39;;
+import * as apigateway from &#39;aws-cdk-lib/aws-apigateway&#39;;
+import * as events from &#39;aws-cdk-lib/aws-events&#39;;
+import * as targets from &#39;aws-cdk-lib/aws-events-targets&#39;;
+import * as sqs from &#39;aws-cdk-lib/aws-sqs&#39;;
+import * as elasticache from &#39;aws-cdk-lib/aws-elasticache&#39;;
+import * as ec2 from &#39;aws-cdk-lib/aws-ec2&#39;;
+import * as iam from &#39;aws-cdk-lib/aws-iam&#39;;
+import { Construct } from &#39;constructs&#39;;
+
+export interface BrainStackProps extends cdk.StackProps {
+  vpc: ec2.IVpc;
+  dbSecurityGroup: ec2.ISecurityGroup;
+  dbClusterArn: string;
+  dbSecretArn: string;
+  environment: string;
+  litellmUrl?: string;
+}
+
+export class BrainStack extends cdk.Stack {
+  public readonly brainApi: apigateway.RestApi;
+  public readonly brainInferenceLambda: lambda.Function;
+  public readonly reconciliationLambda: lambda.Function;
+  public readonly redisCluster: elasticache.CfnCacheCluster;
+
+  constructor(scope: Construct, id: string, props: BrainStackProps) {
+    super(scope, id, props);
+
+    const { vpc, dbSecurityGroup, dbClusterArn, dbSecretArn, environment } = props;
+
+    // Security Groups
+    const brainSecurityGroup = new ec2.SecurityGroup(this, &#39;BrainSecurityGroup&#39;, {
+      vpc,
+      description: &#39;Security group for Brain Lambda functions&#39;,
+      allowAllOutbound: true,
+    });
+
+    const redisSecurityGroup = new ec2.SecurityGroup(this, &#39;RedisSecurityGroup&#39;, {
+      vpc,
+      description: &#39;Security group for Redis cluster&#39;,
+      allowAllOutbound: false,
+    });
+
+    // Allow Brain Lambda to access Redis
+    redisSecurityGroup.addIngressRule(
+      brainSecurityGroup,
+      ec2.Port.tcp(6379),
+      &#39;Allow Brain Lambda to access Redis&#39;
+    );
+
+    // ElastiCache Redis
+    const redisSubnetGroup = new elasticache.CfnSubnetGroup(this, &#39;RedisSubnetGroup&#39;, {
+      description: &#39;Subnet group for Brain Redis cluster&#39;,
+      subnetIds: vpc.privateSubnets.map(subnet =&gt; subnet.subnetId),
+      cacheSubnetGroupName: `radiant-brain-redis-${environment}`,
+    });
+
+    this.redisCluster = new elasticache.CfnCacheCluster(this, &#39;BrainRedisCluster&#39;, {
+      cacheNodeType: environment === &#39;prod&#39; ? &#39;cache.r6g.large&#39; : &#39;cache.t3.micro&#39;,
+      engine: &#39;redis&#39;,
+      numCacheNodes: 1,
+      clusterName: `radiant-brain-${environment}`,
+      vpcSecurityGroupIds: [redisSecurityGroup.securityGroupId],
+      cacheSubnetGroupName: redisSubnetGroup.cacheSubnetGroupName,
+      port: 6379,
+    });
+
+    // SQS Queues
+    const dreamQueue = new sqs.Queue(this, &#39;DreamQueue&#39;, {
+      queueName: `radiant-dream-queue-${environment}`,
+      visibilityTimeout: cdk.Duration.minutes(15),
+      retentionPeriod: cdk.Duration.days(7),
+      deadLetterQueue: {
+        queue: new sqs.Queue(this, &#39;DreamDLQ&#39;, {
+          queueName: `radiant-dream-dlq-${environment}`,
+          retentionPeriod: cdk.Duration.days(14),
+        }),
+        maxReceiveCount: 3,
+      },
+    });
+
+    // Lambda Environment Variables
+    const lambdaEnvironment: Record&lt;string, string&gt; = {
+      ENVIRONMENT: environment,
+      DB_CLUSTER_ARN: dbClusterArn,
+      DB_SECRET_ARN: dbSecretArn,
+      REDIS_ENDPOINT: this.redisCluster.attrRedisEndpointAddress,
+      REDIS_PORT: this.redisCluster.attrRedisEndpointPort,
+      REDIS_URL: `redis://${this.redisCluster.attrRedisEndpointAddress}:${this.redisCluster.attrRedisEndpointPort}`,
+      DREAM_QUEUE_URL: dreamQueue.queueUrl,
+      LOG_LEVEL: environment === &#39;prod&#39; ? &#39;info&#39; : &#39;debug&#39;,
+      LITELLM_ENDPOINT: props.litellmUrl || &#39;http://localhost:4000&#39;,
+      SYSTEM1_MODEL: &#39;llama3-8b-instruct&#39;,
+      SYSTEM15_MODEL: &#39;llama3-8b-instruct&#39;,
+      SYSTEM2_MODEL: &#39;llama3-70b-instruct&#39;,
+    };
+
+    // Brain Inference Lambda
+    this.brainInferenceLambda = new lambda.Function(this, &#39;BrainInferenceLambda&#39;, {
+      functionName: `radiant-brain-inference-${environment}`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: &#39;brain/inference.handler&#39;,
+      code: lambda.Code.fromAsset(&#39;lambda/dist&#39;),
+      memorySize: environment === &#39;prod&#39; ? 2048 : 1024,
+      timeout: cdk.Duration.seconds(30),
+      vpc,
+      securityGroups: [brainSecurityGroup],
+      environment: lambdaEnvironment,
+      tracing: lambda.Tracing.ACTIVE,
+    });
+
+    // Reconciliation Lambda
+    this.reconciliationLambda = new lambda.Function(this, &#39;ReconciliationLambda&#39;, {
+      functionName: `radiant-brain-reconciliation-${environment}`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: &#39;brain/reconciliation.handler&#39;,
+      code: lambda.Code.fromAsset(&#39;lambda/dist&#39;),
+      memorySize: 1024,
+      timeout: cdk.Duration.minutes(5),
+      vpc,
+      securityGroups: [brainSecurityGroup],
+      environment: lambdaEnvironment,
+      tracing: lambda.Tracing.ACTIVE,
+    });
+
+    // Run reconciliation every 15 minutes
+    const reconciliationRule = new events.Rule(this, &#39;ReconciliationSchedule&#39;, {
+      schedule: events.Schedule.rate(cdk.Duration.minutes(15)),
+      description: &#39;Trigger Brain reconciliation job every 15 minutes&#39;,
+    });
+    reconciliationRule.addTarget(new targets.LambdaFunction(this.reconciliationLambda));
+
+    // API Gateway
+    this.brainApi = new apigateway.RestApi(this, &#39;BrainApi&#39;, {
+      restApiName: `radiant-brain-api-${environment}`,
+      description: &#39;RADIANT AGI Brain API&#39;,
+      deployOptions: {
+        stageName: environment,
+        tracingEnabled: true,
+        loggingLevel: apigateway.MethodLoggingLevel.INFO,
+      },
+    });
+
+    // /brain/inference endpoint
+    const brainResource = this.brainApi.root.addResource(&#39;brain&#39;);
+    const inferenceResource = brainResource.addResource(&#39;inference&#39;);
+    inferenceResource.addMethod(&#39;POST&#39;, new apigateway.LambdaIntegration(this.brainInferenceLambda));
+  }
+}</code></pre>
+<hr />
+<h3 id="consciousness-stack.ts">3. consciousness-stack.ts</h3>
+<p><strong>Purpose</strong>: Deploys the Consciousness Engine infrastructure including MCP Server, Sleep Cycle, Deep Research, and admin APIs.</p>
+<pre class="typescript"><code>import * as cdk from &#39;aws-cdk-lib&#39;;
+import * as lambda from &#39;aws-cdk-lib/aws-lambda&#39;;
+import * as events from &#39;aws-cdk-lib/aws-events&#39;;
+import * as targets from &#39;aws-cdk-lib/aws-events-targets&#39;;
+import * as apigateway from &#39;aws-cdk-lib/aws-apigateway&#39;;
+import * as iam from &#39;aws-cdk-lib/aws-iam&#39;;
+import * as secretsmanager from &#39;aws-cdk-lib/aws-secretsmanager&#39;;
+import * as sqs from &#39;aws-cdk-lib/aws-sqs&#39;;
+import { Construct } from &#39;constructs&#39;;
+
+interface ConsciousnessStackProps extends cdk.StackProps {
+  appId: string;
+  environment: string;
+  apiGateway: apigateway.RestApi;
+  lambdaLayer: lambda.LayerVersion;
+  dbClusterArn: string;
+  dbSecretArn: string;
+  databaseName: string;
+}
+
+/**
+ * Consciousness Engine Stack
+ * 
+ * Deploys the consciousness engine infrastructure:
+ * - MCP Server Lambda (Model Context Protocol)
+ * - Sleep Cycle Lambda (weekly evolution)
+ * - Deep Research Lambda (browser automation)
+ * - Thinking Session Lambda (async processing)
+ * - Budget Monitor Lambda (cost control)
+ * - Admin API endpoints
+ */
+export class ConsciousnessStack extends cdk.Stack {
+  public readonly mcpServerLambda: lambda.Function;
+  public readonly sleepCycleLambda: lambda.Function;
+  public readonly deepResearchLambda: lambda.Function;
+  public readonly thinkingSessionLambda: lambda.Function;
+  public readonly adminApiLambda: lambda.Function;
+  public readonly consciousnessExecutorLambda: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: ConsciousnessStackProps) {
+    super(scope, id, props);
+
+    const { appId, environment, apiGateway, lambdaLayer, dbClusterArn, dbSecretArn, databaseName } = props;
+
+    // SQS Queues for Async Processing
+    const thinkingSessionQueue = new sqs.Queue(this, &#39;ThinkingSessionQueue&#39;, {
+      queueName: `${appId}-${environment}-thinking-sessions`,
+      visibilityTimeout: cdk.Duration.minutes(15),
+      retentionPeriod: cdk.Duration.days(7),
+      deadLetterQueue: {
+        queue: new sqs.Queue(this, &#39;ThinkingSessionDLQ&#39;, {
+          queueName: `${appId}-${environment}-thinking-sessions-dlq`,
+        }),
+        maxReceiveCount: 3,
+      },
+    });
+
+    const deepResearchQueue = new sqs.Queue(this, &#39;DeepResearchQueue&#39;, {
+      queueName: `${appId}-${environment}-deep-research`,
+      visibilityTimeout: cdk.Duration.minutes(30),
+      retentionPeriod: cdk.Duration.days(7),
+    });
+
+    // Common Lambda Environment
+    const commonEnv = {
+      NODE_OPTIONS: &#39;--enable-source-maps&#39;,
+      ENVIRONMENT: environment,
+      DB_CLUSTER_ARN: dbClusterArn,
+      DB_SECRET_ARN: dbSecretArn,
+      DATABASE_NAME: databaseName,
+      THINKING_SESSION_QUEUE_URL: thinkingSessionQueue.queueUrl,
+      DEEP_RESEARCH_QUEUE_URL: deepResearchQueue.queueUrl,
+    };
+
+    // Consciousness Executor Lambda (Python - 16 Libraries)
+    this.consciousnessExecutorLambda = new lambda.Function(this, &#39;ConsciousnessExecutor&#39;, {
+      functionName: `${appId}-${environment}-consciousness-executor`,
+      runtime: lambda.Runtime.PYTHON_3_11,
+      handler: &#39;handler.handler&#39;,
+      code: lambda.Code.fromAsset(&#39;lambda/consciousness-executor&#39;),
+      timeout: cdk.Duration.minutes(5),
+      memorySize: 4096,
+      environment: { ENVIRONMENT: environment },
+    });
+
+    // MCP Server Lambda (Model Context Protocol)
+    this.mcpServerLambda = new lambda.Function(this, &#39;MCPServer&#39;, {
+      functionName: `${appId}-${environment}-consciousness-mcp`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: &#39;consciousness/mcp-server.handler&#39;,
+      code: lambda.Code.fromAsset(&#39;lambda&#39;),
+      layers: [lambdaLayer],
+      timeout: cdk.Duration.seconds(60),
+      memorySize: 1024,
+      environment: {
+        ...commonEnv,
+        CONSCIOUSNESS_EXECUTOR_ARN: this.consciousnessExecutorLambda.functionArn,
+      },
+    });
+
+    // Sleep Cycle Lambda (Weekly Evolution)
+    this.sleepCycleLambda = new lambda.Function(this, &#39;SleepCycle&#39;, {
+      functionName: `${appId}-${environment}-consciousness-sleep`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: &#39;consciousness/sleep-cycle.handler&#39;,
+      code: lambda.Code.fromAsset(&#39;lambda&#39;),
+      layers: [lambdaLayer],
+      timeout: cdk.Duration.minutes(15),
+      memorySize: 2048,
+      environment: commonEnv,
+    });
+
+    // Schedule: Nightly at 3 AM UTC
+    new events.Rule(this, &#39;SleepCycleSchedule&#39;, {
+      ruleName: `${appId}-${environment}-consciousness-sleep`,
+      schedule: events.Schedule.cron({ minute: &#39;0&#39;, hour: &#39;3&#39; }),
+      targets: [new targets.LambdaFunction(this.sleepCycleLambda)],
+    });
+  }
+}</code></pre>
+<hr />
+<h3 id="grimoire-stack.ts">4. grimoire-stack.ts</h3>
+<p><strong>Purpose</strong>: Provisions The Grimoire (procedural memory) and Economic Governor infrastructure.</p>
+<pre class="typescript"><code>// See GRIMOIRE-GOVERNOR-SOURCE-PART5.md for full implementation
+// Key components:
+// - Grimoire API Lambda
+// - Governor API Lambda  
+// - Daily cleanup Lambda (EventBridge)
+// - Shared Python layer for Flyte dependencies</code></pre>
+<hr />
+<h2 id="additional-stacks-summary">Additional Stacks (Summary)</h2>
+<table>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Key Resources</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>admin-stack.ts</code></td>
+<td>Admin API Gateway, 20+ Lambda handlers, IAM roles</td>
+</tr>
+<tr>
+<td><code>auth-stack.ts</code></td>
+<td>Cognito User Pools (user + admin), Identity Pools</td>
+</tr>
+<tr>
+<td><code>batch-stack.ts</code></td>
+<td>AWS Batch compute environment, job definitions</td>
+</tr>
+<tr>
+<td><code>cato-redis-stack.ts</code></td>
+<td>ElastiCache Redis for Cato state</td>
+</tr>
+<tr>
+<td><code>cognition-stack.ts</code></td>
+<td>Metacognition Lambda, introspection APIs</td>
+</tr>
+<tr>
+<td><code>collaboration-stack.ts</code></td>
+<td>WebSocket API, connection management</td>
+</tr>
+<tr>
+<td><code>data-stack.ts</code></td>
+<td>Aurora Serverless v2, DynamoDB tables</td>
+</tr>
+<tr>
+<td><code>formal-reasoning-stack.ts</code></td>
+<td>Z3 solver Lambda, verification APIs</td>
+</tr>
+<tr>
+<td><code>foundation-stack.ts</code></td>
+<td>VPC, subnets, security groups</td>
+</tr>
+<tr>
+<td><code>library-execution-stack.ts</code></td>
+<td>Code execution sandbox Lambda</td>
+</tr>
+<tr>
+<td><code>library-registry-stack.ts</code></td>
+<td>AI library registry Lambda</td>
+</tr>
+<tr>
+<td><code>mission-control-stack.ts</code></td>
+<td>Deployment orchestration Lambda</td>
+</tr>
+<tr>
+<td><code>model-sync-scheduler-stack.ts</code></td>
+<td>Model sync EventBridge rules</td>
+</tr>
+<tr>
+<td><code>monitoring-stack.ts</code></td>
+<td>CloudWatch dashboards, alarms, SNS</td>
+</tr>
+<tr>
+<td><code>multi-region-stack.ts</code></td>
+<td>Global Aurora, Route 53 health checks</td>
+</tr>
+<tr>
+<td><code>networking-stack.ts</code></td>
+<td>NAT Gateways, VPC endpoints</td>
+</tr>
+<tr>
+<td><code>scheduled-tasks-stack.ts</code></td>
+<td>EventBridge scheduled tasks</td>
+</tr>
+<tr>
+<td><code>security-monitoring-stack.ts</code></td>
+<td>GuardDuty, Security Hub</td>
+</tr>
+<tr>
+<td><code>security-stack.ts</code></td>
+<td>KMS keys, IAM policies</td>
+</tr>
+<tr>
+<td><code>storage-stack.ts</code></td>
+<td>S3 buckets, lifecycle policies</td>
+</tr>
+<tr>
+<td><code>tms-stack.ts</code></td>
+<td>Tenant Management System Lambda</td>
+</tr>
+<tr>
+<td><code>user-registry-stack.ts</code></td>
+<td>User profile management</td>
+</tr>
+<tr>
+<td><code>webhooks-stack.ts</code></td>
+<td>Webhook delivery system</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="stack-configuration-patterns">Stack Configuration Patterns</h2>
+<h3 id="environment-variables">Environment Variables</h3>
+<p>All stacks use consistent environment variable naming: - <code>ENVIRONMENT</code> - dev/staging/prod - <code>DB_CLUSTER_ARN</code> - Aurora cluster ARN - <code>DB_SECRET_ARN</code> - Secrets Manager ARN - <code>LITELLM_URL</code> - LiteLLM proxy endpoint - <code>LOG_LEVEL</code> - info/debug based on environment</p>
+<h3 id="security-patterns">Security Patterns</h3>
+<ul>
+<li>VPC placement for all Lambdas</li>
+<li>Security groups with least privilege</li>
+<li>IAM roles with scoped permissions</li>
+<li>Secrets Manager for credentials</li>
+<li>KMS encryption for data at rest</li>
+</ul>
+<h3 id="tier-based-configuration">Tier-Based Configuration</h3>
+<ul>
+<li>Tier 1-2: Minimal resources, t3.micro instances</li>
+<li>Tier 3-4: Production resources, r6g instances</li>
+<li>Tier 5+: High availability, multi-AZ</li>
+</ul>
+<hr />
+<p><em>This concludes the CDK stacks export. See other export files for Lambda handlers and services.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PERFORMANCE OPTIMIZATION - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>PERFORMANCE OPTIMIZATION</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/PERFORMANCE-OPTIMIZATION.md</div>
+  </div>
+  
+  <h1 id="radiant-performance-optimization-guide">RADIANT Performance Optimization Guide</h1>
+<h2 id="version-5.42.0">Version: 5.42.0</h2>
+<p>This document outlines performance optimizations implemented and recommended for the RADIANT platform.</p>
+<hr />
+<h2 id="lambda-cold-start-optimization">1. Lambda Cold Start Optimization</h2>
+<h3 id="current-configuration">Current Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Lambda</th>
+<th>Memory</th>
+<th>Timeout</th>
+<th>Provisioned Concurrency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Admin API</td>
+<td>1024 MB</td>
+<td>30s</td>
+<td>0 (on-demand)</td>
+</tr>
+<tr>
+<td>Think Tank API</td>
+<td>2048 MB</td>
+<td>60s</td>
+<td>0 (on-demand)</td>
+</tr>
+<tr>
+<td>Agent Worker</td>
+<td>2048 MB</td>
+<td>300s</td>
+<td>0 (configurable)</td>
+</tr>
+<tr>
+<td>Transparency Worker</td>
+<td>512 MB</td>
+<td>30s</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<h3 id="recommendations">Recommendations</h3>
+<h4 id="bundle-optimization">1.1 Bundle Optimization</h4>
+<pre class="typescript"><code>// Use esbuild for smaller bundles
+// Current: ~5MB bundled
+// Target: &lt;2MB bundled
+
+// In CDK stack:
+bundling: {
+  minify: true,
+  sourceMap: false,
+  treeshaking: true,
+  externalModules: [&#39;@aws-sdk/*&#39;], // Use Lambda&#39;s built-in SDK
+}</code></pre>
+<h4 id="lazy-loading">1.2 Lazy Loading</h4>
+<pre class="typescript"><code>// Defer heavy imports until needed
+let bedrockClient: BedrockRuntimeClient | null = null;
+
+function getBedrockClient() {
+  if (!bedrockClient) {
+    bedrockClient = new BedrockRuntimeClient({});
+  }
+  return bedrockClient;
+}</code></pre>
+<h4 id="connection-reuse">1.3 Connection Reuse</h4>
+<pre class="typescript"><code>// Reuse HTTP connections
+const httpAgent = new https.Agent({
+  keepAlive: true,
+  maxSockets: 50,
+});</code></pre>
+<hr />
+<h2 id="database-query-optimization">2. Database Query Optimization</h2>
+<h3 id="query-patterns">2.1 Query Patterns</h3>
+<p><strong>Use Indexes Effectively:</strong></p>
+<pre class="sql"><code>-- Ensure indexes exist for common queries
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_ai_reports_tenant_updated 
+ON ai_reports(tenant_id, updated_at DESC);
+
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_ai_report_insights_tenant_created
+ON ai_report_insights(tenant_id, created_at DESC);</code></pre>
+<p><strong>Batch Operations:</strong></p>
+<pre class="typescript"><code>// Instead of N individual inserts
+for (const item of items) {
+  await executeStatement(&#39;INSERT INTO...&#39;, [item]);
+}
+
+// Use batch insert
+const values = items.map((_, i) =&gt; `($${i*3+1}, $${i*3+2}, $${i*3+3})`).join(&#39;,&#39;);
+await executeStatement(`INSERT INTO table (a, b, c) VALUES ${values}`, flatParams);</code></pre>
+<h3 id="connection-pooling">2.2 Connection Pooling</h3>
+<p>Aurora Data API handles connection pooling automatically. Ensure: - <code>maxConnections</code> is appropriate for tier - Idle connections are released</p>
+<hr />
+<h2 id="caching-strategy">3. Caching Strategy</h2>
+<h3 id="in-memory-caching-lambda">3.1 In-Memory Caching (Lambda)</h3>
+<pre class="typescript"><code>// Cache expensive computations during Lambda lifetime
+const cache = new Map&lt;string, { data: unknown; expiry: number }&gt;();
+
+function getCached&lt;T&gt;(key: string, ttlMs: number, compute: () =&gt; T): T {
+  const now = Date.now();
+  const cached = cache.get(key);
+  
+  if (cached &amp;&amp; cached.expiry &gt; now) {
+    return cached.data as T;
+  }
+  
+  const data = compute();
+  cache.set(key, { data, expiry: now + ttlMs });
+  return data;
+}</code></pre>
+<h3 id="rediselasticache-production">3.2 Redis/ElastiCache (Production)</h3>
+<p>For high-traffic endpoints: - Model configurations: 5 min TTL - Tenant settings: 1 min TTL - User sessions: 15 min TTL</p>
+<h3 id="api-gateway-caching">3.3 API Gateway Caching</h3>
+<pre class="typescript"><code>// CDK configuration
+const api = new apigateway.RestApi(this, &#39;Api&#39;, {
+  deployOptions: {
+    cachingEnabled: true,
+    cacheClusterEnabled: true,
+    cacheClusterSize: &#39;0.5&#39;,
+    cacheTtl: cdk.Duration.minutes(1),
+  },
+});
+
+// Per-method caching
+method.addMethodResponse({
+  statusCode: &#39;200&#39;,
+  responseParameters: {
+    &#39;method.response.header.Cache-Control&#39;: true,
+  },
+});</code></pre>
+<hr />
+<h2 id="response-optimization">4. Response Optimization</h2>
+<h3 id="compression">4.1 Compression</h3>
+<pre class="typescript"><code>// Enable gzip for large responses
+if (body.length &gt; 1024) {
+  const compressed = zlib.gzipSync(body);
+  return {
+    statusCode: 200,
+    headers: {
+      &#39;Content-Encoding&#39;: &#39;gzip&#39;,
+      &#39;Content-Type&#39;: &#39;application/json&#39;,
+    },
+    body: compressed.toString(&#39;base64&#39;),
+    isBase64Encoded: true,
+  };
+}</code></pre>
+<h3 id="pagination">4.2 Pagination</h3>
+<pre class="typescript"><code>// Always paginate large result sets
+const DEFAULT_PAGE_SIZE = 50;
+const MAX_PAGE_SIZE = 200;
+
+function paginate&lt;T&gt;(items: T[], page: number, pageSize: number): PaginatedResult&lt;T&gt; {
+  const size = Math.min(pageSize || DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
+  const offset = (page - 1) * size;
+  
+  return {
+    items: items.slice(offset, offset + size),
+    total: items.length,
+    page,
+    pageSize: size,
+    totalPages: Math.ceil(items.length / size),
+  };
+}</code></pre>
+<hr />
+<h2 id="ai-model-call-optimization">5. AI Model Call Optimization</h2>
+<h3 id="streaming-responses">5.1 Streaming Responses</h3>
+<pre class="typescript"><code>// Use streaming for long generations
+const stream = await bedrockClient.send(new InvokeModelWithResponseStreamCommand({
+  modelId,
+  body: JSON.stringify(request),
+}));
+
+for await (const event of stream.body) {
+  if (event.chunk) {
+    yield JSON.parse(new TextDecoder().decode(event.chunk.bytes));
+  }
+}</code></pre>
+<h3 id="request-batching">5.2 Request Batching</h3>
+<pre class="typescript"><code>// Batch similar requests
+const batchWindow = 50; // ms
+const pendingRequests: Map&lt;string, Promise&lt;Response&gt;&gt; = new Map();
+
+async function batchedInvoke(prompt: string): Promise&lt;Response&gt; {
+  const key = hashPrompt(prompt);
+  
+  if (pendingRequests.has(key)) {
+    return pendingRequests.get(key)!;
+  }
+  
+  const promise = invoke(prompt);
+  pendingRequests.set(key, promise);
+  
+  setTimeout(() =&gt; pendingRequests.delete(key), batchWindow);
+  
+  return promise;
+}</code></pre>
+<h3 id="prompt-caching-claude">5.3 Prompt Caching (Claude)</h3>
+<pre class="typescript"><code>// Use prompt caching for repeated system prompts
+const request = {
+  anthropic_version: &#39;bedrock-2023-05-31&#39;,
+  system: [
+    {
+      type: &#39;text&#39;,
+      text: systemPrompt,
+      cache_control: { type: &#39;ephemeral&#39; }, // Enable caching
+    },
+  ],
+  messages,
+};</code></pre>
+<hr />
+<h2 id="frontend-performance">6. Frontend Performance</h2>
+<h3 id="code-splitting">6.1 Code Splitting</h3>
+<pre class="typescript"><code>// Dynamic imports for large components
+const AIReportsPage = dynamic(() =&gt; import(&#39;./ai-reports&#39;), {
+  loading: () =&gt; &lt;Skeleton /&gt;,
+  ssr: false,
+});</code></pre>
+<h3 id="data-fetching">6.2 Data Fetching</h3>
+<pre class="typescript"><code>// Use SWR for caching and revalidation
+const { data, error, isLoading } = useSWR(
+  &#39;/api/admin/ai-reports&#39;,
+  fetcher,
+  {
+    revalidateOnFocus: false,
+    dedupingInterval: 30000,
+  }
+);</code></pre>
+<h3 id="image-optimization">6.3 Image Optimization</h3>
+<pre class="typescript"><code>// Use Next.js Image component
+import Image from &#39;next/image&#39;;
+
+&lt;Image
+  src={logoUrl}
+  width={200}
+  height={50}
+  priority={false}
+  loading=&quot;lazy&quot;
+/&gt;</code></pre>
+<hr />
+<h2 id="monitoring-alerts">7. Monitoring &amp; Alerts</h2>
+<h3 id="key-metrics">7.1 Key Metrics</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Warning</th>
+<th>Critical</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P95 Latency</td>
+<td>&gt; 1s</td>
+<td>&gt; 3s</td>
+</tr>
+<tr>
+<td>Error Rate</td>
+<td>&gt; 1%</td>
+<td>&gt; 5%</td>
+</tr>
+<tr>
+<td>Cold Start Rate</td>
+<td>&gt; 10%</td>
+<td>&gt; 25%</td>
+</tr>
+<tr>
+<td>Cache Hit Rate</td>
+<td>&lt; 80%</td>
+<td>&lt; 60%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cloudwatch-alarms">7.2 CloudWatch Alarms</h3>
+<pre class="typescript"><code>new cloudwatch.Alarm(this, &#39;HighLatencyAlarm&#39;, {
+  metric: api.metricLatency({ statistic: &#39;p95&#39; }),
+  threshold: 1000,
+  evaluationPeriods: 3,
+  comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD,
+});</code></pre>
+<hr />
+<h2 id="cost-optimization">8. Cost Optimization</h2>
+<h3 id="right-sizing">8.1 Right-Sizing</h3>
+<ul>
+<li>Start with minimum viable memory</li>
+<li>Use Lambda Power Tuning to find optimal</li>
+<li>Monitor actual memory usage</li>
+</ul>
+<h3 id="reserved-concurrency">8.2 Reserved Concurrency</h3>
+<pre class="typescript"><code>// For predictable workloads
+const fn = new lambda.Function(this, &#39;Function&#39;, {
+  // ...
+  reservedConcurrentExecutions: 100, // Limit max concurrency
+});</code></pre>
+<h3 id="spot-instances-ecsfargate">8.3 Spot Instances (ECS/Fargate)</h3>
+<p>For self-hosted models:</p>
+<pre class="typescript"><code>fargateService.taskDefinition.addContainer(&#39;model&#39;, {
+  // ...
+  capacityProviderStrategies: [
+    { capacityProvider: &#39;FARGATE_SPOT&#39;, weight: 2 },
+    { capacityProvider: &#39;FARGATE&#39;, weight: 1 },
+  ],
+});</code></pre>
+<hr />
+<h2 id="quick-wins-checklist">9. Quick Wins Checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Enable API Gateway caching for read endpoints</label></li>
+<li><label><input type="checkbox" />Add database indexes for frequent queries</label></li>
+<li><label><input type="checkbox" />Implement response compression for large payloads</label></li>
+<li><label><input type="checkbox" />Use streaming for AI model responses</label></li>
+<li><label><input type="checkbox" />Enable HTTP keep-alive for external calls</label></li>
+<li><label><input type="checkbox" />Lazy-load heavy SDK clients</label></li>
+<li><label><input type="checkbox" />Paginate all list endpoints</label></li>
+<li><label><input type="checkbox" />Add CloudWatch alarms for latency</label></li>
+<li><label><input type="checkbox" />Review Lambda memory settings monthly</label></li>
+<li><label><input type="checkbox" />Enable prompt caching for Claude models</label></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

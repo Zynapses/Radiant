@@ -119,8 +119,8 @@ export default function BlackboardPage() {
   const { data: dashboard, isLoading: dashboardLoading, refetch: refetchDashboard } = useQuery({
     queryKey: ['blackboard', 'dashboard'],
     queryFn: async () => {
-      const res = await api.get('/admin/blackboard/dashboard');
-      return res.data.data as DashboardStats;
+      const res = await api.get<{ data: { data: DashboardStats } }>('/admin/blackboard/dashboard');
+      return res.data.data;
     },
     refetchInterval: 30000,
   });
@@ -129,8 +129,8 @@ export default function BlackboardPage() {
   const { data: decisions, isLoading: decisionsLoading } = useQuery({
     queryKey: ['blackboard', 'decisions'],
     queryFn: async () => {
-      const res = await api.get('/admin/blackboard/decisions?limit=50');
-      return res.data.data.decisions as ResolvedDecision[];
+      const res = await api.get<{ data: { data: { decisions: ResolvedDecision[] } } }>('/admin/blackboard/decisions?limit=50');
+      return res.data.data.decisions;
     },
     enabled: activeTab === 'decisions',
   });
@@ -139,8 +139,8 @@ export default function BlackboardPage() {
   const { data: groups, isLoading: groupsLoading } = useQuery({
     queryKey: ['blackboard', 'groups'],
     queryFn: async () => {
-      const res = await api.get('/admin/blackboard/groups');
-      return res.data.data.groups as QuestionGroup[];
+      const res = await api.get<{ data: { data: { groups: QuestionGroup[] } } }>('/admin/blackboard/groups');
+      return res.data.data.groups;
     },
     enabled: activeTab === 'groups',
   });
@@ -149,8 +149,8 @@ export default function BlackboardPage() {
   const { data: agents, isLoading: agentsLoading } = useQuery({
     queryKey: ['blackboard', 'agents'],
     queryFn: async () => {
-      const res = await api.get('/admin/blackboard/agents');
-      return res.data.data.agents as ActiveAgent[];
+      const res = await api.get<{ data: { data: { agents: ActiveAgent[] } } }>('/admin/blackboard/agents');
+      return res.data.data.agents;
     },
     enabled: activeTab === 'agents',
     refetchInterval: 10000,
@@ -160,8 +160,8 @@ export default function BlackboardPage() {
   const { data: locks, isLoading: locksLoading } = useQuery({
     queryKey: ['blackboard', 'locks'],
     queryFn: async () => {
-      const res = await api.get('/admin/blackboard/locks');
-      return res.data.data.locks as ResourceLock[];
+      const res = await api.get<{ data: { data: { locks: ResourceLock[] } } }>('/admin/blackboard/locks');
+      return res.data.data.locks;
     },
     enabled: activeTab === 'locks',
     refetchInterval: 10000,
@@ -171,8 +171,8 @@ export default function BlackboardPage() {
   const { data: config, isLoading: configLoading } = useQuery({
     queryKey: ['blackboard', 'config'],
     queryFn: async () => {
-      const res = await api.get('/admin/blackboard/config');
-      return res.data.data.config as BlackboardConfig;
+      const res = await api.get<{ data: { data: { config: BlackboardConfig } } }>('/admin/blackboard/config');
+      return res.data.data.config;
     },
     enabled: activeTab === 'config',
   });

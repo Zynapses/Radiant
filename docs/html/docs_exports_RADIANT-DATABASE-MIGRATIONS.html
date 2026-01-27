@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIANT DATABASE MIGRATIONS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RADIANT DATABASE MIGRATIONS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/RADIANT-DATABASE-MIGRATIONS.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.18.0---database-migrations-export">RADIANT v4.18.0 - Database Migrations Export</h1>
+<p><strong>Component</strong>: PostgreSQL Database Schema <strong>Database</strong>: Aurora PostgreSQL 15 <strong>Files</strong>: 160+ SQL migration files <strong>Features</strong>: Row-Level Security (RLS), pgvector, Multi-tenancy</p>
+<hr />
+<h2 id="architecture-narrative">Architecture Narrative</h2>
+<p>RADIANT uses <strong>Aurora PostgreSQL Serverless v2</strong> with a comprehensive migration system. All tables implement <strong>Row-Level Security (RLS)</strong> for multi-tenant isolation, using the <code>app.current_tenant_id</code> session variable set at the start of each request.</p>
+<h3 id="key-database-features">Key Database Features</h3>
+<ol type="1">
+<li><strong>Multi-Tenant Isolation</strong> - RLS policies on all tables</li>
+<li><strong>Vector Search</strong> - pgvector extension for embeddings</li>
+<li><strong>Audit Logging</strong> - Append-only audit tables</li>
+<li><strong>Versioned Migrations</strong> - Sequential numbered migrations</li>
+<li><strong>Seed Data</strong> - Default configurations and models</li>
+</ol>
+<h3 id="migration-naming-convention">Migration Naming Convention</h3>
+<pre><code>XXX_feature_name.sql
+
+Where XXX is a sequential number:
+001-009: Core platform schema
+010-019: AI and Brain features
+020-029: Think Tank and collaboration
+030-039: Configuration and billing
+040-049: Advanced AI features
+050-099: Platform extensions
+100+: Latest additions</code></pre>
+<hr />
+<h2 id="migration-inventory">Migration Inventory</h2>
+<h3 id="core-platform-001-009">Core Platform (001-009)</h3>
+<table>
+<colgroup>
+<col style="width: 55%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr>
+<th>Migration</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>001_initial_schema.sql</code></td>
+<td>Base tables: tenants, users, administrators</td>
+</tr>
+<tr>
+<td><code>002_tenant_isolation.sql</code></td>
+<td>RLS policies for multi-tenancy</td>
+</tr>
+<tr>
+<td><code>003_ai_models.sql</code></td>
+<td>AI model registry tables</td>
+</tr>
+<tr>
+<td><code>004_usage_billing.sql</code></td>
+<td>Usage tracking and billing</td>
+</tr>
+<tr>
+<td><code>005_admin_approval.sql</code></td>
+<td>Two-person approval workflow</td>
+</tr>
+<tr>
+<td><code>006_self_hosted_models.sql</code></td>
+<td>Self-hosted model management</td>
+</tr>
+<tr>
+<td><code>007_external_providers.sql</code></td>
+<td>External provider configuration</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ai-brain-features-010-019">AI &amp; Brain Features (010-019)</h3>
+<table>
+<thead>
+<tr>
+<th>Migration</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>010_visual_ai_pipeline.sql</code></td>
+<td>Visual AI processing</td>
+</tr>
+<tr>
+<td><code>011_brain_router.sql</code></td>
+<td>AGI Brain router tables</td>
+</tr>
+<tr>
+<td><code>012_metrics_analytics.sql</code></td>
+<td>Metrics and analytics</td>
+</tr>
+<tr>
+<td><code>013_neural_engine.sql</code></td>
+<td>Neural engine configuration</td>
+</tr>
+<tr>
+<td><code>014_error_logging.sql</code></td>
+<td>Error logging tables</td>
+</tr>
+<tr>
+<td><code>015_credentials_registry.sql</code></td>
+<td>Credential management</td>
+</tr>
+<tr>
+<td><code>016_think_tank.sql</code></td>
+<td>Think Tank sessions and steps</td>
+</tr>
+<tr>
+<td><code>017_concurrent_chat.sql</code></td>
+<td>Concurrent chat support</td>
+</tr>
+<tr>
+<td><code>018_realtime_collaboration.sql</code></td>
+<td>Real-time collaboration</td>
+</tr>
+<tr>
+<td><code>019_persistent_memory.sql</code></td>
+<td>Persistent memory storage</td>
+</tr>
+</tbody>
+</table>
+<h3 id="think-tank-collaboration-020-029">Think Tank &amp; Collaboration (020-029)</h3>
+<table>
+<thead>
+<tr>
+<th>Migration</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>020_focus_personas.sql</code></td>
+<td>Focus persona management</td>
+</tr>
+<tr>
+<td><code>021_team_plans.sql</code></td>
+<td>Team planning features</td>
+</tr>
+<tr>
+<td><code>022_provider_registry.sql</code></td>
+<td>Provider registry</td>
+</tr>
+<tr>
+<td><code>023_time_machine.sql</code></td>
+<td>Time Machine versioning</td>
+</tr>
+<tr>
+<td><code>024_orchestration_engine.sql</code></td>
+<td>Orchestration engine</td>
+</tr>
+<tr>
+<td><code>025_license_management.sql</code></td>
+<td>License management</td>
+</tr>
+<tr>
+<td><code>026_unified_model_registry.sql</code></td>
+<td>Unified model registry</td>
+</tr>
+<tr>
+<td><code>027_feedback_learning.sql</code></td>
+<td>Feedback and learning</td>
+</tr>
+<tr>
+<td><code>028_neural_orchestration.sql</code></td>
+<td>Neural orchestration</td>
+</tr>
+<tr>
+<td><code>029_workflow_proposals.sql</code></td>
+<td>Workflow proposals</td>
+</tr>
+</tbody>
+</table>
+<h3 id="configuration-billing-030-039">Configuration &amp; Billing (030-039)</h3>
+<table>
+<thead>
+<tr>
+<th>Migration</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>030_app_isolation.sql</code></td>
+<td>App-level isolation</td>
+</tr>
+<tr>
+<td><code>031_internationalization.sql</code></td>
+<td>i18n support</td>
+</tr>
+<tr>
+<td><code>032_dynamic_configuration.sql</code></td>
+<td>Dynamic config</td>
+</tr>
+<tr>
+<td><code>032b_artifact_genui_engine.sql</code></td>
+<td>Artifact generation UI</td>
+</tr>
+<tr>
+<td><code>032c_artifact_genui_seed.sql</code></td>
+<td>Artifact UI seed data</td>
+</tr>
+<tr>
+<td><code>032d_artifact_extend_base.sql</code></td>
+<td>Artifact extensions</td>
+</tr>
+<tr>
+<td><code>033_billing_credits.sql</code></td>
+<td>Credit-based billing</td>
+</tr>
+<tr>
+<td><code>034_storage_billing.sql</code></td>
+<td>Storage billing</td>
+</tr>
+<tr>
+<td><code>035_versioned_subscriptions.sql</code></td>
+<td>Subscription versioning</td>
+</tr>
+<tr>
+<td><code>036_dual_admin_approval.sql</code></td>
+<td>Dual admin approval</td>
+</tr>
+<tr>
+<td><code>037_canvas_artifacts.sql</code></td>
+<td>Canvas artifacts</td>
+</tr>
+<tr>
+<td><code>038_scheduled_prompts.sql</code></td>
+<td>Scheduled prompts</td>
+</tr>
+</tbody>
+</table>
+<h3 id="advanced-ai-features-040-099">Advanced AI Features (040-099)</h3>
+<table>
+<thead>
+<tr>
+<th>Migration</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>040_agi_brain_plans.sql</code></td>
+<td>AGI brain planning</td>
+</tr>
+<tr>
+<td><code>041_consciousness_engine.sql</code></td>
+<td>Consciousness engine</td>
+</tr>
+<tr>
+<td><code>042_formal_reasoning.sql</code></td>
+<td>Formal reasoning</td>
+</tr>
+<tr>
+<td><code>043_ego_state.sql</code></td>
+<td>Ego state management</td>
+</tr>
+<tr>
+<td><code>044_dreaming.sql</code></td>
+<td>Dream cycle storage</td>
+</tr>
+<tr>
+<td><code>045_ghost_vectors.sql</code></td>
+<td>Ghost vector storage</td>
+</tr>
+<tr>
+<td><code>050_grimoire_governor.sql</code></td>
+<td>Grimoire &amp; Governor</td>
+</tr>
+<tr>
+<td>…</td>
+<td>Additional features</td>
+</tr>
+</tbody>
+</table>
+<h3 id="platform-extensions-100">Platform Extensions (100+)</h3>
+<table>
+<thead>
+<tr>
+<th>Migration</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>100_cato_safety.sql</code></td>
+<td>Cato safety system</td>
+</tr>
+<tr>
+<td><code>101_ecd_verification.sql</code></td>
+<td>ECD truth verification</td>
+</tr>
+<tr>
+<td><code>102_ego_state_injection.sql</code></td>
+<td>Zero-cost ego system</td>
+</tr>
+<tr>
+<td><code>103_metrics_learning.sql</code></td>
+<td>Metrics-based learning</td>
+</tr>
+<tr>
+<td>…</td>
+<td>Additional extensions</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="key-migrations">Key Migrations</h2>
+<h3 id="initial_schema.sql">001_initial_schema.sql</h3>
+<p><strong>Purpose</strong>: Creates base tables for the multi-tenant platform.</p>
+<pre class="sql"><code>-- RADIANT v4.17.0 - Migration 001: Initial Schema
+-- Creates base tables for multi-tenant platform
+
+-- Enable required extensions
+CREATE EXTENSION IF NOT EXISTS &quot;uuid-ossp&quot;;
+CREATE EXTENSION IF NOT EXISTS &quot;pgcrypto&quot;;
+
+-- ============================================================================
+-- TENANTS TABLE
+-- ============================================================================
+
+CREATE TABLE tenants (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) NOT NULL UNIQUE,
+    display_name VARCHAR(200) NOT NULL,
+    domain VARCHAR(255),
+    settings JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    status VARCHAR(20) NOT NULL DEFAULT &#39;active&#39; 
+        CHECK (status IN (&#39;active&#39;, &#39;suspended&#39;, &#39;pending&#39;)),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_tenants_name ON tenants(name);
+CREATE INDEX idx_tenants_domain ON tenants(domain) WHERE domain IS NOT NULL;
+CREATE INDEX idx_tenants_status ON tenants(status);
+
+-- ============================================================================
+-- USERS TABLE (End Users)
+-- ============================================================================
+
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    cognito_user_id VARCHAR(128) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    display_name VARCHAR(200),
+    role VARCHAR(50) NOT NULL DEFAULT &#39;user&#39; 
+        CHECK (role IN (&#39;user&#39;, &#39;power_user&#39;, &#39;admin&#39;)),
+    status VARCHAR(20) NOT NULL DEFAULT &#39;active&#39; 
+        CHECK (status IN (&#39;active&#39;, &#39;suspended&#39;, &#39;pending&#39;)),
+    settings JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (tenant_id, email),
+    UNIQUE (cognito_user_id)
+);
+
+CREATE INDEX idx_users_tenant_id ON users(tenant_id);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_cognito_user_id ON users(cognito_user_id);
+
+-- ============================================================================
+-- ADMINISTRATORS TABLE (Platform Admins)
+-- ============================================================================
+
+CREATE TABLE administrators (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    cognito_user_id VARCHAR(128) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    display_name VARCHAR(200) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT &#39;admin&#39; 
+        CHECK (role IN (&#39;super_admin&#39;, &#39;admin&#39;, &#39;operator&#39;, &#39;auditor&#39;)),
+    permissions TEXT[] NOT NULL DEFAULT &#39;{}&#39;,
+    mfa_enabled BOOLEAN NOT NULL DEFAULT false,
+    last_login_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    invited_by UUID REFERENCES administrators(id)
+);
+
+-- ============================================================================
+-- APPROVAL REQUESTS TABLE (Two-Person Approval)
+-- ============================================================================
+
+CREATE TABLE approval_requests (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    requester_id UUID NOT NULL REFERENCES administrators(id),
+    action_type VARCHAR(100) NOT NULL,
+    resource_type VARCHAR(100) NOT NULL,
+    resource_id VARCHAR(255),
+    payload JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    status VARCHAR(20) NOT NULL DEFAULT &#39;pending&#39;
+        CHECK (status IN (&#39;pending&#39;, &#39;approved&#39;, &#39;rejected&#39;, &#39;expired&#39;)),
+    approved_by UUID REFERENCES administrators(id),
+    approved_at TIMESTAMPTZ,
+    rejection_reason TEXT,
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);</code></pre>
+<hr />
+<h3 id="think_tank.sql">016_think_tank.sql</h3>
+<p><strong>Purpose</strong>: Think Tank platform for complex problem decomposition.</p>
+<pre class="sql"><code>-- RADIANT v4.17.0 - Migration 016: Think Tank Platform
+-- Complex problem decomposition and multi-step reasoning
+
+CREATE TABLE thinktank_sessions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    problem_summary TEXT,
+    domain VARCHAR(50),
+    complexity VARCHAR(20) CHECK (complexity IN (&#39;low&#39;, &#39;medium&#39;, &#39;high&#39;, &#39;extreme&#39;)),
+    total_steps INTEGER DEFAULT 0,
+    avg_confidence DECIMAL(3, 2),
+    solution_found BOOLEAN DEFAULT false,
+    total_tokens INTEGER DEFAULT 0,
+    total_cost DECIMAL(10, 6) DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    completed_at TIMESTAMPTZ
+);
+
+CREATE TABLE thinktank_steps (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    session_id UUID NOT NULL REFERENCES thinktank_sessions(id) ON DELETE CASCADE,
+    step_number INTEGER NOT NULL,
+    step_type VARCHAR(50) NOT NULL 
+        CHECK (step_type IN (&#39;decompose&#39;, &#39;reason&#39;, &#39;execute&#39;, &#39;verify&#39;, &#39;synthesize&#39;)),
+    description TEXT,
+    reasoning TEXT,
+    result TEXT,
+    confidence DECIMAL(3, 2) CHECK (confidence &gt;= 0 AND confidence &lt;= 1),
+    model_used VARCHAR(100),
+    tokens_used INTEGER,
+    duration_ms INTEGER,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE thinktank_tools (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tool_name VARCHAR(100) NOT NULL UNIQUE,
+    tool_type VARCHAR(50) NOT NULL,
+    description TEXT,
+    parameters_schema JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    implementation TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_thinktank_sessions_tenant ON thinktank_sessions(tenant_id, created_at DESC);
+CREATE INDEX idx_thinktank_sessions_user ON thinktank_sessions(user_id);
+CREATE INDEX idx_thinktank_steps_session ON thinktank_steps(session_id, step_number);
+
+-- Row Level Security
+ALTER TABLE thinktank_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE thinktank_steps ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY thinktank_sessions_isolation ON thinktank_sessions
+    FOR ALL USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;, true)::uuid);
+
+CREATE POLICY thinktank_steps_isolation ON thinktank_steps
+    FOR ALL USING (
+        session_id IN (
+            SELECT id FROM thinktank_sessions 
+            WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;, true)::uuid
+        )
+    );
+
+-- Default tools
+INSERT INTO thinktank_tools (tool_name, tool_type, description, parameters_schema) VALUES
+    (&#39;web_search&#39;, &#39;search&#39;, &#39;Search the web for information&#39;, &#39;{&quot;query&quot;: &quot;string&quot;}&#39;),
+    (&#39;calculator&#39;, &#39;compute&#39;, &#39;Perform mathematical calculations&#39;, &#39;{&quot;expression&quot;: &quot;string&quot;}&#39;),
+    (&#39;code_executor&#39;, &#39;compute&#39;, &#39;Execute code snippets&#39;, &#39;{&quot;language&quot;: &quot;string&quot;, &quot;code&quot;: &quot;string&quot;}&#39;),
+    (&#39;file_reader&#39;, &#39;io&#39;, &#39;Read file contents&#39;, &#39;{&quot;path&quot;: &quot;string&quot;}&#39;),
+    (&#39;api_caller&#39;, &#39;network&#39;, &#39;Make API requests&#39;, &#39;{&quot;url&quot;: &quot;string&quot;, &quot;method&quot;: &quot;string&quot;, &quot;body&quot;: &quot;object&quot;}&#39;);</code></pre>
+<hr />
+<h3 id="grimoire_governor.sql">050_grimoire_governor.sql</h3>
+<p><strong>Purpose</strong>: Grimoire procedural memory and Economic Governor.</p>
+<pre class="sql"><code>-- RADIANT v5.0.0 - Migration 050: Grimoire &amp; Governor
+-- Procedural memory and cost optimization
+
+-- ============================================================================
+-- KNOWLEDGE HEURISTICS TABLE (The Grimoire)
+-- ============================================================================
+
+CREATE TABLE knowledge_heuristics (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    domain VARCHAR(100) NOT NULL,
+    trigger_pattern TEXT NOT NULL,
+    action_template TEXT NOT NULL,
+    success_count INTEGER DEFAULT 0,
+    failure_count INTEGER DEFAULT 0,
+    confidence DECIMAL(3, 2) DEFAULT 0.50,
+    embedding VECTOR(1536),
+    source_execution_id UUID,
+    last_used_at TIMESTAMPTZ,
+    expires_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_heuristics_domain ON knowledge_heuristics(tenant_id, domain);
+CREATE INDEX idx_heuristics_embedding ON knowledge_heuristics USING ivfflat (embedding vector_cosine_ops);
+
+-- RLS
+ALTER TABLE knowledge_heuristics ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY heuristics_tenant_isolation ON knowledge_heuristics
+    FOR ALL USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;, true)::uuid);
+
+-- ============================================================================
+-- GOVERNOR SAVINGS LOG
+-- ============================================================================
+
+CREATE TABLE governor_savings_log (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    task_id UUID NOT NULL,
+    original_model VARCHAR(100) NOT NULL,
+    selected_model VARCHAR(100) NOT NULL,
+    complexity_score DECIMAL(3, 2) NOT NULL,
+    estimated_original_cost DECIMAL(10, 6) NOT NULL,
+    actual_cost DECIMAL(10, 6) NOT NULL,
+    savings DECIMAL(10, 6) NOT NULL,
+    decision_reason TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE governor_savings_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY governor_log_isolation ON governor_savings_log
+    FOR ALL USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;, true)::uuid);</code></pre>
+<hr />
+<h2 id="rls-pattern">RLS Pattern</h2>
+<p>All tenant-scoped tables use this pattern:</p>
+<pre class="sql"><code>-- Enable RLS
+ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;
+
+-- Create isolation policy
+CREATE POLICY table_name_isolation ON table_name
+    FOR ALL USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;, true)::uuid);
+
+-- For related tables (via foreign key)
+CREATE POLICY child_table_isolation ON child_table
+    FOR ALL USING (
+        parent_id IN (
+            SELECT id FROM parent_table 
+            WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;, true)::uuid
+        )
+    );</code></pre>
+<h3 id="setting-tenant-context">Setting Tenant Context</h3>
+<pre class="typescript"><code>// In Lambda handlers
+await executeStatement(
+  `SELECT set_config(&#39;app.current_tenant_id&#39;, $1, true)`,
+  [{ name: &#39;tenantId&#39;, value: { stringValue: tenantId } }]
+);</code></pre>
+<hr />
+<h2 id="database-extensions">Database Extensions</h2>
+<pre class="sql"><code>-- Required extensions
+CREATE EXTENSION IF NOT EXISTS &quot;uuid-ossp&quot;;    -- UUID generation
+CREATE EXTENSION IF NOT EXISTS &quot;pgcrypto&quot;;     -- Cryptographic functions
+CREATE EXTENSION IF NOT EXISTS &quot;vector&quot;;       -- pgvector for embeddings
+CREATE EXTENSION IF NOT EXISTS &quot;pg_trgm&quot;;      -- Trigram similarity</code></pre>
+<hr />
+<h2 id="migration-execution">Migration Execution</h2>
+<h3 id="fresh-install">Fresh Install</h3>
+<pre class="bash"><code># Run all migrations in order
+for f in migrations/*.sql; do
+  psql -h $DB_HOST -U $DB_USER -d $DB_NAME -f &quot;$f&quot;
+done</code></pre>
+<h3 id="incremental-update">Incremental Update</h3>
+<pre class="bash"><code># Run only new migrations (from version X)
+for f in migrations/$(($CURRENT_VERSION + 1))_*.sql; do
+  psql -h $DB_HOST -U $DB_USER -d $DB_NAME -f &quot;$f&quot;
+done</code></pre>
+<hr />
+<p><em>This concludes the Database Migrations export. See other export files for additional components.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ON CALL - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>ON CALL</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/runbooks/ON_CALL.md</div>
+  </div>
+  
+  <h1 id="on-call-runbook">On-Call Runbook</h1>
+<h2 id="overview">Overview</h2>
+<p>This runbook provides guidance for on-call engineers supporting the RADIANT platform.</p>
+<h2 id="on-call-responsibilities">On-Call Responsibilities</h2>
+<ol type="1">
+<li><strong>Monitor</strong> alerts and dashboards</li>
+<li><strong>Respond</strong> to incidents within SLA</li>
+<li><strong>Escalate</strong> when needed</li>
+<li><strong>Document</strong> all actions taken</li>
+<li><strong>Handoff</strong> to next on-call</li>
+</ol>
+<h2 id="shift-schedule">Shift Schedule</h2>
+<ul>
+<li>Primary on-call: 24/7 coverage</li>
+<li>Secondary on-call: Backup for escalation</li>
+<li>Shifts rotate weekly (Monday 9am)</li>
+</ul>
+<h2 id="alert-sources">Alert Sources</h2>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Type</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PagerDuty</td>
+<td>Alerts</td>
+<td>High</td>
+</tr>
+<tr>
+<td>Slack #alerts</td>
+<td>Warnings</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>Email</td>
+<td>Informational</td>
+<td>Low</td>
+</tr>
+</tbody>
+</table>
+<h2 id="first-response">First Response</h2>
+<h3 id="acknowledge-alert">1. Acknowledge Alert</h3>
+<pre class="bash"><code># Via PagerDuty app or CLI
+pd incident acknowledge &lt;incident-id&gt;</code></pre>
+<h3 id="initial-assessment-5-minutes">2. Initial Assessment (5 minutes)</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />What is the alert?</label></li>
+<li><label><input type="checkbox" />What service is affected?</label></li>
+<li><label><input type="checkbox" />What’s the impact?</label></li>
+<li><label><input type="checkbox" />When did it start?</label></li>
+</ul>
+<h3 id="check-dashboards">3. Check Dashboards</h3>
+<pre class="bash"><code># Open CloudWatch dashboard
+open &quot;https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=radiant-production-dashboard&quot;
+
+# Or use AWS CLI
+aws cloudwatch get-metric-data \
+  --metric-data-queries file://quick-metrics.json \
+  --start-time $(date -d &#39;1 hour ago&#39; -Iseconds) \
+  --end-time $(date -Iseconds)</code></pre>
+<h3 id="check-service-health">4. Check Service Health</h3>
+<pre class="bash"><code># API health
+curl -s https://api.radiant.example.com/v2/health | jq
+
+# Dashboard health
+curl -s -o /dev/null -w &quot;%{http_code}&quot; https://admin.radiant.example.com
+
+# Database (via admin API)
+curl -s -H &quot;Authorization: Bearer $TOKEN&quot; \
+  https://api.radiant.example.com/v2/admin/health/database | jq</code></pre>
+<h2 id="common-alerts">Common Alerts</h2>
+<h3 id="api-error-rate-high">API Error Rate High</h3>
+<p><strong>Alert:</strong> <code>radiant-production-api-5xx-errors</code></p>
+<p><strong>Quick Check:</strong></p>
+<pre class="bash"><code># Recent Lambda errors
+aws logs filter-log-events \
+  --log-group-name /aws/lambda/radiant-production-router \
+  --filter-pattern &quot;ERROR&quot; \
+  --start-time $(date -d &#39;30 minutes ago&#39; +%s000) \
+  --limit 20</code></pre>
+<p><strong>Actions:</strong> 1. Check if it’s a single endpoint or widespread 2. Check recent deployments 3. Check database connectivity 4. Escalate if &gt; 5 minutes</p>
+<h3 id="api-latency-high">API Latency High</h3>
+<p><strong>Alert:</strong> <code>radiant-production-api-latency</code></p>
+<p><strong>Quick Check:</strong></p>
+<pre class="bash"><code># Lambda duration
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/Lambda \
+  --metric-name Duration \
+  --dimensions Name=FunctionName,Value=radiant-production-router \
+  --statistics p99 \
+  --period 60 \
+  --start-time $(date -d &#39;30 minutes ago&#39; -Iseconds) \
+  --end-time $(date -Iseconds)</code></pre>
+<p><strong>Actions:</strong> 1. Check if cold starts are high 2. Check database query times 3. Check AI provider latency 4. Consider scaling up</p>
+<h3 id="database-cpu-high">Database CPU High</h3>
+<p><strong>Alert:</strong> <code>radiant-production-db-cpu</code></p>
+<p><strong>Quick Check:</strong></p>
+<pre class="bash"><code># DB metrics
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/RDS \
+  --metric-name CPUUtilization \
+  --dimensions Name=DBClusterIdentifier,Value=radiant-production \
+  --statistics Average \
+  --period 60 \
+  --start-time $(date -d &#39;30 minutes ago&#39; -Iseconds) \
+  --end-time $(date -Iseconds)</code></pre>
+<p><strong>Actions:</strong> 1. Check for long-running queries 2. Check connection count 3. Consider read replica 4. Escalate to database team</p>
+<h3 id="lambda-throttling">Lambda Throttling</h3>
+<p><strong>Alert:</strong> Lambda concurrent execution limit</p>
+<p><strong>Quick Check:</strong></p>
+<pre class="bash"><code>aws cloudwatch get-metric-statistics \
+  --namespace AWS/Lambda \
+  --metric-name Throttles \
+  --dimensions Name=FunctionName,Value=radiant-production-router \
+  --statistics Sum \
+  --period 60 \
+  --start-time $(date -d &#39;30 minutes ago&#39; -Iseconds) \
+  --end-time $(date -Iseconds)</code></pre>
+<p><strong>Actions:</strong> 1. Request concurrency limit increase 2. Check for retry storms 3. Consider provisioned concurrency</p>
+<h2 id="escalation">Escalation</h2>
+<h3 id="when-to-escalate">When to Escalate</h3>
+<ul>
+<li>SEV1/SEV2 incidents</li>
+<li>Unable to resolve within 30 minutes</li>
+<li>Security incidents</li>
+<li>Data loss potential</li>
+<li>Need additional expertise</li>
+</ul>
+<h3 id="escalation-path">Escalation Path</h3>
+<ol type="1">
+<li><strong>Secondary On-Call</strong> - First escalation</li>
+<li><strong>Engineering Lead</strong> - Major incidents</li>
+<li><strong>Security Team</strong> - Security issues</li>
+<li><strong>Executive</strong> - Business-critical</li>
+</ol>
+<h3 id="how-to-escalate">How to Escalate</h3>
+<pre class="bash"><code># Via PagerDuty
+pd incident escalate &lt;incident-id&gt; --escalation-policy &quot;Engineering Lead&quot;
+
+# Via Slack
+/page @engineering-lead SEV2 - API errors &gt; 5%</code></pre>
+<h2 id="useful-commands">Useful Commands</h2>
+<h3 id="log-analysis">Log Analysis</h3>
+<pre class="bash"><code># Search logs for errors
+aws logs filter-log-events \
+  --log-group-name /aws/lambda/radiant-production-router \
+  --filter-pattern &quot;ERROR&quot; \
+  --start-time $(date -d &#39;1 hour ago&#39; +%s000)
+
+# Search for specific request
+aws logs filter-log-events \
+  --log-group-name /aws/lambda/radiant-production-router \
+  --filter-pattern &#39;&quot;requestId&quot;:&quot;abc123&quot;&#39;</code></pre>
+<h3 id="quick-metrics">Quick Metrics</h3>
+<pre class="bash"><code># API request count
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/ApiGateway \
+  --metric-name Count \
+  --dimensions Name=ApiName,Value=radiant-production-api \
+  --statistics Sum \
+  --period 300 \
+  --start-time $(date -d &#39;1 hour ago&#39; -Iseconds) \
+  --end-time $(date -Iseconds)</code></pre>
+<h3 id="service-status">Service Status</h3>
+<pre class="bash"><code># All Lambda functions
+aws lambda list-functions \
+  --query &quot;Functions[?starts_with(FunctionName, &#39;radiant-production&#39;)].[FunctionName,LastModified]&quot; \
+  --output table
+
+# All RDS clusters
+aws rds describe-db-clusters \
+  --query &quot;DBClusters[?starts_with(DBClusterIdentifier, &#39;radiant&#39;)].[DBClusterIdentifier,Status]&quot; \
+  --output table</code></pre>
+<h2 id="handoff-procedure">Handoff Procedure</h2>
+<h3 id="end-of-shift">End of Shift</h3>
+<ol type="1">
+<li><strong>Document</strong> any ongoing issues</li>
+<li><strong>Update</strong> incident tickets</li>
+<li><strong>Brief</strong> incoming on-call</li>
+<li><strong>Transfer</strong> PagerDuty responsibility</li>
+</ol>
+<h3 id="handoff-template">Handoff Template</h3>
+<pre><code>## On-Call Handoff
+
+**Date:** YYYY-MM-DD
+**Outgoing:** @name
+**Incoming:** @name
+
+### Active Incidents
+- None / [Incident links]
+
+### Recent Issues
+- [Brief description of any issues in past 24h]
+
+### Upcoming Changes
+- [Any scheduled deployments or maintenance]
+
+### Notes
+- [Anything the incoming on-call should know]</code></pre>
+<h2 id="resources">Resources</h2>
+<ul>
+<li><a href="./INCIDENT_RESPONSE.md">Incident Response Runbook</a></li>
+<li><a href="./DEPLOYMENT.md">Deployment Runbook</a></li>
+<li><a href="https://console.aws.amazon.com/cloudwatch">CloudWatch Dashboard</a></li>
+<li><a href="https://admin.radiant.example.com">Admin Dashboard</a></li>
+<li><a href="https://radiant.pagerduty.com">PagerDuty</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

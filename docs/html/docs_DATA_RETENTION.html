@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DATA RETENTION - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>DATA RETENTION</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/DATA_RETENTION.md</div>
+  </div>
+  
+  <h1 id="radiant-data-retention-policy">RADIANT Data Retention Policy</h1>
+<h2 id="overview">Overview</h2>
+<p>This document defines data retention periods and deletion procedures for all data stored in the RADIANT platform.</p>
+<h2 id="retention-schedule">Retention Schedule</h2>
+<h3 id="user-data">User Data</h3>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 27%" />
+<col style="width: 13%" />
+<col style="width: 26%" />
+<col style="width: 15%" />
+</colgroup>
+<thead>
+<tr>
+<th>Data Type</th>
+<th>Active Retention</th>
+<th>Archive</th>
+<th>Total Retention</th>
+<th>Deletion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Account info</td>
+<td>Active + 30 days</td>
+<td>N/A</td>
+<td>Account lifetime + 30 days</td>
+<td>Automatic</td>
+</tr>
+<tr>
+<td>Usage history</td>
+<td>2 years</td>
+<td>5 years</td>
+<td>7 years</td>
+<td>Automatic</td>
+</tr>
+<tr>
+<td>Chat history</td>
+<td>90 days</td>
+<td>1 year</td>
+<td>1 year</td>
+<td>Automatic</td>
+</tr>
+<tr>
+<td>Uploaded files</td>
+<td>Active</td>
+<td>30 days post-delete</td>
+<td>Active + 30 days</td>
+<td>On request</td>
+</tr>
+<tr>
+<td>API keys</td>
+<td>Active</td>
+<td>N/A</td>
+<td>Revoked + 90 days</td>
+<td>Automatic</td>
+</tr>
+</tbody>
+</table>
+<h3 id="system-data">System Data</h3>
+<table>
+<thead>
+<tr>
+<th>Data Type</th>
+<th>Retention</th>
+<th>Purpose</th>
+<th>Deletion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Audit logs</td>
+<td>7 years</td>
+<td>Compliance</td>
+<td>Automatic</td>
+</tr>
+<tr>
+<td>Access logs</td>
+<td>2 years</td>
+<td>Security</td>
+<td>Automatic</td>
+</tr>
+<tr>
+<td>Error logs</td>
+<td>90 days</td>
+<td>Debugging</td>
+<td>Automatic</td>
+</tr>
+<tr>
+<td>Metrics</td>
+<td>15 months</td>
+<td>CloudWatch default</td>
+<td>Automatic</td>
+</tr>
+<tr>
+<td>Backups</td>
+<td>35 days</td>
+<td>Recovery</td>
+<td>Automatic</td>
+</tr>
+</tbody>
+</table>
+<h3 id="billing-data">Billing Data</h3>
+<table>
+<thead>
+<tr>
+<th>Data Type</th>
+<th>Retention</th>
+<th>Purpose</th>
+<th>Legal Basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Invoices</td>
+<td>7 years</td>
+<td>Tax compliance</td>
+<td>Legal requirement</td>
+</tr>
+<tr>
+<td>Transactions</td>
+<td>7 years</td>
+<td>Financial audit</td>
+<td>Legal requirement</td>
+</tr>
+<tr>
+<td>Payment methods</td>
+<td>Active</td>
+<td>Processing</td>
+<td>Contract</td>
+</tr>
+<tr>
+<td>Receipts</td>
+<td>7 years</td>
+<td>Tax compliance</td>
+<td>Legal requirement</td>
+</tr>
+</tbody>
+</table>
+<h2 id="implementation">Implementation</h2>
+<h3 id="database-retention">Database Retention</h3>
+<pre class="sql"><code>-- Automatic data cleanup job (runs daily)
+CREATE OR REPLACE FUNCTION cleanup_expired_data()
+RETURNS void AS $$
+BEGIN
+  -- Delete expired chat messages (90 days)
+  DELETE FROM chat_messages 
+  WHERE created_at &lt; NOW() - INTERVAL &#39;90 days&#39;
+  AND archived = false;
+  
+  -- Archive chat messages older than 90 days
+  UPDATE chat_messages 
+  SET archived = true, archived_at = NOW()
+  WHERE created_at &lt; NOW() - INTERVAL &#39;90 days&#39;
+  AND archived = false;
+  
+  -- Delete archived messages older than 1 year
+  DELETE FROM chat_messages
+  WHERE archived = true
+  AND archived_at &lt; NOW() - INTERVAL &#39;1 year&#39;;
+  
+  -- Delete revoked API keys (90 days after revocation)
+  DELETE FROM api_keys
+  WHERE revoked_at &lt; NOW() - INTERVAL &#39;90 days&#39;;
+  
+  -- Delete expired sessions
+  DELETE FROM user_sessions
+  WHERE expires_at &lt; NOW();
+  
+  -- Log cleanup
+  INSERT INTO system_jobs (job_name, completed_at, records_affected)
+  VALUES (&#39;cleanup_expired_data&#39;, NOW(), 
+    (SELECT count(*) FROM pg_stat_user_tables WHERE relname IN 
+      (&#39;chat_messages&#39;, &#39;api_keys&#39;, &#39;user_sessions&#39;)));
+END;
+$$ LANGUAGE plpgsql;
+
+-- Schedule daily at 3 AM UTC
+SELECT cron.schedule(&#39;data-cleanup&#39;, &#39;0 3 * * *&#39;, &#39;SELECT cleanup_expired_data()&#39;);</code></pre>
+<h3 id="s3-lifecycle-policies">S3 Lifecycle Policies</h3>
+<pre class="typescript"><code>const bucket = new s3.Bucket(this, &#39;Storage&#39;, {
+  lifecycleRules: [
+    // User uploads - delete 30 days after object deletion marker
+    {
+      id: &#39;delete-old-versions&#39;,
+      noncurrentVersionExpiration: cdk.Duration.days(30),
+    },
+    
+    // Temp files - delete after 7 days
+    {
+      id: &#39;cleanup-temp&#39;,
+      prefix: &#39;temp/&#39;,
+      expiration: cdk.Duration.days(7),
+    },
+    
+    // Logs - transition to Glacier after 90 days, delete after 2 years
+    {
+      id: &#39;archive-logs&#39;,
+      prefix: &#39;logs/&#39;,
+      transitions: [
+        {
+          storageClass: s3.StorageClass.GLACIER,
+          transitionAfter: cdk.Duration.days(90),
+        },
+      ],
+      expiration: cdk.Duration.days(730), // 2 years
+    },
+    
+    // Backups - delete after 35 days
+    {
+      id: &#39;cleanup-backups&#39;,
+      prefix: &#39;backups/&#39;,
+      expiration: cdk.Duration.days(35),
+    },
+  ],
+});</code></pre>
+<h3 id="cloudwatch-log-retention">CloudWatch Log Retention</h3>
+<pre class="typescript"><code>// Set retention for all log groups
+const logRetention: Record&lt;string, logs.RetentionDays&gt; = {
+  // Application logs
+  &#39;/aws/lambda/radiant-*&#39;: logs.RetentionDays.THREE_MONTHS,
+  
+  // API Gateway logs
+  &#39;/aws/apigateway/radiant-*&#39;: logs.RetentionDays.THREE_MONTHS,
+  
+  // Database logs (longer for compliance)
+  &#39;/aws/rds/cluster/radiant-*&#39;: logs.RetentionDays.TWO_YEARS,
+  
+  // Audit logs (longest retention)
+  &#39;/radiant/audit/*&#39;: logs.RetentionDays.TEN_YEARS,
+};</code></pre>
+<h2 id="data-deletion">Data Deletion</h2>
+<h3 id="user-initiated-deletion">User-Initiated Deletion</h3>
+<h4 id="account-deletion-flow">Account Deletion Flow</h4>
+<pre class="typescript"><code>async function deleteUserAccount(userId: string): Promise&lt;void&gt; {
+  // 1. Verify identity (MFA required)
+  await verifyIdentity(userId);
+  
+  // 2. Cancel active subscriptions
+  await cancelSubscriptions(userId);
+  
+  // 3. Export data (optional, user-requested)
+  const exportUrl = await exportUserData(userId);
+  
+  // 4. Mark account for deletion (30-day grace period)
+  await markForDeletion(userId, {
+    scheduledAt: addDays(new Date(), 30),
+    reason: &#39;user_requested&#39;,
+  });
+  
+  // 5. Send confirmation email
+  await sendDeletionConfirmation(userId, exportUrl);
+}
+
+// Actual deletion after grace period
+async function executeAccountDeletion(userId: string): Promise&lt;void&gt; {
+  // Delete in order (respect foreign keys)
+  await deleteApiKeys(userId);
+  await deleteChatHistory(userId);
+  await deleteFiles(userId);
+  await deletePreferences(userId);
+  await deleteBillingHistory(userId); // Anonymize, don&#39;t delete
+  await deleteAccount(userId);
+  
+  // Anonymize audit logs
+  await anonymizeAuditLogs(userId);
+  
+  // Log deletion for compliance
+  await logAccountDeletion(userId);
+}</code></pre>
+<h4 id="data-categories-deleted">Data Categories Deleted</h4>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Action</th>
+<th>Timing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Profile</td>
+<td>Delete</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>Preferences</td>
+<td>Delete</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>Chat history</td>
+<td>Delete</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>Files</td>
+<td>Delete</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>API keys</td>
+<td>Revoke + Delete</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>Billing history</td>
+<td>Anonymize</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>Audit logs</td>
+<td>Anonymize</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>Backups</td>
+<td>Excluded</td>
+<td>Expires naturally</td>
+</tr>
+</tbody>
+</table>
+<h3 id="administrative-deletion">Administrative Deletion</h3>
+<pre class="typescript"><code>// Bulk deletion for compliance (e.g., GDPR request)
+async function adminBulkDelete(
+  tenantId: string,
+  options: {
+    dataTypes: string[];
+    olderThan: Date;
+    reason: string;
+    approvedBy: string[];
+  }
+): Promise&lt;DeletionReport&gt; {
+  // Require dual admin approval
+  if (options.approvedBy.length &lt; 2) {
+    throw new Error(&#39;Dual admin approval required&#39;);
+  }
+  
+  // Log the deletion request
+  await logAdminAction({
+    action: &#39;bulk_delete&#39;,
+    tenantId,
+    options,
+  });
+  
+  // Execute deletion
+  const results = await Promise.all(
+    options.dataTypes.map(type =&gt; 
+      deleteDataByType(tenantId, type, options.olderThan)
+    )
+  );
+  
+  return {
+    requestId: generateRequestId(),
+    deletedAt: new Date(),
+    recordsDeleted: results.reduce((a, b) =&gt; a + b, 0),
+    dataTypes: options.dataTypes,
+  };
+}</code></pre>
+<h3 id="tenant-offboarding">Tenant Offboarding</h3>
+<pre class="typescript"><code>async function offboardTenant(tenantId: string): Promise&lt;void&gt; {
+  // 1. Export all data (required for compliance)
+  const exportUrl = await exportTenantData(tenantId);
+  
+  // 2. Notify all users
+  await notifyTenantUsers(tenantId, &#39;account_closing&#39;);
+  
+  // 3. Wait for grace period (30 days default)
+  await scheduleTenantDeletion(tenantId, {
+    gracePeriod: 30,
+    exportUrl,
+  });
+  
+  // 4. After grace period, delete all data
+  // (Handled by scheduled job)
+}</code></pre>
+<h2 id="legal-holds">Legal Holds</h2>
+<h3 id="implementing-a-legal-hold">Implementing a Legal Hold</h3>
+<pre class="sql"><code>-- Legal hold table
+CREATE TABLE legal_holds (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID REFERENCES tenants(id),
+  user_id UUID REFERENCES users(id),
+  hold_type VARCHAR(50) NOT NULL, -- &#39;litigation&#39;, &#39;investigation&#39;, &#39;regulatory&#39;
+  description TEXT,
+  started_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ,
+  created_by UUID REFERENCES administrators(id),
+  CONSTRAINT legal_holds_target CHECK (tenant_id IS NOT NULL OR user_id IS NOT NULL)
+);
+
+-- Prevent deletion of held data
+CREATE OR REPLACE FUNCTION check_legal_hold()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM legal_holds 
+    WHERE (tenant_id = OLD.tenant_id OR user_id = OLD.user_id)
+    AND (expires_at IS NULL OR expires_at &gt; NOW())
+  ) THEN
+    RAISE EXCEPTION &#39;Cannot delete data under legal hold&#39;;
+  END IF;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;</code></pre>
+<h3 id="suspending-retention-policies">Suspending Retention Policies</h3>
+<pre class="typescript"><code>// Suspend automatic deletion during legal hold
+async function applyLegalHold(params: {
+  holdId: string;
+  scope: &#39;tenant&#39; | &#39;user&#39;;
+  targetId: string;
+}): Promise&lt;void&gt; {
+  // Update retention flags
+  await updateRetentionPolicy(params.targetId, {
+    suspended: true,
+    holdId: params.holdId,
+  });
+  
+  // Exclude from cleanup jobs
+  await excludeFromCleanup(params.targetId);
+  
+  // Notify compliance team
+  await notifyCompliance(&#39;legal_hold_applied&#39;, params);
+}</code></pre>
+<h2 id="audit-trail">Audit Trail</h2>
+<h3 id="retention-actions-log">Retention Actions Log</h3>
+<pre class="sql"><code>-- Log all retention-related actions
+CREATE TABLE retention_actions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  action_type VARCHAR(50) NOT NULL, -- &#39;delete&#39;, &#39;archive&#39;, &#39;export&#39;, &#39;hold&#39;
+  target_type VARCHAR(50) NOT NULL, -- &#39;user&#39;, &#39;tenant&#39;, &#39;data_type&#39;
+  target_id VARCHAR(255) NOT NULL,
+  records_affected INTEGER,
+  performed_by UUID,
+  reason TEXT,
+  metadata JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Index for compliance queries
+CREATE INDEX idx_retention_actions_date ON retention_actions(created_at);
+CREATE INDEX idx_retention_actions_target ON retention_actions(target_type, target_id);</code></pre>
+<h3 id="compliance-reporting">Compliance Reporting</h3>
+<pre class="typescript"><code>// Generate retention compliance report
+async function generateRetentionReport(
+  startDate: Date,
+  endDate: Date
+): Promise&lt;RetentionReport&gt; {
+  return {
+    period: { start: startDate, end: endDate },
+    
+    // Data deleted by type
+    deletions: await getRetentionActions(&#39;delete&#39;, startDate, endDate),
+    
+    // Data archived
+    archives: await getRetentionActions(&#39;archive&#39;, startDate, endDate),
+    
+    // Active legal holds
+    legalHolds: await getActiveLegalHolds(),
+    
+    // Policy violations (data past retention not deleted)
+    violations: await getRetentionViolations(),
+    
+    // User deletion requests
+    userRequests: await getUserDeletionRequests(startDate, endDate),
+  };
+}</code></pre>
+<h2 id="verification">Verification</h2>
+<h3 id="monthly-retention-audit">Monthly Retention Audit</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Verify cleanup jobs running successfully</label></li>
+<li><label><input type="checkbox" />Check for retention policy violations</label></li>
+<li><label><input type="checkbox" />Review legal holds status</label></li>
+<li><label><input type="checkbox" />Verify S3 lifecycle policies active</label></li>
+<li><label><input type="checkbox" />Confirm CloudWatch log retention settings</label></li>
+<li><label><input type="checkbox" />Review user deletion requests processed</label></li>
+<li><label><input type="checkbox" />Update retention schedule if needed</label></li>
+</ul>
+<h3 id="compliance-queries">Compliance Queries</h3>
+<pre class="sql"><code>-- Find data past retention period
+SELECT 
+  &#39;chat_messages&#39; as table_name,
+  COUNT(*) as records,
+  MIN(created_at) as oldest_record
+FROM chat_messages
+WHERE created_at &lt; NOW() - INTERVAL &#39;90 days&#39;
+AND archived = false
+
+UNION ALL
+
+SELECT 
+  &#39;api_keys&#39; as table_name,
+  COUNT(*) as records,
+  MIN(revoked_at) as oldest_record
+FROM api_keys
+WHERE revoked_at &lt; NOW() - INTERVAL &#39;90 days&#39;;</code></pre>
+<h2 id="contact">Contact</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Contact</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Data Protection Officer</td>
+<td>dpo@radiant.example.com</td>
+<td>GDPR requests</td>
+</tr>
+<tr>
+<td>Legal</td>
+<td>legal@radiant.example.com</td>
+<td>Legal holds</td>
+</tr>
+<tr>
+<td>Compliance</td>
+<td>compliance@radiant.example.com</td>
+<td>Audit questions</td>
+</tr>
+</tbody>
+</table>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

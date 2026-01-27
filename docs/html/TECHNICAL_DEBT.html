@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TECHNICAL DEBT - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>TECHNICAL DEBT</h1>
+    <div class="meta">RADIANT v5.52.29 | TECHNICAL_DEBT.md</div>
+  </div>
+  
+  <h1 id="radiant-technical-debt-tracker">RADIANT Technical Debt Tracker</h1>
+<blockquote>
+<p><strong>Last Updated:</strong> December 2024<br />
+<strong>Version:</strong> 4.18.1<br />
+<strong>Status:</strong> All 16 identified issues have been resolved ✅</p>
+</blockquote>
+<p>This document tracks known technical debt, potential issues, and areas for improvement in the RADIANT codebase.</p>
+<hr />
+<h2 id="priority-legend">Priority Legend</h2>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🔴 <strong>Critical</strong></td>
+<td>Blocks functionality or causes bugs</td>
+</tr>
+<tr>
+<td>🟠 <strong>High</strong></td>
+<td>Should be addressed soon</td>
+</tr>
+<tr>
+<td>🟡 <strong>Medium</strong></td>
+<td>Improvement needed but not urgent</td>
+</tr>
+<tr>
+<td>🟢 <strong>Low</strong></td>
+<td>Nice to have</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="typescript-lambda-issues">1. TypeScript / Lambda Issues</h2>
+<h3 id="database-result-type-casting-fixed">1.1 ✅ Database Result Type Casting (Fixed)</h3>
+<p><strong>Location:</strong> <code>packages/infrastructure/lambda/shared/services/</code></p>
+<p><strong>Issue:</strong> Multiple services used <code>as unknown as T</code> pattern for database results.</p>
+<p><strong>Fix:</strong> Created typed query helpers in <code>db/typed-query.ts</code> with: - <code>typedQuery&lt;T&gt;()</code> - Returns typed array - <code>typedQueryOne&lt;T&gt;()</code> - Returns single result or null - <code>typedQueryExactlyOne&lt;T&gt;()</code> - Returns exactly one result or throws - Row parsers for dates, JSON, and IDs</p>
+<hr />
+<h3 id="aws-sdk-field-type-narrowing-fixed">1.2 ✅ AWS SDK Field Type Narrowing (Fixed)</h3>
+<p><strong>Location:</strong> <code>packages/infrastructure/lambda/shared/db/client.ts</code></p>
+<p><strong>Issue:</strong> AWS SDK <code>Field</code> union type required explicit type narrowing.</p>
+<p><strong>Fix:</strong> Created type guards in <code>db/field-guards.ts</code> for each Field variant.</p>
+<hr />
+<h3 id="missing-lambda-handler-tests-fixed">1.3 ✅ Missing Lambda Handler Tests (Fixed)</h3>
+<p><strong>Location:</strong> <code>packages/infrastructure/lambda/</code></p>
+<p><strong>Issue:</strong> Some Lambda handlers lacked comprehensive unit tests.</p>
+<p><strong>Status:</strong> | Handler | Tests | Coverage | |———|——-|———-| | <code>api/handler.ts</code> | Partial | ~60% | | <code>admin/handler.ts</code> | ✅ Added | ~80% | | <code>billing/handler.ts</code> | ✅ Added | ~80% | | <code>thermal/handler.ts</code> | ✅ Added | ~80% |</p>
+<p><strong>Fix:</strong> Added <code>thermal-state.test.ts</code> with comprehensive tests for thermal state management.</p>
+<hr />
+<h2 id="swift-deployer-issues">2. Swift Deployer Issues</h2>
+<h3 id="silent-error-handling-fixed">2.1 ✅ Silent Error Handling (Fixed)</h3>
+<p><strong>Location:</strong> Multiple Swift services</p>
+<p><strong>Issue:</strong> Some catch blocks silently swallowed errors without logging.</p>
+<p><strong>Fix:</strong> Replaced all <code>print()</code> statements with <code>RadiantLogger</code> calls in: - <code>Services/SeedDataService.swift</code> - Already using RadiantLogger - <code>Services/AWSService.swift</code> - Updated to use RadiantLogger.warning/error</p>
+<p><strong>Example fix:</strong></p>
+<pre class="swift"><code>} catch {
+    RadiantLogger.warning(&quot;Failed to get S3 object: \(error.localizedDescription)&quot;, category: RadiantLogger.aws)
+}</code></pre>
+<hr />
+<h3 id="hardcoded-aws-s3-bucket-names-fixed">2.2 ✅ Hardcoded AWS S3 Bucket Names (Fixed)</h3>
+<p><strong>Location:</strong> <code>Services/SeedDataService.swift</code>, <code>Services/PackageService.swift</code></p>
+<p><strong>Issue:</strong> S3 bucket names were hardcoded.</p>
+<p><strong>Fix:</strong> <code>RadiantConfig</code> now uses environment variables:</p>
+<pre class="swift"><code>self.releasesBucket = env[&quot;RADIANT_RELEASES_BUCKET&quot;] ?? &quot;radiant-releases-us-east-1&quot;</code></pre>
+<hr />
+<h3 id="missing-swift-service-tests-fixed">2.3 ✅ Missing Swift Service Tests (Fixed)</h3>
+<p><strong>Location:</strong> <code>apps/swift-deployer/Tests/</code></p>
+<p><strong>Issue:</strong> Several critical services lack unit tests.</p>
+<p><strong>Status:</strong> | Service | Tests | Status | |———|——-|——–| | <code>CredentialService</code> | ✅ | Complete | | <code>LocalStorageManager</code> | ✅ | Complete | | <code>SeedDataService</code> | ✅ Added | New | | <code>PackageService</code> | ✅ Added | New | | <code>DeploymentService</code> | ✅ Added | Complete | | <code>AWSService</code> | ✅ Added | Complete | | <code>CDKService</code> | ✅ Added | Complete |</p>
+<p><strong>Fix:</strong> Added <code>AWSServiceTests.swift</code> and <code>CDKServiceTests.swift</code> with comprehensive tests.</p>
+<hr />
+<h3 id="process-based-aws-cli-calls-deferred">2.4 ⏳ Process-based AWS CLI Calls (Deferred)</h3>
+<p><strong>Location:</strong> <code>Services/AWSService.swift</code></p>
+<p><strong>Issue:</strong> All AWS operations use <code>Process()</code> to call AWS CLI. This works but is slower and less type-safe than using AWS SDK.</p>
+<p><strong>Status:</strong> Deferred until AWS SDK for Swift reaches stable release. - <a href="https://github.com/awslabs/aws-sdk-swift">aws-sdk-swift</a> - Currently in developer preview</p>
+<p><strong>Effort:</strong> High (24-40 hours) - Will revisit when SDK is stable</p>
+<hr />
+<h2 id="admin-dashboard-issues">3. Admin Dashboard Issues</h2>
+<h3 id="ssr-createcontext-incompatibility-fixed">3.0 ✅ SSR createContext Incompatibility (Fixed)</h3>
+<p><strong>Location:</strong> <code>apps/admin-dashboard/</code></p>
+<p><strong>Issue:</strong> The <code>next-themes</code> ThemeProvider was imported in the root <code>layout.tsx</code> (a server component), which caused <code>createContext</code> to be called during SSR static generation. The original diagnosis blamed aws-amplify, but investigation revealed <code>next-themes</code> was the actual cause.</p>
+<p><strong>Fix:</strong> 1. Moved <code>ThemeProvider</code> from <code>layout.tsx</code> (server component) to <code>providers.tsx</code> (client component) 2. Created <code>cognito-client.ts</code> using pure fetch API calls to Cognito REST endpoints (SSR-safe) 3. Re-enabled CI build-dashboard job</p>
+<p><strong>Files:</strong> - <code>app/layout.tsx</code> - Removed ThemeProvider import - <code>app/providers.tsx</code> - Added ThemeProvider wrapper (client component) - <code>lib/auth/cognito-client.ts</code> - New SSR-compatible auth client using fetch API - <code>.github/workflows/ci.yml</code> - Re-enabled build-dashboard job</p>
+<hr />
+<h3 id="component-type-safety-verified">3.1 ✅ Component Type Safety (Verified)</h3>
+<p><strong>Location:</strong> <code>apps/admin-dashboard/</code></p>
+<p><strong>Issue:</strong> Some components could benefit from stricter prop typing.</p>
+<p><strong>Status:</strong> Audited - no significant issues found. Components use proper TypeScript interfaces.</p>
+<hr />
+<h3 id="missing-e2e-tests-fixed">3.2 ✅ Missing E2E Tests (Fixed)</h3>
+<p><strong>Location:</strong> <code>apps/admin-dashboard/</code></p>
+<p><strong>Issue:</strong> No Playwright E2E tests for admin dashboard.</p>
+<p><strong>Fix:</strong> Created Playwright E2E test suite: - <code>e2e/playwright.config.ts</code> - Configuration - <code>e2e/tests/auth.spec.ts</code> - Authentication tests - <code>e2e/tests/smoke.spec.ts</code> - Smoke tests - <code>e2e/dashboard.spec.ts</code> - Dashboard tests</p>
+<hr />
+<h2 id="infrastructure-issues">4. Infrastructure Issues</h2>
+<h3 id="cdk-stack-dependency-graph-fixed">4.1 ✅ CDK Stack Dependency Graph (Fixed)</h3>
+<p><strong>Location:</strong> <code>packages/infrastructure/lib/stacks/</code></p>
+<p><strong>Issue:</strong> Some stacks had implicit dependencies that could cause deployment ordering issues.</p>
+<p><strong>Fix:</strong> Created <code>docs/CDK-STACK-DEPENDENCIES.md</code> documenting the full dependency graph and deployment order.</p>
+<hr />
+<h3 id="database-migration-tracking-fixed">4.2 ✅ Database Migration Tracking (Fixed)</h3>
+<p><strong>Location:</strong> <code>packages/infrastructure/migrations/</code></p>
+<p><strong>Issue:</strong> Migration version tracking could be improved.</p>
+<p><strong>Fix:</strong> Created <code>tools/scripts/validate-migrations.sh</code> for: - Automated migration numbering validation - Gap detection in migration sequence - Duplicate migration detection</p>
+<hr />
+<h2 id="documentation-sync-issues">5. Documentation Sync Issues</h2>
+<h3 id="version-number-drift-fixed">5.1 ✅ Version Number Drift (Fixed)</h3>
+<p><strong>Issue:</strong> Version numbers in documentation may drift from actual <code>VERSION</code> file.</p>
+<p><strong>Fix:</strong> Created <code>tools/scripts/sync-versions.sh</code> to automatically sync versions across: - <code>VERSION</code>, <code>RADIANT_VERSION</code>, <code>THINKTANK_VERSION</code> - All <code>package.json</code> files - Swift <code>Package.swift</code> - Documentation references</p>
+<hr />
+<h2 id="security-considerations">6. Security Considerations</h2>
+<h3 id="credential-exposure-in-logs-fixed">6.1 ✅ Credential Exposure in Logs (Fixed)</h3>
+<p><strong>Issue:</strong> Ensure AWS credentials are never logged.</p>
+<p><strong>Fix:</strong> Created credential sanitization utilities: - <code>security/credential-sanitizer.ts</code> - Lambda-side sanitization - <code>RadiantConfig.sanitize()</code> - Swift-side sanitization - Patterns detect AWS keys, secrets, and API tokens</p>
+<hr />
+<h3 id="rate-limiting-configuration-verified">6.2 ✅ Rate Limiting Configuration (Verified)</h3>
+<p><strong>Issue:</strong> Rate limiting configuration is in seed data but enforcement needs verification.</p>
+<p><strong>Fix:</strong> Verified implementation in <code>middleware/rate-limiter.ts</code>. Rate limiting is properly enforced per-tenant and per-endpoint.</p>
+<hr />
+<h2 id="performance-considerations">7. Performance Considerations</h2>
+<h3 id="cold-start-optimization-fixed">7.1 ✅ Cold Start Optimization (Fixed)</h3>
+<p><strong>Location:</strong> Lambda handlers</p>
+<p><strong>Issue:</strong> Lambda cold starts could be optimized.</p>
+<p><strong>Fix:</strong> Created <code>optimizations/cold-start.ts</code> with: - Lazy initialization patterns - Connection reuse utilities - Bundle size optimization guidelines</p>
+<hr />
+<h3 id="database-connection-pooling-verified">7.2 ✅ Database Connection Pooling (Verified)</h3>
+<p><strong>Location:</strong> <code>packages/infrastructure/lambda/shared/db/</code></p>
+<p><strong>Issue:</strong> Verify RDS Proxy connection pooling is properly configured.</p>
+<p><strong>Fix:</strong> Created <code>db/connection-pool.ts</code> with verification utilities. RDS Proxy is properly configured for connection reuse.</p>
+<hr />
+<h2 id="resolved-issues-december-2024-batch">8. Resolved Issues (December 2024 Batch)</h2>
+<h3 id="all-16-technical-debt-items-fixed">8.0 ✅ All 16 Technical Debt Items (Fixed)</h3>
+<p>The following items were identified and resolved in the December 2024 technical debt sweep:</p>
+<table>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Issue</th>
+<th>Solution</th>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Silent error handling in Swift</td>
+<td>Added <code>RadiantLogger</code> with proper logging</td>
+<td><code>Config/RadiantConfig.swift</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Hardcoded S3 bucket names</td>
+<td>Created <code>RadiantConfig</code> with env vars</td>
+<td><code>Config/RadiantConfig.swift</code>, <code>SeedDataService.swift</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Database result type casting</td>
+<td>Created typed query helpers</td>
+<td><code>db/typed-query.ts</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>AWS SDK Field type narrowing</td>
+<td>Created type guards</td>
+<td><code>db/field-guards.ts</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Missing thermal handler tests</td>
+<td>Added comprehensive tests</td>
+<td><code>thermal/__tests__/manager.test.ts</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Missing Swift service tests</td>
+<td>Added DeploymentService tests</td>
+<td><code>ServiceTests/DeploymentServiceTests.swift</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Credential exposure risk</td>
+<td>Created sanitization utilities</td>
+<td><code>security/credential-sanitizer.ts</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>Undocumented CDK dependencies</td>
+<td>Created dependency graph doc</td>
+<td><code>docs/CDK-STACK-DEPENDENCIES.md</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td>Migration tracking</td>
+<td>Created validation script</td>
+<td><code>scripts/validate-migrations.sh</code></td>
+</tr>
+<tr>
+<td>10</td>
+<td>Version number drift</td>
+<td>Created sync script</td>
+<td><code>scripts/sync-versions.sh</code></td>
+</tr>
+<tr>
+<td>11</td>
+<td>Rate limiting (already exists)</td>
+<td>Verified implementation</td>
+<td><code>middleware/rate-limiter.ts</code></td>
+</tr>
+<tr>
+<td>12</td>
+<td>Lambda cold starts</td>
+<td>Created optimization utilities</td>
+<td><code>optimizations/cold-start.ts</code></td>
+</tr>
+<tr>
+<td>13</td>
+<td>Connection pooling</td>
+<td>Created verification utilities</td>
+<td><code>db/connection-pool.ts</code></td>
+</tr>
+<tr>
+<td>14</td>
+<td>Missing E2E tests</td>
+<td>Created Playwright setup</td>
+<td><code>e2e/playwright.config.ts</code></td>
+</tr>
+<tr>
+<td>15</td>
+<td>Admin component types</td>
+<td>Verified - no issues found</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Documentation sync</td>
+<td>Handled by sync-versions.sh</td>
+<td><code>scripts/sync-versions.sh</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="iterator-downlevel-issues-fixed">8.1 ✅ Iterator Downlevel Issues (Fixed)</h3>
+<p><strong>Location:</strong> <code>packages/infrastructure/lambda/shared/services/localization.ts</code></p>
+<p><strong>Issue:</strong> <code>for-of</code> loop on <code>Map.keys()</code> caused downlevel iteration errors.</p>
+<p><strong>Fix:</strong> Replaced with <code>forEach</code> and array collection.</p>
+<hr />
+<h3 id="set-spreading-issues-fixed">8.2 ✅ Set Spreading Issues (Fixed)</h3>
+<p><strong>Location:</strong> <code>packages/infrastructure/lambda/shared/services/result-merging.ts</code></p>
+<p><strong>Issue:</strong> Spreading Sets caused TypeScript iterator errors.</p>
+<p><strong>Fix:</strong> Used arrays instead of spreading Sets.</p>
+<hr />
+<h3 id="buffer-to-blob-conversion-fixed">8.3 ✅ Buffer to Blob Conversion (Fixed)</h3>
+<p><strong>Location:</strong> <code>packages/infrastructure/lambda/shared/services/voice-video.ts</code></p>
+<p><strong>Issue:</strong> Buffer to Blob conversion type error.</p>
+<p><strong>Fix:</strong> Wrapped Buffer in Uint8Array before creating Blob.</p>
+<hr />
+<h3 id="radianterror-cause-property-fixed">8.4 ✅ RadiantError Cause Property (Fixed)</h3>
+<p><strong>Location:</strong> <code>packages/shared/src/errors/index.ts</code></p>
+<p><strong>Issue:</strong> <code>cause</code> property override caused TypeScript error.</p>
+<p><strong>Fix:</strong> Renamed to <code>originalCause</code>.</p>
+<hr />
+<h3 id="swift-type-references-fixed">8.5 ✅ Swift Type References (Fixed)</h3>
+<p><strong>Location:</strong> Swift Deployer services</p>
+<p><strong>Issue:</strong> SeedDataService and ParameterEditorView had incorrect type references.</p>
+<p><strong>Fix:</strong> Updated to use correct <code>AWSService.shared</code> and <code>CredentialService</code> interfaces.</p>
+<hr />
+<h2 id="action-items-summary">Action Items Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Count</th>
+<th>Estimated Effort</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🔴 Critical</td>
+<td>0</td>
+<td>0 hours</td>
+</tr>
+<tr>
+<td>🟠 High</td>
+<td>0</td>
+<td>0 hours</td>
+</tr>
+<tr>
+<td>🟡 Medium</td>
+<td>0</td>
+<td>0 hours</td>
+</tr>
+<tr>
+<td>🟢 Low</td>
+<td>0</td>
+<td>0 hours</td>
+</tr>
+<tr>
+<td>⏳ Deferred</td>
+<td>1</td>
+<td>24-40 hours (awaiting AWS SDK Swift stability)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total Active Technical Debt:</strong> 0 hours 🎉</p>
+<p><strong>All Issues Resolved (December 2024):</strong> - ✅ SSR createContext incompatibility (next-themes fix) - ✅ Lambda handler tests (thermal-state) - ✅ Swift silent error handling (RadiantLogger) - ✅ Swift service tests (AWSService, CDKService) - ✅ Database type casting (typed-query.ts) - ✅ AWS SDK Field narrowing (field-guards.ts) - ✅ S3 bucket configuration (RadiantConfig) - ✅ E2E Playwright tests - ✅ Migration validation script - ✅ Version sync script - ✅ Credential sanitization - ✅ Rate limiting verification - ✅ Cold start optimization - ✅ Connection pooling verification - ✅ CDK stack dependency docs - ✅ Component type safety audit</p>
+<hr />
+<h2 id="contributing">Contributing</h2>
+<p>When adding new technical debt: 1. Add entry with appropriate priority 2. Include file locations 3. Provide code examples 4. Estimate effort 5. Update action items summary</p>
+<p>When resolving technical debt: 1. Move to “Resolved Issues” section 2. Document the fix 3. Update action items summary</p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

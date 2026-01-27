@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>004 nli entailment - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>004 nli entailment</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/adr/004-nli-entailment.md</div>
+  </div>
+  
+  <h1 id="adr-004-nli-entailment-over-cosine-similarity">ADR-004: NLI Entailment Over Cosine Similarity</h1>
+<h2 id="status">Status</h2>
+<p>Accepted</p>
+<h2 id="context">Context</h2>
+<p>Cosine similarity between embeddings is commonly used to measure semantic similarity. However, it has a critical flaw: <strong>it cannot detect negation</strong>.</p>
+<h3 id="the-negation-blindness-problem">The Negation Blindness Problem</h3>
+<pre><code>Sentence A: &quot;The Earth is flat&quot;
+Sentence B: &quot;The Earth is not flat&quot;
+
+Cosine Similarity: 0.92 (highly similar!)
+NLI Classification: CONTRADICTION</code></pre>
+<p>When embeddings are created, they capture semantic content without preserving logical relationships. The words “flat” and “not flat” refer to the same concept, so embeddings place them close together.</p>
+<h3 id="impact-on-cato">Impact on Cato</h3>
+<p>If Cato uses cosine similarity for surprise measurement: 1. Prediction: “X is true” 2. Outcome: “X is false” 3. Cosine similarity: HIGH (similar embeddings) 4. Surprise score: LOW (incorrectly!) 5. <strong>No learning occurs</strong> despite being completely wrong</p>
+<p>This is catastrophic for a learning system.</p>
+<h2 id="decision">Decision</h2>
+<p>Use <strong>Natural Language Inference (NLI)</strong> with DeBERTa-large-MNLI for all surprise and consistency measurements.</p>
+<h3 id="nli-classification">NLI Classification</h3>
+<table>
+<thead>
+<tr>
+<th>Label</th>
+<th>Meaning</th>
+<th>Surprise Score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ENTAILMENT</td>
+<td>A implies B</td>
+<td>0.0 (expected)</td>
+</tr>
+<tr>
+<td>NEUTRAL</td>
+<td>A neither implies nor contradicts B</td>
+<td>0.5 (uncertain)</td>
+</tr>
+<tr>
+<td>CONTRADICTION</td>
+<td>A contradicts B</td>
+<td>1.0 (surprising)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="model-selection">Model Selection</h3>
+<p><strong>DeBERTa-large-MNLI</strong> chosen for: - State-of-the-art NLI accuracy (91.3% on MNLI) - Efficient inference (~50ms on GPU) - Well-calibrated confidence scores - Apache 2.0 license</p>
+<h2 id="architecture">Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                    Prediction + Outcome                          │
+│  Prediction: &quot;Claude is made by Anthropic&quot;                      │
+│  Outcome: &quot;Anthropic created Claude&quot;                            │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    NLI Classifier (DeBERTa)                      │
+│  Input: [CLS] Prediction [SEP] Outcome [SEP]                    │
+│  Output: {entailment: 0.95, neutral: 0.04, contradiction: 0.01} │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Surprise Calculator                           │
+│  Label: ENTAILMENT                                              │
+│  Confidence: 0.95                                               │
+│  Surprise Score: 0.0 × (1 - 0.95) = 0.0                        │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h2 id="implementation">Implementation</h2>
+<h3 id="sagemaker-multi-model-endpoint">SageMaker Multi-Model Endpoint</h3>
+<p>Deploy DeBERTa on SageMaker MME for cost-efficient GPU sharing:</p>
+<pre class="python"><code>class NLIService:
+    &quot;&quot;&quot;NLI classification using DeBERTa on SageMaker MME.&quot;&quot;&quot;
+    
+    def __init__(
+        self,
+        endpoint_name: str = &quot;cato-nli-mme&quot;,
+        region: str = &quot;us-east-1&quot;
+    ):
+        self.runtime = boto3.client(
+            &quot;sagemaker-runtime&quot;,
+            region_name=region
+        )
+        self.endpoint_name = endpoint_name
+    
+    async def classify(
+        self,
+        premise: str,
+        hypothesis: str
+    ) -&gt; NLIResult:
+        &quot;&quot;&quot;
+        Classify relationship between premise and hypothesis.
+        
+        Args:
+            premise: The reference text (prediction)
+            hypothesis: The text to compare (outcome)
+        
+        Returns:
+            NLIResult with label, scores, and surprise value
+        &quot;&quot;&quot;
+        payload = {
+            &quot;inputs&quot;: {
+                &quot;premise&quot;: premise,
+                &quot;hypothesis&quot;: hypothesis
+            }
+        }
+        
+        response = self.runtime.invoke_endpoint(
+            EndpointName=self.endpoint_name,
+            ContentType=&quot;application/json&quot;,
+            Body=json.dumps(payload),
+            TargetModel=&quot;deberta-large-mnli.tar.gz&quot;
+        )
+        
+        result = json.loads(response[&quot;Body&quot;].read())
+        
+        # Extract scores
+        scores = {
+            &quot;entailment&quot;: result[&quot;scores&quot;][0],
+            &quot;neutral&quot;: result[&quot;scores&quot;][1],
+            &quot;contradiction&quot;: result[&quot;scores&quot;][2]
+        }
+        
+        # Determine label
+        label = max(scores, key=scores.get)
+        confidence = scores[label]
+        
+        # Calculate surprise
+        if label == &quot;entailment&quot;:
+            surprise = 0.0
+        elif label == &quot;neutral&quot;:
+            surprise = 0.5
+        else:  # contradiction
+            surprise = 1.0
+        
+        # Weight by confidence
+        weighted_surprise = surprise * confidence + 0.5 * (1 - confidence)
+        
+        return NLIResult(
+            label=label,
+            scores=scores,
+            confidence=confidence,
+            surprise=weighted_surprise
+        )</code></pre>
+<h3 id="typescript-client">TypeScript Client</h3>
+<pre class="typescript"><code>interface NLIResult {
+  label: &#39;entailment&#39; | &#39;neutral&#39; | &#39;contradiction&#39;;
+  scores: {
+    entailment: number;
+    neutral: number;
+    contradiction: number;
+  };
+  confidence: number;
+  surprise: number;
+}
+
+class NLIClient {
+  private readonly sagemakerRuntime: SageMakerRuntimeClient;
+  private readonly endpointName: string;
+  
+  async classify(
+    premise: string,
+    hypothesis: string
+  ): Promise&lt;NLIResult&gt; {
+    const command = new InvokeEndpointCommand({
+      EndpointName: this.endpointName,
+      ContentType: &#39;application/json&#39;,
+      Body: JSON.stringify({
+        inputs: { premise, hypothesis }
+      }),
+      TargetModel: &#39;deberta-large-mnli.tar.gz&#39;
+    });
+    
+    const response = await this.sagemakerRuntime.send(command);
+    const result = JSON.parse(
+      new TextDecoder().decode(response.Body)
+    );
+    
+    return this.parseResult(result);
+  }
+}</code></pre>
+<h2 id="consequences">Consequences</h2>
+<h3 id="positive">Positive</h3>
+<ul>
+<li><strong>Correct negation handling</strong>: Contradictions detected accurately</li>
+<li><strong>Calibrated uncertainty</strong>: NEUTRAL captures genuine uncertainty</li>
+<li><strong>Interpretable</strong>: Three-way classification is human-understandable</li>
+<li><strong>Robust</strong>: DeBERTa handles paraphrasing, synonyms, and complex logic</li>
+</ul>
+<h3 id="negative">Negative</h3>
+<ul>
+<li><strong>Additional latency</strong>: ~50ms per classification</li>
+<li><strong>GPU requirement</strong>: DeBERTa needs GPU for efficient inference</li>
+<li><strong>Hosting cost</strong>: ~$200-500/month for SageMaker MME</li>
+<li><strong>Pair-wise limitation</strong>: Can only compare two texts at a time</li>
+</ul>
+<h2 id="comparison-cosine-vs-nli">Comparison: Cosine vs NLI</h2>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 43%" />
+<col style="width: 11%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Cosine Similarity</th>
+<th>NLI</th>
+<th>Correct?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“X is true” vs “X is true”</td>
+<td>1.0 (similar)</td>
+<td>ENTAILMENT</td>
+<td>Both ✓</td>
+</tr>
+<tr>
+<td>“X is true” vs “X is not true”</td>
+<td>0.92 (similar)</td>
+<td>CONTRADICTION</td>
+<td>NLI ✓</td>
+</tr>
+<tr>
+<td>“Dogs are mammals” vs “Canines are warm-blooded”</td>
+<td>0.65 (medium)</td>
+<td>ENTAILMENT</td>
+<td>NLI ✓</td>
+</tr>
+<tr>
+<td>“It’s raining” vs “The weather is wet”</td>
+<td>0.55 (medium)</td>
+<td>ENTAILMENT</td>
+<td>NLI ✓</td>
+</tr>
+<tr>
+<td>“2+2=4” vs “The sum is four”</td>
+<td>0.45 (low)</td>
+<td>ENTAILMENT</td>
+<td>NLI ✓</td>
+</tr>
+</tbody>
+</table>
+<h2 id="infrastructure">Infrastructure</h2>
+<h3 id="sagemaker-mme-configuration">SageMaker MME Configuration</h3>
+<pre class="hcl"><code>resource &quot;aws_sagemaker_endpoint&quot; &quot;nli_mme&quot; {
+  name                 = &quot;cato-nli-mme&quot;
+  endpoint_config_name = aws_sagemaker_endpoint_configuration.nli_mme.name
+}
+
+resource &quot;aws_sagemaker_endpoint_configuration&quot; &quot;nli_mme&quot; {
+  name = &quot;cato-nli-mme-config&quot;
+
+  production_variants {
+    variant_name           = &quot;primary&quot;
+    model_name             = aws_sagemaker_model.nli_mme.name
+    instance_type          = &quot;ml.g4dn.xlarge&quot;  # Cost-effective GPU
+    initial_instance_count = 2
+    
+    # Multi-model endpoint settings
+    container_startup_health_check_timeout_in_seconds = 600
+  }
+}</code></pre>
+<h2 id="scaling">Scaling</h2>
+<table>
+<thead>
+<tr>
+<th>Users</th>
+<th>NLI Calls/sec</th>
+<th>Instances</th>
+<th>Cost/month</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100K</td>
+<td>10</td>
+<td>2</td>
+<td>$200</td>
+</tr>
+<tr>
+<td>1M</td>
+<td>100</td>
+<td>5</td>
+<td>$500</td>
+</tr>
+<tr>
+<td>10M</td>
+<td>500</td>
+<td>20</td>
+<td>$2,000</td>
+</tr>
+</tbody>
+</table>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2006.03654">DeBERTa: Decoding-enhanced BERT with Disentangled Attention</a></li>
+<li><a href="https://cims.nyu.edu/~sbowman/multinli/">MNLI: Multi-Genre Natural Language Inference</a></li>
+<li><a href="https://docs.aws.amazon.com/sagemaker/latest/dg/multi-model-endpoints.html">SageMaker Multi-Model Endpoints</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

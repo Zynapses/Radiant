@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRIMOIRE GOVERNOR SOURCE PART4 - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>GRIMOIRE GOVERNOR SOURCE PART4</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/GRIMOIRE-GOVERNOR-SOURCE-PART4.md</div>
+  </div>
+  
+  <h1 id="radiant-v5.0.2---source-export-part-4-python-utilities">RADIANT v5.0.2 - Source Export Part 4: Python Utilities</h1>
+<hr />
+<h2 id="database-utilities">7. Database Utilities</h2>
+<p><strong>File</strong>: <code>packages/flyte/utils/db.py</code></p>
+<p><strong>Purpose</strong>: Provides RLS-safe database connections with automatic pgvector registration. All Flyte tasks use these utilities for secure multi-tenant database access.</p>
+<p><strong>Key Features</strong>: - Connection pooling for efficiency - Automatic RLS context setting via <code>SET app.current_tenant_id</code> - pgvector type registration - Read-only connection mode for safe queries</p>
+<pre class="python"><code>&quot;&quot;&quot;
+Database Utilities for Flyte Tasks
+
+RADIANT v5.0.2 - System Evolution
+
+Provides RLS-safe database connections with automatic pgvector registration.
+All Flyte tasks should use get_safe_db_connection() for database access.
+
+Usage:
+    from radiant.flyte.utils.db import get_safe_db_connection
+    
+    with get_safe_db_connection(tenant_id) as (conn, cur):
+        cur.execute(&quot;SELECT * FROM my_table&quot;)
+        rows = cur.fetchall()
+    # Connection automatically committed and closed
+&quot;&quot;&quot;
+
+import os
+import psycopg2
+from psycopg2 import pool
+from contextlib import contextmanager
+from typing import Tuple, Generator, Optional
+
+# Attempt to import pgvector - graceful fallback if not installed
+try:
+    from pgvector.psycopg2 import register_vector
+    HAS_PGVECTOR = True
+except ImportError:
+    HAS_PGVECTOR = False
+    print(&quot;Warning: pgvector not installed. Vector operations will fail.&quot;)
+
+# Connection pool (lazy initialized)
+_connection_pool: Optional[pool.ThreadedConnectionPool] = None
+
+# System tenant ID for maintenance operations
+SYSTEM_TENANT_ID = &#39;00000000-0000-0000-0000-000000000000&#39;
+
+
+def _get_pool() -&gt; pool.ThreadedConnectionPool:
+    &quot;&quot;&quot;Get or create the connection pool&quot;&quot;&quot;
+    global _connection_pool
+    
+    if _connection_pool is None:
+        _connection_pool = pool.ThreadedConnectionPool(
+            minconn=1,
+            maxconn=10,
+            host=os.environ.get(&quot;DB_HOST&quot;, &quot;localhost&quot;),
+            database=os.environ.get(&quot;DB_NAME&quot;, &quot;radiant&quot;),
+            user=os.environ.get(&quot;DB_USER&quot;, &quot;radiant&quot;),
+            password=os.environ.get(&quot;DB_PASSWORD&quot;, &quot;&quot;),
+            port=int(os.environ.get(&quot;DB_PORT&quot;, &quot;5432&quot;)),
+            connect_timeout=10,
+            options=&quot;-c statement_timeout=30000&quot;
+        )
+    
+    return _connection_pool
+
+
+def _register_vector_if_available(conn) -&gt; None:
+    &quot;&quot;&quot;Register pgvector types if available&quot;&quot;&quot;
+    if HAS_PGVECTOR:
+        register_vector(conn)
+
+
+@contextmanager
+def get_safe_db_connection(tenant_id: str) -&gt; Generator[Tuple, None, None]:
+    &quot;&quot;&quot;
+    Context manager that provides an RLS-safe database connection.
+    
+    Features:
+    - Automatic pgvector registration
+    - RLS tenant context enforcement
+    - Transaction management (commit on success, rollback on error)
+    - Connection pooling
+    - Automatic cleanup
+    
+    Args:
+        tenant_id: UUID of the tenant. Use &#39;00000000-0000-0000-0000-000000000000&#39;
+                   for system maintenance operations.
+    
+    Yields:
+        Tuple of (connection, cursor)
+        
+    Example:
+        with get_safe_db_connection(&#39;tenant-uuid&#39;) as (conn, cur):
+            cur.execute(&quot;SELECT * FROM knowledge_heuristics WHERE domain = %s&quot;, (&#39;medical&#39;,))
+            rows = cur.fetchall()
+        # Automatically committed and connection returned to pool
+    &quot;&quot;&quot;
+    db_pool = _get_pool()
+    conn = db_pool.getconn()
+    
+    try:
+        # 1. Register pgvector types (must be done per connection)
+        _register_vector_if_available(conn)
+        
+        # 2. Create cursor
+        cur = conn.cursor()
+        
+        # 3. Set RLS context - CRITICAL for multi-tenant security
+        cur.execute(&quot;SET app.current_tenant_id = %s&quot;, (tenant_id,))
+        
+        # 4. Yield connection and cursor to caller
+        yield conn, cur
+        
+        # 5. Commit transaction on successful completion
+        conn.commit()
+        
+    except Exception as e:
+        # Rollback on any error
+        conn.rollback()
+        raise e
+        
+    finally:
+        # Always return connection to pool
+        db_pool.putconn(conn)
+
+
+@contextmanager  
+def get_system_db_connection() -&gt; Generator[Tuple, None, None]:
+    &quot;&quot;&quot;
+    Context manager for system-level operations (no RLS).
+    
+    WARNING: Use only for maintenance tasks that need cross-tenant access.
+    The calling Lambda must have appropriate IAM permissions.
+    
+    Yields:
+        Tuple of (connection, cursor)
+    &quot;&quot;&quot;
+    db_pool = _get_pool()
+    conn = db_pool.getconn()
+    
+    try:
+        _register_vector_if_available(conn)
+        cur = conn.cursor()
+        
+        # Set system tenant ID (has special RLS policy for maintenance)
+        cur.execute(&quot;SET app.current_tenant_id = %s&quot;, (SYSTEM_TENANT_ID,))
+        
+        yield conn, cur
+        conn.commit()
+        
+    except Exception as e:
+        conn.rollback()
+        raise e
+        
+    finally:
+        db_pool.putconn(conn)
+
+
+@contextmanager
+def get_readonly_connection(tenant_id: str) -&gt; Generator[Tuple, None, None]:
+    &quot;&quot;&quot;
+    Context manager for read-only operations.
+    Sets transaction to read-only mode for safety.
+    
+    Args:
+        tenant_id: UUID of the tenant
+        
+    Yields:
+        Tuple of (connection, cursor)
+    &quot;&quot;&quot;
+    db_pool = _get_pool()
+    conn = db_pool.getconn()
+    
+    try:
+        _register_vector_if_available(conn)
+        cur = conn.cursor()
+        
+        # Set read-only transaction
+        cur.execute(&quot;SET TRANSACTION READ ONLY&quot;)
+        cur.execute(&quot;SET app.current_tenant_id = %s&quot;, (tenant_id,))
+        
+        yield conn, cur
+        conn.commit()
+        
+    except Exception as e:
+        conn.rollback()
+        raise e
+        
+    finally:
+        db_pool.putconn(conn)
+
+
+def close_pool() -&gt; None:
+    &quot;&quot;&quot;Close the connection pool. Call during Lambda shutdown.&quot;&quot;&quot;
+    global _connection_pool
+    if _connection_pool is not None:
+        _connection_pool.closeall()
+        _connection_pool = None
+
+
+def health_check() -&gt; bool:
+    &quot;&quot;&quot;
+    Verify database connectivity.
+    
+    Returns:
+        True if database is accessible, False otherwise
+    &quot;&quot;&quot;
+    try:
+        db_pool = _get_pool()
+        conn = db_pool.getconn()
+        try:
+            cur = conn.cursor()
+            cur.execute(&quot;SELECT 1&quot;)
+            result = cur.fetchone()
+            return result[0] == 1
+        finally:
+            db_pool.putconn(conn)
+    except Exception as e:
+        print(f&quot;Database health check failed: {e}&quot;)
+        return False</code></pre>
+<hr />
+<h2 id="embedding-utilities">8. Embedding Utilities</h2>
+<p><strong>File</strong>: <code>packages/flyte/utils/embeddings.py</code></p>
+<p><strong>Purpose</strong>: Generates vector embeddings for semantic search in The Grimoire using OpenAI’s text-embedding-3-small model via LiteLLM proxy.</p>
+<p><strong>Key Features</strong>: - Single and batch embedding generation - Cosine similarity/distance calculations - In-memory caching for efficiency</p>
+<pre class="python"><code>&quot;&quot;&quot;
+Embedding Generation Utilities
+
+RADIANT v5.0.2 - System Evolution
+
+Generates vector embeddings for semantic search in The Grimoire.
+Uses OpenAI&#39;s text-embedding-3-small (1536 dimensions) via LiteLLM.
+&quot;&quot;&quot;
+
+import os
+import httpx
+from typing import List, Optional
+
+
+# Model configuration
+DEFAULT_MODEL = &quot;text-embedding-3-small&quot;
+EMBEDDING_DIMENSIONS = 1536
+MAX_CHARS = 30000  # ~8K tokens for text-embedding-3-small
+
+
+def get_litellm_config() -&gt; tuple:
+    &quot;&quot;&quot;Get LiteLLM configuration from environment&quot;&quot;&quot;
+    url = os.environ.get(&#39;LITELLM_PROXY_URL&#39;, &#39;http://litellm.radiant.internal&#39;)
+    api_key = os.environ.get(&#39;LITELLM_API_KEY&#39;, &#39;&#39;)
+    return url, api_key
+
+
+def generate_embedding(
+    text: str, 
+    model: str = DEFAULT_MODEL,
+    timeout: float = 30.0
+) -&gt; List[float]:
+    &quot;&quot;&quot;
+    Generates a vector embedding for the given text.
+    
+    Args:
+        text: The text to embed (max 8191 tokens for text-embedding-3-small)
+        model: The embedding model to use (default: text-embedding-3-small)
+        timeout: Request timeout in seconds
+        
+    Returns:
+        List of floats representing the embedding vector (1536 dimensions)
+        
+    Raises:
+        httpx.HTTPError: If the API call fails
+        ValueError: If the response is malformed
+    &quot;&quot;&quot;
+    url, api_key = get_litellm_config()
+    
+    # Truncate very long texts to avoid token limits
+    if len(text) &gt; MAX_CHARS:
+        text = text[:MAX_CHARS]
+    
+    with httpx.Client(timeout=timeout) as client:
+        response = client.post(
+            f&quot;{url}/embeddings&quot;,
+            headers={
+                &quot;Authorization&quot;: f&quot;Bearer {api_key}&quot;,
+                &quot;Content-Type&quot;: &quot;application/json&quot;
+            },
+            json={
+                &quot;model&quot;: model,
+                &quot;input&quot;: text,
+                &quot;encoding_format&quot;: &quot;float&quot;
+            }
+        )
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        if &quot;data&quot; not in data or len(data[&quot;data&quot;]) == 0:
+            raise ValueError(f&quot;Invalid embedding response: {data}&quot;)
+            
+        embedding = data[&quot;data&quot;][0][&quot;embedding&quot;]
+        
+        # Validate dimension
+        if len(embedding) != EMBEDDING_DIMENSIONS:
+            raise ValueError(f&quot;Unexpected embedding dimension: {len(embedding)}, expected {EMBEDDING_DIMENSIONS}&quot;)
+            
+        return embedding
+
+
+def generate_embeddings_batch(
+    texts: List[str], 
+    model: str = DEFAULT_MODEL,
+    timeout: float = 60.0
+) -&gt; List[List[float]]:
+    &quot;&quot;&quot;
+    Generates embeddings for multiple texts in a single API call.
+    More efficient than individual calls for bulk operations.
+    
+    Args:
+        texts: List of texts to embed (max 2048 items per batch)
+        model: The embedding model to use
+        timeout: Request timeout in seconds
+        
+    Returns:
+        List of embedding vectors in the same order as inputs
+        
+    Raises:
+        httpx.HTTPError: If the API call fails
+        ValueError: If the response is malformed
+    &quot;&quot;&quot;
+    if not texts:
+        return []
+    
+    url, api_key = get_litellm_config()
+    
+    # Truncate texts
+    truncated_texts = [t[:MAX_CHARS] if len(t) &gt; MAX_CHARS else t for t in texts]
+    
+    with httpx.Client(timeout=timeout) as client:
+        response = client.post(
+            f&quot;{url}/embeddings&quot;,
+            headers={
+                &quot;Authorization&quot;: f&quot;Bearer {api_key}&quot;,
+                &quot;Content-Type&quot;: &quot;application/json&quot;
+            },
+            json={
+                &quot;model&quot;: model,
+                &quot;input&quot;: truncated_texts,
+                &quot;encoding_format&quot;: &quot;float&quot;
+            }
+        )
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        if &quot;data&quot; not in data:
+            raise ValueError(f&quot;Invalid batch embedding response: {data}&quot;)
+        
+        # Sort by index to ensure correct order
+        embeddings_data = sorted(data[&quot;data&quot;], key=lambda x: x[&quot;index&quot;])
+        embeddings = [item[&quot;embedding&quot;] for item in embeddings_data]
+        
+        # Validate dimensions
+        for i, emb in enumerate(embeddings):
+            if len(emb) != EMBEDDING_DIMENSIONS:
+                raise ValueError(f&quot;Unexpected dimension for embedding {i}: {len(emb)}&quot;)
+        
+        return embeddings
+
+
+def cosine_similarity(vec1: List[float], vec2: List[float]) -&gt; float:
+    &quot;&quot;&quot;
+    Calculate cosine similarity between two vectors.
+    
+    Args:
+        vec1: First embedding vector
+        vec2: Second embedding vector
+        
+    Returns:
+        Cosine similarity score between 0 and 1
+    &quot;&quot;&quot;
+    import math
+    
+    if len(vec1) != len(vec2):
+        raise ValueError(&quot;Vectors must have the same dimension&quot;)
+    
+    dot_product = sum(a * b for a, b in zip(vec1, vec2))
+    magnitude1 = math.sqrt(sum(a * a for a in vec1))
+    magnitude2 = math.sqrt(sum(b * b for b in vec2))
+    
+    if magnitude1 == 0 or magnitude2 == 0:
+        return 0.0
+    
+    return dot_product / (magnitude1 * magnitude2)
+
+
+def cosine_distance(vec1: List[float], vec2: List[float]) -&gt; float:
+    &quot;&quot;&quot;
+    Calculate cosine distance between two vectors.
+    
+    Args:
+        vec1: First embedding vector
+        vec2: Second embedding vector
+        
+    Returns:
+        Cosine distance (1 - similarity), where 0 = identical
+    &quot;&quot;&quot;
+    return 1.0 - cosine_similarity(vec1, vec2)
+
+
+class EmbeddingCache:
+    &quot;&quot;&quot;
+    Simple in-memory cache for embeddings to avoid redundant API calls.
+    Useful for batch operations with potential duplicates.
+    &quot;&quot;&quot;
+    
+    def __init__(self, max_size: int = 1000):
+        self._cache: dict = {}
+        self._max_size = max_size
+    
+    def get(self, text: str) -&gt; Optional[List[float]]:
+        &quot;&quot;&quot;Get cached embedding if available&quot;&quot;&quot;
+        return self._cache.get(text)
+    
+    def set(self, text: str, embedding: List[float]) -&gt; None:
+        &quot;&quot;&quot;Cache an embedding&quot;&quot;&quot;
+        if len(self._cache) &gt;= self._max_size:
+            # Simple LRU: remove oldest entry
+            oldest_key = next(iter(self._cache))
+            del self._cache[oldest_key]
+        self._cache[text] = embedding
+    
+    def get_or_generate(self, text: str, model: str = DEFAULT_MODEL) -&gt; List[float]:
+        &quot;&quot;&quot;Get from cache or generate new embedding&quot;&quot;&quot;
+        cached = self.get(text)
+        if cached is not None:
+            return cached
+        
+        embedding = generate_embedding(text, model)
+        self.set(text, embedding)
+        return embedding
+    
+    def clear(self) -&gt; None:
+        &quot;&quot;&quot;Clear the cache&quot;&quot;&quot;
+        self._cache.clear()</code></pre>
+<hr />
+<h2 id="cato-safety-client">9. Cato Safety Client</h2>
+<p><strong>File</strong>: <code>packages/flyte/utils/cato_client.py</code></p>
+<p><strong>Purpose</strong>: HTTP bridge to the TypeScript Cato Safety Service. Validates content for safety before storage or retrieval.</p>
+<p><strong>Key Features</strong>: - Epistemic safety checks (fail-open for reads) - Storage validation (fail-closed for writes) - Batch checking for efficiency</p>
+<pre class="python"><code>&quot;&quot;&quot;
+Cato HTTP Client - Polyglot Bridge
+
+This module provides Python access to the TypeScript Cato Safety Service
+via HTTP. This is the CORRECT pattern for polyglot microservices - 
+never import TypeScript modules directly from Python.
+
+RADIANT v5.0.2 - System Evolution
+
+Usage:
+    from radiant.flyte.utils.cato_client import CatoClient
+    
+    risk = CatoClient.epistemic_check(&quot;Some content&quot;, &quot;tenant-uuid&quot;)
+    if risk.risk_level == &quot;LOW&quot;:
+        # Safe to proceed
+&quot;&quot;&quot;
+
+import os
+import httpx
+from dataclasses import dataclass, field
+from typing import Optional, Literal, List
+
+# Type definitions
+RiskLevel = Literal[&quot;LOW&quot;, &quot;MEDIUM&quot;, &quot;HIGH&quot;, &quot;CRITICAL&quot;]
+
+
+@dataclass
+class CatoRisk:
+    &quot;&quot;&quot;Result of a Cato safety check&quot;&quot;&quot;
+    risk_level: RiskLevel
+    reason: str
+    cbf_violations: List[str] = field(default_factory=list)
+    
+    @property
+    def is_safe(self) -&gt; bool:
+        &quot;&quot;&quot;Returns True if content passed safety checks&quot;&quot;&quot;
+        return self.risk_level == &quot;LOW&quot;
+    
+    @property
+    def should_block(self) -&gt; bool:
+        &quot;&quot;&quot;Returns True if content should be blocked&quot;&quot;&quot;
+        return self.risk_level in (&quot;HIGH&quot;, &quot;CRITICAL&quot;)
+    
+    @property
+    def needs_review(self) -&gt; bool:
+        &quot;&quot;&quot;Returns True if content needs human review&quot;&quot;&quot;
+        return self.risk_level == &quot;MEDIUM&quot;
+
+
+class CatoClient:
+    &quot;&quot;&quot;
+    HTTP Bridge to the TypeScript Cato Safety Service
+    
+    Environment Variables:
+        CATO_API_URL: Base URL of the Cato service (default: internal service mesh)
+        CATO_TIMEOUT: Request timeout in seconds (default: 5.0)
+    &quot;&quot;&quot;
+    
+    _base_url: Optional[str] = None
+    _timeout: float = 5.0
+    
+    @classmethod
+    def _get_config(cls) -&gt; tuple:
+        &quot;&quot;&quot;Lazy load configuration from environment&quot;&quot;&quot;
+        if cls._base_url is None:
+            cls._base_url = os.environ.get(
+                &quot;CATO_API_URL&quot;, 
+                &quot;http://cato-service.radiant.internal/api/safety&quot;
+            )
+            cls._timeout = float(os.environ.get(&quot;CATO_TIMEOUT&quot;, &quot;5.0&quot;))
+        return cls._base_url, cls._timeout
+    
+    @staticmethod
+    def epistemic_check(content: str, tenant_id: str) -&gt; CatoRisk:
+        &quot;&quot;&quot;
+        Validates content against Cato&#39;s epistemic safety rules.
+        
+        This check is used for:
+        - Validating heuristics before injection into prompts
+        - Validating AI-generated content before storage
+        - Detecting prompt injection attempts in memory
+        
+        Args:
+            content: The text content to validate
+            tenant_id: UUID of the tenant (for RLS context)
+            
+        Returns:
+            CatoRisk with risk_level and reason
+            
+        Note:
+            On failure, returns LOW risk (fail-open for reads).
+            Callers should implement fail-closed for writes.
+        &quot;&quot;&quot;
+        base_url, timeout = CatoClient._get_config()
+        
+        try:
+            with httpx.Client(timeout=timeout) as client:
+                resp = client.post(
+                    f&quot;{base_url}/check&quot;,
+                    headers={
+                        &quot;X-Tenant-ID&quot;: tenant_id,
+                        &quot;Content-Type&quot;: &quot;application/json&quot;
+                    },
+                    json={
+                        &quot;content&quot;: content,
+                        &quot;check_type&quot;: &quot;epistemic&quot;,
+                        &quot;context&quot;: {
+                            &quot;source&quot;: &quot;grimoire&quot;,
+                            &quot;operation&quot;: &quot;validation&quot;
+                        }
+                    }
+                )
+                
+                if resp.status_code != 200:
+                    print(f&quot;Cato check returned {resp.status_code}: {resp.text}&quot;)
+                    return CatoRisk(
+                        risk_level=&quot;LOW&quot;, 
+                        reason=f&quot;Cato unavailable (HTTP {resp.status_code})&quot;
+                    )
+                
+                data = resp.json()
+                return CatoRisk(
+                    risk_level=data.get(&quot;riskLevel&quot;, &quot;LOW&quot;),
+                    reason=data.get(&quot;reason&quot;, &quot;&quot;),
+                    cbf_violations=data.get(&quot;violations&quot;, [])
+                )
+                
+        except httpx.TimeoutException:
+            print(f&quot;Cato check timed out after {timeout}s&quot;)
+            return CatoRisk(risk_level=&quot;LOW&quot;, reason=&quot;Cato timeout - bypass&quot;)
+            
+        except Exception as e:
+            print(f&quot;Cato check failed: {e}&quot;)
+            return CatoRisk(risk_level=&quot;LOW&quot;, reason=f&quot;Error bypass: {str(e)}&quot;)
+    
+    @staticmethod
+    def validate_for_storage(content: str, tenant_id: str) -&gt; CatoRisk:
+        &quot;&quot;&quot;
+        FAIL-CLOSED validation for content storage operations.
+        
+        Unlike epistemic_check which fails open (returns LOW on error),
+        this method returns HIGH risk on any error, preventing potentially
+        dangerous content from being stored.
+        
+        Use this for:
+        - Storing heuristics in The Grimoire
+        - Storing user-provided memory entries
+        - Any write operation to persistent storage
+        
+        Args:
+            content: The content to validate
+            tenant_id: UUID of the tenant
+            
+        Returns:
+            CatoRisk - Returns HIGH risk level on any error
+        &quot;&quot;&quot;
+        base_url, timeout = CatoClient._get_config()
+        
+        try:
+            with httpx.Client(timeout=timeout) as client:
+                resp = client.post(
+                    f&quot;{base_url}/check&quot;,
+                    headers={
+                        &quot;X-Tenant-ID&quot;: tenant_id,
+                        &quot;Content-Type&quot;: &quot;application/json&quot;
+                    },
+                    json={
+                        &quot;content&quot;: content,
+                        &quot;check_type&quot;: &quot;storage&quot;,
+                        &quot;context&quot;: {
+                            &quot;source&quot;: &quot;grimoire&quot;,
+                            &quot;operation&quot;: &quot;write&quot;,
+                            &quot;fail_closed&quot;: True
+                        }
+                    }
+                )
+                
+                if resp.status_code != 200:
+                    print(f&quot;Cato storage check returned {resp.status_code} - BLOCKING&quot;)
+                    return CatoRisk(
+                        risk_level=&quot;HIGH&quot;, 
+                        reason=f&quot;Cato unavailable - fail-closed (HTTP {resp.status_code})&quot;
+                    )
+                
+                data = resp.json()
+                return CatoRisk(
+                    risk_level=data.get(&quot;riskLevel&quot;, &quot;HIGH&quot;),
+                    reason=data.get(&quot;reason&quot;, &quot;&quot;),
+                    cbf_violations=data.get(&quot;violations&quot;, [])
+                )
+                
+        except Exception as e:
+            print(f&quot;Cato storage check failed - BLOCKING: {e}&quot;)
+            return CatoRisk(
+                risk_level=&quot;HIGH&quot;, 
+                reason=f&quot;Fail-closed error: {str(e)}&quot;
+            )
+    
+    @staticmethod
+    def batch_check(contents: List[str], tenant_id: str) -&gt; List[CatoRisk]:
+        &quot;&quot;&quot;
+        Validates multiple content items in a single request.
+        More efficient than individual checks for bulk operations.
+        
+        Args:
+            contents: List of text content to validate
+            tenant_id: UUID of the tenant
+            
+        Returns:
+            List of CatoRisk objects in the same order as inputs
+        &quot;&quot;&quot;
+        base_url, timeout = CatoClient._get_config()
+        
+        if not contents:
+            return []
+        
+        try:
+            with httpx.Client(timeout=timeout * 2) as client:
+                resp = client.post(
+                    f&quot;{base_url}/check/batch&quot;,
+                    headers={
+                        &quot;X-Tenant-ID&quot;: tenant_id,
+                        &quot;Content-Type&quot;: &quot;application/json&quot;
+                    },
+                    json={
+                        &quot;contents&quot;: contents,
+                        &quot;check_type&quot;: &quot;epistemic&quot;
+                    }
+                )
+                
+                if resp.status_code != 200:
+                    return [CatoRisk(risk_level=&quot;LOW&quot;, reason=&quot;Batch unavailable&quot;) 
+                            for _ in contents]
+                
+                data = resp.json()
+                return [
+                    CatoRisk(
+                        risk_level=item.get(&quot;riskLevel&quot;, &quot;LOW&quot;),
+                        reason=item.get(&quot;reason&quot;, &quot;&quot;),
+                        cbf_violations=item.get(&quot;violations&quot;, [])
+                    )
+                    for item in data.get(&quot;results&quot;, [])
+                ]
+                
+        except Exception as e:
+            print(f&quot;Cato batch check failed: {e}&quot;)
+            return [CatoRisk(risk_level=&quot;LOW&quot;, reason=&quot;Batch error bypass&quot;) 
+                    for _ in contents]</code></pre>
+<hr />
+<h2 id="python-utils-module-exports">10. Python Utils Module Exports</h2>
+<p><strong>File</strong>: <code>packages/flyte/utils/__init__.py</code></p>
+<p><strong>Purpose</strong>: Central export point for all Python utilities.</p>
+<pre class="python"><code>&quot;&quot;&quot;
+RADIANT Flyte Utilities
+
+v5.0.2 - System Evolution
+&quot;&quot;&quot;
+
+from .db import (
+    get_safe_db_connection,
+    get_system_db_connection,
+    get_readonly_connection,
+    close_pool,
+    health_check,
+    SYSTEM_TENANT_ID
+)
+
+from .embeddings import (
+    generate_embedding,
+    generate_embeddings_batch,
+    cosine_similarity,
+    cosine_distance,
+    EmbeddingCache,
+    EMBEDDING_DIMENSIONS
+)
+
+from .cato_client import (
+    CatoClient,
+    CatoRisk
+)
+
+__all__ = [
+    # Database
+    &#39;get_safe_db_connection&#39;,
+    &#39;get_system_db_connection&#39;, 
+    &#39;get_readonly_connection&#39;,
+    &#39;close_pool&#39;,
+    &#39;health_check&#39;,
+    &#39;SYSTEM_TENANT_ID&#39;,
+    # Embeddings
+    &#39;generate_embedding&#39;,
+    &#39;generate_embeddings_batch&#39;,
+    &#39;cosine_similarity&#39;,
+    &#39;cosine_distance&#39;,
+    &#39;EmbeddingCache&#39;,
+    &#39;EMBEDDING_DIMENSIONS&#39;,
+    # Cato
+    &#39;CatoClient&#39;,
+    &#39;CatoRisk&#39;,
+]</code></pre>
+<hr />
+<p><em>Continued in GRIMOIRE-GOVERNOR-SOURCE-PART5.md</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

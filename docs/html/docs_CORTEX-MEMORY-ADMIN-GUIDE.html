@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORTEX MEMORY ADMIN GUIDE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>CORTEX MEMORY ADMIN GUIDE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/CORTEX-MEMORY-ADMIN-GUIDE.md</div>
+  </div>
+  
+  <h1 id="cortex-memory-system---administrator-guide">Cortex Memory System - Administrator Guide</h1>
+<p><strong>Version:</strong> 4.20.0<br />
+<strong>Last Updated:</strong> January 2026<br />
+<strong>Component:</strong> RADIANT Platform Core</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-executive-summary">Executive Summary</a></li>
+<li><a href="#2-architecture-overview">Architecture Overview</a></li>
+<li><a href="#3-hot-tier-administration">Hot Tier Administration</a></li>
+<li><a href="#4-warm-tier-administration">Warm Tier Administration</a></li>
+<li><a href="#5-cold-tier-administration">Cold Tier Administration</a></li>
+<li><a href="#6-tenant-isolation--security">Tenant Isolation &amp; Security</a></li>
+<li><a href="#7-dashboard-operations">Dashboard Operations</a></li>
+<li><a href="#8-housekeeping--maintenance">Housekeeping &amp; Maintenance</a></li>
+<li><a href="#9-gdpr-compliance">GDPR Compliance</a></li>
+<li><a href="#10-monitoring--alerts">Monitoring &amp; Alerts</a></li>
+<li><a href="#11-troubleshooting">Troubleshooting</a></li>
+<li><a href="#12-api-reference">API Reference</a></li>
+</ol>
+<hr />
+<h2 id="executive-summary">1. Executive Summary</h2>
+<h3 id="why-tiered-memory">1.1 Why Tiered Memory?</h3>
+<p>Direct database storage fails at enterprise scale due to:</p>
+<table>
+<colgroup>
+<col style="width: 52%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Volume Limits</strong></td>
+<td>PostgreSQL degrades past 100M rows per table</td>
+</tr>
+<tr>
+<td><strong>Latency Degradation</strong></td>
+<td>Cold queries block hot context retrieval</td>
+</tr>
+<tr>
+<td><strong>Cost Inefficiency</strong></td>
+<td>Paying hot-storage prices for cold data</td>
+</tr>
+<tr>
+<td><strong>Compliance Conflicts</strong></td>
+<td>GDPR/HIPAA require different retention per data type</td>
+</tr>
+<tr>
+<td><strong>Data Gravity</strong></td>
+<td>Customers can’t bring their own data lakes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-solution-hotwarmcold-architecture">1.2 The Solution: Hot/Warm/Cold Architecture</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│                     CORTEX MEMORY SYSTEM                            │
+├─────────────────┬─────────────────┬─────────────────────────────────┤
+│    HOT TIER     │    WARM TIER    │          COLD TIER              │
+│  Redis + DynamoDB│ Neptune + pgvector│      S3 + Iceberg            │
+├─────────────────┼─────────────────┼─────────────────────────────────┤
+│ Real-time context│ Knowledge Graph │ Historical Archive             │
+│ Session state   │ 90-day window   │ Zero-Copy Mounts               │
+│ Ghost Vectors   │ Graph-RAG       │ Glacier tiering                │
+├─────────────────┼─────────────────┼─────────────────────────────────┤
+│    &lt; 10ms       │    &lt; 100ms      │         &lt; 2 seconds            │
+│   (p99 target)  │   (p99 target)  │        (p99 target)            │
+└─────────────────┴─────────────────┴─────────────────────────────────┘</code></pre>
+<h3 id="key-benefits">1.3 Key Benefits</h3>
+<ul>
+<li><strong>Performance</strong>: Sub-10ms hot reads, sub-100ms graph queries</li>
+<li><strong>Cost Efficiency</strong>: 90% reduction in storage costs for archival data</li>
+<li><strong>Compliance</strong>: Automated retention policies per data classification</li>
+<li><strong>Data Sovereignty</strong>: Zero-Copy mounts to tenant-owned data lakes</li>
+<li><strong>Scalability</strong>: Each tier scales independently</li>
+</ul>
+<hr />
+<h2 id="architecture-overview">2. Architecture Overview</h2>
+<h3 id="the-retrieval-dance---runtime-query-flow">2.1 The “Retrieval Dance” - Runtime Query Flow</h3>
+<p>The Cortex uses a sophisticated multi-tier retrieval pattern:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                         THE &quot;RETRIEVAL DANCE&quot;                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Step 1: INTENT PARSING (Hot Tier)                                          │
+│  ─────────────────────────────────                                          │
+│  • Analyze User Query + Ghost Vectors                                        │
+│  • Identify entities mentioned (&quot;Pump 302&quot;, &quot;Q4 Report&quot;)                     │
+│  • Determine query intent and required depth                                 │
+│                                                                              │
+│  Step 2: GRAPH TRAVERSAL (Warm Tier)                                        │
+│  ────────────────────────────────────                                        │
+│  • Traverse Knowledge Graph 2-3 hops from identified entities                │
+│  • ⚠️ CRITICAL: Check for &quot;Golden Rule&quot; Overrides                           │
+│    (e.g., &quot;Always ignore Manual v1 for Pump 302&quot;)                           │
+│  • If override exists → Apply strict priority                                │
+│                                                                              │
+│  Step 3: DEEP FETCH (Cold Tier)                                             │
+│  ──────────────────────────────                                              │
+│  • If Graph points to archived content (e.g., page 47 of 500MB PDF)         │
+│  • Generate signed URL to fetch ONLY that specific content                   │
+│  • Retrieve via Stub Nodes (metadata pointers to external storage)           │
+│                                                                              │
+│  Step 4: SYNTHESIS (Foundation Model)                                        │
+│  ────────────────────────────────────                                        │
+│  • Package: Query + Graph Logic + Fetched Content                            │
+│  • Route to appropriate model (Claude, Gemini, etc.)                         │
+│  • Generate response with Chain of Custody audit trail                       │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<p><strong>Latency Breakdown:</strong> | Step | Target | Actual p99 | |——|——–|————| | Intent Parsing | &lt; 10ms | 3ms | | Graph Traversal | &lt; 100ms | 75ms | | Deep Fetch (if needed) | &lt; 2s | 1.2s | | Synthesis | &lt; 500ms | 350ms |</p>
+<h3 id="tier-responsibilities">2.2 Tier Responsibilities</h3>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 29%" />
+<col style="width: 26%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Data Types</th>
+<th>Retention</th>
+<th>Technology</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hot</strong></td>
+<td>Session context, Ghost Vectors, telemetry feeds</td>
+<td>4 hours default</td>
+<td>Redis Cluster + DynamoDB overflow</td>
+</tr>
+<tr>
+<td><strong>Warm</strong></td>
+<td>Knowledge graph, entity relationships, document embeddings</td>
+<td>90 days default</td>
+<td>Amazon Neptune + Aurora pgvector</td>
+</tr>
+<tr>
+<td><strong>Cold</strong></td>
+<td>Historical archives, audit logs, compliance records</td>
+<td>7+ years</td>
+<td>S3 Iceberg + Glacier lifecycle</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tier-coordinator">2.3 Tier Coordinator</h3>
+<p>The TierCoordinator service orchestrates:</p>
+<ul>
+<li><strong>Automatic Promotion</strong>: Hot → Warm when TTL expires</li>
+<li><strong>Automatic Archival</strong>: Warm → Cold after retention period</li>
+<li><strong>On-Demand Retrieval</strong>: Cold → Warm when historical data needed</li>
+<li><strong>Eviction Policies</strong>: LRU for Hot tier, confidence-based for Warm</li>
+</ul>
+<hr />
+<h2 id="hot-tier-administration">3. Hot Tier Administration</h2>
+<h3 id="redis-cluster-configuration">3.1 Redis Cluster Configuration</h3>
+<p>Default production settings:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hot_redis_cluster_mode</code></td>
+<td><code>true</code></td>
+<td>Enable sharding</td>
+</tr>
+<tr>
+<td><code>hot_shard_count</code></td>
+<td><code>3</code></td>
+<td>Number of shards</td>
+</tr>
+<tr>
+<td><code>hot_replicas_per_shard</code></td>
+<td><code>2</code></td>
+<td>Replicas for HA</td>
+</tr>
+<tr>
+<td><code>hot_instance_type</code></td>
+<td><code>r7g.xlarge</code></td>
+<td>AWS instance type</td>
+</tr>
+<tr>
+<td><code>hot_max_memory_percent</code></td>
+<td><code>80</code></td>
+<td>Eviction threshold</td>
+</tr>
+<tr>
+<td><code>hot_default_ttl_seconds</code></td>
+<td><code>14400</code></td>
+<td>4 hours default TTL</td>
+</tr>
+<tr>
+<td><code>hot_overflow_to_dynamodb</code></td>
+<td><code>true</code></td>
+<td>Overflow large values</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-schema-tenant-isolation">3.2 Key Schema (Tenant Isolation)</h3>
+<p>All Redis keys follow this pattern:</p>
+<pre><code>{tenant_id}:{data_type}:{identifier}</code></pre>
+<p>Examples:</p>
+<pre><code>abc123:session:user_456:context
+abc123:ghost:user_789
+abc123:telemetry:stream_001
+abc123:prefetch:doc_123</code></pre>
+<h3 id="data-types-in-hot-tier">3.3 Data Types in Hot Tier</h3>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 30%" />
+<col style="width: 11%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Data Type</th>
+<th>Key Pattern</th>
+<th>TTL</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Session Context</strong></td>
+<td><code>{tenant}:session:{user}:context</code></td>
+<td>4h</td>
+<td>Current conversation + tool calls</td>
+</tr>
+<tr>
+<td><strong>Ghost Vectors</strong></td>
+<td><code>{tenant}:ghost:{user}</code></td>
+<td>24h</td>
+<td>User personality embeddings (Role, Bias, Preferences)</td>
+</tr>
+<tr>
+<td><strong>Live Telemetry</strong></td>
+<td><code>{tenant}:telemetry:{stream}</code></td>
+<td>1h</td>
+<td>Real-time sensor feeds (MQTT/OPC UA)</td>
+</tr>
+<tr>
+<td><strong>Prefetch Cache</strong></td>
+<td><code>{tenant}:prefetch:{doc}</code></td>
+<td>30m</td>
+<td>Anticipated document needs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="live-telemetry-integration-industrial-iot">3.4 Live Telemetry Integration (Industrial IoT)</h3>
+<p>The Hot tier can ingest real-time sensor data directly into the context window:</p>
+<table>
+<thead>
+<tr>
+<th>Protocol</th>
+<th>Use Case</th>
+<th>Injection Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MQTT</strong></td>
+<td>IoT sensors, edge devices</td>
+<td>Subscribe to topics</td>
+</tr>
+<tr>
+<td><strong>OPC UA</strong></td>
+<td>Industrial equipment (SCADA/PLC)</td>
+<td>Poll or subscribe</td>
+</tr>
+<tr>
+<td><strong>Kafka</strong></td>
+<td>Event streams</td>
+<td>Consumer group</td>
+</tr>
+<tr>
+<td><strong>WebSocket</strong></td>
+<td>Real-time dashboards</td>
+<td>Persistent connection</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Configuration:</strong></p>
+<pre class="bash"><code>POST /api/admin/cortex/telemetry-feeds
+{
+  &quot;name&quot;: &quot;pump_302_sensors&quot;,
+  &quot;protocol&quot;: &quot;opc_ua&quot;,
+  &quot;endpoint&quot;: &quot;opc.tcp://plc.factory.local:4840&quot;,
+  &quot;nodeIds&quot;: [&quot;ns=2;s=Pump302.Pressure&quot;, &quot;ns=2;s=Pump302.Temperature&quot;],
+  &quot;pollInterval&quot;: 1000,
+  &quot;contextInjection&quot;: true
+}</code></pre>
+<p><strong>Business Value:</strong> When a user asks “Why is Pump 302 showing high pressure?”, the AI sees: - Current sensor values (Hot tier - real-time) - Equipment hierarchy and dependencies (Warm tier - graph) - Historical maintenance records (Cold tier - archives)</p>
+<h3 id="monitoring-hot-tier">3.4 Monitoring Hot Tier</h3>
+<p>Key metrics to watch:</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 25%" />
+<col style="width: 28%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Warning</th>
+<th>Critical</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Memory Usage %</td>
+<td>&gt; 70%</td>
+<td>&gt; 85%</td>
+<td>Scale shards or reduce TTL</td>
+</tr>
+<tr>
+<td>Cache Hit Rate</td>
+<td>&lt; 90%</td>
+<td>&lt; 80%</td>
+<td>Review prefetch strategy</td>
+</tr>
+<tr>
+<td>p99 Latency</td>
+<td>&gt; 5ms</td>
+<td>&gt; 10ms</td>
+<td>Check network, cluster health</td>
+</tr>
+<tr>
+<td>Connection Count</td>
+<td>&gt; 80% max</td>
+<td>&gt; 95% max</td>
+<td>Scale or connection pooling</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="warm-tier-administration">4. Warm Tier Administration</h2>
+<h3 id="neptune-configuration">4.1 Neptune Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>warm_neptune_mode</code></td>
+<td><code>serverless</code></td>
+<td>Serverless or provisioned</td>
+</tr>
+<tr>
+<td><code>warm_neptune_min_capacity</code></td>
+<td><code>1.0</code></td>
+<td>Minimum NCUs</td>
+</tr>
+<tr>
+<td><code>warm_neptune_max_capacity</code></td>
+<td><code>16.0</code></td>
+<td>Maximum NCUs</td>
+</tr>
+<tr>
+<td><code>warm_retention_days</code></td>
+<td><code>90</code></td>
+<td>Before archival</td>
+</tr>
+<tr>
+<td><code>warm_graph_weight_percent</code></td>
+<td><code>60</code></td>
+<td>Graph vs vector weight</td>
+</tr>
+<tr>
+<td><code>warm_vector_weight_percent</code></td>
+<td><code>40</code></td>
+<td>In hybrid search</td>
+</tr>
+</tbody>
+</table>
+<h3 id="graph-rag-knowledge-graph">4.2 Graph-RAG Knowledge Graph</h3>
+<p>The Warm tier implements <strong>Graph-RAG</strong> for superior reasoning:</p>
+<h4 id="why-graph-beats-vector-only">Why Graph Beats Vector-Only</h4>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 41%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Vector Search</th>
+<th>Graph-RAG</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“What causes X?”</td>
+<td>Returns similar docs</td>
+<td>Traverses CAUSES edges</td>
+</tr>
+<tr>
+<td>“What depends on Y?”</td>
+<td>Returns related docs</td>
+<td>Follows DEPENDS_ON paths</td>
+</tr>
+<tr>
+<td>“What supersedes Z?”</td>
+<td>May return old versions</td>
+<td>Explicit SUPERSEDES edges</td>
+</tr>
+</tbody>
+</table>
+<h4 id="node-types">Node Types</h4>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+<th>Evergreen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>document</code></td>
+<td>Source documents</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>entity</code></td>
+<td>Named entities (Equipment, People, Orgs)</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>concept</code></td>
+<td>Abstract concepts</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>procedure</code></td>
+<td>Business procedures (“If X happens, do Y”)</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><code>fact</code></td>
+<td>Verified facts</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><code>golden_qa</code></td>
+<td>Verified Q&amp;A pairs (Golden Answers)</td>
+<td><strong>Yes</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="golden-rules-override-system">Golden Rules (Override System)</h4>
+<p><strong>Critical Feature:</strong> Administrators can create high-priority rules that supersede all other data.</p>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 38%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr>
+<th>Rule Type</th>
+<th>Description</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>force_override</code></td>
+<td>Always use this answer for this entity</td>
+<td><strong>Highest</strong></td>
+</tr>
+<tr>
+<td><code>ignore_source</code></td>
+<td>Never use data from this source</td>
+<td>High</td>
+</tr>
+<tr>
+<td><code>prefer_source</code></td>
+<td>Prefer this source over others</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><code>deprecate</code></td>
+<td>Mark as obsolete (e.g., “Ignore Manual v1”)</td>
+<td>High</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Creating a Golden Rule:</strong></p>
+<pre class="bash"><code>POST /api/admin/cortex/golden-rules
+{
+  &quot;entityId&quot;: &quot;pump_302&quot;,
+  &quot;ruleType&quot;: &quot;force_override&quot;,
+  &quot;condition&quot;: &quot;max_pressure_query&quot;,
+  &quot;override&quot;: &quot;100 PSI (verified by Chief Engineer, Jan 2026)&quot;,
+  &quot;reason&quot;: &quot;Manual v1 was incorrect&quot;,
+  &quot;verifiedBy&quot;: &quot;bob@company.com&quot;,
+  &quot;signature&quot;: &quot;sha256:abc123...&quot;
+}</code></pre>
+<p><strong>Chain of Custody:</strong> Every Golden Rule includes: - Who verified it - When it was verified - Digital signature for audit trail - Reason for override</p>
+<h4 id="edge-types">Edge Types</h4>
+<table>
+<thead>
+<tr>
+<th>Edge</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mentions</code></td>
+<td>Document mentions entity</td>
+</tr>
+<tr>
+<td><code>causes</code></td>
+<td>Causal relationship</td>
+</tr>
+<tr>
+<td><code>depends_on</code></td>
+<td>Dependency relationship</td>
+</tr>
+<tr>
+<td><code>supersedes</code></td>
+<td>Version replacement</td>
+</tr>
+<tr>
+<td><code>verified_by</code></td>
+<td>Source verification</td>
+</tr>
+<tr>
+<td><code>authored_by</code></td>
+<td>Authorship attribution</td>
+</tr>
+<tr>
+<td><code>relates_to</code></td>
+<td>General relationship</td>
+</tr>
+<tr>
+<td><code>contains</code></td>
+<td>Containment</td>
+</tr>
+<tr>
+<td><code>requires</code></td>
+<td>Prerequisite</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pgvector-integration">4.3 pgvector Integration</h3>
+<p>Hybrid search combines: 1. <strong>Graph traversal</strong> (60% weight): Neptune path queries 2. <strong>Vector similarity</strong> (40% weight): pgvector cosine distance</p>
+<pre class="sql"><code>-- Example hybrid query
+SELECT n.*, 
+       (0.6 * graph_score + 0.4 * (1 - embedding &lt;=&gt; query_vector)) as hybrid_score
+FROM cortex_graph_nodes n
+WHERE tenant_id = $1
+ORDER BY hybrid_score DESC
+LIMIT 10;</code></pre>
+<h3 id="conflict-detection">4.4 Conflict Detection</h3>
+<p>The system automatically detects contradictory facts:</p>
+<table>
+<thead>
+<tr>
+<th>Conflict Type</th>
+<th>Description</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>contradiction</code></td>
+<td>Mutually exclusive facts</td>
+<td>Manual review required</td>
+</tr>
+<tr>
+<td><code>superseded</code></td>
+<td>Newer fact replaces older</td>
+<td>Auto-archive older</td>
+</tr>
+<tr>
+<td><code>ambiguous</code></td>
+<td>Unclear relationship</td>
+<td>Flag for clarification</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cold-tier-administration">5. Cold Tier Administration</h2>
+<h3 id="s3-iceberg-configuration">5.1 S3 Iceberg Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cold_s3_bucket</code></td>
+<td>Auto-generated</td>
+<td>Archive bucket</td>
+</tr>
+<tr>
+<td><code>cold_iceberg_enabled</code></td>
+<td><code>true</code></td>
+<td>Use Iceberg tables</td>
+</tr>
+<tr>
+<td><code>cold_compression_format</code></td>
+<td><code>snappy</code></td>
+<td>snappy, zstd, or gzip</td>
+</tr>
+<tr>
+<td><code>cold_zero_copy_enabled</code></td>
+<td><code>false</code></td>
+<td>Enable external mounts</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage-class-lifecycle">5.2 Storage Class Lifecycle</h3>
+<p>Data automatically transitions through storage classes:</p>
+<pre><code>Day 0-30:     S3 Standard
+Day 30-90:   S3 Intelligent-Tiering
+Day 90-365:  Glacier Instant Retrieval
+Day 365+:    Glacier Deep Archive</code></pre>
+<h3 id="zero-copy-mounts-stub-nodes">5.3 Zero-Copy Mounts &amp; Stub Nodes</h3>
+<p><strong>The Innovation:</strong> We do not force tenants to move 50TB of data to our cloud. We <strong>Mount</strong> their existing Data Lakes.</p>
+<p><strong>The Mechanism:</strong> RADIANT scans external storage metadata and generates <strong>“Stub Nodes”</strong> in the Warm Graph: - Stub Node example: <code>"Log File 2024.csv exists at S3://bucket/logs/"</code> - Actual content is fetched <strong>only</strong> if Graph Traversal determines it is critical for the answer - Enables sub-second metadata queries over petabytes of external data</p>
+<table>
+<thead>
+<tr>
+<th>Source Type</th>
+<th>Description</th>
+<th>Connection Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>snowflake</code></td>
+<td>Snowflake Data Share</td>
+<td>OAuth + Data Share</td>
+</tr>
+<tr>
+<td><code>databricks</code></td>
+<td>Delta Lake / Unity Catalog</td>
+<td>Service Principal</td>
+</tr>
+<tr>
+<td><code>s3</code></td>
+<td>Customer S3 bucket</td>
+<td>Cross-account IAM role</td>
+</tr>
+<tr>
+<td><code>azure_datalake</code></td>
+<td>Azure Data Lake Gen2</td>
+<td>Managed Identity</td>
+</tr>
+<tr>
+<td><code>gcs</code></td>
+<td>Google Cloud Storage</td>
+<td>Service Account</td>
+</tr>
+</tbody>
+</table>
+<h4 id="creating-a-zero-copy-mount">Creating a Zero-Copy Mount</h4>
+<pre class="bash"><code>POST /api/admin/cortex/mounts
+{
+  &quot;name&quot;: &quot;customer-data-lake&quot;,
+  &quot;sourceType&quot;: &quot;snowflake&quot;,
+  &quot;connectionConfig&quot;: {
+    &quot;account&quot;: &quot;xy12345.us-east-1&quot;,
+    &quot;warehouse&quot;: &quot;COMPUTE_WH&quot;,
+    &quot;database&quot;: &quot;CUSTOMER_DB&quot;,
+    &quot;schema&quot;: &quot;PUBLIC&quot;
+  }
+}</code></pre>
+<h4 id="rescanning-a-mount">Rescanning a Mount</h4>
+<pre class="bash"><code>POST /api/admin/cortex/mounts/{mountId}/rescan</code></pre>
+<p>This triggers: 1. Catalog synchronization 2. Schema discovery 3. Node creation for new objects 4. Index updates</p>
+<h3 id="archive-retrieval">5.4 Archive Retrieval</h3>
+<p>Cold data can be retrieved on-demand:</p>
+<table>
+<thead>
+<tr>
+<th>Storage Class</th>
+<th>Retrieval Time</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard</td>
+<td>Immediate</td>
+<td>Base</td>
+</tr>
+<tr>
+<td>Intelligent-Tiering</td>
+<td>Immediate</td>
+<td>Base</td>
+</tr>
+<tr>
+<td>Glacier Instant</td>
+<td>~100ms</td>
+<td>Higher</td>
+</tr>
+<tr>
+<td>Glacier Flexible</td>
+<td>1-12 hours</td>
+<td>Lower</td>
+</tr>
+<tr>
+<td>Deep Archive</td>
+<td>12-48 hours</td>
+<td>Lowest</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tenant-isolation-security">6. Tenant Isolation &amp; Security</h2>
+<h3 id="defense-in-depth-strategy">6.1 Defense-in-Depth Strategy</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Isolation Mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hot</strong></td>
+<td>Redis key prefixing + ACLs</td>
+</tr>
+<tr>
+<td><strong>Warm</strong></td>
+<td>Neptune IAM policies + PostgreSQL RLS</td>
+</tr>
+<tr>
+<td><strong>Cold</strong></td>
+<td>S3 bucket policies + KMS per-tenant keys</td>
+</tr>
+</tbody>
+</table>
+<h3 id="hot-tier-security">6.2 Hot Tier Security</h3>
+<pre><code># Redis key prefix enforcement
+Key pattern: {tenant_id}:*
+ACL: user tenant_{id} on +@all ~{tenant_id}:*</code></pre>
+<h3 id="warm-tier-security">6.3 Warm Tier Security</h3>
+<p>PostgreSQL Row-Level Security:</p>
+<pre class="sql"><code>CREATE POLICY cortex_graph_nodes_isolation ON cortex_graph_nodes
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);</code></pre>
+<p>Neptune IAM policy scoping:</p>
+<pre class="json"><code>{
+  &quot;Effect&quot;: &quot;Allow&quot;,
+  &quot;Action&quot;: [&quot;neptune-db:*&quot;],
+  &quot;Resource&quot;: &quot;arn:aws:neptune-db:*:*:cluster/*/database/*&quot;,
+  &quot;Condition&quot;: {
+    &quot;StringEquals&quot;: {
+      &quot;neptune-db:QueryLanguage&quot;: &quot;Gremlin&quot;,
+      &quot;aws:ResourceTag/TenantId&quot;: &quot;${aws:PrincipalTag/TenantId}&quot;
+    }
+  }
+}</code></pre>
+<h3 id="cold-tier-security">6.4 Cold Tier Security</h3>
+<p>S3 bucket policy:</p>
+<pre class="json"><code>{
+  &quot;Effect&quot;: &quot;Allow&quot;,
+  &quot;Principal&quot;: {&quot;AWS&quot;: &quot;arn:aws:iam::*:role/tenant-*&quot;},
+  &quot;Action&quot;: [&quot;s3:GetObject&quot;],
+  &quot;Resource&quot;: &quot;arn:aws:s3:::cortex-cold/*&quot;,
+  &quot;Condition&quot;: {
+    &quot;StringLike&quot;: {
+      &quot;s3:prefix&quot;: [&quot;${aws:PrincipalTag/TenantId}/*&quot;]
+    }
+  }
+}</code></pre>
+<h3 id="compliance-requirements-matrix">6.5 Compliance Requirements Matrix</h3>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Hot Tier</th>
+<th>Warm Tier</th>
+<th>Cold Tier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Encryption at rest</td>
+<td>✅ AES-256</td>
+<td>✅ AES-256</td>
+<td>✅ KMS CMK</td>
+</tr>
+<tr>
+<td>Encryption in transit</td>
+<td>✅ TLS 1.3</td>
+<td>✅ TLS 1.3</td>
+<td>✅ TLS 1.3</td>
+</tr>
+<tr>
+<td>Audit logging</td>
+<td>CloudWatch</td>
+<td>CloudTrail</td>
+<td>S3 Access Logs</td>
+</tr>
+<tr>
+<td>Retention control</td>
+<td>TTL-based</td>
+<td>Policy-based</td>
+<td>Lifecycle rules</td>
+</tr>
+<tr>
+<td>GDPR erasure</td>
+<td>Immediate</td>
+<td>24h SLA</td>
+<td>72h SLA</td>
+</tr>
+<tr>
+<td>Data residency</td>
+<td>Region-locked</td>
+<td>Region-locked</td>
+<td>Region-locked</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="dashboard-operations">7. Dashboard Operations</h2>
+<h3 id="accessing-cortex-dashboard">7.1 Accessing Cortex Dashboard</h3>
+<p>Navigate to: <strong>Admin Dashboard → Memory → Cortex</strong></p>
+<h3 id="dashboard-pages">7.2 Dashboard Pages</h3>
+<h4 id="overview-page-cortex">Overview Page (<code>/cortex</code>)</h4>
+<p>Displays: - <strong>Tier Health Cards</strong>: Status for Hot/Warm/Cold - <strong>Data Flow Metrics</strong>: Promotions, archivals, retrievals - <strong>Active Alerts</strong>: Threshold violations - <strong>Zero-Copy Mounts</strong>: Connected data sources - <strong>Model Migration</strong>: One-Click Swap</p>
+<h4 id="model-migration-cortexmodel-migration">Model Migration (<code>/cortex/model-migration</code>)</h4>
+<p>Swap AI models without losing your Cortex knowledge:</p>
+<p><strong>Supported Models:</strong> | Provider | Model | Max Tokens | Images | Tools | |———-|——-|————|——–|——-| | Anthropic | Claude 3 Opus | 200K | ✓ | ✓ | | Anthropic | Claude 3 Sonnet | 200K | ✓ | ✓ | | OpenAI | GPT-4 Turbo | 128K | ✓ | ✓ | | OpenAI | GPT-4o | 128K | ✓ | ✓ | | Meta | Llama 3 70B | 8K | ✗ | ✓ | | Google | Gemini Pro | 32K | ✓ | ✓ |</p>
+<p><strong>Migration Workflow:</strong> 1. <strong>Initiate</strong> - Select target model 2. <strong>Validate</strong> - Check feature compatibility, estimate cost change 3. <strong>Test</strong> - Run accuracy, latency, cost, safety tests 4. <strong>Execute</strong> - Switch to new model 5. <strong>Rollback</strong> - Revert if needed (available for 7 days)</p>
+<p><strong>API:</strong></p>
+<pre class="bash"><code>POST /api/admin/cortex/v2/model-migrations
+{
+  &quot;targetModel&quot;: { &quot;provider&quot;: &quot;meta&quot;, &quot;modelId&quot;: &quot;llama-3-70b-instruct&quot; }
+}</code></pre>
+<h4 id="graph-explorer-cortexgraph">Graph Explorer (<code>/cortex/graph</code>)</h4>
+<p>Features: - Visual knowledge graph exploration - Node/edge filtering by type - Search across labels - Confidence score display - Source document links</p>
+<h4 id="conflicts-page-cortexconflicts">Conflicts Page (<code>/cortex/conflicts</code>)</h4>
+<p>Shows: - Contradictory fact pairs - Conflict type classification - Resolution actions - Audit trail</p>
+<h4 id="gdpr-erasure-cortexgdpr">GDPR Erasure (<code>/cortex/gdpr</code>)</h4>
+<p>Manages: - Erasure request queue - Per-tier completion status - Audit log retention flag - Compliance documentation</p>
+<hr />
+<h2 id="housekeeping-maintenance">8. Housekeeping &amp; Maintenance</h2>
+<h3 id="twilight-dreaming-integration">8.1 Twilight Dreaming Integration</h3>
+<p>Cortex integrates with the Twilight Dreaming background process:</p>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Frequency</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ttl_enforcement</code></td>
+<td>Hourly</td>
+<td>Expire Hot tier keys</td>
+</tr>
+<tr>
+<td><code>archive_promotion</code></td>
+<td>Nightly</td>
+<td>Move Warm → Cold</td>
+</tr>
+<tr>
+<td><code>deduplication</code></td>
+<td>Nightly</td>
+<td>Merge duplicate nodes</td>
+</tr>
+<tr>
+<td><code>conflict_resolution</code></td>
+<td>Nightly</td>
+<td>Flag contradictions</td>
+</tr>
+<tr>
+<td><code>iceberg_compaction</code></td>
+<td>Nightly</td>
+<td>Optimize Cold storage</td>
+</tr>
+<tr>
+<td><code>index_optimization</code></td>
+<td>Weekly</td>
+<td>Reindex vectors</td>
+</tr>
+<tr>
+<td><code>integrity_audit</code></td>
+<td>Weekly</td>
+<td>Cross-tier consistency</td>
+</tr>
+<tr>
+<td><code>storage_report</code></td>
+<td>Weekly</td>
+<td>Cost analysis</td>
+</tr>
+</tbody>
+</table>
+<h3 id="manual-task-trigger">8.2 Manual Task Trigger</h3>
+<pre class="bash"><code>POST /api/admin/cortex/housekeeping/trigger
+{
+  &quot;taskType&quot;: &quot;deduplication&quot;
+}</code></pre>
+<h3 id="task-status-monitoring">8.3 Task Status Monitoring</h3>
+<pre class="bash"><code>GET /api/admin/cortex/housekeeping/status</code></pre>
+<p>Returns:</p>
+<pre class="json"><code>[
+  {
+    &quot;taskType&quot;: &quot;archive_promotion&quot;,
+    &quot;frequency&quot;: &quot;nightly&quot;,
+    &quot;status&quot;: &quot;completed&quot;,
+    &quot;lastRunAt&quot;: &quot;2026-01-23T04:00:00Z&quot;,
+    &quot;nextRunAt&quot;: &quot;2026-01-24T04:00:00Z&quot;,
+    &quot;lastResult&quot;: {
+      &quot;success&quot;: true,
+      &quot;recordsProcessed&quot;: 1542,
+      &quot;errorsEncountered&quot;: 0,
+      &quot;durationMs&quot;: 3421
+    }
+  }
+]</code></pre>
+<hr />
+<h2 id="gdpr-compliance">9. GDPR Compliance</h2>
+<h3 id="article-17-erasure-process">9.1 Article 17 Erasure Process</h3>
+<p>GDPR “Right to be Forgotten” requires cascade deletion:</p>
+<pre><code>┌────────────────────────────────────────────────────────┐
+│                GDPR ERASURE CASCADE                    │
+├─────────────┬─────────────┬───────────────┬────────────┤
+│  Request    │  Hot Tier   │   Warm Tier   │ Cold Tier  │
+│  Received   │   Delete    │   Anonymize   │  Tombstone │
+├─────────────┼─────────────┼───────────────┼────────────┤
+│   T+0       │  Immediate  │   24h SLA     │  72h SLA   │
+└─────────────┴─────────────┴───────────────┴────────────┘</code></pre>
+<h3 id="creating-an-erasure-request">9.2 Creating an Erasure Request</h3>
+<pre class="bash"><code>POST /api/admin/cortex/gdpr/erasure
+{
+  &quot;targetUserId&quot;: &quot;user_123&quot;,  // null for tenant-wide
+  &quot;scopeType&quot;: &quot;user&quot;,         // or &quot;tenant&quot;
+  &quot;reason&quot;: &quot;User request via support ticket #456&quot;
+}</code></pre>
+<h3 id="erasure-status-tracking">9.3 Erasure Status Tracking</h3>
+<pre class="bash"><code>GET /api/admin/cortex/gdpr/erasure</code></pre>
+<p>Returns status per tier:</p>
+<pre class="json"><code>{
+  &quot;id&quot;: &quot;erasure_789&quot;,
+  &quot;status&quot;: &quot;processing&quot;,
+  &quot;hot_tier_status&quot;: &quot;completed&quot;,
+  &quot;warm_tier_status&quot;: &quot;completed&quot;,
+  &quot;cold_tier_status&quot;: &quot;pending&quot;,
+  &quot;audit_log_retained&quot;: true,
+  &quot;requestedAt&quot;: &quot;2026-01-23T10:00:00Z&quot;
+}</code></pre>
+<h3 id="audit-trail-retention">9.4 Audit Trail Retention</h3>
+<p>Even after erasure: - <strong>Retained</strong>: Anonymized audit entries (for compliance proof) - <strong>Deleted</strong>: All PII and content data</p>
+<hr />
+<h2 id="monitoring-alerts">10. Monitoring &amp; Alerts</h2>
+<h3 id="key-metrics">10.1 Key Metrics</h3>
+<h4 id="hot-tier-metrics">Hot Tier Metrics</h4>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Warning</th>
+<th>Critical</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>redis_memory_usage_percent</code></td>
+<td>&gt; 70%</td>
+<td>&gt; 85%</td>
+</tr>
+<tr>
+<td><code>redis_cache_hit_rate</code></td>
+<td>&lt; 90%</td>
+<td>&lt; 80%</td>
+</tr>
+<tr>
+<td><code>redis_p99_latency_ms</code></td>
+<td>&gt; 5ms</td>
+<td>&gt; 10ms</td>
+</tr>
+<tr>
+<td><code>redis_connection_count</code></td>
+<td>&gt; 80% limit</td>
+<td>&gt; 95% limit</td>
+</tr>
+</tbody>
+</table>
+<h4 id="warm-tier-metrics">Warm Tier Metrics</h4>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Warning</th>
+<th>Critical</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neptune_cpu_percent</code></td>
+<td>&gt; 70%</td>
+<td>&gt; 90%</td>
+</tr>
+<tr>
+<td><code>neptune_query_latency_p99_ms</code></td>
+<td>&gt; 80ms</td>
+<td>&gt; 150ms</td>
+</tr>
+<tr>
+<td><code>graph_node_count</code></td>
+<td>&gt; 50M</td>
+<td>&gt; 100M</td>
+</tr>
+<tr>
+<td><code>pgvector_index_size</code></td>
+<td>&gt; 100GB</td>
+<td>&gt; 500GB</td>
+</tr>
+</tbody>
+</table>
+<h4 id="cold-tier-metrics">Cold Tier Metrics</h4>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Warning</th>
+<th>Critical</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>s3_storage_cost_usd</code></td>
+<td>&gt; budget * 0.8</td>
+<td>&gt; budget</td>
+</tr>
+<tr>
+<td><code>iceberg_compaction_lag_hours</code></td>
+<td>&gt; 24h</td>
+<td>&gt; 72h</td>
+</tr>
+<tr>
+<td><code>zero_copy_mount_error_count</code></td>
+<td>&gt; 5/day</td>
+<td>&gt; 20/day</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-flow-metrics">10.2 Data Flow Metrics</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hot_to_warm_promotions</code></td>
+<td>Records moved Hot → Warm</td>
+</tr>
+<tr>
+<td><code>warm_to_cold_archivals</code></td>
+<td>Records moved Warm → Cold</td>
+</tr>
+<tr>
+<td><code>cold_to_warm_retrievals</code></td>
+<td>Records restored Cold → Warm</td>
+</tr>
+<tr>
+<td><code>tier_miss_rate</code></td>
+<td>Cache misses requiring tier traversal</td>
+</tr>
+</tbody>
+</table>
+<h3 id="alert-configuration">10.3 Alert Configuration</h3>
+<p>Alerts are created automatically when thresholds are exceeded:</p>
+<pre class="json"><code>{
+  &quot;id&quot;: &quot;alert_123&quot;,
+  &quot;tier&quot;: &quot;hot&quot;,
+  &quot;severity&quot;: &quot;warning&quot;,
+  &quot;metric&quot;: &quot;redis_memory_usage&quot;,
+  &quot;threshold&quot;: 70,
+  &quot;currentValue&quot;: 75.5,
+  &quot;message&quot;: &quot;Redis memory usage exceeds 70%&quot;,
+  &quot;triggeredAt&quot;: &quot;2026-01-23T14:30:00Z&quot;
+}</code></pre>
+<h3 id="acknowledging-alerts">10.4 Acknowledging Alerts</h3>
+<pre class="bash"><code>POST /api/admin/cortex/alerts/{alertId}/acknowledge</code></pre>
+<hr />
+<h2 id="troubleshooting">11. Troubleshooting</h2>
+<h3 id="hot-tier-issues">11.1 Hot Tier Issues</h3>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 25%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>High memory usage</td>
+<td>TTL too long, insufficient shards</td>
+<td>Reduce TTL, add shards</td>
+</tr>
+<tr>
+<td>Low cache hit rate</td>
+<td>Poor prefetch strategy</td>
+<td>Review access patterns</td>
+</tr>
+<tr>
+<td>High latency</td>
+<td>Network issues, cluster split</td>
+<td>Check VPC, node health</td>
+</tr>
+<tr>
+<td>Connection errors</td>
+<td>Pool exhaustion</td>
+<td>Increase pool size, add replicas</td>
+</tr>
+</tbody>
+</table>
+<h3 id="warm-tier-issues">11.2 Warm Tier Issues</h3>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 25%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Slow graph queries</td>
+<td>Unoptimized traversals</td>
+<td>Add indexes, review query patterns</td>
+</tr>
+<tr>
+<td>High CPU usage</td>
+<td>Complex queries, under-provisioned</td>
+<td>Scale NCUs, optimize queries</td>
+</tr>
+<tr>
+<td>Vector index slow</td>
+<td>Too many dimensions</td>
+<td>Consider dimensionality reduction</td>
+</tr>
+<tr>
+<td>Conflicts piling up</td>
+<td>No resolution process</td>
+<td>Assign reviewers, automate</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cold-tier-issues">11.3 Cold Tier Issues</h3>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 25%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>High storage costs</td>
+<td>Incorrect lifecycle rules</td>
+<td>Review and adjust transitions</td>
+</tr>
+<tr>
+<td>Slow retrievals</td>
+<td>Data in Deep Archive</td>
+<td>Use Glacier Instant for frequent access</td>
+</tr>
+<tr>
+<td>Mount scan failures</td>
+<td>Credential expiration</td>
+<td>Rotate credentials</td>
+</tr>
+<tr>
+<td>Iceberg compaction lag</td>
+<td>Large partition count</td>
+<td>Tune compaction schedule</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cross-tier-issues">11.4 Cross-Tier Issues</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>High tier miss rate</td>
+<td>Data not warming up</td>
+<td>Enable auto-promotion</td>
+</tr>
+<tr>
+<td>Promotion failures</td>
+<td>Schema mismatch</td>
+<td>Check migration scripts</td>
+</tr>
+<tr>
+<td>Inconsistent data</td>
+<td>Replication lag</td>
+<td>Review Tier Coordinator logs</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-reference">12. API Reference</h2>
+<h3 id="base-url">Base URL</h3>
+<pre><code>/api/admin/cortex</code></pre>
+<h3 id="endpoints">Endpoints</h3>
+<h4 id="dashboard-config">Dashboard &amp; Config</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/overview</code></td>
+<td>Full dashboard data</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/config</code></td>
+<td>Current tier configuration</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/config</code></td>
+<td>Update configuration</td>
+</tr>
+</tbody>
+</table>
+<h4 id="health-alerts">Health &amp; Alerts</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/health</code></td>
+<td>Tier health status</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/health/check</code></td>
+<td>Trigger health check</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/alerts</code></td>
+<td>Active alerts</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/alerts/{id}/acknowledge</code></td>
+<td>Acknowledge alert</td>
+</tr>
+</tbody>
+</table>
+<h4 id="metrics">Metrics</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/metrics?period=day</code></td>
+<td>Data flow metrics</td>
+</tr>
+</tbody>
+</table>
+<h4 id="graph-explorer">Graph Explorer</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/graph/stats</code></td>
+<td>Node/edge type counts</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/graph/explore?search=...</code></td>
+<td>Search and explore nodes</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/graph/conflicts</code></td>
+<td>Unresolved conflicts</td>
+</tr>
+</tbody>
+</table>
+<h4 id="housekeeping">Housekeeping</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/housekeeping/status</code></td>
+<td>All task statuses</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/housekeeping/trigger</code></td>
+<td>Run task manually</td>
+</tr>
+</tbody>
+</table>
+<h4 id="zero-copy-mounts">Zero-Copy Mounts</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/mounts</code></td>
+<td>List mounts</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/mounts</code></td>
+<td>Create mount</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/mounts/{id}/rescan</code></td>
+<td>Rescan mount</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/mounts/{id}</code></td>
+<td>Delete mount</td>
+</tr>
+</tbody>
+</table>
+<h4 id="gdpr">GDPR</h4>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/gdpr/erasure</code></td>
+<td>List erasure requests</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/gdpr/erasure</code></td>
+<td>Create erasure request</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="appendix-a-implementation-checklist">Appendix A: Implementation Checklist</h2>
+<h3 id="infrastructure">Infrastructure</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Redis cluster deployed with tenant key isolation</label></li>
+<li><label><input type="checkbox" />Neptune cluster or serverless configured</label></li>
+<li><label><input type="checkbox" />S3 bucket with Iceberg tables created</label></li>
+<li><label><input type="checkbox" />IAM policies scoped per tenant</label></li>
+<li><label><input type="checkbox" />KMS keys created for encryption</label></li>
+<li><label><input type="checkbox" />VPC endpoints configured</label></li>
+</ul>
+<h3 id="database">Database</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>cortex_config</code> table exists</label></li>
+<li><label><input type="checkbox" /><code>cortex_graph_nodes</code> with RLS enabled</label></li>
+<li><label><input type="checkbox" /><code>cortex_graph_edges</code> with RLS enabled</label></li>
+<li><label><input type="checkbox" /><code>cortex_cold_archives</code> tracking table</label></li>
+<li><label><input type="checkbox" /><code>cortex_zero_copy_mounts</code> configured</label></li>
+<li><label><input type="checkbox" />Vector indexes created</label></li>
+</ul>
+<h3 id="monitoring">Monitoring</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />CloudWatch dashboards created</label></li>
+<li><label><input type="checkbox" />Alert thresholds configured</label></li>
+<li><label><input type="checkbox" />PagerDuty/OpsGenie integration</label></li>
+<li><label><input type="checkbox" />Cost anomaly detection enabled</label></li>
+</ul>
+<h3 id="operations">Operations</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Housekeeping tasks initialized</label></li>
+<li><label><input type="checkbox" />Backup schedules confirmed</label></li>
+<li><label><input type="checkbox" />DR procedures documented</label></li>
+<li><label><input type="checkbox" />Runbooks created</label></li>
+</ul>
+<hr />
+<p><em>Document Version: 4.20.0</em><br />
+<em>For engineering implementation details, see CORTEX-ENGINEERING-GUIDE.md</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -2,7 +2,11 @@
  * Cost Tracking Service
  * 
  * Tracks and manages AI usage costs across the Cato system.
+ * Uses database persistence for cost data that must survive Lambda invocations.
  */
+
+import { executeStatement } from '../../database/aurora-client';
+import { logger } from '../../logging/enhanced-logger';
 
 export interface CostEntry {
   id: string;
@@ -69,64 +73,143 @@ export interface MtdCost {
 }
 
 export class CostTrackingService {
-  private entries: CostEntry[] = [];
-  private budgets: Map<string, CostBudget> = new Map();
-
   async trackCost(entry: Omit<CostEntry, 'id' | 'timestamp'>): Promise<CostEntry> {
-    const fullEntry: CostEntry = {
-      ...entry,
-      id: `cost_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      timestamp: new Date(),
-    };
-    this.entries.push(fullEntry);
-    await this.updateBudget(entry.tenantId, entry.costCents);
-    return fullEntry;
+    try {
+      const result = await executeStatement(
+        `INSERT INTO cost_events (tenant_id, user_id, model_id, provider, input_tokens, output_tokens, cost_cents, request_type, metadata)
+         VALUES ($1, (SELECT id FROM users WHERE tenant_id = $1 LIMIT 1), $2, $3, $4, $5, $6, $7, $8::jsonb)
+         RETURNING id, created_at`,
+        [entry.tenantId, entry.modelId, entry.provider, entry.inputTokens, entry.outputTokens, entry.costCents, entry.requestType, JSON.stringify(entry.metadata || {})]
+      );
+
+      const row = result.rows[0] as Record<string, unknown>;
+      return {
+        ...entry,
+        id: row.id as string,
+        timestamp: new Date(row.created_at as string),
+      };
+    } catch (error) {
+      logger.warn('Failed to track cost in database', { error: String(error) });
+      // Return entry with generated ID for graceful degradation
+      return {
+        ...entry,
+        id: `cost_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        timestamp: new Date(),
+      };
+    }
   }
 
   async getSummary(tenantId: string, period: CostSummary['period']): Promise<CostSummary> {
-    const now = new Date();
-    const periodStart = this.getPeriodStart(now, period);
-    
-    const periodEntries = this.entries.filter(
-      e => e.tenantId === tenantId && e.timestamp >= periodStart
-    );
+    try {
+      const intervalMap = { hour: '1 hour', day: '1 day', week: '7 days', month: '1 month' };
+      const interval = intervalMap[period];
 
-    const byModel: Record<string, { costCents: number; requests: number }> = {};
-    const byProvider: Record<string, { costCents: number; requests: number }> = {};
+      // Get totals
+      const totalsResult = await executeStatement(
+        `SELECT 
+           COALESCE(SUM(cost_cents), 0) as total_cost,
+           COALESCE(SUM(input_tokens), 0) as total_input,
+           COALESCE(SUM(output_tokens), 0) as total_output,
+           COUNT(*) as request_count
+         FROM cost_events 
+         WHERE tenant_id = $1 AND created_at >= NOW() - $2::interval`,
+        [tenantId, interval]
+      );
 
-    let totalCostCents = 0;
-    let totalInputTokens = 0;
-    let totalOutputTokens = 0;
+      // Get by model
+      const byModelResult = await executeStatement(
+        `SELECT model_id, SUM(cost_cents) as cost, COUNT(*) as requests
+         FROM cost_events 
+         WHERE tenant_id = $1 AND created_at >= NOW() - $2::interval
+         GROUP BY model_id`,
+        [tenantId, interval]
+      );
 
-    for (const entry of periodEntries) {
-      totalCostCents += entry.costCents;
-      totalInputTokens += entry.inputTokens;
-      totalOutputTokens += entry.outputTokens;
+      // Get by provider
+      const byProviderResult = await executeStatement(
+        `SELECT provider, SUM(cost_cents) as cost, COUNT(*) as requests
+         FROM cost_events 
+         WHERE tenant_id = $1 AND created_at >= NOW() - $2::interval
+         GROUP BY provider`,
+        [tenantId, interval]
+      );
 
-      if (!byModel[entry.modelId]) byModel[entry.modelId] = { costCents: 0, requests: 0 };
-      byModel[entry.modelId].costCents += entry.costCents;
-      byModel[entry.modelId].requests += 1;
+      const totals = totalsResult.rows[0] as Record<string, unknown>;
+      const byModel: Record<string, { costCents: number; requests: number }> = {};
+      const byProvider: Record<string, { costCents: number; requests: number }> = {};
 
-      if (!byProvider[entry.provider]) byProvider[entry.provider] = { costCents: 0, requests: 0 };
-      byProvider[entry.provider].costCents += entry.costCents;
-      byProvider[entry.provider].requests += 1;
+      for (const row of byModelResult.rows as Record<string, unknown>[]) {
+        byModel[row.model_id as string] = { costCents: Number(row.cost), requests: Number(row.requests) };
+      }
+
+      for (const row of byProviderResult.rows as Record<string, unknown>[]) {
+        byProvider[row.provider as string] = { costCents: Number(row.cost), requests: Number(row.requests) };
+      }
+
+      return {
+        tenantId,
+        period,
+        totalCostCents: Number(totals.total_cost) || 0,
+        totalInputTokens: Number(totals.total_input) || 0,
+        totalOutputTokens: Number(totals.total_output) || 0,
+        requestCount: Number(totals.request_count) || 0,
+        byModel,
+        byProvider,
+      };
+    } catch (error) {
+      logger.warn('Failed to get cost summary from database', { tenantId, error: String(error) });
+      return {
+        tenantId,
+        period,
+        totalCostCents: 0,
+        totalInputTokens: 0,
+        totalOutputTokens: 0,
+        requestCount: 0,
+        byModel: {},
+        byProvider: {},
+      };
     }
-
-    return {
-      tenantId,
-      period,
-      totalCostCents,
-      totalInputTokens,
-      totalOutputTokens,
-      requestCount: periodEntries.length,
-      byModel,
-      byProvider,
-    };
   }
 
   async getBudget(tenantId: string): Promise<CostBudget> {
-    if (!this.budgets.has(tenantId)) {
-      this.budgets.set(tenantId, {
+    try {
+      // Get budget config
+      const configResult = await executeStatement(
+        `SELECT daily_limit, monthly_limit, alert_threshold
+         FROM cost_budgets WHERE tenant_id = $1 AND is_active = true
+         ORDER BY created_at DESC LIMIT 1`,
+        [tenantId]
+      );
+
+      // Get current spend
+      const spendResult = await executeStatement(
+        `SELECT 
+           COALESCE(SUM(CASE WHEN created_at >= DATE_TRUNC('day', NOW()) THEN cost_cents ELSE 0 END), 0) as daily_spend,
+           COALESCE(SUM(CASE WHEN created_at >= DATE_TRUNC('month', NOW()) THEN cost_cents ELSE 0 END), 0) as monthly_spend
+         FROM cost_events WHERE tenant_id = $1`,
+        [tenantId]
+      );
+
+      const config = configResult.rows[0] as Record<string, unknown> | undefined;
+      const spend = spendResult.rows[0] as Record<string, unknown>;
+
+      const dailyLimitCents = config ? Number(config.daily_limit) * 100 : 10000;
+      const monthlyLimitCents = config ? Number(config.monthly_limit) * 100 : 100000;
+      const currentDailyCents = Number(spend.daily_spend) || 0;
+      const currentMonthlyCents = Number(spend.monthly_spend) || 0;
+
+      return {
+        tenantId,
+        dailyLimitCents,
+        monthlyLimitCents,
+        currentDailyCents,
+        currentMonthlyCents,
+        alertThreshold: config ? Number(config.alert_threshold) : 0.8,
+        isOverBudget: currentDailyCents > dailyLimitCents || currentMonthlyCents > monthlyLimitCents,
+      };
+    } catch (error) {
+      logger.warn('Failed to get budget from database', { tenantId, error: String(error) });
+      return {
         tenantId,
         dailyLimitCents: 10000,
         monthlyLimitCents: 100000,
@@ -134,31 +217,24 @@ export class CostTrackingService {
         currentMonthlyCents: 0,
         alertThreshold: 0.8,
         isOverBudget: false,
-      });
+      };
     }
-    return this.budgets.get(tenantId)!;
   }
 
   async setBudgetLimits(tenantId: string, dailyLimitCents: number, monthlyLimitCents: number): Promise<CostBudget> {
-    const budget = await this.getBudget(tenantId);
-    budget.dailyLimitCents = dailyLimitCents;
-    budget.monthlyLimitCents = monthlyLimitCents;
-    budget.isOverBudget = budget.currentDailyCents > dailyLimitCents || budget.currentMonthlyCents > monthlyLimitCents;
-    return budget;
+    await executeStatement(
+      `INSERT INTO cost_budgets (tenant_id, name, daily_limit, monthly_limit, is_active)
+       VALUES ($1, 'default', $2, $3, true)
+       ON CONFLICT (tenant_id) WHERE name = 'default'
+       DO UPDATE SET daily_limit = $2, monthly_limit = $3, updated_at = NOW()`,
+      [tenantId, dailyLimitCents / 100, monthlyLimitCents / 100]
+    );
+    return this.getBudget(tenantId);
   }
 
   async resetDailyBudget(tenantId: string): Promise<void> {
-    const budget = await this.getBudget(tenantId);
-    budget.currentDailyCents = 0;
-    budget.isOverBudget = false;
-  }
-
-  private async updateBudget(tenantId: string, costCents: number): Promise<void> {
-    const budget = await this.getBudget(tenantId);
-    budget.currentDailyCents += costCents;
-    budget.currentMonthlyCents += costCents;
-    budget.isOverBudget = budget.currentDailyCents > budget.dailyLimitCents || 
-                          budget.currentMonthlyCents > budget.monthlyLimitCents;
+    // Daily budget is calculated dynamically from cost_events, no reset needed
+    logger.info('Daily budget reset requested', { tenantId });
   }
 
   private getPeriodStart(now: Date, period: CostSummary['period']): Date {
@@ -173,29 +249,69 @@ export class CostTrackingService {
   }
 
   async getRealtimeEstimate(tenantId = 'default'): Promise<RealtimeCostEstimate> {
-    const budget = await this.getBudget(tenantId);
-    return {
-      estimatedCostUsd: budget.currentDailyCents / 100,
-      breakdown: {
-        bedrock: budget.currentDailyCents * 0.4 / 100,
-        sagemaker: budget.currentDailyCents * 0.3 / 100,
-        lambda: budget.currentDailyCents * 0.15 / 100,
-        storage: budget.currentDailyCents * 0.1 / 100,
-        other: budget.currentDailyCents * 0.05 / 100,
-      },
-      invocations: this.entries.filter(e => e.tenantId === tenantId).length,
-      updatedAt: new Date(),
-    };
+    try {
+      const result = await executeStatement(
+        `SELECT 
+           COALESCE(SUM(cost_cents), 0) as total_cost,
+           COUNT(*) as invocations,
+           COALESCE(SUM(CASE WHEN provider = 'bedrock' THEN cost_cents ELSE 0 END), 0) as bedrock_cost,
+           COALESCE(SUM(CASE WHEN provider = 'sagemaker' THEN cost_cents ELSE 0 END), 0) as sagemaker_cost,
+           COALESCE(SUM(CASE WHEN provider = 'lambda' THEN cost_cents ELSE 0 END), 0) as lambda_cost
+         FROM cost_events 
+         WHERE tenant_id = $1 AND created_at >= DATE_TRUNC('day', NOW())`,
+        [tenantId]
+      );
+
+      const row = result.rows[0] as Record<string, unknown>;
+      const totalCost = Number(row.total_cost) || 0;
+
+      return {
+        estimatedCostUsd: totalCost / 100,
+        breakdown: {
+          bedrock: Number(row.bedrock_cost) / 100 || 0,
+          sagemaker: Number(row.sagemaker_cost) / 100 || 0,
+          lambda: Number(row.lambda_cost) / 100 || 0,
+          storage: totalCost * 0.1 / 100,
+          other: totalCost * 0.05 / 100,
+        },
+        invocations: Number(row.invocations) || 0,
+        updatedAt: new Date(),
+      };
+    } catch (error) {
+      logger.warn('Failed to get realtime estimate', { tenantId, error: String(error) });
+      return {
+        estimatedCostUsd: 0,
+        breakdown: { bedrock: 0, sagemaker: 0, lambda: 0, storage: 0, other: 0 },
+        invocations: 0,
+        updatedAt: new Date(),
+      };
+    }
   }
 
   async getDailyCost(tenantId = 'default'): Promise<number> {
-    const budget = await this.getBudget(tenantId);
-    return budget.currentDailyCents;
+    try {
+      const result = await executeStatement(
+        `SELECT COALESCE(SUM(cost_cents), 0) as daily_cost
+         FROM cost_events WHERE tenant_id = $1 AND created_at >= DATE_TRUNC('day', NOW())`,
+        [tenantId]
+      );
+      return Number((result.rows[0] as Record<string, unknown>).daily_cost) || 0;
+    } catch {
+      return 0;
+    }
   }
 
   async getMtdCost(tenantId = 'default'): Promise<number> {
-    const budget = await this.getBudget(tenantId);
-    return budget.currentMonthlyCents;
+    try {
+      const result = await executeStatement(
+        `SELECT COALESCE(SUM(cost_cents), 0) as mtd_cost
+         FROM cost_events WHERE tenant_id = $1 AND created_at >= DATE_TRUNC('month', NOW())`,
+        [tenantId]
+      );
+      return Number((result.rows[0] as Record<string, unknown>).mtd_cost) || 0;
+    } catch {
+      return 0;
+    }
   }
 
   async getBudgetStatus(tenantId = 'default'): Promise<CostBudget> {

@@ -5,7 +5,8 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { corsHeaders, jsonResponse, errorResponse } from '../shared/middleware/api-response';
+import { corsHeaders } from '../shared/middleware/api-response';
+import { createResponse, createErrorResponse } from '../shared/utils/response';
 import { enhancedLogger as logger } from '../shared/logging/enhanced-logger';
 import { generateArtifact } from '../shared/services/dia/miner.service';
 import { exportArtifact } from '../shared/services/dia/compliance-exporter';
@@ -30,7 +31,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     if (method === 'POST' && path.includes('/export')) {
       const artifactId = extractArtifactId(path);
       if (!artifactId) {
-        return errorResponse(400, 'Missing artifact ID');
+        return createErrorResponse('Missing artifact ID');
       }
       return handleExport(event, artifactId, tenantId, userId);
     }
@@ -44,16 +45,16 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     if (method === 'GET') {
       const artifactId = extractArtifactId(path);
       if (!artifactId) {
-        return errorResponse(400, 'Missing artifact ID');
+        return createErrorResponse('Missing artifact ID');
       }
       return handleGet(artifactId, tenantId);
     }
 
-    return errorResponse(404, 'Not found');
+    return createErrorResponse('Not found');
 
   } catch (error) {
     logger.error('DIA API error', { error: String(error), path, method });
-    return errorResponse(500, 'Internal server error');
+    return createErrorResponse('Internal server error');
   }
 }
 
@@ -76,7 +77,7 @@ async function handleGenerate(
   const { conversationId, title } = body;
 
   if (!conversationId) {
-    return errorResponse(400, 'conversationId is required');
+    return createErrorResponse('conversationId is required');
   }
 
   logger.info('Generating DIA artifact', { conversationId, tenantId, userId });
@@ -95,11 +96,11 @@ async function handleGenerate(
       phiDetected: artifact.phiDetected,
     });
 
-    return jsonResponse(200, artifact);
+    return createResponse(artifact);
 
   } catch (error) {
     logger.error('Failed to generate artifact', { error: String(error), conversationId });
-    return errorResponse(500, 'Failed to generate decision record');
+    return createErrorResponse('Failed to generate decision record');
   }
 }
 
@@ -113,7 +114,7 @@ async function handleExport(
   const { format, redactPhi = true } = body;
 
   if (!format) {
-    return errorResponse(400, 'format is required');
+    return createErrorResponse('format is required');
   }
 
   // Fetch the artifact
@@ -123,7 +124,7 @@ async function handleExport(
   );
 
   if (result.rows.length === 0) {
-    return errorResponse(404, 'Artifact not found');
+    return createErrorResponse('Artifact not found');
   }
 
   const artifact = result.rows[0];
@@ -151,11 +152,11 @@ async function handleExport(
       ]
     );
 
-    return jsonResponse(200, exportResult);
+    return createResponse(exportResult);
 
   } catch (error) {
     logger.error('Failed to export artifact', { error: String(error), artifactId, format });
-    return errorResponse(500, 'Failed to export');
+    return createErrorResponse('Failed to export');
   }
 }
 
@@ -186,7 +187,7 @@ async function handleList(
 
   const result = await executeStatement(query, params);
 
-  return jsonResponse(200, { artifacts: result.rows });
+  return createResponse({ artifacts: result.rows });
 }
 
 async function handleGet(
@@ -199,8 +200,8 @@ async function handleGet(
   );
 
   if (result.rows.length === 0) {
-    return errorResponse(404, 'Artifact not found');
+    return createErrorResponse('Artifact not found');
   }
 
-  return jsonResponse(200, result.rows[0]);
+  return createResponse(result.rows[0]);
 }

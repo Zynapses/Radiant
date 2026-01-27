@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PERFORMANCE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>PERFORMANCE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/PERFORMANCE.md</div>
+  </div>
+  
+  <h1 id="radiant-performance-guide">RADIANT Performance Guide</h1>
+<h2 id="overview">Overview</h2>
+<p>This guide covers performance optimization, caching strategies, and scalability considerations for the RADIANT platform.</p>
+<h2 id="architecture-performance">Architecture Performance</h2>
+<h3 id="request-flow">Request Flow</h3>
+<pre><code>Client → CloudFront → WAF → API Gateway → Lambda → Aurora
+                                              ↓
+                                          Redis Cache</code></pre>
+<h3 id="latency-targets">Latency Targets</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Target</th>
+<th>Max Acceptable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CloudFront edge</td>
+<td>&lt; 50ms</td>
+<td>100ms</td>
+</tr>
+<tr>
+<td>WAF processing</td>
+<td>&lt; 5ms</td>
+<td>20ms</td>
+</tr>
+<tr>
+<td>API Gateway</td>
+<td>&lt; 20ms</td>
+<td>50ms</td>
+</tr>
+<tr>
+<td>Lambda cold start</td>
+<td>&lt; 500ms</td>
+<td>1000ms</td>
+</tr>
+<tr>
+<td>Lambda execution</td>
+<td>&lt; 200ms</td>
+<td>500ms</td>
+</tr>
+<tr>
+<td>Database query</td>
+<td>&lt; 50ms</td>
+<td>200ms</td>
+</tr>
+<tr>
+<td><strong>Total P95</strong></td>
+<td><strong>&lt; 500ms</strong></td>
+<td><strong>2000ms</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="caching-strategy">Caching Strategy</h2>
+<h3 id="multi-layer-caching">Multi-Layer Caching</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                     CloudFront CDN                          │
+│  TTL: 5m for static, 1m for API (with stale-while-revalidate)│
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    API Gateway Cache                         │
+│           TTL: 60s for GET endpoints                        │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                      Redis Cache                             │
+│     Session: 24h, Config: 5m, Translations: 1h             │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    Aurora Database                           │
+│           Query cache, Connection pooling                   │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="cache-keys">Cache Keys</h3>
+<pre class="typescript"><code>// Session cache
+`session:${tenantId}:${userId}` → TTL: 24h
+
+// Configuration cache
+`config:${tenantId}:${key}` → TTL: 5m
+`config:global:${key}` → TTL: 5m
+
+// Translation cache
+`i18n:${language}:bundle` → TTL: 1h
+`i18n:${language}:${key}` → TTL: 1h
+
+// Model cache
+`models:${tenantId}:list` → TTL: 5m
+`models:${tenantId}:${modelId}` → TTL: 5m
+
+// Rate limit cache
+`ratelimit:${tenantId}:${endpoint}` → TTL: 1m
+`ratelimit:ip:${ip}` → TTL: 5m</code></pre>
+<h3 id="cache-invalidation">Cache Invalidation</h3>
+<pre class="typescript"><code>// Pattern-based invalidation
+await redis.del(`config:${tenantId}:*`);
+
+// Event-driven invalidation
+eventBridge.putEvents({
+  Entries: [{
+    Source: &#39;radiant.config&#39;,
+    DetailType: &#39;ConfigUpdated&#39;,
+    Detail: JSON.stringify({ tenantId, key }),
+  }],
+});</code></pre>
+<h2 id="database-optimization">Database Optimization</h2>
+<h3 id="connection-pooling">Connection Pooling</h3>
+<pre class="typescript"><code>// RDS Proxy configuration
+const pool = {
+  min: 2,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
+};</code></pre>
+<h3 id="query-optimization">Query Optimization</h3>
+<pre class="sql"><code>-- Always use indexes
+CREATE INDEX idx_models_tenant_status ON ai_models(tenant_id, status);
+CREATE INDEX idx_transactions_tenant_date ON credit_transactions(tenant_id, created_at DESC);
+
+-- Use covering indexes for common queries
+CREATE INDEX idx_models_list ON ai_models(tenant_id, status, is_enabled) 
+  INCLUDE (display_name, category, input_cost_per_1k);
+
+-- Partition large tables by date
+CREATE TABLE audit_logs_2024_01 PARTITION OF audit_logs
+  FOR VALUES FROM (&#39;2024-01-01&#39;) TO (&#39;2024-02-01&#39;);</code></pre>
+<h3 id="rls-performance">RLS Performance</h3>
+<pre class="sql"><code>-- Set tenant context once per request
+SET app.current_tenant_id = &#39;tenant-123&#39;;
+
+-- All subsequent queries automatically filtered
+SELECT * FROM models;  -- Implicitly filtered by RLS</code></pre>
+<h2 id="lambda-optimization">Lambda Optimization</h2>
+<h3 id="cold-start-reduction">Cold Start Reduction</h3>
+<pre class="typescript"><code>// 1. Minimize dependencies
+// 2. Use Lambda layers for shared code
+// 3. Enable provisioned concurrency for critical functions
+
+// Provisioned concurrency config
+new lambda.Function(this, &#39;Router&#39;, {
+  // ... config
+  provisionedConcurrentExecutions: 10, // Keep 10 warm
+});</code></pre>
+<h3 id="memory-optimization">Memory Optimization</h3>
+<pre class="typescript"><code>// Memory vs CPU tradeoff
+// More memory = more CPU = faster execution
+
+// Recommended settings by function type:
+const memoryConfig = {
+  router: 1024,      // Main API - balanced
+  billing: 512,      // Light compute
+  aiProxy: 2048,     // Heavy compute for AI
+  migration: 256,    // Infrequent, light
+};</code></pre>
+<h3 id="bundling">Bundling</h3>
+<pre class="typescript"><code>// esbuild configuration for minimal bundle size
+{
+  bundle: true,
+  minify: true,
+  treeShaking: true,
+  external: [&#39;aws-sdk&#39;], // Use Lambda runtime SDK
+  target: &#39;node20&#39;,
+}</code></pre>
+<h2 id="rate-limiting">Rate Limiting</h2>
+<h3 id="tier-limits">Tier Limits</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>RPS</th>
+<th>Burst</th>
+<th>Daily</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Free</td>
+<td>10</td>
+<td>20</td>
+<td>1,000</td>
+</tr>
+<tr>
+<td>Starter</td>
+<td>50</td>
+<td>100</td>
+<td>10,000</td>
+</tr>
+<tr>
+<td>Professional</td>
+<td>100</td>
+<td>200</td>
+<td>50,000</td>
+</tr>
+<tr>
+<td>Business</td>
+<td>500</td>
+<td>1,000</td>
+<td>250,000</td>
+</tr>
+<tr>
+<td>Enterprise</td>
+<td>2,000</td>
+<td>5,000</td>
+<td>Unlimited</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation">Implementation</h3>
+<pre class="typescript"><code>// Token bucket algorithm in Redis
+const rateLimiter = {
+  async checkLimit(tenantId: string, limit: number): Promise&lt;boolean&gt; {
+    const key = `ratelimit:${tenantId}`;
+    const current = await redis.incr(key);
+    
+    if (current === 1) {
+      await redis.expire(key, 1); // 1 second window
+    }
+    
+    return current &lt;= limit;
+  }
+};</code></pre>
+<h2 id="load-testing">Load Testing</h2>
+<h3 id="running-tests">Running Tests</h3>
+<pre class="bash"><code># Install k6
+brew install k6
+
+# Run smoke test
+k6 run --env BASE_URL=https://api-dev.radiant.example.com tests/load/k6-config.js
+
+# Run with specific scenario
+k6 run --env BASE_URL=https://api-dev.radiant.example.com \
+  -e SCENARIO=load tests/load/k6-config.js</code></pre>
+<h3 id="performance-baselines">Performance Baselines</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Baseline</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Throughput</td>
+<td>500 RPS</td>
+<td>2000 RPS</td>
+</tr>
+<tr>
+<td>P50 Latency</td>
+<td>100ms</td>
+<td>50ms</td>
+</tr>
+<tr>
+<td>P95 Latency</td>
+<td>500ms</td>
+<td>200ms</td>
+</tr>
+<tr>
+<td>P99 Latency</td>
+<td>1000ms</td>
+<td>500ms</td>
+</tr>
+<tr>
+<td>Error Rate</td>
+<td>&lt; 1%</td>
+<td>&lt; 0.1%</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scaling">Scaling</h2>
+<h3 id="horizontal-scaling">Horizontal Scaling</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Scaling Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lambda</td>
+<td>Automatic (up to account limit)</td>
+</tr>
+<tr>
+<td>Aurora</td>
+<td>Read replicas, Serverless v2</td>
+</tr>
+<tr>
+<td>Redis</td>
+<td>ElastiCache cluster mode</td>
+</tr>
+<tr>
+<td>API Gateway</td>
+<td>Automatic</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vertical-scaling">Vertical Scaling</h3>
+<pre class="typescript"><code>// Aurora Serverless v2 scaling
+const database = new rds.DatabaseCluster(this, &#39;Database&#39;, {
+  serverlessV2MinCapacity: 0.5,  // Minimum ACUs
+  serverlessV2MaxCapacity: 16,   // Maximum ACUs
+});
+
+// Lambda memory scaling
+const lambda = new lambda.Function(this, &#39;Function&#39;, {
+  memorySize: 2048,  // More memory = more CPU
+});</code></pre>
+<h2 id="monitoring">Monitoring</h2>
+<h3 id="key-metrics">Key Metrics</h3>
+<pre class="typescript"><code>// CloudWatch metrics to monitor
+const metrics = {
+  // Latency
+  &#39;AWS/ApiGateway/Latency&#39;: &#39;p95 &lt; 500ms&#39;,
+  &#39;AWS/Lambda/Duration&#39;: &#39;p95 &lt; 200ms&#39;,
+  &#39;AWS/RDS/ReadLatency&#39;: &#39;avg &lt; 50ms&#39;,
+  
+  // Throughput
+  &#39;AWS/ApiGateway/Count&#39;: &#39;track trends&#39;,
+  &#39;AWS/Lambda/Invocations&#39;: &#39;track trends&#39;,
+  
+  // Errors
+  &#39;AWS/ApiGateway/5XXError&#39;: &#39;rate &lt; 1%&#39;,
+  &#39;AWS/Lambda/Errors&#39;: &#39;rate &lt; 1%&#39;,
+  
+  // Resources
+  &#39;AWS/Lambda/ConcurrentExecutions&#39;: &#39;&lt; 80% of limit&#39;,
+  &#39;AWS/RDS/CPUUtilization&#39;: &#39;&lt; 80%&#39;,
+  &#39;AWS/RDS/DatabaseConnections&#39;: &#39;&lt; 80% of max&#39;,
+};</code></pre>
+<h3 id="alerting-thresholds">Alerting Thresholds</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Warning</th>
+<th>Critical</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API P95 Latency</td>
+<td>&gt; 1s</td>
+<td>&gt; 3s</td>
+</tr>
+<tr>
+<td>Error Rate</td>
+<td>&gt; 1%</td>
+<td>&gt; 5%</td>
+</tr>
+<tr>
+<td>Lambda Concurrent</td>
+<td>&gt; 500</td>
+<td>&gt; 800</td>
+</tr>
+<tr>
+<td>DB CPU</td>
+<td>&gt; 70%</td>
+<td>&gt; 85%</td>
+</tr>
+<tr>
+<td>DB Connections</td>
+<td>&gt; 60%</td>
+<td>&gt; 80%</td>
+</tr>
+</tbody>
+</table>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="dos">Do’s</h3>
+<ul>
+<li>✅ Cache aggressively with proper invalidation</li>
+<li>✅ Use connection pooling</li>
+<li>✅ Minimize cold starts with provisioned concurrency</li>
+<li>✅ Use read replicas for read-heavy workloads</li>
+<li>✅ Implement circuit breakers for external services</li>
+<li>✅ Use async processing for non-critical paths</li>
+</ul>
+<h3 id="donts">Don’ts</h3>
+<ul>
+<li>❌ Don’t make synchronous calls to external APIs in hot paths</li>
+<li>❌ Don’t use Lambda for long-running tasks (&gt; 15 min)</li>
+<li>❌ Don’t store large objects in Redis</li>
+<li>❌ Don’t rely on API Gateway caching for dynamic data</li>
+<li>❌ Don’t skip database indexes</li>
+</ul>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="high-latency">High Latency</h3>
+<ol type="1">
+<li>Check Lambda cold starts (enable provisioned concurrency)</li>
+<li>Check database query times (add indexes)</li>
+<li>Check external API latency (add caching/circuit breaker)</li>
+<li>Check connection pool exhaustion</li>
+</ol>
+<h3 id="high-error-rate">High Error Rate</h3>
+<ol type="1">
+<li>Check Lambda errors in CloudWatch Logs</li>
+<li>Check database connection errors</li>
+<li>Check rate limiting (429 errors)</li>
+<li>Check WAF blocked requests</li>
+</ol>
+<h3 id="scaling-issues">Scaling Issues</h3>
+<ol type="1">
+<li>Check Lambda concurrent execution limit</li>
+<li>Check database connection limit</li>
+<li>Check API Gateway throttling</li>
+<li>Check Redis memory usage</li>
+</ol>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

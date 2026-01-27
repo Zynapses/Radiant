@@ -128,15 +128,6 @@ export class CatoValidatorMethod extends CatoBaseMethodExecutor<ValidatorInput, 
     return signals;
   }
 
-  protected async invokeModel(systemPrompt: string, userPrompt: string, context: MethodExecutionContext): Promise<ModelInvocationResult> {
-    const preset = CATO_GOVERNANCE_PRESETS[context.governancePreset];
-    const mock: ValidatorOutput = {
-      overallRisk: CatoRiskLevel.LOW, overallRiskScore: 0.25, triageDecision: CatoTriageDecision.AUTO_EXECUTE, triageReason: 'Risk within acceptable limits',
-      vetoApplied: false, riskFactors: [{ factorId: 'risk_data', name: 'Data Impact', category: 'data_integrity', level: CatoRiskLevel.LOW, score: 0.2, weight: 0.3, description: 'Minimal data impact', source: 'validator', vetoTrigger: false }],
-      autoExecuteThreshold: preset.riskThresholds.autoExecute, vetoThreshold: preset.riskThresholds.veto, unmitigatedRisks: [], mitigationSuggestions: []
-    };
-    return { response: JSON.stringify(mock), parsedOutput: mock, tokensInput: 600, tokensOutput: 400, costCents: 2, latencyMs: 500, modelId: 'claude-sonnet-4-20250514', provider: 'anthropic' };
-  }
 }
 
 export const createValidatorMethod = (pool: Pool, methodRegistry: CatoMethodRegistryService, schemaRegistry: CatoSchemaRegistryService) => new CatoValidatorMethod(pool, methodRegistry, schemaRegistry);

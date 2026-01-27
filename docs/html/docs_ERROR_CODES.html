@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ERROR CODES - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>ERROR CODES</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/ERROR_CODES.md</div>
+  </div>
+  
+  <h1 id="radiant-error-codes-reference">RADIANT Error Codes Reference</h1>
+<p>Standardized error codes for consistent API responses across all RADIANT services.</p>
+<h2 id="overview">Overview</h2>
+<p>All RADIANT errors follow a consistent format:</p>
+<pre class="json"><code>{
+  &quot;error&quot;: {
+    &quot;code&quot;: &quot;RADIANT_AUTH_1001&quot;,
+    &quot;message&quot;: &quot;Invalid authentication token. Please sign in again.&quot;,
+    &quot;category&quot;: &quot;authentication&quot;,
+    &quot;retryable&quot;: false,
+    &quot;timestamp&quot;: &quot;2024-12-25T10:30:00.000Z&quot;
+  }
+}</code></pre>
+<h2 id="error-code-format">Error Code Format</h2>
+<pre><code>RADIANT_&lt;CATEGORY&gt;_&lt;NUMBER&gt;</code></pre>
+<ul>
+<li><strong>RADIANT</strong> - Prefix for all error codes</li>
+<li><strong>CATEGORY</strong> - Short category identifier (AUTH, VAL, RES, etc.)</li>
+<li><strong>NUMBER</strong> - Unique 4-digit number within category</li>
+</ul>
+<hr />
+<h2 id="authentication-errors-1xxx">Authentication Errors (1xxx)</h2>
+<p>Errors related to authentication and identity.</p>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 30%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP</th>
+<th>Retryable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RADIANT_AUTH_1001</code></td>
+<td>401</td>
+<td>❌</td>
+<td>Invalid authentication token</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTH_1002</code></td>
+<td>401</td>
+<td>❌</td>
+<td>Token has expired</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTH_1003</code></td>
+<td>401</td>
+<td>❌</td>
+<td>Missing authentication token</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTH_1004</code></td>
+<td>401</td>
+<td>❌</td>
+<td>Invalid API key</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTH_1005</code></td>
+<td>401</td>
+<td>❌</td>
+<td>API key has expired</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTH_1006</code></td>
+<td>401</td>
+<td>❌</td>
+<td>API key has been revoked</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTH_1007</code></td>
+<td>403</td>
+<td>❌</td>
+<td>Insufficient API key scope</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTH_1008</code></td>
+<td>401</td>
+<td>❌</td>
+<td>Multi-factor authentication required</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTH_1009</code></td>
+<td>401</td>
+<td>❌</td>
+<td>Session has expired</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="authorization-errors-2xxx">Authorization Errors (2xxx)</h2>
+<p>Errors related to permissions and access control.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP</th>
+<th>Retryable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RADIANT_AUTHZ_2001</code></td>
+<td>403</td>
+<td>❌</td>
+<td>Forbidden - access denied</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTHZ_2002</code></td>
+<td>403</td>
+<td>❌</td>
+<td>Tenant ID mismatch</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTHZ_2003</code></td>
+<td>403</td>
+<td>❌</td>
+<td>Required role not assigned</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTHZ_2004</code></td>
+<td>403</td>
+<td>❌</td>
+<td>Permission denied</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTHZ_2005</code></td>
+<td>403</td>
+<td>❌</td>
+<td>Resource access denied</td>
+</tr>
+<tr>
+<td><code>RADIANT_AUTHZ_2006</code></td>
+<td>403</td>
+<td>❌</td>
+<td>Subscription tier insufficient</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="validation-errors-3xxx">Validation Errors (3xxx)</h2>
+<p>Errors related to input validation.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP</th>
+<th>Retryable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RADIANT_VAL_3001</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Required field is missing</td>
+</tr>
+<tr>
+<td><code>RADIANT_VAL_3002</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Invalid field format</td>
+</tr>
+<tr>
+<td><code>RADIANT_VAL_3003</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Value out of allowed range</td>
+</tr>
+<tr>
+<td><code>RADIANT_VAL_3004</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Invalid data type</td>
+</tr>
+<tr>
+<td><code>RADIANT_VAL_3005</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Constraint violation</td>
+</tr>
+<tr>
+<td><code>RADIANT_VAL_3006</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Schema mismatch</td>
+</tr>
+<tr>
+<td><code>RADIANT_VAL_3007</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Invalid JSON in request body</td>
+</tr>
+<tr>
+<td><code>RADIANT_VAL_3008</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Maximum length exceeded</td>
+</tr>
+<tr>
+<td><code>RADIANT_VAL_3009</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Minimum length required</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="resource-errors-4xxx">Resource Errors (4xxx)</h2>
+<p>Errors related to resources and entities.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP</th>
+<th>Retryable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RADIANT_RES_4001</code></td>
+<td>404</td>
+<td>❌</td>
+<td>Resource not found</td>
+</tr>
+<tr>
+<td><code>RADIANT_RES_4002</code></td>
+<td>409</td>
+<td>❌</td>
+<td>Resource already exists</td>
+</tr>
+<tr>
+<td><code>RADIANT_RES_4003</code></td>
+<td>410</td>
+<td>❌</td>
+<td>Resource has been deleted</td>
+</tr>
+<tr>
+<td><code>RADIANT_RES_4004</code></td>
+<td>423</td>
+<td>✅</td>
+<td>Resource is locked</td>
+</tr>
+<tr>
+<td><code>RADIANT_RES_4005</code></td>
+<td>409</td>
+<td>✅</td>
+<td>Resource conflict</td>
+</tr>
+<tr>
+<td><code>RADIANT_RES_4006</code></td>
+<td>429</td>
+<td>❌</td>
+<td>Resource quota exceeded</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="rate-limiting-errors-5xxx">Rate Limiting Errors (5xxx)</h2>
+<p>Errors related to rate limiting and throttling.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP</th>
+<th>Retryable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RADIANT_RATE_5001</code></td>
+<td>429</td>
+<td>✅</td>
+<td>Rate limit exceeded</td>
+</tr>
+<tr>
+<td><code>RADIANT_RATE_5002</code></td>
+<td>429</td>
+<td>✅</td>
+<td>Tenant rate limit exceeded</td>
+</tr>
+<tr>
+<td><code>RADIANT_RATE_5003</code></td>
+<td>429</td>
+<td>✅</td>
+<td>User rate limit exceeded</td>
+</tr>
+<tr>
+<td><code>RADIANT_RATE_5004</code></td>
+<td>429</td>
+<td>✅</td>
+<td>API key rate limit exceeded</td>
+</tr>
+<tr>
+<td><code>RADIANT_RATE_5005</code></td>
+<td>429</td>
+<td>✅</td>
+<td>Model rate limit exceeded</td>
+</tr>
+<tr>
+<td><code>RADIANT_RATE_5006</code></td>
+<td>429</td>
+<td>✅</td>
+<td>Burst limit exceeded</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Retry-After Header:</strong> Rate limit errors include <code>Retry-After</code> header with seconds to wait.</p>
+<hr />
+<h2 id="aimodel-errors-6xxx">AI/Model Errors (6xxx)</h2>
+<p>Errors related to AI models and inference.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP</th>
+<th>Retryable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RADIANT_AI_6001</code></td>
+<td>404</td>
+<td>❌</td>
+<td>Model not found</td>
+</tr>
+<tr>
+<td><code>RADIANT_AI_6002</code></td>
+<td>503</td>
+<td>✅</td>
+<td>Model temporarily unavailable</td>
+</tr>
+<tr>
+<td><code>RADIANT_AI_6003</code></td>
+<td>503</td>
+<td>✅</td>
+<td>Model overloaded</td>
+</tr>
+<tr>
+<td><code>RADIANT_AI_6004</code></td>
+<td>502</td>
+<td>✅</td>
+<td>AI provider error</td>
+</tr>
+<tr>
+<td><code>RADIANT_AI_6005</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Context length exceeded</td>
+</tr>
+<tr>
+<td><code>RADIANT_AI_6006</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Content filtered by safety</td>
+</tr>
+<tr>
+<td><code>RADIANT_AI_6007</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Invalid AI request</td>
+</tr>
+<tr>
+<td><code>RADIANT_AI_6008</code></td>
+<td>500</td>
+<td>✅</td>
+<td>Streaming error</td>
+</tr>
+<tr>
+<td><code>RADIANT_AI_6009</code></td>
+<td>504</td>
+<td>✅</td>
+<td>AI request timeout</td>
+</tr>
+<tr>
+<td><code>RADIANT_AI_6010</code></td>
+<td>503</td>
+<td>✅</td>
+<td>Model is cold (warming up)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="billing-errors-7xxx">Billing Errors (7xxx)</h2>
+<p>Errors related to billing, credits, and subscriptions.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP</th>
+<th>Retryable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RADIANT_BILL_7001</code></td>
+<td>402</td>
+<td>❌</td>
+<td>Insufficient credits</td>
+</tr>
+<tr>
+<td><code>RADIANT_BILL_7002</code></td>
+<td>402</td>
+<td>❌</td>
+<td>Payment required</td>
+</tr>
+<tr>
+<td><code>RADIANT_BILL_7003</code></td>
+<td>402</td>
+<td>❌</td>
+<td>Payment failed</td>
+</tr>
+<tr>
+<td><code>RADIANT_BILL_7004</code></td>
+<td>402</td>
+<td>❌</td>
+<td>Subscription expired</td>
+</tr>
+<tr>
+<td><code>RADIANT_BILL_7005</code></td>
+<td>402</td>
+<td>❌</td>
+<td>Subscription cancelled</td>
+</tr>
+<tr>
+<td><code>RADIANT_BILL_7006</code></td>
+<td>400</td>
+<td>❌</td>
+<td>Invalid coupon code</td>
+</tr>
+<tr>
+<td><code>RADIANT_BILL_7007</code></td>
+<td>429</td>
+<td>❌</td>
+<td>Usage quota exceeded</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="storage-errors-8xxx">Storage Errors (8xxx)</h2>
+<p>Errors related to file storage.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP</th>
+<th>Retryable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RADIANT_STOR_8001</code></td>
+<td>413</td>
+<td>❌</td>
+<td>Storage quota exceeded</td>
+</tr>
+<tr>
+<td><code>RADIANT_STOR_8002</code></td>
+<td>413</td>
+<td>❌</td>
+<td>File too large</td>
+</tr>
+<tr>
+<td><code>RADIANT_STOR_8003</code></td>
+<td>415</td>
+<td>❌</td>
+<td>Invalid file type</td>
+</tr>
+<tr>
+<td><code>RADIANT_STOR_8004</code></td>
+<td>500</td>
+<td>✅</td>
+<td>Upload failed</td>
+</tr>
+<tr>
+<td><code>RADIANT_STOR_8005</code></td>
+<td>404</td>
+<td>❌</td>
+<td>File not found</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="internal-errors-9xxx">Internal Errors (9xxx)</h2>
+<p>Internal server errors and system failures.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP</th>
+<th>Retryable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RADIANT_INT_9001</code></td>
+<td>500</td>
+<td>✅</td>
+<td>Internal server error</td>
+</tr>
+<tr>
+<td><code>RADIANT_INT_9002</code></td>
+<td>500</td>
+<td>✅</td>
+<td>Database error</td>
+</tr>
+<tr>
+<td><code>RADIANT_INT_9003</code></td>
+<td>500</td>
+<td>✅</td>
+<td>Cache error</td>
+</tr>
+<tr>
+<td><code>RADIANT_INT_9004</code></td>
+<td>500</td>
+<td>✅</td>
+<td>Queue processing error</td>
+</tr>
+<tr>
+<td><code>RADIANT_INT_9005</code></td>
+<td>503</td>
+<td>✅</td>
+<td>Service unavailable</td>
+</tr>
+<tr>
+<td><code>RADIANT_INT_9006</code></td>
+<td>502</td>
+<td>✅</td>
+<td>Dependency failure</td>
+</tr>
+<tr>
+<td><code>RADIANT_INT_9007</code></td>
+<td>500</td>
+<td>❌</td>
+<td>Configuration error</td>
+</tr>
+<tr>
+<td><code>RADIANT_INT_9008</code></td>
+<td>504</td>
+<td>✅</td>
+<td>Request timeout</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="usage-in-code">Usage in Code</h2>
+<h3 id="typescriptjavascript">TypeScript/JavaScript</h3>
+<pre class="typescript"><code>import { 
+  ErrorCodes, 
+  RadiantError, 
+  createNotFoundError,
+  createValidationError,
+  isRetryableError 
+} from &#39;@radiant/shared&#39;;
+
+// Using factory functions (recommended)
+throw createNotFoundError(&#39;User&#39;, userId);
+throw createValidationError(&#39;Email is required&#39;, &#39;email&#39;);
+
+// Direct construction
+throw new RadiantError(ErrorCodes.AUTH_INVALID_TOKEN, &#39;Custom message&#39;, {
+  details: { tokenPrefix: &#39;rad_...&#39; },
+  requestId: context.awsRequestId,
+});
+
+// Check if retryable
+if (isRetryableError(error.code)) {
+  // Implement retry logic
+}</code></pre>
+<h3 id="response-format">Response Format</h3>
+<pre class="typescript"><code>// RadiantError automatically formats responses
+const error = new RadiantError(ErrorCodes.RESOURCE_NOT_FOUND);
+return error.toResponse();
+
+// Returns:
+// {
+//   statusCode: 404,
+//   headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+//   body: &#39;{&quot;error&quot;:{&quot;code&quot;:&quot;RADIANT_RES_4001&quot;,&quot;message&quot;:&quot;Resource not found.&quot;,&quot;category&quot;:&quot;resource&quot;,&quot;retryable&quot;:false,&quot;timestamp&quot;:&quot;...&quot;}}&#39;
+// }</code></pre>
+<hr />
+<h2 id="client-handling">Client Handling</h2>
+<h3 id="retry-logic">Retry Logic</h3>
+<pre class="typescript"><code>async function callWithRetry(fn: () =&gt; Promise&lt;Response&gt;, maxRetries = 3) {
+  for (let i = 0; i &lt; maxRetries; i++) {
+    try {
+      const response = await fn();
+      if (response.ok) return response;
+      
+      const error = await response.json();
+      if (!error.error.retryable) throw error;
+      
+      const retryAfter = response.headers.get(&#39;Retry-After&#39;) || &#39;5&#39;;
+      await sleep(parseInt(retryAfter) * 1000);
+    } catch (e) {
+      if (i === maxRetries - 1) throw e;
+    }
+  }
+}</code></pre>
+<h3 id="error-display">Error Display</h3>
+<pre class="typescript"><code>function getUserMessage(error: RadiantError): string {
+  // Error codes include user-friendly messages
+  return error.message;
+}
+
+function shouldShowRetryButton(error: RadiantError): boolean {
+  return error.retryable;
+}</code></pre>
+<hr />
+<h2 id="adding-new-error-codes">Adding New Error Codes</h2>
+<ol type="1">
+<li>Add the code to <code>packages/shared/src/errors/codes.ts</code>:</li>
+</ol>
+<pre class="typescript"><code>export const ErrorCodes = {
+  // ... existing codes
+  MY_NEW_ERROR: &#39;RADIANT_CAT_NNNN&#39;,
+} as const;</code></pre>
+<ol start="2" type="1">
+<li>Add metadata:</li>
+</ol>
+<pre class="typescript"><code>export const ErrorCodeMetadata: Record&lt;ErrorCode, {...}&gt; = {
+  // ... existing metadata
+  [ErrorCodes.MY_NEW_ERROR]: {
+    httpStatus: 400,
+    category: &#39;category&#39;,
+    retryable: false,
+    userMessage: &#39;User-friendly error message.&#39;,
+  },
+};</code></pre>
+<ol start="3" type="1">
+<li>Update this documentation.</li>
+</ol>
+<hr />
+<h2 id="see-also">See Also</h2>
+<ul>
+<li><a href="API_REFERENCE.md">API Reference</a></li>
+<li><a href="../CONTRIBUTING.md">Contributing Guide</a></li>
+<li><a href="TROUBLESHOOTING.md">Troubleshooting</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

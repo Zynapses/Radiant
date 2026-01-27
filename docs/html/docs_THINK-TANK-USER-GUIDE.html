@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THINK TANK USER GUIDE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>THINK TANK USER GUIDE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/THINK-TANK-USER-GUIDE.md</div>
+  </div>
+  
+  <h1 id="think-tank-ai---user-guide">Think Tank AI - User Guide</h1>
+<blockquote>
+<p><strong>Your gateway to 100+ AI models in one place</strong></p>
+<p>Version: 3.2.0 (Platform: RADIANT 4.18.1) Last Updated: December 2024</p>
+</blockquote>
+<hr />
+<h2 id="welcome-to-think-tank">Welcome to Think Tank</h2>
+<p>Think Tank is your all-in-one AI assistant platform. Access the world’s best AI models—GPT-4, Claude, Gemini, and 100+ more—from a single, beautiful interface.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-getting-started">Getting Started</a></li>
+<li><a href="#2-your-dashboard">Your Dashboard</a></li>
+<li><a href="#3-chatting-with-ai">Chatting with AI</a></li>
+<li><a href="#4-choosing-models">Choosing Models</a></li>
+<li><a href="#5-focus-modes--personas">Focus Modes &amp; Personas</a></li>
+<li><a href="#6-canvas--artifacts">Canvas &amp; Artifacts</a></li>
+<li><a href="#7-collaboration-features">Collaboration Features</a></li>
+<li><a href="#8-managing-your-account">Managing Your Account</a></li>
+<li><a href="#9-credits--billing">Credits &amp; Billing</a></li>
+<li><a href="#10-tips--best-practices">Tips &amp; Best Practices</a></li>
+<li><a href="#11-keyboard-shortcuts">Keyboard Shortcuts</a></li>
+<li><a href="#12-faq">FAQ</a></li>
+<li><a href="#13-delight-system">Delight System</a></li>
+</ol>
+<hr />
+<h2 id="getting-started">1. Getting Started</h2>
+<h3 id="creating-your-account">1.1 Creating Your Account</h3>
+<ol type="1">
+<li>Visit <strong><a href="https://thinktank.ai">thinktank.ai</a></strong></li>
+<li>Click <strong>Get Started Free</strong></li>
+<li>Sign up with:
+<ul>
+<li>Email and password</li>
+<li>Google account</li>
+<li>Microsoft account</li>
+<li>Apple ID</li>
+</ul></li>
+<li>Verify your email</li>
+<li>Complete your profile</li>
+</ol>
+<h3 id="choosing-a-plan">1.2 Choosing a Plan</h3>
+<table>
+<thead>
+<tr>
+<th>Plan</th>
+<th>Price</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Free</strong></td>
+<td>$0/month</td>
+<td>Trying out Think Tank</td>
+</tr>
+<tr>
+<td><strong>Starter</strong></td>
+<td>$29/month</td>
+<td>Individual creators</td>
+</tr>
+<tr>
+<td><strong>Pro</strong></td>
+<td>$99/month</td>
+<td>Power users</td>
+</tr>
+<tr>
+<td><strong>Team</strong></td>
+<td>$49/user/month</td>
+<td>Small teams</td>
+</tr>
+<tr>
+<td><strong>Business</strong></td>
+<td>$199/user/month</td>
+<td>Organizations</td>
+</tr>
+</tbody>
+</table>
+<h3 id="your-first-chat">1.3 Your First Chat</h3>
+<ol type="1">
+<li>Click <strong>New Chat</strong> or press <code>Ctrl+N</code></li>
+<li>Type your question or request</li>
+<li>Press <code>Enter</code> or click <strong>Send</strong></li>
+<li>Watch as AI responds in real-time</li>
+</ol>
+<p><strong>Try these starter prompts:</strong> - “Explain quantum computing like I’m 10 years old” - “Write a professional email declining a meeting” - “Help me debug this Python code: [paste code]” - “Create a meal plan for the week”</p>
+<hr />
+<h2 id="your-dashboard">2. Your Dashboard</h2>
+<h3 id="interface-overview">2.1 Interface Overview</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  🧠 Think Tank                    [Search]  [Credits: 450]  👤  │
+├─────────────┬───────────────────────────────────────────────────┤
+│             │                                                   │
+│  📁 Chats   │                    Chat Area                      │
+│  ─────────  │                                                   │
+│  ⭐ Starred │    Welcome! How can I help you today?             │
+│  📅 Today   │                                                   │
+│    Chat 1   │                                                   │
+│    Chat 2   │                                                   │
+│  📅 Yesterday│                                                   │
+│    Chat 3   │                                                   │
+│             │                                                   │
+│  ─────────  │  ┌───────────────────────────────────────────┐   │
+│  🎭 Personas│  │ Type your message...              [Send] │   │
+│  📋 Canvas  │  └───────────────────────────────────────────┘   │
+│  ⚙️ Settings│                                                   │
+│             │  Model: GPT-4 Turbo  |  Focus: General  |  🎤 📎  │
+└─────────────┴───────────────────────────────────────────────────┘</code></pre>
+<h3 id="sidebar-navigation">2.2 Sidebar Navigation</h3>
+<table>
+<thead>
+<tr>
+<th>Icon</th>
+<th>Section</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>💬</td>
+<td>Chats</td>
+<td>All your conversations</td>
+</tr>
+<tr>
+<td>⭐</td>
+<td>Starred</td>
+<td>Important chats</td>
+</tr>
+<tr>
+<td>🎭</td>
+<td>Personas</td>
+<td>Custom AI personalities</td>
+</tr>
+<tr>
+<td>📋</td>
+<td>Canvas</td>
+<td>Visual workspace</td>
+</tr>
+<tr>
+<td>📊</td>
+<td>Usage</td>
+<td>Credit usage stats</td>
+</tr>
+<tr>
+<td>⚙️</td>
+<td>Settings</td>
+<td>Account settings</td>
+</tr>
+</tbody>
+</table>
+<h3 id="quick-actions">2.3 Quick Actions</h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Shortcut</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>New Chat</td>
+<td><code>Ctrl+N</code></td>
+</tr>
+<tr>
+<td>Search</td>
+<td><code>Ctrl+K</code></td>
+</tr>
+<tr>
+<td>Toggle Sidebar</td>
+<td><code>Ctrl+B</code></td>
+</tr>
+<tr>
+<td>Settings</td>
+<td><code>Ctrl+,</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="chatting-with-ai">3. Chatting with AI</h2>
+<h3 id="sending-messages">3.1 Sending Messages</h3>
+<p><strong>Text Messages:</strong> - Type in the input box - Press <code>Enter</code> to send - Use <code>Shift+Enter</code> for new lines</p>
+<p><strong>Attachments:</strong> - 📎 Click to attach files - Drag &amp; drop images, PDFs, code files - Paste images directly (<code>Ctrl+V</code>)</p>
+<p><strong>Voice Input:</strong> - 🎤 Click microphone icon - Speak your message - Click again to stop</p>
+<h3 id="message-actions">3.2 Message Actions</h3>
+<p>Hover over any message to see actions:</p>
+<table>
+<thead>
+<tr>
+<th>Icon</th>
+<th>Action</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>📋</td>
+<td>Copy</td>
+<td>Copy message text</td>
+</tr>
+<tr>
+<td>🔄</td>
+<td>Regenerate</td>
+<td>Get a new response</td>
+</tr>
+<tr>
+<td>✏️</td>
+<td>Edit</td>
+<td>Modify your message</td>
+</tr>
+<tr>
+<td>👍/👎</td>
+<td>Rate</td>
+<td>Help improve AI</td>
+</tr>
+<tr>
+<td>📌</td>
+<td>Pin</td>
+<td>Keep message visible</td>
+</tr>
+<tr>
+<td>🗑️</td>
+<td>Delete</td>
+<td>Remove message</td>
+</tr>
+</tbody>
+</table>
+<h3 id="streaming-responses">3.3 Streaming Responses</h3>
+<p>AI responses stream in real-time. You can: - <strong>Stop</strong>: Click ⏹️ to stop generation - <strong>Continue</strong>: Ask “continue” if response was cut off - <strong>Regenerate</strong>: Get a different response</p>
+<h3 id="multi-turn-conversations">3.4 Multi-Turn Conversations</h3>
+<p>Think Tank remembers your conversation context:</p>
+<pre><code>You: I&#39;m planning a trip to Japan
+AI:  That&#39;s exciting! When are you planning to visit...
+
+You: What about the food?
+AI:  Japanese cuisine is incredible! Based on your trip...
+     [AI remembers you&#39;re going to Japan]</code></pre>
+<h3 id="code-in-chats">3.5 Code in Chats</h3>
+<p>Code is automatically syntax-highlighted:</p>
+<pre class="python"><code>def hello_world():
+    print(&quot;Hello, Think Tank!&quot;)</code></pre>
+<p>Click <strong>Copy</strong> to copy code blocks, or <strong>Run</strong> for supported languages.</p>
+<hr />
+<h2 id="choosing-models">4. Choosing Models</h2>
+<h3 id="model-selection">4.1 Model Selection</h3>
+<p>Click the model selector at the bottom of the chat:</p>
+<pre><code>┌─────────────────────────────────────┐
+│ Select Model                    ✕  │
+├─────────────────────────────────────┤
+│ ⭐ Favorites                        │
+│   GPT-4 Turbo          $0.02/msg   │
+│   Claude 3 Opus        $0.03/msg   │
+├─────────────────────────────────────┤
+│ 🔥 Recommended                      │
+│   GPT-4o               $0.01/msg   │
+│   Claude 3.5 Sonnet    $0.01/msg   │
+│   Gemini 1.5 Pro       $0.01/msg   │
+├─────────────────────────────────────┤
+│ 📝 Writing                          │
+│ 💻 Coding                           │
+│ 🔬 Analysis                         │
+│ 🎨 Creative                         │
+│ [View All 100+ Models]              │
+└─────────────────────────────────────┘</code></pre>
+<h3 id="model-categories">4.2 Model Categories</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Best For</th>
+<th>Top Models</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>General</strong></td>
+<td>Everyday tasks</td>
+<td>GPT-4o, Claude 3.5</td>
+</tr>
+<tr>
+<td><strong>Writing</strong></td>
+<td>Content creation</td>
+<td>Claude 3 Opus, GPT-4</td>
+</tr>
+<tr>
+<td><strong>Coding</strong></td>
+<td>Programming help</td>
+<td>GPT-4 Turbo, CodeLlama</td>
+</tr>
+<tr>
+<td><strong>Analysis</strong></td>
+<td>Data &amp; research</td>
+<td>Gemini 1.5, Claude 3</td>
+</tr>
+<tr>
+<td><strong>Creative</strong></td>
+<td>Art &amp; ideas</td>
+<td>GPT-4, Mistral Large</td>
+</tr>
+<tr>
+<td><strong>Vision</strong></td>
+<td>Image understanding</td>
+<td>GPT-4V, LLaVA</td>
+</tr>
+<tr>
+<td><strong>Fast</strong></td>
+<td>Quick responses</td>
+<td>GPT-3.5, Claude Instant</td>
+</tr>
+</tbody>
+</table>
+<h4 id="choosing-the-right-model">Choosing the Right Model</h4>
+<p><strong>For everyday questions and tasks</strong>: Start with GPT-4o or Claude 3.5 Sonnet. These models offer the best balance of quality, speed, and cost. They handle most tasks excellently including writing, answering questions, brainstorming, and light coding.</p>
+<p><strong>For professional writing</strong>: Claude 3 Opus excels at long-form content, maintaining consistent tone, and nuanced writing. GPT-4 is also excellent for business documents and creative writing.</p>
+<p><strong>For coding and technical work</strong>: GPT-4 Turbo has strong coding abilities across many languages. For specialized tasks, consider CodeLlama (open source, good for common languages) or specialized models like DeepSeek Coder.</p>
+<p><strong>For data analysis</strong>: Gemini 1.5 Pro handles very long documents (up to 1 million tokens) making it ideal for analyzing large datasets or documents. Claude 3 is excellent for nuanced analytical reasoning.</p>
+<p><strong>For creative projects</strong>: GPT-4 and Mistral Large are both creative and can help with brainstorming, storytelling, and idea generation. They’re less constrained in creative contexts.</p>
+<p><strong>For image understanding</strong>: GPT-4V (Vision) and Claude 3 Vision can analyze images, read text from photos, describe scenes, and answer questions about visual content.</p>
+<p><strong>For quick, simple tasks</strong>: GPT-3.5 Turbo and Claude Instant are much faster and cheaper. Use them for simple questions, formatting, or when you need instant responses.</p>
+<h3 id="auto-mode">4.3 Auto Mode</h3>
+<p>Let Think Tank choose the best model:</p>
+<ol type="1">
+<li>Enable <strong>Auto Mode</strong> in settings</li>
+<li>Our Brain Router analyzes your request</li>
+<li>Automatically selects optimal model</li>
+<li>Balances quality, speed, and cost</li>
+</ol>
+<h4 id="how-auto-mode-works">How Auto Mode Works</h4>
+<p>When you enable Auto Mode, Think Tank’s Brain Router analyzes each message you send and selects the best model based on:</p>
+<ul>
+<li><strong>Task complexity</strong>: Simple questions go to fast models; complex tasks go to powerful models</li>
+<li><strong>Content type</strong>: Coding questions route to code-specialized models; creative requests to creative models</li>
+<li><strong>Your history</strong>: Learns your preferences over time and adjusts recommendations</li>
+<li><strong>Cost efficiency</strong>: Avoids using expensive models when cheaper ones would work equally well</li>
+<li><strong>Current availability</strong>: Routes around any models experiencing slowdowns</li>
+</ul>
+<p><strong>When to use Auto Mode</strong>: - You’re not sure which model to use - You want to optimize cost without sacrificing quality - You have varied tasks throughout the day - You’re new to Think Tank</p>
+<p><strong>When to choose manually</strong>: - You need a specific model’s unique capabilities - You’re doing specialized work (e.g., always want Claude for writing) - You’re comparing models intentionally - You have strong preferences for certain models</p>
+<h3 id="model-comparison">4.4 Model Comparison</h3>
+<p>Split-screen to compare models:</p>
+<ol type="1">
+<li>Click <strong>Compare</strong> button</li>
+<li>Select 2-4 models</li>
+<li>Send message to all simultaneously</li>
+<li>See responses side-by-side</li>
+</ol>
+<hr />
+<h2 id="focus-modes-personas">5. Focus Modes &amp; Personas</h2>
+<h3 id="focus-modes">5.1 Focus Modes</h3>
+<p>Pre-configured modes for specific tasks:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Optimized For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>💼 <strong>Professional</strong></td>
+<td>Business writing, emails</td>
+</tr>
+<tr>
+<td>💻 <strong>Developer</strong></td>
+<td>Code, debugging, architecture</td>
+</tr>
+<tr>
+<td>📚 <strong>Research</strong></td>
+<td>Analysis, citations, accuracy</td>
+</tr>
+<tr>
+<td>✍️ <strong>Creative</strong></td>
+<td>Stories, brainstorming</td>
+</tr>
+<tr>
+<td>📖 <strong>Learning</strong></td>
+<td>Explanations, tutoring</td>
+</tr>
+<tr>
+<td>🎯 <strong>Concise</strong></td>
+<td>Brief, direct answers</td>
+</tr>
+</tbody>
+</table>
+<p><strong>To switch modes:</strong> 1. Click the Focus selector 2. Choose your mode 3. AI adapts its style</p>
+<h4 id="focus-mode-details">Focus Mode Details</h4>
+<p><strong>Professional Mode</strong>: The AI adopts a business-appropriate tone. Responses are polished, formal, and suitable for workplace communication. Great for drafting emails, reports, presentations, and client communications. Avoids casual language and ensures professional formatting.</p>
+<p><strong>Developer Mode</strong>: Optimized for technical work. The AI provides code with proper syntax highlighting, explains technical concepts clearly, suggests best practices, and can help debug issues. Responses include code comments and consider edge cases.</p>
+<p><strong>Research Mode</strong>: Emphasizes accuracy and thoroughness. The AI cites sources when possible, acknowledges uncertainty, presents multiple perspectives, and structures information logically. Ideal for academic work, fact-checking, and deep analysis.</p>
+<p><strong>Creative Mode</strong>: Removes constraints on creativity. The AI is more willing to explore unusual ideas, use vivid language, and think outside the box. Perfect for brainstorming, creative writing, storytelling, and generating innovative solutions.</p>
+<p><strong>Learning Mode</strong>: The AI becomes a patient tutor. Explanations start from basics and build up, concepts are broken into digestible pieces, and the AI checks understanding before moving on. Great for studying new topics.</p>
+<p><strong>Concise Mode</strong>: Responses are brief and to the point. The AI avoids lengthy explanations and gets straight to the answer. Useful when you need quick facts or are in a hurry.</p>
+<h3 id="custom-personas">5.2 Custom Personas</h3>
+<p>Create your own AI personalities:</p>
+<ol type="1">
+<li>Go to <strong>Personas</strong> → <strong>Create New</strong></li>
+<li>Configure:
+<ul>
+<li><strong>Name</strong>: “Marketing Expert”</li>
+<li><strong>Personality</strong>: Professional, enthusiastic</li>
+<li><strong>Expertise</strong>: Digital marketing, SEO</li>
+<li><strong>Style</strong>: Uses bullet points, data-driven</li>
+</ul></li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<p><strong>Example Persona:</strong></p>
+<pre><code>Name: Code Reviewer
+Personality: Thorough, constructive
+Instructions: Review code for bugs, security issues,
+              and best practices. Always suggest
+              improvements with examples.</code></pre>
+<h3 id="sharing-personas">5.3 Sharing Personas</h3>
+<ul>
+<li><strong>Public</strong>: Share with all Think Tank users</li>
+<li><strong>Team</strong>: Share within your organization</li>
+<li><strong>Private</strong>: Only you can use</li>
+</ul>
+<hr />
+<h2 id="canvas-artifacts">6. Canvas &amp; Artifacts</h2>
+<h3 id="what-is-canvas">6.1 What is Canvas?</h3>
+<p>Canvas is your visual workspace for complex outputs: - Code files with syntax highlighting - Diagrams and flowcharts - Documents and reports - Data tables - Mind maps</p>
+<h3 id="creating-artifacts">6.2 Creating Artifacts</h3>
+<p>When AI generates complex content, it appears as an artifact:</p>
+<pre><code>┌─────────────────────────────────────────────┐
+│ 📄 business_plan.md                    ✕ ⋮  │
+├─────────────────────────────────────────────┤
+│ # Business Plan                             │
+│                                             │
+│ ## Executive Summary                        │
+│ ...                                         │
+│                                             │
+├─────────────────────────────────────────────┤
+│ [Copy] [Download] [Edit] [Version History]  │
+└─────────────────────────────────────────────┘</code></pre>
+<h3 id="artifact-actions">6.3 Artifact Actions</h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Copy</strong></td>
+<td>Copy content to clipboard</td>
+</tr>
+<tr>
+<td><strong>Download</strong></td>
+<td>Save as file</td>
+</tr>
+<tr>
+<td><strong>Edit</strong></td>
+<td>Modify directly</td>
+</tr>
+<tr>
+<td><strong>Versions</strong></td>
+<td>View previous versions</td>
+</tr>
+<tr>
+<td><strong>Share</strong></td>
+<td>Generate share link</td>
+</tr>
+<tr>
+<td><strong>To Canvas</strong></td>
+<td>Open in full Canvas view</td>
+</tr>
+</tbody>
+</table>
+<h3 id="full-canvas-mode">6.4 Full Canvas Mode</h3>
+<p>For larger projects:</p>
+<ol type="1">
+<li>Click <strong>Canvas</strong> in sidebar</li>
+<li>Create new canvas or open existing</li>
+<li>Add multiple artifacts</li>
+<li>Arrange spatially</li>
+<li>Connect related items</li>
+</ol>
+<hr />
+<h2 id="collaboration-features">7. Collaboration Features</h2>
+<h3 id="sharing-chats">7.1 Sharing Chats</h3>
+<p>Share any conversation:</p>
+<ol type="1">
+<li>Click <strong>Share</strong> (🔗) on a chat</li>
+<li>Choose visibility:
+<ul>
+<li><strong>Link</strong>: Anyone with link</li>
+<li><strong>Team</strong>: Your organization</li>
+<li><strong>Private</strong>: Specific people</li>
+</ul></li>
+<li>Copy and share the link</li>
+</ol>
+<h3 id="real-time-collaboration">7.2 Real-Time Collaboration</h3>
+<p>Work together on the same chat:</p>
+<ol type="1">
+<li>Share chat with <strong>Edit</strong> access</li>
+<li>Multiple users can:
+<ul>
+<li>Send messages simultaneously</li>
+<li>See each other’s cursors</li>
+<li>React to messages</li>
+</ul></li>
+<li>Changes sync in real-time</li>
+</ol>
+<h3 id="team-workspaces">7.3 Team Workspaces</h3>
+<p>For Team and Business plans:</p>
+<ul>
+<li><strong>Shared Chats</strong>: Team-visible conversations</li>
+<li><strong>Shared Personas</strong>: Team AI configurations</li>
+<li><strong>Shared Canvas</strong>: Collaborative workspaces</li>
+<li><strong>Usage Dashboard</strong>: Team analytics</li>
+</ul>
+<h3 id="comments-annotations">7.4 Comments &amp; Annotations</h3>
+<p>Add notes to any message:</p>
+<ol type="1">
+<li>Hover over message</li>
+<li>Click <strong>Comment</strong> (💬)</li>
+<li>Add your note</li>
+<li>Tag teammates with <span class="citation" data-cites="mention">@mention</span></li>
+</ol>
+<hr />
+<h2 id="managing-your-account">8. Managing Your Account</h2>
+<h3 id="profile-settings">8.1 Profile Settings</h3>
+<p>Access via <strong>Settings</strong> → <strong>Profile</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Name</td>
+<td>Your visible name</td>
+</tr>
+<tr>
+<td>Email</td>
+<td>Login email</td>
+</tr>
+<tr>
+<td>Avatar</td>
+<td>Profile picture</td>
+</tr>
+<tr>
+<td>Language</td>
+<td>Interface language</td>
+</tr>
+<tr>
+<td>Timezone</td>
+<td>For scheduled features</td>
+</tr>
+</tbody>
+</table>
+<h3 id="preferences">8.2 Preferences</h3>
+<p>Customize your experience:</p>
+<table>
+<thead>
+<tr>
+<th>Preference</th>
+<th>Options</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Theme</td>
+<td>Light, Dark, System</td>
+</tr>
+<tr>
+<td>Font Size</td>
+<td>Small, Medium, Large</td>
+</tr>
+<tr>
+<td>Default Model</td>
+<td>Your preferred model</td>
+</tr>
+<tr>
+<td>Auto Mode</td>
+<td>Enable/disable</td>
+</tr>
+<tr>
+<td>Sound Effects</td>
+<td>On/Off</td>
+</tr>
+<tr>
+<td>Notifications</td>
+<td>Email, Push, None</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-privacy">8.3 Data &amp; Privacy</h3>
+<p>Control your data:</p>
+<ul>
+<li><strong>Export Data</strong>: Download all your chats</li>
+<li><strong>Delete History</strong>: Remove chat history</li>
+<li><strong>Training Opt-Out</strong>: Exclude from AI training</li>
+<li><strong>Data Retention</strong>: Set auto-delete period</li>
+</ul>
+<h3 id="connected-apps">8.4 Connected Apps</h3>
+<p>Manage integrations:</p>
+<ul>
+<li>Google Drive</li>
+<li>Dropbox</li>
+<li>Notion</li>
+<li>Slack</li>
+<li>GitHub</li>
+</ul>
+<hr />
+<h2 id="credits-billing">9. Credits &amp; Billing</h2>
+<h3 id="understanding-credits">9.1 Understanding Credits</h3>
+<p>Credits are Think Tank’s universal currency:</p>
+<table>
+<thead>
+<tr>
+<th>Credit Value</th>
+<th>Equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 credit</td>
+<td>$0.01</td>
+</tr>
+<tr>
+<td>100 credits</td>
+<td>$1.00</td>
+</tr>
+</tbody>
+</table>
+<h3 id="credit-usage">9.2 Credit Usage</h3>
+<p>Different models cost different amounts:</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>~Cost per Message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPT-3.5 Turbo</td>
+<td>0.5 credits</td>
+</tr>
+<tr>
+<td>GPT-4o</td>
+<td>1-2 credits</td>
+</tr>
+<tr>
+<td>GPT-4 Turbo</td>
+<td>2-3 credits</td>
+</tr>
+<tr>
+<td>Claude 3.5 Sonnet</td>
+<td>1-2 credits</td>
+</tr>
+<tr>
+<td>Claude 3 Opus</td>
+<td>3-5 credits</td>
+</tr>
+</tbody>
+</table>
+<p><em>Actual cost depends on message length</em></p>
+<h3 id="viewing-usage">9.3 Viewing Usage</h3>
+<p>Check your usage in <strong>Settings</strong> → <strong>Usage</strong>:</p>
+<pre><code>┌─────────────────────────────────────────────┐
+│ Credit Usage - December 2024                │
+├─────────────────────────────────────────────┤
+│ Balance:        450 credits                 │
+│ Used this month: 1,550 credits              │
+│ Included:       2,000 credits               │
+│                                             │
+│ [██████████████░░░░░░] 77% used            │
+│                                             │
+│ By Model:                                   │
+│   GPT-4 Turbo     800 credits (52%)        │
+│   Claude 3        500 credits (32%)        │
+│   Other           250 credits (16%)        │
+└─────────────────────────────────────────────┘</code></pre>
+<h3 id="purchasing-credits">9.4 Purchasing Credits</h3>
+<p>Need more credits?</p>
+<ol type="1">
+<li>Go to <strong>Settings</strong> → <strong>Billing</strong></li>
+<li>Click <strong>Buy Credits</strong></li>
+<li>Select amount:
+<ul>
+<li>500 credits - $5</li>
+<li>1,000 credits - $9 (10% bonus)</li>
+<li>5,000 credits - $40 (20% bonus)</li>
+</ul></li>
+<li>Complete payment</li>
+</ol>
+<h3 id="subscription-management">9.5 Subscription Management</h3>
+<p>Manage your plan:</p>
+<ul>
+<li><strong>Upgrade</strong>: Get more features and credits</li>
+<li><strong>Downgrade</strong>: Switch to lower tier (end of period)</li>
+<li><strong>Cancel</strong>: Cancel subscription (keep access until end)</li>
+<li><strong>Invoices</strong>: Download billing history</li>
+</ul>
+<hr />
+<h2 id="tips-best-practices">10. Tips &amp; Best Practices</h2>
+<h3 id="writing-better-prompts">10.1 Writing Better Prompts</h3>
+<p><strong>Be Specific:</strong></p>
+<pre><code>❌ &quot;Write about dogs&quot;
+✅ &quot;Write a 200-word blog post about training golden 
+    retriever puppies, focusing on positive reinforcement&quot;</code></pre>
+<p><strong>Provide Context:</strong></p>
+<pre><code>❌ &quot;Fix this code&quot;
+✅ &quot;Fix this Python code that should sort a list but 
+    throws an IndexError: [paste code]&quot;</code></pre>
+<p><strong>Set the Format:</strong></p>
+<pre><code>❌ &quot;Give me ideas&quot;
+✅ &quot;Give me 5 blog post ideas about sustainable living,
+    formatted as bullet points with a brief description&quot;</code></pre>
+<h3 id="getting-better-results">10.2 Getting Better Results</h3>
+<table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Chain of thought</strong></td>
+<td>“Think step by step…”</td>
+</tr>
+<tr>
+<td><strong>Role assignment</strong></td>
+<td>“Act as a senior developer…”</td>
+</tr>
+<tr>
+<td><strong>Examples</strong></td>
+<td>“Here’s an example of what I want…”</td>
+</tr>
+<tr>
+<td><strong>Constraints</strong></td>
+<td>“In 100 words or less…”</td>
+</tr>
+<tr>
+<td><strong>Iteration</strong></td>
+<td>“Good, but make it more formal”</td>
+</tr>
+</tbody>
+</table>
+<h3 id="saving-credits">10.3 Saving Credits</h3>
+<ul>
+<li>Use <strong>Auto Mode</strong> for optimal model selection</li>
+<li>Use <strong>GPT-3.5</strong> for simple tasks</li>
+<li>Be concise in your prompts</li>
+<li>Avoid regenerating unnecessarily</li>
+<li>Use <strong>Focus Modes</strong> for specialized tasks</li>
+</ul>
+<h3 id="organizing-chats">10.4 Organizing Chats</h3>
+<ul>
+<li>⭐ <strong>Star</strong> important conversations</li>
+<li>📁 <strong>Folders</strong>: Group related chats</li>
+<li>🏷️ <strong>Tags</strong>: Add searchable labels</li>
+<li>🔍 <strong>Search</strong>: Find any past conversation</li>
+</ul>
+<hr />
+<h2 id="keyboard-shortcuts">11. Keyboard Shortcuts</h2>
+<h3 id="general">11.1 General</h3>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Ctrl+N</code></td>
+<td>New chat</td>
+</tr>
+<tr>
+<td><code>Ctrl+K</code></td>
+<td>Search</td>
+</tr>
+<tr>
+<td><code>Ctrl+B</code></td>
+<td>Toggle sidebar</td>
+</tr>
+<tr>
+<td><code>Ctrl+,</code></td>
+<td>Settings</td>
+</tr>
+<tr>
+<td><code>Ctrl+/</code></td>
+<td>Show shortcuts</td>
+</tr>
+<tr>
+<td><code>Escape</code></td>
+<td>Close modal</td>
+</tr>
+</tbody>
+</table>
+<h3 id="chat">11.2 Chat</h3>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Enter</code></td>
+<td>Send message</td>
+</tr>
+<tr>
+<td><code>Shift+Enter</code></td>
+<td>New line</td>
+</tr>
+<tr>
+<td><code>Ctrl+↑</code></td>
+<td>Edit last message</td>
+</tr>
+<tr>
+<td><code>Ctrl+Shift+C</code></td>
+<td>Copy last response</td>
+</tr>
+<tr>
+<td><code>Ctrl+Shift+R</code></td>
+<td>Regenerate</td>
+</tr>
+<tr>
+<td><code>Ctrl+.</code></td>
+<td>Stop generation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="navigation">11.3 Navigation</h3>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Alt+↑/↓</code></td>
+<td>Previous/next chat</td>
+</tr>
+<tr>
+<td><code>Ctrl+1-9</code></td>
+<td>Switch to chat 1-9</td>
+</tr>
+<tr>
+<td><code>Ctrl+Tab</code></td>
+<td>Cycle tabs</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="faq">12. FAQ</h2>
+<h3 id="getting-started-1">Getting Started</h3>
+<p><strong>Q: Is Think Tank free?</strong> A: Yes! The Free plan includes 50 credits/month. Upgrade for more credits and features.</p>
+<p><strong>Q: Which AI model should I use?</strong> A: Enable Auto Mode and let us choose, or: - General tasks → GPT-4o or Claude 3.5 Sonnet - Complex analysis → GPT-4 Turbo or Claude 3 Opus - Quick answers → GPT-3.5 Turbo</p>
+<p><strong>Q: Can I use Think Tank on mobile?</strong> A: Yes! Visit thinktank.ai on any mobile browser, or download our iOS/Android apps.</p>
+<h3 id="credits-billing-1">Credits &amp; Billing</h3>
+<p><strong>Q: What happens when I run out of credits?</strong> A: You can purchase more credits or wait for your monthly refresh (paid plans).</p>
+<p><strong>Q: Do unused credits roll over?</strong> A: Monthly included credits expire. Purchased credits never expire.</p>
+<p><strong>Q: Can I get a refund?</strong> A: Contact support within 14 days for subscription refunds.</p>
+<h3 id="privacy-security">Privacy &amp; Security</h3>
+<p><strong>Q: Is my data used to train AI?</strong> A: By default, no. You can verify in Settings → Privacy.</p>
+<p><strong>Q: Who can see my chats?</strong> A: Only you, unless you explicitly share them.</p>
+<p><strong>Q: Is my data encrypted?</strong> A: Yes, with AES-256 encryption at rest and TLS 1.3 in transit.</p>
+<h3 id="troubleshooting">Troubleshooting</h3>
+<p><strong>Q: Why is the AI response slow?</strong> A: Complex queries or busy times may cause delays. Try a faster model.</p>
+<p><strong>Q: Why did my response get cut off?</strong> A: Models have output limits. Type “continue” to get the rest.</p>
+<p><strong>Q: I found a bug. How do I report it?</strong> A: Click <strong>Help</strong> → <strong>Report Issue</strong> or email support@thinktank.ai.</p>
+<hr />
+<h2 id="need-help">Need Help?</h2>
+<ul>
+<li>📚 <strong>Help Center</strong>: help.thinktank.ai</li>
+<li>💬 <strong>Live Chat</strong>: Click the chat bubble</li>
+<li>📧 <strong>Email</strong>: support@thinktank.ai</li>
+<li>🐦 <strong>Twitter</strong>: <span class="citation" data-cites="ThinkTankAI">@ThinkTankAI</span></li>
+<li>💬 <strong>Discord</strong>: discord.gg/thinktank</li>
+</ul>
+<hr />
+<h2 id="version-history">Version History</h2>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 25%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3.2.0</td>
+<td>December 2024</td>
+<td>Time Machine, enhanced collaboration, A/B experiments, <strong>Delight System</strong></td>
+</tr>
+<tr>
+<td>3.1.0</td>
+<td>November 2024</td>
+<td>Canvas improvements, new models</td>
+</tr>
+<tr>
+<td>3.0.0</td>
+<td>October 2024</td>
+<td>Initial release</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="delight-system">13. Delight System</h2>
+<p>Think Tank includes a personality system called “Delight” that makes your AI experience more engaging.</p>
+<h3 id="what-is-delight">13.1 What is Delight?</h3>
+<p>Delight adds contextual, friendly messages during your conversations:</p>
+<ul>
+<li><strong>Domain Loading</strong>: “Consulting the fundamental forces…” when you ask physics questions</li>
+<li><strong>Time Awareness</strong>: “Burning the midnight tokens” during late-night sessions</li>
+<li><strong>Model Dynamics</strong>: “Consensus forming…” when multiple models agree</li>
+<li><strong>Wellbeing Nudges</strong>: “You’ve been thinking hard. Time for a break?”</li>
+</ul>
+<h3 id="personality-modes">13.2 Personality Modes</h3>
+<p>Choose your preferred personality style in <strong>Settings → Delight</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Professional</strong></td>
+<td>Minimal, business-appropriate feedback</td>
+</tr>
+<tr>
+<td><strong>Subtle</strong></td>
+<td>Light touches of personality</td>
+</tr>
+<tr>
+<td><strong>Expressive</strong></td>
+<td>Full personality with humor</td>
+</tr>
+<tr>
+<td><strong>Playful</strong></td>
+<td>Maximum fun, includes easter eggs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="achievements">13.3 Achievements</h3>
+<p>Earn achievements as you use Think Tank:</p>
+<table>
+<thead>
+<tr>
+<th>Achievement</th>
+<th>How to Unlock</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🧭 Domain Explorer</td>
+<td>Explore 10+ knowledge domains</td>
+</tr>
+<tr>
+<td>🔥 Week Warrior</td>
+<td>Use Think Tank 7 days in a row</td>
+</tr>
+<tr>
+<td>👑 Renaissance Mind</td>
+<td>Explore 50+ domains</td>
+</tr>
+<tr>
+<td>⚡ Monthly Mind</td>
+<td>30-day streak</td>
+</tr>
+</tbody>
+</table>
+<p>View your achievements in <strong>Settings → Achievements</strong>.</p>
+<h3 id="easter-eggs">13.4 Easter Eggs</h3>
+<p>Think Tank has hidden surprises! Try: - Typing special phrases - Using keyboard shortcuts - Exploring during special times</p>
+<p>Discover them yourself—that’s half the fun!</p>
+<h3 id="sound-effects">13.5 Sound Effects</h3>
+<p>Enable audio feedback in <strong>Settings → Delight → Sounds</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Theme</th>
+<th>Style</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Default</td>
+<td>Pleasant chimes</td>
+</tr>
+<tr>
+<td>Mission Control</td>
+<td>NASA-inspired beeps</td>
+</tr>
+<tr>
+<td>Library</td>
+<td>Page turns, book sounds</td>
+</tr>
+<tr>
+<td>Workshop</td>
+<td>Tool clicks</td>
+</tr>
+<tr>
+<td>Emissions</td>
+<td>Tesla-style… fun</td>
+</tr>
+</tbody>
+</table>
+<h3 id="customizing-delight">13.6 Customizing Delight</h3>
+<p>Toggle individual features: - ✅ Domain messages - ✅ Model personality - ✅ Time awareness - ✅ Achievements - ✅ Wellbeing nudges - ✅ Easter eggs - ✅ Sound effects</p>
+<p>Set intensity level (1-10) to control how often messages appear.</p>
+<hr />
+<p><em>Thank you for using Think Tank! We’re constantly improving based on your feedback.</em></p>
+<p>© 2024 Think Tank AI. All rights reserved.</p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

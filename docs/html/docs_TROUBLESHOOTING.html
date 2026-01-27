@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TROUBLESHOOTING - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>TROUBLESHOOTING</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/TROUBLESHOOTING.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.17.0---troubleshooting-guide">RADIANT v4.17.0 - Troubleshooting Guide</h1>
+<h2 id="common-issues-and-solutions">Common Issues and Solutions</h2>
+<h3 id="cdk-deployment-failures">CDK Deployment Failures</h3>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 45%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bootstrap failed</td>
+<td>Wrong account/region</td>
+<td>Verify <code>aws sts get-caller-identity</code></td>
+</tr>
+<tr>
+<td>Stack timeout</td>
+<td>Slow resource creation</td>
+<td>Check CloudFormation events in AWS Console</td>
+</tr>
+<tr>
+<td>Resource limit</td>
+<td>Service quota exceeded</td>
+<td>Request quota increase via AWS Service Quotas</td>
+</tr>
+<tr>
+<td>IAM permission denied</td>
+<td>Insufficient permissions</td>
+<td>Ensure IAM user has AdministratorAccess</td>
+</tr>
+<tr>
+<td>Circular dependency</td>
+<td>Stack references</td>
+<td>Check stack dependencies in CDK code</td>
+</tr>
+<tr>
+<td>Asset upload failed</td>
+<td>S3 bucket permissions</td>
+<td>Verify CDK bootstrap bucket exists</td>
+</tr>
+</tbody>
+</table>
+<h3 id="aurora-database-issues">Aurora Database Issues</h3>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 45%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connection refused</td>
+<td>Security group rules</td>
+<td>Verify Lambda SG can reach Aurora SG on port 5432</td>
+</tr>
+<tr>
+<td>Authentication failed</td>
+<td>Wrong credentials</td>
+<td>Check Secrets Manager for correct credentials</td>
+</tr>
+<tr>
+<td>Connection timeout</td>
+<td>Missing VPC endpoints</td>
+<td>Add RDS VPC endpoint to private subnets</td>
+</tr>
+<tr>
+<td>Too many connections</td>
+<td>Connection exhaustion</td>
+<td>Use RDS Proxy or increase max_connections</td>
+</tr>
+<tr>
+<td>Slow queries</td>
+<td>Missing indexes</td>
+<td>Run EXPLAIN ANALYZE and add appropriate indexes</td>
+</tr>
+<tr>
+<td>RLS blocking access</td>
+<td>Tenant ID not set</td>
+<td>Ensure <code>app.current_tenant_id</code> is set in session</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lambda-function-errors">Lambda Function Errors</h3>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 45%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cold start &gt; 10s</td>
+<td>VPC attachment</td>
+<td>Use provisioned concurrency for critical functions</td>
+</tr>
+<tr>
+<td>Timeout</td>
+<td>Slow downstream services</td>
+<td>Increase timeout, check DB/API latency</td>
+</tr>
+<tr>
+<td>Out of memory</td>
+<td>Large payloads/responses</td>
+<td>Increase memory allocation (also increases CPU)</td>
+</tr>
+<tr>
+<td>Permission denied</td>
+<td>IAM role misconfigured</td>
+<td>Check Lambda execution role policies</td>
+</tr>
+<tr>
+<td>Module not found</td>
+<td>Missing dependency</td>
+<td>Verify all dependencies in package.json</td>
+</tr>
+<tr>
+<td>Handler not found</td>
+<td>Incorrect handler path</td>
+<td>Check function configuration in CDK</td>
+</tr>
+</tbody>
+</table>
+<h3 id="litellm-ecs-issues">LiteLLM / ECS Issues</h3>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 45%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>503 Service Unavailable</td>
+<td>ECS task unhealthy</td>
+<td>Check ECS service events and task logs</td>
+</tr>
+<tr>
+<td>Provider timeout</td>
+<td>Invalid API key</td>
+<td>Verify provider secrets in Secrets Manager</td>
+</tr>
+<tr>
+<td>Rate limited</td>
+<td>Too many requests</td>
+<td>Implement exponential backoff retry</td>
+</tr>
+<tr>
+<td>Wrong model response</td>
+<td>Model misconfigured</td>
+<td>Check config.yaml model mappings</td>
+</tr>
+<tr>
+<td>Container crashes</td>
+<td>Memory exhaustion</td>
+<td>Increase task memory in CDK</td>
+</tr>
+<tr>
+<td>No healthy targets</td>
+<td>Health check failing</td>
+<td>Verify health check endpoint returns 200</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sagemaker-issues-tier-3">SageMaker Issues (Tier 3+)</h3>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 45%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Endpoint failed to create</td>
+<td>Insufficient capacity</td>
+<td>Try different instance type or region</td>
+</tr>
+<tr>
+<td>InvocationError</td>
+<td>Model loading failed</td>
+<td>Check CloudWatch logs for model errors</td>
+</tr>
+<tr>
+<td>Slow cold start</td>
+<td>Large model size</td>
+<td>Use warm pools or smaller model variant</td>
+</tr>
+<tr>
+<td>Capacity error</td>
+<td>Instance quota reached</td>
+<td>Request SageMaker quota increase</td>
+</tr>
+<tr>
+<td>Timeout</td>
+<td>Long inference time</td>
+<td>Increase endpoint timeout or optimize model</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cognito-authentication-issues">Cognito Authentication Issues</h3>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 45%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Invalid grant</td>
+<td>Expired refresh token</td>
+<td>Re-authenticate user</td>
+</tr>
+<tr>
+<td>User not confirmed</td>
+<td>Email not verified</td>
+<td>Check email or manually confirm user</td>
+</tr>
+<tr>
+<td>MFA required</td>
+<td>MFA not set up</td>
+<td>Complete MFA setup flow</td>
+</tr>
+<tr>
+<td>Invalid client</td>
+<td>Wrong client ID</td>
+<td>Verify app client ID in configuration</td>
+</tr>
+<tr>
+<td>Callback URL mismatch</td>
+<td>URL not whitelisted</td>
+<td>Add URL to allowed callbacks in Cognito</td>
+</tr>
+</tbody>
+</table>
+<h3 id="admin-dashboard-issues">Admin Dashboard Issues</h3>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 45%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>403 Forbidden</td>
+<td>CloudFront OAC issue</td>
+<td>Verify S3 bucket policy allows CloudFront</td>
+</tr>
+<tr>
+<td>API calls fail</td>
+<td>CORS configuration</td>
+<td>Check API Gateway CORS settings</td>
+</tr>
+<tr>
+<td>Login redirect loop</td>
+<td>Cookie domain mismatch</td>
+<td>Verify cookie domain matches site domain</td>
+</tr>
+<tr>
+<td>Blank page</td>
+<td>Build error</td>
+<td>Check <code>next build</code> output for errors</td>
+</tr>
+<tr>
+<td>Slow load</td>
+<td>Large bundle size</td>
+<td>Enable code splitting and lazy loading</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="log-locations">Log Locations</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>CloudWatch Log Group</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API Gateway</td>
+<td><code>/aws/api-gateway/radiant-{env}-api</code></td>
+</tr>
+<tr>
+<td>Lambda Functions</td>
+<td><code>/aws/lambda/Radiant-{env}-*</code></td>
+</tr>
+<tr>
+<td>LiteLLM (ECS)</td>
+<td><code>/ecs/radiant-{env}-litellm</code></td>
+</tr>
+<tr>
+<td>SageMaker Endpoints</td>
+<td><code>/aws/sagemaker/Endpoints/radiant-*</code></td>
+</tr>
+<tr>
+<td>Aurora PostgreSQL</td>
+<td><code>/aws/rds/cluster/radiant-{env}/postgresql</code></td>
+</tr>
+<tr>
+<td>CloudFront</td>
+<td>Standard CloudFront logs in S3</td>
+</tr>
+</tbody>
+</table>
+<h3 id="viewing-logs">Viewing Logs</h3>
+<pre class="bash"><code># Tail Lambda logs in real-time
+aws logs tail /aws/lambda/Radiant-dev-router --follow
+
+# View ECS logs
+aws logs tail /ecs/radiant-dev-litellm --follow
+
+# Search logs for errors
+aws logs filter-log-events \
+  --log-group-name /aws/lambda/Radiant-dev-router \
+  --filter-pattern &quot;ERROR&quot; \
+  --start-time $(date -d &#39;1 hour ago&#39; +%s)000</code></pre>
+<hr />
+<h2 id="health-check-endpoints">Health Check Endpoints</h2>
+<pre class="bash"><code># Platform API health
+curl https://api.YOUR_DOMAIN/health
+# Expected: {&quot;status&quot;:&quot;healthy&quot;,&quot;version&quot;:&quot;4.17.0&quot;}
+
+# LiteLLM health
+curl https://api.YOUR_DOMAIN/v2/litellm/health
+# Expected: {&quot;status&quot;:&quot;healthy&quot;}
+
+# Admin API health  
+curl https://admin-api.YOUR_DOMAIN/health
+
+# Model registry status
+curl https://api.YOUR_DOMAIN/v2/models/status</code></pre>
+<hr />
+<h2 id="emergency-procedures">Emergency Procedures</h2>
+<h3 id="database-restore-from-snapshot">Database Restore from Snapshot</h3>
+<pre class="bash"><code># List available snapshots
+aws rds describe-db-cluster-snapshots \
+  --db-cluster-identifier radiant-prod-cluster \
+  --query &#39;DBClusterSnapshots[*].[DBClusterSnapshotIdentifier,SnapshotCreateTime]&#39; \
+  --output table
+
+# Restore from snapshot
+aws rds restore-db-cluster-from-snapshot \
+  --db-cluster-identifier radiant-prod-restored \
+  --snapshot-identifier your-snapshot-id \
+  --engine aurora-postgresql \
+  --vpc-security-group-ids sg-xxx \
+  --db-subnet-group-name radiant-prod-db-subnet</code></pre>
+<h3 id="point-in-time-recovery">Point-in-Time Recovery</h3>
+<pre class="bash"><code>aws rds restore-db-cluster-to-point-in-time \
+  --source-db-cluster-identifier radiant-prod-cluster \
+  --db-cluster-identifier radiant-prod-recovered \
+  --restore-to-time &quot;2024-12-20T10:00:00Z&quot; \
+  --vpc-security-group-ids sg-xxx \
+  --db-subnet-group-name radiant-prod-db-subnet</code></pre>
+<h3 id="rollback-cdk-deployment">Rollback CDK Deployment</h3>
+<pre class="bash"><code># Rollback to previous deployment
+cd packages/infrastructure
+npx cdk deploy Radiant-prod-API \
+  --context environment=prod \
+  --context tier=3 \
+  --rollback</code></pre>
+<h3 id="disable-problematic-model">Disable Problematic Model</h3>
+<pre class="sql"><code>-- Connect to Aurora and run:
+UPDATE models 
+SET status = &#39;disabled&#39;, 
+    disabled_reason = &#39;Emergency disable due to errors&#39;,
+    updated_at = NOW()
+WHERE model_id = &#39;problematic-model-id&#39;;</code></pre>
+<h3 id="force-scale-down-sagemaker">Force Scale Down SageMaker</h3>
+<pre class="bash"><code># Scale endpoint to 0 instances
+aws sagemaker update-endpoint-weights-and-capacities \
+  --endpoint-name radiant-prod-model-endpoint \
+  --desired-weights-and-capacities &#39;[{&quot;VariantName&quot;:&quot;AllTraffic&quot;,&quot;DesiredInstanceCount&quot;:0}]&#39;</code></pre>
+<hr />
+<h2 id="performance-benchmarks">Performance Benchmarks</h2>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 25%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Target</th>
+<th>Acceptable</th>
+<th>Action if Exceeded</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API Gateway p50 latency</td>
+<td>&lt; 50ms</td>
+<td>&lt; 100ms</td>
+<td>Check Lambda cold starts</td>
+</tr>
+<tr>
+<td>API Gateway p99 latency</td>
+<td>&lt; 200ms</td>
+<td>&lt; 500ms</td>
+<td>Enable provisioned concurrency</td>
+</tr>
+<tr>
+<td>Chat streaming start</td>
+<td>&lt; 500ms</td>
+<td>&lt; 1s</td>
+<td>Check LiteLLM/provider latency</td>
+</tr>
+<tr>
+<td>Admin dashboard load</td>
+<td>&lt; 2s</td>
+<td>&lt; 3s</td>
+<td>Optimize bundle, enable CDN caching</td>
+</tr>
+<tr>
+<td>Model warm-up time</td>
+<td>&lt; 3 min</td>
+<td>&lt; 5 min</td>
+<td>Use larger instance or warm pools</td>
+</tr>
+<tr>
+<td>Aurora query latency</td>
+<td>&lt; 10ms</td>
+<td>&lt; 50ms</td>
+<td>Add indexes, optimize queries</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="support-checklist">Support Checklist</h2>
+<p>When reporting issues, include:</p>
+<ol type="1">
+<li><strong>Environment</strong>: dev/staging/prod</li>
+<li><strong>Tier</strong>: 1-5</li>
+<li><strong>Error message</strong>: Full error text</li>
+<li><strong>Request ID</strong>: From response headers</li>
+<li><strong>Timestamp</strong>: When the error occurred</li>
+<li><strong>Steps to reproduce</strong>: What actions led to the error</li>
+<li><strong>Relevant logs</strong>: CloudWatch log excerpts</li>
+</ol>
+<hr />
+<h2 id="useful-aws-cli-commands">Useful AWS CLI Commands</h2>
+<pre class="bash"><code># Check stack status
+aws cloudformation describe-stacks --stack-name Radiant-dev-API \
+  --query &#39;Stacks[0].StackStatus&#39;
+
+# List recent CloudFormation events
+aws cloudformation describe-stack-events --stack-name Radiant-dev-API \
+  --query &#39;StackEvents[0:10].[Timestamp,ResourceStatus,ResourceType,LogicalResourceId]&#39; \
+  --output table
+
+# Check Lambda function configuration
+aws lambda get-function-configuration --function-name Radiant-dev-router
+
+# List ECS services
+aws ecs list-services --cluster radiant-dev-cluster
+
+# Describe ECS service
+aws ecs describe-services --cluster radiant-dev-cluster \
+  --services radiant-dev-litellm
+
+# Check Secrets Manager secret
+aws secretsmanager get-secret-value --secret-id radiant/dev/db-credentials \
+  --query &#39;SecretString&#39; --output text | jq .</code></pre>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

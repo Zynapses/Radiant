@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>08 SWIFT DEPLOYER - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>08 SWIFT DEPLOYER</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/publications/08-SWIFT-DEPLOYER.md</div>
+  </div>
+  
+  <h1 id="swift-deployer-app-reference">Swift Deployer App Reference</h1>
+<h2 id="app-architecture">App Architecture</h2>
+<h3 id="overview">Overview</h3>
+<p>The Swift Deployer is a native macOS application for deploying and managing RADIANT infrastructure to AWS.</p>
+<p><strong>Requirements:</strong> - macOS 13.0 (Ventura) or later - Swift 5.9+ - Xcode 15+</p>
+<h3 id="file-structure-36-files">File Structure (36 Files)</h3>
+<pre><code>apps/swift-deployer/
+├── Package.swift
+└── Sources/RadiantDeployer/
+    ├── RadiantDeployerApp.swift          # App entry point
+    ├── AppState.swift                    # Global state management
+    │
+    ├── Config/
+    │   └── RadiantConfig.swift           # App configuration
+    │
+    ├── Models/ (6 files)
+    │   ├── Configuration.swift           # Deployment configuration
+    │   ├── Credentials.swift             # AWS credentials model
+    │   ├── Deployment.swift              # Deployment state model
+    │   ├── DomainConfiguration.swift     # Domain settings
+    │   ├── InstallationParameters.swift  # Install params
+    │   └── ManagedApp.swift              # Managed app model
+    │
+    ├── Services/ (21 files)
+    │   ├── AIAssistantService.swift      # AI deployment assistant
+    │   ├── AIRegistryService.swift       # AI model registry
+    │   ├── APIService.swift              # API communication
+    │   ├── AWSService.swift              # AWS SDK wrapper
+    │   ├── AuditLogger.swift             # Audit logging
+    │   ├── CDKService.swift              # CDK deployment
+    │   ├── CredentialService.swift       # Credential management
+    │   ├── DNSService.swift              # DNS configuration
+    │   ├── DatabaseService.swift         # Local SQLite/SQLCipher
+    │   ├── DeploymentLockService.swift   # Deployment locking
+    │   ├── DeploymentService.swift       # Main deployment logic
+    │   ├── GitHubPackageRegistry.swift   # Package downloads
+    │   ├── HealthCheckService.swift      # Health monitoring
+    │   ├── LocalStorageManager.swift     # Encrypted local storage
+    │   ├── MultiRegionService.swift      # Multi-region deployment
+    │   ├── OnePasswordService.swift      # 1Password integration
+    │   ├── PackageService.swift          # Package management
+    │   ├── SeedDataService.swift         # Database seeding
+    │   ├── SnapshotService.swift         # State snapshots
+    │   ├── TimeoutService.swift          # Timeout handling
+    │   └── VoiceInputService.swift       # Voice commands
+    │
+    ├── Views/ (8+ files)
+    │   ├── ABTestingView.swift           # A/B testing config
+    │   ├── ContentView.swift             # Main content
+    │   ├── DeploymentView.swift          # Deployment UI
+    │   ├── SettingsView.swift            # App settings
+    │   └── ... (other views)
+    │
+    └── Components/ (4 files)
+        ├── MacOSComponents.swift         # Design tokens &amp; components
+        ├── AppCommands.swift             # Menu bar commands
+        ├── DataTableComponents.swift     # Table components
+        └── DetailViewComponents.swift    # Detail view patterns</code></pre>
+<hr />
+<h2 id="models">Models</h2>
+<h3 id="configuration.swift">Configuration.swift</h3>
+<p>Deployment configuration model.</p>
+<pre class="swift"><code>struct DeploymentConfiguration: Codable, Sendable {
+    var appId: String
+    var environment: Environment
+    var tier: Int
+    var region: AWSRegion
+    var domain: String?
+    var enabledStacks: Set&lt;StackName&gt;
+    var customParameters: [String: String]
+}
+
+enum Environment: String, Codable, CaseIterable, Sendable {
+    case development = &quot;dev&quot;
+    case staging = &quot;staging&quot;
+    case production = &quot;prod&quot;
+}
+
+enum StackName: String, Codable, CaseIterable, Sendable {
+    case networking
+    case foundation
+    case data
+    case storage
+    case auth
+    case ai
+    case api
+    case admin
+    case batch
+    case collaboration
+    case monitoring
+    case security
+    case webhooks
+    case scheduledTasks
+    case multiRegion
+}</code></pre>
+<h3 id="credentials.swift">Credentials.swift</h3>
+<p>AWS credentials model.</p>
+<pre class="swift"><code>struct AWSCredentials: Codable, Sendable {
+    let accessKeyId: String
+    let secretAccessKey: String
+    let sessionToken: String?
+    let region: String
+    let profile: String?
+    let expiresAt: Date?
+    
+    var isExpired: Bool {
+        guard let expiresAt else { return false }
+        return Date() &gt; expiresAt
+    }
+}
+
+struct CredentialProfile: Codable, Identifiable, Sendable {
+    let id: UUID
+    var name: String
+    var credentials: AWSCredentials
+    var isDefault: Bool
+    var lastUsed: Date?
+}</code></pre>
+<h3 id="deployment.swift">Deployment.swift</h3>
+<p>Deployment state tracking.</p>
+<pre class="swift"><code>struct Deployment: Codable, Identifiable, Sendable {
+    let id: UUID
+    var configuration: DeploymentConfiguration
+    var status: DeploymentStatus
+    var stackStatuses: [StackName: StackStatus]
+    var startedAt: Date
+    var completedAt: Date?
+    var errorMessage: String?
+    var outputs: [String: String]
+}
+
+enum DeploymentStatus: String, Codable, Sendable {
+    case pending
+    case preparing
+    case deploying
+    case verifying
+    case completed
+    case failed
+    case rollingBack
+    case cancelled
+}
+
+enum StackStatus: String, Codable, Sendable {
+    case pending
+    case creating
+    case updating
+    case complete
+    case failed
+    case rollbackInProgress
+    case rollbackComplete
+    case deleted
+}</code></pre>
+<hr />
+<h2 id="services">Services</h2>
+<h3 id="cdkservice.swift">CDKService.swift</h3>
+<p>AWS CDK deployment service.</p>
+<pre class="swift"><code>actor CDKService {
+    private let shell: ShellService
+    private let logger: AuditLogger
+    
+    // Deploy a single stack
+    func deployStack(
+        _ stack: StackName,
+        config: DeploymentConfiguration,
+        credentials: AWSCredentials
+    ) async throws -&gt; StackOutput {
+        let command = buildCDKCommand(
+            action: &quot;deploy&quot;,
+            stack: stack,
+            config: config
+        )
+        
+        return try await shell.execute(
+            command,
+            environment: credentials.asEnvironment()
+        )
+    }
+    
+    // Deploy all stacks in dependency order
+    func deployAllStacks(
+        config: DeploymentConfiguration,
+        credentials: AWSCredentials,
+        progressHandler: @Sendable (StackName, StackStatus) -&gt; Void
+    ) async throws -&gt; DeploymentResult {
+        let orderedStacks = topologicalSort(config.enabledStacks)
+        var outputs: [StackName: StackOutput] = [:]
+        
+        for stack in orderedStacks {
+            progressHandler(stack, .creating)
+            do {
+                outputs[stack] = try await deployStack(stack, config: config, credentials: credentials)
+                progressHandler(stack, .complete)
+            } catch {
+                progressHandler(stack, .failed)
+                throw DeploymentError.stackFailed(stack, error)
+            }
+        }
+        
+        return DeploymentResult(outputs: outputs)
+    }
+    
+    // Stack dependency order
+    private func topologicalSort(_ stacks: Set&lt;StackName&gt;) -&gt; [StackName] {
+        // networking → foundation → data/storage/auth → ai → api/admin → rest
+        let order: [StackName] = [
+            .networking, .foundation, .data, .storage, .auth,
+            .ai, .api, .admin, .batch, .collaboration,
+            .monitoring, .security, .webhooks, .scheduledTasks, .multiRegion
+        ]
+        return order.filter { stacks.contains($0) }
+    }
+}</code></pre>
+<h3 id="deploymentservice.swift">DeploymentService.swift</h3>
+<p>Main deployment orchestration.</p>
+<pre class="swift"><code>@MainActor
+class DeploymentService: ObservableObject {
+    @Published var currentDeployment: Deployment?
+    @Published var deploymentHistory: [Deployment] = []
+    @Published var isDeploying = false
+    
+    private let cdkService: CDKService
+    private let healthService: HealthCheckService
+    private let auditLogger: AuditLogger
+    private let localStorage: LocalStorageManager
+    
+    func startDeployment(config: DeploymentConfiguration) async throws {
+        guard !isDeploying else {
+            throw DeploymentError.alreadyInProgress
+        }
+        
+        isDeploying = true
+        let deployment = Deployment(
+            id: UUID(),
+            configuration: config,
+            status: .preparing,
+            stackStatuses: [:],
+            startedAt: Date()
+        )
+        currentDeployment = deployment
+        
+        do {
+            // 1. Validate configuration
+            try await validateConfiguration(config)
+            
+            // 2. Acquire deployment lock
+            try await acquireLock(config.appId)
+            
+            // 3. Deploy stacks
+            currentDeployment?.status = .deploying
+            let result = try await cdkService.deployAllStacks(
+                config: config,
+                credentials: try await getCredentials(),
+                progressHandler: { [weak self] stack, status in
+                    Task { @MainActor in
+                        self?.currentDeployment?.stackStatuses[stack] = status
+                    }
+                }
+            )
+            
+            // 4. Verify deployment
+            currentDeployment?.status = .verifying
+            try await healthService.verifyDeployment(result)
+            
+            // 5. Complete
+            currentDeployment?.status = .completed
+            currentDeployment?.completedAt = Date()
+            currentDeployment?.outputs = result.flatOutputs
+            
+        } catch {
+            currentDeployment?.status = .failed
+            currentDeployment?.errorMessage = error.localizedDescription
+            throw error
+        } finally {
+            isDeploying = false
+            if let deployment = currentDeployment {
+                deploymentHistory.append(deployment)
+                try? await localStorage.saveDeployment(deployment)
+            }
+        }
+    }
+    
+    func rollback(deploymentId: UUID) async throws {
+        // Rollback implementation
+    }
+}</code></pre>
+<h3 id="aiassistantservice.swift">AIAssistantService.swift</h3>
+<p>AI-powered deployment assistant.</p>
+<pre class="swift"><code>actor AIAssistantService {
+    private let apiService: APIService
+    
+    struct AssistantResponse: Sendable {
+        let message: String
+        let suggestions: [Suggestion]
+        let actions: [SuggestedAction]
+    }
+    
+    enum SuggestedAction: Sendable {
+        case deployStack(StackName)
+        case checkHealth
+        case viewLogs(String)
+        case runDiagnostics
+        case contactSupport
+    }
+    
+    // Get deployment guidance
+    func getDeploymentGuidance(
+        for config: DeploymentConfiguration,
+        currentStatus: DeploymentStatus?
+    ) async throws -&gt; AssistantResponse {
+        let prompt = buildGuidancePrompt(config: config, status: currentStatus)
+        let response = try await apiService.chat(
+            messages: [.init(role: .user, content: prompt)],
+            model: &quot;anthropic/claude-3-haiku&quot;
+        )
+        return parseAssistantResponse(response)
+    }
+    
+    // Diagnose deployment error
+    func diagnoseError(
+        error: Error,
+        stackName: StackName,
+        logs: String
+    ) async throws -&gt; AssistantResponse {
+        let prompt = &quot;&quot;&quot;
+        Analyze this AWS CDK deployment error and provide:
+        1. Root cause analysis
+        2. Specific fix steps
+        3. Prevention recommendations
+        
+        Stack: \(stackName.rawValue)
+        Error: \(error.localizedDescription)
+        Logs:
+        \(logs.prefix(2000))
+        &quot;&quot;&quot;
+        
+        let response = try await apiService.chat(
+            messages: [.init(role: .user, content: prompt)],
+            model: &quot;anthropic/claude-3-5-sonnet&quot;
+        )
+        return parseAssistantResponse(response)
+    }
+}</code></pre>
+<h3 id="localstoragemanager.swift">LocalStorageManager.swift</h3>
+<p>Encrypted local storage using SQLCipher.</p>
+<pre class="swift"><code>actor LocalStorageManager {
+    private let db: Connection
+    private let encryptionKey: String
+    
+    init() throws {
+        let path = LocalStorageManager.databasePath
+        db = try Connection(path)
+        encryptionKey = try KeychainService.getOrCreateDatabaseKey()
+        try db.key(encryptionKey)
+        try createTablesIfNeeded()
+    }
+    
+    // Tables
+    private func createTablesIfNeeded() throws {
+        try db.execute(&quot;&quot;&quot;
+            CREATE TABLE IF NOT EXISTS deployments (
+                id TEXT PRIMARY KEY,
+                data BLOB NOT NULL,
+                created_at INTEGER NOT NULL
+            );
+            
+            CREATE TABLE IF NOT EXISTS credentials (
+                id TEXT PRIMARY KEY,
+                profile_name TEXT NOT NULL,
+                encrypted_data BLOB NOT NULL,
+                is_default INTEGER DEFAULT 0,
+                last_used INTEGER
+            );
+            
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            );
+        &quot;&quot;&quot;)
+    }
+    
+    // Save deployment
+    func saveDeployment(_ deployment: Deployment) throws {
+        let data = try JSONEncoder().encode(deployment)
+        try db.run(&quot;&quot;&quot;
+            INSERT OR REPLACE INTO deployments (id, data, created_at)
+            VALUES (?, ?, ?)
+        &quot;&quot;&quot;, deployment.id.uuidString, data, Date().timeIntervalSince1970)
+    }
+    
+    // Get deployment history
+    func getDeploymentHistory() throws -&gt; [Deployment] {
+        let rows = try db.prepare(&quot;&quot;&quot;
+            SELECT data FROM deployments ORDER BY created_at DESC LIMIT 100
+        &quot;&quot;&quot;)
+        return try rows.compactMap { row in
+            guard let data = row[0] as? Data else { return nil }
+            return try JSONDecoder().decode(Deployment.self, from: data)
+        }
+    }
+    
+    // Credential management
+    func saveCredentials(_ credentials: CredentialProfile) throws {
+        let encrypted = try encrypt(credentials)
+        try db.run(&quot;&quot;&quot;
+            INSERT OR REPLACE INTO credentials (id, profile_name, encrypted_data, is_default, last_used)
+            VALUES (?, ?, ?, ?, ?)
+        &quot;&quot;&quot;, credentials.id.uuidString, credentials.name, encrypted, 
+             credentials.isDefault ? 1 : 0, credentials.lastUsed?.timeIntervalSince1970)
+    }
+}</code></pre>
+<h3 id="healthcheckservice.swift">HealthCheckService.swift</h3>
+<p>Deployment health verification.</p>
+<pre class="swift"><code>actor HealthCheckService {
+    struct HealthCheckResult: Sendable {
+        let service: String
+        let status: HealthStatus
+        let latencyMs: Int?
+        let message: String?
+    }
+    
+    enum HealthStatus: Sendable {
+        case healthy
+        case degraded
+        case unhealthy
+        case unknown
+    }
+    
+    func verifyDeployment(_ result: DeploymentResult) async throws {
+        var checks: [HealthCheckResult] = []
+        
+        // Check API Gateway
+        if let apiUrl = result.outputs[&quot;ApiUrl&quot;] {
+            checks.append(await checkEndpoint(apiUrl + &quot;/health&quot;, service: &quot;API Gateway&quot;))
+        }
+        
+        // Check LiteLLM
+        if let litellmUrl = result.outputs[&quot;LiteLLMUrl&quot;] {
+            checks.append(await checkEndpoint(litellmUrl + &quot;/health&quot;, service: &quot;LiteLLM&quot;))
+        }
+        
+        // Check Database
+        checks.append(await checkDatabase(result.outputs[&quot;DatabaseEndpoint&quot;]))
+        
+        // Evaluate results
+        let unhealthy = checks.filter { $0.status == .unhealthy }
+        if !unhealthy.isEmpty {
+            throw HealthCheckError.servicesUnhealthy(unhealthy)
+        }
+    }
+    
+    private func checkEndpoint(_ url: String, service: String) async -&gt; HealthCheckResult {
+        let start = Date()
+        do {
+            let (_, response) = try await URLSession.shared.data(from: URL(string: url)!)
+            let httpResponse = response as! HTTPURLResponse
+            let latency = Int(Date().timeIntervalSince(start) * 1000)
+            
+            return HealthCheckResult(
+                service: service,
+                status: httpResponse.statusCode == 200 ? .healthy : .degraded,
+                latencyMs: latency,
+                message: nil
+            )
+        } catch {
+            return HealthCheckResult(
+                service: service,
+                status: .unhealthy,
+                latencyMs: nil,
+                message: error.localizedDescription
+            )
+        }
+    }
+}</code></pre>
+<hr />
+<h2 id="components">Components</h2>
+<h3 id="macoscomponents.swift">MacOSComponents.swift</h3>
+<p>Design tokens and reusable components.</p>
+<pre class="swift"><code>// Design Tokens
+enum RadiantSpacing {
+    static let xxs: CGFloat = 2
+    static let xs: CGFloat = 4
+    static let sm: CGFloat = 8
+    static let md: CGFloat = 12
+    static let lg: CGFloat = 16
+    static let xl: CGFloat = 24
+}
+
+enum RadiantRadius {
+    static let sm: CGFloat = 4
+    static let md: CGFloat = 8
+    static let lg: CGFloat = 12
+    static let xl: CGFloat = 16
+}
+
+// Status Badge Component
+struct StatusBadge: View {
+    let status: String
+    let color: Color
+    
+    var body: some View {
+        Text(status)
+            .font(.caption)
+            .fontWeight(.medium)
+            .padding(.horizontal, RadiantSpacing.sm)
+            .padding(.vertical, RadiantSpacing.xxs)
+            .background(color.opacity(0.15))
+            .foregroundColor(color)
+            .cornerRadius(RadiantRadius.sm)
+    }
+}
+
+// Progress Indicator
+struct DeploymentProgressView: View {
+    let stacks: [StackName]
+    let statuses: [StackName: StackStatus]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: RadiantSpacing.sm) {
+            ForEach(stacks, id: \.self) { stack in
+                HStack {
+                    statusIcon(for: statuses[stack] ?? .pending)
+                    Text(stack.rawValue)
+                        .font(.system(.body, design: .monospaced))
+                    Spacer()
+                    StatusBadge(
+                        status: (statuses[stack] ?? .pending).rawValue,
+                        color: statusColor(statuses[stack] ?? .pending)
+                    )
+                }
+            }
+        }
+    }
+}</code></pre>
+<h3 id="appcommands.swift">AppCommands.swift</h3>
+<p>Menu bar commands with keyboard shortcuts.</p>
+<pre class="swift"><code>struct AppCommands: Commands {
+    @ObservedObject var appState: AppState
+    
+    var body: some Commands {
+        CommandGroup(replacing: .newItem) {
+            Button(&quot;New Deployment&quot;) {
+                appState.showNewDeploymentSheet = true
+            }
+            .keyboardShortcut(&quot;n&quot;, modifiers: .command)
+            
+            Button(&quot;Import Configuration...&quot;) {
+                appState.importConfiguration()
+            }
+            .keyboardShortcut(&quot;i&quot;, modifiers: [.command, .shift])
+        }
+        
+        CommandMenu(&quot;Deployment&quot;) {
+            Button(&quot;Deploy All Stacks&quot;) {
+                Task { await appState.deployAll() }
+            }
+            .keyboardShortcut(&quot;d&quot;, modifiers: [.command, .shift])
+            .disabled(appState.isDeploying)
+            
+            Button(&quot;Stop Deployment&quot;) {
+                appState.stopDeployment()
+            }
+            .keyboardShortcut(&quot;.&quot;, modifiers: .command)
+            .disabled(!appState.isDeploying)
+            
+            Divider()
+            
+            Button(&quot;View Logs&quot;) {
+                appState.showLogs = true
+            }
+            .keyboardShortcut(&quot;l&quot;, modifiers: [.command, .option])
+            
+            Button(&quot;Run Health Check&quot;) {
+                Task { await appState.runHealthCheck() }
+            }
+            .keyboardShortcut(&quot;h&quot;, modifiers: [.command, .shift])
+        }
+        
+        CommandMenu(&quot;AWS&quot;) {
+            Button(&quot;Switch Profile...&quot;) {
+                appState.showProfileSwitcher = true
+            }
+            .keyboardShortcut(&quot;p&quot;, modifiers: [.command, .option])
+            
+            Button(&quot;Refresh Credentials&quot;) {
+                Task { await appState.refreshCredentials() }
+            }
+            .keyboardShortcut(&quot;r&quot;, modifiers: [.command, .shift])
+        }
+    }
+}</code></pre>
+<hr />
+<h2 id="ui-patterns-10-macos-patterns">UI Patterns (10 macOS Patterns)</h2>
+<p>The Swift Deployer follows these macOS design patterns:</p>
+<ol type="1">
+<li><strong>NavigationSplitView</strong> - Sidebar + Content + Inspector</li>
+<li><strong>Liquid Glass</strong> - On navigation/controls only</li>
+<li><strong>Toolbar-as-Command-Center</strong> - Grouped actions + overflow</li>
+<li><strong>Scroll Edge Effects</strong> - Floating UI legibility</li>
+<li><strong>Master List → Detail</strong> - 3-level navigation</li>
+<li><strong>Search as First-Class</strong> - Toolbar trailing position</li>
+<li><strong>Tables for Data</strong> - Lists for collections</li>
+<li><strong>Multi-Select + Context Menus</strong> - Drag &amp; drop support</li>
+<li><strong>Full Menu Bar</strong> - Keyboard shortcuts</li>
+<li><strong>Settings Window + Inspectors</strong> - macOS-native patterns</li>
+</ol>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

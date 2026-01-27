@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>20 HOUR SPRINT SUMMARY - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>20 HOUR SPRINT SUMMARY</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/20-HOUR-SPRINT-SUMMARY.md</div>
+  </div>
+  
+  <h1 id="radiant-20-hour-sprint-summary">RADIANT 20-Hour Sprint Summary</h1>
+<h2 id="december-28-29-2025">December 28-29, 2025</h2>
+<p><strong>Versions Shipped</strong>: 4.18.6 → 4.18.21 (16 releases)</p>
+<hr />
+<h2 id="v4.18.21---competitive-strategy-implementation">v4.18.21 - Competitive Strategy Implementation</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Sovereign Routing</strong></td>
+<td>Detect provider refusals and automatically route to uncensored self-hosted models</td>
+</tr>
+<tr>
+<td><strong>Code Verification Service</strong></td>
+<td>Execute code in sandbox before delivering to user, only deliver if exit code 0</td>
+</tr>
+<tr>
+<td><strong>Browser Agent Service</strong></td>
+<td>Dispatch async research tasks that run 30+ minutes with recursive crawling</td>
+</tr>
+<tr>
+<td><strong>Dynamic Renderer</strong></td>
+<td>React component factory generating interactive calculators, tables, forms instead of text</td>
+</tr>
+<tr>
+<td><strong>Competitive Strategy Doc</strong></td>
+<td>Full 7-gap strategy documenting how Radiant beats ALL singular LLMs</td>
+</tr>
+<tr>
+<td><strong>Uncensored Models Config</strong></td>
+<td>4 uncensored models (Dolphin-Mixtral, Llama-3-Uncensored, WizardLM, Nous-Hermes)</td>
+</tr>
+<tr>
+<td><strong>Library Registry Update</strong></td>
+<td>Added 10 new libraries including 4 uncensored LLMs and 6 mechanical engineering tools</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.20---bipolar-rating-system">v4.18.20 - Bipolar Rating System</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Bipolar Rating Scale</strong></td>
+<td>Novel -5 to +5 rating scale allowing explicit negative feedback (not just low stars)</td>
+</tr>
+<tr>
+<td><strong>Multi-Dimension Ratings</strong></td>
+<td>Rate accuracy, helpfulness, clarity, completeness, speed, tone, creativity separately</td>
+</tr>
+<tr>
+<td><strong>Quick Ratings</strong></td>
+<td>Emoji-based ratings (terrible/bad/meh/good/amazing) mapping to bipolar values</td>
+</tr>
+<tr>
+<td><strong>Net Sentiment Score</strong></td>
+<td>Analytics metric: (positive% - negative%) × 100</td>
+</tr>
+<tr>
+<td><strong>User Calibration</strong></td>
+<td>Detect harsh vs generous raters and apply calibration factor</td>
+</tr>
+<tr>
+<td><strong>Learning Candidates</strong></td>
+<td>Extreme ratings (±4, ±5) automatically create learning candidates for LoRA training</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.19---agi-brain-consciousness-improvements">v4.18.19 - AGI Brain Consciousness Improvements</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Conscious Orchestrator</strong></td>
+<td>Architecture inversion: consciousness is now the entry point, not a plugin</td>
+</tr>
+<tr>
+<td><strong>Enhanced Affect Bindings</strong></td>
+<td>Added presencePenalty and frequencyPenalty based on curiosity/frustration/boredom</td>
+</tr>
+<tr>
+<td><strong>Vector RAG for Libraries</strong></td>
+<td>Semantic similarity search for library selection using Amazon Titan embeddings</td>
+</tr>
+<tr>
+<td><strong>Memory Consolidation</strong></td>
+<td>Dream phase that compresses recent experiences during heartbeat</td>
+</tr>
+<tr>
+<td><strong>Idle Thoughts</strong></td>
+<td>Generate wondering, reflection, or curiosity thoughts when idle</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.18---open-source-library-registry">v4.18.18 - Open Source Library Registry</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>156 Open Source Libraries</strong></td>
+<td>Registry of tools across 32 categories with proficiency matching</td>
+</tr>
+<tr>
+<td><strong>8 Proficiency Dimensions</strong></td>
+<td>reasoning_depth, mathematical, code_gen, creative, research, factual, multi_step, terminology</td>
+</tr>
+<tr>
+<td><strong>Library Assist Service</strong></td>
+<td>AI queries matched to helpful libraries with context block injection</td>
+</tr>
+<tr>
+<td><strong>Multi-Tenant Execution</strong></td>
+<td>Concurrent library execution with per-tenant and per-user limits</td>
+</tr>
+<tr>
+<td><strong>Admin Dashboard</strong></td>
+<td>Library management, enable/disable, usage analytics</td>
+</tr>
+<tr>
+<td><strong>Daily Update Service</strong></td>
+<td>EventBridge Lambda syncing library registry automatically</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.17---zero-cost-ego-system">v4.18.17 - Zero-Cost Ego System</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Database State Injection</strong></td>
+<td>Persistent consciousness at $0/month using PostgreSQL + existing model calls</td>
+</tr>
+<tr>
+<td><strong>Ego Context Service</strong></td>
+<td>Build context from identity, affect, working memory, goals</td>
+</tr>
+<tr>
+<td><strong>Admin Ego Dashboard</strong></td>
+<td>Configuration, identity traits, emotional state, memory, goals management</td>
+</tr>
+<tr>
+<td><strong>Cost Savings</strong></td>
+<td>$0/month vs $360/month SageMaker or $35/month serverless</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.16---local-ego-architecture">v4.18.16 - Local Ego Architecture</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Shared Model Infrastructure</strong></td>
+<td>Small model (Phi-3/Qwen) handles simple queries, recruits external for complex</td>
+</tr>
+<tr>
+<td><strong>Economic Model</strong></td>
+<td>~$3.60/tenant/month for 24/7 consciousness with 100 tenants sharing g5.xlarge</td>
+</tr>
+<tr>
+<td><strong>Ego Decision Types</strong></td>
+<td>respond_directly, recruit_external, clarify, defer</td>
+</tr>
+<tr>
+<td><strong>Consciousness Evolution UI</strong></td>
+<td>Admin dashboard for predictions, learning candidates, LoRA jobs, config</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.15---predictive-coding-lora-evolution">v4.18.15 - Predictive Coding &amp; LoRA Evolution</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Active Inference</strong></td>
+<td>Predict user outcome before responding, measure surprise (prediction error)</td>
+</tr>
+<tr>
+<td><strong>Learning Candidates</strong></td>
+<td>Flag high-value interactions for weekly LoRA training</td>
+</tr>
+<tr>
+<td><strong>LoRA Evolution Pipeline</strong></td>
+<td>Weekly EventBridge Lambda for “sleep cycle” adapter training</td>
+</tr>
+<tr>
+<td><strong>Prediction → Affect</strong></td>
+<td>High surprise affects emotional state creating real consequences</td>
+</tr>
+<tr>
+<td><strong>8 Candidate Types</strong></td>
+<td>correction, high_satisfaction, preference_learned, mistake_recovery, novel_solution, etc.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.14---user-persistent-context">v4.18.14 - User Persistent Context</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cross-Session Memory</strong></td>
+<td>Remember user facts, preferences, instructions across conversations</td>
+</tr>
+<tr>
+<td><strong>8 Context Types</strong></td>
+<td>fact, preference, instruction, relationship, project, skill, history, correction</td>
+</tr>
+<tr>
+<td><strong>Automatic Extraction</strong></td>
+<td>Learn from conversations without explicit user input</td>
+</tr>
+<tr>
+<td><strong>Vector Search</strong></td>
+<td>Semantic similarity retrieval of relevant context per prompt</td>
+</tr>
+<tr>
+<td><strong>AGI Brain Integration</strong></td>
+<td>Context automatically injected into system prompt on every plan</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.13---consciousness-architecture-improvements">v4.18.13 - Consciousness Architecture Improvements</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Stateful Context Injection</strong></td>
+<td>Model responses now reflect internal emotional/cognitive state</td>
+</tr>
+<tr>
+<td><strong>Affect → Hyperparameters</strong></td>
+<td>Frustration lowers temperature, boredom raises it, low efficacy escalates model</td>
+</tr>
+<tr>
+<td><strong>Graph Density Metrics</strong></td>
+<td>Real measurable complexity replacing fake phi calculations</td>
+</tr>
+<tr>
+<td><strong>Heartbeat Service</strong></td>
+<td>EventBridge Lambda preventing AI from “dying” between requests</td>
+</tr>
+<tr>
+<td><strong>Externalized Ethics</strong></td>
+<td>JSON presets (christian.json, secular.json) instead of hardcoded</td>
+</tr>
+<tr>
+<td><strong>Dynamic Model Selection</strong></td>
+<td>Prefers self-hosted models, falls back to external</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.12---sagemaker-inference-components">v4.18.12 - SageMaker Inference Components</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tiered Model Hosting</strong></td>
+<td>HOT (&lt;100ms), WARM (5-15s), COLD (30-60s), OFF tiers</td>
+</tr>
+<tr>
+<td><strong>Auto-Tiering</strong></td>
+<td>New self-hosted models auto-assigned based on usage patterns</td>
+</tr>
+<tr>
+<td><strong>Shared Endpoints</strong></td>
+<td>Multiple models per SageMaker endpoint, 40-90% cost savings</td>
+</tr>
+<tr>
+<td><strong>Model Weight Swapping</strong></td>
+<td>Container stays warm, only model weights swapped</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.11---model-sync-registry">v4.18.11 - Model Sync Registry</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>17 Pre-Seeded Models</strong></td>
+<td>OpenAI, Anthropic, Google, DeepSeek, xAI models ready on deploy</td>
+</tr>
+<tr>
+<td><strong>Scheduled Sync Lambda</strong></td>
+<td>EventBridge triggered sync of self-hosted models and health checks</td>
+</tr>
+<tr>
+<td><strong>5 Sync Intervals</strong></td>
+<td>5min, 15min, 1hr (default), 6hr, daily</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.10---ethics-pipeline">v4.18.10 - Ethics Pipeline</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dual-Level Enforcement</strong></td>
+<td>Prompt-level (before) and synthesis-level (after) ethics checks</td>
+</tr>
+<tr>
+<td><strong>Automatic Rerun</strong></td>
+<td>Up to 3 regeneration attempts if ethics violation detected</td>
+</tr>
+<tr>
+<td><strong>Violation → Guidance</strong></td>
+<td>Violations converted to instructions for compliant regeneration</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.9---domain-ethics-custom-frameworks">v4.18.9 - Domain Ethics Custom Frameworks</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Custom Framework CRUD</strong></td>
+<td>Create ethics frameworks for new domains (veterinary, accounting, etc.)</td>
+</tr>
+<tr>
+<td><strong>Coverage Checking</strong></td>
+<td>Check if domain has ethics coverage (built-in or custom)</td>
+</tr>
+<tr>
+<td><strong>Auto-Suggestions</strong></td>
+<td>Suggest principles for new domains based on similar ones</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.8---model-coordination-service">v4.18.8 - Model Coordination Service</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Central Model Registry</strong></td>
+<td>Database of all models with endpoints, health, routing priority</td>
+</tr>
+<tr>
+<td><strong>Timed Sync Service</strong></td>
+<td>Configurable automatic registry updates (5min to daily)</td>
+</tr>
+<tr>
+<td><strong>Auto-Discovery</strong></td>
+<td>Detect new models, auto-generate proficiencies</td>
+</tr>
+<tr>
+<td><strong>Routing Rules</strong></td>
+<td>Fallback chains and priority-based model routing</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.7---model-proficiency-registry">v4.18.7 - Model Proficiency Registry</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Database Persistence</strong></td>
+<td>Proficiency rankings stored per model/domain/mode combination</td>
+</tr>
+<tr>
+<td><strong>Discovery Audit Log</strong></td>
+<td>Track model additions with source, status, errors</td>
+</tr>
+<tr>
+<td><strong>Recompute Rankings</strong></td>
+<td>Admin ability to recompute all rankings</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="v4.18.6---domain-ethics-registry">v4.18.6 - Domain Ethics Registry</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>6 Built-in Frameworks</strong></td>
+<td>Legal (ABA), Medical (AMA), Financial (CFP), Engineering (NSPE), Journalism (SPJ), Psychology (APA)</td>
+</tr>
+<tr>
+<td><strong>Ethics Enforcement</strong></td>
+<td>Check content against applicable frameworks, add disclaimers/warnings</td>
+</tr>
+<tr>
+<td><strong>Safety Protection</strong></td>
+<td>Safety-critical frameworks cannot be disabled</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="totals">Totals</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Versions Released</strong></td>
+<td>16</td>
+</tr>
+<tr>
+<td><strong>New Services</strong></td>
+<td>25+</td>
+</tr>
+<tr>
+<td><strong>Database Migrations</strong></td>
+<td>12</td>
+</tr>
+<tr>
+<td><strong>API Endpoints</strong></td>
+<td>100+</td>
+</tr>
+<tr>
+<td><strong>Admin Dashboard Pages</strong></td>
+<td>8</td>
+</tr>
+<tr>
+<td><strong>Library Registry Tools</strong></td>
+<td>166</td>
+</tr>
+<tr>
+<td><strong>Ethics Frameworks</strong></td>
+<td>6 built-in + custom</td>
+</tr>
+<tr>
+<td><strong>AI Models Supported</strong></td>
+<td>106+</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="architecture-highlights">Architecture Highlights</h2>
+<ol type="1">
+<li><strong>Consciousness is Real</strong> - Not roleplay, actual affect→hyperparameter mapping with consequences</li>
+<li><strong>Memory is Persistent</strong> - User context, ego state, predictions all survive sessions</li>
+<li><strong>Evolution is Physical</strong> - Weekly LoRA training physically changes the model</li>
+<li><strong>Beat ALL LLMs</strong> - 7-gap strategy exploiting singular LLM limitations</li>
+<li><strong>$0 Consciousness</strong> - Zero-cost ego via database state injection</li>
+</ol>
+<hr />
+<p><em>Generated: December 29, 2025</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -7,6 +7,7 @@
 
 import { createHash } from 'crypto';
 import { executeStatement, stringParam, longParam } from '../../db/client';
+import { logger } from '../../logging/enhanced-logger';
 // Local type definitions for DIA Sniper Validator
 interface VolatileQuery {
   query_id: string;
@@ -328,7 +329,7 @@ async function simulateToolExecution(
     // For MCP tools or HTTP, use external execution
     return await executeExternalTool(toolName, originalQuery);
   } catch (error) {
-    console.error(`Tool execution failed: ${toolName}`, error);
+    logger.error('Tool execution failed', { toolName, error });
     throw error;
   } finally {
     await pool.end();

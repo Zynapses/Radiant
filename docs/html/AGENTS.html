@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AGENTS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>AGENTS</h1>
+    <div class="meta">RADIANT v5.52.29 | AGENTS.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.18.0---ai-build-agent-configuration">RADIANT v4.18.0 - AI Build Agent Configuration</h1>
+<blockquote>
+<p><strong>This file provides persistent context for Windsurf/Claude Opus 4.5</strong> <strong>Read this FIRST before any implementation work</strong></p>
+</blockquote>
+<h2 id="what-you-are-building">🎯 What You Are Building</h2>
+<p>RADIANT is a <strong>multi-tenant AWS SaaS platform</strong> for AI model access and orchestration. It has THREE components:</p>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 33%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Location</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Swift Deployer App</strong></td>
+<td><code>apps/swift-deployer/</code></td>
+<td>macOS app that deploys infrastructure</td>
+</tr>
+<tr>
+<td><strong>AWS Infrastructure</strong></td>
+<td><code>packages/infrastructure/</code></td>
+<td>CDK stacks, Lambdas, databases</td>
+</tr>
+<tr>
+<td><strong>Admin Dashboard</strong></td>
+<td><code>apps/admin-dashboard/</code></td>
+<td>Next.js web admin interface</td>
+</tr>
+</tbody>
+</table>
+<h2 id="technology-stack">🏗️ Technology Stack</h2>
+<ul>
+<li><strong>Swift App</strong>: SwiftUI, macOS 13.0+, Swift 5.9+, Xcode 15+, SQLCipher</li>
+<li><strong>Infrastructure</strong>: AWS CDK (TypeScript), Aurora PostgreSQL, Lambda, API Gateway</li>
+<li><strong>Dashboard</strong>: Next.js 14, TypeScript, Tailwind CSS</li>
+<li><strong>AI Integration</strong>: 106+ models (50 external + 56 self-hosted), LiteLLM</li>
+</ul>
+<h2 id="project-structure">📁 Project Structure</h2>
+<pre><code>radiant/
+├── VERSION                      # Package version: &quot;4.18.0&quot;
+├── RADIANT_VERSION              # Radiant component: &quot;4.18.0&quot;
+├── THINKTANK_VERSION            # Think Tank: &quot;3.2.0&quot;
+├── VERSION_HISTORY.json         # All releases with hashes
+├── tools/scripts/               # Build &amp; validation scripts
+│
+├── apps/
+│   ├── swift-deployer/          # Swift macOS deployer app
+│   │   ├── Package.swift
+│   │   └── Sources/RadiantDeployer/
+│   │       ├── Models/
+│   │       ├── Services/        # AIAssistantService, LocalStorageManager, TimeoutService
+│   │       └── Views/
+│   │
+│   └── admin-dashboard/         # Next.js admin UI
+│       ├── app/(dashboard)/     # Dashboard pages
+│       └── components/          # React components
+│
+└── packages/
+    ├── shared/                  # @radiant/shared - Types &amp; constants
+    └── infrastructure/          # @radiant/infrastructure - CDK stacks
+        ├── lib/stacks/          # 14 CDK stacks
+        ├── lambda/              # Lambda handlers
+        └── migrations/          # 44 database migrations</code></pre>
+<h2 id="critical-constants">🔑 Critical Constants</h2>
+<pre class="typescript"><code>// Always use these - NEVER hardcode
+const RADIANT_VERSION = &quot;4.18.0&quot;;
+const DOMAIN_PLACEHOLDER = &quot;{{RADIANT_DOMAIN}}&quot;;</code></pre>
+<h2 id="mandatory-policy-enforcement">🚨 MANDATORY POLICY ENFORCEMENT</h2>
+<p><strong>BEFORE starting ANY significant task:</strong></p>
+<ol type="1">
+<li><strong>Scan ALL workflows</strong> in <code>/.windsurf/workflows/</code></li>
+<li><strong>Read each description</strong> field in the frontmatter</li>
+<li><strong>For each matching policy</strong> → follow its requirements</li>
+<li><strong>New policies auto-apply</strong> - no manual update needed</li>
+</ol>
+<pre><code>DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.</code></pre>
+<p><strong>NO EXCEPTIONS. Forgetting policies creates technical debt and compliance risks.</strong></p>
+<h2 id="mandatory-documentation-updates">📚 MANDATORY DOCUMENTATION UPDATES</h2>
+<blockquote>
+<p>⚠️ <strong>CRITICAL: Every code change MUST include documentation updates</strong></p>
+</blockquote>
+<p><strong>Master Policy</strong>: <code>/.windsurf/workflows/docs-update-all.md</code> <strong>Documentation Manifest</strong>: <code>/docs/DOCUMENTATION-MANIFEST.json</code></p>
+<h3 id="quick-reference---always-update-these">Quick Reference - Always Update These:</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 62%" />
+</colgroup>
+<thead>
+<tr>
+<th>Change Type</th>
+<th>Required Documentation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ANY change</strong></td>
+<td><code>CHANGELOG.md</code></td>
+</tr>
+<tr>
+<td><strong>Think Tank feature</strong></td>
+<td><code>THINKTANK-USER-GUIDE.md</code> + <code>THINKTANK-ADMIN-GUIDE.md</code> + <code>THINKTANK-ADMIN-GUIDE-V2.md</code></td>
+</tr>
+<tr>
+<td><strong>Platform feature</strong></td>
+<td><code>RADIANT-ADMIN-GUIDE.md</code></td>
+</tr>
+<tr>
+<td><strong>Admin guide update</strong></td>
+<td><code>STRATEGIC-VISION-MARKETING.md</code> (auto-trigger)</td>
+</tr>
+<tr>
+<td><strong>Technical/Architecture</strong></td>
+<td><code>ENGINEERING-IMPLEMENTATION-VISION.md</code></td>
+</tr>
+<tr>
+<td><strong>Database change</strong></td>
+<td><code>sections/SECTION-07-DATABASE-SCHEMA.md</code> + <code>RADIANT-PLATFORM-ARCHITECTURE.md</code></td>
+</tr>
+<tr>
+<td><strong>Competitive advantage</strong></td>
+<td><code>THINKTANK-MOATS.md</code> or <code>RADIANT-MOATS.md</code></td>
+</tr>
+<tr>
+<td><strong>Swift Deployer change</strong></td>
+<td><code>SWIFT-DEPLOYER-USER-GUIDE.md</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-golden-rule">The Golden Rule</h3>
+<pre><code>IF you change code → THEN you MUST update ALL applicable documentation</code></pre>
+<p><strong>NEVER</strong>: - ❌ Say “I’ll update docs later” - ❌ Update only CHANGELOG.md - ❌ Skip user guide for user-facing changes - ❌ Skip admin guide for admin-facing changes - ❌ Forget STRATEGIC-VISION-MARKETING.md when updating admin guides</p>
+<p><strong>ALWAYS</strong>: - ✅ Update documentation IN THE SAME TASK as code changes - ✅ Update version numbers in all touched documents - ✅ Check the trigger matrix in <code>/docs/DOCUMENTATION-MANIFEST.json</code></p>
+<h2 id="implementation-rules">⚠️ Implementation Rules</h2>
+<ol type="1">
+<li><strong>File Creation Order</strong>: Follow dependency graph in each section</li>
+<li><strong>RLS Variables</strong>: Always use <code>app.current_tenant_id</code> (not <code>current_tenant_id</code>)</li>
+<li><strong>Sendable Conformance</strong>: All types crossing actor boundaries must be Sendable</li>
+<li><strong>No Hardcoded Versions</strong>: Use RADIANT_VERSION constant</li>
+<li><strong>Error Handling</strong>: Use typed errors with helpful messages</li>
+<li><strong>Policy Compliance</strong>: Run <code>/policy-enforcement</code> pre-flight check for every task</li>
+</ol>
+<h2 id="phase-execution">📋 Phase Execution</h2>
+<p>Phases are in <code>docs/phases/</code>. Execute in order:</p>
+<h3 id="batch-1-core-platform-phases-1-9-complete">Batch 1: Core Platform (Phases 1-9) ✅ COMPLETE</h3>
+<ol type="1">
+<li><strong>Phase 1</strong>: Foundation (Sections 0-2) - Shared types, Swift app, base CDK</li>
+<li><strong>Phase 2</strong>: Core Infrastructure (Sections 3-7) - AI stacks, Lambdas, DB schema</li>
+<li><strong>Phase 3</strong>: Admin &amp; Deployment (Sections 8-9) - Dashboard, assembly guide</li>
+<li><strong>Phase 4</strong>: AI Features (Sections 10-17) - Visual AI, Brain, Analytics</li>
+<li><strong>Phase 5</strong>: Consumer Platform (Sections 18-28) - Think Tank, collaboration</li>
+<li><strong>Phase 6</strong>: Advanced Features (Sections 29-35) - Registry, Time Machine</li>
+<li><strong>Phase 7</strong>: Intelligence Layer (Sections 36-39) - Neural engine, workflows</li>
+<li><strong>Phase 8</strong>: Platform Hardening (Sections 40-42) - Isolation, i18n, config</li>
+<li><strong>Phase 9</strong>: Billing System (Sections 43-46) - Credits, storage, subscriptions</li>
+</ol>
+<h3 id="batch-2-prompt-32-update-phases-10-24-complete">Batch 2: PROMPT-32 Update (Phases 10-24) ✅ COMPLETE</h3>
+<p>Extension specs in: <code>radiant-cascade-extension-v4.18.0/docs/phases/</code></p>
+<ol start="10" type="1">
+<li><strong>Phase 10</strong>: Header &amp; Shared Types (PROMPT-32 Part 01) ✅</li>
+<li><strong>Phase 11</strong>: Swift App Enhancements (PROMPT-32 Part 02) ✅</li>
+<li><strong>Phase 12</strong>: CDK Base Updates (PROMPT-32 Part 03) ✅</li>
+<li><strong>Phase 13</strong>: CDK AI &amp; API (PROMPT-32 Part 04) ✅</li>
+<li><strong>Phase 14</strong>: Lambda Core (PROMPT-32 Part 05) ✅</li>
+<li><strong>Phase 15</strong>: Lambda Admin (PROMPT-32 Part 06) ✅</li>
+<li><strong>Phase 16</strong>: Self-Hosted Models (PROMPT-32 Part 07) ✅</li>
+<li><strong>Phase 17</strong>: Database Schema (PROMPT-32 Part 08) ✅</li>
+<li><strong>Phase 18</strong>: Admin Dashboard (PROMPT-32 Part 09) ✅</li>
+<li><strong>Phase 19</strong>: Deployment Guide (PROMPT-32 Part 10) ✅</li>
+<li><strong>Phase 20</strong>: AI Features (PROMPT-32 Part 11) ✅</li>
+<li><strong>Phase 21</strong>: Think Tank (PROMPT-32 Part 12) ✅</li>
+<li><strong>Phase 22</strong>: Time Machine (PROMPT-32 Part 13) ✅</li>
+<li><strong>Phase 23</strong>: Orchestration (PROMPT-32 Part 14) ✅</li>
+<li><strong>Phase 24</strong>: Billing (PROMPT-32 Part 15) ✅</li>
+</ol>
+<h3 id="batch-3-prompt-33-update-v3-phases-25-31-complete">Batch 3: PROMPT-33 Update v3 (Phases 25-31) ✅ COMPLETE</h3>
+<ol start="25" type="1">
+<li><strong>Phase 25</strong>: Package System (PROMPT-33 Part 01) ✅</li>
+<li><strong>Phase 26</strong>: AI Assistant &amp; Progress UI (PROMPT-33 Part 02) ✅</li>
+<li><strong>Phase 27</strong>: Build System &amp; Local Storage (PROMPT-33 Part 03) ✅</li>
+<li><strong>Phase 28</strong>: Cost Management (PROMPT-33 Part 04) ✅</li>
+<li><strong>Phase 29</strong>: Compliance &amp; Security (PROMPT-33 Part 05) ✅</li>
+<li><strong>Phase 30</strong>: A/B Testing &amp; Settings (PROMPT-33 Part 06) ✅</li>
+<li><strong>Phase 31</strong>: Database &amp; Checklist (PROMPT-33 Part 07) ✅</li>
+</ol>
+<h3 id="batch-4-verification-phases-32-33-complete">Batch 4: Verification (Phases 32-33) ✅ COMPLETE</h3>
+<ol start="32" type="1">
+<li><strong>Phase 32</strong>: Implementation Guide Verification ✅</li>
+<li><strong>Phase 33</strong>: Interrogation Testing (55 edge-case scenarios) ✅</li>
+</ol>
+<h2 id="quick-start-commands">🚀 Quick Start Commands</h2>
+<pre class="bash"><code># Start Phase 1 implementation
+/implement-phase 1
+
+# Continue to next phase
+/continue-phase
+
+# Verify current phase
+/verify-phase</code></pre>
+<h2 id="documentation-references">📖 Documentation References</h2>
+<ul>
+<li>Full specs: <code>docs/sections/</code> (split by section number)</li>
+<li>Phase summaries: <code>docs/phases/</code></li>
+<li>Original prompt: <code>docs/RADIANT-PROMPT-32-FULL.md</code></li>
+</ul>
+<h2 id="verification-checklist">✅ Verification Checklist</h2>
+<p>Before marking any phase complete: - [ ] All files created per section spec - [ ] Types match shared definitions in Section 0 - [ ] Imports resolve correctly - [ ] No TypeScript/Swift compilation errors - [ ] Database migrations are numbered sequentially</p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

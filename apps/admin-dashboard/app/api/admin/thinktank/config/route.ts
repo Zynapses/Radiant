@@ -25,11 +25,6 @@ export async function PATCH(request: Request) {
     const config = await thinkTankApi.updateConfig(updates);
     
     // Audit logging is handled by the service layer
-    console.log('[AUDIT] Think Tank config update requested:', {
-      action: 'thinktank_config_changed',
-      timestamp: new Date().toISOString(),
-      changedFields: Object.keys(updates),
-    });
 
     return NextResponse.json(config);
   } catch (error) {

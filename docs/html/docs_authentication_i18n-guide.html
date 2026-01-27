@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>i18n guide - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>i18n guide</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/authentication/i18n-guide.md</div>
+  </div>
+  
+  <h1 id="internationalization-i18n-guide">Internationalization (i18n) Guide</h1>
+<blockquote>
+<p><strong>Version</strong>: 5.52.29 | <strong>Last Updated</strong>: January 25, 2026 | <strong>Audience</strong>: All Users &amp; Developers</p>
+</blockquote>
+<p>This guide covers RADIANT’s internationalization features, including 18 supported languages, RTL support for Arabic, and multi-language search with CJK (Chinese, Japanese, Korean) support.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#supported-languages">Supported Languages</a></li>
+<li><a href="#changing-your-language">Changing Your Language</a></li>
+<li><a href="#right-to-left-rtl-support">Right-to-Left (RTL) Support</a></li>
+<li><a href="#multi-language-search">Multi-Language Search</a></li>
+<li><a href="#for-developers">For Developers</a></li>
+<li><a href="#for-administrators">For Administrators</a></li>
+</ol>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>RADIANT supports 18 languages across all applications, with special handling for:</p>
+<ul>
+<li><strong>Right-to-Left (RTL)</strong> languages like Arabic</li>
+<li><strong>CJK (Chinese, Japanese, Korean)</strong> languages with bi-gram search</li>
+<li><strong>Locale-specific</strong> date, time, and number formatting</li>
+</ul>
+<pre class="mermaid"><code>graph TB
+    subgraph &quot;Language Features&quot;
+        L[18 Languages]
+        RTL[RTL Support]
+        CJK[CJK Search]
+        FMT[Locale Formatting]
+    end
+    
+    subgraph &quot;Applications&quot;
+        TT[Think Tank]
+        CU[Curator]
+        TA[Tenant Admin]
+        RA[RADIANT Admin]
+    end
+    
+    L --&gt; TT
+    L --&gt; CU
+    L --&gt; TA
+    L --&gt; RA
+    
+    RTL --&gt; TT
+    RTL --&gt; CU
+    RTL --&gt; TA
+    RTL --&gt; RA</code></pre>
+<hr />
+<h2 id="supported-languages">Supported Languages</h2>
+<p>RADIANT supports 18 languages with varying levels of full-text search support:</p>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Code</th>
+<th>Native Name</th>
+<th>Direction</th>
+<th>Search Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>English</td>
+<td><code>en</code></td>
+<td>English</td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Spanish</td>
+<td><code>es</code></td>
+<td>Español</td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>French</td>
+<td><code>fr</code></td>
+<td>Français</td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>German</td>
+<td><code>de</code></td>
+<td>Deutsch</td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Portuguese</td>
+<td><code>pt</code></td>
+<td>Português</td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Italian</td>
+<td><code>it</code></td>
+<td>Italiano</td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Dutch</td>
+<td><code>nl</code></td>
+<td>Nederlands</td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Polish</td>
+<td><code>pl</code></td>
+<td>Polski</td>
+<td>LTR</td>
+<td>PostgreSQL <code>simple</code></td>
+</tr>
+<tr>
+<td>Russian</td>
+<td><code>ru</code></td>
+<td>Русский</td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Turkish</td>
+<td><code>tr</code></td>
+<td>Türkçe</td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Japanese</td>
+<td><code>ja</code></td>
+<td>日本語</td>
+<td>LTR</td>
+<td><code>pg_bigm</code> bi-gram</td>
+</tr>
+<tr>
+<td>Korean</td>
+<td><code>ko</code></td>
+<td>한국어</td>
+<td>LTR</td>
+<td><code>pg_bigm</code> bi-gram</td>
+</tr>
+<tr>
+<td>Chinese (Simplified)</td>
+<td><code>zh-CN</code></td>
+<td>简体中文</td>
+<td>LTR</td>
+<td><code>pg_bigm</code> bi-gram</td>
+</tr>
+<tr>
+<td>Chinese (Traditional)</td>
+<td><code>zh-TW</code></td>
+<td>繁體中文</td>
+<td>LTR</td>
+<td><code>pg_bigm</code> bi-gram</td>
+</tr>
+<tr>
+<td><strong>Arabic</strong></td>
+<td><code>ar</code></td>
+<td>العربية</td>
+<td><strong>RTL</strong></td>
+<td>PostgreSQL <code>simple</code></td>
+</tr>
+<tr>
+<td>Hindi</td>
+<td><code>hi</code></td>
+<td>हिन्दी</td>
+<td>LTR</td>
+<td>PostgreSQL <code>simple</code></td>
+</tr>
+<tr>
+<td>Thai</td>
+<td><code>th</code></td>
+<td>ไทย</td>
+<td>LTR</td>
+<td>PostgreSQL <code>simple</code></td>
+</tr>
+<tr>
+<td>Vietnamese</td>
+<td><code>vi</code></td>
+<td>Tiếng Việt</td>
+<td>LTR</td>
+<td>PostgreSQL <code>simple</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="language-detection">Language Detection</h3>
+<p>RADIANT automatically detects the primary language of your content for optimal search indexing:</p>
+<pre class="mermaid"><code>flowchart TD
+    A[User Input] --&gt; B{Detect Language}
+    B --&gt;|CJK Characters| C[Use pg_bigm]
+    B --&gt;|Arabic Script| D[Use simple FTS]
+    B --&gt;|Latin/Cyrillic| E[Use Native FTS]
+    
+    C --&gt; F[Bi-gram Indexing]
+    D --&gt; G[Simple Tokenization]
+    E --&gt; H[Stemming + Stop Words]</code></pre>
+<hr />
+<h2 id="changing-your-language">Changing Your Language</h2>
+<h3 id="in-think-tank-curator">In Think Tank / Curator</h3>
+<ol type="1">
+<li>Click your <strong>avatar</strong> in the top-right corner</li>
+<li>Select <strong>Settings</strong></li>
+<li>Click <strong>Language &amp; Region</strong></li>
+<li>Select your preferred <strong>language</strong> from the dropdown</li>
+<li>The interface updates immediately</li>
+</ol>
+<h3 id="in-tenant-admin-radiant-admin">In Tenant Admin / RADIANT Admin</h3>
+<ol type="1">
+<li>Click your <strong>avatar</strong> in the top-right corner</li>
+<li>Select <strong>Account Settings</strong></li>
+<li>Navigate to <strong>Preferences</strong> → <strong>Language</strong></li>
+<li>Select your language</li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<h3 id="during-sign-in">During Sign-In</h3>
+<p>The sign-in page automatically detects your browser language. To change it:</p>
+<ol type="1">
+<li>Look for the <strong>language selector</strong> (usually bottom of the page)</li>
+<li>Click and select your language</li>
+<li>The sign-in page reloads in your language</li>
+</ol>
+<hr />
+<h2 id="right-to-left-rtl-support">Right-to-Left (RTL) Support</h2>
+<p>When using Arabic, the entire interface automatically adapts:</p>
+<h3 id="what-changes">What Changes</h3>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>RTL Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Text direction</strong></td>
+<td>Flows right-to-left</td>
+</tr>
+<tr>
+<td><strong>Navigation</strong></td>
+<td>Moves to the right side</td>
+</tr>
+<tr>
+<td><strong>Icons</strong></td>
+<td>Directional icons are mirrored</td>
+</tr>
+<tr>
+<td><strong>Buttons</strong></td>
+<td>Order is reversed</td>
+</tr>
+<tr>
+<td><strong>Forms</strong></td>
+<td>Labels and inputs are flipped</td>
+</tr>
+<tr>
+<td><strong>Tables</strong></td>
+<td>Columns flow right-to-left</td>
+</tr>
+</tbody>
+</table>
+<h3 id="what-stays-left-to-right">What Stays Left-to-Right</h3>
+<p>Certain elements remain LTR for clarity:</p>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Email addresses</strong></td>
+<td>Standard format worldwide</td>
+</tr>
+<tr>
+<td><strong>URLs</strong></td>
+<td>Technical format</td>
+</tr>
+<tr>
+<td><strong>Code blocks</strong></td>
+<td>Programming languages are LTR</td>
+</tr>
+<tr>
+<td><strong>Passwords</strong></td>
+<td>Consistency and security</td>
+</tr>
+<tr>
+<td><strong>Phone numbers</strong></td>
+<td>International format</td>
+</tr>
+<tr>
+<td><strong>MFA codes</strong></td>
+<td>Numeric sequences</td>
+</tr>
+</tbody>
+</table>
+<h3 id="visual-example">Visual Example</h3>
+<pre><code>┌─────────────────────────────────────────────────────┐
+│ LTR Layout (English)                                │
+├─────────────────────────────────────────────────────┤
+│ [Logo] Navigation ────────────────────  [Avatar ▼] │
+│                                                     │
+│ [Sidebar]  │  Main Content Area                    │
+│            │                                        │
+│            │  Form Label: [Input Field        ]    │
+│            │  [Cancel]              [Submit ➔]     │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────┐
+│ RTL Layout (Arabic)                                 │
+├─────────────────────────────────────────────────────┤
+│ [▼ الملف] ────────────────────  التنقل [الشعار]   │
+│                                                     │
+│                    │  [الشريط الجانبي]              │
+│  منطقة المحتوى الرئيسية                            │
+│                                                     │
+│ [        حقل الإدخال] :تسمية النموذج               │
+│ [←إرسال]              [إلغاء]                      │
+│                                                     │
+└─────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="multi-language-search">Multi-Language Search</h2>
+<p>RADIANT provides intelligent search across all supported languages.</p>
+<h3 id="how-it-works">How It Works</h3>
+<pre class="mermaid"><code>flowchart LR
+    subgraph &quot;Search Query&quot;
+        Q[User Query]
+    end
+    
+    subgraph &quot;Language Detection&quot;
+        D{Detect Script}
+    end
+    
+    subgraph &quot;Search Strategy&quot;
+        FTS[PostgreSQL FTS&lt;br/&gt;Stemming, ranking]
+        BIGM[pg_bigm&lt;br/&gt;Bi-gram matching]
+        SIMPLE[Simple FTS&lt;br/&gt;Basic tokenization]
+    end
+    
+    Q --&gt; D
+    D --&gt;|&quot;Latin (en,es,fr...)&quot;| FTS
+    D --&gt;|&quot;CJK (ja,ko,zh)&quot;| BIGM
+    D --&gt;|&quot;Arabic, Hindi...&quot;| SIMPLE</code></pre>
+<h3 id="cjk-search-chinese-japanese-korean">CJK Search (Chinese, Japanese, Korean)</h3>
+<p>CJK languages don’t have word boundaries, so traditional full-text search doesn’t work. RADIANT uses <strong>bi-gram indexing</strong> (<code>pg_bigm</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>No word segmentation needed</strong></td>
+<td>Works without dictionaries</td>
+</tr>
+<tr>
+<td><strong>Substring matching</strong></td>
+<td>Find partial words/phrases</td>
+</tr>
+<tr>
+<td><strong>Mixed-language support</strong></td>
+<td>Search CJK + English together</td>
+</tr>
+<tr>
+<td><strong>Fuzzy matching</strong></td>
+<td>Find similar terms</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong></p>
+<p>Searching for <code>人工知能</code> (artificial intelligence) finds: - Exact matches: <code>人工知能</code> - Partial matches: <code>人工知能技術</code> (AI technology) - Mixed: <code>AIと人工知能の違い</code> (Difference between AI and artificial intelligence)</p>
+<h3 id="western-language-search">Western Language Search</h3>
+<p>For Latin-script and Cyrillic languages, RADIANT uses PostgreSQL’s native full-text search:</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Stemming</strong></td>
+<td>“running” matches “run”, “runs”</td>
+</tr>
+<tr>
+<td><strong>Stop words</strong></td>
+<td>Common words (“the”, “is”) are ignored</td>
+</tr>
+<tr>
+<td><strong>Ranking</strong></td>
+<td>Results sorted by relevance</td>
+</tr>
+<tr>
+<td><strong>Phrase search</strong></td>
+<td><code>"exact phrase"</code> matching</td>
+</tr>
+</tbody>
+</table>
+<h3 id="search-tips-by-language">Search Tips by Language</h3>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Tip</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>English</strong></td>
+<td>Use quotes for exact phrases: <code>"machine learning"</code></td>
+</tr>
+<tr>
+<td><strong>Spanish</strong></td>
+<td>Accents are normalized: <code>café</code> = <code>cafe</code></td>
+</tr>
+<tr>
+<td><strong>German</strong></td>
+<td>Compound words are split: <code>Softwareentwicklung</code></td>
+</tr>
+<tr>
+<td><strong>Japanese</strong></td>
+<td>Hiragana, katakana, and kanji all work</td>
+</tr>
+<tr>
+<td><strong>Chinese</strong></td>
+<td>Both simplified and traditional are indexed</td>
+</tr>
+<tr>
+<td><strong>Korean</strong></td>
+<td>Hangul syllables are bi-gram indexed</td>
+</tr>
+<tr>
+<td><strong>Arabic</strong></td>
+<td>Diacritics are normalized</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="for-developers">For Developers</h2>
+<h3 id="using-translations-in-code">Using Translations in Code</h3>
+<p><strong>React (Admin Dashboard):</strong></p>
+<pre class="typescript"><code>import { useTranslation } from &#39;@/hooks/useTranslation&#39;;
+
+function MyComponent() {
+  const { t, language, setLanguage, isRTL } = useTranslation();
+  
+  return (
+    &lt;div dir={isRTL ? &#39;rtl&#39; : &#39;ltr&#39;}&gt;
+      &lt;h1&gt;{t(&#39;auth.login.title&#39;)}&lt;/h1&gt;
+      &lt;p&gt;{t(&#39;auth.login.description&#39;)}&lt;/p&gt;
+      &lt;button&gt;{t(&#39;common.submit&#39;)}&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<p><strong>Translation Files Structure:</strong></p>
+<pre><code>locales/
+├── auth/
+│   ├── en.json
+│   ├── es.json
+│   ├── fr.json
+│   ├── ja.json
+│   ├── ko.json
+│   ├── zh-CN.json
+│   ├── ar.json
+│   └── ...
+└── index.ts</code></pre>
+<p><strong>Example Translation File (<code>en.json</code>):</strong></p>
+<pre class="json"><code>{
+  &quot;auth&quot;: {
+    &quot;login&quot;: {
+      &quot;title&quot;: &quot;Sign In&quot;,
+      &quot;description&quot;: &quot;Welcome back! Please sign in to continue.&quot;,
+      &quot;email_placeholder&quot;: &quot;Enter your email&quot;,
+      &quot;password_placeholder&quot;: &quot;Enter your password&quot;,
+      &quot;submit&quot;: &quot;Sign In&quot;,
+      &quot;forgot_password&quot;: &quot;Forgot password?&quot;,
+      &quot;no_account&quot;: &quot;Don&#39;t have an account?&quot;,
+      &quot;sign_up&quot;: &quot;Sign up&quot;
+    },
+    &quot;mfa&quot;: {
+      &quot;title&quot;: &quot;Two-Factor Authentication&quot;,
+      &quot;enter_code&quot;: &quot;Enter the 6-digit code from your authenticator app&quot;,
+      &quot;verify&quot;: &quot;Verify&quot;,
+      &quot;use_backup&quot;: &quot;Use a backup code&quot;
+    }
+  },
+  &quot;common&quot;: {
+    &quot;submit&quot;: &quot;Submit&quot;,
+    &quot;cancel&quot;: &quot;Cancel&quot;,
+    &quot;save&quot;: &quot;Save&quot;,
+    &quot;delete&quot;: &quot;Delete&quot;,
+    &quot;loading&quot;: &quot;Loading...&quot;,
+    &quot;error&quot;: &quot;An error occurred&quot;
+  }
+}</code></pre>
+<h3 id="rtl-css-utilities">RTL CSS Utilities</h3>
+<p><strong>RTL-aware CSS classes (<code>rtl.css</code>):</strong></p>
+<pre class="css"><code>/* Automatic margin/padding flipping */
+[dir=&quot;rtl&quot;] .ml-4 { margin-left: 0; margin-right: 1rem; }
+[dir=&quot;rtl&quot;] .mr-4 { margin-right: 0; margin-left: 1rem; }
+[dir=&quot;rtl&quot;] .pl-4 { padding-left: 0; padding-right: 1rem; }
+[dir=&quot;rtl&quot;] .pr-4 { padding-right: 0; padding-left: 1rem; }
+
+/* Text alignment flipping */
+[dir=&quot;rtl&quot;] .text-left { text-align: right; }
+[dir=&quot;rtl&quot;] .text-right { text-align: left; }
+
+/* Flex direction flipping */
+[dir=&quot;rtl&quot;] .flex-row { flex-direction: row-reverse; }
+
+/* Preserve LTR for specific content */
+.ltr-preserve {
+  direction: ltr !important;
+  unicode-bidi: embed;
+}
+
+/* Apply to emails, codes, passwords */
+input[type=&quot;email&quot;],
+input[type=&quot;password&quot;],
+.code-input,
+.mfa-code {
+  direction: ltr;
+  text-align: left;
+}</code></pre>
+<h3 id="usertl-hook">useRTL Hook</h3>
+<pre class="typescript"><code>import { useRTL } from &#39;@/hooks/useRTL&#39;;
+
+function MyComponent() {
+  const { isRTL, dir, flipMargin, flipPadding, flipTextAlign } = useRTL();
+  
+  return (
+    &lt;div 
+      dir={dir}
+      className={`${flipMargin(&#39;ml-4&#39;)} ${flipTextAlign(&#39;text-left&#39;)}`}
+    &gt;
+      {/* Content */}
+    &lt;/div&gt;
+  );
+}</code></pre>
+<h3 id="multi-language-search-api">Multi-Language Search API</h3>
+<pre class="typescript"><code>// Search with automatic language detection
+const results = await searchService.search({
+  query: &#39;人工知能&#39;, // Japanese
+  tenantId: &#39;tenant_123&#39;,
+  // Language is auto-detected, but can be overridden:
+  // languageHint: &#39;ja&#39;
+});
+
+// Results include detected language
+console.log(results.detectedLanguage); // &#39;ja&#39;
+console.log(results.searchMethod); // &#39;pg_bigm&#39;</code></pre>
+<hr />
+<h2 id="for-administrators">For Administrators</h2>
+<h3 id="setting-default-language">Setting Default Language</h3>
+<p><strong>Tenant Admins:</strong></p>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Settings</strong> → <strong>Localization</strong></li>
+<li>Set <strong>Default Language</strong> for new users</li>
+<li>Set <strong>Fallback Language</strong> (used when translation is missing)</li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<p><strong>Platform Admins:</strong></p>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>Configuration</strong> → <strong>Localization</strong></li>
+<li>Set platform-wide defaults</li>
+<li>Enable/disable languages per tenant tier</li>
+</ol>
+<h3 id="translation-management">Translation Management</h3>
+<p><strong>Viewing Translation Coverage:</strong></p>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Settings</strong> → <strong>Localization</strong> → <strong>Coverage</strong></li>
+<li>View translation status by language:
+<ul>
+<li>✅ <strong>100%</strong> - Fully translated</li>
+<li>🟡 <strong>90%+</strong> - Nearly complete</li>
+<li>🔴 <strong>&lt;90%</strong> - Missing translations</li>
+</ul></li>
+</ol>
+<h3 id="custom-translations">Custom Translations</h3>
+<p>Tenants can override default translations:</p>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Settings</strong> → <strong>Localization</strong> → <strong>Custom</strong></li>
+<li>Select a language</li>
+<li>Search for the key to override</li>
+<li>Enter your custom translation</li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<p>Custom translations take precedence over defaults.</p>
+<h3 id="search-configuration">Search Configuration</h3>
+<p><strong>Enabling CJK Search:</strong></p>
+<p>CJK search requires the <code>pg_bigm</code> PostgreSQL extension. This is automatically configured for all tenants.</p>
+<p><strong>Search Indexing:</strong></p>
+<p>Content is automatically indexed in the detected language. To re-index:</p>
+<ol type="1">
+<li>Navigate to <strong>Admin</strong> → <strong>Settings</strong> → <strong>Search</strong></li>
+<li>Click <strong>Rebuild Index</strong></li>
+<li>Wait for indexing to complete (can take several minutes)</li>
+</ol>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./overview.md">Authentication Overview</a></li>
+<li><a href="./user-guide.md">User Guide</a></li>
+<li><a href="../api/search-api.md">Search API Reference</a></li>
+<li><a href="../sections/SECTION-41-INTERNATIONALIZATION.md">Section 41: Internationalization</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

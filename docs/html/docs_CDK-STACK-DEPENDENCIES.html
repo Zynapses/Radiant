@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CDK STACK DEPENDENCIES - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>CDK STACK DEPENDENCIES</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/CDK-STACK-DEPENDENCIES.md</div>
+  </div>
+  
+  <h1 id="radiant-cdk-stack-dependencies">RADIANT CDK Stack Dependencies</h1>
+<blockquote>
+<p><strong>Technical Reference</strong></p>
+<p>Version: 4.18.1 | Last Updated: December 2024</p>
+</blockquote>
+<p>This document defines the explicit dependency graph for RADIANT CDK stacks to ensure correct deployment ordering.</p>
+<hr />
+<h2 id="stack-dependency-graph">Stack Dependency Graph</h2>
+<pre><code>                                    ┌─────────────────┐
+                                    │  NetworkStack   │
+                                    │   (Foundation)  │
+                                    └────────┬────────┘
+                                             │
+                    ┌────────────────────────┼────────────────────────┐
+                    │                        │                        │
+                    ▼                        ▼                        ▼
+           ┌───────────────┐        ┌───────────────┐        ┌───────────────┐
+           │ DatabaseStack │        │ SecurityStack │        │  StorageStack │
+           └───────┬───────┘        └───────┬───────┘        └───────┬───────┘
+                   │                        │                        │
+                   └────────────────────────┼────────────────────────┘
+                                            │
+                                            ▼
+                                   ┌────────────────┐
+                                   │   AuthStack    │
+                                   │   (Cognito)    │
+                                   └────────┬───────┘
+                                            │
+                    ┌───────────────────────┼───────────────────────┐
+                    │                       │                       │
+                    ▼                       ▼                       ▼
+           ┌───────────────┐       ┌───────────────┐       ┌───────────────┐
+           │   APIStack    │       │  AdminStack   │       │ BillingStack  │
+           └───────┬───────┘       └───────┬───────┘       └───────┬───────┘
+                   │                       │                       │
+                   └───────────────────────┼───────────────────────┘
+                                           │
+                                           ▼
+                                  ┌────────────────┐
+                                  │   AIStack      │
+                                  │  (Models/LLM)  │
+                                  └────────┬───────┘
+                                           │
+                           ┌───────────────┼───────────────┐
+                           │               │               │
+                           ▼               ▼               ▼
+                  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+                  │ThermalStack │  │PerceptionSvc│  │ SageMaker   │
+                  │  (Scaling)  │  │  (Vision)   │  │ (Self-Host) │
+                  └─────────────┘  └─────────────┘  └─────────────┘</code></pre>
+<hr />
+<h2 id="stack-definitions">Stack Definitions</h2>
+<h3 id="layer-1-foundation">Layer 1: Foundation</h3>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 36%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Purpose</th>
+<th>Exports</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>NetworkStack</strong></td>
+<td>VPC, Subnets, NAT Gateways</td>
+<td>VPC ID, Subnet IDs, Security Group IDs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="layer-2-core-infrastructure">Layer 2: Core Infrastructure</h3>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 23%" />
+<col style="width: 35%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Purpose</th>
+<th>Dependencies</th>
+<th>Exports</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DatabaseStack</strong></td>
+<td>Aurora PostgreSQL, RDS Proxy</td>
+<td>NetworkStack</td>
+<td>Cluster ARN, Secret ARN, Proxy Endpoint</td>
+</tr>
+<tr>
+<td><strong>SecurityStack</strong></td>
+<td>KMS Keys, WAF, GuardDuty</td>
+<td>NetworkStack</td>
+<td>Key ARNs, WAF ACL ARN</td>
+</tr>
+<tr>
+<td><strong>StorageStack</strong></td>
+<td>S3 Buckets, CloudFront</td>
+<td>NetworkStack</td>
+<td>Bucket ARNs, Distribution ID</td>
+</tr>
+</tbody>
+</table>
+<h3 id="layer-3-authentication">Layer 3: Authentication</h3>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 23%" />
+<col style="width: 35%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Purpose</th>
+<th>Dependencies</th>
+<th>Exports</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AuthStack</strong></td>
+<td>Cognito User/Identity Pools</td>
+<td>Database, Security, Storage</td>
+<td>Pool IDs, Client IDs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="layer-4-application-services">Layer 4: Application Services</h3>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 23%" />
+<col style="width: 35%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Purpose</th>
+<th>Dependencies</th>
+<th>Exports</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>APIStack</strong></td>
+<td>API Gateway, Lambda handlers</td>
+<td>Auth, Database, Security</td>
+<td>API Endpoint, Lambda ARNs</td>
+</tr>
+<tr>
+<td><strong>AdminStack</strong></td>
+<td>Admin API, Dashboard hosting</td>
+<td>Auth, Database, Security</td>
+<td>Admin API Endpoint</td>
+</tr>
+<tr>
+<td><strong>BillingStack</strong></td>
+<td>Stripe integration, Usage tracking</td>
+<td>Auth, Database</td>
+<td>Billing API Endpoint</td>
+</tr>
+</tbody>
+</table>
+<h3 id="layer-5-ai-services">Layer 5: AI Services</h3>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 23%" />
+<col style="width: 35%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Purpose</th>
+<th>Dependencies</th>
+<th>Exports</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AIStack</strong></td>
+<td>LiteLLM, Model routing</td>
+<td>API, Database, Security</td>
+<td>AI Gateway Endpoint</td>
+</tr>
+</tbody>
+</table>
+<h3 id="layer-6-specialized-services">Layer 6: Specialized Services</h3>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 23%" />
+<col style="width: 35%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Purpose</th>
+<th>Dependencies</th>
+<th>Exports</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ThermalStack</strong></td>
+<td>Model scaling, State management</td>
+<td>AI, Database</td>
+<td>Thermal API Endpoint</td>
+</tr>
+<tr>
+<td><strong>PerceptionStack</strong></td>
+<td>Computer vision pipeline</td>
+<td>AI, Storage</td>
+<td>Perception API Endpoint</td>
+</tr>
+<tr>
+<td><strong>SageMakerStack</strong></td>
+<td>Self-hosted model endpoints</td>
+<td>AI, Network</td>
+<td>Endpoint ARNs</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cdk-implementation">CDK Implementation</h2>
+<h3 id="explicit-dependencies">Explicit Dependencies</h3>
+<pre class="typescript"><code>// packages/infrastructure/lib/main.ts
+
+import { App } from &#39;aws-cdk-lib&#39;;
+
+const app = new App();
+
+// Layer 1
+const networkStack = new NetworkStack(app, &#39;Network&#39;, { env });
+
+// Layer 2
+const databaseStack = new DatabaseStack(app, &#39;Database&#39;, { 
+  env,
+  vpc: networkStack.vpc,
+});
+databaseStack.addDependency(networkStack);
+
+const securityStack = new SecurityStack(app, &#39;Security&#39;, {
+  env,
+  vpc: networkStack.vpc,
+});
+securityStack.addDependency(networkStack);
+
+const storageStack = new StorageStack(app, &#39;Storage&#39;, {
+  env,
+  vpc: networkStack.vpc,
+});
+storageStack.addDependency(networkStack);
+
+// Layer 3
+const authStack = new AuthStack(app, &#39;Auth&#39;, {
+  env,
+  database: databaseStack,
+  security: securityStack,
+  storage: storageStack,
+});
+authStack.addDependency(databaseStack);
+authStack.addDependency(securityStack);
+authStack.addDependency(storageStack);
+
+// Layer 4
+const apiStack = new APIStack(app, &#39;API&#39;, {
+  env,
+  auth: authStack,
+  database: databaseStack,
+  security: securityStack,
+});
+apiStack.addDependency(authStack);
+
+// ... continue for remaining stacks</code></pre>
+<h3 id="cross-stack-references">Cross-Stack References</h3>
+<pre class="typescript"><code>// Example: APIStack referencing DatabaseStack exports
+
+export class APIStack extends Stack {
+  constructor(scope: Construct, id: string, props: APIStackProps) {
+    super(scope, id, props);
+    
+    // Use exports from DatabaseStack
+    const clusterArn = props.database.clusterArn;
+    const secretArn = props.database.secretArn;
+    
+    // Create Lambda with database access
+    const handler = new Function(this, &#39;ApiHandler&#39;, {
+      environment: {
+        AURORA_CLUSTER_ARN: clusterArn,
+        AURORA_SECRET_ARN: secretArn,
+      },
+    });
+  }
+}</code></pre>
+<hr />
+<h2 id="deployment-order">Deployment Order</h2>
+<h3 id="fresh-install">Fresh Install</h3>
+<pre class="bash"><code># Deploy in dependency order
+cdk deploy NetworkStack
+cdk deploy DatabaseStack SecurityStack StorageStack --parallel
+cdk deploy AuthStack
+cdk deploy APIStack AdminStack BillingStack --parallel
+cdk deploy AIStack
+cdk deploy ThermalStack PerceptionStack SageMakerStack --parallel</code></pre>
+<h3 id="update-with-dependencies">Update (with dependencies)</h3>
+<pre class="bash"><code># CDK handles ordering automatically when using addDependency
+cdk deploy --all</code></pre>
+<h3 id="selective-deployment">Selective Deployment</h3>
+<pre class="bash"><code># Deploy specific stack and its dependencies
+cdk deploy AIStack --require-approval never</code></pre>
+<hr />
+<h2 id="rollback-considerations">Rollback Considerations</h2>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 51%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Rollback Safe</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NetworkStack</td>
+<td>⚠️ Caution</td>
+<td>May affect all dependent stacks</td>
+</tr>
+<tr>
+<td>DatabaseStack</td>
+<td>⚠️ Caution</td>
+<td>Requires DB snapshot for data preservation</td>
+</tr>
+<tr>
+<td>SecurityStack</td>
+<td>✅ Safe</td>
+<td>KMS keys have deletion protection</td>
+</tr>
+<tr>
+<td>StorageStack</td>
+<td>⚠️ Caution</td>
+<td>S3 buckets may have data</td>
+</tr>
+<tr>
+<td>AuthStack</td>
+<td>✅ Safe</td>
+<td>Cognito pools preserved</td>
+</tr>
+<tr>
+<td>APIStack</td>
+<td>✅ Safe</td>
+<td>Stateless Lambda functions</td>
+</tr>
+<tr>
+<td>AdminStack</td>
+<td>✅ Safe</td>
+<td>Stateless</td>
+</tr>
+<tr>
+<td>BillingStack</td>
+<td>⚠️ Caution</td>
+<td>May have pending transactions</td>
+</tr>
+<tr>
+<td>AIStack</td>
+<td>✅ Safe</td>
+<td>Stateless routing</td>
+</tr>
+<tr>
+<td>ThermalStack</td>
+<td>✅ Safe</td>
+<td>State in database</td>
+</tr>
+<tr>
+<td>SageMakerStack</td>
+<td>⚠️ Caution</td>
+<td>May have running endpoints</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="validation-script">Validation Script</h2>
+<pre class="bash"><code>#!/bin/bash
+# tools/scripts/validate-stack-deps.sh
+
+echo &quot;Validating CDK stack dependencies...&quot;
+
+# Check for circular dependencies
+cdk synth --quiet 2&gt;&amp;1 | grep -i &quot;circular&quot; &amp;&amp; {
+    echo &quot;❌ Circular dependency detected!&quot;
+    exit 1
+}
+
+# Verify deployment order
+cdk diff --all 2&gt;&amp;1 | head -50
+
+echo &quot;✅ Stack dependencies validated&quot;</code></pre>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="DEPLOYMENT-GUIDE.md">Deployment Guide</a> - Full deployment procedures</li>
+<li><a href="DEPLOYER-ARCHITECTURE.md">Deployer Architecture</a> - Package and deployment flow</li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

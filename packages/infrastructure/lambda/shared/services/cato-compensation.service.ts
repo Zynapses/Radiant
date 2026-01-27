@@ -8,6 +8,7 @@ import { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 import { CatoCompensationType, CatoCompensationEntry, CatoAffectedResource } from '@radiant/shared';
 import { CatoToolRegistryService } from './cato-tool-registry.service';
+import { enhancedLogger as logger } from '../logging/enhanced-logger';
 
 export class CatoCompensationService {
   private pool: Pool;
@@ -117,7 +118,7 @@ export class CatoCompensationService {
     for (const resource of entry.affectedResources) {
       if (resource.action === 'CREATE') {
         // Delete the created resource
-        console.log(`Would delete ${resource.resourceType}:${resource.resourceId}`);
+        logger.info('Compensation: would delete resource', { resourceType: resource.resourceType, resourceId: resource.resourceId });
       }
     }
   }
@@ -126,14 +127,14 @@ export class CatoCompensationService {
     for (const resource of entry.affectedResources) {
       if (resource.previousState && (resource.action === 'UPDATE' || resource.action === 'DELETE')) {
         // Restore to previous state
-        console.log(`Would restore ${resource.resourceType}:${resource.resourceId} to previous state`);
+        logger.info('Compensation: would restore resource to previous state', { resourceType: resource.resourceType, resourceId: resource.resourceId });
       }
     }
   }
 
   private async executeNotifyCompensation(entry: CatoCompensationEntry): Promise<void> {
     // Send notification about the failed action
-    console.log(`Would notify about compensation for step ${entry.stepNumber}: ${entry.stepName}`);
+    logger.info('Compensation: would notify about compensation', { stepNumber: entry.stepNumber, stepName: entry.stepName });
   }
 
   private async flagForManualCompensation(entry: CatoCompensationEntry): Promise<void> {

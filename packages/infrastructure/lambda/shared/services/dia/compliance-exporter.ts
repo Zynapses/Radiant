@@ -130,57 +130,94 @@ export async function exportArtifact(params: {
 }
 
 /**
- * Generate PDF export
+ * Generate PDF export using PDFKit
  */
 async function generatePDFExport(
   artifact: DecisionArtifact,
   redact?: boolean
 ): Promise<Buffer> {
-  // For now, generate a structured JSON that could be converted to PDF
-  // In production, use a PDF library like pdfkit
-  const doc = {
-    title: artifact.title,
-    generated: new Date().toISOString(),
-    version: artifact.version,
-    status: artifact.status,
-    sections: [
-      {
-        title: 'Executive Summary',
-        content: artifact.summary || 'No summary available',
-      },
-      {
-        title: 'Claims & Evidence',
-        claims: artifact.artifactContent.claims.map((c) => ({
+  // Try to use PDFKit for real PDF generation
+  try {
+    const PDFDocument = (await import('pdfkit')).default;
+    
+    return new Promise((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      const doc = new PDFDocument({ margin: 50 });
+      
+      doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on('error', reject);
+      
+      // Title
+      doc.fontSize(24).font('Helvetica-Bold').text(artifact.title, { align: 'center' });
+      doc.moveDown();
+      doc.fontSize(10).font('Helvetica').text(`Generated: ${new Date().toISOString()}`, { align: 'center' });
+      doc.text(`Version: ${artifact.version} | Status: ${artifact.status}`, { align: 'center' });
+      doc.moveDown(2);
+      
+      // Executive Summary
+      doc.fontSize(16).font('Helvetica-Bold').text('Executive Summary');
+      doc.moveDown(0.5);
+      doc.fontSize(11).font('Helvetica').text(artifact.summary || 'No summary available');
+      doc.moveDown();
+      
+      // Claims & Evidence
+      doc.fontSize(16).font('Helvetica-Bold').text('Claims & Evidence');
+      doc.moveDown(0.5);
+      for (const claim of artifact.artifactContent.claims) {
+        const claimText = redact ? redactSensitive(claim.text) : claim.text;
+        doc.fontSize(11).font('Helvetica-Bold').text(`• ${claim.claim_type.toUpperCase()}`);
+        doc.font('Helvetica').text(claimText);
+        doc.fontSize(9).fillColor('gray')
+          .text(`Verification: ${claim.verification_status} | Confidence: ${(claim.confidence_score * 100).toFixed(1)}% | Evidence: ${claim.supporting_evidence.length} sources`);
+        doc.fillColor('black').moveDown(0.5);
+      }
+      doc.moveDown();
+      
+      // Dissent Analysis
+      doc.fontSize(16).font('Helvetica-Bold').text('Dissent Analysis');
+      doc.moveDown(0.5);
+      doc.fontSize(11).font('Helvetica').text(`Total dissent events: ${artifact.artifactContent.dissent_events.length}`);
+      for (const dissent of artifact.artifactContent.dissent_events) {
+        const position = redact ? redactSensitive(dissent.contested_position) : dissent.contested_position;
+        doc.fontSize(10).font('Helvetica-Bold').text(`Severity: ${dissent.dissent_severity}`);
+        doc.font('Helvetica').text(`Position: ${position}`);
+        doc.text(`Resolution: ${dissent.resolution}`);
+        doc.moveDown(0.5);
+      }
+      doc.moveDown();
+      
+      // Compliance Status
+      doc.fontSize(16).font('Helvetica-Bold').text('Compliance Status');
+      doc.moveDown(0.5);
+      doc.fontSize(11).font('Helvetica')
+        .text(`Frameworks: ${artifact.complianceFrameworks.join(', ') || 'None'}`)
+        .text(`PHI Detected: ${artifact.phiDetected ? 'Yes' : 'No'}`)
+        .text(`PII Detected: ${artifact.piiDetected ? 'Yes' : 'No'}`);
+      
+      doc.end();
+    });
+  } catch {
+    // Fallback to structured JSON if PDFKit is not available
+    const doc = {
+      title: artifact.title,
+      generated: new Date().toISOString(),
+      version: artifact.version,
+      status: artifact.status,
+      sections: [
+        { title: 'Executive Summary', content: artifact.summary || 'No summary available' },
+        { title: 'Claims & Evidence', claims: artifact.artifactContent.claims.map((c) => ({
           text: redact ? redactSensitive(c.text) : c.text,
           type: c.claim_type,
           verification: c.verification_status,
           confidence: c.confidence_score,
-          evidence_count: c.supporting_evidence.length,
-        })),
-      },
-      {
-        title: 'Dissent Analysis',
-        dissent_count: artifact.artifactContent.dissent_events.length,
-        events: artifact.artifactContent.dissent_events.map((d) => ({
-          position: redact ? redactSensitive(d.contested_position) : d.contested_position,
-          severity: d.dissent_severity,
-          resolution: d.resolution,
-        })),
-      },
-      {
-        title: 'Metrics',
-        ...artifact.artifactContent.metrics,
-      },
-      {
-        title: 'Compliance Status',
-        frameworks: artifact.complianceFrameworks,
-        phi_detected: artifact.phiDetected,
-        pii_detected: artifact.piiDetected,
-      },
-    ],
-  };
-
-  return Buffer.from(JSON.stringify(doc, null, 2));
+        })) },
+        { title: 'Dissent Analysis', dissent_count: artifact.artifactContent.dissent_events.length },
+        { title: 'Compliance Status', frameworks: artifact.complianceFrameworks },
+      ],
+    };
+    return Buffer.from(JSON.stringify(doc, null, 2));
+  }
 }
 
 /**

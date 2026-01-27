@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 29 ADMIN EXTENSIONS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 29 ADMIN EXTENSIONS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-29-ADMIN-EXTENSIONS.md</div>
+  </div>
+  
+  <h1 id="section-29-admin-dashboard-extensions-v3.7.0">SECTION 29: ADMIN DASHBOARD EXTENSIONS (v3.7.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<blockquote>
+<p><strong>NEW in v3.7.0</strong>: Extended admin dashboard capabilities for managing all v3.x features.</p>
+</blockquote>
+<hr />
+<h2 id="admin-dashboard-navigation-update">29.1 Admin Dashboard Navigation Update</h2>
+<pre class="typescript"><code>// apps/admin-dashboard/src/components/layout/sidebar.tsx
+
+const navigationItems = [
+  // Existing items...
+  { name: &#39;Dashboard&#39;, href: &#39;/dashboard&#39;, icon: LayoutDashboard },
+  { name: &#39;Tenants&#39;, href: &#39;/tenants&#39;, icon: Building2 },
+  { name: &#39;Users&#39;, href: &#39;/users&#39;, icon: Users },
+  { name: &#39;Administrators&#39;, href: &#39;/administrators&#39;, icon: Shield },
+  
+  // AI &amp; Models Section
+  { type: &#39;separator&#39;, label: &#39;AI &amp; Models&#39; },
+  { name: &#39;Providers&#39;, href: &#39;/providers&#39;, icon: Cloud },
+  { name: &#39;Models&#39;, href: &#39;/models&#39;, icon: Brain },
+  { name: &#39;Model Pricing&#39;, href: &#39;/models/pricing&#39;, icon: DollarSign }, // NEW
+  { name: &#39;Visual AI&#39;, href: &#39;/visual-ai&#39;, icon: Image },
+  { name: &#39;Thermal States&#39;, href: &#39;/thermal-states&#39;, icon: Thermometer },
+  
+  // Think Tank Section (NEW)
+  { type: &#39;separator&#39;, label: &#39;Think Tank&#39; },
+  { name: &#39;Think Tank Users&#39;, href: &#39;/thinktank/users&#39;, icon: UserCircle },
+  { name: &#39;Conversations&#39;, href: &#39;/thinktank/conversations&#39;, icon: MessageSquare },
+  { name: &#39;Domain Modes&#39;, href: &#39;/thinktank/domain-modes&#39;, icon: Layers },
+  { name: &#39;Model Categories&#39;, href: &#39;/thinktank/model-categories&#39;, icon: Grid },
+  
+  // Operations Section
+  { type: &#39;separator&#39;, label: &#39;Operations&#39; },
+  { name: &#39;Usage &amp; Billing&#39;, href: &#39;/billing&#39;, icon: Receipt },
+  { name: &#39;Analytics&#39;, href: &#39;/analytics&#39;, icon: BarChart },
+  { name: &#39;Error Logs&#39;, href: &#39;/errors&#39;, icon: AlertTriangle },
+  { name: &#39;Audit Logs&#39;, href: &#39;/audit&#39;, icon: FileText },
+  
+  // Settings Section
+  { type: &#39;separator&#39;, label: &#39;Settings&#39; },
+  { name: &#39;Credentials&#39;, href: &#39;/credentials&#39;, icon: Key },
+  { name: &#39;System Config&#39;, href: &#39;/config&#39;, icon: Settings },
+];</code></pre>
+<hr />
+<h2 id="think-tank-user-management-page">29.2 Think Tank User Management Page</h2>
+<pre class="typescript"><code>// apps/admin-dashboard/src/app/(dashboard)/thinktank/users/page.tsx
+
+&#39;use client&#39;;
+
+import { useState } from &#39;react&#39;;
+import { useQuery } from &#39;@tanstack/react-query&#39;;
+import { Card, CardContent, CardHeader, CardTitle } from &#39;@/components/ui/card&#39;;
+import { DataTable } from &#39;@/components/ui/data-table&#39;;
+import { Badge } from &#39;@/components/ui/badge&#39;;
+import { Button } from &#39;@/components/ui/button&#39;;
+import { Input } from &#39;@/components/ui/input&#39;;
+import { Search, Download, UserX, Mail } from &#39;lucide-react&#39;;
+import { formatDistanceToNow } from &#39;date-fns&#39;;
+
+const columns = [
+  {
+    accessorKey: &#39;email&#39;,
+    header: &#39;Email&#39;,
+    cell: ({ row }) =&gt; (
+      &lt;div&gt;
+        &lt;div className=&quot;font-medium&quot;&gt;{row.original.email}&lt;/div&gt;
+        &lt;div className=&quot;text-xs text-muted-foreground&quot;&gt;
+          ID: {row.original.id.slice(0, 8)}...
+        &lt;/div&gt;
+      &lt;/div&gt;
+    ),
+  },
+  {
+    accessorKey: &#39;display_name&#39;,
+    header: &#39;Display Name&#39;,
+  },
+  {
+    accessorKey: &#39;language&#39;,
+    header: &#39;Language&#39;,
+    cell: ({ row }) =&gt; (
+      &lt;Badge variant=&quot;outline&quot;&gt;{row.original.language?.toUpperCase() || &#39;EN&#39;}&lt;/Badge&gt;
+    ),
+  },
+  {
+    accessorKey: &#39;subscription_tier&#39;,
+    header: &#39;Tier&#39;,
+    cell: ({ row }) =&gt; {
+      const tier = row.original.subscription_tier;
+      const colors = {
+        free: &#39;bg-gray-100&#39;,
+        pro: &#39;bg-blue-100 text-blue-800&#39;,
+        team: &#39;bg-purple-100 text-purple-800&#39;,
+        enterprise: &#39;bg-amber-100 text-amber-800&#39;,
+      };
+      return &lt;Badge className={colors[tier] || colors.free}&gt;{tier}&lt;/Badge&gt;;
+    },
+  },
+  {
+    accessorKey: &#39;conversation_count&#39;,
+    header: &#39;Conversations&#39;,
+    cell: ({ row }) =&gt; row.original.conversation_count?.toLocaleString() || &#39;0&#39;,
+  },
+  {
+    accessorKey: &#39;total_tokens_used&#39;,
+    header: &#39;Tokens Used&#39;,
+    cell: ({ row }) =&gt; (row.original.total_tokens_used || 0).toLocaleString(),
+  },
+  {
+    accessorKey: &#39;total_spent&#39;,
+    header: &#39;Total Spent&#39;,
+    cell: ({ row }) =&gt; `$${(row.original.total_spent || 0).toFixed(2)}`,
+  },
+  {
+    accessorKey: &#39;last_active_at&#39;,
+    header: &#39;Last Active&#39;,
+    cell: ({ row }) =&gt;
+      row.original.last_active_at
+        ? formatDistanceToNow(new Date(row.original.last_active_at), { addSuffix: true })
+        : &#39;Never&#39;,
+  },
+  {
+    accessorKey: &#39;status&#39;,
+    header: &#39;Status&#39;,
+    cell: ({ row }) =&gt; (
+      &lt;Badge variant={row.original.status === &#39;active&#39; ? &#39;default&#39; : &#39;destructive&#39;}&gt;
+        {row.original.status}
+      &lt;/Badge&gt;
+    ),
+  },
+];
+
+export default function ThinkTankUsersPage() {
+  const [search, setSearch] = useState(&#39;&#39;);
+  
+  const { data: users, isLoading } = useQuery({
+    queryKey: [&#39;thinktank-users&#39;, search],
+    queryFn: () =&gt; fetch(`/api/admin/thinktank/users?search=${search}`).then(r =&gt; r.json()),
+  });
+
+  const { data: stats } = useQuery({
+    queryKey: [&#39;thinktank-user-stats&#39;],
+    queryFn: () =&gt; fetch(&#39;/api/admin/thinktank/users/stats&#39;).then(r =&gt; r.json()),
+  });
+
+  return (
+    &lt;div className=&quot;space-y-6&quot;&gt;
+      &lt;div className=&quot;flex justify-between items-center&quot;&gt;
+        &lt;div&gt;
+          &lt;h1 className=&quot;text-2xl font-bold&quot;&gt;Think Tank Users&lt;/h1&gt;
+          &lt;p className=&quot;text-muted-foreground&quot;&gt;
+            Manage Think Tank consumer users
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;Button variant=&quot;outline&quot;&gt;
+          &lt;Download className=&quot;h-4 w-4 mr-2&quot; /&gt;
+          Export
+        &lt;/Button&gt;
+      &lt;/div&gt;
+
+      {/* Stats Cards */}
+      &lt;div className=&quot;grid gap-4 md:grid-cols-4&quot;&gt;
+        &lt;Card&gt;
+          &lt;CardHeader className=&quot;pb-2&quot;&gt;
+            &lt;CardTitle className=&quot;text-sm font-medium text-muted-foreground&quot;&gt;
+              Total Users
+            &lt;/CardTitle&gt;
+          &lt;/CardHeader&gt;
+          &lt;CardContent&gt;
+            &lt;div className=&quot;text-2xl font-bold&quot;&gt;{stats?.totalUsers?.toLocaleString() || 0}&lt;/div&gt;
+          &lt;/CardContent&gt;
+        &lt;/Card&gt;
+        &lt;Card&gt;
+          &lt;CardHeader className=&quot;pb-2&quot;&gt;
+            &lt;CardTitle className=&quot;text-sm font-medium text-muted-foreground&quot;&gt;
+              Active (7d)
+            &lt;/CardTitle&gt;
+          &lt;/CardHeader&gt;
+          &lt;CardContent&gt;
+            &lt;div className=&quot;text-2xl font-bold&quot;&gt;{stats?.activeUsers7d?.toLocaleString() || 0}&lt;/div&gt;
+          &lt;/CardContent&gt;
+        &lt;/Card&gt;
+        &lt;Card&gt;
+          &lt;CardHeader className=&quot;pb-2&quot;&gt;
+            &lt;CardTitle className=&quot;text-sm font-medium text-muted-foreground&quot;&gt;
+              Pro+ Subscribers
+            &lt;/CardTitle&gt;
+          &lt;/CardHeader&gt;
+          &lt;CardContent&gt;
+            &lt;div className=&quot;text-2xl font-bold&quot;&gt;{stats?.paidUsers?.toLocaleString() || 0}&lt;/div&gt;
+          &lt;/CardContent&gt;
+        &lt;/Card&gt;
+        &lt;Card&gt;
+          &lt;CardHeader className=&quot;pb-2&quot;&gt;
+            &lt;CardTitle className=&quot;text-sm font-medium text-muted-foreground&quot;&gt;
+              Total Revenue
+            &lt;/CardTitle&gt;
+          &lt;/CardHeader&gt;
+          &lt;CardContent&gt;
+            &lt;div className=&quot;text-2xl font-bold&quot;&gt;${stats?.totalRevenue?.toLocaleString() || 0}&lt;/div&gt;
+          &lt;/CardContent&gt;
+        &lt;/Card&gt;
+      &lt;/div&gt;
+
+      {/* Search &amp; Table */}
+      &lt;Card&gt;
+        &lt;CardHeader&gt;
+          &lt;div className=&quot;flex items-center gap-4&quot;&gt;
+            &lt;div className=&quot;relative flex-1 max-w-sm&quot;&gt;
+              &lt;Search className=&quot;absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground&quot; /&gt;
+              &lt;Input
+                placeholder=&quot;Search by email or name...&quot;
+                value={search}
+                onChange={(e) =&gt; setSearch(e.target.value)}
+                className=&quot;pl-9&quot;
+              /&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/CardHeader&gt;
+        &lt;CardContent&gt;
+          &lt;DataTable
+            columns={columns}
+            data={users?.data || []}
+            isLoading={isLoading}
+          /&gt;
+        &lt;/CardContent&gt;
+      &lt;/Card&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<hr />
+<h2 id="domain-modes-configuration-page">29.3 Domain Modes Configuration Page</h2>
+<pre class="typescript"><code>// apps/admin-dashboard/src/app/(dashboard)/thinktank/domain-modes/page.tsx
+
+&#39;use client&#39;;
+
+import { useState } from &#39;react&#39;;
+import { useQuery, useMutation, useQueryClient } from &#39;@tanstack/react-query&#39;;
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from &#39;@/components/ui/card&#39;;
+import { Switch } from &#39;@/components/ui/switch&#39;;
+import { Button } from &#39;@/components/ui/button&#39;;
+import { Input } from &#39;@/components/ui/input&#39;;
+import { Label } from &#39;@/components/ui/label&#39;;
+import { Textarea } from &#39;@/components/ui/textarea&#39;;
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from &#39;@/components/ui/select&#39;;
+import { Badge } from &#39;@/components/ui/badge&#39;;
+import { toast } from &#39;sonner&#39;;
+import { 
+  Stethoscope, Scale, Code2, Lightbulb, GraduationCap, 
+  PenTool, FlaskConical, Save 
+} from &#39;lucide-react&#39;;
+
+const DOMAIN_MODES = [
+  { id: &#39;general&#39;, name: &#39;General&#39;, icon: Lightbulb, description: &#39;Default mode for general queries&#39; },
+  { id: &#39;medical&#39;, name: &#39;Medical&#39;, icon: Stethoscope, description: &#39;Healthcare and medical topics&#39; },
+  { id: &#39;legal&#39;, name: &#39;Legal&#39;, icon: Scale, description: &#39;Legal research and analysis&#39; },
+  { id: &#39;code&#39;, name: &#39;Code&#39;, icon: Code2, description: &#39;Programming and development&#39; },
+  { id: &#39;academic&#39;, name: &#39;Academic&#39;, icon: GraduationCap, description: &#39;Research and education&#39; },
+  { id: &#39;creative&#39;, name: &#39;Creative&#39;, icon: PenTool, description: &#39;Writing and content creation&#39; },
+  { id: &#39;scientific&#39;, name: &#39;Scientific&#39;, icon: FlaskConical, description: &#39;Scientific research&#39; },
+];
+
+export default function DomainModesPage() {
+  const queryClient = useQueryClient();
+  
+  const { data: config } = useQuery({
+    queryKey: [&#39;domain-modes-config&#39;],
+    queryFn: () =&gt; fetch(&#39;/api/admin/thinktank/domain-modes&#39;).then(r =&gt; r.json()),
+  });
+
+  const { data: models } = useQuery({
+    queryKey: [&#39;available-models&#39;],
+    queryFn: () =&gt; fetch(&#39;/api/admin/models?enabled=true&#39;).then(r =&gt; r.json()),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (data: any) =&gt;
+      fetch(&#39;/api/admin/thinktank/domain-modes&#39;, {
+        method: &#39;PUT&#39;,
+        headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+        body: JSON.stringify(data),
+      }).then(r =&gt; r.json()),
+    onSuccess: () =&gt; {
+      queryClient.invalidateQueries({ queryKey: [&#39;domain-modes-config&#39;] });
+      toast.success(&#39;Domain mode configuration saved&#39;);
+    },
+  });
+
+  const [localConfig, setLocalConfig] = useState(config || {});
+
+  return (
+    &lt;div className=&quot;space-y-6&quot;&gt;
+      &lt;div className=&quot;flex justify-between items-center&quot;&gt;
+        &lt;div&gt;
+          &lt;h1 className=&quot;text-2xl font-bold&quot;&gt;Domain Modes&lt;/h1&gt;
+          &lt;p className=&quot;text-muted-foreground&quot;&gt;
+            Configure specialized AI modes for different use cases
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;Button onClick={() =&gt; updateMutation.mutate(localConfig)}&gt;
+          &lt;Save className=&quot;h-4 w-4 mr-2&quot; /&gt;
+          Save Changes
+        &lt;/Button&gt;
+      &lt;/div&gt;
+
+      &lt;div className=&quot;grid gap-4&quot;&gt;
+        {DOMAIN_MODES.map((mode) =&gt; {
+          const ModeIcon = mode.icon;
+          const modeConfig = localConfig?.modes?.[mode.id] || {};
+          
+          return (
+            &lt;Card key={mode.id}&gt;
+              &lt;CardHeader&gt;
+                &lt;div className=&quot;flex items-center justify-between&quot;&gt;
+                  &lt;div className=&quot;flex items-center gap-3&quot;&gt;
+                    &lt;div className=&quot;p-2 rounded-lg bg-primary/10&quot;&gt;
+                      &lt;ModeIcon className=&quot;h-5 w-5 text-primary&quot; /&gt;
+                    &lt;/div&gt;
+                    &lt;div&gt;
+                      &lt;CardTitle className=&quot;text-lg&quot;&gt;{mode.name}&lt;/CardTitle&gt;
+                      &lt;CardDescription&gt;{mode.description}&lt;/CardDescription&gt;
+                    &lt;/div&gt;
+                  &lt;/div&gt;
+                  &lt;Switch
+                    checked={modeConfig.enabled !== false}
+                    onCheckedChange={(checked) =&gt;
+                      setLocalConfig({
+                        ...localConfig,
+                        modes: {
+                          ...localConfig.modes,
+                          [mode.id]: { ...modeConfig, enabled: checked },
+                        },
+                      })
+                    }
+                  /&gt;
+                &lt;/div&gt;
+              &lt;/CardHeader&gt;
+              &lt;CardContent className=&quot;space-y-4&quot;&gt;
+                &lt;div className=&quot;grid gap-4 md:grid-cols-2&quot;&gt;
+                  &lt;div className=&quot;space-y-2&quot;&gt;
+                    &lt;Label&gt;Default Model&lt;/Label&gt;
+                    &lt;Select
+                      value={modeConfig.defaultModel || &#39;auto&#39;}
+                      onValueChange={(value) =&gt;
+                        setLocalConfig({
+                          ...localConfig,
+                          modes: {
+                            ...localConfig.modes,
+                            [mode.id]: { ...modeConfig, defaultModel: value },
+                          },
+                        })
+                      }
+                    &gt;
+                      &lt;SelectTrigger&gt;
+                        &lt;SelectValue placeholder=&quot;Auto (RADIANT Brain)&quot; /&gt;
+                      &lt;/SelectTrigger&gt;
+                      &lt;SelectContent&gt;
+                        &lt;SelectItem value=&quot;auto&quot;&gt;Auto (RADIANT Brain)&lt;/SelectItem&gt;
+                        {(models?.data || []).map((model: any) =&gt; (
+                          &lt;SelectItem key={model.id} value={model.id}&gt;
+                            {model.display_name}
+                          &lt;/SelectItem&gt;
+                        ))}
+                      &lt;/SelectContent&gt;
+                    &lt;/Select&gt;
+                  &lt;/div&gt;
+                  
+                  &lt;div className=&quot;space-y-2&quot;&gt;
+                    &lt;Label&gt;Temperature&lt;/Label&gt;
+                    &lt;Input
+                      type=&quot;number&quot;
+                      min=&quot;0&quot;
+                      max=&quot;2&quot;
+                      step=&quot;0.1&quot;
+                      value={modeConfig.temperature || 0.7}
+                      onChange={(e) =&gt;
+                        setLocalConfig({
+                          ...localConfig,
+                          modes: {
+                            ...localConfig.modes,
+                            [mode.id]: { ...modeConfig, temperature: parseFloat(e.target.value) },
+                          },
+                        })
+                      }
+                    /&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;
+                
+                &lt;div className=&quot;space-y-2&quot;&gt;
+                  &lt;Label&gt;System Prompt Override&lt;/Label&gt;
+                  &lt;Textarea
+                    placeholder=&quot;Optional: Custom system prompt for this mode...&quot;
+                    value={modeConfig.systemPrompt || &#39;&#39;}
+                    onChange={(e) =&gt;
+                      setLocalConfig({
+                        ...localConfig,
+                        modes: {
+                          ...localConfig.modes,
+                          [mode.id]: { ...modeConfig, systemPrompt: e.target.value },
+                        },
+                      })
+                    }
+                    rows={3}
+                  /&gt;
+                &lt;/div&gt;
+              &lt;/CardContent&gt;
+            &lt;/Card&gt;
+          );
+        })}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

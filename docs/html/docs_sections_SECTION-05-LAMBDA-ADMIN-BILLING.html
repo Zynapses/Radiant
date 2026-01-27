@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 05 LAMBDA ADMIN BILLING - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 05 LAMBDA ADMIN BILLING</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-05-LAMBDA-ADMIN-BILLING.md</div>
+  </div>
+  
+  <h1 id="section-5-lambda-functions---admin-billing-v2.1.0">SECTION 5: LAMBDA FUNCTIONS - ADMIN &amp; BILLING (v2.1.0)</h1>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<blockquote>
+<p><strong>Dependencies:</strong> Sections 0-4 <strong>Creates:</strong> Invitations, Approvals, Metering, Billing handlers</p>
+</blockquote>
+<h2 id="type-imports">Type Imports</h2>
+<pre class="typescript"><code>import { Administrator, AdminRole, Invitation, ApprovalRequest, Invoice } from &#39;@radiant/shared&#39;;</code></pre>
+<blockquote>
+<p><strong>IMPORTANT:</strong> Use canonical table names: administrators, invitations, approval_requests</p>
+</blockquote>
+<hr />
+<h1 id="radiant-v2.2.0---prompt-5-lambda-functions---admin-billing">RADIANT v2.2.0 - Prompt 5: Lambda Functions - Admin &amp; Billing</h1>
+<blockquote>
+<p><strong>Prompt 5 of 9</strong> | Target Size: ~60KB | Version: 3.7.0 | December 2024</p>
+</blockquote>
+<hr />
+<h2 id="overview">OVERVIEW</h2>
+<p>This prompt creates the Admin &amp; Billing Lambda functions for the RADIANT platform:</p>
+<ol type="1">
+<li><strong>Invitations Lambda</strong> - Email-based administrator invitations with secure tokens</li>
+<li><strong>Approvals Lambda</strong> - Two-person approval workflow for production deployments</li>
+<li><strong>Admin Users Lambda</strong> - Administrator CRUD, roles, and MFA management</li>
+<li><strong>Admin Profiles Lambda</strong> - Preferences, notifications, and settings</li>
+<li><strong>Metering Lambda</strong> - Real-time usage event collection and tracking</li>
+<li><strong>Billing Lambda</strong> - Cost aggregation, invoicing, and payment processing</li>
+<li><strong>Audit Lambda</strong> - Comprehensive audit logging and compliance reporting</li>
+<li><strong>Notifications Lambda</strong> - Admin notification delivery and management</li>
+</ol>
+<hr />
+<h2 id="key-features">KEY FEATURES</h2>
+<h3 id="administrator-management">Administrator Management</h3>
+<ul>
+<li><strong>Email Invitations</strong>: Secure token-based invitation system with expiry</li>
+<li><strong>Role-Based Access</strong>: super_admin, admin, operator, auditor roles</li>
+<li><strong>MFA Requirement</strong>: Mandatory MFA for production environment access</li>
+<li><strong>Two-Person Approval</strong>: Production deployments require separate initiator and approver</li>
+</ul>
+<h3 id="billing-metering">Billing &amp; Metering</h3>
+<ul>
+<li><strong>Real-Time Tracking</strong>: Every API call metered with token counts and costs</li>
+<li><strong>Dynamic Pricing</strong>: Costs pulled from Dynamic Model Registry</li>
+<li><strong>Configurable Margin</strong>: Default 20% markup on provider costs</li>
+<li><strong>Stripe Integration</strong>: Automatic billing and payment processing</li>
+<li><strong>Usage Rollups</strong>: Daily aggregation for efficient querying</li>
+</ul>
+<hr />
+<h2 id="lambda-directory-structure">LAMBDA DIRECTORY STRUCTURE</h2>
+<p>``` packages/infrastructure/lambda/ Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ admin/ Ã¢â€â€š Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ invitations.ts # Email invitations Ã¢â€â€š Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ approvals.ts # Two-person approval workflow Ã¢â€â€š Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ users.ts # Admin user CRUD Ã¢â€â€š Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ profiles.ts # Admin preferences Ã¢â€â€š Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ notifications.ts # Notification management Ã¢â€â€š Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ audit.ts # Audit log queries Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ billing/ Ã¢â€â€š Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ metering.ts # Usage event collection Ã¢â€â€š Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ billing.ts # Cost aggregation &amp; invoices Ã¢â€â€š Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pricing.ts # Dynamic pricing sync Ã¢â€â€š Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ payments.ts # Stripe integration Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ shared/ Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ admin/ Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ index.ts Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ types.ts # Admin-specific types Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ email.ts # SES email utilities Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tokens.ts # Secure token generation Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ stripe.ts # Stripe client ```</p>
+<hr />
+<h2 id="part-1-shared-admin-utilities">PART 1: SHARED ADMIN UTILITIES</h2>
+<h3 id="packagesinfrastructurelambdasharedadminindex.ts">packages/infrastructure/lambda/shared/admin/index.ts</h3>
+<p>```typescript // Re-export admin utilities export * from ‘./types’; export * from ‘./email’; export * from ‘./tokens’; export * from ‘./stripe’; ```</p>
+<h3 id="packagesinfrastructurelambdasharedadmintypes.ts">packages/infrastructure/lambda/shared/admin/types.ts</h3>
+<p>```typescript /** * Admin-specific types for RADIANT v2.2.0 */</p>
+<p>import { z } from ‘zod’;</p>
+<p>// ============================================================================ // ADMINISTRATOR ROLES // ============================================================================</p>
+<p>export const AdminRole = { SUPER_ADMIN: ‘super_admin’, ADMIN: ‘admin’, OPERATOR: ‘operator’, AUDITOR: ‘auditor’, } as const;</p>
+<p>export type AdminRoleType = typeof AdminRole[keyof typeof AdminRole];</p>
+<p>export const ROLE_HIERARCHY: Record&lt;AdminRoleType, number&gt; = { [AdminRole.SUPER_ADMIN]: 100, [AdminRole.ADMIN]: 75, [AdminRole.OPERATOR]: 50, [AdminRole.AUDITOR]: 25, };</p>
+<p>export const ROLE_PERMISSIONS: Record&lt;AdminRoleType, string[]&gt; = { [AdminRole.SUPER_ADMIN]: [ ‘admin:<em>’, ’billing:</em>’, ‘settings:<em>’, ’deployments:</em>’, ‘approvals:<em>’, ’audit:</em>’, ], [AdminRole.ADMIN]: [ ‘admin:read’, ‘admin:write’, ‘billing:read’, ‘settings:read’, ‘settings:write’, ‘deployments:read’, ‘deployments:write’, ‘approvals:read’, ‘approvals:initiate’, ], [AdminRole.OPERATOR]: [ ‘admin:read’, ‘billing:read’, ‘settings:read’, ‘deployments:read’, ], [AdminRole.AUDITOR]: [ ‘admin:read’, ‘billing:read’, ‘audit:read’, ], };</p>
+<p>// ============================================================================ // INVITATION TYPES // ============================================================================</p>
+<p>export interface Invitation { id: string; email: string; role: AdminRoleType; invitedBy: string; invitedByName: string; appId: string; tenantId: string; environment: ‘dev’ | ‘staging’ | ‘prod’; token: string; tokenHash: string; expiresAt: string; status: ‘pending’ | ‘accepted’ | ‘expired’ | ‘revoked’; createdAt: string; acceptedAt?: string; acceptedByIp?: string; }</p>
+<p>export const createInvitationSchema = z.object({ email: z.string().email(), role: z.enum([‘super_admin’, ‘admin’, ‘operator’, ‘auditor’]), message: z.string().max(500).optional(), expiresInHours: z.number().int().min(1).max(168).default(48), });</p>
+<p>export const acceptInvitationSchema = z.object({ token: z.string().min(32), firstName: z.string().min(1).max(50), lastName: z.string().min(1).max(50), password: z.string().min(12).max(128), mfaMethod: z.enum([‘authenticator’, ‘sms’, ‘email’]).default(‘authenticator’), phone: z.string().optional(), });</p>
+<p>// ============================================================================ // APPROVAL TYPES // ============================================================================</p>
+<p>export type ApprovalType = | ‘deployment’ | ‘promotion’ | ‘model_activation’ | ‘provider_change’ | ‘user_role_change’ | ‘billing_change’;</p>
+<p>export type ApprovalStatus = | ‘pending’ | ‘approved’ | ‘rejected’ | ‘expired’ | ‘cancelled’;</p>
+<p>export interface ApprovalRequest { id: string; type: ApprovalType; appId: string; tenantId: string; environment: ‘dev’ | ‘staging’ | ‘prod’; requestedBy: string; requestedByName: string; requestedAt: string; expiresAt: string; status: ApprovalStatus; approvedBy?: string; approvedByName?: string; approvedAt?: string; rejectedReason?: string; action: string; resourceType: string; resourceId: string; details: Record&lt;string, unknown&gt;; priority: ‘low’ | ‘medium’ | ‘high’ | ‘critical’; notes?: string; }</p>
+<p>export const createApprovalSchema = z.object({ type: z.enum([ ‘deployment’, ‘promotion’, ‘model_activation’, ‘provider_change’, ‘user_role_change’, ‘billing_change’, ]), action: z.string(), resourceType: z.string(), resourceId: z.string(), details: z.record(z.unknown()), priority: z.enum([‘low’, ‘medium’, ‘high’, ‘critical’]).default(‘medium’), notes: z.string().max(1000).optional(), expiresInHours: z.number().int().min(1).max(168).default(24), });</p>
+<p>export const processApprovalSchema = z.object({ action: z.enum([‘approve’, ‘reject’]), reason: z.string().max(500).optional(), }); ```</p>
+<h3 id="packagesinfrastructurelambdasharedadmintokens.ts">packages/infrastructure/lambda/shared/admin/tokens.ts</h3>
+<p>```typescript /** * Secure token generation and validation */</p>
+<p>import { randomBytes, createHash, timingSafeEqual } from ‘crypto’;</p>
+<p>export function generateToken(length: number = 32): string { return randomBytes(length).toString(‘base64url’); }</p>
+<p>export function generateCode(length: number = 6): string { const chars = ‘0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ’; const bytes = randomBytes(length); let code = ’’; for (let i = 0; i &lt; length; i++) { code += chars[bytes[i] % chars.length]; } return code; }</p>
+<p>export function hashToken(token: string): string { return createHash(‘sha256’).update(token).digest(‘hex’); }</p>
+<p>export function verifyToken(token: string, hash: string): boolean { const tokenHash = hashToken(token); try { return timingSafeEqual( Buffer.from(tokenHash, ‘hex’), Buffer.from(hash, ‘hex’) ); } catch { return false; } }</p>
+<p>export function generateInvitationToken(): { token: string; tokenHash: string } { const token = generateToken(48); const tokenHash = hashToken(token); return { token, tokenHash }; }</p>
+<p>export function calculateExpiry(hoursFromNow: number): string { const expiry = new Date(); expiry.setHours(expiry.getHours() + hoursFromNow); return expiry.toISOString(); }</p>
+<p>export function isExpired(expiresAt: string): boolean { return new Date(expiresAt) &lt; new Date(); } ```</p>
+<h3 id="packagesinfrastructurelambdasharedadminemail.ts">packages/infrastructure/lambda/shared/admin/email.ts</h3>
+<p>```typescript /** * Email utilities using AWS SES */</p>
+<p>import { SESClient, SendEmailCommand } from ‘<span class="citation" data-cites="aws-sdk/client-ses">@aws-sdk/client-ses</span>’; import { Logger } from ‘../logger’;</p>
+<p>const sesClient = new SESClient({});</p>
+<p>export interface EmailOptions { to: string | string[]; subject: string; html: string; text?: string; replyTo?: string; }</p>
+<p>export async function sendEmail(options: EmailOptions, logger: Logger): Promise<void> { const fromEmail = `noreply@${process.env.DOMAIN || ‘radiant.cloud’}`; const toAddresses = Array.isArray(options.to) ? options.to : [options.to];</p>
+<p>const command = new SendEmailCommand({ Source: fromEmail, Destination: { ToAddresses: toAddresses }, Message: { Subject: { Data: options.subject, Charset: ‘UTF-8’ }, Body: { Html: { Data: options.html, Charset: ‘UTF-8’ }, …(options.text &amp;&amp; { Text: { Data: options.text, Charset: ‘UTF-8’ } }), }, }, ReplyToAddresses: options.replyTo ? [options.replyTo] : undefined, });</p>
+<p>try { await sesClient.send(command); logger.info(‘Email sent successfully’, { to: toAddresses, subject: options.subject }); } catch (error) { logger.error(‘Failed to send email’, error as Error, { to: toAddresses }); throw error; } }</p>
+export function generateInvitationEmail(params: { inviteeName: string; inviterName: string; role: string; appName: string; environment: string; acceptUrl: string; expiresAt: string; message?: string; }): { html: string; text: string } { const html = ` &lt;!DOCTYPE html&gt;
+<html>
+<head>
+<meta charset="utf-8">
+<title>
+You’ve Been Invited to ${params.appName}
+</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, &#39;Segoe UI&#39;, Roboto, sans-serif; background: #f5f5f5; padding: 40px;">
+<div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; padding: 40px;">
+<pre><code>&lt;h1 style=&quot;color: #1a1a1a; margin-bottom: 20px;&quot;&gt;You&#39;re Invited!&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;\${params.inviterName}&lt;/strong&gt; has invited you to join &lt;strong&gt;\${params.appName}&lt;/strong&gt; as a &lt;strong&gt;\${params.role}&lt;/strong&gt; for the &lt;strong&gt;\${params.environment}&lt;/strong&gt; environment.&lt;/p&gt;
+\${params.message ? \`&lt;blockquote style=&quot;background: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0;&quot;&gt;&quot;\${params.message}&quot;&lt;/blockquote&gt;\` : &#39;&#39;}
+&lt;div style=&quot;text-align: center; margin: 30px 0;&quot;&gt;
+  &lt;a href=&quot;\${params.acceptUrl}&quot; style=&quot;display: inline-block; padding: 14px 32px; background: #007bff; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;&quot;&gt;Accept Invitation&lt;/a&gt;
+&lt;/div&gt;
+&lt;p style=&quot;color: #666; font-size: 14px;&quot;&gt;This invitation expires on &lt;strong&gt;\${new Date(params.expiresAt).toLocaleDateString(&#39;en-US&#39;, { weekday: &#39;long&#39;, year: &#39;numeric&#39;, month: &#39;long&#39;, day: &#39;numeric&#39; })}&lt;/strong&gt;&lt;/p&gt;</code></pre>
+</div>
+</body>
+</html>
+<p>`;</p>
+<p>const text = `You’ve been invited to ${params.appName} by ${params.inviterName} as a ${params.role}. Accept: ${params.acceptUrl}`; return { html, text }; }</p>
+export function generateApprovalEmail(params: { approverName: string; requesterName: string; appName: string; environment: string; action: string; resourceType: string; resourceId: string; approveUrl: string; rejectUrl: string; expiresAt: string; }): { html: string; text: string } { const html = ` &lt;!DOCTYPE html&gt;
+<html>
+<head>
+<meta charset="utf-8">
+<title>
+Approval Required - ${params.appName}
+</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, &#39;Segoe UI&#39;, Roboto, sans-serif; background: #f5f5f5; padding: 40px;">
+<div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden;">
+<pre><code>&lt;div style=&quot;background: #ffc107; padding: 20px; text-align: center;&quot;&gt;
+  &lt;h1 style=&quot;margin: 0; color: #1a1a1a;&quot;&gt;Ã¢Å¡Â Ã¯Â¸Â Approval Required&lt;/h1&gt;
+&lt;/div&gt;
+&lt;div style=&quot;padding: 30px;&quot;&gt;
+  &lt;p&gt;Hi \${params.approverName},&lt;/p&gt;
+  &lt;p&gt;&lt;strong&gt;\${params.requesterName}&lt;/strong&gt; has requested approval for:&lt;/p&gt;
+  &lt;div style=&quot;background: #f8f9fa; padding: 20px; border-radius: 6px; margin: 20px 0;&quot;&gt;
+    &lt;p&gt;&lt;strong&gt;Environment:&lt;/strong&gt; \${params.environment.toUpperCase()}&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;Action:&lt;/strong&gt; \${params.action}&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;Resource:&lt;/strong&gt; \${params.resourceType} (\${params.resourceId})&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;text-align: center; margin: 30px 0;&quot;&gt;
+    &lt;a href=&quot;\${params.approveUrl}&quot; style=&quot;display: inline-block; padding: 14px 32px; background: #28a745; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; margin-right: 10px;&quot;&gt;Ã¢Å“â€œ Approve&lt;/a&gt;
+    &lt;a href=&quot;\${params.rejectUrl}&quot; style=&quot;display: inline-block; padding: 14px 32px; background: #dc3545; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;&quot;&gt;Ã¢Å“â€” Reject&lt;/a&gt;
+  &lt;/div&gt;
+  &lt;p style=&quot;color: #dc3545; font-size: 12px; text-align: center;&quot;&gt;Ã¢Å¡Â Ã¯Â¸Â Production deployments require two-person approval&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+</div>
+</body>
+</html>
+<p>`;</p>
+<p>const text = `APPROVAL REQUIRED: ${params.requesterName} requests approval for ${params.action} on ${params.resourceType}. Approve: ${params.approveUrl} Reject: ${params.rejectUrl}`; return { html, text }; } ```</p>
+<h3 id="packagesinfrastructurelambdasharedadminstripe.ts">packages/infrastructure/lambda/shared/admin/stripe.ts</h3>
+<p>```typescript /** * Stripe payment integration */</p>
+<p>import Stripe from ‘stripe’; import { SecretsManagerClient, GetSecretValueCommand } from ‘<span class="citation" data-cites="aws-sdk/client-secrets-manager">@aws-sdk/client-secrets-manager</span>’; import { Logger } from ‘../logger’;</p>
+<p>const secretsClient = new SecretsManagerClient({}); let stripeClient: Stripe | null = null;</p>
+<p>async function getStripeClient(): Promise<Stripe> { if (stripeClient) return stripeClient;</p>
+<p>const secretArn = process.env.STRIPE_SECRET_ARN; if (!secretArn) throw new Error(‘STRIPE_SECRET_ARN not configured’);</p>
+<p>const command = new GetSecretValueCommand({ SecretId: secretArn }); const response = await secretsClient.send(command); if (!response.SecretString) throw new Error(‘Stripe secret not found’);</p>
+<p>const secrets = JSON.parse(response.SecretString); stripeClient = new Stripe(secrets.apiKey, { apiVersion: ‘2023-10-16’ }); return stripeClient; }</p>
+<p>export async function getOrCreateCustomer( tenantId: string, email: string, name: string, metadata: Record&lt;string, string&gt;, logger: Logger ): Promise<string> { const stripe = await getStripeClient();</p>
+<p>const existing = await stripe.customers.search({ query: `metadata[‘tenantId’]:‘${tenantId}’`, limit: 1, });</p>
+<p>if (existing.data.length &gt; 0) { logger.info(‘Found existing Stripe customer’, { tenantId, customerId: existing.data[0].id }); return existing.data[0].id; }</p>
+<p>const customer = await stripe.customers.create({ email, name, metadata: { tenantId, …metadata }, });</p>
+<p>logger.info(‘Created Stripe customer’, { tenantId, customerId: customer.id }); return customer.id; }</p>
+<p>export async function createInvoice(params: { customerId: string; tenantId: string; periodStart: Date; periodEnd: Date; lineItems: Array&lt;{ description: string; amount: number; quantity: number; metadata?: Record&lt;string, string&gt;; }&gt;; metadata?: Record&lt;string, string&gt;; }, logger: Logger): Promise&lt;Stripe.Invoice&gt; { const stripe = await getStripeClient();</p>
+<p>for (const item of params.lineItems) { await stripe.invoiceItems.create({ customer: params.customerId, amount: item.amount, currency: ‘usd’, description: item.description, quantity: item.quantity, metadata: item.metadata, }); }</p>
+<p>const invoice = await stripe.invoices.create({ customer: params.customerId, auto_advance: true, collection_method: ‘charge_automatically’, metadata: { tenantId: params.tenantId, periodStart: params.periodStart.toISOString(), periodEnd: params.periodEnd.toISOString(), …params.metadata, }, });</p>
+<p>logger.info(‘Created Stripe invoice’, { tenantId: params.tenantId, invoiceId: invoice.id }); return invoice; }</p>
+<p>export async function getInvoiceStatus(invoiceId: string, logger: Logger): Promise&lt;{ status: string; paid: boolean; amountDue: number; amountPaid: number; }&gt; { const stripe = await getStripeClient(); const invoice = await stripe.invoices.retrieve(invoiceId); return { status: invoice.status || ‘unknown’, paid: invoice.paid, amountDue: invoice.amount_due, amountPaid: invoice.amount_paid, }; } ```</p>
+<hr />
+<h2 id="part-2-invitations-lambda">PART 2: INVITATIONS LAMBDA</h2>
+<h3 id="packagesinfrastructurelambdaadmininvitations.ts">packages/infrastructure/lambda/admin/invitations.ts</h3>
+<p>```typescript /** * Administrator Invitation Lambda * Handles email-based administrator invitations with secure tokens */</p>
+<p>import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from ‘aws-lambda’; import { v4 as uuidv4 } from ‘uuid’; import { Logger } from ‘../shared/logger’; import { success, created, handleError } from ‘../shared/response’; import { extractAuthContext, requireAdmin, requirePermission } from ‘../shared/auth’; import { ValidationError, NotFoundError, ForbiddenError } from ‘../shared/errors’; import { executeQuery, createAuditLog } from ‘../shared/db’; import { createInvitationSchema, acceptInvitationSchema, ROLE_HIERARCHY } from ‘../shared/admin/types’; import { generateInvitationToken, hashToken, calculateExpiry, isExpired } from ‘../shared/admin/tokens’; import { sendEmail, generateInvitationEmail } from ‘../shared/admin/email’; import { CognitoIdentityProviderClient, AdminCreateUserCommand, AdminAddUserToGroupCommand, AdminSetUserMFAPreferenceCommand, } from ‘<span class="citation" data-cites="aws-sdk/client-cognito-identity-provider">@aws-sdk/client-cognito-identity-provider</span>’;</p>
+<p>const logger = new Logger({ handler: ‘invitations’ }); const cognitoClient = new CognitoIdentityProviderClient({});</p>
+<p>export async function handler( event: APIGatewayProxyEvent, context: Context ): Promise<APIGatewayProxyResult> { const requestLogger = logger.child({ requestId: context.awsRequestId, path: event.path });</p>
+<p>try { const invitationId = event.pathParameters?.invitationId; const action = event.path.split(‘/’).pop();</p>
+<pre><code>switch (event.httpMethod) {
+  case &#39;GET&#39;:
+    if (invitationId) return await handleGetInvitation(invitationId, event, requestLogger);
+    return await handleListInvitations(event, requestLogger);
+
+  case &#39;POST&#39;:
+    if (action === &#39;accept&#39;) return await handleAcceptInvitation(event, requestLogger);
+    if (action === &#39;resend&#39; &amp;&amp; invitationId) return await handleResendInvitation(invitationId, event, requestLogger);
+    return await handleCreateInvitation(event, requestLogger);
+
+  case &#39;DELETE&#39;:
+    if (!invitationId) throw new ValidationError(&#39;Invitation ID required&#39;);
+    return await handleRevokeInvitation(invitationId, event, requestLogger);
+
+  default:
+    throw new ValidationError(\`Method \${event.httpMethod} not allowed\`);
+}</code></pre>
+<p>} catch (error) { return handleError(error, requestLogger); } }</p>
+<p>async function handleCreateInvitation(event: APIGatewayProxyEvent, logger: Logger): Promise<APIGatewayProxyResult> { const auth = extractAuthContext(event); requireAdmin(auth); requirePermission(auth, ‘admin:write’);</p>
+<p>const body = event.body ? JSON.parse(event.body) : {}; const parseResult = createInvitationSchema.safeParse(body); if (!parseResult.success) { throw new ValidationError(‘Invalid request body’, parseResult.error.flatten().fieldErrors as Record&lt;string, string[]&gt;); }</p>
+<p>const { email, role, message, expiresInHours } = parseResult.data;</p>
+<p>// Validate role hierarchy if (ROLE_HIERARCHY[role] &gt; ROLE_HIERARCHY[auth.role as keyof typeof ROLE_HIERARCHY]) { throw new ForbiddenError(‘Cannot invite administrator with higher role than your own’); }</p>
+<p>// Check existing admin/invitation const existingAdmin = await executeQuery( `SELECT id FROM administrators WHERE email = $1 AND tenant_id = $2`, [email, auth.tenantId], logger ); if (existingAdmin.rowCount &gt; 0) { throw new ValidationError(‘An administrator with this email already exists’); }</p>
+<p>const pendingInvitation = await executeQuery( `SELECT id FROM invitations WHERE email = $1 AND tenant_id = $2 AND status = ‘pending’ AND expires_at &gt; NOW()`, [email, auth.tenantId], logger ); if (pendingInvitation.rowCount &gt; 0) { throw new ValidationError(‘A pending invitation already exists for this email’); }</p>
+<p>// Generate token and create invitation const { token, tokenHash } = generateInvitationToken(); const expiresAt = calculateExpiry(expiresInHours); const invitationId = uuidv4();</p>
+<p>const inviterResult = await executeQuery(`SELECT first_name, last_name FROM administrators WHERE id = $1`, [auth.userId], logger); const inviterName = inviterResult.rows[0] ? `${inviterResult.rows[0].first_name} ${inviterResult.rows[0].last_name}` : ‘An administrator’;</p>
+<p>const appResult = await executeQuery(`SELECT name FROM apps WHERE id = $1`, [auth.appId], logger); const appName = appResult.rows[0]?.name || auth.appId;</p>
+<p>await executeQuery( `INSERT INTO invitations (id, email, role, invited_by, app_id, tenant_id, environment, token_hash, expires_at, status, message, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, ‘pending’, $10, NOW())`, [invitationId, email, role, auth.userId, auth.appId, auth.tenantId, auth.environment, tokenHash, expiresAt, message || null], logger );</p>
+<p>// Send email const acceptUrl = `${process.env.ADMIN_URL}/invite/accept?token=${token}`; const emailContent = generateInvitationEmail({ inviteeName: ’’, inviterName, role, appName, environment: auth.environment, acceptUrl, expiresAt, message, }); await sendEmail({ to: email, subject: `You’ve been invited to ${appName}`, html: emailContent.html, text: emailContent.text }, logger);</p>
+<p>await createAuditLog({ tenant_id: auth.tenantId, user_id: null, admin_id: auth.userId, action: ‘invitation.create’, resource_type: ‘invitation’, resource_id: invitationId, details: { email, role, expiresAt }, ip_address: event.requestContext.identity?.sourceIp || null, user_agent: event.headers[‘User-Agent’] || null, }, logger);</p>
+<p>logger.info(‘Invitation created and sent’, { invitationId, email, role }); return created({ invitation: { id: invitationId, email, role, status: ‘pending’, expiresAt, createdAt: new Date().toISOString() } }); }</p>
+<p>async function handleAcceptInvitation(event: APIGatewayProxyEvent, logger: Logger): Promise<APIGatewayProxyResult> { const body = event.body ? JSON.parse(event.body) : {}; const parseResult = acceptInvitationSchema.safeParse(body); if (!parseResult.success) { throw new ValidationError(‘Invalid request body’, parseResult.error.flatten().fieldErrors as Record&lt;string, string[]&gt;); }</p>
+<p>const { token, firstName, lastName, password, mfaMethod, phone } = parseResult.data;</p>
+<p>const tokenHash = hashToken(token); const inviteResult = await executeQuery( `SELECT * FROM invitations WHERE token_hash = $1 AND status = ‘pending’`, [tokenHash], logger ); if (inviteResult.rowCount === 0) throw new NotFoundError(‘Invalid or expired invitation’);</p>
+<p>const invitation = inviteResult.rows[0]; if (isExpired(invitation.expires_at)) { await executeQuery(`UPDATE invitations SET status = ‘expired’ WHERE id = $1`, [invitation.id], logger); throw new ValidationError(‘This invitation has expired’); }</p>
+<p>if (invitation.environment === ‘prod’ &amp;&amp; mfaMethod === ‘sms’ &amp;&amp; !phone) { throw new ValidationError(‘Phone number required for SMS MFA’); }</p>
+<p>const userPoolId = process.env.ADMIN_USER_POOL_ID; const adminUserId = uuidv4();</p>
+<p>// Create Cognito user await cognitoClient.send(new AdminCreateUserCommand({ UserPoolId: userPoolId, Username: invitation.email, TemporaryPassword: password, UserAttributes: [ { Name: ‘email’, Value: invitation.email }, { Name: ‘email_verified’, Value: ‘true’ }, { Name: ‘given_name’, Value: firstName }, { Name: ‘family_name’, Value: lastName }, { Name: ‘custom:adminId’, Value: adminUserId }, { Name: ‘custom:tenantId’, Value: invitation.tenant_id }, { Name: ‘custom:role’, Value: invitation.role }, ], MessageAction: ‘SUPPRESS’, }));</p>
+<p>await cognitoClient.send(new AdminAddUserToGroupCommand({ UserPoolId: userPoolId, Username: invitation.email, GroupName: invitation.role, }));</p>
+<p>if (invitation.environment === ‘prod’) { await cognitoClient.send(new AdminSetUserMFAPreferenceCommand({ UserPoolId: userPoolId, Username: invitation.email, SoftwareTokenMfaSettings: mfaMethod === ‘authenticator’ ? { Enabled: true, PreferredMfa: true } : undefined, SMSMfaSettings: mfaMethod === ‘sms’ ? { Enabled: true, PreferredMfa: true } : undefined, })); }</p>
+<p>// Create admin user record await executeQuery( `INSERT INTO administrators (id, cognito_user_id, email, first_name, last_name, display_name, role, app_id, tenant_id, mfa_enabled, mfa_method, status, created_at, updated_at, created_by, invitation_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, ‘active’, NOW(), NOW(), $12, $13)`, [adminUserId, invitation.email, invitation.email, firstName, lastName, `${firstName} ${lastName}`, invitation.role, invitation.app_id, invitation.tenant_id, invitation.environment === ‘prod’, mfaMethod, invitation.invited_by, invitation.id], logger );</p>
+<p>// Create default profile await executeQuery( `INSERT INTO admin_profiles (admin_id, notifications, timezone, language, date_format, time_format, currency, theme, default_environment, sidebar_collapsed, table_rows_per_page, updated_at) VALUES ($1, $2, ‘America/New_York’, ‘en’, ‘MM/DD/YYYY’, ‘12h’, ‘USD’, ‘system’, $3, false, 25, NOW())`, [adminUserId, JSON.stringify({ method: ‘email’, frequency: ‘immediate’, categories: { security: true, billing: true, deployments: true, approvals: true, system: true } }), invitation.environment], logger );</p>
+<p>await executeQuery( `UPDATE invitations SET status = ‘accepted’, accepted_at = NOW(), accepted_by_ip = $2 WHERE id = $1`, [invitation.id, event.requestContext.identity?.sourceIp || null], logger );</p>
+<p>await createAuditLog({ tenant_id: invitation.tenant_id, user_id: null, admin_id: adminUserId, action: ‘invitation.accept’, resource_type: ‘invitation’, resource_id: invitation.id, details: { email: invitation.email, role: invitation.role, firstName, lastName }, ip_address: event.requestContext.identity?.sourceIp || null, user_agent: event.headers[‘User-Agent’] || null, }, logger);</p>
+<p>logger.info(‘Invitation accepted’, { invitationId: invitation.id, adminUserId, email: invitation.email }); return success({ message: ‘Invitation accepted successfully’, adminUser: { id: adminUserId, email: invitation.email, firstName, lastName, role: invitation.role, mfaRequired: invitation.environment === ‘prod’ }, }); }</p>
+<p>async function handleListInvitations(event: APIGatewayProxyEvent, logger: Logger): Promise<APIGatewayProxyResult> { const auth = extractAuthContext(event); requireAdmin(auth); requirePermission(auth, ‘admin:read’);</p>
+<p>const status = event.queryStringParameters?.status; const limit = parseInt(event.queryStringParameters?.limit || ‘50’); const offset = parseInt(event.queryStringParameters?.offset || ‘0’);</p>
+<p>let query = `SELECT i.*, a.first_name as inviter_first_name, a.last_name as inviter_last_name FROM invitations i LEFT JOIN administrators a ON i.invited_by = a.id WHERE i.tenant_id = $1`; const params: any[] = [auth.tenantId];</p>
+<p>if (status) { params.push(status); query += ` AND i.status = $${params.length}`; } query += ` ORDER BY i.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`; params.push(limit, offset);</p>
+<p>const result = await executeQuery(query, params, logger); const invitations = result.rows.map(row =&gt; ({ id: row.id, email: row.email, role: row.role, status: row.status, environment: row.environment, invitedBy: { id: row.invited_by, name: row.inviter_first_name ? `${row.inviter_first_name} ${row.inviter_last_name}` : ‘Unknown’ }, message: row.message, expiresAt: row.expires_at, createdAt: row.created_at, acceptedAt: row.accepted_at, }));</p>
+<p>return success({ invitations, pagination: { limit, offset, hasMore: invitations.length === limit } }); }</p>
+<p>async function handleGetInvitation(invitationId: string, event: APIGatewayProxyEvent, logger: Logger): Promise<APIGatewayProxyResult> { const auth = extractAuthContext(event); requireAdmin(auth); requirePermission(auth, ‘admin:read’);</p>
+<p>const result = await executeQuery( `SELECT i.*, a.first_name as inviter_first_name, a.last_name as inviter_last_name FROM invitations i LEFT JOIN administrators a ON i.invited_by = a.id WHERE i.id = $1 AND i.tenant_id = $2`, [invitationId, auth.tenantId], logger ); if (result.rowCount === 0) throw new NotFoundError(‘Invitation not found’);</p>
+<p>const row = result.rows[0]; return success({ invitation: { id: row.id, email: row.email, role: row.role, status: row.status, environment: row.environment, invitedBy: { id: row.invited_by, name: `${row.inviter_first_name} ${row.inviter_last_name}` }, message: row.message, expiresAt: row.expires_at, createdAt: row.created_at, acceptedAt: row.accepted_at, }, }); }</p>
+<p>async function handleResendInvitation(invitationId: string, event: APIGatewayProxyEvent, logger: Logger): Promise<APIGatewayProxyResult> { const auth = extractAuthContext(event); requireAdmin(auth); requirePermission(auth, ‘admin:write’);</p>
+<p>const result = await executeQuery(`SELECT * FROM invitations WHERE id = $1 AND tenant_id = $2`, [invitationId, auth.tenantId], logger); if (result.rowCount === 0) throw new NotFoundError(‘Invitation not found’);</p>
+<p>const invitation = result.rows[0]; if (invitation.status !== ‘pending’) throw new ValidationError(`Cannot resend ${invitation.status} invitation`);</p>
+<p>const { token, tokenHash } = generateInvitationToken(); const expiresAt = calculateExpiry(48);</p>
+<p>await executeQuery(`UPDATE invitations SET token_hash = $2, expires_at = $3 WHERE id = $1`, [invitationId, tokenHash, expiresAt], logger);</p>
+<p>const inviterResult = await executeQuery(`SELECT first_name, last_name FROM administrators WHERE id = $1`, [auth.userId], logger); const inviterName = inviterResult.rows[0] ? `${inviterResult.rows[0].first_name} ${inviterResult.rows[0].last_name}` : ‘An administrator’;</p>
+<p>const appResult = await executeQuery(`SELECT name FROM apps WHERE id = $1`, [auth.appId], logger); const appName = appResult.rows[0]?.name || auth.appId;</p>
+<p>const acceptUrl = `${process.env.ADMIN_URL}/invite/accept?token=${token}`; const emailContent = generateInvitationEmail({ inviteeName: ’’, inviterName, role: invitation.role, appName, environment: invitation.environment, acceptUrl, expiresAt, message: invitation.message }); await sendEmail({ to: invitation.email, subject: `Reminder: You’ve been invited to ${appName}`, html: emailContent.html, text: emailContent.text }, logger);</p>
+<p>logger.info(‘Invitation resent’, { invitationId, email: invitation.email }); return success({ message: ‘Invitation resent successfully’, expiresAt }); }</p>
+<p>async function handleRevokeInvitation(invitationId: string, event: APIGatewayProxyEvent, logger: Logger): Promise<APIGatewayProxyResult> { const auth = extractAuthContext(event); requireAdmin(auth); requirePermission(auth, ‘admin:write’);</p>
+<p>const result = await executeQuery(`SELECT * FROM invitations WHERE id = $1 AND tenant_id = $2`, [invitationId, auth.tenantId], logger); if (result.rowCount === 0) throw new NotFoundError(‘Invitation not found’);</p>
+<p>const invitation = result.rows[0]; if (invitation.status !== ‘pending’) throw new ValidationError(`Cannot revoke ${invitation.status} invitation`);</p>
+<p>await executeQuery(`UPDATE invitations SET status = ‘revoked’ WHERE id = $1`, [invitationId], logger);</p>
+<p>await createAuditLog({ tenant_id: auth.tenantId, user_id: null, admin_id: auth.userId, action: ‘invitation.revoke’, resource_type: ‘invitation’, resource_id: invitationId, details: { email: invitation.email }, ip_address: event.requestContext.identity?.sourceIp || null, user_agent: event.headers[‘User-Agent’] || null, }, logger);</p>
+<p>logger.info(‘Invitation revoked’, { invitationId, email: invitation.email }); return success({ message: ‘Invitation revoked successfully’ }); } ```</p>
+<hr />
+<h2 id="part-3-two-person-approvals-lambda">PART 3: TWO-PERSON APPROVALS LAMBDA</h2>
+<h3 id="packagesinfrastructurelambdaadminapprovals.ts">packages/infrastructure/lambda/admin/approvals.ts</h3>
+<p>```typescript /** * Two-Person Approval Workflow Lambda * Production deployments require separate initiator and approver */</p>
+<p>import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from ‘aws-lambda’; import { v4 as uuidv4 } from ‘uuid’; import { Logger } from ‘../shared/logger’; import { success, created, handleError } from ‘../shared/response’; import { extractAuthContext, requireAdmin, requirePermission } from ‘../shared/auth’; import { ValidationError, NotFoundError, ForbiddenError } from ‘../shared/errors’; import { executeQuery, createAuditLog } from ‘../shared/db’; import { createApprovalSchema, processApprovalSchema, ApprovalStatus, AdminRole, ROLE_HIERARCHY } from ‘../shared/admin/types’; import { calculateExpiry, isExpired } from ‘../shared/admin/tokens’; import { sendEmail, generateApprovalEmail } from ‘../shared/admin/email’;</p>
+<p>const logger = new Logger({ handler: ‘approvals’ });</p>
+<p>export async function handler(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> { const requestLogger = logger.child({ requestId: context.awsRequestId, path: event.path });</p>
+<p>try { const auth = extractAuthContext(event); requireAdmin(auth);</p>
+<pre><code>const approvalId = event.pathParameters?.approvalId;
+const action = event.path.split(&#39;/&#39;).pop();
+
+switch (event.httpMethod) {
+  case &#39;GET&#39;:
+    if (approvalId) return await handleGetApproval(approvalId, auth, requestLogger);
+    return await handleListApprovals(event, auth, requestLogger);
+  case &#39;POST&#39;:
+    if (action === &#39;process&#39; &amp;&amp; approvalId) return await handleProcessApproval(approvalId, event, auth, requestLogger);
+    return await handleCreateApproval(event, auth, requestLogger);
+  case &#39;DELETE&#39;:
+    if (!approvalId) throw new ValidationError(&#39;Approval ID required&#39;);
+    return await handleCancelApproval(approvalId, event, auth, requestLogger);
+  default:
+    throw new ValidationError(\`Method \${event.httpMethod} not allowed\`);
+}</code></pre>
+<p>} catch (error) { return handleError(error, requestLogger); } }</p>
+<p>async function handleCreateApproval(event: APIGatewayProxyEvent, auth: ReturnType<typeof extractAuthContext>, logger: Logger): Promise<APIGatewayProxyResult> { requirePermission(auth, ‘approvals:initiate’);</p>
+<p>const body = event.body ? JSON.parse(event.body) : {}; const parseResult = createApprovalSchema.safeParse(body); if (!parseResult.success) throw new ValidationError(‘Invalid request body’, parseResult.error.flatten().fieldErrors as Record&lt;string, string[]&gt;);</p>
+<p>const { type, action, resourceType, resourceId, details, priority, notes, expiresInHours } = parseResult.data; const requiresTwoPersonApproval = auth.environment === ‘prod’;</p>
+<p>const requesterResult = await executeQuery(`SELECT first_name, last_name FROM administrators WHERE id = $1`, [auth.userId], logger); const requesterName = requesterResult.rows[0] ? `${requesterResult.rows[0].first_name} ${requesterResult.rows[0].last_name}` : ‘Unknown’;</p>
+<p>const approvalId = uuidv4(); const expiresAt = calculateExpiry(expiresInHours);</p>
+<p>await executeQuery( `INSERT INTO approval_requests (id, type, app_id, tenant_id, environment, requested_by, requested_at, expires_at, status, action, resource_type, resource_id, details, priority, notes, requires_two_person, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, ‘pending’, $8, $9, $10, $11, $12, $13, $14, NOW())`, [approvalId, type, auth.appId, auth.tenantId, auth.environment, auth.userId, expiresAt, action, resourceType, resourceId, JSON.stringify(details), priority, notes || null, requiresTwoPersonApproval], logger );</p>
+<p>if (requiresTwoPersonApproval) { await notifyApprovers(approvalId, auth, requesterName, logger); }</p>
+<p>await createAuditLog({ tenant_id: auth.tenantId, user_id: null, admin_id: auth.userId, action: ‘approval.create’, resource_type: ‘approval_request’, resource_id: approvalId, details: { type, resourceType, resourceId, requiresTwoPersonApproval }, ip_address: event.requestContext.identity?.sourceIp || null, user_agent: event.headers[‘User-Agent’] || null, }, logger);</p>
+<p>logger.info(‘Approval request created’, { approvalId, type, requestedBy: auth.userId, requiresTwoPersonApproval }); return created({ approval: { id: approvalId, type, status: ‘pending’, action, resourceType, resourceId, priority, expiresAt, requiresTwoPersonApproval, createdAt: new Date().toISOString() }, }); }</p>
+<p>async function handleProcessApproval(approvalId: string, event: APIGatewayProxyEvent, auth: ReturnType<typeof extractAuthContext>, logger: Logger): Promise<APIGatewayProxyResult> { requirePermission(auth, ’approvals:*’);</p>
+<p>const body = event.body ? JSON.parse(event.body) : {}; const parseResult = processApprovalSchema.safeParse(body); if (!parseResult.success) throw new ValidationError(‘Invalid request body’, parseResult.error.flatten().fieldErrors as Record&lt;string, string[]&gt;);</p>
+<p>const { action, reason } = parseResult.data;</p>
+<p>const result = await executeQuery(`SELECT * FROM approval_requests WHERE id = $1 AND tenant_id = $2`, [approvalId, auth.tenantId], logger); if (result.rowCount === 0) throw new NotFoundError(‘Approval request not found’);</p>
+<p>const approval = result.rows[0]; if (approval.status !== ‘pending’) throw new ValidationError(`Cannot process ${approval.status} approval request`); if (isExpired(approval.expires_at)) { await executeQuery(`UPDATE approval_requests SET status = ‘expired’ WHERE id = $1`, [approvalId], logger); throw new ValidationError(‘This approval request has expired’); }</p>
+<p>// Two-person approval: cannot approve own request if (approval.requires_two_person &amp;&amp; approval.requested_by === auth.userId) { throw new ForbiddenError(‘You cannot approve your own request. Production deployments require approval from a different administrator.’); }</p>
+<p>const newStatus: ApprovalStatus = action === ‘approve’ ? ‘approved’ : ‘rejected’; await executeQuery( `UPDATE approval_requests SET status = $2, approved_by = $3, approved_at = NOW(), rejected_reason = $4 WHERE id = $1`, [approvalId, newStatus, auth.userId, action === ‘reject’ ? reason : null], logger );</p>
+<p>if (action === ‘approve’) { await executeApprovedAction(approval, logger); }</p>
+<p>await createAuditLog({ tenant_id: auth.tenantId, user_id: null, admin_id: auth.userId, action: `approval.${action}`, resource_type: ‘approval_request’, resource_id: approvalId, details: { type: approval.type, resourceType: approval.resource_type, resourceId: approval.resource_id, reason }, ip_address: event.requestContext.identity?.sourceIp || null, user_agent: event.headers[‘User-Agent’] || null, }, logger);</p>
+<p>logger.info(‘Approval request processed’, { approvalId, action, processedBy: auth.userId }); return success({ approval: { id: approvalId, status: newStatus, processedBy: auth.userId, processedAt: new Date().toISOString(), reason: action === ‘reject’ ? reason : undefined } }); }</p>
+<p>async function executeApprovedAction(approval: any, logger: Logger): Promise<void> { logger.info(‘Executing approved action’, { type: approval.type, resourceType: approval.resource_type, resourceId: approval.resource_id });</p>
+<p>switch (approval.type) { case ‘deployment’: // Trigger deployment workflow via Step Functions or CodePipeline break; case ‘promotion’: await executeQuery(`UPDATE deployments SET promoted_to = $2, promoted_at = NOW() WHERE id = $1`, [approval.resource_id, approval.details?.targetEnv], logger); break; case ‘model_activation’: await executeQuery(`UPDATE ai_models SET status = $2, thermal_state = $3, updated_at = NOW() WHERE id = $1`, [approval.details?.modelId, approval.details?.newStatus, approval.details?.thermalState], logger); break; case ‘provider_change’: await executeQuery(`UPDATE ai_providers SET config = $2, updated_at = NOW() WHERE id = $1`, [approval.details?.providerId, JSON.stringify(approval.details?.config)], logger); break; case ‘user_role_change’: await executeQuery(`UPDATE administrators SET role = $2, updated_at = NOW() WHERE id = $1`, [approval.details?.userId, approval.details?.newRole], logger); break; case ‘billing_change’: await executeQuery(`UPDATE billing_settings SET margin_percent = COALESCE($2, margin_percent), tax_percent = COALESCE($3, tax_percent), updated_at = NOW() WHERE tenant_id = $1`, [approval.details?.tenantId, approval.details?.settings?.marginPercent, approval.details?.settings?.taxPercent], logger); break; default: logger.warn(‘Unknown approval type’, { type: approval.type }); } }</p>
+<p>async function notifyApprovers(approvalId: string, auth: ReturnType<typeof extractAuthContext>, requesterName: string, logger: Logger): Promise<void> { const result = await executeQuery( `SELECT id, email, first_name, last_name FROM administrators WHERE tenant_id = $1 AND id != $2 AND status = ‘active’ AND role IN (‘super_admin’, ‘admin’)`, [auth.tenantId, auth.userId], logger ); if (result.rowCount === 0) { logger.warn(‘No other admins available to approve’); return; }</p>
+<p>const appResult = await executeQuery(`SELECT name FROM apps WHERE id = $1`, [auth.appId], logger); const appName = appResult.rows[0]?.name || auth.appId;</p>
+<p>const approvalResult = await executeQuery(`SELECT * FROM approval_requests WHERE id = $1`, [approvalId], logger); const approval = approvalResult.rows[0];</p>
+<p>for (const admin of result.rows) { const approveUrl = `${process.env.ADMIN_URL}/approvals/${approvalId}?action=approve`; const rejectUrl = `${process.env.ADMIN_URL}/approvals/${approvalId}?action=reject`; const emailContent = generateApprovalEmail({ approverName: admin.first_name, requesterName, appName, environment: auth.environment, action: approval.action, resourceType: approval.resource_type, resourceId: approval.resource_id, approveUrl, rejectUrl, expiresAt: approval.expires_at, }); await sendEmail({ to: admin.email, subject: `Ã¢Å¡Â Ã¯Â¸Â Approval Required: ${approval.action} - ${appName}`, html: emailContent.html, text: emailContent.text }, logger); } logger.info(‘Approvers notified’, { approvalId, notifiedCount: result.rowCount }); }</p>
+<p>async function handleListApprovals(event: APIGatewayProxyEvent, auth: ReturnType<typeof extractAuthContext>, logger: Logger): Promise<APIGatewayProxyResult> { requirePermission(auth, ‘approvals:read’);</p>
+<p>const status = event.queryStringParameters?.status; const pendingForMe = event.queryStringParameters?.pendingForMe === ‘true’; const limit = parseInt(event.queryStringParameters?.limit || ‘50’); const offset = parseInt(event.queryStringParameters?.offset || ‘0’);</p>
+<p>let query = `SELECT ar.*, req.first_name as requester_first_name, req.last_name as requester_last_name FROM approval_requests ar LEFT JOIN administrators req ON ar.requested_by = req.id WHERE ar.tenant_id = $1`; const params: any[] = [auth.tenantId];</p>
+<p>if (status) { params.push(status); query += ` AND ar.status = $${params.length}`; } if (pendingForMe) { params.push(auth.userId); query += ` AND ar.status = ‘pending’ AND ar.requested_by != $${params.length}`; } query += ` ORDER BY ar.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`; params.push(limit, offset);</p>
+<p>const result = await executeQuery(query, params, logger); const approvals = result.rows.map(row =&gt; ({ id: row.id, type: row.type, status: row.status, environment: row.environment, action: row.action, resourceType: row.resource_type, resourceId: row.resource_id, priority: row.priority, requestedBy: { id: row.requested_by, name: `${row.requester_first_name} ${row.requester_last_name}` }, requestedAt: row.requested_at, expiresAt: row.expires_at, requiresTwoPersonApproval: row.requires_two_person, canApprove: row.status === ‘pending’ &amp;&amp; row.requested_by !== auth.userId, }));</p>
+<p>return success({ approvals, pagination: { limit, offset, hasMore: approvals.length === limit } }); }</p>
+<p>async function handleGetApproval(approvalId: string, auth: ReturnType<typeof extractAuthContext>, logger: Logger): Promise<APIGatewayProxyResult> { requirePermission(auth, ‘approvals:read’);</p>
+<p>const result = await executeQuery( `SELECT ar.*, req.first_name as requester_first_name, req.last_name as requester_last_name, req.email as requester_email FROM approval_requests ar LEFT JOIN administrators req ON ar.requested_by = req.id WHERE ar.id = $1 AND ar.tenant_id = $2`, [approvalId, auth.tenantId], logger ); if (result.rowCount === 0) throw new NotFoundError(‘Approval request not found’);</p>
+<p>const row = result.rows[0]; return success({ approval: { id: row.id, type: row.type, status: row.status, environment: row.environment, action: row.action, resourceType: row.resource_type, resourceId: row.resource_id, details: row.details, priority: row.priority, notes: row.notes, requestedBy: { id: row.requested_by, name: `${row.requester_first_name} ${row.requester_last_name}`, email: row.requester_email }, requestedAt: row.requested_at, expiresAt: row.expires_at, requiresTwoPersonApproval: row.requires_two_person, canApprove: row.status === ‘pending’ &amp;&amp; row.requested_by !== auth.userId, }, }); }</p>
+<p>async function handleCancelApproval(approvalId: string, event: APIGatewayProxyEvent, auth: ReturnType<typeof extractAuthContext>, logger: Logger): Promise<APIGatewayProxyResult> { const result = await executeQuery(`SELECT * FROM approval_requests WHERE id = $1 AND tenant_id = $2`, [approvalId, auth.tenantId], logger); if (result.rowCount === 0) throw new NotFoundError(‘Approval request not found’);</p>
+<p>const approval = result.rows[0]; if (approval.requested_by !== auth.userId &amp;&amp; auth.role !== AdminRole.SUPER_ADMIN) { throw new ForbiddenError(‘Only the requester or a super admin can cancel this request’); } if (approval.status !== ‘pending’) throw new ValidationError(`Cannot cancel ${approval.status} approval request`);</p>
+<p>await executeQuery(`UPDATE approval_requests SET status = ‘cancelled’ WHERE id = $1`, [approvalId], logger); await createAuditLog({ tenant_id: auth.tenantId, user_id: null, admin_id: auth.userId, action: ‘approval.cancel’, resource_type: ‘approval_request’, resource_id: approvalId, details: { type: approval.type }, ip_address: event.requestContext.identity?.sourceIp || null, user_agent: event.headers[‘User-Agent’] || null, }, logger);</p>
+<p>logger.info(‘Approval request cancelled’, { approvalId }); return success({ message: ‘Approval request cancelled’ }); } ```</p>
+<hr />
+<h2 id="part-4-metering-lambda">PART 4: METERING LAMBDA</h2>
+<h3 id="packagesinfrastructurelambdabillingmetering.ts">packages/infrastructure/lambda/billing/metering.ts</h3>
+<p>```typescript /** * Usage Metering Lambda * Collects and stores usage events for billing calculations */</p>
+<p>import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from ‘aws-lambda’; import { DynamoDBClient } from ‘<span class="citation" data-cites="aws-sdk/client-dynamodb">@aws-sdk/client-dynamodb</span>’; import { DynamoDBDocumentClient, PutCommand, QueryCommand, UpdateCommand } from ‘<span class="citation" data-cites="aws-sdk/lib-dynamodb">@aws-sdk/lib-dynamodb</span>’; import { v4 as uuidv4 } from ‘uuid’; import { z } from ‘zod’; import { Logger } from ‘../shared/logger’; import { success, created, handleError } from ‘../shared/response’; import { extractAuthContext } from ‘../shared/auth’; import { ValidationError } from ‘../shared/errors’; import { executeQuery } from ‘../shared/db’;</p>
+<p>const logger = new Logger({ handler: ‘metering’ }); const ddbClient = DynamoDBDocumentClient.from(new DynamoDBClient({}), { marshallOptions: { removeUndefinedValues: true } });</p>
+<p>const USAGE_TABLE = process.env.USAGE_TABLE || ‘radiant-usage-events’; const ROLLUP_TABLE = process.env.ROLLUP_TABLE || ‘radiant-usage-rollups’;</p>
+<p>const recordUsageSchema = z.object({ requestId: z.string(), providerId: z.string(), modelId: z.string(), modelName: z.string(), requestType: z.enum([‘chat’, ‘embedding’, ‘image’, ‘audio’, ‘video’]), inputTokens: z.number().int().min(0), outputTokens: z.number().int().min(0), latencyMs: z.number().int().min(0), cached: z.boolean().default(false), phiDetected: z.boolean().default(false), phiSanitized: z.boolean().default(false), userId: z.string().optional(), });</p>
+<p>export async function handler(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> { const requestLogger = logger.child({ requestId: context.awsRequestId, path: event.path });</p>
+<p>try { const auth = extractAuthContext(event); const action = event.path.split(‘/’).pop();</p>
+<pre><code>switch (event.httpMethod) {
+  case &#39;POST&#39;:
+    if (action === &#39;record&#39;) return await handleRecordUsage(event, auth, requestLogger);
+    if (action === &#39;batch&#39;) return await handleBatchRecord(event, auth, requestLogger);
+    break;
+  case &#39;GET&#39;:
+    if (action === &#39;summary&#39;) return await handleGetSummary(event, auth, requestLogger);
+    if (action === &#39;rollups&#39;) return await handleGetRollups(event, auth, requestLogger);
+    break;
+}
+throw new ValidationError(\`Unknown action: \${action}\`);</code></pre>
+<p>} catch (error) { return handleError(error, requestLogger); } }</p>
+<p>async function handleRecordUsage(event: APIGatewayProxyEvent, auth: ReturnType<typeof extractAuthContext>, logger: Logger): Promise<APIGatewayProxyResult> { const body = event.body ? JSON.parse(event.body) : {}; const parseResult = recordUsageSchema.safeParse(body); if (!parseResult.success) throw new ValidationError(‘Invalid usage data’, parseResult.error.flatten().fieldErrors as Record&lt;string, string[]&gt;);</p>
+<p>const data = parseResult.data;</p>
+<p>// Get pricing from model registry const pricing = await getModelPricing(data.modelId, logger); const inputCost = (data.inputTokens / 1000000) * pricing.inputPricePerMillion; const outputCost = (data.outputTokens / 1000000) * pricing.outputPricePerMillion; const providerCost = inputCost + outputCost;</p>
+<p>// Apply margin const marginPercent = await getTenantMargin(auth.tenantId, logger); const billedCost = providerCost * (1 + marginPercent / 100);</p>
+<p>const usageEvent = { id: uuidv4(), timestamp: new Date().toISOString(), tenantId: auth.tenantId, userId: data.userId || auth.userId, adminId: auth.isAdmin ? auth.userId : undefined, appId: auth.appId, environment: auth.environment, providerId: data.providerId, modelId: data.modelId, modelName: data.modelName, requestType: data.requestType, inputTokens: data.inputTokens, outputTokens: data.outputTokens, totalTokens: data.inputTokens + data.outputTokens, providerCost, billedCost, currency: ‘USD’, requestId: data.requestId, latencyMs: data.latencyMs, cached: data.cached, phiDetected: data.phiDetected, phiSanitized: data.phiSanitized, };</p>
+<p>await ddbClient.send(new PutCommand({ TableName: USAGE_TABLE, Item: { pk: `TENANT#${auth.tenantId}`, sk: `EVENT#${usageEvent.timestamp}#${usageEvent.id}`, …usageEvent, ttl: Math.floor(Date.now() / 1000) + (90 * 24 * 60 * 60) }, }));</p>
+<p>await updateDailyRollup(usageEvent, logger);</p>
+<p>logger.info(‘Usage recorded’, { eventId: usageEvent.id, modelId: data.modelId, tokens: usageEvent.totalTokens, cost: billedCost }); return created({ event: { id: usageEvent.id, billedCost, providerCost } }); }</p>
+<p>async function handleBatchRecord(event: APIGatewayProxyEvent, auth: ReturnType<typeof extractAuthContext>, logger: Logger): Promise<APIGatewayProxyResult> { const body = event.body ? JSON.parse(event.body) : {}; if (!Array.isArray(body.events) || body.events.length === 0) throw new ValidationError(‘events array is required’); if (body.events.length &gt; 100) throw new ValidationError(‘Maximum 100 events per batch’);</p>
+<p>const results: Array&lt;{ id: string; success: boolean; error?: string }&gt; = [];</p>
+<p>for (const eventData of body.events) { try { const parseResult = recordUsageSchema.safeParse(eventData); if (!parseResult.success) { results.push({ id: eventData.requestId || ‘unknown’, success: false, error: ‘Invalid data’ }); continue; }</p>
+<pre><code>  const data = parseResult.data;
+  const pricing = await getModelPricing(data.modelId, logger);
+  const providerCost = ((data.inputTokens / 1000000) * pricing.inputPricePerMillion) + ((data.outputTokens / 1000000) * pricing.outputPricePerMillion);
+  const marginPercent = await getTenantMargin(auth.tenantId, logger);
+  const billedCost = providerCost * (1 + marginPercent / 100);
+
+  const usageEvent = {
+    id: uuidv4(), timestamp: new Date().toISOString(), tenantId: auth.tenantId, userId: data.userId || auth.userId,
+    appId: auth.appId, environment: auth.environment, providerId: data.providerId, modelId: data.modelId, modelName: data.modelName,
+    requestType: data.requestType, inputTokens: data.inputTokens, outputTokens: data.outputTokens, totalTokens: data.inputTokens + data.outputTokens,
+    providerCost, billedCost, currency: &#39;USD&#39;, requestId: data.requestId, latencyMs: data.latencyMs, cached: data.cached, phiDetected: data.phiDetected, phiSanitized: data.phiSanitized,
+  };
+
+  await ddbClient.send(new PutCommand({ TableName: USAGE_TABLE, Item: { pk: \`TENANT#\${auth.tenantId}\`, sk: \`EVENT#\${usageEvent.timestamp}#\${usageEvent.id}\`, ...usageEvent, ttl: Math.floor(Date.now() / 1000) + (90 * 24 * 60 * 60) } }));
+  await updateDailyRollup(usageEvent, logger);
+  results.push({ id: usageEvent.id, success: true });
+} catch (error: any) {
+  results.push({ id: eventData.requestId || &#39;unknown&#39;, success: false, error: error.message });
+}</code></pre>
+<p>}</p>
+<p>logger.info(‘Batch usage recorded’, { total: body.events.length, successful: results.filter(r =&gt; r.success).length }); return success({ results, summary: { total: results.length, successful: results.filter(r =&gt; r.success).length, failed: results.filter(r =&gt; !r.success).length } }); }</p>
+<p>async function handleGetSummary(event: APIGatewayProxyEvent, auth: ReturnType<typeof extractAuthContext>, logger: Logger): Promise<APIGatewayProxyResult> { const startDate = event.queryStringParameters?.startDate || getDefaultStartDate(); const endDate = event.queryStringParameters?.endDate || getTodayDate();</p>
+<p>const response = await ddbClient.send(new QueryCommand({ TableName: ROLLUP_TABLE, KeyConditionExpression: ‘pk = :pk AND sk BETWEEN :start AND :end’, ExpressionAttributeValues: { ‘:pk’: `TENANT#${auth.tenantId}`, ‘:start’: `DATE#${startDate}`, ‘:end’: `DATE#${endDate}#~` }, }));</p>
+<p>const rollups = response.Items || []; const totals = rollups.reduce((acc, r) =&gt; ({ requests: acc.requests + (r.requestCount || 0), inputTokens: acc.inputTokens + (r.inputTokens || 0), outputTokens: acc.outputTokens + (r.outputTokens || 0), providerCost: acc.providerCost + (r.providerCost || 0), billedCost: acc.billedCost + (r.billedCost || 0), }), { requests: 0, inputTokens: 0, outputTokens: 0, providerCost: 0, billedCost: 0 });</p>
+<p>return success({ period: { startDate, endDate }, totals }); }</p>
+<p>async function handleGetRollups(event: APIGatewayProxyEvent, auth: ReturnType<typeof extractAuthContext>, logger: Logger): Promise<APIGatewayProxyResult> { const startDate = event.queryStringParameters?.startDate || getDefaultStartDate(); const endDate = event.queryStringParameters?.endDate || getTodayDate();</p>
+<p>const response = await ddbClient.send(new QueryCommand({ TableName: ROLLUP_TABLE, KeyConditionExpression: ‘pk = :pk AND sk BETWEEN :start AND :end’, ExpressionAttributeValues: { ‘:pk’: `TENANT#${auth.tenantId}`, ‘:start’: `DATE#${startDate}`, ‘:end’: `DATE#${endDate}#~` }, }));</p>
+<p>const rollups = (response.Items || []).map(item =&gt; ({ date: item.date, modelId: item.modelId, providerId: item.providerId, requestCount: item.requestCount, inputTokens: item.inputTokens, outputTokens: item.outputTokens, totalTokens: item.totalTokens, providerCost: item.providerCost, billedCost: item.billedCost, avgLatencyMs: item.avgLatencyMs, }));</p>
+<p>return success({ rollups, period: { startDate, endDate } }); }</p>
+<p>async function updateDailyRollup(event: any, logger: Logger): Promise<void> { const date = event.timestamp.split(‘T’)[0]; try { await ddbClient.send(new UpdateCommand({ TableName: ROLLUP_TABLE, Key: { pk: `TENANT#${event.tenantId}`, sk: `DATE#${date}#MODEL#${event.modelId}` }, UpdateExpression: `SET #date = :date, modelId = :modelId, providerId = :providerId, requestCount = if_not_exists(requestCount, :zero) + :one, inputTokens = if_not_exists(inputTokens, :zero) + :inputTokens, outputTokens = if_not_exists(outputTokens, :zero) + :outputTokens, totalTokens = if_not_exists(totalTokens, :zero) + :totalTokens, providerCost = if_not_exists(providerCost, :zero) + :providerCost, billedCost = if_not_exists(billedCost, :zero) + :billedCost, cachedRequests = if_not_exists(cachedRequests, :zero) + :cached, phiRequests = if_not_exists(phiRequests, :zero) + :phi, updatedAt = :updatedAt`, ExpressionAttributeNames: { ‘#date’: ‘date’ }, ExpressionAttributeValues: { ‘:date’: date, ‘:modelId’: event.modelId, ‘:providerId’: event.providerId, ‘:zero’: 0, ‘:one’: 1, ‘:inputTokens’: event.inputTokens, ‘:outputTokens’: event.outputTokens, ‘:totalTokens’: event.totalTokens, ‘:providerCost’: event.providerCost, ‘:billedCost’: event.billedCost, ‘:cached’: event.cached ? 1 : 0, ‘:phi’: event.phiDetected ? 1 : 0, ‘:updatedAt’: new Date().toISOString(), }, })); } catch (error) { logger.error(‘Failed to update rollup’, error as Error, { tenantId: event.tenantId, date, modelId: event.modelId }); } }</p>
+<p>async function getModelPricing(modelId: string, logger: Logger): Promise&lt;{ inputPricePerMillion: number; outputPricePerMillion: number }&gt; { const result = await executeQuery(`SELECT input_price_per_million, output_price_per_million FROM ai_models WHERE id = $1`, [modelId], logger); if (result.rowCount === 0) return { inputPricePerMillion: 1.0, outputPricePerMillion: 2.0 }; return { inputPricePerMillion: parseFloat(result.rows[0].input_price_per_million) || 1.0, outputPricePerMillion: parseFloat(result.rows[0].output_price_per_million) || 2.0 }; }</p>
+<p>async function getTenantMargin(tenantId: string, logger: Logger): Promise<number> { const result = await executeQuery(`SELECT margin_percent FROM billing_settings WHERE tenant_id = $1`, [tenantId], logger); return result.rowCount &gt; 0 ? parseFloat(result.rows[0].margin_percent) : 20; }</p>
+<p>function getDefaultStartDate(): string { const d = new Date(); d.setDate(d.getDate() - 30); return d.toISOString().split(‘T’)[0]; } function getTodayDate(): string { return new Date().toISOString().split(‘T’)[0]; } ```</p>
+<hr />
+<h2 id="part-5-database-schema-additions">PART 5: DATABASE SCHEMA ADDITIONS</h2>
+<h3 id="packagesinfrastructuremigrations005_admin_billing.sql">packages/infrastructure/migrations/005_admin_billing.sql</h3>
+<p>```sql – ============================================================================ – RADIANT v2.2.0 - Admin &amp; Billing Schema – ============================================================================</p>
+<p>– Admin Invitations CREATE TABLE IF NOT EXISTS invitations ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), email VARCHAR(255) NOT NULL, role VARCHAR(50) NOT NULL, invited_by UUID NOT NULL REFERENCES administrators(id), app_id VARCHAR(100) NOT NULL, tenant_id VARCHAR(100) NOT NULL, environment VARCHAR(20) NOT NULL, token_hash VARCHAR(64) NOT NULL, expires_at TIMESTAMP WITH TIME ZONE NOT NULL, status VARCHAR(20) NOT NULL DEFAULT ‘pending’, message TEXT, accepted_at TIMESTAMP WITH TIME ZONE, accepted_by_ip VARCHAR(45), created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), CONSTRAINT valid_invitation_status CHECK (status IN (‘pending’, ‘accepted’, ‘expired’, ‘revoked’)) );</p>
+<p>CREATE INDEX idx_invitations_email ON invitations(email); CREATE INDEX idx_invitations_tenant ON invitations(tenant_id); CREATE INDEX idx_invitations_token ON invitations(token_hash); CREATE INDEX idx_invitations_status ON invitations(status);</p>
+<p>– Approval Requests CREATE TABLE IF NOT EXISTS approval_requests ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), type VARCHAR(50) NOT NULL, app_id VARCHAR(100) NOT NULL, tenant_id VARCHAR(100) NOT NULL, environment VARCHAR(20) NOT NULL, requested_by UUID NOT NULL REFERENCES administrators(id), requested_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), expires_at TIMESTAMP WITH TIME ZONE NOT NULL, status VARCHAR(20) NOT NULL DEFAULT ‘pending’, approved_by UUID REFERENCES administrators(id), approved_at TIMESTAMP WITH TIME ZONE, rejected_reason TEXT, action VARCHAR(100) NOT NULL, resource_type VARCHAR(100) NOT NULL, resource_id VARCHAR(255), details JSONB, priority VARCHAR(20) NOT NULL DEFAULT ‘medium’, notes TEXT, requires_two_person BOOLEAN NOT NULL DEFAULT false, created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), CONSTRAINT valid_approval_status CHECK (status IN (‘pending’, ‘approved’, ‘rejected’, ‘expired’, ‘cancelled’)), CONSTRAINT valid_priority CHECK (priority IN (‘low’, ‘medium’, ‘high’, ‘critical’)) );</p>
+<p>CREATE INDEX idx_approvals_tenant ON approval_requests(tenant_id); CREATE INDEX idx_approvals_status ON approval_requests(status); CREATE INDEX idx_approvals_requested_by ON approval_requests(requested_by);</p>
+<p>– Admin Profiles CREATE TABLE IF NOT EXISTS admin_profiles ( admin_id UUID PRIMARY KEY REFERENCES administrators(id) ON DELETE CASCADE, notifications JSONB NOT NULL DEFAULT ‘{}’, timezone VARCHAR(50) NOT NULL DEFAULT ‘America/New_York’, language VARCHAR(10) NOT NULL DEFAULT ‘en’, date_format VARCHAR(20) NOT NULL DEFAULT ‘MM/DD/YYYY’, time_format VARCHAR(10) NOT NULL DEFAULT ‘12h’, currency VARCHAR(3) NOT NULL DEFAULT ‘USD’, theme VARCHAR(20) NOT NULL DEFAULT ‘system’, default_environment VARCHAR(20) NOT NULL DEFAULT ‘dev’, sidebar_collapsed BOOLEAN NOT NULL DEFAULT false, table_rows_per_page INTEGER NOT NULL DEFAULT 25, updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW() );</p>
+<p>– Billing Settings CREATE TABLE IF NOT EXISTS billing_settings ( tenant_id VARCHAR(100) PRIMARY KEY, margin_percent DECIMAL(5,2) NOT NULL DEFAULT 20.00, margin_type VARCHAR(20) NOT NULL DEFAULT ‘fixed’, tiers JSONB, tax_enabled BOOLEAN NOT NULL DEFAULT false, tax_percent DECIMAL(5,2) NOT NULL DEFAULT 0.00, tax_id VARCHAR(50), stripe_customer_id VARCHAR(100), default_payment_method_id VARCHAR(100), auto_pay BOOLEAN NOT NULL DEFAULT false, billing_cycle_day INTEGER NOT NULL DEFAULT 1, currency VARCHAR(3) NOT NULL DEFAULT ‘USD’, budget_limit DECIMAL(12,2), alert_thresholds INTEGER[] NOT NULL DEFAULT ‘{50, 75, 90, 100}’, created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), CONSTRAINT valid_margin_type CHECK (margin_type IN (‘fixed’, ‘tiered’)), CONSTRAINT valid_billing_day CHECK (billing_cycle_day BETWEEN 1 AND 28) );</p>
+<p>– Invoices CREATE TABLE IF NOT EXISTS invoices ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id VARCHAR(100) NOT NULL, app_id VARCHAR(100) NOT NULL, period_start DATE NOT NULL, period_end DATE NOT NULL, subtotal DECIMAL(12,2) NOT NULL, margin_percent DECIMAL(5,2) NOT NULL, tax DECIMAL(12,2) NOT NULL DEFAULT 0, tax_percent DECIMAL(5,2) NOT NULL DEFAULT 0, total DECIMAL(12,2) NOT NULL, currency VARCHAR(3) NOT NULL DEFAULT ‘USD’, status VARCHAR(20) NOT NULL DEFAULT ‘draft’, due_date TIMESTAMP WITH TIME ZONE NOT NULL, paid_at TIMESTAMP WITH TIME ZONE, line_items JSONB NOT NULL DEFAULT ‘[]’, stripe_invoice_id VARCHAR(100), stripe_payment_intent_id VARCHAR(100), created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), CONSTRAINT valid_invoice_status CHECK (status IN (‘draft’, ‘pending’, ‘paid’, ‘overdue’, ‘cancelled’)) );</p>
+<p>CREATE INDEX idx_invoices_tenant ON invoices(tenant_id); CREATE INDEX idx_invoices_status ON invoices(status); CREATE INDEX idx_invoices_period ON invoices(period_start, period_end);</p>
+<p>– Admin Notifications CREATE TABLE IF NOT EXISTS admin_notifications ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), admin_id UUID NOT NULL REFERENCES administrators(id) ON DELETE CASCADE, tenant_id VARCHAR(100) NOT NULL, type VARCHAR(50) NOT NULL, priority VARCHAR(20) NOT NULL DEFAULT ‘medium’, title VARCHAR(255) NOT NULL, message TEXT NOT NULL, action_url VARCHAR(500), action_label VARCHAR(100), read BOOLEAN NOT NULL DEFAULT false, read_at TIMESTAMP WITH TIME ZONE, dismissed BOOLEAN NOT NULL DEFAULT false, dismissed_at TIMESTAMP WITH TIME ZONE, email_sent BOOLEAN NOT NULL DEFAULT false, email_sent_at TIMESTAMP WITH TIME ZONE, created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), expires_at TIMESTAMP WITH TIME ZONE, CONSTRAINT valid_notification_type CHECK (type IN (‘security’, ‘billing’, ‘deployment’, ‘approval’, ‘system’, ‘alert’)), CONSTRAINT valid_notification_priority CHECK (priority IN (‘low’, ‘medium’, ‘high’, ‘critical’)) );</p>
+<p>CREATE INDEX idx_notifications_admin ON admin_notifications(admin_id); CREATE INDEX idx_notifications_read ON admin_notifications(admin_id, read); ```</p>
+<hr />
+<h2 id="api-routes-summary">API ROUTES SUMMARY</h2>
+<h3 id="admin-routes">Admin Routes</h3>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 15%" />
+<col style="width: 33%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Description</th>
+<th>Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>/admin/invitations</td>
+<td>Create invitation</td>
+<td>admin:write</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/admin/invitations</td>
+<td>List invitations</td>
+<td>admin:read</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/admin/invitations/:id</td>
+<td>Get invitation</td>
+<td>admin:read</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/admin/invitations/:id/resend</td>
+<td>Resend invitation</td>
+<td>admin:write</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/admin/invitations/:id</td>
+<td>Revoke invitation</td>
+<td>admin:write</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/admin/invitations/accept</td>
+<td>Accept invitation</td>
+<td>(public)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/admin/approvals</td>
+<td>Create approval request</td>
+<td>approvals:initiate</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/admin/approvals</td>
+<td>List approvals</td>
+<td>approvals:read</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/admin/approvals/:id</td>
+<td>Get approval</td>
+<td>approvals:read</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/admin/approvals/:id/process</td>
+<td>Approve/reject</td>
+<td>approvals:*</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/admin/approvals/:id</td>
+<td>Cancel approval</td>
+<td>approvals:initiate</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/admin/users</td>
+<td>List admins</td>
+<td>admin:read</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/admin/users/:id</td>
+<td>Get admin</td>
+<td>admin:read</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>/admin/users/:id</td>
+<td>Update admin</td>
+<td>admin:write</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/admin/users/:id</td>
+<td>Delete admin</td>
+<td>admin:*</td>
+</tr>
+</tbody>
+</table>
+<h3 id="billing-routes">Billing Routes</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Description</th>
+<th>Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>/billing/settings</td>
+<td>Get settings</td>
+<td>billing:read</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>/billing/settings</td>
+<td>Update settings</td>
+<td>billing:*</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/billing/current</td>
+<td>Current period usage</td>
+<td>billing:read</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/billing/projections</td>
+<td>Cost projections</td>
+<td>billing:read</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/billing/invoices</td>
+<td>List invoices</td>
+<td>billing:read</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/billing/invoices/:id</td>
+<td>Get invoice</td>
+<td>billing:read</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/billing/generate</td>
+<td>Generate invoice</td>
+<td>billing:*</td>
+</tr>
+</tbody>
+</table>
+<h3 id="metering-routes">Metering Routes</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Description</th>
+<th>Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td>/metering/record</td>
+<td>Record usage event</td>
+<td>(internal)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/metering/batch</td>
+<td>Batch record events</td>
+<td>(internal)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/metering/summary</td>
+<td>Usage summary</td>
+<td>billing:read</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/metering/rollups</td>
+<td>Daily rollups</td>
+<td>billing:read</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="deployment-verification">DEPLOYMENT VERIFICATION</h2>
+<p>```bash # 1. Create Invitation curl -X POST -H “Authorization: Bearer $ADMIN_TOKEN” -H “Content-Type: application/json” \ -d ‘{“email”: “new.admin@company.com”, “role”: “operator”, “message”: “Welcome!”, “expiresInHours”: 48}’ \ https://admin-api.thinktank.YOUR_DOMAIN.com/api/v2/admin/invitations</p>
+<h1 id="list-pending-approvals-for-me-to-approve">2. List Pending Approvals (for me to approve)</h1>
+<p>curl -H “Authorization: Bearer $ADMIN_TOKEN” \ “https://admin-api.thinktank.YOUR_DOMAIN.com/api/v2/admin/approvals?status=pending&amp;pendingForMe=true”</p>
+<h1 id="get-current-billing-period">3. Get Current Billing Period</h1>
+<p>curl -H “Authorization: Bearer $ADMIN_TOKEN” \ https://admin-api.thinktank.YOUR_DOMAIN.com/api/v2/billing/current</p>
+<h1 id="get-usage-rollups">4. Get Usage Rollups</h1>
+<p>curl -H “Authorization: Bearer $ADMIN_TOKEN” \ “https://admin-api.thinktank.YOUR_DOMAIN.com/api/v2/metering/rollups?startDate=2024-12-01&amp;endDate=2024-12-21”</p>
+<h1 id="generate-invoice">5. Generate Invoice</h1>
+<p>curl -X POST -H “Authorization: Bearer $ADMIN_TOKEN” -H “Content-Type: application/json” \ -d ‘{“periodStart”: “2024-12-01”, “periodEnd”: “2024-12-31”, “sendToStripe”: true}’ \ https://admin-api.thinktank.YOUR_DOMAIN.com/api/v2/billing/generate ```</p>
+<hr />
+<h2 id="estimated-costs-by-tier">ESTIMATED COSTS BY TIER</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Tier 1</th>
+<th>Tier 2</th>
+<th>Tier 3</th>
+<th>Tier 4</th>
+<th>Tier 5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lambda (Admin)</td>
+<td>$5</td>
+<td>$15</td>
+<td>$50</td>
+<td>$150</td>
+<td>$500</td>
+</tr>
+<tr>
+<td>Lambda (Billing)</td>
+<td>$5</td>
+<td>$20</td>
+<td>$75</td>
+<td>$200</td>
+<td>$600</td>
+</tr>
+<tr>
+<td>DynamoDB (Usage)</td>
+<td>$10</td>
+<td>$50</td>
+<td>$200</td>
+<td>$500</td>
+<td>$1,500</td>
+</tr>
+<tr>
+<td>SES (Emails)</td>
+<td>$1</td>
+<td>$5</td>
+<td>$20</td>
+<td>$50</td>
+<td>$150</td>
+</tr>
+<tr>
+<td>Stripe Fees</td>
+<td>Variable</td>
+<td>Variable</td>
+<td>Variable</td>
+<td>Variable</td>
+<td>Variable</td>
+</tr>
+<tr>
+<td><strong>Prompt 5 Total</strong></td>
+<td>~$21</td>
+<td>~$90</td>
+<td>~$345</td>
+<td>~$900</td>
+<td>~$2,750</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note: Stripe fees are 2.9% + $0.30 per transaction, not included in estimates.</em></p>
+<hr />
+<h2 id="next-prompts">NEXT PROMPTS</h2>
+<p>Continue with: - <strong>Prompt 6</strong>: Self-Hosted Models &amp; Mid-Level Services Configuration - <strong>Prompt 7</strong>: External Providers &amp; Database Schema/Migrations - <strong>Prompt 8</strong>: Admin Web Dashboard (Next.js) - <strong>Prompt 9</strong>: Assembly &amp; Deployment Guide</p>
+<hr />
+<p><em>End of Prompt 5: Lambda Functions - Admin &amp; Billing</em> <em>RADIANT v2.2.0 - December 2024</em></p>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ-1">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<h1 id="end-of-section-5">END OF SECTION 5</h1>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ-2">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ-3">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

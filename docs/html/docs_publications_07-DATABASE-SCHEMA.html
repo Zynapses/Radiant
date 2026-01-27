@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>07 DATABASE SCHEMA - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>07 DATABASE SCHEMA</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/publications/07-DATABASE-SCHEMA.md</div>
+  </div>
+  
+  <h1 id="radiant-database-schema-reference">RADIANT Database Schema Reference</h1>
+<h2 id="complete-migration-inventory-40-migrations">Complete Migration Inventory (40 Migrations)</h2>
+<h3 id="migration-index">Migration Index</h3>
+<table>
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 28%" />
+<col style="width: 41%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Migration</th>
+<th>Tables Created</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>001</td>
+<td>initial_schema</td>
+<td>tenants, users, administrators, invitations, approval_requests</td>
+<td>Core platform tables</td>
+</tr>
+<tr>
+<td>002</td>
+<td>tenant_isolation</td>
+<td>RLS policies</td>
+<td>Row-level security</td>
+</tr>
+<tr>
+<td>003</td>
+<td>ai_models</td>
+<td>ai_models, model_capabilities</td>
+<td>Model registry</td>
+</tr>
+<tr>
+<td>004</td>
+<td>usage_billing</td>
+<td>usage_records, invoices</td>
+<td>Usage tracking</td>
+</tr>
+<tr>
+<td>005</td>
+<td>admin_approval</td>
+<td>approval_workflows</td>
+<td>Admin approvals</td>
+</tr>
+<tr>
+<td>006</td>
+<td>self_hosted_models</td>
+<td>self_hosted_models, model_deployments</td>
+<td>Self-hosted AI</td>
+</tr>
+<tr>
+<td>007</td>
+<td>external_providers</td>
+<td>external_providers, provider_configs</td>
+<td>Provider management</td>
+</tr>
+<tr>
+<td>010</td>
+<td>visual_ai_pipeline</td>
+<td>visual_pipelines, pipeline_stages</td>
+<td>Visual AI processing</td>
+</tr>
+<tr>
+<td>011</td>
+<td>brain_router</td>
+<td>routing_rules, task_classifications</td>
+<td>Request routing</td>
+</tr>
+<tr>
+<td>012</td>
+<td>metrics_analytics</td>
+<td>metrics, analytics_snapshots</td>
+<td>Analytics</td>
+</tr>
+<tr>
+<td>013</td>
+<td>neural_engine</td>
+<td>neural_configs, neural_executions</td>
+<td>Neural processing</td>
+</tr>
+<tr>
+<td>014</td>
+<td>error_logging</td>
+<td>error_logs, error_patterns</td>
+<td>Error tracking</td>
+</tr>
+<tr>
+<td>015</td>
+<td>credentials_registry</td>
+<td>credentials, credential_rotations</td>
+<td>Credential management</td>
+</tr>
+<tr>
+<td>016</td>
+<td>think_tank</td>
+<td>thinktank_sessions, thinktank_steps, thinktank_tools</td>
+<td>Think Tank</td>
+</tr>
+<tr>
+<td>017</td>
+<td>concurrent_chat</td>
+<td>chat_sessions, chat_messages</td>
+<td>Chat management</td>
+</tr>
+<tr>
+<td>018</td>
+<td>realtime_collaboration</td>
+<td>collaborations, collaboration_members</td>
+<td>Real-time collab</td>
+</tr>
+<tr>
+<td>019</td>
+<td>persistent_memory</td>
+<td>memories, memory_associations</td>
+<td>Memory system</td>
+</tr>
+<tr>
+<td>020</td>
+<td>focus_personas</td>
+<td>personas, persona_configs</td>
+<td>AI personas</td>
+</tr>
+<tr>
+<td>021</td>
+<td>team_plans</td>
+<td>teams, team_members, team_plans</td>
+<td>Team management</td>
+</tr>
+<tr>
+<td>022</td>
+<td>provider_registry</td>
+<td>providers, provider_health</td>
+<td>Provider registry</td>
+</tr>
+<tr>
+<td>023</td>
+<td>time_machine</td>
+<td>snapshots, snapshot_diffs</td>
+<td>Time machine</td>
+</tr>
+<tr>
+<td>024</td>
+<td>orchestration_engine</td>
+<td>workflow_definitions, workflow_tasks, workflow_executions, task_executions</td>
+<td>Orchestration</td>
+</tr>
+<tr>
+<td>025</td>
+<td>license_management</td>
+<td>licenses, license_activations</td>
+<td>Licensing</td>
+</tr>
+<tr>
+<td>026</td>
+<td>unified_model_registry</td>
+<td>unified_models, model_versions</td>
+<td>Model registry</td>
+</tr>
+<tr>
+<td>027</td>
+<td>feedback_learning</td>
+<td>feedback, learning_samples</td>
+<td>Feedback system</td>
+</tr>
+<tr>
+<td>028</td>
+<td>neural_orchestration</td>
+<td>neural_workflows, neural_steps</td>
+<td>Neural orchestration</td>
+</tr>
+<tr>
+<td>029</td>
+<td>workflow_proposals</td>
+<td>proposals, proposal_evidence</td>
+<td>Workflow improvements</td>
+</tr>
+<tr>
+<td>030</td>
+<td>app_isolation</td>
+<td>app_contexts, app_permissions</td>
+<td>App isolation</td>
+</tr>
+<tr>
+<td>031</td>
+<td>internationalization</td>
+<td>locales, translations</td>
+<td>i18n</td>
+</tr>
+<tr>
+<td>032</td>
+<td>dynamic_configuration</td>
+<td>configs, config_history</td>
+<td>Dynamic config</td>
+</tr>
+<tr>
+<td>033</td>
+<td>billing_credits</td>
+<td>credit_balances, credit_transactions, credit_purchases</td>
+<td>Credits</td>
+</tr>
+<tr>
+<td>034</td>
+<td>storage_billing</td>
+<td>storage_usage, storage_costs</td>
+<td>Storage billing</td>
+</tr>
+<tr>
+<td>035</td>
+<td>versioned_subscriptions</td>
+<td>subscription_tiers, subscriptions</td>
+<td>Subscriptions</td>
+</tr>
+<tr>
+<td>036</td>
+<td>dual_admin_approval</td>
+<td>dual_approvals, approval_chains</td>
+<td>Dual approval</td>
+</tr>
+<tr>
+<td>037</td>
+<td>canvas_artifacts</td>
+<td>canvases, canvas_elements</td>
+<td>Canvas</td>
+</tr>
+<tr>
+<td>038</td>
+<td>scheduled_prompts</td>
+<td>scheduled_prompts, prompt_executions</td>
+<td>Scheduling</td>
+</tr>
+<tr>
+<td>039</td>
+<td>auto_resolve</td>
+<td>auto_resolutions, resolution_rules</td>
+<td>Auto-resolve</td>
+</tr>
+<tr>
+<td>040</td>
+<td>model_selection_pricing</td>
+<td>model_pricing, selection_history</td>
+<td>Pricing</td>
+</tr>
+<tr>
+<td>041</td>
+<td>admin_billing_enhancements</td>
+<td>billing_reports, revenue_tracking</td>
+<td>Billing enhancements</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="core-tables-migration-001">Core Tables (Migration 001)</h2>
+<h3 id="tenants">tenants</h3>
+<p>Primary multi-tenant organization table.</p>
+<pre class="sql"><code>CREATE TABLE tenants (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) NOT NULL UNIQUE,
+    display_name VARCHAR(200) NOT NULL,
+    domain VARCHAR(255),
+    settings JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    status VARCHAR(20) NOT NULL DEFAULT &#39;active&#39; 
+        CHECK (status IN (&#39;active&#39;, &#39;suspended&#39;, &#39;pending&#39;)),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_tenants_name ON tenants(name);
+CREATE INDEX idx_tenants_domain ON tenants(domain) WHERE domain IS NOT NULL;
+CREATE INDEX idx_tenants_status ON tenants(status);</code></pre>
+<p><strong>Settings JSON Structure:</strong></p>
+<pre class="json"><code>{
+  &quot;branding&quot;: {
+    &quot;logo_url&quot;: &quot;string&quot;,
+    &quot;primary_color&quot;: &quot;#hex&quot;,
+    &quot;company_name&quot;: &quot;string&quot;
+  },
+  &quot;limits&quot;: {
+    &quot;max_users&quot;: 100,
+    &quot;max_api_keys&quot;: 10,
+    &quot;monthly_token_limit&quot;: 1000000
+  },
+  &quot;features&quot;: {
+    &quot;think_tank_enabled&quot;: true,
+    &quot;orchestration_enabled&quot;: true,
+    &quot;collaboration_enabled&quot;: true
+  },
+  &quot;compliance&quot;: {
+    &quot;hipaa_mode&quot;: false,
+    &quot;data_retention_days&quot;: 90
+  }
+}</code></pre>
+<hr />
+<h3 id="users">users</h3>
+<p>End users within tenants.</p>
+<pre class="sql"><code>CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    cognito_user_id VARCHAR(128) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    display_name VARCHAR(200),
+    role VARCHAR(50) NOT NULL DEFAULT &#39;user&#39; 
+        CHECK (role IN (&#39;user&#39;, &#39;power_user&#39;, &#39;admin&#39;)),
+    status VARCHAR(20) NOT NULL DEFAULT &#39;active&#39; 
+        CHECK (status IN (&#39;active&#39;, &#39;suspended&#39;, &#39;pending&#39;)),
+    settings JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (tenant_id, email),
+    UNIQUE (cognito_user_id)
+);
+
+-- Indexes
+CREATE INDEX idx_users_tenant_id ON users(tenant_id);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_cognito_user_id ON users(cognito_user_id);
+CREATE INDEX idx_users_status ON users(status);</code></pre>
+<p><strong>User Roles:</strong> | Role | Permissions | |——|————-| | <code>user</code> | Basic API access, own resources | | <code>power_user</code> | + Create API keys, advanced features | | <code>admin</code> | + Manage users, view analytics |</p>
+<hr />
+<h3 id="administrators">administrators</h3>
+<p>Platform administrators (separate from tenant users).</p>
+<pre class="sql"><code>CREATE TABLE administrators (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    cognito_user_id VARCHAR(128) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    display_name VARCHAR(200) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT &#39;admin&#39; 
+        CHECK (role IN (&#39;super_admin&#39;, &#39;admin&#39;, &#39;operator&#39;, &#39;auditor&#39;)),
+    permissions TEXT[] NOT NULL DEFAULT &#39;{}&#39;,
+    mfa_enabled BOOLEAN NOT NULL DEFAULT false,
+    last_login_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    invited_by UUID REFERENCES administrators(id)
+);</code></pre>
+<p><strong>Admin Roles:</strong> | Role | Description | Permissions | |——|————-|————-| | <code>super_admin</code> | Full platform access | All operations | | <code>admin</code> | Standard admin | Manage tenants, users, models | | <code>operator</code> | Operations | View logs, manage deployments | | <code>auditor</code> | Read-only audit | View all, modify none |</p>
+<hr />
+<h3 id="approval_requests">approval_requests</h3>
+<p>Two-person approval system.</p>
+<pre class="sql"><code>CREATE TABLE approval_requests (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    requester_id UUID NOT NULL REFERENCES administrators(id),
+    action_type VARCHAR(100) NOT NULL,
+    resource_type VARCHAR(100) NOT NULL,
+    resource_id VARCHAR(255),
+    payload JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    status VARCHAR(20) NOT NULL DEFAULT &#39;pending&#39; 
+        CHECK (status IN (&#39;pending&#39;, &#39;approved&#39;, &#39;rejected&#39;, &#39;expired&#39;)),
+    required_approvals INTEGER NOT NULL DEFAULT 1,
+    approvals JSONB NOT NULL DEFAULT &#39;[]&#39;,
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);</code></pre>
+<p><strong>Action Types Requiring Approval:</strong> - <code>delete_tenant</code> - Delete a tenant - <code>modify_billing</code> - Change billing settings - <code>grant_super_admin</code> - Elevate to super admin - <code>bulk_data_export</code> - Export all data - <code>disable_security_feature</code> - Disable security</p>
+<hr />
+<h2 id="think-tank-tables-migration-016">Think Tank Tables (Migration 016)</h2>
+<h3 id="thinktank_sessions">thinktank_sessions</h3>
+<p>Problem-solving session tracking.</p>
+<pre class="sql"><code>CREATE TABLE thinktank_sessions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    problem_summary TEXT,
+    domain VARCHAR(50),
+    complexity VARCHAR(20) CHECK (complexity IN (&#39;low&#39;, &#39;medium&#39;, &#39;high&#39;, &#39;extreme&#39;)),
+    total_steps INTEGER DEFAULT 0,
+    avg_confidence DECIMAL(3, 2),
+    solution_found BOOLEAN DEFAULT false,
+    total_tokens INTEGER DEFAULT 0,
+    total_cost DECIMAL(10, 6) DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    completed_at TIMESTAMPTZ
+);
+
+-- Indexes
+CREATE INDEX idx_thinktank_sessions_tenant ON thinktank_sessions(tenant_id, created_at DESC);
+CREATE INDEX idx_thinktank_sessions_user ON thinktank_sessions(user_id);
+
+-- RLS
+ALTER TABLE thinktank_sessions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY thinktank_sessions_isolation ON thinktank_sessions
+    FOR ALL USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;, true)::uuid);</code></pre>
+<p><strong>Domains:</strong> - <code>research</code> - Academic research - <code>engineering</code> - Technical problems - <code>analytical</code> - Data analysis - <code>creative</code> - Creative tasks - <code>legal</code> - Legal analysis - <code>medical</code> - Medical queries (HIPAA) - <code>business</code> - Business strategy - <code>general</code> - General problems</p>
+<hr />
+<h3 id="thinktank_steps">thinktank_steps</h3>
+<p>Individual reasoning steps within sessions.</p>
+<pre class="sql"><code>CREATE TABLE thinktank_steps (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    session_id UUID NOT NULL REFERENCES thinktank_sessions(id) ON DELETE CASCADE,
+    step_number INTEGER NOT NULL,
+    step_type VARCHAR(50) NOT NULL 
+        CHECK (step_type IN (&#39;decompose&#39;, &#39;reason&#39;, &#39;execute&#39;, &#39;verify&#39;, &#39;synthesize&#39;)),
+    description TEXT,
+    reasoning TEXT,
+    result TEXT,
+    confidence DECIMAL(3, 2) CHECK (confidence &gt;= 0 AND confidence &lt;= 1),
+    model_used VARCHAR(100),
+    tokens_used INTEGER,
+    duration_ms INTEGER,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_thinktank_steps_session ON thinktank_steps(session_id, step_number);
+
+-- RLS
+ALTER TABLE thinktank_steps ENABLE ROW LEVEL SECURITY;
+CREATE POLICY thinktank_steps_isolation ON thinktank_steps
+    FOR ALL USING (
+        session_id IN (SELECT id FROM thinktank_sessions 
+                       WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;, true)::uuid)
+    );</code></pre>
+<p><strong>Step Types:</strong> | Type | Description | Typical Model | |——|————-|—————| | <code>decompose</code> | Break problem into parts | Claude 3.5 | | <code>reason</code> | Chain-of-thought reasoning | o1, Claude | | <code>execute</code> | Execute solution step | Task-specific | | <code>verify</code> | Verify result accuracy | Different model | | <code>synthesize</code> | Combine into final answer | Claude 3.5 |</p>
+<hr />
+<h3 id="thinktank_tools">thinktank_tools</h3>
+<p>Available tools for Think Tank.</p>
+<pre class="sql"><code>CREATE TABLE thinktank_tools (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tool_name VARCHAR(100) NOT NULL UNIQUE,
+    tool_type VARCHAR(50) NOT NULL,
+    description TEXT,
+    parameters_schema JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    implementation TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Default tools
+INSERT INTO thinktank_tools (tool_name, tool_type, description, parameters_schema) VALUES
+    (&#39;web_search&#39;, &#39;search&#39;, &#39;Search the web for information&#39;, &#39;{&quot;query&quot;: &quot;string&quot;}&#39;),
+    (&#39;calculator&#39;, &#39;compute&#39;, &#39;Perform mathematical calculations&#39;, &#39;{&quot;expression&quot;: &quot;string&quot;}&#39;),
+    (&#39;code_executor&#39;, &#39;compute&#39;, &#39;Execute code snippets&#39;, &#39;{&quot;language&quot;: &quot;string&quot;, &quot;code&quot;: &quot;string&quot;}&#39;),
+    (&#39;file_reader&#39;, &#39;io&#39;, &#39;Read file contents&#39;, &#39;{&quot;path&quot;: &quot;string&quot;}&#39;),
+    (&#39;api_caller&#39;, &#39;network&#39;, &#39;Make API requests&#39;, &#39;{&quot;url&quot;: &quot;string&quot;, &quot;method&quot;: &quot;string&quot;, &quot;body&quot;: &quot;object&quot;}&#39;);</code></pre>
+<hr />
+<h2 id="orchestration-tables-migration-024">Orchestration Tables (Migration 024)</h2>
+<h3 id="workflow_definitions">workflow_definitions</h3>
+<p>Workflow pattern definitions.</p>
+<pre class="sql"><code>CREATE TABLE workflow_definitions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    workflow_id VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    category VARCHAR(50) NOT NULL 
+        CHECK (category IN (&#39;generation&#39;, &#39;analysis&#39;, &#39;transformation&#39;, &#39;pipeline&#39;, &#39;custom&#39;)),
+    version VARCHAR(20) NOT NULL DEFAULT &#39;1.0.0&#39;,
+    
+    dag_definition JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    input_schema JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    output_schema JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    default_parameters JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    
+    timeout_seconds INTEGER DEFAULT 3600,
+    max_retries INTEGER DEFAULT 3,
+    min_tier INTEGER DEFAULT 1,
+    
+    is_active BOOLEAN DEFAULT true,
+    requires_audit_trail BOOLEAN DEFAULT false,
+    hipaa_compliant BOOLEAN DEFAULT false,
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_by UUID
+);</code></pre>
+<p><strong>DAG Definition Structure:</strong></p>
+<pre class="json"><code>{
+  &quot;nodes&quot;: [
+    {
+      &quot;taskId&quot;: &quot;decompose&quot;,
+      &quot;taskType&quot;: &quot;model_inference&quot;,
+      &quot;modelId&quot;: &quot;anthropic/claude-3-5-sonnet&quot;,
+      &quot;config&quot;: {
+        &quot;systemPrompt&quot;: &quot;Break down the problem...&quot;,
+        &quot;temperature&quot;: 0.3
+      },
+      &quot;dependsOn&quot;: []
+    },
+    {
+      &quot;taskId&quot;: &quot;solve_part_1&quot;,
+      &quot;taskType&quot;: &quot;model_inference&quot;,
+      &quot;dependsOn&quot;: [&quot;decompose&quot;]
+    }
+  ],
+  &quot;edges&quot;: [
+    {&quot;from&quot;: &quot;decompose&quot;, &quot;to&quot;: &quot;solve_part_1&quot;}
+  ]
+}</code></pre>
+<hr />
+<h3 id="workflow_tasks">workflow_tasks</h3>
+<p>Individual tasks within workflows.</p>
+<pre class="sql"><code>CREATE TABLE workflow_tasks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    workflow_id UUID NOT NULL REFERENCES workflow_definitions(id) ON DELETE CASCADE,
+    task_id VARCHAR(100) NOT NULL,
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    
+    task_type VARCHAR(50) NOT NULL 
+        CHECK (task_type IN (&#39;model_inference&#39;, &#39;transformation&#39;, &#39;condition&#39;, 
+                             &#39;parallel&#39;, &#39;aggregation&#39;, &#39;external_api&#39;, &#39;human_review&#39;)),
+    model_id VARCHAR(100),
+    service_id VARCHAR(100),
+    
+    config JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    input_mapping JSONB DEFAULT &#39;{}&#39;,
+    output_mapping JSONB DEFAULT &#39;{}&#39;,
+    
+    sequence_order INTEGER DEFAULT 0,
+    depends_on TEXT[] DEFAULT &#39;{}&#39;,
+    condition_expression TEXT,
+    timeout_seconds INTEGER DEFAULT 300,
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(workflow_id, task_id)
+);</code></pre>
+<p><strong>Task Types:</strong> | Type | Description | Example | |——|————-|———| | <code>model_inference</code> | AI model call | Generate text | | <code>transformation</code> | Data transformation | Format output | | <code>condition</code> | Conditional branching | If confidence &gt; 0.8 | | <code>parallel</code> | Parallel execution | Call 3 models | | <code>aggregation</code> | Combine results | Merge responses | | <code>external_api</code> | External API call | Web search | | <code>human_review</code> | Human-in-the-loop | Approval step |</p>
+<hr />
+<h3 id="workflow_executions">workflow_executions</h3>
+<p>Workflow execution tracking.</p>
+<pre class="sql"><code>CREATE TABLE workflow_executions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    workflow_id UUID NOT NULL REFERENCES workflow_definitions(id),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL,
+    
+    status VARCHAR(20) NOT NULL DEFAULT &#39;pending&#39; 
+        CHECK (status IN (&#39;pending&#39;, &#39;running&#39;, &#39;paused&#39;, &#39;completed&#39;, &#39;failed&#39;, &#39;cancelled&#39;)),
+    
+    input_parameters JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    resolved_parameters JSONB DEFAULT &#39;{}&#39;,
+    output_data JSONB,
+    
+    error_message TEXT,
+    error_details JSONB,
+    
+    started_at TIMESTAMPTZ,
+    completed_at TIMESTAMPTZ,
+    duration_ms INTEGER,
+    
+    estimated_cost_usd DECIMAL(10, 4),
+    actual_cost_usd DECIMAL(10, 4),
+    
+    checkpoint_data JSONB,
+    priority INTEGER DEFAULT 5 CHECK (priority &gt;= 1 AND priority &lt;= 10),
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE workflow_executions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY workflow_executions_isolation ON workflow_executions
+    FOR ALL USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;, true)::uuid);</code></pre>
+<hr />
+<h3 id="task_executions">task_executions</h3>
+<p>Individual task execution tracking.</p>
+<pre class="sql"><code>CREATE TABLE task_executions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    workflow_execution_id UUID NOT NULL REFERENCES workflow_executions(id) ON DELETE CASCADE,
+    task_id VARCHAR(100) NOT NULL,
+    
+    status VARCHAR(20) NOT NULL DEFAULT &#39;pending&#39; 
+        CHECK (status IN (&#39;pending&#39;, &#39;running&#39;, &#39;completed&#39;, &#39;failed&#39;, &#39;skipped&#39;, &#39;retrying&#39;)),
+    attempt_number INTEGER DEFAULT 1,
+    
+    input_data JSONB,
+    output_data JSONB,
+    
+    error_message TEXT,
+    error_code VARCHAR(50),
+    
+    started_at TIMESTAMPTZ,
+    completed_at TIMESTAMPTZ,
+    duration_ms INTEGER,
+    
+    resource_usage JSONB DEFAULT &#39;{}&#39;,
+    cost_usd DECIMAL(10, 4),
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);</code></pre>
+<hr />
+<h2 id="billing-tables-migrations-033-035">Billing Tables (Migrations 033-035)</h2>
+<h3 id="credit_balances">credit_balances</h3>
+<p>Tenant credit balance tracking.</p>
+<pre class="sql"><code>CREATE TABLE credit_balances (
+    tenant_id UUID PRIMARY KEY REFERENCES tenants(id) ON DELETE CASCADE,
+    balance DECIMAL(12, 4) NOT NULL DEFAULT 0,
+    lifetime_purchased DECIMAL(12, 4) NOT NULL DEFAULT 0,
+    lifetime_used DECIMAL(12, 4) NOT NULL DEFAULT 0,
+    lifetime_bonus DECIMAL(12, 4) NOT NULL DEFAULT 0,
+    low_balance_alert_threshold DECIMAL(12, 4),
+    last_low_balance_alert TIMESTAMPTZ,
+    auto_purchase_enabled BOOLEAN DEFAULT false,
+    auto_purchase_threshold DECIMAL(12, 4),
+    auto_purchase_amount DECIMAL(12, 4),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);</code></pre>
+<hr />
+<h3 id="credit_transactions">credit_transactions</h3>
+<p>Credit transaction history.</p>
+<pre class="sql"><code>CREATE TABLE credit_transactions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    transaction_type VARCHAR(30) NOT NULL 
+        CHECK (transaction_type IN (&#39;purchase&#39;, &#39;bonus&#39;, &#39;refund&#39;, &#39;usage&#39;, 
+                                    &#39;transfer_in&#39;, &#39;transfer_out&#39;, 
+                                    &#39;subscription_allocation&#39;, &#39;expiration&#39;, &#39;adjustment&#39;)),
+    amount DECIMAL(12, 4) NOT NULL,
+    balance_after DECIMAL(12, 4) NOT NULL,
+    description TEXT,
+    reference_id VARCHAR(255),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_credit_transactions_tenant ON credit_transactions(tenant_id, created_at DESC);</code></pre>
+<hr />
+<h3 id="subscription_tiers">subscription_tiers</h3>
+<p>Available subscription plans.</p>
+<pre class="sql"><code>CREATE TABLE subscription_tiers (
+    id VARCHAR(50) PRIMARY KEY,
+    display_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price_monthly DECIMAL(10, 2),
+    price_annual DECIMAL(10, 2),
+    included_credits_per_user DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    features JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    limits JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    is_public BOOLEAN DEFAULT true,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Default tiers
+INSERT INTO subscription_tiers (id, display_name, price_monthly, price_annual, included_credits_per_user, features) VALUES
+(&#39;free&#39;, &#39;Free&#39;, 0, NULL, 100, &#39;{&quot;think_tank&quot;: false, &quot;orchestration&quot;: false, &quot;models&quot;: [&quot;gpt-4o-mini&quot;, &quot;claude-3-haiku&quot;]}&#39;),
+(&#39;pro&#39;, &#39;Pro&#39;, 49, 490, 5000, &#39;{&quot;think_tank&quot;: true, &quot;orchestration&quot;: true, &quot;models&quot;: &quot;all&quot;}&#39;),
+(&#39;team&#39;, &#39;Team&#39;, 199, 1990, 25000, &#39;{&quot;think_tank&quot;: true, &quot;orchestration&quot;: true, &quot;collaboration&quot;: true, &quot;models&quot;: &quot;all&quot;}&#39;),
+(&#39;enterprise&#39;, &#39;Enterprise&#39;, NULL, NULL, 0, &#39;{&quot;think_tank&quot;: true, &quot;orchestration&quot;: true, &quot;collaboration&quot;: true, &quot;models&quot;: &quot;all&quot;, &quot;custom_models&quot;: true}&#39;);</code></pre>
+<hr />
+<h3 id="subscriptions">subscriptions</h3>
+<p>Active tenant subscriptions.</p>
+<pre class="sql"><code>CREATE TABLE subscriptions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    tier_id VARCHAR(50) NOT NULL REFERENCES subscription_tiers(id),
+    status VARCHAR(20) NOT NULL DEFAULT &#39;active&#39; 
+        CHECK (status IN (&#39;active&#39;, &#39;cancelled&#39;, &#39;past_due&#39;, &#39;trialing&#39;, &#39;paused&#39;)),
+    billing_cycle VARCHAR(10) NOT NULL CHECK (billing_cycle IN (&#39;monthly&#39;, &#39;annual&#39;)),
+    seats_purchased INTEGER NOT NULL DEFAULT 1,
+    seats_used INTEGER NOT NULL DEFAULT 0,
+    current_period_start TIMESTAMPTZ NOT NULL,
+    current_period_end TIMESTAMPTZ NOT NULL,
+    cancel_at_period_end BOOLEAN DEFAULT false,
+    cancelled_at TIMESTAMPTZ,
+    stripe_customer_id VARCHAR(255),
+    stripe_subscription_id VARCHAR(255),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);</code></pre>
+<hr />
+<h2 id="row-level-security-migration-002">Row-Level Security (Migration 002)</h2>
+<h3 id="rls-pattern">RLS Pattern</h3>
+<p>All tenant-scoped tables use this pattern:</p>
+<pre class="sql"><code>-- Enable RLS on table
+ALTER TABLE {table_name} ENABLE ROW LEVEL SECURITY;
+
+-- Create isolation policy
+CREATE POLICY {table_name}_isolation ON {table_name}
+    FOR ALL USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;, true)::uuid);</code></pre>
+<h3 id="setting-tenant-context">Setting Tenant Context</h3>
+<p>Every request sets the tenant context before queries:</p>
+<pre class="sql"><code>SET app.current_tenant_id = &#39;{tenant_uuid}&#39;;</code></pre>
+<h3 id="tables-with-rls-enabled">Tables with RLS Enabled:</h3>
+<ul>
+<li>users</li>
+<li>thinktank_sessions</li>
+<li>thinktank_steps</li>
+<li>workflow_executions</li>
+<li>task_executions</li>
+<li>credit_transactions</li>
+<li>subscriptions</li>
+<li>chat_sessions</li>
+<li>chat_messages</li>
+<li>collaborations</li>
+<li>memories</li>
+<li>feedback</li>
+<li>api_keys</li>
+<li>(all tenant-scoped tables)</li>
+</ul>
+<hr />
+<h2 id="common-patterns">Common Patterns</h2>
+<h3 id="updated-at-trigger">Updated At Trigger</h3>
+<pre class="sql"><code>CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Apply to tables
+CREATE TRIGGER update_{table}_updated_at 
+    BEFORE UPDATE ON {table}
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();</code></pre>
+<h3 id="soft-delete-pattern">Soft Delete Pattern</h3>
+<pre class="sql"><code>-- Add columns
+deleted_at TIMESTAMPTZ,
+deleted_by UUID,
+
+-- Query with filter
+WHERE deleted_at IS NULL</code></pre>
+<h3 id="audit-columns">Audit Columns</h3>
+<pre class="sql"><code>created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+created_by UUID,
+updated_by UUID</code></pre>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -604,12 +604,6 @@ export default function WorkflowEditorPage() {
     }));
   };
 
-  const handleRun = () => {
-    setIsRunning(true);
-    // Simulate workflow execution
-    setTimeout(() => setIsRunning(false), 3000);
-  };
-
   return (
     <div className="h-[calc(100vh-6rem)] flex flex-col">
       {/* Header */}

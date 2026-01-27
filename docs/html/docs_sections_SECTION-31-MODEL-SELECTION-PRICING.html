@@ -1,0 +1,2398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 31 MODEL SELECTION PRICING - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 31 MODEL SELECTION PRICING</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-31-MODEL-SELECTION-PRICING.md</div>
+  </div>
+  
+  <h1 id="section-31-think-tank-model-selection-editable-pricing-v3.8.0">SECTION 31: THINK TANK MODEL SELECTION &amp; EDITABLE PRICING (v3.8.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<blockquote>
+<p><strong>NEW in v3.8.0</strong>: Users can now manually select AI models in Think Tank. All pricing is admin-editable with bulk controls and individual overrides.</p>
+</blockquote>
+<hr />
+<h2 id="model-categories-for-think-tank">31.1 Model Categories for Think Tank</h2>
+<h3 id="standard-models-15---production-ready">Standard Models (15) - Production-Ready</h3>
+<table>
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 19%" />
+<col style="width: 13%" />
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 18%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr>
+<th>ID</th>
+<th>Display Name</th>
+<th>Provider</th>
+<th>Context</th>
+<th>Input $/1M</th>
+<th>Output $/1M</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>claude-4-opus</code></td>
+<td>Claude 4 Opus</td>
+<td>Anthropic</td>
+<td>200K</td>
+<td>$15.00</td>
+<td>$75.00</td>
+<td>Complex reasoning, analysis</td>
+</tr>
+<tr>
+<td><code>claude-4-sonnet</code></td>
+<td>Claude 4 Sonnet</td>
+<td>Anthropic</td>
+<td>200K</td>
+<td>$3.00</td>
+<td>$15.00</td>
+<td>Quality/cost balance</td>
+</tr>
+<tr>
+<td><code>claude-3.5-haiku</code></td>
+<td>Claude 3.5 Haiku</td>
+<td>Anthropic</td>
+<td>200K</td>
+<td>$0.25</td>
+<td>$1.25</td>
+<td>Fast responses</td>
+</tr>
+<tr>
+<td><code>gpt-4o</code></td>
+<td>GPT-4o</td>
+<td>OpenAI</td>
+<td>128K</td>
+<td>$2.50</td>
+<td>$10.00</td>
+<td>Multimodal, reliable</td>
+</tr>
+<tr>
+<td><code>gpt-4o-mini</code></td>
+<td>GPT-4o Mini</td>
+<td>OpenAI</td>
+<td>128K</td>
+<td>$0.15</td>
+<td>$0.60</td>
+<td>Cost-effective</td>
+</tr>
+<tr>
+<td><code>o1</code></td>
+<td>o1 Reasoning</td>
+<td>OpenAI</td>
+<td>200K</td>
+<td>$15.00</td>
+<td>$60.00</td>
+<td>Multi-step reasoning</td>
+</tr>
+<tr>
+<td><code>gemini-2.0-pro</code></td>
+<td>Gemini 2.0 Pro</td>
+<td>Google</td>
+<td>2M</td>
+<td>$1.25</td>
+<td>$5.00</td>
+<td>Massive context</td>
+</tr>
+<tr>
+<td><code>gemini-2.0-flash</code></td>
+<td>Gemini 2.0 Flash</td>
+<td>Google</td>
+<td>1M</td>
+<td>$0.075</td>
+<td>$0.30</td>
+<td>Speed, large context</td>
+</tr>
+<tr>
+<td><code>grok-3</code></td>
+<td>Grok 3</td>
+<td>xAI</td>
+<td>131K</td>
+<td>$3.00</td>
+<td>$15.00</td>
+<td>Real-time info</td>
+</tr>
+<tr>
+<td><code>grok-3-fast</code></td>
+<td>Grok 3 Fast</td>
+<td>xAI</td>
+<td>131K</td>
+<td>$1.00</td>
+<td>$5.00</td>
+<td>Quick responses</td>
+</tr>
+<tr>
+<td><code>grok-3-mini</code></td>
+<td>Grok 3 Mini</td>
+<td>xAI</td>
+<td>131K</td>
+<td>$0.30</td>
+<td>$1.50</td>
+<td>Budget Grok</td>
+</tr>
+<tr>
+<td><code>deepseek-v3</code></td>
+<td>DeepSeek V3</td>
+<td>DeepSeek</td>
+<td>64K</td>
+<td>$0.14</td>
+<td>$0.28</td>
+<td>Extremely low cost</td>
+</tr>
+<tr>
+<td><code>mistral-large-2</code></td>
+<td>Mistral Large 2</td>
+<td>Mistral</td>
+<td>128K</td>
+<td>$2.00</td>
+<td>$6.00</td>
+<td>Multilingual</td>
+</tr>
+<tr>
+<td><code>codestral-latest</code></td>
+<td>Codestral</td>
+<td>Mistral</td>
+<td>32K</td>
+<td>$0.30</td>
+<td>$0.90</td>
+<td>Code generation</td>
+</tr>
+<tr>
+<td><code>perplexity-sonar-pro</code></td>
+<td>Sonar Pro</td>
+<td>Perplexity</td>
+<td>128K</td>
+<td>$3.00</td>
+<td>$15.00</td>
+<td>Web search</td>
+</tr>
+</tbody>
+</table>
+<h3 id="novel-models-15---cutting-edgeexperimental">Novel Models (15) - Cutting-Edge/Experimental</h3>
+<table>
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 18%" />
+<col style="width: 12%" />
+<col style="width: 11%" />
+<col style="width: 15%" />
+<col style="width: 16%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr>
+<th>ID</th>
+<th>Display Name</th>
+<th>Provider</th>
+<th>Context</th>
+<th>Input $/1M</th>
+<th>Output $/1M</th>
+<th>Novel Feature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>o1-pro</code></td>
+<td>o1 Pro</td>
+<td>OpenAI</td>
+<td>200K</td>
+<td>$150.00</td>
+<td>$600.00</td>
+<td>Extended reasoning chains</td>
+</tr>
+<tr>
+<td><code>deepseek-r1</code></td>
+<td>DeepSeek R1</td>
+<td>DeepSeek</td>
+<td>64K</td>
+<td>$0.55</td>
+<td>$2.19</td>
+<td>Open reasoning model</td>
+</tr>
+<tr>
+<td><code>gemini-2.0-ultra</code></td>
+<td>Gemini 2.0 Ultra</td>
+<td>Google</td>
+<td>2M</td>
+<td>$5.00</td>
+<td>$15.00</td>
+<td>Native multimodal</td>
+</tr>
+<tr>
+<td><code>gemini-2.0-pro-exp</code></td>
+<td>Gemini Pro Exp</td>
+<td>Google</td>
+<td>10M</td>
+<td>$2.50</td>
+<td>$10.00</td>
+<td>10M token context</td>
+</tr>
+<tr>
+<td><code>grok-2-vision</code></td>
+<td>Grok 2 Vision</td>
+<td>xAI</td>
+<td>32K</td>
+<td>$2.00</td>
+<td>$10.00</td>
+<td>Image understanding</td>
+</tr>
+<tr>
+<td><code>grok-realtime</code></td>
+<td>Grok Realtime</td>
+<td>xAI</td>
+<td>32K</td>
+<td>$5.00</td>
+<td>$20.00</td>
+<td>Live streaming</td>
+</tr>
+<tr>
+<td><code>grok-coder</code></td>
+<td>Grok Coder</td>
+<td>xAI</td>
+<td>131K</td>
+<td>$1.50</td>
+<td>$7.50</td>
+<td>Specialized code gen</td>
+</tr>
+<tr>
+<td><code>grok-analyst</code></td>
+<td>Grok Analyst</td>
+<td>xAI</td>
+<td>131K</td>
+<td>$2.00</td>
+<td>$10.00</td>
+<td>Data analysis</td>
+</tr>
+<tr>
+<td><code>gpt-4o-realtime</code></td>
+<td>GPT-4o Realtime</td>
+<td>OpenAI</td>
+<td>128K</td>
+<td>$5.00</td>
+<td>$20.00</td>
+<td>Voice/video streaming</td>
+</tr>
+<tr>
+<td><code>claude-4-opus-agents</code></td>
+<td>Claude Opus Agents</td>
+<td>Anthropic</td>
+<td>200K</td>
+<td>$15.00</td>
+<td>$75.00</td>
+<td>Tool use, computer use</td>
+</tr>
+<tr>
+<td><code>qwen-2.5-coder</code></td>
+<td>Qwen 2.5 Coder</td>
+<td>Together</td>
+<td>128K</td>
+<td>$0.30</td>
+<td>$0.90</td>
+<td>Open-source code</td>
+</tr>
+<tr>
+<td><code>llama-3.3-70b</code></td>
+<td>Llama 3.3 70B</td>
+<td>Together</td>
+<td>128K</td>
+<td>$0.88</td>
+<td>$0.88</td>
+<td>Open weights</td>
+</tr>
+<tr>
+<td><code>phi-4</code></td>
+<td>Phi-4</td>
+<td>Microsoft</td>
+<td>16K</td>
+<td>$0.07</td>
+<td>$0.14</td>
+<td>Small but capable</td>
+</tr>
+<tr>
+<td><code>grok-embed</code></td>
+<td>Grok Embed</td>
+<td>xAI</td>
+<td>8K</td>
+<td>$0.10</td>
+<td>-</td>
+<td>Text embeddings</td>
+</tr>
+<tr>
+<td><code>command-r-plus</code></td>
+<td>Command R+</td>
+<td>Cohere</td>
+<td>128K</td>
+<td>$2.50</td>
+<td>$10.00</td>
+<td>RAG optimized</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="database-schema-for-model-selection">31.2 Database Schema for Model Selection</h2>
+<pre class="sql"><code>-- Migration: 20241223_031_thinktank_model_selection.sql
+
+-- Add model categorization columns
+ALTER TABLE models ADD COLUMN IF NOT EXISTS is_novel BOOLEAN DEFAULT FALSE;
+ALTER TABLE models ADD COLUMN IF NOT EXISTS category VARCHAR(50) DEFAULT &#39;general&#39;;
+ALTER TABLE models ADD COLUMN IF NOT EXISTS thinktank_enabled BOOLEAN DEFAULT TRUE;
+ALTER TABLE models ADD COLUMN IF NOT EXISTS thinktank_display_order INTEGER DEFAULT 100;
+
+-- User model preferences for Think Tank
+CREATE TABLE IF NOT EXISTS thinktank_user_model_preferences (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES thinktank_users(id) ON DELETE CASCADE,
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    
+    -- Selection Mode: &#39;auto&#39; | &#39;manual&#39; | &#39;favorites&#39;
+    selection_mode VARCHAR(20) NOT NULL DEFAULT &#39;auto&#39;,
+    
+    -- Default Model (when manual mode)
+    default_model_id VARCHAR(100),
+    
+    -- Favorite Models (JSON array of model IDs)
+    favorite_models JSONB DEFAULT &#39;[]&#39;::JSONB,
+    
+    -- Category Preferences
+    show_standard_models BOOLEAN DEFAULT TRUE,
+    show_novel_models BOOLEAN DEFAULT TRUE,
+    show_self_hosted_models BOOLEAN DEFAULT FALSE,
+    
+    -- Cost Preferences
+    show_cost_per_message BOOLEAN DEFAULT TRUE,
+    max_cost_per_message DECIMAL(10, 6), -- NULL = no limit
+    prefer_cost_optimization BOOLEAN DEFAULT FALSE,
+    
+    -- Domain Mode Model Overrides
+    -- Example: {&quot;medical&quot;: &quot;claude-4-opus&quot;, &quot;code&quot;: &quot;codestral-latest&quot;}
+    domain_mode_model_overrides JSONB DEFAULT &#39;{}&#39;::JSONB,
+    
+    -- Recent Models (for quick access)
+    recent_models JSONB DEFAULT &#39;[]&#39;::JSONB,
+    
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    UNIQUE(user_id)
+);
+
+CREATE INDEX idx_thinktank_model_prefs_user ON thinktank_user_model_preferences(user_id);
+CREATE INDEX idx_thinktank_model_prefs_tenant ON thinktank_user_model_preferences(tenant_id);
+
+-- Trigger for updated_at
+CREATE TRIGGER update_thinktank_model_prefs_timestamp
+    BEFORE UPDATE ON thinktank_user_model_preferences
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();</code></pre>
+<hr />
+<h2 id="admin-editable-pricing-schema">31.3 Admin Editable Pricing Schema</h2>
+<pre class="sql"><code>-- Migration: 20241223_032_editable_pricing.sql
+
+-- Pricing configuration table (admin-editable)
+CREATE TABLE IF NOT EXISTS pricing_config (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    
+    -- Global Markup Defaults
+    external_default_markup DECIMAL(5, 4) DEFAULT 0.40,     -- 40%
+    self_hosted_default_markup DECIMAL(5, 4) DEFAULT 0.75, -- 75%
+    
+    -- Minimum Charges
+    minimum_charge_per_request DECIMAL(10, 6) DEFAULT 0.001,
+    
+    -- Grace Period for Price Increases (hours)
+    price_increase_grace_period_hours INTEGER DEFAULT 24,
+    
+    -- Auto-Update Settings
+    auto_update_from_providers BOOLEAN DEFAULT TRUE,
+    auto_update_frequency VARCHAR(20) DEFAULT &#39;daily&#39;, -- &#39;hourly&#39;, &#39;daily&#39;, &#39;weekly&#39;
+    last_auto_update TIMESTAMPTZ,
+    
+    -- Notification Settings
+    notify_on_price_change BOOLEAN DEFAULT TRUE,
+    notify_threshold_percent DECIMAL(5, 2) DEFAULT 10.00, -- Notify if price changes &gt;10%
+    
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    UNIQUE(tenant_id)
+);
+
+-- Model-specific pricing overrides (admin-editable per model)
+CREATE TABLE IF NOT EXISTS model_pricing_overrides (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    model_id VARCHAR(100) NOT NULL,
+    
+    -- Override Values (NULL = use defaults)
+    markup_override DECIMAL(5, 4),           -- Override markup percentage
+    input_price_override DECIMAL(12, 6),     -- Override input price per 1M tokens
+    output_price_override DECIMAL(12, 6),    -- Override output price per 1M tokens
+    
+    -- Effective Dates (for scheduled price changes)
+    effective_from TIMESTAMPTZ DEFAULT NOW(),
+    effective_to TIMESTAMPTZ,
+    
+    -- Audit
+    created_by UUID REFERENCES administrators(id),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    UNIQUE(tenant_id, model_id, effective_from)
+);
+
+CREATE INDEX idx_pricing_overrides_tenant ON model_pricing_overrides(tenant_id);
+CREATE INDEX idx_pricing_overrides_model ON model_pricing_overrides(model_id);
+CREATE INDEX idx_pricing_overrides_effective ON model_pricing_overrides(effective_from, effective_to);
+
+-- Price history for auditing
+CREATE TABLE IF NOT EXISTS price_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    model_id VARCHAR(100) NOT NULL,
+    
+    -- Previous Values
+    previous_input_price DECIMAL(12, 6),
+    previous_output_price DECIMAL(12, 6),
+    previous_markup DECIMAL(5, 4),
+    
+    -- New Values
+    new_input_price DECIMAL(12, 6),
+    new_output_price DECIMAL(12, 6),
+    new_markup DECIMAL(5, 4),
+    
+    -- Change Source
+    change_source VARCHAR(50), -- &#39;admin&#39;, &#39;auto_sync&#39;, &#39;bulk_update&#39;
+    changed_by UUID REFERENCES administrators(id),
+    
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_price_history_tenant_model ON price_history(tenant_id, model_id);
+CREATE INDEX idx_price_history_date ON price_history(created_at);
+
+-- View for effective pricing (combines base + overrides)
+CREATE OR REPLACE VIEW effective_model_pricing AS
+SELECT 
+    m.id AS model_id,
+    m.display_name,
+    m.provider_id,
+    m.is_novel,
+    m.category,
+    m.thinktank_enabled,
+    
+    -- Base Prices
+    COALESCE(m.pricing-&gt;&gt;&#39;input_tokens&#39;, &#39;0&#39;)::DECIMAL AS base_input_price,
+    COALESCE(m.pricing-&gt;&gt;&#39;output_tokens&#39;, &#39;0&#39;)::DECIMAL AS base_output_price,
+    
+    -- Effective Markup (override &gt; category default &gt; global default)
+    COALESCE(
+        mpo.markup_override,
+        CASE 
+            WHEN m.provider_id = &#39;self_hosted&#39; THEN pc.self_hosted_default_markup
+            ELSE pc.external_default_markup
+        END,
+        0.40
+    ) AS effective_markup,
+    
+    -- Final User Prices (with markup)
+    ROUND(
+        COALESCE(mpo.input_price_override, COALESCE(m.pricing-&gt;&gt;&#39;input_tokens&#39;, &#39;0&#39;)::DECIMAL) *
+        (1 + COALESCE(mpo.markup_override, 
+            CASE WHEN m.provider_id = &#39;self_hosted&#39; THEN pc.self_hosted_default_markup ELSE pc.external_default_markup END,
+            0.40)),
+        6
+    ) AS user_input_price,
+    
+    ROUND(
+        COALESCE(mpo.output_price_override, COALESCE(m.pricing-&gt;&gt;&#39;output_tokens&#39;, &#39;0&#39;)::DECIMAL) *
+        (1 + COALESCE(mpo.markup_override,
+            CASE WHEN m.provider_id = &#39;self_hosted&#39; THEN pc.self_hosted_default_markup ELSE pc.external_default_markup END,
+            0.40)),
+        6
+    ) AS user_output_price,
+    
+    -- Override Status
+    mpo.id IS NOT NULL AS has_override,
+    mpo.effective_from,
+    mpo.effective_to
+    
+FROM models m
+LEFT JOIN pricing_config pc ON TRUE
+LEFT JOIN model_pricing_overrides mpo ON m.id = mpo.model_id 
+    AND (mpo.effective_from &lt;= NOW() OR mpo.effective_from IS NULL)
+    AND (mpo.effective_to &gt; NOW() OR mpo.effective_to IS NULL);</code></pre>
+<hr />
+<h2 id="admin-pricing-dashboard">31.4 Admin Pricing Dashboard</h2>
+<pre class="typescript"><code>// apps/admin-dashboard/src/app/(dashboard)/models/pricing/page.tsx
+
+&#39;use client&#39;;
+
+import { useState } from &#39;react&#39;;
+import { useQuery, useMutation, useQueryClient } from &#39;@tanstack/react-query&#39;;
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from &#39;@/components/ui/card&#39;;
+import { Button } from &#39;@/components/ui/button&#39;;
+import { Input } from &#39;@/components/ui/input&#39;;
+import { Label } from &#39;@/components/ui/label&#39;;
+import { Switch } from &#39;@/components/ui/switch&#39;;
+import { Tabs, TabsContent, TabsList, TabsTrigger } from &#39;@/components/ui/tabs&#39;;
+import { Badge } from &#39;@/components/ui/badge&#39;;
+import { Slider } from &#39;@/components/ui/slider&#39;;
+import { 
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
+} from &#39;@/components/ui/table&#39;;
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter
+} from &#39;@/components/ui/dialog&#39;;
+import { toast } from &#39;sonner&#39;;
+import { Save, RefreshCw, DollarSign, Percent, History, Edit2 } from &#39;lucide-react&#39;;
+
+interface PricingConfig {
+  externalDefaultMarkup: number;
+  selfHostedDefaultMarkup: number;
+  minimumChargePerRequest: number;
+  priceIncreaseGracePeriodHours: number;
+  autoUpdateFromProviders: boolean;
+  autoUpdateFrequency: &#39;hourly&#39; | &#39;daily&#39; | &#39;weekly&#39;;
+  notifyOnPriceChange: boolean;
+  notifyThresholdPercent: number;
+}
+
+interface ModelPricing {
+  modelId: string;
+  displayName: string;
+  providerId: string;
+  isNovel: boolean;
+  category: string;
+  baseInputPrice: number;
+  baseOutputPrice: number;
+  effectiveMarkup: number;
+  userInputPrice: number;
+  userOutputPrice: number;
+  hasOverride: boolean;
+}
+
+export default function ModelPricingPage() {
+  const queryClient = useQueryClient();
+  const [selectedModel, setSelectedModel] = useState&lt;ModelPricing | null&gt;(null);
+  const [bulkMarkup, setBulkMarkup] = useState({ external: 40, selfHosted: 75 });
+
+  // Fetch pricing config
+  const { data: config, isLoading: configLoading } = useQuery&lt;PricingConfig&gt;({
+    queryKey: [&#39;pricing-config&#39;],
+    queryFn: () =&gt; fetch(&#39;/api/admin/pricing/config&#39;).then(r =&gt; r.json()),
+  });
+
+  // Fetch all model pricing
+  const { data: models, isLoading: modelsLoading } = useQuery&lt;ModelPricing[]&gt;({
+    queryKey: [&#39;model-pricing&#39;],
+    queryFn: () =&gt; fetch(&#39;/api/admin/pricing/models&#39;).then(r =&gt; r.json()),
+  });
+
+  // Update config mutation
+  const updateConfigMutation = useMutation({
+    mutationFn: (data: Partial&lt;PricingConfig&gt;) =&gt;
+      fetch(&#39;/api/admin/pricing/config&#39;, {
+        method: &#39;PUT&#39;,
+        headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+        body: JSON.stringify(data),
+      }).then(r =&gt; r.json()),
+    onSuccess: () =&gt; {
+      queryClient.invalidateQueries({ queryKey: [&#39;pricing-config&#39;] });
+      toast.success(&#39;Pricing configuration updated&#39;);
+    },
+  });
+
+  // Bulk update markup mutation
+  const bulkUpdateMutation = useMutation({
+    mutationFn: (data: { type: &#39;external&#39; | &#39;self_hosted&#39;; markup: number }) =&gt;
+      fetch(&#39;/api/admin/pricing/bulk-update&#39;, {
+        method: &#39;POST&#39;,
+        headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+        body: JSON.stringify(data),
+      }).then(r =&gt; r.json()),
+    onSuccess: (_, variables) =&gt; {
+      queryClient.invalidateQueries({ queryKey: [&#39;model-pricing&#39;] });
+      toast.success(`All ${variables.type === &#39;external&#39; ? &#39;external&#39; : &#39;self-hosted&#39;} models updated to ${variables.markup}% markup`);
+    },
+  });
+
+  // Individual model override mutation
+  const overrideMutation = useMutation({
+    mutationFn: (data: { modelId: string; markup?: number; inputPrice?: number; outputPrice?: number }) =&gt;
+      fetch(`/api/admin/pricing/models/${data.modelId}/override`, {
+        method: &#39;PUT&#39;,
+        headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+        body: JSON.stringify(data),
+      }).then(r =&gt; r.json()),
+    onSuccess: () =&gt; {
+      queryClient.invalidateQueries({ queryKey: [&#39;model-pricing&#39;] });
+      setSelectedModel(null);
+      toast.success(&#39;Model pricing override saved&#39;);
+    },
+  });
+
+  // Clear override mutation
+  const clearOverrideMutation = useMutation({
+    mutationFn: (modelId: string) =&gt;
+      fetch(`/api/admin/pricing/models/${modelId}/override`, {
+        method: &#39;DELETE&#39;,
+      }).then(r =&gt; r.json()),
+    onSuccess: () =&gt; {
+      queryClient.invalidateQueries({ queryKey: [&#39;model-pricing&#39;] });
+      toast.success(&#39;Pricing override removed&#39;);
+    },
+  });
+
+  const [localConfig, setLocalConfig] = useState&lt;Partial&lt;PricingConfig&gt;&gt;(config || {});
+
+  return (
+    &lt;div className=&quot;space-y-6&quot;&gt;
+      &lt;div className=&quot;flex justify-between items-center&quot;&gt;
+        &lt;div&gt;
+          &lt;h1 className=&quot;text-2xl font-bold&quot;&gt;Model Pricing&lt;/h1&gt;
+          &lt;p className=&quot;text-muted-foreground&quot;&gt;
+            Configure pricing markups and overrides for all AI models
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div className=&quot;flex gap-2&quot;&gt;
+          &lt;Button variant=&quot;outline&quot; onClick={() =&gt; queryClient.invalidateQueries()}&gt;
+            &lt;RefreshCw className=&quot;h-4 w-4 mr-2&quot; /&gt;
+            Refresh
+          &lt;/Button&gt;
+          &lt;Button onClick={() =&gt; updateConfigMutation.mutate(localConfig)}&gt;
+            &lt;Save className=&quot;h-4 w-4 mr-2&quot; /&gt;
+            Save Config
+          &lt;/Button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;Tabs defaultValue=&quot;config&quot;&gt;
+        &lt;TabsList&gt;
+          &lt;TabsTrigger value=&quot;config&quot;&gt;Global Configuration&lt;/TabsTrigger&gt;
+          &lt;TabsTrigger value=&quot;bulk&quot;&gt;Bulk Updates&lt;/TabsTrigger&gt;
+          &lt;TabsTrigger value=&quot;models&quot;&gt;Individual Models&lt;/TabsTrigger&gt;
+          &lt;TabsTrigger value=&quot;history&quot;&gt;Price History&lt;/TabsTrigger&gt;
+        &lt;/TabsList&gt;
+
+        {/* Global Configuration Tab */}
+        &lt;TabsContent value=&quot;config&quot; className=&quot;space-y-4&quot;&gt;
+          &lt;div className=&quot;grid gap-4 md:grid-cols-2&quot;&gt;
+            &lt;Card&gt;
+              &lt;CardHeader&gt;
+                &lt;CardTitle className=&quot;flex items-center gap-2&quot;&gt;
+                  &lt;Percent className=&quot;h-5 w-5&quot; /&gt;
+                  Default Markups
+                &lt;/CardTitle&gt;
+                &lt;CardDescription&gt;
+                  Global markup percentages applied to all models
+                &lt;/CardDescription&gt;
+              &lt;/CardHeader&gt;
+              &lt;CardContent className=&quot;space-y-6&quot;&gt;
+                &lt;div className=&quot;space-y-3&quot;&gt;
+                  &lt;div className=&quot;flex justify-between&quot;&gt;
+                    &lt;Label&gt;External Provider Markup&lt;/Label&gt;
+                    &lt;span className=&quot;font-mono text-sm&quot;&gt;
+                      {((localConfig.externalDefaultMarkup || config?.externalDefaultMarkup || 0.40) * 100).toFixed(0)}%
+                    &lt;/span&gt;
+                  &lt;/div&gt;
+                  &lt;Slider
+                    value={[(localConfig.externalDefaultMarkup || config?.externalDefaultMarkup || 0.40) * 100]}
+                    min={0}
+                    max={200}
+                    step={5}
+                    onValueChange={([value]) =&gt;
+                      setLocalConfig({ ...localConfig, externalDefaultMarkup: value / 100 })
+                    }
+                  /&gt;
+                  &lt;p className=&quot;text-xs text-muted-foreground&quot;&gt;
+                    Applied to OpenAI, Anthropic, Google, xAI, Mistral, etc.
+                  &lt;/p&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;space-y-3&quot;&gt;
+                  &lt;div className=&quot;flex justify-between&quot;&gt;
+                    &lt;Label&gt;Self-Hosted Model Markup&lt;/Label&gt;
+                    &lt;span className=&quot;font-mono text-sm&quot;&gt;
+                      {((localConfig.selfHostedDefaultMarkup || config?.selfHostedDefaultMarkup || 0.75) * 100).toFixed(0)}%
+                    &lt;/span&gt;
+                  &lt;/div&gt;
+                  &lt;Slider
+                    value={[(localConfig.selfHostedDefaultMarkup || config?.selfHostedDefaultMarkup || 0.75) * 100]}
+                    min={0}
+                    max={300}
+                    step={5}
+                    onValueChange={([value]) =&gt;
+                      setLocalConfig({ ...localConfig, selfHostedDefaultMarkup: value / 100 })
+                    }
+                  /&gt;
+                  &lt;p className=&quot;text-xs text-muted-foreground&quot;&gt;
+                    Applied to SageMaker-hosted models (covers compute costs)
+                  &lt;/p&gt;
+                &lt;/div&gt;
+              &lt;/CardContent&gt;
+            &lt;/Card&gt;
+
+            &lt;Card&gt;
+              &lt;CardHeader&gt;
+                &lt;CardTitle className=&quot;flex items-center gap-2&quot;&gt;
+                  &lt;DollarSign className=&quot;h-5 w-5&quot; /&gt;
+                  Pricing Rules
+                &lt;/CardTitle&gt;
+                &lt;CardDescription&gt;
+                  Additional pricing configuration
+                &lt;/CardDescription&gt;
+              &lt;/CardHeader&gt;
+              &lt;CardContent className=&quot;space-y-4&quot;&gt;
+                &lt;div className=&quot;space-y-2&quot;&gt;
+                  &lt;Label&gt;Minimum Charge Per Request ($)&lt;/Label&gt;
+                  &lt;Input
+                    type=&quot;number&quot;
+                    step=&quot;0.0001&quot;
+                    value={localConfig.minimumChargePerRequest || config?.minimumChargePerRequest || 0.001}
+                    onChange={(e) =&gt;
+                      setLocalConfig({ ...localConfig, minimumChargePerRequest: parseFloat(e.target.value) })
+                    }
+                  /&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;space-y-2&quot;&gt;
+                  &lt;Label&gt;Price Increase Grace Period (hours)&lt;/Label&gt;
+                  &lt;Input
+                    type=&quot;number&quot;
+                    min={0}
+                    max={168}
+                    value={localConfig.priceIncreaseGracePeriodHours || config?.priceIncreaseGracePeriodHours || 24}
+                    onChange={(e) =&gt;
+                      setLocalConfig({ ...localConfig, priceIncreaseGracePeriodHours: parseInt(e.target.value) })
+                    }
+                  /&gt;
+                  &lt;p className=&quot;text-xs text-muted-foreground&quot;&gt;
+                    Delay before price increases take effect
+                  &lt;/p&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;flex items-center justify-between&quot;&gt;
+                  &lt;div&gt;
+                    &lt;Label&gt;Auto-Update from Providers&lt;/Label&gt;
+                    &lt;p className=&quot;text-xs text-muted-foreground&quot;&gt;
+                      Automatically sync base prices from provider APIs
+                    &lt;/p&gt;
+                  &lt;/div&gt;
+                  &lt;Switch
+                    checked={localConfig.autoUpdateFromProviders ?? config?.autoUpdateFromProviders ?? true}
+                    onCheckedChange={(checked) =&gt;
+                      setLocalConfig({ ...localConfig, autoUpdateFromProviders: checked })
+                    }
+                  /&gt;
+                &lt;/div&gt;
+
+                &lt;div className=&quot;flex items-center justify-between&quot;&gt;
+                  &lt;div&gt;
+                    &lt;Label&gt;Notify on Price Changes&lt;/Label&gt;
+                    &lt;p className=&quot;text-xs text-muted-foreground&quot;&gt;
+                      Alert when provider prices change significantly
+                    &lt;/p&gt;
+                  &lt;/div&gt;
+                  &lt;Switch
+                    checked={localConfig.notifyOnPriceChange ?? config?.notifyOnPriceChange ?? true}
+                    onCheckedChange={(checked) =&gt;
+                      setLocalConfig({ ...localConfig, notifyOnPriceChange: checked })
+                    }
+                  /&gt;
+                &lt;/div&gt;
+              &lt;/CardContent&gt;
+            &lt;/Card&gt;
+          &lt;/div&gt;
+        &lt;/TabsContent&gt;
+
+        {/* Bulk Updates Tab */}
+        &lt;TabsContent value=&quot;bulk&quot; className=&quot;space-y-4&quot;&gt;
+          &lt;div className=&quot;grid gap-4 md:grid-cols-2&quot;&gt;
+            &lt;Card&gt;
+              &lt;CardHeader&gt;
+                &lt;CardTitle&gt;External Providers&lt;/CardTitle&gt;
+                &lt;CardDescription&gt;
+                  Update markup for all external AI providers at once
+                &lt;/CardDescription&gt;
+              &lt;/CardHeader&gt;
+              &lt;CardContent className=&quot;space-y-4&quot;&gt;
+                &lt;div className=&quot;space-y-3&quot;&gt;
+                  &lt;div className=&quot;flex justify-between&quot;&gt;
+                    &lt;Label&gt;Markup Percentage&lt;/Label&gt;
+                    &lt;span className=&quot;font-mono text-sm&quot;&gt;{bulkMarkup.external}%&lt;/span&gt;
+                  &lt;/div&gt;
+                  &lt;Slider
+                    value={[bulkMarkup.external]}
+                    min={0}
+                    max={200}
+                    step={5}
+                    onValueChange={([value]) =&gt; setBulkMarkup({ ...bulkMarkup, external: value })}
+                  /&gt;
+                &lt;/div&gt;
+                &lt;Button
+                  className=&quot;w-full&quot;
+                  onClick={() =&gt; bulkUpdateMutation.mutate({ type: &#39;external&#39;, markup: bulkMarkup.external })}
+                  disabled={bulkUpdateMutation.isPending}
+                &gt;
+                  Apply to All External Models
+                &lt;/Button&gt;
+                &lt;p className=&quot;text-xs text-muted-foreground&quot;&gt;
+                  Affects: OpenAI, Anthropic, Google, xAI, Mistral, Perplexity, DeepSeek, Cohere, etc.
+                &lt;/p&gt;
+              &lt;/CardContent&gt;
+            &lt;/Card&gt;
+
+            &lt;Card&gt;
+              &lt;CardHeader&gt;
+                &lt;CardTitle&gt;Self-Hosted Models&lt;/CardTitle&gt;
+                &lt;CardDescription&gt;
+                  Update markup for all SageMaker-hosted models at once
+                &lt;/CardDescription&gt;
+              &lt;/CardHeader&gt;
+              &lt;CardContent className=&quot;space-y-4&quot;&gt;
+                &lt;div className=&quot;space-y-3&quot;&gt;
+                  &lt;div className=&quot;flex justify-between&quot;&gt;
+                    &lt;Label&gt;Markup Percentage&lt;/Label&gt;
+                    &lt;span className=&quot;font-mono text-sm&quot;&gt;{bulkMarkup.selfHosted}%&lt;/span&gt;
+                  &lt;/div&gt;
+                  &lt;Slider
+                    value={[bulkMarkup.selfHosted]}
+                    min={0}
+                    max={300}
+                    step={5}
+                    onValueChange={([value]) =&gt; setBulkMarkup({ ...bulkMarkup, selfHosted: value })}
+                  /&gt;
+                &lt;/div&gt;
+                &lt;Button
+                  className=&quot;w-full&quot;
+                  onClick={() =&gt; bulkUpdateMutation.mutate({ type: &#39;self_hosted&#39;, markup: bulkMarkup.selfHosted })}
+                  disabled={bulkUpdateMutation.isPending}
+                &gt;
+                  Apply to All Self-Hosted Models
+                &lt;/Button&gt;
+                &lt;p className=&quot;text-xs text-muted-foreground&quot;&gt;
+                  Affects: Stable Diffusion, Whisper, SAM 2, YOLO, MusicGen, etc.
+                &lt;/p&gt;
+              &lt;/CardContent&gt;
+            &lt;/Card&gt;
+          &lt;/div&gt;
+        &lt;/TabsContent&gt;
+
+        {/* Individual Models Tab */}
+        &lt;TabsContent value=&quot;models&quot;&gt;
+          &lt;Card&gt;
+            &lt;CardHeader&gt;
+              &lt;CardTitle&gt;Model Pricing Details&lt;/CardTitle&gt;
+              &lt;CardDescription&gt;
+                View and override pricing for individual models
+              &lt;/CardDescription&gt;
+            &lt;/CardHeader&gt;
+            &lt;CardContent&gt;
+              &lt;Table&gt;
+                &lt;TableHeader&gt;
+                  &lt;TableRow&gt;
+                    &lt;TableHead&gt;Model&lt;/TableHead&gt;
+                    &lt;TableHead&gt;Provider&lt;/TableHead&gt;
+                    &lt;TableHead&gt;Category&lt;/TableHead&gt;
+                    &lt;TableHead className=&quot;text-right&quot;&gt;Base Input&lt;/TableHead&gt;
+                    &lt;TableHead className=&quot;text-right&quot;&gt;Base Output&lt;/TableHead&gt;
+                    &lt;TableHead className=&quot;text-right&quot;&gt;Markup&lt;/TableHead&gt;
+                    &lt;TableHead className=&quot;text-right&quot;&gt;User Input&lt;/TableHead&gt;
+                    &lt;TableHead className=&quot;text-right&quot;&gt;User Output&lt;/TableHead&gt;
+                    &lt;TableHead&gt;Override&lt;/TableHead&gt;
+                    &lt;TableHead&gt;&lt;/TableHead&gt;
+                  &lt;/TableRow&gt;
+                &lt;/TableHeader&gt;
+                &lt;TableBody&gt;
+                  {(models || []).map((model) =&gt; (
+                    &lt;TableRow key={model.modelId}&gt;
+                      &lt;TableCell&gt;
+                        &lt;div className=&quot;font-medium&quot;&gt;{model.displayName}&lt;/div&gt;
+                        &lt;div className=&quot;text-xs text-muted-foreground font-mono&quot;&gt;{model.modelId}&lt;/div&gt;
+                      &lt;/TableCell&gt;
+                      &lt;TableCell&gt;{model.providerId}&lt;/TableCell&gt;
+                      &lt;TableCell&gt;
+                        &lt;Badge variant={model.isNovel ? &#39;secondary&#39; : &#39;outline&#39;}&gt;
+                          {model.isNovel ? &#39;Novel&#39; : &#39;Standard&#39;}
+                        &lt;/Badge&gt;
+                      &lt;/TableCell&gt;
+                      &lt;TableCell className=&quot;text-right font-mono&quot;&gt;
+                        ${model.baseInputPrice.toFixed(2)}
+                      &lt;/TableCell&gt;
+                      &lt;TableCell className=&quot;text-right font-mono&quot;&gt;
+                        ${model.baseOutputPrice.toFixed(2)}
+                      &lt;/TableCell&gt;
+                      &lt;TableCell className=&quot;text-right font-mono&quot;&gt;
+                        {(model.effectiveMarkup * 100).toFixed(0)}%
+                      &lt;/TableCell&gt;
+                      &lt;TableCell className=&quot;text-right font-mono text-green-600&quot;&gt;
+                        ${model.userInputPrice.toFixed(2)}
+                      &lt;/TableCell&gt;
+                      &lt;TableCell className=&quot;text-right font-mono text-green-600&quot;&gt;
+                        ${model.userOutputPrice.toFixed(2)}
+                      &lt;/TableCell&gt;
+                      &lt;TableCell&gt;
+                        {model.hasOverride ? (
+                          &lt;Badge variant=&quot;default&quot;&gt;Custom&lt;/Badge&gt;
+                        ) : (
+                          &lt;Badge variant=&quot;outline&quot;&gt;Default&lt;/Badge&gt;
+                        )}
+                      &lt;/TableCell&gt;
+                      &lt;TableCell&gt;
+                        &lt;Dialog&gt;
+                          &lt;DialogTrigger asChild&gt;
+                            &lt;Button variant=&quot;ghost&quot; size=&quot;sm&quot; onClick={() =&gt; setSelectedModel(model)}&gt;
+                              &lt;Edit2 className=&quot;h-4 w-4&quot; /&gt;
+                            &lt;/Button&gt;
+                          &lt;/DialogTrigger&gt;
+                          &lt;DialogContent&gt;
+                            &lt;DialogHeader&gt;
+                              &lt;DialogTitle&gt;Edit Pricing: {model.displayName}&lt;/DialogTitle&gt;
+                            &lt;/DialogHeader&gt;
+                            &lt;ModelPricingEditor
+                              model={model}
+                              onSave={(data) =&gt; overrideMutation.mutate({ modelId: model.modelId, ...data })}
+                              onClear={() =&gt; clearOverrideMutation.mutate(model.modelId)}
+                            /&gt;
+                          &lt;/DialogContent&gt;
+                        &lt;/Dialog&gt;
+                      &lt;/TableCell&gt;
+                    &lt;/TableRow&gt;
+                  ))}
+                &lt;/TableBody&gt;
+              &lt;/Table&gt;
+            &lt;/CardContent&gt;
+          &lt;/Card&gt;
+        &lt;/TabsContent&gt;
+
+        {/* Price History Tab */}
+        &lt;TabsContent value=&quot;history&quot;&gt;
+          &lt;PriceHistoryTable /&gt;
+        &lt;/TabsContent&gt;
+      &lt;/Tabs&gt;
+    &lt;/div&gt;
+  );
+}
+
+// Model Pricing Editor Component
+function ModelPricingEditor({ 
+  model, 
+  onSave, 
+  onClear 
+}: { 
+  model: ModelPricing; 
+  onSave: (data: any) =&gt; void;
+  onClear: () =&gt; void;
+}) {
+  const [markup, setMarkup] = useState(model.effectiveMarkup * 100);
+  const [inputPrice, setInputPrice] = useState&lt;number | null&gt;(null);
+  const [outputPrice, setOutputPrice] = useState&lt;number | null&gt;(null);
+
+  return (
+    &lt;div className=&quot;space-y-4&quot;&gt;
+      &lt;div className=&quot;space-y-2&quot;&gt;
+        &lt;Label&gt;Custom Markup (%)&lt;/Label&gt;
+        &lt;div className=&quot;flex items-center gap-4&quot;&gt;
+          &lt;Slider
+            value={[markup]}
+            min={0}
+            max={200}
+            step={5}
+            onValueChange={([value]) =&gt; setMarkup(value)}
+            className=&quot;flex-1&quot;
+          /&gt;
+          &lt;span className=&quot;font-mono w-16 text-right&quot;&gt;{markup}%&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div className=&quot;grid grid-cols-2 gap-4&quot;&gt;
+        &lt;div className=&quot;space-y-2&quot;&gt;
+          &lt;Label&gt;Override Input Price ($/1M tokens)&lt;/Label&gt;
+          &lt;Input
+            type=&quot;number&quot;
+            step=&quot;0.01&quot;
+            placeholder={`Default: $${model.baseInputPrice.toFixed(2)}`}
+            value={inputPrice ?? &#39;&#39;}
+            onChange={(e) =&gt; setInputPrice(e.target.value ? parseFloat(e.target.value) : null)}
+          /&gt;
+        &lt;/div&gt;
+        &lt;div className=&quot;space-y-2&quot;&gt;
+          &lt;Label&gt;Override Output Price ($/1M tokens)&lt;/Label&gt;
+          &lt;Input
+            type=&quot;number&quot;
+            step=&quot;0.01&quot;
+            placeholder={`Default: $${model.baseOutputPrice.toFixed(2)}`}
+            value={outputPrice ?? &#39;&#39;}
+            onChange={(e) =&gt; setOutputPrice(e.target.value ? parseFloat(e.target.value) : null)}
+          /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div className=&quot;bg-muted p-3 rounded-lg&quot;&gt;
+        &lt;div className=&quot;text-sm font-medium mb-2&quot;&gt;Preview User Prices&lt;/div&gt;
+        &lt;div className=&quot;grid grid-cols-2 gap-4 text-sm&quot;&gt;
+          &lt;div&gt;
+            Input: &lt;span className=&quot;font-mono text-green-600&quot;&gt;
+              ${((inputPrice ?? model.baseInputPrice) * (1 + markup / 100)).toFixed(2)}/1M
+            &lt;/span&gt;
+          &lt;/div&gt;
+          &lt;div&gt;
+            Output: &lt;span className=&quot;font-mono text-green-600&quot;&gt;
+              ${((outputPrice ?? model.baseOutputPrice) * (1 + markup / 100)).toFixed(2)}/1M
+            &lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;DialogFooter className=&quot;flex justify-between&quot;&gt;
+        {model.hasOverride &amp;&amp; (
+          &lt;Button variant=&quot;outline&quot; onClick={onClear}&gt;
+            Clear Override
+          &lt;/Button&gt;
+        )}
+        &lt;Button onClick={() =&gt; onSave({ markup: markup / 100, inputPrice, outputPrice })}&gt;
+          Save Override
+        &lt;/Button&gt;
+      &lt;/DialogFooter&gt;
+    &lt;/div&gt;
+  );
+}
+
+// Price History Table Component
+function PriceHistoryTable() {
+  const { data: history } = useQuery({
+    queryKey: [&#39;price-history&#39;],
+    queryFn: () =&gt; fetch(&#39;/api/admin/pricing/history?limit=100&#39;).then(r =&gt; r.json()),
+  });
+
+  return (
+    &lt;Card&gt;
+      &lt;CardHeader&gt;
+        &lt;CardTitle className=&quot;flex items-center gap-2&quot;&gt;
+          &lt;History className=&quot;h-5 w-5&quot; /&gt;
+          Price Change History
+        &lt;/CardTitle&gt;
+      &lt;/CardHeader&gt;
+      &lt;CardContent&gt;
+        &lt;Table&gt;
+          &lt;TableHeader&gt;
+            &lt;TableRow&gt;
+              &lt;TableHead&gt;Date&lt;/TableHead&gt;
+              &lt;TableHead&gt;Model&lt;/TableHead&gt;
+              &lt;TableHead&gt;Change Type&lt;/TableHead&gt;
+              &lt;TableHead className=&quot;text-right&quot;&gt;Previous&lt;/TableHead&gt;
+              &lt;TableHead className=&quot;text-right&quot;&gt;New&lt;/TableHead&gt;
+              &lt;TableHead&gt;Changed By&lt;/TableHead&gt;
+            &lt;/TableRow&gt;
+          &lt;/TableHeader&gt;
+          &lt;TableBody&gt;
+            {(history || []).map((entry: any) =&gt; (
+              &lt;TableRow key={entry.id}&gt;
+                &lt;TableCell className=&quot;text-sm&quot;&gt;
+                  {new Date(entry.createdAt).toLocaleString()}
+                &lt;/TableCell&gt;
+                &lt;TableCell className=&quot;font-mono text-sm&quot;&gt;{entry.modelId}&lt;/TableCell&gt;
+                &lt;TableCell&gt;
+                  &lt;Badge variant=&quot;outline&quot;&gt;{entry.changeSource}&lt;/Badge&gt;
+                &lt;/TableCell&gt;
+                &lt;TableCell className=&quot;text-right font-mono text-sm&quot;&gt;
+                  {entry.previousMarkup ? `${(entry.previousMarkup * 100).toFixed(0)}%` : &#39;-&#39;}
+                &lt;/TableCell&gt;
+                &lt;TableCell className=&quot;text-right font-mono text-sm&quot;&gt;
+                  {entry.newMarkup ? `${(entry.newMarkup * 100).toFixed(0)}%` : &#39;-&#39;}
+                &lt;/TableCell&gt;
+                &lt;TableCell className=&quot;text-sm&quot;&gt;{entry.changedByEmail || &#39;System&#39;}&lt;/TableCell&gt;
+              &lt;/TableRow&gt;
+            ))}
+          &lt;/TableBody&gt;
+        &lt;/Table&gt;
+      &lt;/CardContent&gt;
+    &lt;/Card&gt;
+  );
+}</code></pre>
+<hr />
+<h2 id="think-tank-model-selection-ui">31.5 Think Tank Model Selection UI</h2>
+<pre class="typescript"><code>// apps/thinktank/src/components/chat/model-selector.tsx
+
+&#39;use client&#39;;
+
+import { useState, useMemo } from &#39;react&#39;;
+import { useQuery, useMutation, useQueryClient } from &#39;@tanstack/react-query&#39;;
+import {
+  Popover, PopoverContent, PopoverTrigger
+} from &#39;@/components/ui/popover&#39;;
+import { Button } from &#39;@/components/ui/button&#39;;
+import { Input } from &#39;@/components/ui/input&#39;;
+import { Badge } from &#39;@/components/ui/badge&#39;;
+import { Switch } from &#39;@/components/ui/switch&#39;;
+import { Label } from &#39;@/components/ui/label&#39;;
+import { Tabs, TabsContent, TabsList, TabsTrigger } from &#39;@/components/ui/tabs&#39;;
+import { ScrollArea } from &#39;@/components/ui/scroll-area&#39;;
+import { cn } from &#39;@/lib/utils&#39;;
+import { 
+  ChevronDown, Search, Star, StarOff, Sparkles, Zap, 
+  DollarSign, Brain, Check, Settings2 
+} from &#39;lucide-react&#39;;
+
+interface Model {
+  id: string;
+  displayName: string;
+  providerId: string;
+  providerName: string;
+  isNovel: boolean;
+  category: string;
+  contextWindow: number;
+  capabilities: string[];
+  userInputPrice: number;
+  userOutputPrice: number;
+  isFavorite?: boolean;
+}
+
+interface ModelPreferences {
+  selectionMode: &#39;auto&#39; | &#39;manual&#39; | &#39;favorites&#39;;
+  defaultModelId?: string;
+  favoriteModels: string[];
+  showStandardModels: boolean;
+  showNovelModels: boolean;
+  showCostPerMessage: boolean;
+  maxCostPerMessage?: number;
+}
+
+interface ModelSelectorProps {
+  selectedModel: string | null; // null = Auto
+  onModelChange: (modelId: string | null) =&gt; void;
+  disabled?: boolean;
+}
+
+export function ModelSelector({ selectedModel, onModelChange, disabled }: ModelSelectorProps) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState(&#39;&#39;);
+  const queryClient = useQueryClient();
+
+  // Fetch available models
+  const { data: models = [] } = useQuery&lt;Model[]&gt;({
+    queryKey: [&#39;thinktank-models&#39;],
+    queryFn: () =&gt; fetch(&#39;/api/thinktank/models&#39;).then(r =&gt; r.json()),
+  });
+
+  // Fetch user preferences
+  const { data: preferences } = useQuery&lt;ModelPreferences&gt;({
+    queryKey: [&#39;thinktank-model-preferences&#39;],
+    queryFn: () =&gt; fetch(&#39;/api/thinktank/preferences/models&#39;).then(r =&gt; r.json()),
+  });
+
+  // Toggle favorite mutation
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: (modelId: string) =&gt;
+      fetch(&#39;/api/thinktank/preferences/models/favorite&#39;, {
+        method: &#39;POST&#39;,
+        headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+        body: JSON.stringify({ modelId }),
+      }).then(r =&gt; r.json()),
+    onSuccess: () =&gt; {
+      queryClient.invalidateQueries({ queryKey: [&#39;thinktank-model-preferences&#39;] });
+      queryClient.invalidateQueries({ queryKey: [&#39;thinktank-models&#39;] });
+    },
+  });
+
+  // Filter and group models
+  const { standardModels, novelModels, favoriteModels } = useMemo(() =&gt; {
+    const filtered = models.filter(m =&gt; 
+      m.displayName.toLowerCase().includes(search.toLowerCase()) ||
+      m.providerId.toLowerCase().includes(search.toLowerCase())
+    );
+
+    return {
+      standardModels: filtered.filter(m =&gt; !m.isNovel &amp;&amp; preferences?.showStandardModels !== false),
+      novelModels: filtered.filter(m =&gt; m.isNovel &amp;&amp; preferences?.showNovelModels !== false),
+      favoriteModels: filtered.filter(m =&gt; preferences?.favoriteModels?.includes(m.id)),
+    };
+  }, [models, search, preferences]);
+
+  // Get selected model details
+  const selectedModelDetails = selectedModel 
+    ? models.find(m =&gt; m.id === selectedModel) 
+    : null;
+
+  // Format price for display
+  const formatPrice = (inputPrice: number, outputPrice: number) =&gt; {
+    const avgPrice = (inputPrice + outputPrice) / 2;
+    if (avgPrice &lt; 1) return `$${avgPrice.toFixed(3)}/1K`;
+    return `$${avgPrice.toFixed(2)}/1M`;
+  };
+
+  return (
+    &lt;Popover open={open} onOpenChange={setOpen}&gt;
+      &lt;PopoverTrigger asChild&gt;
+        &lt;Button
+          variant=&quot;outline&quot;
+          role=&quot;combobox&quot;
+          aria-expanded={open}
+          disabled={disabled}
+          className=&quot;justify-between min-w-[200px]&quot;
+        &gt;
+          &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+            {selectedModel === null ? (
+              &lt;&gt;
+                &lt;Brain className=&quot;h-4 w-4 text-purple-500&quot; /&gt;
+                &lt;span&gt;Auto&lt;/span&gt;
+                &lt;Badge variant=&quot;secondary&quot; className=&quot;text-xs&quot;&gt;RADIANT Brain&lt;/Badge&gt;
+              &lt;/&gt;
+            ) : (
+              &lt;&gt;
+                {selectedModelDetails?.isNovel &amp;&amp; &lt;Sparkles className=&quot;h-4 w-4 text-amber-500&quot; /&gt;}
+                &lt;span&gt;{selectedModelDetails?.displayName || selectedModel}&lt;/span&gt;
+                {preferences?.showCostPerMessage &amp;&amp; selectedModelDetails &amp;&amp; (
+                  &lt;span className=&quot;text-xs text-muted-foreground&quot;&gt;
+                    {formatPrice(selectedModelDetails.userInputPrice, selectedModelDetails.userOutputPrice)}
+                  &lt;/span&gt;
+                )}
+              &lt;/&gt;
+            )}
+          &lt;/div&gt;
+          &lt;ChevronDown className=&quot;ml-2 h-4 w-4 shrink-0 opacity-50&quot; /&gt;
+        &lt;/Button&gt;
+      &lt;/PopoverTrigger&gt;
+      
+      &lt;PopoverContent className=&quot;w-[400px] p-0&quot; align=&quot;start&quot;&gt;
+        &lt;div className=&quot;p-3 border-b&quot;&gt;
+          &lt;div className=&quot;relative&quot;&gt;
+            &lt;Search className=&quot;absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground&quot; /&gt;
+            &lt;Input
+              placeholder=&quot;Search models...&quot;
+              value={search}
+              onChange={(e) =&gt; setSearch(e.target.value)}
+              className=&quot;pl-9&quot;
+            /&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;Tabs defaultValue=&quot;all&quot; className=&quot;w-full&quot;&gt;
+          &lt;TabsList className=&quot;w-full justify-start rounded-none border-b bg-transparent p-0&quot;&gt;
+            &lt;TabsTrigger value=&quot;all&quot; className=&quot;rounded-none data-[state=active]:border-b-2&quot;&gt;
+              All
+            &lt;/TabsTrigger&gt;
+            &lt;TabsTrigger value=&quot;favorites&quot; className=&quot;rounded-none data-[state=active]:border-b-2&quot;&gt;
+              &lt;Star className=&quot;h-3 w-3 mr-1&quot; /&gt;
+              Favorites
+            &lt;/TabsTrigger&gt;
+            &lt;TabsTrigger value=&quot;standard&quot; className=&quot;rounded-none data-[state=active]:border-b-2&quot;&gt;
+              Standard
+            &lt;/TabsTrigger&gt;
+            &lt;TabsTrigger value=&quot;novel&quot; className=&quot;rounded-none data-[state=active]:border-b-2&quot;&gt;
+              &lt;Sparkles className=&quot;h-3 w-3 mr-1&quot; /&gt;
+              Novel
+            &lt;/TabsTrigger&gt;
+          &lt;/TabsList&gt;
+
+          &lt;ScrollArea className=&quot;h-[300px]&quot;&gt;
+            {/* Auto Option */}
+            &lt;div className=&quot;p-1&quot;&gt;
+              &lt;ModelOption
+                model={null}
+                isSelected={selectedModel === null}
+                onSelect={() =&gt; {
+                  onModelChange(null);
+                  setOpen(false);
+                }}
+                showCost={false}
+              /&gt;
+            &lt;/div&gt;
+
+            &lt;TabsContent value=&quot;all&quot; className=&quot;m-0 p-1&quot;&gt;
+              {favoriteModels.length &gt; 0 &amp;&amp; (
+                &lt;div className=&quot;mb-2&quot;&gt;
+                  &lt;div className=&quot;px-2 py-1 text-xs font-medium text-muted-foreground&quot;&gt;Favorites&lt;/div&gt;
+                  {favoriteModels.map(model =&gt; (
+                    &lt;ModelOption
+                      key={model.id}
+                      model={model}
+                      isSelected={selectedModel === model.id}
+                      isFavorite={true}
+                      onSelect={() =&gt; {
+                        onModelChange(model.id);
+                        setOpen(false);
+                      }}
+                      onToggleFavorite={() =&gt; toggleFavoriteMutation.mutate(model.id)}
+                      showCost={preferences?.showCostPerMessage}
+                    /&gt;
+                  ))}
+                &lt;/div&gt;
+              )}
+              
+              {standardModels.length &gt; 0 &amp;&amp; (
+                &lt;div className=&quot;mb-2&quot;&gt;
+                  &lt;div className=&quot;px-2 py-1 text-xs font-medium text-muted-foreground&quot;&gt;Standard Models&lt;/div&gt;
+                  {standardModels.map(model =&gt; (
+                    &lt;ModelOption
+                      key={model.id}
+                      model={model}
+                      isSelected={selectedModel === model.id}
+                      isFavorite={preferences?.favoriteModels?.includes(model.id)}
+                      onSelect={() =&gt; {
+                        onModelChange(model.id);
+                        setOpen(false);
+                      }}
+                      onToggleFavorite={() =&gt; toggleFavoriteMutation.mutate(model.id)}
+                      showCost={preferences?.showCostPerMessage}
+                    /&gt;
+                  ))}
+                &lt;/div&gt;
+              )}
+
+              {novelModels.length &gt; 0 &amp;&amp; (
+                &lt;div&gt;
+                  &lt;div className=&quot;px-2 py-1 text-xs font-medium text-muted-foreground flex items-center gap-1&quot;&gt;
+                    &lt;Sparkles className=&quot;h-3 w-3&quot; /&gt;
+                    Novel / Experimental
+                  &lt;/div&gt;
+                  {novelModels.map(model =&gt; (
+                    &lt;ModelOption
+                      key={model.id}
+                      model={model}
+                      isSelected={selectedModel === model.id}
+                      isFavorite={preferences?.favoriteModels?.includes(model.id)}
+                      onSelect={() =&gt; {
+                        onModelChange(model.id);
+                        setOpen(false);
+                      }}
+                      onToggleFavorite={() =&gt; toggleFavoriteMutation.mutate(model.id)}
+                      showCost={preferences?.showCostPerMessage}
+                    /&gt;
+                  ))}
+                &lt;/div&gt;
+              )}
+            &lt;/TabsContent&gt;
+
+            &lt;TabsContent value=&quot;favorites&quot; className=&quot;m-0 p-1&quot;&gt;
+              {favoriteModels.length === 0 ? (
+                &lt;div className=&quot;p-4 text-center text-sm text-muted-foreground&quot;&gt;
+                  No favorite models yet. Star models to add them here.
+                &lt;/div&gt;
+              ) : (
+                favoriteModels.map(model =&gt; (
+                  &lt;ModelOption
+                    key={model.id}
+                    model={model}
+                    isSelected={selectedModel === model.id}
+                    isFavorite={true}
+                    onSelect={() =&gt; {
+                      onModelChange(model.id);
+                      setOpen(false);
+                    }}
+                    onToggleFavorite={() =&gt; toggleFavoriteMutation.mutate(model.id)}
+                    showCost={preferences?.showCostPerMessage}
+                  /&gt;
+                ))
+              )}
+            &lt;/TabsContent&gt;
+
+            &lt;TabsContent value=&quot;standard&quot; className=&quot;m-0 p-1&quot;&gt;
+              {standardModels.map(model =&gt; (
+                &lt;ModelOption
+                  key={model.id}
+                  model={model}
+                  isSelected={selectedModel === model.id}
+                  isFavorite={preferences?.favoriteModels?.includes(model.id)}
+                  onSelect={() =&gt; {
+                    onModelChange(model.id);
+                    setOpen(false);
+                  }}
+                  onToggleFavorite={() =&gt; toggleFavoriteMutation.mutate(model.id)}
+                  showCost={preferences?.showCostPerMessage}
+                /&gt;
+              ))}
+            &lt;/TabsContent&gt;
+
+            &lt;TabsContent value=&quot;novel&quot; className=&quot;m-0 p-1&quot;&gt;
+              {novelModels.map(model =&gt; (
+                &lt;ModelOption
+                  key={model.id}
+                  model={model}
+                  isSelected={selectedModel === model.id}
+                  isFavorite={preferences?.favoriteModels?.includes(model.id)}
+                  onSelect={() =&gt; {
+                    onModelChange(model.id);
+                    setOpen(false);
+                  }}
+                  onToggleFavorite={() =&gt; toggleFavoriteMutation.mutate(model.id)}
+                  showCost={preferences?.showCostPerMessage}
+                /&gt;
+              ))}
+            &lt;/TabsContent&gt;
+          &lt;/ScrollArea&gt;
+        &lt;/Tabs&gt;
+
+        {/* Settings Footer */}
+        &lt;div className=&quot;border-t p-2 flex justify-between items-center&quot;&gt;
+          &lt;div className=&quot;flex items-center gap-2 text-xs text-muted-foreground&quot;&gt;
+            &lt;DollarSign className=&quot;h-3 w-3&quot; /&gt;
+            &lt;span&gt;Prices per 1M tokens&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;Button variant=&quot;ghost&quot; size=&quot;sm&quot; className=&quot;text-xs&quot;&gt;
+            &lt;Settings2 className=&quot;h-3 w-3 mr-1&quot; /&gt;
+            Preferences
+          &lt;/Button&gt;
+        &lt;/div&gt;
+      &lt;/PopoverContent&gt;
+    &lt;/Popover&gt;
+  );
+}
+
+// Individual Model Option Component
+function ModelOption({
+  model,
+  isSelected,
+  isFavorite,
+  onSelect,
+  onToggleFavorite,
+  showCost,
+}: {
+  model: Model | null;
+  isSelected: boolean;
+  isFavorite?: boolean;
+  onSelect: () =&gt; void;
+  onToggleFavorite?: () =&gt; void;
+  showCost?: boolean;
+}) {
+  // Auto option
+  if (model === null) {
+    return (
+      &lt;div
+        className={cn(
+          &quot;flex items-center gap-3 p-2 rounded-md cursor-pointer hover:bg-accent&quot;,
+          isSelected &amp;&amp; &quot;bg-accent&quot;
+        )}
+        onClick={onSelect}
+      &gt;
+        &lt;Brain className=&quot;h-5 w-5 text-purple-500&quot; /&gt;
+        &lt;div className=&quot;flex-1&quot;&gt;
+          &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+            &lt;span className=&quot;font-medium&quot;&gt;Auto&lt;/span&gt;
+            &lt;Badge variant=&quot;secondary&quot; className=&quot;text-xs&quot;&gt;RADIANT Brain&lt;/Badge&gt;
+          &lt;/div&gt;
+          &lt;div className=&quot;text-xs text-muted-foreground&quot;&gt;
+            Intelligently selects the best model for your task
+          &lt;/div&gt;
+        &lt;/div&gt;
+        {isSelected &amp;&amp; &lt;Check className=&quot;h-4 w-4 text-primary&quot; /&gt;}
+      &lt;/div&gt;
+    );
+  }
+
+  return (
+    &lt;div
+      className={cn(
+        &quot;flex items-center gap-3 p-2 rounded-md cursor-pointer hover:bg-accent group&quot;,
+        isSelected &amp;&amp; &quot;bg-accent&quot;
+      )}
+      onClick={onSelect}
+    &gt;
+      &lt;div className=&quot;flex-shrink-0&quot;&gt;
+        {model.isNovel ? (
+          &lt;Sparkles className=&quot;h-5 w-5 text-amber-500&quot; /&gt;
+        ) : (
+          &lt;Zap className=&quot;h-5 w-5 text-blue-500&quot; /&gt;
+        )}
+      &lt;/div&gt;
+      
+      &lt;div className=&quot;flex-1 min-w-0&quot;&gt;
+        &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+          &lt;span className=&quot;font-medium truncate&quot;&gt;{model.displayName}&lt;/span&gt;
+          {model.isNovel &amp;&amp; (
+            &lt;Badge variant=&quot;outline&quot; className=&quot;text-xs text-amber-600 border-amber-300&quot;&gt;
+              Novel
+            &lt;/Badge&gt;
+          )}
+        &lt;/div&gt;
+        &lt;div className=&quot;flex items-center gap-2 text-xs text-muted-foreground&quot;&gt;
+          &lt;span&gt;{model.providerName}&lt;/span&gt;
+          &lt;span&gt;•&lt;/span&gt;
+          &lt;span&gt;{(model.contextWindow / 1000).toFixed(0)}K context&lt;/span&gt;
+          {showCost &amp;&amp; (
+            &lt;&gt;
+              &lt;span&gt;•&lt;/span&gt;
+              &lt;span className=&quot;text-green-600&quot;&gt;
+                ${((model.userInputPrice + model.userOutputPrice) / 2).toFixed(2)}/1M
+              &lt;/span&gt;
+            &lt;/&gt;
+          )}
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div className=&quot;flex items-center gap-1&quot;&gt;
+        {onToggleFavorite &amp;&amp; (
+          &lt;button
+            className=&quot;p-1 opacity-0 group-hover:opacity-100 transition-opacity&quot;
+            onClick={(e) =&gt; {
+              e.stopPropagation();
+              onToggleFavorite();
+            }}
+          &gt;
+            {isFavorite ? (
+              &lt;Star className=&quot;h-4 w-4 text-yellow-500 fill-yellow-500&quot; /&gt;
+            ) : (
+              &lt;StarOff className=&quot;h-4 w-4 text-muted-foreground&quot; /&gt;
+            )}
+          &lt;/button&gt;
+        )}
+        {isSelected &amp;&amp; &lt;Check className=&quot;h-4 w-4 text-primary&quot; /&gt;}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<hr />
+<h2 id="think-tank-model-api-endpoints">31.6 Think Tank Model API Endpoints</h2>
+<pre class="typescript"><code>// packages/lambdas/src/handlers/thinktank/models.ts
+
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from &#39;aws-lambda&#39;;
+import { Pool } from &#39;pg&#39;;
+import { createLogger, corsHeaders } from &#39;@radiant/shared&#39;;
+import { verifyJWT, getUserFromToken } from &#39;../auth/jwt&#39;;
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const logger = createLogger(&#39;thinktank-models&#39;);
+
+// GET /api/thinktank/models - List available models for Think Tank users
+export async function listModels(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    const user = await getUserFromToken(event);
+    const client = await pool.connect();
+
+    try {
+      // Get models with effective pricing and user favorites
+      const result = await client.query(`
+        SELECT 
+          m.id,
+          m.display_name,
+          m.provider_id,
+          p.display_name as provider_name,
+          m.is_novel,
+          m.category,
+          m.context_window,
+          m.capabilities,
+          m.thinktank_enabled,
+          
+          -- Effective pricing (from view)
+          emp.user_input_price,
+          emp.user_output_price,
+          emp.effective_markup,
+          
+          -- User favorites
+          $1 = ANY(COALESCE(ump.favorite_models, &#39;[]&#39;)::text[]) as is_favorite
+          
+        FROM models m
+        JOIN providers p ON m.provider_id = p.id
+        LEFT JOIN effective_model_pricing emp ON m.id = emp.model_id
+        LEFT JOIN thinktank_user_model_preferences ump ON ump.user_id = $2
+        
+        WHERE m.thinktank_enabled = true
+          AND m.is_enabled = true
+          AND m.status = &#39;active&#39;
+          
+        ORDER BY 
+          m.is_novel ASC,
+          m.thinktank_display_order ASC,
+          m.display_name ASC
+      `, [user.id, user.id]);
+
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify(result.rows.map(row =&gt; ({
+          id: row.id,
+          displayName: row.display_name,
+          providerId: row.provider_id,
+          providerName: row.provider_name,
+          isNovel: row.is_novel,
+          category: row.category,
+          contextWindow: row.context_window,
+          capabilities: row.capabilities || [],
+          userInputPrice: parseFloat(row.user_input_price) || 0,
+          userOutputPrice: parseFloat(row.user_output_price) || 0,
+          isFavorite: row.is_favorite,
+        }))),
+      };
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    logger.error(&#39;Failed to list models&#39;, { error });
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: &#39;Failed to load models&#39; }),
+    };
+  }
+}
+
+// GET /api/thinktank/preferences/models - Get user&#39;s model preferences
+export async function getModelPreferences(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    const user = await getUserFromToken(event);
+    const client = await pool.connect();
+
+    try {
+      const result = await client.query(`
+        SELECT 
+          selection_mode,
+          default_model_id,
+          favorite_models,
+          show_standard_models,
+          show_novel_models,
+          show_self_hosted_models,
+          show_cost_per_message,
+          max_cost_per_message,
+          prefer_cost_optimization,
+          domain_mode_model_overrides,
+          recent_models
+        FROM thinktank_user_model_preferences
+        WHERE user_id = $1
+      `, [user.id]);
+
+      if (result.rows.length === 0) {
+        // Return defaults
+        return {
+          statusCode: 200,
+          headers: corsHeaders,
+          body: JSON.stringify({
+            selectionMode: &#39;auto&#39;,
+            defaultModelId: null,
+            favoriteModels: [],
+            showStandardModels: true,
+            showNovelModels: true,
+            showSelfHostedModels: false,
+            showCostPerMessage: true,
+            maxCostPerMessage: null,
+            preferCostOptimization: false,
+            domainModeModelOverrides: {},
+            recentModels: [],
+          }),
+        };
+      }
+
+      const row = result.rows[0];
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({
+          selectionMode: row.selection_mode,
+          defaultModelId: row.default_model_id,
+          favoriteModels: row.favorite_models || [],
+          showStandardModels: row.show_standard_models,
+          showNovelModels: row.show_novel_models,
+          showSelfHostedModels: row.show_self_hosted_models,
+          showCostPerMessage: row.show_cost_per_message,
+          maxCostPerMessage: row.max_cost_per_message ? parseFloat(row.max_cost_per_message) : null,
+          preferCostOptimization: row.prefer_cost_optimization,
+          domainModeModelOverrides: row.domain_mode_model_overrides || {},
+          recentModels: row.recent_models || [],
+        }),
+      };
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    logger.error(&#39;Failed to get model preferences&#39;, { error });
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: &#39;Failed to load preferences&#39; }),
+    };
+  }
+}
+
+// PUT /api/thinktank/preferences/models - Update user&#39;s model preferences
+export async function updateModelPreferences(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    const user = await getUserFromToken(event);
+    const body = JSON.parse(event.body || &#39;{}&#39;);
+    const client = await pool.connect();
+
+    try {
+      await client.query(`
+        INSERT INTO thinktank_user_model_preferences (
+          user_id, tenant_id, selection_mode, default_model_id, favorite_models,
+          show_standard_models, show_novel_models, show_self_hosted_models,
+          show_cost_per_message, max_cost_per_message, prefer_cost_optimization,
+          domain_mode_model_overrides
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        ON CONFLICT (user_id) DO UPDATE SET
+          selection_mode = COALESCE($3, thinktank_user_model_preferences.selection_mode),
+          default_model_id = COALESCE($4, thinktank_user_model_preferences.default_model_id),
+          favorite_models = COALESCE($5, thinktank_user_model_preferences.favorite_models),
+          show_standard_models = COALESCE($6, thinktank_user_model_preferences.show_standard_models),
+          show_novel_models = COALESCE($7, thinktank_user_model_preferences.show_novel_models),
+          show_self_hosted_models = COALESCE($8, thinktank_user_model_preferences.show_self_hosted_models),
+          show_cost_per_message = COALESCE($9, thinktank_user_model_preferences.show_cost_per_message),
+          max_cost_per_message = $10,
+          prefer_cost_optimization = COALESCE($11, thinktank_user_model_preferences.prefer_cost_optimization),
+          domain_mode_model_overrides = COALESCE($12, thinktank_user_model_preferences.domain_mode_model_overrides),
+          updated_at = NOW()
+      `, [
+        user.id,
+        user.tenantId,
+        body.selectionMode,
+        body.defaultModelId,
+        JSON.stringify(body.favoriteModels || []),
+        body.showStandardModels,
+        body.showNovelModels,
+        body.showSelfHostedModels,
+        body.showCostPerMessage,
+        body.maxCostPerMessage,
+        body.preferCostOptimization,
+        JSON.stringify(body.domainModeModelOverrides || {}),
+      ]);
+
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({ success: true }),
+      };
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    logger.error(&#39;Failed to update model preferences&#39;, { error });
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: &#39;Failed to save preferences&#39; }),
+    };
+  }
+}
+
+// POST /api/thinktank/preferences/models/favorite - Toggle favorite model
+export async function toggleFavoriteModel(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    const user = await getUserFromToken(event);
+    const { modelId } = JSON.parse(event.body || &#39;{}&#39;);
+    
+    if (!modelId) {
+      return {
+        statusCode: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: &#39;modelId is required&#39; }),
+      };
+    }
+
+    const client = await pool.connect();
+
+    try {
+      // Check if model is currently a favorite
+      const currentResult = await client.query(`
+        SELECT favorite_models FROM thinktank_user_model_preferences WHERE user_id = $1
+      `, [user.id]);
+
+      let favorites: string[] = currentResult.rows[0]?.favorite_models || [];
+      
+      if (favorites.includes(modelId)) {
+        // Remove from favorites
+        favorites = favorites.filter(id =&gt; id !== modelId);
+      } else {
+        // Add to favorites
+        favorites.push(modelId);
+      }
+
+      // Update or insert
+      await client.query(`
+        INSERT INTO thinktank_user_model_preferences (user_id, tenant_id, favorite_models)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (user_id) DO UPDATE SET
+          favorite_models = $3,
+          updated_at = NOW()
+      `, [user.id, user.tenantId, JSON.stringify(favorites)]);
+
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({ 
+          success: true, 
+          isFavorite: favorites.includes(modelId),
+          favoriteModels: favorites,
+        }),
+      };
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    logger.error(&#39;Failed to toggle favorite&#39;, { error });
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: &#39;Failed to update favorites&#39; }),
+    };
+  }
+}</code></pre>
+<hr />
+<h2 id="admin-pricing-api-endpoints">31.7 Admin Pricing API Endpoints</h2>
+<pre class="typescript"><code>// packages/lambdas/src/handlers/admin/pricing.ts
+
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from &#39;aws-lambda&#39;;
+import { Pool } from &#39;pg&#39;;
+import { createLogger, corsHeaders } from &#39;@radiant/shared&#39;;
+import { requireAdmin } from &#39;../auth/admin&#39;;
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const logger = createLogger(&#39;admin-pricing&#39;);
+
+// GET /api/admin/pricing/config
+export async function getPricingConfig(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    await requireAdmin(event);
+    const client = await pool.connect();
+
+    try {
+      const result = await client.query(`
+        SELECT * FROM pricing_config LIMIT 1
+      `);
+
+      if (result.rows.length === 0) {
+        // Return defaults
+        return {
+          statusCode: 200,
+          headers: corsHeaders,
+          body: JSON.stringify({
+            externalDefaultMarkup: 0.40,
+            selfHostedDefaultMarkup: 0.75,
+            minimumChargePerRequest: 0.001,
+            priceIncreaseGracePeriodHours: 24,
+            autoUpdateFromProviders: true,
+            autoUpdateFrequency: &#39;daily&#39;,
+            notifyOnPriceChange: true,
+            notifyThresholdPercent: 10,
+          }),
+        };
+      }
+
+      const row = result.rows[0];
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({
+          externalDefaultMarkup: parseFloat(row.external_default_markup),
+          selfHostedDefaultMarkup: parseFloat(row.self_hosted_default_markup),
+          minimumChargePerRequest: parseFloat(row.minimum_charge_per_request),
+          priceIncreaseGracePeriodHours: row.price_increase_grace_period_hours,
+          autoUpdateFromProviders: row.auto_update_from_providers,
+          autoUpdateFrequency: row.auto_update_frequency,
+          lastAutoUpdate: row.last_auto_update,
+          notifyOnPriceChange: row.notify_on_price_change,
+          notifyThresholdPercent: parseFloat(row.notify_threshold_percent),
+        }),
+      };
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    logger.error(&#39;Failed to get pricing config&#39;, { error });
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: &#39;Failed to load pricing config&#39; }),
+    };
+  }
+}
+
+// PUT /api/admin/pricing/config
+export async function updatePricingConfig(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    const admin = await requireAdmin(event);
+    const body = JSON.parse(event.body || &#39;{}&#39;);
+    const client = await pool.connect();
+
+    try {
+      await client.query(`
+        INSERT INTO pricing_config (
+          tenant_id, external_default_markup, self_hosted_default_markup,
+          minimum_charge_per_request, price_increase_grace_period_hours,
+          auto_update_from_providers, auto_update_frequency,
+          notify_on_price_change, notify_threshold_percent
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        ON CONFLICT (tenant_id) DO UPDATE SET
+          external_default_markup = COALESCE($2, pricing_config.external_default_markup),
+          self_hosted_default_markup = COALESCE($3, pricing_config.self_hosted_default_markup),
+          minimum_charge_per_request = COALESCE($4, pricing_config.minimum_charge_per_request),
+          price_increase_grace_period_hours = COALESCE($5, pricing_config.price_increase_grace_period_hours),
+          auto_update_from_providers = COALESCE($6, pricing_config.auto_update_from_providers),
+          auto_update_frequency = COALESCE($7, pricing_config.auto_update_frequency),
+          notify_on_price_change = COALESCE($8, pricing_config.notify_on_price_change),
+          notify_threshold_percent = COALESCE($9, pricing_config.notify_threshold_percent),
+          updated_at = NOW()
+      `, [
+        admin.tenantId,
+        body.externalDefaultMarkup,
+        body.selfHostedDefaultMarkup,
+        body.minimumChargePerRequest,
+        body.priceIncreaseGracePeriodHours,
+        body.autoUpdateFromProviders,
+        body.autoUpdateFrequency,
+        body.notifyOnPriceChange,
+        body.notifyThresholdPercent,
+      ]);
+
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({ success: true }),
+      };
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    logger.error(&#39;Failed to update pricing config&#39;, { error });
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: &#39;Failed to save config&#39; }),
+    };
+  }
+}
+
+// POST /api/admin/pricing/bulk-update - Bulk update markups
+export async function bulkUpdatePricing(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    const admin = await requireAdmin(event);
+    const { type, markup } = JSON.parse(event.body || &#39;{}&#39;);
+    
+    if (!type || markup === undefined) {
+      return {
+        statusCode: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: &#39;type and markup are required&#39; }),
+      };
+    }
+
+    const client = await pool.connect();
+
+    try {
+      await client.query(&#39;BEGIN&#39;);
+
+      // Get affected models
+      const modelsResult = await client.query(`
+        SELECT id, pricing-&gt;&gt;&#39;billed_markup&#39; as current_markup
+        FROM models
+        WHERE provider_id ${type === &#39;self_hosted&#39; ? &quot;= &#39;self_hosted&#39;&quot; : &quot;!= &#39;self_hosted&#39;&quot;}
+      `);
+
+      // Record price history for each model
+      for (const model of modelsResult.rows) {
+        await client.query(`
+          INSERT INTO price_history (tenant_id, model_id, previous_markup, new_markup, change_source, changed_by)
+          VALUES ($1, $2, $3, $4, &#39;bulk_update&#39;, $5)
+        `, [admin.tenantId, model.id, parseFloat(model.current_markup) || 0, markup / 100, admin.id]);
+      }
+
+      // Update all models of the specified type
+      await client.query(`
+        UPDATE models
+        SET pricing = jsonb_set(
+          COALESCE(pricing, &#39;{}&#39;::jsonb),
+          &#39;{billed_markup}&#39;,
+          to_jsonb($1::numeric)
+        ),
+        updated_at = NOW()
+        WHERE provider_id ${type === &#39;self_hosted&#39; ? &quot;= &#39;self_hosted&#39;&quot; : &quot;!= &#39;self_hosted&#39;&quot;}
+      `, [markup / 100]);
+
+      // Also update the default in pricing_config
+      if (type === &#39;self_hosted&#39;) {
+        await client.query(`
+          UPDATE pricing_config SET self_hosted_default_markup = $1, updated_at = NOW()
+          WHERE tenant_id = $2
+        `, [markup / 100, admin.tenantId]);
+      } else {
+        await client.query(`
+          UPDATE pricing_config SET external_default_markup = $1, updated_at = NOW()
+          WHERE tenant_id = $2
+        `, [markup / 100, admin.tenantId]);
+      }
+
+      await client.query(&#39;COMMIT&#39;);
+
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({ 
+          success: true,
+          modelsUpdated: modelsResult.rows.length,
+        }),
+      };
+    } catch (error) {
+      await client.query(&#39;ROLLBACK&#39;);
+      throw error;
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    logger.error(&#39;Failed to bulk update pricing&#39;, { error });
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: &#39;Failed to update pricing&#39; }),
+    };
+  }
+}
+
+// PUT /api/admin/pricing/models/:modelId/override - Set individual model override
+export async function setModelPricingOverride(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    const admin = await requireAdmin(event);
+    const modelId = event.pathParameters?.modelId;
+    const { markup, inputPrice, outputPrice } = JSON.parse(event.body || &#39;{}&#39;);
+    
+    if (!modelId) {
+      return {
+        statusCode: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: &#39;modelId is required&#39; }),
+      };
+    }
+
+    const client = await pool.connect();
+
+    try {
+      await client.query(&#39;BEGIN&#39;);
+
+      // Get current values for history
+      const currentResult = await client.query(`
+        SELECT markup_override, input_price_override, output_price_override
+        FROM model_pricing_overrides
+        WHERE tenant_id = $1 AND model_id = $2
+        ORDER BY effective_from DESC
+        LIMIT 1
+      `, [admin.tenantId, modelId]);
+
+      const current = currentResult.rows[0];
+
+      // Record history
+      await client.query(`
+        INSERT INTO price_history (
+          tenant_id, model_id, 
+          previous_markup, new_markup,
+          previous_input_price, new_input_price,
+          previous_output_price, new_output_price,
+          change_source, changed_by
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, &#39;admin&#39;, $9)
+      `, [
+        admin.tenantId, modelId,
+        current?.markup_override, markup,
+        current?.input_price_override, inputPrice,
+        current?.output_price_override, outputPrice,
+        admin.id,
+      ]);
+
+      // Insert or update override
+      await client.query(`
+        INSERT INTO model_pricing_overrides (
+          tenant_id, model_id, markup_override, input_price_override, output_price_override, created_by
+        ) VALUES ($1, $2, $3, $4, $5, $6)
+        ON CONFLICT (tenant_id, model_id, effective_from) DO UPDATE SET
+          markup_override = $3,
+          input_price_override = $4,
+          output_price_override = $5,
+          updated_at = NOW()
+      `, [admin.tenantId, modelId, markup, inputPrice, outputPrice, admin.id]);
+
+      await client.query(&#39;COMMIT&#39;);
+
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({ success: true }),
+      };
+    } catch (error) {
+      await client.query(&#39;ROLLBACK&#39;);
+      throw error;
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    logger.error(&#39;Failed to set pricing override&#39;, { error });
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: &#39;Failed to save override&#39; }),
+    };
+  }
+}
+
+// DELETE /api/admin/pricing/models/:modelId/override - Remove override
+export async function deleteModelPricingOverride(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    const admin = await requireAdmin(event);
+    const modelId = event.pathParameters?.modelId;
+
+    if (!modelId) {
+      return {
+        statusCode: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: &#39;modelId is required&#39; }),
+      };
+    }
+
+    const client = await pool.connect();
+
+    try {
+      await client.query(`
+        DELETE FROM model_pricing_overrides
+        WHERE tenant_id = $1 AND model_id = $2
+      `, [admin.tenantId, modelId]);
+
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({ success: true }),
+      };
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    logger.error(&#39;Failed to delete pricing override&#39;, { error });
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: &#39;Failed to remove override&#39; }),
+    };
+  }
+}</code></pre>
+<hr />
+<h2 id="integration-with-chat-handler">31.8 Integration with Chat Handler</h2>
+<pre class="typescript"><code>// apps/thinktank/src/components/chat/chat-input.tsx (updated)
+
+import { ModelSelector } from &#39;./model-selector&#39;;
+
+export function ChatInput({ onSend, disabled }: ChatInputProps) {
+  const [message, setMessage] = useState(&#39;&#39;);
+  const [selectedModel, setSelectedModel] = useState&lt;string | null&gt;(null); // null = Auto
+
+  const handleSend = () =&gt; {
+    if (!message.trim()) return;
+    
+    onSend({
+      content: message,
+      modelId: selectedModel, // Will be resolved by RADIANT Brain if null
+    });
+    
+    setMessage(&#39;&#39;);
+  };
+
+  return (
+    &lt;div className=&quot;border-t p-4&quot;&gt;
+      &lt;div className=&quot;flex items-end gap-3&quot;&gt;
+        &lt;div className=&quot;flex-1&quot;&gt;
+          &lt;Textarea
+            value={message}
+            onChange={(e) =&gt; setMessage(e.target.value)}
+            placeholder=&quot;Type your message...&quot;
+            className=&quot;min-h-[60px] resize-none&quot;
+            disabled={disabled}
+            onKeyDown={(e) =&gt; {
+              if (e.key === &#39;Enter&#39; &amp;&amp; !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+          /&gt;
+        &lt;/div&gt;
+        &lt;div className=&quot;flex flex-col gap-2&quot;&gt;
+          &lt;ModelSelector
+            selectedModel={selectedModel}
+            onModelChange={setSelectedModel}
+            disabled={disabled}
+          /&gt;
+          &lt;Button onClick={handleSend} disabled={disabled || !message.trim()}&gt;
+            &lt;Send className=&quot;h-4 w-4&quot; /&gt;
+          &lt;/Button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

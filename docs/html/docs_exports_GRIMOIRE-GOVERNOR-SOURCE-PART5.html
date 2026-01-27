@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRIMOIRE GOVERNOR SOURCE PART5 - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>GRIMOIRE GOVERNOR SOURCE PART5</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/GRIMOIRE-GOVERNOR-SOURCE-PART5.md</div>
+  </div>
+  
+  <h1 id="radiant-v5.0.2---source-export-part-5-infrastructure-admin-ui">RADIANT v5.0.2 - Source Export Part 5: Infrastructure &amp; Admin UI</h1>
+<hr />
+<h2 id="cdk-infrastructure-stack">11. CDK Infrastructure Stack</h2>
+<p><strong>File</strong>: <code>packages/infrastructure/lib/stacks/grimoire-stack.ts</code></p>
+<p><strong>Purpose</strong>: AWS CDK stack defining all infrastructure for The Grimoire and Economic Governor. Creates Lambda functions, EventBridge schedules, and integrates with VPC/database resources.</p>
+<p><strong>Key Resources</strong>: - <code>GrimoireApiFunction</code> - REST API for Grimoire operations - <code>GovernorApiFunction</code> - REST API for Governor operations - <code>GrimoireCleanupFunction</code> - Scheduled daily cleanup Lambda - Python layer for Flyte dependencies - EventBridge rule for scheduled cleanup</p>
+<pre class="typescript"><code>/**
+ * Grimoire &amp; Economic Governor CDK Stack
+ * RADIANT v5.0.2 - System Evolution
+ * 
+ * This stack defines the AWS infrastructure for:
+ * - The Grimoire: Self-optimizing procedural memory
+ * - Economic Governor: Cost-aware model routing
+ */
+
+import * as cdk from &#39;aws-cdk-lib&#39;;
+import * as lambda from &#39;aws-cdk-lib/aws-lambda&#39;;
+import * as events from &#39;aws-cdk-lib/aws-events&#39;;
+import * as targets from &#39;aws-cdk-lib/aws-events-targets&#39;;
+import * as ec2 from &#39;aws-cdk-lib/aws-ec2&#39;;
+import * as iam from &#39;aws-cdk-lib/aws-iam&#39;;
+import { Construct } from &#39;constructs&#39;;
+
+export interface GrimoireStackProps extends cdk.StackProps {
+  vpc: ec2.IVpc;
+  securityGroup: ec2.ISecurityGroup;
+  dbSecretArn: string;
+  litellmProxyUrl: string;
+  catoApiUrl: string;
+  layerArn?: string;
+}
+
+export class GrimoireStack extends cdk.Stack {
+  public readonly grimoireApiFunction: lambda.Function;
+  public readonly governorApiFunction: lambda.Function;
+  public readonly cleanupFunction: lambda.Function;
+
+  constructor(scope: Construct, id: string, props: GrimoireStackProps) {
+    super(scope, id, props);
+
+    const { vpc, securityGroup, dbSecretArn, litellmProxyUrl, catoApiUrl } = props;
+
+    // Common environment variables for all Lambdas
+    const commonEnv = {
+      DB_SECRET_ARN: dbSecretArn,
+      LITELLM_PROXY_URL: litellmProxyUrl,
+      CATO_API_URL: catoApiUrl,
+      NODE_OPTIONS: &#39;--enable-source-maps&#39;,
+    };
+
+    // Create shared Python layer for Flyte dependencies
+    const pythonLayer = new lambda.LayerVersion(this, &#39;FlytePythonLayer&#39;, {
+      code: lambda.Code.fromAsset(&#39;lambda-layers/flyte-deps&#39;),
+      compatibleRuntimes: [lambda.Runtime.PYTHON_3_11],
+      description: &#39;Flyte dependencies: psycopg2, pgvector, httpx&#39;,
+    });
+
+    // ========================================================================
+    // THE GRIMOIRE API
+    // ========================================================================
+    
+    this.grimoireApiFunction = new lambda.Function(this, &#39;GrimoireApiFunction&#39;, {
+      functionName: &#39;radiant-grimoire-api&#39;,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: &#39;index.handler&#39;,
+      code: lambda.Code.fromAsset(&#39;lambda/grimoire-api&#39;),
+      memorySize: 512,
+      timeout: cdk.Duration.seconds(30),
+      vpc,
+      securityGroups: [securityGroup],
+      environment: {
+        ...commonEnv,
+        SERVICE_NAME: &#39;grimoire-api&#39;,
+      },
+      tracing: lambda.Tracing.ACTIVE,
+    });
+
+    // Grant Secrets Manager access
+    this.grimoireApiFunction.addToRolePolicy(new iam.PolicyStatement({
+      actions: [&#39;secretsmanager:GetSecretValue&#39;],
+      resources: [dbSecretArn],
+    }));
+
+    // ========================================================================
+    // ECONOMIC GOVERNOR API
+    // ========================================================================
+    
+    this.governorApiFunction = new lambda.Function(this, &#39;GovernorApiFunction&#39;, {
+      functionName: &#39;radiant-governor-api&#39;,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: &#39;index.handler&#39;,
+      code: lambda.Code.fromAsset(&#39;lambda/governor-api&#39;),
+      memorySize: 512,
+      timeout: cdk.Duration.seconds(30),
+      vpc,
+      securityGroups: [securityGroup],
+      environment: {
+        ...commonEnv,
+        SERVICE_NAME: &#39;governor-api&#39;,
+      },
+      tracing: lambda.Tracing.ACTIVE,
+    });
+
+    this.governorApiFunction.addToRolePolicy(new iam.PolicyStatement({
+      actions: [&#39;secretsmanager:GetSecretValue&#39;],
+      resources: [dbSecretArn],
+    }));
+
+    // ========================================================================
+    // GRIMOIRE CLEANUP (Scheduled)
+    // ========================================================================
+    
+    this.cleanupFunction = new lambda.Function(this, &#39;GrimoireCleanupFunction&#39;, {
+      functionName: &#39;radiant-grimoire-cleanup&#39;,
+      runtime: lambda.Runtime.PYTHON_3_11,
+      handler: &#39;cleanup.handler&#39;,
+      code: lambda.Code.fromAsset(&#39;lambda/grimoire&#39;),
+      memorySize: 256,
+      timeout: cdk.Duration.minutes(5),
+      vpc,
+      securityGroups: [securityGroup],
+      layers: [pythonLayer],
+      environment: {
+        DB_SECRET_ARN: dbSecretArn,
+        CLEANUP_BATCH_SIZE: &#39;1000&#39;,
+        LOW_CONFIDENCE_THRESHOLD: &#39;0.3&#39;,
+        LOW_CONFIDENCE_MAX_AGE_DAYS: &#39;30&#39;,
+      },
+      tracing: lambda.Tracing.ACTIVE,
+    });
+
+    this.cleanupFunction.addToRolePolicy(new iam.PolicyStatement({
+      actions: [&#39;secretsmanager:GetSecretValue&#39;],
+      resources: [dbSecretArn],
+    }));
+
+    // Schedule cleanup to run daily at 3 AM UTC
+    const cleanupRule = new events.Rule(this, &#39;GrimoireCleanupSchedule&#39;, {
+      schedule: events.Schedule.cron({ hour: &#39;3&#39;, minute: &#39;0&#39; }),
+      description: &#39;Daily Grimoire cleanup - expired and low-confidence heuristics&#39;,
+    });
+
+    cleanupRule.addTarget(new targets.LambdaFunction(this.cleanupFunction));
+
+    // ========================================================================
+    // OUTPUTS
+    // ========================================================================
+    
+    new cdk.CfnOutput(this, &#39;GrimoireApiArn&#39;, {
+      value: this.grimoireApiFunction.functionArn,
+      description: &#39;Grimoire API Lambda ARN&#39;,
+    });
+
+    new cdk.CfnOutput(this, &#39;GovernorApiArn&#39;, {
+      value: this.governorApiFunction.functionArn,
+      description: &#39;Governor API Lambda ARN&#39;,
+    });
+
+    new cdk.CfnOutput(this, &#39;CleanupFunctionArn&#39;, {
+      value: this.cleanupFunction.functionArn,
+      description: &#39;Grimoire Cleanup Lambda ARN&#39;,
+    });
+  }
+}</code></pre>
+<hr />
+<h2 id="cleanup-lambda-handler">12. Cleanup Lambda Handler</h2>
+<p><strong>File</strong>: <code>packages/infrastructure/lambda/grimoire/cleanup.py</code></p>
+<p><strong>Purpose</strong>: Scheduled Lambda function for daily Grimoire maintenance. Removes expired heuristics and cleans up low-confidence entries.</p>
+<pre class="python"><code>&quot;&quot;&quot;
+Grimoire Cleanup Lambda
+
+RADIANT v5.0.2 - System Evolution
+
+Scheduled maintenance job that runs daily to:
+1. Delete expired heuristics (past expires_at)
+2. Delete low-confidence heuristics older than 30 days
+3. Log cleanup statistics for monitoring
+&quot;&quot;&quot;
+
+import os
+import json
+import boto3
+import psycopg2
+from datetime import datetime
+
+
+# Configuration from environment
+DB_SECRET_ARN = os.environ.get(&#39;DB_SECRET_ARN&#39;)
+BATCH_SIZE = int(os.environ.get(&#39;CLEANUP_BATCH_SIZE&#39;, &#39;1000&#39;))
+LOW_CONFIDENCE_THRESHOLD = float(os.environ.get(&#39;LOW_CONFIDENCE_THRESHOLD&#39;, &#39;0.3&#39;))
+LOW_CONFIDENCE_MAX_AGE_DAYS = int(os.environ.get(&#39;LOW_CONFIDENCE_MAX_AGE_DAYS&#39;, &#39;30&#39;))
+
+# System tenant ID bypasses RLS for maintenance
+SYSTEM_TENANT_ID = &#39;00000000-0000-0000-0000-000000000000&#39;
+
+
+def get_db_credentials():
+    &quot;&quot;&quot;Retrieves database credentials from Secrets Manager&quot;&quot;&quot;
+    client = boto3.client(&#39;secretsmanager&#39;)
+    response = client.get_secret_value(SecretId=DB_SECRET_ARN)
+    secret = json.loads(response[&#39;SecretString&#39;])
+    return {
+        &#39;host&#39;: secret[&#39;host&#39;],
+        &#39;database&#39;: secret[&#39;dbname&#39;],
+        &#39;user&#39;: secret[&#39;username&#39;],
+        &#39;password&#39;: secret[&#39;password&#39;],
+        &#39;port&#39;: secret.get(&#39;port&#39;, 5432)
+    }
+
+
+def handler(event, context):
+    &quot;&quot;&quot;
+    Lambda handler for Grimoire cleanup.
+    
+    Args:
+        event: EventBridge scheduled event
+        context: Lambda context
+        
+    Returns:
+        Dict with cleanup statistics
+    &quot;&quot;&quot;
+    print(f&quot;Starting Grimoire cleanup at {datetime.utcnow().isoformat()}&quot;)
+    
+    credentials = get_db_credentials()
+    
+    conn = psycopg2.connect(**credentials)
+    
+    try:
+        cur = conn.cursor()
+        
+        # Set system tenant context for RLS bypass
+        cur.execute(&quot;SET app.current_tenant_id = %s&quot;, (SYSTEM_TENANT_ID,))
+        
+        # 1. Delete expired heuristics
+        cur.execute(&quot;&quot;&quot;
+            WITH deleted AS (
+                DELETE FROM knowledge_heuristics
+                WHERE expires_at &lt; NOW()
+                RETURNING id, tenant_id, domain
+            )
+            SELECT 
+                COUNT(*) as count,
+                COUNT(DISTINCT tenant_id) as tenant_count
+            FROM deleted
+        &quot;&quot;&quot;)
+        expired_result = cur.fetchone()
+        expired_count = expired_result[0] or 0
+        expired_tenants = expired_result[1] or 0
+        
+        print(f&quot;Deleted {expired_count} expired heuristics from {expired_tenants} tenants&quot;)
+        
+        # 2. Delete low-confidence stale heuristics
+        cur.execute(&quot;&quot;&quot;
+            WITH deleted AS (
+                DELETE FROM knowledge_heuristics
+                WHERE confidence_score &lt; %s
+                  AND created_at &lt; NOW() - INTERVAL &#39;%s days&#39;
+                RETURNING id, tenant_id, domain, confidence_score
+            )
+            SELECT 
+                COUNT(*) as count,
+                AVG(confidence_score) as avg_conf
+            FROM deleted
+        &quot;&quot;&quot;, (LOW_CONFIDENCE_THRESHOLD, LOW_CONFIDENCE_MAX_AGE_DAYS))
+        low_conf_result = cur.fetchone()
+        low_conf_count = low_conf_result[0] or 0
+        avg_deleted_conf = low_conf_result[1] or 0
+        
+        print(f&quot;Deleted {low_conf_count} low-confidence heuristics (avg conf: {avg_deleted_conf:.2f})&quot;)
+        
+        # 3. Get remaining statistics
+        cur.execute(&quot;&quot;&quot;
+            SELECT 
+                COUNT(*) as total,
+                COUNT(DISTINCT tenant_id) as tenants,
+                AVG(confidence_score) as avg_conf,
+                COUNT(*) FILTER (WHERE confidence_score &gt;= 0.8) as high_conf
+            FROM knowledge_heuristics
+            WHERE expires_at &gt; NOW()
+        &quot;&quot;&quot;)
+        stats = cur.fetchone()
+        
+        conn.commit()
+        
+        result = {
+            &#39;status&#39;: &#39;success&#39;,
+            &#39;timestamp&#39;: datetime.utcnow().isoformat(),
+            &#39;cleanup&#39;: {
+                &#39;expired_deleted&#39;: expired_count,
+                &#39;expired_tenant_count&#39;: expired_tenants,
+                &#39;low_confidence_deleted&#39;: low_conf_count,
+                &#39;total_deleted&#39;: expired_count + low_conf_count
+            },
+            &#39;remaining&#39;: {
+                &#39;total_heuristics&#39;: stats[0] or 0,
+                &#39;tenant_count&#39;: stats[1] or 0,
+                &#39;avg_confidence&#39;: float(stats[2]) if stats[2] else 0,
+                &#39;high_confidence_count&#39;: stats[3] or 0
+            },
+            &#39;config&#39;: {
+                &#39;low_confidence_threshold&#39;: LOW_CONFIDENCE_THRESHOLD,
+                &#39;low_confidence_max_age_days&#39;: LOW_CONFIDENCE_MAX_AGE_DAYS
+            }
+        }
+        
+        print(f&quot;Cleanup complete: {json.dumps(result)}&quot;)
+        return result
+        
+    except Exception as e:
+        conn.rollback()
+        print(f&quot;Cleanup failed: {str(e)}&quot;)
+        raise
+        
+    finally:
+        conn.close()</code></pre>
+<hr />
+<h2 id="grimoire-admin-ui">13. Grimoire Admin UI</h2>
+<p><strong>File</strong>: <code>apps/admin-dashboard/app/(dashboard)/thinktank/grimoire/page.tsx</code></p>
+<p><strong>Purpose</strong>: React/Next.js admin interface for managing The Grimoire. Provides CRUD operations and statistics visualization.</p>
+<p><strong>Features</strong>: - List/search heuristics by domain - Add new heuristics manually - Delete heuristics (admin only) - Reinforce (increase/decrease confidence) - View statistics dashboard</p>
+<pre class="tsx"><code>/**
+ * Grimoire Admin Page
+ * RADIANT v5.0.2 - System Evolution
+ * 
+ * Admin interface for managing The Grimoire procedural memory.
+ */
+
+&#39;use client&#39;;
+
+import React, { useEffect, useState } from &#39;react&#39;;
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from &#39;@/components/ui/card&#39;;
+import { Button } from &#39;@/components/ui/button&#39;;
+import { Input } from &#39;@/components/ui/input&#39;;
+import { Badge } from &#39;@/components/ui/badge&#39;;
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from &#39;@/components/ui/select&#39;;
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from &#39;@/components/ui/table&#39;;
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from &#39;@/components/ui/dialog&#39;;
+import { Textarea } from &#39;@/components/ui/textarea&#39;;
+import { 
+  BookOpen, 
+  Plus, 
+  Trash2, 
+  ThumbsUp, 
+  ThumbsDown,
+  Search,
+  RefreshCw
+} from &#39;lucide-react&#39;;
+import { useToast } from &#39;@/hooks/use-toast&#39;;
+
+interface Heuristic {
+  id: string;
+  domain: string;
+  heuristic_text: string;
+  confidence_score: number;
+  created_at: string;
+  expires_at: string;
+}
+
+interface GrimoireStats {
+  total_heuristics: number;
+  total_high_confidence: number;
+  total_expiring_soon: number;
+  domain_count: number;
+  by_domain: Record&lt;string, {
+    total: number;
+    avg_confidence: number;
+    high_confidence: number;
+    expiring_soon: number;
+  }&gt;;
+}
+
+const DOMAINS = [&#39;general&#39;, &#39;medical&#39;, &#39;financial&#39;, &#39;legal&#39;, &#39;technical&#39;, &#39;creative&#39;];
+
+export default function GrimoirePage() {
+  const [heuristics, setHeuristics] = useState&lt;Heuristic[]&gt;([]);
+  const [stats, setStats] = useState&lt;GrimoireStats | null&gt;(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedDomain, setSelectedDomain] = useState&lt;string&gt;(&#39;all&#39;);
+  const [searchQuery, setSearchQuery] = useState(&#39;&#39;);
+  const [newHeuristic, setNewHeuristic] = useState({ domain: &#39;general&#39;, text: &#39;&#39; });
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  const fetchData = async () =&gt; {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (selectedDomain !== &#39;all&#39;) params.set(&#39;domain&#39;, selectedDomain);
+      if (searchQuery) params.set(&#39;search&#39;, searchQuery);
+
+      const [heuristicsRes, statsRes] = await Promise.all([
+        fetch(`/api/grimoire/heuristics?${params}`),
+        fetch(&#39;/api/grimoire/stats&#39;)
+      ]);
+
+      if (heuristicsRes.ok) {
+        const data = await heuristicsRes.json();
+        setHeuristics(data.heuristics);
+      }
+
+      if (statsRes.ok) {
+        const data = await statsRes.json();
+        setStats(data);
+      }
+    } catch (error) {
+      toast({ title: &#39;Error&#39;, description: &#39;Failed to fetch data&#39;, variant: &#39;destructive&#39; });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() =&gt; {
+    fetchData();
+  }, [selectedDomain]);
+
+  const handleSearch = () =&gt; {
+    fetchData();
+  };
+
+  const handleAddHeuristic = async () =&gt; {
+    if (!newHeuristic.text.trim()) {
+      toast({ title: &#39;Error&#39;, description: &#39;Heuristic text is required&#39;, variant: &#39;destructive&#39; });
+      return;
+    }
+
+    try {
+      const res = await fetch(&#39;/api/grimoire/heuristics&#39;, {
+        method: &#39;POST&#39;,
+        headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+        body: JSON.stringify({
+          domain: newHeuristic.domain,
+          heuristic_text: newHeuristic.text
+        })
+      });
+
+      if (res.ok) {
+        toast({ title: &#39;Success&#39;, description: &#39;Heuristic added&#39; });
+        setNewHeuristic({ domain: &#39;general&#39;, text: &#39;&#39; });
+        setDialogOpen(false);
+        fetchData();
+      } else {
+        throw new Error(&#39;Failed to add&#39;);
+      }
+    } catch (error) {
+      toast({ title: &#39;Error&#39;, description: &#39;Failed to add heuristic&#39;, variant: &#39;destructive&#39; });
+    }
+  };
+
+  const handleDelete = async (id: string) =&gt; {
+    if (!confirm(&#39;Delete this heuristic?&#39;)) return;
+
+    try {
+      const res = await fetch(`/api/grimoire/heuristics/${id}`, { method: &#39;DELETE&#39; });
+      if (res.ok) {
+        toast({ title: &#39;Success&#39;, description: &#39;Heuristic deleted&#39; });
+        fetchData();
+      }
+    } catch (error) {
+      toast({ title: &#39;Error&#39;, description: &#39;Failed to delete&#39;, variant: &#39;destructive&#39; });
+    }
+  };
+
+  const handleReinforce = async (id: string, positive: boolean) =&gt; {
+    try {
+      const res = await fetch(`/api/grimoire/heuristics/${id}/reinforce`, {
+        method: &#39;POST&#39;,
+        headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+        body: JSON.stringify({ positive })
+      });
+
+      if (res.ok) {
+        toast({ 
+          title: &#39;Success&#39;, 
+          description: positive ? &#39;Confidence increased&#39; : &#39;Confidence decreased&#39; 
+        });
+        fetchData();
+      }
+    } catch (error) {
+      toast({ title: &#39;Error&#39;, description: &#39;Failed to reinforce&#39;, variant: &#39;destructive&#39; });
+    }
+  };
+
+  const getConfidenceBadge = (score: number) =&gt; {
+    if (score &gt;= 0.8) return &lt;Badge className=&quot;bg-green-500&quot;&gt;High ({(score * 100).toFixed(0)}%)&lt;/Badge&gt;;
+    if (score &gt;= 0.5) return &lt;Badge className=&quot;bg-yellow-500&quot;&gt;Medium ({(score * 100).toFixed(0)}%)&lt;/Badge&gt;;
+    return &lt;Badge className=&quot;bg-red-500&quot;&gt;Low ({(score * 100).toFixed(0)}%)&lt;/Badge&gt;;
+  };
+
+  return (
+    &lt;div className=&quot;space-y-6 p-6&quot;&gt;
+      &lt;div className=&quot;flex items-center justify-between&quot;&gt;
+        &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+          &lt;BookOpen className=&quot;h-8 w-8&quot; /&gt;
+          &lt;div&gt;
+            &lt;h1 className=&quot;text-2xl font-bold&quot;&gt;The Grimoire&lt;/h1&gt;
+            &lt;p className=&quot;text-muted-foreground&quot;&gt;Self-optimizing procedural memory&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;Dialog open={dialogOpen} onOpenChange={setDialogOpen}&gt;
+          &lt;DialogTrigger asChild&gt;
+            &lt;Button&gt;&lt;Plus className=&quot;mr-2 h-4 w-4&quot; /&gt; Add Heuristic&lt;/Button&gt;
+          &lt;/DialogTrigger&gt;
+          &lt;DialogContent&gt;
+            &lt;DialogHeader&gt;
+              &lt;DialogTitle&gt;Add New Heuristic&lt;/DialogTitle&gt;
+              &lt;DialogDescription&gt;
+                Manually add a procedural memory heuristic
+              &lt;/DialogDescription&gt;
+            &lt;/DialogHeader&gt;
+            &lt;div className=&quot;space-y-4 py-4&quot;&gt;
+              &lt;Select 
+                value={newHeuristic.domain} 
+                onValueChange={(v) =&gt; setNewHeuristic(prev =&gt; ({ ...prev, domain: v }))}
+              &gt;
+                &lt;SelectTrigger&gt;
+                  &lt;SelectValue placeholder=&quot;Select domain&quot; /&gt;
+                &lt;/SelectTrigger&gt;
+                &lt;SelectContent&gt;
+                  {DOMAINS.map(d =&gt; (
+                    &lt;SelectItem key={d} value={d}&gt;{d.charAt(0).toUpperCase() + d.slice(1)}&lt;/SelectItem&gt;
+                  ))}
+                &lt;/SelectContent&gt;
+              &lt;/Select&gt;
+              &lt;Textarea
+                placeholder=&quot;When [condition], always [action]...&quot;
+                value={newHeuristic.text}
+                onChange={(e) =&gt; setNewHeuristic(prev =&gt; ({ ...prev, text: e.target.value }))}
+                rows={4}
+              /&gt;
+            &lt;/div&gt;
+            &lt;DialogFooter&gt;
+              &lt;Button variant=&quot;outline&quot; onClick={() =&gt; setDialogOpen(false)}&gt;Cancel&lt;/Button&gt;
+              &lt;Button onClick={handleAddHeuristic}&gt;Add Heuristic&lt;/Button&gt;
+            &lt;/DialogFooter&gt;
+          &lt;/DialogContent&gt;
+        &lt;/Dialog&gt;
+      &lt;/div&gt;
+
+      {/* Statistics Cards */}
+      {stats &amp;&amp; (
+        &lt;div className=&quot;grid grid-cols-4 gap-4&quot;&gt;
+          &lt;Card&gt;
+            &lt;CardHeader className=&quot;pb-2&quot;&gt;
+              &lt;CardDescription&gt;Total Heuristics&lt;/CardDescription&gt;
+              &lt;CardTitle className=&quot;text-3xl&quot;&gt;{stats.total_heuristics}&lt;/CardTitle&gt;
+            &lt;/CardHeader&gt;
+          &lt;/Card&gt;
+          &lt;Card&gt;
+            &lt;CardHeader className=&quot;pb-2&quot;&gt;
+              &lt;CardDescription&gt;High Confidence&lt;/CardDescription&gt;
+              &lt;CardTitle className=&quot;text-3xl text-green-500&quot;&gt;{stats.total_high_confidence}&lt;/CardTitle&gt;
+            &lt;/CardHeader&gt;
+          &lt;/Card&gt;
+          &lt;Card&gt;
+            &lt;CardHeader className=&quot;pb-2&quot;&gt;
+              &lt;CardDescription&gt;Expiring Soon&lt;/CardDescription&gt;
+              &lt;CardTitle className=&quot;text-3xl text-yellow-500&quot;&gt;{stats.total_expiring_soon}&lt;/CardTitle&gt;
+            &lt;/CardHeader&gt;
+          &lt;/Card&gt;
+          &lt;Card&gt;
+            &lt;CardHeader className=&quot;pb-2&quot;&gt;
+              &lt;CardDescription&gt;Domains&lt;/CardDescription&gt;
+              &lt;CardTitle className=&quot;text-3xl&quot;&gt;{stats.domain_count}&lt;/CardTitle&gt;
+            &lt;/CardHeader&gt;
+          &lt;/Card&gt;
+        &lt;/div&gt;
+      )}
+
+      {/* Filters */}
+      &lt;Card&gt;
+        &lt;CardContent className=&quot;pt-6&quot;&gt;
+          &lt;div className=&quot;flex gap-4&quot;&gt;
+            &lt;Select value={selectedDomain} onValueChange={setSelectedDomain}&gt;
+              &lt;SelectTrigger className=&quot;w-48&quot;&gt;
+                &lt;SelectValue placeholder=&quot;Filter by domain&quot; /&gt;
+              &lt;/SelectTrigger&gt;
+              &lt;SelectContent&gt;
+                &lt;SelectItem value=&quot;all&quot;&gt;All Domains&lt;/SelectItem&gt;
+                {DOMAINS.map(d =&gt; (
+                  &lt;SelectItem key={d} value={d}&gt;{d.charAt(0).toUpperCase() + d.slice(1)}&lt;/SelectItem&gt;
+                ))}
+              &lt;/SelectContent&gt;
+            &lt;/Select&gt;
+            &lt;div className=&quot;flex-1 flex gap-2&quot;&gt;
+              &lt;Input 
+                placeholder=&quot;Search heuristics...&quot;
+                value={searchQuery}
+                onChange={(e) =&gt; setSearchQuery(e.target.value)}
+                onKeyDown={(e) =&gt; e.key === &#39;Enter&#39; &amp;&amp; handleSearch()}
+              /&gt;
+              &lt;Button variant=&quot;outline&quot; onClick={handleSearch}&gt;
+                &lt;Search className=&quot;h-4 w-4&quot; /&gt;
+              &lt;/Button&gt;
+            &lt;/div&gt;
+            &lt;Button variant=&quot;outline&quot; onClick={fetchData}&gt;
+              &lt;RefreshCw className={`h-4 w-4 ${loading ? &#39;animate-spin&#39; : &#39;&#39;}`} /&gt;
+            &lt;/Button&gt;
+          &lt;/div&gt;
+        &lt;/CardContent&gt;
+      &lt;/Card&gt;
+
+      {/* Heuristics Table */}
+      &lt;Card&gt;
+        &lt;CardContent className=&quot;pt-6&quot;&gt;
+          &lt;Table&gt;
+            &lt;TableHeader&gt;
+              &lt;TableRow&gt;
+                &lt;TableHead className=&quot;w-24&quot;&gt;Domain&lt;/TableHead&gt;
+                &lt;TableHead&gt;Heuristic&lt;/TableHead&gt;
+                &lt;TableHead className=&quot;w-32&quot;&gt;Confidence&lt;/TableHead&gt;
+                &lt;TableHead className=&quot;w-32&quot;&gt;Created&lt;/TableHead&gt;
+                &lt;TableHead className=&quot;w-40&quot;&gt;Actions&lt;/TableHead&gt;
+              &lt;/TableRow&gt;
+            &lt;/TableHeader&gt;
+            &lt;TableBody&gt;
+              {heuristics.map((h) =&gt; (
+                &lt;TableRow key={h.id}&gt;
+                  &lt;TableCell&gt;
+                    &lt;Badge variant=&quot;outline&quot;&gt;{h.domain}&lt;/Badge&gt;
+                  &lt;/TableCell&gt;
+                  &lt;TableCell className=&quot;max-w-md truncate&quot;&gt;{h.heuristic_text}&lt;/TableCell&gt;
+                  &lt;TableCell&gt;{getConfidenceBadge(h.confidence_score)}&lt;/TableCell&gt;
+                  &lt;TableCell className=&quot;text-sm text-muted-foreground&quot;&gt;
+                    {new Date(h.created_at).toLocaleDateString()}
+                  &lt;/TableCell&gt;
+                  &lt;TableCell&gt;
+                    &lt;div className=&quot;flex gap-1&quot;&gt;
+                      &lt;Button 
+                        size=&quot;sm&quot; 
+                        variant=&quot;ghost&quot;
+                        onClick={() =&gt; handleReinforce(h.id, true)}
+                        title=&quot;Increase confidence&quot;
+                      &gt;
+                        &lt;ThumbsUp className=&quot;h-4 w-4 text-green-500&quot; /&gt;
+                      &lt;/Button&gt;
+                      &lt;Button 
+                        size=&quot;sm&quot; 
+                        variant=&quot;ghost&quot;
+                        onClick={() =&gt; handleReinforce(h.id, false)}
+                        title=&quot;Decrease confidence&quot;
+                      &gt;
+                        &lt;ThumbsDown className=&quot;h-4 w-4 text-red-500&quot; /&gt;
+                      &lt;/Button&gt;
+                      &lt;Button 
+                        size=&quot;sm&quot; 
+                        variant=&quot;ghost&quot;
+                        onClick={() =&gt; handleDelete(h.id)}
+                        title=&quot;Delete&quot;
+                      &gt;
+                        &lt;Trash2 className=&quot;h-4 w-4 text-destructive&quot; /&gt;
+                      &lt;/Button&gt;
+                    &lt;/div&gt;
+                  &lt;/TableCell&gt;
+                &lt;/TableRow&gt;
+              ))}
+              {heuristics.length === 0 &amp;&amp; (
+                &lt;TableRow&gt;
+                  &lt;TableCell colSpan={5} className=&quot;text-center text-muted-foreground py-8&quot;&gt;
+                    No heuristics found
+                  &lt;/TableCell&gt;
+                &lt;/TableRow&gt;
+              )}
+            &lt;/TableBody&gt;
+          &lt;/Table&gt;
+        &lt;/CardContent&gt;
+      &lt;/Card&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<hr />
+<h2 id="governor-admin-ui">14. Governor Admin UI</h2>
+<p><strong>File</strong>: <code>apps/admin-dashboard/app/(dashboard)/thinktank/governor/page.tsx</code></p>
+<p><strong>Purpose</strong>: React/Next.js admin interface for managing the Economic Governor. Provides configuration and statistics visualization.</p>
+<p><strong>Features</strong>: - Configure Governor mode per domain - View savings statistics and trends - View recent routing decisions - Cost optimization analytics</p>
+<pre class="tsx"><code>/**
+ * Economic Governor Admin Page
+ * RADIANT v5.0.2 - System Evolution
+ * 
+ * Admin interface for managing the Economic Governor.
+ */
+
+&#39;use client&#39;;
+
+import React, { useEffect, useState } from &#39;react&#39;;
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from &#39;@/components/ui/card&#39;;
+import { Button } from &#39;@/components/ui/button&#39;;
+import { Badge } from &#39;@/components/ui/badge&#39;;
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from &#39;@/components/ui/select&#39;;
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from &#39;@/components/ui/table&#39;;
+import { 
+  Gauge, 
+  DollarSign, 
+  TrendingDown,
+  RefreshCw,
+  ArrowRight
+} from &#39;lucide-react&#39;;
+import { useToast } from &#39;@/hooks/use-toast&#39;;
+
+type GovernorMode = &#39;performance&#39; | &#39;balanced&#39; | &#39;cost_saver&#39; | &#39;off&#39;;
+
+interface DomainConfig {
+  domain: string;
+  mode: GovernorMode;
+  updated_at: string;
+}
+
+interface GovernorStats {
+  period: { days: number };
+  summary: {
+    totalDecisions: number;
+    avgComplexity: number;
+    totalSavings: number;
+    modelSwaps: number;
+    taskDistribution: {
+      simple: number;
+      medium: number;
+      complex: number;
+    };
+  };
+  daily: Array&lt;{
+    day: string;
+    decisions: number;
+    savings: number;
+    avg_complexity: number;
+  }&gt;;
+  byMode: Array&lt;{
+    mode: string;
+    count: number;
+    savings: number;
+  }&gt;;
+}
+
+interface RecentDecision {
+  id: string;
+  executionId: string;
+  originalModel: string;
+  selectedModel: string;
+  complexityScore: number;
+  savingsAmount: number;
+  mode: string;
+  reason: string;
+  createdAt: string;
+}
+
+const MODES: { value: GovernorMode; label: string; description: string }[] = [
+  { value: &#39;off&#39;, label: &#39;Off&#39;, description: &#39;No optimization - use requested models&#39; },
+  { value: &#39;performance&#39;, label: &#39;Performance&#39;, description: &#39;Prioritize quality over cost&#39; },
+  { value: &#39;balanced&#39;, label: &#39;Balanced&#39;, description: &#39;Balance cost and quality&#39; },
+  { value: &#39;cost_saver&#39;, label: &#39;Cost Saver&#39;, description: &#39;Maximize cost savings&#39; },
+];
+
+const DOMAINS = [&#39;general&#39;, &#39;medical&#39;, &#39;financial&#39;, &#39;legal&#39;, &#39;technical&#39;, &#39;creative&#39;];
+
+export default function GovernorPage() {
+  const [configs, setConfigs] = useState&lt;DomainConfig[]&gt;([]);
+  const [stats, setStats] = useState&lt;GovernorStats | null&gt;(null);
+  const [recentDecisions, setRecentDecisions] = useState&lt;RecentDecision[]&gt;([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  const fetchData = async () =&gt; {
+    setLoading(true);
+    try {
+      const [configRes, statsRes, recentRes] = await Promise.all([
+        fetch(&#39;/api/governor/config&#39;),
+        fetch(&#39;/api/governor/statistics?days=30&#39;),
+        fetch(&#39;/api/governor/recent?limit=10&#39;)
+      ]);
+
+      if (configRes.ok) {
+        const data = await configRes.json();
+        setConfigs(data.domains);
+      }
+
+      if (statsRes.ok) {
+        const data = await statsRes.json();
+        setStats(data);
+      }
+
+      if (recentRes.ok) {
+        const data = await recentRes.json();
+        setRecentDecisions(data.decisions);
+      }
+    } catch (error) {
+      toast({ title: &#39;Error&#39;, description: &#39;Failed to fetch data&#39;, variant: &#39;destructive&#39; });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() =&gt; {
+    fetchData();
+  }, []);
+
+  const handleModeChange = async (domain: string, mode: GovernorMode) =&gt; {
+    try {
+      const res = await fetch(&#39;/api/governor/config&#39;, {
+        method: &#39;PUT&#39;,
+        headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+        body: JSON.stringify({ domain, mode })
+      });
+
+      if (res.ok) {
+        toast({ title: &#39;Success&#39;, description: `${domain} mode updated to ${mode}` });
+        fetchData();
+      }
+    } catch (error) {
+      toast({ title: &#39;Error&#39;, description: &#39;Failed to update mode&#39;, variant: &#39;destructive&#39; });
+    }
+  };
+
+  const getModeBadge = (mode: string) =&gt; {
+    const colors: Record&lt;string, string&gt; = {
+      off: &#39;bg-gray-500&#39;,
+      performance: &#39;bg-blue-500&#39;,
+      balanced: &#39;bg-green-500&#39;,
+      cost_saver: &#39;bg-yellow-500&#39;
+    };
+    return &lt;Badge className={colors[mode] || &#39;bg-gray-500&#39;}&gt;{mode.replace(&#39;_&#39;, &#39; &#39;)}&lt;/Badge&gt;;
+  };
+
+  const getComplexityBadge = (score: number) =&gt; {
+    if (score &lt;= 4) return &lt;Badge className=&quot;bg-green-500&quot;&gt;Simple ({score})&lt;/Badge&gt;;
+    if (score &lt;= 8) return &lt;Badge className=&quot;bg-yellow-500&quot;&gt;Medium ({score})&lt;/Badge&gt;;
+    return &lt;Badge className=&quot;bg-red-500&quot;&gt;Complex ({score})&lt;/Badge&gt;;
+  };
+
+  return (
+    &lt;div className=&quot;space-y-6 p-6&quot;&gt;
+      &lt;div className=&quot;flex items-center justify-between&quot;&gt;
+        &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+          &lt;Gauge className=&quot;h-8 w-8&quot; /&gt;
+          &lt;div&gt;
+            &lt;h1 className=&quot;text-2xl font-bold&quot;&gt;Economic Governor&lt;/h1&gt;
+            &lt;p className=&quot;text-muted-foreground&quot;&gt;Cost-aware model routing&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;Button variant=&quot;outline&quot; onClick={fetchData}&gt;
+          &lt;RefreshCw className={`h-4 w-4 mr-2 ${loading ? &#39;animate-spin&#39; : &#39;&#39;}`} /&gt;
+          Refresh
+        &lt;/Button&gt;
+      &lt;/div&gt;
+
+      {/* Summary Statistics */}
+      {stats &amp;&amp; (
+        &lt;div className=&quot;grid grid-cols-4 gap-4&quot;&gt;
+          &lt;Card&gt;
+            &lt;CardHeader className=&quot;pb-2&quot;&gt;
+              &lt;CardDescription&gt;Total Decisions (30d)&lt;/CardDescription&gt;
+              &lt;CardTitle className=&quot;text-3xl&quot;&gt;{stats.summary.totalDecisions}&lt;/CardTitle&gt;
+            &lt;/CardHeader&gt;
+          &lt;/Card&gt;
+          &lt;Card&gt;
+            &lt;CardHeader className=&quot;pb-2&quot;&gt;
+              &lt;CardDescription&gt;Total Savings&lt;/CardDescription&gt;
+              &lt;CardTitle className=&quot;text-3xl text-green-500&quot;&gt;
+                &lt;DollarSign className=&quot;inline h-6 w-6&quot; /&gt;
+                {stats.summary.totalSavings.toFixed(2)}
+              &lt;/CardTitle&gt;
+            &lt;/CardHeader&gt;
+          &lt;/Card&gt;
+          &lt;Card&gt;
+            &lt;CardHeader className=&quot;pb-2&quot;&gt;
+              &lt;CardDescription&gt;Model Swaps&lt;/CardDescription&gt;
+              &lt;CardTitle className=&quot;text-3xl flex items-center gap-2&quot;&gt;
+                &lt;TrendingDown className=&quot;h-6 w-6 text-blue-500&quot; /&gt;
+                {stats.summary.modelSwaps}
+              &lt;/CardTitle&gt;
+            &lt;/CardHeader&gt;
+          &lt;/Card&gt;
+          &lt;Card&gt;
+            &lt;CardHeader className=&quot;pb-2&quot;&gt;
+              &lt;CardDescription&gt;Avg Complexity&lt;/CardDescription&gt;
+              &lt;CardTitle className=&quot;text-3xl&quot;&gt;{stats.summary.avgComplexity.toFixed(1)}/10&lt;/CardTitle&gt;
+            &lt;/CardHeader&gt;
+          &lt;/Card&gt;
+        &lt;/div&gt;
+      )}
+
+      {/* Task Distribution */}
+      {stats &amp;&amp; (
+        &lt;Card&gt;
+          &lt;CardHeader&gt;
+            &lt;CardTitle&gt;Task Distribution&lt;/CardTitle&gt;
+            &lt;CardDescription&gt;Last 30 days by complexity&lt;/CardDescription&gt;
+          &lt;/CardHeader&gt;
+          &lt;CardContent&gt;
+            &lt;div className=&quot;flex gap-4&quot;&gt;
+              &lt;div className=&quot;flex-1 text-center p-4 bg-green-500/10 rounded-lg&quot;&gt;
+                &lt;div className=&quot;text-3xl font-bold text-green-500&quot;&gt;
+                  {stats.summary.taskDistribution.simple}
+                &lt;/div&gt;
+                &lt;div className=&quot;text-sm text-muted-foreground&quot;&gt;Simple (1-4)&lt;/div&gt;
+              &lt;/div&gt;
+              &lt;div className=&quot;flex-1 text-center p-4 bg-yellow-500/10 rounded-lg&quot;&gt;
+                &lt;div className=&quot;text-3xl font-bold text-yellow-500&quot;&gt;
+                  {stats.summary.taskDistribution.medium}
+                &lt;/div&gt;
+                &lt;div className=&quot;text-sm text-muted-foreground&quot;&gt;Medium (5-8)&lt;/div&gt;
+              &lt;/div&gt;
+              &lt;div className=&quot;flex-1 text-center p-4 bg-red-500/10 rounded-lg&quot;&gt;
+                &lt;div className=&quot;text-3xl font-bold text-red-500&quot;&gt;
+                  {stats.summary.taskDistribution.complex}
+                &lt;/div&gt;
+                &lt;div className=&quot;text-sm text-muted-foreground&quot;&gt;Complex (9-10)&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/CardContent&gt;
+        &lt;/Card&gt;
+      )}
+
+      {/* Domain Configuration */}
+      &lt;Card&gt;
+        &lt;CardHeader&gt;
+          &lt;CardTitle&gt;Domain Configuration&lt;/CardTitle&gt;
+          &lt;CardDescription&gt;Set Governor mode per domain&lt;/CardDescription&gt;
+        &lt;/CardHeader&gt;
+        &lt;CardContent&gt;
+          &lt;Table&gt;
+            &lt;TableHeader&gt;
+              &lt;TableRow&gt;
+                &lt;TableHead&gt;Domain&lt;/TableHead&gt;
+                &lt;TableHead&gt;Current Mode&lt;/TableHead&gt;
+                &lt;TableHead&gt;Change Mode&lt;/TableHead&gt;
+              &lt;/TableRow&gt;
+            &lt;/TableHeader&gt;
+            &lt;TableBody&gt;
+              {DOMAINS.map(domain =&gt; {
+                const config = configs.find(c =&gt; c.domain === domain);
+                const currentMode = config?.mode || &#39;balanced&#39;;
+                return (
+                  &lt;TableRow key={domain}&gt;
+                    &lt;TableCell className=&quot;font-medium&quot;&gt;
+                      {domain.charAt(0).toUpperCase() + domain.slice(1)}
+                    &lt;/TableCell&gt;
+                    &lt;TableCell&gt;{getModeBadge(currentMode)}&lt;/TableCell&gt;
+                    &lt;TableCell&gt;
+                      &lt;Select 
+                        value={currentMode} 
+                        onValueChange={(v) =&gt; handleModeChange(domain, v as GovernorMode)}
+                      &gt;
+                        &lt;SelectTrigger className=&quot;w-48&quot;&gt;
+                          &lt;SelectValue /&gt;
+                        &lt;/SelectTrigger&gt;
+                        &lt;SelectContent&gt;
+                          {MODES.map(m =&gt; (
+                            &lt;SelectItem key={m.value} value={m.value}&gt;
+                              &lt;div className=&quot;flex flex-col&quot;&gt;
+                                &lt;span&gt;{m.label}&lt;/span&gt;
+                                &lt;span className=&quot;text-xs text-muted-foreground&quot;&gt;{m.description}&lt;/span&gt;
+                              &lt;/div&gt;
+                            &lt;/SelectItem&gt;
+                          ))}
+                        &lt;/SelectContent&gt;
+                      &lt;/Select&gt;
+                    &lt;/TableCell&gt;
+                  &lt;/TableRow&gt;
+                );
+              })}
+            &lt;/TableBody&gt;
+          &lt;/Table&gt;
+        &lt;/CardContent&gt;
+      &lt;/Card&gt;
+
+      {/* Recent Decisions */}
+      &lt;Card&gt;
+        &lt;CardHeader&gt;
+          &lt;CardTitle&gt;Recent Routing Decisions&lt;/CardTitle&gt;
+          &lt;CardDescription&gt;Last 10 model routing decisions&lt;/CardDescription&gt;
+        &lt;/CardHeader&gt;
+        &lt;CardContent&gt;
+          &lt;Table&gt;
+            &lt;TableHeader&gt;
+              &lt;TableRow&gt;
+                &lt;TableHead&gt;Time&lt;/TableHead&gt;
+                &lt;TableHead&gt;Complexity&lt;/TableHead&gt;
+                &lt;TableHead&gt;Routing&lt;/TableHead&gt;
+                &lt;TableHead&gt;Savings&lt;/TableHead&gt;
+                &lt;TableHead&gt;Reason&lt;/TableHead&gt;
+              &lt;/TableRow&gt;
+            &lt;/TableHeader&gt;
+            &lt;TableBody&gt;
+              {recentDecisions.map((d) =&gt; (
+                &lt;TableRow key={d.id}&gt;
+                  &lt;TableCell className=&quot;text-sm text-muted-foreground&quot;&gt;
+                    {new Date(d.createdAt).toLocaleTimeString()}
+                  &lt;/TableCell&gt;
+                  &lt;TableCell&gt;{getComplexityBadge(d.complexityScore)}&lt;/TableCell&gt;
+                  &lt;TableCell&gt;
+                    &lt;div className=&quot;flex items-center gap-2 text-sm&quot;&gt;
+                      &lt;code className=&quot;bg-muted px-1 rounded&quot;&gt;{d.originalModel}&lt;/code&gt;
+                      {d.originalModel !== d.selectedModel &amp;&amp; (
+                        &lt;&gt;
+                          &lt;ArrowRight className=&quot;h-4 w-4&quot; /&gt;
+                          &lt;code className=&quot;bg-muted px-1 rounded&quot;&gt;{d.selectedModel}&lt;/code&gt;
+                        &lt;/&gt;
+                      )}
+                    &lt;/div&gt;
+                  &lt;/TableCell&gt;
+                  &lt;TableCell&gt;
+                    {d.savingsAmount &gt; 0 &amp;&amp; (
+                      &lt;span className=&quot;text-green-500&quot;&gt;${d.savingsAmount.toFixed(4)}&lt;/span&gt;
+                    )}
+                  &lt;/TableCell&gt;
+                  &lt;TableCell className=&quot;max-w-xs truncate text-sm text-muted-foreground&quot;&gt;
+                    {d.reason}
+                  &lt;/TableCell&gt;
+                &lt;/TableRow&gt;
+              ))}
+              {recentDecisions.length === 0 &amp;&amp; (
+                &lt;TableRow&gt;
+                  &lt;TableCell colSpan={5} className=&quot;text-center text-muted-foreground py-8&quot;&gt;
+                    No recent decisions
+                  &lt;/TableCell&gt;
+                &lt;/TableRow&gt;
+              )}
+            &lt;/TableBody&gt;
+          &lt;/Table&gt;
+        &lt;/CardContent&gt;
+      &lt;/Card&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<hr />
+<h2 id="think-tank-workflow-integration">15. Think Tank Workflow Integration</h2>
+<p><strong>File</strong>: <code>packages/flyte/workflows/think_tank_workflow.py</code> (excerpt)</p>
+<p><strong>Purpose</strong>: Shows how The Grimoire and Economic Governor integrate into the main Think Tank workflow.</p>
+<pre class="python"><code>&quot;&quot;&quot;
+Think Tank Workflow - Grimoire &amp; Governor Integration
+
+RADIANT v5.0.2 - System Evolution
+
+This excerpt shows how The Grimoire and Economic Governor
+integrate into the Human-in-the-Loop Think Tank workflow.
+&quot;&quot;&quot;
+
+from flytekit import workflow, dynamic
+from dataclasses import dataclass
+from typing import Optional, List
+
+from radiant.flyte.workflows.grimoire_tasks import consult_grimoire, librarian_review
+from radiant.flyte.utils import EconomicGovernor, GovernorDecision
+
+
+@dataclass
+class ThinkTankRequest:
+    tenant_id: str
+    user_id: str
+    prompt: str
+    domain: str
+    session_id: str
+    model: Optional[str] = None
+
+
+@dataclass  
+class ThinkTankResult:
+    response: str
+    execution_id: str
+    model_used: str
+    grimoire_heuristics_used: int
+    governor_savings: float
+    was_successful: bool
+
+
+@workflow
+def think_tank_hitl_workflow(request: ThinkTankRequest) -&gt; ThinkTankResult:
+    &quot;&quot;&quot;
+    Human-in-the-Loop reasoning workflow with procedural memory and cost optimization.
+    
+    Flow:
+    1. Consult Grimoire for relevant heuristics
+    2. Economic Governor evaluates task complexity
+    3. Execute with optimal model
+    4. On success, Librarian reviews for new heuristics
+    &quot;&quot;&quot;
+    
+    # Step 1: Consult The Grimoire
+    grimoire_result = consult_grimoire(
+        tenant_id=request.tenant_id,
+        prompt=request.prompt,
+        domain=request.domain
+    )
+    
+    # Step 2: Economic Governor evaluation
+    governor = EconomicGovernor()
+    decision = governor.evaluate_task(
+        task={&#39;type&#39;: &#39;think_tank&#39;, &#39;prompt&#39;: request.prompt, &#39;context&#39;: {}},
+        agent={&#39;agent_id&#39;: &#39;thinktank&#39;, &#39;role&#39;: &#39;reasoner&#39;, &#39;model&#39;: request.model or &#39;gpt-4o&#39;},
+        domain=request.domain
+    )
+    
+    # Step 3: Build augmented prompt with heuristics
+    augmented_prompt = grimoire_result.context_injection + &quot;\n\n&quot; + request.prompt
+    
+    # Step 4: Execute with selected model
+    # ... (AI execution logic)
+    response = &quot;...&quot;  # Placeholder
+    execution_id = &quot;...&quot;
+    was_successful = True
+    
+    # Step 5: Librarian review on success
+    if was_successful:
+        librarian_review(
+            tenant_id=request.tenant_id,
+            execution_id=execution_id,
+            prompt=request.prompt,
+            response=response,
+            domain=request.domain,
+            was_successful=True,
+            user_rating=None  # Will be updated async
+        )
+    
+    return ThinkTankResult(
+        response=response,
+        execution_id=execution_id,
+        model_used=decision.selected_model,
+        grimoire_heuristics_used=len(grimoire_result.heuristics),
+        governor_savings=decision.estimated_savings,
+        was_successful=was_successful
+    )</code></pre>
+<hr />
+<h1 id="export-complete">Export Complete</h1>
+<p>This concludes the comprehensive source export for <strong>The Grimoire</strong> and <strong>Economic Governor</strong> systems in RADIANT v5.0.2.</p>
+<p><strong>Files Included:</strong> 1. Database Schema Migration (SQL) 2. Economic Governor Service (TypeScript) 3. Governor Module Exports (TypeScript) 4. Grimoire API Handler (TypeScript) 5. Governor API Handler (TypeScript) 6. Grimoire Flyte Tasks (Python) 7. Database Utilities (Python) 8. Embedding Utilities (Python) 9. Cato Safety Client (Python) 10. Python Utils Module Exports (Python) 11. CDK Infrastructure Stack (TypeScript) 12. Cleanup Lambda Handler (Python) 13. Grimoire Admin UI (React/TSX) 14. Governor Admin UI (React/TSX) 15. Think Tank Workflow Integration (Python)</p>
+<p><strong>Total:</strong> 15 source files across 5 documentation parts.</p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

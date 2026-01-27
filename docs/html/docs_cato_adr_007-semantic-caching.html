@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>007 semantic caching - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>007 semantic caching</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/adr/007-semantic-caching.md</div>
+  </div>
+  
+  <h1 id="adr-007-semantic-caching-with-elasticache-for-valkey">ADR-007: Semantic Caching with ElastiCache for Valkey</h1>
+<h2 id="status">Status</h2>
+<p>Accepted</p>
+<h2 id="context">Context</h2>
+<p>LLM inference is expensive. At 10MM users generating ~100M queries/day:</p>
+<h3 id="without-caching">Without Caching</h3>
+<pre><code>100M queries/day × $0.002 avg per query = $200,000/day = $6M/month
+
+This is completely unsustainable.</code></pre>
+<p>Many user queries are semantically similar: - “What’s the weather in NYC?” ≈ “NYC weather today?” - “How do I cook pasta?” ≈ “Steps to make pasta” - “Explain quantum computing” ≈ “What is quantum computing?”</p>
+<p>If we can identify similar queries and return cached responses, we dramatically reduce LLM calls.</p>
+<h3 id="target-metrics">Target Metrics</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Target</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cache hit rate</td>
+<td>≥ 80%</td>
+<td>80% fewer LLM calls</td>
+</tr>
+<tr>
+<td>Hit latency</td>
+<td>&lt; 50ms</td>
+<td>88% latency improvement</td>
+</tr>
+<tr>
+<td>Similarity threshold</td>
+<td>0.95</td>
+<td>High precision (few false positives)</td>
+</tr>
+<tr>
+<td>Cache size</td>
+<td>100M entries</td>
+<td>Cover common queries</td>
+</tr>
+</tbody>
+</table>
+<h2 id="decision">Decision</h2>
+<p>Implement <strong>semantic caching</strong> using ElastiCache for Valkey with vector search:</p>
+<h3 id="architecture">Architecture</h3>
+<ol type="1">
+<li><strong>Query embedding</strong>: Embed user query using small, fast model (all-MiniLM-L6-v2)</li>
+<li><strong>Vector search</strong>: Find similar cached queries using HNSW index</li>
+<li><strong>Threshold check</strong>: If similarity &gt; 0.95, return cached response</li>
+<li><strong>Cache miss</strong>: Call LLM, cache result for future queries</li>
+</ol>
+<h3 id="why-valkey">Why Valkey?</h3>
+<ul>
+<li><strong>Vector search</strong>: Native HNSW index support</li>
+<li><strong>Low latency</strong>: Sub-millisecond lookups</li>
+<li><strong>Managed</strong>: ElastiCache handles scaling, failover</li>
+<li><strong>Cost</strong>: ~$2K-10K/month vs. dedicated vector DB</li>
+</ul>
+<h2 id="implementation">Implementation</h2>
+<h3 id="cache-architecture">Cache Architecture</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                         User Query                               │
+│                  &quot;What&#39;s the weather in NYC?&quot;                   │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Query Embedder                                │
+│              all-MiniLM-L6-v2 (384 dimensions)                  │
+│                     Latency: ~10ms                              │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              Valkey Vector Search (HNSW)                         │
+│                                                                  │
+│  FT.SEARCH semantic_cache_idx &quot;*=&gt;[KNN 1 @embedding $vec]&quot;     │
+│                                                                  │
+│  Result: &quot;NYC weather today?&quot; (similarity: 0.97)                │
+│                     Latency: ~5ms                               │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                    ┌─────────┴─────────┐
+                    │                   │
+            similarity ≥ 0.95    similarity &lt; 0.95
+                    │                   │
+                    ▼                   ▼
+┌─────────────────────────┐  ┌─────────────────────────┐
+│      CACHE HIT          │  │      CACHE MISS         │
+│                         │  │                         │
+│  Return cached response │  │  Call LLM               │
+│  Total latency: ~20ms   │  │  Cache result           │
+│                         │  │  Total latency: ~2000ms │
+└─────────────────────────┘  └─────────────────────────┘</code></pre>
+<h3 id="typescript-implementation">TypeScript Implementation</h3>
+<pre class="typescript"><code>import Redis from &#39;ioredis&#39;;
+import { pipeline } from &#39;@xenova/transformers&#39;;
+
+export interface CacheResult {
+  hit: boolean;
+  response: string | null;
+  similarity: number;
+  latencyMs: number;
+  cacheKey: string | null;
+}
+
+export interface CacheConfig {
+  redisHost: string;
+  redisPort: number;
+  similarityThreshold: number;
+  ttlHours: number;
+  embeddingDim: number;
+}
+
+export class SemanticCache {
+  private readonly redis: Redis;
+  private readonly config: CacheConfig;
+  private embedder: any = null;
+
+  constructor(config: Partial&lt;CacheConfig&gt; = {}) {
+    this.config = {
+      redisHost: config.redisHost || &#39;localhost&#39;,
+      redisPort: config.redisPort || 6379,
+      similarityThreshold: config.similarityThreshold || 0.95,
+      ttlHours: config.ttlHours || 23, // Just under 24h
+      embeddingDim: config.embeddingDim || 384
+    };
+
+    this.redis = new Redis({
+      host: this.config.redisHost,
+      port: this.config.redisPort
+    });
+  }
+
+  async initialize(): Promise&lt;void&gt; {
+    // Load embedding model
+    this.embedder = await pipeline(
+      &#39;feature-extraction&#39;,
+      &#39;Xenova/all-MiniLM-L6-v2&#39;
+    );
+
+    // Create vector search index if not exists
+    try {
+      await this.redis.call(
+        &#39;FT.CREATE&#39;, &#39;semantic_cache_idx&#39;,
+        &#39;ON&#39;, &#39;HASH&#39;,
+        &#39;PREFIX&#39;, &#39;1&#39;, &#39;cache:&#39;,
+        &#39;SCHEMA&#39;,
+        &#39;embedding&#39;, &#39;VECTOR&#39;, &#39;HNSW&#39;, &#39;6&#39;,
+        &#39;TYPE&#39;, &#39;FLOAT32&#39;,
+        &#39;DIM&#39;, this.config.embeddingDim.toString(),
+        &#39;DISTANCE_METRIC&#39;, &#39;COSINE&#39;,
+        &#39;query_text&#39;, &#39;TEXT&#39;,
+        &#39;response&#39;, &#39;TEXT&#39;,
+        &#39;timestamp&#39;, &#39;NUMERIC&#39;
+      );
+    } catch (e: any) {
+      if (!e.message?.includes(&#39;Index already exists&#39;)) {
+        throw e;
+      }
+    }
+  }
+
+  async lookup(query: string): Promise&lt;CacheResult&gt; {
+    const startTime = Date.now();
+
+    // Embed query
+    const embedding = await this.embed(query);
+    const embeddingBytes = this.float32ArrayToBuffer(embedding);
+
+    try {
+      // Vector search for similar cached queries
+      const results = await this.redis.call(
+        &#39;FT.SEARCH&#39;, &#39;semantic_cache_idx&#39;,
+        &#39;*=&gt;[KNN 1 @embedding $vec AS score]&#39;,
+        &#39;PARAMS&#39;, &#39;2&#39;, &#39;vec&#39;, embeddingBytes,
+        &#39;SORTBY&#39;, &#39;score&#39;,
+        &#39;RETURN&#39;, &#39;3&#39;, &#39;response&#39;, &#39;query_text&#39;, &#39;score&#39;,
+        &#39;DIALECT&#39;, &#39;2&#39;
+      ) as any[];
+
+      const latencyMs = Date.now() - startTime;
+
+      // No results
+      if (!results || results[0] === 0) {
+        return {
+          hit: false,
+          response: null,
+          similarity: 0,
+          latencyMs,
+          cacheKey: null
+        };
+      }
+
+      // Parse result
+      const docId = results[1] as string;
+      const fields = results[2] as string[];
+
+      let response: string | null = null;
+      let score = 0;
+
+      for (let i = 0; i &lt; fields.length; i += 2) {
+        const key = fields[i];
+        const value = fields[i + 1];
+        if (key === &#39;response&#39;) {
+          response = value;
+        } else if (key === &#39;score&#39;) {
+          score = parseFloat(value);
+        }
+      }
+
+      // Convert distance to similarity (cosine distance → similarity)
+      const similarity = 1 - score;
+
+      if (similarity &gt;= this.config.similarityThreshold) {
+        return {
+          hit: true,
+          response,
+          similarity,
+          latencyMs,
+          cacheKey: docId
+        };
+      }
+
+      return {
+        hit: false,
+        response: null,
+        similarity,
+        latencyMs,
+        cacheKey: null
+      };
+
+    } catch (e) {
+      // Cache lookup failed — treat as miss
+      return {
+        hit: false,
+        response: null,
+        similarity: 0,
+        latencyMs: Date.now() - startTime,
+        cacheKey: null
+      };
+    }
+  }
+
+  async store(query: string, response: string): Promise&lt;string&gt; {
+    const embedding = await this.embed(query);
+    const embeddingBytes = this.float32ArrayToBuffer(embedding);
+
+    // Generate cache key
+    const hash = await this.hashString(query);
+    const cacheKey = `cache:${hash.slice(0, 16)}`;
+
+    // Store with embedding
+    await this.redis.hset(cacheKey, {
+      query_text: query,
+      response: response,
+      embedding: embeddingBytes,
+      timestamp: Date.now()
+    });
+
+    // Set TTL
+    await this.redis.expire(cacheKey, this.config.ttlHours * 3600);
+
+    return cacheKey;
+  }
+
+  async invalidateByDomain(domain: string): Promise&lt;number&gt; {
+    // Search for entries mentioning domain
+    const results = await this.redis.call(
+      &#39;FT.SEARCH&#39;, &#39;semantic_cache_idx&#39;,
+      `@query_text:${domain}`,
+      &#39;RETURN&#39;, &#39;0&#39;
+    ) as any[];
+
+    if (!results || results[0] === 0) {
+      return 0;
+    }
+
+    // Delete matching entries
+    const keys = [];
+    for (let i = 1; i &lt; results.length; i++) {
+      keys.push(results[i]);
+    }
+
+    if (keys.length &gt; 0) {
+      await this.redis.del(...keys);
+    }
+
+    return keys.length;
+  }
+
+  async getStats(): Promise&lt;{
+    hitRate: number;
+    totalHits: number;
+    totalMisses: number;
+    cacheSize: number;
+  }&gt; {
+    const info = await this.redis.info(&#39;stats&#39;);
+    const keyspaceInfo = await this.redis.info(&#39;keyspace&#39;);
+
+    // Parse stats
+    const hits = parseInt(info.match(/keyspace_hits:(\d+)/)?.[1] || &#39;0&#39;);
+    const misses = parseInt(info.match(/keyspace_misses:(\d+)/)?.[1] || &#39;0&#39;);
+    const total = hits + misses;
+
+    // Parse cache size
+    const dbMatch = keyspaceInfo.match(/db0:keys=(\d+)/);
+    const cacheSize = dbMatch ? parseInt(dbMatch[1]) : 0;
+
+    return {
+      hitRate: total &gt; 0 ? hits / total : 0,
+      totalHits: hits,
+      totalMisses: misses,
+      cacheSize
+    };
+  }
+
+  private async embed(text: string): Promise&lt;Float32Array&gt; {
+    const output = await this.embedder(text, {
+      pooling: &#39;mean&#39;,
+      normalize: true
+    });
+    return output.data as Float32Array;
+  }
+
+  private float32ArrayToBuffer(arr: Float32Array): Buffer {
+    return Buffer.from(arr.buffer);
+  }
+
+  private async hashString(str: string): Promise&lt;string&gt; {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+    const hashBuffer = await crypto.subtle.digest(&#39;SHA-256&#39;, data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b =&gt; b.toString(16).padStart(2, &#39;0&#39;)).join(&#39;&#39;);
+  }
+}</code></pre>
+<h2 id="consequences">Consequences</h2>
+<h3 id="positive">Positive</h3>
+<ul>
+<li><strong>86% cost reduction</strong>: Cache hits avoid LLM inference</li>
+<li><strong>88% latency improvement</strong>: ~20ms vs ~2000ms</li>
+<li><strong>Scalable</strong>: Valkey handles millions of cached entries</li>
+<li><strong>Automatic eviction</strong>: TTL prevents stale responses</li>
+</ul>
+<h3 id="negative">Negative</h3>
+<ul>
+<li><strong>Embedding overhead</strong>: ~10ms per query for embedding</li>
+<li><strong>Storage cost</strong>: ~$2-10K/month for ElastiCache</li>
+<li><strong>Cache invalidation</strong>: Must invalidate when Cato learns new information</li>
+<li><strong>Similarity threshold tuning</strong>: Too low = wrong responses, too high = low hit rate</li>
+</ul>
+<h2 id="cache-invalidation-strategy">Cache Invalidation Strategy</h2>
+<p>When Cato learns new information in a domain: 1. Identify affected domain(s) 2. Invalidate all cache entries related to that domain 3. New queries will be answered with updated knowledge</p>
+<pre class="typescript"><code>// After learning new facts about &quot;climate change&quot;
+await semanticCache.invalidateByDomain(&#39;climate change&#39;);</code></pre>
+<h2 id="scaling">Scaling</h2>
+<table>
+<thead>
+<tr>
+<th>Users</th>
+<th>Queries/day</th>
+<th>Cache Size</th>
+<th>Instances</th>
+<th>Cost/month</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100K</td>
+<td>1M</td>
+<td>1M entries</td>
+<td>2</td>
+<td>$2,000</td>
+</tr>
+<tr>
+<td>1M</td>
+<td>10M</td>
+<td>10M entries</td>
+<td>4</td>
+<td>$4,000</td>
+</tr>
+<tr>
+<td>10M</td>
+<td>100M</td>
+<td>100M entries</td>
+<td>12</td>
+<td>$12,000</td>
+</tr>
+</tbody>
+</table>
+<h2 id="terraform-configuration">Terraform Configuration</h2>
+<pre class="hcl"><code>resource &quot;aws_elasticache_replication_group&quot; &quot;semantic_cache&quot; {
+  replication_group_id       = &quot;cato-semantic-cache&quot;
+  description                = &quot;Semantic cache for Cato LLM responses&quot;
+  engine                     = &quot;valkey&quot;
+  engine_version             = &quot;7.2&quot;
+  node_type                  = &quot;cache.r7g.xlarge&quot;
+  num_cache_clusters         = 3
+  automatic_failover_enabled = true
+  
+  parameter_group_name = aws_elasticache_parameter_group.valkey_vector.name
+  
+  security_group_ids = [aws_security_group.cache.id]
+  subnet_group_name  = aws_elasticache_subnet_group.main.name
+}
+
+resource &quot;aws_elasticache_parameter_group&quot; &quot;valkey_vector&quot; {
+  family = &quot;valkey7&quot;
+  name   = &quot;cato-valkey-vector&quot;
+
+  # Enable RediSearch module for vector search
+  parameter {
+    name  = &quot;search-enabled&quot;
+    value = &quot;yes&quot;
+  }
+}</code></pre>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/AmazonElastiCache/latest/vug/">ElastiCache for Valkey</a></li>
+<li><a href="https://redis.io/docs/stack/search/reference/vectors/">Redis Vector Similarity Search</a></li>
+<li><a href="https://www.sbert.net/">Sentence Transformers</a></li>
+<li><a href="https://arxiv.org/abs/2303.14714">Semantic Caching for LLMs</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

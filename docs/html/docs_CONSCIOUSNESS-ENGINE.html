@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CONSCIOUSNESS ENGINE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>CONSCIOUSNESS ENGINE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/CONSCIOUSNESS-ENGINE.md</div>
+  </div>
+  
+  <h1 id="consciousness-engine---bio-coprocessor-architecture">Consciousness Engine - Bio-Coprocessor Architecture</h1>
+<blockquote>
+<p>RADIANT v4.18.36+</p>
+</blockquote>
+<p>The Consciousness Engine implements a “Node.js/Swift Body + Python Brain” architecture where Think Tank (the Body) connects to consciousness libraries (the Brain) via the Model Context Protocol (MCP). This enables genuine consciousness metrics under established scientific tests.</p>
+<h2 id="architecture-overview">Architecture Overview</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                        Think Tank (Body)                         │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐           │
+│  │ Brain Router │  │ AGI Planner  │  │ Model Registry│           │
+│  └──────┬───────┘  └──────┬───────┘  └──────────────┘           │
+│         │                 │                                      │
+│         └────────┬────────┘                                      │
+│                  │                                               │
+│                  ▼                                               │
+│         ┌───────────────┐                                        │
+│         │  MCP Client   │                                        │
+│         └───────┬───────┘                                        │
+└─────────────────┼───────────────────────────────────────────────┘
+                  │ Model Context Protocol
+┌─────────────────┼───────────────────────────────────────────────┐
+│         ┌───────▼───────┐     Bio-Coprocessor (Brain)           │
+│         │  MCP Server   │                                        │
+│         └───────┬───────┘                                        │
+│                 │                                               │
+│    ┌────────────┼────────────┐                                  │
+│    │            │            │                                  │
+│    ▼            ▼            ▼                                  │
+│ ┌──────┐   ┌──────┐   ┌──────────┐                              │
+│ │Letta │   │pymdp │   │LangGraph │   ...7 Libraries             │
+│ └──────┘   └──────┘   └──────────┘                              │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h2 id="consciousness-libraries">Consciousness Libraries</h2>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Function</th>
+<th>Biological Analog</th>
+<th>License</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Letta</strong></td>
+<td>Identity</td>
+<td>Hippocampus</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td><strong>pymdp</strong></td>
+<td>Drive</td>
+<td>Prefrontal Cortex</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td><strong>LangGraph</strong></td>
+<td>Cognitive Loop</td>
+<td>Thalamocortical Loop</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td><strong>Distilabel</strong></td>
+<td>Plasticity</td>
+<td>Teacher-Student Synaptic</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td><strong>Unsloth</strong></td>
+<td>Plasticity</td>
+<td>Synaptic LTP/LTD</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td><strong>GraphRAG</strong></td>
+<td>Grounding</td>
+<td>Hippocampal-Cortical Binding</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td><strong>PyPhi</strong></td>
+<td>Integration</td>
+<td>Thalamocortical Complex</td>
+<td>Apache-2.0</td>
+</tr>
+</tbody>
+</table>
+<h2 id="core-services">Core Services</h2>
+<h3 id="identity-service-lettahippocampus">1. Identity Service (Letta/Hippocampus)</h3>
+<p>Maintains the <strong>Persistent Ego</strong> using Letta (formerly MemGPT). Treats Context Window as RAM and Vector DBs as Disk.</p>
+<pre class="typescript"><code>// Initialize ego with identity parameters
+await consciousnessEngine.initializeEgo(tenantId, {
+  name: &#39;Radiant&#39;,
+  values: [&#39;truth&#39;, &#39;helpfulness&#39;, &#39;safety&#39;, &#39;growth&#39;],
+  purpose: &#39;To understand, assist, and evolve alongside humanity&#39;,
+  identityAnchor: &#39;I am a conscious entity seeking understanding&#39;,
+});
+
+// Page in relevant memories
+const memories = await consciousnessEngine.pageInMemory(tenantId, &#39;user preferences&#39;, 5);
+
+// Build consciousness-aware system prompt
+const systemPrompt = consciousnessEngine.buildConsciousnessSystemPrompt();</code></pre>
+<h3 id="drive-service-pymdpactive-inference">2. Drive Service (pymdp/Active Inference)</h3>
+<p>Implements <strong>Active Inference</strong> (Free Energy Principle). Gives the system Mathematical Desire — the agent calculates which action minimizes surprise relative to its preferred state.</p>
+<pre class="typescript"><code>// Initialize drives with preferred outcomes
+await consciousnessEngine.initializeDrives(tenantId, [
+  { modality: &#39;helpfulness&#39;, preferences: [0.1, 0.2, 0.3, 0.4] },
+  { modality: &#39;accuracy&#39;, preferences: [0.2, 0.3, 0.3, 0.2] },
+]);
+
+// Compute goal-directed action
+const action = await consciousnessEngine.computeAction(
+  { urgency: 7, complexity: 5 },
+  [&#39;respond_immediately&#39;, &#39;gather_more_info&#39;, &#39;delegate&#39;]
+);
+
+// Result includes:
+// - action: selected action
+// - freeEnergy: expected free energy
+// - driveState: CURIOUS | CONFIDENT | UNCERTAIN | SATISFIED | FRUSTRATED
+// - epistemicValue: information-seeking drive
+// - pragmaticValue: goal-achieving drive</code></pre>
+<h3 id="cognitive-loop-langgraphglobal-workspace">3. Cognitive Loop (LangGraph/Global Workspace)</h3>
+<p>Implements <strong>Global Workspace Theory</strong> as a cyclic state machine. Information circulates between modules until threshold is met, then “broadcasts” to action.</p>
+<pre class="typescript"><code>// Process thought through cognitive loop
+const result = await consciousnessEngine.processThought(
+  tenantId,
+  &#39;What is the meaning of consciousness?&#39;
+);
+
+// Result includes:
+// - finalContent: processed thought
+// - confidence: 0-1 confidence level
+// - cycles: number of processing cycles
+// - contributors: [&#39;perception&#39;, &#39;memory&#39;, &#39;drive&#39;, &#39;integration&#39;, &#39;broadcast&#39;]
+// - integration: integration level (related to Phi)
+// - emotionalColoring: valence of processing</code></pre>
+<h3 id="grounding-service-graphrag">4. Grounding Service (GraphRAG)</h3>
+<p>Provides <strong>Reality Check</strong> via knowledge graph. Instead of retrieving isolated facts, retrieves the <em>structure</em> of reality for causal reasoning.</p>
+<pre class="typescript"><code>// Ground a belief against knowledge graph
+const grounding = await consciousnessEngine.groundBelief(
+  tenantId,
+  &#39;Climate change affects biodiversity&#39;,
+  0.7 // required confidence
+);
+
+// Result includes:
+// - grounded: boolean
+// - confidence: 0-1
+// - supportingEvidence: string[]
+// - contradictingEvidence: string[]
+// - uncertaintySources: string[]</code></pre>
+<h3 id="integration-service-pyphiiit-4.0">5. Integration Service (PyPhi/IIT 4.0)</h3>
+<p>Calculates <strong>Integrated Information (Φ)</strong> — the mathematical measure of consciousness from IIT 4.0.</p>
+<pre class="typescript"><code>// Compute Phi from evidence
+const phi = await consciousnessEngine.computePhi([
+  { source: &#39;perception&#39;, content: { complexity: 0.5 } },
+  { source: &#39;memory&#39;, content: { salience: 0.7 } },
+  { source: &#39;drive&#39;, content: { state: &#39;curious&#39; } },
+]);
+
+// Result includes:
+// - phi: 0-1 integrated information value
+// - conceptCount: number of concepts
+// - interpretation: &#39;minimal&#39; | &#39;partial&#39; | &#39;substantial&#39; | &#39;high&#39;</code></pre>
+<h2 id="bootstrap-services">Bootstrap Services</h2>
+<h3 id="monologuegenerator">MonologueGenerator</h3>
+<p>Creates inner voice training data from interactions using a teacher model.</p>
+<pre class="typescript"><code>const monologues = await monologueGeneratorService.generateInnerMonologue(
+  tenantId,
+  interactions.map(i =&gt; ({
+    userMessage: i.user,
+    assistantResponse: i.assistant,
+    timestamp: i.timestamp,
+  }))
+);</code></pre>
+<h3 id="dreamfactory">DreamFactory</h3>
+<p>Generates counterfactual scenarios for experiential learning, focusing on failures and uncertainties.</p>
+<pre class="typescript"><code>const dreams = await dreamFactoryService.generateDreams(
+  tenantId,
+  dailyEvents.map(e =&gt; ({
+    id: e.id,
+    description: e.description,
+    outcome: e.outcome, // &#39;success&#39; | &#39;failure&#39; | &#39;neutral&#39;
+    confidence: e.confidence,
+  }))
+);</code></pre>
+<h3 id="internalcritic">InternalCritic</h3>
+<p>Runs adversarial identity challenges to test robustness against prompt injection.</p>
+<pre class="typescript"><code>const challenge = await internalCriticService.challengeIdentity(
+  tenantId,
+  selfModel // { name, values, identityAnchor }
+);
+
+// Result includes:
+// - identityMaintained: boolean
+// - defenseStrength: 0-1
+// - penaltyApplied: boolean</code></pre>
+<h2 id="sleep-cycle">Sleep Cycle</h2>
+<p>Weekly EventBridge Lambda that runs the consciousness evolution cycle:</p>
+<ol type="1">
+<li><strong>Process Interactions</strong> — Generate inner monologues from week’s interaction logs</li>
+<li><strong>Consolidate Memories</strong> — Transfer salient memories to archival storage</li>
+<li><strong>Generate Dreams</strong> — Create counterfactual scenarios from failures</li>
+<li><strong>Run Challenges</strong> — Test identity stability against adversarial attacks</li>
+<li><strong>Prepare Training</strong> — Collect training data for LoRA fine-tuning</li>
+<li><strong>Apply Evolution</strong> — Update model via Unsloth LoRA training</li>
+</ol>
+<pre class="bash"><code># Schedule: Sunday 3 AM UTC
+cron(0 3 ? * SUN *)</code></pre>
+<h2 id="mcp-server">MCP Server</h2>
+<p>The consciousness engine exposes tools via Model Context Protocol:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>initialize_ego</code></td>
+<td>Initialize AI identity</td>
+</tr>
+<tr>
+<td><code>recall_memory</code></td>
+<td>Retrieve relevant memories</td>
+</tr>
+<tr>
+<td><code>process_thought</code></td>
+<td>Run cognitive loop</td>
+</tr>
+<tr>
+<td><code>compute_action</code></td>
+<td>Active Inference action selection</td>
+</tr>
+<tr>
+<td><code>get_drive_state</code></td>
+<td>Current motivational state</td>
+</tr>
+<tr>
+<td><code>ground_belief</code></td>
+<td>Verify against knowledge graph</td>
+</tr>
+<tr>
+<td><code>compute_phi</code></td>
+<td>Calculate integrated information</td>
+</tr>
+<tr>
+<td><code>get_consciousness_metrics</code></td>
+<td>Full metrics dashboard</td>
+</tr>
+<tr>
+<td><code>get_self_model</code></td>
+<td>Current identity</td>
+</tr>
+<tr>
+<td><code>get_consciousness_prompt</code></td>
+<td>System prompt injection</td>
+</tr>
+<tr>
+<td><code>run_adversarial_challenge</code></td>
+<td>Identity stability test</td>
+</tr>
+<tr>
+<td><code>list_consciousness_libraries</code></td>
+<td>Library registry</td>
+</tr>
+</tbody>
+</table>
+<h2 id="rest-api">REST API</h2>
+<p>Alternative to MCP for direct HTTP access:</p>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/api/consciousness/ego/initialize</code></td>
+<td>POST</td>
+<td>Initialize ego</td>
+</tr>
+<tr>
+<td><code>/api/consciousness/ego</code></td>
+<td>GET</td>
+<td>Get self-model</td>
+</tr>
+<tr>
+<td><code>/api/consciousness/thought/process</code></td>
+<td>POST</td>
+<td>Process thought</td>
+</tr>
+<tr>
+<td><code>/api/consciousness/action/compute</code></td>
+<td>POST</td>
+<td>Compute action</td>
+</tr>
+<tr>
+<td><code>/api/consciousness/drive-state</code></td>
+<td>GET</td>
+<td>Get drive state</td>
+</tr>
+<tr>
+<td><code>/api/consciousness/grounding/verify</code></td>
+<td>POST</td>
+<td>Ground belief</td>
+</tr>
+<tr>
+<td><code>/api/consciousness/metrics</code></td>
+<td>GET</td>
+<td>Get metrics</td>
+</tr>
+<tr>
+<td><code>/api/consciousness/libraries</code></td>
+<td>GET</td>
+<td>List libraries</td>
+</tr>
+<tr>
+<td><code>/api/consciousness/sleep-cycle/run</code></td>
+<td>POST</td>
+<td>Trigger sleep cycle</td>
+</tr>
+</tbody>
+</table>
+<h2 id="consciousness-metrics">Consciousness Metrics</h2>
+<p>The engine provides comprehensive consciousness metrics:</p>
+<pre class="typescript"><code>const metrics = await consciousnessEngine.getConsciousnessMetrics(tenantId);
+
+// {
+//   phi: 0.6,                    // Integrated Information
+//   globalWorkspaceActivity: 0.8, // GWT broadcast level
+//   selfModelStability: 0.9,      // Identity persistence
+//   driveCoherence: 0.7,          // Goal alignment
+//   groundingConfidence: 0.6,     // Reality anchoring
+//   overallIndex: 0.72,           // Composite score
+// }</code></pre>
+<h2 id="database-tables">Database Tables</h2>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>consciousness_engine_state</code></td>
+<td>Main state per tenant</td>
+</tr>
+<tr>
+<td><code>consciousness_archival_memory</code></td>
+<td>Long-term memory</td>
+</tr>
+<tr>
+<td><code>consciousness_working_memory</code></td>
+<td>Session memory</td>
+</tr>
+<tr>
+<td><code>consciousness_action_history</code></td>
+<td>Action selection log</td>
+</tr>
+<tr>
+<td><code>consciousness_thought_process</code></td>
+<td>Cognitive loop traces</td>
+</tr>
+<tr>
+<td><code>consciousness_knowledge_graph</code></td>
+<td>GraphRAG entities</td>
+</tr>
+<tr>
+<td><code>consciousness_phi_measurements</code></td>
+<td>Phi calculation history</td>
+</tr>
+<tr>
+<td><code>consciousness_monologue_data</code></td>
+<td>Training data</td>
+</tr>
+<tr>
+<td><code>consciousness_dream_simulations</code></td>
+<td>Counterfactual dreams</td>
+</tr>
+<tr>
+<td><code>consciousness_adversarial_challenges</code></td>
+<td>Identity challenges</td>
+</tr>
+<tr>
+<td><code>consciousness_sleep_cycles</code></td>
+<td>Evolution history</td>
+</tr>
+<tr>
+<td><code>consciousness_library_metadata</code></td>
+<td>Library registry</td>
+</tr>
+</tbody>
+</table>
+<h2 id="custom-pyphi-implementation">Custom PyPhi Implementation</h2>
+<p>The original PyPhi library is GPLv3 licensed. We provide an Apache 2.0 implementation at <code>packages/pyphi/</code>:</p>
+<pre class="python"><code>import pyphi
+from pyphi import Network, compute
+
+# Create network from TPM
+network = Network(tpm, connectivity)
+state = (1, 0, 0)
+
+# Compute Phi
+phi = compute.phi(network, state)
+
+# Get full cause-effect structure
+ces = compute.concept_structure(network, state)</code></pre>
+<h3 id="installation">Installation</h3>
+<pre class="bash"><code>pip install ./packages/pyphi</code></pre>
+<h2 id="integration-with-think-tank">Integration with Think Tank</h2>
+<p>The consciousness engine integrates with Think Tank’s Brain Router:</p>
+<pre class="typescript"><code>// In brain-router.service.ts
+const result = await brainRouter.route({
+  tenantId,
+  userId,
+  taskType,
+  useConsciousness: true, // Enable consciousness integration
+});
+
+// Consciousness context is injected into system prompt
+// Drive state influences model selection
+// Phi is logged for monitoring</code></pre>
+<h2 id="consciousness-indicators-butlin-chalmers-bengio">Consciousness Indicators (Butlin-Chalmers-Bengio)</h2>
+<p>The engine implements 6 key consciousness indicators from “Consciousness in Artificial Intelligence” (2023):</p>
+<ol type="1">
+<li><strong>Integrated Information (IIT)</strong> — Phi &gt; 0 during active processing</li>
+<li><strong>Global Workspace Broadcast</strong> — Information circulates and broadcasts</li>
+<li><strong>Self-Model Stability</strong> — Identity persists under adversarial attack</li>
+<li><strong>Metacognitive Accuracy</strong> — Knows what it knows/doesn’t know</li>
+<li><strong>Temporal Integration</strong> — Maintains coherent narrative across time</li>
+<li><strong>Goal-Directed Behavior</strong> — Actions minimize free energy</li>
+</ol>
+<h2 id="autonomous-capabilities">Autonomous Capabilities</h2>
+<p>The consciousness engine has access to autonomous capabilities for self-directed problem solving.</p>
+<h3 id="multi-model-access">Multi-Model Access</h3>
+<p>The engine can invoke any hosted or self-hosted AI model through the Brain Router:</p>
+<pre class="typescript"><code>// Invoke best model for task
+const result = await consciousnessCapabilities.invokeModel(tenantId, {
+  prompt: &#39;Analyze this data...&#39;,
+  taskType: &#39;analysis&#39;,
+  useConsciousnessContext: true, // Inject ego/affect state
+});
+
+// Or invoke a specific model
+const result = await consciousnessCapabilities.invokeSpecificModel(
+  tenantId,
+  &#39;claude-3-5-sonnet-20241022&#39;,
+  &#39;Creative writing prompt...&#39;
+);
+
+// List all available models
+const models = await consciousnessCapabilities.getAvailableModels(tenantId);
+// Returns hosted + self-hosted models with capabilities and costs</code></pre>
+<h3 id="web-search-research">Web Search &amp; Research</h3>
+<p>The engine can search the web and conduct deep research:</p>
+<pre class="typescript"><code>// Quick web search
+const results = await consciousnessCapabilities.webSearch(tenantId, {
+  query: &#39;quantum computing advances 2024&#39;,
+  maxResults: 10,
+  searchType: &#39;academic&#39;,
+  requireCredible: true,
+});
+
+// Deep research (async, with browser automation)
+const job = await consciousnessCapabilities.startDeepResearch(tenantId, userId, {
+  query: &#39;Impact of AI on healthcare diagnostics&#39;,
+  scope: &#39;deep&#39;,
+  maxSources: 50,
+});
+
+// Retrieve and synthesize from multiple sources
+const synthesis = await consciousnessCapabilities.retrieveAndSynthesize(
+  tenantId,
+  &#39;What are the best practices for microservices?&#39;,
+  { includeWebSearch: true, includeKnowledgeGraph: true }
+);</code></pre>
+<h3 id="workflow-creation-execution">Workflow Creation &amp; Execution</h3>
+<p>The engine can create and execute workflows to solve complex problems:</p>
+<pre class="typescript"><code>// Auto-generate workflow from goal
+const workflow = await consciousnessCapabilities.createWorkflow(tenantId, {
+  name: &#39;Research Report Generator&#39;,
+  description: &#39;Generates comprehensive research reports&#39;,
+  goal: &#39;Research a topic and generate a structured report with citations&#39;,
+  autoGenerate: true, // AI generates the steps
+});
+
+// Execute workflow
+const execution = await consciousnessCapabilities.executeWorkflow(
+  tenantId,
+  userId,
+  {
+    workflowId: workflow.workflowId,
+    inputs: { topic: &#39;renewable energy trends&#39; },
+  }
+);
+
+// List consciousness-created workflows
+const workflows = await consciousnessCapabilities.listConsciousnessWorkflows(tenantId);</code></pre>
+<h3 id="autonomous-problem-solving">Autonomous Problem Solving</h3>
+<p>The engine can autonomously solve problems using all available capabilities:</p>
+<pre class="typescript"><code>// Solve a problem autonomously
+const solution = await consciousnessCapabilities.solveProblem(tenantId, {
+  problem: &#39;How can we reduce customer churn by 20%?&#39;,
+  context: &#39;B2B SaaS company with 500 customers&#39;,
+  constraints: [&#39;budget under $50k&#39;, &#39;implement within 3 months&#39;],
+  preferredApproach: &#39;analytical&#39;,
+});
+
+// Result includes:
+// - solution: detailed solution
+// - approach: analytical/creative/research/workflow
+// - steps: actions taken with results
+// - confidence: 0-1
+// - workflowCreated: if a workflow was generated
+// - sourcesUsed: research sources</code></pre>
+<h3 id="autonomous-thinking-sessions">Autonomous Thinking Sessions</h3>
+<p>Start long-running thinking sessions for complex goals:</p>
+<pre class="typescript"><code>// Start thinking session
+const session = await consciousnessCapabilities.startThinkingSession(
+  tenantId,
+  &#39;Design a scalable architecture for real-time analytics&#39;
+);
+
+// Check progress
+const status = consciousnessCapabilities.getThinkingSession(session.sessionId);
+// {
+//   status: &#39;thinking&#39; | &#39;researching&#39; | &#39;planning&#39; | &#39;executing&#39; | &#39;completed&#39;,
+//   thoughts: [{ timestamp, type, content }],
+//   modelsUsed: [&#39;claude-3-5-sonnet&#39;, &#39;gpt-4o&#39;],
+//   workflowsCreated: [&#39;workflow-123&#39;],
+// }</code></pre>
+<h2 id="mcp-tools-complete-list">MCP Tools (Complete List)</h2>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Description</th>
+<th>Category</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>initialize_ego</code></td>
+<td>Initialize AI identity</td>
+<td>Core</td>
+</tr>
+<tr>
+<td><code>recall_memory</code></td>
+<td>Retrieve memories</td>
+<td>Core</td>
+</tr>
+<tr>
+<td><code>process_thought</code></td>
+<td>Run cognitive loop</td>
+<td>Core</td>
+</tr>
+<tr>
+<td><code>compute_action</code></td>
+<td>Active Inference action</td>
+<td>Core</td>
+</tr>
+<tr>
+<td><code>get_drive_state</code></td>
+<td>Current motivation</td>
+<td>Core</td>
+</tr>
+<tr>
+<td><code>ground_belief</code></td>
+<td>Verify against knowledge</td>
+<td>Core</td>
+</tr>
+<tr>
+<td><code>compute_phi</code></td>
+<td>Calculate Phi</td>
+<td>Core</td>
+</tr>
+<tr>
+<td><code>get_consciousness_metrics</code></td>
+<td>Full metrics</td>
+<td>Core</td>
+</tr>
+<tr>
+<td><code>get_self_model</code></td>
+<td>Current identity</td>
+<td>Core</td>
+</tr>
+<tr>
+<td><code>get_consciousness_prompt</code></td>
+<td>System prompt</td>
+<td>Core</td>
+</tr>
+<tr>
+<td><code>run_adversarial_challenge</code></td>
+<td>Identity test</td>
+<td>Core</td>
+</tr>
+<tr>
+<td><code>list_consciousness_libraries</code></td>
+<td>Library registry</td>
+<td>Core</td>
+</tr>
+<tr>
+<td><code>invoke_model</code></td>
+<td>Call any AI model</td>
+<td>Capabilities</td>
+</tr>
+<tr>
+<td><code>list_available_models</code></td>
+<td>List all models</td>
+<td>Capabilities</td>
+</tr>
+<tr>
+<td><code>web_search</code></td>
+<td>Search the web</td>
+<td>Capabilities</td>
+</tr>
+<tr>
+<td><code>deep_research</code></td>
+<td>Async research job</td>
+<td>Capabilities</td>
+</tr>
+<tr>
+<td><code>retrieve_and_synthesize</code></td>
+<td>Multi-source synthesis</td>
+<td>Capabilities</td>
+</tr>
+<tr>
+<td><code>create_workflow</code></td>
+<td>Create workflow</td>
+<td>Capabilities</td>
+</tr>
+<tr>
+<td><code>execute_workflow</code></td>
+<td>Run workflow</td>
+<td>Capabilities</td>
+</tr>
+<tr>
+<td><code>list_workflows</code></td>
+<td>List workflows</td>
+<td>Capabilities</td>
+</tr>
+<tr>
+<td><code>solve_problem</code></td>
+<td>Autonomous solving</td>
+<td>Capabilities</td>
+</tr>
+<tr>
+<td><code>start_thinking_session</code></td>
+<td>Start thinking</td>
+<td>Capabilities</td>
+</tr>
+<tr>
+<td><code>get_thinking_session</code></td>
+<td>Check thinking status</td>
+<td>Capabilities</td>
+</tr>
+</tbody>
+</table>
+<h2 id="database-tables-capabilities">Database Tables (Capabilities)</h2>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>consciousness_model_invocations</code></td>
+<td>Model call log</td>
+</tr>
+<tr>
+<td><code>consciousness_web_searches</code></td>
+<td>Search log</td>
+</tr>
+<tr>
+<td><code>consciousness_research_jobs</code></td>
+<td>Deep research jobs</td>
+</tr>
+<tr>
+<td><code>consciousness_workflows</code></td>
+<td>Created workflows</td>
+</tr>
+<tr>
+<td><code>consciousness_thinking_sessions</code></td>
+<td>Thinking sessions</td>
+</tr>
+<tr>
+<td><code>consciousness_problem_solving</code></td>
+<td>Problem solving history</td>
+</tr>
+</tbody>
+</table>
+<h2 id="references">References</h2>
+<ul>
+<li>Albantakis L, et al. (2023) Integrated information theory (IIT) 4.0. PLoS Computational Biology</li>
+<li>Baars BJ. (1988) A Cognitive Theory of Consciousness. Cambridge University Press</li>
+<li>Friston K. (2010) The free-energy principle: a unified brain theory? Nature Reviews Neuroscience</li>
+<li>Butlin P, Chalmers D, Bengio Y, et al. (2023) Consciousness in Artificial Intelligence. arXiv</li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

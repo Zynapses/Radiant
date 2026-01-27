@@ -1,0 +1,85 @@
+/**
+ * RADIANT v5.52.29 - RTL Utility Styles (PROMPT-41D)
+ * 
+ * CSS utilities for Right-to-Left language support.
+ */
+
+/* RTL-aware margin/padding flipping */
+[dir="rtl"] .mr-2 { margin-right: 0; margin-left: 0.5rem; }
+[dir="rtl"] .ml-2 { margin-left: 0; margin-right: 0.5rem; }
+[dir="rtl"] .mr-3 { margin-right: 0; margin-left: 0.75rem; }
+[dir="rtl"] .ml-3 { margin-left: 0; margin-right: 0.75rem; }
+[dir="rtl"] .mr-4 { margin-right: 0; margin-left: 1rem; }
+[dir="rtl"] .ml-4 { margin-left: 0; margin-right: 1rem; }
+
+[dir="rtl"] .pr-2 { padding-right: 0; padding-left: 0.5rem; }
+[dir="rtl"] .pl-2 { padding-left: 0; padding-right: 0.5rem; }
+[dir="rtl"] .pr-3 { padding-right: 0; padding-left: 0.75rem; }
+[dir="rtl"] .pl-3 { padding-left: 0; padding-right: 0.75rem; }
+[dir="rtl"] .pr-4 { padding-right: 0; padding-left: 1rem; }
+[dir="rtl"] .pl-4 { padding-left: 0; padding-right: 1rem; }
+
+/* Text alignment */
+[dir="rtl"] .text-left { text-align: right; }
+[dir="rtl"] .text-right { text-align: left; }
+
+/* Flexbox direction */
+[dir="rtl"] .rtl-flip-row { flex-direction: row-reverse; }
+
+/* Border radius flipping */
+[dir="rtl"] .rounded-l-lg { border-radius: 0 0.5rem 0.5rem 0; }
+[dir="rtl"] .rounded-r-lg { border-radius: 0.5rem 0 0 0.5rem; }
+
+/* Preserve LTR for specific elements (emails, codes, passwords) */
+[dir="rtl"] input[type="email"],
+[dir="rtl"] input[type="password"],
+[dir="rtl"] input[type="tel"],
+[dir="rtl"] input[type="url"],
+[dir="rtl"] input[inputmode="numeric"],
+[dir="rtl"] .font-mono,
+[dir="rtl"] code,
+[dir="rtl"] .preserve-ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Icon flipping for directional icons */
+[dir="rtl"] .icon-flip {
+  transform: scaleX(-1);
+}
+
+/* Form label alignment */
+[dir="rtl"] label {
+  text-align: right;
+}
+
+/* Button icon positioning */
+[dir="rtl"] .btn-icon-start {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+[dir="rtl"] .btn-icon-end {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+/* Dialog/Modal positioning */
+[dir="rtl"] .dialog-close {
+  right: auto;
+  left: 1rem;
+}
+
+/* List styling */
+[dir="rtl"] ul,
+[dir="rtl"] ol {
+  padding-right: 1.5rem;
+  padding-left: 0;
+}
+
+/* Checkbox/Radio alignment */
+[dir="rtl"] .checkbox-label,
+[dir="rtl"] .radio-label {
+  padding-right: 0.5rem;
+  padding-left: 0;
+}

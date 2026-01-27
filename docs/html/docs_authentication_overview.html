@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>overview - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>overview</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/authentication/overview.md</div>
+  </div>
+  
+  <h1 id="radiant-authentication-overview">RADIANT Authentication Overview</h1>
+<blockquote>
+<p><strong>Version</strong>: 5.52.29 | <strong>Last Updated</strong>: January 25, 2026 | <strong>PROMPT-41C</strong></p>
+</blockquote>
+<p>RADIANT provides enterprise-grade authentication with multi-layer security, supporting everything from individual users to large organizations with complex security requirements.</p>
+<h2 id="key-features">Key Features</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Multi-layer authentication</strong></td>
+<td>End users, tenant admins, and platform admins</td>
+</tr>
+<tr>
+<td><strong>Enterprise SSO</strong></td>
+<td>SAML 2.0 and OIDC integration</td>
+</tr>
+<tr>
+<td><strong>Two-Factor Authentication</strong></td>
+<td>Required for admin roles</td>
+</tr>
+<tr>
+<td><strong>OAuth 2.0 Provider</strong></td>
+<td>Third-party app integrations</td>
+</tr>
+<tr>
+<td><strong>18 Language Support</strong></td>
+<td>Full internationalization including RTL</td>
+</tr>
+<tr>
+<td><strong>Multi-language Search</strong></td>
+<td>CJK (Chinese, Japanese, Korean) support</td>
+</tr>
+</tbody>
+</table>
+<h2 id="authentication-layers">Authentication Layers</h2>
+<p>RADIANT implements three distinct authentication layers, each designed for specific use cases:</p>
+<pre class="mermaid"><code>graph TB
+    subgraph &quot;Layer 1: End Users&quot;
+        EU[End Users] --&gt; UP[User Pool]
+        UP --&gt; TT[Think Tank]
+        UP --&gt; CU[Curator]
+        UP --&gt; TA[Tenant Admin]
+    end
+    
+    subgraph &quot;Layer 2: Platform Admins&quot;
+        PA[Platform Admins] --&gt; AP[Admin Pool]
+        AP --&gt; RA[RADIANT Admin]
+    end
+    
+    subgraph &quot;Layer 3: Services&quot;
+        SV[Services &amp; Apps] --&gt; AK[API Keys]
+        SV --&gt; M2M[M2M Tokens]
+        AK --&gt; API[RADIANT API]
+        M2M --&gt; API
+    end
+    
+    style EU fill:#e1f5fe
+    style PA fill:#fff3e0
+    style SV fill:#f3e5f5</code></pre>
+<h3 id="layer-1-end-user-authentication">Layer 1: End-User Authentication</h3>
+<p>For users of Think Tank, Curator, and Tenant Admin applications.</p>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Sign-in Methods</strong></td>
+<td>Email/password, Google, Microsoft, Apple, GitHub</td>
+</tr>
+<tr>
+<td><strong>Enterprise SSO</strong></td>
+<td>SAML 2.0 and OIDC for organization-wide sign-in</td>
+</tr>
+<tr>
+<td><strong>Passkeys</strong></td>
+<td>WebAuthn/FIDO2 passwordless authentication</td>
+</tr>
+<tr>
+<td><strong>MFA</strong></td>
+<td>Optional for standard users, required for tenant admins</td>
+</tr>
+<tr>
+<td><strong>Languages</strong></td>
+<td>18 languages including Arabic (RTL)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="layer-2-platform-administrator-authentication">Layer 2: Platform Administrator Authentication</h3>
+<p>For RADIANT platform operators and support staff.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Access</strong></td>
+<td>Invitation-only (no self-registration)</td>
+</tr>
+<tr>
+<td><strong>MFA</strong></td>
+<td>Always required, cannot be disabled</td>
+</tr>
+<tr>
+<td><strong>Session Timeout</strong></td>
+<td>30 minutes (shorter than end users)</td>
+</tr>
+<tr>
+<td><strong>Audit</strong></td>
+<td>All actions logged with full context</td>
+</tr>
+</tbody>
+</table>
+<h3 id="layer-3-service-authentication">Layer 3: Service Authentication</h3>
+<p>For programmatic access and third-party integrations.</p>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>API Keys</strong></td>
+<td>Long-lived keys for server-to-server communication</td>
+</tr>
+<tr>
+<td><strong>OAuth Tokens</strong></td>
+<td>Short-lived tokens for third-party apps acting as users</td>
+</tr>
+<tr>
+<td><strong>Scopes</strong></td>
+<td>Fine-grained permissions for each token/key</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="supported-languages">Supported Languages</h2>
+<p>RADIANT authentication screens are available in 18 languages:</p>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Code</th>
+<th>Direction</th>
+<th>Search Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>English</td>
+<td><code>en</code></td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Spanish</td>
+<td><code>es</code></td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>French</td>
+<td><code>fr</code></td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>German</td>
+<td><code>de</code></td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Portuguese</td>
+<td><code>pt</code></td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Italian</td>
+<td><code>it</code></td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Dutch</td>
+<td><code>nl</code></td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Polish</td>
+<td><code>pl</code></td>
+<td>LTR</td>
+<td>PostgreSQL <code>simple</code></td>
+</tr>
+<tr>
+<td>Russian</td>
+<td><code>ru</code></td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Turkish</td>
+<td><code>tr</code></td>
+<td>LTR</td>
+<td>PostgreSQL FTS</td>
+</tr>
+<tr>
+<td>Japanese</td>
+<td><code>ja</code></td>
+<td>LTR</td>
+<td><code>pg_bigm</code> bi-gram</td>
+</tr>
+<tr>
+<td>Korean</td>
+<td><code>ko</code></td>
+<td>LTR</td>
+<td><code>pg_bigm</code> bi-gram</td>
+</tr>
+<tr>
+<td>Chinese (Simplified)</td>
+<td><code>zh-CN</code></td>
+<td>LTR</td>
+<td><code>pg_bigm</code> bi-gram</td>
+</tr>
+<tr>
+<td>Chinese (Traditional)</td>
+<td><code>zh-TW</code></td>
+<td>LTR</td>
+<td><code>pg_bigm</code> bi-gram</td>
+</tr>
+<tr>
+<td><strong>Arabic</strong></td>
+<td><code>ar</code></td>
+<td><strong>RTL</strong></td>
+<td>PostgreSQL <code>simple</code></td>
+</tr>
+<tr>
+<td>Hindi</td>
+<td><code>hi</code></td>
+<td>LTR</td>
+<td>PostgreSQL <code>simple</code></td>
+</tr>
+<tr>
+<td>Thai</td>
+<td><code>th</code></td>
+<td>LTR</td>
+<td>PostgreSQL <code>simple</code></td>
+</tr>
+<tr>
+<td>Vietnamese</td>
+<td><code>vi</code></td>
+<td>LTR</td>
+<td>PostgreSQL <code>simple</code></td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="./i18n-guide.md">Internationalization Guide</a> for details on changing your language.</p>
+<hr />
+<h2 id="security-features">Security Features</h2>
+<h3 id="multi-factor-authentication-mfa">Multi-Factor Authentication (MFA)</h3>
+<pre class="mermaid"><code>flowchart LR
+    subgraph &quot;MFA Methods&quot;
+        TOTP[Authenticator App&lt;br/&gt;TOTP]
+        BC[Backup Codes&lt;br/&gt;10 one-time codes]
+    end
+    
+    subgraph &quot;Device Trust&quot;
+        DT[Remember Device&lt;br/&gt;30 days]
+        DM[Device Management&lt;br/&gt;Up to 5 devices]
+    end
+    
+    TOTP --&gt; DT
+    BC --&gt; DT</code></pre>
+<table>
+<colgroup>
+<col style="width: 38%" />
+<col style="width: 61%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>TOTP</strong></td>
+<td>Time-based codes from authenticator apps (Google, Microsoft, 1Password, Authy)</td>
+</tr>
+<tr>
+<td><strong>Backup Codes</strong></td>
+<td>10 one-time recovery codes for emergency access</td>
+</tr>
+<tr>
+<td><strong>Device Trust</strong></td>
+<td>Skip MFA verification on trusted devices for 30 days</td>
+</tr>
+</tbody>
+</table>
+<h3 id="enterprise-sso">Enterprise SSO</h3>
+<pre class="mermaid"><code>flowchart LR
+    User --&gt; App[RADIANT App]
+    App --&gt; |&quot;Redirect&quot;| IdP[Identity Provider]
+    IdP --&gt; |&quot;SAML/OIDC&quot;| App
+    App --&gt; |&quot;Session&quot;| User
+    
+    subgraph &quot;Supported Providers&quot;
+        Okta
+        AzureAD[Azure AD]
+        Google[Google Workspace]
+        OneLogin
+        Custom[Custom SAML/OIDC]
+    end
+    
+    IdP -.-&gt; Okta
+    IdP -.-&gt; AzureAD
+    IdP -.-&gt; Google
+    IdP -.-&gt; OneLogin
+    IdP -.-&gt; Custom</code></pre>
+<h3 id="oauth-for-third-party-apps">OAuth for Third-Party Apps</h3>
+<p>Third-party applications can request permission to access RADIANT on behalf of users:</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User
+    participant App as Third-Party App
+    participant RADIANT
+    
+    User-&gt;&gt;App: Click &quot;Connect to RADIANT&quot;
+    App-&gt;&gt;RADIANT: Authorization request
+    RADIANT-&gt;&gt;User: Show consent screen
+    User-&gt;&gt;RADIANT: Approve
+    RADIANT-&gt;&gt;App: Authorization code
+    App-&gt;&gt;RADIANT: Exchange for tokens
+    RADIANT-&gt;&gt;App: Access token
+    App-&gt;&gt;RADIANT: API requests (as user)</code></pre>
+<hr />
+<h2 id="application-matrix">Application Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Application</th>
+<th>User Types</th>
+<th>MFA</th>
+<th>SSO</th>
+<th>OAuth</th>
+<th>Languages</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Think Tank</strong></td>
+<td>Standard users</td>
+<td>Optional (hidden)</td>
+<td>✅</td>
+<td>N/A</td>
+<td>18</td>
+</tr>
+<tr>
+<td><strong>Curator</strong></td>
+<td>Standard users</td>
+<td>Optional (hidden)</td>
+<td>✅</td>
+<td>N/A</td>
+<td>18</td>
+</tr>
+<tr>
+<td><strong>Tenant Admin</strong></td>
+<td>Tenant admins/owners</td>
+<td>Required</td>
+<td>✅</td>
+<td>N/A</td>
+<td>18</td>
+</tr>
+<tr>
+<td><strong>RADIANT Admin</strong></td>
+<td>Platform admins</td>
+<td>Required</td>
+<td>❌</td>
+<td>N/A</td>
+<td>18</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="quick-links">Quick Links</h2>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th>Document</th>
+<th>Audience</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="./user-guide.md">User Authentication Guide</a></td>
+<td>End Users</td>
+<td>Sign-in, password, passkeys</td>
+</tr>
+<tr>
+<td><a href="./tenant-admin-guide.md">Tenant Admin Guide</a></td>
+<td>Tenant Admins</td>
+<td>SSO, user management, MFA policies</td>
+</tr>
+<tr>
+<td><a href="./platform-admin-guide.md">Platform Admin Guide</a></td>
+<td>Platform Admins</td>
+<td>System-wide auth configuration</td>
+</tr>
+<tr>
+<td><a href="./mfa-guide.md">MFA Setup Guide</a></td>
+<td>All Admins</td>
+<td>Two-factor authentication setup</td>
+</tr>
+<tr>
+<td><a href="./oauth-guide.md">OAuth Developer Guide</a></td>
+<td>Developers</td>
+<td>Building third-party integrations</td>
+</tr>
+<tr>
+<td><a href="./i18n-guide.md">Internationalization Guide</a></td>
+<td>All</td>
+<td>Language settings, RTL support</td>
+</tr>
+<tr>
+<td><a href="../api/authentication-api.md">API Reference</a></td>
+<td>Developers</td>
+<td>Technical API documentation</td>
+</tr>
+<tr>
+<td><a href="../api/search-api.md">Search API Reference</a></td>
+<td>Developers</td>
+<td>Multi-language search</td>
+</tr>
+<tr>
+<td><a href="../security/authentication-architecture.md">Security Architecture</a></td>
+<td>Security Teams</td>
+<td>Compliance and architecture</td>
+</tr>
+<tr>
+<td><a href="./troubleshooting.md">Troubleshooting</a></td>
+<td>All</td>
+<td>Common issues and solutions</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="../RADIANT-ADMIN-GUIDE.md">RADIANT Admin Guide</a> - Platform administration</li>
+<li><a href="../THINKTANK-ADMIN-GUIDE.md">Think Tank Admin Guide</a> - Tenant administration</li>
+<li><a href="../THINKTANK-USER-GUIDE.md">Think Tank User Guide</a> - End-user documentation</li>
+<li><a href="../ENGINEERING-IMPLEMENTATION-VISION.md">Engineering Implementation Vision</a> - Technical architecture</li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

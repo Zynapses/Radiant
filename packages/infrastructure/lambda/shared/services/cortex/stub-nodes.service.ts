@@ -3,8 +3,13 @@
  * Zero-copy pointers to external data lake content
  */
 
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, GetObjectCommand, ListObjectsV2Command, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+// @ts-ignore - parquetjs has no type declarations
+import * as parquet from 'parquetjs';
+import { XMLParser } from 'fast-xml-parser';
+import AdmZip from 'adm-zip';
+import { enhancedLogger as logger } from '../../logging/enhanced-logger';
 import type {
   StubNode,
   StubNodeExternalSource,
@@ -319,9 +324,48 @@ export class StubNodesService {
   }
 
   private async listS3Files(mount: ZeroCopyMount): Promise<Array<{ uri: string; label: string; sizeBytes: number; lastModified: Date }>> {
-    // Implementation would use S3 ListObjectsV2
-    // Simplified for now - actual implementation would paginate
-    return [];
+    const files: Array<{ uri: string; label: string; sizeBytes: number; lastModified: Date }> = [];
+    
+    // Parse mount connection string for bucket and prefix
+    const connectionConfig = mount.connectionConfig as { bucket: string; prefix?: string; region?: string };
+    const bucket = connectionConfig.bucket;
+    const prefix = connectionConfig.prefix || '';
+    
+    let continuationToken: string | undefined;
+    
+    do {
+      const command = new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: prefix,
+        ContinuationToken: continuationToken,
+        MaxKeys: 1000,
+      });
+      
+      const response = await this.s3Client.send(command);
+      
+      if (response.Contents) {
+        for (const obj of response.Contents) {
+          if (obj.Key && obj.Size !== undefined) {
+            // Skip directories (keys ending with /)
+            if (obj.Key.endsWith('/')) continue;
+            
+            const uri = `s3://${bucket}/${obj.Key}`;
+            const label = obj.Key.split('/').pop() || obj.Key;
+            
+            files.push({
+              uri,
+              label,
+              sizeBytes: obj.Size,
+              lastModified: obj.LastModified || new Date(),
+            });
+          }
+        }
+      }
+      
+      continuationToken = response.NextContinuationToken;
+    } while (continuationToken);
+    
+    return files;
   }
 
   private async generateS3SignedUrl(
@@ -379,25 +423,345 @@ export class StubNodesService {
     return contentTypes[format];
   }
 
-  // Placeholder methods for metadata extraction
-  private async extractTableColumns(_stubNode: StubNode): Promise<string[]> {
-    return []; // Would parse CSV header or Parquet schema
+  /**
+   * Extract column names from CSV or Parquet files by reading the header
+   */
+  private async extractTableColumns(stubNode: StubNode): Promise<string[]> {
+    const { uri, format } = stubNode.externalSource;
+    
+    if (format === 'csv') {
+      // Fetch first 4KB of CSV to get header row
+      const headContent = await this.fetchPartialContent(uri, 0, 4096);
+      if (!headContent) return [];
+      
+      // Parse first line as header
+      const firstNewline = headContent.indexOf('\n');
+      const headerLine = firstNewline > 0 ? headContent.substring(0, firstNewline) : headContent;
+      
+      // Handle quoted CSV columns
+      const columns: string[] = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (const char of headerLine) {
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          columns.push(current.trim().replace(/^"|"$/g, ''));
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      if (current) {
+        columns.push(current.trim().replace(/^"|"$/g, '').replace(/\r$/, ''));
+      }
+      
+      return columns;
+    }
+    
+    if (format === 'parquet') {
+      // Check cached metadata first
+      const metadata = stubNode.extractedMetadata;
+      if (metadata.columns) return metadata.columns;
+      
+      // Extract schema using parquetjs
+      try {
+        const fullContent = await this.fetchFullContent(stubNode.externalSource.uri);
+        if (fullContent) {
+          const reader = await parquet.ParquetReader.openBuffer(Buffer.from(fullContent));
+          const schema = reader.getSchema();
+          const columns = schema.fields.map((f: { name: string }) => f.name);
+          await reader.close();
+          return columns;
+        }
+      } catch (error) {
+        logger.warn('Parquet schema extraction failed', { error });
+      }
+      return [];
+    }
+    
+    return [];
   }
 
-  private async estimateRowCount(_stubNode: StubNode): Promise<number> {
-    return 0; // Would estimate from file size
+  /**
+   * Estimate row count based on file size and format
+   */
+  private async estimateRowCount(stubNode: StubNode): Promise<number> {
+    const { format, sizeBytes } = stubNode.externalSource;
+    
+    if (format === 'csv') {
+      // Sample first 64KB to estimate average row size
+      const sampleSize = Math.min(65536, sizeBytes);
+      const sample = await this.fetchPartialContent(stubNode.externalSource.uri, 0, sampleSize);
+      if (!sample) return 0;
+      
+      // Count newlines in sample
+      const newlineCount = (sample.match(/\n/g) || []).length;
+      if (newlineCount === 0) return 1;
+      
+      // Subtract 1 for header row, then extrapolate
+      const avgRowSize = sampleSize / newlineCount;
+      const estimatedRows = Math.floor(sizeBytes / avgRowSize) - 1; // -1 for header
+      
+      return Math.max(0, estimatedRows);
+    }
+    
+    if (format === 'json') {
+      // For JSONL, count newlines; for JSON arrays, parse structure
+      const sample = await this.fetchPartialContent(stubNode.externalSource.uri, 0, 1024);
+      if (!sample) return 0;
+      
+      // Check if it's JSONL (newline-delimited)
+      if (sample.includes('\n') && sample.trim().startsWith('{')) {
+        const newlineCount = (sample.match(/\n/g) || []).length;
+        const avgRowSize = 1024 / newlineCount;
+        return Math.floor(sizeBytes / avgRowSize);
+      }
+      
+      // JSON array - would need full parse
+      return 0;
+    }
+    
+    if (format === 'parquet') {
+      // Parquet stores row count in metadata footer
+      // Average compressed row is ~100-500 bytes
+      return Math.floor(sizeBytes / 200);
+    }
+    
+    return 0;
   }
 
-  private async extractPageCount(_stubNode: StubNode): Promise<number> {
-    return 0; // Would use PDF parser
+  /**
+   * Extract page count from PDF or DOCX documents
+   */
+  private async extractPageCount(stubNode: StubNode): Promise<number> {
+    const { uri, format, sizeBytes } = stubNode.externalSource;
+    
+    if (format === 'pdf') {
+      // PDF page count is in the trailer - fetch last 1KB for /Count entry
+      const tailContent = await this.fetchPartialContent(uri, Math.max(0, sizeBytes - 1024), 1024);
+      if (!tailContent) return 0;
+      
+      // Look for /Count N pattern in PDF trailer
+      const countMatch = tailContent.match(/\/Count\s+(\d+)/i);
+      if (countMatch) {
+        return parseInt(countMatch[1], 10);
+      }
+      
+      // Fallback: estimate based on file size (avg PDF page ~50-100KB)
+      return Math.max(1, Math.floor(sizeBytes / 75000));
+    }
+    
+    if (format === 'docx') {
+      // DOCX is a ZIP - page count is in docProps/app.xml
+      try {
+        const fullContent = await this.fetchFullContent(uri);
+        if (fullContent) {
+          const zip = new AdmZip(Buffer.from(fullContent));
+          const appXmlEntry = zip.getEntry('docProps/app.xml');
+          if (appXmlEntry) {
+            const appXml = appXmlEntry.getData().toString('utf-8');
+            const parser = new XMLParser();
+            const parsed = parser.parse(appXml) as { Properties?: { Pages?: number } };
+            if (parsed.Properties?.Pages) {
+              return parsed.Properties.Pages;
+            }
+          }
+        }
+      } catch (error) {
+        logger.warn('DOCX page extraction failed', { error });
+      }
+      // Fallback: estimate based on file size (avg DOCX page ~10-30KB)
+      return Math.max(1, Math.floor(sizeBytes / 20000));
+    }
+    
+    return 0;
   }
 
-  private async extractEntities(_stubNode: StubNode): Promise<string[]> {
-    return []; // Would use NLP entity extraction
+  /**
+   * Extract named entities from document content using pattern matching
+   */
+  private async extractEntities(stubNode: StubNode): Promise<string[]> {
+    const { uri, format } = stubNode.externalSource;
+    const entities: Set<string> = new Set();
+    
+    // Fetch a sample of text content (first 32KB)
+    let textContent = '';
+    
+    if (format === 'txt' || format === 'html' || format === 'csv' || format === 'json') {
+      const content = await this.fetchPartialContent(uri, 0, 32768);
+      textContent = content || '';
+      
+      // Strip HTML tags if HTML
+      if (format === 'html') {
+        textContent = textContent.replace(/<[^>]*>/g, ' ');
+      }
+    }
+    
+    if (!textContent) return [];
+    
+    // Extract email addresses
+    const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+    const emails = textContent.match(emailPattern) || [];
+    emails.forEach(e => entities.add(`EMAIL:${e}`));
+    
+    // Extract URLs
+    const urlPattern = /https?:\/\/[^\s<>"']+/g;
+    const urls = textContent.match(urlPattern) || [];
+    urls.slice(0, 10).forEach(u => entities.add(`URL:${u}`));
+    
+    // Extract phone numbers
+    const phonePattern = /(?:\+?1[-.]?)?\(?\d{3}\)?[-.]?\d{3}[-.]?\d{4}/g;
+    const phones = textContent.match(phonePattern) || [];
+    phones.forEach(p => entities.add(`PHONE:${p}`));
+    
+    // Extract dates
+    const datePattern = /\b(?:\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}|\d{4}[\/-]\d{1,2}[\/-]\d{1,2}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{4})\b/gi;
+    const dates = textContent.match(datePattern) || [];
+    dates.slice(0, 20).forEach(d => entities.add(`DATE:${d}`));
+    
+    // Extract capitalized proper nouns (potential names/organizations)
+    const properNounPattern = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b/g;
+    const properNouns = textContent.match(properNounPattern) || [];
+    properNouns.slice(0, 30).forEach(n => entities.add(`ENTITY:${n}`));
+    
+    return Array.from(entities).slice(0, 100);
   }
 
-  private async extractKeywords(_stubNode: StubNode): Promise<string[]> {
-    return []; // Would use keyword extraction
+  /**
+   * Extract keywords from document content using TF-IDF-like scoring
+   */
+  private async extractKeywords(stubNode: StubNode): Promise<string[]> {
+    const { uri, format } = stubNode.externalSource;
+    
+    // Fetch content sample
+    let textContent = '';
+    if (format === 'txt' || format === 'html' || format === 'csv' || format === 'json') {
+      const content = await this.fetchPartialContent(uri, 0, 65536);
+      textContent = content || '';
+      
+      if (format === 'html') {
+        textContent = textContent.replace(/<[^>]*>/g, ' ');
+      }
+    }
+    
+    if (!textContent) return [];
+    
+    // Tokenize and count word frequencies
+    const words = textContent.toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter(w => w.length > 3 && w.length < 30);
+    
+    // Common stop words to filter out
+    const stopWords = new Set([
+      'that', 'this', 'with', 'from', 'have', 'been', 'were', 'they', 'will',
+      'would', 'could', 'should', 'their', 'there', 'about', 'which', 'when',
+      'what', 'where', 'than', 'then', 'these', 'those', 'other', 'some',
+      'into', 'only', 'over', 'such', 'also', 'just', 'more', 'most', 'very'
+    ]);
+    
+    // Count frequencies
+    const freq: Map<string, number> = new Map();
+    for (const word of words) {
+      if (!stopWords.has(word)) {
+        freq.set(word, (freq.get(word) || 0) + 1);
+      }
+    }
+    
+    // Sort by frequency and return top keywords
+    const sorted = Array.from(freq.entries())
+      .filter(([_, count]) => count >= 2)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 50)
+      .map(([word]) => word);
+    
+    return sorted;
+  }
+
+  /**
+   * Fetch full content from S3 (for small files that need complete parsing)
+   */
+  private async fetchFullContent(uri: string): Promise<Uint8Array | null> {
+    const match = uri.match(/^s3:\/\/([^/]+)\/(.+)$/);
+    if (!match) return null;
+    
+    const [, bucket, key] = match;
+    
+    try {
+      const command = new GetObjectCommand({
+        Bucket: bucket,
+        Key: key,
+      });
+      
+      const response = await this.s3Client.send(command);
+      if (!response.Body) return null;
+      
+      const chunks: Uint8Array[] = [];
+      const reader = response.Body.transformToWebStream().getReader();
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+      }
+      
+      const combined = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
+      let offset = 0;
+      for (const chunk of chunks) {
+        combined.set(chunk, offset);
+        offset += chunk.length;
+      }
+      
+      return combined;
+    } catch (error) {
+      logger.error('Failed to fetch full content', { uri, error });
+      return null;
+    }
+  }
+
+  /**
+   * Fetch partial content from S3 using byte range
+   */
+  private async fetchPartialContent(uri: string, start: number, length: number): Promise<string | null> {
+    const match = uri.match(/^s3:\/\/([^/]+)\/(.+)$/);
+    if (!match) return null;
+    
+    const [, bucket, key] = match;
+    
+    try {
+      const command = new GetObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Range: `bytes=${start}-${start + length - 1}`,
+      });
+      
+      const response = await this.s3Client.send(command);
+      if (!response.Body) return null;
+      
+      // Convert stream to string
+      const chunks: Uint8Array[] = [];
+      const reader = response.Body.transformToWebStream().getReader();
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+      }
+      
+      const combined = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
+      let offset = 0;
+      for (const chunk of chunks) {
+        combined.set(chunk, offset);
+        offset += chunk.length;
+      }
+      
+      return new TextDecoder().decode(combined);
+    } catch (error) {
+      logger.error('Failed to fetch partial content', { uri, error });
+      return null;
+    }
   }
 
   private mapRowToStubNode(row: unknown): StubNode {

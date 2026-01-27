@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRIMOIRE GOVERNOR SOURCE PART3 - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>GRIMOIRE GOVERNOR SOURCE PART3</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/GRIMOIRE-GOVERNOR-SOURCE-PART3.md</div>
+  </div>
+  
+  <h1 id="radiant-v5.0.2---source-export-part-3-python-flyte-tasks">RADIANT v5.0.2 - Source Export Part 3: Python Flyte Tasks</h1>
+<hr />
+<h2 id="grimoire-flyte-tasks">6. Grimoire Flyte Tasks</h2>
+<p><strong>File</strong>: <code>packages/flyte/workflows/grimoire_tasks.py</code></p>
+<p><strong>Purpose</strong>: Flyte workflow tasks for The Grimoire procedural memory system. Implements semantic search for heuristic retrieval and automated learning from successful executions.</p>
+<p><strong>Key Tasks</strong>: - <code>consult_grimoire</code> - Query relevant heuristics before task execution - <code>librarian_review</code> - Extract lessons after successful execution - <code>cleanup_expired_heuristics</code> - Maintenance task for stale data - Admin functions for manual management</p>
+<pre class="python"><code>&quot;&quot;&quot;
+The Grimoire - Procedural Memory Flyte Tasks
+
+RADIANT v5.0.2 - System Evolution
+
+Flyte tasks for managing The Grimoire&#39;s self-optimizing procedural memory.
+These tasks integrate with the Think Tank workflow to provide:
+1. Pre-execution heuristic consultation
+2. Post-execution learning (Librarian Review)
+3. Scheduled maintenance
+&quot;&quot;&quot;
+
+import json
+import os
+import re
+import uuid
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass
+
+from flytekit import task, workflow, current_context
+import httpx
+
+# Local imports
+from radiant.flyte.utils.db import get_safe_db_connection, get_system_db_connection
+from radiant.flyte.utils.embeddings import generate_embedding, cosine_similarity
+from radiant.flyte.utils.cato_client import CatoClient
+
+
+# Configuration
+LITELLM_PROXY_URL = os.environ.get(&quot;LITELLM_PROXY_URL&quot;, &quot;http://localhost:4000&quot;)
+LITELLM_API_KEY = os.environ.get(&quot;LITELLM_API_KEY&quot;, &quot;&quot;)
+MAX_HEURISTICS_PER_QUERY = 5
+SIMILARITY_THRESHOLD = 0.7
+DEFAULT_CONFIDENCE = 0.5
+
+
+@dataclass
+class HeuristicMatch:
+    &quot;&quot;&quot;A matched heuristic from The Grimoire&quot;&quot;&quot;
+    id: str
+    domain: str
+    heuristic_text: str
+    confidence_score: float
+    similarity_score: float
+
+
+@dataclass 
+class GrimoireConsultResult:
+    &quot;&quot;&quot;Result of consulting The Grimoire&quot;&quot;&quot;
+    heuristics: List[HeuristicMatch]
+    context_injection: str
+    consultation_id: str
+
+
+@task(
+    cache=False,
+    retries=2,
+    timeout=timedelta(seconds=30)
+)
+def consult_grimoire(
+    tenant_id: str,
+    prompt: str,
+    domain: str = &quot;general&quot;,
+    max_results: int = MAX_HEURISTICS_PER_QUERY
+) -&gt; GrimoireConsultResult:
+    &quot;&quot;&quot;
+    Consults The Grimoire for relevant heuristics before task execution.
+    
+    This task:
+    1. Generates an embedding for the current prompt
+    2. Performs vector similarity search against stored heuristics
+    3. Validates results through Cato safety checks
+    4. Returns a formatted context injection for the agent
+    
+    Args:
+        tenant_id: UUID of the tenant
+        prompt: The user&#39;s prompt/task
+        domain: Task domain for filtering
+        max_results: Maximum heuristics to return
+        
+    Returns:
+        GrimoireConsultResult with matched heuristics and context injection
+    &quot;&quot;&quot;
+    consultation_id = str(uuid.uuid4())
+    
+    # Generate embedding for the prompt
+    try:
+        prompt_embedding = generate_embedding(prompt[:8000])
+    except Exception as e:
+        print(f&quot;Embedding generation failed: {e}&quot;)
+        return GrimoireConsultResult(
+            heuristics=[],
+            context_injection=&quot;&quot;,
+            consultation_id=consultation_id
+        )
+    
+    # Query The Grimoire
+    with get_safe_db_connection(tenant_id) as (conn, cur):
+        cur.execute(&quot;&quot;&quot;
+            SELECT 
+                id, domain, heuristic_text, confidence_score,
+                1 - (context_embedding &lt;=&gt; %s::vector) as similarity
+            FROM knowledge_heuristics
+            WHERE expires_at &gt; NOW()
+              AND (domain = %s OR domain = &#39;general&#39;)
+              AND context_embedding IS NOT NULL
+            ORDER BY context_embedding &lt;=&gt; %s::vector
+            LIMIT %s
+        &quot;&quot;&quot;, (prompt_embedding, domain, prompt_embedding, max_results * 2))
+        
+        rows = cur.fetchall()
+    
+    # Filter by similarity threshold and validate with Cato
+    heuristics = []
+    for row in rows:
+        id_, dom, text, confidence, similarity = row
+        
+        if similarity &lt; SIMILARITY_THRESHOLD:
+            continue
+            
+        # Safety check via Cato
+        risk = CatoClient.epistemic_check(text, tenant_id)
+        if risk.should_block:
+            print(f&quot;Heuristic {id_} blocked by Cato: {risk.reason}&quot;)
+            continue
+        
+        heuristics.append(HeuristicMatch(
+            id=str(id_),
+            domain=dom,
+            heuristic_text=text,
+            confidence_score=confidence,
+            similarity_score=similarity
+        ))
+        
+        if len(heuristics) &gt;= max_results:
+            break
+    
+    # Build context injection
+    context_injection = _build_context_injection(heuristics)
+    
+    return GrimoireConsultResult(
+        heuristics=heuristics,
+        context_injection=context_injection,
+        consultation_id=consultation_id
+    )
+
+
+def _build_context_injection(heuristics: List[HeuristicMatch]) -&gt; str:
+    &quot;&quot;&quot;Formats heuristics into a system prompt injection.&quot;&quot;&quot;
+    if not heuristics:
+        return &quot;&quot;
+    
+    lines = [&quot;&lt;grimoire_heuristics&gt;&quot;]
+    lines.append(&quot;The following lessons from previous successful executions may be relevant:&quot;)
+    lines.append(&quot;&quot;)
+    
+    for i, h in enumerate(heuristics, 1):
+        confidence_pct = int(h.confidence_score * 100)
+        lines.append(f&quot;{i}. [{h.domain.upper()}] (Confidence: {confidence_pct}%)&quot;)
+        lines.append(f&quot;   {h.heuristic_text}&quot;)
+        lines.append(&quot;&quot;)
+    
+    lines.append(&quot;Apply these heuristics where appropriate, but use your judgment.&quot;)
+    lines.append(&quot;&lt;/grimoire_heuristics&gt;&quot;)
+    
+    return &quot;\n&quot;.join(lines)
+
+
+@task(
+    cache=False,
+    retries=2,
+    timeout=timedelta(seconds=60)
+)
+def librarian_review(
+    tenant_id: str,
+    execution_id: str,
+    prompt: str,
+    response: str,
+    domain: str,
+    was_successful: bool,
+    user_rating: Optional[int] = None
+) -&gt; Dict[str, any]:
+    &quot;&quot;&quot;
+    The Librarian reviews successful executions and extracts reusable heuristics.
+    
+    This task:
+    1. Only processes successful executions
+    2. Uses an LLM to extract generalizable lessons
+    3. Validates extracted heuristics via Cato
+    4. Stores new heuristics with embeddings
+    
+    Args:
+        tenant_id: UUID of the tenant
+        execution_id: ID of the execution to review
+        prompt: Original user prompt
+        response: AI response that was successful
+        domain: Task domain
+        was_successful: Whether the task was successful
+        user_rating: Optional 1-5 rating from user
+        
+    Returns:
+        Dict with extracted_count and heuristic_ids
+    &quot;&quot;&quot;
+    # Only learn from successes
+    if not was_successful:
+        return {&quot;extracted_count&quot;: 0, &quot;heuristic_ids&quot;: [], &quot;reason&quot;: &quot;Not successful&quot;}
+    
+    # Only learn from highly-rated responses
+    if user_rating is not None and user_rating &lt; 4:
+        return {&quot;extracted_count&quot;: 0, &quot;heuristic_ids&quot;: [], &quot;reason&quot;: &quot;Low rating&quot;}
+    
+    # Extract heuristics using LLM
+    extraction_prompt = f&quot;&quot;&quot;Analyze this successful AI interaction and extract 1-3 reusable heuristics.
+
+DOMAIN: {domain}
+
+USER PROMPT:
+{prompt[:2000]}
+
+SUCCESSFUL RESPONSE:
+{response[:3000]}
+
+Extract generalizable lessons in this format:
+- &quot;When [specific condition], always [specific action]&quot;
+
+Rules:
+1. Only extract truly generalizable lessons
+2. Be specific enough to be actionable
+3. Avoid domain-specific jargon unless necessary
+4. Each heuristic should be a single sentence
+
+Return ONLY a JSON array of strings, e.g.:
+[&quot;When X, always Y&quot;, &quot;When A, always B&quot;]
+
+If no generalizable lessons can be extracted, return: []&quot;&quot;&quot;
+
+    try:
+        with httpx.Client(timeout=30.0) as client:
+            resp = client.post(
+                f&quot;{LITELLM_PROXY_URL}/chat/completions&quot;,
+                headers={
+                    &quot;Authorization&quot;: f&quot;Bearer {LITELLM_API_KEY}&quot;,
+                    &quot;Content-Type&quot;: &quot;application/json&quot;
+                },
+                json={
+                    &quot;model&quot;: &quot;gpt-4o-mini&quot;,
+                    &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: extraction_prompt}],
+                    &quot;temperature&quot;: 0.3,
+                    &quot;max_tokens&quot;: 500
+                }
+            )
+            resp.raise_for_status()
+            
+            content = resp.json()[&quot;choices&quot;][0][&quot;message&quot;][&quot;content&quot;]
+            
+            # Parse JSON from response
+            json_match = re.search(r&#39;\[.*\]&#39;, content, re.DOTALL)
+            if not json_match:
+                return {&quot;extracted_count&quot;: 0, &quot;heuristic_ids&quot;: [], &quot;reason&quot;: &quot;No JSON found&quot;}
+            
+            heuristics = json.loads(json_match.group())
+            
+    except Exception as e:
+        print(f&quot;Heuristic extraction failed: {e}&quot;)
+        return {&quot;extracted_count&quot;: 0, &quot;heuristic_ids&quot;: [], &quot;reason&quot;: str(e)}
+    
+    if not heuristics:
+        return {&quot;extracted_count&quot;: 0, &quot;heuristic_ids&quot;: [], &quot;reason&quot;: &quot;No heuristics extracted&quot;}
+    
+    # Validate and store heuristics
+    stored_ids = []
+    
+    for heuristic_text in heuristics[:3]:
+        if not isinstance(heuristic_text, str) or len(heuristic_text) &lt; 20:
+            continue
+        
+        # Safety check
+        risk = CatoClient.validate_for_storage(heuristic_text, tenant_id)
+        if risk.should_block:
+            print(f&quot;Heuristic blocked by Cato: {risk.reason}&quot;)
+            continue
+        
+        # Generate embedding
+        try:
+            embedding = generate_embedding(heuristic_text)
+        except Exception as e:
+            print(f&quot;Embedding failed for heuristic: {e}&quot;)
+            continue
+        
+        # Check for duplicates
+        with get_safe_db_connection(tenant_id) as (conn, cur):
+            cur.execute(&quot;&quot;&quot;
+                SELECT id, heuristic_text, confidence_score,
+                       1 - (context_embedding &lt;=&gt; %s::vector) as similarity
+                FROM knowledge_heuristics
+                WHERE domain = %s
+                  AND expires_at &gt; NOW()
+                  AND context_embedding IS NOT NULL
+                ORDER BY context_embedding &lt;=&gt; %s::vector
+                LIMIT 1
+            &quot;&quot;&quot;, (embedding, domain, embedding))
+            
+            existing = cur.fetchone()
+            
+            if existing and existing[3] &gt; 0.95:
+                # Very similar heuristic exists - reinforce it
+                cur.execute(&quot;&quot;&quot;
+                    UPDATE knowledge_heuristics
+                    SET confidence_score = LEAST(1.0, confidence_score + 0.05),
+                        expires_at = expires_at + INTERVAL &#39;30 days&#39;,
+                        updated_at = NOW()
+                    WHERE id = %s
+                &quot;&quot;&quot;, (existing[0],))
+                conn.commit()
+                stored_ids.append(str(existing[0]))
+                continue
+            
+            # Store new heuristic
+            heuristic_id = str(uuid.uuid4())
+            cur.execute(&quot;&quot;&quot;
+                INSERT INTO knowledge_heuristics (
+                    id, tenant_id, domain, heuristic_text, 
+                    context_embedding, confidence_score, source_execution_id
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+            &quot;&quot;&quot;, (
+                heuristic_id, tenant_id, domain, heuristic_text,
+                embedding, DEFAULT_CONFIDENCE, execution_id
+            ))
+            conn.commit()
+            stored_ids.append(heuristic_id)
+    
+    return {
+        &quot;extracted_count&quot;: len(stored_ids),
+        &quot;heuristic_ids&quot;: stored_ids,
+        &quot;reason&quot;: &quot;Success&quot;
+    }
+
+
+@task(
+    cache=False,
+    retries=1,
+    timeout=timedelta(minutes=5)
+)
+def cleanup_expired_heuristics(batch_size: int = 1000) -&gt; Dict[str, int]:
+    &quot;&quot;&quot;
+    Scheduled maintenance task to clean up The Grimoire.
+    
+    Removes:
+    1. Expired heuristics (past expires_at)
+    2. Low-confidence heuristics older than 30 days
+    
+    Returns:
+        Dict with expired_count and low_confidence_count
+    &quot;&quot;&quot;
+    with get_system_db_connection() as (conn, cur):
+        # Delete expired
+        cur.execute(&quot;&quot;&quot;
+            DELETE FROM knowledge_heuristics
+            WHERE expires_at &lt; NOW()
+            RETURNING id
+        &quot;&quot;&quot;)
+        expired_count = len(cur.fetchall())
+        
+        # Delete low-confidence stale
+        cur.execute(&quot;&quot;&quot;
+            DELETE FROM knowledge_heuristics
+            WHERE confidence_score &lt; 0.3
+              AND created_at &lt; NOW() - INTERVAL &#39;30 days&#39;
+            RETURNING id
+        &quot;&quot;&quot;)
+        low_confidence_count = len(cur.fetchall())
+        
+        conn.commit()
+    
+    return {
+        &quot;expired_count&quot;: expired_count,
+        &quot;low_confidence_count&quot;: low_confidence_count,
+        &quot;total_deleted&quot;: expired_count + low_confidence_count
+    }
+
+
+# ============================================================================
+# ADMIN FUNCTIONS
+# ============================================================================
+
+@task(cache=False)
+def list_heuristics(
+    tenant_id: str,
+    domain: Optional[str] = None,
+    limit: int = 100
+) -&gt; List[Dict]:
+    &quot;&quot;&quot;Admin function to list heuristics.&quot;&quot;&quot;
+    with get_safe_db_connection(tenant_id) as (conn, cur):
+        if domain:
+            cur.execute(&quot;&quot;&quot;
+                SELECT id, domain, heuristic_text, confidence_score, 
+                       created_at, expires_at
+                FROM knowledge_heuristics
+                WHERE domain = %s AND expires_at &gt; NOW()
+                ORDER BY confidence_score DESC
+                LIMIT %s
+            &quot;&quot;&quot;, (domain, limit))
+        else:
+            cur.execute(&quot;&quot;&quot;
+                SELECT id, domain, heuristic_text, confidence_score,
+                       created_at, expires_at
+                FROM knowledge_heuristics
+                WHERE expires_at &gt; NOW()
+                ORDER BY confidence_score DESC
+                LIMIT %s
+            &quot;&quot;&quot;, (limit,))
+        
+        rows = cur.fetchall()
+        
+    return [
+        {
+            &quot;id&quot;: str(row[0]),
+            &quot;domain&quot;: row[1],
+            &quot;heuristic_text&quot;: row[2],
+            &quot;confidence_score&quot;: row[3],
+            &quot;created_at&quot;: row[4].isoformat() if row[4] else None,
+            &quot;expires_at&quot;: row[5].isoformat() if row[5] else None
+        }
+        for row in rows
+    ]
+
+
+@task(cache=False)
+def delete_heuristic(tenant_id: str, heuristic_id: str) -&gt; bool:
+    &quot;&quot;&quot;Admin function to delete a heuristic.&quot;&quot;&quot;
+    with get_safe_db_connection(tenant_id) as (conn, cur):
+        cur.execute(
+            &quot;DELETE FROM knowledge_heuristics WHERE id = %s RETURNING id&quot;,
+            (heuristic_id,)
+        )
+        deleted = cur.fetchone() is not None
+        conn.commit()
+    return deleted
+
+
+@task(cache=False)
+def add_manual_heuristic(
+    tenant_id: str,
+    domain: str,
+    heuristic_text: str
+) -&gt; Optional[str]:
+    &quot;&quot;&quot;Admin function to manually add a heuristic.&quot;&quot;&quot;
+    # Safety check
+    risk = CatoClient.validate_for_storage(heuristic_text, tenant_id)
+    if risk.should_block:
+        print(f&quot;Manual heuristic blocked: {risk.reason}&quot;)
+        return None
+    
+    # Generate embedding
+    try:
+        embedding = generate_embedding(heuristic_text)
+    except Exception as e:
+        print(f&quot;Embedding generation failed: {e}&quot;)
+        return None
+    
+    heuristic_id = str(uuid.uuid4())
+    
+    with get_safe_db_connection(tenant_id) as (conn, cur):
+        cur.execute(&quot;&quot;&quot;
+            INSERT INTO knowledge_heuristics (
+                id, tenant_id, domain, heuristic_text,
+                context_embedding, confidence_score
+            ) VALUES (%s, %s, %s, %s, %s, 0.7)
+            RETURNING id
+        &quot;&quot;&quot;, (heuristic_id, tenant_id, domain, heuristic_text, embedding))
+        conn.commit()
+    
+    return heuristic_id
+
+
+@task(cache=False)
+def get_grimoire_stats(tenant_id: str) -&gt; Dict:
+    &quot;&quot;&quot;Get Grimoire statistics for a tenant.&quot;&quot;&quot;
+    with get_safe_db_connection(tenant_id) as (conn, cur):
+        cur.execute(&quot;&quot;&quot;
+            SELECT 
+                COUNT(*) as total,
+                COUNT(*) FILTER (WHERE confidence_score &gt;= 0.8) as high_confidence,
+                COUNT(*) FILTER (WHERE expires_at &lt; NOW() + INTERVAL &#39;7 days&#39;) as expiring_soon,
+                AVG(confidence_score) as avg_confidence
+            FROM knowledge_heuristics
+            WHERE expires_at &gt; NOW()
+        &quot;&quot;&quot;)
+        row = cur.fetchone()
+        
+        cur.execute(&quot;&quot;&quot;
+            SELECT domain, COUNT(*) as count
+            FROM knowledge_heuristics
+            WHERE expires_at &gt; NOW()
+            GROUP BY domain
+        &quot;&quot;&quot;)
+        by_domain = {r[0]: r[1] for r in cur.fetchall()}
+    
+    return {
+        &quot;total_heuristics&quot;: row[0] or 0,
+        &quot;high_confidence&quot;: row[1] or 0,
+        &quot;expiring_soon&quot;: row[2] or 0,
+        &quot;avg_confidence&quot;: float(row[3]) if row[3] else 0.0,
+        &quot;by_domain&quot;: by_domain
+    }</code></pre>
+<hr />
+<p><em>Continued in GRIMOIRE-GOVERNOR-SOURCE-PART4.md</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

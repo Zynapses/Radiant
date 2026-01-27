@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COST OPTIMIZATION - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>COST OPTIMIZATION</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/COST_OPTIMIZATION.md</div>
+  </div>
+  
+  <h1 id="radiant-cost-optimization-guide">RADIANT Cost Optimization Guide</h1>
+<h2 id="overview">Overview</h2>
+<p>This guide provides strategies for optimizing AWS costs for the RADIANT platform while maintaining performance and reliability.</p>
+<h2 id="current-architecture-costs">Current Architecture Costs</h2>
+<h3 id="estimated-monthly-costs-by-tier">Estimated Monthly Costs by Tier</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Infrastructure</th>
+<th>Est. Monthly Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SEED (Dev)</td>
+<td>Minimal</td>
+<td>$50-150</td>
+</tr>
+<tr>
+<td>STARTUP</td>
+<td>Small production</td>
+<td>$200-400</td>
+</tr>
+<tr>
+<td>GROWTH</td>
+<td>Self-hosted models</td>
+<td>$1,000-2,500</td>
+</tr>
+<tr>
+<td>SCALE</td>
+<td>Multi-region</td>
+<td>$4,000-8,000</td>
+</tr>
+<tr>
+<td>ENTERPRISE</td>
+<td>Global, full HA</td>
+<td>$15,000-35,000</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cost-breakdown-by-service">Cost Breakdown by Service</h3>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>% of Total</th>
+<th>Optimization Potential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Aurora</td>
+<td>30-40%</td>
+<td>High</td>
+</tr>
+<tr>
+<td>Lambda</td>
+<td>15-25%</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>API Gateway</td>
+<td>5-10%</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>5-10%</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>CloudFront</td>
+<td>5-10%</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>ElastiCache</td>
+<td>10-15%</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>Other</td>
+<td>10-15%</td>
+<td>Varies</td>
+</tr>
+</tbody>
+</table>
+<h2 id="optimization-strategies">Optimization Strategies</h2>
+<h3 id="database-optimization">1. Database Optimization</h3>
+<h4 id="aurora-serverless-v2">Aurora Serverless v2</h4>
+<pre class="typescript"><code>// Use Serverless v2 for variable workloads
+const cluster = new rds.DatabaseCluster(this, &#39;Database&#39;, {
+  serverlessV2MinCapacity: 0.5,   // Scale to near-zero
+  serverlessV2MaxCapacity: 16,    // Scale up when needed
+});</code></pre>
+<p><strong>Savings:</strong> 40-60% vs. provisioned instances for variable workloads</p>
+<h4 id="reserved-instances-steady-workloads">Reserved Instances (Steady Workloads)</h4>
+<pre class="bash"><code># Purchase reserved capacity for predictable workloads
+aws rds purchase-reserved-db-instances-offering \
+  --reserved-db-instances-offering-id xxx \
+  --db-instance-count 1</code></pre>
+<p><strong>Savings:</strong> 30-60% for 1-3 year terms</p>
+<h4 id="read-replicas-strategy">Read Replicas Strategy</h4>
+<pre class="typescript"><code>// Use read replicas only when needed
+// Scale readers with traffic
+readers: [
+  rds.ClusterInstance.serverlessV2(&#39;reader&#39;, {
+    scaleWithWriter: true,  // Auto-scale with primary
+  }),
+],</code></pre>
+<h3 id="lambda-optimization">2. Lambda Optimization</h3>
+<h4 id="right-size-memory">Right-Size Memory</h4>
+<pre class="typescript"><code>// Test different memory sizes to find optimal cost/performance
+const memoryOptions = [256, 512, 1024, 2048];
+
+// Use AWS Lambda Power Tuning tool
+// https://github.com/alexcasalboni/aws-lambda-power-tuning</code></pre>
+<table>
+<thead>
+<tr>
+<th>Function Type</th>
+<th>Recommended Memory</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Simple CRUD</td>
+<td>256-512 MB</td>
+<td>Light compute</td>
+</tr>
+<tr>
+<td>API Router</td>
+<td>512-1024 MB</td>
+<td>Balanced</td>
+</tr>
+<tr>
+<td>AI Processing</td>
+<td>1024-2048 MB</td>
+<td>Heavy compute</td>
+</tr>
+</tbody>
+</table>
+<h4 id="provisioned-concurrency-strategic">Provisioned Concurrency (Strategic)</h4>
+<pre class="typescript"><code>// Only use for latency-critical functions
+new lambda.Alias(this, &#39;LiveAlias&#39;, {
+  aliasName: &#39;live&#39;,
+  version: fn.currentVersion,
+  provisionedConcurrentExecutions: 5,  // Keep 5 warm
+});</code></pre>
+<p><strong>Cost:</strong> ~$0.015/hour per provisioned instance <strong>Use when:</strong> P99 latency requirements &lt; 200ms</p>
+<h4 id="arm64-graviton2">ARM64 (Graviton2)</h4>
+<pre class="typescript"><code>// 20% cheaper, often faster
+const fn = new lambda.Function(this, &#39;Function&#39;, {
+  architecture: lambda.Architecture.ARM_64,
+  runtime: lambda.Runtime.NODEJS_20_X,
+});</code></pre>
+<p><strong>Savings:</strong> 20% on compute costs</p>
+<h3 id="s3-optimization">3. S3 Optimization</h3>
+<h4 id="intelligent-tiering">Intelligent Tiering</h4>
+<pre class="typescript"><code>const bucket = new s3.Bucket(this, &#39;Storage&#39;, {
+  intelligentTieringConfigurations: [{
+    name: &#39;auto-tier&#39;,
+    archiveAccessTierTime: cdk.Duration.days(90),
+    deepArchiveAccessTierTime: cdk.Duration.days(180),
+  }],
+});</code></pre>
+<p><strong>Savings:</strong> Up to 95% for infrequently accessed data</p>
+<h4 id="lifecycle-rules">Lifecycle Rules</h4>
+<pre class="typescript"><code>const bucket = new s3.Bucket(this, &#39;Storage&#39;, {
+  lifecycleRules: [
+    // Move old versions to cheaper storage
+    {
+      noncurrentVersionTransitions: [
+        {
+          storageClass: s3.StorageClass.INFREQUENT_ACCESS,
+          transitionAfter: cdk.Duration.days(30),
+        },
+        {
+          storageClass: s3.StorageClass.GLACIER,
+          transitionAfter: cdk.Duration.days(90),
+        },
+      ],
+    },
+    // Delete old logs
+    {
+      prefix: &#39;logs/&#39;,
+      expiration: cdk.Duration.days(90),
+    },
+  ],
+});</code></pre>
+<h3 id="api-gateway-optimization">4. API Gateway Optimization</h3>
+<h4 id="http-api-vs-rest-api">HTTP API vs REST API</h4>
+<pre class="typescript"><code>// HTTP API is 70% cheaper than REST API
+// Use when you don&#39;t need REST API features
+
+// HTTP API: $1.00/million requests
+// REST API: $3.50/million requests</code></pre>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>REST API</th>
+<th>HTTP API</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cost</td>
+<td>$3.50/M</td>
+<td>$1.00/M</td>
+</tr>
+<tr>
+<td>Lambda integration</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Request validation</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>API keys/usage plans</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Caching</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<h4 id="caching">Caching</h4>
+<pre class="typescript"><code>// Enable caching for GET endpoints
+const method = resource.addMethod(&#39;GET&#39;, integration, {
+  cacheKeyParameters: [&#39;method.request.querystring.id&#39;],
+});
+
+// Cache stage setting
+stage.cacheClusterEnabled = true;
+stage.cacheClusterSize = &#39;0.5&#39;;  // 0.5 GB minimum</code></pre>
+<p><strong>Note:</strong> Cache costs $0.02/hour (0.5 GB). Calculate break-even point.</p>
+<h3 id="cloudwatch-optimization">5. CloudWatch Optimization</h3>
+<h4 id="log-retention">Log Retention</h4>
+<pre class="typescript"><code>// Don&#39;t keep logs forever
+new logs.LogGroup(this, &#39;LogGroup&#39;, {
+  retention: logs.RetentionDays.ONE_MONTH,  // Adjust per environment
+});</code></pre>
+<table>
+<thead>
+<tr>
+<th>Environment</th>
+<th>Retention</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Development</td>
+<td>7 days</td>
+<td>Quick debugging</td>
+</tr>
+<tr>
+<td>Staging</td>
+<td>14 days</td>
+<td>Testing cycles</td>
+</tr>
+<tr>
+<td>Production</td>
+<td>90 days</td>
+<td>Compliance needs</td>
+</tr>
+</tbody>
+</table>
+<h4 id="metric-filters-vs.-logs-insights">Metric Filters vs. Logs Insights</h4>
+<pre class="typescript"><code>// Use metric filters for known patterns
+// Cheaper than running Logs Insights queries repeatedly
+
+new logs.MetricFilter(this, &#39;ErrorMetric&#39;, {
+  logGroup,
+  metricNamespace: &#39;Radiant&#39;,
+  metricName: &#39;Errors&#39;,
+  filterPattern: logs.FilterPattern.literal(&#39;ERROR&#39;),
+});</code></pre>
+<h3 id="elasticache-optimization">6. ElastiCache Optimization</h3>
+<h4 id="reserved-nodes">Reserved Nodes</h4>
+<pre class="bash"><code># Purchase reserved nodes for production
+aws elasticache purchase-reserved-cache-nodes-offering \
+  --reserved-cache-nodes-offering-id xxx</code></pre>
+<p><strong>Savings:</strong> 30-55% for 1-3 year terms</p>
+<h4 id="right-size-nodes">Right-Size Nodes</h4>
+<table>
+<thead>
+<tr>
+<th>Use Case</th>
+<th>Recommended</th>
+<th>Memory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Development</td>
+<td>cache.t3.micro</td>
+<td>0.5 GB</td>
+</tr>
+<tr>
+<td>Small Prod</td>
+<td>cache.t3.small</td>
+<td>1.4 GB</td>
+</tr>
+<tr>
+<td>Medium Prod</td>
+<td>cache.r6g.large</td>
+<td>13 GB</td>
+</tr>
+<tr>
+<td>Large Prod</td>
+<td>cache.r6g.xlarge</td>
+<td>26 GB</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-transfer-optimization">7. Data Transfer Optimization</h3>
+<h4 id="use-vpc-endpoints">Use VPC Endpoints</h4>
+<pre class="typescript"><code>// Avoid NAT Gateway costs for AWS services
+vpc.addInterfaceEndpoint(&#39;S3Endpoint&#39;, {
+  service: ec2.InterfaceVpcEndpointAwsService.S3,
+});
+
+vpc.addInterfaceEndpoint(&#39;SecretsManagerEndpoint&#39;, {
+  service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
+});</code></pre>
+<p><strong>Savings:</strong> $0.045/GB saved vs. NAT Gateway</p>
+<h4 id="cloudfront-for-s3">CloudFront for S3</h4>
+<pre class="typescript"><code>// Serve S3 content through CloudFront
+// Cheaper data transfer + better performance
+const distribution = new cloudfront.Distribution(this, &#39;CDN&#39;, {
+  defaultBehavior: {
+    origin: new origins.S3Origin(bucket),
+  },
+});</code></pre>
+<h2 id="cost-monitoring">Cost Monitoring</h2>
+<h3 id="aws-cost-explorer">AWS Cost Explorer</h3>
+<pre class="bash"><code># Get cost breakdown by service
+aws ce get-cost-and-usage \
+  --time-period Start=2024-12-01,End=2024-12-31 \
+  --granularity MONTHLY \
+  --metrics BlendedCost \
+  --group-by Type=DIMENSION,Key=SERVICE</code></pre>
+<h3 id="cloudwatch-billing-alerts">CloudWatch Billing Alerts</h3>
+<pre class="typescript"><code>// Alert before surprise bills
+new cloudwatch.Alarm(this, &#39;BillingAlarm&#39;, {
+  metric: new cloudwatch.Metric({
+    namespace: &#39;AWS/Billing&#39;,
+    metricName: &#39;EstimatedCharges&#39;,
+    dimensionsMap: { Currency: &#39;USD&#39; },
+    statistic: &#39;Maximum&#39;,
+    period: cdk.Duration.hours(6),
+  }),
+  threshold: 1000,  // $1000 threshold
+  evaluationPeriods: 1,
+});</code></pre>
+<h3 id="cost-allocation-tags">Cost Allocation Tags</h3>
+<pre class="typescript"><code>// Tag all resources for cost tracking
+cdk.Tags.of(this).add(&#39;Project&#39;, &#39;radiant&#39;);
+cdk.Tags.of(this).add(&#39;Environment&#39;, environment);
+cdk.Tags.of(this).add(&#39;CostCenter&#39;, &#39;platform&#39;);</code></pre>
+<h2 id="environment-specific-recommendations">Environment-Specific Recommendations</h2>
+<h3 id="development">Development</h3>
+<ul>
+<li>Use Aurora Serverless v2 (scales to zero)</li>
+<li>Minimal Lambda memory</li>
+<li>No provisioned concurrency</li>
+<li>Short log retention</li>
+<li>Single-AZ deployments</li>
+</ul>
+<p><strong>Target:</strong> &lt; $100/month</p>
+<h3 id="staging">Staging</h3>
+<ul>
+<li>Aurora Serverless v2</li>
+<li>Moderate Lambda memory</li>
+<li>No provisioned concurrency</li>
+<li>14-day log retention</li>
+<li>Single-AZ acceptable</li>
+</ul>
+<p><strong>Target:</strong> &lt; $300/month</p>
+<h3 id="production">Production</h3>
+<ul>
+<li>Aurora Serverless v2 or Reserved (if predictable)</li>
+<li>Right-sized Lambda memory</li>
+<li>Provisioned concurrency for critical paths</li>
+<li>90-day log retention</li>
+<li>Multi-AZ required</li>
+</ul>
+<p><strong>Target:</strong> Optimize for reliability, then cost</p>
+<h2 id="monthly-cost-review-checklist">Monthly Cost Review Checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Review AWS Cost Explorer for anomalies</label></li>
+<li><label><input type="checkbox" />Check for unused resources (idle RDS, orphan EBS)</label></li>
+<li><label><input type="checkbox" />Review Lambda right-sizing opportunities</label></li>
+<li><label><input type="checkbox" />Check S3 storage class distribution</label></li>
+<li><label><input type="checkbox" />Review data transfer costs</label></li>
+<li><label><input type="checkbox" />Validate reserved capacity utilization</label></li>
+<li><label><input type="checkbox" />Update cost allocation tags</label></li>
+<li><label><input type="checkbox" />Project next month’s costs</label></li>
+</ul>
+<h2 id="tools">Tools</h2>
+<ul>
+<li><a href="https://console.aws.amazon.com/cost-management/home">AWS Cost Explorer</a></li>
+<li><a href="https://console.aws.amazon.com/trustedadvisor/">AWS Trusted Advisor</a></li>
+<li><a href="https://console.aws.amazon.com/compute-optimizer/">AWS Compute Optimizer</a></li>
+<li><a href="https://github.com/alexcasalboni/aws-lambda-power-tuning">Lambda Power Tuning</a></li>
+<li><a href="https://www.infracost.io/">Infracost</a> - Cost estimation for IaC</li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

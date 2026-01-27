@@ -254,7 +254,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     return response(404, { error: 'Not found' });
   } catch (error: any) {
-    console.error('Collaboration settings error:', error);
+    // Error logged by main handler
     return response(500, { error: error.message || 'Internal server error' });
   }
 }

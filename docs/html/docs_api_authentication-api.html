@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>authentication api - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>authentication api</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/api/authentication-api.md</div>
+  </div>
+  
+  <h1 id="authentication-api-reference">Authentication API Reference</h1>
+<blockquote>
+<p><strong>Version</strong>: 5.52.29 | <strong>Last Updated</strong>: January 25, 2026 | <strong>Base URL</strong>: <code>https://api.radiant.ai/v1</code></p>
+</blockquote>
+<p>Complete API reference for RADIANT authentication endpoints.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#authentication">Authentication</a></li>
+<li><a href="#sign-in--sign-out">Sign In / Sign Out</a></li>
+<li><a href="#password-management">Password Management</a></li>
+<li><a href="#multi-factor-authentication">Multi-Factor Authentication</a></li>
+<li><a href="#session-management">Session Management</a></li>
+<li><a href="#oauth-20-endpoints">OAuth 2.0 Endpoints</a></li>
+<li><a href="#user-profile">User Profile</a></li>
+<li><a href="#error-responses">Error Responses</a></li>
+</ol>
+<hr />
+<h2 id="overview">Overview</h2>
+<h3 id="base-urls">Base URLs</h3>
+<table>
+<thead>
+<tr>
+<th>Environment</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Production</td>
+<td><code>https://api.radiant.ai/v1</code></td>
+</tr>
+<tr>
+<td>Staging</td>
+<td><code>https://api.staging.radiant.ai/v1</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="authentication-methods">Authentication Methods</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Header</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bearer Token</td>
+<td><code>Authorization: Bearer &lt;token&gt;</code></td>
+<td>User requests</td>
+</tr>
+<tr>
+<td>API Key</td>
+<td><code>X-API-Key: &lt;key&gt;</code></td>
+<td>Server-to-server</td>
+</tr>
+</tbody>
+</table>
+<h3 id="common-headers">Common Headers</h3>
+<pre class="http"><code>Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIs...
+X-Request-ID: uuid-for-tracing</code></pre>
+<h3 id="rate-limits">Rate Limits</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint Category</th>
+<th>Limit</th>
+<th>Window</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Authentication</td>
+<td>10 requests</td>
+<td>1 minute</td>
+</tr>
+<tr>
+<td>Password reset</td>
+<td>3 requests</td>
+<td>1 hour</td>
+</tr>
+<tr>
+<td>MFA verification</td>
+<td>5 requests</td>
+<td>1 minute</td>
+</tr>
+<tr>
+<td>General API</td>
+<td>100 requests</td>
+<td>1 minute</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="authentication">Authentication</h2>
+<h3 id="get-current-user">Get Current User</h3>
+<p>Retrieve the authenticated user’s profile.</p>
+<pre class="http"><code>GET /auth/me
+Authorization: Bearer &lt;access_token&gt;</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;id&quot;: &quot;usr_abc123def456&quot;,
+  &quot;email&quot;: &quot;user@example.com&quot;,
+  &quot;name&quot;: &quot;Jane Doe&quot;,
+  &quot;avatar_url&quot;: &quot;https://cdn.radiant.ai/avatars/abc123.png&quot;,
+  &quot;tenant_id&quot;: &quot;ten_xyz789&quot;,
+  &quot;roles&quot;: [&quot;member&quot;],
+  &quot;mfa_enabled&quot;: true,
+  &quot;language&quot;: &quot;en&quot;,
+  &quot;timezone&quot;: &quot;America/New_York&quot;,
+  &quot;created_at&quot;: &quot;2024-01-15T10:30:00Z&quot;,
+  &quot;last_sign_in_at&quot;: &quot;2026-01-25T08:00:00Z&quot;
+}</code></pre>
+<hr />
+<h2 id="sign-in-sign-out">Sign In / Sign Out</h2>
+<h3 id="sign-in-with-emailpassword">Sign In with Email/Password</h3>
+<pre class="http"><code>POST /auth/signin
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;email&quot;: &quot;user@example.com&quot;,
+  &quot;password&quot;: &quot;SecurePassword123!&quot;,
+  &quot;remember_me&quot;: true
+}</code></pre>
+<p><strong>Response 200 (Success):</strong></p>
+<pre class="json"><code>{
+  &quot;access_token&quot;: &quot;eyJhbGciOiJSUzI1NiIs...&quot;,
+  &quot;refresh_token&quot;: &quot;dGhpcyBpcyBhIHJlZnJlc2g...&quot;,
+  &quot;token_type&quot;: &quot;Bearer&quot;,
+  &quot;expires_in&quot;: 3600,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;usr_abc123def456&quot;,
+    &quot;email&quot;: &quot;user@example.com&quot;,
+    &quot;name&quot;: &quot;Jane Doe&quot;
+  }
+}</code></pre>
+<p><strong>Response 200 (MFA Required):</strong></p>
+<pre class="json"><code>{
+  &quot;challenge&quot;: &quot;MFA_REQUIRED&quot;,
+  &quot;session&quot;: &quot;session_token_for_mfa&quot;,
+  &quot;mfa_methods&quot;: [&quot;totp&quot;, &quot;backup_code&quot;]
+}</code></pre>
+<p><strong>Response 401:</strong></p>
+<pre class="json"><code>{
+  &quot;error&quot;: &quot;invalid_credentials&quot;,
+  &quot;message&quot;: &quot;Invalid email or password&quot;
+}</code></pre>
+<h3 id="sign-in-with-sso">Sign In with SSO</h3>
+<p>Initiate SSO sign-in flow.</p>
+<pre class="http"><code>POST /auth/sso/initiate
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;email&quot;: &quot;user@company.com&quot;
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;sso_url&quot;: &quot;https://idp.company.com/saml/sso?SAMLRequest=...&quot;,
+  &quot;provider&quot;: &quot;saml&quot;,
+  &quot;provider_name&quot;: &quot;Company SSO&quot;
+}</code></pre>
+<p><strong>Response 200 (No SSO):</strong></p>
+<pre class="json"><code>{
+  &quot;sso_enabled&quot;: false,
+  &quot;message&quot;: &quot;No SSO configured for this domain&quot;
+}</code></pre>
+<h3 id="sso-callback">SSO Callback</h3>
+<p>Handle SSO provider callback (internal use).</p>
+<pre class="http"><code>POST /auth/sso/callback
+Content-Type: application/x-www-form-urlencoded</code></pre>
+<h3 id="sign-out">Sign Out</h3>
+<pre class="http"><code>POST /auth/signout
+Authorization: Bearer &lt;access_token&gt;</code></pre>
+<p><strong>Request Body (optional):</strong></p>
+<pre class="json"><code>{
+  &quot;all_devices&quot;: false
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Signed out successfully&quot;
+}</code></pre>
+<h3 id="refresh-token">Refresh Token</h3>
+<p>Exchange refresh token for new access token.</p>
+<pre class="http"><code>POST /auth/refresh
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;refresh_token&quot;: &quot;dGhpcyBpcyBhIHJlZnJlc2g...&quot;
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;access_token&quot;: &quot;eyJhbGciOiJSUzI1NiIs...&quot;,
+  &quot;refresh_token&quot;: &quot;bmV3IHJlZnJlc2ggdG9rZW4...&quot;,
+  &quot;token_type&quot;: &quot;Bearer&quot;,
+  &quot;expires_in&quot;: 3600
+}</code></pre>
+<hr />
+<h2 id="password-management">Password Management</h2>
+<h3 id="request-password-reset">Request Password Reset</h3>
+<pre class="http"><code>POST /auth/password/forgot
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;email&quot;: &quot;user@example.com&quot;
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;If an account exists, a reset link has been sent&quot;
+}</code></pre>
+<blockquote>
+<p><strong>Note</strong>: Always returns success to prevent email enumeration.</p>
+</blockquote>
+<h3 id="reset-password">Reset Password</h3>
+<pre class="http"><code>POST /auth/password/reset
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;token&quot;: &quot;reset_token_from_email&quot;,
+  &quot;password&quot;: &quot;NewSecurePassword123!&quot;,
+  &quot;password_confirmation&quot;: &quot;NewSecurePassword123!&quot;
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Password reset successfully&quot;
+}</code></pre>
+<p><strong>Response 400:</strong></p>
+<pre class="json"><code>{
+  &quot;error&quot;: &quot;invalid_token&quot;,
+  &quot;message&quot;: &quot;Reset token is invalid or expired&quot;
+}</code></pre>
+<h3 id="change-password">Change Password</h3>
+<pre class="http"><code>POST /auth/password/change
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;current_password&quot;: &quot;OldPassword123!&quot;,
+  &quot;new_password&quot;: &quot;NewSecurePassword456!&quot;,
+  &quot;new_password_confirmation&quot;: &quot;NewSecurePassword456!&quot;
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Password changed successfully&quot;,
+  &quot;sessions_revoked&quot;: true
+}</code></pre>
+<h3 id="validate-password-strength">Validate Password Strength</h3>
+<pre class="http"><code>POST /auth/password/validate
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;password&quot;: &quot;TestPassword123!&quot;
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;valid&quot;: true,
+  &quot;score&quot;: 4,
+  &quot;requirements&quot;: {
+    &quot;min_length&quot;: { &quot;required&quot;: 12, &quot;met&quot;: true },
+    &quot;uppercase&quot;: { &quot;required&quot;: true, &quot;met&quot;: true },
+    &quot;lowercase&quot;: { &quot;required&quot;: true, &quot;met&quot;: true },
+    &quot;number&quot;: { &quot;required&quot;: true, &quot;met&quot;: true },
+    &quot;special&quot;: { &quot;required&quot;: true, &quot;met&quot;: true }
+  },
+  &quot;suggestions&quot;: []
+}</code></pre>
+<hr />
+<h2 id="multi-factor-authentication">Multi-Factor Authentication</h2>
+<h3 id="get-mfa-status">Get MFA Status</h3>
+<pre class="http"><code>GET /auth/mfa/status
+Authorization: Bearer &lt;access_token&gt;</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;enabled&quot;: true,
+  &quot;methods&quot;: [
+    {
+      &quot;type&quot;: &quot;totp&quot;,
+      &quot;enabled&quot;: true,
+      &quot;configured_at&quot;: &quot;2024-06-15T10:30:00Z&quot;
+    }
+  ],
+  &quot;backup_codes_remaining&quot;: 8,
+  &quot;trusted_devices&quot;: 2
+}</code></pre>
+<h3 id="setup-totp">Setup TOTP</h3>
+<pre class="http"><code>POST /auth/mfa/totp/setup
+Authorization: Bearer &lt;access_token&gt;</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;secret&quot;: &quot;JBSWY3DPEHPK3PXP&quot;,
+  &quot;qr_code&quot;: &quot;data:image/png;base64,iVBORw0KGgo...&quot;,
+  &quot;otpauth_uri&quot;: &quot;otpauth://totp/RADIANT:user@example.com?secret=JBSWY3DPEHPK3PXP&amp;issuer=RADIANT&quot;
+}</code></pre>
+<h3 id="verify-and-enable-totp">Verify and Enable TOTP</h3>
+<pre class="http"><code>POST /auth/mfa/totp/verify
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;code&quot;: &quot;123456&quot;
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;success&quot;: true,
+  &quot;backup_codes&quot;: [
+    &quot;ABCD1234&quot;,
+    &quot;EFGH5678&quot;,
+    &quot;IJKL9012&quot;,
+    &quot;MNOP3456&quot;,
+    &quot;QRST7890&quot;,
+    &quot;UVWX1234&quot;,
+    &quot;YZAB5678&quot;,
+    &quot;CDEF9012&quot;,
+    &quot;GHIJ3456&quot;,
+    &quot;KLMN7890&quot;
+  ],
+  &quot;message&quot;: &quot;MFA enabled. Save your backup codes securely.&quot;
+}</code></pre>
+<h3 id="verify-mfa-code-during-sign-in">Verify MFA Code (During Sign-In)</h3>
+<pre class="http"><code>POST /auth/mfa/verify
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;session&quot;: &quot;session_token_from_signin&quot;,
+  &quot;code&quot;: &quot;123456&quot;,
+  &quot;trust_device&quot;: true
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;access_token&quot;: &quot;eyJhbGciOiJSUzI1NiIs...&quot;,
+  &quot;refresh_token&quot;: &quot;dGhpcyBpcyBhIHJlZnJlc2g...&quot;,
+  &quot;token_type&quot;: &quot;Bearer&quot;,
+  &quot;expires_in&quot;: 3600,
+  &quot;device_trusted&quot;: true
+}</code></pre>
+<h3 id="use-backup-code">Use Backup Code</h3>
+<pre class="http"><code>POST /auth/mfa/backup/verify
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;session&quot;: &quot;session_token_from_signin&quot;,
+  &quot;backup_code&quot;: &quot;ABCD1234&quot;
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;access_token&quot;: &quot;eyJhbGciOiJSUzI1NiIs...&quot;,
+  &quot;refresh_token&quot;: &quot;dGhpcyBpcyBhIHJlZnJlc2g...&quot;,
+  &quot;backup_codes_remaining&quot;: 7,
+  &quot;message&quot;: &quot;Backup code used. 7 codes remaining.&quot;
+}</code></pre>
+<h3 id="regenerate-backup-codes">Regenerate Backup Codes</h3>
+<pre class="http"><code>POST /auth/mfa/backup/regenerate
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;mfa_code&quot;: &quot;123456&quot;
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;backup_codes&quot;: [
+    &quot;NEWC1234&quot;,
+    &quot;ODES5678&quot;,
+    &quot;...&quot;
+  ],
+  &quot;message&quot;: &quot;New backup codes generated. Previous codes are now invalid.&quot;
+}</code></pre>
+<h3 id="disable-mfa">Disable MFA</h3>
+<pre class="http"><code>POST /auth/mfa/disable
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;mfa_code&quot;: &quot;123456&quot;,
+  &quot;password&quot;: &quot;CurrentPassword123!&quot;
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;MFA disabled&quot;
+}</code></pre>
+<p><strong>Response 403:</strong></p>
+<pre class="json"><code>{
+  &quot;error&quot;: &quot;mfa_required&quot;,
+  &quot;message&quot;: &quot;MFA cannot be disabled for your account type&quot;
+}</code></pre>
+<h3 id="get-trusted-devices">Get Trusted Devices</h3>
+<pre class="http"><code>GET /auth/mfa/devices
+Authorization: Bearer &lt;access_token&gt;</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;devices&quot;: [
+    {
+      &quot;id&quot;: &quot;dev_abc123&quot;,
+      &quot;name&quot;: &quot;Chrome on MacOS&quot;,
+      &quot;last_used&quot;: &quot;2026-01-25T08:00:00Z&quot;,
+      &quot;trusted_at&quot;: &quot;2026-01-20T10:00:00Z&quot;,
+      &quot;expires_at&quot;: &quot;2026-02-19T10:00:00Z&quot;,
+      &quot;current&quot;: true
+    },
+    {
+      &quot;id&quot;: &quot;dev_def456&quot;,
+      &quot;name&quot;: &quot;Safari on iPhone&quot;,
+      &quot;last_used&quot;: &quot;2026-01-24T15:30:00Z&quot;,
+      &quot;trusted_at&quot;: &quot;2026-01-15T09:00:00Z&quot;,
+      &quot;expires_at&quot;: &quot;2026-02-14T09:00:00Z&quot;,
+      &quot;current&quot;: false
+    }
+  ]
+}</code></pre>
+<h3 id="remove-trusted-device">Remove Trusted Device</h3>
+<pre class="http"><code>DELETE /auth/mfa/devices/{device_id}
+Authorization: Bearer &lt;access_token&gt;</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Device removed from trusted list&quot;
+}</code></pre>
+<hr />
+<h2 id="session-management">Session Management</h2>
+<h3 id="list-active-sessions">List Active Sessions</h3>
+<pre class="http"><code>GET /auth/sessions
+Authorization: Bearer &lt;access_token&gt;</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;sessions&quot;: [
+    {
+      &quot;id&quot;: &quot;sess_abc123&quot;,
+      &quot;device&quot;: &quot;Chrome on MacOS&quot;,
+      &quot;ip_address&quot;: &quot;192.168.1.100&quot;,
+      &quot;location&quot;: &quot;New York, US&quot;,
+      &quot;created_at&quot;: &quot;2026-01-20T10:00:00Z&quot;,
+      &quot;last_activity&quot;: &quot;2026-01-25T08:30:00Z&quot;,
+      &quot;current&quot;: true
+    },
+    {
+      &quot;id&quot;: &quot;sess_def456&quot;,
+      &quot;device&quot;: &quot;Safari on iPhone&quot;,
+      &quot;ip_address&quot;: &quot;10.0.0.50&quot;,
+      &quot;location&quot;: &quot;New York, US&quot;,
+      &quot;created_at&quot;: &quot;2026-01-22T14:00:00Z&quot;,
+      &quot;last_activity&quot;: &quot;2026-01-24T18:00:00Z&quot;,
+      &quot;current&quot;: false
+    }
+  ]
+}</code></pre>
+<h3 id="revoke-session">Revoke Session</h3>
+<pre class="http"><code>DELETE /auth/sessions/{session_id}
+Authorization: Bearer &lt;access_token&gt;</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;Session revoked&quot;
+}</code></pre>
+<h3 id="revoke-all-other-sessions">Revoke All Other Sessions</h3>
+<pre class="http"><code>POST /auth/sessions/revoke-others
+Authorization: Bearer &lt;access_token&gt;</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;success&quot;: true,
+  &quot;revoked_count&quot;: 3,
+  &quot;message&quot;: &quot;3 sessions revoked&quot;
+}</code></pre>
+<hr />
+<h2 id="oauth-2.0-endpoints">OAuth 2.0 Endpoints</h2>
+<h3 id="authorization-endpoint">Authorization Endpoint</h3>
+<pre class="http"><code>GET /oauth/authorize</code></pre>
+<p><strong>Query Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>client_id</code></td>
+<td>Yes</td>
+<td>Application client ID</td>
+</tr>
+<tr>
+<td><code>redirect_uri</code></td>
+<td>Yes</td>
+<td>Callback URL (must match registration)</td>
+</tr>
+<tr>
+<td><code>response_type</code></td>
+<td>Yes</td>
+<td><code>code</code></td>
+</tr>
+<tr>
+<td><code>scope</code></td>
+<td>Yes</td>
+<td>Space-separated scopes</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>Yes</td>
+<td>CSRF protection token</td>
+</tr>
+<tr>
+<td><code>code_challenge</code></td>
+<td>Yes*</td>
+<td>PKCE challenge (S256)</td>
+</tr>
+<tr>
+<td><code>code_challenge_method</code></td>
+<td>Yes*</td>
+<td><code>S256</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong></p>
+<pre><code>GET /oauth/authorize?client_id=app_123&amp;redirect_uri=https://myapp.com/callback&amp;response_type=code&amp;scope=openid%20profile&amp;state=abc123&amp;code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&amp;code_challenge_method=S256</code></pre>
+<h3 id="token-endpoint">Token Endpoint</h3>
+<pre class="http"><code>POST /oauth/token
+Content-Type: application/x-www-form-urlencoded</code></pre>
+<p><strong>Authorization Code Grant:</strong></p>
+<pre><code>grant_type=authorization_code
+&amp;code=AUTH_CODE
+&amp;redirect_uri=https://myapp.com/callback
+&amp;client_id=app_123
+&amp;client_secret=secret_456
+&amp;code_verifier=PKCE_VERIFIER</code></pre>
+<p><strong>Refresh Token Grant:</strong></p>
+<pre><code>grant_type=refresh_token
+&amp;refresh_token=REFRESH_TOKEN
+&amp;client_id=app_123
+&amp;client_secret=secret_456</code></pre>
+<p><strong>Client Credentials Grant:</strong></p>
+<pre><code>grant_type=client_credentials
+&amp;client_id=app_123
+&amp;client_secret=secret_456
+&amp;scope=read:data</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;access_token&quot;: &quot;eyJhbGciOiJSUzI1NiIs...&quot;,
+  &quot;token_type&quot;: &quot;Bearer&quot;,
+  &quot;expires_in&quot;: 3600,
+  &quot;refresh_token&quot;: &quot;dGhpcyBpcyBhIHJlZnJlc2g...&quot;,
+  &quot;scope&quot;: &quot;openid profile&quot;
+}</code></pre>
+<h3 id="token-introspection">Token Introspection</h3>
+<pre class="http"><code>POST /oauth/introspect
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic base64(client_id:client_secret)</code></pre>
+<p><strong>Request:</strong></p>
+<pre><code>token=ACCESS_TOKEN</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;active&quot;: true,
+  &quot;client_id&quot;: &quot;app_123&quot;,
+  &quot;scope&quot;: &quot;openid profile&quot;,
+  &quot;sub&quot;: &quot;usr_abc123&quot;,
+  &quot;exp&quot;: 1706234567,
+  &quot;iat&quot;: 1706230967,
+  &quot;token_type&quot;: &quot;Bearer&quot;
+}</code></pre>
+<h3 id="token-revocation">Token Revocation</h3>
+<pre class="http"><code>POST /oauth/revoke
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic base64(client_id:client_secret)</code></pre>
+<p><strong>Request:</strong></p>
+<pre><code>token=REFRESH_TOKEN
+&amp;token_type_hint=refresh_token</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;success&quot;: true
+}</code></pre>
+<h3 id="userinfo-endpoint-oidc">UserInfo Endpoint (OIDC)</h3>
+<pre class="http"><code>GET /oauth/userinfo
+Authorization: Bearer &lt;access_token&gt;</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;sub&quot;: &quot;usr_abc123def456&quot;,
+  &quot;name&quot;: &quot;Jane Doe&quot;,
+  &quot;given_name&quot;: &quot;Jane&quot;,
+  &quot;family_name&quot;: &quot;Doe&quot;,
+  &quot;email&quot;: &quot;user@example.com&quot;,
+  &quot;email_verified&quot;: true,
+  &quot;picture&quot;: &quot;https://cdn.radiant.ai/avatars/abc123.png&quot;
+}</code></pre>
+<hr />
+<h2 id="user-profile">User Profile</h2>
+<h3 id="update-profile">Update Profile</h3>
+<pre class="http"><code>PATCH /auth/profile
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json</code></pre>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;name&quot;: &quot;Jane Smith&quot;,
+  &quot;language&quot;: &quot;es&quot;,
+  &quot;timezone&quot;: &quot;Europe/Madrid&quot;
+}</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;id&quot;: &quot;usr_abc123def456&quot;,
+  &quot;email&quot;: &quot;user@example.com&quot;,
+  &quot;name&quot;: &quot;Jane Smith&quot;,
+  &quot;language&quot;: &quot;es&quot;,
+  &quot;timezone&quot;: &quot;Europe/Madrid&quot;,
+  &quot;updated_at&quot;: &quot;2026-01-25T10:00:00Z&quot;
+}</code></pre>
+<h3 id="update-avatar">Update Avatar</h3>
+<pre class="http"><code>POST /auth/profile/avatar
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: multipart/form-data</code></pre>
+<p><strong>Request:</strong></p>
+<pre><code>avatar: (binary file, max 5MB, PNG/JPG/GIF)</code></pre>
+<p><strong>Response 200:</strong></p>
+<pre class="json"><code>{
+  &quot;avatar_url&quot;: &quot;https://cdn.radiant.ai/avatars/new_abc123.png&quot;
+}</code></pre>
+<hr />
+<h2 id="error-responses">Error Responses</h2>
+<h3 id="error-format">Error Format</h3>
+<p>All errors follow this format:</p>
+<pre class="json"><code>{
+  &quot;error&quot;: &quot;error_code&quot;,
+  &quot;message&quot;: &quot;Human-readable message&quot;,
+  &quot;details&quot;: { },
+  &quot;request_id&quot;: &quot;req_abc123&quot;
+}</code></pre>
+<h3 id="error-codes">Error Codes</h3>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>invalid_credentials</code></td>
+<td>401</td>
+<td>Email or password incorrect</td>
+</tr>
+<tr>
+<td><code>account_locked</code></td>
+<td>403</td>
+<td>Too many failed attempts</td>
+</tr>
+<tr>
+<td><code>account_suspended</code></td>
+<td>403</td>
+<td>Account has been suspended</td>
+</tr>
+<tr>
+<td><code>mfa_required</code></td>
+<td>401</td>
+<td>MFA verification needed</td>
+</tr>
+<tr>
+<td><code>mfa_invalid</code></td>
+<td>401</td>
+<td>MFA code incorrect</td>
+</tr>
+<tr>
+<td><code>session_expired</code></td>
+<td>401</td>
+<td>Session has expired</td>
+</tr>
+<tr>
+<td><code>token_invalid</code></td>
+<td>401</td>
+<td>Token is invalid or expired</td>
+</tr>
+<tr>
+<td><code>token_revoked</code></td>
+<td>401</td>
+<td>Token has been revoked</td>
+</tr>
+<tr>
+<td><code>insufficient_scope</code></td>
+<td>403</td>
+<td>Token lacks required scope</td>
+</tr>
+<tr>
+<td><code>rate_limited</code></td>
+<td>429</td>
+<td>Too many requests</td>
+</tr>
+<tr>
+<td><code>invalid_request</code></td>
+<td>400</td>
+<td>Request validation failed</td>
+</tr>
+<tr>
+<td><code>not_found</code></td>
+<td>404</td>
+<td>Resource not found</td>
+</tr>
+<tr>
+<td><code>server_error</code></td>
+<td>500</td>
+<td>Internal server error</td>
+</tr>
+</tbody>
+</table>
+<h3 id="validation-errors">Validation Errors</h3>
+<pre class="json"><code>{
+  &quot;error&quot;: &quot;validation_error&quot;,
+  &quot;message&quot;: &quot;Validation failed&quot;,
+  &quot;details&quot;: {
+    &quot;fields&quot;: {
+      &quot;email&quot;: [&quot;Invalid email format&quot;],
+      &quot;password&quot;: [&quot;Must be at least 12 characters&quot;]
+    }
+  }
+}</code></pre>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="../authentication/overview.md">Authentication Overview</a></li>
+<li><a href="../authentication/oauth-guide.md">OAuth Developer Guide</a></li>
+<li><a href="../security/authentication-architecture.md">Security Architecture</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

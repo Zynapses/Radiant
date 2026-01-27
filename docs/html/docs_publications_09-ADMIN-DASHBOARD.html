@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09 ADMIN DASHBOARD - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>09 ADMIN DASHBOARD</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/publications/09-ADMIN-DASHBOARD.md</div>
+  </div>
+  
+  <h1 id="admin-dashboard-reference">Admin Dashboard Reference</h1>
+<h2 id="dashboard-architecture">Dashboard Architecture</h2>
+<h3 id="technology-stack">Technology Stack</h3>
+<ul>
+<li><strong>Framework:</strong> Next.js 14 (App Router)</li>
+<li><strong>Language:</strong> TypeScript</li>
+<li><strong>Styling:</strong> Tailwind CSS</li>
+<li><strong>Components:</strong> shadcn/ui</li>
+<li><strong>Icons:</strong> Lucide React</li>
+<li><strong>State:</strong> React Query, Zustand</li>
+<li><strong>Forms:</strong> React Hook Form, Zod</li>
+</ul>
+<h3 id="page-structure">Page Structure</h3>
+<pre><code>apps/admin-dashboard/
+├── app/
+│   ├── layout.tsx              # Root layout
+│   ├── page.tsx                # Landing/login
+│   └── (dashboard)/            # Dashboard routes (43 pages)
+│       ├── layout.tsx          # Dashboard layout with sidebar
+│       ├── page.tsx            # Overview dashboard
+│       └── [module]/page.tsx   # Individual modules
+├── components/
+│   ├── ui/                     # shadcn/ui components
+│   ├── workflow-editor/        # Visual workflow editor
+│   └── shared/                 # Shared components
+└── lib/
+    ├── api.ts                  # API client
+    ├── auth.ts                 # Auth utilities
+    └── utils.ts                # Helper functions</code></pre>
+<hr />
+<h2 id="complete-page-inventory-43-pages">Complete Page Inventory (43 Pages)</h2>
+<h3 id="core-administration">Core Administration</h3>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 31%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Overview</td>
+<td><code>/</code></td>
+<td>System health, key metrics, quick actions</td>
+</tr>
+<tr>
+<td>Administrators</td>
+<td><code>/administrators</code></td>
+<td>Manage admin users, roles, permissions</td>
+</tr>
+<tr>
+<td>Audit Logs</td>
+<td><code>/audit-logs</code></td>
+<td>View all system audit events</td>
+</tr>
+<tr>
+<td>AWS Logs</td>
+<td><code>/aws-logs</code></td>
+<td>CloudWatch log viewer</td>
+</tr>
+<tr>
+<td>Security</td>
+<td><code>/security</code></td>
+<td>Security settings, WAF, compliance</td>
+</tr>
+<tr>
+<td>Settings</td>
+<td><code>/settings</code></td>
+<td>Platform configuration</td>
+</tr>
+<tr>
+<td>System Config</td>
+<td><code>/system-config</code></td>
+<td>Advanced system settings</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ai-models">AI &amp; Models</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Models</td>
+<td><code>/models</code></td>
+<td>AI model configuration</td>
+</tr>
+<tr>
+<td>Model Metadata</td>
+<td><code>/model-metadata</code></td>
+<td>Model capabilities &amp; pricing</td>
+</tr>
+<tr>
+<td>User Models</td>
+<td><code>/user-models</code></td>
+<td>Per-tenant model access</td>
+</tr>
+<tr>
+<td>Providers</td>
+<td><code>/providers</code></td>
+<td>AI provider management</td>
+</tr>
+</tbody>
+</table>
+<h3 id="orchestration">Orchestration</h3>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 31%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Orchestration</td>
+<td><code>/orchestration</code></td>
+<td>Workflow management</td>
+</tr>
+<tr>
+<td>Orchestration Patterns</td>
+<td><code>/orchestration-patterns</code></td>
+<td>49 patterns library</td>
+</tr>
+<tr>
+<td>Orchestration Editor</td>
+<td><code>/orchestration-patterns/editor</code></td>
+<td>Visual workflow editor</td>
+</tr>
+</tbody>
+</table>
+<h3 id="think-tank">Think Tank</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Think Tank</td>
+<td><code>/thinktank</code></td>
+<td>Session management</td>
+</tr>
+<tr>
+<td>Cognition</td>
+<td><code>/cognition</code></td>
+<td>Cognitive settings</td>
+</tr>
+<tr>
+<td>Cognitive Brain</td>
+<td><code>/cognitive-brain</code></td>
+<td>Brain configuration</td>
+</tr>
+<tr>
+<td>Consciousness</td>
+<td><code>/consciousness</code></td>
+<td>Consciousness monitoring</td>
+</tr>
+<tr>
+<td>Metacognition</td>
+<td><code>/metacognition</code></td>
+<td>Self-reflection settings</td>
+</tr>
+<tr>
+<td>Planning</td>
+<td><code>/planning</code></td>
+<td>Goal planning</td>
+</tr>
+<tr>
+<td>World Model</td>
+<td><code>/world-model</code></td>
+<td>World model state</td>
+</tr>
+</tbody>
+</table>
+<h3 id="billing-cost">Billing &amp; Cost</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Billing</td>
+<td><code>/billing</code></td>
+<td>Revenue, invoices, subscriptions</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td><code>/cost</code></td>
+<td>Cost analytics, budgets</td>
+</tr>
+</tbody>
+</table>
+<h3 id="analytics-monitoring">Analytics &amp; Monitoring</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Analytics</td>
+<td><code>/analytics</code></td>
+<td>Usage analytics</td>
+</tr>
+<tr>
+<td>Reports</td>
+<td><code>/reports</code></td>
+<td>Generated reports</td>
+</tr>
+<tr>
+<td>Health</td>
+<td><code>/health</code></td>
+<td>System health dashboard</td>
+</tr>
+<tr>
+<td>Deployments</td>
+<td><code>/deployments</code></td>
+<td>Deployment history</td>
+</tr>
+</tbody>
+</table>
+<h3 id="agi-learning">AGI &amp; Learning</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agents</td>
+<td><code>/agents</code></td>
+<td>Autonomous agents</td>
+</tr>
+<tr>
+<td>Learning</td>
+<td><code>/learning</code></td>
+<td>ML training data</td>
+</tr>
+<tr>
+<td>ML Training</td>
+<td><code>/ml-training</code></td>
+<td>Model training jobs</td>
+</tr>
+<tr>
+<td>Self-Improvement</td>
+<td><code>/self-improvement</code></td>
+<td>Self-improvement logs</td>
+</tr>
+<tr>
+<td>Moral Compass</td>
+<td><code>/moral-compass</code></td>
+<td>Ethical guidelines</td>
+</tr>
+<tr>
+<td>Feedback</td>
+<td><code>/feedback</code></td>
+<td>User feedback</td>
+</tr>
+</tbody>
+</table>
+<h3 id="collaboration-features">Collaboration &amp; Features</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Route</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Time Machine</td>
+<td><code>/time-machine</code></td>
+<td>Historical state access</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td><code>/storage</code></td>
+<td>File storage management</td>
+</tr>
+<tr>
+<td>Notifications</td>
+<td><code>/notifications</code></td>
+<td>Notification settings</td>
+</tr>
+<tr>
+<td>Localization</td>
+<td><code>/localization</code></td>
+<td>i18n management</td>
+</tr>
+<tr>
+<td>Configuration</td>
+<td><code>/configuration</code></td>
+<td>Dynamic configuration</td>
+</tr>
+<tr>
+<td>Compliance</td>
+<td><code>/compliance</code></td>
+<td>Compliance dashboard</td>
+</tr>
+<tr>
+<td>Geographic</td>
+<td><code>/geographic</code></td>
+<td>Geographic settings</td>
+</tr>
+<tr>
+<td>Multi-Region</td>
+<td><code>/multi-region</code></td>
+<td>Multi-region config</td>
+</tr>
+<tr>
+<td>Experiments</td>
+<td><code>/experiments</code></td>
+<td>A/B testing</td>
+</tr>
+<tr>
+<td>Migrations</td>
+<td><code>/migrations</code></td>
+<td>Database migrations</td>
+</tr>
+<tr>
+<td>Services</td>
+<td><code>/services</code></td>
+<td>Service status</td>
+</tr>
+<tr>
+<td>Request Handler</td>
+<td><code>/request-handler</code></td>
+<td>Request routing</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="key-pages-detail">Key Pages Detail</h2>
+<h3 id="overview-dashboard">Overview Dashboard (<code>/</code>)</h3>
+<p><strong>Metrics Displayed:</strong> - Active tenants (24h) - Total API requests (24h) - Total tokens processed - Revenue (MTD) - Error rate - Average latency</p>
+<p><strong>Quick Actions:</strong> - View recent errors - Check provider health - Review pending approvals - Generate report</p>
+<p><strong>Charts:</strong> - Requests over time (7d) - Token usage by model - Revenue trend - Error rate trend</p>
+<hr />
+<h3 id="models-page-models">Models Page (<code>/models</code>)</h3>
+<p><strong>Features:</strong> - List all 106+ models - Filter by provider, capability - Enable/disable models - Set model pricing overrides - Configure fallback chains - View usage statistics</p>
+<p><strong>Model Card Display:</strong></p>
+<pre><code>┌─────────────────────────────────────────────┐
+│ anthropic/claude-3-5-sonnet                 │
+│ ─────────────────────────────────────────── │
+│ Provider: Bedrock (primary), LiteLLM (fb)   │
+│ Capabilities: reasoning, coding, vision     │
+│ Context: 200K tokens                        │
+│ Pricing: $3.00/$15.00 per 1M tokens         │
+│ Status: ● Enabled                           │
+│ Usage (24h): 1.2M tokens                    │
+│                                             │
+│ [Configure] [Disable] [View Stats]          │
+└─────────────────────────────────────────────┘</code></pre>
+<hr />
+<h3 id="orchestration-patterns-page-orchestration-patterns">Orchestration Patterns Page (<code>/orchestration-patterns</code>)</h3>
+<p><strong>Features:</strong> - Browse 49 patterns by category - Search patterns - View pattern details - Edit pattern workflows - Create custom patterns - View execution statistics</p>
+<p><strong>Pattern Categories Tabs:</strong> - Consensus &amp; Aggregation (7) - Debate &amp; Deliberation (7) - Critique &amp; Refinement (7) - Verification &amp; Validation (7) - Decomposition (7) - Specialized Reasoning (7) - Multi-Model Routing (4) - Ensemble Methods (3)</p>
+<p><strong>Pattern Detail View:</strong></p>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ AI Debate                                      [Edit] [Test] │
+│ ─────────────────────────────────────────────────────────── │
+│ Category: Debate &amp; Deliberation                             │
+│ Quality Improvement: +25-40%                                │
+│ Typical Latency: High (10-30s)                              │
+│ Min Models: 3                                               │
+│                                                             │
+│ Description:                                                │
+│ Two AI models debate opposing positions while a third       │
+│ model judges the arguments and synthesizes a final answer.  │
+│                                                             │
+│ Best For:                                                   │
+│ • Controversial topics                                      │
+│ • Complex decisions                                         │
+│ • Exploring multiple perspectives                           │
+│                                                             │
+│ Workflow Steps:                                             │
+│ 1. Generate Pro Argument (Claude)                           │
+│ 2. Generate Con Argument (GPT-4o)                           │
+│ 3. Judge Arguments (Claude - thinking mode)                 │
+│ 4. Synthesize Final Answer                                  │
+│                                                             │
+│ Executions (30d): 1,247  |  Avg Quality: 0.89               │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h3 id="visual-workflow-editor-orchestration-patternseditor">Visual Workflow Editor (<code>/orchestration-patterns/editor</code>)</h3>
+<p><strong>Features:</strong> - Drag-and-drop workflow design - 16 method palette - Node connection editing - Step configuration (4 tabs) - Zoom, pan, fit controls - Test execution - Save/load workflows</p>
+<p><strong>Method Palette (16 Methods):</strong> | Method | Category | Description | |——–|———-|————-| | Generate | Core | Generate text response | | Analyze | Core | Analyze input | | Transform | Core | Transform data | | Validate | Core | Validate output | | Critique | Refinement | Critique response | | Refine | Refinement | Improve response | | Decompose | Decomposition | Break into parts | | Synthesize | Aggregation | Combine results | | Judge | Evaluation | Evaluate quality | | Vote | Consensus | Majority voting | | Debate_Pro | Debate | Pro argument | | Debate_Con | Debate | Con argument | | Verify | Verification | Fact-check | | Search | External | Web search | | Execute_Code | External | Run code | | Custom | Custom | Custom logic |</p>
+<p><strong>Step Configuration Tabs:</strong> 1. <strong>General</strong> - Name, order, model, output variable 2. <strong>Parameters</strong> - Method-specific parameters 3. <strong>Advanced</strong> - Conditions, iterations, dependencies 4. <strong>Parallel</strong> - Parallel execution settings, AGI selection</p>
+<hr />
+<h3 id="billing-page-billing">Billing Page (<code>/billing</code>)</h3>
+<p><strong>Sections:</strong></p>
+<p><strong>Revenue Overview:</strong> - Monthly Recurring Revenue (MRR) - Annual Recurring Revenue (ARR) - Revenue growth % - Churn rate</p>
+<p><strong>Subscription Management:</strong> - Active subscriptions by tier - Upcoming renewals - Cancelled subscriptions - Trial conversions</p>
+<p><strong>Credit Management:</strong> - Total credits sold - Credits consumed - Credit purchase history - Low balance alerts</p>
+<p><strong>Invoice Management:</strong> - Generate invoices - View invoice history - Export to CSV - Send invoice reminders</p>
+<hr />
+<h3 id="analytics-page-analytics">Analytics Page (<code>/analytics</code>)</h3>
+<p><strong>Dashboard Sections:</strong></p>
+<p><strong>Usage Analytics:</strong> - Requests by model - Tokens by tenant - Peak usage times - Geographic distribution</p>
+<p><strong>Performance Analytics:</strong> - Latency percentiles (p50, p95, p99) - Error rates by endpoint - Provider availability - Cache hit rates</p>
+<p><strong>Business Analytics:</strong> - Cost per request - Revenue per tenant - Feature adoption - User engagement</p>
+<p><strong>Custom Reports:</strong> - Date range selection - Dimension grouping - Metric selection - Export options (CSV, PDF, JSON)</p>
+<hr />
+<h3 id="security-page-security">Security Page (<code>/security</code>)</h3>
+<p><strong>Sections:</strong></p>
+<p><strong>Authentication:</strong> - Cognito configuration - MFA enforcement - Session settings - Password policies</p>
+<p><strong>API Security:</strong> - Rate limiting rules - IP allowlists - API key management - Request validation</p>
+<p><strong>Compliance:</strong> - SOC2 status - HIPAA mode toggle - Data retention settings - Audit log retention</p>
+<p><strong>WAF Configuration:</strong> - Rule management - Blocked requests - Rate limit thresholds - Custom rules</p>
+<hr />
+<h3 id="think-tank-page-thinktank">Think Tank Page (<code>/thinktank</code>)</h3>
+<p><strong>Features:</strong> - View all sessions across tenants - Filter by domain, status, confidence - Session detail view - Step-by-step reasoning display - Cost and token tracking</p>
+<p><strong>Session List View:</strong></p>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ Session ID    │ Tenant  │ Domain    │ Steps │ Conf  │ Cost  │
+│ ───────────── │ ─────── │ ───────── │ ───── │ ───── │ ───── │
+│ abc123...     │ Acme    │ Engineering│ 6     │ 0.92  │ $0.45 │
+│ def456...     │ Beta    │ Research  │ 8     │ 0.87  │ $0.72 │
+│ ghi789...     │ Acme    │ Legal     │ 4     │ 0.95  │ $0.28 │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<p><strong>Session Detail View:</strong></p>
+<pre><code>Problem: &quot;Design a microservices architecture for 10M daily users&quot;
+Domain: Engineering | Complexity: High | Status: Completed
+
+Step 1: Decompose [Claude 3.5] ✓ (conf: 0.94)
+├─ Identified 5 sub-problems
+└─ Duration: 2.3s | Tokens: 1,247
+
+Step 2: Requirements Analysis [Claude + GPT-4o parallel] ✓ (conf: 0.91)
+├─ Synthesized from 2 models
+└─ Duration: 4.1s | Tokens: 3,892
+
+Step 3-5: [...]
+
+Step 6: Synthesize Final Solution [Claude 3.5 thinking] ✓ (conf: 0.89)
+├─ Generated comprehensive solution
+└─ Duration: 5.7s | Tokens: 2,156
+
+Total: 6 steps | 18.2s | 12,453 tokens | $0.45
+Final Confidence: 0.89</code></pre>
+<hr />
+<h2 id="component-library">Component Library</h2>
+<h3 id="shared-components">Shared Components</h3>
+<p><strong>DataTable:</strong> - Sortable columns - Pagination - Row selection - Export functionality - Column visibility toggle</p>
+<p><strong>StatusBadge:</strong> - Status indicator with color - Configurable variants - Icon support</p>
+<p><strong>MetricCard:</strong> - Large number display - Trend indicator - Comparison to previous period</p>
+<p><strong>Chart Components:</strong> - LineChart (time series) - BarChart (comparisons) - PieChart (distributions) - AreaChart (cumulative)</p>
+<p><strong>Form Components:</strong> - Input with validation - Select with search - DateRangePicker - JSONEditor - CodeEditor</p>
+<hr />
+<h2 id="api-integration">API Integration</h2>
+<h3 id="api-client-libapi.ts">API Client (<code>lib/api.ts</code>)</h3>
+<pre class="typescript"><code>import { QueryClient } from &#39;@tanstack/react-query&#39;;
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
+export const apiClient = {
+  // GET request
+  async get&lt;T&gt;(path: string): Promise&lt;T&gt; {
+    const response = await fetch(`${API_BASE}${path}`, {
+      headers: await getAuthHeaders(),
+    });
+    if (!response.ok) throw new APIError(response);
+    return response.json();
+  },
+  
+  // POST request
+  async post&lt;T&gt;(path: string, data: unknown): Promise&lt;T&gt; {
+    const response = await fetch(`${API_BASE}${path}`, {
+      method: &#39;POST&#39;,
+      headers: {
+        &#39;Content-Type&#39;: &#39;application/json&#39;,
+        ...(await getAuthHeaders()),
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new APIError(response);
+    return response.json();
+  },
+  
+  // React Query hooks
+  useModels: () =&gt; useQuery([&#39;models&#39;], () =&gt; apiClient.get(&#39;/admin/models&#39;)),
+  useTenants: () =&gt; useQuery([&#39;tenants&#39;], () =&gt; apiClient.get(&#39;/admin/tenants&#39;)),
+  useAnalytics: (range: string) =&gt; 
+    useQuery([&#39;analytics&#39;, range], () =&gt; apiClient.get(`/admin/analytics?range=${range}`)),
+};</code></pre>
+<h3 id="authentication-libauth.ts">Authentication (<code>lib/auth.ts</code>)</h3>
+<pre class="typescript"><code>import { Amplify, Auth } from &#39;aws-amplify&#39;;
+
+export async function getAuthHeaders(): Promise&lt;Headers&gt; {
+  const session = await Auth.currentSession();
+  return {
+    &#39;Authorization&#39;: `Bearer ${session.getIdToken().getJwtToken()}`,
+  };
+}
+
+export function useAuth() {
+  const [user, setUser] = useState&lt;CognitoUser | null&gt;(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() =&gt; {
+    Auth.currentAuthenticatedUser()
+      .then(setUser)
+      .catch(() =&gt; setUser(null))
+      .finally(() =&gt; setLoading(false));
+  }, []);
+  
+  return { user, loading, signIn, signOut };
+}</code></pre>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

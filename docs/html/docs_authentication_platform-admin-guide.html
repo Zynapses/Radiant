@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>platform admin guide - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>platform admin guide</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/authentication/platform-admin-guide.md</div>
+  </div>
+  
+  <h1 id="platform-administrator-authentication-guide">Platform Administrator Authentication Guide</h1>
+<blockquote>
+<p><strong>Version</strong>: 5.52.29 | <strong>Last Updated</strong>: January 25, 2026 | <strong>Audience</strong>: Platform Administrators</p>
+</blockquote>
+<p>This guide covers system-wide authentication configuration for RADIANT platform administrators: managing Cognito pools, global security policies, tenant authentication settings, and compliance configuration.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#cognito-user-pool-management">Cognito User Pool Management</a></li>
+<li><a href="#global-security-policies">Global Security Policies</a></li>
+<li><a href="#tenant-authentication-management">Tenant Authentication Management</a></li>
+<li><a href="#oauth-provider-management">OAuth Provider Management</a></li>
+<li><a href="#compliance--audit">Compliance &amp; Audit</a></li>
+<li><a href="#emergency-procedures">Emergency Procedures</a></li>
+<li><a href="#infrastructure-configuration">Infrastructure Configuration</a></li>
+</ol>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>As a Platform Administrator, you manage authentication infrastructure across all tenants. Your responsibilities include:</p>
+<table>
+<colgroup>
+<col style="width: 68%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Responsibility</th>
+<th>Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cognito Pool Management</strong></td>
+<td>Configure AWS Cognito settings</td>
+</tr>
+<tr>
+<td><strong>Global Security Policies</strong></td>
+<td>Set platform-wide security baselines</td>
+</tr>
+<tr>
+<td><strong>Tenant Oversight</strong></td>
+<td>Monitor and assist tenant authentication</td>
+</tr>
+<tr>
+<td><strong>OAuth Provider Registry</strong></td>
+<td>Manage platform-level OAuth settings</td>
+</tr>
+<tr>
+<td><strong>Compliance Configuration</strong></td>
+<td>Configure audit, retention, and compliance features</td>
+</tr>
+<tr>
+<td><strong>Incident Response</strong></td>
+<td>Handle security incidents and emergency access</td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>graph TB
+    subgraph &quot;Platform Admin Scope&quot;
+        PA[Platform Admin] --&gt; COGNITO[Cognito Pools]
+        PA --&gt; GLOBAL[Global Policies]
+        PA --&gt; TENANTS[Tenant Oversight]
+        PA --&gt; OAUTH[OAuth Registry]
+        PA --&gt; COMPLIANCE[Compliance]
+        PA --&gt; INCIDENT[Incidents]
+    end
+    
+    subgraph &quot;Tenant Scope&quot;
+        TENANTS --&gt; T1[Tenant 1]
+        TENANTS --&gt; T2[Tenant 2]
+        TENANTS --&gt; TN[Tenant N]
+    end
+    
+    COGNITO --&gt; T1
+    COGNITO --&gt; T2
+    COGNITO --&gt; TN</code></pre>
+<blockquote>
+<p><strong>Note</strong>: Platform administrators always require MFA and have shorter session timeouts (30 minutes) compared to tenant users.</p>
+</blockquote>
+<hr />
+<h2 id="cognito-user-pool-management">Cognito User Pool Management</h2>
+<h3 id="user-pool-architecture">User Pool Architecture</h3>
+<p>RADIANT uses separate Cognito User Pools for different user types:</p>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 40%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Pool</th>
+<th>Purpose</th>
+<th>Users</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>End-User Pool</strong></td>
+<td>Think Tank, Curator, Tenant Admin users</td>
+<td>Organization members</td>
+</tr>
+<tr>
+<td><strong>Platform Admin Pool</strong></td>
+<td>RADIANT platform administrators</td>
+<td>Internal operations</td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>graph LR
+    subgraph &quot;AWS Cognito&quot;
+        EUP[End-User Pool]
+        PAP[Platform Admin Pool]
+    end
+    
+    subgraph &quot;Applications&quot;
+        TT[Think Tank]
+        CU[Curator]
+        TA[Tenant Admin]
+        RA[RADIANT Admin]
+    end
+    
+    EUP --&gt; TT
+    EUP --&gt; CU
+    EUP --&gt; TA
+    PAP --&gt; RA</code></pre>
+<h3 id="configuring-the-end-user-pool">Configuring the End-User Pool</h3>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>Infrastructure</strong> → <strong>Cognito</strong></li>
+<li>Select <strong>End-User Pool</strong></li>
+<li>Configure settings:</li>
+</ol>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+<th>Recommended</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Password policy</strong></td>
+<td>Minimum requirements</td>
+<td>12+ chars, mixed case, number, symbol</td>
+</tr>
+<tr>
+<td><strong>MFA configuration</strong></td>
+<td>Available MFA methods</td>
+<td>TOTP enabled</td>
+</tr>
+<tr>
+<td><strong>Account recovery</strong></td>
+<td>How users reset passwords</td>
+<td>Email verification</td>
+</tr>
+<tr>
+<td><strong>Email configuration</strong></td>
+<td>SES for transactional emails</td>
+<td>Use verified SES domain</td>
+</tr>
+<tr>
+<td><strong>Lambda triggers</strong></td>
+<td>Custom authentication logic</td>
+<td>Pre-signup, Post-confirm</td>
+</tr>
+</tbody>
+</table>
+<h3 id="configuring-the-platform-admin-pool">Configuring the Platform Admin Pool</h3>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>Infrastructure</strong> → <strong>Cognito</strong></li>
+<li>Select <strong>Platform Admin Pool</strong></li>
+<li>This pool has stricter defaults:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Changeable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Self-registration</strong></td>
+<td>Disabled</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>MFA</strong></td>
+<td>Required (TOTP)</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Password length</strong></td>
+<td>16+ characters</td>
+<td>Can increase only</td>
+</tr>
+<tr>
+<td><strong>Session duration</strong></td>
+<td>30 minutes</td>
+<td>Can decrease only</td>
+</tr>
+</tbody>
+</table>
+<h3 id="managing-app-clients">Managing App Clients</h3>
+<p>App clients define how applications connect to Cognito:</p>
+<ol type="1">
+<li>Navigate to <strong>Cognito</strong> → <strong>App Clients</strong></li>
+<li>View existing clients:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Client</th>
+<th>Application</th>
+<th>OAuth Flows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>thinktank-web</code></td>
+<td>Think Tank Web</td>
+<td>Authorization Code + PKCE</td>
+</tr>
+<tr>
+<td><code>curator-web</code></td>
+<td>Curator Web</td>
+<td>Authorization Code + PKCE</td>
+</tr>
+<tr>
+<td><code>admin-web</code></td>
+<td>Admin Dashboard</td>
+<td>Authorization Code + PKCE</td>
+</tr>
+<tr>
+<td><code>api-m2m</code></td>
+<td>Machine-to-Machine</td>
+<td>Client Credentials</td>
+</tr>
+</tbody>
+</table>
+<ol start="3" type="1">
+<li>To create a new client, click <strong>Add Client</strong> and configure:
+<ul>
+<li><strong>Name</strong>: Descriptive identifier</li>
+<li><strong>Generate secret</strong>: Yes for server apps, No for SPAs</li>
+<li><strong>OAuth flows</strong>: Select appropriate flows</li>
+<li><strong>Scopes</strong>: Limit to required scopes</li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="global-security-policies">Global Security Policies</h2>
+<h3 id="password-policy-baseline">Password Policy Baseline</h3>
+<p>Set minimum password requirements that all tenants must meet:</p>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>Security</strong> → <strong>Global Policies</strong></li>
+<li>Under <strong>Password Baseline</strong>:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Minimum</th>
+<th>Maximum</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Length</strong></td>
+<td>8</td>
+<td>—</td>
+<td>12</td>
+</tr>
+<tr>
+<td><strong>Uppercase</strong></td>
+<td>Required</td>
+<td>—</td>
+<td>Required</td>
+</tr>
+<tr>
+<td><strong>Lowercase</strong></td>
+<td>Required</td>
+<td>—</td>
+<td>Required</td>
+</tr>
+<tr>
+<td><strong>Numbers</strong></td>
+<td>Required</td>
+<td>—</td>
+<td>Required</td>
+</tr>
+<tr>
+<td><strong>Symbols</strong></td>
+<td>Optional</td>
+<td>—</td>
+<td>Required</td>
+</tr>
+<tr>
+<td><strong>History</strong></td>
+<td>0</td>
+<td>24</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<p>Tenants can only set policies <strong>stricter</strong> than the baseline.</p>
+<h3 id="mfa-policy-baseline">MFA Policy Baseline</h3>
+<p>Define minimum MFA requirements:</p>
+<table>
+<thead>
+<tr>
+<th>User Type</th>
+<th>Platform Minimum</th>
+<th>Tenant Can Override</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tenant Owners</strong></td>
+<td>Required</td>
+<td>No (cannot weaken)</td>
+</tr>
+<tr>
+<td><strong>Tenant Admins</strong></td>
+<td>Required</td>
+<td>No (cannot weaken)</td>
+</tr>
+<tr>
+<td><strong>Members</strong></td>
+<td>Hidden</td>
+<td>Yes (can require)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="session-policy-baseline">Session Policy Baseline</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Platform Limit</th>
+<th>Tenant Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Max session length</strong></td>
+<td>30 days</td>
+<td>1 hour - 30 days</td>
+</tr>
+<tr>
+<td><strong>Inactivity timeout</strong></td>
+<td>7 days</td>
+<td>15 min - 7 days</td>
+</tr>
+<tr>
+<td><strong>Concurrent sessions</strong></td>
+<td>10</td>
+<td>1 - 10</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rate-limiting">Rate Limiting</h3>
+<p>Protect against abuse with rate limits:</p>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Limit</th>
+<th>Window</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/auth/signin</code></td>
+<td>10 requests</td>
+<td>1 minute per IP</td>
+</tr>
+<tr>
+<td><code>/auth/signup</code></td>
+<td>5 requests</td>
+<td>1 minute per IP</td>
+</tr>
+<tr>
+<td><code>/auth/password-reset</code></td>
+<td>3 requests</td>
+<td>1 hour per email</td>
+</tr>
+<tr>
+<td><code>/auth/mfa/verify</code></td>
+<td>5 requests</td>
+<td>1 minute per user</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tenant-authentication-management">Tenant Authentication Management</h2>
+<h3 id="viewing-tenant-auth-status">Viewing Tenant Auth Status</h3>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>Tenants</strong></li>
+<li>The <strong>Authentication</strong> column shows:
+<ul>
+<li>🟢 <strong>Healthy</strong>: No issues</li>
+<li>🟡 <strong>Warning</strong>: Potential issues (high failure rate, expiring certs)</li>
+<li>🔴 <strong>Critical</strong>: Active issues (SSO down, lockouts)</li>
+</ul></li>
+</ol>
+<h3 id="tenant-sso-oversight">Tenant SSO Oversight</h3>
+<p>View and assist with tenant SSO configurations:</p>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>Tenants</strong> → <strong>[Tenant]</strong> → <strong>SSO</strong></li>
+<li>View:
+<ul>
+<li>SSO provider details</li>
+<li>Certificate expiration dates</li>
+<li>Recent authentication success/failure rates</li>
+<li>Error logs</li>
+</ul></li>
+</ol>
+<h3 id="certificate-expiration-alerts">Certificate Expiration Alerts</h3>
+<p>Automatic alerts are sent when:</p>
+<table>
+<thead>
+<tr>
+<th>Timeframe</th>
+<th>Alert Level</th>
+<th>Recipients</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>30 days before</td>
+<td>Info</td>
+<td>Tenant admins</td>
+</tr>
+<tr>
+<td>14 days before</td>
+<td>Warning</td>
+<td>Tenant admins, Platform admins</td>
+</tr>
+<tr>
+<td>7 days before</td>
+<td>Critical</td>
+<td>All admins + escalation</td>
+</tr>
+<tr>
+<td>Expired</td>
+<td>Emergency</td>
+<td>All + service status page</td>
+</tr>
+</tbody>
+</table>
+<h3 id="assisting-tenant-users">Assisting Tenant Users</h3>
+<p>To help a tenant user with authentication issues:</p>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>Tenants</strong> → <strong>[Tenant]</strong> → <strong>Users</strong></li>
+<li>Find the user</li>
+<li>Available actions:
+<ul>
+<li><strong>Reset password</strong>: Send password reset email</li>
+<li><strong>Reset MFA</strong>: Clear MFA configuration</li>
+<li><strong>Unlock account</strong>: Remove lockout</li>
+<li><strong>Terminate sessions</strong>: Force re-authentication</li>
+<li><strong>View auth logs</strong>: See recent activity</li>
+</ul></li>
+</ol>
+<blockquote>
+<p><strong>Audit</strong>: All platform admin actions on tenant users are logged with full context.</p>
+</blockquote>
+<hr />
+<h2 id="oauth-provider-management">OAuth Provider Management</h2>
+<h3 id="platform-oauth-applications">Platform OAuth Applications</h3>
+<p>Manage applications that can integrate with RADIANT across tenants:</p>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>OAuth</strong> → <strong>Applications</strong></li>
+<li>View registered applications:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Name</strong></td>
+<td>Application display name</td>
+</tr>
+<tr>
+<td><strong>Publisher</strong></td>
+<td>Verified publisher (if any)</td>
+</tr>
+<tr>
+<td><strong>Client ID</strong></td>
+<td>Public identifier</td>
+</tr>
+<tr>
+<td><strong>Redirect URIs</strong></td>
+<td>Allowed callback URLs</td>
+</tr>
+<tr>
+<td><strong>Scopes</strong></td>
+<td>Maximum permitted scopes</td>
+</tr>
+<tr>
+<td><strong>Status</strong></td>
+<td>Active, Suspended, Pending Review</td>
+</tr>
+</tbody>
+</table>
+<h3 id="registering-a-platform-app">Registering a Platform App</h3>
+<p>For first-party or verified partner applications:</p>
+<ol type="1">
+<li>Click <strong>Register Application</strong></li>
+<li>Enter application details:
+<ul>
+<li><strong>Name</strong>: Display name shown to users</li>
+<li><strong>Description</strong>: What the app does</li>
+<li><strong>Publisher</strong>: Company/developer name</li>
+<li><strong>Logo URL</strong>: 256x256 PNG/SVG</li>
+<li><strong>Privacy Policy URL</strong>: Required</li>
+<li><strong>Terms of Service URL</strong>: Required</li>
+</ul></li>
+<li>Configure OAuth settings:
+<ul>
+<li><strong>Redirect URIs</strong>: Exact match required</li>
+<li><strong>Allowed scopes</strong>: Select from available scopes</li>
+<li><strong>Token lifetime</strong>: Access token expiration</li>
+</ul></li>
+<li>Click <strong>Register</strong></li>
+<li>Securely store the <strong>Client Secret</strong> (shown only once)</li>
+</ol>
+<h3 id="scope-definitions">Scope Definitions</h3>
+<table>
+<thead>
+<tr>
+<th>Scope</th>
+<th>Access</th>
+<th>Sensitivity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>openid</code></td>
+<td>Basic identity</td>
+<td>Low</td>
+</tr>
+<tr>
+<td><code>profile</code></td>
+<td>Name, avatar</td>
+<td>Low</td>
+</tr>
+<tr>
+<td><code>email</code></td>
+<td>Email address</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><code>read:sessions</code></td>
+<td>View user sessions</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><code>write:sessions</code></td>
+<td>Modify sessions</td>
+<td>High</td>
+</tr>
+<tr>
+<td><code>read:files</code></td>
+<td>Access user files</td>
+<td>High</td>
+</tr>
+<tr>
+<td><code>write:files</code></td>
+<td>Upload/delete files</td>
+<td>High</td>
+</tr>
+<tr>
+<td><code>admin:tenant</code></td>
+<td>Tenant admin actions</td>
+<td>Critical</td>
+</tr>
+</tbody>
+</table>
+<h3 id="suspending-an-application">Suspending an Application</h3>
+<p>If an application is compromised or violates policies:</p>
+<ol type="1">
+<li>Find the application in the list</li>
+<li>Click <strong>Suspend</strong></li>
+<li>Select reason:
+<ul>
+<li><strong>Security incident</strong></li>
+<li><strong>Policy violation</strong></li>
+<li><strong>Publisher request</strong></li>
+</ul></li>
+<li>All tokens are immediately invalidated</li>
+<li>Tenants are notified</li>
+</ol>
+<hr />
+<h2 id="compliance-audit">Compliance &amp; Audit</h2>
+<h3 id="audit-log-configuration">Audit Log Configuration</h3>
+<p>Configure what authentication events are logged:</p>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>Compliance</strong> → <strong>Audit Configuration</strong></li>
+<li>Enable/disable event categories:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Events</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>Sign-in, sign-out, failures</td>
+<td>Enabled</td>
+</tr>
+<tr>
+<td><strong>MFA</strong></td>
+<td>Setup, verification, reset</td>
+<td>Enabled</td>
+</tr>
+<tr>
+<td><strong>Password</strong></td>
+<td>Change, reset, policy violations</td>
+<td>Enabled</td>
+</tr>
+<tr>
+<td><strong>Session</strong></td>
+<td>Create, terminate, timeout</td>
+<td>Enabled</td>
+</tr>
+<tr>
+<td><strong>Admin Actions</strong></td>
+<td>All admin operations</td>
+<td>Enabled (cannot disable)</td>
+</tr>
+<tr>
+<td><strong>OAuth</strong></td>
+<td>Authorization, token issuance</td>
+<td>Enabled</td>
+</tr>
+</tbody>
+</table>
+<h3 id="log-retention">Log Retention</h3>
+<p>Configure retention periods (compliance requirements may mandate minimums):</p>
+<table>
+<thead>
+<tr>
+<th>Log Type</th>
+<th>Default</th>
+<th>Minimum</th>
+<th>Maximum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>90 days</td>
+<td>30 days</td>
+<td>7 years</td>
+</tr>
+<tr>
+<td><strong>Admin Actions</strong></td>
+<td>7 years</td>
+<td>1 year</td>
+<td>7 years</td>
+</tr>
+<tr>
+<td><strong>Security Incidents</strong></td>
+<td>7 years</td>
+<td>7 years</td>
+<td>7 years</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compliance-reports">Compliance Reports</h3>
+<p>Generate pre-built compliance reports:</p>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>Compliance</strong> → <strong>Reports</strong></li>
+<li>Available reports:</li>
+</ol>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 34%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Report</th>
+<th>Contents</th>
+<th>Frequency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Authentication Summary</strong></td>
+<td>Sign-in stats, failure rates, MFA adoption</td>
+<td>Weekly/Monthly</td>
+</tr>
+<tr>
+<td><strong>Security Incidents</strong></td>
+<td>Failed logins, lockouts, anomalies</td>
+<td>Daily/Weekly</td>
+</tr>
+<tr>
+<td><strong>SSO Health</strong></td>
+<td>Provider status, cert expirations</td>
+<td>Weekly</td>
+</tr>
+<tr>
+<td><strong>User Access Review</strong></td>
+<td>User permissions across tenants</td>
+<td>Quarterly</td>
+</tr>
+<tr>
+<td><strong>Admin Activity</strong></td>
+<td>All platform admin actions</td>
+<td>Monthly</td>
+</tr>
+</tbody>
+</table>
+<h3 id="siem-integration">SIEM Integration</h3>
+<p>Export logs to external SIEM systems:</p>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>Compliance</strong> → <strong>Integrations</strong></li>
+<li>Configure export:
+<ul>
+<li><strong>Destination</strong>: S3 bucket, CloudWatch, or direct SIEM</li>
+<li><strong>Format</strong>: JSON, CEF, or LEEF</li>
+<li><strong>Frequency</strong>: Real-time, hourly, or daily batch</li>
+</ul></li>
+<li>Test the integration</li>
+<li>Enable export</li>
+</ol>
+<hr />
+<h2 id="emergency-procedures">Emergency Procedures</h2>
+<h3 id="security-incident-response">Security Incident Response</h3>
+<pre class="mermaid"><code>flowchart TD
+    A[Incident Detected] --&gt; B{Severity?}
+    B --&gt;|Critical| C[Immediate Lockdown]
+    B --&gt;|High| D[Targeted Response]
+    B --&gt;|Medium| E[Investigation]
+    
+    C --&gt; F[Disable affected accounts]
+    C --&gt; G[Revoke all sessions]
+    C --&gt; H[Block IP ranges]
+    
+    D --&gt; I[Reset affected passwords]
+    D --&gt; J[Require MFA re-enrollment]
+    
+    E --&gt; K[Review audit logs]
+    E --&gt; L[Assess impact]</code></pre>
+<h3 id="emergency-account-lockdown">Emergency Account Lockdown</h3>
+<p>To immediately lock down a compromised account:</p>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>Emergency</strong> → <strong>Lockdown</strong></li>
+<li>Enter the <strong>user email</strong> or <strong>tenant ID</strong></li>
+<li>Select lockdown scope:
+<ul>
+<li><strong>Single user</strong>: Lock one account</li>
+<li><strong>Tenant-wide</strong>: Lock all users in a tenant</li>
+<li><strong>Platform-wide</strong>: Lock all non-admin users (extreme)</li>
+</ul></li>
+<li>Confirm with your MFA code</li>
+<li>Document the incident</li>
+</ol>
+<h3 id="emergency-access-bypass">Emergency Access Bypass</h3>
+<p>For critical situations where normal auth is unavailable:</p>
+<ol type="1">
+<li>Contact the <strong>on-call platform engineer</strong></li>
+<li>Provide incident details and verification</li>
+<li>The engineer can issue a <strong>time-limited bypass token</strong></li>
+<li>All bypass usage is logged and reviewed</li>
+</ol>
+<blockquote>
+<p><strong>Warning</strong>: Emergency bypass is audited and should only be used for genuine emergencies.</p>
+</blockquote>
+<h3 id="credential-rotation">Credential Rotation</h3>
+<p>Rotate Cognito and OAuth secrets:</p>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>Infrastructure</strong> → <strong>Secrets</strong></li>
+<li>Select the credential to rotate</li>
+<li>Click <strong>Rotate</strong></li>
+<li>Update any dependent systems</li>
+<li>Verify functionality</li>
+<li>Revoke the old credential</li>
+</ol>
+<hr />
+<h2 id="infrastructure-configuration">Infrastructure Configuration</h2>
+<h3 id="cognito-lambda-triggers">Cognito Lambda Triggers</h3>
+<p>Custom logic hooks in the authentication flow:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pre Sign-up</strong></td>
+<td>Validate/modify registration</td>
+<td>Block disposable emails</td>
+</tr>
+<tr>
+<td><strong>Post Confirmation</strong></td>
+<td>Actions after verification</td>
+<td>Create default workspace</td>
+</tr>
+<tr>
+<td><strong>Pre Authentication</strong></td>
+<td>Before password verification</td>
+<td>Check IP allowlist</td>
+</tr>
+<tr>
+<td><strong>Post Authentication</strong></td>
+<td>After successful auth</td>
+<td>Log custom metrics</td>
+</tr>
+<tr>
+<td><strong>Pre Token Generation</strong></td>
+<td>Customize token claims</td>
+<td>Add tenant context</td>
+</tr>
+</tbody>
+</table>
+<h3 id="email-templates">Email Templates</h3>
+<p>Customize authentication emails:</p>
+<ol type="1">
+<li>Navigate to <strong>Platform Admin</strong> → <strong>Infrastructure</strong> → <strong>Email Templates</strong></li>
+<li>Available templates:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Template</th>
+<th>Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Verification</strong></td>
+<td>New user email verification</td>
+</tr>
+<tr>
+<td><strong>Password Reset</strong></td>
+<td>Forgot password request</td>
+</tr>
+<tr>
+<td><strong>MFA Setup</strong></td>
+<td>MFA enrollment confirmation</td>
+</tr>
+<tr>
+<td><strong>Security Alert</strong></td>
+<td>Suspicious activity detected</td>
+</tr>
+<tr>
+<td><strong>Session Alert</strong></td>
+<td>New device sign-in</td>
+</tr>
+</tbody>
+</table>
+<ol start="3" type="1">
+<li>Customize:
+<ul>
+<li>Subject line</li>
+<li>Body content (HTML + plain text)</li>
+<li>Sender name</li>
+</ul></li>
+<li>Preview and test before saving</li>
+</ol>
+<h3 id="multi-region-configuration">Multi-Region Configuration</h3>
+<p>For global deployments:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Primary region</strong></td>
+<td>Main Cognito pool location</td>
+</tr>
+<tr>
+<td><strong>Replica regions</strong></td>
+<td>Read replicas for lower latency</td>
+</tr>
+<tr>
+<td><strong>Failover</strong></td>
+<td>Automatic failover on primary outage</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./overview.md">Authentication Overview</a></li>
+<li><a href="./tenant-admin-guide.md">Tenant Admin Guide</a></li>
+<li><a href="../security/authentication-architecture.md">Security Architecture</a></li>
+<li><a href="./oauth-guide.md">OAuth Developer Guide</a></li>
+<li><a href="../COMPLIANCE.md">Compliance Documentation</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

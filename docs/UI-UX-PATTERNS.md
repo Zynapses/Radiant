@@ -845,6 +845,125 @@ AI-powered predictive suggestions.
 | 2026-01-24 | Generic Heatmap | New component | 2D grid with 5 color schemes | Cascade |
 | 2026-01-24 | Latency Heatmap | New component | Geographic AWS region latency map | Cascade |
 | 2026-01-24 | CBF Violations Heatmap | New component | Content boundary rule violation analytics | Cascade |
+| 2026-01-27 | Ghost Inference Config | New page | Admin configuration page for vLLM/SageMaker settings | Cascade |
+
+---
+
+## Category 14: Infrastructure Configuration Patterns (v5.52.40)
+
+**Source**: Custom RADIANT admin dashboard patterns for infrastructure management
+
+### Ghost Inference Configuration Page
+
+Admin page for configuring vLLM ghost inference parameters.
+
+| Location | `apps/admin-dashboard/app/(dashboard)/system/ghost-inference/page.tsx` |
+|----------|-----------------------------------------------------------------------|
+
+**Page Structure:**
+
+| Section | Component | Purpose |
+|---------|-----------|---------|
+| Header | Title + Description + Actions | Page context and primary actions |
+| Status Cards | 4-column grid | Status, Requests, Latency, Cost metrics |
+| Tabs | Model, Performance, Infrastructure, Deployments | Configuration categories |
+| Deploy Dialog | Dialog with validation | Cost estimation and deployment confirmation |
+
+**Status Badge Pattern:**
+
+| Status | Background | Text Color | Icon |
+|--------|------------|------------|------|
+| `active` | `bg-emerald-100` | `text-emerald-700` | `CheckCircle2` |
+| `warming` | `bg-amber-100` | `text-amber-700` | `Loader2` (spinning) |
+| `scaling` | `bg-blue-100` | `text-blue-700` | `Activity` |
+| `error` | `bg-red-100` | `text-red-700` | `XCircle` |
+| `disabled` | `bg-slate-100` | `text-slate-600` | `Clock` |
+| `deploying` | `bg-amber-100` | `text-amber-700` | `Loader2` (spinning) |
+| `failed` | `bg-red-100` | `text-red-700` | `XCircle` |
+
+**Tab Icons:**
+
+| Tab | Icon |
+|-----|------|
+| Model | `Brain` |
+| Performance | `Gauge` |
+| Infrastructure | `Server` |
+| Deployments | `History` |
+
+**Form Patterns Used:**
+
+| Component | Usage |
+|-----------|-------|
+| `Input` | Text fields (model name, numeric inputs) |
+| `Select` | Dropdown selections (dtype, instance type, tensor parallelism) |
+| `Slider` | Range inputs (GPU memory, hidden state layer) |
+| `Switch` | Boolean toggles (return hidden states, scale to zero, eager mode) |
+| `Separator` | Section dividers within tabs |
+
+**Instance Type Display:**
+
+Instance type selector shows GPU details inline:
+```tsx
+<SelectItem value={instanceType}>
+  {instanceType} - {gpuCount}x {gpuType} ({gpuMemoryGb}GB) - ${hourlyCostUsd}/hr
+</SelectItem>
+```
+
+Selected instance shows expanded details in muted panel below selector.
+
+**Validation Dialog Pattern:**
+
+| Section | Background | Border | Content |
+|---------|------------|--------|---------|
+| Errors | `bg-red-50` | `border-red-200` | `XCircle` icon + error list |
+| Warnings | `bg-amber-50` | `border-amber-200` | `AlertTriangle` icon + warning list |
+| Cost Estimate | `bg-muted` | none | Hourly + Monthly cost |
+
+**Deployment History Table:**
+
+| Column | Content |
+|--------|---------|
+| Endpoint | Monospace font (`font-mono text-sm`) |
+| Status | Badge with status icon |
+| Started | Localized datetime |
+| Startup Time | Minutes + seconds format |
+| Invocations | Formatted number with error count if > 0 |
+| Cost | USD format |
+
+**Empty State Pattern:**
+
+No configuration state uses centered layout:
+- `Brain` icon (h-16 w-16 text-muted-foreground)
+- Heading (text-xl font-semibold)
+- Description (text-muted-foreground max-w-md text-center)
+- CTA Button with Settings icon
+
+**Action Bar Pattern:**
+
+| State | Buttons |
+|-------|---------|
+| No changes | Deploy (primary), Refresh (outline) |
+| Has changes | Discard Changes (outline), Save Configuration (primary), Deploy (outline), Refresh (outline) |
+
+**Loading State:**
+
+Full-page centered loader:
+```tsx
+<div className="flex items-center justify-center h-96">
+  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+</div>
+```
+
+**Toast Notifications:**
+
+| Action | Variant | Title | Description |
+|--------|---------|-------|-------------|
+| Config created | default | Configuration Created | Default message |
+| Config saved | default | Configuration Saved | Field count updated |
+| Validation failed | destructive | Validation Failed | Error list |
+| Deploy initiated | default | Deployment Initiated | Endpoint name |
+| Deploy failed | destructive | Deployment Failed | Error message |
+| Fetch error | destructive | Error | Load failure message |
 
 ---
 

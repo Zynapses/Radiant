@@ -406,12 +406,18 @@ class ProcessHydrationService {
 
     let s3ObjectsDeleted = 0;
 
-    // Delete S3 objects
+    // Delete S3 objects using AWS SDK
     for (const row of s3Snapshots.rows) {
       try {
-        // Note: In production, use DeleteObjectCommand
-        // For now, just log
-        logger.info('Would delete S3 object', {
+        const { S3Client, DeleteObjectCommand } = await import('@aws-sdk/client-s3');
+        const s3Client = new S3Client({ region: process.env.AWS_REGION || 'us-east-1' });
+        
+        await s3Client.send(new DeleteObjectCommand({
+          Bucket: row.s3_bucket,
+          Key: row.s3_key,
+        }));
+        
+        logger.info('Deleted S3 object', {
           bucket: row.s3_bucket,
           key: row.s3_key,
         });
@@ -484,11 +490,20 @@ class ProcessHydrationService {
       return acc;
     }, {} as Record<string, number>);
 
+    // Query for average restoration time
+    const restorationTimeResult = await this.db.query(
+      `SELECT AVG(restoration_time_ms) as avg_time
+       FROM hydration_restoration_log
+       WHERE tenant_id = $1 AND created_at > NOW() - INTERVAL '7 days'`,
+      [tenantId]
+    );
+    const avgRestorationTimeMs = parseFloat(restorationTimeResult.rows[0]?.avg_time || '0');
+
     return {
       totalSnapshots: parseInt(snapshotStats.rows[0]?.count || '0', 10),
       totalSizeBytes: parseInt(snapshotStats.rows[0]?.total_size || '0', 10),
       hydratedAgents: parseInt(agentStats.rows[0]?.count || '0', 10),
-      avgRestorationTimeMs: 0, // Would need timing data
+      avgRestorationTimeMs,
       snapshotsByCheckpoint,
     };
   }

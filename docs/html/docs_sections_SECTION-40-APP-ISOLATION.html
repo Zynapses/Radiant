@@ -1,0 +1,2096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 40 APP ISOLATION - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 40 APP ISOLATION</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-40-APP-ISOLATION.md</div>
+  </div>
+  
+  <h1 id="section-40-application-level-data-isolation-v4.6.0">SECTION 40: APPLICATION-LEVEL DATA ISOLATION (v4.6.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<blockquote>
+<p><strong>CRITICAL: This section implements complete isolation between client apps (Think Tank, Launch Board, AlwaysMe, Mechanical Maker) AND Think Tank.</strong> <strong>Same user email in different apps = completely separate identities and data.</strong></p>
+</blockquote>
+<hr />
+<h2 id="architecture-overview">40.1 ARCHITECTURE OVERVIEW</h2>
+<h3 id="the-problem">The Problem</h3>
+<p>Before v4.6.0, RADIANT had <strong>tenant-level isolation</strong> but not <strong>application-level isolation</strong>:</p>
+<pre><code>BEFORE (v4.5.0 and earlier):
+┌─────────────────────────────────────────────────────────────────────┐
+│ Tenant: Acme Corp (tenant_id: abc-123)                              │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  User: alice@acme.com (single user record)                         │
+│  ├── Can access Think Tank data    ✓                               │
+│  ├── Can access Launch Board data  ✓  ← PROBLEM!                   │
+│  ├── Can access Think Tank data        ✓  ← PROBLEM!                   │
+│  └── All apps share same chat history, preferences, etc.           │
+│                                                                     │
+│  RLS Policy: WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;)    │
+│  └── Only filters by tenant, not by app                            │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="the-solution">The Solution</h3>
+<p>v4.6.0 implements <strong>application-level isolation</strong>:</p>
+<pre><code>AFTER (v4.6.0):
+┌─────────────────────────────────────────────────────────────────────┐
+│ Tenant: Acme Corp (tenant_id: abc-123)                              │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ App: Think Tank (app_id: thinktank)                         │   │
+│  │ ┌─────────────────────────────────────────────────────────┐ │   │
+│  │ │ AppUser: alice@acme.com (app_user_id: usr-tt-001)       │ │   │
+│  │ │ └── Chats, preferences, history ONLY for Think Tank     │ │   │
+│  │ └─────────────────────────────────────────────────────────┘ │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ App: Launch Board (app_id: launchboard)                     │   │
+│  │ ┌─────────────────────────────────────────────────────────┐ │   │
+│  │ │ AppUser: alice@acme.com (app_user_id: usr-lb-002)       │ │   │
+│  │ │ └── Chats, preferences, history ONLY for Launch Board   │ │   │
+│  │ └─────────────────────────────────────────────────────────┘ │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ App: Think Tank (app_id: thinktank)                        │   │
+│  │ ┌─────────────────────────────────────────────────────────┐ │   │
+│  │ │ AppUser: alice@acme.com (app_user_id: usr-sv-003)       │ │   │
+│  │ │ └── Chats, preferences, history ONLY for Think Tank         │ │   │
+│  │ │ └── COMPLETELY ISOLATED from Think Tank and Launch Board│ │   │
+│  │ └─────────────────────────────────────────────────────────┘ │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│  RLS Policy: WHERE tenant_id = :tenant AND app_id = :app           │
+│  └── Filters by BOTH tenant AND app                                │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="isolation-layers">Isolation Layers</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────────┐
+│                         RADIANT v4.6.0 ISOLATION LAYERS                          │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  LAYER 1: COGNITO (Identity)                                                    │
+│  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────┐           │
+│  │ Think Tank Pool   │  │ Launch Board Pool │  │ Think Tank Pool       │           │
+│  │ (thinktank-prod)  │  │ (launchboard-prod)│  │ (thinktank-prod)     │           │
+│  │                   │  │                   │  │                   │           │
+│  │ custom:app_id =   │  │ custom:app_id =   │  │ custom:app_id =   │           │
+│  │ &quot;thinktank&quot;       │  │ &quot;launchboard&quot;     │  │ &quot;thinktank&quot;          │           │
+│  └───────────────────┘  └───────────────────┘  └───────────────────┘           │
+│           │                     │                     │                         │
+│           ▼                     ▼                     ▼                         │
+│  LAYER 2: API GATEWAY (Routing)                                                 │
+│  ┌───────────────────────────────────────────────────────────────────┐         │
+│  │ thinktank.domain.com    → thinktank API                           │         │
+│  │ launchboard.domain.com  → launchboard API                         │         │
+│  │ thinktank.domain.com  → thinktank API                              │         │
+│  │                                                                   │         │
+│  │ JWT Validation: Verify app_id in token matches route              │         │
+│  └───────────────────────────────────────────────────────────────────┘         │
+│           │                                                                     │
+│           ▼                                                                     │
+│  LAYER 3: LAMBDA (Context)                                                      │
+│  ┌───────────────────────────────────────────────────────────────────┐         │
+│  │ AuthContext = {                                                   │         │
+│  │   tenantId: &#39;abc-123&#39;,                                           │         │
+│  │   appId: &#39;thinktank&#39;,     ← NEW: App ID extracted from JWT       │         │
+│  │   userId: &#39;usr-tt-001&#39;,   ← App-scoped user ID                   │         │
+│  │   email: &#39;alice@acme.com&#39;                                        │         │
+│  │ }                                                                 │         │
+│  │                                                                   │         │
+│  │ Database Connection:                                              │         │
+│  │   SET app.current_tenant_id = &#39;abc-123&#39;;                         │         │
+│  │   SET app.current_app_id = &#39;thinktank&#39;;   ← NEW                  │         │
+│  └───────────────────────────────────────────────────────────────────┘         │
+│           │                                                                     │
+│           ▼                                                                     │
+│  LAYER 4: DATABASE (RLS)                                                        │
+│  ┌───────────────────────────────────────────────────────────────────┐         │
+│  │ CREATE POLICY app_isolation ON user_data                          │         │
+│  │   USING (                                                         │         │
+│  │     tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID    │         │
+│  │     AND                                                           │         │
+│  │     app_id = current_setting(&#39;app.current_app_id&#39;)                │         │
+│  │   );                                                              │         │
+│  │                                                                   │         │
+│  │ Every SELECT/INSERT/UPDATE/DELETE filtered by BOTH               │         │
+│  └───────────────────────────────────────────────────────────────────┘         │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="database-schema-changes">40.2 DATABASE SCHEMA CHANGES</h2>
+<h3 id="migration-040_app_level_isolation.sql">Migration: 040_app_level_isolation.sql</h3>
+<pre class="sql"><code>-- ============================================================================
+-- RADIANT v4.6.0 - Application-Level Data Isolation
+-- ============================================================================
+-- This migration adds app_id isolation to all user-facing tables
+-- ============================================================================
+
+-- Create function to get current app_id from session
+CREATE OR REPLACE FUNCTION current_app_id() RETURNS VARCHAR(50) AS $$
+BEGIN
+    RETURN NULLIF(current_setting(&#39;app.current_app_id&#39;, true), &#39;&#39;);
+EXCEPTION WHEN OTHERS THEN RETURN NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
+
+-- ============================================================================
+-- APP_USERS: App-Scoped User Instances
+-- ============================================================================
+-- A single email can have MULTIPLE app_user records (one per app)
+-- This is the PRIMARY user identity within each application
+
+CREATE TABLE IF NOT EXISTS app_users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    
+    -- Multi-tenant + Multi-app isolation
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    app_id VARCHAR(50) NOT NULL,
+    
+    -- Link to base user (optional - for cross-app identity correlation by admins only)
+    base_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    
+    -- Identity (same email can exist in multiple apps)
+    cognito_sub VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    email_verified BOOLEAN DEFAULT false,
+    
+    -- Profile (app-specific)
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    display_name VARCHAR(200),
+    avatar_url TEXT,
+    
+    -- App-specific preferences
+    preferences JSONB DEFAULT &#39;{}&#39;,
+    timezone VARCHAR(50) DEFAULT &#39;UTC&#39;,
+    locale VARCHAR(10) DEFAULT &#39;en-US&#39;,
+    
+    -- Status
+    status VARCHAR(20) NOT NULL DEFAULT &#39;active&#39; CHECK (status IN (&#39;active&#39;, &#39;inactive&#39;, &#39;suspended&#39;)),
+    last_login_at TIMESTAMPTZ,
+    login_count INTEGER DEFAULT 0,
+    
+    -- Timestamps
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ,
+    
+    -- Unique constraint: one user per email per app per tenant
+    UNIQUE(tenant_id, app_id, email),
+    -- Cognito sub is unique per app
+    UNIQUE(app_id, cognito_sub)
+);
+
+-- Indexes for app_users
+CREATE INDEX idx_app_users_tenant_app ON app_users(tenant_id, app_id);
+CREATE INDEX idx_app_users_email ON app_users(email);
+CREATE INDEX idx_app_users_cognito ON app_users(cognito_sub);
+CREATE INDEX idx_app_users_base_user ON app_users(base_user_id);
+CREATE INDEX idx_app_users_status ON app_users(status) WHERE deleted_at IS NULL;
+
+-- RLS for app_users
+ALTER TABLE app_users ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY app_users_isolation ON app_users
+    FOR ALL
+    USING (
+        tenant_id = current_tenant_id() 
+        AND app_id = current_app_id()
+    );
+
+-- Admin policy: Platform admins can view all users within their tenant
+CREATE POLICY app_users_admin_view ON app_users
+    FOR SELECT
+    USING (
+        tenant_id = current_tenant_id()
+        AND current_setting(&#39;app.is_admin&#39;, true) = &#39;true&#39;
+    );
+
+-- ============================================================================
+-- ADD app_id TO EXISTING TABLES
+-- ============================================================================
+
+-- Add app_id column to user-facing tables that need isolation
+-- Using IF NOT EXISTS pattern for idempotent migrations
+
+-- Chats / Conversations (Think Tank and Client Apps)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;thinktank_chats&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE thinktank_chats ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;thinktank_messages&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE thinktank_messages ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;thinktank_conversations&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE thinktank_conversations ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- Concurrent Sessions
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;concurrent_sessions&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE concurrent_sessions ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- Voice Sessions
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;voice_sessions&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE voice_sessions ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- Memory
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;memory_stores&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE memory_stores ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;memories&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE memories ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- Canvases &amp; Artifacts
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;canvases&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE canvases ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;artifacts&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE artifacts ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- User Personas
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;user_personas&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE user_personas ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- Scheduled Prompts
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;scheduled_prompts&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE scheduled_prompts ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- User Preferences (Neural Engine)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;user_preferences&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE user_preferences ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- User Memory (Neural Engine)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;user_memory&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE user_memory ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- User Behavior Patterns
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;user_behavior_patterns&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE user_behavior_patterns ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- Feedback tables
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;feedback_explicit&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE feedback_explicit ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;feedback_implicit&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE feedback_implicit ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;feedback_voice&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE feedback_voice ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- Execution Manifests
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;execution_manifests&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE execution_manifests ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- Think Tank-specific tables
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;thinktank_sessions&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE thinktank_sessions ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;thinktank_user_model_preferences&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE thinktank_user_model_preferences ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- Collaboration
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;collaboration_rooms&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE collaboration_rooms ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- Time Machine snapshots
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name = &#39;chat_snapshots&#39; AND column_name = &#39;app_id&#39;) THEN
+        ALTER TABLE chat_snapshots ADD COLUMN app_id VARCHAR(50) NOT NULL DEFAULT &#39;thinktank&#39;;
+    END IF;
+END $$;
+
+-- ============================================================================
+-- CREATE INDEXES FOR app_id COLUMNS
+-- ============================================================================
+
+-- Indexes for efficient app-scoped queries
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_thinktank_chats_app ON thinktank_chats(tenant_id, app_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_thinktank_messages_app ON thinktank_messages(tenant_id, app_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_concurrent_sessions_app ON concurrent_sessions(tenant_id, app_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_voice_sessions_app ON voice_sessions(tenant_id, app_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_memory_stores_app ON memory_stores(tenant_id, app_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_canvases_app ON canvases(tenant_id, app_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_user_personas_app ON user_personas(tenant_id, app_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_user_preferences_app ON user_preferences(tenant_id, app_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_feedback_explicit_app ON feedback_explicit(tenant_id, app_id);
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_execution_manifests_app ON execution_manifests(tenant_id, app_id);
+
+-- ============================================================================
+-- UPDATE RLS POLICIES TO INCLUDE app_id
+-- ============================================================================
+
+-- Drop existing policies and recreate with app_id filtering
+-- Using a function to standardize policy creation
+
+CREATE OR REPLACE FUNCTION create_app_isolation_policy(
+    table_name TEXT,
+    policy_name TEXT DEFAULT NULL
+) RETURNS VOID AS $$
+DECLARE
+    p_name TEXT;
+BEGIN
+    p_name := COALESCE(policy_name, table_name || &#39;_app_isolation&#39;);
+    
+    -- Drop existing policy if exists
+    EXECUTE format(&#39;DROP POLICY IF EXISTS %I ON %I&#39;, p_name, table_name);
+    
+    -- Create new policy with app_id filtering
+    EXECUTE format(&#39;
+        CREATE POLICY %I ON %I
+        FOR ALL
+        USING (
+            tenant_id = current_tenant_id() 
+            AND app_id = current_app_id()
+        )
+    &#39;, p_name, table_name);
+END;
+$$ LANGUAGE plpgsql;
+
+-- Apply app isolation policies to all relevant tables
+SELECT create_app_isolation_policy(&#39;thinktank_chats&#39;);
+SELECT create_app_isolation_policy(&#39;thinktank_messages&#39;);
+SELECT create_app_isolation_policy(&#39;thinktank_conversations&#39;);
+SELECT create_app_isolation_policy(&#39;concurrent_sessions&#39;);
+SELECT create_app_isolation_policy(&#39;voice_sessions&#39;);
+SELECT create_app_isolation_policy(&#39;memory_stores&#39;);
+SELECT create_app_isolation_policy(&#39;memories&#39;);
+SELECT create_app_isolation_policy(&#39;canvases&#39;);
+SELECT create_app_isolation_policy(&#39;artifacts&#39;);
+SELECT create_app_isolation_policy(&#39;user_personas&#39;);
+SELECT create_app_isolation_policy(&#39;scheduled_prompts&#39;);
+SELECT create_app_isolation_policy(&#39;user_preferences&#39;);
+SELECT create_app_isolation_policy(&#39;user_memory&#39;);
+SELECT create_app_isolation_policy(&#39;user_behavior_patterns&#39;);
+SELECT create_app_isolation_policy(&#39;feedback_explicit&#39;);
+SELECT create_app_isolation_policy(&#39;feedback_implicit&#39;);
+SELECT create_app_isolation_policy(&#39;feedback_voice&#39;);
+SELECT create_app_isolation_policy(&#39;execution_manifests&#39;);
+SELECT create_app_isolation_policy(&#39;thinktank_sessions&#39;);
+SELECT create_app_isolation_policy(&#39;thinktank_user_model_preferences&#39;);
+SELECT create_app_isolation_policy(&#39;collaboration_rooms&#39;);
+
+-- ============================================================================
+-- ADMIN CROSS-APP VIEW POLICIES
+-- ============================================================================
+-- Platform administrators need to view data across apps for support
+
+CREATE OR REPLACE FUNCTION create_admin_view_policy(
+    table_name TEXT
+) RETURNS VOID AS $$
+BEGIN
+    EXECUTE format(&#39;DROP POLICY IF EXISTS %I ON %I&#39;, table_name || &#39;_admin_view&#39;, table_name);
+    
+    EXECUTE format(&#39;
+        CREATE POLICY %I ON %I
+        FOR SELECT
+        USING (
+            tenant_id = current_tenant_id()
+            AND current_setting(&#39;&#39;app.is_admin&#39;&#39;, true) = &#39;&#39;true&#39;&#39;
+        )
+    &#39;, table_name || &#39;_admin_view&#39;, table_name);
+END;
+$$ LANGUAGE plpgsql;
+
+-- Apply admin view policies
+SELECT create_admin_view_policy(&#39;thinktank_chats&#39;);
+SELECT create_admin_view_policy(&#39;thinktank_messages&#39;);
+SELECT create_admin_view_policy(&#39;concurrent_sessions&#39;);
+SELECT create_admin_view_policy(&#39;memory_stores&#39;);
+SELECT create_admin_view_policy(&#39;canvases&#39;);
+SELECT create_admin_view_policy(&#39;user_personas&#39;);
+SELECT create_admin_view_policy(&#39;feedback_explicit&#39;);
+SELECT create_admin_view_policy(&#39;execution_manifests&#39;);
+
+-- ============================================================================
+-- APP REGISTRY TABLE
+-- ============================================================================
+-- Track all registered applications
+
+CREATE TABLE IF NOT EXISTS app_registry (
+    id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    display_name VARCHAR(200) NOT NULL,
+    description TEXT,
+    
+    -- App type
+    app_type VARCHAR(50) NOT NULL CHECK (app_type IN (&#39;client_app&#39;, &#39;consumer&#39;, &#39;admin&#39;, &#39;internal&#39;)),
+    
+    -- Cognito configuration
+    cognito_user_pool_id VARCHAR(100),
+    cognito_client_id VARCHAR(100),
+    
+    -- Routing
+    subdomain VARCHAR(100),
+    custom_domain VARCHAR(255),
+    
+    -- Features enabled for this app
+    features JSONB DEFAULT &#39;{}&#39;,
+    
+    -- Status
+    status VARCHAR(20) NOT NULL DEFAULT &#39;active&#39; CHECK (status IN (&#39;active&#39;, &#39;inactive&#39;, &#39;deprecated&#39;)),
+    
+    -- Timestamps
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Seed default applications
+INSERT INTO app_registry (id, name, display_name, description, app_type, subdomain) VALUES
+    (&#39;thinktank&#39;, &#39;thinktank&#39;, &#39;Think Tank&#39;, &#39;Consumer-facing AI chat application&#39;, &#39;consumer&#39;, &#39;thinktank&#39;),
+    (&#39;thinktank&#39;, &#39;thinktank&#39;, &#39;Think Tank&#39;, &#39;Collaborative AI workspace&#39;, &#39;client_app&#39;, &#39;thinktank&#39;),
+    (&#39;launchboard&#39;, &#39;launchboard&#39;, &#39;Launch Board&#39;, &#39;Project management with AI&#39;, &#39;client_app&#39;, &#39;launchboard&#39;),
+    (&#39;alwaysme&#39;, &#39;alwaysme&#39;, &#39;Always Me&#39;, &#39;Personal AI assistant&#39;, &#39;client_app&#39;, &#39;alwaysme&#39;),
+    (&#39;mechanicalmaker&#39;, &#39;mechanicalmaker&#39;, &#39;Mechanical Maker&#39;, &#39;Engineering AI tools&#39;, &#39;client_app&#39;, &#39;mechanicalmaker&#39;),
+    (&#39;admin&#39;, &#39;admin&#39;, &#39;Admin Dashboard&#39;, &#39;Platform administration&#39;, &#39;admin&#39;, &#39;admin&#39;)
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================================================================
+-- CROSS-APP CORRELATION TABLE (Admin Only)
+-- ============================================================================
+-- For platform admins to correlate user identities across apps
+-- End users CANNOT access this table
+
+CREATE TABLE IF NOT EXISTS cross_app_user_correlation (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    
+    -- Email is the correlation key
+    email VARCHAR(255) NOT NULL,
+    
+    -- App user IDs for each app
+    app_user_ids JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    -- Example: {&quot;thinktank&quot;: &quot;uuid-1&quot;, &quot;launchboard&quot;: &quot;uuid-2&quot;, &quot;launchboard&quot;: &quot;uuid-3&quot;}
+    
+    -- Metadata
+    first_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    
+    -- Unique per tenant
+    UNIQUE(tenant_id, email)
+);
+
+-- Only admins can access this table
+ALTER TABLE cross_app_user_correlation ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY cross_app_admin_only ON cross_app_user_correlation
+    FOR ALL
+    USING (
+        tenant_id = current_tenant_id()
+        AND current_setting(&#39;app.is_admin&#39;, true) = &#39;true&#39;
+    );
+
+-- ============================================================================
+-- MIGRATION TRACKING
+-- ============================================================================
+
+INSERT INTO schema_migrations (version, name, applied_by, checksum)
+VALUES (&#39;040&#39;, &#39;app_level_isolation&#39;, &#39;system&#39;, md5(&#39;v4.6.0_app_isolation&#39;))
+ON CONFLICT (version) DO NOTHING;</code></pre>
+<hr />
+<h2 id="cognito-configuration">40.3 COGNITO CONFIGURATION</h2>
+<h3 id="per-app-user-pool-stack">Per-App User Pool Stack</h3>
+<pre class="typescript"><code>// packages/infrastructure/lib/stacks/app-cognito.stack.ts
+
+import * as cdk from &#39;aws-cdk-lib&#39;;
+import * as cognito from &#39;aws-cdk-lib/aws-cognito&#39;;
+import { Construct } from &#39;constructs&#39;;
+
+export interface AppCognitoStackProps extends cdk.StackProps {
+  appId: string;
+  appName: string;
+  environment: string;
+  domain: string;
+  tier: number;
+}
+
+/**
+ * Creates a dedicated Cognito User Pool for each application.
+ * This ensures complete identity isolation between apps.
+ */
+export class AppCognitoStack extends cdk.Stack {
+  public readonly userPool: cognito.UserPool;
+  public readonly userPoolClient: cognito.UserPoolClient;
+  public readonly userPoolDomain: cognito.UserPoolDomain;
+  
+  constructor(scope: Construct, id: string, props: AppCognitoStackProps) {
+    super(scope, id, props);
+    
+    const resourcePrefix = `${props.appId}-${props.environment}`;
+    
+    // ========================================================================
+    // USER POOL (Per-App)
+    // ========================================================================
+    
+    this.userPool = new cognito.UserPool(this, &#39;UserPool&#39;, {
+      userPoolName: `${resourcePrefix}-users`,
+      
+      // Self sign-up enabled for Think Tank, disabled for client apps
+      selfSignUpEnabled: props.appId === &#39;thinktank&#39;,
+      
+      // Sign-in options
+      signInAliases: {
+        email: true,
+        username: false,
+      },
+      
+      // Password policy
+      passwordPolicy: {
+        minLength: 12,
+        requireLowercase: true,
+        requireUppercase: true,
+        requireDigits: true,
+        requireSymbols: true,
+      },
+      
+      // MFA configuration
+      mfa: props.tier &gt;= 3 
+        ? cognito.Mfa.OPTIONAL 
+        : cognito.Mfa.OFF,
+      mfaSecondFactor: {
+        sms: true,
+        otp: true,
+      },
+      
+      // Account recovery
+      accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
+      
+      // Standard attributes
+      standardAttributes: {
+        email: {
+          required: true,
+          mutable: true,
+        },
+        fullname: {
+          required: false,
+          mutable: true,
+        },
+      },
+      
+      // Custom attributes - CRITICAL: app_id is immutable
+      customAttributes: {
+        tenantId: new cognito.StringAttribute({ mutable: false }),
+        appId: new cognito.StringAttribute({ mutable: false }), // NEW: App identifier
+        role: new cognito.StringAttribute({ mutable: true }),
+        appUserId: new cognito.StringAttribute({ mutable: false }), // NEW: App-scoped user ID
+      },
+      
+      // Lambda triggers for app isolation
+      lambdaTriggers: {
+        preSignUp: this.createPreSignUpLambda(resourcePrefix, props.appId),
+        postConfirmation: this.createPostConfirmationLambda(resourcePrefix, props.appId),
+        preTokenGeneration: this.createPreTokenGenerationLambda(resourcePrefix, props.appId),
+      },
+      
+      // Removal policy
+      removalPolicy: props.environment === &#39;prod&#39;
+        ? cdk.RemovalPolicy.RETAIN
+        : cdk.RemovalPolicy.DESTROY,
+    });
+    
+    // ========================================================================
+    // USER POOL CLIENT (Per-App)
+    // ========================================================================
+    
+    this.userPoolClient = this.userPool.addClient(&#39;UserPoolClient&#39;, {
+      userPoolClientName: `${resourcePrefix}-web-client`,
+      
+      // OAuth configuration
+      oAuth: {
+        flows: {
+          authorizationCodeGrant: true,
+          implicitCodeGrant: false,
+        },
+        scopes: [
+          cognito.OAuthScope.EMAIL,
+          cognito.OAuthScope.OPENID,
+          cognito.OAuthScope.PROFILE,
+        ],
+        callbackUrls: [
+          `https://${props.appId}.${props.domain}/auth/callback`,
+          &#39;http://localhost:3000/auth/callback&#39;,
+        ],
+        logoutUrls: [
+          `https://${props.appId}.${props.domain}/auth/logout`,
+          &#39;http://localhost:3000/auth/logout&#39;,
+        ],
+      },
+      
+      // Token configuration
+      accessTokenValidity: cdk.Duration.hours(1),
+      idTokenValidity: cdk.Duration.hours(1),
+      refreshTokenValidity: cdk.Duration.days(30),
+      
+      // Auth flows
+      authFlows: {
+        userPassword: true,
+        userSrp: true,
+      },
+      
+      // Prevent user existence errors
+      preventUserExistenceErrors: true,
+      
+      // Read/write attributes
+      readAttributes: new cognito.ClientAttributes()
+        .withStandardAttributes({
+          email: true,
+          fullname: true,
+        })
+        .withCustomAttributes(&#39;tenantId&#39;, &#39;appId&#39;, &#39;role&#39;, &#39;appUserId&#39;),
+        
+      writeAttributes: new cognito.ClientAttributes()
+        .withStandardAttributes({
+          fullname: true,
+        }),
+    });
+    
+    // ========================================================================
+    // USER POOL DOMAIN (Per-App)
+    // ========================================================================
+    
+    this.userPoolDomain = this.userPool.addDomain(&#39;Domain&#39;, {
+      cognitoDomain: {
+        domainPrefix: `${props.appId}-${props.environment}-auth`,
+      },
+    });
+    
+    // ========================================================================
+    // OUTPUTS
+    // ========================================================================
+    
+    new cdk.CfnOutput(this, &#39;UserPoolId&#39;, {
+      value: this.userPool.userPoolId,
+      exportName: `${resourcePrefix}-user-pool-id`,
+    });
+    
+    new cdk.CfnOutput(this, &#39;UserPoolClientId&#39;, {
+      value: this.userPoolClient.userPoolClientId,
+      exportName: `${resourcePrefix}-user-pool-client-id`,
+    });
+    
+    new cdk.CfnOutput(this, &#39;UserPoolDomain&#39;, {
+      value: this.userPoolDomain.domainName,
+      exportName: `${resourcePrefix}-user-pool-domain`,
+    });
+  }
+  
+  /**
+   * Pre-SignUp Lambda: Validates sign-up requests and enforces app isolation
+   */
+  private createPreSignUpLambda(resourcePrefix: string, appId: string): lambda.Function {
+    return new lambdaNodejs.NodejsFunction(this, &#39;PreSignUpFunction&#39;, {
+      functionName: `${resourcePrefix}-pre-signup`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: &#39;handler&#39;,
+      entry: &#39;lambda/cognito/pre-signup.ts&#39;,
+      environment: {
+        APP_ID: appId,
+      },
+    });
+  }
+  
+  /**
+   * Post-Confirmation Lambda: Creates app_users record after confirmation
+   */
+  private createPostConfirmationLambda(resourcePrefix: string, appId: string): lambda.Function {
+    return new lambdaNodejs.NodejsFunction(this, &#39;PostConfirmationFunction&#39;, {
+      functionName: `${resourcePrefix}-post-confirmation`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: &#39;handler&#39;,
+      entry: &#39;lambda/cognito/post-confirmation.ts&#39;,
+      environment: {
+        APP_ID: appId,
+      },
+    });
+  }
+  
+  /**
+   * Pre-Token-Generation Lambda: Adds app_id and app_user_id to JWT claims
+   */
+  private createPreTokenGenerationLambda(resourcePrefix: string, appId: string): lambda.Function {
+    return new lambdaNodejs.NodejsFunction(this, &#39;PreTokenGenerationFunction&#39;, {
+      functionName: `${resourcePrefix}-pre-token-gen`,
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: &#39;handler&#39;,
+      entry: &#39;lambda/cognito/pre-token-generation.ts&#39;,
+      environment: {
+        APP_ID: appId,
+      },
+    });
+  }
+}</code></pre>
+<h3 id="cognito-lambda-triggers">Cognito Lambda Triggers</h3>
+<pre class="typescript"><code>// lambda/cognito/pre-signup.ts
+
+import { PreSignUpTriggerEvent, PreSignUpTriggerHandler } from &#39;aws-lambda&#39;;
+
+/**
+ * Pre-SignUp Lambda
+ * Validates that the user is signing up for the correct app
+ */
+export const handler: PreSignUpTriggerHandler = async (event) =&gt; {
+  const appId = process.env.APP_ID;
+  
+  // For Think Tank, auto-confirm email in non-prod environments
+  if (appId === &#39;thinktank&#39; &amp;&amp; process.env.ENVIRONMENT !== &#39;prod&#39;) {
+    event.response.autoConfirmUser = true;
+    event.response.autoVerifyEmail = true;
+  }
+  
+  // Log sign-up attempt for audit
+  console.log(&#39;Pre-SignUp&#39;, {
+    appId,
+    email: event.request.userAttributes.email,
+    userPoolId: event.userPoolId,
+  });
+  
+  return event;
+};</code></pre>
+<pre class="typescript"><code>// lambda/cognito/post-confirmation.ts
+
+import { PostConfirmationTriggerEvent, PostConfirmationTriggerHandler } from &#39;aws-lambda&#39;;
+import { getDbClient } from &#39;../shared/db&#39;;
+
+/**
+ * Post-Confirmation Lambda
+ * Creates the app_users record after user confirms their email
+ */
+export const handler: PostConfirmationTriggerHandler = async (event) =&gt; {
+  const appId = process.env.APP_ID!;
+  const tenantId = event.request.userAttributes[&#39;custom:tenantId&#39;];
+  const cognitoSub = event.request.userAttributes.sub;
+  const email = event.request.userAttributes.email;
+  const fullName = event.request.userAttributes.name || &#39;&#39;;
+  
+  const db = await getDbClient();
+  
+  try {
+    // Create app-scoped user record
+    const result = await db.query(`
+      INSERT INTO app_users (
+        tenant_id, app_id, cognito_sub, email, 
+        first_name, last_name, display_name, status
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, &#39;active&#39;)
+      ON CONFLICT (tenant_id, app_id, email) DO UPDATE SET
+        cognito_sub = EXCLUDED.cognito_sub,
+        last_login_at = NOW(),
+        login_count = app_users.login_count + 1
+      RETURNING id
+    `, [
+      tenantId,
+      appId,
+      cognitoSub,
+      email,
+      fullName.split(&#39; &#39;)[0] || &#39;&#39;,
+      fullName.split(&#39; &#39;).slice(1).join(&#39; &#39;) || &#39;&#39;,
+      fullName || email.split(&#39;@&#39;)[0],
+    ]);
+    
+    const appUserId = result.rows[0].id;
+    
+    // Update cross-app correlation (for admin use only)
+    await db.query(`
+      INSERT INTO cross_app_user_correlation (tenant_id, email, app_user_ids)
+      VALUES ($1, $2, $3::jsonb)
+      ON CONFLICT (tenant_id, email) DO UPDATE SET
+        app_user_ids = cross_app_user_correlation.app_user_ids || $3::jsonb,
+        last_activity_at = NOW()
+    `, [tenantId, email, JSON.stringify({ [appId]: appUserId })]);
+    
+    console.log(&#39;Created app_user&#39;, { appId, appUserId, email });
+    
+  } catch (error) {
+    console.error(&#39;Error creating app_user&#39;, error);
+    throw error;
+  }
+  
+  return event;
+};</code></pre>
+<pre class="typescript"><code>// lambda/cognito/pre-token-generation.ts
+
+import { PreTokenGenerationTriggerEvent, PreTokenGenerationTriggerHandler } from &#39;aws-lambda&#39;;
+import { getDbClient } from &#39;../shared/db&#39;;
+
+/**
+ * Pre-Token-Generation Lambda
+ * Adds app_id and app_user_id to JWT claims
+ */
+export const handler: PreTokenGenerationTriggerHandler = async (event) =&gt; {
+  const appId = process.env.APP_ID!;
+  const cognitoSub = event.request.userAttributes.sub;
+  
+  const db = await getDbClient();
+  
+  // Get app_user_id for this user
+  const result = await db.query(`
+    SELECT id FROM app_users 
+    WHERE cognito_sub = $1 AND app_id = $2
+  `, [cognitoSub, appId]);
+  
+  const appUserId = result.rows[0]?.id;
+  
+  if (!appUserId) {
+    console.error(&#39;No app_user found for&#39;, { cognitoSub, appId });
+    throw new Error(&#39;User not found in this application&#39;);
+  }
+  
+  // Add custom claims to the ID token
+  event.response.claimsOverrideDetails = {
+    claimsToAddOrOverride: {
+      &#39;custom:app_id&#39;: appId,
+      &#39;custom:app_user_id&#39;: appUserId,
+    },
+  };
+  
+  return event;
+};</code></pre>
+<hr />
+<h2 id="lambda-auth-context-update">40.4 LAMBDA AUTH CONTEXT UPDATE</h2>
+<blockquote>
+<p><strong>NOTE</strong>: The <code>AuthContext</code> interface and <code>extractAuthContext</code> function are defined in <strong>Section 4</strong> (<code>lambda/shared/auth.ts</code>). The canonical definition already includes all app isolation fields: <code>appId</code>, <code>appUserId</code>, <code>isSuperAdmin</code>, <code>tokenExpiry</code>.</p>
+<p><strong>DO NOT redefine these types.</strong> Import from <code>@radiant/shared</code> or <code>../shared/auth</code>.</p>
+</blockquote>
+<h3 id="app-isolation-validation-logic">App Isolation Validation Logic</h3>
+<p>The following validation logic is already integrated into Section 4’s <code>extractAuthContext</code>:</p>
+<pre class="typescript"><code>// Already in Section 4: lambda/shared/auth.ts
+// Key validation points for app isolation:
+
+// 1. Extract app-specific claims
+const appId = claims[&#39;custom:appId&#39;] || claims[&#39;custom:app_id&#39;];
+const appUserId = claims[&#39;custom:appUserId&#39;] || claims[&#39;custom:app_user_id&#39;];
+
+// 2. Validate required claims for app isolation
+if (!appId) throw new UnauthorizedError(&#39;Missing app ID&#39;);
+if (!appUserId) throw new UnauthorizedError(&#39;Missing app user ID&#39;);
+
+// 3. Validate app_id matches route (defense in depth)
+const routeAppId = extractAppIdFromRoute(event);
+if (routeAppId &amp;&amp; routeAppId !== appId) {
+  throw new ForbiddenError(`Token app_id (${appId}) does not match route (${routeAppId})`);
+}</code></pre>
+<h3 id="extract-app-id-from-route-helper">Extract App ID from Route Helper</h3>
+<pre class="typescript"><code>// lambda/shared/auth.ts - extractAppIdFromRoute function
+/**
+ * Extract app_id from route for validation
+ */
+function extractAppIdFromRoute(event: APIGatewayProxyEvent): string | null {
+  // Extract from subdomain: thinktank.domain.com -&gt; thinktank
+  const host = event.headers.Host || event.headers.host;
+  if (host) {
+    const subdomain = host.split(&#39;.&#39;)[0];
+    if ([&#39;thinktank&#39;, &#39;launchboard&#39;, &#39;alwaysme&#39;, &#39;mechanicalmaker&#39;].includes(subdomain)) {
+      return subdomain;
+    }
+  }
+  
+  // Extract from path: /api/thinktank/... -&gt; thinktank
+  const pathMatch = event.path.match(/^\/api\/(thinktank|launchboard|alwaysme|mechanicalmaker)/);
+  if (pathMatch) {
+    return pathMatch[1];
+  }
+  
+  return null;
+}
+
+/**
+ * Set database context for RLS policies
+ * CRITICAL: This must be called before any database queries
+ */
+export async function setDatabaseContext(
+  db: PoolClient,
+  auth: AuthContext
+): Promise&lt;void&gt; {
+  await db.query(`
+    SET LOCAL app.current_tenant_id = $1;
+    SET LOCAL app.current_app_id = $2;
+    SET LOCAL app.is_admin = $3;
+  `, [auth.tenantId, auth.appId, auth.isAdmin ? &#39;true&#39; : &#39;false&#39;]);
+}
+
+/**
+ * Create authenticated database client with context
+ */
+export async function getAuthenticatedDb(
+  auth: AuthContext
+): Promise&lt;{ client: PoolClient; release: () =&gt; void }&gt; {
+  const pool = await getPool();
+  const client = await pool.connect();
+  
+  try {
+    await setDatabaseContext(client, auth);
+    
+    return {
+      client,
+      release: () =&gt; client.release(),
+    };
+  } catch (error) {
+    client.release();
+    throw error;
+  }
+}</code></pre>
+<hr />
+<h2 id="api-routing-by-app">40.5 API ROUTING BY APP</h2>
+<h3 id="api-gateway-per-app-routes">API Gateway Per-App Routes</h3>
+<pre class="typescript"><code>// packages/infrastructure/lib/stacks/api.stack.ts - Addition
+
+/**
+ * Create per-app API routes with app_id validation
+ */
+private createAppRoutes(props: APIStackProps): void {
+  const apps = [&#39;thinktank&#39;, &#39;launchboard&#39;, &#39;alwaysme&#39;, &#39;mechanicalmaker&#39;];
+  
+  for (const appId of apps) {
+    // Create resource for this app
+    const appResource = this.api.root.addResource(appId);
+    
+    // Apply app-specific authorizer
+    const authorizer = new apigateway.CognitoUserPoolsAuthorizer(
+      this,
+      `${appId}Authorizer`,
+      {
+        cognitoUserPools: [props.appUserPools[appId]],
+        identitySource: &#39;method.request.header.Authorization&#39;,
+      }
+    );
+    
+    // Chat endpoint
+    const chatsResource = appResource.addResource(&#39;chats&#39;);
+    chatsResource.addMethod(&#39;GET&#39;, 
+      new apigateway.LambdaIntegration(this.chatFunction),
+      { authorizer }
+    );
+    chatsResource.addMethod(&#39;POST&#39;,
+      new apigateway.LambdaIntegration(this.chatFunction),
+      { authorizer }
+    );
+    
+    // Chat by ID
+    const chatResource = chatsResource.addResource(&#39;{chatId}&#39;);
+    chatResource.addMethod(&#39;GET&#39;,
+      new apigateway.LambdaIntegration(this.chatFunction),
+      { authorizer }
+    );
+    chatResource.addMethod(&#39;DELETE&#39;,
+      new apigateway.LambdaIntegration(this.chatFunction),
+      { authorizer }
+    );
+    
+    // Messages
+    const messagesResource = chatResource.addResource(&#39;messages&#39;);
+    messagesResource.addMethod(&#39;GET&#39;,
+      new apigateway.LambdaIntegration(this.chatFunction),
+      { authorizer }
+    );
+    messagesResource.addMethod(&#39;POST&#39;,
+      new apigateway.LambdaIntegration(this.chatFunction),
+      { authorizer }
+    );
+    
+    // User preferences (app-specific)
+    const preferencesResource = appResource.addResource(&#39;preferences&#39;);
+    preferencesResource.addMethod(&#39;GET&#39;,
+      new apigateway.LambdaIntegration(this.preferencesFunction),
+      { authorizer }
+    );
+    preferencesResource.addMethod(&#39;PUT&#39;,
+      new apigateway.LambdaIntegration(this.preferencesFunction),
+      { authorizer }
+    );
+    
+    // Memory (app-specific)
+    const memoryResource = appResource.addResource(&#39;memory&#39;);
+    memoryResource.addMethod(&#39;GET&#39;,
+      new apigateway.LambdaIntegration(this.memoryFunction),
+      { authorizer }
+    );
+  }
+}</code></pre>
+<hr />
+<h2 id="admin-dashboard-updates">40.6 ADMIN DASHBOARD UPDATES</h2>
+<h3 id="cross-app-user-view-admin-only">Cross-App User View (Admin Only)</h3>
+<pre class="typescript"><code>// apps/admin-dashboard/src/app/(dashboard)/users/cross-app/page.tsx
+
+&#39;use client&#39;;
+
+import { useState } from &#39;react&#39;;
+import { useQuery } from &#39;@tanstack/react-query&#39;;
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Chip,
+  TextField,
+  InputAdornment,
+  IconButton,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+} from &#39;@mui/material&#39;;
+import { Search, Visibility, Apps, Person } from &#39;@mui/icons-material&#39;;
+
+interface CrossAppUser {
+  email: string;
+  tenantId: string;
+  appUsers: {
+    appId: string;
+    appUserId: string;
+    displayName: string;
+    lastLoginAt: string;
+    status: string;
+    chatCount: number;
+  }[];
+  firstSeenAt: string;
+  lastActivityAt: string;
+}
+
+export default function CrossAppUsersPage() {
+  const [search, setSearch] = useState(&#39;&#39;);
+  const [selectedUser, setSelectedUser] = useState&lt;CrossAppUser | null&gt;(null);
+  
+  const { data: users, isLoading } = useQuery({
+    queryKey: [&#39;cross-app-users&#39;, search],
+    queryFn: async () =&gt; {
+      const response = await fetch(
+        `/api/admin/users/cross-app?search=${encodeURIComponent(search)}`
+      );
+      return response.json() as Promise&lt;CrossAppUser[]&gt;;
+    },
+  });
+  
+  const appColors: Record&lt;string, string&gt; = {
+    thinktank: &#39;primary&#39;,
+    thinktank: &#39;secondary&#39;,
+    launchboard: &#39;success&#39;,
+    alwaysme: &#39;warning&#39;,
+    mechanicalmaker: &#39;info&#39;,
+  };
+  
+  return (
+    &lt;Box&gt;
+      &lt;Typography variant=&quot;h4&quot; gutterBottom&gt;
+        Cross-App User Correlation
+      &lt;/Typography&gt;
+      &lt;Typography variant=&quot;body2&quot; color=&quot;textSecondary&quot; sx={{ mb: 3 }}&gt;
+        View users across all applications. This is for admin support purposes only.
+        End users cannot see data from other applications.
+      &lt;/Typography&gt;
+      
+      &lt;Card sx={{ mb: 3 }}&gt;
+        &lt;CardContent&gt;
+          &lt;TextField
+            fullWidth
+            placeholder=&quot;Search by email...&quot;
+            value={search}
+            onChange={(e) =&gt; setSearch(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                &lt;InputAdornment position=&quot;start&quot;&gt;
+                  &lt;Search /&gt;
+                &lt;/InputAdornment&gt;
+              ),
+            }}
+          /&gt;
+        &lt;/CardContent&gt;
+      &lt;/Card&gt;
+      
+      &lt;Card&gt;
+        &lt;Table&gt;
+          &lt;TableHead&gt;
+            &lt;TableRow&gt;
+              &lt;TableCell&gt;Email&lt;/TableCell&gt;
+              &lt;TableCell&gt;Applications&lt;/TableCell&gt;
+              &lt;TableCell&gt;First Seen&lt;/TableCell&gt;
+              &lt;TableCell&gt;Last Activity&lt;/TableCell&gt;
+              &lt;TableCell&gt;Actions&lt;/TableCell&gt;
+            &lt;/TableRow&gt;
+          &lt;/TableHead&gt;
+          &lt;TableBody&gt;
+            {users?.map((user) =&gt; (
+              &lt;TableRow key={user.email}&gt;
+                &lt;TableCell&gt;
+                  &lt;Box sx={{ display: &#39;flex&#39;, alignItems: &#39;center&#39;, gap: 1 }}&gt;
+                    &lt;Person fontSize=&quot;small&quot; /&gt;
+                    {user.email}
+                  &lt;/Box&gt;
+                &lt;/TableCell&gt;
+                &lt;TableCell&gt;
+                  &lt;Box sx={{ display: &#39;flex&#39;, gap: 0.5, flexWrap: &#39;wrap&#39; }}&gt;
+                    {user.appUsers.map((appUser) =&gt; (
+                      &lt;Chip
+                        key={appUser.appId}
+                        label={appUser.appId}
+                        size=&quot;small&quot;
+                        color={appColors[appUser.appId] as any || &#39;default&#39;}
+                        variant={appUser.status === &#39;active&#39; ? &#39;filled&#39; : &#39;outlined&#39;}
+                      /&gt;
+                    ))}
+                  &lt;/Box&gt;
+                &lt;/TableCell&gt;
+                &lt;TableCell&gt;
+                  {new Date(user.firstSeenAt).toLocaleDateString()}
+                &lt;/TableCell&gt;
+                &lt;TableCell&gt;
+                  {new Date(user.lastActivityAt).toLocaleString()}
+                &lt;/TableCell&gt;
+                &lt;TableCell&gt;
+                  &lt;Tooltip title=&quot;View Details&quot;&gt;
+                    &lt;IconButton onClick={() =&gt; setSelectedUser(user)}&gt;
+                      &lt;Visibility /&gt;
+                    &lt;/IconButton&gt;
+                  &lt;/Tooltip&gt;
+                &lt;/TableCell&gt;
+              &lt;/TableRow&gt;
+            ))}
+          &lt;/TableBody&gt;
+        &lt;/Table&gt;
+      &lt;/Card&gt;
+      
+      {/* User Detail Dialog */}
+      &lt;Dialog
+        open={!!selectedUser}
+        onClose={() =&gt; setSelectedUser(null)}
+        maxWidth=&quot;md&quot;
+        fullWidth
+      &gt;
+        &lt;DialogTitle&gt;
+          &lt;Box sx={{ display: &#39;flex&#39;, alignItems: &#39;center&#39;, gap: 1 }}&gt;
+            &lt;Apps /&gt;
+            User Details: {selectedUser?.email}
+          &lt;/Box&gt;
+        &lt;/DialogTitle&gt;
+        &lt;DialogContent&gt;
+          {selectedUser &amp;&amp; (
+            &lt;Table&gt;
+              &lt;TableHead&gt;
+                &lt;TableRow&gt;
+                  &lt;TableCell&gt;Application&lt;/TableCell&gt;
+                  &lt;TableCell&gt;Display Name&lt;/TableCell&gt;
+                  &lt;TableCell&gt;Status&lt;/TableCell&gt;
+                  &lt;TableCell&gt;Chats&lt;/TableCell&gt;
+                  &lt;TableCell&gt;Last Login&lt;/TableCell&gt;
+                &lt;/TableRow&gt;
+              &lt;/TableHead&gt;
+              &lt;TableBody&gt;
+                {selectedUser.appUsers.map((appUser) =&gt; (
+                  &lt;TableRow key={appUser.appId}&gt;
+                    &lt;TableCell&gt;
+                      &lt;Chip
+                        label={appUser.appId}
+                        color={appColors[appUser.appId] as any || &#39;default&#39;}
+                      /&gt;
+                    &lt;/TableCell&gt;
+                    &lt;TableCell&gt;{appUser.displayName}&lt;/TableCell&gt;
+                    &lt;TableCell&gt;
+                      &lt;Chip
+                        label={appUser.status}
+                        size=&quot;small&quot;
+                        color={appUser.status === &#39;active&#39; ? &#39;success&#39; : &#39;default&#39;}
+                      /&gt;
+                    &lt;/TableCell&gt;
+                    &lt;TableCell&gt;{appUser.chatCount}&lt;/TableCell&gt;
+                    &lt;TableCell&gt;
+                      {appUser.lastLoginAt 
+                        ? new Date(appUser.lastLoginAt).toLocaleString()
+                        : &#39;Never&#39;}
+                    &lt;/TableCell&gt;
+                  &lt;/TableRow&gt;
+                ))}
+              &lt;/TableBody&gt;
+            &lt;/Table&gt;
+          )}
+        &lt;/DialogContent&gt;
+      &lt;/Dialog&gt;
+    &lt;/Box&gt;
+  );
+}</code></pre>
+<hr />
+<h2 id="migration-guide">40.7 MIGRATION GUIDE</h2>
+<h3 id="step-by-step-migration-for-existing-deployments">Step-by-Step Migration for Existing Deployments</h3>
+<pre class="markdown"><code># Migration Guide: v4.5.0 → v4.6.0 (Application-Level Isolation)
+
+## Overview
+
+This migration adds app_id isolation to all user-facing tables. Existing data
+will be migrated with a default app_id based on the primary application.
+
+## Pre-Migration Checklist
+
+- [ ] Backup database
+- [ ] Schedule maintenance window (migration takes ~10-30 minutes depending on data size)
+- [ ] Notify users of maintenance
+- [ ] Verify AWS Lambda permissions for Cognito triggers
+
+## Migration Steps
+
+### 1. Apply Database Migration
+
+```bash
+# Apply the new migration
+cd packages/infrastructure
+pnpm run migrate:up
+
+# Verify migration applied
+psql $DATABASE_URL -c &quot;SELECT * FROM schema_migrations WHERE version = &#39;040&#39;;&quot;</code></pre>
+<h3 id="migrate-existing-users-to-app_users">2. Migrate Existing Users to app_users</h3>
+<pre class="sql"><code>-- Migration script to copy existing users to app_users
+-- Run this ONCE after applying 040_app_level_isolation.sql
+
+INSERT INTO app_users (
+    tenant_id,
+    app_id,
+    base_user_id,
+    cognito_sub,
+    email,
+    email_verified,
+    first_name,
+    last_name,
+    display_name,
+    avatar_url,
+    preferences,
+    timezone,
+    locale,
+    status,
+    last_login_at,
+    created_at,
+    updated_at
+)
+SELECT 
+    u.tenant_id,
+    t.app_id,  -- Use tenant&#39;s app_id
+    u.id,      -- Link to base user
+    u.cognito_sub,
+    u.email,
+    u.email_verified,
+    u.first_name,
+    u.last_name,
+    u.display_name,
+    u.avatar_url,
+    u.preferences,
+    u.timezone,
+    u.locale,
+    u.status,
+    u.last_login_at,
+    u.created_at,
+    u.updated_at
+FROM users u
+JOIN tenants t ON u.tenant_id = t.id
+WHERE NOT EXISTS (
+    SELECT 1 FROM app_users au 
+    WHERE au.tenant_id = u.tenant_id 
+    AND au.app_id = t.app_id 
+    AND au.email = u.email
+);</code></pre>
+<h3 id="update-existing-data-with-app_id">3. Update Existing Data with app_id</h3>
+<pre class="sql"><code>-- Set app_id on existing data based on tenant&#39;s primary app
+UPDATE thinktank_chats SET app_id = &#39;thinktank&#39; WHERE app_id IS NULL OR app_id = &#39;&#39;;
+UPDATE thinktank_messages SET app_id = &#39;thinktank&#39; WHERE app_id IS NULL OR app_id = &#39;&#39;;
+UPDATE concurrent_sessions SET app_id = &#39;thinktank&#39; WHERE app_id IS NULL OR app_id = &#39;&#39;;
+-- ... repeat for all tables</code></pre>
+<h3 id="deploy-new-cognito-pools">4. Deploy New Cognito Pools</h3>
+<pre class="bash"><code># Deploy per-app Cognito pools
+cd packages/infrastructure
+cdk deploy AppCognitoThinkTankStack
+cdk deploy AppCognitoThinkTankStack
+cdk deploy AppCognitoLaunchBoardStack
+cdk deploy AppCognitoAlwaysMeStack
+cdk deploy AppCognitoMechanicalMakerStack</code></pre>
+<h3 id="update-api-gateway">5. Update API Gateway</h3>
+<pre class="bash"><code># Deploy updated API with per-app routes
+cdk deploy APIStack</code></pre>
+<h3 id="verify-migration">6. Verify Migration</h3>
+<pre class="sql"><code>-- Verify app_users populated
+SELECT app_id, COUNT(*) FROM app_users GROUP BY app_id;
+
+-- Verify RLS policies working
+SET app.current_tenant_id = &#39;your-tenant-id&#39;;
+SET app.current_app_id = &#39;thinktank&#39;;
+SELECT COUNT(*) FROM thinktank_chats; -- Should only show Think Tank chats
+
+SET app.current_app_id = &#39;thinktank&#39;;
+SELECT COUNT(*) FROM thinktank_chats; -- Should show 0 (no Think Tank chats in thinktank_chats)</code></pre>
+<h2 id="rollback-procedure">Rollback Procedure</h2>
+<p>If issues occur, you can temporarily disable app isolation:</p>
+<pre class="sql"><code>-- Emergency rollback: Remove app_id from RLS policies
+CREATE OR REPLACE FUNCTION current_app_id() RETURNS VARCHAR(50) AS $$
+BEGIN
+    RETURN NULL;  -- Returns NULL, effectively disabling app filtering
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER STABLE;</code></pre>
+<h2 id="post-migration">Post-Migration</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Monitor error rates in CloudWatch</label></li>
+<li><label><input type="checkbox" />Verify cross-app isolation working (test with same email in different apps)</label></li>
+<li><label><input type="checkbox" />Update client applications with new Cognito pool IDs</label></li>
+<li><label><input type="checkbox" />Train support staff on cross-app user correlation dashboard</label></li>
+</ul>
+<pre><code>
+---
+
+## 40.8 TESTING
+
+### Isolation Test Suite
+
+```typescript
+// tests/isolation/app-isolation.test.ts
+
+import { describe, it, expect, beforeAll, afterAll } from &#39;@jest/globals&#39;;
+import { getDbClient, closePool } from &#39;../utils/db&#39;;
+
+describe(&#39;Application-Level Data Isolation&#39;, () =&gt; {
+  let db: any;
+  
+  beforeAll(async () =&gt; {
+    db = await getDbClient();
+  });
+  
+  afterAll(async () =&gt; {
+    await closePool();
+  });
+  
+  describe(&#39;RLS Policies&#39;, () =&gt; {
+    it(&#39;should isolate data between apps in same tenant&#39;, async () =&gt; {
+      const tenantId = &#39;test-tenant-001&#39;;
+      
+      // Create test chats in different apps
+      await db.query(`SET app.current_tenant_id = $1`, [tenantId]);
+      
+      // Insert chat in Think Tank
+      await db.query(`SET app.current_app_id = &#39;thinktank&#39;`);
+      await db.query(`
+        INSERT INTO thinktank_chats (id, tenant_id, app_id, user_id, title)
+        VALUES (&#39;chat-thinktank-1&#39;, $1, &#39;thinktank&#39;, &#39;user-1&#39;, &#39;Think Tank Chat&#39;)
+      `, [tenantId]);
+      
+      // Insert chat in Think Tank
+      await db.query(`SET app.current_app_id = &#39;thinktank&#39;`);
+      await db.query(`
+        INSERT INTO thinktank_chats (id, tenant_id, app_id, user_id, title)
+        VALUES (&#39;chat-tt-1&#39;, $1, &#39;thinktank&#39;, &#39;user-1&#39;, &#39;Think Tank Chat&#39;)
+      `, [tenantId]);
+      
+      // Query from Think Tank context
+      await db.query(`SET app.current_app_id = &#39;thinktank&#39;`);
+      const thinktankChats = await db.query(`SELECT * FROM thinktank_chats`);
+      
+      expect(thinktankChats.rows).toHaveLength(1);
+      expect(thinktankChats.rows[0].title).toBe(&#39;Think Tank Chat&#39;);
+      
+      // Query from Think Tank context
+      await db.query(`SET app.current_app_id = &#39;thinktank&#39;`);
+      const ttChats = await db.query(`SELECT * FROM thinktank_chats`);
+      
+      expect(ttChats.rows).toHaveLength(1);
+      expect(ttChats.rows[0].title).toBe(&#39;Think Tank Chat&#39;);
+    });
+    
+    it(&#39;should allow admin cross-app view&#39;, async () =&gt; {
+      const tenantId = &#39;test-tenant-001&#39;;
+      
+      await db.query(`SET app.current_tenant_id = $1`, [tenantId]);
+      await db.query(`SET app.is_admin = &#39;true&#39;`);
+      
+      // Admin should see all chats
+      const allChats = await db.query(`
+        SELECT * FROM thinktank_chats WHERE tenant_id = $1
+      `, [tenantId]);
+      
+      expect(allChats.rows.length).toBeGreaterThanOrEqual(2);
+    });
+    
+    it(&#39;should prevent cross-tenant access&#39;, async () =&gt; {
+      await db.query(`SET app.current_tenant_id = &#39;other-tenant&#39;`);
+      await db.query(`SET app.current_app_id = &#39;thinktank&#39;`);
+      
+      const otherTenantChats = await db.query(`SELECT * FROM thinktank_chats`);
+      
+      expect(otherTenantChats.rows).toHaveLength(0);
+    });
+  });
+  
+  describe(&#39;App Users&#39;, () =&gt; {
+    it(&#39;should create separate app_users for same email&#39;, async () =&gt; {
+      const tenantId = &#39;test-tenant-002&#39;;
+      const email = &#39;alice@test.com&#39;;
+      
+      // Create app_user in Think Tank
+      await db.query(`
+        INSERT INTO app_users (tenant_id, app_id, cognito_sub, email, status)
+        VALUES ($1, &#39;thinktank&#39;, &#39;sub-thinktank&#39;, $2, &#39;active&#39;)
+      `, [tenantId, email]);
+      
+      // Create app_user in Think Tank
+      await db.query(`
+        INSERT INTO app_users (tenant_id, app_id, cognito_sub, email, status)
+        VALUES ($1, &#39;thinktank&#39;, &#39;sub-thinktank&#39;, $2, &#39;active&#39;)
+      `, [tenantId, email]);
+      
+      // Verify both exist
+      const thinktankUser = await db.query(`
+        SELECT * FROM app_users 
+        WHERE tenant_id = $1 AND app_id = &#39;thinktank&#39; AND email = $2
+      `, [tenantId, email]);
+      
+      const ttUser = await db.query(`
+        SELECT * FROM app_users 
+        WHERE tenant_id = $1 AND app_id = &#39;thinktank&#39; AND email = $2
+      `, [tenantId, email]);
+      
+      expect(thinktankUser.rows).toHaveLength(1);
+      expect(ttUser.rows).toHaveLength(1);
+      expect(thinktankUser.rows[0].id).not.toBe(ttUser.rows[0].id);
+    });
+  });
+});</code></pre>
+<hr />
+<h2 id="summary">40.9 SUMMARY</h2>
+<h3 id="what-v4.6.0-achieves">What v4.6.0 Achieves</h3>
+<table>
+<colgroup>
+<col style="width: 51%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr>
+<th>Before (v4.5.0)</th>
+<th>After (v4.6.0)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Users isolated by tenant_id only</td>
+<td>Users isolated by tenant_id + app_id</td>
+</tr>
+<tr>
+<td>Same email = same user across all apps</td>
+<td>Same email = separate identity per app</td>
+</tr>
+<tr>
+<td>Think Tank data visible to client apps</td>
+<td>Think Tank completely isolated</td>
+</tr>
+<tr>
+<td>Single Cognito pool per tenant</td>
+<td>Separate Cognito pool per app</td>
+</tr>
+<tr>
+<td>RLS filters by tenant only</td>
+<td>RLS filters by tenant AND app</td>
+</tr>
+<tr>
+<td>No cross-app admin view</td>
+<td>Admin dashboard for cross-app correlation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-files-changedadded">Key Files Changed/Added</h3>
+<pre><code>packages/
+├── infrastructure/
+│   ├── lib/stacks/
+│   │   └── app-cognito.stack.ts           # NEW: Per-app Cognito
+│   └── migrations/
+│       └── 040_app_level_isolation.sql     # NEW: Database changes
+├── lambda/
+│   ├── cognito/
+│   │   ├── pre-signup.ts                   # NEW: Sign-up validation
+│   │   ├── post-confirmation.ts            # NEW: App user creation
+│   │   └── pre-token-generation.ts         # NEW: Add app claims
+│   └── shared/
+│       └── auth/
+│           └── context.ts                  # UPDATED: App context
+apps/
+├── admin-dashboard/
+│   └── src/app/(dashboard)/users/
+│       └── cross-app/page.tsx              # NEW: Admin view
+tests/
+└── isolation/
+    └── app-isolation.test.ts               # NEW: Isolation tests</code></pre>
+<hr />
+<h2 id="ðÿš-how-to-use-this-prompt">ðŸš€ HOW TO USE THIS PROMPT</h2>
+<p>This is the <strong>definitive, fully deduplicated</strong> implementation prompt for RADIANT v2.2.0. All duplicate type definitions have been removed and replaced with a single source of truth.</p>
+<h3 id="for-windsurf-ide">For Windsurf IDE:</h3>
+<ol type="1">
+<li>Open Windsurf IDE</li>
+<li>Create a new folder: <code>radiant</code></li>
+<li>Paste this entire prompt into Cascade (Claude Opus 4.5)</li>
+<li>The AI will implement systematically, section by section</li>
+<li>Review and commit incrementally</li>
+</ol>
+<h3 id="implementation-order-dependency-graph">Implementation Order (Dependency Graph):</h3>
+<pre><code>â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  SECTION 0: Shared Types (@radiant/shared)                      â”‚
+â”‚  â””â”€â”€ Must be implemented FIRST - all other sections import it  â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                              â”‚
+                              â–¼
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  SECTION 1: Foundation &amp; Swift App                              â”‚
+â”‚  â””â”€â”€ Depends on: Section 0                                      â”‚
+â”‚  â””â”€â”€ Creates: Monorepo structure, Swift macOS app               â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                              â”‚
+                              â–¼
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  SECTION 2: CDK Infrastructure                                  â”‚
+â”‚  â””â”€â”€ Depends on: Sections 0, 1                                  â”‚
+â”‚  â””â”€â”€ Creates: VPC, Aurora, DynamoDB, S3, KMS, WAF               â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                              â”‚
+                              â–¼
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  SECTION 3: CDK AI &amp; API Stacks                                 â”‚
+â”‚  â””â”€â”€ Depends on: Sections 0-2                                   â”‚
+â”‚  â””â”€â”€ Creates: Cognito, LiteLLM, API Gateway, AppSync            â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                              â”‚
+                              â–¼
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  SECTION 4: Lambda Functions - Core                             â”‚
+â”‚  â””â”€â”€ Depends on: Sections 0-3                                   â”‚
+â”‚  â””â”€â”€ Creates: Router, Chat, Models, Providers, PHI handlers     â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                              â”‚
+                              â–¼
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  SECTION 5: Lambda Functions - Admin &amp; Billing                  â”‚
+â”‚  â””â”€â”€ Depends on: Sections 0-4                                   â”‚
+â”‚  â””â”€â”€ Creates: Invitations, Approvals, Metering, Billing         â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                              â”‚
+                              â–¼
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  SECTION 6: Self-Hosted Models &amp; Services                       â”‚
+â”‚  â””â”€â”€ Depends on: Sections 0-5                                   â”‚
+â”‚  â””â”€â”€ Creates: 30+ SageMaker models, Thermal state management    â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                              â”‚
+                              â–¼
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  SECTION 7: Database Schema (CANONICAL)                         â”‚
+â”‚  â””â”€â”€ Depends on: Sections 0-6                                   â”‚
+â”‚  â””â”€â”€ Creates: Complete PostgreSQL schema, all migrations        â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                              â”‚
+                              â–¼
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  SECTION 8: Admin Web Dashboard                                 â”‚
+â”‚  â””â”€â”€ Depends on: Sections 0-7                                   â”‚
+â”‚  â””â”€â”€ Creates: Next.js 14 dashboard, all management UIs          â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                              â”‚
+                              â–¼
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  SECTION 9: Assembly &amp; Deployment                               â”‚
+â”‚  â””â”€â”€ Depends on: ALL sections                                   â”‚
+â”‚  â””â”€â”€ Provides: Verification, testing, troubleshooting           â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜</code></pre>
+<hr />
+<h2 id="ðÿ-configuration---replace-these-placeholders">ðŸ“‹ CONFIGURATION - REPLACE THESE PLACEHOLDERS</h2>
+<p>Before deployment, find and replace these placeholders:</p>
+<table>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 34%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Placeholder</th>
+<th>Description</th>
+<th>Your Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>`YOUR_DOMAIN.com`</td>
+<td>Your base domain</td>
+<td>e.g., `zynapses.com`</td>
+</tr>
+<tr>
+<td>`YOUR_APP_ID`</td>
+<td>Application identifier</td>
+<td>e.g., `thinktank`</td>
+</tr>
+<tr>
+<td>`YOUR_AWS_ACCOUNT_ID`</td>
+<td>12-digit AWS account</td>
+<td>e.g., `123456789012`</td>
+</tr>
+<tr>
+<td>`YOUR_AWS_REGION`</td>
+<td>Primary AWS region</td>
+<td>e.g., `us-east-1`</td>
+</tr>
+<tr>
+<td>`YOUR_ORG_IDENTIFIER`</td>
+<td>Bundle ID prefix</td>
+<td>e.g., `com.yourcompany`</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="ðÿš-canonical-database-tables">ðŸ“Š CANONICAL DATABASE TABLES</h2>
+<p>Use these table names consistently (not the alternatives):</p>
+<table>
+<colgroup>
+<col style="width: 51%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr>
+<th>Canonical Name</th>
+<th>❌ Do NOT Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tenants</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>users</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>administrators</code></td>
+<td><code>admin_users</code></td>
+</tr>
+<tr>
+<td><code>invitations</code></td>
+<td><code>admin_invitations</code></td>
+</tr>
+<tr>
+<td><code>approval_requests</code></td>
+<td><code>promotions</code>, <code>admin_approvals</code></td>
+</tr>
+<tr>
+<td><code>providers</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>models</code></td>
+<td><code>ai_models</code> (legacy)</td>
+</tr>
+<tr>
+<td><code>ai_models</code></td>
+<td>- (v4.1.0 orchestration registry)</td>
+</tr>
+<tr>
+<td><code>model_licenses</code></td>
+<td>- (v4.1.0 license tracking)</td>
+</tr>
+<tr>
+<td><code>model_dependencies</code></td>
+<td>- (v4.1.0 dependency tracking)</td>
+</tr>
+<tr>
+<td><code>workflow_definitions</code></td>
+<td>- (v4.1.0 workflow DAGs)</td>
+</tr>
+<tr>
+<td><code>workflow_tasks</code></td>
+<td>- (v4.1.0 workflow steps)</td>
+</tr>
+<tr>
+<td><code>workflow_parameters</code></td>
+<td>- (v4.1.0 configurable params)</td>
+</tr>
+<tr>
+<td><code>workflow_executions</code></td>
+<td>- (v4.1.0 execution tracking)</td>
+</tr>
+<tr>
+<td><code>task_executions</code></td>
+<td>- (v4.1.0 task-level logs)</td>
+</tr>
+<tr>
+<td><code>service_definitions</code></td>
+<td>- (v4.1.0 mid-level services)</td>
+</tr>
+<tr>
+<td><code>orchestration_audit_log</code></td>
+<td>- (v4.1.0 change audit)</td>
+</tr>
+<tr>
+<td><code>unified_model_registry</code></td>
+<td>- (v4.2.0 combined view - ALL models)</td>
+</tr>
+<tr>
+<td><code>registry_sync_log</code></td>
+<td>- (v4.2.0 sync history)</td>
+</tr>
+<tr>
+<td><code>provider_health</code></td>
+<td>- (v4.2.0 health monitoring)</td>
+</tr>
+<tr>
+<td><code>self_hosted_models</code></td>
+<td>- (v4.2.0 SageMaker models catalog)</td>
+</tr>
+<tr>
+<td><code>execution_manifests</code></td>
+<td>- (v4.3.0 full execution provenance)</td>
+</tr>
+<tr>
+<td><code>feedback_explicit</code></td>
+<td>- (v4.3.0 thumbs up/down + categories)</td>
+</tr>
+<tr>
+<td><code>feedback_implicit</code></td>
+<td>- (v4.3.0 regenerate, copy, abandon signals)</td>
+</tr>
+<tr>
+<td><code>feedback_voice</code></td>
+<td>- (v4.3.0 voice feedback with transcription)</td>
+</tr>
+<tr>
+<td><code>neural_model_scores</code></td>
+<td>- (v4.3.0 learned model effectiveness)</td>
+</tr>
+<tr>
+<td><code>neural_routing_recommendations</code></td>
+<td>- (v4.3.0 Brain advice from Neural Engine)</td>
+</tr>
+<tr>
+<td><code>user_trust_scores</code></td>
+<td>- (v4.3.0 anti-gaming trust levels)</td>
+</tr>
+<tr>
+<td><code>ab_experiments</code></td>
+<td>- (v4.3.0 A/B testing experiments)</td>
+</tr>
+<tr>
+<td><code>ab_experiment_assignments</code></td>
+<td>- (v4.3.0 user experiment assignments)</td>
+</tr>
+<tr>
+<td><code>localization_languages</code></td>
+<td>- (v4.7.0 supported languages)</td>
+</tr>
+<tr>
+<td><code>localization_registry</code></td>
+<td>- (v4.7.0 all translatable strings)</td>
+</tr>
+<tr>
+<td><code>localization_translations</code></td>
+<td>- (v4.7.0 per-language translations)</td>
+</tr>
+<tr>
+<td><code>localization_audit_log</code></td>
+<td>- (v4.7.0 translation change history)</td>
+</tr>
+<tr>
+<td><code>configuration_categories</code></td>
+<td>- (v4.8.0 config categories)</td>
+</tr>
+<tr>
+<td><code>system_configuration</code></td>
+<td>- (v4.8.0 global config parameters)</td>
+</tr>
+<tr>
+<td><code>tenant_configuration_overrides</code></td>
+<td>- (v4.8.0 per-tenant config overrides)</td>
+</tr>
+<tr>
+<td><code>configuration_audit_log</code></td>
+<td>- (v4.8.0 config change history)</td>
+</tr>
+<tr>
+<td><code>configuration_cache_invalidation</code></td>
+<td>- (v4.8.0 cache invalidation queue)</td>
+</tr>
+<tr>
+<td><code>usage_events</code></td>
+<td><code>usage_records</code></td>
+</tr>
+<tr>
+<td><code>invoices</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>audit_logs</code></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

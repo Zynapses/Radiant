@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INCIDENT RESPONSE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>INCIDENT RESPONSE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/runbooks/INCIDENT-RESPONSE.md</div>
+  </div>
+  
+  <h1 id="radiant-incident-response-runbook">RADIANT Incident Response Runbook</h1>
+<blockquote>
+<p><strong>Version</strong>: {{RADIANT_VERSION}} <strong>Last Updated</strong>: {{BUILD_DATE}}</p>
+</blockquote>
+<hr />
+<h2 id="incident-classification">1. Incident Classification</h2>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 25%" />
+<col style="width: 31%" />
+<col style="width: 21%" />
+</colgroup>
+<thead>
+<tr>
+<th>Severity</th>
+<th>Definition</th>
+<th>Response Time</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P1 - Critical</strong></td>
+<td>Platform down, all users affected</td>
+<td>15 minutes</td>
+<td>Database failure, Auth down</td>
+</tr>
+<tr>
+<td><strong>P2 - High</strong></td>
+<td>Major feature broken, many users affected</td>
+<td>1 hour</td>
+<td>Payment processing failed</td>
+</tr>
+<tr>
+<td><strong>P3 - Medium</strong></td>
+<td>Feature degraded, some users affected</td>
+<td>4 hours</td>
+<td>Slow response times</td>
+</tr>
+<tr>
+<td><strong>P4 - Low</strong></td>
+<td>Minor issue, workaround available</td>
+<td>24 hours</td>
+<td>UI bug, typo</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="incident-response-process">2. Incident Response Process</h2>
+<h3 id="detection">2.1 Detection</h3>
+<ol type="1">
+<li><strong>Automated Alerts</strong>: CloudWatch, PagerDuty</li>
+<li><strong>User Reports</strong>: Support tickets, status page</li>
+<li><strong>Monitoring</strong>: Dashboard anomalies</li>
+</ol>
+<h3 id="triage">2.2 Triage</h3>
+<pre><code>┌─────────────────────────────────────────┐
+│         Incident Detected               │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│     Assess Impact &amp; Severity            │
+│  - Users affected?                      │
+│  - Revenue impact?                      │
+│  - Data at risk?                        │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│     Assign Severity (P1-P4)             │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│     Notify Stakeholders                 │
+└─────────────────────────────────────────┘</code></pre>
+<h3 id="response-actions">2.3 Response Actions</h3>
+<p><strong>P1 - Critical</strong> 1. Page on-call engineer immediately 2. Create incident channel (#incident-YYYYMMDD) 3. Update status page to “Investigating” 4. Assemble incident team 5. Begin investigation</p>
+<p><strong>P2 - High</strong> 1. Notify on-call engineer 2. Create incident ticket 3. Update status page if customer-facing 4. Begin investigation within 1 hour</p>
+<hr />
+<h2 id="common-incidents">3. Common Incidents</h2>
+<h3 id="database-connection-failure">3.1 Database Connection Failure</h3>
+<p><strong>Symptoms:</strong> - 500 errors on API requests - “Connection refused” in logs</p>
+<p><strong>Investigation:</strong></p>
+<pre class="bash"><code># Check Aurora cluster status
+aws rds describe-db-clusters --db-cluster-identifier radiant-cluster
+
+# Check security group rules
+aws ec2 describe-security-groups --group-ids sg-xxx
+
+# Verify secrets
+aws secretsmanager get-secret-value --secret-id radiant/db-credentials</code></pre>
+<p><strong>Resolution:</strong> 1. Check if cluster is available 2. Verify security group allows Lambda access 3. Check if credentials rotated 4. Restart affected Lambda functions</p>
+<h3 id="high-latency">3.2 High Latency</h3>
+<p><strong>Symptoms:</strong> - Response times &gt; 5 seconds - Timeout errors</p>
+<p><strong>Investigation:</strong></p>
+<pre class="bash"><code># Check Lambda duration metrics
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/Lambda \
+  --metric-name Duration \
+  --dimensions Name=FunctionName,Value=radiant-api \
+  --start-time $(date -u -d &#39;1 hour ago&#39; +%Y-%m-%dT%H:%M:%SZ) \
+  --end-time $(date -u +%Y-%m-%dT%H:%M:%SZ) \
+  --period 300 \
+  --statistics Average,Maximum
+
+# Check external provider health
+curl -w &quot;@curl-format.txt&quot; https://api.openai.com/v1/models</code></pre>
+<p><strong>Resolution:</strong> 1. Identify slow component (DB, provider, processing) 2. Scale resources if needed 3. Enable caching if appropriate 4. Contact provider if external issue</p>
+<h3 id="provider-outage">3.3 Provider Outage</h3>
+<p><strong>Symptoms:</strong> - Errors from specific AI provider - Brain Router selecting alternatives</p>
+<p><strong>Investigation:</strong></p>
+<pre class="bash"><code># Check provider health dashboard
+# Review error rates by provider in CloudWatch
+
+aws cloudwatch get-metric-statistics \
+  --namespace RADIANT/Providers \
+  --metric-name ErrorRate \
+  --dimensions Name=Provider,Value=openai \
+  --start-time $(date -u -d &#39;1 hour ago&#39; +%Y-%m-%dT%H:%M:%SZ) \
+  --end-time $(date -u +%Y-%m-%dT%H:%M:%SZ) \
+  --period 60 \
+  --statistics Average</code></pre>
+<p><strong>Resolution:</strong> 1. Verify outage on provider status page 2. Brain Router should auto-failover 3. Update internal status page 4. Monitor for resolution 5. Post-incident: review failover effectiveness</p>
+<hr />
+<h2 id="communication-templates">4. Communication Templates</h2>
+<h3 id="status-page---investigating">4.1 Status Page - Investigating</h3>
+<pre><code>Investigating Increased Error Rates
+
+We are currently investigating reports of increased error rates 
+affecting [service]. Our team is actively working to identify 
+and resolve the issue.
+
+We will provide updates every 30 minutes or as we have new information.
+
+Posted: [TIME] UTC</code></pre>
+<h3 id="status-page---identified">4.2 Status Page - Identified</h3>
+<pre><code>Issue Identified - [Brief Description]
+
+We have identified the cause of [issue]. The problem is related to 
+[root cause summary]. Our team is implementing a fix.
+
+Estimated resolution: [TIME] UTC
+
+Posted: [TIME] UTC</code></pre>
+<h3 id="status-page---resolved">4.3 Status Page - Resolved</h3>
+<pre><code>Resolved - [Brief Description]
+
+The issue affecting [service] has been resolved. 
+[Brief explanation of fix].
+
+Total duration: [X] hours [Y] minutes
+Impact: [description of impact]
+
+We apologize for any inconvenience caused.
+
+Posted: [TIME] UTC</code></pre>
+<hr />
+<h2 id="post-incident">5. Post-Incident</h2>
+<h3 id="post-mortem-template">5.1 Post-Mortem Template</h3>
+<pre class="markdown"><code># Incident Post-Mortem: [Title]
+
+**Date**: [Date]
+**Duration**: [Start] - [End] ([Duration])
+**Severity**: P[X]
+**Author**: [Name]
+
+## Summary
+[1-2 sentence summary]
+
+## Impact
+- Users affected: [number]
+- Revenue impact: [amount]
+- SLA impact: [yes/no]
+
+## Timeline
+| Time (UTC) | Event |
+|------------|-------|
+| HH:MM | [Event] |
+
+## Root Cause
+[Detailed explanation]
+
+## Resolution
+[How it was fixed]
+
+## Action Items
+| Item | Owner | Due Date | Status |
+|------|-------|----------|--------|
+| [Action] | [Name] | [Date] | Open |
+
+## Lessons Learned
+- [Lesson 1]
+- [Lesson 2]</code></pre>
+<h3 id="review-meeting">5.2 Review Meeting</h3>
+<p>Schedule within 48 hours of resolution: - Review timeline - Identify root cause - Assign action items - Update runbooks if needed</p>
+<hr />
+<h2 id="contacts">6. Contacts</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Contact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>On-Call Engineer</td>
+<td>PagerDuty</td>
+</tr>
+<tr>
+<td>Platform Lead</td>
+<td>[email]</td>
+</tr>
+<tr>
+<td>Security Team</td>
+<td>security@radiant.ai</td>
+</tr>
+<tr>
+<td>Customer Success</td>
+<td>support@radiant.ai</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>This runbook is part of the RADIANT v{{RADIANT_VERSION}} documentation.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

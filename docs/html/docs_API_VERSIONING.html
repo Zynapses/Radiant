@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API VERSIONING - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>API VERSIONING</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/API_VERSIONING.md</div>
+  </div>
+  
+  <h1 id="radiant-api-versioning-guide">RADIANT API Versioning Guide</h1>
+<h2 id="overview">Overview</h2>
+<p>This document describes the API versioning strategy for the RADIANT platform.</p>
+<h2 id="versioning-strategy">Versioning Strategy</h2>
+<h3 id="url-path-versioning">URL Path Versioning</h3>
+<p>RADIANT uses URL path versioning as the primary versioning mechanism:</p>
+<pre><code>https://api.radiant.example.com/v2/models
+https://api.radiant.example.com/v2/chat/completions</code></pre>
+<h3 id="version-lifecycle">Version Lifecycle</h3>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Status</th>
+<th>Support End</th>
+<th>Deprecation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v1</td>
+<td>Deprecated</td>
+<td>2024-06-01</td>
+<td>Sunset</td>
+</tr>
+<tr>
+<td>v2</td>
+<td>Current</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>v3</td>
+<td>Planned</td>
+<td>-</td>
+<td>Q3 2025</td>
+</tr>
+</tbody>
+</table>
+<h3 id="support-policy">Support Policy</h3>
+<ul>
+<li><strong>Current version</strong>: Full support, all new features</li>
+<li><strong>Previous version</strong>: Security fixes only, 12 months after new version</li>
+<li><strong>Deprecated</strong>: No fixes, 6-month sunset warning</li>
+</ul>
+<h2 id="breaking-vs-non-breaking-changes">Breaking vs Non-Breaking Changes</h2>
+<h3 id="non-breaking-changes-no-version-bump">Non-Breaking Changes (No Version Bump)</h3>
+<p>✅ These changes can be made to the current version:</p>
+<ul>
+<li>Adding new endpoints</li>
+<li>Adding new optional request parameters</li>
+<li>Adding new response fields</li>
+<li>Adding new enum values (with graceful handling)</li>
+<li>Performance improvements</li>
+<li>Bug fixes that don’t change behavior</li>
+</ul>
+<h3 id="breaking-changes-require-new-version">Breaking Changes (Require New Version)</h3>
+<p>❌ These changes require a new API version:</p>
+<ul>
+<li>Removing endpoints</li>
+<li>Removing request/response fields</li>
+<li>Changing field types</li>
+<li>Changing validation rules</li>
+<li>Changing authentication methods</li>
+<li>Changing error response formats</li>
+<li>Removing enum values</li>
+<li>Changing default values</li>
+</ul>
+<h2 id="version-header-support">Version Header Support</h2>
+<h3 id="request-headers">Request Headers</h3>
+<pre class="http"><code># Specify API version via header (optional override)
+X-API-Version: 2024-12-01
+
+# Request specific features
+X-API-Features: beta-orchestration,streaming-v2</code></pre>
+<h3 id="response-headers">Response Headers</h3>
+<pre class="http"><code># Current API version
+X-API-Version: 2
+X-API-Version-Date: 2024-12-01
+
+# Deprecation warning
+Deprecation: true
+Sunset: Sat, 01 Jun 2024 00:00:00 GMT
+Link: &lt;https://api.radiant.example.com/v2&gt;; rel=&quot;successor-version&quot;</code></pre>
+<h2 id="deprecation-process">Deprecation Process</h2>
+<h3 id="timeline">Timeline</h3>
+<pre><code>Day 0:    Announce deprecation
+          Add Deprecation header
+          Update documentation
+          
+Month 3:  Send reminder emails
+          Log deprecation warnings
+          
+Month 6:  Begin returning 299 status for deprecated endpoints
+          Increase warning frequency
+          
+Month 12: Sunset - Return 410 Gone
+          Redirect to new version docs</code></pre>
+<h3 id="deprecation-headers">Deprecation Headers</h3>
+<pre class="typescript"><code>// Add deprecation headers to old endpoints
+function addDeprecationHeaders(res: Response, sunset: Date): void {
+  res.setHeader(&#39;Deprecation&#39;, &#39;true&#39;);
+  res.setHeader(&#39;Sunset&#39;, sunset.toUTCString());
+  res.setHeader(&#39;Link&#39;, &#39;&lt;https://api.radiant.example.com/v3&gt;; rel=&quot;successor-version&quot;&#39;);
+}</code></pre>
+<h3 id="deprecation-warnings">Deprecation Warnings</h3>
+<pre class="typescript"><code>// Log deprecation usage for migration tracking
+async function logDeprecatedUsage(req: Request): Promise&lt;void&gt; {
+  await analytics.track({
+    event: &#39;deprecated_api_usage&#39;,
+    properties: {
+      endpoint: req.path,
+      version: extractVersion(req),
+      apiKey: extractKeyId(req),
+      tenant: extractTenantId(req),
+    },
+  });
+}</code></pre>
+<h2 id="migration-guide-template">Migration Guide Template</h2>
+<h3 id="v1-to-v2-migration">v1 to v2 Migration</h3>
+<pre class="markdown"><code># Migrating from API v1 to v2
+
+## Breaking Changes
+
+### 1. Authentication
+- v1: API key in query string (`?api_key=xxx`)
+- v2: API key in header (`Authorization: Bearer xxx`)
+
+### 2. Response Format
+- v1: Flat response (`{ models: [...] }`)
+- v2: Wrapped response (`{ data: [...], meta: {...} }`)
+
+### 3. Error Format
+- v1: `{ error: &quot;message&quot; }`
+- v2: `{ error: { code: &quot;...&quot;, message: &quot;...&quot;, details: [...] } }`
+
+## Migration Steps
+
+1. Update authentication headers
+2. Update response parsing
+3. Update error handling
+4. Test all endpoints
+5. Switch base URL from /v1 to /v2</code></pre>
+<h2 id="feature-flags">Feature Flags</h2>
+<h3 id="beta-features">Beta Features</h3>
+<pre class="typescript"><code>// Enable beta features via header
+const betaFeatures = {
+  &#39;beta-orchestration&#39;: true,
+  &#39;beta-streaming-v2&#39;: true,
+  &#39;beta-function-calling&#39;: true,
+};
+
+function isBetaEnabled(req: Request, feature: string): boolean {
+  const features = req.headers[&#39;x-api-features&#39;]?.split(&#39;,&#39;) || [];
+  return features.includes(feature) &amp;&amp; betaFeatures[feature];
+}</code></pre>
+<h3 id="graduated-features">Graduated Features</h3>
+<pre class="typescript"><code>// Track feature graduation
+const featureGraduation = {
+  &#39;function-calling&#39;: {
+    beta: &#39;2024-06-01&#39;,
+    stable: &#39;2024-09-01&#39;,
+    version: &#39;v2&#39;,
+  },
+  &#39;streaming-v2&#39;: {
+    beta: &#39;2024-09-01&#39;,
+    stable: null, // Still in beta
+    version: &#39;v2&#39;,
+  },
+};</code></pre>
+<h2 id="sdk-versioning">SDK Versioning</h2>
+<h3 id="sdk-version-matrix">SDK Version Matrix</h3>
+<table>
+<thead>
+<tr>
+<th>SDK</th>
+<th>Latest</th>
+<th>Min API Version</th>
+<th>Max API Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JavaScript</td>
+<td>2.5.0</td>
+<td>v2</td>
+<td>v2</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>2.3.0</td>
+<td>v2</td>
+<td>v2</td>
+</tr>
+<tr>
+<td>Go</td>
+<td>1.2.0</td>
+<td>v2</td>
+<td>v2</td>
+</tr>
+<tr>
+<td>Ruby</td>
+<td>1.1.0</td>
+<td>v2</td>
+<td>v2</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sdk-version-headers">SDK Version Headers</h3>
+<pre class="http"><code># SDKs include version info
+User-Agent: radiant-js/2.5.0 node/20.10.0
+X-Radiant-SDK: js
+X-Radiant-SDK-Version: 2.5.0</code></pre>
+<h2 id="openapi-specification">OpenAPI Specification</h2>
+<h3 id="versioned-specs">Versioned Specs</h3>
+<pre><code>/docs/openapi/v2.yaml     # Current version
+/docs/openapi/v2-beta.yaml # With beta features
+/docs/openapi/v1.yaml     # Deprecated version</code></pre>
+<h3 id="schema-versioning">Schema Versioning</h3>
+<pre class="yaml"><code># openapi.yaml
+openapi: 3.1.0
+info:
+  title: RADIANT API
+  version: 2.0.0
+  x-api-version: v2
+  x-version-date: &#39;2024-12-01&#39;
+  x-deprecation-date: null</code></pre>
+<h2 id="testing-versions">Testing Versions</h2>
+<h3 id="version-compatibility-tests">Version Compatibility Tests</h3>
+<pre class="typescript"><code>describe(&#39;API Version Compatibility&#39;, () =&gt; {
+  it(&#39;should support v2 endpoints&#39;, async () =&gt; {
+    const res = await fetch(&#39;/v2/health&#39;);
+    expect(res.status).toBe(200);
+  });
+  
+  it(&#39;should return 410 for sunset v1 endpoints&#39;, async () =&gt; {
+    const res = await fetch(&#39;/v1/health&#39;);
+    expect(res.status).toBe(410);
+    expect(res.headers.get(&#39;Link&#39;)).toContain(&#39;/v2&#39;);
+  });
+  
+  it(&#39;should include deprecation headers for deprecated endpoints&#39;, async () =&gt; {
+    const res = await fetch(&#39;/v2/deprecated-endpoint&#39;);
+    expect(res.headers.get(&#39;Deprecation&#39;)).toBe(&#39;true&#39;);
+    expect(res.headers.get(&#39;Sunset&#39;)).toBeDefined();
+  });
+});</code></pre>
+<h2 id="client-communication">Client Communication</h2>
+<h3 id="changelog">Changelog</h3>
+<p>Maintain a public changelog:</p>
+<pre class="markdown"><code># API Changelog
+
+## 2024-12-24 (v2.5)
+- Added: Orchestration patterns endpoint
+- Added: Workflow proposals endpoint
+- Changed: Increased rate limits for Professional tier
+
+## 2024-12-01 (v2.4)
+- Added: AI translation for localization
+- Deprecated: Legacy /translate endpoint (sunset 2025-06-01)</code></pre>
+<h3 id="email-notifications">Email Notifications</h3>
+<pre class="typescript"><code>// Notify developers of breaking changes
+async function notifyApiChanges(change: ApiChange): Promise&lt;void&gt; {
+  const affectedKeys = await getApiKeysUsingEndpoint(change.endpoint);
+  
+  for (const key of affectedKeys) {
+    await sendEmail({
+      to: key.ownerEmail,
+      subject: `RADIANT API: ${change.type} - ${change.endpoint}`,
+      template: &#39;api-change-notification&#39;,
+      data: {
+        change,
+        migrationGuide: change.migrationGuideUrl,
+        deadline: change.sunsetDate,
+      },
+    });
+  }
+}</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="for-api-developers">For API Developers</h3>
+<ol type="1">
+<li><strong>Plan for change</strong>: Design APIs to be extensible</li>
+<li><strong>Use optional fields</strong>: Make new fields optional with defaults</li>
+<li><strong>Version from day one</strong>: Include version in all endpoints</li>
+<li><strong>Document everything</strong>: Keep OpenAPI specs updated</li>
+<li><strong>Communicate early</strong>: 12-month deprecation notice minimum</li>
+</ol>
+<h3 id="for-api-consumers">For API Consumers</h3>
+<ol type="1">
+<li><strong>Pin versions</strong>: Don’t use unversioned endpoints</li>
+<li><strong>Handle unknown fields</strong>: Ignore unexpected response fields</li>
+<li><strong>Monitor deprecation headers</strong>: Set up alerts</li>
+<li><strong>Test regularly</strong>: Run integration tests against current version</li>
+<li><strong>Subscribe to updates</strong>: Follow changelog and email updates</li>
+</ol>
+<h2 id="contact">Contact</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Contact</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API Support</td>
+<td>api-support@radiant.example.com</td>
+<td>Usage questions</td>
+</tr>
+<tr>
+<td>Developer Relations</td>
+<td>devrel@radiant.example.com</td>
+<td>SDKs, docs</td>
+</tr>
+<tr>
+<td>Engineering</td>
+<td>engineering@radiant.example.com</td>
+<td>Bug reports</td>
+</tr>
+</tbody>
+</table>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

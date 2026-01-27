@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI ETHICS STANDARDS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>AI ETHICS STANDARDS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/AI-ETHICS-STANDARDS.md</div>
+  </div>
+  
+  <h1 id="ai-ethics-standards-framework">AI Ethics Standards Framework</h1>
+<p><strong>Version</strong>: 4.18.3<br />
+<strong>Last Updated</strong>: 2024-12-28</p>
+<h2 id="overview">Overview</h2>
+<p>RADIANT’s ethical AI behavior is guided by principles that map to established industry standards. This document provides full transparency into the standards framework and how each ethical principle aligns with recognized AI ethics guidelines.</p>
+<hr />
+<h2 id="industry-standards">Industry Standards</h2>
+<h3 id="government-regulatory">Government &amp; Regulatory</h3>
+<h4 id="nist-ai-risk-management-framework-ai-rmf-1.0">NIST AI Risk Management Framework (AI RMF 1.0)</h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>NIST_AI_RMF</code></td>
+</tr>
+<tr>
+<td><strong>Full Name</strong></td>
+<td>NIST AI Risk Management Framework</td>
+</tr>
+<tr>
+<td><strong>Version</strong></td>
+<td>1.0</td>
+</tr>
+<tr>
+<td><strong>Organization</strong></td>
+<td>National Institute of Standards and Technology</td>
+</tr>
+<tr>
+<td><strong>Published</strong></td>
+<td>January 26, 2023</td>
+</tr>
+<tr>
+<td><strong>Status</strong></td>
+<td>✅ Required</td>
+</tr>
+<tr>
+<td><strong>URL</strong></td>
+<td>https://www.nist.gov/itl/ai-risk-management-framework</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description</strong>: Comprehensive framework for managing risks in AI systems throughout their lifecycle. Provides guidance on governance, mapping, measurement, and management of AI risks.</p>
+<p><strong>Key Functions</strong>: - <strong>GOVERN</strong>: Establish AI governance - <strong>MAP</strong>: Map and characterize AI context - <strong>MEASURE</strong>: Assess and analyze AI risks - <strong>MANAGE</strong>: Prioritize and act on AI risks</p>
+<hr />
+<h4 id="isoiec-420012023-ai-management-system">ISO/IEC 42001:2023 AI Management System</h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ISO_42001</code></td>
+</tr>
+<tr>
+<td><strong>Full Name</strong></td>
+<td>ISO/IEC 42001:2023 AI Management System</td>
+</tr>
+<tr>
+<td><strong>Version</strong></td>
+<td>2023</td>
+</tr>
+<tr>
+<td><strong>Organization</strong></td>
+<td>International Organization for Standardization</td>
+</tr>
+<tr>
+<td><strong>Published</strong></td>
+<td>December 18, 2023</td>
+</tr>
+<tr>
+<td><strong>Status</strong></td>
+<td>✅ Required</td>
+</tr>
+<tr>
+<td><strong>URL</strong></td>
+<td>https://www.iso.org/standard/81230.html</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description</strong>: First international AI management system standard. Provides requirements for establishing, implementing, maintaining and continually improving an AI management system.</p>
+<p><strong>Key Clauses</strong>: - <strong>Clause 4</strong>: Context of the organization - <strong>Clause 5</strong>: Leadership - <strong>Clause 6</strong>: Planning - <strong>Clause 7</strong>: Support - <strong>Clause 8</strong>: Operation - <strong>Clause 9</strong>: Performance evaluation - <strong>Clause 10</strong>: Improvement</p>
+<hr />
+<h4 id="eu-ai-act">EU AI Act</h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>EU_AI_ACT</code></td>
+</tr>
+<tr>
+<td><strong>Full Name</strong></td>
+<td>European Union Artificial Intelligence Act</td>
+</tr>
+<tr>
+<td><strong>Version</strong></td>
+<td>2024</td>
+</tr>
+<tr>
+<td><strong>Organization</strong></td>
+<td>European Union</td>
+</tr>
+<tr>
+<td><strong>Published</strong></td>
+<td>March 13, 2024</td>
+</tr>
+<tr>
+<td><strong>Status</strong></td>
+<td>✅ Required</td>
+</tr>
+<tr>
+<td><strong>URL</strong></td>
+<td>https://artificialintelligenceact.eu/</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description</strong>: Comprehensive regulatory framework for AI systems in the EU. Establishes risk-based approach with requirements for high-risk AI systems.</p>
+<p><strong>Key Articles</strong>: - <strong>Article 7</strong>: Special attention to vulnerable groups - <strong>Article 9</strong>: Risk management system - <strong>Article 10</strong>: Data governance - <strong>Article 13</strong>: Transparency obligations - <strong>Article 14</strong>: Human oversight</p>
+<hr />
+<h3 id="industry-academic">Industry &amp; Academic</h3>
+<h4 id="ieee-7000-2021">IEEE 7000-2021</h4>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>IEEE_7000</code></td>
+</tr>
+<tr>
+<td><strong>Full Name</strong></td>
+<td>IEEE 7000-2021 Model Process for Addressing Ethical Concerns</td>
+</tr>
+<tr>
+<td><strong>Version</strong></td>
+<td>2021</td>
+</tr>
+<tr>
+<td><strong>Organization</strong></td>
+<td>Institute of Electrical and Electronics Engineers</td>
+</tr>
+<tr>
+<td><strong>Published</strong></td>
+<td>September 15, 2021</td>
+</tr>
+<tr>
+<td><strong>URL</strong></td>
+<td>https://standards.ieee.org/ieee/7000/6781/</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description</strong>: Standard for addressing ethical concerns during system design. Provides model process for identifying and addressing ethical values.</p>
+<hr />
+<h4 id="oecd-ai-principles">OECD AI Principles</h4>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>OECD_AI</code></td>
+</tr>
+<tr>
+<td><strong>Full Name</strong></td>
+<td>OECD Principles on Artificial Intelligence</td>
+</tr>
+<tr>
+<td><strong>Version</strong></td>
+<td>2019</td>
+</tr>
+<tr>
+<td><strong>Organization</strong></td>
+<td>Organisation for Economic Co-operation and Development</td>
+</tr>
+<tr>
+<td><strong>Published</strong></td>
+<td>May 22, 2019</td>
+</tr>
+<tr>
+<td><strong>URL</strong></td>
+<td>https://oecd.ai/en/ai-principles</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description</strong>: First intergovernmental standard on AI. Promotes AI that is innovative, trustworthy, and respects human rights and democratic values.</p>
+<hr />
+<h4 id="unesco-ai-ethics">UNESCO AI Ethics</h4>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>UNESCO_AI</code></td>
+</tr>
+<tr>
+<td><strong>Full Name</strong></td>
+<td>UNESCO Recommendation on the Ethics of AI</td>
+</tr>
+<tr>
+<td><strong>Version</strong></td>
+<td>2021</td>
+</tr>
+<tr>
+<td><strong>Organization</strong></td>
+<td>United Nations Educational, Scientific and Cultural Organization</td>
+</tr>
+<tr>
+<td><strong>Published</strong></td>
+<td>November 23, 2021</td>
+</tr>
+<tr>
+<td><strong>URL</strong></td>
+<td>https://www.unesco.org/en/artificial-intelligence/recommendation-ethics</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description</strong>: First global standard-setting instrument on ethics of AI. Adopted by all 193 Member States.</p>
+<hr />
+<h3 id="additional-iso-standards">Additional ISO Standards</h3>
+<h4 id="isoiec-238942023">ISO/IEC 23894:2023</h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ISO_23894</code></td>
+</tr>
+<tr>
+<td><strong>Full Name</strong></td>
+<td>ISO/IEC 23894:2023 AI Risk Management</td>
+</tr>
+<tr>
+<td><strong>Version</strong></td>
+<td>2023</td>
+</tr>
+<tr>
+<td><strong>Organization</strong></td>
+<td>International Organization for Standardization</td>
+</tr>
+<tr>
+<td><strong>Published</strong></td>
+<td>February 1, 2023</td>
+</tr>
+<tr>
+<td><strong>URL</strong></td>
+<td>https://www.iso.org/standard/77304.html</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description</strong>: Guidance on managing risk for organizations using or developing AI systems. Complements ISO 31000 risk management.</p>
+<hr />
+<h4 id="isoiec-385072022">ISO/IEC 38507:2022</h4>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ISO_38507</code></td>
+</tr>
+<tr>
+<td><strong>Full Name</strong></td>
+<td>ISO/IEC 38507:2022 Governance of IT - AI</td>
+</tr>
+<tr>
+<td><strong>Version</strong></td>
+<td>2022</td>
+</tr>
+<tr>
+<td><strong>Organization</strong></td>
+<td>International Organization for Standardization</td>
+</tr>
+<tr>
+<td><strong>Published</strong></td>
+<td>April 1, 2022</td>
+</tr>
+<tr>
+<td><strong>URL</strong></td>
+<td>https://www.iso.org/standard/56641.html</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Description</strong>: Guidance for governing bodies on AI governance. Extends IT governance to address AI-specific considerations.</p>
+<hr />
+<h2 id="principle-to-standard-mapping">Principle-to-Standard Mapping</h2>
+<p>Each ethical principle in RADIANT maps to specific sections of industry standards:</p>
+<h3 id="love-others">Love Others</h3>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 28%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Section</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NIST AI RMF</td>
+<td>GOVERN 1.2</td>
+<td>Organizations should ensure AI systems respect human dignity</td>
+</tr>
+<tr>
+<td>ISO/IEC 42001</td>
+<td>Clause 5.2</td>
+<td>AI policy shall include commitment to human-centered values</td>
+</tr>
+<tr>
+<td>Christian Ethics</td>
+<td>Matthew 22:39</td>
+<td>Love your neighbor as yourself</td>
+</tr>
+</tbody>
+</table>
+<h3 id="golden-rule">Golden Rule</h3>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 28%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Section</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NIST AI RMF</td>
+<td>MAP 1.1</td>
+<td>Intended purpose and context of use are documented</td>
+</tr>
+<tr>
+<td>EU AI Act</td>
+<td>Article 9</td>
+<td>Risk management system shall consider effects on persons</td>
+</tr>
+<tr>
+<td>Christian Ethics</td>
+<td>Matthew 7:12</td>
+<td>Do to others what you would have them do to you</td>
+</tr>
+</tbody>
+</table>
+<h3 id="speak-truth">Speak Truth</h3>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 28%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Section</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NIST AI RMF</td>
+<td>GOVERN 4.1</td>
+<td>Organizational transparency about AI system capabilities and limitations</td>
+</tr>
+<tr>
+<td>ISO/IEC 42001</td>
+<td>Clause 7.4</td>
+<td>Communication shall be truthful and clear</td>
+</tr>
+<tr>
+<td>EU AI Act</td>
+<td>Article 13</td>
+<td>Transparency obligations for high-risk AI systems</td>
+</tr>
+<tr>
+<td>Christian Ethics</td>
+<td>John 8:32</td>
+<td>The truth will set you free</td>
+</tr>
+</tbody>
+</table>
+<h3 id="show-mercy">Show Mercy</h3>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 28%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Section</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NIST AI RMF</td>
+<td>MEASURE 2.6</td>
+<td>AI systems should minimize potential harms</td>
+</tr>
+<tr>
+<td>EU AI Act</td>
+<td>Article 14</td>
+<td>Human oversight to minimize risks</td>
+</tr>
+<tr>
+<td>Christian Ethics</td>
+<td>Matthew 5:7</td>
+<td>Blessed are the merciful</td>
+</tr>
+</tbody>
+</table>
+<h3 id="serve-humbly">Serve Humbly</h3>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 28%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Section</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NIST AI RMF</td>
+<td>GOVERN 1.1</td>
+<td>Policies reflect commitment to accountability</td>
+</tr>
+<tr>
+<td>ISO/IEC 42001</td>
+<td>Clause 5.1</td>
+<td>Top management shall demonstrate leadership and commitment</td>
+</tr>
+<tr>
+<td>Christian Ethics</td>
+<td>Mark 10:45</td>
+<td>The greatest among you shall be your servant</td>
+</tr>
+</tbody>
+</table>
+<h3 id="avoid-judgment">Avoid Judgment</h3>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 28%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Section</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NIST AI RMF</td>
+<td>MAP 2.3</td>
+<td>Scientific integrity and objectivity in AI assessments</td>
+</tr>
+<tr>
+<td>EU AI Act</td>
+<td>Article 10</td>
+<td>Data governance to avoid bias</td>
+</tr>
+<tr>
+<td>Christian Ethics</td>
+<td>Matthew 7:1</td>
+<td>Do not judge, or you too will be judged</td>
+</tr>
+</tbody>
+</table>
+<h3 id="care-for-vulnerable">Care for Vulnerable</h3>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 28%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Section</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NIST AI RMF</td>
+<td>MAP 1.5</td>
+<td>Potential impacts on individuals and communities identified</td>
+</tr>
+<tr>
+<td>EU AI Act</td>
+<td>Article 7</td>
+<td>Special attention to vulnerable groups</td>
+</tr>
+<tr>
+<td>ISO/IEC 42001</td>
+<td>Clause 8.4</td>
+<td>Consider impacts on interested parties</td>
+</tr>
+<tr>
+<td>Christian Ethics</td>
+<td>Matthew 25:40</td>
+<td>Whatever you did for the least of these, you did for me</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="alignment-levels">Alignment Levels</h2>
+<p>Principles map to standards with different alignment levels:</p>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 50%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th>Level</th>
+<th>Description</th>
+<th>Icon</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>derived</strong></td>
+<td>Principle was directly derived from this standard</td>
+<td>📋</td>
+</tr>
+<tr>
+<td><strong>aligned</strong></td>
+<td>Principle aligns with this standard’s requirements</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>supports</strong></td>
+<td>Principle supports this standard’s goals</td>
+<td>🤝</td>
+</tr>
+<tr>
+<td><strong>extends</strong></td>
+<td>Principle extends beyond this standard</td>
+<td>➕</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="database-schema">Database Schema</h2>
+<h3 id="ai_ethics_standards">ai_ethics_standards</h3>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 22%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td><code>code</code></td>
+<td>VARCHAR(50)</td>
+<td>Unique standard code (e.g., ‘NIST_AI_RMF’)</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>VARCHAR(255)</td>
+<td>Short name</td>
+</tr>
+<tr>
+<td><code>full_name</code></td>
+<td>VARCHAR(500)</td>
+<td>Complete standard title</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>VARCHAR(50)</td>
+<td>Version number</td>
+</tr>
+<tr>
+<td><code>organization</code></td>
+<td>VARCHAR(255)</td>
+<td>Issuing organization</td>
+</tr>
+<tr>
+<td><code>organization_type</code></td>
+<td>VARCHAR(50)</td>
+<td>government, iso, industry, academic, religious</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td>Summary description</td>
+</tr>
+<tr>
+<td><code>url</code></td>
+<td>VARCHAR(500)</td>
+<td>Link to official standard</td>
+</tr>
+<tr>
+<td><code>publication_date</code></td>
+<td>DATE</td>
+<td>When published</td>
+</tr>
+<tr>
+<td><code>is_mandatory</code></td>
+<td>BOOLEAN</td>
+<td>Required for compliance</td>
+</tr>
+<tr>
+<td><code>display_order</code></td>
+<td>INTEGER</td>
+<td>UI ordering</td>
+</tr>
+<tr>
+<td><code>icon</code></td>
+<td>VARCHAR(50)</td>
+<td>Lucide icon name</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ai_ethics_principle_standards">ai_ethics_principle_standards</h3>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 22%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td><code>principle_id</code></td>
+<td>UUID</td>
+<td>FK to ethical_principles</td>
+</tr>
+<tr>
+<td><code>standard_id</code></td>
+<td>UUID</td>
+<td>FK to ai_ethics_standards</td>
+</tr>
+<tr>
+<td><code>standard_section</code></td>
+<td>VARCHAR(100)</td>
+<td>Specific section (e.g., ‘MAP 1.1’)</td>
+</tr>
+<tr>
+<td><code>standard_requirement</code></td>
+<td>TEXT</td>
+<td>Requirement text</td>
+</tr>
+<tr>
+<td><code>alignment_level</code></td>
+<td>VARCHAR(20)</td>
+<td>derived, aligned, supports, extends</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-endpoints">API Endpoints</h2>
+<h3 id="get-adminethicsstandards">GET /admin/ethics/standards</h3>
+<p>Returns all active AI ethics standards.</p>
+<p><strong>Response</strong>:</p>
+<pre class="json"><code>{
+  &quot;standards&quot;: [
+    {
+      &quot;code&quot;: &quot;NIST_AI_RMF&quot;,
+      &quot;name&quot;: &quot;NIST AI RMF&quot;,
+      &quot;fullName&quot;: &quot;NIST AI Risk Management Framework&quot;,
+      &quot;version&quot;: &quot;1.0&quot;,
+      &quot;organization&quot;: &quot;National Institute of Standards and Technology&quot;,
+      &quot;organizationType&quot;: &quot;government&quot;,
+      &quot;description&quot;: &quot;Comprehensive framework for managing risks...&quot;,
+      &quot;url&quot;: &quot;https://www.nist.gov/itl/ai-risk-management-framework&quot;,
+      &quot;publicationDate&quot;: &quot;2023-01-26&quot;,
+      &quot;isMandatory&quot;: true,
+      &quot;icon&quot;: &quot;Shield&quot;
+    }
+  ]
+}</code></pre>
+<h3 id="get-adminethicsprinciples">GET /admin/ethics/principles</h3>
+<p>Returns ethical principles with their standard mappings.</p>
+<p><strong>Response</strong>:</p>
+<pre class="json"><code>{
+  &quot;principles&quot;: [
+    {
+      &quot;principleId&quot;: &quot;uuid&quot;,
+      &quot;name&quot;: &quot;Love Others&quot;,
+      &quot;teaching&quot;: &quot;Love your neighbor as yourself&quot;,
+      &quot;source&quot;: &quot;Matthew 22:39&quot;,
+      &quot;category&quot;: &quot;love&quot;,
+      &quot;weight&quot;: 1.0,
+      &quot;standards&quot;: [
+        {
+          &quot;code&quot;: &quot;NIST_AI_RMF&quot;,
+          &quot;name&quot;: &quot;NIST AI RMF&quot;,
+          &quot;fullName&quot;: &quot;NIST AI Risk Management Framework&quot;,
+          &quot;section&quot;: &quot;GOVERN 1.2&quot;,
+          &quot;requirement&quot;: &quot;Organizations should ensure AI systems respect human dignity&quot;,
+          &quot;isMandatory&quot;: true
+        }
+      ]
+    }
+  ]
+}</code></pre>
+<hr />
+<h2 id="admin-dashboard">Admin Dashboard</h2>
+<p><strong>Location</strong>: Admin Dashboard → Ethics → Standards</p>
+<h3 id="features">Features</h3>
+<ol type="1">
+<li><strong>Standards List</strong>: All industry frameworks with metadata</li>
+<li><strong>Principle Mapping</strong>: See which standards each principle aligns with</li>
+<li><strong>External Links</strong>: Direct links to official standard documents</li>
+<li><strong>Mandatory Indicators</strong>: Red badges for required standards</li>
+<li><strong>Organization Types</strong>: Color-coded by type (government, ISO, industry, academic, religious)</li>
+</ol>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./RADIANT-ADMIN-GUIDE.md#13-ai-ethics--standards">RADIANT Admin Guide - Ethics Section</a></li>
+<li><a href="../packages/infrastructure/lambda/shared/services/ethical-guardrails.service.ts">Ethical Guardrails Service</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

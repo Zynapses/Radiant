@@ -1,0 +1,5421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ORCHESTRATION REFERENCE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>ORCHESTRATION REFERENCE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/ORCHESTRATION-REFERENCE.md</div>
+  </div>
+  
+  <h1 id="radiant-orchestration-reference-v5.2.2">RADIANT Orchestration Reference v5.2.2</h1>
+<p>Complete reference for all <strong>System Workflows</strong> (49) and <strong>System Methods</strong> (70+) with UI names, scientific names, descriptions, parameters, and inputs/outputs.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#system-methods">System Methods</a>
+<ul>
+<li><a href="#generation-methods">Generation Methods</a></li>
+<li><a href="#evaluation-methods">Evaluation Methods</a></li>
+<li><a href="#synthesis-methods">Synthesis Methods</a></li>
+<li><a href="#verification-methods">Verification Methods</a></li>
+<li><a href="#debate-methods">Debate Methods</a></li>
+<li><a href="#aggregation-methods">Aggregation Methods</a></li>
+<li><a href="#reasoning-methods">Reasoning Methods</a></li>
+<li><a href="#routing-methods">Routing Methods</a></li>
+<li><a href="#uncertainty-methods">Uncertainty Methods</a></li>
+<li><a href="#hallucination-detection-methods">Hallucination Detection Methods</a></li>
+<li><a href="#human-in-the-loop-methods">Human-in-the-Loop Methods</a></li>
+<li><a href="#collaboration-methods">Collaboration Methods</a></li>
+<li><a href="#neural-methods">Neural Methods</a></li>
+</ul></li>
+<li><a href="#system-workflows">System Workflows</a>
+<ul>
+<li><a href="#adversarial--validation">Adversarial &amp; Validation</a></li>
+<li><a href="#debate--deliberation">Debate &amp; Deliberation</a></li>
+<li><a href="#judge--critic">Judge &amp; Critic</a></li>
+<li><a href="#ensemble--aggregation">Ensemble &amp; Aggregation</a></li>
+<li><a href="#reflection--self-improvement">Reflection &amp; Self-Improvement</a></li>
+<li><a href="#verification--fact-checking">Verification &amp; Fact-Checking</a></li>
+<li><a href="#multi-agent-collaboration">Multi-Agent Collaboration</a></li>
+<li><a href="#reasoning-enhancement">Reasoning Enhancement</a></li>
+<li><a href="#model-routing-strategies">Model Routing Strategies</a></li>
+<li><a href="#domain-specific-orchestration">Domain-Specific Orchestration</a></li>
+<li><a href="#cognitive-frameworks">Cognitive Frameworks</a></li>
+</ul></li>
+</ol>
+<hr />
+<h1 id="system-methods">System Methods</h1>
+<p>All system methods are protected—admins can only modify parameters and enabled status, not method definitions.</p>
+<hr />
+<h2 id="generation-methods">Generation Methods</h2>
+<h3 id="generate_response">GENERATE_RESPONSE</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Generate</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Basic Generation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>GENERATE_RESPONSE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Generate a response to a prompt using specified model</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Simple</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>temperature</code> | number | 0.7 | Sampling temperature (0-2) | | <code>max_tokens</code> | integer | 4096 | Maximum output tokens |</p>
+<p><strong>Inputs:</strong> <code>prompt</code>, <code>context</code> <strong>Outputs:</strong> <code>response</code></p>
+<hr />
+<h3 id="generate_with_cot">GENERATE_WITH_COT</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Think Step-by-Step</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Chain-of-Thought Generation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>GENERATE_WITH_COT</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Generate response using chain-of-thought reasoning</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Wei et al. 2022</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>+20-40% on reasoning</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>temperature</code> | number | 0.3 | Sampling temperature | | <code>max_tokens</code> | integer | 8192 | Maximum output tokens | | <code>thinking_budget</code> | integer | 2000 | Tokens for reasoning |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>reasoning</code>, <code>response</code></p>
+<hr />
+<h3 id="refine_response">REFINE_RESPONSE</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Refine</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Iterative Refinement</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>REFINE_RESPONSE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Improve a response based on feedback</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>refinement_focus</code> | string | “all” | Focus area: all, accuracy, clarity, completeness | | <code>preserve_structure</code> | boolean | true | Maintain response structure |</p>
+<p><strong>Inputs:</strong> <code>response</code>, <code>feedback</code> <strong>Outputs:</strong> <code>refined_response</code></p>
+<hr />
+<h2 id="evaluation-methods">Evaluation Methods</h2>
+<h3 id="critique_response">CRITIQUE_RESPONSE</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Critique</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Critical Evaluation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>CRITIQUE_RESPONSE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Critically evaluate a response for flaws and improvements</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>focus_areas</code> | array | [“accuracy”, “completeness”, “clarity”, “logic”] | Areas to evaluate | | <code>severity_threshold</code> | string | “medium” | Minimum severity to report |</p>
+<p><strong>Inputs:</strong> <code>original_prompt</code>, <code>response</code> <strong>Outputs:</strong> <code>critique</code>, <code>issues[]</code>, <code>suggestions[]</code></p>
+<hr />
+<h3 id="judge_responses">JUDGE_RESPONSES</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Judge</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Comparative Judgment</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>JUDGE_RESPONSES</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Compare and judge multiple responses to select the best</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>evaluation_mode</code> | enum | “pairwise” | Mode: pointwise, pairwise, listwise | | <code>criteria</code> | array | [“accuracy”, “helpfulness”, “clarity”, “completeness”] | Evaluation criteria |</p>
+<p><strong>Inputs:</strong> <code>original_prompt</code>, <code>responses[]</code> <strong>Outputs:</strong> <code>best_index</code>, <code>score</code>, <code>reasoning</code></p>
+<hr />
+<h3 id="poll_judge">POLL_JUDGE</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Multi-Judge Panel</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Panel of LLMs Evaluation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>POLL_JUDGE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Multiple diverse judge models evaluate outputs independently</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Panel of LLMs Evaluation Framework</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>Reduces single-model bias 40-60%</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>num_judges</code> | integer | 3 | Number of judge models | | <code>scoring_criteria</code> | array | [“accuracy”, “completeness”, “clarity”] | Evaluation dimensions | | <code>aggregation</code> | enum | “mean” | Aggregation: mean, median, weighted |</p>
+<p><strong>Inputs:</strong> <code>original_prompt</code>, <code>response</code> <strong>Outputs:</strong> <code>scores[]</code>, <code>aggregate_score</code>, <code>per_judge_feedback[]</code></p>
+<hr />
+<h3 id="g_eval">G_EVAL</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Structured Scoring</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>G-Eval NLG Evaluation Framework</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>G_EVAL</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Chain-of-thought scoring for NLG across coherence, consistency, fluency, relevance</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>G-Eval: NLG Evaluation using GPT-4</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>Correlates 0.5+ with human judgment</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>dimensions</code> | array | [“coherence”, “consistency”, “fluency”, “relevance”] | G-Eval dimensions | | <code>use_cot</code> | boolean | true | Chain-of-thought scoring | | <code>score_range</code> | array | [1, 5] | Score min/max |</p>
+<p><strong>Inputs:</strong> <code>source</code>, <code>generated</code> <strong>Outputs:</strong> <code>dimension_scores{}</code>, <code>overall_score</code>, <code>reasoning</code></p>
+<hr />
+<h3 id="pairwise_prefer">PAIRWISE_PREFER</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Head-to-Head Compare</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Pairwise Preference Judgment</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>PAIRWISE_PREFER</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Compare two outputs head-to-head for reliable relative ranking</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Pairwise Preference Learning</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Simple</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>comparison_criteria</code> | array | [“quality”, “accuracy”, “helpfulness”] | Comparison dimensions | | <code>allow_tie</code> | boolean | true | Allow tie verdicts |</p>
+<p><strong>Inputs:</strong> <code>response_a</code>, <code>response_b</code> <strong>Outputs:</strong> <code>verdict</code> (A/B/TIE), <code>key_differentiator</code></p>
+<hr />
+<h3 id="self_reflect">SELF_REFLECT</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Reflect</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Self-Reflection</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SELF_REFLECT</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>AI reflects on its own response to identify improvements</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>reflection_depth</code> | string | “thorough” | Depth: quick, standard, thorough | | <code>aspects</code> | array | [“accuracy”, “completeness”, “clarity”] | Aspects to reflect on |</p>
+<p><strong>Inputs:</strong> <code>original_prompt</code>, <code>response</code> <strong>Outputs:</strong> <code>strengths[]</code>, <code>weaknesses[]</code>, <code>improvements[]</code></p>
+<hr />
+<h3 id="compare_analysis">COMPARE_ANALYSIS</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Side-by-Side Compare</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Comparative Analysis</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>COMPARE_ANALYSIS</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Structured comparison highlighting differences and trade-offs</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>Decision clarity +50%</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Simple</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>comparison_dimensions</code> | array | [“pros”, “cons”, “use_cases”] | Dimensions to compare | | <code>include_recommendation</code> | boolean | true | Include final recommendation |</p>
+<p><strong>Inputs:</strong> <code>options[]</code> <strong>Outputs:</strong> <code>comparison_table</code>, <code>recommendation</code>, <code>reasoning</code></p>
+<hr />
+<h2 id="synthesis-methods">Synthesis Methods</h2>
+<h3 id="synthesize_responses">SYNTHESIZE_RESPONSES</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Synthesize</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Multi-Response Synthesis</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SYNTHESIZE_RESPONSES</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Combine best parts from multiple responses</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>combination_strategy</code> | string | “best_parts” | Strategy: best_parts, weighted, comprehensive | | <code>conflict_resolution</code> | string | “majority” | Conflict handling: majority, note, first |</p>
+<p><strong>Inputs:</strong> <code>original_prompt</code>, <code>responses[]</code> <strong>Outputs:</strong> <code>synthesized_response</code></p>
+<hr />
+<h3 id="build_consensus">BUILD_CONSENSUS</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Consensus</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Consensus Aggregation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>BUILD_CONSENSUS</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Identify points of agreement across multiple responses</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>consensus_threshold</code> | number | 0.7 | Agreement threshold (0-1) | | <code>include_disputed</code> | boolean | true | Include disputed points |</p>
+<p><strong>Inputs:</strong> <code>responses[]</code> <strong>Outputs:</strong> <code>consensus_points[]</code>, <code>disputed_points[]</code>, <code>unique_insights[]</code></p>
+<hr />
+<h3 id="moa_layers">MOA_LAYERS</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Layered Synthesis</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Mixture of Agents Multi-Layer</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>MOA_LAYERS</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>3-4 layers of proposer agents feeding into aggregators</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Together AI - Mixture of Agents</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>+8% over GPT-4o on AlpacaEval</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>num_layers</code> | integer | 3 | Number of synthesis layers (2-5) | | <code>proposers_per_layer</code> | integer | 3 | Proposers per layer | | <code>aggregator_model</code> | string | “anthropic/claude-3-5-sonnet-20241022” | Model for aggregation |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>layer_outputs[]</code>, <code>final_response</code></p>
+<hr />
+<h3 id="multi_source_synth">MULTI_SOURCE_SYNTH</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Combine &amp; Summarize</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Multi-Source Synthesis</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>MULTI_SOURCE_SYNTH</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Combine insights from multiple model responses</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>Comprehensive coverage +40%</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Simple</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>preserve_unique</code> | boolean | true | Preserve unique insights | | <code>conflict_handling</code> | string | “note” | Conflict handling: note, resolve, ignore | | <code>structure_output</code> | boolean | true | Structure the output |</p>
+<p><strong>Inputs:</strong> <code>responses[]</code> <strong>Outputs:</strong> <code>synthesized_response</code>, <code>conflicts[]</code></p>
+<hr />
+<h3 id="llm_blender">LLM_BLENDER</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Rank &amp; Merge Responses</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>LLM-Blender Pairwise Ranking Fusion</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>LLM_BLENDER</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>PairRanker scores pairs, GenFusion merges top outputs</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>ACL 2023 - LLM-Blender</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>+12% over best single model</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>num_responses</code> | integer | 5 | Responses to rank | | <code>top_k_for_fusion</code> | integer | 3 | Top K to fuse |</p>
+<p><strong>Inputs:</strong> <code>prompt</code>, <code>responses[]</code> <strong>Outputs:</strong> <code>rankings[]</code>, <code>fused_response</code></p>
+<hr />
+<h3 id="token_auction">TOKEN_AUCTION</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Fair Multi-Stakeholder Merge</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Token Auction Mechanism</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>TOKEN_AUCTION</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Token-by-token auction for fair multi-stakeholder output</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>WWW 2024 Best Paper - Token Auction</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Expert</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>budget_per_agent</code> | integer | 100 | Token budget per agent | | <code>auction_type</code> | string | “second_price” | Auction: second_price, first_price | | <code>min_bid</code> | integer | 1 | Minimum bid value |</p>
+<p><strong>Inputs:</strong> <code>prompt</code>, <code>stakeholder_preferences[]</code> <strong>Outputs:</strong> <code>merged_response</code>, <code>budget_usage[]</code></p>
+<hr />
+<h2 id="verification-methods">Verification Methods</h2>
+<h3 id="verify_facts">VERIFY_FACTS</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Fact Check</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Factual Verification</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>VERIFY_FACTS</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Extract and verify factual claims in a response</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>extraction_method</code> | string | “explicit” | Method: explicit, implicit, all | | <code>verification_depth</code> | string | “thorough” | Depth: quick, standard, thorough |</p>
+<p><strong>Inputs:</strong> <code>response</code> <strong>Outputs:</strong> <code>claims[]</code>, <code>verifications[]</code>, <code>confidence_scores[]</code></p>
+<hr />
+<h3 id="process_reward">PROCESS_REWARD</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Step Verification</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Process Reward Model Verification</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>PROCESS_REWARD</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Verify each reasoning step independently</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>OpenAI ICLR 2024 - Process Reward Models</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>+6% on MATH benchmark</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>verify_each_step</code> | boolean | true | Verify each step | | <code>step_accuracy_threshold</code> | number | 0.7 | Accuracy threshold | | <code>regenerate_on_failure</code> | boolean | true | Regenerate failed steps |</p>
+<p><strong>Inputs:</strong> <code>problem</code>, <code>reasoning_steps[]</code> <strong>Outputs:</strong> <code>step_verdicts[]</code>, <code>overall_valid</code>, <code>failed_steps[]</code></p>
+<hr />
+<h3 id="selfcheck_gpt">SELFCHECK_GPT</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Internal Consistency</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>SelfCheckGPT Verification Pipeline</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SELFCHECK_GPT</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Generate N samples, cross-reference for inconsistencies</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>SelfCheckGPT - Zero-Resource Hallucination Detection</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>Hallucination F1 +25%</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>sample_count</code> | integer | 5 | Consistency check samples | | <code>consistency_threshold</code> | number | 0.7 | Consistency threshold | | <code>check_method</code> | enum | “nli” | Method: nli, bertscore, exact |</p>
+<p><strong>Inputs:</strong> <code>claim</code>, <code>samples[]</code> <strong>Outputs:</strong> <code>consistency_score</code>, <code>inconsistent_claims[]</code></p>
+<hr />
+<h3 id="cite_verify">CITE_VERIFY</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Source Attribution</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Citation Accuracy Verification</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>CITE_VERIFY</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Trace claims to source passages, verify citations</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>Citation accuracy +40%</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>citation_match_threshold</code> | number | 0.8 | Match threshold | | <code>verify_quotes</code> | boolean | true | Verify exact quotes | | <code>check_context</code> | boolean | true | Check citation context |</p>
+<p><strong>Inputs:</strong> <code>response</code>, <code>sources[]</code> <strong>Outputs:</strong> <code>citation_verdicts[]</code>, <code>fabricated_citations[]</code></p>
+<hr />
+<h3 id="natural_logic">NATURAL_LOGIC</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Logic-Based Fact Check</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Zero-Shot Natural Logic Verification</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>NATURAL_LOGIC</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Use set-theoretic operators for logical consistency</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>EMNLP 2024 - Zero-Shot Natural Logic</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>+8.96 accuracy points</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>operators</code> | array | [“subset”, “superset”, “negation”, “equivalence”] | Logic operators | | <code>require_proof</code> | boolean | true | Require formal proof |</p>
+<p><strong>Inputs:</strong> <code>premise</code>, <code>claim</code> <strong>Outputs:</strong> <code>relation</code>, <code>valid</code>, <code>proof</code></p>
+<hr />
+<h3 id="unifact">UNIFACT</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Combined Verification</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>UniFact Unified Verification</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>UNIFACT</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Hybrid model-based and text-based verification</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>UniFact 2024</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>Comprehensive verification +20%</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>methods</code> | array | [“semantic”, “textual”, “logical”] | Verification methods | | <code>combine_strategy</code> | string | “weighted” | Combination: weighted, majority, all |</p>
+<p><strong>Inputs:</strong> <code>claim</code> <strong>Outputs:</strong> <code>method_verdicts{}</code>, <code>combined_verdict</code></p>
+<hr />
+<h3 id="eigenscore">EIGENSCORE</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Internal State Check</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>EigenScore Hidden State Analysis</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>EIGENSCORE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Analyze eigenvalue patterns in hidden states for uncertainty</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>ICLR 2024 - EigenScore</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Expert</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>threshold</code> | number | 0.6 | Uncertainty threshold | | <code>layer_indices</code> | array | [-1, -2, -3] | Layers to analyze | | <code>aggregate</code> | string | “mean” | Aggregation: mean, max, min |</p>
+<p><strong>Inputs:</strong> <code>hidden_states</code> <strong>Outputs:</strong> <code>uncertainty_score</code>, <code>layer_scores[]</code></p>
+<hr />
+<h3 id="requery_check">REQUERY_CHECK</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Re-Query Consistency</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Iterative Prompting Consistency Check</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>REQUERY_CHECK</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Black-box detection via paraphrased prompts</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>DeepMind NeurIPS 2024</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>num_rephrasings</code> | integer | 3 | Number of rephrasings | | <code>consistency_threshold</code> | number | 0.8 | Consistency threshold | | <code>rephrase_strategy</code> | string | “semantic” | Strategy: semantic, syntactic, mixed |</p>
+<p><strong>Inputs:</strong> <code>original_prompt</code> <strong>Outputs:</strong> <code>responses[]</code>, <code>consistency_score</code>, <code>inconsistencies[]</code></p>
+<hr />
+<h2 id="debate-methods">Debate Methods</h2>
+<h3 id="generate_challenge">GENERATE_CHALLENGE</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Challenge</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Adversarial Challenge</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>GENERATE_CHALLENGE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Challenge a response by arguing the opposite position</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>challenge_intensity</code> | string | “moderate” | Intensity: mild, moderate, aggressive | | <code>focus</code> | string | “weakest_points” | Focus: weakest_points, all, random |</p>
+<p><strong>Inputs:</strong> <code>original_prompt</code>, <code>response</code> <strong>Outputs:</strong> <code>challenges[]</code>, <code>counter_arguments[]</code></p>
+<hr />
+<h3 id="defend_position">DEFEND_POSITION</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Defend</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Position Defense</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>DEFEND_POSITION</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Defend a response against challenges</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>defense_strategy</code> | string | “address_all” | Strategy: address_all, strongest_only, concede_weak | | <code>concede_valid</code> | boolean | true | Concede valid challenges |</p>
+<p><strong>Inputs:</strong> <code>response</code>, <code>challenge</code> <strong>Outputs:</strong> <code>defense</code>, <code>concessions[]</code>, <code>improved_response</code></p>
+<hr />
+<h3 id="sparse_debate">SPARSE_DEBATE</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Efficient Debate</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Sparse Communication Topology Debate</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SPARSE_DEBATE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Agents connect in sparse patterns (ring, star, tree) to reduce communication cost</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Sparse Communication Networks for Multi-Agent Debate</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>-40-60% cost with &lt;5% quality loss</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>topology</code> | enum | “ring” | Network: ring, star, tree, full | | <code>debate_rounds</code> | integer | 3 | Number of debate rounds (1-10) | | <code>temperature</code> | number | 0.7 | Agent response temperature |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>debate_history[]</code>, <code>final_position</code>, <code>consensus_reached</code></p>
+<hr />
+<h3 id="arg_mapping">ARG_MAPPING</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Attack &amp; Support Mapping</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>ArgLLMs Quantitative Bipolar Argumentation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ARG_MAPPING</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Build explicit attack/support relations between arguments with strength scores</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Imperial College London 2024 - ArgLLMs</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>Structured argumentation +35%</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>strength_threshold</code> | number | 0.5 | Min argument strength to include | | <code>include_rebuttal</code> | boolean | true | Generate rebuttals | | <code>max_depth</code> | integer | 3 | Max argument tree depth |</p>
+<p><strong>Inputs:</strong> <code>claim</code> <strong>Outputs:</strong> <code>argument_graph</code>, <code>relations[]</code>, <code>strength_scores{}</code></p>
+<hr />
+<h3 id="hah_delphi">HAH_DELPHI</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Human-AI Expert Panel</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>HAH-Delphi Human-AI Hybrid Consensus</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>HAH_DELPHI</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Four-tier Delphi consensus combining AI with human expert oversight</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>HAH-Delphi Aug 2025</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>&gt;90% coverage on expert decisions</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Expert</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>tiers</code> | integer | 4 | Number of consensus tiers | | <code>human_threshold</code> | number | 0.6 | Escalate to human above this | | <code>consensus_target</code> | number | 0.9 | Target consensus level | | <code>max_rounds</code> | integer | 5 | Maximum Delphi rounds |</p>
+<p><strong>Inputs:</strong> <code>prompt</code>, <code>previous_consensus</code> <strong>Outputs:</strong> <code>consensus</code>, <code>confidence</code>, <code>human_escalated</code></p>
+<hr />
+<h3 id="reconcile_weighted">RECONCILE_WEIGHTED</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Confidence-Weighted Agreement</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>ReConcile Confidence-Weighted Consensus</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>RECONCILE_WEIGHTED</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Diverse LLMs weighted by verbalized confidence scores</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>ACL 2024 - ReConcile</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>+15-25% on diverse model ensembles</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>min_confidence</code> | number | 0.6 | Minimum confidence to include | | <code>weight_by</code> | string | “confidence” | Weighting strategy | | <code>reconciliation_rounds</code> | integer | 2 | Reconciliation iterations |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>weighted_response</code>, <code>confidence_scores[]</code>, <code>disagreements[]</code></p>
+<hr />
+<h2 id="aggregation-methods">Aggregation Methods</h2>
+<h3 id="majority_vote">MAJORITY_VOTE</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Vote</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Majority Aggregation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>MAJORITY_VOTE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Select the most common answer from multiple responses</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Simple</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>vote_method</code> | string | “exact_match” | Method: exact_match, semantic, fuzzy | | <code>tie_breaker</code> | string | “first” | Tie breaker: first, random, longest |</p>
+<p><strong>Inputs:</strong> <code>responses[]</code> <strong>Outputs:</strong> <code>winner</code>, <code>vote_counts{}</code>, <code>confidence</code></p>
+<hr />
+<h3 id="weighted_aggregate">WEIGHTED_AGGREGATE</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Weight</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Weighted Aggregation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>WEIGHTED_AGGREGATE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Combine responses weighted by confidence/expertise</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Simple</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>weight_by</code> | string | “confidence” | Weight source: confidence, expertise, accuracy | | <code>normalize</code> | boolean | true | Normalize weights |</p>
+<p><strong>Inputs:</strong> <code>responses[]</code>, <code>weights[]</code> <strong>Outputs:</strong> <code>aggregated_response</code>, <code>contribution_scores[]</code></p>
+<hr />
+<h3 id="self_consistency">SELF_CONSISTENCY</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Multi-Sample Voting</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Self-Consistency Decoding</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SELF_CONSISTENCY</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Generate 5-20 reasoning paths, majority vote on final answers</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Wang et al. 2022 - Self-Consistency</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>+17.9% on GSM8K</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>sample_count</code> | integer | 5 | Number of reasoning paths (3-20) | | <code>temperature</code> | number | 0.7 | Sampling temperature | | <code>vote_method</code> | string | “majority” | Vote method: majority, weighted | | <code>extract_answer</code> | boolean | true | Extract final answer |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>reasoning_paths[]</code>, <code>final_answer</code>, <code>confidence</code></p>
+<hr />
+<h3 id="gedi_vote">GEDI_VOTE</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Ranked Choice Voting</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>GEDI Electoral Collective Decision Making</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>GEDI_VOTE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Ordinal preferential voting with 3+ agents</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>EMNLP 2024 - GEDI Electoral CDM</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>Consensus +30%</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>num_agents</code> | integer | 3 | Number of voting agents | | <code>ranking_depth</code> | integer | 3 | Rankings per agent | | <code>elimination_rounds</code> | boolean | true | Use elimination rounds |</p>
+<p><strong>Inputs:</strong> <code>options[]</code> <strong>Outputs:</strong> <code>winner</code>, <code>round_results[]</code>, <code>final_rankings[]</code></p>
+<hr />
+<h2 id="reasoning-methods">Reasoning Methods</h2>
+<h3 id="decompose_problem">DECOMPOSE_PROBLEM</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Decompose</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Problem Decomposition</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>DECOMPOSE_PROBLEM</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Break down a complex problem into sub-problems</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>max_subproblems</code> | integer | 5 | Maximum sub-problems | | <code>decomposition_strategy</code> | string | “functional” | Strategy: functional, hierarchical, sequential |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>subproblems[]</code>, <code>dependencies[]</code>, <code>complexity_estimates[]</code></p>
+<hr />
+<h3 id="logic_lm">LOGIC_LM</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Translate to Logic &amp; Solve</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Logic-LM Neuro-Symbolic Reasoning</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>LOGIC_LM</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Convert to formal logic, solve externally, translate back</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>EMNLP 2023 - Logic-LM</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>+39.2% over standard prompting</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>target_logic</code> | string | “prolog” | Target: prolog, z3, fol | | <code>solver</code> | string | “swi-prolog” | External solver | | <code>translate_back</code> | boolean | true | Translate result to natural language |</p>
+<p><strong>Inputs:</strong> <code>problem</code> <strong>Outputs:</strong> <code>formal_representation</code>, <code>solver_output</code>, <code>natural_answer</code></p>
+<hr />
+<h3 id="llm_modulo">LLM_MODULO</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Generate &amp; Verify Loop</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>LLM-Modulo Framework</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>LLM_MODULO</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Generate candidates, validate with external critics, iterate</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>ICML 2024 Spotlight - LLM-Modulo</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>12%→93.9% plan success</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>max_iterations</code> | integer | 5 | Maximum iterations | | <code>critics</code> | array | [“syntax”, “semantic”, “constraint”] | Critic types | | <code>require_all_pass</code> | boolean | true | All critics must pass |</p>
+<p><strong>Inputs:</strong> <code>problem</code> <strong>Outputs:</strong> <code>solution</code>, <code>iterations_used</code>, <code>critic_feedback[]</code></p>
+<hr />
+<h2 id="routing-methods">Routing Methods</h2>
+<h3 id="detect_task_type">DETECT_TASK_TYPE</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Classify</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Task Classification</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>DETECT_TASK_TYPE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Analyze prompt to determine task type and complexity</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Simple</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>task_categories</code> | array | [“coding”, “reasoning”, “creative”, “factual”, “math”, “research”] | Task categories |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>task_type</code>, <code>complexity</code>, <code>capabilities_required[]</code></p>
+<hr />
+<h3 id="select_best_model">SELECT_BEST_MODEL</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Route</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Model Selection</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SELECT_BEST_MODEL</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Choose the optimal model for a given task</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Simple</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>consider_cost</code> | boolean | true | Factor in cost | | <code>consider_latency</code> | boolean | true | Factor in latency | | <code>quality_priority</code> | number | 0.7 | Quality weight (0-1) |</p>
+<p><strong>Inputs:</strong> <code>task_type</code>, <code>complexity</code>, <code>constraints</code> <strong>Outputs:</strong> <code>selected_model</code>, <code>score</code>, <code>alternatives[]</code></p>
+<hr />
+<h3 id="routellm">ROUTELLM</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Smart Model Selection</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>RouteLLM Adaptive Selection</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ROUTELLM</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Trained router predicts which model answers correctly</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>LMSYS RouteLLM</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>-50% cost, &lt;3% quality loss</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>router_model</code> | enum | “matrix_factorization” | Router: matrix_factorization, bert, causal_lm | | <code>cost_threshold</code> | number | 0.7 | Max cost relative to baseline | | <code>quality_floor</code> | number | 0.8 | Minimum acceptable quality |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>selected_model</code>, <code>confidence</code>, <code>routing_reason</code></p>
+<hr />
+<h3 id="frugal_cascade">FRUGAL_CASCADE</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Progressive Escalation</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>FrugalGPT Cascading Selection</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>FRUGAL_CASCADE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Try cheap models first, escalate on low confidence</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>FrugalGPT 2023</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>-90% cost, maintained quality</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>model_cascade</code> | array | [“gpt-4o-mini”, “gpt-4o”, “o1”] | Models in escalation order | | <code>confidence_threshold</code> | number | 0.85 | Escalate below this confidence | | <code>max_escalations</code> | integer | 2 | Maximum escalation steps |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>response</code>, <code>model_used</code>, <code>escalations_used</code></p>
+<hr />
+<h3 id="pareto_route">PARETO_ROUTE</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Budget-Aware Routing</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Cost-Quality Pareto Routing</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>PARETO_ROUTE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Route on Pareto-optimal cost/quality trade-off</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Pareto-Optimal Model Selection</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>budget_cents</code> | number | 10 | Budget constraint per query | | <code>quality_weight</code> | number | 0.7 | Weight for quality (0-1) | | <code>latency_weight</code> | number | 0.1 | Weight for latency (0-1) |</p>
+<p><strong>Inputs:</strong> <code>prompt</code>, <code>budget</code> <strong>Outputs:</strong> <code>selected_model</code>, <code>expected_quality</code>, <code>expected_cost</code></p>
+<hr />
+<h3 id="c3po_cascade">C3PO_CASCADE</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Smart Cost Escalation</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>C3PO Self-Supervised Cascade</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>C3PO_CASCADE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Self-supervised cascade learning query difficulty</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>NeurIPS 2024 - C3PO</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>-40% cost, +2% quality</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>cascade_levels</code> | integer | 3 | Number of model tiers | | <code>self_supervised</code> | boolean | true | Enable self-supervised learning | | <code>calibration_samples</code> | integer | 100 | Samples for difficulty calibration |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>response</code>, <code>difficulty_score</code>, <code>tier_used</code></p>
+<hr />
+<h3 id="automix">AUTOMIX</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Self-Routing Selection</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>AutoMix POMDP Routing</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>AUTOMIX</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>POMDP-based self-routing by task difficulty</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Nov 2025 - AutoMix</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Expert</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>pomdp_horizon</code> | integer | 3 | POMDP planning horizon | | <code>exploration_rate</code> | number | 0.1 | ε for ε-greedy exploration | | <code>self_verification</code> | boolean | true | Verify own outputs |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>response</code>, <code>belief_state</code>, <code>action_taken</code></p>
+<hr />
+<h3 id="aflow_mcts">AFLOW_MCTS</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Auto-Discover Best Workflow</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>AFlow MCTS Workflow Discovery</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>AFLOW_MCTS</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>MCTS to discover optimal workflow compositions</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>ICLR 2025 - AFlow</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Expert</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>search_iterations</code> | integer | 100 | MCTS iterations | | <code>exploration_weight</code> | number | 1.414 | UCB exploration constant | | <code>max_depth</code> | integer | 5 | Max workflow depth |</p>
+<p><strong>Inputs:</strong> <code>task_description</code> <strong>Outputs:</strong> <code>discovered_workflow</code>, <code>expected_performance</code>, <code>search_tree</code></p>
+<hr />
+<h2 id="uncertainty-methods">Uncertainty Methods</h2>
+<h3 id="semantic_entropy">SEMANTIC_ENTROPY</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Meaning-Based Uncertainty</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Semantic Entropy Quantification</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SEMANTIC_ENTROPY</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Cluster semantically equivalent answers, compute entropy over meaning clusters</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Nature 2024 - Semantic Uncertainty in LLMs</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>AUROC 0.79-0.87 hallucination detection</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>sample_count</code> | integer | 10 | Number of response samples (5-20) | | <code>temperature</code> | number | 0.7 | Sampling temperature | | <code>clustering_method</code> | enum | “nli” | Clustering: nli, embedding, exact | | <code>entropy_threshold</code> | number | 0.5 | Flag uncertainty above this |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>entropy_score</code>, <code>clusters[]</code>, <code>uncertainty_flag</code></p>
+<hr />
+<h3 id="se_probes">SE_PROBES</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Fast Uncertainty Check</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Semantic Entropy Probes</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SE_PROBES</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Lightweight probes on hidden states for fast entropy estimation (logprob-based)</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>ICML 2024 - Semantic Entropy Probes</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>300x faster, 90% accuracy</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Expert</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>probe_layers</code> | array | [-1, -2] | Model layers to probe (logprob-based) | | <code>threshold</code> | number | 0.5 | Uncertainty threshold | | <code>fast_mode</code> | boolean | true | Use fast logprob estimation | | <code>sample_count</code> | integer | 5 | Number of samples for averaging |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>entropy_estimate</code>, <code>layer_entropies[]</code>, <code>uncertainty_flag</code></p>
+<hr />
+<h3 id="kernel_entropy">KERNEL_ENTROPY</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Detailed Uncertainty Score</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Kernel Language Entropy</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>KERNEL_ENTROPY</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Continuous entropy via kernel density estimation on embeddings</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>NeurIPS 2024 - Kernel Language Entropy</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>kernel</code> | enum | “rbf” | Kernel: rbf, linear, polynomial | | <code>bandwidth</code> | string | “auto” | Bandwidth or “auto” for Silverman | | <code>sample_count</code> | integer | 10 | Response samples for KDE |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>kde_entropy</code>, <code>density_estimate</code>, <code>bandwidth_used</code></p>
+<hr />
+<h3 id="calibrated_conf">CALIBRATED_CONF</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Calibrated Confidence</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Calibrated Confidence Estimation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>CALIBRATED_CONF</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Elicit confidence via prompting and calibrate against accuracy</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Calibrated Confidence Estimation Research</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>ECE -15%</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>calibration_method</code> | enum | “platt_scaling” | Method: platt_scaling, isotonic, temperature_scaling | | <code>confidence_prompt</code> | string | “verbalized” | How to elicit confidence | | <code>temperature</code> | number | 0.3 | Sampling temperature |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>response</code>, <code>raw_confidence</code>, <code>calibrated_confidence</code></p>
+<hr />
+<h3 id="consistency_uq">CONSISTENCY_UQ</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Agreement Scoring</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Consistency-Based Uncertainty Quantification</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>CONSISTENCY_UQ</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Measure agreement across samples as uncertainty proxy</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Consistency-Based UQ Research</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Simple</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>sample_count</code> | integer | 5 | Number of response samples | | <code>agreement_metric</code> | enum | “jaccard” | Metric: jaccard, cosine, exact_match, bertscore | | <code>threshold</code> | number | 0.7 | Agreement threshold |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>agreement_score</code>, <code>responses[]</code>, <code>uncertainty_flag</code></p>
+<hr />
+<h3 id="conformal_pred">CONFORMAL_PRED</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Guaranteed Accuracy Bounds</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Enhanced Conformal Prediction</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>CONFORMAL_PRED</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Prediction sets with statistical guarantees on coverage</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>NeurIPS 2024 - Conformal Prediction for LLMs</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>coverage_target</code> | number | 0.9 | Target coverage (0.5-0.99) | | <code>calibration_size</code> | integer | 500 | Calibration set size | | <code>adaptive</code> | boolean | true | Use adaptive conformal sets |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>prediction_set[]</code>, <code>coverage_guarantee</code>, <code>set_size</code></p>
+<hr />
+<h2 id="hallucination-detection-methods">Hallucination Detection Methods</h2>
+<h3 id="multi_halluc">MULTI_HALLUC</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Fact-Check Scanner</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Multi-Method Hallucination Detection</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>MULTI_HALLUC</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Ensemble detection: consistency, attribution, semantic entropy</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Multi-Method Hallucination Detection 2025</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>F1 0.85+</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>methods</code> | array | [“consistency”, “attribution”, “semantic_entropy”] | Detection methods | | <code>aggregation</code> | enum | “weighted” | Aggregation: weighted, majority, any | | <code>flag_threshold</code> | number | 0.6 | Flag as hallucination above this |</p>
+<p><strong>Inputs:</strong> <code>response</code> <strong>Outputs:</strong> <code>hallucination_score</code>, <code>method_scores{}</code>, <code>flagged_claims[]</code></p>
+<hr />
+<h3 id="metaqa">METAQA</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Mutation Testing</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>MetaQA Metamorphic Testing</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>METAQA</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Test consistency via semantically equivalent transformations</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>MetaQA Metamorphic Testing 2025</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>Subtle inconsistencies +30%</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>transformations</code> | array | [“paraphrase”, “negation”, “entity_swap”] | Mutation types | | <code>num_mutations</code> | integer | 3 | Mutations per claim | | <code>consistency_threshold</code> | number | 0.8 | Consistency threshold |</p>
+<p><strong>Inputs:</strong> <code>original_prompt</code> <strong>Outputs:</strong> <code>mutations[]</code>, <code>responses[]</code>, <code>inconsistencies[]</code></p>
+<hr />
+<h3 id="factual_ground">FACTUAL_GROUND</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Source Verification</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Factual Grounding Verification</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>FACTUAL_GROUND</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Verify claims against retrieved documents with evidence mapping</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Factual Grounding Research 2025</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>Grounding accuracy +45%</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>retrieval_top_k</code> | integer | 5 | Documents to retrieve | | <code>evidence_threshold</code> | number | 0.7 | Evidence support threshold | | <code>require_explicit_support</code> | boolean | true | Require explicit evidence |</p>
+<p><strong>Inputs:</strong> <code>claim</code>, <code>documents[]</code> <strong>Outputs:</strong> <code>verdict</code>, <code>evidence_mapping[]</code>, <code>ungrounded_claims[]</code></p>
+<hr />
+<h2 id="human-in-the-loop-methods">Human-in-the-Loop Methods</h2>
+<h3 id="hitl_review">HITL_REVIEW</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Human Review Queue</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Human-in-the-Loop Review System</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>HITL_REVIEW</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Route low-confidence or high-stakes outputs to human review</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Human-in-the-Loop ML Systems</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>Critical error prevention +90%</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Simple</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>confidence_threshold</code> | number | 0.7 | Route to human below this | | <code>stake_level</code> | enum | “medium” | Stake: low, medium, high, critical | | <code>auto_approve_above</code> | number | 0.95 | Auto-approve above this confidence | | <code>queue_priority</code> | enum | “fifo” | Queue ordering: fifo, priority, lifo |</p>
+<p><strong>Inputs:</strong> <code>response</code>, <code>confidence</code>, <code>context</code> <strong>Outputs:</strong> <code>queued</code>, <code>queue_position</code>, <code>estimated_wait</code></p>
+<hr />
+<h3 id="tiered_eval">TIERED_EVAL</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Multi-Level Review</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Tiered Evaluation Architecture</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>TIERED_EVAL</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Multi-tier: AI auto → AI flag → human → expert</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Tiered Evaluation Architecture</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>tiers</code> | array | [“auto”, “ai_flag”, “human”, “expert”] | Evaluation tiers | | <code>escalation_criteria</code> | string | “confidence” | Escalation trigger | | <code>sla_hours</code> | integer | 24 | SLA for human review |</p>
+<p><strong>Inputs:</strong> <code>response</code>, <code>context</code> <strong>Outputs:</strong> <code>tier_used</code>, <code>approvals[]</code>, <code>final_decision</code></p>
+<hr />
+<h3 id="active_sample">ACTIVE_SAMPLE</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Smart Sampling</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Active Learning Sample Selection</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ACTIVE_SAMPLE</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Select most informative samples for human labeling</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>Active Learning for NLP</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>Labeling efficiency +60%</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Advanced</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>selection_strategy</code> | enum | “uncertainty” | Strategy: uncertainty, diversity, hybrid | | <code>batch_size</code> | integer | 10 | Samples per batch | | <code>diversity_weight</code> | number | 0.3 | Diversity in selection |</p>
+<p><strong>Inputs:</strong> <code>candidate_pool[]</code> <strong>Outputs:</strong> <code>selected_samples[]</code>, <code>selection_reasons[]</code></p>
+<hr />
+<h2 id="collaboration-methods">Collaboration Methods</h2>
+<h3 id="econ_nash">ECON_NASH</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>No-Communication Coordination</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>ECON Bayesian Nash Equilibrium</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ECON_NASH</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Agents coordinate without message exchange using game theory</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>ICML 2025 - ECON</td>
+</tr>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>+11.2% coordination, -21.4% resources</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Expert</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>num_agents</code> | integer | 3 | Number of agents | | <code>equilibrium_type</code> | string | “bayesian_nash” | Equilibrium type | | <code>utility_function</code> | string | “cooperative” | Utility: cooperative, competitive |</p>
+<p><strong>Inputs:</strong> <code>prompt</code> <strong>Outputs:</strong> <code>coordinated_response</code>, <code>equilibrium_reached</code>, <code>agent_strategies[]</code></p>
+<hr />
+<h2 id="neural-methods">Neural Methods</h2>
+<h3 id="cato_neural">CATO_NEURAL</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Neural Decision</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Cato Neural Decision Engine</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>CATO_NEURAL</code></td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Integrates Cato safety pipeline with consciousness affect state and predictive coding for neural-informed decisions. Uses Control Barrier Functions for safety, affect-to-hyperparameter mapping for dynamic behavior, and active inference for uncertainty handling.</td>
+</tr>
+<tr>
+<td><strong>Research</strong></td>
+<td>RADIANT Cato Safety Architecture + Active Inference</td>
+</tr>
+<tr>
+<td><strong>Complexity</strong></td>
+<td>Expert</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parameters:</strong> | Parameter | Type | Default | Description | |———–|——|———|————-| | <code>safety_mode</code> | enum | “enforce” | CBF mode: enforce, warn, monitor | | <code>use_affect_mapping</code> | boolean | true | Map affect to hyperparameters | | <code>use_predictive_coding</code> | boolean | true | Enable active inference | | <code>precision_governor_enabled</code> | boolean | true | Limit confidence by epistemic state | | <code>cbf_threshold</code> | number | 0.95 | Safety barrier threshold (0.8-1.0) | | <code>affect_influence.frustration_temperature_scale</code> | number | 0.2 | Temperature reduction when frustrated | | <code>affect_influence.curiosity_exploration_boost</code> | number | 0.3 | Exploration increase when curious | | <code>affect_influence.low_efficacy_escalation</code> | boolean | true | Escalate on low self-efficacy | | <code>prediction_config.generate_predictions</code> | boolean | true | Generate predictions | | <code>prediction_config.track_surprise</code> | boolean | true | Track surprise | | <code>prediction_config.learning_threshold</code> | number | 0.5 | Surprise threshold for learning | | <code>escalation_config.auto_escalate_on_uncertainty</code> | boolean | true | Auto-escalate on uncertainty | | <code>escalation_config.uncertainty_threshold</code> | number | 0.7 | Uncertainty threshold | | <code>escalation_config.human_escalation_enabled</code> | boolean | true | Enable human escalation |</p>
+<p><strong>Inputs:</strong> <code>prompt</code>, <code>context</code>, <code>affect_state</code> <strong>Outputs:</strong> <code>response</code>, <code>safety_verdict</code>, <code>hyperparameters_used</code>, <code>predictions[]</code></p>
+<hr />
+<h1 id="system-workflows">System Workflows</h1>
+<p>All 49 system workflows are protected—admins can only modify configuration and enabled status, not workflow definitions.</p>
+<hr />
+<h2 id="adversarial-validation">Adversarial &amp; Validation</h2>
+<h3 id="are---red-team-attack">ARE - Red Team Attack</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Red Team Attack</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Adversarial Robustness Evaluation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ARE</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Adversarial &amp; Validation</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>One AI probes another for vulnerabilities, safety failures, and edge cases</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Identifies 80-95% of vulnerabilities</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>security_testing</code>, <code>safety_validation</code>, <code>edge_case_discovery</code>, <code>robustness_testing</code> <strong>Problem Indicators:</strong> <code>safety_critical</code>, <code>needs_validation</code>, <code>security_concern</code>, <code>untrusted_input</code></p>
+<hr />
+<h3 id="lm_vs_lm---cross-examination">LM_VS_LM - Cross-Examination</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Cross-Examination</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>LM vs LM Factual Verification</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>LM_VS_LM</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Adversarial &amp; Validation</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Interrogator AI repeatedly questions responder AI’s claims to expose inconsistencies and hallucinations</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Reduces hallucinations by 40-60%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>fact_checking</code>, <code>claim_verification</code>, <code>hallucination_detection</code>, <code>interview_simulation</code> <strong>Problem Indicators:</strong> <code>factual_claims</code>, <code>needs_verification</code>, <code>potential_hallucination</code>, <code>complex_reasoning</code></p>
+<hr />
+<h2 id="debate-deliberation">Debate &amp; Deliberation</h2>
+<h3 id="sod---ai-debate">SOD - AI Debate</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>AI Debate</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Scalable Oversight via Debate</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SOD</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Debate &amp; Deliberation</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Two AIs argue opposing positions to convince a judge; truthful arguments should win</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Improves decision quality by 25-35%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Very High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Very High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>controversial_topics</code>, <code>decision_making</code>, <code>policy_analysis</code>, <code>ethical_dilemmas</code> <strong>Problem Indicators:</strong> <code>multiple_viewpoints</code>, <code>controversial</code>, <code>needs_balanced_view</code>, <code>complex_decision</code></p>
+<hr />
+<h3 id="mda---multi-agent-debate">MDA - Multi-Agent Debate</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Multi-Agent Debate</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Multiagent Deliberative Alignment</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>MDA</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Debate &amp; Deliberation</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Multiple LLM instances propose, critique, and refine until consensus</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Consensus quality +30-45%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Very High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Very High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>complex_problems</code>, <code>consensus_building</code>, <code>brainstorming</code>, <code>research_synthesis</code> <strong>Problem Indicators:</strong> <code>needs_consensus</code>, <code>multiple_approaches</code>, <code>collaborative_task</code>, <code>complex_problem</code></p>
+<hr />
+<h3 id="reconcile---round-table-consensus">ReConcile - Round Table Consensus</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Round Table Consensus</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Reconciled Ensemble Deliberation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ReConcile</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Debate &amp; Deliberation</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Heterogeneous models from different providers reconcile viewpoints iteratively</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Reduces provider bias by 50-70%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Very High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>cross_provider_synthesis</code>, <code>bias_reduction</code>, <code>comprehensive_analysis</code>, <code>balanced_output</code> <strong>Problem Indicators:</strong> <code>provider_bias_concern</code>, <code>needs_diversity</code>, <code>comprehensive_coverage</code>, <code>balanced_perspective</code></p>
+<hr />
+<h2 id="judge-critic">Judge &amp; Critic</h2>
+<h3 id="laaje---ai-judge">LAAJE - AI Judge</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>AI Judge</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>LLM-as-a-Judge Evaluation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>LAAJE</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Judge &amp; Critic</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Designated AI evaluates outputs using pointwise, pairwise, or listwise modes</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Evaluation accuracy 85-95%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>quality_evaluation</code>, <code>comparison</code>, <code>ranking</code>, <code>selection</code> <strong>Problem Indicators:</strong> <code>multiple_options</code>, <code>needs_ranking</code>, <code>quality_assessment</code>, <code>best_selection</code></p>
+<hr />
+<h3 id="rlaif---constitutional-critic">RLAIF - Constitutional Critic</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Constitutional Critic</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Reinforcement Learning from AI Feedback</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>RLAIF</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Judge &amp; Critic</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>AI critiques/revises against explicit principles; Constitutional AI pattern</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Alignment improvement 60-80%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>safety_alignment</code>, <code>policy_compliance</code>, <code>ethical_review</code>, <code>guideline_adherence</code> <strong>Problem Indicators:</strong> <code>needs_alignment</code>, <code>policy_check</code>, <code>ethical_concern</code>, <code>compliance_required</code></p>
+<hr />
+<h3 id="iref---critique-revise-loop">IREF - Critique-Revise Loop</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Critique-Revise Loop</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Iterative Refinement with External Feedback</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>IREF</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Judge &amp; Critic</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Generator → Critic identifies flaws → Generator revises; repeats until quality threshold</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Quality improvement per iteration: 15-25%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>iterative_improvement</code>, <code>quality_refinement</code>, <code>error_correction</code>, <code>polish</code> <strong>Problem Indicators:</strong> <code>needs_refinement</code>, <code>quality_critical</code>, <code>iterative_task</code>, <code>perfectionist</code></p>
+<hr />
+<h2 id="ensemble-aggregation">Ensemble &amp; Aggregation</h2>
+<h3 id="scmr---majority-vote">SCMR - Majority Vote</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Majority Vote</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Self-Consistency via Marginal Reasoning</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SCMR</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Ensemble &amp; Aggregation</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Same prompt to N instances, select most common answer</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>+15-25% accuracy on factual tasks</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>factual_questions</code>, <code>multiple_choice</code>, <code>classification</code>, <code>simple_reasoning</code> <strong>Problem Indicators:</strong> <code>objective_answer</code>, <code>clear_correct_answer</code>, <code>factual_query</code>, <code>classification_task</code></p>
+<hr />
+<h3 id="cwma---weighted-ensemble">CWMA - Weighted Ensemble</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Weighted Ensemble</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Confidence-Weighted Model Aggregation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>CWMA</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Ensemble &amp; Aggregation</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Weight model contributions by confidence, accuracy, or domain expertise</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>+20-35% over simple averaging</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>domain_expertise</code>, <code>confidence_critical</code>, <code>weighted_synthesis</code>, <code>expert_combination</code> <strong>Problem Indicators:</strong> <code>domain_specific</code>, <code>expertise_required</code>, <code>confidence_matters</code>, <code>specialized_knowledge</code></p>
+<hr />
+<h3 id="smoe---mixture-router">SMoE - Mixture Router</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Mixture Router</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Sparse Mixture-of-Experts Routing</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SMoE</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Ensemble &amp; Aggregation</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Lightweight router selects specialist AI(s) per input</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Cost reduction 40-60% with same quality</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>routing</code>, <code>specialization</code>, <code>efficiency</code>, <code>domain_detection</code> <strong>Problem Indicators:</strong> <code>unknown_domain</code>, <code>needs_specialist</code>, <code>efficiency_critical</code>, <code>variable_task_type</code></p>
+<hr />
+<h2 id="reflection-self-improvement">Reflection &amp; Self-Improvement</h2>
+<h3 id="isfr---self-refine-loop">ISFR - Self-Refine Loop</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Self-Refine Loop</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Iterative Self-Feedback Refinement</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ISFR</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Reflection &amp; Self-Improvement</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>AI generates → self-critiques → refines until satisfactory</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>+20-30% quality per iteration</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>writing</code>, <code>code_improvement</code>, <code>iterative_tasks</code>, <code>quality_improvement</code> <strong>Problem Indicators:</strong> <code>needs_polish</code>, <code>iterative_improvement</code>, <code>quality_critical</code>, <code>refinement_needed</code></p>
+<hr />
+<h3 id="vrl---reflexion-agent">VRL - Reflexion Agent</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Reflexion Agent</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Verbal Reinforcement Learning</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>VRL</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Reflection &amp; Self-Improvement</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Agent reflects on failures, stores insights in episodic memory, improves without gradients</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>+30-50% on repeated tasks</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>agentic_tasks</code>, <code>learning_from_failure</code>, <code>adaptive_behavior</code>, <code>long_term_improvement</code> <strong>Problem Indicators:</strong> <code>repeated_task</code>, <code>learning_opportunity</code>, <code>failure_recovery</code>, <code>adaptive_needed</code></p>
+<hr />
+<h3 id="lats---tree-search-reasoning">LATS - Tree Search Reasoning</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Tree Search Reasoning</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Language Agent Tree Search</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>LATS</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Reflection &amp; Self-Improvement</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Monte-Carlo tree search exploring reasoning paths with backpropagation</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>4%→74% on puzzle tasks</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Very High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Very High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>complex_reasoning</code>, <code>planning</code>, <code>search_problems</code>, <code>optimization</code> <strong>Problem Indicators:</strong> <code>search_problem</code>, <code>multiple_paths</code>, <code>optimization</code>, <code>complex_planning</code></p>
+<hr />
+<h2 id="verification-fact-checking">Verification &amp; Fact-Checking</h2>
+<h3 id="cove---chain-of-verification">CoVe - Chain of Verification</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Chain of Verification</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Stepwise Verification Prompting</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>CoVe</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Verification &amp; Fact-Checking</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Draft → generate verification questions → answer independently → verified output</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Reduces factual errors by 30-50%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>fact_checking</code>, <code>claim_verification</code>, <code>accuracy_critical</code>, <code>research</code> <strong>Problem Indicators:</strong> <code>factual_claims</code>, <code>needs_verification</code>, <code>accuracy_critical</code>, <code>research_output</code></p>
+<hr />
+<h3 id="selfrag---retrieval-augmented-verification">SelfRAG - Retrieval-Augmented Verification</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Retrieval-Augmented Verification</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Self-Reflective RAG</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SelfRAG</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Verification &amp; Fact-Checking</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>AI self-critiques, fetches documents if needed, validates against evidence</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Factual accuracy +40-60%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>research</code>, <code>fact_checking</code>, <code>document_based</code>, <code>evidence_required</code> <strong>Problem Indicators:</strong> <code>needs_sources</code>, <code>research_task</code>, <code>evidence_based</code>, <code>document_analysis</code></p>
+<hr />
+<h2 id="multi-agent-collaboration">Multi-Agent Collaboration</h2>
+<h3 id="llm_mas---agent-team">LLM_MAS - Agent Team</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Agent Team</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>LLM-based Multi-Agent Systems</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>LLM_MAS</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Multi-Agent Collaboration</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Specialized agents with distinct roles collaborate via natural language</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Complex task completion +40-60%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Very High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>complex_projects</code>, <code>multi_skill</code>, <code>collaborative</code>, <code>project_management</code> <strong>Problem Indicators:</strong> <code>multi_disciplinary</code>, <code>complex_project</code>, <code>needs_coordination</code>, <code>diverse_skills</code></p>
+<hr />
+<h3 id="mapr---peer-review-pipeline">MAPR - Peer Review Pipeline</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Peer Review Pipeline</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Multi-Agent Peer Review</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>MAPR</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Multi-Agent Collaboration</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Sequential review chain where each agent reviews prior agent’s work</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Error reduction 50-70%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>document_review</code>, <code>quality_assurance</code>, <code>sequential_improvement</code>, <code>editorial</code> <strong>Problem Indicators:</strong> <code>needs_review</code>, <code>quality_critical</code>, <code>sequential_task</code>, <code>editorial_process</code></p>
+<hr />
+<h2 id="reasoning-enhancement">Reasoning Enhancement</h2>
+<h3 id="cot---chain-of-thought">CoT - Chain-of-Thought</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Chain-of-Thought</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>CoT Prompting</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>CoT</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Reasoning Enhancement</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Step-by-step reasoning before final answer</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>+20-40% on math/logic</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>math</code>, <code>logic</code>, <code>reasoning</code>, <code>problem_solving</code> <strong>Problem Indicators:</strong> <code>requires_reasoning</code>, <code>multi_step</code>, <code>logical_problem</code>, <code>math_problem</code></p>
+<hr />
+<h3 id="zeroshotcot---zero-shot-cot">ZeroShotCoT - Zero-Shot CoT</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Zero-Shot CoT</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>“Let’s think step by step”</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ZeroShotCoT</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Reasoning Enhancement</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Add “Let’s think step by step” to prompt without examples</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>+15-30% without examples</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>general_reasoning</code>, <code>quick_improvement</code>, <code>no_examples_available</code> <strong>Problem Indicators:</strong> <code>reasoning_needed</code>, <code>no_examples</code>, <code>general_question</code></p>
+<hr />
+<h3 id="tot---tree-of-thoughts">ToT - Tree-of-Thoughts</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Tree-of-Thoughts</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>ToT with BFS/DFS</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ToT</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Reasoning Enhancement</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Explore multiple reasoning paths with breadth/depth-first search</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>4%→74% on puzzles</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Very High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Very High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>puzzles</code>, <code>creative_writing</code>, <code>planning</code>, <code>exploration</code> <strong>Problem Indicators:</strong> <code>multiple_solutions</code>, <code>creative_task</code>, <code>exploration_needed</code>, <code>puzzle</code></p>
+<hr />
+<h3 id="got---graph-of-thoughts">GoT - Graph-of-Thoughts</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Graph-of-Thoughts</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>GoT Synthesis</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>GoT</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Reasoning Enhancement</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Thought units as graph nodes with arbitrary connections</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>+62% over ToT on sorting</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Very High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Very High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>complex_synthesis</code>, <code>interconnected_reasoning</code>, <code>sorting</code>, <code>complex_logic</code> <strong>Problem Indicators:</strong> <code>complex_relationships</code>, <code>synthesis_needed</code>, <code>interconnected_concepts</code></p>
+<hr />
+<h3 id="react---reasoning-acting">ReAct - Reasoning + Acting</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>ReAct</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Reasoning + Acting</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ReAct</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Reasoning Enhancement</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Interleave reasoning and acting with external tools</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>+34% on interactive tasks</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>tool_use</code>, <code>interactive_tasks</code>, <code>research</code>, <code>agentic</code> <strong>Problem Indicators:</strong> <code>needs_tools</code>, <code>interactive</code>, <code>external_data</code>, <code>agentic_task</code></p>
+<hr />
+<h3 id="l2m---least-to-most">L2M - Least-to-Most</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Least-to-Most</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Decomposition Prompting</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>L2M</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Reasoning Enhancement</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Decompose problem into subproblems, solve smallest first</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>16%→99% on SCAN</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>compositional</code>, <code>hierarchical</code>, <code>step_building</code> <strong>Problem Indicators:</strong> <code>compositional_task</code>, <code>can_decompose</code>, <code>builds_on_previous</code></p>
+<hr />
+<h3 id="ps---plan-and-solve">PS - Plan-and-Solve</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Plan-and-Solve</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Explicit Planning</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>PS</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Reasoning Enhancement</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Devise plan then execute step by step</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Matches 8-shot CoT</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>complex_tasks</code>, <code>planning</code>, <code>structured_problems</code> <strong>Problem Indicators:</strong> <code>needs_planning</code>, <code>complex_execution</code>, <code>structured_approach</code></p>
+<hr />
+<h3 id="mcp---metacognitive-prompting">MCP - Metacognitive Prompting</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Metacognitive Prompting</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>5-stage reflection</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>MCP</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Reasoning Enhancement</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Understand, decompose, execute, self-verify, refine</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Beats CoT on NLU</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>nlu</code>, <code>comprehension</code>, <code>thorough_analysis</code> <strong>Problem Indicators:</strong> <code>comprehension_critical</code>, <code>needs_verification</code>, <code>thorough_needed</code></p>
+<hr />
+<h3 id="pot---program-of-thought">PoT - Program-of-Thought</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Program-of-Thought</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Code-based Reasoning</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>PoT</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Reasoning Enhancement</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Generate code to solve math problems</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>For mathematical computation</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>math</code>, <code>computation</code>, <code>algorithmic</code> <strong>Problem Indicators:</strong> <code>mathematical</code>, <code>needs_computation</code>, <code>algorithmic_solution</code></p>
+<hr />
+<h2 id="model-routing-strategies">Model Routing Strategies</h2>
+<h3 id="single---single-model">SINGLE - Single Model</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Single Model</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Primary model only</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SINGLE</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Model Routing Strategies</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Route to single best model for fastest response</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Fastest, lowest cost</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>simple_tasks</code>, <code>speed_critical</code>, <code>cost_sensitive</code> <strong>Problem Indicators:</strong> <code>simple_task</code>, <code>speed_priority</code>, <code>cost_priority</code></p>
+<hr />
+<h3 id="ensemble---ensemble">ENSEMBLE - Ensemble</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Ensemble</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Query multiple, synthesize</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ENSEMBLE</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Model Routing Strategies</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Query multiple models and synthesize results with conflict detection</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Best overall quality</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>important_decisions</code>, <code>quality_critical</code>, <code>diverse_perspectives</code> <strong>Problem Indicators:</strong> <code>quality_priority</code>, <code>needs_diversity</code>, <code>important_task</code></p>
+<hr />
+<h3 id="cascade---cascade">CASCADE - Cascade</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Escalate on low confidence</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>CASCADE</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Model Routing Strategies</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Start with cheap model, escalate to better if confidence below threshold</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Cost reduction 40-60%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Variable</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>variable_complexity</code>, <code>cost_optimization</code>, <code>adaptive</code> <strong>Problem Indicators:</strong> <code>unknown_complexity</code>, <code>cost_conscious</code>, <code>adaptive_quality</code></p>
+<hr />
+<h3 id="specialist---specialist-routing">SPECIALIST - Specialist Routing</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Specialist Routing</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Route to domain expert</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SPECIALIST</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Model Routing Strategies</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Route to best model per content type/domain</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Best domain performance</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>domain_specific</code>, <code>specialized_tasks</code>, <code>expert_needed</code> <strong>Problem Indicators:</strong> <code>specific_domain</code>, <code>expert_knowledge</code>, <code>specialized_task</code></p>
+<hr />
+<h2 id="domain-specific-orchestration">Domain-Specific Orchestration</h2>
+<h3 id="domain_inject---domain-expert-injection">DOMAIN_INJECT - Domain Expert Injection</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Domain Expert Injection</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Prepend domain prompts</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>DOMAIN_INJECT</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Domain-Specific Orchestration</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Prepend domain-specific system prompts based on 800+ domain routing</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Domain accuracy +20-40%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>domain_tasks</code>, <code>specialized_knowledge</code>, <code>professional_contexts</code> <strong>Problem Indicators:</strong> <code>domain_specific</code>, <code>professional_context</code>, <code>specialized_knowledge</code></p>
+<hr />
+<h3 id="multi_expert---multi-expert-consensus">MULTI_EXPERT - Multi-Expert Consensus</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Multi-Expert Consensus</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Multiple domain experts</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>MULTI_EXPERT</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Domain-Specific Orchestration</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Route to multiple domain experts, synthesize</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Expert consensus quality +30%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>complex_domain</code>, <code>cross_functional</code>, <code>expert_consensus</code> <strong>Problem Indicators:</strong> <code>multi_domain</code>, <code>expert_critical</code>, <code>consensus_needed</code></p>
+<hr />
+<h3 id="challenger_consensus---challenger-consensus">CHALLENGER_CONSENSUS - Challenger + Consensus</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Challenger + Consensus</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Baseline then challenge</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>CHALLENGER_CONSENSUS</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Domain-Specific Orchestration</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Baseline round → Challenger round questioning assumptions → Synthesis</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Removes blind spots +40%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>assumption_testing</code>, <code>robust_analysis</code>, <code>critical_thinking</code> <strong>Problem Indicators:</strong> <code>assumptions_present</code>, <code>needs_challenge</code>, <code>robust_required</code></p>
+<hr />
+<h3 id="cross_domain---cross-domain-synthesis">CROSS_DOMAIN - Cross-Domain Synthesis</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Cross-Domain Synthesis</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Multi-domain merge</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>CROSS_DOMAIN</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Domain-Specific Orchestration</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Detect multi-domain queries, route to each expert, merge insights</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Cross-domain insight +50%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>interdisciplinary</code>, <code>cross_functional</code>, <code>holistic_analysis</code> <strong>Problem Indicators:</strong> <code>multi_domain</code>, <code>interdisciplinary</code>, <code>holistic_needed</code></p>
+<hr />
+<h2 id="cognitive-frameworks">Cognitive Frameworks</h2>
+<h3 id="first_principles---first-principles-thinking">FIRST_PRINCIPLES - First Principles Thinking</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>First Principles Thinking</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Decompose to fundamentals</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>FIRST_PRINCIPLES</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Decompose problem to fundamental truths and rebuild solution</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Novel solutions +60%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>innovation</code>, <code>fundamental_analysis</code>, <code>breakthrough_thinking</code> <strong>Problem Indicators:</strong> <code>needs_innovation</code>, <code>fundamental_question</code>, <code>conventional_failed</code></p>
+<hr />
+<h3 id="analogical---analogical-reasoning">ANALOGICAL - Analogical Reasoning</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Analogical Reasoning</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Cross-domain patterns</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ANALOGICAL</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Find analogies from other domains to solve current problem</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Creative solutions +40%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>creative_solutions</code>, <code>cross_domain</code>, <code>pattern_matching</code> <strong>Problem Indicators:</strong> <code>stuck_on_problem</code>, <code>needs_creativity</code>, <code>pattern_available</code></p>
+<hr />
+<h3 id="systems---systems-thinking">SYSTEMS - Systems Thinking</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Systems Thinking</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Feedback loops, emergence</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SYSTEMS</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Analyze as interconnected system with feedback loops and emergent properties</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>System understanding +50%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>complex_systems</code>, <code>organizational</code>, <code>ecosystem_analysis</code> <strong>Problem Indicators:</strong> <code>complex_system</code>, <code>interconnected</code>, <code>feedback_present</code></p>
+<hr />
+<h3 id="socratic---socratic-method">SOCRATIC - Socratic Method</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Socratic Method</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Dialectical questioning</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SOCRATIC</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Use probing questions to stimulate critical thinking and illuminate ideas</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Understanding depth +40%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>learning</code>, <code>clarification</code>, <code>deep_understanding</code> <strong>Problem Indicators:</strong> <code>needs_clarity</code>, <code>learning_context</code>, <code>deep_dive</code></p>
+<hr />
+<h3 id="triz---triz">TRIZ - TRIZ</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>TRIZ</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Contradiction resolution</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>TRIZ</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Use contradiction matrices and 40 inventive principles</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Inventive solutions +70%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>engineering</code>, <code>invention</code>, <code>contradiction_resolution</code> <strong>Problem Indicators:</strong> <code>contradiction_present</code>, <code>engineering_problem</code>, <code>invention_needed</code></p>
+<hr />
+<h3 id="design_thinking---design-thinking">DESIGN_THINKING - Design Thinking</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Design Thinking</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Empathize→Define→Ideate→Prototype→Test</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>DESIGN_THINKING</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Human-centered design process with iteration</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>User satisfaction +50%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Very High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>product_design</code>, <code>user_experience</code>, <code>innovation</code> <strong>Problem Indicators:</strong> <code>user_focused</code>, <code>design_problem</code>, <code>needs_iteration</code></p>
+<hr />
+<h3 id="scientific---scientific-method">SCIENTIFIC - Scientific Method</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Scientific Method</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Hypothesis→Experiment→Analysis</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>SCIENTIFIC</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Formulate hypothesis, design experiment, analyze results</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Rigorous conclusions +60%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>research</code>, <code>investigation</code>, <code>empirical_questions</code> <strong>Problem Indicators:</strong> <code>testable_question</code>, <code>research_needed</code>, <code>empirical</code></p>
+<hr />
+<h3 id="lateral---lateral-thinking">LATERAL - Lateral Thinking</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Lateral Thinking</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Random entry, provocation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>LATERAL</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Use random stimuli and provocations to break conventional thinking</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Creative breakthroughs +80%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>creativity</code>, <code>brainstorming</code>, <code>unconventional_solutions</code> <strong>Problem Indicators:</strong> <code>stuck_in_rut</code>, <code>needs_creativity</code>, <code>brainstorming</code></p>
+<hr />
+<h3 id="abductive---abductive-reasoning">ABDUCTIVE - Abductive Reasoning</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Abductive Reasoning</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Inference to best explanation</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>ABDUCTIVE</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Generate and evaluate hypotheses to find best explanation</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Explanation quality +40%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>diagnosis</code>, <code>investigation</code>, <code>hypothesis_generation</code> <strong>Problem Indicators:</strong> <code>unexplained_phenomenon</code>, <code>diagnosis_needed</code>, <code>mystery</code></p>
+<hr />
+<h3 id="counterfactual---counterfactual-thinking">COUNTERFACTUAL - Counterfactual Thinking</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Counterfactual Thinking</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>What-if analysis</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>COUNTERFACTUAL</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Explore alternative scenarios and their implications</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Risk identification +50%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>planning</code>, <code>risk_analysis</code>, <code>scenario_planning</code> <strong>Problem Indicators:</strong> <code>scenario_analysis</code>, <code>risk_assessment</code>, <code>planning</code></p>
+<hr />
+<h3 id="dialectical---dialectical-thinking">DIALECTICAL - Dialectical Thinking</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Dialectical Thinking</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Thesis-antithesis-synthesis</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>DIALECTICAL</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Explore opposing views to reach higher synthesis</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Balanced conclusions +45%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>philosophy</code>, <code>conflict_resolution</code>, <code>synthesis</code> <strong>Problem Indicators:</strong> <code>opposing_views</code>, <code>conflict_present</code>, <code>synthesis_needed</code></p>
+<hr />
+<h3 id="morphological---morphological-analysis">MORPHOLOGICAL - Morphological Analysis</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Morphological Analysis</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Parameter space exploration</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>MORPHOLOGICAL</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Systematically explore all possible parameter combinations</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Option coverage +70%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>systematic_exploration</code>, <code>option_generation</code>, <code>completeness</code> <strong>Problem Indicators:</strong> <code>many_parameters</code>, <code>systematic_needed</code>, <code>completeness_required</code></p>
+<hr />
+<h3 id="premortem---pre-mortem-analysis">PREMORTEM - Pre-mortem Analysis</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Pre-mortem Analysis</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Prospective hindsight</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>PREMORTEM</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Imagine failure has occurred and work backwards to identify causes</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Risk mitigation +60%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>risk_management</code>, <code>project_planning</code>, <code>failure_prevention</code> <strong>Problem Indicators:</strong> <code>project_start</code>, <code>risk_critical</code>, <code>planning_phase</code></p>
+<hr />
+<h3 id="fermi---fermi-estimation">FERMI - Fermi Estimation</h3>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UI Name</strong></td>
+<td>Fermi Estimation</td>
+</tr>
+<tr>
+<td><strong>Scientific Name</strong></td>
+<td>Order of magnitude reasoning</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><code>FERMI</code></td>
+</tr>
+<tr>
+<td><strong>Category</strong></td>
+<td>Cognitive Frameworks</td>
+</tr>
+<tr>
+<td><strong>Description</strong></td>
+<td>Break down estimation into smaller, estimable components</td>
+</tr>
+<tr>
+<td><strong>Quality Improvement</strong></td>
+<td>Estimation accuracy +50%</td>
+</tr>
+<tr>
+<td><strong>Latency</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Min Models</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Best For:</strong> <code>estimation</code>, <code>quick_analysis</code>, <code>order_of_magnitude</code> <strong>Problem Indicators:</strong> <code>unknown_quantity</code>, <code>estimation_needed</code>, <code>limited_data</code></p>
+<hr />
+<h1 id="quick-reference-tables">Quick Reference Tables</h1>
+<h2 id="workflows-by-category">Workflows by Category</h2>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 25%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Count</th>
+<th>Workflows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Adversarial &amp; Validation</td>
+<td>2</td>
+<td>ARE, LM_VS_LM</td>
+</tr>
+<tr>
+<td>Debate &amp; Deliberation</td>
+<td>3</td>
+<td>SOD, MDA, ReConcile</td>
+</tr>
+<tr>
+<td>Judge &amp; Critic</td>
+<td>3</td>
+<td>LAAJE, RLAIF, IREF</td>
+</tr>
+<tr>
+<td>Ensemble &amp; Aggregation</td>
+<td>3</td>
+<td>SCMR, CWMA, SMoE</td>
+</tr>
+<tr>
+<td>Reflection &amp; Self-Improvement</td>
+<td>3</td>
+<td>ISFR, VRL, LATS</td>
+</tr>
+<tr>
+<td>Verification &amp; Fact-Checking</td>
+<td>2</td>
+<td>CoVe, SelfRAG</td>
+</tr>
+<tr>
+<td>Multi-Agent Collaboration</td>
+<td>2</td>
+<td>LLM_MAS, MAPR</td>
+</tr>
+<tr>
+<td>Reasoning Enhancement</td>
+<td>9</td>
+<td>CoT, ZeroShotCoT, ToT, GoT, ReAct, L2M, PS, MCP, PoT</td>
+</tr>
+<tr>
+<td>Model Routing Strategies</td>
+<td>4</td>
+<td>SINGLE, ENSEMBLE, CASCADE, SPECIALIST</td>
+</tr>
+<tr>
+<td>Domain-Specific Orchestration</td>
+<td>4</td>
+<td>DOMAIN_INJECT, MULTI_EXPERT, CHALLENGER_CONSENSUS, CROSS_DOMAIN</td>
+</tr>
+<tr>
+<td>Cognitive Frameworks</td>
+<td>14</td>
+<td>FIRST_PRINCIPLES, ANALOGICAL, SYSTEMS, SOCRATIC, TRIZ, DESIGN_THINKING, SCIENTIFIC, LATERAL, ABDUCTIVE, COUNTERFACTUAL, DIALECTICAL, MORPHOLOGICAL, PREMORTEM, FERMI</td>
+</tr>
+</tbody>
+</table>
+<h2 id="workflows-by-costlatency">Workflows by Cost/Latency</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 19%" />
+<col style="width: 23%" />
+<col style="width: 20%" />
+<col style="width: 27%" />
+</colgroup>
+<thead>
+<tr>
+<th>Cost</th>
+<th>Low Latency</th>
+<th>Medium Latency</th>
+<th>High Latency</th>
+<th>Very High Latency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Low</strong></td>
+<td>ZeroShotCoT, SINGLE, FERMI, LATERAL</td>
+<td>PoT, SMoE</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td>-</td>
+<td>CoT, PS, SCMR, CWMA, SOCRATIC, ABDUCTIVE, ANALOGICAL</td>
+<td>CoVe, SelfRAG, ReAct, L2M, VRL, MCP, ISFR, RLAIF, FIRST_PRINCIPLES, SYSTEMS, SCIENTIFIC, COUNTERFACTUAL, DIALECTICAL, MORPHOLOGICAL, PREMORTEM, TRIZ</td>
+<td>-</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td>-</td>
+<td>LAAJE, SPECIALIST</td>
+<td>ARE, LM_VS_LM, IREF, MAPR, MULTI_EXPERT, CHALLENGER_CONSENSUS, CROSS_DOMAIN, LLM_MAS</td>
+<td>DESIGN_THINKING</td>
+</tr>
+<tr>
+<td><strong>Very High</strong></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>SOD, MDA, ReConcile, LATS, ToT, GoT</td>
+</tr>
+</tbody>
+</table>
+<h2 id="workflows-by-minimum-models-required">Workflows by Minimum Models Required</h2>
+<table>
+<colgroup>
+<col style="width: 52%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr>
+<th>Min Models</th>
+<th>Workflows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>CoT, ZeroShotCoT, ToT, GoT, ReAct, L2M, PS, MCP, PoT, SINGLE, ISFR, VRL, LATS, CoVe, SelfRAG, DOMAIN_INJECT, FIRST_PRINCIPLES, ANALOGICAL, SYSTEMS, SOCRATIC, TRIZ, DESIGN_THINKING, SCIENTIFIC, LATERAL, ABDUCTIVE, COUNTERFACTUAL, DIALECTICAL, MORPHOLOGICAL, PREMORTEM, FERMI</td>
+</tr>
+<tr>
+<td>2</td>
+<td>ARE, LM_VS_LM, LAAJE, RLAIF, IREF, SMoE, CASCADE, SPECIALIST, CHALLENGER_CONSENSUS</td>
+</tr>
+<tr>
+<td>3</td>
+<td>SOD, MDA, ReConcile, SCMR, CWMA, LLM_MAS, MAPR, ENSEMBLE, MULTI_EXPERT, CROSS_DOMAIN</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Generated for RADIANT v5.2.2 - Complete Orchestration Reference</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

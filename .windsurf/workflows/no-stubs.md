@@ -142,3 +142,65 @@ If stubs are discovered in "completed" code:
 3. Documentation must be updated to reflect actual status
 
 **A feature with stubs is a LIE to the user. Do not lie.**
+
+## AI Agent Mandatory Behavior
+
+**THIS POLICY APPLIES TO ALL AI CODING AGENTS (Windsurf, Cursor, Claude, etc.)**
+
+### Before Writing ANY Code
+
+1. **STOP** if you are about to write a stub, placeholder, or "coming soon" implementation
+2. **ASK** the user if now is the appropriate time to implement the full feature
+3. **WAIT** until the feature can be fully implemented rather than creating technical debt
+
+### Legitimate Reasons to Defer (NOT Stub)
+
+These are the ONLY valid reasons to not implement something NOW:
+
+1. **Missing external dependency** - e.g., waiting for a third-party API that doesn't exist yet
+2. **User explicitly requests deferral** - User says "skip this for now"
+3. **Requires hardware/infrastructure not available** - e.g., GPU cluster for training
+4. **Blocked by incomplete prerequisite** - e.g., database table doesn't exist yet
+
+### NOT Valid Reasons
+
+These are NOT acceptable excuses for stubs:
+
+- ❌ "It's complex" - Complex is fine, implement it
+- ❌ "It would take too long" - Take the time needed
+- ❌ "I'm not sure of the exact implementation" - Research and implement
+- ❌ "The user didn't specify details" - Ask for clarification
+- ❌ "It's not the main focus" - If you're touching it, finish it
+
+### If You Must Defer
+
+If there is a LEGITIMATE reason to defer:
+
+1. **Do NOT create the stub** - Leave the code path absent entirely
+2. **Document in a tracking file** - Add to `PENDING-IMPLEMENTATIONS.md`
+3. **Tell the user explicitly** - "I am not implementing X because [legitimate reason]"
+4. **Never pretend it's done** - No "coming soon" UI, no empty functions
+
+## Detection Commands
+
+Run these to find violations:
+
+```bash
+# Find TODO/FIXME comments
+grep -r "// TODO\|// FIXME\|// HACK" packages/ apps/ --include="*.ts" --include="*.tsx"
+
+# Find placeholder returns
+grep -r "return \[\];\|return {};\|return null;\|return 0;" packages/ apps/ --include="*.ts" | grep -v test
+
+# Find "coming soon" UI
+grep -r "coming soon\|Coming Soon\|COMING_SOON" apps/ --include="*.tsx"
+
+# Find stub patterns
+grep -r "throw.*[Nn]ot.*[Ii]mplemented\|// [Ss]tub\|// [Pp]laceholder" packages/ apps/ --include="*.ts"
+```
+
+## This Policy is MANDATORY
+
+This is not a suggestion. This is a hard requirement.
+
+**Every AI agent reading this file MUST comply. No exceptions. No excuses.**

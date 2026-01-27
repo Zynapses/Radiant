@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWIFT DEPLOYER USER GUIDE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SWIFT DEPLOYER USER GUIDE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/SWIFT-DEPLOYER-USER-GUIDE.md</div>
+  </div>
+  
+  <h1 id="radiant-swift-deployer-user-guide">RADIANT Swift Deployer User Guide</h1>
+<p><strong>Version</strong>: 5.52.17<br />
+<strong>Platform</strong>: macOS 13.0+ (Ventura and later)<br />
+<strong>Last Updated</strong>: January 24, 2026</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-overview">Overview</a></li>
+<li><a href="#2-system-requirements">System Requirements</a></li>
+<li><a href="#3-installation">Installation</a></li>
+<li><a href="#4-first-launch--setup">First Launch &amp; Setup</a></li>
+<li><a href="#5-main-interface">Main Interface</a></li>
+<li><a href="#6-dashboard">Dashboard</a></li>
+<li><a href="#7-applications-management">Applications Management</a></li>
+<li><a href="#8-deployment">Deployment</a></li>
+<li><a href="#9-domain-url-configuration">Domain URL Configuration</a></li>
+<li><a href="#10-feature-flags">Feature Flags</a></li>
+<li><a href="#11-ai-registry">AI Registry</a></li>
+<li><a href="#12-self-hosted-models">Self-Hosted Models</a></li>
+<li><a href="#13-multi-region-deployment">Multi-Region Deployment</a></li>
+<li><a href="#14-security--compliance">Security &amp; Compliance</a></li>
+<li><a href="#15-cost-management">Cost Management</a></li>
+<li><a href="#16-monitoring">Monitoring</a></li>
+<li><a href="#17-snapshots--rollbacks">Snapshots &amp; Rollbacks</a></li>
+<li><a href="#18-package-management">Package Management</a></li>
+<li><a href="#19-settings">Settings</a></li>
+<li><a href="#20-ai-assistant">AI Assistant</a></li>
+<li><a href="#21-troubleshooting">Troubleshooting</a></li>
+<li><a href="#22-keyboard-shortcuts">Keyboard Shortcuts</a></li>
+<li><a href="#23-glossary">Glossary</a></li>
+</ol>
+<hr />
+<h2 id="overview">1. Overview</h2>
+<p>The RADIANT Swift Deployer is a native macOS application for deploying and managing RADIANT AI platform infrastructure on AWS. It provides a visual interface for:</p>
+<ul>
+<li><strong>Infrastructure Deployment</strong>: Deploy complete RADIANT stacks to AWS</li>
+<li><strong>Domain Configuration</strong>: Configure URLs for all platform applications</li>
+<li><strong>AI Model Management</strong>: Configure external and self-hosted AI models</li>
+<li><strong>Monitoring</strong>: Real-time health checks and cost tracking</li>
+<li><strong>Compliance</strong>: HIPAA, SOC2, and GDPR compliance tools</li>
+</ul>
+<h3 id="architecture">Architecture</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                    RADIANT Swift Deployer                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │  1Password   │  │  AWS CLI     │  │  CDK CLI     │          │
+│  │  Integration │  │  Credentials │  │  Deployment  │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│                            │                                     │
+│                            ▼                                     │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │                    AWS Account                           │   │
+│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐       │   │
+│  │  │ Aurora  │ │ Lambda  │ │ S3      │ │CloudFront│       │   │
+│  │  │ (DB)    │ │ (API)   │ │(Storage)│ │ (CDN)   │       │   │
+│  │  └─────────┘ └─────────┘ └─────────┘ └─────────┘       │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="radiant-applications">RADIANT Applications</h3>
+<p>The deployer manages five core applications:</p>
+<table>
+<thead>
+<tr>
+<th>Application</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RADIANT Admin</strong></td>
+<td>Platform administration dashboard</td>
+<td>✓ Yes</td>
+</tr>
+<tr>
+<td><strong>Think Tank Admin</strong></td>
+<td>Think Tank configuration and management</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Curator</strong></td>
+<td>Knowledge graph curation and fact verification</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Think Tank</strong></td>
+<td>Consumer AI chat interface</td>
+<td>✓ Yes</td>
+</tr>
+<tr>
+<td><strong>External API</strong></td>
+<td>REST/GraphQL API for integrations</td>
+<td>✓ Yes</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="system-requirements">2. System Requirements</h2>
+<h3 id="minimum-requirements">Minimum Requirements</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>macOS</strong></td>
+<td>13.0 (Ventura) or later</td>
+</tr>
+<tr>
+<td><strong>Processor</strong></td>
+<td>Apple Silicon (M1/M2/M3) or Intel</td>
+</tr>
+<tr>
+<td><strong>Memory</strong></td>
+<td>8 GB RAM</td>
+</tr>
+<tr>
+<td><strong>Storage</strong></td>
+<td>2 GB available space</td>
+</tr>
+<tr>
+<td><strong>Network</strong></td>
+<td>Stable internet connection</td>
+</tr>
+</tbody>
+</table>
+<h3 id="required-software">Required Software</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 27%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Software</th>
+<th>Purpose</th>
+<th>Installation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1Password</strong></td>
+<td>Credential management</td>
+<td><a href="https://1password.com">1password.com</a></td>
+</tr>
+<tr>
+<td><strong>AWS CLI v2</strong></td>
+<td>AWS operations</td>
+<td><code>brew install awscli</code></td>
+</tr>
+<tr>
+<td><strong>Node.js 18+</strong></td>
+<td>CDK runtime</td>
+<td><code>brew install node@18</code></td>
+</tr>
+<tr>
+<td><strong>AWS CDK</strong></td>
+<td>Infrastructure deployment</td>
+<td><code>npm install -g aws-cdk</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="aws-account-requirements">AWS Account Requirements</h3>
+<ul>
+<li>AWS account with administrator access</li>
+<li>IAM user or role with deployment permissions</li>
+<li>Sufficient service quotas for:
+<ul>
+<li>Aurora PostgreSQL clusters</li>
+<li>Lambda functions (100+)</li>
+<li>S3 buckets</li>
+<li>CloudFront distributions</li>
+<li>SageMaker endpoints (for self-hosted models)</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="installation">3. Installation</h2>
+<h3 id="download">Download</h3>
+<ol type="1">
+<li>Download <code>Radiant Deployer.app</code> from the releases page</li>
+<li>Move to <code>/Applications</code> folder</li>
+<li>Right-click → Open (first launch only, to bypass Gatekeeper)</li>
+</ol>
+<h3 id="first-launch">First Launch</h3>
+<p>On first launch, macOS may show a security warning:</p>
+<ol type="1">
+<li>Click <strong>Cancel</strong> on the warning dialog</li>
+<li>Open <strong>System Preferences</strong> → <strong>Privacy &amp; Security</strong></li>
+<li>Click <strong>Open Anyway</strong> next to “Radiant Deployer was blocked”</li>
+<li>Click <strong>Open</strong> in the confirmation dialog</li>
+</ol>
+<h3 id="verify-installation">Verify Installation</h3>
+<p>After launching, verify the version in the window header:</p>
+<pre><code>RADIANT Deployer v5.52.17</code></pre>
+<hr />
+<h2 id="first-launch-setup">4. First Launch &amp; Setup</h2>
+<h3 id="password-setup">1Password Setup</h3>
+<p>The deployer requires 1Password for secure credential management.</p>
+<p><strong>Step 1</strong>: Install 1Password CLI</p>
+<pre class="bash"><code>brew install 1password-cli</code></pre>
+<p><strong>Step 2</strong>: Enable CLI integration 1. Open 1Password app 2. Go to <strong>Settings</strong> → <strong>Developer</strong> 3. Enable <strong>Integrate with 1Password CLI</strong></p>
+<p><strong>Step 3</strong>: Sign in to 1Password</p>
+<pre class="bash"><code>op signin</code></pre>
+<p><strong>Step 4</strong>: Verify in Deployer - The deployer will show a green checkmark when 1Password is configured - If not configured, you’ll see the 1Password Setup screen</p>
+<h3 id="aws-credentials-setup">AWS Credentials Setup</h3>
+<p><strong>Option A</strong>: Store in 1Password (Recommended)</p>
+<ol type="1">
+<li>Create a new item in 1Password with:
+<ul>
+<li><strong>Title</strong>: <code>RADIANT AWS Credentials</code></li>
+<li><strong>AWS Access Key ID</strong>: Your access key</li>
+<li><strong>AWS Secret Access Key</strong>: Your secret key</li>
+<li><strong>Region</strong>: e.g., <code>us-east-1</code></li>
+</ul></li>
+<li>Tag the item with <code>radiant</code> for easy discovery</li>
+</ol>
+<p><strong>Option B</strong>: Use AWS CLI profiles</p>
+<pre class="bash"><code>aws configure --profile radiant-deploy</code></pre>
+<h3 id="initial-configuration-checklist">Initial Configuration Checklist</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />1Password installed and CLI enabled</label></li>
+<li><label><input type="checkbox" />AWS credentials stored securely</label></li>
+<li><label><input type="checkbox" />AWS CDK bootstrapped in target region</label></li>
+<li><label><input type="checkbox" />Domain purchased and DNS access available</label></li>
+<li><label><input type="checkbox" />SSL certificate requested (or will use ACM)</label></li>
+</ul>
+<hr />
+<h2 id="main-interface">5. Main Interface</h2>
+<h3 id="window-layout">Window Layout</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  ◉ ◉ ◉                    RADIANT Deployer                      │
+├───────────┬─────────────────────────────────────────────────────┤
+│           │  ┌─────────────────────────────────────────────┐   │
+│  SIDEBAR  │  │              CONTENT TOOLBAR                │   │
+│           │  ├─────────────────────────────────────────────┤   │
+│  ┌──────┐ │  │                                             │   │
+│  │ MAIN │ │  │                                             │   │
+│  ├──────┤ │  │                                             │   │
+│  │ OPS  │ │  │            MAIN CONTENT AREA                │   │
+│  ├──────┤ │  │                                             │   │
+│  │ AI   │ │  │                                             │   │
+│  ├──────┤ │  │                                             │   │
+│  │CONFIG│ │  │                                             │   │
+│  ├──────┤ │  │                                             │   │
+│  │SYSTEM│ │  │                                             │   │
+│  └──────┘ │  └─────────────────────────────────────────────┘   │
+│           │                                                     │
+└───────────┴─────────────────────────────────────────────────────┘</code></pre>
+<h3 id="sidebar-sections">Sidebar Sections</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 25%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Section</th>
+<th>Tabs</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MAIN</strong></td>
+<td>Dashboard, Apps, Deploy</td>
+<td>Core operations</td>
+</tr>
+<tr>
+<td><strong>OPERATIONS</strong></td>
+<td>Instances, Snapshots, Packages, History</td>
+<td>Management</td>
+</tr>
+<tr>
+<td><strong>AI REGISTRY</strong></td>
+<td>Providers, Models, Self-Hosted</td>
+<td>AI configuration</td>
+</tr>
+<tr>
+<td><strong>CONFIGURATION</strong></td>
+<td>Domain URLs, Email, Curator</td>
+<td>Platform config</td>
+</tr>
+<tr>
+<td><strong>ADVANCED</strong></td>
+<td>Multi-Region, A/B Testing, Cortex Memory</td>
+<td>Advanced features</td>
+</tr>
+<tr>
+<td><strong>SECURITY</strong></td>
+<td>Security, Compliance</td>
+<td>Security settings</td>
+</tr>
+<tr>
+<td><strong>SYSTEM</strong></td>
+<td>Costs, Monitoring, Settings</td>
+<td>System management</td>
+</tr>
+</tbody>
+</table>
+<h3 id="environment-selector">Environment Selector</h3>
+<p>At the top of the sidebar, select the target environment:</p>
+<table>
+<thead>
+<tr>
+<th>Environment</th>
+<th>Purpose</th>
+<th>Color</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Development</strong></td>
+<td>Testing and development</td>
+<td>Blue</td>
+</tr>
+<tr>
+<td><strong>Staging</strong></td>
+<td>Pre-production testing</td>
+<td>Orange</td>
+</tr>
+<tr>
+<td><strong>Production</strong></td>
+<td>Live production</td>
+<td>Green</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="dashboard">6. Dashboard</h2>
+<p>The Dashboard provides an at-a-glance view of your RADIANT deployment.</p>
+<h3 id="status-cards">Status Cards</h3>
+<table>
+<thead>
+<tr>
+<th>Card</th>
+<th>Information</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Version</strong></td>
+<td>Current deployed version with update indicator</td>
+</tr>
+<tr>
+<td><strong>Health</strong></td>
+<td>Overall system health (Healthy/Degraded/Unhealthy)</td>
+</tr>
+<tr>
+<td><strong>Costs</strong></td>
+<td>Month-to-date AWS costs</td>
+</tr>
+<tr>
+<td><strong>Active Users</strong></td>
+<td>Current active user count</td>
+</tr>
+</tbody>
+</table>
+<h3 id="quick-actions">Quick Actions</h3>
+<ul>
+<li><strong>Deploy</strong> → Jump to deployment view</li>
+<li><strong>View Logs</strong> → Open CloudWatch logs</li>
+<li><strong>Health Check</strong> → Run comprehensive health check</li>
+<li><strong>Refresh</strong> → Refresh all status indicators</li>
+</ul>
+<h3 id="recent-activity">Recent Activity</h3>
+<p>Shows the last 10 deployment and configuration changes.</p>
+<hr />
+<h2 id="applications-management">7. Applications Management</h2>
+<h3 id="viewing-applications">Viewing Applications</h3>
+<p>The <strong>Apps</strong> tab shows all RADIANT applications:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  RADIANT Applications                                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ⚙️  RADIANT Admin          ✓ Enabled    https://acme.com/admin │
+│      Platform administration                                     │
+│                                                                  │
+│  🧠 Think Tank Admin        ✓ Enabled    https://acme.com/tt-admin│
+│      Think Tank configuration                                    │
+│                                                                  │
+│  📖 Curator                  ✓ Enabled    https://acme.com/curator│
+│      Knowledge graph curation                                    │
+│                                                                  │
+│  💬 Think Tank              ✓ Enabled    https://acme.com/       │
+│      Consumer AI interface                                       │
+│                                                                  │
+│  🔗 External API            ✓ Enabled    https://acme.com/api   │
+│      REST/GraphQL API                                            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="per-app-actions">Per-App Actions</h3>
+<p>Click on any application to: - View health status - Open in browser - View CloudWatch logs - Restart (Lambda functions) - Scale (if applicable)</p>
+<hr />
+<h2 id="deployment">8. Deployment</h2>
+<h3 id="deployment-modes">Deployment Modes</h3>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 36%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mode</th>
+<th>When Used</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fresh Install</strong></td>
+<td>No existing deployment</td>
+<td>Full infrastructure creation</td>
+</tr>
+<tr>
+<td><strong>Update</strong></td>
+<td>Existing deployment, newer version</td>
+<td>Incremental update</td>
+</tr>
+<tr>
+<td><strong>Rollback</strong></td>
+<td>After failed update</td>
+<td>Restore from snapshot</td>
+</tr>
+</tbody>
+</table>
+<h3 id="deployment-process">Deployment Process</h3>
+<p><strong>Step 1: Select Application</strong> - Choose the RADIANT platform instance to deploy</p>
+<p><strong>Step 2: Select Environment</strong> - Development, Staging, or Production</p>
+<p><strong>Step 3: Configure Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tier</strong></td>
+<td>Infrastructure size</td>
+<td>Based on use case</td>
+</tr>
+<tr>
+<td><strong>Region</strong></td>
+<td>AWS region</td>
+<td>us-east-1</td>
+</tr>
+<tr>
+<td><strong>Multi-AZ</strong></td>
+<td>High availability</td>
+<td>Growth+ tiers</td>
+</tr>
+<tr>
+<td><strong>Self-Hosted Models</strong></td>
+<td>SageMaker endpoints</td>
+<td>Growth+ tiers</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Step 4: Review &amp; Deploy</strong> - Review all settings - Click <strong>Deploy</strong> to begin - Monitor progress in the deployment log</p>
+<h3 id="tier-levels">Tier Levels</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Monthly Cost</th>
+<th>Use Case</th>
+<th>Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SEED</strong></td>
+<td>$50-150</td>
+<td>Development</td>
+<td>Minimal resources</td>
+</tr>
+<tr>
+<td><strong>STARTER</strong></td>
+<td>$200-400</td>
+<td>Small production</td>
+<td>WAF, GuardDuty</td>
+</tr>
+<tr>
+<td><strong>GROWTH</strong></td>
+<td>$1,000-2,500</td>
+<td>Medium production</td>
+<td>Self-hosted models</td>
+</tr>
+<tr>
+<td><strong>SCALE</strong></td>
+<td>$4,000-8,000</td>
+<td>Large production</td>
+<td>Multi-region</td>
+</tr>
+<tr>
+<td><strong>ENTERPRISE</strong></td>
+<td>$15,000-35,000</td>
+<td>Global deployment</td>
+<td>Full features</td>
+</tr>
+</tbody>
+</table>
+<h3 id="deployment-log">Deployment Log</h3>
+<p>The deployment log shows real-time progress:</p>
+<pre><code>[12:00:01] Starting deployment v5.52.17...
+[12:00:02] ✓ Credentials validated
+[12:00:05] ✓ Package downloaded (45.2 MB)
+[12:00:10] → Deploying NetworkStack...
+[12:02:30] ✓ NetworkStack deployed
+[12:02:31] → Deploying DatabaseStack...
+[12:05:45] ✓ DatabaseStack deployed
+...
+[12:15:00] ✓ Deployment complete!</code></pre>
+<hr />
+<h2 id="domain-url-configuration">9. Domain URL Configuration</h2>
+<h3 id="overview-1">Overview</h3>
+<p>Configure how users access each RADIANT application.</p>
+<h3 id="routing-strategies">Routing Strategies</h3>
+<p><strong>Subdomain-Based</strong>:</p>
+<pre><code>admin.acme.radiant.ai      → RADIANT Admin
+thinktank-admin.acme.radiant.ai → Think Tank Admin
+curator.acme.radiant.ai    → Curator
+app.acme.radiant.ai        → Think Tank
+api.acme.radiant.ai        → External API</code></pre>
+<p><strong>Path-Based</strong> (Default):</p>
+<pre><code>acme.radiant.ai/admin           → RADIANT Admin
+acme.radiant.ai/thinktank-admin → Think Tank Admin
+acme.radiant.ai/curator         → Curator
+acme.radiant.ai/                → Think Tank
+acme.radiant.ai/api             → External API</code></pre>
+<h3 id="configuration-steps">Configuration Steps</h3>
+<p><strong>Step 1: Enter Base Domain</strong> - Enter your domain without protocol: <code>acme.radiant.ai</code></p>
+<p><strong>Step 2: Choose Routing Strategy</strong> - Subdomain: Each app on its own subdomain - Path-Based: All apps under one domain with paths</p>
+<p><strong>Step 3: Configure Per-App Settings</strong> - Enable/disable optional apps - Customize subdomains or paths - Set cache policies</p>
+<p><strong>Step 4: Validate DNS</strong> - Click <strong>Validate</strong> to check DNS configuration - Green checkmarks indicate proper setup</p>
+<h3 id="dns-records">DNS Records</h3>
+<p>For <strong>subdomain-based</strong> routing, create these DNS records:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CNAME</td>
+<td>admin</td>
+<td>d123456.cloudfront.net</td>
+</tr>
+<tr>
+<td>CNAME</td>
+<td>app</td>
+<td>d123456.cloudfront.net</td>
+</tr>
+<tr>
+<td>CNAME</td>
+<td>api</td>
+<td>d123456.cloudfront.net</td>
+</tr>
+<tr>
+<td>CNAME</td>
+<td>curator</td>
+<td>d123456.cloudfront.net</td>
+</tr>
+<tr>
+<td>CNAME</td>
+<td>thinktank-admin</td>
+<td>d123456.cloudfront.net</td>
+</tr>
+</tbody>
+</table>
+<p>For <strong>path-based</strong> routing:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A (ALIAS)</td>
+<td>@</td>
+<td>d123456.cloudfront.net</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ssl-certificates">SSL Certificates</h3>
+<p>The deployer automatically provisions SSL certificates via AWS ACM:</p>
+<ol type="1">
+<li>ACM requests certificate for your domain</li>
+<li>Validation records are displayed</li>
+<li>Add CNAME records to your DNS</li>
+<li>Wait for validation (usually 5-30 minutes)</li>
+<li>Certificate is automatically attached to CloudFront</li>
+</ol>
+<hr />
+<h2 id="feature-flags">10. Feature Flags</h2>
+<h3 id="overview-2">Overview</h3>
+<p>Control which platform features are enabled for deployment.</p>
+<h3 id="core-features">Core Features</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cortex Memory</strong></td>
+<td>✓ On</td>
+<td>Three-tier memory system (Hot/Warm/Cold)</td>
+</tr>
+<tr>
+<td><strong>Ego System</strong></td>
+<td>✓ On</td>
+<td>Zero-cost persistent AI identity</td>
+</tr>
+<tr>
+<td><strong>Compliance Export</strong></td>
+<td>✓ On</td>
+<td>HIPAA, SOC2, GDPR-formatted exports</td>
+</tr>
+</tbody>
+</table>
+<h3 id="think-tank-features">Think Tank Features</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Time Machine</strong></td>
+<td>✓ On</td>
+<td>Fork conversations, create checkpoints</td>
+</tr>
+<tr>
+<td><strong>Collaboration</strong></td>
+<td>✓ On</td>
+<td>Real-time multi-user sessions</td>
+</tr>
+</tbody>
+</table>
+<h3 id="optional-applications">Optional Applications</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Default</th>
+<th>Minimum Tier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Curator</strong></td>
+<td>On</td>
+<td>Growth</td>
+</tr>
+</tbody>
+</table>
+<h3 id="infrastructure-features">Infrastructure Features</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Default</th>
+<th>Minimum Tier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Self-Hosted Models</strong></td>
+<td>Off</td>
+<td>Growth</td>
+</tr>
+<tr>
+<td><strong>Multi-Region</strong></td>
+<td>Off</td>
+<td>Scale</td>
+</tr>
+</tbody>
+</table>
+<h3 id="accessing-feature-flags">Accessing Feature Flags</h3>
+<ol type="1">
+<li>Go to <strong>Settings</strong> → <strong>Features</strong> tab</li>
+<li>Toggle features on/off</li>
+<li>Click <strong>Apply</strong> to save</li>
+<li>Redeploy to activate changes</li>
+</ol>
+<hr />
+<h2 id="ai-registry">11. AI Registry</h2>
+<h3 id="providers-tab">Providers Tab</h3>
+<p>View and configure AI providers:</p>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Models</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>OpenAI</strong></td>
+<td>GPT-4o, GPT-4-turbo, etc.</td>
+<td>Active</td>
+</tr>
+<tr>
+<td><strong>Anthropic</strong></td>
+<td>Claude 3.5 Sonnet, etc.</td>
+<td>Active</td>
+</tr>
+<tr>
+<td><strong>Google</strong></td>
+<td>Gemini 1.5 Pro, etc.</td>
+<td>Active</td>
+</tr>
+<tr>
+<td><strong>Amazon Bedrock</strong></td>
+<td>Claude, Titan, etc.</td>
+<td>Active</td>
+</tr>
+<tr>
+<td><strong>Self-Hosted</strong></td>
+<td>Custom models</td>
+<td>Configure</td>
+</tr>
+</tbody>
+</table>
+<h3 id="adding-provider-keys">Adding Provider Keys</h3>
+<ol type="1">
+<li>Click <strong>Add Provider</strong></li>
+<li>Select provider from dropdown</li>
+<li>Enter API key</li>
+<li>Click <strong>Validate</strong> to test connection</li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<p>Keys are securely stored in AWS Secrets Manager.</p>
+<h3 id="models-tab">Models Tab</h3>
+<p>View all available AI models:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  AI Models                                         Filter: All  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  GPT-4o                    OpenAI           $2.50/1M tokens     │
+│  ├─ Context: 128K          Speed: Fast      Quality: Excellent  │
+│                                                                  │
+│  Claude 3.5 Sonnet         Anthropic        $3.00/1M tokens     │
+│  ├─ Context: 200K          Speed: Fast      Quality: Excellent  │
+│                                                                  │
+│  Gemini 1.5 Pro            Google           $1.25/1M tokens     │
+│  ├─ Context: 1M            Speed: Medium    Quality: Very Good  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="model-categories">Model Categories</h3>
+<p>Models are organized by capability:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Reasoning</strong></td>
+<td>Complex analysis, decision-making</td>
+</tr>
+<tr>
+<td><strong>Creative</strong></td>
+<td>Writing, brainstorming</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td>Programming, debugging</td>
+</tr>
+<tr>
+<td><strong>Fast</strong></td>
+<td>Quick responses, low latency</td>
+</tr>
+<tr>
+<td><strong>Vision</strong></td>
+<td>Image analysis</td>
+</tr>
+<tr>
+<td><strong>Embedding</strong></td>
+<td>Vector search</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="self-hosted-models">12. Self-Hosted Models</h2>
+<h3 id="overview-3">Overview</h3>
+<p>Deploy AI models on your own AWS infrastructure for: - Data sovereignty - Reduced latency - Cost optimization at scale - Custom fine-tuned models</p>
+<h3 id="supported-models">Supported Models</h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Size</th>
+<th>Instance Type</th>
+<th>Monthly Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Llama 3.1 8B</td>
+<td>8B</td>
+<td>ml.g5.xlarge</td>
+<td>~$150</td>
+</tr>
+<tr>
+<td>Llama 3.1 70B</td>
+<td>70B</td>
+<td>ml.g5.12xlarge</td>
+<td>~$1,200</td>
+</tr>
+<tr>
+<td>Mixtral 8x7B</td>
+<td>46.7B</td>
+<td>ml.g5.4xlarge</td>
+<td>~$400</td>
+</tr>
+<tr>
+<td>CodeLlama 34B</td>
+<td>34B</td>
+<td>ml.g5.2xlarge</td>
+<td>~$300</td>
+</tr>
+</tbody>
+</table>
+<h3 id="deployment-steps">Deployment Steps</h3>
+<ol type="1">
+<li>Go to <strong>Self-Hosted</strong> tab</li>
+<li>Click <strong>Add Model</strong></li>
+<li>Select model from catalog</li>
+<li>Choose instance type</li>
+<li>Set scaling parameters</li>
+<li>Click <strong>Deploy</strong></li>
+</ol>
+<h3 id="thermal-states">Thermal States</h3>
+<p>Self-hosted models have thermal states to optimize costs:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Description</th>
+<th>Response Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>HOT</strong></td>
+<td>Running, ready</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td><strong>WARM</strong></td>
+<td>Scaled down, quick start</td>
+<td>30-60 seconds</td>
+</tr>
+<tr>
+<td><strong>COLD</strong></td>
+<td>Stopped</td>
+<td>3-5 minutes</td>
+</tr>
+<tr>
+<td><strong>OFF</strong></td>
+<td>Deleted</td>
+<td>Full deploy</td>
+</tr>
+</tbody>
+</table>
+<h3 id="auto-scaling">Auto-Scaling</h3>
+<p>Configure auto-scaling based on: - Request count - Queue depth - Time of day (scheduled)</p>
+<hr />
+<h2 id="multi-region-deployment">13. Multi-Region Deployment</h2>
+<h3 id="overview-4">Overview</h3>
+<p>Deploy RADIANT across multiple AWS regions for: - Geographic redundancy - Reduced latency for global users - Disaster recovery</p>
+<h3 id="supported-regions">Supported Regions</h3>
+<table>
+<thead>
+<tr>
+<th>Region</th>
+<th>Location</th>
+<th>Latency Zone</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>us-east-1</td>
+<td>N. Virginia</td>
+<td>Americas</td>
+</tr>
+<tr>
+<td>us-west-2</td>
+<td>Oregon</td>
+<td>Americas</td>
+</tr>
+<tr>
+<td>eu-west-1</td>
+<td>Ireland</td>
+<td>Europe</td>
+</tr>
+<tr>
+<td>eu-central-1</td>
+<td>Frankfurt</td>
+<td>Europe</td>
+</tr>
+<tr>
+<td>ap-southeast-1</td>
+<td>Singapore</td>
+<td>Asia</td>
+</tr>
+<tr>
+<td>ap-northeast-1</td>
+<td>Tokyo</td>
+<td>Asia</td>
+</tr>
+</tbody>
+</table>
+<h3 id="configuration">Configuration</h3>
+<ol type="1">
+<li>Go to <strong>Multi-Region</strong> tab</li>
+<li>Select primary region</li>
+<li>Add secondary regions</li>
+<li>Configure replication:
+<ul>
+<li><strong>Database</strong>: Aurora Global Database</li>
+<li><strong>Storage</strong>: S3 Cross-Region Replication</li>
+<li><strong>API</strong>: Route53 latency-based routing</li>
+</ul></li>
+</ol>
+<h3 id="failover">Failover</h3>
+<p>Automatic failover when: - Primary region health check fails - Manual failover triggered - Scheduled maintenance</p>
+<hr />
+<h2 id="security-compliance">14. Security &amp; Compliance</h2>
+<h3 id="security-tab">Security Tab</h3>
+<p>Configure security features:</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>WAF</strong></td>
+<td>Web Application Firewall</td>
+<td>On (Starter+)</td>
+</tr>
+<tr>
+<td><strong>GuardDuty</strong></td>
+<td>Threat detection</td>
+<td>On (Starter+)</td>
+</tr>
+<tr>
+<td><strong>Shield</strong></td>
+<td>DDoS protection</td>
+<td>Standard</td>
+</tr>
+<tr>
+<td><strong>VPC Flow Logs</strong></td>
+<td>Network monitoring</td>
+<td>On</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compliance-tab">Compliance Tab</h3>
+<h4 id="hipaa-compliance">HIPAA Compliance</h4>
+<p>Enable for healthcare data: - PHI encryption at rest and in transit - Audit logging for all data access - BAA documentation - Access controls</p>
+<h4 id="soc2-compliance">SOC2 Compliance</h4>
+<p>Enable for enterprise: - Comprehensive audit trails - Access reviews - Incident response procedures - Vendor management</p>
+<h4 id="gdpr-compliance">GDPR Compliance</h4>
+<p>Enable for EU data: - Data subject access requests - Right to erasure - Data portability - Consent management</p>
+<h3 id="compliance-reports">Compliance Reports</h3>
+<p>Generate compliance reports:</p>
+<ol type="1">
+<li>Go to <strong>Compliance</strong> tab</li>
+<li>Select report type</li>
+<li>Choose date range</li>
+<li>Click <strong>Generate</strong></li>
+<li>Download PDF or JSON</li>
+</ol>
+<hr />
+<h2 id="cost-management">15. Cost Management</h2>
+<h3 id="costs-tab">Costs Tab</h3>
+<p>View and manage AWS costs:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  Cost Overview                              January 2026         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Month-to-Date:  $1,234.56                                      │
+│  Projected:      $2,100.00                                      │
+│  Budget:         $2,500.00                    ████████░░ 84%    │
+│                                                                  │
+│  ┌────────────────────────────────────────────────────────┐    │
+│  │  Cost Breakdown                                         │    │
+│  │  ────────────────────────────────────────────────────   │    │
+│  │  Aurora PostgreSQL    $450.00   ████████████░░░░ 36%   │    │
+│  │  Lambda               $280.00   ████████░░░░░░░░ 23%   │    │
+│  │  SageMaker            $200.00   ██████░░░░░░░░░░ 16%   │    │
+│  │  S3 Storage           $120.00   ████░░░░░░░░░░░░ 10%   │    │
+│  │  CloudFront           $100.00   ███░░░░░░░░░░░░░  8%   │    │
+│  │  Other                 $84.56   ██░░░░░░░░░░░░░░  7%   │    │
+│  └────────────────────────────────────────────────────────┘    │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="cost-optimization">Cost Optimization</h3>
+<p>The deployer includes automatic cost optimization:</p>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 29%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Savings</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Thermal Management</strong></td>
+<td>30-70%</td>
+<td>Scale down idle models</td>
+</tr>
+<tr>
+<td><strong>Semantic Cache</strong></td>
+<td>20-40%</td>
+<td>Cache repeated queries</td>
+</tr>
+<tr>
+<td><strong>Model Routing</strong></td>
+<td>40-60%</td>
+<td>Route to cheaper models when appropriate</td>
+</tr>
+<tr>
+<td><strong>Reserved Capacity</strong></td>
+<td>30-50%</td>
+<td>Pre-purchase compute capacity</td>
+</tr>
+</tbody>
+</table>
+<h3 id="budget-alerts">Budget Alerts</h3>
+<p>Set up budget alerts:</p>
+<ol type="1">
+<li>Go to <strong>Costs</strong> tab</li>
+<li>Click <strong>Set Budget</strong></li>
+<li>Enter monthly budget amount</li>
+<li>Configure alert thresholds (50%, 75%, 90%, 100%)</li>
+<li>Add notification emails</li>
+</ol>
+<hr />
+<h2 id="monitoring">16. Monitoring</h2>
+<h3 id="monitoring-tab">Monitoring Tab</h3>
+<p>Real-time monitoring dashboard:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  System Health                                                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  API Latency          45ms     ✓ Healthy                        │
+│  Database             12ms     ✓ Healthy                        │
+│  Lambda Cold Starts   2.3%     ✓ Healthy                        │
+│  Error Rate           0.01%    ✓ Healthy                        │
+│                                                                  │
+│  ┌────────────────────────────────────────────────────────┐    │
+│  │  Request Volume (Last 24h)                              │    │
+│  │  ▁▂▃▄▅▆▇█▇▆▅▄▃▂▁▂▃▄▅▆▇█▇▆▅▄▃▂▁▂▃▄▅▆▇█              │    │
+│  │  12am    6am    12pm    6pm    12am                     │    │
+│  └────────────────────────────────────────────────────────┘    │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="health-checks">Health Checks</h3>
+<p>Automatic health checks run every 60 seconds:</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Description</th>
+<th>Threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>API Gateway</strong></td>
+<td>Endpoint availability</td>
+<td>99.9%</td>
+</tr>
+<tr>
+<td><strong>Lambda</strong></td>
+<td>Function execution</td>
+<td>&lt;5s p99</td>
+</tr>
+<tr>
+<td><strong>Database</strong></td>
+<td>Connection pool</td>
+<td>&lt;90% utilized</td>
+</tr>
+<tr>
+<td><strong>Storage</strong></td>
+<td>S3 availability</td>
+<td>99.99%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="alerts">Alerts</h3>
+<p>Configure alerts for: - Error rate spikes - Latency increases - Resource exhaustion - Security events</p>
+<hr />
+<h2 id="snapshots-rollbacks">17. Snapshots &amp; Rollbacks</h2>
+<h3 id="snapshots-tab">Snapshots Tab</h3>
+<p>View and manage deployment snapshots:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  Deployment Snapshots                                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  📸 snap-2026-01-24-pre-update                                  │
+│     Created: Jan 24, 2026 6:00 AM   Size: 2.3 GB                │
+│     Version: 5.52.16   Reason: Pre-update backup                │
+│     [Restore] [Download] [Delete]                                │
+│                                                                  │
+│  📸 snap-2026-01-20-manual                                      │
+│     Created: Jan 20, 2026 3:00 PM   Size: 2.1 GB                │
+│     Version: 5.45.0    Reason: Manual backup                    │
+│     [Restore] [Download] [Delete]                                │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="creating-snapshots">Creating Snapshots</h3>
+<p>Snapshots are created automatically: - Before every update deployment - Before rollbacks - On a scheduled basis (configurable)</p>
+<p>Manual snapshots: 1. Click <strong>Create Snapshot</strong> 2. Enter description 3. Choose components to include 4. Click <strong>Create</strong></p>
+<h3 id="rollback-process">Rollback Process</h3>
+<ol type="1">
+<li>Go to <strong>Snapshots</strong> tab</li>
+<li>Select snapshot to restore</li>
+<li>Click <strong>Restore</strong></li>
+<li>Confirm the rollback</li>
+<li>Monitor restoration progress</li>
+</ol>
+<hr />
+<h2 id="package-management">18. Package Management</h2>
+<h3 id="packages-tab">Packages Tab</h3>
+<p>Manage deployment packages:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  Deployment Packages                                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  📦 radiant-5.52.17-stable.tar.gz          ✓ Current            │
+│     Channel: Stable   Size: 45.2 MB   Downloaded: Jan 24        │
+│                                                                  │
+│  📦 radiant-5.52.16-stable.tar.gz                               │
+│     Channel: Stable   Size: 44.8 MB   Downloaded: Jan 20        │
+│                                                                  │
+│  📦 radiant-5.53.0-beta.tar.gz                                  │
+│     Channel: Beta     Size: 46.1 MB   Downloaded: Jan 23        │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="release-channels">Release Channels</h3>
+<table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Description</th>
+<th>Stability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Stable</strong></td>
+<td>Production-ready releases</td>
+<td>Highest</td>
+</tr>
+<tr>
+<td><strong>Beta</strong></td>
+<td>Pre-release testing</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Canary</strong></td>
+<td>Experimental features</td>
+<td>Low</td>
+</tr>
+</tbody>
+</table>
+<h3 id="package-operations">Package Operations</h3>
+<ul>
+<li><strong>Download</strong>: Get latest package from channel</li>
+<li><strong>Verify</strong>: Check package integrity</li>
+<li><strong>Inspect</strong>: View package contents</li>
+<li><strong>Delete</strong>: Remove old packages</li>
+</ul>
+<hr />
+<h2 id="settings">19. Settings</h2>
+<h3 id="general-settings">General Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Theme</strong></td>
+<td>Light/Dark/System</td>
+<td>System</td>
+</tr>
+<tr>
+<td><strong>Notifications</strong></td>
+<td>Desktop notifications</td>
+<td>On</td>
+</tr>
+<tr>
+<td><strong>Auto-Update</strong></td>
+<td>Check for updates</td>
+<td>On</td>
+</tr>
+<tr>
+<td><strong>Telemetry</strong></td>
+<td>Anonymous usage data</td>
+<td>Off</td>
+</tr>
+</tbody>
+</table>
+<h3 id="credentials-settings">Credentials Settings</h3>
+<p>Manage 1Password integration and AWS credentials.</p>
+<h3 id="features-settings">Features Settings</h3>
+<p>Configure feature flags (see <a href="#10-feature-flags">Section 10</a>).</p>
+<h3 id="ai-assistant-settings">AI Assistant Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Enabled</strong></td>
+<td>Use AI for assistance</td>
+<td>On</td>
+</tr>
+<tr>
+<td><strong>Model</strong></td>
+<td>AI model to use</td>
+<td>GPT-4o</td>
+</tr>
+<tr>
+<td><strong>Voice Input</strong></td>
+<td>Enable voice commands</td>
+<td>Off</td>
+</tr>
+</tbody>
+</table>
+<h3 id="timeout-settings">Timeout Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Default</th>
+<th>Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Deployment</strong></td>
+<td>30 min</td>
+<td>10-60 min</td>
+</tr>
+<tr>
+<td><strong>Health Check</strong></td>
+<td>30 sec</td>
+<td>10-120 sec</td>
+</tr>
+<tr>
+<td><strong>API Calls</strong></td>
+<td>60 sec</td>
+<td>10-300 sec</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage-settings">Storage Settings</h3>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 41%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cache Location</strong></td>
+<td>Package cache</td>
+<td>~/Library/Caches/RadiantDeployer</td>
+</tr>
+<tr>
+<td><strong>Max Cache Size</strong></td>
+<td>Maximum cache</td>
+<td>5 GB</td>
+</tr>
+<tr>
+<td><strong>Log Retention</strong></td>
+<td>Keep logs for</td>
+<td>30 days</td>
+</tr>
+</tbody>
+</table>
+<h3 id="advanced-settings">Advanced Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Debug Mode</strong></td>
+<td>Verbose logging</td>
+<td>Off</td>
+</tr>
+<tr>
+<td><strong>Dry Run</strong></td>
+<td>Simulate deployments</td>
+<td>Off</td>
+</tr>
+<tr>
+<td><strong>Parallel Stacks</strong></td>
+<td>Concurrent deployments</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="ai-assistant">20. AI Assistant</h2>
+<h3 id="overview-5">Overview</h3>
+<p>The built-in AI Assistant helps with: - Deployment planning - Troubleshooting - Cost optimization - Configuration recommendations</p>
+<h3 id="activation">Activation</h3>
+<p>Press <strong>⌘ + Shift + A</strong> or click the sparkles icon in the toolbar.</p>
+<h3 id="example-queries">Example Queries</h3>
+<pre><code>&quot;What&#39;s the best tier for 500 users?&quot;
+&quot;Why is my deployment failing?&quot;
+&quot;How can I reduce costs?&quot;
+&quot;Explain the Cortex memory system&quot;
+&quot;Generate a compliance report for SOC2&quot;</code></pre>
+<h3 id="voice-commands">Voice Commands</h3>
+<p>Enable voice input in Settings → AI Assistant:</p>
+<ol type="1">
+<li>Click the microphone icon</li>
+<li>Speak your command</li>
+<li>Review and confirm</li>
+</ol>
+<hr />
+<h2 id="troubleshooting">21. Troubleshooting</h2>
+<h3 id="common-issues">Common Issues</h3>
+<h4 id="password-not-detected">1Password Not Detected</h4>
+<p><strong>Symptom</strong>: “1Password CLI not found” error</p>
+<p><strong>Solution</strong>:</p>
+<pre class="bash"><code># Install CLI
+brew install 1password-cli
+
+# Enable integration in 1Password app
+# Settings → Developer → Integrate with 1Password CLI
+
+# Test
+op signin</code></pre>
+<h4 id="deployment-stuck">Deployment Stuck</h4>
+<p><strong>Symptom</strong>: Deployment hangs at a specific stack</p>
+<p><strong>Solution</strong>: 1. Check CloudFormation console for detailed error 2. Review deployment logs in the app 3. Check AWS service quotas 4. Ensure IAM permissions are correct</p>
+<h4 id="dns-validation-failing">DNS Validation Failing</h4>
+<p><strong>Symptom</strong>: SSL certificate stuck in “Pending Validation”</p>
+<p><strong>Solution</strong>: 1. Verify CNAME records are correct 2. Wait up to 30 minutes for DNS propagation 3. Use <code>dig</code> to verify records: <code>bash    dig _acme-challenge.yourdomain.com CNAME</code></p>
+<h4 id="health-check-failures">Health Check Failures</h4>
+<p><strong>Symptom</strong>: Applications showing “Unhealthy”</p>
+<p><strong>Solution</strong>: 1. Check CloudWatch logs for errors 2. Verify Lambda functions are not timing out 3. Check database connectivity 4. Review security group rules</p>
+<h3 id="getting-help">Getting Help</h3>
+<ol type="1">
+<li><strong>Documentation</strong>: Press <strong>⌘ + ?</strong> for contextual help</li>
+<li><strong>AI Assistant</strong>: Ask the built-in assistant</li>
+<li><strong>Logs</strong>: Export logs from Settings → Storage → Export Logs</li>
+<li><strong>Support</strong>: Contact support@radiant.ai</li>
+</ol>
+<hr />
+<h2 id="keyboard-shortcuts">22. Keyboard Shortcuts</h2>
+<h3 id="global">Global</h3>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>⌘ + ,</strong></td>
+<td>Open Settings</td>
+</tr>
+<tr>
+<td><strong>⌘ + R</strong></td>
+<td>Refresh</td>
+</tr>
+<tr>
+<td><strong>⌘ + N</strong></td>
+<td>New Deployment</td>
+</tr>
+<tr>
+<td><strong>⌘ + Shift + A</strong></td>
+<td>AI Assistant</td>
+</tr>
+<tr>
+<td><strong>⌘ + ?</strong></td>
+<td>Help</td>
+</tr>
+<tr>
+<td><strong>⌘ + Q</strong></td>
+<td>Quit</td>
+</tr>
+</tbody>
+</table>
+<h3 id="navigation">Navigation</h3>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>⌘ + 1</strong></td>
+<td>Dashboard</td>
+</tr>
+<tr>
+<td><strong>⌘ + 2</strong></td>
+<td>Apps</td>
+</tr>
+<tr>
+<td><strong>⌘ + 3</strong></td>
+<td>Deploy</td>
+</tr>
+<tr>
+<td><strong>⌘ + 4</strong></td>
+<td>Instances</td>
+</tr>
+<tr>
+<td><strong>⌘ + 5</strong></td>
+<td>Settings</td>
+</tr>
+</tbody>
+</table>
+<h3 id="deployment-1">Deployment</h3>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>⌘ + D</strong></td>
+<td>Start Deployment</td>
+</tr>
+<tr>
+<td><strong>⌘ + .</strong></td>
+<td>Cancel Deployment</td>
+</tr>
+<tr>
+<td><strong>⌘ + L</strong></td>
+<td>View Logs</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="glossary">23. Glossary</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Aurora</strong></td>
+<td>AWS managed PostgreSQL database service</td>
+</tr>
+<tr>
+<td><strong>CDK</strong></td>
+<td>AWS Cloud Development Kit for infrastructure as code</td>
+</tr>
+<tr>
+<td><strong>CloudFront</strong></td>
+<td>AWS content delivery network (CDN)</td>
+</tr>
+<tr>
+<td><strong>Cortex</strong></td>
+<td>RADIANT’s three-tier memory system</td>
+</tr>
+<tr>
+<td><strong>Curator</strong></td>
+<td>Knowledge graph curation application</td>
+</tr>
+<tr>
+<td><strong>Ego System</strong></td>
+<td>Zero-cost persistent AI identity system</td>
+</tr>
+<tr>
+<td><strong>Lambda</strong></td>
+<td>AWS serverless compute service</td>
+</tr>
+<tr>
+<td><strong>Multi-AZ</strong></td>
+<td>Multiple availability zones for high availability</td>
+</tr>
+<tr>
+<td><strong>SageMaker</strong></td>
+<td>AWS machine learning service for self-hosted models</td>
+</tr>
+<tr>
+<td><strong>Think Tank</strong></td>
+<td>RADIANT’s consumer AI chat application</td>
+</tr>
+<tr>
+<td><strong>Thermal State</strong></td>
+<td>Model readiness level (HOT/WARM/COLD/OFF)</td>
+</tr>
+<tr>
+<td><strong>Tier</strong></td>
+<td>Infrastructure size level (SEED to ENTERPRISE)</td>
+</tr>
+<tr>
+<td><strong>WAF</strong></td>
+<td>Web Application Firewall</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="document-information">Document Information</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Version</strong></td>
+<td>5.52.17</td>
+</tr>
+<tr>
+<td><strong>Last Updated</strong></td>
+<td>January 24, 2026</td>
+</tr>
+<tr>
+<td><strong>Author</strong></td>
+<td>RADIANT Team</td>
+</tr>
+<tr>
+<td><strong>Status</strong></td>
+<td>Published</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>For additional support, contact support@radiant.ai or visit docs.radiant.ai</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

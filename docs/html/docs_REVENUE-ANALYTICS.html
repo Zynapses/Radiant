@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REVENUE ANALYTICS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>REVENUE ANALYTICS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/REVENUE-ANALYTICS.md</div>
+  </div>
+  
+  <h1 id="revenue-analytics-system">Revenue Analytics System</h1>
+<p><strong>Version</strong>: 4.18.3<br />
+<strong>Last Updated</strong>: 2024-12-28</p>
+<h2 id="overview">Overview</h2>
+<p>The Revenue Analytics system tracks gross revenue, cost of goods sold (COGS), and gross profit across all RADIANT products. It provides visibility into subscription billing, AI provider markup, self-hosted model revenue, and associated AWS/infrastructure costs.</p>
+<p><strong>Important</strong>: This system tracks <strong>gross revenue and COGS only</strong>. Marketing, sales, G&amp;A, and other operating expenses must be subtracted separately in your accounting system to calculate net profit.</p>
+<hr />
+<h2 id="admin-dashboard-location">Admin Dashboard Location</h2>
+<p><strong>Path</strong>: Admin Dashboard → Revenue Analytics<br />
+<strong>URL</strong>: <code>/revenue</code></p>
+<hr />
+<h2 id="revenue-sources">Revenue Sources</h2>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 43%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Source</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>subscription</code></td>
+<td>Monthly/annual subscription fees</td>
+<td>Tier 3 Pro @ $99/month</td>
+</tr>
+<tr>
+<td><code>credit_purchase</code></td>
+<td>One-time credit purchases</td>
+<td>10,000 credits @ $50</td>
+</tr>
+<tr>
+<td><code>ai_markup_external</code></td>
+<td>Markup on external AI provider usage</td>
+<td>OpenAI, Anthropic, etc. (typically 20-35% markup)</td>
+</tr>
+<tr>
+<td><code>ai_markup_self_hosted</code></td>
+<td>Markup on self-hosted model usage</td>
+<td>SageMaker models (typically 75% markup on AWS cost)</td>
+</tr>
+<tr>
+<td><code>overage</code></td>
+<td>Usage beyond subscription limits</td>
+<td>Additional API calls beyond tier limit</td>
+</tr>
+<tr>
+<td><code>storage</code></td>
+<td>Storage fees</td>
+<td>User file storage, vector embeddings</td>
+</tr>
+<tr>
+<td><code>other</code></td>
+<td>Miscellaneous revenue</td>
+<td>Custom integrations, support fees</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cost-categories-cogs">Cost Categories (COGS)</h2>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 35%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Description</th>
+<th>AWS Services</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>aws_compute</code></td>
+<td>Compute infrastructure</td>
+<td>EC2, SageMaker, Lambda</td>
+</tr>
+<tr>
+<td><code>aws_storage</code></td>
+<td>Storage services</td>
+<td>S3, EBS, EFS</td>
+</tr>
+<tr>
+<td><code>aws_network</code></td>
+<td>Network and data transfer</td>
+<td>Data Transfer, API Gateway, CloudFront</td>
+</tr>
+<tr>
+<td><code>aws_database</code></td>
+<td>Database services</td>
+<td>Aurora PostgreSQL, DynamoDB</td>
+</tr>
+<tr>
+<td><code>external_ai</code></td>
+<td>External AI provider costs</td>
+<td>OpenAI API, Anthropic API, etc.</td>
+</tr>
+<tr>
+<td><code>infrastructure</code></td>
+<td>Other cloud costs</td>
+<td>Secrets Manager, CloudWatch, etc.</td>
+</tr>
+<tr>
+<td><code>platform_fees</code></td>
+<td>Payment processing</td>
+<td>Stripe fees (~2.9% + $0.30)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="dashboard-features">Dashboard Features</h2>
+<h3 id="summary-cards">Summary Cards</h3>
+<ul>
+<li><strong>Gross Revenue</strong>: Total revenue from all sources</li>
+<li><strong>Total COGS</strong>: Sum of all cost categories</li>
+<li><strong>Gross Profit</strong>: Revenue minus COGS</li>
+<li><strong>Gross Margin</strong>: (Profit / Revenue) × 100%</li>
+</ul>
+<h3 id="time-period-selection">Time Period Selection</h3>
+<table>
+<thead>
+<tr>
+<th>Period</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7d</td>
+<td>Last 7 days</td>
+</tr>
+<tr>
+<td>30d</td>
+<td>Last 30 days (default)</td>
+</tr>
+<tr>
+<td>90d</td>
+<td>Last 90 days</td>
+</tr>
+<tr>
+<td>YTD</td>
+<td>Year to date</td>
+</tr>
+<tr>
+<td>12m</td>
+<td>Last 12 months</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tabs">Tabs</h3>
+<ol type="1">
+<li><strong>Revenue Breakdown</strong>: Revenue by source with visual progress bars</li>
+<li><strong>Cost Breakdown</strong>: AWS costs and external provider costs</li>
+<li><strong>By Model</strong>: Per-model revenue with provider cost vs customer charge</li>
+<li><strong>By Tenant</strong>: Top tenants by total revenue</li>
+</ol>
+<hr />
+<h2 id="export-formats">Export Formats</h2>
+<h3 id="available-formats">Available Formats</h3>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>File Extension</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CSV</td>
+<td><code>.csv</code></td>
+<td>Summary for spreadsheets (Excel, Google Sheets)</td>
+</tr>
+<tr>
+<td>JSON</td>
+<td><code>.json</code></td>
+<td>Full details for custom integrations</td>
+</tr>
+<tr>
+<td>QuickBooks IIF</td>
+<td><code>.iif</code></td>
+<td>Direct import to QuickBooks Desktop</td>
+</tr>
+<tr>
+<td>Xero CSV</td>
+<td><code>.csv</code></td>
+<td>Import to Xero accounting</td>
+</tr>
+<tr>
+<td>Sage CSV</td>
+<td><code>.csv</code></td>
+<td>Import to Sage accounting</td>
+</tr>
+</tbody>
+</table>
+<h3 id="export-contents">Export Contents</h3>
+<p><strong>CSV Summary Export:</strong></p>
+<pre class="csv"><code>Period Start,2024-12-01
+Period End,2024-12-28
+
+REVENUE,
+Subscription Revenue,15000.00
+Credit Purchase Revenue,2500.00
+AI Markup (External),8750.00
+AI Markup (Self-Hosted),3200.00
+...
+TOTAL GROSS REVENUE,29450.00
+
+COSTS (COGS),
+AWS Compute,4500.00
+External AI Providers,7000.00
+...
+TOTAL COST,12500.00
+
+GROSS PROFIT,16950.00
+GROSS MARGIN,57.5%</code></pre>
+<p><strong>QuickBooks IIF Export:</strong> - Creates General Journal entries - Revenue accounts: Subscription Revenue, Credit Sales Revenue, AI Markup Revenue - Expense accounts: AWS Compute Expense, External AI Provider Expense - Includes CLASS for categorization</p>
+<hr />
+<h2 id="api-endpoints">API Endpoints</h2>
+<h3 id="get-apiadminrevenuedashboard">GET /api/admin/revenue/dashboard</h3>
+<p>Returns the revenue dashboard data.</p>
+<p><strong>Query Parameters:</strong> | Parameter | Type | Required | Description | |———–|——|———-|————-| | periodStart | ISO Date | Yes | Start of period | | periodEnd | ISO Date | Yes | End of period | | period | string | Yes | <code>day</code>, <code>week</code>, <code>month</code>, <code>quarter</code>, <code>year</code> | | tenantId | UUID | No | Filter to specific tenant |</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;summary&quot;: {
+    &quot;periodStart&quot;: &quot;2024-12-01T00:00:00Z&quot;,
+    &quot;periodEnd&quot;: &quot;2024-12-28T23:59:59Z&quot;,
+    &quot;subscriptionRevenue&quot;: 15000.00,
+    &quot;creditPurchaseRevenue&quot;: 2500.00,
+    &quot;aiMarkupExternalRevenue&quot;: 8750.00,
+    &quot;aiMarkupSelfHostedRevenue&quot;: 3200.00,
+    &quot;overageRevenue&quot;: 0,
+    &quot;storageRevenue&quot;: 0,
+    &quot;otherRevenue&quot;: 0,
+    &quot;totalGrossRevenue&quot;: 29450.00,
+    &quot;awsComputeCost&quot;: 4500.00,
+    &quot;awsStorageCost&quot;: 500.00,
+    &quot;awsNetworkCost&quot;: 200.00,
+    &quot;awsDatabaseCost&quot;: 800.00,
+    &quot;externalAiCost&quot;: 7000.00,
+    &quot;infrastructureCost&quot;: 300.00,
+    &quot;platformFeesCost&quot;: 850.00,
+    &quot;totalCost&quot;: 14150.00,
+    &quot;grossProfit&quot;: 15300.00,
+    &quot;grossMargin&quot;: 51.95
+  },
+  &quot;previousPeriodSummary&quot;: { ... },
+  &quot;trends&quot;: [
+    { &quot;date&quot;: &quot;2024-12-01&quot;, &quot;grossRevenue&quot;: 1050.00, &quot;totalCost&quot;: 450.00, ... }
+  ],
+  &quot;byTenant&quot;: [
+    { &quot;tenantId&quot;: &quot;uuid&quot;, &quot;tenantName&quot;: &quot;Acme Corp&quot;, &quot;totalRevenue&quot;: 5000.00, ... }
+  ],
+  &quot;byModel&quot;: [
+    { &quot;modelId&quot;: &quot;gpt-4o&quot;, &quot;hostingType&quot;: &quot;external&quot;, &quot;providerCost&quot;: 500.00, &quot;customerCharge&quot;: 650.00, ... }
+  ],
+  &quot;revenueChange&quot;: 12.5,
+  &quot;profitChange&quot;: 15.2,
+  &quot;marginChange&quot;: 2.1
+}</code></pre>
+<h3 id="post-apiadminrevenueexport">POST /api/admin/revenue/export</h3>
+<p>Exports revenue data in the specified format.</p>
+<p><strong>Request Body:</strong></p>
+<pre class="json"><code>{
+  &quot;format&quot;: &quot;quickbooks_iif&quot;,
+  &quot;periodStart&quot;: &quot;2024-12-01T00:00:00Z&quot;,
+  &quot;periodEnd&quot;: &quot;2024-12-28T23:59:59Z&quot;,
+  &quot;includeDetails&quot;: false,
+  &quot;tenantId&quot;: null
+}</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;filename&quot;: &quot;revenue_2024-12-01_2024-12-28.iif&quot;,
+  &quot;mimeType&quot;: &quot;text/plain&quot;,
+  &quot;data&quot;: &quot;base64-encoded-file-content&quot;,
+  &quot;recordCount&quot;: 14,
+  &quot;periodStart&quot;: &quot;2024-12-01T00:00:00Z&quot;,
+  &quot;periodEnd&quot;: &quot;2024-12-28T23:59:59Z&quot;
+}</code></pre>
+<hr />
+<h2 id="database-schema">Database Schema</h2>
+<h3 id="revenue_entries">revenue_entries</h3>
+<p>Individual revenue events.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>UUID</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td>tenant_id</td>
+<td>UUID</td>
+<td>FK to tenants</td>
+</tr>
+<tr>
+<td>source</td>
+<td>VARCHAR(30)</td>
+<td>Revenue source type</td>
+</tr>
+<tr>
+<td>amount</td>
+<td>DECIMAL(15,4)</td>
+<td>Revenue amount</td>
+</tr>
+<tr>
+<td>currency</td>
+<td>VARCHAR(3)</td>
+<td>Currency code (default: USD)</td>
+</tr>
+<tr>
+<td>description</td>
+<td>TEXT</td>
+<td>Description</td>
+</tr>
+<tr>
+<td>reference_id</td>
+<td>VARCHAR(255)</td>
+<td>Related subscription/transaction ID</td>
+</tr>
+<tr>
+<td>reference_type</td>
+<td>VARCHAR(50)</td>
+<td>Type of reference</td>
+</tr>
+<tr>
+<td>product</td>
+<td>VARCHAR(20)</td>
+<td><code>radiant</code>, <code>think_tank</code>, or <code>combined</code></td>
+</tr>
+<tr>
+<td>model_id</td>
+<td>VARCHAR(100)</td>
+<td>For AI markup revenue</td>
+</tr>
+<tr>
+<td>period_start</td>
+<td>TIMESTAMPTZ</td>
+<td>Period this revenue applies to</td>
+</tr>
+<tr>
+<td>period_end</td>
+<td>TIMESTAMPTZ</td>
+<td>Period end</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cost_entries">cost_entries</h3>
+<p>Infrastructure and provider costs.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>UUID</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td>tenant_id</td>
+<td>UUID</td>
+<td>FK to tenants (NULL for shared infra)</td>
+</tr>
+<tr>
+<td>category</td>
+<td>VARCHAR(30)</td>
+<td>Cost category</td>
+</tr>
+<tr>
+<td>amount</td>
+<td>DECIMAL(15,4)</td>
+<td>Cost amount</td>
+</tr>
+<tr>
+<td>aws_service_name</td>
+<td>VARCHAR(100)</td>
+<td>e.g., ‘SageMaker’, ‘Aurora’</td>
+</tr>
+<tr>
+<td>resource_id</td>
+<td>VARCHAR(255)</td>
+<td>AWS resource identifier</td>
+</tr>
+<tr>
+<td>provider_id</td>
+<td>VARCHAR(50)</td>
+<td>For external AI costs</td>
+</tr>
+<tr>
+<td>period_start</td>
+<td>TIMESTAMPTZ</td>
+<td>Period start</td>
+</tr>
+<tr>
+<td>period_end</td>
+<td>TIMESTAMPTZ</td>
+<td>Period end</td>
+</tr>
+</tbody>
+</table>
+<h3 id="revenue_daily_aggregates">revenue_daily_aggregates</h3>
+<p>Pre-computed daily summaries for fast queries.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>aggregate_date</td>
+<td>DATE</td>
+<td>The date</td>
+</tr>
+<tr>
+<td>tenant_id</td>
+<td>UUID</td>
+<td>NULL for platform totals</td>
+</tr>
+<tr>
+<td>subscription_revenue</td>
+<td>DECIMAL</td>
+<td>Daily subscription revenue</td>
+</tr>
+<tr>
+<td>ai_markup_external_revenue</td>
+<td>DECIMAL</td>
+<td>Daily external AI markup</td>
+</tr>
+<tr>
+<td>ai_markup_self_hosted_revenue</td>
+<td>DECIMAL</td>
+<td>Daily self-hosted markup</td>
+</tr>
+<tr>
+<td>total_gross_revenue</td>
+<td>DECIMAL</td>
+<td>Total for the day</td>
+</tr>
+<tr>
+<td>total_cost</td>
+<td>DECIMAL</td>
+<td>Total COGS for the day</td>
+</tr>
+<tr>
+<td>gross_profit</td>
+<td>DECIMAL</td>
+<td>Revenue - Cost</td>
+</tr>
+<tr>
+<td>gross_margin</td>
+<td>DECIMAL</td>
+<td>Percentage margin</td>
+</tr>
+</tbody>
+</table>
+<h3 id="model_revenue_tracking">model_revenue_tracking</h3>
+<p>Per-model revenue breakdown for markup analysis.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tracking_date</td>
+<td>DATE</td>
+<td>The date</td>
+</tr>
+<tr>
+<td>model_id</td>
+<td>VARCHAR(100)</td>
+<td>Model identifier</td>
+</tr>
+<tr>
+<td>hosting_type</td>
+<td>VARCHAR(20)</td>
+<td><code>external</code> or <code>self_hosted</code></td>
+</tr>
+<tr>
+<td>provider_cost</td>
+<td>DECIMAL</td>
+<td>What we pay</td>
+</tr>
+<tr>
+<td>customer_charge</td>
+<td>DECIMAL</td>
+<td>What customer pays</td>
+</tr>
+<tr>
+<td>markup</td>
+<td>DECIMAL</td>
+<td>customer_charge - provider_cost</td>
+</tr>
+<tr>
+<td>markup_percent</td>
+<td>DECIMAL</td>
+<td>Percentage markup</td>
+</tr>
+<tr>
+<td>request_count</td>
+<td>INTEGER</td>
+<td>Number of requests</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="markup-calculations">Markup Calculations</h2>
+<h3 id="external-ai-providers">External AI Providers</h3>
+<p>Default markup: <strong>20-35%</strong> on provider cost</p>
+<pre><code>Customer Price = Provider Cost × (1 + Markup Rate)
+Markup Revenue = Customer Price - Provider Cost</code></pre>
+<h3 id="self-hosted-models">Self-Hosted Models</h3>
+<p>Default markup: <strong>75%</strong> on AWS SageMaker cost</p>
+<pre><code>Hourly Customer Rate = AWS Hourly Cost × 1.75
+Per-Request Rate = AWS Cost + (AWS Cost × 0.75)</code></pre>
+<hr />
+<h2 id="accounting-integration-notes">Accounting Integration Notes</h2>
+<h3 id="quickbooks">QuickBooks</h3>
+<ul>
+<li>Import the <code>.iif</code> file via File → Utilities → Import → IIF Files</li>
+<li>Creates General Journal entries with appropriate accounts</li>
+<li>Requires accounts to exist: Subscription Revenue, AWS Compute Expense, etc.</li>
+</ul>
+<h3 id="xero">Xero</h3>
+<ul>
+<li>Import via Invoices → Import</li>
+<li>Maps to account codes (4000-series for revenue, 5000-series for expenses)</li>
+</ul>
+<h3 id="sage">Sage</h3>
+<ul>
+<li>Import via Transactions → Import</li>
+<li>Uses nominal codes matching Sage’s structure</li>
+</ul>
+<hr />
+<h2 id="permissions">Permissions</h2>
+<p>Revenue Analytics is visible only to: - <strong>Platform Admins</strong>: Full access to all tenant data - <strong>Tenant Admins</strong>: Access to their tenant’s revenue only (filtered view)</p>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./BILLING-CREDITS.md">Billing &amp; Credits</a></li>
+<li><a href="./COST-ANALYTICS.md">Cost Analytics</a></li>
+<li><a href="./sections/SECTION-31-MODEL-SELECTION-PRICING.md">Model Pricing</a></li>
+<li><a href="./sections/SECTION-36-UNIFIED-MODEL-REGISTRY.md">Unified Model Registry</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

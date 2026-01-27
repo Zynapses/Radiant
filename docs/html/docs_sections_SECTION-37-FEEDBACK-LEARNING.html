@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 37 FEEDBACK LEARNING - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 37 FEEDBACK LEARNING</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-37-FEEDBACK-LEARNING.md</div>
+  </div>
+  
+  <h1 id="section-37-feedback-learning-system-neural-engine-loop-v4.3.0">SECTION 37: FEEDBACK LEARNING SYSTEM &amp; NEURAL ENGINE LOOP (v4.3.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<blockquote>
+<p><strong>Dependencies:</strong> Sections 0-36, especially 11 (Brain) and 13 (Neural Engine) <strong>Creates:</strong> Complete feedback loop from user signals → Neural Engine → Brain decisions</p>
+</blockquote>
+<hr />
+<h2 id="feedback-system-overview">37.1 Feedback System Overview</h2>
+<p>The Feedback Learning System creates a closed-loop where user feedback continuously improves AI routing decisions. The system captures both explicit feedback (thumbs up/down) and implicit signals (regenerate, copy, abandon), ties each to a complete execution manifest, and feeds everything into the Neural Engine which advises the Brain.</p>
+<h3 id="architecture-flow">Architecture Flow</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           FEEDBACK LEARNING LOOP                                 │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  User Request ──────────────────────────────────────────────────────────────►   │
+│       │                                                                         │
+│       ▼                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                         RADIANT BRAIN                                    │   │
+│  │  • Consults Neural Engine for recommendations                            │   │
+│  │  • Considers user/tenant/global learning                                 │   │
+│  │  • Applies confidence thresholds                                         │   │
+│  │  • Selects orchestration → services → models                             │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│       │                                                                         │
+│       ▼                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                     EXECUTION MANIFEST                                   │   │
+│  │  Records: output_id, models[], versions[], orchestration_id,             │   │
+│  │           services[], thermal_states{}, provider_health{},               │   │
+│  │           brain_reasoning, latency_ms, cost, timestamp                   │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│       │                                                                         │
+│       ▼                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                         AI RESPONSE                                      │   │
+│  │  Delivered to user with output_id for feedback reference                 │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│       │                                                                         │
+│       ├───────────────────────┬───────────────────────────────┐                 │
+│       ▼                       ▼                               ▼                 │
+│  ┌──────────────┐      ┌──────────────┐              ┌──────────────┐          │
+│  │   EXPLICIT   │      │   IMPLICIT   │              │    VOICE     │          │
+│  │  👍 👎 + cat │      │  regenerate  │              │  🎤 any lang │          │
+│  │  + text      │      │  copy/share  │              │  transcribe  │          │
+│  └──────────────┘      │  abandon     │              │  translate   │          │
+│       │                │  switch model│              └──────────────┘          │
+│       │                └──────────────┘                     │                   │
+│       │                       │                             │                   │
+│       └───────────────────────┼─────────────────────────────┘                   │
+│                               ▼                                                 │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                       NEURAL ENGINE                                      │   │
+│  │  • Aggregates feedback by model/orchestration/service                    │   │
+│  │  • Updates model scores (individual → tenant → global)                   │   │
+│  │  • Applies confidence thresholds and decay                               │   │
+│  │  • Generates routing recommendations                                     │   │
+│  │  • Tracks A/B experiment outcomes                                        │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│       │                                                                         │
+│       ▼                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                    BRAIN INTELLIGENCE                                    │   │
+│  │  Real-time: Neural recommendations inform next Brain decision            │   │
+│  │  Batch: Nightly aggregation updates routing weights                      │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="learning-scope-hierarchy">Learning Scope Hierarchy</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────────┐
+│                          TIERED LEARNING SCOPE                                   │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  Priority 1: USER SCOPE (Most Personalized)                                     │
+│  ┌───────────────────────────────────────────────────────────────────────────┐ │
+│  │  • Alice&#39;s feedback improves Alice&#39;s experience                           │ │
+│  │  • Fast adaptation to individual preferences                              │ │
+│  │  • Requires minimum ~20 feedback samples for confidence                   │ │
+│  └───────────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                            │
+│                                    ▼                                            │
+│  Priority 2: TENANT SCOPE (Organization-Wide)                                   │
+│  ┌───────────────────────────────────────────────────────────────────────────┐ │
+│  │  • Company X&#39;s employees collectively train Company X&#39;s Brain             │ │
+│  │  • Isolated from Company Y (privacy boundary)                             │ │
+│  │  • Captures organizational preferences (e.g., &quot;we prefer Claude&quot;)         │ │
+│  └───────────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                            │
+│                                    ▼                                            │
+│  Priority 3: GLOBAL SCOPE (Platform-Wide, Anonymized)                          │
+│  ┌───────────────────────────────────────────────────────────────────────────┐ │
+│  │  • Aggregate patterns: &quot;Claude wins 73% for legal tasks&quot;                  │ │
+│  │  • Cold start defaults for new users/tenants                              │ │
+│  │  • Configurable opt-in/opt-out per tenant                                 │ │
+│  └───────────────────────────────────────────────────────────────────────────┘ │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="feedback-database-schema">37.2 Feedback Database Schema</h2>
+<pre class="sql"><code>-- migrations/037_feedback_learning_system.sql
+
+-- ============================================================================
+-- EXECUTION MANIFESTS: Full provenance for every AI output
+-- ============================================================================
+
+CREATE TABLE execution_manifests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    output_id VARCHAR(100) UNIQUE NOT NULL,  -- Reference ID for feedback
+    
+    -- Context
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    conversation_id UUID REFERENCES thinktank_conversations(id),
+    message_id UUID REFERENCES thinktank_messages(id),
+    
+    -- What was requested
+    request_type VARCHAR(50) NOT NULL,  -- &#39;chat&#39;, &#39;completion&#39;, &#39;orchestration&#39;, &#39;service&#39;
+    task_type VARCHAR(50),  -- &#39;code&#39;, &#39;creative&#39;, &#39;analysis&#39;, &#39;medical&#39;, etc.
+    domain_mode VARCHAR(50),  -- Think Tank domain mode if applicable
+    input_prompt_hash VARCHAR(64),  -- SHA-256 of input for deduplication
+    input_tokens INTEGER,
+    input_language VARCHAR(10),  -- Detected input language (ISO 639-1)
+    
+    -- What was used (THE MANIFEST)
+    models_used TEXT[] NOT NULL,
+    model_versions JSONB DEFAULT &#39;{}&#39;,  -- {&quot;claude-sonnet-4&quot;: &quot;20241022&quot;, ...}
+    orchestration_id UUID REFERENCES workflow_definitions(id),
+    orchestration_name VARCHAR(100),
+    services_used TEXT[],  -- [&#39;perception&#39;, &#39;medical&#39;, ...]
+    thermal_states_at_execution JSONB DEFAULT &#39;{}&#39;,  -- {&quot;whisper-large-v3&quot;: &quot;HOT&quot;, ...}
+    provider_health_at_execution JSONB DEFAULT &#39;{}&#39;,  -- {&quot;anthropic&quot;: {&quot;latency_ms&quot;: 150, &quot;error_rate&quot;: 0.01}, ...}
+    
+    -- Brain&#39;s decision
+    brain_reasoning TEXT,  -- Why Brain chose this path
+    brain_confidence DECIMAL(3, 2),  -- 0.00-1.00
+    was_user_override BOOLEAN DEFAULT false,  -- User manually selected model
+    
+    -- Outcome metrics
+    output_tokens INTEGER,
+    total_latency_ms INTEGER,
+    time_to_first_token_ms INTEGER,
+    total_cost DECIMAL(10, 6),
+    was_streamed BOOLEAN DEFAULT false,
+    
+    -- For multi-step orchestrations
+    step_count INTEGER DEFAULT 1,
+    step_details JSONB DEFAULT &#39;[]&#39;,  -- [{model, latency, tokens, cost}, ...]
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT valid_confidence CHECK (brain_confidence &gt;= 0 AND brain_confidence &lt;= 1)
+);
+
+CREATE INDEX idx_exec_manifest_output ON execution_manifests(output_id);
+CREATE INDEX idx_exec_manifest_tenant_user ON execution_manifests(tenant_id, user_id);
+CREATE INDEX idx_exec_manifest_conversation ON execution_manifests(conversation_id);
+CREATE INDEX idx_exec_manifest_models ON execution_manifests USING GIN(models_used);
+CREATE INDEX idx_exec_manifest_task ON execution_manifests(task_type);
+CREATE INDEX idx_exec_manifest_created ON execution_manifests(created_at DESC);
+
+-- ============================================================================
+-- EXPLICIT FEEDBACK: Thumbs up/down with optional categories
+-- ============================================================================
+
+CREATE TYPE feedback_rating AS ENUM (&#39;positive&#39;, &#39;negative&#39;, &#39;neutral&#39;);
+CREATE TYPE feedback_category AS ENUM (
+    &#39;accuracy&#39;,      -- Factually correct
+    &#39;relevance&#39;,     -- Answered the question
+    &#39;tone&#39;,          -- Appropriate style
+    &#39;format&#39;,        -- Good structure/formatting
+    &#39;speed&#39;,         -- Fast enough
+    &#39;safety&#39;,        -- Appropriate content
+    &#39;creativity&#39;,    -- Novel/interesting
+    &#39;completeness&#39;,  -- Fully addressed request
+    &#39;other&#39;
+);
+
+CREATE TABLE feedback_explicit (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    
+    -- Link to execution
+    output_id VARCHAR(100) NOT NULL REFERENCES execution_manifests(output_id),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    
+    -- The feedback
+    rating feedback_rating NOT NULL,
+    categories feedback_category[] DEFAULT &#39;{}&#39;,  -- What specifically was good/bad
+    comment_text TEXT,  -- Optional text feedback
+    comment_language VARCHAR(10),  -- Detected language of comment
+    
+    -- Metadata
+    feedback_source VARCHAR(50) DEFAULT &#39;thinktank&#39;,  -- &#39;thinktank&#39;, &#39;api&#39;, &#39;admin&#39;
+    user_agent TEXT,
+    client_timestamp TIMESTAMPTZ,  -- When user clicked
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    -- One feedback per output per user
+    UNIQUE(output_id, user_id)
+);
+
+CREATE INDEX idx_feedback_explicit_output ON feedback_explicit(output_id);
+CREATE INDEX idx_feedback_explicit_tenant ON feedback_explicit(tenant_id);
+CREATE INDEX idx_feedback_explicit_rating ON feedback_explicit(rating);
+CREATE INDEX idx_feedback_explicit_created ON feedback_explicit(created_at DESC);
+
+-- ============================================================================
+-- IMPLICIT FEEDBACK: Behavioral signals (higher volume, weighted less)
+-- ============================================================================
+
+CREATE TYPE implicit_signal_type AS ENUM (
+    &#39;regenerate&#39;,           -- User clicked regenerate (negative)
+    &#39;copy_response&#39;,        -- User copied response (positive)
+    &#39;share_response&#39;,       -- User shared response (very positive)
+    &#39;export_response&#39;,      -- User exported (positive)
+    &#39;continue_conversation&#39;,-- User sent follow-up (neutral-positive)
+    &#39;abandon_conversation&#39;, -- User left without follow-up (weak negative)
+    &#39;abandon_mid_response&#39;, -- User stopped streaming (negative)
+    &#39;manual_model_switch&#39;,  -- User changed model (negative for current)
+    &#39;edit_and_resend&#39;,      -- User edited their prompt (neutral)
+    &#39;response_time_short&#39;,  -- Quick reply = engaged (positive)
+    &#39;response_time_long&#39;,   -- Slow reply = confused/distracted (neutral)
+    &#39;scroll_to_end&#39;,        -- Read full response (positive)
+    &#39;scroll_bounce&#39;,        -- Scrolled away quickly (negative)
+    &#39;favorite_added&#39;,       -- Added to favorites (very positive)
+    &#39;report_content&#39;        -- Reported for review (very negative)
+);
+
+CREATE TABLE feedback_implicit (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    
+    -- Link to execution
+    output_id VARCHAR(100) NOT NULL REFERENCES execution_manifests(output_id),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    
+    -- The signal
+    signal_type implicit_signal_type NOT NULL,
+    signal_value JSONB DEFAULT &#39;{}&#39;,  -- Additional context (e.g., time_to_next_message_ms)
+    
+    -- Computed sentiment score (-1.0 to +1.0)
+    sentiment_score DECIMAL(3, 2) NOT NULL,
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_feedback_implicit_output ON feedback_implicit(output_id);
+CREATE INDEX idx_feedback_implicit_tenant ON feedback_implicit(tenant_id);
+CREATE INDEX idx_feedback_implicit_signal ON feedback_implicit(signal_type);
+CREATE INDEX idx_feedback_implicit_created ON feedback_implicit(created_at DESC);
+
+-- ============================================================================
+-- VOICE FEEDBACK: Multi-language voice input with transcription
+-- ============================================================================
+
+CREATE TABLE feedback_voice (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    
+    -- Link to execution
+    output_id VARCHAR(100) NOT NULL REFERENCES execution_manifests(output_id),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    
+    -- Audio storage
+    audio_s3_key VARCHAR(500) NOT NULL,
+    audio_duration_seconds DECIMAL(8, 2),
+    audio_format VARCHAR(20),  -- &#39;webm&#39;, &#39;mp3&#39;, &#39;wav&#39;, etc.
+    
+    -- Transcription
+    transcription_text TEXT,
+    original_language VARCHAR(10),  -- Detected language (ISO 639-1)
+    translated_text TEXT,  -- English translation if not English
+    transcription_confidence DECIMAL(3, 2),
+    transcription_model VARCHAR(50),  -- &#39;whisper-large-v3&#39;, etc.
+    
+    -- Sentiment analysis of voice feedback
+    sentiment_score DECIMAL(3, 2),  -- -1.0 to +1.0
+    inferred_rating feedback_rating,
+    inferred_categories feedback_category[],
+    
+    -- Processing status
+    processing_status VARCHAR(20) DEFAULT &#39;pending&#39;,  -- &#39;pending&#39;, &#39;processing&#39;, &#39;completed&#39;, &#39;failed&#39;
+    processing_error TEXT,
+    processed_at TIMESTAMPTZ,
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_feedback_voice_output ON feedback_voice(output_id);
+CREATE INDEX idx_feedback_voice_status ON feedback_voice(processing_status);
+
+-- ============================================================================
+-- NEURAL MODEL SCORES: Learned effectiveness per model/task/scope
+-- ============================================================================
+
+CREATE TYPE learning_scope AS ENUM (&#39;user&#39;, &#39;tenant&#39;, &#39;global&#39;);
+
+CREATE TABLE neural_model_scores (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    
+    -- Scope (null = global)
+    scope learning_scope NOT NULL,
+    tenant_id UUID REFERENCES tenants(id),  -- null for global
+    user_id UUID REFERENCES users(id),      -- null for tenant/global
+    
+    -- What we&#39;re scoring
+    model_id VARCHAR(100) NOT NULL,
+    task_type VARCHAR(50),  -- null = overall score for model
+    domain_mode VARCHAR(50),  -- null = all domains
+    
+    -- Aggregated scores (0.0 to 1.0)
+    effectiveness_score DECIMAL(4, 3) NOT NULL DEFAULT 0.500,
+    accuracy_score DECIMAL(4, 3),
+    relevance_score DECIMAL(4, 3),
+    speed_score DECIMAL(4, 3),
+    
+    -- Statistics
+    positive_count INTEGER DEFAULT 0,
+    negative_count INTEGER DEFAULT 0,
+    neutral_count INTEGER DEFAULT 0,
+    implicit_positive_count INTEGER DEFAULT 0,
+    implicit_negative_count INTEGER DEFAULT 0,
+    total_feedback_count INTEGER DEFAULT 0,
+    
+    -- Confidence in this score (based on sample size)
+    confidence DECIMAL(3, 2) DEFAULT 0.00,
+    
+    -- Model version tracking
+    last_model_version VARCHAR(50),
+    score_decay_applied_at TIMESTAMPTZ,  -- When we last decayed old scores
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Unique per scope/model/task combination
+    UNIQUE NULLS NOT DISTINCT (scope, tenant_id, user_id, model_id, task_type, domain_mode)
+);
+
+CREATE INDEX idx_neural_scores_model ON neural_model_scores(model_id);
+CREATE INDEX idx_neural_scores_scope ON neural_model_scores(scope);
+CREATE INDEX idx_neural_scores_tenant ON neural_model_scores(tenant_id);
+CREATE INDEX idx_neural_scores_effectiveness ON neural_model_scores(effectiveness_score DESC);
+
+-- ============================================================================
+-- NEURAL ROUTING RECOMMENDATIONS: Brain reads these for decisions
+-- ============================================================================
+
+CREATE TABLE neural_routing_recommendations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    
+    -- Scope
+    scope learning_scope NOT NULL,
+    tenant_id UUID REFERENCES tenants(id),
+    user_id UUID REFERENCES users(id),
+    
+    -- Recommendation context
+    task_type VARCHAR(50) NOT NULL,
+    domain_mode VARCHAR(50),
+    input_characteristics JSONB DEFAULT &#39;{}&#39;,  -- {requires_vision, requires_audio, token_estimate_range, ...}
+    
+    -- The recommendation
+    recommended_model VARCHAR(100) NOT NULL,
+    recommended_orchestration_id UUID REFERENCES workflow_definitions(id),
+    recommended_services TEXT[],
+    
+    -- Alternatives (ordered by score)
+    alternative_models TEXT[],
+    
+    -- Confidence
+    recommendation_confidence DECIMAL(3, 2) NOT NULL,
+    sample_size INTEGER,  -- How much data this is based on
+    
+    -- Reasoning (for debugging/transparency)
+    reasoning TEXT,
+    
+    -- Validity
+    valid_from TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    valid_until TIMESTAMPTZ,  -- null = no expiry
+    is_active BOOLEAN DEFAULT true,
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_neural_rec_active ON neural_routing_recommendations(is_active, scope);
+CREATE INDEX idx_neural_rec_task ON neural_routing_recommendations(task_type, domain_mode);
+CREATE INDEX idx_neural_rec_tenant ON neural_routing_recommendations(tenant_id);
+
+-- ============================================================================
+-- USER TRUST SCORES: Anti-gaming feedback weighting
+-- ============================================================================
+
+CREATE TABLE user_trust_scores (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    
+    -- Trust factors
+    trust_score DECIMAL(3, 2) NOT NULL DEFAULT 0.50,  -- 0.00-1.00
+    account_age_days INTEGER,
+    total_feedback_count INTEGER DEFAULT 0,
+    feedback_diversity_score DECIMAL(3, 2),  -- How varied their feedback is
+    feedback_alignment_score DECIMAL(3, 2),  -- How aligned with population
+    
+    -- Flags
+    is_outlier BOOLEAN DEFAULT false,
+    outlier_reason TEXT,
+    is_rate_limited BOOLEAN DEFAULT false,
+    rate_limit_until TIMESTAMPTZ,
+    
+    -- Last update
+    last_feedback_at TIMESTAMPTZ,
+    last_trust_calculation_at TIMESTAMPTZ,
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    UNIQUE(tenant_id, user_id)
+);
+
+CREATE INDEX idx_trust_scores_tenant ON user_trust_scores(tenant_id);
+CREATE INDEX idx_trust_scores_outlier ON user_trust_scores(is_outlier);
+
+-- ============================================================================
+-- A/B TESTING: Measure if routing changes improve outcomes
+-- ============================================================================
+
+CREATE TYPE experiment_status AS ENUM (&#39;draft&#39;, &#39;running&#39;, &#39;paused&#39;, &#39;completed&#39;, &#39;cancelled&#39;);
+
+CREATE TABLE ab_experiments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    
+    -- Experiment definition
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    hypothesis TEXT,
+    
+    -- Scope
+    tenant_id UUID REFERENCES tenants(id),  -- null = all tenants
+    
+    -- What we&#39;re testing
+    experiment_type VARCHAR(50) NOT NULL,  -- &#39;model_routing&#39;, &#39;orchestration&#39;, &#39;service&#39;
+    control_config JSONB NOT NULL,  -- The current/default behavior
+    treatment_config JSONB NOT NULL,  -- The new behavior being tested
+    
+    -- Traffic allocation
+    traffic_percentage DECIMAL(5, 2) DEFAULT 10.00,  -- % of users in treatment
+    
+    -- Status
+    status experiment_status NOT NULL DEFAULT &#39;draft&#39;,
+    started_at TIMESTAMPTZ,
+    ended_at TIMESTAMPTZ,
+    
+    -- Results
+    control_sample_size INTEGER DEFAULT 0,
+    treatment_sample_size INTEGER DEFAULT 0,
+    control_positive_rate DECIMAL(5, 4),
+    treatment_positive_rate DECIMAL(5, 4),
+    statistical_significance DECIMAL(5, 4),  -- p-value
+    effect_size DECIMAL(5, 4),  -- Cohen&#39;s d
+    winner VARCHAR(20),  -- &#39;control&#39;, &#39;treatment&#39;, &#39;inconclusive&#39;
+    
+    created_by UUID REFERENCES administrators(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_ab_experiments_status ON ab_experiments(status);
+CREATE INDEX idx_ab_experiments_tenant ON ab_experiments(tenant_id);
+
+CREATE TABLE ab_experiment_assignments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    experiment_id UUID NOT NULL REFERENCES ab_experiments(id) ON DELETE CASCADE,
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    
+    -- Assignment
+    variant VARCHAR(20) NOT NULL,  -- &#39;control&#39; or &#39;treatment&#39;
+    assigned_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    UNIQUE(experiment_id, user_id)
+);
+
+CREATE INDEX idx_ab_assignments_experiment ON ab_experiment_assignments(experiment_id);
+CREATE INDEX idx_ab_assignments_user ON ab_experiment_assignments(user_id);
+
+-- ============================================================================
+-- ROW LEVEL SECURITY
+-- ============================================================================
+
+ALTER TABLE execution_manifests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE feedback_explicit ENABLE ROW LEVEL SECURITY;
+ALTER TABLE feedback_implicit ENABLE ROW LEVEL SECURITY;
+ALTER TABLE feedback_voice ENABLE ROW LEVEL SECURITY;
+ALTER TABLE neural_model_scores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE neural_routing_recommendations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_trust_scores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ab_experiments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ab_experiment_assignments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY exec_manifest_isolation ON execution_manifests 
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY feedback_explicit_isolation ON feedback_explicit 
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY feedback_implicit_isolation ON feedback_implicit 
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY feedback_voice_isolation ON feedback_voice 
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY neural_scores_isolation ON neural_model_scores 
+    USING (tenant_id IS NULL OR tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY neural_rec_isolation ON neural_routing_recommendations 
+    USING (tenant_id IS NULL OR tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY trust_scores_isolation ON user_trust_scores 
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY ab_experiments_isolation ON ab_experiments 
+    USING (tenant_id IS NULL OR tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY ab_assignments_isolation ON ab_experiment_assignments 
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+
+-- ============================================================================
+-- HELPER FUNCTIONS
+-- ============================================================================
+
+-- Get aggregated feedback score for an output
+CREATE OR REPLACE FUNCTION get_feedback_score(p_output_id VARCHAR)
+RETURNS JSONB AS $$
+DECLARE
+    explicit_score DECIMAL;
+    implicit_score DECIMAL;
+    combined_score DECIMAL;
+    result JSONB;
+BEGIN
+    -- Get explicit feedback
+    SELECT 
+        CASE rating 
+            WHEN &#39;positive&#39; THEN 1.0 
+            WHEN &#39;negative&#39; THEN -1.0 
+            ELSE 0.0 
+        END INTO explicit_score
+    FROM feedback_explicit
+    WHERE output_id = p_output_id
+    LIMIT 1;
+    
+    -- Get average implicit feedback
+    SELECT AVG(sentiment_score) INTO implicit_score
+    FROM feedback_implicit
+    WHERE output_id = p_output_id;
+    
+    -- Combine (explicit weighted 3x)
+    combined_score := COALESCE(
+        (COALESCE(explicit_score, 0) * 3 + COALESCE(implicit_score, 0)) / 
+        CASE 
+            WHEN explicit_score IS NOT NULL AND implicit_score IS NOT NULL THEN 4
+            WHEN explicit_score IS NOT NULL THEN 3
+            WHEN implicit_score IS NOT NULL THEN 1
+            ELSE 1
+        END,
+        0
+    );
+    
+    result := jsonb_build_object(
+        &#39;explicit_score&#39;, explicit_score,
+        &#39;implicit_score&#39;, implicit_score,
+        &#39;combined_score&#39;, combined_score,
+        &#39;has_explicit&#39;, explicit_score IS NOT NULL,
+        &#39;has_implicit&#39;, implicit_score IS NOT NULL
+    );
+    
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Get best model recommendation for context
+CREATE OR REPLACE FUNCTION get_neural_recommendation(
+    p_tenant_id UUID,
+    p_user_id UUID,
+    p_task_type VARCHAR,
+    p_domain_mode VARCHAR DEFAULT NULL
+)
+RETURNS TABLE (
+    model_id VARCHAR,
+    confidence DECIMAL,
+    scope learning_scope,
+    reasoning TEXT
+) AS $$
+BEGIN
+    -- Try user-specific first, then tenant, then global
+    RETURN QUERY
+    SELECT 
+        r.recommended_model,
+        r.recommendation_confidence,
+        r.scope,
+        r.reasoning
+    FROM neural_routing_recommendations r
+    WHERE r.is_active = true
+    AND (r.valid_until IS NULL OR r.valid_until &gt; NOW())
+    AND r.task_type = p_task_type
+    AND (r.domain_mode IS NULL OR r.domain_mode = p_domain_mode)
+    AND (
+        (r.scope = &#39;user&#39; AND r.tenant_id = p_tenant_id AND r.user_id = p_user_id) OR
+        (r.scope = &#39;tenant&#39; AND r.tenant_id = p_tenant_id AND r.user_id IS NULL) OR
+        (r.scope = &#39;global&#39; AND r.tenant_id IS NULL AND r.user_id IS NULL)
+    )
+    ORDER BY 
+        CASE r.scope 
+            WHEN &#39;user&#39; THEN 1 
+            WHEN &#39;tenant&#39; THEN 2 
+            WHEN &#39;global&#39; THEN 3 
+        END,
+        r.recommendation_confidence DESC
+    LIMIT 1;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Calculate implicit signal sentiment
+CREATE OR REPLACE FUNCTION get_implicit_sentiment(p_signal_type implicit_signal_type)
+RETURNS DECIMAL AS $$
+BEGIN
+    RETURN CASE p_signal_type
+        WHEN &#39;copy_response&#39; THEN 0.7
+        WHEN &#39;share_response&#39; THEN 0.9
+        WHEN &#39;export_response&#39; THEN 0.6
+        WHEN &#39;favorite_added&#39; THEN 0.9
+        WHEN &#39;continue_conversation&#39; THEN 0.3
+        WHEN &#39;scroll_to_end&#39; THEN 0.2
+        WHEN &#39;response_time_short&#39; THEN 0.2
+        WHEN &#39;regenerate&#39; THEN -0.8
+        WHEN &#39;manual_model_switch&#39; THEN -0.6
+        WHEN &#39;abandon_conversation&#39; THEN -0.3
+        WHEN &#39;abandon_mid_response&#39; THEN -0.7
+        WHEN &#39;scroll_bounce&#39; THEN -0.4
+        WHEN &#39;report_content&#39; THEN -1.0
+        WHEN &#39;edit_and_resend&#39; THEN 0.0
+        WHEN &#39;response_time_long&#39; THEN 0.0
+        ELSE 0.0
+    END;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;</code></pre>
+<hr />
+<h2 id="shared-types-for-feedback-system">37.3 Shared Types for Feedback System</h2>
+<pre class="typescript"><code>// packages/shared/src/types/feedback.types.ts
+
+/**
+ * RADIANT v4.3.0 - Feedback System Types
+ */
+
+// ============================================================================
+// EXECUTION MANIFEST
+// ============================================================================
+
+export interface ExecutionManifest {
+    id: string;
+    outputId: string;  // Unique reference for feedback
+    
+    // Context
+    tenantId: string;
+    userId: string;
+    conversationId?: string;
+    messageId?: string;
+    
+    // Request
+    requestType: &#39;chat&#39; | &#39;completion&#39; | &#39;orchestration&#39; | &#39;service&#39;;
+    taskType?: TaskType;
+    domainMode?: DomainMode;
+    inputPromptHash?: string;
+    inputTokens?: number;
+    inputLanguage?: string;
+    
+    // THE MANIFEST - What was used
+    modelsUsed: string[];
+    modelVersions: Record&lt;string, string&gt;;
+    orchestrationId?: string;
+    orchestrationName?: string;
+    servicesUsed: string[];
+    thermalStatesAtExecution: Record&lt;string, ThermalState&gt;;
+    providerHealthAtExecution: Record&lt;string, ProviderHealthSnapshot&gt;;
+    
+    // Brain decision
+    brainReasoning?: string;
+    brainConfidence: number;
+    wasUserOverride: boolean;
+    
+    // Outcome
+    outputTokens?: number;
+    totalLatencyMs: number;
+    timeToFirstTokenMs?: number;
+    totalCost: number;
+    wasStreamed: boolean;
+    
+    // Multi-step
+    stepCount: number;
+    stepDetails: ExecutionStep[];
+    
+    createdAt: Date;
+}
+
+export interface ExecutionStep {
+    stepIndex: number;
+    modelId: string;
+    latencyMs: number;
+    inputTokens: number;
+    outputTokens: number;
+    cost: number;
+}
+
+export interface ProviderHealthSnapshot {
+    latencyMs: number;
+    errorRate: number;
+    status: &#39;healthy&#39; | &#39;degraded&#39; | &#39;unhealthy&#39;;
+}
+
+export type TaskType = 
+    | &#39;chat&#39; 
+    | &#39;code&#39; 
+    | &#39;analysis&#39; 
+    | &#39;creative&#39; 
+    | &#39;vision&#39; 
+    | &#39;audio&#39;
+    | &#39;medical&#39;
+    | &#39;legal&#39;
+    | &#39;research&#39;
+    | &#39;translation&#39;;
+
+export type DomainMode = 
+    | &#39;general&#39;
+    | &#39;medical&#39;
+    | &#39;legal&#39;
+    | &#39;code&#39;
+    | &#39;creative&#39;
+    | &#39;research&#39;
+    | &#39;business&#39;;
+
+// ============================================================================
+// EXPLICIT FEEDBACK
+// ============================================================================
+
+export type FeedbackRating = &#39;positive&#39; | &#39;negative&#39; | &#39;neutral&#39;;
+
+export type FeedbackCategory = 
+    | &#39;accuracy&#39;
+    | &#39;relevance&#39;
+    | &#39;tone&#39;
+    | &#39;format&#39;
+    | &#39;speed&#39;
+    | &#39;safety&#39;
+    | &#39;creativity&#39;
+    | &#39;completeness&#39;
+    | &#39;other&#39;;
+
+export interface ExplicitFeedback {
+    id: string;
+    outputId: string;
+    tenantId: string;
+    userId: string;
+    
+    rating: FeedbackRating;
+    categories: FeedbackCategory[];
+    commentText?: string;
+    commentLanguage?: string;
+    
+    feedbackSource: &#39;thinktank&#39; | &#39;api&#39; | &#39;admin&#39;;
+    createdAt: Date;
+}
+
+export interface FeedbackSubmission {
+    outputId: string;
+    rating: FeedbackRating;
+    categories?: FeedbackCategory[];
+    commentText?: string;
+}
+
+// ============================================================================
+// IMPLICIT FEEDBACK
+// ============================================================================
+
+export type ImplicitSignalType =
+    | &#39;regenerate&#39;
+    | &#39;copy_response&#39;
+    | &#39;share_response&#39;
+    | &#39;export_response&#39;
+    | &#39;continue_conversation&#39;
+    | &#39;abandon_conversation&#39;
+    | &#39;abandon_mid_response&#39;
+    | &#39;manual_model_switch&#39;
+    | &#39;edit_and_resend&#39;
+    | &#39;response_time_short&#39;
+    | &#39;response_time_long&#39;
+    | &#39;scroll_to_end&#39;
+    | &#39;scroll_bounce&#39;
+    | &#39;favorite_added&#39;
+    | &#39;report_content&#39;;
+
+export interface ImplicitFeedback {
+    id: string;
+    outputId: string;
+    tenantId: string;
+    userId: string;
+    
+    signalType: ImplicitSignalType;
+    signalValue: Record&lt;string, unknown&gt;;
+    sentimentScore: number;  // -1.0 to +1.0
+    
+    createdAt: Date;
+}
+
+export interface ImplicitSignalSubmission {
+    outputId: string;
+    signalType: ImplicitSignalType;
+    signalValue?: Record&lt;string, unknown&gt;;
+}
+
+// ============================================================================
+// VOICE FEEDBACK
+// ============================================================================
+
+export interface VoiceFeedback {
+    id: string;
+    outputId: string;
+    tenantId: string;
+    userId: string;
+    
+    audioS3Key: string;
+    audioDurationSeconds: number;
+    audioFormat: string;
+    
+    transcriptionText?: string;
+    originalLanguage?: string;
+    translatedText?: string;
+    transcriptionConfidence?: number;
+    transcriptionModel?: string;
+    
+    sentimentScore?: number;
+    inferredRating?: FeedbackRating;
+    inferredCategories?: FeedbackCategory[];
+    
+    processingStatus: &#39;pending&#39; | &#39;processing&#39; | &#39;completed&#39; | &#39;failed&#39;;
+    processedAt?: Date;
+    
+    createdAt: Date;
+}
+
+// ============================================================================
+// NEURAL LEARNING
+// ============================================================================
+
+export type LearningScope = &#39;user&#39; | &#39;tenant&#39; | &#39;global&#39;;
+
+export interface NeuralModelScore {
+    id: string;
+    scope: LearningScope;
+    tenantId?: string;
+    userId?: string;
+    
+    modelId: string;
+    taskType?: TaskType;
+    domainMode?: DomainMode;
+    
+    effectivenessScore: number;  // 0.0-1.0
+    accuracyScore?: number;
+    relevanceScore?: number;
+    speedScore?: number;
+    
+    positiveCount: number;
+    negativeCount: number;
+    neutralCount: number;
+    implicitPositiveCount: number;
+    implicitNegativeCount: number;
+    totalFeedbackCount: number;
+    
+    confidence: number;  // 0.0-1.0
+    
+    updatedAt: Date;
+}
+
+export interface NeuralRecommendation {
+    id: string;
+    scope: LearningScope;
+    tenantId?: string;
+    userId?: string;
+    
+    taskType: TaskType;
+    domainMode?: DomainMode;
+    inputCharacteristics: Record&lt;string, unknown&gt;;
+    
+    recommendedModel: string;
+    recommendedOrchestrationId?: string;
+    recommendedServices: string[];
+    alternativeModels: string[];
+    
+    recommendationConfidence: number;
+    sampleSize: number;
+    reasoning: string;
+    
+    isActive: boolean;
+    validFrom: Date;
+    validUntil?: Date;
+}
+
+// ============================================================================
+// TRUST &amp; ANTI-GAMING
+// ============================================================================
+
+export interface UserTrustScore {
+    id: string;
+    tenantId: string;
+    userId: string;
+    
+    trustScore: number;  // 0.0-1.0
+    accountAgeDays: number;
+    totalFeedbackCount: number;
+    feedbackDiversityScore: number;
+    feedbackAlignmentScore: number;
+    
+    isOutlier: boolean;
+    outlierReason?: string;
+    isRateLimited: boolean;
+    rateLimitUntil?: Date;
+    
+    updatedAt: Date;
+}
+
+// ============================================================================
+// A/B TESTING
+// ============================================================================
+
+export type ExperimentStatus = &#39;draft&#39; | &#39;running&#39; | &#39;paused&#39; | &#39;completed&#39; | &#39;cancelled&#39;;
+
+export interface ABExperiment {
+    id: string;
+    name: string;
+    description?: string;
+    hypothesis?: string;
+    
+    tenantId?: string;
+    experimentType: &#39;model_routing&#39; | &#39;orchestration&#39; | &#39;service&#39;;
+    controlConfig: Record&lt;string, unknown&gt;;
+    treatmentConfig: Record&lt;string, unknown&gt;;
+    
+    trafficPercentage: number;
+    status: ExperimentStatus;
+    
+    controlSampleSize: number;
+    treatmentSampleSize: number;
+    controlPositiveRate?: number;
+    treatmentPositiveRate?: number;
+    statisticalSignificance?: number;
+    effectSize?: number;
+    winner?: &#39;control&#39; | &#39;treatment&#39; | &#39;inconclusive&#39;;
+    
+    startedAt?: Date;
+    endedAt?: Date;
+}
+
+// Import existing types
+import { ThermalState } from &#39;./ai.types&#39;;</code></pre>
+<p>Update the shared types index:</p>
+<pre class="typescript"><code>// packages/shared/src/types/index.ts
+
+// Add to existing exports
+export * from &#39;./feedback.types&#39;;</code></pre>
+<hr />
+<h2 id="api-endpoints-summary">37.4 API Endpoints Summary</h2>
+<h3 id="feedback-endpoints">Feedback Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 32%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/api/v2/feedback/explicit</code></td>
+<td>Submit thumbs up/down with optional categories</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v2/feedback/implicit</code></td>
+<td>Record implicit signal (regenerate, copy, etc.)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v2/feedback/voice</code></td>
+<td>Upload voice feedback (multipart)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/feedback/stats/{outputId}</code></td>
+<td>Get aggregated feedback for output</td>
+</tr>
+</tbody>
+</table>
+<h3 id="neural-engine-endpoints">Neural Engine Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 32%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/neural/recommendation</code></td>
+<td>Get Neural Engine recommendation</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/neural/scores</code></td>
+<td>Get model scores for context</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v2/neural/learn</code></td>
+<td>Trigger learning for output (internal)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="voice-processing-endpoints">Voice Processing Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 32%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/api/v2/voice/transcribe</code></td>
+<td>Transcribe audio to text (any language)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v2/voice/translate</code></td>
+<td>Translate text to English</td>
+</tr>
+</tbody>
+</table>
+<h3 id="service-layer-client-apps">Service Layer (Client Apps)</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 32%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/service/feedback/config</code></td>
+<td>Get feedback widget configuration</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v2/service/feedback/implicit/batch</code></td>
+<td>Batch submit implicit signals</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/service/feedback/conversation/{id}/summary</code></td>
+<td>Get conversation feedback summary</td>
+</tr>
+</tbody>
+</table>
+<h3 id="admin-endpoints">Admin Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/feedback/stats</code></td>
+<td>Feedback analytics dashboard</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/experiments</code></td>
+<td>List A/B experiments</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/v2/admin/experiments</code></td>
+<td>Create A/B experiment</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/v2/admin/experiments/{id}</code></td>
+<td>Update experiment status</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v2/admin/trust-scores</code></td>
+<td>View user trust scores</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="implicit-signal-sentiment-mapping">37.5 Implicit Signal Sentiment Mapping</h2>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 36%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Signal Type</th>
+<th>Sentiment Score</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>favorite_added</code></td>
+<td>+0.9</td>
+<td>Very positive - user values this response</td>
+</tr>
+<tr>
+<td><code>share_response</code></td>
+<td>+0.9</td>
+<td>Very positive - worth sharing</td>
+</tr>
+<tr>
+<td><code>copy_response</code></td>
+<td>+0.7</td>
+<td>Positive - useful enough to copy</td>
+</tr>
+<tr>
+<td><code>export_response</code></td>
+<td>+0.6</td>
+<td>Positive - keeping for later</td>
+</tr>
+<tr>
+<td><code>continue_conversation</code></td>
+<td>+0.3</td>
+<td>Neutral-positive - engaged</td>
+</tr>
+<tr>
+<td><code>scroll_to_end</code></td>
+<td>+0.2</td>
+<td>Weak positive - read full response</td>
+</tr>
+<tr>
+<td><code>response_time_short</code></td>
+<td>+0.2</td>
+<td>Weak positive - quick engagement</td>
+</tr>
+<tr>
+<td><code>edit_and_resend</code></td>
+<td>0.0</td>
+<td>Neutral - refining question</td>
+</tr>
+<tr>
+<td><code>response_time_long</code></td>
+<td>0.0</td>
+<td>Neutral - thinking/distracted</td>
+</tr>
+<tr>
+<td><code>abandon_conversation</code></td>
+<td>-0.3</td>
+<td>Weak negative - may be done or frustrated</td>
+</tr>
+<tr>
+<td><code>scroll_bounce</code></td>
+<td>-0.4</td>
+<td>Negative - didn’t read response</td>
+</tr>
+<tr>
+<td><code>manual_model_switch</code></td>
+<td>-0.6</td>
+<td>Negative - current model wasn’t working</td>
+</tr>
+<tr>
+<td><code>abandon_mid_response</code></td>
+<td>-0.7</td>
+<td>Negative - stopped streaming early</td>
+</tr>
+<tr>
+<td><code>regenerate</code></td>
+<td>-0.8</td>
+<td>Negative - response wasn’t good</td>
+</tr>
+<tr>
+<td><code>report_content</code></td>
+<td>-1.0</td>
+<td>Very negative - safety/quality issue</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="learning-weighting-formula">37.6 Learning Weighting Formula</h2>
+<p>Combined feedback score for model scoring:</p>
+<pre><code>weighted_score = (
+    (explicit_score × 3.0 × trust_weight) +
+    (implicit_score × 1.0) +
+    (voice_score × 2.0 × trust_weight)
+) / total_weight</code></pre>
+<p>Where: - <code>explicit_score</code>: -1.0 to +1.0 from thumbs rating - <code>implicit_score</code>: Average of implicit signal sentiments - <code>voice_score</code>: Sentiment analysis of transcribed voice feedback - <code>trust_weight</code>: 0.1 to 1.0 based on user trust score</p>
+<p>Model effectiveness update:</p>
+<pre><code>new_score = (current_score × current_count + weighted_score) / (current_count + 1)
+confidence = min(total_count / min_sample_size, 1.0)</code></pre>
+<hr />
+<h2 id="summary">Summary</h2>
+<p>RADIANT v4.3.0 (PROMPT-17) adds <strong>Feedback Learning System &amp; Neural Engine Loop</strong>:</p>
+<h3 id="section-37-feedback-learning-system-v4.3.0">Section 37: Feedback Learning System (v4.3.0)</h3>
+<ol type="1">
+<li><strong>Database Schema</strong> (037_feedback_learning_system.sql)
+<ul>
+<li><code>execution_manifests</code> - Full provenance for every AI output</li>
+<li><code>feedback_explicit</code> - Thumbs up/down with categories</li>
+<li><code>feedback_implicit</code> - Behavioral signals (regenerate, copy, abandon, etc.)</li>
+<li><code>feedback_voice</code> - Multi-language voice feedback with transcription</li>
+<li><code>neural_model_scores</code> - Learned effectiveness per model/task/scope</li>
+<li><code>neural_routing_recommendations</code> - Brain advice from Neural Engine</li>
+<li><code>user_trust_scores</code> - Anti-gaming trust levels</li>
+<li><code>ab_experiments</code> - A/B testing experiments</li>
+</ul></li>
+<li><strong>Learning Scopes</strong>
+<ul>
+<li>User-level: Personal preferences, fastest adaptation</li>
+<li>Tenant-level: Organization-wide patterns, privacy isolated</li>
+<li>Global-level: Platform defaults, cold start handling</li>
+</ul></li>
+<li><strong>Signal Types</strong>
+<ul>
+<li>Explicit: Thumbs up/down + 8 feedback categories + text comments</li>
+<li>Implicit: 15 behavioral signals (regenerate, copy, share, abandon, etc.)</li>
+<li>Voice: Multi-language voice feedback with Whisper transcription</li>
+</ul></li>
+<li><strong>Neural Engine Integration</strong>
+<ul>
+<li>Brain consults Neural Engine before every routing decision</li>
+<li>Neural scores weighted at 35% in model selection</li>
+<li>Real-time + nightly batch learning</li>
+</ul></li>
+<li><strong>Anti-Gaming Protection</strong>
+<ul>
+<li>User trust scores (0.0-1.0)</li>
+<li>Rate limiting (50 feedback/hour)</li>
+<li>Outlier detection (deviation from population)</li>
+<li>Account age weighting</li>
+</ul></li>
+<li><strong>A/B Testing Framework</strong>
+<ul>
+<li>Create experiments comparing routing strategies</li>
+<li>Automatic user assignment to control/treatment</li>
+<li>Statistical significance tracking</li>
+</ul></li>
+</ol>
+<hr />
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -435,9 +435,19 @@ async function getRateLimitStatistics(tenantId: string): Promise<{
     requests: Number(row.requests) || 0,
   }));
 
-  // Count blocked requests (approximation based on over-limit records)
-  // In production, you'd want a separate log table for this
-  const blockedCount24h = 0; // Placeholder
+  // Count blocked requests from the rate limit events log
+  const blockedResult = await executeStatement({
+    sql: `
+      SELECT COUNT(*) as blocked_count
+      FROM hitl_rate_limit_events
+      WHERE tenant_id = :tenantId 
+        AND event_type = 'blocked'
+        AND created_at > NOW() - INTERVAL '24 hours'
+    `,
+    parameters: [stringParam('tenantId', tenantId)],
+  });
+
+  const blockedCount24h = Number(blockedResult.rows?.[0]?.blocked_count) || 0;
 
   return {
     globalUsage,

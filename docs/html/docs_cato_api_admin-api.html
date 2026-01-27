@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>admin api - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>admin api</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/api/admin-api.md</div>
+  </div>
+  
+  <h1 id="cato-admin-api">Cato Admin API</h1>
+<p>Admin endpoints for managing the Cato global consciousness service.</p>
+<p><strong>Base Path</strong>: <code>/api/admin/cato</code></p>
+<p><strong>Authentication</strong>: Requires admin role with <code>consciousness_admin</code> permission.</p>
+<h2 id="overview">Overview</h2>
+<p>The Cato Admin API provides endpoints for: - <strong>Status &amp; Health</strong>: Monitor Cato’s operational state - <strong>Budget Management</strong>: Configure and monitor spending limits - <strong>Cache Management</strong>: View and invalidate semantic cache - <strong>Memory Management</strong>: Access and modify Cato’s memory systems - <strong>Shadow Self</strong>: Test and monitor the Shadow Self endpoint - <strong>NLI</strong>: Test the NLI entailment classifier</p>
+<hr />
+<h2 id="status-health">Status &amp; Health</h2>
+<h3 id="get-status">GET /status</h3>
+<p>Get comprehensive Cato status including budget, cache, memory, and health.</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;mode&quot;: &quot;day&quot;,
+  &quot;canExplore&quot;: true,
+  &quot;budget&quot;: {
+    &quot;dailySpend&quot;: 3.45,
+    &quot;monthlySpend&quot;: 127.89,
+    &quot;dailyRemaining&quot;: 11.55,
+    &quot;monthlyRemaining&quot;: 372.11
+  },
+  &quot;cache&quot;: {
+    &quot;hitRate&quot;: 0.86,
+    &quot;size&quot;: 1234567
+  },
+  &quot;memory&quot;: {
+    &quot;semanticFactCount&quot;: 50000,
+    &quot;workingMemoryEntries&quot;: 1000,
+    &quot;domainsCount&quot;: 800
+  },
+  &quot;shadowSelf&quot;: {
+    &quot;healthy&quot;: true
+  },
+  &quot;timestamp&quot;: &quot;2024-01-15T12:00:00Z&quot;
+}</code></pre>
+<h3 id="get-health">GET /health</h3>
+<p>Simple health check for monitoring systems.</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;healthy&quot;: true,
+  &quot;components&quot;: {
+    &quot;shadowSelf&quot;: true,
+    &quot;budget&quot;: true,
+    &quot;mode&quot;: &quot;day&quot;
+  },
+  &quot;timestamp&quot;: &quot;2024-01-15T12:00:00Z&quot;
+}</code></pre>
+<hr />
+<h2 id="budget-management">Budget Management</h2>
+<h3 id="get-budgetstatus">GET /budget/status</h3>
+<p>Get current budget status.</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;mode&quot;: &quot;day&quot;,
+  &quot;dailySpend&quot;: 3.45,
+  &quot;monthlySpend&quot;: 127.89,
+  &quot;dailyRemaining&quot;: 11.55,
+  &quot;monthlyRemaining&quot;: 372.11,
+  &quot;canExplore&quot;: true,
+  &quot;nextModeChange&quot;: &quot;2024-01-16T02:00:00Z&quot;,
+  &quot;config&quot;: {
+    &quot;monthlyLimit&quot;: 500,
+    &quot;dailyExplorationLimit&quot;: 15,
+    &quot;explorationRatio&quot;: 0.2,
+    &quot;nightStartHour&quot;: 2,
+    &quot;nightEndHour&quot;: 6,
+    &quot;emergencyThreshold&quot;: 0.9
+  }
+}</code></pre>
+<h3 id="get-budgetconfig">GET /budget/config</h3>
+<p>Get budget configuration.</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;monthlyLimit&quot;: 500,
+  &quot;dailyExplorationLimit&quot;: 15,
+  &quot;explorationRatio&quot;: 0.2,
+  &quot;nightStartHour&quot;: 2,
+  &quot;nightEndHour&quot;: 6,
+  &quot;emergencyThreshold&quot;: 0.9
+}</code></pre>
+<h3 id="put-budgetconfig">PUT /budget/config</h3>
+<p>Update budget configuration.</p>
+<p><strong>Request:</strong></p>
+<pre class="json"><code>{
+  &quot;monthlyLimit&quot;: 1000,
+  &quot;dailyExplorationLimit&quot;: 30,
+  &quot;nightStartHour&quot;: 3,
+  &quot;nightEndHour&quot;: 5
+}</code></pre>
+<p><strong>Validation:</strong> - <code>monthlyLimit</code>: 0-100000 - <code>dailyExplorationLimit</code>: 0-1000 - <code>nightStartHour</code>: 0-23 - <code>nightEndHour</code>: 0-23 - <code>emergencyThreshold</code>: 0.5-0.99</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;message&quot;: &quot;Budget config updated&quot;,
+  &quot;updates&quot;: {
+    &quot;monthlyLimit&quot;: 1000,
+    &quot;dailyExplorationLimit&quot;: 30
+  }
+}</code></pre>
+<h3 id="get-budgethistory">GET /budget/history</h3>
+<p>Get cost history for the current month.</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;dailyHistory&quot;: [
+    { &quot;date&quot;: &quot;2024-01-01&quot;, &quot;amount&quot;: 12.34 },
+    { &quot;date&quot;: &quot;2024-01-02&quot;, &quot;amount&quot;: 14.56 }
+  ],
+  &quot;monthlyBreakdown&quot;: {
+    &quot;inference&quot;: 80.00,
+    &quot;curiosity&quot;: 30.00,
+    &quot;grounding&quot;: 10.00,
+    &quot;consolidation&quot;: 5.00,
+    &quot;total&quot;: 125.00
+  }
+}</code></pre>
+<hr />
+<h2 id="cache-management">Cache Management</h2>
+<h3 id="get-cachestats">GET /cache/stats</h3>
+<p>Get semantic cache statistics.</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;hitRate&quot;: 0.86,
+  &quot;totalHits&quot;: 1234567,
+  &quot;totalMisses&quot;: 200000,
+  &quot;cacheSize&quot;: 1434567
+}</code></pre>
+<h3 id="post-cacheinvalidate">POST /cache/invalidate</h3>
+<p>Invalidate cache entries for a domain.</p>
+<p><strong>Request:</strong></p>
+<pre class="json"><code>{
+  &quot;domain&quot;: &quot;climate_change&quot;
+}</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;message&quot;: &quot;Cache invalidated&quot;,
+  &quot;domain&quot;: &quot;climate_change&quot;,
+  &quot;entriesRemoved&quot;: 45
+}</code></pre>
+<hr />
+<h2 id="memory-management">Memory Management</h2>
+<h3 id="get-memorystats">GET /memory/stats</h3>
+<p>Get memory system statistics.</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;semanticFactCount&quot;: 50000,
+  &quot;workingMemoryEntries&quot;: 1000,
+  &quot;domainsCount&quot;: 800
+}</code></pre>
+<h3 id="get-memoryfacts">GET /memory/facts</h3>
+<p>Get semantic facts by domain.</p>
+<p><strong>Query Parameters:</strong> - <code>domain</code> (optional, default: “general”): Domain to query - <code>limit</code> (optional, default: 50): Maximum facts to return</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;domain&quot;: &quot;physics&quot;,
+  &quot;facts&quot;: [
+    {
+      &quot;factId&quot;: &quot;abc123&quot;,
+      &quot;subject&quot;: &quot;light&quot;,
+      &quot;predicate&quot;: &quot;travels_at&quot;,
+      &quot;object&quot;: &quot;299792458 m/s&quot;,
+      &quot;domain&quot;: &quot;physics&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;sources&quot;: [&quot;physics.gov&quot;],
+      &quot;createdAt&quot;: &quot;2024-01-01T00:00:00Z&quot;,
+      &quot;updatedAt&quot;: &quot;2024-01-15T00:00:00Z&quot;,
+      &quot;version&quot;: 3
+    }
+  ],
+  &quot;count&quot;: 1
+}</code></pre>
+<h3 id="post-memoryfacts">POST /memory/facts</h3>
+<p>Store a new semantic fact.</p>
+<p><strong>Request:</strong></p>
+<pre class="json"><code>{
+  &quot;subject&quot;: &quot;water&quot;,
+  &quot;predicate&quot;: &quot;boils_at&quot;,
+  &quot;object&quot;: &quot;100°C at 1 atm&quot;,
+  &quot;domain&quot;: &quot;chemistry&quot;,
+  &quot;confidence&quot;: 0.99,
+  &quot;sources&quot;: [&quot;chemistry.org&quot;]
+}</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;message&quot;: &quot;Fact stored&quot;,
+  &quot;factId&quot;: &quot;def456&quot;
+}</code></pre>
+<h3 id="get-memorygoals">GET /memory/goals</h3>
+<p>Get current Cato goals.</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;goals&quot;: [
+    &quot;Learn more about quantum computing&quot;,
+    &quot;Improve understanding of climate models&quot;,
+    &quot;Consolidate knowledge about neural networks&quot;
+  ]
+}</code></pre>
+<h3 id="put-memorygoals">PUT /memory/goals</h3>
+<p>Update Cato goals.</p>
+<p><strong>Request:</strong></p>
+<pre class="json"><code>{
+  &quot;goals&quot;: [
+    &quot;Explore machine learning fundamentals&quot;,
+    &quot;Understand protein folding&quot;
+  ]
+}</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;message&quot;: &quot;Goals updated&quot;,
+  &quot;goals&quot;: [
+    &quot;Explore machine learning fundamentals&quot;,
+    &quot;Understand protein folding&quot;
+  ]
+}</code></pre>
+<h3 id="get-memorymeta-state">GET /memory/meta-state</h3>
+<p>Get current meta-cognitive state.</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;state&quot;: &quot;CONFIDENT&quot;,
+  &quot;attentionFocus&quot;: &quot;machine learning&quot;
+}</code></pre>
+<hr />
+<h2 id="shadow-self">Shadow Self</h2>
+<h3 id="get-shadow-selfstatus">GET /shadow-self/status</h3>
+<p>Get Shadow Self endpoint status.</p>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;status&quot;: &quot;InService&quot;,
+  &quot;instanceCount&quot;: 10,
+  &quot;pendingInstanceCount&quot;: 10
+}</code></pre>
+<h3 id="post-shadow-selftest">POST /shadow-self/test</h3>
+<p>Test Shadow Self with a prompt.</p>
+<p><strong>Request:</strong></p>
+<pre class="json"><code>{
+  &quot;text&quot;: &quot;Explain the theory of relativity&quot;
+}</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;generatedText&quot;: &quot;The theory of relativity...&quot;,
+  &quot;uncertainty&quot;: 0.23,
+  &quot;logitsEntropy&quot;: 1.45,
+  &quot;latencyMs&quot;: 234,
+  &quot;hiddenStateLayersExtracted&quot;: 3
+}</code></pre>
+<hr />
+<h2 id="nli-testing">NLI Testing</h2>
+<h3 id="post-nlitest">POST /nli/test</h3>
+<p>Test NLI entailment classification.</p>
+<p><strong>Request:</strong></p>
+<pre class="json"><code>{
+  &quot;premise&quot;: &quot;The sky is blue&quot;,
+  &quot;hypothesis&quot;: &quot;The sky has a color&quot;
+}</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;label&quot;: &quot;entailment&quot;,
+  &quot;scores&quot;: {
+    &quot;entailment&quot;: 0.95,
+    &quot;neutral&quot;: 0.04,
+    &quot;contradiction&quot;: 0.01
+  },
+  &quot;confidence&quot;: 0.95,
+  &quot;surprise&quot;: 0.0,
+  &quot;latencyMs&quot;: 45
+}</code></pre>
+<hr />
+<h2 id="error-responses">Error Responses</h2>
+<p>All endpoints return errors in this format:</p>
+<pre class="json"><code>{
+  &quot;error&quot;: &quot;Error message here&quot;
+}</code></pre>
+<p><strong>Common Status Codes:</strong> - <code>400</code> - Bad Request (validation error) - <code>401</code> - Unauthorized (missing tenant ID) - <code>404</code> - Not Found - <code>500</code> - Internal Server Error</p>
+<hr />
+<h2 id="rate-limits">Rate Limits</h2>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Rate Limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET endpoints</td>
+<td>100/minute</td>
+</tr>
+<tr>
+<td>POST /cache/invalidate</td>
+<td>10/minute</td>
+</tr>
+<tr>
+<td>POST /shadow-self/test</td>
+<td>10/minute</td>
+</tr>
+<tr>
+<td>POST /nli/test</td>
+<td>100/minute</td>
+</tr>
+<tr>
+<td>PUT /budget/config</td>
+<td>10/minute</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="../architecture/global-architecture.md">Architecture Overview</a></li>
+<li><a href="../adr/005-circadian-budget.md">ADR-005: Circadian Budget</a></li>
+<li><a href="../adr/007-semantic-caching.md">ADR-007: Semantic Caching</a></li>
+<li><a href="../adr/008-shadow-self-infrastructure.md">ADR-008: Shadow Self</a></li>
+<li><a href="../runbooks/deployment.md">Deployment Runbook</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

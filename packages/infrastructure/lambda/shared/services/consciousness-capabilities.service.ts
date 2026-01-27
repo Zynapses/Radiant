@@ -1592,8 +1592,35 @@ Provide a comprehensive solution that:
   }
 
   private async queueResearchJob(jobId: string): Promise<void> {
-    // In production, would send to SQS or invoke Lambda
-    logger.info('Research job queued', { jobId });
+    try {
+      const { SQSClient, SendMessageCommand } = await import('@aws-sdk/client-sqs');
+      const sqs = new SQSClient({ region: process.env.AWS_REGION || 'us-east-1' });
+      const queueUrl = process.env.RESEARCH_JOBS_QUEUE_URL;
+      
+      if (queueUrl) {
+        await sqs.send(new SendMessageCommand({
+          QueueUrl: queueUrl,
+          MessageBody: JSON.stringify({ jobId, queuedAt: new Date().toISOString() }),
+          MessageGroupId: 'research-jobs',
+          MessageDeduplicationId: `research-${jobId}`,
+        }));
+        logger.info('Research job queued to SQS', { jobId });
+      } else {
+        // Fallback: invoke Lambda directly
+        const { LambdaClient, InvokeCommand } = await import('@aws-sdk/client-lambda');
+        const lambda = new LambdaClient({ region: process.env.AWS_REGION || 'us-east-1' });
+        const functionName = process.env.RESEARCH_WORKER_LAMBDA || `radiant-${process.env.STAGE || 'dev'}-research-worker`;
+        
+        await lambda.send(new InvokeCommand({
+          FunctionName: functionName,
+          InvocationType: 'Event',
+          Payload: JSON.stringify({ jobId }),
+        }));
+        logger.info('Research job dispatched to Lambda', { jobId, functionName });
+      }
+    } catch (error) {
+      logger.warn('Failed to queue research job, will retry via scheduled task', { jobId, error });
+    }
   }
 
   private buildDAG(steps: Array<{ name: string; type: string; config: Record<string, unknown> }>): Record<string, unknown> {

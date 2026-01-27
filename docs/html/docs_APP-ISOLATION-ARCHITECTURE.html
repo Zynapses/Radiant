@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APP ISOLATION ARCHITECTURE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>APP ISOLATION ARCHITECTURE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/APP-ISOLATION-ARCHITECTURE.md</div>
+  </div>
+  
+  <h1 id="radiant-app-isolation-architecture">RADIANT App Isolation Architecture</h1>
+<blockquote>
+<p><strong>Version</strong>: 4.18.0<br />
+<strong>Status</strong>: MANDATORY - No exceptions<br />
+<strong>Last Updated</strong>: 2026-01-18</p>
+</blockquote>
+<h2 id="executive-summary">Executive Summary</h2>
+<p>RADIANT consists of <strong>four completely isolated applications</strong>. Think Tank MUST NOT share any web server, authentication context, or direct resource access with Radiant Admin. Period.</p>
+<h2 id="architecture-overview">Architecture Overview</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              RADIANT PLATFORM                                    │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                  │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐              │
+│  │  RADIANT ADMIN   │  │ THINK TANK ADMIN │  │ THINK TANK       │              │
+│  │  (Platform)      │  │ (Tenant Admin)   │  │ (Consumer)       │              │
+│  ├──────────────────┤  ├──────────────────┤  ├──────────────────┤              │
+│  │ Port: 3000       │  │ Port: 3001       │  │ Port: 3002       │              │
+│  │ Domain: admin.*  │  │ Domain: manage.* │  │ Domain: app.*    │              │
+│  │ Auth: Cognito    │  │ Auth: API-only   │  │ Auth: API-only   │              │
+│  │ Role: SuperAdmin │  │ Role: TenantAdmin│  │ Role: User       │              │
+│  └────────┬─────────┘  └────────┬─────────┘  └────────┬─────────┘              │
+│           │                     │                     │                         │
+│           │                     │                     │                         │
+│           ▼                     ▼                     ▼                         │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                         RADIANT API GATEWAY                              │   │
+│  │                    (API Gateway + Lambda Functions)                      │   │
+│  ├─────────────────────────────────────────────────────────────────────────┤   │
+│  │  /api/admin/*     - Radiant Admin endpoints (SuperAdmin only)           │   │
+│  │  /api/thinktank/* - Think Tank Admin endpoints (TenantAdmin)            │   │
+│  │  /api/v2/*        - Think Tank Consumer endpoints (Users)               │   │
+│  │  /api/auth/*      - Authentication endpoints (all apps)                 │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                                     │                                           │
+│                                     ▼                                           │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                         RADIANT INFRASTRUCTURE                           │   │
+│  │              (Aurora PostgreSQL, S3, SageMaker, etc.)                   │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                  │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+  ┌──────────────────┐
+  │  SWIFT DEPLOYER  │  (macOS app - deploys infrastructure)
+  │  (Native macOS)  │
+  └──────────────────┘</code></pre>
+<h2 id="four-applications">Four Applications</h2>
+<h3 id="radiant-admin-appsradiant-admin">1. Radiant Admin (<code>apps/radiant-admin/</code>)</h3>
+<p><strong>Purpose</strong>: Platform-level administration for RADIANT infrastructure.</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Users</strong></td>
+<td>Platform SuperAdmins only</td>
+</tr>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>Direct Cognito (Admin User Pool)</td>
+</tr>
+<tr>
+<td><strong>Domain</strong></td>
+<td><code>admin.{domain}</code></td>
+</tr>
+<tr>
+<td><strong>Port</strong></td>
+<td>3000</td>
+</tr>
+<tr>
+<td><strong>Access</strong></td>
+<td>Direct to Radiant resources (privileged)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Features</strong>: - Tenant management (create, suspend, delete) - Global model registry and pricing - Provider configuration (AWS Bedrock, OpenAI, etc.) - Infrastructure monitoring - Global billing and costs - Security alerts and compliance - Multi-region configuration - System-wide settings</p>
+<p><strong>What it does NOT contain</strong>: - ❌ Any Think Tank user features - ❌ Any Think Tank admin features - ❌ Conversation management - ❌ User rules management - ❌ Delight system configuration - ❌ Domain mode configuration</p>
+<hr />
+<h3 id="think-tank-admin-appsthinktank-admin">2. Think Tank Admin (<code>apps/thinktank-admin/</code>)</h3>
+<p><strong>Purpose</strong>: Tenant-level administration for Think Tank.</p>
+<table>
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Users</strong></td>
+<td>Tenant Administrators ONLY (TenantAdmin, SuperAdmin roles)</td>
+</tr>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>API-only (via <code>/api/auth/admin/*</code> endpoints)</td>
+</tr>
+<tr>
+<td><strong>Domain</strong></td>
+<td><code>manage.{tenant}.{domain}</code></td>
+</tr>
+<tr>
+<td><strong>Port</strong></td>
+<td>3001</td>
+</tr>
+<tr>
+<td><strong>Access</strong></td>
+<td>API-only - NO direct Radiant access</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CRITICAL: Admin Role Validation</strong></p>
+<p>Think Tank Admin uses <strong>admin-only authentication endpoints</strong> that validate user roles:</p>
+<pre><code>POST /api/auth/admin/login    - Validates TenantAdmin or SuperAdmin role
+POST /api/auth/admin/refresh  - Re-validates admin role on every refresh
+GET  /api/auth/admin/session  - Validates admin role for session checks</code></pre>
+<p><strong>Non-admin users (regular Users) CANNOT access Think Tank Admin. No exceptions.</strong></p>
+<ul>
+<li>Server-side: Lambda validates role is in <code>['SuperAdmin', 'TenantAdmin', 'super_admin', 'tenant_admin', 'admin']</code></li>
+<li>Client-side: Double-validation in auth client (defense in depth)</li>
+<li>On 403 ADMIN_ACCESS_DENIED: Immediate redirect to login with clear error message</li>
+</ul>
+<p><strong>Features</strong>: - Think Tank user management (within tenant) - Conversation monitoring and moderation - User rules templates - Delight system configuration - Domain mode configuration - Model category preferences - Shadow testing configuration - Ego system configuration - Collaboration settings - Compliance within tenant - Tenant-level analytics</p>
+<p><strong>Security Rules</strong>: - ✅ All data access via Radiant API - ✅ Tenant isolation enforced by API - ✅ No direct database access - ✅ No direct S3 access - ✅ No Cognito SDK usage - ❌ Cannot access other tenants - ❌ Cannot modify platform settings</p>
+<hr />
+<h3 id="think-tank-consumer-appsthinktank">3. Think Tank Consumer (<code>apps/thinktank/</code>)</h3>
+<p><strong>Purpose</strong>: End-user AI chat application.</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Users</strong></td>
+<td>End users (consumers)</td>
+</tr>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>API-only (via <code>/api/auth/*</code>)</td>
+</tr>
+<tr>
+<td><strong>Domain</strong></td>
+<td><code>app.{tenant}.{domain}</code> or <code>{tenant}.thinktank.ai</code></td>
+</tr>
+<tr>
+<td><strong>Port</strong></td>
+<td>3002</td>
+</tr>
+<tr>
+<td><strong>Access</strong></td>
+<td>API-only - NO direct Radiant access</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Features</strong>: - AI chat interface - Conversation history - My Rules (personal preferences) - Brain plan visualization - Artifacts (generated content) - Collaboration (real-time sessions) - Domain selection - Model preferences - File uploads (via API) - Export/share conversations</p>
+<p><strong>Security Rules</strong>: - ✅ All data access via Radiant API - ✅ User can only access own data - ✅ Tenant isolation enforced by API - ✅ Rate limiting enforced by API - ❌ No direct database access - ❌ No direct S3 access - ❌ No Cognito SDK usage - ❌ No admin functionality</p>
+<hr />
+<h3 id="swift-deployer-appsswift-deployer">4. Swift Deployer (<code>apps/swift-deployer/</code>)</h3>
+<p><strong>Purpose</strong>: macOS application for deploying RADIANT infrastructure.</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Users</strong></td>
+<td>DevOps / Platform Engineers</td>
+</tr>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>AWS credentials (local)</td>
+</tr>
+<tr>
+<td><strong>Platform</strong></td>
+<td>macOS 13.0+</td>
+</tr>
+<tr>
+<td><strong>Access</strong></td>
+<td>AWS APIs for deployment</td>
+</tr>
+</tbody>
+</table>
+<p><em>No changes to this app.</em></p>
+<hr />
+<h2 id="authentication-architecture">Authentication Architecture</h2>
+<h3 id="radiant-admin-direct-cognito">Radiant Admin (Direct Cognito)</h3>
+<pre><code>┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│  Radiant Admin  │────▶│  Cognito Admin   │────▶│  Radiant API    │
+│  (Browser)      │     │  User Pool       │     │  (Privileged)   │
+└─────────────────┘     └──────────────────┘     └─────────────────┘</code></pre>
+<ul>
+<li>Uses <code>@aws-amplify/auth</code> directly</li>
+<li>Admin User Pool (separate from Think Tank users)</li>
+<li>Returns Cognito tokens</li>
+<li>API validates Cognito JWT directly</li>
+</ul>
+<h3 id="think-tank-apps-api-only-auth">Think Tank Apps (API-Only Auth)</h3>
+<pre><code>┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│  Think Tank     │────▶│  Radiant API     │────▶│  Cognito User   │
+│  (Browser)      │     │  /api/auth/*     │     │  Pool           │
+└─────────────────┘     └──────────────────┘     └─────────────────┘
+        │                       │
+        │                       ▼
+        │               ┌──────────────────┐
+        │               │  Session Token   │
+        │               │  (API-issued)    │
+        └───────────────┴──────────────────┘</code></pre>
+<ul>
+<li>NO Cognito SDK in browser</li>
+<li>All auth via <code>/api/auth/*</code> endpoints:
+<ul>
+<li><code>POST /api/auth/login</code> - Email/password login</li>
+<li><code>POST /api/auth/register</code> - User registration</li>
+<li><code>POST /api/auth/refresh</code> - Refresh session</li>
+<li><code>POST /api/auth/logout</code> - End session</li>
+<li><code>POST /api/auth/forgot-password</code> - Password reset</li>
+<li><code>POST /api/auth/verify-email</code> - Email verification</li>
+</ul></li>
+<li>API returns opaque session tokens (not Cognito tokens)</li>
+<li>Sessions stored server-side (Redis/DynamoDB)</li>
+<li>Tokens are httpOnly cookies or short-lived JWTs</li>
+</ul>
+<hr />
+<h2 id="directory-structure">Directory Structure</h2>
+<pre><code>apps/
+├── radiant-admin/              # Platform administration
+│   ├── app/
+│   │   ├── (dashboard)/        # Admin pages
+│   │   │   ├── tenants/
+│   │   │   ├── models/
+│   │   │   ├── providers/
+│   │   │   ├── billing/
+│   │   │   ├── security/
+│   │   │   ├── compliance/
+│   │   │   ├── orchestration/
+│   │   │   ├── consciousness/
+│   │   │   ├── brain/
+│   │   │   ├── cato/
+│   │   │   └── ...
+│   │   └── api/                # BFF routes (proxy to Lambda)
+│   ├── lib/
+│   │   ├── auth/               # Cognito auth (direct)
+│   │   └── api/                # API client
+│   └── components/
+│
+├── thinktank-admin/            # Think Tank tenant administration
+│   ├── app/
+│   │   ├── (dashboard)/
+│   │   │   ├── users/
+│   │   │   ├── conversations/
+│   │   │   ├── rules/
+│   │   │   ├── delight/
+│   │   │   ├── domain-modes/
+│   │   │   ├── model-categories/
+│   │   │   ├── shadow-testing/
+│   │   │   ├── ego/
+│   │   │   ├── collaborate/
+│   │   │   ├── compliance/
+│   │   │   ├── settings/
+│   │   │   └── analytics/
+│   │   └── api/                # BFF routes (proxy to Lambda)
+│   ├── lib/
+│   │   ├── auth/               # API-only auth
+│   │   └── api/                # API client
+│   └── components/
+│
+├── thinktank/                  # Think Tank consumer app
+│   ├── app/
+│   │   ├── (chat)/             # Main chat interface
+│   │   ├── (settings)/         # User settings
+│   │   │   ├── my-rules/
+│   │   │   ├── preferences/
+│   │   │   └── profile/
+│   │   ├── collaborate/        # Collaboration sessions
+│   │   ├── artifacts/          # Generated artifacts
+│   │   └── api/                # BFF routes (proxy to Lambda)
+│   ├── lib/
+│   │   ├── auth/               # API-only auth
+│   │   └── api/                # API client
+│   └── components/
+│
+└── swift-deployer/             # macOS deployer (unchanged)</code></pre>
+<hr />
+<h2 id="api-endpoint-segregation">API Endpoint Segregation</h2>
+<h3 id="platform-admin-endpoints-apiadmin">Platform Admin Endpoints (<code>/api/admin/*</code>)</h3>
+<p>Only accessible by Radiant Admin with SuperAdmin role:</p>
+<pre><code>/api/admin/tenants/*
+/api/admin/models/*
+/api/admin/providers/*
+/api/admin/billing/*
+/api/admin/security/*
+/api/admin/compliance/*
+/api/admin/orchestration/*
+/api/admin/consciousness/*
+/api/admin/brain/*
+/api/admin/cato/*
+/api/admin/infrastructure/*
+/api/admin/multi-region/*</code></pre>
+<h3 id="think-tank-admin-endpoints-apithinktank">Think Tank Admin Endpoints (<code>/api/thinktank/*</code>)</h3>
+<p>Accessible by Think Tank Admin with TenantAdmin role:</p>
+<pre><code>/api/thinktank/users/*
+/api/thinktank/conversations/*
+/api/thinktank/rules/*
+/api/thinktank/delight/*
+/api/thinktank/domain-modes/*
+/api/thinktank/model-categories/*
+/api/thinktank/shadow-testing/*
+/api/thinktank/ego/*
+/api/thinktank/collaborate/*
+/api/thinktank/compliance/*
+/api/thinktank/settings/*
+/api/thinktank/analytics/*</code></pre>
+<h3 id="think-tank-consumer-endpoints-apiv2">Think Tank Consumer Endpoints (<code>/api/v2/*</code>)</h3>
+<p>Accessible by Think Tank users:</p>
+<pre><code>/api/v2/chat/*
+/api/v2/conversations/*
+/api/v2/my-rules/*
+/api/v2/preferences/*
+/api/v2/brain-plan/*
+/api/v2/artifacts/*
+/api/v2/collaborate/*
+/api/v2/domain-taxonomy/*
+/api/v2/models/*
+/api/v2/upload/*
+/api/v2/export/*</code></pre>
+<h3 id="auth-endpoints-apiauth">Auth Endpoints (<code>/api/auth/*</code>)</h3>
+<p>Used by Think Tank apps (not Radiant Admin):</p>
+<pre><code>POST /api/auth/login
+POST /api/auth/register
+POST /api/auth/refresh
+POST /api/auth/logout
+POST /api/auth/forgot-password
+POST /api/auth/verify-email
+POST /api/auth/change-password
+GET  /api/auth/session</code></pre>
+<hr />
+<h2 id="security-invariants">Security Invariants</h2>
+<h3 id="must-never">MUST NEVER</h3>
+<ol type="1">
+<li><strong>Think Tank apps MUST NEVER</strong>:
+<ul>
+<li>Import <code>@aws-amplify/auth</code> or any Cognito SDK</li>
+<li>Access AWS resources directly (S3, DynamoDB, etc.)</li>
+<li>Have database connection strings</li>
+<li>Have AWS credentials</li>
+<li>Access Radiant Admin endpoints</li>
+<li>Share cookies/sessions with Radiant Admin</li>
+</ul></li>
+<li><strong>Radiant Admin MUST NEVER</strong>:
+<ul>
+<li>Serve Think Tank consumer pages</li>
+<li>Serve Think Tank admin pages</li>
+<li>Share authentication with Think Tank</li>
+</ul></li>
+</ol>
+<h3 id="must-always">MUST ALWAYS</h3>
+<ol type="1">
+<li><strong>Think Tank apps MUST ALWAYS</strong>:
+<ul>
+<li>Authenticate via <code>/api/auth/*</code> endpoints only</li>
+<li>Access data via Radiant API only</li>
+<li>Include tenant ID in all requests</li>
+<li>Handle API errors gracefully</li>
+</ul></li>
+<li><strong>API MUST ALWAYS</strong>:
+<ul>
+<li>Validate session tokens server-side</li>
+<li>Enforce tenant isolation</li>
+<li>Rate limit requests</li>
+<li>Log all access attempts</li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="deployment">Deployment</h2>
+<h3 id="separate-domains">Separate Domains</h3>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 46%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>App</th>
+<th>Production Domain</th>
+<th>Staging Domain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Radiant Admin</td>
+<td><code>admin.radiant.ai</code></td>
+<td><code>admin.staging.radiant.ai</code></td>
+</tr>
+<tr>
+<td>Think Tank Admin</td>
+<td><code>manage.{tenant}.radiant.ai</code></td>
+<td><code>manage.{tenant}.staging.radiant.ai</code></td>
+</tr>
+<tr>
+<td>Think Tank</td>
+<td><code>{tenant}.thinktank.ai</code></td>
+<td><code>{tenant}.staging.thinktank.ai</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="cdk-stacks">CDK Stacks</h3>
+<pre class="typescript"><code>// Separate CloudFront distributions
+new RadiantAdminStack(app, &#39;RadiantAdmin&#39;, { ... });
+new ThinkTankAdminStack(app, &#39;ThinkTankAdmin&#39;, { ... });
+new ThinkTankConsumerStack(app, &#39;ThinkTankConsumer&#39;, { ... });</code></pre>
+<hr />
+<h2 id="migration-plan">Migration Plan</h2>
+<h3 id="phase-1-create-new-apps">Phase 1: Create New Apps</h3>
+<ol type="1">
+<li>Create <code>apps/thinktank-admin/</code> with API-only auth</li>
+<li>Create proper <code>apps/thinktank/</code> consumer app</li>
+<li>Implement <code>/api/auth/*</code> Lambda endpoints</li>
+</ol>
+<h3 id="phase-2-migrate-features">Phase 2: Migrate Features</h3>
+<ol type="1">
+<li>Move Think Tank admin pages to <code>thinktank-admin/</code></li>
+<li>Move Think Tank consumer features to <code>thinktank/</code></li>
+<li>Update all API calls to use proper endpoints</li>
+</ol>
+<h3 id="phase-3-clean-radiant-admin">Phase 3: Clean Radiant Admin</h3>
+<ol type="1">
+<li>Remove all Think Tank code from <code>admin-dashboard/</code></li>
+<li>Rename <code>admin-dashboard/</code> to <code>radiant-admin/</code></li>
+<li>Update sidebar and navigation</li>
+</ol>
+<h3 id="phase-4-deploy-verify">Phase 4: Deploy &amp; Verify</h3>
+<ol type="1">
+<li>Deploy all three apps to separate domains</li>
+<li>Verify authentication isolation</li>
+<li>Verify API access controls</li>
+<li>Security audit</li>
+</ol>
+<hr />
+<h2 id="compliance">Compliance</h2>
+<p>This architecture is REQUIRED for: - <strong>SOC 2 Type II</strong>: Separation of duties - <strong>HIPAA</strong>: Access controls and audit trails - <strong>GDPR</strong>: Data isolation and consent management - <strong>PCI DSS</strong>: Network segmentation (if processing payments)</p>
+<hr />
+<h2 id="document-history">Document History</h2>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Version</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-01-18</td>
+<td>1.0.0</td>
+<td>Initial architecture document</td>
+</tr>
+</tbody>
+</table>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIANT COMPLETE INDEX - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RADIANT COMPLETE INDEX</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/RADIANT-COMPLETE-INDEX.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.18.0---complete-source-code-export">RADIANT v4.18.0 - Complete Source Code Export</h1>
+<p><strong>For Gemini Assessment</strong> <strong>Export Date</strong>: January 9, 2026 <strong>Total Source Files</strong>: 1,484</p>
+<hr />
+<h2 id="executive-summary">Executive Summary</h2>
+<p><strong>RADIANT</strong> (Real-time AI Decision Intelligence And Neural Technology) is a <strong>multi-tenant AWS SaaS platform</strong> for enterprise AI model access, orchestration, and management. It consists of three primary components:</p>
+<ol type="1">
+<li><strong>Swift Deployer App</strong> - macOS native application for infrastructure deployment</li>
+<li><strong>AWS Infrastructure</strong> - CDK-defined serverless backend with 14+ stacks</li>
+<li><strong>Admin Dashboard</strong> - Next.js web interface for platform administration</li>
+</ol>
+<p>The platform also includes <strong>Think Tank</strong>, a consumer-facing AI assistant with advanced features like procedural memory (The Grimoire), cost optimization (Economic Governor), and multi-model orchestration.</p>
+<hr />
+<h2 id="architecture-overview">Architecture Overview</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           RADIANT Platform v4.18.0                              │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                         CLIENT APPLICATIONS                              │   │
+│  │  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────┐   │   │
+│  │  │  Swift Deployer   │  │  Admin Dashboard  │  │   Think Tank UI   │   │   │
+│  │  │  (macOS Native)   │  │  (Next.js 14)     │  │   (React/Next)    │   │   │
+│  │  └───────────────────┘  └───────────────────┘  └───────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                          │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                          API GATEWAY LAYER                               │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │   │
+│  │  │  REST API   │  │ WebSocket   │  │  Auth API   │  │  Admin API  │   │   │
+│  │  │  /api/v2    │  │  /ws        │  │  /auth      │  │  /admin     │   │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                          │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                        LAMBDA FUNCTIONS LAYER                            │   │
+│  │  ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌──────────┐  │   │
+│  │  │   Brain   │ │  Think    │ │  Billing  │ │   Cato    │ │ Governor │  │   │
+│  │  │  Router   │ │  Tank     │ │  Metering │ │  Safety   │ │   API    │  │   │
+│  │  └───────────┘ └───────────┘ └───────────┘ └───────────┘ └──────────┘  │   │
+│  │  ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌──────────┐  │   │
+│  │  │ Grimoire  │ │  Admin    │ │ Artifact  │ │   Ego     │ │  Domain  │  │   │
+│  │  │   API     │ │  Handlers │ │  Engine   │ │  Service  │ │ Taxonomy │  │   │
+│  │  └───────────┘ └───────────┘ └───────────┘ └───────────┘ └──────────┘  │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                          │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                          AI SERVICES LAYER                               │   │
+│  │  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────┐  │   │
+│  │  │      LiteLLM        │  │   Self-Hosted       │  │   External      │  │   │
+│  │  │   (Proxy/Router)    │  │   Models (56)       │  │   APIs (50)     │  │   │
+│  │  └─────────────────────┘  └─────────────────────┘  └─────────────────┘  │   │
+│  │  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────┐  │   │
+│  │  │   Consciousness     │  │   Flyte Workflows   │  │  Formal         │  │   │
+│  │  │   Engine            │  │   (Python)          │  │  Reasoning      │  │   │
+│  │  └─────────────────────┘  └─────────────────────┘  └─────────────────┘  │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                                      │                                          │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │                         DATA PERSISTENCE LAYER                           │   │
+│  │  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────┐  │   │
+│  │  │  Aurora PostgreSQL  │  │   ElastiCache       │  │   S3 Storage    │  │   │
+│  │  │  (160+ migrations)  │  │   (Redis)           │  │   (Artifacts)   │  │   │
+│  │  │  + pgvector         │  │                     │  │                 │  │   │
+│  │  └─────────────────────┘  └─────────────────────┘  └─────────────────┘  │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="project-structure">Project Structure</h2>
+<pre><code>radiant/
+├── VERSION                          # &quot;4.18.0&quot;
+├── RADIANT_VERSION                  # &quot;4.18.0&quot;  
+├── THINKTANK_VERSION                # &quot;3.2.0&quot;
+├── VERSION_HISTORY.json             # All releases with hashes
+│
+├── apps/                            # Client Applications
+│   ├── swift-deployer/              # macOS Deployer (36 Swift files)
+│   │   ├── Sources/RadiantDeployer/
+│   │   │   ├── Models/              # Data models
+│   │   │   ├── Services/            # AWS, API, AI services
+│   │   │   ├── Views/               # SwiftUI views
+│   │   │   └── Components/          # Reusable UI components
+│   │   └── Package.swift
+│   │
+│   └── admin-dashboard/             # Next.js Admin UI (~120 TSX files)
+│       ├── app/(dashboard)/         # Dashboard pages
+│       │   ├── brain/               # Brain Router config
+│       │   ├── cato/                # Safety system admin
+│       │   ├── thinktank/           # Think Tank features
+│       │   ├── models/              # AI model management
+│       │   └── billing/             # Billing &amp; usage
+│       ├── components/              # React components
+│       └── lib/                     # Utilities
+│
+├── packages/                        # Core Packages
+│   ├── shared/                      # @radiant/shared (~80 TS files)
+│   │   └── src/
+│   │       ├── types/               # TypeScript type definitions
+│   │       └── constants/           # Shared constants
+│   │
+│   ├── infrastructure/              # @radiant/infrastructure (~500 files)
+│   │   ├── lib/stacks/              # 14+ CDK stacks
+│   │   ├── lambda/                  # Lambda handlers
+│   │   │   ├── admin/               # Admin API handlers
+│   │   │   ├── api/                 # Public API handlers
+│   │   │   ├── brain/               # Brain Router
+│   │   │   ├── thinktank/           # Think Tank APIs
+│   │   │   └── shared/              # Shared services
+│   │   │       └── services/        # Core business logic
+│   │   └── migrations/              # 160+ SQL migrations
+│   │
+│   └── flyte/                       # Python Workflows (6 files)
+│       ├── workflows/               # Flyte task definitions
+│       └── utils/                   # Python utilities
+│
+├── config/                          # Configuration
+│   └── ethics/presets/              # Ethics framework presets
+│
+└── docs/                            # Documentation
+    ├── RADIANT-ADMIN-GUIDE.md       # Platform admin guide
+    ├── THINKTANK-ADMIN-GUIDE.md     # Think Tank admin guide
+    └── exports/                     # Source exports (this directory)</code></pre>
+<hr />
+<h2 id="component-details">Component Details</h2>
+<h3 id="swift-deployer-app-36-files">1. Swift Deployer App (36 files)</h3>
+<p><strong>Purpose</strong>: Native macOS application for deploying and managing RADIANT infrastructure on AWS.</p>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 22%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Directory</th>
+<th>Files</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Models/</code></td>
+<td>8</td>
+<td>Data models (Configuration, Deployment, Credentials, etc.)</td>
+</tr>
+<tr>
+<td><code>Services/</code></td>
+<td>21</td>
+<td>AWS, CDK, API, AI, Database, Deployment services</td>
+</tr>
+<tr>
+<td><code>Views/</code></td>
+<td>3</td>
+<td>SwiftUI view controllers</td>
+</tr>
+<tr>
+<td><code>Components/</code></td>
+<td>4</td>
+<td>Reusable UI components</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key Features</strong>: - One-click AWS infrastructure deployment - Real-time deployment progress tracking - Multi-region support - 1Password credential integration - AI-powered deployment assistant - Secure local storage (SQLCipher)</p>
+<h3 id="aws-infrastructure-500-files">2. AWS Infrastructure (500+ files)</h3>
+<p><strong>Purpose</strong>: CDK-defined serverless backend with all Lambda functions, stacks, and configurations.</p>
+<h4 id="cdk-stacks-14-stacks">CDK Stacks (14 stacks)</h4>
+<table>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>admin-stack.ts</code></td>
+<td>Admin API and dashboard backend</td>
+</tr>
+<tr>
+<td><code>ai-stack.ts</code></td>
+<td>AI model integration and routing</td>
+</tr>
+<tr>
+<td><code>api-stack.ts</code></td>
+<td>Public REST API</td>
+</tr>
+<tr>
+<td><code>auth-stack.ts</code></td>
+<td>Cognito authentication</td>
+</tr>
+<tr>
+<td><code>batch-stack.ts</code></td>
+<td>Batch processing jobs</td>
+</tr>
+<tr>
+<td><code>brain-stack.ts</code></td>
+<td>Brain Router orchestration</td>
+</tr>
+<tr>
+<td><code>cato-genesis-stack.ts</code></td>
+<td>Consciousness engine</td>
+</tr>
+<tr>
+<td><code>cato-redis-stack.ts</code></td>
+<td>Cato Safety with Redis</td>
+</tr>
+<tr>
+<td><code>database-stack.ts</code></td>
+<td>Aurora PostgreSQL</td>
+</tr>
+<tr>
+<td><code>grimoire-stack.ts</code></td>
+<td>Procedural memory system</td>
+</tr>
+<tr>
+<td><code>storage-stack.ts</code></td>
+<td>S3 artifact storage</td>
+</tr>
+<tr>
+<td><code>thinktank-stack.ts</code></td>
+<td>Think Tank features</td>
+</tr>
+<tr>
+<td><code>tier-transition-stack.ts</code></td>
+<td>Tenant tier upgrades</td>
+</tr>
+<tr>
+<td><code>vpc-stack.ts</code></td>
+<td>VPC and networking</td>
+</tr>
+</tbody>
+</table>
+<h4 id="lambda-services-100-handlers">Lambda Services (100+ handlers)</h4>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Handlers</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>admin/</code></td>
+<td>20+</td>
+<td>Admin dashboard APIs</td>
+</tr>
+<tr>
+<td><code>api/</code></td>
+<td>10+</td>
+<td>Public model/chat APIs</td>
+</tr>
+<tr>
+<td><code>brain/</code></td>
+<td>5+</td>
+<td>Brain Router orchestration</td>
+</tr>
+<tr>
+<td><code>thinktank/</code></td>
+<td>15+</td>
+<td>Think Tank features</td>
+</tr>
+<tr>
+<td><code>billing/</code></td>
+<td>5+</td>
+<td>Usage metering and billing</td>
+</tr>
+<tr>
+<td><code>shared/services/</code></td>
+<td>40+</td>
+<td>Core business logic services</td>
+</tr>
+</tbody>
+</table>
+<h3 id="admin-dashboard-120-files">3. Admin Dashboard (120+ files)</h3>
+<p><strong>Purpose</strong>: Next.js 14 web application for platform administration.</p>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Pages</th>
+<th>Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Brain</td>
+<td>8</td>
+<td>Router config, cognition, dreams, oversight</td>
+</tr>
+<tr>
+<td>Cato</td>
+<td>6</td>
+<td>Safety personas, CBF, audit, recovery</td>
+</tr>
+<tr>
+<td>Think Tank</td>
+<td>15+</td>
+<td>Grimoire, Governor, Ego, domains, artifacts</td>
+</tr>
+<tr>
+<td>Models</td>
+<td>5</td>
+<td>Model management, thermal controls</td>
+</tr>
+<tr>
+<td>Billing</td>
+<td>3</td>
+<td>Usage, credits, invoices</td>
+</tr>
+<tr>
+<td>Compliance</td>
+<td>4</td>
+<td>HIPAA, SOC2, audit logs</td>
+</tr>
+<tr>
+<td>Settings</td>
+<td>5</td>
+<td>Configuration, timeouts, i18n</td>
+</tr>
+</tbody>
+</table>
+<h3 id="database-schema-160-migrations">4. Database Schema (160+ migrations)</h3>
+<p><strong>Purpose</strong>: PostgreSQL schema with Row-Level Security for multi-tenancy.</p>
+<table>
+<thead>
+<tr>
+<th>Migration Range</th>
+<th>Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>001-009</td>
+<td>Core schema, tenants, models, billing</td>
+</tr>
+<tr>
+<td>010-019</td>
+<td>Brain Router, analytics, Think Tank</td>
+</tr>
+<tr>
+<td>020-029</td>
+<td>Collaboration, memory, orchestration</td>
+</tr>
+<tr>
+<td>030-039</td>
+<td>Isolation, i18n, billing credits</td>
+</tr>
+<tr>
+<td>040-049</td>
+<td>Artifacts, scheduled prompts, domains</td>
+</tr>
+<tr>
+<td>050-099</td>
+<td>Brain plans, formal reasoning, ego</td>
+</tr>
+<tr>
+<td>100-129</td>
+<td>Consciousness, learning, metrics</td>
+</tr>
+<tr>
+<td>130-160</td>
+<td>Cato safety, PHI sanitization</td>
+</tr>
+</tbody>
+</table>
+<h3 id="flyte-workflows-6-files">5. Flyte Workflows (6 files)</h3>
+<p><strong>Purpose</strong>: Python-based workflow orchestration for Think Tank.</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>grimoire_tasks.py</code></td>
+<td>Procedural memory management</td>
+</tr>
+<tr>
+<td><code>think_tank_workflow.py</code></td>
+<td>HITL reasoning workflow</td>
+</tr>
+<tr>
+<td><code>db.py</code></td>
+<td>RLS-safe database connections</td>
+</tr>
+<tr>
+<td><code>embeddings.py</code></td>
+<td>Vector embedding generation</td>
+</tr>
+<tr>
+<td><code>cato_client.py</code></td>
+<td>Safety validation client</td>
+</tr>
+<tr>
+<td><code>__init__.py</code></td>
+<td>Module exports</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="key-features">Key Features</h2>
+<h3 id="multi-tenant-architecture">1. Multi-Tenant Architecture</h3>
+<ul>
+<li>Row-Level Security (RLS) on all tables</li>
+<li>Tenant context via <code>app.current_tenant_id</code></li>
+<li>Isolated data per tenant</li>
+</ul>
+<h3 id="ai-models">2. 106 AI Models</h3>
+<ul>
+<li>50 external providers (OpenAI, Anthropic, Google, etc.)</li>
+<li>56 self-hosted models (medical, scientific, etc.)</li>
+<li>LiteLLM proxy for unified access</li>
+</ul>
+<h3 id="brain-router">3. Brain Router</h3>
+<ul>
+<li>9 orchestration modes (thinking, coding, creative, etc.)</li>
+<li>Domain-aware model selection</li>
+<li>Affect-based hyperparameter mapping</li>
+</ul>
+<h3 id="consciousness-engine">4. Consciousness Engine</h3>
+<ul>
+<li>Ego system for persistent identity</li>
+<li>Affective state management</li>
+<li>Ethics framework selection</li>
+</ul>
+<h3 id="cato-safety">5. Cato Safety</h3>
+<ul>
+<li>5-layer security stack</li>
+<li>Control Barrier Functions (CBF)</li>
+<li>Merkle audit trail</li>
+<li>5 mood personas</li>
+</ul>
+<h3 id="the-grimoire">6. The Grimoire</h3>
+<ul>
+<li>Self-optimizing procedural memory</li>
+<li>Vector embeddings for semantic search</li>
+<li>Automatic learning from successes</li>
+</ul>
+<h3 id="economic-governor">7. Economic Governor</h3>
+<ul>
+<li>System 0 complexity classification</li>
+<li>Cost-optimized model routing</li>
+<li>Per-domain configuration</li>
+</ul>
+<hr />
+<h2 id="export-file-index">Export File Index</h2>
+<p>This export is split into multiple parts by component:</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 34%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr>
+<th>Part</th>
+<th>File</th>
+<th>Contents</th>
+<th>Lines</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00</td>
+<td><code>RADIANT-COMPLETE-INDEX.md</code></td>
+<td>This master index</td>
+<td>-</td>
+</tr>
+<tr>
+<td>01</td>
+<td><code>RADIANT-SWIFT-DEPLOYER.md</code></td>
+<td>Swift Deployer App (all 36 files)</td>
+<td>~5,000</td>
+</tr>
+<tr>
+<td>02</td>
+<td><code>RADIANT-CDK-STACKS.md</code></td>
+<td>CDK Stack definitions (14 files)</td>
+<td>~3,000</td>
+</tr>
+<tr>
+<td>03</td>
+<td><code>RADIANT-LAMBDA-ADMIN.md</code></td>
+<td>Admin Lambda handlers</td>
+<td>~4,000</td>
+</tr>
+<tr>
+<td>04</td>
+<td><code>RADIANT-LAMBDA-API.md</code></td>
+<td>Public API Lambda handlers</td>
+<td>~3,000</td>
+</tr>
+<tr>
+<td>05</td>
+<td><code>RADIANT-LAMBDA-BRAIN.md</code></td>
+<td>Brain Router handlers</td>
+<td>~2,000</td>
+</tr>
+<tr>
+<td>06</td>
+<td><code>RADIANT-LAMBDA-THINKTANK.md</code></td>
+<td>Think Tank handlers</td>
+<td>~3,000</td>
+</tr>
+<tr>
+<td>07</td>
+<td><code>RADIANT-LAMBDA-SERVICES.md</code></td>
+<td>Shared services</td>
+<td>~8,000</td>
+</tr>
+<tr>
+<td>08</td>
+<td><code>RADIANT-SHARED-TYPES.md</code></td>
+<td>Type definitions</td>
+<td>~4,000</td>
+</tr>
+<tr>
+<td>09</td>
+<td><code>RADIANT-DASHBOARD-PAGES.md</code></td>
+<td>Admin dashboard pages</td>
+<td>~6,000</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>RADIANT-DASHBOARD-COMPONENTS.md</code></td>
+<td>Dashboard components</td>
+<td>~4,000</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>RADIANT-MIGRATIONS.md</code></td>
+<td>Database migrations</td>
+<td>~8,000</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>RADIANT-FLYTE-WORKFLOWS.md</code></td>
+<td>Python workflows</td>
+<td>~2,000</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Estimated Total</strong>: ~52,000 lines of source code</p>
+<hr />
+<h2 id="technology-stack">Technology Stack</h2>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Technologies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Frontend</strong></td>
+<td>Next.js 14, React, TypeScript, Tailwind CSS, shadcn/ui</td>
+</tr>
+<tr>
+<td><strong>Desktop</strong></td>
+<td>Swift 5.9, SwiftUI, macOS 13+, SQLCipher</td>
+</tr>
+<tr>
+<td><strong>Backend</strong></td>
+<td>AWS Lambda, Node.js 20, TypeScript</td>
+</tr>
+<tr>
+<td><strong>Database</strong></td>
+<td>Aurora PostgreSQL 15, pgvector, ElastiCache Redis</td>
+</tr>
+<tr>
+<td><strong>AI</strong></td>
+<td>LiteLLM, 106 models, SageMaker endpoints</td>
+</tr>
+<tr>
+<td><strong>Infra</strong></td>
+<td>AWS CDK, CloudFormation, VPC, API Gateway</td>
+</tr>
+<tr>
+<td><strong>Workflows</strong></td>
+<td>Flyte, Python 3.11</td>
+</tr>
+<tr>
+<td><strong>Auth</strong></td>
+<td>Cognito, JWT, RBAC</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="how-it-works-narrative">How It Works (Narrative)</h2>
+<h3 id="user-journey-think-tank-query">User Journey: Think Tank Query</h3>
+<ol type="1">
+<li><strong>User submits prompt</strong> via Think Tank UI</li>
+<li><strong>Domain Detection</strong> identifies field/specialty</li>
+<li><strong>Brain Router</strong> selects orchestration mode</li>
+<li><strong>Grimoire</strong> consulted for relevant heuristics</li>
+<li><strong>Governor</strong> evaluates complexity, selects optimal model</li>
+<li><strong>Cato Safety</strong> validates request</li>
+<li><strong>LiteLLM</strong> routes to selected model</li>
+<li><strong>Response generated</strong> with consciousness context</li>
+<li><strong>Librarian reviews</strong> for learning opportunities</li>
+<li><strong>Metrics logged</strong> for billing and analytics</li>
+</ol>
+<h3 id="admin-journey-model-management">Admin Journey: Model Management</h3>
+<ol type="1">
+<li><strong>Admin logs in</strong> via Cognito</li>
+<li><strong>Dashboard</strong> shows system health</li>
+<li><strong>Models page</strong> lists all 106 models</li>
+<li><strong>Enable/disable</strong> models per tenant</li>
+<li><strong>Set pricing</strong> and usage limits</li>
+<li><strong>Monitor usage</strong> in real-time</li>
+<li><strong>Review compliance</strong> reports</li>
+<li><strong>Manage billing</strong> and credits</li>
+</ol>
+<h3 id="deployment-journey-new-installation">Deployment Journey: New Installation</h3>
+<ol type="1">
+<li><strong>Open Swift Deployer</strong> on macOS</li>
+<li><strong>Configure AWS credentials</strong> (1Password integration)</li>
+<li><strong>Select region</strong> and environment</li>
+<li><strong>AI Assistant</strong> guides through setup</li>
+<li><strong>One-click deploy</strong> runs CDK stacks</li>
+<li><strong>Progress tracked</strong> in real-time</li>
+<li><strong>Health checks</strong> verify deployment</li>
+<li><strong>Admin invited</strong> via email</li>
+</ol>
+<hr />
+<h2 id="security-model">Security Model</h2>
+<h3 id="multi-tenant-isolation">Multi-Tenant Isolation</h3>
+<ul>
+<li>Every table has <code>tenant_id</code> column</li>
+<li>RLS policies enforce tenant boundaries</li>
+<li><code>SET app.current_tenant_id</code> before all queries</li>
+</ul>
+<h3 id="authentication">Authentication</h3>
+<ul>
+<li>Cognito user pools per tenant</li>
+<li>JWT tokens with tenant claims</li>
+<li>API Gateway authorizers</li>
+</ul>
+<h3 id="safety-cato">Safety (Cato)</h3>
+<ul>
+<li>5-layer security stack</li>
+<li>Control Barrier Functions (CBF)</li>
+<li>Fail-closed for writes</li>
+<li>Human escalation workflow</li>
+</ul>
+<h3 id="compliance">Compliance</h3>
+<ul>
+<li>HIPAA-ready with PHI sanitization</li>
+<li>SOC2 audit logging</li>
+<li>Data retention policies</li>
+<li>Self-audit checklists</li>
+</ul>
+<hr />
+<p><em>Companion export files follow with full source code…</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIANT ADMIN DASHBOARD - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RADIANT ADMIN DASHBOARD</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/RADIANT-ADMIN-DASHBOARD.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.18.0---admin-dashboard-export">RADIANT v4.18.0 - Admin Dashboard Export</h1>
+<p><strong>Component</strong>: Next.js Admin Web Application <strong>Framework</strong>: Next.js 14, React 18, TypeScript <strong>Styling</strong>: Tailwind CSS, shadcn/ui <strong>Files</strong>: 120+ TSX pages/components</p>
+<hr />
+<h2 id="architecture-narrative">Architecture Narrative</h2>
+<p>The Admin Dashboard is a <strong>Next.js 14 web application</strong> providing administrators with full control over the RADIANT platform. It uses the App Router, Server Components, and modern React patterns for optimal performance and developer experience.</p>
+<h3 id="technology-stack">Technology Stack</h3>
+<ul>
+<li><strong>Framework</strong>: Next.js 14 (App Router)</li>
+<li><strong>UI Components</strong>: shadcn/ui (Radix primitives)</li>
+<li><strong>Styling</strong>: Tailwind CSS</li>
+<li><strong>State Management</strong>: React Query (TanStack Query)</li>
+<li><strong>Forms</strong>: React Hook Form + Zod</li>
+<li><strong>Icons</strong>: Lucide React</li>
+<li><strong>Charts</strong>: Recharts</li>
+</ul>
+<h3 id="directory-structure">Directory Structure</h3>
+<pre><code>apps/admin-dashboard/
+├── app/                          # Next.js App Router
+│   ├── (dashboard)/             # Dashboard layout group
+│   │   ├── page.tsx             # Main dashboard
+│   │   ├── layout.tsx           # Dashboard layout
+│   │   ├── brain/               # AGI Brain admin (8 pages)
+│   │   ├── cato/                # Cato Safety admin (6 pages)
+│   │   ├── consciousness/       # Consciousness admin (7 pages)
+│   │   ├── thinktank/           # Think Tank admin (18 pages)
+│   │   ├── models/              # Model management (5 pages)
+│   │   ├── security/            # Security admin (8 pages)
+│   │   ├── orchestration/       # Orchestration (10 pages)
+│   │   └── ...                  # 50+ more sections
+│   ├── api/                     # API routes
+│   └── layout.tsx               # Root layout
+├── components/                  # Reusable components
+│   ├── ui/                      # shadcn/ui components (31)
+│   ├── dashboard/               # Dashboard components (4)
+│   ├── thinktank/               # Think Tank components (18)
+│   └── ...                      # Domain components
+├── lib/                         # Utilities and hooks
+│   ├── hooks/                   # Custom React hooks
+│   ├── api/                     # API client functions
+│   └── utils/                   # Helper utilities
+└── public/                      # Static assets</code></pre>
+<hr />
+<h2 id="key-pages">Key Pages</h2>
+<h3 id="main-dashboard-page.tsx">Main Dashboard (page.tsx)</h3>
+<p><strong>Purpose</strong>: Platform overview with key metrics, system health, and quick actions.</p>
+<pre class="tsx"><code>&#39;use client&#39;;
+
+import { MetricCard } from &#39;@/components/dashboard/metric-card&#39;;
+import { SystemHealth } from &#39;@/components/dashboard/system-health&#39;;
+import { ActivityFeed } from &#39;@/components/dashboard/activity-feed&#39;;
+import { QuickActions } from &#39;@/components/dashboard/quick-actions&#39;;
+import { useDashboard } from &#39;@/lib/hooks/use-dashboard&#39;;
+import { 
+  Activity, 
+  DollarSign, 
+  Cpu, 
+  Users,
+  Zap,
+  TrendingUp
+} from &#39;lucide-react&#39;;
+
+export default function DashboardPage() {
+  const { data, isLoading } = useDashboard();
+
+  return (
+    &lt;div className=&quot;space-y-6&quot;&gt;
+      &lt;div&gt;
+        &lt;h1 className=&quot;text-3xl font-bold tracking-tight&quot;&gt;Dashboard&lt;/h1&gt;
+        &lt;p className=&quot;text-muted-foreground&quot;&gt;
+          RADIANT platform overview and metrics
+        &lt;/p&gt;
+      &lt;/div&gt;
+
+      &lt;div className=&quot;grid gap-4 md:grid-cols-2 lg:grid-cols-4&quot;&gt;
+        &lt;MetricCard
+          title=&quot;Total Requests&quot;
+          value={data?.totalRequests?.value ?? 0}
+          change={data?.totalRequests?.change ?? 0}
+          icon={Activity}
+          loading={isLoading}
+        /&gt;
+        &lt;MetricCard
+          title=&quot;Active Models&quot;
+          value={data?.activeModels?.value ?? 0}
+          change={0}
+          icon={Cpu}
+          loading={isLoading}
+          format=&quot;number&quot;
+        /&gt;
+        &lt;MetricCard
+          title=&quot;Revenue (MTD)&quot;
+          value={data?.revenue?.value ?? 0}
+          change={data?.revenue?.change ?? 0}
+          icon={DollarSign}
+          loading={isLoading}
+          format=&quot;currency&quot;
+        /&gt;
+        &lt;MetricCard
+          title=&quot;Error Rate&quot;
+          value={data?.errorRate?.value ?? 0}
+          change={data?.errorRate?.change ?? 0}
+          icon={Zap}
+          loading={isLoading}
+        /&gt;
+      &lt;/div&gt;
+
+      &lt;div className=&quot;grid gap-6 md:grid-cols-2 lg:grid-cols-3&quot;&gt;
+        &lt;div className=&quot;lg:col-span-2&quot;&gt;
+          &lt;SystemHealth /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;QuickActions /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div className=&quot;grid gap-6 md:grid-cols-2&quot;&gt;
+        &lt;ActivityFeed /&gt;
+        &lt;div className=&quot;rounded-lg border bg-card p-6&quot;&gt;
+          &lt;h3 className=&quot;font-semibold mb-4 flex items-center gap-2&quot;&gt;
+            &lt;TrendingUp className=&quot;h-5 w-5&quot; /&gt;
+            Usage Trends
+          &lt;/h3&gt;
+          &lt;div className=&quot;h-[300px] flex items-center justify-center text-muted-foreground&quot;&gt;
+            Chart placeholder
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<hr />
+<h2 id="page-inventory">Page Inventory</h2>
+<h3 id="brain-administration-8-pages">Brain Administration (8 pages)</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>brain/page.tsx</code></td>
+<td>Brain dashboard overview</td>
+</tr>
+<tr>
+<td><code>brain/config/page.tsx</code></td>
+<td>SOFAI configuration</td>
+</tr>
+<tr>
+<td><code>brain/ghost/page.tsx</code></td>
+<td>Ghost vector management</td>
+</tr>
+<tr>
+<td><code>brain/flash-facts/page.tsx</code></td>
+<td>Flash fact administration</td>
+</tr>
+<tr>
+<td><code>brain/dreams/page.tsx</code></td>
+<td>Dream cycle monitoring</td>
+</tr>
+<tr>
+<td><code>brain/routing/page.tsx</code></td>
+<td>Routing analytics</td>
+</tr>
+<tr>
+<td><code>brain/oversight/page.tsx</code></td>
+<td>Human oversight queue</td>
+</tr>
+<tr>
+<td><code>brain/calibration/page.tsx</code></td>
+<td>Trust calibration</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cato-safety-6-pages">Cato Safety (6 pages)</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cato/page.tsx</code></td>
+<td>Cato dashboard</td>
+</tr>
+<tr>
+<td><code>cato/personas/page.tsx</code></td>
+<td>Mood/persona management</td>
+</tr>
+<tr>
+<td><code>cato/cbf/page.tsx</code></td>
+<td>Control Barrier Functions</td>
+</tr>
+<tr>
+<td><code>cato/audit/page.tsx</code></td>
+<td>Safety audit logs</td>
+</tr>
+<tr>
+<td><code>cato/recovery/page.tsx</code></td>
+<td>Epistemic recovery</td>
+</tr>
+<tr>
+<td><code>cato/config/page.tsx</code></td>
+<td>Safety configuration</td>
+</tr>
+</tbody>
+</table>
+<h3 id="consciousness-engine-7-pages">Consciousness Engine (7 pages)</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>consciousness/page.tsx</code></td>
+<td>Consciousness dashboard</td>
+</tr>
+<tr>
+<td><code>consciousness/mcp/page.tsx</code></td>
+<td>MCP server status</td>
+</tr>
+<tr>
+<td><code>consciousness/sleep/page.tsx</code></td>
+<td>Sleep cycle configuration</td>
+</tr>
+<tr>
+<td><code>consciousness/memory/page.tsx</code></td>
+<td>Memory management</td>
+</tr>
+<tr>
+<td><code>consciousness/goals/page.tsx</code></td>
+<td>Goal tracking</td>
+</tr>
+<tr>
+<td><code>consciousness/budget/page.tsx</code></td>
+<td>Budget monitoring</td>
+</tr>
+<tr>
+<td><code>consciousness/research/page.tsx</code></td>
+<td>Deep research queue</td>
+</tr>
+</tbody>
+</table>
+<h3 id="think-tank-18-pages">Think Tank (18 pages)</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>thinktank/artifacts/page.tsx</code></td>
+<td>Artifact management</td>
+</tr>
+<tr>
+<td><code>thinktank/collaborate/page.tsx</code></td>
+<td>Collaboration settings</td>
+</tr>
+<tr>
+<td><code>thinktank/compliance/page.tsx</code></td>
+<td>Think Tank compliance</td>
+</tr>
+<tr>
+<td><code>thinktank/conversations/page.tsx</code></td>
+<td>Conversation history</td>
+</tr>
+<tr>
+<td><code>thinktank/delight/page.tsx</code></td>
+<td>Delight engine</td>
+</tr>
+<tr>
+<td><code>thinktank/domain-modes/page.tsx</code></td>
+<td>Domain mode config</td>
+</tr>
+<tr>
+<td><code>thinktank/ego/page.tsx</code></td>
+<td>Ego system config</td>
+</tr>
+<tr>
+<td><code>thinktank/governor/page.tsx</code></td>
+<td>Economic Governor</td>
+</tr>
+<tr>
+<td><code>thinktank/grimoire/page.tsx</code></td>
+<td>Procedural memory</td>
+</tr>
+<tr>
+<td><code>thinktank/model-categories/page.tsx</code></td>
+<td>Model categories</td>
+</tr>
+<tr>
+<td><code>thinktank/my-rules/page.tsx</code></td>
+<td>User rules</td>
+</tr>
+<tr>
+<td><code>thinktank/settings/page.tsx</code></td>
+<td>Think Tank settings</td>
+</tr>
+<tr>
+<td><code>thinktank/shadow-testing/page.tsx</code></td>
+<td>Shadow testing</td>
+</tr>
+<tr>
+<td><code>thinktank/users/page.tsx</code></td>
+<td>Think Tank users</td>
+</tr>
+</tbody>
+</table>
+<h3 id="models-5-pages">Models (5 pages)</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>models/page.tsx</code></td>
+<td>Model registry</td>
+</tr>
+<tr>
+<td><code>models/providers/page.tsx</code></td>
+<td>Provider config</td>
+</tr>
+<tr>
+<td><code>models/self-hosted/page.tsx</code></td>
+<td>Self-hosted models</td>
+</tr>
+<tr>
+<td><code>models/routing/page.tsx</code></td>
+<td>Model routing</td>
+</tr>
+<tr>
+<td><code>models/costs/page.tsx</code></td>
+<td>Model costs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="security-8-pages">Security (8 pages)</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>security/page.tsx</code></td>
+<td>Security dashboard</td>
+</tr>
+<tr>
+<td><code>security/rbac/page.tsx</code></td>
+<td>Role management</td>
+</tr>
+<tr>
+<td><code>security/audit/page.tsx</code></td>
+<td>Security audit</td>
+</tr>
+<tr>
+<td><code>security/compliance/page.tsx</code></td>
+<td>Compliance status</td>
+</tr>
+<tr>
+<td><code>security/encryption/page.tsx</code></td>
+<td>Encryption settings</td>
+</tr>
+<tr>
+<td><code>security/secrets/page.tsx</code></td>
+<td>Secret management</td>
+</tr>
+<tr>
+<td><code>security/network/page.tsx</code></td>
+<td>Network security</td>
+</tr>
+<tr>
+<td><code>security/alerts/page.tsx</code></td>
+<td>Security alerts</td>
+</tr>
+</tbody>
+</table>
+<h3 id="orchestration-10-pages">Orchestration (10 pages)</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>orchestration/page.tsx</code></td>
+<td>Orchestration dashboard</td>
+</tr>
+<tr>
+<td><code>orchestration/workflows/page.tsx</code></td>
+<td>Workflow management</td>
+</tr>
+<tr>
+<td><code>orchestration/patterns/page.tsx</code></td>
+<td>Pattern library</td>
+</tr>
+<tr>
+<td><code>orchestration/swarms/page.tsx</code></td>
+<td>Swarm configuration</td>
+</tr>
+<tr>
+<td><code>orchestration/consensus/page.tsx</code></td>
+<td>Consensus settings</td>
+</tr>
+<tr>
+<td><code>orchestration/queues/page.tsx</code></td>
+<td>Queue monitoring</td>
+</tr>
+<tr>
+<td><code>orchestration/timeouts/page.tsx</code></td>
+<td>Timeout config</td>
+</tr>
+<tr>
+<td><code>orchestration/retries/page.tsx</code></td>
+<td>Retry policies</td>
+</tr>
+<tr>
+<td><code>orchestration/events/page.tsx</code></td>
+<td>Event history</td>
+</tr>
+<tr>
+<td><code>orchestration/metrics/page.tsx</code></td>
+<td>Orchestration metrics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="additional-sections-40-pages">Additional Sections (40+ pages)</h3>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Pages</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>administrators/</code></td>
+<td>2</td>
+<td>Admin user management</td>
+</tr>
+<tr>
+<td><code>analytics/</code></td>
+<td>3</td>
+<td>Usage analytics</td>
+</tr>
+<tr>
+<td><code>audit-logs/</code></td>
+<td>2</td>
+<td>System audit logs</td>
+</tr>
+<tr>
+<td><code>aws-logs/</code></td>
+<td>3</td>
+<td>AWS CloudWatch integration</td>
+</tr>
+<tr>
+<td><code>billing/</code></td>
+<td>2</td>
+<td>Billing management</td>
+</tr>
+<tr>
+<td><code>compliance/</code></td>
+<td>5</td>
+<td>Compliance controls</td>
+</tr>
+<tr>
+<td><code>configuration/</code></td>
+<td>3</td>
+<td>System configuration</td>
+</tr>
+<tr>
+<td><code>costs/</code></td>
+<td>1</td>
+<td>Cost management</td>
+</tr>
+<tr>
+<td><code>deployments/</code></td>
+<td>2</td>
+<td>Deployment history</td>
+</tr>
+<tr>
+<td><code>experiments/</code></td>
+<td>2</td>
+<td>A/B testing</td>
+</tr>
+<tr>
+<td><code>geographic/</code></td>
+<td>2</td>
+<td>Geographic distribution</td>
+</tr>
+<tr>
+<td><code>health/</code></td>
+<td>2</td>
+<td>System health</td>
+</tr>
+<tr>
+<td><code>localization/</code></td>
+<td>5</td>
+<td>i18n management</td>
+</tr>
+<tr>
+<td><code>migrations/</code></td>
+<td>2</td>
+<td>Database migrations</td>
+</tr>
+<tr>
+<td><code>multi-region/</code></td>
+<td>2</td>
+<td>Multi-region config</td>
+</tr>
+<tr>
+<td><code>notifications/</code></td>
+<td>2</td>
+<td>Notification settings</td>
+</tr>
+<tr>
+<td><code>providers/</code></td>
+<td>2</td>
+<td>Provider management</td>
+</tr>
+<tr>
+<td><code>qa/</code></td>
+<td>2</td>
+<td>Quality assurance</td>
+</tr>
+<tr>
+<td><code>revenue/</code></td>
+<td>2</td>
+<td>Revenue tracking</td>
+</tr>
+<tr>
+<td><code>settings/</code></td>
+<td>6</td>
+<td>System settings</td>
+</tr>
+<tr>
+<td><code>storage/</code></td>
+<td>2</td>
+<td>Storage management</td>
+</tr>
+<tr>
+<td><code>tenants/</code></td>
+<td>1</td>
+<td>Tenant management</td>
+</tr>
+<tr>
+<td><code>time-machine/</code></td>
+<td>2</td>
+<td>Time Machine admin</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="component-library">Component Library</h2>
+<h3 id="shadcnui-components-31-files">shadcn/ui Components (31 files)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>button.tsx</code></td>
+<td>Button variants</td>
+</tr>
+<tr>
+<td><code>card.tsx</code></td>
+<td>Card container</td>
+</tr>
+<tr>
+<td><code>dialog.tsx</code></td>
+<td>Modal dialogs</td>
+</tr>
+<tr>
+<td><code>dropdown-menu.tsx</code></td>
+<td>Dropdown menus</td>
+</tr>
+<tr>
+<td><code>form.tsx</code></td>
+<td>Form wrapper</td>
+</tr>
+<tr>
+<td><code>input.tsx</code></td>
+<td>Input fields</td>
+</tr>
+<tr>
+<td><code>label.tsx</code></td>
+<td>Form labels</td>
+</tr>
+<tr>
+<td><code>select.tsx</code></td>
+<td>Select dropdowns</td>
+</tr>
+<tr>
+<td><code>table.tsx</code></td>
+<td>Data tables</td>
+</tr>
+<tr>
+<td><code>tabs.tsx</code></td>
+<td>Tab navigation</td>
+</tr>
+<tr>
+<td><code>toast.tsx</code></td>
+<td>Toast notifications</td>
+</tr>
+<tr>
+<td><code>tooltip.tsx</code></td>
+<td>Tooltips</td>
+</tr>
+<tr>
+<td><code>avatar.tsx</code></td>
+<td>User avatars</td>
+</tr>
+<tr>
+<td><code>badge.tsx</code></td>
+<td>Status badges</td>
+</tr>
+<tr>
+<td><code>checkbox.tsx</code></td>
+<td>Checkboxes</td>
+</tr>
+<tr>
+<td><code>command.tsx</code></td>
+<td>Command palette</td>
+</tr>
+<tr>
+<td><code>popover.tsx</code></td>
+<td>Popovers</td>
+</tr>
+<tr>
+<td><code>progress.tsx</code></td>
+<td>Progress bars</td>
+</tr>
+<tr>
+<td><code>separator.tsx</code></td>
+<td>Visual separators</td>
+</tr>
+<tr>
+<td><code>sheet.tsx</code></td>
+<td>Slide-out panels</td>
+</tr>
+<tr>
+<td><code>skeleton.tsx</code></td>
+<td>Loading skeletons</td>
+</tr>
+<tr>
+<td><code>slider.tsx</code></td>
+<td>Range sliders</td>
+</tr>
+<tr>
+<td><code>switch.tsx</code></td>
+<td>Toggle switches</td>
+</tr>
+<tr>
+<td><code>textarea.tsx</code></td>
+<td>Text areas</td>
+</tr>
+<tr>
+<td>…</td>
+<td>7 more</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dashboard-components-4-files">Dashboard Components (4 files)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>metric-card.tsx</code></td>
+<td>KPI metric display</td>
+</tr>
+<tr>
+<td><code>system-health.tsx</code></td>
+<td>Health status grid</td>
+</tr>
+<tr>
+<td><code>activity-feed.tsx</code></td>
+<td>Recent activity list</td>
+</tr>
+<tr>
+<td><code>quick-actions.tsx</code></td>
+<td>Common action buttons</td>
+</tr>
+</tbody>
+</table>
+<h3 id="think-tank-components-18-files">Think Tank Components (18 files)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>brain-plan-viewer.tsx</code></td>
+<td>Brain plan visualization</td>
+</tr>
+<tr>
+<td><code>artifact-viewer.tsx</code></td>
+<td>Artifact display</td>
+</tr>
+<tr>
+<td><code>conversation-panel.tsx</code></td>
+<td>Conversation UI</td>
+</tr>
+<tr>
+<td><code>domain-mode-card.tsx</code></td>
+<td>Domain mode display</td>
+</tr>
+<tr>
+<td><code>ego-dashboard.tsx</code></td>
+<td>Ego system UI</td>
+</tr>
+<tr>
+<td><code>governor-config.tsx</code></td>
+<td>Governor settings</td>
+</tr>
+<tr>
+<td><code>grimoire-table.tsx</code></td>
+<td>Heuristics table</td>
+</tr>
+<tr>
+<td><code>model-category-card.tsx</code></td>
+<td>Model category display</td>
+</tr>
+<tr>
+<td><code>rating-panel.tsx</code></td>
+<td>Rating interface</td>
+</tr>
+<tr>
+<td><code>rule-editor.tsx</code></td>
+<td>User rule editor</td>
+</tr>
+<tr>
+<td><code>swarm-visualizer.tsx</code></td>
+<td>Swarm visualization</td>
+</tr>
+<tr>
+<td><code>user-context-panel.tsx</code></td>
+<td>User context display</td>
+</tr>
+<tr>
+<td>…</td>
+<td>6 more</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-integration">API Integration</h2>
+<h3 id="custom-hooks">Custom Hooks</h3>
+<pre class="typescript"><code>// lib/hooks/use-dashboard.ts
+import { useQuery } from &#39;@tanstack/react-query&#39;;
+import { fetchDashboardData } from &#39;@/lib/api/dashboard&#39;;
+
+export function useDashboard() {
+  return useQuery({
+    queryKey: [&#39;dashboard&#39;],
+    queryFn: fetchDashboardData,
+    refetchInterval: 30000, // 30 seconds
+  });
+}</code></pre>
+<h3 id="api-client">API Client</h3>
+<pre class="typescript"><code>// lib/api/dashboard.ts
+import { apiClient } from &#39;./client&#39;;
+
+export async function fetchDashboardData() {
+  const response = await apiClient.get(&#39;/api/admin/dashboard&#39;);
+  return response.data;
+}
+
+export async function fetchModels() {
+  const response = await apiClient.get(&#39;/api/admin/models&#39;);
+  return response.data;
+}
+
+export async function updateModel(id: string, data: ModelUpdate) {
+  const response = await apiClient.patch(`/api/admin/models/${id}`, data);
+  return response.data;
+}</code></pre>
+<hr />
+<h2 id="layout-structure">Layout Structure</h2>
+<h3 id="dashboard-layout">Dashboard Layout</h3>
+<pre class="tsx"><code>// app/(dashboard)/layout.tsx
+import { Sidebar } from &#39;@/components/layout/sidebar&#39;;
+import { Header } from &#39;@/components/layout/header&#39;;
+import { Breadcrumbs } from &#39;@/components/layout/breadcrumbs&#39;;
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    &lt;div className=&quot;flex h-screen&quot;&gt;
+      &lt;Sidebar /&gt;
+      &lt;div className=&quot;flex-1 flex flex-col overflow-hidden&quot;&gt;
+        &lt;Header /&gt;
+        &lt;main className=&quot;flex-1 overflow-y-auto p-6&quot;&gt;
+          &lt;Breadcrumbs /&gt;
+          {children}
+        &lt;/main&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<hr />
+<h2 id="ui-patterns">UI Patterns</h2>
+<h3 id="data-tables">Data Tables</h3>
+<pre class="tsx"><code>import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from &#39;@/components/ui/table&#39;;
+
+function ModelTable({ models }: { models: Model[] }) {
+  return (
+    &lt;Table&gt;
+      &lt;TableHeader&gt;
+        &lt;TableRow&gt;
+          &lt;TableHead&gt;Name&lt;/TableHead&gt;
+          &lt;TableHead&gt;Provider&lt;/TableHead&gt;
+          &lt;TableHead&gt;Status&lt;/TableHead&gt;
+          &lt;TableHead&gt;Actions&lt;/TableHead&gt;
+        &lt;/TableRow&gt;
+      &lt;/TableHeader&gt;
+      &lt;TableBody&gt;
+        {models.map((model) =&gt; (
+          &lt;TableRow key={model.id}&gt;
+            &lt;TableCell&gt;{model.name}&lt;/TableCell&gt;
+            &lt;TableCell&gt;{model.provider}&lt;/TableCell&gt;
+            &lt;TableCell&gt;
+              &lt;Badge variant={model.active ? &#39;default&#39; : &#39;secondary&#39;}&gt;
+                {model.active ? &#39;Active&#39; : &#39;Inactive&#39;}
+              &lt;/Badge&gt;
+            &lt;/TableCell&gt;
+            &lt;TableCell&gt;
+              &lt;DropdownMenu&gt;...&lt;/DropdownMenu&gt;
+            &lt;/TableCell&gt;
+          &lt;/TableRow&gt;
+        ))}
+      &lt;/TableBody&gt;
+    &lt;/Table&gt;
+  );
+}</code></pre>
+<h3 id="form-patterns">Form Patterns</h3>
+<pre class="tsx"><code>import { useForm } from &#39;react-hook-form&#39;;
+import { zodResolver } from &#39;@hookform/resolvers/zod&#39;;
+import * as z from &#39;zod&#39;;
+
+const schema = z.object({
+  name: z.string().min(1, &#39;Name is required&#39;),
+  enabled: z.boolean(),
+});
+
+function SettingsForm() {
+  const form = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: { name: &#39;&#39;, enabled: true },
+  });
+
+  return (
+    &lt;Form {...form}&gt;
+      &lt;form onSubmit={form.handleSubmit(onSubmit)}&gt;
+        &lt;FormField
+          control={form.control}
+          name=&quot;name&quot;
+          render={({ field }) =&gt; (
+            &lt;FormItem&gt;
+              &lt;FormLabel&gt;Name&lt;/FormLabel&gt;
+              &lt;FormControl&gt;
+                &lt;Input {...field} /&gt;
+              &lt;/FormControl&gt;
+              &lt;FormMessage /&gt;
+            &lt;/FormItem&gt;
+          )}
+        /&gt;
+        &lt;Button type=&quot;submit&quot;&gt;Save&lt;/Button&gt;
+      &lt;/form&gt;
+    &lt;/Form&gt;
+  );
+}</code></pre>
+<hr />
+<p><em>This concludes the Admin Dashboard export. See other export files for additional components.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

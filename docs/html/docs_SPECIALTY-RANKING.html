@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPECIALTY RANKING - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SPECIALTY RANKING</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/SPECIALTY-RANKING.md</div>
+  </div>
+  
+  <h1 id="radiant-specialty-ranking-system">RADIANT Specialty Ranking System</h1>
+<blockquote>
+<p>Version: 4.18.0 Last Updated: 2024-12-28</p>
+</blockquote>
+<h2 id="overview">Overview</h2>
+<p>The Specialty Ranking System is RADIANT’s <strong>AI-powered proficiency ranking</strong> for models and orchestration modes. It provides domain-specific expertise scores that drive intelligent model selection.</p>
+<h2 id="architecture">Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                         SPECIALTY RANKING SYSTEM                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌────────────────────┐     ┌────────────────────┐     ┌─────────────────┐  │
+│  │  AI Research       │────▶│  Specialty         │────▶│  Model          │  │
+│  │  Service           │     │  Rankings DB       │     │  Selection      │  │
+│  └────────────────────┘     └────────────────────┘     └─────────────────┘  │
+│          │                          │                          │            │
+│          ▼                          ▼                          ▼            │
+│  ┌────────────────────┐     ┌────────────────────┐     ┌─────────────────┐  │
+│  │ • Benchmarks       │     │ • Per-model scores │     │ • Brain Router  │  │
+│  │ • Community Reviews│     │ • Per-specialty    │     │ • AGI Planner   │  │
+│  │ • Internal Data    │     │ • Tiered (S-F)     │     │ • Orchestration │  │
+│  └────────────────────┘     └────────────────────┘     └─────────────────┘  │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="specialty-categories">20 Specialty Categories</h2>
+<p>Models are ranked across 20 specialty categories representing domain-specific expertise:</p>
+<h3 id="domain-expertise">Domain Expertise</h3>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 13%" />
+<col style="width: 29%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Icon</th>
+<th>Description</th>
+<th>Example Tasks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>medical</code></td>
+<td>🏥</td>
+<td>Medical &amp; Healthcare</td>
+<td>Diagnosis, treatment, clinical guidelines</td>
+</tr>
+<tr>
+<td><code>legal</code></td>
+<td>⚖️</td>
+<td>Legal &amp; Compliance</td>
+<td>Contract review, legal research, compliance</td>
+</tr>
+<tr>
+<td><code>finance</code></td>
+<td>💰</td>
+<td>Finance &amp; Trading</td>
+<td>Financial analysis, trading strategies</td>
+</tr>
+<tr>
+<td><code>science</code></td>
+<td>🔭</td>
+<td>Scientific</td>
+<td>Research methodology, scientific writing</td>
+</tr>
+<tr>
+<td><code>security</code></td>
+<td>🔐</td>
+<td>Cybersecurity</td>
+<td>Vulnerability analysis, security audits</td>
+</tr>
+<tr>
+<td><code>architecture</code></td>
+<td>🏗️</td>
+<td>System Architecture</td>
+<td>System design, scalability planning</td>
+</tr>
+</tbody>
+</table>
+<h3 id="task-capabilities">Task Capabilities</h3>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 13%" />
+<col style="width: 29%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Icon</th>
+<th>Description</th>
+<th>Example Tasks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reasoning</code></td>
+<td>🧠</td>
+<td>Reasoning &amp; Logic</td>
+<td>Complex deduction, logical analysis</td>
+</tr>
+<tr>
+<td><code>coding</code></td>
+<td>💻</td>
+<td>Code Generation</td>
+<td>Programming, debugging, refactoring</td>
+</tr>
+<tr>
+<td><code>math</code></td>
+<td>📐</td>
+<td>Mathematics</td>
+<td>Calculations, proofs, statistics</td>
+</tr>
+<tr>
+<td><code>creative</code></td>
+<td>✍️</td>
+<td>Creative Writing</td>
+<td>Stories, poetry, marketing copy</td>
+</tr>
+<tr>
+<td><code>analysis</code></td>
+<td>📊</td>
+<td>Data Analysis</td>
+<td>Data interpretation, patterns</td>
+</tr>
+<tr>
+<td><code>research</code></td>
+<td>🔬</td>
+<td>Research &amp; Synthesis</td>
+<td>Literature review, synthesis</td>
+</tr>
+<tr>
+<td><code>debugging</code></td>
+<td>🐛</td>
+<td>Debugging &amp; QA</td>
+<td>Bug finding, test generation</td>
+</tr>
+<tr>
+<td><code>conversation</code></td>
+<td>💬</td>
+<td>Conversational</td>
+<td>Natural dialogue, engagement</td>
+</tr>
+</tbody>
+</table>
+<h3 id="modalities">Modalities</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Icon</th>
+<th>Description</th>
+<th>Example Tasks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vision</code></td>
+<td>👁️</td>
+<td>Vision &amp; Images</td>
+<td>Image analysis, OCR, diagrams</td>
+</tr>
+<tr>
+<td><code>audio</code></td>
+<td>🎤</td>
+<td>Audio &amp; Speech</td>
+<td>Transcription, voice analysis</td>
+</tr>
+</tbody>
+</table>
+<h3 id="performance-attributes">Performance Attributes</h3>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 13%" />
+<col style="width: 29%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Icon</th>
+<th>Description</th>
+<th>Example Tasks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>speed</code></td>
+<td>⚡</td>
+<td>Low Latency</td>
+<td>Real-time responses</td>
+</tr>
+<tr>
+<td><code>accuracy</code></td>
+<td>🎯</td>
+<td>High Accuracy</td>
+<td>Fact-critical tasks</td>
+</tr>
+<tr>
+<td><code>safety</code></td>
+<td>🛡️</td>
+<td>Safety &amp; Alignment</td>
+<td>Sensitive content handling</td>
+</tr>
+<tr>
+<td><code>instruction</code></td>
+<td>📋</td>
+<td>Instruction Following</td>
+<td>Complex multi-step tasks</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tier-system">Tier System</h2>
+<p>Each model receives a tier rating (S-F) for each specialty:</p>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Score Range</th>
+<th>Description</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>S</strong></td>
+<td>95-100</td>
+<td>Elite - Best-in-class</td>
+<td>Primary selection for this specialty</td>
+</tr>
+<tr>
+<td><strong>A</strong></td>
+<td>85-94</td>
+<td>Excellent - Highly recommended</td>
+<td>Strong choice, reliable</td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td>75-84</td>
+<td>Good - Solid performance</td>
+<td>Acceptable, cost-effective</td>
+</tr>
+<tr>
+<td><strong>C</strong></td>
+<td>65-74</td>
+<td>Average - Acceptable</td>
+<td>Use if better unavailable</td>
+</tr>
+<tr>
+<td><strong>D</strong></td>
+<td>50-64</td>
+<td>Below Average - Use with caution</td>
+<td>Fallback only</td>
+</tr>
+<tr>
+<td><strong>F</strong></td>
+<td>0-49</td>
+<td>Poor - Not recommended</td>
+<td>Do not use</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="specialty-ranking-data-structure">Specialty Ranking Data Structure</h2>
+<pre class="typescript"><code>interface SpecialtyRanking {
+  rankingId: string;
+  modelId: string;                    // e.g., &#39;anthropic/claude-3-5-sonnet&#39;
+  provider: string;                   // e.g., &#39;anthropic&#39;
+  specialty: SpecialtyCategory;       // e.g., &#39;medical&#39;, &#39;coding&#39;
+  
+  // Scores (0-100)
+  proficiencyScore: number;           // Overall weighted score
+  benchmarkScore: number;             // From published benchmarks
+  communityScore: number;             // From community reviews
+  internalScore: number;              // From internal usage data
+  
+  // Rankings
+  rank: number;                       // Global rank for this specialty
+  percentile: number;                 // e.g., 95 = top 5%
+  tier: &#39;S&#39; | &#39;A&#39; | &#39;B&#39; | &#39;C&#39; | &#39;D&#39; | &#39;F&#39;;
+  
+  // Metadata
+  confidence: number;                 // 0-1 confidence in assessment
+  dataPoints: number;                 // Number of data points used
+  lastResearched: string;             // ISO timestamp
+  researchSources: string[];          // Sources used
+  trend: &#39;improving&#39; | &#39;stable&#39; | &#39;declining&#39;;
+  
+  // Admin
+  adminOverride?: number;             // Locked admin score
+  isLocked: boolean;                  // Whether ranking is locked
+  updatedAt: string;
+}</code></pre>
+<hr />
+<h2 id="mode-rankings">Mode Rankings</h2>
+<p>In addition to specialty rankings, models are ranked for each <strong>orchestration mode</strong>:</p>
+<pre class="typescript"><code>interface ModeRanking {
+  rankingId: string;
+  mode: OrchestrationMode;            // e.g., &#39;extended_thinking&#39;, &#39;coding&#39;
+  modelId: string;
+  provider: string;
+  score: number;
+  tier: &#39;S&#39; | &#39;A&#39; | &#39;B&#39; | &#39;C&#39; | &#39;D&#39; | &#39;F&#39;;
+  strengths: string[];                // What this model excels at
+  weaknesses: string[];               // Where it falls short
+  recommendedFor: string[];           // Task types recommended for
+  notRecommendedFor: string[];        // Task types to avoid
+  confidence: number;
+  isLocked: boolean;
+  adminOverride?: number;
+  updatedAt: string;
+}</code></pre>
+<h3 id="orchestration-modes">Orchestration Modes</h3>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 24%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Icon</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>thinking</code></td>
+<td>💭</td>
+<td>Standard reasoning with step-by-step analysis</td>
+</tr>
+<tr>
+<td><code>extended_thinking</code></td>
+<td>🧠</td>
+<td>Deep multi-step reasoning for complex problems</td>
+</tr>
+<tr>
+<td><code>research</code></td>
+<td>🔬</td>
+<td>Information gathering and synthesis</td>
+</tr>
+<tr>
+<td><code>creative</code></td>
+<td>🎨</td>
+<td>Divergent thinking and idea generation</td>
+</tr>
+<tr>
+<td><code>analytical</code></td>
+<td>📊</td>
+<td>Data analysis and pattern recognition</td>
+</tr>
+<tr>
+<td><code>coding</code></td>
+<td>💻</td>
+<td>Code generation and debugging</td>
+</tr>
+<tr>
+<td><code>conversational</code></td>
+<td>💬</td>
+<td>Natural dialogue and engagement</td>
+</tr>
+<tr>
+<td><code>fast</code></td>
+<td>⚡</td>
+<td>Quick responses with minimal latency</td>
+</tr>
+<tr>
+<td><code>precise</code></td>
+<td>🎯</td>
+<td>High accuracy with verification</td>
+</tr>
+<tr>
+<td><code>balanced</code></td>
+<td>⚖️</td>
+<td>Optimal cost/quality/speed tradeoff</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="model-specialty-profiles">Model Specialty Profiles</h2>
+<h3 id="claude-3.5-sonnet">Claude 3.5 Sonnet</h3>
+<pre><code>Specialty Scores (0-100):
+🧠 reasoning:     94 (S)  │████████████████████░░░░│
+💻 coding:        95 (S)  │████████████████████░░░░│
+📐 math:          88 (A)  │██████████████████░░░░░░│
+✍️ creative:      92 (A)  │███████████████████░░░░░│
+📊 analysis:      91 (A)  │███████████████████░░░░░│
+🔬 research:      90 (A)  │██████████████████░░░░░░│
+🏥 medical:       92 (A)  │███████████████████░░░░░│
+⚖️ legal:         89 (A)  │██████████████████░░░░░░│
+💰 finance:       88 (A)  │██████████████████░░░░░░│
+🔐 security:      91 (A)  │███████████████████░░░░░│
+👁️ vision:        93 (A)  │███████████████████░░░░░│
+🛡️ safety:        95 (S)  │████████████████████░░░░│
+⚡ speed:         75 (B)  │███████████████░░░░░░░░░│
+
+Best For: General-purpose, coding, creative, research, analysis
+Mode Recommendations: thinking, extended_thinking, creative, research</code></pre>
+<h3 id="openai-o1">OpenAI o1</h3>
+<pre><code>Specialty Scores (0-100):
+🧠 reasoning:     98 (S)  │█████████████████████░░░│
+💻 coding:        90 (A)  │██████████████████░░░░░░│
+📐 math:          96 (S)  │████████████████████░░░░│
+✍️ creative:      75 (B)  │███████████████░░░░░░░░░│
+📊 analysis:      94 (S)  │███████████████████░░░░░│
+🔬 research:      88 (A)  │██████████████████░░░░░░│
+🏥 medical:       85 (B)  │█████████████████░░░░░░░│
+⚖️ legal:         88 (A)  │██████████████████░░░░░░│
+💰 finance:       91 (A)  │███████████████████░░░░░│
+🔐 security:      89 (A)  │██████████████████░░░░░░│
+🛡️ safety:        92 (A)  │███████████████████░░░░░│
+⚡ speed:         60 (D)  │████████████░░░░░░░░░░░░│
+
+Best For: Complex reasoning, mathematics, analysis, multi-step problems
+Mode Recommendations: extended_thinking, analytical, precise</code></pre>
+<h3 id="deepseek-coder">DeepSeek Coder</h3>
+<pre><code>Specialty Scores (0-100):
+🧠 reasoning:     85 (B)  │█████████████████░░░░░░░│
+💻 coding:        96 (S)  │████████████████████░░░░│
+📐 math:          92 (A)  │███████████████████░░░░░│
+✍️ creative:      65 (C)  │█████████████░░░░░░░░░░░│
+📊 analysis:      82 (B)  │████████████████░░░░░░░░│
+🐛 debugging:     94 (S)  │███████████████████░░░░░│
+🏗️ architecture: 88 (A)  │██████████████████░░░░░░│
+🔐 security:      85 (B)  │█████████████████░░░░░░░│
+⚡ speed:         90 (A)  │██████████████████░░░░░░│
+
+Best For: Code generation, debugging, system design
+Mode Recommendations: coding, fast</code></pre>
+<h3 id="gpt-4o">GPT-4o</h3>
+<pre><code>Specialty Scores (0-100):
+🧠 reasoning:     90 (A)  │██████████████████░░░░░░│
+💻 coding:        88 (A)  │██████████████████░░░░░░│
+📐 math:          85 (B)  │█████████████████░░░░░░░│
+✍️ creative:      88 (A)  │██████████████████░░░░░░│
+📊 analysis:      86 (A)  │█████████████████░░░░░░░│
+🔬 research:      87 (A)  │██████████████████░░░░░░│
+👁️ vision:        95 (S)  │████████████████████░░░░│
+🎤 audio:         92 (A)  │███████████████████░░░░░│
+💬 conversation: 91 (A)  │███████████████████░░░░░│
+⚡ speed:         88 (A)  │██████████████████░░░░░░│
+
+Best For: Multimodal tasks, vision, audio, conversation
+Mode Recommendations: conversational, fast, balanced</code></pre>
+<h3 id="gemini-2.0-flash">Gemini 2.0 Flash</h3>
+<pre><code>Specialty Scores (0-100):
+🧠 reasoning:     82 (B)  │████████████████░░░░░░░░│
+💻 coding:        80 (B)  │████████████████░░░░░░░░│
+📐 math:          78 (B)  │███████████████░░░░░░░░░│
+📊 analysis:      80 (B)  │████████████████░░░░░░░░│
+🔬 research:      82 (B)  │████████████████░░░░░░░░│
+👁️ vision:        85 (B)  │█████████████████░░░░░░░│
+⚡ speed:         98 (S)  │█████████████████████░░░│
+💬 conversation: 85 (B)  │█████████████████░░░░░░░│
+
+Best For: Fast responses, real-time applications
+Mode Recommendations: fast, conversational</code></pre>
+<hr />
+<h2 id="ai-powered-research">AI-Powered Research</h2>
+<p>The specialty rankings are maintained through <strong>automated AI research</strong>:</p>
+<h3 id="research-process">Research Process</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│  SPECIALTY RANKING RESEARCH FLOW                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 1: Gather Data Sources                                                 │
+│  • Published benchmarks (MMLU, HumanEval, MATH, GPQA, etc.)                  │
+│  • Community reviews (Reddit, Twitter, Discord)                              │
+│  • Academic papers and evaluations                                           │
+│  • Internal usage data and quality scores                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 2: AI Analysis                                                         │
+│  • Claude 3.5 Sonnet analyzes all sources                                    │
+│  • Generates per-specialty proficiency scores                                │
+│  • Assigns tier ratings (S/A/B/C/D/F)                                        │
+│  • Calculates confidence levels                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 3: Score Calculation                                                   │
+│                                                                              │
+│  proficiencyScore = (benchmarkWeight × benchmarkScore) +                     │
+│                     (communityWeight × communityScore) +                     │
+│                     (internalWeight × internalScore)                         │
+│                                                                              │
+│  Default Weights: benchmark=0.5, community=0.3, internal=0.2                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  STEP 4: Update Rankings                                                     │
+│  • Update specialty_rankings table                                           │
+│  • Recalculate global ranks per specialty                                    │
+│  • Calculate percentiles                                                     │
+│  • Record research log                                                       │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="research-api">Research API</h3>
+<pre class="typescript"><code>// Research a specific model across all specialties
+const result = await specialtyRankingService.researchModelProficiency(
+  &#39;anthropic/claude-3-5-sonnet&#39;
+);
+// Returns: { modelsResearched: 1, specialtiesUpdated: 20, rankingsChanged: 20 }
+
+// Research all models for a specific specialty
+const result = await specialtyRankingService.researchSpecialtyRankings(&#39;medical&#39;);
+// Returns: { modelsResearched: 50, specialtiesUpdated: 1, rankingsChanged: 45 }
+
+// Get leaderboard for a specialty
+const leaderboard = await specialtyRankingService.getSpecialtyLeaderboard(&#39;coding&#39;, 10);
+// Returns: { specialty: &#39;coding&#39;, rankings: [{ rank: 1, modelId: &#39;...&#39;, score: 96, tier: &#39;S&#39; }, ...] }
+
+// Get best model for a specialty
+const best = await specialtyRankingService.getBestModelForSpecialty(&#39;medical&#39;, { minScore: 85 });
+// Returns: { modelId: &#39;anthropic/claude-3-5-sonnet&#39;, score: 92, tier: &#39;A&#39; }</code></pre>
+<h3 id="research-schedule">Research Schedule</h3>
+<pre class="typescript"><code>interface ResearchSchedule {
+  scheduleId: string;
+  name: string;
+  frequency: &#39;hourly&#39; | &#39;daily&#39; | &#39;weekly&#39; | &#39;monthly&#39; | &#39;manual&#39;;
+  cronExpression?: string;
+  enabled: boolean;
+  lastRun?: string;
+  nextRun?: string;
+  targetScope: &#39;all&#39; | &#39;specialty&#39; | &#39;mode&#39; | &#39;model&#39;;
+  targetFilter?: string;
+}
+
+// Example schedules:
+// - Daily research for new models
+// - Weekly refresh of all specialty rankings
+// - Monthly deep research with expanded sources</code></pre>
+<hr />
+<h2 id="admin-controls">Admin Controls</h2>
+<h3 id="admin-dashboard">Admin Dashboard</h3>
+<p><strong>Path</strong>: Admin Dashboard → Orchestration → Specialty Rankings</p>
+<p>Features: - <strong>Leaderboards</strong>: View top models per specialty - <strong>Model Profiles</strong>: See all specialty scores for a model - <strong>Override Scores</strong>: Lock a model’s specialty score - <strong>Trigger Research</strong>: Manually refresh rankings - <strong>Configure Weights</strong>: Adjust scoring weights</p>
+<h3 id="admin-api">Admin API</h3>
+<pre class="typescript"><code>// Override a ranking (locks it from research updates)
+await specialtyRankingService.adminOverrideRanking(
+  &#39;anthropic/claude-3-5-sonnet&#39;,
+  &#39;medical&#39;,
+  95,  // New score
+  &#39;Internal evaluation showed higher medical accuracy&#39;
+);
+
+// Unlock a ranking (allows research to update it again)
+await specialtyRankingService.unlockRanking(&#39;anthropic/claude-3-5-sonnet&#39;, &#39;medical&#39;);
+
+// Get model rankings
+const rankings = await specialtyRankingService.getModelRankings(&#39;anthropic/claude-3-5-sonnet&#39;);</code></pre>
+<hr />
+<h2 id="integration-with-orchestration">Integration with Orchestration</h2>
+<h3 id="brain-router-integration">Brain Router Integration</h3>
+<p>The Brain Router uses specialty rankings for model selection:</p>
+<pre class="typescript"><code>// In brain-router.ts
+const bestMedicalModel = await specialtyRankingService.getBestModelForSpecialty(&#39;medical&#39;, {
+  minScore: 85,
+  excludeModels: disabledModels
+});
+
+// Factor specialty score into routing decision
+const domainMatchScore = await getSpecialtyScore(modelId, detectedSpecialty);
+const finalScore = costScore * 0.3 + latencyScore * 0.2 + qualityScore * 0.3 + domainMatchScore * 0.2;</code></pre>
+<h3 id="agi-brain-planner-integration">AGI Brain Planner Integration</h3>
+<p>The AGI Brain Planner uses specialty rankings to select models:</p>
+<pre class="typescript"><code>// In agi-brain-planner.service.ts
+const { primary, fallbacks } = await this.selectModels(
+  tenantId,
+  promptAnalysis,
+  domainResult,      // Contains detected domain/subspecialty
+  orchestrationMode
+);
+
+// Models are selected based on:
+// 1. Domain proficiency match (from domain taxonomy)
+// 2. Specialty rankings (from specialty ranking service)
+// 3. Mode rankings (how well model performs in the chosen mode)</code></pre>
+<h3 id="combined-scoring-example">Combined Scoring Example</h3>
+<pre><code>Prompt: &quot;Review this contract for liability issues&quot;
+
+Domain Detection:
+  Field: Law → Domain: Contract Law → Subspecialty: Commercial Contracts
+  Confidence: 0.89
+
+Required Specialties: legal, accuracy, reasoning
+
+Model Scoring:
+┌─────────────────────┬────────┬──────────┬───────────┬───────────┐
+│ Model               │ ⚖️ Legal │ 🎯 Accuracy│ 🧠 Reasoning│ Combined  │
+├─────────────────────┼────────┼──────────┼───────────┼───────────┤
+│ Claude 3.5 Sonnet   │ 89 (A) │ 91 (A)   │ 94 (S)    │ 91.3      │
+│ GPT-4o              │ 85 (B) │ 88 (A)   │ 90 (A)    │ 87.7      │
+│ OpenAI o1           │ 88 (A) │ 92 (A)   │ 98 (S)    │ 92.7 ✓    │
+└─────────────────────┴────────┴──────────┴───────────┴───────────┘
+
+Selected: OpenAI o1 (highest combined score for legal + reasoning)</code></pre>
+<hr />
+<h2 id="database-schema">Database Schema</h2>
+<pre class="sql"><code>-- Specialty rankings table
+CREATE TABLE specialty_rankings (
+  ranking_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  model_id TEXT NOT NULL,
+  provider TEXT NOT NULL,
+  specialty TEXT NOT NULL,
+  proficiency_score NUMERIC(5,2) NOT NULL,
+  benchmark_score NUMERIC(5,2),
+  community_score NUMERIC(5,2),
+  internal_score NUMERIC(5,2),
+  rank INTEGER,
+  percentile NUMERIC(5,2),
+  tier TEXT NOT NULL CHECK (tier IN (&#39;S&#39;, &#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;F&#39;)),
+  confidence NUMERIC(3,2) DEFAULT 0.80,
+  data_points INTEGER DEFAULT 0,
+  last_researched TIMESTAMPTZ,
+  research_sources TEXT[],
+  trend TEXT DEFAULT &#39;stable&#39; CHECK (trend IN (&#39;improving&#39;, &#39;stable&#39;, &#39;declining&#39;)),
+  admin_override NUMERIC(5,2),
+  admin_notes TEXT,
+  is_locked BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(model_id, specialty)
+);
+
+-- Mode rankings table
+CREATE TABLE mode_rankings (
+  ranking_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  mode TEXT NOT NULL,
+  model_id TEXT NOT NULL,
+  provider TEXT NOT NULL,
+  score NUMERIC(5,2) NOT NULL,
+  tier TEXT NOT NULL CHECK (tier IN (&#39;S&#39;, &#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;F&#39;)),
+  strengths TEXT[],
+  weaknesses TEXT[],
+  recommended_for TEXT[],
+  not_recommended_for TEXT[],
+  confidence NUMERIC(3,2) DEFAULT 0.80,
+  admin_override NUMERIC(5,2),
+  is_locked BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(mode, model_id)
+);
+
+-- Research logs
+CREATE TABLE specialty_research_logs (
+  log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  research_type TEXT NOT NULL, -- &#39;model&#39;, &#39;specialty&#39;, &#39;full&#39;
+  target_id TEXT,
+  models_researched INTEGER,
+  specialties_updated INTEGER,
+  rankings_changed INTEGER,
+  duration_ms INTEGER,
+  ai_confidence NUMERIC(3,2),
+  sources_used TEXT[],
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);</code></pre>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./ORCHESTRATION-METHODS.md">Orchestration Methods</a> - Complete orchestration system documentation</li>
+<li><a href="./DOMAIN-TAXONOMY.md">Domain Taxonomy</a> - Domain detection and proficiency system</li>
+<li><a href="./AGI-BRAIN-PLANNER.md">AGI Brain Planner</a> - Real-time planning system</li>
+<li><a href="./MODEL-ROUTER.md">Model Router</a> - Intelligent model selection</li>
+</ul>
+<hr />
+<h2 id="api-reference">API Reference</h2>
+<h3 id="endpoints">Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 22%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/specialty-rankings</code></td>
+<td>List all rankings</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/specialty-rankings/:modelId</code></td>
+<td>Get model’s rankings</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/specialty-rankings/specialty/:specialty</code></td>
+<td>Get specialty leaderboard</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/admin/specialty-rankings/research/model/:modelId</code></td>
+<td>Research a model</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/admin/specialty-rankings/research/specialty/:specialty</code></td>
+<td>Research a specialty</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/api/admin/specialty-rankings/:modelId/:specialty</code></td>
+<td>Override ranking</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/admin/specialty-rankings/:modelId/:specialty/lock</code></td>
+<td>Unlock ranking</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/mode-rankings</code></td>
+<td>List mode rankings</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/admin/mode-rankings/:mode</code></td>
+<td>Get mode leaderboard</td>
+</tr>
+</tbody>
+</table>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

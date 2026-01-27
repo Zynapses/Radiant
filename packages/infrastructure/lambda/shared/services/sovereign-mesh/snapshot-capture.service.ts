@@ -348,9 +348,11 @@ class SnapshotCaptureService {
     modifiedInputs: Record<string, unknown>
   ): Promise<string> {
     const goal = modifiedInputs.goal || originalExecution.goal;
+    const parsedOriginal = this.parseJson(originalExecution.constraints) || {};
+    const modConstraints = modifiedInputs.constraints || {};
     const constraints = { 
-      ...(this.parseJson(originalExecution.constraints) || {}),
-      ...(modifiedInputs.constraints || {}),
+      ...(typeof parsedOriginal === 'object' ? parsedOriginal as Record<string, unknown> : {}),
+      ...(typeof modConstraints === 'object' ? modConstraints as Record<string, unknown> : {}),
     };
 
     const result = await executeStatement(

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCALING - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SCALING</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/runbooks/SCALING.md</div>
+  </div>
+  
+  <h1 id="radiant-scaling-runbook">RADIANT Scaling Runbook</h1>
+<blockquote>
+<p><strong>Version</strong>: {{RADIANT_VERSION}} <strong>Last Updated</strong>: {{BUILD_DATE}}</p>
+</blockquote>
+<hr />
+<h2 id="auto-scaling-configuration">1. Auto-Scaling Configuration</h2>
+<h3 id="lambda-functions">1.1 Lambda Functions</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Min</th>
+<th>Max</th>
+<th>Scaling Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API Handler</td>
+<td>10</td>
+<td>1000</td>
+<td>Concurrent requests</td>
+</tr>
+<tr>
+<td>Brain Router</td>
+<td>5</td>
+<td>500</td>
+<td>Queue depth</td>
+</tr>
+<tr>
+<td>Webhook Handler</td>
+<td>2</td>
+<td>100</td>
+<td>Event count</td>
+</tr>
+</tbody>
+</table>
+<h3 id="aurora-postgresql">1.2 Aurora PostgreSQL</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Min ACUs</td>
+<td>2</td>
+<td>Development</td>
+</tr>
+<tr>
+<td>Max ACUs</td>
+<td>64</td>
+<td>Production</td>
+</tr>
+<tr>
+<td>Scale-out cooldown</td>
+<td>5 minutes</td>
+<td></td>
+</tr>
+<tr>
+<td>Scale-in cooldown</td>
+<td>15 minutes</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="sagemaker-endpoints">1.3 SageMaker Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Model Category</th>
+<th>Min</th>
+<th>Max</th>
+<th>Scale Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vision Models</td>
+<td>0</td>
+<td>5</td>
+<td>Invocations/min</td>
+</tr>
+<tr>
+<td>LLM Models</td>
+<td>0</td>
+<td>3</td>
+<td>Queue depth</td>
+</tr>
+<tr>
+<td>Audio Models</td>
+<td>0</td>
+<td>2</td>
+<td>Invocations/min</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="manual-scaling-procedures">2. Manual Scaling Procedures</h2>
+<h3 id="pre-event-scaling">2.1 Pre-Event Scaling</h3>
+<p>Before expected high traffic:</p>
+<pre class="bash"><code># Scale Aurora to maximum
+aws rds modify-db-cluster \
+  --db-cluster-identifier radiant-cluster \
+  --serverless-v2-scaling-configuration MinCapacity=16,MaxCapacity=64
+
+# Pre-warm Lambda functions
+for i in {1..100}; do
+  aws lambda invoke \
+    --function-name radiant-api \
+    --invocation-type Event \
+    --payload &#39;{&quot;warmup&quot;: true}&#39; \
+    /dev/null &amp;
+done
+wait
+
+# Scale SageMaker endpoints
+aws sagemaker update-endpoint-weights-and-capacities \
+  --endpoint-name radiant-vision \
+  --desired-weights-and-capacities &#39;[{&quot;VariantName&quot;:&quot;AllTraffic&quot;,&quot;DesiredInstanceCount&quot;:3}]&#39;</code></pre>
+<h3 id="emergency-scaling">2.2 Emergency Scaling</h3>
+<p>During unexpected traffic spike:</p>
+<pre class="bash"><code># Increase Lambda concurrency limit
+aws lambda put-function-concurrency \
+  --function-name radiant-api \
+  --reserved-concurrent-executions 2000
+
+# Scale Aurora immediately
+aws rds modify-db-cluster \
+  --db-cluster-identifier radiant-cluster \
+  --serverless-v2-scaling-configuration MinCapacity=32,MaxCapacity=128 \
+  --apply-immediately</code></pre>
+<hr />
+<h2 id="monitoring-scaling-events">3. Monitoring Scaling Events</h2>
+<h3 id="key-metrics">3.1 Key Metrics</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Warning</th>
+<th>Critical</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lambda Concurrent Executions</td>
+<td>70% of limit</td>
+<td>90% of limit</td>
+</tr>
+<tr>
+<td>Aurora ACU Utilization</td>
+<td>80%</td>
+<td>95%</td>
+</tr>
+<tr>
+<td>API Gateway 5xx Rate</td>
+<td>1%</td>
+<td>5%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cloudwatch-alarms">3.2 CloudWatch Alarms</h3>
+<pre class="bash"><code># List scaling alarms
+aws cloudwatch describe-alarms \
+  --alarm-name-prefix &quot;radiant-scaling&quot;
+
+# Check alarm history
+aws cloudwatch describe-alarm-history \
+  --alarm-name &quot;radiant-api-high-concurrency&quot; \
+  --history-item-type StateUpdate</code></pre>
+<hr />
+<h2 id="cost-considerations">4. Cost Considerations</h2>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Cost Factor</th>
+<th>Optimization</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lambda</td>
+<td>Duration × Memory</td>
+<td>Right-size memory</td>
+</tr>
+<tr>
+<td>Aurora</td>
+<td>ACU-hours</td>
+<td>Scale down off-peak</td>
+</tr>
+<tr>
+<td>SageMaker</td>
+<td>Instance-hours</td>
+<td>Use spot instances</td>
+</tr>
+<tr>
+<td>API Gateway</td>
+<td>Request count</td>
+<td>Enable caching</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>This runbook is part of the RADIANT v{{RADIANT_VERSION}} documentation.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>README - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>README</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/README.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.17.0---section-files-for-windsurfclaude-opus-4.5">RADIANT v4.17.0 - Section Files for Windsurf/Claude Opus 4.5</h1>
+<h2 id="implementation-order">Implementation Order</h2>
+<p>Implement these sections in numerical order. Each section depends on previous sections.</p>
+<h3 id="phase-1-foundation-sections-0-2">Phase 1: Foundation (Sections 0-2)</h3>
+<ul>
+<li><code>00-HEADER-AND-OVERVIEW.md</code> - Read first for context</li>
+<li><code>SECTION-00-SHARED-TYPES-AND-CONSTANTS.md</code> - TypeScript types, implement first</li>
+<li><code>SECTION-01-SWIFT-DEPLOYMENT-APP.md</code> - macOS Swift app</li>
+<li><code>SECTION-02-CDK-INFRASTRUCTURE-STACKS.md</code> - VPC, Aurora, S3, etc.</li>
+</ul>
+<h3 id="phase-2-core-infrastructure-sections-3-7">Phase 2: Core Infrastructure (Sections 3-7)</h3>
+<ul>
+<li><code>SECTION-03-CDK-AI-AND-API-STACKS.md</code> - API Gateway, SageMaker, LiteLLM</li>
+<li><code>SECTION-04-LAMBDA-CORE.md</code> - Core Lambda functions</li>
+<li><code>SECTION-05-LAMBDA-ADMIN-BILLING.md</code> - Admin &amp; billing Lambdas</li>
+<li><code>SECTION-06-SELF-HOSTED-MODELS.md</code> - SageMaker model configs</li>
+<li><code>SECTION-07-DATABASE-SCHEMA.md</code> - 140+ tables with RLS</li>
+</ul>
+<h3 id="phase-3-admin-deployment-sections-8-9">Phase 3: Admin &amp; Deployment (Sections 8-9)</h3>
+<ul>
+<li><code>SECTION-08-ADMIN-DASHBOARD.md</code> - Next.js admin UI</li>
+<li><code>SECTION-09-DEPLOYMENT-GUIDE.md</code> - Build &amp; deploy scripts</li>
+</ul>
+<h3 id="phase-4-ai-features-sections-10-17">Phase 4: AI Features (Sections 10-17)</h3>
+<ul>
+<li><code>SECTION-10-VISUAL-AI-PIPELINE.md</code> - Image processing</li>
+<li><code>SECTION-11-RADIANT-BRAIN.md</code> - Intelligent routing</li>
+<li><code>SECTION-12-METRICS-ANALYTICS.md</code> - Usage tracking</li>
+<li><code>SECTION-13-NEURAL-ENGINE.md</code> - User preferences (pgvector)</li>
+<li><code>SECTION-14-ERROR-LOGGING.md</code> - Centralized errors</li>
+<li><code>SECTION-15-CREDENTIALS-REGISTRY.md</code> - API key management</li>
+<li><code>SECTION-16-AWS-ADMIN-CREDENTIALS.md</code> - AWS credentials</li>
+<li><code>SECTION-17-AUTO-RESOLVE-API.md</code> - Auto-resolve requests</li>
+</ul>
+<h3 id="phase-5-consumer-platform-sections-18-28">Phase 5: Consumer Platform (Sections 18-28)</h3>
+<ul>
+<li><code>SECTION-18-THINK-TANK-PLATFORM.md</code> - Consumer AI interface</li>
+<li><code>SECTION-19-CONCURRENT-CHAT.md</code> - Split-pane multi-chat</li>
+<li><code>SECTION-20-REALTIME-COLLABORATION.md</code> - Yjs CRDT</li>
+<li><code>SECTION-21-VOICE-VIDEO.md</code> - Audio/video input</li>
+<li><code>SECTION-22-PERSISTENT-MEMORY.md</code> - Cross-session memory</li>
+<li><code>SECTION-23-CANVAS-ARTIFACTS.md</code> - Rich content</li>
+<li><code>SECTION-24-RESULT-MERGING.md</code> - AI synthesis</li>
+<li><code>SECTION-25-FOCUS-MODES-PERSONAS.md</code> - Custom personas</li>
+<li><code>SECTION-26-SCHEDULED-PROMPTS.md</code> - Recurring tasks</li>
+<li><code>SECTION-27-FAMILY-TEAM-PLANS.md</code> - Shared subscriptions</li>
+<li><code>SECTION-28-ANALYTICS-INTEGRATION.md</code> - Usage analytics</li>
+</ul>
+<h3 id="phase-6-advanced-features-sections-29-35">Phase 6: Advanced Features (Sections 29-35)</h3>
+<ul>
+<li><code>SECTION-29-ADMIN-EXTENSIONS.md</code> - Additional admin pages</li>
+<li><code>SECTION-30-DYNAMIC-PROVIDER-REGISTRY.md</code> - xAI/Grok support</li>
+<li><code>SECTION-31-MODEL-SELECTION-PRICING.md</code> - User model choice</li>
+<li><code>SECTION-32-TIME-MACHINE-CORE.md</code> - Chat history versioning</li>
+<li><code>SECTION-33-TIME-MACHINE-UI.md</code> - Visual timeline</li>
+<li><code>SECTION-34-ORCHESTRATION-ENGINE.md</code> - Database-driven workflows</li>
+<li><code>SECTION-35-LICENSE-MANAGEMENT.md</code> - Model licenses</li>
+</ul>
+<h3 id="phase-7-intelligence-layer-sections-36-39">Phase 7: Intelligence Layer (Sections 36-39)</h3>
+<ul>
+<li><code>SECTION-36-UNIFIED-MODEL-REGISTRY.md</code> - 106+ models</li>
+<li><code>SECTION-37-FEEDBACK-LEARNING.md</code> - User feedback loop</li>
+<li><code>SECTION-38-NEURAL-ORCHESTRATION.md</code> - Neural-first routing</li>
+<li><code>SECTION-39-WORKFLOW-PROPOSALS.md</code> - Evidence-based workflows</li>
+</ul>
+<h3 id="phase-8-platform-hardening-sections-40-42">Phase 8: Platform Hardening (Sections 40-42)</h3>
+<ul>
+<li><code>SECTION-40-APP-ISOLATION.md</code> - Per-app data isolation</li>
+<li><code>SECTION-41-INTERNATIONALIZATION.md</code> - 18 languages</li>
+<li><code>SECTION-42-DYNAMIC-CONFIGURATION.md</code> - Runtime parameters</li>
+</ul>
+<h3 id="phase-9-billing-enterprise-sections-43-46">Phase 9: Billing &amp; Enterprise (Sections 43-46)</h3>
+<ul>
+<li><code>SECTION-43-BILLING-CREDITS.md</code> - 7-tier subscriptions</li>
+<li><code>SECTION-44-STORAGE-BILLING.md</code> - S3/DB pricing</li>
+<li><code>SECTION-45-VERSIONED-SUBSCRIPTIONS.md</code> - Grandfathering</li>
+<li><code>SECTION-46-DUAL-ADMIN-APPROVAL.md</code> - Two-person approval</li>
+</ul>
+<h2 id="file-sizes">File Sizes</h2>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Size</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00</td>
+<td>43KB</td>
+<td>Header &amp; Overview</td>
+</tr>
+<tr>
+<td>00-TYPES</td>
+<td>39KB</td>
+<td>Shared Types</td>
+</tr>
+<tr>
+<td>01</td>
+<td>90KB</td>
+<td>Swift App</td>
+</tr>
+<tr>
+<td>02</td>
+<td>94KB</td>
+<td>CDK Infrastructure</td>
+</tr>
+<tr>
+<td>03</td>
+<td>128KB</td>
+<td>CDK AI/API</td>
+</tr>
+<tr>
+<td>04</td>
+<td>101KB</td>
+<td>Lambda Core</td>
+</tr>
+<tr>
+<td>05</td>
+<td>75KB</td>
+<td>Lambda Admin</td>
+</tr>
+<tr>
+<td>06</td>
+<td>95KB</td>
+<td>Self-Hosted Models</td>
+</tr>
+<tr>
+<td>07</td>
+<td>208KB</td>
+<td>Database Schema (largest)</td>
+</tr>
+<tr>
+<td>08</td>
+<td>146KB</td>
+<td>Admin Dashboard</td>
+</tr>
+<tr>
+<td>39</td>
+<td>152KB</td>
+<td>Workflow Proposals</td>
+</tr>
+<tr>
+<td>41</td>
+<td>118KB</td>
+<td>Internationalization</td>
+</tr>
+</tbody>
+</table>
+<h2 id="version-4.17.0">Version: 4.17.0</h2>
+<h2 id="total-48-files-including-readme">Total: 48 files (including README)</h2>
+<h2 id="combined-size-2.1mb">Combined Size: ~2.1MB</h2>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

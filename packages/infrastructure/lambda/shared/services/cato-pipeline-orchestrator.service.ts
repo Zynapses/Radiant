@@ -11,6 +11,7 @@
 import { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
+import { logger } from '../logging/enhanced-logger';
 import {
   CatoPipelineExecution,
   CatoPipelineStatus,
@@ -87,7 +88,7 @@ export class CatoPipelineOrchestratorService {
       try {
         await handler(event);
       } catch (error) {
-        console.error('Event handler error:', error);
+        logger.error('Pipeline event handler error', { error });
       }
     }
   }
@@ -266,9 +267,90 @@ export class CatoPipelineOrchestratorService {
     }
 
     // Continue execution from where it left off
-    // For now, mark as completed since we'd need to track remaining methods
-    await this.updateExecutionStatus(pipelineId, CatoPipelineStatus.COMPLETED);
-    return { execution: (await this.getExecution(pipelineId))!, checkpointsPending: [] };
+    await this.updateExecutionStatus(pipelineId, CatoPipelineStatus.RUNNING);
+    
+    // Get checkpoint state to find remaining methods
+    const checkpointState = await this.getCheckpointState(pipelineId, checkpointId);
+    if (!checkpointState || !checkpointState.remainingMethods?.length) {
+      await this.updateExecutionStatus(pipelineId, CatoPipelineStatus.COMPLETED);
+      return { execution: (await this.getExecution(pipelineId))!, checkpointsPending: [] };
+    }
+
+    // Resume execution with remaining methods
+    const envelopes = checkpointState.completedEnvelopes || [];
+    const checkpointsPending: string[] = [];
+
+    try {
+      for (let i = 0; i < checkpointState.remainingMethods.length; i++) {
+        const methodId = checkpointState.remainingMethods[i];
+        const context = {
+          pipelineId,
+          tenantId: execution.tenantId,
+          userId: execution.userId,
+          traceId: execution.traceId,
+          sequence: envelopes.length,
+          previousEnvelopes: envelopes,
+          originalRequest: execution.originalRequest || {},
+          governancePreset: execution.governancePreset || 'BALANCED',
+          complianceFrameworks: [],
+        };
+
+        const result = await this.executeMethod(methodId, context);
+        envelopes.push(result.envelope);
+
+        // Check for new checkpoints (via metadata flag)
+        const outputData = result.envelope.output?.data as Record<string, unknown> | undefined;
+        if (outputData?.requiresCheckpoint) {
+          const newCheckpointId = await this.createCheckpoint(pipelineId, methodId, result.envelope, checkpointState.remainingMethods.slice(i + 1));
+          checkpointsPending.push(newCheckpointId);
+          await this.updateExecutionStatus(pipelineId, CatoPipelineStatus.CHECKPOINT_WAITING);
+          return { execution: (await this.getExecution(pipelineId))!, checkpointsPending };
+        }
+      }
+
+      await this.updateExecutionStatus(pipelineId, CatoPipelineStatus.COMPLETED);
+      return { 
+        execution: (await this.getExecution(pipelineId))!, 
+        finalEnvelope: envelopes[envelopes.length - 1],
+        checkpointsPending 
+      };
+    } catch (error) {
+      await this.handlePipelineError(pipelineId, execution.tenantId, error, envelopes);
+      throw error;
+    }
+  }
+
+  private async getCheckpointState(pipelineId: string, checkpointId: string): Promise<{
+    remainingMethods: string[];
+    completedEnvelopes: CatoMethodEnvelope[];
+  } | null> {
+    const result = await this.pool.query(
+      `SELECT remaining_methods, completed_envelopes 
+       FROM cato_pipeline_checkpoints 
+       WHERE pipeline_id = $1 AND checkpoint_id = $2`,
+      [pipelineId, checkpointId]
+    );
+    if (result.rows.length === 0) return null;
+    const row = result.rows[0] as { remaining_methods: string; completed_envelopes: string };
+    return {
+      remainingMethods: JSON.parse(row.remaining_methods || '[]'),
+      completedEnvelopes: JSON.parse(row.completed_envelopes || '[]'),
+    };
+  }
+
+  private async createCheckpoint(
+    pipelineId: string, 
+    methodId: string, 
+    envelope: CatoMethodEnvelope,
+    remainingMethods: string[]
+  ): Promise<string> {
+    const checkpointId = `chk_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    await this.pool.query(
+      `INSERT INTO cato_pipeline_checkpoints (pipeline_id, checkpoint_id, method_id, envelope_id, remaining_methods, created_at)
+       VALUES ($1, $2, $3, $4, $5, NOW())`,
+      [pipelineId, checkpointId, methodId, envelope.envelopeId, JSON.stringify(remainingMethods)]
+    );
+    return checkpointId;
   }
 
   private async executeMethod(

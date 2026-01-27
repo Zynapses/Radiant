@@ -36,6 +36,8 @@ import {
   FileText,
   BookOpen,
   Brain,
+  Globe,
+  Languages,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -132,6 +134,7 @@ const navigation: NavSection[] = [
       { name: 'Compliance', href: '/compliance', icon: ShieldCheck },
       { name: 'Analytics', href: '/analytics', icon: BarChart3 },
       { name: 'Reports', href: '/reports', icon: FileText },
+      { name: 'Localization', href: '/localization', icon: Globe },
       { name: 'Settings', href: '/settings', icon: Settings },
     ],
   },

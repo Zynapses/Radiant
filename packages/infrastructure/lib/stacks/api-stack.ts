@@ -1793,6 +1793,80 @@ export class ApiStack extends cdk.Stack {
     });
 
     // =========================================================================
+    // MFA API (v5.52.28) - Two-Factor Authentication endpoints
+    // =========================================================================
+    const mfaLambda = this.createLambda(
+      'MFA',
+      'auth/mfa.handler',
+      commonEnv,
+      vpc,
+      apiSecurityGroup,
+      lambdaRole
+    );
+    const mfaIntegration = new apigateway.LambdaIntegration(mfaLambda);
+
+    // MFA endpoints under /api/v2/mfa/*
+    const mfa = v2.addResource('mfa');
+    mfa.addProxy({
+      defaultIntegration: mfaIntegration,
+      defaultMethodOptions: {
+        authorizer: cognitoAuthorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      },
+    });
+
+    // =========================================================================
+    // OAuth 2.0 Provider API (v5.52.26) - RFC 6749 compliant authorization server
+    // =========================================================================
+    const oauthLambda = this.createLambda(
+      'OAuth',
+      'oauth/handler.handler',
+      commonEnv,
+      vpc,
+      apiSecurityGroup,
+      lambdaRole
+    );
+    const oauthIntegration = new apigateway.LambdaIntegration(oauthLambda);
+
+    // OAuth public endpoints (no auth required for OAuth flow)
+    const oauth = this.api.root.addResource('oauth');
+    const oauthAuthorize = oauth.addResource('authorize');
+    oauthAuthorize.addMethod('GET', oauthIntegration);
+    oauthAuthorize.addMethod('POST', oauthIntegration);
+    oauth.addResource('token').addMethod('POST', oauthIntegration);
+    oauth.addResource('revoke').addMethod('POST', oauthIntegration);
+    oauth.addResource('introspect').addMethod('POST', oauthIntegration);
+    oauth.addResource('userinfo').addMethod('GET', oauthIntegration, {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+    oauth.addResource('jwks.json').addMethod('GET', oauthIntegration);
+
+    // OIDC Discovery endpoint
+    const wellKnown = this.api.root.addResource('.well-known');
+    wellKnown.addResource('openid-configuration').addMethod('GET', oauthIntegration);
+
+    // OAuth Admin API
+    const oauthAdminLambda = this.createLambda(
+      'OAuthAdmin',
+      'admin/oauth-apps.handler',
+      commonEnv,
+      vpc,
+      apiSecurityGroup,
+      lambdaRole
+    );
+    const oauthAdminIntegration = new apigateway.LambdaIntegration(oauthAdminLambda);
+
+    const oauthAdmin = admin.addResource('oauth');
+    oauthAdmin.addProxy({
+      defaultIntegration: oauthAdminIntegration,
+      defaultMethodOptions: {
+        authorizer: adminAuthorizer,
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+      },
+    });
+
+    // =========================================================================
     // Think Tank API (v4.18.0) - Consolidated router for all Think Tank endpoints
     // =========================================================================
     const thinktankLambda = this.createLambda(

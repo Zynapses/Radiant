@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10 COMPLIANCE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>10 COMPLIANCE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/publications/10-COMPLIANCE.md</div>
+  </div>
+  
+  <h1 id="compliance-security-standards">Compliance &amp; Security Standards</h1>
+<h2 id="overview">Overview</h2>
+<p>RADIANT implements comprehensive compliance frameworks to meet enterprise security requirements across multiple regulatory standards.</p>
+<hr />
+<h2 id="required-provider-api-keys">Required Provider API Keys</h2>
+<p>RADIANT requires the following external AI provider API keys for deployment:</p>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 31%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+</colgroup>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Secret Path</th>
+<th>Purpose</th>
+<th>Get Key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Anthropic (Claude)</strong></td>
+<td><code>radiant/providers/anthropic</code></td>
+<td>Primary AI provider for Claude models</td>
+<td>https://console.anthropic.com/settings/keys</td>
+</tr>
+<tr>
+<td><strong>Groq</strong></td>
+<td><code>radiant/providers/groq</code></td>
+<td>Fast LPU inference for fallback</td>
+<td>https://console.groq.com/keys</td>
+</tr>
+</tbody>
+</table>
+<h3 id="deployment-flow">Deployment Flow</h3>
+<ol type="1">
+<li><strong>Configure Keys in Deployer</strong> - Enter API keys in the Swift Deployer “Required Provider API Keys” section</li>
+<li><strong>Local Storage</strong> - Keys are stored securely in macOS Keychain</li>
+<li><strong>AWS Upload</strong> - During deployment, keys are uploaded to AWS Secrets Manager</li>
+<li><strong>Lambda Access</strong> - Lambda functions retrieve keys from Secrets Manager at runtime</li>
+</ol>
+<h3 id="why-these-providers-are-required">Why These Providers Are Required</h3>
+<ul>
+<li><p><strong>Anthropic (Claude)</strong>: Primary provider for Claude 3.5 Sonnet, Claude Opus 4, and other Claude models via AWS Bedrock. Direct API access provides extended thinking and latest model features.</p></li>
+<li><p><strong>Groq</strong>: Ultra-fast inference (100-200ms) on Llama and Mixtral models. Used as fallback when Bedrock is unavailable and for speed-critical applications.</p></li>
+</ul>
+<hr />
+<h2 id="soc-2-type-ii-compliance">SOC 2 Type II Compliance</h2>
+<h3 id="trust-service-criteria">Trust Service Criteria</h3>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 27%" />
+<col style="width: 44%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Controls</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Security</strong></td>
+<td>Access control, encryption, monitoring</td>
+<td>Cognito, KMS, CloudWatch</td>
+</tr>
+<tr>
+<td><strong>Availability</strong></td>
+<td>Redundancy, failover, SLAs</td>
+<td>Multi-AZ, auto-scaling</td>
+</tr>
+<tr>
+<td><strong>Processing Integrity</strong></td>
+<td>Data validation, error handling</td>
+<td>Input validation, checksums</td>
+</tr>
+<tr>
+<td><strong>Confidentiality</strong></td>
+<td>Data classification, encryption</td>
+<td>RLS, AES-256, TLS 1.3</td>
+</tr>
+<tr>
+<td><strong>Privacy</strong></td>
+<td>Data handling, consent</td>
+<td>GDPR controls, retention policies</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-controls">Key Controls</h3>
+<ol type="1">
+<li><strong>Access Management</strong>
+<ul>
+<li>Multi-factor authentication (MFA) required for admins</li>
+<li>Role-based access control (RBAC)</li>
+<li>API key rotation policies</li>
+<li>Session timeout enforcement</li>
+</ul></li>
+<li><strong>Encryption</strong>
+<ul>
+<li>At rest: AES-256 via AWS KMS</li>
+<li>In transit: TLS 1.3 minimum</li>
+<li>Database: Aurora encryption enabled</li>
+<li>Secrets: AWS Secrets Manager</li>
+</ul></li>
+<li><strong>Audit Logging</strong>
+<ul>
+<li>All API requests logged</li>
+<li>Admin actions tracked</li>
+<li>CloudTrail for AWS operations</li>
+<li>90-day retention minimum</li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="hipaa-compliance">HIPAA Compliance</h2>
+<h3 id="protected-health-information-phi-handling">Protected Health Information (PHI) Handling</h3>
+<p>RADIANT supports HIPAA-compliant deployments with enhanced controls:</p>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Access Controls</strong></td>
+<td>User authentication, authorization, audit</td>
+</tr>
+<tr>
+<td><strong>Audit Controls</strong></td>
+<td>Complete activity logging, tamper-evident</td>
+</tr>
+<tr>
+<td><strong>Integrity Controls</strong></td>
+<td>Data validation, checksums, versioning</td>
+</tr>
+<tr>
+<td><strong>Transmission Security</strong></td>
+<td>TLS 1.3, encrypted channels only</td>
+</tr>
+</tbody>
+</table>
+<h3 id="hipaa-mode-features">HIPAA Mode Features</h3>
+<p>When HIPAA mode is enabled:</p>
+<pre class="typescript"><code>interface HIPAAConfig {
+  enabled: boolean;
+  phiDetection: boolean;        // Scan for PHI in requests
+  enhancedLogging: boolean;     // Additional audit details
+  dataRetentionDays: number;    // Configurable retention
+  encryptionRequired: boolean;  // Force encryption
+  accessReviewDays: number;     // Periodic access review
+}</code></pre>
+<h3 id="phi-sanitization">PHI Sanitization</h3>
+<pre class="typescript"><code>// Automatic PHI detection and handling
+export class PHISanitizationService {
+  private patterns = [
+    /\b\d{3}-\d{2}-\d{4}\b/,     // SSN
+    /\b\d{9}\b/,                  // MRN
+    /\b[A-Z]{2}\d{6,8}\b/,       // License numbers
+    // ... additional patterns
+  ];
+  
+  async sanitize(input: string): Promise&lt;SanitizedInput&gt; {
+    // Detect and redact PHI before processing
+    let sanitized = input;
+    for (const pattern of this.patterns) {
+      sanitized = sanitized.replace(pattern, &#39;[REDACTED]&#39;);
+    }
+    return { original: input, sanitized, phiDetected: sanitized !== input };
+  }
+}</code></pre>
+<hr />
+<h2 id="gdpr-compliance">GDPR Compliance</h2>
+<h3 id="data-subject-rights">Data Subject Rights</h3>
+<p>RADIANT implements all required GDPR data subject rights:</p>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 43%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Right</th>
+<th>Implementation</th>
+<th>API Endpoint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Right to Access</strong></td>
+<td>Export all user data</td>
+<td><code>GET /api/gdpr/export</code></td>
+</tr>
+<tr>
+<td><strong>Right to Rectification</strong></td>
+<td>Update personal data</td>
+<td><code>PATCH /api/users/{id}</code></td>
+</tr>
+<tr>
+<td><strong>Right to Erasure</strong></td>
+<td>Delete all user data</td>
+<td><code>DELETE /api/gdpr/erase</code></td>
+</tr>
+<tr>
+<td><strong>Right to Portability</strong></td>
+<td>Export in machine-readable format</td>
+<td><code>GET /api/gdpr/export?format=json</code></td>
+</tr>
+<tr>
+<td><strong>Right to Object</strong></td>
+<td>Opt-out of processing</td>
+<td><code>POST /api/gdpr/object</code></td>
+</tr>
+<tr>
+<td><strong>Right to Restrict</strong></td>
+<td>Limit processing</td>
+<td><code>POST /api/gdpr/restrict</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-processing">Data Processing</h3>
+<pre class="typescript"><code>interface GDPRDataRequest {
+  subjectId: string;          // User identifier
+  requestType: &#39;access&#39; | &#39;rectification&#39; | &#39;erasure&#39; | &#39;portability&#39; | &#39;object&#39; | &#39;restrict&#39;;
+  requestedBy: string;        // Requester (user or DPO)
+  verificationMethod: string; // How identity was verified
+  deadline: Date;             // 30-day compliance deadline
+}
+
+export class GDPRService {
+  async handleDataRequest(request: GDPRDataRequest): Promise&lt;GDPRResponse&gt; {
+    // Log the request
+    await this.auditLogger.log(&#39;gdpr_request&#39;, request);
+    
+    switch (request.requestType) {
+      case &#39;access&#39;:
+        return this.exportUserData(request.subjectId);
+      case &#39;erasure&#39;:
+        return this.eraseUserData(request.subjectId);
+      case &#39;portability&#39;:
+        return this.exportPortableData(request.subjectId);
+      // ... other handlers
+    }
+  }
+  
+  async eraseUserData(userId: string): Promise&lt;void&gt; {
+    // Cascade delete across all tables
+    await this.db.transaction(async (tx) =&gt; {
+      await tx.delete(&#39;thinktank_steps&#39;).where(&#39;session_id&#39;, &#39;in&#39;, 
+        tx.select(&#39;id&#39;).from(&#39;thinktank_sessions&#39;).where(&#39;user_id&#39;, userId));
+      await tx.delete(&#39;thinktank_sessions&#39;).where(&#39;user_id&#39;, userId);
+      await tx.delete(&#39;usage_records&#39;).where(&#39;user_id&#39;, userId);
+      await tx.delete(&#39;api_keys&#39;).where(&#39;user_id&#39;, userId);
+      await tx.delete(&#39;users&#39;).where(&#39;id&#39;, userId);
+    });
+  }
+}</code></pre>
+<h3 id="consent-management">Consent Management</h3>
+<pre class="typescript"><code>interface ConsentRecord {
+  userId: string;
+  consentType: &#39;marketing&#39; | &#39;analytics&#39; | &#39;ai_training&#39; | &#39;data_sharing&#39;;
+  granted: boolean;
+  grantedAt: Date;
+  ipAddress: string;
+  userAgent: string;
+  version: string;  // Consent policy version
+}
+
+// All processing requires valid consent
+async function checkConsent(userId: string, purpose: string): Promise&lt;boolean&gt; {
+  const consent = await db.query(
+    &#39;SELECT granted FROM consent_records WHERE user_id = $1 AND consent_type = $2&#39;,
+    [userId, purpose]
+  );
+  return consent?.granted === true;
+}</code></pre>
+<h3 id="data-retention">Data Retention</h3>
+<table>
+<thead>
+<tr>
+<th>Data Type</th>
+<th>Retention Period</th>
+<th>Basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>User accounts</td>
+<td>Until deletion requested</td>
+<td>Contract</td>
+</tr>
+<tr>
+<td>Session data</td>
+<td>90 days</td>
+<td>Legitimate interest</td>
+</tr>
+<tr>
+<td>Audit logs</td>
+<td>7 years</td>
+<td>Legal requirement</td>
+</tr>
+<tr>
+<td>Usage analytics</td>
+<td>2 years</td>
+<td>Legitimate interest</td>
+</tr>
+<tr>
+<td>AI training data</td>
+<td>Until consent withdrawn</td>
+<td>Consent</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="iso-27001-compliance">ISO 27001 Compliance</h2>
+<h3 id="information-security-management-system-isms">Information Security Management System (ISMS)</h3>
+<p>RADIANT’s infrastructure aligns with ISO 27001:2022 requirements:</p>
+<h3 id="annex-a-controls">Annex A Controls</h3>
+<h4 id="a.5-organizational-controls">A.5 Organizational Controls</h4>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 34%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Control</th>
+<th>Description</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A.5.1</td>
+<td>Policies for information security</td>
+<td>Documented security policies</td>
+</tr>
+<tr>
+<td>A.5.2</td>
+<td>Information security roles</td>
+<td>Defined RACI matrix</td>
+</tr>
+<tr>
+<td>A.5.3</td>
+<td>Segregation of duties</td>
+<td>Role-based access, dual approval</td>
+</tr>
+<tr>
+<td>A.5.7</td>
+<td>Threat intelligence</td>
+<td>AWS GuardDuty, threat feeds</td>
+</tr>
+<tr>
+<td>A.5.15</td>
+<td>Access control</td>
+<td>Cognito + IAM + RLS</td>
+</tr>
+<tr>
+<td>A.5.23</td>
+<td>Information security for cloud</td>
+<td>AWS Well-Architected</td>
+</tr>
+<tr>
+<td>A.5.29</td>
+<td>Information security during disruption</td>
+<td>DR procedures</td>
+</tr>
+</tbody>
+</table>
+<h4 id="a.6-people-controls">A.6 People Controls</h4>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 34%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Control</th>
+<th>Description</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A.6.1</td>
+<td>Screening</td>
+<td>Background checks for admins</td>
+</tr>
+<tr>
+<td>A.6.3</td>
+<td>Information security awareness</td>
+<td>Training programs</td>
+</tr>
+<tr>
+<td>A.6.5</td>
+<td>Responsibilities after termination</td>
+<td>Access revocation procedures</td>
+</tr>
+</tbody>
+</table>
+<h4 id="a.7-physical-controls">A.7 Physical Controls</h4>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Description</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A.7.1</td>
+<td>Physical security perimeters</td>
+<td>AWS data center security</td>
+</tr>
+<tr>
+<td>A.7.4</td>
+<td>Physical security monitoring</td>
+<td>AWS compliance certifications</td>
+</tr>
+</tbody>
+</table>
+<h4 id="a.8-technological-controls">A.8 Technological Controls</h4>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 34%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Control</th>
+<th>Description</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A.8.1</td>
+<td>User endpoint devices</td>
+<td>MDM for admin devices</td>
+</tr>
+<tr>
+<td>A.8.2</td>
+<td>Privileged access rights</td>
+<td>IAM policies, MFA required</td>
+</tr>
+<tr>
+<td>A.8.3</td>
+<td>Information access restriction</td>
+<td>RLS, tenant isolation</td>
+</tr>
+<tr>
+<td>A.8.4</td>
+<td>Access to source code</td>
+<td>GitHub branch protection</td>
+</tr>
+<tr>
+<td>A.8.5</td>
+<td>Secure authentication</td>
+<td>Cognito, JWT, API keys</td>
+</tr>
+<tr>
+<td>A.8.7</td>
+<td>Protection against malware</td>
+<td>WAF, input validation</td>
+</tr>
+<tr>
+<td>A.8.9</td>
+<td>Configuration management</td>
+<td>CDK, Infrastructure as Code</td>
+</tr>
+<tr>
+<td>A.8.10</td>
+<td>Information deletion</td>
+<td>GDPR erasure, retention policies</td>
+</tr>
+<tr>
+<td>A.8.11</td>
+<td>Data masking</td>
+<td>PHI sanitization, PII redaction</td>
+</tr>
+<tr>
+<td>A.8.12</td>
+<td>Data leakage prevention</td>
+<td>DLP policies, egress controls</td>
+</tr>
+<tr>
+<td>A.8.15</td>
+<td>Logging</td>
+<td>CloudWatch, audit trails</td>
+</tr>
+<tr>
+<td>A.8.16</td>
+<td>Monitoring activities</td>
+<td>CloudWatch alarms, dashboards</td>
+</tr>
+<tr>
+<td>A.8.20</td>
+<td>Networks security</td>
+<td>VPC, security groups, NACLs</td>
+</tr>
+<tr>
+<td>A.8.22</td>
+<td>Segregation of networks</td>
+<td>Private subnets, VPC endpoints</td>
+</tr>
+<tr>
+<td>A.8.24</td>
+<td>Use of cryptography</td>
+<td>KMS, TLS 1.3, AES-256</td>
+</tr>
+<tr>
+<td>A.8.25</td>
+<td>Secure development lifecycle</td>
+<td>Code review, security scanning</td>
+</tr>
+<tr>
+<td>A.8.28</td>
+<td>Secure coding</td>
+<td>OWASP guidelines, linting</td>
+</tr>
+</tbody>
+</table>
+<h3 id="risk-assessment-matrix">Risk Assessment Matrix</h3>
+<table>
+<thead>
+<tr>
+<th>Risk Category</th>
+<th>Likelihood</th>
+<th>Impact</th>
+<th>Controls</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Data breach</td>
+<td>Low</td>
+<td>Critical</td>
+<td>Encryption, RLS, monitoring</td>
+</tr>
+<tr>
+<td>Service outage</td>
+<td>Medium</td>
+<td>High</td>
+<td>Multi-AZ, auto-scaling, DR</td>
+</tr>
+<tr>
+<td>Unauthorized access</td>
+<td>Low</td>
+<td>Critical</td>
+<td>MFA, RBAC, audit logging</td>
+</tr>
+<tr>
+<td>Insider threat</td>
+<td>Low</td>
+<td>High</td>
+<td>Segregation, dual approval</td>
+</tr>
+<tr>
+<td>Supply chain attack</td>
+<td>Low</td>
+<td>High</td>
+<td>Dependency scanning, SBOMs</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="security-architecture">Security Architecture</h2>
+<h3 id="defense-in-depth">Defense in Depth</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                      INTERNET                                │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                    AWS WAF                                   │
+│     Rate limiting, SQL injection, XSS protection            │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                 CloudFront / ALB                            │
+│              TLS 1.3 termination                            │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                  API Gateway                                 │
+│         JWT validation, API key auth                        │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                    VPC (Private)                            │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │                  Lambda Functions                     │  │
+│  │           Input validation, RLS context              │  │
+│  └────────────────────────┬─────────────────────────────┘  │
+│                           │                                  │
+│  ┌────────────────────────▼─────────────────────────────┐  │
+│  │              Aurora PostgreSQL                        │  │
+│  │        Row-Level Security, Encryption                │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="two-person-approval">Two-Person Approval</h3>
+<p>Sensitive operations require dual admin approval:</p>
+<pre class="typescript"><code>interface ApprovalRequest {
+  id: string;
+  requesterId: string;
+  actionType: &#39;delete_tenant&#39; | &#39;modify_billing&#39; | &#39;grant_super_admin&#39; | 
+              &#39;bulk_export&#39; | &#39;disable_security&#39;;
+  resourceId: string;
+  payload: Record&lt;string, unknown&gt;;
+  status: &#39;pending&#39; | &#39;approved&#39; | &#39;rejected&#39; | &#39;expired&#39;;
+  requiredApprovals: number;  // Usually 2
+  approvals: Approval[];
+  expiresAt: Date;
+}
+
+// Cannot approve own requests
+async function approveRequest(requestId: string, approverId: string) {
+  const request = await getRequest(requestId);
+  
+  if (request.requesterId === approverId) {
+    throw new Error(&#39;Cannot approve own request&#39;);
+  }
+  
+  if (request.approvals.some(a =&gt; a.approverId === approverId)) {
+    throw new Error(&#39;Already approved&#39;);
+  }
+  
+  // Add approval
+  request.approvals.push({ approverId, approvedAt: new Date() });
+  
+  // Execute if threshold met
+  if (request.approvals.length &gt;= request.requiredApprovals) {
+    await executeApprovedAction(request);
+  }
+}</code></pre>
+<hr />
+<h2 id="audit-logging">Audit Logging</h2>
+<h3 id="log-structure">Log Structure</h3>
+<pre class="typescript"><code>interface AuditLog {
+  id: string;
+  timestamp: Date;
+  tenantId: string;
+  userId: string;
+  adminId?: string;
+  action: string;
+  resourceType: string;
+  resourceId: string;
+  ipAddress: string;
+  userAgent: string;
+  requestId: string;
+  oldValue?: Record&lt;string, unknown&gt;;
+  newValue?: Record&lt;string, unknown&gt;;
+  result: &#39;success&#39; | &#39;failure&#39;;
+  errorMessage?: string;
+}</code></pre>
+<h3 id="logged-actions">Logged Actions</h3>
+<ul>
+<li>All authentication events (login, logout, MFA)</li>
+<li>All API requests with parameters</li>
+<li>All data modifications (create, update, delete)</li>
+<li>All admin actions</li>
+<li>All security events (failed auth, rate limits)</li>
+<li>All GDPR requests</li>
+<li>All compliance-related operations</li>
+</ul>
+<h3 id="log-retention">Log Retention</h3>
+<table>
+<thead>
+<tr>
+<th>Log Type</th>
+<th>Retention</th>
+<th>Storage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API Access</td>
+<td>90 days</td>
+<td>CloudWatch</td>
+</tr>
+<tr>
+<td>Security Events</td>
+<td>1 year</td>
+<td>S3 + Glacier</td>
+</tr>
+<tr>
+<td>Audit Trail</td>
+<td>7 years</td>
+<td>S3 + Glacier</td>
+</tr>
+<tr>
+<td>GDPR Requests</td>
+<td>7 years</td>
+<td>Aurora</td>
+</tr>
+</tbody>
+</table>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 24 RESULT MERGING - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 24 RESULT MERGING</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-24-RESULT-MERGING.md</div>
+  </div>
+  
+  <h1 id="section-24-result-merging-ai-synthesis-v3.6.0">SECTION 24: RESULT MERGING &amp; AI SYNTHESIS (v3.6.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="result-merging-overview">24.1 Result Merging Overview</h2>
+<p>Combine responses from multiple AI models with intelligent synthesis.</p>
+<h2 id="merge-database-schema">24.2 Merge Database Schema</h2>
+<pre class="sql"><code>-- migrations/033_result_merging.sql
+
+CREATE TABLE merge_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    prompt TEXT NOT NULL,
+    merge_strategy VARCHAR(50) NOT NULL DEFAULT &#39;consensus&#39;,
+    models_used TEXT[] NOT NULL,
+    final_result TEXT,
+    quality_score DECIMAL(3, 2),
+    total_cost DECIMAL(10, 6),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE merge_responses (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id UUID NOT NULL REFERENCES merge_sessions(id) ON DELETE CASCADE,
+    model VARCHAR(100) NOT NULL,
+    response TEXT NOT NULL,
+    tokens_used INTEGER,
+    latency_ms INTEGER,
+    contribution_weight DECIMAL(3, 2) DEFAULT 1.0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_merge_sessions_user ON merge_sessions(tenant_id, user_id);
+CREATE INDEX idx_merge_responses_session ON merge_responses(session_id);
+
+ALTER TABLE merge_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE merge_responses ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY merge_sessions_isolation ON merge_sessions USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY merge_responses_isolation ON merge_responses USING (
+    session_id IN (SELECT id FROM merge_sessions WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID)
+);</code></pre>
+<h2 id="result-merger-service">24.3 Result Merger Service</h2>
+<pre class="typescript"><code>// packages/core/src/services/result-merger.ts
+
+import { Pool } from &#39;pg&#39;;
+import { BedrockRuntimeClient, InvokeModelCommand } from &#39;@aws-sdk/client-bedrock-runtime&#39;;
+
+type MergeStrategy = &#39;consensus&#39; | &#39;best_of&#39; | &#39;synthesize&#39; | &#39;debate&#39;;
+
+interface MergeResult {
+    sessionId: string;
+    mergedResponse: string;
+    qualityScore: number;
+    contributions: Array&lt;{ model: string; weight: number }&gt;;
+}
+
+export class ResultMerger {
+    private pool: Pool;
+    private bedrock: BedrockRuntimeClient;
+    
+    constructor(pool: Pool) {
+        this.pool = pool;
+        this.bedrock = new BedrockRuntimeClient({});
+    }
+    
+    async merge(
+        tenantId: string,
+        userId: string,
+        prompt: string,
+        responses: Array&lt;{ model: string; response: string; tokens?: number; latencyMs?: number }&gt;,
+        strategy: MergeStrategy = &#39;consensus&#39;
+    ): Promise&lt;MergeResult&gt; {
+        // Create session
+        const models = responses.map(r =&gt; r.model);
+        const sessionResult = await this.pool.query(`
+            INSERT INTO merge_sessions (tenant_id, user_id, prompt, merge_strategy, models_used)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING id
+        `, [tenantId, userId, prompt, strategy, models]);
+        
+        const sessionId = sessionResult.rows[0].id;
+        
+        // Store individual responses
+        for (const response of responses) {
+            await this.pool.query(`
+                INSERT INTO merge_responses (session_id, model, response, tokens_used, latency_ms)
+                VALUES ($1, $2, $3, $4, $5)
+            `, [sessionId, response.model, response.response, response.tokens, response.latencyMs]);
+        }
+        
+        // Perform merge based on strategy
+        const mergeResult = await this.performMerge(prompt, responses, strategy);
+        
+        // Update session with result
+        await this.pool.query(`
+            UPDATE merge_sessions SET final_result = $2, quality_score = $3 WHERE id = $1
+        `, [sessionId, mergeResult.mergedResponse, mergeResult.qualityScore]);
+        
+        return {
+            sessionId,
+            ...mergeResult
+        };
+    }
+    
+    private async performMerge(
+        prompt: string,
+        responses: Array&lt;{ model: string; response: string }&gt;,
+        strategy: MergeStrategy
+    ): Promise&lt;{ mergedResponse: string; qualityScore: number; contributions: Array&lt;{ model: string; weight: number }&gt; }&gt; {
+        const strategyHandlers: Record&lt;MergeStrategy, () =&gt; Promise&lt;any&gt;&gt; = {
+            consensus: () =&gt; this.consensusMerge(responses),
+            best_of: () =&gt; this.bestOfMerge(prompt, responses),
+            synthesize: () =&gt; this.synthesizeMerge(prompt, responses),
+            debate: () =&gt; this.debateMerge(prompt, responses)
+        };
+        
+        return strategyHandlers[strategy]();
+    }
+    
+    private async consensusMerge(responses: Array&lt;{ model: string; response: string }&gt;) {
+        const responsesText = responses.map((r, i) =&gt; `Response ${i + 1} (${r.model}):\n${r.response}`).join(&#39;\n\n&#39;);
+        
+        const synthesis = await this.invokeModel(`
+            Analyze these AI responses and create a consensus response that incorporates the best elements from each:
+            
+            ${responsesText}
+            
+            Create a unified response that represents the consensus view. Return JSON: { &quot;response&quot;: &quot;...&quot;, &quot;contributions&quot;: [{&quot;model&quot;: &quot;...&quot;, &quot;weight&quot;: 0.0-1.0}] }
+        `);
+        
+        return {
+            mergedResponse: synthesis.response,
+            qualityScore: 0.85,
+            contributions: synthesis.contributions || responses.map(r =&gt; ({ model: r.model, weight: 1 / responses.length }))
+        };
+    }
+    
+    private async bestOfMerge(prompt: string, responses: Array&lt;{ model: string; response: string }&gt;) {
+        const responsesText = responses.map((r, i) =&gt; `Response ${i + 1} (${r.model}):\n${r.response}`).join(&#39;\n\n&#39;);
+        
+        const evaluation = await this.invokeModel(`
+            Original question: ${prompt}
+            
+            Evaluate these responses and select the best one:
+            
+            ${responsesText}
+            
+            Return JSON: { &quot;bestIndex&quot;: 0-${responses.length - 1}, &quot;reason&quot;: &quot;...&quot;, &quot;score&quot;: 0.0-1.0 }
+        `);
+        
+        const bestResponse = responses[evaluation.bestIndex || 0];
+        
+        return {
+            mergedResponse: bestResponse.response,
+            qualityScore: evaluation.score || 0.8,
+            contributions: [{ model: bestResponse.model, weight: 1.0 }]
+        };
+    }
+    
+    private async synthesizeMerge(prompt: string, responses: Array&lt;{ model: string; response: string }&gt;) {
+        const responsesText = responses.map((r, i) =&gt; `Response ${i + 1} (${r.model}):\n${r.response}`).join(&#39;\n\n&#39;);
+        
+        const synthesis = await this.invokeModel(`
+            Original question: ${prompt}
+            
+            Create a comprehensive synthesis that combines insights from all these responses:
+            
+            ${responsesText}
+            
+            Synthesize into a single, well-structured response that incorporates unique insights from each.
+        `);
+        
+        return {
+            mergedResponse: synthesis,
+            qualityScore: 0.9,
+            contributions: responses.map(r =&gt; ({ model: r.model, weight: 1 / responses.length }))
+        };
+    }
+    
+    private async debateMerge(prompt: string, responses: Array&lt;{ model: string; response: string }&gt;) {
+        // Multi-round debate simulation
+        const responsesText = responses.map((r, i) =&gt; `${r.model}:\n${r.response}`).join(&#39;\n\n---\n\n&#39;);
+        
+        const debate = await this.invokeModel(`
+            Simulate a debate between these AI perspectives on: ${prompt}
+            
+            Initial positions:
+            ${responsesText}
+            
+            Identify points of agreement and disagreement, then synthesize a conclusion that addresses the strongest arguments from each perspective.
+        `);
+        
+        return {
+            mergedResponse: debate,
+            qualityScore: 0.85,
+            contributions: responses.map(r =&gt; ({ model: r.model, weight: 1 / responses.length }))
+        };
+    }
+    
+    private async invokeModel(prompt: string): Promise&lt;any&gt; {
+        const response = await this.bedrock.send(new InvokeModelCommand({
+            modelId: &#39;anthropic.claude-3-sonnet-20240229-v1:0&#39;,
+            body: JSON.stringify({
+                anthropic_version: &#39;bedrock-2023-05-31&#39;,
+                max_tokens: 4096,
+                messages: [{ role: &#39;user&#39;, content: prompt }]
+            }),
+            contentType: &#39;application/json&#39;
+        }));
+        
+        const result = JSON.parse(new TextDecoder().decode(response.body));
+        const text = result.content[0].text;
+        
+        try {
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            return jsonMatch ? JSON.parse(jsonMatch[0]) : text;
+        } catch {
+            return text;
+        }
+    }
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

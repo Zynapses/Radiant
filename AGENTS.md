@@ -91,6 +91,8 @@ DYNAMIC: New policies in /.windsurf/workflows/ are AUTOMATICALLY enforced.
 | **Technical/Architecture** | `ENGINEERING-IMPLEMENTATION-VISION.md` |
 | **Database change** | `sections/SECTION-07-DATABASE-SCHEMA.md` + `RADIANT-PLATFORM-ARCHITECTURE.md` |
 | **Competitive advantage** | `THINKTANK-MOATS.md` or `RADIANT-MOATS.md` |
+| **Swift Deployer change** | `SWIFT-DEPLOYER-USER-GUIDE.md` |
+| **Service layer (MCP/A2A/API)** | `SERVICE-LAYER-GUIDE.md` + `RADIANT-PLATFORM-ARCHITECTURE.md` |
 
 ### The Golden Rule
 
@@ -118,6 +120,29 @@ IF you change code → THEN you MUST update ALL applicable documentation
 4. **No Hardcoded Versions**: Use RADIANT_VERSION constant
 5. **Error Handling**: Use typed errors with helpful messages
 6. **Policy Compliance**: Run `/policy-enforcement` pre-flight check for every task
+7. **No Stubs Policy**: See `/.windsurf/workflows/no-stubs.md` - NEVER create placeholder implementations
+
+## 🚫 NO STUBS POLICY (CRITICAL)
+
+> **Policy File**: `/.windsurf/workflows/no-stubs.md`
+
+**AI agents MUST NOT create:**
+- ❌ Methods returning empty arrays, zero, or hardcoded values
+- ❌ Functions with `// TODO`, `// Placeholder`, or `// Coming soon` comments
+- ❌ UI components showing "Coming soon" or similar messages
+- ❌ Any code that doesn't fulfill its documented contract
+
+**EVERY implementation MUST:**
+- ✅ Fully implement the documented functionality
+- ✅ Connect to real data sources (database, API, S3, etc.)
+- ✅ Handle errors appropriately
+- ✅ Be immediately usable in production
+
+**If full implementation is blocked:**
+1. Document the blocker explicitly
+2. Throw a descriptive error (not return empty/zero)
+3. Create a tracking issue
+4. Get explicit user approval before proceeding
 
 ## 📋 Phase Execution
 

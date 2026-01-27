@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADMINISTRATOR GUIDE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>ADMINISTRATOR GUIDE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/ADMINISTRATOR-GUIDE.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.17.0---administrator-guide">RADIANT v4.17.0 - Administrator Guide</h1>
+<blockquote>
+<p>⚠️ <strong>DEPRECATED</strong>: This document has been superseded by: - <a href="./RADIANT-ADMIN-GUIDE.md">RADIANT-ADMIN-GUIDE.md</a> - Platform administration - <a href="./THINKTANK-ADMIN-GUIDE.md">THINKTANK-ADMIN-GUIDE.md</a> - Think Tank administration</p>
+<p>This file is kept for historical reference only. Please use the above guides.</p>
+</blockquote>
+<hr />
+<blockquote>
+<p><strong>Comprehensive documentation for RADIANT platform administrators</strong></p>
+<p>Last Updated: {{BUILD_DATE}} Version: {{RADIANT_VERSION}}</p>
+</blockquote>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-overview">Overview</a></li>
+<li><a href="#2-getting-started">Getting Started</a></li>
+<li><a href="#3-dashboard-navigation">Dashboard Navigation</a></li>
+<li><a href="#4-tenant-management">Tenant Management</a></li>
+<li><a href="#5-user--access-management">User &amp; Access Management</a></li>
+<li><a href="#6-ai-model-configuration">AI Model Configuration</a></li>
+<li><a href="#7-billing--subscriptions">Billing &amp; Subscriptions</a></li>
+<li><a href="#8-monitoring--analytics">Monitoring &amp; Analytics</a></li>
+<li><a href="#9-security--compliance">Security &amp; Compliance</a></li>
+<li><a href="#10-troubleshooting">Troubleshooting</a></li>
+<li><a href="#11-api-reference">API Reference</a></li>
+<li><a href="#12-appendix">Appendix</a></li>
+</ol>
+<hr />
+<h2 id="overview">1. Overview</h2>
+<h3 id="what-is-radiant">1.1 What is RADIANT?</h3>
+<p>RADIANT is a multi-tenant AWS SaaS platform for AI model access and orchestration. It provides:</p>
+<ul>
+<li><strong>106+ AI Models</strong>: 50 external provider models + 56 self-hosted models</li>
+<li><strong>Intelligent Routing</strong>: Brain router for optimal model selection</li>
+<li><strong>Multi-Tenant Architecture</strong>: Complete data isolation with Row-Level Security</li>
+<li><strong>7-Tier Subscription System</strong>: From free tier to enterprise</li>
+<li><strong>Comprehensive Admin Dashboard</strong>: Full platform management</li>
+</ul>
+<h3 id="architecture-overview">1.2 Architecture Overview</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                        RADIANT Platform                          │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
+│  │   Admin     │  │  Think Tank │  │     API Gateway         │  │
+│  │  Dashboard  │  │  (Consumer) │  │   (REST + WebSocket)    │  │
+│  └──────┬──────┘  └──────┬──────┘  └───────────┬─────────────┘  │
+│         │                │                      │                │
+│  ┌──────┴────────────────┴──────────────────────┴─────────────┐ │
+│  │                    Lambda Functions                         │ │
+│  │  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌──────────┐  │ │
+│  │  │ Brain  │ │ Neural │ │Billing │ │ Admin  │ │ Webhooks │  │ │
+│  │  │ Router │ │ Engine │ │Service │ │  API   │ │  Handler │  │ │
+│  │  └────────┘ └────────┘ └────────┘ └────────┘ └──────────┘  │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+│                              │                                   │
+│  ┌───────────────────────────┴───────────────────────────────┐  │
+│  │                    Data Layer                              │  │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐  │  │
+│  │  │   Aurora     │  │  DynamoDB    │  │       S3        │  │  │
+│  │  │ PostgreSQL   │  │  (Sessions)  │  │   (Storage)     │  │  │
+│  │  └──────────────┘  └──────────────┘  └─────────────────┘  │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                              │                                   │
+│  ┌───────────────────────────┴───────────────────────────────┐  │
+│  │                    AI Providers                            │  │
+│  │  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌─────────┐  │  │
+│  │  │OpenAI  │ │Anthropic│ │ Google │ │SageMaker│ │ Bedrock │  │  │
+│  │  └────────┘ └────────┘ └────────┘ └────────┘ └─────────┘  │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="key-concepts">1.3 Key Concepts</h3>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tenant</strong></td>
+<td>An organization using RADIANT (complete data isolation)</td>
+</tr>
+<tr>
+<td><strong>User</strong></td>
+<td>Individual user within a tenant</td>
+</tr>
+<tr>
+<td><strong>Subscription</strong></td>
+<td>Billing tier determining features and limits</td>
+</tr>
+<tr>
+<td><strong>Credits</strong></td>
+<td>Currency for AI model usage</td>
+</tr>
+<tr>
+<td><strong>Brain Router</strong></td>
+<td>Intelligent system for model selection</td>
+</tr>
+<tr>
+<td><strong>Neural Engine</strong></td>
+<td>Personalization engine learning user preferences</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="getting-started">2. Getting Started</h2>
+<h3 id="accessing-the-admin-dashboard">2.1 Accessing the Admin Dashboard</h3>
+<ol type="1">
+<li>Navigate to: <code>https://admin.{{RADIANT_DOMAIN}}</code></li>
+<li>Sign in with your administrator credentials</li>
+<li>Complete MFA verification (required for all admin accounts)</li>
+</ol>
+<h3 id="first-time-setup-checklist">2.2 First-Time Setup Checklist</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Configure default subscription tiers</label></li>
+<li><label><input type="checkbox" />Set up AI provider credentials</label></li>
+<li><label><input type="checkbox" />Configure email templates</label></li>
+<li><label><input type="checkbox" />Set billing parameters</label></li>
+<li><label><input type="checkbox" />Review security settings</label></li>
+<li><label><input type="checkbox" />Enable monitoring alerts</label></li>
+</ul>
+<h3 id="admin-roles">2.3 Admin Roles</h3>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 68%" />
+</colgroup>
+<thead>
+<tr>
+<th>Role</th>
+<th>Permissions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Super Admin</strong></td>
+<td>Full platform access, can manage other admins</td>
+</tr>
+<tr>
+<td><strong>Billing Admin</strong></td>
+<td>Manage subscriptions, credits, invoices</td>
+</tr>
+<tr>
+<td><strong>Support Admin</strong></td>
+<td>View tenant data, assist users, limited modifications</td>
+</tr>
+<tr>
+<td><strong>Read-Only Admin</strong></td>
+<td>View-only access to dashboards and reports</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="dashboard-navigation">3. Dashboard Navigation</h2>
+<h3 id="main-dashboard">3.1 Main Dashboard</h3>
+<p>The main dashboard displays:</p>
+<ul>
+<li><strong>Active Users</strong>: Real-time count of connected users</li>
+<li><strong>API Requests</strong>: Requests per minute/hour/day</li>
+<li><strong>Revenue</strong>: Current period revenue metrics</li>
+<li><strong>Model Usage</strong>: Top models by usage</li>
+<li><strong>System Health</strong>: Service status indicators</li>
+</ul>
+<h3 id="navigation-menu">3.2 Navigation Menu</h3>
+<pre><code>📊 Dashboard          - Overview and metrics
+👥 Tenants            - Tenant management
+👤 Users              - User administration  
+🤖 Models             - AI model configuration
+💳 Billing            - Subscriptions and credits
+📈 Analytics          - Usage analytics
+🔐 Security           - Security settings
+⚙️  Settings           - Platform configuration
+📋 Audit Logs         - Activity logs
+🔧 Migrations         - Database migrations
+🌐 Localization       - Language settings</code></pre>
+<hr />
+<h2 id="tenant-management">4. Tenant Management</h2>
+<h3 id="creating-a-tenant">4.1 Creating a Tenant</h3>
+<ol type="1">
+<li>Navigate to <strong>Tenants</strong> → <strong>Create New</strong></li>
+<li>Fill in required fields:
+<ul>
+<li><strong>Name</strong>: Organization name</li>
+<li><strong>Slug</strong>: URL-safe identifier (auto-generated)</li>
+<li><strong>Primary Email</strong>: Main contact email</li>
+<li><strong>Subscription Tier</strong>: Initial tier</li>
+</ul></li>
+<li>Click <strong>Create Tenant</strong></li>
+</ol>
+<h3 id="tenant-settings">4.2 Tenant Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Status</strong></td>
+<td>Active, Suspended, or Cancelled</td>
+</tr>
+<tr>
+<td><strong>Subscription</strong></td>
+<td>Current tier and billing cycle</td>
+</tr>
+<tr>
+<td><strong>Features</strong></td>
+<td>Feature flags enabled for tenant</td>
+</tr>
+<tr>
+<td><strong>Rate Limits</strong></td>
+<td>Custom rate limit overrides</td>
+</tr>
+<tr>
+<td><strong>Data Retention</strong></td>
+<td>Custom retention policies</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tenant-isolation">4.3 Tenant Isolation</h3>
+<p>Each tenant has complete data isolation through:</p>
+<ul>
+<li><strong>Row-Level Security (RLS)</strong>: PostgreSQL policies</li>
+<li><strong>Tenant Context</strong>: <code>app.current_tenant_id</code> session variable</li>
+<li><strong>Separate Storage</strong>: S3 prefixes per tenant</li>
+<li><strong>Audit Logging</strong>: All access logged per tenant</li>
+</ul>
+<h3 id="suspending-a-tenant">4.4 Suspending a Tenant</h3>
+<ol type="1">
+<li>Navigate to <strong>Tenants</strong> → Select tenant</li>
+<li>Click <strong>Actions</strong> → <strong>Suspend</strong></li>
+<li>Select reason and duration</li>
+<li>Confirm suspension</li>
+</ol>
+<blockquote>
+<p>⚠️ Suspended tenants cannot access the API but data is preserved.</p>
+</blockquote>
+<hr />
+<h2 id="user-access-management">5. User &amp; Access Management</h2>
+<h3 id="user-roles-per-tenant">5.1 User Roles (Per Tenant)</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Owner</strong></td>
+<td>Full tenant control, billing access</td>
+</tr>
+<tr>
+<td><strong>Admin</strong></td>
+<td>Manage users, settings, view billing</td>
+</tr>
+<tr>
+<td><strong>Member</strong></td>
+<td>Standard access, use AI features</td>
+</tr>
+<tr>
+<td><strong>Viewer</strong></td>
+<td>Read-only access</td>
+</tr>
+</tbody>
+</table>
+<h3 id="managing-users">5.2 Managing Users</h3>
+<p><strong>Add User:</strong> 1. Navigate to <strong>Tenants</strong> → Select tenant → <strong>Users</strong> 2. Click <strong>Invite User</strong> 3. Enter email and select role 4. User receives invitation email</p>
+<p><strong>Remove User:</strong> 1. Select user from list 2. Click <strong>Actions</strong> → <strong>Remove</strong> 3. Confirm removal</p>
+<h3 id="api-keys">5.3 API Keys</h3>
+<p>Tenants can create API keys for programmatic access:</p>
+<table>
+<thead>
+<tr>
+<th>Key Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Production</strong></td>
+<td>Full access, rate-limited by tier</td>
+</tr>
+<tr>
+<td><strong>Development</strong></td>
+<td>Limited access, lower rate limits</td>
+</tr>
+<tr>
+<td><strong>Read-Only</strong></td>
+<td>Only GET requests allowed</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sso-configuration">5.4 SSO Configuration</h3>
+<p>RADIANT supports enterprise SSO:</p>
+<ul>
+<li><strong>SAML 2.0</strong>: Okta, Azure AD, OneLogin</li>
+<li><strong>OIDC</strong>: Google, Auth0, Cognito</li>
+<li><strong>SCIM</strong>: Automated user provisioning</li>
+</ul>
+<hr />
+<h2 id="ai-model-configuration">6. AI Model Configuration</h2>
+<h3 id="model-categories">6.1 Model Categories</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Count</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LLM</strong></td>
+<td>45+</td>
+<td>GPT-4, Claude 3, Gemini</td>
+</tr>
+<tr>
+<td><strong>Vision</strong></td>
+<td>15+</td>
+<td>GPT-4V, LLaVA, BLIP-2</td>
+</tr>
+<tr>
+<td><strong>Audio</strong></td>
+<td>8+</td>
+<td>Whisper, TTS models</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td>10+</td>
+<td>CodeLlama, StarCoder</td>
+</tr>
+<tr>
+<td><strong>Embedding</strong></td>
+<td>8+</td>
+<td>text-embedding-3, E5</td>
+</tr>
+<tr>
+<td><strong>Scientific</strong></td>
+<td>12+</td>
+<td>AlphaFold, ESM-2</td>
+</tr>
+</tbody>
+</table>
+<h3 id="model-pricing">6.2 Model Pricing</h3>
+<p>Configure model pricing in <strong>Models</strong> → <strong>Pricing</strong>:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ Model: gpt-4-turbo                                          │
+├─────────────────────────────────────────────────────────────┤
+│ Base Input Price:   $10.00 / 1M tokens                      │
+│ Base Output Price:  $30.00 / 1M tokens                      │
+│ Markup:             40%                                      │
+│ ─────────────────────────────────────────────────────────── │
+│ Final Input Price:  $14.00 / 1M tokens                      │
+│ Final Output Price: $42.00 / 1M tokens                      │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="provider-credentials">6.3 Provider Credentials</h3>
+<p>Configure AI provider API keys in <strong>Settings</strong> → <strong>Providers</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Required Credentials</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenAI</td>
+<td>API Key, Organization ID</td>
+</tr>
+<tr>
+<td>Anthropic</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td>Google</td>
+<td>Service Account JSON</td>
+</tr>
+<tr>
+<td>AWS Bedrock</td>
+<td>IAM Role (automatic)</td>
+</tr>
+<tr>
+<td>Cohere</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td>Mistral</td>
+<td>API Key</td>
+</tr>
+</tbody>
+</table>
+<h3 id="self-hosted-models">6.4 Self-Hosted Models</h3>
+<p>Self-hosted models run on SageMaker with thermal state management:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Description</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>OFF</strong></td>
+<td>Not deployed</td>
+<td>$0</td>
+</tr>
+<tr>
+<td><strong>COLD</strong></td>
+<td>Deployed, scaled to 0</td>
+<td>Minimal</td>
+</tr>
+<tr>
+<td><strong>WARM</strong></td>
+<td>1 instance running</td>
+<td>Per-hour</td>
+</tr>
+<tr>
+<td><strong>HOT</strong></td>
+<td>Auto-scaling active</td>
+<td>Per-hour + usage</td>
+</tr>
+</tbody>
+</table>
+<h3 id="license-management">6.5 License Management</h3>
+<p>Track model licenses in <strong>Models</strong> → <strong>Licenses</strong>:</p>
+<ul>
+<li><strong>Compliance Status</strong>: Compliant, Review Needed, Non-Compliant</li>
+<li><strong>Commercial Use</strong>: Allowed/Not Allowed</li>
+<li><strong>Expiration Tracking</strong>: Alerts for expiring licenses</li>
+<li><strong>Audit Log</strong>: All license changes tracked</li>
+</ul>
+<hr />
+<h2 id="billing-subscriptions">7. Billing &amp; Subscriptions</h2>
+<h3 id="subscription-tiers">7.1 Subscription Tiers</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Monthly</th>
+<th>Annual</th>
+<th>Credits/User</th>
+<th>Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Free</strong></td>
+<td>$0</td>
+<td>$0</td>
+<td>50</td>
+<td>Basic models</td>
+</tr>
+<tr>
+<td><strong>Starter</strong></td>
+<td>$29</td>
+<td>$290</td>
+<td>500</td>
+<td>+ Advanced models</td>
+</tr>
+<tr>
+<td><strong>Pro</strong></td>
+<td>$99</td>
+<td>$990</td>
+<td>2,000</td>
+<td>+ Priority support</td>
+</tr>
+<tr>
+<td><strong>Team</strong></td>
+<td>$49/user</td>
+<td>$490/user</td>
+<td>1,500</td>
+<td>+ Collaboration</td>
+</tr>
+<tr>
+<td><strong>Business</strong></td>
+<td>$199/user</td>
+<td>$1,990/user</td>
+<td>5,000</td>
+<td>+ SSO, API</td>
+</tr>
+<tr>
+<td><strong>Enterprise</strong></td>
+<td>Custom</td>
+<td>Custom</td>
+<td>Unlimited</td>
+<td>+ Dedicated</td>
+</tr>
+<tr>
+<td><strong>Self-Hosted</strong></td>
+<td>License</td>
+<td>License</td>
+<td>Unlimited</td>
+<td>On-premise</td>
+</tr>
+</tbody>
+</table>
+<h3 id="credit-system">7.2 Credit System</h3>
+<p>Credits are the universal currency for AI usage:</p>
+<ul>
+<li><strong>Allocation</strong>: Monthly per-user based on tier</li>
+<li><strong>Rollover</strong>: Unused credits expire monthly</li>
+<li><strong>Bonus Credits</strong>: Promotional or support credits</li>
+<li><strong>Purchase</strong>: Additional credits available</li>
+</ul>
+<p><strong>Credit Calculation:</strong></p>
+<pre><code>Cost = (Input Tokens × Input Price) + (Output Tokens × Output Price)
+Credits Used = Cost × 100 (1 credit = $0.01)</code></pre>
+<h3 id="grandfathering">7.3 Grandfathering</h3>
+<p>When prices change, existing subscribers keep their original terms:</p>
+<ol type="1">
+<li>Navigate to <strong>Billing</strong> → <strong>Plan Versions</strong></li>
+<li>View grandfathered subscriptions</li>
+<li>Offer migration incentives if desired</li>
+</ol>
+<h3 id="invoicing">7.4 Invoicing</h3>
+<ul>
+<li><strong>Automatic Invoicing</strong>: Generated monthly/annually</li>
+<li><strong>Payment Methods</strong>: Credit card, ACH, wire transfer</li>
+<li><strong>Invoice History</strong>: Available in tenant portal</li>
+<li><strong>Tax Handling</strong>: Configurable tax rates by region</li>
+</ul>
+<hr />
+<h2 id="monitoring-analytics">8. Monitoring &amp; Analytics</h2>
+<h3 id="real-time-metrics">8.1 Real-Time Metrics</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Requests/min</strong></td>
+<td>API request rate</td>
+</tr>
+<tr>
+<td><strong>Latency p50/p95/p99</strong></td>
+<td>Response time percentiles</td>
+</tr>
+<tr>
+<td><strong>Error Rate</strong></td>
+<td>Percentage of failed requests</td>
+</tr>
+<tr>
+<td><strong>Token Usage</strong></td>
+<td>Input/output tokens consumed</td>
+</tr>
+<tr>
+<td><strong>Active Users</strong></td>
+<td>Concurrent connected users</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dashboards">8.2 Dashboards</h3>
+<p><strong>Available Dashboards:</strong> - Platform Overview - Tenant Usage - Model Performance - Revenue Analytics - Error Analysis - Provider Health</p>
+<h3 id="alerts">8.3 Alerts</h3>
+<p>Configure alerts in <strong>Settings</strong> → <strong>Alerts</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Alert Type</th>
+<th>Threshold</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>High Error Rate</td>
+<td>&gt; 5%</td>
+<td>Email, Slack</td>
+</tr>
+<tr>
+<td>Provider Down</td>
+<td>Health check fail</td>
+<td>PagerDuty</td>
+</tr>
+<tr>
+<td>Credit Exhaustion</td>
+<td>&lt; 10% remaining</td>
+<td>Email user</td>
+</tr>
+<tr>
+<td>Unusual Usage</td>
+<td>&gt; 3σ deviation</td>
+<td>Review queue</td>
+</tr>
+</tbody>
+</table>
+<h3 id="audit-logs">8.4 Audit Logs</h3>
+<p>All administrative actions are logged:</p>
+<pre class="json"><code>{
+  &quot;timestamp&quot;: &quot;2024-01-15T10:30:00Z&quot;,
+  &quot;admin_id&quot;: &quot;admin_123&quot;,
+  &quot;action&quot;: &quot;tenant.suspend&quot;,
+  &quot;target&quot;: &quot;tenant_456&quot;,
+  &quot;reason&quot;: &quot;Payment failure&quot;,
+  &quot;ip_address&quot;: &quot;192.168.1.1&quot;
+}</code></pre>
+<hr />
+<h2 id="security-compliance">9. Security &amp; Compliance</h2>
+<h3 id="authentication">9.1 Authentication</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Email/Password</strong></td>
+<td>Standard authentication</td>
+</tr>
+<tr>
+<td><strong>MFA</strong></td>
+<td>TOTP or SMS (required for admins)</td>
+</tr>
+<tr>
+<td><strong>SSO</strong></td>
+<td>SAML/OIDC federation</td>
+</tr>
+<tr>
+<td><strong>API Keys</strong></td>
+<td>For programmatic access</td>
+</tr>
+</tbody>
+</table>
+<h3 id="authorization">9.2 Authorization</h3>
+<ul>
+<li><strong>Role-Based Access Control (RBAC)</strong>: Predefined roles</li>
+<li><strong>Row-Level Security</strong>: Database-level isolation</li>
+<li><strong>API Scopes</strong>: Fine-grained API permissions</li>
+</ul>
+<h3 id="data-protection">9.3 Data Protection</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Encryption at Rest</strong></td>
+<td>AES-256 (AWS KMS)</td>
+</tr>
+<tr>
+<td><strong>Encryption in Transit</strong></td>
+<td>TLS 1.3</td>
+</tr>
+<tr>
+<td><strong>Key Rotation</strong></td>
+<td>Automatic, configurable</td>
+</tr>
+<tr>
+<td><strong>Data Masking</strong></td>
+<td>PII detection and masking</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compliance">9.4 Compliance</h3>
+<p>RADIANT supports compliance with:</p>
+<ul>
+<li><strong>SOC 2 Type II</strong></li>
+<li><strong>GDPR</strong></li>
+<li><strong>HIPAA</strong> (with BAA)</li>
+<li><strong>CCPA</strong></li>
+</ul>
+<h3 id="dual-admin-approval">9.5 Dual-Admin Approval</h3>
+<p>Critical operations require two administrators:</p>
+<ol type="1">
+<li>First admin initiates request</li>
+<li>Second admin reviews and approves</li>
+<li>Operation executes after approval</li>
+</ol>
+<p><strong>Operations requiring dual approval:</strong> - Production database migrations - Bulk data deletions - Security policy changes - Price increases affecting existing customers</p>
+<hr />
+<h2 id="troubleshooting">10. Troubleshooting</h2>
+<h3 id="common-issues">10.1 Common Issues</h3>
+<p><strong>Issue: User cannot access tenant</strong></p>
+<pre><code>✓ Check user status (active?)
+✓ Verify tenant status (not suspended?)
+✓ Check subscription (not expired?)
+✓ Review audit logs for blocks</code></pre>
+<p><strong>Issue: High latency on requests</strong></p>
+<pre><code>✓ Check provider health dashboard
+✓ Review model thermal state
+✓ Check rate limit status
+✓ Analyze request patterns</code></pre>
+<p><strong>Issue: Credits not updating</strong></p>
+<pre><code>✓ Verify billing cycle
+✓ Check for failed transactions
+✓ Review credit transaction log
+✓ Check for pending allocations</code></pre>
+<h3 id="health-checks">10.2 Health Checks</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Expected Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/health</code></td>
+<td><code>{"status": "healthy"}</code></td>
+</tr>
+<tr>
+<td><code>/health/db</code></td>
+<td><code>{"status": "connected"}</code></td>
+</tr>
+<tr>
+<td><code>/health/cache</code></td>
+<td><code>{"status": "connected"}</code></td>
+</tr>
+<tr>
+<td><code>/health/providers</code></td>
+<td>Provider status array</td>
+</tr>
+</tbody>
+</table>
+<h3 id="log-analysis">10.3 Log Analysis</h3>
+<p>Logs are available in CloudWatch:</p>
+<pre class="bash"><code># View recent errors
+aws logs filter-log-events \
+  --log-group-name /radiant/lambda \
+  --filter-pattern &quot;ERROR&quot;
+
+# Search by request ID
+aws logs filter-log-events \
+  --log-group-name /radiant/lambda \
+  --filter-pattern &quot;req_abc123&quot;</code></pre>
+<h3 id="support-escalation">10.4 Support Escalation</h3>
+<table>
+<thead>
+<tr>
+<th>Severity</th>
+<th>Response Time</th>
+<th>Contact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Critical</strong></td>
+<td>15 minutes</td>
+<td>PagerDuty</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td>1 hour</td>
+<td>support@radiant.ai</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td>4 hours</td>
+<td>Support portal</td>
+</tr>
+<tr>
+<td><strong>Low</strong></td>
+<td>24 hours</td>
+<td>Support portal</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-reference">11. API Reference</h2>
+<h3 id="admin-api-base-url">11.1 Admin API Base URL</h3>
+<pre><code>https://api.{{RADIANT_DOMAIN}}/admin/v1</code></pre>
+<h3 id="authentication-1">11.2 Authentication</h3>
+<pre class="bash"><code>curl -H &quot;Authorization: Bearer &lt;admin_token&gt;&quot; \
+     -H &quot;X-Tenant-ID: &lt;tenant_id&gt;&quot; \
+     https://api.{{RADIANT_DOMAIN}}/admin/v1/tenants</code></pre>
+<h3 id="key-endpoints">11.3 Key Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/tenants</code></td>
+<td>List all tenants</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/tenants</code></td>
+<td>Create tenant</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/tenants/:id</code></td>
+<td>Get tenant details</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/tenants/:id</code></td>
+<td>Update tenant</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/tenants/:id/suspend</code></td>
+<td>Suspend tenant</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/users</code></td>
+<td>List users</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/models</code></td>
+<td>List models</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/models/:id/pricing</code></td>
+<td>Update pricing</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/analytics/usage</code></td>
+<td>Usage analytics</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/audit-logs</code></td>
+<td>Audit logs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="webhooks">11.4 Webhooks</h3>
+<p>Configure webhooks for real-time events:</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Payload</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tenant.created</code></td>
+<td>Tenant object</td>
+</tr>
+<tr>
+<td><code>subscription.changed</code></td>
+<td>Subscription details</td>
+</tr>
+<tr>
+<td><code>credit.low</code></td>
+<td>Balance warning</td>
+</tr>
+<tr>
+<td><code>user.invited</code></td>
+<td>User invitation</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="appendix">12. Appendix</h2>
+<h3 id="glossary">12.1 Glossary</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 66%" />
+</colgroup>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Brain Router</strong></td>
+<td>AI system that selects optimal model for each request</td>
+</tr>
+<tr>
+<td><strong>Neural Engine</strong></td>
+<td>Personalization system learning user preferences</td>
+</tr>
+<tr>
+<td><strong>Thermal State</strong></td>
+<td>Self-hosted model readiness level</td>
+</tr>
+<tr>
+<td><strong>RLS</strong></td>
+<td>Row-Level Security for tenant isolation</td>
+</tr>
+<tr>
+<td><strong>Credits</strong></td>
+<td>Platform currency (1 credit = $0.01)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="keyboard-shortcuts">12.2 Keyboard Shortcuts</h3>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Ctrl+K</code></td>
+<td>Quick search</td>
+</tr>
+<tr>
+<td><code>Ctrl+/</code></td>
+<td>Toggle sidebar</td>
+</tr>
+<tr>
+<td><code>Ctrl+.</code></td>
+<td>Command palette</td>
+</tr>
+<tr>
+<td><code>Esc</code></td>
+<td>Close modal</td>
+</tr>
+</tbody>
+</table>
+<h3 id="environment-variables">12.3 Environment Variables</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RADIANT_DOMAIN</code></td>
+<td>Platform domain</td>
+</tr>
+<tr>
+<td><code>AURORA_CLUSTER_ARN</code></td>
+<td>Database ARN</td>
+</tr>
+<tr>
+<td><code>AURORA_SECRET_ARN</code></td>
+<td>Database credentials</td>
+</tr>
+<tr>
+<td><code>COGNITO_USER_POOL_ID</code></td>
+<td>Auth pool ID</td>
+</tr>
+</tbody>
+</table>
+<h3 id="support-resources">12.4 Support Resources</h3>
+<ul>
+<li><strong>Documentation</strong>: https://docs.{{RADIANT_DOMAIN}}</li>
+<li><strong>API Reference</strong>: https://api.{{RADIANT_DOMAIN}}/docs</li>
+<li><strong>Status Page</strong>: https://status.{{RADIANT_DOMAIN}}</li>
+<li><strong>Support Portal</strong>: https://support.{{RADIANT_DOMAIN}}</li>
+</ul>
+<hr />
+<h2 id="version-history">Version History</h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4.17.0</td>
+<td>{{BUILD_DATE}}</td>
+<td>Initial comprehensive guide</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>This documentation is automatically generated as part of the RADIANT build process.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

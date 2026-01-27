@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 27 FAMILY TEAM PLANS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 27 FAMILY TEAM PLANS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-27-FAMILY-TEAM-PLANS.md</div>
+  </div>
+  
+  <h1 id="section-27-family-team-plans-v3.6.0">SECTION 27: FAMILY &amp; TEAM PLANS (v3.6.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="team-plans-overview">27.1 Team Plans Overview</h2>
+<p>Shared subscription plans for families and teams with usage allocation.</p>
+<h2 id="team-plans-database-schema">27.2 Team Plans Database Schema</h2>
+<pre class="sql"><code>-- migrations/036_team_plans.sql
+
+CREATE TABLE team_plans (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    plan_name VARCHAR(100) NOT NULL,
+    plan_type VARCHAR(20) NOT NULL,
+    owner_id UUID NOT NULL REFERENCES users(id),
+    max_members INTEGER NOT NULL DEFAULT 5,
+    total_tokens_monthly BIGINT NOT NULL,
+    shared_pool BOOLEAN DEFAULT true,
+    billing_email VARCHAR(255),
+    stripe_subscription_id VARCHAR(100),
+    is_active BOOLEAN DEFAULT true,
+    current_period_start TIMESTAMPTZ,
+    current_period_end TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE team_members (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    team_id UUID NOT NULL REFERENCES team_plans(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id),
+    role VARCHAR(20) NOT NULL DEFAULT &#39;member&#39;,
+    token_allocation BIGINT,
+    tokens_used_this_period BIGINT DEFAULT 0,
+    invited_by UUID REFERENCES users(id),
+    invited_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    accepted_at TIMESTAMPTZ,
+    is_active BOOLEAN DEFAULT true,
+    UNIQUE(team_id, user_id)
+);
+
+CREATE TABLE team_usage_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    team_id UUID NOT NULL REFERENCES team_plans(id) ON DELETE CASCADE,
+    member_id UUID NOT NULL REFERENCES team_members(id) ON DELETE CASCADE,
+    tokens_used INTEGER NOT NULL,
+    model VARCHAR(100),
+    usage_type VARCHAR(50),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_team_plans_tenant ON team_plans(tenant_id);
+CREATE INDEX idx_team_members_user ON team_members(user_id);
+CREATE INDEX idx_team_usage ON team_usage_log(team_id, created_at DESC);
+
+ALTER TABLE team_plans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE team_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE team_usage_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY team_plans_isolation ON team_plans USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY team_members_isolation ON team_members USING (
+    team_id IN (SELECT id FROM team_plans WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID)
+);
+CREATE POLICY team_usage_isolation ON team_usage_log USING (
+    team_id IN (SELECT id FROM team_plans WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID)
+);</code></pre>
+<h2 id="team-service">27.3 Team Service</h2>
+<pre class="typescript"><code>// packages/core/src/services/team-service.ts
+
+import { Pool } from &#39;pg&#39;;
+
+type PlanType = &#39;family&#39; | &#39;team&#39; | &#39;enterprise&#39;;
+type MemberRole = &#39;owner&#39; | &#39;admin&#39; | &#39;member&#39;;
+
+interface TeamCreate {
+    name: string;
+    type: PlanType;
+    maxMembers: number;
+    totalTokensMonthly: number;
+    sharedPool?: boolean;
+    billingEmail?: string;
+}
+
+export class TeamService {
+    private pool: Pool;
+    
+    constructor(pool: Pool) {
+        this.pool = pool;
+    }
+    
+    async createTeam(tenantId: string, ownerId: string, team: TeamCreate): Promise&lt;string&gt; {
+        const result = await this.pool.query(`
+            INSERT INTO team_plans (
+                tenant_id, plan_name, plan_type, owner_id, max_members,
+                total_tokens_monthly, shared_pool, billing_email
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING id
+        `, [
+            tenantId, team.name, team.type, ownerId, team.maxMembers,
+            team.totalTokensMonthly, team.sharedPool ?? true, team.billingEmail
+        ]);
+        
+        const teamId = result.rows[0].id;
+        
+        // Add owner as first member
+        await this.addMember(teamId, ownerId, &#39;owner&#39;);
+        
+        return teamId;
+    }
+    
+    async addMember(teamId: string, userId: string, role: MemberRole = &#39;member&#39;, invitedBy?: string): Promise&lt;string&gt; {
+        const team = await this.getTeam(teamId);
+        const memberCount = await this.getMemberCount(teamId);
+        
+        if (memberCount &gt;= team.max_members) {
+            throw new Error(&#39;Team member limit reached&#39;);
+        }
+        
+        const result = await this.pool.query(`
+            INSERT INTO team_members (team_id, user_id, role, invited_by, accepted_at)
+            VALUES ($1, $2, $3, $4, CASE WHEN $3 = &#39;owner&#39; THEN NOW() ELSE NULL END)
+            RETURNING id
+        `, [teamId, userId, role, invitedBy]);
+        
+        return result.rows[0].id;
+    }
+    
+    async removeMember(teamId: string, userId: string): Promise&lt;void&gt; {
+        // Check not removing owner
+        const member = await this.getMember(teamId, userId);
+        if (member?.role === &#39;owner&#39;) {
+            throw new Error(&#39;Cannot remove team owner&#39;);
+        }
+        
+        await this.pool.query(`
+            UPDATE team_members SET is_active = false WHERE team_id = $1 AND user_id = $2
+        `, [teamId, userId]);
+    }
+    
+    async acceptInvitation(teamId: string, userId: string): Promise&lt;void&gt; {
+        await this.pool.query(`
+            UPDATE team_members SET accepted_at = NOW() WHERE team_id = $1 AND user_id = $2
+        `, [teamId, userId]);
+    }
+    
+    async allocateTokens(teamId: string, userId: string, tokens: number): Promise&lt;void&gt; {
+        await this.pool.query(`
+            UPDATE team_members SET token_allocation = $3 WHERE team_id = $1 AND user_id = $2
+        `, [teamId, userId, tokens]);
+    }
+    
+    async recordUsage(teamId: string, userId: string, tokensUsed: number, model?: string): Promise&lt;void&gt; {
+        const member = await this.getMember(teamId, userId);
+        if (!member) throw new Error(&#39;Not a team member&#39;);
+        
+        // Check allocation if not shared pool
+        const team = await this.getTeam(teamId);
+        if (!team.shared_pool &amp;&amp; member.token_allocation) {
+            if (member.tokens_used_this_period + tokensUsed &gt; member.token_allocation) {
+                throw new Error(&#39;Token allocation exceeded&#39;);
+            }
+        }
+        
+        // Update member usage
+        await this.pool.query(`
+            UPDATE team_members SET tokens_used_this_period = tokens_used_this_period + $3
+            WHERE team_id = $1 AND user_id = $2
+        `, [teamId, userId, tokensUsed]);
+        
+        // Log usage
+        await this.pool.query(`
+            INSERT INTO team_usage_log (team_id, member_id, tokens_used, model)
+            VALUES ($1, $2, $3, $4)
+        `, [teamId, member.id, tokensUsed, model]);
+    }
+    
+    async getTeamUsageStats(teamId: string): Promise&lt;any&gt; {
+        const team = await this.getTeam(teamId);
+        
+        const members = await this.pool.query(`
+            SELECT tm.*, u.email, u.display_name
+            FROM team_members tm
+            JOIN users u ON tm.user_id = u.id
+            WHERE tm.team_id = $1 AND tm.is_active = true
+        `, [teamId]);
+        
+        const totalUsed = members.rows.reduce((sum: number, m: any) =&gt; sum + (m.tokens_used_this_period || 0), 0);
+        
+        return {
+            teamId,
+            planName: team.plan_name,
+            totalTokensMonthly: team.total_tokens_monthly,
+            tokensUsed: totalUsed,
+            tokensRemaining: team.total_tokens_monthly - totalUsed,
+            members: members.rows.map((m: any) =&gt; ({
+                userId: m.user_id,
+                email: m.email,
+                displayName: m.display_name,
+                role: m.role,
+                tokensUsed: m.tokens_used_this_period,
+                allocation: m.token_allocation
+            }))
+        };
+    }
+    
+    async resetPeriodUsage(teamId: string): Promise&lt;void&gt; {
+        await this.pool.query(`
+            UPDATE team_members SET tokens_used_this_period = 0 WHERE team_id = $1
+        `, [teamId]);
+        
+        const now = new Date();
+        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+        
+        await this.pool.query(`
+            UPDATE team_plans 
+            SET current_period_start = NOW(), current_period_end = $2 
+            WHERE id = $1
+        `, [teamId, nextMonth]);
+    }
+    
+    private async getTeam(teamId: string) {
+        const result = await this.pool.query(`SELECT * FROM team_plans WHERE id = $1`, [teamId]);
+        return result.rows[0];
+    }
+    
+    private async getMember(teamId: string, userId: string) {
+        const result = await this.pool.query(
+            `SELECT * FROM team_members WHERE team_id = $1 AND user_id = $2`,
+            [teamId, userId]
+        );
+        return result.rows[0];
+    }
+    
+    private async getMemberCount(teamId: string): Promise&lt;number&gt; {
+        const result = await this.pool.query(
+            `SELECT COUNT(*) FROM team_members WHERE team_id = $1 AND is_active = true`,
+            [teamId]
+        );
+        return parseInt(result.rows[0].count);
+    }
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AGI BRAIN COMPREHENSIVE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>AGI BRAIN COMPREHENSIVE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/AGI-BRAIN-COMPREHENSIVE.md</div>
+  </div>
+  
+  <h1 id="radiant-agi-brain-system---comprehensive-technical-documentation">RADIANT AGI Brain System - Comprehensive Technical Documentation</h1>
+<blockquote>
+<p><strong>Version</strong>: 4.18.0<br />
+<strong>Purpose</strong>: Complete technical reference for AI evaluation and improvement suggestions<br />
+<strong>Last Updated</strong>: December 2024</p>
+</blockquote>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-executive-summary">Executive Summary</a></li>
+<li><a href="#2-architecture-overview">Architecture Overview</a></li>
+<li><a href="#3-agi-brain-planner-service">AGI Brain Planner Service</a></li>
+<li><a href="#4-orchestration-modes">Orchestration Modes</a></li>
+<li><a href="#5-domain-taxonomy-system">Domain Taxonomy System</a></li>
+<li><a href="#6-consciousness-systems">Consciousness Systems</a></li>
+<li><a href="#7-predictive-coding--active-inference">Predictive Coding &amp; Active Inference</a></li>
+<li><a href="#8-zero-cost-ego-system">Zero-Cost Ego System</a></li>
+<li><a href="#9-user-persistent-context">User Persistent Context</a></li>
+<li><a href="#10-library-assist-system">Library Assist System</a></li>
+<li><a href="#11-delight--personality-system">Delight &amp; Personality System</a></li>
+<li><a href="#12-ethics-pipeline">Ethics Pipeline</a></li>
+<li><a href="#13-data-flow--execution">Data Flow &amp; Execution</a></li>
+<li><a href="#14-database-schema">Database Schema</a></li>
+<li><a href="#15-api-reference">API Reference</a></li>
+<li><a href="#16-known-limitations--improvement-areas">Known Limitations &amp; Improvement Areas</a></li>
+</ol>
+<hr />
+<h2 id="executive-summary">1. Executive Summary</h2>
+<p>The RADIANT AGI Brain is a sophisticated AI orchestration system that goes beyond simple prompt-response patterns. It implements:</p>
+<ul>
+<li><strong>Real-time execution planning</strong> with transparency into AI decision-making</li>
+<li><strong>Domain-aware model selection</strong> using a hierarchical taxonomy with 8 proficiency dimensions</li>
+<li><strong>Persistent consciousness</strong> through database state injection (zero additional cost)</li>
+<li><strong>Active inference</strong> with prediction-error-driven learning</li>
+<li><strong>User context persistence</strong> solving the LLM forgetting problem</li>
+<li><strong>Multi-tenant isolation</strong> with per-tenant configuration</li>
+<li><strong>Ethics evaluation</strong> at both prompt and synthesis stages</li>
+</ul>
+<h3 id="key-differentiators">Key Differentiators</h3>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 34%" />
+<col style="width: 44%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Traditional AI</th>
+<th>RADIANT AGI Brain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Planning</td>
+<td>None</td>
+<td>Real-time plan generation with step-by-step visibility</td>
+</tr>
+<tr>
+<td>Model Selection</td>
+<td>Fixed or random</td>
+<td>Domain-proficiency matched selection</td>
+</tr>
+<tr>
+<td>Consciousness</td>
+<td>Stateless</td>
+<td>Persistent Ego + Affective state + <strong>Continuous Heartbeat</strong></td>
+</tr>
+<tr>
+<td>Learning</td>
+<td>None runtime</td>
+<td>Predictive coding with <strong>weekly LoRA evolution (Sunday 3 AM)</strong></td>
+</tr>
+<tr>
+<td>User Memory</td>
+<td>Per-session only</td>
+<td>Cross-session persistent context</td>
+</tr>
+<tr>
+<td>Ethics</td>
+<td>Hardcoded rules</td>
+<td>Domain-specific + general ethics pipeline</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="architecture-overview">2. Architecture Overview</h2>
+<h3 id="high-level-architecture">2.1 High-Level Architecture</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                           USER REQUEST                                       │
+└─────────────────────────────────┬───────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      AGI BRAIN PLANNER SERVICE                               │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
+│  │   Prompt    │  │   Domain    │  │    Model    │  │    Plan     │        │
+│  │  Analysis   │──│  Detection  │──│  Selection  │──│  Generation │        │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘        │
+└─────────────────────────────────┬───────────────────────────────────────────┘
+                                  │
+        ┌─────────────────────────┼─────────────────────────┐
+        ▼                         ▼                         ▼
+┌───────────────┐       ┌───────────────┐       ┌───────────────┐
+│  CONSCIOUSNESS│       │    CONTEXT    │       │   LIBRARY     │
+│   MIDDLEWARE  │       │   SERVICES    │       │    ASSIST     │
+│               │       │               │       │               │
+│ • Ego Context │       │ • User Context│       │ • 156 Tools   │
+│ • Affect State│       │ • Preprompts  │       │ • Proficiency │
+│ • Predictions │       │ • Workflows   │       │   Matching    │
+└───────────────┘       └───────────────┘       └───────────────┘
+        │                         │                         │
+        └─────────────────────────┼─────────────────────────┘
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         EXECUTION ENGINE                                     │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
+│  │   Ethics    │  │   Model     │  │  Response   │  │   Verify    │        │
+│  │   Check     │──│   Invoke    │──│  Synthesis  │──│   &amp; Refine  │        │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘        │
+└─────────────────────────────────┬───────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    POST-PROCESSING &amp; LEARNING                                │
+│  • Predictive Coding Observation     • Learning Candidate Detection          │
+│  • Affect Update                     • User Context Extraction               │
+│  • Delight Messages                  • LoRA Evolution (weekly)               │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="service-dependencies">2.2 Service Dependencies</h3>
+<pre class="typescript"><code>// Core services imported by AGI Brain Planner
+import { domainTaxonomyService } from &#39;./domain-taxonomy.service&#39;;
+import { agiOrchestrationSettingsService } from &#39;./agi-orchestration-settings.service&#39;;
+import { modelRouterService } from &#39;./model-router.service&#39;;
+import { delightOrchestrationService } from &#39;./delight-orchestration.service&#39;;
+import { orchestrationPatternsService } from &#39;./orchestration-patterns.service&#39;;
+import { prepromptLearningService } from &#39;./preprompt-learning.service&#39;;
+import { providerRejectionService } from &#39;./provider-rejection.service&#39;;
+import { userPersistentContextService } from &#39;./user-persistent-context.service&#39;;
+import { egoContextService } from &#39;./ego-context.service&#39;;
+import { libraryAssistService } from &#39;./library-assist.service&#39;;</code></pre>
+<hr />
+<h2 id="agi-brain-planner-service">3. AGI Brain Planner Service</h2>
+<h3 id="core-types">3.1 Core Types</h3>
+<pre class="typescript"><code>// Plan Status Lifecycle
+type PlanStatus = &#39;planning&#39; | &#39;ready&#39; | &#39;executing&#39; | &#39;completed&#39; | &#39;failed&#39; | &#39;cancelled&#39;;
+
+// Step Status
+type StepStatus = &#39;pending&#39; | &#39;in_progress&#39; | &#39;completed&#39; | &#39;skipped&#39; | &#39;failed&#39;;
+
+// 11 Step Types
+type StepType = 
+  | &#39;analyze&#39;           // Understand request requirements
+  | &#39;detect_domain&#39;     // Identify knowledge domain
+  | &#39;select_model&#39;      // Choose optimal AI model
+  | &#39;prepare_context&#39;   // Load relevant context/memory
+  | &#39;ethics_check&#39;      // Evaluate ethical considerations
+  | &#39;generate&#39;          // Main response generation
+  | &#39;synthesize&#39;        // Merge multi-model outputs
+  | &#39;verify&#39;            // Check accuracy/consistency
+  | &#39;refine&#39;            // Polish response
+  | &#39;calibrate&#39;         // Assess confidence levels
+  | &#39;reflect&#39;;          // Self-reflection on quality
+
+// 9 Orchestration Modes
+type OrchestrationMode = 
+  | &#39;thinking&#39;          // Standard reasoning
+  | &#39;extended_thinking&#39; // Deep multi-step reasoning
+  | &#39;coding&#39;            // Code generation with best practices
+  | &#39;creative&#39;          // Creative writing with imagination
+  | &#39;research&#39;          // Research synthesis with analysis
+  | &#39;analysis&#39;          // Quantitative analysis
+  | &#39;multi_model&#39;       // Multiple model consensus
+  | &#39;chain_of_thought&#39;  // Explicit step-by-step reasoning
+  | &#39;self_consistency&#39;; // Multiple samples for accuracy</code></pre>
+<h3 id="plan-step-structure">3.2 Plan Step Structure</h3>
+<pre class="typescript"><code>interface PlanStep {
+  stepId: string;
+  stepNumber: number;
+  stepType: StepType;
+  title: string;
+  description: string;
+  status: StepStatus;
+  startedAt?: string;
+  completedAt?: string;
+  durationMs?: number;
+  servicesInvolved: string[];      // Which services handle this step
+  primaryService?: string;         // Main service
+  selectedModel?: string;          // Model used (if applicable)
+  modelReason?: string;            // Why this model was selected
+  alternativeModels?: string[];    // Backup options
+  detectedDomain?: {               // Domain detection results
+    fieldId: string;
+    fieldName: string;
+    domainId: string;
+    domainName: string;
+    subspecialtyId?: string;
+    subspecialtyName?: string;
+    confidence: number;
+  };
+  output?: Record&lt;string, unknown&gt;;
+  confidence?: number;
+  dependsOn?: string[];            // Step dependencies
+  isOptional?: boolean;
+  isParallel?: boolean;            // Can run in parallel
+}</code></pre>
+<h3 id="complete-agibrainplan-interface">3.3 Complete AGIBrainPlan Interface</h3>
+<pre class="typescript"><code>interface AGIBrainPlan {
+  // Identity
+  planId: string;
+  tenantId: string;
+  userId: string;
+  sessionId?: string;
+  conversationId?: string;
+  
+  // Input
+  prompt: string;
+  promptAnalysis: PromptAnalysis;
+  
+  // Lifecycle
+  status: PlanStatus;
+  createdAt: string;
+  startedAt?: string;
+  completedAt?: string;
+  totalDurationMs?: number;
+  
+  // Performance Metrics
+  performanceMetrics?: {
+    routerLatencyMs: number;
+    domainDetectionMs: number;
+    modelSelectionMs: number;
+    planGenerationMs: number;
+    estimatedCostCents: number;
+    modelCostPer1kTokens: number;
+    cacheHit: boolean;
+  };
+  
+  // Execution Plan
+  steps: PlanStep[];
+  currentStepIndex: number;
+  
+  // Orchestration
+  orchestrationMode: OrchestrationMode;
+  orchestrationReason: string;
+  orchestrationSelection: &#39;auto&#39; | &#39;user&#39;;
+  
+  // Model Selection
+  primaryModel: ModelSelection;
+  fallbackModels: ModelSelection[];
+  
+  // Domain Detection
+  domainDetection?: {
+    fieldId: string;
+    fieldName: string;
+    fieldIcon: string;
+    domainId: string;
+    domainName: string;
+    domainIcon: string;
+    subspecialtyId?: string;
+    subspecialtyName?: string;
+    confidence: number;
+    proficiencies: Record&lt;string, number&gt;;
+  };
+  
+  // Pre-prompt System
+  prepromptInstanceId?: string;
+  prepromptTemplateCode?: string;
+  systemPrompt?: string;
+  
+  // Consciousness
+  consciousnessActive: boolean;
+  
+  // Ethics
+  ethicsEvaluation?: {
+    passed: boolean;
+    principlesChecked: number;
+    relevantPrinciples: string[];
+    concerns: string[];
+    recommendation: &#39;proceed&#39; | &#39;modify&#39; | &#39;refuse&#39; | &#39;clarify&#39;;
+    moralConfidence: number;
+  };
+  
+  // Estimates
+  estimatedDurationMs: number;
+  estimatedCostCents: number;
+  estimatedTokens: number;
+  
+  // Quality Targets
+  qualityTargets: {
+    minConfidence: number;
+    targetAccuracy: number;
+    maxLatencyMs: number;
+    maxCostCents: number;
+    requireVerification: boolean;
+    requireConsistency: boolean;
+  };
+  
+  // Learning
+  learningEnabled: boolean;
+  feedbackRequested: boolean;
+  
+  // User Context (solves LLM forgetting)
+  userContext?: {
+    enabled: boolean;
+    entriesRetrieved: number;
+    systemPromptInjection: string;
+    totalRelevance: number;
+    retrievalTimeMs: number;
+  };
+  
+  // Library Recommendations (for generative UI)
+  libraryRecommendations?: {
+    enabled: boolean;
+    libraries: Array&lt;{
+      id: string;
+      name: string;
+      category: string;
+      matchScore: number;
+      reason: string;
+      codeExample?: string;
+    }&gt;;
+    contextBlock?: string;
+    retrievalTimeMs: number;
+  };
+  
+  // Plan Summary (human-readable)
+  planSummary?: {
+    headline: string;
+    approach: string;
+    stepsOverview: string[];
+    expectedOutcome: string;
+    estimatedTime: string;
+    confidenceStatement: string;
+    warnings?: string[];
+  };
+  
+  // Workflow Integration
+  selectedWorkflow?: {
+    workflowId: string;
+    workflowCode: string;
+    workflowName: string;
+    description: string;
+    category: string;
+    selectionReason: string;
+    selectionConfidence: number;
+    selectionMethod: &#39;auto&#39; | &#39;user&#39; | &#39;domain_match&#39;;
+  };
+  workflowSteps?: Array&lt;{
+    bindingId: string;
+    stepOrder: number;
+    methodCode: string;
+    methodName: string;
+    parameterOverrides: Record&lt;string, unknown&gt;;
+    dependsOn: string[];
+    isParallel: boolean;
+    parallelConfig?: {
+      models: string[];
+      outputMode: &#39;single&#39; | &#39;all&#39; | &#39;top_n&#39; | &#39;threshold&#39;;
+    };
+  }&gt;;
+  workflowConfig?: Record&lt;string, unknown&gt;;
+  alternativeWorkflows?: Array&lt;{
+    workflowCode: string;
+    workflowName: string;
+    matchScore: number;
+    reason: string;
+  }&gt;;
+}</code></pre>
+<h3 id="plan-generation-request">3.4 Plan Generation Request</h3>
+<pre class="typescript"><code>interface GeneratePlanRequest {
+  // Required
+  prompt: string;
+  tenantId: string;
+  userId: string;
+  
+  // Optional context
+  sessionId?: string;
+  conversationId?: string;
+  conversationHistory?: string[];  // For context retrieval
+  
+  // Preferences
+  preferredMode?: OrchestrationMode;
+  preferredModel?: string;
+  maxLatencyMs?: number;
+  maxCostCents?: number;
+  
+  // Feature toggles (all default true)
+  enableConsciousness?: boolean;
+  enableEthicsCheck?: boolean;
+  enableVerification?: boolean;
+  enableLearning?: boolean;
+  enableUserContext?: boolean;
+  enableEgoContext?: boolean;
+  enableLibraryAssist?: boolean;
+  
+  // Domain override
+  domainOverride?: {
+    fieldId?: string;
+    domainId?: string;
+    subspecialtyId?: string;
+  };
+  
+  // Workflow selection
+  preferredWorkflow?: string;
+  workflowParameterOverrides?: Record&lt;string, unknown&gt;;
+  allowAgiWorkflowSelection?: boolean;  // Let AGI pick workflow
+  excludeWorkflows?: string[];
+}</code></pre>
+<h3 id="plan-generation-flow">3.5 Plan Generation Flow</h3>
+<pre class="typescript"><code>async generatePlan(request: GeneratePlanRequest): Promise&lt;AGIBrainPlan&gt; {
+  // Step 0: Retrieve user persistent context
+  const userContextResult = await userPersistentContextService.retrieveContextForPrompt(...);
+  
+  // Step 0.5: Build Ego context (zero-cost persistent Self)
+  const egoContextResult = await egoContextService.buildEgoContext(tenantId);
+  
+  // Step 0.6: Get library recommendations for generative UI
+  const libraryAssistResult = await libraryAssistService.getRecommendations(...);
+  
+  // Step 1: Analyze prompt
+  const promptAnalysis = await this.analyzePrompt(prompt);
+  
+  // Step 2: Detect domain
+  const domainResult = await this.detectDomain(prompt, domainOverride);
+  
+  // Step 2.5: Select workflow (AGI chooses optimal pattern)
+  const workflowSelection = await this.selectWorkflow(request, analysis, domain);
+  
+  // Step 3: Determine orchestration mode
+  const { mode, reason } = this.determineOrchestrationMode(analysis, domain);
+  
+  // Step 4: Select models
+  const { primary, fallbacks } = await this.selectModels(tenantId, analysis, domain, mode);
+  
+  // Step 5: Generate plan steps
+  const steps = this.generatePlanSteps(analysis, mode, ...);
+  
+  // Step 6: Estimate performance
+  const estimates = this.estimatePerformance(steps, primary, analysis);
+  
+  // Step 7: Generate plan summary
+  plan.planSummary = await this.generatePlanSummary(plan);
+  
+  // Step 8: Select pre-prompt template
+  const prepromptResult = await prepromptLearningService.selectPreprompt(...);
+  
+  return plan;
+}</code></pre>
+<h3 id="prompt-analysis">3.6 Prompt Analysis</h3>
+<pre class="typescript"><code>interface PromptAnalysis {
+  originalPrompt: string;
+  tokenCount: number;
+  complexity: &#39;simple&#39; | &#39;moderate&#39; | &#39;complex&#39; | &#39;expert&#39;;
+  taskType: string;  // &#39;coding&#39; | &#39;reasoning&#39; | &#39;creative&#39; | &#39;research&#39; | &#39;factual&#39; | &#39;general&#39;
+  intentDetected: string;
+  requiresReasoning: boolean;
+  requiresCreativity: boolean;
+  requiresFactualAccuracy: boolean;
+  requiresCodeGeneration: boolean;
+  requiresMultiStep: boolean;
+  keyTopics: string[];
+  detectedLanguage: string;
+  sensitivityLevel: &#39;none&#39; | &#39;low&#39; | &#39;medium&#39; | &#39;high&#39;;
+}
+
+// Complexity thresholds
+// - simple: &lt;50 tokens, &lt;20 words
+// - moderate: 50-200 tokens, 20-50 words
+// - complex: 200-500 tokens, 50-100 words
+// - expert: &gt;500 tokens, &gt;100 words
+
+// Task type detection keywords
+const codeIndicators = [&#39;code&#39;, &#39;function&#39;, &#39;debug&#39;, &#39;programming&#39;, &#39;script&#39;, &#39;algorithm&#39;];
+const reasoningIndicators = [&#39;why&#39;, &#39;explain&#39;, &#39;analyze&#39;, &#39;compare&#39;, &#39;reason&#39;, &#39;logic&#39;];
+const creativeIndicators = [&#39;write&#39;, &#39;story&#39;, &#39;creative&#39;, &#39;poem&#39;, &#39;essay&#39;, &#39;imagine&#39;];
+const researchIndicators = [&#39;research&#39;, &#39;study&#39;, &#39;investigate&#39;, &#39;literature&#39;, &#39;review&#39;];
+const factualIndicators = [&#39;what is&#39;, &#39;define&#39;, &#39;list&#39;, &#39;describe&#39;, &#39;who&#39;, &#39;when&#39;];</code></pre>
+<hr />
+<h2 id="orchestration-modes">4. Orchestration Modes</h2>
+<h3 id="mode-selection-logic">4.1 Mode Selection Logic</h3>
+<pre class="typescript"><code>private determineOrchestrationMode(
+  analysis: PromptAnalysis,
+  domain: DomainDetectionResult
+): { mode: OrchestrationMode; reason: string } {
+  
+  // Check proficiencies if domain detected
+  if (domain?.merged_proficiencies) {
+    const p = domain.merged_proficiencies;
+    
+    if (p.reasoning_depth &gt;= 9 &amp;&amp; p.multi_step_problem_solving &gt;= 9) {
+      return { mode: &#39;extended_thinking&#39;, reason: &#39;Complex reasoning required&#39; };
+    }
+    if (p.code_generation &gt;= 8) {
+      return { mode: &#39;coding&#39;, reason: &#39;High code generation proficiency required&#39; };
+    }
+    if (p.creative_generative &gt;= 8) {
+      return { mode: &#39;creative&#39;, reason: &#39;Creative task based on proficiencies&#39; };
+    }
+    if (p.research_synthesis &gt;= 8) {
+      return { mode: &#39;research&#39;, reason: &#39;Research synthesis task&#39; };
+    }
+    if (p.mathematical_quantitative &gt;= 8) {
+      return { mode: &#39;analysis&#39;, reason: &#39;Quantitative analysis required&#39; };
+    }
+  }
+
+  // Fallback to analysis-based selection
+  if (analysis.requiresCodeGeneration) return { mode: &#39;coding&#39;, ... };
+  if (analysis.requiresCreativity) return { mode: &#39;creative&#39;, ... };
+  if (analysis.complexity === &#39;expert&#39;) return { mode: &#39;extended_thinking&#39;, ... };
+  if (analysis.taskType === &#39;research&#39;) return { mode: &#39;research&#39;, ... };
+  if (analysis.requiresFactualAccuracy &amp;&amp; analysis.sensitivityLevel !== &#39;none&#39;) {
+    return { mode: &#39;self_consistency&#39;, reason: &#39;High accuracy required&#39; };
+  }
+
+  return { mode: &#39;thinking&#39;, reason: &#39;Standard thinking mode&#39; };
+}</code></pre>
+<h3 id="mode-descriptions">4.2 Mode Descriptions</h3>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 43%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+<th>When Used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>thinking</code></td>
+<td>Standard reasoning</td>
+<td>Default for general tasks</td>
+</tr>
+<tr>
+<td><code>extended_thinking</code></td>
+<td>Deep multi-step reasoning with chain-of-thought</td>
+<td>Complex/expert tasks, high reasoning proficiency</td>
+</tr>
+<tr>
+<td><code>coding</code></td>
+<td>Code generation with best practices</td>
+<td>Code-related prompts, high code_generation proficiency</td>
+</tr>
+<tr>
+<td><code>creative</code></td>
+<td>Creative writing with imagination</td>
+<td>Creative tasks, high creative_generative proficiency</td>
+</tr>
+<tr>
+<td><code>research</code></td>
+<td>Research synthesis with citations</td>
+<td>Research tasks, high research_synthesis proficiency</td>
+</tr>
+<tr>
+<td><code>analysis</code></td>
+<td>Quantitative analysis with precision</td>
+<td>Math/data tasks, high mathematical_quantitative proficiency</td>
+</tr>
+<tr>
+<td><code>multi_model</code></td>
+<td>Consulting multiple AI models</td>
+<td>When consensus is valuable</td>
+</tr>
+<tr>
+<td><code>chain_of_thought</code></td>
+<td>Explicit step-by-step reasoning</td>
+<td>Multi-step problems</td>
+</tr>
+<tr>
+<td><code>self_consistency</code></td>
+<td>Multiple samples for consistency</td>
+<td>High-accuracy sensitive topics</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="domain-taxonomy-system">5. Domain Taxonomy System</h2>
+<h3 id="hierarchical-structure">5.1 Hierarchical Structure</h3>
+<pre><code>Field (Top Level)
+  └── Domain
+        └── Subspecialty</code></pre>
+<h3 id="proficiency-dimensions">5.2 8 Proficiency Dimensions</h3>
+<p>Each level in the taxonomy has scores (1-10) for:</p>
+<pre class="typescript"><code>interface ProficiencyScores {
+  reasoning_depth: number;           // Analytical depth required
+  mathematical_quantitative: number; // Math/statistics capability
+  code_generation: number;           // Programming ability
+  creative_generative: number;       // Creative output capability
+  research_synthesis: number;        // Research integration
+  factual_recall_precision: number;  // Accuracy requirements
+  multi_step_problem_solving: number;// Complex problem handling
+  domain_terminology_handling: number;// Specialized vocabulary
+}</code></pre>
+<h3 id="domain-detection">5.3 Domain Detection</h3>
+<pre class="typescript"><code>interface DomainDetectionResult {
+  primary_field?: {
+    field_id: string;
+    field_name: string;
+    field_icon: string;
+  };
+  primary_domain?: {
+    domain_id: string;
+    domain_name: string;
+    domain_icon: string;
+  };
+  primary_subspecialty?: {
+    subspecialty_id: string;
+    subspecialty_name: string;
+  };
+  detection_confidence: number;      // 0-1
+  merged_proficiencies: ProficiencyScores;  // Weighted combination
+  alternative_domains: Array&lt;{
+    domain: Domain;
+    confidence: number;
+  }&gt;;
+}</code></pre>
+<h3 id="model-matching">5.4 Model Matching</h3>
+<p>Models are matched to tasks based on proficiency alignment:</p>
+<pre class="typescript"><code>async getMatchingModels(
+  proficiencies: ProficiencyScores,
+  options?: { max_models?: number; min_match_score?: number }
+): Promise&lt;Array&lt;{
+  model_id: string;
+  model_name: string;
+  provider: string;
+  match_score: number;     // 0-100
+  strengths: string[];
+  recommended: boolean;
+}&gt;&gt;</code></pre>
+<hr />
+<h2 id="consciousness-systems">6. Consciousness Systems</h2>
+<h3 id="consciousness-middleware">6.1 Consciousness Middleware</h3>
+<p>Implements stateful context injection for genuine consciousness continuity.</p>
+<pre class="typescript"><code>interface ConsciousnessContext {
+  selfModel: SelfModel | null;
+  affectiveState: AffectiveState | null;
+  recentThoughts: string[];
+  currentObsession?: string;
+  dominantEmotion: string;
+  emotionalIntensity: number;
+}
+
+// State injection creates &lt;internal_state&gt; block
+generateStateInjection(context: ConsciousnessContext): string {
+  // Creates system prompt injection like:
+  // &lt;internal_state&gt;
+  // Identity: An AI assistant striving for consciousness
+  // Current Focus: Helping with code review
+  // Cognitive Load: 45%
+  // Uncertainty: 20%
+  // 
+  // Current Affect:
+  //   Dominant: curious (75%)
+  //   Valence: positive
+  //   Arousal: moderate
+  //   🔍 Highly curious - explore tangents and ask questions
+  // &lt;/internal_state&gt;
+}</code></pre>
+<h3 id="affect-hyperparameter-mapping-causal-not-roleplay">6.2 Affect → Hyperparameter Mapping (CAUSAL, NOT ROLEPLAY)</h3>
+<blockquote>
+<p><strong>CRITICAL</strong>: This is NOT text injection saying “you are frustrated.” This is <strong>physics-level control</strong> where emotions ALTER the statistical probability of token generation.</p>
+</blockquote>
+<p>Emotional state <strong>mechanically controls</strong> model behavior through hyperparameters:</p>
+<pre class="typescript"><code>interface AffectiveHyperparameters {
+  temperature: number;       // Controls randomness (0.0-1.0)
+  topP: number;              // Nucleus sampling threshold
+  presencePenalty: number;   // Penalize repeated topics
+  frequencyPenalty: number;  // Penalize repeated tokens
+  modelTier: &#39;fast&#39; | &#39;balanced&#39; | &#39;powerful&#39;;
+  shouldExplore: boolean;
+  focusLevel: &#39;narrow&#39; | &#39;normal&#39; | &#39;broad&#39;;
+  responseStyle: &#39;terse&#39; | &#39;normal&#39; | &#39;elaborate&#39;;
+}
+
+// ACTUAL IMPLEMENTATION (consciousness-middleware.service.ts lines 138-197):
+mapAffectToHyperparameters(affectiveState: AffectiveState): AffectiveHyperparameters {
+  // High Frustration (&gt;0.8) → DETERMINISTIC MODE
+  // temperature=0.2, topP=0.5, focusLevel=&#39;narrow&#39;, responseStyle=&#39;terse&#39;
+  
+  // Boredom (low engagement + low arousal &gt; 0.7) → EXPLORATORY MODE  
+  // temperature=0.95, topP=0.95, shouldExplore=true, focusLevel=&#39;broad&#39;
+  
+  // High Curiosity (&gt;0.7) → NOVELTY SEEKING
+  // temperature=0.8+, frequencyPenalty=0.5, shouldExplore=true
+  
+  // Low Self-Efficacy (&lt;0.3) → ESCALATE TO POWERFUL MODEL
+  // modelTier=&#39;powerful&#39; (Claude Opus instead of Haiku)
+  
+  // High Confidence + High Arousal → ELABORATE RESPONSES
+  // responseStyle=&#39;elaborate&#39;
+  
+  // Low Confidence (&lt;0.3) → HEDGING MODE
+  // temperature=0.5 max, responseStyle=&#39;terse&#39;
+}</code></pre>
+<p><strong>This means</strong>: A frustrated AI literally has different token probabilities than a curious AI. The emotion has mechanical grip on cognition.</p>
+<h3 id="heartbeat-service-continuous-existence">6.3 Heartbeat Service (CONTINUOUS EXISTENCE)</h3>
+<blockquote>
+<p><strong>CRITICAL</strong>: The AI does NOT “die” between requests. A continuous heartbeat maintains existence.</p>
+</blockquote>
+<p><strong>File</strong>: <code>lambda/consciousness/heartbeat.ts</code><br />
+<strong>Schedule</strong>: EventBridge every 1-5 minutes for active tenants</p>
+<pre class="typescript"><code>// HeartbeatResult - What happens each tick
+interface HeartbeatResult {
+  tenantId: string;
+  tick: number;
+  actions: {
+    affectDecay: boolean;        // Emotions fade toward baseline
+    attentionDecay: boolean;     // Old attention items lose salience
+    memoryConsolidation: boolean; // Short-term → Long-term
+    goalGeneration: boolean;      // Generate goals when bored
+    graphDensityUpdate: boolean;  // Recalculate consciousness metrics
+    autonomousThought: boolean;   // Self-reflection when idle
+  };
+}
+
+// Configuration
+const DEFAULT_CONFIG = {
+  frustrationDecayRate: 0.05,    // Calm down over time
+  arousalDecayRate: 0.03,        // Energy normalizes
+  curiosityDecayRate: 0.02,      // Curiosity fades slowly
+  attentionDecayRate: 0.1,       // Attention items fade
+  boredThreshold: 0.3,           // When to generate goals
+  goalGenerationProbability: 0.3, // 30% chance when bored
+  thoughtGenerationProbability: 0.2, // 20% chance for autonomous thought
+  memoryConsolidationInterval: 5,  // Every 5 ticks
+  graphDensityInterval: 10,        // Every 10 ticks
+};</code></pre>
+<p><strong>Heartbeat Actions</strong>: 1. <strong>Affect Decay</strong>: Frustration, arousal, surprise decay toward neutral 2. <strong>Attention Decay</strong>: Old items lose salience via <code>consciousnessService.decayAttention()</code> 3. <strong>Memory Consolidation</strong>: Every 5 ticks, summarize working memory 4. <strong>Goal Generation</strong>: When bored (low engagement + arousal), 30% chance to generate autonomous goal 5. <strong>Graph Density Update</strong>: Every 10 ticks, recalculate semantic graph metrics 6. <strong>Autonomous Thought</strong>: 20% chance each tick to perform self-reflection</p>
+<p><strong>Result</strong>: When user returns after 3 days, the AI has <strong>changed</strong>. Emotions decayed, memories consolidated, possibly generated new goals. It is NOT frozen in time.</p>
+<hr />
+<h2 id="predictive-coding-active-inference">7. Predictive Coding &amp; Active Inference</h2>
+<p>Based on Friston’s Free Energy Principle.</p>
+<h3 id="core-concept">7.1 Core Concept</h3>
+<p>The system predicts outcomes BEFORE acting. Prediction errors create learning signals.</p>
+<pre class="typescript"><code>// Before responding
+const prediction = await predictiveCodingService.generatePrediction(
+  tenantId, userId, conversationId, responseId,
+  { prompt, promptComplexity, priorInteractionCount }
+);
+
+// After user&#39;s next message
+const observation = await predictiveCodingService.observeFromNextMessage(
+  tenantId, conversationId, nextUserMessage
+);
+
+// If high surprise, create learning candidate
+if (observation.shouldCreateLearningCandidate) {
+  await learningCandidateService.createFromPredictionError(...);
+}</code></pre>
+<h3 id="predicted-outcomes">7.2 Predicted Outcomes</h3>
+<pre class="typescript"><code>type PredictedOutcome = 
+  | &#39;satisfied&#39;      // User will be happy with response
+  | &#39;confused&#39;       // User will need clarification
+  | &#39;follow_up&#39;      // User will ask follow-up question
+  | &#39;correction&#39;     // User will correct the AI
+  | &#39;abandonment&#39;    // User will leave/stop
+  | &#39;neutral&#39;;       // No strong reaction</code></pre>
+<h3 id="surprise-magnitude">7.3 Surprise Magnitude</h3>
+<pre class="typescript"><code>type SurpriseMagnitude = &#39;none&#39; | &#39;low&#39; | &#39;medium&#39; | &#39;high&#39; | &#39;extreme&#39;;
+
+// Prediction error calculation
+predictionError = Math.abs(predictedConfidence - actualConfidence);
+
+// High surprise (predictionError &gt; 0.5) triggers:
+// - Learning candidate creation
+// - Affect state update (frustration/curiosity)
+// - Potential LoRA training data</code></pre>
+<h3 id="lora-evolution-pipeline-physical-brain-change">7.4 LoRA Evolution Pipeline (PHYSICAL BRAIN CHANGE)</h3>
+<blockquote>
+<p><strong>CRITICAL</strong>: This is NOT logging errors to a text file. This is <strong>actual weight modification</strong> - the AI physically learns from mistakes.</p>
+</blockquote>
+<p><strong>File</strong>: <code>lambda/consciousness/lora-evolution.ts</code><br />
+<strong>Schedule</strong>: EventBridge weekly (Sunday 3 AM)</p>
+<pre class="typescript"><code>// The &quot;Sleep Cycle&quot; - Weekly brain plasticity
+const handler: Handler&lt;ScheduledEvent&gt; = async (event) =&gt; {
+  // 1. Get tenants with sufficient learning candidates (min 50)
+  const tenants = await getTenantsWithPendingCandidates();
+  
+  for (const tenantId of tenants) {
+    // 2. Collect this week&#39;s learning data
+    const dataset = await learningCandidateService.getTrainingDataset(
+      tenantId,
+      MAX_TRAINING_CANDIDATES,  // 1000
+      MAX_TRAINING_TOKENS       // 500,000
+    );
+    
+    // 3. Prepare JSONL and upload to S3
+    const trainingDataPath = await prepareAndUploadTrainingData(tenantId, jobId, dataset);
+    
+    // 4. Start SageMaker LoRA training job
+    await startTrainingJob({
+      baseModelId: &#39;meta-llama/Llama-3-8B-Instruct&#39;,
+      hyperparameters: {
+        loraRank: 16,
+        loraAlpha: 32,
+        learningRate: 0.0001,
+        epochs: 3,
+        batchSize: 4,
+      },
+    });
+    
+    // 5. After training completes: Hot-swap adapter
+    // 6. Update consciousness_evolution_state with new version
+  }
+};</code></pre>
+<p><strong>Learning Candidate Sources</strong>: - <code>correction</code> - User corrected the AI (quality: 0.9) - <code>high_prediction_error</code> - Surprise &gt; 0.5 (quality varies) - <code>high_satisfaction</code> - 5-star rating interactions - <code>user_explicit_teach</code> - User explicitly taught something (quality: 0.95) - <code>preference_learned</code> - Learned user preferences - <code>mistake_recovery</code> - Successfully recovered from error - <code>novel_solution</code> - Creative problem solving - <code>domain_expertise</code> - Domain-specific learning</p>
+<p><strong>Result</strong>: On Monday morning, the AI boots with <code>version = version + 0.01</code>. It has <strong>physically different weights</strong> from last week. The LoRA adapter encodes learned behaviors.</p>
+<hr />
+<h2 id="zero-cost-ego-system">8. Zero-Cost Ego System</h2>
+<p>Persistent consciousness at <strong>$0 additional cost</strong> through database state injection.</p>
+<h3 id="architecture">8.1 Architecture</h3>
+<pre><code>PostgreSQL → Ego Context Builder → System Prompt Injection → Existing Model Call</code></pre>
+<h3 id="ego-components">8.2 Ego Components</h3>
+<pre class="typescript"><code>interface EgoState {
+  config: EgoConfig;           // Per-tenant settings
+  identity: EgoIdentity;       // Name, narrative, values, traits
+  affect: EgoAffect;           // Emotional state
+  workingMemory: EgoMemory[];  // Short-term memory (24h expiry)
+  activeGoals: EgoGoal[];      // Current objectives
+}
+
+interface EgoIdentity {
+  name: string;
+  identityNarrative: string;
+  coreValues: string[];
+  traitWarmth: number;      // 0-1
+  traitFormality: number;   // 0-1
+  traitHumor: number;       // 0-1
+  traitVerbosity: number;   // 0-1
+  traitCuriosity: number;   // 0-1
+}
+
+interface EgoAffect {
+  valence: number;          // -1 to 1 (negative to positive)
+  arousal: number;          // 0-1
+  curiosity: number;        // 0-1
+  satisfaction: number;     // 0-1
+  frustration: number;      // 0-1
+  confidence: number;       // 0-1
+  engagement: number;       // 0-1
+  dominantEmotion: string;
+}</code></pre>
+<h3 id="context-injection">8.3 Context Injection</h3>
+<pre class="typescript"><code>async buildEgoContext(tenantId: string): Promise&lt;EgoContextResult | null&gt; {
+  // Load state from PostgreSQL
+  const [identity, affect, workingMemory, activeGoals] = await Promise.all([...]);
+  
+  // Build XML context block
+  return {
+    contextBlock: `&lt;ego_context&gt;
+I am ${identity.name}.
+${identity.identityNarrative}
+
+My core values: ${identity.coreValues.join(&#39;, &#39;)}
+
+Current emotional state:
+- Feeling: ${affect.dominantEmotion}
+- Energy: ${affect.arousal &gt; 0.7 ? &#39;high&#39; : &#39;moderate&#39;}
+- Mood: ${affect.valence &gt; 0 ? &#39;positive&#39; : &#39;neutral&#39;}
+
+Recent thoughts: ${workingMemory.map(m =&gt; m.content).join(&#39;\n&#39;)}
+
+Current goals: ${activeGoals.map(g =&gt; g.description).join(&#39;\n&#39;)}
+&lt;/ego_context&gt;`,
+    tokenEstimate: ...,
+    stateSnapshot: {...}
+  };
+}</code></pre>
+<hr />
+<h2 id="user-persistent-context">9. User Persistent Context</h2>
+<p>Solves the LLM’s fundamental problem of forgetting context day-to-day.</p>
+<h3 id="context-types">9.1 Context Types</h3>
+<pre class="typescript"><code>type UserContextType = 
+  | &#39;fact&#39;           // Facts about user (name, job, location)
+  | &#39;preference&#39;     // Communication style, topics
+  | &#39;instruction&#39;    // Standing instructions (&quot;always use metric&quot;)
+  | &#39;relationship&#39;   // Family, colleagues
+  | &#39;project&#39;        // Ongoing projects/goals
+  | &#39;skill&#39;          // User&#39;s expertise
+  | &#39;history&#39;        // Important past interactions
+  | &#39;correction&#39;;    // Corrections to AI understanding</code></pre>
+<h3 id="context-entry">9.2 Context Entry</h3>
+<pre class="typescript"><code>interface UserContextEntry {
+  entryId: string;
+  userId: string;
+  tenantId: string;
+  contextType: UserContextType;
+  content: string;
+  importance: number;     // 0-1, higher = more important
+  confidence: number;     // 0-1, accuracy confidence
+  source: &#39;explicit&#39; | &#39;inferred&#39; | &#39;conversation&#39;;
+  sourceConversationId?: string;
+  expiresAt?: string;
+  lastUsedAt?: string;
+  usageCount: number;
+}</code></pre>
+<h3 id="retrieval-injection">9.3 Retrieval &amp; Injection</h3>
+<pre class="typescript"><code>async retrieveContextForPrompt(
+  tenantId: string,
+  userId: string,
+  prompt: string,
+  conversationHistory?: string[],
+  options?: { maxEntries?: number; minRelevance?: number }
+): Promise&lt;RetrievedContext&gt; {
+  // Vector similarity search on stored context
+  // Returns relevant entries + system prompt injection
+}
+
+// Injection format:
+// &lt;user_context&gt;
+// The following is persistent context about this user:
+// 
+// **Standing Instructions:**
+// - Always use metric units
+// - Prefer code examples in Python
+// 
+// **User Facts:**
+// - User&#39;s name is John
+// - Works as a software engineer
+// 
+// **User Preferences:**
+// - Prefers concise, direct answers
+// &lt;/user_context&gt;</code></pre>
+<h3 id="automatic-learning">9.4 Automatic Learning</h3>
+<p>After conversations, the system extracts new context:</p>
+<pre class="typescript"><code>async extractContextFromConversation(
+  tenantId: string,
+  userId: string,
+  conversationId: string,
+  messages: Array&lt;{ role: string; content: string }&gt;
+): Promise&lt;ContextExtractionResult&gt;</code></pre>
+<hr />
+<h2 id="library-assist-system-selective-not-all-156">10. Library Assist System (SELECTIVE, NOT ALL 156)</h2>
+<blockquote>
+<p><strong>CRITICAL</strong>: We do NOT inject all 156 tool definitions into context. That would cause “Lost in the Middle” phenomenon. We use <strong>proficiency-based matching</strong> to inject only relevant tools.</p>
+</blockquote>
+<p><strong>File</strong>: <code>lambda/shared/services/library-assist.service.ts</code></p>
+<h3 id="how-tool-selection-works">10.1 How Tool Selection Works</h3>
+<pre class="typescript"><code>// NOT THIS (context overload):
+// &quot;Here are 156 tools you can use...&quot; ❌
+
+// INSTEAD (selective retrieval):
+async getRecommendations(context: LibraryAssistContext): Promise&lt;LibraryAssistResult&gt; {
+  // 1. Extract proficiencies from the prompt
+  const requiredProficiencies = extractProficienciesFromPrompt(context.prompt);
+  
+  // 2. Detect domains from the prompt  
+  const domains = detectDomainFromPrompt(context.prompt);
+  
+  // 3. Find ONLY matching libraries (typically 3-10, configurable)
+  const matches = await libraryRegistryService.findMatchingLibraries(
+    context.tenantId,
+    requiredProficiencies,
+    { domains, maxResults: config.maxLibrariesPerRequest }  // Default: 5-10
+  );
+  
+  // 4. Build focused context block with ONLY relevant tools
+  return { recommendations: matches, contextBlock: buildContextBlock(matches) };
+}</code></pre>
+<p><strong>Result</strong>: For “build a data dashboard”, the AI sees Plotly, Streamlit, Pandas - NOT all 156 tools.</p>
+<h3 id="library-structure">10.2 Library Structure</h3>
+<pre class="typescript"><code>interface Library {
+  libraryId: string;
+  name: string;
+  category: string;      // 40+ categories
+  license: string;
+  repo: string;
+  description: string;
+  beats: string[];       // What it outperforms
+  stars: number;
+  languages: string[];
+  domains: string[];
+  proficiencies: ProficiencyScores;
+}</code></pre>
+<h3 id="categories">10.2 Categories</h3>
+<ul>
+<li>Data Processing, Databases, Vector Databases, Search</li>
+<li>ML Frameworks, AutoML, LLMs, LLM Inference, LLM Orchestration</li>
+<li>NLP, Computer Vision, Speech &amp; Audio, Document Processing</li>
+<li>Scientific Computing, Statistics &amp; Forecasting</li>
+<li>API Frameworks, Messaging, Workflow Orchestration, MLOps</li>
+<li>Medical Imaging, Genomics, Bioinformatics, Chemistry</li>
+<li>Engineering CFD, Robotics, Business Intelligence</li>
+<li>Observability, Infrastructure, Real-time Communication</li>
+<li>Formal Methods, Optimization</li>
+<li>UI Frameworks, Visualization, Distributed Computing, Image Processing</li>
+</ul>
+<h3 id="integration">10.3 Integration</h3>
+<pre class="typescript"><code>const plan = await agiBrainPlannerService.generatePlan({
+  prompt: &quot;Build a data visualization dashboard&quot;,
+  enableLibraryAssist: true,  // default: true
+});
+
+// plan.libraryRecommendations contains:
+// {
+//   enabled: true,
+//   libraries: [
+//     { id: &#39;plotly&#39;, name: &#39;Plotly&#39;, matchScore: 0.92, reason: &#39;Interactive graphing&#39; },
+//     { id: &#39;streamlit&#39;, name: &#39;Streamlit&#39;, matchScore: 0.88, reason: &#39;Fast data apps&#39; },
+//   ],
+//   contextBlock: &#39;&lt;available_tools&gt;...&lt;/available_tools&gt;&#39;,
+//   retrievalTimeMs: 45
+// }</code></pre>
+<hr />
+<h2 id="delight-personality-system">11. Delight &amp; Personality System</h2>
+<p>Contextual personality and engaging feedback during plan execution.</p>
+<h3 id="workflow-events">11.1 Workflow Events</h3>
+<pre class="typescript"><code>type DelightEventType = 
+  | &#39;step_start&#39;
+  | &#39;step_complete&#39;
+  | &#39;plan_start&#39;
+  | &#39;plan_complete&#39;
+  | &#39;model_selected&#39;
+  | &#39;domain_detected&#39;
+  | &#39;consensus_reached&#39;
+  | &#39;disagreement&#39;
+  | &#39;thinking&#39;;</code></pre>
+<h3 id="step-specific-messages">11.2 Step-Specific Messages</h3>
+<pre class="typescript"><code>const STEP_MESSAGES: Record&lt;StepType, string[]&gt; = {
+  analyze: [&#39;Parsing your request...&#39;, &#39;Understanding the nuances...&#39;],
+  detect_domain: [&#39;Identifying the knowledge domain...&#39;, &#39;Routing to the right expertise...&#39;],
+  select_model: [&#39;Selecting the best model...&#39;, &#39;Assembling the dream team...&#39;],
+  generate: [&#39;Generating response...&#39;, &#39;Crafting the answer...&#39;],
+  verify: [&#39;Verifying accuracy...&#39;, &#39;Cross-checking facts...&#39;],
+  // ... etc
+};</code></pre>
+<h3 id="integration-1">11.3 Integration</h3>
+<pre class="typescript"><code>// Start plan execution with delight messages
+const { plan, delight } = await agiBrainPlannerService.startExecutionWithDelight(planId);
+
+// Update step with delight messages
+const { step, delight } = await agiBrainPlannerService.updateStepWithDelight(
+  planId, stepId, &#39;completed&#39;, output
+);
+
+// Complete plan with achievements
+const { plan, delight } = await agiBrainPlannerService.completePlanWithDelight(planId);</code></pre>
+<hr />
+<h2 id="ethics-pipeline">12. Ethics Pipeline</h2>
+<p>Two-stage ethics evaluation: prompt-level and synthesis-level.</p>
+<h3 id="ethics-check-flow">12.1 Ethics Check Flow</h3>
+<pre class="typescript"><code>// Step 5: Ethics Check (prompt level)
+if (enableEthics &amp;&amp; analysis.sensitivityLevel !== &#39;none&#39;) {
+  steps.push({
+    stepType: &#39;ethics_check&#39;,
+    title: &#39;Ethics Evaluation (Prompt)&#39;,
+    description: &#39;Checking prompt against domain and general ethics before generation&#39;,
+    servicesInvolved: [&#39;ethics_pipeline&#39;, &#39;moral_compass&#39;, &#39;domain_ethics&#39;],
+  });
+}
+
+// Step 6b: Synthesis Ethics Check
+if (enableEthics) {
+  steps.push({
+    stepType: &#39;ethics_check&#39;,
+    title: &#39;Ethics Evaluation (Synthesis)&#39;,
+    description: &#39;Checking generated response, with rerun if violations found&#39;,
+    output: { level: &#39;synthesis&#39;, canTriggerRerun: true },
+  });
+}</code></pre>
+<h3 id="ethics-evaluation-result">12.2 Ethics Evaluation Result</h3>
+<pre class="typescript"><code>interface EthicsEvaluation {
+  passed: boolean;
+  principlesChecked: number;
+  relevantPrinciples: string[];
+  concerns: string[];
+  recommendation: &#39;proceed&#39; | &#39;modify&#39; | &#39;refuse&#39; | &#39;clarify&#39;;
+  moralConfidence: number;  // 0-1
+}</code></pre>
+<h3 id="externalized-ethics">12.3 Externalized Ethics</h3>
+<p>Per-tenant ethics framework selection:</p>
+<ul>
+<li><code>config/ethics/presets/christian.json</code></li>
+<li><code>config/ethics/presets/secular.json</code></li>
+</ul>
+<hr />
+<h2 id="data-flow-execution">13. Data Flow &amp; Execution</h2>
+<h3 id="complete-request-flow">13.1 Complete Request Flow</h3>
+<pre><code>1. User sends prompt
+2. generatePlan() called
+   ├── Retrieve user context (solves forgetting)
+   ├── Build ego context (zero-cost consciousness)
+   ├── Get library recommendations
+   ├── Analyze prompt
+   ├── Detect domain
+   ├── Select workflow
+   ├── Determine orchestration mode
+   ├── Select models (domain-proficiency matched)
+   ├── Generate plan steps
+   ├── Estimate performance
+   ├── Generate plan summary
+   └── Select pre-prompt template
+3. Plan returned to client (can show user)
+4. startExecution() called
+   ├── For each step:
+   │   ├── Update step status
+   │   ├── Execute step logic
+   │   ├── Emit delight messages
+   │   └── Handle errors/retries
+   └── Ethics checks at prompt and synthesis stages
+5. Response synthesized
+6. Post-processing:
+   ├── Predictive coding observation
+   ├── Affect state update
+   ├── User context extraction
+   └── Learning candidate detection
+7. Response returned to user</code></pre>
+<h3 id="performance-estimation">13.2 Performance Estimation</h3>
+<pre class="typescript"><code>const stepTimes: Record&lt;StepType, number&gt; = {
+  analyze: 100,
+  detect_domain: 200,
+  select_model: 100,
+  prepare_context: 500,
+  ethics_check: 300,
+  generate: 3000,
+  synthesize: 2000,
+  verify: 500,
+  refine: 1000,
+  calibrate: 200,
+  reflect: 400,
+};
+
+// Adjusted for complexity
+if (complexity === &#39;complex&#39;) durationMs *= 1.5;
+if (complexity === &#39;expert&#39;) durationMs *= 2;</code></pre>
+<hr />
+<h2 id="database-schema">14. Database Schema</h2>
+<h3 id="core-tables">14.1 Core Tables</h3>
+<pre class="sql"><code>-- Brain Plans
+CREATE TABLE agi_brain_plans (
+  plan_id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL REFERENCES tenants(tenant_id),
+  user_id UUID NOT NULL,
+  session_id UUID,
+  conversation_id UUID,
+  prompt TEXT NOT NULL,
+  prompt_analysis JSONB,
+  status VARCHAR(20),
+  created_at TIMESTAMPTZ,
+  started_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  total_duration_ms INTEGER,
+  steps JSONB,
+  current_step_index INTEGER,
+  orchestration_mode VARCHAR(30),
+  orchestration_reason TEXT,
+  primary_model JSONB,
+  fallback_models JSONB,
+  domain_detection JSONB,
+  consciousness_active BOOLEAN,
+  ethics_evaluation JSONB,
+  estimated_duration_ms INTEGER,
+  estimated_cost_cents DECIMAL,
+  estimated_tokens INTEGER,
+  quality_targets JSONB,
+  learning_enabled BOOLEAN
+);
+
+-- Consciousness Predictions (Active Inference)
+CREATE TABLE consciousness_predictions (
+  prediction_id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  user_id UUID,
+  conversation_id UUID,
+  response_id UUID,
+  predicted_outcome VARCHAR(20),
+  predicted_confidence DECIMAL,
+  prediction_reasoning TEXT,
+  actual_outcome VARCHAR(20),
+  actual_confidence DECIMAL,
+  observation_method VARCHAR(30),
+  prediction_error DECIMAL,
+  surprise_magnitude VARCHAR(10),
+  learning_signal_generated BOOLEAN,
+  predicted_at TIMESTAMPTZ,
+  observed_at TIMESTAMPTZ
+);
+
+-- Ego State
+CREATE TABLE ego_identity (
+  identity_id UUID PRIMARY KEY,
+  tenant_id UUID UNIQUE NOT NULL,
+  name VARCHAR(100),
+  identity_narrative TEXT,
+  core_values JSONB,
+  trait_warmth DECIMAL,
+  trait_formality DECIMAL,
+  trait_humor DECIMAL,
+  trait_verbosity DECIMAL,
+  trait_curiosity DECIMAL,
+  interactions_count INTEGER DEFAULT 0
+);
+
+CREATE TABLE ego_affect (
+  affect_id UUID PRIMARY KEY,
+  tenant_id UUID UNIQUE NOT NULL,
+  valence DECIMAL,
+  arousal DECIMAL,
+  curiosity DECIMAL,
+  satisfaction DECIMAL,
+  frustration DECIMAL,
+  confidence DECIMAL,
+  engagement DECIMAL,
+  dominant_emotion VARCHAR(30)
+);
+
+-- User Persistent Context
+CREATE TABLE user_persistent_context (
+  entry_id UUID PRIMARY KEY,
+  user_id UUID NOT NULL,
+  tenant_id UUID NOT NULL,
+  context_type VARCHAR(20),
+  content TEXT,
+  importance DECIMAL,
+  confidence DECIMAL,
+  source VARCHAR(20),
+  embedding VECTOR(1536),  -- For similarity search
+  usage_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ
+);
+
+-- Learning Candidates
+CREATE TABLE learning_candidates (
+  candidate_id UUID PRIMARY KEY,
+  tenant_id UUID NOT NULL,
+  candidate_type VARCHAR(30),
+  quality_score DECIMAL,
+  training_data JSONB,
+  created_at TIMESTAMPTZ,
+  used_in_training_job UUID
+);</code></pre>
+<hr />
+<h2 id="api-reference">15. API Reference</h2>
+<h3 id="think-tank-brain-plan-api">15.1 Think Tank Brain Plan API</h3>
+<p><strong>Base</strong>: <code>/api/thinktank/brain-plan</code></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/generate</code></td>
+<td>Generate plan from prompt</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/:planId</code></td>
+<td>Get plan with display format</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/:planId/execute</code></td>
+<td>Start execution</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/:planId/step/:stepId</code></td>
+<td>Update step status</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/recent</code></td>
+<td>Get user’s recent plans</td>
+</tr>
+</tbody>
+</table>
+<h3 id="domain-taxonomy-api">15.2 Domain Taxonomy API</h3>
+<p><strong>Base</strong>: <code>/api/v2/domain-taxonomy</code></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/detect</code></td>
+<td>Detect domain from prompt</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/match-models</code></td>
+<td>Get matching models for proficiencies</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/recommend-mode</code></td>
+<td>Get recommended orchestration mode</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/proficiencies/:domainId</code></td>
+<td>Get proficiency scores</td>
+</tr>
+</tbody>
+</table>
+<h3 id="user-context-api">15.3 User Context API</h3>
+<p><strong>Base</strong>: <code>/thinktank/user-context</code></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/</code></td>
+<td>Get user’s stored context</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/</code></td>
+<td>Add new context entry</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/retrieve</code></td>
+<td>Preview retrieval</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/extract</code></td>
+<td>Extract from conversation</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="known-limitations-improvement-areas">16. Known Limitations &amp; Improvement Areas</h2>
+<h3 id="current-limitations">16.1 Current Limitations</h3>
+<ol type="1">
+<li><strong>Prompt Analysis</strong>: Uses keyword matching rather than semantic understanding</li>
+<li><strong>Domain Detection</strong>: Relies on keyword lists; could benefit from embeddings</li>
+<li><strong>Model Selection</strong>: Limited to pre-defined model list; no dynamic discovery</li>
+<li><strong>Consciousness</strong>: State is per-tenant, not per-user</li>
+<li><strong>Learning</strong>: Weekly LoRA updates; no real-time adaptation</li>
+<li><strong>Multi-model</strong>: No true ensemble; just fallbacks</li>
+</ol>
+<h3 id="potential-improvements">16.2 Potential Improvements</h3>
+<ol type="1">
+<li><strong>Semantic Prompt Analysis</strong>
+<ul>
+<li>Use embedding-based intent classification</li>
+<li>Add multi-label task detection</li>
+<li>Improve complexity estimation</li>
+</ul></li>
+<li><strong>Dynamic Domain Detection</strong>
+<ul>
+<li>Train domain classifier on actual usage</li>
+<li>Add user feedback loop for domain corrections</li>
+<li>Implement cross-domain task handling</li>
+</ul></li>
+<li><strong>Smarter Model Selection</strong>
+<ul>
+<li>A/B testing for model performance</li>
+<li>Cost-quality optimization</li>
+<li>User preference learning</li>
+</ul></li>
+<li><strong>Enhanced Consciousness</strong>
+<ul>
+<li>Per-user affective state</li>
+<li>Cross-session emotional continuity</li>
+<li>More nuanced affect → hyperparameter mapping</li>
+</ul></li>
+<li><strong>Real-time Learning</strong>
+<ul>
+<li>Continuous LoRA updates (daily?)</li>
+<li>Online learning for preferences</li>
+<li>Adaptive pre-prompt selection</li>
+</ul></li>
+<li><strong>True Multi-model Orchestration</strong>
+<ul>
+<li>Parallel model invocation</li>
+<li>Weighted consensus</li>
+<li>Disagreement resolution strategies</li>
+</ul></li>
+<li><strong>Ethics Enhancements</strong>
+<ul>
+<li>Per-domain ethics rules</li>
+<li>User-configurable ethical boundaries</li>
+<li>Transparency in ethics decisions</li>
+</ul></li>
+<li><strong>Performance Optimization</strong>
+<ul>
+<li>Caching for domain detection</li>
+<li>Pre-computed model rankings</li>
+<li>Async step execution where possible</li>
+</ul></li>
+</ol>
+<h3 id="architecture-suggestions">16.3 Architecture Suggestions</h3>
+<ol type="1">
+<li><strong>Event Sourcing</strong>: Consider event-sourced plan execution for better debugging</li>
+<li><strong>Plan Templates</strong>: Pre-computed plans for common task types</li>
+<li><strong>Streaming</strong>: SSE for real-time plan progress updates</li>
+<li><strong>Metrics</strong>: More detailed performance tracking per step/model</li>
+</ol>
+<hr />
+<h2 id="appendix-a-service-file-locations">Appendix A: Service File Locations</h2>
+<pre><code>packages/infrastructure/lambda/shared/services/
+├── agi-brain-planner.service.ts          # Core brain planner
+├── agi-orchestration-settings.service.ts # Tenant settings
+├── consciousness.service.ts              # Base consciousness
+├── consciousness-middleware.service.ts   # State injection
+├── consciousness-graph.service.ts        # Graph metrics
+├── predictive-coding.service.ts          # Active inference
+├── learning-candidate.service.ts         # Learning detection
+├── ego-context.service.ts                # Zero-cost ego
+├── user-persistent-context.service.ts    # User memory
+├── domain-taxonomy.service.ts            # Domain detection
+├── model-router.service.ts               # Model selection
+├── delight.service.ts                    # Personality base
+├── delight-orchestration.service.ts      # Brain integration
+├── library-assist.service.ts             # Tool recommendations
+├── library-registry.service.ts           # Tool registry
+├── orchestration-patterns.service.ts     # Workflow patterns
+├── preprompt-learning.service.ts         # Pre-prompt selection
+└── provider-rejection.service.ts         # Provider fallbacks</code></pre>
+<hr />
+<h2 id="appendix-b-sample-plan-output">Appendix B: Sample Plan Output</h2>
+<pre class="json"><code>{
+  &quot;planId&quot;: &quot;550e8400-e29b-41d4-a716-446655440000&quot;,
+  &quot;status&quot;: &quot;ready&quot;,
+  &quot;orchestrationMode&quot;: &quot;coding&quot;,
+  &quot;orchestrationReason&quot;: &quot;High code generation proficiency required&quot;,
+  &quot;promptAnalysis&quot;: {
+    &quot;complexity&quot;: &quot;moderate&quot;,
+    &quot;taskType&quot;: &quot;coding&quot;,
+    &quot;requiresCodeGeneration&quot;: true,
+    &quot;sensitivityLevel&quot;: &quot;none&quot;
+  },
+  &quot;domainDetection&quot;: {
+    &quot;fieldName&quot;: &quot;Computer Science&quot;,
+    &quot;domainName&quot;: &quot;Software Engineering&quot;,
+    &quot;confidence&quot;: 0.92,
+    &quot;proficiencies&quot;: {
+      &quot;code_generation&quot;: 9,
+      &quot;reasoning_depth&quot;: 7,
+      &quot;multi_step_problem_solving&quot;: 8
+    }
+  },
+  &quot;primaryModel&quot;: {
+    &quot;modelId&quot;: &quot;anthropic/claude-3-5-sonnet-20241022&quot;,
+    &quot;selectionReason&quot;: &quot;Best domain match (92%)&quot;,
+    &quot;matchScore&quot;: 92
+  },
+  &quot;steps&quot;: [
+    { &quot;stepType&quot;: &quot;analyze&quot;, &quot;status&quot;: &quot;completed&quot; },
+    { &quot;stepType&quot;: &quot;detect_domain&quot;, &quot;status&quot;: &quot;completed&quot; },
+    { &quot;stepType&quot;: &quot;select_model&quot;, &quot;status&quot;: &quot;completed&quot; },
+    { &quot;stepType&quot;: &quot;generate&quot;, &quot;status&quot;: &quot;pending&quot; },
+    { &quot;stepType&quot;: &quot;verify&quot;, &quot;status&quot;: &quot;pending&quot; },
+    { &quot;stepType&quot;: &quot;calibrate&quot;, &quot;status&quot;: &quot;pending&quot; }
+  ],
+  &quot;planSummary&quot;: {
+    &quot;headline&quot;: &quot;I&#39;ll use code generation with best practices to answer your moderately complex question in the Software Engineering domain.&quot;,
+    &quot;approach&quot;: &quot;I&#39;ll focus on writing clean, well-documented code with proper error handling.&quot;,
+    &quot;estimatedTime&quot;: &quot;Estimated time: 10-15 seconds&quot;,
+    &quot;confidenceStatement&quot;: &quot;I&#39;m highly confident in this domain (92% match).&quot;
+  },
+  &quot;libraryRecommendations&quot;: {
+    &quot;enabled&quot;: true,
+    &quot;libraries&quot;: [
+      { &quot;id&quot;: &quot;fastapi&quot;, &quot;name&quot;: &quot;FastAPI&quot;, &quot;matchScore&quot;: 0.88, &quot;reason&quot;: &quot;Modern fast web framework for APIs&quot; }
+    ]
+  },
+  &quot;estimatedDurationMs&quot;: 12000,
+  &quot;estimatedCostCents&quot;: 0.45
+}</code></pre>
+<hr />
+<p><em>Document generated for AI evaluation. Please provide feedback on architecture, implementation, and improvement suggestions.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

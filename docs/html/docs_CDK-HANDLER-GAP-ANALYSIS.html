@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CDK HANDLER GAP ANALYSIS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>CDK HANDLER GAP ANALYSIS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/CDK-HANDLER-GAP-ANALYSIS.md</div>
+  </div>
+  
+  <h1 id="cdk-handler-gap-analysis">CDK Handler Gap Analysis</h1>
+<p><strong>Generated</strong>: 2026-01-19<br />
+<strong>Purpose</strong>: Audit of Lambda handlers vs CDK API Gateway routes</p>
+<h2 id="executive-summary">Executive Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Handlers in Code</th>
+<th>Routed in CDK</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>admin/*</code></td>
+<td>56</td>
+<td>56 via proxy→admin/handler.ts</td>
+<td>✅ OK</td>
+</tr>
+<tr>
+<td><code>thinktank/*</code></td>
+<td>29</td>
+<td>2 (artifact-engine only)</td>
+<td>⚠️ <strong>27 MISSING</strong></td>
+</tr>
+<tr>
+<td><code>thinktank-admin/*</code></td>
+<td>2</td>
+<td>1 (via separate stack)</td>
+<td>✅ OK</td>
+</tr>
+<tr>
+<td><code>api/*</code></td>
+<td>4</td>
+<td>4 (router handles)</td>
+<td>✅ OK</td>
+</tr>
+<tr>
+<td>Other stacks</td>
+<td>~50</td>
+<td>~50</td>
+<td>✅ OK</td>
+</tr>
+</tbody>
+</table>
+<h2 id="architecture-overview">Architecture Overview</h2>
+<h3 id="how-admin-routes-work">How Admin Routes Work ✅</h3>
+<pre><code>API Gateway /api/v2/admin/*
+    ↓ (proxy)
+admin/handler.ts (CDK: admin/handler.handler)
+    ↓ (dynamic import based on path)
+admin/consciousness.ts, admin/ego.ts, admin/metrics.ts, etc.</code></pre>
+<p>The admin proxy correctly routes to <code>admin/handler.ts</code>, which uses dynamic imports to delegate to 50+ sub-handlers. <strong>This is working correctly.</strong></p>
+<h3 id="how-think-tank-routes-work">How Think Tank Routes Work ⚠️</h3>
+<pre><code>API Gateway /api/v2/thinktank/artifacts/*
+    ↓ (proxy)
+thinktank/artifact-engine.ts (CDK routes exist)
+
+API Gateway /api/v2/thinktank/* (other paths)
+    ↓ 
+❌ NO CDK ROUTES - handlers exist but aren&#39;t exposed</code></pre>
+<p><strong>Problem</strong>: 27 Think Tank handlers exist in code but have no CDK API Gateway routes.</p>
+<h2 id="missing-think-tank-routes">Missing Think Tank Routes</h2>
+<h3 id="priority-1---core-think-tank-features-no-cdk-routes">Priority 1 - Core Think Tank Features (No CDK Routes)</h3>
+<table>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Purpose</th>
+<th>CDK Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>thinktank/conversations.ts</code></td>
+<td>Conversation CRUD</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/users.ts</code></td>
+<td>User management</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/models.ts</code></td>
+<td>Model listing</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/brain-plan.ts</code></td>
+<td>AGI Brain Plan API</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/user-context.ts</code></td>
+<td>Persistent context</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/domain-modes.ts</code></td>
+<td>Domain mode config</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/model-categories.ts</code></td>
+<td>Model categories</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/ratings.ts</code></td>
+<td>User ratings</td>
+<td>❌ Missing</td>
+</tr>
+</tbody>
+</table>
+<h3 id="priority-2---advanced-features-no-cdk-routes">Priority 2 - Advanced Features (No CDK Routes)</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Purpose</th>
+<th>CDK Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>thinktank/grimoire.ts</code></td>
+<td>Procedural memory</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/economic-governor.ts</code></td>
+<td>Cost optimization</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/time-travel.ts</code></td>
+<td>Time Machine</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/council-of-rivals.ts</code></td>
+<td>Multi-model consensus</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/concurrent-execution.ts</code></td>
+<td>Parallel tasks</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/structure-from-chaos.ts</code></td>
+<td>Synthesis engine</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/sentinel-agents.ts</code></td>
+<td>Background agents</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/flash-facts.ts</code></td>
+<td>Quick facts</td>
+<td>❌ Missing</td>
+</tr>
+</tbody>
+</table>
+<h3 id="priority-3---specialized-features-no-cdk-routes">Priority 3 - Specialized Features (No CDK Routes)</h3>
+<table>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Purpose</th>
+<th>CDK Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>thinktank/liquid-interface.ts</code></td>
+<td>Adaptive UI</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/reality-engine.ts</code></td>
+<td>Reality testing</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/security-signals.ts</code></td>
+<td>Security indicators</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/policy-framework.ts</code></td>
+<td>Policy management</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/derivation-history.ts</code></td>
+<td>Derivation tracking</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/enhanced-collaboration.ts</code></td>
+<td>Team features</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/file-conversion.ts</code></td>
+<td>File processing</td>
+<td>❌ Missing</td>
+</tr>
+<tr>
+<td><code>thinktank/ideas.ts</code></td>
+<td>Idea management</td>
+<td>❌ Missing</td>
+</tr>
+</tbody>
+</table>
+<h3 id="already-routed">Already Routed ✅</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Purpose</th>
+<th>CDK Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>thinktank/artifact-engine.ts</code></td>
+<td>GenUI artifacts</td>
+<td>✅ api-stack.ts</td>
+</tr>
+<tr>
+<td><code>thinktank/analytics.ts</code></td>
+<td>Usage analytics</td>
+<td>✅ thinktank-admin-api-stack.ts</td>
+</tr>
+<tr>
+<td><code>thinktank/settings.ts</code></td>
+<td>Status/config</td>
+<td>✅ thinktank-admin-api-stack.ts</td>
+</tr>
+<tr>
+<td><code>thinktank/my-rules.ts</code></td>
+<td>User rules</td>
+<td>✅ thinktank-admin-api-stack.ts</td>
+</tr>
+<tr>
+<td><code>thinktank/shadow-testing.ts</code></td>
+<td>A/B testing</td>
+<td>✅ thinktank-admin-api-stack.ts</td>
+</tr>
+</tbody>
+</table>
+<h2 id="recommended-solution">Recommended Solution</h2>
+<h3 id="option-a-consolidated-think-tank-router-recommended">Option A: Consolidated Think Tank Router (Recommended)</h3>
+<p>Create a single <code>thinktank/handler.ts</code> that routes to all Think Tank handlers, similar to admin/handler.ts:</p>
+<pre class="typescript"><code>// thinktank/handler.ts
+export async function handler(event) {
+  const path = event.path;
+  if (path.includes(&#39;/conversations&#39;)) return (await import(&#39;./conversations.js&#39;)).handler(event);
+  if (path.includes(&#39;/users&#39;)) return (await import(&#39;./users.js&#39;)).handler(event);
+  // ... etc
+}</code></pre>
+<p>Then add single CDK route:</p>
+<pre class="typescript"><code>const thinktankRouter = v2.addResource(&#39;thinktank&#39;);
+thinktankRouter.addProxy({
+  defaultIntegration: new apigateway.LambdaIntegration(thinktankLambda),
+  ...
+});</code></pre>
+<h3 id="option-b-individual-lambda-integrations">Option B: Individual Lambda Integrations</h3>
+<p>Add each handler as a separate Lambda with proxy route. <strong>Not recommended</strong> - would add ~100+ resources to already large stack.</p>
+<h2 id="implementation-checklist">Implementation Checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Create <code>thinktank/handler.ts</code> consolidated router</label></li>
+<li><label><input type="checkbox" />Add dynamic imports for all 29 Think Tank handlers</label></li>
+<li><label><input type="checkbox" />Add CDK route in <code>api-stack.ts</code> with proxy</label></li>
+<li><label><input type="checkbox" />Test all routes work</label></li>
+<li><label><input type="checkbox" />Update this document</label></li>
+</ul>
+<h2 id="related-files">Related Files</h2>
+<ul>
+<li>CDK Stacks: <code>packages/infrastructure/lib/stacks/*.ts</code></li>
+<li>Lambda Handlers: <code>packages/infrastructure/lambda/</code></li>
+<li>Admin Router: <code>packages/infrastructure/lambda/admin/handler.ts</code></li>
+<li>Think Tank Admin Stack: <code>packages/infrastructure/lib/stacks/thinktank-admin-api-stack.ts</code></li>
+</ul>
+<h2 id="policy-reference">Policy Reference</h2>
+<p>See <code>/.windsurf/workflows/cdk-infrastructure-sync.md</code> for CDK update policy.</p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>02 THINK TANK ARCHITECTURE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>02 THINK TANK ARCHITECTURE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/publications/02-THINK-TANK-ARCHITECTURE.md</div>
+  </div>
+  
+  <h1 id="think-tank-platform-architecture">Think Tank Platform Architecture</h1>
+<div data-align="center">
+<p><strong>Advanced Multi-Step AI Problem Solving</strong></p>
+<p>Version 3.2.0 | December 2024</p>
+<hr />
+<p><em>A comprehensive technical architecture document for the Think Tank AI reasoning platform</em></p>
+</div>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-platform-overview">Platform Overview</a></li>
+<li><a href="#2-core-architecture">Core Architecture</a></li>
+<li><a href="#3-problem-solving-pipeline">Problem Solving Pipeline</a></li>
+<li><a href="#4-session-management">Session Management</a></li>
+<li><a href="#5-collaboration-features">Collaboration Features</a></li>
+<li><a href="#6-domain-modes">Domain Modes</a></li>
+<li><a href="#7-quality--confidence">Quality &amp; Confidence</a></li>
+<li><a href="#8-user-interface">User Interface</a></li>
+</ol>
+<hr />
+<h2 id="platform-overview">1. Platform Overview</h2>
+<h3 id="what-is-think-tank">1.1 What is Think Tank?</h3>
+<p><strong>Think Tank</strong> is an advanced AI reasoning platform that decomposes complex problems into manageable sub-problems, applies multi-step reasoning, and synthesizes comprehensive solutions using orchestrated AI models.</p>
+<p>Unlike simple chat interfaces, Think Tank: - <strong>Decomposes</strong> complex problems into sub-tasks - <strong>Reasons</strong> through each component step-by-step - <strong>Executes</strong> specialized AI calls for each step - <strong>Synthesizes</strong> results into coherent solutions - <strong>Tracks</strong> confidence and quality throughout</p>
+<h3 id="think-tank-vs-traditional-chat">1.2 Think Tank vs Traditional Chat</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                    TRADITIONAL CHAT vs THINK TANK                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   TRADITIONAL CHAT                       THINK TANK                         │
+│   ────────────────                       ──────────                         │
+│                                                                             │
+│   User ──▶ AI ──▶ Response               User ──▶ Problem Analysis          │
+│                                                        │                    │
+│   Single prompt, single response                       ▼                    │
+│   No decomposition                            ┌───────────────┐             │
+│   No reasoning steps                          │  Decompose    │             │
+│   No confidence tracking                      │  into parts   │             │
+│   No iterative refinement                     └───────┬───────┘             │
+│                                                       │                     │
+│                                          ┌────────────┼────────────┐        │
+│                                          ▼            ▼            ▼        │
+│                                     ┌────────┐  ┌────────┐  ┌────────┐     │
+│                                     │ Part 1 │  │ Part 2 │  │ Part 3 │     │
+│                                     │ Reason │  │ Reason │  │ Reason │     │
+│                                     └───┬────┘  └───┬────┘  └───┬────┘     │
+│                                         │           │           │          │
+│                                         └─────┬─────┴─────┬─────┘          │
+│                                               ▼           ▼                 │
+│                                         ┌────────┐  ┌────────┐             │
+│                                         │Execute │  │Execute │             │
+│                                         │ + Verify│  │ + Verify│            │
+│                                         └───┬────┘  └───┬────┘             │
+│                                             │           │                   │
+│                                             └─────┬─────┘                   │
+│                                                   ▼                         │
+│                                          ┌───────────────┐                  │
+│                                          │  Synthesize   │                  │
+│                                          │  Solution     │                  │
+│                                          │  (confidence) │                  │
+│                                          └───────────────┘                  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="key-capabilities">1.3 Key Capabilities</h3>
+<table>
+<colgroup>
+<col style="width: 48%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Problem Decomposition</strong></td>
+<td>Breaks complex questions into manageable sub-problems</td>
+</tr>
+<tr>
+<td><strong>Multi-Step Reasoning</strong></td>
+<td>Chain-of-thought with recorded steps</td>
+</tr>
+<tr>
+<td><strong>Domain Specialization</strong></td>
+<td>8+ specialized reasoning modes</td>
+</tr>
+<tr>
+<td><strong>Confidence Tracking</strong></td>
+<td>Quality scores for every step</td>
+</tr>
+<tr>
+<td><strong>Artifact Generation</strong></td>
+<td>Code, documents, diagrams as outputs</td>
+</tr>
+<tr>
+<td><strong>Real-time Collaboration</strong></td>
+<td>Multiple users solving together</td>
+</tr>
+<tr>
+<td><strong>Session Persistence</strong></td>
+<td>Resume any session later</td>
+</tr>
+<tr>
+<td><strong>Cost Transparency</strong></td>
+<td>Token and cost tracking per step</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="core-architecture">2. Core Architecture</h2>
+<h3 id="system-components">2.1 System Components</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                       THINK TANK ARCHITECTURE                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                      CONSUMER INTERFACE LAYER                         │  │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐       │  │
+│  │  │   Web Client    │  │  Mobile Client  │  │   API Client    │       │  │
+│  │  │  (Next.js/React)│  │   (React Native)│  │    (SDK)        │       │  │
+│  │  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘       │  │
+│  └───────────┼────────────────────┼────────────────────┼────────────────┘  │
+│              │                    │                    │                   │
+│              └────────────────────┼────────────────────┘                   │
+│                                   │                                        │
+│  ┌────────────────────────────────▼───────────────────────────────────┐   │
+│  │                      THINK TANK ENGINE                              │   │
+│  │                                                                     │   │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │   │
+│  │  │   Session    │  │   Problem    │  │   Step       │              │   │
+│  │  │   Manager    │  │  Decomposer  │  │   Executor   │              │   │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘              │   │
+│  │                                                                     │   │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │   │
+│  │  │  Reasoning   │  │   Solution   │  │  Confidence  │              │   │
+│  │  │   Engine     │  │ Synthesizer  │  │   Scorer     │              │   │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘              │   │
+│  │                                                                     │   │
+│  └────────────────────────────────┬───────────────────────────────────┘   │
+│                                   │                                        │
+│  ┌────────────────────────────────▼───────────────────────────────────┐   │
+│  │                    ORCHESTRATION LAYER                              │   │
+│  │                                                                     │   │
+│  │  ┌──────────────────────────────────────────────────────────────┐  │   │
+│  │  │                OrchestrationPatternsService                   │  │   │
+│  │  │  • 49 workflow patterns    • AGI model selection              │  │   │
+│  │  │  • Parallel execution      • Mode-aware invocation            │  │   │
+│  │  └──────────────────────────────────────────────────────────────┘  │   │
+│  │                                                                     │   │
+│  │  ┌──────────────────────────────────────────────────────────────┐  │   │
+│  │  │                    ModelRouterService                         │  │   │
+│  │  │  • 106+ AI models          • Intelligent routing              │  │   │
+│  │  │  • Live metadata           • Fallback handling                │  │   │
+│  │  └──────────────────────────────────────────────────────────────┘  │   │
+│  │                                                                     │   │
+│  └────────────────────────────────┬───────────────────────────────────┘   │
+│                                   │                                        │
+│  ┌────────────────────────────────▼───────────────────────────────────┐   │
+│  │                        DATA LAYER                                   │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Sessions   │  │Conversations│  │  Messages   │  │ Artifacts │  │   │
+│  │  │  (Aurora)   │  │  (Aurora)   │  │  (Aurora)   │  │   (S3)    │  │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="think-tank-engine">2.2 Think Tank Engine</h3>
+<p>The core engine that powers intelligent problem solving:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                        THINK TANK ENGINE DETAIL                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  class ThinkTankEngine {                                                    │
+│                                                                             │
+│    ┌─────────────────────────────────────────────────────────────────────┐ │
+│    │  async solve(problem: ThinkTankProblem): Promise&lt;ThinkTankResult&gt;   │ │
+│    │                                                                      │ │
+│    │  1. CREATE SESSION                                                   │ │
+│    │     • Initialize session with problem context                        │ │
+│    │     • Set domain mode and preferences                                │ │
+│    │     • Record start time and user info                                │ │
+│    │                                                                      │ │
+│    │  2. DECOMPOSE PROBLEM                                                │ │
+│    │     • AI analyzes problem structure                                  │ │
+│    │     • Identifies sub-problems and dependencies                       │ │
+│    │     • Creates execution plan                                         │ │
+│    │                                                                      │ │
+│    │  3. FOR EACH SUB-PROBLEM:                                            │ │
+│    │     ┌───────────────────────────────────────────────────────────┐   │ │
+│    │     │  a. REASON                                                 │   │ │
+│    │     │     • Chain-of-thought analysis                           │   │ │
+│    │     │     • Record reasoning steps                              │   │ │
+│    │     │                                                            │   │ │
+│    │     │  b. EXECUTE                                                │   │ │
+│    │     │     • Call appropriate AI model(s)                        │   │ │
+│    │     │     • May use parallel execution                          │   │ │
+│    │     │     • Track tokens and cost                               │   │ │
+│    │     │                                                            │   │ │
+│    │     │  c. RECORD STEP                                            │   │ │
+│    │     │     • Save step result with confidence                    │   │ │
+│    │     │     • Update session state                                │   │ │
+│    │     └───────────────────────────────────────────────────────────┘   │ │
+│    │                                                                      │ │
+│    │  4. SYNTHESIZE SOLUTION                                              │ │
+│    │     • Combine all step results                                       │ │
+│    │     • Generate final answer with reasoning                           │ │
+│    │     • Calculate overall confidence                                   │ │
+│    │                                                                      │ │
+│    │  5. RETURN RESULT                                                    │ │
+│    │     • Solution with confidence score                                 │ │
+│    │     • All recorded steps                                             │ │
+│    │     • Total cost and token usage                                     │ │
+│    └─────────────────────────────────────────────────────────────────────┘ │
+│  }                                                                          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="problem-solving-pipeline">3. Problem Solving Pipeline</h2>
+<h3 id="pipeline-stages">3.1 Pipeline Stages</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                     PROBLEM SOLVING PIPELINE                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  USER INPUT                                                                 │
+│  ══════════                                                                 │
+│  &quot;Design a scalable microservices architecture for an e-commerce           │
+│   platform that handles 10M daily users with real-time inventory&quot;          │
+│                                                                             │
+│       │                                                                     │
+│       ▼                                                                     │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  STAGE 1: PROBLEM ANALYSIS                                          │   │
+│  │  ─────────────────────────                                          │   │
+│  │  • Identify problem type: System Design                             │   │
+│  │  • Detect domain: Engineering/Architecture                          │   │
+│  │  • Assess complexity: High                                          │   │
+│  │  • Select domain mode: Engineering Mode                             │   │
+│  │  • Choose orchestration pattern: Decomposed Prompting               │   │
+│  └──────────────────────────────────┬──────────────────────────────────┘   │
+│                                     │                                       │
+│       ▼                                                                     │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  STAGE 2: DECOMPOSITION                                             │   │
+│  │  ─────────────────────                                              │   │
+│  │  Sub-Problem 1: Requirements Analysis                               │   │
+│  │  Sub-Problem 2: Service Identification                              │   │
+│  │  Sub-Problem 3: Data Architecture                                   │   │
+│  │  Sub-Problem 4: Communication Patterns                              │   │
+│  │  Sub-Problem 5: Scalability Design                                  │   │
+│  │  Sub-Problem 6: Infrastructure                                      │   │
+│  │                                                                     │   │
+│  │  Dependencies: [1] → [2,3] → [4] → [5] → [6]                       │   │
+│  └──────────────────────────────────┬──────────────────────────────────┘   │
+│                                     │                                       │
+│       ▼                                                                     │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  STAGE 3: STEP-BY-STEP EXECUTION                                    │   │
+│  │  ───────────────────────────────                                    │   │
+│  │                                                                     │   │
+│  │  Step 1: Requirements ───────────────────────────────────────────   │   │
+│  │  │ Model: Claude 3.5 (thinking mode)                                │   │
+│  │  │ Tokens: 2,450 │ Cost: $0.024 │ Confidence: 0.92                 │   │
+│  │  │ Output: Detailed requirements document                          │   │
+│  │  └──────────────────────────────────────────────────────────────   │   │
+│  │                                                                     │   │
+│  │  Step 2: Service Identification ─────────────────────────────────   │   │
+│  │  │ Model: GPT-4o + Claude (parallel, merge synthesis)              │   │
+│  │  │ Tokens: 3,200 │ Cost: $0.041 │ Confidence: 0.89                 │   │
+│  │  │ Output: 12 microservices identified with boundaries             │   │
+│  │  └──────────────────────────────────────────────────────────────   │   │
+│  │                                                                     │   │
+│  │  [Steps 3-6 continue...]                                            │   │
+│  └──────────────────────────────────┬──────────────────────────────────┘   │
+│                                     │                                       │
+│       ▼                                                                     │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  STAGE 4: SYNTHESIS                                                 │   │
+│  │  ─────────────────                                                  │   │
+│  │  • Combine all step outputs                                         │   │
+│  │  • Generate comprehensive solution document                         │   │
+│  │  • Include architecture diagram (artifact)                          │   │
+│  │  • Validate consistency across steps                                │   │
+│  │  • Calculate final confidence: 0.88                                 │   │
+│  └──────────────────────────────────┬──────────────────────────────────┘   │
+│                                     │                                       │
+│       ▼                                                                     │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  FINAL OUTPUT                                                       │   │
+│  │  ────────────                                                       │   │
+│  │  • Complete microservices architecture document                     │   │
+│  │  • Service interaction diagrams                                     │   │
+│  │  • Database schema recommendations                                  │   │
+│  │  • Infrastructure as code templates                                 │   │
+│  │  • Scaling strategies and benchmarks                                │   │
+│  │                                                                     │   │
+│  │  Total: 12,400 tokens │ $0.18 │ 6 steps │ 45 seconds                │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="step-recording">3.2 Step Recording</h3>
+<p>Every reasoning step is recorded with comprehensive metadata:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                          STEP RECORD STRUCTURE                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  interface ThinkTankStep {                                                  │
+│    stepId: string;                    // Unique step identifier            │
+│    sessionId: string;                 // Parent session                    │
+│    stepOrder: number;                 // Execution order                   │
+│    stepType: StepType;                // decompose | reason | execute | .. │
+│    title: string;                     // Human-readable step name          │
+│    description: string;               // What this step does               │
+│                                                                             │
+│    // Execution Details                                                     │
+│    input: {                                                                 │
+│      prompt: string;                  // Input to AI                       │
+│      context: Record&lt;string, any&gt;;    // Previous step outputs             │
+│      parameters: Record&lt;string, any&gt;; // Step-specific params              │
+│    };                                                                       │
+│                                                                             │
+│    output: {                                                                │
+│      response: string;                // AI response                       │
+│      artifacts: Artifact[];           // Generated files/diagrams          │
+│      structuredData?: any;            // Parsed structured output          │
+│    };                                                                       │
+│                                                                             │
+│    // Model &amp; Cost                                                          │
+│    modelUsed: string;                 // Which AI model                    │
+│    modelMode: ModelMode;              // thinking | fast | creative | ..   │
+│    tokensUsed: number;                // Total tokens                      │
+│    costCents: number;                 // Cost in cents                     │
+│    latencyMs: number;                 // Execution time                    │
+│                                                                             │
+│    // Quality                                                               │
+│    confidence: number;                // 0-1 confidence score              │
+│    reasoning: string;                 // Explanation of confidence         │
+│                                                                             │
+│    // Parallel Execution (if applicable)                                    │
+│    wasParallel: boolean;                                                    │
+│    parallelModels?: string[];         // Models used in parallel           │
+│    synthesisStrategy?: string;        // How results were combined         │
+│                                                                             │
+│    // Timestamps                                                            │
+│    startedAt: Date;                                                         │
+│    completedAt: Date;                                                       │
+│  }                                                                          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="session-management">4. Session Management</h2>
+<h3 id="session-lifecycle">4.1 Session Lifecycle</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                         SESSION LIFECYCLE                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│    ┌─────────┐                                                              │
+│    │  NEW    │  User starts a new problem-solving session                  │
+│    └────┬────┘                                                              │
+│         │                                                                   │
+│         ▼                                                                   │
+│    ┌─────────┐                                                              │
+│    │ ACTIVE  │  Session is being worked on                                 │
+│    └────┬────┘  • Steps executing                                          │
+│         │       • User can interact                                         │
+│         │       • Real-time updates                                         │
+│         │                                                                   │
+│    ┌────┴────────────────────────────┐                                     │
+│    │                                  │                                     │
+│    ▼                                  ▼                                     │
+│  ┌─────────┐                    ┌─────────┐                                │
+│  │ PAUSED  │                    │COMPLETED│  All steps finished            │
+│  └────┬────┘                    └────┬────┘  • Solution synthesized        │
+│       │                              │       • Confidence calculated        │
+│       │ User resumes                 │                                      │
+│       │                              │                                      │
+│       ▼                              ▼                                      │
+│  ┌─────────┐                    ┌─────────┐                                │
+│  │ ACTIVE  │                    │ARCHIVED │  Moved to long-term storage    │
+│  └─────────┘                    └─────────┘                                │
+│                                                                             │
+│                                                                             │
+│  Session States:                                                            │
+│  ───────────────                                                            │
+│  • NEW        - Just created, no work done                                 │
+│  • ACTIVE     - Currently processing or awaiting input                     │
+│  • PAUSED     - User paused, can resume                                    │
+│  • COMPLETED  - All steps done, solution ready                             │
+│  • ARCHIVED   - Moved to cold storage                                      │
+│  • FAILED     - Unrecoverable error occurred                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="session-data-model">4.2 Session Data Model</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                         SESSION DATA MODEL                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         SESSION                                      │   │
+│  │  sessionId: uuid                                                    │   │
+│  │  tenantId: uuid                                                     │   │
+│  │  userId: uuid                                                       │   │
+│  │  title: string                                                      │   │
+│  │  status: SessionStatus                                              │   │
+│  │  domainMode: DomainMode                                             │   │
+│  │  createdAt: timestamp                                               │   │
+│  │  updatedAt: timestamp                                               │   │
+│  └────────────────────────────────┬────────────────────────────────────┘   │
+│                                   │                                         │
+│                                   │ has many                                │
+│                                   ▼                                         │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                       CONVERSATIONS                                  │   │
+│  │  conversationId: uuid                                               │   │
+│  │  sessionId: uuid (FK)                                               │   │
+│  │  title: string                                                      │   │
+│  │  createdAt: timestamp                                               │   │
+│  └────────────────────────────────┬────────────────────────────────────┘   │
+│                                   │                                         │
+│                                   │ has many                                │
+│                                   ▼                                         │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         MESSAGES                                     │   │
+│  │  messageId: uuid                                                    │   │
+│  │  conversationId: uuid (FK)                                          │   │
+│  │  role: &#39;user&#39; | &#39;assistant&#39; | &#39;system&#39;                              │   │
+│  │  content: text                                                      │   │
+│  │  createdAt: timestamp                                               │   │
+│  └────────────────────────────────┬────────────────────────────────────┘   │
+│                                   │                                         │
+│                                   │ has many                                │
+│                                   ▼                                         │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                           STEPS                                      │   │
+│  │  stepId: uuid                                                       │   │
+│  │  sessionId: uuid (FK)                                               │   │
+│  │  stepOrder: integer                                                 │   │
+│  │  stepType: StepType                                                 │   │
+│  │  input: jsonb                                                       │   │
+│  │  output: jsonb                                                      │   │
+│  │  modelUsed: string                                                  │   │
+│  │  tokensUsed: integer                                                │   │
+│  │  costCents: decimal                                                 │   │
+│  │  confidence: decimal                                                │   │
+│  │  startedAt: timestamp                                               │   │
+│  │  completedAt: timestamp                                             │   │
+│  └────────────────────────────────┬────────────────────────────────────┘   │
+│                                   │                                         │
+│                                   │ has many                                │
+│                                   ▼                                         │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                         ARTIFACTS                                    │   │
+│  │  artifactId: uuid                                                   │   │
+│  │  stepId: uuid (FK)                                                  │   │
+│  │  type: &#39;code&#39; | &#39;diagram&#39; | &#39;document&#39; | &#39;data&#39;                     │   │
+│  │  filename: string                                                   │   │
+│  │  mimeType: string                                                   │   │
+│  │  s3Key: string                                                      │   │
+│  │  sizeBytes: integer                                                 │   │
+│  │  createdAt: timestamp                                               │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="collaboration-features">5. Collaboration Features</h2>
+<h3 id="real-time-collaboration">5.1 Real-Time Collaboration</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                      REAL-TIME COLLABORATION                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│                    ┌─────────────────────────────┐                          │
+│                    │      Think Tank Session      │                          │
+│                    │   &quot;Architecture Design #42&quot;  │                          │
+│                    └──────────────┬──────────────┘                          │
+│                                   │                                         │
+│              ┌────────────────────┼────────────────────┐                    │
+│              │                    │                    │                    │
+│              ▼                    ▼                    ▼                    │
+│      ┌─────────────┐      ┌─────────────┐      ┌─────────────┐             │
+│      │   User A    │      │   User B    │      │   User C    │             │
+│      │  (Owner)    │      │  (Editor)   │      │  (Viewer)   │             │
+│      └──────┬──────┘      └──────┬──────┘      └──────┬──────┘             │
+│             │                    │                    │                     │
+│             │                    │                    │                     │
+│      ┌──────▼────────────────────▼────────────────────▼──────┐             │
+│      │                  WebSocket Connection                  │             │
+│      │             (Real-time event streaming)               │             │
+│      └───────────────────────────┬───────────────────────────┘             │
+│                                  │                                          │
+│                                  ▼                                          │
+│      ┌───────────────────────────────────────────────────────┐             │
+│      │                 Event Types                            │             │
+│      │                                                        │             │
+│      │  • step.started      - A new step is executing        │             │
+│      │  • step.progress     - Step progress update           │             │
+│      │  • step.completed    - Step finished with result      │             │
+│      │  • message.added     - New message in conversation    │             │
+│      │  • cursor.moved      - User cursor position           │             │
+│      │  • user.joined       - New collaborator joined        │             │
+│      │  • user.left         - Collaborator left              │             │
+│      │  • artifact.created  - New artifact generated         │             │
+│      │  • session.status    - Session state changed          │             │
+│      └───────────────────────────────────────────────────────┘             │
+│                                                                             │
+│                                                                             │
+│  COLLABORATION ROLES:                                                       │
+│  ────────────────────                                                       │
+│                                                                             │
+│  ┌────────────┬────────────────────────────────────────────────────────┐   │
+│  │   Role     │   Permissions                                          │   │
+│  ├────────────┼────────────────────────────────────────────────────────┤   │
+│  │   Owner    │   Full control, manage collaborators, delete session  │   │
+│  │   Editor   │   Add messages, trigger steps, view all content       │   │
+│  │   Viewer   │   Read-only access to session and results             │   │
+│  │   Commenter│   View + add comments, no step triggering             │   │
+│  └────────────┴────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="domain-modes">6. Domain Modes</h2>
+<h3 id="specialized-reasoning-modes">6.1 Specialized Reasoning Modes</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                         DOMAIN MODES                                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Think Tank adapts its reasoning approach based on problem domain:          │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  🔬 RESEARCH MODE                                                   │   │
+│  │  ──────────────                                                     │   │
+│  │  Best for: Academic research, literature review, fact-finding       │   │
+│  │  Models: Perplexity Sonar, Claude (deep_research mode)              │   │
+│  │  Features:                                                          │   │
+│  │  • Source citation                                                  │   │
+│  │  • Cross-reference verification                                     │   │
+│  │  • Comprehensive literature synthesis                               │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  💻 ENGINEERING MODE                                                │   │
+│  │  ────────────────                                                   │   │
+│  │  Best for: System design, architecture, technical problems          │   │
+│  │  Models: Claude, GPT-4o, DeepSeek (code mode)                       │   │
+│  │  Features:                                                          │   │
+│  │  • Code generation as artifacts                                     │   │
+│  │  • Architecture diagrams                                            │   │
+│  │  • Technical trade-off analysis                                     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  🧮 ANALYTICAL MODE                                                 │   │
+│  │  ───────────────                                                    │   │
+│  │  Best for: Data analysis, math, statistics, quantitative problems   │   │
+│  │  Models: o1, Claude (thinking mode), DeepSeek R1                    │   │
+│  │  Features:                                                          │   │
+│  │  • Step-by-step mathematical reasoning                              │   │
+│  │  • Statistical analysis                                             │   │
+│  │  • Proof verification                                               │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  🎨 CREATIVE MODE                                                   │   │
+│  │  ─────────────                                                      │   │
+│  │  Best for: Writing, brainstorming, ideation, design                 │   │
+│  │  Models: Claude, GPT-4o (creative mode, high temperature)           │   │
+│  │  Features:                                                          │   │
+│  │  • Multiple creative alternatives                                   │   │
+│  │  • Iterative refinement                                             │   │
+│  │  • Style adaptation                                                 │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  ⚖️ LEGAL MODE                                                      │   │
+│  │  ──────────                                                         │   │
+│  │  Best for: Contract analysis, compliance, legal research            │   │
+│  │  Models: Claude (precise mode), GPT-4o                              │   │
+│  │  Features:                                                          │   │
+│  │  • Citation of legal precedents                                     │   │
+│  │  • Risk assessment                                                  │   │
+│  │  • Compliance checking                                              │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  🏥 MEDICAL MODE (HIPAA Compliant)                                  │   │
+│  │  ─────────────────────────────                                      │   │
+│  │  Best for: Clinical analysis, medical research (non-diagnostic)     │   │
+│  │  Models: Claude (precise mode), approved medical models             │   │
+│  │  Features:                                                          │   │
+│  │  • PHI sanitization                                                 │   │
+│  │  • Medical literature citation                                      │   │
+│  │  • Disclaimer generation                                            │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  📊 BUSINESS MODE                                                   │   │
+│  │  ─────────────                                                      │   │
+│  │  Best for: Strategy, planning, market analysis, business problems   │   │
+│  │  Models: GPT-4o, Claude, Gemini                                     │   │
+│  │  Features:                                                          │   │
+│  │  • Framework application (SWOT, Porter&#39;s, etc.)                     │   │
+│  │  • Financial modeling                                               │   │
+│  │  • Competitive analysis                                             │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  🎯 GENERAL MODE                                                    │   │
+│  │  ────────────                                                       │   │
+│  │  Best for: Mixed problems, general questions                        │   │
+│  │  Models: Automatically selected based on sub-problem analysis       │   │
+│  │  Features:                                                          │   │
+│  │  • Dynamic mode switching per step                                  │   │
+│  │  • Balanced approach                                                │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="quality-confidence">7. Quality &amp; Confidence</h2>
+<h3 id="confidence-scoring-system">7.1 Confidence Scoring System</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                      CONFIDENCE SCORING SYSTEM                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Every step and the final solution receives a confidence score (0-1):       │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  CONFIDENCE FACTORS                                                  │   │
+│  │                                                                      │   │
+│  │  ┌────────────────────┬──────────────────────────────────────────┐  │   │
+│  │  │  Factor            │  Contribution                             │  │   │
+│  │  ├────────────────────┼──────────────────────────────────────────┤  │   │
+│  │  │  Model Agreement   │  +0.2 if parallel models agree            │  │   │
+│  │  │  Reasoning Depth   │  +0.15 for thorough chain-of-thought     │  │   │
+│  │  │  Source Quality    │  +0.15 for cited/verified sources        │  │   │
+│  │  │  Task Complexity   │  -0.1 for very complex sub-problems      │  │   │
+│  │  │  Model Confidence  │  +0.1 for high model self-confidence     │  │   │
+│  │  │  Consistency       │  +0.1 for consistency with prior steps   │  │   │
+│  │  │  Verification      │  +0.2 if verified by second model        │  │   │
+│  │  └────────────────────┴──────────────────────────────────────────┘  │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  CONFIDENCE LEVELS                                                   │   │
+│  │                                                                      │   │
+│  │   0.9 - 1.0  │████████████████████│  VERY HIGH  - Strong consensus  │   │
+│  │   0.7 - 0.9  │████████████████    │  HIGH       - Reliable          │   │
+│  │   0.5 - 0.7  │████████████        │  MODERATE   - Review recommended│   │
+│  │   0.3 - 0.5  │████████            │  LOW        - Uncertain         │   │
+│  │   0.0 - 0.3  │████                │  VERY LOW   - Needs verification│   │
+│  │                                                                      │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  FINAL SOLUTION CONFIDENCE                                          │   │
+│  │                                                                      │   │
+│  │  Formula:                                                            │   │
+│  │  ─────────                                                           │   │
+│  │  final_confidence = weighted_avg(step_confidences) × synthesis_factor│   │
+│  │                                                                      │   │
+│  │  Where:                                                              │   │
+│  │  • step weights based on importance/complexity                      │   │
+│  │  • synthesis_factor accounts for integration quality                │   │
+│  │                                                                      │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="user-interface">8. User Interface</h2>
+<h3 id="think-tank-ui-layout">8.1 Think Tank UI Layout</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                       THINK TANK USER INTERFACE                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  ┌──────────┐ Think Tank                      [New] [Share] [Export]│   │
+│  │  │   Logo   │ Problem: &quot;Design microservices architecture...&quot;       │   │
+│  │  └──────────┘ Mode: Engineering │ Confidence: 0.88 │ Cost: $0.18   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+│  ┌─────────────┬───────────────────────────────────────┬───────────────┐   │
+│  │             │                                       │               │   │
+│  │  SESSIONS   │          MAIN CONVERSATION            │    DETAILS    │   │
+│  │             │                                       │               │   │
+│  │  ▼ Today    │  ┌─────────────────────────────────┐  │  STEPS        │   │
+│  │  │ Arch #42 │  │ 👤 You                          │  │  ────────     │   │
+│  │  │ Data Q   │  │ Design a scalable microservices │  │  ✅ Step 1    │   │
+│  │             │  │ architecture for an e-commerce  │  │     0.92      │   │
+│  │  ▼ Yesterday│  │ platform that handles 10M...    │  │  ✅ Step 2    │   │
+│  │  │ ML Model │  └─────────────────────────────────┘  │     0.89      │   │
+│  │  │ Security │                                       │  ✅ Step 3    │   │
+│  │             │  ┌─────────────────────────────────┐  │     0.91      │   │
+│  │  ▼ Last Week│  │ 🤖 Think Tank                   │  │  ⏳ Step 4    │   │
+│  │  │ API Des  │  │                                 │  │     Running   │   │
+│  │  │ Budget   │  │ I&#39;ll approach this problem by:  │  │  ⬜ Step 5    │   │
+│  │             │  │                                 │  │  ⬜ Step 6    │   │
+│  │             │  │ 1. Analyzing requirements...    │  │               │   │
+│  │             │  │ 2. Identifying services...      │  │  ────────────│   │
+│  │  [+ New]    │  │ 3. Designing data flow...       │  │  ARTIFACTS    │   │
+│  │             │  │                                 │  │  ────────     │   │
+│  │             │  │ ┌─────────────────────────────┐ │  │  📄 arch.md  │   │
+│  │             │  │ │ Step 4 Progress: 65%       │ │  │  📊 diagram  │   │
+│  │             │  │ │ █████████░░░░░             │ │  │  💻 docker   │   │
+│  │             │  │ │ Analyzing data patterns... │ │  │               │   │
+│  │             │  │ └─────────────────────────────┘ │  │  ────────────│   │
+│  │             │  │                                 │  │  MODELS USED  │   │
+│  │             │  └─────────────────────────────────┘  │  ────────     │   │
+│  │             │                                       │  Claude 3.5   │   │
+│  │             │  ┌─────────────────────────────────┐  │  GPT-4o       │   │
+│  │             │  │ 💬 Ask a follow-up question... │  │  o1           │   │
+│  │             │  └─────────────────────────────────┘  │               │   │
+│  │             │                                       │               │   │
+│  └─────────────┴───────────────────────────────────────┴───────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<div data-align="center">
+<p><strong>Think Tank Platform Architecture v3.2.0</strong></p>
+<p><em>Advanced AI reasoning for complex problems</em></p>
+<hr />
+<p>© 2024 RADIANT. All Rights Reserved.</p>
+</div>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

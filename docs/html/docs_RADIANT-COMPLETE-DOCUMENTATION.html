@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIANT COMPLETE DOCUMENTATION - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RADIANT COMPLETE DOCUMENTATION</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/RADIANT-COMPLETE-DOCUMENTATION.md</div>
+  </div>
+  
+  <h1 id="radiant-platform-v4.18.2">RADIANT Platform v4.18.2</h1>
+<h2 id="complete-documentation">Complete Documentation</h2>
+<hr />
+<p><strong>Multi-Tenant AWS SaaS Platform for AI Model Access &amp; Orchestration</strong></p>
+<p>Version: 4.18.2 | Last Updated: December 28, 2024</p>
+<hr />
+<h1 id="table-of-contents">Table of Contents</h1>
+<ol type="1">
+<li><a href="#1-platform-overview">Platform Overview</a></li>
+<li><a href="#2-architecture">Architecture</a></li>
+<li><a href="#3-deployment-guide">Deployment Guide</a></li>
+<li><a href="#4-administrator-guide">Administrator Guide</a></li>
+<li><a href="#5-think-tank-user-guide">Think Tank User Guide</a></li>
+<li><a href="#6-api-reference">API Reference</a></li>
+<li><a href="#7-changelog">Changelog</a></li>
+</ol>
+<hr />
+<h1 id="platform-overview">1. Platform Overview</h1>
+<h2 id="what-is-radiant">1.1 What is RADIANT?</h2>
+<p>RADIANT is a multi-tenant AWS SaaS platform providing unified access to 106+ AI models through:</p>
+<ul>
+<li><strong>50 External Provider Models</strong>: OpenAI, Anthropic, Google, xAI, DeepSeek, and more</li>
+<li><strong>56 Self-Hosted Models</strong>: Running on AWS SageMaker for cost control and privacy</li>
+<li><strong>Intelligent Routing</strong>: Brain router for optimal model selection</li>
+<li><strong>Neural Engine</strong>: Personalization learning from user interactions</li>
+</ul>
+<h2 id="components">1.2 Components</h2>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 33%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Location</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Swift Deployer App</strong></td>
+<td><code>apps/swift-deployer/</code></td>
+<td>macOS app that deploys infrastructure</td>
+</tr>
+<tr>
+<td><strong>AWS Infrastructure</strong></td>
+<td><code>packages/infrastructure/</code></td>
+<td>CDK stacks, Lambdas, databases</td>
+</tr>
+<tr>
+<td><strong>Admin Dashboard</strong></td>
+<td><code>apps/admin-dashboard/</code></td>
+<td>Next.js web admin interface</td>
+</tr>
+<tr>
+<td><strong>Think Tank</strong></td>
+<td>Consumer product</td>
+<td>AI chat interface for end users</td>
+</tr>
+</tbody>
+</table>
+<h2 id="technology-stack">1.3 Technology Stack</h2>
+<ul>
+<li><strong>Swift App</strong>: SwiftUI, macOS 13.0+, Swift 5.9+, Xcode 15+, SQLCipher</li>
+<li><strong>Infrastructure</strong>: AWS CDK (TypeScript), Aurora PostgreSQL, Lambda, API Gateway</li>
+<li><strong>Dashboard</strong>: Next.js 14, TypeScript, Tailwind CSS</li>
+<li><strong>AI Integration</strong>: 106+ models, LiteLLM proxy</li>
+</ul>
+<hr />
+<h1 id="architecture">2. Architecture</h1>
+<h2 id="high-level-architecture">2.1 High-Level Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│                         RADIANT Platform                             │
+├─────────────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                  │
+│  │  Think Tank │  │    Admin    │  │   Swift     │                  │
+│  │  (Consumer) │  │  Dashboard  │  │  Deployer   │                  │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘                  │
+│         │                │                │                          │
+│  ┌──────┴────────────────┴────────────────┴──────┐                  │
+│  │              API Gateway + Lambda              │                  │
+│  └──────────────────────┬────────────────────────┘                  │
+│                         │                                            │
+│  ┌──────────────────────┴────────────────────────┐                  │
+│  │              AGI Orchestration                 │                  │
+│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐         │                  │
+│  │  │  Brain  │ │ Neural  │ │ Domain  │         │                  │
+│  │  │ Router  │ │ Engine  │ │Taxonomy │         │                  │
+│  │  └─────────┘ └─────────┘ └─────────┘         │                  │
+│  └──────────────────────┬────────────────────────┘                  │
+│                         │                                            │
+│  ┌──────────────────────┴────────────────────────┐                  │
+│  │              AI Model Layer                    │                  │
+│  │  ┌─────────────────┐ ┌─────────────────┐      │                  │
+│  │  │ External APIs   │ │ Self-Hosted     │      │                  │
+│  │  │ (50 models)     │ │ (56 models)     │      │                  │
+│  │  └─────────────────┘ └─────────────────┘      │                  │
+│  └───────────────────────────────────────────────┘                  │
+│                                                                      │
+│  ┌───────────────────────────────────────────────┐                  │
+│  │              Data Layer                        │                  │
+│  │  Aurora PostgreSQL │ S3 │ ElastiCache         │                  │
+│  └───────────────────────────────────────────────┘                  │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<h2 id="cdk-stacks">2.2 CDK Stacks</h2>
+<table>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>NetworkStack</strong></td>
+<td>VPC, subnets, security groups</td>
+</tr>
+<tr>
+<td><strong>DatabaseStack</strong></td>
+<td>Aurora PostgreSQL, secrets</td>
+</tr>
+<tr>
+<td><strong>CacheStack</strong></td>
+<td>ElastiCache Redis</td>
+</tr>
+<tr>
+<td><strong>StorageStack</strong></td>
+<td>S3 buckets, CloudFront</td>
+</tr>
+<tr>
+<td><strong>AuthStack</strong></td>
+<td>Cognito, JWT validation</td>
+</tr>
+<tr>
+<td><strong>APIStack</strong></td>
+<td>API Gateway, Lambda functions</td>
+</tr>
+<tr>
+<td><strong>AIStack</strong></td>
+<td>SageMaker endpoints, LiteLLM</td>
+</tr>
+<tr>
+<td><strong>MonitoringStack</strong></td>
+<td>CloudWatch, alarms, dashboards</td>
+</tr>
+</tbody>
+</table>
+<h2 id="database-schema">2.3 Database Schema</h2>
+<p>Key tables: - <code>tenants</code> - Multi-tenant organization data - <code>users</code> - User accounts with tenant association - <code>ai_models</code> - Model registry with capabilities - <code>ai_providers</code> - External API provider configs - <code>usage_logs</code> - Request/token tracking - <code>billing_*</code> - Subscriptions, credits, transactions - <code>delight_*</code> - Personality system data</p>
+<hr />
+<h1 id="deployment-guide">3. Deployment Guide</h1>
+<h2 id="prerequisites">3.1 Prerequisites</h2>
+<h3 id="aws-account-setup">AWS Account Setup</h3>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Action</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AWS Account</td>
+<td>Create or use existing</td>
+<td>Account ID available</td>
+</tr>
+<tr>
+<td>IAM User</td>
+<td>Create with AdministratorAccess</td>
+<td>Access keys configured</td>
+</tr>
+<tr>
+<td>AWS CLI</td>
+<td>Install and configure</td>
+<td><code>aws sts get-caller-identity</code></td>
+</tr>
+<tr>
+<td>Route 53 Domain (optional)</td>
+<td>Register domain</td>
+<td>Domain in hosted zone</td>
+</tr>
+</tbody>
+</table>
+<h3 id="development-environment">Development Environment</h3>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Version</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node.js</td>
+<td>20.x LTS</td>
+<td><code>node --version</code></td>
+</tr>
+<tr>
+<td>pnpm</td>
+<td>8.x+</td>
+<td><code>pnpm --version</code></td>
+</tr>
+<tr>
+<td>AWS CDK CLI</td>
+<td>2.x</td>
+<td><code>cdk --version</code></td>
+</tr>
+<tr>
+<td>Xcode</td>
+<td>15.x+</td>
+<td><code>xcode-select -p</code></td>
+</tr>
+<tr>
+<td>Swift</td>
+<td>5.9+</td>
+<td><code>swift --version</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="quick-start">3.2 Quick Start</h2>
+<h3 id="automated-deployment">Automated Deployment</h3>
+<pre class="bash"><code># Deploy to dev environment
+./scripts/deploy.sh --environment dev
+
+# Deploy to staging
+./scripts/deploy.sh --environment staging
+
+# Deploy to production
+./scripts/deploy.sh --environment prod</code></pre>
+<blockquote>
+<p><strong>Note:</strong> RADIANT uses a unified deployment model. All features are available in every deployment. Licensing restrictions are handled at the application level, not infrastructure level.</p>
+</blockquote>
+<h3 id="verify-deployment">Verify Deployment</h3>
+<pre class="bash"><code>./scripts/verify-deployment.sh --environment dev</code></pre>
+<h2 id="manual-deployment">3.3 Manual Deployment</h2>
+<h3 id="step-1-install-dependencies">Step 1: Install Dependencies</h3>
+<pre class="bash"><code>cd radiant
+pnpm install</code></pre>
+<h3 id="step-2-build-packages">Step 2: Build Packages</h3>
+<pre class="bash"><code># Shared types
+cd packages/shared &amp;&amp; npm run build
+
+# Lambda functions
+cd packages/infrastructure/lambda &amp;&amp; npm install &amp;&amp; npm run build
+
+# Admin dashboard
+cd apps/admin-dashboard &amp;&amp; npm install &amp;&amp; npm run build</code></pre>
+<h3 id="step-3-deploy-cdk-stacks">Step 3: Deploy CDK Stacks</h3>
+<pre class="bash"><code>cd packages/infrastructure
+
+# Bootstrap (first time only)
+cdk bootstrap aws://ACCOUNT_ID/REGION
+
+# Deploy all stacks
+cdk deploy --all --require-approval never</code></pre>
+<h2 id="swift-deployer-app">3.4 Swift Deployer App</h2>
+<p>The Swift Deployer provides a GUI for deployment:</p>
+<ol type="1">
+<li>Launch the app: <code>swift run</code> from <code>apps/swift-deployer/</code></li>
+<li>Configure AWS credentials</li>
+<li>Select environment (dev/staging/prod)</li>
+<li>Click Deploy</li>
+</ol>
+<p>Features: - AI Assistant for deployment guidance - Real-time deployment logs - Rollback support - Configuration management</p>
+<hr />
+<h1 id="administrator-guide">4. Administrator Guide</h1>
+<h2 id="administrator-roles">4.1 Administrator Roles</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Permissions</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Super Admin</strong></td>
+<td>Full access to all features</td>
+<td>Platform owner</td>
+</tr>
+<tr>
+<td><strong>Admin</strong></td>
+<td>Tenant management, billing, models</td>
+<td>Operations team</td>
+</tr>
+<tr>
+<td><strong>Operator</strong></td>
+<td>Read access, limited actions</td>
+<td>Support team</td>
+</tr>
+<tr>
+<td><strong>Auditor</strong></td>
+<td>Read-only access to logs</td>
+<td>Compliance team</td>
+</tr>
+</tbody>
+</table>
+<h2 id="dashboard-overview">4.2 Dashboard Overview</h2>
+<p>Access at: <code>https://admin.your-domain.com</code></p>
+<h3 id="main-sections">Main Sections</h3>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dashboard</strong></td>
+<td>System health, key metrics</td>
+</tr>
+<tr>
+<td><strong>Tenants</strong></td>
+<td>Manage organizations</td>
+</tr>
+<tr>
+<td><strong>Users</strong></td>
+<td>User accounts, permissions</td>
+</tr>
+<tr>
+<td><strong>Models</strong></td>
+<td>AI model configuration</td>
+</tr>
+<tr>
+<td><strong>Providers</strong></td>
+<td>External API providers</td>
+</tr>
+<tr>
+<td><strong>Billing</strong></td>
+<td>Subscriptions, credits</td>
+</tr>
+<tr>
+<td><strong>Orchestration</strong></td>
+<td>AGI settings, weights</td>
+</tr>
+<tr>
+<td><strong>Think Tank</strong></td>
+<td>Delight, domains, plans</td>
+</tr>
+<tr>
+<td><strong>Audit</strong></td>
+<td>Activity logs, compliance</td>
+</tr>
+</tbody>
+</table>
+<h2 id="tenant-management">4.3 Tenant Management</h2>
+<h3 id="creating-a-tenant">Creating a Tenant</h3>
+<ol type="1">
+<li>Navigate to <strong>Tenants → Create New</strong></li>
+<li>Enter organization details</li>
+<li>Configure limits and quotas</li>
+<li>Assign initial administrator</li>
+<li>Set billing plan</li>
+</ol>
+<h3 id="tenant-settings">Tenant Settings</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Name</td>
+<td>Organization display name</td>
+</tr>
+<tr>
+<td>Slug</td>
+<td>URL-friendly identifier</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>active, suspended, trial</td>
+</tr>
+<tr>
+<td>Plan</td>
+<td>Subscription tier</td>
+</tr>
+<tr>
+<td>Limits</td>
+<td>API calls, storage, users</td>
+</tr>
+</tbody>
+</table>
+<h2 id="ai-model-configuration">4.4 AI Model Configuration</h2>
+<h3 id="model-properties">Model Properties</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Provider</td>
+<td>OpenAI, Anthropic, etc.</td>
+</tr>
+<tr>
+<td>Model ID</td>
+<td>Provider’s model identifier</td>
+</tr>
+<tr>
+<td>Display Name</td>
+<td>User-facing name</td>
+</tr>
+<tr>
+<td>Capabilities</td>
+<td>text, vision, code, etc.</td>
+</tr>
+<tr>
+<td>Pricing</td>
+<td>Input/output token costs</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>enabled, disabled, beta</td>
+</tr>
+</tbody>
+</table>
+<h3 id="self-hosted-models">Self-Hosted Models</h3>
+<p>Configure SageMaker endpoints: 1. Navigate to <strong>Models → Self-Hosted</strong> 2. Add endpoint ARN 3. Configure scaling 4. Set health checks</p>
+<h2 id="billing-administration">4.5 Billing Administration</h2>
+<h3 id="subscription-plans">Subscription Plans</h3>
+<table>
+<thead>
+<tr>
+<th>Plan</th>
+<th>Credits/Month</th>
+<th>Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Free</td>
+<td>100</td>
+<td>Basic models</td>
+</tr>
+<tr>
+<td>Starter</td>
+<td>1,000</td>
+<td>All external models</td>
+</tr>
+<tr>
+<td>Pro</td>
+<td>10,000</td>
+<td>+ Self-hosted models</td>
+</tr>
+<tr>
+<td>Team</td>
+<td>50,000</td>
+<td>+ Collaboration</td>
+</tr>
+<tr>
+<td>Business</td>
+<td>200,000</td>
+<td>+ Priority support</td>
+</tr>
+</tbody>
+</table>
+<h3 id="credit-management">Credit Management</h3>
+<ul>
+<li>View credit balances</li>
+<li>Add bonus credits</li>
+<li>Set usage alerts</li>
+<li>Export billing reports</li>
+</ul>
+<h2 id="agi-orchestration-settings">4.6 AGI Orchestration Settings</h2>
+<h3 id="service-weights">Service Weights</h3>
+<p>Adjust influence of AGI components:</p>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Default Weight</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>consciousness</td>
+<td>0.8</td>
+<td>Self-awareness modeling</td>
+</tr>
+<tr>
+<td>metacognition</td>
+<td>0.7</td>
+<td>Learning from interactions</td>
+</tr>
+<tr>
+<td>moral_compass</td>
+<td>0.9</td>
+<td>Ethical guardrails</td>
+</tr>
+<tr>
+<td>domain_taxonomy</td>
+<td>0.8</td>
+<td>Domain expertise matching</td>
+</tr>
+<tr>
+<td>brain_router</td>
+<td>0.9</td>
+<td>Model selection</td>
+</tr>
+</tbody>
+</table>
+<h3 id="decision-weights">Decision Weights</h3>
+<table>
+<thead>
+<tr>
+<th>Weight</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>modelQualityWeight</td>
+<td>Prefer higher quality</td>
+</tr>
+<tr>
+<td>modelCostWeight</td>
+<td>Prefer lower cost</td>
+</tr>
+<tr>
+<td>modelLatencyWeight</td>
+<td>Prefer faster response</td>
+</tr>
+</tbody>
+</table>
+<h2 id="delight-system-administration">4.7 Delight System Administration</h2>
+<p>The Delight System provides personality and engagement features.</p>
+<h3 id="dashboard-overview-1">Dashboard Overview</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Messages Shown</td>
+<td>Total delight messages displayed</td>
+</tr>
+<tr>
+<td>Achievements Unlocked</td>
+<td>Total achievements earned</td>
+</tr>
+<tr>
+<td>Easter Eggs Found</td>
+<td>Hidden features discovered</td>
+</tr>
+<tr>
+<td>Active Users</td>
+<td>Users with Delight enabled</td>
+</tr>
+</tbody>
+</table>
+<h3 id="managing-categories">Managing Categories</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Domain Loading</td>
+<td>Messages while loading expertise</td>
+</tr>
+<tr>
+<td>Time Awareness</td>
+<td>Time-of-day messages</td>
+</tr>
+<tr>
+<td>Model Dynamics</td>
+<td>AI consensus feedback</td>
+</tr>
+<tr>
+<td>Achievements</td>
+<td>Milestone celebrations</td>
+</tr>
+<tr>
+<td>Wellbeing</td>
+<td>Break reminders</td>
+</tr>
+<tr>
+<td>Easter Eggs</td>
+<td>Hidden features</td>
+</tr>
+<tr>
+<td>Sounds</td>
+<td>Audio feedback</td>
+</tr>
+</tbody>
+</table>
+<h3 id="statistics-dashboard">Statistics Dashboard</h3>
+<p>Access at <strong>Think Tank → Delight → View Statistics</strong>:</p>
+<ul>
+<li>Weekly trends (12-week history)</li>
+<li>Top messages by engagement</li>
+<li>Achievement unlock rates</li>
+<li>Easter egg discovery metrics</li>
+<li>User engagement leaderboard</li>
+</ul>
+<h3 id="api-endpoints">API Endpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/api/admin/delight/dashboard</code></td>
+<td>GET</td>
+<td>Dashboard data</td>
+</tr>
+<tr>
+<td><code>/api/admin/delight/statistics</code></td>
+<td>GET</td>
+<td>Detailed statistics</td>
+</tr>
+<tr>
+<td><code>/api/admin/delight/categories/:id</code></td>
+<td>PATCH</td>
+<td>Toggle category</td>
+</tr>
+<tr>
+<td><code>/api/admin/delight/messages</code></td>
+<td>POST</td>
+<td>Create message</td>
+</tr>
+</tbody>
+</table>
+<h2 id="localization">4.8 Localization</h2>
+<h3 id="supported-languages">Supported Languages</h3>
+<p>Configure in <strong>Settings → Localization</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Code</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>English</td>
+<td>en</td>
+<td>Default</td>
+</tr>
+<tr>
+<td>Spanish</td>
+<td>es</td>
+<td>Available</td>
+</tr>
+<tr>
+<td>French</td>
+<td>fr</td>
+<td>Available</td>
+</tr>
+<tr>
+<td>German</td>
+<td>de</td>
+<td>Available</td>
+</tr>
+<tr>
+<td>Japanese</td>
+<td>ja</td>
+<td>Available</td>
+</tr>
+</tbody>
+</table>
+<h3 id="translation-management">Translation Management</h3>
+<ol type="1">
+<li>Navigate to <strong>Localization → Translations</strong></li>
+<li>Select namespace (common, chat, settings)</li>
+<li>Edit translations per language</li>
+<li>Publish changes</li>
+</ol>
+<hr />
+<h1 id="think-tank-user-guide">5. Think Tank User Guide</h1>
+<h2 id="getting-started">5.1 Getting Started</h2>
+<h3 id="creating-your-account">Creating Your Account</h3>
+<ol type="1">
+<li>Visit <strong>thinktank.ai</strong></li>
+<li>Click <strong>Get Started Free</strong></li>
+<li>Sign up with email or social login</li>
+<li>Verify your email</li>
+<li>Complete your profile</li>
+</ol>
+<h3 id="your-first-chat">Your First Chat</h3>
+<ol type="1">
+<li>Click <strong>New Chat</strong> or press <code>Ctrl+N</code></li>
+<li>Type your question</li>
+<li>Press <strong>Enter</strong> or click <strong>Send</strong></li>
+<li>Watch AI respond in real-time</li>
+</ol>
+<h2 id="choosing-models">5.2 Choosing Models</h2>
+<h3 id="available-models">Available Models</h3>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Top Models</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenAI</td>
+<td>GPT-4o, GPT-4 Turbo, o1</td>
+</tr>
+<tr>
+<td>Anthropic</td>
+<td>Claude 3.5 Sonnet, Claude 3 Opus</td>
+</tr>
+<tr>
+<td>Google</td>
+<td>Gemini 1.5 Pro, Gemini Ultra</td>
+</tr>
+<tr>
+<td>xAI</td>
+<td>Grok-2</td>
+</tr>
+<tr>
+<td>Meta</td>
+<td>Llama 3.1 405B</td>
+</tr>
+</tbody>
+</table>
+<h3 id="auto-mode">Auto Mode</h3>
+<p>Enable <strong>Auto Mode</strong> to let the Brain Router select the optimal model based on: - Query complexity - Domain expertise needed - Cost optimization - Response speed requirements</p>
+<h2 id="focus-modes-personas">5.3 Focus Modes &amp; Personas</h2>
+<h3 id="focus-modes">Focus Modes</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>General</td>
+<td>Everyday questions</td>
+</tr>
+<tr>
+<td>Coding</td>
+<td>Programming help</td>
+</tr>
+<tr>
+<td>Creative</td>
+<td>Writing, brainstorming</td>
+</tr>
+<tr>
+<td>Research</td>
+<td>Deep analysis</td>
+</tr>
+<tr>
+<td>Analysis</td>
+<td>Data interpretation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="personas">Personas</h3>
+<p>Create custom AI personalities: 1. Go to <strong>Personas → Create</strong> 2. Set name and description 3. Define behavior instructions 4. Save and activate</p>
+<h2 id="canvas-artifacts">5.4 Canvas &amp; Artifacts</h2>
+<h3 id="canvas-features">Canvas Features</h3>
+<ul>
+<li>Rich text editing</li>
+<li>Code blocks with syntax highlighting</li>
+<li>Image generation and editing</li>
+<li>Diagram creation</li>
+<li>Export to PDF, Markdown, Word</li>
+</ul>
+<h3 id="artifact-types">Artifact Types</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Document</td>
+<td>Long-form text</td>
+</tr>
+<tr>
+<td>Code</td>
+<td>Executable snippets</td>
+</tr>
+<tr>
+<td>Image</td>
+<td>AI-generated visuals</td>
+</tr>
+<tr>
+<td>Diagram</td>
+<td>Flowcharts, diagrams</td>
+</tr>
+<tr>
+<td>Table</td>
+<td>Structured data</td>
+</tr>
+</tbody>
+</table>
+<h2 id="collaboration">5.5 Collaboration</h2>
+<h3 id="sharing-chats">Sharing Chats</h3>
+<ol type="1">
+<li>Click <strong>Share</strong> on any chat</li>
+<li>Choose visibility (link, team, public)</li>
+<li>Set permissions (view, comment, edit)</li>
+<li>Copy share link</li>
+</ol>
+<h3 id="team-features">Team Features</h3>
+<ul>
+<li>Shared workspaces</li>
+<li>Real-time collaboration</li>
+<li>Comment threads</li>
+<li>Version history</li>
+</ul>
+<h2 id="credits-billing">5.6 Credits &amp; Billing</h2>
+<h3 id="understanding-credits">Understanding Credits</h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Credits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPT-4o message</td>
+<td>1-5</td>
+</tr>
+<tr>
+<td>Claude 3 Opus message</td>
+<td>2-8</td>
+</tr>
+<tr>
+<td>Image generation</td>
+<td>5-20</td>
+</tr>
+<tr>
+<td>Voice transcription</td>
+<td>1-3</td>
+</tr>
+</tbody>
+</table>
+<h3 id="plans">Plans</h3>
+<table>
+<thead>
+<tr>
+<th>Plan</th>
+<th>Price</th>
+<th>Credits/Month</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Free</td>
+<td>$0</td>
+<td>100</td>
+</tr>
+<tr>
+<td>Starter</td>
+<td>$29</td>
+<td>1,000</td>
+</tr>
+<tr>
+<td>Pro</td>
+<td>$99</td>
+<td>10,000</td>
+</tr>
+<tr>
+<td>Team</td>
+<td>$49/user</td>
+<td>5,000/user</td>
+</tr>
+</tbody>
+</table>
+<h2 id="delight-system">5.7 Delight System</h2>
+<p>Think Tank includes a personality system for engaging interactions.</p>
+<h3 id="what-is-delight">What is Delight?</h3>
+<p>Contextual, friendly messages during conversations: - <strong>Domain Loading</strong>: “Consulting the fundamental forces…” for physics - <strong>Time Awareness</strong>: “Burning the midnight tokens” late at night - <strong>Model Dynamics</strong>: “Consensus forming…” when models agree - <strong>Wellbeing</strong>: “Time for a break?” after long sessions</p>
+<h3 id="personality-modes">Personality Modes</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Professional</td>
+<td>Minimal feedback</td>
+</tr>
+<tr>
+<td>Subtle</td>
+<td>Light personality</td>
+</tr>
+<tr>
+<td>Expressive</td>
+<td>Full personality</td>
+</tr>
+<tr>
+<td>Playful</td>
+<td>Maximum fun</td>
+</tr>
+</tbody>
+</table>
+<h3 id="achievements">Achievements</h3>
+<table>
+<thead>
+<tr>
+<th>Achievement</th>
+<th>Unlock</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🧭 Domain Explorer</td>
+<td>10+ domains</td>
+</tr>
+<tr>
+<td>🔥 Week Warrior</td>
+<td>7-day streak</td>
+</tr>
+<tr>
+<td>👑 Renaissance Mind</td>
+<td>50+ domains</td>
+</tr>
+<tr>
+<td>⚡ Monthly Mind</td>
+<td>30-day streak</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sound-themes">Sound Themes</h3>
+<table>
+<thead>
+<tr>
+<th>Theme</th>
+<th>Style</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Default</td>
+<td>Pleasant chimes</td>
+</tr>
+<tr>
+<td>Mission Control</td>
+<td>NASA beeps</td>
+</tr>
+<tr>
+<td>Library</td>
+<td>Book sounds</td>
+</tr>
+<tr>
+<td>Workshop</td>
+<td>Tool clicks</td>
+</tr>
+</tbody>
+</table>
+<h3 id="customization">Customization</h3>
+<p>Toggle in <strong>Settings → Delight</strong>: - Domain messages - Model personality - Time awareness - Achievements - Wellbeing nudges - Easter eggs - Sound effects</p>
+<h2 id="keyboard-shortcuts">5.8 Keyboard Shortcuts</h2>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Ctrl+N</code></td>
+<td>New chat</td>
+</tr>
+<tr>
+<td><code>Ctrl+/</code></td>
+<td>Focus input</td>
+</tr>
+<tr>
+<td><code>Ctrl+Enter</code></td>
+<td>Send message</td>
+</tr>
+<tr>
+<td><code>Ctrl+K</code></td>
+<td>Command palette</td>
+</tr>
+<tr>
+<td><code>Ctrl+B</code></td>
+<td>Toggle sidebar</td>
+</tr>
+<tr>
+<td><code>Esc</code></td>
+<td>Stop generation</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="api-reference">6. API Reference</h1>
+<h2 id="authentication">6.1 Authentication</h2>
+<p>All API requests require authentication via JWT token:</p>
+<pre><code>Authorization: Bearer &lt;token&gt;</code></pre>
+<h3 id="obtaining-tokens">Obtaining Tokens</h3>
+<pre class="bash"><code>POST /api/auth/login
+Content-Type: application/json
+
+{
+  &quot;email&quot;: &quot;user@example.com&quot;,
+  &quot;password&quot;: &quot;password&quot;
+}</code></pre>
+<p>Response:</p>
+<pre class="json"><code>{
+  &quot;access_token&quot;: &quot;eyJ...&quot;,
+  &quot;refresh_token&quot;: &quot;eyJ...&quot;,
+  &quot;expires_in&quot;: 3600
+}</code></pre>
+<h2 id="core-endpoints">6.2 Core Endpoints</h2>
+<h3 id="chat-completions">Chat Completions</h3>
+<pre class="bash"><code>POST /api/v2/chat/completions
+Content-Type: application/json
+
+{
+  &quot;model&quot;: &quot;gpt-4o&quot;,
+  &quot;messages&quot;: [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello!&quot;}
+  ],
+  &quot;stream&quot;: true
+}</code></pre>
+<h3 id="models">Models</h3>
+<pre class="bash"><code>GET /api/v2/models</code></pre>
+<p>Response:</p>
+<pre class="json"><code>{
+  &quot;models&quot;: [
+    {
+      &quot;id&quot;: &quot;gpt-4o&quot;,
+      &quot;provider&quot;: &quot;openai&quot;,
+      &quot;capabilities&quot;: [&quot;text&quot;, &quot;vision&quot;],
+      &quot;pricing&quot;: {
+        &quot;input&quot;: 0.005,
+        &quot;output&quot;: 0.015
+      }
+    }
+  ]
+}</code></pre>
+<h2 id="admin-endpoints">6.3 Admin Endpoints</h2>
+<h3 id="tenants">Tenants</h3>
+<pre class="bash"><code>GET /api/admin/tenants
+POST /api/admin/tenants
+GET /api/admin/tenants/:id
+PUT /api/admin/tenants/:id
+DELETE /api/admin/tenants/:id</code></pre>
+<h3 id="users">Users</h3>
+<pre class="bash"><code>GET /api/admin/users
+POST /api/admin/users
+GET /api/admin/users/:id
+PUT /api/admin/users/:id</code></pre>
+<h3 id="billing">Billing</h3>
+<pre class="bash"><code>GET /api/admin/billing/subscriptions
+GET /api/admin/billing/transactions
+POST /api/admin/billing/credits/add</code></pre>
+<h2 id="think-tank-endpoints">6.4 Think Tank Endpoints</h2>
+<h3 id="brain-plans">Brain Plans</h3>
+<pre class="bash"><code>POST /api/thinktank/brain-plan/generate
+GET /api/thinktank/brain-plan/:planId
+POST /api/thinktank/brain-plan/:planId/execute</code></pre>
+<h3 id="domain-taxonomy">Domain Taxonomy</h3>
+<pre class="bash"><code>GET /api/v2/domain-taxonomy
+GET /api/v2/domain-taxonomy/fields
+POST /api/v2/domain-taxonomy/detect</code></pre>
+<h3 id="delight">Delight</h3>
+<pre class="bash"><code>GET /api/admin/delight/dashboard
+GET /api/admin/delight/statistics
+PATCH /api/admin/delight/categories/:id
+POST /api/admin/delight/messages</code></pre>
+<h2 id="error-codes">6.5 Error Codes</h2>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>HTTP</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RADIANT_AUTH_001</td>
+<td>401</td>
+<td>Invalid token</td>
+</tr>
+<tr>
+<td>RADIANT_AUTH_002</td>
+<td>401</td>
+<td>Token expired</td>
+</tr>
+<tr>
+<td>RADIANT_AUTH_003</td>
+<td>403</td>
+<td>Insufficient permissions</td>
+</tr>
+<tr>
+<td>RADIANT_TENANT_001</td>
+<td>404</td>
+<td>Tenant not found</td>
+</tr>
+<tr>
+<td>RADIANT_MODEL_001</td>
+<td>404</td>
+<td>Model not found</td>
+</tr>
+<tr>
+<td>RADIANT_BILLING_001</td>
+<td>402</td>
+<td>Insufficient credits</td>
+</tr>
+<tr>
+<td>RADIANT_RATE_001</td>
+<td>429</td>
+<td>Rate limit exceeded</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="changelog">7. Changelog</h1>
+<h2 id="section">[4.18.2] - 2024-12-28</h2>
+<h3 id="added">Added</h3>
+<h4 id="think-tank-delight-system">Think Tank Delight System</h4>
+<ul>
+<li>Core service with personality modes and trigger types</li>
+<li>AGI Brain integration for real-time messages</li>
+<li>Real-time event streaming</li>
+<li>Persistent statistics with 12-week trends</li>
+<li>Admin dashboard with analytics</li>
+</ul>
+<h4 id="localization-system">Localization System</h4>
+<ul>
+<li>Database migration for UI string registry</li>
+<li>Translation hook for React</li>
+<li>Language selector in settings</li>
+</ul>
+<h4 id="windsurf-workflows">Windsurf Workflows</h4>
+<ul>
+<li>Policy workflows for code quality</li>
+</ul>
+<h3 id="changed">Changed</h3>
+<h4 id="unified-deployment-model">Unified Deployment Model</h4>
+<ul>
+<li>Removed tier 1-5 deployment selection</li>
+<li>Single deployment with all features</li>
+<li>Licensing at application level</li>
+</ul>
+<h3 id="documentation">Documentation</h3>
+<ul>
+<li>Updated deployment guide</li>
+<li>Added Delight System documentation</li>
+<li>Added admin guide section 20</li>
+</ul>
+<h2 id="section-1">[4.18.1] - 2024-12-25</h2>
+<h3 id="added-1">Added</h3>
+<ul>
+<li>Standardized error handling system</li>
+<li>Comprehensive test coverage</li>
+<li>Testing and error code documentation</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li>TypeScript errors in various services</li>
+<li>Type safety improvements</li>
+</ul>
+<h2 id="section-2">[4.18.0] - 2024-12-24</h2>
+<h3 id="added-2">Added</h3>
+<ul>
+<li>Unified package system</li>
+<li>AI Assistant in Swift Deployer</li>
+<li>Configurable timeouts</li>
+<li>Cost management</li>
+<li>Compliance reports</li>
+<li>A/B testing framework</li>
+</ul>
+<hr />
+<h1 id="appendix">Appendix</h1>
+<h2 id="a.-quick-reference">A. Quick Reference</h2>
+<h3 id="swift-deployer-commands">Swift Deployer Commands</h3>
+<pre class="bash"><code># Build and run
+swift run --package-path apps/swift-deployer
+
+# Run tests
+swift test --package-path apps/swift-deployer</code></pre>
+<h3 id="cdk-commands">CDK Commands</h3>
+<pre class="bash"><code># Synthesize
+cdk synth
+
+# Deploy specific stack
+cdk deploy RadiantAPIStack
+
+# Destroy
+cdk destroy --all</code></pre>
+<h3 id="database-migrations">Database Migrations</h3>
+<pre class="bash"><code># Run migrations
+cd packages/infrastructure
+npm run migrate
+
+# Rollback
+npm run migrate:rollback</code></pre>
+<h2 id="b.-support-resources">B. Support Resources</h2>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Documentation</td>
+<td>docs.radiant.example.com</td>
+</tr>
+<tr>
+<td>Status Page</td>
+<td>status.radiant.example.com</td>
+</tr>
+<tr>
+<td>Support Email</td>
+<td>support@radiant.example.com</td>
+</tr>
+</tbody>
+</table>
+<h2 id="c.-version-information">C. Version Information</h2>
+<ul>
+<li><strong>RADIANT Version</strong>: 4.18.2</li>
+<li><strong>Think Tank Version</strong>: 3.2.0</li>
+<li><strong>Last Updated</strong>: December 28, 2024</li>
+</ul>
+<hr />
+<p><em>© 2024 RADIANT Platform. All rights reserved.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

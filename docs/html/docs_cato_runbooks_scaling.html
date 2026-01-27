@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>scaling - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>scaling</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/runbooks/scaling.md</div>
+  </div>
+  
+  <h1 id="cato-scaling-runbook">Cato Scaling Runbook</h1>
+<h2 id="overview">Overview</h2>
+<p>This runbook covers scaling Cato infrastructure to handle increased load.</p>
+<h2 id="scaling-triggers">Scaling Triggers</h2>
+<h3 id="automatic-scaling">Automatic Scaling</h3>
+<p>The following components auto-scale based on metrics:</p>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 19%" />
+<col style="width: 24%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Metric</th>
+<th>Scale Up</th>
+<th>Scale Down</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shadow Self (SageMaker)</td>
+<td>GPU Utilization &gt; 80%</td>
+<td>+10 instances</td>
+<td>-10 instances when &lt; 40%</td>
+</tr>
+<tr>
+<td>Ray Serve (EKS)</td>
+<td>Requests/replica &gt; 10</td>
+<td>+5 replicas</td>
+<td>-5 replicas when &lt; 3</td>
+</tr>
+<tr>
+<td>NLI Model (SageMaker MME)</td>
+<td>Latency p99 &gt; 100ms</td>
+<td>+2 instances</td>
+<td>-2 when &lt; 50ms</td>
+</tr>
+<tr>
+<td>ElastiCache</td>
+<td>Memory &gt; 80%</td>
+<td>Vertical scale</td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<h3 id="manual-scaling-triggers">Manual Scaling Triggers</h3>
+<p>Scale manually when: - Daily traffic increases by 50%+ - Monthly costs exceed budget by 20%+ - Latency SLOs are at risk</p>
+<h2 id="scaling-procedures">Scaling Procedures</h2>
+<h3 id="shadow-self-sagemaker">1. Shadow Self (SageMaker)</h3>
+<p><strong>Scale Up:</strong></p>
+<pre class="bash"><code>aws sagemaker update-endpoint-weights-and-capacities \
+  --endpoint-name cato-shadow-self \
+  --desired-weights-and-capacities \
+    VariantName=primary,DesiredInstanceCount=50</code></pre>
+<p><strong>Check Status:</strong></p>
+<pre class="bash"><code>aws sagemaker describe-endpoint --endpoint-name cato-shadow-self</code></pre>
+<p><strong>Timing:</strong> Instance provisioning takes ~5-10 minutes.</p>
+<h3 id="ray-serve-eks">2. Ray Serve (EKS)</h3>
+<p><strong>Scale Up:</strong></p>
+<pre class="bash"><code>kubectl scale deployment cato-orchestrator -n cato --replicas=100</code></pre>
+<p><strong>Check Status:</strong></p>
+<pre class="bash"><code>kubectl get pods -n cato -l app=cato-orchestrator</code></pre>
+<p><strong>Update Auto-Scaling:</strong></p>
+<pre class="bash"><code>kubectl patch hpa cato-orchestrator-hpa -n cato \
+  --patch &#39;{&quot;spec&quot;:{&quot;maxReplicas&quot;:200}}&#39;</code></pre>
+<h3 id="elasticache-valkey">3. ElastiCache (Valkey)</h3>
+<p><strong>Vertical Scale (downtime required):</strong></p>
+<pre class="bash"><code>aws elasticache modify-replication-group \
+  --replication-group-id cato-cache-production \
+  --cache-node-type cache.r7g.2xlarge \
+  --apply-immediately</code></pre>
+<p><strong>Add Read Replicas:</strong></p>
+<pre class="bash"><code>aws elasticache increase-replica-count \
+  --replication-group-id cato-cache-production \
+  --new-replica-count 5 \
+  --apply-immediately</code></pre>
+<h3 id="dynamodb">4. DynamoDB</h3>
+<p>DynamoDB with on-demand billing auto-scales. For provisioned capacity:</p>
+<p><strong>Update Capacity:</strong></p>
+<pre class="bash"><code>aws dynamodb update-table \
+  --table-name cato-semantic-memory-production \
+  --provisioned-throughput ReadCapacityUnits=10000,WriteCapacityUnits=5000</code></pre>
+<h3 id="opensearch-serverless">5. OpenSearch Serverless</h3>
+<p>OpenSearch Serverless auto-scales. To increase max capacity:</p>
+<pre class="bash"><code>aws opensearchserverless update-collection \
+  --id &lt;collection-id&gt; \
+  --description &quot;Increased capacity&quot;</code></pre>
+<h2 id="scaling-by-user-scale">Scaling by User Scale</h2>
+<h3 id="k-1m-users">100K → 1M Users</h3>
+<ol type="1">
+<li><strong>Shadow Self</strong>: 5 → 50 instances</li>
+<li><strong>Ray Serve</strong>: 10 → 50 replicas</li>
+<li><strong>ElastiCache</strong>: cache.r7g.xlarge → cache.r7g.2xlarge</li>
+<li><strong>Budget</strong>: $500 → $2,000/month</li>
+</ol>
+<pre class="bash"><code># Terraform variable update
+cd infrastructure/terraform/environments/production
+terraform apply -var=&quot;shadow_self_min_instances=50&quot; -var=&quot;cache_node_type=cache.r7g.2xlarge&quot;</code></pre>
+<h3 id="m-10m-users">1M → 10M Users</h3>
+<ol type="1">
+<li><strong>Shadow Self</strong>: 50 → 250 instances</li>
+<li><strong>Ray Serve</strong>: 50 → 100 replicas</li>
+<li><strong>ElastiCache</strong>: Add cluster mode, 6 shards</li>
+<li><strong>Multi-region</strong>: Enable replicas in eu-west-1, ap-northeast-1</li>
+<li><strong>Budget</strong>: $2,000 → $100,000/month</li>
+</ol>
+<pre class="bash"><code># Enable global tables
+terraform apply -var=&quot;enable_global_tables=true&quot; -var=&quot;replica_regions=[\&quot;eu-west-1\&quot;,\&quot;ap-northeast-1\&quot;]&quot;</code></pre>
+<h2 id="cost-optimization-during-scaling">Cost Optimization During Scaling</h2>
+<h3 id="use-savings-plans">Use Savings Plans</h3>
+<p>At 10M users, SageMaker is ~$275K/month. With 3-year Savings Plan: - <strong>Savings</strong>: 64% (~$100K/month) - <strong>Commitment</strong>: 3-year term</p>
+<pre class="bash"><code># Create Savings Plan via AWS Console or API
+aws savingsplans create-savings-plan \
+  --savings-plan-offering-id &lt;offering-id&gt; \
+  --commitment 100000 \
+  --savings-plan-type Compute</code></pre>
+<h3 id="use-spot-instances-for-batch">Use Spot Instances for Batch</h3>
+<p>Night-mode curiosity can use Spot instances: - <strong>Savings</strong>: 70% on compute - <strong>Risk</strong>: Interruption (acceptable for batch)</p>
+<h3 id="right-size-instances">Right-Size Instances</h3>
+<p>Monitor and right-size monthly:</p>
+<pre class="bash"><code>aws compute-optimizer get-ec2-instance-recommendations \
+  --filters name=Finding,values=OPTIMIZED</code></pre>
+<h2 id="monitoring-during-scale">Monitoring During Scale</h2>
+<h3 id="key-metrics-to-watch">Key Metrics to Watch</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Warning</th>
+<th>Critical</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shadow Self Latency p99</td>
+<td>&gt; 300ms</td>
+<td>&gt; 500ms</td>
+</tr>
+<tr>
+<td>Cache Hit Rate</td>
+<td>&lt; 75%</td>
+<td>&lt; 60%</td>
+</tr>
+<tr>
+<td>Error Rate</td>
+<td>&gt; 0.5%</td>
+<td>&gt; 1%</td>
+</tr>
+<tr>
+<td>Budget Burn Rate</td>
+<td>&gt; 120%</td>
+<td>&gt; 150%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dashboards">Dashboards</h3>
+<ul>
+<li><strong>Cato Overview</strong>: All key metrics</li>
+<li><strong>Cost Explorer</strong>: Real-time spend</li>
+</ul>
+<h3 id="alerts">Alerts</h3>
+<p>Configure PagerDuty/Slack alerts for critical thresholds.</p>
+<h2 id="rollback-procedures">Rollback Procedures</h2>
+<p>If scaling causes issues:</p>
+<h3 id="rollback-sagemaker">Rollback SageMaker</h3>
+<pre class="bash"><code>aws sagemaker update-endpoint-weights-and-capacities \
+  --endpoint-name cato-shadow-self \
+  --desired-weights-and-capacities VariantName=primary,DesiredInstanceCount=10</code></pre>
+<h3 id="rollback-eks">Rollback EKS</h3>
+<pre class="bash"><code>kubectl rollout undo deployment/cato-orchestrator -n cato</code></pre>
+<h3 id="rollback-terraform">Rollback Terraform</h3>
+<pre class="bash"><code>cd infrastructure/terraform/environments/production
+git checkout HEAD~1 -- *.tfvars
+terraform apply</code></pre>
+<h2 id="contact">Contact</h2>
+<ul>
+<li><strong>On-call</strong>: #cato-oncall</li>
+<li><strong>Escalation</strong>: consciousness-team@thinktank.ai</li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

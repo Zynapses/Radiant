@@ -283,22 +283,124 @@ class ShadowModeService {
   }
 
   private extractChallenge(source: ShadowLearningSource): string {
-    // Extract the problem statement from the source
-    // In production, this would use NLP to identify the challenge
+    // Extract the problem statement using NLP patterns and heuristics
     const content = source.content;
-
-    // Look for common patterns
-    if (content.includes('Example:')) {
-      const parts = content.split('Example:');
-      return parts[0].trim();
+    
+    // Use NLP-based extraction via LLM for complex content
+    if (content.length > 1000 && this.shouldUseNlpExtraction(content)) {
+      // Queue for async NLP extraction (non-blocking)
+      this.queueNlpExtraction(source).catch(err => 
+        logger.debug('Async NLP extraction queued', { error: err })
+      );
     }
 
+    // Pattern-based extraction for immediate response
+    return this.extractChallengeWithPatterns(content);
+  }
+  
+  /**
+   * Determine if content would benefit from NLP extraction
+   */
+  private shouldUseNlpExtraction(content: string): boolean {
+    // Use NLP for content with multiple potential sections
+    const hasMultipleSections = (content.match(/#{1,3}\s/g) || []).length > 2;
+    const hasComplexStructure = content.includes('Problem:') || 
+                                content.includes('Challenge:') ||
+                                content.includes('Task:') ||
+                                content.includes('Objective:');
+    const hasCodeMixedWithText = content.includes('```') && content.length > 500;
+    
+    return hasMultipleSections || hasComplexStructure || hasCodeMixedWithText;
+  }
+  
+  /**
+   * Extract challenge using pattern matching (fast, synchronous)
+   */
+  private extractChallengeWithPatterns(content: string): string {
+    // Priority 1: Explicit problem/challenge markers
+    const challengePatterns = [
+      /(?:Problem|Challenge|Task|Objective|Question):\s*([\s\S]*?)(?=\n(?:Example|Solution|Answer|Code|```)|$)/i,
+      /(?:Write|Implement|Create|Build|Design)\s+(?:a\s+)?(?:function|program|algorithm|method|class)\s+([\s\S]*?)(?=\n(?:Example|```)|$)/i,
+      /(?:Given|You are given)\s+([\s\S]*?)(?=\n(?:Example|```)|$)/i,
+    ];
+    
+    for (const pattern of challengePatterns) {
+      const match = content.match(pattern);
+      if (match && match[1] && match[1].trim().length > 20) {
+        return match[1].trim().substring(0, 1000);
+      }
+    }
+    
+    // Priority 2: Content before Example section
+    if (content.includes('Example:') || content.includes('Example 1:')) {
+      const parts = content.split(/Example(?:\s*\d)?:/i);
+      if (parts[0].trim().length > 20) {
+        return parts[0].trim().substring(0, 1000);
+      }
+    }
+
+    // Priority 3: Content before first code block
     if (content.includes('```')) {
       const parts = content.split('```');
-      return parts[0].trim();
+      if (parts[0].trim().length > 20) {
+        return parts[0].trim().substring(0, 1000);
+      }
+    }
+    
+    // Priority 4: First meaningful paragraph
+    const paragraphs = content.split(/\n\n+/);
+    for (const para of paragraphs) {
+      const cleaned = para.trim();
+      if (cleaned.length > 50 && !cleaned.startsWith('```') && !cleaned.startsWith('#')) {
+        return cleaned.substring(0, 1000);
+      }
     }
 
     return content.substring(0, 500);
+  }
+  
+  /**
+   * Queue content for async NLP-based extraction (updates source later)
+   */
+  private async queueNlpExtraction(source: ShadowLearningSource): Promise<void> {
+    try {
+      const { callLiteLLM } = await import('./litellm.service.js');
+      
+      const response = await callLiteLLM({
+        model: 'groq/llama-3.1-8b-instant', // Fast model for extraction
+        messages: [
+          {
+            role: 'system',
+            content: `Extract the core problem/challenge statement from this content. 
+Return ONLY the problem statement, no code, no examples, no solutions.
+Keep it concise (max 500 chars).`,
+          },
+          {
+            role: 'user',
+            content: source.content.substring(0, 3000),
+          },
+        ],
+        temperature: 0.1,
+        max_tokens: 500,
+      });
+
+      // Store extracted challenge for future use
+      if (response.content && response.content.length > 20) {
+        const contentHash = this.hashContent(source.content);
+        await executeStatement(
+          `UPDATE shadow_learning_sources 
+           SET extracted_challenge = $2, extraction_method = 'nlp'
+           WHERE content_hash = $1`,
+          [
+            { name: 'hash', value: { stringValue: contentHash } },
+            { name: 'challenge', value: { stringValue: response.content } },
+          ]
+        );
+        logger.debug('NLP challenge extraction completed', { url: source.url });
+      }
+    } catch (error) {
+      logger.warn('NLP challenge extraction failed', { url: source.url, error });
+    }
   }
 
   private async generatePrediction(challenge: string): Promise<string> {
@@ -451,17 +553,112 @@ Output ONLY the code solution, no explanations. Use appropriate language based o
     sourceType: 'github' | 'documentation' | 'stackoverflow',
     config: ShadowModeConfig
   ): Promise<ShadowLearningSource[]> {
-    // In production, this would fetch from actual sources
     switch (sourceType) {
       case 'documentation':
         return this.getDocumentationExercises('typescript');
       case 'github':
-        return []; // Would fetch from GitHub API
+        return this.getGitHubExercises(config.focus_areas);
       case 'stackoverflow':
-        return []; // Would fetch from SO API
+        return this.getStackOverflowExercises(config.focus_areas);
       default:
         return [];
     }
+  }
+
+  /**
+   * Get exercises from GitHub public repositories
+   * Exercises are seeded during deployment from curated public repos
+   */
+  private async getGitHubExercises(focusAreas: string[]): Promise<ShadowLearningSource[]> {
+    logger.info('Fetching GitHub exercises', { focusAreas });
+
+    let query = `
+      SELECT id, source_type, source_url, content, metadata, created_at
+      FROM shadow_learning_sources
+      WHERE source_type = 'github'
+      AND is_active = true
+    `;
+    const params: ReturnType<typeof stringParam>[] = [];
+
+    if (focusAreas.length > 0) {
+      query += ` AND (metadata->>'language' = ANY($1) OR metadata->>'topic' = ANY($1))`;
+      params.push(stringParam('focusAreas', focusAreas.join(',')));
+    }
+
+    query += ` ORDER BY RANDOM() LIMIT 20`;
+
+    const result = await executeStatement(query, params);
+
+    if (!result.rows || result.rows.length === 0) {
+      logger.info('No GitHub exercises found, returning empty list');
+      return [];
+    }
+
+    return result.rows.map((row: unknown) => {
+      const r = row as Record<string, unknown>;
+      const rawMetadata = r.metadata as Record<string, unknown> | null;
+      const metadata: Record<string, string> = {};
+      if (rawMetadata) {
+        for (const [key, value] of Object.entries(rawMetadata)) {
+          metadata[key] = String(value);
+        }
+      }
+      return {
+        type: 'github' as const,
+        url: String(r.source_url || ''),
+        content: String(r.content || ''),
+        metadata,
+      };
+    });
+  }
+
+  /**
+   * Get exercises from StackOverflow questions/answers
+   * Exercises are seeded during deployment from curated Q&A pairs
+   */
+  private async getStackOverflowExercises(focusAreas: string[]): Promise<ShadowLearningSource[]> {
+    logger.info('Fetching StackOverflow exercises', { focusAreas });
+
+    let query = `
+      SELECT id, source_type, source_url, content, metadata, created_at
+      FROM shadow_learning_sources
+      WHERE source_type = 'stackoverflow'
+      AND is_active = true
+    `;
+    const params: ReturnType<typeof stringParam>[] = [];
+
+    if (focusAreas.length > 0) {
+      query += ` AND (metadata->>'tags' ILIKE ANY(ARRAY[${focusAreas.map((_, i) => `$${i + 1}`).join(',')}]))`;
+      focusAreas.forEach((area, i) => {
+        params.push(stringParam(`area${i}`, `%${area}%`));
+      });
+    }
+
+    query += ` ORDER BY COALESCE((metadata->>'score')::int, 0) DESC LIMIT 20`;
+
+    const result = await executeStatement(query, params);
+
+    if (!result.rows || result.rows.length === 0) {
+      logger.info('No StackOverflow exercises found, returning empty list');
+      return [];
+    }
+
+    return result.rows.map((row: unknown) => {
+      const r = row as Record<string, unknown>;
+      const rawMetadata = r.metadata as Record<string, unknown> | null;
+      const metadata: Record<string, string> = {};
+      if (rawMetadata) {
+        for (const [key, value] of Object.entries(rawMetadata)) {
+          metadata[key] = String(value);
+        }
+      }
+      return {
+        type: 'stackoverflow' as const,
+        url: String(r.source_url || ''),
+        content: String(r.content || ''),
+        metadata,
+      };
+    });
   }
 
   private parseResultRows(rows: unknown[]): ShadowLearningResult[] {

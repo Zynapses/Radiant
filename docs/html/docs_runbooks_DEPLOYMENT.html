@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DEPLOYMENT - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>DEPLOYMENT</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/runbooks/DEPLOYMENT.md</div>
+  </div>
+  
+  <h1 id="deployment-runbook">Deployment Runbook</h1>
+<h2 id="overview">Overview</h2>
+<p>This runbook covers deployment procedures for the RADIANT platform.</p>
+<h2 id="environments">Environments</h2>
+<table>
+<thead>
+<tr>
+<th>Environment</th>
+<th>Purpose</th>
+<th>Auto-Deploy</th>
+<th>Approval</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dev</code></td>
+<td>Development testing</td>
+<td>On PR merge to develop</td>
+<td>None</td>
+</tr>
+<tr>
+<td><code>staging</code></td>
+<td>Pre-production</td>
+<td>On PR merge to main</td>
+<td>None</td>
+</tr>
+<tr>
+<td><code>production</code></td>
+<td>Live environment</td>
+<td>Manual trigger</td>
+<td>Required</td>
+</tr>
+</tbody>
+</table>
+<h2 id="pre-deployment-checklist">Pre-Deployment Checklist</h2>
+<h3 id="code-quality">Code Quality</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />All tests passing in CI</label></li>
+<li><label><input type="checkbox" />Code review approved</label></li>
+<li><label><input type="checkbox" />No security vulnerabilities</label></li>
+<li><label><input type="checkbox" />Documentation updated</label></li>
+</ul>
+<h3 id="infrastructure">Infrastructure</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />CDK diff reviewed</label></li>
+<li><label><input type="checkbox" />Database migrations reviewed</label></li>
+<li><label><input type="checkbox" />No breaking API changes (or versioned)</label></li>
+<li><label><input type="checkbox" />Feature flags in place if needed</label></li>
+</ul>
+<h3 id="operations">Operations</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Monitoring dashboards ready</label></li>
+<li><label><input type="checkbox" />Rollback plan documented</label></li>
+<li><label><input type="checkbox" />On-call notified (production)</label></li>
+<li><label><input type="checkbox" />Low-traffic window selected (production)</label></li>
+</ul>
+<h2 id="deployment-steps">Deployment Steps</h2>
+<h3 id="development-environment">1. Development Environment</h3>
+<pre class="bash"><code># Automatic via GitHub Actions on develop branch
+# Or manual:
+make deploy-dev</code></pre>
+<h3 id="staging-environment">2. Staging Environment</h3>
+<pre class="bash"><code># Automatic via GitHub Actions on main branch
+# Or manual:
+make deploy-staging</code></pre>
+<h3 id="production-environment">3. Production Environment</h3>
+<h4 id="step-1-create-release">Step 1: Create Release</h4>
+<pre class="bash"><code># Create release tag
+git tag -a v4.17.1 -m &quot;Release 4.17.1&quot;
+git push origin v4.17.1
+
+# Or use GitHub Releases UI</code></pre>
+<h4 id="step-2-deploy-infrastructure">Step 2: Deploy Infrastructure</h4>
+<pre class="bash"><code># CDK diff first
+ENVIRONMENT=production pnpm --filter @radiant/infrastructure cdk diff
+
+# Deploy with approval
+make deploy-prod</code></pre>
+<h4 id="step-3-database-migrations">Step 3: Database Migrations</h4>
+<ol type="1">
+<li>Go to Admin Dashboard → Migrations</li>
+<li>Create migration approval request</li>
+<li>Get second admin approval</li>
+<li>Execute migration</li>
+<li>Verify data integrity</li>
+</ol>
+<h4 id="step-4-deploy-dashboard">Step 4: Deploy Dashboard</h4>
+<pre class="bash"><code># Build dashboard
+pnpm --filter @radiant/admin-dashboard build
+
+# Deploy to S3
+aws s3 sync apps/admin-dashboard/out s3://radiant-dashboard-production --delete
+
+# Invalidate CloudFront
+aws cloudfront create-invalidation \
+  --distribution-id &lt;DIST_ID&gt; \
+  --paths &quot;/*&quot;</code></pre>
+<h4 id="step-5-verify-deployment">Step 5: Verify Deployment</h4>
+<pre class="bash"><code># Health check
+curl https://api.radiant.example.com/v2/health
+
+# Check dashboard
+open https://admin.radiant.example.com
+
+# Monitor CloudWatch
+open https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=radiant-production-dashboard</code></pre>
+<h2 id="database-migrations">Database Migrations</h2>
+<h3 id="creating-migrations">Creating Migrations</h3>
+<pre class="bash"><code># Create new migration file
+touch packages/infrastructure/migrations/037_new_feature.sql</code></pre>
+<h3 id="migration-file-format">Migration File Format</h3>
+<pre class="sql"><code>-- Migration: 037_new_feature
+-- Description: Add new feature tables
+-- Author: developer@example.com
+-- Date: 2024-12-24
+
+-- Up Migration
+CREATE TABLE IF NOT EXISTS new_feature (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE new_feature ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policy
+CREATE POLICY new_feature_tenant_isolation ON new_feature
+  USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::uuid);
+
+-- Rollback: DROP TABLE new_feature;</code></pre>
+<h3 id="running-migrations">Running Migrations</h3>
+<pre class="bash"><code># Dev/Staging (local)
+./scripts/run-migrations.sh
+
+# Production (via Admin Dashboard)
+# Use Migration Approval workflow</code></pre>
+<h2 id="rollback-procedures">Rollback Procedures</h2>
+<h3 id="quick-rollback-lambda">Quick Rollback (Lambda)</h3>
+<pre class="bash"><code># List recent versions
+aws lambda list-versions-by-function \
+  --function-name radiant-production-router \
+  --max-items 5
+
+# Update alias to previous version
+aws lambda update-alias \
+  --function-name radiant-production-router \
+  --name live \
+  --function-version 42</code></pre>
+<h3 id="full-rollback-cdk">Full Rollback (CDK)</h3>
+<pre class="bash"><code># Check recent deployments
+aws cloudformation describe-stack-events \
+  --stack-name RadiantProductionApi \
+  --max-items 20
+
+# Rollback (if still in progress)
+aws cloudformation cancel-update-stack \
+  --stack-name RadiantProductionApi
+
+# Or redeploy previous version
+git checkout v4.17.0
+make deploy-prod</code></pre>
+<h3 id="dashboard-rollback">Dashboard Rollback</h3>
+<pre class="bash"><code># Sync previous build from backup
+aws s3 sync s3://radiant-backups/dashboard/v4.17.0 s3://radiant-dashboard-production --delete
+
+# Invalidate cache
+aws cloudfront create-invalidation \
+  --distribution-id &lt;DIST_ID&gt; \
+  --paths &quot;/*&quot;</code></pre>
+<h2 id="blue-green-deployment-optional">Blue-Green Deployment (Optional)</h2>
+<p>For zero-downtime deployments:</p>
+<ol type="1">
+<li>Deploy new version to “green” stack</li>
+<li>Run smoke tests against green</li>
+<li>Switch Route 53 weighted routing</li>
+<li>Monitor for errors</li>
+<li>Remove “blue” stack after verification</li>
+</ol>
+<h2 id="canary-deployment-optional">Canary Deployment (Optional)</h2>
+<p>For gradual rollouts:</p>
+<ol type="1">
+<li>Deploy new Lambda version</li>
+<li>Configure alias with 10% weight</li>
+<li>Monitor error rates</li>
+<li>Gradually increase to 100%</li>
+</ol>
+<pre class="bash"><code># Configure canary
+aws lambda update-alias \
+  --function-name radiant-production-router \
+  --name live \
+  --routing-config AdditionalVersionWeights={&quot;43&quot;=0.1}</code></pre>
+<h2 id="monitoring-during-deployment">Monitoring During Deployment</h2>
+<h3 id="key-metrics-to-watch">Key Metrics to Watch</h3>
+<ul>
+<li>API error rate (&lt; 1%)</li>
+<li>API latency p99 (&lt; 2s)</li>
+<li>Lambda errors (0)</li>
+<li>Database connections (&lt; 80)</li>
+</ul>
+<h3 id="alerts-to-monitor">Alerts to Monitor</h3>
+<ul>
+<li><code>radiant-production-api-5xx-errors</code></li>
+<li><code>radiant-production-api-latency</code></li>
+<li><code>radiant-production-lambda-errors</code></li>
+<li><code>radiant-production-db-cpu</code></li>
+</ul>
+<h2 id="post-deployment">Post-Deployment</h2>
+<h3 id="verification-checklist">Verification Checklist</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Health endpoints responding</label></li>
+<li><label><input type="checkbox" />Login working</label></li>
+<li><label><input type="checkbox" />Key user flows functional</label></li>
+<li><label><input type="checkbox" />No error spike in CloudWatch</label></li>
+<li><label><input type="checkbox" />No increase in support tickets</label></li>
+</ul>
+<h3 id="documentation">Documentation</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Update CHANGELOG.md</label></li>
+<li><label><input type="checkbox" />Create GitHub Release</label></li>
+<li><label><input type="checkbox" />Notify stakeholders</label></li>
+<li><label><input type="checkbox" />Update status page (if applicable)</label></li>
+</ul>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="deployment-stuck">Deployment Stuck</h3>
+<pre class="bash"><code># Check CloudFormation status
+aws cloudformation describe-stacks --stack-name RadiantProductionApi
+
+# Check for stack events
+aws cloudformation describe-stack-events --stack-name RadiantProductionApi
+
+# Force continue if stuck
+aws cloudformation continue-update-rollback --stack-name RadiantProductionApi</code></pre>
+<h3 id="lambda-not-updating">Lambda Not Updating</h3>
+<pre class="bash"><code># Force function update
+aws lambda update-function-code \
+  --function-name radiant-production-router \
+  --s3-bucket radiant-artifacts \
+  --s3-key lambda/latest.zip</code></pre>
+<h3 id="dashboard-not-updating">Dashboard Not Updating</h3>
+<pre class="bash"><code># Check CloudFront status
+aws cloudfront get-distribution --id &lt;DIST_ID&gt;
+
+# Create aggressive invalidation
+aws cloudfront create-invalidation \
+  --distribution-id &lt;DIST_ID&gt; \
+  --paths &quot;/*&quot;</code></pre>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

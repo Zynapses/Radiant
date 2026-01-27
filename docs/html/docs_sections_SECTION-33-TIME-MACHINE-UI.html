@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 33 TIME MACHINE UI - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 33 TIME MACHINE UI</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-33-TIME-MACHINE-UI.md</div>
+  </div>
+  
+  <h1 id="section-33-time-machine-ui-simplified-ai-api-v4.0.0">SECTION 33: TIME MACHINE UI &amp; SIMPLIFIED AI API (v4.0.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<blockquote>
+<p><strong>Version: 4.0.0 | The visual “fly back through time” experience + AI-friendly API</strong></p>
+</blockquote>
+<hr />
+<h2 id="simplified-ai-api-for-time-machine">33.1 Simplified AI API for Time Machine</h2>
+<p>The AI API allows client apps to let their AI assistants help users navigate history naturally.</p>
+<pre class="typescript"><code>// packages/functions/src/handlers/thinktank/ai-time-machine.handlers.ts
+
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from &#39;aws-lambda&#39;;
+import { TimeMachineService } from &#39;../../services/time-machine.service&#39;;
+import { pool } from &#39;../../utils/db&#39;;
+
+const service = new TimeMachineService(pool);
+
+const corsHeaders = {
+  &#39;Access-Control-Allow-Origin&#39;: &#39;*&#39;,
+  &#39;Access-Control-Allow-Headers&#39;: &#39;Content-Type,Authorization&#39;,
+  &#39;Content-Type&#39;: &#39;application/json&#39;,
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AI-FRIENDLY SIMPLIFIED API
+// These endpoints return human-readable summaries that AI can relay to users
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * GET /api/ai/chats/:chatId/history/summary
+ * 
+ * Returns a human-readable summary of chat history that an AI can present.
+ * 
+ * Example response:
+ * {
+ *   &quot;summary&quot;: &quot;This conversation has 47 snapshots over 3 days. You&#39;ve exchanged 
+ *               156 messages and shared 8 files. The oldest point you can restore 
+ *               to is December 20th at 2:34 PM.&quot;,
+ *   &quot;highlights&quot;: [
+ *     &quot;December 22: Major file update - report_final.xlsx&quot;,
+ *     &quot;December 21: Long discussion about project requirements&quot;,
+ *     &quot;December 20: Conversation started&quot;
+ *   ],
+ *   &quot;canRestore&quot;: true,
+ *   &quot;oldestDate&quot;: &quot;2024-12-20&quot;,
+ *   &quot;newestDate&quot;: &quot;2024-12-23&quot;
+ * }
+ */
+export async function getHistorySummary(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    const chatId = event.pathParameters?.chatId;
+    const tenantId = event.requestContext.authorizer?.claims?.[&#39;custom:tenant_id&#39;];
+    
+    if (!chatId) {
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: &#39;chatId required&#39; }) };
+    }
+    
+    const timeline = await service.getTimeline(chatId, tenantId);
+    
+    // Generate human-readable summary
+    const dayCount = Object.keys(timeline.snapshotsByDate).length;
+    const oldestDate = new Date(timeline.oldestSnapshot).toLocaleDateString(&#39;en-US&#39;, { 
+      month: &#39;long&#39;, day: &#39;numeric&#39;, hour: &#39;numeric&#39;, minute: &#39;2-digit&#39; 
+    });
+    
+    // Generate highlights from significant snapshots
+    const highlights: string[] = [];
+    const fileSnapshots = timeline.snapshots.filter(s =&gt; 
+      s.trigger === &#39;file_uploaded&#39; || s.trigger === &#39;file_generated&#39;
+    );
+    const restoreSnapshots = timeline.snapshots.filter(s =&gt; s.trigger === &#39;restore_performed&#39;);
+    
+    // Add recent file activity
+    if (fileSnapshots.length &gt; 0) {
+      const recent = fileSnapshots[fileSnapshots.length - 1];
+      const date = new Date(recent.timestamp).toLocaleDateString(&#39;en-US&#39;, { month: &#39;long&#39;, day: &#39;numeric&#39; });
+      highlights.push(`${date}: File activity (${timeline.currentFileCount} files total)`);
+    }
+    
+    // Add restore activity
+    if (restoreSnapshots.length &gt; 0) {
+      highlights.push(`You&#39;ve restored from history ${restoreSnapshots.length} time(s)`);
+    }
+    
+    // Add conversation start
+    if (timeline.snapshots.length &gt; 0) {
+      const first = timeline.snapshots[0];
+      const date = new Date(first.timestamp).toLocaleDateString(&#39;en-US&#39;, { month: &#39;long&#39;, day: &#39;numeric&#39; });
+      highlights.push(`${date}: Conversation started`);
+    }
+    
+    const summary = `This conversation has ${timeline.totalSnapshots} snapshots over ${dayCount} day${dayCount !== 1 ? &#39;s&#39; : &#39;&#39;}. ` +
+      `You&#39;ve exchanged ${timeline.currentMessageCount} messages and shared ${timeline.currentFileCount} file${timeline.currentFileCount !== 1 ? &#39;s&#39; : &#39;&#39;}. ` +
+      `The oldest point you can restore to is ${oldestDate}.`;
+    
+    return {
+      statusCode: 200,
+      headers: corsHeaders,
+      body: JSON.stringify({
+        summary,
+        highlights,
+        canRestore: timeline.totalSnapshots &gt; 1,
+        oldestDate: timeline.oldestSnapshot.split(&#39;T&#39;)[0],
+        newestDate: timeline.newestSnapshot.split(&#39;T&#39;)[0],
+        stats: {
+          totalSnapshots: timeline.totalSnapshots,
+          messageCount: timeline.currentMessageCount,
+          fileCount: timeline.currentFileCount,
+          totalMediaBytes: timeline.totalMediaBytes,
+        },
+      }),
+    };
+  } catch (error: any) {
+    console.error(&#39;getHistorySummary error:&#39;, error);
+    return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: error.message }) };
+  }
+}
+
+/**
+ * POST /api/ai/chats/:chatId/history/find
+ * 
+ * Natural language search through history.
+ * 
+ * Request:
+ * { &quot;query&quot;: &quot;that spreadsheet from last week&quot; }
+ * 
+ * Response:
+ * {
+ *   &quot;found&quot;: true,
+ *   &quot;description&quot;: &quot;I found &#39;budget_2024.xlsx&#39; from December 18th. Would you like me to restore it or download the current version?&quot;,
+ *   &quot;items&quot;: [
+ *     { &quot;type&quot;: &quot;file&quot;, &quot;name&quot;: &quot;budget_2024.xlsx&quot;, &quot;date&quot;: &quot;2024-12-18&quot;, &quot;id&quot;: &quot;...&quot; }
+ *   ],
+ *   &quot;suggestedActions&quot;: [&quot;restore&quot;, &quot;download&quot;, &quot;show_versions&quot;]
+ * }
+ */
+export async function findInHistory(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    const chatId = event.pathParameters?.chatId;
+    const tenantId = event.requestContext.authorizer?.claims?.[&#39;custom:tenant_id&#39;];
+    const body = JSON.parse(event.body || &#39;{}&#39;);
+    
+    if (!chatId || !body.query) {
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: &#39;chatId and query required&#39; }) };
+    }
+    
+    // Search both messages and files
+    const [messages, files] = await Promise.all([
+      service.searchMessages(chatId, body.query, tenantId),
+      service.searchFiles(chatId, body.query, tenantId),
+    ]);
+    
+    const items: Array&lt;{
+      type: &#39;message&#39; | &#39;file&#39;;
+      name?: string;
+      preview?: string;
+      date: string;
+      id: string;
+    }&gt; = [];
+    
+    // Add top file results
+    for (const file of files.slice(0, 3)) {
+      items.push({
+        type: &#39;file&#39;,
+        name: file.displayName,
+        date: file.createdAt.split(&#39;T&#39;)[0],
+        id: file.id,
+      });
+    }
+    
+    // Add top message results
+    for (const msg of messages.slice(0, 3)) {
+      items.push({
+        type: &#39;message&#39;,
+        preview: msg.content.substring(0, 100) + (msg.content.length &gt; 100 ? &#39;...&#39; : &#39;&#39;),
+        date: msg.createdAt.split(&#39;T&#39;)[0],
+        id: msg.messageId,
+      });
+    }
+    
+    // Generate description
+    let description = &#39;&#39;;
+    if (items.length === 0) {
+      description = `I couldn&#39;t find anything matching &quot;${body.query}&quot; in your chat history.`;
+    } else if (files.length &gt; 0 &amp;&amp; messages.length === 0) {
+      description = `I found ${files.length} file${files.length !== 1 ? &#39;s&#39; : &#39;&#39;} matching &quot;${body.query}&quot;. ` +
+        `The most recent is &#39;${files[0].displayName}&#39; from ${new Date(files[0].createdAt).toLocaleDateString()}.`;
+    } else if (messages.length &gt; 0 &amp;&amp; files.length === 0) {
+      description = `I found ${messages.length} message${messages.length !== 1 ? &#39;s&#39; : &#39;&#39;} mentioning &quot;${body.query}&quot;.`;
+    } else {
+      description = `I found ${files.length} file${files.length !== 1 ? &#39;s&#39; : &#39;&#39;} and ${messages.length} message${messages.length !== 1 ? &#39;s&#39; : &#39;&#39;} ` +
+        `related to &quot;${body.query}&quot;.`;
+    }
+    
+    const suggestedActions: string[] = [];
+    if (files.length &gt; 0) {
+      suggestedActions.push(&#39;download&#39;, &#39;show_versions&#39;);
+    }
+    if (messages.length &gt; 0) {
+      suggestedActions.push(&#39;jump_to_message&#39;);
+    }
+    if (items.length &gt; 0) {
+      suggestedActions.push(&#39;restore&#39;);
+    }
+    
+    return {
+      statusCode: 200,
+      headers: corsHeaders,
+      body: JSON.stringify({
+        found: items.length &gt; 0,
+        description,
+        items,
+        suggestedActions,
+      }),
+    };
+  } catch (error: any) {
+    console.error(&#39;findInHistory error:&#39;, error);
+    return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: error.message }) };
+  }
+}
+
+/**
+ * POST /api/ai/chats/:chatId/history/restore
+ * 
+ * AI-assisted restore with natural language confirmation.
+ * 
+ * Request:
+ * { 
+ *   &quot;action&quot;: &quot;restore_file&quot;,
+ *   &quot;fileId&quot;: &quot;...&quot;,
+ *   &quot;confirmed&quot;: true
+ * }
+ * 
+ * Response:
+ * {
+ *   &quot;success&quot;: true,
+ *   &quot;message&quot;: &quot;I&#39;ve restored &#39;budget_2024.xlsx&#39; to the version from December 18th. Your current version has been saved and you can restore it anytime.&quot;,
+ *   &quot;undoAvailable&quot;: true,
+ *   &quot;undoSnapshotId&quot;: &quot;...&quot;
+ * }
+ */
+export async function aiRestore(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    const chatId = event.pathParameters?.chatId;
+    const userId = event.requestContext.authorizer?.claims?.sub;
+    const tenantId = event.requestContext.authorizer?.claims?.[&#39;custom:tenant_id&#39;];
+    const body = JSON.parse(event.body || &#39;{}&#39;);
+    
+    if (!chatId || !body.action) {
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: &#39;chatId and action required&#39; }) };
+    }
+    
+    // Require confirmation for restore actions
+    if (!body.confirmed) {
+      let confirmMessage = &#39;&#39;;
+      
+      switch (body.action) {
+        case &#39;restore_file&#39;:
+          confirmMessage = &quot;I&#39;ll restore this file to the selected version. Your current version will be saved and you can always get it back. Confirm?&quot;;
+          break;
+        case &#39;restore_message&#39;:
+          confirmMessage = &quot;I&#39;ll restore this message to how it was at the selected point. Confirm?&quot;;
+          break;
+        case &#39;restore_all&#39;:
+          confirmMessage = &quot;I&#39;ll restore the entire conversation to the selected point. All your current messages and files will be saved and recoverable. Confirm?&quot;;
+          break;
+        default:
+          return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: &#39;Unknown action&#39; }) };
+      }
+      
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({
+          needsConfirmation: true,
+          message: confirmMessage,
+          action: body.action,
+        }),
+      };
+    }
+    
+    // Perform the restore
+    let result;
+    let message = &#39;&#39;;
+    
+    switch (body.action) {
+      case &#39;restore_file&#39;:
+        result = await service.restore({
+          chatId,
+          targetSnapshotId: body.snapshotId,
+          scope: &#39;single_file&#39;,
+          fileIds: [body.fileId],
+          reason: &#39;AI-assisted restore&#39;,
+        }, userId, tenantId);
+        message = `I&#39;ve restored the file. Your previous version has been saved - snapshot ${result.previousSnapshotId.substring(0, 8)}.`;
+        break;
+        
+      case &#39;restore_message&#39;:
+        result = await service.restore({
+          chatId,
+          targetSnapshotId: body.snapshotId,
+          scope: &#39;single_message&#39;,
+          messageIds: [body.messageId],
+          reason: &#39;AI-assisted restore&#39;,
+        }, userId, tenantId);
+        message = `I&#39;ve restored the message. Your edit history is preserved.`;
+        break;
+        
+      case &#39;restore_all&#39;:
+        result = await service.restore({
+          chatId,
+          targetSnapshotId: body.snapshotId,
+          scope: &#39;full_chat&#39;,
+          reason: &#39;AI-assisted restore&#39;,
+        }, userId, tenantId);
+        message = `I&#39;ve restored the conversation to that point. ${result.messagesRestored} messages and ${result.filesRestored} files were restored. ` +
+          `Don&#39;t worry - everything from before is saved and you can restore it anytime.`;
+        break;
+    }
+    
+    return {
+      statusCode: 200,
+      headers: corsHeaders,
+      body: JSON.stringify({
+        success: true,
+        message,
+        undoAvailable: true,
+        undoSnapshotId: result?.previousSnapshotId,
+        newVersion: result?.newVersion,
+      }),
+    };
+  } catch (error: any) {
+    console.error(&#39;aiRestore error:&#39;, error);
+    return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: error.message }) };
+  }
+}
+
+/**
+ * GET /api/ai/chats/:chatId/history/compare
+ * 
+ * Compare two points in time - useful for &quot;what changed since...&quot;
+ * 
+ * Query params: from=snapshotId&amp;to=snapshotId (or &quot;current&quot;)
+ * 
+ * Response:
+ * {
+ *   &quot;summary&quot;: &quot;Between December 18th and now: 12 new messages, 2 files updated, 1 file added.&quot;,
+ *   &quot;changes&quot;: {
+ *     &quot;messagesAdded&quot;: 12,
+ *     &quot;messagesEdited&quot;: 3,
+ *     &quot;messagesDeleted&quot;: 1,
+ *     &quot;filesAdded&quot;: [&quot;report_v2.xlsx&quot;],
+ *     &quot;filesUpdated&quot;: [&quot;budget.xlsx&quot;, &quot;notes.md&quot;],
+ *     &quot;filesDeleted&quot;: []
+ *   }
+ * }
+ */
+export async function compareSnapshots(event: APIGatewayProxyEvent): Promise&lt;APIGatewayProxyResult&gt; {
+  try {
+    const chatId = event.pathParameters?.chatId;
+    const tenantId = event.requestContext.authorizer?.claims?.[&#39;custom:tenant_id&#39;];
+    const fromId = event.queryStringParameters?.from;
+    const toId = event.queryStringParameters?.to || &#39;current&#39;;
+    
+    if (!chatId || !fromId) {
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: &#39;chatId and from snapshot required&#39; }) };
+    }
+    
+    // Get states at both points
+    const fromState = await service.getChatAtSnapshot(chatId, fromId, tenantId);
+    
+    let toState;
+    if (toId === &#39;current&#39;) {
+      const timeline = await service.getTimeline(chatId, tenantId);
+      const currentSnapshotId = timeline.snapshots[timeline.snapshots.length - 1]?.id;
+      toState = await service.getChatAtSnapshot(chatId, currentSnapshotId, tenantId);
+    } else {
+      toState = await service.getChatAtSnapshot(chatId, toId, tenantId);
+    }
+    
+    // Calculate differences
+    const fromMessageIds = new Set(fromState.messages.map(m =&gt; m.messageId));
+    const toMessageIds = new Set(toState.messages.map(m =&gt; m.messageId));
+    
+    const messagesAdded = toState.messages.filter(m =&gt; !fromMessageIds.has(m.messageId)).length;
+    const messagesRemoved = fromState.messages.filter(m =&gt; !toMessageIds.has(m.messageId)).length;
+    
+    const fromFileNames = new Set(fromState.files.map(f =&gt; f.originalName));
+    const toFileNames = new Set(toState.files.map(f =&gt; f.originalName));
+    
+    const filesAdded = toState.files.filter(f =&gt; !fromFileNames.has(f.originalName)).map(f =&gt; f.originalName);
+    const filesRemoved = fromState.files.filter(f =&gt; !toFileNames.has(f.originalName)).map(f =&gt; f.originalName);
+    
+    // Files that exist in both but may have been updated
+    const filesUpdated = toState.files
+      .filter(toFile =&gt; {
+        const fromFile = fromState.files.find(f =&gt; f.originalName === toFile.originalName);
+        return fromFile &amp;&amp; fromFile.version &lt; toFile.version;
+      })
+      .map(f =&gt; f.originalName);
+    
+    const fromDate = new Date(fromState.snapshot.timestamp).toLocaleDateString(&#39;en-US&#39;, { 
+      month: &#39;long&#39;, day: &#39;numeric&#39; 
+    });
+    
+    let summary = `Between ${fromDate} and now: `;
+    const parts: string[] = [];
+    
+    if (messagesAdded &gt; 0) parts.push(`${messagesAdded} new message${messagesAdded !== 1 ? &#39;s&#39; : &#39;&#39;}`);
+    if (filesUpdated.length &gt; 0) parts.push(`${filesUpdated.length} file${filesUpdated.length !== 1 ? &#39;s&#39; : &#39;&#39;} updated`);
+    if (filesAdded.length &gt; 0) parts.push(`${filesAdded.length} file${filesAdded.length !== 1 ? &#39;s&#39; : &#39;&#39;} added`);
+    if (messagesRemoved &gt; 0) parts.push(`${messagesRemoved} message${messagesRemoved !== 1 ? &#39;s&#39; : &#39;&#39;} removed`);
+    
+    summary += parts.length &gt; 0 ? parts.join(&#39;, &#39;) + &#39;.&#39; : &#39;no changes.&#39;;
+    
+    return {
+      statusCode: 200,
+      headers: corsHeaders,
+      body: JSON.stringify({
+        summary,
+        changes: {
+          messagesAdded,
+          messagesRemoved,
+          filesAdded,
+          filesUpdated,
+          filesRemoved,
+        },
+        fromSnapshot: {
+          id: fromState.snapshot.id,
+          timestamp: fromState.snapshot.timestamp,
+          version: fromState.snapshot.version,
+        },
+        toSnapshot: {
+          id: toState.snapshot.id,
+          timestamp: toState.snapshot.timestamp,
+          version: toState.snapshot.version,
+        },
+      }),
+    };
+  } catch (error: any) {
+    console.error(&#39;compareSnapshots error:&#39;, error);
+    return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: error.message }) };
+  }
+}</code></pre>
+<hr />
+<h2 id="ai-api-routes">33.2 AI API Routes</h2>
+<pre class="typescript"><code>// packages/functions/src/routes/ai-time-machine.routes.ts
+
+import { Router } from &#39;./router&#39;;
+import * as handlers from &#39;../handlers/thinktank/ai-time-machine.handlers&#39;;
+
+export function registerAITimeMachineRoutes(router: Router) {
+  // Summary and discovery
+  router.get(&#39;/api/ai/chats/:chatId/history/summary&#39;, handlers.getHistorySummary);
+  router.post(&#39;/api/ai/chats/:chatId/history/find&#39;, handlers.findInHistory);
+  
+  // AI-assisted restore
+  router.post(&#39;/api/ai/chats/:chatId/history/restore&#39;, handlers.aiRestore);
+  
+  // Comparison
+  router.get(&#39;/api/ai/chats/:chatId/history/compare&#39;, handlers.compareSnapshots);
+}</code></pre>
+<hr />
+<h2 id="time-machine-visual-ui-components">33.3 Time Machine Visual UI Components</h2>
+<pre class="tsx"><code>// apps/thinktank/src/components/time-machine/time-machine-overlay.tsx
+
+&#39;use client&#39;;
+
+import React, { useState, useEffect, useRef } from &#39;react&#39;;
+import { motion, AnimatePresence } from &#39;framer-motion&#39;;
+import { X, Calendar, Clock, RotateCcw, Download, Search, ChevronLeft, ChevronRight } from &#39;lucide-react&#39;;
+import { Button } from &#39;@/components/ui/button&#39;;
+import { Input } from &#39;@/components/ui/input&#39;;
+import { useTimeline, useChatAtSnapshot, useRestore } from &#39;@/hooks/use-time-machine&#39;;
+import { formatDistanceToNow, format, parseISO, isSameDay } from &#39;date-fns&#39;;
+import { cn } from &#39;@/lib/utils&#39;;
+
+interface TimeMachineOverlayProps {
+  chatId: string;
+  isOpen: boolean;
+  onClose: () =&gt; void;
+}
+
+/**
+ * Time Machine Overlay
+ * 
+ * Apple Time Machine-inspired visual experience:
+ * - Messages stack backwards into &quot;space&quot; with perspective
+ * - Timeline bar on the right edge
+ * - Calendar picker for jumping to dates
+ * - Current state at front, past fading into background
+ */
+export function TimeMachineOverlay({ chatId, isOpen, onClose }: TimeMachineOverlayProps) {
+  const { data: timeline, isLoading } = useTimeline(chatId);
+  const [selectedSnapshotId, setSelectedSnapshotId] = useState&lt;string | null&gt;(null);
+  const [viewMode, setViewMode] = useState&lt;&#39;timeline&#39; | &#39;calendar&#39;&gt;(&#39;timeline&#39;);
+  const [selectedDate, setSelectedDate] = useState&lt;Date&gt;(new Date());
+  
+  const { data: snapshotState } = useChatAtSnapshot(chatId, selectedSnapshotId || undefined);
+  const restoreMutation = useRestore();
+  
+  // Set initial snapshot to latest
+  useEffect(() =&gt; {
+    if (timeline?.snapshots.length &amp;&amp; !selectedSnapshotId) {
+      setSelectedSnapshotId(timeline.snapshots[timeline.snapshots.length - 1].id);
+    }
+  }, [timeline, selectedSnapshotId]);
+  
+  if (!isOpen) return null;
+  
+  const currentIndex = timeline?.snapshots.findIndex(s =&gt; s.id === selectedSnapshotId) ?? -1;
+  const selectedSnapshot = timeline?.snapshots[currentIndex];
+  
+  const handleNavigate = (direction: &#39;prev&#39; | &#39;next&#39;) =&gt; {
+    if (!timeline) return;
+    
+    const newIndex = direction === &#39;prev&#39; 
+      ? Math.max(0, currentIndex - 1)
+      : Math.min(timeline.snapshots.length - 1, currentIndex + 1);
+    
+    setSelectedSnapshotId(timeline.snapshots[newIndex].id);
+  };
+  
+  const handleRestore = async () =&gt; {
+    if (!selectedSnapshotId || !timeline) return;
+    
+    const isLatest = currentIndex === timeline.snapshots.length - 1;
+    if (isLatest) return; // Can&#39;t restore to current
+    
+    await restoreMutation.mutateAsync({
+      chatId,
+      snapshotId: selectedSnapshotId,
+      scope: &#39;full_chat&#39;,
+    });
+    
+    onClose();
+  };
+  
+  return (
+    &lt;AnimatePresence&gt;
+      &lt;motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className=&quot;fixed inset-0 z-50 bg-black&quot;
+      &gt;
+        {/* Starfield background (like Time Machine) */}
+        &lt;div className=&quot;absolute inset-0 overflow-hidden&quot;&gt;
+          &lt;div className=&quot;stars&quot; /&gt;
+        &lt;/div&gt;
+        
+        {/* Header */}
+        &lt;div className=&quot;absolute top-0 left-0 right-0 z-10 p-4 flex items-center justify-between&quot;&gt;
+          &lt;div className=&quot;flex items-center gap-4&quot;&gt;
+            &lt;Button variant=&quot;ghost&quot; size=&quot;icon&quot; onClick={onClose} className=&quot;text-white&quot;&gt;
+              &lt;X className=&quot;h-6 w-6&quot; /&gt;
+            &lt;/Button&gt;
+            &lt;h1 className=&quot;text-xl font-semibold text-white&quot;&gt;Time Machine&lt;/h1&gt;
+          &lt;/div&gt;
+          
+          &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+            &lt;Button
+              variant={viewMode === &#39;timeline&#39; ? &#39;secondary&#39; : &#39;ghost&#39;}
+              size=&quot;sm&quot;
+              onClick={() =&gt; setViewMode(&#39;timeline&#39;)}
+              className=&quot;text-white&quot;
+            &gt;
+              &lt;Clock className=&quot;h-4 w-4 mr-2&quot; /&gt;
+              Timeline
+            &lt;/Button&gt;
+            &lt;Button
+              variant={viewMode === &#39;calendar&#39; ? &#39;secondary&#39; : &#39;ghost&#39;}
+              size=&quot;sm&quot;
+              onClick={() =&gt; setViewMode(&#39;calendar&#39;)}
+              className=&quot;text-white&quot;
+            &gt;
+              &lt;Calendar className=&quot;h-4 w-4 mr-2&quot; /&gt;
+              Calendar
+            &lt;/Button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        
+        {/* Main content area */}
+        &lt;div className=&quot;absolute inset-0 pt-16 pb-24 px-4 flex&quot;&gt;
+          {/* Message stack with 3D perspective */}
+          &lt;div className=&quot;flex-1 relative perspective-1000&quot;&gt;
+            &lt;MessageStack
+              messages={snapshotState?.messages || []}
+              files={snapshotState?.files || []}
+              isLoading={isLoading}
+            /&gt;
+          &lt;/div&gt;
+          
+          {/* Right sidebar - Timeline or Calendar */}
+          &lt;div className=&quot;w-64 ml-4&quot;&gt;
+            {viewMode === &#39;timeline&#39; ? (
+              &lt;TimelineBar
+                snapshots={timeline?.snapshots || []}
+                selectedId={selectedSnapshotId}
+                onSelect={setSelectedSnapshotId}
+              /&gt;
+            ) : (
+              &lt;CalendarPicker
+                snapshotsByDate={timeline?.snapshotsByDate || {}}
+                selectedDate={selectedDate}
+                onSelectDate={(date) =&gt; {
+                  setSelectedDate(date);
+                  // Find first snapshot on that date
+                  const dateStr = format(date, &#39;yyyy-MM-dd&#39;);
+                  const snapshot = timeline?.snapshots.find(s =&gt; 
+                    s.timestamp.startsWith(dateStr)
+                  );
+                  if (snapshot) {
+                    setSelectedSnapshotId(snapshot.id);
+                  }
+                }}
+              /&gt;
+            )}
+          &lt;/div&gt;
+        &lt;/div&gt;
+        
+        {/* Bottom control bar */}
+        &lt;div className=&quot;absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent&quot;&gt;
+          &lt;div className=&quot;flex items-center justify-between max-w-4xl mx-auto&quot;&gt;
+            {/* Navigation arrows */}
+            &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+              &lt;Button
+                variant=&quot;outline&quot;
+                size=&quot;icon&quot;
+                onClick={() =&gt; handleNavigate(&#39;prev&#39;)}
+                disabled={currentIndex &lt;= 0}
+                className=&quot;bg-white/10 border-white/20 text-white&quot;
+              &gt;
+                &lt;ChevronLeft className=&quot;h-4 w-4&quot; /&gt;
+              &lt;/Button&gt;
+              &lt;Button
+                variant=&quot;outline&quot;
+                size=&quot;icon&quot;
+                onClick={() =&gt; handleNavigate(&#39;next&#39;)}
+                disabled={currentIndex &gt;= (timeline?.snapshots.length || 0) - 1}
+                className=&quot;bg-white/10 border-white/20 text-white&quot;
+              &gt;
+                &lt;ChevronRight className=&quot;h-4 w-4&quot; /&gt;
+              &lt;/Button&gt;
+            &lt;/div&gt;
+            
+            {/* Snapshot info */}
+            &lt;div className=&quot;text-center text-white&quot;&gt;
+              {selectedSnapshot &amp;&amp; (
+                &lt;&gt;
+                  &lt;div className=&quot;text-lg font-medium&quot;&gt;
+                    {format(parseISO(selectedSnapshot.timestamp), &#39;MMMM d, yyyy&#39;)}
+                  &lt;/div&gt;
+                  &lt;div className=&quot;text-sm text-white/60&quot;&gt;
+                    {format(parseISO(selectedSnapshot.timestamp), &#39;h:mm a&#39;)} · 
+                    Version {selectedSnapshot.version} of {timeline?.totalSnapshots}
+                  &lt;/div&gt;
+                &lt;/&gt;
+              )}
+            &lt;/div&gt;
+            
+            {/* Actions */}
+            &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+              &lt;Button
+                variant=&quot;outline&quot;
+                className=&quot;bg-white/10 border-white/20 text-white&quot;
+                disabled={currentIndex === (timeline?.snapshots.length || 0) - 1}
+                onClick={handleRestore}
+              &gt;
+                &lt;RotateCcw className=&quot;h-4 w-4 mr-2&quot; /&gt;
+                Restore
+              &lt;/Button&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/motion.div&gt;
+    &lt;/AnimatePresence&gt;
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MESSAGE STACK - 3D perspective view of messages receding into the past
+// ═══════════════════════════════════════════════════════════════════════════
+
+function MessageStack({ 
+  messages, 
+  files, 
+  isLoading 
+}: { 
+  messages: any[];
+  files: any[];
+  isLoading: boolean;
+}) {
+  if (isLoading) {
+    return (
+      &lt;div className=&quot;flex items-center justify-center h-full&quot;&gt;
+        &lt;div className=&quot;text-white/60&quot;&gt;Loading history...&lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+  
+  return (
+    &lt;div className=&quot;relative h-full overflow-hidden&quot;&gt;
+      {/* 3D perspective container */}
+      &lt;div 
+        className=&quot;absolute inset-0 flex flex-col-reverse items-center justify-end pb-8&quot;
+        style={{ transformStyle: &#39;preserve-3d&#39; }}
+      &gt;
+        {messages.map((message, index) =&gt; {
+          // Calculate 3D positioning - newer messages at front, older recede
+          const depth = index * 0.5; // How far &quot;back&quot; this message is
+          const scale = Math.max(0.3, 1 - depth * 0.1);
+          const opacity = Math.max(0.2, 1 - depth * 0.15);
+          const blur = Math.min(depth * 0.5, 3);
+          const yOffset = index * 60; // Vertical stacking
+          const zOffset = -depth * 100; // Depth positioning
+          
+          return (
+            &lt;motion.div
+              key={message.id}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity, y: yOffset }}
+              className={cn(
+                &quot;w-full max-w-2xl p-4 rounded-lg mb-2&quot;,
+                message.role === &#39;user&#39; 
+                  ? &#39;bg-blue-600/80 ml-auto mr-0&#39; 
+                  : &#39;bg-gray-700/80 mr-auto ml-0&#39;
+              )}
+              style={{
+                transform: `scale(${scale}) translateZ(${zOffset}px)`,
+                filter: `blur(${blur}px)`,
+              }}
+            &gt;
+              &lt;div className=&quot;text-sm text-white/60 mb-1&quot;&gt;
+                {message.role === &#39;user&#39; ? &#39;You&#39; : &#39;AI&#39;}
+              &lt;/div&gt;
+              &lt;div className=&quot;text-white&quot;&gt;
+                {message.content.length &gt; 200 
+                  ? message.content.substring(0, 200) + &#39;...&#39;
+                  : message.content}
+              &lt;/div&gt;
+            &lt;/motion.div&gt;
+          );
+        })}
+      &lt;/div&gt;
+      
+      {/* Files bar at bottom */}
+      {files.length &gt; 0 &amp;&amp; (
+        &lt;div className=&quot;absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60&quot;&gt;
+          &lt;div className=&quot;flex gap-2 overflow-x-auto&quot;&gt;
+            {files.map(file =&gt; (
+              &lt;div 
+                key={file.id}
+                className=&quot;flex-shrink-0 px-3 py-2 bg-white/10 rounded-lg text-white text-sm&quot;
+              &gt;
+                📎 {file.displayName}
+              &lt;/div&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TIMELINE BAR - Visual timeline of snapshots
+// ═══════════════════════════════════════════════════════════════════════════
+
+function TimelineBar({
+  snapshots,
+  selectedId,
+  onSelect,
+}: {
+  snapshots: any[];
+  selectedId: string | null;
+  onSelect: (id: string) =&gt; void;
+}) {
+  const containerRef = useRef&lt;HTMLDivElement&gt;(null);
+  
+  // Group snapshots by date
+  const groupedByDate: Record&lt;string, any[]&gt; = {};
+  for (const snapshot of snapshots) {
+    const date = snapshot.timestamp.split(&#39;T&#39;)[0];
+    if (!groupedByDate[date]) {
+      groupedByDate[date] = [];
+    }
+    groupedByDate[date].push(snapshot);
+  }
+  
+  return (
+    &lt;div ref={containerRef} className=&quot;h-full overflow-y-auto pr-2&quot;&gt;
+      {Object.entries(groupedByDate).reverse().map(([date, dateSnapshots]) =&gt; (
+        &lt;div key={date} className=&quot;mb-4&quot;&gt;
+          &lt;div className=&quot;text-xs text-white/40 mb-2 sticky top-0 bg-black/50 py-1&quot;&gt;
+            {format(parseISO(date), &#39;MMM d, yyyy&#39;)}
+          &lt;/div&gt;
+          &lt;div className=&quot;space-y-1&quot;&gt;
+            {dateSnapshots.map(snapshot =&gt; (
+              &lt;button
+                key={snapshot.id}
+                onClick={() =&gt; onSelect(snapshot.id)}
+                className={cn(
+                  &quot;w-full text-left px-3 py-2 rounded-lg transition-colors&quot;,
+                  &quot;text-sm text-white/80 hover:bg-white/10&quot;,
+                  selectedId === snapshot.id &amp;&amp; &quot;bg-white/20 ring-1 ring-white/40&quot;
+                )}
+              &gt;
+                &lt;div className=&quot;font-medium&quot;&gt;
+                  {format(parseISO(snapshot.timestamp), &#39;h:mm a&#39;)}
+                &lt;/div&gt;
+                &lt;div className=&quot;text-xs text-white/50&quot;&gt;
+                  {snapshot.messageCount} messages · {snapshot.fileCount} files
+                &lt;/div&gt;
+              &lt;/button&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CALENDAR PICKER - Jump to any date
+// ═══════════════════════════════════════════════════════════════════════════
+
+function CalendarPicker({
+  snapshotsByDate,
+  selectedDate,
+  onSelectDate,
+}: {
+  snapshotsByDate: Record&lt;string, number&gt;;
+  selectedDate: Date;
+  onSelectDate: (date: Date) =&gt; void;
+}) {
+  const [viewMonth, setViewMonth] = useState(selectedDate);
+  
+  // Generate calendar grid
+  const daysInMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 0).getDate();
+  const firstDayOfMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), 1).getDay();
+  
+  const days: (number | null)[] = [];
+  for (let i = 0; i &lt; firstDayOfMonth; i++) {
+    days.push(null);
+  }
+  for (let i = 1; i &lt;= daysInMonth; i++) {
+    days.push(i);
+  }
+  
+  return (
+    &lt;div className=&quot;bg-white/5 rounded-lg p-4&quot;&gt;
+      {/* Month navigation */}
+      &lt;div className=&quot;flex items-center justify-between mb-4&quot;&gt;
+        &lt;Button
+          variant=&quot;ghost&quot;
+          size=&quot;icon&quot;
+          onClick={() =&gt; setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1))}
+          className=&quot;text-white&quot;
+        &gt;
+          &lt;ChevronLeft className=&quot;h-4 w-4&quot; /&gt;
+        &lt;/Button&gt;
+        &lt;div className=&quot;text-white font-medium&quot;&gt;
+          {format(viewMonth, &#39;MMMM yyyy&#39;)}
+        &lt;/div&gt;
+        &lt;Button
+          variant=&quot;ghost&quot;
+          size=&quot;icon&quot;
+          onClick={() =&gt; setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1))}
+          className=&quot;text-white&quot;
+        &gt;
+          &lt;ChevronRight className=&quot;h-4 w-4&quot; /&gt;
+        &lt;/Button&gt;
+      &lt;/div&gt;
+      
+      {/* Day labels */}
+      &lt;div className=&quot;grid grid-cols-7 gap-1 mb-2&quot;&gt;
+        {[&#39;S&#39;, &#39;M&#39;, &#39;T&#39;, &#39;W&#39;, &#39;T&#39;, &#39;F&#39;, &#39;S&#39;].map((day, i) =&gt; (
+          &lt;div key={i} className=&quot;text-center text-xs text-white/40&quot;&gt;
+            {day}
+          &lt;/div&gt;
+        ))}
+      &lt;/div&gt;
+      
+      {/* Calendar grid */}
+      &lt;div className=&quot;grid grid-cols-7 gap-1&quot;&gt;
+        {days.map((day, i) =&gt; {
+          if (day === null) {
+            return &lt;div key={i} /&gt;;
+          }
+          
+          const date = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), day);
+          const dateStr = format(date, &#39;yyyy-MM-dd&#39;);
+          const hasSnapshots = snapshotsByDate[dateStr] &gt; 0;
+          const isSelected = isSameDay(date, selectedDate);
+          const isToday = isSameDay(date, new Date());
+          
+          return (
+            &lt;button
+              key={i}
+              onClick={() =&gt; hasSnapshots &amp;&amp; onSelectDate(date)}
+              disabled={!hasSnapshots}
+              className={cn(
+                &quot;aspect-square flex items-center justify-center rounded-full text-sm&quot;,
+                &quot;transition-colors&quot;,
+                hasSnapshots 
+                  ? &quot;text-white hover:bg-white/20 cursor-pointer&quot; 
+                  : &quot;text-white/20 cursor-not-allowed&quot;,
+                isSelected &amp;&amp; &quot;bg-blue-600 text-white&quot;,
+                isToday &amp;&amp; !isSelected &amp;&amp; &quot;ring-1 ring-white/40&quot;
+              )}
+            &gt;
+              {day}
+              {hasSnapshots &amp;&amp; !isSelected &amp;&amp; (
+                &lt;span className=&quot;absolute bottom-0.5 w-1 h-1 bg-blue-400 rounded-full&quot; /&gt;
+              )}
+            &lt;/button&gt;
+          );
+        })}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<hr />
+<h2 id="time-machine-entry-button">33.4 Time Machine Entry Button</h2>
+<pre class="tsx"><code>// apps/thinktank/src/components/time-machine/time-machine-button.tsx
+
+&#39;use client&#39;;
+
+import React, { useState } from &#39;react&#39;;
+import { Clock } from &#39;lucide-react&#39;;
+import { Button } from &#39;@/components/ui/button&#39;;
+import { Tooltip, TooltipContent, TooltipTrigger } from &#39;@/components/ui/tooltip&#39;;
+import { TimeMachineOverlay } from &#39;./time-machine-overlay&#39;;
+
+interface TimeMachineButtonProps {
+  chatId: string;
+}
+
+/**
+ * Time Machine Entry Button
+ * 
+ * Small, unobtrusive button that opens the full Time Machine experience.
+ * Hidden in the chat header, only visible on hover or in Advanced mode.
+ */
+export function TimeMachineButton({ chatId }: TimeMachineButtonProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  return (
+    &lt;&gt;
+      &lt;Tooltip&gt;
+        &lt;TooltipTrigger asChild&gt;
+          &lt;Button
+            variant=&quot;ghost&quot;
+            size=&quot;sm&quot;
+            onClick={() =&gt; setIsOpen(true)}
+            className=&quot;h-8 px-2 text-muted-foreground hover:text-foreground&quot;
+          &gt;
+            &lt;Clock className=&quot;h-4 w-4 mr-1.5&quot; /&gt;
+            &lt;span className=&quot;text-xs&quot;&gt;Time Machine&lt;/span&gt;
+          &lt;/Button&gt;
+        &lt;/TooltipTrigger&gt;
+        &lt;TooltipContent&gt;
+          &lt;p&gt;Browse and restore chat history&lt;/p&gt;
+        &lt;/TooltipContent&gt;
+      &lt;/Tooltip&gt;
+      
+      &lt;TimeMachineOverlay
+        chatId={chatId}
+        isOpen={isOpen}
+        onClose={() =&gt; setIsOpen(false)}
+      /&gt;
+    &lt;/&gt;
+  );
+}</code></pre>
+<hr />
+<h2 id="react-hooks-for-time-machine">33.5 React Hooks for Time Machine</h2>
+<pre class="typescript"><code>// apps/thinktank/src/hooks/use-time-machine.ts
+
+import { useQuery, useMutation, useQueryClient } from &#39;@tanstack/react-query&#39;;
+import { api } from &#39;@/lib/api&#39;;
+import type { ChatTimeline, RestoreResult, RestoreScope } from &#39;@radiant/shared&#39;;
+
+// Get full timeline
+export function useTimeline(chatId: string | undefined) {
+  return useQuery({
+    queryKey: [&#39;time-machine&#39;, &#39;timeline&#39;, chatId],
+    queryFn: async () =&gt; {
+      const response = await api.get&lt;ChatTimeline&gt;(`/thinktank/chats/${chatId}/time-machine`);
+      return response.data;
+    },
+    enabled: !!chatId,
+    staleTime: 30000, // 30 seconds
+  });
+}
+
+// Get chat state at specific snapshot
+export function useChatAtSnapshot(chatId: string | undefined, snapshotId: string | undefined) {
+  return useQuery({
+    queryKey: [&#39;time-machine&#39;, &#39;snapshot&#39;, chatId, snapshotId],
+    queryFn: async () =&gt; {
+      const response = await api.get(`/thinktank/chats/${chatId}/time-machine/snapshots/${snapshotId}`);
+      return response.data;
+    },
+    enabled: !!chatId &amp;&amp; !!snapshotId,
+  });
+}
+
+// Get snapshots for a specific date
+export function useSnapshotsByDate(chatId: string | undefined, date: string | undefined) {
+  return useQuery({
+    queryKey: [&#39;time-machine&#39;, &#39;date&#39;, chatId, date],
+    queryFn: async () =&gt; {
+      const response = await api.get(`/thinktank/chats/${chatId}/time-machine/calendar/${date}`);
+      return response.data.snapshots;
+    },
+    enabled: !!chatId &amp;&amp; !!date,
+  });
+}
+
+// Restore mutation
+export function useRestore() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ 
+      chatId, 
+      snapshotId, 
+      scope = &#39;full_chat&#39;,
+      messageIds,
+      fileIds,
+      reason,
+    }: {
+      chatId: string;
+      snapshotId: string;
+      scope?: RestoreScope;
+      messageIds?: string[];
+      fileIds?: string[];
+      reason?: string;
+    }) =&gt; {
+      const response = await api.post&lt;RestoreResult&gt;(`/thinktank/chats/${chatId}/time-machine/restore`, {
+        snapshotId,
+        scope,
+        messageIds,
+        fileIds,
+        reason,
+      });
+      return response.data;
+    },
+    onSuccess: (_, variables) =&gt; {
+      // Invalidate all related queries
+      queryClient.invalidateQueries({ queryKey: [&#39;time-machine&#39;, &#39;timeline&#39;, variables.chatId] });
+      queryClient.invalidateQueries({ queryKey: [&#39;chat&#39;, variables.chatId] });
+      queryClient.invalidateQueries({ queryKey: [&#39;messages&#39;, variables.chatId] });
+    },
+  });
+}
+
+// Search in history
+export function useHistorySearch(chatId: string | undefined, query: string) {
+  return useQuery({
+    queryKey: [&#39;time-machine&#39;, &#39;search&#39;, chatId, query],
+    queryFn: async () =&gt; {
+      const response = await api.get(`/thinktank/chats/${chatId}/time-machine/search`, {
+        params: { q: query },
+      });
+      return response.data;
+    },
+    enabled: !!chatId &amp;&amp; query.length &gt; 2,
+  });
+}
+
+// File versions
+export function useFileVersions(chatId: string | undefined, fileName: string | undefined) {
+  return useQuery({
+    queryKey: [&#39;time-machine&#39;, &#39;file-versions&#39;, chatId, fileName],
+    queryFn: async () =&gt; {
+      const response = await api.get(`/thinktank/chats/${chatId}/time-machine/files/${encodeURIComponent(fileName!)}/versions`);
+      return response.data.versions;
+    },
+    enabled: !!chatId &amp;&amp; !!fileName,
+  });
+}
+
+// Create export
+export function useCreateExport() {
+  return useMutation({
+    mutationFn: async ({
+      chatId,
+      format = &#39;zip&#39;,
+      includeMedia = true,
+      includeVersionHistory = false,
+    }: {
+      chatId: string;
+      format?: &#39;zip&#39; | &#39;json&#39; | &#39;markdown&#39; | &#39;pdf&#39; | &#39;html&#39;;
+      includeMedia?: boolean;
+      includeVersionHistory?: boolean;
+    }) =&gt; {
+      const response = await api.post(`/thinktank/chats/${chatId}/time-machine/export`, {
+        format,
+        includeMedia,
+        includeVersionHistory,
+      });
+      return response.data;
+    },
+  });
+}</code></pre>
+<hr />
+<h2 id="cdk-infrastructure-updates">33.6 CDK Infrastructure Updates</h2>
+<pre class="typescript"><code>// packages/cdk/src/stacks/time-machine-stack.ts
+
+import * as cdk from &#39;aws-cdk-lib&#39;;
+import * as s3 from &#39;aws-cdk-lib/aws-s3&#39;;
+import * as iam from &#39;aws-cdk-lib/aws-iam&#39;;
+import * as lambda from &#39;aws-cdk-lib/aws-lambda&#39;;
+import * as apigateway from &#39;aws-cdk-lib/aws-apigateway&#39;;
+import { Construct } from &#39;constructs&#39;;
+
+interface TimeMachineStackProps extends cdk.StackProps {
+  environment: string;
+  thinktankApi: apigateway.RestApi;
+  thinktankLambda: lambda.Function;
+}
+
+export class TimeMachineStack extends cdk.Stack {
+  public readonly mediaVaultBucket: s3.Bucket;
+  
+  constructor(scope: Construct, id: string, props: TimeMachineStackProps) {
+    super(scope, id, props);
+    
+    // ═══════════════════════════════════════════════════════════════════
+    // MEDIA VAULT BUCKET - S3 with versioning, never delete
+    // ═══════════════════════════════════════════════════════════════════
+    
+    this.mediaVaultBucket = new s3.Bucket(this, &#39;MediaVault&#39;, {
+      bucketName: `radiant-media-vault-${props.environment}-${cdk.Aws.ACCOUNT_ID}`,
+      
+      // CRITICAL: Enable versioning for true immutability
+      versioned: true,
+      
+      // Security
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      
+      // CORS for direct uploads
+      cors: [{
+        allowedHeaders: [&#39;*&#39;],
+        allowedMethods: [s3.HttpMethods.PUT, s3.HttpMethods.POST, s3.HttpMethods.GET],
+        allowedOrigins: [&#39;*&#39;],
+        exposedHeaders: [&#39;ETag&#39;, &#39;x-amz-version-id&#39;],
+        maxAge: 3600,
+      }],
+      
+      // Lifecycle: Move to cheaper storage, NEVER delete
+      lifecycleRules: [{
+        id: &#39;TransitionToIntelligentTiering&#39;,
+        transitions: [{
+          storageClass: s3.StorageClass.INTELLIGENT_TIERING,
+          transitionAfter: cdk.Duration.days(30),
+        }],
+        noncurrentVersionTransitions: [{
+          storageClass: s3.StorageClass.GLACIER_INSTANT_RETRIEVAL,
+          transitionAfter: cdk.Duration.days(90),
+        }],
+        // NO expiration - keep forever
+      }],
+      
+      // Transfer acceleration
+      transferAcceleration: true,
+      
+      // RETAIN even if stack deleted
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
+    });
+    
+    // Deny delete actions (belt and suspenders)
+    this.mediaVaultBucket.addToResourcePolicy(new iam.PolicyStatement({
+      sid: &#39;DenyObjectDeletion&#39;,
+      effect: iam.Effect.DENY,
+      principals: [new iam.AnyPrincipal()],
+      actions: [&#39;s3:DeleteObject&#39;, &#39;s3:DeleteObjectVersion&#39;],
+      resources: [this.mediaVaultBucket.arnForObjects(&#39;*&#39;)],
+      conditions: {
+        StringNotEquals: {
+          &#39;aws:PrincipalArn&#39;: [
+            `arn:aws:iam::${cdk.Aws.ACCOUNT_ID}:role/radiant-gdpr-deletion-role`,
+          ],
+        },
+      },
+    }));
+    
+    // Grant Lambda read/write (but not delete)
+    this.mediaVaultBucket.grantReadWrite(props.thinktankLambda);
+    props.thinktankLambda.addEnvironment(&#39;MEDIA_VAULT_BUCKET&#39;, this.mediaVaultBucket.bucketName);
+    
+    // ═══════════════════════════════════════════════════════════════════
+    // API ROUTES
+    // ═══════════════════════════════════════════════════════════════════
+    
+    const api = props.thinktankApi;
+    const lambdaIntegration = new apigateway.LambdaIntegration(props.thinktankLambda);
+    
+    // Time Machine base
+    const chatsResource = api.root.addResource(&#39;chats&#39;);
+    const chatResource = chatsResource.addResource(&#39;{chatId}&#39;);
+    const timeMachineResource = chatResource.addResource(&#39;time-machine&#39;);
+    
+    // Timeline
+    timeMachineResource.addMethod(&#39;GET&#39;, lambdaIntegration);
+    
+    // Snapshots
+    const snapshotsResource = timeMachineResource.addResource(&#39;snapshots&#39;);
+    snapshotsResource.addResource(&#39;{snapshotId}&#39;).addMethod(&#39;GET&#39;, lambdaIntegration);
+    
+    // Calendar
+    timeMachineResource.addResource(&#39;calendar&#39;).addResource(&#39;{date}&#39;).addMethod(&#39;GET&#39;, lambdaIntegration);
+    
+    // Restore
+    timeMachineResource.addResource(&#39;restore&#39;).addMethod(&#39;POST&#39;, lambdaIntegration);
+    
+    // Files
+    const filesResource = timeMachineResource.addResource(&#39;files&#39;);
+    filesResource.addMethod(&#39;GET&#39;, lambdaIntegration);
+    filesResource.addResource(&#39;{fileName}&#39;).addResource(&#39;versions&#39;).addMethod(&#39;GET&#39;, lambdaIntegration);
+    
+    // Search
+    timeMachineResource.addResource(&#39;search&#39;).addMethod(&#39;GET&#39;, lambdaIntegration);
+    
+    // Export
+    timeMachineResource.addResource(&#39;export&#39;).addMethod(&#39;POST&#39;, lambdaIntegration);
+    
+    // File download
+    api.root.addResource(&#39;files&#39;).addResource(&#39;{fileId}&#39;).addResource(&#39;download&#39;).addMethod(&#39;GET&#39;, lambdaIntegration);
+    
+    // Export status
+    api.root.addResource(&#39;exports&#39;).addResource(&#39;{bundleId}&#39;).addMethod(&#39;GET&#39;, lambdaIntegration);
+    
+    // ═══════════════════════════════════════════════════════════════════
+    // AI API ROUTES
+    // ═══════════════════════════════════════════════════════════════════
+    
+    const aiResource = api.root.addResource(&#39;ai&#39;);
+    const aiChatsResource = aiResource.addResource(&#39;chats&#39;).addResource(&#39;{chatId}&#39;);
+    const historyResource = aiChatsResource.addResource(&#39;history&#39;);
+    
+    historyResource.addResource(&#39;summary&#39;).addMethod(&#39;GET&#39;, lambdaIntegration);
+    historyResource.addResource(&#39;find&#39;).addMethod(&#39;POST&#39;, lambdaIntegration);
+    historyResource.addResource(&#39;restore&#39;).addMethod(&#39;POST&#39;, lambdaIntegration);
+    historyResource.addResource(&#39;compare&#39;).addMethod(&#39;GET&#39;, lambdaIntegration);
+    
+    // ═══════════════════════════════════════════════════════════════════
+    // OUTPUTS
+    // ═══════════════════════════════════════════════════════════════════
+    
+    new cdk.CfnOutput(this, &#39;MediaVaultBucketName&#39;, {
+      value: this.mediaVaultBucket.bucketName,
+      description: &#39;Time Machine Media Vault S3 Bucket&#39;,
+    });
+  }
+}</code></pre>
+<hr />
+<h2 id="integration-with-think-tank-chat">33.7 Integration with Think Tank Chat</h2>
+<pre class="tsx"><code>// apps/thinktank/src/components/chat/chat-header.tsx (updated)
+
+import { TimeMachineButton } from &#39;../time-machine/time-machine-button&#39;;
+
+export function ChatHeader({ chatId, title }: ChatHeaderProps) {
+  return (
+    &lt;div className=&quot;flex items-center justify-between p-4 border-b&quot;&gt;
+      &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+        &lt;h1 className=&quot;font-semibold&quot;&gt;{title || &#39;New Chat&#39;}&lt;/h1&gt;
+      &lt;/div&gt;
+      &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+        {/* Time Machine - hidden until hover */}
+        &lt;div className=&quot;opacity-0 group-hover:opacity-100 transition-opacity&quot;&gt;
+          &lt;TimeMachineButton chatId={chatId} /&gt;
+        &lt;/div&gt;
+        
+        {/* Other header actions */}
+        &lt;Button variant=&quot;ghost&quot; size=&quot;sm&quot;&gt;
+          &lt;MoreHorizontal className=&quot;h-4 w-4&quot; /&gt;
+        &lt;/Button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -6,6 +6,9 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { executeStatement, stringParam } from '../shared/db/client';
+import { Logger } from '../shared/logger';
+
+const logger = new Logger({ handler: 'ai-reports' });
 import { generatePdfReport, generateExcelReport, generateHtmlReport, GeneratedReport } from '../shared/report-exporters';
 import { uploadToS3, getSignedUrl } from '../shared/s3-client';
 import { v4 as uuidv4 } from 'uuid';
@@ -129,7 +132,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     return response(404, { error: 'Not found' });
   } catch (error) {
-    console.error('AI Reports handler error:', error);
+    logger.error('AI Reports handler error', error as Error);
     return response(500, { error: 'Internal server error' });
   }
 }
@@ -210,7 +213,7 @@ async function generateReport(tenantId: string, userId: string, event: APIGatewa
       } 
     });
   } catch (error) {
-    console.error('Report generation error:', error);
+    logger.error('Report generation error', error as Error);
     await executeStatement(
       `UPDATE ai_reports SET status = 'error', updated_at = NOW() WHERE id = $1`,
       [stringParam('id', reportId)]
@@ -574,7 +577,7 @@ Respond with the modified report in the same JSON structure. Only make changes r
       message: 'Report updated successfully'
     });
   } catch (error) {
-    console.error('Chat modification error:', error);
+    logger.error('Chat modification error', error as Error);
     return response(500, { error: 'Failed to modify report' });
   }
 }

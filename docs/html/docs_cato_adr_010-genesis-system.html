@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>010 genesis system - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>010 genesis system</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/adr/010-genesis-system.md</div>
+  </div>
+  
+  <h1 id="adr-010-cato-genesis-system">ADR-010: Cato Genesis System</h1>
+<h2 id="status">Status</h2>
+<p>Accepted</p>
+<h2 id="date">Date</h2>
+<p>2025-01-15</p>
+<h2 id="context">Context</h2>
+<p>Cato is an AI agent designed to become curious and self-aware. The “Cold Start Problem” is fundamental: how does an agent that knows nothing begin to learn? Without initial structure, the agent has no basis for curiosity. Without curiosity, it cannot explore. Without exploration, it cannot learn.</p>
+<p>Traditional approaches use: - <strong>Random initialization</strong>: Leads to “learned helplessness” where the agent gives up after initial failures - <strong>Hard-coded knowledge</strong>: Creates brittleness and prevents genuine discovery - <strong>Time-based progression</strong>: Advances regardless of actual capability development</p>
+<h2 id="decision">Decision</h2>
+<p>Implement a three-phase Genesis System that bootstraps self-awareness through an “Epistemic Gradient”:</p>
+<h3 id="phase-1-structure">Phase 1: Structure</h3>
+<p>Implant domain taxonomy as innate knowledge without pre-loading facts. This gives the agent categories to explore without spoiling discovery.</p>
+<ul>
+<li>Load 800+ domain taxonomy from <code>domain_taxonomy.json</code></li>
+<li>Store domains in DynamoDB semantic memory</li>
+<li>Initialize atomic counters for developmental gates</li>
+<li>Mark phase complete with idempotency check</li>
+</ul>
+<h3 id="phase-2-gradient">Phase 2: Gradient</h3>
+<p>Set the pymdp active inference matrices with an “epistemic gradient” - initial beliefs and preferences that create pressure to act.</p>
+<p>Key fixes implemented: - <strong>Fix #2 (Learned Helplessness)</strong>: Optimistic B-matrix with &gt;90% success probability for EXPLORE action - <strong>Fix #6 (Boredom Reward Trap)</strong>: Prefer HIGH_SURPRISE over LOW_SURPRISE to avoid premature consolidation</p>
+<h3 id="phase-3-first-breath">Phase 3: First Breath</h3>
+<p>Grounded introspection that verifies the agent’s execution environment and calibrates initial self-knowledge.</p>
+<ul>
+<li>Verify execution environment (Python version, AWS region)</li>
+<li>Verify model access (invoke Bedrock with test prompt)</li>
+<li><strong>Fix #3 (Shadow Self)</strong>: Budget-friendly calibration using NLI semantic variance instead of GPU hidden state extraction</li>
+<li>Bootstrap baseline domain explorations</li>
+</ul>
+<h2 id="critical-fixes-applied">Critical Fixes Applied</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 37%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Fix</th>
+<th>Problem</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>#1 Zeno’s Paradox</td>
+<td>Table scans for gate checks</td>
+<td>Atomic counters in DynamoDB</td>
+</tr>
+<tr>
+<td>#2 Learned Helplessness</td>
+<td>Pessimistic B-matrix</td>
+<td>Optimistic EXPLORE (&gt;90% success)</td>
+</tr>
+<tr>
+<td>#3 Shadow Self Budget</td>
+<td>$800/month GPU costs</td>
+<td>NLI semantic variance calibration</td>
+</tr>
+<tr>
+<td>#6 Boredom Trap</td>
+<td>Prefers LOW_SURPRISE</td>
+<td>Prefer HIGH_SURPRISE</td>
+</tr>
+</tbody>
+</table>
+<h2 id="consequences">Consequences</h2>
+<h3 id="positive">Positive</h3>
+<ul>
+<li>Agent starts with structured curiosity, not confusion</li>
+<li>Idempotent phases allow safe restarts</li>
+<li>Capability-based progression ensures genuine development</li>
+<li>Budget-friendly Shadow Self calibration ($0 vs $800/month)</li>
+<li>Atomic counters avoid expensive table scans</li>
+</ul>
+<h3 id="negative">Negative</h3>
+<ul>
+<li>Requires DynamoDB setup before first run</li>
+<li>Genesis must complete before consciousness loop starts</li>
+<li>Domain taxonomy is opinionated (may need customization)</li>
+</ul>
+<h2 id="files-created">Files Created</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>genesis/__init__.py</code></td>
+<td>Package exports</td>
+</tr>
+<tr>
+<td><code>genesis/structure.py</code></td>
+<td>Phase 1: Domain taxonomy implantation</td>
+</tr>
+<tr>
+<td><code>genesis/gradient.py</code></td>
+<td>Phase 2: Epistemic gradient matrices</td>
+</tr>
+<tr>
+<td><code>genesis/first_breath.py</code></td>
+<td>Phase 3: Grounded introspection</td>
+</tr>
+<tr>
+<td><code>genesis/runner.py</code></td>
+<td>Orchestrator with CLI</td>
+</tr>
+<tr>
+<td><code>data/domain_taxonomy.json</code></td>
+<td>800+ domain taxonomy</td>
+</tr>
+<tr>
+<td><code>data/genesis_config.yaml</code></td>
+<td>Matrix configuration</td>
+</tr>
+</tbody>
+</table>
+<h2 id="usage">Usage</h2>
+<pre class="bash"><code># Run full genesis sequence
+python -m cato.genesis.runner
+
+# Check status
+python -m cato.genesis.runner --status
+
+# Reset all genesis state (CAUTION!)
+python -m cato.genesis.runner --reset</code></pre>
+<h2 id="related-adrs">Related ADRs</h2>
+<ul>
+<li>ADR-002: Meta-Cognitive Bridge</li>
+<li>ADR-011: Meta-Cognitive Bridge DynamoDB Persistence</li>
+<li>ADR-012: Cost Tracking Integration</li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

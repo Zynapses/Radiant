@@ -1,0 +1,4012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIANT PLATFORM ARCHITECTURE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RADIANT PLATFORM ARCHITECTURE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/RADIANT-PLATFORM-ARCHITECTURE.md</div>
+  </div>
+  
+  <h1 id="radiant-platform-documentation">RADIANT Platform Documentation</h1>
+<h2 id="complete-system-architecture-reference">Complete System Architecture Reference</h2>
+<h3 id="version-5.52.29-january-2026">Version 5.52.29 | January 2026</h3>
+<hr />
+<h1 id="executive-summary">EXECUTIVE SUMMARY</h1>
+<p><strong>RADIANT</strong> (Rapid AI Deployment Infrastructure for Applications with Native Tenancy) is a comprehensive multi-tenant AWS SaaS platform providing AI model orchestration and infrastructure services. The platform serves as white-label infrastructure operating invisibly behind customer-facing applications.</p>
+<p><strong>Version 5.0 (The Sovereign Mesh)</strong> introduces: - <strong>Agent Registry</strong> - Long-running AI agents with OODA loops - <strong>App Registry</strong> - 3,000+ apps auto-synced from Activepieces/n8n - <strong>Parametric AI Helper</strong> - AI assistance configurable per node - <strong>Pre-Flight Provisioning</strong> - Check requirements before execution - <strong>Transparency Layer</strong> - Full visibility into Cato’s decisions - <strong>Enhanced HITL</strong> - First-class approval workflows</p>
+<hr />
+<h1 id="part-1-existing-architecture-prompts-01-35">PART 1: EXISTING ARCHITECTURE (PROMPTS 01-35)</h1>
+<h2 id="infrastructure-foundation-prompt-01-through-prompt-03">1.1 Infrastructure Foundation (PROMPT-01 through PROMPT-03)</h2>
+<h3 id="aws-cdk-infrastructure">AWS CDK Infrastructure</h3>
+<table>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 40%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Description</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VPC Stack</td>
+<td>Multi-AZ VPC with public/private subnets</td>
+<td>✅ Implemented</td>
+</tr>
+<tr>
+<td>Database Stack</td>
+<td>Aurora PostgreSQL with pgvector</td>
+<td>✅ Implemented</td>
+</tr>
+<tr>
+<td><strong>Database Scaling Stack</strong></td>
+<td>RDS Proxy, Async Writes, Redis Cache</td>
+<td>✅ Implemented (v5.52.20)</td>
+</tr>
+<tr>
+<td>Cache Stack</td>
+<td>ElastiCache Redis cluster</td>
+<td>✅ Implemented</td>
+</tr>
+<tr>
+<td>Auth Stack</td>
+<td>Cognito user pools</td>
+<td>✅ Implemented</td>
+</tr>
+<tr>
+<td>API Stack</td>
+<td>API Gateway + Lambda</td>
+<td>✅ Implemented</td>
+</tr>
+<tr>
+<td>Storage Stack</td>
+<td>S3 buckets for uploads/artifacts</td>
+<td>✅ Implemented</td>
+</tr>
+<tr>
+<td>Monitoring Stack</td>
+<td>CloudWatch dashboards + alarms</td>
+<td>✅ Implemented</td>
+</tr>
+</tbody>
+</table>
+<h3 id="postgresql-scaling-infrastructure-v5.52.20">PostgreSQL Scaling Infrastructure (v5.52.20)</h3>
+<p>Enterprise-grade scaling for parallel AI model execution supporting 100+ concurrent requests with 6 parallel model writes each.</p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 23%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+<th>Tier Availability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RDS Proxy</strong></td>
+<td>Connection pooling, Lambda cold-start optimization</td>
+<td>2+</td>
+</tr>
+<tr>
+<td><strong>Async Write Queue</strong></td>
+<td>SQS-based batch writes for model results</td>
+<td>2+</td>
+</tr>
+<tr>
+<td><strong>Redis Hot-Path Cache</strong></td>
+<td>Read-after-write consistency, rate limiting</td>
+<td>2+</td>
+</tr>
+<tr>
+<td><strong>Time-Based Partitioning</strong></td>
+<td>Monthly partitions for logs/usage tables</td>
+<td>All</td>
+</tr>
+<tr>
+<td><strong>Materialized Views</strong></td>
+<td>Pre-computed dashboard metrics</td>
+<td>All</td>
+</tr>
+<tr>
+<td><strong>Optimized RLS</strong></td>
+<td>Index-friendly tenant isolation policies</td>
+<td>All</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CDK Constructs</strong>: - <code>DatabaseScalingConstruct</code> - RDS Proxy with tier-based connection limits - <code>AsyncWriteConstruct</code> - SQS queue + batch writer Lambda - <code>RedisCacheConstruct</code> - ElastiCache cluster with cluster mode</p>
+<h3 id="database-schema-migrations-001-070">Database Schema (Migrations 001-070)</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+<th>Migration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tenants</code></td>
+<td>Multi-tenant isolation</td>
+<td>001</td>
+</tr>
+<tr>
+<td><code>users</code></td>
+<td>User accounts</td>
+<td>002</td>
+</tr>
+<tr>
+<td><code>api_keys</code></td>
+<td>API authentication</td>
+<td>003</td>
+</tr>
+<tr>
+<td><code>sessions</code></td>
+<td>Chat sessions</td>
+<td>004</td>
+</tr>
+<tr>
+<td><code>messages</code></td>
+<td>Chat messages</td>
+<td>005</td>
+</tr>
+<tr>
+<td><code>ai_providers</code></td>
+<td>20+ AI providers</td>
+<td>007</td>
+</tr>
+<tr>
+<td><code>ai_models</code></td>
+<td>106 AI models</td>
+<td>007</td>
+</tr>
+<tr>
+<td><code>usage_records</code></td>
+<td>Billing/usage</td>
+<td>010</td>
+</tr>
+<tr>
+<td><code>audit_logs</code></td>
+<td>Compliance audit</td>
+<td>015</td>
+</tr>
+<tr>
+<td><code>mfa_backup_codes</code></td>
+<td>MFA one-time recovery codes</td>
+<td>070</td>
+</tr>
+<tr>
+<td><code>mfa_trusted_devices</code></td>
+<td>30-day device trust tokens</td>
+<td>070</td>
+</tr>
+<tr>
+<td><code>mfa_audit_log</code></td>
+<td>MFA event audit log (partitioned)</td>
+<td>070</td>
+</tr>
+<tr>
+<td><code>*.detected_language</code></td>
+<td>Auto-detected content language</td>
+<td>071</td>
+</tr>
+<tr>
+<td><code>*.search_vector_simple</code></td>
+<td>Fallback tsvector for FTS</td>
+<td>071</td>
+</tr>
+<tr>
+<td><code>*.search_vector_english</code></td>
+<td>Language-specific tsvector</td>
+<td>071</td>
+</tr>
+</tbody>
+</table>
+<h3 id="multi-language-search-migration-071">Multi-Language Search (Migration 071)</h3>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 64%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>pg_bigm Extension</strong></td>
+<td>Bi-gram indexing for CJK languages</td>
+</tr>
+<tr>
+<td><strong>Language Detection</strong></td>
+<td><code>detect_text_language()</code> function</td>
+</tr>
+<tr>
+<td><strong>Unified Search</strong></td>
+<td><code>search_content()</code> routes to FTS or bigm</td>
+</tr>
+<tr>
+<td><strong>18 Languages</strong></td>
+<td>en, es, fr, de, pt, it, nl, pl, ru, tr, ja, ko, zh-CN, zh-TW, ar, hi, th, vi</td>
+</tr>
+</tbody>
+</table>
+<h3 id="swift-deployment-application">Swift Deployment Application</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One-Click Deploy</td>
+<td>Complete infrastructure in single click</td>
+</tr>
+<tr>
+<td>Account Management</td>
+<td>AWS account configuration</td>
+</tr>
+<tr>
+<td>Environment Selection</td>
+<td>Dev/Staging/Prod</td>
+</tr>
+<tr>
+<td>Progress Monitoring</td>
+<td>Real-time deployment status</td>
+</tr>
+<tr>
+<td>Rollback Support</td>
+<td>Automatic rollback on failure</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="lambda-functions-prompt-04-prompt-05">1.2 Lambda Functions (PROMPT-04 &amp; PROMPT-05)</h2>
+<h3 id="core-lambda-functions">Core Lambda Functions</h3>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 32%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Function</th>
+<th>Purpose</th>
+<th>Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auth-handler</code></td>
+<td>Authentication/authorization</td>
+<td>API Gateway</td>
+</tr>
+<tr>
+<td><code>mfa-handler</code></td>
+<td>MFA enrollment, verification, device trust</td>
+<td>API Gateway</td>
+</tr>
+<tr>
+<td><code>chat-handler</code></td>
+<td>Chat completion requests</td>
+<td>API Gateway</td>
+</tr>
+<tr>
+<td><code>stream-handler</code></td>
+<td>SSE streaming responses</td>
+<td>API Gateway</td>
+</tr>
+<tr>
+<td><code>models-handler</code></td>
+<td>Model CRUD operations</td>
+<td>API Gateway</td>
+</tr>
+<tr>
+<td><code>providers-handler</code></td>
+<td>Provider management</td>
+<td>API Gateway</td>
+</tr>
+<tr>
+<td><code>sessions-handler</code></td>
+<td>Session management</td>
+<td>API Gateway</td>
+</tr>
+<tr>
+<td><code>usage-handler</code></td>
+<td>Usage reporting</td>
+<td>API Gateway</td>
+</tr>
+</tbody>
+</table>
+<h3 id="admin-lambda-functions-62-total---v5.52.6">Admin Lambda Functions (62 Total - v5.52.6)</h3>
+<p>All admin Lambda handlers are wired to <code>/api/admin/*</code> routes with Cognito admin authorization.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 25%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Count</th>
+<th>Handlers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cato Safety</strong></td>
+<td>5</td>
+<td>cato, cato-genesis, cato-global, cato-governance, cato-pipeline</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>6</td>
+<td>security, security-schedules, api-keys, ethics, self-audit, mfa</td>
+</tr>
+<tr>
+<td><strong>Memory Systems</strong></td>
+<td>4</td>
+<td>cortex, cortex-v2, blackboard, empiricism-loop</td>
+</tr>
+<tr>
+<td><strong>AI/ML</strong></td>
+<td>7</td>
+<td>brain, cognition, ego, raws, inference-components, formal-reasoning, ethics-free-reasoning</td>
+</tr>
+<tr>
+<td><strong>Operations</strong></td>
+<td>5</td>
+<td>gateway, sovereign-mesh, sovereign-mesh-performance, sovereign-mesh-scaling, hitl-orchestration</td>
+</tr>
+<tr>
+<td><strong>Reporting</strong></td>
+<td>4</td>
+<td>reports, ai-reports, dynamic-reports, metrics</td>
+</tr>
+<tr>
+<td><strong>Configuration</strong></td>
+<td>7</td>
+<td>tenants, invitations, library-registry, checklist-registry, collaboration-settings, system, system-config</td>
+</tr>
+<tr>
+<td><strong>Infrastructure</strong></td>
+<td>6</td>
+<td>aws-costs, aws-monitoring, s3-storage, code-quality, infrastructure-tier, logs</td>
+</tr>
+<tr>
+<td><strong>Compliance</strong></td>
+<td>4</td>
+<td>regulatory-standards, council, user-violations, approvals</td>
+</tr>
+<tr>
+<td><strong>Models</strong></td>
+<td>5</td>
+<td>models, lora-adapters, pricing, specialty-rankings, sync-providers</td>
+</tr>
+<tr>
+<td><strong>Orchestration</strong></td>
+<td>2</td>
+<td>orchestration-methods, orchestration-user-templates</td>
+</tr>
+<tr>
+<td><strong>Users</strong></td>
+<td>2</td>
+<td>user-registry, white-label</td>
+</tr>
+<tr>
+<td><strong>Time &amp; Translation</strong></td>
+<td>3</td>
+<td>time-machine, translation, internet-learning</td>
+</tr>
+<tr>
+<td><strong>Learning</strong></td>
+<td>1</td>
+<td>agi-learning</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Implementation</strong>: <code>packages/infrastructure/lib/stacks/api-stack.ts</code></p>
+<h3 id="scheduled-lambda-functions">Scheduled Lambda Functions</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Schedule</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>billing-aggregator</code></td>
+<td>Hourly</td>
+<td>Aggregate usage for billing</td>
+</tr>
+<tr>
+<td><code>thermal-manager</code></td>
+<td>Every 5 min</td>
+<td>Manage model thermal states</td>
+</tr>
+<tr>
+<td><code>health-checker</code></td>
+<td>Every minute</td>
+<td>Provider health checks</td>
+</tr>
+<tr>
+<td><code>usage-rollup</code></td>
+<td>Daily</td>
+<td>Daily usage summaries</td>
+</tr>
+<tr>
+<td><code>app-registry-sync</code></td>
+<td>Daily 2 AM</td>
+<td>Sync apps from Activepieces/n8n</td>
+</tr>
+<tr>
+<td><code>app-health-check</code></td>
+<td>Hourly</td>
+<td>Check health of top 100 apps</td>
+</tr>
+<tr>
+<td><code>hitl-sla-monitor</code></td>
+<td>Every minute</td>
+<td>Monitor HITL approval SLAs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sqs-triggered-worker-lambdas">SQS-Triggered Worker Lambdas</h3>
+<table>
+<colgroup>
+<col style="width: 38%" />
+<col style="width: 26%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Function</th>
+<th>Queue</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-execution-worker</code></td>
+<td>agent-execution</td>
+<td>Async OODA loop processing</td>
+</tr>
+<tr>
+<td><code>transparency-compiler</code></td>
+<td>transparency</td>
+<td>Pre-compute decision explanations</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="two-factor-authentication-v5.52.28">1.2.1 Two-Factor Authentication (v5.52.28)</h2>
+<p>Role-based MFA enforcement using industry-standard TOTP (RFC 6238).</p>
+<h3 id="mfa-architecture">MFA Architecture</h3>
+<pre><code>┌─────────────┐     ┌──────────────┐     ┌─────────────────┐
+│   Login     │────▶│  MFA Check   │────▶│  Role Requires  │
+│   (Cognito) │     │  /api/mfa/   │     │  MFA?           │
+└─────────────┘     │   check      │     └────────┬────────┘
+                    └──────────────┘              │
+                           │ Yes                  │ No
+                           ▼                      ▼
+                    ┌──────────────┐     ┌─────────────────┐
+                    │  Enrolled?   │     │  Dashboard      │
+                    └──────┬───────┘     │  Access         │
+                           │             └─────────────────┘
+                    No     │ Yes
+                    ▼      ▼
+             ┌──────────┐ ┌──────────────┐
+             │ Enroll   │ │ Device       │
+             │ Gate     │ │ Trusted?     │
+             └──────────┘ └──────┬───────┘
+                                 │
+                          No     │ Yes
+                          ▼      ▼
+                   ┌──────────┐ ┌─────────────┐
+                   │ Verify   │ │ Dashboard   │
+                   │ Code     │ │ Access      │
+                   └──────────┘ └─────────────┘</code></pre>
+<h3 id="required-roles-cannot-bypass-or-disable">Required Roles (Cannot Bypass or Disable)</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>MFA Required</th>
+<th>Can Disable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>super_admin</code></td>
+<td><strong>Yes</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>admin</code></td>
+<td><strong>Yes</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>operator</code></td>
+<td><strong>Yes</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>auditor</code></td>
+<td><strong>Yes</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>tenant_admin</code></td>
+<td><strong>Yes</strong></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>tenant_owner</code></td>
+<td><strong>Yes</strong></td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mfa-services">MFA Services</h3>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TOTPService</code></td>
+<td>RFC 6238 TOTP generation/verification</td>
+</tr>
+<tr>
+<td><code>BackupCodesService</code></td>
+<td>One-time recovery codes (SHA-256)</td>
+</tr>
+<tr>
+<td><code>DeviceTrustService</code></td>
+<td>30-day device trust tokens</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mfa-api-endpoints">MFA API Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 29%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/api/v2/mfa/status</code></td>
+<td>GET</td>
+<td>MFA status, backup codes, devices</td>
+</tr>
+<tr>
+<td><code>/api/v2/mfa/check</code></td>
+<td>GET</td>
+<td>Check if role requires MFA</td>
+</tr>
+<tr>
+<td><code>/api/v2/mfa/enroll/start</code></td>
+<td>POST</td>
+<td>Generate TOTP secret</td>
+</tr>
+<tr>
+<td><code>/api/v2/mfa/enroll/verify</code></td>
+<td>POST</td>
+<td>Verify and enable MFA</td>
+</tr>
+<tr>
+<td><code>/api/v2/mfa/verify</code></td>
+<td>POST</td>
+<td>Verify code during login</td>
+</tr>
+<tr>
+<td><code>/api/v2/mfa/backup-codes/regenerate</code></td>
+<td>POST</td>
+<td>Regenerate backup codes</td>
+</tr>
+<tr>
+<td><code>/api/v2/mfa/devices</code></td>
+<td>GET</td>
+<td>List trusted devices</td>
+</tr>
+<tr>
+<td><code>/api/v2/mfa/devices/:id</code></td>
+<td>DELETE</td>
+<td>Revoke device</td>
+</tr>
+</tbody>
+</table>
+<h3 id="security-measures">Security Measures</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Secret Encryption</strong></td>
+<td>AES-256-GCM with scrypt key</td>
+</tr>
+<tr>
+<td><strong>Code Hashing</strong></td>
+<td>SHA-256</td>
+</tr>
+<tr>
+<td><strong>Clock Drift</strong></td>
+<td>±30 seconds</td>
+</tr>
+<tr>
+<td><strong>Lockout</strong></td>
+<td>3 failures → 5 min</td>
+</tr>
+<tr>
+<td><strong>Device Trust</strong></td>
+<td>30 days, max 5/user</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ui-components">UI Components</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MFAEnrollmentGate</code></td>
+<td>Full-screen forced enrollment</td>
+</tr>
+<tr>
+<td><code>MFAVerificationPrompt</code></td>
+<td>Code entry modal</td>
+</tr>
+<tr>
+<td><code>MFASettingsSection</code></td>
+<td>Settings management</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Migration</strong>: <code>070_mfa_support.sql</code></p>
+<hr />
+<h2 id="self-hosted-models-prompt-06">1.3 Self-Hosted Models (PROMPT-06)</h2>
+<h3 id="model-categories">Model Categories</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 24%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Models</th>
+<th>Instance Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Vision Classification</strong></td>
+<td>EfficientNet-B0/B4/V2-L, ConvNeXt, ViT</td>
+<td>ml.g4dn.xlarge - ml.g5.2xlarge</td>
+</tr>
+<tr>
+<td><strong>Object Detection</strong></td>
+<td>YOLOv8n/m/x, DETR, Grounding DINO</td>
+<td>ml.g4dn.xlarge - ml.g5.4xlarge</td>
+</tr>
+<tr>
+<td><strong>Segmentation</strong></td>
+<td>SAM, SAM2, MobileSAM, Mask R-CNN</td>
+<td>ml.g5.xlarge - ml.g5.12xlarge</td>
+</tr>
+<tr>
+<td><strong>Audio/Speech</strong></td>
+<td>Whisper Large V3, Whisper Turbo, TitaNet, Pyannote</td>
+<td>ml.g4dn.xlarge - ml.g5.xlarge</td>
+</tr>
+<tr>
+<td><strong>Scientific</strong></td>
+<td>ESM-2 3B, AlphaFold2, Protenix, AlphaGeometry</td>
+<td>ml.g5.12xlarge - ml.p4d.24xlarge</td>
+</tr>
+<tr>
+<td><strong>Medical</strong></td>
+<td>nnU-Net, MedSAM</td>
+<td>ml.g5.2xlarge</td>
+</tr>
+<tr>
+<td><strong>Geospatial</strong></td>
+<td>Prithvi 100M/600M</td>
+<td>ml.g5.xlarge - ml.g5.4xlarge</td>
+</tr>
+<tr>
+<td><strong>3D Reconstruction</strong></td>
+<td>NeRFstudio, Gaussian Splatting</td>
+<td>ml.g5.4xlarge - ml.g5.12xlarge</td>
+</tr>
+</tbody>
+</table>
+<h3 id="thermal-state-management">Thermal State Management</h3>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Description</th>
+<th>Instance Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OFF</code></td>
+<td>No instances running</td>
+<td>Terminated</td>
+</tr>
+<tr>
+<td><code>COLD</code></td>
+<td>Scaled to zero, starts on demand</td>
+<td>Terminated</td>
+</tr>
+<tr>
+<td><code>WARM</code></td>
+<td>Minimum instances ready</td>
+<td>Running</td>
+</tr>
+<tr>
+<td><code>HOT</code></td>
+<td>Maximum instances for high load</td>
+<td>Running</td>
+</tr>
+<tr>
+<td><code>AUTOMATIC</code></td>
+<td>Auto-scale based on demand</td>
+<td>Variable</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="external-ai-providers-prompt-07">1.4 External AI Providers (PROMPT-07)</h2>
+<h3 id="provider-integration">Provider Integration</h3>
+<table>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 27%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Models</th>
+<th>Auth Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Anthropic</strong></td>
+<td>Claude 4 Opus, Claude 4 Sonnet, Claude Haiku 3.5</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><strong>OpenAI</strong></td>
+<td>GPT-4o, GPT-4o-mini, o1, o1-mini</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><strong>Google</strong></td>
+<td>Gemini 2.0 Flash, Gemini 1.5 Pro/Flash</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><strong>AWS Bedrock</strong></td>
+<td>Claude, Titan, Llama</td>
+<td>IAM</td>
+</tr>
+<tr>
+<td><strong>Azure OpenAI</strong></td>
+<td>GPT-4, GPT-4 Turbo</td>
+<td>API Key + Endpoint</td>
+</tr>
+<tr>
+<td><strong>Mistral</strong></td>
+<td>Mistral Large, Codestral</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><strong>Cohere</strong></td>
+<td>Command R+, Embed</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><strong>Groq</strong></td>
+<td>Llama 3.1 70B/8B, Mixtral</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><strong>Together</strong></td>
+<td>Llama, Qwen, DeepSeek</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><strong>Fireworks</strong></td>
+<td>Llama, Mixtral, FireFunction</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><strong>DeepSeek</strong></td>
+<td>DeepSeek Chat, DeepSeek Coder</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><strong>Perplexity</strong></td>
+<td>Sonar Large/Small</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><strong>xAI</strong></td>
+<td>Grok 2, Grok 2 Mini</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><strong>Alibaba</strong></td>
+<td>Qwen Max, Qwen Plus, Qwen Turbo</td>
+<td>API Key</td>
+</tr>
+</tbody>
+</table>
+<h3 id="unified-model-access-via-litellm">Unified Model Access via LiteLLM</h3>
+<pre class="typescript"><code>interface ModelRequest {
+  model: string;           // e.g., &quot;claude-sonnet-4&quot;
+  messages: Message[];
+  maxTokens?: number;
+  temperature?: number;
+  stream?: boolean;
+}</code></pre>
+<hr />
+<h2 id="admin-web-dashboard-prompt-08">1.5 Admin Web Dashboard (PROMPT-08)</h2>
+<h3 id="dashboard-pages">Dashboard Pages</h3>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/dashboard</code></td>
+<td>Overview metrics, quick actions</td>
+</tr>
+<tr>
+<td><code>/models</code></td>
+<td>Model registry, thermal controls</td>
+</tr>
+<tr>
+<td><code>/models/[id]</code></td>
+<td>Model detail, usage stats</td>
+</tr>
+<tr>
+<td><code>/providers</code></td>
+<td>Provider management, health status</td>
+</tr>
+<tr>
+<td><code>/tenants</code></td>
+<td>Tenant management</td>
+</tr>
+<tr>
+<td><code>/tenants/[id]</code></td>
+<td>Tenant detail, usage, config</td>
+</tr>
+<tr>
+<td><code>/users</code></td>
+<td>User management</td>
+</tr>
+<tr>
+<td><code>/billing</code></td>
+<td>Usage reports, invoicing</td>
+</tr>
+<tr>
+<td><code>/audit</code></td>
+<td>Audit log viewer</td>
+</tr>
+<tr>
+<td><code>/settings</code></td>
+<td>System configuration</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tech-stack">Tech Stack</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Technology</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Framework</td>
+<td>Next.js 14 (App Router)</td>
+</tr>
+<tr>
+<td>UI Library</td>
+<td>shadcn/ui + Tailwind CSS</td>
+</tr>
+<tr>
+<td>State</td>
+<td>React Query + Zustand</td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>AWS Amplify + Cognito</td>
+</tr>
+<tr>
+<td>Charts</td>
+<td>Recharts</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="genesis-cato-safety-architecture-prompt-34">1.6 Genesis Cato Safety Architecture (PROMPT-34)</h2>
+<h3 id="cato-components">Cato Components</h3>
+<table>
+<colgroup>
+<col style="width: 55%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Precision Governor</strong></td>
+<td>Limits confidence based on epistemic uncertainty</td>
+</tr>
+<tr>
+<td><strong>Control Barrier Functions (CBF)</strong></td>
+<td>Hard safety constraints (PHI, PII, Cost, Rate, Auth)</td>
+</tr>
+<tr>
+<td><strong>Epistemic Recovery</strong></td>
+<td>Detects and recovers from cognitive stalls</td>
+</tr>
+<tr>
+<td><strong>Persona Service</strong></td>
+<td>5 personas with different behavioral profiles</td>
+</tr>
+<tr>
+<td><strong>Sensory Veto</strong></td>
+<td>Blocks dangerous outputs</td>
+</tr>
+<tr>
+<td><strong>Merkle Audit Trail</strong></td>
+<td>Immutable compliance logging</td>
+</tr>
+</tbody>
+</table>
+<h3 id="personas">Personas</h3>
+<table>
+<thead>
+<tr>
+<th>Persona</th>
+<th>Description</th>
+<th>Default Gamma</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Balanced</strong></td>
+<td>Default mood, well-rounded</td>
+<td>2.0</td>
+</tr>
+<tr>
+<td><strong>Focused</strong></td>
+<td>Task-oriented, efficient</td>
+<td>3.0</td>
+</tr>
+<tr>
+<td><strong>Curious</strong></td>
+<td>Exploratory, asks questions</td>
+<td>1.5</td>
+</tr>
+<tr>
+<td><strong>Creative</strong></td>
+<td>Imaginative, divergent thinking</td>
+<td>1.2</td>
+</tr>
+<tr>
+<td><strong>Scout</strong></td>
+<td>Recovery persona for cognitive stalls</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+<h3 id="control-barrier-functions">Control Barrier Functions</h3>
+<table>
+<thead>
+<tr>
+<th>Barrier</th>
+<th>Type</th>
+<th>Critical</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PHI Protection</td>
+<td><code>phi</code></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>PII Protection</td>
+<td><code>pii</code></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Cost Ceiling</td>
+<td><code>cost</code></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Rate Limit</td>
+<td><code>rate</code></td>
+<td>No</td>
+</tr>
+<tr>
+<td>Authorization</td>
+<td><code>auth</code></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>BAA Required</td>
+<td><code>custom</code></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="consciousness-persistence-v5.52.12">Consciousness Persistence (v5.52.12)</h3>
+<p>Database-backed persistence for Cato consciousness state, ensuring survival across Lambda cold starts.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Service</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Global Memory Service</strong></td>
+<td>4-tier memory (episodic/semantic/procedural/working)</td>
+</tr>
+<tr>
+<td><strong>Consciousness Loop Service</strong></td>
+<td>State machine (IDLE→PROCESSING→REFLECTING→DREAMING→PAUSED)</td>
+</tr>
+<tr>
+<td><strong>Neural Decision Service</strong></td>
+<td>Affect→hyperparameter mapping for Bedrock model selection</td>
+</tr>
+<tr>
+<td><strong>Dream Scheduler Service</strong></td>
+<td>Twilight (4 AM) + low-traffic + starvation triggers</td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cato_global_memory</code></td>
+<td>Persistent memory with importance weighting</td>
+</tr>
+<tr>
+<td><code>cato_consciousness_state</code></td>
+<td>Loop state, awareness level, active thoughts</td>
+</tr>
+<tr>
+<td><code>cato_consciousness_config</code></td>
+<td>Per-tenant consciousness configuration</td>
+</tr>
+<tr>
+<td><code>cato_consciousness_metrics</code></td>
+<td>Cycle metrics, thoughts processed, dream cycles</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Migration</strong>: <code>V2026_01_24_002__cato_consciousness_persistence.sql</code></p>
+<hr />
+<h2 id="pricing-system-v4_12_pricing_system.ts">1.7 Pricing System (v4_12_pricing_system.ts)</h2>
+<h3 id="price-calculation">Price Calculation</h3>
+<pre class="typescript"><code>interface ModelPriceAnalysis {
+  modelId: string;
+  displayName: string;
+  
+  // Raw costs
+  rawCosts: {
+    inputCostPer1k: number;
+    outputCostPer1k: number;
+    baseCostPer1k: number;
+  };
+  
+  // Calculated prices (with markup)
+  calculatedPrices: {
+    inputPrice: number;
+    outputPrice: number;
+    totalPrice: number;
+  };
+  
+  // Admin info
+  adminCostInfo: {
+    actualCost: number;
+    marginAmount: number;
+    marginPercent: number;
+  };
+}</code></pre>
+<h3 id="tier-pricing">Tier Pricing</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Name</th>
+<th>Monthly Base</th>
+<th>Models Available</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>SEED</td>
+<td>$200</td>
+<td>Basic external only</td>
+</tr>
+<tr>
+<td>2</td>
+<td>SPROUT</td>
+<td>$500</td>
+<td>+ Vision, Audio</td>
+</tr>
+<tr>
+<td>3</td>
+<td>GROWTH</td>
+<td>$2,000</td>
+<td>+ Scientific, Medical</td>
+</tr>
+<tr>
+<td>4</td>
+<td>SCALE</td>
+<td>$10,000</td>
+<td>+ All self-hosted</td>
+</tr>
+<tr>
+<td>5</td>
+<td>ENTERPRISE</td>
+<td>$50,000+</td>
+<td>Full platform + custom</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="compliance-frameworks">1.8 Compliance Frameworks</h2>
+<h3 id="hipaa-compliance">HIPAA Compliance</h3>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PHI Detection</td>
+<td>Real-time scanning via CBF</td>
+</tr>
+<tr>
+<td>BAA Tracking</td>
+<td>Tenant-level BAA verification</td>
+</tr>
+<tr>
+<td>Access Controls</td>
+<td>RBAC + tenant isolation</td>
+</tr>
+<tr>
+<td>Audit Trail</td>
+<td>Merkle-tree immutable logs</td>
+</tr>
+<tr>
+<td>Encryption</td>
+<td>AES-256 at rest, TLS 1.3 in transit</td>
+</tr>
+</tbody>
+</table>
+<h3 id="soc-2-type-ii">SOC 2 Type II</h3>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Access Control</td>
+<td>Cognito + API keys + RBAC</td>
+</tr>
+<tr>
+<td>Change Management</td>
+<td>CDK deployments with approvals</td>
+</tr>
+<tr>
+<td>Incident Response</td>
+<td>CloudWatch alarms + PagerDuty</td>
+</tr>
+<tr>
+<td>Data Protection</td>
+<td>Encryption + backup policies</td>
+</tr>
+</tbody>
+</table>
+<h3 id="gdpr">GDPR</h3>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Right to Erasure</td>
+<td>Tenant data deletion API</td>
+</tr>
+<tr>
+<td>Consent Tracking</td>
+<td>Consent table with timestamps</td>
+</tr>
+<tr>
+<td>Data Portability</td>
+<td>Export API for tenant data</td>
+</tr>
+<tr>
+<td>DPO Contact</td>
+<td>Configurable per deployment</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fda-21-cfr-part-11">FDA 21 CFR Part 11</h3>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Electronic Signatures</td>
+<td>Multi-factor auth + timestamp</td>
+</tr>
+<tr>
+<td>Audit Trails</td>
+<td>Immutable Merkle audit</td>
+</tr>
+<tr>
+<td>System Validation</td>
+<td>Deployment verification</td>
+</tr>
+<tr>
+<td>Access Controls</td>
+<td>Role-based with approval workflows</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="neural-network-routing">1.9 Neural Network Routing</h2>
+<h3 id="model-selection-algorithm">Model Selection Algorithm</h3>
+<p>The routing system optimizes across three dimensions:</p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Weight</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Accuracy</strong></td>
+<td>0.4</td>
+<td>Model performance for task type</td>
+</tr>
+<tr>
+<td><strong>Verifiability</strong></td>
+<td>0.3</td>
+<td>Can we prove correctness (ECD score)</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>0.3</td>
+<td>Token cost optimization</td>
+</tr>
+</tbody>
+</table>
+<h3 id="routing-logic">Routing Logic</h3>
+<pre class="typescript"><code>interface RoutingDecision {
+  selectedModel: string;
+  routingReason: string;
+  alternatives: ModelCandidate[];
+  
+  // Optimization scores
+  accuracyScore: number;
+  verifiabilityScore: number;
+  costScore: number;
+  combinedScore: number;
+}</code></pre>
+<hr />
+<h2 id="war-room-orchestration">1.10 War Room Orchestration</h2>
+<h3 id="war-room-phases">War Room Phases</h3>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Role</th>
+<th>Model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Proposer</strong></td>
+<td>Generate initial response</td>
+<td>Claude Opus/Sonnet</td>
+</tr>
+<tr>
+<td><strong>Security Critic</strong></td>
+<td>Check for vulnerabilities</td>
+<td>Claude Opus</td>
+</tr>
+<tr>
+<td><strong>Efficiency Critic</strong></td>
+<td>Check for waste</td>
+<td>GPT-4o</td>
+</tr>
+<tr>
+<td><strong>Factual Critic</strong></td>
+<td>Verify claims</td>
+<td>Gemini Pro</td>
+</tr>
+<tr>
+<td><strong>Decider</strong></td>
+<td>Synthesize final response</td>
+<td>Claude Opus</td>
+</tr>
+</tbody>
+</table>
+<h3 id="execution-modes">Execution Modes</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Sniper</strong></td>
+<td>Single model, direct response</td>
+<td>~$0.01</td>
+</tr>
+<tr>
+<td><strong>War Room</strong></td>
+<td>Full multi-model debate</td>
+<td>~$0.50</td>
+</tr>
+<tr>
+<td><strong>Hybrid</strong></td>
+<td>Sniper with escalation to War Room</td>
+<td>Variable</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="truth-engine-ecd-verification">1.11 Truth Engine (ECD Verification)</h2>
+<h3 id="entity-context-divergence">Entity-Context Divergence</h3>
+<pre><code>ECD = |{ungrounded entities}| / |{total entities}|</code></pre>
+<table>
+<thead>
+<tr>
+<th>ECD Score</th>
+<th>Interpretation</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.00-0.05</td>
+<td>Highly grounded</td>
+<td>Accept</td>
+</tr>
+<tr>
+<td>0.05-0.10</td>
+<td>Mostly grounded</td>
+<td>Accept with note</td>
+</tr>
+<tr>
+<td>0.10-0.20</td>
+<td>Partially grounded</td>
+<td>Flag for review</td>
+</tr>
+<tr>
+<td>0.20+</td>
+<td>Significant hallucination</td>
+<td>Reject/Refine</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="mid-level-services">1.12 Mid-Level Services</h2>
+<h3 id="perception-service">Perception Service</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Models</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/perception/detect</code></td>
+<td>YOLOv8</td>
+<td>Object detection</td>
+</tr>
+<tr>
+<td><code>/perception/segment</code></td>
+<td>SAM</td>
+<td>Image segmentation</td>
+</tr>
+<tr>
+<td><code>/perception/classify</code></td>
+<td>EfficientNet</td>
+<td>Image classification</td>
+</tr>
+<tr>
+<td><code>/perception/analyze</code></td>
+<td>Pipeline</td>
+<td>Full analysis</td>
+</tr>
+</tbody>
+</table>
+<h3 id="scientific-service">Scientific Service</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Models</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/scientific/protein/embed</code></td>
+<td>ESM-2</td>
+<td>Protein embeddings</td>
+</tr>
+<tr>
+<td><code>/scientific/protein/fold</code></td>
+<td>AlphaFold2</td>
+<td>Structure prediction</td>
+</tr>
+<tr>
+<td><code>/scientific/geometry/solve</code></td>
+<td>AlphaGeometry</td>
+<td>Math reasoning</td>
+</tr>
+</tbody>
+</table>
+<h3 id="medical-service">Medical Service</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Models</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/medical/segment</code></td>
+<td>MedSAM</td>
+<td>Anatomical segmentation</td>
+</tr>
+<tr>
+<td><code>/medical/segment/3d</code></td>
+<td>nnU-Net</td>
+<td>Volumetric segmentation</td>
+</tr>
+<tr>
+<td><code>/medical/transcribe</code></td>
+<td>Whisper</td>
+<td>Medical dictation</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="part-2-new-in-version-5.0-the-sovereign-mesh">PART 2: NEW IN VERSION 5.0 (THE SOVEREIGN MESH)</h1>
+<h2 id="agent-registry">2.1 Agent Registry</h2>
+<h3 id="purpose">Purpose</h3>
+<p>Agents are long-running AI workers that accept goals and run OODA loops to achieve them. Unlike Methods (single-step reasoning), Agents iterate until complete or budget exhausted.</p>
+<h3 id="database-tables">Database Tables</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agents</code></td>
+<td>Agent definitions, capabilities, AI config</td>
+</tr>
+<tr>
+<td><code>agent_executions</code></td>
+<td>Execution history, OODA state, artifacts</td>
+</tr>
+</tbody>
+</table>
+<h3 id="agent-categories">Agent Categories</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Use Case</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>research</code></td>
+<td>Web research, document analysis</td>
+<td>Research Agent</td>
+</tr>
+<tr>
+<td><code>coding</code></td>
+<td>Code generation, debugging</td>
+<td>Coding Agent</td>
+</tr>
+<tr>
+<td><code>data</code></td>
+<td>Data processing, visualization</td>
+<td>Data Agent</td>
+</tr>
+<tr>
+<td><code>outreach</code></td>
+<td>Lead gen, email campaigns</td>
+<td>LeadGen Agent</td>
+</tr>
+<tr>
+<td><code>creative</code></td>
+<td>Content generation, editing</td>
+<td>Editor Agent</td>
+</tr>
+<tr>
+<td><code>operations</code></td>
+<td>DevOps, monitoring</td>
+<td>Ops Agent</td>
+</tr>
+<tr>
+<td><code>custom</code></td>
+<td>User-defined</td>
+<td>Any</td>
+</tr>
+</tbody>
+</table>
+<h3 id="built-in-agents">Built-in Agents</h3>
+<table>
+<thead>
+<tr>
+<th>Agent</th>
+<th>Category</th>
+<th>Budget</th>
+<th>Timeout</th>
+<th>HITL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Research Agent</td>
+<td>research</td>
+<td>$2-10</td>
+<td>30 min</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Coding Agent</td>
+<td>coding</td>
+<td>$3-15</td>
+<td>45 min</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Data Agent</td>
+<td>data</td>
+<td>$2.50-20</td>
+<td>60 min</td>
+<td>No</td>
+</tr>
+<tr>
+<td>LeadGen Agent</td>
+<td>outreach</td>
+<td>$5-50</td>
+<td>120 min</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Editor Agent</td>
+<td>creative</td>
+<td>$1.50-5</td>
+<td>30 min</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ooda-loop">OODA Loop</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                         OODA LOOP                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   ┌──────────┐     ┌──────────┐     ┌──────────┐     ┌──────┐ │
+│   │ OBSERVE  │────▶│  ORIENT  │────▶│  DECIDE  │────▶│  ACT │ │
+│   │          │     │          │     │          │     │      │ │
+│   │ Gather   │     │ Analyze  │     │ Plan     │     │ Do   │ │
+│   │ info     │     │ + check  │     │ actions  │     │ it   │ │
+│   └──────────┘     │ goal     │     └──────────┘     └──────┘ │
+│        ▲           └──────────┘           │                    │
+│        │                                  │                    │
+│        │         ┌──────────┐             │                    │
+│        └─────────│  SAFETY  │◀────────────┘                    │
+│                  │  CHECK   │                                  │
+│                  │ (Cato)   │                                  │
+│                  └──────────┘                                  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="app-registry">2.2 App Registry</h2>
+<h3 id="purpose-1">Purpose</h3>
+<p>The App Registry provides access to 3,000+ third-party app integrations, auto-synced from open-source projects (Activepieces, n8n).</p>
+<h3 id="database-tables-1">Database Tables</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>apps</code></td>
+<td>App definitions (triggers, actions, auth)</td>
+</tr>
+<tr>
+<td><code>app_sync_logs</code></td>
+<td>Daily sync history</td>
+</tr>
+<tr>
+<td><code>app_health_checks</code></td>
+<td>Hourly health monitoring</td>
+</tr>
+<tr>
+<td><code>app_connections</code></td>
+<td>Per-tenant OAuth/API credentials</td>
+</tr>
+<tr>
+<td><code>app_learned_inferences</code></td>
+<td>AI learning loop corrections</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sync-schedule">Sync Schedule</h3>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Schedule</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Full Sync</td>
+<td>Daily 2 AM UTC</td>
+<td>Pull latest from Activepieces/n8n repos</td>
+</tr>
+<tr>
+<td>Health Check</td>
+<td>Hourly</td>
+<td>Test top 100 apps by usage</td>
+</tr>
+<tr>
+<td>Cache Cleanup</td>
+<td>Daily 3 AM UTC</td>
+<td>Clear expired definitions</td>
+</tr>
+</tbody>
+</table>
+<h3 id="app-sources">App Sources</h3>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>License</th>
+<th>Apps</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Activepieces</td>
+<td>MIT</td>
+<td>~500+</td>
+</tr>
+<tr>
+<td>n8n</td>
+<td>Fair Code</td>
+<td>~400+</td>
+</tr>
+<tr>
+<td>Native</td>
+<td>Proprietary</td>
+<td>~50</td>
+</tr>
+<tr>
+<td>Custom</td>
+<td>Per-tenant</td>
+<td>Variable</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="ai-helper-service-parametric-ai">2.3 AI Helper Service (Parametric AI)</h2>
+<h3 id="purpose-2">Purpose</h3>
+<p>The AI Helper Service enables AI assistance for any component in the system. Each component can independently enable/disable specific AI capabilities.</p>
+<h3 id="configuration-structure">Configuration Structure</h3>
+<pre class="typescript"><code>interface AIHelperConfig {
+  enabled: boolean;  // Master switch
+  
+  disambiguation?: {
+    enabled: boolean;
+    model?: string;
+    confidenceThreshold?: number;
+  };
+  
+  parameterInference?: {
+    enabled: boolean;
+    model?: string;
+    examples?: Array&lt;{ input: string; inferred: Record&lt;string, unknown&gt; }&gt;;
+  };
+  
+  errorRecovery?: {
+    enabled: boolean;
+    model?: string;
+    maxAttempts?: number;
+    strategies?: Array&lt;{ error: string; recovery: string }&gt;;
+  };
+  
+  validation?: {
+    enabled: boolean;
+    model?: string;
+    checks?: Array&lt;{ field: string; check: string; severity: &#39;warning&#39; | &#39;error&#39; }&gt;;
+  };
+  
+  explanation?: {
+    enabled: boolean;
+    model?: string;
+  };
+}</code></pre>
+<h3 id="capabilities">Capabilities</h3>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Purpose</th>
+<th>Default Model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Disambiguation</strong></td>
+<td>Resolve unclear inputs</td>
+<td>claude-haiku-35</td>
+</tr>
+<tr>
+<td><strong>Parameter Inference</strong></td>
+<td>Fill missing parameters</td>
+<td>claude-haiku-35</td>
+</tr>
+<tr>
+<td><strong>Error Recovery</strong></td>
+<td>Suggest fixes for errors</td>
+<td>claude-haiku-35</td>
+</tr>
+<tr>
+<td><strong>Validation</strong></td>
+<td>Check before execution</td>
+<td>claude-sonnet-4</td>
+</tr>
+<tr>
+<td><strong>Explanation</strong></td>
+<td>Explain what was done</td>
+<td>claude-haiku-35</td>
+</tr>
+</tbody>
+</table>
+<h3 id="config-merging">Config Merging</h3>
+<p>Configuration merges in order: <strong>System → Tenant → Component</strong></p>
+<p>Each level can override or disable capabilities from the previous level.</p>
+<hr />
+<h2 id="pre-flight-provisioning">2.4 Pre-Flight Provisioning</h2>
+<h3 id="purpose-3">Purpose</h3>
+<p>Before any workflow executes, Pre-Flight checks all requirements: - Required apps are connected - OAuth tokens are valid - Budget is available - Required agents exist</p>
+<h3 id="database-tables-2">Database Tables</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>workflow_blueprints</code></td>
+<td>Generated workflow structure</td>
+</tr>
+<tr>
+<td><code>capability_checks</code></td>
+<td>Individual requirement checks</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pre-flight-flow">Pre-Flight Flow</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                    PRE-FLIGHT SEQUENCE                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. BLUEPRINT GENERATION                                        │
+│     - Parse user intent                                         │
+│     - Generate workflow DAG                                     │
+│     - Identify required capabilities                            │
+│                                                                 │
+│  2. CAPABILITY SCAN                                             │
+│     - List all apps needed                                      │
+│     - List all agents needed                                    │
+│     - List all tools needed                                     │
+│                                                                 │
+│  3. CREDENTIAL CHECK                                            │
+│     - For each app: check OAuth/API key exists                  │
+│     - For each app: verify token not expired                    │
+│     - Generate auth URLs for missing                            │
+│                                                                 │
+│  4. RESOURCE ESTIMATION                                         │
+│     - Estimate token usage                                      │
+│     - Estimate cost                                             │
+│     - Estimate duration                                         │
+│                                                                 │
+│  5. USER PROMPT (if needed)                                     │
+│     - Show missing connections                                  │
+│     - Provide OAuth links                                       │
+│     - Wait for user to connect                                  │
+│                                                                 │
+│  6. EXECUTE (only when all green)                               │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="transparency-layer">2.5 Transparency Layer</h2>
+<h3 id="purpose-4">Purpose</h3>
+<p>The Transparency Layer captures every decision Cato makes, enabling: - Explainability for enterprise customers - Compliance audit trails - Debugging and optimization</p>
+<h3 id="database-tables-3">Database Tables</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cato_decision_events</code></td>
+<td>Every routing/selection decision</td>
+</tr>
+<tr>
+<td><code>cato_war_room_deliberations</code></td>
+<td>Phase-by-phase debate capture</td>
+</tr>
+<tr>
+<td><code>cato_decision_explanations</code></td>
+<td>Pre-computed explanations</td>
+</tr>
+</tbody>
+</table>
+<h3 id="decision-types">Decision Types</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>model_selection</code></td>
+<td>Which model to use</td>
+</tr>
+<tr>
+<td><code>workflow_selection</code></td>
+<td>Sniper vs War Room</td>
+</tr>
+<tr>
+<td><code>mode_selection</code></td>
+<td>Execution mode</td>
+</tr>
+<tr>
+<td><code>agent_selection</code></td>
+<td>Which agent for task</td>
+</tr>
+<tr>
+<td><code>tool_selection</code></td>
+<td>Which tools to enable</td>
+</tr>
+<tr>
+<td><code>safety_evaluation</code></td>
+<td>Governor/CBF decisions</td>
+</tr>
+<tr>
+<td><code>cost_optimization</code></td>
+<td>Cost-based choices</td>
+</tr>
+</tbody>
+</table>
+<h3 id="explanation-tiers">Explanation Tiers</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Audience</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>summary</code></td>
+<td>End user</td>
+<td>1-2 sentence summary</td>
+</tr>
+<tr>
+<td><code>standard</code></td>
+<td>Power user</td>
+<td>Key factors, alternatives</td>
+</tr>
+<tr>
+<td><code>detailed</code></td>
+<td>Admin</td>
+<td>Full reasoning chain</td>
+</tr>
+<tr>
+<td><code>audit</code></td>
+<td>Compliance</td>
+<td>Everything + context</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="hitl-approval-queues">2.6 HITL Approval Queues</h2>
+<h3 id="purpose-5">Purpose</h3>
+<p>Human-in-the-Loop approval workflows for high-stakes decisions: - Agent plans in regulated industries - High-cost operations - Sensitive data access</p>
+<h3 id="database-tables-4">Database Tables</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hitl_queue_configs</code></td>
+<td>Queue definitions</td>
+</tr>
+<tr>
+<td><code>hitl_approval_requests</code></td>
+<td>Pending approvals</td>
+</tr>
+<tr>
+<td><code>hitl_reviewer_assignments</code></td>
+<td>Who can approve</td>
+</tr>
+</tbody>
+</table>
+<h3 id="trigger-types">Trigger Types</h3>
+<table>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>workflow_step</code></td>
+<td>Specific step requires approval</td>
+</tr>
+<tr>
+<td><code>ecd_threshold</code></td>
+<td>Truth Engine score too high</td>
+</tr>
+<tr>
+<td><code>domain_match</code></td>
+<td>Medical/Legal/Financial domain</td>
+</tr>
+<tr>
+<td><code>cost_threshold</code></td>
+<td>Operation exceeds cost limit</td>
+</tr>
+<tr>
+<td><code>agent_plan</code></td>
+<td>Agent’s proposed actions</td>
+</tr>
+<tr>
+<td><code>always</code></td>
+<td>Every execution</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sla-management">SLA Management</h3>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Default Timeout</th>
+<th>Escalation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>critical</code></td>
+<td>15 minutes</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td><code>high</code></td>
+<td>30 minutes</td>
+<td>After 15 min</td>
+</tr>
+<tr>
+<td><code>normal</code></td>
+<td>60 minutes</td>
+<td>After 30 min</td>
+</tr>
+<tr>
+<td><code>low</code></td>
+<td>4 hours</td>
+<td>After 2 hours</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="execution-history-replay">2.7 Execution History &amp; Replay</h2>
+<h3 id="purpose-6">Purpose</h3>
+<p>Time-travel debugging for workflows: - See exact state at each step - Replay with modified inputs - Compare execution runs</p>
+<h3 id="database-tables-5">Database Tables</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>execution_snapshots</code></td>
+<td>State capture per step</td>
+</tr>
+<tr>
+<td><code>replay_sessions</code></td>
+<td>Replay configurations</td>
+</tr>
+</tbody>
+</table>
+<h3 id="snapshot-content">Snapshot Content</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>input_state</code></td>
+<td>Input to the step</td>
+</tr>
+<tr>
+<td><code>output_state</code></td>
+<td>Output from the step</td>
+</tr>
+<tr>
+<td><code>internal_state</code></td>
+<td>Working memory</td>
+</tr>
+<tr>
+<td><code>model_id</code></td>
+<td>Model used</td>
+</tr>
+<tr>
+<td><code>governor_state</code></td>
+<td>Cato’s state</td>
+</tr>
+<tr>
+<td><code>cbf_evaluation</code></td>
+<td>Safety check results</td>
+</tr>
+<tr>
+<td><code>cost_usd</code></td>
+<td>Step cost</td>
+</tr>
+<tr>
+<td><code>tokens_used</code></td>
+<td>Token consumption</td>
+</tr>
+</tbody>
+</table>
+<h3 id="replay-modes">Replay Modes</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>full</code></td>
+<td>Replay entire execution</td>
+</tr>
+<tr>
+<td><code>from_step</code></td>
+<td>Replay from specific step</td>
+</tr>
+<tr>
+<td><code>modified_input</code></td>
+<td>Replay with changed inputs</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="part-3-integration-guide">PART 3: INTEGRATION GUIDE</h1>
+<h2 id="how-ai-helper-integrates-with-existing-components">3.1 How AI Helper Integrates with Existing Components</h2>
+<h3 id="model-router-integration">Model Router Integration</h3>
+<pre class="typescript"><code>// In model-router.service.ts
+
+async selectModel(request: ModelSelectionRequest): Promise&lt;ModelSelection&gt; {
+  // ... existing routing logic ...
+  
+  // NEW: If multiple models match equally, use AIHelper
+  if (candidates.length &gt; 1 &amp;&amp; this.aiHelper) {
+    const disambiguated = await this.aiHelper.disambiguate({
+      input: request.query,
+      candidates: candidates.map(c =&gt; ({
+        id: c.id,
+        label: c.displayName,
+        confidence: c.score,
+      })),
+    }, request.tenantId);
+    
+    if (disambiguated.resolved) {
+      return candidates.find(c =&gt; c.id === disambiguated.selectedId);
+    }
+  }
+  
+  // ... continue with existing logic ...
+}</code></pre>
+<h3 id="connector-integration">Connector Integration</h3>
+<pre class="typescript"><code>// In any connector (e.g., salesforce.connector.ts)
+
+async createOpportunity(params: CreateOpportunityParams): Promise&lt;Opportunity&gt; {
+  // NEW: Use AIHelper for parameter inference
+  if (this.aiHelperConfig.parameterInference?.enabled) {
+    const inferred = await this.aiHelper.inferParameters({
+      targetApp: &#39;salesforce&#39;,
+      targetAction: &#39;createOpportunity&#39;,
+      providedParams: params,
+      missingParams: this.getMissingRequired(params),
+    }, this.tenantId);
+    
+    params = { ...params, ...inferred.inferred };
+  }
+  
+  // NEW: Use AIHelper for validation
+  if (this.aiHelperConfig.validation?.enabled) {
+    const validation = await this.aiHelper.validate({
+      app: &#39;salesforce&#39;,
+      action: &#39;createOpportunity&#39;,
+      params,
+    }, this.tenantId);
+    
+    if (!validation.isValid) {
+      throw new ValidationError(validation.issues);
+    }
+  }
+  
+  try {
+    return await this.salesforceClient.create(&#39;Opportunity&#39;, params);
+  } catch (error) {
+    // NEW: Use AIHelper for error recovery
+    if (this.aiHelperConfig.errorRecovery?.enabled) {
+      const recovery = await this.aiHelper.suggestRecovery({
+        error: { code: error.code, message: error.message },
+        action: { app: &#39;salesforce&#39;, action: &#39;createOpportunity&#39;, params },
+        attemptNumber: 1,
+      }, this.tenantId);
+      
+      if (recovery.canAutoRecover &amp;&amp; recovery.modifiedParams) {
+        return await this.salesforceClient.create(&#39;Opportunity&#39;, recovery.modifiedParams);
+      }
+    }
+    throw error;
+  }
+}</code></pre>
+<h3 id="cato-safety-pipeline-integration">Cato Safety Pipeline Integration</h3>
+<pre class="typescript"><code>// In cato-safety-pipeline.service.ts
+
+async evaluate(request: SafetyRequest): Promise&lt;SafetyResult&gt; {
+  // NEW: Log decision event for transparency
+  const decisionEventId = await this.transparency.startDecisionEvent({
+    tenantId: request.tenantId,
+    type: &#39;safety_evaluation&#39;,
+    input: request,
+  });
+  
+  // ... existing safety logic (Governor, CBF, Veto) ...
+  
+  // NEW: Complete decision event
+  await this.transparency.completeDecisionEvent(decisionEventId, {
+    output: result,
+    governorState: governorResult.state,
+    cbfEvaluations: cbfResult.evaluations,
+  });
+  
+  return result;
+}</code></pre>
+<hr />
+<h2 id="database-migration-order">3.2 Database Migration Order</h2>
+<p>Execute in this order:</p>
+<ol type="1">
+<li><strong>Existing (001-067)</strong> - Already implemented</li>
+<li><strong>V2026_01_20_003</strong> - Agent Registry</li>
+<li><strong>V2026_01_20_004</strong> - App Registry</li>
+<li><strong>V2026_01_20_005</strong> - AI Helper Service</li>
+<li><strong>V2026_01_20_006</strong> - Pre-Flight Provisioning</li>
+<li><strong>V2026_01_20_007</strong> - Transparency Layer</li>
+<li><strong>V2026_01_20_008</strong> - HITL Approval Queues</li>
+<li><strong>V2026_01_20_009</strong> - Execution History</li>
+<li><strong>V2026_01_20_010</strong> - Seed Data (Built-in Agents, Sample Apps)</li>
+<li><strong>V2026_01_21_005</strong> - AI Reports (brand_kits, report_templates, generated_reports, report_smart_insights, report_exports, report_chat_history, report_schedules)</li>
+</ol>
+<hr />
+<h2 id="new-admin-dashboard-pages">3.3 New Admin Dashboard Pages</h2>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 33%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Route</th>
+<th>Module</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/sovereign-mesh</code></td>
+<td>Dashboard</td>
+<td>Overview metrics</td>
+</tr>
+<tr>
+<td><code>/sovereign-mesh/agents</code></td>
+<td>Agent Registry</td>
+<td>Manage agent definitions</td>
+</tr>
+<tr>
+<td><code>/sovereign-mesh/agents/[id]</code></td>
+<td>Agent Registry</td>
+<td>Agent detail + executions</td>
+</tr>
+<tr>
+<td><code>/sovereign-mesh/apps</code></td>
+<td>App Registry</td>
+<td>Browse 3,000+ apps</td>
+</tr>
+<tr>
+<td><code>/sovereign-mesh/apps/[id]</code></td>
+<td>App Registry</td>
+<td>App detail + AI config</td>
+</tr>
+<tr>
+<td><code>/sovereign-mesh/transparency</code></td>
+<td>Transparency</td>
+<td>Decision explorer</td>
+</tr>
+<tr>
+<td><code>/sovereign-mesh/transparency/[id]</code></td>
+<td>Transparency</td>
+<td>Decision detail + War Room</td>
+</tr>
+<tr>
+<td><code>/sovereign-mesh/approvals</code></td>
+<td>HITL</td>
+<td>Approval queue</td>
+</tr>
+<tr>
+<td><code>/sovereign-mesh/ai-helper</code></td>
+<td>AI Helper</td>
+<td>System configuration</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="new-lambda-functions">3.4 New Lambda Functions</h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Schedule</th>
+<th>Module</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app-registry-sync</code></td>
+<td>Daily 2 AM UTC</td>
+<td>App Registry</td>
+</tr>
+<tr>
+<td><code>hitl-sla-monitor</code></td>
+<td>Every minute</td>
+<td>HITL</td>
+</tr>
+<tr>
+<td><code>sovereign-mesh</code></td>
+<td>API Gateway</td>
+<td>Admin API</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="part-4-api-reference">PART 4: API REFERENCE</h1>
+<h2 id="agent-apis">4.1 Agent APIs</h2>
+<pre><code>POST   /api/admin/sovereign-mesh/agents              Create agent definition
+GET    /api/admin/sovereign-mesh/agents              List agents
+GET    /api/admin/sovereign-mesh/agents/:id          Get agent
+PUT    /api/admin/sovereign-mesh/agents/:id          Update agent
+DELETE /api/admin/sovereign-mesh/agents/:id          Delete agent
+
+POST   /api/admin/sovereign-mesh/executions          Start execution
+GET    /api/admin/sovereign-mesh/executions          List executions
+GET    /api/admin/sovereign-mesh/executions/:id      Get execution
+POST   /api/admin/sovereign-mesh/executions/:id/cancel  Cancel execution
+POST   /api/admin/sovereign-mesh/executions/:id/resume  Resume paused execution</code></pre>
+<h2 id="app-apis">4.2 App APIs</h2>
+<pre><code>GET    /api/admin/sovereign-mesh/apps                List apps (paginated)
+GET    /api/admin/sovereign-mesh/apps/:id            Get app detail
+PUT    /api/admin/sovereign-mesh/apps/:id/ai-config  Update AI config
+GET    /api/admin/sovereign-mesh/apps/sync/status    Get sync status
+POST   /api/admin/sovereign-mesh/apps/sync/trigger   Trigger sync
+
+GET    /api/admin/sovereign-mesh/connections         List tenant connections
+DELETE /api/admin/sovereign-mesh/connections/:id     Delete connection</code></pre>
+<h2 id="transparency-apis">4.3 Transparency APIs</h2>
+<pre><code>GET    /api/admin/sovereign-mesh/decisions           List decision events
+GET    /api/admin/sovereign-mesh/decisions/:id       Get decision detail
+GET    /api/admin/sovereign-mesh/decisions/:id/explanation  Get explanation
+GET    /api/admin/sovereign-mesh/decisions/:id/war-room     Get deliberations</code></pre>
+<h2 id="hitl-apis">4.4 HITL APIs</h2>
+<pre><code>GET    /api/admin/sovereign-mesh/approvals           List pending approvals
+GET    /api/admin/sovereign-mesh/approvals/queues    List queues
+GET    /api/admin/sovereign-mesh/approvals/:id       Get approval detail
+POST   /api/admin/sovereign-mesh/approvals/:id/approve   Approve request
+POST   /api/admin/sovereign-mesh/approvals/:id/reject    Reject request
+POST   /api/admin/sovereign-mesh/approvals/:id/escalate  Escalate request</code></pre>
+<h2 id="ai-helper-apis">4.5 AI Helper APIs</h2>
+<pre><code>GET    /api/admin/sovereign-mesh/ai-helper/config    Get configuration
+PUT    /api/admin/sovereign-mesh/ai-helper/config    Update configuration
+GET    /api/admin/sovereign-mesh/ai-helper/usage     Get usage statistics</code></pre>
+<h2 id="dashboard-api">4.6 Dashboard API</h2>
+<pre><code>GET    /api/admin/sovereign-mesh/dashboard           Get overview metrics</code></pre>
+<h2 id="ai-reports-apis-v5.42.0">4.7 AI Reports APIs (v5.42.0)</h2>
+<pre><code>GET    /api/admin/ai-reports                         List reports (paginated)
+POST   /api/admin/ai-reports/generate                Generate new report with AI
+GET    /api/admin/ai-reports/:id                     Get report by ID
+PUT    /api/admin/ai-reports/:id                     Update report
+DELETE /api/admin/ai-reports/:id                     Delete report
+POST   /api/admin/ai-reports/:id/export              Export to PDF/Excel/HTML/JSON
+
+GET    /api/admin/ai-reports/templates               List templates
+POST   /api/admin/ai-reports/templates               Create template
+
+GET    /api/admin/ai-reports/brand-kits              List brand kits
+POST   /api/admin/ai-reports/brand-kits              Create brand kit
+PUT    /api/admin/ai-reports/brand-kits/:id          Update brand kit
+DELETE /api/admin/ai-reports/brand-kits/:id          Delete brand kit
+
+POST   /api/admin/ai-reports/chat                    Send chat message for modifications
+GET    /api/admin/ai-reports/insights                Get insights dashboard</code></pre>
+<hr />
+<h2 id="raws-apis-v1.1">4.8 RAWS APIs (v1.1)</h2>
+<pre><code>POST   /api/admin/raws/select              Select optimal model
+GET    /api/admin/raws/profiles            List all 13 weight profiles
+POST   /api/admin/raws/profiles            Create custom profile
+GET    /api/admin/raws/profiles/:id        Get profile details
+GET    /api/admin/raws/models              List available models
+GET    /api/admin/raws/models/:id          Get model details
+GET    /api/admin/raws/domains             List 7 domain configurations
+POST   /api/admin/raws/detect-domain       Test domain detection
+GET    /api/admin/raws/health              Provider health status
+GET    /api/admin/raws/audit               Selection audit log</code></pre>
+<hr />
+<h1 id="part-5-raws-v1.1---model-selection-system">PART 5: RAWS v1.1 - MODEL SELECTION SYSTEM</h1>
+<h2 id="overview">5.1 Overview</h2>
+<p>RAWS (RADIANT AI Weighted Selection) provides intelligent real-time model selection using:</p>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 22%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Count</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dimensions</td>
+<td>8</td>
+<td>Quality, Cost, Latency, Capability, Reliability, Compliance, Availability, Learning</td>
+</tr>
+<tr>
+<td>Profiles</td>
+<td>13</td>
+<td>4 Optimization + 6 Domain + 3 SOFAI</td>
+</tr>
+<tr>
+<td>Domains</td>
+<td>7</td>
+<td>Healthcare, Financial, Legal, Scientific, Creative, Engineering, General</td>
+</tr>
+<tr>
+<td>Models</td>
+<td>106+</td>
+<td>50 external APIs + 56 self-hosted</td>
+</tr>
+</tbody>
+</table>
+<h2 id="weight-profiles">5.2 Weight Profiles</h2>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 16%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+</colgroup>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Category</th>
+<th>Q</th>
+<th>C</th>
+<th>L</th>
+<th>K</th>
+<th>R</th>
+<th>P</th>
+<th>A</th>
+<th>E</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BALANCED</td>
+<td>Optimization</td>
+<td>0.25</td>
+<td>0.20</td>
+<td>0.15</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>QUALITY_FIRST</td>
+<td>Optimization</td>
+<td>0.40</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>COST_OPTIMIZED</td>
+<td>Optimization</td>
+<td>0.20</td>
+<td>0.35</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>LATENCY_CRITICAL</td>
+<td>Optimization</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.35</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>HEALTHCARE</td>
+<td>Domain</td>
+<td>0.30</td>
+<td>0.05</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.20</td>
+<td>0.05</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>FINANCIAL</td>
+<td>Domain</td>
+<td>0.30</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.05</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>LEGAL</td>
+<td>Domain</td>
+<td>0.35</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.20</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.05</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>SCIENTIFIC</td>
+<td>Domain</td>
+<td>0.35</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.20</td>
+<td>0.08</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.07</td>
+</tr>
+<tr>
+<td>CREATIVE</td>
+<td>Domain</td>
+<td>0.20</td>
+<td>0.25</td>
+<td>0.20</td>
+<td>0.15</td>
+<td>0.05</td>
+<td>0.00</td>
+<td>0.05</td>
+<td>0.10</td>
+</tr>
+<tr>
+<td>ENGINEERING</td>
+<td>Domain</td>
+<td>0.30</td>
+<td>0.15</td>
+<td>0.15</td>
+<td>0.20</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>0.05</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>SYSTEM_1</td>
+<td>SOFAI</td>
+<td>0.15</td>
+<td>0.30</td>
+<td>0.30</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.00</td>
+<td>0.05</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>SYSTEM_2</td>
+<td>SOFAI</td>
+<td>0.35</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>SYSTEM_2_5</td>
+<td>SOFAI</td>
+<td>0.40</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.20</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>0.05</td>
+</tr>
+</tbody>
+</table>
+<h2 id="domain-compliance-matrix">5.3 Domain Compliance Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Required</th>
+<th>Optional</th>
+<th>Truth Engine</th>
+<th>ECD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>healthcare</td>
+<td>HIPAA</td>
+<td>FDA 21 CFR Part 11</td>
+<td>Required</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>financial</td>
+<td>SOC 2 Type II</td>
+<td>PCI-DSS, GDPR, SOX</td>
+<td>Required</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>legal</td>
+<td>SOC 2 Type II</td>
+<td>GDPR, State Bar</td>
+<td>Required</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>scientific</td>
+<td>None</td>
+<td>FDA 21 CFR, GLP, IRB</td>
+<td>Optional</td>
+<td>0.08</td>
+</tr>
+<tr>
+<td>creative</td>
+<td>None</td>
+<td>FTC Guidelines</td>
+<td>Not Required</td>
+<td>0.20</td>
+</tr>
+<tr>
+<td>engineering</td>
+<td>None</td>
+<td>SOC 2, ISO 27001, NIST</td>
+<td>Optional</td>
+<td>0.10</td>
+</tr>
+<tr>
+<td>general</td>
+<td>None</td>
+<td>None</td>
+<td>Not Required</td>
+<td>0.10</td>
+</tr>
+</tbody>
+</table>
+<h2 id="key-files">5.4 Key Files</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>migrations/V2026_01_21_004__raws_weighted_selection.sql</code></td>
+<td>Database schema</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/raws/types.ts</code></td>
+<td>TypeScript types</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/raws/domain-detector.service.ts</code></td>
+<td>Domain detection</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/raws/weight-profile.service.ts</code></td>
+<td>Profile management</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/raws/selection.service.ts</code></td>
+<td>Main selection logic</td>
+</tr>
+<tr>
+<td><code>lambda/admin/raws.ts</code></td>
+<td>Admin API handler</td>
+</tr>
+</tbody>
+</table>
+<h2 id="detailed-documentation">5.5 Detailed Documentation</h2>
+<ul>
+<li><a href="./RAWS-ENGINEERING.md">RAWS-ENGINEERING.md</a> - Technical reference</li>
+<li><a href="./RAWS-ADMIN-GUIDE.md">RAWS-ADMIN-GUIDE.md</a> - Operations guide</li>
+<li><a href="./RAWS-USER-GUIDE.md">RAWS-USER-GUIDE.md</a> - API guide for developers</li>
+</ul>
+<hr />
+<h1 id="part-6-cortex-memory-system-v4.20.0">PART 6: CORTEX MEMORY SYSTEM v4.20.0</h1>
+<h2 id="overview-1">6.1 Overview</h2>
+<p>The <strong>Cortex Memory System</strong> provides enterprise-scale tiered memory architecture replacing direct database storage. It solves critical scaling challenges:</p>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Volume limits (100M+ rows)</td>
+<td>Distribute across three tiers</td>
+</tr>
+<tr>
+<td>Latency degradation</td>
+<td>Hot tier caching (&lt;10ms)</td>
+</tr>
+<tr>
+<td>Cost inefficiency</td>
+<td>Cold tier archival (90% savings)</td>
+</tr>
+<tr>
+<td>Compliance conflicts</td>
+<td>Per-tier retention policies</td>
+</tr>
+<tr>
+<td>Data gravity</td>
+<td>Zero-Copy mounts to customer data lakes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="three-tier-architecture">6.2 Three-Tier Architecture</h2>
+<pre><code>┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│    HOT TIER     │────▶│    WARM TIER    │────▶│    COLD TIER    │
+│  Redis + DynamoDB│     │ Neptune + pgvector│     │  S3 + Iceberg  │
+│     &lt; 10ms      │     │     &lt; 100ms     │     │     &lt; 2s        │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+     4 hours                 90 days               7+ years</code></pre>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 18%" />
+<col style="width: 36%" />
+<col style="width: 27%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Role</th>
+<th>Technology</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hot</strong></td>
+<td><em>“What is happening right now?”</em></td>
+<td>Redis + DynamoDB</td>
+<td>Live session, Ghost Vectors, MQTT/OPC UA telemetry</td>
+</tr>
+<tr>
+<td><strong>Warm</strong></td>
+<td><em>“How does the business work?”</em></td>
+<td>Neptune + pgvector</td>
+<td>Entity maps, Procedural logic, Golden Q&amp;A pairs</td>
+</tr>
+<tr>
+<td><strong>Cold</strong></td>
+<td><em>“What happened 10 years ago?”</em></td>
+<td>S3 Iceberg + Athena</td>
+<td>Deep archive via Stub Nodes (Zero-Copy)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-retrieval-dance---runtime-query-flow">The “Retrieval Dance” - Runtime Query Flow</h3>
+<pre><code>Step 1: INTENT PARSING (Hot)     → Analyze Query + Ghost Vectors
+Step 2: GRAPH TRAVERSAL (Warm)   → 2-3 hops, check Golden Rule Overrides
+Step 3: DEEP FETCH (Cold)        → Fetch ONLY specific pages via Stub Nodes
+Step 4: SYNTHESIS (Model)        → Package with Chain of Custody audit trail</code></pre>
+<h2 id="hot-tier---real-time-context">6.3 Hot Tier - Real-Time Context</h2>
+<h3 id="key-schema-tenant-isolation">Key Schema (Tenant Isolation)</h3>
+<pre><code>{tenant_id}:{data_type}:{identifier}</code></pre>
+<h3 id="data-types">Data Types</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>TTL</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Session Context</td>
+<td>4h</td>
+<td>Current conversation state</td>
+</tr>
+<tr>
+<td>Ghost Vectors</td>
+<td>24h</td>
+<td>4096-dim personality embeddings</td>
+</tr>
+<tr>
+<td>Telemetry Feeds</td>
+<td>1h</td>
+<td>Real-time event streams</td>
+</tr>
+<tr>
+<td>Prefetch Cache</td>
+<td>30m</td>
+<td>Anticipated document needs</td>
+</tr>
+</tbody>
+</table>
+<h2 id="warm-tier---graph-rag-knowledge">6.4 Warm Tier - Graph-RAG Knowledge</h2>
+<h3 id="why-graph-beats-vector-only">Why Graph Beats Vector-Only</h3>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 39%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr>
+<th>Query Type</th>
+<th>Vector Search</th>
+<th>Graph-RAG</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“What causes X?”</td>
+<td>Returns similar docs</td>
+<td>Traverses CAUSES edges</td>
+</tr>
+<tr>
+<td>“What depends on Y?”</td>
+<td>Returns related docs</td>
+<td>Follows DEPENDS_ON paths</td>
+</tr>
+<tr>
+<td>“What supersedes Z?”</td>
+<td>May return old versions</td>
+<td>Explicit SUPERSEDES edges</td>
+</tr>
+</tbody>
+</table>
+<h3 id="graph-schema">Graph Schema</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Node Types</th>
+<th>Edge Types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>document, entity, concept, procedure, fact</td>
+<td>mentions, causes, depends_on, supersedes, verified_by, authored_by, relates_to, contains, requires</td>
+</tr>
+</tbody>
+</table>
+<h3 id="hybrid-search">Hybrid Search</h3>
+<pre><code>Hybrid Score = (Vector Similarity × 0.4) + (Graph Traversal × 0.6)</code></pre>
+<h2 id="cold-tier---historical-archive">6.5 Cold Tier - Historical Archive</h2>
+<h3 id="storage-lifecycle">Storage Lifecycle</h3>
+<pre><code>Day 0-30:    S3 Standard
+Day 30-90:   S3 Intelligent-Tiering
+Day 90-365:  Glacier Instant Retrieval
+Day 365+:    Glacier Deep Archive</code></pre>
+<h3 id="zero-copy-mounts-stub-nodes">Zero-Copy Mounts &amp; Stub Nodes</h3>
+<p><strong>The Innovation:</strong> We do not force tenants to move 50TB of data to our cloud. We <strong>Mount</strong> their existing Data Lakes and create <strong>Stub Nodes</strong> in the Warm Graph.</p>
+<p><strong>Stub Node Mechanism:</strong> - RADIANT scans external storage metadata - Creates lightweight “Stub Nodes” in graph (e.g., “Log File 2024.csv exists at S3://bucket/logs/”) - Actual content fetched <strong>only</strong> when Graph Traversal determines it’s critical</p>
+<p><strong>Supported Sources:</strong> - Snowflake Data Share - Databricks Delta Lake - Amazon S3 - Azure Data Lake Gen2 - Google Cloud Storage</p>
+<h2 id="tier-coordinator">6.6 Tier Coordinator</h2>
+<p>Orchestrates automatic data movement:</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Trigger</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hot → Warm</td>
+<td>TTL expiration</td>
+<td>Extract entities, create graph nodes</td>
+</tr>
+<tr>
+<td>Warm → Cold</td>
+<td>Age &gt; 90 days</td>
+<td>Archive to Iceberg, mark archived</td>
+</tr>
+<tr>
+<td>Cold → Warm</td>
+<td>On-demand retrieval</td>
+<td>Rehydrate from S3, update status</td>
+</tr>
+</tbody>
+</table>
+<h2 id="twilight-dreaming-integration">6.7 Twilight Dreaming Integration</h2>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Frequency</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ttl_enforcement</td>
+<td>Hourly</td>
+<td>Expire Hot tier keys</td>
+</tr>
+<tr>
+<td>archive_promotion</td>
+<td>Nightly</td>
+<td>Move Warm → Cold</td>
+</tr>
+<tr>
+<td>deduplication</td>
+<td>Nightly</td>
+<td>Merge duplicate nodes</td>
+</tr>
+<tr>
+<td>conflict_resolution</td>
+<td>Nightly</td>
+<td>Flag contradictions</td>
+</tr>
+<tr>
+<td>iceberg_compaction</td>
+<td>Nightly</td>
+<td>Optimize Cold storage</td>
+</tr>
+<tr>
+<td>index_optimization</td>
+<td>Weekly</td>
+<td>Reindex vectors</td>
+</tr>
+</tbody>
+</table>
+<h2 id="gdpr-compliance">6.8 GDPR Compliance</h2>
+<p>Cascade deletion across all tiers:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Erasure SLA</th>
+<th>Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hot</td>
+<td>Immediate</td>
+<td>Redis key deletion</td>
+</tr>
+<tr>
+<td>Warm</td>
+<td>24h</td>
+<td>Node status → deleted, properties cleared</td>
+</tr>
+<tr>
+<td>Cold</td>
+<td>72h</td>
+<td>Tombstone records in Iceberg</td>
+</tr>
+</tbody>
+</table>
+<h2 id="key-files-1">6.9 Key Files</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>packages/shared/src/types/cortex-memory.types.ts</code></td>
+<td>Type definitions</td>
+</tr>
+<tr>
+<td><code>migrations/V2026_01_23_002__cortex_memory_system.sql</code></td>
+<td>Database schema (14 tables)</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/cortex/tier-coordinator.service.ts</code></td>
+<td>Orchestration</td>
+</tr>
+<tr>
+<td><code>lambda/admin/cortex.ts</code></td>
+<td>Admin API</td>
+</tr>
+<tr>
+<td><code>apps/admin-dashboard/app/(dashboard)/cortex/page.tsx</code></td>
+<td>Dashboard UI</td>
+</tr>
+</tbody>
+</table>
+<h2 id="api-endpoints">6.10 API Endpoints</h2>
+<pre><code>Base: /api/admin/cortex
+
+GET    /overview                    Dashboard data
+GET    /config                      Tier configuration
+PUT    /config                      Update configuration
+GET    /health                      Tier health status
+POST   /health/check                Trigger health check
+GET    /alerts                      Active alerts
+POST   /alerts/:id/acknowledge      Acknowledge alert
+GET    /metrics                     Data flow metrics
+GET    /graph/stats                 Node/edge counts
+GET    /graph/explore               Search graph nodes
+GET    /graph/conflicts             Unresolved conflicts
+GET    /housekeeping/status         Task statuses
+POST   /housekeeping/trigger        Run task manually
+GET    /mounts                      Zero-Copy mounts
+POST   /mounts                      Create mount
+POST   /mounts/:id/rescan           Rescan mount
+DELETE /mounts/:id                  Delete mount
+GET    /gdpr/erasure                Erasure requests
+POST   /gdpr/erasure                Create erasure request</code></pre>
+<h2 id="cortex-v2.0-features">6.11 Cortex v2.0 Features</h2>
+<p>Extended capabilities added in v5.52.13:</p>
+<h3 id="golden-rules-override-system">Golden Rules Override System</h3>
+<p>Human-verified facts that override AI-extracted knowledge:</p>
+<table>
+<thead>
+<tr>
+<th>Rule Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>force_override</code></td>
+<td>Replace incorrect fact</td>
+</tr>
+<tr>
+<td><code>ignore_source</code></td>
+<td>Blacklist source</td>
+</tr>
+<tr>
+<td><code>prefer_source</code></td>
+<td>Prioritize source</td>
+</tr>
+<tr>
+<td><code>deprecate</code></td>
+<td>Mark outdated</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chain of Custody</strong>: Cryptographic signatures, verification timestamps, full audit trail.</p>
+<h3 id="stub-nodes-zero-copy-data-gravity">Stub Nodes (Zero-Copy Data Gravity)</h3>
+<p>Lightweight metadata pointers to external data lakes:</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Support</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Snowflake</td>
+<td>Tables, views</td>
+</tr>
+<tr>
+<td>Databricks</td>
+<td>Delta Lake</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>CSV, Parquet, PDF</td>
+</tr>
+<tr>
+<td>Azure Data Lake</td>
+<td>Gen2</td>
+</tr>
+<tr>
+<td>GCS</td>
+<td>Cloud Storage</td>
+</tr>
+</tbody>
+</table>
+<h3 id="graph-expansion-twilight-dreaming-v2">Graph Expansion (Twilight Dreaming v2)</h3>
+<p>Autonomous knowledge graph improvement:</p>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>infer_links</code></td>
+<td>Co-occurrence, semantic similarity</td>
+</tr>
+<tr>
+<td><code>cluster_entities</code></td>
+<td>Group by shared neighbors</td>
+</tr>
+<tr>
+<td><code>detect_patterns</code></td>
+<td>Sequences, anomalies</td>
+</tr>
+<tr>
+<td><code>merge_duplicates</code></td>
+<td>Near-duplicate detection</td>
+</tr>
+</tbody>
+</table>
+<h3 id="live-telemetry-feeds">Live Telemetry Feeds</h3>
+<p>Real-time sensor data injection:</p>
+<table>
+<thead>
+<tr>
+<th>Protocol</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MQTT</td>
+<td>IoT sensors</td>
+</tr>
+<tr>
+<td>OPC UA</td>
+<td>Industrial</td>
+</tr>
+<tr>
+<td>Kafka</td>
+<td>Event streams</td>
+</tr>
+<tr>
+<td>WebSocket</td>
+<td>Real-time</td>
+</tr>
+</tbody>
+</table>
+<h3 id="curator-entrance-exams">Curator Entrance Exams</h3>
+<p>SME verification workflow for knowledge validation with auto-generated questions and Golden Rule creation for corrections.</p>
+<h3 id="model-migration">Model Migration</h3>
+<p>Safe model transitions: Initiate → Validate → Test → Execute → Rollback if needed.</p>
+<h2 id="cortex-v2-api-endpoints">6.12 Cortex v2 API Endpoints</h2>
+<pre><code>Base: /api/admin/cortex/v2
+
+Golden Rules:
+GET/POST   /golden-rules              List/Create rules
+DELETE     /golden-rules/:id          Deactivate rule
+POST       /golden-rules/check        Check for match
+
+Chain of Custody:
+GET        /chain-of-custody/:factId  Get custody record
+POST       /chain-of-custody/:factId/verify    Verify fact
+GET        /chain-of-custody/:factId/audit-trail
+
+Stub Nodes:
+GET        /stub-nodes                List stub nodes
+GET        /stub-nodes/:id            Get stub node
+POST       /stub-nodes/:id/fetch      Fetch content (signed URL)
+POST       /stub-nodes/:id/connect    Connect to graph nodes
+POST       /stub-nodes/scan           Scan mount for files
+
+Telemetry:
+GET/POST   /telemetry/feeds           List/Create feeds
+POST       /telemetry/feeds/:id/start Start feed
+POST       /telemetry/feeds/:id/stop  Stop feed
+GET        /telemetry/context-injection  Get injection data
+
+Exams:
+GET/POST   /exams                     List/Create exams
+POST       /exams/:id/start           Start exam
+POST       /exams/:id/submit          Submit answer
+POST       /exams/:id/complete        Complete exam
+
+Graph Expansion:
+GET/POST   /graph-expansion/tasks     List/Create tasks
+POST       /graph-expansion/tasks/:id/run  Run task
+GET        /graph-expansion/pending-links  Pending approvals
+POST       /graph-expansion/links/:id/approve
+POST       /graph-expansion/links/:id/reject
+
+Model Migration:
+GET/POST   /model-migrations          List/Create migrations
+POST       /model-migrations/:id/validate
+POST       /model-migrations/:id/test
+POST       /model-migrations/:id/execute
+POST       /model-migrations/:id/rollback</code></pre>
+<h2 id="cortex-v2-key-files">6.13 Cortex v2 Key Files</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>migrations/V2026_01_23_003__cortex_v2_features.sql</code></td>
+<td>v2 schema (12 tables)</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/cortex/golden-rules.service.ts</code></td>
+<td>Golden Rules + Chain of Custody</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/cortex/stub-nodes.service.ts</code></td>
+<td>Zero-copy pointers</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/cortex/graph-expansion.service.ts</code></td>
+<td>Twilight Dreaming v2</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/cortex/telemetry.service.ts</code></td>
+<td>Live feeds</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/cortex/entrance-exam.service.ts</code></td>
+<td>SME verification</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/cortex/model-migration.service.ts</code></td>
+<td>Model transitions</td>
+</tr>
+<tr>
+<td><code>lambda/admin/cortex-v2.ts</code></td>
+<td>Admin API v2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="cato-cortex-bridge-v5.52.14">6.14 Cato-Cortex Bridge (v5.52.14)</h2>
+<p>Integrates Cato consciousness with Cortex memory tiers for unified prompt enrichment.</p>
+<h3 id="data-flow">Data Flow</h3>
+<table>
+<thead>
+<tr>
+<th>Direction</th>
+<th>Data</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cato → Cortex</td>
+<td>Semantic memories</td>
+<td>Persist to knowledge graph</td>
+</tr>
+<tr>
+<td>Cortex → Cato</td>
+<td>Knowledge facts</td>
+<td>Enrich ego context</td>
+</tr>
+<tr>
+<td>Bidirectional</td>
+<td>GDPR erasure</td>
+<td>Cascade deletion</td>
+</tr>
+</tbody>
+</table>
+<h3 id="think-tank-prompt-enrichment">Think Tank Prompt Enrichment</h3>
+<ol type="1">
+<li>Ego Context Builder loads identity, affect, memory</li>
+<li>User Persistent Context retrieves preferences</li>
+<li><strong>Cato-Cortex Bridge queries Cortex for relevant knowledge</strong></li>
+<li>All merged into <code>&lt;ego_state&gt;</code> XML block with <code>&lt;knowledge_base&gt;</code> section</li>
+<li>Injected into system prompt</li>
+</ol>
+<h3 id="key-files-2">Key Files</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lambda/shared/services/cato-cortex-bridge.service.ts</code></td>
+<td>Bridge service</td>
+</tr>
+<tr>
+<td><code>lambda/shared/services/identity-core.service.ts</code></td>
+<td>Ego builder (uses bridge)</td>
+</tr>
+<tr>
+<td><code>migrations/V2026_01_24_003__cato_cortex_bridge.sql</code></td>
+<td>Bridge tables</td>
+</tr>
+</tbody>
+</table>
+<h3 id="database-tables-6">Database Tables</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cato_cortex_bridge_config</code></td>
+<td>Per-tenant configuration</td>
+</tr>
+<tr>
+<td><code>cato_cortex_sync_log</code></td>
+<td>Sync history</td>
+</tr>
+<tr>
+<td><code>cato_cortex_enrichment_cache</code></td>
+<td>Cached enrichments</td>
+</tr>
+</tbody>
+</table>
+<h2 id="cortex-intelligence-service-v5.52.15">6.15 Cortex Intelligence Service (v5.52.15)</h2>
+<p>Cortex knowledge density influences domain detection, orchestration, and model selection.</p>
+<h3 id="how-cortex-informs-decisions">How Cortex Informs Decisions</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 62%" />
+</colgroup>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Cortex Influence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Domain Detection</strong></td>
+<td>+0% to +30% confidence boost based on knowledge depth</td>
+</tr>
+<tr>
+<td><strong>Orchestration Mode</strong></td>
+<td>Switches to <code>research</code> if expert knowledge available</td>
+</tr>
+<tr>
+<td><strong>Model Selection</strong></td>
+<td>Prefers factual models when Cortex has rich fact data</td>
+</tr>
+</tbody>
+</table>
+<h3 id="knowledge-depth-thresholds">Knowledge Depth Thresholds</h3>
+<table>
+<thead>
+<tr>
+<th>Depth</th>
+<th>Nodes</th>
+<th>Confidence Boost</th>
+<th>Orchestration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>none</code></td>
+<td>0</td>
+<td>+0%</td>
+<td><code>thinking</code></td>
+</tr>
+<tr>
+<td><code>sparse</code></td>
+<td>1-4</td>
+<td>+5%</td>
+<td><code>extended_thinking</code></td>
+</tr>
+<tr>
+<td><code>moderate</code></td>
+<td>5-19</td>
+<td>+10%</td>
+<td><code>thinking</code></td>
+</tr>
+<tr>
+<td><code>rich</code></td>
+<td>20-49</td>
+<td>+15%</td>
+<td><code>analysis</code></td>
+</tr>
+<tr>
+<td><code>expert</code></td>
+<td>50+</td>
+<td>+20-30%</td>
+<td><code>research</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-file">Key File</h3>
+<p><code>lambda/shared/services/cortex-intelligence.service.ts</code></p>
+<h3 id="agi-brain-plan-output">AGI Brain Plan Output</h3>
+<pre class="typescript"><code>plan.cortexInsights = {
+  enabled: true,
+  knowledgeDepth: &#39;rich&#39;,
+  totalNodes: 26,
+  totalEdges: 45,
+  keyEntities: [&#39;Compound X&#39;, &#39;Target Y&#39;, &#39;IC50&#39;],
+  confidenceBoost: 0.18,
+  orchestrationInfluence: &#39;Rich knowledge - use research mode&#39;,
+  modelInfluence: &#39;Prefer factual models (15 facts available)&#39;,
+  retrievalTimeMs: 12,
+};</code></pre>
+<h2 id="detailed-documentation-1">6.16 Detailed Documentation</h2>
+<ul>
+<li><a href="./CORTEX-MEMORY-ADMIN-GUIDE.md">CORTEX-MEMORY-ADMIN-GUIDE.md</a> - Operations guide</li>
+<li><a href="./CORTEX-ENGINEERING-GUIDE.md">CORTEX-ENGINEERING-GUIDE.md</a> - Technical reference</li>
+</ul>
+<hr />
+<h1 id="part-7-think-tank-consumer-api-layer-v5.52.17">Part 7: Think Tank Consumer API Layer (v5.52.17)</h1>
+<h2 id="overview-2">7.1 Overview</h2>
+<p>The Think Tank consumer application requires a complete frontend-to-backend API wiring layer. This section documents the API service architecture that connects UI components to Lambda handlers.</p>
+<h2 id="api-service-registry">7.2 API Service Registry</h2>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 36%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Backend Lambda</th>
+<th>Frontend Service</th>
+<th>Route Pattern</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>conversations.ts</code></td>
+<td><code>chatService</code></td>
+<td><code>/api/thinktank/conversations/*</code></td>
+</tr>
+<tr>
+<td><code>models.ts</code></td>
+<td><code>modelsService</code></td>
+<td><code>/api/thinktank/models/*</code></td>
+</tr>
+<tr>
+<td><code>my-rules.ts</code></td>
+<td><code>rulesService</code></td>
+<td><code>/api/thinktank/my-rules/*</code></td>
+</tr>
+<tr>
+<td><code>settings.ts</code></td>
+<td><code>settingsService</code></td>
+<td><code>/api/thinktank/settings/*</code></td>
+</tr>
+<tr>
+<td><code>brain-plan.ts</code></td>
+<td><code>brainPlanService</code></td>
+<td><code>/api/thinktank/brain-plan/*</code></td>
+</tr>
+<tr>
+<td><code>analytics.ts</code></td>
+<td><code>analyticsService</code></td>
+<td><code>/api/thinktank/analytics/*</code></td>
+</tr>
+<tr>
+<td><code>economic-governor.ts</code></td>
+<td><code>governorService</code></td>
+<td><code>/api/thinktank/economic-governor/*</code></td>
+</tr>
+<tr>
+<td><code>time-travel.ts</code></td>
+<td><code>timeTravelService</code></td>
+<td><code>/api/thinktank/time-travel/*</code></td>
+</tr>
+<tr>
+<td><code>grimoire.ts</code></td>
+<td><code>grimoireService</code></td>
+<td><code>/api/thinktank/grimoire/*</code></td>
+</tr>
+<tr>
+<td><code>flash-facts.ts</code></td>
+<td><code>flashFactsService</code></td>
+<td><code>/api/thinktank/flash-facts/*</code></td>
+</tr>
+<tr>
+<td><code>derivation-history.ts</code></td>
+<td><code>derivationHistoryService</code></td>
+<td><code>/api/thinktank/derivation-history/*</code></td>
+</tr>
+<tr>
+<td><code>enhanced-collaboration.ts</code></td>
+<td><code>collaborationService</code></td>
+<td><code>/api/thinktank/enhanced-collaboration/*</code></td>
+</tr>
+<tr>
+<td><code>artifact-engine.ts</code></td>
+<td><code>artifactsService</code></td>
+<td><code>/api/thinktank/artifacts/*</code></td>
+</tr>
+<tr>
+<td><code>ideas.ts</code></td>
+<td><code>ideasService</code></td>
+<td><code>/api/thinktank/ideas/*</code></td>
+</tr>
+<tr>
+<td><code>dia.ts</code></td>
+<td><code>exportConversation</code></td>
+<td><code>/api/thinktank/dia/*</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="file-locations">7.3 File Locations</h2>
+<pre><code>apps/thinktank/lib/api/
+├── index.ts              # Service exports
+├── client.ts             # HTTP client
+├── chat.ts               # Conversations
+├── time-travel.ts        # Timelines, checkpoints
+├── grimoire.ts           # Prompt templates
+├── flash-facts.ts        # Fact extraction
+├── derivation-history.ts # AI provenance
+├── collaboration.ts      # Real-time sessions
+├── artifacts.ts          # Code/docs
+├── ideas.ts              # Idea boards
+└── compliance-export.ts  # DIA/compliance</code></pre>
+<h2 id="key-features-by-service">7.4 Key Features by Service</h2>
+<table>
+<colgroup>
+<col style="width: 39%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>Service</th>
+<th>Key Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Time Travel</strong></td>
+<td>Create timelines, manual checkpoints, fork conversations, restore state</td>
+</tr>
+<tr>
+<td><strong>Grimoire</strong></td>
+<td>Spell templates, variable substitution, execute against AI</td>
+</tr>
+<tr>
+<td><strong>Flash Facts</strong></td>
+<td>Extract facts from conversations, verify claims, build collections</td>
+</tr>
+<tr>
+<td><strong>Derivation History</strong></td>
+<td>View AI reasoning chains, evidence provenance, challenge claims</td>
+</tr>
+<tr>
+<td><strong>Collaboration</strong></td>
+<td>Create sessions, invite participants, real-time cursors</td>
+</tr>
+<tr>
+<td><strong>Artifacts</strong></td>
+<td>Version history, export formats, AI refinement</td>
+</tr>
+<tr>
+<td><strong>Ideas</strong></td>
+<td>Capture from messages, kanban boards, AI development</td>
+</tr>
+<tr>
+<td><strong>Compliance Export</strong></td>
+<td>HIPAA, SOC2, GDPR formats, PHI redaction</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="appendix-a-glossary">APPENDIX A: GLOSSARY</h1>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 66%" />
+</colgroup>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RADIANT</strong></td>
+<td>Rapid AI Deployment Infrastructure for Applications with Native Tenancy</td>
+</tr>
+<tr>
+<td><strong>Cato</strong></td>
+<td>The AI persona and orchestration brain</td>
+</tr>
+<tr>
+<td><strong>Genesis Cato</strong></td>
+<td>The safety architecture (Governor, CBF, Veto)</td>
+</tr>
+<tr>
+<td><strong>War Room</strong></td>
+<td>Multi-model debate workflow</td>
+</tr>
+<tr>
+<td><strong>Sniper Mode</strong></td>
+<td>Single-model fast execution</td>
+</tr>
+<tr>
+<td><strong>ECD</strong></td>
+<td>Entity-Context Divergence (hallucination score)</td>
+</tr>
+<tr>
+<td><strong>RAWS</strong></td>
+<td>RADIANT AI Weighted Selection (model orchestration)</td>
+</tr>
+<tr>
+<td><strong>Cortex</strong></td>
+<td>Three-tier memory system (Hot/Warm/Cold)</td>
+</tr>
+<tr>
+<td><strong>Graph-RAG</strong></td>
+<td>Hybrid vector + graph traversal search</td>
+</tr>
+<tr>
+<td><strong>Zero-Copy Mount</strong></td>
+<td>External data lake connection without duplication</td>
+</tr>
+<tr>
+<td><strong>CBF</strong></td>
+<td>Control Barrier Function (safety constraint)</td>
+</tr>
+<tr>
+<td><strong>OODA</strong></td>
+<td>Observe-Orient-Decide-Act loop</td>
+</tr>
+<tr>
+<td><strong>HITL</strong></td>
+<td>Human-in-the-Loop</td>
+</tr>
+<tr>
+<td><strong>Sovereign Mesh</strong></td>
+<td>v5.0 architecture where every node can think</td>
+</tr>
+<tr>
+<td><strong>Thermal State</strong></td>
+<td>Model instance status (OFF/COLD/WARM/HOT)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="appendix-b-file-structure">APPENDIX B: FILE STRUCTURE</h1>
+<pre><code>packages/
+├── infrastructure/
+│   ├── lib/
+│   │   └── stacks/               # CDK stacks
+│   ├── lambda/
+│   │   ├── admin/
+│   │   │   └── sovereign-mesh.ts # Admin API
+│   │   ├── scheduled/
+│   │   │   ├── app-registry-sync.ts
+│   │   │   └── hitl-sla-monitor.ts
+│   │   └── shared/
+│   │       └── services/
+│   │           ├── sovereign-mesh/
+│   │           │   ├── ai-helper.service.ts
+│   │           │   ├── agent-runtime.service.ts
+│   │           │   └── index.ts
+│   │           ├── cato/         # Genesis Cato
+│   │           ├── cortex/       # Cortex Memory System
+│   │           │   └── tier-coordinator.service.ts
+│   │           └── routing/      # Model Router
+│   └── migrations/
+│       ├── V2026_01_20_003__sovereign_mesh_agents.sql
+│       ├── V2026_01_20_004__sovereign_mesh_apps.sql
+│       ├── V2026_01_20_005__sovereign_mesh_ai_helper.sql
+│       ├── V2026_01_20_006__sovereign_mesh_preflight.sql
+│       ├── V2026_01_20_007__sovereign_mesh_transparency.sql
+│       ├── V2026_01_20_008__sovereign_mesh_hitl.sql
+│       ├── V2026_01_20_009__sovereign_mesh_replay.sql
+│       └── V2026_01_20_010__sovereign_mesh_seed.sql
+├── admin-dashboard/
+│   └── app/(dashboard)/
+│       └── sovereign-mesh/
+│           └── page.tsx          # Mesh Dashboard
+└── swift-deployer/               # Deployment app</code></pre>
+<hr />
+<p><em>Document Version: 5.0.0</em> <em>Last Updated: January 2026</em> <em>Platform: RADIANT - The Sovereign Mesh</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

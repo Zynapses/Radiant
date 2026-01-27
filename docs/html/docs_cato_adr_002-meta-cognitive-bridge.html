@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>002 meta cognitive bridge - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>002 meta cognitive bridge</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/adr/002-meta-cognitive-bridge.md</div>
+  </div>
+  
+  <h1 id="adr-002-meta-cognitive-bridge-with-44-pymdp-matrices">ADR-002: Meta-Cognitive Bridge with 4×4 pymdp Matrices</h1>
+<h2 id="status">Status</h2>
+<p>Accepted</p>
+<h2 id="context">Context</h2>
+<p>The original Cato design attempted to model 800+ knowledge domains directly in pymdp (Active Inference), creating intractable 800×800 transition matrices. This approach has several fatal flaws:</p>
+<ol type="1">
+<li><strong>Computational Intractability</strong>: 800×800 matrices require O(n³) operations for belief updates</li>
+<li><strong>Semantic Overload</strong>: pymdp is designed for discrete state-action spaces, not semantic reasoning</li>
+<li><strong>Mixing Concerns</strong>: Conflates “what to think about” (semantics) with “how to think” (metacognition)</li>
+</ol>
+<p>The fundamental insight is that <strong>LLMs already handle semantic complexity</strong>. What pymdp should control is <strong>attention and cognitive mode</strong>, not content.</p>
+<h2 id="decision">Decision</h2>
+<p>Implement a Meta-Cognitive Bridge where pymdp operates on <strong>4 discrete meta-cognitive states</strong>, not 800+ domain states.</p>
+<h3 id="meta-cognitive-states-hidden-states">Meta-Cognitive States (Hidden States)</h3>
+<pre><code>S = [CONFUSED, CONFIDENT, BORED, STAGNANT]</code></pre>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 33%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr>
+<th>State</th>
+<th>Description</th>
+<th>Trigger Conditions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CONFUSED</td>
+<td>High uncertainty, needs clarification</td>
+<td>Contradictory info, novel domain</td>
+</tr>
+<tr>
+<td>CONFIDENT</td>
+<td>High certainty, ready to act</td>
+<td>Consistent predictions, familiar domain</td>
+</tr>
+<tr>
+<td>BORED</td>
+<td>Low novelty, seeks stimulation</td>
+<td>Repetitive patterns, no learning progress</td>
+</tr>
+<tr>
+<td>STAGNANT</td>
+<td>Stuck, needs external input</td>
+<td>No progress despite effort</td>
+</tr>
+</tbody>
+</table>
+<h3 id="meta-cognitive-actions">Meta-Cognitive Actions</h3>
+<pre><code>A = [EXPLORE, CONSOLIDATE, VERIFY, REST]</code></pre>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 40%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Action</th>
+<th>Description</th>
+<th>Execution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EXPLORE</td>
+<td>Seek new information</td>
+<td>Generate curiosity questions</td>
+</tr>
+<tr>
+<td>CONSOLIDATE</td>
+<td>Strengthen existing knowledge</td>
+<td>Memory consolidation, pattern reinforcement</td>
+</tr>
+<tr>
+<td>VERIFY</td>
+<td>Check understanding against reality</td>
+<td>Tool grounding, external verification</td>
+</tr>
+<tr>
+<td>REST</td>
+<td>Reduce activity, wait for input</td>
+<td>Lower temperature, passive mode</td>
+</tr>
+</tbody>
+</table>
+<h3 id="observations-from-llm-outputs">Observations (from LLM outputs)</h3>
+<pre><code>O = [HIGH_SURPRISE, LOW_SURPRISE, CONTRADICTION, CONFIRMATION]</code></pre>
+<h2 id="architecture">Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                    LLM (Semantic Layer)                          │
+│  Handles: Domain knowledge, language, reasoning, creativity     │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ LLM Outputs
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Signal Converter                              │
+│  Extracts: Confidence scores, novelty signals, learning progress │
+│  Maps to: Discrete observations [HIGH/LOW_SURPRISE, etc.]       │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ Discrete Observations
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    pymdp (4×4 Controller)                        │
+│  States: [CONFUSED, CONFIDENT, BORED, STAGNANT]                 │
+│  Actions: [EXPLORE, CONSOLIDATE, VERIFY, REST]                  │
+│  Computes: Optimal policy via Expected Free Energy              │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ Action Policy
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Action Executor                               │
+│  EXPLORE → Generate curiosity question, call LLM                │
+│  CONSOLIDATE → Trigger memory consolidation pipeline            │
+│  VERIFY → Call grounding tools (web search, code exec)          │
+│  REST → Reduce activity, await user input                       │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h2 id="signal-converter-implementation">Signal Converter Implementation</h2>
+<pre class="python"><code>class SignalConverter:
+    &quot;&quot;&quot;Convert LLM outputs to discrete pymdp observations.&quot;&quot;&quot;
+    
+    def __init__(self, nli_client, surprise_threshold: float = 0.5):
+        self.nli = nli_client
+        self.threshold = surprise_threshold
+    
+    def convert(
+        self,
+        prediction: str,
+        outcome: str,
+        confidence: float
+    ) -&gt; int:
+        &quot;&quot;&quot;
+        Convert LLM prediction/outcome to observation index.
+        
+        Returns:
+            0 = HIGH_SURPRISE (unexpected outcome)
+            1 = LOW_SURPRISE (expected outcome)
+            2 = CONTRADICTION (logical conflict)
+            3 = CONFIRMATION (strong agreement)
+        &quot;&quot;&quot;
+        # Use NLI to detect relationship
+        result = self.nli.classify(prediction, outcome)
+        
+        if result.label == &quot;CONTRADICTION&quot;:
+            return 2  # CONTRADICTION
+        elif result.label == &quot;ENTAILMENT&quot; and confidence &gt; 0.8:
+            return 3  # CONFIRMATION
+        elif result.score &lt; self.threshold:
+            return 0  # HIGH_SURPRISE
+        else:
+            return 1  # LOW_SURPRISE</code></pre>
+<h2 id="transition-matrix-a">Transition Matrix (A)</h2>
+<p>The 4×4 transition matrix encodes how states evolve based on observations:</p>
+<pre><code>A[observation][current_state] → P(next_state)
+
+Example for HIGH_SURPRISE observation:
+  CONFUSED → stays CONFUSED (0.8)
+  CONFIDENT → becomes CONFUSED (0.6)
+  BORED → becomes interested (CONFIDENT) (0.5)
+  STAGNANT → stays STAGNANT (0.7)</code></pre>
+<h2 id="consequences">Consequences</h2>
+<h3 id="positive">Positive</h3>
+<ul>
+<li><strong>Tractable computation</strong>: 4×4 matrices compute in microseconds</li>
+<li><strong>Clean separation</strong>: LLM handles semantics, pymdp handles control</li>
+<li><strong>Interpretable</strong>: Meta-cognitive states are human-understandable</li>
+<li><strong>Scalable</strong>: No growth with domain count</li>
+</ul>
+<h3 id="negative">Negative</h3>
+<ul>
+<li><strong>Signal conversion overhead</strong>: Requires NLI call for each observation</li>
+<li><strong>Simplified model</strong>: May miss nuanced cognitive states</li>
+<li><strong>Tuning required</strong>: Transition matrices need empirical calibration</li>
+</ul>
+<h2 id="implementation-notes">Implementation Notes</h2>
+<h3 id="pymdp-configuration">pymdp Configuration</h3>
+<pre class="python"><code>import pymdp
+
+# 4 hidden states
+num_states = [4]  # [CONFUSED, CONFIDENT, BORED, STAGNANT]
+
+# 4 observations
+num_obs = [4]  # [HIGH_SURPRISE, LOW_SURPRISE, CONTRADICTION, CONFIRMATION]
+
+# 4 actions
+num_controls = [4]  # [EXPLORE, CONSOLIDATE, VERIFY, REST]
+
+# Initialize agent
+agent = pymdp.Agent(
+    A=likelihood_matrix,    # P(observation | state)
+    B=transition_matrix,    # P(next_state | current_state, action)
+    C=preference_vector,    # Preferred observations
+    D=initial_state_prior,  # Initial state belief
+    policy_len=3            # Planning horizon
+)</code></pre>
+<h3 id="integration-with-cato">Integration with Cato</h3>
+<p>The Meta-Cognitive Bridge runs as a background service, updating Cato’s “mood” and guiding curiosity decisions without interfering with real-time user interactions.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://pymdp-rtd.readthedocs.io/">pymdp Documentation</a></li>
+<li><a href="https://doi.org/10.1162/neco_a_01357">Active Inference: A Process Theory</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Free_energy_principle">Free Energy Principle</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

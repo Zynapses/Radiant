@@ -1,0 +1,3965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 04 LAMBDA CORE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 04 LAMBDA CORE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-04-LAMBDA-CORE.md</div>
+  </div>
+  
+  <h1 id="section-4-lambda-functions---core-v2.1.0">SECTION 4: LAMBDA FUNCTIONS - CORE (v2.1.0)</h1>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<blockquote>
+<p><strong>Dependencies:</strong> Sections 0-3 <strong>Creates:</strong> Router, Chat, Models, Providers, PHI handlers</p>
+</blockquote>
+<h2 id="type-imports">Type Imports</h2>
+<pre class="typescript"><code>import { AIModel, AIProvider, ThermalState, PHIConfig, UsageEvent } from &#39;@radiant/shared&#39;;</code></pre>
+<hr />
+<h1 id="radiant-v2.2.0---prompt-4-lambda-functions---core">RADIANT v2.2.0 - Prompt 4: Lambda Functions - Core</h1>
+<blockquote>
+<p><strong>Prompt 4 of 9</strong> | Target Size: ~55KB | Version: 3.7.0 | December 2024</p>
+</blockquote>
+<hr />
+<h2 id="overview">OVERVIEW</h2>
+<p>This prompt creates the core Lambda functions for the RADIANT API:</p>
+<ol type="1">
+<li><strong>Router Lambda</strong> - Main API entry point, request routing, health checks</li>
+<li><strong>Chat Lambda</strong> - AI completions via LiteLLM, streaming support</li>
+<li><strong>Models Lambda</strong> - Dynamic model registry CRUD operations</li>
+<li><strong>Providers Lambda</strong> - Provider management and configuration</li>
+<li><strong>PHI Lambda</strong> - HIPAA-compliant PHI sanitization and re-identification</li>
+</ol>
+<p>Plus shared utilities: - Database client (Aurora PostgreSQL via Data API) - LiteLLM client (HTTP client for AI routing) - Authentication helpers (JWT validation, tenant extraction) - Response helpers (standardized API responses) - Logging and tracing utilities</p>
+<hr />
+<h2 id="lambda-directory-structure">LAMBDA DIRECTORY STRUCTURE</h2>
+<pre><code>packages/infrastructure/lambda/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tsconfig.json
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ package.json
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ shared/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ config.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ logger.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ errors.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ response.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ auth.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ db/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ client.ts
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ queries.ts
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ types.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ litellm/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ client.ts
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ types.ts
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ phi/
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ sanitizer.ts
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ patterns.ts
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ types.ts
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ router.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ chat.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ models.ts
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ providers.ts
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ admin/
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ [See Prompt 5]</code></pre>
+<hr />
+<h2 id="part-1-lambda-configuration">PART 1: LAMBDA CONFIGURATION</h2>
+<h3 id="packagesinfrastructurelambdapackage.json">packages/infrastructure/lambda/package.json</h3>
+<pre class="json"><code>{
+  &quot;name&quot;: &quot;@radiant/lambda&quot;,
+  &quot;version&quot;: &quot;2.2.0&quot;,
+  &quot;private&quot;: true,
+  &quot;scripts&quot;: {
+    &quot;build&quot;: &quot;tsc&quot;,
+    &quot;clean&quot;: &quot;rm -rf dist&quot;,
+    &quot;lint&quot;: &quot;eslint . --ext .ts&quot;,
+    &quot;test&quot;: &quot;jest&quot;
+  },
+  &quot;dependencies&quot;: {
+    &quot;@aws-sdk/client-dynamodb&quot;: &quot;^3.470.0&quot;,
+    &quot;@aws-sdk/client-rds-data&quot;: &quot;^3.470.0&quot;,
+    &quot;@aws-sdk/client-secrets-manager&quot;: &quot;^3.470.0&quot;,
+    &quot;@aws-sdk/client-ssm&quot;: &quot;^3.470.0&quot;,
+    &quot;@aws-sdk/client-s3&quot;: &quot;^3.470.0&quot;,
+    &quot;@aws-sdk/client-sagemaker-runtime&quot;: &quot;^3.470.0&quot;,
+    &quot;@aws-sdk/lib-dynamodb&quot;: &quot;^3.470.0&quot;,
+    &quot;@aws-sdk/s3-request-presigner&quot;: &quot;^3.470.0&quot;,
+    &quot;uuid&quot;: &quot;^9.0.0&quot;,
+    &quot;zod&quot;: &quot;^3.22.0&quot;
+  },
+  &quot;devDependencies&quot;: {
+    &quot;@types/aws-lambda&quot;: &quot;^8.10.130&quot;,
+    &quot;@types/node&quot;: &quot;^20.10.0&quot;,
+    &quot;@types/uuid&quot;: &quot;^9.0.0&quot;,
+    &quot;typescript&quot;: &quot;^5.3.0&quot;,
+    &quot;jest&quot;: &quot;^29.7.0&quot;,
+    &quot;@types/jest&quot;: &quot;^29.5.11&quot;,
+    &quot;ts-jest&quot;: &quot;^29.1.1&quot;
+  }
+}</code></pre>
+<h3 id="packagesinfrastructurelambdatsconfig.json">packages/infrastructure/lambda/tsconfig.json</h3>
+<pre class="json"><code>{
+  &quot;compilerOptions&quot;: {
+    &quot;target&quot;: &quot;ES2022&quot;,
+    &quot;module&quot;: &quot;NodeNext&quot;,
+    &quot;moduleResolution&quot;: &quot;NodeNext&quot;,
+    &quot;lib&quot;: [&quot;ES2022&quot;],
+    &quot;outDir&quot;: &quot;./dist&quot;,
+    &quot;rootDir&quot;: &quot;.&quot;,
+    &quot;strict&quot;: true,
+    &quot;esModuleInterop&quot;: true,
+    &quot;skipLibCheck&quot;: true,
+    &quot;forceConsistentCasingInFileNames&quot;: true,
+    &quot;declaration&quot;: true,
+    &quot;declarationMap&quot;: true,
+    &quot;sourceMap&quot;: true,
+    &quot;resolveJsonModule&quot;: true,
+    &quot;noUnusedLocals&quot;: true,
+    &quot;noUnusedParameters&quot;: true,
+    &quot;noImplicitReturns&quot;: true,
+    &quot;noFallthroughCasesInSwitch&quot;: true
+  },
+  &quot;include&quot;: [&quot;**/*.ts&quot;],
+  &quot;exclude&quot;: [&quot;node_modules&quot;, &quot;dist&quot;]
+}</code></pre>
+<hr />
+<h2 id="part-2-shared-utilities">PART 2: SHARED UTILITIES</h2>
+<h3 id="packagesinfrastructurelambdasharedindex.ts">packages/infrastructure/lambda/shared/index.ts</h3>
+<pre class="typescript"><code>// Re-export all shared utilities
+export * from &#39;./config&#39;;
+export * from &#39;./logger&#39;;
+export * from &#39;./errors&#39;;
+export * from &#39;./response&#39;;
+export * from &#39;./auth&#39;;
+export * from &#39;./db&#39;;
+export * from &#39;./litellm&#39;;
+export * from &#39;./phi&#39;;</code></pre>
+<h3 id="packagesinfrastructurelambdasharedconfig.ts">packages/infrastructure/lambda/shared/config.ts</h3>
+<pre class="typescript"><code>/**
+ * Environment configuration with validation
+ */
+
+import { z } from &#39;zod&#39;;
+
+const envSchema = z.object({
+  APP_ID: z.string().min(1),
+  ENVIRONMENT: z.enum([&#39;dev&#39;, &#39;staging&#39;, &#39;prod&#39;]),
+  TIER: z.string().transform(Number).pipe(z.number().min(1).max(5)),
+  LITELLM_URL: z.string().url(),
+  AURORA_SECRET_ARN: z.string().startsWith(&#39;arn:aws:secretsmanager:&#39;),
+  AURORA_CLUSTER_ARN: z.string().startsWith(&#39;arn:aws:rds:&#39;),
+  USAGE_TABLE: z.string().min(1),
+  SESSIONS_TABLE: z.string().min(1),
+  CACHE_TABLE: z.string().min(1),
+  MEDIA_BUCKET: z.string().min(1),
+  USER_POOL_ID: z.string().min(1),
+  LOG_LEVEL: z.enum([&#39;debug&#39;, &#39;info&#39;, &#39;warn&#39;, &#39;error&#39;]).default(&#39;info&#39;),
+  AWS_REGION: z.string().default(&#39;us-east-1&#39;),
+});
+
+export type Config = z.infer&lt;typeof envSchema&gt;;
+
+let cachedConfig: Config | null = null;
+
+export function getConfig(): Config {
+  if (cachedConfig) return cachedConfig;
+
+  const result = envSchema.safeParse(process.env);
+  
+  if (!result.success) {
+    console.error(&#39;Configuration validation failed:&#39;, result.error.flatten());
+    throw new Error(`Invalid configuration: ${JSON.stringify(result.error.flatten())}`);
+  }
+
+  cachedConfig = result.data;
+  return cachedConfig;
+}
+
+/**
+ * Feature flags based on tier
+ */
+export interface FeatureFlags {
+  multiRegion: boolean;
+  waf: boolean;
+  guardDuty: boolean;
+  sagemaker: boolean;
+  elasticache: boolean;
+  xray: boolean;
+  phiSanitization: boolean;
+  advancedMetrics: boolean;
+}
+
+export function getFeatureFlags(tier: number): FeatureFlags {
+  return {
+    multiRegion: tier &gt;= 4,
+    waf: tier &gt;= 2,
+    guardDuty: tier &gt;= 2,
+    sagemaker: tier &gt;= 3,
+    elasticache: tier &gt;= 2,
+    xray: tier &gt;= 2,
+    phiSanitization: true, // Always available
+    advancedMetrics: tier &gt;= 3,
+  };
+}</code></pre>
+<h3 id="packagesinfrastructurelambdasharedlogger.ts">packages/infrastructure/lambda/shared/logger.ts</h3>
+<pre class="typescript"><code>/**
+ * Structured logging with correlation IDs
+ */
+
+export type LogLevel = &#39;debug&#39; | &#39;info&#39; | &#39;warn&#39; | &#39;error&#39;;
+
+interface LogContext {
+  requestId?: string;
+  tenantId?: string;
+  userId?: string;
+  appId?: string;
+  environment?: string;
+  [key: string]: unknown;
+}
+
+interface LogEntry {
+  timestamp: string;
+  level: LogLevel;
+  message: string;
+  context?: LogContext;
+  error?: {
+    name: string;
+    message: string;
+    stack?: string;
+  };
+  duration?: number;
+  [key: string]: unknown;
+}
+
+const LOG_LEVELS: Record&lt;LogLevel, number&gt; = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3,
+};
+
+export class Logger {
+  private context: LogContext;
+  private minLevel: LogLevel;
+  private startTime: number;
+
+  constructor(context: LogContext = {}, minLevel?: LogLevel) {
+    this.context = context;
+    this.minLevel = minLevel || (process.env.LOG_LEVEL as LogLevel) || &#39;info&#39;;
+    this.startTime = Date.now();
+  }
+
+  private shouldLog(level: LogLevel): boolean {
+    return LOG_LEVELS[level] &gt;= LOG_LEVELS[this.minLevel];
+  }
+
+  private formatEntry(level: LogLevel, message: string, extra?: Record&lt;string, unknown&gt;): LogEntry {
+    return {
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      context: this.context,
+      duration: Date.now() - this.startTime,
+      ...extra,
+    };
+  }
+
+  private log(level: LogLevel, message: string, extra?: Record&lt;string, unknown&gt;): void {
+    if (!this.shouldLog(level)) return;
+
+    const entry = this.formatEntry(level, message, extra);
+    const output = JSON.stringify(entry);
+
+    switch (level) {
+      case &#39;error&#39;:
+        console.error(output);
+        break;
+      case &#39;warn&#39;:
+        console.warn(output);
+        break;
+      default:
+        console.log(output);
+    }
+  }
+
+  debug(message: string, extra?: Record&lt;string, unknown&gt;): void {
+    this.log(&#39;debug&#39;, message, extra);
+  }
+
+  info(message: string, extra?: Record&lt;string, unknown&gt;): void {
+    this.log(&#39;info&#39;, message, extra);
+  }
+
+  warn(message: string, extra?: Record&lt;string, unknown&gt;): void {
+    this.log(&#39;warn&#39;, message, extra);
+  }
+
+  error(message: string, error?: Error, extra?: Record&lt;string, unknown&gt;): void {
+    this.log(&#39;error&#39;, message, {
+      ...extra,
+      error: error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      } : undefined,
+    });
+  }
+
+  child(additionalContext: LogContext): Logger {
+    return new Logger(
+      { ...this.context, ...additionalContext },
+      this.minLevel
+    );
+  }
+
+  setRequestId(requestId: string): void {
+    this.context.requestId = requestId;
+  }
+
+  setTenantId(tenantId: string): void {
+    this.context.tenantId = tenantId;
+  }
+
+  setUserId(userId: string): void {
+    this.context.userId = userId;
+  }
+}
+
+// Default logger instance
+export const logger = new Logger({
+  appId: process.env.APP_ID,
+  environment: process.env.ENVIRONMENT,
+});</code></pre>
+<h3 id="packagesinfrastructurelambdasharederrors.ts">packages/infrastructure/lambda/shared/errors.ts</h3>
+<pre class="typescript"><code>/**
+ * Custom error types for API responses
+ */
+
+export abstract class AppError extends Error {
+  abstract readonly statusCode: number;
+  abstract readonly code: string;
+  readonly isOperational = true;
+
+  constructor(message: string) {
+    super(message);
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
+  }
+
+  toJSON() {
+    return {
+      code: this.code,
+      message: this.message,
+      statusCode: this.statusCode,
+    };
+  }
+}
+
+// 400 Bad Request
+export class ValidationError extends AppError {
+  readonly statusCode = 400;
+  readonly code = &#39;VALIDATION_ERROR&#39;;
+  readonly details?: Record&lt;string, string[]&gt;;
+
+  constructor(message: string, details?: Record&lt;string, string[]&gt;) {
+    super(message);
+    this.details = details;
+  }
+
+  toJSON() {
+    return {
+      ...super.toJSON(),
+      details: this.details,
+    };
+  }
+}
+
+// 401 Unauthorized
+export class UnauthorizedError extends AppError {
+  readonly statusCode = 401;
+  readonly code = &#39;UNAUTHORIZED&#39;;
+
+  constructor(message = &#39;Authentication required&#39;) {
+    super(message);
+  }
+}
+
+// 403 Forbidden
+export class ForbiddenError extends AppError {
+  readonly statusCode = 403;
+  readonly code = &#39;FORBIDDEN&#39;;
+
+  constructor(message = &#39;Access denied&#39;) {
+    super(message);
+  }
+}
+
+// 404 Not Found
+export class NotFoundError extends AppError {
+  readonly statusCode = 404;
+  readonly code = &#39;NOT_FOUND&#39;;
+  readonly resource?: string;
+
+  constructor(resource?: string) {
+    super(resource ? `${resource} not found` : &#39;Resource not found&#39;);
+    this.resource = resource;
+  }
+}
+
+// 409 Conflict
+export class ConflictError extends AppError {
+  readonly statusCode = 409;
+  readonly code = &#39;CONFLICT&#39;;
+
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+// 422 Unprocessable Entity
+export class UnprocessableError extends AppError {
+  readonly statusCode = 422;
+  readonly code = &#39;UNPROCESSABLE_ENTITY&#39;;
+
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+// 429 Too Many Requests
+export class RateLimitError extends AppError {
+  readonly statusCode = 429;
+  readonly code = &#39;RATE_LIMITED&#39;;
+  readonly retryAfter?: number;
+
+  constructor(retryAfter?: number) {
+    super(&#39;Rate limit exceeded&#39;);
+    this.retryAfter = retryAfter;
+  }
+}
+
+// 500 Internal Server Error
+export class InternalError extends AppError {
+  readonly statusCode = 500;
+  readonly code = &#39;INTERNAL_ERROR&#39;;
+
+  constructor(message = &#39;An unexpected error occurred&#39;) {
+    super(message);
+  }
+}
+
+// 502 Bad Gateway (AI provider errors)
+export class ProviderError extends AppError {
+  readonly statusCode = 502;
+  readonly code = &#39;PROVIDER_ERROR&#39;;
+  readonly provider?: string;
+
+  constructor(message: string, provider?: string) {
+    super(message);
+    this.provider = provider;
+  }
+}
+
+// 503 Service Unavailable
+export class ServiceUnavailableError extends AppError {
+  readonly statusCode = 503;
+  readonly code = &#39;SERVICE_UNAVAILABLE&#39;;
+
+  constructor(message = &#39;Service temporarily unavailable&#39;) {
+    super(message);
+  }
+}
+
+/**
+ * Check if error is an operational error (expected)
+ */
+export function isOperationalError(error: unknown): error is AppError {
+  return error instanceof AppError &amp;&amp; error.isOperational;
+}
+
+/**
+ * Convert unknown error to AppError
+ */
+export function toAppError(error: unknown): AppError {
+  if (error instanceof AppError) {
+    return error;
+  }
+
+  if (error instanceof Error) {
+    return new InternalError(error.message);
+  }
+
+  return new InternalError(&#39;Unknown error occurred&#39;);
+}</code></pre>
+<h3 id="packagesinfrastructurelambdasharedresponse.ts">packages/infrastructure/lambda/shared/response.ts</h3>
+<pre class="typescript"><code>/**
+ * Standardized API response helpers
+ */
+
+import type { APIGatewayProxyResult } from &#39;aws-lambda&#39;;
+import { AppError, toAppError } from &#39;./errors&#39;;
+import { Logger } from &#39;./logger&#39;;
+
+interface SuccessResponse&lt;T&gt; {
+  success: true;
+  data: T;
+  meta?: ResponseMeta;
+}
+
+interface ErrorResponse {
+  success: false;
+  error: {
+    code: string;
+    message: string;
+    details?: unknown;
+  };
+}
+
+interface ResponseMeta {
+  requestId?: string;
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
+  };
+  timing?: {
+    duration: number;
+  };
+}
+
+type ApiResponse&lt;T&gt; = SuccessResponse&lt;T&gt; | ErrorResponse;
+
+const DEFAULT_HEADERS = {
+  &#39;Content-Type&#39;: &#39;application/json&#39;,
+  &#39;Access-Control-Allow-Origin&#39;: &#39;*&#39;,
+  &#39;Access-Control-Allow-Headers&#39;: &#39;Content-Type,Authorization,X-Api-Key,X-Tenant-Id&#39;,
+  &#39;Access-Control-Allow-Methods&#39;: &#39;GET,POST,PUT,DELETE,OPTIONS&#39;,
+  &#39;X-Content-Type-Options&#39;: &#39;nosniff&#39;,
+  &#39;X-Frame-Options&#39;: &#39;DENY&#39;,
+  &#39;Strict-Transport-Security&#39;: &#39;max-age=31536000; includeSubDomains&#39;,
+};
+
+/**
+ * Create success response
+ */
+export function success&lt;T&gt;(
+  data: T,
+  statusCode = 200,
+  meta?: ResponseMeta
+): APIGatewayProxyResult {
+  const response: SuccessResponse&lt;T&gt; = {
+    success: true,
+    data,
+    meta,
+  };
+
+  return {
+    statusCode,
+    headers: DEFAULT_HEADERS,
+    body: JSON.stringify(response),
+  };
+}
+
+/**
+ * Create created response (201)
+ */
+export function created&lt;T&gt;(data: T, meta?: ResponseMeta): APIGatewayProxyResult {
+  return success(data, 201, meta);
+}
+
+/**
+ * Create no content response (204)
+ */
+export function noContent(): APIGatewayProxyResult {
+  return {
+    statusCode: 204,
+    headers: DEFAULT_HEADERS,
+    body: &#39;&#39;,
+  };
+}
+
+/**
+ * Create error response
+ */
+export function error(
+  err: AppError,
+  logger?: Logger
+): APIGatewayProxyResult {
+  if (logger) {
+    if (err.statusCode &gt;= 500) {
+      logger.error(&#39;Internal error&#39;, err);
+    } else {
+      logger.warn(&#39;Client error&#39;, { error: err.toJSON() });
+    }
+  }
+
+  const response: ErrorResponse = {
+    success: false,
+    error: {
+      code: err.code,
+      message: err.message,
+      details: (err as any).details,
+    },
+  };
+
+  const headers = { ...DEFAULT_HEADERS };
+  
+  if (&#39;retryAfter&#39; in err &amp;&amp; err.retryAfter) {
+    headers[&#39;Retry-After&#39;] = String(err.retryAfter);
+  }
+
+  return {
+    statusCode: err.statusCode,
+    headers,
+    body: JSON.stringify(response),
+  };
+}
+
+/**
+ * Handle errors uniformly
+ */
+export function handleError(
+  err: unknown,
+  logger?: Logger
+): APIGatewayProxyResult {
+  const appError = toAppError(err);
+  return error(appError, logger);
+}
+
+/**
+ * Create streaming response headers
+ */
+export function streamingHeaders(): Record&lt;string, string&gt; {
+  return {
+    ...DEFAULT_HEADERS,
+    &#39;Content-Type&#39;: &#39;text/event-stream&#39;,
+    &#39;Cache-Control&#39;: &#39;no-cache&#39;,
+    Connection: &#39;keep-alive&#39;,
+  };
+}
+
+/**
+ * Format Server-Sent Event
+ */
+export function formatSSE(data: unknown, event?: string): string {
+  let output = &#39;&#39;;
+  if (event) {
+    output += `event: ${event}\n`;
+  }
+  output += `data: ${JSON.stringify(data)}\n\n`;
+  return output;
+}</code></pre>
+<h3 id="packagesinfrastructurelambdasharedauth.ts">packages/infrastructure/lambda/shared/auth.ts</h3>
+<pre class="typescript"><code>/**
+ * Authentication and authorization utilities
+ */
+
+import type { APIGatewayProxyEvent } from &#39;aws-lambda&#39;;
+import { UnauthorizedError, ForbiddenError } from &#39;./errors&#39;;
+import { Logger } from &#39;./logger&#39;;
+
+/**
+ * Enhanced AuthContext with app isolation (v4.6.0)
+ */
+export interface AuthContext {
+  // Identity
+  userId: string;       // Cognito sub
+  appUserId: string;    // App-scoped user ID from app_users table
+  tenantId: string;
+  appId: string;        // Application identifier (thinktank, launchboard, etc.)
+  email: string;
+  
+  // Roles &amp; permissions
+  roles: string[];
+  groups: string[];
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
+  
+  // Session
+  sessionId?: string;
+  tokenExpiry: number;
+}
+
+export interface TokenClaims {
+  sub: string;
+  email?: string;
+  &#39;cognito:username&#39;?: string;
+  &#39;cognito:groups&#39;?: string[];
+  &#39;custom:tenantId&#39;?: string;
+  &#39;custom:tenant_id&#39;?: string;
+  &#39;custom:appId&#39;?: string;
+  &#39;custom:app_id&#39;?: string;
+  &#39;custom:appUserId&#39;?: string;
+  &#39;custom:app_user_id&#39;?: string;
+  &#39;custom:role&#39;?: string;
+  iss: string;
+  aud: string;
+  exp: number;
+  iat: number;
+}
+
+/**
+ * Extract and validate authentication context from API Gateway event
+ * Includes app isolation validation (v4.6.0)
+ */
+export function extractAuthContext(event: APIGatewayProxyEvent): AuthContext {
+  const claims = event.requestContext.authorizer?.claims as TokenClaims | undefined;
+  
+  if (!claims) {
+    throw new UnauthorizedError(&#39;No authentication claims found&#39;);
+  }
+
+  // Check token expiration
+  if (claims.exp &amp;&amp; claims.exp &lt; Date.now() / 1000) {
+    throw new UnauthorizedError(&#39;Token has expired&#39;);
+  }
+  
+  // Extract core identifiers
+  const userId = claims.sub;
+  const tenantId = claims[&#39;custom:tenantId&#39;] || claims[&#39;custom:tenant_id&#39;];
+  const appId = claims[&#39;custom:appId&#39;] || claims[&#39;custom:app_id&#39;];
+  const appUserId = claims[&#39;custom:appUserId&#39;] || claims[&#39;custom:app_user_id&#39;];
+  const email = claims.email || claims[&#39;cognito:username&#39;] || &#39;&#39;;
+  
+  // Validate required claims
+  if (!userId) throw new UnauthorizedError(&#39;Missing user ID&#39;);
+  if (!tenantId) throw new UnauthorizedError(&#39;Missing tenant ID&#39;);
+  
+  // App isolation - appId and appUserId required for v4.6.0+
+  // Fallback for backward compatibility with pre-v4.6.0 tokens
+  const resolvedAppId = appId || extractAppIdFromRoute(event) || &#39;default&#39;;
+  const resolvedAppUserId = appUserId || userId; // Fallback to userId for legacy tokens
+  
+  // Validate app_id matches route (defense in depth)
+  const routeAppId = extractAppIdFromRoute(event);
+  if (routeAppId &amp;&amp; appId &amp;&amp; routeAppId !== appId) {
+    throw new ForbiddenError(`Token app_id (${appId}) does not match route (${routeAppId})`);
+  }
+  
+  // Extract roles and groups
+  const groups = claims[&#39;cognito:groups&#39;] || [];
+  const roles = claims[&#39;custom:role&#39;] ? [claims[&#39;custom:role&#39;]] : [];
+  
+  const isAdmin = groups.some(g =&gt; 
+    [&#39;super_admin&#39;, &#39;admin&#39;, &#39;operator&#39;, &#39;auditor&#39;].includes(g)
+  );
+  const isSuperAdmin = groups.includes(&#39;super_admin&#39;);
+
+  return {
+    userId,
+    appUserId: resolvedAppUserId,
+    tenantId,
+    appId: resolvedAppId,
+    email,
+    roles,
+    groups,
+    isAdmin,
+    isSuperAdmin,
+    tokenExpiry: claims.exp || 0,
+  };
+}
+
+/**
+ * Extract app_id from route for validation (v4.6.0)
+ */
+function extractAppIdFromRoute(event: APIGatewayProxyEvent): string | null {
+  // Extract from subdomain: thinktank.domain.com -&gt; thinktank
+  const host = event.headers.Host || event.headers[&#39;host&#39;];
+  if (host) {
+    const subdomain = host.split(&#39;.&#39;)[0];
+    if ([&#39;thinktank&#39;, &#39;launchboard&#39;, &#39;alwaysme&#39;, &#39;mechanicalmaker&#39;].includes(subdomain)) {
+      return subdomain;
+    }
+  }
+  
+  // Extract from path: /api/thinktank/... -&gt; thinktank
+  const pathMatch = event.path.match(/^\/api\/(thinktank|launchboard|alwaysme|mechanicalmaker)/);
+  if (pathMatch) {
+    return pathMatch[1];
+  }
+  
+  return null;
+}
+
+/**
+ * Require specific roles
+ */
+export function requireRoles(auth: AuthContext, requiredRoles: string[]): void {
+  const hasRole = requiredRoles.some(role =&gt; 
+    auth.roles.includes(role) || auth.groups.includes(role)
+  );
+
+  if (!hasRole) {
+    throw new ForbiddenError(
+      `Required roles: ${requiredRoles.join(&#39;, &#39;)}`
+    );
+  }
+}
+
+/**
+ * Require admin access
+ */
+export function requireAdmin(auth: AuthContext): void {
+  if (!auth.isAdmin) {
+    throw new ForbiddenError(&#39;Admin access required&#39;);
+  }
+}
+
+/**
+ * Require super admin access
+ */
+export function requireSuperAdmin(auth: AuthContext): void {
+  if (!auth.groups.includes(&#39;super_admin&#39;)) {
+    throw new ForbiddenError(&#39;Super admin access required&#39;);
+  }
+}
+
+/**
+ * Check if user can access tenant
+ */
+export function canAccessTenant(auth: AuthContext, tenantId: string): boolean {
+  // Super admins can access any tenant
+  if (auth.groups.includes(&#39;super_admin&#39;)) {
+    return true;
+  }
+  
+  // Users can only access their own tenant
+  return auth.tenantId === tenantId;
+}
+
+/**
+ * Require tenant access
+ */
+export function requireTenantAccess(auth: AuthContext, tenantId: string): void {
+  if (!canAccessTenant(auth, tenantId)) {
+    throw new ForbiddenError(&#39;Access to tenant denied&#39;);
+  }
+}
+
+/**
+ * Extract API key from header (for API key auth)
+ */
+export function extractApiKey(event: APIGatewayProxyEvent): string | undefined {
+  return event.headers[&#39;X-Api-Key&#39;] || event.headers[&#39;x-api-key&#39;];
+}
+
+/**
+ * Log authentication context (sanitized)
+ */
+export function logAuthContext(auth: AuthContext, logger: Logger): void {
+  logger.info(&#39;Authenticated request&#39;, {
+    userId: auth.userId,
+    tenantId: auth.tenantId,
+    isAdmin: auth.isAdmin,
+    groupCount: auth.groups.length,
+  });
+}</code></pre>
+<hr />
+<h2 id="part-3-database-client">PART 3: DATABASE CLIENT</h2>
+<h3 id="packagesinfrastructurelambdashareddbindex.ts">packages/infrastructure/lambda/shared/db/index.ts</h3>
+<pre class="typescript"><code>export * from &#39;./client&#39;;
+export * from &#39;./queries&#39;;
+export * from &#39;./types&#39;;</code></pre>
+<h3 id="packagesinfrastructurelambdashareddbtypes.ts">packages/infrastructure/lambda/shared/db/types.ts</h3>
+<pre class="typescript"><code>/**
+ * Database types matching Aurora PostgreSQL schema
+ */
+
+// ============================================================================
+// PROVIDERS
+// ============================================================================
+
+export interface DBProvider {
+  id: string;
+  name: string;
+  type: &#39;external&#39; | &#39;self-hosted&#39; | &#39;mid-tier&#39;;
+  status: &#39;active&#39; | &#39;inactive&#39; | &#39;deprecated&#39;;
+  hipaa_compliant: boolean;
+  baa_available: boolean;
+  base_url: string | null;
+  auth_type: &#39;api_key&#39; | &#39;oauth&#39; | &#39;iam&#39; | &#39;none&#39;;
+  capabilities: string[];
+  config: Record&lt;string, unknown&gt;;
+  created_at: string;
+  updated_at: string;
+}
+
+// ============================================================================
+// MODELS
+// ============================================================================
+
+export interface DBModel {
+  id: string;
+  provider_id: string;
+  name: string;
+  display_name: string;
+  description: string | null;
+  type: &#39;external&#39; | &#39;self-hosted&#39;;
+  specialty: string;
+  capabilities: string[];
+  context_window: number | null;
+  max_output_tokens: number | null;
+  supports_functions: boolean;
+  supports_vision: boolean;
+  supports_streaming: boolean;
+  has_thinking_mode: boolean;
+  thinking_budget_tokens: number | null;
+  pricing: DBModelPricing;
+  thermal_state: string | null;
+  thermal_config: DBThermalConfig | null;
+  status: &#39;active&#39; | &#39;inactive&#39; | &#39;deprecated&#39; | &#39;coming_soon&#39;;
+  release_date: string | null;
+  deprecation_date: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DBModelPricing {
+  input_tokens?: number;
+  output_tokens?: number;
+  per_image?: number;
+  per_minute_audio?: number;
+  per_minute_video?: number;
+  per_3d_model?: number;
+  billed_markup: number;
+}
+
+export interface DBThermalConfig {
+  state: &#39;OFF&#39; | &#39;COLD&#39; | &#39;WARM&#39; | &#39;HOT&#39; | &#39;AUTOMATIC&#39;;
+  min_instances: number;
+  max_instances: number;
+  scale_to_zero_after_minutes?: number;
+  warmup_time_seconds?: number;
+}
+
+// ============================================================================
+// TENANTS
+// ============================================================================
+
+export interface DBTenant {
+  id: string;
+  app_id: string;
+  name: string;
+  domain: string | null;
+  status: &#39;active&#39; | &#39;suspended&#39; | &#39;deleted&#39;;
+  settings: DBTenantSettings;
+  phi_config: DBPhiConfig | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DBTenantSettings {
+  default_model?: string;
+  allowed_providers?: string[];
+  max_tokens_per_request?: number;
+  rate_limit?: {
+    requests_per_minute: number;
+    tokens_per_day: number;
+  };
+}
+
+export interface DBPhiConfig {
+  mode: &#39;auto&#39; | &#39;manual&#39; | &#39;disabled&#39;;
+  categories: Record&lt;string, boolean&gt;;
+  reidentification: {
+    allowed: boolean;
+    requires_approval: boolean;
+    mapping_ttl_hours: number;
+  };
+}
+
+// ============================================================================
+// USAGE
+// ============================================================================
+
+export interface DBUsageRecord {
+  id: string;
+  tenant_id: string;
+  user_id: string | null;
+  session_id: string | null;
+  model_id: string;
+  provider_id: string;
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+  cost: number;
+  billed_amount: number;
+  request_type: string;
+  latency_ms: number;
+  created_at: string;
+}
+
+// ============================================================================
+// AUDIT LOG
+// ============================================================================
+
+export interface DBAuditLog {
+  id: string;
+  tenant_id: string;
+  user_id: string | null;
+  admin_id: string | null;
+  action: string;
+  resource_type: string;
+  resource_id: string | null;
+  details: Record&lt;string, unknown&gt;;
+  ip_address: string | null;
+  user_agent: string | null;
+  created_at: string;
+}</code></pre>
+<h3 id="packagesinfrastructurelambdashareddbclient.ts">packages/infrastructure/lambda/shared/db/client.ts</h3>
+<pre class="typescript"><code>/**
+ * Aurora PostgreSQL client using Data API
+ */
+
+import {
+  RDSDataClient,
+  ExecuteStatementCommand,
+  BatchExecuteStatementCommand,
+  BeginTransactionCommand,
+  CommitTransactionCommand,
+  RollbackTransactionCommand,
+  Field,
+  SqlParameter,
+} from &#39;@aws-sdk/client-rds-data&#39;;
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from &#39;@aws-sdk/client-secrets-manager&#39;;
+import { getConfig } from &#39;../config&#39;;
+import { Logger } from &#39;../logger&#39;;
+import { InternalError } from &#39;../errors&#39;;
+
+// Initialize clients
+const rdsClient = new RDSDataClient({});
+const secretsClient = new SecretsManagerClient({});
+
+// Cache database credentials
+let dbCredentials: { username: string; password: string } | null = null;
+
+export interface QueryResult&lt;T = Record&lt;string, unknown&gt;&gt; {
+  rows: T[];
+  rowCount: number;
+  columnMetadata?: { name: string; type: string }[];
+}
+
+export interface TransactionContext {
+  transactionId: string;
+}
+
+/**
+ * Get database credentials from Secrets Manager
+ */
+async function getDbCredentials(): Promise&lt;{ username: string; password: string }&gt; {
+  if (dbCredentials) return dbCredentials;
+
+  const config = getConfig();
+  
+  try {
+    const command = new GetSecretValueCommand({
+      SecretId: config.AURORA_SECRET_ARN,
+    });
+    
+    const response = await secretsClient.send(command);
+    
+    if (!response.SecretString) {
+      throw new Error(&#39;Secret value is empty&#39;);
+    }
+    
+    dbCredentials = JSON.parse(response.SecretString);
+    return dbCredentials!;
+  } catch (error) {
+    throw new InternalError(`Failed to retrieve database credentials: ${error}`);
+  }
+}
+
+/**
+ * Convert JavaScript value to SQL parameter
+ */
+function toSqlParameter(name: string, value: unknown): SqlParameter {
+  if (value === null || value === undefined) {
+    return { name, value: { isNull: true } };
+  }
+
+  if (typeof value === &#39;string&#39;) {
+    return { name, value: { stringValue: value } };
+  }
+
+  if (typeof value === &#39;number&#39;) {
+    if (Number.isInteger(value)) {
+      return { name, value: { longValue: value } };
+    }
+    return { name, value: { doubleValue: value } };
+  }
+
+  if (typeof value === &#39;boolean&#39;) {
+    return { name, value: { booleanValue: value } };
+  }
+
+  if (Array.isArray(value)) {
+    return { name, value: { stringValue: JSON.stringify(value) }, typeHint: &#39;JSON&#39; };
+  }
+
+  if (typeof value === &#39;object&#39;) {
+    return { name, value: { stringValue: JSON.stringify(value) }, typeHint: &#39;JSON&#39; };
+  }
+
+  return { name, value: { stringValue: String(value) } };
+}
+
+/**
+ * Convert SQL field to JavaScript value
+ */
+function fromSqlField(field: Field): unknown {
+  if (field.isNull) return null;
+  if (field.stringValue !== undefined) return field.stringValue;
+  if (field.longValue !== undefined) return field.longValue;
+  if (field.doubleValue !== undefined) return field.doubleValue;
+  if (field.booleanValue !== undefined) return field.booleanValue;
+  if (field.blobValue !== undefined) return field.blobValue;
+  if (field.arrayValue !== undefined) {
+    return field.arrayValue.stringValues || 
+           field.arrayValue.longValues || 
+           field.arrayValue.doubleValues || 
+           field.arrayValue.booleanValues || 
+           [];
+  }
+  return null;
+}
+
+/**
+ * Execute a SQL query
+ */
+export async function query&lt;T = Record&lt;string, unknown&gt;&gt;(
+  sql: string,
+  params: Record&lt;string, unknown&gt; = {},
+  logger?: Logger,
+  transactionId?: string
+): Promise&lt;QueryResult&lt;T&gt;&gt; {
+  const config = getConfig();
+  const startTime = Date.now();
+
+  try {
+    const command = new ExecuteStatementCommand({
+      resourceArn: config.AURORA_CLUSTER_ARN,
+      secretArn: config.AURORA_SECRET_ARN,
+      database: &#39;radiant&#39;,
+      sql,
+      parameters: Object.entries(params).map(([name, value]) =&gt; 
+        toSqlParameter(name, value)
+      ),
+      includeResultMetadata: true,
+      transactionId,
+    });
+
+    const response = await rdsClient.send(command);
+    const duration = Date.now() - startTime;
+
+    if (logger) {
+      logger.debug(&#39;Database query executed&#39;, {
+        sql: sql.substring(0, 100),
+        duration,
+        rowCount: response.numberOfRecordsUpdated,
+      });
+    }
+
+    // Convert response to rows
+    const rows: T[] = [];
+    
+    if (response.records &amp;&amp; response.columnMetadata) {
+      for (const record of response.records) {
+        const row: Record&lt;string, unknown&gt; = {};
+        
+        for (let i = 0; i &lt; response.columnMetadata.length; i++) {
+          const columnName = response.columnMetadata[i].name || `col${i}`;
+          row[columnName] = fromSqlField(record[i]);
+        }
+        
+        rows.push(row as T);
+      }
+    }
+
+    return {
+      rows,
+      rowCount: response.numberOfRecordsUpdated || rows.length,
+      columnMetadata: response.columnMetadata?.map(col =&gt; ({
+        name: col.name || &#39;&#39;,
+        type: col.typeName || &#39;&#39;,
+      })),
+    };
+  } catch (error) {
+    const duration = Date.now() - startTime;
+    
+    if (logger) {
+      logger.error(&#39;Database query failed&#39;, error as Error, {
+        sql: sql.substring(0, 100),
+        duration,
+      });
+    }
+    
+    throw new InternalError(`Database query failed: ${error}`);
+  }
+}
+
+/**
+ * Execute a single row query
+ */
+export async function queryOne&lt;T = Record&lt;string, unknown&gt;&gt;(
+  sql: string,
+  params: Record&lt;string, unknown&gt; = {},
+  logger?: Logger
+): Promise&lt;T | null&gt; {
+  const result = await query&lt;T&gt;(sql, params, logger);
+  return result.rows[0] || null;
+}
+
+/**
+ * Begin a transaction
+ */
+export async function beginTransaction(logger?: Logger): Promise&lt;TransactionContext&gt; {
+  const config = getConfig();
+
+  try {
+    const command = new BeginTransactionCommand({
+      resourceArn: config.AURORA_CLUSTER_ARN,
+      secretArn: config.AURORA_SECRET_ARN,
+      database: &#39;radiant&#39;,
+    });
+
+    const response = await rdsClient.send(command);
+
+    if (!response.transactionId) {
+      throw new Error(&#39;No transaction ID returned&#39;);
+    }
+
+    if (logger) {
+      logger.debug(&#39;Transaction started&#39;, { transactionId: response.transactionId });
+    }
+
+    return { transactionId: response.transactionId };
+  } catch (error) {
+    throw new InternalError(`Failed to begin transaction: ${error}`);
+  }
+}
+
+/**
+ * Commit a transaction
+ */
+export async function commitTransaction(
+  ctx: TransactionContext,
+  logger?: Logger
+): Promise&lt;void&gt; {
+  const config = getConfig();
+
+  try {
+    const command = new CommitTransactionCommand({
+      resourceArn: config.AURORA_CLUSTER_ARN,
+      secretArn: config.AURORA_SECRET_ARN,
+      transactionId: ctx.transactionId,
+    });
+
+    await rdsClient.send(command);
+
+    if (logger) {
+      logger.debug(&#39;Transaction committed&#39;, { transactionId: ctx.transactionId });
+    }
+  } catch (error) {
+    throw new InternalError(`Failed to commit transaction: ${error}`);
+  }
+}
+
+/**
+ * Rollback a transaction
+ */
+export async function rollbackTransaction(
+  ctx: TransactionContext,
+  logger?: Logger
+): Promise&lt;void&gt; {
+  const config = getConfig();
+
+  try {
+    const command = new RollbackTransactionCommand({
+      resourceArn: config.AURORA_CLUSTER_ARN,
+      secretArn: config.AURORA_SECRET_ARN,
+      transactionId: ctx.transactionId,
+    });
+
+    await rdsClient.send(command);
+
+    if (logger) {
+      logger.debug(&#39;Transaction rolled back&#39;, { transactionId: ctx.transactionId });
+    }
+  } catch (error) {
+    // Log but don&#39;t throw - rollback errors are usually not critical
+    if (logger) {
+      logger.warn(&#39;Transaction rollback failed&#39;, { 
+        transactionId: ctx.transactionId,
+        error: String(error),
+      });
+    }
+  }
+}
+
+/**
+ * Execute a callback within a transaction
+ */
+export async function withTransaction&lt;T&gt;(
+  callback: (transactionId: string) =&gt; Promise&lt;T&gt;,
+  logger?: Logger
+): Promise&lt;T&gt; {
+  const ctx = await beginTransaction(logger);
+  
+  try {
+    const result = await callback(ctx.transactionId);
+    await commitTransaction(ctx, logger);
+    return result;
+  } catch (error) {
+    await rollbackTransaction(ctx, logger);
+    throw error;
+  }
+}</code></pre>
+<h3 id="packagesinfrastructurelambdashareddbqueries.ts">packages/infrastructure/lambda/shared/db/queries.ts</h3>
+<pre class="typescript"><code>/**
+ * Pre-built database queries
+ */
+
+import { query, queryOne, QueryResult } from &#39;./client&#39;;
+import { DBProvider, DBModel, DBTenant, DBUsageRecord, DBAuditLog } from &#39;./types&#39;;
+import { Logger } from &#39;../logger&#39;;
+import { NotFoundError } from &#39;../errors&#39;;
+
+// ============================================================================
+// PROVIDERS
+// ============================================================================
+
+export async function getProviders(
+  filters: {
+    type?: string;
+    status?: string;
+    hipaaCompliant?: boolean;
+    limit?: number;
+    offset?: number;
+  } = {},
+  logger?: Logger
+): Promise&lt;QueryResult&lt;DBProvider&gt;&gt; {
+  let sql = `
+    SELECT * FROM providers
+    WHERE 1=1
+  `;
+  const params: Record&lt;string, unknown&gt; = {};
+
+  if (filters.type) {
+    sql += ` AND type = :type`;
+    params.type = filters.type;
+  }
+
+  if (filters.status) {
+    sql += ` AND status = :status`;
+    params.status = filters.status;
+  }
+
+  if (filters.hipaaCompliant !== undefined) {
+    sql += ` AND hipaa_compliant = :hipaaCompliant`;
+    params.hipaaCompliant = filters.hipaaCompliant;
+  }
+
+  sql += ` ORDER BY name ASC`;
+
+  if (filters.limit) {
+    sql += ` LIMIT :limit`;
+    params.limit = filters.limit;
+  }
+
+  if (filters.offset) {
+    sql += ` OFFSET :offset`;
+    params.offset = filters.offset;
+  }
+
+  return query&lt;DBProvider&gt;(sql, params, logger);
+}
+
+export async function getProviderById(
+  id: string,
+  logger?: Logger
+): Promise&lt;DBProvider&gt; {
+  const result = await queryOne&lt;DBProvider&gt;(
+    `SELECT * FROM providers WHERE id = :id`,
+    { id },
+    logger
+  );
+
+  if (!result) {
+    throw new NotFoundError(`Provider ${id}`);
+  }
+
+  return result;
+}
+
+export async function updateProvider(
+  id: string,
+  updates: Partial&lt;Pick&lt;DBProvider, &#39;status&#39; | &#39;hipaa_compliant&#39; | &#39;config&#39;&gt;&gt;,
+  logger?: Logger
+): Promise&lt;DBProvider&gt; {
+  const setClauses: string[] = [&#39;updated_at = NOW()&#39;];
+  const params: Record&lt;string, unknown&gt; = { id };
+
+  if (updates.status !== undefined) {
+    setClauses.push(&#39;status = :status&#39;);
+    params.status = updates.status;
+  }
+
+  if (updates.hipaa_compliant !== undefined) {
+    setClauses.push(&#39;hipaa_compliant = :hipaaCompliant&#39;);
+    params.hipaaCompliant = updates.hipaa_compliant;
+  }
+
+  if (updates.config !== undefined) {
+    setClauses.push(&#39;config = :config&#39;);
+    params.config = updates.config;
+  }
+
+  const sql = `
+    UPDATE providers
+    SET ${setClauses.join(&#39;, &#39;)}
+    WHERE id = :id
+    RETURNING *
+  `;
+
+  const result = await queryOne&lt;DBProvider&gt;(sql, params, logger);
+
+  if (!result) {
+    throw new NotFoundError(`Provider ${id}`);
+  }
+
+  return result;
+}
+
+// ============================================================================
+// MODELS
+// ============================================================================
+
+export async function getModels(
+  filters: {
+    providerId?: string;
+    specialty?: string;
+    status?: string;
+    type?: string;
+    supportsVision?: boolean;
+    supportsStreaming?: boolean;
+    limit?: number;
+    offset?: number;
+  } = {},
+  logger?: Logger
+): Promise&lt;QueryResult&lt;DBModel&gt;&gt; {
+  let sql = `
+    SELECT * FROM models
+    WHERE 1=1
+  `;
+  const params: Record&lt;string, unknown&gt; = {};
+
+  if (filters.providerId) {
+    sql += ` AND provider_id = :providerId`;
+    params.providerId = filters.providerId;
+  }
+
+  if (filters.specialty) {
+    sql += ` AND specialty = :specialty`;
+    params.specialty = filters.specialty;
+  }
+
+  if (filters.status) {
+    sql += ` AND status = :status`;
+    params.status = filters.status;
+  }
+
+  if (filters.type) {
+    sql += ` AND type = :type`;
+    params.type = filters.type;
+  }
+
+  if (filters.supportsVision !== undefined) {
+    sql += ` AND supports_vision = :supportsVision`;
+    params.supportsVision = filters.supportsVision;
+  }
+
+  if (filters.supportsStreaming !== undefined) {
+    sql += ` AND supports_streaming = :supportsStreaming`;
+    params.supportsStreaming = filters.supportsStreaming;
+  }
+
+  sql += ` ORDER BY display_name ASC`;
+
+  if (filters.limit) {
+    sql += ` LIMIT :limit`;
+    params.limit = filters.limit;
+  }
+
+  if (filters.offset) {
+    sql += ` OFFSET :offset`;
+    params.offset = filters.offset;
+  }
+
+  return query&lt;DBModel&gt;(sql, params, logger);
+}
+
+export async function getModelById(
+  id: string,
+  logger?: Logger
+): Promise&lt;DBModel&gt; {
+  const result = await queryOne&lt;DBModel&gt;(
+    `SELECT * FROM models WHERE id = :id`,
+    { id },
+    logger
+  );
+
+  if (!result) {
+    throw new NotFoundError(`Model ${id}`);
+  }
+
+  return result;
+}
+
+export async function getModelByName(
+  name: string,
+  logger?: Logger
+): Promise&lt;DBModel | null&gt; {
+  return queryOne&lt;DBModel&gt;(
+    `SELECT * FROM models WHERE name = :name AND status = &#39;active&#39;`,
+    { name },
+    logger
+  );
+}
+
+export async function updateModel(
+  id: string,
+  updates: Partial&lt;Pick&lt;DBModel, &#39;status&#39; | &#39;thermal_state&#39; | &#39;thermal_config&#39; | &#39;display_name&#39; | &#39;description&#39;&gt;&gt;,
+  logger?: Logger
+): Promise&lt;DBModel&gt; {
+  const setClauses: string[] = [&#39;updated_at = NOW()&#39;];
+  const params: Record&lt;string, unknown&gt; = { id };
+
+  if (updates.status !== undefined) {
+    setClauses.push(&#39;status = :status&#39;);
+    params.status = updates.status;
+  }
+
+  if (updates.thermal_state !== undefined) {
+    setClauses.push(&#39;thermal_state = :thermalState&#39;);
+    params.thermalState = updates.thermal_state;
+  }
+
+  if (updates.thermal_config !== undefined) {
+    setClauses.push(&#39;thermal_config = :thermalConfig&#39;);
+    params.thermalConfig = updates.thermal_config;
+  }
+
+  if (updates.display_name !== undefined) {
+    setClauses.push(&#39;display_name = :displayName&#39;);
+    params.displayName = updates.display_name;
+  }
+
+  if (updates.description !== undefined) {
+    setClauses.push(&#39;description = :description&#39;);
+    params.description = updates.description;
+  }
+
+  const sql = `
+    UPDATE models
+    SET ${setClauses.join(&#39;, &#39;)}
+    WHERE id = :id
+    RETURNING *
+  `;
+
+  const result = await queryOne&lt;DBModel&gt;(sql, params, logger);
+
+  if (!result) {
+    throw new NotFoundError(`Model ${id}`);
+  }
+
+  return result;
+}
+
+// ============================================================================
+// TENANTS
+// ============================================================================
+
+export async function getTenantById(
+  id: string,
+  logger?: Logger
+): Promise&lt;DBTenant&gt; {
+  const result = await queryOne&lt;DBTenant&gt;(
+    `SELECT * FROM tenants WHERE id = :id AND status = &#39;active&#39;`,
+    { id },
+    logger
+  );
+
+  if (!result) {
+    throw new NotFoundError(`Tenant ${id}`);
+  }
+
+  return result;
+}
+
+export async function getTenantPhiConfig(
+  tenantId: string,
+  logger?: Logger
+): Promise&lt;DBTenant[&#39;phi_config&#39;]&gt; {
+  const tenant = await getTenantById(tenantId, logger);
+  return tenant.phi_config;
+}
+
+// ============================================================================
+// USAGE
+// ============================================================================
+
+export async function recordUsage(
+  usage: Omit&lt;DBUsageRecord, &#39;id&#39; | &#39;created_at&#39;&gt;,
+  logger?: Logger
+): Promise&lt;DBUsageRecord&gt; {
+  const sql = `
+    INSERT INTO usage_records (
+      id, tenant_id, user_id, session_id, model_id, provider_id,
+      input_tokens, output_tokens, total_tokens, cost, billed_amount,
+      request_type, latency_ms
+    ) VALUES (
+      gen_random_uuid(), :tenantId, :userId, :sessionId, :modelId, :providerId,
+      :inputTokens, :outputTokens, :totalTokens, :cost, :billedAmount,
+      :requestType, :latencyMs
+    )
+    RETURNING *
+  `;
+
+  const result = await queryOne&lt;DBUsageRecord&gt;(sql, {
+    tenantId: usage.tenant_id,
+    userId: usage.user_id,
+    sessionId: usage.session_id,
+    modelId: usage.model_id,
+    providerId: usage.provider_id,
+    inputTokens: usage.input_tokens,
+    outputTokens: usage.output_tokens,
+    totalTokens: usage.total_tokens,
+    cost: usage.cost,
+    billedAmount: usage.billed_amount,
+    requestType: usage.request_type,
+    latencyMs: usage.latency_ms,
+  }, logger);
+
+  return result!;
+}
+
+// ============================================================================
+// AUDIT LOG
+// ============================================================================
+
+export async function createAuditLog(
+  log: Omit&lt;DBAuditLog, &#39;id&#39; | &#39;created_at&#39;&gt;,
+  logger?: Logger
+): Promise&lt;DBAuditLog&gt; {
+  const sql = `
+    INSERT INTO audit_logs (
+      id, tenant_id, user_id, admin_id, action, resource_type,
+      resource_id, details, ip_address, user_agent
+    ) VALUES (
+      gen_random_uuid(), :tenantId, :userId, :adminId, :action, :resourceType,
+      :resourceId, :details, :ipAddress, :userAgent
+    )
+    RETURNING *
+  `;
+
+  const result = await queryOne&lt;DBAuditLog&gt;(sql, {
+    tenantId: log.tenant_id,
+    userId: log.user_id,
+    adminId: log.admin_id,
+    action: log.action,
+    resourceType: log.resource_type,
+    resourceId: log.resource_id,
+    details: log.details,
+    ipAddress: log.ip_address,
+    userAgent: log.user_agent,
+  }, logger);
+
+  return result!;
+}</code></pre>
+<hr />
+<h2 id="part-4-litellm-client">PART 4: LITELLM CLIENT</h2>
+<h3 id="packagesinfrastructurelambdasharedlitellmindex.ts">packages/infrastructure/lambda/shared/litellm/index.ts</h3>
+<pre class="typescript"><code>export * from &#39;./client&#39;;
+export * from &#39;./types&#39;;</code></pre>
+<h3 id="packagesinfrastructurelambdasharedlitellmtypes.ts">packages/infrastructure/lambda/shared/litellm/types.ts</h3>
+<pre class="typescript"><code>/**
+ * LiteLLM API types
+ */
+
+// ============================================================================
+// CHAT COMPLETION
+// ============================================================================
+
+export interface ChatCompletionRequest {
+  model: string;
+  messages: ChatMessage[];
+  max_tokens?: number;
+  temperature?: number;
+  top_p?: number;
+  stream?: boolean;
+  stop?: string | string[];
+  presence_penalty?: number;
+  frequency_penalty?: number;
+  user?: string;
+  metadata?: Record&lt;string, unknown&gt;;
+}
+
+export interface ChatMessage {
+  role: &#39;system&#39; | &#39;user&#39; | &#39;assistant&#39; | &#39;function&#39; | &#39;tool&#39;;
+  content: string | ContentPart[];
+  name?: string;
+  function_call?: FunctionCall;
+  tool_calls?: ToolCall[];
+}
+
+export interface ContentPart {
+  type: &#39;text&#39; | &#39;image_url&#39;;
+  text?: string;
+  image_url?: {
+    url: string;
+    detail?: &#39;low&#39; | &#39;high&#39; | &#39;auto&#39;;
+  };
+}
+
+export interface FunctionCall {
+  name: string;
+  arguments: string;
+}
+
+export interface ToolCall {
+  id: string;
+  type: &#39;function&#39;;
+  function: FunctionCall;
+}
+
+export interface ChatCompletionResponse {
+  id: string;
+  object: &#39;chat.completion&#39;;
+  created: number;
+  model: string;
+  choices: ChatChoice[];
+  usage: TokenUsage;
+  system_fingerprint?: string;
+}
+
+export interface ChatChoice {
+  index: number;
+  message: ChatMessage;
+  finish_reason: &#39;stop&#39; | &#39;length&#39; | &#39;function_call&#39; | &#39;tool_calls&#39; | &#39;content_filter&#39; | null;
+  logprobs?: unknown;
+}
+
+export interface TokenUsage {
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
+}
+
+// ============================================================================
+// STREAMING
+// ============================================================================
+
+export interface ChatCompletionChunk {
+  id: string;
+  object: &#39;chat.completion.chunk&#39;;
+  created: number;
+  model: string;
+  choices: StreamChoice[];
+  usage?: TokenUsage;
+}
+
+export interface StreamChoice {
+  index: number;
+  delta: {
+    role?: string;
+    content?: string;
+    function_call?: Partial&lt;FunctionCall&gt;;
+    tool_calls?: Partial&lt;ToolCall&gt;[];
+  };
+  finish_reason: string | null;
+}
+
+// ============================================================================
+// EMBEDDINGS
+// ============================================================================
+
+export interface EmbeddingRequest {
+  model: string;
+  input: string | string[];
+  encoding_format?: &#39;float&#39; | &#39;base64&#39;;
+  dimensions?: number;
+  user?: string;
+}
+
+export interface EmbeddingResponse {
+  object: &#39;list&#39;;
+  data: EmbeddingData[];
+  model: string;
+  usage: {
+    prompt_tokens: number;
+    total_tokens: number;
+  };
+}
+
+export interface EmbeddingData {
+  object: &#39;embedding&#39;;
+  index: number;
+  embedding: number[];
+}
+
+// ============================================================================
+// MODELS
+// ============================================================================
+
+export interface LiteLLMModel {
+  id: string;
+  object: &#39;model&#39;;
+  created: number;
+  owned_by: string;
+}
+
+export interface LiteLLMModelList {
+  object: &#39;list&#39;;
+  data: LiteLLMModel[];
+}
+
+// ============================================================================
+// HEALTH
+// ============================================================================
+
+export interface HealthResponse {
+  status: &#39;healthy&#39; | &#39;unhealthy&#39;;
+  version?: string;
+  models?: string[];
+}
+
+// ============================================================================
+// ERRORS
+// ============================================================================
+
+export interface LiteLLMError {
+  error: {
+    message: string;
+    type: string;
+    param?: string;
+    code?: string;
+  };
+}</code></pre>
+<h3 id="packagesinfrastructurelambdasharedlitellmclient.ts">packages/infrastructure/lambda/shared/litellm/client.ts</h3>
+<pre class="typescript"><code>/**
+ * LiteLLM HTTP client
+ */
+
+import { getConfig } from &#39;../config&#39;;
+import { Logger } from &#39;../logger&#39;;
+import { ProviderError, ServiceUnavailableError, RateLimitError } from &#39;../errors&#39;;
+import {
+  ChatCompletionRequest,
+  ChatCompletionResponse,
+  ChatCompletionChunk,
+  EmbeddingRequest,
+  EmbeddingResponse,
+  LiteLLMModelList,
+  HealthResponse,
+  LiteLLMError,
+} from &#39;./types&#39;;
+
+const DEFAULT_TIMEOUT = 120000; // 2 minutes for AI requests
+
+interface FetchOptions {
+  method?: string;
+  body?: unknown;
+  timeout?: number;
+  stream?: boolean;
+}
+
+/**
+ * Make HTTP request to LiteLLM
+ */
+async function fetchLiteLLM&lt;T&gt;(
+  path: string,
+  options: FetchOptions = {},
+  logger?: Logger
+): Promise&lt;T&gt; {
+  const config = getConfig();
+  const url = `${config.LITELLM_URL}${path}`;
+  const timeout = options.timeout || DEFAULT_TIMEOUT;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() =&gt; controller.abort(), timeout);
+
+  try {
+    const startTime = Date.now();
+
+    const response = await fetch(url, {
+      method: options.method || &#39;GET&#39;,
+      headers: {
+        &#39;Content-Type&#39;: &#39;application/json&#39;,
+        Accept: options.stream ? &#39;text/event-stream&#39; : &#39;application/json&#39;,
+      },
+      body: options.body ? JSON.stringify(options.body) : undefined,
+      signal: controller.signal,
+    });
+
+    const duration = Date.now() - startTime;
+
+    if (logger) {
+      logger.debug(&#39;LiteLLM request completed&#39;, {
+        path,
+        status: response.status,
+        duration,
+      });
+    }
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      let errorMessage = `LiteLLM error: ${response.status}`;
+
+      try {
+        const errorJson = JSON.parse(errorBody) as LiteLLMError;
+        errorMessage = errorJson.error?.message || errorMessage;
+      } catch {
+        errorMessage = errorBody || errorMessage;
+      }
+
+      if (response.status === 429) {
+        const retryAfter = parseInt(response.headers.get(&#39;Retry-After&#39;) || &#39;60&#39;);
+        throw new RateLimitError(retryAfter);
+      }
+
+      if (response.status &gt;= 500) {
+        throw new ServiceUnavailableError(errorMessage);
+      }
+
+      throw new ProviderError(errorMessage, &#39;litellm&#39;);
+    }
+
+    if (options.stream) {
+      return response as unknown as T;
+    }
+
+    return await response.json() as T;
+  } catch (error) {
+    if (error instanceof Error &amp;&amp; error.name === &#39;AbortError&#39;) {
+      throw new ServiceUnavailableError(&#39;LiteLLM request timed out&#39;);
+    }
+
+    if (error instanceof ProviderError || 
+        error instanceof ServiceUnavailableError || 
+        error instanceof RateLimitError) {
+      throw error;
+    }
+
+    throw new ServiceUnavailableError(`LiteLLM connection failed: ${error}`);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+/**
+ * Create chat completion
+ */
+export async function createChatCompletion(
+  request: ChatCompletionRequest,
+  logger?: Logger
+): Promise&lt;ChatCompletionResponse&gt; {
+  return fetchLiteLLM&lt;ChatCompletionResponse&gt;(
+    &#39;/v1/chat/completions&#39;,
+    {
+      method: &#39;POST&#39;,
+      body: request,
+    },
+    logger
+  );
+}
+
+/**
+ * Create streaming chat completion
+ */
+export async function* streamChatCompletion(
+  request: ChatCompletionRequest,
+  logger?: Logger
+): AsyncGenerator&lt;ChatCompletionChunk&gt; {
+  const streamRequest = { ...request, stream: true };
+
+  const response = await fetchLiteLLM&lt;Response&gt;(
+    &#39;/v1/chat/completions&#39;,
+    {
+      method: &#39;POST&#39;,
+      body: streamRequest,
+      stream: true,
+    },
+    logger
+  );
+
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new ServiceUnavailableError(&#39;No response body for streaming&#39;);
+  }
+
+  const decoder = new TextDecoder();
+  let buffer = &#39;&#39;;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split(&#39;\n&#39;);
+      buffer = lines.pop() || &#39;&#39;;
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        
+        if (!trimmed || !trimmed.startsWith(&#39;data: &#39;)) continue;
+        
+        const data = trimmed.slice(6);
+        
+        if (data === &#39;[DONE]&#39;) {
+          return;
+        }
+
+        try {
+          const chunk = JSON.parse(data) as ChatCompletionChunk;
+          yield chunk;
+        } catch {
+          if (logger) {
+            logger.warn(&#39;Failed to parse SSE chunk&#39;, { data });
+          }
+        }
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+/**
+ * Create embeddings
+ */
+export async function createEmbedding(
+  request: EmbeddingRequest,
+  logger?: Logger
+): Promise&lt;EmbeddingResponse&gt; {
+  return fetchLiteLLM&lt;EmbeddingResponse&gt;(
+    &#39;/v1/embeddings&#39;,
+    {
+      method: &#39;POST&#39;,
+      body: request,
+    },
+    logger
+  );
+}
+
+/**
+ * List available models
+ */
+export async function listModels(logger?: Logger): Promise&lt;LiteLLMModelList&gt; {
+  return fetchLiteLLM&lt;LiteLLMModelList&gt;(&#39;/v1/models&#39;, {}, logger);
+}
+
+/**
+ * Health check
+ */
+export async function checkHealth(logger?: Logger): Promise&lt;HealthResponse&gt; {
+  try {
+    const response = await fetchLiteLLM&lt;HealthResponse&gt;(
+      &#39;/health&#39;,
+      { timeout: 5000 },
+      logger
+    );
+    return response;
+  } catch {
+    return { status: &#39;unhealthy&#39; };
+  }
+}
+
+/**
+ * Calculate cost for a completion
+ */
+export function calculateCost(
+  usage: { prompt_tokens: number; completion_tokens: number },
+  pricing: { input_tokens?: number; output_tokens?: number; billed_markup: number }
+): { cost: number; billed: number } {
+  const inputCost = (usage.prompt_tokens / 1_000_000) * (pricing.input_tokens || 0);
+  const outputCost = (usage.completion_tokens / 1_000_000) * (pricing.output_tokens || 0);
+  const cost = inputCost + outputCost;
+  const billed = cost * (1 + pricing.billed_markup);
+
+  return { cost, billed };
+}</code></pre>
+<hr />
+<h2 id="part-5-phi-sanitization">PART 5: PHI SANITIZATION</h2>
+<h3 id="packagesinfrastructurelambdasharedphiindex.ts">packages/infrastructure/lambda/shared/phi/index.ts</h3>
+<pre class="typescript"><code>export * from &#39;./sanitizer&#39;;
+export * from &#39;./patterns&#39;;
+export * from &#39;./types&#39;;</code></pre>
+<h3 id="packagesinfrastructurelambdasharedphitypes.ts">packages/infrastructure/lambda/shared/phi/types.ts</h3>
+<pre class="typescript"><code>/**
+ * PHI (Protected Health Information) types
+ */
+
+export type PHICategory =
+  | &#39;NAME&#39;
+  | &#39;SSN&#39;
+  | &#39;DOB&#39;
+  | &#39;ADDRESS&#39;
+  | &#39;PHONE&#39;
+  | &#39;EMAIL&#39;
+  | &#39;DIAGNOSIS&#39;
+  | &#39;TREATMENT&#39;
+  | &#39;MEDICAL_RECORD&#39;
+  | &#39;INSURANCE_ID&#39;;
+
+export interface PHIConfig {
+  mode: &#39;auto&#39; | &#39;manual&#39; | &#39;disabled&#39;;
+  categories: Record&lt;PHICategory, boolean&gt;;
+  reidentification: {
+    allowed: boolean;
+    requires_approval: boolean;
+    mapping_ttl_hours: number;
+  };
+}
+
+export interface PHIMatch {
+  category: PHICategory;
+  original: string;
+  placeholder: string;
+  startIndex: number;
+  endIndex: number;
+  confidence: number;
+}
+
+export interface SanitizationResult {
+  sanitizedText: string;
+  matches: PHIMatch[];
+  mappingId: string;
+}
+
+export interface ReidentificationResult {
+  originalText: string;
+  matches: PHIMatch[];
+}
+
+export interface PHIMapping {
+  id: string;
+  tenant_id: string;
+  session_id: string | null;
+  mappings: Record&lt;string, string&gt;; // placeholder -&gt; original
+  created_at: string;
+  expires_at: string;
+}
+
+export const DEFAULT_PHI_CONFIG: PHIConfig = {
+  mode: &#39;auto&#39;,
+  categories: {
+    NAME: true,
+    SSN: true,
+    DOB: true,
+    ADDRESS: true,
+    PHONE: true,
+    EMAIL: true,
+    DIAGNOSIS: false, // Often needed for AI analysis
+    TREATMENT: false, // Often needed for AI analysis
+    MEDICAL_RECORD: true,
+    INSURANCE_ID: true,
+  },
+  reidentification: {
+    allowed: true,
+    requires_approval: true,
+    mapping_ttl_hours: 24,
+  },
+};</code></pre>
+<h3 id="packagesinfrastructurelambdasharedphipatterns.ts">packages/infrastructure/lambda/shared/phi/patterns.ts</h3>
+<pre class="typescript"><code>/**
+ * PHI detection patterns
+ */
+
+import { PHICategory } from &#39;./types&#39;;
+
+export interface PHIPattern {
+  category: PHICategory;
+  patterns: RegExp[];
+  validator?: (match: string) =&gt; boolean;
+  confidence: number;
+}
+
+/**
+ * PHI detection patterns by category
+ */
+export const PHI_PATTERNS: PHIPattern[] = [
+  // Social Security Numbers
+  {
+    category: &#39;SSN&#39;,
+    patterns: [
+      /\b\d{3}-\d{2}-\d{4}\b/g,
+      /\b\d{3}\s\d{2}\s\d{4}\b/g,
+      /\bSSN[:\s]*\d{3}[-\s]?\d{2}[-\s]?\d{4}\b/gi,
+    ],
+    validator: (match) =&gt; {
+      const digits = match.replace(/\D/g, &#39;&#39;);
+      if (digits.length !== 9) return false;
+      // Invalid SSN patterns
+      if (digits.startsWith(&#39;000&#39;) || digits.startsWith(&#39;666&#39;)) return false;
+      if (digits.substring(0, 3) === &#39;900&#39; &amp;&amp; parseInt(digits.substring(0, 3)) &lt;= 999) return true;
+      return true;
+    },
+    confidence: 0.95,
+  },
+
+  // Dates of Birth
+  {
+    category: &#39;DOB&#39;,
+    patterns: [
+      /\b(?:DOB|Date of Birth|Birthday|Born)[:\s]*(\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})\b/gi,
+      /\b(?:DOB|Date of Birth|Birthday|Born)[:\s]*([A-Z][a-z]+\s+\d{1,2},?\s+\d{4})\b/gi,
+    ],
+    confidence: 0.90,
+  },
+
+  // Phone Numbers
+  {
+    category: &#39;PHONE&#39;,
+    patterns: [
+      /\b\(?[2-9]\d{2}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g,
+      /\b(?:Phone|Tel|Mobile|Cell)[:\s]*\(?[2-9]\d{2}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/gi,
+      /\b\+1[-.\s]?\(?[2-9]\d{2}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g,
+    ],
+    confidence: 0.85,
+  },
+
+  // Email Addresses
+  {
+    category: &#39;EMAIL&#39;,
+    patterns: [
+      /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,
+    ],
+    validator: (match) =&gt; {
+      // Exclude common system emails
+      const systemDomains = [&#39;YOUR_DOMAIN.com&#39;, &#39;test.com&#39;, &#39;localhost&#39;];
+      const domain = match.split(&#39;@&#39;)[1]?.toLowerCase();
+      return !systemDomains.includes(domain);
+    },
+    confidence: 0.90,
+  },
+
+  // Medical Record Numbers
+  {
+    category: &#39;MEDICAL_RECORD&#39;,
+    patterns: [
+      /\b(?:MRN|Medical Record|Patient ID)[:\s#]*([A-Z0-9]{6,12})\b/gi,
+      /\bMRN[:\s#]*\d{6,12}\b/gi,
+    ],
+    confidence: 0.85,
+  },
+
+  // Insurance IDs
+  {
+    category: &#39;INSURANCE_ID&#39;,
+    patterns: [
+      /\b(?:Insurance ID|Policy Number|Member ID)[:\s#]*([A-Z0-9]{8,15})\b/gi,
+      /\b(?:Group|Plan)\s*(?:Number|ID|#)[:\s]*([A-Z0-9]{6,12})\b/gi,
+    ],
+    confidence: 0.80,
+  },
+
+  // Street Addresses
+  {
+    category: &#39;ADDRESS&#39;,
+    patterns: [
+      /\b\d{1,5}\s+[A-Za-z]+(?:\s+[A-Za-z]+)*\s+(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Way|Place|Pl)\b\.?/gi,
+      /\b(?:P\.?O\.?\s*Box|PO Box)\s+\d+\b/gi,
+    ],
+    confidence: 0.75,
+  },
+
+  // Names (context-dependent)
+  {
+    category: &#39;NAME&#39;,
+    patterns: [
+      /\b(?:Patient|Client|Name)[:\s]*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b/gi,
+      /\b(?:Dr\.|Doctor|Mr\.|Mrs\.|Ms\.)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b/g,
+    ],
+    confidence: 0.70,
+  },
+
+  // Diagnoses (ICD codes and common conditions)
+  {
+    category: &#39;DIAGNOSIS&#39;,
+    patterns: [
+      /\b(?:ICD-?10)[:\s]*([A-Z]\d{2}(?:\.\d{1,4})?)\b/gi,
+      /\b(?:Diagnosis|Dx)[:\s]*([A-Za-z\s]+(?:syndrome|disease|disorder|condition))\b/gi,
+    ],
+    confidence: 0.80,
+  },
+
+  // Treatments
+  {
+    category: &#39;TREATMENT&#39;,
+    patterns: [
+      /\b(?:Rx|Prescription|Medication)[:\s]*([A-Za-z]+(?:\s+\d+\s*mg)?)\b/gi,
+      /\b(?:Treatment|Procedure)[:\s]*([A-Za-z\s]+(?:ectomy|plasty|scopy|therapy))\b/gi,
+    ],
+    confidence: 0.75,
+  },
+];
+
+/**
+ * Get patterns for enabled categories
+ */
+export function getEnabledPatterns(
+  categories: Record&lt;PHICategory, boolean&gt;
+): PHIPattern[] {
+  return PHI_PATTERNS.filter(pattern =&gt; categories[pattern.category]);
+}</code></pre>
+<h3 id="packagesinfrastructurelambdasharedphisanitizer.ts">packages/infrastructure/lambda/shared/phi/sanitizer.ts</h3>
+<pre class="typescript"><code>/**
+ * PHI sanitization engine
+ */
+
+import { v4 as uuid } from &#39;uuid&#39;;
+import {
+  PHIConfig,
+  PHICategory,
+  PHIMatch,
+  SanitizationResult,
+  ReidentificationResult,
+  PHIMapping,
+  DEFAULT_PHI_CONFIG,
+} from &#39;./types&#39;;
+import { getEnabledPatterns, PHIPattern } from &#39;./patterns&#39;;
+import { Logger } from &#39;../logger&#39;;
+
+// Placeholder format: [PHI_CATEGORY_INDEX]
+const PLACEHOLDER_PREFIX = &#39;[PHI_&#39;;
+const PLACEHOLDER_SUFFIX = &#39;]&#39;;
+
+/**
+ * Generate a placeholder for a PHI match
+ */
+function generatePlaceholder(category: PHICategory, index: number): string {
+  return `${PLACEHOLDER_PREFIX}${category}_${index}${PLACEHOLDER_SUFFIX}`;
+}
+
+/**
+ * Parse a placeholder back to its parts
+ */
+function parsePlaceholder(placeholder: string): { category: PHICategory; index: number } | null {
+  const match = placeholder.match(/\[PHI_([A-Z_]+)_(\d+)\]/);
+  if (!match) return null;
+  return {
+    category: match[1] as PHICategory,
+    index: parseInt(match[2]),
+  };
+}
+
+/**
+ * Detect PHI in text
+ */
+export function detectPHI(
+  text: string,
+  config: PHIConfig = DEFAULT_PHI_CONFIG,
+  logger?: Logger
+): PHIMatch[] {
+  if (config.mode === &#39;disabled&#39;) {
+    return [];
+  }
+
+  const matches: PHIMatch[] = [];
+  const patterns = getEnabledPatterns(config.categories);
+  const categoryCounters: Record&lt;string, number&gt; = {};
+
+  for (const patternDef of patterns) {
+    for (const regex of patternDef.patterns) {
+      // Reset regex lastIndex
+      regex.lastIndex = 0;
+      let match: RegExpExecArray | null;
+
+      while ((match = regex.exec(text)) !== null) {
+        const original = match[1] || match[0];
+        
+        // Skip if validator fails
+        if (patternDef.validator &amp;&amp; !patternDef.validator(original)) {
+          continue;
+        }
+
+        // Check for overlapping matches
+        const startIndex = text.indexOf(original, match.index);
+        const endIndex = startIndex + original.length;
+        
+        const isOverlapping = matches.some(
+          m =&gt; (startIndex &gt;= m.startIndex &amp;&amp; startIndex &lt; m.endIndex) ||
+               (endIndex &gt; m.startIndex &amp;&amp; endIndex &lt;= m.endIndex)
+        );
+
+        if (isOverlapping) continue;
+
+        // Generate unique placeholder
+        categoryCounters[patternDef.category] = (categoryCounters[patternDef.category] || 0) + 1;
+        const placeholder = generatePlaceholder(
+          patternDef.category,
+          categoryCounters[patternDef.category]
+        );
+
+        matches.push({
+          category: patternDef.category,
+          original,
+          placeholder,
+          startIndex,
+          endIndex,
+          confidence: patternDef.confidence,
+        });
+      }
+    }
+  }
+
+  // Sort by start index (descending) for safe replacement
+  matches.sort((a, b) =&gt; b.startIndex - a.startIndex);
+
+  if (logger &amp;&amp; matches.length &gt; 0) {
+    logger.info(&#39;PHI detected&#39;, {
+      matchCount: matches.length,
+      categories: [...new Set(matches.map(m =&gt; m.category))],
+    });
+  }
+
+  return matches;
+}
+
+/**
+ * Sanitize PHI in text
+ */
+export function sanitizePHI(
+  text: string,
+  config: PHIConfig = DEFAULT_PHI_CONFIG,
+  logger?: Logger
+): SanitizationResult {
+  const matches = detectPHI(text, config, logger);
+  
+  if (matches.length === 0) {
+    return {
+      sanitizedText: text,
+      matches: [],
+      mappingId: &#39;&#39;,
+    };
+  }
+
+  let sanitizedText = text;
+
+  // Replace in reverse order to preserve indices
+  for (const match of matches) {
+    sanitizedText = 
+      sanitizedText.substring(0, match.startIndex) +
+      match.placeholder +
+      sanitizedText.substring(match.endIndex);
+  }
+
+  // Generate mapping ID for re-identification
+  const mappingId = uuid();
+
+  return {
+    sanitizedText,
+    matches: matches.reverse(), // Return in original order
+    mappingId,
+  };
+}
+
+/**
+ * Re-identify PHI in text
+ */
+export function reidentifyPHI(
+  sanitizedText: string,
+  mapping: PHIMapping,
+  logger?: Logger
+): ReidentificationResult {
+  let originalText = sanitizedText;
+  const matches: PHIMatch[] = [];
+
+  // Find all placeholders in the text
+  const placeholderRegex = /\[PHI_[A-Z_]+_\d+\]/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = placeholderRegex.exec(sanitizedText)) !== null) {
+    const placeholder = match[0];
+    const original = mapping.mappings[placeholder];
+
+    if (original) {
+      const parsed = parsePlaceholder(placeholder);
+      
+      if (parsed) {
+        matches.push({
+          category: parsed.category,
+          original,
+          placeholder,
+          startIndex: match.index,
+          endIndex: match.index + placeholder.length,
+          confidence: 1.0,
+        });
+      }
+    }
+  }
+
+  // Replace in reverse order
+  matches.sort((a, b) =&gt; b.startIndex - a.startIndex);
+  
+  for (const m of matches) {
+    originalText =
+      originalText.substring(0, m.startIndex) +
+      m.original +
+      originalText.substring(m.endIndex);
+  }
+
+  if (logger) {
+    logger.info(&#39;PHI re-identified&#39;, {
+      matchCount: matches.length,
+    });
+  }
+
+  return {
+    originalText,
+    matches: matches.reverse(),
+  };
+}
+
+/**
+ * Create a mapping record for storage
+ */
+export function createMappingRecord(
+  tenantId: string,
+  sessionId: string | null,
+  result: SanitizationResult,
+  ttlHours: number
+): PHIMapping {
+  const mappings: Record&lt;string, string&gt; = {};
+  
+  for (const match of result.matches) {
+    mappings[match.placeholder] = match.original;
+  }
+
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + ttlHours * 60 * 60 * 1000);
+
+  return {
+    id: result.mappingId,
+    tenant_id: tenantId,
+    session_id: sessionId,
+    mappings,
+    created_at: now.toISOString(),
+    expires_at: expiresAt.toISOString(),
+  };
+}
+
+/**
+ * Check if text contains any PHI
+ */
+export function containsPHI(
+  text: string,
+  config: PHIConfig = DEFAULT_PHI_CONFIG
+): boolean {
+  const matches = detectPHI(text, config);
+  return matches.length &gt; 0;
+}
+
+/**
+ * Get PHI summary for audit logging
+ */
+export function getPHISummary(
+  matches: PHIMatch[]
+): Record&lt;PHICategory, number&gt; {
+  const summary: Record&lt;string, number&gt; = {};
+  
+  for (const match of matches) {
+    summary[match.category] = (summary[match.category] || 0) + 1;
+  }
+  
+  return summary as Record&lt;PHICategory, number&gt;;
+}</code></pre>
+<hr />
+<h2 id="part-6-router-lambda">PART 6: ROUTER LAMBDA</h2>
+<h3 id="packagesinfrastructurelambdaapirouter.ts">packages/infrastructure/lambda/api/router.ts</h3>
+<pre class="typescript"><code>/**
+ * Router Lambda - Main API entry point
+ * 
+ * Handles:
+ * - Health checks
+ * - Request routing
+ * - CORS preflight
+ * - Error handling
+ */
+
+import type {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from &#39;aws-lambda&#39;;
+import { Logger } from &#39;../shared/logger&#39;;
+import { getConfig } from &#39;../shared/config&#39;;
+import { success, handleError } from &#39;../shared/response&#39;;
+import { NotFoundError } from &#39;../shared/errors&#39;;
+import { checkHealth as checkLiteLLMHealth } from &#39;../shared/litellm&#39;;
+import { query } from &#39;../shared/db&#39;;
+
+// Initialize logger
+const logger = new Logger({ handler: &#39;router&#39; });
+
+/**
+ * Main handler
+ */
+export async function handler(
+  event: APIGatewayProxyEvent,
+  context: Context
+): Promise&lt;APIGatewayProxyResult&gt; {
+  // Set request context
+  const requestLogger = logger.child({
+    requestId: context.awsRequestId,
+    path: event.path,
+    method: event.httpMethod,
+  });
+
+  try {
+    const config = getConfig();
+    
+    requestLogger.info(&#39;Request received&#39;, {
+      queryParams: event.queryStringParameters,
+      hasBody: !!event.body,
+    });
+
+    // Route based on path
+    const path = event.path.replace(/^\/api\/v2/, &#39;&#39;);
+
+    switch (true) {
+      // Health check
+      case path === &#39;/health&#39; || path === &#39;/&#39;:
+        return await handleHealthCheck(requestLogger);
+
+      // Ready check (deep health)
+      case path === &#39;/ready&#39;:
+        return await handleReadyCheck(requestLogger);
+
+      // Version info
+      case path === &#39;/version&#39;:
+        return handleVersionInfo();
+
+      // Metrics (admin only)
+      case path === &#39;/metrics&#39;:
+        return await handleMetrics(event, requestLogger);
+
+      default:
+        throw new NotFoundError(`Route ${event.httpMethod} ${event.path}`);
+    }
+  } catch (error) {
+    return handleError(error, requestLogger);
+  }
+}
+
+/**
+ * Basic health check
+ */
+async function handleHealthCheck(logger: Logger): Promise&lt;APIGatewayProxyResult&gt; {
+  const config = getConfig();
+
+  return success({
+    status: &#39;healthy&#39;,
+    timestamp: new Date().toISOString(),
+    environment: config.ENVIRONMENT,
+    tier: config.TIER,
+  });
+}
+
+/**
+ * Deep health check (ready probe)
+ */
+async function handleReadyCheck(logger: Logger): Promise&lt;APIGatewayProxyResult&gt; {
+  const config = getConfig();
+  const checks: Record&lt;string, { status: string; latency?: number }&gt; = {};
+  const startTime = Date.now();
+
+  // Check database
+  try {
+    const dbStart = Date.now();
+    await query(&#39;SELECT 1&#39;, {}, logger);
+    checks.database = {
+      status: &#39;healthy&#39;,
+      latency: Date.now() - dbStart,
+    };
+  } catch (error) {
+    checks.database = { status: &#39;unhealthy&#39; };
+    logger.error(&#39;Database health check failed&#39;, error as Error);
+  }
+
+  // Check LiteLLM
+  try {
+    const llmStart = Date.now();
+    const health = await checkLiteLLMHealth(logger);
+    checks.litellm = {
+      status: health.status,
+      latency: Date.now() - llmStart,
+    };
+  } catch (error) {
+    checks.litellm = { status: &#39;unhealthy&#39; };
+    logger.error(&#39;LiteLLM health check failed&#39;, error as Error);
+  }
+
+  // Determine overall status
+  const allHealthy = Object.values(checks).every(c =&gt; c.status === &#39;healthy&#39;);
+  const overallStatus = allHealthy ? &#39;ready&#39; : &#39;degraded&#39;;
+
+  logger.info(&#39;Ready check completed&#39;, {
+    status: overallStatus,
+    checks,
+    totalLatency: Date.now() - startTime,
+  });
+
+  return success({
+    status: overallStatus,
+    timestamp: new Date().toISOString(),
+    environment: config.ENVIRONMENT,
+    tier: config.TIER,
+    checks,
+  }, allHealthy ? 200 : 503);
+}
+
+/**
+ * Version information
+ */
+function handleVersionInfo(): APIGatewayProxyResult {
+  const config = getConfig();
+
+  return success({
+    version: &#39;2.2.0&#39;,
+    appId: config.APP_ID,
+    environment: config.ENVIRONMENT,
+    tier: config.TIER,
+    apiVersion: &#39;v2&#39;,
+    buildDate: &#39;2024-12&#39;,
+  });
+}
+
+/**
+ * Metrics endpoint (admin only)
+ */
+async function handleMetrics(
+  event: APIGatewayProxyEvent,
+  logger: Logger
+): Promise&lt;APIGatewayProxyResult&gt; {
+  // Metrics collection - use Section 12 MetricsCollector service
+  // See Section 12.2 for implementation details
+  // await metricsCollector.recordUsage({ ... });
+  // This would aggregate data from CloudWatch, DynamoDB usage table, etc.
+
+  return success({
+    message: &#39;Metrics endpoint - coming in Prompt 5&#39;,
+    timestamp: new Date().toISOString(),
+  });
+}</code></pre>
+<hr />
+<h2 id="part-7-chat-lambda">PART 7: CHAT LAMBDA</h2>
+<h3 id="packagesinfrastructurelambdaapichat.ts">packages/infrastructure/lambda/api/chat.ts</h3>
+<pre class="typescript"><code>/**
+ * Chat Lambda - AI completions handler
+ * 
+ * Handles:
+ * - Chat completions via LiteLLM
+ * - Streaming responses
+ * - PHI sanitization
+ * - Usage tracking
+ */
+
+import type {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from &#39;aws-lambda&#39;;
+import { z } from &#39;zod&#39;;
+import { v4 as uuid } from &#39;uuid&#39;;
+import { Logger } from &#39;../shared/logger&#39;;
+import { getConfig, getFeatureFlags } from &#39;../shared/config&#39;;
+import { success, handleError, formatSSE, streamingHeaders } from &#39;../shared/response&#39;;
+import { extractAuthContext, logAuthContext } from &#39;../shared/auth&#39;;
+import { ValidationError, NotFoundError } from &#39;../shared/errors&#39;;
+import {
+  createChatCompletion,
+  streamChatCompletion,
+  calculateCost,
+  ChatCompletionRequest,
+  ChatMessage,
+} from &#39;../shared/litellm&#39;;
+import { getModelByName, getTenantPhiConfig, recordUsage } from &#39;../shared/db&#39;;
+import { sanitizePHI, createMappingRecord, DEFAULT_PHI_CONFIG } from &#39;../shared/phi&#39;;
+import { DynamoDBClient } from &#39;@aws-sdk/client-dynamodb&#39;;
+import { DynamoDBDocumentClient, PutCommand } from &#39;@aws-sdk/lib-dynamodb&#39;;
+
+// Initialize clients
+const ddbClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+const logger = new Logger({ handler: &#39;chat&#39; });
+
+// Request validation schema
+const chatRequestSchema = z.object({
+  model: z.string().min(1),
+  messages: z.array(z.object({
+    role: z.enum([&#39;system&#39;, &#39;user&#39;, &#39;assistant&#39;, &#39;function&#39;, &#39;tool&#39;]),
+    content: z.union([
+      z.string(),
+      z.array(z.object({
+        type: z.enum([&#39;text&#39;, &#39;image_url&#39;]),
+        text: z.string().optional(),
+        image_url: z.object({
+          url: z.string(),
+          detail: z.enum([&#39;low&#39;, &#39;high&#39;, &#39;auto&#39;]).optional(),
+        }).optional(),
+      })),
+    ]),
+    name: z.string().optional(),
+  })).min(1),
+  max_tokens: z.number().int().positive().max(128000).optional(),
+  temperature: z.number().min(0).max(2).optional(),
+  stream: z.boolean().optional().default(false),
+  session_id: z.string().uuid().optional(),
+  enable_phi: z.boolean().optional(),
+  phi_categories: z.array(z.string()).optional(),
+});
+
+type ChatRequest = z.infer&lt;typeof chatRequestSchema&gt;;
+
+/**
+ * Main handler
+ */
+export async function handler(
+  event: APIGatewayProxyEvent,
+  context: Context
+): Promise&lt;APIGatewayProxyResult&gt; {
+  const requestLogger = logger.child({
+    requestId: context.awsRequestId,
+    path: event.path,
+  });
+
+  try {
+    // Extract authentication
+    const auth = extractAuthContext(event);
+    logAuthContext(auth, requestLogger);
+    requestLogger.setTenantId(auth.tenantId);
+    requestLogger.setUserId(auth.userId);
+
+    // Parse and validate request
+    const body = event.body ? JSON.parse(event.body) : {};
+    const parseResult = chatRequestSchema.safeParse(body);
+
+    if (!parseResult.success) {
+      throw new ValidationError(
+        &#39;Invalid request body&#39;,
+        parseResult.error.flatten().fieldErrors as Record&lt;string, string[]&gt;
+      );
+    }
+
+    const request = parseResult.data;
+    const config = getConfig();
+    const features = getFeatureFlags(config.TIER);
+
+    // Get model information
+    const model = await getModelByName(request.model, requestLogger);
+    if (!model) {
+      throw new NotFoundError(`Model ${request.model}`);
+    }
+
+    // Get tenant PHI config
+    let phiConfig = DEFAULT_PHI_CONFIG;
+    if (features.phiSanitization &amp;&amp; request.enable_phi !== false) {
+      try {
+        const tenantConfig = await getTenantPhiConfig(auth.tenantId, requestLogger);
+        if (tenantConfig) {
+          phiConfig = tenantConfig;
+        }
+      } catch {
+        // Use default if tenant config not found
+      }
+    }
+
+    // Sanitize PHI in messages
+    const sanitizedMessages = await sanitizeMessages(
+      request.messages,
+      phiConfig,
+      auth.tenantId,
+      request.session_id || null,
+      requestLogger
+    );
+
+    // Build LiteLLM request
+    const litellmRequest: ChatCompletionRequest = {
+      model: model.name,
+      messages: sanitizedMessages.messages,
+      max_tokens: request.max_tokens,
+      temperature: request.temperature,
+      stream: request.stream,
+      user: auth.userId,
+      metadata: {
+        tenant_id: auth.tenantId,
+        session_id: request.session_id,
+        app_id: config.APP_ID,
+      },
+    };
+
+    // Handle streaming vs non-streaming
+    if (request.stream) {
+      return await handleStreamingRequest(
+        litellmRequest,
+        model,
+        auth,
+        request,
+        sanitizedMessages.mappingId,
+        requestLogger
+      );
+    } else {
+      return await handleNonStreamingRequest(
+        litellmRequest,
+        model,
+        auth,
+        request,
+        sanitizedMessages.mappingId,
+        requestLogger
+      );
+    }
+  } catch (error) {
+    return handleError(error, requestLogger);
+  }
+}
+
+/**
+ * Sanitize PHI in messages
+ */
+async function sanitizeMessages(
+  messages: ChatRequest[&#39;messages&#39;],
+  phiConfig: typeof DEFAULT_PHI_CONFIG,
+  tenantId: string,
+  sessionId: string | null,
+  logger: Logger
+): Promise&lt;{ messages: ChatMessage[]; mappingId: string }&gt; {
+  if (phiConfig.mode === &#39;disabled&#39;) {
+    return {
+      messages: messages as ChatMessage[],
+      mappingId: &#39;&#39;,
+    };
+  }
+
+  const config = getConfig();
+  const sanitizedMessages: ChatMessage[] = [];
+  let combinedMappingId = &#39;&#39;;
+  const allMappings: Record&lt;string, string&gt; = {};
+
+  for (const message of messages) {
+    if (typeof message.content === &#39;string&#39;) {
+      const result = sanitizePHI(message.content, phiConfig, logger);
+      
+      if (result.matches.length &gt; 0) {
+        combinedMappingId = combinedMappingId || result.mappingId;
+        
+        // Collect mappings
+        for (const match of result.matches) {
+          allMappings[match.placeholder] = match.original;
+        }
+      }
+
+      sanitizedMessages.push({
+        ...message,
+        content: result.sanitizedText,
+      } as ChatMessage);
+    } else {
+      // Handle content parts (images, etc.)
+      const sanitizedParts = [];
+      
+      for (const part of message.content) {
+        if (part.type === &#39;text&#39; &amp;&amp; part.text) {
+          const result = sanitizePHI(part.text, phiConfig, logger);
+          
+          if (result.matches.length &gt; 0) {
+            combinedMappingId = combinedMappingId || result.mappingId;
+            for (const match of result.matches) {
+              allMappings[match.placeholder] = match.original;
+            }
+          }
+
+          sanitizedParts.push({
+            ...part,
+            text: result.sanitizedText,
+          });
+        } else {
+          sanitizedParts.push(part);
+        }
+      }
+
+      sanitizedMessages.push({
+        ...message,
+        content: sanitizedParts,
+      } as ChatMessage);
+    }
+  }
+
+  // Store PHI mapping in DynamoDB for re-identification
+  if (combinedMappingId &amp;&amp; Object.keys(allMappings).length &gt; 0) {
+    const ttlHours = phiConfig.reidentification.mapping_ttl_hours;
+    const expiresAt = Math.floor(Date.now() / 1000) + (ttlHours * 60 * 60);
+
+    await ddbClient.send(new PutCommand({
+      TableName: config.CACHE_TABLE,
+      Item: {
+        pk: `phi#${combinedMappingId}`,
+        tenant_id: tenantId,
+        session_id: sessionId,
+        mappings: allMappings,
+        created_at: new Date().toISOString(),
+        ttl: expiresAt,
+      },
+    }));
+
+    logger.info(&#39;PHI mappings stored&#39;, {
+      mappingId: combinedMappingId,
+      mappingCount: Object.keys(allMappings).length,
+    });
+  }
+
+  return {
+    messages: sanitizedMessages,
+    mappingId: combinedMappingId,
+  };
+}
+
+/**
+ * Handle non-streaming request
+ */
+async function handleNonStreamingRequest(
+  request: ChatCompletionRequest,
+  model: Awaited&lt;ReturnType&lt;typeof getModelByName&gt;&gt;,
+  auth: ReturnType&lt;typeof extractAuthContext&gt;,
+  originalRequest: ChatRequest,
+  phiMappingId: string,
+  logger: Logger
+): Promise&lt;APIGatewayProxyResult&gt; {
+  const startTime = Date.now();
+
+  // Call LiteLLM
+  const response = await createChatCompletion(request, logger);
+  const latency = Date.now() - startTime;
+
+  // Calculate costs
+  const pricing = model!.pricing;
+  const { cost, billed } = calculateCost(response.usage, {
+    input_tokens: pricing.input_tokens || 0,
+    output_tokens: pricing.output_tokens || 0,
+    billed_markup: pricing.billed_markup,
+  });
+
+  // Record usage
+  await recordUsage({
+    tenant_id: auth.tenantId,
+    user_id: auth.userId,
+    session_id: originalRequest.session_id || null,
+    model_id: model!.id,
+    provider_id: model!.provider_id,
+    input_tokens: response.usage.prompt_tokens,
+    output_tokens: response.usage.completion_tokens,
+    total_tokens: response.usage.total_tokens,
+    cost,
+    billed_amount: billed,
+    request_type: &#39;chat.completion&#39;,
+    latency_ms: latency,
+  }, logger);
+
+  // Store in sessions table if session_id provided
+  if (originalRequest.session_id) {
+    const config = getConfig();
+    await ddbClient.send(new PutCommand({
+      TableName: config.SESSIONS_TABLE,
+      Item: {
+        pk: originalRequest.session_id,
+        gsi1pk: auth.userId,
+        gsi1sk: new Date().toISOString(),
+        messages: [
+          ...originalRequest.messages,
+          response.choices[0]?.message,
+        ],
+        model: request.model,
+        tenant_id: auth.tenantId,
+        phi_mapping_id: phiMappingId || undefined,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        ttl: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60), // 30 days
+      },
+    }));
+  }
+
+  logger.info(&#39;Chat completion successful&#39;, {
+    model: request.model,
+    inputTokens: response.usage.prompt_tokens,
+    outputTokens: response.usage.completion_tokens,
+    latency,
+    cost,
+  });
+
+  return success({
+    id: response.id,
+    object: response.object,
+    created: response.created,
+    model: response.model,
+    choices: response.choices,
+    usage: response.usage,
+    session_id: originalRequest.session_id,
+    phi_mapping_id: phiMappingId || undefined,
+  });
+}
+
+/**
+ * Handle streaming request
+ * Note: API Gateway doesn&#39;t support true streaming, so we buffer and return
+ * For true streaming, use WebSocket API or Lambda Function URLs
+ */
+async function handleStreamingRequest(
+  request: ChatCompletionRequest,
+  model: Awaited&lt;ReturnType&lt;typeof getModelByName&gt;&gt;,
+  auth: ReturnType&lt;typeof extractAuthContext&gt;,
+  originalRequest: ChatRequest,
+  phiMappingId: string,
+  logger: Logger
+): Promise&lt;APIGatewayProxyResult&gt; {
+  const startTime = Date.now();
+  const chunks: string[] = [];
+  let totalContent = &#39;&#39;;
+  let finishReason: string | null = null;
+  let usage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+
+  try {
+    for await (const chunk of streamChatCompletion(request, logger)) {
+      chunks.push(formatSSE(chunk));
+      
+      if (chunk.choices[0]?.delta?.content) {
+        totalContent += chunk.choices[0].delta.content;
+      }
+      
+      if (chunk.choices[0]?.finish_reason) {
+        finishReason = chunk.choices[0].finish_reason;
+      }
+      
+      if (chunk.usage) {
+        usage = chunk.usage;
+      }
+    }
+
+    // Add done marker
+    chunks.push(formatSSE(&#39;[DONE]&#39;));
+  } catch (error) {
+    logger.error(&#39;Streaming error&#39;, error as Error);
+    throw error;
+  }
+
+  const latency = Date.now() - startTime;
+
+  // Record usage if we have it
+  if (usage.total_tokens &gt; 0) {
+    const pricing = model!.pricing;
+    const { cost, billed } = calculateCost(usage, {
+      input_tokens: pricing.input_tokens || 0,
+      output_tokens: pricing.output_tokens || 0,
+      billed_markup: pricing.billed_markup,
+    });
+
+    await recordUsage({
+      tenant_id: auth.tenantId,
+      user_id: auth.userId,
+      session_id: originalRequest.session_id || null,
+      model_id: model!.id,
+      provider_id: model!.provider_id,
+      input_tokens: usage.prompt_tokens,
+      output_tokens: usage.completion_tokens,
+      total_tokens: usage.total_tokens,
+      cost,
+      billed_amount: billed,
+      request_type: &#39;chat.completion.stream&#39;,
+      latency_ms: latency,
+    }, logger);
+  }
+
+  logger.info(&#39;Streaming completion successful&#39;, {
+    model: request.model,
+    chunkCount: chunks.length,
+    contentLength: totalContent.length,
+    latency,
+  });
+
+  // Return SSE formatted response
+  // Note: For true streaming, implement Lambda Function URL or WebSocket
+  return {
+    statusCode: 200,
+    headers: streamingHeaders(),
+    body: chunks.join(&#39;&#39;),
+  };
+}</code></pre>
+<hr />
+<h2 id="part-8-models-lambda">PART 8: MODELS LAMBDA</h2>
+<h3 id="packagesinfrastructurelambdaapimodels.ts">packages/infrastructure/lambda/api/models.ts</h3>
+<pre class="typescript"><code>/**
+ * Models Lambda - Dynamic model registry
+ * 
+ * Handles:
+ * - List all models
+ * - Get model by ID
+ * - Filter by specialty, provider, status
+ * - Admin: Update model status, thermal state
+ */
+
+import type {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from &#39;aws-lambda&#39;;
+import { z } from &#39;zod&#39;;
+import { Logger } from &#39;../shared/logger&#39;;
+import { getConfig } from &#39;../shared/config&#39;;
+import { success, handleError, noContent } from &#39;../shared/response&#39;;
+import { extractAuthContext, requireAdmin, logAuthContext } from &#39;../shared/auth&#39;;
+import { ValidationError, NotFoundError } from &#39;../shared/errors&#39;;
+import { getModels, getModelById, updateModel as dbUpdateModel } from &#39;../shared/db&#39;;
+import { createAuditLog } from &#39;../shared/db&#39;;
+
+// Initialize logger
+const logger = new Logger({ handler: &#39;models&#39; });
+
+// Query parameters schema
+const listQuerySchema = z.object({
+  provider_id: z.string().optional(),
+  specialty: z.string().optional(),
+  status: z.enum([&#39;active&#39;, &#39;inactive&#39;, &#39;deprecated&#39;, &#39;coming_soon&#39;]).optional(),
+  type: z.enum([&#39;external&#39;, &#39;self-hosted&#39;]).optional(),
+  supports_vision: z.string().transform(v =&gt; v === &#39;true&#39;).optional(),
+  supports_streaming: z.string().transform(v =&gt; v === &#39;true&#39;).optional(),
+  limit: z.string().transform(Number).pipe(z.number().int().min(1).max(100)).optional(),
+  offset: z.string().transform(Number).pipe(z.number().int().min(0)).optional(),
+});
+
+// Update request schema (admin only)
+const updateModelSchema = z.object({
+  status: z.enum([&#39;active&#39;, &#39;inactive&#39;, &#39;deprecated&#39;, &#39;coming_soon&#39;]).optional(),
+  thermal_state: z.enum([&#39;OFF&#39;, &#39;COLD&#39;, &#39;WARM&#39;, &#39;HOT&#39;, &#39;AUTOMATIC&#39;]).optional(),
+  display_name: z.string().min(1).max(200).optional(),
+  description: z.string().max(2000).optional(),
+});
+
+/**
+ * Main handler
+ */
+export async function handler(
+  event: APIGatewayProxyEvent,
+  context: Context
+): Promise&lt;APIGatewayProxyResult&gt; {
+  const requestLogger = logger.child({
+    requestId: context.awsRequestId,
+    path: event.path,
+    method: event.httpMethod,
+  });
+
+  try {
+    // Extract authentication
+    const auth = extractAuthContext(event);
+    logAuthContext(auth, requestLogger);
+
+    // Parse path parameters
+    const modelId = event.pathParameters?.modelId;
+
+    switch (event.httpMethod) {
+      case &#39;GET&#39;:
+        if (modelId) {
+          return await handleGetModel(modelId, requestLogger);
+        }
+        return await handleListModels(event, requestLogger);
+
+      case &#39;PUT&#39;:
+      case &#39;PATCH&#39;:
+        if (!modelId) {
+          throw new ValidationError(&#39;Model ID required for update&#39;);
+        }
+        requireAdmin(auth);
+        return await handleUpdateModel(modelId, event, auth, requestLogger);
+
+      default:
+        throw new ValidationError(`Method ${event.httpMethod} not allowed`);
+    }
+  } catch (error) {
+    return handleError(error, requestLogger);
+  }
+}
+
+/**
+ * List models with filtering
+ */
+async function handleListModels(
+  event: APIGatewayProxyEvent,
+  logger: Logger
+): Promise&lt;APIGatewayProxyResult&gt; {
+  // Parse and validate query parameters
+  const queryResult = listQuerySchema.safeParse(event.queryStringParameters || {});
+  
+  if (!queryResult.success) {
+    throw new ValidationError(
+      &#39;Invalid query parameters&#39;,
+      queryResult.error.flatten().fieldErrors as Record&lt;string, string[]&gt;
+    );
+  }
+
+  const filters = queryResult.data;
+
+  // Query database
+  const result = await getModels({
+    providerId: filters.provider_id,
+    specialty: filters.specialty,
+    status: filters.status,
+    type: filters.type,
+    supportsVision: filters.supports_vision,
+    supportsStreaming: filters.supports_streaming,
+    limit: filters.limit || 50,
+    offset: filters.offset || 0,
+  }, logger);
+
+  // Transform to API response format
+  const models = result.rows.map(transformModel);
+
+  logger.info(&#39;Models listed&#39;, {
+    count: models.length,
+    filters,
+  });
+
+  return success({
+    models,
+    pagination: {
+      limit: filters.limit || 50,
+      offset: filters.offset || 0,
+      total: result.rowCount,
+      hasMore: result.rowCount &gt; (filters.offset || 0) + models.length,
+    },
+  });
+}
+
+/**
+ * Get single model by ID
+ */
+async function handleGetModel(
+  modelId: string,
+  logger: Logger
+): Promise&lt;APIGatewayProxyResult&gt; {
+  const model = await getModelById(modelId, logger);
+
+  logger.info(&#39;Model retrieved&#39;, { modelId });
+
+  return success({
+    model: transformModel(model),
+  });
+}
+
+/**
+ * Update model (admin only)
+ */
+async function handleUpdateModel(
+  modelId: string,
+  event: APIGatewayProxyEvent,
+  auth: ReturnType&lt;typeof extractAuthContext&gt;,
+  logger: Logger
+): Promise&lt;APIGatewayProxyResult&gt; {
+  // Parse and validate request body
+  const body = event.body ? JSON.parse(event.body) : {};
+  const parseResult = updateModelSchema.safeParse(body);
+
+  if (!parseResult.success) {
+    throw new ValidationError(
+      &#39;Invalid request body&#39;,
+      parseResult.error.flatten().fieldErrors as Record&lt;string, string[]&gt;
+    );
+  }
+
+  const updates = parseResult.data;
+
+  if (Object.keys(updates).length === 0) {
+    throw new ValidationError(&#39;No updates provided&#39;);
+  }
+
+  // Get current model
+  const currentModel = await getModelById(modelId, logger);
+
+  // Update model
+  const updatedModel = await dbUpdateModel(modelId, updates, logger);
+
+  // Create audit log
+  await createAuditLog({
+    tenant_id: auth.tenantId,
+    user_id: null,
+    admin_id: auth.userId,
+    action: &#39;model.update&#39;,
+    resource_type: &#39;model&#39;,
+    resource_id: modelId,
+    details: {
+      before: {
+        status: currentModel.status,
+        thermal_state: currentModel.thermal_state,
+        display_name: currentModel.display_name,
+      },
+      after: updates,
+    },
+    ip_address: event.requestContext.identity?.sourceIp || null,
+    user_agent: event.headers[&#39;User-Agent&#39;] || null,
+  }, logger);
+
+  logger.info(&#39;Model updated&#39;, {
+    modelId,
+    updates,
+    adminId: auth.userId,
+  });
+
+  return success({
+    model: transformModel(updatedModel),
+  });
+}
+
+/**
+ * Transform database model to API response format
+ */
+function transformModel(dbModel: any) {
+  return {
+    id: dbModel.id,
+    providerId: dbModel.provider_id,
+    name: dbModel.name,
+    displayName: dbModel.display_name,
+    description: dbModel.description,
+    type: dbModel.type,
+    specialty: dbModel.specialty,
+    capabilities: dbModel.capabilities,
+    contextWindow: dbModel.context_window,
+    maxOutputTokens: dbModel.max_output_tokens,
+    supportsFunctions: dbModel.supports_functions,
+    supportsVision: dbModel.supports_vision,
+    supportsStreaming: dbModel.supports_streaming,
+    hasThinkingMode: dbModel.has_thinking_mode,
+    thinkingBudgetTokens: dbModel.thinking_budget_tokens,
+    pricing: {
+      inputTokens: dbModel.pricing?.input_tokens,
+      outputTokens: dbModel.pricing?.output_tokens,
+      perImage: dbModel.pricing?.per_image,
+      perMinuteAudio: dbModel.pricing?.per_minute_audio,
+      perMinuteVideo: dbModel.pricing?.per_minute_video,
+      per3DModel: dbModel.pricing?.per_3d_model,
+      billedMarkup: dbModel.pricing?.billed_markup,
+    },
+    thermalState: dbModel.thermal_state,
+    thermalConfig: dbModel.thermal_config,
+    status: dbModel.status,
+    releaseDate: dbModel.release_date,
+    deprecationDate: dbModel.deprecation_date,
+    createdAt: dbModel.created_at,
+    updatedAt: dbModel.updated_at,
+  };
+}</code></pre>
+<hr />
+<h2 id="part-9-providers-lambda">PART 9: PROVIDERS LAMBDA</h2>
+<h3 id="packagesinfrastructurelambdaapiproviders.ts">packages/infrastructure/lambda/api/providers.ts</h3>
+<pre class="typescript"><code>/**
+ * Providers Lambda - AI provider management
+ * 
+ * Handles:
+ * - List all providers
+ * - Get provider by ID
+ * - Get provider models
+ * - Admin: Update provider status
+ */
+
+import type {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from &#39;aws-lambda&#39;;
+import { z } from &#39;zod&#39;;
+import { Logger } from &#39;../shared/logger&#39;;
+import { getConfig } from &#39;../shared/config&#39;;
+import { success, handleError } from &#39;../shared/response&#39;;
+import { extractAuthContext, requireAdmin, logAuthContext } from &#39;../shared/auth&#39;;
+import { ValidationError } from &#39;../shared/errors&#39;;
+import {
+  getProviders,
+  getProviderById,
+  updateProvider as dbUpdateProvider,
+  getModels,
+  createAuditLog,
+} from &#39;../shared/db&#39;;
+
+// Initialize logger
+const logger = new Logger({ handler: &#39;providers&#39; });
+
+// Query parameters schema
+const listQuerySchema = z.object({
+  type: z.enum([&#39;external&#39;, &#39;self-hosted&#39;, &#39;mid-tier&#39;]).optional(),
+  status: z.enum([&#39;active&#39;, &#39;inactive&#39;, &#39;deprecated&#39;]).optional(),
+  hipaa_compliant: z.string().transform(v =&gt; v === &#39;true&#39;).optional(),
+  limit: z.string().transform(Number).pipe(z.number().int().min(1).max(100)).optional(),
+  offset: z.string().transform(Number).pipe(z.number().int().min(0)).optional(),
+});
+
+// Update request schema (admin only)
+const updateProviderSchema = z.object({
+  status: z.enum([&#39;active&#39;, &#39;inactive&#39;, &#39;deprecated&#39;]).optional(),
+  hipaa_compliant: z.boolean().optional(),
+  config: z.record(z.unknown()).optional(),
+});
+
+/**
+ * Main handler
+ */
+export async function handler(
+  event: APIGatewayProxyEvent,
+  context: Context
+): Promise&lt;APIGatewayProxyResult&gt; {
+  const requestLogger = logger.child({
+    requestId: context.awsRequestId,
+    path: event.path,
+    method: event.httpMethod,
+  });
+
+  try {
+    // Extract authentication
+    const auth = extractAuthContext(event);
+    logAuthContext(auth, requestLogger);
+
+    // Parse path
+    const providerId = event.pathParameters?.providerId;
+    const subPath = event.path.split(&#39;/&#39;).pop();
+
+    switch (event.httpMethod) {
+      case &#39;GET&#39;:
+        if (providerId) {
+          if (subPath === &#39;models&#39;) {
+            return await handleGetProviderModels(providerId, requestLogger);
+          }
+          return await handleGetProvider(providerId, requestLogger);
+        }
+        return await handleListProviders(event, requestLogger);
+
+      case &#39;PUT&#39;:
+      case &#39;PATCH&#39;:
+        if (!providerId) {
+          throw new ValidationError(&#39;Provider ID required for update&#39;);
+        }
+        requireAdmin(auth);
+        return await handleUpdateProvider(providerId, event, auth, requestLogger);
+
+      default:
+        throw new ValidationError(`Method ${event.httpMethod} not allowed`);
+    }
+  } catch (error) {
+    return handleError(error, requestLogger);
+  }
+}
+
+/**
+ * List providers with filtering
+ */
+async function handleListProviders(
+  event: APIGatewayProxyEvent,
+  logger: Logger
+): Promise&lt;APIGatewayProxyResult&gt; {
+  // Parse and validate query parameters
+  const queryResult = listQuerySchema.safeParse(event.queryStringParameters || {});
+  
+  if (!queryResult.success) {
+    throw new ValidationError(
+      &#39;Invalid query parameters&#39;,
+      queryResult.error.flatten().fieldErrors as Record&lt;string, string[]&gt;
+    );
+  }
+
+  const filters = queryResult.data;
+
+  // Query database
+  const result = await getProviders({
+    type: filters.type,
+    status: filters.status,
+    hipaaCompliant: filters.hipaa_compliant,
+    limit: filters.limit || 50,
+    offset: filters.offset || 0,
+  }, logger);
+
+  // Transform to API response format
+  const providers = result.rows.map(transformProvider);
+
+  logger.info(&#39;Providers listed&#39;, {
+    count: providers.length,
+    filters,
+  });
+
+  return success({
+    providers,
+    pagination: {
+      limit: filters.limit || 50,
+      offset: filters.offset || 0,
+      total: result.rowCount,
+      hasMore: result.rowCount &gt; (filters.offset || 0) + providers.length,
+    },
+  });
+}
+
+/**
+ * Get single provider by ID
+ */
+async function handleGetProvider(
+  providerId: string,
+  logger: Logger
+): Promise&lt;APIGatewayProxyResult&gt; {
+  const provider = await getProviderById(providerId, logger);
+
+  logger.info(&#39;Provider retrieved&#39;, { providerId });
+
+  return success({
+    provider: transformProvider(provider),
+  });
+}
+
+/**
+ * Get models for a provider
+ */
+async function handleGetProviderModels(
+  providerId: string,
+  logger: Logger
+): Promise&lt;APIGatewayProxyResult&gt; {
+  // Verify provider exists
+  await getProviderById(providerId, logger);
+
+  // Get provider&#39;s models
+  const result = await getModels({
+    providerId,
+    status: &#39;active&#39;,
+  }, logger);
+
+  const models = result.rows.map(model =&gt; ({
+    id: model.id,
+    name: model.name,
+    displayName: model.display_name,
+    specialty: model.specialty,
+    status: model.status,
+    thermalState: model.thermal_state,
+  }));
+
+  logger.info(&#39;Provider models retrieved&#39;, {
+    providerId,
+    modelCount: models.length,
+  });
+
+  return success({
+    providerId,
+    models,
+  });
+}
+
+/**
+ * Update provider (admin only)
+ */
+async function handleUpdateProvider(
+  providerId: string,
+  event: APIGatewayProxyEvent,
+  auth: ReturnType&lt;typeof extractAuthContext&gt;,
+  logger: Logger
+): Promise&lt;APIGatewayProxyResult&gt; {
+  // Parse and validate request body
+  const body = event.body ? JSON.parse(event.body) : {};
+  const parseResult = updateProviderSchema.safeParse(body);
+
+  if (!parseResult.success) {
+    throw new ValidationError(
+      &#39;Invalid request body&#39;,
+      parseResult.error.flatten().fieldErrors as Record&lt;string, string[]&gt;
+    );
+  }
+
+  const updates = parseResult.data;
+
+  if (Object.keys(updates).length === 0) {
+    throw new ValidationError(&#39;No updates provided&#39;);
+  }
+
+  // Get current provider
+  const currentProvider = await getProviderById(providerId, logger);
+
+  // Update provider
+  const updatedProvider = await dbUpdateProvider(providerId, {
+    status: updates.status,
+    hipaa_compliant: updates.hipaa_compliant,
+    config: updates.config,
+  }, logger);
+
+  // Create audit log
+  await createAuditLog({
+    tenant_id: auth.tenantId,
+    user_id: null,
+    admin_id: auth.userId,
+    action: &#39;provider.update&#39;,
+    resource_type: &#39;provider&#39;,
+    resource_id: providerId,
+    details: {
+      before: {
+        status: currentProvider.status,
+        hipaa_compliant: currentProvider.hipaa_compliant,
+      },
+      after: updates,
+    },
+    ip_address: event.requestContext.identity?.sourceIp || null,
+    user_agent: event.headers[&#39;User-Agent&#39;] || null,
+  }, logger);
+
+  logger.info(&#39;Provider updated&#39;, {
+    providerId,
+    updates,
+    adminId: auth.userId,
+  });
+
+  return success({
+    provider: transformProvider(updatedProvider),
+  });
+}
+
+/**
+ * Transform database provider to API response format
+ */
+function transformProvider(dbProvider: any) {
+  return {
+    id: dbProvider.id,
+    name: dbProvider.name,
+    type: dbProvider.type,
+    status: dbProvider.status,
+    hipaaCompliant: dbProvider.hipaa_compliant,
+    baaAvailable: dbProvider.baa_available,
+    baseUrl: dbProvider.base_url,
+    authType: dbProvider.auth_type,
+    capabilities: dbProvider.capabilities,
+    createdAt: dbProvider.created_at,
+    updatedAt: dbProvider.updated_at,
+  };
+}</code></pre>
+<hr />
+<h2 id="deployment-verification">DEPLOYMENT VERIFICATION</h2>
+<p>After deploying the Lambda functions, verify they work:</p>
+<pre class="bash"><code># 1. Health check
+curl https://api.thinktank.YOUR_DOMAIN.com/api/v2/health
+
+# Expected response:
+# {
+#   &quot;success&quot;: true,
+#   &quot;data&quot;: {
+#     &quot;status&quot;: &quot;healthy&quot;,
+#     &quot;timestamp&quot;: &quot;2024-12-21T...&quot;,
+#     &quot;environment&quot;: &quot;dev&quot;,
+#     &quot;tier&quot;: 1
+#   }
+# }
+
+# 2. List models (requires auth token)
+curl -H &quot;Authorization: Bearer $TOKEN&quot; \
+  https://api.thinktank.YOUR_DOMAIN.com/api/v2/models
+
+# 3. List providers
+curl -H &quot;Authorization: Bearer $TOKEN&quot; \
+  https://api.thinktank.YOUR_DOMAIN.com/api/v2/providers
+
+# 4. Chat completion
+curl -X POST \
+  -H &quot;Authorization: Bearer $TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#39;{
+    &quot;model&quot;: &quot;gpt-4&quot;,
+    &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello!&quot;}]
+  }&#39; \
+  https://api.thinktank.YOUR_DOMAIN.com/api/v2/chat/completions</code></pre>
+<hr />
+<h2 id="next-prompts">NEXT PROMPTS</h2>
+<p>Continue with: - <strong>Prompt 5</strong>: Lambda Functions - Admin &amp; Billing (Invitations, Approvals, Metering) - <strong>Prompt 6</strong>: Self-Hosted Models &amp; Mid-Level Services Configuration - <strong>Prompt 7</strong>: External Providers &amp; Database Schema/Migrations - <strong>Prompt 8</strong>: Admin Web Dashboard (Next.js) - <strong>Prompt 9</strong>: Assembly &amp; Deployment Guide</p>
+<hr />
+<p><em>End of Prompt 4: Lambda Functions - Core</em> <em>RADIANT v2.2.0 - December 2024</em></p>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ-1">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<h1 id="end-of-section-4">END OF SECTION 4</h1>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ-2">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ-3">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

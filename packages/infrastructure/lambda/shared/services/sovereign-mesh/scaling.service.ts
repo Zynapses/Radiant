@@ -26,6 +26,8 @@ import type {
   UpdateScalingProfileRequest,
   ApplyScalingProfileResponse,
   EstimateCostResponse,
+} from '@radiant/shared';
+import {
   AWS_PRICING,
   DEFAULT_LAMBDA_CONFIG,
   DEFAULT_AURORA_CONFIG,
@@ -502,19 +504,19 @@ class ScalingService {
       [stringParam('tenantId', tenantId)]
     );
 
-    const hourly = hourlyResult.rows?.[0] || {};
+    const hourly = (hourlyResult.rows?.[0] || {}) as any;
 
     return {
-      currentActiveSessions: parseInt(row?.active || '0', 10),
+      currentActiveSessions: parseInt((row as any)?.active || '0', 10),
       peakSessionsToday: parseInt(hourly.peak_24h || '0', 10),
       peakSessionsWeek: parseInt(hourly.peak_7d || '0', 10),
       peakSessionsMonth: parseInt(hourly.peak_30d || '0', 10),
-      avgSessionDurationSeconds: parseInt(row?.avg_duration || '0', 10) / 1000,
+      avgSessionDurationSeconds: parseInt((row as any)?.avg_duration || '0', 10) / 1000,
       sessionsLast1Hour: parseInt(hourly.last_1h || '0', 10),
       sessionsLast24Hours: parseInt(hourly.last_24h || '0', 10),
       sessionsLast7Days: parseInt(hourly.last_7d || '0', 10),
       sessionsLast30Days: parseInt(hourly.last_30d || '0', 10),
-      sessionsByRegion: row?.by_region || {},
+      sessionsByRegion: (row?.by_region || {}) as any,
       sessionsByTenant: [],
     };
   }
@@ -530,12 +532,12 @@ class ScalingService {
 
     const row = result.rows?.[0];
     return {
-      maxConcurrentSessions: parseInt(row?.max_sessions || '10000', 10),
-      currentUtilizationPercent: parseFloat(row?.utilization_percent || '0'),
-      headroomSessions: parseInt(row?.headroom || '10000', 10),
+      maxConcurrentSessions: parseInt((row as any)?.max_sessions || '10000', 10),
+      currentUtilizationPercent: parseFloat((row as any)?.utilization_percent || '0'),
+      headroomSessions: parseInt((row as any)?.headroom || '10000', 10),
       estimatedTimeToCapacity: null,
-      bottleneck: (row?.bottleneck as any) || 'none',
-      bottleneckUtilization: parseFloat(row?.utilization_percent || '0'),
+      bottleneck: ((row as any)?.bottleneck as any) || 'none',
+      bottleneckUtilization: parseFloat((row as any)?.utilization_percent || '0'),
     };
   }
 
@@ -942,7 +944,7 @@ class ScalingService {
         maxCapacityAcu: parseFloat(row.aurora_max_capacity_acu as string),
         readReplicaCount: parseInt(row.aurora_read_replica_count as string, 10),
         enableGlobalDatabase: row.aurora_enable_global_database as boolean,
-        secondaryRegions: (row.aurora_secondary_regions as string[]) || [],
+        secondaryRegions: (row.aurora_secondary_regions as any) || [],
         connectionPoolSize: parseInt(row.aurora_connection_pool_size as string, 10),
         enablePgBouncer: row.aurora_enable_pgbouncer as boolean,
       },
@@ -952,7 +954,7 @@ class ScalingService {
         replicasPerShard: parseInt(row.redis_replicas_per_shard as string, 10),
         enableClusterMode: row.redis_enable_cluster_mode as boolean,
         enableGlobalDatastore: row.redis_enable_global_datastore as boolean,
-        secondaryRegions: (row.redis_secondary_regions as string[]) || [],
+        secondaryRegions: (row.redis_secondary_regions as any) || [],
         maxConnections: parseInt(row.redis_max_connections as string, 10),
       },
       apiGateway: {
@@ -960,7 +962,7 @@ class ScalingService {
         throttlingBurstLimit: parseInt(row.api_throttling_burst_limit as string, 10),
         enableEdgeOptimized: row.api_enable_edge_optimized as boolean,
         enableCloudFront: row.api_enable_cloudfront as boolean,
-        regionalEndpoints: (row.api_regional_endpoints as string[]) || ['us-east-1'],
+        regionalEndpoints: (row.api_regional_endpoints as any) || ['us-east-1'],
       },
       sqs: {
         standardQueueCount: parseInt(row.sqs_standard_queue_count as string, 10),

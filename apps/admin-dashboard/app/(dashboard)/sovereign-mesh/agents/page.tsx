@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -61,6 +62,7 @@ const categoryIcons: Record<string, React.ReactNode> = {
 };
 
 export default function AgentsPage() {
+  const { toast } = useToast();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,11 +83,7 @@ export default function AgentsPage() {
     requiresHitl: false,
   });
 
-  useEffect(() => {
-    loadData();
-  }, [categoryFilter]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const [agentsRes, categoriesRes] = await Promise.all([
@@ -106,7 +104,11 @@ export default function AgentsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [categoryFilter]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleCreateAgent = async () => {
     try {
@@ -164,10 +166,24 @@ export default function AgentsPage() {
 
       if (response.ok) {
         const data = await response.json();
-        alert(`Execution started: ${data.executionId}`);
+        toast({
+          title: 'Execution Started',
+          description: `Agent execution ${data.executionId} has been initiated.`,
+        });
+      } else {
+        toast({
+          title: 'Execution Failed',
+          description: 'Failed to start agent execution.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Failed to start execution:', error);
+      toast({
+        title: 'Execution Failed',
+        description: 'An error occurred while starting execution.',
+        variant: 'destructive',
+      });
     }
   };
 

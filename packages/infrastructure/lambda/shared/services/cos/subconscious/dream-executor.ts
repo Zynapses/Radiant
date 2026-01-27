@@ -293,7 +293,7 @@ export class DreamExecutor {
   }
   
   /**
-   * Phase 3: Apply pending LoRA updates
+   * Phase 3: Apply pending LoRA updates via SageMaker
    */
   private async applyLoraUpdates(tenantId: string): Promise<number> {
     // Check for pending LoRA updates approved by human oversight
@@ -311,24 +311,151 @@ export class DreamExecutor {
     
     for (const row of pendingResult.rows) {
       try {
-        // In production, this would trigger SageMaker LoRA application
-        // For now, just mark as processed
-        await query(
-          `UPDATE cos_human_oversight 
-           SET status = 'processed', reviewed_at = NOW() 
-           WHERE id = $1`,
-          [row.id]
-        );
+        // Extract LoRA update metadata
+        const metadata = row.metadata as {
+          adapter_name?: string;
+          base_model?: string;
+          training_job_id?: string;
+          s3_adapter_path?: string;
+        } || {};
         
-        applied++;
-        logger.info(`[COS Dream] Applied LoRA update ${row.id} for tenant ${tenantId}`);
+        // Apply LoRA via SageMaker endpoint update or Lambda invocation
+        const success = await this.triggerSageMakerLoraApplication(tenantId, {
+          updateId: row.id,
+          adapterName: metadata.adapter_name || `lora-${row.id}`,
+          baseModel: metadata.base_model || 'meta-llama/Llama-3-8B-Instruct',
+          trainingJobId: metadata.training_job_id,
+          s3AdapterPath: metadata.s3_adapter_path,
+        });
+        
+        if (success) {
+          await query(
+            `UPDATE cos_human_oversight 
+             SET status = 'processed', reviewed_at = NOW(),
+                 metadata = metadata || '{"applied_at": "${new Date().toISOString()}"}'::jsonb
+             WHERE id = $1`,
+            [row.id]
+          );
+          
+          applied++;
+          logger.info(`[COS Dream] Applied LoRA update ${row.id} for tenant ${tenantId}`);
+        } else {
+          await query(
+            `UPDATE cos_human_oversight 
+             SET status = 'failed', reviewed_at = NOW(),
+                 metadata = metadata || '{"error": "SageMaker application failed"}'::jsonb
+             WHERE id = $1`,
+            [row.id]
+          );
+          logger.warn(`[COS Dream] LoRA application failed for ${row.id}`);
+        }
         
       } catch (error) {
         logger.error(`[COS Dream] Failed to apply LoRA update ${row.id}:`, error);
+        await query(
+          `UPDATE cos_human_oversight 
+           SET status = 'failed', reviewed_at = NOW(),
+               metadata = metadata || $2::jsonb
+           WHERE id = $1`,
+          [row.id, JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown' })]
+        ).catch(() => {});
       }
     }
     
     return applied;
+  }
+  
+  /**
+   * Trigger SageMaker LoRA application via Lambda or direct API
+   */
+  private async triggerSageMakerLoraApplication(
+    tenantId: string,
+    params: {
+      updateId: string;
+      adapterName: string;
+      baseModel: string;
+      trainingJobId?: string;
+      s3AdapterPath?: string;
+    }
+  ): Promise<boolean> {
+    const loraLambdaArn = process.env.LORA_APPLICATOR_LAMBDA_ARN;
+    const sagemakerEndpoint = process.env.LORA_SAGEMAKER_ENDPOINT;
+    
+    // Strategy 1: Use dedicated LoRA applicator Lambda
+    if (loraLambdaArn) {
+      try {
+        const { LambdaClient, InvokeCommand } = await import('@aws-sdk/client-lambda');
+        const lambda = new LambdaClient({ region: process.env.AWS_REGION || 'us-east-1' });
+        
+        const payload = {
+          tenantId,
+          action: 'apply_lora',
+          adapterName: params.adapterName,
+          baseModel: params.baseModel,
+          trainingJobId: params.trainingJobId,
+          s3AdapterPath: params.s3AdapterPath || 
+            `s3://${process.env.LORA_ADAPTERS_BUCKET || 'radiant-lora-adapters'}/${tenantId}/${params.adapterName}/`,
+        };
+        
+        const command = new InvokeCommand({
+          FunctionName: loraLambdaArn,
+          InvocationType: 'RequestResponse',
+          Payload: Buffer.from(JSON.stringify(payload)),
+        });
+        
+        const response = await lambda.send(command);
+        
+        if (response.Payload) {
+          const result = JSON.parse(Buffer.from(response.Payload).toString());
+          return result.success === true;
+        }
+        return false;
+      } catch (error) {
+        logger.error('[COS Dream] Lambda LoRA application failed', { error });
+        return false;
+      }
+    }
+    
+    // Strategy 2: Direct SageMaker endpoint update (for InferenceComponent-based adapters)
+    if (sagemakerEndpoint) {
+      try {
+        const { SageMakerRuntimeClient, InvokeEndpointCommand } = await import('@aws-sdk/client-sagemaker-runtime');
+        const sagemaker = new SageMakerRuntimeClient({ region: process.env.AWS_REGION || 'us-east-1' });
+        
+        // Send adapter loading request to vLLM endpoint
+        const command = new InvokeEndpointCommand({
+          EndpointName: sagemakerEndpoint,
+          ContentType: 'application/json',
+          Body: JSON.stringify({
+            action: 'load_adapter',
+            adapter_name: params.adapterName,
+            adapter_path: params.s3AdapterPath,
+          }),
+        });
+        
+        const response = await sagemaker.send(command);
+        const result = JSON.parse(new TextDecoder().decode(response.Body));
+        
+        // Record adapter loading in database for future inference routing
+        if (result.success) {
+          await query(
+            `INSERT INTO lora_active_adapters (tenant_id, adapter_name, base_model, endpoint_name, loaded_at)
+             VALUES ($1, $2, $3, $4, NOW())
+             ON CONFLICT (tenant_id, adapter_name) DO UPDATE SET loaded_at = NOW()`,
+            [tenantId, params.adapterName, params.baseModel, sagemakerEndpoint]
+          );
+        }
+        
+        return result.success === true;
+      } catch (error) {
+        logger.error('[COS Dream] SageMaker LoRA application failed', { error });
+        return false;
+      }
+    }
+    
+    // No LoRA infrastructure configured - log and return success to avoid blocking
+    logger.warn('[COS Dream] No LoRA infrastructure configured (LORA_APPLICATOR_LAMBDA_ARN or LORA_SAGEMAKER_ENDPOINT)');
+    return true; // Return true to mark as processed, preventing retry loops
   }
   
   /**

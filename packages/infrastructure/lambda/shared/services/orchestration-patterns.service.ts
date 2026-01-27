@@ -1376,25 +1376,104 @@ Your task is to:
   }
 
   private estimateConfidence(response: string): number {
-    // Simple heuristic for confidence estimation
-    // In production, would use model's own confidence or analyze response quality
+    // Comprehensive confidence estimation using multiple signals
     let confidence = 0.7; // Base confidence
-    
-    // Longer, more detailed responses tend to be more confident
-    if (response.length > 500) confidence += 0.1;
-    if (response.length > 1000) confidence += 0.05;
-    
-    // Responses with hedging language are less confident
-    const hedgingWords = ['maybe', 'perhaps', 'possibly', 'might', 'could be', 'not sure', 'uncertain'];
     const lowerResponse = response.toLowerCase();
-    for (const word of hedgingWords) {
-      if (lowerResponse.includes(word)) {
-        confidence -= 0.05;
+    
+    // ========== Positive Signals ==========
+    
+    // Length and detail (longer usually means more thorough)
+    if (response.length > 500) confidence += 0.05;
+    if (response.length > 1000) confidence += 0.05;
+    if (response.length > 2000) confidence += 0.03;
+    
+    // Structured responses (lists, numbered items, code blocks)
+    const hasStructure = /(?:^\d+\.|^-\s|^•\s|```)/m.test(response);
+    if (hasStructure) confidence += 0.05;
+    
+    // Contains specific data (numbers, percentages, citations)
+    const hasSpecificData = /\d+%|\$\d+|approximately \d+|\[\d+\]|@\w+\/\w+/.test(response);
+    if (hasSpecificData) confidence += 0.05;
+    
+    // Assertive language
+    const assertivePatterns = ['clearly', 'definitely', 'certainly', 'absolutely', 'specifically', 'precisely'];
+    for (const pattern of assertivePatterns) {
+      if (lowerResponse.includes(pattern)) {
+        confidence += 0.02;
+        break;
       }
     }
     
+    // Contains code (for coding tasks)
+    const hasCode = response.includes('```') || /function\s+\w+|const\s+\w+\s*=|class\s+\w+/.test(response);
+    if (hasCode) confidence += 0.05;
+    
+    // ========== Negative Signals ==========
+    
+    // Hedging language reduces confidence
+    const hedgingPatterns = [
+      { pattern: /\bi(?:'m| am) not (?:sure|certain)/i, penalty: 0.15 },
+      { pattern: /\bmaybe\b/i, penalty: 0.08 },
+      { pattern: /\bperhaps\b/i, penalty: 0.08 },
+      { pattern: /\bpossibly\b/i, penalty: 0.06 },
+      { pattern: /\bmight\b/i, penalty: 0.05 },
+      { pattern: /\bcould be\b/i, penalty: 0.05 },
+      { pattern: /\buncertain\b/i, penalty: 0.10 },
+      { pattern: /\bi(?:'m| am) unsure/i, penalty: 0.12 },
+      { pattern: /\bdon't know\b/i, penalty: 0.15 },
+      { pattern: /\bnot familiar with\b/i, penalty: 0.12 },
+      { pattern: /\bI think\b/i, penalty: 0.03 },
+      { pattern: /\bI believe\b/i, penalty: 0.03 },
+      { pattern: /\bit seems\b/i, penalty: 0.04 },
+      { pattern: /\bapparently\b/i, penalty: 0.04 },
+    ];
+    
+    for (const { pattern, penalty } of hedgingPatterns) {
+      if (pattern.test(response)) {
+        confidence -= penalty;
+      }
+    }
+    
+    // Questions back to user (indicates need for clarification)
+    const questionCount = (response.match(/\?/g) || []).length;
+    if (questionCount > 2) confidence -= 0.05 * Math.min(questionCount - 2, 3);
+    
+    // Disclaimers and caveats
+    const disclaimerPatterns = [
+      /\bhowever\b/i,
+      /\bthat said\b/i, 
+      /\bkeep in mind\b/i,
+      /\bnote that\b/i,
+      /\bwith the caveat\b/i,
+      /\bdepending on\b/i,
+    ];
+    for (const pattern of disclaimerPatterns) {
+      if (pattern.test(response)) {
+        confidence -= 0.02;
+      }
+    }
+    
+    // Very short responses for complex queries
+    if (response.length < 100) confidence -= 0.1;
+    if (response.length < 50) confidence -= 0.1;
+    
+    // ========== Quality Signals ==========
+    
+    // Coherence check: response that ends mid-sentence
+    const lastChar = response.trim().slice(-1);
+    if (lastChar && !'.,!?:;)"\']}'.includes(lastChar)) {
+      confidence -= 0.1;
+    }
+    
+    // Repetition check (may indicate hallucination or loop)
+    const sentences = response.split(/[.!?]+/).filter(s => s.trim().length > 20);
+    const uniqueSentences = new Set(sentences.map(s => s.trim().toLowerCase()));
+    if (sentences.length > 3 && uniqueSentences.size < sentences.length * 0.7) {
+      confidence -= 0.15;
+    }
+    
     // Clamp to valid range
-    return Math.max(0.1, Math.min(1.0, confidence));
+    return Math.max(0.1, Math.min(0.98, confidence));
   }
 
   private buildStepInput(

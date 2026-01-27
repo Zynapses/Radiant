@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 20 REALTIME COLLABORATION - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 20 REALTIME COLLABORATION</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-20-REALTIME-COLLABORATION.md</div>
+  </div>
+  
+  <h1 id="section-20-real-time-collaboration-v3.6.0">SECTION 20: REAL-TIME COLLABORATION (v3.6.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="collaboration-overview">20.1 Collaboration Overview</h2>
+<p>Real-time collaborative editing using Yjs CRDT for shared workspaces.</p>
+<h2 id="collaboration-database-schema">20.2 Collaboration Database Schema</h2>
+<pre class="sql"><code>-- migrations/029_realtime_collaboration.sql
+
+CREATE TABLE collaboration_rooms (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    room_name VARCHAR(100) NOT NULL,
+    room_type VARCHAR(50) NOT NULL DEFAULT &#39;document&#39;,
+    created_by UUID NOT NULL REFERENCES users(id),
+    yjs_document BYTEA,
+    is_active BOOLEAN DEFAULT true,
+    max_participants INTEGER DEFAULT 10,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE room_participants (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    room_id UUID NOT NULL REFERENCES collaboration_rooms(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id),
+    role VARCHAR(20) NOT NULL DEFAULT &#39;editor&#39;,
+    cursor_position JSONB,
+    is_online BOOLEAN DEFAULT false,
+    joined_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_seen TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(room_id, user_id)
+);
+
+CREATE TABLE collaboration_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    room_id UUID NOT NULL REFERENCES collaboration_rooms(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id),
+    action_type VARCHAR(50) NOT NULL,
+    action_data JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_collab_rooms_tenant ON collaboration_rooms(tenant_id);
+CREATE INDEX idx_room_participants ON room_participants(room_id);
+CREATE INDEX idx_collab_history ON collaboration_history(room_id, created_at DESC);
+
+ALTER TABLE collaboration_rooms ENABLE ROW LEVEL SECURITY;
+ALTER TABLE room_participants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE collaboration_history ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY collab_rooms_isolation ON collaboration_rooms USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY room_participants_isolation ON room_participants USING (
+    room_id IN (SELECT id FROM collaboration_rooms WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID)
+);
+CREATE POLICY collab_history_isolation ON collaboration_history USING (
+    room_id IN (SELECT id FROM collaboration_rooms WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID)
+);</code></pre>
+<h2 id="yjs-collaboration-provider">20.3 Yjs Collaboration Provider</h2>
+<pre class="typescript"><code>// packages/core/src/services/yjs-provider.ts
+
+import * as Y from &#39;yjs&#39;;
+import { WebsocketProvider } from &#39;y-websocket&#39;;
+import { Pool } from &#39;pg&#39;;
+
+export class YjsCollaborationProvider {
+    private pool: Pool;
+    private documents: Map&lt;string, Y.Doc&gt; = new Map();
+    private providers: Map&lt;string, WebsocketProvider&gt; = new Map();
+    
+    constructor(pool: Pool) {
+        this.pool = pool;
+    }
+    
+    async getOrCreateRoom(
+        tenantId: string,
+        roomId: string,
+        userId: string
+    ): Promise&lt;{ doc: Y.Doc; provider: WebsocketProvider }&gt; {
+        // Check if document already exists in memory
+        if (this.documents.has(roomId)) {
+            return {
+                doc: this.documents.get(roomId)!,
+                provider: this.providers.get(roomId)!
+            };
+        }
+        
+        // Load from database or create new
+        const result = await this.pool.query(
+            `SELECT yjs_document FROM collaboration_rooms WHERE id = $1 AND tenant_id = $2`,
+            [roomId, tenantId]
+        );
+        
+        const doc = new Y.Doc();
+        
+        if (result.rows[0]?.yjs_document) {
+            Y.applyUpdate(doc, result.rows[0].yjs_document);
+        }
+        
+        // Create WebSocket provider
+        const wsUrl = process.env.YJS_WEBSOCKET_URL || &#39;wss://collab.radiant.ai&#39;;
+        const provider = new WebsocketProvider(wsUrl, roomId, doc);
+        
+        // Set up persistence
+        doc.on(&#39;update&#39;, async (update: Uint8Array) =&gt; {
+            await this.persistDocument(roomId, Y.encodeStateAsUpdate(doc));
+        });
+        
+        this.documents.set(roomId, doc);
+        this.providers.set(roomId, provider);
+        
+        // Add user as participant
+        await this.addParticipant(roomId, userId);
+        
+        return { doc, provider };
+    }
+    
+    async addParticipant(roomId: string, userId: string): Promise&lt;void&gt; {
+        await this.pool.query(`
+            INSERT INTO room_participants (room_id, user_id, is_online)
+            VALUES ($1, $2, true)
+            ON CONFLICT (room_id, user_id)
+            DO UPDATE SET is_online = true, last_seen = NOW()
+        `, [roomId, userId]);
+    }
+    
+    async removeParticipant(roomId: string, userId: string): Promise&lt;void&gt; {
+        await this.pool.query(`
+            UPDATE room_participants SET is_online = false, last_seen = NOW()
+            WHERE room_id = $1 AND user_id = $2
+        `, [roomId, userId]);
+    }
+    
+    async updateCursor(roomId: string, userId: string, position: any): Promise&lt;void&gt; {
+        await this.pool.query(`
+            UPDATE room_participants SET cursor_position = $3, last_seen = NOW()
+            WHERE room_id = $1 AND user_id = $2
+        `, [roomId, userId, JSON.stringify(position)]);
+    }
+    
+    private async persistDocument(roomId: string, update: Uint8Array): Promise&lt;void&gt; {
+        await this.pool.query(`
+            UPDATE collaboration_rooms SET yjs_document = $2, updated_at = NOW()
+            WHERE id = $1
+        `, [roomId, Buffer.from(update)]);
+    }
+    
+    async getParticipants(roomId: string): Promise&lt;any[]&gt; {
+        const result = await this.pool.query(`
+            SELECT rp.*, u.email, u.display_name
+            FROM room_participants rp
+            JOIN users u ON rp.user_id = u.id
+            WHERE rp.room_id = $1
+        `, [roomId]);
+        return result.rows;
+    }
+    
+    async logAction(roomId: string, userId: string, actionType: string, data: any): Promise&lt;void&gt; {
+        await this.pool.query(`
+            INSERT INTO collaboration_history (room_id, user_id, action_type, action_data)
+            VALUES ($1, $2, $3, $4)
+        `, [roomId, userId, actionType, JSON.stringify(data)]);
+    }
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

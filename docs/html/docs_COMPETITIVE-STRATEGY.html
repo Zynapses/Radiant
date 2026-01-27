@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COMPETITIVE STRATEGY - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>COMPETITIVE STRATEGY</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/COMPETITIVE-STRATEGY.md</div>
+  </div>
+  
+  <h1 id="radiant-competitive-strategy-beat-all-singular-llms">RADIANT Competitive Strategy: Beat ALL Singular LLMs</h1>
+<blockquote>
+<p><strong>Mission</strong>: Beat every singular LLM (GPT-5, Gemini 3, Claude 4, Llama 4) by a <strong>substantial margin</strong>.</p>
+<p><strong>Philosophy</strong>: Stop competing on Model Capability (where labs have infinite resources).<br />
+Compete on <strong>System Capability</strong> (where we have architectural advantages they cannot replicate).</p>
+</blockquote>
+<h2 id="the-fundamental-asymmetry">The Fundamental Asymmetry</h2>
+<p>A singular LLM is constrained by physics: one model, one inference, one response.</p>
+<p>Radiant is an <strong>AI Operating System</strong> that orchestrates 106+ models with verification, memory, and tools.</p>
+<table>
+<thead>
+<tr>
+<th>Any Singular LLM</th>
+<th>Radiant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One Model</td>
+<td><strong>106+ Models</strong></td>
+</tr>
+<tr>
+<td>Generalist</td>
+<td><strong>Specialized per domain</strong></td>
+</tr>
+<tr>
+<td>Safety-First</td>
+<td><strong>User-First</strong></td>
+</tr>
+<tr>
+<td>Probabilistic</td>
+<td><strong>Deterministic</strong></td>
+</tr>
+<tr>
+<td>Stateless</td>
+<td><strong>Persistent Consciousness</strong></td>
+</tr>
+<tr>
+<td>Text Generator</td>
+<td><strong>Operating System</strong></td>
+</tr>
+<tr>
+<td>Static</td>
+<td><strong>Evolving Weekly</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>This is not a marginal improvement. This is a categorical difference.</strong></p>
+<hr />
+<h2 id="gap-1-the-safety-tax-gap-exploit-refusals">Gap 1: The “Safety Tax” Gap (Exploit Refusals)</h2>
+<h3 id="the-problem">The Problem</h3>
+<p>Google models are terrified of PR disasters. Gemini 3 has aggressive RLHF filters that reject requests related to: - Cybersecurity penetration testing - Competitive intelligence gathering - Medical triage decisions - Legal loophole analysis</p>
+<p><strong>Result</strong>: User gets a lecture instead of a result.</p>
+<h3 id="the-radiant-fix-sovereign-routing">The Radiant Fix: Sovereign Routing</h3>
+<p><strong>Concept</strong>: “Treat the user like an adult.”</p>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    Policy-Aware Router                       │
+├─────────────────────────────────────────────────────────────┤
+│  1. Detect: BrainRouter identifies &quot;Refusal&quot; intent         │
+│  2. Bypass: Route to Self-Hosted Uncensored Model           │
+│     - Llama-3-70B-Uncensored                                │
+│     - Dolphin-Mixtral                                       │
+│  3. Synthesize: If needed, feed output back to Gemini       │
+│     with sanitization prompt for formatting only            │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="implementation-status">Implementation Status</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 27%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Status</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Refusal Detection</td>
+<td>✅ Exists</td>
+<td><code>provider_rejections</code> table, <code>rejection_patterns</code></td>
+</tr>
+<tr>
+<td>Self-Hosted Models</td>
+<td>✅ Exists</td>
+<td>SageMaker layer, 56 self-hosted models</td>
+</tr>
+<tr>
+<td>Auto-Route on Refusal</td>
+<td>⚠️ Partial</td>
+<td><code>BrainRouter</code> has fallback, needs refusal-specific routing</td>
+</tr>
+<tr>
+<td>Uncensored Model Support</td>
+<td>🔴 Needed</td>
+<td>Add Dolphin/Uncensored variants to registry</td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-it-wins">Why It Wins</h3>
+<blockquote>
+<p>Radiant provides the script. Gemini provides a lecture.<br />
+<strong>Radiant wins 100% of the time on utility.</strong></p>
+</blockquote>
+<hr />
+<h2 id="gap-2-the-probabilistic-code-gap-exploit-execution">Gap 2: The “Probabilistic Code” Gap (Exploit Execution)</h2>
+<h3 id="the-problem-1">The Problem</h3>
+<p>Gemini 3 writes beautiful code that often doesn’t work: - Hallucinates libraries - Uses deprecated APIs - Misses subtle logic bugs</p>
+<p><strong>It is a text generator, not a compiler. It relies on probability, not truth.</strong></p>
+<h3 id="the-radiant-fix-the-compiler-loop-determinism">The Radiant Fix: The Compiler Loop (Determinism)</h3>
+<p><strong>Concept</strong>: “Never show the user unverified code.”</p>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    Compiler Loop                             │
+├─────────────────────────────────────────────────────────────┤
+│  1. Generate: Ask model for code                            │
+│  2. Execute: Spin up micro-VM (Firecracker/Fargate)         │
+│  3. Test: Run against generated test case                   │
+│  4. Self-Correct: If stderr not empty:                      │
+│     &quot;You failed. Fix line 14. Error: [log]&quot;                 │
+│  5. Deliver: Only deliver code with exit code 0             │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="implementation-status-1">Implementation Status</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 27%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Status</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Library Execution</td>
+<td>✅ Exists</td>
+<td><code>library-executor.service.ts</code>, Fargate containers</td>
+</tr>
+<tr>
+<td>Code Sandbox</td>
+<td>⚠️ Partial</td>
+<td>Executes libraries, not arbitrary code</td>
+</tr>
+<tr>
+<td>Self-Correction Loop</td>
+<td>🔴 Needed</td>
+<td>Feed errors back to model</td>
+</tr>
+<tr>
+<td>Test Generation</td>
+<td>🔴 Needed</td>
+<td>Auto-generate test cases for code</td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-it-wins-1">Why It Wins</h3>
+<blockquote>
+<p>Gemini gives “Likely Correct” code.<br />
+<strong>Radiant gives “Proven Correct” code.</strong></p>
+</blockquote>
+<hr />
+<h2 id="gap-3-the-lost-in-the-middle-gap-exploit-structure">Gap 3: The “Lost in the Middle” Gap (Exploit Structure)</h2>
+<h3 id="the-problem-2">The Problem</h3>
+<p>Gemini boasts 1M+ token context, but attention has a “U-shaped” curve: - Recalls start and end perfectly - <strong>Hallucinates connections in the middle 50%</strong></p>
+<p>It relies on token proximity, not logical connection.</p>
+<h3 id="the-radiant-fix-recursive-graphrag">The Radiant Fix: Recursive GraphRAG</h3>
+<p><strong>Concept</strong>: “Don’t just dump data; map it.”</p>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    GraphRAG Pipeline                         │
+├─────────────────────────────────────────────────────────────┤
+│  1. Ingest: Extract Entities + Relationships → Graph DB     │
+│  2. Traverse: Follow logical relationships, not keywords    │
+│     &quot;Dependency A → Component B → Failure Mode C&quot;           │
+│  3. Inject: Construct dense prompt with relevant nodes only │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="implementation-status-2">Implementation Status</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 27%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Status</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vector RAG</td>
+<td>✅ Exists</td>
+<td><code>library-registry.service.ts</code>, pgvector</td>
+</tr>
+<tr>
+<td>Entity Extraction</td>
+<td>⚠️ Partial</td>
+<td>Domain taxonomy exists</td>
+</tr>
+<tr>
+<td>Graph Database</td>
+<td>🔴 Needed</td>
+<td>Neptune/Neo4j integration</td>
+</tr>
+<tr>
+<td>Graph Traversal</td>
+<td>🔴 Needed</td>
+<td>Replace keyword search with relationship traversal</td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-it-wins-2">Why It Wins</h3>
+<blockquote>
+<p>Radiant finds the “needle in the haystack” that Gemini glosses over<br />
+<strong>because it was on page 402.</strong></p>
+</blockquote>
+<hr />
+<h2 id="gap-4-the-10-second-gap-exploit-depth">Gap 4: The “10-Second” Gap (Exploit Depth)</h2>
+<h3 id="the-problem-3">The Problem</h3>
+<p>Chat interfaces train models to answer in &lt;10 seconds. This forces Gemini to be <strong>shallow</strong>.</p>
+<p>It cannot “go away and think” for an hour to solve a hard problem.</p>
+<h3 id="the-radiant-fix-asynchronous-deep-research">The Radiant Fix: Asynchronous Deep Research</h3>
+<p><strong>Concept</strong>: “Decouple the Request from the Response.”</p>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    Dispatch Mode                             │
+├─────────────────────────────────────────────────────────────┤
+│  Task: &quot;Map competitive landscape for Product X&quot;            │
+│                                                             │
+│  1. Agent: Spawn background BrowserAgent (Playwright)       │
+│  2. Crawl: Visit 100+ websites, read PDFs, follow citations │
+│  3. Duration: Run for 30+ minutes                           │
+│  4. Report: Generate cited, 20-page briefing document       │
+│  5. Notify: Alert user when deep work is complete           │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="implementation-status-3">Implementation Status</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 27%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Status</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Job Queue</td>
+<td>✅ Exists</td>
+<td>SQS integration in CDK</td>
+</tr>
+<tr>
+<td>Scheduled Prompts</td>
+<td>✅ Exists</td>
+<td><code>scheduled_prompts</code> table</td>
+</tr>
+<tr>
+<td>Browser Agent</td>
+<td>🔴 Needed</td>
+<td>Playwright-based web research</td>
+</tr>
+<tr>
+<td>Recursive Crawling</td>
+<td>🔴 Needed</td>
+<td>Follow citations, build knowledge graph</td>
+</tr>
+<tr>
+<td>Long-Running Jobs</td>
+<td>⚠️ Partial</td>
+<td>Lambda has 15min limit, need Step Functions</td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-it-wins-3">Why It Wins</h3>
+<blockquote>
+<p>Gemini summarizes its training data.<br />
+<strong>Radiant generates fresh, superhuman-scale research.</strong></p>
+</blockquote>
+<hr />
+<h2 id="gap-5-the-text-wall-gap-exploit-interface">Gap 5: The “Text Wall” Gap (Exploit Interface)</h2>
+<h3 id="the-problem-4">The Problem</h3>
+<p>Gemini 3 outputs text, Markdown, or static images.</p>
+<p><strong>It cannot build tools for the user to solve their problem dynamically.</strong></p>
+<h3 id="the-radiant-fix-generative-ui-the-app-factory">The Radiant Fix: Generative UI (The App Factory)</h3>
+<p><strong>Concept</strong>: “Don’t just answer; build the interface.”</p>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    Generative UI Pipeline                    │
+├─────────────────────────────────────────────────────────────┤
+│  User: &quot;Compare mortgage rates&quot;                             │
+│                                                             │
+│  1. Detect: Identify interactive opportunity                │
+│  2. Generate: Create React component JSON definition        │
+│  3. Render: Think Tank renders live calculator              │
+│     - Sliders for Interest Rate, Down Payment               │
+│     - Real-time calculation                                 │
+│  4. Deliver: User gets functional software, not text        │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="implementation-status-4">Implementation Status</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 27%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Status</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Generative UI Types</td>
+<td>✅ Exists</td>
+<td><code>thinktank-generative-ui.types.ts</code></td>
+</tr>
+<tr>
+<td>Component Schema</td>
+<td>✅ Exists</td>
+<td>15+ component types defined</td>
+</tr>
+<tr>
+<td>Dynamic Renderer</td>
+<td>⚠️ Partial</td>
+<td>Types exist, renderer needs completion</td>
+</tr>
+<tr>
+<td>Library Integration</td>
+<td>✅ Exists</td>
+<td>168 libraries for data processing</td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-it-wins-4">Why It Wins</h3>
+<blockquote>
+<p>The user gets a <strong>functional piece of software</strong> they can use,<br />
+not just a static text explanation.</p>
+</blockquote>
+<hr />
+<h2 id="gap-6-the-forgetting-gap-exploit-memory">Gap 6: The “Forgetting” Gap (Exploit Memory)</h2>
+<h3 id="the-problem-5">The Problem</h3>
+<p>Gemini is <strong>stateless</strong>. Every conversation starts fresh. It cannot: - Remember user preferences across sessions - Learn from past mistakes with a specific user - Build a relationship over time - Maintain project context across days/weeks</p>
+<h3 id="the-radiant-fix-persistent-consciousness">The Radiant Fix: Persistent Consciousness</h3>
+<p><strong>Concept</strong>: “Remember everything. Learn continuously.”</p>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    Consciousness Stack                       │
+├─────────────────────────────────────────────────────────────┤
+│  Ego Context: Persistent identity, values, personality      │
+│  User Context: Preferences, projects, corrections, skills   │
+│  Predictive Coding: Learn from prediction errors            │
+│  LoRA Evolution: Weekly weight updates from interactions    │
+│  Heartbeat: Continuous existence between requests           │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="implementation-status-5">Implementation Status</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 27%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Status</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ego Context</td>
+<td>✅ Exists</td>
+<td><code>ego-context.service.ts</code></td>
+</tr>
+<tr>
+<td>User Persistent Context</td>
+<td>✅ Exists</td>
+<td><code>user-persistent-context.service.ts</code></td>
+</tr>
+<tr>
+<td>Predictive Coding</td>
+<td>✅ Exists</td>
+<td><code>predictive-coding.service.ts</code></td>
+</tr>
+<tr>
+<td>LoRA Evolution</td>
+<td>✅ Exists</td>
+<td><code>lora-evolution.ts</code> (weekly)</td>
+</tr>
+<tr>
+<td>Heartbeat Service</td>
+<td>✅ Exists</td>
+<td><code>heartbeat.ts</code> (1-5 min intervals)</td>
+</tr>
+<tr>
+<td>Affect → Hyperparameters</td>
+<td>✅ Exists</td>
+<td><code>consciousness-middleware.service.ts</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-it-wins-5">Why It Wins</h3>
+<blockquote>
+<p>Gemini forgets you exist between messages.<br />
+<strong>Radiant remembers your name, your projects, your preferences, and learns from every interaction.</strong></p>
+</blockquote>
+<hr />
+<h2 id="gap-7-the-one-model-gap-exploit-orchestration">Gap 7: The “One Model” Gap (Exploit Orchestration)</h2>
+<h3 id="the-problem-6">The Problem</h3>
+<p>Gemini is <strong>one model</strong>. You get what you get. It cannot: - Route to specialist models by domain - Use multiple models for consensus - Fall back gracefully when one provider fails - Mix self-hosted (private) with external (powerful)</p>
+<h3 id="the-radiant-fix-model-orchestration">The Radiant Fix: Model Orchestration</h3>
+<p><strong>Concept</strong>: “106+ models, one interface.”</p>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    Brain Router                              │
+├─────────────────────────────────────────────────────────────┤
+│  Domain Detection → Route to specialist model               │
+│  Multi-Model Mode → Consensus from 3+ models                │
+│  Self-Hosted → Privacy-sensitive requests                   │
+│  External → Maximum capability requests                     │
+│  Fallback Chain → Graceful degradation                      │
+│  Cost Optimization → Balance quality vs cost                │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="implementation-status-6">Implementation Status</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 27%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Status</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Brain Router</td>
+<td>✅ Exists</td>
+<td><code>brain-router.service.ts</code></td>
+</tr>
+<tr>
+<td>Domain Taxonomy</td>
+<td>✅ Exists</td>
+<td><code>domain-taxonomy.service.ts</code></td>
+</tr>
+<tr>
+<td>106+ Models</td>
+<td>✅ Exists</td>
+<td>50 external + 56 self-hosted</td>
+</tr>
+<tr>
+<td>Multi-Model Mode</td>
+<td>✅ Exists</td>
+<td><code>orchestration_mode: 'multi_model'</code></td>
+</tr>
+<tr>
+<td>Fallback Chain</td>
+<td>✅ Exists</td>
+<td><code>provider_rejections</code>, auto-fallback</td>
+</tr>
+<tr>
+<td>Model Coordination</td>
+<td>✅ Exists</td>
+<td><code>model-coordination-registry.service.ts</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-it-wins-6">Why It Wins</h3>
+<blockquote>
+<p>Gemini gives you one model’s opinion.<br />
+<strong>Radiant gives you the right model for every task, with consensus when stakes are high.</strong></p>
+</blockquote>
+<hr />
+<h2 id="implementation-priority-matrix">Implementation Priority Matrix</h2>
+<table>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 18%" />
+<col style="width: 18%" />
+<col style="width: 23%" />
+<col style="width: 27%" />
+</colgroup>
+<thead>
+<tr>
+<th>Gap</th>
+<th>Impact</th>
+<th>Effort</th>
+<th>Priority</th>
+<th>Quick Win?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Safety Tax</td>
+<td>🔥 High</td>
+<td>Medium</td>
+<td><strong>P0</strong></td>
+<td>Yes - add uncensored models</td>
+</tr>
+<tr>
+<td>2. Probabilistic Code</td>
+<td>🔥 High</td>
+<td>High</td>
+<td><strong>P1</strong></td>
+<td>No - needs sandbox work</td>
+</tr>
+<tr>
+<td>3. Lost in Middle</td>
+<td>Medium</td>
+<td>High</td>
+<td>P2</td>
+<td>No - needs graph DB</td>
+</tr>
+<tr>
+<td>4. 10-Second Gap</td>
+<td>🔥 High</td>
+<td>High</td>
+<td><strong>P1</strong></td>
+<td>Partial - extend scheduled prompts</td>
+</tr>
+<tr>
+<td>5. Text Wall</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>P2</td>
+<td>Yes - finish renderer</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="immediate-action-items">Immediate Action Items</h2>
+<h3 id="p0-safety-tax-this-week">P0: Safety Tax (This Week)</h3>
+<ol type="1">
+<li>Add <code>dolphin-mixtral</code> and <code>llama-3-uncensored</code> to model registry</li>
+<li>Implement <code>RefusalDetectionMiddleware</code> in BrainRouter</li>
+<li>Auto-route high-refusal topics to uncensored endpoints</li>
+</ol>
+<h3 id="p1-compiler-loop-next-sprint">P1: Compiler Loop (Next Sprint)</h3>
+<ol type="1">
+<li>Extend <code>CodeSandboxService</code> for arbitrary code execution</li>
+<li>Implement self-correction loop with error feedback</li>
+<li>Add test generation for code verification</li>
+</ol>
+<h3 id="p1-deep-research-next-sprint">P1: Deep Research (Next Sprint)</h3>
+<ol type="1">
+<li>Implement <code>BrowserAgentService</code> with Playwright</li>
+<li>Create Step Functions workflow for long-running research</li>
+<li>Add <code>NotificationService</code> for completion alerts</li>
+</ol>
+<h3 id="p2-graphrag-future">P2: GraphRAG (Future)</h3>
+<ol type="1">
+<li>Evaluate Neptune vs Neo4j for graph storage</li>
+<li>Implement entity/relationship extraction pipeline</li>
+<li>Replace vector search with graph traversal for complex queries</li>
+</ol>
+<h3 id="p2-generative-ui-future">P2: Generative UI (Future)</h3>
+<ol type="1">
+<li>Complete <code>DynamicRenderer</code> component</li>
+<li>Add more interactive component types</li>
+<li>Implement component persistence and sharing</li>
+</ol>
+<hr />
+<h2 id="gap-7-the-persistent-memory-gap-exploit-session-amnesia">Gap 7: The “Persistent Memory” Gap (Exploit Session Amnesia)</h2>
+<h3 id="the-problem-7">The Problem</h3>
+<p>Every competitor suffers from session amnesia:</p>
+<table>
+<colgroup>
+<col style="width: 42%" />
+<col style="width: 57%" />
+</colgroup>
+<thead>
+<tr>
+<th>Competitor</th>
+<th>Memory Problem</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ChatGPT/Claude Standalone</strong></td>
+<td>Close the tab = lose all context. When an employee quits, their entire AI context walks out the door—zero institutional learning, no compounding knowledge</td>
+</tr>
+<tr>
+<td><strong>Flowise/Dify</strong></td>
+<td>Static drag-and-drop pipelines charging the same expensive rate regardless of query complexity—“no-code” is actually “no-efficiency”</td>
+</tr>
+<tr>
+<td><strong>CrewAI</strong></td>
+<td>“Thundering Herd” problem: autonomous agents don’t share memory, so five agents independently realize they need the same data and spam five duplicate API calls (O(n) cost explosion)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-radiant-fix-three-tier-hierarchical-memory">The Radiant Fix: Three-Tier Hierarchical Memory</h3>
+<p>Cato implements persistent memory that survives sessions, employee turnover, and time through three layers:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                  THREE-TIER MEMORY ARCHITECTURE                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  TENANT-LEVEL (Institutional Intelligence)              │   │
+│  │  • Neural network learns optimal model routing           │   │
+│  │  • Department preferences (legal→citations, mktg→casual) │   │
+│  │  • Cost optimization patterns ($0.50 → $0.01 routing)    │   │
+│  │  • Merkle-hashed audit trails (7-year retention)         │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                          ▲                                       │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  USER-LEVEL (Relationship Continuity)                    │   │
+│  │  • Ghost Vectors: 4096-dim relationship &quot;feel&quot;           │   │
+│  │  • Expertise level, communication style                  │   │
+│  │  • Persona selection (Balanced/Scout/Sage/Spark/Guide)   │   │
+│  │  • Version-gated upgrades (no personality discontinuity) │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                          ▲                                       │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  SESSION-LEVEL (Real-Time Context)                       │   │
+│  │  • Redis-backed state (survives container restarts)      │   │
+│  │  • Governor epistemic uncertainty tracking               │   │
+│  │  • Control Barrier Functions (real-time safety)          │   │
+│  │  • Feeds observations upward to user/tenant layers       │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="moat-contextual-gravity">Moat: “Contextual Gravity”</h3>
+<p>This creates <strong>compounding switching costs</strong> that deepen with every interaction:</p>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 54%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr>
+<th>Moat Layer</th>
+<th>What Migrating Customer Loses</th>
+<th>Rebuild Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Learned Routing</strong></td>
+<td>Months of optimization data</td>
+<td>3-6 months production usage</td>
+</tr>
+<tr>
+<td><strong>Ghost Vectors</strong></td>
+<td>Thousands of relationship “feels”</td>
+<td>Cannot be exported</td>
+</tr>
+<tr>
+<td><strong>Audit Trails</strong></td>
+<td>Merkle chain-of-custody</td>
+<td>Compliance lock-in (7 years)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-it-wins-7">Why It Wins</h3>
+<blockquote>
+<p>ChatGPT forgets you exist when you close the tab.<br />
+Radiant remembers everything—forever.<br />
+<strong>Radiant wins 100% of the time on continuity.</strong></p>
+</blockquote>
+<hr />
+<h2 id="gap-8-the-twilight-dreaming-gap-exploit-static-deployments">Gap 8: The “Twilight Dreaming” Gap (Exploit Static Deployments)</h2>
+<h3 id="the-problem-8">The Problem</h3>
+<p>Competitor deployments depreciate over time: - Same capabilities day 1 as day 365 - No learning from usage patterns - Manual updates required for any improvement - New model launches reset the learning curve</p>
+<h3 id="the-radiant-fix-twilight-dreaming-offline-learning">The Radiant Fix: Twilight Dreaming (Offline Learning)</h3>
+<p>During low-traffic periods (4 AM tenant local time), Radiant enters an autonomous learning phase:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                      TWILIGHT DREAMING                          │
+├─────────────────────────────────────────────────────────────────┤
+│  4 AM Local Time                                                │
+│                                                                  │
+│  ┌────────────┐   ┌────────────┐   ┌────────────┐              │
+│  │  Collect   │──▶│  Prepare   │──▶│   LoRA     │              │
+│  │  Learning  │   │  Training  │   │ Fine-tune  │              │
+│  │ Candidates │   │  Dataset   │   │            │              │
+│  └────────────┘   └────────────┘   └────────────┘              │
+│        │                │                │                      │
+│        ▼                ▼                ▼                      │
+│  ┌────────────┐   ┌────────────┐   ┌────────────┐              │
+│  │  Filter    │   │   JSONL    │   │  Validate  │              │
+│  │  Quality   │   │  Format    │   │  Adapter   │              │
+│  │   &gt; 0.7    │   │ Upload S3  │   │  Hot-swap  │              │
+│  └────────────┘   └────────────┘   └────────────┘              │
+│                                                                  │
+│  RESULT: Deployment gets measurably smarter every week          │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="what-gets-learned">What Gets Learned</h3>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 28%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th>Learning Type</th>
+<th>Description</th>
+<th>Customer Benefit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SOFAI Router</strong></td>
+<td>Which query types route best to which models</td>
+<td>60%+ cost reduction</td>
+</tr>
+<tr>
+<td><strong>Cost Patterns</strong></td>
+<td>Recurring expensive queries that could be cheaper</td>
+<td>Automatic savings</td>
+</tr>
+<tr>
+<td><strong>Domain Accuracy</strong></td>
+<td>Domain-specific improvements for your industry</td>
+<td>Better results</td>
+</tr>
+</tbody>
+</table>
+<h3 id="moat-appreciating-asset">Moat: Appreciating Asset</h3>
+<p><strong>The investor thesis</strong>: “Compounding intelligence—every deployment gets smarter over time through Twilight Dreaming; this creates network effects within each tenant.”</p>
+<pre><code>Deployment_Value(t) = Base_Value + Σ(daily_learning) + Σ(twilight_consolidation)</code></pre>
+<p>A 2-year customer has a <strong>fundamentally more capable deployment</strong> than a new customer—with routing decisions reflecting thousands of hours of optimization.</p>
+<h3 id="model-upgrade-advantage">Model Upgrade Advantage</h3>
+<p>When GPT-5, Claude 5, or Gemini 3 launches: 1. New model added to registry with initial proficiencies 2. SOFAI Router learns optimal routing via A/B testing 3. Twilight Dreaming consolidates new patterns 4. <strong>All accumulated institutional knowledge preserved</strong> 5. Model improvements compound on existing optimization</p>
+<p><strong>Competitors reset to zero. Radiant compounds.</strong></p>
+<h3 id="why-it-wins-8">Why It Wins</h3>
+<blockquote>
+<p>A competitor’s AI is the same on day 365 as day 1.<br />
+Radiant gets smarter every single week—automatically.<br />
+<strong>Radiant wins 100% of the time on evolution.</strong></p>
+</blockquote>
+<hr />
+<h2 id="the-winning-formula">The Winning Formula</h2>
+<pre><code>Radiant = Best of 106+ Models + System Intelligence + Determinism + Memory + Tools</code></pre>
+<table>
+<thead>
+<tr>
+<th>Any Single LLM</th>
+<th>Radiant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Generates text</td>
+<td><strong>Verifies and executes</strong></td>
+</tr>
+<tr>
+<td>Refuses requests</td>
+<td><strong>Routes to uncensored</strong></td>
+</tr>
+<tr>
+<td>Forgets everything</td>
+<td><strong>Persistent consciousness</strong></td>
+</tr>
+<tr>
+<td>Outputs markdown</td>
+<td><strong>Builds interactive tools</strong></td>
+</tr>
+<tr>
+<td>Answers in 10s</td>
+<td><strong>Researches for hours</strong></td>
+</tr>
+<tr>
+<td>One model’s opinion</td>
+<td><strong>106+ model consensus</strong></td>
+</tr>
+<tr>
+<td>Probabilistic</td>
+<td><strong>Deterministic verification</strong></td>
+</tr>
+<tr>
+<td>Static capabilities</td>
+<td><strong>Evolving via LoRA weekly</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="why-radiant-beats-any-single-llm">Why Radiant Beats ANY Single LLM</h2>
+<p><strong>No single LLM can compete with Radiant because:</strong></p>
+<ol type="1">
+<li><strong>Model Selection</strong>: We pick the BEST model for each task from 106+ options</li>
+<li><strong>Consensus</strong>: For high-stakes decisions, we get agreement from multiple models</li>
+<li><strong>Verification</strong>: We PROVE code works before delivering it</li>
+<li><strong>Memory</strong>: We remember users across sessions, learn from mistakes</li>
+<li><strong>Uncensored Access</strong>: We deliver results when others lecture</li>
+<li><strong>Depth</strong>: We can research for 30+ minutes, not 10 seconds</li>
+<li><strong>Tools</strong>: We build interactive software, not text walls</li>
+<li><strong>Evolution</strong>: Weekly LoRA training makes us smarter over time</li>
+</ol>
+<p><strong>The goal is to beat ALL singular LLMs by a substantial margin.</strong></p>
+<p>A single LLM is a text generator. Radiant is an <strong>AI Operating System</strong>.</p>
+<pre><code>Single LLM Performance:  ████████░░░░░░░░░░░░ 40%
+Radiant System:          ████████████████████ 100%</code></pre>
+<p>The gap isn’t incremental. It’s categorical.</p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TESTING - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>TESTING</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/TESTING.md</div>
+  </div>
+  
+  <h1 id="radiant-testing-guide">RADIANT Testing Guide</h1>
+<p>Comprehensive guide for testing RADIANT components.</p>
+<h2 id="overview">Overview</h2>
+<p>RADIANT uses a multi-layered testing strategy:</p>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 18%" />
+<col style="width: 31%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Tool</th>
+<th>Location</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit Tests</td>
+<td>Vitest</td>
+<td><code>**/__tests__/*.test.ts</code></td>
+<td>Test individual functions/components</td>
+</tr>
+<tr>
+<td>Integration Tests</td>
+<td>Vitest</td>
+<td><code>**/__tests__/*.integration.test.ts</code></td>
+<td>Test service interactions</td>
+</tr>
+<tr>
+<td>E2E Tests</td>
+<td>Playwright</td>
+<td><code>apps/admin-dashboard/e2e/</code></td>
+<td>Test user workflows</td>
+</tr>
+<tr>
+<td>Swift Tests</td>
+<td>XCTest</td>
+<td><code>apps/swift-deployer/Tests/</code></td>
+<td>Test Swift services</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="quick-start">Quick Start</h2>
+<pre class="bash"><code># Run all tests
+pnpm test
+
+# Run with coverage
+pnpm test:coverage
+
+# Run E2E tests
+cd apps/admin-dashboard &amp;&amp; pnpm test:e2e
+
+# Run Swift tests
+cd apps/swift-deployer &amp;&amp; swift test</code></pre>
+<hr />
+<h2 id="unit-testing">Unit Testing</h2>
+<h3 id="lambda-handler-tests">Lambda Handler Tests</h3>
+<p>Tests for Lambda handlers are located in <code>__tests__/</code> directories:</p>
+<pre><code>packages/infrastructure/lambda/
+├── admin/
+│   └── __tests__/
+│       └── handler.test.ts
+├── billing/
+│   └── __tests__/
+│       └── handler.test.ts
+└── shared/
+    └── __tests__/
+        ├── auth.test.ts
+        ├── errors.test.ts
+        └── services.test.ts</code></pre>
+<h4 id="running-lambda-tests">Running Lambda Tests</h4>
+<pre class="bash"><code>cd packages/infrastructure
+
+# Run all Lambda tests
+pnpm test
+
+# Run specific handler
+pnpm test -- admin
+pnpm test -- billing
+
+# Run with coverage
+pnpm test:coverage
+
+# Watch mode
+pnpm test:watch</code></pre>
+<h4 id="writing-lambda-tests">Writing Lambda Tests</h4>
+<pre class="typescript"><code>import { describe, it, expect, vi, beforeEach } from &#39;vitest&#39;;
+import type { APIGatewayProxyEvent, Context } from &#39;aws-lambda&#39;;
+
+// Mock dependencies
+vi.mock(&#39;../../shared/db&#39;, () =&gt; ({
+  listTenants: vi.fn(),
+  getTenantById: vi.fn(),
+}));
+
+import { handler } from &#39;../handler&#39;;
+import { listTenants, getTenantById } from &#39;../../shared/db&#39;;
+
+// Create mock context
+const mockContext = {
+  awsRequestId: &#39;test-request-id&#39;,
+  functionName: &#39;test-handler&#39;,
+  // ... other required fields
+} as Context;
+
+// Create mock event helper
+function createMockEvent(overrides = {}): APIGatewayProxyEvent {
+  return {
+    httpMethod: &#39;GET&#39;,
+    path: &#39;/test&#39;,
+    headers: { Authorization: &#39;Bearer test-token&#39; },
+    // ... default values
+    ...overrides,
+  };
+}
+
+describe(&#39;Handler&#39;, () =&gt; {
+  beforeEach(() =&gt; {
+    vi.clearAllMocks();
+  });
+
+  it(&#39;should return 200 for valid request&#39;, async () =&gt; {
+    (listTenants as ReturnType&lt;typeof vi.fn&gt;).mockResolvedValue([]);
+    
+    const event = createMockEvent({ path: &#39;/admin/tenants&#39; });
+    const result = await handler(event, mockContext);
+    
+    expect(result.statusCode).toBe(200);
+  });
+});</code></pre>
+<h3 id="shared-module-tests">Shared Module Tests</h3>
+<p>Test shared utilities and services:</p>
+<pre class="typescript"><code>// packages/infrastructure/lambda/shared/__tests__/errors.test.ts
+import { describe, it, expect } from &#39;vitest&#39;;
+import {
+  ValidationError,
+  NotFoundError,
+  isOperationalError,
+  toAppError,
+} from &#39;../errors&#39;;
+
+describe(&#39;Error Classes&#39;, () =&gt; {
+  it(&#39;should create ValidationError with 400 status&#39;, () =&gt; {
+    const error = new ValidationError(&#39;Invalid input&#39;);
+    
+    expect(error.statusCode).toBe(400);
+    expect(error.code).toBe(&#39;VALIDATION_ERROR&#39;);
+  });
+});</code></pre>
+<hr />
+<h2 id="e2e-testing-admin-dashboard">E2E Testing (Admin Dashboard)</h2>
+<h3 id="setup">Setup</h3>
+<pre class="bash"><code>cd apps/admin-dashboard
+
+# Install Playwright browsers
+npx playwright install
+
+# Run E2E tests
+pnpm test:e2e
+
+# Run with UI
+pnpm test:e2e:ui
+
+# Run specific test file
+pnpm test:e2e -- dashboard.spec.ts</code></pre>
+<h3 id="test-structure">Test Structure</h3>
+<pre><code>apps/admin-dashboard/e2e/
+├── dashboard.spec.ts      # Dashboard navigation tests
+├── deployment.spec.ts     # Deployment workflow tests
+└── fixtures/
+    └── test-data.json     # Test fixtures</code></pre>
+<h3 id="writing-e2e-tests">Writing E2E Tests</h3>
+<pre class="typescript"><code>// apps/admin-dashboard/e2e/dashboard.spec.ts
+import { test, expect } from &#39;@playwright/test&#39;;
+
+test.describe(&#39;Dashboard&#39;, () =&gt; {
+  test.beforeEach(async ({ page }) =&gt; {
+    // Mock authentication
+    await page.addInitScript(() =&gt; {
+      localStorage.setItem(&#39;auth_token&#39;, &#39;test-token&#39;);
+      localStorage.setItem(&#39;user&#39;, JSON.stringify({
+        id: &#39;test-user&#39;,
+        email: &#39;test@example.com&#39;,
+        role: &#39;admin&#39;,
+      }));
+    });
+  });
+
+  test(&#39;should display dashboard home&#39;, async ({ page }) =&gt; {
+    await page.goto(&#39;/&#39;);
+    await expect(page.getByRole(&#39;heading&#39;, { level: 1 }))
+      .toContainText(&#39;Dashboard&#39;);
+  });
+
+  test(&#39;should navigate to models page&#39;, async ({ page }) =&gt; {
+    await page.goto(&#39;/&#39;);
+    await page.getByRole(&#39;link&#39;, { name: &#39;Models&#39; }).click();
+    await expect(page).toHaveURL(&#39;/models&#39;);
+  });
+});</code></pre>
+<hr />
+<h2 id="swift-testing">Swift Testing</h2>
+<h3 id="test-structure-1">Test Structure</h3>
+<pre><code>apps/swift-deployer/Tests/
+├── RadiantDeployerTests.swift           # Basic unit tests
+└── RadiantDeployerTests/
+    ├── E2ETests/
+    │   └── DeploymentE2ETests.swift     # E2E workflow tests
+    └── ServiceTests/
+        ├── LocalStorageManagerTests.swift
+        └── CredentialServiceTests.swift</code></pre>
+<h3 id="running-swift-tests">Running Swift Tests</h3>
+<pre class="bash"><code>cd apps/swift-deployer
+
+# Run all tests
+swift test
+
+# Run specific test class
+swift test --filter LocalStorageManagerTests
+
+# Run with verbose output
+swift test -v
+
+# Generate coverage (requires llvm-cov)
+swift test --enable-code-coverage</code></pre>
+<h3 id="writing-swift-tests">Writing Swift Tests</h3>
+<pre class="swift"><code>import XCTest
+@testable import RadiantDeployer
+
+final class LocalStorageManagerTests: XCTestCase {
+    var storageManager: LocalStorageManager!
+    
+    override func setUp() {
+        super.setUp()
+        storageManager = LocalStorageManager.shared
+    }
+    
+    override func tearDown() {
+        // Cleanup
+        super.tearDown()
+    }
+    
+    func testSaveAndLoadConfiguration() async throws {
+        // Given
+        let key = &quot;test_config&quot;
+        let config = TestConfiguration(name: &quot;Test&quot;, value: 42)
+        
+        // When
+        try await storageManager.save(config, forKey: key)
+        let loaded: TestConfiguration? = try await storageManager.load(forKey: key)
+        
+        // Then
+        XCTAssertNotNil(loaded)
+        XCTAssertEqual(loaded?.name, &quot;Test&quot;)
+        XCTAssertEqual(loaded?.value, 42)
+    }
+}</code></pre>
+<hr />
+<h2 id="test-utilities">Test Utilities</h2>
+<h3 id="mock-factories">Mock Factories</h3>
+<p>Use the shared testing utilities:</p>
+<pre class="typescript"><code>import {
+  createMockTenant,
+  createMockUser,
+  createMockApiKey,
+  createMockChatRequest,
+  createMockChatResponse,
+  createMockApiGatewayEvent,
+  createMockLambdaContext,
+} from &#39;@radiant/shared/testing&#39;;
+
+// Create mock data
+const tenant = createMockTenant({ name: &#39;Test Corp&#39; });
+const user = createMockUser({ tenantId: tenant.id });
+const event = createMockApiGatewayEvent({
+  httpMethod: &#39;POST&#39;,
+  body: JSON.stringify({ model: &#39;gpt-4o&#39; }),
+});</code></pre>
+<h3 id="assertion-helpers">Assertion Helpers</h3>
+<pre class="typescript"><code>import {
+  assertDefined,
+  assertEqual,
+  assertMatch,
+  assertContains,
+  assertThrows,
+  waitFor,
+  sleep,
+} from &#39;@radiant/shared/testing&#39;;
+
+// Custom assertions
+assertDefined(result, &#39;Result should not be null&#39;);
+assertMatch(response.id, /^chatcmpl_/, &#39;Invalid response ID format&#39;);
+
+// Wait for async condition
+await waitFor(() =&gt; service.isReady(), { timeout: 5000 });</code></pre>
+<hr />
+<h2 id="mocking-guidelines">Mocking Guidelines</h2>
+<h3 id="database-mocking">Database Mocking</h3>
+<pre class="typescript"><code>vi.mock(&#39;../db/client&#39;, () =&gt; ({
+  executeStatement: vi.fn(),
+}));
+
+import { executeStatement } from &#39;../db/client&#39;;
+
+// Mock return value
+(executeStatement as ReturnType&lt;typeof vi.fn&gt;).mockResolvedValue({
+  rows: [{ id: &#39;123&#39;, name: &#39;Test&#39; }],
+});</code></pre>
+<h3 id="aws-sdk-mocking">AWS SDK Mocking</h3>
+<pre class="typescript"><code>vi.mock(&#39;@aws-sdk/client-s3&#39;, () =&gt; ({
+  S3Client: vi.fn().mockImplementation(() =&gt; ({
+    send: vi.fn(),
+  })),
+  PutObjectCommand: vi.fn(),
+}));</code></pre>
+<h3 id="external-api-mocking">External API Mocking</h3>
+<pre class="typescript"><code>vi.mock(&#39;node-fetch&#39;, () =&gt; ({
+  default: vi.fn(),
+}));
+
+import fetch from &#39;node-fetch&#39;;
+
+(fetch as ReturnType&lt;typeof vi.fn&gt;).mockResolvedValue({
+  ok: true,
+  json: () =&gt; Promise.resolve({ data: &#39;mocked&#39; }),
+});</code></pre>
+<hr />
+<h2 id="cicd-integration">CI/CD Integration</h2>
+<p>Tests run automatically in GitHub Actions:</p>
+<pre class="yaml"><code># .github/workflows/ci.yml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run tests
+        run: pnpm test
+        env:
+          DATABASE_URL: postgres://test@localhost:5432/test</code></pre>
+<h3 id="coverage-requirements">Coverage Requirements</h3>
+<ul>
+<li>Minimum 80% coverage for new code</li>
+<li>Critical paths require 90%+ coverage</li>
+<li>All error handling paths must be tested</li>
+</ul>
+<hr />
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="dos">Do’s</h3>
+<ul>
+<li>✅ Test behavior, not implementation</li>
+<li>✅ Use descriptive test names</li>
+<li>✅ Mock external dependencies</li>
+<li>✅ Test error cases and edge cases</li>
+<li>✅ Keep tests fast and isolated</li>
+<li>✅ Use factory functions for test data</li>
+</ul>
+<h3 id="donts">Don’ts</h3>
+<ul>
+<li>❌ Don’t test private methods directly</li>
+<li>❌ Don’t share state between tests</li>
+<li>❌ Don’t test framework code</li>
+<li>❌ Don’t ignore flaky tests</li>
+<li>❌ Don’t hardcode test data</li>
+</ul>
+<h3 id="test-naming-convention">Test Naming Convention</h3>
+<pre class="typescript"><code>describe(&#39;ServiceName&#39;, () =&gt; {
+  describe(&#39;methodName&#39;, () =&gt; {
+    it(&#39;should return X when given Y&#39;, () =&gt; {});
+    it(&#39;should throw error when invalid input&#39;, () =&gt; {});
+    it(&#39;should handle empty array gracefully&#39;, () =&gt; {});
+  });
+});</code></pre>
+<hr />
+<h2 id="debugging-tests">Debugging Tests</h2>
+<h3 id="vitest">Vitest</h3>
+<pre class="bash"><code># Run with verbose output
+pnpm test -- --reporter=verbose
+
+# Run single test
+pnpm test -- -t &quot;should return 200&quot;
+
+# Debug mode
+node --inspect-brk node_modules/.bin/vitest run</code></pre>
+<h3 id="playwright">Playwright</h3>
+<pre class="bash"><code># Debug mode with browser
+pnpm test:e2e -- --debug
+
+# Generate trace on failure
+pnpm test:e2e -- --trace on
+
+# View trace
+npx playwright show-trace trace.zip</code></pre>
+<h3 id="swift">Swift</h3>
+<pre class="bash"><code># Run with verbose output
+swift test -v
+
+# Run single test
+swift test --filter &quot;testSaveAndLoadConfiguration&quot;</code></pre>
+<hr />
+<h2 id="see-also">See Also</h2>
+<ul>
+<li><a href="../CONTRIBUTING.md">Contributing Guide</a></li>
+<li><a href="ERROR_CODES.md">Error Codes Reference</a></li>
+<li><a href="API_REFERENCE.md">API Reference</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

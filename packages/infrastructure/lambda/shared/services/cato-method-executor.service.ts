@@ -228,7 +228,8 @@ export abstract class CatoBaseMethodExecutor<TInput = unknown, TOutput = unknown
 
   protected async applyContextStrategy(
     envelopes: CatoMethodEnvelope[],
-    strategy: CatoContextStrategy
+    strategy: CatoContextStrategy,
+    executionContext?: MethodExecutionContext
   ): Promise<CatoAccumulatedContext> {
     const originalCount = envelopes.length;
     let prunedEnvelopes: CatoMethodEnvelope[] = [];
@@ -255,11 +256,8 @@ export abstract class CatoBaseMethodExecutor<TInput = unknown, TOutput = unknown
         break;
 
       case CatoContextStrategy.SUMMARY:
-        // For summary, we'd typically call an LLM to summarize
-        // For now, just take key envelopes
-        prunedEnvelopes = envelopes.filter((_, i) => 
-          i === 0 || i === envelopes.length - 1
-        );
+        // Use LLM to create intelligent summary of context
+        prunedEnvelopes = await this.summarizeEnvelopes(envelopes, executionContext);
         break;
 
       default:
@@ -605,6 +603,70 @@ export abstract class CatoBaseMethodExecutor<TInput = unknown, TOutput = unknown
 
   protected generateSpanId(): string {
     return crypto.randomBytes(16).toString('hex');
+  }
+
+  /**
+   * Summarize envelopes using LLM for intelligent context pruning
+   * Returns key envelopes with middle ones summarized into their output data
+   */
+  protected async summarizeEnvelopes(
+    envelopes: CatoMethodEnvelope[],
+    context?: MethodExecutionContext
+  ): Promise<CatoMethodEnvelope[]> {
+    if (envelopes.length <= 3) {
+      return envelopes;
+    }
+
+    try {
+      // Build summary request for the middle envelopes
+      const middleEnvelopes = envelopes.slice(1, -1);
+      const summaryContent = middleEnvelopes.map((e, i) => 
+        `[${i + 1}] Output: ${JSON.stringify(e.output.data).substring(0, 500)}`
+      ).join('\n\n');
+
+      const summaryRequest: ModelRequest = {
+        modelId: 'groq/llama-3.1-8b-instant', // Fast model for summarization
+        messages: [{
+          role: 'user',
+          content: `Summarize the following method execution outputs into a concise context summary. 
+Focus on key decisions, outputs, and any important state changes.
+
+${summaryContent}
+
+Provide a JSON response with format: { "summary": "...", "keyPoints": ["...", "..."] }`
+        }],
+        systemPrompt: 'You are a context summarization assistant. Provide concise, accurate summaries.',
+        maxTokens: 1000,
+        temperature: 0.3,
+        tenantId: context?.tenantId || 'system',
+      };
+
+      const response = await this.modelRouter.invoke(summaryRequest);
+      
+      // Parse summary
+      let summaryData: { summary: string; keyPoints: string[] };
+      try {
+        const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+        summaryData = jsonMatch ? JSON.parse(jsonMatch[0]) : { 
+          summary: response.content, 
+          keyPoints: [] 
+        };
+      } catch {
+        summaryData = { summary: response.content, keyPoints: [] };
+      }
+
+      // Modify the first envelope to include summary in its output
+      const firstEnvelope = { ...envelopes[0] };
+      const outputData = firstEnvelope.output.data as Record<string, unknown>;
+      outputData._contextSummary = summaryData;
+      outputData._summarizedEnvelopeCount = middleEnvelopes.length;
+
+      // Return first (with summary) and last envelope
+      return [firstEnvelope, envelopes[envelopes.length - 1]];
+    } catch {
+      // Fallback: just take first and last if summarization fails
+      return [envelopes[0], envelopes[envelopes.length - 1]];
+    }
   }
 }
 

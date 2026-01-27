@@ -413,14 +413,67 @@ class PreCognitionService {
     intent: MorphicIntent,
     prompt: string
   ): Promise<PreCognitionSolution> {
-    // In production, this would call the Genesis model to pre-generate
-    // For now, we create template solutions based on intent
-
+    // Use Genesis model (Claude Sonnet) to pre-generate intelligent solutions
     const solution: PreCognitionSolution = {
       type: 'morph',
       suggestedActions: [],
     };
 
+    try {
+      const { callLiteLLM } = await import('../litellm.service.js');
+      
+      const response = await callLiteLLM({
+        model: 'claude-sonnet-4-20250514',
+        messages: [{
+          role: 'user',
+          content: `Based on this user intent and prompt, generate a pre-cognition solution.
+
+Intent: ${intent}
+Prompt: ${prompt}
+
+Respond with JSON:
+{
+  "componentType": "string (LineChart|BarChart|DataGrid|KanbanBoard|Calendar|Form|TextEditor)",
+  "props": { /* component-specific props */ },
+  "suggestedActions": ["action1", "action2"],
+  "dataBindings": ["field1", "field2"]
+}`
+        }],
+        temperature: 0.3,
+        max_tokens: 1000,
+      });
+
+      // Parse LLM response
+      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        
+        // Build layout from LLM suggestion
+        solution.morphLayout = {
+          id: uuidv4(),
+          type: 'single',
+          components: [{
+            id: uuidv4(),
+            componentId: parsed.componentType?.toLowerCase() || 'data-grid',
+            componentType: parsed.componentType || 'DataGrid',
+            props: parsed.props || {},
+            position: { x: 0, y: 0, w: 12, h: 8 },
+            ghostBindings: (parsed.dataBindings || []).map((b: string) => ({
+              targetProp: b,
+              sourceType: 'ghost',
+              sourceId: 'auto',
+            })),
+          }],
+        };
+        
+        solution.suggestedActions = parsed.suggestedActions || [];
+        return solution;
+      }
+    } catch (error) {
+      // Fall through to template-based solutions
+    }
+
+    // Fallback: template solutions based on intent
     switch (intent) {
       case 'visualization':
         solution.morphLayout = {

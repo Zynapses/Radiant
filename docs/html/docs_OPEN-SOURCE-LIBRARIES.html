@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OPEN SOURCE LIBRARIES - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>OPEN SOURCE LIBRARIES</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/OPEN-SOURCE-LIBRARIES.md</div>
+  </div>
+  
+  <h1 id="radiant-open-source-libraries-registry">RADIANT Open Source Libraries Registry</h1>
+<blockquote>
+<p><strong>Dependency Tracking &amp; License Compliance</strong></p>
+<p><strong>Version</strong>: 1.0 | <strong>Date</strong>: January 19, 2026<br />
+<strong>Last Updated</strong>: January 19, 2026</p>
+</blockquote>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>This document tracks all open source libraries used by RADIANT and Think Tank. It is <strong>MANDATORY</strong> to update this document when libraries are added or removed.</p>
+<p><strong>Policy</strong>: See <code>/.windsurf/workflows/open-source-library-policy.md</code></p>
+<hr />
+<h2 id="license-classification">License Classification</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 38%" />
+<col style="width: 15%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Commercial Use</th>
+<th>Flag</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅ <strong>Permissive</strong></td>
+<td>Free for commercial use</td>
+<td>None</td>
+<td>Auto-approved</td>
+</tr>
+<tr>
+<td>⚠️ <strong>Weak Copyleft</strong></td>
+<td>Usually OK with dynamic linking</td>
+<td><strong>⚠️ REVIEW</strong></td>
+<td>Legal review recommended</td>
+</tr>
+<tr>
+<td>🔶 <strong>Strong Copyleft</strong></td>
+<td>Requires source disclosure</td>
+<td><strong>🔶 COPYLEFT</strong></td>
+<td>Flag for review, document justification</td>
+</tr>
+<tr>
+<td>🚨 <strong>Non-Commercial</strong></td>
+<td>NOT free for commercial use</td>
+<td><strong>🚨 NON-COMMERCIAL</strong></td>
+<td>Flag for immediate review</td>
+</tr>
+<tr>
+<td>❓ <strong>Proprietary/Unknown</strong></td>
+<td>Requires paid license or unknown</td>
+<td><strong>❓ UNKNOWN</strong></td>
+<td>Flag and verify before production</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note</strong>: Flagged licenses are NOT automatically blocked. They require documentation and review to ensure proper compliance.</p>
+<hr />
+<h2 id="category-1-radiant-platform-internal-libraries">Category 1: RADIANT Platform Internal Libraries</h2>
+<p>Libraries used internally by the RADIANT platform infrastructure.</p>
+<h3 id="aws-sdk-libraries">AWS SDK Libraries</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@aws-sdk/client-apigatewaymanagementapi</code></td>
+<td>WebSocket API management</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-bedrock-runtime</code></td>
+<td>AWS Bedrock AI runtime</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-cloudwatch</code></td>
+<td>CloudWatch metrics</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-cloudwatch-logs</code></td>
+<td>CloudWatch logging</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-cognito-identity-provider</code></td>
+<td>User authentication</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-cost-explorer</code></td>
+<td>Cost analysis</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-dynamodb</code></td>
+<td>DynamoDB operations</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-ecs</code></td>
+<td>Container orchestration</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-eventbridge</code></td>
+<td>Event scheduling</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-kms</code></td>
+<td>Key management</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-lambda</code></td>
+<td>Lambda invocation</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-rds-data</code></td>
+<td>Aurora Data API</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-s3</code></td>
+<td>S3 storage</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-sagemaker</code></td>
+<td>ML model management</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-sagemaker-runtime</code></td>
+<td>ML inference</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-secrets-manager</code></td>
+<td>Secrets storage</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-ses</code></td>
+<td>Email sending</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-sns</code></td>
+<td>Push notifications</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-sqs</code></td>
+<td>Message queuing</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-ssm</code></td>
+<td>Parameter store</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/lib-dynamodb</code></td>
+<td>DynamoDB document client</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/s3-request-presigner</code></td>
+<td>Pre-signed S3 URLs</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-budgets</code></td>
+<td>Budget management</td>
+<td>Apache-2.0</td>
+<td>2024-06-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-elasticache</code></td>
+<td>Redis/ElastiCache</td>
+<td>Apache-2.0</td>
+<td>2024-06-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-kinesis</code></td>
+<td>Data streaming</td>
+<td>Apache-2.0</td>
+<td>2024-06-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-neptune</code></td>
+<td>Graph database</td>
+<td>Apache-2.0</td>
+<td>2024-06-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-opensearch</code></td>
+<td>Search service</td>
+<td>Apache-2.0</td>
+<td>2024-06-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-opensearchserverless</code></td>
+<td>Serverless search</td>
+<td>Apache-2.0</td>
+<td>2024-06-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-pricing</code></td>
+<td>AWS pricing API</td>
+<td>Apache-2.0</td>
+<td>2024-06-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@aws-sdk/client-textract</code></td>
+<td>Document OCR</td>
+<td>Apache-2.0</td>
+<td>2024-06-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="infrastructure-libraries">Infrastructure Libraries</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>aws-cdk-lib</code></td>
+<td>AWS Cloud Development Kit</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>constructs</code></td>
+<td>CDK constructs</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>source-map-support</code></td>
+<td>Stack trace support</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="database-caching-libraries">Database &amp; Caching Libraries</h3>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pg</code></td>
+<td>PostgreSQL client for Node.js</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>redis</code></td>
+<td>Redis client v5</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>ioredis</code></td>
+<td>Redis client (alternative)</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="payment-processing">Payment Processing</h3>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stripe</code></td>
+<td>Stripe payment SDK</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="validation-utilities">Validation &amp; Utilities</h3>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>zod</code></td>
+<td>TypeScript-first schema validation</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>uuid</code></td>
+<td>UUID generation</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>date-fns</code></td>
+<td>Date manipulation</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="observability">Observability</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@opentelemetry/api</code></td>
+<td>OpenTelemetry tracing API</td>
+<td>Apache-2.0</td>
+<td>2024-06-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="authentication">Authentication</h3>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jwks-rsa</code></td>
+<td>JWKS RSA key retrieval</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="category-2-think-tank-internal-libraries">Category 2: Think Tank Internal Libraries</h2>
+<p>Libraries used internally by Think Tank applications.</p>
+<h3 id="react-framework">React Framework</h3>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>react</code></td>
+<td>React UI library</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>react-dom</code></td>
+<td>React DOM bindings</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>next</code></td>
+<td>Next.js framework</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>next-themes</code></td>
+<td>Theme switching for Next.js</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ui-component-libraries-radix-ui">UI Component Libraries (Radix UI)</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@radix-ui/react-accordion</code></td>
+<td>Accessible accordion</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-alert-dialog</code></td>
+<td>Accessible alert dialogs</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-avatar</code></td>
+<td>Avatar component</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-checkbox</code></td>
+<td>Accessible checkbox</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-collapsible</code></td>
+<td>Collapsible sections</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-dialog</code></td>
+<td>Accessible modals</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-dropdown-menu</code></td>
+<td>Dropdown menus</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-label</code></td>
+<td>Form labels</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-popover</code></td>
+<td>Popover component</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-progress</code></td>
+<td>Progress indicators</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-scroll-area</code></td>
+<td>Custom scrollbars</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-select</code></td>
+<td>Accessible select</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-separator</code></td>
+<td>Visual separator</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-slider</code></td>
+<td>Range slider</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-slot</code></td>
+<td>Slot composition</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-switch</code></td>
+<td>Toggle switch</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-tabs</code></td>
+<td>Tab navigation</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-toast</code></td>
+<td>Toast notifications</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@radix-ui/react-tooltip</code></td>
+<td>Tooltips</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="state-management-data-fetching">State Management &amp; Data Fetching</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@tanstack/react-query</code></td>
+<td>Server state management</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@tanstack/react-query-devtools</code></td>
+<td>React Query devtools</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>zustand</code></td>
+<td>Lightweight state management with persistence</td>
+<td>MIT</td>
+<td>2026-01-19</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="styling-animation">Styling &amp; Animation</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tailwindcss</code></td>
+<td>Utility-first CSS framework</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>tailwindcss-animate</code></td>
+<td>Tailwind animation utilities</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>tailwind-merge</code></td>
+<td>Merge Tailwind classes</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>class-variance-authority</code></td>
+<td>Variant class management</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>clsx</code></td>
+<td>Conditional classnames</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>framer-motion</code></td>
+<td>Animation library</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>autoprefixer</code></td>
+<td>CSS vendor prefixing</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>postcss</code></td>
+<td>CSS transformation</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="forms">Forms</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>react-hook-form</code></td>
+<td>Performant forms</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@hookform/resolvers</code></td>
+<td>Form validation resolvers</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="icons-visualization">Icons &amp; Visualization</h3>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lucide-react</code></td>
+<td>Icon library</td>
+<td>ISC</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>recharts</code></td>
+<td>Charting library</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>d3-geo</code></td>
+<td>Geographic projections</td>
+<td>ISC</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>react-simple-maps</code></td>
+<td>Map components</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>topojson-client</code></td>
+<td>TopoJSON parsing</td>
+<td>ISC</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="content-rendering">Content Rendering</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>react-markdown</code></td>
+<td>Markdown rendering in React</td>
+<td>MIT</td>
+<td>2026-01-19</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>react-syntax-highlighter</code></td>
+<td>Code syntax highlighting</td>
+<td>MIT</td>
+<td>2026-01-19</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ui-utilities">UI Utilities</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cmdk</code></td>
+<td>Command palette</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>sonner</code></td>
+<td>Toast notifications</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>react-resizable-panels</code></td>
+<td>Resizable panel layouts</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="category-3-orchestration-user-libraries">Category 3: Orchestration / User Libraries</h2>
+<p>Libraries that users or Cato can invoke for document processing, file conversion, and AI orchestration.</p>
+<h3 id="document-processing">Document Processing</h3>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mammoth</code></td>
+<td>DOCX to HTML conversion</td>
+<td>BSD-2-Clause</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>pdf-parse</code></td>
+<td>PDF text extraction</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>xlsx</code></td>
+<td>Excel file processing</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>pdfkit</code></td>
+<td>PDF generation for AI reports</td>
+<td>MIT</td>
+<td>2026-01-22</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>exceljs</code></td>
+<td>Excel generation for AI reports</td>
+<td>MIT</td>
+<td>2026-01-22</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="media-processing">Media Processing</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sharp</code></td>
+<td>High-performance image processing</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@ts-ffmpeg/fluent-ffmpeg</code></td>
+<td>FFmpeg wrapper (TypeScript fork)</td>
+<td>MIT</td>
+<td>2026-01-20</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="collaboration-crdt">Collaboration (CRDT)</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>yjs</code></td>
+<td>CRDT implementation for real-time collaboration</td>
+<td>MIT</td>
+<td>2024-06-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>y-protocols</code></td>
+<td>Yjs protocol handlers</td>
+<td>MIT</td>
+<td>2024-06-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="archiving">Archiving</h3>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>adm-zip</code></td>
+<td>ZIP file handling</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>tar</code></td>
+<td>TAR archive handling</td>
+<td>ISC</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="browser-automation">Browser Automation</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>playwright</code></td>
+<td>Browser automation for web scraping</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="category-4-cli-libraries">Category 4: CLI Libraries</h2>
+<p>Libraries used by the RADIANT CLI tool.</p>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>commander</code></td>
+<td>Command-line argument parsing</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>inquirer</code></td>
+<td>Interactive CLI prompts</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>chalk</code></td>
+<td>Terminal string styling</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>ora</code></td>
+<td>Terminal spinners</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>conf</code></td>
+<td>Configuration storage</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>table</code></td>
+<td>CLI table formatting</td>
+<td>BSD-3-Clause</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="category-5-swift-libraries-macos-deployer">Category 5: Swift Libraries (macOS Deployer)</h2>
+<p>Libraries used by the Swift macOS deployer application.</p>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GRDB.swift</code></td>
+<td>SQLite database toolkit</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="category-6-development-testing-libraries">Category 6: Development &amp; Testing Libraries</h2>
+<p>Libraries used only in development and testing environments.</p>
+<h3 id="testing-frameworks">Testing Frameworks</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vitest</code></td>
+<td>Vite-native test runner</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@vitest/coverage-v8</code></td>
+<td>Vitest coverage with V8</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@vitest/ui</code></td>
+<td>Vitest UI</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>jest</code></td>
+<td>JavaScript testing framework</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>ts-jest</code></td>
+<td>TypeScript Jest transformer</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@playwright/test</code></td>
+<td>Playwright test runner</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@testing-library/react</code></td>
+<td>React testing utilities</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>jsdom</code></td>
+<td>DOM implementation for Node.js</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>chai</code></td>
+<td>Assertion library</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="build-tools">Build Tools</h3>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>typescript</code></td>
+<td>TypeScript compiler</td>
+<td>Apache-2.0</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>ts-node</code></td>
+<td>TypeScript execution</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>tsup</code></td>
+<td>TypeScript bundler</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>esbuild</code></td>
+<td>Fast JavaScript bundler</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@vitejs/plugin-react</code></td>
+<td>Vite React plugin</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="linting-formatting">Linting &amp; Formatting</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>eslint</code></td>
+<td>JavaScript linter</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>eslint-config-next</code></td>
+<td>Next.js ESLint config</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@typescript-eslint/eslint-plugin</code></td>
+<td>TypeScript ESLint rules</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@typescript-eslint/parser</code></td>
+<td>TypeScript ESLint parser</td>
+<td>BSD-2-Clause</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>husky</code></td>
+<td>Git hooks</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>lint-staged</code></td>
+<td>Lint staged files</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="type-definitions">Type Definitions</h3>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 26%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Description</th>
+<th>License</th>
+<th>Date Added</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@types/node</code></td>
+<td>Node.js type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/react</code></td>
+<td>React type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/react-dom</code></td>
+<td>React DOM type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/aws-lambda</code></td>
+<td>AWS Lambda type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/pg</code></td>
+<td>PostgreSQL type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/uuid</code></td>
+<td>UUID type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/jest</code></td>
+<td>Jest type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/inquirer</code></td>
+<td>Inquirer type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/d3-geo</code></td>
+<td>D3 Geo type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/topojson-client</code></td>
+<td>TopoJSON type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/adm-zip</code></td>
+<td>ADM-ZIP type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/fluent-ffmpeg</code></td>
+<td>FFmpeg type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/jsonwebtoken</code></td>
+<td>JWT type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/pdf-parse</code></td>
+<td>PDF Parse type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>@types/sharp</code></td>
+<td>Sharp type definitions</td>
+<td>MIT</td>
+<td>2024-01-01</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="license-summary">License Summary</h2>
+<table>
+<thead>
+<tr>
+<th>License</th>
+<th>Count</th>
+<th>Commercial Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MIT</td>
+<td>85+</td>
+<td>✅ Free</td>
+</tr>
+<tr>
+<td>Apache-2.0</td>
+<td>35+</td>
+<td>✅ Free</td>
+</tr>
+<tr>
+<td>ISC</td>
+<td>5</td>
+<td>✅ Free</td>
+</tr>
+<tr>
+<td>BSD-2-Clause</td>
+<td>2</td>
+<td>✅ Free</td>
+</tr>
+<tr>
+<td>BSD-3-Clause</td>
+<td>1</td>
+<td>✅ Free</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total Libraries</strong>: 120+<br />
+<strong>🔶 Copyleft Flagged</strong>: 0<br />
+<strong>🚨 Non-Commercial Flagged</strong>: 0<br />
+<strong>⚠️ Review Required</strong>: 0</p>
+<hr />
+<h2 id="adding-a-new-library">Adding a New Library</h2>
+<p>When adding a new library, you <strong>MUST</strong>:</p>
+<ol type="1">
+<li><strong>Check the license</strong> - Identify the license type</li>
+<li><strong>Categorize it</strong> - Determine which category it belongs to</li>
+<li><strong>Update this document</strong> - Add it to the appropriate table</li>
+<li><strong>Include all fields</strong>: Name, Description, License, Date Added, Flag</li>
+<li><strong>If flagged</strong> - Document justification in “Flagged Libraries” section below</li>
+</ol>
+<h3 id="license-classification-process">License Classification Process</h3>
+<table>
+<thead>
+<tr>
+<th>License Type</th>
+<th>Flag</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MIT, Apache-2.0, ISC, BSD</td>
+<td>✅</td>
+<td>Auto-approved</td>
+</tr>
+<tr>
+<td>LGPL-2.1, LGPL-3.0</td>
+<td>⚠️ REVIEW</td>
+<td>Flag, legal review recommended</td>
+</tr>
+<tr>
+<td>MPL-2.0</td>
+<td>⚠️ REVIEW</td>
+<td>Flag, file-level copyleft</td>
+</tr>
+<tr>
+<td>GPL-2.0, GPL-3.0</td>
+<td>🔶 COPYLEFT</td>
+<td>Flag, document isolation strategy</td>
+</tr>
+<tr>
+<td>AGPL-3.0</td>
+<td>🔶 COPYLEFT</td>
+<td>Flag, document network usage</td>
+</tr>
+<tr>
+<td>SSPL</td>
+<td>🚨 NON-COMMERCIAL</td>
+<td>Flag for immediate review</td>
+</tr>
+<tr>
+<td>Commons Clause</td>
+<td>🚨 NON-COMMERCIAL</td>
+<td>Flag for immediate review</td>
+</tr>
+<tr>
+<td>Proprietary</td>
+<td>❓ UNKNOWN</td>
+<td>Flag, verify licensing terms</td>
+</tr>
+<tr>
+<td>Unknown</td>
+<td>❓ UNKNOWN</td>
+<td>Flag, must verify before production</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="flagged-libraries">Flagged Libraries</h2>
+<p>Libraries with non-permissive licenses that require documentation.</p>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>License</th>
+<th>Flag</th>
+<th>Justification</th>
+<th>Reviewed By</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>No flagged libraries yet</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="removing-a-library">Removing a Library</h2>
+<p>When removing a library:</p>
+<ol type="1">
+<li><strong>Update this document</strong> - Remove from the appropriate table</li>
+<li><strong>Add to removal log</strong> - Document in the “Removal History” section below</li>
+<li><strong>Update package.json</strong> - Remove from all relevant package files</li>
+</ol>
+<hr />
+<h2 id="removal-history">Removal History</h2>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 24%" />
+<col style="width: 34%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr>
+<th>Library</th>
+<th>Category</th>
+<th>Removal Date</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fluent-ffmpeg</code></td>
+<td>Media Processing</td>
+<td>2026-01-20</td>
+<td>Deprecated/unmaintained, replaced with <code>@ts-ffmpeg/fluent-ffmpeg</code></td>
+</tr>
+<tr>
+<td><code>@types/fluent-ffmpeg</code></td>
+<td>Type Definitions</td>
+<td>2026-01-20</td>
+<td>No longer needed, replacement includes types</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><strong>Policy</strong>: This document is maintained under <code>/.windsurf/workflows/open-source-library-policy.md</code></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

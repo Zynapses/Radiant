@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DEPLOYER ARCHITECTURE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>DEPLOYER ARCHITECTURE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/DEPLOYER-ARCHITECTURE.md</div>
+  </div>
+  
+  <h1 id="radiant-deployer-architecture-deployment-packages">RADIANT Deployer Architecture &amp; Deployment Packages</h1>
+<blockquote>
+<p><strong>Technical Architecture Document</strong></p>
+<p>Version: 4.18.1 | Last Updated: December 2024</p>
+</blockquote>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>The RadiantDeployer Swift app operates in three distinct modes, each with different behaviors for parameter handling, package selection, and database operations.</p>
+<h2 id="deployment-modes">Deployment Modes</h2>
+<h3 id="mode-definitions">Mode Definitions</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                        DEPLOYER OPERATIONAL MODES                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐                │
+│  │   INSTALL    │     │    UPDATE    │     │   ROLLBACK   │                │
+│  │  (Fresh)     │     │  (Upgrade)   │     │  (Revert)    │                │
+│  └──────┬───────┘     └──────┬───────┘     └──────┬───────┘                │
+│         │                    │                    │                         │
+│         ▼                    ▼                    ▼                         │
+│  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐                │
+│  │ Use Default  │     │ Read Current │     │ Read Target  │                │
+│  │ Parameters   │     │ From Instance│     │ Snapshot     │                │
+│  └──────┬───────┘     └──────┬───────┘     └──────┬───────┘                │
+│         │                    │                    │                         │
+│         ▼                    ▼                    ▼                         │
+│  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐                │
+│  │ Seed AI      │     │ Merge User   │     │ Restore      │                │
+│  │ Registry     │     │ Changes      │     │ Previous     │                │
+│  └──────┬───────┘     └──────┬───────┘     └──────┬───────┘                │
+│         │                    │                    │                         │
+│         ▼                    ▼                    ▼                         │
+│  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐                │
+│  │ Create New   │     │ Apply Delta  │     │ Apply        │                │
+│  │ Instance     │     │ Changes      │     │ Snapshot     │                │
+│  └──────────────┘     └──────────────┘     └──────────────┘                │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="install-mode-fresh-installation">INSTALL Mode (Fresh Installation)</h3>
+<p><strong>Trigger:</strong> No existing deployment detected for app/environment combination</p>
+<p><strong>Key Behaviors:</strong> 1. Uses DEFAULT parameters from tier configuration 2. Runs ALL database migrations (fresh) 3. SEEDS the AI Registry with providers and models 4. Creates initial admin user 5. Stores deployment metadata</p>
+<p><strong>Parameter Source:</strong> <code>InstallationParameters.defaults()</code></p>
+<pre class="swift"><code>// Parameters are initialized with tier-appropriate defaults
+let parameters = InstallationParameters.defaults(
+    appId: app.id,
+    environment: environment,
+    tier: .growth  // Based on selected tier
+)</code></pre>
+<h3 id="update-mode-upgrade-existing">UPDATE Mode (Upgrade Existing)</h3>
+<p><strong>Trigger:</strong> Existing deployment detected AND target version &gt;= current version</p>
+<p><strong>Key Behaviors:</strong> 1. Fetches current parameters FROM the running instance 2. Creates pre-update snapshot for rollback 3. MERGES user changes with current parameters 4. Validates parameter changes are safe 5. Runs INCREMENTAL migrations only 6. <strong>DOES NOT</strong> seed AI Registry (preserves admin customizations)</p>
+<p><strong>Parameter Source:</strong> Running instance API + user modifications</p>
+<pre class="swift"><code>// Parameters fetched from instance, then merged with user changes
+let currentParameters = await fetchCurrentParameters(app, environment, credentials)
+let updatedParameters = mergeParameters(current: currentParameters, changes: userChanges)</code></pre>
+<h3 id="rollback-mode-revert-to-previous">ROLLBACK Mode (Revert to Previous)</h3>
+<p><strong>Trigger:</strong> User explicitly requests rollback OR target version &lt; current version</p>
+<p><strong>Key Behaviors:</strong> 1. Loads target snapshot from S3 2. Creates safety snapshot of current state 3. Deploys with SNAPSHOT parameters (not current, not defaults) 4. Optionally restores database from RDS snapshot 5. Does not modify AI Registry</p>
+<p><strong>Parameter Source:</strong> Selected snapshot</p>
+<hr />
+<h2 id="deployment-package-structure">Deployment Package Structure</h2>
+<p>Deployment packages are self-contained, versioned bundles containing everything needed to deploy a specific version of RADIANT.</p>
+<pre><code>radiant-4.18.0-abc123.radpkg
+├── manifest.json              # Package metadata &amp; verification
+├── checksums.sha256           # File integrity verification
+│
+├── infrastructure/            # CDK Stacks (compiled)
+│   ├── cdk.out/               # Synthesized CloudFormation
+│   ├── lib/                   # CDK TypeScript (compiled)
+│   └── cdk.json               # CDK configuration
+│
+├── migrations/                # Database migrations
+│   ├── radiant/               # Core schema migrations
+│   ├── thinktank/             # Think Tank specific
+│   └── seeds/                 # Seed data (AI Registry, etc.)
+│
+├── functions/                 # Lambda function code
+│   ├── api/                   # API handlers
+│   ├── admin/                 # Admin handlers
+│   ├── billing/               # Billing handlers
+│   └── thermal/               # Thermal management
+│
+├── admin-dashboard/           # Next.js admin dashboard
+│   └── .next/                 # Compiled Next.js
+│
+└── config/                    # Default configurations
+    ├── defaults.json          # Default parameters per tier
+    ├── providers.json         # AI provider seed data
+    └── models.json            # AI model seed data</code></pre>
+<h3 id="package-manifest">Package Manifest</h3>
+<pre class="json"><code>{
+  &quot;packageFormat&quot;: &quot;radpkg-v1&quot;,
+  &quot;version&quot;: &quot;4.18.0&quot;,
+  &quot;buildId&quot;: &quot;abc123def456&quot;,
+  &quot;buildTimestamp&quot;: &quot;2024-12-24T10:30:00Z&quot;,
+  
+  &quot;components&quot;: {
+    &quot;radiantPlatform&quot;: {
+      &quot;version&quot;: &quot;4.18.0&quot;,
+      &quot;minUpgradeFrom&quot;: &quot;4.15.0&quot;
+    },
+    &quot;thinkTank&quot;: {
+      &quot;version&quot;: &quot;3.2.0&quot;,
+      &quot;minUpgradeFrom&quot;: &quot;3.0.0&quot;
+    }
+  },
+  
+  &quot;compatibility&quot;: {
+    &quot;minimumDeployerVersion&quot;: &quot;4.16.0&quot;,
+    &quot;supportedTiers&quot;: [&quot;SEED&quot;, &quot;STARTER&quot;, &quot;GROWTH&quot;, &quot;SCALE&quot;, &quot;ENTERPRISE&quot;],
+    &quot;supportedRegions&quot;: [&quot;us-east-1&quot;, &quot;us-west-2&quot;, &quot;eu-west-1&quot;, &quot;ap-southeast-1&quot;]
+  },
+  
+  &quot;installBehavior&quot;: {
+    &quot;seedAIRegistry&quot;: true,
+    &quot;createInitialAdmin&quot;: true,
+    &quot;runFullMigrations&quot;: true
+  },
+  
+  &quot;updateBehavior&quot;: {
+    &quot;seedAIRegistry&quot;: false,
+    &quot;preserveAdminCustomizations&quot;: true,
+    &quot;runIncrementalMigrations&quot;: true,
+    &quot;createPreUpdateSnapshot&quot;: true
+  }
+}</code></pre>
+<hr />
+<h2 id="package-storage-locations">Package Storage Locations</h2>
+<pre><code>1. DEPLOYER APP CACHE (Local)
+   ~/Library/Application Support/RadiantDeployer/packages/
+   ├── radiant-4.18.0-abc123.radpkg
+   ├── radiant-4.17.0-def456.radpkg
+   └── index.json
+
+2. S3 RELEASE BUCKET (Cloud - Official Releases)
+   s3://radiant-releases-{region}/
+   ├── stable/
+   │   ├── radiant-4.18.0-abc123.radpkg
+   │   └── latest.json
+   ├── beta/
+   │   └── radiant-4.19.0-beta1-xyz789.radpkg
+   └── archive/
+       └── radiant-4.17.0-def456.radpkg
+
+3. DEPLOYED INSTANCE (Cloud - Per Instance)
+   s3://radiant-{appId}-{env}-deployments/
+   ├── current/
+   │   └── radiant-4.18.0-abc123.radpkg
+   └── snapshots/
+       ├── snapshot-2024-12-24T10-30-00Z/
+       │   ├── package.radpkg
+       │   ├── parameters.json
+       │   └── db-snapshot-id.txt
+       └── ...</code></pre>
+<hr />
+<h2 id="key-implementation-files">Key Implementation Files</h2>
+<h3 id="swift-deployer">Swift Deployer</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Models/InstallationParameters.swift</code></td>
+<td>DeploymentMode enum, TierLevel, InstallationParameters, InstanceParameters, ParameterChanges, DeploymentSnapshot</td>
+</tr>
+<tr>
+<td><code>Services/DeploymentService.swift</code></td>
+<td>Mode detection, executeInstall, executeUpdate, executeRollback, parameter fetching/merging</td>
+</tr>
+<tr>
+<td><code>Services/PackageService.swift</code></td>
+<td>Package discovery, download, verification, caching</td>
+</tr>
+<tr>
+<td><code>Views/Deployment/ParameterEditorView.swift</code></td>
+<td>UI for editing parameters based on mode</td>
+</tr>
+</tbody>
+</table>
+<h3 id="build-tools">Build Tools</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tools/scripts/build-package.sh</code></td>
+<td>Build deployment packages from source</td>
+</tr>
+<tr>
+<td><code>tools/version-manager.ts</code></td>
+<td>Version bumping and synchronization</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="data-flow-diagrams">Data Flow Diagrams</h2>
+<h3 id="install-flow">Install Flow</h3>
+<pre><code>User                    Deployer                    AWS
+────                    ────────                    ───
+
+1. Select App    ──────►
+2. Select Env    ──────►
+3. Select Tier   ──────►
+4. Click Deploy  ──────►
+                       5. Check instance exists ──────► (None found)
+                       6. Mode = INSTALL
+                       7. Load DEFAULT params
+                       8. Download latest package ◄────── S3
+                       9. Verify package integrity
+                       10. Deploy CDK stacks ─────────► CloudFormation
+                       11. Run ALL migrations ─────────► Aurora
+                       12. SEED AI Registry ──────────► Aurora
+                       13. Create initial admin ──────► Cognito
+                       14. Store deployment meta ─────► S3 + DB
+                       15. Report success
+◄───────────────────────</code></pre>
+<h3 id="update-flow">Update Flow</h3>
+<pre><code>User                    Deployer                    AWS + Instance
+────                    ────────                    ──────────────
+
+1. Select App    ──────►
+2. Select Env    ──────►
+3. Change Params ──────►
+4. Click Update  ──────►
+                       5. Check instance exists ──────► (Found!)
+                       6. Mode = UPDATE
+                       7. Fetch CURRENT params ◄──────── Radiant API
+                       8. Create snapshot ────────────► S3
+                       9. MERGE user changes
+                       10. Validate changes
+                       11. Download target package ◄──── S3
+                       12. Deploy CDK stacks ─────────► CloudFormation
+                       13. Run INCREMENTAL migrations ► Aurora
+                       14. SKIP AI Registry seeding
+                       15. Update deployment meta ────► S3 + DB
+                       16. Report success
+◄───────────────────────</code></pre>
+<h3 id="rollback-flow">Rollback Flow</h3>
+<pre><code>User                    Deployer                    AWS
+────                    ────────                    ───
+
+1. Select App    ──────►
+2. Select Env    ──────►
+3. Select Snapshot ────►
+4. Click Rollback ─────►
+                       5. Mode = ROLLBACK
+                       6. Load target snapshot ◄──────── S3
+                       7. Validate compatibility
+                       8. Create safety snapshot ─────► S3
+                       9. Download snapshot package ◄── S3
+                       10. Deploy CDK stacks ─────────► CloudFormation
+                       11. Optionally restore DB ─────► RDS Snapshot
+                       12. Update deployment meta ────► S3 + DB
+                       13. Report success
+◄───────────────────────</code></pre>
+<hr />
+<h2 id="verification-checklist">Verification Checklist</h2>
+<h3 id="deployment-modes-1">Deployment Modes</h3>
+<ul>
+<li><strong>On INSTALL</strong>: Parameters come from defaults</li>
+<li><strong>On UPDATE</strong>: Parameters come from running instance + user changes</li>
+<li><strong>On ROLLBACK</strong>: Parameters come from selected snapshot</li>
+</ul>
+<h3 id="ai-registry-seeding">AI Registry Seeding</h3>
+<ul>
+<li>AI Registry is seeded ONLY on fresh install</li>
+<li>On UPDATE, AI Registry is preserved (not touched)</li>
+<li>Admins can add/remove providers via Admin Dashboard</li>
+</ul>
+<h3 id="deployment-packages">Deployment Packages</h3>
+<ul>
+<li>Packages are created by build-package.sh script</li>
+<li>Package creation is triggered by code changes or version bumps</li>
+<li>Packages are stored in local cache, S3 release bucket, and instance bucket</li>
+</ul>
+<h3 id="parameter-rules">Parameter Rules</h3>
+<ul>
+<li>Region CANNOT be changed after install</li>
+<li>Tier CAN be changed on update (with feature validation)</li>
+<li>All parameter changes are tracked via snapshots</li>
+</ul>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="DEPLOYER-ADMIN-GUIDE.md">Deployer Admin Guide</a> - User-facing documentation</li>
+<li><a href="DEPLOYMENT-GUIDE.md">Deployment Guide</a> - Deployment procedures</li>
+<li><a href="API_REFERENCE.md">API Reference</a> - API documentation</li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAWS USER GUIDE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RAWS USER GUIDE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/RAWS-USER-GUIDE.md</div>
+  </div>
+  
+  <h1 id="raws-v1.1-user-documentation">RAWS v1.1 User Documentation</h1>
+<h2 id="api-guide-for-developers-and-integrators">API Guide for Developers and Integrators</h2>
+<hr />
+<p><strong>Document Version:</strong> 1.1.0<br />
+<strong>API Version:</strong> v1<br />
+<strong>Last Updated:</strong> January 2026</p>
+<hr />
+<h2 id="introduction">1. Introduction</h2>
+<p>RAWS (RADIANT AI Weighted Selection) automatically selects the optimal AI model for your requests based on:</p>
+<ul>
+<li><strong>Quality</strong>: How accurate the model is</li>
+<li><strong>Cost</strong>: Price for your usage</li>
+<li><strong>Latency</strong>: Response speed</li>
+<li><strong>Capabilities</strong>: Features supported</li>
+<li><strong>Compliance</strong>: Regulatory certifications</li>
+</ul>
+<h3 id="why-use-raws">Why Use RAWS?</h3>
+<table>
+<thead>
+<tr>
+<th>Without RAWS</th>
+<th>With RAWS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Manually choose models</td>
+<td>Automatic optimization</td>
+</tr>
+<tr>
+<td>Risk compliance violations</td>
+<td>Compliance-aware filtering</td>
+</tr>
+<tr>
+<td>Static selection</td>
+<td>Dynamic, context-aware</td>
+</tr>
+<tr>
+<td>No fallback handling</td>
+<td>Automatic fallback chain</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="quick-start">2. Quick Start</h2>
+<pre class="bash"><code>curl -X POST https://api.radiant.example.com/v1/raws/select \
+  -H &quot;Authorization: Bearer YOUR_API_KEY&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#39;{
+    &quot;requiredCapabilities&quot;: [&quot;chat&quot;, &quot;streaming&quot;],
+    &quot;estimatedInputTokens&quot;: 1000,
+    &quot;estimatedOutputTokens&quot;: 500
+  }&#39;</code></pre>
+<hr />
+<h2 id="domain-specific-selection">3. Domain-Specific Selection</h2>
+<p>RAWS supports 7 domains, each with appropriate compliance requirements:</p>
+<h3 id="domain-overview">3.1 Domain Overview</h3>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Use Case</th>
+<th>Compliance</th>
+<th>Min Quality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>healthcare</code></td>
+<td>Medical, clinical</td>
+<td>HIPAA required</td>
+<td>80</td>
+</tr>
+<tr>
+<td><code>financial</code></td>
+<td>Investment, accounting</td>
+<td>SOC 2 required</td>
+<td>75</td>
+</tr>
+<tr>
+<td><code>legal</code></td>
+<td>Contracts, litigation</td>
+<td>SOC 2 required</td>
+<td>80</td>
+</tr>
+<tr>
+<td><code>scientific</code></td>
+<td>Research, academic</td>
+<td>Varies</td>
+<td>70</td>
+</tr>
+<tr>
+<td><code>creative</code></td>
+<td>Content, marketing</td>
+<td>None</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>engineering</code></td>
+<td>Code, software</td>
+<td>Varies</td>
+<td>70</td>
+</tr>
+<tr>
+<td><code>general</code></td>
+<td>Default</td>
+<td>None</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="healthcare-domain">3.2 Healthcare Domain</h3>
+<p><strong>When to Use</strong>: Medical queries, patient data, clinical documentation</p>
+<p><strong>Compliance</strong>: HIPAA is <strong>mandatory</strong>. All models must be HIPAA-certified.</p>
+<p><strong>What Happens</strong>: - Only HIPAA-compliant models considered - Minimum quality score of 80 enforced - System 2 reasoning forced (no fast/cheap models) - Truth Engine verification required (ECD ≤ 0.05)</p>
+<pre class="json"><code>{
+  &quot;requiredCapabilities&quot;: [&quot;chat&quot;, &quot;tool_use&quot;],
+  &quot;estimatedInputTokens&quot;: 2000,
+  &quot;estimatedOutputTokens&quot;: 1500,
+  &quot;domain&quot;: &quot;healthcare&quot;
+}</code></pre>
+<p><strong>Typical Models Selected</strong>: claude-sonnet-4-5, gpt-4o, gemini-2.5-pro (all HIPAA-certified)</p>
+<h3 id="financial-domain">3.3 Financial Domain</h3>
+<p><strong>When to Use</strong>: Investment analysis, accounting, financial reporting, tax</p>
+<p><strong>Compliance</strong>: SOC 2 Type II is <strong>mandatory</strong>.</p>
+<p><strong>What Happens</strong>: - Only SOC 2 certified models considered - Minimum quality score of 75 enforced - System 2 reasoning forced - Truth Engine verification required (ECD ≤ 0.05)</p>
+<pre class="json"><code>{
+  &quot;requiredCapabilities&quot;: [&quot;chat&quot;, &quot;function_calling&quot;],
+  &quot;estimatedInputTokens&quot;: 2000,
+  &quot;estimatedOutputTokens&quot;: 1500,
+  &quot;domain&quot;: &quot;financial&quot;
+}</code></pre>
+<h3 id="legal-domain">3.4 Legal Domain</h3>
+<p><strong>When to Use</strong>: Contract analysis, legal research, compliance documentation</p>
+<p><strong>Compliance</strong>: SOC 2 Type II is <strong>mandatory</strong>. Source citations required.</p>
+<p><strong>What Happens</strong>: - Only SOC 2 certified models considered - Minimum quality score of 80 enforced - System 2 reasoning forced - Source citation verification enabled - Truth Engine required (ECD ≤ 0.05)</p>
+<pre class="json"><code>{
+  &quot;requiredCapabilities&quot;: [&quot;chat&quot;, &quot;tool_use&quot;],
+  &quot;estimatedInputTokens&quot;: 3000,
+  &quot;estimatedOutputTokens&quot;: 2000,
+  &quot;domain&quot;: &quot;legal&quot;
+}</code></pre>
+<h3 id="scientific-domain">3.5 Scientific Domain</h3>
+<p><strong>When to Use</strong>: Research analysis, data interpretation, academic writing</p>
+<p><strong>Compliance</strong>: Varies by research type. FDA 21 CFR Part 11 for pharmaceutical research.</p>
+<p><strong>What Happens</strong>: - Source citation required - Minimum quality score of 70 - Slightly relaxed ECD threshold (0.08) - No forced compliance (specify if needed)</p>
+<pre class="json"><code>{
+  &quot;requiredCapabilities&quot;: [&quot;chat&quot;, &quot;reasoning&quot;],
+  &quot;estimatedInputTokens&quot;: 3000,
+  &quot;estimatedOutputTokens&quot;: 2000,
+  &quot;domain&quot;: &quot;scientific&quot;
+}</code></pre>
+<p><strong>For FDA-regulated research</strong>, add compliance:</p>
+<pre class="json"><code>{
+  &quot;domain&quot;: &quot;scientific&quot;,
+  &quot;requiredCompliance&quot;: [&quot;FDA_21_CFR&quot;]
+}</code></pre>
+<h3 id="creative-domain">3.6 Creative Domain</h3>
+<p><strong>When to Use</strong>: Content writing, storytelling, marketing copy, brainstorming</p>
+<p><strong>Compliance</strong>: None required. Most flexible domain.</p>
+<p><strong>What Happens</strong>: - No compliance filtering - No minimum quality threshold - Cost and latency optimized (weights: C=0.25, L=0.20) - Learning dimension emphasized (E=0.10) - High ECD tolerance (0.20) - creative license allowed</p>
+<pre class="json"><code>{
+  &quot;requiredCapabilities&quot;: [&quot;chat&quot;, &quot;streaming&quot;],
+  &quot;estimatedInputTokens&quot;: 500,
+  &quot;estimatedOutputTokens&quot;: 2000,
+  &quot;domain&quot;: &quot;creative&quot;
+}</code></pre>
+<h3 id="engineering-domain">3.7 Engineering Domain</h3>
+<p><strong>When to Use</strong>: Code generation, debugging, architecture design, DevOps</p>
+<p><strong>Compliance</strong>: Varies. SOC 2 recommended for sensitive applications.</p>
+<p><strong>What Happens</strong>: - Minimum quality score of 70 (code must work) - Capability dimension emphasized (K=0.20) - Prefers models with function_calling and tool_use - Moderate ECD threshold (0.10)</p>
+<pre class="json"><code>{
+  &quot;requiredCapabilities&quot;: [&quot;chat&quot;, &quot;function_calling&quot;],
+  &quot;estimatedInputTokens&quot;: 2000,
+  &quot;estimatedOutputTokens&quot;: 1500,
+  &quot;domain&quot;: &quot;engineering&quot;
+}</code></pre>
+<p><strong>For medical device software</strong>, add FDA compliance:</p>
+<pre class="json"><code>{
+  &quot;domain&quot;: &quot;engineering&quot;,
+  &quot;requiredCompliance&quot;: [&quot;FDA_21_CFR&quot;, &quot;SOC2&quot;]
+}</code></pre>
+<hr />
+<h2 id="compliance-options">4. Compliance Options</h2>
+<h3 id="available-compliance-frameworks">4.1 Available Compliance Frameworks</h3>
+<table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Code</th>
+<th>When Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HIPAA</td>
+<td><code>HIPAA</code></td>
+<td>Healthcare/medical data</td>
+</tr>
+<tr>
+<td>SOC 2 Type II</td>
+<td><code>SOC2</code></td>
+<td>Financial, legal, enterprise</td>
+</tr>
+<tr>
+<td>GDPR</td>
+<td><code>GDPR</code></td>
+<td>EU data subjects</td>
+</tr>
+<tr>
+<td>FDA 21 CFR Part 11</td>
+<td><code>FDA_21_CFR</code></td>
+<td>Pharma, medical devices</td>
+</tr>
+<tr>
+<td>PCI-DSS</td>
+<td><code>PCI_DSS</code></td>
+<td>Payment card data</td>
+</tr>
+<tr>
+<td>CCPA</td>
+<td><code>CCPA</code></td>
+<td>California consumer data</td>
+</tr>
+<tr>
+<td>ISO 27001</td>
+<td><code>ISO_27001</code></td>
+<td>Enterprise security</td>
+</tr>
+</tbody>
+</table>
+<h3 id="specifying-compliance">4.2 Specifying Compliance</h3>
+<p><strong>Single Framework</strong>:</p>
+<pre class="json"><code>{
+  &quot;requiredCapabilities&quot;: [&quot;chat&quot;],
+  &quot;estimatedInputTokens&quot;: 1000,
+  &quot;estimatedOutputTokens&quot;: 500,
+  &quot;requiredCompliance&quot;: [&quot;HIPAA&quot;]
+}</code></pre>
+<p><strong>Multiple Frameworks</strong>:</p>
+<pre class="json"><code>{
+  &quot;requiredCapabilities&quot;: [&quot;chat&quot;],
+  &quot;estimatedInputTokens&quot;: 1000,
+  &quot;estimatedOutputTokens&quot;: 500,
+  &quot;requiredCompliance&quot;: [&quot;SOC2&quot;, &quot;GDPR&quot;, &quot;ISO_27001&quot;]
+}</code></pre>
+<h3 id="domain-vs.-explicit-compliance">4.3 Domain vs. Explicit Compliance</h3>
+<p>Using <code>domain</code> automatically sets compliance:</p>
+<pre class="json"><code>// These are equivalent:
+{ &quot;domain&quot;: &quot;healthcare&quot; }
+{ &quot;requiredCompliance&quot;: [&quot;HIPAA&quot;] }
+
+// Domain also sets quality threshold, system type, Truth Engine
+// So domain is preferred over explicit compliance alone</code></pre>
+<hr />
+<h2 id="optimization-strategies">5. Optimization Strategies</h2>
+<h3 id="use-optimization-preferences">5.1 Use Optimization Preferences</h3>
+<pre class="json"><code>// Cost-optimized
+{ &quot;optimizeFor&quot;: &quot;cost&quot; }
+
+// Quality-optimized  
+{ &quot;optimizeFor&quot;: &quot;quality&quot; }
+
+// Latency-optimized
+{ &quot;optimizeFor&quot;: &quot;latency&quot; }
+
+// Balanced (default)
+{ &quot;optimizeFor&quot;: &quot;balanced&quot; }</code></pre>
+<h3 id="combine-domain-with-optimization">5.2 Combine Domain with Optimization</h3>
+<pre class="json"><code>{
+  &quot;requiredCapabilities&quot;: [&quot;chat&quot;],
+  &quot;estimatedInputTokens&quot;: 1000,
+  &quot;estimatedOutputTokens&quot;: 500,
+  &quot;domain&quot;: &quot;engineering&quot;,
+  &quot;optimizeFor&quot;: &quot;cost&quot;  // Cost-optimize within engineering constraints
+}</code></pre>
+<h3 id="set-hard-constraints">5.3 Set Hard Constraints</h3>
+<pre class="json"><code>{
+  &quot;requiredCapabilities&quot;: [&quot;chat&quot;],
+  &quot;estimatedInputTokens&quot;: 1000,
+  &quot;estimatedOutputTokens&quot;: 500,
+  &quot;maxPrice&quot;: 0.01,        // Max $0.01 per request
+  &quot;minQuality&quot;: 75,        // At least 75 quality score
+  &quot;maxLatencyMs&quot;: 1000     // Under 1 second
+}</code></pre>
+<hr />
+<h2 id="understanding-selection-results">6. Understanding Selection Results</h2>
+<h3 id="response-structure">6.1 Response Structure</h3>
+<pre class="json"><code>{
+  &quot;selection&quot;: {
+    &quot;modelId&quot;: &quot;claude-sonnet-4-5&quot;,
+    &quot;providerId&quot;: &quot;anthropic&quot;,
+    &quot;displayName&quot;: &quot;Claude Sonnet 4.5&quot;,
+    &quot;score&quot;: 85.2,
+    &quot;estimatedPrice&quot;: 0.0115,
+    &quot;estimatedLatencyMs&quot;: 450,
+    &quot;reason&quot;: &quot;Selected for engineering domain. HIPAA compliant. High capability score.&quot;
+  },
+  &quot;fallbacks&quot;: [...],
+  &quot;scoring&quot;: {
+    &quot;dimensionScores&quot;: {
+      &quot;quality&quot;: 83,
+      &quot;cost&quot;: 70,
+      &quot;latency&quot;: 85,
+      &quot;capability&quot;: 100,
+      &quot;reliability&quot;: 95,
+      &quot;compliance&quot;: 100,
+      &quot;availability&quot;: 100,
+      &quot;learning&quot;: 60
+    },
+    &quot;weightsUsed&quot;: {
+      &quot;Q&quot;: 0.30, &quot;C&quot;: 0.15, &quot;L&quot;: 0.15, &quot;K&quot;: 0.20,
+      &quot;R&quot;: 0.10, &quot;P&quot;: 0.00, &quot;A&quot;: 0.05, &quot;E&quot;: 0.05
+    },
+    &quot;weightProfileId&quot;: &quot;ENGINEERING&quot;
+  },
+  &quot;metadata&quot;: {
+    &quot;systemType&quot;: &quot;SYSTEM_2&quot;,
+    &quot;domain&quot;: &quot;engineering&quot;,
+    &quot;selectionTimeMs&quot;: 23
+  }
+}</code></pre>
+<h3 id="compliance-score">6.2 Compliance Score</h3>
+<p>The compliance score (P) in <code>dimensionScores</code> reflects: - 100: Model has all required compliance certifications - 0: Model filtered out (you won’t see this - it’s excluded)</p>
+<p>If you request HIPAA compliance, only HIPAA-certified models are returned.</p>
+<hr />
+<h2 id="sdk-examples">7. SDK Examples</h2>
+<h3 id="javascripttypescript">7.1 JavaScript/TypeScript</h3>
+<pre class="typescript"><code>import { RAWSClient } from &#39;@radiant/raws-client&#39;;
+
+const raws = new RAWSClient({ apiKey: process.env.RADIANT_API_KEY });
+
+// Healthcare selection (automatic HIPAA compliance)
+const healthcareResult = await raws.select({
+  requiredCapabilities: [&#39;chat&#39;, &#39;tool_use&#39;],
+  estimatedInputTokens: 2000,
+  estimatedOutputTokens: 1500,
+  domain: &#39;healthcare&#39;,
+});
+
+// Engineering selection
+const engineeringResult = await raws.select({
+  requiredCapabilities: [&#39;chat&#39;, &#39;function_calling&#39;],
+  estimatedInputTokens: 2000,
+  estimatedOutputTokens: 1000,
+  domain: &#39;engineering&#39;,
+});
+
+// Creative selection (cost-optimized)
+const creativeResult = await raws.select({
+  requiredCapabilities: [&#39;chat&#39;, &#39;streaming&#39;],
+  estimatedInputTokens: 500,
+  estimatedOutputTokens: 2000,
+  domain: &#39;creative&#39;,
+  optimizeFor: &#39;cost&#39;,
+});</code></pre>
+<h3 id="python">7.2 Python</h3>
+<pre class="python"><code>from radiant_raws import RAWSClient
+
+raws = RAWSClient(api_key=&quot;your-api-key&quot;)
+
+# Healthcare (HIPAA enforced)
+result = raws.select(
+    required_capabilities=[&quot;chat&quot;, &quot;tool_use&quot;],
+    estimated_input_tokens=2000,
+    estimated_output_tokens=1500,
+    domain=&quot;healthcare&quot;,
+)
+
+# Financial (SOC 2 enforced)
+result = raws.select(
+    required_capabilities=[&quot;chat&quot;, &quot;function_calling&quot;],
+    estimated_input_tokens=2000,
+    estimated_output_tokens=1500,
+    domain=&quot;financial&quot;,
+)</code></pre>
+<hr />
+<h2 id="best-practices">8. Best Practices</h2>
+<h3 id="always-specify-domain-for-regulated-use-cases">8.1 Always Specify Domain for Regulated Use Cases</h3>
+<pre class="typescript"><code>// ❌ Don&#39;t rely on auto-detection for regulated domains
+const result = await raws.select({
+  requiredCapabilities: [&#39;chat&#39;],
+  estimatedInputTokens: 1000,
+  estimatedOutputTokens: 500,
+  // Missing domain - might not get HIPAA compliance
+});
+
+// ✅ Explicitly specify domain
+const result = await raws.select({
+  requiredCapabilities: [&#39;chat&#39;],
+  estimatedInputTokens: 1000,
+  estimatedOutputTokens: 500,
+  domain: &#39;healthcare&#39;,  // Guarantees HIPAA compliance
+});</code></pre>
+<h3 id="check-compliance-in-response">8.2 Check Compliance in Response</h3>
+<pre class="typescript"><code>const result = await raws.select({ domain: &#39;healthcare&#39;, ... });
+
+// Verify compliance was applied
+console.log(result.scoring.dimensionScores.compliance); // Should be 100
+console.log(result.metadata.domain); // Should be &#39;healthcare&#39;</code></pre>
+<h3 id="use-appropriate-domain-for-your-use-case">8.3 Use Appropriate Domain for Your Use Case</h3>
+<table>
+<thead>
+<tr>
+<th>Use Case</th>
+<th>Recommended Domain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Patient chatbot</td>
+<td><code>healthcare</code></td>
+</tr>
+<tr>
+<td>Investment advisor</td>
+<td><code>financial</code></td>
+</tr>
+<tr>
+<td>Contract review</td>
+<td><code>legal</code></td>
+</tr>
+<tr>
+<td>Research assistant</td>
+<td><code>scientific</code></td>
+</tr>
+<tr>
+<td>Blog writer</td>
+<td><code>creative</code></td>
+</tr>
+<tr>
+<td>Code assistant</td>
+<td><code>engineering</code></td>
+</tr>
+<tr>
+<td>General Q&amp;A</td>
+<td><code>general</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="faq">9. FAQ</h2>
+<p><strong>Q: What happens if I request a domain but don’t have models with required compliance?</strong></p>
+<p>A: You’ll receive error <code>RAWS_005: Compliance requirement not met</code>. This means no models in your tier have the required certification. Contact support to upgrade.</p>
+<p><strong>Q: Can I use healthcare models for non-healthcare purposes?</strong></p>
+<p>A: Yes, HIPAA-certified models can be used for any purpose. The certification means they <em>can</em> handle PHI, not that they <em>must</em>.</p>
+<p><strong>Q: How do I know which models have which compliance?</strong></p>
+<p>A: The selection response includes the model’s compliance. You can also query the model registry:</p>
+<pre class="bash"><code>curl https://api.radiant.example.com/v1/raws/models?compliance=HIPAA</code></pre>
+<p><strong>Q: Is the engineering domain appropriate for medical device software?</strong></p>
+<p>A: Use <code>engineering</code> domain with explicit <code>requiredCompliance: ["FDA_21_CFR", "SOC2"]</code> for medical device software development.</p>
+<hr />
+<h2 id="error-reference">10. Error Reference</h2>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Description</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RAWS_001</code></td>
+<td>No eligible models</td>
+<td>Reduce requirements</td>
+</tr>
+<tr>
+<td><code>RAWS_005</code></td>
+<td>Compliance not met</td>
+<td>Check tier/requirements</td>
+</tr>
+<tr>
+<td><code>RAWS_006</code></td>
+<td>Tier restriction</td>
+<td>Upgrade subscription</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="contact">11. Contact</h2>
+<p><strong>Documentation</strong>: https://docs.radiant.example.com/raws</p>
+<p><strong>Compliance Questions</strong>: compliance@radiant.example.com</p>
+<p><strong>Support</strong>: support@radiant.example.com</p>
+<hr />
+<p><strong>End of User Documentation</strong></p>
+<p><em>Version 1.1.0 | January 2026</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

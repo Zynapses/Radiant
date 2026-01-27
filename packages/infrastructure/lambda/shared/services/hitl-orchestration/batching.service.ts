@@ -425,10 +425,13 @@ function extractCorrelationKey(
 async function findSemanticBatch(
   tenantId: string,
   questionText: string,
-  _threshold: number = 0.7
+  threshold: number = 0.7
 ): Promise<string | undefined> {
-  // FUTURE: Implement embedding-based similarity
-  // For now, use simple keyword matching
+  // Try embedding-based similarity first
+  const embeddingMatch = await findBatchByEmbedding(tenantId, questionText, threshold);
+  if (embeddingMatch) return embeddingMatch;
+  
+  // Fallback to keyword matching if embedding service unavailable
   const keywords = questionText.toLowerCase().split(/\s+/).filter(w => w.length > 4);
   
   if (keywords.length === 0) return undefined;
@@ -463,6 +466,56 @@ async function findSemanticBatch(
     }
   }
 
+  return undefined;
+}
+
+/**
+ * Find batch using embedding-based semantic similarity
+ */
+async function findBatchByEmbedding(
+  tenantId: string,
+  questionText: string,
+  threshold: number
+): Promise<string | undefined> {
+  try {
+    const { callLiteLLMEmbedding } = await import('../litellm.service.js');
+    
+    // Generate embedding for the question
+    const embeddingResponse = await callLiteLLMEmbedding({
+      model: 'text-embedding-3-small',
+      input: questionText,
+    });
+    
+    const questionEmbedding = embeddingResponse.data[0].embedding;
+    
+    // Query for similar batches using pgvector cosine similarity
+    const result = await executeStatement({
+      sql: `
+        SELECT b.id, b.embedding, 
+               1 - (b.embedding <=> :embedding::vector) as similarity
+        FROM hitl_question_batches b
+        WHERE b.tenant_id = :tenantId
+          AND b.status = 'collecting'
+          AND b.batch_type = 'semantic'
+          AND b.embedding IS NOT NULL
+          AND 1 - (b.embedding <=> :embedding::vector) >= :threshold
+        ORDER BY similarity DESC
+        LIMIT 1
+      `,
+      parameters: [
+        stringParam('tenantId', tenantId),
+        { name: 'embedding', value: { stringValue: JSON.stringify(questionEmbedding) } },
+        { name: 'threshold', value: { doubleValue: threshold } },
+      ],
+    });
+    
+    if (result.rows && result.rows.length > 0) {
+      return result.rows[0].id as string;
+    }
+  } catch (error) {
+    // Embedding service unavailable, fall back to keyword matching
+  }
+  
   return undefined;
 }
 

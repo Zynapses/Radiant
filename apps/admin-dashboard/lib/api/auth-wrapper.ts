@@ -23,7 +23,8 @@ type RouteHandler = (
   context?: { params: Record<string, string> }
 ) => Promise<NextResponse> | NextResponse;
 
-type AuthenticatedRouteHandler<T = Record<string, string | string[]>> = (
+// Next.js 15 uses Promise-wrapped params - use permissive type to support both patterns
+type AuthenticatedRouteHandler<T = unknown> = (
   request: AuthenticatedRequest,
   context?: { params: T }
 ) => Promise<NextResponse> | NextResponse;
@@ -95,10 +96,10 @@ function extractUserFromToken(token: string): AuthenticatedUser | null {
  *   { requiredRoles: ['admin', 'super_admin'] }
  * );
  */
-export function withAuth<T = Record<string, string | string[]>>(
+export function withAuth<T = unknown>(
   handler: AuthenticatedRouteHandler<T>,
   options: AuthOptions = {}
-): (request: NextRequest, context?: { params: T }) => Promise<NextResponse> | NextResponse {
+) {
   return async (request: NextRequest, context?: { params: T }) => {
     const { requiredRoles, allowPublic } = options;
     
@@ -167,9 +168,9 @@ export function withAuth<T = Record<string, string | string[]>>(
 /**
  * Wrap an API route handler that requires admin role
  */
-export function withAdminAuth<T = Record<string, string | string[]>>(
+export function withAdminAuth<T = unknown>(
   handler: AuthenticatedRouteHandler<T>
-): (request: NextRequest, context?: { params: T }) => Promise<NextResponse> | NextResponse {
+) {
   return withAuth(handler, { requiredRoles: ['admin', 'super_admin'] });
 }
 

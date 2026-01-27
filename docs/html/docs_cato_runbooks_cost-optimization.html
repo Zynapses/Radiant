@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cost optimization - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>cost optimization</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/runbooks/cost-optimization.md</div>
+  </div>
+  
+  <h1 id="cato-cost-optimization-runbook">Cato Cost Optimization Runbook</h1>
+<h2 id="current-cost-structure">Current Cost Structure</h2>
+<h3 id="cost-breakdown-by-component-at-10m-users">Cost Breakdown by Component (at 10M users)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>On-Demand Cost</th>
+<th>Optimized Cost</th>
+<th>Savings</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shadow Self (SageMaker)</td>
+<td>$275,000/mo</td>
+<td>$100,000/mo</td>
+<td>64%</td>
+</tr>
+<tr>
+<td>Bedrock (Claude)</td>
+<td>$130,000/mo</td>
+<td>$52,000/mo</td>
+<td>60%</td>
+</tr>
+<tr>
+<td>OpenSearch Serverless</td>
+<td>$90,000/mo</td>
+<td>$90,000/mo</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>DynamoDB Global Tables</td>
+<td>$60,000/mo</td>
+<td>$60,000/mo</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>ElastiCache</td>
+<td>$36,000/mo</td>
+<td>$36,000/mo</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>Other</td>
+<td>$130,000/mo</td>
+<td>$100,000/mo</td>
+<td>23%</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$721,000/mo</strong></td>
+<td><strong>$438,000/mo</strong></td>
+<td><strong>39%</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="optimization-strategies">Optimization Strategies</h2>
+<h3 id="sagemaker-savings-plans">1. SageMaker Savings Plans</h3>
+<p><strong>Impact:</strong> 64% reduction on Shadow Self compute</p>
+<p><strong>How to Implement:</strong></p>
+<pre class="bash"><code># Check current usage
+aws ce get-savings-plans-utilization \
+  --time-period Start=2024-01-01,End=2024-01-31
+
+# View available plans
+aws savingsplans describe-savings-plan-rates \
+  --savings-plan-id sp-1234567890abcdef0
+
+# Purchase via Console or API
+aws savingsplans create-savings-plan \
+  --savings-plan-offering-id &lt;offering-id&gt; \
+  --commitment 100000 \
+  --savings-plan-type Compute</code></pre>
+<p><strong>Commitment:</strong> 1-year (20% savings) or 3-year (64% savings)</p>
+<p><strong>Break-even:</strong> Need 10+ ml.g5.2xlarge instances to justify.</p>
+<hr />
+<h3 id="semantic-caching-86-llm-cost-reduction">2. Semantic Caching (86% LLM Cost Reduction)</h3>
+<p><strong>Target:</strong> 86% cache hit rate</p>
+<p><strong>Current Performance:</strong></p>
+<pre class="bash"><code>curl https://api.cato.thinktank.ai/api/admin/cato/cache/stats</code></pre>
+<p><strong>Optimization Actions:</strong></p>
+<ol type="1">
+<li><p><strong>Increase cache size</strong> if hit rate &lt; 80%</p>
+<pre class="bash"><code>aws elasticache modify-replication-group \
+  --replication-group-id cato-cache \
+  --cache-node-type cache.r7g.2xlarge</code></pre></li>
+<li><p><strong>Adjust similarity threshold</strong> (default: 0.95)</p>
+<ul>
+<li>Lower to 0.92 for higher hit rate</li>
+<li>Higher to 0.97 for better quality</li>
+</ul></li>
+<li><p><strong>Extend TTL</strong> if knowledge is stable</p>
+<ul>
+<li>Default: 23 hours</li>
+<li>Increase to 47 hours for stable domains</li>
+</ul></li>
+<li><p><strong>Selective invalidation</strong> instead of full domain invalidation</p></li>
+</ol>
+<hr />
+<h3 id="bedrock-batch-api-50-discount">3. Bedrock Batch API (50% Discount)</h3>
+<p><strong>Use Case:</strong> Night-mode curiosity processing</p>
+<p><strong>How It Works:</strong> - Submit batch jobs between 2-6 AM UTC - Bedrock processes asynchronously - 50% cost reduction vs. real-time API</p>
+<p><strong>Implementation:</strong></p>
+<pre class="python"><code>import boto3
+
+bedrock = boto3.client(&#39;bedrock-runtime&#39;)
+
+# Submit batch job
+response = bedrock.create_model_invocation_job(
+    jobName=&#39;cato-curiosity-batch-2024-01-15&#39;,
+    modelId=&#39;anthropic.claude-3-5-sonnet-20241022-v2:0&#39;,
+    inputDataConfig={
+        &#39;s3InputDataConfig&#39;: {
+            &#39;s3Uri&#39;: &#39;s3://cato-batch/input/curiosity-questions.jsonl&#39;
+        }
+    },
+    outputDataConfig={
+        &#39;s3OutputDataConfig&#39;: {
+            &#39;s3Uri&#39;: &#39;s3://cato-batch/output/&#39;
+        }
+    }
+)</code></pre>
+<p><strong>Savings:</strong> ~$65,000/month at scale</p>
+<hr />
+<h3 id="spot-instances-for-background-processing">4. Spot Instances for Background Processing</h3>
+<p><strong>Use Case:</strong> Curiosity processing, memory consolidation</p>
+<p><strong>Savings:</strong> 70% on compute</p>
+<p><strong>Risk:</strong> Interruption (acceptable for batch)</p>
+<p><strong>Implementation:</strong></p>
+<pre class="yaml"><code># EKS spot node group
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: cato-eks
+managedNodeGroups:
+  - name: spot-curiosity
+    instanceTypes: [&quot;m5.xlarge&quot;, &quot;m5a.xlarge&quot;, &quot;m5n.xlarge&quot;]
+    spot: true
+    minSize: 0
+    maxSize: 20
+    labels:
+      workload: curiosity
+    taints:
+      - key: spot
+        value: &quot;true&quot;
+        effect: NoSchedule</code></pre>
+<hr />
+<h3 id="fp8-quantization-for-shadow-self">5. FP8 Quantization for Shadow Self</h3>
+<p><strong>Impact:</strong> 50% reduction in GPU memory and compute</p>
+<p><strong>How It Works:</strong> - Llama-3-8B uses 16-bit weights (16GB) - FP8 reduces to 8GB - 50% fewer GPU instances needed</p>
+<p><strong>Implementation:</strong></p>
+<pre class="python"><code>from transformers import AutoModelForCausalLM
+import torch
+
+model = AutoModelForCausalLM.from_pretrained(
+    &quot;meta-llama/Meta-Llama-3-8B-Instruct&quot;,
+    torch_dtype=torch.float8_e4m3fn,  # FP8
+    device_map=&quot;auto&quot;
+)</code></pre>
+<p><strong>Trade-off:</strong> Minor quality degradation (~1% on benchmarks)</p>
+<hr />
+<h3 id="right-sizing-instances">6. Right-Sizing Instances</h3>
+<p><strong>Monthly Review Process:</strong></p>
+<ol type="1">
+<li><p><strong>Check utilization:</strong></p>
+<pre class="bash"><code>aws compute-optimizer get-ec2-instance-recommendations</code></pre></li>
+<li><p><strong>Common findings:</strong></p>
+<ul>
+<li>SageMaker instances underutilized → reduce count</li>
+<li>ElastiCache oversized → downgrade node type</li>
+<li>EKS nodes too large → use smaller instances</li>
+</ul></li>
+<li><p><strong>Target utilization:</strong></p>
+<ul>
+<li>GPU: 70-80%</li>
+<li>CPU: 60-70%</li>
+<li>Memory: 70-80%</li>
+</ul></li>
+</ol>
+<hr />
+<h3 id="dynamodb-optimization">7. DynamoDB Optimization</h3>
+<p><strong>On-Demand vs. Provisioned:</strong> - On-demand: Good for variable/unpredictable load - Provisioned: 20% cheaper for steady load</p>
+<p><strong>When to switch to provisioned:</strong> - RCU/WCU stable for 30+ days - Predictable traffic patterns</p>
+<p><strong>Enable DAX caching:</strong></p>
+<pre class="bash"><code># DAX provides sub-ms reads, reduces RCU
+aws dax create-cluster \
+  --cluster-name cato-dax \
+  --node-type dax.r5.large \
+  --replication-factor 3</code></pre>
+<hr />
+<h3 id="bedrock-prompt-caching">8. Bedrock Prompt Caching</h3>
+<p><strong>Impact:</strong> 90% token cost reduction for repeated system prompts</p>
+<p><strong>How It Works:</strong> - Cato’s system prompt is ~2000 tokens - Cache it with <code>cache_control: ephemeral</code> - Pay full price once, 10% thereafter</p>
+<p><strong>Implementation:</strong></p>
+<pre class="python"><code>response = bedrock.invoke_model(
+    modelId=&#39;anthropic.claude-3-5-sonnet-20241022-v2:0&#39;,
+    body={
+        &quot;anthropic_version&quot;: &quot;bedrock-2023-05-31&quot;,
+        &quot;max_tokens&quot;: 1024,
+        &quot;system&quot;: [
+            {
+                &quot;type&quot;: &quot;text&quot;,
+                &quot;text&quot;: CATO_SYSTEM_PROMPT,
+                &quot;cache_control&quot;: {&quot;type&quot;: &quot;ephemeral&quot;}
+            }
+        ],
+        &quot;messages&quot;: [...]
+    }
+)</code></pre>
+<hr />
+<h2 id="cost-monitoring">Cost Monitoring</h2>
+<h3 id="daily-checks">Daily Checks</h3>
+<ol type="1">
+<li><p><strong>Check budget status:</strong></p>
+<pre class="bash"><code>curl https://api.cato.thinktank.ai/api/admin/cato/budget/status</code></pre></li>
+<li><p><strong>Check Cost Explorer:</strong></p>
+<pre class="bash"><code>aws ce get-cost-and-usage \
+  --time-period Start=2024-01-14,End=2024-01-15 \
+  --granularity DAILY \
+  --metrics UnblendedCost \
+  --filter &#39;{&quot;Dimensions&quot;:{&quot;Key&quot;:&quot;SERVICE&quot;,&quot;Values&quot;:[&quot;Amazon SageMaker&quot;]}}&#39;</code></pre></li>
+</ol>
+<h3 id="weekly-review">Weekly Review</h3>
+<ol type="1">
+<li>Check Savings Plans utilization</li>
+<li>Review instance right-sizing recommendations</li>
+<li>Analyze cache hit rate trends</li>
+<li>Review budget burn rate</li>
+</ol>
+<h3 id="monthly-actions">Monthly Actions</h3>
+<ol type="1">
+<li>Right-size instances based on utilization</li>
+<li>Evaluate Savings Plans renewal/purchase</li>
+<li>Review architecture for optimization opportunities</li>
+<li>Update cost projections</li>
+</ol>
+<hr />
+<h2 id="cost-alerts">Cost Alerts</h2>
+<p>Configure alerts in AWS Budgets:</p>
+<table>
+<thead>
+<tr>
+<th>Alert</th>
+<th>Threshold</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Daily spend</td>
+<td>&gt; $5,000</td>
+<td>Slack notification</td>
+</tr>
+<tr>
+<td>Weekly spend</td>
+<td>&gt; $30,000</td>
+<td>Email + Slack</td>
+</tr>
+<tr>
+<td>Monthly forecast</td>
+<td>&gt; 110% budget</td>
+<td>PagerDuty</td>
+</tr>
+<tr>
+<td>Anomaly detection</td>
+<td>&gt; 20% spike</td>
+<td>Slack + investigation</td>
+</tr>
+</tbody>
+</table>
+<pre class="bash"><code>aws budgets create-budget \
+  --account-id $AWS_ACCOUNT_ID \
+  --budget file://budget.json \
+  --notifications-with-subscribers file://notifications.json</code></pre>
+<hr />
+<h2 id="emergency-cost-reduction">Emergency Cost Reduction</h2>
+<p>If costs are spiraling:</p>
+<h3 id="immediate-actions-1-hour">Immediate Actions (&lt; 1 hour)</h3>
+<ol type="1">
+<li><p><strong>Enable emergency mode:</strong></p>
+<pre class="bash"><code>curl -X PUT \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#39;{&quot;emergencyThreshold&quot;: 0.5}&#39; \
+  https://api.cato.thinktank.ai/api/admin/cato/budget/config</code></pre></li>
+<li><p><strong>Disable curiosity processing:</strong></p>
+<pre class="bash"><code>curl -X PUT \
+  -d &#39;{&quot;dailyExplorationLimit&quot;: 0}&#39; \
+  https://api.cato.thinktank.ai/api/admin/cato/budget/config</code></pre></li>
+<li><p><strong>Scale down non-critical components:</strong></p>
+<pre class="bash"><code>kubectl scale deployment cato-curiosity -n cato --replicas=0</code></pre></li>
+</ol>
+<h3 id="short-term-actions-1-day">Short-term Actions (&lt; 1 day)</h3>
+<ol type="1">
+<li>Scale down Shadow Self instances</li>
+<li>Reduce Bedrock calls (lower quality threshold)</li>
+<li>Increase cache TTL</li>
+<li>Disable non-critical features</li>
+</ol>
+<h3 id="medium-term-actions-1-week">Medium-term Actions (&lt; 1 week)</h3>
+<ol type="1">
+<li>Purchase Reserved Capacity / Savings Plans</li>
+<li>Implement additional caching layers</li>
+<li>Optimize query patterns</li>
+<li>Right-size all resources</li>
+</ol>
+<hr />
+<h2 id="contact">Contact</h2>
+<ul>
+<li><strong>Cost questions:</strong> #cato-costs</li>
+<li><strong>Budget alerts:</strong> #cato-oncall</li>
+<li><strong>Finance review:</strong> finance@thinktank.ai</li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

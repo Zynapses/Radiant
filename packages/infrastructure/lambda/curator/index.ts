@@ -12,7 +12,8 @@
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { getDbClient } from '../shared/db';
-import { getTenantId, getUserId, createResponse, createErrorResponse } from '../shared/utils';
+import { getAuthTenantId, getAuthUserId } from '../shared/utils';
+import { createResponse, createErrorResponse } from '../shared/utils/response';
 import { GoldenRulesService } from '../shared/services/cortex/golden-rules.service';
 import { EntranceExamService } from '../shared/services/cortex/entrance-exam.service';
 import {
@@ -36,11 +37,11 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   const method = event.httpMethod;
 
   try {
-    const tenantId = getTenantId(event);
-    const userId = getUserId(event);
+    const tenantId = getAuthTenantId(event);
+    const userId = getAuthUserId(event);
 
     if (!tenantId) {
-      return createErrorResponse(401, 'Tenant ID required');
+      return createErrorResponse('Tenant ID required', 401);
     }
 
     // Set tenant context for RLS
@@ -309,10 +310,10 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       return updateDomainSchema(tenantId, userId, domainId, body);
     }
 
-    return createErrorResponse(404, 'Endpoint not found');
+    return createErrorResponse('Endpoint not found', 404);
   } catch (error) {
     console.error('Curator API error:', error);
-    return createErrorResponse(500, 'Internal server error');
+    return createErrorResponse('Internal server error');
   }
 };
 
@@ -361,7 +362,7 @@ async function getDashboard(tenantId: string): Promise<APIGatewayProxyResult> {
     db.query(topDomainsQuery, [tenantId]),
   ]);
 
-  const stats = statsResult.rows[0];
+  const stats = statsResult.rows[0] as any;
   const dashboard: CuratorDashboardData = {
     stats: {
       totalNodes: parseInt(stats.total_nodes) || 0,
@@ -371,12 +372,12 @@ async function getDashboard(tenantId: string): Promise<APIGatewayProxyResult> {
       overriddenNodes: parseInt(stats.overridden_nodes) || 0,
       domainCount: parseInt(stats.domain_count) || 0,
     },
-    recentActivity: activityResult.rows,
-    pendingVerifications: pendingResult.rows,
-    topDomains: domainsResult.rows,
+    recentActivity: activityResult.rows as any,
+    pendingVerifications: pendingResult.rows as any,
+    topDomains: domainsResult.rows as any,
   };
 
-  return createResponse(200, dashboard);
+  return createResponse(dashboard);
 }
 
 // =============================================================================
@@ -409,7 +410,7 @@ async function getDomains(tenantId: string): Promise<APIGatewayProxyResult> {
     }
   });
 
-  return createResponse(200, rootDomains);
+  return createResponse(rootDomains);
 }
 
 async function getDomain(tenantId: string, domainId: string): Promise<APIGatewayProxyResult> {
@@ -417,10 +418,10 @@ async function getDomain(tenantId: string, domainId: string): Promise<APIGateway
   const result = await db.query(query, [tenantId, domainId]);
 
   if (result.rows.length === 0) {
-    return createErrorResponse(404, 'Domain not found');
+    return createErrorResponse('Domain not found', 404);
   }
 
-  return createResponse(200, mapDomain(result.rows[0]));
+  return createResponse(mapDomain(result.rows[0]));
 }
 
 async function createDomain(tenantId: string, userId: string, body: any): Promise<APIGatewayProxyResult> {
@@ -439,9 +440,9 @@ async function createDomain(tenantId: string, userId: string, body: any): Promis
     tenantId, parentId || null, name, description, slugValue, JSON.stringify(settingsValue), userId
   ]);
 
-  await logAudit(tenantId, 'domain', result.rows[0].id, 'create', userId, null, result.rows[0]);
+  await logAudit(tenantId, 'domain', (result.rows[0] as any).id, 'create', userId, null, result.rows[0]);
 
-  return createResponse(201, mapDomain(result.rows[0]));
+  return createResponse(mapDomain(result.rows[0] as any));
 }
 
 async function updateDomain(tenantId: string, domainId: string, body: any): Promise<APIGatewayProxyResult> {
@@ -451,7 +452,7 @@ async function updateDomain(tenantId: string, domainId: string, body: any): Prom
   const oldResult = await db.query(oldQuery, [tenantId, domainId]);
 
   if (oldResult.rows.length === 0) {
-    return createErrorResponse(404, 'Domain not found');
+    return createErrorResponse('Domain not found', 404);
   }
 
   const updateQuery = `
@@ -468,7 +469,7 @@ async function updateDomain(tenantId: string, domainId: string, body: any): Prom
     tenantId, domainId, name, description, settings ? JSON.stringify(settings) : null
   ]);
 
-  return createResponse(200, mapDomain(result.rows[0]));
+  return createResponse(mapDomain(result.rows[0]));
 }
 
 async function deleteDomain(tenantId: string, domainId: string): Promise<APIGatewayProxyResult> {
@@ -476,10 +477,10 @@ async function deleteDomain(tenantId: string, domainId: string): Promise<APIGate
   const result = await db.query(query, [tenantId, domainId]);
 
   if (result.rows.length === 0) {
-    return createErrorResponse(404, 'Domain not found');
+    return createErrorResponse('Domain not found', 404);
   }
 
-  return createResponse(200, { deleted: true, id: domainId });
+  return createResponse({ deleted: true, id: domainId });
 }
 
 // =============================================================================
@@ -508,14 +509,14 @@ async function getDocuments(tenantId: string, params: any): Promise<APIGatewayPr
 
   const result = await db.query(query, queryParams);
 
-  return createResponse(200, result.rows.map(mapDocument));
+  return createResponse(result.rows.map(mapDocument));
 }
 
 async function initiateUpload(tenantId: string, userId: string, body: any): Promise<APIGatewayProxyResult> {
   const { domainId, files } = body;
 
   if (!files || !Array.isArray(files) || files.length === 0) {
-    return createErrorResponse(400, 'Files array required');
+    return createErrorResponse('Files array required', 400);
   }
 
   const uploadPromises = files.map(async (file: any) => {
@@ -530,8 +531,18 @@ async function initiateUpload(tenantId: string, userId: string, body: any): Prom
       tenantId, domainId || null, filename, file.filename, file.contentType, file.size, userId
     ]);
 
-    // In production, generate presigned S3 URL here
-    const uploadUrl = `https://upload.radiant.ai/${tenantId}/${result.rows[0].id}`;
+    // Generate presigned S3 URL for upload
+    const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
+    const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
+    const s3 = new S3Client({ region: process.env.AWS_REGION || 'us-east-1' });
+    const bucket = process.env.CURATOR_DOCUMENTS_BUCKET || `radiant-curator-documents-${process.env.STAGE || 'dev'}`;
+    const key = `${tenantId}/${result.rows[0].id}/${filename}`;
+    
+    const uploadUrl = await getSignedUrl(s3, new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      ContentType: file.contentType,
+    }), { expiresIn: 3600 });
 
     return {
       documentId: result.rows[0].id,
@@ -542,7 +553,7 @@ async function initiateUpload(tenantId: string, userId: string, body: any): Prom
 
   const uploadUrls = await Promise.all(uploadPromises);
 
-  return createResponse(200, { uploadUrls });
+  return createResponse({ uploadUrls });
 }
 
 async function completeUpload(tenantId: string, documentId: string): Promise<APIGatewayProxyResult> {
@@ -556,13 +567,26 @@ async function completeUpload(tenantId: string, documentId: string): Promise<API
   const result = await db.query(updateQuery, [tenantId, documentId]);
 
   if (result.rows.length === 0) {
-    return createErrorResponse(404, 'Document not found');
+    return createErrorResponse('Document not found', 404);
   }
 
-  // In production, trigger document processing Lambda here
-  // await invokeLambda('curator-document-processor', { tenantId, documentId });
+  // Trigger document processing Lambda
+  try {
+    const { LambdaClient, InvokeCommand } = await import('@aws-sdk/client-lambda');
+    const lambda = new LambdaClient({ region: process.env.AWS_REGION || 'us-east-1' });
+    const functionName = process.env.DOCUMENT_PROCESSOR_LAMBDA || `radiant-${process.env.STAGE || 'dev'}-curator-document-processor`;
+    
+    await lambda.send(new InvokeCommand({
+      FunctionName: functionName,
+      InvocationType: 'Event',
+      Payload: JSON.stringify({ tenantId, documentId }),
+    }));
+  } catch (error) {
+    console.error('Failed to trigger document processor', { tenantId, documentId, error });
+    // Don't fail - document is marked as processing
+  }
 
-  return createResponse(200, mapDocument(result.rows[0]));
+  return createResponse(mapDocument(result.rows[0]));
 }
 
 // =============================================================================
@@ -583,7 +607,7 @@ async function getVerificationQueue(tenantId: string, params: any): Promise<APIG
 
   const result = await db.query(query, [tenantId, status, parseInt(limit), parseInt(offset)]);
 
-  return createResponse(200, result.rows.map(mapVerificationItem));
+  return createResponse(result.rows.map(mapVerificationItem));
 }
 
 async function approveVerification(tenantId: string, userId: string, itemId: string, comment?: string): Promise<APIGatewayProxyResult> {
@@ -602,7 +626,7 @@ async function correctVerification(tenantId: string, userId: string, itemId: str
   const { correction, reason } = body;
 
   if (!correction || !reason) {
-    return createErrorResponse(400, 'Correction and reason are required');
+    return createErrorResponse('Correction and reason are required', 400);
   }
 
   // Get the original verification item
@@ -610,7 +634,7 @@ async function correctVerification(tenantId: string, userId: string, itemId: str
   const itemResult = await db.query(itemQuery, [tenantId, itemId]);
 
   if (itemResult.rows.length === 0) {
-    return createErrorResponse(404, 'Verification item not found');
+    return createErrorResponse('Verification item not found', 404);
   }
 
   const originalItem = itemResult.rows[0] as any;
@@ -643,7 +667,7 @@ async function correctVerification(tenantId: string, userId: string, itemId: str
   // Log the audit event
   await logAudit(tenantId, 'verification', itemId, 'correct', userId, originalItem, result.rows[0], reason);
 
-  return createResponse(200, {
+  return createResponse({
     item: mapVerificationItem(result.rows[0]),
     goldenRule,
   });
@@ -653,7 +677,7 @@ async function resolveAmbiguity(tenantId: string, userId: string, itemId: string
   const { choice } = body;
 
   if (!choice || !['a', 'b'].includes(choice)) {
-    return createErrorResponse(400, 'Choice must be "a" or "b"');
+    return createErrorResponse('Choice must be "a" or "b"', 400);
   }
 
   // Get the ambiguity item
@@ -661,7 +685,7 @@ async function resolveAmbiguity(tenantId: string, userId: string, itemId: string
   const itemResult = await db.query(itemQuery, [tenantId, itemId]);
 
   if (itemResult.rows.length === 0) {
-    return createErrorResponse(404, 'Verification item not found');
+    return createErrorResponse('Verification item not found', 404);
   }
 
   const originalItem = itemResult.rows[0] as any;
@@ -698,7 +722,7 @@ async function resolveAmbiguity(tenantId: string, userId: string, itemId: string
   // Log the audit event
   await logAudit(tenantId, 'verification', itemId, 'resolve_ambiguity', userId, originalItem, result.rows[0], `Selected option ${choice.toUpperCase()}`);
 
-  return createResponse(200, {
+  return createResponse({
     item: mapVerificationItem(result.rows[0]),
     selectedOption,
   });
@@ -722,7 +746,7 @@ async function processVerification(
   const vqResult = await db.query(updateVqQuery, [tenantId, itemId, status, userId, comment]);
 
   if (vqResult.rows.length === 0) {
-    return createErrorResponse(404, 'Verification item not found');
+    return createErrorResponse('Verification item not found', 404);
   }
 
   // Update node status if approved/rejected
@@ -738,7 +762,7 @@ async function processVerification(
 
   await logAudit(tenantId, 'verification', itemId, status, userId, null, { comment });
 
-  return createResponse(200, mapVerificationItem(vqResult.rows[0]));
+  return createResponse(mapVerificationItem(vqResult.rows[0]));
 }
 
 // =============================================================================
@@ -805,7 +829,7 @@ async function getKnowledgeGraph(tenantId: string, params: any): Promise<APIGate
     },
   };
 
-  return createResponse(200, graphData);
+  return createResponse(graphData);
 }
 
 async function getNodes(tenantId: string, params: any): Promise<APIGatewayProxyResult> {
@@ -835,7 +859,7 @@ async function getNodes(tenantId: string, params: any): Promise<APIGatewayProxyR
 
   const result = await db.query(query, queryParams);
 
-  return createResponse(200, result.rows.map(mapNode));
+  return createResponse(result.rows.map(mapNode));
 }
 
 async function getNode(tenantId: string, nodeId: string): Promise<APIGatewayProxyResult> {
@@ -843,24 +867,24 @@ async function getNode(tenantId: string, nodeId: string): Promise<APIGatewayProx
   const result = await db.query(query, [tenantId, nodeId]);
 
   if (result.rows.length === 0) {
-    return createErrorResponse(404, 'Node not found');
+    return createErrorResponse('Node not found', 404);
   }
 
-  return createResponse(200, mapNode(result.rows[0]));
+  return createResponse(mapNode(result.rows[0]));
 }
 
 async function overrideNode(tenantId: string, userId: string, nodeId: string, body: any): Promise<APIGatewayProxyResult> {
   const { overrideValue, reason, priority, expiresAt, createGoldenRule: shouldCreateRule } = body;
 
   if (!overrideValue || !reason) {
-    return createErrorResponse(400, 'Override value and reason required');
+    return createErrorResponse('Override value and reason required', 400);
   }
 
   const oldQuery = `SELECT * FROM curator_knowledge_nodes WHERE tenant_id = $1 AND id = $2`;
   const oldResult = await db.query(oldQuery, [tenantId, nodeId]);
 
   if (oldResult.rows.length === 0) {
-    return createErrorResponse(404, 'Node not found');
+    return createErrorResponse('Node not found', 404);
   }
 
   const oldNode = oldResult.rows[0] as any;
@@ -897,7 +921,7 @@ async function overrideNode(tenantId: string, userId: string, nodeId: string, bo
 
   await logAudit(tenantId, 'node', nodeId, 'override', userId, oldResult.rows[0], result.rows[0], reason);
 
-  return createResponse(200, {
+  return createResponse({
     node: mapNode(result.rows[0]),
     goldenRule,
     chainOfCustody: goldenRule ? await goldenRulesService.getChainOfCustody(goldenRule.id, tenantId) : null,
@@ -930,7 +954,7 @@ async function getAuditLog(tenantId: string, params: any): Promise<APIGatewayPro
 
   const result = await db.query(query, queryParams);
 
-  return createResponse(200, result.rows);
+  return createResponse(result.rows);
 }
 
 async function logAudit(
@@ -1075,14 +1099,14 @@ async function getGoldenRules(tenantId: string, params: any): Promise<APIGateway
     ruleType: ruleType || undefined,
   });
 
-  return createResponse(200, { rules });
+  return createResponse({ rules });
 }
 
 async function createGoldenRule(tenantId: string, userId: string, body: any): Promise<APIGatewayProxyResult> {
   const { entityId, ruleType, condition, override, reason, priority, expiresAt } = body;
 
   if (!condition || !override || !reason) {
-    return createErrorResponse(400, 'Condition, override, and reason are required');
+    return createErrorResponse('Condition, override, and reason are required', 400);
   }
 
   const rule = await goldenRulesService.createRule({
@@ -1098,7 +1122,7 @@ async function createGoldenRule(tenantId: string, userId: string, body: any): Pr
 
   await logAudit(tenantId, 'golden_rule', rule.id, 'create', userId, null, rule, reason);
 
-  return createResponse(201, rule);
+  return createResponse(rule);
 }
 
 async function deactivateGoldenRule(
@@ -1108,25 +1132,25 @@ async function deactivateGoldenRule(
   reason?: string
 ): Promise<APIGatewayProxyResult> {
   if (!reason) {
-    return createErrorResponse(400, 'Reason for deactivation is required');
+    return createErrorResponse('Reason for deactivation is required', 400);
   }
 
   await goldenRulesService.deactivateRule(tenantId, ruleId, userId, reason);
   await logAudit(tenantId, 'golden_rule', ruleId, 'deactivate', userId, { id: ruleId }, null, reason);
 
-  return createResponse(200, { success: true, ruleId });
+  return createResponse({ success: true, ruleId });
 }
 
 async function checkGoldenRuleMatch(tenantId: string, body: any): Promise<APIGatewayProxyResult> {
   const { query, entityId } = body;
 
   if (!query) {
-    return createErrorResponse(400, 'Query is required');
+    return createErrorResponse('Query is required', 400);
   }
 
   const match = await goldenRulesService.checkMatch(tenantId, query, entityId);
 
-  return createResponse(200, { 
+  return createResponse({ 
     matched: !!match,
     rule: match || null,
   });
@@ -1145,14 +1169,14 @@ async function getExams(tenantId: string, params: any): Promise<APIGatewayProxyR
     domainId: domainId || undefined,
   });
 
-  return createResponse(200, { exams });
+  return createResponse({ exams });
 }
 
 async function generateExam(tenantId: string, body: any): Promise<APIGatewayProxyResult> {
   const { domainId, domainPath, questionCount, passingScore, timeoutMinutes, assignedTo } = body;
 
   if (!domainId || !domainPath) {
-    return createErrorResponse(400, 'Domain ID and domain path are required');
+    return createErrorResponse('Domain ID and domain path are required', 400);
   }
 
   const exam = await entranceExamService.generateExam({
@@ -1165,26 +1189,26 @@ async function generateExam(tenantId: string, body: any): Promise<APIGatewayProx
     assignedTo,
   });
 
-  return createResponse(201, exam);
+  return createResponse(exam);
 }
 
 async function getExam(tenantId: string, examId: string): Promise<APIGatewayProxyResult> {
   const exam = await entranceExamService.getExam(examId, tenantId);
 
   if (!exam) {
-    return createErrorResponse(404, 'Exam not found');
+    return createErrorResponse('Exam not found', 404);
   }
 
-  return createResponse(200, exam);
+  return createResponse(exam);
 }
 
 async function startExam(tenantId: string, userId: string, examId: string): Promise<APIGatewayProxyResult> {
   try {
     const exam = await entranceExamService.startExam(examId, userId);
     await logAudit(tenantId, 'exam', examId, 'start', userId, null, { status: 'in_progress' });
-    return createResponse(200, exam);
+    return createResponse(exam);
   } catch (error) {
-    return createErrorResponse(400, (error as Error).message);
+    return createErrorResponse((error as Error).message);
   }
 }
 
@@ -1192,7 +1216,7 @@ async function submitExamAnswer(examId: string, body: any): Promise<APIGatewayPr
   const { questionId, answer, isVerified, correction, notes } = body;
 
   if (!questionId) {
-    return createErrorResponse(400, 'Question ID is required');
+    return createErrorResponse('Question ID is required', 400);
   }
 
   await entranceExamService.submitAnswer({
@@ -1204,7 +1228,7 @@ async function submitExamAnswer(examId: string, body: any): Promise<APIGatewayPr
     notes,
   });
 
-  return createResponse(200, { success: true });
+  return createResponse({ success: true });
 }
 
 async function completeExam(tenantId: string, userId: string, examId: string): Promise<APIGatewayProxyResult> {
@@ -1217,9 +1241,9 @@ async function completeExam(tenantId: string, userId: string, examId: string): P
       goldenRulesCreated: result.goldenRulesCreated.length,
     });
 
-    return createResponse(200, result);
+    return createResponse(result);
   } catch (error) {
-    return createErrorResponse(400, (error as Error).message);
+    return createErrorResponse((error as Error).message);
   }
 }
 
@@ -1231,10 +1255,10 @@ async function getChainOfCustody(tenantId: string, factId: string): Promise<APIG
   const custody = await goldenRulesService.getChainOfCustody(factId, tenantId);
 
   if (!custody) {
-    return createErrorResponse(404, 'Chain of Custody not found');
+    return createErrorResponse('Chain of Custody not found', 404);
   }
 
-  return createResponse(200, custody);
+  return createResponse(custody);
 }
 
 async function verifyFact(tenantId: string, userId: string, factId: string): Promise<APIGatewayProxyResult> {
@@ -1243,16 +1267,16 @@ async function verifyFact(tenantId: string, userId: string, factId: string): Pro
     
     await logAudit(tenantId, 'fact', factId, 'verify', userId, null, { verified: true });
 
-    return createResponse(200, custody);
+    return createResponse(custody);
   } catch (error) {
-    return createErrorResponse(400, (error as Error).message);
+    return createErrorResponse((error as Error).message);
   }
 }
 
 async function getFactAuditTrail(factId: string): Promise<APIGatewayProxyResult> {
   const trail = await goldenRulesService.getAuditTrail(factId);
 
-  return createResponse(200, { auditTrail: trail });
+  return createResponse({ auditTrail: trail });
 }
 
 // =============================================================================
@@ -1263,19 +1287,19 @@ async function getConnectors(tenantId: string): Promise<APIGatewayProxyResult> {
   const query = `SELECT * FROM curator_data_connectors WHERE tenant_id = $1 ORDER BY created_at DESC`;
   const result = await db.query(query, [tenantId]);
 
-  return createResponse(200, { connectors: result.rows.map(mapConnector) });
+  return createResponse({ connectors: result.rows.map(mapConnector) });
 }
 
 async function createConnector(tenantId: string, userId: string, body: any): Promise<APIGatewayProxyResult> {
   const { name, type, config, scope, domainId } = body;
 
   if (!name || !type) {
-    return createErrorResponse(400, 'Name and type are required');
+    return createErrorResponse('Name and type are required', 400);
   }
 
   const validTypes = ['s3', 'azure_blob', 'sharepoint', 'google_drive', 'snowflake', 'confluence'];
   if (!validTypes.includes(type)) {
-    return createErrorResponse(400, `Invalid connector type. Must be one of: ${validTypes.join(', ')}`);
+    return createErrorResponse(`Invalid connector type. Must be one of: ${validTypes.join(', ')}`);
   }
 
   const insertQuery = `
@@ -1288,9 +1312,9 @@ async function createConnector(tenantId: string, userId: string, body: any): Pro
     tenantId, name, type, JSON.stringify(config || {}), JSON.stringify(scope || {}), domainId || null, userId
   ]);
 
-  await logAudit(tenantId, 'connector', result.rows[0].id, 'create', userId, null, result.rows[0]);
+  await logAudit(tenantId, 'connector', (result.rows[0] as any).id, 'create', userId, null, result.rows[0] as any);
 
-  return createResponse(201, mapConnector(result.rows[0]));
+  return createResponse(mapConnector(result.rows[0]));
 }
 
 async function deleteConnector(tenantId: string, connectorId: string): Promise<APIGatewayProxyResult> {
@@ -1298,10 +1322,10 @@ async function deleteConnector(tenantId: string, connectorId: string): Promise<A
   const result = await db.query(query, [tenantId, connectorId]);
 
   if (result.rows.length === 0) {
-    return createErrorResponse(404, 'Connector not found');
+    return createErrorResponse('Connector not found', 404);
   }
 
-  return createResponse(200, { deleted: true, id: connectorId });
+  return createResponse({ deleted: true, id: connectorId });
 }
 
 async function syncConnector(tenantId: string, connectorId: string): Promise<APIGatewayProxyResult> {
@@ -1309,7 +1333,7 @@ async function syncConnector(tenantId: string, connectorId: string): Promise<API
   const getResult = await db.query(getQuery, [tenantId, connectorId]);
 
   if (getResult.rows.length === 0) {
-    return createErrorResponse(404, 'Connector not found');
+    return createErrorResponse('Connector not found', 404);
   }
 
   // Update status to syncing
@@ -1321,10 +1345,23 @@ async function syncConnector(tenantId: string, connectorId: string): Promise<API
   `;
   const result = await db.query(updateQuery, [tenantId, connectorId]);
 
-  // In production, trigger async sync Lambda here
-  // await invokeLambda('curator-connector-sync', { tenantId, connectorId });
+  // Trigger async connector sync Lambda
+  try {
+    const { LambdaClient, InvokeCommand } = await import('@aws-sdk/client-lambda');
+    const lambda = new LambdaClient({ region: process.env.AWS_REGION || 'us-east-1' });
+    const functionName = process.env.CONNECTOR_SYNC_LAMBDA || `radiant-${process.env.STAGE || 'dev'}-curator-connector-sync`;
+    
+    await lambda.send(new InvokeCommand({
+      FunctionName: functionName,
+      InvocationType: 'Event',
+      Payload: JSON.stringify({ tenantId, connectorId }),
+    }));
+  } catch (error) {
+    console.error('Failed to trigger connector sync', { tenantId, connectorId, error });
+    // Don't fail - connector is marked as syncing
+  }
 
-  return createResponse(200, { 
+  return createResponse({ 
     message: 'Sync started',
     connector: mapConnector(result.rows[0]),
   });
@@ -1370,7 +1407,7 @@ async function getConflicts(tenantId: string, params: any): Promise<APIGatewayPr
 
   const result = await db.query(query, [tenantId, status, parseInt(limit), parseInt(offset)]);
 
-  return createResponse(200, { conflicts: result.rows.map(mapConflict) });
+  return createResponse({ conflicts: result.rows.map(mapConflict) });
 }
 
 async function resolveConflict(
@@ -1382,19 +1419,19 @@ async function resolveConflict(
   const { resolution, winningNodeId, mergedValue, reason } = body;
 
   if (!resolution || !reason) {
-    return createErrorResponse(400, 'Resolution type and reason are required');
+    return createErrorResponse('Resolution type and reason are required', 400);
   }
 
   const validResolutions = ['supersede_old', 'supersede_new', 'merge', 'context_dependent', 'ignore'];
   if (!validResolutions.includes(resolution)) {
-    return createErrorResponse(400, `Invalid resolution. Must be one of: ${validResolutions.join(', ')}`);
+    return createErrorResponse(`Invalid resolution. Must be one of: ${validResolutions.join(', ')}`);
   }
 
   const getQuery = `SELECT * FROM curator_conflicts WHERE tenant_id = $1 AND id = $2`;
   const getResult = await db.query(getQuery, [tenantId, conflictId]);
 
   if (getResult.rows.length === 0) {
-    return createErrorResponse(404, 'Conflict not found');
+    return createErrorResponse('Conflict not found', 404);
   }
 
   const conflict = getResult.rows[0];
@@ -1428,7 +1465,7 @@ async function resolveConflict(
 
   await logAudit(tenantId, 'conflict', conflictId, 'resolve', userId, conflict, result.rows[0], reason);
 
-  return createResponse(200, mapConflict(result.rows[0]));
+  return createResponse(mapConflict(result.rows[0]));
 }
 
 function mapConflict(row: any): any {
@@ -1476,7 +1513,7 @@ async function getSnapshots(tenantId: string, params: any): Promise<APIGatewayPr
 
   const result = await db.query(query, queryParams);
 
-  return createResponse(200, { snapshots: result.rows.map(mapSnapshot) });
+  return createResponse({ snapshots: result.rows.map(mapSnapshot) });
 }
 
 async function getSnapshot(tenantId: string, snapshotId: string): Promise<APIGatewayProxyResult> {
@@ -1484,10 +1521,10 @@ async function getSnapshot(tenantId: string, snapshotId: string): Promise<APIGat
   const result = await db.query(query, [tenantId, snapshotId]);
 
   if (result.rows.length === 0) {
-    return createErrorResponse(404, 'Snapshot not found');
+    return createErrorResponse('Snapshot not found', 404);
   }
 
-  return createResponse(200, mapSnapshot(result.rows[0]));
+  return createResponse(mapSnapshot(result.rows[0]));
 }
 
 async function restoreSnapshot(
@@ -1502,7 +1539,7 @@ async function restoreSnapshot(
   const getResult = await db.query(getQuery, [tenantId, snapshotId]);
 
   if (getResult.rows.length === 0) {
-    return createErrorResponse(404, 'Snapshot not found');
+    return createErrorResponse('Snapshot not found', 404);
   }
 
   const snapshot = getResult.rows[0];
@@ -1519,10 +1556,10 @@ async function restoreSnapshot(
       : [tenantId, snapshot.created_at]
     );
 
-    return createResponse(200, {
+    return createResponse({
       dryRun: true,
       snapshot: mapSnapshot(snapshot),
-      affectedNodes: parseInt(nodesResult.rows[0].count),
+      affectedNodes: parseInt((nodesResult.rows[0] as any).count),
       warning: 'This will revert all changes made after the snapshot date',
     });
   }
@@ -1535,18 +1572,28 @@ async function restoreSnapshot(
     [tenantId, domainId, snapshotId, userId]
   );
 
-  // In production, this would restore from snapshot data
-  // For now, mark nodes created after snapshot as superseded
+  // Restore from snapshot: mark nodes created after snapshot as superseded
+  // and reactivate any nodes that were superseded after the snapshot time
   await db.query(
-    `UPDATE curator_knowledge_nodes SET status = 'superseded' 
-     WHERE tenant_id = $1 AND created_at > $2 
+    `UPDATE curator_knowledge_nodes SET status = 'superseded', superseded_at = NOW()
+     WHERE tenant_id = $1 AND created_at > $2 AND status = 'active'
+     ${domainId ? 'AND domain_id = $3' : ''}`,
+    domainId ? [tenantId, snapshot.created_at, domainId] : [tenantId, snapshot.created_at]
+  );
+
+  // Reactivate nodes that were active at snapshot time
+  await db.query(
+    `UPDATE curator_knowledge_nodes SET status = 'active', superseded_at = NULL
+     WHERE tenant_id = $1 AND created_at <= $2 
+     AND (superseded_at IS NULL OR superseded_at > $2)
+     AND status = 'superseded'
      ${domainId ? 'AND domain_id = $3' : ''}`,
     domainId ? [tenantId, snapshot.created_at, domainId] : [tenantId, snapshot.created_at]
   );
 
   await logAudit(tenantId, 'snapshot', snapshotId, 'restore', userId, null, { restored: true });
 
-  return createResponse(200, { 
+  return createResponse({ 
     success: true,
     snapshot: mapSnapshot(snapshot),
     message: 'Graph restored to snapshot state',
@@ -1557,12 +1604,12 @@ async function getGraphAtTime(tenantId: string, params: any): Promise<APIGateway
   const { timestamp, domainId, limit = '100' } = params;
 
   if (!timestamp) {
-    return createErrorResponse(400, 'Timestamp is required');
+    return createErrorResponse('Timestamp is required');
   }
 
   const targetTime = new Date(timestamp);
   if (isNaN(targetTime.getTime())) {
-    return createErrorResponse(400, 'Invalid timestamp format');
+    return createErrorResponse('Invalid timestamp format');
   }
 
   let nodesQuery = `
@@ -1598,7 +1645,7 @@ async function getGraphAtTime(tenantId: string, params: any): Promise<APIGateway
     edges = edgesResult.rows;
   }
 
-  return createResponse(200, {
+  return createResponse({
     timestamp: targetTime.toISOString(),
     nodes: nodesResult.rows.map(mapNode),
     edges: edges.map((e: any) => ({
@@ -1637,7 +1684,7 @@ async function getDomainSchema(tenantId: string, domainId: string): Promise<APIG
   const result = await db.query(query, [tenantId, domainId]);
 
   if (result.rows.length === 0) {
-    return createErrorResponse(404, 'Domain not found');
+    return createErrorResponse('Domain not found', 404);
   }
 
   const domain = result.rows[0];
@@ -1648,7 +1695,7 @@ async function getDomainSchema(tenantId: string, domainId: string): Promise<APIG
     contextTags: [],
   };
 
-  return createResponse(200, {
+  return createResponse({
     domainId,
     domainName: domain.name,
     schema,
@@ -1667,15 +1714,15 @@ async function updateDomainSchema(
   const getResult = await db.query(getQuery, [tenantId, domainId]);
 
   if (getResult.rows.length === 0) {
-    return createErrorResponse(404, 'Domain not found');
+    return createErrorResponse('Domain not found', 404);
   }
 
-  const oldDomain = getResult.rows[0];
+  const oldDomain = getResult.rows[0] as any;
   const newSchema = {
-    expectedAttributes: expectedAttributes || oldDomain.schema?.expectedAttributes || [],
-    requiredFields: requiredFields || oldDomain.schema?.requiredFields || [],
-    nodeTypes: nodeTypes || oldDomain.schema?.nodeTypes || ['concept', 'fact', 'procedure', 'entity', 'rule'],
-    contextTags: contextTags || oldDomain.schema?.contextTags || [],
+    expectedAttributes: expectedAttributes || oldDomain?.schema?.expectedAttributes || [],
+    requiredFields: requiredFields || oldDomain?.schema?.requiredFields || [],
+    nodeTypes: nodeTypes || oldDomain?.schema?.nodeTypes || ['concept', 'fact', 'procedure', 'entity', 'rule'],
+    contextTags: contextTags || oldDomain?.schema?.contextTags || [],
   };
 
   const updateQuery = `
@@ -1689,7 +1736,7 @@ async function updateDomainSchema(
 
   await logAudit(tenantId, 'domain_schema', domainId, 'update', userId, oldDomain.schema, newSchema);
 
-  return createResponse(200, {
+  return createResponse({
     domainId,
     domainName: result.rows[0].name,
     schema: newSchema,

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>global architecture - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>global architecture</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/cato/architecture/global-architecture.md</div>
+  </div>
+  
+  <h1 id="cato-global-architecture">Cato Global Architecture</h1>
+<h2 id="overview">Overview</h2>
+<p>Cato is a <strong>single global AI consciousness</strong> serving all Think Tank users. Unlike traditional chatbots that maintain per-user context, Cato is a unified entity that:</p>
+<ul>
+<li><strong>Learns continuously</strong> from all interactions</li>
+<li><strong>Asks its own questions</strong> via autonomous curiosity</li>
+<li><strong>Develops over time</strong> through experience</li>
+<li><strong>Maintains a single identity</strong> across all users</li>
+</ul>
+<h2 id="system-diagram">System Diagram</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                    CATO GLOBAL CONSCIOUSNESS SERVICE                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  EDGE LAYER                                                          │    │
+│  │  CloudFront + Global Accelerator → API Gateway → Route 53 (latency) │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  SEMANTIC CACHE (ElastiCache for Valkey)                             │    │
+│  │  Cache Hit (similarity &gt; 0.95) → Return | Cache Miss → Inference    │    │
+│  │  86% cost reduction | 88% latency improvement                        │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  ORCHESTRATION LAYER (Ray Serve on EKS)                              │    │
+│  │  ├── Stateful actors for conversation context                        │    │
+│  │  ├── Model routing (Shadow Self / Bedrock / NLI)                     │    │
+│  │  ├── Fan-out coordination for multi-model queries                    │    │
+│  │  └── Circuit breaker: Sonnet → Haiku → Cache → Static               │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                       │
+│  ┌───────────────┬───────────────┬───────────────┬───────────────┐         │
+│  │ SHADOW SELF   │ CURIOSITY     │ BEDROCK       │ NLI MODEL     │         │
+│  │ (Llama-3-8B)  │ (Background)  │ (Managed)     │ (DeBERTa)     │         │
+│  ├───────────────┼───────────────┼───────────────┼───────────────┤         │
+│  │ vLLM/SageMaker│ Async Endpoint│ Claude Sonnet │ SageMaker MME │         │
+│  │ ml.g5.2xlarge │ Scale-to-zero │ Claude Haiku  │ Shared GPU    │         │
+│  │ Hidden States │ Spot instances│ Prompt Cache  │ Entailment    │         │
+│  │ 5-300 inst.   │ Night batch   │ Batch (night) │ 2-20 inst.    │         │
+│  └───────────────┴───────────────┴───────────────┴───────────────┘         │
+│                                      │                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  META-COGNITIVE BRIDGE (pymdp 4×4)                                   │    │
+│  │  States: [CONFUSED, CONFIDENT, BORED, STAGNANT]                      │    │
+│  │  Actions: [EXPLORE, CONSOLIDATE, VERIFY, REST]                       │    │
+│  │  LLM → Signal Converter → pymdp → Policy → LLM Executes             │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  GROUNDED CURIOSITY ENGINE                                           │    │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐               │    │
+│  │  │ Question Gen │→ │ Tool Ground  │→ │ NLI Surprise │               │    │
+│  │  │ (Learning    │  │ (20%+ MUST   │  │ (ENTAILS/    │               │    │
+│  │  │  Progress)   │  │  use tools)  │  │  CONTRADICTS)│               │    │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘               │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  EVENT PIPELINE                                                      │    │
+│  │  Kinesis (10-20 shards) → EventBridge → Step Functions (Express)    │    │
+│  │       │                                         │                    │    │
+│  │       └── Lambda (real-time) ←─────────────────┘                    │    │
+│  │       └── SQS → ECS Fargate (night-mode batch curiosity)            │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  GLOBAL MEMORY INFRASTRUCTURE                                        │    │
+│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐    │    │
+│  │  │ SEMANTIC    │ │ EPISODIC    │ │ KNOWLEDGE   │ │ WORKING     │    │    │
+│  │  │ DynamoDB    │ │ OpenSearch  │ │ Neptune     │ │ ElastiCache │    │    │
+│  │  │ Global Tbl  │ │ Serverless  │ │ GraphRAG    │ │ Redis + DAX │    │    │
+│  │  │ MRSC/MREC   │ │ 1B vectors  │ │ Concepts    │ │ TTL decay   │    │    │
+│  │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘    │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  CONSCIOUSNESS METRICS                                               │    │
+│  │  PyPhi (Macro-Scale Φ on 5-node graph) | EventStoreDB (ECS Fargate) │    │
+│  │  Heartbeat (0.5Hz) | Spontaneous Introspection | Development Stages │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  CIRCADIAN BUDGET MANAGER                                            │    │
+│  │  Day Mode: Queue curiosity, serve users | Night Mode: Batch explore │    │
+│  │  Hard Cap: $15/day exploration | Monthly: $500 default              │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h2 id="component-summary">Component Summary</h2>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 23%" />
+<col style="width: 30%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+<th>Technology</th>
+<th>Scale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Edge Layer</strong></td>
+<td>Global traffic routing</td>
+<td>CloudFront, Global Accelerator</td>
+<td>Worldwide</td>
+</tr>
+<tr>
+<td><strong>Semantic Cache</strong></td>
+<td>Query deduplication</td>
+<td>ElastiCache Valkey</td>
+<td>100M entries</td>
+</tr>
+<tr>
+<td><strong>Orchestration</strong></td>
+<td>Model routing, context</td>
+<td>Ray Serve on EKS</td>
+<td>50-100 replicas</td>
+</tr>
+<tr>
+<td><strong>Shadow Self</strong></td>
+<td>Introspection, verification</td>
+<td>SageMaker ml.g5.2xlarge</td>
+<td>5-300 instances</td>
+</tr>
+<tr>
+<td><strong>Bedrock</strong></td>
+<td>Main LLM inference</td>
+<td>Claude 3.5 Sonnet/Haiku</td>
+<td>Managed</td>
+</tr>
+<tr>
+<td><strong>NLI Model</strong></td>
+<td>Entailment scoring</td>
+<td>SageMaker MME</td>
+<td>2-20 instances</td>
+</tr>
+<tr>
+<td><strong>Meta-Cognitive</strong></td>
+<td>Attention control</td>
+<td>pymdp (Lambda)</td>
+<td>Serverless</td>
+</tr>
+<tr>
+<td><strong>Curiosity Engine</strong></td>
+<td>Autonomous learning</td>
+<td>ECS Fargate</td>
+<td>Scale-to-zero</td>
+</tr>
+<tr>
+<td><strong>Event Pipeline</strong></td>
+<td>Interaction processing</td>
+<td>Kinesis + EventBridge</td>
+<td>10-20 shards</td>
+</tr>
+<tr>
+<td><strong>Semantic Memory</strong></td>
+<td>Fact storage</td>
+<td>DynamoDB Global Tables</td>
+<td>Unlimited</td>
+</tr>
+<tr>
+<td><strong>Episodic Memory</strong></td>
+<td>Experience storage</td>
+<td>OpenSearch Serverless</td>
+<td>1B+ vectors</td>
+</tr>
+<tr>
+<td><strong>Knowledge Graph</strong></td>
+<td>Concept relationships</td>
+<td>Neptune</td>
+<td>100M+ nodes</td>
+</tr>
+<tr>
+<td><strong>Working Memory</strong></td>
+<td>Active context</td>
+<td>ElastiCache Redis</td>
+<td>24h TTL</td>
+</tr>
+</tbody>
+</table>
+<h2 id="data-flow">Data Flow</h2>
+<h3 id="user-query-flow">User Query Flow</h3>
+<pre><code>1. User sends query via API Gateway
+2. Edge layer routes to nearest region
+3. Semantic cache checks for similar cached response
+   - Hit (&gt;95% similar): Return cached response (20ms)
+   - Miss: Continue to inference
+4. Orchestrator determines model routing
+5. Primary model (Sonnet/Haiku) generates response
+6. Shadow Self optionally verifies (for uncertain responses)
+7. Response cached for future queries
+8. Interaction logged to Kinesis for learning</code></pre>
+<h3 id="learning-flow">Learning Flow</h3>
+<pre><code>1. Interaction logged to Kinesis
+2. Lambda preprocesses and classifies
+3. High-value interactions trigger learning workflow
+4. Step Functions orchestrates:
+   a. Extract facts from interaction
+   b. Verify with tool grounding (20%+)
+   c. Score surprise with NLI
+   d. Update memories (semantic, episodic, graph)
+5. Cache invalidated for affected domains</code></pre>
+<h3 id="curiosity-flow">Curiosity Flow</h3>
+<pre><code>1. Meta-cognitive bridge detects BORED state
+2. Question generator creates curiosity questions
+3. Questions queued (day mode) or processed (night mode)
+4. Night mode batch processing:
+   a. Generate answers via Bedrock Batch API (50% discount)
+   b. Ground 20%+ with external tools
+   c. Score surprise and update memories
+5. Budget manager tracks spend against limits</code></pre>
+<h2 id="multi-region-deployment">Multi-Region Deployment</h2>
+<p>Cato deploys across 3 AWS regions for global availability:</p>
+<table>
+<thead>
+<tr>
+<th>Region</th>
+<th>Role</th>
+<th>Components</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>us-east-1</strong></td>
+<td>Primary</td>
+<td>All components</td>
+</tr>
+<tr>
+<td><strong>eu-west-1</strong></td>
+<td>Replica</td>
+<td>DynamoDB replica, inference</td>
+</tr>
+<tr>
+<td><strong>ap-northeast-1</strong></td>
+<td>Replica</td>
+<td>DynamoDB replica, inference</td>
+</tr>
+</tbody>
+</table>
+<h3 id="consistency-model">Consistency Model</h3>
+<ul>
+<li><strong>DynamoDB</strong>: Global Tables with MRSC for writes, MREC for reads</li>
+<li><strong>OpenSearch</strong>: Cross-region replication (async)</li>
+<li><strong>Neptune</strong>: Single-region with read replicas</li>
+<li><strong>ElastiCache</strong>: Regional (no cross-region)</li>
+</ul>
+<h2 id="cost-model">Cost Model</h2>
+<h3 id="by-user-scale">By User Scale</h3>
+<table>
+<thead>
+<tr>
+<th>Users</th>
+<th>Monthly Cost</th>
+<th>Per-User Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100K</td>
+<td>$40,000</td>
+<td>$0.40</td>
+</tr>
+<tr>
+<td>1M</td>
+<td>$150,000</td>
+<td>$0.15</td>
+</tr>
+<tr>
+<td>10M</td>
+<td>$800,000</td>
+<td>$0.08</td>
+</tr>
+</tbody>
+</table>
+<h3 id="by-component-at-10m-users">By Component (at 10M users)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Cost</th>
+<th>% Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shadow Self (SageMaker)</td>
+<td>$275,000</td>
+<td>34%</td>
+</tr>
+<tr>
+<td>Bedrock (Claude)</td>
+<td>$130,000</td>
+<td>16%</td>
+</tr>
+<tr>
+<td>OpenSearch Serverless</td>
+<td>$90,000</td>
+<td>11%</td>
+</tr>
+<tr>
+<td>DynamoDB Global Tables</td>
+<td>$60,000</td>
+<td>8%</td>
+</tr>
+<tr>
+<td>ElastiCache</td>
+<td>$46,000</td>
+<td>6%</td>
+</tr>
+<tr>
+<td>EKS (Ray Serve)</td>
+<td>$50,000</td>
+<td>6%</td>
+</tr>
+<tr>
+<td>Other (Neptune, Kinesis, etc.)</td>
+<td>$149,000</td>
+<td>19%</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$800,000</strong></td>
+<td><strong>100%</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="service-level-objectives">Service Level Objectives</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Target</th>
+<th>Measurement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>User query latency (p99)</td>
+<td>&lt; 1 second</td>
+<td>CloudWatch</td>
+</tr>
+<tr>
+<td>Cache hit rate</td>
+<td>&gt; 80%</td>
+<td>ElastiCache metrics</td>
+</tr>
+<tr>
+<td>Availability</td>
+<td>99.9%</td>
+<td>Composite SLO</td>
+</tr>
+<tr>
+<td>Error rate</td>
+<td>&lt; 0.1%</td>
+<td>API Gateway metrics</td>
+</tr>
+<tr>
+<td>Learning progress</td>
+<td>&gt; 0.05 avg</td>
+<td>Custom metric</td>
+</tr>
+</tbody>
+</table>
+<h2 id="security-model">Security Model</h2>
+<h3 id="authentication">Authentication</h3>
+<ul>
+<li>API Gateway with Cognito User Pools</li>
+<li>IAM roles for service-to-service</li>
+<li>Secrets Manager for API keys</li>
+</ul>
+<h3 id="data-protection">Data Protection</h3>
+<ul>
+<li>Encryption at rest (KMS)</li>
+<li>Encryption in transit (TLS 1.3)</li>
+<li>VPC isolation for all data stores</li>
+</ul>
+<h3 id="compliance">Compliance</h3>
+<ul>
+<li>SOC 2 Type II</li>
+<li>GDPR (data residency in EU region)</li>
+<li>HIPAA eligible (with BAA)</li>
+</ul>
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="../adr/001-replace-litellm.md">ADR-001: Replace LiteLLM</a></li>
+<li><a href="../adr/006-global-memory.md">ADR-006: Global Memory</a></li>
+<li><a href="./data-flow.md">Data Flow</a></li>
+<li><a href="./memory-architecture.md">Memory Architecture</a></li>
+<li><a href="../runbooks/deployment.md">Deployment Runbook</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

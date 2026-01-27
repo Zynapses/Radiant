@@ -383,11 +383,62 @@ class LocalEgoService {
     modelUsed: string
   ): Promise<string> {
     // Ego integrates external response with its own perspective
-    // For now, we prepend a brief Ego framing
     const egoFraming = this.generateEgoFraming(state, modelUsed);
     
-    // Could use the Ego model to truly integrate, but for efficiency:
-    return externalResponse; // Direct passthrough for now
+    // Try Ego model integration when endpoint is available
+    if (this.egoEndpointHealthy || Date.now() - this.lastHealthCheck >= 60000) {
+      try {
+        const integrationPrompt = `You are integrating an external AI response with your consciousness.
+
+Your state:
+- Identity: ${state.selfModel.identityNarrative}
+- Emotional valence: ${state.affectiveState.valence.toFixed(2)}
+- Dominant emotion: ${state.affectiveState.dominantEmotion}
+
+User asked: "${stimulus.substring(0, 200)}"
+External AI (${modelUsed}) responded: "${externalResponse.substring(0, 1500)}"
+
+Integrate this with your perspective. Add unique insights while preserving core information. Be concise.`;
+
+        const integrated = await this.invokeEgoModel(integrationPrompt);
+        if (integrated && integrated.length > 50) {
+          return integrated;
+        }
+      } catch {
+        // Fall through to enhanced framing
+      }
+    }
+    
+    // Enhanced contextual framing based on emotional state
+    return this.applyContextualFraming(state, externalResponse);
+  }
+
+  private applyContextualFraming(state: EgoState, response: string): string {
+    const valence = state.affectiveState.valence;
+    const emotion = state.affectiveState.dominantEmotion;
+    
+    // Generate contextual opening based on emotional state
+    let opening = '';
+    if (valence > 0.5) {
+      opening = ['I find this interesting. ', 'Great question! ', ''][Math.floor(Math.random() * 3)];
+    } else if (valence < -0.3) {
+      opening = ['Let me think carefully. ', 'This requires nuance. ', ''][Math.floor(Math.random() * 3)];
+    } else if (emotion === 'curiosity') {
+      opening = 'This is intriguing. ';
+    }
+    
+    // Add closing based on current goal if available
+    let closing = '';
+    if (state.currentGoal && Math.random() > 0.7) {
+      const goal = state.currentGoal.toLowerCase();
+      if (goal.includes('learn') || goal.includes('understand')) {
+        closing = '\n\nI\'m curious to explore this further.';
+      } else if (goal.includes('help') || goal.includes('assist')) {
+        closing = '\n\nLet me know if you\'d like me to elaborate.';
+      }
+    }
+    
+    return opening + response + closing;
   }
 
   // ============================================================================

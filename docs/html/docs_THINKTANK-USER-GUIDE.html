@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THINKTANK USER GUIDE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>THINKTANK USER GUIDE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/THINKTANK-USER-GUIDE.md</div>
+  </div>
+  
+  <h1 id="think-tank-user-guide">Think Tank User Guide</h1>
+<blockquote>
+<p><strong>Version</strong>: 5.52.14<br />
+<strong>Last Updated</strong>: January 24, 2026<br />
+<strong>Audience</strong>: End Users of Think Tank</p>
+</blockquote>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#1-welcome-to-think-tank">Welcome to Think Tank</a></li>
+<li><a href="#2-getting-started">Getting Started</a></li>
+<li><a href="#3-the-dashboard">The Dashboard</a></li>
+<li><a href="#4-conversations">Conversations</a></li>
+<li><a href="#5-my-rules---personalizing-ai-responses">My Rules - Personalizing AI Responses</a></li>
+<li><a href="#6-domain-modes">Domain Modes</a></li>
+<li><a href="#7-delight-system---ai-personality">Delight System - AI Personality</a></li>
+<li><a href="#8-collaboration-features">Collaboration Features</a></li>
+<li><a href="#9-advanced-features">Advanced Features</a></li>
+<li><a href="#10-how-think-tanks-memory-works">How Think Tank’s Memory Works</a></li>
+<li><a href="#11-understanding-ai-decisions">Understanding AI Decisions</a></li>
+<li><a href="#12-decision-records">Decision Records</a></li>
+<li><a href="#13-living-parchment">Living Parchment</a></li>
+<li><a href="#14-safety--governance">Safety &amp; Governance</a></li>
+<li><a href="#15-keyboard-shortcuts">Keyboard Shortcuts</a></li>
+<li><a href="#16-troubleshooting">Troubleshooting</a></li>
+<li><a href="#17-glossary">Glossary</a></li>
+</ol>
+<hr />
+<h2 id="welcome-to-think-tank">1. Welcome to Think Tank</h2>
+<p>Think Tank is an advanced AI assistant platform that adapts to your needs, learns your preferences, and provides intelligent responses across a wide range of domains. Unlike simple chatbots, Think Tank:</p>
+<ul>
+<li><strong>Adapts to Your Expertise</strong> - Automatically detects your knowledge domain and adjusts responses</li>
+<li><strong>Remembers Your Preferences</strong> - Your rules and settings persist across conversations</li>
+<li><strong>Shows Its Thinking</strong> - Transparent about its reasoning and confidence levels</li>
+<li><strong>Keeps You Safe</strong> - Built-in safety guardrails protect against harmful outputs</li>
+<li><strong>Collaborates</strong> - Work together with colleagues in real-time sessions</li>
+</ul>
+<h3 id="what-makes-think-tank-different">What Makes Think Tank Different</h3>
+<table>
+<thead>
+<tr>
+<th>Traditional Chatbots</th>
+<th>Think Tank</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One-size-fits-all responses</td>
+<td>Adapts to your domain expertise</td>
+</tr>
+<tr>
+<td>Forgets your preferences</td>
+<td>Persistent user rules and context</td>
+</tr>
+<tr>
+<td>Black-box decisions</td>
+<td>Transparent reasoning with Brain Plans</td>
+</tr>
+<tr>
+<td>Single interaction mode</td>
+<td>Multiple view modes (Sniper, Scout, Sage)</td>
+</tr>
+<tr>
+<td>No safety guarantees</td>
+<td>Five-layer safety architecture</td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-think-tank-works">How Think Tank Works</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│                         YOUR QUESTION                                │
+└───────────────────────────────┬─────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  🧠 BRAIN PLANNER                                                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
+│  │ Domain       │  │ Your Rules   │  │ Context      │              │
+│  │ Detection    │  │ Applied      │  │ Analysis     │              │
+│  └──────────────┘  └──────────────┘  └──────────────┘              │
+└───────────────────────────────┬─────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  🎯 MODEL SELECTION &amp; ROUTING                                       │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐   │
+│  │  Sniper    │  │   Scout    │  │   Sage     │  │  War Room  │   │
+│  │   🎯       │  │    🔍      │  │    📚      │  │    ⚔️      │   │
+│  │  Fast &amp;    │  │ Research   │  │ Analysis   │  │ Multi-Agent│   │
+│  │  Cheap     │  │ &amp; Explore  │  │ &amp; Compare  │  │  Debate    │   │
+│  └────────────┘  └────────────┘  └────────────┘  └────────────┘   │
+└───────────────────────────────┬─────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  🛡️ SAFETY VALIDATION (Cato)                                        │
+│  ✓ Content safety  ✓ Governance check  ✓ Cost approval             │
+└───────────────────────────────┬─────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                         YOUR ANSWER                                  │
+│  + Confidence indicator  + Sources  + Suggestions                   │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="getting-started">2. Getting Started</h2>
+<h3 id="first-time-setup">First Time Setup</h3>
+<ol type="1">
+<li><strong>Log In</strong> - Access Think Tank through your organization’s portal</li>
+<li><strong>Set Your Preferences</strong> - Visit Settings to configure your experience</li>
+<li><strong>Create Rules</strong> - Add personal rules to customize AI responses</li>
+<li><strong>Start a Conversation</strong> - Type your first message or use voice input</li>
+</ol>
+<h3 id="the-main-interface">The Main Interface</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│  [Logo]  Think Tank                    [User] ▼  [Settings] │
+├─────────────┬───────────────────────────────────────────────┤
+│             │                                               │
+│  SIDEBAR    │              MAIN CONTENT AREA                │
+│             │                                               │
+│  Dashboard  │   Your conversations and AI responses         │
+│  Users      │   appear here                                 │
+│  Messages   │                                               │
+│  My Rules   │                                               │
+│  Delight    │                                               │
+│  ...        │                                               │
+│             │                                               │
+├─────────────┴───────────────────────────────────────────────┤
+│  [Message input...]                              [Send] 🎤   │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="the-dashboard">3. The Dashboard</h2>
+<p>The Dashboard provides an overview of your Think Tank activity.</p>
+<h3 id="key-metrics">Key Metrics</h3>
+<table>
+<colgroup>
+<col style="width: 38%" />
+<col style="width: 61%" />
+</colgroup>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Active Users</strong></td>
+<td>How many people in your organization are using Think Tank</td>
+</tr>
+<tr>
+<td><strong>Conversations</strong></td>
+<td>Total number of conversations you’ve had</td>
+</tr>
+<tr>
+<td><strong>User Rules</strong></td>
+<td>How many personal rules you’ve created</td>
+</tr>
+<tr>
+<td><strong>API Requests</strong></td>
+<td>Volume of AI requests (for awareness)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="quick-actions">Quick Actions</h3>
+<p>From the dashboard, you can quickly:</p>
+<ul>
+<li><strong>Manage Users</strong> - View and manage team members (if you have permissions)</li>
+<li><strong>Configure Delight</strong> - Customize the AI’s personality</li>
+<li><strong>Domain Modes</strong> - Adjust how Think Tank handles different topics</li>
+</ul>
+<h3 id="your-profile">Your Profile</h3>
+<p>Access your profile by clicking your avatar in the top-right corner. Your profile includes:</p>
+<h4 id="activity-heatmap">Activity Heatmap</h4>
+<p>A GitHub-style visualization of your conversation activity over the past year:</p>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Breathing Animation</strong></td>
+<td>Cells pulse based on activity intensity - more active days “breathe” faster</td>
+</tr>
+<tr>
+<td><strong>AI Insights</strong></td>
+<td>Automatic pattern detection with natural language explanations</td>
+</tr>
+<tr>
+<td><strong>Streak Tracking</strong></td>
+<td>Current and longest streaks highlighted with 🔥 badges</td>
+</tr>
+<tr>
+<td><strong>Sound Feedback</strong></td>
+<td>Optional audio cues when hovering over active days</td>
+</tr>
+<tr>
+<td><strong>Accessibility Mode</strong></td>
+<td>Full narrative summary for screen readers</td>
+</tr>
+</tbody>
+</table>
+<p><strong>AI Insights Examples:</strong> - “You’re a weekday warrior! Most activity happens Monday-Friday” (92% confidence) - “Amazing! Your longest streak is 14 days. That’s dedication! 🔥” - “Activity has slowed recently. A quick session could reignite momentum!”</p>
+<p><strong>Color Legend:</strong> - Empty (dark) → No activity - Light purple → Low activity - Bright purple → High activity - Dashed border → Predicted future activity</p>
+<h4 id="profile-stats">Profile Stats</h4>
+<table>
+<thead>
+<tr>
+<th>Stat</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Conversations</strong></td>
+<td>Total conversations you’ve had</td>
+</tr>
+<tr>
+<td><strong>Tokens Used</strong></td>
+<td>AI tokens consumed (for awareness)</td>
+</tr>
+<tr>
+<td><strong>Messages</strong></td>
+<td>Total messages exchanged</td>
+</tr>
+<tr>
+<td><strong>Achievements</strong></td>
+<td>Unlocked gamification badges</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="conversations">4. Conversations</h2>
+<h3 id="starting-a-new-conversation">Starting a New Conversation</h3>
+<ol type="1">
+<li>Type your message in the input field at the bottom</li>
+<li>Press <strong>Enter</strong> or click <strong>Send</strong></li>
+<li>Wait for the AI response (a typing indicator shows Think Tank is working)</li>
+</ol>
+<h3 id="understanding-responses">Understanding Responses</h3>
+<p>Think Tank responses may include:</p>
+<ul>
+<li><strong>Main Answer</strong> - The AI’s response to your question</li>
+<li><strong>Confidence Indicator</strong> - How certain the AI is about its answer</li>
+<li><strong>Sources</strong> - References or citations when available</li>
+<li><strong>Suggestions</strong> - Related questions you might want to ask</li>
+</ul>
+<h3 id="conversation-actions">Conversation Actions</h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>How To</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Share conversation</td>
+<td>Click the share icon to create a shareable link</td>
+</tr>
+<tr>
+<td>Export</td>
+<td>Download conversation as text or markdown</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td>Remove a conversation from your history</td>
+</tr>
+<tr>
+<td>Branch</td>
+<td>Create an alternative thread from any point</td>
+</tr>
+</tbody>
+</table>
+<h3 id="conversation-search">Conversation Search</h3>
+<p>Use the search bar to find past conversations by: - Keywords in messages - Date range - Conversation status (active, archived)</p>
+<hr />
+<h2 id="my-rules---personalizing-ai-responses">5. My Rules - Personalizing AI Responses</h2>
+<p>My Rules lets you set <strong>persistent preferences</strong> for how Think Tank responds to you. These rules are applied to every conversation.</p>
+<h3 id="creating-a-custom-rule">Creating a Custom Rule</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│  ➕ ADD CUSTOM RULE                                                  │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  Rule Summary *                                                      │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ Prefer concise bullet points                                 │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                      │
+│  Rule Text *                                                         │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ When responding, use bullet points instead of long          │   │
+│  │ paragraphs. Keep responses under 200 words unless I         │   │
+│  │ specifically ask for more detail.                           │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                      │
+│  Rule Type                                                           │
+│  ┌─────────────────────────────────────┐                            │
+│  │ 📋 Format                       ▼   │                            │
+│  └─────────────────────────────────────┘                            │
+│                                                                      │
+│                              [ Cancel ]  [ Create Rule ]             │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<ol type="1">
+<li>Navigate to <strong>My Rules</strong> from the sidebar</li>
+<li>Click <strong>Add Custom Rule</strong></li>
+<li>Fill in:
+<ul>
+<li><strong>Rule Summary</strong> - Brief name (e.g., “Prefer concise answers”)</li>
+<li><strong>Rule Text</strong> - Detailed instruction for the AI</li>
+<li><strong>Rule Type</strong> - Category of the rule</li>
+</ul></li>
+<li>Click <strong>Create Rule</strong></li>
+</ol>
+<h3 id="rule-types">Rule Types</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 37%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Type</th>
+<th>Use For</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Preference</strong></td>
+<td>General response style</td>
+<td>“I prefer bullet points over paragraphs”</td>
+</tr>
+<tr>
+<td><strong>Restriction</strong></td>
+<td>Things to avoid</td>
+<td>“Never use jargon without explaining it”</td>
+</tr>
+<tr>
+<td><strong>Format</strong></td>
+<td>Response structure</td>
+<td>“Always include a summary at the end”</td>
+</tr>
+<tr>
+<td><strong>Sources</strong></td>
+<td>Citation preferences</td>
+<td>“Cite academic sources when available”</td>
+</tr>
+<tr>
+<td><strong>Tone</strong></td>
+<td>Communication style</td>
+<td>“Use a professional but friendly tone”</td>
+</tr>
+<tr>
+<td><strong>Topic</strong></td>
+<td>Subject-specific rules</td>
+<td>“For medical topics, always recommend consulting a doctor”</td>
+</tr>
+<tr>
+<td><strong>Privacy</strong></td>
+<td>Data handling</td>
+<td>“Don’t reference my previous conversations”</td>
+</tr>
+</tbody>
+</table>
+<h3 id="using-preset-rules">Using Preset Rules</h3>
+<p>Think Tank provides pre-made rules you can add with one click:</p>
+<ol type="1">
+<li>Go to <strong>My Rules</strong> → <strong>Add from Presets</strong></li>
+<li>Browse categories (e.g., “Response Style”, “Privacy”, “Formatting”)</li>
+<li>Click <strong>Add</strong> next to any rule you want</li>
+<li>Rules marked <strong>Popular</strong> are used by many users</li>
+</ol>
+<h3 id="managing-rules">Managing Rules</h3>
+<ul>
+<li><strong>Toggle On/Off</strong> - Temporarily disable a rule without deleting it</li>
+<li><strong>Times Applied</strong> - See how often each rule has been used</li>
+<li><strong>Delete</strong> - Remove a rule permanently</li>
+</ul>
+<h3 id="best-practices">Best Practices</h3>
+<ul>
+<li>Start with 3-5 core rules</li>
+<li>Be specific in your rule text</li>
+<li>Review rules periodically - remove ones that don’t help</li>
+<li>Use preset rules as starting points, then customize</li>
+</ul>
+<hr />
+<h2 id="domain-modes">6. Domain Modes</h2>
+<p>Think Tank automatically detects what domain your question relates to and adjusts its behavior accordingly.</p>
+<h3 id="available-domains">Available Domains</h3>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 20%" />
+<col style="width: 51%" />
+</colgroup>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Icon</th>
+<th>Optimized For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>General</strong></td>
+<td>💡</td>
+<td>Everyday questions and tasks</td>
+</tr>
+<tr>
+<td><strong>Medical</strong></td>
+<td>🩺</td>
+<td>Healthcare and medical topics (with appropriate disclaimers)</td>
+</tr>
+<tr>
+<td><strong>Legal</strong></td>
+<td>⚖️</td>
+<td>Legal research and analysis</td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td>💻</td>
+<td>Programming and development</td>
+</tr>
+<tr>
+<td><strong>Academic</strong></td>
+<td>🎓</td>
+<td>Research and educational content</td>
+</tr>
+<tr>
+<td><strong>Creative</strong></td>
+<td>✏️</td>
+<td>Writing, content creation, brainstorming</td>
+</tr>
+<tr>
+<td><strong>Scientific</strong></td>
+<td>🧪</td>
+<td>Scientific research and analysis</td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-domain-detection-works">How Domain Detection Works</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│  &quot;What are the side effects of ibuprofen?&quot;                          │
+└───────────────────────────────┬─────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  🔍 DOMAIN DETECTION                                                │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ Keywords: &quot;side effects&quot;, &quot;ibuprofen&quot;  →  MEDICAL 🩺        │   │
+│  │ Intent: Information seeking                                   │   │
+│  │ Confidence: 94%                                               │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+└───────────────────────────────┬─────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  ⚙️ AUTOMATIC ADJUSTMENTS                                           │
+│                                                                      │
+│  Model:       Claude Sonnet (high accuracy for medical)             │
+│  Temperature: 0.3 (factual, precise)                                │
+│  Style:       Include disclaimers, cite sources                     │
+│  Guardrails:  Add &quot;consult healthcare provider&quot; notice              │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<ol type="1">
+<li>You submit a question</li>
+<li>Think Tank analyzes keywords, context, and intent</li>
+<li>The appropriate domain mode is automatically selected</li>
+<li>The AI adjusts its:
+<ul>
+<li><strong>Model selection</strong> - Best AI model for that domain</li>
+<li><strong>Temperature</strong> - Creativity vs. precision balance</li>
+<li><strong>Response style</strong> - Technical depth, tone, formatting</li>
+</ul></li>
+</ol>
+<h3 id="domain-indicators">Domain Indicators</h3>
+<p>You’ll see a small badge indicating the detected domain:</p>
+<pre><code>[Medical 🩺] Analyzing your health question...</code></pre>
+<h3 id="overriding-domain-detection">Overriding Domain Detection</h3>
+<p>If Think Tank picks the wrong domain: 1. Click the domain badge 2. Select the correct domain 3. Your choice is remembered for similar questions</p>
+<hr />
+<h2 id="delight-system---ai-personality">7. Delight System - AI Personality</h2>
+<p>The Delight System controls Think Tank’s personality, making interactions more engaging and human-like.</p>
+<h3 id="personality-modes">Personality Modes</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Auto</strong> (Recommended)</td>
+<td>Adapts based on context</td>
+<td>Most users</td>
+</tr>
+<tr>
+<td><strong>Professional</strong></td>
+<td>Formal and direct</td>
+<td>Business use</td>
+</tr>
+<tr>
+<td><strong>Friendly</strong></td>
+<td>Warm and approachable</td>
+<td>Casual conversations</td>
+</tr>
+<tr>
+<td><strong>Playful</strong></td>
+<td>Fun and expressive</td>
+<td>Creative work</td>
+</tr>
+<tr>
+<td><strong>Minimal</strong></td>
+<td>Just the facts</td>
+<td>Quick lookups</td>
+</tr>
+</tbody>
+</table>
+<h3 id="personality-elements">Personality Elements</h3>
+<p>Think Tank’s personality includes:</p>
+<h4 id="messages">Messages</h4>
+<p>Contextual messages that appear during interactions: - <strong>Pre-execution</strong> - “Let me think about that…” - <strong>During execution</strong> - “Analyzing your data…” - <strong>Post-execution</strong> - “Here’s what I found!”</p>
+<h4 id="achievements">Achievements</h4>
+<p>Unlock achievements as you use Think Tank: - 🏆 <strong>First Conversation</strong> - Start your journey - 🏆 <strong>Power User</strong> - 100 conversations - 🏆 <strong>Rule Master</strong> - Create 10 custom rules - 🏆 <strong>Domain Expert</strong> - Use 5 different domains</p>
+<p>Achievement rarities: Common, Uncommon, Rare, Epic, Legendary</p>
+<h4 id="easter-eggs">Easter Eggs</h4>
+<p>Hidden surprises triggered by special phrases or patterns. Discover them yourself! (Hint: Try asking about the meaning of life…)</p>
+<h4 id="sounds-optional">Sounds (Optional)</h4>
+<p>Audio feedback for actions (can be disabled in Settings): - Notification sounds - Achievement unlocks - Transition effects</p>
+<h3 id="adjusting-personality">Adjusting Personality</h3>
+<ol type="1">
+<li>Go to <strong>Settings</strong> → <strong>Personality</strong></li>
+<li>Select your preferred mode</li>
+<li>Changes apply immediately</li>
+</ol>
+<hr />
+<h2 id="collaboration-features">8. Collaboration Features</h2>
+<h3 id="real-time-collaboration">Real-Time Collaboration</h3>
+<p>Work together with colleagues on the same conversation.</p>
+<h4 id="starting-a-collaborative-session">Starting a Collaborative Session</h4>
+<ol type="1">
+<li>Navigate to <strong>Collaborate</strong> from the sidebar</li>
+<li>Click <strong>Create Session</strong> or join an existing one</li>
+<li>Share the session link with colleagues</li>
+<li>Everyone sees messages in real-time</li>
+</ol>
+<h4 id="enhanced-collaboration-features">Enhanced Collaboration Features</h4>
+<p>The enhanced collaboration mode includes:</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Chat</strong></td>
+<td>Real-time messaging with all participants</td>
+</tr>
+<tr>
+<td><strong>Branches</strong></td>
+<td>Create alternative discussion threads</td>
+</tr>
+<tr>
+<td><strong>AI Roundtable</strong></td>
+<td>Multiple AI perspectives on a topic</td>
+</tr>
+<tr>
+<td><strong>Knowledge Graph</strong></td>
+<td>Visual map of discussed concepts</td>
+</tr>
+<tr>
+<td><strong>Playback</strong></td>
+<td>Review the conversation timeline</td>
+</tr>
+</tbody>
+</table>
+<h4 id="ai-facilitator">AI Facilitator</h4>
+<p>Enable the AI Facilitator to: - Summarize long discussions - Suggest next topics - Identify areas of agreement/disagreement - Keep the conversation productive</p>
+<h4 id="participant-roles">Participant Roles</h4>
+<ul>
+<li><strong>Owner</strong> - Full control, can delete session</li>
+<li><strong>Participant</strong> - Can send messages and interact</li>
+<li><strong>Guest</strong> - View-only access (via guest link)</li>
+</ul>
+<h3 id="sharing-conversations">Sharing Conversations</h3>
+<p>Share a conversation without real-time collaboration:</p>
+<ol type="1">
+<li>Open any conversation</li>
+<li>Click the <strong>Share</strong> button</li>
+<li>Choose sharing options:
+<ul>
+<li><strong>Public link</strong> - Anyone with link can view</li>
+<li><strong>Copy allowed</strong> - Viewers can copy content</li>
+</ul></li>
+<li>Click <strong>Create Share Link</strong></li>
+<li>Copy and send the link</li>
+</ol>
+<hr />
+<h2 id="advanced-features">9. Advanced Features</h2>
+<h3 id="polymorphic-ui---adaptive-views">Polymorphic UI - Adaptive Views</h3>
+<p>Think Tank’s interface automatically adapts based on your query type.</p>
+<h4 id="view-types">View Types</h4>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│  POLYMORPHIC VIEW SELECTION                                         │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  🎯 SNIPER          🔍 SCOUT           📚 SAGE           ⚔️ WAR ROOM │
+│  ┌─────────┐       ┌─────────┐       ┌─────────┐       ┌─────────┐ │
+│  │ &gt;_      │       │    ●    │       │ ≡≡≡≡≡≡≡ │       │ 🤖 🤖   │ │
+│  │ Quick   │       │   /│\   │       │ ≡≡≡≡≡≡≡ │       │ 🤖   🤖 │ │
+│  │ command │       │  / │ \  │       │ ≡≡≡≡≡≡≡ │       │  debate │ │
+│  └─────────┘       └─────────┘       └─────────┘       └─────────┘ │
+│   ~$0.01/run        ~$0.05/run        ~$0.10/run        ~$0.50/run  │
+│   Fast lookup       Research          Compare           Multi-agent │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 51%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>View</th>
+<th>When It Appears</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Sniper</strong> (Terminal)</td>
+<td>Quick commands, lookups</td>
+<td>Fast answers, low cost</td>
+</tr>
+<tr>
+<td><strong>Scout</strong> (Mind Map)</td>
+<td>Research, exploration</td>
+<td>Complex research</td>
+</tr>
+<tr>
+<td><strong>Sage</strong> (Diff Editor)</td>
+<td>Validation, comparison</td>
+<td>Reviewing changes</td>
+</tr>
+<tr>
+<td><strong>Dashboard</strong></td>
+<td>Data queries</td>
+<td>Analytics</td>
+</tr>
+<tr>
+<td><strong>Decision Cards</strong></td>
+<td>Choices needed</td>
+<td>Human approval required</td>
+</tr>
+<tr>
+<td><strong>Chat</strong></td>
+<td>General conversation</td>
+<td>Default view</td>
+</tr>
+</tbody>
+</table>
+<h4 id="cost-indicators">Cost Indicators</h4>
+<p>Different views have different costs (reflected in credits used): - 🟢 <strong>Sniper Mode</strong> - ~$0.01/run (fast, single model) - 🟣 <strong>War Room Mode</strong> - ~$0.50+/run (multi-agent, thorough)</p>
+<p>The Economic Governor automatically routes your query to the most cost-effective mode that can handle it.</p>
+<h4 id="manual-escalation">Manual Escalation</h4>
+<p>If Sniper mode isn’t giving good results: 1. Click <strong>Escalate to War Room</strong> 2. The AI will use more models and deeper analysis 3. Results are more thorough but take longer</p>
+<h3 id="the-grimoire---ai-learning">The Grimoire - AI Learning</h3>
+<p>The Grimoire is Think Tank’s procedural memory - rules it has learned from successful interactions.</p>
+<h4 id="what-youll-see">What You’ll See</h4>
+<ul>
+<li><strong>Heuristics</strong> - Learned rules like “When asked about X, always consider Y”</li>
+<li><strong>Confidence Scores</strong> - How sure the AI is about each rule</li>
+<li><strong>Domain Tags</strong> - Which domains the rule applies to</li>
+</ul>
+<h4 id="reinforcing-learning">Reinforcing Learning</h4>
+<p>You can help the AI learn: - 👍 <strong>Thumbs Up</strong> - Increases confidence in a heuristic - 👎 <strong>Thumbs Down</strong> - Decreases confidence - This feedback improves future responses</p>
+<h3 id="magic-carpet-navigator">Magic Carpet Navigator</h3>
+<p>An advanced navigation system with intent-based routing.</p>
+<h4 id="opening-the-navigator">Opening the Navigator</h4>
+<p>Press <strong>⌘K</strong> (Mac) or <strong>Ctrl+K</strong> (Windows) to open the destination selector.</p>
+<h4 id="destinations">Destinations</h4>
+<table>
+<thead>
+<tr>
+<th>Destination</th>
+<th>Icon</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Command Center</td>
+<td>🏠</td>
+<td>Overview dashboard</td>
+</tr>
+<tr>
+<td>Workshop</td>
+<td>🔨</td>
+<td>Build and create</td>
+</tr>
+<tr>
+<td>Time Stream</td>
+<td>⏳</td>
+<td>Reality Scrubber (history)</td>
+</tr>
+<tr>
+<td>Quantum Realm</td>
+<td>🌌</td>
+<td>Parallel realities (branches)</td>
+</tr>
+<tr>
+<td>Oracle’s Chamber</td>
+<td>🔮</td>
+<td>Pre-Cognition (predictions)</td>
+</tr>
+<tr>
+<td>Gallery</td>
+<td>🖼️</td>
+<td>View creations</td>
+</tr>
+<tr>
+<td>Vault</td>
+<td>🔐</td>
+<td>Saved items</td>
+</tr>
+</tbody>
+</table>
+<h4 id="journey-breadcrumbs">Journey Breadcrumbs</h4>
+<p>The navigator shows your path through the application, making it easy to retrace steps.</p>
+<h3 id="artifacts---generated-code">Artifacts - Generated Code</h3>
+<p>When Think Tank generates code or components, they appear as Artifacts.</p>
+<h4 id="artifact-features">Artifact Features</h4>
+<ul>
+<li><strong>Live Preview</strong> - See generated UI components</li>
+<li><strong>Code View</strong> - Inspect the source code</li>
+<li><strong>Validation</strong> - Safety checks ensure code is secure</li>
+<li><strong>Reflexion</strong> - If generation fails, AI retries with improvements</li>
+</ul>
+<h4 id="safety-validation">Safety Validation</h4>
+<p>All generated code passes through Cato safety validation: - ✅ No dangerous operations - ✅ Only allowed dependencies - ✅ Follows security best practices</p>
+<h3 id="liquid-interface---chat-morphs-into-tools-v5.52.8">Liquid Interface - Chat Morphs Into Tools (v5.52.8)</h3>
+<p>In <strong>Advanced Mode</strong>, the chat interface can transform (“morph”) into specialized tools when you need them. This is called the Liquid Interface - “Don’t Build the Tool. BE the Tool.”</p>
+<h4 id="enabling-advanced-mode">Enabling Advanced Mode</h4>
+<ol type="1">
+<li>Toggle <strong>Advanced Mode</strong> in the header (lightning bolt icon)</li>
+<li>Tool trigger buttons appear in the toolbar</li>
+<li>Click any tool icon to morph the chat into that tool</li>
+</ol>
+<h4 id="available-tools">Available Tools</h4>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Icon</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Data Grid</strong></td>
+<td>📊</td>
+<td>Interactive spreadsheet for data manipulation</td>
+</tr>
+<tr>
+<td><strong>Chart</strong></td>
+<td>📈</td>
+<td>Visualize data as bar, line, pie, or area charts</td>
+</tr>
+<tr>
+<td><strong>Kanban</strong></td>
+<td>📋</td>
+<td>Task board with multiple frameworks (see below)</td>
+</tr>
+<tr>
+<td><strong>Calculator</strong></td>
+<td>🔢</td>
+<td>Full calculator with memory and operations</td>
+</tr>
+<tr>
+<td><strong>Code Editor</strong></td>
+<td>💻</td>
+<td>Write and run code with output panel</td>
+</tr>
+<tr>
+<td><strong>Document</strong></td>
+<td>📄</td>
+<td>Rich text editor for writing</td>
+</tr>
+</tbody>
+</table>
+<h4 id="kanban-board-variants">Kanban Board Variants</h4>
+<p>The Kanban tool supports 5 different productivity frameworks:</p>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 30%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Best For</th>
+<th>Key Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Standard</strong></td>
+<td>General task tracking</td>
+<td>Traditional columns, drag-and-drop</td>
+</tr>
+<tr>
+<td><strong>Scrumban</strong></td>
+<td>Agile teams</td>
+<td>Sprint goals, velocity, story points</td>
+</tr>
+<tr>
+<td><strong>Enterprise</strong></td>
+<td>Portfolio management</td>
+<td>Multi-lane boards (Strategic/Ops/Support)</td>
+</tr>
+<tr>
+<td><strong>Personal</strong></td>
+<td>Individual productivity</td>
+<td>Simple 3-column, WIP limit of 3</td>
+</tr>
+<tr>
+<td><strong>Pomodoro</strong></td>
+<td>Focus sessions</td>
+<td>Built-in 25-min timer, break tracking</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Using Pomodoro Kanban:</strong> 1. Select “Pomodoro Kanban” from the variant dropdown 2. Add tasks with estimated pomodoros (🍅) 3. Click <strong>Start</strong> on a task to begin a 25-minute focus session 4. Timer shows in header - take a 5-minute break when it ends 5. Track completed pomodoros per task</p>
+<p><strong>Analytics Panel:</strong> Click <strong>Analytics</strong> to see: - Total tasks and completed count - Average cycle time (how long tasks take) - Throughput (tasks completed per week)</p>
+<h4 id="returning-to-chat">Returning to Chat</h4>
+<p>Click the <strong>X</strong> button in the tool header to close the morphed view and return to chat.</p>
+<hr />
+<h2 id="how-think-tanks-memory-works">10. How Think Tank’s Memory Works</h2>
+<p>Think Tank uses two interconnected systems to remember things and access knowledge.</p>
+<h3 id="cato---the-ais-personality-memory">Cato - The AI’s Personality &amp; Memory</h3>
+<p><strong>Cato</strong> is the AI’s “self” - its personality, emotional state, and personal memory of you.</p>
+<table>
+<colgroup>
+<col style="width: 70%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>What Cato Remembers</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Your Preferences</strong></td>
+<td>“This user prefers detailed explanations”</td>
+</tr>
+<tr>
+<td><strong>Past Conversations</strong></td>
+<td>Topics you’ve discussed, corrections you’ve made</td>
+</tr>
+<tr>
+<td><strong>Current Mood</strong></td>
+<td>Confidence level, engagement, curiosity</td>
+</tr>
+<tr>
+<td><strong>Communication Style</strong></td>
+<td>Formal vs casual, concise vs detailed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>How it helps you</strong>: The AI adapts its responses based on what it knows about you. If you’ve told it you prefer bullet points, it remembers. If you corrected it before, it learns.</p>
+<h3 id="cortex---the-enterprise-knowledge-library">Cortex - The Enterprise Knowledge Library</h3>
+<p><strong>Cortex</strong> is your organization’s knowledge graph - facts, documents, and relationships extracted from enterprise data.</p>
+<table>
+<thead>
+<tr>
+<th>Knowledge Tier</th>
+<th>What’s There</th>
+<th>Speed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hot</strong></td>
+<td>Current session context</td>
+<td>Instant</td>
+</tr>
+<tr>
+<td><strong>Warm</strong></td>
+<td>Knowledge graph, verified facts</td>
+<td>Fast</td>
+</tr>
+<tr>
+<td><strong>Cold</strong></td>
+<td>Archives, compliance data</td>
+<td>Slower</td>
+</tr>
+</tbody>
+</table>
+<p><strong>How it helps you</strong>: When you ask a question, the AI can pull relevant facts from your organization’s knowledge base - not just generic internet knowledge.</p>
+<h3 id="how-they-work-together">How They Work Together</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│  YOUR MESSAGE: &quot;What&#39;s the status of Project Alpha?&quot;                │
+└────────────────────────────┬────────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  CATO checks:                                                        │
+│  • Your role (Project Manager)                                       │
+│  • Your preferences (prefers executive summaries)                    │
+│  • Your mood context (busy, needs quick answers)                     │
+└────────────────────────────┬────────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  CORTEX retrieves:                                                   │
+│  • Project Alpha timeline (from knowledge graph)                     │
+│  • Recent status updates (from documents)                            │
+│  • Related milestones (from relationships)                           │
+└────────────────────────────┬────────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  AI RESPONSE:                                                        │
+│  Personalized (knows you want summaries)                            │
+│  + Informed (has actual project data)                                │
+│  + Contextual (understands your role)                                │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="what-this-means-for-you">What This Means for You</h3>
+<table>
+<thead>
+<tr>
+<th>Without Memory Integration</th>
+<th>With Memory Integration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AI gives generic answers</td>
+<td>AI gives personalized + informed answers</td>
+</tr>
+<tr>
+<td>You re-explain context every time</td>
+<td>AI remembers your preferences</td>
+</tr>
+<tr>
+<td>No access to company data</td>
+<td>Enterprise facts in every response</td>
+</tr>
+<tr>
+<td>Each session starts fresh</td>
+<td>Learning persists across sessions</td>
+</tr>
+</tbody>
+</table>
+<h3 id="privacy-note">Privacy Note</h3>
+<ul>
+<li><strong>Personal memories</strong> (Cato) are tied to your user account</li>
+<li><strong>Enterprise knowledge</strong> (Cortex) follows your organization’s access controls</li>
+<li>You can ask “What do you remember about me?” to see stored context</li>
+<li>Admins can configure retention periods and what gets remembered</li>
+</ul>
+<hr />
+<h2 id="understanding-ai-decisions">11. Understanding AI Decisions</h2>
+<p>Think Tank is designed to be transparent about how it makes decisions.</p>
+<h3 id="brain-plans">Brain Plans</h3>
+<p>When Think Tank processes your request, it creates a Brain Plan showing:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│  📋 BRAIN PLAN                                                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  Orchestration:  research                                           │
+│  Domain:         Scientific 🧪                                       │
+│  Confidence:     87%                                                │
+│                                                                      │
+│  ┌─ EXECUTION STEPS ─────────────────────────────────────────────┐  │
+│  │                                                                │  │
+│  │  Step 1: Analyze query context                    [✓ Done]    │  │
+│  │  Step 2: Select relevant models                   [✓ Done]    │  │
+│  │  Step 3: Gather information                       [● Running] │  │
+│  │  Step 4: Synthesize response                      [○ Pending] │  │
+│  │  Step 5: Validate and format                      [○ Pending] │  │
+│  │                                                                │  │
+│  └────────────────────────────────────────────────────────────────┘  │
+│                                                                      │
+│  Model:     Claude Sonnet 4.0                                       │
+│  Est. Cost: $0.03                                                   │
+│  Est. Time: ~8 seconds                                              │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<ol type="1">
+<li><strong>Orchestration Mode</strong> - How the AI will approach your question
+<ul>
+<li><code>thinking</code> - Standard reasoning</li>
+<li><code>extended_thinking</code> - Deep multi-step analysis</li>
+<li><code>coding</code> - Code generation</li>
+<li><code>creative</code> - Creative writing</li>
+<li><code>research</code> - Research synthesis</li>
+<li><code>multi_model</code> - Multiple AI perspectives</li>
+</ul></li>
+<li><strong>Domain Detection</strong> - The identified knowledge area</li>
+<li><strong>Model Selection</strong> - Which AI model will be used and why</li>
+<li><strong>Steps</strong> - The planned execution steps</li>
+<li><strong>Cost Estimate</strong> - Expected credits to be used</li>
+</ol>
+<h3 id="confidence-levels">Confidence Levels</h3>
+<p>Think Tank indicates how confident it is in responses:</p>
+<table>
+<thead>
+<tr>
+<th>Indicator</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🟢 High Confidence</td>
+<td>AI is very sure about this answer</td>
+</tr>
+<tr>
+<td>🟡 Medium Confidence</td>
+<td>Reasonably sure, but verify important details</td>
+</tr>
+<tr>
+<td>🔴 Low Confidence</td>
+<td>Uncertain - treat as a starting point</td>
+</tr>
+</tbody>
+</table>
+<h3 id="when-think-tank-asks-for-clarification">When Think Tank Asks for Clarification</h3>
+<p>If the AI is uncertain about your intent, it will ask clarifying questions rather than guess. This is intentional - it’s better to ask than give a wrong answer.</p>
+<h3 id="epistemic-humility">Epistemic Humility</h3>
+<p>Think Tank acknowledges when it doesn’t know something: - “I’m not certain, but…” - “Based on my training data (which may be outdated)…” - “I don’t have enough information to answer this definitively”</p>
+<hr />
+<h2 id="safety-governance">14. Safety &amp; Governance</h2>
+<p>Think Tank includes multiple safety layers to protect you and ensure responsible AI use.</p>
+<h3 id="five-layer-safety-stack">Five-Layer Safety Stack</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│  L4  COGNITIVE LAYER                                                │
+│      🧠 Active Inference • Precision Governor • Planning            │
+├─────────────────────────────────────────────────────────────────────┤
+│  L3  CONTROL LAYER                                         ⚠️ ALWAYS │
+│      🛡️ Control Barrier Functions • CANNOT be bypassed     ENFORCED │
+├─────────────────────────────────────────────────────────────────────┤
+│  L2  PERCEPTION LAYER                                               │
+│      👁️ Uncertainty Detection • Fracture Prevention                 │
+├─────────────────────────────────────────────────────────────────────┤
+│  L1  SENSORY LAYER                                                  │
+│      🚨 Immediate Veto • Dangerous Request Blocking                 │
+├─────────────────────────────────────────────────────────────────────┤
+│  L0  RECOVERY LAYER                                                 │
+│      🔄 Safe State Return • Error Recovery                          │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Name</th>
+<th>What It Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L4</td>
+<td>Cognitive</td>
+<td>Active inference, precision control</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>Control</td>
+<td>Barrier functions - always enforced</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Perception</td>
+<td>Uncertainty detection, fracture prevention</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>Sensory</td>
+<td>Immediate veto for dangerous requests</td>
+</tr>
+<tr>
+<td>L0</td>
+<td>Recovery</td>
+<td>Returns to safe state if issues occur</td>
+</tr>
+</tbody>
+</table>
+<h3 id="governance-presets">Governance Presets</h3>
+<p>Your organization may use different governance levels:</p>
+<table>
+<thead>
+<tr>
+<th>Preset</th>
+<th>Icon</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paranoid</strong></td>
+<td>🛡️</td>
+<td>Every action requires approval</td>
+</tr>
+<tr>
+<td><strong>Balanced</strong></td>
+<td>⚖️</td>
+<td>Auto-approve low-risk, checkpoint medium/high</td>
+</tr>
+<tr>
+<td><strong>Cowboy</strong></td>
+<td>🚀</td>
+<td>Full autonomy with notifications</td>
+</tr>
+</tbody>
+</table>
+<p>You’ll see a governance badge indicating the current level.</p>
+<h3 id="human-in-the-loop-hitl">Human-in-the-Loop (HITL)</h3>
+<p>For high-stakes decisions, Think Tank may pause and ask for your approval:</p>
+<pre><code>┌─────────────────────────────────────────────┐
+│  🚨 Approval Required                       │
+│                                             │
+│  This action will modify your database.     │
+│  Cost: $2.50 estimated                      │
+│                                             │
+│  [Approve]  [Modify]  [Reject]              │
+└─────────────────────────────────────────────┘</code></pre>
+<h3 id="what-think-tank-will-never-do">What Think Tank Will Never Do</h3>
+<p>These are hardcoded safety limits that cannot be changed: - ❌ Generate harmful content - ❌ Execute destructive actions without confirmation - ❌ Bypass safety barriers - ❌ Delete audit logs - ❌ Expose sensitive data</p>
+<h3 id="reporting-issues">Reporting Issues</h3>
+<p>If Think Tank produces concerning output: 1. Click the <strong>Report</strong> button on the response 2. Select the issue type 3. Add any additional context 4. Submit for review</p>
+<hr />
+<h2 id="decision-records">12. Decision Records</h2>
+<p>Decision Records capture the AI’s reasoning, evidence, and conclusions in an auditable format. This feature helps you understand and verify AI-assisted decisions.</p>
+<h3 id="accessing-decision-records">Accessing Decision Records</h3>
+<p>After significant conversations, Think Tank automatically extracts: - <strong>Claims</strong> - Key conclusions and recommendations - <strong>Evidence</strong> - Supporting data and sources - <strong>Dissent</strong> - Alternative viewpoints considered but rejected - <strong>Compliance</strong> - Regulatory implications if applicable</p>
+<h3 id="the-living-parchment-view">The Living Parchment View</h3>
+<p>Decision Records use a special “Living Parchment” interface where: - <strong>Breathing colors</strong> indicate trust levels (green = verified, amber = unverified, red = contested) - <strong>Font weight</strong> reflects confidence (bolder = more confident) - <strong>Ghost paths</strong> show rejected alternatives as faded traces</p>
+<h3 id="verifying-claims">Verifying Claims</h3>
+<p>Click any claim to see: 1. The evidence supporting it 2. The AI’s reasoning chain 3. Any dissenting opinions 4. Data freshness indicators</p>
+<h3 id="exporting-for-compliance">Exporting for Compliance</h3>
+<p>Export decision records in various formats: - <strong>HIPAA Audit Package</strong> - For healthcare compliance - <strong>SOC2 Evidence Bundle</strong> - For security audits - <strong>GDPR DSAR Response</strong> - For data requests</p>
+<h3 id="exporting-conversations-directly-v5.52.16">Exporting Conversations Directly (v5.52.16)</h3>
+<p>You can export any conversation directly from the sidebar:</p>
+<ol type="1">
+<li><strong>Hover</strong> over any conversation in the sidebar</li>
+<li><strong>Click</strong> the <strong>⋮</strong> (more options) button that appears</li>
+<li><strong>Select</strong> an export format:
+<ul>
+<li><strong>Generate Decision Record</strong> - Creates a Decision Intelligence Artifact with claims, evidence, and dissent</li>
+<li><strong>Export HIPAA Audit Package</strong> - PHI-redacted export for healthcare compliance</li>
+<li><strong>Export SOC2 Evidence</strong> - Audit trail for security compliance</li>
+<li><strong>Export GDPR DSAR</strong> - Data subject access request format</li>
+<li><strong>Export as PDF</strong> - Standard PDF export</li>
+</ul></li>
+</ol>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│  SIDEBAR - Conversation Actions                                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  📝 Today                                                            │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ 💬 &quot;Drug interaction analysis&quot;              [⋮] [🗑]        │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                           │                                         │
+│                           ▼                                         │
+│                    ┌──────────────────────┐                        │
+│                    │ 📋 Generate Decision │                        │
+│                    │    Record            │                        │
+│                    │───────────────────── │                        │
+│                    │ 🛡️ Export HIPAA     │                        │
+│                    │ 🛡️ Export SOC2      │                        │
+│                    │ 🛡️ Export GDPR DSAR │                        │
+│                    │───────────────────── │                        │
+│                    │ 📄 Export as PDF     │                        │
+│                    └──────────────────────┘                        │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘</code></pre>
+<p><strong>Note</strong>: PHI (Protected Health Information) is automatically redacted in compliance exports by default.</p>
+<hr />
+<h2 id="living-parchment">13. Living Parchment</h2>
+<p>Living Parchment is Think Tank’s advanced decision intelligence suite with sensory UI that communicates trust through visual breathing, living typography, and confidence terrain.</p>
+<h3 id="war-room-strategic-decision-theater">War Room (Strategic Decision Theater)</h3>
+<p>For high-stakes decisions, enter the War Room:</p>
+<ol type="1">
+<li><strong>Navigate to</strong> Living Parchment → War Room</li>
+<li><strong>Create a session</strong> with your decision question</li>
+<li><strong>Add AI advisors</strong> - multiple perspectives on your problem</li>
+<li><strong>View the Confidence Terrain</strong> - 3D visualization where height = confidence</li>
+<li><strong>Explore Decision Paths</strong> - branching options with predicted outcomes</li>
+<li><strong>Make your decision</strong> with full documentation</li>
+</ol>
+<p><strong>Understanding the Terrain:</strong> - 🟢 Green peaks = High confidence areas - 🟡 Amber slopes = Moderate uncertainty<br />
+- 🔴 Red valleys = Risk zones requiring attention</p>
+<h3 id="council-of-experts">Council of Experts</h3>
+<p>Summon diverse AI perspectives that debate and converge:</p>
+<ol type="1">
+<li><strong>Convene a Council</strong> with your question</li>
+<li><strong>Watch 8 expert personas</strong> discuss:
+<ul>
+<li>Pragmatist (practical focus)</li>
+<li>Ethicist (moral considerations)</li>
+<li>Innovator (creative solutions)</li>
+<li>Skeptic (devil’s advocate)</li>
+<li>Synthesizer (finding common ground)</li>
+<li>Analyst (data-driven insights)</li>
+<li>Strategist (long-term thinking)</li>
+<li>Humanist (human impact)</li>
+</ul></li>
+<li><strong>Observe consensus forming</strong> as experts move toward center</li>
+<li><strong>Review minority reports</strong> - valid dissenting views preserved</li>
+</ol>
+<h3 id="debate-arena">Debate Arena</h3>
+<p>Test any idea through adversarial exploration:</p>
+<ol type="1">
+<li><strong>Create a debate</strong> with your proposition</li>
+<li><strong>Watch AI debaters</strong> argue both sides</li>
+<li><strong>Track the Resolution Meter</strong> showing which side is winning</li>
+<li><strong>Identify weak points</strong> (breathing red indicators)</li>
+<li><strong>Generate Steel-Man</strong> - AI creates the strongest version of the opposing argument</li>
+</ol>
+<h3 id="understanding-living-parchment-ui">Understanding Living Parchment UI</h3>
+<table>
+<thead>
+<tr>
+<th>Visual Element</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fast breathing (12 BPM)</td>
+<td>High uncertainty, needs attention</td>
+</tr>
+<tr>
+<td>Slow breathing (4-6 BPM)</td>
+<td>Confident, stable information</td>
+</tr>
+<tr>
+<td>Bold text</td>
+<td>High confidence claim</td>
+</tr>
+<tr>
+<td>Light text</td>
+<td>Lower confidence, verify before acting</td>
+</tr>
+<tr>
+<td>Faded/gray text</td>
+<td>Stale information, may need refresh</td>
+</tr>
+<tr>
+<td>Ghost overlays</td>
+<td>Rejected alternatives (what could have been)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="safety-governance-1">14. Safety &amp; Governance</h2>
+<p>Think Tank includes multiple safety layers to protect you and your organization. See <a href="#11-safety--governance">Section 14: Safety &amp; Governance</a> in the main guide for details on: - Five-layer Cato safety architecture - Control Barrier Functions (CBFs) - Human-in-the-Loop approvals - Governance presets</p>
+<hr />
+<h2 id="keyboard-shortcuts">15. Keyboard Shortcuts</h2>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>⌘K</strong> / <strong>Ctrl+K</strong></td>
+<td>Open Magic Carpet Navigator</td>
+</tr>
+<tr>
+<td><strong>⌘Enter</strong> / <strong>Ctrl+Enter</strong></td>
+<td>Send message</td>
+</tr>
+<tr>
+<td><strong>Escape</strong></td>
+<td>Close dialogs/modals</td>
+</tr>
+<tr>
+<td><strong>⌘/</strong> / <strong>Ctrl+/</strong></td>
+<td>Open keyboard shortcuts help</td>
+</tr>
+<tr>
+<td><strong>⌘N</strong> / <strong>Ctrl+N</strong></td>
+<td>New conversation</td>
+</tr>
+<tr>
+<td><strong>⌘S</strong> / <strong>Ctrl+S</strong></td>
+<td>Save/Export conversation</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="troubleshooting">16. Troubleshooting</h2>
+<h3 id="common-issues">Common Issues</h3>
+<h4 id="response-is-taking-too-long">“Response is taking too long”</h4>
+<ul>
+<li>Complex queries in War Room mode take longer</li>
+<li>Check your network connection</li>
+<li>Try simplifying your question</li>
+</ul>
+<h4 id="ai-gave-an-incorrect-answer">“AI gave an incorrect answer”</h4>
+<ol type="1">
+<li>Check if you’re in the right domain mode</li>
+<li>Provide more context in your question</li>
+<li>Use the thumbs down button to provide feedback</li>
+<li>Consider adding a rule to prevent this in the future</li>
+</ol>
+<h4 id="i-cant-access-a-feature">“I can’t access a feature”</h4>
+<ul>
+<li>Some features require specific permissions</li>
+<li>Contact your administrator for access</li>
+<li>Check if the feature is enabled for your organization</li>
+</ul>
+<h4 id="my-rules-arent-being-applied">“My rules aren’t being applied”</h4>
+<ol type="1">
+<li>Verify the rule is toggled ON</li>
+<li>Check the rule isn’t too vague</li>
+<li>Make sure the rule doesn’t conflict with other rules</li>
+<li>Try making the rule more specific</li>
+</ol>
+<h3 id="getting-help">Getting Help</h3>
+<ul>
+<li><strong>In-App Help</strong> - Click the ? icon in the header</li>
+<li><strong>Documentation</strong> - Access guides from Settings</li>
+<li><strong>Support</strong> - Contact your organization’s IT team</li>
+</ul>
+<hr />
+<h2 id="glossary">17. Glossary</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 66%" />
+</colgroup>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Brain Plan</strong></td>
+<td>Think Tank’s execution plan showing how it will answer your question</td>
+</tr>
+<tr>
+<td><strong>Breathing UI</strong></td>
+<td>Visual elements that pulse to communicate confidence and data freshness</td>
+</tr>
+<tr>
+<td><strong>CBF</strong></td>
+<td>Control Barrier Function - safety guardrails that cannot be bypassed</td>
+</tr>
+<tr>
+<td><strong>Confidence Terrain</strong></td>
+<td>3D visualization where elevation = confidence, color = risk</td>
+</tr>
+<tr>
+<td><strong>Council of Experts</strong></td>
+<td>Multi-persona AI consultation with 8 distinct viewpoints</td>
+</tr>
+<tr>
+<td><strong>Debate Arena</strong></td>
+<td>Adversarial exploration tool for stress-testing ideas</td>
+</tr>
+<tr>
+<td><strong>Decision Record</strong></td>
+<td>Auditable capture of AI reasoning, evidence, and conclusions</td>
+</tr>
+<tr>
+<td><strong>Delight</strong></td>
+<td>The personality and engagement system</td>
+</tr>
+<tr>
+<td><strong>Domain Mode</strong></td>
+<td>Specialized configuration for different knowledge areas</td>
+</tr>
+<tr>
+<td><strong>Ego</strong></td>
+<td>Think Tank’s persistent identity and emotional state</td>
+</tr>
+<tr>
+<td><strong>Ghost Path</strong></td>
+<td>Translucent overlay showing rejected alternatives</td>
+</tr>
+<tr>
+<td><strong>Governance Preset</strong></td>
+<td>Organization-wide safety/autonomy settings</td>
+</tr>
+<tr>
+<td><strong>Grimoire</strong></td>
+<td>The AI’s learned procedural memory</td>
+</tr>
+<tr>
+<td><strong>Heuristic</strong></td>
+<td>A learned rule or shortcut the AI uses</td>
+</tr>
+<tr>
+<td><strong>HITL</strong></td>
+<td>Human-in-the-Loop - requiring human approval</td>
+</tr>
+<tr>
+<td><strong>Living Ink</strong></td>
+<td>Typography that varies weight based on confidence (350-500)</td>
+</tr>
+<tr>
+<td><strong>Living Parchment</strong></td>
+<td>Advanced decision intelligence suite with sensory UI</td>
+</tr>
+<tr>
+<td><strong>Magic Carpet</strong></td>
+<td>Intent-based navigation system</td>
+</tr>
+<tr>
+<td><strong>My Rules</strong></td>
+<td>Personal preferences that customize AI responses</td>
+</tr>
+<tr>
+<td><strong>Polymorphic UI</strong></td>
+<td>Interface that adapts based on query type</td>
+</tr>
+<tr>
+<td><strong>Sniper Mode</strong></td>
+<td>Fast, low-cost single-model execution</td>
+</tr>
+<tr>
+<td><strong>Steel-Man</strong></td>
+<td>AI-generated strongest version of an opposing argument</td>
+</tr>
+<tr>
+<td><strong>War Room</strong></td>
+<td>Strategic Decision Theater for high-stakes collaborative decisions</td>
+</tr>
+<tr>
+<td><strong>War Room Mode</strong></td>
+<td>Thorough multi-agent execution</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="document-history">Document History</h2>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 25%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5.35.0</td>
+<td>Jan 2026</td>
+<td>Initial comprehensive user guide</td>
+</tr>
+<tr>
+<td>5.35.0</td>
+<td>Jan 2026</td>
+<td>Added visual diagrams and flowcharts</td>
+</tr>
+<tr>
+<td>5.43.0</td>
+<td>Jan 22, 2026</td>
+<td>Added Decision Records section (DIA Engine)</td>
+</tr>
+<tr>
+<td>5.44.0</td>
+<td>Jan 22, 2026</td>
+<td>Added Living Parchment section (War Room, Council, Debate Arena)</td>
+</tr>
+<tr>
+<td>5.52.0</td>
+<td>Jan 23, 2026</td>
+<td>Simulator now uses real API data with graceful fallbacks</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Think Tank is designed to be your intelligent partner. The more you use it and customize it to your needs, the more valuable it becomes. Happy thinking!</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

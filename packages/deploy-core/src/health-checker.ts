@@ -1,15 +1,31 @@
 // @radiant/deploy-core - Health Checker
 // Verifies deployment health across all services
 
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
 import type { HealthCheckResult, AWSCredentials } from './types';
 
 export class HealthChecker {
   private credentials: AWSCredentials;
   private endpoints: Record<string, string>;
+  private lambdaClient: LambdaClient;
+  private s3Client: S3Client;
 
   constructor(credentials: AWSCredentials, endpoints: Record<string, string> = {}) {
     this.credentials = credentials;
     this.endpoints = endpoints;
+    
+    const clientConfig = {
+      region: credentials.region,
+      credentials: {
+        accessKeyId: credentials.accessKeyId,
+        secretAccessKey: credentials.secretAccessKey,
+        sessionToken: credentials.sessionToken,
+      },
+    };
+    
+    this.lambdaClient = new LambdaClient(clientConfig);
+    this.s3Client = new S3Client(clientConfig);
   }
 
   /**
@@ -27,16 +43,39 @@ export class HealthChecker {
   }
 
   /**
-   * Check database connectivity
+   * Check database connectivity via Lambda health function
    */
   async checkDatabase(): Promise<HealthCheckResult> {
     const start = Date.now();
     try {
-      // Would connect to Aurora/Postgres and run simple query
+      const healthFunctionName = this.endpoints['dbHealthFunction'] || 'radiant-db-health';
+      
+      const command = new InvokeCommand({
+        FunctionName: healthFunctionName,
+        InvocationType: 'RequestResponse',
+        Payload: JSON.stringify({ action: 'health_check' }),
+      });
+
+      const response = await this.lambdaClient.send(command);
+      
+      if (response.StatusCode === 200 && response.Payload) {
+        const payloadStr = new TextDecoder().decode(response.Payload);
+        const result = JSON.parse(payloadStr);
+        
+        return {
+          service: 'database',
+          healthy: result.healthy === true,
+          latencyMs: Date.now() - start,
+          message: result.message,
+          checkedAt: new Date(),
+        };
+      }
+
       return {
         service: 'database',
-        healthy: true,
+        healthy: false,
         latencyMs: Date.now() - start,
+        message: 'Invalid response from health check function',
         checkedAt: new Date(),
       };
     } catch (error) {
@@ -86,16 +125,35 @@ export class HealthChecker {
   }
 
   /**
-   * Check Lambda functions
+   * Check Lambda functions by invoking a health check function
    */
   async checkLambdas(): Promise<HealthCheckResult> {
     const start = Date.now();
     try {
-      // Would invoke Lambda health check function
+      const healthFunctionName = this.endpoints['lambdaHealthFunction'] || 'radiant-lambda-health';
+      
+      const command = new InvokeCommand({
+        FunctionName: healthFunctionName,
+        InvocationType: 'RequestResponse',
+        Payload: JSON.stringify({ action: 'health_check' }),
+      });
+
+      const response = await this.lambdaClient.send(command);
+      
+      if (response.StatusCode === 200) {
+        return {
+          service: 'lambdas',
+          healthy: true,
+          latencyMs: Date.now() - start,
+          checkedAt: new Date(),
+        };
+      }
+
       return {
         service: 'lambdas',
-        healthy: true,
+        healthy: false,
         latencyMs: Date.now() - start,
+        message: `Lambda returned status ${response.StatusCode}`,
         checkedAt: new Date(),
       };
     } catch (error) {
@@ -110,12 +168,19 @@ export class HealthChecker {
   }
 
   /**
-   * Check S3 buckets
+   * Check S3 buckets accessibility
    */
   async checkS3(): Promise<HealthCheckResult> {
     const start = Date.now();
     try {
-      // Would check S3 bucket accessibility
+      const bucketName = this.endpoints['s3Bucket'] || 'radiant-storage';
+      
+      const command = new HeadBucketCommand({
+        Bucket: bucketName,
+      });
+
+      await this.s3Client.send(command);
+      
       return {
         service: 's3',
         healthy: true,

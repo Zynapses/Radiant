@@ -1,6 +1,6 @@
 # RADIANT Platform Documentation
 ## Complete System Architecture Reference
-### Version 5.52.6 | January 2026
+### Version 5.52.40 | January 2026
 
 ---
 
@@ -28,13 +28,32 @@
 |-----------|-------------|--------|
 | VPC Stack | Multi-AZ VPC with public/private subnets | ✅ Implemented |
 | Database Stack | Aurora PostgreSQL with pgvector | ✅ Implemented |
+| **Database Scaling Stack** | RDS Proxy, Async Writes, Redis Cache | ✅ Implemented (v5.52.20) |
 | Cache Stack | ElastiCache Redis cluster | ✅ Implemented |
 | Auth Stack | Cognito user pools | ✅ Implemented |
 | API Stack | API Gateway + Lambda | ✅ Implemented |
 | Storage Stack | S3 buckets for uploads/artifacts | ✅ Implemented |
 | Monitoring Stack | CloudWatch dashboards + alarms | ✅ Implemented |
 
-### Database Schema (Migrations 001-067)
+### PostgreSQL Scaling Infrastructure (v5.52.20)
+
+Enterprise-grade scaling for parallel AI model execution supporting 100+ concurrent requests with 6 parallel model writes each.
+
+| Component | Purpose | Tier Availability |
+|-----------|---------|-------------------|
+| **RDS Proxy** | Connection pooling, Lambda cold-start optimization | 2+ |
+| **Async Write Queue** | SQS-based batch writes for model results | 2+ |
+| **Redis Hot-Path Cache** | Read-after-write consistency, rate limiting | 2+ |
+| **Time-Based Partitioning** | Monthly partitions for logs/usage tables | All |
+| **Materialized Views** | Pre-computed dashboard metrics | All |
+| **Optimized RLS** | Index-friendly tenant isolation policies | All |
+
+**CDK Constructs**:
+- `DatabaseScalingConstruct` - RDS Proxy with tier-based connection limits
+- `AsyncWriteConstruct` - SQS queue + batch writer Lambda
+- `RedisCacheConstruct` - ElastiCache cluster with cluster mode
+
+### Database Schema (Migrations 001-070)
 
 | Table | Purpose | Migration |
 |-------|---------|-----------|
@@ -47,6 +66,21 @@
 | `ai_models` | 106 AI models | 007 |
 | `usage_records` | Billing/usage | 010 |
 | `audit_logs` | Compliance audit | 015 |
+| `mfa_backup_codes` | MFA one-time recovery codes | 070 |
+| `mfa_trusted_devices` | 30-day device trust tokens | 070 |
+| `mfa_audit_log` | MFA event audit log (partitioned) | 070 |
+| `*.detected_language` | Auto-detected content language | 071 |
+| `*.search_vector_simple` | Fallback tsvector for FTS | 071 |
+| `*.search_vector_english` | Language-specific tsvector | 071 |
+
+### Multi-Language Search (Migration 071)
+
+| Feature | Implementation |
+|---------|----------------|
+| **pg_bigm Extension** | Bi-gram indexing for CJK languages |
+| **Language Detection** | `detect_text_language()` function |
+| **Unified Search** | `search_content()` routes to FTS or bigm |
+| **18 Languages** | en, es, fr, de, pt, it, nl, pl, ru, tr, ja, ko, zh-CN, zh-TW, ar, hi, th, vi |
 
 ### Swift Deployment Application
 
@@ -67,6 +101,7 @@
 | Function | Purpose | Trigger |
 |----------|---------|---------|
 | `auth-handler` | Authentication/authorization | API Gateway |
+| `mfa-handler` | MFA enrollment, verification, device trust | API Gateway |
 | `chat-handler` | Chat completion requests | API Gateway |
 | `stream-handler` | SSE streaming responses | API Gateway |
 | `models-handler` | Model CRUD operations | API Gateway |
@@ -81,9 +116,9 @@ All admin Lambda handlers are wired to `/api/admin/*` routes with Cognito admin 
 | Category | Count | Handlers |
 |----------|-------|----------|
 | **Cato Safety** | 5 | cato, cato-genesis, cato-global, cato-governance, cato-pipeline |
+| **Security** | 6 | security, security-schedules, api-keys, ethics, self-audit, mfa |
 | **Memory Systems** | 4 | cortex, cortex-v2, blackboard, empiricism-loop |
 | **AI/ML** | 7 | brain, cognition, ego, raws, inference-components, formal-reasoning, ethics-free-reasoning |
-| **Security** | 5 | security, security-schedules, api-keys, ethics, self-audit |
 | **Operations** | 5 | gateway, sovereign-mesh, sovereign-mesh-performance, sovereign-mesh-scaling, hitl-orchestration |
 | **Reporting** | 4 | reports, ai-reports, dynamic-reports, metrics |
 | **Configuration** | 7 | tenants, invitations, library-registry, checklist-registry, collaboration-settings, system, system-config |
@@ -115,6 +150,93 @@ All admin Lambda handlers are wired to `/api/admin/*` routes with Cognito admin 
 |----------|-------|---------|
 | `agent-execution-worker` | agent-execution | Async OODA loop processing |
 | `transparency-compiler` | transparency | Pre-compute decision explanations |
+
+---
+
+## 1.2.1 Two-Factor Authentication (v5.52.28)
+
+Role-based MFA enforcement using industry-standard TOTP (RFC 6238).
+
+### MFA Architecture
+
+```
+┌─────────────┐     ┌──────────────┐     ┌─────────────────┐
+│   Login     │────▶│  MFA Check   │────▶│  Role Requires  │
+│   (Cognito) │     │  /api/mfa/   │     │  MFA?           │
+└─────────────┘     │   check      │     └────────┬────────┘
+                    └──────────────┘              │
+                           │ Yes                  │ No
+                           ▼                      ▼
+                    ┌──────────────┐     ┌─────────────────┐
+                    │  Enrolled?   │     │  Dashboard      │
+                    └──────┬───────┘     │  Access         │
+                           │             └─────────────────┘
+                    No     │ Yes
+                    ▼      ▼
+             ┌──────────┐ ┌──────────────┐
+             │ Enroll   │ │ Device       │
+             │ Gate     │ │ Trusted?     │
+             └──────────┘ └──────┬───────┘
+                                 │
+                          No     │ Yes
+                          ▼      ▼
+                   ┌──────────┐ ┌─────────────┐
+                   │ Verify   │ │ Dashboard   │
+                   │ Code     │ │ Access      │
+                   └──────────┘ └─────────────┘
+```
+
+### Required Roles (Cannot Bypass or Disable)
+
+| Role | MFA Required | Can Disable |
+|------|--------------|-------------|
+| `super_admin` | **Yes** | No |
+| `admin` | **Yes** | No |
+| `operator` | **Yes** | No |
+| `auditor` | **Yes** | No |
+| `tenant_admin` | **Yes** | No |
+| `tenant_owner` | **Yes** | No |
+
+### MFA Services
+
+| Service | Purpose |
+|---------|---------|
+| `TOTPService` | RFC 6238 TOTP generation/verification |
+| `BackupCodesService` | One-time recovery codes (SHA-256) |
+| `DeviceTrustService` | 30-day device trust tokens |
+
+### MFA API Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/v2/mfa/status` | GET | MFA status, backup codes, devices |
+| `/api/v2/mfa/check` | GET | Check if role requires MFA |
+| `/api/v2/mfa/enroll/start` | POST | Generate TOTP secret |
+| `/api/v2/mfa/enroll/verify` | POST | Verify and enable MFA |
+| `/api/v2/mfa/verify` | POST | Verify code during login |
+| `/api/v2/mfa/backup-codes/regenerate` | POST | Regenerate backup codes |
+| `/api/v2/mfa/devices` | GET | List trusted devices |
+| `/api/v2/mfa/devices/:id` | DELETE | Revoke device |
+
+### Security Measures
+
+| Feature | Implementation |
+|---------|----------------|
+| **Secret Encryption** | AES-256-GCM with scrypt key |
+| **Code Hashing** | SHA-256 |
+| **Clock Drift** | ±30 seconds |
+| **Lockout** | 3 failures → 5 min |
+| **Device Trust** | 30 days, max 5/user |
+
+### UI Components
+
+| Component | Location |
+|-----------|----------|
+| `MFAEnrollmentGate` | Full-screen forced enrollment |
+| `MFAVerificationPrompt` | Code entry modal |
+| `MFASettingsSection` | Settings management |
+
+**Migration**: `070_mfa_support.sql`
 
 ---
 
@@ -1155,9 +1277,29 @@ Step 4: SYNTHESIS (Model)        → Package with Chain of Custody audit trail
 | Type | TTL | Purpose |
 |------|-----|---------|
 | Session Context | 4h | Current conversation state |
-| Ghost Vectors | 24h | 4096-dim personality embeddings |
+| Ghost Vectors | 24h | 8192-dim personality embeddings from vLLM hidden states |
 | Telemetry Feeds | 1h | Real-time event streams |
 | Prefetch Cache | 30m | Anticipated document needs |
+
+### Ghost Inference Configuration (v5.52.40)
+
+Ghost vectors are extracted using vLLM on SageMaker with configurable parameters per tenant:
+
+| Component | Purpose |
+|-----------|---------|
+| `ghost_inference_config` | Tenant-specific vLLM settings |
+| `ghost_inference_deployments` | SageMaker endpoint deployment history |
+| `ghost_inference_metrics` | Performance metrics aggregation |
+| `GhostInferenceConstruct` | CDK construct for SageMaker deployment |
+
+**vLLM Configuration Parameters:**
+- Model: LLaMA 3 70B Instruct (configurable)
+- Tensor Parallel Size: 1-8 GPUs
+- Hidden State Layer: Configurable layer for extraction
+- GPU Memory Utilization: 50-99%
+- Quantization: AWQ, GPTQ, SqueezeLLM, FP8
+
+**Admin API:** `/api/admin/ghost-inference/*` for dashboard, config, deployments, validation
 
 ## 6.4 Warm Tier - Graph-RAG Knowledge
 

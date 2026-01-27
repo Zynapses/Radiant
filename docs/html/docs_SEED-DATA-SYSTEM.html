@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEED DATA SYSTEM - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SEED DATA SYSTEM</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/SEED-DATA-SYSTEM.md</div>
+  </div>
+  
+  <h1 id="radiant-ai-registry-seed-data-system">RADIANT AI Registry Seed Data System</h1>
+<blockquote>
+<p><strong>Technical Documentation</strong></p>
+<p>Version: 4.18.1 | Last Updated: December 2024</p>
+</blockquote>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>The RADIANT Seed Data System manages versioned AI provider and model configurations that are used to populate the AI Registry during fresh installations. Seed data is stored separately from packages, can be versioned independently, and is selectable when building deployment packages.</p>
+<h2 id="architecture">Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                        SEED DATA ARCHITECTURE                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  config/seeds/                                                              │
+│  ├── registry.json          # Index of all seed versions                   │
+│  ├── v1/                    # Seed data version 1.0.0                      │
+│  │   ├── manifest.json      # Version metadata and stats                   │
+│  │   ├── providers.json     # 21 external providers                        │
+│  │   ├── external-models.json  # 50+ external models                       │
+│  │   ├── self-hosted-models.json  # 38 self-hosted models                  │
+│  │   └── services.json      # 5 orchestration services                     │
+│  └── v2/                    # Future seed versions...                      │
+│                                                                              │
+│  Build Time:                                                                 │
+│  ┌─────────────────┐                                                        │
+│  │ build-package.sh │──► Select seed version ──► Include in package        │
+│  │ --seed-version 1 │                                                       │
+│  └─────────────────┘                                                        │
+│                                                                              │
+│  Deploy Time (INSTALL only):                                                 │
+│  ┌─────────────────┐                                                        │
+│  │ DeploymentService│──► Read seeds from package ──► INSERT to database    │
+│  │ .executeInstall() │                                                       │
+│  └─────────────────┘                                                        │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h2 id="critical-rules">Critical Rules</h2>
+<h3 id="rule-1-no-hardcoding-in-deployer-app">Rule 1: NO HARDCODING IN DEPLOYER APP</h3>
+<p>The Swift Deployer app <strong>MUST NOT</strong> contain hardcoded lists of providers or models:</p>
+<pre class="swift"><code>// ❌ WRONG - Never do this
+let providers = [&quot;openai&quot;, &quot;anthropic&quot;, &quot;google&quot;, ...]
+
+// ✅ CORRECT - Fetch from Radiant API after deployment
+let providers = try await radiantAPI.fetchProviders()</code></pre>
+<h3 id="rule-2-installer-seeds-updater-preserves">Rule 2: INSTALLER SEEDS, UPDATER PRESERVES</h3>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 71%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Seed Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>INSTALL</strong></td>
+<td>Seeds database with complete provider/model list</td>
+</tr>
+<tr>
+<td><strong>UPDATE</strong></td>
+<td>NEVER touches AI Registry - preserves admin customizations</td>
+</tr>
+<tr>
+<td><strong>ROLLBACK</strong></td>
+<td>Restores from snapshot - does not re-seed</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rule-3-admin-controls-all">Rule 3: ADMIN CONTROLS ALL</h3>
+<p>Everything in seed data is <strong>editable by the administrator</strong> post-deployment: - Enable/disable providers and models - Change pricing markup - Add new providers/models - Delete providers/models</p>
+<hr />
+<h2 id="seed-data-structure">Seed Data Structure</h2>
+<h3 id="manifest.json">manifest.json</h3>
+<pre class="json"><code>{
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;name&quot;: &quot;RADIANT AI Registry Seed Data&quot;,
+  &quot;description&quot;: &quot;Complete provider and model seed data for fresh installations&quot;,
+  &quot;createdAt&quot;: &quot;2024-12-25T00:00:00Z&quot;,
+  &quot;updatedAt&quot;: &quot;2024-12-25T00:00:00Z&quot;,
+  &quot;compatibility&quot;: {
+    &quot;minRadiantVersion&quot;: &quot;4.16.0&quot;,
+    &quot;maxRadiantVersion&quot;: &quot;5.0.0&quot;
+  },
+  &quot;files&quot;: {
+    &quot;providers&quot;: &quot;providers.json&quot;,
+    &quot;externalModels&quot;: &quot;external-models.json&quot;,
+    &quot;selfHostedModels&quot;: &quot;self-hosted-models.json&quot;,
+    &quot;services&quot;: &quot;services.json&quot;
+  },
+  &quot;stats&quot;: {
+    &quot;externalProviders&quot;: 21,
+    &quot;externalModels&quot;: 50,
+    &quot;selfHostedModels&quot;: 38,
+    &quot;services&quot;: 5
+  },
+  &quot;pricing&quot;: {
+    &quot;externalMarkup&quot;: 1.40,
+    &quot;selfHostedMarkup&quot;: 1.75
+  }
+}</code></pre>
+<h3 id="providers.json">providers.json</h3>
+<p>Each provider includes:</p>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>Unique identifier</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>Internal name</td>
+</tr>
+<tr>
+<td><code>displayName</code></td>
+<td>Human-readable name</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>Provider category (text_generation, image_generation, etc.)</td>
+</tr>
+<tr>
+<td><code>apiBaseUrl</code></td>
+<td>API endpoint</td>
+</tr>
+<tr>
+<td><code>authType</code></td>
+<td>Authentication type (bearer, api_key, iam)</td>
+</tr>
+<tr>
+<td><code>secretName</code></td>
+<td>AWS Secrets Manager path for API key</td>
+</tr>
+<tr>
+<td><code>features</code></td>
+<td>Supported features (streaming, vision, etc.)</td>
+</tr>
+<tr>
+<td><code>compliance</code></td>
+<td>Compliance certifications (SOC2, GDPR, HIPAA)</td>
+</tr>
+<tr>
+<td><code>rateLimit</code></td>
+<td>Rate limiting configuration</td>
+</tr>
+</tbody>
+</table>
+<h3 id="external-models.json">external-models.json</h3>
+<p>Each model includes:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>Unique model identifier</td>
+</tr>
+<tr>
+<td><code>providerId</code></td>
+<td>Reference to provider</td>
+</tr>
+<tr>
+<td><code>modelId</code></td>
+<td>Provider’s model ID</td>
+</tr>
+<tr>
+<td><code>litellmId</code></td>
+<td>LiteLLM routing ID</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>Model category</td>
+</tr>
+<tr>
+<td><code>capabilities</code></td>
+<td>Model capabilities</td>
+</tr>
+<tr>
+<td><code>contextWindow</code></td>
+<td>Max input tokens</td>
+</tr>
+<tr>
+<td><code>maxOutput</code></td>
+<td>Max output tokens</td>
+</tr>
+<tr>
+<td><code>pricing</code></td>
+<td>Cost per 1K tokens + markup</td>
+</tr>
+<tr>
+<td><code>minTier</code></td>
+<td>Minimum tier required</td>
+</tr>
+</tbody>
+</table>
+<h3 id="self-hosted-models.json">self-hosted-models.json</h3>
+<p>Each self-hosted model includes:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>Unique model identifier</td>
+</tr>
+<tr>
+<td><code>instanceType</code></td>
+<td>SageMaker instance type</td>
+</tr>
+<tr>
+<td><code>thermal</code></td>
+<td>Thermal management config (COLD/WARM/HOT)</td>
+</tr>
+<tr>
+<td><code>license</code></td>
+<td>Open-source license</td>
+</tr>
+<tr>
+<td><code>pricing</code></td>
+<td>Hourly rate + per-unit pricing</td>
+</tr>
+<tr>
+<td><code>minTier</code></td>
+<td>Minimum tier required (typically 3+)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="building-packages-with-seed-data">Building Packages with Seed Data</h2>
+<h3 id="list-available-seed-versions">List Available Seed Versions</h3>
+<pre class="bash"><code>./tools/scripts/build-package.sh --list-seeds</code></pre>
+<p>Output:</p>
+<pre><code>📦 Available Seed Data Versions:
+   v1.0.0 - 21 providers, 50 external models, 38 self-hosted models</code></pre>
+<h3 id="build-with-specific-seed-version">Build with Specific Seed Version</h3>
+<pre class="bash"><code># Use default (latest) seed version
+./tools/scripts/build-package.sh
+
+# Use specific seed version
+./tools/scripts/build-package.sh --seed-version 1</code></pre>
+<h3 id="package-manifest-with-seed-data">Package Manifest with Seed Data</h3>
+<p>The generated package manifest includes seed data information:</p>
+<pre class="json"><code>{
+  &quot;schemaVersion&quot;: &quot;2.1&quot;,
+  &quot;package&quot;: {
+    &quot;version&quot;: &quot;4.18.1&quot;
+  },
+  &quot;seedData&quot;: {
+    &quot;version&quot;: &quot;1.0.0&quot;,
+    &quot;hash&quot;: &quot;abc123...&quot;,
+    &quot;externalProviders&quot;: 21,
+    &quot;externalModels&quot;: 50,
+    &quot;selfHostedModels&quot;: 38,
+    &quot;services&quot;: 5
+  },
+  &quot;installBehavior&quot;: {
+    &quot;seedAIRegistry&quot;: true
+  },
+  &quot;updateBehavior&quot;: {
+    &quot;seedAIRegistry&quot;: false
+  }
+}</code></pre>
+<hr />
+<h2 id="seed-data-categories">Seed Data Categories</h2>
+<h3 id="external-providers-21">External Providers (21)</h3>
+<table>
+<colgroup>
+<col style="width: 47%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Providers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Text Generation</td>
+<td>OpenAI, Anthropic, Google, xAI, DeepSeek, Mistral, Cohere</td>
+</tr>
+<tr>
+<td>Image Generation</td>
+<td>OpenAI Images, Stability AI, FLUX</td>
+</tr>
+<tr>
+<td>Video Generation</td>
+<td>Runway, Luma AI</td>
+</tr>
+<tr>
+<td>Audio</td>
+<td>ElevenLabs, OpenAI Audio</td>
+</tr>
+<tr>
+<td>Embeddings</td>
+<td>OpenAI Embeddings, Voyage AI</td>
+</tr>
+<tr>
+<td>Search</td>
+<td>Perplexity</td>
+</tr>
+<tr>
+<td>3D Generation</td>
+<td>Meshy</td>
+</tr>
+<tr>
+<td>Self-Hosted</td>
+<td>SageMaker (internal)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="external-models-50">External Models (50+)</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Example Models</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Text</td>
+<td>GPT-4o, Claude Sonnet 4, Gemini 2.0, Grok 3, DeepSeek R1</td>
+</tr>
+<tr>
+<td>Reasoning</td>
+<td>O1, O3 Mini, DeepSeek Reasoner</td>
+</tr>
+<tr>
+<td>Code</td>
+<td>Codestral</td>
+</tr>
+<tr>
+<td>Image</td>
+<td>DALL-E 3, Stable Diffusion 3, FLUX Pro</td>
+</tr>
+<tr>
+<td>Video</td>
+<td>Gen-3 Alpha, Ray 2</td>
+</tr>
+<tr>
+<td>Audio</td>
+<td>Whisper, TTS-1, Multilingual V2</td>
+</tr>
+</tbody>
+</table>
+<h3 id="self-hosted-models-38">Self-Hosted Models (38)</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Models</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vision Classification</td>
+<td>EfficientNet, Swin Transformer, CLIP</td>
+</tr>
+<tr>
+<td>Object Detection</td>
+<td>YOLOv8 (Nano/Small/Medium/XLarge), Grounding DINO</td>
+</tr>
+<tr>
+<td>Segmentation</td>
+<td>SAM, SAM 2, MobileSAM</td>
+</tr>
+<tr>
+<td>Speech</td>
+<td>Whisper Large V3, Parakeet TDT</td>
+</tr>
+<tr>
+<td>Scientific</td>
+<td>AlphaFold 2, ESM-2</td>
+</tr>
+<tr>
+<td>Medical</td>
+<td>nnU-Net, MedSAM</td>
+</tr>
+<tr>
+<td>Geospatial</td>
+<td>Prithvi 100M/600M</td>
+</tr>
+<tr>
+<td>3D</td>
+<td>Nerfstudio</td>
+</tr>
+<tr>
+<td>LLM</td>
+<td>Mistral 7B, Llama 3 70B</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="pricing-structure">Pricing Structure</h2>
+<h3 id="external-providers">External Providers</h3>
+<p>Default markup: <strong>40% (1.40x)</strong></p>
+<p>Example: GPT-4o - Provider cost: $0.0025/1K input, $0.01/1K output - Tenant cost: $0.0035/1K input, $0.014/1K output</p>
+<h3 id="self-hosted-models">Self-Hosted Models</h3>
+<p>Default markup: <strong>75% (1.75x)</strong></p>
+<p>Example: YOLOv8 Medium - Infrastructure cost: ~$2.47/hour + $0.005/image - Tenant cost: ~$4.32/hour + $0.00875/image</p>
+<hr />
+<h2 id="creating-new-seed-versions">Creating New Seed Versions</h2>
+<h3 id="create-version-directory">1. Create Version Directory</h3>
+<pre class="bash"><code>mkdir config/seeds/v2</code></pre>
+<h3 id="create-required-files">2. Create Required Files</h3>
+<ul>
+<li><code>manifest.json</code> - Version metadata</li>
+<li><code>providers.json</code> - Provider definitions</li>
+<li><code>external-models.json</code> - External model definitions</li>
+<li><code>self-hosted-models.json</code> - Self-hosted model definitions</li>
+<li><code>services.json</code> - Service definitions</li>
+</ul>
+<h3 id="update-registry">3. Update Registry</h3>
+<p>Add new version to <code>config/seeds/registry.json</code>:</p>
+<pre class="json"><code>{
+  &quot;versions&quot;: [
+    {
+      &quot;version&quot;: &quot;2.0.0&quot;,
+      &quot;directory&quot;: &quot;v2&quot;,
+      &quot;releaseDate&quot;: &quot;2025-01-15&quot;,
+      &quot;status&quot;: &quot;stable&quot;,
+      &quot;changelog&quot;: &quot;Added new providers and models...&quot;
+    },
+    // ... existing versions
+  ]
+}</code></pre>
+<h3 id="test-build">4. Test Build</h3>
+<pre class="bash"><code>./tools/scripts/build-package.sh --seed-version 2</code></pre>
+<hr />
+<h2 id="database-seeding">Database Seeding</h2>
+<p>During fresh installation, the DeploymentService generates SQL migrations from seed data:</p>
+<pre class="sql"><code>-- Only runs if providers table is empty
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM providers LIMIT 1) THEN
+        -- Insert providers
+        INSERT INTO providers (...) VALUES (...);
+        
+        -- Insert external models
+        INSERT INTO models (...) VALUES (...);
+        
+        -- Insert self-hosted models
+        INSERT INTO self_hosted_models (...) VALUES (...);
+    END IF;
+END $$;</code></pre>
+<p>Key behaviors: - Uses <code>ON CONFLICT DO NOTHING</code> to preserve admin changes - Only runs on fresh install (empty database) - Logs completion with model counts</p>
+<hr />
+<h2 id="swift-service-api">Swift Service API</h2>
+<h3 id="seeddataservice">SeedDataService</h3>
+<pre class="swift"><code>actor SeedDataService {
+    /// List available seed versions
+    func listAvailableSeedVersions() async throws -&gt; [SeedDataInfo]
+    
+    /// Load complete seed data for a version
+    func loadSeedData(version: String) async throws -&gt; SeedData
+    
+    /// Generate SQL migration from seed data
+    func generateSeedMigration(seedData: SeedData) -&gt; String
+}</code></pre>
+<h3 id="usage-in-deploymentservice">Usage in DeploymentService</h3>
+<pre class="swift"><code>func executeInstall(...) async throws -&gt; DeploymentExecutionResult {
+    // Load seed data from package
+    let seedData = try await seedDataService.loadSeedData(
+        version: package.manifest.seedData?.version ?? &quot;1.0.0&quot;
+    )
+    
+    // Generate and run seed migration
+    let seedSQL = seedDataService.generateSeedMigration(seedData: seedData)
+    try await runMigration(sql: seedSQL)
+}</code></pre>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="DEPLOYER-ARCHITECTURE.md">Deployer Architecture</a> - Deployment modes and package management</li>
+<li><a href="DEPLOYER-ADMIN-GUIDE.md">Deployer Admin Guide</a> - User-facing deployment documentation</li>
+<li><a href="API_REFERENCE.md">API Reference</a> - Provider and model API endpoints</li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAAS METRICS DASHBOARD - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SAAS METRICS DASHBOARD</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/SAAS-METRICS-DASHBOARD.md</div>
+  </div>
+  
+  <h1 id="saas-metrics-dashboard">SaaS Metrics Dashboard</h1>
+<p><strong>Version</strong>: 4.18.3<br />
+<strong>Last Updated</strong>: 2024-12-28</p>
+<h2 id="overview">Overview</h2>
+<p>The SaaS Metrics Dashboard provides comprehensive visibility into key business metrics including revenue, costs, customer health, and model profitability. It integrates data from the Revenue Analytics system and Cost Analytics to present a unified view of business performance.</p>
+<h2 id="admin-dashboard-location">Admin Dashboard Location</h2>
+<p><strong>Path</strong>: Admin Dashboard → SaaS Metrics<br />
+<strong>URL</strong>: <code>/saas-metrics</code></p>
+<hr />
+<h2 id="key-metrics">Key Metrics</h2>
+<h3 id="revenue-metrics">Revenue Metrics</h3>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 43%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Description</th>
+<th>Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MRR</strong></td>
+<td>Monthly Recurring Revenue</td>
+<td>Sum of all monthly subscription fees</td>
+</tr>
+<tr>
+<td><strong>ARR</strong></td>
+<td>Annual Recurring Revenue</td>
+<td>MRR × 12</td>
+</tr>
+<tr>
+<td><strong>Total Revenue</strong></td>
+<td>All revenue in period</td>
+<td>Subscriptions + Credits + AI Markup + Storage</td>
+</tr>
+<tr>
+<td><strong>ARPU</strong></td>
+<td>Average Revenue Per User</td>
+<td>Total Revenue / Active Customers</td>
+</tr>
+<tr>
+<td><strong>LTV</strong></td>
+<td>Lifetime Value</td>
+<td>ARPU × Average Customer Lifespan</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cost-metrics">Cost Metrics</h3>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 44%" />
+<col style="width: 27%" />
+</colgroup>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Description</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Total COGS</strong></td>
+<td>Cost of Goods Sold</td>
+<td>AWS + External AI + Platform Fees</td>
+</tr>
+<tr>
+<td><strong>Gross Profit</strong></td>
+<td>Revenue - COGS</td>
+<td>Calculated</td>
+</tr>
+<tr>
+<td><strong>Gross Margin</strong></td>
+<td>(Gross Profit / Revenue) × 100</td>
+<td>Percentage</td>
+</tr>
+<tr>
+<td><strong>CAC</strong></td>
+<td>Customer Acquisition Cost</td>
+<td>Marketing + Sales / New Customers</td>
+</tr>
+</tbody>
+</table>
+<h3 id="customer-metrics">Customer Metrics</h3>
+<table>
+<colgroup>
+<col style="width: 38%" />
+<col style="width: 61%" />
+</colgroup>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Total Customers</strong></td>
+<td>Active paying tenants</td>
+</tr>
+<tr>
+<td><strong>New Customers</strong></td>
+<td>Customers acquired in period</td>
+</tr>
+<tr>
+<td><strong>Churned Customers</strong></td>
+<td>Customers lost in period</td>
+</tr>
+<tr>
+<td><strong>Churn Rate</strong></td>
+<td>(Churned / Total) × 100</td>
+</tr>
+<tr>
+<td><strong>Net Revenue Retention</strong></td>
+<td>(Starting MRR + Expansion - Churn) / Starting MRR</td>
+</tr>
+</tbody>
+</table>
+<h3 id="unit-economics">Unit Economics</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Healthy Range</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LTV:CAC Ratio</strong></td>
+<td>&gt; 3:1</td>
+<td>Lifetime value vs acquisition cost</td>
+</tr>
+<tr>
+<td><strong>Payback Period</strong></td>
+<td>&lt; 12 months</td>
+<td>Time to recover CAC</td>
+</tr>
+<tr>
+<td><strong>Gross Margin</strong></td>
+<td>&gt; 50%</td>
+<td>COGS efficiency</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="dashboard-tabs">Dashboard Tabs</h2>
+<h3 id="overview-tab">Overview Tab</h3>
+<ul>
+<li>Revenue, Cost &amp; Profit trend chart (daily)</li>
+<li>Revenue by Source pie chart</li>
+<li>Revenue by Tier bar chart</li>
+<li>Cost breakdown with progress bars</li>
+<li>Top 5 tenants by revenue table</li>
+</ul>
+<h3 id="revenue-tab">Revenue Tab</h3>
+<ul>
+<li>MRR movement chart (New, Expansion, Churned)</li>
+<li>Revenue by Product breakdown</li>
+<li>ARPU and LTV metrics</li>
+<li>Revenue growth trends</li>
+</ul>
+<h3 id="costs-tab">Costs Tab</h3>
+<ul>
+<li>Cost distribution pie chart</li>
+<li>Cost breakdown table by category</li>
+<li>Gross margin trends</li>
+<li>CAC metrics</li>
+</ul>
+<h3 id="customers-tab">Customers Tab</h3>
+<ul>
+<li>Customer growth trend chart</li>
+<li>New vs Churned visualization</li>
+<li>Usage metrics (requests, active users)</li>
+<li>Churn rate tracking</li>
+</ul>
+<h3 id="models-tab">Models Tab</h3>
+<ul>
+<li>Model performance table (requests, revenue, cost, profit, margin)</li>
+<li>Model revenue vs cost horizontal bar chart</li>
+<li>Self-hosted vs External identification</li>
+</ul>
+<hr />
+<h2 id="charts-visualizations">Charts &amp; Visualizations</h2>
+<h3 id="chart-types-used">Chart Types Used</h3>
+<table>
+<thead>
+<tr>
+<th>Chart</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Area Chart</strong></td>
+<td>Revenue and cost trends over time</td>
+</tr>
+<tr>
+<td><strong>Composed Chart</strong></td>
+<td>Multi-metric comparisons</td>
+</tr>
+<tr>
+<td><strong>Bar Chart</strong></td>
+<td>Revenue by tier, model comparisons</td>
+</tr>
+<tr>
+<td><strong>Pie Chart</strong></td>
+<td>Revenue/cost distribution</td>
+</tr>
+<tr>
+<td><strong>Line Chart</strong></td>
+<td>Usage trends</td>
+</tr>
+</tbody>
+</table>
+<h3 id="color-palette">Color Palette</h3>
+<pre class="typescript"><code>const CHART_COLORS = {
+  primary: &#39;#3b82f6&#39;,    // Blue - Revenue
+  secondary: &#39;#8b5cf6&#39;,  // Purple - Secondary metrics
+  success: &#39;#22c55e&#39;,    // Green - Profit, positive
+  warning: &#39;#f59e0b&#39;,    // Amber - Warnings
+  danger: &#39;#ef4444&#39;,     // Red - Costs, negative
+  info: &#39;#06b6d4&#39;,       // Cyan - Info
+};</code></pre>
+<hr />
+<h2 id="export-functionality">Export Functionality</h2>
+<h3 id="available-formats">Available Formats</h3>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Extension</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Excel (CSV)</strong></td>
+<td><code>.csv</code></td>
+<td>Spreadsheet analysis, Excel/Google Sheets</td>
+</tr>
+<tr>
+<td><strong>JSON</strong></td>
+<td><code>.json</code></td>
+<td>Custom integrations, data processing</td>
+</tr>
+</tbody>
+</table>
+<h3 id="export-contents">Export Contents</h3>
+<p>The export includes all metrics organized in sections:</p>
+<ol type="1">
+<li><strong>Report Header</strong>: Period, generation timestamp</li>
+<li><strong>Revenue Summary</strong>: MRR, ARR, Total Revenue, Gross Profit, Margin</li>
+<li><strong>Cost Breakdown</strong>: By category with amounts and percentages</li>
+<li><strong>Customer Metrics</strong>: Totals, new, churned, churn rate</li>
+<li><strong>Unit Economics</strong>: ARPU, LTV, CAC, LTV:CAC ratio</li>
+<li><strong>Revenue by Source</strong>: Subscriptions, Credits, AI Markup, etc.</li>
+<li><strong>Revenue by Tier</strong>: Enterprise, Business, Pro, Starter</li>
+<li><strong>Top Tenants</strong>: Name, revenue, users, requests, tier</li>
+<li><strong>Model Performance</strong>: Per-model revenue, cost, profit, margin</li>
+<li><strong>Daily Revenue Trend</strong>: Date, revenue, cost, profit</li>
+</ol>
+<h3 id="export-example-csv">Export Example (CSV)</h3>
+<pre class="csv"><code>RADIANT SaaS Metrics Report
+Period: 30d
+Generated: 2024-12-28T22:57:00Z
+
+=== REVENUE SUMMARY ===
+Metric,Value,Growth
+MRR,$89500.00,12.5%
+ARR,$1074000.00,15.2%
+Total Revenue,$89500.00,18.3%
+Gross Profit,$47500.00,
+Gross Margin,53.1%,
+
+=== COST BREAKDOWN ===
+Category,Amount,Percentage
+External AI Providers,$18500.00,44.0%
+AWS Compute,$12800.00,30.5%
+...
+
+=== MODEL PERFORMANCE ===
+Model,Requests,Revenue,Cost,Profit,Margin
+GPT-4o,425000,$12750.00,$8500.00,$4250.00,33.3%
+Claude 3.5 Sonnet,312000,$9360.00,$6240.00,$3120.00,33.3%</code></pre>
+<hr />
+<h2 id="period-selection">Period Selection</h2>
+<table>
+<thead>
+<tr>
+<th>Period</th>
+<th>Description</th>
+<th>Data Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>7d</strong></td>
+<td>Last 7 days</td>
+<td>Daily granularity</td>
+</tr>
+<tr>
+<td><strong>30d</strong></td>
+<td>Last 30 days</td>
+<td>Daily granularity</td>
+</tr>
+<tr>
+<td><strong>90d</strong></td>
+<td>Last 90 days</td>
+<td>Daily granularity</td>
+</tr>
+<tr>
+<td><strong>12m</strong></td>
+<td>Last 12 months</td>
+<td>Monthly granularity</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-integration">API Integration</h2>
+<h3 id="data-sources">Data Sources</h3>
+<p>The SaaS Metrics dashboard aggregates data from:</p>
+<ol type="1">
+<li><strong>Revenue Analytics</strong> (<code>/api/admin/revenue/dashboard</code>)
+<ul>
+<li>Revenue entries</li>
+<li>Daily aggregates</li>
+<li>Revenue by source</li>
+</ul></li>
+<li><strong>Cost Analytics</strong> (<code>/api/admin/cost/summary</code>)
+<ul>
+<li>Cost entries</li>
+<li>AWS costs</li>
+<li>External AI costs</li>
+</ul></li>
+<li><strong>Billing System</strong> (<code>/api/admin/billing</code>)
+<ul>
+<li>Subscriptions</li>
+<li>Credit transactions</li>
+<li>Tier information</li>
+</ul></li>
+<li><strong>Analytics</strong> (<code>/api/admin/analytics</code>)
+<ul>
+<li>Usage metrics</li>
+<li>Model performance</li>
+<li>Request counts</li>
+</ul></li>
+</ol>
+<h3 id="api-endpoint">API Endpoint</h3>
+<pre><code>GET /api/admin/saas-metrics?period={7d|30d|90d|12m}</code></pre>
+<p><strong>Response:</strong></p>
+<pre class="json"><code>{
+  &quot;mrr&quot;: 89500,
+  &quot;mrrGrowth&quot;: 12.5,
+  &quot;arr&quot;: 1074000,
+  &quot;totalRevenue&quot;: 89500,
+  &quot;totalCost&quot;: 42000,
+  &quot;grossProfit&quot;: 47500,
+  &quot;grossMargin&quot;: 53.1,
+  &quot;totalCustomers&quot;: 342,
+  &quot;churnRate&quot;: 2.3,
+  &quot;arpu&quot;: 261.70,
+  &quot;ltv&quot;: 3140.40,
+  &quot;cac&quot;: 450,
+  &quot;ltvCacRatio&quot;: 6.98,
+  &quot;revenueBySource&quot;: [...],
+  &quot;costByCategory&quot;: [...],
+  &quot;revenueTrend&quot;: [...],
+  &quot;topTenants&quot;: [...],
+  &quot;modelMetrics&quot;: [...]
+}</code></pre>
+<hr />
+<h2 id="permissions">Permissions</h2>
+<p>The SaaS Metrics Dashboard requires: - <strong>Admin</strong> role or higher - Access to billing data - Access to usage analytics</p>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./REVENUE-ANALYTICS.md">Revenue Analytics</a></li>
+<li><a href="./COST-ANALYTICS.md">Cost Analytics</a></li>
+<li><a href="./BILLING-CREDITS.md">Billing &amp; Credits</a></li>
+<li><a href="./RADIANT-ADMIN-GUIDE.md#15-revenue-analytics">Admin Guide - Revenue Analytics</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

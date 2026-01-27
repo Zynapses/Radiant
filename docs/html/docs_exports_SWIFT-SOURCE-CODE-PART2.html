@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWIFT SOURCE CODE PART2 - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SWIFT SOURCE CODE PART2</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/SWIFT-SOURCE-CODE-PART2.md</div>
+  </div>
+  
+  <h1 id="radiant-swift-deployer---actual-source-code---part-2">RADIANT Swift Deployer - ACTUAL SOURCE CODE - Part 2</h1>
+<h2 id="file-servicesaiassistantservice.swift">File: Services/AIAssistantService.swift</h2>
+<pre class="swift"><code>import Foundation
+import Security
+
+/// AI Assistant Service for Claude API integration
+/// Provides intelligent deployment guidance and troubleshooting
+actor AIAssistantService {
+    
+    // MARK: - Types
+    
+    enum AIError: Error, LocalizedError {
+        case noApiKey
+        case invalidResponse
+        case networkError(String)
+        case rateLimited
+        case apiError(String)
+        
+        var errorDescription: String? {
+            switch self {
+            case .noApiKey:
+                return &quot;No API key configured. Add your Claude API key in Settings.&quot;
+            case .invalidResponse:
+                return &quot;Invalid response from AI service&quot;
+            case .networkError(let message):
+                return &quot;Network error: \(message)&quot;
+            case .rateLimited:
+                return &quot;Rate limited. Please wait a moment.&quot;
+            case .apiError(let message):
+                return &quot;AI API error: \(message)&quot;
+            }
+        }
+    }
+    
+    struct Message: Codable {
+        let role: String
+        let content: String
+    }
+    
+    struct ChatRequest: Codable {
+        let model: String
+        let max_tokens: Int
+        let messages: [Message]
+        let system: String?
+    }
+    
+    struct ChatResponse: Codable {
+        struct Content: Codable {
+            let type: String
+            let text: String
+        }
+        let id: String
+        let content: [Content]
+    }
+    
+    // MARK: - Properties
+    
+    private let keychainService = &quot;com.radiant.deployer&quot;
+    private let apiKeyAccount = &quot;claude-api-key&quot;
+    private let baseURL = &quot;https://api.anthropic.com/v1&quot;
+    private let model = &quot;claude-3-5-sonnet-20241022&quot;
+    
+    private var isConnected = false
+    private var lastConnectionCheck: Date?
+    private let connectionCheckInterval: TimeInterval = 60
+    
+    private let systemPrompt = &quot;&quot;&quot;
+    You are the RADIANT Deployer AI Assistant, helping users deploy and manage AWS infrastructure.
+    
+    Your capabilities:
+    - Explain deployment steps and configurations
+    - Troubleshoot deployment errors
+    - Recommend optimal tier configurations
+    - Explain AWS resource costs
+    - Guide users through credential setup
+    
+    Be concise, technical, and helpful. If you don&#39;t know something, say so.
+    Always prioritize security best practices.
+    &quot;&quot;&quot;
+    
+    // MARK: - Keychain Management
+    
+    func saveApiKey(_ apiKey: String) throws {
+        let data = apiKey.data(using: .utf8)!
+        
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: apiKeyAccount,
+        ]
+        
+        // Delete existing
+        SecItemDelete(query as CFDictionary)
+        
+        // Add new
+        var newQuery = query
+        newQuery[kSecValueData as String] = data
+        
+        let status = SecItemAdd(newQuery as CFDictionary, nil)
+        guard status == errSecSuccess else {
+            throw AIError.apiError(&quot;Failed to save API key: \(status)&quot;)
+        }
+    }
+    
+    func getApiKey() -&gt; String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: apiKeyAccount,
+            kSecReturnData as String: true,
+        ]
+        
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &amp;result)
+        
+        guard status == errSecSuccess,
+              let data = result as? Data,
+              let apiKey = String(data: data, encoding: .utf8) else {
+            return nil
+        }
+        
+        return apiKey
+    }
+    
+    func deleteApiKey() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: apiKeyAccount,
+        ]
+        SecItemDelete(query as CFDictionary)
+    }
+    
+    // MARK: - Connection Management
+    
+    func checkConnection() async -&gt; Bool {
+        // Use cached result if recent
+        if let lastCheck = lastConnectionCheck,
+           Date().timeIntervalSince(lastCheck) &lt; connectionCheckInterval {
+            return isConnected
+        }
+        
+        guard let apiKey = getApiKey(), !apiKey.isEmpty else {
+            isConnected = false
+            return false
+        }
+        
+        do {
+            // Simple test request
+            let _ = try await sendMessage(&quot;Hello&quot;, context: nil)
+            isConnected = true
+            lastConnectionCheck = Date()
+            return true
+        } catch {
+            isConnected = false
+            lastConnectionCheck = Date()
+            return false
+        }
+    }
+    
+    // MARK: - Chat Methods
+    
+    func sendMessage(_ message: String, context: [Message]?) async throws -&gt; String {
+        guard let apiKey = getApiKey() else {
+            throw AIError.noApiKey
+        }
+        
+        var messages = context ?? []
+        messages.append(Message(role: &quot;user&quot;, content: message))
+        
+        let request = ChatRequest(
+            model: model,
+            max_tokens: 1024,
+            messages: messages,
+            system: systemPrompt
+        )
+        
+        var urlRequest = URLRequest(url: URL(string: &quot;\(baseURL)/messages&quot;)!)
+        urlRequest.httpMethod = &quot;POST&quot;
+        urlRequest.setValue(&quot;application/json&quot;, forHTTPHeaderField: &quot;Content-Type&quot;)
+        urlRequest.setValue(apiKey, forHTTPHeaderField: &quot;x-api-key&quot;)
+        urlRequest.setValue(&quot;2023-06-01&quot;, forHTTPHeaderField: &quot;anthropic-version&quot;)
+        urlRequest.httpBody = try JSONEncoder().encode(request)
+        
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw AIError.invalidResponse
+        }
+        
+        if httpResponse.statusCode == 429 {
+            throw AIError.rateLimited
+        }
+        
+        guard httpResponse.statusCode == 200 else {
+            let errorMessage = String(data: data, encoding: .utf8) ?? &quot;Unknown error&quot;
+            throw AIError.apiError(errorMessage)
+        }
+        
+        let chatResponse = try JSONDecoder().decode(ChatResponse.self, from: data)
+        return chatResponse.content.first?.text ?? &quot;&quot;
+    }
+    
+    // MARK: - Specialized Methods
+    
+    func explainDeploymentStep(_ step: String, tier: Int) async throws -&gt; String {
+        let prompt = &quot;&quot;&quot;
+        Explain this deployment step for a Tier \(tier) RADIANT deployment:
+        
+        Step: \(step)
+        
+        Keep the explanation concise (2-3 sentences) and mention any important considerations.
+        &quot;&quot;&quot;
+        return try await sendMessage(prompt, context: nil)
+    }
+    
+    func troubleshootError(_ error: String, context: String) async throws -&gt; String {
+        let prompt = &quot;&quot;&quot;
+        Help troubleshoot this deployment error:
+        
+        Error: \(error)
+        
+        Context: \(context)
+        
+        Provide:
+        1. Likely cause
+        2. Recommended fix
+        3. Prevention tip
+        &quot;&quot;&quot;
+        return try await sendMessage(prompt, context: nil)
+    }
+    
+    func recommendTier(requirements: [String: Any]) async throws -&gt; String {
+        let requirementsJson = try JSONSerialization.data(withJSONObject: requirements)
+        let requirementsString = String(data: requirementsJson, encoding: .utf8) ?? &quot;{}&quot;
+        
+        let prompt = &quot;&quot;&quot;
+        Based on these requirements, recommend the best RADIANT subscription tier (1-7):
+        
+        Requirements: \(requirementsString)
+        
+        Tiers:
+        1: Free - 10K tokens/month
+        2: Starter - 100K tokens/month
+        3: Pro - 500K tokens/month  
+        4: Business - 2M tokens/month
+        5: Enterprise - 10M tokens/month
+        6: Enterprise Plus - 50M tokens/month
+        7: Unlimited - Custom
+        
+        Recommend a tier and explain why.
+        &quot;&quot;&quot;
+        return try await sendMessage(prompt, context: nil)
+    }
+    
+    func estimateCosts(tier: Int, region: String, features: [String]) async throws -&gt; String {
+        let prompt = &quot;&quot;&quot;
+        Estimate monthly AWS costs for:
+        - RADIANT Tier: \(tier)
+        - Region: \(region)
+        - Features: \(features.joined(separator: &quot;, &quot;))
+        
+        Break down by:
+        1. Compute (Lambda, ECS)
+        2. Database (Aurora)
+        3. Storage (S3)
+        4. Network (API Gateway, CloudFront)
+        5. AI (if self-hosted models)
+        
+        Give rough estimates and note variables.
+        &quot;&quot;&quot;
+        return try await sendMessage(prompt, context: nil)
+    }
+    
+    func generateMigrationPlan(from: String, to: String) async throws -&gt; String {
+        let prompt = &quot;&quot;&quot;
+        Generate a migration plan from \(from) to \(to) for RADIANT.
+        
+        Include:
+        1. Pre-migration checklist
+        2. Migration steps
+        3. Rollback procedure
+        4. Verification steps
+        5. Estimated downtime
+        &quot;&quot;&quot;
+        return try await sendMessage(prompt, context: nil)
+    }
+    
+    // MARK: - PROMPT-33 Required Methods
+    
+    /// Error translation result
+    struct ErrorTranslation: Sendable {
+        let userFriendlyMessage: String
+        let technicalDetails: String
+        let suggestedAction: String
+        let severity: String // &quot;critical&quot;, &quot;high&quot;, &quot;medium&quot;, &quot;low&quot;
+    }
+    
+    /// Recovery recommendation result
+    struct RecoveryRecommendation: Sendable {
+        let action: String // &quot;rollback&quot;, &quot;retry&quot;, &quot;manual&quot;
+        let confidence: Double // 0.0-1.0
+        let reason: String
+        let steps: [String]
+        let alternativeActions: [String]
+    }
+    
+    /// AI assessment result
+    struct AIAssessment: Sendable {
+        let riskLevel: String // &quot;low&quot;, &quot;medium&quot;, &quot;high&quot;, &quot;critical&quot;
+        let migrationComplexity: String
+        let estimatedDuration: String
+        let warnings: [String]
+        let recommendations: [String]
+    }
+    
+    /// Generated release notes
+    struct GeneratedReleaseNotes: Sendable {
+        let summary: String
+        let features: [String]
+        let fixes: [String]
+        let breakingChanges: [String]
+        let upgradeNotes: String
+    }
+    
+    /// Explain a deployment event with context
+    func explain(context: String, event: String) async throws -&gt; String {
+        let prompt = &quot;&quot;&quot;
+        Explain this deployment event in plain language:
+        
+        Context: \(context)
+        Event: \(event)
+        
+        Keep the explanation concise (2-3 sentences) and user-friendly.
+        &quot;&quot;&quot;
+        
+        do {
+            return try await sendMessage(prompt, context: nil)
+        } catch {
+            return fallbackExplanation(for: event)
+        }
+    }
+    
+    /// Translate technical error to user-friendly message
+    func translateError(error: Error, context: String) async throws -&gt; ErrorTranslation {
+        let prompt = &quot;&quot;&quot;
+        Translate this technical error to a user-friendly message:
+        
+        Error: \(error.localizedDescription)
+        Context: \(context)
+        
+        Respond in JSON format:
+        {
+          &quot;userFriendlyMessage&quot;: &quot;...&quot;,
+          &quot;technicalDetails&quot;: &quot;...&quot;,
+          &quot;suggestedAction&quot;: &quot;...&quot;,
+          &quot;severity&quot;: &quot;critical|high|medium|low&quot;
+        }
+        &quot;&quot;&quot;
+        
+        do {
+            let response = try await sendMessage(prompt, context: nil)
+            // Parse JSON response
+            if let data = response.data(using: .utf8),
+               let json = try? JSONSerialization.jsonObject(with: data) as? [String: String] {
+                return ErrorTranslation(
+                    userFriendlyMessage: json[&quot;userFriendlyMessage&quot;] ?? error.localizedDescription,
+                    technicalDetails: json[&quot;technicalDetails&quot;] ?? &quot;&quot;,
+                    suggestedAction: json[&quot;suggestedAction&quot;] ?? &quot;Contact support&quot;,
+                    severity: json[&quot;severity&quot;] ?? &quot;medium&quot;
+                )
+            }
+            return fallbackErrorTranslation(error: error)
+        } catch {
+            return fallbackErrorTranslation(error: error)
+        }
+    }
+    
+    /// Recommend recovery action for a deployment failure
+    func recommendRecovery(failure: String, snapshotAvailable: Bool) async throws -&gt; RecoveryRecommendation {
+        let prompt = &quot;&quot;&quot;
+        Recommend a recovery action for this deployment failure:
+        
+        Failure: \(failure)
+        Snapshot Available: \(snapshotAvailable)
+        
+        Respond in JSON format:
+        {
+          &quot;action&quot;: &quot;rollback|retry|manual&quot;,
+          &quot;confidence&quot;: 0.0-1.0,
+          &quot;reason&quot;: &quot;...&quot;,
+          &quot;steps&quot;: [&quot;step1&quot;, &quot;step2&quot;],
+          &quot;alternativeActions&quot;: [&quot;alt1&quot;, &quot;alt2&quot;]
+        }
+        &quot;&quot;&quot;
+        
+        do {
+            let response = try await sendMessage(prompt, context: nil)
+            if let data = response.data(using: .utf8),
+               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                return RecoveryRecommendation(
+                    action: json[&quot;action&quot;] as? String ?? (snapshotAvailable ? &quot;rollback&quot; : &quot;manual&quot;),
+                    confidence: json[&quot;confidence&quot;] as? Double ?? 0.5,
+                    reason: json[&quot;reason&quot;] as? String ?? &quot;Based on failure analysis&quot;,
+                    steps: json[&quot;steps&quot;] as? [String] ?? [],
+                    alternativeActions: json[&quot;alternativeActions&quot;] as? [String] ?? []
+                )
+            }
+            return fallbackRecoveryRecommendation(snapshotAvailable: snapshotAvailable)
+        } catch {
+            return fallbackRecoveryRecommendation(snapshotAvailable: snapshotAvailable)
+        }
+    }
+    
+    /// Generate release notes from conventional commits
+    func generateReleaseNotes(commits: [String]) async throws -&gt; GeneratedReleaseNotes {
+        let commitList = commits.joined(separator: &quot;\n&quot;)
+        let prompt = &quot;&quot;&quot;
+        Generate release notes from these commits:
+        
+        \(commitList)
+        
+        Respond in JSON format:
+        {
+          &quot;summary&quot;: &quot;...&quot;,
+          &quot;features&quot;: [&quot;...&quot;],
+          &quot;fixes&quot;: [&quot;...&quot;],
+          &quot;breakingChanges&quot;: [&quot;...&quot;],
+          &quot;upgradeNotes&quot;: &quot;...&quot;
+        }
+        &quot;&quot;&quot;
+        
+        do {
+            let response = try await sendMessage(prompt, context: nil)
+            if let data = response.data(using: .utf8),
+               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                return GeneratedReleaseNotes(
+                    summary: json[&quot;summary&quot;] as? String ?? &quot;Release notes&quot;,
+                    features: json[&quot;features&quot;] as? [String] ?? [],
+                    fixes: json[&quot;fixes&quot;] as? [String] ?? [],
+                    breakingChanges: json[&quot;breakingChanges&quot;] as? [String] ?? [],
+                    upgradeNotes: json[&quot;upgradeNotes&quot;] as? String ?? &quot;&quot;
+                )
+            }
+            return fallbackReleaseNotes(commits: commits)
+        } catch {
+            return fallbackReleaseNotes(commits: commits)
+        }
+    }
+    
+    /// Assess deployment risk and complexity
+    func assessDeployment(packageVersion: String, currentVersions: [String: String]) async throws -&gt; AIAssessment {
+        let versionsJson = currentVersions.map { &quot;\($0.key): \($0.value)&quot; }.joined(separator: &quot;, &quot;)
+        let prompt = &quot;&quot;&quot;
+        Assess this deployment:
+        
+        Target Package: \(packageVersion)
+        Current Versions: \(versionsJson)
+        
+        Respond in JSON format:
+        {
+          &quot;riskLevel&quot;: &quot;low|medium|high|critical&quot;,
+          &quot;migrationComplexity&quot;: &quot;simple|moderate|complex&quot;,
+          &quot;estimatedDuration&quot;: &quot;...&quot;,
+          &quot;warnings&quot;: [&quot;...&quot;],
+          &quot;recommendations&quot;: [&quot;...&quot;]
+        }
+        &quot;&quot;&quot;
+        
+        do {
+            let response = try await sendMessage(prompt, context: nil)
+            if let data = response.data(using: .utf8),
+               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                return AIAssessment(
+                    riskLevel: json[&quot;riskLevel&quot;] as? String ?? &quot;medium&quot;,
+                    migrationComplexity: json[&quot;migrationComplexity&quot;] as? String ?? &quot;moderate&quot;,
+                    estimatedDuration: json[&quot;estimatedDuration&quot;] as? String ?? &quot;15-30 minutes&quot;,
+                    warnings: json[&quot;warnings&quot;] as? [String] ?? [],
+                    recommendations: json[&quot;recommendations&quot;] as? [String] ?? []
+                )
+            }
+            return fallbackAssessment()
+        } catch {
+            return fallbackAssessment()
+        }
+    }
+    
+    // MARK: - Fallback Methods (when AI unavailable)
+    
+    func fallbackExplanation(for event: String) -&gt; String {
+        switch event.lowercased() {
+        case let e where e.contains(&quot;snapshot&quot;):
+            return &quot;Creating a backup of current system state before making changes.&quot;
+        case let e where e.contains(&quot;migration&quot;):
+            return &quot;Applying database schema changes to update the system.&quot;
+        case let e where e.contains(&quot;health&quot;):
+            return &quot;Verifying all services are responding correctly after deployment.&quot;
+        case let e where e.contains(&quot;maintenance&quot;):
+            return &quot;Temporarily pausing user requests to safely apply updates.&quot;
+        case let e where e.contains(&quot;rollback&quot;):
+            return &quot;Reverting to the previous system state due to an issue.&quot;
+        default:
+            return &quot;Processing deployment step: \(event)&quot;
+        }
+    }
+    
+    func fallbackErrorTranslation(error: Error) -&gt; ErrorTranslation {
+        let message = error.localizedDescription
+        
+        if message.contains(&quot;timeout&quot;) {
+            return ErrorTranslation(
+                userFriendlyMessage: &quot;The operation took too long to complete.&quot;,
+                technicalDetails: message,
+                suggestedAction: &quot;Check network connectivity and try again.&quot;,
+                severity: &quot;medium&quot;
+            )
+        } else if message.contains(&quot;permission&quot;) || message.contains(&quot;access&quot;) {
+            return ErrorTranslation(
+                userFriendlyMessage: &quot;Insufficient permissions to complete this action.&quot;,
+                technicalDetails: message,
+                suggestedAction: &quot;Verify AWS credentials and IAM permissions.&quot;,
+                severity: &quot;high&quot;
+            )
+        } else if message.contains(&quot;connection&quot;) || message.contains(&quot;network&quot;) {
+            return ErrorTranslation(
+                userFriendlyMessage: &quot;Unable to connect to AWS services.&quot;,
+                technicalDetails: message,
+                suggestedAction: &quot;Check your internet connection and AWS region settings.&quot;,
+                severity: &quot;high&quot;
+            )
+        }
+        
+        return ErrorTranslation(
+            userFriendlyMessage: &quot;An error occurred during the operation.&quot;,
+            technicalDetails: message,
+            suggestedAction: &quot;Review the error details and try again.&quot;,
+            severity: &quot;medium&quot;
+        )
+    }
+    
+    func fallbackRecoveryRecommendation(snapshotAvailable: Bool) -&gt; RecoveryRecommendation {
+        if snapshotAvailable {
+            return RecoveryRecommendation(
+                action: &quot;rollback&quot;,
+                confidence: 0.8,
+                reason: &quot;A snapshot is available for safe rollback&quot;,
+                steps: [&quot;Initiate rollback&quot;, &quot;Restore from snapshot&quot;, &quot;Verify system health&quot;],
+                alternativeActions: [&quot;Retry deployment&quot;, &quot;Manual intervention&quot;]
+            )
+        }
+        return RecoveryRecommendation(
+            action: &quot;manual&quot;,
+            confidence: 0.5,
+            reason: &quot;No snapshot available - manual intervention recommended&quot;,
+            steps: [&quot;Review error logs&quot;, &quot;Assess system state&quot;, &quot;Contact support if needed&quot;],
+            alternativeActions: [&quot;Retry deployment with fixes&quot;]
+        )
+    }
+    
+    func fallbackReleaseNotes(commits: [String]) -&gt; GeneratedReleaseNotes {
+        var features: [String] = []
+        var fixes: [String] = []
+        var breaking: [String] = []
+        
+        for commit in commits {
+            if commit.starts(with: &quot;feat!&quot;) || commit.contains(&quot;!:&quot;) {
+                breaking.append(commit)
+            } else if commit.starts(with: &quot;feat&quot;) {
+                features.append(commit)
+            } else if commit.starts(with: &quot;fix&quot;) {
+                fixes.append(commit)
+            }
+        }
+        
+        return GeneratedReleaseNotes(
+            summary: &quot;Release containing \(commits.count) changes&quot;,
+            features: features,
+            fixes: fixes,
+            breakingChanges: breaking,
+            upgradeNotes: breaking.isEmpty ? &quot;&quot; : &quot;This release contains breaking changes. Review before upgrading.&quot;
+        )
+    }
+    
+    func fallbackAssessment() -&gt; AIAssessment {
+        return AIAssessment(
+            riskLevel: &quot;medium&quot;,
+            migrationComplexity: &quot;moderate&quot;,
+            estimatedDuration: &quot;15-30 minutes&quot;,
+            warnings: [&quot;AI assessment unavailable - using default values&quot;],
+            recommendations: [&quot;Create a snapshot before proceeding&quot;, &quot;Monitor deployment closely&quot;]
+        )
+    }
+}
+
+// MARK: - Singleton Access
+
+extension AIAssistantService {
+    static let shared = AIAssistantService()
+}</code></pre>
+<hr />
+<h2 id="file-modelsmanagedapp.swift">File: Models/ManagedApp.swift</h2>
+<pre class="swift"><code>import Foundation
+
+let DOMAIN_PLACEHOLDER = &quot;YOUR_DOMAIN.com&quot;
+
+struct ManagedApp: Identifiable, Codable, Hashable, Sendable {
+    let id: String
+    var name: String
+    var domain: String
+    var description: String?
+    var createdAt: Date
+    var updatedAt: Date
+    var environments: EnvironmentStatuses
+    
+    var isDomainConfigured: Bool {
+        !domain.contains(DOMAIN_PLACEHOLDER)
+    }
+    
+    struct EnvironmentStatuses: Codable, Hashable, Sendable {
+        var dev: EnvironmentStatus
+        var staging: EnvironmentStatus
+        var prod: EnvironmentStatus
+        
+        subscript(env: DeployEnvironment) -&gt; EnvironmentStatus {
+            get {
+                switch env {
+                case .dev: return dev
+                case .staging: return staging
+                case .prod: return prod
+                }
+            }
+            set {
+                switch env {
+                case .dev: dev = newValue
+                case .staging: staging = newValue
+                case .prod: prod = newValue
+                }
+            }
+        }
+    }
+}
+
+struct EnvironmentStatus: Codable, Hashable, Sendable {
+    var deployed: Bool
+    var version: String?
+    var tier: Int
+    var lastDeployedAt: Date?
+    var healthStatus: HealthStatus
+    var apiUrl: String?
+    var dashboardUrl: String?
+}
+
+enum HealthStatus: String, Codable, Sendable {
+    case healthy, degraded, unhealthy, unknown
+    
+    var color: String {
+        switch self {
+        case .healthy: return &quot;green&quot;
+        case .degraded: return &quot;orange&quot;
+        case .unhealthy: return &quot;red&quot;
+        case .unknown: return &quot;gray&quot;
+        }
+    }
+}
+
+extension ManagedApp {
+    static let defaults: [ManagedApp] = [
+        ManagedApp(
+            id: &quot;thinktank&quot;,
+            name: &quot;Think Tank&quot;,
+            domain: &quot;thinktank.\(DOMAIN_PLACEHOLDER)&quot;,
+            description: &quot;AI-powered brainstorming and ideation platform&quot;,
+            createdAt: Date(),
+            updatedAt: Date(),
+            environments: .init(
+                dev: .init(deployed: false, tier: 1, healthStatus: .unknown),
+                staging: .init(deployed: false, tier: 2, healthStatus: .unknown),
+                prod: .init(deployed: false, tier: 3, healthStatus: .unknown)
+            )
+        ),
+        ManagedApp(
+            id: &quot;launchboard&quot;,
+            name: &quot;Launch Board&quot;,
+            domain: &quot;launchboard.\(DOMAIN_PLACEHOLDER)&quot;,
+            description: &quot;Project launch management and tracking&quot;,
+            createdAt: Date(),
+            updatedAt: Date(),
+            environments: .init(
+                dev: .init(deployed: false, tier: 1, healthStatus: .unknown),
+                staging: .init(deployed: false, tier: 2, healthStatus: .unknown),
+                prod: .init(deployed: false, tier: 3, healthStatus: .unknown)
+            )
+        ),
+        ManagedApp(
+            id: &quot;alwaysme&quot;,
+            name: &quot;Always Me&quot;,
+            domain: &quot;alwaysme.\(DOMAIN_PLACEHOLDER)&quot;,
+            description: &quot;Personal AI assistant and memory&quot;,
+            createdAt: Date(),
+            updatedAt: Date(),
+            environments: .init(
+                dev: .init(deployed: false, tier: 1, healthStatus: .unknown),
+                staging: .init(deployed: false, tier: 2, healthStatus: .unknown),
+                prod: .init(deployed: false, tier: 3, healthStatus: .unknown)
+            )
+        ),
+        ManagedApp(
+            id: &quot;mechanicalmaker&quot;,
+            name: &quot;Mechanical Maker&quot;,
+            domain: &quot;mechanicalmaker.\(DOMAIN_PLACEHOLDER)&quot;,
+            description: &quot;AI-assisted mechanical design and CAD&quot;,
+            createdAt: Date(),
+            updatedAt: Date(),
+            environments: .init(
+                dev: .init(deployed: false, tier: 1, healthStatus: .unknown),
+                staging: .init(deployed: false, tier: 2, healthStatus: .unknown),
+                prod: .init(deployed: false, tier: 3, healthStatus: .unknown)
+            )
+        )
+    ]
+}</code></pre>
+<hr />
+<h2 id="file-modelsconfiguration.swift">File: Models/Configuration.swift</h2>
+<pre class="swift"><code>import Foundation
+
+/// Centralized configuration for RADIANT Deployer
+/// All hardcoded values should be placed here for easy customization
+struct Configuration {
+    
+    // MARK: - AWS Regions
+    
+    /// Default region for releases bucket
+    static var releasesBucketRegion: String {
+        ProcessInfo.processInfo.environment[&quot;RADIANT_RELEASES_REGION&quot;] ?? &quot;us-east-1&quot;
+    }
+    
+    /// Primary deployment region
+    static var primaryRegion: String {
+        ProcessInfo.processInfo.environment[&quot;RADIANT_PRIMARY_REGION&quot;] ?? &quot;us-east-1&quot;
+    }
+    
+    /// Available regions for deployment
+    static let availableRegions: [String] = [
+        &quot;us-east-1&quot;,
+        &quot;us-west-2&quot;,
+        &quot;eu-west-1&quot;,
+        &quot;eu-central-1&quot;,
+        &quot;ap-northeast-1&quot;,
+        &quot;ap-southeast-1&quot;,
+        &quot;ap-south-1&quot;
+    ]
+    
+    // MARK: - S3 Buckets
+    
+    /// Releases bucket name pattern
+    static func releasesBucket(region: String = releasesBucketRegion) -&gt; String {
+        &quot;radiant-releases-\(region)&quot;
+    }
+    
+    /// Media bucket name pattern
+    static func mediaBucket(region: String) -&gt; String {
+        &quot;radiant-media-\(region)&quot;
+    }
+    
+    // MARK: - SES Configuration
+    
+    /// SES mail-from MX record
+    static func sesMailFromMX(region: String = primaryRegion) -&gt; String {
+        &quot;10 feedback-smtp.\(region).amazonses.com&quot;
+    }
+    
+    /// SES SPF record
+    static let sesSPFRecord = &quot;v=spf1 include:amazonses.com ~all&quot;
+    
+    // MARK: - Version Information
+    
+    /// Current RADIANT version
+    static let radiantVersion = &quot;4.18.0&quot;
+    
+    /// Minimum deployer version required
+    static let minimumDeployerVersion = &quot;4.18.0&quot;
+    
+    // MARK: - Timeouts (seconds)
+    
+    static let cdkDeployTimeout = 1800
+    static let cdkBootstrapTimeout = 600
+    static let healthCheckTimeout = 30
+    static let migrationTimeout = 300
+    static let packageDownloadTimeout = 300
+    
+    // MARK: - Defaults
+    
+    /// Default VPC CIDR
+    static let defaultVpcCidr = &quot;10.0.0.0/16&quot;
+    
+    /// Default Aurora instance class by tier
+    static func defaultAuroraInstance(tier: Int) -&gt; String {
+        switch tier {
+        case 1: return &quot;db.t3.medium&quot;
+        case 2: return &quot;db.r6g.large&quot;
+        case 3: return &quot;db.r6g.xlarge&quot;
+        case 4: return &quot;db.r6g.2xlarge&quot;
+        default: return &quot;db.t3.medium&quot;
+        }
+    }
+    
+    // MARK: - Compatibility
+    
+    /// Supported deployment tiers
+    static let supportedTiers = [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;]
+    
+    /// AWS CDK version requirement
+    static let awsCdkVersion = &quot;2.x&quot;
+    
+    /// Node.js version requirement
+    static let nodejsVersion = &quot;20.x&quot;
+    
+    /// PostgreSQL version requirement
+    static let postgresqlVersion = &quot;15&quot;
+}</code></pre>
+<hr />
+<h2 id="file-modelscredentials.swift">File: Models/Credentials.swift</h2>
+<pre class="swift"><code>import Foundation
+
+struct CredentialSet: Identifiable, Codable {
+    let id: String
+    var name: String
+    var accessKeyId: String
+    var secretAccessKey: String
+    var region: String
+    var accountId: String?
+    var environment: CredentialEnvironment
+    var createdAt: Date
+    var lastValidatedAt: Date?
+    var isValid: Bool?
+    
+    var maskedSecretKey: String {
+        guard secretAccessKey.count &gt; 8 else { return &quot;********&quot; }
+        let prefix = String(secretAccessKey.prefix(4))
+        let suffix = String(secretAccessKey.suffix(4))
+        return &quot;\(prefix)...\(suffix)&quot;
+    }
+}
+
+enum CredentialEnvironment: String, Codable, CaseIterable {
+    case dev = &quot;Development&quot;
+    case staging = &quot;Staging&quot;
+    case prod = &quot;Production&quot;
+    case shared = &quot;Shared&quot;
+}
+
+struct AWSAccount: Codable {
+    let accountId: String
+    let accountAlias: String?
+    let regions: [String]
+}</code></pre>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECURITY AUDIT CHECKLIST - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECURITY AUDIT CHECKLIST</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/SECURITY-AUDIT-CHECKLIST.md</div>
+  </div>
+  
+  <h1 id="radiant-security-audit-checklist">RADIANT Security Audit Checklist</h1>
+<h2 id="version-5.42.0">Version: 5.42.0</h2>
+<h2 id="last-audit-january-2026">Last Audit: January 2026</h2>
+<p>This document provides a security audit checklist for the RADIANT platform covering authentication, authorization, data isolation, and security best practices.</p>
+<hr />
+<h2 id="row-level-security-rls-policies">1. Row-Level Security (RLS) Policies</h2>
+<h3 id="core-tables---rls-status">1.1 Core Tables - RLS Status</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>RLS Enabled</th>
+<th>Policy Type</th>
+<th>Verified</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tenants</code></td>
+<td>✅</td>
+<td>tenant_id match</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>users</code></td>
+<td>✅</td>
+<td>tenant_id + user_id</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>ai_reports</code></td>
+<td>✅</td>
+<td>tenant_id match</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>ai_report_templates</code></td>
+<td>✅</td>
+<td>tenant_id OR is_system</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>ai_report_brand_kits</code></td>
+<td>✅</td>
+<td>tenant_id match</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>ai_report_insights</code></td>
+<td>✅</td>
+<td>tenant_id match</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>billing_credits</code></td>
+<td>✅</td>
+<td>tenant_id match</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>usage_records</code></td>
+<td>✅</td>
+<td>tenant_id match</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>model_configs</code></td>
+<td>✅</td>
+<td>tenant_id match</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>agi_brain_plans</code></td>
+<td>✅</td>
+<td>tenant_id + user_id</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>conversations</code></td>
+<td>✅</td>
+<td>tenant_id + user_id</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rls-policy-template">1.2 RLS Policy Template</h3>
+<pre class="sql"><code>-- Standard tenant isolation policy
+ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation ON table_name
+  FOR ALL
+  USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;, true)::text)
+  WITH CHECK (tenant_id = current_setting(&#39;app.current_tenant_id&#39;, true)::text);
+
+-- User-level isolation (for user-specific data)
+CREATE POLICY user_isolation ON table_name
+  FOR ALL
+  USING (
+    tenant_id = current_setting(&#39;app.current_tenant_id&#39;, true)::text
+    AND user_id = current_setting(&#39;app.current_user_id&#39;, true)::text
+  );</code></pre>
+<h3 id="rls-audit-queries">1.3 RLS Audit Queries</h3>
+<pre class="sql"><code>-- Check which tables have RLS enabled
+SELECT schemaname, tablename, rowsecurity 
+FROM pg_tables 
+WHERE schemaname = &#39;public&#39; AND rowsecurity = true;
+
+-- Check RLS policies
+SELECT tablename, policyname, permissive, roles, cmd, qual 
+FROM pg_policies 
+WHERE schemaname = &#39;public&#39;;
+
+-- Verify tenant context is set
+SELECT current_setting(&#39;app.current_tenant_id&#39;, true);</code></pre>
+<hr />
+<h2 id="authentication-flow">2. Authentication Flow</h2>
+<h3 id="token-validation">2.1 Token Validation</h3>
+<pre class="typescript"><code>// Required checks for every authenticated request:
+interface AuthChecks {
+  tokenSignature: boolean;      // JWT signature valid
+  tokenExpiry: boolean;         // Not expired
+  tokenIssuer: boolean;         // Correct issuer
+  tenantExists: boolean;        // Tenant is valid
+  tenantActive: boolean;        // Tenant not suspended
+  userExists: boolean;          // User exists
+  userActive: boolean;          // User not disabled
+  permissionsValid: boolean;    // Has required permissions
+}</code></pre>
+<h3 id="auth-middleware-checklist">2.2 Auth Middleware Checklist</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="" />JWT signature verification</label></li>
+<li><label><input type="checkbox" checked="" />Token expiration check</label></li>
+<li><label><input type="checkbox" checked="" />Issuer validation</label></li>
+<li><label><input type="checkbox" checked="" />Audience validation</label></li>
+<li><label><input type="checkbox" checked="" />Tenant context injection</label></li>
+<li><label><input type="checkbox" checked="" />User context injection</label></li>
+<li><label><input type="checkbox" checked="" />Role/permission extraction</label></li>
+<li><label><input type="checkbox" checked="" />Rate limiting per user</label></li>
+<li><label><input type="checkbox" checked="" />Session validation (if applicable)</label></li>
+</ul>
+<h3 id="admin-authentication">2.3 Admin Authentication</h3>
+<pre class="typescript"><code>// Admin endpoints require additional checks:
+const adminAuthChecks = {
+  isAdmin: user.roles.includes(&#39;admin&#39;) || user.isSuperAdmin,
+  hasPermission: (permission: string) =&gt; user.permissions.includes(permission),
+  isSuperAdmin: user.isSuperAdmin === true,
+};</code></pre>
+<hr />
+<h2 id="authorization-patterns">3. Authorization Patterns</h2>
+<h3 id="permission-hierarchy">3.1 Permission Hierarchy</h3>
+<pre><code>SuperAdmin
+  └── Full platform access
+  └── Can access any tenant
+  └── Can modify system settings
+
+TenantAdmin
+  └── Full tenant access
+  └── Can manage users
+  └── Can configure models
+  └── Can view billing
+
+TenantUser
+  └── Limited to own data
+  └── Can use AI features
+  └── Cannot modify settings</code></pre>
+<h3 id="resource-authorization">3.2 Resource Authorization</h3>
+<pre class="typescript"><code>// Every resource access must verify:
+async function authorizeResourceAccess(
+  userId: string,
+  tenantId: string,
+  resourceType: string,
+  resourceId: string,
+  action: &#39;read&#39; | &#39;write&#39; | &#39;delete&#39;
+): Promise&lt;boolean&gt; {
+  // 1. Verify tenant access
+  if (!await canAccessTenant(userId, tenantId)) return false;
+  
+  // 2. Verify resource belongs to tenant
+  if (!await resourceBelongsToTenant(resourceType, resourceId, tenantId)) return false;
+  
+  // 3. Verify user has permission for action
+  if (!await userHasPermission(userId, resourceType, action)) return false;
+  
+  return true;
+}</code></pre>
+<hr />
+<h2 id="input-validation-sanitization">4. Input Validation &amp; Sanitization</h2>
+<h3 id="required-validations">4.1 Required Validations</h3>
+<table>
+<thead>
+<tr>
+<th>Input Type</th>
+<th>Validation</th>
+<th>Sanitization</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UUID</td>
+<td>Format check</td>
+<td>None needed</td>
+</tr>
+<tr>
+<td>Email</td>
+<td>RFC 5322 regex</td>
+<td>Lowercase, trim</td>
+</tr>
+<tr>
+<td>Tenant ID</td>
+<td>Alphanumeric + hyphen</td>
+<td>Lowercase</td>
+</tr>
+<tr>
+<td>User input text</td>
+<td>Length limits</td>
+<td>HTML escape</td>
+</tr>
+<tr>
+<td>JSON payloads</td>
+<td>Schema validation</td>
+<td>Type coercion</td>
+</tr>
+<tr>
+<td>File uploads</td>
+<td>MIME type, size</td>
+<td>Virus scan</td>
+</tr>
+<tr>
+<td>SQL parameters</td>
+<td>Parameterized queries</td>
+<td>Never concatenate</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sql-injection-prevention">4.2 SQL Injection Prevention</h3>
+<pre class="typescript"><code>// ✅ CORRECT: Parameterized queries
+await executeStatement(
+  &#39;SELECT * FROM users WHERE tenant_id = $1 AND id = $2&#39;,
+  [stringParam(&#39;tenantId&#39;, tenantId), stringParam(&#39;id&#39;, userId)]
+);
+
+// ❌ WRONG: String concatenation
+await executeStatement(
+  `SELECT * FROM users WHERE tenant_id = &#39;${tenantId}&#39;` // NEVER DO THIS
+);</code></pre>
+<h3 id="xss-prevention">4.3 XSS Prevention</h3>
+<pre class="typescript"><code>// Sanitize user-generated content before rendering
+import DOMPurify from &#39;dompurify&#39;;
+
+const sanitizedHtml = DOMPurify.sanitize(userContent, {
+  ALLOWED_TAGS: [&#39;b&#39;, &#39;i&#39;, &#39;em&#39;, &#39;strong&#39;, &#39;a&#39;, &#39;p&#39;, &#39;br&#39;],
+  ALLOWED_ATTR: [&#39;href&#39;, &#39;title&#39;],
+});</code></pre>
+<hr />
+<h2 id="api-security">5. API Security</h2>
+<h3 id="rate-limiting">5.1 Rate Limiting</h3>
+<table>
+<thead>
+<tr>
+<th>Endpoint Type</th>
+<th>Rate Limit</th>
+<th>Window</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Auth endpoints</td>
+<td>10 req</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>Admin API</td>
+<td>100 req</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>AI generation</td>
+<td>20 req</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>Export endpoints</td>
+<td>5 req</td>
+<td>1 min</td>
+</tr>
+<tr>
+<td>Public API</td>
+<td>1000 req</td>
+<td>1 min</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cors-configuration">5.2 CORS Configuration</h3>
+<pre class="typescript"><code>// Strict CORS for production
+const corsConfig = {
+  origin: [
+    &#39;https://admin.radiant.ai&#39;,
+    &#39;https://app.radiant.ai&#39;,
+    process.env.NODE_ENV === &#39;development&#39; &amp;&amp; &#39;http://localhost:3000&#39;,
+  ].filter(Boolean),
+  methods: [&#39;GET&#39;, &#39;POST&#39;, &#39;PUT&#39;, &#39;DELETE&#39;, &#39;PATCH&#39;],
+  allowedHeaders: [&#39;Content-Type&#39;, &#39;Authorization&#39;, &#39;X-Tenant-ID&#39;],
+  credentials: true,
+  maxAge: 86400,
+};</code></pre>
+<h3 id="security-headers">5.3 Security Headers</h3>
+<pre class="typescript"><code>const securityHeaders = {
+  &#39;Strict-Transport-Security&#39;: &#39;max-age=31536000; includeSubDomains&#39;,
+  &#39;X-Content-Type-Options&#39;: &#39;nosniff&#39;,
+  &#39;X-Frame-Options&#39;: &#39;DENY&#39;,
+  &#39;X-XSS-Protection&#39;: &#39;1; mode=block&#39;,
+  &#39;Content-Security-Policy&#39;: &quot;default-src &#39;self&#39;; script-src &#39;self&#39;&quot;,
+  &#39;Referrer-Policy&#39;: &#39;strict-origin-when-cross-origin&#39;,
+};</code></pre>
+<hr />
+<h2 id="data-protection">6. Data Protection</h2>
+<h3 id="encryption-at-rest">6.1 Encryption at Rest</h3>
+<table>
+<thead>
+<tr>
+<th>Data Type</th>
+<th>Encryption</th>
+<th>Key Management</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Aurora PostgreSQL</td>
+<td>AES-256</td>
+<td>AWS KMS</td>
+</tr>
+<tr>
+<td>S3 Buckets</td>
+<td>AES-256</td>
+<td>AWS KMS</td>
+</tr>
+<tr>
+<td>Secrets</td>
+<td>AES-256</td>
+<td>Secrets Manager</td>
+</tr>
+<tr>
+<td>Local storage</td>
+<td>N/A</td>
+<td>Not stored</td>
+</tr>
+</tbody>
+</table>
+<h3 id="encryption-in-transit">6.2 Encryption in Transit</h3>
+<ul>
+<li>All API traffic: TLS 1.2+</li>
+<li>Database connections: SSL required</li>
+<li>Internal AWS: VPC endpoints</li>
+</ul>
+<h3 id="pii-handling">6.3 PII Handling</h3>
+<pre class="typescript"><code>// PII fields requiring special handling
+const piiFields = [
+  &#39;email&#39;,
+  &#39;name&#39;,
+  &#39;phone&#39;,
+  &#39;address&#39;,
+  &#39;ip_address&#39;,
+  &#39;api_key&#39;,
+];
+
+// Log redaction
+function redactPII(obj: Record&lt;string, unknown&gt;): Record&lt;string, unknown&gt; {
+  const redacted = { ...obj };
+  for (const field of piiFields) {
+    if (field in redacted) {
+      redacted[field] = &#39;[REDACTED]&#39;;
+    }
+  }
+  return redacted;
+}</code></pre>
+<hr />
+<h2 id="secret-management">7. Secret Management</h2>
+<h3 id="secret-storage">7.1 Secret Storage</h3>
+<table>
+<thead>
+<tr>
+<th>Secret Type</th>
+<th>Storage</th>
+<th>Rotation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API Keys</td>
+<td>Secrets Manager</td>
+<td>90 days</td>
+</tr>
+<tr>
+<td>Database credentials</td>
+<td>Secrets Manager</td>
+<td>30 days</td>
+</tr>
+<tr>
+<td>JWT signing keys</td>
+<td>Secrets Manager</td>
+<td>365 days</td>
+</tr>
+<tr>
+<td>Encryption keys</td>
+<td>KMS</td>
+<td>Auto</td>
+</tr>
+</tbody>
+</table>
+<h3 id="secret-access">7.2 Secret Access</h3>
+<pre class="typescript"><code>// Secrets should never be:
+// - Logged
+// - Returned in API responses
+// - Stored in environment variables (use Secrets Manager)
+// - Committed to code
+
+// Correct pattern:
+const secret = await secretsManager.getSecretValue({
+  SecretId: &#39;prod/radiant/api-key&#39;,
+});</code></pre>
+<hr />
+<h2 id="audit-logging">8. Audit Logging</h2>
+<h3 id="events-to-log">8.1 Events to Log</h3>
+<table>
+<thead>
+<tr>
+<th>Event Category</th>
+<th>Events</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Authentication</td>
+<td>Login, logout, failed attempts</td>
+</tr>
+<tr>
+<td>Authorization</td>
+<td>Permission denied, role changes</td>
+</tr>
+<tr>
+<td>Data access</td>
+<td>Read sensitive data, exports</td>
+</tr>
+<tr>
+<td>Data modification</td>
+<td>Create, update, delete</td>
+</tr>
+<tr>
+<td>Admin actions</td>
+<td>User management, settings changes</td>
+</tr>
+<tr>
+<td>Security events</td>
+<td>Rate limit hits, suspicious activity</td>
+</tr>
+</tbody>
+</table>
+<h3 id="log-format">8.2 Log Format</h3>
+<pre class="typescript"><code>interface AuditLog {
+  timestamp: string;
+  eventType: string;
+  tenantId: string;
+  userId: string;
+  resourceType: string;
+  resourceId: string;
+  action: string;
+  outcome: &#39;success&#39; | &#39;failure&#39;;
+  ipAddress: string;
+  userAgent: string;
+  details: Record&lt;string, unknown&gt;;
+}</code></pre>
+<hr />
+<h2 id="vulnerability-checklist">9. Vulnerability Checklist</h2>
+<h3 id="owasp-top-10-coverage">9.1 OWASP Top 10 Coverage</h3>
+<table>
+<thead>
+<tr>
+<th>Vulnerability</th>
+<th>Mitigation</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Injection</td>
+<td>Parameterized queries</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Broken Auth</td>
+<td>JWT + MFA support</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Sensitive Data Exposure</td>
+<td>Encryption + redaction</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>XML External Entities</td>
+<td>Not applicable (JSON only)</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Broken Access Control</td>
+<td>RLS + auth middleware</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Security Misconfiguration</td>
+<td>IaC + security headers</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>XSS</td>
+<td>Content sanitization</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Insecure Deserialization</td>
+<td>Schema validation</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Known Vulnerabilities</td>
+<td>Dependabot + npm audit</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Insufficient Logging</td>
+<td>Audit logging</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dependency-security">9.2 Dependency Security</h3>
+<pre class="bash"><code># Run regularly
+npm audit
+npm audit fix
+
+# Check for outdated packages
+npm outdated
+
+# Review Dependabot alerts in GitHub</code></pre>
+<hr />
+<h2 id="incident-response">10. Incident Response</h2>
+<h3 id="security-incident-procedure">10.1 Security Incident Procedure</h3>
+<ol type="1">
+<li><strong>Detect</strong> - Automated alerts or manual report</li>
+<li><strong>Contain</strong> - Isolate affected systems</li>
+<li><strong>Investigate</strong> - Review logs, identify scope</li>
+<li><strong>Eradicate</strong> - Remove threat, patch vulnerability</li>
+<li><strong>Recover</strong> - Restore services</li>
+<li><strong>Document</strong> - Post-incident report</li>
+</ol>
+<h3 id="emergency-contacts">10.2 Emergency Contacts</h3>
+<pre><code>Security Team: security@radiant.ai
+On-Call: PagerDuty integration
+AWS Support: Enterprise support case</code></pre>
+<hr />
+<h2 id="compliance">11. Compliance</h2>
+<h3 id="compliance-requirements">11.1 Compliance Requirements</h3>
+<table>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Status</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SOC 2 Type II</td>
+<td>In progress</td>
+<td>Annual audit</td>
+</tr>
+<tr>
+<td>GDPR</td>
+<td>✅</td>
+<td>Data processing agreements</td>
+</tr>
+<tr>
+<td>HIPAA</td>
+<td>Optional</td>
+<td>PHI sanitization available</td>
+</tr>
+<tr>
+<td>CCPA</td>
+<td>✅</td>
+<td>Privacy controls implemented</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-retention">11.2 Data Retention</h3>
+<table>
+<thead>
+<tr>
+<th>Data Type</th>
+<th>Retention</th>
+<th>Deletion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Audit logs</td>
+<td>2 years</td>
+<td>Auto-archive</td>
+</tr>
+<tr>
+<td>User data</td>
+<td>Account lifetime + 30 days</td>
+<td>On request</td>
+</tr>
+<tr>
+<td>AI conversations</td>
+<td>90 days default</td>
+<td>Configurable</td>
+</tr>
+<tr>
+<td>Reports</td>
+<td>1 year</td>
+<td>Auto-delete</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="security-testing">12. Security Testing</h2>
+<h3 id="testing-schedule">12.1 Testing Schedule</h3>
+<table>
+<thead>
+<tr>
+<th>Test Type</th>
+<th>Frequency</th>
+<th>Last Run</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dependency audit</td>
+<td>Weekly</td>
+<td>Auto</td>
+</tr>
+<tr>
+<td>SAST (static analysis)</td>
+<td>On PR</td>
+<td>Auto</td>
+</tr>
+<tr>
+<td>DAST (dynamic)</td>
+<td>Monthly</td>
+<td>Manual</td>
+</tr>
+<tr>
+<td>Penetration test</td>
+<td>Annual</td>
+<td>External</td>
+</tr>
+<tr>
+<td>Security review</td>
+<td>Quarterly</td>
+<td>Internal</td>
+</tr>
+</tbody>
+</table>
+<h3 id="security-test-commands">12.2 Security Test Commands</h3>
+<pre class="bash"><code># Static analysis
+npm run lint
+npm run typecheck
+
+# Dependency audit
+npm audit
+
+# Secret scanning
+git secrets --scan
+
+# Infrastructure security
+cdk synth &amp;&amp; cfn-nag</code></pre>
+<hr />
+<h2 id="approval">Approval</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Name</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Security Lead</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Engineering Lead</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>CTO</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

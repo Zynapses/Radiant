@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INDEX - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>INDEX</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/INDEX.md</div>
+  </div>
+  
+  <h1 id="radiant-documentation-index">RADIANT Documentation Index</h1>
+<blockquote>
+<p><strong>Complete documentation for the RADIANT AI Platform</strong></p>
+<p>Version: 4.18.1 | Last Updated: December 2024</p>
+</blockquote>
+<hr />
+<h2 id="quick-links">Quick Links</h2>
+<table>
+<thead>
+<tr>
+<th>I want to…</th>
+<th>Read this</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deploy RADIANT</td>
+<td><a href="DEPLOYER-ADMIN-GUIDE.md">Deployer Admin Guide</a></td>
+</tr>
+<tr>
+<td>Manage the platform</td>
+<td><a href="RADIANT-ADMIN-GUIDE.md">Radiant Admin Guide</a></td>
+</tr>
+<tr>
+<td>Use Think Tank</td>
+<td><a href="THINK-TANK-USER-GUIDE.md">Think Tank User Guide</a></td>
+</tr>
+<tr>
+<td>Understand the architecture</td>
+<td><a href="ARCHITECTURE.md">Architecture</a></td>
+</tr>
+<tr>
+<td>Troubleshoot issues</td>
+<td><a href="TROUBLESHOOTING.md">Troubleshooting</a></td>
+</tr>
+<tr>
+<td>Use the API</td>
+<td><a href="API_REFERENCE.md">API Reference</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="documentation-categories">Documentation Categories</h2>
+<h3 id="administrator-documentation">Administrator Documentation</h3>
+<p>Guides for platform administrators and operators.</p>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 39%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Document</th>
+<th>Description</th>
+<th>Audience</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="DEPLOYER-ADMIN-GUIDE.md">Deployer Admin Guide</a></td>
+<td>Complete guide for Swift Deployer app</td>
+<td>DevOps, Platform Engineers</td>
+</tr>
+<tr>
+<td><a href="RADIANT-ADMIN-GUIDE.md">Radiant Admin Guide</a></td>
+<td>Admin Dashboard management guide</td>
+<td>Platform Administrators</td>
+</tr>
+<tr>
+<td><a href="ADMINISTRATOR-GUIDE.md">Administrator Guide</a></td>
+<td>Legacy admin documentation</td>
+<td>All Administrators</td>
+</tr>
+<tr>
+<td><a href="DEPLOYMENT-GUIDE.md">Deployment Guide</a></td>
+<td>Infrastructure deployment</td>
+<td>DevOps Engineers</td>
+</tr>
+<tr>
+<td><a href="RADIANT-SYSTEM-GUIDE.md">System Guide</a></td>
+<td>System architecture details</td>
+<td>Technical Leads</td>
+</tr>
+</tbody>
+</table>
+<h3 id="consumer-documentation">Consumer Documentation</h3>
+<p>Guides for end-users of RADIANT-powered applications.</p>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 39%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Document</th>
+<th>Description</th>
+<th>Audience</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="THINK-TANK-USER-GUIDE.md">Think Tank User Guide</a></td>
+<td>Complete user guide for Think Tank</td>
+<td>End Users</td>
+</tr>
+</tbody>
+</table>
+<h3 id="technical-reference">Technical Reference</h3>
+<p>Technical documentation for developers and integrators.</p>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 39%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Document</th>
+<th>Description</th>
+<th>Audience</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="API_REFERENCE.md">API Reference</a></td>
+<td>REST API documentation</td>
+<td>Developers</td>
+</tr>
+<tr>
+<td><a href="API_VERSIONING.md">API Versioning</a></td>
+<td>API version management</td>
+<td>API Consumers</td>
+</tr>
+<tr>
+<td><a href="ERROR_CODES.md">Error Codes</a></td>
+<td>Standardized error codes</td>
+<td>Developers</td>
+</tr>
+<tr>
+<td><a href="TESTING.md">Testing Guide</a></td>
+<td>Testing strategies and tools</td>
+<td>Developers, QA</td>
+</tr>
+<tr>
+<td><a href="ARCHITECTURE.md">Architecture</a></td>
+<td>System architecture</td>
+<td>Architects, Developers</td>
+</tr>
+</tbody>
+</table>
+<h3 id="operations-compliance">Operations &amp; Compliance</h3>
+<p>Guides for operations, security, and compliance.</p>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 39%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Document</th>
+<th>Description</th>
+<th>Audience</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="COMPLIANCE.md">Compliance</a></td>
+<td>SOC2, HIPAA, GDPR compliance</td>
+<td>Compliance Officers</td>
+</tr>
+<tr>
+<td><a href="../SECURITY.md">Security</a></td>
+<td>Security policies</td>
+<td>Security Team</td>
+</tr>
+<tr>
+<td><a href="DATA_RETENTION.md">Data Retention</a></td>
+<td>Data lifecycle management</td>
+<td>Compliance, Legal</td>
+</tr>
+<tr>
+<td><a href="DISASTER_RECOVERY.md">Disaster Recovery</a></td>
+<td>DR procedures</td>
+<td>Operations</td>
+</tr>
+<tr>
+<td><a href="PERFORMANCE.md">Performance</a></td>
+<td>Performance tuning</td>
+<td>DevOps</td>
+</tr>
+<tr>
+<td><a href="COST_OPTIMIZATION.md">Cost Optimization</a></td>
+<td>Cost management</td>
+<td>Finance, Operations</td>
+</tr>
+<tr>
+<td><a href="TROUBLESHOOTING.md">Troubleshooting</a></td>
+<td>Problem resolution</td>
+<td>Support, Operations</td>
+</tr>
+</tbody>
+</table>
+<h3 id="runbooks">Runbooks</h3>
+<p>Operational procedures for common tasks.</p>
+<table>
+<thead>
+<tr>
+<th>Runbook</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="runbooks/">runbooks/</a></td>
+<td>Operational runbooks directory</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="documentation-by-role">Documentation by Role</h2>
+<h3 id="platform-engineers-devops">Platform Engineers / DevOps</h3>
+<ol type="1">
+<li><a href="DEPLOYER-ADMIN-GUIDE.md">Deployer Admin Guide</a> - Deploy and manage infrastructure</li>
+<li><a href="DEPLOYMENT-GUIDE.md">Deployment Guide</a> - Manual deployment procedures</li>
+<li><a href="DISASTER_RECOVERY.md">Disaster Recovery</a> - DR planning and execution</li>
+<li><a href="PERFORMANCE.md">Performance</a> - Performance optimization</li>
+</ol>
+<h3 id="platform-administrators">Platform Administrators</h3>
+<ol type="1">
+<li><a href="RADIANT-ADMIN-GUIDE.md">Radiant Admin Guide</a> - Day-to-day management</li>
+<li><a href="ADMINISTRATOR-GUIDE.md">Administrator Guide</a> - Additional admin tasks</li>
+<li><a href="COST_OPTIMIZATION.md">Cost Optimization</a> - Cost management</li>
+</ol>
+<h3 id="developers">Developers</h3>
+<ol type="1">
+<li><a href="API_REFERENCE.md">API Reference</a> - API integration</li>
+<li><a href="ERROR_CODES.md">Error Codes</a> - Error handling</li>
+<li><a href="TESTING.md">Testing Guide</a> - Writing tests</li>
+<li><a href="ARCHITECTURE.md">Architecture</a> - System design</li>
+</ol>
+<h3 id="end-users">End Users</h3>
+<ol type="1">
+<li><a href="THINK-TANK-USER-GUIDE.md">Think Tank User Guide</a> - Using Think Tank</li>
+</ol>
+<h3 id="compliance-security">Compliance &amp; Security</h3>
+<ol type="1">
+<li><a href="COMPLIANCE.md">Compliance</a> - Compliance frameworks</li>
+<li><a href="../SECURITY.md">Security</a> - Security policies</li>
+<li><a href="DATA_RETENTION.md">Data Retention</a> - Data management</li>
+</ol>
+<hr />
+<h2 id="version-information">Version Information</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Version</th>
+<th>Documentation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RADIANT Platform</td>
+<td>4.18.1</td>
+<td>This documentation</td>
+</tr>
+<tr>
+<td>Think Tank</td>
+<td>3.2.0</td>
+<td><a href="THINK-TANK-USER-GUIDE.md">User Guide</a></td>
+</tr>
+<tr>
+<td>Swift Deployer</td>
+<td>4.18.1</td>
+<td><a href="DEPLOYER-ADMIN-GUIDE.md">Admin Guide</a></td>
+</tr>
+<tr>
+<td>Admin Dashboard</td>
+<td>4.18.1</td>
+<td><a href="RADIANT-ADMIN-GUIDE.md">Admin Guide</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="recent-updates">Recent Updates</h2>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 40%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr>
+<th>Date</th>
+<th>Document</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dec 2024</td>
+<td><a href="DEPLOYER-ADMIN-GUIDE.md">Deployer Admin Guide</a></td>
+<td>New comprehensive guide</td>
+</tr>
+<tr>
+<td>Dec 2024</td>
+<td><a href="RADIANT-ADMIN-GUIDE.md">Radiant Admin Guide</a></td>
+<td>New comprehensive guide</td>
+</tr>
+<tr>
+<td>Dec 2024</td>
+<td><a href="ERROR_CODES.md">Error Codes</a></td>
+<td>60+ standardized error codes</td>
+</tr>
+<tr>
+<td>Dec 2024</td>
+<td><a href="TESTING.md">Testing Guide</a></td>
+<td>Complete testing documentation</td>
+</tr>
+<tr>
+<td>Dec 2024</td>
+<td><a href="THINK-TANK-USER-GUIDE.md">Think Tank User Guide</a></td>
+<td>Updated to v3.2.0</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="contributing-to-documentation">Contributing to Documentation</h2>
+<p>See <a href="../CONTRIBUTING.md">CONTRIBUTING.md</a> for guidelines on updating documentation.</p>
+<h3 id="documentation-standards">Documentation Standards</h3>
+<ul>
+<li>Use Markdown format</li>
+<li>Include version and date</li>
+<li>Add to this index when creating new docs</li>
+<li>Follow the existing structure and style</li>
+</ul>
+<hr />
+<h2 id="getting-help">Getting Help</h2>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Link</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Documentation Issues</td>
+<td>GitHub Issues</td>
+</tr>
+<tr>
+<td>General Support</td>
+<td>support@radiant.example.com</td>
+</tr>
+<tr>
+<td>Security Issues</td>
+<td>security@radiant.example.com</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Last updated: December 2024</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

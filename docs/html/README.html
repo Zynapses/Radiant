@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>README - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>README</h1>
+    <div class="meta">RADIANT v5.52.29 | README.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.18.0">RADIANT v4.18.0</h1>
+<p>A <strong>multi-tenant AWS SaaS platform</strong> for AI model access and orchestration.</p>
+<h2 id="overview">Overview</h2>
+<p>RADIANT consists of three components:</p>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 33%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Location</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Swift Deployer App</strong></td>
+<td><code>apps/swift-deployer/</code></td>
+<td>macOS app for deploying AWS infrastructure</td>
+</tr>
+<tr>
+<td><strong>AWS Infrastructure</strong></td>
+<td><code>packages/infrastructure/</code></td>
+<td>CDK stacks, Lambdas, databases (deployed to AWS)</td>
+</tr>
+<tr>
+<td><strong>Admin Dashboard</strong></td>
+<td><code>apps/admin-dashboard/</code></td>
+<td>Next.js web admin interface (deployed to AWS)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="architecture">Architecture</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                        Your Mac                                  │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │           Swift Deployer App (RadiantDeployer)           │   │
+│  │  • Runs locally on macOS                                 │   │
+│  │  • Deploys infrastructure to AWS via CDK                 │   │
+│  │  • AI Assistant for deployment guidance                  │   │
+│  └─────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ Deploys
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         AWS Cloud                                │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │                 Admin Dashboard (Next.js)                │   │
+│  │  • Hosted on AWS (CloudFront + S3 or Amplify)           │   │
+│  │  • Manage tenants, models, billing, compliance          │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                   │
+│                              ▼                                   │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │              AWS Infrastructure (CDK)                    │   │
+│  │  • API Gateway, Lambda, Aurora PostgreSQL               │   │
+│  │  • Cognito, S3, SageMaker endpoints                     │   │
+│  └─────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h2 id="requirements">Requirements</h2>
+<h3 id="swift-deployer-app">Swift Deployer App</h3>
+<ul>
+<li>macOS 13.0 (Ventura) or later</li>
+<li>Xcode 15.0+ or Swift 5.9+</li>
+</ul>
+<h3 id="aws-infrastructure">AWS Infrastructure</h3>
+<ul>
+<li>Node.js 20.0+</li>
+<li>pnpm 8.0+</li>
+<li>AWS CDK 2.120.0+</li>
+<li>AWS Account with appropriate permissions</li>
+</ul>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="option-a-use-swift-deployer-recommended">Option A: Use Swift Deployer (Recommended)</h3>
+<p>The Swift Deployer is a macOS app that guides you through deployment with an AI assistant.</p>
+<pre class="bash"><code>cd apps/swift-deployer
+swift build
+swift run</code></pre>
+<p>This opens the RadiantDeployer app which will: 1. Validate your AWS credentials 2. Guide you through configuration 3. Deploy all infrastructure to AWS 4. Deploy the Admin Dashboard to AWS</p>
+<h3 id="option-b-manual-deployment">Option B: Manual Deployment</h3>
+<pre class="bash"><code># 1. Install dependencies
+pnpm install
+
+# 2. Build shared package
+pnpm build:shared
+
+# 3. Deploy infrastructure to AWS
+pnpm deploy:dev</code></pre>
+<h3 id="accessing-the-admin-dashboard">Accessing the Admin Dashboard</h3>
+<p>After deployment, the Admin Dashboard is accessible at your configured domain (e.g., <code>admin.yourdomain.com</code>). It is <strong>not</strong> run locally - it’s deployed to AWS and accessed via browser.</p>
+<h2 id="project-structure">Project Structure</h2>
+<pre><code>radiant/
+├── package.json                    # Root monorepo config
+├── pnpm-workspace.yaml             # pnpm workspace config
+├── tsconfig.base.json              # Base TypeScript config
+├── .github/workflows/ci.yml        # CI/CD pipeline
+├── .husky/pre-commit               # Pre-commit hooks
+│
+├── apps/
+│   ├── swift-deployer/             # RadiantDeployer macOS app (runs locally)
+│   │   ├── Package.swift
+│   │   ├── Sources/RadiantDeployer/
+│   │   │   ├── Models/
+│   │   │   ├── Services/
+│   │   │   └── Views/
+│   │   └── Tests/                  # Swift unit &amp; E2E tests
+│   │
+│   └── admin-dashboard/            # Next.js admin UI (deployed to AWS)
+│       ├── app/(dashboard)/
+│       ├── components/
+│       ├── lib/
+│       └── e2e/                    # Playwright E2E tests
+│
+├── packages/
+│   ├── shared/                     # @radiant/shared - Types &amp; constants
+│   │   └── src/
+│   │       ├── types/
+│   │       ├── constants/
+│   │       ├── utils/
+│   │       ├── errors/             # Standardized error codes
+│   │       └── testing/            # Test utilities
+│   │
+│   └── infrastructure/             # @radiant/infrastructure - CDK stacks
+│       ├── bin/radiant.ts
+│       ├── lib/stacks/
+│       ├── lambda/
+│       │   ├── admin/__tests__/    # Lambda unit tests
+│       │   ├── billing/__tests__/
+│       │   └── shared/__tests__/
+│       └── migrations/
+│
+└── docs/
+    ├── TESTING.md                  # Testing guide
+    ├── ERROR_CODES.md              # Error codes reference
+    └── sections/                   # Full specification documents</code></pre>
+<h2 id="infrastructure-tiers">Infrastructure Tiers</h2>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Name</th>
+<th>Monthly Cost</th>
+<th>Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>SEED</td>
+<td>$50-150</td>
+<td>Dev/test, minimal resources</td>
+</tr>
+<tr>
+<td>2</td>
+<td>STARTUP</td>
+<td>$200-400</td>
+<td>Small production, WAF</td>
+</tr>
+<tr>
+<td>3</td>
+<td>GROWTH</td>
+<td>$1,000-2,500</td>
+<td>Self-hosted models, HIPAA</td>
+</tr>
+<tr>
+<td>4</td>
+<td>SCALE</td>
+<td>$4,000-8,000</td>
+<td>Multi-region, global DB</td>
+</tr>
+<tr>
+<td>5</td>
+<td>ENTERPRISE</td>
+<td>$15,000-35,000</td>
+<td>Enterprise-grade global</td>
+</tr>
+</tbody>
+</table>
+<h2 id="documentation">Documentation</h2>
+<ul>
+<li><a href="docs/ARCHITECTURE.md">Architecture Overview</a></li>
+<li><a href="docs/sections/">Full Specifications</a></li>
+</ul>
+<h2 id="development-phases">Development Phases</h2>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Description</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1-9</td>
+<td>Core Platform (Sections 0-46)</td>
+<td>✅ Complete</td>
+</tr>
+<tr>
+<td>10-24</td>
+<td>PROMPT-32 Update</td>
+<td>✅ Complete</td>
+</tr>
+<tr>
+<td>25-31</td>
+<td>PROMPT-33 Update v3</td>
+<td>✅ Complete</td>
+</tr>
+<tr>
+<td>32-33</td>
+<td>Verification &amp; Testing</td>
+<td>✅ Complete</td>
+</tr>
+</tbody>
+</table>
+<h3 id="v4.18.0-new-features-prompt-33">v4.18.0 New Features (PROMPT-33)</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Unified Package System</strong></td>
+<td>Atomic component versioning with .pkg format</td>
+</tr>
+<tr>
+<td><strong>Cost Management</strong></td>
+<td>Real-time cost tracking with AI recommendations</td>
+</tr>
+<tr>
+<td><strong>Compliance Reports</strong></td>
+<td>SOC2, HIPAA, GDPR, ISO27001 report generation</td>
+</tr>
+<tr>
+<td><strong>Security Dashboard</strong></td>
+<td>Anomaly detection and intrusion alerts</td>
+</tr>
+<tr>
+<td><strong>A/B Testing</strong></td>
+<td>Hash-based experiments with statistical analysis</td>
+</tr>
+<tr>
+<td><strong>Deployment Settings</strong></td>
+<td>SSM-synced configuration with lock-step mode</td>
+</tr>
+<tr>
+<td><strong>AI Assistant</strong></td>
+<td>Claude-powered deployment guidance in Swift app</td>
+</tr>
+</tbody>
+</table>
+<h2 id="admin-dashboard">Admin Dashboard</h2>
+<p>The admin dashboard provides a complete management interface:</p>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dashboard</td>
+<td>Overview metrics and activity</td>
+</tr>
+<tr>
+<td>Models</td>
+<td>AI model configuration</td>
+</tr>
+<tr>
+<td>Providers</td>
+<td>Provider management and credentials</td>
+</tr>
+<tr>
+<td>Orchestration</td>
+<td>Neural patterns and workflows</td>
+</tr>
+<tr>
+<td>Administrators</td>
+<td>User management and invitations</td>
+</tr>
+<tr>
+<td>Billing</td>
+<td>Credits, subscriptions, transactions</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>Storage usage monitoring</td>
+</tr>
+<tr>
+<td>Localization</td>
+<td>Translation management</td>
+</tr>
+<tr>
+<td>Configuration</td>
+<td>System settings</td>
+</tr>
+<tr>
+<td>Migrations</td>
+<td>Database migration approval</td>
+</tr>
+<tr>
+<td>Audit Logs</td>
+<td>Activity tracking</td>
+</tr>
+<tr>
+<td>Notifications</td>
+<td>System alerts</td>
+</tr>
+<tr>
+<td>Settings</td>
+<td>User preferences, deployment settings, timeouts</td>
+</tr>
+<tr>
+<td><strong>Analytics</strong></td>
+<td>Cost analytics with AI recommendations</td>
+</tr>
+<tr>
+<td><strong>Compliance</strong></td>
+<td>SOC2/HIPAA/GDPR/ISO27001 reports</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>Anomaly detection and threat monitoring</td>
+</tr>
+<tr>
+<td><strong>Experiments</strong></td>
+<td>A/B testing with statistical analysis</td>
+</tr>
+<tr>
+<td><strong>Time Machine</strong></td>
+<td>Conversation history and versioning</td>
+</tr>
+</tbody>
+</table>
+<h3 id="running-the-dashboard">Running the Dashboard</h3>
+<pre class="bash"><code>cd apps/admin-dashboard
+pnpm dev</code></pre>
+<h2 id="database-migrations">Database Migrations</h2>
+<p>44 migrations covering: - Core schema (tenants, users, admins) - AI models and providers - Orchestration patterns and workflows - Billing and credits - Storage management - Localization - Configuration management</p>
+<h3 id="running-migrations">Running Migrations</h3>
+<pre class="bash"><code>cd packages/infrastructure
+pnpm migrate</code></pre>
+<h3 id="seed-data">Seed Data</h3>
+<p>Demo data is available for development:</p>
+<pre class="bash"><code>psql -d radiant -f migrations/seed/001_demo_data.sql</code></pre>
+<h2 id="lambda-handlers">Lambda Handlers</h2>
+<table>
+<thead>
+<tr>
+<th>Handler</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>router</td>
+<td>Main API router</td>
+</tr>
+<tr>
+<td>admin</td>
+<td>Admin operations</td>
+</tr>
+<tr>
+<td>feedback</td>
+<td>Feedback learning</td>
+</tr>
+<tr>
+<td>orchestration</td>
+<td>Neural orchestration</td>
+</tr>
+<tr>
+<td>proposals</td>
+<td>Workflow proposals</td>
+</tr>
+<tr>
+<td>localization</td>
+<td>Translation API</td>
+</tr>
+<tr>
+<td>configuration</td>
+<td>Config management</td>
+</tr>
+<tr>
+<td>billing</td>
+<td>Credits and subscriptions</td>
+</tr>
+<tr>
+<td>storage</td>
+<td>Storage tracking</td>
+</tr>
+<tr>
+<td>migration-approval</td>
+<td>Dual-admin approval</td>
+</tr>
+<tr>
+<td><strong>cost-logger</strong></td>
+<td>Real-time cost tracking</td>
+</tr>
+<tr>
+<td><strong>compliance-reporter</strong></td>
+<td>SOC2/HIPAA/GDPR/ISO27001 reports</td>
+</tr>
+<tr>
+<td><strong>anomaly-detector</strong></td>
+<td>Security intrusion detection</td>
+</tr>
+<tr>
+<td><strong>experiment-tracker</strong></td>
+<td>A/B test assignment and analysis</td>
+</tr>
+</tbody>
+</table>
+<h2 id="environment-variables">Environment Variables</h2>
+<p>Copy the template and configure:</p>
+<pre class="bash"><code>cp .env.example .env</code></pre>
+<p>Required variables: - <code>AWS_REGION</code> - AWS region - <code>AWS_ACCOUNT_ID</code> - AWS account ID - <code>DB_CLUSTER_ARN</code> - Aurora cluster ARN - <code>DB_SECRET_ARN</code> - Database secret ARN - <code>COGNITO_USER_POOL_ID</code> - Cognito user pool - <code>COGNITO_CLIENT_ID</code> - Cognito client ID</p>
+<h2 id="testing">Testing</h2>
+<p>RADIANT includes comprehensive testing at multiple levels:</p>
+<pre class="bash"><code># Run all tests
+pnpm test
+
+# Run Lambda unit tests
+cd packages/infrastructure &amp;&amp; pnpm test
+
+# Run E2E tests
+cd apps/admin-dashboard &amp;&amp; pnpm test:e2e
+
+# Run Swift tests
+cd apps/swift-deployer &amp;&amp; swift test</code></pre>
+<p>See <a href="docs/TESTING.md">Testing Guide</a> for detailed information.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>RADIANT uses standardized error codes across all services. See <a href="docs/ERROR_CODES.md">Error Codes Reference</a>.</p>
+<pre class="typescript"><code>import { ErrorCodes, RadiantError } from &#39;@radiant/shared&#39;;
+
+throw new RadiantError(ErrorCodes.AUTH_INVALID_TOKEN);</code></pre>
+<h2 id="cicd">CI/CD</h2>
+<p>GitHub Actions workflow includes: - Linting and type checking - Unit tests with coverage - E2E tests - CDK synthesis validation - Automated deployment (on merge to main)</p>
+<h2 id="license">License</h2>
+<p>MIT</p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

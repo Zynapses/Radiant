@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 30 DYNAMIC PROVIDER REGISTRY - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 30 DYNAMIC PROVIDER REGISTRY</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-30-DYNAMIC-PROVIDER-REGISTRY.md</div>
+  </div>
+  
+  <h1 id="section-30-dynamic-provider-registry-xaigrok-v3.7.0">SECTION 30: DYNAMIC PROVIDER REGISTRY + xAI/GROK (v3.7.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<blockquote>
+<p><strong>NEW in v3.7.0</strong>: Database-driven model registry with automatic sync and xAI/Grok integration.</p>
+</blockquote>
+<hr />
+<h2 id="complete-provider-model-registry">30.1 Complete Provider &amp; Model Registry</h2>
+<h3 id="external-ai-providers-21">External AI Providers (21+)</h3>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 29%" />
+<col style="width: 20%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th>Provider ID</th>
+<th>Display Name</th>
+<th>API Base</th>
+<th>Auth Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>anthropic</code></td>
+<td>Anthropic</td>
+<td>api.anthropic.com</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>openai</code></td>
+<td>OpenAI</td>
+<td>api.openai.com</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>google</code></td>
+<td>Google (Gemini)</td>
+<td>generativelanguage.googleapis.com</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>xai</code></td>
+<td>xAI (Grok)</td>
+<td>api.x.ai</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>mistral</code></td>
+<td>Mistral AI</td>
+<td>api.mistral.ai</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>cohere</code></td>
+<td>Cohere</td>
+<td>api.cohere.ai</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>perplexity</code></td>
+<td>Perplexity</td>
+<td>api.perplexity.ai</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>deepseek</code></td>
+<td>DeepSeek</td>
+<td>api.deepseek.com</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>together</code></td>
+<td>Together AI</td>
+<td>api.together.xyz</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>fireworks</code></td>
+<td>Fireworks AI</td>
+<td>api.fireworks.ai</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>groq</code></td>
+<td>Groq</td>
+<td>api.groq.com</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>replicate</code></td>
+<td>Replicate</td>
+<td>api.replicate.com</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>huggingface</code></td>
+<td>Hugging Face</td>
+<td>api-inference.huggingface.co</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>bedrock</code></td>
+<td>AWS Bedrock</td>
+<td>bedrock-runtime.amazonaws.com</td>
+<td>IAM</td>
+</tr>
+<tr>
+<td><code>azure_openai</code></td>
+<td>Azure OpenAI</td>
+<td>*.openai.azure.com</td>
+<td>API Key</td>
+</tr>
+<tr>
+<td><code>vertex_ai</code></td>
+<td>Google Vertex AI</td>
+<td>*.aiplatform.googleapis.com</td>
+<td>Service Account</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="xaigrok-models-10-models">30.2 xAI/Grok Models (10 Models)</h2>
+<table>
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 19%" />
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 18%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr>
+<th>Model ID</th>
+<th>Display Name</th>
+<th>Context</th>
+<th>Input $/1M</th>
+<th>Output $/1M</th>
+<th>Capabilities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>grok-3</code></td>
+<td>Grok 3</td>
+<td>131K</td>
+<td>$3.00</td>
+<td>$15.00</td>
+<td>Flagship, real-time info</td>
+</tr>
+<tr>
+<td><code>grok-3-fast</code></td>
+<td>Grok 3 Fast</td>
+<td>131K</td>
+<td>$1.00</td>
+<td>$5.00</td>
+<td>Speed-optimized</td>
+</tr>
+<tr>
+<td><code>grok-3-mini</code></td>
+<td>Grok 3 Mini</td>
+<td>131K</td>
+<td>$0.30</td>
+<td>$1.50</td>
+<td>Cost-effective</td>
+</tr>
+<tr>
+<td><code>grok-2</code></td>
+<td>Grok 2</td>
+<td>131K</td>
+<td>$2.00</td>
+<td>$10.00</td>
+<td>Previous generation</td>
+</tr>
+<tr>
+<td><code>grok-2-vision</code></td>
+<td>Grok 2 Vision</td>
+<td>32K</td>
+<td>$2.00</td>
+<td>$10.00</td>
+<td>Image understanding</td>
+</tr>
+<tr>
+<td><code>grok-2-mini</code></td>
+<td>Grok 2 Mini</td>
+<td>131K</td>
+<td>$0.20</td>
+<td>$1.00</td>
+<td>Budget option</td>
+</tr>
+<tr>
+<td><code>grok-coder</code></td>
+<td>Grok Coder</td>
+<td>131K</td>
+<td>$1.50</td>
+<td>$7.50</td>
+<td>Code generation</td>
+</tr>
+<tr>
+<td><code>grok-analyst</code></td>
+<td>Grok Analyst</td>
+<td>131K</td>
+<td>$2.00</td>
+<td>$10.00</td>
+<td>Data analysis</td>
+</tr>
+<tr>
+<td><code>grok-embed</code></td>
+<td>Grok Embed</td>
+<td>8K</td>
+<td>$0.10</td>
+<td>-</td>
+<td>Text embeddings</td>
+</tr>
+<tr>
+<td><code>grok-realtime</code></td>
+<td>Grok Realtime</td>
+<td>32K</td>
+<td>$5.00</td>
+<td>$20.00</td>
+<td>Voice/streaming</td>
+</tr>
+</tbody>
+</table>
+<h3 id="xai-provider-configuration">xAI Provider Configuration</h3>
+<pre class="typescript"><code>// packages/shared/src/providers/xai.ts
+
+export const XAI_PROVIDER_CONFIG = {
+  id: &#39;xai&#39;,
+  displayName: &#39;xAI (Grok)&#39;,
+  apiBase: &#39;https://api.x.ai/v1&#39;,
+  authType: &#39;api_key&#39;,
+  authHeader: &#39;Authorization&#39;,
+  authPrefix: &#39;Bearer &#39;,
+  
+  models: [
+    {
+      id: &#39;grok-3&#39;,
+      displayName: &#39;Grok 3&#39;,
+      contextWindow: 131072,
+      maxOutputTokens: 8192,
+      supportedModalities: [&#39;text&#39;],
+      pricing: { inputPer1M: 3.00, outputPer1M: 15.00 },
+      capabilities: [&#39;chat&#39;, &#39;reasoning&#39;, &#39;analysis&#39;, &#39;realtime_info&#39;],
+      isNovel: false,
+    },
+    {
+      id: &#39;grok-3-fast&#39;,
+      displayName: &#39;Grok 3 Fast&#39;,
+      contextWindow: 131072,
+      maxOutputTokens: 8192,
+      supportedModalities: [&#39;text&#39;],
+      pricing: { inputPer1M: 1.00, outputPer1M: 5.00 },
+      capabilities: [&#39;chat&#39;, &#39;fast_response&#39;],
+      isNovel: false,
+    },
+    {
+      id: &#39;grok-3-mini&#39;,
+      displayName: &#39;Grok 3 Mini&#39;,
+      contextWindow: 131072,
+      maxOutputTokens: 4096,
+      supportedModalities: [&#39;text&#39;],
+      pricing: { inputPer1M: 0.30, outputPer1M: 1.50 },
+      capabilities: [&#39;chat&#39;, &#39;cost_effective&#39;],
+      isNovel: false,
+    },
+    {
+      id: &#39;grok-2&#39;,
+      displayName: &#39;Grok 2&#39;,
+      contextWindow: 131072,
+      maxOutputTokens: 8192,
+      supportedModalities: [&#39;text&#39;],
+      pricing: { inputPer1M: 2.00, outputPer1M: 10.00 },
+      capabilities: [&#39;chat&#39;, &#39;reasoning&#39;],
+      isNovel: false,
+    },
+    {
+      id: &#39;grok-2-vision&#39;,
+      displayName: &#39;Grok 2 Vision&#39;,
+      contextWindow: 32768,
+      maxOutputTokens: 4096,
+      supportedModalities: [&#39;text&#39;, &#39;image&#39;],
+      pricing: { inputPer1M: 2.00, outputPer1M: 10.00 },
+      capabilities: [&#39;chat&#39;, &#39;vision&#39;, &#39;image_analysis&#39;],
+      isNovel: true,
+    },
+    {
+      id: &#39;grok-2-mini&#39;,
+      displayName: &#39;Grok 2 Mini&#39;,
+      contextWindow: 131072,
+      maxOutputTokens: 4096,
+      supportedModalities: [&#39;text&#39;],
+      pricing: { inputPer1M: 0.20, outputPer1M: 1.00 },
+      capabilities: [&#39;chat&#39;],
+      isNovel: false,
+    },
+    {
+      id: &#39;grok-coder&#39;,
+      displayName: &#39;Grok Coder&#39;,
+      contextWindow: 131072,
+      maxOutputTokens: 8192,
+      supportedModalities: [&#39;text&#39;],
+      pricing: { inputPer1M: 1.50, outputPer1M: 7.50 },
+      capabilities: [&#39;chat&#39;, &#39;code_generation&#39;, &#39;code_review&#39;],
+      isNovel: true,
+    },
+    {
+      id: &#39;grok-analyst&#39;,
+      displayName: &#39;Grok Analyst&#39;,
+      contextWindow: 131072,
+      maxOutputTokens: 8192,
+      supportedModalities: [&#39;text&#39;],
+      pricing: { inputPer1M: 2.00, outputPer1M: 10.00 },
+      capabilities: [&#39;chat&#39;, &#39;data_analysis&#39;, &#39;insights&#39;],
+      isNovel: true,
+    },
+    {
+      id: &#39;grok-embed&#39;,
+      displayName: &#39;Grok Embed&#39;,
+      contextWindow: 8192,
+      maxOutputTokens: 0,
+      supportedModalities: [&#39;text&#39;],
+      pricing: { inputPer1M: 0.10, outputPer1M: 0 },
+      capabilities: [&#39;embeddings&#39;],
+      isNovel: false,
+    },
+    {
+      id: &#39;grok-realtime&#39;,
+      displayName: &#39;Grok Realtime&#39;,
+      contextWindow: 32768,
+      maxOutputTokens: 4096,
+      supportedModalities: [&#39;text&#39;, &#39;audio&#39;],
+      pricing: { inputPer1M: 5.00, outputPer1M: 20.00 },
+      capabilities: [&#39;chat&#39;, &#39;voice&#39;, &#39;streaming&#39;, &#39;realtime&#39;],
+      isNovel: true,
+    },
+  ],
+};</code></pre>
+<hr />
+<h2 id="complete-model-registry">30.3 Complete Model Registry</h2>
+<h3 id="all-external-models-60">All External Models (60+)</h3>
+<pre class="typescript"><code>// packages/shared/src/models/registry.ts
+
+export const MODEL_REGISTRY: ModelDefinition[] = [
+  // ═══════════════════════════════════════════════════════════════════
+  // ANTHROPIC MODELS
+  // ═══════════════════════════════════════════════════════════════════
+  {
+    id: &#39;claude-4-opus&#39;,
+    providerId: &#39;anthropic&#39;,
+    displayName: &#39;Claude 4 Opus&#39;,
+    contextWindow: 200000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 15.00, outputPer1M: 75.00 },
+    capabilities: [&#39;chat&#39;, &#39;reasoning&#39;, &#39;analysis&#39;, &#39;code&#39;, &#39;vision&#39;],
+    isNovel: false,
+    category: &#39;flagship&#39;,
+  },
+  {
+    id: &#39;claude-4-sonnet&#39;,
+    providerId: &#39;anthropic&#39;,
+    displayName: &#39;Claude 4 Sonnet&#39;,
+    contextWindow: 200000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 3.00, outputPer1M: 15.00 },
+    capabilities: [&#39;chat&#39;, &#39;reasoning&#39;, &#39;analysis&#39;, &#39;code&#39;, &#39;vision&#39;],
+    isNovel: false,
+    category: &#39;balanced&#39;,
+  },
+  {
+    id: &#39;claude-3.5-haiku&#39;,
+    providerId: &#39;anthropic&#39;,
+    displayName: &#39;Claude 3.5 Haiku&#39;,
+    contextWindow: 200000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 0.25, outputPer1M: 1.25 },
+    capabilities: [&#39;chat&#39;, &#39;code&#39;],
+    isNovel: false,
+    category: &#39;economy&#39;,
+  },
+  
+  // ═══════════════════════════════════════════════════════════════════
+  // OPENAI MODELS
+  // ═══════════════════════════════════════════════════════════════════
+  {
+    id: &#39;gpt-4o&#39;,
+    providerId: &#39;openai&#39;,
+    displayName: &#39;GPT-4o&#39;,
+    contextWindow: 128000,
+    maxOutputTokens: 16384,
+    pricing: { inputPer1M: 2.50, outputPer1M: 10.00 },
+    capabilities: [&#39;chat&#39;, &#39;reasoning&#39;, &#39;vision&#39;, &#39;audio&#39;],
+    isNovel: false,
+    category: &#39;flagship&#39;,
+  },
+  {
+    id: &#39;gpt-4o-mini&#39;,
+    providerId: &#39;openai&#39;,
+    displayName: &#39;GPT-4o Mini&#39;,
+    contextWindow: 128000,
+    maxOutputTokens: 16384,
+    pricing: { inputPer1M: 0.15, outputPer1M: 0.60 },
+    capabilities: [&#39;chat&#39;, &#39;vision&#39;],
+    isNovel: false,
+    category: &#39;economy&#39;,
+  },
+  {
+    id: &#39;o1&#39;,
+    providerId: &#39;openai&#39;,
+    displayName: &#39;o1 Reasoning&#39;,
+    contextWindow: 200000,
+    maxOutputTokens: 100000,
+    pricing: { inputPer1M: 15.00, outputPer1M: 60.00 },
+    capabilities: [&#39;reasoning&#39;, &#39;analysis&#39;, &#39;math&#39;, &#39;code&#39;],
+    isNovel: false,
+    category: &#39;specialized&#39;,
+  },
+  {
+    id: &#39;o1-pro&#39;,
+    providerId: &#39;openai&#39;,
+    displayName: &#39;o1 Pro&#39;,
+    contextWindow: 200000,
+    maxOutputTokens: 100000,
+    pricing: { inputPer1M: 150.00, outputPer1M: 600.00 },
+    capabilities: [&#39;reasoning&#39;, &#39;analysis&#39;, &#39;math&#39;, &#39;code&#39;, &#39;extended_thinking&#39;],
+    isNovel: true,
+    category: &#39;novel&#39;,
+  },
+  {
+    id: &#39;gpt-4o-realtime&#39;,
+    providerId: &#39;openai&#39;,
+    displayName: &#39;GPT-4o Realtime&#39;,
+    contextWindow: 128000,
+    maxOutputTokens: 4096,
+    pricing: { inputPer1M: 5.00, outputPer1M: 20.00 },
+    capabilities: [&#39;voice&#39;, &#39;streaming&#39;, &#39;realtime&#39;],
+    isNovel: true,
+    category: &#39;novel&#39;,
+  },
+  
+  // ═══════════════════════════════════════════════════════════════════
+  // GOOGLE MODELS
+  // ═══════════════════════════════════════════════════════════════════
+  {
+    id: &#39;gemini-2.0-pro&#39;,
+    providerId: &#39;google&#39;,
+    displayName: &#39;Gemini 2.0 Pro&#39;,
+    contextWindow: 2000000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 1.25, outputPer1M: 5.00 },
+    capabilities: [&#39;chat&#39;, &#39;reasoning&#39;, &#39;vision&#39;, &#39;code&#39;],
+    isNovel: false,
+    category: &#39;flagship&#39;,
+  },
+  {
+    id: &#39;gemini-2.0-flash&#39;,
+    providerId: &#39;google&#39;,
+    displayName: &#39;Gemini 2.0 Flash&#39;,
+    contextWindow: 1000000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 0.075, outputPer1M: 0.30 },
+    capabilities: [&#39;chat&#39;, &#39;vision&#39;, &#39;fast&#39;],
+    isNovel: false,
+    category: &#39;balanced&#39;,
+  },
+  {
+    id: &#39;gemini-2.0-ultra&#39;,
+    providerId: &#39;google&#39;,
+    displayName: &#39;Gemini 2.0 Ultra&#39;,
+    contextWindow: 2000000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 5.00, outputPer1M: 15.00 },
+    capabilities: [&#39;chat&#39;, &#39;reasoning&#39;, &#39;vision&#39;, &#39;multimodal&#39;],
+    isNovel: true,
+    category: &#39;novel&#39;,
+  },
+  {
+    id: &#39;gemini-2.0-pro-exp&#39;,
+    providerId: &#39;google&#39;,
+    displayName: &#39;Gemini Pro Experimental&#39;,
+    contextWindow: 10000000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 2.50, outputPer1M: 10.00 },
+    capabilities: [&#39;chat&#39;, &#39;reasoning&#39;, &#39;massive_context&#39;],
+    isNovel: true,
+    category: &#39;novel&#39;,
+  },
+  
+  // ═══════════════════════════════════════════════════════════════════
+  // XAI/GROK MODELS (from 30.2)
+  // ═══════════════════════════════════════════════════════════════════
+  {
+    id: &#39;grok-3&#39;,
+    providerId: &#39;xai&#39;,
+    displayName: &#39;Grok 3&#39;,
+    contextWindow: 131072,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 3.00, outputPer1M: 15.00 },
+    capabilities: [&#39;chat&#39;, &#39;reasoning&#39;, &#39;realtime_info&#39;],
+    isNovel: false,
+    category: &#39;flagship&#39;,
+  },
+  {
+    id: &#39;grok-3-fast&#39;,
+    providerId: &#39;xai&#39;,
+    displayName: &#39;Grok 3 Fast&#39;,
+    contextWindow: 131072,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 1.00, outputPer1M: 5.00 },
+    capabilities: [&#39;chat&#39;, &#39;fast&#39;],
+    isNovel: false,
+    category: &#39;balanced&#39;,
+  },
+  {
+    id: &#39;grok-3-mini&#39;,
+    providerId: &#39;xai&#39;,
+    displayName: &#39;Grok 3 Mini&#39;,
+    contextWindow: 131072,
+    maxOutputTokens: 4096,
+    pricing: { inputPer1M: 0.30, outputPer1M: 1.50 },
+    capabilities: [&#39;chat&#39;],
+    isNovel: false,
+    category: &#39;economy&#39;,
+  },
+  
+  // ═══════════════════════════════════════════════════════════════════
+  // DEEPSEEK MODELS
+  // ═══════════════════════════════════════════════════════════════════
+  {
+    id: &#39;deepseek-v3&#39;,
+    providerId: &#39;deepseek&#39;,
+    displayName: &#39;DeepSeek V3&#39;,
+    contextWindow: 64000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 0.14, outputPer1M: 0.28 },
+    capabilities: [&#39;chat&#39;, &#39;code&#39;, &#39;reasoning&#39;],
+    isNovel: false,
+    category: &#39;economy&#39;,
+  },
+  {
+    id: &#39;deepseek-r1&#39;,
+    providerId: &#39;deepseek&#39;,
+    displayName: &#39;DeepSeek R1&#39;,
+    contextWindow: 64000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 0.55, outputPer1M: 2.19 },
+    capabilities: [&#39;reasoning&#39;, &#39;chain_of_thought&#39;, &#39;analysis&#39;],
+    isNovel: true,
+    category: &#39;novel&#39;,
+  },
+  
+  // ═══════════════════════════════════════════════════════════════════
+  // MISTRAL MODELS
+  // ═══════════════════════════════════════════════════════════════════
+  {
+    id: &#39;mistral-large-2&#39;,
+    providerId: &#39;mistral&#39;,
+    displayName: &#39;Mistral Large 2&#39;,
+    contextWindow: 128000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 2.00, outputPer1M: 6.00 },
+    capabilities: [&#39;chat&#39;, &#39;reasoning&#39;, &#39;multilingual&#39;],
+    isNovel: false,
+    category: &#39;specialized&#39;,
+  },
+  {
+    id: &#39;codestral-latest&#39;,
+    providerId: &#39;mistral&#39;,
+    displayName: &#39;Codestral&#39;,
+    contextWindow: 32000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 0.30, outputPer1M: 0.90 },
+    capabilities: [&#39;code&#39;, &#39;code_generation&#39;, &#39;code_review&#39;],
+    isNovel: false,
+    category: &#39;specialized&#39;,
+  },
+  
+  // ═══════════════════════════════════════════════════════════════════
+  // PERPLEXITY MODELS
+  // ═══════════════════════════════════════════════════════════════════
+  {
+    id: &#39;perplexity-sonar-pro&#39;,
+    providerId: &#39;perplexity&#39;,
+    displayName: &#39;Sonar Pro&#39;,
+    contextWindow: 128000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 3.00, outputPer1M: 15.00 },
+    capabilities: [&#39;search&#39;, &#39;chat&#39;, &#39;citations&#39;, &#39;realtime_info&#39;],
+    isNovel: false,
+    category: &#39;specialized&#39;,
+  },
+  
+  // ═══════════════════════════════════════════════════════════════════
+  // NOVEL/EXPERIMENTAL MODELS
+  // ═══════════════════════════════════════════════════════════════════
+  {
+    id: &#39;claude-4-opus-agents&#39;,
+    providerId: &#39;anthropic&#39;,
+    displayName: &#39;Claude Opus Agents&#39;,
+    contextWindow: 200000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 15.00, outputPer1M: 75.00 },
+    capabilities: [&#39;chat&#39;, &#39;tool_use&#39;, &#39;computer_use&#39;, &#39;agents&#39;],
+    isNovel: true,
+    category: &#39;novel&#39;,
+  },
+  {
+    id: &#39;qwen-2.5-coder&#39;,
+    providerId: &#39;together&#39;,
+    displayName: &#39;Qwen 2.5 Coder&#39;,
+    contextWindow: 128000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 0.30, outputPer1M: 0.90 },
+    capabilities: [&#39;code&#39;, &#39;code_generation&#39;],
+    isNovel: true,
+    category: &#39;novel&#39;,
+  },
+  {
+    id: &#39;llama-3.3-70b&#39;,
+    providerId: &#39;together&#39;,
+    displayName: &#39;Llama 3.3 70B&#39;,
+    contextWindow: 128000,
+    maxOutputTokens: 8192,
+    pricing: { inputPer1M: 0.88, outputPer1M: 0.88 },
+    capabilities: [&#39;chat&#39;, &#39;reasoning&#39;, &#39;open_weights&#39;],
+    isNovel: true,
+    category: &#39;novel&#39;,
+  },
+  {
+    id: &#39;phi-4&#39;,
+    providerId: &#39;azure_openai&#39;,
+    displayName: &#39;Phi-4&#39;,
+    contextWindow: 16000,
+    maxOutputTokens: 4096,
+    pricing: { inputPer1M: 0.07, outputPer1M: 0.14 },
+    capabilities: [&#39;chat&#39;, &#39;reasoning&#39;, &#39;efficient&#39;],
+    isNovel: true,
+    category: &#39;novel&#39;,
+  },
+];</code></pre>
+<hr />
+<h2 id="provider-sync-lambda">30.4 Provider Sync Lambda</h2>
+<pre class="typescript"><code>// packages/lambdas/src/handlers/admin/sync-providers.ts
+
+import { ScheduledHandler } from &#39;aws-lambda&#39;;
+import { Pool } from &#39;pg&#39;;
+import { MODEL_REGISTRY } from &#39;@radiant/shared&#39;;
+import { createLogger } from &#39;@radiant/shared&#39;;
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const logger = createLogger(&#39;provider-sync&#39;);
+
+export const handler: ScheduledHandler = async () =&gt; {
+  logger.info(&#39;Starting provider/model sync&#39;);
+  
+  const client = await pool.connect();
+  
+  try {
+    await client.query(&#39;BEGIN&#39;);
+    
+    // Sync all models from registry
+    for (const model of MODEL_REGISTRY) {
+      await client.query(`
+        INSERT INTO models (
+          id, provider_id, display_name, model_type, context_window,
+          max_output_tokens, pricing, capabilities, is_novel, category,
+          is_enabled, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, TRUE, NOW())
+        ON CONFLICT (id) DO UPDATE SET
+          display_name = EXCLUDED.display_name,
+          context_window = EXCLUDED.context_window,
+          max_output_tokens = EXCLUDED.max_output_tokens,
+          capabilities = EXCLUDED.capabilities,
+          is_novel = EXCLUDED.is_novel,
+          category = EXCLUDED.category,
+          updated_at = NOW()
+        -- Note: pricing is NOT updated to preserve admin overrides
+      `, [
+        model.id,
+        model.providerId,
+        model.displayName,
+        &#39;chat&#39;,
+        model.contextWindow,
+        model.maxOutputTokens,
+        JSON.stringify(model.pricing),
+        JSON.stringify(model.capabilities),
+        model.isNovel || false,
+        model.category || &#39;general&#39;,
+      ]);
+    }
+    
+    await client.query(&#39;COMMIT&#39;);
+    logger.info(`Synced ${MODEL_REGISTRY.length} models`);
+    
+  } catch (error) {
+    await client.query(&#39;ROLLBACK&#39;);
+    logger.error(&#39;Sync failed&#39;, { error });
+    throw error;
+  } finally {
+    client.release();
+  }
+};</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

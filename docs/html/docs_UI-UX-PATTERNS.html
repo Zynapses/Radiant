@@ -1,0 +1,2986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI UX PATTERNS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>UI UX PATTERNS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/UI-UX-PATTERNS.md</div>
+  </div>
+  
+  <h1 id="radiant-uiux-patterns-styles-and-behaviors">RADIANT UI/UX Patterns, Styles, and Behaviors</h1>
+<blockquote>
+<p><strong>Design System Documentation</strong></p>
+<p><strong>Version</strong>: 1.1 | <strong>Date</strong>: January 19, 2026<br />
+<strong>Last Updated</strong>: January 24, 2026</p>
+</blockquote>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>This document tracks all UI/UX patterns, styles, and behaviors used in RADIANT and Think Tank applications. It is <strong>MANDATORY</strong> to:</p>
+<ol type="1">
+<li><strong>Review this document BEFORE making UI changes</strong></li>
+<li><strong>Update this document when patterns are added, modified, or removed</strong></li>
+</ol>
+<p><strong>Policy</strong>: See <code>/.windsurf/workflows/ui-ux-patterns-policy.md</code></p>
+<hr />
+<h2 id="design-system-foundation">Design System Foundation</h2>
+<h3 id="source-references">Source References</h3>
+<table>
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 22%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Resource</th>
+<th>URL</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>shadcn/ui</strong></td>
+<td>https://ui.shadcn.com</td>
+<td>Base component library</td>
+</tr>
+<tr>
+<td><strong>Radix UI</strong></td>
+<td>https://www.radix-ui.com</td>
+<td>Accessible primitives</td>
+</tr>
+<tr>
+<td><strong>Tailwind CSS</strong></td>
+<td>https://tailwindcss.com</td>
+<td>Utility-first styling</td>
+</tr>
+<tr>
+<td><strong>Material Design 3</strong></td>
+<td>https://m3.material.io</td>
+<td>Color theory, spacing</td>
+</tr>
+<tr>
+<td><strong>Atlassian Design System</strong></td>
+<td>https://atlassian.design</td>
+<td>Enterprise patterns</td>
+</tr>
+<tr>
+<td><strong>Shopify Polaris</strong></td>
+<td>https://polaris.shopify.com</td>
+<td>Admin dashboard patterns</td>
+</tr>
+<tr>
+<td><strong>GitHub Primer</strong></td>
+<td>https://primer.style</td>
+<td>Developer-focused UI</td>
+</tr>
+<tr>
+<td><strong>Framer Motion</strong></td>
+<td>https://www.framer.com/motion</td>
+<td>Animation library</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="category-1-design-tokens">Category 1: Design Tokens</h2>
+<h3 id="color-system">Color System</h3>
+<p><strong>Source</strong>: shadcn/ui theming system with HSL CSS variables</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 32%" />
+<col style="width: 29%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th>Token</th>
+<th>Light Mode</th>
+<th>Dark Mode</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--background</code></td>
+<td><code>0 0% 100%</code></td>
+<td><code>222.2 84% 4.9%</code></td>
+<td>Page background</td>
+</tr>
+<tr>
+<td><code>--foreground</code></td>
+<td><code>222.2 84% 4.9%</code></td>
+<td><code>210 40% 98%</code></td>
+<td>Primary text</td>
+</tr>
+<tr>
+<td><code>--primary</code></td>
+<td><code>262 83% 58%</code></td>
+<td><code>262 83% 68%</code></td>
+<td>Brand purple</td>
+</tr>
+<tr>
+<td><code>--secondary</code></td>
+<td><code>210 40% 96.1%</code></td>
+<td><code>217.2 32.6% 17.5%</code></td>
+<td>Secondary elements</td>
+</tr>
+<tr>
+<td><code>--muted</code></td>
+<td><code>210 40% 96.1%</code></td>
+<td><code>217.2 32.6% 17.5%</code></td>
+<td>Muted backgrounds</td>
+</tr>
+<tr>
+<td><code>--accent</code></td>
+<td><code>210 40% 96.1%</code></td>
+<td><code>217.2 32.6% 17.5%</code></td>
+<td>Accent highlights</td>
+</tr>
+<tr>
+<td><code>--destructive</code></td>
+<td><code>0 84.2% 60.2%</code></td>
+<td><code>0 62.8% 30.6%</code></td>
+<td>Error/danger states</td>
+</tr>
+<tr>
+<td><code>--border</code></td>
+<td><code>214.3 31.8% 91.4%</code></td>
+<td><code>217.2 32.6% 17.5%</code></td>
+<td>Border color</td>
+</tr>
+<tr>
+<td><code>--ring</code></td>
+<td><code>262 83% 58%</code></td>
+<td><code>262 83% 68%</code></td>
+<td>Focus ring</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: - <code>apps/admin-dashboard/app/globals.css</code> - <code>apps/thinktank-admin/app/globals.css</code></p>
+<h3 id="thermal-state-colors">Thermal State Colors</h3>
+<p><strong>Source</strong>: Custom RADIANT design for infrastructure status</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Color</th>
+<th>Hex</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>off</code></td>
+<td>Gray</td>
+<td><code>#6b7280</code></td>
+<td>Disabled/inactive</td>
+</tr>
+<tr>
+<td><code>cold</code></td>
+<td>Blue</td>
+<td><code>#3b82f6</code></td>
+<td>Cold/standby</td>
+</tr>
+<tr>
+<td><code>warm</code></td>
+<td>Amber</td>
+<td><code>#f59e0b</code></td>
+<td>Warming up</td>
+</tr>
+<tr>
+<td><code>hot</code></td>
+<td>Red</td>
+<td><code>#ef4444</code></td>
+<td>Active/hot</td>
+</tr>
+<tr>
+<td><code>automatic</code></td>
+<td>Purple</td>
+<td><code>#8b5cf6</code></td>
+<td>Auto-managed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/tailwind.config.ts</code></p>
+<h3 id="service-status-colors">Service Status Colors</h3>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Color</th>
+<th>Hex</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>running</code></td>
+<td>Green</td>
+<td><code>#22c55e</code></td>
+<td>Service healthy</td>
+</tr>
+<tr>
+<td><code>degraded</code></td>
+<td>Amber</td>
+<td><code>#f59e0b</code></td>
+<td>Partial issues</td>
+</tr>
+<tr>
+<td><code>disabled</code></td>
+<td>Gray</td>
+<td><code>#6b7280</code></td>
+<td>Intentionally off</td>
+</tr>
+<tr>
+<td><code>offline</code></td>
+<td>Red</td>
+<td><code>#ef4444</code></td>
+<td>Unavailable</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/tailwind.config.ts</code></p>
+<h3 id="typography">Typography</h3>
+<table>
+<thead>
+<tr>
+<th>Token</th>
+<th>Value</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>font-sans</code></td>
+<td><code>Inter, system-ui, sans-serif</code></td>
+<td>Body text</td>
+</tr>
+<tr>
+<td><code>font-mono</code></td>
+<td><code>JetBrains Mono, monospace</code></td>
+<td>Code, technical</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Source</strong>: Inter from Google Fonts, JetBrains Mono for code</p>
+<hr />
+<h2 id="category-2-component-patterns">Category 2: Component Patterns</h2>
+<h3 id="button-variants">Button Variants</h3>
+<p><strong>Source</strong>: shadcn/ui Button component with class-variance-authority</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Style</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>default</code></td>
+<td>Purple background, white text</td>
+<td>Primary actions</td>
+</tr>
+<tr>
+<td><code>destructive</code></td>
+<td>Red background</td>
+<td>Delete, dangerous actions</td>
+</tr>
+<tr>
+<td><code>outline</code></td>
+<td>Border only</td>
+<td>Secondary actions</td>
+</tr>
+<tr>
+<td><code>secondary</code></td>
+<td>Gray background</td>
+<td>Tertiary actions</td>
+</tr>
+<tr>
+<td><code>ghost</code></td>
+<td>No background until hover</td>
+<td>Subtle actions</td>
+</tr>
+<tr>
+<td><code>link</code></td>
+<td>Text with underline</td>
+<td>Navigation links</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Size</th>
+<th>Height</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>default</code></td>
+<td><code>h-10</code> (40px)</td>
+<td>Standard buttons</td>
+</tr>
+<tr>
+<td><code>sm</code></td>
+<td><code>h-9</code> (36px)</td>
+<td>Compact areas</td>
+</tr>
+<tr>
+<td><code>lg</code></td>
+<td><code>h-11</code> (44px)</td>
+<td>Prominent CTAs</td>
+</tr>
+<tr>
+<td><code>icon</code></td>
+<td><code>h-10 w-10</code></td>
+<td>Icon-only buttons</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/ui/button.tsx</code></p>
+<h3 id="card-component">Card Component</h3>
+<p><strong>Source</strong>: shadcn/ui Card component with Glass variant (v5.52.2)</p>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 31%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Part</th>
+<th>Class</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Card</code></td>
+<td><code>rounded-xl border bg-card shadow-sm</code></td>
+<td>Container</td>
+</tr>
+<tr>
+<td><code>Card variant="glass"</code></td>
+<td><code>bg-white/[0.04] backdrop-blur-lg border-white/[0.08]</code></td>
+<td>Glass effect</td>
+</tr>
+<tr>
+<td><code>CardHeader</code></td>
+<td><code>flex flex-col space-y-1.5 p-6</code></td>
+<td>Title area</td>
+</tr>
+<tr>
+<td><code>CardTitle</code></td>
+<td><code>text-2xl font-semibold</code></td>
+<td>Main heading</td>
+</tr>
+<tr>
+<td><code>CardDescription</code></td>
+<td><code>text-sm text-muted-foreground</code></td>
+<td>Subtitle</td>
+</tr>
+</tbody>
+</table>
+<h3 id="glasscard-component-v5.52.2">GlassCard Component (v5.52.2)</h3>
+<p><strong>Source</strong>: Custom RADIANT glassmorphism component</p>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 31%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Part</th>
+<th>Class</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GlassCard</code></td>
+<td><code>bg-white/[0.04] backdrop-blur-lg border-white/[0.08] rounded-xl</code></td>
+<td>Glass container</td>
+</tr>
+<tr>
+<td><code>GlassPanel</code></td>
+<td><code>bg-white/[0.03] backdrop-blur-lg border-white/[0.06] rounded-2xl</code></td>
+<td>Glass panel</td>
+</tr>
+<tr>
+<td><code>GlassOverlay</code></td>
+<td><code>fixed inset-0 bg-black/40 backdrop-blur-xl z-50</code></td>
+<td>Modal overlay</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variants:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Effect</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>default</code></td>
+<td>Subtle glass</td>
+<td>Standard cards</td>
+</tr>
+<tr>
+<td><code>elevated</code></td>
+<td>Stronger shadow</td>
+<td>Floating panels</td>
+</tr>
+<tr>
+<td><code>inset</code></td>
+<td>Inner shadow</td>
+<td>Embedded content</td>
+</tr>
+<tr>
+<td><code>glow</code></td>
+<td>Ambient color glow</td>
+<td>Featured content</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Intensity:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Intensity</th>
+<th>Background</th>
+<th>Blur</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>light</code></td>
+<td><code>bg-white/[0.02]</code></td>
+<td><code>backdrop-blur-md</code></td>
+</tr>
+<tr>
+<td><code>medium</code></td>
+<td><code>bg-white/[0.04]</code></td>
+<td><code>backdrop-blur-lg</code></td>
+</tr>
+<tr>
+<td><code>strong</code></td>
+<td><code>bg-white/[0.08]</code></td>
+<td><code>backdrop-blur-xl</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Glow Colors:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Color</th>
+<th>Shadow</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>violet</code></td>
+<td><code>shadow-[0_0_30px_rgba(139,92,246,0.15)]</code></td>
+</tr>
+<tr>
+<td><code>fuchsia</code></td>
+<td><code>shadow-[0_0_30px_rgba(217,70,239,0.15)]</code></td>
+</tr>
+<tr>
+<td><code>cyan</code></td>
+<td><code>shadow-[0_0_30px_rgba(34,211,238,0.15)]</code></td>
+</tr>
+<tr>
+<td><code>emerald</code></td>
+<td><code>shadow-[0_0_30px_rgba(52,211,153,0.15)]</code></td>
+</tr>
+<tr>
+<td><code>blue</code></td>
+<td><code>shadow-[0_0_30px_rgba(59,130,246,0.15)]</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: - <code>apps/thinktank/components/ui/glass-card.tsx</code> - <code>apps/admin-dashboard/components/ui/glass-card.tsx</code> - <code>apps/thinktank-admin/components/ui/glass-card.tsx</code> - <code>apps/curator/components/ui/glass-card.tsx</code></p>
+<h3 id="stat-card-component">Stat Card Component</h3>
+<p><strong>Source</strong>: Custom RADIANT component for metrics display</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Icon Background</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>default</code></td>
+<td><code>bg-slate-100</code></td>
+<td>Neutral metrics</td>
+</tr>
+<tr>
+<td><code>primary</code></td>
+<td><code>bg-blue-100</code></td>
+<td>Key metrics</td>
+</tr>
+<tr>
+<td><code>success</code></td>
+<td><code>bg-emerald-100</code></td>
+<td>Positive metrics</td>
+</tr>
+<tr>
+<td><code>warning</code></td>
+<td><code>bg-amber-100</code></td>
+<td>Attention needed</td>
+</tr>
+<tr>
+<td><code>danger</code></td>
+<td><code>bg-red-100</code></td>
+<td>Critical metrics</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: - <code>apps/admin-dashboard/components/ui/stat-card.tsx</code> - <code>apps/admin-dashboard/lib/design-tokens.ts</code></p>
+<h3 id="dialogmodal-pattern">Dialog/Modal Pattern</h3>
+<p><strong>Source</strong>: Radix UI Dialog primitive + shadcn/ui styling</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DialogTrigger</code></td>
+<td>Button to open</td>
+</tr>
+<tr>
+<td><code>DialogContent</code></td>
+<td>Modal container with overlay</td>
+</tr>
+<tr>
+<td><code>DialogHeader</code></td>
+<td>Title and description area</td>
+</tr>
+<tr>
+<td><code>DialogFooter</code></td>
+<td>Action buttons</td>
+</tr>
+<tr>
+<td><code>DialogClose</code></td>
+<td>Close button</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Behavior</strong>: - Focus trap inside modal - Escape key closes - Click outside closes - Scroll lock on body</p>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/ui/dialog.tsx</code></p>
+<h3 id="toast-notifications">Toast Notifications</h3>
+<p><strong>Source</strong>: Sonner toast library</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Icon</th>
+<th>Duration</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>success</code></td>
+<td>✓ Check</td>
+<td>4s</td>
+<td>Successful actions</td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td>✕ X</td>
+<td>6s</td>
+<td>Errors</td>
+</tr>
+<tr>
+<td><code>warning</code></td>
+<td>⚠ Alert</td>
+<td>5s</td>
+<td>Warnings</td>
+</tr>
+<tr>
+<td><code>info</code></td>
+<td>ℹ Info</td>
+<td>4s</td>
+<td>Information</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/ui/toaster.tsx</code></p>
+<hr />
+<h2 id="category-3-layout-patterns">Category 3: Layout Patterns</h2>
+<h3 id="grid-layouts">Grid Layouts</h3>
+<p><strong>Source</strong>: Custom RADIANT responsive grid system</p>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 29%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Classes</th>
+<th>Breakpoints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stats2</code></td>
+<td><code>grid-cols-1 sm:grid-cols-2</code></td>
+<td>1 → 2 columns</td>
+</tr>
+<tr>
+<td><code>stats3</code></td>
+<td><code>grid-cols-1 sm:grid-cols-2 lg:grid-cols-3</code></td>
+<td>1 → 2 → 3</td>
+</tr>
+<tr>
+<td><code>stats4</code></td>
+<td><code>grid-cols-1 sm:grid-cols-2 lg:grid-cols-4</code></td>
+<td>1 → 2 → 4</td>
+</tr>
+<tr>
+<td><code>stats5</code></td>
+<td><code>grid-cols-2 sm:grid-cols-3 lg:grid-cols-5</code></td>
+<td>2 → 3 → 5</td>
+</tr>
+<tr>
+<td><code>cards2</code></td>
+<td><code>grid-cols-1 md:grid-cols-2 gap-6</code></td>
+<td>1 → 2</td>
+</tr>
+<tr>
+<td><code>cards3</code></td>
+<td><code>grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6</code></td>
+<td>1 → 2 → 3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/lib/design-tokens.ts</code></p>
+<h3 id="sidebar-layout">Sidebar Layout</h3>
+<p><strong>Source</strong>: shadcn/ui Sidebar component pattern</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Width</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Expanded</td>
+<td>256px</td>
+<td>Full navigation</td>
+</tr>
+<tr>
+<td>Collapsed</td>
+<td>64px</td>
+<td>Icons only</td>
+</tr>
+<tr>
+<td>Mobile</td>
+<td>Full overlay</td>
+<td>Sheet pattern</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/layout/</code></p>
+<h3 id="container-pattern">Container Pattern</h3>
+<p><strong>Source</strong>: Tailwind CSS container with custom config</p>
+<pre class="css"><code>container: {
+  center: true,
+  padding: &#39;2rem&#39;,
+  screens: { &#39;2xl&#39;: &#39;1400px&#39; }
+}</code></pre>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/tailwind.config.ts</code></p>
+<h3 id="resizable-panels">Resizable Panels</h3>
+<p><strong>Source</strong>: react-resizable-panels library</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ResizablePanelGroup</code></td>
+<td>Container for panels</td>
+</tr>
+<tr>
+<td><code>ResizablePanel</code></td>
+<td>Individual panel</td>
+</tr>
+<tr>
+<td><code>ResizableHandle</code></td>
+<td>Drag handle between panels</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/ui/resizable.tsx</code></p>
+<hr />
+<h2 id="category-4-animation-patterns">Category 4: Animation Patterns</h2>
+<h3 id="framer-motion-animations">Framer Motion Animations</h3>
+<p><strong>Source</strong>: Framer Motion library</p>
+<table>
+<thead>
+<tr>
+<th>Animation</th>
+<th>Properties</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fade In</strong></td>
+<td><code>opacity: 0 → 1</code></td>
+<td>Element appearance</td>
+</tr>
+<tr>
+<td><strong>Slide In</strong></td>
+<td><code>translateX/Y + opacity</code></td>
+<td>Panel transitions</td>
+</tr>
+<tr>
+<td><strong>Scale</strong></td>
+<td><code>scale: 0.95 → 1</code></td>
+<td>Modal appearance</td>
+</tr>
+<tr>
+<td><strong>Stagger</strong></td>
+<td><code>staggerChildren: 0.05</code></td>
+<td>List items</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: - <code>apps/admin-dashboard/components/thinktank/magic-carpet/</code> - <code>apps/admin-dashboard/components/collaboration/panels/</code></p>
+<h3 id="css-animations-tailwind">CSS Animations (Tailwind)</h3>
+<table>
+<thead>
+<tr>
+<th>Animation</th>
+<th>Keyframes</th>
+<th>Duration</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>accordion-down</code></td>
+<td>Height 0 → auto</td>
+<td>0.2s</td>
+<td>Accordion expand</td>
+</tr>
+<tr>
+<td><code>accordion-up</code></td>
+<td>Height auto → 0</td>
+<td>0.2s</td>
+<td>Accordion collapse</td>
+</tr>
+<tr>
+<td><code>fade-in</code></td>
+<td>Opacity 0 → 1</td>
+<td>0.2s</td>
+<td>Element appearance</td>
+</tr>
+<tr>
+<td><code>slide-in-from-right</code></td>
+<td>TranslateX 100% → 0</td>
+<td>0.3s</td>
+<td>Sheet/drawer</td>
+</tr>
+<tr>
+<td><code>pulse-slow</code></td>
+<td>Opacity 1 → 0.5 → 1</td>
+<td>2s loop</td>
+<td>Loading states</td>
+</tr>
+<tr>
+<td><code>shimmer</code></td>
+<td>Background position</td>
+<td>2s loop</td>
+<td>Skeleton loading</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/tailwind.config.ts</code></p>
+<hr />
+<h2 id="category-5-interaction-behaviors">Category 5: Interaction Behaviors</h2>
+<h3 id="focus-management">Focus Management</h3>
+<p><strong>Source</strong>: Radix UI accessibility patterns + WCAG 2.1</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Focus Ring</strong></td>
+<td><code>ring-2 ring-ring ring-offset-2</code> on focus</td>
+</tr>
+<tr>
+<td><strong>Focus Trap</strong></td>
+<td>Tab cycles within modals/dialogs</td>
+</tr>
+<tr>
+<td><strong>Focus Restore</strong></td>
+<td>Returns focus when modal closes</td>
+</tr>
+<tr>
+<td><strong>Skip Links</strong></td>
+<td>Hidden link to main content</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/app/globals.css</code> (<code>.focus-ring</code> class)</p>
+<h3 id="keyboard-navigation">Keyboard Navigation</h3>
+<p><strong>Source</strong>: Radix UI primitives</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dialog</strong></td>
+<td>Escape to close</td>
+</tr>
+<tr>
+<td><strong>Dropdown</strong></td>
+<td>Arrow keys, Enter, Escape</td>
+</tr>
+<tr>
+<td><strong>Tabs</strong></td>
+<td>Arrow keys to switch</td>
+</tr>
+<tr>
+<td><strong>Accordion</strong></td>
+<td>Space/Enter to toggle</td>
+</tr>
+<tr>
+<td><strong>Select</strong></td>
+<td>Arrow keys, Enter, Type to search</td>
+</tr>
+</tbody>
+</table>
+<h3 id="loading-states">Loading States</h3>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Visual</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Skeleton</strong></td>
+<td>Gray animated placeholder</td>
+<td>Content loading</td>
+</tr>
+<tr>
+<td><strong>Spinner</strong></td>
+<td>Rotating icon</td>
+<td>Action in progress</td>
+</tr>
+<tr>
+<td><strong>Progress</strong></td>
+<td>Bar with percentage</td>
+<td>File upload, long tasks</td>
+</tr>
+<tr>
+<td><strong>Shimmer</strong></td>
+<td>Gradient animation</td>
+<td>Card/list loading</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: - <code>apps/admin-dashboard/components/ui/skeleton.tsx</code> - <code>apps/admin-dashboard/components/ui/progress.tsx</code></p>
+<h3 id="empty-states">Empty States</h3>
+<p><strong>Source</strong>: Custom RADIANT pattern</p>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Icon</td>
+<td>Visual indicator</td>
+</tr>
+<tr>
+<td>Title</td>
+<td>What’s empty</td>
+</tr>
+<tr>
+<td>Description</td>
+<td>Why/what to do</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>CTA button</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/ui/empty-state.tsx</code></p>
+<hr />
+<h2 id="category-6-form-patterns">Category 6: Form Patterns</h2>
+<h3 id="form-layout">Form Layout</h3>
+<p><strong>Source</strong>: react-hook-form + shadcn/ui Form component</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Stacked</strong></td>
+<td>Label above input, full width</td>
+</tr>
+<tr>
+<td><strong>Inline</strong></td>
+<td>Label beside input</td>
+</tr>
+<tr>
+<td><strong>Grid</strong></td>
+<td>Multiple fields in columns</td>
+</tr>
+</tbody>
+</table>
+<h3 id="validation">Validation</h3>
+<p><strong>Source</strong>: Zod schema validation + <span class="citation" data-cites="hookform/resolvers">@hookform/resolvers</span></p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Visual</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Default</strong></td>
+<td>Gray border</td>
+</tr>
+<tr>
+<td><strong>Focus</strong></td>
+<td>Ring highlight</td>
+</tr>
+<tr>
+<td><strong>Error</strong></td>
+<td>Red border + error message</td>
+</tr>
+<tr>
+<td><strong>Success</strong></td>
+<td>Green border (optional)</td>
+</tr>
+<tr>
+<td><strong>Disabled</strong></td>
+<td>Reduced opacity</td>
+</tr>
+</tbody>
+</table>
+<h3 id="input-types">Input Types</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Radix Primitive</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Input</code></td>
+<td>Native</td>
+<td>Text, email, password</td>
+</tr>
+<tr>
+<td><code>Textarea</code></td>
+<td>Native</td>
+<td>Multi-line text</td>
+</tr>
+<tr>
+<td><code>Select</code></td>
+<td><code>@radix-ui/react-select</code></td>
+<td>Dropdown selection</td>
+</tr>
+<tr>
+<td><code>Checkbox</code></td>
+<td><code>@radix-ui/react-checkbox</code></td>
+<td>Boolean toggle</td>
+</tr>
+<tr>
+<td><code>Switch</code></td>
+<td><code>@radix-ui/react-switch</code></td>
+<td>On/off toggle</td>
+</tr>
+<tr>
+<td><code>Slider</code></td>
+<td><code>@radix-ui/react-slider</code></td>
+<td>Range selection</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="category-7-data-display-patterns">Category 7: Data Display Patterns</h2>
+<h3 id="tables">Tables</h3>
+<p><strong>Source</strong>: shadcn/ui Table component</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Class</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Table</code></td>
+<td>Full width container</td>
+<td>Wrapper</td>
+</tr>
+<tr>
+<td><code>TableHeader</code></td>
+<td>Sticky header</td>
+<td>Column names</td>
+</tr>
+<tr>
+<td><code>TableBody</code></td>
+<td>Scrollable</td>
+<td>Data rows</td>
+</tr>
+<tr>
+<td><code>TableRow</code></td>
+<td>Hover state</td>
+<td>Individual row</td>
+</tr>
+<tr>
+<td><code>TableCell</code></td>
+<td>Padding, alignment</td>
+<td>Cell content</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/ui/table.tsx</code></p>
+<h3 id="charts">Charts</h3>
+<p><strong>Source</strong>: Recharts library</p>
+<table>
+<thead>
+<tr>
+<th>Chart Type</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LineChart</code></td>
+<td>Trends over time</td>
+</tr>
+<tr>
+<td><code>BarChart</code></td>
+<td>Comparisons</td>
+</tr>
+<tr>
+<td><code>AreaChart</code></td>
+<td>Volume/quantity</td>
+</tr>
+<tr>
+<td><code>PieChart</code></td>
+<td>Proportions</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chart Colors</strong> (CSS variables): - <code>--chart-1</code>: Primary (purple) - <code>--chart-2</code>: Teal - <code>--chart-3</code>: Dark blue - <code>--chart-4</code>: Yellow - <code>--chart-5</code>: Orange</p>
+<p><strong>Interactive Report Charts</strong> (v5.42.0):</p>
+<table>
+<colgroup>
+<col style="width: 41%" />
+<col style="width: 29%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CHART_COLORS</code></td>
+<td>8-color palette</td>
+<td><code>['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16']</code></td>
+</tr>
+<tr>
+<td>Tooltip formatter</td>
+<td>K/M suffixes</td>
+<td>Auto-format large numbers</td>
+</tr>
+<tr>
+<td>ResponsiveContainer</td>
+<td>100% width</td>
+<td>Adapts to panel size</td>
+</tr>
+<tr>
+<td>Cell coloring</td>
+<td>Index-based</td>
+<td>Each bar/pie slice unique color</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/app/(dashboard)/reports/page.tsx</code></p>
+<h3 id="smart-insights-panel-v5.42.0">Smart Insights Panel (v5.42.0)</h3>
+<p><strong>Source</strong>: Custom RADIANT component for AI-powered report insights</p>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 30%" />
+<col style="width: 13%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr>
+<th>Insight Type</th>
+<th>Border Color</th>
+<th>Icon</th>
+<th>Background</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>trend</code></td>
+<td>Blue (<code>border-l-blue-500</code>)</td>
+<td><code>TrendingUp</code></td>
+<td><code>bg-blue-50/50</code></td>
+</tr>
+<tr>
+<td><code>anomaly</code></td>
+<td>Amber (<code>border-l-amber-500</code>)</td>
+<td><code>AlertTriangle</code></td>
+<td><code>bg-amber-50/50</code></td>
+</tr>
+<tr>
+<td><code>achievement</code></td>
+<td>Green (<code>border-l-green-500</code>)</td>
+<td><code>Target</code></td>
+<td><code>bg-green-50/50</code></td>
+</tr>
+<tr>
+<td><code>recommendation</code></td>
+<td>Purple (<code>border-l-purple-500</code>)</td>
+<td><code>Zap</code></td>
+<td><code>bg-purple-50/50</code></td>
+</tr>
+<tr>
+<td><code>warning</code></td>
+<td>Red (<code>border-l-red-500</code>)</td>
+<td><code>AlertCircle</code></td>
+<td><code>bg-red-50/50</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Severity Badge Colors</strong>: | Severity | Border | Text | |———-|——–|——| | <code>low</code> | <code>border-green-500</code> | <code>text-green-600</code> | | <code>medium</code> | <code>border-amber-500</code> | <code>text-amber-600</code> | | <code>high</code> | <code>border-red-500</code> | <code>text-red-600</code> |</p>
+<p><strong>Layout</strong>: Card with <code>border-l-4</code>, flex row with insight details left and confidence score right.</p>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/app/(dashboard)/reports/page.tsx</code>, <code>apps/thinktank-admin/app/(dashboard)/reports/page.tsx</code></p>
+<h3 id="brand-kit-panel-v5.42.0">Brand Kit Panel (v5.42.0)</h3>
+<p><strong>Source</strong>: Custom RADIANT component for report branding customization</p>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 36%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Element</th>
+<th>Component</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Logo Upload</td>
+<td><code>&lt;input type="file"&gt;</code> hidden + dashed border dropzone</td>
+<td>FileReader → data URL</td>
+</tr>
+<tr>
+<td>Company Name</td>
+<td><code>Input</code></td>
+<td>Bound to <code>brandKit.companyName</code></td>
+</tr>
+<tr>
+<td>Tagline</td>
+<td><code>Input</code></td>
+<td>Bound to <code>brandKit.tagline</code></td>
+</tr>
+<tr>
+<td>Color Pickers</td>
+<td><code>&lt;input type="color"&gt;</code></td>
+<td>Native HTML5 color picker</td>
+</tr>
+<tr>
+<td>Font Selector</td>
+<td><code>Select</code></td>
+<td>Header and body font dropdowns</td>
+</tr>
+<tr>
+<td>Quick Presets</td>
+<td>Color circle buttons</td>
+<td>One-click theme colors</td>
+</tr>
+<tr>
+<td>Preview Card</td>
+<td><code>Card</code> with inline styles</td>
+<td>Live preview of branding</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Default Brand Kit</strong>:</p>
+<pre class="typescript"><code>{
+  logoUrl: null,
+  primaryColor: &#39;#3b82f6&#39;,
+  secondaryColor: &#39;#64748b&#39;,
+  accentColor: &#39;#10b981&#39;,
+  fontFamily: &#39;Inter, system-ui, sans-serif&#39;,
+  headerFont: &#39;Inter, system-ui, sans-serif&#39;,
+  companyName: &#39;RADIANT&#39;,
+  tagline: &#39;AI-Powered Insights&#39;,
+}</code></pre>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/app/(dashboard)/reports/page.tsx</code>, <code>apps/thinktank-admin/app/(dashboard)/reports/page.tsx</code></p>
+<h3 id="badges">Badges</h3>
+<p><strong>Source</strong>: shadcn/ui Badge + custom variants</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Colors</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>default</code></td>
+<td>Primary colors</td>
+<td>Standard</td>
+</tr>
+<tr>
+<td><code>secondary</code></td>
+<td>Gray</td>
+<td>Less emphasis</td>
+</tr>
+<tr>
+<td><code>destructive</code></td>
+<td>Red</td>
+<td>Errors, warnings</td>
+</tr>
+<tr>
+<td><code>outline</code></td>
+<td>Border only</td>
+<td>Subtle</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tier Badges</strong> (custom): | Tier | Colors | |——|——–| | <code>free</code> | Slate | | <code>pro</code> | Blue | | <code>team</code> | Purple | | <code>enterprise</code> | Amber |</p>
+<p><strong>Status Badges</strong> (custom): | Status | Colors | |——–|——–| | <code>active</code> | Emerald | | <code>inactive</code> | Slate | | <code>suspended</code> | Red | | <code>archived</code> | Amber |</p>
+<p><strong>Files</strong>: - <code>apps/admin-dashboard/components/ui/badge.tsx</code> - <code>apps/admin-dashboard/lib/design-tokens.ts</code></p>
+<hr />
+<h2 id="category-8-navigation-patterns">Category 8: Navigation Patterns</h2>
+<h3 id="tabs">Tabs</h3>
+<p><strong>Source</strong>: Radix UI Tabs primitive</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Horizontal</strong></td>
+<td>Page sections</td>
+</tr>
+<tr>
+<td><strong>Vertical</strong></td>
+<td>Settings sidebar</td>
+</tr>
+<tr>
+<td><strong>Contained</strong></td>
+<td>Card-style tabs</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/ui/tabs.tsx</code></p>
+<h3 id="breadcrumbs">Breadcrumbs</h3>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Format</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Standard</strong></td>
+<td>Home / Section / Page</td>
+</tr>
+<tr>
+<td><strong>Truncated</strong></td>
+<td>Home / … / Page</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dropdown-menu">Dropdown Menu</h3>
+<p><strong>Source</strong>: Radix UI Dropdown Menu primitive</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DropdownMenuTrigger</code></td>
+<td>Button to open</td>
+</tr>
+<tr>
+<td><code>DropdownMenuContent</code></td>
+<td>Menu container</td>
+</tr>
+<tr>
+<td><code>DropdownMenuItem</code></td>
+<td>Clickable item</td>
+</tr>
+<tr>
+<td><code>DropdownMenuSeparator</code></td>
+<td>Visual divider</td>
+</tr>
+<tr>
+<td><code>DropdownMenuSub</code></td>
+<td>Nested submenu</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: - <code>apps/admin-dashboard/components/ui/dropdown-menu.tsx</code> - <code>apps/thinktank/components/ui/dropdown-menu.tsx</code> (v5.52.16 - glassmorphism variant)</p>
+<p><strong>Think Tank Variant</strong> (v5.52.16): | Property | Value | |———-|——-| | Background | <code>bg-slate-900/95 backdrop-blur-xl</code> | | Border | <code>border-white/[0.08]</code> | | Item hover | <code>focus:bg-white/[0.08]</code> | | Text color | <code>text-slate-300</code> (hover: <code>text-white</code>) | | Border radius | <code>rounded-xl</code> | | Shadow | <code>shadow-xl shadow-black/20</code> |</p>
+<hr />
+<h2 id="category-9-think-tank-consumer-chat-patterns">Category 9: Think Tank Consumer Chat Patterns</h2>
+<p><strong>Source</strong>: Custom Think Tank design with shadcn/ui and Framer Motion</p>
+<h3 id="advanced-mode-toggle">Advanced Mode Toggle</h3>
+<p>Toggle between Auto and Advanced modes with animated transition.</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Appearance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Auto Mode</td>
+<td>Sparkles icon, subtle styling</td>
+</tr>
+<tr>
+<td>Advanced Mode</td>
+<td>Zap icon, violet glow background</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keyboard Shortcut</strong>: <code>⌘+Shift+A</code></p>
+<p><strong>Files</strong>: <code>apps/thinktank/components/chat/AdvancedModeToggle.tsx</code></p>
+<h3 id="message-bubble">Message Bubble</h3>
+<p>Enhanced chat message component with metadata support.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Auto Mode</th>
+<th>Advanced Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Avatar</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Content</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Streaming cursor</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Model used</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Token count</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Cost estimate</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Rating buttons</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/thinktank/components/chat/MessageBubble.tsx</code></p>
+<h3 id="chat-input">Chat Input</h3>
+<p>Smart auto-resizing textarea with model selector integration.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Auto-resize</td>
+<td>Grows up to 200px</td>
+</tr>
+<tr>
+<td>Attachment button</td>
+<td>File upload</td>
+</tr>
+<tr>
+<td>Voice button</td>
+<td>Voice input</td>
+</tr>
+<tr>
+<td>Model selector</td>
+<td>Shows in Advanced Mode</td>
+</tr>
+<tr>
+<td>Send button</td>
+<td>Gradient styling when active</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/thinktank/components/chat/ChatInput.tsx</code></p>
+<h3 id="sidebar-with-date-grouping">Sidebar with Date Grouping</h3>
+<p>Conversation list grouped by time period.</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Conversations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Today</td>
+<td>Conversations from today</td>
+</tr>
+<tr>
+<td>Yesterday</td>
+<td>Previous day</td>
+</tr>
+<tr>
+<td>Last 7 Days</td>
+<td>Past week</td>
+</tr>
+<tr>
+<td>Older</td>
+<td>Everything else</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/thinktank/components/chat/Sidebar.tsx</code></p>
+<h3 id="brain-plan-viewer">Brain Plan Viewer</h3>
+<p>Collapsible execution plan display for Advanced Mode.</p>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mode badge</td>
+<td>Shows orchestration mode</td>
+</tr>
+<tr>
+<td>Domain badge</td>
+<td>Detected knowledge domain</td>
+</tr>
+<tr>
+<td>Progress bar</td>
+<td>Step completion percentage</td>
+</tr>
+<tr>
+<td>Step list</td>
+<td>Individual execution steps</td>
+</tr>
+<tr>
+<td>Model selection</td>
+<td>Selected model with reason</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/thinktank/components/chat/BrainPlanViewer.tsx</code></p>
+<h3 id="model-selector-dialog">Model Selector Dialog</h3>
+<p>Full-featured model picker with search and categories.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Search</td>
+<td>Filter by name/description</td>
+</tr>
+<tr>
+<td>Categories</td>
+<td>Filter by model category</td>
+</tr>
+<tr>
+<td>Model cards</td>
+<td>Shows capabilities, cost, latency</td>
+</tr>
+<tr>
+<td>Auto option</td>
+<td>“Let Cato decide” option</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/thinktank/components/chat/ModelSelector.tsx</code></p>
+<h3 id="language-selector">Language Selector</h3>
+<p>Component for selecting preferred UI language from API-provided list.</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dropdown</code></td>
+<td>Compact dropdown with current language</td>
+</tr>
+<tr>
+<td><code>list</code></td>
+<td>Full list for settings page</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Native names</td>
+<td>Shows language in its own script</td>
+</tr>
+<tr>
+<td>RTL support</td>
+<td>Respects text direction</td>
+</tr>
+<tr>
+<td>API-driven</td>
+<td>Languages loaded from Radiant API</td>
+</tr>
+<tr>
+<td>Persisted</td>
+<td>Saves to localStorage</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/thinktank/components/ui/language-selector.tsx</code></p>
+<hr />
+<h2 id="category-10-localization-patterns">Category 10: Localization Patterns</h2>
+<p><strong>Source</strong>: Custom Think Tank design</p>
+<h3 id="translation-hook-pattern">Translation Hook Pattern</h3>
+<p>React hook pattern for accessing translations.</p>
+<pre class="tsx"><code>const { t } = useTranslation();
+return &lt;span&gt;{t(T.common.save)}&lt;/span&gt;;</code></pre>
+<table>
+<thead>
+<tr>
+<th>Export</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>useTranslation</code></td>
+<td>Get <code>t</code> function only</td>
+</tr>
+<tr>
+<td><code>useLanguage</code></td>
+<td>Get language + setter</td>
+</tr>
+<tr>
+<td><code>useLocalization</code></td>
+<td>Full context access</td>
+</tr>
+<tr>
+<td><code>T</code></td>
+<td>Translation key constants</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/thinktank/lib/i18n/localization-context.tsx</code></p>
+<h3 id="translation-key-pattern">Translation Key Pattern</h3>
+<p>Centralized key constants for type safety.</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Prefix</th>
+<th>Example Key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Common</td>
+<td><code>thinktank.common.</code></td>
+<td><code>T.common.save</code></td>
+</tr>
+<tr>
+<td>Chat</td>
+<td><code>thinktank.chat.</code></td>
+<td><code>T.chat.send</code></td>
+</tr>
+<tr>
+<td>Errors</td>
+<td><code>thinktank.errors.</code></td>
+<td><code>T.errors.network</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: - <code>apps/thinktank/lib/i18n/translation-keys.ts</code> - <code>apps/thinktank/lib/i18n/default-translations.ts</code></p>
+<h3 id="parameter-interpolation-pattern">Parameter Interpolation Pattern</h3>
+<p>Support for dynamic values in translations.</p>
+<pre class="tsx"><code>// Translation: &quot;Delete {{count}} items&quot;
+t(T.history.deleteSelectedConfirm, { count: 5 })
+// Output: &quot;Delete 5 items&quot;</code></pre>
+<p><strong>Files</strong>: <code>apps/thinktank/lib/i18n/localization-context.tsx</code></p>
+<hr />
+<h2 id="category-11-magic-carpet-patterns-think-tank-admin">Category 11: Magic Carpet Patterns (Think Tank Admin)</h2>
+<p><strong>Source</strong>: Custom RADIANT/Think Tank design</p>
+<h3 id="spatial-glass-card">Spatial Glass Card</h3>
+<p>Glassmorphism effect with backdrop blur.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Background</td>
+<td><code>bg-white/80 dark:bg-slate-900/80</code></td>
+</tr>
+<tr>
+<td>Backdrop</td>
+<td><code>backdrop-blur-xl</code></td>
+</tr>
+<tr>
+<td>Border</td>
+<td><code>border border-white/20</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/thinktank/magic-carpet/spatial-glass-card.tsx</code></p>
+<h3 id="ai-presence-indicator">AI Presence Indicator</h3>
+<p>Animated indicator showing AI activity state.</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Animation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Idle</td>
+<td>Subtle pulse</td>
+</tr>
+<tr>
+<td>Thinking</td>
+<td>Faster pulse</td>
+</tr>
+<tr>
+<td>Responding</td>
+<td>Wave effect</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/thinktank/magic-carpet/ai-presence-indicator.tsx</code></p>
+<h3 id="reality-scrubber-timeline">Reality Scrubber Timeline</h3>
+<p>Time-travel UI for conversation history.</p>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Timeline</td>
+<td>Visual history</td>
+</tr>
+<tr>
+<td>Scrubber</td>
+<td>Drag to point in time</td>
+</tr>
+<tr>
+<td>Markers</td>
+<td>Key moments</td>
+</tr>
+<tr>
+<td>Preview</td>
+<td>Hover state preview</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/thinktank/magic-carpet/reality-scrubber-timeline.tsx</code></p>
+<h3 id="quantum-split-view">Quantum Split View</h3>
+<p>Parallel conversation comparison view.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Split panes</td>
+<td>Side-by-side views</td>
+</tr>
+<tr>
+<td>Sync scroll</td>
+<td>Optional linked scrolling</td>
+</tr>
+<tr>
+<td>Merge</td>
+<td>Combine best parts</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/thinktank/magic-carpet/quantum-split-view.tsx</code></p>
+<h3 id="pre-cognition-suggestions">Pre-Cognition Suggestions</h3>
+<p>AI-powered predictive suggestions.</p>
+<table>
+<thead>
+<tr>
+<th>Animation</th>
+<th>Timing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fade in</td>
+<td>0.2s</td>
+</tr>
+<tr>
+<td>Slide up</td>
+<td>0.3s</td>
+</tr>
+<tr>
+<td>Stagger</td>
+<td>0.05s between items</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/thinktank/magic-carpet/pre-cognition-suggestions.tsx</code></p>
+<hr />
+<h2 id="pattern-modification-history">Pattern Modification History</h2>
+<table>
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 20%" />
+<col style="width: 18%" />
+<col style="width: 18%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr>
+<th>Date</th>
+<th>Pattern</th>
+<th>Change</th>
+<th>Reason</th>
+<th>Modified By</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2024-01-01</td>
+<td>Initial</td>
+<td>Document created</td>
+<td>Baseline</td>
+<td>System</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>Advanced Mode Toggle</td>
+<td>New component</td>
+<td>Think Tank Auto/Advanced mode switching</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>Message Bubble</td>
+<td>Enhanced</td>
+<td>Added metadata display, rating actions, streaming cursor</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>Chat Input</td>
+<td>Enhanced</td>
+<td>Added model selector integration, auto-resize</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>Sidebar</td>
+<td>New component</td>
+<td>Conversation list with search, date grouping</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>Brain Plan Viewer</td>
+<td>New component</td>
+<td>Displays AGI execution plan with step progress</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>Model Selector Dialog</td>
+<td>New component</td>
+<td>Full model picker with categories and search</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>Language Selector</td>
+<td>New component</td>
+<td>Dropdown/list language picker with native names</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>Localization System</td>
+<td>New pattern</td>
+<td>useTranslation hook, T keys, API-based i18n</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>GlassCard</td>
+<td>New component</td>
+<td>Glassmorphism card with blur, glow, hover effects</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>GlassPanel</td>
+<td>New component</td>
+<td>Frosted glass container panel</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>AuroraBackground</td>
+<td>New component</td>
+<td>Animated aurora gradient effect for backgrounds</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>InteractiveTimeline</td>
+<td>New component</td>
+<td>Vertical timeline with grouped history navigation</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>HorizontalTimeline</td>
+<td>New component</td>
+<td>Horizontal scrollable timeline preview</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>ViewRouter</td>
+<td>New component</td>
+<td>Polymorphic UI morphing with Sniper/War Room modes</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>ModernChatInterface</td>
+<td>New component</td>
+<td>2026+ chat UI with glassmorphism, advanced mode</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-19</td>
+<td>Design Tokens</td>
+<td>New system</td>
+<td>Complete design token system for colors, spacing, animation</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-23</td>
+<td>Responsive Grids</td>
+<td>Enforced</td>
+<td>All stats grids must use <code>md:grid-cols-2 lg:grid-cols-4</code> pattern</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-23</td>
+<td>Toast Notifications</td>
+<td>Enforced</td>
+<td>All mutation actions must show toast feedback</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-23</td>
+<td>useQuery Typing</td>
+<td>Enforced</td>
+<td>All useQuery hooks must use generic typing <code>useQuery&lt;T&gt;()</code></td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-23</td>
+<td>Magic Carpet Interactions</td>
+<td>Implemented</td>
+<td>Bookmark, branch, prediction handlers with toast feedback</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-23</td>
+<td>Collaborative Session</td>
+<td>Implemented</td>
+<td>Invite, permission, remove participant handlers with state</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-23</td>
+<td>Reply/Edit Actions</td>
+<td>Implemented</td>
+<td>Reply populates input with <span class="citation" data-cites="mention">@mention</span>, edit populates content</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-23</td>
+<td>Living Parchment</td>
+<td>Implemented</td>
+<td>War Room advisor analysis, Council session conclusion via API</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-23</td>
+<td>Geographic Map</td>
+<td>Implemented</td>
+<td>Region click handler with toast and selection state</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-23</td>
+<td>Report Edit</td>
+<td>Implemented</td>
+<td>Edit report handler opens dialog with report configuration</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-23</td>
+<td>ViewRouter State</td>
+<td>Implemented</td>
+<td>View/mode state tracking for polymorphic UI transitions</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-24</td>
+<td>Activity Heatmap</td>
+<td>New component</td>
+<td>GitHub-style yearly activity visualization</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-24</td>
+<td>Enhanced Activity Heatmap</td>
+<td>New component</td>
+<td>AI insights, breathing animation, streaks, sound</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-24</td>
+<td>Generic Heatmap</td>
+<td>New component</td>
+<td>2D grid with 5 color schemes</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-24</td>
+<td>Latency Heatmap</td>
+<td>New component</td>
+<td>Geographic AWS region latency map</td>
+<td>Cascade</td>
+</tr>
+<tr>
+<td>2026-01-24</td>
+<td>CBF Violations Heatmap</td>
+<td>New component</td>
+<td>Content boundary rule violation analytics</td>
+<td>Cascade</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="category-13-heatmap-components-v5.52.1">Category 13: Heatmap Components (v5.52.1)</h2>
+<p><strong>Source</strong>: Custom RADIANT visualization components for data density display</p>
+<h3 id="activity-heatmap">Activity Heatmap</h3>
+<p>GitHub-style contribution graph for user activity tracking.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Location</td>
+<td><code>apps/thinktank/components/ui/activity-heatmap.tsx</code></td>
+</tr>
+<tr>
+<td>Color Schemes</td>
+<td><code>violet</code>, <code>green</code>, <code>blue</code></td>
+</tr>
+<tr>
+<td>Layout</td>
+<td>52 weeks × 7 days grid</td>
+</tr>
+<tr>
+<td>Animation</td>
+<td>Framer Motion staggered fade-in</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<pre class="tsx"><code>&lt;ActivityHeatmap 
+  data={[{ date: &#39;2026-01-24&#39;, count: 5 }]} 
+  year={2026}
+  colorScheme=&quot;violet&quot;
+/&gt;</code></pre>
+<h3 id="enhanced-activity-heatmap">Enhanced Activity Heatmap</h3>
+<p>Industry-leading activity visualization with AI features.</p>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Breathing Animation</strong></td>
+<td>Cells pulse based on activity intensity (0.5s cycle)</td>
+</tr>
+<tr>
+<td><strong>AI Insights</strong></td>
+<td>Pattern detection, anomaly alerts, trend predictions</td>
+</tr>
+<tr>
+<td><strong>Streak Tracking</strong></td>
+<td>Current/longest streak badges with 🔥 icons</td>
+</tr>
+<tr>
+<td><strong>Sound Feedback</strong></td>
+<td>Web Audio API pitch varies with intensity</td>
+</tr>
+<tr>
+<td><strong>Accessibility Mode</strong></td>
+<td>Full narrative summary for screen readers</td>
+</tr>
+<tr>
+<td><strong>Predictions</strong></td>
+<td>Future cells with dashed borders</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Props:</strong> | Prop | Type | Default | Description | |——|——|———|————-| | <code>data</code> | <code>ActivityDay[]</code> | required | Activity data | | <code>year</code> | <code>number</code> | current year | Display year | | <code>colorScheme</code> | <code>'violet' \| 'green' \| 'blue' \| 'fire' \| 'ocean'</code> | <code>'violet'</code> | Color theme | | <code>enableBreathing</code> | <code>boolean</code> | <code>true</code> | Enable pulse animation | | <code>enableSound</code> | <code>boolean</code> | <code>false</code> | Enable audio feedback | | <code>enableAIInsights</code> | <code>boolean</code> | <code>true</code> | Show AI analysis | | <code>showStreaks</code> | <code>boolean</code> | <code>true</code> | Highlight streak days |</p>
+<p><strong>Files</strong>: <code>apps/thinktank/components/ui/enhanced-activity-heatmap.tsx</code></p>
+<h3 id="generic-heatmap">Generic Heatmap</h3>
+<p>2D grid visualization for correlation matrices and patterns.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Location</td>
+<td><code>apps/admin-dashboard/components/charts/heatmap.tsx</code></td>
+</tr>
+<tr>
+<td>Color Schemes</td>
+<td><code>blue</code>, <code>red</code>, <code>green</code>, <code>purple</code>, <code>diverging</code></td>
+</tr>
+<tr>
+<td>Cell Sizes</td>
+<td><code>sm</code> (32px), <code>md</code> (48px), <code>lg</code> (64px)</td>
+</tr>
+<tr>
+<td>Animation</td>
+<td>Framer Motion staggered scale-in</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<pre class="tsx"><code>&lt;Heatmap
+  data={[{ row: &#39;Model A&#39;, col: &#39;Mon&#39;, value: 42 }]}
+  rows={[&#39;Model A&#39;, &#39;Model B&#39;]}
+  cols={[&#39;Mon&#39;, &#39;Tue&#39;, &#39;Wed&#39;]}
+  colorScheme=&quot;blue&quot;
+  showValues={true}
+  cellSize=&quot;md&quot;
+/&gt;</code></pre>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/charts/heatmap.tsx</code></p>
+<h3 id="latency-heatmap">Latency Heatmap</h3>
+<p>Geographic visualization of AWS region latencies.</p>
+<table>
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Location</td>
+<td><code>apps/admin-dashboard/components/geographic/latency-heatmap.tsx</code></td>
+</tr>
+<tr>
+<td>Regions</td>
+<td>17 AWS regions with SVG positioning</td>
+</tr>
+<tr>
+<td>Thresholds</td>
+<td>&lt;50ms (green) → &gt;500ms (red)</td>
+</tr>
+<tr>
+<td>Animation</td>
+<td>Pulse for critical regions</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Latency Colors:</strong> | Threshold | Color | Label | |———–|——-|——-| | &lt;50ms | <code>#22c55e</code> | Excellent | | &lt;100ms | <code>#84cc16</code> | Good | | &lt;200ms | <code>#eab308</code> | Fair | | &lt;500ms | <code>#f97316</code> | Slow | | &gt;500ms | <code>#ef4444</code> | Critical |</p>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/geographic/latency-heatmap.tsx</code></p>
+<h3 id="cbf-violations-heatmap">CBF Violations Heatmap</h3>
+<p>Content Boundary Framework rule violation analytics.</p>
+<table>
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Location</td>
+<td><code>apps/admin-dashboard/components/analytics/cbf-violations-heatmap.tsx</code></td>
+</tr>
+<tr>
+<td>Grouping</td>
+<td>By category (content_safety, pii_detection, etc.)</td>
+</tr>
+<tr>
+<td>Severity</td>
+<td>low (blue), medium (yellow), high (orange), critical (red)</td>
+</tr>
+<tr>
+<td>Trends</td>
+<td>Up/down arrows for violation direction</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Category Icons:</strong> | Category | Icon | |———-|——| | <code>content_safety</code> | 🛡️ | | <code>data_privacy</code> | 🔒 | | <code>pii_detection</code> | 👤 | | <code>harmful_content</code> | ⚠️ | | <code>jailbreak</code> | 🔓 | | <code>prompt_injection</code> | 💉 |</p>
+<p><strong>Files</strong>: <code>apps/admin-dashboard/components/analytics/cbf-violations-heatmap.tsx</code></p>
+<hr />
+<h2 id="category-12-think-tank-consumer-app-2026-patterns">Category 12: Think Tank Consumer App 2026+ Patterns</h2>
+<p><strong>Source</strong>: Custom RADIANT/Think Tank design (2026+ UI/UX trends)</p>
+<h3 id="glassmorphism-components">Glassmorphism Components</h3>
+<p>Modern glass effect components with depth and blur.</p>
+<h4 id="glasscard">GlassCard</h4>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Background</td>
+<td><code>bg-white/[0.02-0.08]</code> based on intensity</td>
+</tr>
+<tr>
+<td>Backdrop</td>
+<td><code>backdrop-blur-md/lg/xl</code> based on intensity</td>
+</tr>
+<tr>
+<td>Border</td>
+<td><code>border-white/[0.06-0.12]</code></td>
+</tr>
+<tr>
+<td>Variants</td>
+<td><code>default</code>, <code>elevated</code>, <code>inset</code>, <code>glow</code></td>
+</tr>
+<tr>
+<td>Glow Colors</td>
+<td><code>violet</code>, <code>fuchsia</code>, <code>cyan</code>, <code>emerald</code></td>
+</tr>
+</tbody>
+</table>
+<pre class="tsx"><code>&lt;GlassCard variant=&quot;glow&quot; glowColor=&quot;violet&quot; hoverEffect&gt;
+  Content
+&lt;/GlassCard&gt;</code></pre>
+<p><strong>Files</strong>: <code>apps/thinktank/components/ui/glass-card.tsx</code></p>
+<h4 id="glasspanel">GlassPanel</h4>
+<p>Container panel with frosted glass effect.</p>
+<pre class="tsx"><code>&lt;GlassPanel blur=&quot;lg&quot; className=&quot;p-4&quot;&gt;
+  Content
+&lt;/GlassPanel&gt;</code></pre>
+<p><strong>Files</strong>: <code>apps/thinktank/components/ui/glass-card.tsx</code></p>
+<h3 id="aurora-background">Aurora Background</h3>
+<p>Animated gradient background with floating color blobs.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Options</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Colors</td>
+<td><code>violet</code>, <code>cyan</code>, <code>emerald</code>, <code>mixed</code></td>
+</tr>
+<tr>
+<td>Intensity</td>
+<td><code>subtle</code>, <code>medium</code>, <code>strong</code></td>
+</tr>
+<tr>
+<td>Animate</td>
+<td><code>true/false</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/thinktank/components/ui/aurora-background.tsx</code></p>
+<h3 id="interactive-timeline">Interactive Timeline</h3>
+<p>Grouped vertical timeline for history browsing.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Grouping</td>
+<td>Today, Yesterday, This Week, This Month, Older</td>
+</tr>
+<tr>
+<td>Animation</td>
+<td>Item entrance, hover scale, selection glow</td>
+</tr>
+<tr>
+<td>Indicators</td>
+<td>Favorite stars, mode badges, domain hints</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/thinktank/components/ui/timeline.tsx</code></p>
+<h3 id="horizontal-timeline">Horizontal Timeline</h3>
+<p>Scrollable horizontal timeline preview.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scroll</td>
+<td>Drag or button navigation</td>
+</tr>
+<tr>
+<td>Cards</td>
+<td>Compact conversation cards</td>
+</tr>
+<tr>
+<td>Selection</td>
+<td>Glow effect on selected</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/thinktank/components/ui/timeline.tsx</code></p>
+<h3 id="polymorphic-view-router">Polymorphic View Router</h3>
+<p>UI that morphs based on task and mode.</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>View</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sniper</td>
+<td>Fast execution</td>
+<td>Single model, quick responses</td>
+</tr>
+<tr>
+<td>War Room</td>
+<td>Deep analysis</td>
+<td>Multi-agent, full orchestration</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>View Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>chat</code></td>
+<td>Standard conversation</td>
+</tr>
+<tr>
+<td><code>terminal</code></td>
+<td>Command center</td>
+</tr>
+<tr>
+<td><code>canvas</code></td>
+<td>Infinite canvas/mindmap</td>
+</tr>
+<tr>
+<td><code>dashboard</code></td>
+<td>Analytics view</td>
+</tr>
+<tr>
+<td><code>diff_editor</code></td>
+<td>Verification split-screen</td>
+</tr>
+<tr>
+<td><code>decision_cards</code></td>
+<td>Human-in-the-loop</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/thinktank/components/polymorphic/view-router.tsx</code></p>
+<h3 id="modern-chat-interface">Modern Chat Interface</h3>
+<p>2026+ chat UI with all advanced features.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Visibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mode badge</td>
+<td>Always</td>
+</tr>
+<tr>
+<td>Model selector</td>
+<td>Advanced mode</td>
+</tr>
+<tr>
+<td>Metadata display</td>
+<td>Advanced mode</td>
+</tr>
+<tr>
+<td>Voice input</td>
+<td>Advanced mode</td>
+</tr>
+<tr>
+<td>File attachments</td>
+<td>Advanced mode</td>
+</tr>
+<tr>
+<td>Rating actions</td>
+<td>On hover</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/thinktank/components/chat/ModernChatInterface.tsx</code></p>
+<h3 id="design-token-system">Design Token System</h3>
+<p>Comprehensive design tokens for consistent styling.</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Colors</td>
+<td><code>glass.light</code>, <code>aurora.violet</code>, <code>glow.cyan</code></td>
+</tr>
+<tr>
+<td>Spacing</td>
+<td>0.5 to 24 rem scale</td>
+</tr>
+<tr>
+<td>Radius</td>
+<td><code>sm</code> to <code>full</code></td>
+</tr>
+<tr>
+<td>Shadows</td>
+<td><code>glass</code>, <code>glassHover</code>, <code>innerGlow</code></td>
+</tr>
+<tr>
+<td>Animation</td>
+<td><code>spring.gentle</code>, <code>easing.elastic</code></td>
+</tr>
+<tr>
+<td>Blur</td>
+<td><code>sm</code> to <code>glass</code> (20px)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Files</strong>: <code>apps/thinktank/lib/design-system/tokens.ts</code></p>
+<h3 id="modern-polish-components-2026">Modern Polish Components (2026+)</h3>
+<p>Super-modern UI polish components for consumer experience.</p>
+<h4 id="page-transitions">Page Transitions</h4>
+<p>Smooth fade and slide transitions between pages.</p>
+<pre class="tsx"><code>import { PageTransition, StaggerContainer, StaggerItem, FloatingElement } from &#39;@/components/ui&#39;;
+
+// Wrap page content
+&lt;PageTransition&gt;
+  &lt;YourPageContent /&gt;
+&lt;/PageTransition&gt;
+
+// Staggered list animation
+&lt;StaggerContainer&gt;
+  {items.map(item =&gt; (
+    &lt;StaggerItem key={item.id}&gt;{item}&lt;/StaggerItem&gt;
+  ))}
+&lt;/StaggerContainer&gt;
+
+// Floating decoration
+&lt;FloatingElement delay={0.5}&gt;
+  &lt;Icon /&gt;
+&lt;/FloatingElement&gt;</code></pre>
+<p><strong>Files</strong>: <code>apps/thinktank/components/ui/page-transition.tsx</code></p>
+<h4 id="skeleton-loaders">Skeleton Loaders</h4>
+<p>Shimmer effect skeleton components for loading states.</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Skeleton</code></td>
+<td>Basic shimmer element</td>
+</tr>
+<tr>
+<td><code>SkeletonText</code></td>
+<td>Multiple line text placeholder</td>
+</tr>
+<tr>
+<td><code>SkeletonCard</code></td>
+<td>Card with avatar and text</td>
+</tr>
+<tr>
+<td><code>SkeletonMessage</code></td>
+<td>Chat message placeholder</td>
+</tr>
+<tr>
+<td><code>SkeletonChatList</code></td>
+<td>Full chat loading state</td>
+</tr>
+<tr>
+<td><code>SkeletonSidebar</code></td>
+<td>Sidebar loading state</td>
+</tr>
+<tr>
+<td><code>SkeletonGrid</code></td>
+<td>Grid of cards</td>
+</tr>
+<tr>
+<td><code>SkeletonStats</code></td>
+<td>Stats row loading</td>
+</tr>
+</tbody>
+</table>
+<pre class="tsx"><code>import { Skeleton, SkeletonCard, SkeletonChatList } from &#39;@/components/ui&#39;;
+
+&lt;Skeleton className=&quot;h-4 w-full&quot; /&gt;
+&lt;SkeletonCard /&gt;
+&lt;SkeletonChatList /&gt;</code></pre>
+<p><strong>Files</strong>: <code>apps/thinktank/components/ui/skeleton.tsx</code></p>
+<h4 id="gradient-text-glow-effects">Gradient Text &amp; Glow Effects</h4>
+<p>Animated text effects for modern styling.</p>
+<table>
+<colgroup>
+<col style="width: 55%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GradientText</code></td>
+<td>Animated gradient text (violet, cyan, rainbow, gold, emerald)</td>
+</tr>
+<tr>
+<td><code>GlowText</code></td>
+<td>Text with drop shadow glow</td>
+</tr>
+<tr>
+<td><code>AnimatedNumber</code></td>
+<td>Counter animation for stats</td>
+</tr>
+<tr>
+<td><code>Typewriter</code></td>
+<td>Typing effect for text</td>
+</tr>
+</tbody>
+</table>
+<pre class="tsx"><code>import { GradientText, GlowText, AnimatedNumber, Typewriter } from &#39;@/components/ui&#39;;
+
+&lt;GradientText gradient=&quot;violet&quot; animate&gt;Think Tank&lt;/GradientText&gt;
+&lt;GlowText color=&quot;cyan&quot;&gt;Glowing&lt;/GlowText&gt;
+&lt;AnimatedNumber value={1234} suffix=&quot;+&quot; /&gt;
+&lt;Typewriter text=&quot;Hello, I&#39;m Cato...&quot; /&gt;</code></pre>
+<p><strong>Files</strong>: <code>apps/thinktank/components/ui/gradient-text.tsx</code></p>
+<h4 id="typing-indicators">Typing Indicators</h4>
+<p>Animated indicators for AI thinking state.</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dots</code></td>
+<td>Bouncing dots (default)</td>
+</tr>
+<tr>
+<td><code>pulse</code></td>
+<td>Single pulsing dot with text</td>
+</tr>
+<tr>
+<td><code>wave</code></td>
+<td>Audio waveform style</td>
+</tr>
+<tr>
+<td><code>thinking</code></td>
+<td>Full “Cato is thinking” panel</td>
+</tr>
+</tbody>
+</table>
+<pre class="tsx"><code>import { TypingIndicator, StreamingIndicator } from &#39;@/components/ui&#39;;
+
+&lt;TypingIndicator variant=&quot;thinking&quot; /&gt;
+&lt;StreamingIndicator /&gt;</code></pre>
+<p><strong>Files</strong>: <code>apps/thinktank/components/ui/typing-indicator.tsx</code></p>
+<h4 id="empty-states-1">Empty States</h4>
+<p>Beautiful empty state illustrations with actions.</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Icon</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>chat</code></td>
+<td>MessageSquare</td>
+<td>Start conversation prompt</td>
+</tr>
+<tr>
+<td><code>history</code></td>
+<td>History</td>
+<td>No conversations yet</td>
+</tr>
+<tr>
+<td><code>artifacts</code></td>
+<td>Layers</td>
+<td>No artifacts created</td>
+</tr>
+<tr>
+<td><code>search</code></td>
+<td>Search</td>
+<td>No results found</td>
+</tr>
+<tr>
+<td><code>rules</code></td>
+<td>Star</td>
+<td>No rules configured</td>
+</tr>
+</tbody>
+</table>
+<pre class="tsx"><code>import { EmptyState, WelcomeHero } from &#39;@/components/ui&#39;;
+
+&lt;EmptyState 
+  type=&quot;chat&quot; 
+  action={{ label: &quot;Start&quot;, onClick: handleStart }} 
+/&gt;
+
+&lt;WelcomeHero onStart={handleStart} /&gt;</code></pre>
+<p><strong>Files</strong>: <code>apps/thinktank/components/ui/empty-state.tsx</code></p>
+<h4 id="modern-buttons">Modern Buttons</h4>
+<p>Enhanced buttons with glow and micro-interactions.</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Variants</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ModernButton</code></td>
+<td>primary, secondary, ghost, glow, outline</td>
+</tr>
+<tr>
+<td><code>IconButton</code></td>
+<td>default, ghost, glow</td>
+</tr>
+<tr>
+<td><code>PillButton</code></td>
+<td>Active/inactive pill for filters</td>
+</tr>
+</tbody>
+</table>
+<pre class="tsx"><code>import { ModernButton, IconButton, PillButton } from &#39;@/components/ui&#39;;
+
+&lt;ModernButton variant=&quot;glow&quot; leftIcon={&lt;Zap /&gt;}&gt;
+  Get Started
+&lt;/ModernButton&gt;
+
+&lt;IconButton icon={&lt;Star /&gt;} label=&quot;Favorite&quot; variant=&quot;glow&quot; /&gt;
+
+&lt;PillButton isActive={selected}&gt;Category&lt;/PillButton&gt;</code></pre>
+<p><strong>Files</strong>: <code>apps/thinktank/components/ui/modern-button.tsx</code></p>
+<h4 id="tailwind-animations">Tailwind Animations</h4>
+<p>Custom animations added to <code>tailwind.config.js</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Animation</th>
+<th>Class</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shimmer</td>
+<td><code>animate-shimmer</code></td>
+<td>Skeleton loading</td>
+</tr>
+<tr>
+<td>Gradient X</td>
+<td><code>animate-gradient-x</code></td>
+<td>Animated gradients</td>
+</tr>
+<tr>
+<td>Pulse Glow</td>
+<td><code>animate-pulse-glow</code></td>
+<td>Pulsing glow effect</td>
+</tr>
+<tr>
+<td>Float</td>
+<td><code>animate-float</code></td>
+<td>Floating decoration</td>
+</tr>
+<tr>
+<td>Spin Slow</td>
+<td><code>animate-spin-slow</code></td>
+<td>Slow rotation</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="adding-a-new-pattern">Adding a New Pattern</h2>
+<p>When adding a new UI/UX pattern:</p>
+<ol type="1">
+<li><strong>Document the source</strong> - Where did the pattern come from?</li>
+<li><strong>Categorize it</strong> - Which category does it belong to?</li>
+<li><strong>Include all details</strong> - Properties, variants, usage</li>
+<li><strong>Add file references</strong> - Where is it implemented?</li>
+<li><strong>Update this document</strong> - Add to appropriate section</li>
+</ol>
+<hr />
+<h2 id="modifying-a-pattern">Modifying a Pattern</h2>
+<p>When modifying an existing pattern:</p>
+<ol type="1">
+<li><strong>Review existing documentation</strong> - Understand current pattern</li>
+<li><strong>Document the change</strong> - Add to “Pattern Modification History”</li>
+<li><strong>Update pattern details</strong> - Modify the relevant section</li>
+<li><strong>Test across apps</strong> - Ensure consistency</li>
+</ol>
+<hr />
+<p><strong>Policy</strong>: This document is maintained under <code>/.windsurf/workflows/ui-ux-patterns-policy.md</code></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

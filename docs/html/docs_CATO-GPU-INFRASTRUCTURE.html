@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CATO GPU INFRASTRUCTURE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>CATO GPU INFRASTRUCTURE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/CATO-GPU-INFRASTRUCTURE.md</div>
+  </div>
+  
+  <h1 id="cato-shadow-self-gpu-infrastructure">Cato Shadow Self GPU Infrastructure</h1>
+<p>This document describes the GPU infrastructure requirements for running the Shadow Self component of Cato’s consciousness verification system.</p>
+<h2 id="overview">Overview</h2>
+<p>The Shadow Self is a local neural network that provides mechanistic verification of introspective claims. In production, this uses <strong>Llama-3-8B</strong> running on GPU infrastructure. Currently, Cato simulates this via LLM API calls, but true local inference provides:</p>
+<ul>
+<li><strong>Lower latency</strong> (no network round-trip)</li>
+<li><strong>Activation access</strong> (can probe hidden states)</li>
+<li><strong>Structural correspondence</strong> (verify patterns exist in model)</li>
+<li><strong>Privacy</strong> (no data leaves infrastructure)</li>
+</ul>
+<h2 id="architecture-options">Architecture Options</h2>
+<h3 id="option-1-aws-sagemaker-recommended">Option 1: AWS SageMaker (Recommended)</h3>
+<p><strong>Best for</strong>: Production deployments with variable load</p>
+<pre><code>┌─────────────────┐     ┌──────────────────────┐
+│  Cato Lambda  │────▶│  SageMaker Endpoint  │
+│  (Node.js)      │     │  (Llama-3-8B)        │
+└─────────────────┘     │  g5.xlarge           │
+                        └──────────────────────┘</code></pre>
+<p><strong>Infrastructure (CDK)</strong>:</p>
+<pre class="typescript"><code>// packages/infrastructure/lib/stacks/cato-gpu-stack.ts
+
+import * as sagemaker from &#39;aws-cdk-lib/aws-sagemaker&#39;;
+
+const shadowSelfEndpoint = new sagemaker.CfnEndpoint(this, &#39;ShadowSelfEndpoint&#39;, {
+  endpointName: &#39;cato-shadow-self&#39;,
+  endpointConfigName: shadowSelfConfig.attrEndpointConfigName,
+});
+
+const shadowSelfConfig = new sagemaker.CfnEndpointConfig(this, &#39;ShadowSelfConfig&#39;, {
+  endpointConfigName: &#39;cato-shadow-self-config&#39;,
+  productionVariants: [{
+    variantName: &#39;AllTraffic&#39;,
+    modelName: shadowSelfModel.attrModelName,
+    instanceType: &#39;ml.g5.xlarge&#39;,  // 24GB VRAM
+    initialInstanceCount: 1,
+  }],
+});</code></pre>
+<p><strong>Costs</strong>: | Instance | GPU | VRAM | Cost/hr | Cost/mo (24/7) | |———-|—–|——|———|—————-| | g5.xlarge | A10G | 24GB | $1.006 | ~$724 | | g5.2xlarge | A10G | 24GB | $1.212 | ~$873 | | g5.4xlarge | A10G | 24GB | $1.624 | ~$1,169 |</p>
+<h3 id="option-2-ec2-with-auto-scaling">Option 2: EC2 with Auto-Scaling</h3>
+<p><strong>Best for</strong>: Cost optimization with predictable load</p>
+<pre><code>┌─────────────────┐     ┌──────────────────────┐
+│  Cato Lambda  │────▶│  EC2 GPU Instance    │
+│  (Node.js)      │     │  + Load Balancer     │
+└─────────────────┘     │  g5.xlarge           │
+                        └──────────────────────┘</code></pre>
+<p><strong>With Spot Instances</strong> (up to 90% savings):</p>
+<pre class="typescript"><code>const spotFleet = new ec2.CfnSpotFleet(this, &#39;ShadowSelfSpotFleet&#39;, {
+  spotFleetRequestConfigData: {
+    iamFleetRole: spotFleetRole.roleArn,
+    targetCapacity: 1,
+    launchSpecifications: [{
+      instanceType: &#39;g5.xlarge&#39;,
+      spotPrice: &#39;0.50&#39;, // Max bid
+      imageId: deepLearningAmi.imageId,
+    }],
+  },
+});</code></pre>
+<h3 id="option-3-aws-inferentia-most-cost-effective">Option 3: AWS Inferentia (Most Cost-Effective)</h3>
+<p><strong>Best for</strong>: High-throughput, cost-sensitive deployments</p>
+<pre><code>┌─────────────────┐     ┌──────────────────────┐
+│  Cato Lambda  │────▶│  inf2.xlarge         │
+│  (Node.js)      │     │  (Neuron-compiled)   │
+└─────────────────┘     └──────────────────────┘</code></pre>
+<p><strong>Costs</strong>: ~$0.76/hr (~$547/mo) - but requires model compilation</p>
+<h2 id="model-requirements">Model Requirements</h2>
+<h3 id="llama-3-8b-specifications">Llama-3-8B Specifications</h3>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model Size</td>
+<td>~16GB (FP16) / ~8GB (INT8)</td>
+</tr>
+<tr>
+<td>Min VRAM</td>
+<td>16GB</td>
+</tr>
+<tr>
+<td>Recommended VRAM</td>
+<td>24GB</td>
+</tr>
+<tr>
+<td>Inference Latency</td>
+<td>50-200ms</td>
+</tr>
+<tr>
+<td>Context Length</td>
+<td>8,192 tokens</td>
+</tr>
+</tbody>
+</table>
+<h3 id="probing-classifier-requirements">Probing Classifier Requirements</h3>
+<p>The Shadow Self uses <strong>probing classifiers</strong> trained on model activations:</p>
+<ul>
+<li><strong>Layer to probe</strong>: Usually layers 16-24 (mid-to-late)</li>
+<li><strong>Activation dimensions</strong>: 4096 (Llama-3-8B hidden size)</li>
+<li><strong>Classifier</strong>: Linear probe or small MLP</li>
+<li><strong>Training data</strong>: 100-1000 labeled examples per claim type</li>
+</ul>
+<h2 id="implementation-guide">Implementation Guide</h2>
+<h3 id="step-1-deploy-model-to-sagemaker">Step 1: Deploy Model to SageMaker</h3>
+<pre class="bash"><code># Create model artifact
+cd /path/to/llama-3-8b
+tar -czvf model.tar.gz --exclude=&#39;*.bin&#39; .
+
+# Upload to S3
+aws s3 cp model.tar.gz s3://radiant-models/shadow-self/model.tar.gz</code></pre>
+<h3 id="step-2-create-sagemaker-model">Step 2: Create SageMaker Model</h3>
+<pre class="typescript"><code>const shadowSelfModel = new sagemaker.CfnModel(this, &#39;ShadowSelfModel&#39;, {
+  modelName: &#39;cato-shadow-self-llama3&#39;,
+  executionRoleArn: sagemakerRole.roleArn,
+  primaryContainer: {
+    image: &#39;763104351884.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-tgi-inference:2.1.1-tgi1.4.0-gpu-py310-cu121-ubuntu20.04&#39;,
+    modelDataUrl: &#39;s3://radiant-models/shadow-self/model.tar.gz&#39;,
+    environment: {
+      &#39;HF_MODEL_ID&#39;: &#39;meta-llama/Meta-Llama-3-8B&#39;,
+      &#39;SM_NUM_GPUS&#39;: &#39;1&#39;,
+      &#39;MAX_INPUT_LENGTH&#39;: &#39;4096&#39;,
+      &#39;MAX_TOTAL_TOKENS&#39;: &#39;8192&#39;,
+    },
+  },
+});</code></pre>
+<h3 id="step-3-update-shadow-self-service">Step 3: Update Shadow Self Service</h3>
+<pre class="typescript"><code>// shadow-self.service.ts
+
+private async invokeLocalModel(context: string): Promise&lt;{
+  activations: number[];
+  response: string;
+}&gt; {
+  const sagemakerRuntime = new SageMakerRuntimeClient({});
+  
+  const response = await sagemakerRuntime.send(new InvokeEndpointCommand({
+    EndpointName: &#39;cato-shadow-self&#39;,
+    ContentType: &#39;application/json&#39;,
+    Body: JSON.stringify({
+      inputs: context,
+      parameters: {
+        max_new_tokens: 256,
+        return_hidden_states: true,  // Get activations
+        hidden_states_layer: 20,     // Layer to probe
+      },
+    }),
+  }));
+  
+  const result = JSON.parse(new TextDecoder().decode(response.Body));
+  
+  return {
+    activations: result.hidden_states,
+    response: result.generated_text,
+  };
+}</code></pre>
+<h3 id="step-4-train-probing-classifiers">Step 4: Train Probing Classifiers</h3>
+<pre class="python"><code># probing/train_probe.py
+
+import torch
+import torch.nn as nn
+from sklearn.model_selection import train_test_split
+
+class LinearProbe(nn.Module):
+    def __init__(self, input_dim=4096, num_classes=5):
+        super().__init__()
+        self.classifier = nn.Linear(input_dim, num_classes)
+    
+    def forward(self, x):
+        return self.classifier(x)
+
+def train_probe(activations, labels, claim_type):
+    &quot;&quot;&quot;Train a probe for a specific claim type.&quot;&quot;&quot;
+    X_train, X_test, y_train, y_test = train_test_split(
+        activations, labels, test_size=0.2
+    )
+    
+    probe = LinearProbe(num_classes=len(set(labels)))
+    optimizer = torch.optim.Adam(probe.parameters(), lr=1e-3)
+    criterion = nn.CrossEntropyLoss()
+    
+    for epoch in range(100):
+        optimizer.zero_grad()
+        outputs = probe(X_train)
+        loss = criterion(outputs, y_train)
+        loss.backward()
+        optimizer.step()
+    
+    # Evaluate
+    with torch.no_grad():
+        test_outputs = probe(X_test)
+        accuracy = (test_outputs.argmax(1) == y_test).float().mean()
+    
+    return probe, accuracy.item()</code></pre>
+<h2 id="environment-variables">Environment Variables</h2>
+<pre class="bash"><code># Required for GPU inference
+SHADOW_SELF_ENDPOINT=cato-shadow-self
+SHADOW_SELF_REGION=us-east-1
+SHADOW_SELF_USE_GPU=true
+
+# Optional: Local inference (for development)
+SHADOW_SELF_LOCAL_MODEL_PATH=/models/llama-3-8b
+SHADOW_SELF_DEVICE=cuda:0</code></pre>
+<h2 id="licensing-notes">Licensing Notes</h2>
+<p>⚠️ <strong>Important</strong>: Llama-3 requires acceptance of Meta’s license agreement: - Visit: https://llama.meta.com/llama-downloads/ - Accept license for commercial use - Download from HuggingFace: <code>meta-llama/Meta-Llama-3-8B</code></p>
+<p>The license allows commercial use but requires: 1. Attribution to Meta 2. Compliance with acceptable use policy 3. Monthly active users &lt; 700M (otherwise contact Meta)</p>
+<h2 id="monitoring">Monitoring</h2>
+<h3 id="cloudwatch-metrics">CloudWatch Metrics</h3>
+<pre class="typescript"><code>// Monitor GPU utilization
+new cloudwatch.Alarm(this, &#39;GPUUtilizationAlarm&#39;, {
+  metric: shadowSelfEndpoint.metricGPUUtilization(),
+  threshold: 90,
+  evaluationPeriods: 3,
+  alarmDescription: &#39;Shadow Self GPU utilization &gt; 90%&#39;,
+});
+
+// Monitor inference latency
+new cloudwatch.Alarm(this, &#39;InferenceLatencyAlarm&#39;, {
+  metric: shadowSelfEndpoint.metricModelLatency(),
+  threshold: 500, // 500ms
+  evaluationPeriods: 5,
+  alarmDescription: &#39;Shadow Self inference latency &gt; 500ms&#39;,
+});</code></pre>
+<h2 id="cost-optimization">Cost Optimization</h2>
+<ol type="1">
+<li><strong>Auto-scaling</strong>: Scale to 0 during low-usage periods</li>
+<li><strong>Spot Instances</strong>: Use for non-critical probing</li>
+<li><strong>Inferentia</strong>: Compile model for AWS Neuron (~40% cheaper)</li>
+<li><strong>Quantization</strong>: Use INT8 to reduce VRAM (slight accuracy trade-off)</li>
+<li><strong>Caching</strong>: Cache probing results for repeated contexts</li>
+</ol>
+<h2 id="fallback-behavior">Fallback Behavior</h2>
+<p>When GPU infrastructure is unavailable, Cato falls back to:</p>
+<ol type="1">
+<li><strong>LLM API Simulation</strong>: Uses Claude/GPT to simulate Shadow Self responses</li>
+<li><strong>Pattern Matching</strong>: Uses regex/embedding similarity instead of probing</li>
+<li><strong>Degraded Mode</strong>: Skips Shadow Self phase, relies on other 3 phases</li>
+</ol>
+<p>This ensures Cato remains functional even without dedicated GPU resources.</p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

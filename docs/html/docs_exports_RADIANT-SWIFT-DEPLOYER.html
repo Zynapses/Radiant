@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIANT SWIFT DEPLOYER - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>RADIANT SWIFT DEPLOYER</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/exports/RADIANT-SWIFT-DEPLOYER.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.18.0---swift-deployer-app-source-export">RADIANT v4.18.0 - Swift Deployer App Source Export</h1>
+<p><strong>Component</strong>: macOS Native Deployer Application <strong>Language</strong>: Swift 5.9, SwiftUI <strong>Files</strong>: 36 source files <strong>Platform</strong>: macOS 13.0+</p>
+<hr />
+<h2 id="architecture-narrative">Architecture Narrative</h2>
+<p>The Swift Deployer is a <strong>native macOS application</strong> that provides a graphical interface for deploying and managing RADIANT infrastructure on AWS. It follows Apple’s Human Interface Guidelines and implements modern macOS patterns including NavigationSplitView, Liquid Glass effects, and full menu bar integration.</p>
+<h3 id="key-capabilities">Key Capabilities</h3>
+<ol type="1">
+<li><strong>One-Click Deployment</strong> - Deploy complete RADIANT infrastructure with a single click</li>
+<li><strong>AI-Powered Assistant</strong> - Claude-powered assistant for guidance and troubleshooting</li>
+<li><strong>Snapshot Management</strong> - Create, restore, and manage deployment snapshots</li>
+<li><strong>Multi-Region Support</strong> - Deploy across multiple AWS regions</li>
+<li><strong>1Password Integration</strong> - Secure credential management</li>
+<li><strong>Real-Time Monitoring</strong> - Track deployment progress and health</li>
+</ol>
+<h3 id="component-structure">Component Structure</h3>
+<pre><code>Sources/RadiantDeployer/
+├── RadiantDeployerApp.swift      # App entry point
+├── AppState.swift                # Global application state
+├── Config/
+│   └── RadiantConfig.swift       # Configuration management
+├── Models/                       # Data models
+│   ├── Configuration.swift
+│   ├── Credentials.swift
+│   ├── Deployment.swift
+│   ├── DomainConfiguration.swift
+│   ├── InstallationParameters.swift
+│   └── ManagedApp.swift
+├── Services/                     # Business logic services
+│   ├── AIAssistantService.swift
+│   ├── AIRegistryService.swift
+│   ├── APIService.swift
+│   ├── AWSService.swift
+│   ├── CDKService.swift
+│   ├── CredentialService.swift
+│   ├── DatabaseService.swift
+│   ├── DeploymentService.swift
+│   ├── DNSService.swift
+│   ├── HealthCheckService.swift
+│   ├── LocalStorageManager.swift
+│   ├── MultiRegionService.swift
+│   ├── OnePasswordService.swift
+│   ├── PackageService.swift
+│   ├── SeedDataService.swift
+│   ├── SnapshotService.swift
+│   └── TimeoutService.swift
+├── Views/                        # SwiftUI views
+│   ├── MainView.swift
+│   └── SettingsView.swift
+└── Components/                   # Reusable UI components
+    ├── AppCommands.swift
+    ├── DataTableComponents.swift
+    ├── DetailViewComponents.swift
+    └── MacOSComponents.swift</code></pre>
+<hr />
+<h2 id="source-files">Source Files</h2>
+<h3 id="radiantdeployerapp.swift">1. RadiantDeployerApp.swift</h3>
+<p><strong>Purpose</strong>: Main application entry point. Defines the SwiftUI App structure with main window, settings, and menu commands.</p>
+<pre class="swift"><code>import SwiftUI
+
+@main
+struct RadiantDeployerApp: App {
+    @StateObject private var appState = AppState()
+    
+    var body: some Scene {
+        WindowGroup(&quot;Radiant Deployer&quot;) {
+            MainView()
+                .environmentObject(appState)
+                .frame(minWidth: 1200, minHeight: 800)
+        }
+        .windowStyle(.titleBar)
+        .windowToolbarStyle(.unified(showsTitle: true))
+        .commands {
+            RadiantCommands(appState: appState)
+        }
+        
+        Settings {
+            SettingsView()
+                .environmentObject(appState)
+        }
+    }
+}
+
+#Preview {
+    MainView()
+        .environmentObject(AppState())
+        .frame(width: 1200, height: 800)
+}</code></pre>
+<hr />
+<h3 id="appstate.swift">2. AppState.swift</h3>
+<p><strong>Purpose</strong>: Global application state management using SwiftUI’s <code>@Published</code> properties. Manages navigation, credentials, deployment state, and service references.</p>
+<pre class="swift"><code>import SwiftUI
+import Combine
+
+@MainActor
+final class AppState: ObservableObject {
+    // MARK: - Navigation
+    @Published var selectedTab: NavigationTab = .dashboard
+    @Published var selectedApp: ManagedApp?
+    @Published var selectedEnvironment: DeployEnvironment = .dev
+    
+    // MARK: - UI State
+    @Published var showInspector: Bool = false
+    @Published var showAIAssistant: Bool = false
+    @Published var sidebarWidth: CGFloat = 240
+    @Published var inspectorWidth: CGFloat = 280
+    @Published var columnVisibility: NavigationSplitViewVisibility = .all
+    
+    // MARK: - Data
+    @Published var apps: [ManagedApp] = []
+    @Published var credentials: [CredentialSet] = []
+    @Published var isLoading = false
+    @Published var error: AppError?
+    
+    // MARK: - Deployment
+    @Published var isDeploying = false
+    @Published var deploymentProgress: DeploymentProgress?
+    @Published var deploymentLogs: [LogEntry] = []
+    
+    // MARK: - Services
+    let credentialService = CredentialService()
+    let cdkService = CDKService()
+    let awsService = AWSService()
+    let aiRegistryService = AIRegistryService()
+    
+    // MARK: - Radiant Connection
+    @Published var radiantBaseURL: String?
+    @Published var radiantAuthToken: String?
+    @Published var isConnectedToRadiant = false
+    
+    // MARK: - 1Password Status
+    @Published var onePasswordConfigured = true
+    @Published var onePasswordStatus: CredentialService.OnePasswordStatus?
+    
+    // MARK: - Debug/Testing
+    @Published var bypassOnePassword = true
+    
+    // MARK: - Initialization
+    init() {
+        Task {
+            await loadInitialData()
+        }
+    }
+    
+    func loadInitialData() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        if bypassOnePassword {
+            onePasswordConfigured = true
+            apps = ManagedApp.defaults
+            return
+        }
+        
+        onePasswordStatus = await credentialService.checkOnePasswordStatus()
+        onePasswordConfigured = onePasswordStatus?.installed == true &amp;&amp; onePasswordStatus?.signedIn == true
+        
+        guard onePasswordConfigured else {
+            apps = ManagedApp.defaults
+            return
+        }
+        
+        do {
+            credentials = try await credentialService.loadCredentials()
+            apps = try await loadApps()
+        } catch {
+            self.error = AppError(message: &quot;Failed to load data&quot;, underlying: error)
+        }
+    }
+    
+    func refreshOnePasswordStatus() async {
+        if bypassOnePassword {
+            onePasswordConfigured = true
+            return
+        }
+        
+        onePasswordStatus = await credentialService.checkOnePasswordStatus()
+        onePasswordConfigured = onePasswordStatus?.installed == true &amp;&amp; onePasswordStatus?.signedIn == true
+        
+        if onePasswordConfigured {
+            do {
+                credentials = try await credentialService.loadCredentials()
+            } catch {
+                self.error = AppError(message: &quot;Failed to load credentials&quot;, underlying: error)
+            }
+        }
+    }
+    
+    private func loadApps() async throws -&gt; [ManagedApp] {
+        return ManagedApp.defaults
+    }
+    
+    // MARK: - Commands
+    
+    func refreshAllStatus() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            credentials = try await credentialService.loadCredentials()
+            apps = try await loadApps()
+        } catch {
+            self.error = AppError(message: &quot;Failed to refresh status&quot;, underlying: error)
+        }
+    }
+    
+    func runHealthCheck() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        guard let credential = credentials.first else {
+            isConnectedToRadiant = false
+            return
+        }
+        
+        let credentialsValid = await AWSService.shared.checkCredentialsValid(credential)
+        let apiHealthy = await AWSService.shared.checkAPIHealth(credential: credential)
+        let dbHealthy = await AWSService.shared.checkDatabaseHealth(credential: credential)
+        
+        isConnectedToRadiant = credentialsValid &amp;&amp; apiHealthy &amp;&amp; dbHealthy
+    }
+}
+
+// MARK: - Navigation
+enum NavigationTab: String, CaseIterable, Identifiable, Sendable {
+    case dashboard = &quot;Dashboard&quot;
+    case apps = &quot;Apps&quot;
+    case deploy = &quot;Deploy&quot;
+    case instances = &quot;Instances&quot;
+    case snapshots = &quot;Snapshots&quot;
+    case packages = &quot;Packages&quot;
+    case history = &quot;History&quot;
+    case providers = &quot;Providers&quot;
+    case models = &quot;Models&quot;
+    case selfHosted = &quot;Self-Hosted&quot;
+    case domains = &quot;Domains&quot;
+    case email = &quot;Email&quot;
+    case multiRegion = &quot;Multi-Region&quot;
+    case abTesting = &quot;A/B Testing&quot;
+    case security = &quot;Security&quot;
+    case compliance = &quot;Compliance&quot;
+    case costs = &quot;Costs&quot;
+    case monitoring = &quot;Monitoring&quot;
+    case settings = &quot;Settings&quot;
+    
+    var id: String { rawValue }
+    
+    var icon: String {
+        switch self {
+        case .dashboard: return &quot;square.grid.2x2&quot;
+        case .apps: return &quot;app.badge&quot;
+        case .deploy: return &quot;arrow.up.circle&quot;
+        case .instances: return &quot;server.rack&quot;
+        case .snapshots: return &quot;clock.arrow.circlepath&quot;
+        case .packages: return &quot;shippingbox&quot;
+        case .history: return &quot;clock&quot;
+        case .providers: return &quot;building.2&quot;
+        case .models: return &quot;cpu&quot;
+        case .selfHosted: return &quot;memorychip&quot;
+        case .domains: return &quot;globe.americas&quot;
+        case .email: return &quot;envelope&quot;
+        case .multiRegion: return &quot;globe&quot;
+        case .abTesting: return &quot;flask&quot;
+        case .security: return &quot;shield.lefthalf.filled&quot;
+        case .compliance: return &quot;checkmark.shield&quot;
+        case .costs: return &quot;dollarsign.circle&quot;
+        case .monitoring: return &quot;waveform.path.ecg.rectangle&quot;
+        case .settings: return &quot;gearshape&quot;
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .dashboard: return .blue
+        case .apps: return .purple
+        case .deploy: return .green
+        case .instances: return .orange
+        case .snapshots: return .cyan
+        case .packages: return .indigo
+        case .history: return .brown
+        case .providers: return .teal
+        case .models: return .pink
+        case .selfHosted: return .mint
+        case .domains: return .cyan
+        case .email: return .orange
+        case .multiRegion: return .blue
+        case .abTesting: return .purple
+        case .security: return .red
+        case .compliance: return .green
+        case .costs: return .yellow
+        case .monitoring: return .teal
+        case .settings: return .gray
+        }
+    }
+    
+    static var mainTabs: [NavigationTab] { [.dashboard, .apps, .deploy] }
+    static var operationTabs: [NavigationTab] { [.instances, .snapshots, .packages, .history] }
+    static var aiTabs: [NavigationTab] { [.providers, .models, .selfHosted] }
+    static var configTabs: [NavigationTab] { [.domains, .email] }
+    static var advancedTabs: [NavigationTab] { [.multiRegion, .abTesting] }
+    static var securityTabs: [NavigationTab] { [.security, .compliance] }
+    static var systemTabs: [NavigationTab] { [.costs, .monitoring, .settings] }
+}
+
+// MARK: - DeployEnvironment
+enum DeployEnvironment: String, CaseIterable, Identifiable, Sendable, Codable {
+    case dev = &quot;Development&quot;
+    case staging = &quot;Staging&quot;
+    case prod = &quot;Production&quot;
+    
+    var id: String { rawValue }
+    
+    var shortName: String {
+        switch self {
+        case .dev: return &quot;DEV&quot;
+        case .staging: return &quot;STAGING&quot;
+        case .prod: return &quot;PROD&quot;
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .dev: return .blue
+        case .staging: return .orange
+        case .prod: return .green
+        }
+    }
+}
+
+// MARK: - Error
+struct AppError: Identifiable, Sendable {
+    let id = UUID()
+    let message: String
+    let underlying: (any Error)?
+    
+    var localizedDescription: String {
+        if let underlying = underlying {
+            return &quot;\(message): \(underlying.localizedDescription)&quot;
+        }
+        return message
+    }
+}</code></pre>
+<hr />
+<h3 id="configradiantconfig.swift">3. Config/RadiantConfig.swift</h3>
+<p><strong>Purpose</strong>: Centralized configuration with environment variable support. Manages AWS settings, paths, timeouts, and feature flags.</p>
+<pre class="swift"><code>// RADIANT v4.18.0 - Configuration
+// Centralized configuration with environment variable support
+
+import Foundation
+import os.log
+
+// MARK: - Logger
+
+enum RadiantLogger {
+    private static let subsystem = &quot;com.radiant.deployer&quot;
+    
+    static let general = Logger(subsystem: subsystem, category: &quot;general&quot;)
+    static let deployment = Logger(subsystem: subsystem, category: &quot;deployment&quot;)
+    static let packages = Logger(subsystem: subsystem, category: &quot;packages&quot;)
+    static let seeds = Logger(subsystem: subsystem, category: &quot;seeds&quot;)
+    static let aws = Logger(subsystem: subsystem, category: &quot;aws&quot;)
+    static let credentials = Logger(subsystem: subsystem, category: &quot;credentials&quot;)
+    
+    static func error(_ message: String, error: Error? = nil, category: Logger = general) {
+        if let error = error {
+            category.error(&quot;\(message): \(error.localizedDescription)&quot;)
+        } else {
+            category.error(&quot;\(message)&quot;)
+        }
+    }
+    
+    static func warning(_ message: String, category: Logger = general) {
+        category.warning(&quot;\(message)&quot;)
+    }
+    
+    static func info(_ message: String, category: Logger = general) {
+        category.info(&quot;\(message)&quot;)
+    }
+    
+    static func debug(_ message: String, category: Logger = general) {
+        category.debug(&quot;\(message)&quot;)
+    }
+}
+
+// MARK: - Configuration
+
+struct RadiantConfig: Sendable {
+    
+    static let shared = RadiantConfig()
+    
+    // MARK: - AWS Configuration
+    let releasesBucket: String
+    let seedsPrefix: String
+    let packagesPrefix: String
+    let defaultRegion: String
+    
+    // MARK: - Paths
+    let packageCacheDirectory: URL
+    let seedsCacheDirectory: URL
+    let awsCliPath: String
+    let cdkCliPath: String
+    
+    // MARK: - Timeouts
+    let networkTimeout: TimeInterval
+    let cdkDeploymentTimeout: TimeInterval
+    let healthCheckTimeout: TimeInterval
+    
+    // MARK: - Feature Flags
+    let verboseLogging: Bool
+    let dryRunMode: Bool
+    
+    private init() {
+        let env = ProcessInfo.processInfo.environment
+        
+        self.releasesBucket = env[&quot;RADIANT_RELEASES_BUCKET&quot;] ?? &quot;radiant-releases-us-east-1&quot;
+        self.seedsPrefix = env[&quot;RADIANT_SEEDS_PREFIX&quot;] ?? &quot;seeds/&quot;
+        self.packagesPrefix = env[&quot;RADIANT_PACKAGES_PREFIX&quot;] ?? &quot;packages/&quot;
+        self.defaultRegion = env[&quot;AWS_DEFAULT_REGION&quot;] ?? &quot;us-east-1&quot;
+        
+        let appSupport: URL
+        if let appSupportDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+            appSupport = appSupportDir
+        } else {
+            appSupport = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(&quot;Library/Application Support&quot;)
+        }
+        let radiantDir = appSupport.appendingPathComponent(&quot;RadiantDeployer&quot;)
+        
+        self.packageCacheDirectory = radiantDir.appendingPathComponent(&quot;packages&quot;)
+        self.seedsCacheDirectory = radiantDir.appendingPathComponent(&quot;seeds&quot;)
+        self.awsCliPath = env[&quot;AWS_CLI_PATH&quot;] ?? &quot;/usr/local/bin/aws&quot;
+        self.cdkCliPath = env[&quot;CDK_CLI_PATH&quot;] ?? &quot;/usr/local/bin/cdk&quot;
+        
+        self.networkTimeout = TimeInterval(env[&quot;RADIANT_NETWORK_TIMEOUT&quot;] ?? &quot;30&quot;) ?? 30
+        self.cdkDeploymentTimeout = TimeInterval(env[&quot;RADIANT_CDK_TIMEOUT&quot;] ?? &quot;3600&quot;) ?? 3600
+        self.healthCheckTimeout = TimeInterval(env[&quot;RADIANT_HEALTH_TIMEOUT&quot;] ?? &quot;60&quot;) ?? 60
+        
+        self.verboseLogging = env[&quot;RADIANT_VERBOSE&quot;] == &quot;true&quot;
+        self.dryRunMode = env[&quot;RADIANT_DRY_RUN&quot;] == &quot;true&quot;
+        
+        try? FileManager.default.createDirectory(at: packageCacheDirectory, withIntermediateDirectories: true)
+        try? FileManager.default.createDirectory(at: seedsCacheDirectory, withIntermediateDirectories: true)
+    }
+    
+    func releasesS3URI(path: String = &quot;&quot;) -&gt; String {
+        &quot;s3://\(releasesBucket)/\(path)&quot;
+    }
+    
+    func instanceBucket(appId: String, environment: String) -&gt; String {
+        &quot;radiant-\(appId)-\(environment)-deployments&quot;
+    }
+}
+
+// MARK: - Credential Sanitization
+
+extension RadiantConfig {
+    
+    static func sanitize(_ string: String) -&gt; String {
+        var result = string
+        
+        let patterns = [
+            &quot;A[KBS]IA[A-Z0-9]{16}&quot;,
+            &quot;[A-Za-z0-9/+=]{40}&quot;,
+            &quot;(?i)(api[_-]?key|apikey|secret|password|token)[\&quot;&#39;:\\s=]+[A-Za-z0-9/+=_-]{16,}&quot;,
+        ]
+        
+        for pattern in patterns {
+            if let regex = try? NSRegularExpression(pattern: pattern, options: []) {
+                result = regex.stringByReplacingMatches(
+                    in: result,
+                    range: NSRange(result.startIndex..., in: result),
+                    withTemplate: &quot;[REDACTED]&quot;
+                )
+            }
+        }
+        
+        return result
+    }
+    
+    static func sanitizeError(_ error: Error) -&gt; String {
+        sanitize(error.localizedDescription)
+    }
+}</code></pre>
+<hr />
+<h3 id="modelsdeployment.swift">4. Models/Deployment.swift</h3>
+<p><strong>Purpose</strong>: Deployment-related data models including progress tracking, results, and granular deployment state machine.</p>
+<pre class="swift"><code>import Foundation
+
+let RADIANT_VERSION = &quot;4.18.0&quot;
+
+struct DeploymentProgress: Identifiable, Sendable {
+    let id = UUID()
+    var phase: DeploymentPhase
+    var progress: Double
+    var currentStack: String?
+    var message: String?
+    var startedAt: Date
+    var estimatedCompletion: Date?
+}
+
+enum DeploymentPhase: String, CaseIterable, Sendable {
+    case idle = &quot;Idle&quot;
+    case validating = &quot;Validating Credentials&quot;
+    case bootstrapping = &quot;Bootstrapping CDK&quot;
+    case synthesizing = &quot;Synthesizing Stacks&quot;
+    case deployingFoundation = &quot;Deploying Foundation&quot;
+    case deployingNetworking = &quot;Deploying Networking&quot;
+    case deploySecurity = &quot;Deploying Security&quot;
+    case deployingData = &quot;Deploying Data Layer&quot;
+    case deployingAI = &quot;Deploying AI Services&quot;
+    case deployingAPI = &quot;Deploying API Layer&quot;
+    case deployingAdmin = &quot;Deploying Admin Dashboard&quot;
+    case runningMigrations = &quot;Running Migrations&quot;
+    case seedingData = &quot;Seeding Initial Data&quot;
+    case verifying = &quot;Verifying Deployment&quot;
+    case complete = &quot;Complete&quot;
+    case failed = &quot;Failed&quot;
+    
+    var progress: Double {
+        switch self {
+        case .idle: return 0.0
+        case .validating: return 0.05
+        case .bootstrapping: return 0.10
+        case .synthesizing: return 0.15
+        case .deployingFoundation: return 0.25
+        case .deployingNetworking: return 0.35
+        case .deploySecurity: return 0.45
+        case .deployingData: return 0.55
+        case .deployingAI: return 0.65
+        case .deployingAPI: return 0.75
+        case .deployingAdmin: return 0.85
+        case .runningMigrations: return 0.90
+        case .seedingData: return 0.95
+        case .verifying: return 0.98
+        case .complete: return 1.0
+        case .failed: return 0.0
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .idle: return &quot;circle&quot;
+        case .validating: return &quot;checkmark.shield&quot;
+        case .bootstrapping: return &quot;arrow.up.circle&quot;
+        case .synthesizing: return &quot;doc.text&quot;
+        case .deployingFoundation: return &quot;building&quot;
+        case .deployingNetworking: return &quot;network&quot;
+        case .deploySecurity: return &quot;lock.shield&quot;
+        case .deployingData: return &quot;cylinder&quot;
+        case .deployingAI: return &quot;cpu&quot;
+        case .deployingAPI: return &quot;server.rack&quot;
+        case .deployingAdmin: return &quot;rectangle.3.group&quot;
+        case .runningMigrations: return &quot;arrow.triangle.2.circlepath&quot;
+        case .seedingData: return &quot;leaf&quot;
+        case .verifying: return &quot;checkmark.circle&quot;
+        case .complete: return &quot;checkmark.circle.fill&quot;
+        case .failed: return &quot;xmark.circle.fill&quot;
+        }
+    }
+}
+
+struct DeploymentResult: Identifiable, Codable, Sendable {
+    let id: String
+    let appId: String
+    let environment: String
+    let version: String
+    let success: Bool
+    let startedAt: Date
+    let completedAt: Date
+    let outputs: DeploymentOutputs?
+    let errors: [String]?
+    
+    static func create(
+        appId: String,
+        environment: String,
+        success: Bool,
+        startedAt: Date,
+        outputs: DeploymentOutputs? = nil,
+        errors: [String]? = nil
+    ) -&gt; DeploymentResult {
+        DeploymentResult(
+            id: UUID().uuidString,
+            appId: appId,
+            environment: environment,
+            version: RADIANT_VERSION,
+            success: success,
+            startedAt: startedAt,
+            completedAt: Date(),
+            outputs: outputs,
+            errors: errors
+        )
+    }
+}
+
+struct DeploymentOutputs: Codable, Sendable {
+    let apiUrl: String
+    let graphqlUrl: String
+    let dashboardUrl: String
+    let cognitoUserPoolId: String
+    let cognitoClientId: String
+    let cognitoDomain: String
+    let auroraEndpoint: String
+    let s3MediaBucket: String
+    let cloudfrontDistribution: String
+}
+
+struct LogEntry: Identifiable, Sendable {
+    let id = UUID()
+    let timestamp: Date
+    let level: LogLevel
+    let message: String
+    let metadata: [String: String]?
+}
+
+enum LogLevel: String, Sendable, Codable {
+    case debug, info, warn, error, success
+    
+    var color: String {
+        switch self {
+        case .debug: return &quot;gray&quot;
+        case .info: return &quot;blue&quot;
+        case .warn: return &quot;orange&quot;
+        case .error: return &quot;red&quot;
+        case .success: return &quot;green&quot;
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .debug: return &quot;ant&quot;
+        case .info: return &quot;info.circle&quot;
+        case .warn: return &quot;exclamationmark.triangle&quot;
+        case .error: return &quot;xmark.circle&quot;
+        case .success: return &quot;checkmark.circle&quot;
+        }
+    }
+}
+
+// MARK: - Granular Deployment State
+
+enum PreparationStep: String, Sendable {
+    case validatingPackage = &quot;Validating Package&quot;
+    case checkingCompatibility = &quot;Checking Compatibility&quot;
+    case acquiringLock = &quot;Acquiring Deployment Lock&quot;
+    case loadingConfiguration = &quot;Loading Configuration&quot;
+}
+
+struct HealthCheckResult: Sendable, Identifiable {
+    let id = UUID()
+    let service: String
+    let status: HealthStatus
+    let responseTime: TimeInterval?
+    let message: String?
+    
+    enum HealthStatus: String, Sendable {
+        case healthy = &quot;Healthy&quot;
+        case unhealthy = &quot;Unhealthy&quot;
+        case timeout = &quot;Timeout&quot;
+        case pending = &quot;Pending&quot;
+    }
+}
+
+struct DeploymentFailure: Sendable {
+    let phase: String
+    let error: String
+    let technicalDetails: String?
+    let isRetryable: Bool
+    let timestamp: Date
+    
+    init(phase: String, error: Error, isRetryable: Bool = false) {
+        self.phase = phase
+        self.error = error.localizedDescription
+        self.technicalDetails = String(describing: error)
+        self.isRetryable = isRetryable
+        self.timestamp = Date()
+    }
+}
+
+struct RollbackResult: Sendable {
+    let success: Bool
+    let snapshotId: String?
+    let restoredVersion: String?
+    let duration: TimeInterval
+    let message: String
+}
+
+struct RollbackFailure: Sendable {
+    let error: String
+    let partiallyRestored: Bool
+    let recoverySteps: [String]
+}
+
+enum DeploymentState: Sendable {
+    case idle
+    case preparing(PreparationStep)
+    case creatingSnapshot(progress: Double)
+    case enablingMaintenance
+    case deployingInfrastructure(progress: Double, message: String)
+    case runningMigrations(current: Int, total: Int, stepName: String)
+    case deployingLambda(progress: Double)
+    case deployingDashboard(progress: Double)
+    case runningHealthChecks(results: [HealthCheckResult])
+    case disablingMaintenance
+    case verifying
+    case complete(DeploymentResult)
+    case failed(DeploymentFailure)
+    case cancelling(fromState: String)
+    case rollingBack(progress: Double, step: String)
+    case rolledBack(RollbackResult)
+    case rollbackFailed(RollbackFailure)
+    
+    var canCancel: Bool {
+        switch self {
+        case .idle, .complete, .failed, .cancelling, .rollingBack, .rolledBack, .rollbackFailed:
+            return false
+        case .preparing, .creatingSnapshot, .enablingMaintenance, .deployingInfrastructure,
+             .runningMigrations, .deployingLambda, .deployingDashboard, .runningHealthChecks,
+             .disablingMaintenance, .verifying:
+            return true
+        }
+    }
+    
+    var progress: Double {
+        switch self {
+        case .idle: return 0.0
+        case .preparing: return 0.05
+        case .creatingSnapshot(let p): return 0.05 + p * 0.10
+        case .enablingMaintenance: return 0.15
+        case .deployingInfrastructure(let p, _): return 0.15 + p * 0.40
+        case .runningMigrations(let c, let t, _): return 0.55 + (Double(c) / Double(max(t, 1))) * 0.15
+        case .deployingLambda(let p): return 0.70 + p * 0.10
+        case .deployingDashboard(let p): return 0.80 + p * 0.10
+        case .runningHealthChecks: return 0.90
+        case .disablingMaintenance: return 0.95
+        case .verifying: return 0.98
+        case .complete: return 1.0
+        case .failed: return 0.0
+        case .cancelling: return 0.0
+        case .rollingBack(let p, _): return p
+        case .rolledBack: return 1.0
+        case .rollbackFailed: return 0.0
+        }
+    }
+    
+    var displayName: String {
+        switch self {
+        case .idle: return &quot;Ready&quot;
+        case .preparing(let step): return step.rawValue
+        case .creatingSnapshot: return &quot;Creating Snapshot&quot;
+        case .enablingMaintenance: return &quot;Enabling Maintenance Mode&quot;
+        case .deployingInfrastructure(_, let msg): return msg.isEmpty ? &quot;Deploying Infrastructure&quot; : msg
+        case .runningMigrations(let c, let t, let name): return &quot;Migration \(c)/\(t): \(name)&quot;
+        case .deployingLambda: return &quot;Deploying Lambda Functions&quot;
+        case .deployingDashboard: return &quot;Deploying Admin Dashboard&quot;
+        case .runningHealthChecks: return &quot;Running Health Checks&quot;
+        case .disablingMaintenance: return &quot;Disabling Maintenance Mode&quot;
+        case .verifying: return &quot;Verifying Deployment&quot;
+        case .complete: return &quot;Deployment Complete&quot;
+        case .failed(let f): return &quot;Failed: \(f.phase)&quot;
+        case .cancelling(let from): return &quot;Cancelling (\(from))&quot;
+        case .rollingBack(_, let step): return &quot;Rolling Back: \(step)&quot;
+        case .rolledBack: return &quot;Rolled Back Successfully&quot;
+        case .rollbackFailed: return &quot;Rollback Failed&quot;
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .idle: return &quot;circle&quot;
+        case .preparing: return &quot;gearshape&quot;
+        case .creatingSnapshot: return &quot;camera&quot;
+        case .enablingMaintenance: return &quot;wrench.and.screwdriver&quot;
+        case .deployingInfrastructure: return &quot;building.2&quot;
+        case .runningMigrations: return &quot;arrow.triangle.2.circlepath&quot;
+        case .deployingLambda: return &quot;function&quot;
+        case .deployingDashboard: return &quot;rectangle.3.group&quot;
+        case .runningHealthChecks: return &quot;heart.text.square&quot;
+        case .disablingMaintenance: return &quot;checkmark.seal&quot;
+        case .verifying: return &quot;checkmark.shield&quot;
+        case .complete: return &quot;checkmark.circle.fill&quot;
+        case .failed: return &quot;xmark.circle.fill&quot;
+        case .cancelling: return &quot;stop.circle&quot;
+        case .rollingBack: return &quot;arrow.uturn.backward.circle&quot;
+        case .rolledBack: return &quot;arrow.uturn.backward.circle.fill&quot;
+        case .rollbackFailed: return &quot;exclamationmark.triangle.fill&quot;
+        }
+    }
+    
+    var isTerminal: Bool {
+        switch self {
+        case .complete, .failed, .rolledBack, .rollbackFailed:
+            return true
+        default:
+            return false
+        }
+    }
+}</code></pre>
+<hr />
+<h3 id="servicesaiassistantservice.swift">5. Services/AIAssistantService.swift</h3>
+<p><strong>Purpose</strong>: Claude API integration for intelligent deployment guidance. Provides error translation, recovery recommendations, and contextual explanations.</p>
+<pre class="swift"><code>import Foundation
+import Security
+
+/// AI Assistant Service for Claude API integration
+/// Provides intelligent deployment guidance and troubleshooting
+actor AIAssistantService {
+    
+    // MARK: - Types
+    
+    enum AIError: Error, LocalizedError {
+        case noApiKey
+        case invalidResponse
+        case networkError(String)
+        case rateLimited
+        case apiError(String)
+        
+        var errorDescription: String? {
+            switch self {
+            case .noApiKey:
+                return &quot;No API key configured. Add your Claude API key in Settings.&quot;
+            case .invalidResponse:
+                return &quot;Invalid response from AI service&quot;
+            case .networkError(let message):
+                return &quot;Network error: \(message)&quot;
+            case .rateLimited:
+                return &quot;Rate limited. Please wait a moment.&quot;
+            case .apiError(let message):
+                return &quot;AI API error: \(message)&quot;
+            }
+        }
+    }
+    
+    struct Message: Codable {
+        let role: String
+        let content: String
+    }
+    
+    struct ChatRequest: Codable {
+        let model: String
+        let max_tokens: Int
+        let messages: [Message]
+        let system: String?
+    }
+    
+    struct ChatResponse: Codable {
+        struct Content: Codable {
+            let type: String
+            let text: String
+        }
+        let id: String
+        let content: [Content]
+    }
+    
+    // MARK: - Properties
+    
+    private let keychainService = &quot;com.radiant.deployer&quot;
+    private let apiKeyAccount = &quot;claude-api-key&quot;
+    private let baseURL = &quot;https://api.anthropic.com/v1&quot;
+    private let model = &quot;claude-3-5-sonnet-20241022&quot;
+    
+    private var isConnected = false
+    private var lastConnectionCheck: Date?
+    private let connectionCheckInterval: TimeInterval = 60
+    
+    private let systemPrompt = &quot;&quot;&quot;
+    You are the RADIANT Deployer AI Assistant, helping users deploy and manage AWS infrastructure.
+    
+    Your capabilities:
+    - Explain deployment steps and configurations
+    - Troubleshoot deployment errors
+    - Recommend optimal tier configurations
+    - Explain AWS resource costs
+    - Guide users through credential setup
+    
+    Be concise, technical, and helpful. If you don&#39;t know something, say so.
+    Always prioritize security best practices.
+    &quot;&quot;&quot;
+    
+    // MARK: - Keychain Management
+    
+    func saveApiKey(_ apiKey: String) throws {
+        let data = apiKey.data(using: .utf8)!
+        
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: apiKeyAccount,
+        ]
+        
+        SecItemDelete(query as CFDictionary)
+        
+        var newQuery = query
+        newQuery[kSecValueData as String] = data
+        
+        let status = SecItemAdd(newQuery as CFDictionary, nil)
+        guard status == errSecSuccess else {
+            throw AIError.apiError(&quot;Failed to save API key: \(status)&quot;)
+        }
+    }
+    
+    func getApiKey() -&gt; String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: apiKeyAccount,
+            kSecReturnData as String: true,
+        ]
+        
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &amp;result)
+        
+        guard status == errSecSuccess,
+              let data = result as? Data,
+              let apiKey = String(data: data, encoding: .utf8) else {
+            return nil
+        }
+        
+        return apiKey
+    }
+    
+    func deleteApiKey() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: apiKeyAccount,
+        ]
+        SecItemDelete(query as CFDictionary)
+    }
+    
+    // MARK: - Chat Methods
+    
+    func sendMessage(_ message: String, context: [Message]?) async throws -&gt; String {
+        guard let apiKey = getApiKey() else {
+            throw AIError.noApiKey
+        }
+        
+        var messages = context ?? []
+        messages.append(Message(role: &quot;user&quot;, content: message))
+        
+        let request = ChatRequest(
+            model: model,
+            max_tokens: 1024,
+            messages: messages,
+            system: systemPrompt
+        )
+        
+        var urlRequest = URLRequest(url: URL(string: &quot;\(baseURL)/messages&quot;)!)
+        urlRequest.httpMethod = &quot;POST&quot;
+        urlRequest.setValue(&quot;application/json&quot;, forHTTPHeaderField: &quot;Content-Type&quot;)
+        urlRequest.setValue(apiKey, forHTTPHeaderField: &quot;x-api-key&quot;)
+        urlRequest.setValue(&quot;2023-06-01&quot;, forHTTPHeaderField: &quot;anthropic-version&quot;)
+        urlRequest.httpBody = try JSONEncoder().encode(request)
+        
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw AIError.invalidResponse
+        }
+        
+        if httpResponse.statusCode == 429 {
+            throw AIError.rateLimited
+        }
+        
+        guard httpResponse.statusCode == 200 else {
+            let errorMessage = String(data: data, encoding: .utf8) ?? &quot;Unknown error&quot;
+            throw AIError.apiError(errorMessage)
+        }
+        
+        let chatResponse = try JSONDecoder().decode(ChatResponse.self, from: data)
+        return chatResponse.content.first?.text ?? &quot;&quot;
+    }
+    
+    // MARK: - Specialized Methods
+    
+    struct ErrorTranslation: Sendable {
+        let userFriendlyMessage: String
+        let technicalDetails: String
+        let suggestedAction: String
+        let severity: String
+    }
+    
+    struct RecoveryRecommendation: Sendable {
+        let action: String
+        let confidence: Double
+        let reason: String
+        let steps: [String]
+        let alternativeActions: [String]
+    }
+    
+    struct AIAssessment: Sendable {
+        let riskLevel: String
+        let migrationComplexity: String
+        let estimatedDuration: String
+        let warnings: [String]
+        let recommendations: [String]
+    }
+    
+    func explain(context: String, event: String) async throws -&gt; String {
+        let prompt = &quot;&quot;&quot;
+        Explain this deployment event in plain language:
+        
+        Context: \(context)
+        Event: \(event)
+        
+        Keep the explanation concise (2-3 sentences) and user-friendly.
+        &quot;&quot;&quot;
+        
+        do {
+            return try await sendMessage(prompt, context: nil)
+        } catch {
+            return fallbackExplanation(for: event)
+        }
+    }
+    
+    func translateError(error: Error, context: String) async throws -&gt; ErrorTranslation {
+        // Implementation with fallback...
+    }
+    
+    func recommendRecovery(failure: String, snapshotAvailable: Bool) async throws -&gt; RecoveryRecommendation {
+        // Implementation with fallback...
+    }
+    
+    func assessDeployment(packageVersion: String, currentVersions: [String: String]) async throws -&gt; AIAssessment {
+        // Implementation with fallback...
+    }
+    
+    // MARK: - Fallback Methods
+    
+    func fallbackExplanation(for event: String) -&gt; String {
+        switch event.lowercased() {
+        case let e where e.contains(&quot;snapshot&quot;):
+            return &quot;Creating a backup of current system state before making changes.&quot;
+        case let e where e.contains(&quot;migration&quot;):
+            return &quot;Applying database schema changes to update the system.&quot;
+        case let e where e.contains(&quot;health&quot;):
+            return &quot;Verifying all services are responding correctly after deployment.&quot;
+        case let e where e.contains(&quot;maintenance&quot;):
+            return &quot;Temporarily pausing user requests to safely apply updates.&quot;
+        case let e where e.contains(&quot;rollback&quot;):
+            return &quot;Reverting to the previous system state due to an issue.&quot;
+        default:
+            return &quot;Processing deployment step: \(event)&quot;
+        }
+    }
+}
+
+extension AIAssistantService {
+    static let shared = AIAssistantService()
+}</code></pre>
+<hr />
+<h3 id="servicesdeploymentservice.swift-excerpt">6. Services/DeploymentService.swift (excerpt)</h3>
+<p><strong>Purpose</strong>: Core deployment orchestration. Handles mode detection (install/update/rollback), execution, snapshot management, and parameter merging.</p>
+<pre class="swift"><code>// RADIANT v4.18.0 - Deployment Service
+// Handles deployment mode detection, execution, and snapshot management
+
+import Foundation
+
+enum DeploymentError: Error, LocalizedError {
+    case noCredentials
+    case instanceNotFound
+    case snapshotNotFound(String)
+    case invalidSnapshot(String)
+    case invalidConfiguration(String)
+    case parameterValidationFailed(String)
+    case infrastructureDeploymentFailed(String)
+    case migrationFailed(String)
+    case rollbackFailed(String)
+    case networkError(Error)
+    case packageNotFound(String)
+    case integrityCheckFailed
+    case verificationFailed(String)
+    case commandFailed(String, Int)
+    
+    var errorDescription: String? {
+        switch self {
+        case .noCredentials: return &quot;No AWS credentials configured&quot;
+        case .instanceNotFound: return &quot;No existing Radiant instance found&quot;
+        case .snapshotNotFound(let id): return &quot;Snapshot not found: \(id)&quot;
+        case .invalidSnapshot(let reason): return &quot;Invalid snapshot: \(reason)&quot;
+        case .invalidConfiguration(let reason): return &quot;Invalid configuration: \(reason)&quot;
+        case .parameterValidationFailed(let reason): return &quot;Parameter validation failed: \(reason)&quot;
+        case .infrastructureDeploymentFailed(let reason): return &quot;Infrastructure deployment failed: \(reason)&quot;
+        case .migrationFailed(let reason): return &quot;Database migration failed: \(reason)&quot;
+        case .rollbackFailed(let reason): return &quot;Rollback failed: \(reason)&quot;
+        case .networkError(let error): return &quot;Network error: \(error.localizedDescription)&quot;
+        case .packageNotFound(let version): return &quot;Deployment package not found: \(version)&quot;
+        case .integrityCheckFailed: return &quot;Package integrity check failed&quot;
+        case .verificationFailed(let reason): return &quot;Verification failed: \(reason)&quot;
+        case .commandFailed(let command, let exitCode): return &quot;Command &#39;\(command)&#39; failed with exit code \(exitCode)&quot;
+        }
+    }
+}
+
+enum MigrationMode: Sendable {
+    case fresh       // Run ALL migrations (install)
+    case incremental // Run only new migrations (update)
+}
+
+actor DeploymentService {
+    
+    private let awsService: AWSService
+    private let cdkService: CDKService
+    private let credentialService: CredentialService
+    private var packageService: PackageService?
+    
+    init() {
+        self.awsService = AWSService()
+        self.cdkService = CDKService()
+        self.credentialService = CredentialService()
+    }
+    
+    // MARK: - Mode Detection
+    
+    func determineDeploymentMode(
+        app: ManagedApp,
+        environment: DeployEnvironment,
+        targetVersion: String? = nil
+    ) async throws -&gt; DeploymentMode {
+        
+        let instanceExists = try await checkInstanceExists(app: app, environment: environment)
+        
+        if !instanceExists {
+            return .install
+        }
+        
+        let currentVersion = try await fetchCurrentVersion(app: app, environment: environment)
+        let target = targetVersion ?? RADIANT_VERSION
+        
+        if compareVersions(target, currentVersion) &gt; 0 {
+            return .update
+        } else if compareVersions(target, currentVersion) &lt; 0 {
+            return .rollback
+        } else {
+            return .update
+        }
+    }
+    
+    // MARK: - Install Mode Execution
+    
+    func executeInstall(
+        app: ManagedApp,
+        environment: DeployEnvironment,
+        package: DeploymentPackage,
+        credentials: CredentialSet,
+        onProgress: @escaping @Sendable (DeploymentProgress) -&gt; Void
+    ) async throws -&gt; DeploymentExecutionResult {
+        let startTime = Date()
+        
+        // STEP 1: Use DEFAULT parameters
+        let envStatus = app.environments[environment]
+        let tier = TierLevel(rawValue: envStatus.tier) ?? .seed
+        let parameters = InstallationParameters.defaults(
+            appId: app.id,
+            environment: environment,
+            tier: tier
+        )
+        
+        // STEP 2: Deploy infrastructure with defaults
+        try await deployInfrastructure(
+            app: app,
+            environment: environment,
+            package: package,
+            parameters: parameters,
+            credentials: credentials,
+            onProgress: onProgress
+        )
+        
+        // STEP 3: Run initial migrations (creates tables)
+        try await runMigrations(
+            package: package,
+            mode: .fresh,
+            fromVersion: nil,
+            onProgress: onProgress
+        )
+        
+        // STEP 4: SEED the AI Registry (ONLY on fresh install)
+        try await seedAIRegistry(
+            package: package,
+            onProgress: onProgress
+        )
+        
+        // STEP 5: Create initial admin user
+        try await createInitialAdmin(
+            app: app,
+            environment: environment,
+            onProgress: onProgress
+        )
+        
+        // STEP 6: Verify deployment
+        let outputs = try await verifyDeployment(app: app, environment: environment)
+        
+        return DeploymentExecutionResult(
+            mode: .install,
+            success: true,
+            version: package.manifest.version,
+            rollbackSnapshotId: nil,
+            outputs: outputs,
+            errors: nil,
+            duration: Date().timeIntervalSince(startTime)
+        )
+    }
+    
+    // MARK: - Update Mode Execution
+    
+    func executeUpdate(
+        app: ManagedApp,
+        environment: DeployEnvironment,
+        package: DeploymentPackage,
+        credentials: CredentialSet,
+        userChanges: ParameterChanges?,
+        onProgress: @escaping @Sendable (DeploymentProgress) -&gt; Void
+    ) async throws -&gt; DeploymentExecutionResult {
+        let startTime = Date()
+        
+        // STEP 1: READ current parameters FROM the running instance
+        let currentParameters = try await fetchCurrentParameters(
+            app: app,
+            environment: environment,
+            credentials: credentials
+        )
+        
+        // STEP 2: Create snapshot for rollback capability
+        let snapshotId = try await createPreUpdateSnapshot(
+            app: app,
+            environment: environment,
+            currentParameters: currentParameters,
+            package: package
+        )
+        
+        // STEP 3: MERGE user changes with current parameters
+        let updatedParameters = mergeParameters(
+            current: currentParameters,
+            changes: userChanges
+        )
+        
+        // STEP 4: Validate parameter changes are safe
+        try validateParameterChanges(
+            from: currentParameters,
+            to: updatedParameters,
+            package: package
+        )
+        
+        // STEP 5: Deploy infrastructure with MERGED parameters
+        try await deployInfrastructure(
+            app: app,
+            environment: environment,
+            package: package,
+            parameters: updatedParameters.toInstallationParameters(),
+            credentials: credentials,
+            onProgress: onProgress
+        )
+        
+        // STEP 6: Run INCREMENTAL migrations (NOT fresh)
+        try await runMigrations(
+            package: package,
+            mode: .incremental,
+            fromVersion: currentParameters.version,
+            onProgress: onProgress
+        )
+        
+        // STEP 7: DO NOT seed AI Registry (preserve admin customizations)
+        
+        // STEP 8: Verify deployment
+        let outputs = try await verifyDeployment(app: app, environment: environment)
+        
+        return DeploymentExecutionResult(
+            mode: .update,
+            success: true,
+            version: package.manifest.version,
+            rollbackSnapshotId: snapshotId,
+            outputs: outputs,
+            errors: nil,
+            duration: Date().timeIntervalSince(startTime)
+        )
+    }
+    
+    // MARK: - Rollback Mode Execution
+    
+    func executeRollback(
+        app: ManagedApp,
+        environment: DeployEnvironment,
+        targetSnapshotId: String,
+        credentials: CredentialSet,
+        onProgress: @escaping @Sendable (DeploymentProgress) -&gt; Void
+    ) async throws -&gt; DeploymentExecutionResult {
+        // Load snapshot, validate, create safety snapshot, deploy with snapshot params
+        // ...
+    }
+    
+    // MARK: - Validation
+    
+    private func validateParameterChanges(
+        from current: InstanceParameters,
+        to updated: InstanceParameters,
+        package: DeploymentPackage
+    ) throws {
+        // Cannot change region after install
+        if current.region != updated.region {
+            throw DeploymentError.parameterValidationFailed(
+                &quot;Region cannot be changed after initial installation.&quot;
+            )
+        }
+        
+        // Cannot downgrade tier below what features require
+        if updated.enableSelfHostedModels &amp;&amp; updated.tier &lt; .growth {
+            throw DeploymentError.parameterValidationFailed(
+                &quot;Self-hosted models require GROWTH tier or higher&quot;
+            )
+        }
+        
+        if updated.enableMultiRegion &amp;&amp; updated.tier &lt; .scale {
+            throw DeploymentError.parameterValidationFailed(
+                &quot;Multi-region requires SCALE tier or higher&quot;
+            )
+        }
+        
+        // Validate Aurora capacity
+        if updated.auroraMinCapacity &gt; updated.auroraMaxCapacity {
+            throw DeploymentError.parameterValidationFailed(
+                &quot;Aurora min capacity cannot exceed max capacity&quot;
+            )
+        }
+    }
+}</code></pre>
+<hr />
+<h2 id="additional-files-summary">Additional Files (Summary)</h2>
+<p>Due to the size of this export, the remaining Swift files are summarized below:</p>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 31%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Lines</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AWSService.swift</code></td>
+<td>~400</td>
+<td>AWS SDK wrapper for EC2, S3, RDS, CloudFormation</td>
+</tr>
+<tr>
+<td><code>CDKService.swift</code></td>
+<td>~300</td>
+<td>CDK CLI wrapper for synth/deploy/destroy</td>
+</tr>
+<tr>
+<td><code>CredentialService.swift</code></td>
+<td>~250</td>
+<td>1Password and AWS credential management</td>
+</tr>
+<tr>
+<td><code>PackageService.swift</code></td>
+<td>~350</td>
+<td>Deployment package download and verification</td>
+</tr>
+<tr>
+<td><code>SnapshotService.swift</code></td>
+<td>~200</td>
+<td>Snapshot creation and restoration</td>
+</tr>
+<tr>
+<td><code>HealthCheckService.swift</code></td>
+<td>~150</td>
+<td>Service health verification</td>
+</tr>
+<tr>
+<td><code>LocalStorageManager.swift</code></td>
+<td>~200</td>
+<td>SQLCipher encrypted local storage</td>
+</tr>
+<tr>
+<td><code>TimeoutService.swift</code></td>
+<td>~100</td>
+<td>Operation timeout management</td>
+</tr>
+<tr>
+<td><code>MultiRegionService.swift</code></td>
+<td>~250</td>
+<td>Multi-region deployment coordination</td>
+</tr>
+<tr>
+<td><code>SeedDataService.swift</code></td>
+<td>~300</td>
+<td>AI Registry seeding</td>
+</tr>
+<tr>
+<td><code>DNSService.swift</code></td>
+<td>~150</td>
+<td>Route 53 DNS management</td>
+</tr>
+<tr>
+<td><code>DatabaseService.swift</code></td>
+<td>~200</td>
+<td>Aurora PostgreSQL operations</td>
+</tr>
+<tr>
+<td><code>AIRegistryService.swift</code></td>
+<td>~400</td>
+<td>AI model registry management</td>
+</tr>
+<tr>
+<td><code>Configuration.swift</code></td>
+<td>~150</td>
+<td>Configuration model</td>
+</tr>
+<tr>
+<td><code>Credentials.swift</code></td>
+<td>~100</td>
+<td>Credential models</td>
+</tr>
+<tr>
+<td><code>InstallationParameters.swift</code></td>
+<td>~200</td>
+<td>Installation parameter models</td>
+</tr>
+<tr>
+<td><code>ManagedApp.swift</code></td>
+<td>~150</td>
+<td>Managed app model</td>
+</tr>
+<tr>
+<td><code>DomainConfiguration.swift</code></td>
+<td>~100</td>
+<td>Domain configuration</td>
+</tr>
+<tr>
+<td><code>MacOSComponents.swift</code></td>
+<td>~300</td>
+<td>Design tokens and components</td>
+</tr>
+<tr>
+<td><code>AppCommands.swift</code></td>
+<td>~150</td>
+<td>Menu bar commands</td>
+</tr>
+<tr>
+<td><code>DataTableComponents.swift</code></td>
+<td>~200</td>
+<td>Table/list components</td>
+</tr>
+<tr>
+<td><code>DetailViewComponents.swift</code></td>
+<td>~150</td>
+<td>Detail view patterns</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>This concludes the Swift Deployer App source export. See other export files for remaining components.</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

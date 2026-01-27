@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 09 DEPLOYMENT GUIDE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 09 DEPLOYMENT GUIDE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-09-DEPLOYMENT-GUIDE.md</div>
+  </div>
+  
+  <h1 id="section-9-assembly-deployment-guide-v2.2.0">SECTION 9: ASSEMBLY &amp; DEPLOYMENT GUIDE (v2.2.0)</h1>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<blockquote>
+<p><strong>Dependencies:</strong> ALL previous sections <strong>Provides:</strong> Verification steps, testing procedures, troubleshooting</p>
+</blockquote>
+<hr />
+<h1 id="radiant-v2.2.0---prompt-9-assembly-deployment-guide">RADIANT v2.2.0 - Prompt 9: Assembly &amp; Deployment Guide</h1>
+<blockquote>
+<p><strong>Prompt 9 of 9</strong> | Target Size: ~15KB | Version: 3.7.0 | December 2024</p>
+</blockquote>
+<hr />
+<h2 id="overview">OVERVIEW</h2>
+<p>This is the final prompt in the 9-part RADIANT series. This prompt provides:</p>
+<ol type="1">
+<li><strong>Project Assembly</strong> - How to combine all components from Prompts 1-8</li>
+<li><strong>Deployment Checklist</strong> - Pre-deployment, deployment, and post-deployment steps</li>
+<li><strong>Testing Procedures</strong> - Integration tests, smoke tests, compliance verification</li>
+<li><strong>Success Criteria</strong> - What constitutes a successful deployment</li>
+<li><strong>Troubleshooting Guide</strong> - Common issues and solutions</li>
+<li><strong>Version History</strong> - Changelog and upgrade notes</li>
+</ol>
+<hr />
+<h2 id="prompt-series-recap">PROMPT SERIES RECAP</h2>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 22%" />
+<col style="width: 22%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Prompt</th>
+<th>Component</th>
+<th>Est. Size</th>
+<th>Key Deliverables</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Foundation &amp; Swift App</td>
+<td>~50KB</td>
+<td>Monorepo structure, Swift macOS deployment app</td>
+</tr>
+<tr>
+<td>2</td>
+<td>CDK Infrastructure</td>
+<td>~45KB</td>
+<td>VPC, Aurora, DynamoDB, S3, KMS, WAF</td>
+</tr>
+<tr>
+<td>3</td>
+<td>CDK AI &amp; API Stacks</td>
+<td>~50KB</td>
+<td>Cognito, LiteLLM, API Gateway, AppSync</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Lambda Core</td>
+<td>~60KB</td>
+<td>Router, Chat, Models, Providers, PHI</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Lambda Admin &amp; Billing</td>
+<td>~55KB</td>
+<td>Invitations, Approvals, Metering, Billing</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Self-Hosted Models</td>
+<td>~75KB</td>
+<td>30+ SageMaker models, Thermal states, Mid-level services</td>
+</tr>
+<tr>
+<td>7</td>
+<td>External Providers &amp; DB</td>
+<td>~85KB</td>
+<td>21 providers, PostgreSQL schema, DynamoDB tables</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Admin Dashboard</td>
+<td>~85KB</td>
+<td>Next.js 14 dashboard, all management UIs</td>
+</tr>
+<tr>
+<td><strong>9</strong></td>
+<td><strong>Assembly &amp; Deployment</strong></td>
+<td><strong>~15KB</strong></td>
+<td><strong>This guide</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total Implementation: ~520KB of implementation prompts</strong></p>
+<hr />
+<h2 id="part-1-project-assembly">PART 1: PROJECT ASSEMBLY</h2>
+<h3 id="directory-structure-after-all-prompts">1.1 Directory Structure After All Prompts</h3>
+<p>After executing Prompts 1-8 in sequence, your project should have this structure:</p>
+<pre><code>radiant/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ README.md
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ package.json
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pnpm-workspace.yaml
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tsconfig.base.json
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ .gitignore
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ .nvmrc
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ packages/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ shared/                           # From Prompt 1
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ package.json
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tsconfig.json
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ src/
+Ã¢â€â€š   Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š   Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ types/
+Ã¢â€â€š   Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ constants/
+Ã¢â€â€š   Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ utils/
+Ã¢â€â€š   Ã¢â€â€š
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ infrastructure/                   # From Prompts 2-3
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ package.json
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tsconfig.json
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ cdk.json
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ bin/
+Ã¢â€â€š       Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ radiant.ts
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ lib/
+Ã¢â€â€š           Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ stacks/
+Ã¢â€â€š           Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ foundation-stack.ts
+Ã¢â€â€š           Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ networking-stack.ts
+Ã¢â€â€š           Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ security-stack.ts
+Ã¢â€â€š           Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ data-stack.ts
+Ã¢â€â€š           Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ storage-stack.ts
+Ã¢â€â€š           Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ auth-stack.ts
+Ã¢â€â€š           Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ai-stack.ts
+Ã¢â€â€š           Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api-stack.ts
+Ã¢â€â€š           Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ admin-stack.ts
+Ã¢â€â€š           Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ constructs/
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ functions/                            # From Prompts 4-5
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ router/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ chat/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ models/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ providers/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ phi-service/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ admin-invitations/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ admin-approvals/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ billing-metering/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ thermal-manager/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ model-sync/
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ index.ts
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ config/                               # From Prompts 6-7
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ litellm/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ config.yaml
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ self-hosted-config.yaml
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ models/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ external-providers.json
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ self-hosted-models.json
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ sagemaker/
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ endpoint-configs/
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ migrations/                           # From Prompt 7
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 001_initial_schema.sql
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 002_rls_policies.sql
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 003_model_registry.sql
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 004_billing_tables.sql
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ 005_admin_tables.sql
+Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ apps/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ swift-deployer/                   # From Prompt 1
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ RadiantAdmin.xcodeproj
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ RadiantAdmin/
+Ã¢â€â€š   Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ App/
+Ã¢â€â€š   Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Views/
+Ã¢â€â€š   Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Services/
+Ã¢â€â€š   Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Models/
+Ã¢â€â€š   Ã¢â€â€š
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ admin-dashboard/                  # From Prompt 8
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ package.json
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ next.config.js
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tailwind.config.js
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ app/
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ components/
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ lib/
+Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ docs/
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ architecture.md
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api-reference.md
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ deployment-guide.md
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ troubleshooting.md</code></pre>
+<h3 id="assembly-verification">1.2 Assembly Verification</h3>
+<p>Run these commands to verify all components are in place:</p>
+<pre class="bash"><code># Navigate to project root
+cd radiant
+
+# Verify structure
+echo &quot;Checking project structure...&quot;
+ls -la packages/shared/src/types/
+ls -la packages/infrastructure/lib/stacks/
+ls -la functions/
+ls -la apps/swift-deployer/
+ls -la apps/admin-dashboard/app/
+ls -la migrations/
+
+# Install dependencies
+pnpm install
+
+# Build shared package
+cd packages/shared &amp;&amp; pnpm build &amp;&amp; cd ../..
+
+# Verify CDK synthesizes
+cd packages/infrastructure
+npx cdk synth --context environment=dev --context tier=1
+cd ../..
+
+# Build admin dashboard
+cd apps/admin-dashboard &amp;&amp; pnpm build &amp;&amp; cd ../..
+
+echo &quot;Assembly verification complete!&quot;</code></pre>
+<hr />
+<h2 id="part-2-deployment-checklist">PART 2: DEPLOYMENT CHECKLIST</h2>
+<h3 id="pre-deployment-requirements">2.1 Pre-Deployment Requirements</h3>
+<h4 id="aws-account-setup">AWS Account Setup</h4>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 22%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Action</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AWS Account</td>
+<td>Create or use existing</td>
+<td>Account ID available</td>
+</tr>
+<tr>
+<td>IAM User</td>
+<td>Create with AdministratorAccess</td>
+<td>Access keys generated</td>
+</tr>
+<tr>
+<td>AWS CLI</td>
+<td>Install and configure</td>
+<td><code>aws sts get-caller-identity</code></td>
+</tr>
+<tr>
+<td>Route 53 Domain (optional)</td>
+<td>Register or transfer domain</td>
+<td>Domain in hosted zone</td>
+</tr>
+<tr>
+<td>ACM Certificate (optional)</td>
+<td>Request in us-east-1</td>
+<td>Certificate validated</td>
+</tr>
+<tr>
+<td>BAA (HIPAA)</td>
+<td>Sign via AWS Artifact</td>
+<td>BAA confirmed</td>
+</tr>
+</tbody>
+</table>
+<h4 id="development-environment">Development Environment</h4>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Version</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node.js</td>
+<td>20.x LTS</td>
+<td><code>node --version</code></td>
+</tr>
+<tr>
+<td>pnpm</td>
+<td>8.x+</td>
+<td><code>pnpm --version</code></td>
+</tr>
+<tr>
+<td>AWS CDK CLI</td>
+<td>2.x</td>
+<td><code>cdk --version</code></td>
+</tr>
+<tr>
+<td>Xcode</td>
+<td>15.x+</td>
+<td><code>xcode-select -p</code></td>
+</tr>
+<tr>
+<td>Swift</td>
+<td>5.9+</td>
+<td><code>swift --version</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="aws-service-quotas">AWS Service Quotas</h4>
+<p>Verify these quotas before deployment (request increases if needed):</p>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Quota</th>
+<th>Required Minimum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VPC</td>
+<td>VPCs per region</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Aurora</td>
+<td>DB clusters</td>
+<td>3 (per environment)</td>
+</tr>
+<tr>
+<td>Lambda</td>
+<td>Concurrent executions</td>
+<td>1,000</td>
+</tr>
+<tr>
+<td>API Gateway</td>
+<td>APIs per region</td>
+<td>10</td>
+</tr>
+<tr>
+<td>SageMaker</td>
+<td>Endpoint instances</td>
+<td>20 (Tier 3+)</td>
+</tr>
+<tr>
+<td>Secrets Manager</td>
+<td>Secrets</td>
+<td>100</td>
+</tr>
+<tr>
+<td>KMS</td>
+<td>CMKs</td>
+<td>50</td>
+</tr>
+</tbody>
+</table>
+<h3 id="deployment-phases">2.2 Deployment Phases</h3>
+<h4 id="phase-1-bootstrap-foundation-15-25-minutes">Phase 1: Bootstrap &amp; Foundation (15-25 minutes)</h4>
+<pre class="bash"><code># 1. Bootstrap CDK (one-time per account/region)
+cd packages/infrastructure
+cdk bootstrap aws://ACCOUNT_ID/us-east-1 --qualifier radiant
+
+# 2. Deploy Foundation Stack
+cdk deploy Radiant-dev-Foundation \
+  --context environment=dev \
+  --context tier=1 \
+  --require-approval never
+
+# 3. Deploy Networking Stack
+cdk deploy Radiant-dev-Networking \
+  --context environment=dev \
+  --context tier=1 \
+  --require-approval never</code></pre>
+<p><strong>Verification:</strong> - [ ] S3 deployment bucket created - [ ] VPC created with correct CIDR - [ ] Subnets in 3 AZs - [ ] NAT Gateway(s) active - [ ] VPC endpoints created</p>
+<h4 id="phase-2-security-data-15-25-minutes">Phase 2: Security &amp; Data (15-25 minutes)</h4>
+<pre class="bash"><code># 4. Deploy Security Stack
+cdk deploy Radiant-dev-Security \
+  --context environment=dev \
+  --context tier=1 \
+  --require-approval never
+
+# 5. Deploy Data Stack
+cdk deploy Radiant-dev-Data \
+  --context environment=dev \
+  --context tier=1 \
+  --require-approval never
+
+# 6. Deploy Storage Stack
+cdk deploy Radiant-dev-Storage \
+  --context environment=dev \
+  --context tier=1 \
+  --require-approval never</code></pre>
+<p><strong>Verification:</strong> - [ ] KMS CMK created - [ ] Secrets Manager secrets created - [ ] Aurora cluster available - [ ] DynamoDB tables created - [ ] S3 buckets created with encryption</p>
+<h4 id="phase-3-auth-ai-20-30-minutes">Phase 3: Auth &amp; AI (20-30 minutes)</h4>
+<pre class="bash"><code># 7. Deploy Auth Stack
+cdk deploy Radiant-dev-Auth \
+  --context environment=dev \
+  --context tier=1 \
+  --require-approval never
+
+# 8. Deploy AI Stack
+cdk deploy Radiant-dev-AI \
+  --context environment=dev \
+  --context tier=1 \
+  --require-approval never</code></pre>
+<p><strong>Verification:</strong> - [ ] Cognito User Pool created - [ ] Cognito Admin Pool created - [ ] LiteLLM ECS service running - [ ] SageMaker endpoints active (Tier 3+)</p>
+<h4 id="phase-4-api-admin-15-20-minutes">Phase 4: API &amp; Admin (15-20 minutes)</h4>
+<pre class="bash"><code># 9. Deploy API Stack
+cdk deploy Radiant-dev-API \
+  --context environment=dev \
+  --context tier=1 \
+  --require-approval never
+
+# 10. Deploy Admin Stack
+cdk deploy Radiant-dev-Admin \
+  --context environment=dev \
+  --context tier=1 \
+  --require-approval never</code></pre>
+<p><strong>Verification:</strong> - [ ] API Gateway deployed - [ ] AppSync API created - [ ] Lambda functions deployed - [ ] CloudFront distribution active - [ ] Admin dashboard accessible</p>
+<h4 id="phase-5-database-migrations-5-10-minutes">Phase 5: Database Migrations (5-10 minutes)</h4>
+<pre class="bash"><code># Run migrations
+cd ../../
+npm run db:migrate -- --environment=dev
+
+# Verify schema
+npm run db:verify -- --environment=dev</code></pre>
+<p><strong>Verification:</strong> - [ ] All migrations applied - [ ] RLS policies active - [ ] Indexes created - [ ] Seed data loaded</p>
+<h3 id="post-deployment-configuration">2.3 Post-Deployment Configuration</h3>
+<h4 id="create-first-super-admin">Create First Super Admin</h4>
+<pre class="bash"><code># Via CLI
+aws cognito-idp admin-create-user \
+  --user-pool-id YOUR_ADMIN_POOL_ID \
+  --username admin@YOUR_DOMAIN.com \
+  --user-attributes Name=email,Value=admin@YOUR_DOMAIN.com \
+  --temporary-password TempPass123! \
+  --message-action SUPPRESS
+
+aws cognito-idp admin-add-user-to-group \
+  --user-pool-id YOUR_ADMIN_POOL_ID \
+  --username admin@YOUR_DOMAIN.com \
+  --group-name super_admin</code></pre>
+<h4 id="configure-ai-providers">Configure AI Providers</h4>
+<ol type="1">
+<li>Navigate to Admin Dashboard Ã¢â€ â€™ Providers</li>
+<li>Add API keys for each external provider:
+<ul>
+<li>OpenAI</li>
+<li>Anthropic</li>
+<li>Google AI</li>
+<li>xAI (Grok)</li>
+<li>DeepSeek</li>
+<li>Others as needed</li>
+</ul></li>
+<li>Verify provider connectivity with test requests</li>
+</ol>
+<h4 id="set-pricing-configuration">Set Pricing Configuration</h4>
+<ol type="1">
+<li>Navigate to Admin Dashboard Ã¢â€ â€™ Billing Ã¢â€ â€™ Pricing</li>
+<li>Review default markup:
+<ul>
+<li>External providers: 40%</li>
+<li>Self-hosted models: 75%</li>
+</ul></li>
+<li>Adjust per-model pricing if needed</li>
+<li>Configure billing thresholds and alerts</li>
+</ol>
+<hr />
+<h2 id="part-3-testing-procedures">PART 3: TESTING PROCEDURES</h2>
+<h3 id="smoke-tests">3.1 Smoke Tests</h3>
+<p>Run immediately after deployment:</p>
+<pre class="bash"><code># API Health Check
+curl https://YOUR_API_ENDPOINT/health
+# Expected: {&quot;status&quot;:&quot;healthy&quot;,&quot;version&quot;:&quot;2.2.0&quot;}
+
+# GraphQL Introspection
+curl -X POST https://YOUR_GRAPHQL_ENDPOINT/graphql \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#39;{&quot;query&quot;:&quot;{ __schema { types { name } } }&quot;}&#39;
+
+# LiteLLM Health
+curl https://YOUR_LITELLM_ENDPOINT/health
+# Expected: {&quot;status&quot;:&quot;healthy&quot;}
+
+# Admin Dashboard
+curl -I https://YOUR_ADMIN_DOMAIN
+# Expected: HTTP/2 200</code></pre>
+<h3 id="integration-tests">3.2 Integration Tests</h3>
+<pre class="bash"><code># Run full integration test suite
+npm run test:integration -- --environment=dev
+
+# Individual test suites
+npm run test:auth       # Authentication flows
+npm run test:models     # Model registry CRUD
+npm run test:chat       # Chat completions
+npm run test:billing    # Metering and billing
+npm run test:admin      # Admin workflows</code></pre>
+<h3 id="end-to-end-test-scenarios">3.3 End-to-End Test Scenarios</h3>
+<h4 id="scenario-1-user-registration-ãâ-â-chat-completion">Scenario 1: User Registration Ã¢â€ â€™ Chat Completion</h4>
+<ol type="1">
+<li>Register new user via Cognito</li>
+<li>Verify email and set MFA</li>
+<li>Login and get access token</li>
+<li>Create chat session</li>
+<li>Send message with model selection</li>
+<li>Verify response received</li>
+<li>Verify usage metered</li>
+</ol>
+<h4 id="scenario-2-admin-invitation-ãâ-â-two-person-approval">Scenario 2: Admin Invitation Ã¢â€ â€™ Two-Person Approval</h4>
+<ol type="1">
+<li>Super admin creates invitation</li>
+<li>Invitee receives email</li>
+<li>Invitee accepts and creates account</li>
+<li>Invitee logs in to admin dashboard</li>
+<li>Invitee requests production action</li>
+<li>First admin approves</li>
+<li>Second admin approves</li>
+<li>Action executes</li>
+</ol>
+<h4 id="scenario-3-self-hosted-model-warm-up-tier-3">Scenario 3: Self-Hosted Model Warm-Up (Tier 3+)</h4>
+<ol type="1">
+<li>Verify model in COLD state</li>
+<li>Send warm-up request</li>
+<li>Verify transition to WARM state</li>
+<li>Monitor endpoint scaling</li>
+<li>Verify inference works</li>
+<li>Test auto-cooling after inactivity</li>
+</ol>
+<h3 id="compliance-verification">3.4 Compliance Verification</h3>
+<h4 id="hipaa-technical-safeguards">HIPAA Technical Safeguards</h4>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Test</th>
+<th>Pass Criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Access Control</td>
+<td>Verify MFA required</td>
+<td>All production users have MFA</td>
+</tr>
+<tr>
+<td>Audit Controls</td>
+<td>Check CloudTrail</td>
+<td>All API calls logged</td>
+</tr>
+<tr>
+<td>Integrity</td>
+<td>Verify log integrity</td>
+<td>File validation enabled</td>
+</tr>
+<tr>
+<td>Transmission</td>
+<td>Test TLS</td>
+<td>TLS 1.3 only</td>
+</tr>
+<tr>
+<td>Encryption</td>
+<td>Check KMS</td>
+<td>Per-tenant CMKs active</td>
+</tr>
+<tr>
+<td>PHI Handling</td>
+<td>Test sanitization</td>
+<td>PHI redacted correctly</td>
+</tr>
+</tbody>
+</table>
+<h4 id="soc-2-controls">SOC 2 Controls</h4>
+<table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Test</th>
+<th>Pass Criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CC1</td>
+<td>Policy review</td>
+<td>Policies documented</td>
+</tr>
+<tr>
+<td>CC2</td>
+<td>Communication</td>
+<td>Alert channels configured</td>
+</tr>
+<tr>
+<td>CC3</td>
+<td>Risk assessment</td>
+<td>Findings documented</td>
+</tr>
+<tr>
+<td>CC4</td>
+<td>Monitoring</td>
+<td>Dashboards active</td>
+</tr>
+<tr>
+<td>CC5</td>
+<td>Control activities</td>
+<td>Approvals working</td>
+</tr>
+<tr>
+<td>CC6</td>
+<td>Logical access</td>
+<td>RLS verified</td>
+</tr>
+<tr>
+<td>CC7</td>
+<td>System operations</td>
+<td>Health checks passing</td>
+</tr>
+<tr>
+<td>CC8</td>
+<td>Change management</td>
+<td>CI/CD with approvals</td>
+</tr>
+<tr>
+<td>CC9</td>
+<td>Risk mitigation</td>
+<td>Backups verified</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="part-4-success-criteria">PART 4: SUCCESS CRITERIA</h2>
+<h3 id="deployment-success-criteria">4.1 Deployment Success Criteria</h3>
+<p>All of the following must be TRUE for a successful deployment:</p>
+<h4 id="infrastructure">Infrastructure</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />All CDK stacks deployed without errors</label></li>
+<li><label><input type="checkbox" />VPC with correct CIDR and subnets</label></li>
+<li><label><input type="checkbox" />Aurora cluster status: available</label></li>
+<li><label><input type="checkbox" />All DynamoDB tables active</label></li>
+<li><label><input type="checkbox" />S3 buckets with encryption enabled</label></li>
+<li><label><input type="checkbox" />KMS CMKs with rotation enabled</label></li>
+</ul>
+<h4 id="authentication">Authentication</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />Cognito User Pool created</label></li>
+<li><label><input type="checkbox" />Cognito Admin Pool with MFA required (production)</label></li>
+<li><label><input type="checkbox" />At least one super admin created</label></li>
+<li><label><input type="checkbox" />Admin can log in successfully</label></li>
+</ul>
+<h4 id="ai-services">AI Services</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />LiteLLM ECS service: RUNNING</label></li>
+<li><label><input type="checkbox" />At least one external provider configured</label></li>
+<li><label><input type="checkbox" />Test completion returns valid response</label></li>
+<li><label><input type="checkbox" />(Tier 3+) SageMaker endpoints: InService</label></li>
+</ul>
+<h4 id="api-layer">API Layer</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />API Gateway: deployed</label></li>
+<li><label><input type="checkbox" />AppSync API: active</label></li>
+<li><label><input type="checkbox" />/health returns 200</label></li>
+<li><label><input type="checkbox" />GraphQL introspection works</label></li>
+</ul>
+<h4 id="admin-dashboard">Admin Dashboard</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />CloudFront distribution: Deployed</label></li>
+<li><label><input type="checkbox" />Dashboard loads without errors</label></li>
+<li><label><input type="checkbox" />Navigation works</label></li>
+<li><label><input type="checkbox" />API calls succeed</label></li>
+</ul>
+<h4 id="database">Database</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />All migrations applied</label></li>
+<li><label><input type="checkbox" />RLS policies active</label></li>
+<li><label><input type="checkbox" />Test queries succeed</label></li>
+<li><label><input type="checkbox" />No orphaned data</label></li>
+</ul>
+<h4 id="monitoring">Monitoring</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />CloudWatch alarms configured</label></li>
+<li><label><input type="checkbox" />CloudTrail logging active</label></li>
+<li><label><input type="checkbox" />GuardDuty enabled</label></li>
+<li><label><input type="checkbox" />Security Hub enabled</label></li>
+</ul>
+<h3 id="performance-benchmarks">4.2 Performance Benchmarks</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Target</th>
+<th>Acceptable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API Gateway latency (p50)</td>
+<td>&lt; 50ms</td>
+<td>&lt; 100ms</td>
+</tr>
+<tr>
+<td>API Gateway latency (p99)</td>
+<td>&lt; 200ms</td>
+<td>&lt; 500ms</td>
+</tr>
+<tr>
+<td>Chat completion (streaming start)</td>
+<td>&lt; 500ms</td>
+<td>&lt; 1s</td>
+</tr>
+<tr>
+<td>Admin dashboard load</td>
+<td>&lt; 2s</td>
+<td>&lt; 3s</td>
+</tr>
+<tr>
+<td>Model warm-up time</td>
+<td>&lt; 3 min</td>
+<td>&lt; 5 min</td>
+</tr>
+<tr>
+<td>Aurora query latency</td>
+<td>&lt; 10ms</td>
+<td>&lt; 50ms</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="part-5-troubleshooting-guide">PART 5: TROUBLESHOOTING GUIDE</h2>
+<h3 id="common-issues">5.1 Common Issues</h3>
+<h4 id="cdk-deployment-failures">CDK Deployment Failures</h4>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 45%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bootstrap failed</td>
+<td>Wrong account/region</td>
+<td>Verify <code>aws sts get-caller-identity</code></td>
+</tr>
+<tr>
+<td>Stack timeout</td>
+<td>Slow resource creation</td>
+<td>Check CloudFormation events</td>
+</tr>
+<tr>
+<td>Resource limit</td>
+<td>Service quota exceeded</td>
+<td>Request quota increase</td>
+</tr>
+<tr>
+<td>IAM permission denied</td>
+<td>Insufficient permissions</td>
+<td>Verify AdministratorAccess</td>
+</tr>
+<tr>
+<td>Circular dependency</td>
+<td>Stack references</td>
+<td>Check stack dependencies</td>
+</tr>
+</tbody>
+</table>
+<h4 id="aurora-connection-issues">Aurora Connection Issues</h4>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 45%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connection refused</td>
+<td>Security group</td>
+<td>Verify Lambda SG can reach Aurora SG</td>
+</tr>
+<tr>
+<td>Authentication failed</td>
+<td>Wrong credentials</td>
+<td>Check Secrets Manager</td>
+</tr>
+<tr>
+<td>Timeout</td>
+<td>VPC endpoints missing</td>
+<td>Add RDS VPC endpoint</td>
+</tr>
+<tr>
+<td>Too many connections</td>
+<td>Connection pooling</td>
+<td>Use RDS Proxy</td>
+</tr>
+</tbody>
+</table>
+<h4 id="lambda-errors">Lambda Errors</h4>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cold start &gt; 10s</td>
+<td>VPC configuration</td>
+<td>Use provisioned concurrency</td>
+</tr>
+<tr>
+<td>Timeout</td>
+<td>Slow downstream</td>
+<td>Increase timeout, check dependencies</td>
+</tr>
+<tr>
+<td>Out of memory</td>
+<td>Large payloads</td>
+<td>Increase memory allocation</td>
+</tr>
+<tr>
+<td>Permission denied</td>
+<td>IAM role</td>
+<td>Check Lambda execution role</td>
+</tr>
+</tbody>
+</table>
+<h4 id="litellm-issues">LiteLLM Issues</h4>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 45%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>503 Service Unavailable</td>
+<td>ECS not healthy</td>
+<td>Check ECS service events</td>
+</tr>
+<tr>
+<td>Provider timeout</td>
+<td>API key invalid</td>
+<td>Verify provider secrets</td>
+</tr>
+<tr>
+<td>Rate limited</td>
+<td>Too many requests</td>
+<td>Implement retry with backoff</td>
+</tr>
+<tr>
+<td>Wrong model response</td>
+<td>Model misconfigured</td>
+<td>Check litellm config.yaml</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sagemaker-issues-tier-3">SageMaker Issues (Tier 3+)</h4>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Likely Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Endpoint failed</td>
+<td>Out of memory</td>
+<td>Use larger instance type</td>
+</tr>
+<tr>
+<td>Slow cold start</td>
+<td>Model too large</td>
+<td>Use warm pool or smaller model</td>
+</tr>
+<tr>
+<td>InvocationError</td>
+<td>Model bug</td>
+<td>Check CloudWatch logs</td>
+</tr>
+<tr>
+<td>Capacity error</td>
+<td>Insufficient instances</td>
+<td>Request quota increase</td>
+</tr>
+</tbody>
+</table>
+<h3 id="log-locations">5.2 Log Locations</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>CloudWatch Log Group</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API Gateway</td>
+<td>/aws/api-gateway/radiant-{env}-api</td>
+</tr>
+<tr>
+<td>Lambda Functions</td>
+<td>/aws/lambda/radiant-{env}-*</td>
+</tr>
+<tr>
+<td>LiteLLM (ECS)</td>
+<td>/ecs/radiant-{env}-litellm</td>
+</tr>
+<tr>
+<td>SageMaker Endpoints</td>
+<td>/aws/sagemaker/Endpoints/radiant-*</td>
+</tr>
+<tr>
+<td>Aurora</td>
+<td>/aws/rds/cluster/radiant-{env}/postgresql</td>
+</tr>
+<tr>
+<td>CloudFront</td>
+<td>/aws/cloudfront/radiant-{env}-admin</td>
+</tr>
+</tbody>
+</table>
+<h3 id="health-check-endpoints">5.3 Health Check Endpoints</h3>
+<pre class="bash"><code># Platform health
+curl https://api.YOUR_DOMAIN.com/health
+
+# LiteLLM health
+curl https://api.YOUR_DOMAIN.com/v2/litellm/health
+
+# Admin API health
+curl https://admin-api.YOUR_DOMAIN.com/health
+
+# Model registry status
+curl https://api.YOUR_DOMAIN.com/v2/models/status</code></pre>
+<h3 id="emergency-procedures">5.4 Emergency Procedures</h3>
+<h4 id="database-restore">Database Restore</h4>
+<pre class="bash"><code># List available snapshots
+aws rds describe-db-cluster-snapshots \
+  --db-cluster-identifier radiant-prod-cluster
+
+# Restore from snapshot
+aws rds restore-db-cluster-from-snapshot \
+  --db-cluster-identifier radiant-prod-restored \
+  --snapshot-identifier your-snapshot-id \
+  --engine aurora-postgresql
+
+# Or use point-in-time recovery
+aws rds restore-db-cluster-to-point-in-time \
+  --source-db-cluster-identifier radiant-prod-cluster \
+  --db-cluster-identifier radiant-prod-recovered \
+  --restore-to-time &quot;2024-12-20T10:00:00Z&quot;</code></pre>
+<h4 id="rollback-deployment">Rollback Deployment</h4>
+<pre class="bash"><code># Rollback to previous CDK deployment
+cdk deploy Radiant-prod-API \
+  --context environment=prod \
+  --context tier=3 \
+  --rollback</code></pre>
+<h4 id="disable-problematic-model">Disable Problematic Model</h4>
+<pre class="sql"><code>-- In Aurora
+UPDATE models 
+SET status = &#39;disabled&#39;, 
+    disabled_reason = &#39;Emergency disable due to errors&#39;
+WHERE model_id = &#39;problematic-model-id&#39;;</code></pre>
+<hr />
+<h2 id="part-6-version-history">PART 6: VERSION HISTORY</h2>
+<h3 id="v2.2.0-december-2024---current">v2.2.0 (December 2024) - Current</h3>
+<p><strong>New Features:</strong> - Dynamic AI Model Registry with database-driven discovery - 21 external AI provider integrations - 30+ self-hosted models across 9 categories - 5 mid-level orchestration services - Thermal state management (OFF/COLD/WARM/HOT/AUTOMATIC) - Administrator invitation system with email notifications - Two-person approval workflow for production deployments - Configurable PHI sanitization with HIPAA compliance - Multi-region deployment (US/EU/APAC) - Comprehensive billing and metering system</p>
+<p><strong>Architecture:</strong> - Unified Swift macOS deployment application - Next.js 14 admin dashboard - AWS CDK infrastructure as code - 9-prompt implementation structure</p>
+<p><strong>Breaking Changes:</strong> - PHI configuration now requires explicit setup - Admin pool separate from user pool - New database schema with RLS</p>
+<h3 id="v2.1.0-december-2024">v2.1.0 (December 2024)</h3>
+<ul>
+<li>Added admin dashboard web application</li>
+<li>Implemented two-person approval workflow</li>
+<li>Enhanced billing service with invoicing</li>
+</ul>
+<h3 id="v2.0.0-december-2024">v2.0.0 (December 2024)</h3>
+<ul>
+<li>Major architectural refactor</li>
+<li>Added PHI sanitization service</li>
+<li>Implemented compliance testing framework</li>
+<li>Multi-app support from single deployment</li>
+</ul>
+<h3 id="v1.1.0-december-2024">v1.1.0 (December 2024)</h3>
+<ul>
+<li>Added media handling (images, video, audio, 3D)</li>
+<li>Implemented 20+ external provider integrations</li>
+<li>Enhanced metering and billing</li>
+</ul>
+<h3 id="v1.0.0-december-2024">v1.0.0 (December 2024)</h3>
+<ul>
+<li>Initial release</li>
+<li>Basic Swift deployment app</li>
+<li>Core CDK infrastructure</li>
+<li>LiteLLM integration</li>
+</ul>
+<hr />
+<h2 id="deployment-timeline">DEPLOYMENT TIMELINE</h2>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Duration</th>
+<th>Activities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pre-deployment</td>
+<td>1-2 hours</td>
+<td>Account setup, quotas, certificates</td>
+</tr>
+<tr>
+<td>Bootstrap</td>
+<td>2-5 min</td>
+<td>CDK bootstrap, S3 buckets</td>
+</tr>
+<tr>
+<td>Foundation/Networking</td>
+<td>10-15 min</td>
+<td>VPC, subnets, NAT gateways</td>
+</tr>
+<tr>
+<td>Security/Data</td>
+<td>15-20 min</td>
+<td>KMS, Secrets, Aurora, DynamoDB</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>5-10 min</td>
+<td>S3 buckets, lifecycle rules</td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>10-15 min</td>
+<td>Cognito pools, groups</td>
+</tr>
+<tr>
+<td>AI</td>
+<td>15-30 min</td>
+<td>LiteLLM, SageMaker (if Tier 3+)</td>
+</tr>
+<tr>
+<td>API</td>
+<td>10-15 min</td>
+<td>API Gateway, AppSync, Lambda</td>
+</tr>
+<tr>
+<td>Admin</td>
+<td>10-15 min</td>
+<td>CloudFront, dashboard sync</td>
+</tr>
+<tr>
+<td>Migrations</td>
+<td>5-10 min</td>
+<td>Schema, RLS, seed data</td>
+</tr>
+<tr>
+<td>Configuration</td>
+<td>15-30 min</td>
+<td>First admin, providers, pricing</td>
+</tr>
+<tr>
+<td>Testing</td>
+<td>30-60 min</td>
+<td>Smoke tests, integration tests</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>2-4 hours</strong></td>
+<td><strong>Complete deployment</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="estimated-costs-by-tier">ESTIMATED COSTS BY TIER</h2>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Tier 1</th>
+<th>Tier 2</th>
+<th>Tier 3</th>
+<th>Tier 4</th>
+<th>Tier 5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Foundation</strong></td>
+<td>$45</td>
+<td>$120</td>
+<td>$350</td>
+<td>$1,200</td>
+<td>$4,500</td>
+</tr>
+<tr>
+<td><strong>AI/API</strong></td>
+<td>$40</td>
+<td>$135</td>
+<td>$625</td>
+<td>$2,250</td>
+<td>$9,000</td>
+</tr>
+<tr>
+<td><strong>Self-Hosted</strong></td>
+<td>$0</td>
+<td>$0</td>
+<td>$500</td>
+<td>$2,000</td>
+<td>$8,000</td>
+</tr>
+<tr>
+<td><strong>Total/Month</strong></td>
+<td><strong>~$85</strong></td>
+<td><strong>~$255</strong></td>
+<td><strong>~$1,475</strong></td>
+<td><strong>~$5,450</strong></td>
+<td><strong>~$21,500</strong></td>
+</tr>
+</tbody>
+</table>
+<p><em>Costs are estimates and vary based on usage, region, and actual resource consumption.</em></p>
+<hr />
+<h2 id="final-notes">FINAL NOTES</h2>
+<h3 id="support-resources">Support Resources</h3>
+<ul>
+<li><strong>AWS Documentation</strong>: https://docs.aws.amazon.com</li>
+<li><strong>CDK Documentation</strong>: https://docs.aws.amazon.com/cdk</li>
+<li><strong>LiteLLM Documentation</strong>: https://docs.litellm.ai</li>
+<li><strong>Next.js Documentation</strong>: https://nextjs.org/docs</li>
+</ul>
+<h3 id="recommended-monitoring-setup">Recommended Monitoring Setup</h3>
+<ol type="1">
+<li><strong>CloudWatch Dashboards</strong> - Create dashboards for each component</li>
+<li><strong>Alarms</strong> - Set up alarms for error rates, latency, costs</li>
+<li><strong>X-Ray</strong> - Enable distributed tracing</li>
+<li><strong>Cost Explorer</strong> - Set up daily cost reports and anomaly detection</li>
+</ol>
+<h3 id="security-best-practices">Security Best Practices</h3>
+<ol type="1">
+<li>Rotate AWS access keys every 90 days</li>
+<li>Enable MFA on root account</li>
+<li>Use separate AWS accounts for prod/staging/dev</li>
+<li>Regular security audits with AWS Inspector</li>
+<li>Quarterly penetration testing</li>
+</ol>
+<hr />
+<p><em>End of Prompt 9: Assembly &amp; Deployment Guide</em> <em>RADIANT v2.2.0 - December 2024</em></p>
+<hr />
+<h2 id="congratulations-ãåå½â">CONGRATULATIONS! Ã°Å¸Å½â€°</h2>
+<p>You have completed the full RADIANT v2.2.0 implementation series.</p>
+<p><strong>What you’ve built:</strong> - Production-grade multi-tenant SaaS platform - 21 external AI provider integrations - 30+ self-hosted AI models - HIPAA and SOC 2 compliant infrastructure - Multi-region global deployment - Complete admin management system - Comprehensive billing and metering</p>
+<p><strong>Next Steps:</strong> 1. Deploy to staging and run full test suite 2. Configure all production providers 3. Complete compliance verification 4. Deploy to production with two-person approval 5. Monitor and iterate</p>
+<p><em>Thank you for building with RADIANT!</em></p>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ-1">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<h1 id="end-of-section-9">END OF SECTION 9</h1>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ-2">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ-3">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<h1 id="appendix-implementation-verification-checklist">APPENDIX: IMPLEMENTATION VERIFICATION CHECKLIST</h1>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ-4">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+<h2 id="pre-implementation">Pre-Implementation</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Node.js 20+ installed (<code>node --version</code>)</label></li>
+<li><label><input type="checkbox" />pnpm 8+ installed (<code>pnpm --version</code>)</label></li>
+<li><label><input type="checkbox" />AWS CLI configured (<code>aws sts get-caller-identity</code>)</label></li>
+<li><label><input type="checkbox" />Xcode 15+ installed (for Swift app)</label></li>
+<li><label><input type="checkbox" />AWS CDK CLI installed (<code>cdk --version</code>)</label></li>
+</ul>
+<h2 id="section-0-shared-types">Section 0: Shared Types</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><code>packages/shared/</code> directory created</label></li>
+<li><label><input type="checkbox" />All type files implemented</label></li>
+<li><label><input type="checkbox" />All constant files implemented</label></li>
+<li><label><input type="checkbox" />All utility files implemented</label></li>
+<li><label><input type="checkbox" /><code>pnpm build</code> succeeds in packages/shared</label></li>
+<li><label><input type="checkbox" /><code>dist/</code> directory contains .js and .d.ts files</label></li>
+</ul>
+<h2 id="section-1-foundation-swift-app">Section 1: Foundation &amp; Swift App</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Root package.json configured</label></li>
+<li><label><input type="checkbox" />Swift app compiles in Xcode</label></li>
+<li><label><input type="checkbox" />Credentials can be saved/loaded</label></li>
+<li><label><input type="checkbox" />Bundle scripts execute successfully</label></li>
+</ul>
+<h2 id="section-2-cdk-infrastructure">Section 2: CDK Infrastructure</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Infrastructure package imports from <span class="citation" data-cites="radiant/shared">@radiant/shared</span></label></li>
+<li><label><input type="checkbox" />NO duplicate tier/region configs created</label></li>
+<li><label><input type="checkbox" /><code>cdk synth</code> succeeds for all stacks</label></li>
+<li><label><input type="checkbox" />Foundation stack deploys</label></li>
+<li><label><input type="checkbox" />Networking stack deploys</label></li>
+<li><label><input type="checkbox" />Security stack deploys</label></li>
+<li><label><input type="checkbox" />Data stack deploys</label></li>
+<li><label><input type="checkbox" />Storage stack deploys</label></li>
+</ul>
+<h2 id="section-3-cdk-ai-api">Section 3: CDK AI &amp; API</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Auth stack deploys</label></li>
+<li><label><input type="checkbox" />AI stack deploys</label></li>
+<li><label><input type="checkbox" />API stack deploys</label></li>
+<li><label><input type="checkbox" />Admin stack deploys</label></li>
+<li><label><input type="checkbox" />Cognito user pool created</label></li>
+<li><label><input type="checkbox" />API Gateway accessible</label></li>
+</ul>
+<h2 id="section-4-lambda-core">Section 4: Lambda Core</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />All core Lambda functions implemented</label></li>
+<li><label><input type="checkbox" />Functions import types from <span class="citation" data-cites="radiant/shared">@radiant/shared</span></label></li>
+<li><label><input type="checkbox" />Health endpoint returns 200</label></li>
+</ul>
+<h2 id="section-5-lambda-admin-billing">Section 5: Lambda Admin &amp; Billing</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Admin Lambda functions implemented</label></li>
+<li><label><input type="checkbox" />Uses canonical table names (administrators, invitations)</label></li>
+<li><label><input type="checkbox" />Billing Lambda functions implemented</label></li>
+</ul>
+<h2 id="section-6-self-hosted-models">Section 6: Self-Hosted Models</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />SageMaker endpoint configs created</label></li>
+<li><label><input type="checkbox" />Thermal state management working</label></li>
+<li><label><input type="checkbox" />Mid-level services defined</label></li>
+</ul>
+<h2 id="section-7-database">Section 7: Database</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />All migrations in <code>migrations/</code> directory</label></li>
+<li><label><input type="checkbox" />Migrations use canonical table names</label></li>
+<li><label><input type="checkbox" />Migrations run successfully</label></li>
+<li><label><input type="checkbox" />RLS policies applied</label></li>
+</ul>
+<h2 id="section-8-admin-dashboard">Section 8: Admin Dashboard</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Dashboard imports types from <span class="citation" data-cites="radiant/shared">@radiant/shared</span></label></li>
+<li><label><input type="checkbox" /><code>pnpm build</code> succeeds</label></li>
+<li><label><input type="checkbox" />Dashboard accessible via CloudFront</label></li>
+<li><label><input type="checkbox" />All pages render correctly</label></li>
+</ul>
+<h2 id="section-9-verification">Section 9: Verification</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />All stacks deployed</label></li>
+<li><label><input type="checkbox" />Health checks pass</label></li>
+<li><label><input type="checkbox" />First admin can be created</label></li>
+<li><label><input type="checkbox" />API calls succeed</label></li>
+<li><label><input type="checkbox" />Dashboard fully functional</label></li>
+</ul>
+<hr />
+<h2 id="quick-domain-replacement">Quick Domain Replacement</h2>
+<p>After cloning/creating the project, run:</p>
+<pre class="bash"><code># macOS
+find . -type f \( -name &quot;*.ts&quot; -o -name &quot;*.tsx&quot; -o -name &quot;*.json&quot; -o -name &quot;*.swift&quot; -o -name &quot;*.md&quot; \) \
+  -not -path &quot;./node_modules/*&quot; \
+  -exec sed -i &#39;&#39; &#39;s/YOUR_DOMAIN\.com/zynapses.com/g&#39; {} \;
+
+# Linux
+find . -type f \( -name &quot;*.ts&quot; -o -name &quot;*.tsx&quot; -o -name &quot;*.json&quot; -o -name &quot;*.swift&quot; -o -name &quot;*.md&quot; \) \
+  -not -path &quot;./node_modules/*&quot; \
+  -exec sed -i &#39;s/YOUR_DOMAIN\.com/zynapses.com/g&#39; {} \;</code></pre>
+<p>Replace <code>YOUR_DOMAIN.com</code> with your actual domain.</p>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

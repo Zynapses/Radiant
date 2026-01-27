@@ -120,7 +120,7 @@ export default function MagicCarpetDemoPage() {
   const { toast } = useToast();
   const [currentPosition, setCurrentPosition] = useState(15);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [aiState, setAiState] = useState<'idle' | 'thinking' | 'speaking' | 'listening' | 'error'>('idle');
+  const [aiState, setAiState] = useState<'idle' | 'listening' | 'thinking' | 'pondering' | 'generating' | 'verifying' | 'confident' | 'uncertain' | 'excited' | 'focused'>('idle');
   const [activeBranchId, setActiveBranchId] = useState('branch-b');
   const [bookmarks, setBookmarks] = useState<Array<{ position: number; label: string }>>([]);
   const [focusActive, setFocusActive] = useState(false);

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHANGE REPORT 2026 01 10 - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>CHANGE REPORT 2026 01 10</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/CHANGE-REPORT-2026-01-10.md</div>
+  </div>
+  
+  <h1 id="radiant-change-report---january-10-2026">RADIANT Change Report - January 10, 2026</h1>
+<p><strong>Report Period:</strong> Last 24 Hours (January 9-10, 2026) <strong>Generated:</strong> January 10, 2026 05:48 UTC-08:00 <strong>Versions Covered:</strong> v5.0.3 → v5.2.0 → v5.2.1 → v5.2.2</p>
+<hr />
+<h2 id="executive-summary">Executive Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Releases</strong></td>
+<td>4 versions</td>
+</tr>
+<tr>
+<td><strong>Files Changed</strong></td>
+<td>66 files</td>
+</tr>
+<tr>
+<td><strong>Lines Added</strong></td>
+<td>~22,466</td>
+</tr>
+<tr>
+<td><strong>Lines Removed</strong></td>
+<td>~200</td>
+</tr>
+<tr>
+<td><strong>New Services</strong></td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>New Migrations</strong></td>
+<td>4</td>
+</tr>
+<tr>
+<td><strong>Documentation Updates</strong></td>
+<td>4 major guides</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="version-releases">Version Releases</h2>
+<h3 id="v5.2.2---orchestration-methods-scientific-implementation">v5.2.2 - Orchestration Methods Scientific Implementation</h3>
+<h4 id="new-features">New Features</h4>
+<p><strong>SE Probes (ICML 2024)</strong> | Attribute | Detail | |———–|——–| | Service | <code>SEProbesService</code> in <code>orchestration-methods.service.ts</code> | | Algorithm | Logprob-based entropy estimation via OpenAI API | | Formula | Per-token Shannon entropy: <code>H = -Σ p * log₂(p)</code> | | Performance | 300x faster than sampling-based methods | | Parameters | <code>probe_layers</code>, <code>threshold</code>, <code>fast_mode</code>, <code>sample_count</code> |</p>
+<p><strong>Kernel Entropy (NeurIPS 2024)</strong> | Attribute | Detail | |———–|——–| | Service | <code>KernelEntropyService</code> in <code>orchestration-methods.service.ts</code> | | Algorithm | Embedding KDE using <code>text-embedding-3-small</code> | | Bandwidth | Silverman estimation: <code>h = median_dist / √(2 * ln(n+1))</code> | | Kernels | RBF, linear, polynomial | | Parameters | <code>kernel</code>, <code>bandwidth</code>, <code>sample_count</code> |</p>
+<p><strong>Pareto Routing</strong> - Multi-objective optimization across quality/latency/cost - Pareto frontier calculation with configurable weights - Budget constraint enforcement</p>
+<p><strong>C3PO Cascade (NeurIPS 2024)</strong> - Self-supervised difficulty prediction - Tiered model cascade (efficient → standard → powerful) - Confidence-based escalation</p>
+<p><strong>AutoMix POMDP (Nov 2025)</strong> - POMDP belief-state model selection - ε-greedy exploration (default ε=0.1) - Self-verification for quality assurance</p>
+<h4 id="system-vs-user-methods-protection">System vs User Methods Protection</h4>
+<ul>
+<li>Added <code>isSystemMethod</code> field to API responses</li>
+<li>System methods: Only parameters and enabled status editable</li>
+<li>Admin UI shows “System” badge for protected methods</li>
+<li>API validation prevents editing system method definitions</li>
+</ul>
+<h4 id="documentation-created-orchestration-reference.md">Documentation Created: ORCHESTRATION-REFERENCE.md</h4>
+<p>Complete reference document (2,326 lines) documenting all system orchestration capabilities.</p>
+<p><strong>System Methods (70+) by Category:</strong></p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 23%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Count</th>
+<th>Key Methods</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Generation</strong></td>
+<td>3</td>
+<td>GENERATE_RESPONSE, GENERATE_WITH_COT, REFINE_RESPONSE</td>
+</tr>
+<tr>
+<td><strong>Evaluation</strong></td>
+<td>8</td>
+<td>CRITIQUE_RESPONSE, JUDGE_RESPONSES, POLL_JUDGE, G_EVAL, PAIRWISE_PREFER, SELF_REFLECT, COMPARE_ANALYSIS</td>
+</tr>
+<tr>
+<td><strong>Synthesis</strong></td>
+<td>6</td>
+<td>SYNTHESIZE_RESPONSES, BUILD_CONSENSUS, MOA_LAYERS, MULTI_SOURCE_SYNTH, LLM_BLENDER, TOKEN_AUCTION</td>
+</tr>
+<tr>
+<td><strong>Verification</strong></td>
+<td>8</td>
+<td>VERIFY_FACTS, PROCESS_REWARD, SELFCHECK_GPT, CITE_VERIFY, NATURAL_LOGIC, UNIFACT, EIGENSCORE, REQUERY_CHECK</td>
+</tr>
+<tr>
+<td><strong>Debate</strong></td>
+<td>6</td>
+<td>GENERATE_CHALLENGE, DEFEND_POSITION, SPARSE_DEBATE, ARG_MAPPING, HAH_DELPHI, RECONCILE_WEIGHTED</td>
+</tr>
+<tr>
+<td><strong>Aggregation</strong></td>
+<td>4</td>
+<td>MAJORITY_VOTE, WEIGHTED_AGGREGATE, SELF_CONSISTENCY, GEDI_VOTE</td>
+</tr>
+<tr>
+<td><strong>Reasoning</strong></td>
+<td>3</td>
+<td>DECOMPOSE_PROBLEM, LOGIC_LM, LLM_MODULO</td>
+</tr>
+<tr>
+<td><strong>Routing</strong></td>
+<td>7</td>
+<td>DETECT_TASK_TYPE, SELECT_BEST_MODEL, ROUTELLM, FRUGAL_CASCADE, PARETO_ROUTE, C3PO_CASCADE, AUTOMIX, AFLOW_MCTS</td>
+</tr>
+<tr>
+<td><strong>Uncertainty</strong></td>
+<td>6</td>
+<td>SEMANTIC_ENTROPY, SE_PROBES, KERNEL_ENTROPY, CALIBRATED_CONF, CONSISTENCY_UQ, CONFORMAL_PRED</td>
+</tr>
+<tr>
+<td><strong>Hallucination</strong></td>
+<td>3</td>
+<td>MULTI_HALLUC, METAQA, FACTUAL_GROUND</td>
+</tr>
+<tr>
+<td><strong>Human-in-Loop</strong></td>
+<td>3</td>
+<td>HITL_REVIEW, TIERED_EVAL, ACTIVE_SAMPLE</td>
+</tr>
+<tr>
+<td><strong>Collaboration</strong></td>
+<td>1</td>
+<td>ECON_NASH</td>
+</tr>
+<tr>
+<td><strong>Neural</strong></td>
+<td>1</td>
+<td>CATO_NEURAL</td>
+</tr>
+</tbody>
+</table>
+<p><strong>System Workflows (49) by Category:</strong></p>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 25%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Count</th>
+<th>Workflows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Adversarial &amp; Validation</strong></td>
+<td>2</td>
+<td>ARE (Red Team Attack), LM_VS_LM (Cross-Examination)</td>
+</tr>
+<tr>
+<td><strong>Debate &amp; Deliberation</strong></td>
+<td>3</td>
+<td>SOD (AI Debate), MDA (Multi-Agent Debate), ReConcile (Round Table Consensus)</td>
+</tr>
+<tr>
+<td><strong>Judge &amp; Critic</strong></td>
+<td>3</td>
+<td>LAAJE (AI Judge), RLAIF (Constitutional Critic), IREF (Critique-Revise Loop)</td>
+</tr>
+<tr>
+<td><strong>Ensemble &amp; Aggregation</strong></td>
+<td>3</td>
+<td>SCMR (Majority Vote), CWMA (Weighted Ensemble), SMoE (Mixture Router)</td>
+</tr>
+<tr>
+<td><strong>Reflection &amp; Self-Improvement</strong></td>
+<td>3</td>
+<td>ISFR (Self-Refine Loop), VRL (Reflexion Agent), LATS (Tree Search Reasoning)</td>
+</tr>
+<tr>
+<td><strong>Verification &amp; Fact-Checking</strong></td>
+<td>2</td>
+<td>CoVe (Chain of Verification), SelfRAG (Retrieval-Augmented Verification)</td>
+</tr>
+<tr>
+<td><strong>Multi-Agent Collaboration</strong></td>
+<td>2</td>
+<td>LLM_MAS (Agent Team), MAPR (Peer Review Pipeline)</td>
+</tr>
+<tr>
+<td><strong>Reasoning Enhancement</strong></td>
+<td>9</td>
+<td>CoT, ZeroShotCoT, ToT, GoT, ReAct, L2M, PS, MCP, PoT</td>
+</tr>
+<tr>
+<td><strong>Model Routing Strategies</strong></td>
+<td>4</td>
+<td>SINGLE, ENSEMBLE, CASCADE, SPECIALIST</td>
+</tr>
+<tr>
+<td><strong>Domain-Specific Orchestration</strong></td>
+<td>4</td>
+<td>DOMAIN_INJECT, MULTI_EXPERT, CHALLENGER_CONSENSUS, CROSS_DOMAIN</td>
+</tr>
+<tr>
+<td><strong>Cognitive Frameworks</strong></td>
+<td>14</td>
+<td>FIRST_PRINCIPLES, ANALOGICAL, SYSTEMS, SOCRATIC, TRIZ, DESIGN_THINKING, SCIENTIFIC, LATERAL, ABDUCTIVE, COUNTERFACTUAL, DIALECTICAL, MORPHOLOGICAL, PREMORTEM, FERMI</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Documentation Structure for Each Method/Workflow:</strong> - UI Name (user-friendly display) - Scientific Name (academic/formal name) - Code identifier - Detailed description - All parameters with types, defaults, and descriptions - Inputs/Outputs specification - Research references (where applicable) - Accuracy improvements (where applicable) - Best use cases and problem indicators</p>
+<p><strong>Source Migration Files:</strong> - <code>066_orchestration_patterns_registry.sql</code> - Base workflow definitions - <code>157_orchestration_methods_part1.sql</code> - Generation, Evaluation, Synthesis methods - <code>157_orchestration_methods_part2.sql</code> - Verification, Debate, Aggregation, Reasoning methods - <code>157_orchestration_methods_part3.sql</code> - Routing, Uncertainty, Hallucination, HITL, Collaboration, Neural methods</p>
+<h4 id="files-modified">Files Modified</h4>
+<ul>
+<li><code>packages/infrastructure/lambda/shared/services/orchestration-methods.service.ts</code></li>
+<li><code>packages/infrastructure/lambda/admin/orchestration-methods.ts</code></li>
+<li><code>apps/admin-dashboard/app/(dashboard)/orchestration/methods/page.tsx</code></li>
+<li><code>docs/THINKTANK-ADMIN-GUIDE.md</code></li>
+<li><code>docs/STRATEGIC-VISION-MARKETING.md</code></li>
+<li><code>.windsurf/workflows/auto-build.md</code></li>
+</ul>
+<hr />
+<h3 id="v5.2.1---production-hardening-resilience-integration">v5.2.1 - Production Hardening: Resilience Integration</h3>
+<h4 id="p0-circuit-breaker-integration">P0: Circuit Breaker Integration</h4>
+<p><strong>ResilientProviderService</strong> (<code>lambda/shared/services/resilient-provider.service.ts</code>) | Feature | Description | |———|————-| | Wrapper | Ready-to-use for all external AI provider calls | | Combines | CircuitBreaker + Retry + Timeout in single call | | Monitoring | Provider health via <code>getAllProviderHealth()</code> | | Logging | Auto-logging of state changes and failures |</p>
+<p><strong>Integration Points:</strong> | Service | Calls Protected | |———|—————–| | <code>model-router.service.ts</code> | Bedrock, LiteLLM, direct provider calls (Groq, Perplexity, xAI, Together) | | <code>embedding.service.ts</code> | OpenAI, Bedrock, Cohere embedding calls (single + batch) | | <code>translation-middleware.service.ts</code> | Qwen 2.5 7B SageMaker translation calls | | <code>inference-components.service.ts</code> | SageMaker inference component lifecycle | | <code>formal-reasoning.service.ts</code> | Lambda executor, SageMaker neural-symbolic (LTN, DeepProbLog) |</p>
+<h4 id="p0-silent-failure-fixes">P0: Silent Failure Fixes</h4>
+<ul>
+<li>Fixed 10+ empty catch blocks in <code>advanced-agi.service.ts</code></li>
+<li>Affected areas: Strategy selection, transfer learning, prediction, action selection, rule extraction, hybrid reasoning, proposal generation</li>
+<li>All now log proper error context with <code>logger.warn()</code></li>
+</ul>
+<h4 id="p1-react-errorboundary">P1: React ErrorBoundary</h4>
+<p><strong>ErrorBoundary</strong> (<code>apps/admin-dashboard/components/error-boundary.tsx</code>) | Component | Purpose | |———–|———| | <code>PageErrorBoundary</code> | Full-page error handling | | <code>SectionErrorBoundary</code> | Graceful section-level fallbacks | | Error reporting | <code>/api/admin/errors/report</code> in production | | Dev mode | Shows stack traces | | Prod mode | User-friendly message |</p>
+<h4 id="p1-billing-idempotency">P1: Billing Idempotency</h4>
+<p><strong>IdempotencyService</strong> (<code>lambda/shared/services/idempotency.service.ts</code>) | Feature | Detail | |———|——–| | Purpose | Prevents duplicate charges on retry | | TTL | 24 hours for idempotency keys | | Status tracking | pending → completed/failed | | Helpers | <code>extractIdempotencyKey()</code>, <code>generateIdempotencyKey()</code> |</p>
+<p><strong>Migration:</strong> <code>V2026_01_10_002__idempotency_keys.sql</code> - <code>idempotency_keys</code> table with RLS - Cleanup function for expired records</p>
+<h4 id="new-files">New Files</h4>
+<ul>
+<li><code>packages/infrastructure/lambda/shared/services/resilient-provider.service.ts</code></li>
+<li><code>packages/infrastructure/lambda/shared/services/idempotency.service.ts</code></li>
+<li><code>packages/infrastructure/migrations/V2026_01_10_002__idempotency_keys.sql</code></li>
+<li><code>apps/admin-dashboard/components/error-boundary.tsx</code></li>
+</ul>
+<hr />
+<h3 id="v5.2.0---production-hardening-prompt-39">v5.2.0 - Production Hardening (PROMPT-39)</h3>
+<h4 id="phase-1-resilience-layer">Phase 1: Resilience Layer</h4>
+<p><strong>CircuitBreaker</strong> (<code>packages/shared/src/utils/resilience.ts</code>) | Feature | Configuration | |———|—————| | Purpose | Prevents cascading failures when AI providers are down | | States | CLOSED → OPEN → HALF_OPEN | | Threshold | 5 failures in 30 seconds | | Recovery | Opens circuit for 60 seconds | | Patterns | Retry with exponential backoff, timeout wrappers, bulkhead |</p>
+<p><strong>Python Resilience</strong> (<code>packages/flyte/utils/resilience.py</code>) | Feature | Detail | |———|——–| | Library | Tenacity-based retry decorators | | Decorator | <code>@with_retry(max_attempts=3)</code> | | Circuit Breaker | Implementation for Python Flyte tasks | | Timeouts | 5s connect, 60s read (never infinite) |</p>
+<h4 id="phase-2-observability-error-handling">Phase 2: Observability &amp; Error Handling</h4>
+<p><strong>Silent Failure Fixes</strong> (<code>consciousness-engine.service.ts</code>) - Empty catch blocks now log full error traces with correlation IDs - Memory retrieval and drive computation failures properly logged - Fallback logic clearly marked with <code>_fallback</code> module tags</p>
+<p><strong>Environment Validator</strong> (<code>packages/shared/src/config/validator.ts</code>) | Feature | Detail | |———|——–| | Timing | Validates on Lambda cold start | | Failure | Throws <code>CriticalConfigurationError</code> immediately | | Core Requirements | <code>LITELLM_PROXY_URL</code>, <code>DB_SECRET_ARN</code>, <code>DB_CLUSTER_ARN</code> |</p>
+<h4 id="phase-3-rate-limiting">Phase 3: Rate Limiting</h4>
+<p><strong>RateLimiterService</strong> (<code>lambda/shared/services/rate-limiter.service.ts</code>) | Feature | Configuration | |———|—————| | Algorithm | Token bucket with Redis storage | | Default | 100 requests/minute per tenant | | Fallback | In-memory when Redis unavailable | | Overrides | Per-tenant with expiration | | Middleware | <code>withRateLimit</code> for Lambda handlers | | Response | 429 with <code>Retry-After</code> headers |</p>
+<p><strong>Environment Variables:</strong> | Variable | Default | Description | |———-|———|————-| | <code>RATE_LIMIT_ENABLED</code> | true | Enable/disable rate limiting | | <code>RATE_LIMIT_REQUESTS_PER_MINUTE</code> | 100 | Default rate limit | | <code>RATE_LIMIT_WINDOW_SECONDS</code> | 60 | Rate limit window |</p>
+<h4 id="phase-4-testing-foundation">Phase 4: Testing Foundation</h4>
+<p><strong>EconomicGovernor Tests</strong> (<code>__tests__/economic-governor.service.test.ts</code>) - Full test coverage for model selection logic - Tests for all governor modes (off, performance, balanced, cost_saver) - Error handling and edge case coverage - Batch processing and singleton pattern tests</p>
+<h4 id="new-files-1">New Files</h4>
+<ul>
+<li><code>packages/shared/src/utils/resilience.ts</code> - TypeScript resilience utilities</li>
+<li><code>packages/shared/src/config/validator.ts</code> - Environment validation</li>
+<li><code>packages/flyte/utils/resilience.py</code> - Python resilience utilities</li>
+<li><code>packages/infrastructure/lambda/shared/services/rate-limiter.service.ts</code></li>
+<li><code>packages/infrastructure/__tests__/economic-governor.service.test.ts</code></li>
+</ul>
+<hr />
+<h3 id="v5.0.3---grimoire-schema-compliance">v5.0.3 - Grimoire Schema Compliance</h3>
+<h4 id="index-row-size-crash-prevention">Index Row Size Crash Prevention</h4>
+<table>
+<thead>
+<tr>
+<th>Change</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Added</td>
+<td>SHA-256 hash column (<code>heuristic_hash</code>)</td>
+</tr>
+<tr>
+<td>Replaced</td>
+<td>TEXT-based unique constraint with hash-based</td>
+</tr>
+<tr>
+<td>Reason</td>
+<td>Prevents PostgreSQL B-Tree index size limit errors</td>
+</tr>
+<tr>
+<td>Compliance</td>
+<td>SHA-256 for SOC2/Veracode scanner compatibility</td>
+</tr>
+</tbody>
+</table>
+<h4 id="vector-index-performance-upgrade">Vector Index Performance Upgrade</h4>
+<table>
+<thead>
+<tr>
+<th>From</th>
+<th>To</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IVFFlat</td>
+<td>HNSW</td>
+</tr>
+<tr>
+<td>Pre-training required</td>
+<td>No pre-training</td>
+</tr>
+<tr>
+<td>Parameters</td>
+<td><code>m=16</code>, <code>ef_construction=64</code></td>
+</tr>
+<tr>
+<td>Benefit</td>
+<td>Better recall, superior for dynamic inserts</td>
+</tr>
+</tbody>
+</table>
+<h4 id="maintenance-security-enhancement">Maintenance Security Enhancement</h4>
+<ul>
+<li>System tenant ID now configurable via <code>SYSTEM_MAINTENANCE_TENANT_ID</code></li>
+<li>Production warning logged if using default system tenant</li>
+<li>Improves audit trail clarity</li>
+</ul>
+<p><strong>Migration:</strong> <code>V2026_01_10_001__fix_heuristics_schema.sql</code></p>
+<hr />
+<h2 id="database-migrations">Database Migrations</h2>
+<table>
+<colgroup>
+<col style="width: 55%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr>
+<th>Migration</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>V2026_01_08_001__hybrid_protocols.sql</code></td>
+<td>Hybrid protocol support</td>
+</tr>
+<tr>
+<td><code>V2026_01_09_001__v5_grimoire_governor.sql</code></td>
+<td>Grimoire &amp; Economic Governor tables</td>
+</tr>
+<tr>
+<td><code>V2026_01_10_001__fix_heuristics_schema.sql</code></td>
+<td>Index fixes, HNSW migration</td>
+</tr>
+<tr>
+<td><code>V2026_01_10_002__idempotency_keys.sql</code></td>
+<td>Billing idempotency support</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="documentation-updates">Documentation Updates</h2>
+<table>
+<colgroup>
+<col style="width: 52%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr>
+<th>Document</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>THINKTANK-ADMIN-GUIDE.md</strong></td>
+<td>Section 34.3 (System vs User Methods), 34.5 (Method Parameters), 34.6 (User Templates)</td>
+</tr>
+<tr>
+<td><strong>RADIANT-ADMIN-GUIDE.md</strong></td>
+<td>Section 10.4 (Orchestration Methods), parameter inheritance model</td>
+</tr>
+<tr>
+<td><strong>STRATEGIC-VISION-MARKETING.md</strong></td>
+<td>Updated orchestration section, 20 scientific algorithms</td>
+</tr>
+<tr>
+<td><strong>ORCHESTRATION-REFERENCE.md</strong></td>
+<td>New 2,326-line complete reference</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="new-services-summary">New Services Summary</h2>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 32%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr>
+<th>Service</th>
+<th>Purpose</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ResilientProviderService</strong></td>
+<td>Circuit breaker wrapper for all AI providers</td>
+<td><code>lambda/shared/services/resilient-provider.service.ts</code></td>
+</tr>
+<tr>
+<td><strong>IdempotencyService</strong></td>
+<td>Prevents duplicate billing charges</td>
+<td><code>lambda/shared/services/idempotency.service.ts</code></td>
+</tr>
+<tr>
+<td><strong>RateLimiterService</strong></td>
+<td>Token bucket rate limiting</td>
+<td><code>lambda/shared/services/rate-limiter.service.ts</code></td>
+</tr>
+<tr>
+<td><strong>SEProbesService</strong></td>
+<td>Fast uncertainty estimation</td>
+<td><code>orchestration-methods.service.ts</code></td>
+</tr>
+<tr>
+<td><strong>KernelEntropyService</strong></td>
+<td>Embedding-based uncertainty</td>
+<td><code>orchestration-methods.service.ts</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="architecture-improvements">Architecture Improvements</h2>
+<h3 id="resilience-pattern">Resilience Pattern</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                    EXTERNAL AI PROVIDER CALL                     │
+├─────────────────────────────────────────────────────────────────┤
+│  ResilientProviderService.callWithResilience()                   │
+│  ├── CircuitBreaker (5 failures → 60s open)                     │
+│  ├── Retry (exponential backoff, 3 attempts)                    │
+│  ├── Timeout (configurable per-provider)                        │
+│  └── Health Monitoring (getAllProviderHealth())                 │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="error-handling-improvement">Error Handling Improvement</h3>
+<pre><code>BEFORE: try { ... } catch (e) { }  // Silent failure
+AFTER:  try { ... } catch (e) { logger.warn(&#39;Context&#39;, { error: e, correlationId }); }</code></pre>
+<hr />
+<h2 id="risk-mitigations">Risk Mitigations</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 66%" />
+</colgroup>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cascading Provider Failures</strong></td>
+<td>CircuitBreaker with automatic recovery</td>
+</tr>
+<tr>
+<td><strong>Duplicate Billing</strong></td>
+<td>IdempotencyService with 24h TTL</td>
+</tr>
+<tr>
+<td><strong>Rate Abuse</strong></td>
+<td>Token bucket rate limiting with 429 responses</td>
+</tr>
+<tr>
+<td><strong>Silent Failures</strong></td>
+<td>All catch blocks now log with context</td>
+</tr>
+<tr>
+<td><strong>Config Errors</strong></td>
+<td>Environment validator on cold start</td>
+</tr>
+<tr>
+<td><strong>UI Crashes</strong></td>
+<td>React ErrorBoundary with graceful fallbacks</td>
+</tr>
+<tr>
+<td><strong>Index Crashes</strong></td>
+<td>SHA-256 hash for large text constraints</td>
+</tr>
+<tr>
+<td><strong>Vector Search Performance</strong></td>
+<td>HNSW indexing upgrade</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="testing-coverage-added">Testing Coverage Added</h2>
+<table>
+<colgroup>
+<col style="width: 54%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr>
+<th>Test Suite</th>
+<th>Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>economic-governor.service.test.ts</code></td>
+<td>Model selection, all governor modes, error handling, batch processing</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="files-changed-summary">Files Changed Summary</h2>
+<p><strong>New Files (14):</strong> - <code>packages/shared/src/utils/resilience.ts</code> - <code>packages/shared/src/config/validator.ts</code> - <code>packages/flyte/utils/resilience.py</code> - <code>packages/infrastructure/lambda/shared/services/rate-limiter.service.ts</code> - <code>packages/infrastructure/lambda/shared/services/resilient-provider.service.ts</code> - <code>packages/infrastructure/lambda/shared/services/idempotency.service.ts</code> - <code>packages/infrastructure/__tests__/economic-governor.service.test.ts</code> - <code>packages/infrastructure/migrations/V2026_01_08_001__hybrid_protocols.sql</code> - <code>packages/infrastructure/migrations/V2026_01_09_001__v5_grimoire_governor.sql</code> - <code>packages/infrastructure/migrations/V2026_01_10_001__fix_heuristics_schema.sql</code> - <code>packages/infrastructure/migrations/V2026_01_10_002__idempotency_keys.sql</code> - <code>apps/admin-dashboard/components/error-boundary.tsx</code> - <code>docs/ORCHESTRATION-REFERENCE.md</code> - <code>docs/CHANGE-REPORT-2026-01-10.md</code></p>
+<p><strong>Modified Services (10):</strong> - <code>model-router.service.ts</code> - Resilience integration - <code>embedding.service.ts</code> - Resilience integration - <code>translation-middleware.service.ts</code> - Resilience integration - <code>inference-components.service.ts</code> - Resilience integration - <code>formal-reasoning.service.ts</code> - Resilience integration - <code>advanced-agi.service.ts</code> - Silent failure fixes - <code>consciousness-engine.service.ts</code> - Silent failure fixes - <code>orchestration-methods.service.ts</code> - New scientific implementations - <code>orchestration-methods.ts</code> (admin) - System method protection - <code>methods/page.tsx</code> - System badge UI</p>
+<hr />
+<p><em>Report generated automatically from CHANGELOG.md and git history</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

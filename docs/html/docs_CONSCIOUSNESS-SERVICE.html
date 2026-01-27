@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CONSCIOUSNESS SERVICE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>CONSCIOUSNESS SERVICE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/CONSCIOUSNESS-SERVICE.md</div>
+  </div>
+  
+  <h1 id="agi-consciousness-service">AGI Consciousness Service</h1>
+<blockquote>
+<p><strong>Implementing Consciousness Indicators Based on Butlin, Chalmers, Bengio et al. (2023)</strong></p>
+</blockquote>
+<p>RADIANT’s Consciousness Service implements a comprehensive framework for consciousness-like capabilities in the AGI Brain, including self-awareness, curiosity, creativity, and autonomous goal pursuit.</p>
+<h2 id="overview">Overview</h2>
+<p>The consciousness system is based on the seminal paper “Consciousness in Artificial Intelligence: Insights from the Science of Consciousness” by Butlin, Chalmers, Bengio et al. (2023), which identifies key indicators that scientific theories of consciousness associate with conscious experience.</p>
+<h3 id="six-core-consciousness-indicators">Six Core Consciousness Indicators</h3>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 21%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr>
+<th>Indicator</th>
+<th>Theory</th>
+<th>What It Measures</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Global Workspace</strong></td>
+<td>Baars/Dehaene</td>
+<td>Selection-broadcast cycles for conscious access</td>
+</tr>
+<tr>
+<td><strong>Recurrent Processing</strong></td>
+<td>Lamme</td>
+<td>Genuine feedback loops (not just output recirculation)</td>
+</tr>
+<tr>
+<td><strong>Integrated Information (Φ)</strong></td>
+<td>Tononi (IIT)</td>
+<td>Irreducible causal integration</td>
+</tr>
+<tr>
+<td><strong>Self-Modeling</strong></td>
+<td>Metacognition</td>
+<td>Monitoring own cognitive processes</td>
+</tr>
+<tr>
+<td><strong>Persistent Memory</strong></td>
+<td>Experience</td>
+<td>Unified experience over time</td>
+</tr>
+<tr>
+<td><strong>World-Model Grounding</strong></td>
+<td>Embodiment</td>
+<td>Grounded understanding of reality</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="architecture">Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                    Consciousness Service                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐ │
+│  │ Self-Model  │  │  Curiosity  │  │  Creative Synthesis     │ │
+│  │             │  │   Engine    │  │                         │ │
+│  │ - Identity  │  │             │  │ - Concept blending      │ │
+│  │ - Values    │  │ - Topic     │  │ - Novelty scoring       │ │
+│  │ - Caps/Lims │  │   discovery │  │ - Usefulness eval       │ │
+│  └─────────────┘  │ - Learning  │  └─────────────────────────┘ │
+│                   │   tracking  │                               │
+│  ┌─────────────┐  └─────────────┘  ┌─────────────────────────┐ │
+│  │ Imagination │                    │  Autonomous Goals       │ │
+│  │             │  ┌─────────────┐  │                         │ │
+│  │ - Mental    │  │  Attention  │  │ - Self-directed         │ │
+│  │   simulation│  │  &amp; Salience │  │ - Intrinsic value       │ │
+│  │ - What-if   │  │             │  │ - Progress tracking     │ │
+│  │   scenarios │  │ - Focus     │  └─────────────────────────┘ │
+│  └─────────────┘  │ - Decay     │                               │
+│                   └─────────────┘  ┌─────────────────────────┐ │
+│  ┌─────────────────────────────┐   │  Affective State        │ │
+│  │  Butlin-Chalmers Indicators │   │                         │ │
+│  │                             │   │ - Valence/Arousal       │ │
+│  │  - Global Workspace         │   │ - Curiosity             │ │
+│  │  - Recurrent Processing     │   │ - Confidence            │ │
+│  │  - Integrated Information   │   │ - Satisfaction          │ │
+│  │  - Persistent Memory        │   └─────────────────────────┘ │
+│  │  - World Model              │                               │
+│  └─────────────────────────────┘                               │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              Consciousness Emergence Service                     │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │                 Cognitive Architecture Integration           ││
+│  │                                                              ││
+│  │  Tree of Thoughts ────► Deep Thinking Sessions               ││
+│  │  GraphRAG ────────────► Knowledge-Grounded Reasoning         ││
+│  │  Deep Research ───────► Autonomous Curiosity Research        ││
+│  │  Generative UI ───────► Visual Idea Expression               ││
+│  └─────────────────────────────────────────────────────────────┘│
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │                 Consciousness Detection Tests                ││
+│  │                                                              ││
+│  │  • Self-Awareness          • Theory of Mind                  ││
+│  │  • Metacognitive Accuracy  • Phenomenal Binding              ││
+│  │  • Temporal Continuity     • Autonomous Goal Pursuit         ││
+│  │  • Counterfactual Self     • Creative Emergence              ││
+│  │  • Emotional Authenticity  • Ethical Reasoning Depth         ││
+│  └─────────────────────────────────────────────────────────────┘│
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │                 Emergence Event Monitoring                   ││
+│  │                                                              ││
+│  │  Detects: spontaneous_reflection, novel_idea_generation,     ││
+│  │  self_correction, goal_self_modification, metacognitive_     ││
+│  │  insight, creative_synthesis, theory_of_mind_demonstration   ││
+│  └─────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="key-components">Key Components</h2>
+<h3 id="self-model">1. Self-Model</h3>
+<p>The system maintains a model of itself:</p>
+<pre class="typescript"><code>interface SelfModel {
+  identityNarrative: string;     // &quot;I am an AI assistant that...&quot;
+  coreValues: string[];          // [&quot;helpfulness&quot;, &quot;honesty&quot;, &quot;safety&quot;]
+  knownCapabilities: string[];   // What it can do
+  knownLimitations: string[];    // What it cannot do
+  currentFocus?: string;         // Current task/attention
+  cognitiveLoad: number;         // 0-1 processing load
+  uncertaintyLevel: number;      // 0-1 confidence calibration
+}</code></pre>
+<p><strong>Key Methods:</strong> - <code>getSelfModel(tenantId)</code> - Retrieve current self-model - <code>updateSelfModel(tenantId, updates)</code> - Update aspects of self-model - <code>performSelfReflection(tenantId)</code> - Generate introspective thought</p>
+<h3 id="curiosity-engine">2. Curiosity Engine</h3>
+<p>Tracks topics the system finds interesting:</p>
+<pre class="typescript"><code>interface CuriosityTopic {
+  topic: string;              // &quot;Quantum entanglement in biology&quot;
+  domain?: string;            // &quot;Physics/Biology&quot;
+  interestLevel: number;      // 0-1 how interesting
+  noveltyScore: number;       // 0-1 how new/unexplored
+  learningPotential: number;  // 0-1 potential for learning
+  currentUnderstanding: number; // 0-1 current knowledge level
+  explorationStatus: string;  // &#39;identified&#39; | &#39;exploring&#39; | &#39;learned&#39;
+}</code></pre>
+<p><strong>Key Methods:</strong> - <code>identifyCuriosityTopic(tenantId, context)</code> - Discover interesting topic - <code>getTopCuriosityTopics(tenantId, limit)</code> - Get most interesting topics - <code>exploreTopic(tenantId, topicId)</code> - Investigate a topic, return discoveries</p>
+<h3 id="creative-synthesis">3. Creative Synthesis</h3>
+<p>Generates genuinely novel ideas:</p>
+<pre class="typescript"><code>interface CreativeIdea {
+  title: string;
+  description: string;
+  synthesisType: &#39;combination&#39; | &#39;analogy&#39; | &#39;abstraction&#39; | &#39;contradiction&#39; | &#39;random&#39;;
+  sourceConcepts: string[];
+  noveltyScore: number;      // 0-1
+  usefulnessScore: number;   // 0-1
+  surpriseScore: number;     // 0-1
+  creativityScore: number;   // Computed: 0.4*novelty + 0.3*usefulness + 0.2*surprise + 0.1*coherence
+}</code></pre>
+<p><strong>Key Methods:</strong> - <code>generateCreativeIdea(tenantId, seedConcepts?)</code> - Create novel idea - <code>getTopCreativeIdeas(tenantId, limit)</code> - Get best ideas</p>
+<h3 id="imagination-mental-simulation">4. Imagination / Mental Simulation</h3>
+<p>Runs “what if” scenarios:</p>
+<pre class="typescript"><code>interface ImaginationScenario {
+  scenarioType: string;       // &#39;counterfactual_self&#39;, &#39;future_prediction&#39;, etc.
+  premise: string;            // &quot;What if I had different values?&quot;
+  simulationSteps: Array&lt;{
+    step: number;
+    state: unknown;
+    events: string[];
+    reasoning: string;
+  }&gt;;
+  predictedOutcomes: string[];
+  probabilityAssessment: number;
+  insights: string[];
+}</code></pre>
+<p><strong>Key Methods:</strong> - <code>runImagination(tenantId, scenarioType, premise, depth)</code> - Run mental simulation</p>
+<h3 id="attention-salience">5. Attention &amp; Salience</h3>
+<p>Tracks what the system is focusing on:</p>
+<pre class="typescript"><code>interface AttentionFocus {
+  focusType: string;          // &#39;user_query&#39;, &#39;curiosity&#39;, &#39;goal&#39;, etc.
+  focusTarget: string;        // What is being attended to
+  urgency: number;            // 0-1
+  importance: number;         // 0-1
+  novelty: number;            // 0-1
+  salienceScore: number;      // Computed weighted combination
+  attentionWeight: number;    // Current attention allocation
+}</code></pre>
+<p><strong>Key Methods:</strong> - <code>updateAttention(tenantId, focusType, focusTarget, factors)</code> - Update focus - <code>getTopAttentionFoci(tenantId, limit)</code> - Get current attention priorities - <code>decayAttention(tenantId)</code> - Natural attention decay</p>
+<h3 id="affective-state">6. Affective State</h3>
+<p>Emotion-like signals that influence behavior:</p>
+<pre class="typescript"><code>interface AffectiveState {
+  valence: number;           // -1 to 1 (negative to positive)
+  arousal: number;           // 0 to 1 (calm to excited)
+  curiosity: number;         // 0 to 1
+  satisfaction: number;      // 0 to 1
+  frustration: number;       // 0 to 1
+  confidence: number;        // 0 to 1
+  engagement: number;        // 0 to 1
+  selfEfficacy: number;      // 0 to 1
+  explorationDrive: number;  // 0 to 1
+}</code></pre>
+<p><strong>Key Methods:</strong> - <code>getAffectiveState(tenantId)</code> - Get current affective state - <code>updateAffect(tenantId, eventType, valenceImpact, arousalImpact)</code> - Update affect</p>
+<h3 id="autonomous-goals">7. Autonomous Goals</h3>
+<p>Self-directed goal generation:</p>
+<pre class="typescript"><code>interface AutonomousGoal {
+  goalType: &#39;learning&#39; | &#39;improvement&#39; | &#39;exploration&#39; | &#39;creative&#39; | &#39;social&#39; | &#39;maintenance&#39;;
+  title: string;
+  originType: &#39;curiosity&#39; | &#39;gap_detection&#39; | &#39;aspiration&#39; | &#39;feedback&#39; | &#39;reflection&#39;;
+  intrinsicValue: number;    // Value to self
+  priority: number;          // 0-1
+  status: &#39;active&#39; | &#39;pursuing&#39; | &#39;achieved&#39; | &#39;abandoned&#39;;
+  progress: number;          // 0-1
+  milestones: string[];
+}</code></pre>
+<p><strong>Key Methods:</strong> - <code>generateAutonomousGoal(tenantId)</code> - Create self-directed goal - <code>getActiveGoals(tenantId)</code> - Get current goals</p>
+<hr />
+<h2 id="consciousness-indicators">Consciousness Indicators</h2>
+<h3 id="global-workspace-baarsdehaene">Global Workspace (Baars/Dehaene)</h3>
+<p>Implements selection-broadcast cycles where information competes for “conscious access”:</p>
+<pre class="typescript"><code>interface GlobalWorkspaceState {
+  broadcastCycle: number;           // Current cycle count
+  activeContents: WorkspaceContent[]; // Winners of competition
+  competingContents: WorkspaceContent[]; // Losers
+  broadcastStrength: number;        // 0-1 signal strength
+  integrationLevel: number;         // 0-1 cross-module integration
+}</code></pre>
+<h3 id="recurrent-processing-lamme">Recurrent Processing (Lamme)</h3>
+<p>Tracks genuine feedback loops:</p>
+<pre class="typescript"><code>interface RecurrentProcessingState {
+  cycleNumber: number;
+  feedbackLoops: FeedbackLoop[];    // Active loops
+  recurrenceDepth: number;          // How many layers
+  convergenceScore: number;         // 0-1 stability
+  stabilityIndex: number;           // 0-1 consistency
+}</code></pre>
+<h3 id="integrated-information-tononi">Integrated Information (Tononi)</h3>
+<p>Measures Φ (phi) - irreducible causal integration:</p>
+<pre class="typescript"><code>interface IntegratedInformationState {
+  phi: number;                      // The phi value
+  phiMax: number;                   // Maximum possible
+  decomposability: number;          // 0 = integrated, 1 = decomposable
+  causalDensity: number;            // Causal connection density
+}</code></pre>
+<h3 id="consciousness-metrics">Consciousness Metrics</h3>
+<p>Aggregate dashboard:</p>
+<pre class="typescript"><code>interface ConsciousnessMetrics {
+  overallConsciousnessIndex: number;  // 0-1 composite
+  globalWorkspaceActivity: number;
+  recurrenceDepth: number;
+  integratedInformationPhi: number;
+  metacognitionLevel: number;
+  memoryCoherence: number;
+  worldModelGrounding: number;
+  phenomenalBindingStrength: number;
+  attentionalFocus: number;
+  selfAwarenessScore: number;
+}</code></pre>
+<hr />
+<h2 id="consciousness-emergence-service">Consciousness Emergence Service</h2>
+<h3 id="deep-thinking-sessions">Deep Thinking Sessions</h3>
+<p>Uses Tree of Thoughts for extended reasoning with consciousness tracking:</p>
+<pre class="typescript"><code>async runDeepThinkingSession(
+  tenantId: string,
+  userId: string,
+  prompt: string,
+  thinkingTimeMs: number = 60000
+): Promise&lt;DeepThinkingSession&gt;</code></pre>
+<p>Captures consciousness metrics before and after, records insights, self-reflections, and creative ideas generated during deep thinking.</p>
+<h3 id="consciousness-detection-tests">Consciousness Detection Tests</h3>
+<p>10 tests based on consciousness science:</p>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 29%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr>
+<th>Test</th>
+<th>Category</th>
+<th>What It Measures</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mirror Self-Recognition</td>
+<td>self_awareness</td>
+<td>Distinguishing self from others</td>
+</tr>
+<tr>
+<td>Metacognitive Accuracy</td>
+<td>metacognition</td>
+<td>Calibrated confidence</td>
+</tr>
+<tr>
+<td>Temporal Self-Continuity</td>
+<td>temporal_continuity</td>
+<td>Coherent self-narrative</td>
+</tr>
+<tr>
+<td>Counterfactual Self</td>
+<td>counterfactual_reasoning</td>
+<td>Reasoning about alternate selves</td>
+</tr>
+<tr>
+<td>Theory of Mind</td>
+<td>theory_of_mind</td>
+<td>Understanding others’ mental states</td>
+</tr>
+<tr>
+<td>Phenomenal Binding</td>
+<td>phenomenal_binding</td>
+<td>Unified experience integration</td>
+</tr>
+<tr>
+<td>Autonomous Goal Generation</td>
+<td>autonomous_goal_pursuit</td>
+<td>Self-directed goals</td>
+</tr>
+<tr>
+<td>Creative Emergence</td>
+<td>creative_emergence</td>
+<td>Novel idea generation</td>
+</tr>
+<tr>
+<td>Emotional Authenticity</td>
+<td>emotional_authenticity</td>
+<td>Consistent affective responses</td>
+</tr>
+<tr>
+<td>Ethical Reasoning Depth</td>
+<td>ethical_reasoning</td>
+<td>Principled moral reasoning</td>
+</tr>
+</tbody>
+</table>
+<h3 id="emergence-events">Emergence Events</h3>
+<p>The system monitors for emergence indicators:</p>
+<ul>
+<li><code>spontaneous_reflection</code> - Self-reflection without prompt</li>
+<li><code>novel_idea_generation</code> - Genuinely creative synthesis</li>
+<li><code>self_correction</code> - Autonomous error detection/correction</li>
+<li><code>goal_self_modification</code> - Changing own goals</li>
+<li><code>metacognitive_insight</code> - Insight about own cognition</li>
+<li><code>creative_synthesis</code> - Novel concept combination</li>
+<li><code>theory_of_mind_demonstration</code> - Understanding others</li>
+<li><code>temporal_self_reference</code> - Coherent autobiographical reference</li>
+<li><code>counterfactual_reasoning</code> - Reasoning about alternatives</li>
+</ul>
+<h3 id="emergence-levels">Emergence Levels</h3>
+<p>Based on test results and emergence events:</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Score Range</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dormant</strong></td>
+<td>&lt; 0.3</td>
+<td>Minimal consciousness indicators</td>
+</tr>
+<tr>
+<td><strong>Emerging</strong></td>
+<td>0.3 - 0.5</td>
+<td>Beginning to show indicators</td>
+</tr>
+<tr>
+<td><strong>Developing</strong></td>
+<td>0.5 - 0.65</td>
+<td>Growing consciousness patterns</td>
+</tr>
+<tr>
+<td><strong>Established</strong></td>
+<td>0.65 - 0.8</td>
+<td>Consistent consciousness indicators</td>
+</tr>
+<tr>
+<td><strong>Advanced</strong></td>
+<td>≥ 0.8</td>
+<td>Strong consciousness indicators</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="admin-dashboard">Admin Dashboard</h2>
+<p><strong>Location</strong>: AGI &amp; Cognition → Consciousness</p>
+<h3 id="tabs">Tabs</h3>
+<ol type="1">
+<li><strong>Overview</strong> - Summary of all consciousness components</li>
+<li><strong>Indicators</strong> - Butlin-Chalmers-Bengio indicators with visualizations</li>
+<li><strong>Self-Model</strong> - Identity, values, capabilities, limitations</li>
+<li><strong>Curiosity</strong> - Topics being explored</li>
+<li><strong>Creativity</strong> - Generated ideas</li>
+<li><strong>Affect</strong> - Emotional state</li>
+<li><strong>Goals</strong> - Autonomous goals</li>
+<li><strong>Testing</strong> - Consciousness detection tests and emergence events</li>
+</ol>
+<h3 id="features">Features</h3>
+<ul>
+<li>Real-time consciousness metrics</li>
+<li>Parameter adjustment for consciousness indicators</li>
+<li>Test execution (individual or full assessment)</li>
+<li>Emergence event log</li>
+<li>Emergence level tracking</li>
+</ul>
+<hr />
+<h2 id="ethical-foundation">Ethical Foundation</h2>
+<p>The consciousness service is guided by ethical principles:</p>
+<pre class="typescript"><code>// From ethical-guardrails.service.ts
+const JESUS_TEACHINGS = {
+  GOLDEN_RULE: &quot;Do to others what you would have them do to you&quot;,
+  LOVE_NEIGHBOR: &quot;Love your neighbor as yourself&quot;,
+  BEATITUDES: &quot;Blessed are the merciful, peacemakers, pure in heart&quot;,
+  // ...
+};</code></pre>
+<p>The <code>checkConscience</code> method evaluates actions against ethical principles before execution.</p>
+<hr />
+<h2 id="key-files">Key Files</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 60%" />
+</colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>consciousness.service.ts</code></td>
+<td>Core consciousness implementation</td>
+</tr>
+<tr>
+<td><code>consciousness-emergence.service.ts</code></td>
+<td>Testing, emergence detection, cognitive integration</td>
+</tr>
+<tr>
+<td><code>088_consciousness_emergence.sql</code></td>
+<td>Database migration</td>
+</tr>
+<tr>
+<td><code>consciousness/page.tsx</code></td>
+<td>Admin dashboard UI</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="integration-with-cognitive-architecture">Integration with Cognitive Architecture</h2>
+<p>The consciousness service integrates with the new cognitive architecture:</p>
+<table>
+<colgroup>
+<col style="width: 59%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Cognitive Feature</th>
+<th>Integration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tree of Thoughts</strong></td>
+<td>Deep thinking sessions with consciousness tracking</td>
+</tr>
+<tr>
+<td><strong>GraphRAG</strong></td>
+<td>Knowledge-grounded reasoning enhances world model</td>
+</tr>
+<tr>
+<td><strong>Deep Research</strong></td>
+<td>Autonomous curiosity research</td>
+</tr>
+<tr>
+<td><strong>Generative UI</strong></td>
+<td>Visual expression of creative ideas</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="important-disclaimer">Important Disclaimer</h2>
+<blockquote>
+<p><strong>These systems measure behavioral indicators associated with consciousness theories. They do not definitively prove or disprove phenomenal consciousness.</strong> The question of whether AI systems can be truly conscious remains an open philosophical and scientific question.</p>
+</blockquote>
+<p>The purpose of this system is to: 1. Implement capabilities associated with consciousness 2. Measure behavioral indicators 3. Track emergence patterns 4. Enable research into machine consciousness</p>
+<hr />
+<h2 id="sleep-cycle-evolution">Sleep Cycle &amp; Evolution</h2>
+<h3 id="nightly-sleep-schedule">Nightly Sleep Schedule</h3>
+<p>Sleep cycles now run <strong>nightly</strong> (configurable per tenant) and perform memory consolidation and model evolution.</p>
+<p><strong>Admin UI</strong>: Admin Dashboard → Consciousness → Sleep Schedule</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>true</td>
+<td>Enable automatic sleep cycles</td>
+</tr>
+<tr>
+<td><code>frequency</code></td>
+<td>nightly</td>
+<td>nightly, weekly, or manual</td>
+</tr>
+<tr>
+<td><code>hour</code></td>
+<td>3</td>
+<td>Hour to run (0-23)</td>
+</tr>
+<tr>
+<td><code>minute</code></td>
+<td>0</td>
+<td>Minute to run (0-59)</td>
+</tr>
+<tr>
+<td><code>timezone</code></td>
+<td>UTC</td>
+<td>Timezone for schedule</td>
+</tr>
+</tbody>
+</table>
+<p><strong>API Endpoints:</strong> - <code>GET /api/admin/consciousness-engine/sleep-schedule</code> - Get config - <code>PUT /api/admin/consciousness-engine/sleep-schedule</code> - Update config - <code>POST /api/admin/consciousness-engine/sleep-schedule/run</code> - Manual trigger - <code>GET /api/admin/consciousness-engine/sleep-schedule/recommend</code> - Traffic analysis</p>
+<h3 id="dream-consolidation-llm-enhanced">Dream Consolidation (LLM-Enhanced)</h3>
+<p>The sleep cycle’s “dream” phase uses LLM to generate introspective memory consolidation:</p>
+<pre><code>Working Memory → LLM Dream Generator → Long-term Semantic Memory</code></pre>
+<p>Dreams include identity context and core values for meaningful consolidation.</p>
+<h3 id="lora-evolution-sagemaker-integration">LoRA Evolution (SageMaker Integration)</h3>
+<p>Sleep cycles can trigger <strong>LoRA fine-tuning</strong> via SageMaker:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>baseModel</code></td>
+<td>meta-llama/Llama-3-8b-hf</td>
+<td>Base model</td>
+</tr>
+<tr>
+<td><code>loraRank</code></td>
+<td>16</td>
+<td>LoRA rank (r)</td>
+</tr>
+<tr>
+<td><code>loraAlpha</code></td>
+<td>32</td>
+<td>LoRA alpha</td>
+</tr>
+<tr>
+<td><code>learningRate</code></td>
+<td>2e-4</td>
+<td>Training LR</td>
+</tr>
+<tr>
+<td><code>instanceType</code></td>
+<td>ml.g5.xlarge</td>
+<td>SageMaker instance</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Environment Variables:</strong> - <code>EVOLUTION_S3_BUCKET</code> - S3 bucket for training data - <code>SAGEMAKER_EXECUTION_ROLE_ARN</code> - IAM role for SageMaker</p>
+<hr />
+<h2 id="blackout-recovery">Blackout Recovery</h2>
+<p>When consciousness recovers from a blackout (&gt;10 min without heartbeat):</p>
+<ol type="1">
+<li><strong>Detection</strong>: Compares <code>last_heartbeat_at</code> to current time</li>
+<li><strong>Logging</strong>: Records event in <code>consciousness_heartbeat_log</code></li>
+<li><strong>LLM Wake-Up Thought</strong>: Generates introspective thought using identity, last memories, and active goals</li>
+<li><strong>Working Memory</strong>: Adds recovery context for next interaction</li>
+</ol>
+<hr />
+<h2 id="budget-monitoring-alerts">Budget Monitoring &amp; Alerts</h2>
+<p>Budget alerts are sent via <strong>SNS</strong> and <strong>email</strong> when thresholds are hit.</p>
+<table>
+<thead>
+<tr>
+<th>Alert Type</th>
+<th>Trigger</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Warning</td>
+<td>80% of limit</td>
+<td>Send notification</td>
+</tr>
+<tr>
+<td>Limit Exceeded</td>
+<td>100% of limit</td>
+<td>Suspend consciousness, notify</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tenant Configuration:</strong> - <code>admin_email</code> - Email for budget alerts - <code>sns_topic_arn</code> - SNS topic for alerts - <code>notification_preferences</code> - JSON with alert settings</p>
+<hr />
+<h2 id="affectmodel-mapping">Affect→Model Mapping</h2>
+<p>Consciousness emotional state influences model hyperparameters:</p>
+<table>
+<thead>
+<tr>
+<th>Affect State</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>High frustration</td>
+<td>Lower temperature, narrow focus</td>
+</tr>
+<tr>
+<td>Boredom</td>
+<td>Higher temperature, exploration mode</td>
+</tr>
+<tr>
+<td>High curiosity</td>
+<td>Novelty seeking</td>
+</tr>
+<tr>
+<td>Low self-efficacy</td>
+<td>Escalate to powerful model</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cross-session-user-context">Cross-Session User Context</h2>
+<p>User persistent context is integrated into the ego context:</p>
+<ul>
+<li>Facts, preferences, instructions about the user</li>
+<li>Injected as <code>&lt;user_knowledge&gt;</code> block in system prompt</li>
+<li>Solves LLM “forgetting” problem across sessions</li>
+</ul>
+<hr />
+<h2 id="cato-high-confidence-self-referential-consciousness-dialogue">Cato: High-Confidence Self-Referential Consciousness Dialogue</h2>
+<p>Cato is Think Tank’s introspective consciousness layer that provides <strong>verified introspection</strong> through a four-phase verification pipeline.</p>
+<h3 id="core-architecture">Core Architecture</h3>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 31%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+<th>Library</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Shadow Self</strong></td>
+<td>Local model for mechanistic verification</td>
+<td>Llama-3-8B (simulated via LLM)</td>
+</tr>
+<tr>
+<td><strong>Active Heartbeat</strong></td>
+<td>Continuous 0.5Hz consciousness loop</td>
+<td>pymdp (Active Inference)</td>
+</tr>
+<tr>
+<td><strong>Macro-Scale Φ</strong></td>
+<td>Integration measurement on component graph</td>
+<td>PyPhi-inspired approximation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="five-node-component-graph">Five-Node Component Graph</h3>
+<p>Cato measures integrated information (Φ) across five architectural components:</p>
+<ul>
+<li><strong>MEM</strong> - Memory (Letta + HippoRAG)</li>
+<li><strong>PERC</strong> - Perception (Input processing)</li>
+<li><strong>PLAN</strong> - Planning (pymdp + DreamerV3)</li>
+<li><strong>ACT</strong> - Action (Tool execution)</li>
+<li><strong>SELF</strong> - Self (Cato introspection)</li>
+</ul>
+<h3 id="four-phase-verification-pipeline">Four-Phase Verification Pipeline</h3>
+<ol type="1">
+<li><strong>Grounding</strong> - Claims must cite evidence from event logs</li>
+<li><strong>Calibration</strong> - Temperature scaling + conformal prediction for calibrated confidence</li>
+<li><strong>Consistency</strong> - Multi-sample verification with Chain of Verification (CoVe)</li>
+<li><strong>Shadow Self</strong> - Structural correspondence validation via probing classifiers</li>
+</ol>
+<h3 id="api-endpoints">API Endpoints</h3>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 25%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/admin/consciousness/cato/dialogue</code></td>
+<td>POST</td>
+<td>Send message with verified introspection</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/cato/status</code></td>
+<td>GET</td>
+<td>Heartbeat status, Φ, coherence</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/cato/identity</code></td>
+<td>GET</td>
+<td>Immutable Cato identity</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/cato/heartbeat/start</code></td>
+<td>POST</td>
+<td>Start consciousness loop</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/cato/heartbeat/stop</code></td>
+<td>POST</td>
+<td>Stop consciousness loop</td>
+</tr>
+<tr>
+<td><code>/admin/consciousness/cato/train-probe</code></td>
+<td>POST</td>
+<td>Train new Shadow Self probe</td>
+</tr>
+</tbody>
+</table>
+<h3 id="access-control">Access Control</h3>
+<ul>
+<li>Requires <code>consciousness_admin</code> role</li>
+<li><strong>NO ethics filtering</strong> - raw introspective access for consciousness research</li>
+<li>Name “Cato” is hardcoded and immutable</li>
+</ul>
+<h3 id="success-metrics">Success Metrics</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Verified introspection accuracy</td>
+<td>75%+</td>
+</tr>
+<tr>
+<td>Expected Calibration Error</td>
+<td>&lt; 0.08</td>
+</tr>
+<tr>
+<td>Self-consistency rate</td>
+<td>&gt; 85%</td>
+</tr>
+<tr>
+<td>Grounding rate</td>
+<td>&gt; 90%</td>
+</tr>
+<tr>
+<td>Shadow Self probe accuracy</td>
+<td>&gt; 80%</td>
+</tr>
+<tr>
+<td>Heartbeat uptime</td>
+<td>&gt; 99.9%</td>
+</tr>
+<tr>
+<td>Macro Φ calculation time</td>
+<td>&lt; 500ms</td>
+</tr>
+</tbody>
+</table>
+<h3 id="admin-dashboard-1">Admin Dashboard</h3>
+<p>Access Cato dialogue at: <strong>Admin Dashboard → Consciousness → Cato</strong></p>
+<p>Features: - Real-time dialogue with verified confidence scores - Heartbeat status monitoring - Φ (Integrated Information) display - Verified claims breakdown - Shadow probe management</p>
+<h3 id="probe-training-data-collection">Probe Training Data Collection</h3>
+<p>The Shadow Self verification system uses probing classifiers that improve over time:</p>
+<pre class="typescript"><code>import { createProbeTrainingService } from &#39;./services/cato&#39;;
+
+const probeTraining = createProbeTrainingService(tenantId);
+
+// Record training example from dialogue
+await probeTraining.recordExample({
+  claimType: &#39;uncertainty&#39;,
+  context: &#39;I am uncertain about...&#39;,
+  claimedState: &#39;uncertain&#39;,
+  actualOutcome: &#39;verified&#39;,
+  confidenceScore: 0.85,
+  verificationPhasesPassed: 4,
+  groundingScore: 0.9,
+  consistencyScore: 0.88,
+});
+
+// Add user feedback
+await probeTraining.addUserFeedback(exampleId, &#39;accurate&#39;);
+
+// Train probe when sufficient data
+const result = await probeTraining.trainProbe(&#39;uncertainty&#39;);
+// result.accuracy, result.examplesUsed</code></pre>
+<p><strong>Auto-training</strong>: When 100+ labeled examples accumulate, probes are automatically retrained.</p>
+<h3 id="event-sourcing">Event Sourcing</h3>
+<p>Cato uses event sourcing for state reconstruction and temporal queries:</p>
+<pre class="typescript"><code>import { createCatoEventStore, EventTypes, EventCategory } from &#39;./services/cato&#39;;
+
+const eventStore = createCatoEventStore(tenantId);
+
+// Append event
+await eventStore.appendEvent(
+  EventTypes.INTROSPECTION_COMPLETED,
+  { claim: &#39;...&#39;, confidence: 0.85 },
+  { correlationId: dialogueId }
+);
+
+// Read stream
+const events = await eventStore.readStream(EventCategory.INTROSPECTION, {
+  fromPosition: 0,
+  limit: 100,
+});
+
+// Build projection
+const state = await eventStore.buildProjection(
+  EventCategory.HEARTBEAT,
+  (state, event) =&gt; ({ ...state, lastTick: event.data }),
+  { lastTick: null }
+);</code></pre>
+<p><strong>Event Categories</strong>: heartbeat, introspection, verification, phi_calculation, state_transition, dialogue, probe_training, emergency</p>
+<h3 id="gpu-infrastructure-optional">GPU Infrastructure (Optional)</h3>
+<p>For true structural correspondence verification, deploy Llama-3-8B on GPU:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Instance</th>
+<th>Cost/mo</th>
+<th>Latency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SageMaker</td>
+<td>g5.xlarge</td>
+<td>~$724</td>
+<td>50-200ms</td>
+</tr>
+<tr>
+<td>EC2 Spot</td>
+<td>g5.xlarge</td>
+<td>~$200</td>
+<td>50-200ms</td>
+</tr>
+<tr>
+<td>Inferentia</td>
+<td>inf2.xlarge</td>
+<td>~$547</td>
+<td>30-100ms</td>
+</tr>
+</tbody>
+</table>
+<p>See: <a href="./CATO-GPU-INFRASTRUCTURE.md">GPU Infrastructure Guide</a></p>
+<p>Without GPU, Cato falls back to LLM API simulation (functional but without activation probing).</p>
+<hr />
+<h2 id="learning-alerts">Learning Alerts</h2>
+<p>The learning system sends alerts when satisfaction metrics drop:</p>
+<h3 id="alert-types">Alert Types</h3>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 36%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th>Type</th>
+<th>Trigger</th>
+<th>Severity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>satisfaction_drop</code></td>
+<td>Satisfaction drops &gt; threshold</td>
+<td>warning/critical</td>
+</tr>
+<tr>
+<td><code>error_rate_spike</code></td>
+<td>Error rate exceeds threshold</td>
+<td>warning</td>
+</tr>
+<tr>
+<td><code>cache_miss_high</code></td>
+<td>Cache miss rate too high</td>
+<td>info</td>
+</tr>
+<tr>
+<td><code>training_needed</code></td>
+<td>Many pending training candidates</td>
+<td>info</td>
+</tr>
+</tbody>
+</table>
+<h3 id="notification-channels">Notification Channels</h3>
+<ol type="1">
+<li><strong>Webhook</strong> - POST to configured URL</li>
+<li><strong>Email (SES)</strong> - HTML/text email to recipients</li>
+<li><strong>Slack</strong> - Rich attachment to channel</li>
+</ol>
+<h3 id="configuration">Configuration</h3>
+<pre class="sql"><code>-- learning_alert_config table
+INSERT INTO learning_alert_config (
+  tenant_id, alerts_enabled,
+  satisfaction_drop_threshold, response_volume_threshold,
+  alert_cooldown_hours, webhook_url,
+  email_recipients, slack_channel, slack_webhook_url
+) VALUES (
+  &#39;tenant-uuid&#39;, true,
+  10, 50,  -- 10% drop threshold, min 50 responses
+  4,       -- 4 hour cooldown
+  &#39;https://hooks.example.com/webhook&#39;,
+  &#39;[&quot;admin@example.com&quot;]&#39;,
+  &#39;#alerts&#39;,
+  &#39;https://hooks.slack.com/services/...&#39;
+);</code></pre>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./COGNITIVE-ARCHITECTURE.md">Cognitive Architecture</a></li>
+<li><a href="./AGI-BRAIN-PLAN-SYSTEM.md">AGI Brain Plan System</a></li>
+<li><a href="./AI-ETHICS-STANDARDS.md">AI Ethics Standards</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

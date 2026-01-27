@@ -48,6 +48,7 @@ import {
   GraduationCap,
   FlaskConical,
   Lightbulb,
+  Key,
   Route,
   Edit3,
   ListChecks,
@@ -124,11 +125,15 @@ const navigation: NavigationItem[] = [
   
   // System Section
   { type: 'separator', label: 'System' },
+  { name: 'System Overview', href: '/system/overview', icon: Activity },
+  { name: 'Gateway Config', href: '/system/gateway', icon: Zap },
   { name: 'Infrastructure Tier', href: '/system/infrastructure', icon: Server },
+  { name: 'PostgreSQL Scaling', href: '/infrastructure/postgresql-scaling', icon: Database },
   
   // Memory Section
   { type: 'separator', label: 'Memory' },
   { name: 'Cortex', href: '/cortex', icon: Database },
+  { name: 'Graph-RAG', href: '/cortex/graph-rag', icon: Network },
   { name: 'Graph Explorer', href: '/cortex/graph', icon: Network },
   { name: 'Conflicts', href: '/cortex/conflicts', icon: GitPullRequest },
   { name: 'GDPR Erasure', href: '/cortex/gdpr', icon: Shield },
@@ -246,6 +251,8 @@ const navigation: NavigationItem[] = [
   
   // Settings Section
   { type: 'separator', label: 'Settings' },
+  { name: 'OAuth Apps', href: '/oauth/apps', icon: Key },
+  { name: 'SSO Connections', href: '/settings/sso', icon: Lock },
   { name: 'Cognitive Arch', href: '/settings/cognitive', icon: Brain },
   { name: 'Intelligence', href: '/settings/intelligence', icon: Zap },
   { name: 'Storage Tiers', href: '/settings/storage', icon: HardDrive },
@@ -253,6 +260,7 @@ const navigation: NavigationItem[] = [
   { name: 'White-Label', href: '/settings/white-label', icon: Layers },
   { name: 'System Config', href: '/system-config', icon: Wrench },
   { name: 'Localization', href: '/localization', icon: Languages },
+  { name: 'Translation Registry', href: '/localization/registry', icon: Globe },
   { name: 'Translation AI', href: '/localization/translation-middleware', icon: Languages },
   { name: 'Translations', href: '/localization/translations', icon: FileText },
   { name: 'Configuration', href: '/configuration', icon: Sliders },

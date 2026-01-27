@@ -212,7 +212,7 @@ function StepNode({
           <p className="text-xs text-muted-foreground/70 mt-1 truncate">{step.method.description}</p>
           {step.parallelExecution?.enabled && (
             <Badge variant="outline" className="mt-2 text-xs">
-              ⚡ {step.parallelExecution.models.length} models
+              ⚡ {step.parallelExecution.models?.length || 0} models
             </Badge>
           )}
         </div>
@@ -286,15 +286,15 @@ function StepConfigPanel({
             <TabsContent value="general" className="space-y-4 mt-4">
               <div className="space-y-2">
                 <Label>Step Name</Label>
-                <Input value={step.stepName} onChange={(e) => onUpdate({ stepName: e.target.value })} />
+                <Input value={step.stepName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ stepName: e.target.value })} />
               </div>
               <div className="space-y-2">
                 <Label>Step Order</Label>
-                <Input type="number" value={step.stepOrder} onChange={(e) => onUpdate({ stepOrder: Number(e.target.value) })} min={1} />
+                <Input type="number" value={step.stepOrder} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ stepOrder: Number(e.target.value) })} min={1} />
               </div>
               <div className="space-y-2">
                 <Label>Model Override</Label>
-                <Select value={step.modelOverride || 'default'} onValueChange={(v) => onUpdate({ modelOverride: v === 'default' ? undefined : v })}>
+                <Select value={step.modelOverride || 'default'} onValueChange={(v: string) => onUpdate({ modelOverride: v === 'default' ? undefined : v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="default">Use Default</SelectItem>
@@ -307,7 +307,7 @@ function StepConfigPanel({
               </div>
               <div className="space-y-2">
                 <Label>Output Variable</Label>
-                <Input value={step.outputVariable || ''} onChange={(e) => onUpdate({ outputVariable: e.target.value })} placeholder="e.g., response_a" />
+                <Input value={step.outputVariable || ''} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ outputVariable: e.target.value })} placeholder="e.g., response_a" />
               </div>
             </TabsContent>
 
@@ -322,7 +322,7 @@ function StepConfigPanel({
                 <Label>Parameter Overrides (JSON)</Label>
                 <Textarea
                   value={JSON.stringify(step.parameterOverrides, null, 2)}
-                  onChange={(e) => {
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                     try { onUpdate({ parameterOverrides: JSON.parse(e.target.value) }); } catch { /* invalid JSON */ }
                   }}
                   rows={6}
@@ -335,7 +335,7 @@ function StepConfigPanel({
                   <div className="flex items-center gap-4">
                     <Slider
                       value={[Number(step.parameterOverrides.temperature || 0.7)]}
-                      onValueChange={([v]) => onUpdate({ parameterOverrides: { ...step.parameterOverrides, temperature: v } })}
+                      onValueChange={([v]: number[]) => onUpdate({ parameterOverrides: { ...step.parameterOverrides, temperature: v } })}
                       min={0} max={2} step={0.1} className="flex-1"
                     />
                     <span className="text-sm w-12">{Number(step.parameterOverrides.temperature || 0.7).toFixed(1)}</span>
@@ -347,7 +347,7 @@ function StepConfigPanel({
             <TabsContent value="parallel" className="mt-4">
               <ParallelExecutionPanel
                 config={step.parallelExecution}
-                onUpdate={(config) => onUpdate({ parallelExecution: config })}
+                onChange={(config: ParallelExecutionConfig) => onUpdate({ parallelExecution: config })}
               />
             </TabsContent>
 
@@ -357,17 +357,17 @@ function StepConfigPanel({
                   <Label>Iterative Execution</Label>
                   <p className="text-xs text-muted-foreground">Repeat this step multiple times</p>
                 </div>
-                <Switch checked={step.isIterative} onCheckedChange={(v) => onUpdate({ isIterative: v })} />
+                <Switch checked={step.isIterative} onCheckedChange={(v: boolean) => onUpdate({ isIterative: v })} />
               </div>
               {step.isIterative && (
                 <div className="space-y-2">
                   <Label>Max Iterations</Label>
-                  <Input type="number" value={step.maxIterations} onChange={(e) => onUpdate({ maxIterations: Number(e.target.value) })} min={1} max={10} />
+                  <Input type="number" value={step.maxIterations} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ maxIterations: Number(e.target.value) })} min={1} max={10} />
                 </div>
               )}
               <div className="space-y-2">
                 <Label>Condition Expression</Label>
-                <Textarea value={step.conditionExpression || ''} onChange={(e) => onUpdate({ conditionExpression: e.target.value })} placeholder="e.g., confidence < 0.7" rows={2} />
+                <Textarea value={step.conditionExpression || ''} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onUpdate({ conditionExpression: e.target.value })} placeholder="e.g., confidence < 0.7" rows={2} />
               </div>
             </TabsContent>
           </Tabs>
@@ -580,7 +580,7 @@ export default function OrchestrationPatternEditorPage() {
             <h3 className="font-semibold mb-2">Methods</h3>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search methods..." className="pl-9" value={methodSearch} onChange={(e) => setMethodSearch(e.target.value)} />
+              <Input placeholder="Search methods..." className="pl-9" value={methodSearch} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMethodSearch(e.target.value)} />
             </div>
           </div>
           <ScrollArea className="h-[calc(100vh-18rem)]">
@@ -705,21 +705,21 @@ export default function OrchestrationPatternEditorPage() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>Pattern Name</Label>
-              <Input value={workflow.commonName} onChange={(e) => setWorkflow(prev => ({ ...prev, commonName: e.target.value }))} />
+              <Input value={workflow.commonName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWorkflow(prev => ({ ...prev, commonName: e.target.value }))} />
             </div>
             <div className="space-y-2">
               <Label>Formal Name</Label>
-              <Input value={workflow.formalName} onChange={(e) => setWorkflow(prev => ({ ...prev, formalName: e.target.value }))} />
+              <Input value={workflow.formalName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWorkflow(prev => ({ ...prev, formalName: e.target.value }))} />
             </div>
             <div className="space-y-2">
               <Label>Description</Label>
-              <Textarea value={workflow.description} onChange={(e) => setWorkflow(prev => ({ ...prev, description: e.target.value }))} rows={3} />
+              <Textarea value={workflow.description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setWorkflow(prev => ({ ...prev, description: e.target.value }))} rows={3} />
             </div>
             <div className="space-y-2">
               <Label>Default Configuration (JSON)</Label>
               <Textarea
                 value={JSON.stringify(workflow.defaultConfig, null, 2)}
-                onChange={(e) => { try { setWorkflow(prev => ({ ...prev, defaultConfig: JSON.parse(e.target.value) })); } catch { /* invalid */ } }}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => { try { setWorkflow(prev => ({ ...prev, defaultConfig: JSON.parse(e.target.value) })); } catch { /* invalid */ } }}
                 rows={4}
                 className="font-mono text-sm"
               />
@@ -729,7 +729,7 @@ export default function OrchestrationPatternEditorPage() {
                 <Label>Enabled</Label>
                 <p className="text-sm text-muted-foreground">Allow this pattern to be selected</p>
               </div>
-              <Switch checked={workflow.isEnabled} onCheckedChange={(v) => setWorkflow(prev => ({ ...prev, isEnabled: v }))} />
+              <Switch checked={workflow.isEnabled} onCheckedChange={(v: boolean) => setWorkflow(prev => ({ ...prev, isEnabled: v }))} />
             </div>
           </div>
           <DialogFooter>

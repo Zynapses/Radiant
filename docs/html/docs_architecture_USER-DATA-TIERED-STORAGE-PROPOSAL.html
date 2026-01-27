@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USER DATA TIERED STORAGE PROPOSAL - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>USER DATA TIERED STORAGE PROPOSAL</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/architecture/USER-DATA-TIERED-STORAGE-PROPOSAL.md</div>
+  </div>
+  
+  <h1 id="user-data-tiered-storage-architecture-proposal">User Data Tiered Storage Architecture Proposal</h1>
+<p><strong>Version</strong>: 1.0.0<br />
+<strong>Date</strong>: January 24, 2026<br />
+<strong>Status</strong>: PROPOSAL<br />
+<strong>Scale Target</strong>: 1M+ concurrent users</p>
+<hr />
+<h2 id="executive-summary">Executive Summary</h2>
+<p>This document evaluates whether to use Cortex’s Hot/Warm/Cold tiered storage architecture for user data (chats, audits, results, uploads) versus dedicated services.</p>
+<p><strong>Recommendation</strong>: Create a <strong>parallel User Data Service (UDS)</strong> that mirrors Cortex’s tiered architecture but is purpose-built for user-generated content with strict security isolation.</p>
+<hr />
+<h2 id="data-categories-analysis">1. Data Categories Analysis</h2>
+<h3 id="chats-conversations">1.1 Chats (Conversations)</h3>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 25%" />
+<col style="width: 46%" />
+</colgroup>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Volume</strong></td>
+<td>~50 messages/user/day</td>
+<td>50M messages/day at scale</td>
+</tr>
+<tr>
+<td><strong>Size</strong></td>
+<td>~2KB average per message</td>
+<td>~100GB/day raw</td>
+</tr>
+<tr>
+<td><strong>Access Pattern</strong></td>
+<td>90% within 24h, 99% within 30 days</td>
+<td>Perfect for tiering</td>
+</tr>
+<tr>
+<td><strong>Retention</strong></td>
+<td>7 years (compliance)</td>
+<td>Cold tier essential</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>User-private, PHI possible</td>
+<td>Encryption + RLS mandatory</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tiered Fit</strong>: ⭐⭐⭐⭐⭐ Excellent</p>
+<h3 id="audit-history">1.2 Audit History</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Volume</strong></td>
+<td>~10 events/user/day</td>
+<td>10M events/day</td>
+</tr>
+<tr>
+<td><strong>Size</strong></td>
+<td>~500 bytes average</td>
+<td>~5GB/day</td>
+</tr>
+<tr>
+<td><strong>Access Pattern</strong></td>
+<td>&lt;1% ever accessed</td>
+<td>Cold-dominant</td>
+</tr>
+<tr>
+<td><strong>Retention</strong></td>
+<td>7 years (HIPAA/SOC2)</td>
+<td>Immutable cold storage</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>Tamper-proof, write-once</td>
+<td>Merkle chain + glacier</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tiered Fit</strong>: ⭐⭐⭐⭐⭐ Excellent (but Cold-dominant)</p>
+<h3 id="results-ai-responses-artifacts">1.3 Results (AI Responses, Artifacts)</h3>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 25%" />
+<col style="width: 46%" />
+</colgroup>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Volume</strong></td>
+<td>~20 results/user/day</td>
+<td>20M/day</td>
+</tr>
+<tr>
+<td><strong>Size</strong></td>
+<td>Variable (1KB - 1MB)</td>
+<td>~200GB/day</td>
+</tr>
+<tr>
+<td><strong>Access Pattern</strong></td>
+<td>Often re-requested within session</td>
+<td>Hot cache valuable</td>
+</tr>
+<tr>
+<td><strong>Retention</strong></td>
+<td>Tied to conversation</td>
+<td>Follow chat lifecycle</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>User-private, may contain code</td>
+<td>Sandboxed + encrypted</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tiered Fit</strong>: ⭐⭐⭐⭐ Good (follows conversation tier)</p>
+<h3 id="uploads-documents-images">1.4 Uploads (Documents, Images)</h3>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 25%" />
+<col style="width: 46%" />
+</colgroup>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Volume</strong></td>
+<td>~2 uploads/user/week</td>
+<td>300K/day</td>
+</tr>
+<tr>
+<td><strong>Size</strong></td>
+<td>100KB - 100MB</td>
+<td>~3TB/day</td>
+</tr>
+<tr>
+<td><strong>Access Pattern</strong></td>
+<td>Burst on upload, then rare</td>
+<td>S3 + metadata index</td>
+</tr>
+<tr>
+<td><strong>Retention</strong></td>
+<td>User-controlled</td>
+<td>GDPR right to erasure</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>User-private, virus scan needed</td>
+<td>Isolated S3 + scanning</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tiered Fit</strong>: ⭐⭐⭐ Moderate (S3 is natural home)</p>
+<hr />
+<h2 id="architecture-options">2. Architecture Options</h2>
+<h3 id="option-a-extend-cortex-for-user-data">Option A: Extend Cortex for User Data</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    CORTEX SYSTEM                             │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  HOT TIER (Redis ElastiCache)                       │   │
+│  │  - AI Memory (current)                              │   │
+│  │  - User Chats (NEW)                                 │   │
+│  │  - Session Results (NEW)                            │   │
+│  └─────────────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  WARM TIER (Neptune + PostgreSQL)                   │   │
+│  │  - Knowledge Graph (current)                        │   │
+│  │  - Chat History (NEW)                               │   │
+│  │  - Audit Trail (NEW)                                │   │
+│  └─────────────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  COLD TIER (S3 Iceberg)                             │   │
+│  │  - Archived Knowledge (current)                     │   │
+│  │  - Archived Chats (NEW)                             │   │
+│  │  - Compliance Archive (NEW)                         │   │
+│  │  - Uploads (NEW)                                    │   │
+│  └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<p><strong>Pros</strong>: - Single system to maintain - Unified tier coordination - Existing GDPR erasure flow</p>
+<p><strong>Cons</strong>: - ❌ Cortex is AI-memory focused, not user-data focused - ❌ Different security models (AI memory vs user PII) - ❌ Different access patterns (graph queries vs time-series) - ❌ Risk of coupling failures - ❌ Neptune cost increases significantly</p>
+<h3 id="option-b-parallel-user-data-service-recommended">Option B: Parallel User Data Service (Recommended)</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                 USER DATA SERVICE (UDS)                      │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  HOT TIER                                            │   │
+│  │  ┌───────────────┐  ┌───────────────┐              │   │
+│  │  │ ElastiCache   │  │ DynamoDB DAX  │              │   │
+│  │  │ (Sessions)    │  │ (Hot Chats)   │              │   │
+│  │  └───────────────┘  └───────────────┘              │   │
+│  │  TTL: 4 hours        TTL: 24 hours                  │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                  │
+│                           ▼                                  │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  WARM TIER                                           │   │
+│  │  ┌───────────────┐  ┌───────────────┐              │   │
+│  │  │ Aurora PG     │  │ OpenSearch    │              │   │
+│  │  │ (Chats +      │  │ (Full-text    │              │   │
+│  │  │  Audits)      │  │  Search)      │              │   │
+│  │  └───────────────┘  └───────────────┘              │   │
+│  │  Retention: 90 days active                          │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                  │
+│                           ▼                                  │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  COLD TIER                                           │   │
+│  │  ┌───────────────┐  ┌───────────────┐              │   │
+│  │  │ S3 Iceberg    │  │ S3 Glacier    │              │   │
+│  │  │ (Queryable    │  │ (Deep         │              │   │
+│  │  │  Archive)     │  │  Archive)     │              │   │
+│  │  └───────────────┘  └───────────────┘              │   │
+│  │  Retention: 7 years (compliance)                    │   │
+│  └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+           │                                │
+           │                                │
+           ▼                                ▼
+┌─────────────────────┐      ┌─────────────────────┐
+│  CORTEX (AI Memory) │      │  Uploads Service    │
+│  (Separate System)  │      │  (S3 + Metadata)    │
+└─────────────────────┘      └─────────────────────┘</code></pre>
+<p><strong>Pros</strong>: - ✅ Purpose-built for user data - ✅ Separate security domain - ✅ Independent scaling - ✅ No Neptune dependency for chats - ✅ Cost optimized per data type</p>
+<p><strong>Cons</strong>: - Two systems to maintain - Need to sync GDPR erasure</p>
+<h3 id="option-c-hybrid-cortex-for-ai-uds-for-user">Option C: Hybrid (Cortex for AI, UDS for User)</h3>
+<p>Best of both worlds: - <strong>Cortex</strong> handles AI memory, knowledge graphs, semantic search - <strong>UDS</strong> handles user-generated content with security isolation - <strong>Bridge Service</strong> coordinates GDPR erasure, data lineage</p>
+<hr />
+<h2 id="recommended-architecture-option-b-bridge">3. Recommended Architecture: Option B + Bridge</h2>
+<h3 id="system-overview">3.1 System Overview</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                           RADIANT DATA LAYER                             │
+│                                                                          │
+│  ┌────────────────────────┐        ┌────────────────────────┐          │
+│  │   USER DATA SERVICE    │        │    CORTEX MEMORY       │          │
+│  │   (UDS)                │        │    SERVICE             │          │
+│  │                        │        │                        │          │
+│  │  Chats, Audits,        │◀──────▶│  AI Memory,            │          │
+│  │  Results, Uploads      │ Bridge │  Knowledge Graph       │          │
+│  │                        │        │                        │          │
+│  └────────────────────────┘        └────────────────────────┘          │
+│              │                                  │                        │
+│              │                                  │                        │
+│              ▼                                  ▼                        │
+│  ┌────────────────────────────────────────────────────────────────┐    │
+│  │                    SECURITY LAYER                               │    │
+│  │  - Row-Level Security (RLS)                                     │    │
+│  │  - Tenant Isolation                                             │    │
+│  │  - User Data Encryption (AES-256-GCM)                          │    │
+│  │  - Audit Logging                                                │    │
+│  │  - GDPR Erasure Orchestration                                   │    │
+│  └────────────────────────────────────────────────────────────────┘    │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="hot-tier-design">3.2 Hot Tier Design</h3>
+<pre class="typescript"><code>// Hot Tier: Session-scoped data (TTL: 4 hours)
+interface HotTierConfig {
+  // ElastiCache for real-time sessions
+  redis: {
+    clusterMode: true;
+    shards: 6;  // Scale with users
+    replicasPerShard: 2;
+    instanceType: &#39;r7g.xlarge&#39;;
+    maxMemoryPolicy: &#39;volatile-lru&#39;;
+  };
+  
+  // DynamoDB + DAX for recent chats
+  dynamodb: {
+    tableName: &#39;uds_hot_chats&#39;;
+    gsi: [&#39;tenant_user_index&#39;, &#39;conversation_index&#39;];
+    dax: {
+      enabled: true;
+      nodeType: &#39;dax.r6g.large&#39;;
+      replicationFactor: 3;
+    };
+    ttl: {
+      enabled: true;
+      attributeName: &#39;expires_at&#39;;
+      defaultHours: 24;
+    };
+  };
+}</code></pre>
+<p><strong>Hot Tier Data</strong>: | Data Type | Storage | TTL | Access Pattern | |———–|———|—–|—————-| | Active Session | Redis | 4h | Every request | | Recent Messages | DynamoDB + DAX | 24h | Frequent reads | | Pending Results | Redis | 1h | Write once, read many |</p>
+<h3 id="warm-tier-design">3.3 Warm Tier Design</h3>
+<pre class="sql"><code>-- Warm Tier: Active data (0-90 days)
+
+-- Conversations table with RLS
+CREATE TABLE uds_conversations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    
+    -- Conversation metadata
+    title VARCHAR(500),
+    model_id VARCHAR(100),
+    started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_message_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    message_count INTEGER DEFAULT 0,
+    total_tokens INTEGER DEFAULT 0,
+    
+    -- Forking support (Time Machine)
+    parent_conversation_id UUID REFERENCES uds_conversations(id),
+    fork_point_message_id UUID,
+    branch_name VARCHAR(200),
+    
+    -- Encryption
+    encryption_key_id VARCHAR(100) NOT NULL,
+    
+    -- Status
+    status VARCHAR(20) DEFAULT &#39;active&#39;,
+    archived_at TIMESTAMPTZ,
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Messages with encryption
+CREATE TABLE uds_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL,
+    conversation_id UUID NOT NULL REFERENCES uds_conversations(id),
+    user_id UUID NOT NULL,
+    
+    -- Message content (encrypted)
+    role VARCHAR(20) NOT NULL CHECK (role IN (&#39;system&#39;, &#39;user&#39;, &#39;assistant&#39;)),
+    content_encrypted BYTEA NOT NULL,  -- AES-256-GCM encrypted
+    content_iv BYTEA NOT NULL,         -- Initialization vector
+    content_hash VARCHAR(64) NOT NULL, -- For deduplication
+    
+    -- Token usage
+    input_tokens INTEGER,
+    output_tokens INTEGER,
+    model_id VARCHAR(100),
+    
+    -- Attachments
+    attachment_ids UUID[] DEFAULT ARRAY[]::UUID[],
+    
+    -- Time Machine support
+    sequence_number INTEGER NOT NULL,
+    is_checkpoint BOOLEAN DEFAULT false,
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Partitioning by month for efficient archival
+CREATE TABLE uds_messages_archive (
+    LIKE uds_messages INCLUDING ALL
+) PARTITION BY RANGE (created_at);
+
+-- Audit log (append-only, tamper-evident)
+CREATE TABLE uds_audit_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL,
+    user_id UUID,
+    
+    -- Event details
+    event_type VARCHAR(100) NOT NULL,
+    event_category VARCHAR(50) NOT NULL,
+    resource_type VARCHAR(100),
+    resource_id UUID,
+    
+    -- Change tracking
+    previous_state_hash VARCHAR(64),
+    new_state_hash VARCHAR(64),
+    changes JSONB,
+    
+    -- Merkle chain for tamper evidence
+    merkle_hash VARCHAR(64) NOT NULL,
+    previous_merkle_hash VARCHAR(64),
+    
+    -- Context
+    ip_address INET,
+    user_agent TEXT,
+    request_id VARCHAR(100),
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Row-Level Security
+ALTER TABLE uds_conversations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE uds_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE uds_audit_log ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_conversations ON uds_conversations
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+    
+CREATE POLICY user_isolation_conversations ON uds_conversations
+    USING (user_id = current_setting(&#39;app.current_user_id&#39;)::UUID 
+           OR current_setting(&#39;app.is_admin&#39;)::BOOLEAN = true);
+
+CREATE POLICY tenant_isolation_messages ON uds_messages
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+
+CREATE POLICY tenant_isolation_audit ON uds_audit_log
+    USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID
+           AND current_setting(&#39;app.is_admin&#39;)::BOOLEAN = true);</code></pre>
+<h3 id="cold-tier-design">3.4 Cold Tier Design</h3>
+<pre class="typescript"><code>// Cold Tier: Archived data (90+ days)
+interface ColdTierConfig {
+  // S3 + Iceberg for queryable archive
+  iceberg: {
+    bucket: &#39;radiant-uds-archive-${region}&#39;;
+    tableNamespace: &#39;uds_archive&#39;;
+    tables: [
+      &#39;conversations&#39;,
+      &#39;messages&#39;, 
+      &#39;audit_log&#39;
+    ];
+    partitionBy: [&#39;tenant_id&#39;, &#39;year&#39;, &#39;month&#39;];
+    format: &#39;parquet&#39;;
+    compression: &#39;zstd&#39;;
+    
+    // Athena integration for queries
+    athenaWorkgroup: &#39;uds-archive-queries&#39;;
+    
+    // Lifecycle
+    storageClasses: [
+      { ageRangeDays: { min: 90, max: 365 }, class: &#39;INTELLIGENT_TIERING&#39; },
+      { ageRangeDays: { min: 365, max: 2555 }, class: &#39;GLACIER_IR&#39; },  // 7 years
+      { ageRangeDays: { min: 2555, max: null }, class: &#39;DEEP_ARCHIVE&#39; }
+    ];
+  };
+  
+  // Compliance archive (7-year retention)
+  compliance: {
+    bucket: &#39;radiant-uds-compliance-${region}&#39;;
+    objectLock: true;  // WORM compliance
+    retentionDays: 2555;  // 7 years
+    encryptionKey: &#39;aws/kms/uds-compliance&#39;;
+  };
+}</code></pre>
+<h3 id="uploads-service">3.5 Uploads Service</h3>
+<pre class="typescript"><code>// Dedicated uploads handling (not in Cortex)
+interface UploadsServiceConfig {
+  // Quarantine bucket for virus scanning
+  quarantine: {
+    bucket: &#39;radiant-uploads-quarantine-${region}&#39;;
+    maxSizeMb: 100;
+    allowedTypes: [&#39;pdf&#39;, &#39;docx&#39;, &#39;xlsx&#39;, &#39;csv&#39;, &#39;txt&#39;, &#39;png&#39;, &#39;jpg&#39;, &#39;gif&#39;];
+    virusScan: {
+      enabled: true;
+      engine: &#39;clamav-lambda&#39;;
+      quarantineDays: 7;
+    };
+  };
+  
+  // Clean storage
+  storage: {
+    bucket: &#39;radiant-uploads-${region}&#39;;
+    encryption: &#39;aws:kms&#39;;
+    keyId: &#39;aws/kms/uds-uploads&#39;;
+    
+    // Per-user isolation via S3 prefixes
+    pathPattern: &#39;${tenant_id}/${user_id}/${upload_id}/${filename}&#39;;
+    
+    // Lifecycle
+    storageClasses: [
+      { ageRangeDays: { min: 0, max: 30 }, class: &#39;STANDARD&#39; },
+      { ageRangeDays: { min: 30, max: 180 }, class: &#39;INTELLIGENT_TIERING&#39; },
+      { ageRangeDays: { min: 180, max: null }, class: &#39;GLACIER_IR&#39; }
+    ];
+  };
+  
+  // Metadata in PostgreSQL
+  metadata: {
+    table: &#39;uds_uploads&#39;;
+    fullTextSearch: true;
+    vectorEmbeddings: true;  // For semantic search
+  };
+}</code></pre>
+<hr />
+<h2 id="security-architecture">4. Security Architecture</h2>
+<h3 id="encryption">4.1 Encryption</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                    ENCRYPTION HIERARCHY                          │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  AWS KMS                                                 │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐     │   │
+│  │  │ Master Key  │  │ Master Key  │  │ Master Key  │     │   │
+│  │  │ (Hot Tier)  │  │ (Warm Tier) │  │ (Cold Tier) │     │   │
+│  │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘     │   │
+│  └─────────┼────────────────┼────────────────┼─────────────┘   │
+│            │                │                │                  │
+│            ▼                ▼                ▼                  │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  Data Encryption Keys (DEKs)                            │   │
+│  │  - Per-tenant DEK                                       │   │
+│  │  - Per-user DEK (optional, for high-security)          │   │
+│  │  - Rotated every 90 days                               │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│            │                │                │                  │
+│            ▼                ▼                ▼                  │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  Encrypted Data                                         │   │
+│  │  - Messages: AES-256-GCM with per-message IV           │   │
+│  │  - Uploads: S3 SSE-KMS                                 │   │
+│  │  - Audit: AES-256-GCM + Merkle chain                   │   │
+│  └─────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="access-control">4.2 Access Control</h3>
+<pre class="typescript"><code>// Row-Level Security enforcement
+interface SecurityContext {
+  tenantId: string;      // Always required
+  userId: string;        // User making request
+  isAdmin: boolean;      // Tenant admin
+  isPlatformAdmin: boolean;  // RADIANT admin
+  permissions: string[]; // Fine-grained permissions
+}
+
+// Every database query runs with this context
+async function setSecurityContext(ctx: SecurityContext): Promise&lt;void&gt; {
+  await executeStatement(`
+    SELECT set_config(&#39;app.current_tenant_id&#39;, $1, true);
+    SELECT set_config(&#39;app.current_user_id&#39;, $2, true);
+    SELECT set_config(&#39;app.is_admin&#39;, $3, true);
+    SELECT set_config(&#39;app.is_platform_admin&#39;, $4, true);
+  `, [ctx.tenantId, ctx.userId, ctx.isAdmin, ctx.isPlatformAdmin]);
+}</code></pre>
+<h3 id="gdpr-erasure-flow">4.3 GDPR Erasure Flow</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                    GDPR ERASURE ORCHESTRATOR                     │
+│                                                                  │
+│  User Request                                                    │
+│       │                                                          │
+│       ▼                                                          │
+│  ┌─────────────────┐                                            │
+│  │ Erasure Request │                                            │
+│  │ Service         │                                            │
+│  └────────┬────────┘                                            │
+│           │                                                      │
+│           ├────────────────┬────────────────┬─────────────────┐ │
+│           ▼                ▼                ▼                 ▼ │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────┐ │
+│  │ UDS Service │  │   Cortex    │  │  Uploads    │  │ Search │ │
+│  │ (Chats,     │  │   (AI       │  │  Service    │  │ Index  │ │
+│  │  Audits)    │  │   Memory)   │  │  (S3)       │  │        │ │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └────────┘ │
+│           │                │                │             │      │
+│           │   Hot Tier     │                │             │      │
+│           │   Warm Tier    │                │             │      │
+│           │   Cold Tier    │                │             │      │
+│           │                │                │             │      │
+│           └────────────────┴────────────────┴─────────────┘      │
+│                            │                                     │
+│                            ▼                                     │
+│                   ┌─────────────────┐                           │
+│                   │ Erasure         │                           │
+│                   │ Confirmation    │                           │
+│                   │ + Audit Log     │                           │
+│                   └─────────────────┘                           │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="cost-analysis-1m-users">5. Cost Analysis (1M Users)</h2>
+<h3 id="option-a-extended-cortex">5.1 Option A: Extended Cortex</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Monthly Cost</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Neptune Serverless</td>
+<td>$8,000</td>
+<td>Increased for chat graph</td>
+</tr>
+<tr>
+<td>ElastiCache (larger)</td>
+<td>$3,500</td>
+<td>More shards for user data</td>
+</tr>
+<tr>
+<td>Aurora PostgreSQL</td>
+<td>$4,000</td>
+<td>Larger instance</td>
+</tr>
+<tr>
+<td>S3 + Glacier</td>
+<td>$2,000</td>
+<td>Combined storage</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$17,500</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="option-b-parallel-uds-recommended">5.2 Option B: Parallel UDS (Recommended)</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Monthly Cost</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UDS Hot Tier</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>- ElastiCache (6 shards)</td>
+<td>$2,400</td>
+<td>Sessions only</td>
+</tr>
+<tr>
+<td>- DynamoDB + DAX</td>
+<td>$1,800</td>
+<td>On-demand + cache</td>
+</tr>
+<tr>
+<td><strong>UDS Warm Tier</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>- Aurora PostgreSQL</td>
+<td>$3,500</td>
+<td>Optimized for time-series</td>
+</tr>
+<tr>
+<td>- OpenSearch</td>
+<td>$1,200</td>
+<td>Full-text search</td>
+</tr>
+<tr>
+<td><strong>UDS Cold Tier</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>- S3 + Iceberg</td>
+<td>$1,500</td>
+<td>Compressed archive</td>
+</tr>
+<tr>
+<td>- Glacier</td>
+<td>$200</td>
+<td>Deep archive</td>
+</tr>
+<tr>
+<td><strong>Cortex (unchanged)</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>- Neptune Serverless</td>
+<td>$3,000</td>
+<td>AI memory only</td>
+</tr>
+<tr>
+<td>- ElastiCache</td>
+<td>$1,200</td>
+<td>AI context only</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$13,800</strong></td>
+<td><strong>21% savings</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="cost-optimization">5.3 Cost Optimization</h3>
+<table>
+<thead>
+<tr>
+<th>Optimization</th>
+<th>Savings</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DynamoDB on-demand</td>
+<td>30-50%</td>
+<td>Pay per request</td>
+</tr>
+<tr>
+<td>S3 Intelligent Tiering</td>
+<td>40%</td>
+<td>Automatic</td>
+</tr>
+<tr>
+<td>Glacier IR vs Glacier</td>
+<td>20%</td>
+<td>Faster retrieval</td>
+</tr>
+<tr>
+<td>Reserved capacity</td>
+<td>30%</td>
+<td>1-year commit</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="implementation-plan">6. Implementation Plan</h2>
+<h3 id="phase-1-foundation-week-1-2">Phase 1: Foundation (Week 1-2)</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Create UDS database schema</label></li>
+<li><label><input type="checkbox" />Implement encryption service</label></li>
+<li><label><input type="checkbox" />Set up RLS policies</label></li>
+<li><label><input type="checkbox" />Deploy DynamoDB tables</label></li>
+</ul>
+<h3 id="phase-2-hot-tier-week-3-4">Phase 2: Hot Tier (Week 3-4)</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Implement session service</label></li>
+<li><label><input type="checkbox" />Deploy DAX cluster</label></li>
+<li><label><input type="checkbox" />Create hot-to-warm promotion job</label></li>
+</ul>
+<h3 id="phase-3-warm-tier-week-5-6">Phase 3: Warm Tier (Week 5-6)</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Migrate existing chat data</label></li>
+<li><label><input type="checkbox" />Implement full-text search</label></li>
+<li><label><input type="checkbox" />Create warm-to-cold archival job</label></li>
+</ul>
+<h3 id="phase-4-cold-tier-week-7-8">Phase 4: Cold Tier (Week 7-8)</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Set up Iceberg tables</label></li>
+<li><label><input type="checkbox" />Configure lifecycle policies</label></li>
+<li><label><input type="checkbox" />Implement Athena queries</label></li>
+</ul>
+<h3 id="phase-5-security-compliance-week-9-10">Phase 5: Security &amp; Compliance (Week 9-10)</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />GDPR erasure orchestrator</label></li>
+<li><label><input type="checkbox" />Merkle chain for audit</label></li>
+<li><label><input type="checkbox" />Security testing</label></li>
+</ul>
+<h3 id="phase-6-integration-week-11-12">Phase 6: Integration (Week 11-12)</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" />Bridge with Cortex</label></li>
+<li><label><input type="checkbox" />Admin dashboard</label></li>
+<li><label><input type="checkbox" />Documentation</label></li>
+</ul>
+<hr />
+<h2 id="recommendation-summary">7. Recommendation Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Use Cortex for user data?</strong></td>
+<td>No - create parallel UDS</td>
+</tr>
+<tr>
+<td><strong>Same tiered approach?</strong></td>
+<td>Yes - Hot/Warm/Cold pattern works</td>
+</tr>
+<tr>
+<td><strong>Share infrastructure?</strong></td>
+<td>No - separate for security</td>
+</tr>
+<tr>
+<td><strong>Share GDPR process?</strong></td>
+<td>Yes - orchestrated erasure</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-principles">Key Principles</h3>
+<ol type="1">
+<li><strong>Separate Concerns</strong>: AI memory ≠ User data</li>
+<li><strong>Security First</strong>: Encryption + RLS + Isolation</li>
+<li><strong>Cost Optimized</strong>: Right storage for each access pattern</li>
+<li><strong>Compliance Ready</strong>: 7-year retention, audit trail</li>
+<li><strong>Scale Ready</strong>: Designed for 1M+ users day one</li>
+</ol>
+<hr />
+<h2 id="next-steps">8. Next Steps</h2>
+<ol type="1">
+<li><strong>Review this proposal</strong> with the team</li>
+<li><strong>Approve architecture</strong> option (recommend B)</li>
+<li><strong>Create detailed schema</strong> for UDS tables</li>
+<li><strong>Estimate infrastructure costs</strong> more precisely</li>
+<li><strong>Begin Phase 1</strong> implementation</li>
+</ol>
+<hr />
+<p><em>Document Author: Cascade AI</em><br />
+<em>Review Required: Architecture Team</em></p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

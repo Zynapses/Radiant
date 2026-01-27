@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ORCHESTRATION PATTERNS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>ORCHESTRATION PATTERNS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/features/ORCHESTRATION-PATTERNS.md</div>
+  </div>
+  
+  <h1 id="radiant-orchestration-patterns-system">RADIANT Orchestration Patterns System</h1>
+<blockquote>
+<p><strong>Version:</strong> 4.18.0<br />
+<strong>Last Updated:</strong> December 2024</p>
+</blockquote>
+<h2 id="overview">Overview</h2>
+<p>The RADIANT Orchestration Patterns System enables sophisticated multi-AI workflows that leverage multiple AI providers in parallel, with intelligent model selection based on task characteristics and domain analysis.</p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#architecture">Architecture</a></li>
+<li><a href="#orchestration-workflows">Orchestration Workflows</a></li>
+<li><a href="#methods--steps">Methods &amp; Steps</a></li>
+<li><a href="#parallel-execution">Parallel Execution</a></li>
+<li><a href="#agi-dynamic-model-selection">AGI Dynamic Model Selection</a></li>
+<li><a href="#model-modes">Model Modes</a></li>
+<li><a href="#visual-workflow-editor">Visual Workflow Editor</a></li>
+<li><a href="#api-reference">API Reference</a></li>
+</ol>
+<hr />
+<h2 id="architecture">Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                        ORCHESTRATION ARCHITECTURE                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐         │
+│  │   WORKFLOWS     │    │    METHODS      │    │     STEPS       │         │
+│  │   (49 patterns) │───▶│   (reusable)    │───▶│  (configured)   │         │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘         │
+│           │                     │                      │                    │
+│           │                     │                      ▼                    │
+│           │                     │         ┌─────────────────────────┐       │
+│           │                     │         │   PARALLEL EXECUTION    │       │
+│           │                     │         │   ─────────────────     │       │
+│           │                     │         │   • Multiple AI models  │       │
+│           │                     │         │   • AGI model selection │       │
+│           │                     │         │   • Mode optimization   │       │
+│           │                     │         │   • Result synthesis    │       │
+│           │                     │         └─────────────────────────┘       │
+│           │                     │                      │                    │
+│           ▼                     ▼                      ▼                    │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                    ModelMetadataService                              │   │
+│  │  • Live model availability    • Capability scores (0-1)              │   │
+│  │  • Pricing data               • Context windows                      │   │
+│  │  • Specialties &amp; weaknesses   • Quality/reliability scores           │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="key-components">Key Components</h3>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 33%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Location</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>OrchestrationPatternsService</strong></td>
+<td><code>packages/infrastructure/lambda/shared/services/orchestration-patterns.service.ts</code></td>
+<td>Core service managing workflow execution</td>
+</tr>
+<tr>
+<td><strong>ModelMetadataService</strong></td>
+<td><code>packages/infrastructure/lambda/shared/services/model-metadata.service.ts</code></td>
+<td>Live model data and capabilities</td>
+</tr>
+<tr>
+<td><strong>Visual Editor</strong></td>
+<td><code>apps/admin-dashboard/app/(dashboard)/orchestration-patterns/editor/page.tsx</code></td>
+<td>Admin UI for workflow design</td>
+</tr>
+<tr>
+<td><strong>Shared Components</strong></td>
+<td><code>apps/admin-dashboard/components/workflow-editor/index.tsx</code></td>
+<td>Reusable editor components</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="orchestration-workflows">Orchestration Workflows</h2>
+<h3 id="documented-patterns">49 Documented Patterns</h3>
+<p>Workflows are organized into categories:</p>
+<table>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 34%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Patterns</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Consensus &amp; Aggregation</strong></td>
+<td>Self-Consistency, Universal Self-Consistency, Meta-Reasoning</td>
+<td>Multiple samples with majority voting</td>
+</tr>
+<tr>
+<td><strong>Debate &amp; Deliberation</strong></td>
+<td>AI Debate, Multi-Agent Debate, Cross-Examination</td>
+<td>Adversarial argumentation</td>
+</tr>
+<tr>
+<td><strong>Critique &amp; Refinement</strong></td>
+<td>Self-Refine, Reflexion, Constitutional AI</td>
+<td>Iterative improvement</td>
+</tr>
+<tr>
+<td><strong>Verification &amp; Validation</strong></td>
+<td>Chain-of-Verification, Fact-Checking Pipeline</td>
+<td>Multi-stage fact checking</td>
+</tr>
+<tr>
+<td><strong>Decomposition</strong></td>
+<td>Least-to-Most, Decomposed Prompting, Tree of Thoughts</td>
+<td>Problem breakdown</td>
+</tr>
+<tr>
+<td><strong>Specialized Reasoning</strong></td>
+<td>Chain-of-Thought, ReAct, Graph-of-Thoughts</td>
+<td>Enhanced reasoning patterns</td>
+</tr>
+<tr>
+<td><strong>Multi-Model Routing</strong></td>
+<td>Mixture of Experts, Speculative Decoding, Model Cascading</td>
+<td>Intelligent routing</td>
+</tr>
+<tr>
+<td><strong>Ensemble Methods</strong></td>
+<td>Model Ensemble, Boosted Prompting, Blended RAG</td>
+<td>Multiple model combination</td>
+</tr>
+</tbody>
+</table>
+<h3 id="workflow-structure">Workflow Structure</h3>
+<pre class="typescript"><code>interface OrchestrationWorkflow {
+  workflowId: string;
+  workflowCode: string;           // e.g., &quot;SOD&quot; for AI Debate
+  commonName: string;             // e.g., &quot;AI Debate&quot;
+  formalName: string;             // e.g., &quot;Scalable Oversight via Debate&quot;
+  category: string;
+  categoryCode: string;
+  patternNumber: number;          // 1-49
+  description: string;
+  detailedDescription?: string;
+  bestFor: string[];              // Use cases
+  problemIndicators: string[];    // When to use
+  qualityImprovement: string;     // Expected improvement
+  typicalLatency: string;
+  typicalCost: string;
+  minModelsRequired: number;
+  defaultConfig: Record&lt;string, unknown&gt;;
+  isSystemWorkflow: boolean;
+  isEnabled: boolean;
+}</code></pre>
+<hr />
+<h2 id="methods-steps">Methods &amp; Steps</h2>
+<h3 id="reusable-methods">Reusable Methods</h3>
+<p>Methods are shared building blocks with default parameters:</p>
+<table>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method Code</th>
+<th>Name</th>
+<th>Role</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GENERATE_RESPONSE</code></td>
+<td>Generate Response</td>
+<td>generator</td>
+<td>Generate a response using AI model</td>
+</tr>
+<tr>
+<td><code>GENERATE_WITH_COT</code></td>
+<td>Chain-of-Thought</td>
+<td>generator</td>
+<td>Generate with step-by-step reasoning</td>
+</tr>
+<tr>
+<td><code>CRITIQUE_RESPONSE</code></td>
+<td>Critique Response</td>
+<td>critic</td>
+<td>Critically evaluate for flaws</td>
+</tr>
+<tr>
+<td><code>JUDGE_RESPONSES</code></td>
+<td>Judge Responses</td>
+<td>judge</td>
+<td>Compare and judge multiple responses</td>
+</tr>
+<tr>
+<td><code>VERIFY_FACTS</code></td>
+<td>Verify Facts</td>
+<td>verifier</td>
+<td>Extract and verify factual claims</td>
+</tr>
+<tr>
+<td><code>SYNTHESIZE_RESPONSES</code></td>
+<td>Synthesize</td>
+<td>synthesizer</td>
+<td>Combine best parts from multiple</td>
+</tr>
+<tr>
+<td><code>BUILD_CONSENSUS</code></td>
+<td>Build Consensus</td>
+<td>synthesizer</td>
+<td>Identify points of agreement</td>
+</tr>
+<tr>
+<td><code>GENERATE_CHALLENGE</code></td>
+<td>Challenge</td>
+<td>challenger</td>
+<td>Argue opposite position</td>
+</tr>
+<tr>
+<td><code>DEFEND_POSITION</code></td>
+<td>Defend</td>
+<td>defender</td>
+<td>Defend against challenges</td>
+</tr>
+<tr>
+<td><code>DECOMPOSE_PROBLEM</code></td>
+<td>Decompose</td>
+<td>reasoner</td>
+<td>Break down complex problems</td>
+</tr>
+<tr>
+<td><code>MAJORITY_VOTE</code></td>
+<td>Majority Vote</td>
+<td>aggregator</td>
+<td>Select most common answer</td>
+</tr>
+<tr>
+<td><code>WEIGHTED_AGGREGATE</code></td>
+<td>Weighted Aggregate</td>
+<td>aggregator</td>
+<td>Combine weighted by confidence</td>
+</tr>
+</tbody>
+</table>
+<h3 id="workflow-steps">Workflow Steps</h3>
+<p>Steps are method instances with custom configuration:</p>
+<pre class="typescript"><code>interface WorkflowStep {
+  bindingId: string;
+  stepOrder: number;
+  stepName: string;
+  stepDescription?: string;
+  method: OrchestrationMethod;
+  parameterOverrides: Record&lt;string, unknown&gt;;  // Override defaults
+  conditionExpression?: string;                 // Conditional execution
+  isIterative: boolean;                         // Repeat execution
+  maxIterations: number;
+  iterationCondition?: string;
+  dependsOnSteps: number[];                     // DAG dependencies
+  modelOverride?: string;                       // Force specific model
+  outputVariable?: string;                      // Store output
+  parallelExecution?: ParallelExecutionConfig;  // Parallel AI calls
+}</code></pre>
+<hr />
+<h2 id="parallel-execution">Parallel Execution</h2>
+<p>Each method step can call <strong>multiple AI providers simultaneously</strong> for improved quality and reliability.</p>
+<h3 id="execution-modes">Execution Modes</h3>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 38%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Behavior</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>all</strong></td>
+<td>Wait for all models to respond</td>
+<td>Maximum quality, comprehensive synthesis</td>
+</tr>
+<tr>
+<td><strong>race</strong></td>
+<td>Return first successful response</td>
+<td>Latency-sensitive applications</td>
+</tr>
+<tr>
+<td><strong>quorum</strong></td>
+<td>Continue when X% of models respond</td>
+<td>Balance of speed and quality</td>
+</tr>
+</tbody>
+</table>
+<h3 id="synthesis-strategies">Synthesis Strategies</h3>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>How It Works</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>best_of</strong></td>
+<td>Select response with highest confidence score</td>
+</tr>
+<tr>
+<td><strong>vote</strong></td>
+<td>Choose most common answer pattern (majority vote)</td>
+</tr>
+<tr>
+<td><strong>weighted</strong></td>
+<td>Score by confidence × speed, select highest</td>
+</tr>
+<tr>
+<td><strong>merge</strong></td>
+<td>Combine insights from all models into unified response</td>
+</tr>
+</tbody>
+</table>
+<h3 id="configuration">Configuration</h3>
+<pre class="typescript"><code>interface ParallelExecutionConfig {
+  enabled: boolean;
+  mode: &#39;all&#39; | &#39;race&#39; | &#39;quorum&#39;;
+  models: string[];                    // Fallback if AGI disabled
+  quorumThreshold?: number;            // 0.5 = majority
+  synthesizeResults?: boolean;
+  synthesisStrategy?: &#39;best_of&#39; | &#39;merge&#39; | &#39;vote&#39; | &#39;weighted&#39;;
+  weightByConfidence?: boolean;
+  timeoutMs?: number;                  // Per-model timeout
+  failureStrategy?: &#39;fail_fast&#39; | &#39;continue&#39; | &#39;fallback&#39;;
+  
+  // AGI Dynamic Selection
+  agiModelSelection?: boolean;         // Enable AGI selection
+  minModels?: number;                  // Min models to select (default: 2)
+  maxModels?: number;                  // Max models to select (default: 5)
+  domainHints?: string[];              // Hints for domain detection
+  preferredModes?: ModelMode[];        // Preferred execution modes
+}</code></pre>
+<hr />
+<h2 id="agi-dynamic-model-selection">AGI Dynamic Model Selection</h2>
+<p>When <code>agiModelSelection</code> is enabled, the system <strong>dynamically selects optimal models</strong> based on:</p>
+<h3 id="domain-detection">1. Domain Detection</h3>
+<p>Analyzes prompt content to detect subject domain:</p>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 70%" />
+</colgroup>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Keywords Detected</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>coding</strong></td>
+<td>code, function, class, debug, algorithm, typescript, python, api, database</td>
+</tr>
+<tr>
+<td><strong>math</strong></td>
+<td>calculate, equation, formula, proof, theorem, algebra, calculus, integral</td>
+</tr>
+<tr>
+<td><strong>science</strong></td>
+<td>scientific, hypothesis, experiment, physics, chemistry, biology, quantum</td>
+</tr>
+<tr>
+<td><strong>legal</strong></td>
+<td>legal, contract, law, regulation, compliance, liability, jurisdiction</td>
+</tr>
+<tr>
+<td><strong>medical</strong></td>
+<td>medical, diagnosis, treatment, symptoms, patient, clinical, therapy</td>
+</tr>
+<tr>
+<td><strong>finance</strong></td>
+<td>financial, investment, market, stock, trading, portfolio, valuation</td>
+</tr>
+<tr>
+<td><strong>creative</strong></td>
+<td>write, story, poem, creative, narrative, fiction, imagine, design</td>
+</tr>
+<tr>
+<td><strong>reasoning</strong></td>
+<td>reason, logic, deduce, infer, conclude, argue, step by step</td>
+</tr>
+<tr>
+<td><strong>research</strong></td>
+<td>research, comprehensive, thorough, deep dive, explore, investigate</td>
+</tr>
+</tbody>
+</table>
+<h3 id="task-characteristics">2. Task Characteristics</h3>
+<p>Analyzes prompt for task requirements:</p>
+<pre class="typescript"><code>interface TaskCharacteristics {
+  complexity: &#39;low&#39; | &#39;medium&#39; | &#39;high&#39;;
+  requiresReasoning: boolean;     // &quot;think&quot;, &quot;step by step&quot;, &quot;why&quot;
+  requiresCreativity: boolean;    // &quot;creative&quot;, &quot;imagine&quot;, &quot;write&quot;
+  requiresPrecision: boolean;     // &quot;exact&quot;, &quot;precise&quot;, &quot;accurate&quot;
+  requiresResearch: boolean;      // &quot;research&quot;, &quot;comprehensive&quot;, &quot;thorough&quot;
+  estimatedTokens: number;
+}</code></pre>
+<h3 id="live-model-scoring">3. Live Model Scoring</h3>
+<p>Queries <code>ModelMetadataService</code> for available models and scores based on:</p>
+<ul>
+<li><strong>Domain match</strong> from model specialties</li>
+<li><strong>Capability scores</strong> (reasoning, coding, creative, etc.)</li>
+<li><strong>Quality/reliability scores</strong> from metadata</li>
+<li><strong>Context window</strong> for complex tasks</li>
+<li><strong>Mode compatibility</strong> for task type</li>
+<li><strong>Cost efficiency</strong> for budget-conscious selection</li>
+</ul>
+<h3 id="optimal-mode-assignment">4. Optimal Mode Assignment</h3>
+<p>For each selected model, assigns the optimal execution mode.</p>
+<hr />
+<h2 id="model-modes">Model Modes</h2>
+<p>Modes configure how models are invoked based on their capabilities and task requirements.</p>
+<h3 id="available-modes">Available Modes</h3>
+<table>
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 20%" />
+<col style="width: 30%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Icon</th>
+<th>Description</th>
+<th>Auto-Selected When</th>
+<th>Parameters Applied</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>standard</strong></td>
+<td>-</td>
+<td>Default execution</td>
+<td>Fallback</td>
+<td>Default params</td>
+</tr>
+<tr>
+<td><strong>thinking</strong></td>
+<td>🧠</td>
+<td>Extended reasoning</td>
+<td><code>requiresReasoning=true</code> + o1/claude/r1</td>
+<td><code>thinkingBudget: 5000-10000, enableThinking: true</code></td>
+</tr>
+<tr>
+<td><strong>deep_research</strong></td>
+<td>🔬</td>
+<td>In-depth research</td>
+<td><code>requiresResearch=true</code> + perplexity/gemini-deep</td>
+<td><code>searchDepth: comprehensive, includeSources: true</code></td>
+</tr>
+<tr>
+<td><strong>fast</strong></td>
+<td>⚡</td>
+<td>Speed-optimized</td>
+<td>flash/turbo/mini models</td>
+<td><code>maxTokens: 2048, streamResponse: true</code></td>
+</tr>
+<tr>
+<td><strong>creative</strong></td>
+<td>🎨</td>
+<td>Higher temperature</td>
+<td><code>requiresCreativity=true</code></td>
+<td><code>temperature: 0.9, topP: 0.95</code></td>
+</tr>
+<tr>
+<td><strong>precise</strong></td>
+<td>🎯</td>
+<td>Low temperature</td>
+<td><code>requiresPrecision=true</code></td>
+<td><code>temperature: 0.1, topP: 0.9</code></td>
+</tr>
+<tr>
+<td><strong>code</strong></td>
+<td>💻</td>
+<td>Code-specialized</td>
+<td>coding domain</td>
+<td><code>temperature: 0.2</code></td>
+</tr>
+<tr>
+<td><strong>vision</strong></td>
+<td>👁️</td>
+<td>Multimodal vision</td>
+<td>vision-capable models</td>
+<td><code>enableVision: true</code></td>
+</tr>
+<tr>
+<td><strong>long_context</strong></td>
+<td>📄</td>
+<td>Extended context</td>
+<td>large context windows</td>
+<td><code>maxTokens: 16384, useLongContext: true</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="mode-selection-logic">Mode Selection Logic</h3>
+<pre class="typescript"><code>// Example: Thinking mode selection
+if (characteristics.requiresReasoning) {
+  if (modelId.includes(&#39;o1&#39;) || modelId.includes(&#39;o3&#39;)) {
+    return { mode: &#39;thinking&#39;, modeBonus: 0.3 };
+  }
+  if (modelId.includes(&#39;claude&#39;) &amp;&amp; modelId.includes(&#39;3.5&#39;)) {
+    return { mode: &#39;thinking&#39;, modeBonus: 0.25 };
+  }
+  if (modelId.includes(&#39;deepseek&#39;) &amp;&amp; modelId.includes(&#39;r1&#39;)) {
+    return { mode: &#39;thinking&#39;, modeBonus: 0.25 };
+  }
+}
+
+// Example: Deep research mode selection
+if (characteristics.requiresResearch) {
+  if (modelId.includes(&#39;perplexity&#39;) || modelId.includes(&#39;sonar&#39;)) {
+    return { mode: &#39;deep_research&#39;, modeBonus: 0.35 };
+  }
+  if (modelId.includes(&#39;gemini&#39;) &amp;&amp; modelName.includes(&#39;deep&#39;)) {
+    return { mode: &#39;deep_research&#39;, modeBonus: 0.3 };
+  }
+}</code></pre>
+<hr />
+<h2 id="visual-workflow-editor">Visual Workflow Editor</h2>
+<h3 id="features">Features</h3>
+<ul>
+<li><strong>Method Palette</strong> - Drag-and-drop orchestration methods</li>
+<li><strong>Canvas</strong> - Visual workflow design with nodes and connections</li>
+<li><strong>Step Configuration</strong> - 4-tab panel:
+<ul>
+<li><strong>General</strong> - Name, order, model override, output variable</li>
+<li><strong>Parameters</strong> - JSON overrides with quick editors</li>
+<li><strong>Parallel</strong> - AGI selection, modes, synthesis</li>
+<li><strong>Advanced</strong> - Iteration, conditions</li>
+</ul></li>
+<li><strong>Zoom/Pan</strong> - Canvas navigation</li>
+<li><strong>Settings Dialog</strong> - Workflow-level configuration</li>
+</ul>
+<h3 id="parallel-tab-configuration">Parallel Tab Configuration</h3>
+<pre><code>┌─────────────────────────────────────────────────────┐
+│ 🔵 Enable Parallel Execution                    [✓] │
+├─────────────────────────────────────────────────────┤
+│ 🧠 AGI Model Selection                          [✓] │
+│ ┌─────────────────────────────────────────────────┐ │
+│ │ Min Models: [2]      Max Models: [5]            │ │
+│ │ Domain Hints: coding, reasoning                 │ │
+│ │ Preferred Modes:                                │ │
+│ │   [✓] thinking  [✓] deep_research  [ ] fast    │ │
+│ │   [ ] creative  [✓] precise        [✓] code    │ │
+│ └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────┤
+│ Execution Mode: [All (wait for all models)     ▼]  │
+│ Quorum Threshold: [──●─────] 50%                   │
+├─────────────────────────────────────────────────────┤
+│ [✓] Synthesize Results                             │
+│ Strategy: [Weighted (confidence + speed)       ▼]  │
+├─────────────────────────────────────────────────────┤
+│ Timeout: [30000] ms                                │
+│ Failure Strategy: [Continue (use successful)   ▼]  │
+└─────────────────────────────────────────────────────┘</code></pre>
+<hr />
+<h2 id="api-reference">API Reference</h2>
+<h3 id="orchestrationpatternsservice">OrchestrationPatternsService</h3>
+<pre class="typescript"><code>class OrchestrationPatternsService {
+  // Pattern Selection
+  async selectPattern(request: PatternSelectionRequest): Promise&lt;PatternSelectionResult&gt;;
+  
+  // Workflow Execution
+  async executeWorkflow(request: ExecutionRequest): Promise&lt;ExecutionResult&gt;;
+  
+  // CRUD Operations
+  async getWorkflow(workflowCode: string): Promise&lt;OrchestrationWorkflow | null&gt;;
+  async getWorkflowSteps(workflowId: string): Promise&lt;WorkflowStep[]&gt;;
+  async getAllWorkflows(options?: { category?: string; enabledOnly?: boolean }): Promise&lt;OrchestrationWorkflow[]&gt;;
+  async getMethods(category?: string): Promise&lt;OrchestrationMethod[]&gt;;
+}</code></pre>
+<h3 id="execution-flow">Execution Flow</h3>
+<pre class="typescript"><code>// 1. Select best pattern for task
+const selection = await orchestrationPatternsService.selectPattern({
+  tenantId: &#39;tenant-123&#39;,
+  prompt: &#39;Write a recursive algorithm for TSP with dynamic programming&#39;,
+  taskType: &#39;coding&#39;,
+  complexity: &#39;high&#39;,
+  qualityPriority: 0.9,
+});
+
+// 2. Execute selected workflow
+const result = await orchestrationPatternsService.executeWorkflow({
+  tenantId: &#39;tenant-123&#39;,
+  workflowCode: selection.selectedPattern.workflowCode,
+  prompt: &#39;...&#39;,
+  configOverrides: {
+    parallelExecution: {
+      enabled: true,
+      agiModelSelection: true,
+      minModels: 3,
+      preferredModes: [&#39;thinking&#39;, &#39;code&#39;],
+    },
+  },
+});
+
+// 3. Result includes all step outputs
+console.log(result.response);           // Final synthesized response
+console.log(result.qualityScore);       // 0-1 quality assessment
+console.log(result.steps);              // Individual step results
+console.log(result.modelsUsed);         // All models that participated</code></pre>
+<h3 id="step-execution-result">Step Execution Result</h3>
+<pre class="typescript"><code>interface StepExecutionResult {
+  stepOrder: number;
+  stepName: string;
+  methodCode: string;
+  input: Record&lt;string, unknown&gt;;
+  output: Record&lt;string, unknown&gt;;
+  modelUsed: string;                    // Primary model
+  latencyMs: number;
+  costCents: number;
+  iteration: number;
+  
+  // Parallel execution details
+  wasParallel?: boolean;
+  parallelResults?: ParallelExecutionResult[];
+  synthesizedFrom?: string[];           // Models that contributed
+}
+
+interface ParallelExecutionResult {
+  modelId: string;
+  response: string;
+  latencyMs: number;
+  costCents: number;
+  tokensUsed: number;
+  confidence?: number;                  // 0-1 estimated confidence
+  status: &#39;success&#39; | &#39;failed&#39; | &#39;timeout&#39;;
+  error?: string;
+}</code></pre>
+<hr />
+<h2 id="database-schema">Database Schema</h2>
+<p>Key tables in <code>packages/infrastructure/migrations/066_orchestration_patterns_registry.sql</code>:</p>
+<pre class="sql"><code>-- Core tables
+orchestration_methods          -- Reusable method definitions
+orchestration_workflows        -- 49 workflow patterns
+workflow_method_bindings       -- Steps linking workflows to methods
+workflow_customizations        -- Per-tenant/user overrides
+
+-- Execution tracking
+orchestration_executions       -- Workflow execution records
+orchestration_step_executions  -- Individual step records</code></pre>
+<hr />
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="when-to-enable-agi-selection">1. When to Enable AGI Selection</h3>
+<p>✅ <strong>Enable when:</strong> - Task domain is unclear or mixed - Maximum quality is required - Cost is not a primary concern</p>
+<p>❌ <strong>Disable when:</strong> - Specific model is required (compliance) - Predictable cost is critical - Testing specific model behavior</p>
+<h3 id="choosing-execution-mode">2. Choosing Execution Mode</h3>
+<table>
+<thead>
+<tr>
+<th>Use Case</th>
+<th>Recommended Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Critical decisions</td>
+<td><code>all</code> with <code>vote</code> synthesis</td>
+</tr>
+<tr>
+<td>User-facing latency-sensitive</td>
+<td><code>race</code></td>
+</tr>
+<tr>
+<td>Background processing</td>
+<td><code>all</code> with <code>merge</code> synthesis</td>
+</tr>
+<tr>
+<td>Cost-sensitive</td>
+<td><code>quorum</code> at 50%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mode-selection-tips">3. Mode Selection Tips</h3>
+<ul>
+<li>Enable <strong>thinking</strong> mode for math, reasoning, complex analysis</li>
+<li>Enable <strong>deep_research</strong> mode for fact-finding, comprehensive answers</li>
+<li>Enable <strong>fast</strong> mode for simple queries, autocomplete</li>
+<li>Enable <strong>code</strong> mode for programming tasks</li>
+<li>Enable <strong>precise</strong> mode for factual, accuracy-critical responses</li>
+</ul>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="common-issues">Common Issues</h3>
+<p><strong>Models not being selected:</strong> - Check <code>ModelMetadataService</code> has available models - Verify <code>isAvailable: true</code> in model metadata - Check domain hints match model specialties</p>
+<p><strong>High latency:</strong> - Reduce <code>maxModels</code> - Use <code>race</code> mode instead of <code>all</code> - Disable <code>thinking</code> mode for simple tasks</p>
+<p><strong>Inconsistent results:</strong> - Enable <code>synthesizeResults</code> with <code>vote</code> strategy - Increase <code>minModels</code> for more consensus - Use <code>precise</code> mode for factual tasks</p>
+<hr />
+<h2 id="changelog">Changelog</h2>
+<h3 id="v4.18.0-december-2024">v4.18.0 (December 2024)</h3>
+<ul>
+<li>Added dynamic model selection from <code>ModelMetadataService</code></li>
+<li>Added 9 model execution modes (thinking, deep_research, etc.)</li>
+<li>Added AGI-driven mode assignment based on task analysis</li>
+<li>Removed hardcoded model lists</li>
+<li>Added preferred modes configuration in UI</li>
+<li>Enhanced domain detection with research category</li>
+<li>Added mode-specific parameter application</li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

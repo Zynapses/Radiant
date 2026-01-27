@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>00 HEADER AND OVERVIEW - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>00 HEADER AND OVERVIEW</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/00-HEADER-AND-OVERVIEW.md</div>
+  </div>
+  
+  <h1 id="radiant-v4.17.0---prompt-32-ai-optimized-for-code-generation">RADIANT v4.17.0 - PROMPT 32: AI-OPTIMIZED FOR CODE GENERATION</h1>
+<blockquote>
+<p><strong>Complete Implementation Prompt for Windsurf/Claude Opus 4.5</strong><br />
+<strong>Version: 4.17.0 | December 2024 | ~2.2MB | 400-500 AI-assisted hours</strong> <strong>Status: AI-OPTIMIZED - Enhanced for reliable Swift &amp; TypeScript code generation</strong></p>
+</blockquote>
+<hr />
+<h2 id="ai-code-generation-enhancements-v4.17.0">🤖 AI CODE GENERATION ENHANCEMENTS (v4.17.0)</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Enhancement</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Complete Swift App Entry Point</strong></td>
+<td>Fixed missing RadiantDeployerApp.swift with proper <span class="citation" data-cites="main">@main</span> struct</td>
+</tr>
+<tr>
+<td><strong>Xcode Project Structure</strong></td>
+<td>Added Package.swift, Info.plist, entitlements templates</td>
+</tr>
+<tr>
+<td><strong>Version Constant</strong></td>
+<td>Single <code>RADIANT_VERSION</code> constant replaces hardcoded strings</td>
+</tr>
+<tr>
+<td><strong>File Creation Order</strong></td>
+<td>Explicit dependency graph for AI implementation</td>
+</tr>
+<tr>
+<td><strong>Preview Providers</strong></td>
+<td>Added SwiftUI previews for all Views</td>
+</tr>
+<tr>
+<td><strong>Platform Requirements</strong></td>
+<td>Clear macOS 13.0+, Swift 5.9+, Xcode 15+ markers</td>
+</tr>
+<tr>
+<td><strong>Sendable Conformance</strong></td>
+<td>All types crossing actor boundaries are Sendable</td>
+</tr>
+<tr>
+<td><strong>SQLCipher Setup</strong></td>
+<td>Complete SPM dependency configuration</td>
+</tr>
+<tr>
+<td><strong>AI Implementation Notes</strong></td>
+<td>MARK comments explaining context and dependencies</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="whats-new-in-v4.16.0-prompt-30">🆕 WHAT’S NEW IN v4.16.0 (PROMPT 30)</h2>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 22%" />
+<col style="width: 22%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Version</th>
+<th>Section</th>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>v4.13.0</strong></td>
+<td>43</td>
+<td><strong>Billing &amp; Credits System</strong></td>
+<td>7-tier subscriptions (FREE→ENTERPRISE PLUS), prepaid credits ($10=1 credit), volume discounts, Stripe integration, credit pools for families/teams</td>
+</tr>
+<tr>
+<td><strong>v4.14.0</strong></td>
+<td>44</td>
+<td><strong>Storage Billing System</strong></td>
+<td>Tiered S3/DB/backup pricing, quota management, overage billing, usage tracking per tenant</td>
+</tr>
+<tr>
+<td><strong>v4.15.0</strong></td>
+<td>45</td>
+<td><strong>Versioned Subscriptions &amp; Grandfathering</strong></td>
+<td>Plan version snapshots, locked pricing for existing subscribers, migration offers with incentives</td>
+</tr>
+<tr>
+<td><strong>v4.16.0</strong></td>
+<td>46</td>
+<td><strong>Dual-Admin Migration Approval</strong></td>
+<td>Two-person approval for production migrations, self-approval prevention, configurable policies, complete audit trail</td>
+</tr>
+</tbody>
+</table>
+<h3 id="new-database-tables-v4.13-v4.16">New Database Tables (v4.13-v4.16):</h3>
+<ul>
+<li><code>subscription_tiers</code>, <code>subscription_add_ons</code>, <code>credit_pools</code>, <code>credit_pool_members</code></li>
+<li><code>credit_transactions</code>, <code>credit_purchases</code>, <code>subscriptions</code>, <code>auto_purchase_settings</code></li>
+<li><code>credit_usage</code>, <code>billing_events</code></li>
+<li><code>storage_usage</code>, <code>storage_pricing</code>, <code>storage_events</code></li>
+<li><code>subscription_plan_versions</code>, <code>grandfathered_subscriptions</code>, <code>plan_change_audit</code></li>
+<li><code>migration_approval_requests</code>, <code>migration_approvals</code>, <code>migration_approval_policies</code></li>
+</ul>
+<h3 id="total-platform-stats-v4.16.0">Total Platform Stats (v4.16.0):</h3>
+<ul>
+<li><strong>46 sections</strong> across 9 implementation phases</li>
+<li><strong>140+ database tables</strong> with RLS</li>
+<li><strong>106+ AI models</strong> (50 external + 56 self-hosted)</li>
+<li><strong>7-tier subscription model</strong> with prepaid credits</li>
+<li><strong>18 languages</strong> with AI translation</li>
+<li><strong>12 configuration categories</strong> with hot reload</li>
+</ul>
+<hr />
+<h1 id="critical-read-this-first---what-this-prompt-builds">⚠️ CRITICAL: READ THIS FIRST - WHAT THIS PROMPT BUILDS</h1>
+<h2 id="two-distinct-components">🎯 TWO DISTINCT COMPONENTS</h2>
+<p>This prompt creates <strong>TWO SEPARATE THINGS</strong> that must be understood before implementation:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────────┐
+│                        RADIANT PLATFORM ARCHITECTURE                             │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                  │
+│   ┌─────────────────────────────────────────┐                                   │
+│   │     COMPONENT 1: SWIFT DEPLOYER         │  ← Built ONCE on developer Mac   │
+│   │     (Section 1 - ~2,400 lines)          │                                   │
+│   │                                          │                                   │
+│   │  • Native macOS application (SwiftUI)   │                                   │
+│   │  • Manages AWS credentials securely     │                                   │
+│   │  • Orchestrates CDK deployments         │                                   │
+│   │  • Runs database migrations             │                                   │
+│   │  • Monitors deployment progress         │                                   │
+│   │  • One-click infrastructure management  │                                   │
+│   │                                          │                                   │
+│   │  THE SWIFT APP IS THE TOOL THAT DEPLOYS │                                   │
+│   │  RADIANT. USERS NEVER TOUCH A TERMINAL. │                                   │
+│   └─────────────────────────────────────────┘                                   │
+│                           │                                                      │
+│                           │ deploys                                              │
+│                           ▼                                                      │
+│   ┌─────────────────────────────────────────┐                                   │
+│   │     COMPONENT 2: AWS INFRASTRUCTURE     │  ← Deployed TO AWS (repeatedly)  │
+│   │     (Sections 0, 2-46 - ~56,000 lines)  │                                   │
+│   │                                          │                                   │
+│   │  • CDK stacks (VPC, Cognito, Aurora,    │                                   │
+│   │    Lambda, API Gateway, SageMaker, etc.)│                                   │
+│   │  • 50+ Lambda functions                  │                                   │
+│   │  • 140+ database tables with RLS        │                                   │
+│   │  • Admin Dashboard (Next.js)            │                                   │
+│   │  • Think Tank consumer platform         │                                   │
+│   │  • 106+ AI model integrations           │                                   │
+│   │  • Multi-tenant, multi-app isolation    │                                   │
+│   │                                          │                                   │
+│   │  THIS IS THE &quot;PAYLOAD&quot; - THE ACTUAL     │                                   │
+│   │  RADIANT PLATFORM RUNNING ON AWS.       │                                   │
+│   └─────────────────────────────────────────┘                                   │
+│                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="key-understanding">Key Understanding</h3>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 30%" />
+<col style="width: 26%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Where It Runs</th>
+<th>When Built</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Swift Deployer</strong> (Section 1)</td>
+<td>Developer’s Mac</td>
+<td>Once</td>
+<td>Deploys and manages AWS infrastructure</td>
+</tr>
+<tr>
+<td><strong>AWS Payload</strong> (Sections 0, 2-46)</td>
+<td>AWS Cloud</td>
+<td>Per environment (dev/staging/prod)</td>
+<td>The actual RADIANT platform</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The Swift app is built ONCE locally. It then deploys the AWS infrastructure REPEATEDLY to different environments.</strong></p>
+<hr />
+<h1 id="implementation-strategy-for-claudewindsurf">🚀 IMPLEMENTATION STRATEGY FOR CLAUDE/WINDSURF</h1>
+<h2 id="how-to-use-this-prompt">How to Use This Prompt</h2>
+<p>This document is ~2MB and exceeds single-context limits. <strong>DO NOT attempt to implement everything at once.</strong></p>
+<h3 id="recommended-approach-phase-by-phase-implementation">Recommended Approach: Phase-by-Phase Implementation</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────────┐
+│                    IMPLEMENTATION PHASES (Follow This Order)                     │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                  │
+│  PHASE 1: Foundation (Implement First)                                          │
+│  ══════════════════════════════════════                                         │
+│  • Section 0: Shared Types &amp; Constants (~1,400 lines)                           │
+│  • Section 1: Swift Deployment App (~2,400 lines)                               │
+│  • Section 2: CDK Infrastructure Stacks (~2,700 lines)                          │
+│                                                                                  │
+│  PHASE 2: Core Infrastructure                                                   │
+│  ═══════════════════════════════                                                │
+│  • Section 3: CDK AI &amp; API Stacks (~2,900 lines)                               │
+│  • Section 4: Lambda Functions - Core (~3,900 lines)                           │
+│  • Section 5: Lambda Functions - Admin &amp; Billing (~1,700 lines)                │
+│  • Section 6: Self-Hosted Models (~1,600 lines)                                │
+│  • Section 7: Database Schema (~3,500 lines)                                   │
+│                                                                                  │
+│  PHASE 3: Admin &amp; Deployment                                                    │
+│  ═══════════════════════════════                                                │
+│  • Section 8: Admin Web Dashboard (~4,200 lines)                               │
+│  • Section 9: Assembly &amp; Deployment Guide (~900 lines)                         │
+│                                                                                  │
+│  PHASE 4: AI Features                                                           │
+│  ═════════════════════                                                          │
+│  • Sections 10-17: Visual AI, Brain, Analytics, Neural Engine, etc.           │
+│  • (~1,500 lines total - smaller sections)                                     │
+│                                                                                  │
+│  PHASE 5: Consumer Platform                                                     │
+│  ═══════════════════════════                                                    │
+│  • Sections 18-28: Think Tank, Concurrent Chat, Collaboration, etc.           │
+│  • (~2,700 lines total)                                                        │
+│                                                                                  │
+│  PHASE 6: Advanced Features                                                     │
+│  ═══════════════════════════                                                    │
+│  • Sections 29-35: Provider Registry, Time Machine, Orchestration, etc.        │
+│  • (~6,200 lines total)                                                        │
+│                                                                                  │
+│  PHASE 7: Intelligence Layer                                                    │
+│  ═══════════════════════════                                                    │
+│  • Sections 36-39: Unified Registry, Feedback Learning, Neural Orchestration   │
+│  • (~5,500 lines total)                                                        │
+│                                                                                  │
+│  PHASE 8: Platform Hardening                                                    │
+│  ═══════════════════════════                                                    │
+│  • Section 40: Application-Level Data Isolation (~1,800 lines)                 │
+│  • Section 41: Complete Internationalization (~3,100 lines)                    │
+│  • Section 42: Dynamic Configuration Management (~2,200 lines)                 │
+│                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="instructions-for-ai-implementation">Instructions for AI Implementation</h3>
+<p>When implementing this prompt, follow these rules:</p>
+<ol type="1">
+<li><strong>Implement ONE PHASE at a time</strong> - Complete all sections in a phase before moving to the next</li>
+<li><strong>Follow the dependency graph</strong> - Sections depend on previous sections (see detailed graph below)</li>
+<li><strong>Section 0 FIRST, always</strong> - Shared types must exist before anything else</li>
+<li><strong>Test each phase</strong> - Verify deployment works before adding more complexity</li>
+<li><strong>Reference, don’t duplicate</strong> - Import from <code>@radiant/shared</code>, never redefine types</li>
+</ol>
+<h3 id="sample-implementation-commands">Sample Implementation Commands</h3>
+<pre class="bash"><code># Phase 1 implementation prompt:
+&quot;Implement RADIANT Phase 1: Sections 0, 1, and 2. 
+ Start with Section 0 (shared types), then Section 1 (Swift app), 
+ then Section 2 (CDK infrastructure). Follow all specifications exactly.&quot;
+
+# Phase 2 implementation prompt:
+&quot;Implement RADIANT Phase 2: Sections 3-7.
+ Phase 1 is complete. Now add CDK AI stacks, Lambda functions,
+ self-hosted models, and database schema.&quot;
+
+# Continue for each phase...</code></pre>
+<hr />
+<h2 id="integration-notes-inherited-from-v4.9.0">🔧 INTEGRATION NOTES (Inherited from v4.9.0)</h2>
+<p>This prompt has been fully integrated with the following key changes:</p>
+<ol type="1">
+<li><strong>AuthContext Unified</strong> - Single source of truth in Section 4, all duplicates removed</li>
+<li><strong>Migration Numbering Fixed</strong> - Sequential 001-050 with clear section mapping</li>
+<li><strong>Version Tags Complete</strong> - All sections now have version tags</li>
+<li><strong>Database Connection Standardized</strong> - All Lambdas use <code>DATABASE_URL</code> pattern</li>
+<li><strong>RLS Policies Consistent</strong> - All use <code>app.current_tenant_id</code></li>
+<li><strong>Duplicate Types Removed</strong> - Single definitions in Section 0</li>
+<li><strong>Leftover Markers Cleaned</strong> - No more “END OF PROMPT X” within document</li>
+<li><strong>TODO Items Addressed</strong> - Resolved or marked with clear implementation notes</li>
+<li><strong>Dependency Order Verified</strong> - Sections ordered by implementation dependencies</li>
+<li><strong>Think Tank Branding</strong> - All “Radiant Solver” references updated to “Think Tank”</li>
+</ol>
+<hr />
+<h2 id="structural-fixes-inherited-from-v4.9.0">⚠️ STRUCTURAL FIXES (Inherited from v4.9.0)</h2>
+<h3 id="issue-1-migration-number-conflicts-fixed">Issue #1: Migration Number Conflicts (FIXED)</h3>
+<p><strong>Problem</strong>: Migrations used inconsistent numbering (001-007, then jumped to 020-042) <strong>Solution</strong>: Renumbered all migrations sequentially: - 001-007: Core schema (Section 7) - 008-009: Reserved - 010-019: Infrastructure features (Sections 10-17) - 020-029: Consumer features (Sections 18-27) - 030-039: Advanced features (Sections 28-37) - 040-046: Latest features (Sections 38-46)</p>
+<h3 id="issue-2-duplicate-type-definitions-fixed">Issue #2: Duplicate Type Definitions (FIXED)</h3>
+<p><strong>Problem</strong>: <code>AuthContext</code>, <code>ModelPricing</code>, <code>ExternalProvider</code> defined multiple times <strong>Solution</strong>: Single source of truth in Section 0 (<code>packages/shared/src/types/</code>)</p>
+<h3 id="issue-3-missing-version-tags-fixed">Issue #3: Missing Version Tags (FIXED)</h3>
+<p><strong>Problem</strong>: Sections 32-35 and 40 had no version tags <strong>Solution</strong>: Added: - Section 32-33: v4.0.0 (Time Machine) - Section 34-35: v4.1.0 (Orchestration Engine) - Section 40: v4.6.0 (App Isolation)</p>
+<h3 id="issue-4-database-connection-inconsistency-fixed">Issue #4: Database Connection Inconsistency (FIXED)</h3>
+<p><strong>Problem</strong>: Mixed <code>DATABASE_URL</code> and <code>DB_HOST/DB_NAME/DB_USER/DB_PASSWORD</code> <strong>Solution</strong>: Standardized all Lambda functions to use <code>DATABASE_URL</code>:</p>
+<pre class="typescript"><code>const pool = new Pool({ connectionString: process.env.DATABASE_URL });</code></pre>
+<h3 id="issue-5-rls-policy-variable-mismatch-fixed">Issue #5: RLS Policy Variable Mismatch (FIXED)</h3>
+<p><strong>Problem</strong>: Some policies used <code>app.current_tenant</code> instead of <code>app.current_tenant_id</code> <strong>Solution</strong>: All RLS policies now consistently use <code>current_setting('app.current_tenant_id')::UUID</code></p>
+<h3 id="issue-6-missing-version-v3.4.0-fixed">Issue #6: Missing Version v3.4.0 (FIXED)</h3>
+<p><strong>Problem</strong>: Version history jumped from v3.3.0 to v3.5.0 <strong>Solution</strong>: Added v3.4.0 as reserved/internal milestone (no user-facing features)</p>
+<h3 id="issue-7-leftover-prompt-markers-fixed">Issue #7: Leftover Prompt Markers (FIXED)</h3>
+<p><strong>Problem</strong>: “END OF PROMPT 15” and “END OF PROMPT 16” embedded within document <strong>Solution</strong>: Removed all internal prompt markers, only final END marker remains</p>
+<hr />
+<h2 id="complete-section-reference">📋 COMPLETE SECTION REFERENCE</h2>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 10%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Section</th>
+<th>Name</th>
+<th>Lines</th>
+<th>Phase</th>
+<th>Version</th>
+<th>Key Deliverables</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0</strong></td>
+<td>Shared Types &amp; Constants</td>
+<td>~1,400</td>
+<td>1</td>
+<td>v2.0.0</td>
+<td>TypeScript types, tier configs, regions</td>
+</tr>
+<tr>
+<td><strong>1</strong></td>
+<td>Swift Deployment App</td>
+<td>~2,400</td>
+<td>1</td>
+<td>v2.0.0</td>
+<td>macOS GUI, credential management, deployment orchestration</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>CDK Infrastructure Stacks</td>
+<td>~2,700</td>
+<td>1</td>
+<td>v2.0.0</td>
+<td>VPC, Aurora, Cognito, S3, base Lambda</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>CDK AI &amp; API Stacks</td>
+<td>~2,900</td>
+<td>2</td>
+<td>v2.1.0</td>
+<td>API Gateway, SageMaker, LiteLLM</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>Lambda Core</td>
+<td>~3,900</td>
+<td>2</td>
+<td>v2.1.0</td>
+<td>Router, chat, model handlers, auth context</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td>Lambda Admin &amp; Billing</td>
+<td>~1,700</td>
+<td>2</td>
+<td>v2.1.0</td>
+<td>Tenant CRUD, billing, invoicing</td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td>Self-Hosted Models</td>
+<td>~1,600</td>
+<td>2</td>
+<td>v2.2.0</td>
+<td>SageMaker endpoints, thermal management</td>
+</tr>
+<tr>
+<td><strong>7</strong></td>
+<td>Database Schema</td>
+<td>~3,500</td>
+<td>2</td>
+<td>v2.2.0</td>
+<td>140+ tables, RLS policies, migrations</td>
+</tr>
+<tr>
+<td><strong>8</strong></td>
+<td>Admin Dashboard</td>
+<td>~4,200</td>
+<td>3</td>
+<td>v2.2.0</td>
+<td>Next.js admin UI, all management pages</td>
+</tr>
+<tr>
+<td><strong>9</strong></td>
+<td>Assembly &amp; Deployment</td>
+<td>~900</td>
+<td>3</td>
+<td>v2.2.0</td>
+<td>Build scripts, deployment guide</td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td>Visual AI Pipeline</td>
+<td>~230</td>
+<td>4</td>
+<td>v2.3.0</td>
+<td>Image processing orchestration</td>
+</tr>
+<tr>
+<td><strong>11</strong></td>
+<td>RADIANT Brain</td>
+<td>~280</td>
+<td>4</td>
+<td>v2.4.0</td>
+<td>Intelligent routing engine</td>
+</tr>
+<tr>
+<td><strong>12</strong></td>
+<td>Metrics &amp; Analytics</td>
+<td>~160</td>
+<td>4</td>
+<td>v2.5.0</td>
+<td>Usage tracking, dashboards</td>
+</tr>
+<tr>
+<td><strong>13</strong></td>
+<td>Neural Engine</td>
+<td>~230</td>
+<td>4</td>
+<td>v3.0.0</td>
+<td>User preferences, pgvector embeddings</td>
+</tr>
+<tr>
+<td><strong>14</strong></td>
+<td>Error Logging</td>
+<td>~200</td>
+<td>4</td>
+<td>v3.1.0</td>
+<td>Centralized error capture</td>
+</tr>
+<tr>
+<td><strong>15</strong></td>
+<td>Credentials Registry</td>
+<td>~220</td>
+<td>4</td>
+<td>v3.2.0</td>
+<td>External API key management</td>
+</tr>
+<tr>
+<td><strong>16</strong></td>
+<td>AWS Admin Credentials</td>
+<td>~90</td>
+<td>4</td>
+<td>v3.2.0</td>
+<td>AWS credential integration</td>
+</tr>
+<tr>
+<td><strong>17</strong></td>
+<td>Auto-Resolve API</td>
+<td>~140</td>
+<td>4</td>
+<td>v3.3.0</td>
+<td>Automatic request handling</td>
+</tr>
+<tr>
+<td><strong>18</strong></td>
+<td>Think Tank Platform</td>
+<td>~300</td>
+<td>5</td>
+<td>v3.5.0</td>
+<td>Consumer AI interface</td>
+</tr>
+<tr>
+<td><strong>19</strong></td>
+<td>Concurrent Chat</td>
+<td>~460</td>
+<td>5</td>
+<td>v3.6.0</td>
+<td>Split-pane multi-chat UI</td>
+</tr>
+<tr>
+<td><strong>20</strong></td>
+<td>Real-Time Collaboration</td>
+<td>~180</td>
+<td>5</td>
+<td>v3.6.0</td>
+<td>Yjs CRDT multi-user editing</td>
+</tr>
+<tr>
+<td><strong>21</strong></td>
+<td>Voice &amp; Video</td>
+<td>~220</td>
+<td>5</td>
+<td>v3.6.0</td>
+<td>Audio input/output integration</td>
+</tr>
+<tr>
+<td><strong>22</strong></td>
+<td>Persistent Memory</td>
+<td>~200</td>
+<td>5</td>
+<td>v3.6.0</td>
+<td>Cross-session user memory</td>
+</tr>
+<tr>
+<td><strong>23</strong></td>
+<td>Canvas &amp; Artifacts</td>
+<td>~210</td>
+<td>5</td>
+<td>v3.6.0</td>
+<td>Rich content editing</td>
+</tr>
+<tr>
+<td><strong>24</strong></td>
+<td>Result Merging</td>
+<td>~230</td>
+<td>5</td>
+<td>v3.6.0</td>
+<td>AI response synthesis</td>
+</tr>
+<tr>
+<td><strong>25</strong></td>
+<td>Focus Modes &amp; Personas</td>
+<td>~210</td>
+<td>5</td>
+<td>v3.6.0</td>
+<td>Domain presets, custom AI personalities</td>
+</tr>
+<tr>
+<td><strong>26</strong></td>
+<td>Scheduled Prompts</td>
+<td>~250</td>
+<td>5</td>
+<td>v3.6.0</td>
+<td>Recurring automated tasks</td>
+</tr>
+<tr>
+<td><strong>27</strong></td>
+<td>Family &amp; Team Plans</td>
+<td>~250</td>
+<td>5</td>
+<td>v3.6.0</td>
+<td>Shared subscriptions</td>
+</tr>
+<tr>
+<td><strong>28</strong></td>
+<td>Analytics Integration</td>
+<td>~200</td>
+<td>5</td>
+<td>v3.6.0</td>
+<td>Think Tank usage analytics</td>
+</tr>
+<tr>
+<td><strong>29</strong></td>
+<td>Admin Extensions</td>
+<td>~430</td>
+<td>6</td>
+<td>v3.7.0</td>
+<td>Additional admin pages</td>
+</tr>
+<tr>
+<td><strong>30</strong></td>
+<td>Dynamic Provider Registry</td>
+<td>~540</td>
+<td>6</td>
+<td>v3.7.0</td>
+<td>Database-driven providers, xAI/Grok</td>
+</tr>
+<tr>
+<td><strong>31</strong></td>
+<td>Model Selection &amp; Pricing</td>
+<td>~1,970</td>
+<td>6</td>
+<td>v3.8.0</td>
+<td>User model choice, editable pricing</td>
+</tr>
+<tr>
+<td><strong>32</strong></td>
+<td>Time Machine Core</td>
+<td>~1,880</td>
+<td>6</td>
+<td>v4.0.0</td>
+<td>Chat history versioning</td>
+</tr>
+<tr>
+<td><strong>33</strong></td>
+<td>Time Machine UI</td>
+<td>~1,320</td>
+<td>6</td>
+<td>v4.0.0</td>
+<td>Visual timeline interface</td>
+</tr>
+<tr>
+<td><strong>34</strong></td>
+<td>Orchestration Engine</td>
+<td>~680</td>
+<td>6</td>
+<td>v4.1.0</td>
+<td>Database-driven workflows</td>
+</tr>
+<tr>
+<td><strong>35</strong></td>
+<td>License Management</td>
+<td>~340</td>
+<td>6</td>
+<td>v4.1.0</td>
+<td>AI model license tracking</td>
+</tr>
+<tr>
+<td><strong>36</strong></td>
+<td>Unified Model Registry</td>
+<td>~1,400</td>
+<td>7</td>
+<td>v4.2.0</td>
+<td>106+ models, sync service</td>
+</tr>
+<tr>
+<td><strong>37</strong></td>
+<td>Feedback Learning</td>
+<td>~1,130</td>
+<td>7</td>
+<td>v4.3.0</td>
+<td>Explicit/implicit/voice feedback</td>
+</tr>
+<tr>
+<td><strong>38</strong></td>
+<td>Neural Orchestration</td>
+<td>~900</td>
+<td>7</td>
+<td>v4.4.0</td>
+<td>Neural-first architecture</td>
+</tr>
+<tr>
+<td><strong>39</strong></td>
+<td>Workflow Proposals</td>
+<td>~4,600</td>
+<td>7</td>
+<td>v4.5.0</td>
+<td>Evidence-based workflow generation</td>
+</tr>
+<tr>
+<td><strong>40</strong></td>
+<td>App Isolation</td>
+<td>~1,800</td>
+<td>8</td>
+<td>v4.6.0</td>
+<td>Per-app data separation</td>
+</tr>
+<tr>
+<td><strong>41</strong></td>
+<td>Internationalization</td>
+<td>~3,100</td>
+<td>8</td>
+<td>v4.7.0</td>
+<td>18 languages, AI translation</td>
+</tr>
+<tr>
+<td><strong>42</strong></td>
+<td>Dynamic Configuration</td>
+<td>~2,200</td>
+<td>8</td>
+<td>v4.8.0</td>
+<td>Runtime parameter management</td>
+</tr>
+<tr>
+<td><strong>43</strong></td>
+<td>Billing &amp; Credits System</td>
+<td>~1,900</td>
+<td>9</td>
+<td>v4.13.0</td>
+<td>7-tier subscriptions, prepaid credits, Stripe</td>
+</tr>
+<tr>
+<td><strong>44</strong></td>
+<td>Storage Billing</td>
+<td>~700</td>
+<td>9</td>
+<td>v4.14.0</td>
+<td>Tiered S3/DB pricing, quotas</td>
+</tr>
+<tr>
+<td><strong>45</strong></td>
+<td>Versioned Subscriptions</td>
+<td>~750</td>
+<td>9</td>
+<td>v4.15.0</td>
+<td>Grandfathering, migration offers</td>
+</tr>
+<tr>
+<td><strong>46</strong></td>
+<td>Dual-Admin Approval</td>
+<td>~700</td>
+<td>9</td>
+<td>v4.16.0</td>
+<td>Two-person migration approval</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="also-includes-all-v4.8.0-features">Also includes all v4.8.0 features:</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>🌍 Localization Registry</strong></td>
+<td>All UI strings stored in database - zero hardcoded text allowed</td>
+</tr>
+<tr>
+<td><strong>🔤 18 Supported Languages</strong></td>
+<td>EN, ES, FR, DE, PT, JA, KO, ZH-CN, ZH-TW, AR, IT, NL, RU, PL, TR, VI, TH, HI</td>
+</tr>
+<tr>
+<td><strong>🤖 AI Auto-Translation</strong></td>
+<td>AWS Bedrock (Claude) translates new strings, flags for admin review</td>
+</tr>
+<tr>
+<td><strong>👨‍💼 Translation Admin UI</strong></td>
+<td>Browse, edit, approve translations in Admin Dashboard</td>
+</tr>
+<tr>
+<td><strong>🚨 Hardcode Prevention</strong></td>
+<td>ESLint rules block hardcoded strings at build time</td>
+</tr>
+<tr>
+<td><strong>⚛️ React i18n Hooks</strong></td>
+<td><code>useTranslation()</code> hook for web apps with fallback chain</td>
+</tr>
+<tr>
+<td><strong>📱 Swift Localization</strong></td>
+<td>Native Swift localization service for Think Tank app</td>
+</tr>
+<tr>
+<td><strong>🔔 Translation Alerts</strong></td>
+<td>Admins notified when AI translations need review</td>
+</tr>
+<tr>
+<td><strong>📊 Translation Coverage</strong></td>
+<td>Dashboard showing % translated per language</td>
+</tr>
+<tr>
+<td><strong>🔄 Real-Time Sync</strong></td>
+<td>Translation updates propagate instantly via WebSocket</td>
+</tr>
+</tbody>
+</table>
+<h3 id="section-41-complete-internationalization-system">Section 41: Complete Internationalization System</h3>
+<p><strong>Why This Matters:</strong> - <strong>Global Reach</strong>: Support users in their native language across 18 languages - <strong>Quality Control</strong>: AI translations flagged for human review before production - <strong>Developer Experience</strong>: ESLint catches hardcoded strings at build time - <strong>Maintainability</strong>: Single source of truth in database, not scattered across code - <strong>Compliance</strong>: GDPR/accessibility requirements for localized content</p>
+<p><strong>Key Components:</strong> - <code>localization_registry</code> - Master list of all translatable strings with keys - <code>localization_translations</code> - Per-language translations with status tracking - <code>localization_languages</code> - Supported languages with metadata - Translation Lambda - Auto-translates via Bedrock when new strings added - Admin UI - Full CRUD for translations with approval workflow - ESLint Plugin - Prevents hardcoded strings in TypeScript/React - Swift Localization Service - Native i18n for Think Tank iOS/macOS app</p>
+<hr />
+<h3 id="also-includes-all-v4.6.0-features">Also includes all v4.6.0 features:</h3>
+<h2 id="whats-new-in-v4.6.0">🚀 WHAT’S NEW IN v4.6.0</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>🔒 Application-Level Data Isolation</strong></td>
+<td>Each client app (Think Tank, Launch Board, AlwaysMe, etc.) is completely isolated</td>
+</tr>
+<tr>
+<td><strong>👤 App-Scoped Users</strong></td>
+<td>Same email creates separate user instances per app - no cross-app data visibility</td>
+</tr>
+<tr>
+<td><strong>🛡️ Enhanced RLS Policies</strong></td>
+<td>Row-Level Security now filters by BOTH <code>tenant_id</code> AND <code>app_id</code></td>
+</tr>
+<tr>
+<td><strong>🔐 Separate Cognito User Pools</strong></td>
+<td>Each app gets its own authentication pool for complete identity isolation</td>
+</tr>
+<tr>
+<td><strong>📊 App-Context Propagation</strong></td>
+<td>All API calls include <code>app_id</code> in context, enforced at Lambda level</td>
+</tr>
+<tr>
+<td><strong>🎯 Think Tank Isolation</strong></td>
+<td>Think Tank is completely isolated from all other client apps</td>
+</tr>
+<tr>
+<td><strong>📝 Cross-App Audit Trail</strong></td>
+<td>Administrators can view cross-app activity but users cannot</td>
+</tr>
+<tr>
+<td><strong>🔄 Migration Strategy</strong></td>
+<td>Non-breaking migration for existing deployments</td>
+</tr>
+</tbody>
+</table>
+<h3 id="section-40-application-level-data-isolation">Section 40: Application-Level Data Isolation</h3>
+<p><strong>Why This Matters:</strong> - <strong>Security</strong>: A compromise in one app cannot affect another - <strong>Compliance</strong>: Per-app audit scope for HIPAA/SOC 2 - <strong>Privacy</strong>: Users in one app never see data from another app - <strong>Data Sovereignty</strong>: Clear boundaries for data residency requirements - <strong>User Experience</strong>: Clean, focused experience per application</p>
+<p><strong>Database Changes:</strong> - New <code>app_users</code> table linking users to specific apps - <code>app_id</code> column added to all user-facing data tables - Updated RLS policies with dual <code>tenant_id + app_id</code> filtering - New <code>current_app_id()</code> function for RLS context - Cross-app admin views for platform administrators</p>
+<p><strong>Infrastructure Changes:</strong> - Separate Cognito User Pool per application - App-specific JWT claims (<code>custom:app_id</code>) - Lambda context propagation for <code>app_id</code> - API Gateway routing per app subdomain</p>
+<p><strong>Lambda Changes:</strong> - Enhanced auth context extraction with <code>appId</code> - Database connection sets both <code>app.current_tenant_id</code> AND <code>app.current_app_id</code> - Audit logging includes <code>app_id</code> for all operations</p>
+<hr />
+<h3 id="design-philosophy-v4.6.0">Design Philosophy (v4.6.0)</h3>
+<ul>
+<li><strong>Defense in Depth</strong> - Isolation enforced at Cognito, API Gateway, Lambda, AND Database levels</li>
+<li><strong>Zero Trust</strong> - Every request validates both tenant and app context</li>
+<li><strong>Least Privilege</strong> - Users can only access their own app’s data</li>
+<li><strong>Admin Override</strong> - Platform admins can view across apps for support/debugging</li>
+<li><strong>Backward Compatible</strong> - Existing single-app deployments work without changes</li>
+</ul>
+<hr />
+<h3 id="also-includes-all-v4.5.0-features">Also includes all v4.5.0 features:</h3>
+<h2 id="whats-new-in-v4.5.0">🚀 WHAT’S NEW IN v4.5.0</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>🔄 Dynamic Workflow Proposals</strong></td>
+<td>Brain &amp; Neural Engine propose new workflows based on substantiated user needs</td>
+</tr>
+<tr>
+<td><strong>📊 Evidence-Based Detection</strong></td>
+<td>7 evidence types: workflow_failure, negative_feedback, explicit_request, manual_override, repeated_attempt, support_escalation, pattern_detection</td>
+</tr>
+<tr>
+<td><strong>🎚️ Threshold-Gated Proposals</strong></td>
+<td>Min occurrences, unique users, time span, impact score, confidence thresholds</td>
+</tr>
+<tr>
+<td><strong>🛡️ Brain Governor Review</strong></td>
+<td>All proposals pass through Brain risk assessment before admin queue</td>
+</tr>
+<tr>
+<td><strong>👨‍💼 Admin Control</strong></td>
+<td>Human administrators approve all new workflows - no auto-publishing</td>
+</tr>
+<tr>
+<td><strong>📝 Full Audit Trail</strong></td>
+<td>Complete tracking of evidence, decisions, and outcomes</td>
+</tr>
+<tr>
+<td><strong>⚙️ Configurable Thresholds</strong></td>
+<td>Admin-editable occurrence, impact, and risk thresholds per tenant</td>
+</tr>
+<tr>
+<td><strong>📐 4-Dimension Risk Assessment</strong></td>
+<td>Cost, latency, quality, compliance risks evaluated for each proposal</td>
+</tr>
+</tbody>
+</table>
+<h3 id="also-includes-all-v4.4.0-features">Also includes all v4.4.0 features:</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>🧠 Neural-First Architecture</strong></td>
+<td>Neural Engine is the fabric, Brain is the governor - tight integration loop</td>
+</tr>
+<tr>
+<td><strong>📋 Think Tank Workflow Registry</strong></td>
+<td>127 orchestration patterns, 127 production workflows, 834 specialized domains</td>
+</tr>
+<tr>
+<td><strong>🎨 Visual Workflow Editor</strong></td>
+<td>Comprehensive drag-and-drop orchestration builder with Neural connectors</td>
+</tr>
+<tr>
+<td><strong>⚡ Real-Time Steering</strong></td>
+<td>Neural Engine monitors and adjusts during execution, not just post-hoc</td>
+</tr>
+<tr>
+<td><strong>👤 Per-User Neural Models</strong></td>
+<td>Personalized preference embeddings, domain preferences, behavioral patterns</td>
+</tr>
+<tr>
+<td><strong>🔄 Concurrent Execution Awareness</strong></td>
+<td>Full support for parallel user sessions in billing, feedback, and learning</td>
+</tr>
+<tr>
+<td><strong>📊 Enhanced Analytics Integration</strong></td>
+<td>Analytics feeds Neural Engine learning signals in real-time</td>
+</tr>
+<tr>
+<td><strong>🎛️ Full Admin Parameter Control</strong></td>
+<td>All Neural/Brain parameters editable through Admin Dashboard</td>
+</tr>
+<tr>
+<td><strong>📱 Client Decision Transparency</strong></td>
+<td>Think Tank receives reasoning, confidence, alternatives for every decision</td>
+</tr>
+<tr>
+<td><strong>🔧 Swift Deployment App v2</strong></td>
+<td>Enhanced deployer with workflow management and Neural configuration</td>
+</tr>
+</tbody>
+</table>
+<h3 id="also-includes-all-v4.3.0-features">Also includes all v4.3.0 features:</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>👍 Feedback System</strong></td>
+<td>Thumbs up/down + optional categories + text/voice comments</td>
+</tr>
+<tr>
+<td><strong>🎯 Execution Manifests</strong></td>
+<td>Full provenance: models, orchestrations, services, thermal states, latency, cost</td>
+</tr>
+<tr>
+<td><strong>🧠 Neural Engine Learning</strong></td>
+<td>Continuous learning from explicit + implicit feedback signals</td>
+</tr>
+<tr>
+<td><strong>🔄 Brain ↔︎ Neural Loop</strong></td>
+<td>Real-time Brain decisions informed by Neural Engine intelligence</td>
+</tr>
+<tr>
+<td><strong>🗣️ Multi-Language Voice</strong></td>
+<td>Voice feedback in any language with auto-transcription/translation</td>
+</tr>
+<tr>
+<td><strong>📊 Implicit Signal Capture</strong></td>
+<td>Regenerate, copy, abandon, manual switch = automatic feedback</td>
+</tr>
+<tr>
+<td><strong>🎚️ Tiered Learning Scope</strong></td>
+<td>Individual → Tenant → Global learning with privacy isolation</td>
+</tr>
+<tr>
+<td><strong>🛡️ Feedback Trust Scores</strong></td>
+<td>Anti-gaming: rate limits, outlier detection, weighted trust</td>
+</tr>
+<tr>
+<td><strong>🔬 A/B Testing Framework</strong></td>
+<td>Measure if routing changes actually improve outcomes</td>
+</tr>
+<tr>
+<td><strong>❄️ Cold Start Handling</strong></td>
+<td>Default routing + collaborative filtering for new users/models</td>
+</tr>
+</tbody>
+</table>
+<h3 id="also-includes-all-v4.2.0-features">Also includes all v4.2.0 features:</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>🔗 Unified Model Registry</strong></td>
+<td>Single SQL view combining ALL 106 models (external + self-hosted)</td>
+</tr>
+<tr>
+<td><strong>🔄 Registry Sync Service</strong></td>
+<td>Automated Lambda syncs providers daily, health checks every 5 min</td>
+</tr>
+<tr>
+<td><strong>📋 Complete Self-Hosted Catalog</strong></td>
+<td>56 self-hosted models with full metadata across 7 categories</td>
+</tr>
+<tr>
+<td><strong>🎯 Orchestration Selection</strong></td>
+<td>Smart model selection algorithm with thermal state awareness</td>
+</tr>
+<tr>
+<td><strong>🏷️ hosting_type Field</strong></td>
+<td>Clear differentiation: ‘external’ vs ‘self_hosted’ per model</td>
+</tr>
+<tr>
+<td><strong>📊 primary_mode Field</strong></td>
+<td>Routing mode: chat, completion, embedding, image, video, audio, search, 3d</td>
+</tr>
+<tr>
+<td><strong>⚡ Thermal-Aware Routing</strong></td>
+<td>Prefer HOT &gt; WARM &gt; COLD for latency optimization</td>
+</tr>
+<tr>
+<td><strong>🏥 Health Status Integration</strong></td>
+<td>Filter unhealthy providers/endpoints from selection</td>
+</tr>
+</tbody>
+</table>
+<h3 id="also-includes-all-v4.1.0-features">Also includes all v4.1.0 features:</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>🧬 AlphaFold 2</strong></td>
+<td>Nobel Prize-winning protein folding (93M params, CASP14 champion)</td>
+</tr>
+<tr>
+<td><strong>🔧 Database-Driven Orchestration</strong></td>
+<td>ALL model configs stored in PostgreSQL - zero hardcoding</td>
+</tr>
+<tr>
+<td><strong>📜 License Management</strong></td>
+<td>Track licenses, compliance status, and commercial use for all models</td>
+</tr>
+<tr>
+<td><strong>➕ Admin Model CRUD</strong></td>
+<td>Add/edit/delete models entirely through Admin Dashboard UI</td>
+</tr>
+<tr>
+<td><strong>🔄 Workflow Engine</strong></td>
+<td>Execute multi-step scientific workflows with database-defined DAGs</td>
+</tr>
+<tr>
+<td><strong>📊 Audit Trail</strong></td>
+<td>Complete logging of all model, workflow, and license changes</td>
+</tr>
+<tr>
+<td><strong>🧪 Protein Folding Pipeline</strong></td>
+<td>Pre-built AlphaFold 2 workflow with MSA → Structure → Relaxation</td>
+</tr>
+<tr>
+<td><strong>⚖️ Compliance Dashboard</strong></td>
+<td>Visual license compliance tracking with Apache/MIT/CC indicators</td>
+</tr>
+</tbody>
+</table>
+<h3 id="also-includes-all-v4.0.0-features">Also includes all v4.0.0 features:</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>⏰ Time Machine</strong></td>
+<td>Apple Time Machine-inspired chat history - fly back through time</td>
+</tr>
+<tr>
+<td><strong>Visual Timeline</strong></td>
+<td>3D perspective view showing chat history fading into the past</td>
+</tr>
+<tr>
+<td><strong>Calendar Navigator</strong></td>
+<td>Jump to any date with visual calendar picker</td>
+</tr>
+<tr>
+<td><strong>Instant Restore</strong></td>
+<td>One-click restore of any message, file, or entire conversation state</td>
+</tr>
+<tr>
+<td><strong>Media Vault</strong></td>
+<td>Every file version preserved forever with S3 versioning</td>
+</tr>
+<tr>
+<td><strong>Service Layer APIs</strong></td>
+<td>Full Time Machine exposed via Complex API</td>
+</tr>
+<tr>
+<td><strong>AI Simplified API</strong></td>
+<td>Time Machine features available in simplified AI API</td>
+</tr>
+<tr>
+<td><strong>Never Lose Anything</strong></td>
+<td>Soft-delete only - everything recoverable forever</td>
+</tr>
+<tr>
+<td><strong>Export Bundles</strong></td>
+<td>Download complete history as ZIP/JSON/Markdown/PDF</td>
+</tr>
+<tr>
+<td><strong>Hidden by Default</strong></td>
+<td>Ultra-simple UI until user clicks “Enter Time Machine”</td>
+</tr>
+</tbody>
+</table>
+<h3 id="also-includes-all-v3.8.0-features">Also includes all v3.8.0 features:</h3>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>User Model Selection</strong></td>
+<td>Users can manually select AI models in Think Tank (not just Auto)</td>
+</tr>
+<tr>
+<td><strong>Standard Models (15)</strong></td>
+<td>Production-ready models from major providers</td>
+</tr>
+<tr>
+<td><strong>Novel Models (15)</strong></td>
+<td>Cutting-edge/experimental models with unique capabilities</td>
+</tr>
+<tr>
+<td><strong>Admin Editable Pricing</strong></td>
+<td>Full control over model pricing and markups in Admin Dashboard</td>
+</tr>
+<tr>
+<td><strong>Bulk Pricing Controls</strong></td>
+<td>Set all external (40% default) or self-hosted (75% default) to one margin</td>
+</tr>
+<tr>
+<td><strong>Individual Price Override</strong></td>
+<td>Override markup for specific models</td>
+</tr>
+<tr>
+<td><strong>Cost Transparency</strong></td>
+<td>Per-message cost display with user’s selected model</td>
+</tr>
+<tr>
+<td><strong>Model Favorites</strong></td>
+<td>Users can favorite models for quick access</td>
+</tr>
+<tr>
+<td><strong>Domain Mode Integration</strong></td>
+<td>Different default models per domain mode (Medical, Code, etc.)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="version-history">📋 VERSION HISTORY</h2>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 30%" />
+<col style="width: 42%" />
+</colgroup>
+<thead>
+<tr>
+<th>Version</th>
+<th>Sections</th>
+<th>Key Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v2.0.0</td>
+<td>0-2</td>
+<td>Foundation: Shared Types, Swift Deployer, CDK Infrastructure</td>
+</tr>
+<tr>
+<td>v2.1.0</td>
+<td>3-5</td>
+<td>Core Platform: AI Stacks, Lambda Functions, Admin &amp; Billing</td>
+</tr>
+<tr>
+<td>v2.2.0</td>
+<td>6-9</td>
+<td>Full Platform: Self-Hosted Models, Database Schema, Admin Dashboard, Deployment</td>
+</tr>
+<tr>
+<td>v2.3.0</td>
+<td>10</td>
+<td>Visual AI Pipeline (13 models)</td>
+</tr>
+<tr>
+<td>v2.4.0</td>
+<td>11</td>
+<td>RADIANT Brain intelligent routing</td>
+</tr>
+<tr>
+<td>v2.5.0</td>
+<td>12</td>
+<td>Metrics &amp; Analytics Engine</td>
+</tr>
+<tr>
+<td>v3.0.0</td>
+<td>13</td>
+<td>User Neural Engine (pgvector)</td>
+</tr>
+<tr>
+<td>v3.1.0</td>
+<td>14</td>
+<td>Centralized Error Logging</td>
+</tr>
+<tr>
+<td>v3.2.0</td>
+<td>15-16</td>
+<td>External &amp; AWS Credentials Registry</td>
+</tr>
+<tr>
+<td>v3.3.0</td>
+<td>17</td>
+<td>Simple Auto-Resolve API</td>
+</tr>
+<tr>
+<td>v3.4.0</td>
+<td>-</td>
+<td>Internal milestone (no user-facing changes)</td>
+</tr>
+<tr>
+<td>v3.5.0</td>
+<td>18</td>
+<td>THINK TANK consumer platform</td>
+</tr>
+<tr>
+<td>v3.6.0</td>
+<td>19-28</td>
+<td>Concurrent Chat, Collaboration, Voice, Memory, Canvas, Personas, Scheduling, Family Plans, Analytics</td>
+</tr>
+<tr>
+<td>v3.7.0</td>
+<td>29-30</td>
+<td>Admin Extensions, Dynamic Provider Registry + xAI/Grok</td>
+</tr>
+<tr>
+<td>v3.8.0</td>
+<td>31</td>
+<td>Think Tank Model Selection &amp; Editable Pricing</td>
+</tr>
+<tr>
+<td>v4.0.0</td>
+<td>32-33</td>
+<td>Time Machine: Visual History, Service Layer APIs, Media Vault</td>
+</tr>
+<tr>
+<td>v4.1.0</td>
+<td>34-35</td>
+<td>Database-Driven Orchestration, AlphaFold 2, License Management, Admin Model CRUD</td>
+</tr>
+<tr>
+<td>v4.2.0</td>
+<td>36</td>
+<td>Unified Model Registry, Registry Sync Service, 56 Self-Hosted Models, Orchestration Selection</td>
+</tr>
+<tr>
+<td>v4.3.0</td>
+<td>37</td>
+<td>Feedback Learning System, Neural Engine Loop, Multi-Language Voice, Implicit Signals, A/B Testing</td>
+</tr>
+<tr>
+<td>v4.4.0</td>
+<td>38</td>
+<td>Neural-First Orchestration, Think Tank Workflow Registry, Visual Workflow Editor, Swift Deployer v2</td>
+</tr>
+<tr>
+<td>v4.5.0</td>
+<td>39</td>
+<td>Dynamic Workflow Proposal System, Evidence-Based Detection, Brain Governor Review, Admin Control</td>
+</tr>
+<tr>
+<td><strong>v4.6.0</strong></td>
+<td><strong>40</strong></td>
+<td><strong>Application-Level Data Isolation, App-Scoped Users, Enhanced RLS, Think Tank Isolation</strong></td>
+</tr>
+<tr>
+<td><strong>v4.7.0</strong></td>
+<td><strong>41</strong></td>
+<td><strong>Complete i18n System, Localization Registry, AI Translation, 18 Languages</strong></td>
+</tr>
+<tr>
+<td><strong>v4.7.1</strong></td>
+<td><strong>-</strong></td>
+<td><strong>Rename: Radiant Solver → Think Tank (consumer app branding)</strong></td>
+</tr>
+<tr>
+<td><strong>v4.8.0</strong></td>
+<td><strong>42</strong></td>
+<td><strong>Dynamic Configuration Management, Admin-Editable Parameters, Hot Reload</strong></td>
+</tr>
+<tr>
+<td><strong>v4.9.0</strong></td>
+<td><strong>-</strong></td>
+<td><strong>Structural Cleanup: Migration renumbering, duplicate removal, consistency fixes</strong></td>
+</tr>
+<tr>
+<td><strong>v4.10.0</strong></td>
+<td><strong>-</strong></td>
+<td><strong>Implementation-Ready: Component clarification, phased implementation guide</strong></td>
+</tr>
+<tr>
+<td><strong>v4.12.0</strong></td>
+<td><strong>-</strong></td>
+<td><strong>Brain Price Optimizer: Cost vs price distinction, caching/batch discounts</strong></td>
+</tr>
+<tr>
+<td><strong>v4.13.0</strong></td>
+<td><strong>43</strong></td>
+<td><strong>Billing &amp; Credits System - 7-tier subscriptions, prepaid credits, Stripe integration</strong></td>
+</tr>
+<tr>
+<td><strong>v4.14.0</strong></td>
+<td><strong>44</strong></td>
+<td><strong>Storage Billing - Tiered S3/DB/backup pricing, quota management</strong></td>
+</tr>
+<tr>
+<td><strong>v4.15.0</strong></td>
+<td><strong>45</strong></td>
+<td><strong>Versioned Subscriptions - Grandfathering, migration incentives</strong></td>
+</tr>
+<tr>
+<td><strong>v4.16.0</strong></td>
+<td><strong>46</strong></td>
+<td><strong>Dual-Admin Approval - Two-person migration approval, audit trail</strong></td>
+</tr>
+<tr>
+<td><strong>v4.16.1</strong></td>
+<td><strong>-</strong></td>
+<td><strong>Audit &amp; Consistency Fixes - RLS standardization, type deduplication, localization</strong></td>
+</tr>
+<tr>
+<td><strong>v4.17.0</strong></td>
+<td><strong>-</strong></td>
+<td><strong>AI Code Gen Optimization - Complete Swift app, Package.swift, Sendable conformance, version constants</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="migration-to-section-mapping">📋 MIGRATION TO SECTION MAPPING</h2>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr>
+<th>Migration</th>
+<th>Section</th>
+<th>Version</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>001_initial_schema.sql</td>
+<td>7</td>
+<td>v2.2.0</td>
+<td>Core tables: tenants, users, sessions</td>
+</tr>
+<tr>
+<td>002_tenant_isolation.sql</td>
+<td>7</td>
+<td>v2.2.0</td>
+<td>RLS policies for tenant isolation</td>
+</tr>
+<tr>
+<td>003_ai_models.sql</td>
+<td>7</td>
+<td>v2.2.0</td>
+<td>Models and providers tables</td>
+</tr>
+<tr>
+<td>004_usage_billing.sql</td>
+<td>7</td>
+<td>v2.2.0</td>
+<td>Usage events and billing</td>
+</tr>
+<tr>
+<td>005_admin_approval.sql</td>
+<td>5</td>
+<td>v2.2.0</td>
+<td>Admin invitations and approvals</td>
+</tr>
+<tr>
+<td>006_self_hosted_models.sql</td>
+<td>6</td>
+<td>v2.2.0</td>
+<td>SageMaker model configurations</td>
+</tr>
+<tr>
+<td>007_external_providers.sql</td>
+<td>7</td>
+<td>v2.2.0</td>
+<td>External provider registry</td>
+</tr>
+<tr>
+<td>010_visual_ai_pipeline.sql</td>
+<td>10</td>
+<td>v2.3.0</td>
+<td>Visual pipeline jobs</td>
+</tr>
+<tr>
+<td>011_radiant_brain.sql</td>
+<td>11</td>
+<td>v2.4.0</td>
+<td>Brain routing decisions</td>
+</tr>
+<tr>
+<td>012_metrics_analytics.sql</td>
+<td>12</td>
+<td>v2.5.0</td>
+<td>Usage metrics and aggregations</td>
+</tr>
+<tr>
+<td>013_user_neural_engine.sql</td>
+<td>13</td>
+<td>v3.0.0</td>
+<td>User preferences and memory</td>
+</tr>
+<tr>
+<td>014_centralized_error_logging.sql</td>
+<td>14</td>
+<td>v3.1.0</td>
+<td>Error logs table</td>
+</tr>
+<tr>
+<td>015_credentials_registry.sql</td>
+<td>15</td>
+<td>v3.2.0</td>
+<td>Credential vaults</td>
+</tr>
+<tr>
+<td>016_aws_admin.sql</td>
+<td>16</td>
+<td>v3.2.0</td>
+<td>AWS credentials integration</td>
+</tr>
+<tr>
+<td>017_auto_resolve.sql</td>
+<td>17</td>
+<td>v3.3.0</td>
+<td>Auto-resolve requests</td>
+</tr>
+<tr>
+<td>018_think_tank.sql</td>
+<td>18</td>
+<td>v3.5.0</td>
+<td>Think Tank sessions and steps</td>
+</tr>
+<tr>
+<td>019_concurrent_chat.sql</td>
+<td>19</td>
+<td>v3.6.0</td>
+<td>Concurrent sessions</td>
+</tr>
+<tr>
+<td>020_realtime_collaboration.sql</td>
+<td>20</td>
+<td>v3.6.0</td>
+<td>Collaboration sessions</td>
+</tr>
+<tr>
+<td>021_voice_video.sql</td>
+<td>21</td>
+<td>v3.6.0</td>
+<td>Voice sessions and transcriptions</td>
+</tr>
+<tr>
+<td>022_persistent_memory.sql</td>
+<td>22</td>
+<td>v3.6.0</td>
+<td>Memory stores</td>
+</tr>
+<tr>
+<td>023_canvas_artifacts.sql</td>
+<td>23</td>
+<td>v3.6.0</td>
+<td>Canvas and artifacts</td>
+</tr>
+<tr>
+<td>024_result_merging.sql</td>
+<td>24</td>
+<td>v3.6.0</td>
+<td>Merge sessions</td>
+</tr>
+<tr>
+<td>025_focus_personas.sql</td>
+<td>25</td>
+<td>v3.6.0</td>
+<td>User personas</td>
+</tr>
+<tr>
+<td>026_scheduled_prompts.sql</td>
+<td>26</td>
+<td>v3.6.0</td>
+<td>Scheduled prompts</td>
+</tr>
+<tr>
+<td>027_team_plans.sql</td>
+<td>27</td>
+<td>v3.6.0</td>
+<td>Team plans</td>
+</tr>
+<tr>
+<td>028_analytics_extensions.sql</td>
+<td>28</td>
+<td>v3.6.0</td>
+<td>Analytics dashboard extensions</td>
+</tr>
+<tr>
+<td>029_admin_extensions.sql</td>
+<td>29</td>
+<td>v3.7.0</td>
+<td>Admin dashboard extensions</td>
+</tr>
+<tr>
+<td>030_dynamic_provider_registry.sql</td>
+<td>30</td>
+<td>v3.7.0</td>
+<td>Provider registry with xAI</td>
+</tr>
+<tr>
+<td>031_thinktank_model_selection.sql</td>
+<td>31</td>
+<td>v3.8.0</td>
+<td>User model preferences</td>
+</tr>
+<tr>
+<td>032_time_machine_core.sql</td>
+<td>32</td>
+<td>v4.0.0</td>
+<td>Time Machine snapshots</td>
+</tr>
+<tr>
+<td>033_time_machine_media.sql</td>
+<td>33</td>
+<td>v4.0.0</td>
+<td>Media vault for Time Machine</td>
+</tr>
+<tr>
+<td>034_orchestration_engine.sql</td>
+<td>34</td>
+<td>v4.1.0</td>
+<td>Orchestration patterns</td>
+</tr>
+<tr>
+<td>035_license_management.sql</td>
+<td>35</td>
+<td>v4.1.0</td>
+<td>License tracking</td>
+</tr>
+<tr>
+<td>036_unified_model_registry.sql</td>
+<td>36</td>
+<td>v4.2.0</td>
+<td>Unified model registry</td>
+</tr>
+<tr>
+<td>037_feedback_learning.sql</td>
+<td>37</td>
+<td>v4.3.0</td>
+<td>Feedback and learning signals</td>
+</tr>
+<tr>
+<td>038_neural_orchestration.sql</td>
+<td>38</td>
+<td>v4.4.0</td>
+<td>Neural orchestration registry</td>
+</tr>
+<tr>
+<td>039_workflow_proposals.sql</td>
+<td>39</td>
+<td>v4.5.0</td>
+<td>Dynamic workflow proposals</td>
+</tr>
+<tr>
+<td>040_app_isolation.sql</td>
+<td>40</td>
+<td>v4.6.0</td>
+<td>Application-level isolation</td>
+</tr>
+<tr>
+<td>041_localization.sql</td>
+<td>41</td>
+<td>v4.7.0</td>
+<td>Internationalization system</td>
+</tr>
+<tr>
+<td>042_configuration.sql</td>
+<td>42</td>
+<td>v4.8.0</td>
+<td>Dynamic configuration</td>
+</tr>
+<tr>
+<td>043_billing_system.sql</td>
+<td>43</td>
+<td>v4.13.0</td>
+<td>Billing tiers, credits, Stripe</td>
+</tr>
+<tr>
+<td>044_storage_billing.sql</td>
+<td>44</td>
+<td>v4.14.0</td>
+<td>Storage usage and pricing</td>
+</tr>
+<tr>
+<td>045_versioned_subscriptions.sql</td>
+<td>45</td>
+<td>v4.15.0</td>
+<td>Plan versions, grandfathering</td>
+</tr>
+<tr>
+<td>046_dual_admin_approval.sql</td>
+<td>46</td>
+<td>v4.16.0</td>
+<td>Migration approval workflow</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="implementation-dependency-graph">🔗 IMPLEMENTATION DEPENDENCY GRAPH</h2>
+<p>Implementation Order (deploy in this sequence):</p>
+<p><strong>Phase 1: Foundation (Sections 0-2)</strong> - Section 0: Shared Types (no dependencies) - Section 1: Swift Deployment App (depends on: 0) - Section 2: CDK Infrastructure Stacks (depends on: 0)</p>
+<p><strong>Phase 2: Core Infrastructure (Sections 3-7)</strong> - Section 3: CDK AI &amp; API Stacks (depends on: 2) - Section 4: Lambda Core (depends on: 0, 3) - Section 5: Lambda Admin &amp; Billing (depends on: 4) - Section 6: Self-Hosted Models (depends on: 3) - Section 7: Database Schema (depends on: none - deploy migrations first!)</p>
+<p><strong>Phase 3: Admin &amp; Deployment (Sections 8-9)</strong> - Section 8: Admin Dashboard (depends on: 4, 5, 7) - Section 9: Assembly &amp; Deployment Guide (depends on: 1-8)</p>
+<p><strong>Phase 4: AI Features (Sections 10-17)</strong> - Section 10: Visual AI Pipeline (depends on: 7) - Section 11: RADIANT Brain (depends on: 10) - Section 12: Metrics &amp; Analytics (depends on: 7) - Section 13: User Neural Engine (depends on: 7, 12) - Section 14: Error Logging (depends on: 7) - Section 15: Credentials Registry (depends on: 7) - Section 16: AWS Admin Credentials (depends on: 15) - Section 17: Auto-Resolve API (depends on: 11, 13)</p>
+<p><strong>Phase 5: Consumer Platform (Sections 18-28)</strong> - Section 18: Think Tank Platform (depends on: 11, 13) - Section 19: Concurrent Chat (depends on: 18) - Section 20: Real-Time Collaboration (depends on: 19) - Section 21: Voice &amp; Video (depends on: 18) - Section 22: Persistent Memory (depends on: 13, 18) - Section 23: Canvas &amp; Artifacts (depends on: 18) - Section 24: Result Merging (depends on: 19) - Section 25: Focus Modes &amp; Personas (depends on: 18) - Section 26: Scheduled Prompts (depends on: 18) - Section 27: Family &amp; Team Plans (depends on: 18) - Section 28: Analytics Integration (depends on: 12, 18)</p>
+<p><strong>Phase 6: Advanced Features (Sections 29-35)</strong> - Section 29: Admin Dashboard Extensions (depends on: 8, 18) - Section 30: Dynamic Provider Registry (depends on: 7, 11) - Section 31: Model Selection &amp; Pricing (depends on: 18, 30) - Section 32: Time Machine Core (depends on: 18) - Section 33: Time Machine UI (depends on: 32) - Section 34: Orchestration Engine (depends on: 11, 30) - Section 35: License Management UI (depends on: 8, 34)</p>
+<p><strong>Phase 7: Intelligence Layer (Sections 36-39)</strong> - Section 36: Unified Model Registry (depends on: 30, 34) - Section 37: Feedback Learning (depends on: 13, 18) - Section 38: Neural Orchestration (depends on: 34, 36, 37) - Section 39: Workflow Proposals (depends on: 38)</p>
+<p><strong>Phase 8: Platform Hardening (Sections 40-42)</strong> - Section 40: App Isolation (depends on: all previous) - Section 41: Internationalization (depends on: 40) - Section 42: Dynamic Configuration (depends on: 41)</p>
+<p><strong>Phase 9: Billing &amp; Enterprise (Sections 43-46)</strong> - Section 43: Billing &amp; Credits (depends on: 42) - Section 44: Storage Billing (depends on: 43) - Section 45: Versioned Subscriptions (depends on: 43, 44) - Section 46: Dual-Admin Approval (depends on: 43)</p>
+<hr />
+<h2 id="critical-database-connection-standard">⚠️ CRITICAL: Database Connection Standard</h2>
+<p><strong>ALL Lambda functions MUST use this pattern:</strong></p>
+<pre class="typescript"><code>import { Pool } from &#39;pg&#39;;
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === &#39;production&#39; ? { rejectUnauthorized: false } : false,
+});</code></pre>
+<p><strong>Environment variable required:</strong></p>
+<pre class="bash"><code>DATABASE_URL=postgresql://user:password@host:5432/database?sslmode=require</code></pre>
+<p><strong>Do NOT use individual DB_HOST, DB_NAME, DB_USER, DB_PASSWORD variables.</strong></p>
+<h1 id="âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ">â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

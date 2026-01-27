@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MULTI PROTOCOL GATEWAY ARCHITECTURE - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>MULTI PROTOCOL GATEWAY ARCHITECTURE</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/MULTI-PROTOCOL-GATEWAY-ARCHITECTURE.md</div>
+  </div>
+  
+  <h1 id="radiant-multi-protocol-ai-interface-architecture-v3.0">RADIANT Multi-Protocol AI Interface Architecture v3.0</h1>
+<h2 id="executive-summary">Executive Summary</h2>
+<p>This document defines the production architecture for RADIANT’s unified, bidirectional protocol layer supporting MCP, A2A, OpenAI, Anthropic, and Google interfaces at <strong>1M+ concurrent connection scale</strong>.</p>
+<p><strong>v3 Changes from v2:</strong></p>
+<table>
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 39%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>v2 (Rejected)</th>
+<th>v3 (Final)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connection Tier</td>
+<td>Envoy + Lua filters</td>
+<td>Custom Go Gateway</td>
+</tr>
+<tr>
+<td>Message Bus</td>
+<td>Redis Pub/Sub</td>
+<td>NATS JetStream</td>
+</tr>
+<tr>
+<td>Authorization</td>
+<td>Tenant-scoped Cedar</td>
+<td>Resource-level ABAC Cedar</td>
+</tr>
+<tr>
+<td>Connection Draining</td>
+<td>30s GOAWAY window</td>
+<td>Resume Token + Session Rehydration</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Critical Insight:</strong> Envoy is a <em>proxy</em>, not a message bus client. Bridging 1M WebSockets to NATS subjects requires the Gateway to be a first-class NATS client — impossible with Envoy without complex Wasm filters.</p>
+<hr />
+<h2 id="part-1-protocol-adapter-layer">Part 1: Protocol Adapter Layer</h2>
+<p>Key elements retained from v2: - JSON Schema as canonical internal format - Dual-level versioning (protocol + provider) - <code>SecurityContext</code> injection into all adapter methods - Bidirectional support (RADIANT as server AND client)</p>
+<hr />
+<h2 id="part-2-go-connectivity-gateway">Part 2: Go Connectivity Gateway</h2>
+<h3 id="architecture-overview">2.1 Architecture Overview</h3>
+<p>The Go Gateway is a lightweight, purpose-built service that:</p>
+<ol type="1">
+<li>Terminates TLS (mTLS for A2A, standard TLS for users)</li>
+<li>Holds persistent WebSocket/SSE connections</li>
+<li>Acts as a first-class NATS JetStream client</li>
+<li>Bridges sockets ↔︎ NATS subjects bidirectionally</li>
+</ol>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                              INTERNET                                        │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     NETWORK LOAD BALANCER (NLB)                              │
+│  • Layer 4 TCP passthrough                                                   │
+│  • Cross-zone load balancing                                                 │
+│  • Health checks on :8080/health                                             │
+│  • TLS termination DISABLED (handled by Gateway)                             │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    GO CONNECTIVITY GATEWAY FLEET                             │
+│                                                                              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
+│  │  Gateway 1  │  │  Gateway 2  │  │  Gateway 3  │  │  Gateway N  │        │
+│  │  (c6g.xl)   │  │  (c6g.xl)   │  │  (c6g.xl)   │  │  (c6g.xl)   │        │
+│  │  ~80K conn  │  │  ~80K conn  │  │  ~80K conn  │  │  ~80K conn  │        │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘        │
+│         │                │                │                │                │
+│  Memory per connection: ~10KB (socket + NATS sub + session state)           │
+│  Target: 50K-100K connections per c6g.xlarge (8GB RAM)                      │
+│                                                                              │
+│  Responsibilities:                                                           │
+│  ├─ TLS termination (mTLS cert validation, OIDC JWT extraction)             │
+│  ├─ WebSocket/SSE upgrade and frame parsing                                 │
+│  ├─ Protocol detection (MCP JSON-RPC, A2A, raw HTTP)                        │
+│  ├─ NATS client: publish to inbox, subscribe to outbox                      │
+│  ├─ Session state: connection_id ↔ session_id mapping                       │
+│  └─ Resume token generation and validation                                  │
+│                                                                              │
+│  DOES NOT: Execute business logic, call databases, make LLM calls           │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         NATS JETSTREAM CLUSTER                               │
+│                                                                              │
+│  Streams:                                                                    │
+│  ├─ INBOX: Incoming messages from connections                               │
+│  │   Subjects: in.{protocol}.{tenant_id}.{agent_id}                         │
+│  │   Retention: WorkQueue (consumed once)                                   │
+│  │   Replicas: 3                                                            │
+│  │                                                                           │
+│  └─ OUTBOX: Responses back to connections                                   │
+│      Subjects: out.{session_id}                                             │
+│      Retention: Limits (1 hour TTL, 1000 msgs max)                          │
+│      Replicas: 3                                                            │
+│                                                                              │
+│  Why NATS over Redis:                                                        │
+│  ├─ At-Least-Once delivery (Redis Pub/Sub is At-Most-Once)                  │
+│  ├─ Subject-based addressing (out.{session_id} for return path)             │
+│  ├─ Persistence survives Lambda cold starts and Gateway rebalancing         │
+│  └─ Consumer groups for Lambda worker scaling                               │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         ADAPTER LOGIC TIER (Lambda)                          │
+│                                                                              │
+│  NATS Consumer Groups:                                                       │
+│  ├─ mcp-workers: Subscribe to in.mcp.&gt;                                      │
+│  ├─ a2a-workers: Subscribe to in.a2a.&gt;                                      │
+│  └─ fc-workers: Subscribe to in.fc.&gt;                                        │
+│                                                                              │
+│  Flow:                                                                       │
+│  1. Receive message from NATS (includes SecurityContext)                    │
+│  2. Validate authorization via Cedar                                        │
+│  3. Execute tool / call provider                                            │
+│  4. Publish response to out.{session_id}                                    │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="key-interfaces">2.2 Key Interfaces</h3>
+<p><strong>SessionContext</strong> - Contains all state for a connected client: - <code>SessionID</code> - Unique session identifier (survives reconnects) - <code>ConnectionID</code> - Current connection identifier (changes on reconnect) - <code>TenantID</code> - Tenant isolation - <code>PrincipalID/Type</code> - Agent, User, or Service - <code>AuthType</code> - mTLS, OIDC, or APIKey - <code>Protocol</code> - MCP, A2A, OpenAI, Anthropic, Google - <code>InboxSubject/OutboxSubject</code> - NATS subjects for this session - <code>ResumeToken/Expiry</code> - For session rehydration</p>
+<p><strong>GatewayStats</strong> - Metrics exposed at <code>/health</code>: - <code>ActiveConnections</code> / <code>TotalConnections</code> - <code>MessagesIn</code> / <code>MessagesOut</code> - <code>ResumedConnections</code> / <code>AuthFailures</code></p>
+<hr />
+<h2 id="part-3-nats-jetstream-configuration">Part 3: NATS JetStream Configuration</h2>
+<h3 id="stream-definitions">3.1 Stream Definitions</h3>
+<pre class="yaml"><code># INBOX Stream - messages from clients to Lambda workers
+name: INBOX
+subjects: [&quot;in.&gt;&quot;]  # in.{protocol}.{tenant_id}.{agent_id}
+retention: workqueue  # Consumed exactly once
+maxAge: 1h
+replicas: 3
+
+# OUTBOX Stream - responses back to specific sessions
+name: OUTBOX
+subjects: [&quot;out.&gt;&quot;]  # out.{session_id}
+retention: limits
+maxAge: 1h  # Messages expire after 1 hour
+replicas: 3
+
+# HISTORY Stream - for session resume replay
+name: HISTORY
+subjects: [&quot;history.&gt;&quot;]  # history.{session_id}
+retention: limits
+maxMsgsPerSubject: 10000
+maxAge: 1h
+replicas: 3</code></pre>
+<h3 id="consumer-definitions">3.2 Consumer Definitions</h3>
+<table>
+<thead>
+<tr>
+<th>Consumer</th>
+<th>Stream</th>
+<th>Filter</th>
+<th>Ack Wait</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mcp-workers</td>
+<td>INBOX</td>
+<td>in.mcp.&gt;</td>
+<td>30s</td>
+<td>MCP protocol handling</td>
+</tr>
+<tr>
+<td>a2a-workers</td>
+<td>INBOX</td>
+<td>in.a2a.&gt;</td>
+<td>60s</td>
+<td>A2A tasks (longer)</td>
+</tr>
+<tr>
+<td>fc-workers</td>
+<td>INBOX</td>
+<td>in.fc.&gt;</td>
+<td>120s</td>
+<td>LLM function calls</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="part-4-resource-level-cedar-authorization">Part 4: Resource-Level Cedar Authorization</h2>
+<h3 id="cedar-schema">4.1 Cedar Schema</h3>
+<pre class="cedarschema"><code>namespace Radiant {
+  entity Agent in [Tenant] {
+    tier: String, scopes: Set&lt;String&gt;, labels: Set&lt;String&gt;
+  };
+  entity User in [Tenant] {
+    role: String, scopes: Set&lt;String&gt;, department: String
+  };
+  entity Tool {
+    name: String, destructive: Bool, sensitive: Bool,
+    requiredScopes: Set&lt;String&gt;, labels: Set&lt;String&gt;,
+    namespace: String, owner: String
+  };
+  
+  action &quot;tool:call&quot; appliesTo {
+    principal: [Agent, User, Service],
+    resource: [Tool],
+    context: { tenantId: String, sourceProtocol: String }
+  };
+}</code></pre>
+<h3 id="key-policies">4.2 Key Policies</h3>
+<table>
+<colgroup>
+<col style="width: 47%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>deny-cross-tenant</code></td>
+<td>FORBID all cross-tenant access</td>
+</tr>
+<tr>
+<td><code>user-tool-call-non-sensitive</code></td>
+<td>Allow non-destructive tools with scopes</td>
+</tr>
+<tr>
+<td><code>agent-tool-call-namespace</code></td>
+<td>Agents can call tools in their namespace</td>
+</tr>
+<tr>
+<td><code>admin-tool-call-all</code></td>
+<td>Admins bypass restrictions</td>
+</tr>
+<tr>
+<td><code>deny-sensitive-without-label</code></td>
+<td>Protect sensitive resources</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="part-5-resume-token-strategy">Part 5: Resume Token Strategy</h2>
+<h3 id="session-lifecycle">5.1 Session Lifecycle</h3>
+<pre><code>Connect → Active → Drain → Resume → Active (same session)
+           │         │        │
+           ▼         ▼        ▼
+     NATS Subject: out.{session_id}
+     
+     • Created when session starts
+     • Persists across connection changes
+     • Lambda publishes here regardless of Gateway node
+     • New Gateway subscribes on resume</code></pre>
+<p><strong>KEY INSIGHT:</strong> Session durability over connection durability. The TCP socket can die and reconnect; the session (and NATS subject) remains stable.</p>
+<h3 id="resume-token-contents">5.2 Resume Token Contents</h3>
+<pre class="go"><code>type ResumeTokenData struct {
+  SessionID       string    // Survives reconnect
+  TenantID        string
+  PrincipalID     string
+  Protocol        string
+  InboxSubject    string    // in.{protocol}.{tenant}.{agent}
+  OutboxSubject   string    // out.{session_id}
+  IssuedAt        time.Time
+  ExpiresAt       time.Time
+  GatewayNode     string    // Hint for sticky routing
+}</code></pre>
+<p>Token is HMAC-SHA256 signed and base64 encoded.</p>
+<hr />
+<h2 id="part-6-production-architecture-summary">Part 6: Production Architecture Summary</h2>
+<h3 id="key-design-decisions">6.1 Key Design Decisions</h3>
+<table>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 27%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Choice</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Gateway</strong></td>
+<td>Custom Go</td>
+<td>Envoy can’t bridge sockets to NATS</td>
+</tr>
+<tr>
+<td><strong>Message Bus</strong></td>
+<td>NATS JetStream</td>
+<td>At-least-once, subject addressing, persistence</td>
+</tr>
+<tr>
+<td><strong>Authorization</strong></td>
+<td>Cedar (ABAC)</td>
+<td>Resource-level policies for agentic isolation</td>
+</tr>
+<tr>
+<td><strong>Connection Draining</strong></td>
+<td>Resume Tokens</td>
+<td>Session durability &gt; connection durability</td>
+</tr>
+<tr>
+<td><strong>Outbound Calls</strong></td>
+<td>HTTP/2 Pool</td>
+<td>5000 concurrent streams per provider</td>
+</tr>
+</tbody>
+</table>
+<h3 id="capacity-planning">6.2 Capacity Planning</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Instance</th>
+<th>Connections</th>
+<th>Count for 1M</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Go Gateway</td>
+<td>c6g.xlarge (8GB)</td>
+<td>80,000</td>
+<td>13 instances</td>
+</tr>
+<tr>
+<td>NATS</td>
+<td>r6g.xlarge</td>
+<td>N/A</td>
+<td>3 nodes (cluster)</td>
+</tr>
+<tr>
+<td>Lambda (MCP)</td>
+<td>1024MB</td>
+<td>N/A</td>
+<td>1000 concurrent</td>
+</tr>
+<tr>
+<td>Lambda (A2A)</td>
+<td>2048MB</td>
+<td>N/A</td>
+<td>500 concurrent</td>
+</tr>
+<tr>
+<td>Lambda (FC)</td>
+<td>2048MB</td>
+<td>N/A</td>
+<td>200 concurrent</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Estimated Monthly Cost (1M connections):</strong> ~$8,000-15,000/month</p>
+<h3 id="file-structure">6.3 File Structure</h3>
+<pre><code>/radiant
+├── /apps/gateway/              # Go Gateway service
+│   ├── /cmd/gateway/main.go
+│   ├── /internal/
+│   │   ├── /config/            # Configuration
+│   │   ├── /server/            # WebSocket server, ingress, egress
+│   │   ├── /session/           # Session context
+│   │   ├── /auth/              # mTLS, OIDC
+│   │   ├── /protocol/          # Protocol detection
+│   │   ├── /resume/            # Resume tokens
+│   │   ├── /nats/              # NATS client
+│   │   └── /health/            # Health endpoints
+│   └── /pkg/messages/          # Message structs
+│
+├── /services/egress-proxy/     # HTTP/2 connection pool (Fargate)
+│   └── /src/
+│       ├── index.ts            # Fastify server
+│       ├── pool.ts             # HTTP/2 pool management
+│       └── providers.ts        # AI provider configs
+│
+├── /infrastructure/docker/gateway/
+│   ├── docker-compose.yml      # Local dev stack
+│   └── mock-worker/            # Mock Lambda for testing
+│
+└── /packages/infrastructure/lib/stacks/
+    └── gateway-stack.ts        # CDK deployment</code></pre>
+<hr />
+<h2 id="part-7-implementation-status">Part 7: Implementation Status</h2>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 27%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Status</th>
+<th>Deliverables</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Go Gateway</td>
+<td>✅ Complete</td>
+<td><code>apps/gateway/</code> - 16 files (incl. TLS)</td>
+</tr>
+<tr>
+<td>Egress Proxy</td>
+<td>✅ Complete</td>
+<td><code>services/egress-proxy/</code> - 5 files</td>
+</tr>
+<tr>
+<td>NATS Setup</td>
+<td>✅ Complete</td>
+<td>Docker Compose with JetStream</td>
+</tr>
+<tr>
+<td>CDK Stack</td>
+<td>✅ Complete</td>
+<td><code>gateway-stack.ts</code></td>
+</tr>
+<tr>
+<td>Resume Tokens</td>
+<td>✅ Complete</td>
+<td>HMAC-signed tokens</td>
+</tr>
+<tr>
+<td>TLS/mTLS</td>
+<td>✅ Complete</td>
+<td><code>internal/server/tls.go</code></td>
+</tr>
+<tr>
+<td>Cedar Schema</td>
+<td>✅ Complete</td>
+<td><code>infrastructure/cedar/schema.cedarschema</code></td>
+</tr>
+<tr>
+<td>Cedar Policies</td>
+<td>✅ Complete</td>
+<td><code>infrastructure/cedar/policies/</code> (2 files)</td>
+</tr>
+<tr>
+<td>Cedar Service</td>
+<td>✅ Complete</td>
+<td><code>lambda/shared/services/cedar/</code></td>
+</tr>
+<tr>
+<td>MCP Lambda Worker</td>
+<td>✅ Complete</td>
+<td><code>lambda/gateway/mcp-worker.ts</code></td>
+</tr>
+<tr>
+<td>Load Testing</td>
+<td>✅ Complete</td>
+<td><code>infrastructure/load-tests/</code> (k6 scripts)</td>
+</tr>
+<tr>
+<td>Integration Tests</td>
+<td>✅ Complete</td>
+<td><code>__tests__/gateway/mcp-worker.test.ts</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><strong>Document Version:</strong> 3.1<br />
+<strong>Status:</strong> Implementation Complete<br />
+<strong>Last Updated:</strong> January 2026<br />
+<strong>Implementation:</strong> RADIANT v5.28.0</p>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

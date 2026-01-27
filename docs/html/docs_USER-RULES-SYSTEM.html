@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USER RULES SYSTEM - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>USER RULES SYSTEM</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/USER-RULES-SYSTEM.md</div>
+  </div>
+  
+  <h1 id="user-rules-system-memory-rules">User Rules System (Memory Rules)</h1>
+<p><strong>Version</strong>: 4.18.3<br />
+<strong>Last Updated</strong>: 2024-12-28</p>
+<h2 id="overview">Overview</h2>
+<p>The User Rules System allows Think Tank users to set persistent personal preferences that govern how the AI responds to them. Similar to Windsurf policies but for end users, these rules are automatically applied to every AI interaction.</p>
+<h2 id="key-concepts">Key Concepts</h2>
+<h3 id="rule-types">Rule Types</h3>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 46%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>restriction</strong></td>
+<td>Things the AI must NOT do</td>
+<td>“Do not discuss religion”</td>
+</tr>
+<tr>
+<td><strong>preference</strong></td>
+<td>Things the AI SHOULD do</td>
+<td>“Acknowledge uncertainty”</td>
+</tr>
+<tr>
+<td><strong>format</strong></td>
+<td>How responses should be structured</td>
+<td>“Use bullet points”</td>
+</tr>
+<tr>
+<td><strong>source</strong></td>
+<td>Citation requirements</td>
+<td>“Always cite sources”</td>
+</tr>
+<tr>
+<td><strong>tone</strong></td>
+<td>Communication style</td>
+<td>“Be concise”</td>
+</tr>
+<tr>
+<td><strong>topic</strong></td>
+<td>Topic-specific rules</td>
+<td>“Add health disclaimers”</td>
+</tr>
+<tr>
+<td><strong>privacy</strong></td>
+<td>Personal data handling</td>
+<td>“Protect my privacy”</td>
+</tr>
+<tr>
+<td><strong>accessibility</strong></td>
+<td>Readability preferences</td>
+<td>“Use simple language”</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rule-sources">Rule Sources</h3>
+<ul>
+<li><strong>user_created</strong>: User typed the rule manually</li>
+<li><strong>preset_added</strong>: Added from the preset library</li>
+<li><strong>ai_suggested</strong>: AI suggested based on feedback patterns</li>
+<li><strong>imported</strong>: Imported from another source</li>
+</ul>
+<hr />
+<h2 id="think-tank-ui">Think Tank UI</h2>
+<p><strong>Location</strong>: Think Tank → My Rules<br />
+<strong>URL</strong>: <code>/thinktank/my-rules</code></p>
+<h3 id="my-rules-tab">My Rules Tab</h3>
+<p>View and manage your personal rules:</p>
+<ul>
+<li><strong>Toggle</strong>: Enable/disable individual rules</li>
+<li><strong>Edit</strong>: Modify rule text</li>
+<li><strong>Delete</strong>: Remove rules</li>
+<li><strong>Stats</strong>: See how many times each rule was applied</li>
+</ul>
+<h3 id="add-from-presets-tab">Add from Presets Tab</h3>
+<p>Browse and add pre-seeded rules:</p>
+<p><strong>Popular Rules</strong> - Most commonly used rules by Think Tank users</p>
+<p><strong>Categories</strong>: - Privacy &amp; Safety - Sources &amp; Citations - Response Format - Tone &amp; Style - Accessibility - Topic Preferences - Advanced</p>
+<hr />
+<h2 id="pre-seeded-preset-rules">Pre-seeded Preset Rules</h2>
+<h3 id="privacy-safety">Privacy &amp; Safety</h3>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Protect my privacy</td>
+<td>Prevents personal references or assumptions</td>
+</tr>
+<tr>
+<td>No religious content</td>
+<td>Filters out religious discussions</td>
+</tr>
+<tr>
+<td>No political content</td>
+<td>Keeps responses politically neutral</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sources-citations">Sources &amp; Citations</h3>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Always cite sources</td>
+<td>Includes verifiable sources for facts</td>
+</tr>
+<tr>
+<td>Prefer academic sources</td>
+<td>Prioritizes peer-reviewed content</td>
+</tr>
+<tr>
+<td>Include source dates</td>
+<td>Adds publication dates for recency</td>
+</tr>
+</tbody>
+</table>
+<h3 id="response-format">Response Format</h3>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Be concise</td>
+<td>Produces shorter, focused responses</td>
+</tr>
+<tr>
+<td>Use lists for clarity</td>
+<td>Organizes with bullets/numbers</td>
+</tr>
+<tr>
+<td>Use headings</td>
+<td>Adds section headers to long content</td>
+</tr>
+<tr>
+<td>Comment code</td>
+<td>Documents code examples</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tone-style">Tone &amp; Style</h3>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Professional tone</td>
+<td>Business-appropriate style</td>
+</tr>
+<tr>
+<td>Casual tone</td>
+<td>Relaxed, conversational style</td>
+</tr>
+<tr>
+<td>Simple explanations</td>
+<td>Accessible without oversimplifying</td>
+</tr>
+</tbody>
+</table>
+<h3 id="advanced">Advanced</h3>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Acknowledge uncertainty</td>
+<td>States limitations honestly</td>
+</tr>
+<tr>
+<td>Clarify before answering</td>
+<td>Confirms question understanding</td>
+</tr>
+<tr>
+<td>Show multiple viewpoints</td>
+<td>Balanced coverage of debates</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="how-rules-are-applied">How Rules Are Applied</h2>
+<h3 id="application-flow">Application Flow</h3>
+<ol type="1">
+<li>User sends message to Think Tank</li>
+<li>AGI Brain generates plan with pre-prompt selection</li>
+<li><code>prepromptLearningService.selectPreprompt()</code> is called</li>
+<li>Service fetches user rules via <code>userRulesService.getRulesForPrompt()</code></li>
+<li>Rules are formatted and appended to the system prompt</li>
+<li>Rule application is logged for tracking</li>
+</ol>
+<h3 id="prompt-injection-format">Prompt Injection Format</h3>
+<p>Rules are injected into the system prompt in categorized sections:</p>
+<pre><code>## User Preferences
+The user has set the following rules for how you should respond:
+
+**Restrictions (Must Follow):**
+- Do not discuss religious topics...
+
+**Source Requirements:**
+- Always provide sources and citations...
+
+**Format Preferences:**
+- Keep responses concise...</code></pre>
+<h3 id="priority">Priority</h3>
+<ul>
+<li>Restrictions are always enforced first (highest priority)</li>
+<li>Higher priority numbers (0-100) take precedence</li>
+<li>Conflicting rules resolved by priority</li>
+</ul>
+<hr />
+<h2 id="database-schema">Database Schema</h2>
+<h3 id="user_memory_rules">user_memory_rules</h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td><code>tenant_id</code></td>
+<td>UUID</td>
+<td>Multi-tenant isolation</td>
+</tr>
+<tr>
+<td><code>user_id</code></td>
+<td>UUID</td>
+<td>Rule owner</td>
+</tr>
+<tr>
+<td><code>rule_text</code></td>
+<td>TEXT</td>
+<td>Full rule content</td>
+</tr>
+<tr>
+<td><code>rule_summary</code></td>
+<td>VARCHAR</td>
+<td>Short display text</td>
+</tr>
+<tr>
+<td><code>rule_type</code></td>
+<td>VARCHAR</td>
+<td>restriction, preference, etc.</td>
+</tr>
+<tr>
+<td><code>priority</code></td>
+<td>INTEGER</td>
+<td>0-100, higher = more important</td>
+</tr>
+<tr>
+<td><code>source</code></td>
+<td>VARCHAR</td>
+<td>user_created, preset_added, etc.</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td>BOOLEAN</td>
+<td>Enable/disable</td>
+</tr>
+<tr>
+<td><code>apply_to_preprompts</code></td>
+<td>BOOLEAN</td>
+<td>Apply to system prompts</td>
+</tr>
+<tr>
+<td><code>apply_to_synthesis</code></td>
+<td>BOOLEAN</td>
+<td>Apply during synthesis</td>
+</tr>
+<tr>
+<td><code>times_applied</code></td>
+<td>INTEGER</td>
+<td>Usage counter</td>
+</tr>
+</tbody>
+</table>
+<h3 id="preset_user_rules">preset_user_rules</h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td><code>rule_text</code></td>
+<td>TEXT</td>
+<td>Full rule content</td>
+</tr>
+<tr>
+<td><code>rule_summary</code></td>
+<td>VARCHAR</td>
+<td>Short display text</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td>User-facing explanation</td>
+</tr>
+<tr>
+<td><code>rule_type</code></td>
+<td>VARCHAR</td>
+<td>Rule category</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>VARCHAR</td>
+<td>UI grouping</td>
+</tr>
+<tr>
+<td><code>icon</code></td>
+<td>VARCHAR</td>
+<td>Lucide icon name</td>
+</tr>
+<tr>
+<td><code>is_popular</code></td>
+<td>BOOLEAN</td>
+<td>Show in popular section</td>
+</tr>
+<tr>
+<td><code>min_tier</code></td>
+<td>INTEGER</td>
+<td>Subscription tier requirement</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-endpoints">API Endpoints</h2>
+<h3 id="user-rules">User Rules</h3>
+<pre><code>GET    /api/thinktank/user-rules           - Get user&#39;s rules
+POST   /api/thinktank/user-rules           - Create new rule
+PATCH  /api/thinktank/user-rules/:id       - Update rule
+DELETE /api/thinktank/user-rules/:id       - Delete rule
+PATCH  /api/thinktank/user-rules/:id/toggle - Enable/disable rule</code></pre>
+<h3 id="presets">Presets</h3>
+<pre><code>GET  /api/thinktank/user-rules/presets     - Get preset categories
+POST /api/thinktank/user-rules/add-preset  - Add preset to user rules</code></pre>
+<h3 id="internal-service-layer">Internal (Service Layer)</h3>
+<pre><code>getRulesForPrompt(tenantId, userId, domainId?, mode?)
+  → Returns formatted rules for prompt injection</code></pre>
+<hr />
+<h2 id="service-integration">Service Integration</h2>
+<h3 id="user-rules.service.ts">user-rules.service.ts</h3>
+<pre class="typescript"><code>// Get rules formatted for prompt injection
+const rules = await userRulesService.getRulesForPrompt(
+  tenantId,
+  userId,
+  domainId,     // Optional: filter by domain
+  mode          // Optional: filter by orchestration mode
+);
+
+// Returns:
+{
+  rules: UserMemoryRule[],
+  formattedForPrompt: string,
+  ruleCount: number,
+  hasRestrictions: boolean,
+  hasSourceRequirements: boolean
+}</code></pre>
+<h3 id="preprompt-learning.service.ts-integration">preprompt-learning.service.ts Integration</h3>
+<p>The preprompt service automatically fetches and applies user rules:</p>
+<pre class="typescript"><code>// In selectPreprompt()
+const userRules = await userRulesService.getRulesForPrompt(
+  request.tenantId,
+  request.userId,
+  request.detectedDomainId,
+  request.orchestrationMode
+);
+
+// Append to rendered preprompt
+rendered.full = rendered.full + userRules.formattedForPrompt;</code></pre>
+<hr />
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="writing-effective-rules">Writing Effective Rules</h3>
+<ol type="1">
+<li><strong>Be Specific</strong>: “Always cite sources with URLs” vs “cite sources”</li>
+<li><strong>Use Positive Framing</strong>: “Use bullet points” vs “Don’t write paragraphs”</li>
+<li><strong>One Rule Per Preference</strong>: Easier to toggle and track</li>
+</ol>
+<h3 id="rule-limits">Rule Limits</h3>
+<ul>
+<li>Maximum 50 rules per user</li>
+<li>Maximum 1000 characters per rule text</li>
+<li>Inactive rules don’t count toward limits</li>
+</ul>
+<h3 id="when-to-use-presets-vs-custom">When to Use Presets vs Custom</h3>
+<ul>
+<li><strong>Presets</strong>: Common preferences with proven effectiveness</li>
+<li><strong>Custom</strong>: Unique personal requirements</li>
+</ul>
+<hr />
+<hr />
+<h2 id="memory-categories">Memory Categories</h2>
+<p>Each memory/rule is categorized by <strong>what it IS</strong>, enabling better organization and future expansion.</p>
+<h3 id="category-hierarchy">Category Hierarchy</h3>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 40%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Top-Level</th>
+<th>Sub-Categories</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Instruction</strong></td>
+<td>format, tone, source</td>
+<td>Direct instructions for AI behavior</td>
+</tr>
+<tr>
+<td><strong>Preference</strong></td>
+<td>style, detail</td>
+<td>Preferences that guide (not mandate) behavior</td>
+</tr>
+<tr>
+<td><strong>Context</strong></td>
+<td>personal, work, project</td>
+<td>Background information about the user</td>
+</tr>
+<tr>
+<td><strong>Knowledge</strong></td>
+<td>fact, definition, procedure</td>
+<td>Facts and information to remember</td>
+</tr>
+<tr>
+<td><strong>Constraint</strong></td>
+<td>topic, privacy, safety</td>
+<td>Hard limits that must be followed</td>
+</tr>
+<tr>
+<td><strong>Goal</strong></td>
+<td>learning, productivity</td>
+<td>User objectives and desired outcomes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="category-codes">Category Codes</h3>
+<pre><code>instruction              # Direct instructions
+  instruction.format     # How to structure responses
+  instruction.tone       # Communication style
+  instruction.source     # Citation requirements
+
+preference               # Preferences
+  preference.style       # Writing style preferences
+  preference.detail      # Detail level preferences
+
+context                  # User context
+  context.personal       # Personal information
+  context.work           # Professional context
+  context.project        # Project-specific info
+
+knowledge                # Knowledge to remember
+  knowledge.fact         # Specific facts
+  knowledge.definition   # Terms and meanings
+  knowledge.procedure    # How to do things
+
+constraint               # Hard limits
+  constraint.topic       # Topics to avoid
+  constraint.privacy     # Privacy rules
+  constraint.safety      # Safety limitations
+
+goal                     # User goals
+  goal.learning          # Learning objectives
+  goal.productivity      # Efficiency goals</code></pre>
+<h3 id="database-schema-memory_categories">Database Schema: memory_categories</h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td><code>code</code></td>
+<td>VARCHAR</td>
+<td>Unique category code (e.g., ‘instruction.format’)</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>VARCHAR</td>
+<td>Display name</td>
+</tr>
+<tr>
+<td><code>parent_id</code></td>
+<td>UUID</td>
+<td>Parent category for hierarchy</td>
+</tr>
+<tr>
+<td><code>level</code></td>
+<td>INTEGER</td>
+<td>1=top-level, 2=sub-category</td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td>VARCHAR</td>
+<td>Materialized path (e.g., ‘instruction.format’)</td>
+</tr>
+<tr>
+<td><code>icon</code></td>
+<td>VARCHAR</td>
+<td>Lucide icon name</td>
+</tr>
+<tr>
+<td><code>color</code></td>
+<td>VARCHAR</td>
+<td>Tailwind color class</td>
+</tr>
+<tr>
+<td><code>is_system</code></td>
+<td>BOOLEAN</td>
+<td>System categories cannot be deleted</td>
+</tr>
+<tr>
+<td><code>is_expandable</code></td>
+<td>BOOLEAN</td>
+<td>Can users add sub-categories?</td>
+</tr>
+</tbody>
+</table>
+<h3 id="api-methods">API Methods</h3>
+<pre class="typescript"><code>// Get category tree
+const tree = await userRulesService.getMemoryCategories();
+// Returns: { categories, topLevel, byCode }
+
+// Get memories grouped by category
+const grouped = await userRulesService.getMemoriesByCategory(
+  tenantId,
+  userId,
+  categoryCode  // Optional: filter to specific category
+);</code></pre>
+<h3 id="future-expansion">Future Expansion</h3>
+<p>The category system is designed for expansion: - <strong>Custom Categories</strong>: Users can create sub-categories under expandable parents - <strong>Category Inheritance</strong>: Rules can inherit from parent categories - <strong>Category-Specific Behavior</strong>: Different application logic per category - <strong>Cross-Category Rules</strong>: Rules that span multiple categories</p>
+<hr />
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="./PREPROMPT-LEARNING-SYSTEM.md">Pre-Prompt Learning System</a></li>
+<li><a href="./THINKTANK.md">Think Tank Documentation</a></li>
+<li><a href="./sections/SECTION-XX-AGI-BRAIN-PLAN.md">AGI Brain Plan System</a></li>
+</ul>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

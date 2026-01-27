@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 18 THINK TANK PLATFORM - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 18 THINK TANK PLATFORM</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-18-THINK-TANK-PLATFORM.md</div>
+  </div>
+  
+  <h1 id="section-18-think-tank-consumer-platform-v3.5.0">SECTION 18: THINK TANK CONSUMER PLATFORM (v3.5.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="think-tank-overview">18.1 Think Tank Overview</h2>
+<p>Complex problem decomposition and multi-step reasoning with chain-of-thought processing.</p>
+<h2 id="think-tank-database-schema">18.2 Think Tank Database Schema</h2>
+<pre class="sql"><code>-- migrations/027_think_tank.sql
+
+CREATE TABLE thinktank_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    problem_summary TEXT,
+    domain VARCHAR(50),
+    complexity VARCHAR(20),
+    total_steps INTEGER DEFAULT 0,
+    avg_confidence DECIMAL(3, 2),
+    solution_found BOOLEAN DEFAULT false,
+    total_tokens INTEGER DEFAULT 0,
+    total_cost DECIMAL(10, 6) DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMPTZ
+);
+
+CREATE TABLE thinktank_steps (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id UUID NOT NULL REFERENCES thinktank_sessions(id) ON DELETE CASCADE,
+    step_number INTEGER NOT NULL,
+    step_type VARCHAR(50) NOT NULL,
+    description TEXT,
+    reasoning TEXT,
+    result TEXT,
+    confidence DECIMAL(3, 2),
+    model_used VARCHAR(100),
+    tokens_used INTEGER,
+    duration_ms INTEGER,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE thinktank_tools (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tool_name VARCHAR(100) NOT NULL UNIQUE,
+    tool_type VARCHAR(50) NOT NULL,
+    description TEXT,
+    parameters_schema JSONB NOT NULL,
+    implementation TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_thinktank_sessions_tenant ON thinktank_sessions(tenant_id, created_at DESC);
+CREATE INDEX idx_thinktank_steps_session ON thinktank_steps(session_id, step_number);
+
+ALTER TABLE thinktank_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE thinktank_steps ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY thinktank_sessions_isolation ON thinktank_sessions USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY thinktank_steps_isolation ON thinktank_steps USING (
+    session_id IN (SELECT id FROM thinktank_sessions WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID)
+);</code></pre>
+<h2 id="think-tank-engine-service">18.3 Think Tank Engine Service</h2>
+<pre class="typescript"><code>// packages/core/src/services/thinktank-engine.ts
+
+import { Pool } from &#39;pg&#39;;
+import { BedrockRuntimeClient, InvokeModelCommand } from &#39;@aws-sdk/client-bedrock-runtime&#39;;
+
+interface ThinkTankProblem {
+    tenantId: string;
+    userId: string;
+    problem: string;
+    domain?: string;
+    maxSteps?: number;
+    tools?: string[];
+}
+
+interface ThinkTankStep {
+    stepNumber: number;
+    type: &#39;decompose&#39; | &#39;reason&#39; | &#39;execute&#39; | &#39;verify&#39; | &#39;synthesize&#39;;
+    description: string;
+    reasoning: string;
+    result: string;
+    confidence: number;
+}
+
+interface ThinkTankResult {
+    sessionId: string;
+    solution: string;
+    steps: ThinkTankStep[];
+    confidence: number;
+    totalTokens: number;
+    totalCost: number;
+}
+
+export class ThinkTankEngine {
+    private pool: Pool;
+    private bedrock: BedrockRuntimeClient;
+    
+    constructor(pool: Pool) {
+        this.pool = pool;
+        this.bedrock = new BedrockRuntimeClient({});
+    }
+    
+    async solve(problem: ThinkTankProblem): Promise&lt;ThinkTankResult&gt; {
+        // Create session
+        const sessionResult = await this.pool.query(`
+            INSERT INTO thinktank_sessions (tenant_id, user_id, problem_summary, domain)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id
+        `, [problem.tenantId, problem.userId, problem.problem.substring(0, 500), problem.domain]);
+        
+        const sessionId = sessionResult.rows[0].id;
+        const steps: ThinkTankStep[] = [];
+        let totalTokens = 0;
+        let totalCost = 0;
+        
+        // Step 1: Decompose problem
+        const decomposition = await this.decomposeProblem(problem.problem);
+        steps.push(await this.recordStep(sessionId, 1, &#39;decompose&#39;, decomposition));
+        totalTokens += decomposition.tokens;
+        
+        // Step 2-N: Solve each sub-problem
+        for (let i = 0; i &lt; decomposition.subProblems.length &amp;&amp; i &lt; (problem.maxSteps || 10); i++) {
+            const subProblem = decomposition.subProblems[i];
+            
+            // Reason about approach
+            const reasoning = await this.reason(subProblem, steps);
+            steps.push(await this.recordStep(sessionId, steps.length + 1, &#39;reason&#39;, reasoning));
+            totalTokens += reasoning.tokens;
+            
+            // Execute solution
+            const execution = await this.execute(subProblem, reasoning.approach, problem.tools);
+            steps.push(await this.recordStep(sessionId, steps.length + 1, &#39;execute&#39;, execution));
+            totalTokens += execution.tokens;
+        }
+        
+        // Final step: Synthesize solution
+        const synthesis = await this.synthesize(problem.problem, steps);
+        steps.push(await this.recordStep(sessionId, steps.length + 1, &#39;synthesize&#39;, synthesis));
+        totalTokens += synthesis.tokens;
+        
+        // Calculate cost and update session
+        totalCost = totalTokens * 0.00001; // Simplified cost calculation
+        const avgConfidence = steps.reduce((sum, s) =&gt; sum + s.confidence, 0) / steps.length;
+        
+        await this.pool.query(`
+            UPDATE thinktank_sessions
+            SET total_steps = $2, avg_confidence = $3, solution_found = true,
+                total_tokens = $4, total_cost = $5, completed_at = NOW()
+            WHERE id = $1
+        `, [sessionId, steps.length, avgConfidence, totalTokens, totalCost]);
+        
+        return {
+            sessionId,
+            solution: synthesis.result,
+            steps,
+            confidence: avgConfidence,
+            totalTokens,
+            totalCost
+        };
+    }
+    
+    private async decomposeProblem(problem: string): Promise&lt;any&gt; {
+        const response = await this.invokeModel(`
+            Decompose this problem into smaller sub-problems:
+            
+            Problem: ${problem}
+            
+            Return JSON: { &quot;subProblems&quot;: [&quot;sub1&quot;, &quot;sub2&quot;, ...], &quot;complexity&quot;: &quot;low|medium|high&quot; }
+        `);
+        
+        return {
+            subProblems: response.subProblems || [problem],
+            complexity: response.complexity || &#39;medium&#39;,
+            tokens: response.tokens,
+            description: &#39;Problem decomposition&#39;,
+            reasoning: `Identified ${response.subProblems?.length || 1} sub-problems`,
+            result: JSON.stringify(response.subProblems),
+            confidence: 0.9
+        };
+    }
+    
+    private async reason(subProblem: string, previousSteps: ThinkTankStep[]): Promise&lt;any&gt; {
+        const context = previousSteps.map(s =&gt; s.result).join(&#39;\n&#39;);
+        
+        const response = await this.invokeModel(`
+            Given context:
+            ${context}
+            
+            Reason about how to solve: ${subProblem}
+            
+            Return JSON: { &quot;approach&quot;: &quot;description&quot;, &quot;confidence&quot;: 0.0-1.0 }
+        `);
+        
+        return {
+            approach: response.approach,
+            tokens: response.tokens,
+            description: `Reasoning about: ${subProblem.substring(0, 50)}`,
+            reasoning: response.approach,
+            result: response.approach,
+            confidence: response.confidence || 0.8
+        };
+    }
+    
+    private async execute(subProblem: string, approach: string, tools?: string[]): Promise&lt;any&gt; {
+        const response = await this.invokeModel(`
+            Execute this approach to solve the sub-problem:
+            
+            Sub-problem: ${subProblem}
+            Approach: ${approach}
+            Available tools: ${tools?.join(&#39;, &#39;) || &#39;none&#39;}
+            
+            Return JSON: { &quot;result&quot;: &quot;solution&quot;, &quot;confidence&quot;: 0.0-1.0 }
+        `);
+        
+        return {
+            tokens: response.tokens,
+            description: &#39;Executing solution&#39;,
+            reasoning: approach,
+            result: response.result,
+            confidence: response.confidence || 0.8
+        };
+    }
+    
+    private async synthesize(originalProblem: string, steps: ThinkTankStep[]): Promise&lt;any&gt; {
+        const stepResults = steps.map(s =&gt; s.result).join(&#39;\n&#39;);
+        
+        const response = await this.invokeModel(`
+            Synthesize a final solution from these steps:
+            
+            Original problem: ${originalProblem}
+            
+            Step results:
+            ${stepResults}
+            
+            Return JSON: { &quot;solution&quot;: &quot;complete solution&quot;, &quot;confidence&quot;: 0.0-1.0 }
+        `);
+        
+        return {
+            tokens: response.tokens,
+            description: &#39;Synthesizing final solution&#39;,
+            reasoning: &#39;Combining all step results&#39;,
+            result: response.solution,
+            confidence: response.confidence || 0.85
+        };
+    }
+    
+    private async invokeModel(prompt: string): Promise&lt;any&gt; {
+        const response = await this.bedrock.send(new InvokeModelCommand({
+            modelId: &#39;anthropic.claude-3-haiku-20240307-v1:0&#39;,
+            body: JSON.stringify({
+                anthropic_version: &#39;bedrock-2023-05-31&#39;,
+                max_tokens: 2048,
+                messages: [{ role: &#39;user&#39;, content: prompt }]
+            }),
+            contentType: &#39;application/json&#39;
+        }));
+        
+        const result = JSON.parse(new TextDecoder().decode(response.body));
+        const text = result.content[0].text;
+        
+        try {
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : { result: text };
+            return { ...parsed, tokens: result.usage?.output_tokens || 100 };
+        } catch {
+            return { result: text, tokens: result.usage?.output_tokens || 100 };
+        }
+    }
+    
+    private async recordStep(
+        sessionId: string,
+        stepNumber: number,
+        stepType: string,
+        data: any
+    ): Promise&lt;ThinkTankStep&gt; {
+        await this.pool.query(`
+            INSERT INTO thinktank_steps (session_id, step_number, step_type, description, reasoning, result, confidence, tokens_used)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `, [sessionId, stepNumber, stepType, data.description, data.reasoning, data.result, data.confidence, data.tokens]);
+        
+        return {
+            stepNumber,
+            type: stepType as any,
+            description: data.description,
+            reasoning: data.reasoning,
+            result: data.result,
+            confidence: data.confidence
+        };
+    }
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>

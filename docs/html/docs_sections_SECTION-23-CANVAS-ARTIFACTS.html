@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECTION 23 CANVAS ARTIFACTS - RADIANT Documentation</title>
+  
+<style>
+@media print {
+  body { font-size: 11pt !important; }
+  pre { page-break-inside: avoid; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .no-print { display: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.7;
+  color: #1d1d1f;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: white;
+}
+
+h1 {
+  color: #1d1d1f;
+  border-bottom: 3px solid #0071e3;
+  padding-bottom: 12px;
+  font-size: 28px;
+  margin-top: 0;
+}
+
+h2 {
+  color: #1d1d1f;
+  border-bottom: 1px solid #d2d2d7;
+  padding-bottom: 8px;
+  font-size: 22px;
+  margin-top: 40px;
+}
+
+h3 { color: #1d1d1f; font-size: 18px; margin-top: 30px; }
+h4 { color: #1d1d1f; font-size: 16px; margin-top: 25px; }
+
+a { color: #0071e3; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9em;
+  color: #1d1d1f;
+}
+
+pre {
+  background: #1d1d1f;
+  color: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background: #0071e3;
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { background: #f5f5f7; }
+
+blockquote {
+  border-left: 4px solid #0071e3;
+  margin: 20px 0;
+  padding: 15px 25px;
+  background: #f5f5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+blockquote p { margin: 0; }
+
+img { max-width: 100%; height: auto; border-radius: 8px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #d2d2d7;
+  margin: 40px 0;
+}
+
+ul, ol { padding-left: 25px; }
+li { margin: 8px 0; }
+
+.header-bar {
+  background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%);
+  color: white;
+  padding: 20px 30px;
+  margin: -40px -30px 30px -30px;
+  border-radius: 0 0 16px 16px;
+}
+
+.header-bar h1 {
+  color: white;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar .meta {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-top: 8px;
+}
+
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #0071e3;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,113,227,0.3);
+}
+
+.print-btn:hover { background: #0077ed; }
+
+.mermaid {
+  background: #f5f5f7;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #d2d2d7;
+  color: #86868b;
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  
+  <div class="header-bar">
+    <h1>SECTION 23 CANVAS ARTIFACTS</h1>
+    <div class="meta">RADIANT v5.52.29 | docs/sections/SECTION-23-CANVAS-ARTIFACTS.md</div>
+  </div>
+  
+  <h1 id="section-23-canvas-artifacts-v3.6.0">SECTION 23: CANVAS &amp; ARTIFACTS (v3.6.0)</h1>
+<h1 id="section">═══════════════════════════════════════════════════════════════════════════════</h1>
+<h2 id="canvas-overview">23.1 Canvas Overview</h2>
+<p>Rich content editing with artifacts for code, documents, and visualizations.</p>
+<h2 id="canvas-database-schema">23.2 Canvas Database Schema</h2>
+<pre class="sql"><code>-- migrations/032_canvas_artifacts.sql
+
+CREATE TABLE canvases (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id),
+    user_id UUID NOT NULL REFERENCES users(id),
+    chat_id UUID REFERENCES chats(id),
+    canvas_name VARCHAR(200),
+    canvas_type VARCHAR(50) NOT NULL DEFAULT &#39;general&#39;,
+    content JSONB NOT NULL DEFAULT &#39;{}&#39;,
+    version INTEGER DEFAULT 1,
+    is_published BOOLEAN DEFAULT false,
+    published_url VARCHAR(500),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE artifacts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    canvas_id UUID NOT NULL REFERENCES canvases(id) ON DELETE CASCADE,
+    artifact_type VARCHAR(50) NOT NULL,
+    title VARCHAR(200),
+    content TEXT NOT NULL,
+    language VARCHAR(50),
+    position_x INTEGER DEFAULT 0,
+    position_y INTEGER DEFAULT 0,
+    width INTEGER DEFAULT 400,
+    height INTEGER DEFAULT 300,
+    z_index INTEGER DEFAULT 0,
+    is_collapsed BOOLEAN DEFAULT false,
+    metadata JSONB DEFAULT &#39;{}&#39;,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE artifact_versions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    artifact_id UUID NOT NULL REFERENCES artifacts(id) ON DELETE CASCADE,
+    version INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    created_by UUID REFERENCES users(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_canvases_user ON canvases(tenant_id, user_id);
+CREATE INDEX idx_artifacts_canvas ON artifacts(canvas_id);
+CREATE INDEX idx_artifact_versions ON artifact_versions(artifact_id, version DESC);
+
+ALTER TABLE canvases ENABLE ROW LEVEL SECURITY;
+ALTER TABLE artifacts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE artifact_versions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY canvases_isolation ON canvases USING (tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID);
+CREATE POLICY artifacts_isolation ON artifacts USING (
+    canvas_id IN (SELECT id FROM canvases WHERE tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID)
+);
+CREATE POLICY artifact_versions_isolation ON artifact_versions USING (
+    artifact_id IN (SELECT a.id FROM artifacts a JOIN canvases c ON a.canvas_id = c.id WHERE c.tenant_id = current_setting(&#39;app.current_tenant_id&#39;)::UUID)
+);</code></pre>
+<h2 id="canvas-service">23.3 Canvas Service</h2>
+<pre class="typescript"><code>// packages/core/src/services/canvas-service.ts
+
+import { Pool } from &#39;pg&#39;;
+
+type ArtifactType = &#39;code&#39; | &#39;markdown&#39; | &#39;mermaid&#39; | &#39;html&#39; | &#39;svg&#39; | &#39;json&#39; | &#39;table&#39;;
+
+interface ArtifactCreate {
+    type: ArtifactType;
+    title?: string;
+    content: string;
+    language?: string;
+    position?: { x: number; y: number };
+    size?: { width: number; height: number };
+}
+
+export class CanvasService {
+    private pool: Pool;
+    
+    constructor(pool: Pool) {
+        this.pool = pool;
+    }
+    
+    async createCanvas(
+        tenantId: string,
+        userId: string,
+        options?: { name?: string; chatId?: string; type?: string }
+    ): Promise&lt;string&gt; {
+        const result = await this.pool.query(`
+            INSERT INTO canvases (tenant_id, user_id, canvas_name, chat_id, canvas_type)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING id
+        `, [tenantId, userId, options?.name, options?.chatId, options?.type || &#39;general&#39;]);
+        
+        return result.rows[0].id;
+    }
+    
+    async addArtifact(canvasId: string, artifact: ArtifactCreate, createdBy?: string): Promise&lt;string&gt; {
+        const result = await this.pool.query(`
+            INSERT INTO artifacts (canvas_id, artifact_type, title, content, language, position_x, position_y, width, height)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            RETURNING id
+        `, [
+            canvasId,
+            artifact.type,
+            artifact.title,
+            artifact.content,
+            artifact.language,
+            artifact.position?.x || 0,
+            artifact.position?.y || 0,
+            artifact.size?.width || 400,
+            artifact.size?.height || 300
+        ]);
+        
+        const artifactId = result.rows[0].id;
+        
+        // Create initial version
+        await this.pool.query(`
+            INSERT INTO artifact_versions (artifact_id, version, content, created_by)
+            VALUES ($1, 1, $2, $3)
+        `, [artifactId, artifact.content, createdBy]);
+        
+        return artifactId;
+    }
+    
+    async updateArtifact(artifactId: string, content: string, updatedBy?: string): Promise&lt;void&gt; {
+        // Get current version
+        const current = await this.pool.query(
+            `SELECT COALESCE(MAX(version), 0) as max_version FROM artifact_versions WHERE artifact_id = $1`,
+            [artifactId]
+        );
+        const newVersion = current.rows[0].max_version + 1;
+        
+        // Update artifact
+        await this.pool.query(`
+            UPDATE artifacts SET content = $2, updated_at = NOW() WHERE id = $1
+        `, [artifactId, content]);
+        
+        // Save version
+        await this.pool.query(`
+            INSERT INTO artifact_versions (artifact_id, version, content, created_by)
+            VALUES ($1, $2, $3, $4)
+        `, [artifactId, newVersion, content, updatedBy]);
+    }
+    
+    async getCanvas(canvasId: string): Promise&lt;any&gt; {
+        const canvas = await this.pool.query(`SELECT * FROM canvases WHERE id = $1`, [canvasId]);
+        const artifacts = await this.pool.query(`SELECT * FROM artifacts WHERE canvas_id = $1 ORDER BY z_index`, [canvasId]);
+        
+        return {
+            ...canvas.rows[0],
+            artifacts: artifacts.rows
+        };
+    }
+    
+    async getArtifactVersions(artifactId: string): Promise&lt;any[]&gt; {
+        const result = await this.pool.query(`
+            SELECT av.*, u.email as created_by_email
+            FROM artifact_versions av
+            LEFT JOIN users u ON av.created_by = u.id
+            WHERE av.artifact_id = $1
+            ORDER BY av.version DESC
+        `, [artifactId]);
+        
+        return result.rows;
+    }
+    
+    async moveArtifact(artifactId: string, x: number, y: number): Promise&lt;void&gt; {
+        await this.pool.query(`
+            UPDATE artifacts SET position_x = $2, position_y = $3, updated_at = NOW() WHERE id = $1
+        `, [artifactId, x, y]);
+    }
+    
+    async resizeArtifact(artifactId: string, width: number, height: number): Promise&lt;void&gt; {
+        await this.pool.query(`
+            UPDATE artifacts SET width = $2, height = $3, updated_at = NOW() WHERE id = $1
+        `, [artifactId, width, height]);
+    }
+    
+    async deleteArtifact(artifactId: string): Promise&lt;void&gt; {
+        await this.pool.query(`DELETE FROM artifacts WHERE id = $1`, [artifactId]);
+    }
+    
+    async publishCanvas(canvasId: string): Promise&lt;string&gt; {
+        const publishedUrl = `https://canvas.radiant.ai/${canvasId}`;
+        
+        await this.pool.query(`
+            UPDATE canvases SET is_published = true, published_url = $2, updated_at = NOW() WHERE id = $1
+        `, [canvasId, publishedUrl]);
+        
+        return publishedUrl;
+    }
+}</code></pre>
+<h1 id="section-1">═══════════════════════════════════════════════════════════════════════════════</h1>
+
+  
+  <div class="footer">
+    RADIANT Documentation | Version 5.52.29 | Generated January 25, 2026
+  </div>
+</body>
+</html>
