@@ -22,7 +22,8 @@ interface BranchPanelProps {
   currentUserId: string;
 }
 
-export function BranchPanel({ session, currentUserId }: BranchPanelProps) {
+export function BranchPanel({ session, currentUserId: _currentUserId }: BranchPanelProps) {
+  void _currentUserId; // Reserved for user-specific branch operations
   const [showCreateBranch, setShowCreateBranch] = useState(false);
   const queryClient = useQueryClient();
 

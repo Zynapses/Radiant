@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Network, Plus, Maximize2, Brain, Check, HelpCircle, Zap, ListTodo, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
@@ -14,7 +13,8 @@ interface KnowledgeGraphPanelProps {
 }
 
 export function KnowledgeGraphPanel({ session }: KnowledgeGraphPanelProps) {
-  const [selectedNode, setSelectedNode] = useState<any>(null);
+  const [_selectedNode, setSelectedNode] = useState<any>(null);
+  void _selectedNode; // Reserved for node selection display
 
   const { data: graph } = useQuery({
     queryKey: ['knowledge-graph', session.id],

@@ -58,14 +58,6 @@ function getLatencyColor(latencyMs: number): string {
   return '#ef4444';
 }
 
-function getLatencyLabel(latencyMs: number): string {
-  if (latencyMs < 50) return 'Excellent';
-  if (latencyMs < 100) return 'Good';
-  if (latencyMs < 200) return 'Fair';
-  if (latencyMs < 500) return 'Slow';
-  return 'Critical';
-}
-
 export function LatencyHeatmap({
   regions,
   title = 'Global Latency',

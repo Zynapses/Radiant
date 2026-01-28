@@ -31,11 +31,12 @@ interface TerminalEntry {
 export function TerminalView({ 
   data, 
   projectId, 
-  sessionId,
-  mode, 
-  onUpdateView,
+  sessionId: _sessionId,
+  mode: _mode, 
+  onUpdateView: _onUpdateView,
   onEscalate 
 }: ViewComponentProps) {
+  void _sessionId; void _mode; void _onUpdateView; // Reserved for view operations
   const [entries, setEntries] = useState<TerminalEntry[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);

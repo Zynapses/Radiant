@@ -121,7 +121,7 @@ actor AuditLogger {
         
         // Persist to disk
         Task {
-            await persistEntry(entry)
+            persistEntry(entry)
         }
     }
     
@@ -149,7 +149,7 @@ actor AuditLogger {
         entries = entries.filter { $0.timestamp >= cutoffDate }
         
         Task {
-            await persistAllEntries()
+            persistAllEntries()
         }
     }
     

@@ -6,7 +6,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { billingApi } from '@/lib/api/endpoints';
-import type { BillingSummary, UsageStats, MarginConfig } from '@/lib/api/types';
+import type { MarginConfig } from '@/lib/api/types';
 
 export const billingKeys = {
   all: ['billing'] as const,

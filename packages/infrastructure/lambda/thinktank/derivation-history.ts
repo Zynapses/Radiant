@@ -369,6 +369,39 @@ export const getDerivationQuality: APIGatewayProxyHandler = async (event) => {
   }
 };
 
+/**
+ * POST /api/thinktank/derivation/compare
+ * Compare two derivations side by side
+ */
+export const compareDerivations: APIGatewayProxyHandler = async (event) => {
+  try {
+    const tenantId = getTenantId(event);
+    if (!tenantId) {
+      return error(401, 'Unauthorized');
+    }
+
+    const body = JSON.parse(event.body || '{}');
+    const { derivationId1, derivationId2 } = body;
+
+    if (!derivationId1 || !derivationId2) {
+      return error(400, 'derivationId1 and derivationId2 are required');
+    }
+
+    const comparison = await resultDerivationService.compareDerivations(derivationId1, derivationId2);
+
+    return success({
+      ...comparison,
+      visualization: {
+        layout: 'side_by_side',
+        highlightDifferences: true,
+      },
+    });
+  } catch (err) {
+    logger.error('Error comparing derivations:', err);
+    return error(500, 'Failed to compare derivations');
+  }
+};
+
 // ============================================================================
 // Main Handler - Routes requests to appropriate function
 // ============================================================================
@@ -393,7 +426,7 @@ export const handler = async (event: Parameters<APIGatewayProxyHandler>[0]): Pro
     return getDerivationModels(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
   }
   if (path.includes('/compare') && method === 'POST') {
-    return (resultDerivationService as any).compareDerivations(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
+    return compareDerivations(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;
   }
   if (path.match(/\/[^/]+$/) && method === 'GET') {
     return getDerivation(event, {} as any, () => {}) as Promise<APIGatewayProxyResult>;

@@ -10,12 +10,12 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { HelpCircle, Clock, AlertTriangle, Shield, Scale, Stethoscope, CheckCircle, X } from 'lucide-react';
+import { HelpCircle, Clock, Shield, Scale, Stethoscope, CheckCircle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ViewComponentProps } from '../view-router';
 
@@ -46,13 +46,14 @@ const URGENCY_CONFIG = {
 
 export function DecisionCardsView({ 
   data, 
-  projectId,
-  sessionId, 
-  mode,
-  domainHint, 
-  onUpdateView,
-  onEscalate 
+  projectId: _projectId,
+  sessionId: _sessionId, 
+  mode: _mode,
+  domainHint: _domainHint, 
+  onUpdateView: _onUpdateView,
+  onEscalate: _onEscalate 
 }: ViewComponentProps) {
+  void _projectId; void _sessionId; void _mode; void _domainHint; void _onUpdateView; void _onEscalate;
   const [decisions, setDecisions] = useState<PendingDecision[]>([]);
   const [selectedDecision, setSelectedDecision] = useState<string | null>(null);
   const [response, setResponse] = useState('');
@@ -86,7 +87,8 @@ export function DecisionCardsView({
     }
   }, [data]);
 
-  const handleRespond = (decisionId: string, answer: string) => {
+  const handleRespond = (decisionId: string, _answer: string) => {
+    void _answer;
     setDecisions(prev => prev.filter(d => d.id !== decisionId));
     setSelectedDecision(null);
     setResponse('');

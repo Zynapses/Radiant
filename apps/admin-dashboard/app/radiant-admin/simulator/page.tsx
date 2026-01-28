@@ -16,11 +16,9 @@ import React, { useState } from 'react';
 import {
   Activity, Building2, Cpu, Cloud, CreditCard, Server, Rocket, Shield,
   ScrollText, Brain, Sparkles, FlaskConical, CheckCircle, Globe, Languages,
-  BarChart3, Users, TrendingUp, TrendingDown, AlertTriangle, Check, X,
-  ChevronRight, Play, Pause, RefreshCw, Save, Search, Filter, MoreHorizontal,
-  Plus, Edit, Trash2, Eye, Download, Upload, Settings, Zap, Clock, DollarSign,
-  Lock, Unlock, AlertCircle, Info, ExternalLink, Copy, Terminal, Database,
-  HardDrive, Wifi, WifiOff, MapPin, Flag,
+  BarChart3, Users, TrendingUp, Check, X,
+  Play, Pause, RefreshCw, Save, Filter, MoreHorizontal,
+  Plus, Download, Zap,
 } from 'lucide-react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,7 +29,6 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 import {
   Select,
   SelectContent,
@@ -88,7 +85,8 @@ const ICONS: Record<string, React.ElementType> = {
 export default function RadiantAdminSimulatorPage() {
   const [currentView, setCurrentView] = useState<AdminViewType>('overview');
   const [isSimulating, setIsSimulating] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [_searchQuery, _setSearchQuery] = useState('');
+  void _searchQuery; void _setSearchQuery; // Reserved for search functionality
 
   // ============================================================================
   // Overview Dashboard

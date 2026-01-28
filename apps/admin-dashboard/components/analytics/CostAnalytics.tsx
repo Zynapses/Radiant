@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { TrendingUp, TrendingDown, Minus, DollarSign, Cpu, Zap } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 import { InsightsList, CostInsight } from '@/components/cost/InsightCard';
 import {

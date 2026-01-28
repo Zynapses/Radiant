@@ -17,7 +17,8 @@ interface ChatPanelProps {
   currentUserId: string;
 }
 
-export function ChatPanel({ session, currentUserId }: ChatPanelProps) {
+export function ChatPanel({ session, currentUserId: _currentUserId }: ChatPanelProps) {
+  void _currentUserId; // Reserved for user-specific chat operations
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);

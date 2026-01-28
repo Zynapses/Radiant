@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -11,18 +11,15 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
-import { toast } from 'sonner';
 import { 
   Layers, 
   Search,
   Plus,
   RefreshCw,
   Cpu,
-  Database,
   Settings,
   Play,
   Pause,
-  Trash2,
   Download,
   Upload,
 } from 'lucide-react';
@@ -69,7 +66,8 @@ async function fetchConfig(): Promise<LoRAConfig> {
 }
 
 export default function LoRAPage() {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
+  void _queryClient; // Reserved for mutations
   const [searchQuery, setSearchQuery] = useState('');
   const [layerFilter, setLayerFilter] = useState<string>('all');
 
@@ -93,7 +91,8 @@ export default function LoRAPage() {
   const baseAdapters = adapters.filter(a => a.layer === 'base');
   const domainAdapters = adapters.filter(a => a.layer === 'domain');
   const tenantAdapters = adapters.filter(a => a.layer === 'tenant');
-  const activeCount = adapters.filter(a => a.status === 'active').length;
+  const _activeCount = adapters.filter(a => a.status === 'active').length;
+  void _activeCount; // Reserved for statistics display
 
   const getStatusBadge = (status: string) => {
     switch (status) {

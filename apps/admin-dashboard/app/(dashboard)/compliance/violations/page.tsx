@@ -21,28 +21,19 @@ import {
 } from '@/components/ui/dialog';
 import { 
   AlertTriangle,
-  Shield,
-  Users,
-  FileText,
-  Activity,
   Settings,
   Plus,
-  Search,
   Filter,
   RefreshCw,
   Eye,
-  Ban,
   CheckCircle,
   XCircle,
-  AlertCircle,
-  Clock,
   TrendingUp,
   TrendingDown,
   Minus,
   Gavel,
   Scale,
   UserX,
-  UserCheck,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 

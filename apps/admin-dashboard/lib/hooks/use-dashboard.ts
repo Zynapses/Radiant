@@ -3,10 +3,6 @@
 import { useQuery } from '@tanstack/react-query';
 import {
   dashboardApi,
-  modelsApi,
-  providersApi,
-  administratorsApi,
-  approvalsApi,
 } from '../api/endpoints';
 
 export function useDashboard() {

@@ -1,15 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from 'sonner';
 import { 
   Server, 
   Cpu,
@@ -20,7 +16,6 @@ import {
   RefreshCw,
   Settings,
   ArrowUpCircle,
-  ArrowDownCircle,
 } from 'lucide-react';
 
 interface TierConfig {
@@ -78,14 +73,15 @@ async function fetchTransitions(): Promise<TransitionRequest[]> {
 }
 
 export default function InfrastructureTierPage() {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
+  void _queryClient; // Reserved for mutations
 
   const { data: tiers = [], isLoading: tiersLoading } = useQuery({
     queryKey: ['tier-config'],
     queryFn: fetchTierConfig,
   });
 
-  const { data: usage = [], isLoading: usageLoading } = useQuery({
+  const { data: usage = [], isLoading: _usageLoading } = useQuery({
     queryKey: ['tier-usage'],
     queryFn: fetchTierUsage,
   });

@@ -6,7 +6,6 @@ import {
   FileText, 
   RefreshCw,
   Search,
-  Filter,
   Download,
   User,
   Clock,
@@ -52,7 +51,7 @@ export function AuditLogsClient() {
   const [resourceFilter, setResourceFilter] = useState<string>('all');
   const queryClient = useQueryClient();
 
-  const { data: logs, isLoading } = useQuery({
+  const { data: logs, isLoading: _isLoading } = useQuery({
     queryKey: ['audit-logs', actionFilter, resourceFilter],
     queryFn: async (): Promise<AuditLog[]> => {
       const params = new URLSearchParams();

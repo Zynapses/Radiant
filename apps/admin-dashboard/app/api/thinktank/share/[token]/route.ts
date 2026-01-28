@@ -4,7 +4,7 @@ import { thinkTankApi } from '@/lib/api/endpoints';
 
 // GET /api/thinktank/share/[token] - Get shared conversation (public endpoint)
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { token: string } }
 ) {
   try {

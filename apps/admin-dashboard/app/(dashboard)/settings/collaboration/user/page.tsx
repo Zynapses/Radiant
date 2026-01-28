@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  User, Settings, Clock, GitBranch, MessageSquare, Brain,
-  Share2, Bell, Loader2, Save, RefreshCw, Eye
+  User,
+  Loader2, Save, RefreshCw, Eye
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

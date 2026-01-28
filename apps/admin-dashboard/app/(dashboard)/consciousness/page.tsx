@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import {
   Brain, Sparkles, Lightbulb, Eye, Heart, Target, RefreshCw,
   Zap, MessageCircle, TrendingUp, Activity, Compass, Palette,
-  Play, Pause, Settings, ChevronRight, Star, AlertTriangle, Beaker,
+  Play, Settings, ChevronRight, Star, AlertTriangle, Beaker,
   CheckCircle, XCircle, Clock, FlaskConical
 } from 'lucide-react';
 
@@ -159,7 +159,8 @@ export default function ConsciousnessPage() {
   const [parameters, setParameters] = useState<ConsciousnessParameter[]>([]);
 
   // Consciousness Testing State
-  const [availableTests, setAvailableTests] = useState<Array<{ testId: string; testName: string; testCategory: string; description: string; paperReference?: { theory: string; authors: string; year: number } }>>([]);
+  const [_availableTests, setAvailableTests] = useState<Array<{ testId: string; testName: string; testCategory: string; description: string; paperReference?: { theory: string; authors: string; year: number } }>>([]);
+  void _availableTests; // Reserved for test listing
   const [testResults, setTestResults] = useState<Record<string, { score: number; passed: boolean; timestamp: string }>>({});
   const [consciousnessProfile, setConsciousnessProfile] = useState<{ overallScore: number; emergenceLevel: string; testsPassed: number; testsTotal: number } | null>(null);
   const [emergenceEvents, setEmergenceEvents] = useState<Array<{ eventType: string; description: string; timestamp: string }>>([]);
@@ -171,7 +172,8 @@ export default function ConsciousnessPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
+  void _error; // Reserved for error display
 
   async function loadData() {
     setLoading(true);

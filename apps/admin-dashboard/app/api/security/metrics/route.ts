@@ -5,8 +5,10 @@ import { withAuth, apiError, type AuthenticatedRequest } from '@/lib/api/auth-wr
 export const GET = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const { searchParams } = new URL(request.url);
-    const product = searchParams.get('product') || 'combined';
-    const range = searchParams.get('range') || '24h';
+    const _product = searchParams.get('product') || 'combined';
+    void _product; // Reserved for product filtering
+    const _range = searchParams.get('range') || '24h';
+    void _range; // Reserved for range filtering
 
     const metrics = {
       totalAnomalies24h: 12,

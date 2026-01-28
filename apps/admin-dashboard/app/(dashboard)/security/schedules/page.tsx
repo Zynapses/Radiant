@@ -10,11 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Progress } from '@/components/ui/progress';
 import { 
   Clock, 
   Play, 
-  Pause, 
   RefreshCw, 
   CheckCircle2, 
   XCircle, 
@@ -30,14 +28,11 @@ import {
   Bell,
   Webhook,
   FileText,
-  PlayCircle,
-  TestTube,
   Layers,
   Power,
   PowerOff,
   Trash2,
   Plus,
-  Save,
   Copy
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -176,7 +171,8 @@ export default function SecuritySchedulesPage() {
     description: '',
     reason: '',
   });
-  const [cronPreview, setCronPreview] = useState<CronParseResult | null>(null);
+  const [_cronPreview, _setCronPreview] = useState<CronParseResult | null>(null);
+  void _cronPreview; void _setCronPreview; // Reserved for cron preview display
   const [templates, setTemplates] = useState<ScheduleTemplate[]>([]);
   const [notifications, setNotifications] = useState<NotificationConfig | null>(null);
   const [webhooks, setWebhooks] = useState<WebhookConfig[]>([]);
@@ -261,22 +257,6 @@ export default function SecuritySchedulesPage() {
       }
     } catch (error) {
       console.error('Failed to fetch webhooks:', error);
-    }
-  };
-
-  const parseCron = async (cron: string) => {
-    try {
-      const res = await fetch('/api/admin/security/schedules/parse-cron', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cronExpression: cron }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setCronPreview(data);
-      }
-    } catch (error) {
-      console.error('Failed to parse cron:', error);
     }
   };
 

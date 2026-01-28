@@ -17,7 +17,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
-import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import {
   Select,
@@ -53,31 +52,17 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import {
   Server,
-  Cpu,
-  MemoryStick,
-  Zap,
   Settings,
-  Play,
   RefreshCw,
   Loader2,
   CheckCircle2,
   AlertTriangle,
   XCircle,
   Clock,
-  DollarSign,
   Activity,
   Brain,
-  Layers,
   Gauge,
-  HardDrive,
-  Info,
   Rocket,
   History,
 } from 'lucide-react';
@@ -477,7 +462,8 @@ export default function GhostInferencePage() {
   const config = dashboard.config;
   const metrics = dashboard.metrics24h;
   const instanceTypes = dashboard.instanceTypes;
-  const activeDeployment = dashboard.activeDeployment;
+  const _activeDeployment = dashboard.activeDeployment;
+  void _activeDeployment; // Reserved for deployment status display
 
   return (
     <div className="space-y-6">

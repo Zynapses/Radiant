@@ -387,6 +387,102 @@ Database-backed persistence for Cato consciousness state, ensuring survival acro
 
 ---
 
+## 1.6.1 Unified AGI Architecture: Brain, Genesis, Cortex, and Cato
+
+RADIANT's AGI capabilities are built on four interconnected subsystems that work together to provide intelligent, safe, and enterprise-ready AI orchestration.
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           USER PROMPT                                        │
+└───────────────────────────────────┬─────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          AGI BRAIN PLANNER                                   │
+│  Coordinates: Domain Detection → Model Selection → Response Generation       │
+└──────────────────────────────────────────────────────────────────────────────┘
+         │                    │                    │                    │
+         ▼                    ▼                    ▼                    ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   GENESIS   │     │    CATO     │     │   CORTEX    │     │   BRAIN     │
+│             │     │             │     │             │     │             │
+│ Maturity    │     │ Safety      │     │ Knowledge   │     │ Cognitive   │
+│ Gates G1-G5 │     │ Pipeline    │     │ Graph       │     │ Mesh        │
+│             │     │             │     │             │     │             │
+│ Capabilities│     │ CBFs        │     │ Three Tiers │     │ LoRA        │
+│ Restrictions│     │ Checkpoints │     │ Golden Rules│     │ Adapters    │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+         │                    │                    │                    │
+         └────────────────────┴────────────────────┴────────────────────┘
+                                      │
+                                      ▼
+                         ┌────────────────────────┐
+                         │   CATO-CORTEX BRIDGE   │
+                         │  Memory Sync + GDPR    │
+                         └────────────────────────┘
+```
+
+### System Roles
+
+| System | Purpose | Key Service |
+|--------|---------|-------------|
+| **Brain** | AGI planning, cognitive mesh, model orchestration | `agi-brain-planner.service.ts` |
+| **Genesis** | Developmental gates, capability unlocking, maturity stages | `cato/genesis.service.ts` |
+| **Cortex** | Tiered memory (Hot/Warm/Cold), knowledge graph, Graph-RAG | `cortex-intelligence.service.ts` |
+| **Cato** | Safety pipeline, CBFs, governance presets, HITL checkpoints | `cato/safety-pipeline.service.ts` |
+
+### Integration Flow
+
+1. **Brain** receives user prompt and coordinates plan generation
+2. **Cortex** provides knowledge density insights to boost domain detection confidence
+3. **Genesis** checks maturity stage and applies capability restrictions
+4. **Cato** runs safety pipeline (Sensory Veto → Precision Governor → CBFs → Entropy → Fracture)
+5. **Brain** selects model using Cortex recommendations and LoRA adapters
+6. **Cato-Cortex Bridge** syncs memories and handles GDPR erasure
+
+### Governance Presets
+
+| Preset | Friction | Auto-Approve | Checkpoints |
+|--------|----------|--------------|-------------|
+| **PARANOID** 🛡️ | 1.0 | 0.0 | All ALWAYS |
+| **BALANCED** ⚖️ | 0.5 | 0.3 | CONDITIONAL |
+| **COWBOY** 🚀 | 0.1 | 0.8 | NEVER/NOTIFY |
+
+### Genesis Maturity Stages
+
+| Stage | Capabilities | Restrictions |
+|-------|-------------|--------------|
+| `EMBRYONIC` | Basic chat | No external actions |
+| `NASCENT` | Context retention | Limited autonomy |
+| `DEVELOPING` | Ethics checks | Requires checkpoints |
+| `MATURING` | Checkpoint system | Some autonomous actions |
+| `MATURE` | Full capability | Minimal restrictions |
+
+### Cortex Memory Tiers
+
+| Tier | Storage | Latency | Retention |
+|------|---------|---------|-----------|
+| **Hot** | Redis + DynamoDB | <10ms | 0-24 hours |
+| **Warm** | Neptune/pgvector | <100ms | 1-90 days |
+| **Cold** | S3 Iceberg | 1-10s | 90d-7 years |
+
+### Cato Safety Pipeline
+
+| Step | Component | Purpose |
+|------|-----------|---------|
+| 1 | Sensory Veto | Immediate halt signals |
+| 2 | Precision Governor | Limits confidence |
+| 3 | Redundant Perception | PHI/PII detection |
+| 4 | Control Barrier Functions | Hard safety constraints |
+| 5 | Semantic Entropy | Deception detection |
+| 6 | Fracture Detection | Alignment verification |
+
+**Detailed Documentation**: See [ENGINEERING-IMPLEMENTATION-VISION.md Section 21](./ENGINEERING-IMPLEMENTATION-VISION.md#21-unified-agi-architecture-brain-genesis-cortex-and-cato-v55229) for full engineering reference.
+
+---
+
 ## 1.7 Pricing System (v4_12_pricing_system.ts)
 
 ### Price Calculation

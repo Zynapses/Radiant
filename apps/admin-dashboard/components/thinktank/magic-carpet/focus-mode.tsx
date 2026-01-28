@@ -8,21 +8,16 @@
  * environment for deep work.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Focus,
-  X,
   Moon,
   Volume2,
   VolumeX,
   Clock,
-  Target,
   Sparkles,
-  Maximize2,
-  Minimize2,
   Eye,
-  EyeOff,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -221,9 +216,10 @@ export function FocusModeControls({
 export function FocusOverlay({
   intensity,
   children,
-  focusedElementId,
+  focusedElementId: _focusedElementId,
   className,
 }: FocusOverlayProps) {
+  void _focusedElementId; // Reserved for element focus
   const dimOpacity = (intensity / 100) * 0.8; // Max 80% dim
 
   return (

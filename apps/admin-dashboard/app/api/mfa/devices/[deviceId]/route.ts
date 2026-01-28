@@ -8,7 +8,7 @@ import { cookies } from 'next/headers';
 const API_BASE = process.env.INTERNAL_API_URL || 'http://localhost:3001';
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ deviceId: string }> }
 ) {
   try {

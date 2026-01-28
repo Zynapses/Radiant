@@ -75,7 +75,7 @@ export function SecurityDashboard() {
   const [product, setProduct] = useState<string>('combined');
   const [timeRange, setTimeRange] = useState<string>('24h');
 
-  const { data: metrics, isLoading: metricsLoading } = useQuery<SecurityMetrics>({
+  const { data: metrics, isLoading: _metricsLoading } = useQuery<SecurityMetrics>({
     queryKey: ['security-metrics', product, timeRange],
     queryFn: () => fetch(`/api/security/metrics?product=${product}&range=${timeRange}`).then((r) => r.json()),
   });

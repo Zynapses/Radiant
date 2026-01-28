@@ -43,6 +43,7 @@ export interface ArbitrageRule {
   condition: RuleCondition;
   action: RuleAction;
   enabled: boolean;
+  priority?: number;
 }
 
 export interface RuleCondition {
@@ -337,6 +338,53 @@ class EconomicGovernorService {
       percentUsed,
       resetsAt: config.budgetResetAt,
     };
+  }
+
+  // --------------------------------------------------------------------------
+  // Arbitrage Rules
+  // --------------------------------------------------------------------------
+
+  async addArbitrageRule(tenantId: string, rule: Omit<ArbitrageRule, 'id'>): Promise<ArbitrageRule> {
+    const config = await this.getConfig(tenantId);
+    const newRule: ArbitrageRule = {
+      id: `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      ...rule,
+    };
+    
+    config.arbitrageRules.push(newRule);
+    await this.updateConfig(tenantId, { arbitrageRules: config.arbitrageRules });
+    
+    logger.info('Added arbitrage rule', { tenantId, ruleId: newRule.id });
+    return newRule;
+  }
+
+  async updateArbitrageRule(tenantId: string, ruleId: string, updates: Partial<ArbitrageRule>): Promise<ArbitrageRule | null> {
+    const config = await this.getConfig(tenantId);
+    const ruleIndex = config.arbitrageRules.findIndex(r => r.id === ruleId);
+    
+    if (ruleIndex === -1) {
+      return null;
+    }
+    
+    config.arbitrageRules[ruleIndex] = { ...config.arbitrageRules[ruleIndex], ...updates };
+    await this.updateConfig(tenantId, { arbitrageRules: config.arbitrageRules });
+    
+    logger.info('Updated arbitrage rule', { tenantId, ruleId });
+    return config.arbitrageRules[ruleIndex];
+  }
+
+  async deleteArbitrageRule(tenantId: string, ruleId: string): Promise<boolean> {
+    const config = await this.getConfig(tenantId);
+    const originalLength = config.arbitrageRules.length;
+    config.arbitrageRules = config.arbitrageRules.filter(r => r.id !== ruleId);
+    
+    if (config.arbitrageRules.length === originalLength) {
+      return false;
+    }
+    
+    await this.updateConfig(tenantId, { arbitrageRules: config.arbitrageRules });
+    logger.info('Deleted arbitrage rule', { tenantId, ruleId });
+    return true;
   }
 
   // --------------------------------------------------------------------------

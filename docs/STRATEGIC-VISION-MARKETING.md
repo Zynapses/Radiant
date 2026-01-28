@@ -251,6 +251,72 @@ A sophisticated **Hot/Warm/Cold memory architecture** that optimizes for both pe
 
 **Business Impact**: Enterprise customers can connect their existing 50TB+ data lakes without costly ETL. The mapped relationships become **Data Gravity** that compounds over time—switching means losing years of accumulated intelligence.
 
+### The Unified AGI Architecture: Brain, Genesis, Cortex, and Cato (v5.52.29)
+
+RADIANT's AGI capabilities are built on **four interconnected subsystems** that form a complete intelligence stack:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           USER PROMPT                                        │
+└───────────────────────────────────┬─────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          AGI BRAIN PLANNER                                   │
+│  Coordinates: Domain Detection → Model Selection → Response Generation       │
+└──────────────────────────────────────────────────────────────────────────────┘
+         │                    │                    │                    │
+         ▼                    ▼                    ▼                    ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   GENESIS   │     │    CATO     │     │   CORTEX    │     │   BRAIN     │
+│             │     │             │     │             │     │             │
+│ Maturity    │     │ Safety      │     │ Knowledge   │     │ Cognitive   │
+│ Gates G1-G5 │     │ Pipeline    │     │ Graph       │     │ Mesh        │
+│             │     │             │     │             │     │             │
+│ Capabilities│     │ CBFs        │     │ Three Tiers │     │ LoRA        │
+│ Restrictions│     │ Checkpoints │     │ Golden Rules│     │ Adapters    │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+         │                    │                    │                    │
+         └────────────────────┴────────────────────┴────────────────────┘
+                                      │
+                                      ▼
+                         ┌────────────────────────┐
+                         │   CATO-CORTEX BRIDGE   │
+                         │  Memory Sync + GDPR    │
+                         └────────────────────────┘
+```
+
+| System | Role | Marketing Pitch | Code-Validated Service |
+|--------|------|-----------------|----------------------|
+| **Brain** | AGI planning, cognitive mesh, model orchestration | "The architect that picks the right expert for every question" | `agi-brain-planner.service.ts` |
+| **Genesis** | Developmental gates, capability unlocking, maturity stages | "AI that earns trust through responsible behavior" | `cato/genesis.service.ts` |
+| **Cortex** | Tiered memory (Hot/Warm/Cold), knowledge graph, Graph-RAG | "Institutional memory that never forgets" | `cortex-intelligence.service.ts` |
+| **Cato** | Safety pipeline, CBFs, governance presets, HITL checkpoints | "Safety that's mathematically guaranteed, not just trained" | `cato/safety-pipeline.service.ts` |
+
+#### The Competitive Moats This Creates
+
+| Moat | Subsystem | Why Competitors Can't Match |
+|------|-----------|---------------------------|
+| **Knowledge Gravity** | Cortex | Years of mapped relationships can't be exported |
+| **Verified Intelligence** | Brain + Cato | Empiricism loop tests code before answering |
+| **Compounding Learning** | Genesis + Brain | Twilight dreaming + LoRA stacking improve nightly |
+| **Enterprise Trust** | Cato | CBFs that NEVER relax, even under jailbreak attempts |
+| **Zero-Cost Ego** | Brain | Persistent consciousness at $0 additional cost |
+
+#### Why "Four Pillars" Matters for Sales
+
+**Competitor pitch**: "We have an AI assistant."
+**RADIANT pitch**: "We have four integrated subsystems that make AI trustworthy enough for professional use."
+
+| Buyer Concern | The Pillar That Addresses It |
+|---------------|------------------------------|
+| "Will it hallucinate?" | **Cato** — 6-step safety pipeline with CBFs |
+| "Will it remember our work?" | **Cortex** — 7-year tiered memory |
+| "Will it keep improving?" | **Genesis** — Graduated trust + nightly learning |
+| "Will it be cost-effective?" | **Brain** — 106 models with intelligent routing |
+
+**Detailed Documentation**: See [ENGINEERING-IMPLEMENTATION-VISION.md Section 21](./ENGINEERING-IMPLEMENTATION-VISION.md#21-unified-agi-architecture-brain-genesis-cortex-and-cato-v55229) for full engineering reference.
+
 ### The Technical Moat
 
 **We aren't just wrapping GPT-4 anymore.** We have built a **Synthetic Employee** that:

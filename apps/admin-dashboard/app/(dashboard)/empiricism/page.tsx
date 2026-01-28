@@ -16,7 +16,6 @@ import { toast } from 'sonner';
 import { 
   FlaskConical, 
   Target,
-  TrendingUp,
   AlertTriangle,
   CheckCircle,
   RefreshCw,

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import { withAuth, withAdminAuth, apiError, apiSuccess } from '@/lib/api/auth-wrapper';
 

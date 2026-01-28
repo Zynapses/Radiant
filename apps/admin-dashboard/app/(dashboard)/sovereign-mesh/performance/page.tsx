@@ -8,28 +8,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 import { 
   Activity, 
   AlertTriangle, 
   CheckCircle2, 
-  Clock, 
   Database, 
-  HardDrive, 
   Layers, 
   RefreshCw, 
   Server, 
-  Settings, 
-  Zap,
   TrendingUp,
-  TrendingDown,
-  BarChart3,
   Cpu,
-  MemoryStick,
   Timer,
   Shield,
   Bell,

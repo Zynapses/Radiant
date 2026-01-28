@@ -25,32 +25,21 @@ import {
   Globe,
   DollarSign,
   Users,
-  Settings,
   Activity,
   Zap,
   BarChart3,
   TrendingUp,
-  TrendingDown,
-  Check,
-  X,
-  ChevronRight,
   Play,
   Pause,
   RefreshCw,
   Save,
   AlertTriangle,
-  Info,
-  Eye,
-  EyeOff,
-  Sliders,
-  Target,
   Heart,
 } from 'lucide-react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
@@ -92,7 +81,6 @@ import {
   MOCK_COST_BUDGET,
   MOCK_USER_STATS,
   GOVERNOR_MODES,
-  CATO_MOODS,
 } from './mock-data';
 
 // Navigation items

@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import {
   Brain, Eye, AlertTriangle, TrendingUp, Target, RefreshCw,
-  CheckCircle, XCircle, HelpCircle, Lightbulb, Activity, BarChart3,
-  ChevronRight, Clock, Zap, Shield, Settings, BookOpen
+  HelpCircle, Lightbulb, BarChart3,
+  ChevronRight, Zap, BookOpen
 } from 'lucide-react';
 
 interface ConfidenceAssessment {
@@ -113,7 +113,8 @@ export default function MetacognitionPage() {
     loadData();
   }, []);
 
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
+  void _error; // Reserved for error display
 
   async function loadData() {
     setLoading(true);

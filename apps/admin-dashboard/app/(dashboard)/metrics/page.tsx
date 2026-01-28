@@ -124,7 +124,7 @@ export default function MetricsDashboard() {
           const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
           const correlationData: HeatmapCell[] = [];
           models.slice(0, 6).forEach((model: { modelId: string; totalUses: number }) => {
-            days.forEach((day, i) => {
+            days.forEach((day, _i) => {
               correlationData.push({
                 row: model.modelId.split('/').pop() || model.modelId,
                 col: day,

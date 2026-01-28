@@ -6,15 +6,12 @@ import {
   Shield,
   FileText,
   CheckCircle,
-  AlertTriangle,
   Clock,
   ExternalLink,
   ChevronRight,
   Search,
-  Filter,
   Building2,
   Globe,
-  Scale,
   Brain,
   Accessibility,
   GraduationCap,
@@ -23,7 +20,6 @@ import {
   RefreshCw,
   BarChart3,
   Award,
-  Calendar,
   User,
   FileCheck,
 } from 'lucide-react';
@@ -51,14 +47,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -67,7 +55,6 @@ import {
 } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 
 interface RegulatoryStandard {
   id: string;
@@ -166,13 +153,14 @@ const COMPLIANCE_STATUS_COLORS: Record<string, string> = {
   certified: 'bg-blue-100 text-blue-700',
 };
 
-const IMPLEMENTATION_STATUS_COLORS: Record<string, string> = {
+const _IMPLEMENTATION_STATUS_COLORS: Record<string, string> = {
   not_started: 'bg-gray-100 text-gray-600',
   in_progress: 'bg-blue-100 text-blue-700',
   implemented: 'bg-green-100 text-green-700',
   verified: 'bg-emerald-100 text-emerald-700',
   not_applicable: 'bg-gray-100 text-gray-500',
 };
+void _IMPLEMENTATION_STATUS_COLORS;
 
 export default function RegulatoryStandardsPage() {
   const [activeTab, setActiveTab] = useState('overview');

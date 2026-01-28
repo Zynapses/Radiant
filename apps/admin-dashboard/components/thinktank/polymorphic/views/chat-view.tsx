@@ -31,12 +31,13 @@ interface ChatMessage {
 
 export function ChatView({ 
   data, 
-  projectId,
-  sessionId, 
+  projectId: _projectId,
+  sessionId: _sessionId, 
   mode, 
-  onUpdateView,
-  onEscalate 
+  onUpdateView: _onUpdateView,
+  onEscalate: _onEscalate 
 }: ViewComponentProps) {
+  void _projectId; void _sessionId; void _onUpdateView; void _onEscalate; // Reserved for view operations
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);

@@ -7,7 +7,6 @@ import {
   Workflow, 
   Layers,
   RefreshCw,
-  Search,
   Star,
   TrendingUp
 } from 'lucide-react';
@@ -15,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { 
   Table, 
   TableBody, 
@@ -58,7 +56,9 @@ interface Workflow {
 }
 
 export function OrchestrationClient() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [_searchQuery, _setSearchQuery] = useState('');
+  void _searchQuery; // Reserved for search functionality
+  void _setSearchQuery;
   const [selectedPatternCategory, setSelectedPatternCategory] = useState<string | null>(null);
   const [selectedWorkflowCategory, setSelectedWorkflowCategory] = useState<string | null>(null);
   const queryClient = useQueryClient();

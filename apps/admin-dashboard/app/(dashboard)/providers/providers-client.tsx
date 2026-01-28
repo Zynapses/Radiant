@@ -8,7 +8,6 @@ import {
   CheckCircle,
   XCircle,
   AlertTriangle,
-  Settings,
   Key,
   Activity
 } from 'lucide-react';
@@ -16,14 +15,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
 import {
   Dialog,
   DialogContent,
@@ -57,7 +48,7 @@ export function ProvidersClient() {
   const [apiKey, setApiKey] = useState('');
   const queryClient = useQueryClient();
 
-  const { data: providers, isLoading } = useQuery({
+  const { data: providers, isLoading: _isLoading } = useQuery({
     queryKey: ['providers'],
     queryFn: async (): Promise<Provider[]> => {
       return apiClient.get<Provider[]>('/admin/providers');

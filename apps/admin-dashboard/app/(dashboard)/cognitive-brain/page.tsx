@@ -74,7 +74,8 @@ export default function CognitiveBrainPage() {
     loadData();
   }, []);
 
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
+  void _error; // Reserved for error display
 
   async function loadData() {
     setLoading(true);

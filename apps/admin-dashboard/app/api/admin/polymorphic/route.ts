@@ -178,7 +178,8 @@ async function handleRender(body: {
   dataPayload: Record<string, unknown>;
   rationale?: string;
 }) {
-  const { viewType, executionMode, dataPayload, rationale } = body;
+  const { viewType, executionMode, dataPayload: _dataPayload, rationale } = body;
+  void _dataPayload; // Reserved for data payload processing
 
   return NextResponse.json({
     data: {

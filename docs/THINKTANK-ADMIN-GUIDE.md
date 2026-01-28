@@ -2,8 +2,8 @@
 
 > **Configuration and administration of Think Tank AI features**
 > 
-> Version: 3.10.1 | Platform: RADIANT 5.52.29
-> Last Updated: January 25, 2026
+> Version: 3.11.0 | Platform: RADIANT 5.52.52
+> Last Updated: January 28, 2026
 
 ---
 
@@ -142,6 +142,12 @@ This guide covers administrative features specific to **Think Tank**, the consum
 43. [Concurrent Task Execution (Moat #17)](#43-concurrent-task-execution-moat-17)
 44. [Structure from Chaos Synthesis (Moat #20)](#44-structure-from-chaos-synthesis-moat-20)
 45. [Localization & Translation Overrides](#45-localization--translation-overrides)
+46. [Unified AGI Architecture](#46-unified-agi-architecture-brain-genesis-cortex-and-cato-v55229)
+47. [Time Machine Administration](#47-time-machine-administration)
+48. [Grimoire Administration](#48-grimoire-administration)
+49. [Sentinel Agents Administration](#49-sentinel-agents-administration)
+50. [Economic Governor Administration](#50-economic-governor-administration)
+51. [Flash Facts Administration](#51-flash-facts-administration)
 
 ---
 
@@ -9698,13 +9704,510 @@ apps/thinktank-admin/app/(dashboard)/localization/page.tsx
 
 ---
 
+## 46. Unified AGI Architecture: Brain, Genesis, Cortex, and Cato (v5.52.29)
+
+**Location**: Admin Dashboard → Think Tank → AGI Overview
+
+Think Tank is powered by RADIANT's **four interconnected AGI subsystems** that work together to provide intelligent, safe, and personalized AI experiences for users.
+
+### 46.1 How Users Benefit
+
+| System | User-Facing Benefit | What Users Notice |
+|--------|---------------------|-------------------|
+| **Brain** | Intelligent model selection | "It always picks the right AI for my question" |
+| **Genesis** | Graduated capabilities | "It feels more capable as I use it more" |
+| **Cortex** | Persistent memory | "It remembers our previous conversations" |
+| **Cato** | Safety without friction | "It keeps me safe without being annoying" |
+
+### 46.2 The User Experience Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           USER ASKS QUESTION                                 │
+└───────────────────────────────┬─────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          BRAIN ORCHESTRATION                                 │
+│  "What domain is this? What's the best model? What does Cortex know?"       │
+└──────────────────────────────────────────────────────────────────────────────┘
+         │                    │                    │                    │
+         ▼                    ▼                    ▼                    ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   CORTEX    │     │    CATO     │     │   GENESIS   │     │    BRAIN    │
+│             │     │             │     │             │     │             │
+│ "I remember │     │ "This is    │     │ "User is at │     │ "Use Claude │
+│ they prefer │     │ safe to     │     │ maturity    │     │ for legal,  │
+│ concise     │     │ answer"     │     │ stage G3"   │     │ add legal   │
+│ answers"    │     │             │     │             │     │ LoRA"       │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+         │                    │                    │                    │
+         └────────────────────┴────────────────────┴────────────────────┘
+                                      │
+                                      ▼
+                         ┌────────────────────────┐
+                         │   PERSONALIZED RESPONSE │
+                         │   Safe, Fast, Relevant  │
+                         └────────────────────────┘
+```
+
+### 46.3 Cortex Memory for Users
+
+Cortex provides the **persistent memory** that makes Think Tank feel like it knows each user.
+
+#### What Cortex Remembers
+
+| Memory Type | Example | Retention |
+|-------------|---------|-----------|
+| **User Preferences** | "User prefers bullet points" | Permanent |
+| **Conversation Context** | "We discussed AWS Lambda yesterday" | 90 days |
+| **Domain Expertise** | "User is senior developer, use advanced terms" | Permanent |
+| **Golden Rules** | "Never recommend deprecated APIs" | Permanent |
+| **Corrections** | "User clarified they work in healthcare, not tech" | Permanent |
+
+#### Memory Tier Visibility
+
+| Tier | User Experience | What's Stored |
+|------|-----------------|---------------|
+| **Hot** | Instant context in conversation | Current session, recent facts |
+| **Warm** | "Let me recall..." (imperceptible delay) | Recent conversations, preferences |
+| **Cold** | "I found in our history..." (<2s) | Older conversations, documents |
+
+#### User Memory Controls
+
+Users can manage their memory via Think Tank settings:
+- **View memories**: See what the AI remembers about them
+- **Correct memories**: Fix incorrect learned information
+- **Delete memories**: GDPR right-to-erasure support
+- **Export memories**: Download all stored context
+
+**Admin API**: `GET /api/admin/cortex/user/:userId/memories`
+
+### 46.4 Cato Safety for Users
+
+Cato provides **invisible safety** that protects users without creating friction.
+
+#### User-Facing Safety Features
+
+| Feature | User Experience | Admin Control |
+|---------|-----------------|---------------|
+| **PHI/PII Detection** | "I've redacted sensitive information from your request" | Sensitivity levels |
+| **Domain Ethics** | "I should note that I can't provide medical diagnoses" | Ethics frameworks |
+| **Hallucination Prevention** | "I'm not confident about this—let me verify" | Uncertainty thresholds |
+| **Cost Protection** | (Invisible) Prevents runaway API costs | Budget limits |
+
+#### Governance Presets by Use Case
+
+| Tenant Type | Preset | User Experience |
+|-------------|--------|-----------------|
+| Healthcare | PARANOID 🛡️ | "I'll need human approval before proceeding with this action" |
+| Enterprise | BALANCED ⚖️ | Seamless with occasional safety notes |
+| Internal R&D | COWBOY 🚀 | Maximum autonomy, minimal interruptions |
+
+**Configure at**: Admin Dashboard → Cato → Governance
+
+### 46.5 Genesis Maturity for Users
+
+Genesis implements **graduated trust** that unlocks capabilities as users demonstrate responsible usage.
+
+#### User Capability Progression
+
+| Stage | What User Can Do | What's Unlocked |
+|-------|------------------|-----------------|
+| **G1 (Embryonic)** | Basic chat | Simple Q&A |
+| **G2 (Nascent)** | Remembered context | Cortex memory access |
+| **G3 (Developing)** | Ethics-checked responses | Professional domain support |
+| **G4 (Maturing)** | Autonomous actions | Tool execution, file operations |
+| **G5 (Mature)** | Full capability | Multi-model orchestration, agents |
+
+#### Progression Triggers
+
+| User Action | Maturity Impact |
+|-------------|-----------------|
+| Positive ratings | +0.1 maturity |
+| Corrections (learning) | +0.05 maturity |
+| Safety violations | -0.2 maturity |
+| Extended responsible use | +0.02/day |
+
+**View User Maturity**: Admin Dashboard → Cato → Genesis → User Stages
+
+### 46.6 Brain Model Selection for Users
+
+Brain provides **intelligent model routing** so users always get the best AI for their question.
+
+#### How Users Experience Model Selection
+
+| User Question | Brain's Decision | User Sees |
+|---------------|------------------|-----------|
+| "Explain quantum physics" | Route to Claude (strong reasoning) | Expert explanation |
+| "Analyze this image" | Route to GPT-4V (vision) | Visual analysis |
+| "Write a creative story" | Route to Claude (creative) | Engaging narrative |
+| "Debug this code" | Route to self-hosted Qwen2.5-Coder | Fast, accurate fix |
+
+Users don't need to choose models—Brain makes optimal selections based on:
+- Domain detection (what topic is this?)
+- Cortex knowledge density (do we have context?)
+- Model proficiency rankings (which model is best at this?)
+- Cost optimization (use cheaper models when quality is equivalent)
+
+#### LoRA Personalization
+
+Brain stacks **three LoRA adapters** for personalized responses:
+
+```
+Base Model (Frozen)
+       +
+Global LoRA (All tenants learning)
+       +
+Tenant LoRA (Organization preferences)
+       +
+User LoRA (Individual style)
+       =
+Personalized Response
+```
+
+### 46.7 Admin Configuration Summary
+
+| Feature | Location | Key Settings |
+|---------|----------|--------------|
+| **Cortex Memory** | Cortex → Configuration | Tier settings, retention policies |
+| **Cato Safety** | Cato → Safety Pipeline | CBFs, governance presets |
+| **Genesis Maturity** | Cato → Genesis | Stage gates, progression rates |
+| **Brain Routing** | Brain → Model Selection | Domain mappings, cost limits |
+| **User Memory View** | Users → [User] → Cortex | Individual memory inspection |
+
+### 46.8 Key API Endpoints for User Features
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /api/thinktank/cortex/my-memories` | User views their memories |
+| `DELETE /api/thinktank/cortex/my-memories/:id` | User deletes a memory |
+| `GET /api/thinktank/genesis/my-stage` | User sees their maturity level |
+| `GET /api/thinktank/brain/last-routing` | User sees why a model was chosen |
+| `POST /api/thinktank/cortex/learn` | User explicitly teaches the AI |
+
+### 46.9 Related Documentation
+
+- **[RADIANT-ADMIN-GUIDE.md Section 31A.8](./RADIANT-ADMIN-GUIDE.md#31a8-unified-agi-architecture-brain-genesis-cortex-and-cato-v55229)** - Platform admin perspective
+- **[ENGINEERING-IMPLEMENTATION-VISION.md Section 21](./ENGINEERING-IMPLEMENTATION-VISION.md#21-unified-agi-architecture-brain-genesis-cortex-and-cato-v55229)** - Full engineering reference
+- **[RADIANT-PLATFORM-ARCHITECTURE.md Section 1.6.1](./RADIANT-PLATFORM-ARCHITECTURE.md#161-unified-agi-architecture-brain-genesis-cortex-and-cato)** - System architecture
+
+---
+
+## 47. Time Machine Administration
+
+**Location**: Admin Dashboard → Think Tank → Time Machine
+
+Time Machine enables conversation forking, checkpointing, and replay for users.
+
+### 47.1 Overview
+
+Time Machine provides "version control for conversations" - users can create branches, save checkpoints, and explore alternative conversation paths without losing their original thread.
+
+### 47.2 Admin Configuration
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Enable Time Machine** | Global feature toggle | `true` |
+| **Max Timelines Per Conversation** | Limit on fork depth | `10` |
+| **Max Checkpoints Per Timeline** | Checkpoint retention | `50` |
+| **Auto-Checkpoint Interval** | Auto-save frequency | `5 messages` |
+| **Retention Period** | How long to keep timelines | `90 days` |
+
+### 47.3 Database Tables
+
+| Table | Purpose |
+|-------|---------|
+| `timelines` | Timeline branches per conversation |
+| `timeline_checkpoints` | Saved conversation states |
+| `timeline_forks` | Fork point metadata |
+
+### 47.4 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/thinktank/time-travel/config` | GET/PUT | Configuration |
+| `/api/admin/thinktank/time-travel/stats` | GET | Usage statistics |
+| `/api/admin/thinktank/time-travel/cleanup` | POST | Purge old timelines |
+
+### 47.5 Implementation Files
+
+```
+lambda/thinktank/time-travel.ts
+lambda/shared/services/time-travel.service.ts
+migrations/XXX_timelines.sql
+```
+
+---
+
+## 48. Grimoire Administration
+
+**Location**: Admin Dashboard → Think Tank → Grimoire
+
+The Grimoire is Think Tank's procedural memory system - learned patterns ("spells") that improve AI responses over time.
+
+### 48.1 Overview
+
+When the AI discovers successful response patterns, they can be codified as "spells" in the Grimoire. These spells are then available to improve future responses.
+
+### 48.2 Spell Schools
+
+| School | Icon | Purpose |
+|--------|------|---------|
+| **Divination** | 🔮 | Information lookup and research |
+| **Evocation** | ⚡ | Direct actions and generation |
+| **Transmutation** | 🔄 | Data transformation and formatting |
+| **Abjuration** | 🛡️ | Error prevention and recovery |
+| **Conjuration** | ✨ | Creating new content |
+| **Enchantment** | 💫 | Enhancing existing content |
+
+### 48.3 Admin Configuration
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Enable Grimoire** | Feature toggle | `true` |
+| **Auto-Promote Threshold** | Success rate to auto-promote patterns | `0.85` |
+| **Spell Power Decay** | Daily decay rate for unused spells | `0.01` |
+| **Max Spells Per Tenant** | Spell library limit | `500` |
+
+### 48.4 Spell Lifecycle
+
+```
+Pattern Detected → Testing → Active → Deprecated
+         ↑                       ↓
+         └──── User Feedback ────┘
+```
+
+### 48.5 Admin Actions
+
+- **View All Spells**: Browse spell library by school/category
+- **Deprecate Spell**: Disable underperforming spells
+- **Promote Pattern**: Manually promote patterns to spells
+- **Export Spells**: Export spell library for backup
+
+### 48.6 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/thinktank/grimoire/spells` | GET | List all spells |
+| `/api/admin/thinktank/grimoire/spells/:id` | PATCH | Update spell status |
+| `/api/admin/thinktank/grimoire/promote` | POST | Promote pattern |
+| `/api/admin/thinktank/grimoire/stats` | GET | Grimoire analytics |
+
+### 48.7 Implementation Files
+
+```
+lambda/thinktank/grimoire.ts
+lambda/shared/services/grimoire.service.ts
+migrations/XXX_grimoire_spells.sql
+```
+
+---
+
+## 49. Sentinel Agents Administration
+
+**Location**: Admin Dashboard → Think Tank → Sentinel Agents
+
+Sentinel Agents are background monitors that watch for conditions and trigger automated actions.
+
+### 49.1 Overview
+
+Sentinels provide "if this, then that" automation for AI interactions. They monitor conversations and workflows, triggering actions when conditions are met.
+
+### 49.2 Agent Types
+
+| Type | Icon | Purpose |
+|------|------|---------|
+| **Monitor** | 🔍 | Watch for patterns and report |
+| **Guardian** | 🛡️ | Prevent unwanted outcomes |
+| **Optimizer** | ⚡ | Improve efficiency automatically |
+| **Auditor** | 📋 | Track and log specific activities |
+
+### 49.3 Admin Configuration
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Enable Sentinel Agents** | Feature toggle | `true` |
+| **Max Agents Per User** | Agent limit per user | `20` |
+| **Max Agents Per Tenant** | Tenant-wide limit | `500` |
+| **Event Retention** | How long to keep event logs | `30 days` |
+| **Max Trigger Rate** | Throttle (triggers/minute) | `60` |
+
+### 49.4 Trigger Conditions
+
+| Condition Type | Example |
+|----------------|---------|
+| **Content Match** | "When code is generated" |
+| **Domain Match** | "When legal domain detected" |
+| **Cost Threshold** | "When query cost > $1" |
+| **Confidence Threshold** | "When confidence < 0.5" |
+| **Pattern Match** | Regex patterns |
+
+### 49.5 Available Actions
+
+- Send notification
+- Add context to response
+- Escalate to human
+- Log to audit trail
+- Trigger webhook
+- Run secondary model
+
+### 49.6 Admin Actions
+
+- **View All Agents**: Browse agents by type/status
+- **Disable Agent**: Temporarily disable problematic agents
+- **View Events**: See all triggered events
+- **Create System Agent**: Create tenant-wide agents
+
+### 49.7 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/thinktank/sentinel-agents` | GET | List all agents |
+| `/api/admin/thinktank/sentinel-agents/:id` | PATCH | Update agent |
+| `/api/admin/thinktank/sentinel-agents/events` | GET | Event log |
+| `/api/admin/thinktank/sentinel-agents/stats` | GET | Statistics |
+
+### 49.8 Implementation Files
+
+```
+lambda/thinktank/sentinel-agents.ts
+lambda/shared/services/sentinel-agent.service.ts
+migrations/XXX_sentinel_agents.sql
+```
+
+---
+
+## 50. Economic Governor Administration
+
+**Location**: Admin Dashboard → Think Tank → Economic Governor
+
+The Economic Governor manages AI costs by intelligently routing queries to cost-effective models.
+
+### 50.1 Overview
+
+The Economic Governor analyzes query complexity and routes to the most cost-effective model that can handle it, achieving significant cost savings without sacrificing quality.
+
+### 50.2 Cost Tiers
+
+| Tier | Models | Cost Range | Use Case |
+|------|--------|------------|----------|
+| **Sniper** | Fast, small models | ~$0.01/query | Simple lookups |
+| **Standard** | Mid-tier models | ~$0.05/query | General queries |
+| **Advanced** | Premium models | ~$0.15/query | Complex analysis |
+| **War Room** | Multi-model | ~$0.50+/query | Critical decisions |
+
+### 50.3 Admin Configuration
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Enable Economic Governor** | Feature toggle | `true` |
+| **Daily Budget (Tenant)** | Max daily spend | `$100` |
+| **Per-Query Limit** | Max single query cost | `$5` |
+| **Default Tier** | Tier for unclassified queries | `Standard` |
+| **Escalation Threshold** | Confidence to auto-escalate | `0.6` |
+
+### 50.4 Routing Rules
+
+Admins can create custom routing rules:
+
+| Rule Type | Example |
+|-----------|---------|
+| **Domain-based** | "Legal → Advanced tier" |
+| **Keyword-based** | "Contains 'urgent' → Standard+" |
+| **User-based** | "Premium users → War Room access" |
+| **Time-based** | "Off-hours → Sniper only" |
+
+### 50.5 Cost Analytics
+
+Track spending across:
+- Model usage breakdown
+- Cost per user/department
+- Savings from optimization
+- Trend analysis
+
+### 50.6 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/thinktank/economic-governor/config` | GET/PUT | Configuration |
+| `/api/admin/thinktank/economic-governor/rules` | GET/POST | Routing rules |
+| `/api/admin/thinktank/economic-governor/usage` | GET | Usage analytics |
+| `/api/admin/thinktank/economic-governor/budgets` | GET/PUT | Budget management |
+
+### 50.7 Implementation Files
+
+```
+lambda/thinktank/economic-governor.ts
+lambda/shared/services/economic-governor.service.ts
+migrations/XXX_economic_routing_rules.sql
+```
+
+---
+
+## 51. Flash Facts Administration
+
+**Location**: Admin Dashboard → Think Tank → Flash Facts
+
+Flash Facts enable quick knowledge capture - bite-sized information users want the AI to remember.
+
+### 51.1 Overview
+
+Flash Facts are user-created quick facts that persist across sessions. Unlike full memories, they're designed for fast, simple context that should always be available.
+
+### 51.2 Admin Configuration
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Enable Flash Facts** | Feature toggle | `true` |
+| **Max Facts Per User** | Fact limit | `100` |
+| **Max Fact Length** | Character limit | `500` |
+| **Default Categories** | Pre-defined categories | Work, Tech, Personal |
+| **Auto-Expire Days** | Expiration (0=never) | `0` |
+
+### 51.3 Fact Categories
+
+| Category | Purpose |
+|----------|---------|
+| **Work Context** | Company, role, team, projects |
+| **Technical** | Languages, frameworks, tools |
+| **Preferences** | Communication style, detail level |
+| **Personal** | Timezone, working hours |
+| **Project-Specific** | Current project context |
+
+### 51.4 Admin Actions
+
+- **View All Facts**: Browse facts by user/category
+- **Delete Fact**: Remove inappropriate facts
+- **Create System Facts**: Tenant-wide facts
+- **Export Facts**: Backup user facts
+
+### 51.5 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/thinktank/flash-facts` | GET | List all facts |
+| `/api/admin/thinktank/flash-facts/:id` | DELETE | Delete fact |
+| `/api/admin/thinktank/flash-facts/stats` | GET | Statistics |
+| `/api/admin/thinktank/flash-facts/categories` | GET/POST | Manage categories |
+
+### 51.6 Implementation Files
+
+```
+lambda/thinktank/flash-facts.ts
+lambda/shared/services/flash-facts.service.ts
+migrations/XXX_flash_facts.sql
+```
+
+---
+
 ## Related Documentation
 
 - [RADIANT Admin Guide](./RADIANT-ADMIN-GUIDE.md) - Platform administration
 - [RADIANT Admin Guide - HITL Orchestration](./RADIANT-ADMIN-GUIDE.md#section-64-hitl-orchestration-enhancements) - Full HITL Orchestration documentation
 - [RADIANT Admin Guide - Metrics & Learning](./RADIANT-ADMIN-GUIDE.md#36-metrics--persistent-learning-infrastructure) - Persistent learning system
 - [RADIANT Admin Guide - Consciousness Evolution](./RADIANT-ADMIN-GUIDE.md#27-consciousness-evolution-administration) - Predictive coding, LoRA evolution, Local Ego
-- [Think Tank User Guide](./THINK-TANK-USER-GUIDE.md) - End user guide
+- [Think Tank User Guide](./THINKTANK-USER-GUIDE.md) - End user guide
 - [User Rules System](./USER-RULES-SYSTEM.md) - Memory rules details
 - [Provider Rejection Handling](./PROVIDER-REJECTION-HANDLING.md) - Rejection system
 - [AI Ethics Standards](./AI-ETHICS-STANDARDS.md) - Ethics framework

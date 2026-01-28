@@ -1,37 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
 import { 
   Shield, 
@@ -49,7 +20,6 @@ import {
   PlayCircle,
   BarChart3,
   Clock,
-  ChevronDown,
   Lock,
   Unlock,
   RefreshCw,
@@ -250,7 +220,8 @@ export default function SecurityPoliciesPage() {
   const systemPoliciesCount = policies.filter(p => p.isSystem).length;
   const tenantPoliciesCount = policies.filter(p => !p.isSystem).length;
 
-  const { toast } = useToast();
+  const { toast: _toast } = useToast();
+  void _toast; // Reserved for toast notifications
 
   if (loading) {
     return (

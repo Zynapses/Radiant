@@ -41,12 +41,8 @@ import {
   FileDown,
   Clock,
   AlertOctagon,
-  Settings,
   Database,
   ShieldCheck,
-  UserX,
-  FileSearch,
-  Bell,
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { CustomReportBuilder } from '@/components/compliance/CustomReportBuilder';

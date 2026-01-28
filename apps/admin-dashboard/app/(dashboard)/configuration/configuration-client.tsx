@@ -7,7 +7,6 @@ import {
   Save, 
   RefreshCw, 
   History,
-  AlertTriangle,
   Lock,
   Unlock
 } from 'lucide-react';
@@ -76,7 +75,7 @@ export function ConfigurationClient() {
     },
   });
 
-  const { data: configs, isLoading: configsLoading } = useQuery<ConfigValue[]>({
+  const { data: configs, isLoading: _configsLoading } = useQuery<ConfigValue[]>({
     queryKey: ['configuration', 'category', selectedCategory],
     queryFn: async () => {
       if (!selectedCategory) return [];

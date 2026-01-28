@@ -20,7 +20,6 @@ import {
   Zap,
   Settings,
   RefreshCw,
-  Save,
   TestTube,
   Database,
 } from 'lucide-react';
@@ -89,7 +88,8 @@ async function testTranslation(text: string, targetLang: string) {
 }
 
 export default function TranslationPage() {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
+  void _queryClient; // Reserved for query invalidation
   const [testText, setTestText] = useState('');
   const [testLang, setTestLang] = useState('es');
   const [testResult, setTestResult] = useState('');

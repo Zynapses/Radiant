@@ -124,7 +124,7 @@ export class GatewayStack extends cdk.Stack {
       },
     });
 
-    const natsService = new ecs.FargateService(this, 'NatsService', {
+    new ecs.FargateService(this, 'NatsService', {
       cluster,
       taskDefinition: natsTaskDefinition,
       desiredCount: 1, // Single node for dev; use NATS cluster for prod

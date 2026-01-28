@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Shield, BookOpen, Scale, Heart, Eye, Lock, AlertTriangle, Check, RefreshCw } from 'lucide-react';
+import { Shield, BookOpen, Scale, Heart, Lock, AlertTriangle, Check, RefreshCw } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 interface EthicsPreset {

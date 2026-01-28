@@ -7,7 +7,7 @@ import {
   type UseQueryOptions,
 } from '@tanstack/react-query';
 import { modelsApi } from '@/lib/api/endpoints';
-import type { Model, ModelFilters, ThermalState, UsageStats } from '@/lib/api/types';
+import type { Model, ModelFilters, ThermalState } from '@/lib/api/types';
 import type { PaginationParams, ApiResponse } from '@/lib/api/client';
 
 export const modelKeys = {

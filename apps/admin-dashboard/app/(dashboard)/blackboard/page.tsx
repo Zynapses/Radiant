@@ -11,14 +11,14 @@
  * - Process Hydration - state serialization
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
-  Brain, Users, Lock, Database, Settings, RefreshCw, 
-  CheckCircle, XCircle, Clock, AlertTriangle, Loader2,
-  MessageSquare, GitBranch, Archive, Trash2, Play
+  Brain, Users, Lock, RefreshCw, 
+  CheckCircle, XCircle, Loader2,
+  MessageSquare, Archive, Trash2, Play
 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -116,7 +116,7 @@ export default function BlackboardPage() {
   const [newAnswer, setNewAnswer] = useState('');
 
   // Dashboard query
-  const { data: dashboard, isLoading: dashboardLoading, refetch: refetchDashboard } = useQuery({
+  const { data: dashboard, isLoading: _dashboardLoading, refetch: refetchDashboard } = useQuery({
     queryKey: ['blackboard', 'dashboard'],
     queryFn: async () => {
       const res = await api.get<{ data: { data: DashboardStats } }>('/admin/blackboard/dashboard');

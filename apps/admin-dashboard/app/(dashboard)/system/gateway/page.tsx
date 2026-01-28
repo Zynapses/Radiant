@@ -16,7 +16,6 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
 import { api } from '@/lib/api/client';
 import {
@@ -26,10 +25,6 @@ import {
   Cpu,
   HardDrive,
   Activity,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Settings,
   Scale,
   Timer,
   Shield,

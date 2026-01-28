@@ -5,7 +5,7 @@ import Foundation
 
 // MARK: - Domain URL Configuration
 
-struct DomainURLConfiguration: Codable, Sendable, Equatable {
+struct DomainURLConfiguration: Codable, Sendable, Equatable, Hashable {
     var baseDomain: String
     var routingStrategy: RoutingStrategy
     var appConfigs: [String: AppRouteConfig]
@@ -46,7 +46,7 @@ struct DomainURLConfiguration: Codable, Sendable, Equatable {
     
     // MARK: - App Route Config
     
-    struct AppRouteConfig: Codable, Sendable, Equatable {
+    struct AppRouteConfig: Codable, Sendable, Equatable, Hashable {
         var enabled: Bool
         var customSubdomain: String?
         var customPath: String?

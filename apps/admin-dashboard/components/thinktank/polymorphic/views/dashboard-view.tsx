@@ -26,12 +26,13 @@ interface MetricCard {
 
 export function DashboardView({ 
   data, 
-  projectId,
-  sessionId, 
-  mode, 
-  onUpdateView,
-  onEscalate 
+  projectId: _projectId,
+  sessionId: _sessionId, 
+  mode: _mode, 
+  onUpdateView: _onUpdateView,
+  onEscalate: _onEscalate 
 }: ViewComponentProps) {
+  void _projectId; void _sessionId; void _mode; void _onUpdateView; void _onEscalate; // Reserved for view operations
   const [metrics, setMetrics] = useState<MetricCard[]>([]);
 
   useEffect(() => {

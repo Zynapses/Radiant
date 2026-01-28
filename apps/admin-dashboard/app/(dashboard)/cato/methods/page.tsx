@@ -75,7 +75,8 @@ export default function CatoMethodsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMethod, setSelectedMethod] = useState<MethodDefinition | null>(null);
-  const [selectedTool, setSelectedTool] = useState<ToolDefinition | null>(null);
+  const [_selectedTool, setSelectedTool] = useState<ToolDefinition | null>(null);
+  void _selectedTool; // Reserved for tool detail view
 
   useEffect(() => {
     fetchData();

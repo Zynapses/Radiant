@@ -6,7 +6,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { servicesApi } from '@/lib/api/endpoints';
-import type { MidLevelService, ServiceState } from '@/lib/api/types';
+import type { ServiceState } from '@/lib/api/types';
 
 // Query keys
 export const serviceKeys = {

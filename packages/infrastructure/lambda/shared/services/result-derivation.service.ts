@@ -572,6 +572,72 @@ class ResultDerivationService {
     };
   }
   
+  /**
+   * Compare two derivations side by side
+   */
+  async compareDerivations(
+    derivationId1: string,
+    derivationId2: string
+  ): Promise<{
+    derivation1: ResultDerivation | null;
+    derivation2: ResultDerivation | null;
+    comparison: {
+      costDiff: number;
+      durationDiff: number;
+      qualityDiff: number;
+      modelsDiff: string[];
+      winner: 'derivation1' | 'derivation2' | 'tie';
+    };
+  }> {
+    const [d1, d2] = await Promise.all([
+      this.getDerivation(derivationId1),
+      this.getDerivation(derivationId2),
+    ]);
+
+    if (!d1 || !d2) {
+      return {
+        derivation1: d1,
+        derivation2: d2,
+        comparison: {
+          costDiff: 0,
+          durationDiff: 0,
+          qualityDiff: 0,
+          modelsDiff: [],
+          winner: 'tie',
+        },
+      };
+    }
+
+    const costDiff = (d1.costs?.totalCost || 0) - (d2.costs?.totalCost || 0);
+    const durationDiff = (d1.timing?.totalDurationMs || 0) - (d2.timing?.totalDurationMs || 0);
+    const qualityDiff = (d1.qualityMetrics?.overallScore || 0) - (d2.qualityMetrics?.overallScore || 0);
+
+    const models1 = new Set((d1.modelsUsed || []).map(m => m.modelId));
+    const models2 = new Set((d2.modelsUsed || []).map(m => m.modelId));
+    const modelsDiff = [...models1].filter(m => !models2.has(m)).concat([...models2].filter(m => !models1.has(m)));
+
+    // Determine winner based on quality (higher is better), cost (lower is better), duration (lower is better)
+    let d1Score = 0;
+    let d2Score = 0;
+    if (qualityDiff > 0) d1Score++; else if (qualityDiff < 0) d2Score++;
+    if (costDiff < 0) d1Score++; else if (costDiff > 0) d2Score++;
+    if (durationDiff < 0) d1Score++; else if (durationDiff > 0) d2Score++;
+
+    const winner = d1Score > d2Score ? 'derivation1' : d2Score > d1Score ? 'derivation2' : 'tie';
+
+    return {
+      derivation1: d1,
+      derivation2: d2,
+      comparison: {
+        costDiff,
+        durationDiff,
+        qualityDiff,
+        modelsDiff,
+        winner,
+      },
+    };
+  }
+
   // ============================================================================
   // Private Methods
   // ============================================================================

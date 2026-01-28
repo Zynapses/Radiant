@@ -6,9 +6,6 @@ import { format, formatDistanceToNow } from 'date-fns';
 import {
   Shield,
   Play,
-  RefreshCw,
-  CheckCircle,
-  XCircle,
   AlertTriangle,
   Clock,
   FileText,
@@ -17,10 +14,12 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
-  Activity,
   BarChart3,
   ListChecks,
   AlertCircle,
+  CheckCircle,
+  XCircle,
+  RefreshCw,
 } from 'lucide-react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -57,7 +56,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from '@/components/ui/dialog';
 import {
   Accordion,
@@ -133,12 +131,13 @@ const STATUS_COLORS: Record<string, string> = {
   cancelled: 'bg-gray-100 text-gray-500',
 };
 
-const SEVERITY_COLORS: Record<string, string> = {
+const _SEVERITY_COLORS: Record<string, string> = {
   critical: 'bg-red-500 text-white',
   high: 'bg-orange-500 text-white',
   medium: 'bg-amber-500 text-white',
   low: 'bg-blue-500 text-white',
 };
+void _SEVERITY_COLORS;
 
 const FRAMEWORK_NAMES: Record<string, string> = {
   soc2: 'SOC 2',

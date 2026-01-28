@@ -14,15 +14,11 @@ import {
   Target, 
   Dna, 
   Activity, 
-  TrendingUp, 
-  AlertTriangle,
-  CheckCircle,
   Clock,
   Trash2,
   RefreshCw,
   Settings,
   Zap,
-  Eye
 } from 'lucide-react';
 import {
   Table,

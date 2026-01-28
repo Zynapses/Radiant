@@ -16,8 +16,7 @@ import {
   Eye,
   BookOpen,
   AlertTriangle,
-  CheckCircle,
-  XCircle
+  CheckCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 

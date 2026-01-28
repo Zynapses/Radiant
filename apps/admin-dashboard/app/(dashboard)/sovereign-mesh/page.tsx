@@ -8,13 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import {
   Bot,
-  Zap,
-  AppWindow,
   Eye,
   CheckCircle,
   AlertTriangle,
   Activity,
-  TrendingUp,
   Clock,
   DollarSign,
   RefreshCw,

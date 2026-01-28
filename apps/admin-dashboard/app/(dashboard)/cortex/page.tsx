@@ -18,8 +18,6 @@ import {
   Trash2,
   Play,
   ChevronRight,
-  Zap,
-  FileText,
   GitBranch,
   CloudOff,
   Shield,

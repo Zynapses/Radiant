@@ -16,8 +16,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { 
   Database, HardDrive, Archive, Snowflake, Shield, Trash2, 
   FileText, MessageSquare, Upload, Activity, Settings, AlertTriangle,
-  CheckCircle, Clock, RefreshCw, Download, Search, Eye, Lock,
-  ChevronRight, BarChart3, Users, Zap
+  CheckCircle, RefreshCw, Lock,
+  ChevronRight, BarChart3, Zap
 } from 'lucide-react';
 
 // =============================================================================
@@ -357,7 +357,8 @@ function AuditLogViewer() {
 
 function ErasureManager() {
   const [requests, setRequests] = useState<ErasureRequest[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
+  void _loading; // Reserved for loading state display
   const [showCreate, setShowCreate] = useState(false);
   const [newRequest, setNewRequest] = useState({
     scope: 'user' as 'user' | 'conversation' | 'tenant',

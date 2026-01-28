@@ -1,7 +1,7 @@
 # Think Tank User Guide
 
-> **Version**: 5.52.29  
-> **Last Updated**: January 25, 2026  
+> **Version**: 5.52.52  
+> **Last Updated**: January 28, 2026  
 > **Audience**: End Users of Think Tank
 
 ---
@@ -22,9 +22,16 @@
 12. [Decision Records](#12-decision-records)
 13. [Living Parchment](#13-living-parchment)
 14. [Safety & Governance](#14-safety--governance)
-15. [Keyboard Shortcuts](#15-keyboard-shortcuts)
-16. [Troubleshooting](#16-troubleshooting)
-17. [Glossary](#17-glossary)
+15. [Time Machine - Conversation Forking](#15-time-machine---conversation-forking)
+16. [The Grimoire - Procedural Memory](#16-the-grimoire---procedural-memory)
+17. [Flash Facts - Quick Knowledge Capture](#17-flash-facts---quick-knowledge-capture)
+18. [Sentinel Agents - Background Monitors](#18-sentinel-agents---background-monitors)
+19. [Economic Governor - Cost Management](#19-economic-governor---cost-management)
+20. [Council of Rivals - Multi-Model Deliberation](#20-council-of-rivals---multi-model-deliberation)
+21. [Voice Input & File Attachments](#21-voice-input--file-attachments)
+22. [Keyboard Shortcuts](#22-keyboard-shortcuts)
+23. [Troubleshooting](#23-troubleshooting)
+24. [Glossary](#24-glossary)
 
 ---
 
@@ -1029,7 +1036,443 @@ Think Tank includes multiple safety layers to protect you and your organization.
 
 ---
 
-## 15. Keyboard Shortcuts
+## 15. Time Machine - Conversation Forking
+
+Time Machine lets you create branches in your conversation history, explore alternative paths, and replay past states.
+
+### What is Time Machine?
+
+Think of Time Machine as "version control for conversations." Just like developers can branch code, you can branch conversations to explore different directions without losing your original path.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  TIME MACHINE - TIMELINE SCRUBBER                                    │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  Main Timeline                                                       │
+│  ───●───●───●───●───●───●─── Present                                │
+│              │                                                       │
+│              └──●───●───●─── Fork: "What if we tried React?"        │
+│                     │                                                │
+│                     └──●───── Fork: "React with TypeScript"          │
+│                                                                      │
+│  [◀◀] [◀] [▶] [▶▶]  [📍 Checkpoint]  [🔀 Fork Here]               │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Creating a Checkpoint
+
+Checkpoints save the conversation state at a specific point:
+
+1. Click the **📍 Checkpoint** button in the Time Machine toolbar
+2. Give it a name (e.g., "Before major decision")
+3. The checkpoint appears on your timeline
+
+### Forking a Conversation
+
+Create an alternative branch from any checkpoint:
+
+1. Navigate to the checkpoint you want to branch from
+2. Click **🔀 Fork Here**
+3. Name your fork (e.g., "Alternative approach")
+4. Continue the conversation in your new branch
+
+### Timeline Navigation
+
+| Control | Action |
+|---------|--------|
+| **◀◀** | Jump to start |
+| **◀** | Previous checkpoint |
+| **▶** | Next checkpoint |
+| **▶▶** | Jump to present |
+| **Drag playhead** | Scrub through history |
+
+### Replaying Conversations
+
+Replay a conversation to see how it evolved:
+
+1. Select a timeline
+2. Click **▶ Replay**
+3. Watch messages appear in sequence
+4. Pause at any point to create a new fork
+
+### Use Cases
+
+| Scenario | How Time Machine Helps |
+|----------|----------------------|
+| **Exploring options** | Fork to try different approaches |
+| **What-if analysis** | Branch to test alternative scenarios |
+| **Decision tracking** | Checkpoint before major decisions |
+| **Training** | Replay conversations for learning |
+
+---
+
+## 16. The Grimoire - Procedural Memory
+
+The Grimoire is Think Tank's "spell book" - a collection of learned patterns and procedures that help the AI respond more effectively over time.
+
+### What is the Grimoire?
+
+When Think Tank discovers a successful pattern (like a good way to explain something or solve a problem), it can save it as a "spell" in the Grimoire for future use.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  📖 GRIMOIRE - SPELL LIBRARY                                         │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌────────────────────┐  ┌────────────────────┐                     │
+│  │ 💻 CODE            │  │ 📊 DATA            │                     │
+│  │ Programming tasks  │  │ Data processing    │                     │
+│  │ 12 spells          │  │ 8 spells           │                     │
+│  └────────────────────┘  └────────────────────┘                     │
+│                                                                      │
+│  ┌────────────────────┐  ┌────────────────────┐                     │
+│  │ 📝 TEXT            │  │ 🔍 ANALYSIS        │                     │
+│  │ Writing & editing  │  │ Research & insight │                     │
+│  │ 15 spells          │  │ 6 spells           │                     │
+│  └────────────────────┘  └────────────────────┘                     │
+│                                                                      │
+│  Recent Castings: SQL Optimizer ⭐⭐⭐ | JSON Fixer ⭐⭐⭐⭐⭐        │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Spell Schools
+
+| School | Icon | Purpose |
+|--------|------|---------|
+| **Code** | 💻 | Programming, debugging, and code generation |
+| **Data** | 📊 | Data processing, transformation, and queries |
+| **Text** | 📝 | Writing, editing, and content creation |
+| **Analysis** | 🔍 | Research, insights, and pattern recognition |
+| **Design** | 🎨 | UI/UX, visual layouts, and styling |
+| **Integration** | 🔗 | API connections, workflows, and pipelines |
+| **Automation** | ⚙️ | Repetitive tasks, batch operations |
+| **Universal** | 🌐 | General-purpose, cross-domain spells |
+
+### Spell Categories
+
+- **Prompt Optimization** - Better ways to ask questions
+- **Error Recovery** - Fixing common mistakes
+- **Context Management** - Handling conversation state
+- **Output Formatting** - Structuring responses
+
+### Power Levels
+
+Spells have power levels (⭐ to ⭐⭐⭐⭐⭐) based on:
+- Success rate
+- Times used
+- Tokens saved
+- User ratings
+
+### Promoting Patterns to Spells
+
+If you notice the AI doing something well repeatedly:
+
+1. Rate the response with 👍
+2. Add feedback: "This pattern is really helpful"
+3. The system may promote it to a spell
+4. Future conversations benefit from this pattern
+
+---
+
+## 17. Flash Facts - Quick Knowledge Capture
+
+Flash Facts lets you quickly save important information for the AI to remember.
+
+### What are Flash Facts?
+
+Flash Facts are bite-sized pieces of knowledge you want Think Tank to always remember about you, your work, or your preferences.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  ⚡ FLASH FACTS                                                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  Quick Add: [Type a fact and press Enter...]                        │
+│                                                                      │
+│  📌 Pinned Facts                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ "I work at Acme Corp as a Senior Developer"           [📌][🗑] │   │
+│  │ "Our tech stack is React + Node.js + PostgreSQL"      [📌][🗑] │   │
+│  │ "I prefer TypeScript over JavaScript"                 [📌][🗑] │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                      │
+│  📂 By Category                                                      │
+│  • Work Context (3)    • Technical Preferences (5)                  │
+│  • Personal (2)        • Project-Specific (4)                       │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Adding Flash Facts
+
+**Quick Method:**
+1. During any conversation, type: "Remember that [fact]"
+2. Think Tank saves it as a Flash Fact
+3. Example: "Remember that I prefer verbose error messages"
+
+**From the Interface:**
+1. Go to **Settings** → **Flash Facts**
+2. Type your fact in the quick-add field
+3. Press Enter or click Add
+
+### Flash Fact Categories
+
+| Category | Examples |
+|----------|----------|
+| **Work Context** | Company, role, team, projects |
+| **Technical** | Languages, frameworks, tools |
+| **Preferences** | Communication style, detail level |
+| **Personal** | Timezone, working hours |
+
+### Managing Flash Facts
+
+- **📌 Pin** - Keep fact always visible
+- **🗑️ Delete** - Remove outdated facts
+- **✏️ Edit** - Update fact details
+- **📂 Categorize** - Organize by topic
+
+---
+
+## 18. Sentinel Agents - Background Monitors
+
+Sentinel Agents are background processes that watch for specific conditions and take action automatically.
+
+### What are Sentinel Agents?
+
+Think of Sentinels as "if this, then that" for AI. They monitor your conversations and workflows, triggering actions when conditions are met.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  🛡️ SENTINEL AGENTS                                                  │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  Active Agents (3)                        [+ Create Agent]          │
+│                                                                      │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ 🔍 Code Quality Monitor                           [Active] ● │   │
+│  │ Triggers: When code is generated                            │   │
+│  │ Actions: Run linting, suggest improvements                   │   │
+│  │ Fired: 47 times | Last: 2 minutes ago                        │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                      │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ 📊 Data Freshness Checker                         [Active] ● │   │
+│  │ Triggers: When citing statistics                             │   │
+│  │ Actions: Verify data age, add freshness warning              │   │
+│  │ Fired: 12 times | Last: 1 hour ago                           │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Agent Types
+
+| Type | Icon | Purpose |
+|------|------|---------|
+| **Monitor** | 🔍 | Watch for patterns and report findings |
+| **Guardian** | 🛡️ | Prevent unwanted outcomes and enforce rules |
+| **Scout** | 🔭 | Proactively search for relevant information |
+| **Herald** | 📢 | Announce important events and notifications |
+| **Arbiter** | ⚖️ | Make decisions and resolve conflicts |
+
+### Creating a Sentinel Agent
+
+1. Go to **Settings** → **Sentinel Agents**
+2. Click **+ Create Agent**
+3. Define your trigger conditions
+4. Specify actions to take
+5. Set any additional conditions
+6. Activate the agent
+
+### Example Agents
+
+| Agent | Trigger | Action |
+|-------|---------|--------|
+| **Citation Checker** | When claims are made | Request sources |
+| **Cost Monitor** | When query cost exceeds $1 | Notify before proceeding |
+| **Security Scanner** | When code is generated | Check for vulnerabilities |
+| **Summary Generator** | After long conversations | Create summary |
+
+---
+
+## 19. Economic Governor - Cost Management
+
+The Economic Governor helps you manage AI costs by intelligently routing queries to the most cost-effective models.
+
+### Understanding Costs
+
+Different AI models have different costs:
+
+| Model Tier | Typical Cost | Best For |
+|------------|--------------|----------|
+| **Fast** (Sniper) | ~$0.01/query | Quick lookups, simple questions |
+| **Standard** | ~$0.05/query | Most conversations |
+| **Advanced** | ~$0.15/query | Complex analysis |
+| **Multi-Model** (War Room) | ~$0.50+/query | Critical decisions |
+
+### Automatic Routing
+
+The Economic Governor automatically routes your queries:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  💰 ECONOMIC GOVERNOR                                                │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  Your Query: "What's the capital of France?"                        │
+│                                                                      │
+│  Analysis:                                                           │
+│  ├─ Complexity: Low                                                  │
+│  ├─ Domain: General Knowledge                                        │
+│  └─ Recommendation: Sniper Mode ($0.01)                             │
+│                                                                      │
+│  [Use Recommended] [Escalate to Standard] [Force War Room]          │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Budget Controls
+
+Set spending limits:
+
+- **Daily Budget** - Maximum spend per day
+- **Query Limit** - Maximum cost per single query
+- **Notifications** - Alert when approaching limits
+
+### Arbitrage Rules
+
+Create rules to optimize costs:
+
+| Rule | Effect |
+|------|--------|
+| "Simple facts → Sniper" | Route factual lookups to fast models |
+| "Code review → Standard" | Use mid-tier for code analysis |
+| "Legal questions → Advanced" | Always use high-accuracy for legal |
+
+### Viewing Usage
+
+Go to **Profile** → **Usage** to see:
+- Total spend this period
+- Cost breakdown by model
+- Most expensive queries
+- Savings from optimization
+
+---
+
+## 20. Council of Rivals - Multi-Model Deliberation
+
+The Council of Rivals brings multiple AI perspectives together to debate and reach consensus on complex questions.
+
+### What is the Council?
+
+For important decisions, you can convene a "council" of different AI models, each offering their perspective on your question.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  ⚔️ COUNCIL OF RIVALS                                                │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  Question: "Should we migrate to microservices?"                    │
+│                                                                      │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐                   │
+│  │ Claude  │ │  GPT-4  │ │ Gemini  │ │ Mistral │                   │
+│  │   ✓     │ │   ✓     │ │   ✗     │ │   ~     │                   │
+│  │  Pro    │ │  Pro    │ │ Against │ │ Neutral │                   │
+│  └─────────┘ └─────────┘ └─────────┘ └─────────┘                   │
+│                                                                      │
+│  Consensus: 60% in favor | Key disagreement: Timeline               │
+│                                                                      │
+│  [View Full Debate] [Request Synthesis] [Add Expert]               │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Starting a Council Session
+
+1. Ask your question normally
+2. Click **Escalate to War Room** or type "I want multiple perspectives"
+3. Select which models to include (or use presets)
+4. Watch the deliberation unfold
+
+### Council Presets
+
+| Preset | Models | Best For |
+|--------|--------|----------|
+| **Technical Review** | Claude, GPT-4, Codex | Code decisions |
+| **Strategic** | Claude, GPT-4, Gemini | Business strategy |
+| **Creative** | Claude, GPT-4, Gemini Pro | Creative projects |
+| **Full Council** | All available models | Critical decisions |
+
+### Understanding Results
+
+- **Votes** - Each model's position (✓ Pro, ✗ Against, ~ Neutral)
+- **Consensus %** - Level of agreement
+- **Key Disagreements** - Points where models differ
+- **Synthesis** - Combined recommendation considering all views
+
+### When to Use Council
+
+| Scenario | Recommended |
+|----------|-------------|
+| Quick factual questions | No - use Sniper |
+| Important decisions | Yes |
+| When you want multiple viewpoints | Yes |
+| Validating a conclusion | Yes |
+
+---
+
+## 21. Voice Input & File Attachments
+
+Think Tank supports voice input and file attachments for richer interactions.
+
+### Voice Input
+
+Click the **🎤** microphone button to speak your message:
+
+1. **Click** the microphone icon
+2. **Speak** clearly into your microphone
+3. **Click again** to stop recording
+4. **Review** the transcription
+5. **Send** or edit before sending
+
+**Supported languages**: All 18 interface languages
+
+### File Attachments
+
+Attach files for the AI to analyze:
+
+1. **Click** the **📎** paperclip button
+2. **Select** files to upload
+3. **Wait** for processing
+4. **Ask** questions about the files
+
+### Supported File Types
+
+| Type | Extensions | What Think Tank Can Do |
+|------|------------|----------------------|
+| **Documents** | PDF, DOC, DOCX, TXT | Read, summarize, answer questions |
+| **Spreadsheets** | CSV, XLS, XLSX | Analyze data, create charts |
+| **Images** | JPG, PNG, GIF, WEBP | Describe, extract text, analyze |
+| **Code** | JS, PY, TS, etc. | Review, explain, debug |
+
+### Drag and Drop
+
+Simply drag files directly into the chat window to attach them.
+
+### File Size Limits
+
+| Plan | Max File Size | Max Files per Message |
+|------|--------------|----------------------|
+| Standard | 10 MB | 5 |
+| Pro | 50 MB | 10 |
+| Enterprise | 100 MB | 20 |
+
+---
+
+## 22. Keyboard Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
@@ -1042,7 +1485,7 @@ Think Tank includes multiple safety layers to protect you and your organization.
 
 ---
 
-## 16. Troubleshooting
+## 23. Troubleshooting
 
 ### Common Issues
 
@@ -1080,7 +1523,7 @@ Think Tank includes multiple safety layers to protect you and your organization.
 
 ---
 
-## 17. Glossary
+## 24. Glossary
 
 | Term | Definition |
 |------|------------|
@@ -1104,8 +1547,12 @@ Think Tank includes multiple safety layers to protect you and your organization.
 | **Magic Carpet** | Intent-based navigation system |
 | **My Rules** | Personal preferences that customize AI responses |
 | **Polymorphic UI** | Interface that adapts based on query type |
+| **Sentinel Agent** | Background process that monitors for conditions and triggers actions |
 | **Sniper Mode** | Fast, low-cost single-model execution |
+| **Spell** | A learned pattern in the Grimoire that improves AI responses |
 | **Steel-Man** | AI-generated strongest version of an opposing argument |
+| **Time Machine** | Conversation forking and replay system |
+| **Timeline** | A branch in Time Machine representing a conversation path |
 | **War Room** | Strategic Decision Theater for high-stakes collaborative decisions |
 | **War Room Mode** | Thorough multi-agent execution |
 
@@ -1120,6 +1567,7 @@ Think Tank includes multiple safety layers to protect you and your organization.
 | 5.43.0 | Jan 22, 2026 | Added Decision Records section (DIA Engine) |
 | 5.44.0 | Jan 22, 2026 | Added Living Parchment section (War Room, Council, Debate Arena) |
 | 5.52.0 | Jan 23, 2026 | Simulator now uses real API data with graceful fallbacks |
+| 5.52.52 | Jan 28, 2026 | Major update: Added Time Machine, Grimoire, Flash Facts, Sentinel Agents, Economic Governor, Council of Rivals, Voice Input & File Attachments sections |
 
 ---
 

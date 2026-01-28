@@ -10,7 +10,7 @@
  * Shows predicted next actions that are already pre-computed.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
@@ -28,12 +28,8 @@ import {
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import {
-  Tooltip,
-  TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
 } from '@/components/ui/tooltip';
 
 // Types
@@ -72,9 +68,10 @@ export function PreCognitionSuggestions({
   isActive = true,
   onSelectPrediction,
   onDismiss,
-  onToggleVisibility,
+  onToggleVisibility: _onToggleVisibility,
   className,
 }: PreCognitionSuggestionsProps) {
+  void _onToggleVisibility; // Reserved for visibility toggle
   const [isMinimized, setIsMinimized] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 

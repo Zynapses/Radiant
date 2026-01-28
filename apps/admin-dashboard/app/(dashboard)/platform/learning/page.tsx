@@ -8,18 +8,15 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Brain, 
-  Settings, 
   Clock, 
   TrendingUp, 
   Database,
   Zap,
   Target,
   MessageSquare,
-  ThumbsUp,
   ThumbsDown,
   Copy,
   RefreshCw,
@@ -27,7 +24,6 @@ import {
   Activity,
   CheckCircle2,
   AlertCircle,
-  Info,
 } from 'lucide-react';
 
 // ============================================================================
@@ -186,10 +182,11 @@ export default function EnhancedLearningPage() {
     return `${h}:00 ${ampm}`;
   };
 
-  const formatDay = (day: number) => {
+  const _formatDay = (day: number) => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     return day >= 0 && day < 7 ? days[day] : 'Any day';
   };
+  void _formatDay; // Reserved for day formatting
 
   if (loading) {
     return (

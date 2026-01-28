@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import * as orchestrationApi from '@/lib/api/orchestration-patterns';
-import type { OrchestrationPattern, PatternCategory, OrchestrationMethod } from '@/lib/api/orchestration-patterns';
+import type { OrchestrationPattern } from '@/lib/api/orchestration-patterns';
 import { Loader2, Search, Plus, LayoutGrid, Settings, Users } from 'lucide-react';
 
 export default function OrchestrationPatternsPage() {

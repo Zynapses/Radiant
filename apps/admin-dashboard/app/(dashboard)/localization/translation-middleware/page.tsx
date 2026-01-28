@@ -17,8 +17,7 @@ import {
   Database,
   Trash2,
   TestTube,
-  CheckCircle,
-  XCircle
+  CheckCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 

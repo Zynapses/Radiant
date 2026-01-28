@@ -19,7 +19,6 @@ import {
   Zap,
   Shield,
   Brain,
-  MessageSquare,
   BarChart3,
 } from 'lucide-react';
 

@@ -37,12 +37,10 @@ import {
   MessageCircleQuestion,
   Settings,
   TrendingUp,
-  Users,
   RefreshCw,
   CheckCircle,
   XCircle,
   Clock,
-  AlertTriangle,
 } from 'lucide-react';
 
 interface ScoutConfig {
@@ -83,7 +81,8 @@ export default function ScoutHITLPage() {
   });
   const [sessions, setSessions] = useState<ScoutSession[]>([]);
   const [stats, setStats] = useState<ScoutStatistics | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
+  void _loading; // Reserved for loading state
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {

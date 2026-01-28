@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
-  Settings, 
   RefreshCw,
   Save,
   User,
@@ -11,7 +10,6 @@ import {
   Bell,
   Palette,
   Key,
-  Globe,
   Rocket,
   Clock
 } from 'lucide-react';
@@ -54,7 +52,7 @@ export function SettingsClient() {
   const [activeTab, setActiveTab] = useState('profile');
   const queryClient = useQueryClient();
 
-  const { data: settings, isLoading } = useQuery({
+  const { data: settings, isLoading: _isLoading } = useQuery({
     queryKey: ['settings'],
     queryFn: async (): Promise<UserSettings> => {
       return apiClient.get<UserSettings>('/admin/settings');

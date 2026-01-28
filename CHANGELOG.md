@@ -5,6 +5,205 @@ All notable changes to RADIANT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.52.53] - 2026-01-28
+
+### Fixed
+
+#### Frontend/Backend API Alignment
+
+**Economic Governor** (`apps/thinktank/lib/api/governor.ts`):
+- Rewrote entire API client to match actual backend routes (`/governor` not `/economic-governor`)
+- Added all missing methods: `getDashboard`, `getConfig`, `updateConfig`, `setMode`, `recommendModel`, `getMetrics`, `getBudget`, `updateBudget`, `getTiers`, `updateTier`, `getRules`, `addRule`, `updateRule`, `deleteRule`
+- Added comprehensive TypeScript types: `GovernorDashboard`, `GovernorConfig`, `CostMetrics`, `FuelGauge`, `ModeIndicator`, `SavingsSparkline`, `ModelTier`, `ArbitrageRule`, `ModelRecommendation`, `BudgetStatus`
+- Deprecated old methods (`getRecentDecisions`, `getSavingsHistory`) with proper fallbacks
+
+**Time Travel Handler** (`lambda/thinktank/time-travel.ts`):
+- Added `listCheckpoints` - GET `/timelines/:id/checkpoints`
+- Added `restoreCheckpoint` - POST `/timelines/:id/checkpoints/:id/restore`
+- Added `compareTimelines` - GET `/compare?timeline1=...&timeline2=...`
+- Added `updateCheckpoint` - PATCH `/timelines/:id/checkpoints/:id`
+- Added `deleteTimeline` - DELETE `/timelines/:id`
+
+**Grimoire Handler** (`lambda/thinktank/grimoire.ts`):
+- Added `executeSpell` - POST `/grimoire/execute` (renders incantation with variables)
+- Added `getFeaturedSpells` - GET `/grimoire/featured` (sorted by usage/success)
+- Added `rateSpell` - POST `/grimoire/spells/:id/rate`
+
+**Flash Facts Handler** (`lambda/thinktank/flash-facts.ts`):
+- Added `confirmFact` - POST `/flash-facts/:id/confirm` (user verification)
+- Added `createCollection` - POST `/flash-facts/collections`
+- Added `addToCollection` - POST `/flash-facts/collections/:id/add`
+- Added `searchFacts` - GET `/flash-facts/search?q=...` (semantic search)
+
+### Documentation
+
+#### Documentation/Code Alignment
+
+**Think Tank User Guide** (`docs/THINKTANK-USER-GUIDE.md`):
+- Fixed spell schools to match implementation: Code, Data, Text, Analysis, Design, Integration, Automation, Universal (was: Divination, Evocation, Transmutation, etc.)
+- Fixed agent types to match implementation: Monitor, Guardian, Scout, Herald, Arbiter (was: Monitor, Guardian, Optimizer, Auditor)
+- Updated ASCII art diagrams to reflect actual school names
+
+**Engineering Implementation Vision** (`docs/ENGINEERING-IMPLEMENTATION-VISION.md`):
+- Fixed table names in Section 22.7 to match migration `100_thinktank_advanced_features.sql`:
+  - `timelines` → `time_travel_timelines`
+  - `timeline_checkpoints` → `time_travel_checkpoints`
+  - `economic_routing_rules` → `economic_governor_config`
+- Added missing tables: `time_travel_forks`, `grimoire_casts`, `economic_governor_usage`, `council_of_rivals`, `council_debates`
+- Fixed column names to match actual schema
+
+---
+
+## [5.52.52] - 2026-01-28
+
+### Documentation
+
+- **Think Tank Code Check** (`docs/THINKTANK-CODE-CHECK.md`): Complete code inventory document for AI analysis including:
+  - Full architecture diagram with all layers
+  - 41 backend API handlers documented with file sizes
+  - 19 frontend API client modules
+  - All 15 chat components with line counts
+  - Database schema with 12+ tables
+  - Complete API endpoint reference (100+ endpoints)
+  - TypeScript interfaces for all major types
+  - State management with Zustand stores
+  - Configuration files documented
+  - Known implementation gaps and recent fixes
+
+- **Think Tank User Guide** (`docs/THINKTANK-USER-GUIDE.md`): Major update with 7 new sections:
+  - Section 15: Time Machine - Conversation Forking (checkpoints, timelines, replay)
+  - Section 16: The Grimoire - Procedural Memory (spell schools, power levels)
+  - Section 17: Flash Facts - Quick Knowledge Capture
+  - Section 18: Sentinel Agents - Background Monitors (types, triggers, actions)
+  - Section 19: Economic Governor - Cost Management (tiers, routing, budgets)
+  - Section 20: Council of Rivals - Multi-Model Deliberation
+  - Section 21: Voice Input & File Attachments
+  - Updated glossary with 4 new terms
+  - Version bump to 5.52.52
+
+- **Engineering Implementation Vision** (`docs/ENGINEERING-IMPLEMENTATION-VISION.md`): New Section 22 - Think Tank Application Architecture:
+  - Complete system architecture diagram
+  - Technology stack with versions
+  - Frontend structure (Next.js App Router, components, stores)
+  - Backend handler architecture (41 handlers inventory)
+  - Full API endpoint reference (50+ endpoints across 6 categories)
+  - Key TypeScript interfaces (ChatMessage, Conversation, Timeline, Spell, etc.)
+  - Database schema with RLS policies
+  - State management patterns (Zustand)
+  - Streaming architecture (SSE)
+  - Feature implementation file mapping
+  - Version bump to 5.52.52
+
+- **Think Tank Admin Guide** (`docs/THINKTANK-ADMIN-GUIDE.md`): 5 new admin sections:
+  - Section 47: Time Machine Administration (config, tables, endpoints)
+  - Section 48: Grimoire Administration (spell schools, lifecycle, actions)
+  - Section 49: Sentinel Agents Administration (types, triggers, actions)
+  - Section 50: Economic Governor Administration (tiers, rules, analytics)
+  - Section 51: Flash Facts Administration (categories, limits)
+  - Version bump to 3.11.0
+
+---
+
+## [5.52.51] - 2026-01-28
+
+### Documentation
+
+- **Curator Engineering Guide** (`docs/CURATOR-ENGINEERING-GUIDE.md`): Comprehensive engineering documentation for the Curator knowledge curation app including:
+  - Complete architecture overview with component diagrams
+  - All 8 UI pages documented with TypeScript interfaces
+  - Full API reference (40+ endpoints across 12 categories)
+  - Database schema for 7 core tables
+  - Core feature documentation: Entrance Exam, Golden Rules, Chain of Custody, Zero-Copy Indexing
+  - User flow diagrams for ingestion, verification, and override processes
+  - Styling system with Curator color palette
+  - Security model with RLS and audit logging
+
+---
+
+## [5.52.50] - 2026-01-28
+
+### Fixed
+
+#### Service Method Implementation Bugs
+
+**TimeTravelService** (`time-travel.service.ts`):
+- Added missing `replayCheckpoints()` method for timeline replay functionality
+- Fixed handler calling non-existent `fork()` → now correctly calls `forkTimeline()`
+- Fixed handler calling non-existent `replay()` → now correctly calls `replayCheckpoints()`
+
+**SentinelAgentService** (`sentinel-agent.service.ts`):
+- Added missing `getAllEvents()` method for unified event stream
+- Added missing `getStats()` method with `triggersToday` and `byType` fields
+- Fixed handler type assertions (`as any`) replaced with proper typed calls
+
+**EconomicGovernorService** (`economic-governor.service.ts`):
+- Added missing `addArbitrageRule()` method for creating arbitrage rules
+- Added missing `updateArbitrageRule()` method for modifying rules
+- Added missing `deleteArbitrageRule()` method for removing rules
+- Added `priority` field to `ArbitrageRule` interface
+- Fixed handler type assertions (`as any`) replaced with proper typed calls
+
+**GrimoireService** (`grimoire.service.ts`):
+- Added missing `querySpells()` method with search capability
+- Added missing `findSpellByPattern()` method for pattern matching
+- Added missing `getGrimoire()` method returning user's spell collection with mastery stats
+- Added missing `promoteToSpell()` method for creating new spells
+
+**UserPersistentContextService** (`user-persistent-context.service.ts`):
+- Added `createContext()` alias method for compatibility with handler calls
+
+**ResultDerivationService** (`result-derivation.service.ts`):
+- Added missing `compareDerivations()` method for side-by-side derivation comparison
+- Returns cost, duration, and quality differences with winner determination
+
+**Handler Fixes**:
+- `thinktank/time-travel.ts` - Fixed `forkTimeline` and `replayTimeline` function calls
+- `thinktank/sentinel-agents.ts` - Fixed `listAgents`, `getAllEvents`, `getStats` function calls
+- `thinktank/economic-governor.ts` - Fixed `addRule`, `updateRule`, `deleteRule` function calls
+- `thinktank/grimoire.ts` - Fixed `querySpells`, `castSpell`, `findSpellByPattern`, `getGrimoire`, `learnFromFailure` function calls
+- `thinktank/derivation-history.ts` - Added proper `compareDerivations` handler function
+- `thinktank/user-context.ts` - Fixed router to use `addUserContext` handler instead of calling service directly
+
+---
+
+## [5.52.49] - 2026-01-27
+
+### Documentation
+
+#### Unified AGI Architecture Documentation Refresh
+
+Comprehensive documentation update to add the "Code-Validated Architecture Overview: Brain, Genesis, Cortex, and Cato" across all documentation sets.
+
+**Updated Documents**:
+- `ENGINEERING-IMPLEMENTATION-VISION.md` - Added Section 21 with full engineering detail (~750 lines)
+- `RADIANT-PLATFORM-ARCHITECTURE.md` - Added Section 1.6.1 with architecture overview and diagrams
+- `RADIANT-ADMIN-GUIDE.md` - Added Section 31A.8 with admin-focused configuration guide
+- `THINKTANK-ADMIN-GUIDE.md` - Added Section 46 with user-facing Cortex/Cato features
+- `STRATEGIC-VISION-MARKETING.md` - Added "Four Pillars" marketing section with competitive moats
+
+**Documented Subsystems**:
+
+| System | Purpose | Key Service |
+|--------|---------|-------------|
+| **Brain** | AGI planning, cognitive mesh, model orchestration | `agi-brain-planner.service.ts` |
+| **Genesis** | Developmental gates, capability unlocking, maturity stages | `cato/genesis.service.ts` |
+| **Cortex** | Tiered memory (Hot/Warm/Cold), knowledge graph, Graph-RAG | `cortex-intelligence.service.ts` |
+| **Cato** | Safety pipeline, CBFs, governance presets, HITL checkpoints | `cato/safety-pipeline.service.ts` |
+
+**Key Concepts Documented**:
+- Governance presets (PARANOID/BALANCED/COWBOY)
+- Genesis maturity stages (G1-G5: Embryonic → Mature)
+- Cortex memory tiers (Hot <10ms / Warm <100ms / Cold <2s)
+- Cato safety pipeline (6 steps: Sensory Veto → Fracture Detection)
+- Control Barrier Functions (immutable safety constraints)
+- Cato-Cortex Bridge (memory sync + GDPR erasure)
+- Competitive moats (Knowledge Gravity, Verified Intelligence, etc.)
+
+**Cross-References**:
+All documents now link to `ENGINEERING-IMPLEMENTATION-VISION.md Section 21` for full engineering reference.
+
+---
+
 ## [5.52.48] - 2026-01-27
 
 ### Added

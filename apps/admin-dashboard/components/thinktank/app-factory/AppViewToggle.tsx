@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { MessageSquare, Sparkles, Columns, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MessageSquare, Sparkles, Columns } from 'lucide-react';
 
 interface AppViewToggleProps {
   activeView: 'text' | 'app' | 'split';

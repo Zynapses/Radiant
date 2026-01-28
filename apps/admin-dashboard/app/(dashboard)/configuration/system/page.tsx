@@ -31,8 +31,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
   Clock,
@@ -51,11 +49,9 @@ import {
   Info,
   AlertTriangle,
   Check,
-  X,
   ChevronRight,
   Settings2,
   Loader2,
-  ExternalLink,
 } from 'lucide-react';
 
 // Icon mapping

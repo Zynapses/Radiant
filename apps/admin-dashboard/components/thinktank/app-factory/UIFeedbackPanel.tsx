@@ -434,7 +434,8 @@ interface FeedbackStatsBadgeProps {
   className?: string;
 }
 
-export function FeedbackStatsBadge({ appId, className }: FeedbackStatsBadgeProps) {
+export function FeedbackStatsBadge({ appId: _appId, className }: FeedbackStatsBadgeProps) {
+  void _appId; // Reserved for API fetch
   // In a real implementation, this would fetch from the API
   const stats = {
     positive: 12,

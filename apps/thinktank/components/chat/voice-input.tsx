@@ -38,6 +38,44 @@ export function VoiceInput({
   const animationFrameRef = useRef<number | null>(null);
   const durationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  const processAudio = useCallback(async (audioBlob: Blob) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', audioBlob, 'audio.webm');
+      formData.append('model', 'whisper-1');
+      formData.append('language', language);
+
+      const response = await fetch('/api/thinktank/voice/transcribe', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Transcription failed');
+      }
+
+      const data = await response.json();
+      
+      if (data.text) {
+        onTranscript(data.text);
+        setState('idle');
+      } else {
+        throw new Error('No transcription returned');
+      }
+    } catch (err) {
+      console.error('Transcription error:', err);
+      setErrorMessage('Failed to transcribe audio');
+      setState('error');
+      onError?.('Failed to transcribe audio');
+      
+      // Reset after 3 seconds
+      setTimeout(() => {
+        setState('idle');
+        setErrorMessage(null);
+      }, 3000);
+    }
+  }, [language, onTranscript, onError]);
+
   const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -108,7 +146,7 @@ export function VoiceInput({
       setState('error');
       onError?.('Microphone access denied');
     }
-  }, [onError]);
+  }, [onError, processAudio]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && state === 'recording') {
@@ -119,43 +157,6 @@ export function VoiceInput({
     }
   }, [state]);
 
-  const processAudio = async (audioBlob: Blob) => {
-    try {
-      const formData = new FormData();
-      formData.append('file', audioBlob, 'audio.webm');
-      formData.append('model', 'whisper-1');
-      formData.append('language', language);
-
-      const response = await fetch('/api/thinktank/voice/transcribe', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Transcription failed');
-      }
-
-      const data = await response.json();
-      
-      if (data.text) {
-        onTranscript(data.text);
-        setState('idle');
-      } else {
-        throw new Error('No transcription returned');
-      }
-    } catch (err) {
-      console.error('Transcription error:', err);
-      setErrorMessage('Failed to transcribe audio');
-      setState('error');
-      onError?.('Failed to transcribe audio');
-      
-      // Reset after 3 seconds
-      setTimeout(() => {
-        setState('idle');
-        setErrorMessage(null);
-      }, 3000);
-    }
-  };
 
   const cancelRecording = useCallback(() => {
     if (mediaRecorderRef.current && state === 'recording') {

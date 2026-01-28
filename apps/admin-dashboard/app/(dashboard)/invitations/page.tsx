@@ -14,12 +14,8 @@ import { toast } from 'sonner';
 import { 
   Mail, 
   UserPlus,
-  Clock,
-  CheckCircle,
-  XCircle,
   RefreshCw,
   Send,
-  Copy,
   Trash2,
 } from 'lucide-react';
 
@@ -68,6 +64,7 @@ export default function InvitationsPage() {
   const [newEmail, setNewEmail] = useState('');
   const [newRole, setNewRole] = useState('user');
   const [newTenant, setNewTenant] = useState('');
+  void setNewTenant; // Reserved for tenant selection input
 
   const { data: invitations = [], isLoading } = useQuery({
     queryKey: ['invitations'],

@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Brain, Sparkles, Zap, Search, Workflow, Clock, DollarSign,
-  RefreshCw, Play, Settings, ChevronRight, Activity, Database,
-  MessageSquare, Lightbulb, Target, TrendingUp, AlertCircle,
-  CheckCircle, XCircle, Loader2, Bot, Globe, FileText, Cpu
+  Brain, Zap, Search, Workflow, Clock, DollarSign,
+  RefreshCw, Play, Activity, Database,
+  Lightbulb, TrendingUp, AlertCircle,
+  CheckCircle, XCircle, Loader2, Bot
 } from 'lucide-react';
 
 interface DashboardData {

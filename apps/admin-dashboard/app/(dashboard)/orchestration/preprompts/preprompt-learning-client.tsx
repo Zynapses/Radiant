@@ -12,12 +12,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Table,
   TableBody,
@@ -35,13 +32,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -58,17 +48,13 @@ import {
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
-  Legend,
 } from 'recharts';
 import {
   Brain,
   Sparkles,
-  Settings,
   TrendingUp,
-  TrendingDown,
   AlertTriangle,
   CheckCircle,
-  XCircle,
   ThumbsUp,
   ThumbsDown,
   MessageSquare,
@@ -86,8 +72,6 @@ import {
   Search,
   FlaskConical,
   Info,
-  ChevronDown,
-  ChevronUp,
   Star,
   Edit,
   Eye,
@@ -195,7 +179,8 @@ export function PrepromptLearningClient() {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedTemplate, setSelectedTemplate] = useState<PrepromptTemplate | null>(null);
   const [showWeightsDialog, setShowWeightsDialog] = useState(false);
-  const [editedWeights, setEditedWeights] = useState<Record<string, number>>({});
+  const [_editedWeights, setEditedWeights] = useState<Record<string, number>>({});
+  void _editedWeights; // Reserved for weight editing tracking
   const queryClient = useQueryClient();
 
   const handleWeightChange = (key: string, value: number) => {

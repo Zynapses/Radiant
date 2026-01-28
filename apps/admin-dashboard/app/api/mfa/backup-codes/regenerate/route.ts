@@ -7,7 +7,7 @@ import { cookies } from 'next/headers';
 
 const API_BASE = process.env.INTERNAL_API_URL || 'http://localhost:3001';
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;

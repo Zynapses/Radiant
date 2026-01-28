@@ -70,7 +70,7 @@ export function FileAttachments({
     return File;
   };
 
-  const validateFile = (file: File): string | null => {
+  const validateFile = useCallback((file: File): string | null => {
     if (file.size > maxSizeBytes) {
       return `File too large (max ${Math.round(maxSizeBytes / 1024 / 1024)}MB)`;
     }
@@ -87,7 +87,7 @@ export function FileAttachments({
     }
     
     return null;
-  };
+  }, [maxSizeBytes, acceptedTypes]);
 
   const createPreview = async (file: File): Promise<string | undefined> => {
     if (file.type.startsWith('image/')) {
@@ -124,7 +124,7 @@ export function FileAttachments({
     const updatedFiles = [...files, ...newAttachments];
     setFiles(updatedFiles);
     onFilesChange(updatedFiles);
-  }, [files, maxFiles, onFilesChange]);
+  }, [files, maxFiles, onFilesChange, validateFile]);
 
   const removeFile = useCallback((id: string) => {
     const updatedFiles = files.filter(f => f.id !== id);

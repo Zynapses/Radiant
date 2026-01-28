@@ -48,7 +48,8 @@ function formatCurrency(amount: number): string {
 export function GeographicClient() {
   const { toast } = useToast();
   const [timeRange, setTimeRange] = useState('30d');
-  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [_selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  void _selectedRegion; // Reserved for region details display
 
   const handleRegionClick = useCallback((code: string) => {
     setSelectedRegion(code);

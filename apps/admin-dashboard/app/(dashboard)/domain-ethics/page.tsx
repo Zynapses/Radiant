@@ -1,25 +1,18 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from 'sonner';
 import { 
   Scale, 
   Shield,
   BookOpen,
   Settings,
   RefreshCw,
-  Save,
-  CheckCircle,
-  AlertTriangle,
 } from 'lucide-react';
 
 interface EthicsFramework {
@@ -56,7 +49,8 @@ async function fetchDomainConfigs(): Promise<DomainEthicsConfig[]> {
 }
 
 export default function DomainEthicsPage() {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
+  void _queryClient; // Reserved for future mutations
 
   const { data: frameworks = [], isLoading: frameworksLoading } = useQuery({
     queryKey: ['ethics-frameworks'],

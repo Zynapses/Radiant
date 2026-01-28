@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { cn, formatCurrency, formatCompactNumber } from '@/lib/utils';
+import { formatCurrency, formatCompactNumber } from '@/lib/utils';
 import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface MetricCardProps {

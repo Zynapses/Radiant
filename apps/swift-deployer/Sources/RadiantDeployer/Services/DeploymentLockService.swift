@@ -307,7 +307,7 @@ actor DeploymentLockService {
         environment: String,
         operation: @Sendable () async throws -> T
     ) async throws -> T {
-        let lock = try await acquireLock(appId: appId, environment: environment)
+        _ = try await acquireLock(appId: appId, environment: environment)
         
         defer {
             Task {

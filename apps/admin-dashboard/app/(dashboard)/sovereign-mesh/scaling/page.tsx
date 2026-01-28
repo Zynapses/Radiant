@@ -5,18 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { 
-  Activity, AlertTriangle, ArrowUpRight, ArrowDownRight, BarChart3, 
-  CheckCircle2, Clock, Cloud, Cpu, Database, DollarSign, Globe, 
-  HardDrive, Layers, LineChart, MemoryStick, RefreshCw, Server, 
-  Settings, Shield, TrendingUp, Users, Zap, Play, Pause, History
+  AlertTriangle, BarChart3, 
+  CheckCircle2, Cpu, Database, DollarSign, Globe, 
+  Layers, MemoryStick, RefreshCw, Server, 
+  TrendingUp, Users
 } from 'lucide-react';
 
 interface ScalingProfile {
@@ -88,11 +85,13 @@ const TIER_LABELS = {
 
 export default function SovereignMeshScalingPage() {
   const [dashboard, setDashboard] = useState<ScalingDashboard | null>(null);
-  const [profiles, setProfiles] = useState<ScalingProfile[]>([]);
+  const [_profiles, setProfiles] = useState<ScalingProfile[]>();
+  void _profiles; // Reserved for profiles display
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
-  const [selectedTier, setSelectedTier] = useState<string | null>(null);
+  const [_selectedTier, setSelectedTier] = useState<string | null>(null);
+  void _selectedTier; // Reserved for tier selection
 
   const fetchData = useCallback(async () => {
     setLoading(true);

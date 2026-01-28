@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Calculator, DollarSign, Percent, RefreshCw, Info } from 'lucide-react';
+import { Calculator, DollarSign, RefreshCw, Info } from 'lucide-react';
 
 interface CalculatorInput {
   id: string;
@@ -103,16 +103,17 @@ const FORMULAS: Record<string, (inputs: Record<string, number>) => Record<string
  * This component IS the calculator.
  */
 export function GeneratedCalculator({
-  id,
+  id: _id,
   title,
   description,
   inputs,
   outputs,
   formula,
-  config,
+  config: _config,
   onInteraction,
-  theme = 'auto',
+  theme: _theme = 'auto',
 }: CalculatorComponentProps) {
+  void _id; void _config; void _theme; // Reserved for calculator configuration
   // Initialize state from default values
   const initialValues = useMemo(() => {
     const values: Record<string, unknown> = {};

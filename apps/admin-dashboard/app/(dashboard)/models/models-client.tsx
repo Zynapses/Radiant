@@ -7,22 +7,16 @@ import {
   Search, 
   RefreshCw,
   Zap,
-  DollarSign,
   Activity,
-  Settings,
-  Power,
-  PowerOff,
   Edit,
   Server,
   Cloud,
   Thermometer,
-  Shield,
   CheckCircle,
   XCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { 
@@ -77,7 +71,7 @@ export function ModelsClient() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: models, isLoading } = useQuery({
+  const { data: models, isLoading: _isLoading } = useQuery({
     queryKey: ['models'],
     queryFn: async (): Promise<Model[]> => {
       return apiClient.get<Model[]>('/admin/models');
@@ -170,7 +164,8 @@ export function ModelsClient() {
     }
   };
 
-  const formatCost = (cost: number) => `$${cost.toFixed(4)}`;
+  const _formatCost = (cost: number) => `$${cost.toFixed(4)}`;
+  void _formatCost; // Reserved for cost formatting
 
   const activeModels = models?.filter(m => m.status === 'active').length ?? 0;
   const totalModels = models?.length ?? 0;

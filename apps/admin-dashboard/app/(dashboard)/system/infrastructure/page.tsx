@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
@@ -44,7 +43,6 @@ import {
   Settings,
   Shield,
   Zap,
-  Database,
   Cloud
 } from 'lucide-react';
 import { LatencyHeatmap, type RegionLatency } from '@/components/geographic/latency-heatmap';
@@ -181,22 +179,6 @@ export default function InfrastructureTierPage() {
       console.error('Failed to fetch data:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const pollTransitionStatus = async () => {
-    try {
-      const res = await fetch('/api/admin/infrastructure/tier/transition-status');
-      if (res.ok) {
-        const status = await res.json();
-        if (status.status === 'STABLE') {
-          setIsTransitioning(false);
-          setTransitionProgress(100);
-          fetchData();
-        }
-      }
-    } catch {
-      // Continue polling
     }
   };
 
@@ -421,7 +403,7 @@ export default function InfrastructureTierPage() {
       <LatencyHeatmap
         regions={regionLatencies}
         title="Global Infrastructure Latency"
-        onRegionClick={(region) => { /* Navigate to region detail */ }}
+        onRegionClick={(_region) => { /* Navigate to region detail */ }}
       />
 
       {/* Transition Progress */}

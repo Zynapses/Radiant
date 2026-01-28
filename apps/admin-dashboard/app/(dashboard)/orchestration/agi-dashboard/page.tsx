@@ -13,8 +13,6 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -23,13 +21,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import {
@@ -210,7 +201,9 @@ const SERVICE_COLORS: Record<string, string> = {
 
 export default function AGIDashboardPage() {
   const queryClient = useQueryClient();
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [_selectedService, _setSelectedService] = useState<string | null>(null);
+  void _selectedService; // Reserved for service detail view
+  void _setSelectedService;
   const [localWeights, setLocalWeights] = useState<ServiceWeight[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
 

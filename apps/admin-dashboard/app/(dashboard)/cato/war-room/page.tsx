@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
@@ -18,12 +17,9 @@ import {
   Pause,
   SkipForward,
   Users,
-  MessageSquare,
   Award,
-  Clock,
   Zap,
   Brain,
-  Shield,
   Lightbulb,
   Scale,
   ThumbsUp,

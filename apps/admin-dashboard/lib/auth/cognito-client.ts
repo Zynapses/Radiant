@@ -209,6 +209,10 @@ class CognitoAuthClient {
     this.onTokenRefresh = config.onTokenRefresh;
     this.onError = config.onError;
     
+    // Suppress unused warnings for reserved properties
+    void this.userPoolId;
+    void this.onError;
+    
     this.log('CognitoAuthClient initialized', { region: this.region, clientId: this.clientId ? '***' : 'missing' });
   }
 
@@ -449,11 +453,6 @@ class CognitoAuthClient {
   private setAuthState(state: AuthState): void {
     this.log(`Auth state: ${state}`);
     this.onAuthStateChange?.(state);
-  }
-
-  private handleError(error: AuthError): never {
-    this.onError?.(error);
-    throw error;
   }
 
   // ============================================================================
